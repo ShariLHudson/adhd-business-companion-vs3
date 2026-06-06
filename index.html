@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ADHD Business Companion</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <section class="hero" aria-labelledby="page-title">
+        <p class="eyebrow">Daily shutdown</p>
+        <h1 id="page-title">Prepare tomorrow without forcing a fit.</h1>
+        <p>
+          Pick the start that supports your real energy, unfinished work, or
+          need to decide later.
+        </p>
+      </section>
+
+      <section class="card" aria-labelledby="today-focus-title">
+        <h2 id="today-focus-title">Today's focus</h2>
+        <p class="muted">
+          If you choose to continue where you left off, this is what your
+          companion will offer back tomorrow.
+        </p>
+        <label class="field">
+          <span>What had your attention today?</span>
+          <input
+            data-today-focus
+            type="text"
+            placeholder="Example: Drafting the sales page"
+          />
+        </label>
+      </section>
+
+      <section class="card" aria-labelledby="tomorrow-start-title">
+        <div class="section-heading">
+          <div>
+            <p class="eyebrow">Tomorrow setup</p>
+            <h2 id="tomorrow-start-title">How would you like to begin tomorrow?</h2>
+          </div>
+          <p class="muted">
+            Choose a guided start, continue today's work, write your own note,
+            or leave the decision for tomorrow.
+          </p>
+        </div>
+
+        <form data-tomorrow-start-form>
+          <div class="start-grid" data-start-style-options></div>
+
+          <div class="note-panel" data-plan-note-panel hidden>
+            <label class="field">
+              <span data-plan-note-prompt></span>
+              <textarea
+                data-plan-note
+                rows="4"
+                placeholder="Finish sales page."
+              ></textarea>
+            </label>
+            <div class="examples" aria-label="Examples">
+              <span>Examples</span>
+              <ul data-plan-note-examples></ul>
+            </div>
+          </div>
+
+          <p class="error" data-form-error hidden></p>
+          <p class="saved" data-saved-message aria-live="polite"></p>
+
+          <button type="submit">Save tomorrow's start</button>
+        </form>
+      </section>
+
+      <aside class="card next-morning" aria-labelledby="next-morning-title">
+        <p class="eyebrow">Next morning display</p>
+        <h2 id="next-morning-title">Tomorrow's first nudge</h2>
+        <p data-next-morning-reminder>No tomorrow start has been saved yet.</p>
+      </aside>
+    </main>
+
+    <script type="module" src="./src/app.js"></script>
+  </body>
+</html>
