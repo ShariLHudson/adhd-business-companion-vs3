@@ -1,0 +1,53 @@
+{
+  "base": "/backgrounds",
+  "description": "Spark Studio Companions — public background image library. Canonical TypeScript catalog: lib/backgroundLibrary.ts",
+  "categories": {
+    "hub": "Energy-based and default workspace overlays (root folder)",
+    "today": "Morning / afternoon today scenes",
+    "evening": "Evening and night wind-down",
+    "focus": "Focus session and deep-work atmosphere",
+    "business": "Business playbook surfaces",
+    "progress": "Wins, momentum, breathe / calm",
+    "recovery": "Low-capacity and overwhelm reset"
+  },
+  "hubSelection": {
+    "highEnergy": "/backgrounds/high-energy-bg.png",
+    "lowEnergy": "/backgrounds/low-energy-bg.png",
+    "morning": "/backgrounds/today/morning-bg.png",
+    "afternoon": "/backgrounds/today/afternoon-bg.png",
+    "evening": "/backgrounds/evening/evening-bg.png",
+    "night": "/backgrounds/evening/night-bg.png"
+  },
+  "files": [
+    "/backgrounds/high-energy-bg.png",
+    "/backgrounds/low-energy-bg.png",
+    "/backgrounds/overwhelm-reset-bg.png",
+    "/backgrounds/today/morning-bg.png",
+    "/backgrounds/today/afternoon-bg.png",
+    "/backgrounds/today/background_01.png",
+    "/backgrounds/today/background_02.png",
+    "/backgrounds/today/background_03.png",
+    "/backgrounds/today/background_04.png",
+    "/backgrounds/today/background_05.png",
+    "/backgrounds/evening/evening-bg.png",
+    "/backgrounds/evening/night-bg.png",
+    "/backgrounds/evening/living-room-at-twilight-bg.png",
+    "/backgrounds/focus/background_06.png",
+    "/backgrounds/focus/background_07.png",
+    "/backgrounds/focus/background_08.png",
+    "/backgrounds/focus/background_14.png",
+    "/backgrounds/focus/background_15.png",
+    "/backgrounds/focus/background_16.png",
+    "/backgrounds/focus/background_17.png",
+    "/backgrounds/business/background_18.png",
+    "/backgrounds/business/background_19.png",
+    "/backgrounds/business/background_20.png",
+    "/backgrounds/progress/serene-sunrise-bg.png",
+    "/backgrounds/progress/blue-sky-clouds-bg.png",
+    "/backgrounds/progress/background_10.png",
+    "/backgrounds/progress/background_12.png",
+    "/backgrounds/recovery/background_09.png",
+    "/backgrounds/recovery/background_11.png",
+    "/backgrounds/recovery/background_13.png"
+  ]
+}
