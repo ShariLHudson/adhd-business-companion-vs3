@@ -12,8 +12,12 @@ type SimpleChatProps = {
   stateHint: string | null;
   showHint: boolean;
   isLoading: boolean;
+  // Home owns cold-open copy (starters / continue) — skip the default empty line.
+  hideEmptyState?: boolean;
   // Kept for compatibility; assistant text is parsed directly below.
   formatParagraphs?: (content: string) => string[];
+  /** Founder-test: render directly under Shari's latest reply (conversation thread). */
+  afterLastAssistant?: ReactNode;
 };
 
 // Render **bold** spans within a line of text.
@@ -79,8 +83,14 @@ export function SimpleChat({
   stateHint,
   showHint,
   isLoading,
+  hideEmptyState = false,
+  afterLastAssistant,
 }: SimpleChatProps) {
   const visible = messages.filter((m) => m.role !== "system");
+  const lastAssistantIdx = visible.reduce(
+    (acc, m, i) => (m.role === "assistant" ? i : acc),
+    -1,
+  );
 
   return (
     <section className="simple-chat mx-auto w-full max-w-xl" aria-live="polite">
@@ -90,34 +100,53 @@ export function SimpleChat({
         </p>
       )}
 
-      {visible.length === 0 && !isLoading && !stateHint && (
+      {visible.length === 0 && !isLoading && !stateHint && !hideEmptyState && (
         <p className="mb-6 text-center text-lg leading-relaxed text-[#5c534a]">
           Start typing or tap the mic — I&apos;m listening.
         </p>
       )}
 
       <ul className="flex flex-col gap-4">
-        {visible.map((msg, i) => (
-          <li
-            key={i}
-            className={`companion-fade-in flex flex-col ${
-              msg.role === "user" ? "items-end" : "items-start"
-            }`}
-          >
-            {msg.role === "user" ? (
-              <p className="inline-block max-w-[85%] rounded-2xl bg-[#1e4f4f] px-4 py-2.5 text-lg leading-[1.6] text-white shadow-sm">
-                {msg.content}
-              </p>
-            ) : (
-              <div className="max-w-[90%] space-y-2 rounded-2xl bg-white/85 px-4 py-3 shadow-sm backdrop-blur-sm">
-                {renderAssistant(msg.content)}
-              </div>
-            )}
-          </li>
-        ))}
+        {visible.map((msg, i) => {
+          // A lone opening line (welcome / New Day) reads as a centered
+          // companion prompt — aligned with the greeting stack, not a wide
+          // left-aligned banner. Real conversation bubbles stay left/right.
+          const isGreeting = visible.length === 1 && msg.role === "assistant";
+          return (
+            <li
+              key={i}
+              className={`companion-fade-in flex flex-col ${
+                msg.role === "user"
+                  ? "items-end"
+                  : isGreeting
+                    ? "items-center"
+                    : "items-start"
+              }`}
+            >
+              {msg.role === "user" ? (
+                <p className="inline-block max-w-[85%] rounded-2xl bg-[#1e4f4f] px-4 py-2.5 text-lg leading-[1.6] text-white shadow-sm">
+                  {msg.content}
+                </p>
+              ) : (
+                <div
+                  className={
+                    isGreeting
+                      ? "mx-auto max-w-md space-y-2 rounded-2xl bg-white/85 px-5 py-4 text-center shadow-sm backdrop-blur-sm"
+                      : "max-w-[90%] space-y-2 rounded-2xl bg-white/85 px-4 py-3 shadow-sm backdrop-blur-sm"
+                  }
+                >
+                  {renderAssistant(msg.content)}
+                </div>
+              )}
+              {afterLastAssistant && i === lastAssistantIdx && (
+                <div className="mt-2 w-full max-w-[90%]">{afterLastAssistant}</div>
+              )}
+            </li>
+          );
+        })}
 
         {isLoading && (
-          <li className="flex justify-start">
+          <li className="flex flex-col items-start gap-1.5">
             <span
               className="flex gap-1.5 rounded-2xl bg-white/85 px-4 py-3 shadow-sm backdrop-blur-sm"
               aria-label="Shari is thinking"
@@ -126,6 +155,7 @@ export function SimpleChat({
               <span className="h-2 w-2 rounded-full bg-[#6b635a]/25" />
               <span className="h-2 w-2 rounded-full bg-[#6b635a]/15" />
             </span>
+            <span className="pl-1 text-sm text-[#6b635a]">Thinking…</span>
           </li>
         )}
       </ul>

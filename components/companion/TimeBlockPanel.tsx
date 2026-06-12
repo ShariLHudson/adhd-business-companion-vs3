@@ -199,9 +199,12 @@ function inHorizon(date: string, view: Horizon): boolean {
 export function TimeBlockPanel({
   onStart,
   onTestAlert,
+  initialProjectId,
 }: {
   onStart: (block: TimeBlock) => void;
   onTestAlert?: () => void;
+  /** Inherit project context when opened from a project ("schedule time to work on X"). */
+  initialProjectId?: string;
 }) {
   const [blocks, setBlocks] = useState<TimeBlock[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -223,9 +226,23 @@ export function TimeBlockPanel({
 
   useEffect(() => {
     setBlocks(getTimeBlocks());
-    setProjects(getProjects());
+    const list = getProjects();
+    setProjects(list);
     setTags(getBlockTags());
-  }, []);
+    // Project → Time Block: inherit the project, prefill a sensible title and a
+    // focused-session duration so the user isn't asked what to work on again.
+    if (initialProjectId) {
+      const proj = list.find((p) => p.id === initialProjectId);
+      setForm((f) => ({
+        ...f,
+        projectId: initialProjectId,
+        title: f.title.trim()
+          ? f.title
+          : proj?.nextAction.trim() || proj?.name || f.title,
+        durationMin: f.durationMin === 30 ? 60 : f.durationMin,
+      }));
+    }
+  }, [initialProjectId]);
 
   function createProject() {
     const name = newProject.trim();
@@ -285,20 +302,34 @@ export function TimeBlockPanel({
 
   function submit() {
     if (!form.title.trim() || durationMin <= 0) return;
-    setBlocks(
-      saveTimeBlock({
-        id: form.id,
-        title: form.title.trim(),
-        date: form.date,
-        startTime: form.startTime,
-        durationMin,
-        energy: form.energy,
-        tag: form.tag,
-        note: form.note.trim() || undefined,
-        projectId: form.projectId,
-        timerEnabled: form.timerEnabled,
-      }),
-    );
+    const saved = saveTimeBlock({
+      id: form.id,
+      title: form.title.trim(),
+      date: form.date,
+      startTime: form.startTime,
+      durationMin,
+      energy: form.energy,
+      tag: form.tag,
+      note: form.note.trim() || undefined,
+      projectId: form.projectId,
+      timerEnabled: form.timerEnabled,
+    });
+    setBlocks(saved);
+    if (!form.id) {
+      const created = saved[0];
+      if (created) {
+        void import("@/lib/ecosystem/eventTrackingEngine").then(({ trackEcosystemEvent }) => {
+          trackEcosystemEvent({
+            eventType: "feature.time_block_started",
+            feature: "time-block",
+            metadata: {
+              timeBlockId: created.id,
+              durationMin: created.durationMin,
+            },
+          });
+        });
+      }
+    }
     resetForm();
   }
 

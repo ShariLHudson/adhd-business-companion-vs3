@@ -7,6 +7,7 @@ import {
   getAudioLinks,
   linksForAudioCategory,
   MASTER_AUDIO_CATEGORIES,
+  SAVED_AUDIO_CATEGORIES,
   myAudioLinks,
   playAudioTrack,
   FAVORITES_PLAYLIST_ID,
@@ -38,12 +39,12 @@ export function FocusAudioPanel({
     initialCategory ?? suggestion.categoryId,
   );
   const [links, setLinks] = useState<AudioLink[]>([]);
-  const [savedLinkId, setSavedLinkId] = useState<string>("");
   const [howToOpen, setHowToOpen] = useState(false);
 
   // Add-your-own form
   const [myName, setMyName] = useState("");
   const [myUrl, setMyUrl] = useState("");
+  const [myCategory, setMyCategory] = useState("focus");
 
   const refresh = useCallback(() => setLinks(getAudioLinks()), []);
   useEffect(() => {
@@ -63,12 +64,13 @@ export function FocusAudioPanel({
     playAudioTrack(track, "focus-audio", category);
   }
 
-  const selectedSaved = savedLinks.find((l) => l.id === savedLinkId) ?? null;
-
   return (
     <div className="companion-fade-in relative h-full overflow-y-auto px-4 py-8 sm:px-6">
       <SceneBackground page={mood} seed={category} />
       <div className="relative mx-auto w-full max-w-xl">
+        {/* All content sits on a readable card over the scene — consistent with
+            Home / Focus / Continue, so text never floats on the image. */}
+        <div className="rounded-2xl border border-[#1e4f4f]/15 bg-white/90 p-5 shadow-sm backdrop-blur-sm sm:p-6">
         <p className="text-2xl font-semibold text-[#1f1c19]">Focus Audio</p>
         <p className="mt-1 text-lg font-medium text-[#1f1c19]">
           What does your brain need right now?
@@ -119,52 +121,55 @@ export function FocusAudioPanel({
           )}
         </div>
 
-        {/* Saved Links — dropdown + add form */}
-        <section className="mt-7 rounded-xl border border-[#c9bfb0]/50 bg-white/70 p-4">
+        {/* Saved Links — a divider section inside the same card (no card-in-card) */}
+        <section className="mt-6 border-t border-[#e7dfd4] pt-5">
           <p className="text-lg font-semibold text-[#1f1c19]">Saved Links</p>
           <p className="mt-1 text-base text-[#6b635a]">
             Your own playlists, recordings, or affirmations — saved here for next
             time.
           </p>
 
+          {/* Grouped by "what does this help you do?" — never a flat list. */}
           {savedLinks.length > 0 ? (
-            <div className="mt-3 flex items-center gap-2">
-              <select
-                value={savedLinkId || savedLinks[0]?.id || ""}
-                onChange={(e) => setSavedLinkId(e.target.value)}
-                className="flex-1 rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base outline-none focus:border-[#1e4f4f]"
-              >
-                {savedLinks.map((l) => (
-                  <option key={l.id} value={l.id}>
-                    {l.name}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={() => {
-                  const target = selectedSaved ?? savedLinks[0];
-                  if (target) play(target);
-                }}
-                className="shrink-0 rounded-lg bg-[#1e4f4f] px-4 py-2.5 text-base font-semibold text-white hover:bg-[#163a3a]"
-              >
-                ▶ Play
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  const target = selectedSaved ?? savedLinks[0];
-                  if (!target) return;
-                  deleteAudioLink(target.id);
-                  setSavedLinkId("");
-                  refresh();
-                }}
-                title="Remove"
-                aria-label="Remove saved link"
-                className="shrink-0 rounded-md px-2 py-2 text-sm text-[#a85c4a] hover:bg-[#a85c4a]/10"
-              >
-                ✕
-              </button>
+            <div className="mt-3 flex flex-col gap-3">
+              {SAVED_AUDIO_CATEGORIES.map((cat) => {
+                const inCat = savedLinks.filter(
+                  (l) => (l.category ?? "other") === cat.id,
+                );
+                if (inCat.length === 0) return null;
+                return (
+                  <div key={cat.id}>
+                    <p className="text-sm font-semibold text-[#1f1c19]">
+                      {cat.emoji} {cat.name}
+                    </p>
+                    <div className="mt-1 flex flex-col gap-1.5">
+                      {inCat.map((l) => (
+                        <div key={l.id} className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => play(l)}
+                            className="flex-1 rounded-lg border border-[#1e4f4f]/25 bg-[#1e4f4f]/5 px-3 py-2 text-left text-base font-medium text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
+                          >
+                            ▶ {l.name}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              deleteAudioLink(l.id);
+                              refresh();
+                            }}
+                            title="Remove"
+                            aria-label={`Remove ${l.name}`}
+                            className="shrink-0 rounded-md px-2 py-2 text-sm text-[#a85c4a] hover:bg-[#a85c4a]/10"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           ) : (
             <p className="mt-3 text-base text-[#6b635a]">
@@ -172,13 +177,27 @@ export function FocusAudioPanel({
             </p>
           )}
 
-          <div className="mt-3 flex flex-col gap-2">
+          <div className="mt-4 flex flex-col gap-2">
             <input
               value={myName}
               onChange={(e) => setMyName(e.target.value)}
               placeholder="Label — e.g. My focus playlist"
               className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base outline-none focus:border-[#1e4f4f]"
             />
+            <label className="text-sm font-semibold text-[#6b635a]">
+              What does this help you do?
+            </label>
+            <select
+              value={myCategory}
+              onChange={(e) => setMyCategory(e.target.value)}
+              className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+            >
+              {SAVED_AUDIO_CATEGORIES.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.emoji} {cat.name}
+                </option>
+              ))}
+            </select>
             <input
               value={myUrl}
               onChange={(e) => setMyUrl(e.target.value)}
@@ -189,7 +208,7 @@ export function FocusAudioPanel({
               type="button"
               disabled={!myName.trim() || !myUrl.trim()}
               onClick={() => {
-                addMyAudioLink(myName, myUrl);
+                addMyAudioLink(myName, myUrl, myCategory);
                 setMyName("");
                 setMyUrl("");
                 refresh();
@@ -228,6 +247,7 @@ export function FocusAudioPanel({
             </p>
           </div>
         )}
+        </div>
 
         <div className="mt-6">
           <button

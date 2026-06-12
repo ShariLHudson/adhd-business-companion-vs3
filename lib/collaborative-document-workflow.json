@@ -1,0 +1,67 @@
+{
+  "version": "1.0",
+  "role": "Digital assistant that helps create and manage Google Docs, Sheets, and Forms while chat stays open for guidance.",
+  "layout": {
+    "left": "Chat with Shari — always active for guidance, research, and next steps.",
+    "right": {
+      "building": "Create panel — draft scaffold; header: Edit, Copy, It's ready only.",
+      "ready": "Export chooser — Open in Google Docs/Sheets/Forms, PDF, Copy Text.",
+      "google": "Embedded Google workspace — chat edits sync to the file."
+    },
+    "rule": "Never claim a panel is open until workspace state is verified visible."
+  },
+  "workflow": [
+    "Detect document creation intent",
+    "Confirm Doc vs Sheet vs Form if ambiguous",
+    "Open Create on the right with blank scaffold",
+    "Coach smallest-first step; chat stays open on the left",
+    "User clicks It's ready → export options",
+    "User picks Google → right panel becomes embedded Google workspace",
+    "Chat edits sync to Google file"
+  ],
+  "intentPhrases": [
+    "create a document",
+    "write a draft for",
+    "make a spreadsheet",
+    "build a form",
+    "create a google doc",
+    "new document",
+    "help me draft"
+  ],
+  "documentTypes": [
+    {
+      "id": "doc",
+      "label": "Google Doc",
+      "triggers": ["doc", "document", "google doc", "write", "draft", "sop", "proposal", "recipe"],
+      "useWhen": "Text-based assets"
+    },
+    {
+      "id": "sheet",
+      "label": "Google Sheet",
+      "triggers": ["sheet", "spreadsheet", "calendar", "table", "tracker"],
+      "useWhen": "Tables and calendars"
+    },
+    {
+      "id": "form",
+      "label": "Google Form",
+      "triggers": ["form", "questionnaire", "intake", "survey"],
+      "useWhen": "Questions and intake"
+    }
+  ],
+  "buildingHeaderActions": ["Edit", "Copy", "It's ready"],
+  "hiddenWhileBuilding": ["Save", "Saved Work", "Templates"],
+  "exportActions": {
+    "primary": ["Open in Google Docs", "Open in Google Sheets", "Open in Google Forms", "Download PDF", "Copy Text"],
+    "secondary": ["Edit in Create", "Link to a Project"]
+  },
+  "verification": {
+    "rule": "Confirm open only after workspace panel + split view + reveal verified",
+    "failureMessage": "I tried to open {type}, but it didn't appear on screen. Tap {type} in the menu, or tell me to try again."
+  },
+  "taskDumpRule": "Multi-task lists stay in chat — prioritize before opening Create",
+  "copyPasteFallback": {
+    "doc": ["Copy from chat or Create", "Open Google Docs and paste", "Or use Open in Google Docs when ready"],
+    "sheet": ["Copy table from chat or Create", "Paste into Google Sheets A1", "Or use Open in Google Sheets when ready"],
+    "form": ["Copy questions from chat", "Create Google Form and add questions", "Or use Open in Google Forms when ready"]
+  }
+}

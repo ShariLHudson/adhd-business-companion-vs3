@@ -58,6 +58,14 @@
   border-bottom: 1px solid rgba(221, 213, 201, 0.45);
 }
 
+.identity-bar-compact {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 248, 0.65) 0%,
+    rgba(255, 252, 248, 0.2) 100%
+  );
+}
+
 .presence-glow img,
 .presence-glow > div {
   box-shadow: 0 4px 28px rgba(212, 165, 116, 0.22);
@@ -140,4 +148,10 @@
     rgba(240, 248, 247, 0.95) 0%,
     rgba(232, 245, 243, 0.85) 100%
   );
+}
+
+.workspace-field-highlight {
+  border-color: #1e4f4f !important;
+  box-shadow: 0 0 0 3px rgba(30, 79, 79, 0.2);
+  animation: companionFadeIn 0.35s ease-out;
 }

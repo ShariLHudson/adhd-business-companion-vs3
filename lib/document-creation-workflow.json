@@ -1,0 +1,584 @@
+{
+  "version": "2.0",
+  "name": "Companion Document Creation Workflow",
+  "summary": "Chat guides; Create is a temporary drafting space; Google Docs/Sheets/Forms store finished work. Templates and snippets stay in the app.",
+  "coreModel": {
+    "chat": "Guidance, coaching, research, and edits — always available on the left.",
+    "create": "Temporary drafting workspace on the right — blank scaffold, no finished-document storage.",
+    "google": "Final working and storage location — Doc, Sheet, or Form embedded beside chat.",
+    "templates": "Reusable patterns only — never the home for finished documents.",
+    "snippets": "Reusable small text pieces only.",
+    "finishedDocuments": "Live in Google, or are copied/downloaded — not stored as app documents."
+  },
+
+  "intentDetection": {
+    "description": "Recognize when the user wants to create a new document and route to the right Google destination.",
+    "sampleIntents": [
+      {
+        "userSays": "Create a document",
+        "destination": null,
+        "needsConfirmation": true,
+        "notes": "Generic — ask Doc vs Sheet vs Form."
+      },
+      {
+        "userSays": "Write a recipe",
+        "destination": "doc",
+        "needsConfirmation": false,
+        "contentKind": "recipe",
+        "notes": "Text document → Google Docs."
+      },
+      {
+        "userSays": "Create an SOP",
+        "destination": "doc",
+        "needsConfirmation": false,
+        "contentKind": "sop"
+      },
+      {
+        "userSays": "Write a proposal",
+        "destination": "doc",
+        "needsConfirmation": false,
+        "contentKind": "proposal"
+      },
+      {
+        "userSays": "Make a client intake form",
+        "destination": "form",
+        "needsConfirmation": false,
+        "contentKind": "questionnaire"
+      },
+      {
+        "userSays": "Create a content calendar",
+        "destination": "sheet",
+        "needsConfirmation": false,
+        "contentKind": "content calendar"
+      },
+      {
+        "userSays": "Make a spreadsheet for Q2 sales",
+        "destination": "sheet",
+        "needsConfirmation": false
+      },
+      {
+        "userSays": "Build a survey for my workshop",
+        "destination": "form",
+        "needsConfirmation": false
+      }
+    ],
+    "triggerPatterns": [
+      "\\bcreate a document\\b",
+      "\\bwrite a (?:recipe|proposal|draft|sop)\\b",
+      "\\bcreate an? (?:sop|proposal|document)\\b",
+      "\\bmake a (?:spreadsheet|client intake form|content calendar)\\b",
+      "\\bbuild a (?:form|questionnaire|survey)\\b",
+      "\\bhelp me draft\\b",
+      "\\bnew document\\b"
+    ],
+    "destinationRules": [
+      {
+        "destination": "doc",
+        "googleProduct": "Google Docs",
+        "when": [
+          "User mentions doc, document, google doc, SOP, proposal, recipe, script, email, letter, or other text-based content",
+          "Content is paragraphs, sections, or prose — not rows/columns or questions"
+        ],
+        "explicitSignals": ["google doc", "google docs", "sop", "standard operating procedure"]
+      },
+      {
+        "destination": "sheet",
+        "googleProduct": "Google Sheets",
+        "when": [
+          "User mentions sheet, spreadsheet, calendar, table, tracker, plan with rows/columns",
+          "Content is tabular, dated, or list-based across columns"
+        ],
+        "explicitSignals": ["spreadsheet", "sheet", "content calendar", "calendar", "tracker", "table"]
+      },
+      {
+        "destination": "form",
+        "googleProduct": "Google Forms",
+        "when": [
+          "User mentions form, questionnaire, intake, survey, quiz",
+          "Content is a set of questions for someone else to answer"
+        ],
+        "explicitSignals": ["form", "questionnaire", "intake", "survey", "quiz"]
+      }
+    ],
+    "confirmation": {
+      "when": "Intent is clear that user wants to create something, but destination (Doc / Sheet / Form) is not explicit.",
+      "prompt": "Do you want this as a **Google Doc** (text), **Google Sheet** (table or calendar), or **Google Form** (questionnaire)?",
+      "shortPrompt": "Doc, Sheet, or Form?",
+      "choices": [
+        { "reply": "1", "label": "Google Doc", "destination": "doc" },
+        { "reply": "2", "label": "Google Sheet", "destination": "sheet" },
+        { "reply": "3", "label": "Google Form", "destination": "form" }
+      ],
+      "alsoAccept": ["google doc", "sheet", "spreadsheet", "form", "questionnaire"]
+    },
+    "blockAutoOpen": {
+      "taskDump": "If user lists many tasks at once, stay in chat — capture, prioritize, pick ONE before opening Create.",
+      "planningFlow": "If user is scheduling or time-blocking, do not auto-open Create unless they explicitly ask to write.",
+      "distress": "If user signals emotional distress, stay in chat — do not open workspaces."
+    }
+  },
+
+  "workspaceLayout": {
+    "mode": "split",
+    "left": {
+      "panel": "chat",
+      "label": "Chat with Shari",
+      "alwaysOpen": true,
+      "userCanHide": true,
+      "purpose": "Guidance, coaching, research, small-step questions, and post-export edits."
+    },
+    "right": {
+      "phases": {
+        "create-building": {
+          "panel": "create",
+          "label": "Create",
+          "description": "Blank drafting scaffold — user composes here or via chat guidance."
+        },
+        "create-ready": {
+          "panel": "create-export",
+          "label": "Export",
+          "description": "Choose where to work with the finished piece."
+        },
+        "google": {
+          "panel": "google-workspace",
+          "label": "Google Docs | Sheets | Forms",
+          "description": "Embedded Google file — chat edits sync when connected."
+        }
+      }
+    },
+    "verification": {
+      "rule": "Never say a workspace opened unless all checks pass.",
+      "checks": [
+        "Right panel is set to the expected section (create or google-workspace)",
+        "Split view is active (chat visible on left)",
+        "Workspace reveal sequence is greater than zero (panel actually shown)"
+      ],
+      "onSuccess": "May confirm to user that the panel is beside them.",
+      "onFailure": "Say you tried to open it but it did not appear — ask them to tap the menu item or say try again."
+    }
+  },
+
+  "createDraftFlow": {
+    "when": "User wants to draft before exporting, or destination is confirmed but content is not yet in Google.",
+    "openActions": [
+      "Open Create on the right",
+      "Keep chat open on the left",
+      "Start with a clean blank scaffold"
+    ],
+    "mustNot": [
+      "Load unrelated or stale drafts",
+      "Pre-fill random template content",
+      "Use a chat sentence as the document title",
+      "Save finished work into Templates",
+      "Expose internal storage concepts to the user"
+    ],
+    "titleRules": {
+      "source": "User-provided title field or inferred topic from intent — never the raw chat message.",
+      "default": "Untitled draft",
+      "examples": {
+        "good": ["ElevenLabs SOP", "Client intake questionnaire", "Q2 content calendar"],
+        "bad": ["I want to write a recipe for lasagna", "Can you help me create an SOP?"]
+      }
+    },
+    "header": {
+      "visibleButtons": [
+        { "id": "edit", "label": "Edit" },
+        { "id": "copy", "label": "Copy" },
+        { "id": "ready", "label": "✓ It's Ready" }
+      ],
+      "hiddenWhileBuilding": [
+        "Save",
+        "Saved Work",
+        "Templates",
+        "Where Is This Saved"
+      ]
+    },
+    "coaching": {
+      "style": "Smallest first step — one title, first paragraph, first row, or first question.",
+      "oneQuestionPerReply": true,
+      "inputChannels": ["chat", "create-panel"],
+      "researchOffer": "Want help finding reference information? You can search the web and paste what you find here.",
+      "forbiddenUserWords": []
+    },
+    "ambiguity": {
+      "multipleDrafts": {
+        "when": "More than one possible in-progress piece matches the user's request.",
+        "prompt": "I found more than one possible document. Which one do you mean? Reply with the number or title.",
+        "requireChoiceBeforeExport": true
+      }
+    }
+  },
+
+  "exportFlow": {
+    "trigger": {
+      "button": "✓ It's Ready",
+      "precondition": "Draft has content in Create panel."
+    },
+    "screen": {
+      "heading": "Ready to export",
+      "title": "Your {documentType} is ready",
+      "subtitle": "Where would you like to work with it?",
+      "body": "{title} — choose below. Google stores and organizes; I stay beside you to coach and improve."
+    },
+    "buttons": {
+      "primary": [
+        {
+          "id": "open-google-doc",
+          "label": "Open in Google Docs",
+          "destination": "doc",
+          "recommendedWhen": ["text", "sop", "proposal", "recipe", "script", "email"]
+        },
+        {
+          "id": "open-google-sheet",
+          "label": "Open in Google Sheets",
+          "destination": "sheet",
+          "recommendedWhen": ["content calendar", "plan", "tracker", "table", "spreadsheet"]
+        },
+        {
+          "id": "open-google-form",
+          "label": "Open in Google Forms",
+          "destination": "form",
+          "recommendedWhen": ["form", "questionnaire", "intake", "survey"]
+        },
+        {
+          "id": "copy-text",
+          "label": "Copy Text",
+          "action": "clipboard"
+        },
+        {
+          "id": "print-pdf",
+          "label": "Print / PDF",
+          "action": "print"
+        }
+      ],
+      "secondary": [
+        {
+          "id": "link-project",
+          "label": "Link to Project",
+          "action": "project-picker"
+        },
+        {
+          "id": "edit-in-create",
+          "label": "Edit in Create",
+          "action": "return-to-building"
+        }
+      ]
+    },
+    "afterGoogleOpen": {
+      "rightPanel": "google-workspace",
+      "leftPanel": "chat",
+      "assistantAck": "**{googleProduct}** is open beside us — tell me what to add, change, or move.",
+      "chatEdits": "User instructions in chat sync to the Google file when connected."
+    }
+  },
+
+  "googleDestinations": {
+    "doc": {
+      "product": "Google Docs",
+      "apiKind": "doc",
+      "useFor": ["recipe", "sop", "proposal", "script", "email", "letter", "article", "any prose"],
+      "createEndpoint": "/api/google/create-doc",
+      "updateEndpoint": "/api/google/update-doc",
+      "applyEditEndpoint": "/api/google/apply-edit",
+      "embedPattern": "https://docs.google.com/document/d/{fileId}/edit?embedded=true",
+      "requiresConnection": true
+    },
+    "sheet": {
+      "product": "Google Sheets",
+      "apiKind": "sheet",
+      "useFor": ["content calendar", "tracker", "plan", "table", "rows and columns"],
+      "createEndpoint": "/api/google/create-doc",
+      "note": "Creates sheet via same create endpoint with kind=sheet",
+      "embedPattern": "https://docs.google.com/spreadsheets/d/{fileId}/edit?embedded=true",
+      "requiresConnection": true
+    },
+    "form": {
+      "product": "Google Forms",
+      "apiKind": "form",
+      "useFor": ["questionnaire", "intake", "survey", "quiz"],
+      "createEndpoint": "/api/google/create-doc",
+      "note": "May create structured doc when native Forms API unavailable",
+      "embedPattern": "https://docs.google.com/forms/d/{fileId}/edit?embedded=true",
+      "requiresConnection": true
+    },
+    "notConnected": {
+      "message": "Google isn't connected yet. You can copy this text or connect Google in Settings.",
+      "buttons": [
+        { "id": "copy-text", "label": "Copy Text" },
+        { "id": "connect-google", "label": "Connect Google", "action": "open-settings-connections" },
+        { "id": "download-pdf", "label": "Download PDF", "action": "print" }
+      ],
+      "mustNot": ["Pretend the Google file was created", "Claim the document is open in Google"]
+    },
+    "copyPasteFallback": {
+      "doc": [
+        "Copy the text from Create or our chat.",
+        "Open Google Docs and paste into a new document.",
+        "Or connect Google and tap Open in Google Docs."
+      ],
+      "sheet": [
+        "Copy your table or list from Create.",
+        "Open Google Sheets and paste into cell A1.",
+        "Or connect Google and tap Open in Google Sheets."
+      ],
+      "form": [
+        "Copy your questions from Create.",
+        "Open Google Forms and add them to a new form.",
+        "Or connect Google and tap Open in Google Forms."
+      ]
+    }
+  },
+
+  "metadataStorage": {
+    "description": "After export to Google, store only lightweight metadata in the app — not the full document body as a finished app document.",
+    "storedFields": [
+      { "key": "title", "type": "string", "userFacing": "Document title", "required": true },
+      { "key": "type", "type": "string", "userFacing": "Document type (e.g. SOP, recipe, content calendar)", "required": true },
+      { "key": "googleUrl", "type": "string", "userFacing": "Link to Google file", "required": false },
+      { "key": "googleFileId", "type": "string", "userFacing": "Google file ID", "internal": true },
+      { "key": "googleKind", "type": "doc | sheet | form", "userFacing": "Google product used", "required": false },
+      { "key": "projectId", "type": "string", "userFacing": "Related project", "required": false },
+      { "key": "projectName", "type": "string", "userFacing": "Project name", "required": false },
+      { "key": "createdAt", "type": "ISO8601", "userFacing": "Created", "required": true },
+      { "key": "updatedAt", "type": "ISO8601", "userFacing": "Last updated", "required": true }
+    ],
+    "notStoredAsFinishedAppDocument": [
+      "Full document body in Templates",
+      "Duplicate finished copies in Saved Work as primary storage",
+      "Chat message text as canonical document content"
+    ],
+    "whereIsMyDocument": {
+      "withMetadata": "Answer from stored title, type, Google link, and project — in plain language.",
+      "withoutMetadata": "Say honestly that you don't have a saved link yet — offer to open Create, connect Google, or start fresh.",
+      "exampleWith": "Your **ElevenLabs SOP** is in **Google Docs**{projectSuffix}. [Open it]({googleUrl})",
+      "exampleWithout": "I don't have a Google link saved for that yet. Want to finish it in Create, or connect Google and export it?"
+    }
+  },
+
+  "errorHandling": {
+    "workspaceNotVisible": {
+      "template": "I tried to open {panelLabel}, but it didn't appear on screen. Tap **{menuLabel}** in the menu, or tell me to try again.",
+      "panels": {
+        "create": { "panelLabel": "Create", "menuLabel": "Create" },
+        "google-workspace": { "panelLabel": "{googleProduct}", "menuLabel": "Create" }
+      }
+    },
+    "googleAuthFailed": {
+      "httpStatus": 401,
+      "message": "Google isn't connected yet. You can copy this text or connect Google in Settings.",
+      "actions": ["copy-text", "connect-google", "download-pdf"]
+    },
+    "googleCreateFailed": {
+      "message": "Couldn't open Google right now — try again, or copy the text for now.",
+      "followUp": "copyPasteFallback for selected destination"
+    },
+    "multipleDrafts": {
+      "message": "I found more than one possible document. Which one do you mean? Reply with the number or title.",
+      "requireSelection": true
+    },
+    "noContentToExport": {
+      "message": "Add a little content first — even one line or a title — then tap **✓ It's Ready**."
+    }
+  },
+
+  "userFacingCopy": {
+    "forbiddenTerms": [
+      "artifact",
+      "asset",
+      "draft object",
+      "saved artifact",
+      "session store",
+      "workspace state",
+      "content-generator",
+      "patchWorkspacePanel",
+      "revealSeq"
+    ],
+    "preferredTerms": {
+      "draft": "draft",
+      "document": "document",
+      "create": "Create",
+      "export": "export",
+      "googleDoc": "Google Doc",
+      "template": "template",
+      "snippet": "snippet"
+    },
+    "messages": {
+      "typeConfirmation": "Happy to help you create a document{topicSuffix}. Do you want this as a **Google Doc** (text), **Google Sheet** (table or calendar), or **Google Form** (questionnaire)? Reply **1** for Doc, **2** for Sheet, or **3** for Form.",
+      "createOpen": "Opening **Create** beside us{topicSuffix} — we'll build it here, then open in **{googleProduct}** when you're ready. Chat stays on the left. What's the very first tiny step?",
+      "ready": "Your **{documentType}** is ready — **{title}**. Choose where you'd like to work with it.",
+      "googleOpen": "**{googleProduct}** is open beside us — tell me what to add, change, or move.",
+      "googleNotConnected": "Google isn't connected yet. You can copy this text or connect Google in Settings.",
+      "whereIsDocumentFound": "Your **{title}** is in **{googleProduct}**{projectClause}.",
+      "whereIsDocumentMissing": "I don't have a Google link saved for that yet. Want to keep drafting in Create, or connect Google and export it?",
+      "researchOffer": "Want help finding reference information? You can search the web and paste what you find here, or tell me what to look for."
+    },
+    "buttons": {
+      "edit": "Edit",
+      "copy": "Copy",
+      "ready": "✓ It's Ready",
+      "openGoogleDocs": "Open in Google Docs",
+      "openGoogleSheets": "Open in Google Sheets",
+      "openGoogleForms": "Open in Google Forms",
+      "copyText": "Copy Text",
+      "printPdf": "Print / PDF",
+      "linkProject": "Link to Project",
+      "editInCreate": "Edit in Create",
+      "connectGoogle": "Connect Google"
+    }
+  },
+
+  "tests": [
+    {
+      "id": "intent-generic-document",
+      "input": "Create a document for my recipe",
+      "expect": {
+        "needsConfirmation": true,
+        "destination": null,
+        "assistantContains": ["Google Doc", "Sheet", "Form"]
+      }
+    },
+    {
+      "id": "intent-recipe-doc",
+      "input": "Write a recipe",
+      "expect": {
+        "needsConfirmation": false,
+        "destination": "doc",
+        "opensCreate": true
+      }
+    },
+    {
+      "id": "intent-sop-doc",
+      "input": "Create an SOP",
+      "expect": {
+        "destination": "doc",
+        "opensCreate": true
+      }
+    },
+    {
+      "id": "intent-proposal-doc",
+      "input": "Write a proposal",
+      "expect": {
+        "destination": "doc"
+      }
+    },
+    {
+      "id": "intent-intake-form",
+      "input": "Make a client intake form",
+      "expect": {
+        "destination": "form"
+      }
+    },
+    {
+      "id": "intent-calendar-sheet",
+      "input": "Create a content calendar",
+      "expect": {
+        "destination": "sheet"
+      }
+    },
+    {
+      "id": "confirmation-reply-doc",
+      "context": "Awaiting type confirmation",
+      "input": "1",
+      "expect": {
+        "destination": "doc",
+        "opensCreate": true
+      }
+    },
+    {
+      "id": "confirmation-reply-sheet",
+      "input": "Google Sheet",
+      "expect": {
+        "destination": "sheet"
+      }
+    },
+    {
+      "id": "create-header-buttons",
+      "phase": "create-building",
+      "expect": {
+        "visibleButtons": ["Edit", "Copy", "✓ It's Ready"],
+        "hiddenButtons": ["Save", "Saved Work", "Templates"]
+      }
+    },
+    {
+      "id": "export-screen-buttons",
+      "phase": "create-ready",
+      "expect": {
+        "primaryButtons": [
+          "Open in Google Docs",
+          "Open in Google Sheets",
+          "Open in Google Forms",
+          "Copy Text",
+          "Print / PDF"
+        ],
+        "secondaryButtons": ["Link to Project", "Edit in Create"]
+      }
+    },
+    {
+      "id": "workspace-verification-fail",
+      "scenario": "Panel state not verified",
+      "expect": {
+        "mustNotClaimOpen": true,
+        "assistantContains": ["didn't appear", "try again"]
+      }
+    },
+    {
+      "id": "google-not-connected",
+      "scenario": "Export with Google disconnected",
+      "expect": {
+        "message": "Google isn't connected yet",
+        "buttons": ["Copy Text", "Connect Google", "Download PDF"],
+        "mustNotPretendSuccess": true
+      }
+    },
+    {
+      "id": "title-not-chat-sentence",
+      "input": "I want to write a really long SOP about ElevenLabs voice settings",
+      "expect": {
+        "titleMustNotEqual": "I want to write a really long SOP about ElevenLabs voice settings",
+        "titleMayBe": "ElevenLabs voice settings"
+      }
+    },
+    {
+      "id": "where-is-document-with-metadata",
+      "scenario": "User asks where their SOP is",
+      "given": { "title": "ElevenLabs SOP", "googleKind": "doc", "googleUrl": "https://docs.google.com/..." },
+      "expect": {
+        "assistantContains": ["ElevenLabs SOP", "Google Docs"],
+        "mustNotContain": ["artifact", "saved artifact"]
+      }
+    },
+    {
+      "id": "where-is-document-no-metadata",
+      "scenario": "User asks where document is with no stored link",
+      "given": {},
+      "expect": {
+        "assistantHonest": true,
+        "mustNotContain": ["artifact"]
+      }
+    },
+    {
+      "id": "multiple-drafts-ask-choice",
+      "scenario": "Two in-progress SOPs match query",
+      "expect": {
+        "assistantContains": ["Which one", "number or title"],
+        "blockExportUntilChosen": true
+      }
+    },
+    {
+      "id": "finished-not-in-templates",
+      "scenario": "User completes SOP and exports to Google",
+      "expect": {
+        "mustNotSaveTo": ["Templates"],
+        "metadataOnlyInApp": true
+      }
+    },
+    {
+      "id": "task-dump-no-auto-create",
+      "input": "Write 3 emails, make 4 calls, and draft a proposal",
+      "expect": {
+        "opensCreate": false,
+        "staysInChat": true
+      }
+    }
+  ]
+}

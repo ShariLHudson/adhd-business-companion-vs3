@@ -7,9 +7,18 @@ import {
   getVoiceStatus,
   PLAN_LABEL,
   PLAN_VOICE_MINUTES,
+  LANGUAGE_OPTIONS,
+  REGION_OPTIONS,
+  DATE_FORMAT_OPTIONS,
+  languageCommunicationSummary,
+  hasPendingLanguagePreferences,
+  PENDING_LANGUAGE_NOTICE,
   type AiTone,
+  type DateFormat,
   type HelpMode,
+  type LanguageCode,
   type PatternAwareness,
+  type RegionCode,
   type SupportStyle,
   type VisualMode,
   type Plan,
@@ -66,7 +75,7 @@ const SUPPORT_STYLES: { id: SupportStyle; label: string; desc: string }[] = [
 
 const PATTERNS: { id: PatternAwareness; label: string; desc: string }[] = [
   { id: "off", label: "Off", desc: "No weekly reflection." },
-  { id: "light", label: "Light", desc: "A gentle weekly recap on Progress." },
+  { id: "light", label: "Light", desc: "A gentle weekly recap on Momentum." },
   {
     id: "guided",
     label: "Guided",
@@ -97,6 +106,7 @@ type Section =
   | "tone"
   | "help"
   | "support"
+  | "language"
   | "notifications"
   | "appearance"
   | "pattern"
@@ -154,6 +164,12 @@ export function SettingsPanel({
   const [fb, setFb] = useState("");
   const [ig, setIg] = useState("");
   const [li, setLi] = useState("");
+  const [interfaceLanguage, setInterfaceLanguage] = useState<LanguageCode>("en");
+  const [responseLanguage, setResponseLanguage] = useState<LanguageCode>("en");
+  const [contentLanguage, setContentLanguage] = useState<LanguageCode>("en");
+  const [voiceLanguage, setVoiceLanguage] = useState<LanguageCode>("en");
+  const [region, setRegion] = useState<RegionCode>("US");
+  const [dateFormat, setDateFormat] = useState<DateFormat>("MM/DD/YYYY");
   const [g, setG] = useState<{
     configured: boolean;
     connected: boolean;
@@ -186,6 +202,12 @@ export function SettingsPanel({
     setFb(p.facebookUrl);
     setIg(p.instagramUrl);
     setLi(p.linkedinUrl);
+    setInterfaceLanguage(p.interfaceLanguage);
+    setResponseLanguage(p.responseLanguage);
+    setContentLanguage(p.contentLanguage);
+    setVoiceLanguage(p.voiceLanguage);
+    setRegion(p.region);
+    setDateFormat(p.dateFormat);
     setPerm(readPerm());
   }, []);
 
@@ -223,6 +245,18 @@ export function SettingsPanel({
     { id: "tone", label: "AI Tone", value: TONES.find((t) => t.id === aiTone)?.label ?? "" },
     { id: "help", label: "Help Mode", value: HELP_MODES.find((h) => h.id === helpMode)?.label ?? "" },
     { id: "support", label: "Support Style", value: SUPPORT_STYLES.find((s) => s.id === supportStyle)?.label ?? "" },
+    {
+      id: "language",
+      label: "Language & Communication",
+      value: languageCommunicationSummary({
+        interfaceLanguage,
+        responseLanguage,
+        contentLanguage,
+        voiceLanguage,
+        region,
+        dateFormat,
+      }),
+    },
     { id: "notifications", label: "Notifications", value: alerts ? "On" : "Off" },
     { id: "appearance", label: "Appearance", value: VISUALS.find((v) => v.id === visualMode)?.label ?? "" },
     { id: "pattern", label: "Pattern awareness", value: PATTERNS.find((p) => p.id === pattern)?.label ?? "" },
@@ -290,6 +324,54 @@ export function SettingsPanel({
   );
 
   const wrap = "companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8";
+  const selectCls =
+    "mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
+
+  function LanguageField({
+    id,
+    label,
+    hint,
+    value,
+    onChange,
+    options,
+    disableUnavailable = false,
+  }: {
+    id: string;
+    label: string;
+    hint?: string;
+    value: string;
+    onChange: (v: string) => void;
+    options: readonly { code: string; label: string; available?: boolean }[];
+    disableUnavailable?: boolean;
+  }) {
+    return (
+      <div>
+        <label className={LABEL} htmlFor={id}>
+          {label}
+        </label>
+        {hint ? <p className="mt-1 text-sm text-[#6b635a]">{hint}</p> : null}
+        <select
+          id={id}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className={selectCls}
+        >
+          {options.map((o) => {
+            const unavailable = o.available === false;
+            return (
+              <option
+                key={o.code}
+                value={o.code}
+                disabled={disableUnavailable && unavailable}
+              >
+                {unavailable ? `${o.label} — coming soon` : o.label}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+    );
+  }
 
   // ---- Sub-panels ---------------------------------------------------------
   if (open === "tone") {
@@ -305,6 +387,89 @@ export function SettingsPanel({
             savePrefs({ aiTone: v });
           }}
         />
+      </div>
+    );
+  }
+  if (open === "language") {
+    function saveLang(patch: Parameters<typeof savePrefs>[0]) {
+      const next = savePrefs(patch);
+      setInterfaceLanguage(next.interfaceLanguage);
+      setResponseLanguage(next.responseLanguage);
+      setContentLanguage(next.contentLanguage);
+      setVoiceLanguage(next.voiceLanguage);
+      setRegion(next.region);
+      setDateFormat(next.dateFormat);
+    }
+    const pendingLang = hasPendingLanguagePreferences({
+      interfaceLanguage,
+      responseLanguage,
+      contentLanguage,
+      voiceLanguage,
+      region,
+      dateFormat,
+    });
+    return (
+      <div className={wrap}>
+        {header("Language & Communication")}
+        <p className="mt-1 text-sm text-[#6b635a]">
+          Choose how your Companion speaks, writes, and formats information.
+          More language options will be added over time.
+        </p>
+        {pendingLang ? (
+          <p className="mt-4 rounded-xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.06] px-4 py-3 text-sm leading-snug text-[#1f1c19]">
+            {PENDING_LANGUAGE_NOTICE}
+          </p>
+        ) : null}
+        <div className="mt-6 flex flex-col gap-5">
+          <LanguageField
+            id="lang-interface"
+            label="Interface Language"
+            hint="App menus and labels. English only until interface translation ships."
+            value={interfaceLanguage}
+            options={LANGUAGE_OPTIONS}
+            disableUnavailable
+            onChange={(v) => saveLang({ interfaceLanguage: v as LanguageCode })}
+          />
+          <LanguageField
+            id="lang-response"
+            label="Companion Response Language"
+            hint="Language Shari will use in chat when available."
+            value={responseLanguage}
+            options={LANGUAGE_OPTIONS}
+            onChange={(v) => saveLang({ responseLanguage: v as LanguageCode })}
+          />
+          <LanguageField
+            id="lang-content"
+            label="Content Creation Language"
+            hint="Default language for drafts in Create when available."
+            value={contentLanguage}
+            options={LANGUAGE_OPTIONS}
+            onChange={(v) => saveLang({ contentLanguage: v as LanguageCode })}
+          />
+          <LanguageField
+            id="lang-voice"
+            label="Voice Language"
+            hint="Spoken conversation language when voice support expands."
+            value={voiceLanguage}
+            options={LANGUAGE_OPTIONS}
+            onChange={(v) => saveLang({ voiceLanguage: v as LanguageCode })}
+          />
+          <LanguageField
+            id="lang-region"
+            label="Region / Date Format"
+            hint="Region for dates and formatting preferences."
+            value={region}
+            options={REGION_OPTIONS}
+            onChange={(v) => saveLang({ region: v as RegionCode })}
+          />
+          <LanguageField
+            id="lang-date"
+            label="Date format"
+            value={dateFormat}
+            options={DATE_FORMAT_OPTIONS}
+            onChange={(v) => saveLang({ dateFormat: v as DateFormat })}
+          />
+        </div>
       </div>
     );
   }

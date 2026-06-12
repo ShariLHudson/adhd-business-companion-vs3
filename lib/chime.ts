@@ -32,7 +32,23 @@ export function playSpin(): number {
   const ctx = ensureCtx();
   if (!ctx) return 2600;
   try {
-    const start = ctx.currentTime;
+    const start = ctx.currentTime + 0.02; // tiny lead-in so nothing is clipped
+    // Immediate "launch" — a quick rising whoosh the instant the wheel starts,
+    // so the audio is unmistakably tied to the spin action (not just the end).
+    {
+      const sweep = ctx.createOscillator();
+      const sg = ctx.createGain();
+      sweep.type = "sawtooth";
+      sweep.frequency.setValueAtTime(200, start);
+      sweep.frequency.exponentialRampToValueAtTime(900, start + 0.18);
+      sweep.connect(sg);
+      sg.connect(ctx.destination);
+      sg.gain.setValueAtTime(0.0001, start);
+      sg.gain.exponentialRampToValueAtTime(0.16, start + 0.03);
+      sg.gain.exponentialRampToValueAtTime(0.0001, start + 0.22);
+      sweep.start(start);
+      sweep.stop(start + 0.25);
+    }
     let t = start;
     let gap = 0.045;
     while (t < start + 2.4) {
@@ -43,7 +59,7 @@ export function playSpin(): number {
       osc.connect(g);
       g.connect(ctx.destination);
       g.gain.setValueAtTime(0.0001, t);
-      g.gain.exponentialRampToValueAtTime(0.07, t + 0.002);
+      g.gain.exponentialRampToValueAtTime(0.11, t + 0.002); // louder so the start is clearly heard
       g.gain.exponentialRampToValueAtTime(0.0001, t + 0.04);
       osc.start(t);
       osc.stop(t + 0.05);
@@ -69,6 +85,37 @@ export function playSpin(): number {
     /* audio unavailable */
   }
   return 2600;
+}
+
+// Focus-session complete — a warm rising major arpeggio (C-E-G-C) that resolves
+// upward. Deliberately DISTINCT from the time-block wind chime and the spin
+// ticks, so each sound teaches the user what just happened.
+export function playFocusComplete() {
+  const c = ensureCtx();
+  if (!c) return;
+  try {
+    const master = c.createGain();
+    master.gain.value = 0.32;
+    master.connect(c.destination);
+    const notes = [523.25, 659.25, 783.99, 1046.5]; // C5 · E5 · G5 · C6
+    const start = c.currentTime;
+    notes.forEach((f, i) => {
+      const osc = c.createOscillator();
+      const g = c.createGain();
+      osc.type = "triangle";
+      osc.frequency.value = f;
+      osc.connect(g);
+      g.connect(master);
+      const t = start + i * 0.13;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(0.3, t + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.7);
+      osc.start(t);
+      osc.stop(t + 0.75);
+    });
+  } catch {
+    /* audio unavailable */
+  }
 }
 
 export function playChime() {

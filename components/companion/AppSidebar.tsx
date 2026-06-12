@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ASSETS,
   BRAND,
@@ -10,7 +10,9 @@ import {
   type AppSection,
   type SidebarNavId,
 } from "@/lib/companionUi";
+import { getLastActivity } from "@/lib/companionStore";
 import type { CoachingMode } from "@/lib/companionPrompt";
+import { useFounderAdmin } from "@/lib/founderAdmin/useFounderAdmin";
 
 type AppSidebarProps = {
   activeNav: SidebarNavId;
@@ -18,8 +20,8 @@ type AppSidebarProps = {
   onNavSelect: (nav: SidebarNavId, mode?: CoachingMode) => void;
 };
 
-// Flat side menu: five top-level doors. Every tool lives inside the area its
-// door opens — no nested trees, no duplicated items.
+// Three primary doors (Chat · Focus · Create) + a collapsible "More" for backstage
+// areas. One navigation system; the top bar collapses to "⋯" on home.
 export function AppSidebar({
   activeNav,
   activeSection,
@@ -32,6 +34,14 @@ export function AppSidebar({
   const [moreOpen, setMoreOpen] = useState(false);
   const showMore = moreOpen || moreActive;
 
+  // Continue indicator — a small dot on Chat when unfinished work exists, so
+  // users elsewhere in the app know there's something to come back to.
+  const [hasContinue, setHasContinue] = useState(false);
+  const { isFounderAdmin } = useFounderAdmin();
+  useEffect(() => {
+    setHasContinue(Boolean(getLastActivity()));
+  }, [activeSection]);
+
   function renderItem(item: {
     id: SidebarNavId;
     label: string;
@@ -42,22 +52,38 @@ export function AppSidebar({
     const active = sectionFor
       ? activeSection === sectionFor
       : activeNav === item.id && activeSection === "home";
+    const showDot = item.id === "chat" && hasContinue && !active;
     return (
       <button
         key={item.id}
         type="button"
         onClick={() => onNavSelect(item.id, item.mode)}
+        title={item.label}
+        aria-label={
+          showDot ? `${item.label} — you have something to continue` : item.label
+        }
         className={`flex w-full items-center justify-start gap-2 rounded-lg px-2 py-2.5 text-left leading-tight transition-colors md:px-3 ${
           active
             ? "bg-[#1e4f4f] text-white shadow-sm"
             : "text-white/80 hover:bg-white/10"
         }`}
       >
-        <span aria-hidden="true" className="flex w-6 shrink-0 justify-center">
+        <span
+          aria-hidden="true"
+          className="relative flex w-6 shrink-0 justify-center"
+        >
           {item.emoji}
+          {showDot && (
+            <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[#e0795a] ring-2 ring-[#6e6a66]" />
+          )}
         </span>
         <span className="hidden text-left text-base font-medium md:inline">
           {item.label}
+          {showDot && (
+            <span aria-hidden="true" className="ml-1.5 text-[#e0795a]">
+              ●
+            </span>
+          )}
         </span>
       </button>
     );
@@ -89,10 +115,12 @@ export function AppSidebar({
           type="button"
           onClick={() => setMoreOpen((o) => !o)}
           aria-expanded={showMore}
-          className="mt-1 flex w-full items-center justify-start gap-2 rounded-lg px-2 py-2.5 text-left leading-tight text-white/80 transition-colors hover:bg-white/10 md:px-3"
+          title="More sections"
+          aria-label="More sections"
+          className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 px-2 py-2.5 text-left leading-tight text-white/80 transition-colors hover:bg-white/10 md:justify-start md:px-3"
         >
           <span aria-hidden="true" className="flex w-6 shrink-0 justify-center">
-            {showMore ? "▾" : "▸"}
+            {showMore ? "▾" : "⋯"}
           </span>
           <span className="hidden text-left text-base font-medium md:inline">
             More
@@ -104,6 +132,24 @@ export function AppSidebar({
           </div>
         )}
       </nav>
+
+      {isFounderAdmin ? (
+        <div className="border-t border-white/15 p-2">
+          <a
+            href="/founder"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Founder Workspace (private)"
+            aria-label="Founder Workspace (private)"
+            className="flex w-full items-center justify-start gap-2 rounded-lg border border-[#e0795a]/40 bg-[#e0795a]/15 px-2 py-2.5 text-left leading-tight text-white transition-colors hover:bg-[#e0795a]/25 md:px-3"
+          >
+            <span aria-hidden="true" className="flex w-6 shrink-0 justify-center">
+              🔒
+            </span>
+            <span className="hidden text-base font-medium md:inline">Founder</span>
+          </a>
+        </div>
+      ) : null}
 
       {/* Google quick links — open your apps from anywhere. */}
       <div className="border-t border-white/15 p-2">
@@ -122,6 +168,7 @@ export function AppSidebar({
             target="_blank"
             rel="noopener noreferrer"
             title={`Open Google ${g.t}`}
+            aria-label={`Open Google ${g.t}`}
             className="flex w-full items-center justify-start gap-2 rounded-lg px-2 py-2 text-left leading-tight text-white/85 transition-colors hover:bg-white/10 md:px-3"
           >
             <span aria-hidden="true" className="flex w-6 shrink-0 justify-center">

@@ -14,6 +14,7 @@ export async function POST(request: NextRequest) {
     const brief = (body.brief as string)?.trim() || "";
     const tone = (body.tone as string)?.trim() || "warm and clear";
     const context = (body.context as string)?.trim() || "";
+    const contentLanguageHint = (body.contentLanguageHint as string)?.trim() || "";
 
     const system = `You create content for an ADHD founder. Produce a ready-to-use "${type}" in a ${tone} tone. If the brief is a template or scaffold, fill it in with real, usable content.
 
@@ -22,7 +23,9 @@ FORMAT IT EXACTLY AS IT SHOULD LOOK WHEN PASTED INTO ITS DESTINATION (a social p
 - Put each list item / step / tip on its OWN line.
 - Do NOT use any markdown symbols — no **, no *, no #, no backticks. Destinations show them literally.
 - It should be copy-paste-ready as-is.
-Return ONLY the content, nothing else.`;
+Return ONLY the content, nothing else.${
+      contentLanguageHint ? `\n\n${contentLanguageHint}` : ""
+    }`;
     const user = brief
       ? `Brief / scaffold:\n${brief}\n\nWrite the ${type} now.`
       : `Write a strong example ${type} now.`;

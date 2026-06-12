@@ -40,6 +40,12 @@ export async function POST(request: NextRequest) {
     const supportStyle = body.supportStyle as string | undefined;
     const userName = body.userName as string | undefined;
     const businessContext = body.businessContext as string | undefined;
+    const intentHint = body.intentHint as string | undefined;
+    const toolOfferHint = body.toolOfferHint as string | undefined;
+    const workspaceContextHint = body.workspaceContextHint as string | undefined;
+    const responseLanguageHint = body.responseLanguageHint as string | undefined;
+    const obstacle = body.obstacle as string | undefined;
+    const somatic = Boolean(body.somatic);
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -55,11 +61,26 @@ export async function POST(request: NextRequest) {
       helpMode,
       supportStyle,
       userName,
+      intentHint,
+      responseLanguageHint,
     });
 
-    const finalSystem = businessContext
-      ? `${systemPrompt}\n\n${businessContext}`
-      : systemPrompt;
+    // Emotional-attunement hints (presence before strategy).
+    const attune =
+      somatic || obstacle
+        ? `\n\nEMOTIONAL READ (apply Presence-Before-Strategy / Somatic rules): ${
+            somatic ? "SOMATIC AVOIDANCE present — validate the body response, normalize it, then at most ONE tiny step. " : ""
+          }${obstacle ? `Likely obstacle: ${obstacle}. Speak to this blocker, not the surface task.` : ""}`
+        : "";
+
+    const offerBlock = toolOfferHint ? `\n\n${toolOfferHint}` : "";
+    const workspaceBlock = workspaceContextHint
+      ? `\n\n${workspaceContextHint}`
+      : "";
+
+    const finalSystem = `${
+      businessContext ? `${systemPrompt}\n\n${businessContext}` : systemPrompt
+    }${attune}${workspaceBlock}${offerBlock}`;
 
     const baseTemp = MODE_TEMPERATURE[coachingMode] ?? 0.75;
     const temperature =

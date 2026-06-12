@@ -46,7 +46,13 @@ const LAST_STEP = 7;
 
 // ADHD-simple, one-question-per-screen. Everything is skippable, always
 // editable, and saves as you go.
-export function BusinessProfilePanel({ onDone }: { onDone?: () => void }) {
+export function BusinessProfilePanel({
+  onDone,
+  onOpenAvatars,
+}: {
+  onDone?: () => void;
+  onOpenAvatars?: () => void;
+}) {
   const [step, setStep] = useState(0);
   const [role, setRole] = useState("");
   const [goals, setGoals] = useState<string[]>([]);
@@ -56,40 +62,7 @@ export function BusinessProfilePanel({ onDone }: { onDone?: () => void }) {
   const [tone, setTone] = useState("");
   const [customGoal, setCustomGoal] = useState("");
 
-  // AIRA — avatar research
-  type Research = {
-    simpleProfile: string;
-    behaviorPatterns: string[];
-    buyingBehavior: string[];
-    communicationStyle: string[];
-    contentTriggers: { works: string[]; avoids: string[] };
-    guidance: string;
-  };
-  const [researching, setResearching] = useState(false);
-  const [research, setResearch] = useState<Research | null>(null);
-  const [rErr, setRErr] = useState(false);
-  const [savedGuidance, setSavedGuidance] = useState(false);
-
-  async function doResearch() {
-    if (!idealClient.trim() || researching) return;
-    setResearching(true);
-    setRErr(false);
-    setSavedGuidance(false);
-    try {
-      const res = await fetch("/api/avatar-research", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ role, sells, idealClient, traits }),
-      });
-      const d = await res.json();
-      if (res.ok && typeof d.simpleProfile === "string") setResearch(d);
-      else setRErr(true);
-    } catch {
-      setRErr(true);
-    } finally {
-      setResearching(false);
-    }
-  }
+  // Client research now lives only in Client Avatars (single source of truth).
 
   useEffect(() => {
     const p = getBusinessProfile();
@@ -332,93 +305,27 @@ export function BusinessProfilePanel({ onDone }: { onDone?: () => void }) {
       {/* Step 4 — ideal client + AIRA research */}
       {step === 4 && (
         <div className="mt-4">
-          <textarea
-            value={idealClient}
-            onChange={(e) => setIdealClient(e.target.value)}
-            placeholder="Describe the people you help — who they are, what they struggle with, what they want."
-            className={`min-h-[120px] resize-none ${input}`}
-            autoFocus
-          />
-          <button
-            type="button"
-            onClick={doResearch}
-            disabled={!idealClient.trim() || researching}
-            className="mt-3 rounded-xl border border-[#1e4f4f]/40 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
-          >
-            {researching ? "Researching…" : "🔍 Research this audience"}
-          </button>
-          {rErr && (
-            <p className="mt-2 text-sm text-[#a85c4a]">
-              Couldn&apos;t research just now — try again.
+          {/* Single source of truth: clients live in Client Avatars, not here.
+              This step is now a read-only pointer, never a second definition. */}
+          <div className="rounded-2xl border border-[#1e4f4f]/20 bg-white/85 p-4">
+            <p className="text-base text-[#2d2926]">
+              👤 Who you help lives in one place:{" "}
+              <span className="font-semibold text-[#1f1c19]">
+                Client Avatars
+              </span>
+              . Build, research, and switch them there — everything you make
+              reads from that single source.
             </p>
-          )}
-          {research && (
-            <div className="companion-fade-in mt-3 rounded-2xl border border-[#1e4f4f]/20 bg-white/85 p-4 text-sm leading-relaxed text-[#2d2926]">
-              <p className="text-base font-semibold text-[#1f1c19]">
-                {research.simpleProfile}
-              </p>
-              <p className="mt-2 text-xs text-[#9a8f82]">
-                General behavioral archetype — no personal data.
-              </p>
-
-              {research.communicationStyle.length > 0 && (
-                <>
-                  <p className="mt-3 font-semibold text-[#1e4f4f]">
-                    How to talk to them
-                  </p>
-                  <ul className="mt-1 list-disc pl-5">
-                    {research.communicationStyle.map((s, i) => (
-                      <li key={i}>{s}</li>
-                    ))}
-                  </ul>
-                </>
-              )}
-              {research.buyingBehavior.length > 0 && (
-                <>
-                  <p className="mt-3 font-semibold text-[#1e4f4f]">
-                    How they buy
-                  </p>
-                  <ul className="mt-1 list-disc pl-5">
-                    {research.buyingBehavior.map((s, i) => (
-                      <li key={i}>{s}</li>
-                    ))}
-                  </ul>
-                </>
-              )}
-              {research.contentTriggers.works.length > 0 && (
-                <p className="mt-3">
-                  <span className="font-semibold text-[#2e8b57]">
-                    Works:
-                  </span>{" "}
-                  {research.contentTriggers.works.join(" · ")}
-                </p>
-              )}
-              {research.contentTriggers.avoids.length > 0 && (
-                <p className="mt-1">
-                  <span className="font-semibold text-[#a85c4a]">
-                    Avoid:
-                  </span>{" "}
-                  {research.contentTriggers.avoids.join(" · ")}
-                </p>
-              )}
-
-              {research.guidance && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    saveBusinessProfile({ audienceResearch: research.guidance });
-                    setSavedGuidance(true);
-                  }}
-                  disabled={savedGuidance}
-                  className="mt-4 rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-60"
-                >
-                  {savedGuidance
-                    ? "Guidance saved ✓"
-                    : "Use this across my content"}
-                </button>
-              )}
-            </div>
-          )}
+            {onOpenAvatars && (
+              <button
+                type="button"
+                onClick={onOpenAvatars}
+                className="mt-3 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+              >
+                Open Client Avatars →
+              </button>
+            )}
+          </div>
         </div>
       )}
 

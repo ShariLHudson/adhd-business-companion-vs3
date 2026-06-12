@@ -12,6 +12,7 @@ export type AppSection =
   | "profile"
   | "energy"
   | "templates-library"
+  | "saved-work"
   | "focus"
   | "progress"
   | "time-block"
@@ -21,6 +22,7 @@ export type AppSection =
   | "snippets"
   | "content-types"
   | "content-generator"
+  | "google-workspace"
   | "business-profile"
   | "client-avatars";
 
@@ -32,6 +34,7 @@ export type SidebarNavId =
   | "progress"
   | "projects"
   | "templates"
+  | "saved-work"
   | "playbook";
 
 export type SidebarToolId =
@@ -65,9 +68,10 @@ export const SIDEBAR_NAV: {
   emoji: string;
   mode?: CoachingMode;
 }[] = [
-  { id: "chat", label: "Chat", emoji: "💬", mode: "today" },
-  { id: "focus", label: "Focus", emoji: "🎯", mode: "focus" },
-  { id: "create", label: "Create", emoji: "✨" },
+  // Each door answers "what am I doing right now?" — no overlapping intent.
+  { id: "chat", label: "Chat", emoji: "💬", mode: "today" }, // think / get unstuck
+  { id: "focus", label: "Focus", emoji: "🎯", mode: "focus" }, // execute / focus / start
+  { id: "create", label: "Create", emoji: "✨" }, // produce content
 ];
 
 // Everything else stays in the product but leaves the main path. Shari can
@@ -81,7 +85,7 @@ export const MORE_NAV: {
   { id: "playbook", label: "Strategies", emoji: "📘" },
   { id: "projects", label: "Projects", emoji: "📁" },
   { id: "templates", label: "Templates", emoji: "📚" },
-  { id: "progress", label: "Progress", emoji: "📈", mode: "progress" },
+  { id: "saved-work", label: "Saved Work", emoji: "📂" },
 ];
 
 // Top-level nav items that open their own section (a panel) rather than
@@ -91,8 +95,8 @@ export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
   create: "content-generator",
   projects: "projects",
   templates: "templates-library",
+  "saved-work": "saved-work",
   playbook: "playbook",
-  progress: "progress",
 };
 
 export const SIDEBAR_TOOLS: {
@@ -100,9 +104,9 @@ export const SIDEBAR_TOOLS: {
   label: string;
   emoji: string;
 }[] = [
-  { id: "brain-dump", label: "Brain Dump", emoji: "🧠" },
+  { id: "brain-dump", label: "Clear My Mind", emoji: "🧠" },
   { id: "focus-timer", label: "Pomodoro", emoji: "⏱" },
-  { id: "reset-day", label: "Reset Day", emoji: "🔄" },
+  { id: "reset-day", label: "Fresh Start", emoji: "🔄" },
   { id: "breathe", label: "Breathe", emoji: "🌬" },
   { id: "voice", label: "Voice", emoji: "🎤" },
 ];
@@ -183,12 +187,12 @@ export const TOOL_SECTION: Partial<Record<SidebarToolId, AppSection>> = {
   "spin-wheel": "spin-wheel",
 };
 
-export const INPUT_PLACEHOLDER = "What would you like help with?";
+export const INPUT_PLACEHOLDER = "";
 
 export const MODE_FEEDBACK: Record<CoachingMode, string> = {
   today: "Chat — I'm here with you.",
   focus: "Focus — let's take it one step at a time.",
   "how-do-i": "Let's walk through this together.",
   playbook: "Let's work on what you're creating.",
-  progress: "Let's look at how things are going.",
+  progress: "Let's take one gentle step forward.",
 };

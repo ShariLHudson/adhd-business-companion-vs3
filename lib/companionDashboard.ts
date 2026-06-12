@@ -76,7 +76,7 @@ function poolForSituation(
       step({
         id: "brain-dump",
         label: "Clear your head",
-        description: "Brain Dump — get it all out",
+        description: "Clear My Mind — get it all out",
         emoji: "🧠",
         tool: "brain-dump",
         mode: "today",

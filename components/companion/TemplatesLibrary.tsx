@@ -19,6 +19,7 @@ import { RemixActions } from "@/components/companion/RemixActions";
 import { ScoreActions } from "@/components/companion/ScoreActions";
 import { ExportActions } from "@/components/companion/ExportActions";
 import type { AppSection } from "@/lib/companionUi";
+import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 
 const STATUS_TABS: { id: TemplateStatus; label: string }[] = [
   { id: "saved", label: "Saved" },
@@ -45,31 +46,30 @@ export function TemplatesLibrary({
   onBack,
   onOpen,
   onGenerate,
+  onBuildWithShari,
 }: {
   onBack?: () => void;
   onOpen?: (section: AppSection) => void;
   onGenerate?: (seed: { type?: string; brief?: string }) => void;
+  onBuildWithShari?: (input: CreationWorkspaceInput) => void;
 }) {
   const [items, setItems] = useState<TemplateItem[]>([]);
   const [status, setStatus] = useState<TemplateStatus>("saved");
-  const [category, setCategory] = useState<TemplateCategory | "all" | null>(
-    null,
-  );
+  const [category, setCategory] = useState<TemplateCategory | "all">("all");
   const [draft, setDraft] = useState<Draft | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
+  // Which category groups are expanded — empty means everything is closed.
+  const [openCats, setOpenCats] = useState<string[]>([]);
 
   useEffect(() => {
     setItems(getTemplates());
   }, []);
 
-  const visible =
-    category === null
-      ? []
-      : items.filter(
-          (t) =>
-            t.status === status &&
-            (category === "all" || t.category === category),
-        );
+  const visible = items.filter(
+    (t) =>
+      t.status === status &&
+      (category === "all" || t.category === category),
+  );
 
   function saveDraft() {
     const body = draft?.body.trim();
@@ -225,8 +225,44 @@ export function TemplatesLibrary({
           }
         />
 
-        {/* The high-value moment: generate a real, savable draft from this
-            template (not a disposable chat reply). */}
+        {onBuildWithShari && (
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() =>
+                onBuildWithShari({
+                  itemType: viewing.subcategory || viewing.title,
+                  title: viewing.title,
+                  draftContent: viewing.body,
+                  brief: viewing.title,
+                  templateId: viewing.id,
+                  stage: "using template",
+                })
+              }
+              className="rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
+            >
+              ✨ Use With Shari
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                onBuildWithShari({
+                  itemType: viewing.subcategory || viewing.title,
+                  title: viewing.title,
+                  draftContent: viewing.body,
+                  brief: `Customize this "${viewing.title}" template`,
+                  templateId: viewing.id,
+                  stage: "customizing template",
+                })
+              }
+              className="rounded-xl border-2 border-[#1e4f4f] bg-white px-5 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+            >
+              ✏️ Customize With Shari
+            </button>
+          </div>
+        )}
+
+        {/* Generate a fresh draft from this template (full-page create flow). */}
         {onGenerate && (
           <button
             type="button"
@@ -236,7 +272,7 @@ export function TemplatesLibrary({
                 brief: `Fill in this "${viewing.title}" template:\n\n${viewing.body}`,
               })
             }
-            className="mt-4 self-start rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
+            className="mt-3 self-start text-sm font-semibold text-[#1e4f4f] hover:underline"
           >
             ✨ Have Shari write this with me
           </button>
@@ -366,59 +402,111 @@ export function TemplatesLibrary({
         ))}
       </div>
 
-      {/* Category filter */}
-      <div className="mt-3 flex flex-wrap gap-2">
-        {(["all", ...TEMPLATE_CATEGORIES] as const).map((c) => (
-          <button
-            key={c}
-            type="button"
-            onClick={() => setCategory(c)}
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-              category === c
-                ? "bg-[#1e4f4f]/15 text-[#1e4f4f]"
-                : "bg-white/70 text-[#6b635a] hover:bg-white"
-            }`}
-          >
-            {c === "all" ? "All" : TEMPLATE_CATEGORY_LABEL[c]}
-          </button>
-        ))}
+      {/* Category filter — a dropdown instead of a wall of chips. */}
+      <div className="mt-3 flex flex-col">
+        <label className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+          Category
+        </label>
+        <select
+          value={category}
+          onChange={(e) =>
+            setCategory(e.target.value as TemplateCategory | "all")
+          }
+          className="mt-1 w-full max-w-xs rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+        >
+          <option value="all">All Categories</option>
+          {TEMPLATE_CATEGORIES.map((c) => (
+            <option key={c} value={c}>
+              {TEMPLATE_CATEGORY_LABEL[c]}
+            </option>
+          ))}
+        </select>
       </div>
 
-      {/* List */}
-      <div className="mt-5 flex flex-col gap-3">
-        {category === null ? (
-          <p className="text-base text-[#6b635a]">
-            👆 Pick a category above to see your templates.
-          </p>
-        ) : visible.length === 0 ? (
-          <p className="text-base text-[#6b635a]">
-            Nothing here yet.
-            {status === "saved" && " Create one, or save one of Shari's outputs."}
-          </p>
-        ) : (
-          visible.map((t) => (
-            <button
-              key={t.id}
-              type="button"
-              onClick={() => setViewId(t.id)}
-              className="flex items-center justify-between gap-3 rounded-xl border border-[#d4cdc3] bg-white/85 px-4 py-3 text-left transition-colors hover:border-[#1e4f4f]/45 hover:bg-white"
-            >
-              <span className="min-w-0">
-                <span className="block truncate text-base font-semibold text-[#1f1c19]">
-                  {t.title}
-                </span>
-                <span className="text-xs font-medium uppercase tracking-wide text-[#1e4f4f]">
-                  {TEMPLATE_CATEGORY_LABEL[t.category]}
-                  {t.subcategory ? ` · ${t.subcategory}` : ""}
-                </span>
-              </span>
-              <span aria-hidden="true" className="shrink-0 text-[#9a8f82]">
-                ›
-              </span>
-            </button>
-          ))
-        )}
-      </div>
+      {/* List — grouped by category, every group closed on open. */}
+      {visible.length === 0 ? (
+        <p className="mt-5 text-base text-[#6b635a]">
+          Nothing here yet.
+          {status === "saved" && " Create one, or save one of Shari's outputs."}
+        </p>
+      ) : (
+        (() => {
+          const groups = TEMPLATE_CATEGORIES.map((c) => ({
+            cat: c,
+            items: visible.filter((t) => t.category === c),
+          })).filter((g) => g.items.length > 0);
+          return (
+            <>
+              {openCats.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setOpenCats([])}
+                  className="mt-4 self-start text-sm font-semibold text-[#1e4f4f] hover:underline"
+                >
+                  ▲ Collapse all
+                </button>
+              )}
+              <div className="mt-3 flex flex-col gap-2.5">
+                {groups.map((g) => {
+                  const open = openCats.includes(g.cat);
+                  return (
+                    <div
+                      key={g.cat}
+                      className="overflow-hidden rounded-2xl border border-[#d4cdc3] bg-white/85"
+                    >
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setOpenCats((o) =>
+                            open ? o.filter((x) => x !== g.cat) : [...o, g.cat],
+                          )
+                        }
+                        className="flex w-full items-center justify-between px-4 py-3.5 text-left"
+                      >
+                        <span className="text-base font-semibold text-[#1f1c19]">
+                          {TEMPLATE_CATEGORY_LABEL[g.cat]}{" "}
+                          <span className="text-sm font-normal text-[#9a8f82]">
+                            ({g.items.length})
+                          </span>
+                        </span>
+                        <span className="text-[#9a8f82]">{open ? "▲" : "▼"}</span>
+                      </button>
+                      {open && (
+                        <div className="flex flex-col gap-2 px-3 pb-3">
+                          {g.items.map((t) => (
+                            <button
+                              key={t.id}
+                              type="button"
+                              onClick={() => setViewId(t.id)}
+                              className="flex items-center justify-between gap-3 rounded-xl border border-[#e4ddd2] bg-white px-4 py-3 text-left transition-colors hover:border-[#1e4f4f]/45"
+                            >
+                              <span className="min-w-0">
+                                <span className="block truncate text-base font-semibold text-[#1f1c19]">
+                                  {t.title}
+                                </span>
+                                <span className="text-xs font-medium uppercase tracking-wide text-[#1e4f4f]">
+                                  {TEMPLATE_CATEGORY_LABEL[t.category]}
+                                  {t.subcategory ? ` · ${t.subcategory}` : ""}
+                                </span>
+                              </span>
+                              <span
+                                aria-hidden="true"
+                                className="shrink-0 text-[#9a8f82]"
+                              >
+                                ›
+                              </span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          );
+        })()
+      )}
 
       {onBack && (
         <button

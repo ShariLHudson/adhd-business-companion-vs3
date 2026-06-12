@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, type RefObject } from "react";
 import { getPrefs } from "@/lib/companionStore";
+import { isProposalArtifact } from "@/lib/artifactType";
 
 // Send a finished piece where it's going: copy, print, push to a new Google
 // Doc, download, or copy-and-open the right social network to paste into.
@@ -24,12 +25,55 @@ export function ExportActions({
   text,
   title,
   social,
+  artifactType,
+  variant = "default",
+  docButtonRef,
+  printButtonRef,
+  onGoogleDocCreated,
+  onPrint,
+  onBeforeAction,
+  embedInPanel = false,
+  compact = false,
 }: {
   text: string;
   title?: string;
   social?: boolean;
+  artifactType?: string;
+  variant?: "default" | "proposal" | "workspace";
+  docButtonRef?: RefObject<HTMLButtonElement | null>;
+  printButtonRef?: RefObject<HTMLButtonElement | null>;
+  onGoogleDocCreated?: (
+    url: string,
+    docId?: string,
+    kind?: "doc" | "sheet" | "form",
+  ) => void;
+  onPrint?: () => void;
+  onBeforeAction?: () => string | null;
+  /** When true, do not open a new browser tab — parent embeds in workspace panel. */
+  embedInPanel?: boolean;
+  compact?: boolean;
 }) {
   const [flash, setFlash] = useState<string | null>(null);
+  const [googleConnected, setGoogleConnected] = useState<boolean | null>(null);
+  const workspaceMode = variant === "workspace" || variant === "proposal";
+  const proposalMode =
+    workspaceMode || isProposalArtifact(artifactType ?? title);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/google/status")
+      .then((r) => r.json())
+      .then((j) => {
+        if (!cancelled) setGoogleConnected(Boolean(j.connected));
+      })
+      .catch(() => {
+        if (!cancelled) setGoogleConnected(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   function note(m: string) {
     setFlash(m);
     window.setTimeout(() => setFlash(null), 2600);
@@ -58,10 +102,25 @@ export function ExportActions({
   }
 
   async function copy() {
-    note((await clip()) ? "Copied ✓" : "Select and copy manually.");
+    const ok = await clip();
+    if (ok) {
+      void import("@/lib/ecosystem/eventTrackingEngine").then(({ trackEcosystemEvent }) => {
+        trackEcosystemEvent({
+          eventType: "document.copy_used",
+          feature: "documents",
+          metadata: { artifactType: artifactType ?? title ?? "content" },
+        });
+      });
+    }
+    note(ok ? "Copied ✓" : "Select and copy manually.");
   }
 
   function print() {
+    const block = onBeforeAction?.();
+    if (block) {
+      note(block);
+      return;
+    }
     const w = window.open("", "_blank", "width=720,height=900");
     if (!w) {
       note("Allow pop-ups to print.");
@@ -74,14 +133,26 @@ export function ExportActions({
     w.document.close();
     w.focus();
     window.setTimeout(() => w.print(), 300);
+    onPrint?.();
+    if (workspaceMode) note("Opening print…");
   }
 
-  async function googleFile(kind: "doc" | "sheet") {
+  async function googleFile(kind: "doc" | "sheet" | "form") {
+    const block = onBeforeAction?.();
+    if (block) {
+      note(block);
+      return;
+    }
     const labels =
       kind === "sheet"
         ? { name: "Sheet", blank: "https://sheets.new" }
         : { name: "Doc", blank: "https://docs.google.com/document/create" };
-    // If a Google account is connected, create the file automatically.
+    if (workspaceMode && googleConnected === false) {
+      note(
+        "Google Docs isn't connected yet — connect in Settings, or keep working here.",
+      );
+      return;
+    }
     try {
       const r = await fetch("/api/google/create-doc", {
         method: "POST",
@@ -91,15 +162,50 @@ export function ExportActions({
       if (r.ok) {
         const j = await r.json();
         if (j.url) {
-          window.open(j.url, "_blank");
-          note(`Created in Google ${labels.name}s ✓`);
+          if (!embedInPanel) {
+            window.open(j.url, "_blank");
+          }
+          onGoogleDocCreated?.(j.url, j.id as string | undefined, kind);
+          void import("@/lib/ecosystem/eventTrackingEngine").then(({ trackEcosystemEvent }) => {
+            trackEcosystemEvent({
+              eventType:
+                kind === "sheet"
+                  ? "document.google_sheet_created"
+                  : kind === "form"
+                    ? "document.google_form_created"
+                    : "document.google_doc_created",
+              feature: "documents",
+              metadata: {
+                documentId: (j.id as string | undefined) ?? "",
+                artifactType: artifactType ?? title ?? kind,
+              },
+            });
+          });
+          note(
+            embedInPanel
+              ? `Opening in Google ${labels.name}s…`
+              : workspaceMode
+                ? "Created Google Doc ✓"
+                : `Created in Google ${labels.name}s ✓`,
+          );
           return;
         }
+      }
+      if (workspaceMode && r.status === 401) {
+        note(
+          "Google Docs isn't connected yet — connect in Settings, or keep working here.",
+        );
+        return;
       }
     } catch {
       /* fall through to copy-and-open */
     }
-    // Fallback: copy + open a blank file to paste into.
+    if (workspaceMode) {
+      note(
+        "Couldn't create the Google Doc right now — try again or save here first.",
+      );
+      return;
+    }
     const ok = await clip();
     window.open(labels.blank, "_blank");
     note(
@@ -146,33 +252,49 @@ export function ExportActions({
     "rounded-lg border border-[#1e4f4f]/40 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]";
 
   return (
-    <div className="mt-2">
-      {flash && (
+    <div className={compact ? "mt-2" : "mt-2"}>
+      {flash && !compact && (
         <p className="mb-2 text-sm font-semibold text-[#1e4f4f]">{flash}</p>
       )}
       <div className="flex flex-wrap gap-2">
-        <button type="button" onClick={copy} className={btn}>
-          📋 Copy
-        </button>
-        <button type="button" onClick={print} className={btn}>
-          🖨 Print
-        </button>
-        <button type="button" onClick={() => googleFile("doc")} className={btn}>
-          📝 Google Docs
-        </button>
+        {!compact && (
+          <button type="button" onClick={copy} className={btn}>
+            📋 Copy
+          </button>
+        )}
         <button
+          ref={printButtonRef}
           type="button"
-          onClick={() => googleFile("sheet")}
+          onClick={print}
           className={btn}
         >
-          📊 Google Sheets
+          {workspaceMode ? "🖨 Print" : "🖨 Print"}
         </button>
-        <button type="button" onClick={calendar} className={btn}>
-          📅 Calendar
+        <button
+          ref={docButtonRef}
+          type="button"
+          onClick={() => googleFile("doc")}
+          className={btn}
+        >
+          {workspaceMode ? "📝 Create Google Doc" : "📝 Google Docs"}
         </button>
-        <button type="button" onClick={download} className={btn}>
-          ⬇ Download
-        </button>
+        {!compact && (
+          <>
+            <button
+              type="button"
+              onClick={() => googleFile("sheet")}
+              className={btn}
+            >
+              📊 Google Sheets
+            </button>
+            <button type="button" onClick={calendar} className={btn}>
+              📅 Calendar
+            </button>
+            <button type="button" onClick={download} className={btn}>
+              ⬇ Download
+            </button>
+          </>
+        )}
       </div>
       {social && (
         <div className="mt-2">

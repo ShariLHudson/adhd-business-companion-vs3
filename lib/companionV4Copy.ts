@@ -5,7 +5,7 @@ export const V4_NEXT_STEP: Record<
   EmotionalState,
   { title: string; accent: string }
 > = {
-  overwhelmed: { title: "Clear your mind", accent: "Brain Dump" },
+  overwhelmed: { title: "Clear your mind", accent: "Clear My Mind" },
   stuck: { title: "Let's figure out the next step", accent: "One small move" },
   focused: { title: "Start 25-min Focus Session", accent: "Pomodoro Timer" },
   building: { title: "Open your Business Playbook", accent: "Create & structure" },

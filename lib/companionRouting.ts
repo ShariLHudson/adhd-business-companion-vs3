@@ -44,10 +44,10 @@ function route(id: ToolRouteId, def: Omit<ToolRoute, "id">): ToolRoute {
 
 const ROUTES: Record<ToolRouteId, RouteDef> = {
   "brain-dump": route("brain-dump", {
-    label: "Brain Dump",
+    label: "Clear My Mind",
     description: "Let's get everything out of your head — no structure needed",
     emoji: "🧠",
-    buttonLabel: "Let's start your Brain Dump",
+    buttonLabel: "Let's clear your mind",
     section: "brain-dump",
     tool: "brain-dump",
     mode: "today",

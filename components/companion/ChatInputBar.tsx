@@ -62,7 +62,7 @@ export function ChatInputBar({
         placeholder={INPUT_PLACEHOLDER}
         rows={1}
         disabled={isLoading}
-        className="max-h-32 min-h-12 flex-1 resize-none border-0 bg-transparent px-2 py-3 text-lg leading-relaxed text-[#1f1c19] placeholder:text-[#9a8f82] focus:outline-none disabled:opacity-50"
+        className="max-h-32 min-h-12 flex-1 resize-none border-0 bg-transparent px-2 py-3 text-lg leading-relaxed text-[#1f1c19] placeholder:text-[#6b635a] focus:outline-none disabled:opacity-50"
       />
 
       <button

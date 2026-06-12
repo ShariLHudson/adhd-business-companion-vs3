@@ -14,6 +14,7 @@ import { RemixActions } from "@/components/companion/RemixActions";
 import { ScoreActions } from "@/components/companion/ScoreActions";
 import { ExportActions } from "@/components/companion/ExportActions";
 import type { AppSection } from "@/lib/companionUi";
+import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 
 type Pkg = {
   subjects: string[];
@@ -49,8 +50,10 @@ const PERSONALIZE = [
 
 export function EmailGeneratorPanel({
   onOpen,
+  onBuildWithShari,
 }: {
   onOpen?: (s: AppSection) => void;
+  onBuildWithShari?: (input: CreationWorkspaceInput) => void;
 }) {
   const [goal, setGoal] = useState("");
   const [saveName, setSaveName] = useState("");
@@ -67,6 +70,8 @@ export function EmailGeneratorPanel({
   const [sequence, setSequence] = useState<SeqItem[]>([]);
   const [flash, setFlash] = useState<string | null>(null);
   const [forAvatar, setForAvatar] = useState<string | undefined>(undefined);
+  // Guided 3-step flow: 1 Intent → 2 Context → 3 Output. One decision at a time.
+  const [step, setStep] = useState(1);
 
   function note(msg: string) {
     setFlash(msg);
@@ -96,6 +101,7 @@ export function EmailGeneratorPanel({
         setBodies(data.versions.map((v: { body: string }) => v.body));
         setVIdx(0);
         setSubjectIdx(0);
+        setStep(3);
       } else {
         setError(true);
       }
@@ -205,84 +211,113 @@ export function EmailGeneratorPanel({
         save, and reuse.
       </p>
 
-      <div className="mt-5">
-        <ClientPicker value={forAvatar} onChange={setForAvatar} />
-      </div>
-
-      {/* Layer 1 — goal selector */}
-      <p className={`mt-5 ${label}`}>What are you writing?</p>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {GOALS.map((g) => (
-          <button
-            key={g}
-            type="button"
-            onClick={() => setGoal(g)}
-            className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors ${
-              goal === g
-                ? "bg-[#1e4f4f] text-white shadow-sm"
-                : "bg-white/80 text-[#3d3630] hover:bg-white"
-            }`}
-          >
-            {g}
-          </button>
-        ))}
-      </div>
-
-      <input
-        value={goal}
-        onChange={(e) => setGoal(e.target.value)}
-        placeholder="…or type your own goal"
-        className={`mt-3 ${inputCls}`}
-      />
-
-      <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-        <div className="min-w-0 flex-1">
-          <label className={label} htmlFor="eg-aud">
-            Who&apos;s it for? (optional)
-          </label>
+      {/* STEP 1 — INTENT: one decision, what are you writing? */}
+      {step === 1 && (
+        <div className="companion-fade-in">
+          <p className={`mt-5 ${label}`}>What are you writing?</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {GOALS.map((g) => (
+              <button
+                key={g}
+                type="button"
+                onClick={() => setGoal(g)}
+                className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+                  goal === g
+                    ? "bg-[#1e4f4f] text-white shadow-sm"
+                    : "bg-white/80 text-[#3d3630] hover:bg-white"
+                }`}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
           <input
-            id="eg-aud"
+            value={goal}
+            onChange={(e) => setGoal(e.target.value)}
+            placeholder="…or type your own"
+            className={`mt-3 ${inputCls}`}
+          />
+          <button
+            type="button"
+            onClick={() => setStep(2)}
+            disabled={!goal.trim()}
+            className="mt-4 self-start rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
+          >
+            Continue →
+          </button>
+        </div>
+      )}
+
+      {/* STEP 2 — CONTEXT: who for + tone, nothing else. */}
+      {step === 2 && (
+        <div className="companion-fade-in">
+          <p className={`mt-5 ${label}`}>Who is this for?</p>
+          <div className="mt-2">
+            <ClientPicker value={forAvatar} onChange={setForAvatar} />
+          </div>
+          <input
             value={audience}
             onChange={(e) => setAudience(e.target.value)}
-            placeholder="e.g. a past client"
-            className={`mt-1.5 ${inputCls}`}
+            placeholder="Anyone specific? (optional)"
+            className={`mt-2 ${inputCls}`}
           />
-        </div>
-        <div className="min-w-0 flex-1">
-          <label className={label} htmlFor="eg-tone">
-            Tone
-          </label>
-          <select
-            id="eg-tone"
-            value={tone}
-            onChange={(e) => setTone(e.target.value)}
-            className={`mt-1.5 ${inputCls}`}
-          >
-            {TONES.map((t) => (
-              <option key={t} value={t}>
-                {t}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
 
-      <button
-        type="button"
-        onClick={() => generate()}
-        disabled={!goal.trim() || loading}
-        className="mt-3 self-start rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
-      >
-        {loading ? "Writing…" : pkg ? "Regenerate" : "✨ Generate email"}
-      </button>
-      {error && (
-        <p className="mt-2 text-sm text-[#a85c4a]">
-          Couldn&apos;t generate just now — try again.
-        </p>
+          <p className={`mt-4 ${label}`}>Tone</p>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {TONES.map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => setTone(t)}
+                className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors ${
+                  tone === t
+                    ? "bg-[#1e4f4f] text-white shadow-sm"
+                    : "bg-white/80 text-[#3d3630] hover:bg-white"
+                }`}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-5 flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="rounded-xl border-2 border-[#1e4f4f] bg-white px-5 py-3 text-base font-semibold text-[#1e4f4f]"
+            >
+              ← Back
+            </button>
+            <button
+              type="button"
+              onClick={() => generate()}
+              disabled={!goal.trim() || loading}
+              className="rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
+            >
+              {loading ? "Writing…" : "✨ Generate email"}
+            </button>
+          </div>
+          {error && (
+            <p className="mt-2 text-sm text-[#a85c4a]">
+              Couldn&apos;t generate just now — try again.
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* STEP 3 — OUTPUT: edit details shortcut back to context. */}
+      {step === 3 && (
+        <button
+          type="button"
+          onClick={() => setStep(2)}
+          className="mt-5 self-start text-sm font-semibold text-[#1e4f4f] hover:underline"
+        >
+          ← Edit details
+        </button>
       )}
 
       {/* Package */}
-      {pkg && (
+      {step === 3 && pkg && (
         <div className="companion-fade-in mt-6 flex flex-col gap-5">
           {/* Personalization toggles */}
           <div>
@@ -496,10 +531,27 @@ export function EmailGeneratorPanel({
             />
             <p className={label}>What would you like to do with this?</p>
             <div className="mt-2 flex flex-wrap gap-2">
+              {onBuildWithShari && pkg && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    onBuildWithShari({
+                      itemType: "Email",
+                      title: saveName.trim() || goal.trim() || "Email",
+                      draftContent: fullArtifact(),
+                      brief: goal,
+                      stage: "editing draft",
+                    })
+                  }
+                  className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
+                >
+                  ✨ Build With Shari
+                </button>
+              )}
               <button
                 type="button"
                 onClick={saveToTemplates}
-                className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
+                className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
               >
                 💾 Save as Template
               </button>

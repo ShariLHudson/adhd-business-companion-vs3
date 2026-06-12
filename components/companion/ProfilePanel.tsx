@@ -27,7 +27,7 @@ export function ProfilePanel({
 }: {
   onOpen?: (section: AppSection) => void;
 }) {
-  const [open, setOpen] = useState<SectionId | null>("account");
+  const [open, setOpen] = useState<SectionId | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [savedAt, setSavedAt] = useState<number | null>(null);
@@ -200,7 +200,7 @@ export function ProfilePanel({
                       </summary>
                       <div className="mt-2 text-sm leading-relaxed text-[#4b463f]">
                         <p>
-                          1. Make any draft — in the Content generator, Email
+                          1. Create any draft — in Create, Email
                           generator, or open a saved template.
                         </p>
                         <p className="mt-1">

@@ -36,16 +36,26 @@ type IdentityBarProps = {
   logoError: boolean;
   onPhotoError: () => void;
   onLogoError: () => void;
+  /** Slim header once chat is underway — conversation owns the screen. */
+  compact?: boolean;
+  // Soft re-entry when unfinished work exists — one line only, no extra card.
+  resumeLine?: string | null;
+  // If memory exists, it MUST be actionable — clicking resumes the work.
+  onResumeClick?: () => void;
 };
 
 export function IdentityBar({
   emotion,
   photoError,
   onPhotoError,
+  resumeLine,
+  onResumeClick,
+  compact = false,
 }: IdentityBarProps) {
   // At rest the line simply invites; once there's a felt sense it reflects it.
-  const status =
-    emotion === "unclear"
+  const status = resumeLine
+    ? resumeLine
+    : emotion === "unclear"
       ? "Tell me how I can help"
       : (PRESENCE_LINES[emotion] ?? "I'm here with you");
   const ring = RING[emotion] ?? "#d4a574";
@@ -79,16 +89,57 @@ export function IdentityBar({
     };
   }, []);
 
-  // Gentle auto-rotate when there's more than one photo.
+  // Gentle auto-rotate when there's more than one photo (idle welcome only).
   useEffect(() => {
-    if (valid.length < 2) return;
+    if (compact || valid.length < 2) return;
     const id = window.setInterval(() => {
       setIdx((i) => (i + 1) % valid.length);
     }, 9000);
     return () => window.clearInterval(id);
-  }, [valid]);
+  }, [valid, compact]);
 
   const src = valid[idx % valid.length] ?? ASSETS.profile;
+
+  const avatar = (size: "lg" | "sm") => {
+    const dim = size === "lg" ? "h-24 w-24 text-2xl" : "h-10 w-10 text-sm";
+    const imgDim = size === "lg" ? 96 : 40;
+    return photoError ? (
+      <div
+        className={`flex ${dim} items-center justify-center rounded-full bg-gradient-to-br from-[#e8dfd4] to-[#d4c8b8] font-semibold text-[#5c534a]`}
+      >
+        S
+      </div>
+    ) : (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        key={src}
+        src={src}
+        alt="Shari"
+        width={imgDim}
+        height={imgDim}
+        onError={() => {
+          if (src === ASSETS.profile) onPhotoError();
+        }}
+        className={`companion-fade-in rounded-full object-cover transition-opacity duration-700 ${dim}`}
+      />
+    );
+  };
+
+  if (compact) {
+    return (
+      <header className="identity-bar identity-bar-compact shrink-0 px-4 py-2.5 sm:px-6">
+        <div className="mx-auto flex max-w-xl items-center justify-center gap-3">
+          <div
+            className="presence-glow shrink-0 rounded-full p-0.5 transition-shadow duration-700"
+            style={{ boxShadow: `0 0 0 2px ${ring}55, 0 0 12px ${ring}28` }}
+          >
+            {avatar("sm")}
+          </div>
+          <p className="text-base italic leading-snug text-[#6b635a]">{status}</p>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="identity-bar shrink-0 px-4 py-6 text-center sm:py-8">
@@ -97,32 +148,24 @@ export function IdentityBar({
           className="presence-glow rounded-full p-1 transition-shadow duration-700"
           style={{ boxShadow: `0 0 0 4px ${ring}55, 0 0 24px ${ring}33` }}
         >
-          {photoError ? (
-            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-[#e8dfd4] to-[#d4c8b8] text-2xl font-semibold text-[#5c534a]">
-              S
-            </div>
-          ) : (
-            // Plain img (not next/image) so the rotating gallery + crossfade are
-            // reliable. eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={src}
-              src={src}
-              alt="Shari"
-              width={96}
-              height={96}
-              onError={() => {
-                if (src === ASSETS.profile) onPhotoError();
-              }}
-              className="companion-fade-in h-24 w-24 rounded-full object-cover transition-opacity duration-700"
-            />
-          )}
+          {avatar("lg")}
         </div>
 
         <p className="mt-4 text-2xl font-semibold text-[#1f1c19]">
           Hi, I&apos;m Shari
         </p>
         <p className="mt-0.5 text-base text-[#1e4f4f]">{BRAND.tagline}</p>
-        <p className="mt-2 text-lg italic text-[#6b635a]">{status}</p>
+        {resumeLine && onResumeClick ? (
+          <button
+            type="button"
+            onClick={onResumeClick}
+            className="mt-2 text-lg font-semibold text-[#1e4f4f] underline decoration-[#1e4f4f]/40 underline-offset-4 hover:decoration-[#1e4f4f]"
+          >
+            {status} →
+          </button>
+        ) : (
+          <p className="mt-2 text-lg italic text-[#6b635a]">{status}</p>
+        )}
       </div>
     </header>
   );

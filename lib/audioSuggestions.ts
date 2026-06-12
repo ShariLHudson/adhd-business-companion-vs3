@@ -68,18 +68,25 @@ export function audioBackgroundMood(categoryId: string): AudioBackgroundMood {
  * Detects when a chat message is really asking for music/audio, and which
  * category fits. Used to route the conversation straight to Focus Audio.
  */
+const ENERGIZE_AUDIO_RE =
+  /\b(energi[sz]e|energi[sz]ing|pep (?:me )?up|pick me up|need (?:more )?energy|get (?:me )?going|wake me up|uplift(?:ing)?|something to energi[sz]e)\b/;
+
 export function detectAudioRequest(text: string): {
   isAudio: boolean;
   categoryId: string;
 } {
   const t = text.toLowerCase();
+  const wantsEnergize = ENERGIZE_AUDIO_RE.test(t);
   const isAudio =
     /\b(music|audio|sound|sounds|soundtrack|playlist|lo-?fi|lofi|noise|song|songs|tunes|listen|beats|ambien|something to (listen|play))\b/.test(
       t,
-    );
+    ) || wantsEnergize;
 
   let categoryId = "deep-work";
-  if (/\b(energi|energy|pump|hype|motivat|wake|moving|upbeat|boost|get going)\b/.test(t)) {
+  if (
+    wantsEnergize ||
+    /\b(energy|pump|hype|motivat|wake|moving|upbeat|boost|get going)\b/.test(t)
+  ) {
     categoryId = "motivation-boost";
   } else if (
     /\b(calm|relax|soothe|anxious|overwhelm|stress|unwind|chill|ground|settle)\b/.test(t)
@@ -101,7 +108,23 @@ export function audioSuggestionLine(categoryId: string): string {
   const name = categoryDisplayName(categoryId);
   const rec = getRecommendedTrack(categoryId);
   const tail = rec ? ` I'd cue up ${rec.name} to start.` : "";
+  if (categoryId === "motivation-boost") {
+    return (
+      `Energizing music can help — **Focus Audio** has a **${name}** playlist.${tail} ` +
+      `Want me to open it?`
+    );
+  }
   return `Sounds like ${name} is what you need.${tail} Want me to take you to Focus Audio?`;
+}
+
+export function focusAudioOpenAck(categoryId: string): string {
+  const name = categoryDisplayName(categoryId);
+  const rec = getRecommendedTrack(categoryId);
+  const tail = rec ? ` Starting with **${rec.name}**.` : "";
+  if (categoryId === "motivation-boost") {
+    return `Opening **Focus Audio** — **${name}** for an energy lift.${tail} Pick a track or add your own link.`;
+  }
+  return `Opening **Focus Audio** — **${name}** is ready.${tail}`;
 }
 
 /** The Companion calls this to recommend audio based on how the person feels. */

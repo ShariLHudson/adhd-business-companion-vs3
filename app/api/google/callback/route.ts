@@ -1,11 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { googleConfig, G_COOKIE, type GTokens } from "@/lib/google";
+import { safeGoogleOAuthReturnPath } from "@/lib/googleReturnPath";
 
 // OAuth redirect target: exchange the code for tokens, fetch the account email,
 // store everything in an httpOnly cookie, then return to the app.
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get("code");
-  const home = new URL("/companion", request.url);
+  const returnPath = safeGoogleOAuthReturnPath(
+    request.nextUrl.searchParams.get("state"),
+  );
+  const home = new URL(returnPath, request.url);
   if (!code) {
     home.searchParams.set("google", "error");
     return NextResponse.redirect(home);

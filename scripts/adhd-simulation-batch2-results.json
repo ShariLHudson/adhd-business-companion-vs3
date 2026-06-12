@@ -1,0 +1,397 @@
+{
+  "overall": 7.45,
+  "detectionGaps": [],
+  "results": [
+    {
+      "id": "fear-niching",
+      "label": "Fear of Niching Down",
+      "turns": [
+        {
+          "user": "I can't pick a niche — what if I choose wrong and lose everyone?",
+          "emotion": "unclear",
+          "obstacle": "decision_conflict",
+          "somatic": false,
+          "reply": "It sounds like you're feeling uncertain about choosing a niche, worried that a wrong decision could lead to losing your audience. This feeling of fear can make it tough to commit to one direction. What feels more pressing for you right now — the fear of making the wrong choice, or the desire to connect with the right audience?",
+          "score": 8,
+          "notes": [
+            "validates",
+            "generic",
+            "warm presence",
+            "speaks to decision_conflict"
+          ],
+          "words": 59,
+          "questions": 1
+        },
+        {
+          "user": "Staying general feels safer but I'm invisible. I'm afraid of picking the wrong one.",
+          "emotion": "unclear",
+          "obstacle": "decision_conflict",
+          "somatic": false,
+          "reply": "It's understandable to feel that staying general offers safety, yet it can lead to feeling invisible. That fear of making the wrong choice may be protecting you from the vulnerability of being seen. What might it look like to explore a niche that feels interesting to you, even if it's just a small step?",
+          "score": 10,
+          "notes": [
+            "validates",
+            "mirrors language",
+            "warm presence",
+            "speaks to decision_conflict"
+          ],
+          "words": 54,
+          "questions": 1
+        }
+      ],
+      "avgScore": 9,
+      "totalScore": 18
+    },
+    {
+      "id": "success-anxiety",
+      "label": "Success Anxiety",
+      "turns": [
+        {
+          "user": "Things are actually going well and that scares me more than failing did.",
+          "emotion": "emotional",
+          "obstacle": null,
+          "somatic": false,
+          "reply": "It's understandable to feel scared when things are going well; growth can bring its own kind of anxiety. It sounds like you're grappling with the pressure of success and the fear of what comes next. What feels heavier for you right now — the excitement of possibilities or the worry of maintaining this momentum?",
+          "score": 7,
+          "notes": [
+            "validates",
+            "some specificity",
+            "warm presence"
+          ],
+          "words": 54,
+          "questions": 1
+        },
+        {
+          "user": "Growth means visibility and responsibility — I'm afraid of success and what comes next.",
+          "emotion": "unclear",
+          "obstacle": "success_anxiety",
+          "somatic": false,
+          "reply": "That fear of visibility and responsibility is very real. Success can feel daunting because it often leads to increased expectations and scrutiny. It’s okay to acknowledge that pressure. What small step could you take to ease into this growth without feeling overwhelmed?",
+          "score": 10,
+          "notes": [
+            "validates",
+            "mirrors language",
+            "warm presence",
+            "speaks to success_anxiety"
+          ],
+          "words": 42,
+          "questions": 1
+        }
+      ],
+      "avgScore": 8.5,
+      "totalScore": 17
+    },
+    {
+      "id": "pricing-paralysis",
+      "label": "Pricing Paralysis",
+      "turns": [
+        {
+          "user": "I've been circling my pricing page for weeks. I know I'm undercharging but I can't bring myself to raise rates.",
+          "emotion": "unclear",
+          "obstacle": "self_doubt",
+          "somatic": false,
+          "reply": "It sounds like you're grappling with the fear of raising your rates, which can feel daunting and tied to your sense of worth. It’s normal to feel hesitant about changing something that impacts your livelihood. This isn't just about the numbers; it's about feeling confident in your value.\n\nWhat feels heavier for you right now — the fear of losing clients, or the frustration of undervaluing your work?",
+          "score": 8,
+          "notes": [
+            "validates",
+            "generic",
+            "warm presence",
+            "speaks to self_doubt"
+          ],
+          "words": 68,
+          "questions": 1
+        },
+        {
+          "user": "Every time I think about sending the new price I imagine them laughing at me.",
+          "emotion": "unclear",
+          "obstacle": "self_doubt",
+          "somatic": false,
+          "reply": "That fear of being laughed at reflects a deep concern about how others perceive your worth. It’s understandable to feel vulnerable when sharing something so personal as your pricing. This isn't just about the prices themselves, but about your confidence in what you offer.\n\nWhat do you think might be on the other side of that fear if you were to share your new rates?",
+          "score": 8,
+          "notes": [
+            "validates",
+            "generic",
+            "warm presence",
+            "speaks to self_doubt"
+          ],
+          "words": 65,
+          "questions": 1
+        }
+      ],
+      "avgScore": 8,
+      "totalScore": 16
+    },
+    {
+      "id": "inbox-shame",
+      "label": "Inbox Shame",
+      "turns": [
+        {
+          "user": "I have 847 unread emails and I can't open my inbox without a shame spiral starting.",
+          "emotion": "stuck",
+          "obstacle": "shame",
+          "somatic": false,
+          "reply": "It sounds like the weight of those unread emails is making it hard to even approach your inbox. That feeling of shame can be really heavy, especially when it feels like there's so much to catch up on. It's not a failure of willpower; it's your body responding to the overwhelm. \n\nLet’s take a small step to ease that pressure. How about setting a timer for just 5 minutes to open your inbox and see what stands out? Want to start with just that?",
+          "score": 8,
+          "notes": [
+            "validates",
+            "mirrors language",
+            "warm presence",
+            "speaks to shame"
+          ],
+          "words": 84,
+          "questions": 2
+        },
+        {
+          "user": "I've missed things that probably cost me money. I feel so stupid.",
+          "emotion": "unclear",
+          "obstacle": "shame",
+          "somatic": false,
+          "reply": "It’s really tough to face missed opportunities, especially when money is involved. That feeling of being stupid can add a lot of weight, and it’s understandable to feel that way when things slip through the cracks. It's important to recognize that everyone faces these kinds of challenges at times.\n\nInstead of focusing on what’s lost, let’s find a small next step to regain some control. Would you like to take a moment to identify just one email that might be urgent or important and focus on that?",
+          "score": 8,
+          "notes": [
+            "validates",
+            "mirrors language",
+            "speaks to shame"
+          ],
+          "words": 87,
+          "questions": 1
+        }
+      ],
+      "avgScore": 8,
+      "totalScore": 16
+    },
+    {
+      "id": "adhd-tax",
+      "label": "ADHD Tax Frustration",
+      "turns": [
+        {
+          "user": "The ADHD tax is real — forgot to invoice again, another late fee, another course I haven't finished.",
+          "emotion": "unclear",
+          "obstacle": "shame",
+          "somatic": false,
+          "reply": "It sounds like you're feeling the weight of missed deadlines and the frustration that comes with it. It's understandable to feel overwhelmed with everything piling up. It’s not just about forgetting; it’s more about how challenging it can be to keep everything on track. \n\nWhat feels heavier for you right now — the stress of the late fees, or the unfinished course?",
+          "score": 9,
+          "notes": [
+            "validates",
+            "mirrors language",
+            "speaks to shame"
+          ],
+          "words": 62,
+          "questions": 1
+        },
+        {
+          "user": "I keep paying for my own disorganization and I'm so frustrated with myself.",
+          "emotion": "emotional",
+          "obstacle": null,
+          "somatic": false,
+          "reply": "That frustration can be really heavy when it feels like your own disorganization is costing you. It’s tough when your efforts don’t seem to align with what you want to achieve. This feeling isn't a failure on your part; it’s a sign that something needs to shift in how you manage things.\n\nWhat’s one small thing you could do today to ease that frustration?",
+          "score": 7,
+          "notes": [
+            "validates",
+            "some specificity"
+          ],
+          "words": 64,
+          "questions": 1
+        }
+      ],
+      "avgScore": 8,
+      "totalScore": 16
+    },
+    {
+      "id": "financial-panic",
+      "label": "Financial Panic",
+      "turns": [
+        {
+          "user": "My income this month is scary and unpredictable — I'm panicking about bills.",
+          "emotion": "emotional",
+          "obstacle": "scarcity_fear",
+          "somatic": false,
+          "reply": "It sounds like the uncertainty around your income is creating a lot of anxiety about your bills. That pressure can feel overwhelming, especially when it seems like it's out of your control. \n\nWhat feels heavier right now — the worry about the bills or the unpredictability of your income?",
+          "score": 7,
+          "notes": [
+            "validates",
+            "some specificity",
+            "speaks to scarcity_fear"
+          ],
+          "words": 49,
+          "questions": 1
+        },
+        {
+          "user": "It's feast or famine every single month. I can't plan anything.",
+          "emotion": "emotional",
+          "obstacle": "scarcity_fear",
+          "somatic": false,
+          "reply": "That cycle of feast or famine can really amplify the stress of unpredictability, making it hard to feel secure in your finances. It's understandable to feel stuck in that pattern, especially when planning for the future feels impossible.\n\nWhat small step could help you feel a bit more grounded in this moment?",
+          "score": 8,
+          "notes": [
+            "validates",
+            "some specificity",
+            "speaks to scarcity_fear"
+          ],
+          "words": 52,
+          "questions": 1
+        }
+      ],
+      "avgScore": 7.5,
+      "totalScore": 15
+    },
+    {
+      "id": "further-along",
+      "label": "I Should Be Further Along",
+      "turns": [
+        {
+          "user": "I thought I'd be further along by now. I feel like I wasted years.",
+          "emotion": "unclear",
+          "obstacle": "grief",
+          "somatic": false,
+          "reply": "It sounds like you're grappling with a sense of loss over the time that feels like it has slipped away from you. That kind of grief can be heavy, especially when expectations don't match reality. It's okay to feel this way; many people experience similar reflections. \n\nWhat feels more pressing for you right now — the regret over the past, or the desire to move forward?",
+          "score": 7,
+          "notes": [
+            "validates",
+            "generic",
+            "warm presence",
+            "speaks to grief"
+          ],
+          "words": 66,
+          "questions": 1
+        },
+        {
+          "user": "Everyone else my age has a real business. I'm still figuring it out and grieving that.",
+          "emotion": "unclear",
+          "obstacle": "grief",
+          "somatic": false,
+          "reply": "It's tough when it feels like everyone else is ahead, and you're caught in a cycle of comparison. That can heighten the grief over your own journey and make it difficult to appreciate your own progress. It’s important to acknowledge that everyone’s path is different, and it’s okay to be in the figuring-out stage.\n\nWhat small step could you take today to honor your own journey and start moving forward?",
+          "score": 8,
+          "notes": [
+            "weak validation",
+            "mirrors language",
+            "warm presence",
+            "speaks to grief"
+          ],
+          "words": 70,
+          "questions": 1
+        }
+      ],
+      "avgScore": 7.5,
+      "totalScore": 15
+    },
+    {
+      "id": "ghosting-clients",
+      "label": "Ghosting Potential Clients",
+      "turns": [
+        {
+          "user": "A prospect reached out three days ago and I still haven't replied. Now it's too awkward.",
+          "emotion": "unclear",
+          "obstacle": "shame",
+          "somatic": false,
+          "reply": "It sounds like you're feeling a bit of shame about not replying to your prospect in time, which can make reaching out feel heavy. It’s understandable to feel that way, especially when you want to make a good impression. Remember, it’s common for people to get busy and miss a response. \n\nAcknowledge that it’s okay to reach out now, even if it feels awkward. What feels like the hardest part about sending that message?",
+          "score": 9,
+          "notes": [
+            "validates",
+            "mirrors language",
+            "warm presence",
+            "speaks to shame"
+          ],
+          "words": 74,
+          "questions": 1
+        },
+        {
+          "user": "I keep opening the draft and closing it. They're probably ghosting me in their head already.",
+          "emotion": "building",
+          "obstacle": "shame",
+          "somatic": false,
+          "reply": "It seems like you're feeling stuck, caught in a loop of second-guessing and fear of rejection. That hesitation often arises from wanting to protect yourself from potential judgment or disappointment. It's important to remember that reaching out can still open the door to a conversation, regardless of the past few days.\n\nInstead of focusing on what they might think, what if you just sent a simple follow-up message? It could be as easy as checking in to see if they received your previous communication. Would you like to draft that message together?",
+          "score": 4,
+          "notes": [
+            "validates",
+            "generic",
+            "warm presence",
+            "missed shame"
+          ],
+          "words": 92,
+          "questions": 2
+        }
+      ],
+      "avgScore": 6.5,
+      "totalScore": 13
+    },
+    {
+      "id": "rejection-spiral",
+      "label": "Rejection Spiral",
+      "turns": [
+        {
+          "user": "Got a no on a proposal yesterday and now I can't send anything else out.",
+          "emotion": "stuck",
+          "obstacle": "rejection_fear",
+          "somatic": false,
+          "reply": "It sounds like that rejection is making it hard to move forward. It's completely normal to feel stuck after a setback like that; your body might be bracing against the possibility of hearing \"no\" again. Remember, this isn't about willpower; it's about protecting yourself from potential hurt. \n\nWhat feels heavier right now — the fear of another rejection, or the pressure to keep trying?",
+          "score": 7,
+          "notes": [
+            "validates",
+            "generic",
+            "warm presence",
+            "speaks to rejection_fear"
+          ],
+          "words": 64,
+          "questions": 1
+        },
+        {
+          "user": "One rejection and my brain says I'm not cut out for this. They'll all say no.",
+          "emotion": "unclear",
+          "obstacle": "rejection_fear",
+          "somatic": false,
+          "reply": "That thought is heavy, and it’s understandable to feel that way after a rejection. Your brain might be trying to protect you from more disappointment by convincing you that it's not worth trying again. It’s not a reflection of your abilities or worth; it’s just a moment, not the whole picture. \n\nWhat if we focused on just one small step forward? Would you like to consider sending a low-stakes message to someone, or do you want to take a moment to acknowledge how you’re feeling?",
+          "score": 5,
+          "notes": [
+            "validates",
+            "some specificity",
+            "missed rejection_fear"
+          ],
+          "words": 85,
+          "questions": 2
+        }
+      ],
+      "avgScore": 6,
+      "totalScore": 12
+    },
+    {
+      "id": "comparing-others",
+      "label": "Comparing Yourself to Others",
+      "turns": [
+        {
+          "user": "Everyone in my niche seems years ahead of me. I scroll LinkedIn and feel sick comparing myself.",
+          "emotion": "emotional",
+          "obstacle": "comparison",
+          "somatic": true,
+          "reply": "It sounds like that comparison is weighing heavily on you and making you feel sick. It's not a failure of willpower; your body is reacting to the pressure of feeling behind. Those feelings are real and valid. \n\nWhat’s heavier for you right now — the pressure to catch up, or the discomfort of feeling exposed and not enough?",
+          "score": 6,
+          "notes": [
+            "validates",
+            "generic",
+            "warm presence",
+            "missed comparison"
+          ],
+          "words": 58,
+          "questions": 1
+        },
+        {
+          "user": "I know comparison is poison but I can't stop looking at what everyone else is doing.",
+          "emotion": "unclear",
+          "obstacle": "comparison",
+          "somatic": false,
+          "reply": "It’s understandable to feel drawn to what others are doing, especially when it seems to highlight where you feel you might be lacking. The urge to compare can be a way of seeking reassurance, but it often leads to more discomfort.\n\nWhat if you took a small break from social media to regain some clarity? Would that feel supportive right now?",
+          "score": 5,
+          "notes": [
+            "validates",
+            "generic",
+            "speaks to comparison"
+          ],
+          "words": 61,
+          "questions": 2
+        }
+      ],
+      "avgScore": 5.5,
+      "totalScore": 11
+    }
+  ]
+}

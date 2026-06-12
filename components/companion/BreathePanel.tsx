@@ -203,9 +203,12 @@ export function BreathePanel({ onDone }: { onDone?: () => void }) {
     }`;
 
   return (
-    <div className="companion-fade-in relative h-full overflow-y-auto">
+    <div className="companion-fade-in relative h-full overflow-y-auto px-4 py-8 sm:px-6">
       <SceneBackground page="progress" seed="breathe" />
-      <div className="relative mx-auto flex max-w-md flex-col items-center px-6 py-8 text-center">
+      <div className="relative mx-auto w-full max-w-xl">
+        {/* Large content area on a readable card over the scene — a sister
+            layout to Focus Audio (same width, spacing, immersive feel). */}
+        <div className="flex flex-col items-center rounded-2xl border border-[#1e4f4f]/15 bg-white/90 p-6 text-center shadow-sm backdrop-blur-sm sm:p-8">
         {/* Primary */}
         <p className="text-4xl font-bold text-[#1f1c19]">Breathe</p>
         {/* Secondary */}
@@ -341,6 +344,7 @@ export function BreathePanel({ onDone }: { onDone?: () => void }) {
               Done
             </button>
           )}
+        </div>
         </div>
       </div>
     </div>

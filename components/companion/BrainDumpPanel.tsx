@@ -10,7 +10,6 @@ import {
   getBrainDumps,
   getPrefs,
   getProjects,
-  getXp,
   logMomentum,
   loadBrainDumpDraft,
   saveBrainDumpDraft,
@@ -22,7 +21,23 @@ import {
   type Project,
 } from "@/lib/companionStore";
 import { RefineActions } from "@/components/companion/RefineActions";
+import { MicButton } from "./MicButton";
+import {
+  BRAINDUMP_CATEGORY_GROUPS,
+  normalizeCategory,
+} from "@/lib/brainDumpCategories";
 import type { AppSection } from "@/lib/companionUi";
+
+type TimeFilter = "today" | "week" | "month" | "30d" | "90d" | "all";
+
+const TIME_FILTERS: { id: TimeFilter; label: string }[] = [
+  { id: "today", label: "Today" },
+  { id: "week", label: "This Week" },
+  { id: "month", label: "This Month" },
+  { id: "30d", label: "Last 30 Days" },
+  { id: "90d", label: "Last 90 Days" },
+  { id: "all", label: "Everything" },
+];
 
 const TYPE_EMOJI: Record<string, string> = {
   task: "🧠",
@@ -69,10 +84,14 @@ export function BrainDumpPanel({
   const [text, setText] = useState("");
   const [entries, setEntries] = useState<BrainDumpEntry[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [view, setView] = useState<"today" | "week" | "everything">("today");
+  // Filter-first: nothing shows until the user picks a filter (or a summary
+  // chip / View items). Brain Dump should feel like a filing cabinet, not an
+  // inbox dumping everything at you on open.
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("week");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [viewed, setViewed] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [xpFlash, setXpFlash] = useState(false);
-  const [xp, setXp] = useState(0);
   const visualMode = getPrefs().visualMode;
   const colorOn = visualMode !== "off";
   const decorative = visualMode === "decorative";
@@ -82,7 +101,6 @@ export function BrainDumpPanel({
     if (draft) setText(draft);
     setEntries(getBrainDumps());
     setProjects(getProjects());
-    setXp(getXp());
   }, []);
 
   // Back press closes an open item detail first, then exits the panel.
@@ -133,6 +151,13 @@ export function BrainDumpPanel({
     clearBrainDumpDraft();
     setText("");
     logMomentum("capture", "Brain dump captured");
+    void import("@/lib/ecosystem/eventTrackingEngine").then(({ trackEcosystemEvent }) => {
+      trackEcosystemEvent({
+        eventType: "feature.brain_dump_used",
+        feature: "brain-dump",
+        metadata: { entryKind: "capture" },
+      });
+    });
     const id = list[0]?.id;
     if (id) void classify(id, trimmed);
   }
@@ -151,7 +176,7 @@ export function BrainDumpPanel({
 
   function markDone(id: string) {
     patch(id, { done: true });
-    setXp(addXp(10));
+    addXp(10); // internal momentum only — no visible score
     setXpFlash(true);
     setTimeout(() => setXpFlash(false), 1800);
     setExpandedId(null);
@@ -160,15 +185,33 @@ export function BrainDumpPanel({
   const projectName = (id?: string) =>
     id ? projects.find((p) => p.id === id)?.name : undefined;
 
-  const visible = entries.filter(
+  const activeEntries = entries.filter((e) => !e.done);
+  const inTime = (iso: string) => {
+    if (timeFilter === "all") return true;
+    if (timeFilter === "today") return isToday(iso);
+    if (timeFilter === "week") return withinDays(iso, 7);
+    if (timeFilter === "30d") return withinDays(iso, 30);
+    if (timeFilter === "90d") return withinDays(iso, 90);
+    const d = new Date(iso);
+    const n = new Date();
+    return d.getMonth() === n.getMonth() && d.getFullYear() === n.getFullYear();
+  };
+  const visible = activeEntries.filter(
     (e) =>
-      !e.done &&
-      (view === "today"
-        ? isToday(e.createdAt)
-        : view === "week"
-          ? withinDays(e.createdAt, 7)
-          : true),
+      inTime(e.createdAt) &&
+      (categoryFilter === "all" ||
+        normalizeCategory(e.category) === categoryFilter),
   );
+  // Overview counts across ALL saved items (the filing-cabinet summary).
+  const categoryCounts = activeEntries.reduce<Record<string, number>>(
+    (acc, e) => {
+      const c = normalizeCategory(e.category);
+      acc[c] = (acc[c] ?? 0) + 1;
+      return acc;
+    },
+    {},
+  );
+  const summary = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]);
 
   const chip = (active: boolean) =>
     `rounded-full px-3 py-1 text-xs font-semibold capitalize transition-colors ${
@@ -179,12 +222,7 @@ export function BrainDumpPanel({
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-2xl font-semibold text-[#1f1c19]">Brain Dump</p>
-        <span className="rounded-full bg-[#1e4f4f]/10 px-3 py-1 text-sm font-semibold text-[#1e4f4f]">
-          {xp} XP
-        </span>
-      </div>
+      <p className="text-2xl font-semibold text-[#1f1c19]">Clear My Mind</p>
       <p className="mt-2 text-base text-[#6b635a]">
         Get it out of your head. I&apos;ll sort it and tell you what wants to
         become action.
@@ -196,46 +234,117 @@ export function BrainDumpPanel({
         placeholder="Everything on your mind right now…"
         className="mt-5 min-h-[120px] resize-none rounded-2xl border-2 border-[#d4cdc3] bg-white/90 px-5 py-4 text-lg leading-relaxed text-[#1f1c19] placeholder:text-[#9a8f82] focus:border-[#1e4f4f] focus:outline-none focus:ring-2 focus:ring-[#1e4f4f]/15"
       />
-      <button
-        type="button"
-        disabled={!text.trim()}
-        onClick={handleSave}
-        className="mt-3 self-end rounded-xl bg-[#1e4f4f] px-8 py-2.5 text-base font-semibold text-white shadow-md hover:bg-[#163a3a] disabled:bg-[#9aaba8]"
-      >
-        Save
-      </button>
+      <div className="mt-3 flex items-center justify-end gap-2">
+        <MicButton
+          onText={(t) => handleChange(text ? `${text} ${t}` : t)}
+          title="Speak your thoughts instead of typing"
+        />
+        <button
+          type="button"
+          disabled={!text.trim()}
+          onClick={handleSave}
+          className="rounded-xl bg-[#1e4f4f] px-8 py-2.5 text-base font-semibold text-white shadow-md hover:bg-[#163a3a] disabled:bg-[#9aaba8]"
+        >
+          Save
+        </button>
+      </div>
 
       {xpFlash && (
         <p className="companion-fade-in mt-3 text-center text-base font-semibold text-[#1e4f4f]">
-          🎉 Nice — that counts! +10 XP
+          🎉 Nice — one less thing carrying mental weight.
         </p>
       )}
 
       {entries.some((e) => !e.done) && (
         <>
-          <div className="mt-7 flex gap-1 self-start rounded-full bg-white/70 p-0.5">
-            {(["today", "week", "everything"] as const).map((v) => (
-              <button
-                key={v}
-                type="button"
-                onClick={() => setView(v)}
-                className={`rounded-full px-3.5 py-1.5 text-sm font-semibold transition-colors ${
-                  view === v ? "bg-[#1e4f4f] text-white" : "text-[#6b635a]"
-                }`}
+          {/* Filing-cabinet overview — clickable counts set the category. */}
+          <p className="mt-7 text-sm font-bold uppercase tracking-wide text-[#7c7468]">
+            Your Clear My Mind items
+          </p>
+          <p className="mt-1 text-sm text-[#6b635a]">
+            You have {activeEntries.length}{" "}
+            {activeEntries.length === 1 ? "item" : "items"} across{" "}
+            {summary.length}{" "}
+            {summary.length === 1 ? "category" : "categories"}. Choose a
+            timeframe and category to see what needs your attention.
+          </p>
+          {summary.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {summary.map(([cat, count]) => (
+                <button
+                  key={cat}
+                  type="button"
+                  onClick={() => {
+                    setCategoryFilter(cat);
+                    setViewed(true);
+                  }}
+                  className="rounded-full border border-[#d4cdc3] bg-white/80 px-3 py-1 text-sm font-medium text-[#3d3630] transition-colors hover:border-[#1e4f4f] hover:bg-white"
+                >
+                  {cat} <span className="text-[#6b635a]">({count})</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Filter bar */}
+          <div className="mt-4 flex flex-wrap items-end gap-3">
+            <label className="flex flex-col text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+              Time
+              <select
+                value={timeFilter}
+                onChange={(e) => {
+                  setTimeFilter(e.target.value as TimeFilter);
+                  setViewed(true);
+                }}
+                className="mt-1 rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
               >
-                {v === "today"
-                  ? "Today"
-                  : v === "week"
-                    ? "This week"
-                    : "Everything"}
+                {TIME_FILTERS.map((t) => (
+                  <option key={t.id} value={t.id}>
+                    {t.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <label className="flex flex-col text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+              Category
+              <select
+                value={categoryFilter}
+                onChange={(e) => {
+                  setCategoryFilter(e.target.value);
+                  setViewed(true);
+                }}
+                className="mt-1 rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+              >
+                <option value="all">All Categories</option>
+                {BRAINDUMP_CATEGORY_GROUPS.map((g) => (
+                  <optgroup key={g.group} label={g.group}>
+                    {g.categories.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </label>
+            {!viewed && (
+              <button
+                type="button"
+                onClick={() => setViewed(true)}
+                className="rounded-xl bg-[#1e4f4f] px-5 py-2 text-base font-semibold text-white hover:bg-[#163a3a]"
+              >
+                View items
               </button>
-            ))}
+            )}
           </div>
 
-          {visible.length === 0 ? (
-            <p className="mt-3 text-base text-[#6b635a]">Nothing here.</p>
+          {viewed &&
+            (visible.length === 0 ? (
+            <p className="mt-4 text-base text-[#6b635a]">
+              Nothing here for this filter.
+            </p>
           ) : (
-            <ul className="mt-3 flex flex-col gap-3">
+            <ul className="mt-4 flex flex-col gap-3">
               {visible.map((entry) => (
                 <li
                   key={entry.id}
@@ -267,6 +376,10 @@ export function BrainDumpPanel({
                     <p className="mt-0.5 whitespace-pre-wrap text-base leading-relaxed text-[#2d2926]">
                       {entry.text}
                     </p>
+                    {/* Category badge — always visible for fast scanning. */}
+                    <span className="mt-1 inline-flex rounded-full bg-[#1e4f4f]/10 px-2 py-0.5 text-xs font-semibold text-[#1e4f4f]">
+                      {normalizeCategory(entry.category)}
+                    </span>
                     {(entry.topic || entry.contextType) && (
                       <span className="mt-1 inline-flex flex-wrap items-center gap-1.5 text-xs">
                         {entry.contextType && (
@@ -323,6 +436,29 @@ export function BrainDumpPanel({
                         text={entry.text}
                         onApply={(next) => patch(entry.id, { text: next })}
                       />
+
+                      {/* Manual category override — AI assigns, user can change. */}
+                      <p className="mt-3 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+                        Category
+                      </p>
+                      <select
+                        value={normalizeCategory(entry.category)}
+                        onChange={(e) =>
+                          patch(entry.id, { category: e.target.value })
+                        }
+                        className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-sm text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                      >
+                        {BRAINDUMP_CATEGORY_GROUPS.map((g) => (
+                          <optgroup key={g.group} label={g.group}>
+                            {g.categories.map((c) => (
+                              <option key={c} value={c}>
+                                {c}
+                              </option>
+                            ))}
+                          </optgroup>
+                        ))}
+                        <option value="Other">Other</option>
+                      </select>
 
                       <p className="mt-3 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
                         Project
@@ -450,7 +586,7 @@ export function BrainDumpPanel({
                 </li>
               ))}
             </ul>
-          )}
+            ))}
         </>
       )}
     </div>

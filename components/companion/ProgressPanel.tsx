@@ -1,280 +1,350 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import {
-  getPrefs,
   getProjects,
   getTodayMomentum,
   getWeekMomentum,
   logMomentum,
-  MOMENTUM_TYPE_LABEL,
   todayStr,
   type MomentumEvent,
   type MomentumType,
-  type PatternAwareness,
   type Project,
 } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
+import { MicButton } from "./MicButton";
 
-// Preset wins, grouped. Each is a one-tap "this happened today."
-const WIN_GROUPS: {
-  key: string;
-  emoji: string;
-  title: string;
-  items: string[];
-}[] = [
-  {
-    key: "showing-up",
-    emoji: "🌱",
-    title: "Showing up wins",
-    items: ["I opened the app", "I thought about my work"],
-  },
-  {
-    key: "action",
-    emoji: "⚡",
-    title: "Action wins",
-    items: ["I worked on a task", "I made progress"],
-  },
-  {
-    key: "business",
-    emoji: "💼",
-    title: "Business wins",
-    items: ["Client work", "Content creation", "Sales actions"],
-  },
+// Momentum is about *noticing* progress for the user — not asking them to log it.
+// Calm, lightweight, emotionally rewarding. Everything is derived from real
+// Companion activity. No scores, no streaks, no dashboard energy.
+
+type Bridge = { label: string; section: AppSection };
+
+// Warm closing observations — rotate one per day. Recognition, not metrics.
+const OBSERVATIONS = [
+  "You kept coming back today.",
+  "Progress doesn't have to be dramatic to matter.",
+  "You didn't need a perfect day to make progress.",
+  "You showed up even when things felt hard.",
+  "You made more progress than you probably realize.",
+  "Small steps still count as steps.",
+];
+
+// Personal, optional reflection prompts — rotate across themes (Wins, Self-
+// Compassion, Learning, ADHD Awareness, Gratitude). One at a time. Never homework.
+const PROMPTS = [
+  // Wins
+  "What went better than expected today?",
+  "What are you proud of today?",
+  "What did you finish today?",
+  // Self-compassion
+  "What was hard today?",
+  "What would you say to a friend who had your day?",
+  "What did you survive today?",
+  // Learning
+  "What helped more than expected?",
+  "What got in your way today?",
+  "What did you learn about yourself today?",
+  // ADHD awareness
+  "When did your brain work best today?",
+  "What helped you focus?",
+  "What drained your energy today?",
+  // Gratitude
+  "What made you smile today?",
+  "Who helped you today?",
+  "What are you thankful for?",
+];
+
+// "One thing Shari noticed today…" — encouraging, observational, never judgmental.
+const NOTICED_LINES = [
+  "You kept showing up even when motivation wasn't there.",
+  "You made progress by breaking things into smaller steps.",
+  "You kept returning to what mattered.",
+  "You paused before pushing harder.",
+  "You made room for recovery.",
 ];
 
 export function ProgressPanel({ onOpen }: { onOpen?: (s: AppSection) => void }) {
   const [events, setEvents] = useState<MomentumEvent[]>([]);
   const [week, setWeek] = useState<MomentumEvent[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-  const [pattern, setPattern] = useState<PatternAwareness>("light");
-  const [winText, setWinText] = useState("");
-  const [openGroup, setOpenGroup] = useState<string | null>("showing-up");
-  const [flash, setFlash] = useState<string | null>(null);
+  const [reflection, setReflection] = useState("");
+  const [saved, setSaved] = useState(false);
+  const [open, setOpen] = useState<string | null>(null); // accordion — all collapsed
+  const [moreOpen, setMoreOpen] = useState(false);
 
   function load() {
     setEvents(getTodayMomentum());
     setWeek(getWeekMomentum());
     setProjects(getProjects());
-    setPattern(getPrefs().patternAwareness);
   }
   useEffect(() => {
     load();
   }, []);
 
-  function logWin(text: string) {
-    const t = text.trim();
+  function saveReflection() {
+    const t = reflection.trim();
     if (!t) return;
-    logMomentum("move", `Win: ${t}`);
-    setFlash(t);
-    window.setTimeout(() => setFlash(null), 1600);
-    load();
+    logMomentum("move", `Reflection: ${t}`); // memory only — never shown as a score
+    setReflection("");
+    setSaved(true);
+    window.setTimeout(() => setSaved(false), 2200);
   }
 
-  function addWin() {
-    logWin(winText);
-    setWinText("");
-  }
+  // Stable per-day index for rotating copy.
+  const dayIndex = Number(todayStr().replace(/-/g, "")) || 0;
+  const observation = OBSERVATIONS[dayIndex % OBSERVATIONS.length];
+  const prompt = PROMPTS[dayIndex % PROMPTS.length];
+  const noticedLine = NOTICED_LINES[dayIndex % NOTICED_LINES.length];
 
-  // ---- Today's momentum — one line only, no score -------------------------
-  const count = (t: string) => events.filter((e) => e.type === t).length;
-  const actions = count("start") + count("move") + count("complete");
-  const phase =
-    count("complete") > 0 || actions >= 3
-      ? {
-          label: "Flow",
-          line: "Flow — you're in real motion today.",
-        }
-      : actions >= 1
-        ? {
-            label: "Building",
-            line: "Building — you took some real steps today.",
-          }
-        : {
-            label: "Starter",
-            line: "Starter — you showed up. That's enough to build from.",
-          };
+  // ---- Derive today's activity from real events --------------------------
+  const c = (t: MomentumType) => events.filter((e) => e.type === t).length;
+  const focusStarts = events.filter(
+    (e) => e.type === "start" && /focus session/i.test(e.label),
+  ).length;
+  const blockStarts = events.filter(
+    (e) => e.type === "start" && /^started:/i.test(e.label),
+  ).length;
+  const breatheCount = events.filter(
+    (e) => e.type === "reset" && /breath/i.test(e.label),
+  ).length;
+  const resetCount = c("reset") - breatheCount;
+  const captures = c("capture");
+  const completes = c("complete");
+  const moves = c("move");
+  const resilience = c("resilience");
 
-  // Wins already logged today (preset taps + custom both land here).
-  const loggedWins = events
-    .filter((e) => e.label?.startsWith("Win:"))
-    .map((e) => e.label.replace(/^Win:\s*/, ""));
-
-  // Projects actually touched today.
   const touched = projects.filter(
     (p) => (p.updatedAt ?? "").slice(0, 10) === todayStr(),
   );
 
-  // ---- Weekly pattern (opt-in, reflective only) ---------------------------
-  const weekDays = new Set(week.map((e) => e.ts.slice(0, 10))).size;
-  const typeCounts = week.reduce<Record<string, number>>((acc, e) => {
+  const plural = (n: number, one: string, many: string) =>
+    `${n} ${n === 1 ? one : many}`;
+
+  const noticed: string[] = [];
+  if (focusStarts)
+    noticed.push(`Completed ${plural(focusStarts, "focus session", "focus sessions")}`);
+  if (blockStarts)
+    noticed.push(`Started ${plural(blockStarts, "time block", "time blocks")}`);
+  if (completes)
+    noticed.push(`Finished ${plural(completes, "thing", "things")} you set out to do`);
+  if (captures)
+    noticed.push(`Captured ${plural(captures, "Clear My Mind item", "Clear My Mind items")}`);
+  if (breatheCount) noticed.push("Used Breathe & Reset");
+  if (resetCount > 0) noticed.push("Took a reset");
+  if (resilience) noticed.push("Came back after getting stuck");
+  if (moves) noticed.push("Moved a project forward");
+  touched.slice(0, 3).forEach((p) => noticed.push(`Worked on ${p.name}`));
+
+  // ---- Warm snapshot line ------------------------------------------------
+  const actions = focusStarts + blockStarts + completes + moves + captures;
+  const snapshot = resilience
+    ? "You came back after getting stuck. That takes real strength."
+    : completes > 0 || actions >= 3
+      ? "You're building momentum."
+      : actions >= 1
+        ? "You kept showing up — that counts."
+        : "A fresh page. Even being here is a start.";
+
+  // ---- Weekly observation (no counts, just patterns) ---------------------
+  const weekTypeCounts = week.reduce<Record<string, number>>((acc, e) => {
     acc[e.type] = (acc[e.type] ?? 0) + 1;
     return acc;
   }, {});
-  const topType = (Object.entries(typeCounts).sort(
+  const topType = (Object.entries(weekTypeCounts).sort(
     (a, b) => b[1] - a[1],
   )[0]?.[0] ?? null) as MomentumType | null;
-  const suggestion =
-    topType === "start"
-      ? "Short bursts of starting seemed to work for you — keep them small."
-      : topType === "capture"
-        ? "You capture a lot — try turning one capture into a single next step."
+
+  const weekLine =
+    topType === "capture" || topType === "reset"
+      ? "One thing I noticed — things tended to move more easily after you cleared your head first."
+      : topType === "start"
+        ? "You often found your footing after a short focus session."
         : topType === "move"
-          ? "Steady forward movement is your pattern — one project at a time fits you."
-          : "Small, consistent actions are adding up. Keep them bite-sized.";
+          ? "You moved best when you stayed with one thing at a time."
+          : topType === "complete"
+            ? "Finishing small things seemed to keep you going this week."
+            : "Small, steady actions have been adding up this week.";
+
+  // ---- One recommended action, guided by the week's pattern --------------
+  const primaryBridge: Bridge =
+    topType === "capture" || topType === "reset"
+      ? { label: "🧠 Clear my mind", section: "brain-dump" }
+      : topType === "start"
+        ? { label: "🎯 Focus session", section: "focus-timer" }
+        : topType === "complete" || topType === "move"
+          ? { label: "🎯 Focus session", section: "focus-timer" }
+          : { label: "💬 Talk with Shari", section: "home" };
+
+  const allBridges: Bridge[] = [
+    { label: "🧠 Clear my mind", section: "brain-dump" },
+    { label: "🎯 Focus session", section: "focus-timer" },
+    { label: "🌿 Breathe & reset", section: "breathe" },
+    { label: "💬 Talk with Shari", section: "home" },
+  ];
+  const otherBridges = allBridges.filter((b) => b.section !== primaryBridge.section);
+
+  const toggle = (id: string) => setOpen((o) => (o === id ? null : id));
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
-      {/* TODAY */}
-      <p className="text-2xl font-semibold text-[#1f1c19]">🟢 Today</p>
+      <p className="text-2xl font-semibold text-[#1f1c19]">Momentum</p>
 
-      {/* Momentum — one line, no number */}
-      <div className="mt-4 rounded-2xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.06] p-4">
-        <p className="text-sm font-semibold text-[#6b635a]">Today&apos;s momentum</p>
-        <p className="mt-0.5 text-lg font-bold text-[#1f1c19]">{phase.line}</p>
+      {/* Momentum snapshot — the one thing always visible */}
+      <div className="mt-4 rounded-2xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.06] p-5">
+        <p className="text-lg font-bold leading-snug text-[#1f1c19]">{snapshot}</p>
+        <p className="mt-2 text-base italic text-[#4b6b6b]">{observation}</p>
       </div>
 
-      {/* TODAY'S WINS */}
-      <p className="mt-7 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-        Today&apos;s wins
-      </p>
-
-      {loggedWins.length > 0 && (
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {loggedWins.map((w, i) => (
-            <span
-              key={i}
-              className="rounded-full bg-[#1e4f4f]/10 px-3 py-1 text-sm font-medium text-[#1e4f4f]"
-            >
-              ✓ {w}
-            </span>
-          ))}
-        </div>
-      )}
-
-      <div className="mt-3 flex flex-col gap-2">
-        {WIN_GROUPS.map((g) => {
-          const open = openGroup === g.key;
-          return (
-            <div
-              key={g.key}
-              className="overflow-hidden rounded-xl border border-[#d4cdc3] bg-white/85"
-            >
-              <button
-                type="button"
-                onClick={() => setOpenGroup(open ? null : g.key)}
-                className="flex w-full items-center justify-between px-4 py-3 text-left"
-              >
-                <span className="text-base font-semibold text-[#1f1c19]">
-                  {g.emoji} {g.title}
-                </span>
-                <span className="text-[#9a8f82]">{open ? "▲" : "▼"}</span>
-              </button>
-              {open && (
-                <div className="flex flex-wrap gap-2 px-4 pb-3">
-                  {g.items.map((item) => (
-                    <button
-                      key={item}
-                      type="button"
-                      onClick={() => logWin(item)}
-                      className="rounded-full border border-[#c9bfb0] bg-white px-3 py-1.5 text-sm font-medium text-[#4b463f] transition-colors hover:border-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
-                    >
-                      + {item}
-                    </button>
-                  ))}
-                </div>
-              )}
-            </div>
-          );
-        })}
-      </div>
-
-      {flash && (
-        <p className="mt-2 text-sm font-semibold text-[#1e4f4f]">
-          Logged: {flash} 🎉
-        </p>
-      )}
-
-      {/* PROJECTS YOU TOUCHED TODAY — real activity only */}
-      {touched.length > 0 && (
-        <>
-          <p className="mt-7 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-            What you worked on today
-          </p>
-          <div className="mt-2 flex flex-col gap-2">
-            {touched.slice(0, 6).map((p) => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => onOpen?.("projects")}
-                className="rounded-xl border border-[#d4cdc3] bg-white/85 p-3 text-left transition-colors hover:bg-white"
-              >
-                <span className="text-base font-semibold text-[#1f1c19]">
-                  {p.name}
-                </span>
-                {p.nextAction.trim() && (
-                  <span className="mt-0.5 block text-sm text-[#6b635a]">
-                    {p.nextAction}
-                  </span>
-                )}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-
-      {/* OPTIONAL — add a win or update */}
-      <p className="mt-7 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-        Add a win or update
-      </p>
-      <div className="mt-2 flex gap-2">
-        <input
-          value={winText}
-          onChange={(e) => setWinText(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") addWin();
-          }}
-          placeholder="Anything that happened today…"
-          className="min-w-0 flex-1 rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-        />
-        <button
-          type="button"
-          onClick={addWin}
-          disabled={!winText.trim()}
-          className="shrink-0 rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
+      {/* Accordion — all collapsed by default */}
+      <div className="mt-5 flex flex-col gap-2.5">
+        <Section
+          id="noticed"
+          title="What Shari noticed today"
+          open={open === "noticed"}
+          onToggle={() => toggle("noticed")}
         >
-          ➕ Add
-        </button>
-      </div>
-
-      {/* Weekly pattern — opt-in, reflective (kept below the fold) */}
-      {pattern !== "off" && week.length > 0 && (
-        <div className="mt-8 rounded-2xl border border-[#1e4f4f]/15 bg-white/70 p-4">
-          <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-            This week — what moved you forward
-          </p>
-          <p className="mt-2 text-base text-[#2d2926]">
-            🌿 You had movement on{" "}
-            <span className="font-semibold">{weekDays} of the last 7 days</span>
-            {topType && (
-              <>
-                , mostly through{" "}
-                <span className="font-semibold">
-                  {MOMENTUM_TYPE_LABEL[topType]}
-                </span>
-              </>
-            )}
-            .
-          </p>
-          {(pattern === "guided" || pattern === "active") && (
-            <p className="mt-2 text-base text-[#1e4f4f]">💡 {suggestion}</p>
+          {noticed.length > 0 ? (
+            <div className="flex flex-col gap-1.5">
+              {noticed.map((line, i) => (
+                <p key={i} className="text-base text-[#2d2926]">
+                  <span className="text-[#1e4f4f]">✓</span> {line}
+                </p>
+              ))}
+            </div>
+          ) : (
+            <p className="text-base text-[#6b635a]">
+              Nothing here yet — that&apos;s okay. Anything you do from here counts.
+            </p>
           )}
-          <p className="mt-2 text-xs text-[#9a8f82]">
-            No scores, no comparison — just what tended to help. Change this in
-            Settings → Pattern awareness.
+        </Section>
+
+        {week.length > 0 && (
+          <Section
+            id="week"
+            title="What seemed to help this week"
+            open={open === "week"}
+            onToggle={() => toggle("week")}
+          >
+            <p className="text-base leading-relaxed text-[#2d2926]">🌿 {weekLine}</p>
+          </Section>
+        )}
+
+        <Section
+          id="keep"
+          title="Keep the momentum going"
+          open={open === "keep"}
+          onToggle={() => toggle("keep")}
+        >
+          <button
+            type="button"
+            onClick={() => onOpen?.(primaryBridge.section)}
+            className="inline-flex items-center rounded-lg bg-[#1e4f4f] px-4 py-2.5 text-base font-semibold text-white transition-colors hover:bg-[#163a3a]"
+          >
+            {primaryBridge.label} →
+          </button>
+          <button
+            type="button"
+            onClick={() => setMoreOpen((m) => !m)}
+            className="mt-3 block text-sm font-semibold text-[#1e4f4f] hover:underline"
+          >
+            {moreOpen ? "Fewer options" : "More options"}
+          </button>
+          {moreOpen && (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {otherBridges.map((b) => (
+                <button
+                  key={b.label}
+                  type="button"
+                  onClick={() => onOpen?.(b.section)}
+                  className="rounded-full border border-[#c9bfb0] bg-white px-4 py-2 text-sm font-medium text-[#4b463f] transition-colors hover:border-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
+                >
+                  {b.label} →
+                </button>
+              ))}
+            </div>
+          )}
+        </Section>
+
+        <Section
+          id="reflect"
+          title="End of day reflection"
+          open={open === "reflect"}
+          onToggle={() => toggle("reflect")}
+        >
+          {/* One supportive observation before the prompt — never judgmental */}
+          <div className="rounded-xl bg-[#1e4f4f]/[0.05] px-3 py-2.5">
+            <p className="text-xs font-semibold uppercase tracking-wide text-[#9a8f82]">
+              One thing Shari noticed today…
+            </p>
+            <p className="mt-0.5 text-base text-[#2d2926]">{noticedLine}</p>
+          </div>
+          <p className="mt-3 text-sm text-[#9a8f82]">
+            Optional — a thought before today ends.
           </p>
-        </div>
-      )}
+          <p className="mt-2 text-base font-medium text-[#2d2926]">{prompt}</p>
+          <div className="mt-2 flex gap-2">
+            <input
+              value={reflection}
+              onChange={(e) => setReflection(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") saveReflection();
+              }}
+              placeholder="Type or tap 🎤 to speak…"
+              className="min-w-0 flex-1 rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+            />
+            <MicButton
+              onText={(t) =>
+                setReflection((prev) => (prev ? `${prev} ${t}` : t))
+              }
+            />
+            <button
+              type="button"
+              onClick={saveReflection}
+              disabled={!reflection.trim()}
+              className="shrink-0 rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
+            >
+              Save
+            </button>
+          </div>
+          {saved && (
+            <p className="mt-2 text-sm font-medium text-[#1e4f4f]">
+              Saved — I&apos;ll remember that. 🌿
+            </p>
+          )}
+        </Section>
+      </div>
+    </div>
+  );
+}
+
+function Section({
+  id,
+  title,
+  open,
+  onToggle,
+  children,
+}: {
+  id: string;
+  title: string;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div
+      id={id}
+      className="overflow-hidden rounded-2xl border border-[#1e4f4f]/15 bg-white/70"
+    >
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-center justify-between px-4 py-3.5 text-left"
+      >
+        <span className="text-base font-semibold text-[#2d2926]">{title}</span>
+        <span className="text-[#9a8f82]">{open ? "▲" : "▼"}</span>
+      </button>
+      {open && <div className="px-4 pb-4">{children}</div>}
     </div>
   );
 }

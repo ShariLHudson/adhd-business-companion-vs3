@@ -12,6 +12,7 @@ import {
   type Snippet,
   type SnippetKind,
 } from "@/lib/companionStore";
+import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 
 const KINDS: SnippetKind[] = [
   "hook",
@@ -43,9 +44,13 @@ const EMPTY: Draft = {
   category: "",
 };
 
-export function SnippetsLibrary() {
+export function SnippetsLibrary({
+  onBuildWithShari,
+}: {
+  onBuildWithShari?: (input: CreationWorkspaceInput) => void;
+}) {
   const [items, setItems] = useState<Snippet[]>([]);
-  const [filter, setFilter] = useState<SnippetKind | "all" | null>(null);
+  const [filter, setFilter] = useState<SnippetKind | "all">("all");
   const [draft, setDraft] = useState<Draft | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
 
@@ -97,10 +102,7 @@ export function SnippetsLibrary() {
     setSuggestions((list) => list.filter((x) => x !== s));
   }
 
-  const visible =
-    filter === null
-      ? []
-      : items.filter((s) => filter === "all" || s.kind === filter);
+  const visible = items.filter((s) => filter === "all" || s.kind === filter);
 
   function save() {
     if (!draft || !draft.content.trim()) return;
@@ -273,6 +275,44 @@ export function SnippetsLibrary() {
           </p>
         )}
         <div className="mt-5 flex flex-wrap gap-2 text-sm font-semibold">
+          {onBuildWithShari && (
+            <>
+              <button
+                type="button"
+                onClick={() =>
+                  onBuildWithShari({
+                    itemType: SNIPPET_KIND_LABEL[viewing.kind],
+                    title: `${SNIPPET_KIND_LABEL[viewing.kind]} snippet`,
+                    draftContent: viewing.content,
+                    brief: viewing.whenToUse
+                      ? `Use this ${SNIPPET_KIND_LABEL[viewing.kind].toLowerCase()} snippet. When: ${viewing.whenToUse}`
+                      : `Use this ${SNIPPET_KIND_LABEL[viewing.kind].toLowerCase()} snippet`,
+                    snippetKind: viewing.kind,
+                    stage: "using snippet in draft",
+                  })
+                }
+                className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-white hover:bg-[#163a3a]"
+              >
+                ✨ Use in Draft
+              </button>
+              <button
+                type="button"
+                onClick={() =>
+                  onBuildWithShari({
+                    itemType: SNIPPET_KIND_LABEL[viewing.kind],
+                    title: `${SNIPPET_KIND_LABEL[viewing.kind]} snippet`,
+                    draftContent: viewing.content,
+                    brief: `Adapt this snippet for my audience: ${viewing.content}`,
+                    snippetKind: viewing.kind,
+                    stage: "adapting snippet",
+                  })
+                }
+                className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-[#1e4f4f] hover:bg-[#f0f5f5]"
+              >
+                💬 Ask Shari to adapt this
+              </button>
+            </>
+          )}
           <button
             type="button"
             onClick={() => {
@@ -383,29 +423,26 @@ export function SnippetsLibrary() {
         </div>
       )}
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {(["all", ...KINDS] as const).map((k) => (
-          <button
-            key={k}
-            type="button"
-            onClick={() => setFilter(k)}
-            className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-              filter === k
-                ? "bg-[#1e4f4f]/15 text-[#1e4f4f]"
-                : "bg-white/70 text-[#6b635a] hover:bg-white"
-            }`}
-          >
-            {k === "all" ? "All" : SNIPPET_KIND_LABEL[k]}
-          </button>
-        ))}
+      <div className="mt-4 flex flex-col">
+        <label className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+          Type
+        </label>
+        <select
+          value={filter}
+          onChange={(e) => setFilter(e.target.value as SnippetKind | "all")}
+          className="mt-1 w-full max-w-xs rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+        >
+          <option value="all">All</option>
+          {KINDS.map((k) => (
+            <option key={k} value={k}>
+              {SNIPPET_KIND_LABEL[k]}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="mt-5 flex flex-col gap-3">
-        {filter === null ? (
-          <p className="text-base text-[#6b635a]">
-            👆 Pick a type above to see your snippets.
-          </p>
-        ) : visible.length === 0 ? (
+        {visible.length === 0 ? (
           <p className="text-base text-[#6b635a]">
             Nothing here yet. Create one, or save a line from the email
             generator.

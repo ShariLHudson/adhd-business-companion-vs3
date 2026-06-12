@@ -14,7 +14,7 @@ const CHIP_POOL: Record<
 > = {
   stuck: {
     think: ["Clear my head", "Break into steps"],
-    do: ["Get one step", "Start Brain Dump"],
+    do: ["Get one step", "Start Clear My Mind"],
     reset: ["Start Reset Day", "Clear my head"],
   },
   overwhelmed: {
@@ -41,7 +41,7 @@ const CHIP_POOL: Record<
 
 const CHIP_TO_ROUTE: Record<string, ToolRouteId> = {
   "Clear my head": "brain-dump",
-  "Start Brain Dump": "brain-dump",
+  "Start Clear My Mind": "brain-dump",
   "Start Reset Day": "reset-day",
   "Get one step": "one-step",
   "One small step": "one-step",

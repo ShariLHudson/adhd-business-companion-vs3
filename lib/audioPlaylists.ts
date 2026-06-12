@@ -3,7 +3,24 @@ export type AudioLink = {
   name: string;
   url: string;
   playlistId: string;
+  category?: string; // for saved audio: what it helps you do (focus/calm/…)
 };
+
+// Simple, human "what does this help you do?" buckets for SAVED audio — kept
+// deliberately lightweight (no playlists, folders, or tags).
+export const SAVED_AUDIO_CATEGORIES: {
+  id: string;
+  emoji: string;
+  name: string;
+}[] = [
+  { id: "focus", emoji: "🎯", name: "Focus" },
+  { id: "calm", emoji: "🌿", name: "Calm" },
+  { id: "energy", emoji: "⚡", name: "Energy" },
+  { id: "sleep", emoji: "😴", name: "Sleep" },
+  { id: "affirmations", emoji: "💬", name: "Affirmations" },
+  { id: "meditation", emoji: "🧘", name: "Meditation" },
+  { id: "other", emoji: "📁", name: "Other" },
+];
 
 export type AudioPlaylist = {
   id: string;
@@ -294,6 +311,18 @@ export function playAudioTrack(
   categoryId?: string
 ): boolean {
   const opened = openAudioLink(track.url);
+  if (opened && context === "focus-audio") {
+    void import("@/lib/ecosystem/eventTrackingEngine").then(({ trackEcosystemEvent }) => {
+      trackEcosystemEvent({
+        eventType: "feature.focus_audio_started",
+        feature: "focus-audio",
+        metadata: {
+          categoryId: categoryId ?? "focus",
+          trackId: track.id,
+        },
+      });
+    });
+  }
   if (opened && context && categoryId) {
     rememberAudioSelection(context, categoryId, track.id);
   } else if (opened && categoryId) {
@@ -313,8 +342,12 @@ export function playRecommendedTrack(
   return playAudioTrack(track, context, categoryId);
 }
 
-export function addMyAudioLink(name: string, url: string): AudioLink {
-  return addAudioLink(name, url, MY_AUDIO_PLAYLIST_ID);
+export function addMyAudioLink(
+  name: string,
+  url: string,
+  category?: string,
+): AudioLink {
+  return addAudioLink(name, url, MY_AUDIO_PLAYLIST_ID, category);
 }
 
 /** @deprecated Use focus preset via masterAudioCategories */
@@ -380,9 +413,20 @@ export function createPlaylist(name: string): AudioPlaylist {
   return pl;
 }
 
-export function addAudioLink(name: string, url: string, playlistId: string): AudioLink {
+export function addAudioLink(
+  name: string,
+  url: string,
+  playlistId: string,
+  category?: string,
+): AudioLink {
   const links = getAudioLinks();
-  const link: AudioLink = { id: "lnk-" + uid(), name: name.trim(), url: url.trim(), playlistId };
+  const link: AudioLink = {
+    id: "lnk-" + uid(),
+    name: name.trim(),
+    url: url.trim(),
+    playlistId,
+    ...(category ? { category } : {}),
+  };
   saveAudioLinks([link, ...links]);
   return link;
 }

@@ -4,6 +4,34 @@
 // Everything here is defensive: SSR-safe, wrapped in try/catch, and never
 // throws. Losing a save is acceptable; crashing the app is not.
 
+import {
+  DEFAULT_LANGUAGE_COMMUNICATION,
+  normalizeLanguageCommunication,
+  type LanguageCommunicationPrefs,
+} from "./companionLanguage";
+import { createCatalogTypeLabels } from "./createCatalog";
+
+export type {
+  LanguageCommunicationPrefs,
+  LanguageCode,
+  RegionCode,
+  DateFormat,
+} from "./companionLanguage";
+export {
+  DEFAULT_LANGUAGE_COMMUNICATION,
+  normalizeLanguageCommunication,
+  languageCommunicationSummary,
+  getOutputLanguageContext,
+  hasPendingLanguagePreferences,
+  languageOptionLabel,
+  getLanguageOption,
+  isLanguageAvailable,
+  PENDING_LANGUAGE_NOTICE,
+  LANGUAGE_OPTIONS,
+  REGION_OPTIONS,
+  DATE_FORMAT_OPTIONS,
+} from "./companionLanguage";
+
 export type StoredMessage = {
   role: "user" | "assistant" | "system";
   content: string;
@@ -313,6 +341,7 @@ export type TemplateItem = {
   category: TemplateCategory;
   subcategory?: string;
   status: TemplateStatus;
+  audienceIds?: string[]; // audiences this template is for (multiple allowed)
   createdAt: string;
   updatedAt: string;
 };
@@ -784,6 +813,7 @@ export type Snippet = {
   whereToUse?: string;
   category?: string;
   tags?: string[];
+  audienceIds?: string[]; // audiences this snippet is for (multiple allowed)
   createdAt: string;
   updatedAt: string;
 };
@@ -919,6 +949,7 @@ export function createSnippet(input: {
   whereToUse?: string;
   category?: string;
   tags?: string[];
+  audienceIds?: string[];
 }): Snippet[] {
   const content = input.content.trim();
   if (!content) return readSnippets();
@@ -932,6 +963,7 @@ export function createSnippet(input: {
     whereToUse: input.whereToUse,
     category: input.category,
     tags: input.tags,
+    audienceIds: input.audienceIds,
     createdAt: now,
     updatedAt: now,
   };
@@ -945,7 +977,14 @@ export function updateSnippet(
   changes: Partial<
     Pick<
       Snippet,
-      "content" | "kind" | "tone" | "whenToUse" | "whereToUse" | "category" | "tags"
+      | "content"
+      | "kind"
+      | "tone"
+      | "whenToUse"
+      | "whereToUse"
+      | "category"
+      | "tags"
+      | "audienceIds"
     >
   >,
 ): Snippet[] {
@@ -964,15 +1003,7 @@ export function deleteSnippet(id: string): Snippet[] {
 
 // ---- Content types (expandable: built-ins + user-created) ------------------
 
-export const DEFAULT_CONTENT_TYPES = [
-  "Email",
-  "Social post",
-  "Video script",
-  "Strategy",
-  "Plan",
-  "Follow-up sequence",
-  "Brain dump summary",
-];
+export const DEFAULT_CONTENT_TYPES = createCatalogTypeLabels();
 
 const CONTENT_TYPES_KEY = "companion-content-types-v1";
 
@@ -1508,6 +1539,19 @@ export function getTimeBlocks(): TimeBlock[] {
   return sortBlocks(readBlocks());
 }
 
+// Upcoming scheduled blocks for a project (today onward, not finished/missed).
+// Projects are the source of truth; this is how a project shows its sessions.
+export function timeBlocksForProject(projectId: string): TimeBlock[] {
+  const today = todayStr();
+  return getTimeBlocks().filter(
+    (b) =>
+      b.projectId === projectId &&
+      b.date >= today &&
+      b.status !== "completed" &&
+      b.status !== "missed",
+  );
+}
+
 export function saveTimeBlock(
   input: Partial<TimeBlock> & { id?: string },
 ): TimeBlock[] {
@@ -1791,6 +1835,14 @@ export function saveProject(
       p.id === input.id ? { ...p, ...input, updatedAt: now } : p,
     );
     writeProjects(next);
+    const up = next.find((p) => p.id === input.id);
+    if (up)
+      setLastActivity({
+        kind: "project",
+        title: up.name,
+        subtitle: "Project",
+        projectId: up.id,
+      });
     return next;
   }
   const project: Project = {
@@ -1808,6 +1860,12 @@ export function saveProject(
   };
   const next = [project, ...list];
   writeProjects(next);
+  setLastActivity({
+    kind: "project",
+    title: project.name,
+    subtitle: "Project",
+    projectId: project.id,
+  });
   return next;
 }
 
@@ -1815,6 +1873,53 @@ export function deleteProject(id: string): Project[] {
   const next = readProjects().filter((p) => p.id !== id);
   writeProjects(next);
   return next;
+}
+
+// ---- Continue memory -----------------------------------------------------
+// One record of the last meaningful thing the user was doing, so the home
+// screen can offer a single 1-click "continue" re-entry. Not a history list.
+export type LastActivity = {
+  kind: "draft" | "project" | "chat";
+  title: string;
+  subtitle?: string;
+  contentType?: string; // for drafts: email / post / plan …
+  content?: string; // partial draft to restore
+  projectId?: string;
+  summary?: string; // for chat: a short recap of what was being discussed
+  ts: string;
+};
+const LAST_ACTIVITY_KEY = "companion-last-activity-v1";
+export function getLastActivity(): LastActivity | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(LAST_ACTIVITY_KEY);
+    if (!raw) return null;
+    const a = JSON.parse(raw);
+    if (a && typeof a.title === "string" && typeof a.kind === "string")
+      return a as LastActivity;
+  } catch {
+    /* noop */
+  }
+  return null;
+}
+export function setLastActivity(a: Omit<LastActivity, "ts">): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(
+      LAST_ACTIVITY_KEY,
+      JSON.stringify({ ...a, ts: new Date().toISOString() }),
+    );
+  } catch {
+    /* noop */
+  }
+}
+export function clearLastActivity(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(LAST_ACTIVITY_KEY);
+  } catch {
+    /* noop */
+  }
 }
 
 export function clearDayState() {
@@ -1884,6 +1989,7 @@ export type Prefs = {
   activeAvatarId: string; // the client avatar currently "in use" app-wide
   advancedAiTools: boolean; // unlocks Multi-Avatar output mode (opt-in)
   onboarded: boolean; // has the user completed (or skipped) first-run onboarding
+  hasChatted: boolean; // has the user ever sent a message (returning vs first-time)
   name: string;
   email: string;
   howToMemory: string;
@@ -1891,7 +1997,7 @@ export type Prefs = {
   facebookUrl: string;
   instagramUrl: string;
   linkedinUrl: string;
-};
+} & LanguageCommunicationPrefs;
 
 const PREFS_KEY = "companion-prefs-v1";
 
@@ -1907,12 +2013,14 @@ const DEFAULT_PREFS: Prefs = {
   activeAvatarId: "",
   advancedAiTools: false,
   onboarded: false,
+  hasChatted: false,
   name: "",
   email: "",
   howToMemory: "",
   facebookUrl: "",
   instagramUrl: "",
   linkedinUrl: "",
+  ...DEFAULT_LANGUAGE_COMMUNICATION,
 };
 
 // Map legacy color values so older saved prefs keep working.
@@ -1931,6 +2039,7 @@ export function getPrefs(): Prefs {
     const parsed = JSON.parse(raw) as Partial<Prefs>;
     const merged = { ...DEFAULT_PREFS, ...parsed };
     merged.visualMode = normalizeVisualMode(merged.visualMode);
+    Object.assign(merged, normalizeLanguageCommunication(merged));
     return merged;
   } catch {
     return DEFAULT_PREFS;
@@ -1939,6 +2048,7 @@ export function getPrefs(): Prefs {
 
 export function savePrefs(update: Partial<Prefs>): Prefs {
   const next = { ...getPrefs(), ...update };
+  Object.assign(next, normalizeLanguageCommunication(next));
   if (typeof window !== "undefined") {
     try {
       localStorage.setItem(PREFS_KEY, JSON.stringify(next));

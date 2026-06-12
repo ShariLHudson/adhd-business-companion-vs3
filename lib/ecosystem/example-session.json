@@ -1,0 +1,134 @@
+{
+  "founder": {
+    "id": "founder-001",
+    "name": "Robin Maple",
+    "business": "Maple Studio (ADHD coaching)",
+    "goals": ["Steady monthly income", "Launch a signature program"],
+    "challenges": ["Overwhelm", "Inconsistent follow-through"],
+    "strengths": ["Big-picture thinking", "Warmth with clients"],
+    "createdAt": "2026-06-18T13:55:00.000Z",
+    "updatedAt": "2026-06-18T13:55:00.000Z"
+  },
+  "session": [
+    {
+      "id": "evt-001",
+      "founderId": "founder-001",
+      "type": "workspace.opened",
+      "ts": "2026-06-18T14:00:01.000Z",
+      "refs": { "workspace": "projects" },
+      "workspaceContext": { "kind": "projects", "layout": "split", "active": true }
+    },
+    {
+      "id": "evt-002",
+      "founderId": "founder-001",
+      "type": "project.created",
+      "ts": "2026-06-18T14:00:20.000Z",
+      "refs": { "projectId": "proj-100" },
+      "data": { "title": "ADHD Sales Funnel — Home Page & 7-Day Email" }
+    },
+    {
+      "id": "evt-003",
+      "founderId": "founder-001",
+      "type": "task.created",
+      "ts": "2026-06-18T14:01:05.000Z",
+      "refs": { "taskId": "task-200", "projectId": "proj-100" },
+      "data": { "title": "Rewrite sales page headline" }
+    },
+    {
+      "id": "evt-004",
+      "founderId": "founder-001",
+      "type": "chat.coaching",
+      "ts": "2026-06-18T14:02:10.000Z",
+      "userMessage": "I keep getting overwhelmed when I open the funnel project.",
+      "refs": { "projectId": "proj-100" }
+    },
+    {
+      "id": "evt-005",
+      "founderId": "founder-001",
+      "type": "painpoint.observed",
+      "ts": "2026-06-18T14:02:11.000Z",
+      "refs": { "painPointId": "pain-300" },
+      "data": { "text": "Overwhelm when the project feels too big" }
+    },
+    {
+      "id": "evt-006",
+      "founderId": "founder-001",
+      "type": "timeblock.created",
+      "ts": "2026-06-18T14:03:40.000Z",
+      "refs": { "timeBlockId": "tb-400", "projectId": "proj-100", "workspace": "time-block" },
+      "data": { "durationMin": 60 },
+      "workspaceContext": { "kind": "time-block", "layout": "split", "active": true }
+    },
+    {
+      "id": "evt-007",
+      "founderId": "founder-001",
+      "type": "focus.started",
+      "ts": "2026-06-18T14:05:00.000Z",
+      "refs": { "projectId": "proj-100" },
+      "data": { "plannedMinutes": 25 }
+    },
+    {
+      "id": "evt-008",
+      "founderId": "founder-001",
+      "type": "focus.completed",
+      "ts": "2026-06-18T14:30:02.000Z",
+      "refs": { "projectId": "proj-100" },
+      "data": { "actualMinutes": 25 }
+    },
+    {
+      "id": "evt-009",
+      "founderId": "founder-001",
+      "type": "task.completed",
+      "ts": "2026-06-18T14:30:30.000Z",
+      "refs": { "taskId": "task-200", "projectId": "proj-100" }
+    },
+    {
+      "id": "evt-010",
+      "founderId": "founder-001",
+      "type": "workspace.opened",
+      "ts": "2026-06-18T14:32:00.000Z",
+      "refs": { "workspace": "create" },
+      "workspaceContext": { "kind": "create", "layout": "split", "active": true }
+    },
+    {
+      "id": "evt-011",
+      "founderId": "founder-001",
+      "type": "document.created",
+      "ts": "2026-06-18T14:40:12.000Z",
+      "refs": { "documentId": "doc-500", "projectId": "proj-100" },
+      "data": { "docType": "sales-page", "title": "Maple Studio — Signature Program Sales Page" }
+    },
+    {
+      "id": "evt-012",
+      "founderId": "founder-001",
+      "type": "assisted_action.accepted",
+      "ts": "2026-06-18T14:41:00.000Z",
+      "refs": { "documentId": "doc-500" },
+      "data": { "action": "Help me draft the opening section" }
+    },
+    {
+      "id": "evt-013",
+      "founderId": "founder-001",
+      "type": "document.exported",
+      "ts": "2026-06-18T14:55:30.000Z",
+      "refs": { "documentId": "doc-500" },
+      "data": { "provider": "google-doc", "location": "https://docs.google.com/document/d/PLACEHOLDER/edit" }
+    },
+    {
+      "id": "evt-014",
+      "founderId": "founder-001",
+      "type": "decision.created",
+      "ts": "2026-06-18T14:58:00.000Z",
+      "refs": { "decisionId": "dec-600", "projectId": "proj-100" },
+      "data": { "text": "Price the signature program at $1,200 or run a beta cohort first?" }
+    },
+    {
+      "id": "evt-015",
+      "founderId": "founder-001",
+      "type": "opportunity.created",
+      "ts": "2026-06-18T14:59:10.000Z",
+      "refs": { "opportunityId": "opp-700" },
+      "data": { "text": "Past client asked about a group program — possible beta cohort" }
+    }
+  ]
+}

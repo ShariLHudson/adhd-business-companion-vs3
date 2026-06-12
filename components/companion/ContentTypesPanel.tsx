@@ -12,8 +12,10 @@ import {
 // are fixed; users add their own (e.g. "Podcast outreach email").
 export function ContentTypesPanel({
   onGenerate,
+  onBuildWithShari,
 }: {
   onGenerate?: (seed: { type?: string; brief?: string }) => void;
+  onBuildWithShari?: (type: string) => void;
 }) {
   const [custom, setCustom] = useState<string[]>([]);
   const [draft, setDraft] = useState("");
@@ -40,13 +42,22 @@ export function ContentTypesPanel({
     >
       <span className="text-base font-semibold text-[#1f1c19]">{t}</span>
       <span className="flex items-center gap-1">
+        {onBuildWithShari && (
+          <button
+            type="button"
+            onClick={() => onBuildWithShari(t)}
+            className="rounded-md px-2.5 py-1 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
+          >
+            ✨ Build With Shari
+          </button>
+        )}
         {onGenerate && (
           <button
             type="button"
             onClick={() => generate(t)}
-            className="rounded-md px-2.5 py-1 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
+            className="rounded-md px-2.5 py-1 text-sm font-semibold text-[#6b635a] hover:bg-black/5"
           >
-            ✨ Generate
+            Generate
           </button>
         )}
         {removable && (

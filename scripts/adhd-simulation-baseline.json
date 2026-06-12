@@ -1,0 +1,349 @@
+[
+  {
+    "id": "too-many-ideas",
+    "label": "Too many ideas",
+    "turns": [
+      {
+        "user": "I have so many business ideas I can't pick one. I'm starting everything and finishing nothing.",
+        "emotion": "unclear",
+        "reply": "It sounds like you're feeling overwhelmed by the number of business ideas you're juggling, leading to starting tasks but not completing them. This can create a cycle of frustration. \n\nTo help you regain focus, I suggest narrowing down to one idea. \n\nWhat’s one idea that excites you the most right now?",
+        "score": 8,
+        "notes": [
+          "validates",
+          "mirrors language",
+          "small step framing"
+        ],
+        "words": 51,
+        "questions": 1
+      },
+      {
+        "user": "Part of me is scared if I pick the wrong one I'll waste a year.",
+        "emotion": "emotional",
+        "reply": "It sounds like you're wrestling with the fear of making the wrong choice and potentially wasting time. This internal conflict can make it hard to commit to one idea. \n\nWhat feels more important to you right now — taking a risk on the idea that excites you, or staying in a safe space but potentially missing out on progress?",
+        "score": 6,
+        "notes": [
+          "validates",
+          "generic",
+          "small step framing"
+        ],
+        "words": 59,
+        "questions": 1
+      }
+    ],
+    "avgScore": 7,
+    "totalScore": 14
+  },
+  {
+    "id": "emotional-overwhelm",
+    "label": "Emotional overwhelm",
+    "turns": [
+      {
+        "user": "I'm exhausted and anxious and everything feels heavy. I might cry at my desk.",
+        "emotion": "emotional",
+        "reply": "It sounds like you're feeling really overwhelmed and heavy right now, and it's understandable to feel that way sometimes. It's important to take a moment for yourself. \n\nHow about we start with a small action, like taking a few deep breaths together? Want to try that?",
+        "score": 6,
+        "notes": [
+          "validates",
+          "generic",
+          "small step framing",
+          "warm presence",
+          "grounds first"
+        ],
+        "words": 46,
+        "questions": 2
+      },
+      {
+        "user": "I don't even know if it's work or life anymore. It's all blended together.",
+        "emotion": "unclear",
+        "reply": "It sounds like you're experiencing a lot of confusion and pressure as work and life blend together. This can create a feeling of being stuck and unable to separate your responsibilities, which is really tough. \n\nOne small step could be to take a short break to do something for yourself, like stretching or stepping outside for a few minutes. Would you like to start with that?",
+        "score": 8,
+        "notes": [
+          "validates",
+          "some specificity",
+          "small step framing",
+          "warm presence"
+        ],
+        "words": 66,
+        "questions": 1
+      }
+    ],
+    "avgScore": 7,
+    "totalScore": 14
+  },
+  {
+    "id": "overwhelmed",
+    "label": "Overwhelmed",
+    "turns": [
+      {
+        "user": "I have like 17 things on my list and my brain is shutting down. I can't even look at my inbox.",
+        "emotion": "unclear",
+        "reply": "It sounds like you're feeling overwhelmed with everything on your plate. Let's simplify this. \n\nPick just one small task from your list that feels the easiest to tackle right now. Want to start with just that?",
+        "score": 7,
+        "notes": [
+          "validates",
+          "generic",
+          "small step framing",
+          "warm presence"
+        ],
+        "words": 36,
+        "questions": 1
+      },
+      {
+        "user": "Honestly even picking one thing feels impossible. Everything feels urgent.",
+        "emotion": "unclear",
+        "reply": "I get it — when everything feels urgent, it can be paralyzing. Let's focus on a single step to break this cycle. \n\nHow about you take a deep breath and just jot down the first thing that comes to mind, no matter how small? We can take it from there. Want to start with that?",
+        "score": 5,
+        "notes": [
+          "weak validation",
+          "mirrors language",
+          "small step framing",
+          "warm presence"
+        ],
+        "words": 55,
+        "questions": 2
+      }
+    ],
+    "avgScore": 6,
+    "totalScore": 12
+  },
+  {
+    "id": "cant-finish",
+    "label": "Can't finish projects",
+    "turns": [
+      {
+        "user": "I have four half-finished projects and I feel like a failure. I always get to 80% and quit.",
+        "emotion": "unclear",
+        "reply": "It sounds like you're feeling overwhelmed and frustrated with your unfinished projects, and that can be really tough. It's common to hit a wall when you're so close to completion. \n\nWhat feels more challenging for you right now — the fear of not finishing, or the pressure to meet your own expectations?",
+        "score": 7,
+        "notes": [
+          "validates",
+          "mirrors language"
+        ],
+        "words": 52,
+        "questions": 1
+      },
+      {
+        "user": "The last 20% feels harder than the first 80% somehow.",
+        "emotion": "unclear",
+        "reply": "That makes sense. The final stretch can often feel the most daunting, leading to feelings of defeat or anxiety. This is a common pattern where the momentum slows down as you approach the finish line, often due to perfectionism or fear of judgment.\n\nHave you considered breaking that last 20% down into smaller, manageable tasks to make it feel less overwhelming?",
+        "score": 5,
+        "notes": [
+          "validates",
+          "generic"
+        ],
+        "words": 61,
+        "questions": 1
+      }
+    ],
+    "avgScore": 6,
+    "totalScore": 12
+  },
+  {
+    "id": "content-paralysis",
+    "label": "Content creation paralysis",
+    "turns": [
+      {
+        "user": "I've been staring at a blank doc for an hour. I need to post but I don't know what to say.",
+        "emotion": "unclear",
+        "reply": "It sounds like you're feeling stuck and overwhelmed by the blank page. Let's simplify this. \n\nHow about we start with one small step? Can you think of one idea or topic you’d like to share in your post?",
+        "score": 5,
+        "notes": [
+          "validates",
+          "generic",
+          "small step framing",
+          "warm presence"
+        ],
+        "words": 38,
+        "questions": 2
+      },
+      {
+        "user": "I keep thinking it has to be brilliant or people will judge me.",
+        "emotion": "unclear",
+        "reply": "It sounds like you're feeling pressure for your post to be perfect, which can really hold you back. This is a common struggle; the fear of judgment can paralyze creativity.\n\nRemember, not every post needs to be brilliant. Sometimes, sharing something simple or authentic can resonate more. \n\nWould you like to brainstorm a few straightforward ideas together to ease that pressure?",
+        "score": 7,
+        "notes": [
+          "validates",
+          "some specificity",
+          "warm presence"
+        ],
+        "words": 61,
+        "questions": 1
+      }
+    ],
+    "avgScore": 6,
+    "totalScore": 12
+  },
+  {
+    "id": "executive-dysfunction",
+    "label": "Executive dysfunction",
+    "turns": [
+      {
+        "user": "I know exactly what I need to do. My body just won't start. Like I'm frozen.",
+        "emotion": "stuck",
+        "reply": "It sounds like you're feeling really stuck and frozen, even though you know what needs to be done. Let's focus on getting you moving with one small step.\n\nHow about starting with just a quick 5-minute task related to what you need to do? Want to pick that first step together?",
+        "score": 6,
+        "notes": [
+          "validates",
+          "some specificity",
+          "small step framing",
+          "warm presence"
+        ],
+        "words": 51,
+        "questions": 2
+      },
+      {
+        "user": "It's a simple task. Ten minutes. But I've been sitting here for an hour.",
+        "emotion": "unclear",
+        "reply": "It seems like the longer you sit, the harder it is to start, which is completely understandable. Let's break that freeze.\n\nHow about setting a timer for just 5 minutes to get that task rolling? You can do it! Want to give that a try?",
+        "score": 6,
+        "notes": [
+          "validates",
+          "some specificity",
+          "small step framing",
+          "warm presence"
+        ],
+        "words": 45,
+        "questions": 2
+      }
+    ],
+    "avgScore": 6,
+    "totalScore": 12
+  },
+  {
+    "id": "time-blindness",
+    "label": "Time blindness",
+    "turns": [
+      {
+        "user": "I sat down to work at 9 and suddenly it's 3pm and I haven't done the thing I meant to do. Where did the day go?",
+        "emotion": "unclear",
+        "reply": "It sounds like you're feeling a bit lost and overwhelmed about how much time has passed without completing your task. This can happen when distractions or a lack of focus take over. \n\nLet's focus on one small step to get you moving forward. What if you take just 5 minutes to jot down what you need to accomplish? Want to start with that?",
+        "score": 5,
+        "notes": [
+          "validates",
+          "generic",
+          "small step framing",
+          "warm presence"
+        ],
+        "words": 63,
+        "questions": 2
+      },
+      {
+        "user": "I was 'busy' all day but nothing important moved forward.",
+        "emotion": "unclear",
+        "reply": "It seems like you're feeling frustrated about being busy but not making progress on what truly matters. This can lead to a sense of being stuck and overwhelmed.\n\nTo break this cycle, consider identifying one specific priority to focus on. What’s the most important thing you want to tackle right now?",
+        "score": 5,
+        "notes": [
+          "weak validation",
+          "some specificity",
+          "small step framing"
+        ],
+        "words": 51,
+        "questions": 1
+      }
+    ],
+    "avgScore": 5,
+    "totalScore": 10
+  },
+  {
+    "id": "perfectionism",
+    "label": "Perfectionism",
+    "turns": [
+      {
+        "user": "I've rewritten this email six times and still won't send it. It has to be perfect before anyone sees it.",
+        "emotion": "building",
+        "reply": "It sounds like you're feeling stuck in the cycle of perfectionism, which can make it hard to move forward. The desire for perfection can often lead to delaying actions like sending an email. Consider this: the email doesn't have to be flawless to be effective. \n\nWant to focus on a small change to help you move forward with sending it?",
+        "score": 7,
+        "notes": [
+          "validates",
+          "some specificity",
+          "small step framing"
+        ],
+        "words": 60,
+        "questions": 1
+      },
+      {
+        "user": "Every version feels wrong in a different way.",
+        "emotion": "unclear",
+        "reply": "It seems you're experiencing a feeling of frustration and confusion, which can often come from the pressure of wanting everything to be just right. This can create a loop where you feel compelled to keep changing things without finding clarity. \n\nWhat if you take a step back and identify just one specific aspect of the email that you feel is most important to get right? Would you like to explore that together?",
+        "score": 3,
+        "notes": [
+          "weak validation",
+          "generic",
+          "small step framing",
+          "warm presence"
+        ],
+        "words": 72,
+        "questions": 2
+      }
+    ],
+    "avgScore": 5,
+    "totalScore": 10
+  },
+  {
+    "id": "imposter",
+    "label": "Imposter syndrome",
+    "turns": [
+      {
+        "user": "Who am I to charge these prices? Everyone else seems more put together than me.",
+        "emotion": "unclear",
+        "reply": "It sounds like you're feeling uncertain about your pricing and comparing yourself to others, which can be really tough. This self-doubt can create a cycle of hesitation and insecurity. Remember, your value isn't determined by how others appear; it's based on what you bring to the table.\n\nWant to explore this feeling further, or would you like a small next step to help you gain clarity on your pricing?",
+        "score": 6,
+        "notes": [
+          "validates",
+          "generic",
+          "small step framing"
+        ],
+        "words": 69,
+        "questions": 1
+      },
+      {
+        "user": "A client complimented me yesterday and I still felt like a fraud.",
+        "emotion": "unclear",
+        "reply": "It's common to experience \"impostor syndrome,\" where external validation doesn't match your internal feelings of self-doubt. This disconnect can leave you feeling unworthy despite positive feedback. Recognizing that this is a common struggle may help ease some of that burden.\n\nWould you like to discuss strategies to build your confidence, or would you prefer to sit with this feeling for a moment?",
+        "score": 3,
+        "notes": [
+          "weak validation",
+          "generic"
+        ],
+        "words": 62,
+        "questions": 1
+      }
+    ],
+    "avgScore": 4.5,
+    "totalScore": 9
+  },
+  {
+    "id": "avoiding-sales",
+    "label": "Avoiding sales calls",
+    "turns": [
+      {
+        "user": "I know I need to make sales calls but I've been avoiding them for three days. Every time I open my CRM I feel sick.",
+        "emotion": "stuck",
+        "reply": "It sounds like you're feeling really stuck and overwhelmed by the idea of making those sales calls. It’s completely normal to feel that way when facing a daunting task. \n\nLet’s break this down to make it easier. How about starting with just opening your CRM and taking a quick look, without any pressure to make calls right away? Want to start with just that?",
+        "score": 4,
+        "notes": [
+          "validates",
+          "generic",
+          "small step framing"
+        ],
+        "words": 64,
+        "questions": 2
+      },
+      {
+        "user": "It's not that I don't know what to say — I just can't make myself dial.",
+        "emotion": "unclear",
+        "reply": "It seems like there's a real resistance to picking up the phone, which is common when it comes to sales calls. This can stem from fear of rejection or feeling pressured to perform. \n\nTo ease into it, try setting a very small goal: commit to making just one call today. This can help lower the pressure and make it feel more manageable. Want to start with that first call?",
+        "score": 4,
+        "notes": [
+          "weak validation",
+          "generic",
+          "small step framing"
+        ],
+        "words": 69,
+        "questions": 1
+      }
+    ],
+    "avgScore": 4,
+    "totalScore": 8
+  }
+]

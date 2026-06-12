@@ -12,7 +12,9 @@ export async function POST(request: NextRequest) {
   const body = await request.json();
   const title = ((body.title as string) || "Untitled").slice(0, 120);
   const content = (body.content as string) || "";
-  const kind = (body.kind as string) === "sheet" ? "sheet" : "doc";
+  const rawKind = (body.kind as string) ?? "doc";
+  const kind =
+    rawKind === "sheet" ? "sheet" : rawKind === "form" ? "form" : "doc";
 
   const tokens = await refreshIfNeeded(stored);
 
@@ -21,9 +23,13 @@ export async function POST(request: NextRequest) {
       ? "application/vnd.google-apps.spreadsheet"
       : "application/vnd.google-apps.document";
   const partType = kind === "sheet" ? "text/csv" : "text/plain";
+  const fileTitle =
+    kind === "form" && !title.toLowerCase().includes("form")
+      ? `Form: ${title}`
+      : title;
 
   const boundary = `spark${Date.now()}`;
-  const metadata = { name: title, mimeType };
+  const metadata = { name: fileTitle, mimeType };
   const multipart =
     `--${boundary}\r\n` +
     `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
@@ -58,7 +64,9 @@ export async function POST(request: NextRequest) {
     const url =
       kind === "sheet"
         ? `https://docs.google.com/spreadsheets/d/${j.id}/edit`
-        : `https://docs.google.com/document/d/${j.id}/edit`;
+        : kind === "form"
+          ? `https://docs.google.com/document/d/${j.id}/edit`
+          : `https://docs.google.com/document/d/${j.id}/edit`;
     const res = NextResponse.json({ url });
     // Persist any refreshed access token.
     if (tokens.access_token !== stored.access_token) {
