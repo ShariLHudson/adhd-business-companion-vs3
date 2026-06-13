@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AppSidebar } from "@/components/companion/AppSidebar";
 import { AdjustMyDayPanel } from "@/components/companion/AdjustMyDayPanel";
 import { BrainDumpPanel } from "@/components/companion/BrainDumpPanel";
@@ -21,6 +21,11 @@ import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
 import { ProfilePanel } from "@/components/companion/ProfilePanel";
 import { ModalSheet } from "@/components/companion/ModalSheet";
+import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm";
+import { CompanionSignInFromQuery } from "@/components/companion/CompanionSignInFromQuery";
+import { CompanionAuthGate } from "@/components/companion/CompanionAuthGate";
+import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import { hasUserOnboarded } from "@/lib/companionOnboarding";
 import { EmailGeneratorPanel } from "@/components/companion/EmailGeneratorPanel";
 import { SnippetsLibrary } from "@/components/companion/SnippetsLibrary";
 import { BusinessProfilePanel } from "@/components/companion/BusinessProfilePanel";
@@ -358,8 +363,6 @@ import {
 } from "@/lib/companionStore";
 import { playChime, unlockChime } from "@/lib/chime";
 import { type ScenePage } from "@/lib/companionBackgrounds";
-import "./companion.css";
-
 type SpeechRecognitionInstance = {
   continuous: boolean;
   interimResults: boolean;
@@ -597,16 +600,24 @@ export default function CompanionPage() {
     prevSectionRef.current = activeSection;
   }, [activeSection]);
 
-  // Settings / Profile open as modal sheets on top of the app (not pages).
-  const [overlay, setOverlay] = useState<null | "settings" | "profile">(null);
+  // Settings / Profile / Sign-in open as modal sheets on top of the app (not pages).
+  const [overlay, setOverlay] = useState<
+    null | "settings" | "profile" | "signin"
+  >(null);
+  const { configured: authConfigured, user } = useCompanionAuth();
+  const openSignIn = useCallback(() => setOverlay("signin"), []);
 
   // Voice output — Shari speaks her replies (ElevenLabs).
   const [voiceOutput, setVoiceOutput] = useState(false);
   const [voiceBlocked, setVoiceBlocked] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
   useEffect(() => {
-    if (!getPrefs().onboarded) setShowOnboarding(true);
-  }, []);
+    if (authConfigured && !user) return;
+    const userId = user?.id;
+    if (!hasUserOnboarded(userId)) {
+      setShowOnboarding(true);
+    }
+  }, [authConfigured, user]);
 
   // Continue card — the home "you were working on…" memory re-entry.
   const [lastAct, setLastAct] = useState<LastActivity | null>(null);
@@ -4565,11 +4576,19 @@ export default function CompanionPage() {
   ]);
 
   return (
+    <CompanionAuthGate>
     <div
       className={`relative flex h-dvh max-h-dvh overflow-hidden text-lg text-[#2d2926] ${shellClass}`}
     >
+      <Suspense fallback={null}>
+        <CompanionSignInFromQuery onOpen={openSignIn} />
+      </Suspense>
       {showOnboarding && (
-        <OnboardingFlow onDone={() => setShowOnboarding(false)} />
+        <OnboardingFlow
+          userId={user?.id}
+          requireSetup={authConfigured}
+          onDone={() => setShowOnboarding(false)}
+        />
       )}
       <CompanionBackground page={scenePage} seed={sceneSeed} />
 
@@ -4587,6 +4606,8 @@ export default function CompanionPage() {
             onNewDayChat={handleNewDayChat}
             onSettings={() => setOverlay("settings")}
             onProfile={() => setOverlay("profile")}
+            onSignIn={authConfigured ? openSignIn : undefined}
+            signedInEmail={user?.email ?? null}
             onOpenAvatars={() => setActiveSection("client-avatars")}
             minimal={activeSection === "home"}
           />
@@ -5171,11 +5192,25 @@ export default function CompanionPage() {
       )}
 
       <ModalSheet
+        open={overlay === "signin"}
+        onClose={() => setOverlay(null)}
+        title="Account"
+      >
+        <div className="px-5 pb-8">
+          <CompanionSignInForm
+            showClose
+            onClose={() => setOverlay(null)}
+            onSuccess={() => setOverlay(null)}
+          />
+        </div>
+      </ModalSheet>
+
+      <ModalSheet
         open={overlay === "settings"}
         onClose={() => setOverlay(null)}
         title="Settings"
       >
-        <SettingsPanel />
+        <SettingsPanel onSignIn={authConfigured ? openSignIn : undefined} />
       </ModalSheet>
 
       <ModalSheet
@@ -5184,6 +5219,7 @@ export default function CompanionPage() {
         title="Profile"
       >
         <ProfilePanel
+          onSignIn={authConfigured ? openSignIn : undefined}
           onOpen={(s) => {
             setOverlay(null);
             setActiveSection(s);
@@ -5207,5 +5243,6 @@ export default function CompanionPage() {
         />
       )}
     </div>
+    </CompanionAuthGate>
   );
 }

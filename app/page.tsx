@@ -1,7 +1,10 @@
 import { redirect } from "next/navigation";
 
+import { companionAuthConfigured } from "@/lib/supabase/companionClient";
+
 export default function Home() {
-  // The companion app lives at /companion. Send the home route there so
-  // localhost:3000 opens straight into the app instead of the starter page.
+  if (companionAuthConfigured()) {
+    redirect("/companion/login");
+  }
   redirect("/companion");
 }

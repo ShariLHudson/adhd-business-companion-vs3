@@ -5,6 +5,7 @@ import { ghlApiConfigured } from "@/lib/ghl/client";
 /** Temporary deploy debug — booleans/lengths only, never secret values. */
 export async function GET() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? "";
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ?? "";
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ?? "";
   const secretKey = process.env.SUPABASE_SECRET_KEY?.trim() ?? "";
   const ghlApiToken = process.env.GHL_API_TOKEN?.trim() ?? "";
@@ -15,6 +16,8 @@ export async function GET() {
     cwd: process.cwd(),
     hasSupabaseUrl: supabaseUrl.length > 0,
     supabaseUrlLength: supabaseUrl.length,
+    hasSupabaseAnonKey: anonKey.length > 0,
+    supabaseAnonKeyLength: anonKey.length,
     hasServiceRoleKey: serviceRoleKey.length > 0,
     serviceRoleKeyLength: serviceRoleKey.length,
     hasSupabaseSecretKey: secretKey.length > 0,

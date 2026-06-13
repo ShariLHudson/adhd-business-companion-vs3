@@ -8,6 +8,7 @@ import {
   savePrefs,
   type AvatarResearch,
 } from "@/lib/companionStore";
+import { markUserOnboarded } from "@/lib/companionOnboarding";
 
 // First-run onboarding — "teach the AI how your brain + business works in under
 // 2 minutes." Light, conversational, never a wall of forms. Builds the first
@@ -43,7 +44,16 @@ const GOALS = [
 const input =
   "w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
 
-export function OnboardingFlow({ onDone }: { onDone: () => void }) {
+export function OnboardingFlow({
+  onDone,
+  userId,
+  requireSetup = false,
+}: {
+  onDone: () => void;
+  userId?: string;
+  /** When true, hide "Skip for now" (signed-in funnel). */
+  requireSetup?: boolean;
+}) {
   const [screen, setScreen] = useState(0);
   const [forWhom, setForWhom] = useState("");
   const [name, setName] = useState("");
@@ -109,7 +119,7 @@ export function OnboardingFlow({ onDone }: { onDone: () => void }) {
       const tone = (customComms.trim() || comms).trim();
       saveBusinessProfile({ goals, ...(tone ? { tone } : {}) });
     }
-    savePrefs({ onboarded: true });
+    markUserOnboarded(userId);
     onDone();
   }
 
@@ -160,13 +170,15 @@ export function OnboardingFlow({ onDone }: { onDone: () => void }) {
             >
               Start
             </button>
-            <button
-              type="button"
-              onClick={() => finish(true)}
-              className="mt-3 text-sm font-medium text-[#9a8f82] hover:underline"
-            >
-              Skip for now
-            </button>
+            {!requireSetup ? (
+              <button
+                type="button"
+                onClick={() => finish(true)}
+                className="mt-3 text-sm font-medium text-[#9a8f82] hover:underline"
+              >
+                Skip for now
+              </button>
+            ) : null}
           </div>
         )}
 

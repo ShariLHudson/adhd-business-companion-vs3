@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { getPrefs, savePrefs } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
+import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 
 // --- Support + billing config ---------------------------------------------
 const SUPPORT_EMAIL = "info@visualsparkstudios.com";
@@ -24,9 +25,12 @@ const SECTIONS: { id: SectionId; label: string; emoji: string }[] = [
 
 export function ProfilePanel({
   onOpen,
+  onSignIn,
 }: {
   onOpen?: (section: AppSection) => void;
+  onSignIn?: () => void;
 }) {
+  const { configured, user, signOut } = useCompanionAuth();
   const [open, setOpen] = useState<SectionId | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -125,6 +129,18 @@ export function ProfilePanel({
               <div className="companion-fade-in border-t border-[#e7dfd4] px-4 py-4">
                 {s.id === "account" && (
                   <div className="flex flex-col gap-3">
+                    {configured ? (
+                      <div className="rounded-lg border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2.5 text-sm text-[#4b463f]">
+                        {user ? (
+                          <>
+                            Signed in as{" "}
+                            <strong>{user.email ?? "your account"}</strong>
+                          </>
+                        ) : (
+                          <>You are not signed in on this device.</>
+                        )}
+                      </div>
+                    ) : null}
                     <input
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -138,7 +154,7 @@ export function ProfilePanel({
                       type="email"
                       className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base outline-none focus:border-[#1e4f4f]"
                     />
-                    <div className="flex items-center gap-2">
+                    <div className="flex flex-wrap items-center gap-2">
                       <button
                         type="button"
                         onClick={() => {
@@ -149,14 +165,24 @@ export function ProfilePanel({
                       >
                         Save
                       </button>
-                      <button
-                        type="button"
-                        disabled
-                        title="Accounts are coming soon"
-                        className="rounded-xl border border-[#c9bfb0] px-5 py-2.5 text-sm font-semibold text-[#9a8f82]"
-                      >
-                        Log out
-                      </button>
+                      {configured && onSignIn ? (
+                        <button
+                          type="button"
+                          onClick={onSignIn}
+                          className="rounded-xl border border-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
+                        >
+                          {user ? "Account & sign-in" : "Sign in"}
+                        </button>
+                      ) : null}
+                      {user ? (
+                        <button
+                          type="button"
+                          onClick={() => void signOut()}
+                          className="rounded-xl border border-[#c9bfb0] px-5 py-2.5 text-sm font-semibold text-[#3d3630] hover:bg-[#f0f5f5]"
+                        >
+                          Log out
+                        </button>
+                      ) : null}
                       {savedAt && (
                         <span className="text-sm text-[#1e4f4f]">Saved ✓</span>
                       )}

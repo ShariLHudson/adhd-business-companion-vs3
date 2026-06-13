@@ -24,6 +24,7 @@ import {
   type Plan,
 } from "@/lib/companionStore";
 import { playChime, unlockChime } from "@/lib/chime";
+import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 
 const TONES: { id: AiTone; label: string; desc: string }[] = [
   { id: "calm", label: "Calm", desc: "Slow, grounding, spacious." },
@@ -145,9 +146,12 @@ const LABEL = "text-sm font-bold uppercase tracking-wide text-[#6b635a]";
 
 export function SettingsPanel({
   registerBack,
+  onSignIn,
 }: {
   registerBack?: (fn: (() => boolean) | null) => void;
+  onSignIn?: () => void;
 }) {
+  const { configured: authConfigured, user, signOut } = useCompanionAuth();
   const [open, setOpen] = useState<Section | null>(null);
   const [aiTone, setAiTone] = useState<AiTone>("balanced");
   const [helpMode, setHelpMode] = useState<HelpMode>("ask-first");
@@ -843,6 +847,37 @@ export function SettingsPanel({
       <div className={wrap}>
         {header("Account")}
         <div className="mt-4 flex flex-col gap-4">
+          {authConfigured ? (
+            <div className="rounded-lg border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2.5 text-sm text-[#4b463f]">
+              {user ? (
+                <>
+                  Signed in as <strong>{user.email ?? "your account"}</strong>
+                </>
+              ) : (
+                <>Sign in to save your account across devices.</>
+              )}
+            </div>
+          ) : null}
+          {authConfigured && onSignIn ? (
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={onSignIn}
+                className="rounded-xl border border-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
+              >
+                {user ? "Account & sign-in" : "Sign in"}
+              </button>
+              {user ? (
+                <button
+                  type="button"
+                  onClick={() => void signOut()}
+                  className="rounded-xl border border-[#c9bfb0] px-5 py-2.5 text-sm font-semibold text-[#3d3630] hover:bg-[#f0f5f5]"
+                >
+                  Log out
+                </button>
+              ) : null}
+            </div>
+          ) : null}
           <div>
             <label className={LABEL} htmlFor="acct-name">
               Name
