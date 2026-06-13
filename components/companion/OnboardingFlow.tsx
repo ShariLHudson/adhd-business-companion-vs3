@@ -47,12 +47,9 @@ const input =
 export function OnboardingFlow({
   onDone,
   userId,
-  requireSetup = false,
 }: {
   onDone: () => void;
   userId?: string;
-  /** When true, hide "Skip for now" (signed-in funnel). */
-  requireSetup?: boolean;
 }) {
   const [screen, setScreen] = useState(0);
   const [forWhom, setForWhom] = useState("");
@@ -170,15 +167,13 @@ export function OnboardingFlow({
             >
               Start
             </button>
-            {!requireSetup ? (
-              <button
-                type="button"
-                onClick={() => finish(true)}
-                className="mt-3 text-sm font-medium text-[#9a8f82] hover:underline"
-              >
-                Skip for now
-              </button>
-            ) : null}
+            <button
+              type="button"
+              onClick={() => finish(true)}
+              className="mt-3 text-sm font-medium text-[#9a8f82] hover:underline"
+            >
+              Skip for now
+            </button>
           </div>
         )}
 

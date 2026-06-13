@@ -31,8 +31,11 @@ export default function CompanionLoginPage() {
         <p className="text-center text-sm font-medium text-[#6b635a]">
           Spark Studio Companion
         </p>
+        <h1 className="mt-3 text-center text-2xl font-semibold text-[#1f1c19]">
+          Welcome
+        </h1>
         <p className="mt-2 text-center text-sm text-[#6b635a]">
-          Sign in or create your account to get started.
+          Sign in or create your account to open your Companion.
         </p>
         <div className="mt-6">
           <CompanionSignInForm

@@ -611,13 +611,8 @@ export default function CompanionPage() {
   const [voiceOutput, setVoiceOutput] = useState(false);
   const [voiceBlocked, setVoiceBlocked] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
-  useEffect(() => {
-    if (authConfigured && !user) return;
-    const userId = user?.id;
-    if (!hasUserOnboarded(userId)) {
-      setShowOnboarding(true);
-    }
-  }, [authConfigured, user]);
+  const openSetup = useCallback(() => setShowOnboarding(true), []);
+  const needsSetup = !hasUserOnboarded(user?.id);
 
   // Continue card — the home "you were working on…" memory re-entry.
   const [lastAct, setLastAct] = useState<LastActivity | null>(null);
@@ -4586,7 +4581,6 @@ export default function CompanionPage() {
       {showOnboarding && (
         <OnboardingFlow
           userId={user?.id}
-          requireSetup={authConfigured}
           onDone={() => setShowOnboarding(false)}
         />
       )}
@@ -4763,12 +4757,49 @@ export default function CompanionPage() {
                     </div>
                   ) : hasChatted ? (
                     // Returning user: one soft line, no starter wall.
-                    <p className="mx-auto mt-5 max-w-xl text-center text-base text-[#6b635a]">
-                      What&apos;s on your mind? Just start typing or talking.
-                    </p>
+                    <>
+                      {needsSetup && (
+                        <div className="mx-auto mt-5 w-full max-w-md rounded-2xl border border-[#1e4f4f]/20 bg-white/90 p-4 shadow-sm">
+                          <p className="text-base font-semibold text-[#1f1c19]">
+                            Personalize Shari for your business
+                          </p>
+                          <p className="mt-1 text-sm text-[#6b635a]">
+                            About 2 minutes — helps Shari speak your language.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={openSetup}
+                            className="mt-3 rounded-xl bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
+                          >
+                            Start setup
+                          </button>
+                        </div>
+                      )}
+                      <p className="mx-auto mt-5 max-w-xl text-center text-base text-[#6b635a]">
+                        What&apos;s on your mind? Just start typing or talking.
+                      </p>
+                    </>
                   ) : (
-                    // First-timer: 3 starter taps to beat the blank page.
+                    // First-timer: welcome + optional setup, then starter chips.
                     <div className="mx-auto mt-5 flex max-w-xl flex-col items-center gap-2.5">
+                      {needsSetup && (
+                        <div className="w-full max-w-md rounded-2xl border border-[#1e4f4f]/20 bg-white/90 p-4 shadow-sm">
+                          <p className="text-base font-semibold text-[#1f1c19]">
+                            Welcome — glad you&apos;re here
+                          </p>
+                          <p className="mt-1 text-sm text-[#6b635a]">
+                            Optional: take 2 minutes so Shari knows your business.
+                            You can also jump straight into chat below.
+                          </p>
+                          <button
+                            type="button"
+                            onClick={openSetup}
+                            className="mt-3 rounded-xl bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
+                          >
+                            Start 2-minute setup
+                          </button>
+                        </div>
+                      )}
                       <p className="text-base text-[#6b635a]">
                         Not sure where to start? Tap one:
                       </p>
