@@ -7,7 +7,7 @@ import {
   verifyFounderAdminToken,
 } from "@/lib/founderAdmin";
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isFounderPage = pathname.startsWith("/founder");
   const isFounderApi = pathname.startsWith("/api/founder");
