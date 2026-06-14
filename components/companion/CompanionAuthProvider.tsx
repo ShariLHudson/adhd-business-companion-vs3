@@ -100,33 +100,70 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
         if (!configured) {
           return { error: "Sign-in is not configured on this server yet." };
         }
-        const supabase = getCompanionSupabase();
-        if (!supabase) {
-          return { error: "Sign-in is not available right now." };
+        try {
+          const res = await fetch("/api/companion-auth/signin", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password }),
+          });
+          const data = (await res.json()) as {
+            ok?: boolean;
+            error?: string;
+            session?: { access_token: string; refresh_token: string };
+          };
+          if (!res.ok || !data.ok || !data.session) {
+            return { error: data.error ?? "Sign-in failed." };
+          }
+          const supabase = getCompanionSupabase();
+          if (!supabase) {
+            return { error: "Could not save your session in the browser." };
+          }
+          const { error } = await supabase.auth.setSession(data.session);
+          if (error) return { error: error.message };
+          return { error: null };
+        } catch {
+          return {
+            error:
+              "Could not reach the server. Check your connection and try again.",
+          };
         }
-        const { error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
-        return { error: error?.message ?? null };
       },
       signUp: async (email, password, name) => {
         if (!configured) {
           return { error: "Sign-in is not configured on this server yet." };
         }
-        const supabase = getCompanionSupabase();
-        if (!supabase) {
-          return { error: "Sign-in is not available right now." };
+        try {
+          const res = await fetch("/api/companion-auth/signup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email, password, name }),
+          });
+          const data = (await res.json()) as {
+            ok?: boolean;
+            error?: string;
+            needsConfirmation?: boolean;
+            session?: { access_token: string; refresh_token: string };
+          };
+          if (!res.ok || !data.ok) {
+            return { error: data.error ?? "Sign-up failed." };
+          }
+          if (data.needsConfirmation) {
+            return { error: null, needsConfirmation: true };
+          }
+          if (data.session) {
+            const supabase = getCompanionSupabase();
+            if (supabase) {
+              const { error } = await supabase.auth.setSession(data.session);
+              if (error) return { error: error.message };
+            }
+          }
+          return { error: null, needsConfirmation: false };
+        } catch {
+          return {
+            error:
+              "Could not reach the server. Check your connection and try again.",
+          };
         }
-        const { data, error } = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: {
-            data: name?.trim() ? { name: name.trim() } : undefined,
-          },
-        });
-        if (error) return { error: error.message };
-        return { error: null, needsConfirmation: !data.session };
       },
       signOut: async () => {
         const supabase = getCompanionSupabase();

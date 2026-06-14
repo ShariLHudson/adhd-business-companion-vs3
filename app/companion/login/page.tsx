@@ -6,6 +6,7 @@ import { useEffect } from "react";
 
 import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import { APP_BRAND_LINE } from "@/lib/appSite";
 import { companionAuthConfigStatus } from "@/lib/supabase/companionClient";
 
 export default function CompanionLoginPage() {
@@ -31,7 +32,7 @@ export default function CompanionLoginPage() {
     <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] px-4">
       <div className="w-full max-w-sm rounded-2xl border border-[#d4cdc3] bg-white p-6 shadow-sm">
         <p className="text-center text-sm font-medium text-[#6b635a]">
-          Spark Studio
+          {APP_BRAND_LINE}
         </p>
         <h1 className="mt-3 text-center text-2xl font-semibold text-[#1f1c19]">
           Welcome to your ADHD Ecosystem

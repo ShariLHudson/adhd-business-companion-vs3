@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { APP_DISPLAY_NAME } from "@/lib/appSite";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Shari Companion",
-  description: "Your warm, grounded coach and companion",
+  title: APP_DISPLAY_NAME,
+  description: "Your warm, grounded ADHD business ecosystem",
 };
 
 export default function RootLayout({

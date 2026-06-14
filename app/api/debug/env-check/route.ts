@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 
+import { getAppSiteUrl } from "@/lib/appSite";
 import { ghlApiConfigured } from "@/lib/ghl/client";
+import { companionAuthConfigStatus } from "@/lib/supabase/companionClient";
 
 /** Temporary deploy debug — booleans/lengths only, never secret values. */
 export async function GET() {
+  const appUrl = process.env.NEXT_PUBLIC_APP_URL?.trim() ?? "";
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? "";
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ?? "";
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim() ?? "";
@@ -12,12 +15,17 @@ export async function GET() {
   const ghlPrivateToken = process.env.GHL_PRIVATE_INTEGRATION_TOKEN?.trim() ?? "";
   const ghlLocationId = process.env.GHL_LOCATION_ID?.trim() ?? "";
 
+  const auth = companionAuthConfigStatus();
+
   return NextResponse.json({
     cwd: process.cwd(),
+    hasAppUrl: appUrl.length > 0,
+    resolvedAppUrl: getAppSiteUrl(),
     hasSupabaseUrl: supabaseUrl.length > 0,
     supabaseUrlLength: supabaseUrl.length,
     hasSupabaseAnonKey: anonKey.length > 0,
     supabaseAnonKeyLength: anonKey.length,
+    anonKeyLooksValid: auth.anonKeyLooksValid,
     hasServiceRoleKey: serviceRoleKey.length > 0,
     serviceRoleKeyLength: serviceRoleKey.length,
     hasSupabaseSecretKey: secretKey.length > 0,

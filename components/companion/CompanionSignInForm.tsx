@@ -8,24 +8,38 @@ import { companionAuthConfigStatus } from "@/lib/supabase/companionClient";
 type Mode = "signin" | "signup";
 
 function ConfigBanner() {
-  const { configured, hasUrl, hasAnonKey } = companionAuthConfigStatus();
-  if (configured) return null;
+  const { configured, hasUrl, hasAnonKey, anonKeyLooksValid, anonKeyLength } =
+    companionAuthConfigStatus();
+  if (configured && anonKeyLooksValid) return null;
 
   const missing: string[] = [];
   if (!hasUrl) missing.push("NEXT_PUBLIC_SUPABASE_URL");
   if (!hasAnonKey) missing.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
 
   return (
-    <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
-      Sign-in is almost ready — add{" "}
-      {missing.map((name, i) => (
-        <span key={name}>
-          {i > 0 ? " and " : ""}
-          <code className="rounded bg-white/80 px-1">{name}</code>
-        </span>
-      ))}{" "}
-      in Vercel, then redeploy. You can still see the form below.
-    </p>
+    <div className="flex flex-col gap-2">
+      {missing.length > 0 ? (
+        <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
+          Sign-in is almost ready — add{" "}
+          {missing.map((name, i) => (
+            <span key={name}>
+              {i > 0 ? " and " : ""}
+              <code className="rounded bg-white/80 px-1">{name}</code>
+            </span>
+          ))}{" "}
+          in Vercel, then redeploy.
+        </p>
+      ) : null}
+      {hasAnonKey && !anonKeyLooksValid ? (
+        <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
+          Your Supabase API key looks too short ({anonKeyLength} characters).
+          In Supabase → Project Settings → API, open the{" "}
+          <strong>Legacy anon</strong> tab, copy the full <code>eyJ…</code> key,
+          paste it into Vercel as{" "}
+          <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code>, then redeploy.
+        </p>
+      ) : null}
+    </div>
   );
 }
 
@@ -81,9 +95,11 @@ export function CompanionSignInForm({
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!configured) {
+    if (!configured || !companionAuthConfigStatus().anonKeyLooksValid) {
       setError(
-        "Sign-in is not live yet — the site owner needs to add Supabase URL + key in Vercel.",
+        companionAuthConfigStatus().anonKeyLooksValid
+          ? "Sign-in is not live yet — the site owner needs to add Supabase URL + key in Vercel."
+          : `Supabase API key is incomplete (${companionAuthConfigStatus().anonKeyLength} characters). Copy the full legacy anon key from Supabase → API, paste into Vercel, redeploy.`,
       );
       return;
     }
