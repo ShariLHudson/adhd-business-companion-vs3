@@ -32,11 +32,15 @@ function ConfigBanner() {
       ) : null}
       {hasAnonKey && !anonKeyLooksValid ? (
         <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
-          Your Supabase API key looks too short ({anonKeyLength} characters).
-          In Supabase → Project Settings → API, open the{" "}
-          <strong>Legacy anon</strong> tab, copy the full <code>eyJ…</code> key,
-          paste it into Vercel as{" "}
-          <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code>, then redeploy.
+          Your Supabase API key does not look right ({anonKeyLength} characters).
+          Use the full <strong>Publishable</strong> key from Supabase → Settings →
+          API Keys (copy button), or the <strong>Legacy anon</strong>{" "}
+          <code className="rounded bg-white/80 px-1">eyJ…</code> key. Paste into
+          Vercel as{" "}
+          <code className="rounded bg-white/80 px-1">
+            NEXT_PUBLIC_SUPABASE_ANON_KEY
+          </code>
+          , then redeploy.
         </p>
       ) : null}
     </div>
@@ -99,7 +103,7 @@ export function CompanionSignInForm({
       setError(
         companionAuthConfigStatus().anonKeyLooksValid
           ? "Sign-in is not live yet — the site owner needs to add Supabase URL + key in Vercel."
-          : `Supabase API key is incomplete (${companionAuthConfigStatus().anonKeyLength} characters). Copy the full legacy anon key from Supabase → API, paste into Vercel, redeploy.`,
+          : `Supabase API key does not look valid (${companionAuthConfigStatus().anonKeyLength} characters). Copy the full publishable or legacy anon key from Supabase, paste into Vercel, redeploy.`,
       );
       return;
     }

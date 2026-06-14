@@ -37,12 +37,19 @@ export function companionAuthConfigStatus(): {
   };
 }
 
-/** Publishable/JWT keys are much longer than a few dozen characters when copied fully. */
+/** Validates client-side Supabase keys (legacy JWT or new publishable format). */
 export function companionAnonKeyLooksValid(): boolean {
   const key = getCompanionSupabaseAnonKey();
   if (!key) return false;
+  if (key.startsWith("sb_secret_")) return false;
   if (key.startsWith("eyJ")) return key.length >= 100;
-  if (key.startsWith("sb_publishable_")) return key.length >= 50;
+  // New opaque publishable keys are ~46 chars: sb_publishable_<22>_<8>
+  if (key.startsWith("sb_publishable_")) {
+    return (
+      key.length >= 40 &&
+      /^sb_publishable_[A-Za-z0-9_-]+_[A-Za-z0-9_-]+$/.test(key)
+    );
+  }
   return key.length >= 80;
 }
 
