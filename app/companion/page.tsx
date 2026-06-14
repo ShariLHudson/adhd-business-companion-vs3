@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AppSidebar } from "@/components/companion/AppSidebar";
 import { AdjustMyDayPanel } from "@/components/companion/AdjustMyDayPanel";
 import { BrainDumpPanel } from "@/components/companion/BrainDumpPanel";
@@ -486,6 +487,7 @@ function toChatTurns(
 }
 
 export default function CompanionPage() {
+  const router = useRouter();
   const [activeSection, setActiveSection] = useState<AppSection>("home");
   const [activeNav, setActiveNav] = useState<SidebarNavId>("chat");
   const [messages, setMessages] = useState<Message[]>([]);
@@ -605,7 +607,10 @@ export default function CompanionPage() {
     null | "settings" | "profile" | "signin"
   >(null);
   const { configured: authConfigured, user } = useCompanionAuth();
-  const openSignIn = useCallback(() => setOverlay("signin"), []);
+  const openSignIn = useCallback(() => {
+    if (authConfigured) setOverlay("signin");
+    else router.push("/companion/login");
+  }, [authConfigured, router]);
 
   // Voice output — Shari speaks her replies (ElevenLabs).
   const [voiceOutput, setVoiceOutput] = useState(false);
@@ -4600,7 +4605,7 @@ export default function CompanionPage() {
             onNewDayChat={handleNewDayChat}
             onSettings={() => setOverlay("settings")}
             onProfile={() => setOverlay("profile")}
-            onSignIn={authConfigured ? openSignIn : undefined}
+            onSignIn={openSignIn}
             signedInEmail={user?.email ?? null}
             onOpenAvatars={() => setActiveSection("client-avatars")}
             minimal={activeSection === "home"}
@@ -5241,7 +5246,7 @@ export default function CompanionPage() {
         onClose={() => setOverlay(null)}
         title="Settings"
       >
-        <SettingsPanel onSignIn={authConfigured ? openSignIn : undefined} />
+        <SettingsPanel onSignIn={openSignIn} />
       </ModalSheet>
 
       <ModalSheet
@@ -5250,7 +5255,7 @@ export default function CompanionPage() {
         title="Profile"
       >
         <ProfilePanel
-          onSignIn={authConfigured ? openSignIn : undefined}
+          onSignIn={openSignIn}
           onOpen={(s) => {
             setOverlay(null);
             setActiveSection(s);

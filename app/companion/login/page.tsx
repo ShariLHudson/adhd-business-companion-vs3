@@ -6,10 +6,12 @@ import { useEffect } from "react";
 
 import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import { companionAuthConfigStatus } from "@/lib/supabase/companionClient";
 
 export default function CompanionLoginPage() {
   const router = useRouter();
-  const { configured, loading, user } = useCompanionAuth();
+  const { loading, user } = useCompanionAuth();
+  const { configured: authReady } = companionAuthConfigStatus();
 
   useEffect(() => {
     if (!loading && user) {
@@ -29,13 +31,13 @@ export default function CompanionLoginPage() {
     <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] px-4">
       <div className="w-full max-w-sm rounded-2xl border border-[#d4cdc3] bg-white p-6 shadow-sm">
         <p className="text-center text-sm font-medium text-[#6b635a]">
-          Spark Studio Companion
+          Spark Studio
         </p>
         <h1 className="mt-3 text-center text-2xl font-semibold text-[#1f1c19]">
-          Welcome
+          Welcome to your ADHD Ecosystem
         </h1>
         <p className="mt-2 text-center text-sm text-[#6b635a]">
-          Sign in or create your account to open your Companion.
+          Sign in or create your account to get started.
         </p>
         <div className="mt-6">
           <CompanionSignInForm
@@ -43,7 +45,7 @@ export default function CompanionLoginPage() {
             onSuccess={() => router.replace("/companion")}
           />
         </div>
-        {!configured ? (
+        {!authReady ? (
           <p className="mt-6 text-center text-sm text-[#6b635a]">
             <Link
               href="/companion"
@@ -51,6 +53,9 @@ export default function CompanionLoginPage() {
             >
               Continue without signing in
             </Link>
+            <span className="block mt-1 text-xs">
+              (Only while sign-in is being configured)
+            </span>
           </p>
         ) : null}
       </div>

@@ -3,8 +3,31 @@
 import { FormEvent, useState } from "react";
 
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import { companionAuthConfigStatus } from "@/lib/supabase/companionClient";
 
 type Mode = "signin" | "signup";
+
+function ConfigBanner() {
+  const { configured, hasUrl, hasAnonKey } = companionAuthConfigStatus();
+  if (configured) return null;
+
+  const missing: string[] = [];
+  if (!hasUrl) missing.push("NEXT_PUBLIC_SUPABASE_URL");
+  if (!hasAnonKey) missing.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+
+  return (
+    <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
+      Sign-in is almost ready — add{" "}
+      {missing.map((name, i) => (
+        <span key={name}>
+          {i > 0 ? " and " : ""}
+          <code className="rounded bg-white/80 px-1">{name}</code>
+        </span>
+      ))}{" "}
+      in Vercel, then redeploy. You can still see the form below.
+    </p>
+  );
+}
 
 export function CompanionSignInForm({
   onSuccess,
@@ -40,7 +63,7 @@ export function CompanionSignInForm({
           <strong>{user.email ?? "your account"}</strong>
         </p>
         <p className="text-sm text-[#6b635a]">
-          You can close this panel and keep using the Companion. Your session
+          You can close this panel and keep using your ADHD Ecosystem. Your session
           stays saved in this browser.
         </p>
         {showClose && onClose ? (
@@ -56,33 +79,14 @@ export function CompanionSignInForm({
     );
   }
 
-  if (!configured) {
-    return (
-      <div className="flex flex-col gap-3">
-        <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
-          Sign-in is not configured yet. Add{" "}
-          <code className="rounded bg-white/80 px-1">NEXT_PUBLIC_SUPABASE_URL</code>{" "}
-          and{" "}
-          <code className="rounded bg-white/80 px-1">
-            NEXT_PUBLIC_SUPABASE_ANON_KEY
-          </code>{" "}
-          in Vercel, then redeploy.
-        </p>
-        {showClose && onClose ? (
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-sm font-medium text-[#6b635a] hover:underline"
-          >
-            Close
-          </button>
-        ) : null}
-      </div>
-    );
-  }
-
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
+    if (!configured) {
+      setError(
+        "Sign-in is not live yet — the site owner needs to add Supabase URL + key in Vercel.",
+      );
+      return;
+    }
     setBusy(true);
     setError(null);
     setNotice(null);
@@ -120,6 +124,8 @@ export function CompanionSignInForm({
 
   return (
     <div className="flex flex-col gap-4">
+      <ConfigBanner />
+
       <div>
         <h2 className="text-xl font-semibold text-[#1f1c19]">
           {mode === "signin" ? "Sign in" : "Create your account"}
@@ -127,7 +133,7 @@ export function CompanionSignInForm({
         <p className="mt-1 text-sm text-[#6b635a]">
           {mode === "signin"
             ? "Welcome back — pick up where you left off."
-            : "Set up your Companion account in under a minute."}
+            : "Set up your ADHD Ecosystem account in under a minute."}
         </p>
       </div>
 
