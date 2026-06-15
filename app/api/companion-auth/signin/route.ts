@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 
-import { sanitizeSupabaseAuthError } from "@/lib/supabase/authErrors";
+import { confirmCompanionUserEmail } from "@/lib/companionAuthProvision";
+import {
+  isEmailNotConfirmedError,
+  sanitizeSupabaseAuthError,
+} from "@/lib/supabase/authErrors";
 import {
   companionAuthConfigured,
   companionAuthConfigStatus,
@@ -52,10 +56,19 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
+    let { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
+    if (error && isEmailNotConfirmedError(error.message)) {
+      const confirmed = await confirmCompanionUserEmail(email);
+      if (confirmed) {
+        ({ data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        }));
+      }
+    }
     if (error) {
       return NextResponse.json({ ok: false, error: error.message }, { status: 401 });
     }

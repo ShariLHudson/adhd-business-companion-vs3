@@ -13,7 +13,13 @@ import type { Session, User } from "@supabase/supabase-js";
 import { getAppSiteUrl } from "@/lib/appSite";
 import { languagePrefsFromUserMetadata } from "@/lib/companionUserLanguage";
 import { savePrefs } from "@/lib/companionStore";
-import { sanitizeSupabaseAuthError } from "@/lib/supabase/authErrors";
+import {
+  emailNotConfirmedMessage,
+  isEmailNotConfirmedError,
+  parseAuthApiResponse,
+  postCompanionAuthApi,
+  sanitizeSupabaseAuthError,
+} from "@/lib/supabase/authErrors";
 import {
   bootstrapCompanionSupabaseConfig,
   companionAuthConfigured,
@@ -35,6 +41,7 @@ type CompanionAuthContextValue = {
     name?: string,
   ) => Promise<{ error: string | null; needsConfirmation?: boolean }>;
   signOut: () => Promise<void>;
+  resendSignUpConfirmation: (email: string) => Promise<{ error: string | null }>;
 };
 
 const CompanionAuthContext = createContext<CompanionAuthContextValue | null>(
@@ -67,14 +74,70 @@ async function signInDirect(
     return { error: "Could not connect to Supabase in your browser." };
   }
   try {
-    const { error } = await supabase.auth.signInWithPassword({
+    const res = await postCompanionAuthApi("/api/companion-auth/signin", {
       email,
       password,
+    });
+    const { data, htmlOrInvalid } = await parseAuthApiResponse(res);
+    if (htmlOrInvalid || !data) {
+      return {
+        error:
+          "Could not reach the sign-in service. Check your connection and try again.",
+      };
+    }
+    if (!data.ok) {
+      const err =
+        typeof data.error === "string" ? data.error : "Sign-in failed.";
+      const message = isEmailNotConfirmedError(err)
+        ? emailNotConfirmedMessage()
+        : sanitizeSupabaseAuthError(err);
+      return { error: message };
+    }
+
+    const session = data.session as
+      | { access_token?: string; refresh_token?: string }
+      | undefined;
+    if (!session?.access_token || !session?.refresh_token) {
+      return { error: "Sign-in failed — no session returned." };
+    }
+
+    const { error } = await supabase.auth.setSession({
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+    });
+    if (error) {
+      return { error: sanitizeSupabaseAuthError(error.message) };
+    }
+    return { error: null };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Sign-in failed.";
+    return { error: sanitizeSupabaseAuthError(message) };
+  }
+}
+
+async function resendSignUpConfirmationDirect(
+  email: string,
+): Promise<{ error: string | null }> {
+  const trimmed = email.trim();
+  if (!trimmed) {
+    return { error: "Enter your email address first." };
+  }
+  const supabase = getCompanionSupabase();
+  if (!supabase) {
+    return { error: "Could not connect to Supabase in your browser." };
+  }
+  try {
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email: trimmed,
+      options: {
+        emailRedirectTo: `${getAppSiteUrl()}/companion`,
+      },
     });
     if (error) return { error: sanitizeSupabaseAuthError(error.message) };
     return { error: null };
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Sign-in failed.";
+    const message = e instanceof Error ? e.message : "Could not resend email.";
     return { error: sanitizeSupabaseAuthError(message) };
   }
 }
@@ -89,17 +152,39 @@ async function signUpDirect(
     return { error: "Could not connect to Supabase in your browser." };
   }
   try {
-    const { data, error } = await supabase.auth.signUp({
+    const res = await postCompanionAuthApi("/api/companion-auth/signup", {
       email,
       password,
-      options: {
-        data: name?.trim() ? { name: name.trim() } : undefined,
-        emailRedirectTo: `${getAppSiteUrl()}/companion`,
-      },
+      name: name?.trim() || undefined,
     });
-    if (error) return { error: sanitizeSupabaseAuthError(error.message) };
-    if (data.session) return { error: null, needsConfirmation: false };
-    return { error: null, needsConfirmation: true };
+    const { data, htmlOrInvalid } = await parseAuthApiResponse(res);
+    if (htmlOrInvalid || !data) {
+      return {
+        error:
+          "Could not reach the sign-up service. Check your connection and try again.",
+      };
+    }
+    if (!data.ok) {
+      const err =
+        typeof data.error === "string" ? data.error : "Sign-up failed.";
+      return { error: sanitizeSupabaseAuthError(err) };
+    }
+
+    const session = data.session as
+      | { access_token?: string; refresh_token?: string }
+      | undefined;
+    if (session?.access_token && session?.refresh_token) {
+      const { error } = await supabase.auth.setSession({
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
+      });
+      if (error) {
+        return { error: sanitizeSupabaseAuthError(error.message) };
+      }
+      return { error: null, needsConfirmation: false };
+    }
+
+    return { error: null, needsConfirmation: Boolean(data.needsConfirmation) };
   } catch (e) {
     const message = e instanceof Error ? e.message : "Sign-up failed.";
     return { error: sanitizeSupabaseAuthError(message) };
@@ -167,6 +252,7 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
         if (!supabase) return;
         await supabase.auth.signOut();
       },
+      resendSignUpConfirmation: resendSignUpConfirmationDirect,
     }),
     [configured, loading, user, session],
   );

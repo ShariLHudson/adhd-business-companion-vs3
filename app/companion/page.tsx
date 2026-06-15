@@ -21,7 +21,8 @@ import { SpinWheelPanel } from "@/components/companion/SpinWheelPanel";
 import { FocusAudioPanel } from "@/components/companion/FocusAudioPanel";
 import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
-import { CompanionDiscoveryPrompt } from "@/components/companion/CompanionDiscoveryPrompt";
+import { markUserOnboarded } from "@/lib/companionOnboarding";
+import { HomeOnboardingOffer } from "@/components/companion/HomeOnboardingOffer";
 import { discoveryContextForChat } from "@/lib/companionDiscovery";
 import { memoryCueFromLastActivity } from "@/lib/homeMemoryCue";
 import { useVisualMode } from "@/lib/useVisualMode";
@@ -5868,7 +5869,14 @@ export default function CompanionPage() {
                     }
                   />
                   {homeCalm ? (
-                    <CompanionDiscoveryPrompt hasMeaningfulUsage={hasChatted} />
+                    <HomeOnboardingOffer
+                      userId={user?.id}
+                      onSetup={() => {
+                        if (user?.id) markUserOnboarded(user.id);
+                        setProfileGettingToKnowYou(true);
+                        setOverlay("profile");
+                      }}
+                    />
                   ) : null}
                   {(homeCalm || !isIdle) && (
                   <div className="mt-2 flex flex-col items-center justify-center gap-1">

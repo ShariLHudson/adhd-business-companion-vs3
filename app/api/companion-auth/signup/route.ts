@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { getAppSiteUrl } from "@/lib/appSite";
+import { provisionCompanionUser } from "@/lib/companionAuthProvision";
 import { sanitizeSupabaseAuthError } from "@/lib/supabase/authErrors";
 import {
   companionAuthConfigured,
@@ -50,42 +50,45 @@ export async function POST(request: Request) {
     );
   }
 
-  const supabase = getCompanionSupabaseServer();
-  if (!supabase) {
-    return NextResponse.json(
-      { ok: false, error: "Could not connect to Supabase." },
-      { status: 503 },
-    );
-  }
-
   try {
-    const { data, error } = await supabase.auth.signUp({
+    const provisioned = await provisionCompanionUser({ email, password, name });
+    if (!provisioned.ok) {
+      return NextResponse.json(
+        { ok: false, error: sanitizeSupabaseAuthError(provisioned.error) },
+        { status: provisioned.status },
+      );
+    }
+
+    const supabase = getCompanionSupabaseServer();
+    if (!supabase) {
+      return NextResponse.json(
+        { ok: false, error: "Could not connect to Supabase." },
+        { status: 503 },
+      );
+    }
+
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
-      options: {
-        data: name ? { name } : undefined,
-        emailRedirectTo: `${getAppSiteUrl()}/companion`,
-      },
     });
     if (error) {
       return NextResponse.json({ ok: false, error: error.message }, { status: 400 });
     }
-
-    if (data.session) {
-      return NextResponse.json({
-        ok: true,
-        needsConfirmation: false,
-        session: {
-          access_token: data.session.access_token,
-          refresh_token: data.session.refresh_token,
-        },
-        user: data.user,
-      });
+    if (!data.session) {
+      return NextResponse.json(
+        { ok: false, error: "Account created but sign-in failed. Try signing in." },
+        { status: 401 },
+      );
     }
 
     return NextResponse.json({
       ok: true,
-      needsConfirmation: true,
+      needsConfirmation: false,
+      created: provisioned.created,
+      session: {
+        access_token: data.session.access_token,
+        refresh_token: data.session.refresh_token,
+      },
       user: data.user,
     });
   } catch (e) {

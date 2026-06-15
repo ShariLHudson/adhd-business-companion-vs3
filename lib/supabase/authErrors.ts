@@ -24,6 +24,19 @@ export function isAuthRequestTimeout(error: unknown): boolean {
 }
 
 /** User-friendly message when Supabase or our auth API returns HTML instead of JSON. */
+export function isEmailNotConfirmedError(message: string): boolean {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes("email not confirmed") ||
+    lower.includes("not confirmed") ||
+    lower.includes("confirm your email")
+  );
+}
+
+export function emailNotConfirmedMessage(): string {
+  return "Your email is not confirmed yet. Check spam/promotions, or resend the confirmation link below.";
+}
+
 export function sanitizeSupabaseAuthError(message: string): string {
   const lower = message.toLowerCase();
   if (

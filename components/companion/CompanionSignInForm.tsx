@@ -96,15 +96,18 @@ export function CompanionSignInForm({
   initialMode?: Mode;
   showClose?: boolean;
 }) {
-  const { configured, loading, user, signIn, signUp } = useCompanionAuth();
+  const { configured, loading, user, signIn, signUp, resendSignUpConfirmation } =
+    useCompanionAuth();
   const { t } = useCompanionLanguage();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [resendBusy, setResendBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [showResend, setShowResend] = useState(false);
 
   if (loading) {
     return (
@@ -136,6 +139,28 @@ export function CompanionSignInForm({
     );
   }
 
+  async function onResendConfirmation() {
+    if (!configured || !email.trim()) {
+      setError("Enter the email you used to sign up, then try again.");
+      return;
+    }
+    setResendBusy(true);
+    setError(null);
+    try {
+      const result = await resendSignUpConfirmation(email);
+      if (result.error) {
+        setError(result.error);
+        return;
+      }
+      setNotice(
+        "Confirmation email sent. Check your inbox and spam/promotions — it can take a few minutes.",
+      );
+      setShowResend(true);
+    } finally {
+      setResendBusy(false);
+    }
+  }
+
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
     if (!configured) {
@@ -153,6 +178,9 @@ export function CompanionSignInForm({
         const result = await signIn(email, password);
         if (result.error) {
           setError(result.error);
+          setShowResend(
+            /not confirmed|confirmation/i.test(result.error),
+          );
           return;
         }
         onSuccess?.();
@@ -166,7 +194,7 @@ export function CompanionSignInForm({
       }
       if (result.needsConfirmation) {
         setNotice(
-          "Check your email for a confirmation link, then come back and sign in.",
+          "Almost there — sign in with the email and password you just created.",
         );
         setMode("signin");
         return;
@@ -204,6 +232,16 @@ export function CompanionSignInForm({
         <p className="rounded-lg border border-[#1e4f4f]/30 bg-[#1e4f4f]/8 px-3 py-2 text-sm text-[#1e4f4f]">
           {notice}
         </p>
+      ) : null}
+      {showResend ? (
+        <button
+          type="button"
+          disabled={resendBusy || !email.trim()}
+          onClick={() => void onResendConfirmation()}
+          className="text-left text-sm font-medium text-[#1e4f4f] underline decoration-[#1e4f4f]/40 underline-offset-2 hover:decoration-[#1e4f4f] disabled:opacity-50"
+        >
+          {resendBusy ? "Sending…" : "Didn't get it? Resend confirmation email"}
+        </button>
       ) : null}
 
       <form onSubmit={onSubmit} className="flex flex-col gap-3">
@@ -262,6 +300,7 @@ export function CompanionSignInForm({
         onClick={() => {
           setError(null);
           setNotice(null);
+          setShowResend(false);
           setMode((m) => (m === "signin" ? "signup" : "signin"));
         }}
         className="text-sm font-medium text-[#1e4f4f] hover:underline"
