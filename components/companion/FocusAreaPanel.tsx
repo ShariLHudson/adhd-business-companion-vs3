@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { SidebarToolId } from "@/lib/companionUi";
+import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
 // Focus = a calm support menu. Three primary actions always visible; the rest
 // live in two collapsed-by-default sections so the first view is only THREE
@@ -140,6 +141,7 @@ export function FocusAreaPanel({
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+      <WorkspaceGuide section="focus" />
       <p className="text-2xl font-semibold text-[#1f1c19]">Focus</p>
       <p className="mt-1 text-base text-[#6b635a]">What would help right now?</p>
 

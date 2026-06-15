@@ -11,20 +11,28 @@ import {
   REGION_OPTIONS,
   DATE_FORMAT_OPTIONS,
   languageCommunicationSummary,
-  hasPendingLanguagePreferences,
-  PENDING_LANGUAGE_NOTICE,
-  type AiTone,
-  type DateFormat,
-  type HelpMode,
   type LanguageCode,
-  type PatternAwareness,
   type RegionCode,
+  type DateFormat,
+  withUnifiedAppLanguage,
+  type AiTone,
+  type HelpMode,
+  type PatternAwareness,
   type SupportStyle,
   type VisualMode,
   type Plan,
 } from "@/lib/companionStore";
+import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
 import { playChime, unlockChime } from "@/lib/chime";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import {
+  getRecognitionStore,
+  saveRecognitionStoreAndNotify,
+  syncBirthday,
+  syncCelebrationMode,
+  type CelebrationMode,
+  type PersonalDate,
+} from "@/lib/recognition";
 
 const TONES: { id: AiTone; label: string; desc: string }[] = [
   { id: "calm", label: "Calm", desc: "Slow, grounding, spacious." },
@@ -89,19 +97,9 @@ const PATTERNS: { id: PatternAwareness; label: string; desc: string }[] = [
   },
 ];
 
-const VISUALS: { id: VisualMode; label: string; desc: string }[] = [
-  { id: "off", label: "None", desc: "Clean and minimal — no colors." },
-  {
-    id: "meaning",
-    label: "Meaning-based",
-    desc: "Color shows the type of thing.",
-  },
-  {
-    id: "decorative",
-    label: "Decorative",
-    desc: "Meaning colors + soft tinted surfaces.",
-  },
-];
+import { visualModeLabel } from "@/lib/visualColorModes";
+import { VisualColorModePicker } from "@/components/companion/VisualColorModePicker";
+import { AI_TONE_GUIDES } from "@/lib/aiToneGuide";
 
 type Section =
   | "tone"
@@ -110,11 +108,43 @@ type Section =
   | "language"
   | "notifications"
   | "appearance"
+  | "celebrations"
   | "pattern"
   | "plan"
   | "advanced"
   | "connections"
   | "account";
+
+export type SettingsSection = Section;
+
+const CELEBRATION_MODES: { id: CelebrationMode; label: string; desc: string }[] = [
+  {
+    id: "full",
+    label: "Full celebrations",
+    desc: "Warm message plus gentle confetti, candles, or banners.",
+  },
+  {
+    id: "simple",
+    label: "Simple celebrations",
+    desc: "Just the message — no visual effects.",
+  },
+  { id: "off", label: "Off", desc: "No celebration prompts." },
+];
+
+const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 const PLANS: { id: Plan; label: string; desc: string }[] = [
   {
@@ -147,12 +177,19 @@ const LABEL = "text-sm font-bold uppercase tracking-wide text-[#6b635a]";
 export function SettingsPanel({
   registerBack,
   onSignIn,
+  initialSection = null,
 }: {
   registerBack?: (fn: (() => boolean) | null) => void;
   onSignIn?: () => void;
+  initialSection?: Section | null;
 }) {
   const { configured: authConfigured, user, signOut } = useCompanionAuth();
-  const [open, setOpen] = useState<Section | null>(null);
+  const { t } = useCompanionLanguage();
+  const [open, setOpen] = useState<Section | null>(initialSection);
+
+  useEffect(() => {
+    if (initialSection) setOpen(initialSection);
+  }, [initialSection]);
   const [aiTone, setAiTone] = useState<AiTone>("balanced");
   const [helpMode, setHelpMode] = useState<HelpMode>("ask-first");
   const [supportStyle, setSupportStyle] = useState<SupportStyle>("balanced");
@@ -179,6 +216,12 @@ export function SettingsPanel({
     connected: boolean;
     email: string | null;
   }>({ configured: false, connected: false, email: null });
+  const [celebrationMode, setCelebrationMode] =
+    useState<CelebrationMode>("full");
+  const [birthdayMonth, setBirthdayMonth] = useState<number | "">("");
+  const [birthdayDay, setBirthdayDay] = useState<number | "">("");
+  const [birthdayYear, setBirthdayYear] = useState<number | "">("");
+  const [personalDates, setPersonalDates] = useState<PersonalDate[]>([]);
 
   function refreshGoogle() {
     fetch("/api/google/status")
@@ -213,6 +256,12 @@ export function SettingsPanel({
     setRegion(p.region);
     setDateFormat(p.dateFormat);
     setPerm(readPerm());
+    const rec = getRecognitionStore();
+    setCelebrationMode(rec.celebrationMode);
+    setBirthdayMonth(rec.birthday?.month ?? "");
+    setBirthdayDay(rec.birthday?.day ?? "");
+    setBirthdayYear(rec.birthday?.year ?? "");
+    setPersonalDates(rec.personalDates);
   }, []);
 
   // Global Back closes an open sub-panel first, then exits Settings.
@@ -262,7 +311,13 @@ export function SettingsPanel({
       }),
     },
     { id: "notifications", label: "Notifications", value: alerts ? "On" : "Off" },
-    { id: "appearance", label: "Appearance", value: VISUALS.find((v) => v.id === visualMode)?.label ?? "" },
+    { id: "appearance", label: "Appearance", value: visualModeLabel(visualMode) },
+    {
+      id: "celebrations",
+      label: "Celebrations",
+      value:
+        CELEBRATION_MODES.find((c) => c.id === celebrationMode)?.label ?? "",
+    },
     { id: "pattern", label: "Pattern awareness", value: PATTERNS.find((p) => p.id === pattern)?.label ?? "" },
     { id: "plan", label: "Plan & voice", value: PLAN_LABEL[plan] },
     { id: "advanced", label: "Advanced AI tools", value: advanced ? "On" : "Off" },
@@ -338,15 +393,13 @@ export function SettingsPanel({
     value,
     onChange,
     options,
-    disableUnavailable = false,
   }: {
     id: string;
     label: string;
     hint?: string;
     value: string;
     onChange: (v: string) => void;
-    options: readonly { code: string; label: string; available?: boolean }[];
-    disableUnavailable?: boolean;
+    options: readonly { code: string; label: string }[];
   }) {
     return (
       <div>
@@ -360,18 +413,11 @@ export function SettingsPanel({
           onChange={(e) => onChange(e.target.value)}
           className={selectCls}
         >
-          {options.map((o) => {
-            const unavailable = o.available === false;
-            return (
-              <option
-                key={o.code}
-                value={o.code}
-                disabled={disableUnavailable && unavailable}
-              >
-                {unavailable ? `${o.label} — coming soon` : o.label}
-              </option>
-            );
-          })}
+          {options.map((o) => (
+            <option key={o.code} value={o.code}>
+              {o.label}
+            </option>
+          ))}
         </select>
       </div>
     );
@@ -383,20 +429,63 @@ export function SettingsPanel({
       <div className={wrap}>
         {header("AI Tone")}
         <p className="mt-1 text-sm text-[#6b635a]">How Shari sounds.</p>
-        <Options
-          items={TONES}
-          current={aiTone}
-          onPick={(v) => {
-            setAiTone(v);
-            savePrefs({ aiTone: v });
-          }}
-        />
+        <div className="mt-4 flex flex-col gap-3">
+          {AI_TONE_GUIDES.map((tone) => {
+            const active = aiTone === tone.id;
+            return (
+              <button
+                key={tone.id}
+                type="button"
+                onClick={() => {
+                  setAiTone(tone.id);
+                  savePrefs({ aiTone: tone.id });
+                }}
+                className={`${CARD} ${
+                  active
+                    ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06]"
+                    : "border-[#d4cdc3] hover:border-[#1e4f4f]/45"
+                }`}
+              >
+                <span className="flex items-center justify-between gap-2">
+                  <span className="text-base font-semibold text-[#1f1c19]">
+                    {tone.label}
+                  </span>
+                  {active ? <span className="text-[#1e4f4f]">✓</span> : null}
+                </span>
+                <span className="mt-0.5 block text-sm text-[#6b635a]">
+                  {tone.desc}
+                </span>
+                <span className="mt-2 block text-sm text-[#4b463f]">
+                  <strong>Best for:</strong> {tone.bestFor}
+                </span>
+                <span className="mt-1 block text-sm text-[#4b463f]">
+                  <strong>What changes:</strong> {tone.whatChanges}
+                </span>
+                <span className="mt-1 block text-sm italic text-[#6b635a]">
+                  {tone.example}
+                </span>
+              </button>
+            );
+          })}
+        </div>
       </div>
     );
   }
   if (open === "language") {
     function saveLang(patch: Parameters<typeof savePrefs>[0]) {
-      const next = savePrefs(patch);
+      const langKey = (
+        [
+          "interfaceLanguage",
+          "responseLanguage",
+          "contentLanguage",
+          "voiceLanguage",
+        ] as const
+      ).find((key) => key in (patch ?? {}));
+      const unified =
+        langKey && patch && patch[langKey]
+          ? withUnifiedAppLanguage(patch[langKey] as LanguageCode, patch)
+          : patch;
+      const next = savePrefs(unified);
       setInterfaceLanguage(next.interfaceLanguage);
       setResponseLanguage(next.responseLanguage);
       setContentLanguage(next.contentLanguage);
@@ -404,56 +493,36 @@ export function SettingsPanel({
       setRegion(next.region);
       setDateFormat(next.dateFormat);
     }
-    const pendingLang = hasPendingLanguagePreferences({
-      interfaceLanguage,
-      responseLanguage,
-      contentLanguage,
-      voiceLanguage,
-      region,
-      dateFormat,
-    });
     return (
       <div className={wrap}>
-        {header("Language & Communication")}
-        <p className="mt-1 text-sm text-[#6b635a]">
-          Choose how your Companion speaks, writes, and formats information.
-          More language options will be added over time.
-        </p>
-        {pendingLang ? (
-          <p className="mt-4 rounded-xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.06] px-4 py-3 text-sm leading-snug text-[#1f1c19]">
-            {PENDING_LANGUAGE_NOTICE}
-          </p>
-        ) : null}
+        {header(t("settings.language"))}
+        <p className="mt-1 text-sm text-[#6b635a]">{t("settings.languageHint")}</p>
         <div className="mt-6 flex flex-col gap-5">
           <LanguageField
-            id="lang-interface"
-            label="Interface Language"
-            hint="App menus and labels. English only until interface translation ships."
-            value={interfaceLanguage}
-            options={LANGUAGE_OPTIONS}
-            disableUnavailable
-            onChange={(v) => saveLang({ interfaceLanguage: v as LanguageCode })}
-          />
-          <LanguageField
             id="lang-response"
-            label="Companion Response Language"
-            hint="Language Shari will use in chat when available."
+            label={t("settings.companionResponseLanguage")}
+            hint="Sets interface, chat, content, and voice together."
             value={responseLanguage}
             options={LANGUAGE_OPTIONS}
             onChange={(v) => saveLang({ responseLanguage: v as LanguageCode })}
           />
           <LanguageField
+            id="lang-interface"
+            label={t("settings.interfaceLanguage")}
+            value={interfaceLanguage}
+            options={LANGUAGE_OPTIONS}
+            onChange={(v) => saveLang({ interfaceLanguage: v as LanguageCode })}
+          />
+          <LanguageField
             id="lang-content"
-            label="Content Creation Language"
-            hint="Default language for drafts in Create when available."
+            label={t("settings.contentLanguage")}
             value={contentLanguage}
             options={LANGUAGE_OPTIONS}
             onChange={(v) => saveLang({ contentLanguage: v as LanguageCode })}
           />
           <LanguageField
             id="lang-voice"
-            label="Voice Language"
-            hint="Spoken conversation language when voice support expands."
+            label={t("settings.voiceLanguage")}
             value={voiceLanguage}
             options={LANGUAGE_OPTIONS}
             onChange={(v) => saveLang({ voiceLanguage: v as LanguageCode })}
@@ -514,16 +583,290 @@ export function SettingsPanel({
       <div className={wrap}>
         {header("Appearance")}
         <p className="mt-1 text-sm text-[#6b635a]">
-          Colors always pair with a label.
+          Choose how color appears in the app. Dynamic colors shift with your
+          situation; meaning-based colors stay fixed per category.
         </p>
-        <Options
-          items={VISUALS}
+        <VisualColorModePicker
           current={visualMode}
           onPick={(v) => {
             setVisualMode(v);
             savePrefs({ visualMode: v });
           }}
         />
+      </div>
+    );
+  }
+  if (open === "celebrations") {
+    function saveBirthday(
+      month: number | "",
+      day: number | "",
+      year: number | "" = birthdayYear,
+    ) {
+      const b =
+        month && day
+          ? {
+              month: Number(month),
+              day: Number(day),
+              ...(year ? { year: Number(year) } : {}),
+            }
+          : null;
+      setBirthdayMonth(month);
+      setBirthdayDay(day);
+      setBirthdayYear(year);
+      syncBirthday(b);
+    }
+
+    function addPersonalDate() {
+      const id = `pd-${Date.now()}`;
+      const next: PersonalDate = {
+        id,
+        label: "Important date",
+        month: new Date().getMonth() + 1,
+        day: new Date().getDate(),
+        kind: "custom",
+        category: "personal",
+      };
+      const dates = [...personalDates, next];
+      setPersonalDates(dates);
+      saveRecognitionStoreAndNotify({ personalDates: dates });
+    }
+
+    function updatePersonalDate(id: string, patch: Partial<PersonalDate>) {
+      const dates = personalDates.map((d) =>
+        d.id === id ? { ...d, ...patch } : d,
+      );
+      setPersonalDates(dates);
+      saveRecognitionStoreAndNotify({ personalDates: dates });
+    }
+
+    function removePersonalDate(id: string) {
+      const dates = personalDates.filter((d) => d.id !== id);
+      setPersonalDates(dates);
+      saveRecognitionStoreAndNotify({ personalDates: dates });
+    }
+
+    return (
+      <div className={wrap}>
+        {header("Celebrations")}
+        <p className="mt-1 text-sm text-[#6b635a]">
+          Warm recognition for birthdays and milestones — never guilt, streaks, or
+          pressure to return.
+        </p>
+        <Options
+          items={CELEBRATION_MODES}
+          current={celebrationMode}
+          onPick={(v) => {
+            setCelebrationMode(v);
+            syncCelebrationMode(v);
+          }}
+        />
+
+        <div className="mt-6">
+          <p className={LABEL}>Your birthday</p>
+          <p className="mt-1 text-sm text-[#6b635a]">
+            Optional — used for a thoughtful birthday note, not marketing.
+          </p>
+          <div className="mt-2 flex gap-2">
+            <select
+              value={birthdayMonth}
+              onChange={(e) =>
+                saveBirthday(
+                  e.target.value ? Number(e.target.value) : "",
+                  birthdayDay,
+                )
+              }
+              className={selectCls}
+              aria-label="Birthday month"
+            >
+              <option value="">Month</option>
+              {MONTHS.map((m, i) => (
+                <option key={m} value={i + 1}>
+                  {m}
+                </option>
+              ))}
+            </select>
+            <select
+              value={birthdayDay}
+              onChange={(e) =>
+                saveBirthday(
+                  birthdayMonth,
+                  e.target.value ? Number(e.target.value) : "",
+                )
+              }
+              className={selectCls}
+              aria-label="Birthday day"
+            >
+              <option value="">Day</option>
+              {Array.from({ length: 31 }, (_, i) => i + 1).map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </select>
+            <input
+              type="number"
+              min={1900}
+              max={2100}
+              value={birthdayYear}
+              onChange={(e) =>
+                saveBirthday(
+                  birthdayMonth,
+                  birthdayDay,
+                  e.target.value ? Number(e.target.value) : "",
+                )
+              }
+              placeholder="Year (optional)"
+              className="w-28 rounded-lg border border-[#c9bfb0] bg-white px-2 py-2.5 text-sm"
+              aria-label="Birthday year"
+            />
+          </div>
+        </div>
+
+        <div className="mt-6">
+          <div className="flex items-center justify-between gap-2">
+            <p className={LABEL}>Important dates</p>
+            <button
+              type="button"
+              onClick={addPersonalDate}
+              className="text-sm font-semibold text-[#1e4f4f]"
+            >
+              + Add
+            </button>
+          </div>
+          <p className="mt-1 text-sm text-[#6b635a]">
+            Anniversaries, vacations, or any date you want remembered.
+          </p>
+          {personalDates.length === 0 ? (
+            <p className="mt-3 text-sm text-[#9a8f82]">None saved yet.</p>
+          ) : (
+            <div className="mt-3 flex flex-col gap-3">
+              {personalDates.map((pd) => (
+                <div
+                  key={pd.id}
+                  className="rounded-xl border border-[#d4cdc3] bg-white/85 p-3"
+                >
+                  <input
+                    type="text"
+                    value={pd.label}
+                    onChange={(e) =>
+                      updatePersonalDate(pd.id, { label: e.target.value })
+                    }
+                    className="w-full rounded-lg border border-[#c9bfb0] px-3 py-2 text-sm"
+                    placeholder="Label"
+                  />
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    <select
+                      value={pd.category ?? "personal"}
+                      onChange={(e) =>
+                        updatePersonalDate(pd.id, {
+                          category: e.target.value as PersonalDate["category"],
+                        })
+                      }
+                      className="rounded-lg border border-[#c9bfb0] px-2 py-1.5 text-sm"
+                    >
+                      <option value="personal">Personal</option>
+                      <option value="family">Family</option>
+                      <option value="business">Business</option>
+                      <option value="travel">Travel</option>
+                      <option value="health">Health</option>
+                      <option value="custom">Custom</option>
+                    </select>
+                    <select
+                      value={pd.kind}
+                      onChange={(e) =>
+                        updatePersonalDate(pd.id, {
+                          kind: e.target.value as PersonalDate["kind"],
+                        })
+                      }
+                      className="rounded-lg border border-[#c9bfb0] px-2 py-1.5 text-sm"
+                    >
+                      <option value="custom">Custom</option>
+                      <option value="anniversary">Anniversary</option>
+                      <option value="vacation">Vacation countdown</option>
+                      <option value="milestone">Milestone</option>
+                      <option value="launch">Launch</option>
+                      <option value="workshop">Workshop</option>
+                      <option value="speaking">Speaking event</option>
+                      <option value="due_date">Due date</option>
+                      <option value="birthday">Birthday</option>
+                    </select>
+                    {pd.kind === "vacation" ||
+                    pd.kind === "launch" ||
+                    pd.kind === "due_date" ? (
+                      <input
+                        type="date"
+                        value={pd.targetDate?.slice(0, 10) ?? ""}
+                        onChange={(e) =>
+                          updatePersonalDate(pd.id, {
+                            targetDate: e.target.value,
+                          })
+                        }
+                        className="rounded-lg border border-[#c9bfb0] px-2 py-1.5 text-sm"
+                      />
+                    ) : (
+                      <>
+                        <select
+                          value={pd.month}
+                          onChange={(e) =>
+                            updatePersonalDate(pd.id, {
+                              month: Number(e.target.value),
+                            })
+                          }
+                          className="rounded-lg border border-[#c9bfb0] px-2 py-1.5 text-sm"
+                        >
+                          {MONTHS.map((m, i) => (
+                            <option key={m} value={i + 1}>
+                              {m}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          value={pd.day}
+                          onChange={(e) =>
+                            updatePersonalDate(pd.id, {
+                              day: Number(e.target.value),
+                            })
+                          }
+                          className="rounded-lg border border-[#c9bfb0] px-2 py-1.5 text-sm"
+                        >
+                          {Array.from({ length: 31 }, (_, i) => i + 1).map(
+                            (d) => (
+                              <option key={d} value={d}>
+                                {d}
+                              </option>
+                            ),
+                          )}
+                        </select>
+                        <input
+                          type="number"
+                          min={1900}
+                          max={2100}
+                          value={pd.year ?? ""}
+                          onChange={(e) =>
+                            updatePersonalDate(pd.id, {
+                              year: e.target.value
+                                ? Number(e.target.value)
+                                : undefined,
+                            })
+                          }
+                          placeholder="Year"
+                          className="w-24 rounded-lg border border-[#c9bfb0] px-2 py-1.5 text-sm"
+                        />
+                      </>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => removePersonalDate(pd.id)}
+                      className="text-sm font-semibold text-[#a85c4a]"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     );
   }

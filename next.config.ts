@@ -1,6 +1,17 @@
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { loadEnvConfig } from "@next/env";
 import type { NextConfig } from "next";
 
+const appRoot = path.dirname(fileURLToPath(import.meta.url));
+// Monorepo parent lockfile can point Next at the wrong root — load companion-app env explicitly.
+loadEnvConfig(appRoot);
+
 const nextConfig: NextConfig = {
+  // Ensure .env.local in companion-app is loaded (monorepo has parent lockfile).
+  turbopack: {
+    root: appRoot,
+  },
   async headers() {
     return [
       {

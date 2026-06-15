@@ -47,10 +47,15 @@ describe("standaloneToolRouting", () => {
     expect(
       detectAssistantToolLaunch(
         "Sure! Opening Breathe & Reset for you now. One moment!",
-      ),
+      )?.tool,
     ).toBe("breathe");
     expect(
-      detectAssistantToolLaunch("Music might help. Opening Focus Audio."),
+      detectAssistantToolLaunch("Music might help. Opening Focus Audio.")?.tool,
     ).toBe("focus-audio");
+    expect(
+      detectAssistantToolLaunch(
+        "Opening Focus Audio — Calm My Brain is ready.",
+      )?.focusAudioCategory,
+    ).toBe("calm-brain");
   });
 });

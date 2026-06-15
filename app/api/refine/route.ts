@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 // The editing / help layer: refine, rewrite, simplify, or break down a piece of
 // text. Returns the transformed text only — no preamble, no explanation.
-type Action = "refine" | "rewrite" | "simplify" | "break-down";
+type Action = "refine" | "rewrite" | "simplify" | "break-down" | "modify";
 
 const INSTRUCTION: Record<Action, string> = {
   refine:
@@ -26,14 +26,30 @@ export async function POST(request: NextRequest) {
     const text = (body.text as string) ?? "";
     const action = body.action as Action;
     const context = (body.context as string)?.trim() || "";
+    const customInstruction = (body.instruction as string)?.trim() || "";
     if (!text.trim()) {
       return NextResponse.json({ error: "Nothing to edit." }, { status: 400 });
     }
-    if (!INSTRUCTION[action]) {
-      return NextResponse.json({ error: "Unknown action." }, { status: 400 });
-    }
 
-    const system = `You are an editing assistant for an ADHD entrepreneur. ${INSTRUCTION[action]} Return ONLY the edited text — no quotes, no preamble, no commentary.${context ? `\n\n${context}` : ""}`;
+    let system: string;
+    if (action === "modify") {
+      if (!customInstruction) {
+        return NextResponse.json(
+          { error: "Instruction required." },
+          { status: 400 },
+        );
+      }
+      system = `You edit drafts for an ADHD entrepreneur. Apply this change to the text: ${customInstruction}
+
+Return the FULL updated draft only — no quotes, no preamble, no commentary. Keep the same format (line breaks, lists) unless the change requires otherwise.${
+        context ? `\n\n${context}` : ""
+      }`;
+    } else {
+      if (!INSTRUCTION[action]) {
+        return NextResponse.json({ error: "Unknown action." }, { status: 400 });
+      }
+      system = `You are an editing assistant for an ADHD entrepreneur. ${INSTRUCTION[action]} Return ONLY the edited text — no quotes, no preamble, no commentary.${context ? `\n\n${context}` : ""}`;
+    }
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",

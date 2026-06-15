@@ -12,6 +12,26 @@ import type { FounderWorkspaceItem } from "@/lib/founderWorkspace";
 
 import type { FounderActionCenterHandlers } from "./FounderActionCenter";
 import { FounderActionCenter } from "./FounderActionCenter";
+import { FounderRecognitionPanel } from "./FounderRecognitionPanel";
+import { FounderCognitiveLoadPanel } from "./FounderCognitiveLoadPanel";
+import { FounderActivationPanel } from "./FounderActivationPanel";
+import { FounderLoopPanel } from "./FounderLoopPanel";
+import { FounderDayDesignerPanel } from "./FounderDayDesignerPanel";
+import { FounderRelationshipPanel } from "./FounderRelationshipPanel";
+import { FounderOpportunityPanel } from "./FounderOpportunityPanel";
+import { FounderAdaptiveCompanionPanel } from "./FounderAdaptiveCompanionPanel";
+import { FounderUserHealthPanel } from "./FounderUserHealthPanel";
+import { FounderDecisionPanel } from "./FounderDecisionPanel";
+import { FounderRecoveryPanel } from "./FounderRecoveryPanel";
+import { FounderMomentumPanel } from "./FounderMomentumPanel";
+import { FounderFutureShariPanel } from "./FounderFutureShariPanel";
+import { FounderEnvironmentPanel } from "./FounderEnvironmentPanel";
+import { FounderBusinessOSPanel } from "./FounderBusinessOSPanel";
+import { FounderChiefOfStaffPanel } from "./FounderChiefOfStaffPanel";
+import { FounderMorningBriefingPanel } from "./FounderMorningBriefingPanel";
+import { FounderEcosystemHubPanel } from "./FounderEcosystemHubPanel";
+import { FounderPredictiveSupportPanel } from "./FounderPredictiveSupportPanel";
+import { FounderIntelligencePanels } from "./FounderIntelligencePanels";
 import type { FounderRecommendedTask } from "@/lib/founderWorkspace/actionCenter";
 
 type FounderDashboardProps = {
@@ -110,6 +130,10 @@ export function FounderDashboard({
           {briefing.todaysFocus.reason}
         </p>
       </section>
+
+      <FounderMorningBriefingPanel />
+
+      <FounderEcosystemHubPanel />
 
       <FounderActionCenter task={recommendedTask} handlers={actionHandlers} />
 
@@ -364,6 +388,26 @@ export function FounderDashboard({
           </span>
         </section>
       ) : null}
+
+      <FounderIntelligencePanels>
+        <FounderRecognitionPanel />
+        <FounderCognitiveLoadPanel />
+        <FounderActivationPanel />
+        <FounderLoopPanel />
+        <FounderDayDesignerPanel />
+        <FounderRelationshipPanel />
+        <FounderOpportunityPanel />
+        <FounderAdaptiveCompanionPanel />
+        <FounderUserHealthPanel />
+        <FounderDecisionPanel />
+        <FounderRecoveryPanel />
+        <FounderMomentumPanel />
+        <FounderFutureShariPanel />
+        <FounderEnvironmentPanel />
+        <FounderBusinessOSPanel />
+        <FounderChiefOfStaffPanel />
+        <FounderPredictiveSupportPanel />
+      </FounderIntelligencePanels>
     </div>
   );
 }

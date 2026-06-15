@@ -2,6 +2,7 @@
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { BackButton } from "@/components/companion/BackButton";
 import { AppSidebar } from "@/components/companion/AppSidebar";
 import { AdjustMyDayPanel } from "@/components/companion/AdjustMyDayPanel";
 import { BrainDumpPanel } from "@/components/companion/BrainDumpPanel";
@@ -20,6 +21,26 @@ import { SpinWheelPanel } from "@/components/companion/SpinWheelPanel";
 import { FocusAudioPanel } from "@/components/companion/FocusAudioPanel";
 import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
+import { ProgressiveDiscoveryCard } from "@/components/companion/ProgressiveDiscoveryCard";
+import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
+import type { ProfileSettingsSection } from "@/components/companion/ProfilePanel";
+import type { SettingsSection } from "@/components/companion/SettingsPanel";
+import { memoryCueFromLastActivity } from "@/lib/homeMemoryCue";
+import { RecognitionMomentCard } from "@/components/companion/RecognitionMomentCard";
+import { ActivationOfferCard } from "@/components/companion/ActivationOfferCard";
+import { RecoveryOfferCard } from "@/components/companion/RecoveryOfferCard";
+import { LoopOfferCard } from "@/components/companion/LoopOfferCard";
+import { RelationshipRememberCard } from "@/components/companion/RelationshipRememberCard";
+import { OpportunityOfferCard } from "@/components/companion/OpportunityOfferCard";
+import { DecisionOfferCard } from "@/components/companion/DecisionOfferCard";
+import { EnvironmentOfferCard } from "@/components/companion/EnvironmentOfferCard";
+import { FutureShariOfferCard } from "@/components/companion/FutureShariOfferCard";
+import { MomentumOfferCard } from "@/components/companion/MomentumOfferCard";
+import { BusinessOSSortCard } from "@/components/companion/BusinessOSSortCard";
+import { ChiefOfStaffOfferCard } from "@/components/companion/ChiefOfStaffOfferCard";
+import { PredictiveSupportOfferCard } from "@/components/companion/PredictiveSupportOfferCard";
+import { DayPlanCard } from "@/components/companion/DayPlanCard";
+import { DayDesignerPromptCard } from "@/components/companion/DayDesignerPromptCard";
 import { ProfilePanel } from "@/components/companion/ProfilePanel";
 import { ModalSheet } from "@/components/companion/ModalSheet";
 import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm";
@@ -76,6 +97,7 @@ import { FounderActionBar } from "@/components/companion/FounderActionBar";
 import { ArtifactActionBar } from "@/components/companion/ArtifactActionBar";
 import { ActionBridgeChip } from "@/components/companion/ActionBridgeChip";
 import { WorkspaceLayout } from "@/components/companion/WorkspaceLayout";
+import { WorkspaceShell } from "@/components/companion/WorkspaceShell";
 import {
   type ChatLayoutMode,
   shouldOpenBesideChat,
@@ -156,6 +178,10 @@ import {
   shouldStayInConversation,
 } from "@/lib/conversationGating";
 import {
+  parseFocusMinutesFromText,
+  savePreferredFocusMinutes,
+} from "@/lib/focusDuration";
+import {
   isWorkspaceOpen,
   scrubFalseWorkspaceClaims,
   workspaceOpenAckVerified,
@@ -183,8 +209,12 @@ import {
   standaloneToolAck,
 } from "@/lib/standaloneToolRouting";
 import {
+  shouldAutoLaunchAfterAssistantOffer,
+  shouldAutoLaunchPendingAction,
+  shouldAutoOpenWorkspaceFromIntent,
+} from "@/lib/companionAutoLaunch";
+import {
   detectOpenSectionRequest,
-  matchesPendingAcceptance,
   pendingActionEmoji,
   pendingActionLabel,
   pendingActionLine,
@@ -346,6 +376,7 @@ import {
   getPrefs,
   getOutputLanguageContext,
   savePrefs,
+  speechLocaleForLanguage,
   getLastActivity,
   setLastActivity,
   clearLastActivity,
@@ -361,7 +392,129 @@ import {
   getVoiceStatus,
   addVoiceSeconds,
   type TimeBlock,
+  type VisualMode,
 } from "@/lib/companionStore";
+import {
+  buildRecognitionContext,
+  evaluateRecognitionMoment,
+  getRecognitionStore,
+  RECOGNITION_UPDATED_EVENT,
+  recordConversationStart,
+  syncBusinessMilestonesFromApp,
+  type RecognitionMoment,
+} from "@/lib/recognition";
+import { getMemberSinceIso } from "@/lib/shariMemberSince";
+import {
+  dismissLoadOffer,
+  evaluateAndRecordCognitiveLoad,
+  type CognitiveLoadResult,
+} from "@/lib/cognitive-load";
+import {
+  evaluateAndRecordActivation,
+  shouldSurfaceActivationOffer,
+  type ActivationSnapshot,
+} from "@/lib/activation";
+import {
+  evaluateAndRecordLoopIntelligence,
+  evaluateLoopIntelligence,
+  shouldSurfaceLoopOffer,
+  type LoopSnapshot,
+} from "@/lib/loop-intelligence";
+import {
+  adaptiveHintForChat,
+  evaluateAndRecordAdaptiveCompanion,
+} from "@/lib/adaptive-companion";
+import {
+  evaluateAndRecordUserHealth,
+  userHealthWelcomeLine,
+  type UserHealthSnapshot,
+} from "@/lib/user-health";
+import {
+  dismissRecoveryOffer,
+  evaluateAndRecordRecovery,
+  isRecoveryOfferDismissedToday,
+  recoveryOverridesProductivity,
+  recoveryWelcomeLine,
+  type RecoverySnapshot,
+} from "@/lib/recovery-intelligence";
+import {
+  acceptDecisionNarrow,
+  acceptDecisionPark,
+  evaluateAndRecordDecision,
+  evaluateDecisionOffer,
+  shouldSurfaceDecisionOffer,
+  type DecisionOffer,
+} from "@/lib/decision-intelligence";
+import {
+  beginDayDesignerFlow,
+  buildSimpleDayPlanView,
+  companionIntroForDayDesigner,
+  isDayDesignerDismissedToday,
+  processDayDesignerMessage,
+  questionForStep,
+  shouldStartDayDesigner,
+  type DayDesignerSession,
+  type SimpleDayPlanView,
+} from "@/lib/day-designer";
+import {
+  acceptRelationshipRemember,
+  evaluateRelationshipOffer,
+  shouldSurfaceRelationshipOffer,
+  type RelationshipOffer,
+} from "@/lib/relationship-intelligence";
+import {
+  acceptOpportunityExplore,
+  evaluateOpportunityOffer,
+  shouldSurfaceOpportunityOffer,
+  type OpportunityOffer,
+} from "@/lib/opportunity-intelligence";
+import {
+  acceptEnvironmentAdjust,
+  evaluateAndRecordEnvironment,
+  evaluateEnvironmentOffer,
+  shouldSurfaceEnvironmentOffer,
+  type EnvironmentOffer,
+} from "@/lib/environment-intelligence";
+import {
+  acceptFutureShari,
+  evaluateFutureShariOffer,
+  shouldSurfaceFutureOffer,
+  type FutureShariOffer,
+} from "@/lib/future-shari";
+import {
+  acceptMomentumAcknowledge,
+  evaluateAndRecordMomentum,
+  evaluateMomentumOffer,
+  shouldSurfaceMomentumOffer,
+  type MomentumOffer,
+} from "@/lib/momentum-intelligence";
+import {
+  acceptBusinessSort,
+  evaluateAndRecordBusinessOS,
+  evaluateBusinessOSSortOffer,
+  shouldSurfaceBusinessOSSortOffer,
+  type BusinessOSSortOffer,
+} from "@/lib/business-os";
+import {
+  acceptChiefPerspective,
+  evaluateAndRecordChiefOfStaff,
+  evaluateChiefOffer,
+  shouldSurfaceChiefOffer,
+  type ChiefOfStaffOffer,
+} from "@/lib/chief-of-staff";
+import {
+  evaluateAndRecordEcosystem,
+  ecosystemGuidanceForChat,
+  evaluateEcosystem,
+  isSuppressed,
+} from "@/lib/ecosystem-intelligence";
+import {
+  acceptPredictiveSupport,
+  evaluateAndRecordPredictiveSupport,
+  evaluatePredictiveOffer,
+  shouldSurfacePredictiveOffer,
+  type PredictiveSupportOffer,
+} from "@/lib/predictive-support";
 import { playChime, unlockChime } from "@/lib/chime";
 import { type ScenePage } from "@/lib/companionBackgrounds";
 type SpeechRecognitionInstance = {
@@ -495,6 +648,37 @@ export default function CompanionPage() {
   // Gates the autosave effect so we never overwrite a saved chat with [].
   const [hydrated, setHydrated] = useState(false);
   const [hasChatted, setHasChatted] = useState(false);
+  const [recognitionMoment, setRecognitionMoment] =
+    useState<RecognitionMoment | null>(null);
+  const [cognitiveLoad, setCognitiveLoad] =
+    useState<CognitiveLoadResult | null>(null);
+  const [userHealth, setUserHealth] = useState<UserHealthSnapshot | null>(null);
+  const [recovery, setRecovery] = useState<RecoverySnapshot | null>(null);
+  const [activationOffer, setActivationOffer] =
+    useState<ActivationSnapshot | null>(null);
+  const [loopOffer, setLoopOffer] = useState<LoopSnapshot | null>(null);
+  const [dayDesignerSession, setDayDesignerSession] =
+    useState<DayDesignerSession | null>(null);
+  const [dayDesignerQuestion, setDayDesignerQuestion] = useState<string | null>(
+    null,
+  );
+  const [dayPlanView, setDayPlanView] = useState<SimpleDayPlanView | null>(null);
+  const [relationshipOffer, setRelationshipOffer] =
+    useState<RelationshipOffer | null>(null);
+  const [opportunityOffer, setOpportunityOffer] =
+    useState<OpportunityOffer | null>(null);
+  const [decisionOffer, setDecisionOffer] = useState<DecisionOffer | null>(null);
+  const [environmentOffer, setEnvironmentOffer] =
+    useState<EnvironmentOffer | null>(null);
+  const [futureShariOffer, setFutureShariOffer] =
+    useState<FutureShariOffer | null>(null);
+  const [momentumOffer, setMomentumOffer] = useState<MomentumOffer | null>(null);
+  const [businessOSSortOffer, setBusinessOSSortOffer] =
+    useState<BusinessOSSortOffer | null>(null);
+  const [chiefOffer, setChiefOffer] = useState<ChiefOfStaffOffer | null>(null);
+  const [predictiveOffer, setPredictiveOffer] =
+    useState<PredictiveSupportOffer | null>(null);
+  const [recoveryOfferLine, setRecoveryOfferLine] = useState<string | null>(null);
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isListening, setIsListening] = useState(false);
@@ -522,6 +706,28 @@ export default function CompanionPage() {
   const pomodoroTimer = usePomodoroTimer();
 
   const isIdle = !messages.some((m) => m.role === "user");
+  const homeCalm = activeSection === "home" && isIdle;
+
+  useEffect(() => {
+    setVisualMode(getPrefs().visualMode);
+  }, [overlay, activeSection]);
+
+  const hasInlineIntelligenceOffer = Boolean(
+    recoveryOfferLine ||
+      activationOffer ||
+      loopOffer ||
+      dayPlanView ||
+      (dayDesignerQuestion && dayDesignerSession) ||
+      relationshipOffer ||
+      decisionOffer ||
+      environmentOffer ||
+      futureShariOffer ||
+      momentumOffer ||
+      opportunityOffer ||
+      businessOSSortOffer ||
+      chiefOffer ||
+      predictiveOffer,
+  );
 
   const liveEmotion = useMemo(() => {
     const lastUser = [...messages].reverse().find((m) => m.role === "user");
@@ -570,6 +776,100 @@ export default function CompanionPage() {
     void reconcileUserIntelligenceWithServer(userIntelligenceEngine.getCounts());
   }, []);
 
+  const refreshRecognition = useCallback(() => {
+    const synced = syncBusinessMilestonesFromApp();
+    const prefs = getPrefs();
+    const moment = evaluateRecognitionMoment(
+      buildRecognitionContext({
+        userName: prefs.name,
+        memberSinceIso: getMemberSinceIso(),
+        conversationCount: getRecognitionStore().conversationStarts,
+        ...synced,
+      }),
+    );
+    setRecognitionMoment(moment);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated || !isIdle) {
+      setRecognitionMoment(null);
+      return;
+    }
+    refreshRecognition();
+  }, [hydrated, isIdle, refreshRecognition]);
+
+  useEffect(() => {
+    const onUpdate = () => {
+      if (hydrated && isIdle) refreshRecognition();
+    };
+    window.addEventListener(RECOGNITION_UPDATED_EVENT, onUpdate);
+    return () =>
+      window.removeEventListener(RECOGNITION_UPDATED_EVENT, onUpdate);
+  }, [hydrated, isIdle, refreshRecognition]);
+
+  useEffect(() => {
+    if (!hydrated || !isIdle) {
+      setCognitiveLoad(null);
+      return;
+    }
+    const result = evaluateAndRecordCognitiveLoad({
+      emotionalState: displayEmotion,
+      recentText:
+        ([...messages].reverse().find((m) => m.role === "user")?.content ??
+          input.trim()) ||
+        undefined,
+    });
+    setCognitiveLoad(result);
+    const health = evaluateAndRecordUserHealth({
+      emotionalState: displayEmotion,
+      text:
+        ([...messages].reverse().find((m) => m.role === "user")?.content ??
+          input.trim()) ||
+        undefined,
+      cognitiveLoadLevel: result.score.level,
+      activationState: activationOffer?.state ?? null,
+      primaryLoopType: loopOffer?.loopType ?? null,
+    });
+    setUserHealth(health);
+    setRecovery(
+      evaluateAndRecordRecovery({
+        emotionalState: displayEmotion,
+        text:
+          ([...messages].reverse().find((m) => m.role === "user")?.content ??
+            input.trim()) ||
+          undefined,
+        cognitiveLoadLevel: result.score.level,
+        activationState: activationOffer?.state ?? null,
+        userHealthStatus: health.status,
+        recognitionRecent: Boolean(recognitionMoment),
+      }),
+    );
+  }, [hydrated, isIdle, displayEmotion, input, messages, activationOffer?.state, loopOffer?.loopType, recognitionMoment]);
+
+  useEffect(() => {
+    if (!hydrated || !isIdle) {
+      setLoopOffer(null);
+      return;
+    }
+    const recentText =
+      ([...messages].reverse().find((m) => m.role === "user")?.content ??
+        input.trim()) ||
+      undefined;
+    const loop = evaluateLoopIntelligence({
+      text: recentText,
+      cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+      activationState: activationOffer?.state ?? null,
+    });
+    setLoopOffer(shouldSurfaceLoopOffer(loop) ? loop : null);
+  }, [
+    hydrated,
+    isIdle,
+    input,
+    messages,
+    cognitiveLoad?.score.level,
+    activationOffer?.state,
+  ]);
+
   // Block legacy Command Center section for end users (founder/admin workspace only).
   useEffect(() => {
     if (activeSection === "progress") {
@@ -606,6 +906,9 @@ export default function CompanionPage() {
   const [overlay, setOverlay] = useState<
     null | "settings" | "profile" | "signin"
   >(null);
+  const [settingsSection, setSettingsSection] =
+    useState<SettingsSection | null>(null);
+  const [visualMode, setVisualMode] = useState<VisualMode>("off");
   const { configured: authConfigured, user } = useCompanionAuth();
   const openSignIn = useCallback(() => {
     if (authConfigured) setOverlay("signin");
@@ -627,6 +930,11 @@ export default function CompanionPage() {
   useEffect(() => {
     setLastAct(getLastActivity());
   }, [activeSection]);
+
+  const homeMemoryCue = useMemo(
+    () => (homeCalm && hasChatted ? memoryCueFromLastActivity(lastAct) : null),
+    [homeCalm, hasChatted, lastAct],
+  );
 
   // Soft execution bridge — ONE chip offered after a chat reply when the
   // conversation implied a deliverable but the user didn't command it.
@@ -672,6 +980,10 @@ export default function CompanionPage() {
   activeSectionRef.current = activeSection;
   const [chatLayoutMode, setChatLayoutMode] =
     useState<ChatLayoutMode>("split");
+  const [workspaceFirstSplit, setWorkspaceFirstSplit] = useState(false);
+  const [companionStandaloneSection, setCompanionStandaloneSection] =
+    useState<AppSection | null>(null);
+  const companionReturnSectionRef = useRef<AppSection | null>(null);
   const patchWorkspacePanel = useCallback((next: AppSection | null) => {
     workspacePanelRef.current = next;
     setWorkspacePanelState((prev) => {
@@ -2005,6 +2317,7 @@ export default function CompanionPage() {
       recognition.stop();
       return;
     }
+    recognition.lang = speechLocaleForLanguage(getPrefs().voiceLanguage);
     baseInputRef.current = input;
     try {
       recognition.start();
@@ -2068,6 +2381,8 @@ export default function CompanionPage() {
         return "saved-work";
       case "playbook":
         return "playbook";
+      case "how-do-i":
+        return "how-do-i";
       default:
         return null;
     }
@@ -2148,6 +2463,72 @@ export default function CompanionPage() {
     revealWorkspace();
   }
 
+  function openCreateDirect() {
+    setWorkspaceFirstSplit(false);
+    setCompanionStandaloneSection(null);
+    patchWorkspacePanel(null);
+    setActiveNav("create");
+    setActiveSection("content-generator");
+    setWorkspaceOffer(null);
+    setToolSuggestion(null);
+    const ctx = toCreationContext("content-generator", {
+      itemType: "content",
+      title: "New piece",
+      brief: "",
+      stage: "choosing content type",
+      source: "generated",
+    });
+    setCreationContext(ctx);
+    setGenSeed({
+      brief: "",
+      topic: "New piece",
+    });
+    setWorkspaceDetail(emptyWorkspaceDetail());
+  }
+
+  /** Menu navigation — open the workspace directly without forcing chat. */
+  function openNavSectionDirect(section: AppSection, nav: SidebarNavId) {
+    setWorkspaceFirstSplit(false);
+    setCompanionStandaloneSection(null);
+    companionReturnSectionRef.current = null;
+    patchWorkspacePanel(null);
+    setChatLayoutMode("split");
+    setActiveNav(nav);
+
+    if (section === "content-generator") {
+      openCreateDirect();
+      return;
+    }
+
+    setWorkspaceSession(null);
+    setActiveSection(section);
+  }
+
+  /** User chose companion help while working — workspace left, chat right. */
+  function openCompanionAssist(sourceSection: AppSection) {
+    companionReturnSectionRef.current = sourceSection;
+    setWorkspaceFirstSplit(true);
+    setChatLayoutMode("split");
+
+    if (supportsWorkspace(sourceSection)) {
+      setCompanionStandaloneSection(null);
+      if (workspacePanel !== sourceSection) {
+        patchWorkspacePanel(sourceSection);
+        if (sourceSection === "projects") {
+          setProjectContinueId(null);
+        }
+      }
+    } else {
+      setCompanionStandaloneSection(sourceSection);
+      patchWorkspacePanel(null);
+    }
+
+    setActiveNav(navForWorkspaceSection(sourceSection) ?? activeNav);
+    setActiveSection("home");
+    revealWorkspace();
+    inputRef.current?.focus();
+  }
+
   function openWorkspaceFromSection(section: AppSection) {
     if (shouldOpenBesideChat(section)) {
       openSectionBesideChat(section);
@@ -2160,26 +2541,8 @@ export default function CompanionPage() {
     if (nav === "chat") {
       setActiveNav("chat");
       setActiveSection("home");
+      setWorkspaceFirstSplit(false);
       if (mode) setCoachingMode(mode);
-      inputRef.current?.focus();
-      return;
-    }
-
-    if (nav === "create") {
-      // Clicking Create starts a NEW create conversation — never open the panel
-      // cold with an old draft/chat. Gather context in chat first; Create opens
-      // only after the user picks a type and confirms (or says "continue my
-      // draft" to resume). This avoids the abrupt takeover with stale content.
-      setActiveNav("chat");
-      setActiveSection("home");
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content:
-            'What would you like to create today? You can make things like:\n\n- Proposal\n- SOP\n- Email\n- Client Avatar\n- Sales Page\n- Marketing Plan\n- Google Doc\n- Google Sheet\n- Google Form\n\nJust tell me which — or say "continue my draft" to pick up where you left off.',
-        },
-      ]);
       inputRef.current?.focus();
       return;
     }
@@ -2197,13 +2560,7 @@ export default function CompanionPage() {
       return;
     }
 
-    if (shouldOpenBesideChat(section)) {
-      openSectionBesideChat(section, nav);
-      return;
-    }
-
-    setActiveNav(nav);
-    setActiveSection(section);
+    openNavSectionDirect(section, nav);
   }
 
   function openFocusAudio(categoryId?: string | null) {
@@ -2227,7 +2584,7 @@ export default function CompanionPage() {
         setActiveSection("breathe");
         break;
       case "focus-audio":
-        openFocusAudio();
+        openFocusAudio(detectAudioRequest(lastUserTextRef.current).categoryId);
         break;
       case "time-block":
         openWorkspaceBesideChat("time-block", workspaceOpenAck("time-block"));
@@ -2342,11 +2699,10 @@ export default function CompanionPage() {
   }
 
   function handleFocusSession(minutes: number) {
-    logMomentum("start", "Focus session started");
-    setActiveSection("home");
+    savePreferredFocusMinutes(minutes);
+    logMomentum("start", `Focus session — ${minutes} min`);
     setActiveNav("focus");
     setCoachingMode("focus");
-    appendSystemMessage(`Focus session — ${minutes} minutes.`);
   }
 
   function clearAllPendingOffers() {
@@ -2511,6 +2867,8 @@ export default function CompanionPage() {
   ) {
     const trimmed = (overrideText ?? input).trim();
     if (!trimmed || isLoading) return;
+    const isNewConversation = !messages.some((m) => m.role === "user");
+    if (isNewConversation) recordConversationStart();
     lastUserTextRef.current = trimmed;
     if (!getPrefs().hasChatted) {
       savePrefs({ hasChatted: true });
@@ -2532,6 +2890,305 @@ export default function CompanionPage() {
       source: "chat",
     });
     void syncClassifiedSignalsToServer(classifiedSignals);
+    const sendEmotion = detectEmotionalState(trimmed);
+    const recoverySnap = evaluateAndRecordRecovery({
+      text: trimmed,
+      emotionalState: sendEmotion,
+      cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+      activationState: undefined,
+      now: new Date(),
+    });
+    setRecovery(recoverySnap);
+    const recLine =
+      !isRecoveryOfferDismissedToday() &&
+      recoveryOverridesProductivity(recoverySnap)
+        ? recoveryWelcomeLine(recoverySnap)
+        : null;
+    setRecoveryOfferLine(recLine);
+
+    const activation = evaluateAndRecordActivation({
+      text: trimmed,
+      emotionalState: sendEmotion,
+      cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+    });
+    if (shouldSurfaceActivationOffer(activation) && !recLine) {
+      setActivationOffer(activation);
+    } else {
+      setActivationOffer(null);
+    }
+    const loop = evaluateAndRecordLoopIntelligence({
+      text: trimmed,
+      cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+      activationState: activation.state,
+    });
+    setLoopOffer(
+      shouldSurfaceLoopOffer(loop) &&
+        !shouldSurfaceActivationOffer(activation) &&
+        !recLine
+        ? loop
+        : null,
+    );
+
+    const loopPrimary = loop?.loopType ?? null;
+
+    if (dayDesignerSession && dayDesignerSession.step !== "complete") {
+      const result = processDayDesignerMessage(dayDesignerSession, trimmed, {
+        emotionalState: sendEmotion,
+        cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+        activationState: activation.state,
+        primaryLoopType: loopPrimary,
+      });
+      setDayDesignerSession(
+        result.session.step === "complete" ? null : result.session,
+      );
+      setDayDesignerQuestion(result.question);
+      if (result.plan) {
+        setDayPlanView(buildSimpleDayPlanView(result.plan));
+        setActivationOffer(null);
+        setLoopOffer(null);
+        setRelationshipOffer(null);
+        setEnvironmentOffer(null);
+        setFutureShariOffer(null);
+        setMomentumOffer(null);
+        setBusinessOSSortOffer(null);
+        setChiefOffer(null);
+        setPredictiveOffer(null);
+        setRecoveryOfferLine(null);
+      }
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      const base = fresh ? [] : messages;
+      const assistantContent = result.plan
+        ? "Here's a gentle plan for today — change anything you like."
+        : (result.question ?? "Got it.");
+      setMessages([
+        ...base,
+        userMessage,
+        { role: "assistant", content: assistantContent },
+      ]);
+      setInput("");
+      voiceUsedRef.current = false;
+      return;
+    }
+
+    if (shouldStartDayDesigner(trimmed) && !isDayDesignerDismissedToday()) {
+      const session = beginDayDesignerFlow();
+      const firstQ = questionForStep("time");
+      setDayDesignerSession(session);
+      setDayDesignerQuestion(firstQ);
+      setDayPlanView(null);
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      const base = fresh ? [] : messages;
+      setMessages([
+        ...base,
+        userMessage,
+        {
+          role: "assistant",
+          content: `${companionIntroForDayDesigner()} ${firstQ}`,
+        },
+      ]);
+      setInput("");
+      voiceUsedRef.current = false;
+      return;
+    }
+
+    const relOffer = evaluateRelationshipOffer({
+      text: trimmed,
+      now: new Date(),
+    });
+    const showRel =
+      shouldSurfaceRelationshipOffer(relOffer) &&
+      !shouldSurfaceActivationOffer(activation) &&
+      !shouldSurfaceLoopOffer(loop) &&
+      !dayDesignerSession &&
+      !dayPlanView;
+    setRelationshipOffer(showRel ? relOffer : null);
+
+    const decision = evaluateDecisionOffer({
+      text: trimmed,
+      now: new Date(),
+      cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+      activationState: activation.state,
+      loopType: loop?.loopType ?? loopPrimary ?? null,
+      userHealthStatus: userHealth?.status ?? null,
+      hasDayPlan: Boolean(dayPlanView),
+    });
+    const showDecision =
+      shouldSurfaceDecisionOffer(decision) &&
+      !shouldSurfaceActivationOffer(activation) &&
+      !shouldSurfaceLoopOffer(loop) &&
+      !showRel &&
+      !dayDesignerSession &&
+      !dayPlanView;
+    setDecisionOffer(showDecision ? decision : null);
+
+    const envOffer = evaluateEnvironmentOffer({
+      text: trimmed,
+      now: new Date(),
+      cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+      activationState: activation.state,
+      recoveryLevel: recovery?.recoveryLevel ?? null,
+      dayEnvironment: dayDesignerSession?.answers.environment ?? null,
+    });
+    const showEnv =
+      shouldSurfaceEnvironmentOffer(envOffer) &&
+      !shouldSurfaceActivationOffer(activation) &&
+      !shouldSurfaceLoopOffer(loop) &&
+      !showRel &&
+      !showDecision &&
+      !dayDesignerSession &&
+      !dayPlanView;
+    setEnvironmentOffer(showEnv ? envOffer : null);
+
+    const futureOffer = evaluateFutureShariOffer({
+      text: trimmed,
+      now: new Date(),
+      cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+      activationState: activation.state,
+      recoveryLevel: recovery?.recoveryLevel ?? null,
+      decisionState: decision?.snapshot.decisionState ?? null,
+    });
+    const showFuture =
+      shouldSurfaceFutureOffer(futureOffer) &&
+      !shouldSurfaceActivationOffer(activation) &&
+      !shouldSurfaceLoopOffer(loop) &&
+      !showRel &&
+      !showDecision &&
+      !showEnv &&
+      !dayDesignerSession &&
+      !dayPlanView;
+    setFutureShariOffer(showFuture ? futureOffer : null);
+
+    const momOffer = evaluateMomentumOffer({
+      text: trimmed,
+      now: new Date(),
+      cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+      activationState: activation.state,
+      userHealthStatus: userHealth?.status ?? null,
+      loopType: loop?.loopType ?? loopPrimary ?? null,
+    });
+    const showMomentum =
+      shouldSurfaceMomentumOffer(momOffer) &&
+      !shouldSurfaceActivationOffer(activation) &&
+      !shouldSurfaceLoopOffer(loop) &&
+      !showRel &&
+      !showDecision &&
+      !showEnv &&
+      !showFuture &&
+      !dayDesignerSession &&
+      !dayPlanView;
+    setMomentumOffer(showMomentum ? momOffer : null);
+
+    const oppOffer = evaluateOpportunityOffer({
+      text: trimmed,
+      now: new Date(),
+      activationBlocker: activation.likelyBlockers[0]?.type ?? null,
+      loopType: loop?.loopType ?? loopPrimary ?? null,
+      cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+    });
+    const showOpp =
+      shouldSurfaceOpportunityOffer(oppOffer) &&
+      !shouldSurfaceActivationOffer(activation) &&
+      !shouldSurfaceLoopOffer(loop) &&
+      !showRel &&
+      !showDecision &&
+      !showEnv &&
+      !showFuture &&
+      !showMomentum &&
+      !dayDesignerSession &&
+      !dayPlanView;
+    setOpportunityOffer(showOpp ? oppOffer : null);
+
+    const bizSortOffer = evaluateBusinessOSSortOffer({
+      text: trimmed,
+      now: new Date(),
+    });
+    const showBizSort =
+      shouldSurfaceBusinessOSSortOffer(bizSortOffer) &&
+      !shouldSurfaceActivationOffer(activation) &&
+      !shouldSurfaceLoopOffer(loop) &&
+      !showRel &&
+      !showDecision &&
+      !showEnv &&
+      !showFuture &&
+      !showMomentum &&
+      !showOpp &&
+      !dayDesignerSession &&
+      !dayPlanView;
+    setBusinessOSSortOffer(showBizSort ? bizSortOffer : null);
+
+    const cosOffer = evaluateChiefOffer({
+      text: trimmed,
+      now: new Date(),
+    });
+    const showChief =
+      shouldSurfaceChiefOffer(cosOffer) &&
+      !shouldSurfaceActivationOffer(activation) &&
+      !shouldSurfaceLoopOffer(loop) &&
+      !showRel &&
+      !showDecision &&
+      !showEnv &&
+      !showFuture &&
+      !showMomentum &&
+      !showOpp &&
+      !showBizSort &&
+      !dayDesignerSession &&
+      !dayPlanView;
+    setChiefOffer(showChief ? cosOffer : null);
+
+    const predOffer = evaluatePredictiveOffer({
+      text: trimmed,
+      now: new Date(),
+    });
+    const showPredictive =
+      shouldSurfacePredictiveOffer(predOffer) &&
+      !shouldSurfaceActivationOffer(activation) &&
+      !shouldSurfaceLoopOffer(loop) &&
+      !showRel &&
+      !showDecision &&
+      !showEnv &&
+      !showFuture &&
+      !showMomentum &&
+      !showOpp &&
+      !showBizSort &&
+      !showChief &&
+      !dayDesignerSession &&
+      !dayPlanView;
+    setPredictiveOffer(showPredictive ? predOffer : null);
+
+    const ecosystemPreview = evaluateEcosystem({
+      text: trimmed,
+      now: new Date(),
+      recognitionActive: Boolean(recognitionMoment),
+      activationOfferActive:
+        shouldSurfaceActivationOffer(activation) || Boolean(activationOffer),
+      loopOfferActive: Boolean(loopOffer) || shouldSurfaceLoopOffer(loop),
+      dayDesignerActive: Boolean(dayDesignerSession),
+      dayPlanActive: Boolean(dayPlanView),
+      userRequestedAction:
+        /\b(help me|show me|open |create |write |send |draft |plan my day|remember |follow up)\b/i.test(
+          trimmed,
+        ),
+    });
+    if (isSuppressed(ecosystemPreview, "activation_offer")) setActivationOffer(null);
+    if (isSuppressed(ecosystemPreview, "loop_offer")) setLoopOffer(null);
+    if (isSuppressed(ecosystemPreview, "relationship_offer"))
+      setRelationshipOffer(null);
+    if (isSuppressed(ecosystemPreview, "decision_offer")) setDecisionOffer(null);
+    if (isSuppressed(ecosystemPreview, "environment_offer"))
+      setEnvironmentOffer(null);
+    if (isSuppressed(ecosystemPreview, "future_shari_offer"))
+      setFutureShariOffer(null);
+    if (isSuppressed(ecosystemPreview, "momentum_offer")) setMomentumOffer(null);
+    if (isSuppressed(ecosystemPreview, "opportunity_offer"))
+      setOpportunityOffer(null);
+    if (isSuppressed(ecosystemPreview, "business_os_sort"))
+      setBusinessOSSortOffer(null);
+    if (isSuppressed(ecosystemPreview, "chief_of_staff")) setChiefOffer(null);
+    if (isSuppressed(ecosystemPreview, "predictive_support_offer"))
+      setPredictiveOffer(null);
+
     if (physicalActionWaiting && isActionDone(trimmed)) {
       const userMessage: Message = { role: "user", content: trimmed };
       if (fresh) clearConversation();
@@ -2816,7 +3473,10 @@ export default function CompanionPage() {
       setAssistedActionOffer(null);
     }
 
-    if (pendingNow && matchesPendingAcceptance(trimmed, pendingNow)) {
+    if (
+      pendingNow &&
+      shouldAutoLaunchPendingAction(trimmed, lastAssistantText, pendingNow)
+    ) {
       executePendingAction(pendingNow);
       return;
     }
@@ -2957,7 +3617,10 @@ export default function CompanionPage() {
       }
     }
 
-    if (workspaceOffer && classified.intent === "confirmation") {
+    if (
+      workspaceOffer &&
+      (classified.intent === "confirmation" || isActionAcceptance(trimmed))
+    ) {
       if (
         workspacePanel === "content-generator" &&
         workspaceOffer.section !== "content-generator"
@@ -3301,14 +3964,7 @@ export default function CompanionPage() {
         lockedArtifactType,
       );
       if (suggested) {
-        setAssistedActionOffer(suggested);
-        setMessages((prev) => [
-          ...prev,
-          {
-            role: "assistant",
-            content: suggested.helpMessage,
-          },
-        ]);
+        acceptAssistedAction(suggested);
         return;
       }
     }
@@ -3527,6 +4183,10 @@ export default function CompanionPage() {
         pendingWorkspaceOffer,
         trimmed,
       );
+      if (shouldAutoOpenWorkspaceFromIntent(trimmed, pendingWorkspaceOffer)) {
+        acceptWorkspaceOffer(pendingWorkspaceOffer);
+        return;
+      }
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: offerReply },
@@ -3655,6 +4315,71 @@ export default function CompanionPage() {
         day?.overwhelm,
       );
       const { responseLanguageHint } = getOutputLanguageContext(prefs);
+      const adaptiveDecision = evaluateAndRecordAdaptiveCompanion({
+        text: trimmed,
+        emotionalState: detected,
+        cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+        activationState: activation.state,
+        loopType: loop?.loopType ?? null,
+        celebrationActive: Boolean(recognitionMoment),
+        planningContext:
+          Boolean(dayDesignerSession) || shouldStartDayDesigner(trimmed),
+      });
+      const healthSnapshot = evaluateAndRecordUserHealth({
+        text: trimmed,
+        emotionalState: detected,
+        cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+        activationState: activation.state,
+        primaryLoopType: loop?.loopType ?? null,
+      });
+      setUserHealth(healthSnapshot);
+      const recoverySnapshot = evaluateAndRecordRecovery({
+        text: trimmed,
+        emotionalState: detected,
+        cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+        activationState: activation.state,
+        userHealthStatus: healthSnapshot.status,
+        adaptiveMode: adaptiveDecision.mode,
+        recognitionRecent: Boolean(recognitionMoment),
+      });
+      setRecovery(recoverySnapshot);
+      const decisionSnapshot = evaluateAndRecordDecision({
+        text: trimmed,
+        cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+        activationState: activation.state,
+        loopType: loop?.loopType ?? null,
+        userHealthStatus: healthSnapshot.status,
+        hasDayPlan: Boolean(dayPlanView),
+      });
+      const environmentSnapshot = evaluateAndRecordEnvironment({
+        text: trimmed,
+        cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+        activationState: activation.state,
+        recoveryLevel: recoverySnapshot.recoveryLevel,
+        dayEnvironment: dayDesignerSession?.answers.environment ?? null,
+      });
+      const momentumSnapshot = evaluateAndRecordMomentum({
+        text: trimmed,
+        cognitiveLoadLevel: cognitiveLoad?.score.level ?? null,
+        activationState: activation.state,
+        userHealthStatus: healthSnapshot.status,
+        loopType: loop?.loopType ?? null,
+      });
+      const businessOSSnapshot = evaluateAndRecordBusinessOS({
+        text: trimmed,
+      });
+      const chiefSnapshot = evaluateAndRecordChiefOfStaff({
+        text: trimmed,
+      });
+      const ecosystemSnapshot = evaluateAndRecordEcosystem({
+        text: trimmed,
+        recognitionActive: Boolean(recognitionMoment),
+        activationOfferActive: Boolean(activationOffer),
+        loopOfferActive: Boolean(loopOffer),
+        dayDesignerActive: Boolean(dayDesignerSession),
+        dayPlanActive: Boolean(dayPlanView),
+      });
+      evaluateAndRecordPredictiveSupport({ text: trimmed });
       const res = await fetch("/api/companion-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -3736,6 +4461,8 @@ export default function CompanionPage() {
           responseLanguageHint,
           obstacle: obstacle ?? undefined,
           somatic: somatic || undefined,
+          adaptiveModeHint: adaptiveHintForChat(adaptiveDecision),
+          ecosystemGuidance: ecosystemGuidanceForChat(ecosystemSnapshot),
         }),
       });
 
@@ -3891,33 +4618,63 @@ export default function CompanionPage() {
         setLastAct({ ...activity, ts: new Date().toISOString() });
       }
       const makeBridge = bridgeFromResolved(resolved);
-      setBridge(makeBridge);
-      if (pendingWorkspaceOffer) {
-        setWorkspaceOffer(pendingWorkspaceOffer);
-        setToolSuggestion(null);
-        setActionBridge(null);
-      } else if (pendingToolOffer) {
-        trackToolSuggestionOffered(pendingToolOffer.kind);
-        setToolSuggestion(pendingToolOffer);
-        setWorkspaceOffer(null);
-        setActionBridge(null);
+      const nextDoItNow =
+        makeBridge || intelligence.shouldDeferTools
+          ? null
+          : detectDoItNowOffer(assistantMsg);
+      const nextActionBridge =
+        makeBridge || intelligence.shouldDeferTools || nextDoItNow
+          ? null
+          : detectActionBridge(assistantMsg);
+      const postApiPending = resolvePendingAction({
+        workspaceOffer: pendingWorkspaceOffer,
+        artifactExportOffer: exportOffer ?? artifactExportOffer,
+        assistedActionOffer,
+        doItNowOffer: nextDoItNow,
+        toolSuggestion: pendingWorkspaceOffer ? null : pendingToolOffer,
+        actionBridge: pendingWorkspaceOffer ? null : nextActionBridge,
+        bridge: makeBridge,
+        lockedArtifactType,
+      });
+
+      if (
+        postApiPending &&
+        shouldAutoLaunchAfterAssistantOffer(
+          trimmed,
+          lastAssistantText,
+          assistantMsg,
+          postApiPending,
+        )
+      ) {
+        if (pendingToolOffer && !pendingWorkspaceOffer) {
+          trackToolSuggestionOffered(pendingToolOffer.kind);
+        }
+        executePendingAction(postApiPending);
       } else {
-        setWorkspaceOffer(null);
-        setToolSuggestion(null);
-        const nextDoItNow =
-          makeBridge || intelligence.shouldDeferTools
-            ? null
-            : detectDoItNowOffer(assistantMsg);
-        setDoItNowOffer(nextDoItNow);
-        setActionBridge(
-          makeBridge || intelligence.shouldDeferTools || nextDoItNow
-            ? null
-            : detectActionBridge(assistantMsg),
-        );
-      }
-      const autoLaunchTool = detectAssistantToolLaunch(assistantMsg);
-      if (autoLaunchTool) {
-        handleToolSelect(autoLaunchTool);
+        setBridge(makeBridge);
+        if (pendingWorkspaceOffer) {
+          setWorkspaceOffer(pendingWorkspaceOffer);
+          setToolSuggestion(null);
+          setActionBridge(null);
+        } else if (pendingToolOffer) {
+          trackToolSuggestionOffered(pendingToolOffer.kind);
+          setToolSuggestion(pendingToolOffer);
+          setWorkspaceOffer(null);
+          setActionBridge(null);
+        } else {
+          setWorkspaceOffer(null);
+          setToolSuggestion(null);
+          setDoItNowOffer(nextDoItNow);
+          setActionBridge(nextActionBridge);
+        }
+        const autoLaunchTool = detectAssistantToolLaunch(assistantMsg);
+        if (autoLaunchTool) {
+          if (autoLaunchTool.tool === "focus-audio") {
+            openFocusAudio(autoLaunchTool.focusAudioCategory);
+          } else {
+            handleToolSelect(autoLaunchTool.tool);
+          }
+        }
       }
       if (voiceOutput && data.message) void playTTS(data.message);
     } catch (err) {
@@ -4021,6 +4778,10 @@ export default function CompanionPage() {
   }
 
   function closeWorkspacePanel() {
+    const returnTo = companionReturnSectionRef.current;
+    companionReturnSectionRef.current = null;
+    setWorkspaceFirstSplit(false);
+    setCompanionStandaloneSection(null);
     patchWorkspacePanel(null);
     setWorkspaceDetail(null);
     setCreationContext(null);
@@ -4035,7 +4796,12 @@ export default function CompanionPage() {
     applyWorkspaceFocus(null);
     setProjectsBootstrapCreate(false);
     setProjectContinueId(null);
-    setActiveNav("chat");
+    if (returnTo && returnTo !== "home") {
+      setActiveSection(returnTo);
+      setActiveNav(navForWorkspaceSection(returnTo) ?? "chat");
+    } else {
+      setActiveNav("chat");
+    }
     setChatLayoutMode("split");
   }
 
@@ -4165,6 +4931,14 @@ export default function CompanionPage() {
             registerBack={registerBack}
           />
         );
+      case "how-do-i":
+        return (
+          <HowDoIPanel
+            onOpen={openWorkspaceFromSection}
+            onAsk={(prompt) => void handleSend(prompt, false, true)}
+            registerBack={registerBack}
+          />
+        );
       case "snippets":
         return (
           <SnippetsLibrary
@@ -4218,6 +4992,13 @@ export default function CompanionPage() {
             }
           />
         );
+      case "focus-timer":
+        return (
+          <FocusTimerPanel
+            timer={pomodoroTimer}
+            onStartSession={handleFocusSession}
+          />
+        );
       default:
         return (
           <p className="p-6 text-base text-[#6b635a]">
@@ -4227,10 +5008,54 @@ export default function CompanionPage() {
     }
   }
 
+  function renderCompanionStandaloneSection(section: AppSection) {
+    switch (section) {
+      case "focus-timer":
+        return (
+          <FocusTimerPanel
+            timer={pomodoroTimer}
+            onStartSession={handleFocusSession}
+          />
+        );
+      case "focus":
+        return (
+          <FocusAreaPanel
+            onOpen={handleToolSelect}
+            onGetUnstuck={() => {
+              void handleSend(
+                "I'm feeling stuck — can you help me find the smallest next step?",
+                true,
+                true,
+              );
+            }}
+          />
+        );
+      case "breathe":
+        return <BreathePanel onDone={closeWorkspacePanel} />;
+      case "focus-audio":
+        return (
+          <FocusAudioPanel
+            emotion={displayEmotion}
+            initialCategory={focusAudioCategory ?? undefined}
+            onDone={closeWorkspacePanel}
+          />
+        );
+      default:
+        return renderWorkspacePanel(section);
+    }
+  }
+
   const workspacePanelNode = useMemo(
-    () => (workspacePanel ? renderWorkspacePanel(workspacePanel) : null),
+    () => {
+      if (workspacePanel) return renderWorkspacePanel(workspacePanel);
+      if (companionStandaloneSection) {
+        return renderCompanionStandaloneSection(companionStandaloneSection);
+      }
+      return null;
+    },
     [
       workspacePanel,
+      companionStandaloneSection,
       genSeed,
       workspaceFocusField,
       workspaceFocusStamp,
@@ -4288,10 +5113,14 @@ export default function CompanionPage() {
       return;
     }
 
-    const mins = offer.minutes ?? 25;
+    const mins =
+      offer.minutes ??
+      parseFocusMinutesFromText(lastUserTextRef.current) ??
+      25;
+    savePreferredFocusMinutes(mins);
     logMomentum("start", `Focus session from Do It Now — ${mins} min`);
     pomodoroTimer.startWith(mins);
-    setActiveSection("home");
+    setActiveSection("focus-timer");
     setActiveNav("focus");
     setCoachingMode("focus");
     setMessages((prev) => [
@@ -4381,6 +5210,15 @@ export default function CompanionPage() {
     trackToolSuggestionAccepted(offer.kind);
     clearAllPendingOffers();
     if (offer.action.type === "tool") {
+      if (offer.action.tool === "focus-audio") {
+        const fromLine = /motivation boost/i.test(offer.line)
+          ? "motivation-boost"
+          : /calm my brain|calming|something calm/i.test(offer.line)
+            ? "calm-brain"
+            : detectAudioRequest(lastUserTextRef.current).categoryId;
+        openFocusAudio(fromLine);
+        return;
+      }
       handleToolSelect(offer.action.tool);
       return;
     }
@@ -4398,7 +5236,11 @@ export default function CompanionPage() {
       return;
     }
     if (bridge.tool === "focus-timer") {
-      const mins = bridge.minutes ?? 25;
+      const mins =
+        bridge.minutes ??
+        parseFocusMinutesFromText(lastUserTextRef.current) ??
+        25;
+      savePreferredFocusMinutes(mins);
       logMomentum("start", `Focus session from chat — ${mins} min`);
       pomodoroTimer.startWith(mins);
       setActiveSection("focus-timer");
@@ -4407,7 +5249,11 @@ export default function CompanionPage() {
       return;
     }
     if (bridge.tool === "focus-audio") {
-      openFocusAudio();
+      openFocusAudio(
+        detectAudioRequest(
+          `${lastUserTextRef.current} ${bridge.label}`,
+        ).categoryId,
+      );
       return;
     }
     handleToolSelect(bridge.tool);
@@ -4579,6 +5425,7 @@ export default function CompanionPage() {
     <CompanionAuthGate>
     <div
       className={`relative flex h-dvh max-h-dvh overflow-hidden text-lg text-[#2d2926] ${shellClass}`}
+      data-visual-mode={visualMode}
     >
       <Suspense fallback={null}>
         <CompanionSignInFromQuery onOpen={openSignIn} />
@@ -4605,8 +5452,6 @@ export default function CompanionPage() {
             onNewDayChat={handleNewDayChat}
             onSettings={() => setOverlay("settings")}
             onProfile={() => setOverlay("profile")}
-            onSignIn={openSignIn}
-            signedInEmail={user?.email ?? null}
             onOpenAvatars={() => setActiveSection("client-avatars")}
             minimal={activeSection === "home"}
           />
@@ -4614,13 +5459,7 @@ export default function CompanionPage() {
 
           {activeSection !== "home" && (
             <div className="shrink-0 px-4 pt-3 sm:px-6">
-              <button
-                type="button"
-                onClick={goBack}
-                className="flex items-center gap-1.5 rounded-xl border border-[#1e4f4f]/25 bg-white/80 px-4 py-2.5 text-lg font-bold text-[#1e4f4f] hover:bg-white"
-              >
-                <span className="text-2xl leading-none">‹</span> Back
-              </button>
+              <BackButton onClick={goBack} />
             </div>
           )}
 
@@ -4636,16 +5475,56 @@ export default function CompanionPage() {
                 logoError={logoError}
                 onPhotoError={() => setPhotoError(true)}
                 onLogoError={() => setLogoError(true)}
-                resumeLine={
-                  // Only when the Continue card is NOT showing — never both.
-                  isIdle && hydrated && lastAct && !hasChatted
-                    ? `Still on ${lastAct.title}?`
-                    : null
+                userBirthday={getRecognitionStore().birthday}
+                recognitionMoment={recognitionMoment}
+                recoveryMode={Boolean(
+                  recoveryOfferLine ||
+                    (recovery && recoveryOverridesProductivity(recovery)),
+                )}
+                focusMode={
+                  pomodoroTimer.isActive ||
+                  activeSection === "focus-timer" ||
+                  workspacePanel === "focus-audio"
                 }
-                onResumeClick={
-                  lastAct ? () => continueWork(lastAct) : undefined
+                recognitionWin={Boolean(
+                  recognitionMoment &&
+                    (recognitionMoment.type === "project_milestone" ||
+                      recognitionMoment.type === "business_milestone" ||
+                      recognitionMoment.type === "conversation_milestone"),
+                )}
+                welcomeLine={
+                  homeCalm
+                    ? null
+                    : cognitiveLoad?.companionOffer ??
+                      (recovery ? recoveryWelcomeLine(recovery) : null) ??
+                      (userHealth ? userHealthWelcomeLine(userHealth) : null)
                 }
+                onDismissWelcome={
+                  homeCalm
+                    ? undefined
+                    : cognitiveLoad?.companionOffer
+                      ? () => {
+                          dismissLoadOffer();
+                          setCognitiveLoad((prev) =>
+                            prev ? { ...prev, companionOffer: null } : null,
+                          );
+                        }
+                      : undefined
+                }
+                memoryCue={homeCalm ? homeMemoryCue : null}
+                primaryQuestion={
+                  homeCalm ? "What feels most important right now?" : null
+                }
+                resumeLine={null}
+                onResumeClick={undefined}
               />
+
+              {homeCalm ? null : isIdle && recognitionMoment && !hasInlineIntelligenceOffer ? (
+                <RecognitionMomentCard
+                  moment={recognitionMoment}
+                  onDismiss={() => setRecognitionMoment(null)}
+                />
+              ) : null}
 
               <div className="flex-1 overflow-y-auto px-4 sm:px-6">
                 {/* Home stays calm: greeting up top, open space here, the chat
@@ -4658,11 +5537,174 @@ export default function CompanionPage() {
                   isLoading={isLoading}
                   formatParagraphs={formatAssistantParagraphs}
                   afterLastAssistant={
-                    // The Pending Action bar (driven by pendingAction) is the
-                    // single launcher — never also show inline offer chips.
-                    !bridge && !isLoading && !pendingAction ? (
+                    homeCalm
+                      ? undefined
+                      : !bridge && !isLoading && !pendingAction ? (
                       <>
-                        {workspaceOffer ? (
+                        {recoveryOfferLine ? (
+                          <RecoveryOfferCard
+                            line={recoveryOfferLine}
+                            onAccept={() => {
+                              const line = recoveryOfferLine;
+                              setRecoveryOfferLine(null);
+                              void handleSend(
+                                `Yes — help me make today lighter. ${line}`,
+                                false,
+                                true,
+                              );
+                            }}
+                            onDismiss={() => {
+                              dismissRecoveryOffer();
+                              setRecoveryOfferLine(null);
+                            }}
+                          />
+                        ) : activationOffer ? (
+                          <ActivationOfferCard
+                            snapshot={activationOffer}
+                            onAccept={() => {
+                              const snap = activationOffer;
+                              setActivationOffer(null);
+                              void handleSend(
+                                `Help me with this small next step: ${snap.suggestedNextStep}`,
+                                false,
+                                true,
+                              );
+                            }}
+                            onDismiss={() => setActivationOffer(null)}
+                          />
+                        ) : loopOffer ? (
+                          <LoopOfferCard
+                            snapshot={loopOffer}
+                            onAccept={() => {
+                              const snap = loopOffer;
+                              setLoopOffer(null);
+                              void handleSend(
+                                `Yes — help me explore this: ${snap.companionResponse}`,
+                                false,
+                                true,
+                              );
+                            }}
+                            onDismiss={() => setLoopOffer(null)}
+                          />
+                        ) : dayPlanView ? (
+                          <DayPlanCard
+                            view={dayPlanView}
+                            onDismiss={() => setDayPlanView(null)}
+                          />
+                        ) : dayDesignerQuestion && dayDesignerSession ? (
+                          <DayDesignerPromptCard
+                            question={dayDesignerQuestion}
+                            onDismiss={() => {
+                              setDayDesignerSession(null);
+                              setDayDesignerQuestion(null);
+                            }}
+                          />
+                        ) : relationshipOffer ? (
+                          <RelationshipRememberCard
+                            offer={relationshipOffer}
+                            onAccept={() => {
+                              const snap = relationshipOffer;
+                              const { message } = acceptRelationshipRemember(snap);
+                              setRelationshipOffer(null);
+                              void handleSend(message, false, true);
+                            }}
+                            onDismiss={() => setRelationshipOffer(null)}
+                          />
+                        ) : decisionOffer ? (
+                          <DecisionOfferCard
+                            offer={decisionOffer}
+                            onNarrow={() => {
+                              const snap = decisionOffer;
+                              const { message } = acceptDecisionNarrow(snap);
+                              setDecisionOffer(null);
+                              void handleSend(message, false, true);
+                            }}
+                            onPark={() => {
+                              const snap = decisionOffer;
+                              const { message } = acceptDecisionPark(snap);
+                              setDecisionOffer(null);
+                              void handleSend(message, false, true);
+                            }}
+                            onDismiss={() => setDecisionOffer(null)}
+                          />
+                        ) : environmentOffer ? (
+                          <EnvironmentOfferCard
+                            offer={environmentOffer}
+                            onTry={() => {
+                              const snap = environmentOffer;
+                              const { message } = acceptEnvironmentAdjust(snap);
+                              setEnvironmentOffer(null);
+                              void handleSend(message, false, true);
+                            }}
+                            onDismiss={() => setEnvironmentOffer(null)}
+                          />
+                        ) : futureShariOffer ? (
+                          <FutureShariOfferCard
+                            offer={futureShariOffer}
+                            onTellMe={() => {
+                              const snap = futureShariOffer;
+                              const { message } = acceptFutureShari(snap);
+                              setFutureShariOffer(null);
+                              void handleSend(message, false, true);
+                            }}
+                            onDismiss={() => setFutureShariOffer(null)}
+                          />
+                        ) : momentumOffer ? (
+                          <MomentumOfferCard
+                            offer={momentumOffer}
+                            onAcknowledge={() => {
+                              const snap = momentumOffer;
+                              const { message } = acceptMomentumAcknowledge(snap);
+                              setMomentumOffer(null);
+                              void handleSend(message, false, true);
+                            }}
+                            onDismiss={() => setMomentumOffer(null)}
+                          />
+                        ) : opportunityOffer ? (
+                          <OpportunityOfferCard
+                            offer={opportunityOffer}
+                            onExplore={() => {
+                              const snap = opportunityOffer;
+                              const { message } = acceptOpportunityExplore(snap);
+                              setOpportunityOffer(null);
+                              void handleSend(message, false, true);
+                            }}
+                            onDismiss={() => setOpportunityOffer(null)}
+                          />
+                        ) : businessOSSortOffer ? (
+                          <BusinessOSSortCard
+                            offer={businessOSSortOffer}
+                            onSort={() => {
+                              const snap = businessOSSortOffer;
+                              const { message } = acceptBusinessSort(snap);
+                              setBusinessOSSortOffer(null);
+                              void handleSend(message, false, true);
+                            }}
+                            onDismiss={() => setBusinessOSSortOffer(null)}
+                          />
+                        ) : chiefOffer ? (
+                          <ChiefOfStaffOfferCard
+                            offer={chiefOffer}
+                            onTellMe={() => {
+                              const snap = chiefOffer;
+                              const { message } = acceptChiefPerspective(snap);
+                              setChiefOffer(null);
+                              void handleSend(message, false, true);
+                            }}
+                            onDismiss={() => setChiefOffer(null)}
+                          />
+                        ) : predictiveOffer ? (
+                          <PredictiveSupportOfferCard
+                            offer={predictiveOffer}
+                            onAccept={() => {
+                              const snap = predictiveOffer;
+                              const { message } = acceptPredictiveSupport(snap);
+                              setPredictiveOffer(null);
+                              void handleSend(message, false, true);
+                            }}
+                            onDismiss={() => setPredictiveOffer(null)}
+                          />
+                        ) : workspaceOffer ? (
                           <ToolSuggestionCard
                             line={workspaceOffer.line}
                             toolEmoji={
@@ -4718,143 +5760,6 @@ export default function CompanionPage() {
                     ) : undefined
                   }
                 />
-                {isIdle && hydrated &&
-                  (hasChatted && lastAct ? (
-                    // Continue card — one re-entry into unfinished work.
-                    <div className="mx-auto mt-5 w-full max-w-md rounded-2xl border border-[#1e4f4f]/20 bg-white/90 p-5 shadow-sm">
-                      <p className="text-base font-semibold text-[#6b635a]">
-                        {/* Emotion-aware override > strict memory title. */}
-                        {/overwhelm|anxious|stress|tired|low|scattered/i.test(
-                          displayEmotion,
-                        )
-                          ? "No rush — pick this back up whenever you're ready:"
-                          : /focus|energ|motivat|ready/i.test(displayEmotion)
-                            ? "Let's keep going — continue where you left off:"
-                            : "You were working on…"}
-                      </p>
-                      <p className="mt-1 text-lg font-semibold text-[#1f1c19]">
-                        {lastAct.title}
-                      </p>
-                      {lastAct.subtitle && (
-                        <p className="text-base text-[#6b635a]">
-                          {lastAct.subtitle}
-                        </p>
-                      )}
-                      <div className="mt-4 flex gap-2">
-                        <button
-                          type="button"
-                          onClick={() => continueWork(lastAct)}
-                          className="rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-base font-semibold text-white hover:bg-[#163a3a]"
-                        >
-                          Continue
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            clearLastActivity();
-                            setLastAct(null);
-                          }}
-                          className="rounded-xl border-2 border-[#1e4f4f] bg-white px-5 py-2.5 text-base font-semibold text-[#1e4f4f]"
-                        >
-                          Start fresh
-                        </button>
-                      </div>
-                    </div>
-                  ) : hasChatted ? (
-                    // Returning user: one soft line, no starter wall.
-                    <>
-                      {needsSetup && (
-                        <div className="mx-auto mt-5 w-full max-w-md rounded-2xl border border-[#1e4f4f]/20 bg-white/90 p-4 shadow-sm">
-                          <p className="text-base font-semibold text-[#1f1c19]">
-                            Personalize Shari for your business
-                          </p>
-                          <p className="mt-1 text-sm text-[#6b635a]">
-                            About 2 minutes — helps Shari speak your language.
-                          </p>
-                          <button
-                            type="button"
-                            onClick={openSetup}
-                            className="mt-3 rounded-xl bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
-                          >
-                            Start setup
-                          </button>
-                        </div>
-                      )}
-                      <p className="mx-auto mt-5 max-w-xl text-center text-base text-[#6b635a]">
-                        What&apos;s on your mind? Just start typing or talking.
-                      </p>
-                    </>
-                  ) : (
-                    // First-timer: welcome + optional setup, then starter chips.
-                    <div className="mx-auto mt-5 flex max-w-xl flex-col items-center gap-2.5">
-                      {needsSetup && (
-                        <div className="w-full max-w-md rounded-2xl border border-[#1e4f4f]/20 bg-white/90 p-4 shadow-sm">
-                          <p className="text-base font-semibold text-[#1f1c19]">
-                            Welcome — glad you&apos;re here
-                          </p>
-                          <p className="mt-1 text-sm text-[#6b635a]">
-                            Optional: take 2 minutes so Shari knows your business.
-                            You can also jump straight into chat below.
-                          </p>
-                          <button
-                            type="button"
-                            onClick={openSetup}
-                            className="mt-3 rounded-xl bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
-                          >
-                            Start 2-minute setup
-                          </button>
-                        </div>
-                      )}
-                      <p className="text-base text-[#6b635a]">
-                        Not sure where to start? Tap one:
-                      </p>
-                      <div className="flex flex-wrap justify-center gap-2">
-                        {(
-                          [
-                            // Action intent → open the tool. Thinking → chat.
-                            {
-                              id: "help_me_write" as StarterChipId,
-                              label: "✍️ Help me write something",
-                              run: () => {
-                                trackStarterChip("help_me_write");
-                                if (!hasChatted) {
-                                  savePrefs({ hasChatted: true });
-                                  setHasChatted(true);
-                                }
-                                setActiveNav("create");
-                                openGenerator(null);
-                              },
-                            },
-                            {
-                              id: "im_overwhelmed" as StarterChipId,
-                              label: "I'm feeling overwhelmed",
-                              run: () => {
-                                trackStarterChip("im_overwhelmed");
-                                void handleSend("I'm feeling overwhelmed", true);
-                              },
-                            },
-                            {
-                              id: "what_should_i_work_on" as StarterChipId,
-                              label: "What should I work on?",
-                              run: () => {
-                                trackStarterChip("what_should_i_work_on");
-                                void handleSend("What should I work on?", true);
-                              },
-                            },
-                          ] as const
-                        ).map((s) => (
-                          <button
-                            key={s.id}
-                            type="button"
-                            onClick={s.run}
-                            className="rounded-full border border-[#1e4f4f]/30 bg-white/80 px-4 py-2 text-base font-medium text-[#1e4f4f] transition-colors hover:bg-white"
-                          >
-                            {s.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
                 <div ref={bottomRef} className="h-2" />
               </div>
 
@@ -4926,6 +5831,17 @@ export default function CompanionPage() {
                       />
                     )
                   ) : null}
+                  {homeCalm ? (
+                    <ProgressiveDiscoveryCard
+                      onOpenBusinessProfile={() => {
+                        setActiveSection("business-profile");
+                      }}
+                      onOpenSettings={() => {
+                        setSettingsSection("tone");
+                        setOverlay("settings");
+                      }}
+                    />
+                  ) : null}
                   <ChatInputBar
                     input={input}
                     isLoading={isLoading}
@@ -4936,6 +5852,11 @@ export default function CompanionPage() {
                     onKeyDown={handleKeyDown}
                     onToggleListening={toggleListening}
                     onSend={() => void handleSend()}
+                    placeholder={
+                      homeCalm
+                        ? "Type or talk — whatever feels right"
+                        : undefined
+                    }
                   />
                   {/* Cold open stays bare: just starters + input. The voice
                       chip and upsell only appear once a conversation exists. */}
@@ -4989,9 +5910,11 @@ export default function CompanionPage() {
             </main>
                 }
                 workspace={workspacePanelNode}
-                workspaceActive={Boolean(workspacePanel)}
+                workspaceActive={Boolean(workspacePanel || companionStandaloneSection)}
                 workspaceTitle={
-                  workspacePanel === "google-workspace" && googleWorkspace
+                  companionStandaloneSection
+                    ? workspaceTitle(companionStandaloneSection)
+                    : workspacePanel === "google-workspace" && googleWorkspace
                     ? googleWorkspaceTitle(googleWorkspace.kind)
                     : workspacePanel
                       ? workspaceTitle(workspacePanel)
@@ -5001,6 +5924,7 @@ export default function CompanionPage() {
                 onChatLayoutModeChange={setChatLayoutMode}
                 onClose={closeWorkspacePanel}
                 revealKey={workspaceRevealSeq}
+                workspaceFirst={workspaceFirstSplit}
               />
             </div>
           )}
@@ -5021,18 +5945,23 @@ export default function CompanionPage() {
               <div className="mx-auto min-h-full w-full max-w-3xl rounded-3xl bg-white/80 shadow-sm backdrop-blur-sm">
 
           {activeSection === "focus-timer" && (
-            <FocusTimerPanel
-              timer={pomodoroTimer}
-              onStartSession={handleFocusSession}
-            />
+            <WorkspaceShell onAskShari={() => openCompanionAssist("focus-timer")}>
+              <FocusTimerPanel
+                timer={pomodoroTimer}
+                onStartSession={handleFocusSession}
+                onAskShari={() => openCompanionAssist("focus-timer")}
+              />
+            </WorkspaceShell>
           )}
 
           {activeSection === "brain-dump" && (
-            <BrainDumpPanel
-              onOpen={(s) => setActiveSection(s)}
-              onAsk={handlePlaybookAsk}
-              registerBack={registerBack}
-            />
+            <WorkspaceShell onAskShari={() => openCompanionAssist("brain-dump")}>
+              <BrainDumpPanel
+                onOpen={(s) => setActiveSection(s)}
+                onAsk={handlePlaybookAsk}
+                registerBack={registerBack}
+              />
+            </WorkspaceShell>
           )}
 
           {activeSection === "breathe" && (
@@ -5051,22 +5980,24 @@ export default function CompanionPage() {
           )}
 
           {activeSection === "focus" && (
-            <FocusAreaPanel
-              onOpen={handleToolSelect}
-              onGetUnstuck={() => {
-                setActiveSection("home");
-                setActiveNav("chat");
-                void handleSend(
-                  "I'm feeling stuck — can you help me find the smallest next step?",
-                  true,
-                  true,
-                );
-              }}
-            />
+            <WorkspaceShell onAskShari={() => openCompanionAssist("focus")}>
+              <FocusAreaPanel
+                onOpen={handleToolSelect}
+                onGetUnstuck={() => {
+                  void handleSend(
+                    "I'm feeling stuck — can you help me find the smallest next step?",
+                    true,
+                    true,
+                  );
+                }}
+              />
+            </WorkspaceShell>
           )}
 
           {activeSection === "time-block" && (
-            <TimeBlockPanel onStart={startBlock} onTestAlert={testAlert} />
+            <WorkspaceShell onAskShari={() => openCompanionAssist("time-block")}>
+              <TimeBlockPanel onStart={startBlock} onTestAlert={testAlert} />
+            </WorkspaceShell>
           )}
 
           {activeSection === "games" && (
@@ -5093,42 +6024,55 @@ export default function CompanionPage() {
           {activeSection === "client-avatars" && <IdealClientBuilder />}
 
           {activeSection === "projects" && (
-            <ProjectsPanel
-              initialProjectId={projectContinueId}
-              onOpen={(s) => setActiveSection(s)}
-              onAsk={handlePlaybookAsk}
-              onBuildWithShari={(input) =>
-                openCreationWorkspace("projects", {
-                  ...input,
-                  source: "project",
-                })
-              }
-            />
+            <WorkspaceShell onAskShari={() => openCompanionAssist("projects")}>
+              <ProjectsPanel
+                initialProjectId={projectContinueId}
+                onOpen={(s) => setActiveSection(s)}
+                onAsk={handlePlaybookAsk}
+                onBuildWithShari={(input) =>
+                  openCreationWorkspace("projects", {
+                    ...input,
+                    source: "project",
+                  })
+                }
+              />
+            </WorkspaceShell>
           )}
 
           {activeSection === "playbook" && (
-            <StrategiesPanel
-              onOpen={(s) => setActiveSection(s)}
-              onAsk={handlePlaybookAsk}
-              registerBack={registerBack}
-            />
+            <WorkspaceShell onAskShari={() => openCompanionAssist("playbook")}>
+              <StrategiesPanel
+                onOpen={(s) => setActiveSection(s)}
+                onAsk={handlePlaybookAsk}
+                registerBack={registerBack}
+              />
+            </WorkspaceShell>
+          )}
+
+          {activeSection === "how-do-i" && (
+            <WorkspaceShell showAssist={false}>
+              <HowDoIPanel
+                onOpen={(s) => setActiveSection(s)}
+                onAsk={(prompt) => void handleSend(prompt, false, true)}
+                registerBack={registerBack}
+              />
+            </WorkspaceShell>
           )}
 
           {activeSection === "templates-library" && (
-            <TemplatesLibrary
-              onOpen={(s) => setActiveSection(s)}
-              onGenerate={openGenerator}
-              onBuildWithShari={(input) =>
-                openCreationWorkspace("content-generator", {
-                  ...input,
-                  source: "template",
-                })
-              }
-              onBack={() => {
-                setActiveNav("chat");
-                setActiveSection("home");
-              }}
-            />
+            <WorkspaceShell showAssist={false}>
+              <TemplatesLibrary
+                onOpen={(s) => setActiveSection(s)}
+                onGenerate={openGenerator}
+                onBuildWithShari={(input) =>
+                  openCreationWorkspace("content-generator", {
+                    ...input,
+                    source: "template",
+                  })
+                }
+                onBack={goBack}
+              />
+            </WorkspaceShell>
           )}
 
           {activeSection === "email-generator" && (
@@ -5169,28 +6113,32 @@ export default function CompanionPage() {
           )}
 
           {activeSection === "content-generator" && !workspacePanel && (
-            <ContentGeneratorPanel
-              seed={genSeed}
-              onBuildWithShari={(input) =>
-                openCreationWorkspace("content-generator", {
-                  ...input,
-                  source: input.source ?? "generated",
-                })
-              }
-              onOpen={(s) => setActiveSection(s)}
-              onWin={(label) => {
-                logMomentum("complete", `Win: ${label}`);
-                clearLastActivity();
-                setLastAct(null);
-                setMessages((prev) => [
-                  ...prev,
-                  {
-                    role: "assistant",
-                    content: `Saved “${label}” — that's a real step done. Nice work.`,
-                  },
-                ]);
-              }}
-            />
+            <WorkspaceShell
+              onAskShari={() => openCompanionAssist("content-generator")}
+            >
+              <ContentGeneratorPanel
+                seed={genSeed}
+                onBuildWithShari={(input) =>
+                  openCreationWorkspace("content-generator", {
+                    ...input,
+                    source: input.source ?? "generated",
+                  })
+                }
+                onOpen={(s) => setActiveSection(s)}
+                onWin={(label) => {
+                  logMomentum("complete", `Win: ${label}`);
+                  clearLastActivity();
+                  setLastAct(null);
+                  setMessages((prev) => [
+                    ...prev,
+                    {
+                      role: "assistant",
+                      content: `Saved “${label}” — that's a real step done. Nice work.`,
+                    },
+                  ]);
+                }}
+              />
+            </WorkspaceShell>
           )}
 
           {activeSection === "energy" && (
@@ -5243,10 +6191,16 @@ export default function CompanionPage() {
 
       <ModalSheet
         open={overlay === "settings"}
-        onClose={() => setOverlay(null)}
+        onClose={() => {
+          setOverlay(null);
+          setSettingsSection(null);
+        }}
         title="Settings"
       >
-        <SettingsPanel onSignIn={openSignIn} />
+        <SettingsPanel
+          onSignIn={openSignIn}
+          initialSection={settingsSection}
+        />
       </ModalSheet>
 
       <ModalSheet
@@ -5259,6 +6213,10 @@ export default function CompanionPage() {
           onOpen={(s) => {
             setOverlay(null);
             setActiveSection(s);
+          }}
+          onOpenSettings={(section) => {
+            setSettingsSection(section);
+            setOverlay("settings");
           }}
         />
       </ModalSheet>

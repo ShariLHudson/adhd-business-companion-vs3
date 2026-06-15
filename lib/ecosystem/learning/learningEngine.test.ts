@@ -101,7 +101,7 @@ describe("ecosystemLearning", () => {
         description: "Send follow-up",
         actionType: "open-google-doc",
         priority: "medium",
-        workspace: { section: "create", ecosystemKind: "create" },
+        workspace: { section: "content-generator", ecosystemKind: "create" },
         prefill: {},
         status: "offered",
         sourceEventIds: [],

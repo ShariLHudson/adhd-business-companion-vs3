@@ -1,3 +1,5 @@
+import { resolveFounderAdminPassword } from "./env";
+
 const SESSION_SALT = "founder-admin-session-v1";
 
 function timingSafeEqualString(a: string, b: string): boolean {
@@ -26,7 +28,7 @@ async function hmacSha256Hex(secret: string, message: string): Promise<string> {
 
 /** Deterministic session token derived from the admin password (server-only). */
 function adminPasswordSecret(): string {
-  return process.env.FOUNDER_ADMIN_PASSWORD?.trim() ?? "";
+  return resolveFounderAdminPassword();
 }
 
 export async function founderAdminToken(): Promise<string> {
@@ -44,6 +46,4 @@ export async function verifyFounderAdminToken(
   return timingSafeEqualString(token, expected);
 }
 
-export function isFounderAdminConfigured(): boolean {
-  return Boolean(adminPasswordSecret());
-}
+export { isFounderAdminConfigured } from "./env";

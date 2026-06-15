@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   createTemplate,
   deleteTemplate,
@@ -15,17 +15,16 @@ import {
   type TemplateStatus,
 } from "@/lib/companionStore";
 import { RefineActions } from "@/components/companion/RefineActions";
-import { RemixActions } from "@/components/companion/RemixActions";
-import { ScoreActions } from "@/components/companion/ScoreActions";
 import { ExportActions } from "@/components/companion/ExportActions";
 import type { AppSection } from "@/lib/companionUi";
+import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
-
-const STATUS_TABS: { id: TemplateStatus; label: string }[] = [
-  { id: "saved", label: "Saved" },
-  { id: "draft", label: "Drafts" },
-  { id: "archived", label: "Archived" },
-];
+import {
+  filterTemplates,
+  TEMPLATE_CATEGORY_OPTIONS,
+  TEMPLATE_STATUS_OPTIONS,
+  type TemplateStatusFilter,
+} from "@/lib/templateLibraryUx";
 
 type Draft = {
   id?: string;
@@ -44,31 +43,28 @@ const EMPTY_DRAFT: Draft = {
 
 export function TemplatesLibrary({
   onBack,
-  onOpen,
-  onGenerate,
   onBuildWithShari,
 }: {
   onBack?: () => void;
+  /** @deprecated Snippets / generate moved to Create — kept for call-site compat */
   onOpen?: (section: AppSection) => void;
   onGenerate?: (seed: { type?: string; brief?: string }) => void;
   onBuildWithShari?: (input: CreationWorkspaceInput) => void;
 }) {
   const [items, setItems] = useState<TemplateItem[]>([]);
-  const [status, setStatus] = useState<TemplateStatus>("saved");
+  const [status, setStatus] = useState<TemplateStatusFilter>("saved");
   const [category, setCategory] = useState<TemplateCategory | "all">("all");
+  const [search, setSearch] = useState("");
   const [draft, setDraft] = useState<Draft | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
-  // Which category groups are expanded — empty means everything is closed.
-  const [openCats, setOpenCats] = useState<string[]>([]);
 
   useEffect(() => {
     setItems(getTemplates());
   }, []);
 
-  const visible = items.filter(
-    (t) =>
-      t.status === status &&
-      (category === "all" || t.category === category),
+  const visible = useMemo(
+    () => filterTemplates(items, { query: search, status, category }),
+    [items, search, status, category],
   );
 
   function saveDraft() {
@@ -207,15 +203,6 @@ export function TemplatesLibrary({
           {viewing.body}
         </div>
 
-        {/* Score this asset, then remix it into another format */}
-        <ScoreActions
-          content={viewing.body}
-          kind={viewing.subcategory || viewing.category}
-          onApply={(next) =>
-            setItems(updateTemplate(viewing.id, { body: next }))
-          }
-        />
-        <RemixActions content={viewing.body} />
         <ExportActions
           text={viewing.body}
           title={viewing.title}
@@ -226,55 +213,21 @@ export function TemplatesLibrary({
         />
 
         {onBuildWithShari && (
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() =>
-                onBuildWithShari({
-                  itemType: viewing.subcategory || viewing.title,
-                  title: viewing.title,
-                  draftContent: viewing.body,
-                  brief: viewing.title,
-                  templateId: viewing.id,
-                  stage: "using template",
-                })
-              }
-              className="rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
-            >
-              ✨ Use With Shari
-            </button>
-            <button
-              type="button"
-              onClick={() =>
-                onBuildWithShari({
-                  itemType: viewing.subcategory || viewing.title,
-                  title: viewing.title,
-                  draftContent: viewing.body,
-                  brief: `Customize this "${viewing.title}" template`,
-                  templateId: viewing.id,
-                  stage: "customizing template",
-                })
-              }
-              className="rounded-xl border-2 border-[#1e4f4f] bg-white px-5 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-            >
-              ✏️ Customize With Shari
-            </button>
-          </div>
-        )}
-
-        {/* Generate a fresh draft from this template (full-page create flow). */}
-        {onGenerate && (
           <button
             type="button"
             onClick={() =>
-              onGenerate({
-                type: viewing.subcategory || viewing.title,
-                brief: `Fill in this "${viewing.title}" template:\n\n${viewing.body}`,
+              onBuildWithShari({
+                itemType: viewing.subcategory || viewing.title,
+                title: viewing.title,
+                draftContent: viewing.body,
+                brief: viewing.title,
+                templateId: viewing.id,
+                stage: "using template",
               })
             }
-            className="mt-3 self-start text-sm font-semibold text-[#1e4f4f] hover:underline"
+            className="mt-4 rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
           >
-            ✨ Have Shari write this with me
+            Open in Create
           </button>
         )}
 
@@ -330,11 +283,12 @@ export function TemplatesLibrary({
     );
   }
 
-  // ---- List view ----------------------------------------------------------
+  // ---- List view — search first, filter second, flat results ---------------
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+      <WorkspaceGuide section="templates-library" />
       <div className="flex items-center justify-between gap-3">
-        <p className="text-2xl font-semibold text-[#1f1c19]">Templates Library</p>
+        <p className="text-2xl font-semibold text-[#1f1c19]">Templates</p>
         <div className="flex items-center gap-2">
           <button
             type="button"
@@ -355,157 +309,77 @@ export function TemplatesLibrary({
           )}
         </div>
       </div>
+      <p className="mt-1 text-base text-[#6b635a]">
+        Search or pick a category — one list at a time.
+      </p>
 
-      {onOpen && (
-        <div className="mt-3 flex flex-wrap gap-2">
-          {onGenerate && (
-            <button
-              type="button"
-              onClick={() => onGenerate({})}
-              className="flex items-center gap-2 rounded-xl border border-[#1e4f4f]/30 bg-white/85 px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-white"
-            >
-              ✨ Generate content with Shari →
-            </button>
-          )}
-          <button
-            type="button"
-            onClick={() => onOpen("snippets")}
-            className="flex items-center gap-2 rounded-xl border border-[#1e4f4f]/30 bg-white/85 px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-white"
-          >
-            🧩 Snippets →
-          </button>
-          <button
-            type="button"
-            onClick={() => onOpen("content-types")}
-            className="flex items-center gap-2 rounded-xl border border-[#1e4f4f]/30 bg-white/85 px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-white"
-          >
-            ⚙️ Content types →
-          </button>
-        </div>
-      )}
+      <input
+        type="search"
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        placeholder="Search templates…"
+        className="mt-5 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-lg text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+        autoFocus
+      />
 
-      {/* Status tabs */}
-      <div className="mt-4 flex gap-2">
-        {STATUS_TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setStatus(t.id)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-              status === t.id
-                ? "bg-[#1e4f4f] text-white shadow-sm"
-                : "bg-white/80 text-[#3d3630] hover:bg-white"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Category filter — a dropdown instead of a wall of chips. */}
-      <div className="mt-3 flex flex-col">
-        <label className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+        <label className="min-w-0 flex-1 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
           Category
+          <select
+            value={category}
+            onChange={(e) =>
+              setCategory(e.target.value as TemplateCategory | "all")
+            }
+            className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+          >
+            {TEMPLATE_CATEGORY_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
         </label>
-        <select
-          value={category}
-          onChange={(e) =>
-            setCategory(e.target.value as TemplateCategory | "all")
-          }
-          className="mt-1 w-full max-w-xs rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-        >
-          <option value="all">All Categories</option>
-          {TEMPLATE_CATEGORIES.map((c) => (
-            <option key={c} value={c}>
-              {TEMPLATE_CATEGORY_LABEL[c]}
-            </option>
-          ))}
-        </select>
+        <label className="min-w-0 flex-1 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+          Status
+          <select
+            value={status}
+            onChange={(e) =>
+              setStatus(e.target.value as TemplateStatusFilter)
+            }
+            className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+          >
+            {TEMPLATE_STATUS_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </label>
       </div>
 
-      {/* List — grouped by category, every group closed on open. */}
       {visible.length === 0 ? (
-        <p className="mt-5 text-base text-[#6b635a]">
-          Nothing here yet.
-          {status === "saved" && " Create one, or save one of Shari's outputs."}
+        <p className="mt-6 text-base text-[#6b635a]">
+          No templates match — try a different search or filter.
         </p>
       ) : (
-        (() => {
-          const groups = TEMPLATE_CATEGORIES.map((c) => ({
-            cat: c,
-            items: visible.filter((t) => t.category === c),
-          })).filter((g) => g.items.length > 0);
-          return (
-            <>
-              {openCats.length > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setOpenCats([])}
-                  className="mt-4 self-start text-sm font-semibold text-[#1e4f4f] hover:underline"
-                >
-                  ▲ Collapse all
-                </button>
-              )}
-              <div className="mt-3 flex flex-col gap-2.5">
-                {groups.map((g) => {
-                  const open = openCats.includes(g.cat);
-                  return (
-                    <div
-                      key={g.cat}
-                      className="overflow-hidden rounded-2xl border border-[#d4cdc3] bg-white/85"
-                    >
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setOpenCats((o) =>
-                            open ? o.filter((x) => x !== g.cat) : [...o, g.cat],
-                          )
-                        }
-                        className="flex w-full items-center justify-between px-4 py-3.5 text-left"
-                      >
-                        <span className="text-base font-semibold text-[#1f1c19]">
-                          {TEMPLATE_CATEGORY_LABEL[g.cat]}{" "}
-                          <span className="text-sm font-normal text-[#9a8f82]">
-                            ({g.items.length})
-                          </span>
-                        </span>
-                        <span className="text-[#9a8f82]">{open ? "▲" : "▼"}</span>
-                      </button>
-                      {open && (
-                        <div className="flex flex-col gap-2 px-3 pb-3">
-                          {g.items.map((t) => (
-                            <button
-                              key={t.id}
-                              type="button"
-                              onClick={() => setViewId(t.id)}
-                              className="flex items-center justify-between gap-3 rounded-xl border border-[#e4ddd2] bg-white px-4 py-3 text-left transition-colors hover:border-[#1e4f4f]/45"
-                            >
-                              <span className="min-w-0">
-                                <span className="block truncate text-base font-semibold text-[#1f1c19]">
-                                  {t.title}
-                                </span>
-                                <span className="text-xs font-medium uppercase tracking-wide text-[#1e4f4f]">
-                                  {TEMPLATE_CATEGORY_LABEL[t.category]}
-                                  {t.subcategory ? ` · ${t.subcategory}` : ""}
-                                </span>
-                              </span>
-                              <span
-                                aria-hidden="true"
-                                className="shrink-0 text-[#9a8f82]"
-                              >
-                                ›
-                              </span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </>
-          );
-        })()
+        <ul className="mt-5 flex flex-col gap-2">
+          {visible.map((t) => (
+            <li key={t.id}>
+              <button
+                type="button"
+                onClick={() => setViewId(t.id)}
+                className="flex w-full items-center justify-between gap-3 rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-3 text-left transition-colors hover:border-[#1e4f4f]/40 hover:bg-white"
+              >
+                <span className="min-w-0 truncate text-base font-semibold text-[#1f1c19]">
+                  {t.title}
+                </span>
+                <span className="shrink-0 text-[#9a8f82]" aria-hidden>
+                  ›
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
       )}
 
       {onBack && (

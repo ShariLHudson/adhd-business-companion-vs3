@@ -4,37 +4,78 @@ import { useEffect, useState } from "react";
 import { getPrefs, savePrefs } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import { enableDiscovery } from "@/lib/progressiveDiscovery";
 
-// --- Support + billing config ---------------------------------------------
 const SUPPORT_EMAIL = "info@visualsparkstudios.com";
 const SUPPORT_PHONE_DISPLAY = "515-954-9177";
 const SUPPORT_PHONE_TEL = "+15159549177";
-// Paste your GoHighLevel customer billing portal link to enable "Manage billing".
 const GHL_BILLING_URL = "";
 
-// Profile is a CONTROL PANEL — account, access, settings entry, and real
-// support escalation. No app teaching or coaching (that lives in Chat).
-type SectionId = "account" | "subscription" | "help" | "contact";
+export type ProfileSettingsSection =
+  | "tone"
+  | "help"
+  | "support"
+  | "language"
+  | "notifications"
+  | "appearance"
+  | "celebrations"
+  | "pattern"
+  | "plan"
+  | "connections"
+  | "account";
 
-const SECTIONS: { id: SectionId; label: string; emoji: string }[] = [
-  { id: "account", label: "Account", emoji: "🧍" },
-  { id: "subscription", label: "Subscription", emoji: "💳" },
-  { id: "help", label: "Help", emoji: "🆘" },
-  { id: "contact", label: "Contact Support", emoji: "📞" },
+const PREF_LINKS: {
+  label: string;
+  emoji: string;
+  settings: ProfileSettingsSection;
+  blurb: string;
+}[] = [
+  {
+    label: "Communication style",
+    emoji: "💬",
+    settings: "tone",
+    blurb: "AI tone, help mode, and support style.",
+  },
+  {
+    label: "Celebrations",
+    emoji: "🎉",
+    settings: "celebrations",
+    blurb: "Birthdays, milestones, and recognition.",
+  },
+  {
+    label: "Memory & appearance",
+    emoji: "🎨",
+    settings: "appearance",
+    blurb: "Colors, pattern awareness, and visual mode.",
+  },
+  {
+    label: "Language",
+    emoji: "🌐",
+    settings: "language",
+    blurb: "Interface, response, and content language.",
+  },
+  {
+    label: "Onboarding preferences",
+    emoji: "🌱",
+    settings: "tone",
+    blurb: "Re-open gentle discovery questions.",
+  },
 ];
 
 export function ProfilePanel({
   onOpen,
   onSignIn,
+  onOpenSettings,
 }: {
   onOpen?: (section: AppSection) => void;
   onSignIn?: () => void;
+  onOpenSettings?: (section: ProfileSettingsSection) => void;
 }) {
   const { configured, user, signOut } = useCompanionAuth();
-  const [open, setOpen] = useState<SectionId | null>(null);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [savedAt, setSavedAt] = useState<number | null>(null);
+  const [supportOpen, setSupportOpen] = useState(false);
   const [ticketType, setTicketType] = useState<"bug" | "broken" | null>(null);
   const [ticketText, setTicketText] = useState("");
 
@@ -50,7 +91,8 @@ export function ProfilePanel({
       ticketType === "broken"
         ? "Something's broken — Spark Studio Companions"
         : "Bug report — Spark Studio Companions";
-    const sig = name || email ? `\n\n— ${name || "User"}${email ? ` (${email})` : ""}` : "";
+    const sig =
+      name || email ? `\n\n— ${name || "User"}${email ? ` (${email})` : ""}` : "";
     const href = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(
       subject,
     )}&body=${encodeURIComponent(ticketText + sig)}`;
@@ -59,311 +101,250 @@ export function ProfilePanel({
     setTicketType(null);
   }
 
-  const issueBtn =
-    "rounded-xl border border-[#c9bfb0] bg-white px-4 py-2.5 text-left text-sm font-semibold text-[#3d3630] hover:bg-[#f0f5f5]";
+  const linkBtn =
+    "flex w-full items-center gap-3 rounded-xl border border-[#d4cdc3] bg-white/85 px-4 py-3 text-left transition-colors hover:border-[#1e4f4f]/40 hover:bg-white";
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
       <p className="text-2xl font-semibold text-[#1f1c19]">Profile</p>
+      <p className="mt-1 text-sm text-[#6b635a]">
+        Account, business context, and preferences — one place.
+      </p>
 
-      {/* Business profile — the context that makes Shari specific to you. */}
-      <button
-        type="button"
-        onClick={() => onOpen?.("business-profile")}
-        className="mt-4 flex items-center gap-3 rounded-xl border border-[#1e4f4f]/30 bg-[#1e4f4f]/[0.06] px-4 py-3 text-left hover:bg-[#1e4f4f]/[0.1]"
-      >
-        <span aria-hidden="true" className="text-2xl">
-          🧠
-        </span>
-        <span>
-          <span className="block text-base font-semibold text-[#1f1c19]">
-            Business profile
-          </span>
-          <span className="block text-sm text-[#6b635a]">
-            Tell Shari about your business so everything fits you (2 min).
-          </span>
-        </span>
-      </button>
-
-      {/* Client Avatars — the "audience brain" everything else draws from. */}
-      <button
-        type="button"
-        onClick={() => onOpen?.("client-avatars")}
-        className="mt-3 flex items-center gap-3 rounded-xl border border-[#1e4f4f]/30 bg-[#1e4f4f]/[0.06] px-4 py-3 text-left hover:bg-[#1e4f4f]/[0.1]"
-      >
-        <span aria-hidden="true" className="text-2xl">
-          👤
-        </span>
-        <span>
-          <span className="block text-base font-semibold text-[#1f1c19]">
-            Client Avatars
-          </span>
-          <span className="block text-sm text-[#6b635a]">
-            Who you help. Build, switch, and the whole app writes for them.
-          </span>
-        </span>
-      </button>
-
-      <ul className="mt-5 flex flex-col gap-2">
-        {SECTIONS.map((s) => (
-          <li
-            key={s.id}
-            className="overflow-hidden rounded-xl border border-[#d4cdc3] bg-white/85"
+      {/* Account — always at top */}
+      <div className="mt-5 rounded-2xl border border-[#1e4f4f]/25 bg-[#1e4f4f]/[0.05] p-4">
+        <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
+          Account
+        </p>
+        {configured ? (
+          <div className="mt-2 rounded-lg border border-[#e7dfd4] bg-white px-3 py-2.5 text-sm text-[#4b463f]">
+            {user ? (
+              <>
+                Signed in as <strong>{user.email ?? "your account"}</strong>
+              </>
+            ) : (
+              <>Not signed in on this device.</>
+            )}
+          </div>
+        ) : null}
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Name — what should Shari call you?"
+          className="mt-3 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base outline-none focus:border-[#1e4f4f]"
+        />
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Email"
+          type="email"
+          className="mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base outline-none focus:border-[#1e4f4f]"
+        />
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              savePrefs({ name: name.trim(), email: email.trim() });
+              setSavedAt(Date.now());
+            }}
+            className="rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
           >
+            Save
+          </button>
+          {configured && onSignIn ? (
             <button
               type="button"
-              onClick={() => setOpen(open === s.id ? null : s.id)}
-              aria-expanded={open === s.id}
-              className="flex w-full items-center gap-2 px-4 py-3 text-left text-base font-semibold text-[#1f1c19]"
+              onClick={onSignIn}
+              className="rounded-xl border border-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
             >
-              <span aria-hidden="true" className="w-6 text-center">
-                {s.emoji}
-              </span>
-              {s.label}
-              <span aria-hidden="true" className="ml-auto text-sm text-[#6b635a]">
-                {open === s.id ? "▾" : "▸"}
-              </span>
+              {user ? "Manage sign-in" : "Sign in"}
             </button>
+          ) : null}
+          {user ? (
+            <button
+              type="button"
+              onClick={() => void signOut()}
+              className="rounded-xl border border-[#c9bfb0] px-5 py-2.5 text-sm font-semibold text-[#3d3630] hover:bg-[#f0f5f5]"
+            >
+              Log out
+            </button>
+          ) : null}
+          {savedAt ? (
+            <span className="text-sm text-[#1e4f4f]">Saved ✓</span>
+          ) : null}
+        </div>
+      </div>
 
-            {open === s.id && (
-              <div className="companion-fade-in border-t border-[#e7dfd4] px-4 py-4">
-                {s.id === "account" && (
-                  <div className="flex flex-col gap-3">
-                    {configured ? (
-                      <div className="rounded-lg border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2.5 text-sm text-[#4b463f]">
-                        {user ? (
-                          <>
-                            Signed in as{" "}
-                            <strong>{user.email ?? "your account"}</strong>
-                          </>
-                        ) : (
-                          <>You are not signed in on this device.</>
-                        )}
-                      </div>
-                    ) : null}
-                    <input
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Name — what should Shari call you?"
-                      className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base outline-none focus:border-[#1e4f4f]"
-                    />
-                    <input
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="Email"
-                      type="email"
-                      className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base outline-none focus:border-[#1e4f4f]"
-                    />
-                    <div className="flex flex-wrap items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          savePrefs({ name: name.trim(), email: email.trim() });
-                          setSavedAt(Date.now());
-                        }}
-                        className="rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
-                      >
-                        Save
-                      </button>
-                      {configured && onSignIn ? (
-                        <button
-                          type="button"
-                          onClick={onSignIn}
-                          className="rounded-xl border border-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
-                        >
-                          {user ? "Account & sign-in" : "Sign in"}
-                        </button>
-                      ) : null}
-                      {user ? (
-                        <button
-                          type="button"
-                          onClick={() => void signOut()}
-                          className="rounded-xl border border-[#c9bfb0] px-5 py-2.5 text-sm font-semibold text-[#3d3630] hover:bg-[#f0f5f5]"
-                        >
-                          Log out
-                        </button>
-                      ) : null}
-                      {savedAt && (
-                        <span className="text-sm text-[#1e4f4f]">Saved ✓</span>
-                      )}
-                    </div>
-                  </div>
-                )}
+      {/* Business context */}
+      <p className="mt-6 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
+        Business
+      </p>
+      <div className="mt-2 flex flex-col gap-2">
+        <button
+          type="button"
+          onClick={() => onOpen?.("business-profile")}
+          className={linkBtn}
+        >
+          <span aria-hidden="true" className="text-xl">
+            🏢
+          </span>
+          <span>
+            <span className="block text-base font-semibold text-[#1f1c19]">
+              Business profile
+            </span>
+            <span className="block text-sm text-[#6b635a]">
+              Name, industry, goals, and who you serve.
+            </span>
+          </span>
+        </button>
+        <button
+          type="button"
+          onClick={() => onOpen?.("client-avatars")}
+          className={linkBtn}
+        >
+          <span aria-hidden="true" className="text-xl">
+            👤
+          </span>
+          <span>
+            <span className="block text-base font-semibold text-[#1f1c19]">
+              Ideal client (avatar)
+            </span>
+            <span className="block text-sm text-[#6b635a]">
+              Pain points and goals — powers Create, marketing, and proposals.
+            </span>
+          </span>
+        </button>
+      </div>
 
-                {s.id === "subscription" && (
-                  <div>
-                    <p className="text-base text-[#1f1c19]">
-                      Plan: <strong>Free</strong> · Status: Active
-                    </p>
-                    {GHL_BILLING_URL ? (
-                      <a
-                        href={GHL_BILLING_URL}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-3 inline-block rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
-                      >
-                        Manage billing
-                      </a>
-                    ) : (
-                      <p className="mt-2 text-sm text-[#6b635a]">
-                        Billing portal connects soon — manage payment, receipts,
-                        and cancellation there. (Needs the GoHighLevel
-                        customer-portal link.)
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {s.id === "help" && (
-                  <div className="flex flex-col gap-3">
-                    <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-                      How-to guides
-                    </p>
-
-                    <details className="rounded-xl border border-[#d4cdc3] bg-white/85 p-3">
-                      <summary className="cursor-pointer text-base font-semibold text-[#1f1c19]">
-                        📝 Send content to Google Docs
-                      </summary>
-                      <div className="mt-2 text-sm leading-relaxed text-[#4b463f]">
-                        <p>
-                          1. Create any draft — in Create, Email
-                          generator, or open a saved template.
-                        </p>
-                        <p className="mt-1">
-                          2. In the export row, tap{" "}
-                          <span className="font-semibold">📝 Google Docs</span>.
-                          It copies your text and opens a new Google Doc.
-                        </p>
-                        <p className="mt-1">
-                          3. In the new Doc, paste with{" "}
-                          <span className="font-semibold">Ctrl+V</span> (
-                          <span className="font-semibold">Cmd+V</span> on Mac).
-                        </p>
-                        <p className="mt-2 text-[#6b635a]">
-                          Tip: make sure you&apos;re signed into Google in your
-                          browser first. (True one-click auto-fill needs a
-                          connected Google account — that&apos;s on the roadmap.)
-                        </p>
-                      </div>
-                    </details>
-
-                    <details className="rounded-xl border border-[#d4cdc3] bg-white/85 p-3">
-                      <summary className="cursor-pointer text-base font-semibold text-[#1f1c19]">
-                        📣 Post to Facebook, Instagram or LinkedIn
-                      </summary>
-                      <div className="mt-2 text-sm leading-relaxed text-[#4b463f]">
-                        <p>
-                          1. Add your profile links in{" "}
-                          <span className="font-semibold">
-                            Settings → Connections
-                          </span>
-                          .
-                        </p>
-                        <p className="mt-1">
-                          2. On a social post, tap the network in the export row
-                          — it copies the post and opens your page.
-                        </p>
-                        <p className="mt-1">3. Paste, review, and post.</p>
-                      </div>
-                    </details>
-
-                    <p className="mt-2 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-                      Need a hand?
-                    </p>
-                    <p className="text-sm text-[#6b635a]">
-                      Hit a problem? Tell us what&apos;s wrong and we&apos;ll
-                      get on it.
-                    </p>
-                    <button
-                      type="button"
-                      onClick={() => setTicketType("bug")}
-                      className={issueBtn}
-                    >
-                      🐞 Something isn&apos;t working
-                    </button>
-                    <a
-                      href={GHL_BILLING_URL || `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent("Account or billing issue")}`}
-                      target={GHL_BILLING_URL ? "_blank" : undefined}
-                      rel={GHL_BILLING_URL ? "noopener noreferrer" : undefined}
-                      className={issueBtn}
-                    >
-                      💳 Account or billing issue
-                    </a>
-                    <button
-                      type="button"
-                      onClick={() => setTicketType("broken")}
-                      className={issueBtn}
-                    >
-                      ⚠️ Something feels broken or wrong
-                    </button>
-
-                    {ticketType && (
-                      <div className="companion-fade-in flex flex-col gap-2">
-                        <textarea
-                          value={ticketText}
-                          onChange={(e) => setTicketText(e.target.value)}
-                          placeholder="What happened? What were you doing when it went wrong?"
-                          className="min-h-[90px] resize-none rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base outline-none focus:border-[#1e4f4f]"
-                        />
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setTicketType(null);
-                              setTicketText("");
-                            }}
-                            className="rounded-xl border-2 border-[#1e4f4f] bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f]"
-                          >
-                            Cancel
-                          </button>
-                          <button
-                            type="button"
-                            disabled={!ticketText.trim()}
-                            onClick={sendTicket}
-                            className="rounded-xl bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white disabled:bg-[#9aaba8]"
-                          >
-                            Send to support
-                          </button>
-                        </div>
-                      </div>
-                    )}
-
-                    <p className="mt-1 border-t border-[#e7dfd4] pt-3 text-sm text-[#6b635a]">
-                      Trying to learn how to use something?{" "}
-                      <button
-                        type="button"
-                        onClick={() => onOpen?.("home")}
-                        className="font-semibold text-[#1e4f4f] underline"
-                      >
-                        Ask in chat
-                      </button>
-                      .
-                    </p>
-                  </div>
-                )}
-
-                {s.id === "contact" && (
-                  <div className="text-sm">
-                    <p className="text-[#6b635a]">Reach a human directly:</p>
-                    <a
-                      href={`mailto:${SUPPORT_EMAIL}`}
-                      className="mt-1 block font-semibold text-[#1e4f4f]"
-                    >
-                      📩 {SUPPORT_EMAIL}
-                    </a>
-                    <a
-                      href={`tel:${SUPPORT_PHONE_TEL}`}
-                      className="mt-0.5 block font-semibold text-[#1e4f4f]"
-                    >
-                      📞 {SUPPORT_PHONE_DISPLAY}
-                    </a>
-                  </div>
-                )}
-              </div>
-            )}
-          </li>
+      {/* Preferences */}
+      <p className="mt-6 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
+        Preferences
+      </p>
+      <div className="mt-2 flex flex-col gap-2">
+        {PREF_LINKS.map((link) => (
+          <button
+            key={link.label}
+            type="button"
+            onClick={() => {
+              if (link.label === "Onboarding preferences") {
+                enableDiscovery();
+              }
+              onOpenSettings?.(link.settings);
+            }}
+            className={linkBtn}
+          >
+            <span aria-hidden="true" className="text-xl">
+              {link.emoji}
+            </span>
+            <span>
+              <span className="block text-base font-semibold text-[#1f1c19]">
+                {link.label}
+              </span>
+              <span className="block text-sm text-[#6b635a]">{link.blurb}</span>
+            </span>
+          </button>
         ))}
-      </ul>
+        <button
+          type="button"
+          onClick={() => onOpen?.("how-do-i")}
+          className={linkBtn}
+        >
+          <span aria-hidden="true" className="text-xl">
+            ❓
+          </span>
+          <span>
+            <span className="block text-base font-semibold text-[#1f1c19]">
+              How Do I
+            </span>
+            <span className="block text-sm text-[#6b635a]">
+              Searchable learning center for the app.
+            </span>
+          </span>
+        </button>
+      </div>
+
+      {/* Subscription */}
+      <div className="mt-6 overflow-hidden rounded-xl border border-[#d4cdc3] bg-white/85">
+        <div className="px-4 py-3">
+          <p className="text-base font-semibold text-[#1f1c19]">💳 Subscription</p>
+          <p className="mt-1 text-sm text-[#6b635a]">
+            Plan: <strong>Free</strong> · Status: Active
+          </p>
+          {GHL_BILLING_URL ? (
+            <a
+              href={GHL_BILLING_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-2 inline-block text-sm font-semibold text-[#1e4f4f] underline"
+            >
+              Manage billing
+            </a>
+          ) : (
+            <button
+              type="button"
+              onClick={() => onOpenSettings?.("plan")}
+              className="mt-2 text-sm font-semibold text-[#1e4f4f]"
+            >
+              View plan & voice →
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Support */}
+      <button
+        type="button"
+        onClick={() => setSupportOpen((o) => !o)}
+        className="mt-3 flex w-full items-center justify-between rounded-xl border border-[#d4cdc3] bg-white/85 px-4 py-3 text-left text-base font-semibold text-[#1f1c19]"
+      >
+        <span>🆘 Help & support</span>
+        <span className="text-sm text-[#6b635a]">{supportOpen ? "▾" : "▸"}</span>
+      </button>
+      {supportOpen ? (
+        <div className="mt-2 rounded-xl border border-[#d4cdc3] bg-white/85 p-4 text-sm">
+          <button
+            type="button"
+            onClick={() => setTicketType("bug")}
+            className="mb-2 w-full rounded-xl border border-[#c9bfb0] px-4 py-2.5 text-left font-semibold"
+          >
+            🐞 Report a bug
+          </button>
+          <button
+            type="button"
+            onClick={() => setTicketType("broken")}
+            className="w-full rounded-xl border border-[#c9bfb0] px-4 py-2.5 text-left font-semibold"
+          >
+            ⚠️ Something feels broken
+          </button>
+          {ticketType ? (
+            <div className="mt-3">
+              <textarea
+                value={ticketText}
+                onChange={(e) => setTicketText(e.target.value)}
+                placeholder="What happened?"
+                className="min-h-[80px] w-full resize-none rounded-lg border border-[#c9bfb0] px-3 py-2"
+              />
+              <button
+                type="button"
+                disabled={!ticketText.trim()}
+                onClick={sendTicket}
+                className="mt-2 rounded-xl bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+              >
+                Send to support
+              </button>
+            </div>
+          ) : null}
+          <p className="mt-3 text-[#6b635a]">
+            <a href={`mailto:${SUPPORT_EMAIL}`} className="font-semibold text-[#1e4f4f]">
+              {SUPPORT_EMAIL}
+            </a>
+            {" · "}
+            <a href={`tel:${SUPPORT_PHONE_TEL}`} className="font-semibold text-[#1e4f4f]">
+              {SUPPORT_PHONE_DISPLAY}
+            </a>
+          </p>
+        </div>
+      ) : null}
     </div>
   );
 }

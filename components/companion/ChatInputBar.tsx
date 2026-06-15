@@ -12,6 +12,7 @@ type ChatInputBarProps = {
   onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onToggleListening: () => void;
   onSend: () => void;
+  placeholder?: string;
 };
 
 export function ChatInputBar({
@@ -24,6 +25,7 @@ export function ChatInputBar({
   onKeyDown,
   onToggleListening,
   onSend,
+  placeholder = INPUT_PLACEHOLDER,
 }: ChatInputBarProps) {
   return (
     <div className="input-glass flex items-end gap-2 rounded-[2rem] p-2 sm:gap-3 sm:p-2.5">
@@ -59,7 +61,7 @@ export function ChatInputBar({
         value={input}
         onChange={(e) => onInputChange(e.target.value)}
         onKeyDown={onKeyDown}
-        placeholder={INPUT_PLACEHOLDER}
+        placeholder={placeholder}
         rows={1}
         disabled={isLoading}
         className="max-h-32 min-h-12 flex-1 resize-none border-0 bg-transparent px-2 py-3 text-lg leading-relaxed text-[#1f1c19] placeholder:text-[#6b635a] focus:outline-none disabled:opacity-50"

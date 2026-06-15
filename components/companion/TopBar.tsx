@@ -19,8 +19,6 @@ type TopBarProps = {
   onNewDayChat: () => void;
   onSettings: () => void;
   onProfile: () => void;
-  onSignIn?: () => void;
-  signedInEmail?: string | null;
   onOpenAvatars?: () => void;
   // On the home screen we collapse everything into one "⋯" so the chat stays
   // the only thing competing for attention.
@@ -36,8 +34,6 @@ export function TopBar({
   onNewDayChat,
   onSettings,
   onProfile,
-  onSignIn,
-  signedInEmail,
   onOpenAvatars,
   minimal = false,
 }: TopBarProps) {
@@ -65,16 +61,6 @@ export function TopBar({
       { label: "🌅 Fresh Start · New Day", fn: onNewDayChat },
       ...(onOpenAvatars
         ? [{ label: "👤 Client Avatars", fn: onOpenAvatars }]
-        : []),
-      ...(onSignIn
-        ? [
-            {
-              label: signedInEmail
-                ? `🔐 Signed in · ${signedInEmail}`
-                : "🔐 Sign in",
-              fn: onSignIn,
-            },
-          ]
         : []),
       { label: "⚙️ Settings", fn: onSettings },
       { label: "🧍 Profile", fn: onProfile },
@@ -255,13 +241,6 @@ export function TopBar({
           </>
         )}
       </div>
-
-      {onSignIn ? (
-        <button type="button" onClick={onSignIn} className={BTN}>
-          <span aria-hidden="true">🔐</span>
-          {signedInEmail ? "Account" : "Sign in"}
-        </button>
-      ) : null}
 
       <button type="button" onClick={onSettings} className={BTN}>
         <span aria-hidden="true">⚙️</span> Settings

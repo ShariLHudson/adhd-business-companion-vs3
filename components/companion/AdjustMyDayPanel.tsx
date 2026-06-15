@@ -7,6 +7,7 @@ import {
   type DayLevel,
   type DayState,
 } from "@/lib/companionStore";
+import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
 const LEVELS: DayLevel[] = ["low", "medium", "high"];
 const NEEDS = [
@@ -84,6 +85,7 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+      <WorkspaceGuide section="energy" />
       <p className="text-2xl font-semibold text-[#1f1c19]">
         How is your brain today?
       </p>

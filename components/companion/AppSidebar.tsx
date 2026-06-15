@@ -12,7 +12,6 @@ import {
 } from "@/lib/companionUi";
 import { getLastActivity } from "@/lib/companionStore";
 import type { CoachingMode } from "@/lib/companionPrompt";
-import { useFounderAdmin } from "@/lib/founderAdmin/useFounderAdmin";
 
 type AppSidebarProps = {
   activeNav: SidebarNavId;
@@ -37,7 +36,6 @@ export function AppSidebar({
   // Continue indicator — a small dot on Chat when unfinished work exists, so
   // users elsewhere in the app know there's something to come back to.
   const [hasContinue, setHasContinue] = useState(false);
-  const { isFounderAdmin } = useFounderAdmin();
   useEffect(() => {
     setHasContinue(Boolean(getLastActivity()));
   }, [activeSection]);
@@ -132,24 +130,6 @@ export function AppSidebar({
           </div>
         )}
       </nav>
-
-      {isFounderAdmin ? (
-        <div className="border-t border-white/15 p-2">
-          <a
-            href="/founder"
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Founder Workspace (private)"
-            aria-label="Founder Workspace (private)"
-            className="flex w-full items-center justify-start gap-2 rounded-lg border border-[#e0795a]/40 bg-[#e0795a]/15 px-2 py-2.5 text-left leading-tight text-white transition-colors hover:bg-[#e0795a]/25 md:px-3"
-          >
-            <span aria-hidden="true" className="flex w-6 shrink-0 justify-center">
-              🔒
-            </span>
-            <span className="hidden text-base font-medium md:inline">Founder</span>
-          </a>
-        </div>
-      ) : null}
 
       {/* Google quick links — open your apps from anywhere. */}
       <div className="border-t border-white/15 p-2">

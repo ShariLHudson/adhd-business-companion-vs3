@@ -4,17 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import {
   businessContextSummary,
   getContentTypes,
-  getAvatars,
   getPrefs,
   getOutputLanguageContext,
   setLastActivity,
   type TemplateCategory,
-  type IdealClientAvatar,
 } from "@/lib/companionStore";
-import { ClientPicker } from "@/components/companion/ClientPicker";
-import { RefineActions } from "@/components/companion/RefineActions";
-import { RemixActions } from "@/components/companion/RemixActions";
-import { ScoreActions } from "@/components/companion/ScoreActions";
 import { ExportActions } from "@/components/companion/ExportActions";
 import type { AppSection } from "@/lib/companionUi";
 import type {
@@ -25,12 +19,14 @@ import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import type { WorkspaceSession } from "@/lib/workspaceSop";
 import { useWorkspaceFieldFocus } from "@/lib/useWorkspaceFieldFocus";
 import { WorkspaceSopProgress } from "@/components/companion/WorkspaceSopProgress";
+import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import {
   isProposalArtifact,
   normalizeArtifactType,
   type ArtifactExportAction,
 } from "@/lib/artifactType";
 import { CreateCatalogPicker } from "@/components/companion/CreateCatalogPicker";
+import { CreateDraftImprove } from "@/components/companion/CreateDraftImprove";
 import { ArtifactWorkspaceHeader } from "@/components/companion/ArtifactWorkspaceHeader";
 import { ArtifactReadyPanel } from "@/components/companion/ArtifactReadyPanel";
 import { ProjectPickerModal } from "@/components/companion/ProjectPickerModal";
@@ -41,7 +37,13 @@ import {
   type GoogleWorkspaceSession,
 } from "@/lib/googleWorkspace";
 import { copyPasteFallbackMessage } from "@/lib/collaborativeDocumentWorkflow";
-import { type CreateCatalogItem } from "@/lib/createCatalog";
+import { type CreateCatalogItem, findCatalogItem } from "@/lib/createCatalog";
+import {
+  CREATE_FEATURED,
+  createPromptQuestion,
+  matchCreateSearch,
+  resolveFeaturedType,
+} from "@/lib/createWorkspaceUx";
 import {
   emptySavedArtifact,
   recordAfterGoogleDoc,
@@ -150,17 +152,10 @@ export function ContentGeneratorPanel({
   const [error, setError] = useState(false);
   const [flash, setFlash] = useState<string | null>(null);
   const [forAvatar, setForAvatar] = useState<string | undefined>(undefined);
-  const [avatars, setAvatars] = useState<IdealClientAvatar[]>([]);
-  const [advanced, setAdvanced] = useState(false);
-  const [multi, setMulti] = useState<
-    { name: string; emoji?: string; text: string }[] | null
-  >(null);
-  const [multiLoading, setMultiLoading] = useState(false);
   const [projectPickerOpen, setProjectPickerOpen] = useState(false);
   const [locationPanelOpen, setLocationPanelOpen] = useState(false);
   const [phase, setPhase] = useState<"building" | "ready">("building");
-  const [showMore, setShowMore] = useState(false); // compose advanced options
-  const [showTools, setShowTools] = useState(false); // post-draft editing tools
+  const [createSearch, setCreateSearch] = useState("");
   const started = useRef(false);
   const lastSeedSig = useRef("");
   // Zero-hop: opened from chat with a clear type → straight to writing, never
@@ -171,11 +166,6 @@ export function ContentGeneratorPanel({
   const exportPrintRef = useRef<HTMLButtonElement | null>(null);
   const typeLocked = Boolean(lockedArtifactType);
   const proposalMode = isProposalArtifact(lockedArtifactType ?? type);
-
-  useEffect(() => {
-    setAvatars(getAvatars());
-    setAdvanced(getPrefs().advancedAiTools);
-  }, []);
 
   const lastReportedDetail = useRef<string>("");
   const lastSessionSyncSig = useRef<string>("");
@@ -233,41 +223,6 @@ export function ContentGeneratorPanel({
     type,
     editingTopic,
   ]);
-
-  // Multi-Avatar mode — one tailored version per avatar (campaigns/testing).
-  async function runAll() {
-    if (!type.trim() && !brief.trim()) return;
-    setMultiLoading(true);
-    setMulti([]);
-    const out: { name: string; emoji?: string; text: string }[] = [];
-    const { contentLanguageHint } = getOutputLanguageContext(getPrefs());
-    for (const a of avatars) {
-      try {
-        const res = await fetch("/api/generate", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            type,
-            brief,
-            tone,
-            context: businessContextSummary(a.id),
-            contentLanguageHint,
-          }),
-        });
-        const data = await res.json();
-        out.push({
-          name: a.name,
-          emoji: a.emoji,
-          text: res.ok && data.result ? data.result : "(couldn't generate)",
-        });
-        setMulti([...out]);
-      } catch {
-        out.push({ name: a.name, emoji: a.emoji, text: "(couldn't generate)" });
-        setMulti([...out]);
-      }
-    }
-    setMultiLoading(false);
-  }
 
   function note(msg: string) {
     setFlash(msg);
@@ -541,13 +496,55 @@ export function ContentGeneratorPanel({
     setLocationPanelOpen((o) => !o);
   }
 
+  function pickCreateType(typeLabel: string, opts?: { bypassRoute?: boolean }) {
+    const item = findCatalogItem(typeLabel);
+    if (item?.route && !opts?.bypassRoute) {
+      onOpenSection?.(item.route);
+      return;
+    }
+    setType(typeLabel);
+    setTopic("");
+    setBrief("");
+    setEditingTopic(false);
+    setDraft("");
+    started.current = false;
+  }
+
+  function handleFeaturedSelect(label: string) {
+    const featured = CREATE_FEATURED.find((f) => f.label === label);
+    if (!featured) return;
+    if (featured.label === "Workshop") {
+      pickCreateType("Workshop", { bypassRoute: true });
+      return;
+    }
+    pickCreateType(resolveFeaturedType(featured));
+  }
+
+  function handleCreateSearchSubmit() {
+    const q = createSearch.trim();
+    if (!q) return;
+    const match = matchCreateSearch(q);
+    if (match?.route) {
+      onOpenSection?.(match.route);
+      return;
+    }
+    if (match?.type) {
+      pickCreateType(match.type);
+      setBrief(q);
+      setTopic(q);
+      return;
+    }
+    pickCreateType(q);
+    setBrief(q);
+    setTopic(q);
+  }
+
   function handleCatalogSelect(item: CreateCatalogItem) {
     if (item.route) {
       onOpenSection?.(item.route);
       return;
     }
-    setType(item.label);
-    setEditingTopic(false);
+    pickCreateType(item.label);
   }
 
   const inputCls =
@@ -570,98 +567,43 @@ export function ContentGeneratorPanel({
           workspaceMode ? "" : "mx-auto max-w-2xl overflow-y-auto px-6 py-8"
         }`}
       >
-      {!(workspaceMode && draft) && (
+      {!(workspaceMode && draft) && !type && (
         <>
-          <p className="text-2xl font-semibold text-[#1f1c19]">
-            {workspaceMode ? "✨ Business Asset Builder" : "✨ Create with Shari"}
-          </p>
+          <WorkspaceGuide section="content-generator" />
+          <p className="text-2xl font-semibold text-[#1f1c19]">Create Something</p>
           <p className="mt-1 text-base text-[#6b635a]">
-            {workspaceMode
-              ? "Build together here — when it's ready, open in Google Docs, Sheets, or Forms and keep coaching beside you."
-              : "Pick what you're building — proposals, SOPs, plans, and more."}
+            One step at a time — pick a type, say what it&apos;s for, then shape the draft.
           </p>
         </>
       )}
 
-      {type && (topic || brief) && !(workspaceMode && draft) && (
-        <div className="mt-5 rounded-2xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.06] px-4 py-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-            You&apos;re creating
+      {type && brief && draft && !(workspaceMode && phase === "ready") && (
+        <div className="mt-4 flex items-center justify-between gap-2">
+          <p className="text-sm text-[#6b635a]">
+            <span className="font-semibold text-[#1f1c19]">{type}</span>
+            {brief ? (
+              <>
+                {" "}
+                — <span className="text-[#1e4f4f]">{brief}</span>
+              </>
+            ) : null}
           </p>
-          {editingTopic ? (
-            <input
-              id="workspace-field-create-topic"
-              value={topic}
-              onChange={(e) => {
-                setTopic(e.target.value);
-                setBrief(e.target.value);
-              }}
-              className={`mt-2 ${inputCls}`}
-              placeholder="What's this about?"
-              autoFocus
-            />
-          ) : (
-            <p className="mt-1 text-lg font-semibold leading-snug text-[#1f1c19]">
-              {type}
-              {topic || brief ? (
-                <>
-                  {" "}
-                  about{" "}
-                  <span className="text-[#1e4f4f]">{topic || brief}</span>
-                </>
-              ) : null}
-            </p>
-          )}
-          <div className="mt-3 flex flex-wrap gap-2">
+          {!typeLocked && (
             <button
               type="button"
-              onClick={() => setEditingTopic((e) => !e)}
-              className="rounded-lg border border-[#1e4f4f]/25 bg-white px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-white/90"
+              onClick={() => {
+                setType("");
+                setDraft("");
+                setTopic("");
+                setBrief("");
+                setEditingTopic(false);
+                started.current = false;
+              }}
+              className="shrink-0 text-sm font-semibold text-[#1e4f4f] hover:underline"
             >
-              {editingTopic ? "Done" : "✏️ Edit"}
+              Change type
             </button>
-            {!typeLocked && (
-              <button
-                type="button"
-                onClick={() => {
-                  setType("");
-                  setDraft("");
-                  setTopic("");
-                  setBrief("");
-                  setShowMore(false);
-                  setEditingTopic(false);
-                  started.current = false;
-                }}
-                className="rounded-lg border border-[#1e4f4f]/25 bg-white px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-white/90"
-              >
-                🔄 Change type
-              </button>
-            )}
-            {typeLocked && (
-              <>
-                <span className="rounded-lg bg-[#1e4f4f]/10 px-3 py-1.5 text-sm font-semibold text-[#1e4f4f]">
-                  🔒 {normalizeArtifactType(lockedArtifactType!)}
-                </span>
-                {/* Escape hatch — type was locked, let the user correct it. */}
-                <button
-                  type="button"
-                  onClick={() => {
-                    onChangeType?.();
-                    setType("");
-                    setDraft("");
-                    setTopic("");
-                    setBrief("");
-                    setShowMore(false);
-                    setEditingTopic(false);
-                    started.current = false;
-                  }}
-                  className="rounded-lg border border-[#1e4f4f]/25 bg-white px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-white/90"
-                >
-                  🔄 Change type
-                </button>
-              </>
-            )}
-          </div>
+          )}
         </div>
       )}
 
@@ -742,159 +684,112 @@ export function ContentGeneratorPanel({
 
       {!seeded && !(workspaceMode && draft) && (
       <div className="mt-5 flex flex-col gap-3">
-        {/* Entry first — pick what you're making. Tools reveal only after. */}
+        {/* Step 1 — pick type */}
         {!type && !draft ? (
           <div className="companion-fade-in">
-            <p className={label}>What are you creating?</p>
-            <p className="mt-0.5 text-sm text-[#6b635a]">
-              What are we creating? Business assets, content, plans, or
-              implementation.
+            <input
+              type="search"
+              value={createSearch}
+              onChange={(e) => setCreateSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  handleCreateSearchSubmit();
+                }
+              }}
+              placeholder="What would you like to create?"
+              className="w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-lg text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+              autoFocus
+            />
+            <p className="mt-3 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+              Suggestions
             </p>
-            <div className="mt-3">
-              <CreateCatalogPicker
-                compact={workspaceMode}
-                highlightLabel={lockedArtifactType}
-                onSelect={handleCatalogSelect}
-              />
+            <div className="mt-2 flex flex-wrap gap-2">
+              {CREATE_FEATURED.map((item) => (
+                <button
+                  key={item.label}
+                  type="button"
+                  onClick={() => handleFeaturedSelect(item.label)}
+                  className="rounded-full border border-[#1e4f4f]/25 bg-white px-4 py-2 text-sm font-semibold text-[#1f1c19] hover:border-[#1e4f4f]/50 hover:bg-[#f0f5f5]"
+                >
+                  {item.emoji} {item.label}
+                </button>
+              ))}
             </div>
+            {createSearch.trim() && (
+              <button
+                type="button"
+                onClick={handleCreateSearchSubmit}
+                className="mt-3 text-sm font-semibold text-[#1e4f4f] hover:underline"
+              >
+                Create &ldquo;{createSearch.trim()}&rdquo; →
+              </button>
+            )}
+            <details className="mt-4">
+              <summary className="cursor-pointer text-sm font-semibold text-[#6b635a] hover:text-[#1e4f4f]">
+                Browse all types
+              </summary>
+              <div className="mt-3">
+                <CreateCatalogPicker
+                  compact
+                  highlightLabel={lockedArtifactType}
+                  onSelect={handleCatalogSelect}
+                />
+              </div>
+            </details>
           </div>
-        ) : (
-          <div className="flex items-center justify-between gap-2">
-            <p className={label}>
-              Creating: <span className="text-[#1f1c19]">{type || "content"}</span>
-            </p>
+        ) : !draft ? (
+          /* Step 2 — minimum info */
+          <div className="companion-fade-in">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-lg font-semibold text-[#1f1c19]">{type}</p>
+              {!typeLocked && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setType("");
+                    setBrief("");
+                    setTopic("");
+                  }}
+                  className="text-sm font-semibold text-[#1e4f4f] hover:underline"
+                >
+                  Change type
+                </button>
+              )}
+            </div>
+            <label
+              className={`mt-4 block ${label}`}
+              htmlFor="workspace-field-create-brief"
+            >
+              {createPromptQuestion(type)}
+            </label>
+            <textarea
+              id="workspace-field-create-brief"
+              value={brief}
+              onChange={(e) => {
+                setBrief(e.target.value);
+                setTopic(e.target.value);
+              }}
+              placeholder="A sentence or two is enough."
+              className="mt-2 min-h-[140px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+              autoFocus
+            />
             <button
               type="button"
-              onClick={() => {
-                setType("");
-                setDraft("");
-                setShowMore(false);
-              }}
-              className="text-sm font-semibold text-[#1e4f4f] hover:underline"
+              onClick={() => run(type, brief, tone)}
+              disabled={loading || !brief.trim()}
+              className="mt-4 w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50 sm:w-auto"
             >
-              change
+              {loading ? "Writing…" : "Generate"}
             </button>
-          </div>
-        )}
-        {(type || draft) && (
-          <>
-        <div>
-          <label className={label} htmlFor="cg-brief">
-            Brief (optional)
-          </label>
-          <textarea
-            id="cg-brief"
-            value={brief}
-            onChange={(e) => setBrief(e.target.value)}
-            placeholder="What's it about? Any details, scaffold, or template…"
-            className={`mt-1.5 min-h-[90px] resize-none ${inputCls}`}
-          />
-        </div>
-        <div className="flex items-end gap-3">
-          <div className="min-w-0 flex-1">
-            <label className={label} htmlFor="cg-tone">
-              Tone
-            </label>
-            <select
-              id="cg-tone"
-              value={tone}
-              onChange={(e) => setTone(e.target.value)}
-              className={`mt-1.5 ${inputCls}`}
-            >
-              {TONES.map((t) => (
-                <option key={t} value={t}>
-                  {t}
-                </option>
-              ))}
-            </select>
-          </div>
-          <button
-            type="button"
-            onClick={() => run(type, brief, tone)}
-            disabled={loading || (!type.trim() && !brief.trim())}
-            className="shrink-0 rounded-xl bg-[#1e4f4f] px-6 py-2.5 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
-          >
-            {loading ? "Writing…" : draft ? "Regenerate" : "✨ Generate"}
-          </button>
-        </div>
-        {/* More options — who it's for + power tools, hidden until needed. */}
-        <button
-          type="button"
-          onClick={() => setShowMore((o) => !o)}
-          className="self-start text-sm font-semibold text-[#6b635a] hover:underline"
-        >
-          {showMore ? "Hide options" : "More options"}
-        </button>
-        {showMore && (
-          <div className="flex flex-col gap-3 rounded-xl border border-[#e7dfd4] bg-white/60 p-3">
-            <ClientPicker value={forAvatar} onChange={setForAvatar} />
-            {type.trim().toLowerCase() === "email" && onOpen && (
-              <button
-                type="button"
-                onClick={() => onOpen("email-generator")}
-                className="self-start text-sm font-semibold text-[#1e4f4f] hover:underline"
-              >
-                Tip: the full Email generator does subject lines + sequences →
-              </button>
-            )}
-            {advanced && avatars.length >= 2 && (
-              <button
-                type="button"
-                onClick={runAll}
-                disabled={multiLoading || (!type.trim() && !brief.trim())}
-                className="self-start rounded-xl border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
-              >
-                {multiLoading
-                  ? `Writing ${avatars.length} versions…`
-                  : `🧪 Generate for all ${avatars.length} audiences`}
-              </button>
+            {error && (
+              <p className="mt-2 text-sm text-[#a85c4a]">
+                Couldn&apos;t generate just now — try again.
+              </p>
             )}
           </div>
-        )}
-        {error && (
-          <p className="text-sm text-[#a85c4a]">
-            Couldn&apos;t generate just now — try again.
-          </p>
-        )}
-          </>
-        )}
+        ) : null}
       </div>
-      )}
-
-      {multi && multi.length > 0 && (
-        <div className="companion-fade-in mt-6">
-          <p className={label}>One version per audience</p>
-          <div className="mt-2 flex flex-col gap-4">
-            {multi.map((m, i) => (
-              <div
-                key={i}
-                className="rounded-2xl border border-[#1e4f4f]/20 bg-white/85 p-4"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <p className="text-base font-semibold text-[#1f1c19]">
-                    {m.emoji ?? "👤"} {m.name}
-                  </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      void navigator.clipboard?.writeText(m.text);
-                      note(`Copied ${m.name}'s version ✓`);
-                    }}
-                    className="rounded-lg bg-[#1e4f4f]/10 px-3 py-1 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/20"
-                  >
-                    Copy
-                  </button>
-                </div>
-                <p className="mt-2 whitespace-pre-wrap text-base leading-relaxed text-[#2d2926]">
-                  {m.text}
-                </p>
-              </div>
-            ))}
-          </div>
-          {flash && (
-            <p className="mt-2 text-sm font-semibold text-[#1e4f4f]">{flash}</p>
-          )}
-        </div>
       )}
 
       {draft && !(workspaceMode && phase === "ready") && (
@@ -913,10 +808,25 @@ export function ContentGeneratorPanel({
             }`}
           />
 
+          <CreateDraftImprove
+            draft={draft}
+            onApply={(next) => {
+              setDraft(next);
+              setLastActivity({
+                kind: "draft",
+                title: brief || type || "Draft",
+                subtitle: type || "content",
+                contentType: type,
+                content: next,
+              });
+            }}
+            disabled={loading}
+          />
+
           {!workspaceMode && (
             <>
           <div className="mt-3 flex flex-wrap items-center gap-2">
-            {!workspaceMode && onBuildWithShari && (
+            {onBuildWithShari && (
               <button
                 type="button"
                 onClick={() =>
@@ -939,33 +849,11 @@ export function ContentGeneratorPanel({
                 void navigator.clipboard?.writeText(draft);
                 note("Copied ✓");
               }}
-              className={`rounded-lg px-4 py-2 text-sm font-semibold ${
-                workspaceMode
-                  ? "bg-[#1e4f4f] text-white hover:bg-[#163a3a]"
-                  : "border border-[#1e4f4f]/40 bg-white text-[#1e4f4f] hover:bg-[#f0f5f5]"
-              }`}
+              className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
             >
               📋 Copy
             </button>
-            <button
-              type="button"
-              onClick={() => setShowTools((o) => !o)}
-              className="text-sm font-semibold text-[#6b635a] hover:underline"
-            >
-              {showTools ? "Hide tools" : "More options"}
-            </button>
           </div>
-          {showTools && (
-            <div className="companion-fade-in">
-              <RefineActions text={draft} onApply={(n) => setDraft(n)} />
-              <ScoreActions
-                content={draft}
-                kind={type}
-                onApply={(n) => setDraft(n)}
-              />
-              <RemixActions content={draft} onApply={(n) => setDraft(n)} />
-            </div>
-          )}
 
           <div className="sticky bottom-0 mt-4 -mx-6 border-t border-[#e7dfd4] bg-[#faf7f2]/95 px-6 py-3 backdrop-blur">
             {flash && (

@@ -3,6 +3,7 @@ import {
   buildCompanionSystemPrompt,
   type CoachingMode,
 } from "@/lib/companionPrompt";
+import { resolveOpenAiApiKey } from "@/lib/openai/resolveOpenAiApiKey";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -21,10 +22,13 @@ const MODE_TEMPERATURE: Record<CoachingMode, number> = {
 
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = resolveOpenAiApiKey();
     if (!apiKey) {
       return NextResponse.json(
-        { error: "OpenAI API key is not configured." },
+        {
+          error:
+            "OpenAI API key is not configured. Add OPENAI_API_KEY to companion-app/.env.local and restart the dev server.",
+        },
         { status: 500 },
       );
     }
@@ -46,6 +50,16 @@ export async function POST(request: NextRequest) {
     const responseLanguageHint = body.responseLanguageHint as string | undefined;
     const obstacle = body.obstacle as string | undefined;
     const somatic = Boolean(body.somatic);
+    const adaptiveModeHint = body.adaptiveModeHint as string | undefined;
+    const userHealthHint = body.userHealthHint as string | undefined;
+    const decisionHint = body.decisionHint as string | undefined;
+    const recoveryHint = body.recoveryHint as string | undefined;
+    const environmentHint = body.environmentHint as string | undefined;
+    const futureHint = body.futureHint as string | undefined;
+    const momentumHint = body.momentumHint as string | undefined;
+    const businessOSHint = body.businessOSHint as string | undefined;
+    const chiefHint = body.chiefHint as string | undefined;
+    const ecosystemGuidance = body.ecosystemGuidance as string | undefined;
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -77,10 +91,23 @@ export async function POST(request: NextRequest) {
     const workspaceBlock = workspaceContextHint
       ? `\n\n${workspaceContextHint}`
       : "";
+    const adaptiveBlock = adaptiveModeHint ? `\n\n${adaptiveModeHint}` : "";
+    const healthBlock = userHealthHint ? `\n\n${userHealthHint}` : "";
+    const decisionBlock = decisionHint ? `\n\n${decisionHint}` : "";
+    const recoveryBlock = recoveryHint ? `\n\n${recoveryHint}` : "";
+    const environmentBlock = environmentHint ? `\n\n${environmentHint}` : "";
+    const futureBlock = futureHint ? `\n\n${futureHint}` : "";
+    const momentumBlock = momentumHint ? `\n\n${momentumHint}` : "";
+    const businessOSBlock = businessOSHint ? `\n\n${businessOSHint}` : "";
+    const chiefBlock = chiefHint ? `\n\n${chiefHint}` : "";
+
+    const ecosystemBlock = ecosystemGuidance
+      ? `\n\n${ecosystemGuidance}`
+      : `${recoveryBlock}${healthBlock}${decisionBlock}${environmentBlock}${futureBlock}${momentumBlock}${businessOSBlock}${chiefBlock}`;
 
     const finalSystem = `${
       businessContext ? `${systemPrompt}\n\n${businessContext}` : systemPrompt
-    }${attune}${workspaceBlock}${offerBlock}`;
+    }${attune}${ecosystemBlock}${adaptiveBlock}${workspaceBlock}${offerBlock}`;
 
     const baseTemp = MODE_TEMPERATURE[coachingMode] ?? 0.75;
     const temperature =

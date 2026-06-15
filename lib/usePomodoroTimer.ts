@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { playFocusComplete, unlockChime } from "@/lib/chime";
+import { loadPreferredFocusMinutes, clampFocusMinutes } from "@/lib/focusDuration";
 
-export const POMODORO_PRESETS = [15, 30, 60, 120, 180] as const;
+export const POMODORO_PRESETS = [5, 10, 12, 15, 20, 25, 30, 45, 60, 90] as const;
 
 export function usePomodoroTimer() {
   const [minutes, setMinutes] = useState<number>(25);
@@ -12,6 +13,10 @@ export function usePomodoroTimer() {
   // What the session is FOR (e.g. a time block / task name) — shown in the
   // global Focus Active bar so the user remembers what they were working on.
   const [label, setLabel] = useState<string | null>(null);
+
+  useEffect(() => {
+    setMinutes(loadPreferredFocusMinutes());
+  }, []);
 
   useEffect(() => {
     if (!running || secondsLeft === null) return;
@@ -92,9 +97,13 @@ export function usePomodoroTimer() {
     setLabel(null);
   }
 
+  function setMinutesClamped(value: number) {
+    setMinutes(clampFocusMinutes(value));
+  }
+
   return {
     minutes,
-    setMinutes,
+    setMinutes: setMinutesClamped,
     secondsLeft,
     running,
     isActive,

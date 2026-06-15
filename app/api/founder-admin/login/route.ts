@@ -4,6 +4,7 @@ import {
   FOUNDER_ADMIN_COOKIE,
   founderAdminToken,
   isFounderAdminConfigured,
+  resolveFounderAdminPassword,
 } from "@/lib/founderAdmin";
 
 export async function POST(request: Request) {
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400 });
   }
 
-  const expected = process.env.FOUNDER_ADMIN_PASSWORD?.trim() ?? "";
+  const expected = resolveFounderAdminPassword();
   if (!password.trim() || password.trim() !== expected) {
     return NextResponse.json(
       {

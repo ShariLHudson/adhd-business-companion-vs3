@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 
-import { getAppSiteUrl } from "@/lib/appSite";
+import { appUrlLooksValid, getAppSiteUrl } from "@/lib/appSite";
 import { ghlApiConfigured } from "@/lib/ghl/client";
-import { companionAuthConfigStatus } from "@/lib/supabase/companionClient";
+import { companionAuthConfigStatus, companionAuthMisconfigHint, companionSupabaseEnvLooksSwapped, companionSupabaseUrlLooksValid, envValuePrefix, getCompanionSupabaseAnonKey, getCompanionSupabaseUrl } from "@/lib/supabase/companionClient";
 
 /** Temporary deploy debug — booleans/lengths only, never secret values. */
 export async function GET() {
@@ -20,12 +20,24 @@ export async function GET() {
   return NextResponse.json({
     cwd: process.cwd(),
     hasAppUrl: appUrl.length > 0,
+    appUrlLooksValid: appUrlLooksValid(appUrl),
     resolvedAppUrl: getAppSiteUrl(),
     hasSupabaseUrl: supabaseUrl.length > 0,
+    supabaseUrlLooksValid: companionSupabaseUrlLooksValid(),
     supabaseUrlLength: supabaseUrl.length,
+    supabaseUrlPrefix: envValuePrefix(supabaseUrl),
     hasSupabaseAnonKey: anonKey.length > 0,
     supabaseAnonKeyLength: anonKey.length,
+    supabaseAnonKeyPrefix: envValuePrefix(anonKey),
     anonKeyLooksValid: auth.anonKeyLooksValid,
+    authConfigured: auth.configured,
+    resolvedSupabaseUrlLength: getCompanionSupabaseUrl().length,
+    resolvedSupabaseUrlPrefix: envValuePrefix(getCompanionSupabaseUrl()),
+    resolvedSupabaseAnonKeyLength: getCompanionSupabaseAnonKey().length,
+    autoCorrectedSupabaseEnv: auth.autoCorrectedEnv,
+    usedSupabaseUrlFallback: auth.usedSupabaseUrlFallback,
+    supabaseEnvLooksSwapped: companionSupabaseEnvLooksSwapped(),
+    supabaseEnvHint: companionAuthMisconfigHint(),
     hasServiceRoleKey: serviceRoleKey.length > 0,
     serviceRoleKeyLength: serviceRoleKey.length,
     hasSupabaseSecretKey: secretKey.length > 0,

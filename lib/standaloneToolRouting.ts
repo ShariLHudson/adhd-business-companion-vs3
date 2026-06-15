@@ -40,19 +40,23 @@ export function detectStandaloneToolRequest(
 }
 
 /** Assistant claimed it is opening a tool — client must actually launch it. */
-export function detectAssistantToolLaunch(text: string): SidebarToolId | null {
+export function detectAssistantToolLaunch(text: string): StandaloneToolLaunch | null {
   const t = text.trim().toLowerCase();
   if (!t) return null;
   if (!/\bopening\b/i.test(t)) return null;
 
   if (/\b(?:breathe(?:\s+and\s+reset)?|breathing|breath)\b/i.test(t)) {
-    return "breathe";
+    return { tool: "breathe" };
   }
-  if (/\bfocus audio\b/i.test(t)) {
-    return "focus-audio";
+  if (/\b(?:focus audio|calm(?:ing)?|motivation|relaxing|background (?:music|sounds?))\b/i.test(t)) {
+    const audio = detectAudioRequest(text);
+    return {
+      tool: "focus-audio",
+      focusAudioCategory: audio.categoryId,
+    };
   }
   if (/\bfocus (?:session|timer)\b/i.test(t)) {
-    return "focus-timer";
+    return { tool: "focus-timer" };
   }
   return null;
 }

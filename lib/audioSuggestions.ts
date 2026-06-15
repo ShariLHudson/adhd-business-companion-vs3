@@ -71,36 +71,60 @@ export function audioBackgroundMood(categoryId: string): AudioBackgroundMood {
 const ENERGIZE_AUDIO_RE =
   /\b(energi[sz]e|energi[sz]ing|pep (?:me )?up|pick me up|need (?:more )?energy|get (?:me )?going|wake me up|uplift(?:ing)?|something to energi[sz]e)\b/;
 
+const CALM_AUDIO_RE =
+  /\b(calm(?:ing)?(?:\s+(?:audio|music|sounds?|playlist))?|relax(?:ing)?(?:\s+(?:audio|music|sounds?))?|soothe|soothing|grounding(?:\s+(?:audio|music|sounds?))?|quiet(?:\s+(?:audio|music|sounds?))?|calm my brain|something calm|need (?:something )?calm)\b/i;
+
+const MOTIVATION_AUDIO_RE =
+  /\b(motivat(?:e|ing|ion(?:al)?)(?:\s+(?:audio|music|sounds?|playlist))?|motivation boost|pump[- ]?up|pep (?:me )?up|energy boost|hype (?:music|playlist)|get (?:me )?going|something motivat)\b/i;
+
+const SLEEP_AUDIO_RE =
+  /\b(sleep(?:\s+(?:audio|music|sounds?))?|wind[- ]?down(?:\s+(?:audio|music|sounds?))?|bedtime (?:sounds?|music)|nap sounds?)\b/i;
+
+const FOCUS_AUDIO_RE =
+  /\b(focus audio|background (?:music|sounds?)|concentration music|deep work (?:music|audio|sounds?)|study (?:music|audio|sounds?))\b/i;
+
+const MUSIC_WORD_RE =
+  /\b(music|audio|sound|sounds|soundtrack|playlist|lo-?fi|lofi|noise|song|songs|tunes|listen|beats|ambien|something to (listen|play))\b/;
+
+export function resolveFocusAudioCategory(text: string): string {
+  const t = text.toLowerCase();
+  if (ENERGIZE_AUDIO_RE.test(t) || MOTIVATION_AUDIO_RE.test(t)) {
+    return "motivation-boost";
+  }
+  if (CALM_AUDIO_RE.test(t)) {
+    return "calm-brain";
+  }
+  if (SLEEP_AUDIO_RE.test(t)) {
+    return "sleep-sounds";
+  }
+  if (/\b(morning|start the day)\b/.test(t)) {
+    return "morning-focus";
+  }
+  if (/\b(focus|concentrat|deep work|study|productiv)\b/.test(t)) {
+    return "deep-work";
+  }
+  return "deep-work";
+}
+
 export function detectAudioRequest(text: string): {
   isAudio: boolean;
   categoryId: string;
 } {
   const t = text.toLowerCase();
   const wantsEnergize = ENERGIZE_AUDIO_RE.test(t);
-  const isAudio =
-    /\b(music|audio|sound|sounds|soundtrack|playlist|lo-?fi|lofi|noise|song|songs|tunes|listen|beats|ambien|something to (listen|play))\b/.test(
-      t,
-    ) || wantsEnergize;
-
-  let categoryId = "deep-work";
-  if (
+  const moodAudioIntent =
     wantsEnergize ||
-    /\b(energy|pump|hype|motivat|wake|moving|upbeat|boost|get going)\b/.test(t)
-  ) {
-    categoryId = "motivation-boost";
-  } else if (
-    /\b(calm|relax|soothe|anxious|overwhelm|stress|unwind|chill|ground|settle)\b/.test(t)
-  ) {
-    categoryId = "calm-brain";
-  } else if (/\b(sleep|rest|wind down|bedtime|nap|drift)\b/.test(t)) {
-    categoryId = "sleep-sounds";
-  } else if (/\b(morning|start the day)\b/.test(t)) {
-    categoryId = "morning-focus";
-  } else if (/\b(focus|concentrat|deep work|study|productiv)\b/.test(t)) {
-    categoryId = "deep-work";
-  }
+    CALM_AUDIO_RE.test(t) ||
+    MOTIVATION_AUDIO_RE.test(t) ||
+    SLEEP_AUDIO_RE.test(t) ||
+    FOCUS_AUDIO_RE.test(t);
 
-  return { isAudio, categoryId };
+  const isAudio = MUSIC_WORD_RE.test(t) || moodAudioIntent;
+
+  return {
+    isAudio,
+    categoryId: resolveFocusAudioCategory(text),
+  };
 }
 
 /** Warm one-liner the Companion says when offering to open Focus Audio. */

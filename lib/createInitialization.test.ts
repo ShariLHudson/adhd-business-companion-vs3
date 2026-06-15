@@ -75,6 +75,7 @@ describe("createInitialization", () => {
           draftContent: "Simple Steps to Attract More Clients\n\nStep one...",
           brief: "",
           stage: "editing draft",
+          artifactTypeLocked: false,
         },
         workspaceDetail: null,
         updatedAt: new Date().toISOString(),

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { getAppSiteUrl } from "@/lib/appSite";
+import { sanitizeSupabaseAuthError } from "@/lib/supabase/authErrors";
 import {
   companionAuthConfigured,
   companionAuthConfigStatus,
@@ -90,13 +91,7 @@ export async function POST(request: Request) {
   } catch (e) {
     const message = e instanceof Error ? e.message : "Sign-up failed.";
     return NextResponse.json(
-      {
-        ok: false,
-        error:
-          message.includes("fetch") || message.includes("Fetch")
-            ? "Could not reach Supabase. Check that your project is active and NEXT_PUBLIC_SUPABASE_URL ends with .supabase.co"
-            : message,
-      },
+      { ok: false, error: sanitizeSupabaseAuthError(message) },
       { status: 502 },
     );
   }

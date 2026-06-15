@@ -1,8 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PRESENCE_LINES, type EmotionalState } from "@/lib/companionEmotions";
 import { ASSETS, BRAND } from "@/lib/companionUi";
+import { getShariImageState } from "@/lib/shariImageState";
+import { recognitionToShariPresence } from "@/lib/recognition/shariPresenceBridge";
+import type { RecognitionMoment } from "@/lib/recognition/types";
+import {
+  getMemberSinceIso,
+  isAppAnniversaryToday,
+} from "@/lib/shariMemberSince";
 
 // A soft "mood ring" color around Shari's photo, reflecting the read on how the
 // person seems.
@@ -15,21 +22,6 @@ const RING: Record<EmotionalState, string> = {
   unclear: "#b8a98f",
 };
 
-// The photo rotates through every image that exists here. To add more, drop
-// JPGs into public/images/shari/ named shari-1.jpg, shari-2.jpg, … and they
-// auto-join the rotation. Missing ones are skipped automatically.
-const CANDIDATES = [
-  ASSETS.profile, // /shari.jpg — always present
-  "/images/shari/shari-1.jpg",
-  "/images/shari/shari-2.jpg",
-  "/images/shari/shari-3.jpg",
-  "/images/shari/shari-4.jpg",
-  "/images/shari/shari-5.jpg",
-  "/images/shari/shari-6.jpg",
-  "/images/shari/shari-7.jpg",
-  "/images/shari/shari-8.jpg",
-];
-
 type IdentityBarProps = {
   emotion: EmotionalState;
   photoError: boolean;
@@ -38,10 +30,24 @@ type IdentityBarProps = {
   onLogoError: () => void;
   /** Slim header once chat is underway — conversation owns the screen. */
   compact?: boolean;
-  // Soft re-entry when unfinished work exists — one line only, no extra card.
   resumeLine?: string | null;
-  // If memory exists, it MUST be actionable — clicking resumes the work.
   onResumeClick?: () => void;
+  userBirthday?: { month: number; day: number } | null;
+  recognitionMoment?: RecognitionMoment | null;
+  /** Gentle recovery day / lighter-day support is active. */
+  recoveryMode?: boolean;
+  /** Focus timer or focus workspace is active. */
+  focusMode?: boolean;
+  /** User win / recognition moment — proud Shari. */
+  recognitionWin?: boolean;
+  /** Optional gentle load-awareness line for the opening welcome. */
+  welcomeLine?: string | null;
+  /** Dismiss the welcome line for today (cognitive load offer). */
+  onDismissWelcome?: () => void;
+  /** One-line memory cue — calm home only. */
+  memoryCue?: string | null;
+  /** Primary question on calm home — replaces status line. */
+  primaryQuestion?: string | null;
 };
 
 export function IdentityBar({
@@ -51,54 +57,66 @@ export function IdentityBar({
   resumeLine,
   onResumeClick,
   compact = false,
+  userBirthday = null,
+  recognitionMoment = null,
+  recoveryMode = false,
+  focusMode = false,
+  recognitionWin = false,
+  welcomeLine = null,
+  onDismissWelcome,
+  memoryCue = null,
+  primaryQuestion = null,
 }: IdentityBarProps) {
-  // At rest the line simply invites; once there's a felt sense it reflects it.
-  const status = resumeLine
-    ? resumeLine
-    : emotion === "unclear"
-      ? "Tell me how I can help"
-      : (PRESENCE_LINES[emotion] ?? "I'm here with you");
+  const status = primaryQuestion
+    ? primaryQuestion
+    : resumeLine
+      ? resumeLine
+      : welcomeLine
+        ? welcomeLine
+        : emotion === "unclear"
+          ? "Tell me how I can help"
+          : (PRESENCE_LINES[emotion] ?? "I'm here with you");
   const ring = RING[emotion] ?? "#d4a574";
 
-  // Discover which candidate images actually exist, then rotate through them.
-  const [valid, setValid] = useState<string[]>([ASSETS.profile]);
-  const [idx, setIdx] = useState(0);
+  const [memberSince, setMemberSince] = useState<string | null>(null);
+  const [imageSrc, setImageSrc] = useState<string>(ASSETS.profile);
 
   useEffect(() => {
-    let alive = true;
-    const found = new Set<string>();
-    let pending = CANDIDATES.length;
-    const finalize = () => {
-      if (!alive) return;
-      const ordered = CANDIDATES.filter((c) => found.has(c));
-      setValid(ordered.length ? ordered : [ASSETS.profile]);
-    };
-    CANDIDATES.forEach((src) => {
-      const img = new window.Image();
-      img.onload = () => {
-        found.add(src);
-        if (--pending === 0) finalize();
-      };
-      img.onerror = () => {
-        if (--pending === 0) finalize();
-      };
-      img.src = src;
-    });
-    return () => {
-      alive = false;
-    };
+    setMemberSince(getMemberSinceIso());
   }, []);
 
-  // Gentle auto-rotate when there's more than one photo (idle welcome only).
-  useEffect(() => {
-    if (compact || valid.length < 2) return;
-    const id = window.setInterval(() => {
-      setIdx((i) => (i + 1) % valid.length);
-    }, 9000);
-    return () => window.clearInterval(id);
-  }, [valid, compact]);
+  const presence = useMemo(() => {
+    const now = new Date();
+    const milestoneCelebration = isAppAnniversaryToday(memberSince, now)
+      ? ("app_anniversary" as const)
+      : null;
+    const base = recognitionToShariPresence(recognitionMoment, {
+      now,
+      emotion,
+      userBirthday,
+      milestoneCelebration,
+      recoveryMode,
+      focusMode,
+      recognitionWin,
+    });
+    return getShariImageState(base);
+  }, [
+    emotion,
+    memberSince,
+    userBirthday,
+    recognitionMoment,
+    recoveryMode,
+    focusMode,
+    recognitionWin,
+  ]);
 
-  const src = valid[idx % valid.length] ?? ASSETS.profile;
+  useEffect(() => {
+    if (compact) {
+      setImageSrc(ASSETS.profile);
+      return;
+    }
+    setImageSrc(presence.src);
+  }, [compact, presence.src]);
 
   const avatar = (size: "lg" | "sm") => {
     const dim = size === "lg" ? "h-24 w-24 text-2xl" : "h-10 w-10 text-sm";
@@ -112,15 +130,20 @@ export function IdentityBar({
     ) : (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        key={src}
-        src={src}
+        key={compact ? "compact" : `${presence.state}-${imageSrc}`}
+        src={imageSrc}
         alt="Shari"
         width={imgDim}
         height={imgDim}
+        data-shari-state={compact ? "default" : presence.state}
         onError={() => {
-          if (src === ASSETS.profile) onPhotoError();
+          if (imageSrc !== ASSETS.profile) {
+            setImageSrc(ASSETS.profile);
+            return;
+          }
+          onPhotoError();
         }}
-        className={`companion-fade-in rounded-full object-cover transition-opacity duration-700 ${dim}`}
+        className={`rounded-full object-cover ${compact ? "" : "companion-fade-in transition-opacity duration-700"} ${dim}`}
       />
     );
   };
@@ -155,6 +178,9 @@ export function IdentityBar({
           Hi, I&apos;m Shari
         </p>
         <p className="mt-0.5 text-base text-[#1e4f4f]">{BRAND.tagline}</p>
+        {memoryCue ? (
+          <p className="mt-2 text-base text-[#6b635a]">{memoryCue}</p>
+        ) : null}
         {resumeLine && onResumeClick ? (
           <button
             type="button"
@@ -164,7 +190,26 @@ export function IdentityBar({
             {status} →
           </button>
         ) : (
-          <p className="mt-2 text-lg italic text-[#6b635a]">{status}</p>
+          <>
+            <p
+              className={`mt-2 text-lg ${
+                primaryQuestion
+                  ? "font-semibold text-[#1f1c19] not-italic"
+                  : "italic text-[#6b635a]"
+              }`}
+            >
+              {status}
+            </p>
+            {welcomeLine && onDismissWelcome ? (
+              <button
+                type="button"
+                onClick={onDismissWelcome}
+                className="mt-1 text-sm text-[#9a8f82] underline decoration-[#9a8f82]/40 underline-offset-2 hover:text-[#6b635a]"
+              >
+                Not now
+              </button>
+            ) : null}
+          </>
         )}
       </div>
     </header>

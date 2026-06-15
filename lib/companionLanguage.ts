@@ -1,25 +1,24 @@
 // Language & communication preferences — output/style only.
 // Intentionally separate from emotional detection, routing, and memory.
-// Informs future UI copy, Companion replies, Make output, and voice later.
 
 export type LanguageOption = {
   code: string;
   label: string;
-  /** When false, preference can be saved but output stays English until enabled. */
-  available: boolean;
 };
 
 export const LANGUAGE_OPTIONS: readonly LanguageOption[] = [
-  { code: "en", label: "English", available: true },
-  { code: "es", label: "Spanish (Español)", available: false },
-  { code: "fr", label: "French (Français)", available: false },
-  { code: "de", label: "German (Deutsch)", available: false },
-  { code: "pt", label: "Portuguese (Português)", available: false },
-  { code: "nl", label: "Dutch (Nederlands)", available: false },
-  { code: "it", label: "Italian (Italiano)", available: false },
-  { code: "pl", label: "Polish (Polski)", available: false },
-  { code: "zh", label: "Chinese (中文)", available: false },
-  { code: "ja", label: "Japanese (日本語)", available: false },
+  { code: "en", label: "English" },
+  { code: "es", label: "Spanish (Español)" },
+  { code: "ur", label: "Urdu (اردو)" },
+  { code: "tl", label: "Filipino / Tagalog" },
+  { code: "fr", label: "French (Français)" },
+  { code: "de", label: "German (Deutsch)" },
+  { code: "pt", label: "Portuguese (Português)" },
+  { code: "nl", label: "Dutch (Nederlands)" },
+  { code: "it", label: "Italian (Italiano)" },
+  { code: "pl", label: "Polish (Polski)" },
+  { code: "zh", label: "Chinese (中文)" },
+  { code: "ja", label: "Japanese (日本語)" },
 ] as const;
 
 export type LanguageCode = (typeof LANGUAGE_OPTIONS)[number]["code"];
@@ -66,6 +65,8 @@ const DATE_FORMAT_CODES = new Set(DATE_FORMAT_OPTIONS.map((o) => o.code));
 const PROMPT_LANGUAGE_NAMES: Record<LanguageCode, string> = {
   en: "English",
   es: "Spanish",
+  ur: "Urdu",
+  tl: "Filipino",
   fr: "French",
   de: "German",
   pt: "Portuguese",
@@ -76,22 +77,57 @@ const PROMPT_LANGUAGE_NAMES: Record<LanguageCode, string> = {
   ja: "Japanese",
 };
 
+const SPEECH_LOCALES: Partial<Record<LanguageCode, string>> = {
+  en: "en-US",
+  es: "es-ES",
+  ur: "ur-PK",
+  tl: "fil-PH",
+  fr: "fr-FR",
+  de: "de-DE",
+  pt: "pt-PT",
+  nl: "nl-NL",
+  it: "it-IT",
+  pl: "pl-PL",
+  zh: "zh-CN",
+  ja: "ja-JP",
+};
+
+const RTL_LANGUAGES = new Set<LanguageCode>(["ur"]);
+
 export function getLanguageOption(code: string): LanguageOption | undefined {
   return LANGUAGE_OPTIONS.find((o) => o.code === code);
 }
 
 export function isLanguageAvailable(code: LanguageCode): boolean {
-  return getLanguageOption(code)?.available ?? false;
+  return LANGUAGE_CODES.has(code);
 }
 
-/** Language used for model output today (English until a code is marked available). */
+/** Valid language code for output, or English as fallback. */
 export function effectiveOutputLanguage(code: LanguageCode): LanguageCode {
-  return isLanguageAvailable(code) ? code : "en";
+  return LANGUAGE_CODES.has(code) ? code : "en";
+}
+
+export function getInterfaceLanguageCode(
+  prefs: Pick<LanguageCommunicationPrefs, "interfaceLanguage" | "responseLanguage">,
+): LanguageCode {
+  return effectiveOutputLanguage(
+    prefs.interfaceLanguage !== "en"
+      ? prefs.interfaceLanguage
+      : prefs.responseLanguage,
+  );
+}
+
+export function isRtlLanguage(code: LanguageCode): boolean {
+  return RTL_LANGUAGES.has(code);
+}
+
+export function speechLocaleForLanguage(code: LanguageCode): string {
+  const effective = effectiveOutputLanguage(code);
+  return SPEECH_LOCALES[effective] ?? "en-US";
 }
 
 export function languageOptionLabel(option: LanguageOption): string {
-  if (option.available) return option.label;
-  return `${option.label} — coming soon`;
+  return option.label;
 }
 
 export function normalizeLanguageCommunication(
@@ -112,6 +148,20 @@ export function normalizeLanguageCommunication(
   };
 }
 
+/** When user picks an app language, keep all language prefs aligned. */
+export function withUnifiedAppLanguage(
+  code: LanguageCode,
+  patch: Partial<LanguageCommunicationPrefs> = {},
+): Partial<LanguageCommunicationPrefs> {
+  return {
+    ...patch,
+    interfaceLanguage: code,
+    responseLanguage: code,
+    contentLanguage: code,
+    voiceLanguage: code,
+  };
+}
+
 export function languageLabel(code: LanguageCode): string {
   return getLanguageOption(code)?.label ?? "English";
 }
@@ -120,53 +170,42 @@ export function regionLabel(code: RegionCode): string {
   return REGION_OPTIONS.find((o) => o.code === code)?.label ?? "United States";
 }
 
-/** One-line summary for the Settings list row. */
 export function languageCommunicationSummary(
   prefs: LanguageCommunicationPrefs,
 ): string {
-  const iface = getLanguageOption(prefs.interfaceLanguage);
-  const label = iface ? languageOptionLabel(iface) : "English";
-  return `${label.replace(/ — coming soon$/, "")} · ${prefs.region}`;
-}
-
-/** True when a non-English preference is saved but output is not available yet. */
-export function hasPendingLanguagePreferences(
-  prefs: LanguageCommunicationPrefs,
-): boolean {
-  return (
-    (prefs.interfaceLanguage !== "en" &&
-      !isLanguageAvailable(prefs.interfaceLanguage)) ||
-    (prefs.responseLanguage !== "en" &&
-      !isLanguageAvailable(prefs.responseLanguage)) ||
-    (prefs.contentLanguage !== "en" &&
-      !isLanguageAvailable(prefs.contentLanguage)) ||
-    (prefs.voiceLanguage !== "en" && !isLanguageAvailable(prefs.voiceLanguage))
+  const primary = getLanguageOption(
+    prefs.responseLanguage ?? prefs.interfaceLanguage,
   );
+  const label = primary ? languageOptionLabel(primary) : "English";
+  return `${label} · ${prefs.region}`;
 }
 
-/** System-prompt hint for Companion chat — undefined until language is available. */
+export function hasPendingLanguagePreferences(
+  _prefs: LanguageCommunicationPrefs,
+): boolean {
+  return false;
+}
+
 export function buildResponseLanguageHint(
   responseLanguage: LanguageCode,
 ): string | undefined {
-  if (responseLanguage === "en" || !isLanguageAvailable(responseLanguage)) {
-    return undefined;
+  const effective = effectiveOutputLanguage(responseLanguage);
+  if (effective === "en") {
+    return "OUTPUT LANGUAGE: Respond in English unless the user clearly writes in another language or asks for another language.";
   }
-  const name = PROMPT_LANGUAGE_NAMES[responseLanguage];
-  return `OUTPUT LANGUAGE: Respond entirely in ${name}. Keep the same warmth, brevity, and ADHD-friendly style.`;
+  const name = PROMPT_LANGUAGE_NAMES[effective];
+  return `OUTPUT LANGUAGE: Respond entirely in ${name}. Keep the same warmth, brevity, and ADHD-friendly style unless the user asks for English or another language.`;
 }
 
-/** System-prompt suffix for Make / generate — undefined until language is available. */
 export function buildContentLanguageHint(
   contentLanguage: LanguageCode,
 ): string | undefined {
-  if (contentLanguage === "en" || !isLanguageAvailable(contentLanguage)) {
-    return undefined;
-  }
-  const name = PROMPT_LANGUAGE_NAMES[contentLanguage];
+  const effective = effectiveOutputLanguage(contentLanguage);
+  if (effective === "en") return undefined;
+  const name = PROMPT_LANGUAGE_NAMES[effective];
   return `OUTPUT LANGUAGE: Write the draft entirely in ${name}.`;
 }
 
-/** Ready to pass into chat and Make API calls (hints activate when languages go live). */
 export function getOutputLanguageContext(
   prefs: Pick<LanguageCommunicationPrefs, "responseLanguage" | "contentLanguage">,
 ): {
@@ -187,5 +226,3 @@ export function getOutputLanguageContext(
   };
 }
 
-export const PENDING_LANGUAGE_NOTICE =
-  "Full multilingual output is coming later. Your choices are saved — Shari still replies and writes in English for now.";

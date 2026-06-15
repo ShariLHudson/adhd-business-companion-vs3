@@ -9,7 +9,7 @@
 export type StrategyGroupId = "personal" | "business";
 
 // The execution actions a strategy can recommend (matches the action buttons).
-export type StrategyActionId = "start" | "timeblock" | "talk" | "save";
+export type StrategyActionId = "start" | "timeblock" | "talk" | "save" | "save-mine";
 
 export type StrategyGroup = {
   id: StrategyGroupId;

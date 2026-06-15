@@ -58,6 +58,14 @@ function poolForSituation(
         mode: "today",
       }),
       step({
+        id: "plan-my-day",
+        label: "Help me plan my day",
+        description: "A gentle, adaptive plan — no packed schedule",
+        emoji: "📅",
+        mode: "today",
+        prompt: "Help me plan my day",
+      }),
+      step({
         id: "one-small-step",
         label: "One small step",
         description: "Pick just one thing — nothing else",

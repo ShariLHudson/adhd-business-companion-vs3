@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { ChatLayoutMode } from "@/lib/workspaceNav";
+import { BackButton } from "@/components/companion/BackButton";
 
 // Workspace Mode shell — Chat + working area together. Presentational only, so
 // page.tsx can adopt it incrementally: pass the chat node and (optionally) an
@@ -25,6 +26,7 @@ export function WorkspaceLayout({
   onChatLayoutModeChange,
   onClose,
   revealKey = 0,
+  workspaceFirst = false,
 }: {
   chat: ReactNode;
   workspace?: ReactNode | null;
@@ -36,6 +38,8 @@ export function WorkspaceLayout({
   onClose?: () => void;
   /** Increment to scroll/focus workspace into view after open. */
   revealKey?: number;
+  /** Workspace on the left, companion chat on the right (user-initiated assist). */
+  workspaceFirst?: boolean;
 }) {
   const [mobileView, setMobileView] = useState<"chat" | "work">("chat");
   const workspacePaneRef = useRef<HTMLDivElement>(null);
@@ -113,7 +117,11 @@ export function WorkspaceLayout({
         </button>
       </div>
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row md:items-stretch">
+      <div
+        className={`flex min-h-0 flex-1 flex-col overflow-hidden md:flex-row md:items-stretch ${
+          workspaceFirst ? "md:flex-row-reverse" : ""
+        }`}
+      >
         {/* Chat pane — kept mounted when hidden so state is preserved */}
         <div
           className={`h-full min-h-0 flex-col overflow-hidden border-[#1e4f4f]/10 md:max-h-full md:border-r ${
@@ -140,9 +148,14 @@ export function WorkspaceLayout({
           }`}
         >
           <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[#1e4f4f]/10 bg-white/60 px-3 py-2">
-            <span className="text-sm font-semibold text-[#2d2926]">
-              {workspaceTitle}
-            </span>
+            <div className="flex min-w-0 items-center gap-2">
+              {onClose ? (
+                <BackButton onClick={onClose} size="compact" label="Back" />
+              ) : null}
+              <span className="truncate text-sm font-semibold text-[#2d2926]">
+                {workspaceTitle}
+              </span>
+            </div>
             <div className="flex flex-wrap items-center justify-end gap-1">
               {chatHidden ? (
                 <>
@@ -185,11 +198,6 @@ export function WorkspaceLayout({
                     Chat + Workspace
                   </button>
                 </>
-              )}
-              {onClose && (
-                <button type="button" onClick={onClose} className={layoutBtn}>
-                  ✕ Close
-                </button>
               )}
             </div>
           </div>

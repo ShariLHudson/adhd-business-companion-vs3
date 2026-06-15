@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { speechLocaleForLanguage } from "@/lib/companionLanguage";
+import { getPrefs } from "@/lib/companionStore";
+
 // Global voice-input standard: "if I can type there, I can talk there."
 // Drop <MicButton onText={t => setValue(v => v ? v + " " + t : t)} /> next to any
 // text field. Speech converts to text in place — no modal, no extra screen.
@@ -26,10 +29,12 @@ export function MicButton({
   onText,
   title = "Speak instead of typing",
   className,
+  lang,
 }: {
   onText: (text: string) => void;
   title?: string;
   className?: string;
+  lang?: string;
 }) {
   const recRef = useRef<Recognition | null>(null);
   const onTextRef = useRef(onText);
@@ -50,7 +55,7 @@ export function MicButton({
     const rec = new SR();
     rec.continuous = false;
     rec.interimResults = false;
-    rec.lang = "en-US";
+    rec.lang = lang ?? speechLocaleForLanguage(getPrefs().voiceLanguage);
     rec.onresult = (e) => {
       let finalText = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
@@ -71,13 +76,14 @@ export function MicButton({
       }
       recRef.current = null;
     };
-  }, []);
+  }, [lang]);
 
   if (!supported) return null;
 
   function toggle() {
     const rec = recRef.current;
     if (!rec) return;
+    rec.lang = lang ?? speechLocaleForLanguage(getPrefs().voiceLanguage);
     if (listening) {
       try {
         rec.stop();

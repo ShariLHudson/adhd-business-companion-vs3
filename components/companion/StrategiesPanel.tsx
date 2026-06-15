@@ -19,9 +19,12 @@ import {
 } from "@/lib/strategySystem";
 import {
   getUserStrategies,
+  saveUserStrategy,
+  suggestCategory,
   userStrategiesFor,
   type UserStrategy,
 } from "@/lib/userStrategies";
+import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import { appReferences } from "@/lib/appReferences";
 import { getPrefs, saveProject } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
@@ -32,7 +35,8 @@ type View =
   | { v: "recommended" }
   | { v: "saved" }
   | { v: "strategy"; stratId: string }
-  | { v: "userStrategy"; id: string };
+  | { v: "userStrategy"; id: string }
+  | { v: "new" };
 
 // Meaning hue → brighter decorative counterpart (matches the rest of the app).
 const DECOR: Record<string, string> = {
@@ -72,6 +76,10 @@ export function StrategiesPanel({
   registerBack?: (fn: (() => boolean) | null) => void;
 }) {
   const [view, setView] = useState<View>({ v: "home" });
+  const [search, setSearch] = useState("");
+  const [newTitle, setNewTitle] = useState("");
+  const [newProblem, setNewProblem] = useState("");
+  const [newSteps, setNewSteps] = useState("");
   const [openSubcat, setOpenSubcat] = useState<string | null>(null);
   const [deepOpen, setDeepOpen] = useState(false);
   const visualMode = getPrefs().visualMode;
@@ -91,7 +99,7 @@ export function StrategiesPanel({
         setView(u ? { v: "group", group: u.type } : { v: "saved" });
         return true;
       }
-      if (view.v === "group" || view.v === "recommended" || view.v === "saved") {
+      if (view.v === "group" || view.v === "recommended" || view.v === "saved" || view.v === "new") {
         setView({ v: "home" });
         return true;
       }
@@ -125,6 +133,12 @@ export function StrategiesPanel({
     const savedCount = getUserStrategies().length;
     const rows: { emoji: string; label: string; blurb: string; go: () => void }[] = [
       {
+        emoji: "➕",
+        label: "New strategy",
+        blurb: "Create your own — something that works for you.",
+        go: () => setView({ v: "new" }),
+      },
+      {
         emoji: "✨",
         label: "Recommended for you",
         blurb: "Solid starting points — more personal over time.",
@@ -155,14 +169,29 @@ export function StrategiesPanel({
         go: () => setView({ v: "saved" }),
       },
     ];
+    const q = search.trim().toLowerCase();
+    const filtered = q
+      ? rows.filter(
+          (r) =>
+            r.label.toLowerCase().includes(q) ||
+            r.blurb.toLowerCase().includes(q),
+        )
+      : rows;
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+        <WorkspaceGuide section="playbook" />
         <p className="text-2xl font-semibold text-[#1f1c19]">Strategies</p>
         <p className="mt-1 text-base text-[#6b635a]">
-          Coaching for your brain and your business. Pick a place to start.
+          Short playbooks for your brain and business. Search, then pick one.
         </p>
+        <input
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search strategies…"
+          className="mt-4 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base outline-none focus:border-[#1e4f4f]"
+        />
         <div className="mt-6 flex flex-col gap-3">
-          {rows.map((r) => (
+          {filtered.map((r) => (
             <button
               key={r.label}
               type="button"
@@ -380,6 +409,74 @@ export function StrategiesPanel({
     );
   }
 
+  // ---- New user strategy --------------------------------------------------
+  if (view.v === "new") {
+    return (
+      <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+        <button
+          type="button"
+          onClick={() => setView({ v: "home" })}
+          className="self-start text-sm font-semibold text-[#1e4f4f]"
+        >
+          ‹ Strategies
+        </button>
+        <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">New strategy</p>
+        <p className="mt-1 text-sm text-[#6b635a]">
+          Something you&apos;ve noticed helps — save it for next time.
+        </p>
+        <input
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
+          placeholder="Strategy name"
+          className="mt-4 w-full rounded-lg border border-[#c9bfb0] px-3 py-2.5 text-base"
+        />
+        <textarea
+          value={newProblem}
+          onChange={(e) => setNewProblem(e.target.value)}
+          placeholder="What problem does this help with?"
+          className="mt-2 min-h-[80px] w-full rounded-lg border border-[#c9bfb0] px-3 py-2.5 text-base"
+        />
+        <textarea
+          value={newSteps}
+          onChange={(e) => setNewSteps(e.target.value)}
+          placeholder="Steps (one per line)"
+          className="mt-2 min-h-[100px] w-full rounded-lg border border-[#c9bfb0] px-3 py-2.5 text-base"
+        />
+        <button
+          type="button"
+          disabled={!newTitle.trim()}
+          onClick={() => {
+            const steps = newSteps
+              .split("\n")
+              .map((s) => s.trim())
+              .filter(Boolean);
+            const { type, category } = suggestCategory(
+              newTitle,
+              newProblem,
+            );
+            saveUserStrategy({
+              title: newTitle.trim(),
+              type,
+              category,
+              source: "user_generated",
+              description: newProblem.trim() || newTitle.trim(),
+              whenToUse: "When this pattern shows up for you.",
+              steps: steps.length ? steps : ["Try it once and notice what helps."],
+              whyItWorks: "You built this from what actually works for you.",
+            });
+            setNewTitle("");
+            setNewProblem("");
+            setNewSteps("");
+            setView({ v: "saved" });
+          }}
+          className="mt-4 rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
+        >
+          Save strategy
+        </button>
+      </div>
+    );
+  }
+
   // ---- User strategy detail (saved / companion-suggested) ----------------
   if (view.v === "userStrategy") {
     const u: UserStrategy | undefined = getUserStrategies().find(
@@ -505,6 +602,27 @@ export function StrategiesPanel({
           },
         ]
       : []),
+    {
+      id: "save-mine",
+      label: "📌 Save as my strategy",
+      help: "Keep this in your personal library.",
+      run: () => {
+        const subcat = resolveSubcat(s);
+        const group = groupForStrategy(s);
+        saveUserStrategy({
+          title: s.title,
+          type: group,
+          category: subcat,
+          source: "user_generated",
+          description: s.problem,
+          whenToUse: s.whenToUse,
+          steps: s.steps,
+          whyItWorks: s.whyWorks,
+          example: s.example,
+        });
+        setView({ v: "saved" });
+      },
+    },
     {
       id: "save",
       label: "📁 Save to project",
@@ -637,9 +755,6 @@ export function StrategiesPanel({
                 {a.label} — {a.help}
               </option>
             ))}
-            <option value="" disabled>
-              🧠 Save as my strategy — coming soon
-            </option>
           </select>
         </div>
       </div>

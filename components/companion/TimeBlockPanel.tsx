@@ -20,6 +20,12 @@ import {
   type Project,
   type TimeBlock,
 } from "@/lib/companionStore";
+import {
+  DEFAULT_TIME_BANK_FILTERS,
+  filterTimeBankBlocks,
+  type TimeBankFilters,
+} from "@/lib/timeBank";
+import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
 type DurUnit = "min" | "hr" | "day" | "week" | "month";
 const UNIT_MIN: Record<DurUnit, number> = {
@@ -170,7 +176,7 @@ const HORIZONS: { id: Horizon; label: string }[] = [
   { id: "week", label: "This week" },
   { id: "nextweek", label: "Next week" },
   { id: "later", label: "Later" },
-  { id: "unscheduled", label: "Unscheduled" },
+  { id: "unscheduled", label: "Time Bank" },
 ];
 
 // Single-bucket horizons don't need per-day headers.
@@ -223,6 +229,10 @@ export function TimeBlockPanel({
   const [addingTag, setAddingTag] = useState(false);
   const [newProject, setNewProject] = useState("");
   const [addingProject, setAddingProject] = useState(false);
+  const [bankOpen, setBankOpen] = useState(true);
+  const [bankFilters, setBankFilters] = useState<TimeBankFilters>(
+    DEFAULT_TIME_BANK_FILTERS,
+  );
 
   useEffect(() => {
     setBlocks(getTimeBlocks());
@@ -236,6 +246,7 @@ export function TimeBlockPanel({
       setForm((f) => ({
         ...f,
         projectId: initialProjectId,
+        date: "",
         title: f.title.trim()
           ? f.title
           : proj?.nextAction.trim() || proj?.name || f.title,
@@ -280,9 +291,11 @@ export function TimeBlockPanel({
   const hasTitle = form.title.trim().length > 0;
   const revealRest = hasTitle && durTouched;
 
-  // Day stack grouped by horizon.
+  // Day stack grouped by horizon (scheduled blocks only).
   const grouped = useMemo(() => {
-    const inRange = blocks.filter((b) => inHorizon(b.date, view));
+    const inRange = blocks.filter(
+      (b) => b.date && inHorizon(b.date, view),
+    );
     const byDay = new Map<string, TimeBlock[]>();
     for (const b of inRange) {
       const key = b.date || "unscheduled";
@@ -292,6 +305,155 @@ export function TimeBlockPanel({
     }
     return [...byDay.entries()].sort((a, b) => a[0].localeCompare(b[0]));
   }, [blocks, view]);
+
+  const bankBlocks = useMemo(
+    () => filterTimeBankBlocks(blocks, bankFilters),
+    [blocks, bankFilters],
+  );
+
+  const bankTags = useMemo(() => {
+    const set = new Set<string>();
+    for (const b of blocks) {
+      if (!b.date && b.tag) set.add(b.tag);
+    }
+    return [...set].sort();
+  }, [blocks]);
+
+  function renderBlockCard(b: TimeBlock, opts?: { bank?: boolean }) {
+    return (
+      <li
+        key={b.id}
+        style={
+          colorOn && b.projectId
+            ? {
+                borderLeftWidth: 5,
+                borderLeftColor: projColor(b.projectId) ?? undefined,
+                ...(decorative && b.status !== "missed"
+                  ? {
+                      backgroundColor: `${projColor(b.projectId) ?? "#999"}0d`,
+                    }
+                  : {}),
+              }
+            : undefined
+        }
+        className={`rounded-2xl border border-[#d4cdc3] p-4 ${
+          b.status === "completed" ? "opacity-60" : ""
+        } ${b.status === "missed" ? "bg-[#a85c4a]/10" : "bg-white/85"}`}
+      >
+        <p className="text-base font-semibold text-[#1f1c19]">
+          {opts?.bank || !b.date
+            ? b.title
+            : `${formatBlockTime(b.startTime)} — ${b.title}`}
+        </p>
+        <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#6b635a]">
+          <span
+            className="inline-block h-2.5 w-2.5 rounded-full"
+            style={{ background: ENERGY_DOT[b.energy] }}
+            title={`${b.energy} energy`}
+          />
+          <span className="rounded-full bg-[#1e4f4f]/10 px-2 py-0.5 font-semibold text-[#1e4f4f]">
+            {formatDuration(b.durationMin)}
+          </span>
+          {projectName(b.projectId) && (
+            <span className="inline-flex items-center gap-1 rounded-full bg-[#1e4f4f]/8 px-2 py-0.5 font-semibold text-[#1e4f4f]">
+              {colorOn && (
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{
+                    background: projColor(b.projectId) ?? "#999",
+                  }}
+                />
+              )}
+              Assigned to: {projectName(b.projectId)}
+            </span>
+          )}
+          {b.tag && (
+            <span className="rounded-full bg-white/80 px-2 py-0.5">{b.tag}</span>
+          )}
+          {b.status !== "pending" && (
+            <span className="capitalize">{b.status}</span>
+          )}
+        </div>
+        <div className="mt-3 flex flex-wrap gap-2 text-sm font-semibold">
+          <button
+            type="button"
+            onClick={() => onStart(b)}
+            className="rounded-md bg-[#1e4f4f] px-3 py-1 text-white hover:bg-[#163a3a]"
+          >
+            ▶ Start now
+          </button>
+          <button
+            type="button"
+            onClick={() => edit(b)}
+            className="rounded-md px-2.5 py-1 text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
+          >
+            ✏ Edit
+          </button>
+          {!opts?.bank && (
+            <button
+              type="button"
+              onClick={() => setSnoozeFor(snoozeFor === b.id ? null : b.id)}
+              className="rounded-md px-2.5 py-1 text-[#6b635a] hover:bg-black/5"
+            >
+              ⏰ Snooze
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => setBlocks(deleteTimeBlock(b.id))}
+            className="rounded-md px-2.5 py-1 text-[#a85c4a] hover:bg-[#a85c4a]/10"
+          >
+            🗑 Delete
+          </button>
+        </div>
+        {!opts?.bank && (
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#6b635a]">
+            <span>📅 Add to calendar:</span>
+            <a
+              href={googleCalUrl(b)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-[#1e4f4f] hover:underline"
+            >
+              Google
+            </a>
+            <a
+              href={outlookCalUrl(b)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold text-[#1e4f4f] hover:underline"
+            >
+              Outlook
+            </a>
+            <button
+              type="button"
+              onClick={() => downloadIcs(b)}
+              className="font-semibold text-[#1e4f4f] hover:underline"
+            >
+              Download .ics
+            </button>
+          </div>
+        )}
+        {snoozeFor === b.id && (
+          <div className="mt-2 flex flex-wrap gap-2">
+            {SNOOZE.map((m) => (
+              <button
+                key={m}
+                type="button"
+                onClick={() => {
+                  setBlocks(snoozeBlock(b.id, m));
+                  setSnoozeFor(null);
+                }}
+                className="rounded-full bg-[#1e4f4f]/10 px-3 py-1 text-xs font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/20"
+              >
+                {m === 120 ? "Later today" : `${m} min`}
+              </button>
+            ))}
+          </div>
+        )}
+      </li>
+    );
+  }
 
   function resetForm() {
     setForm(emptyForm());
@@ -363,6 +525,7 @@ export function TimeBlockPanel({
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+      <WorkspaceGuide section="time-block" />
       <div className="flex items-center justify-between gap-3">
         <p className="text-2xl font-semibold text-[#1f1c19]">Time Blocks</p>
         {onTestAlert && (
@@ -424,7 +587,7 @@ export function TimeBlockPanel({
                 }
                 className="h-4 w-4 accent-[#1e4f4f]"
               />
-              No date yet — keep it unscheduled
+              No date yet — save to Time Bank
             </label>
 
             <p className="mt-3 text-sm font-semibold text-[#6b635a]">Duration</p>
@@ -641,17 +804,117 @@ export function TimeBlockPanel({
         )}
       </div>
 
-      {/* Day stack */}
+      {/* Time Bank — unscheduled blocks stay here even when assigned to a project */}
+      <div className="mt-7 rounded-2xl border border-[#d4cdc3] bg-white/60 p-4">
+        <button
+          type="button"
+          onClick={() => setBankOpen((o) => !o)}
+          className="flex w-full items-center gap-2 text-left"
+        >
+          <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
+            Time Bank
+          </p>
+          <span className="rounded-full bg-[#1e4f4f]/10 px-2 py-0.5 text-xs font-semibold text-[#1e4f4f]">
+            {bankBlocks.length}
+          </span>
+          <span className="ml-auto text-sm text-[#6b635a]">{bankOpen ? "▾" : "▸"}</span>
+        </button>
+        <p className="mt-1 text-sm text-[#6b635a]">
+          Saved blocks without a date — assign to projects without losing them here.
+        </p>
+        {bankOpen && (
+          <>
+            <div className="mt-3 flex flex-wrap gap-2">
+              <select
+                value={bankFilters.assignment}
+                onChange={(e) =>
+                  setBankFilters((f) => ({
+                    ...f,
+                    assignment: e.target.value as TimeBankFilters["assignment"],
+                  }))
+                }
+                className="rounded-full border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                aria-label="Filter by assignment"
+              >
+                <option value="all">All</option>
+                <option value="unassigned">Unassigned</option>
+                <option value="assigned">Assigned</option>
+              </select>
+              <select
+                value={bankFilters.projectId}
+                onChange={(e) =>
+                  setBankFilters((f) => ({ ...f, projectId: e.target.value }))
+                }
+                className="rounded-full border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                aria-label="Filter by project"
+              >
+                <option value="all">All projects</option>
+                {projects.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+              {bankTags.length > 0 && (
+                <select
+                  value={bankFilters.tag}
+                  onChange={(e) =>
+                    setBankFilters((f) => ({ ...f, tag: e.target.value }))
+                  }
+                  className="rounded-full border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                  aria-label="Filter by category"
+                >
+                  <option value="all">All categories</option>
+                  {bankTags.map((t) => (
+                    <option key={t} value={t}>
+                      {t}
+                    </option>
+                  ))}
+                </select>
+              )}
+              <select
+                value={bankFilters.duration}
+                onChange={(e) =>
+                  setBankFilters((f) => ({
+                    ...f,
+                    duration: e.target.value as TimeBankFilters["duration"],
+                  }))
+                }
+                className="rounded-full border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                aria-label="Filter by duration"
+              >
+                <option value="all">Any duration</option>
+                <option value="short">Under 30 min</option>
+                <option value="medium">30–60 min</option>
+                <option value="long">Over 1 hr</option>
+              </select>
+            </div>
+            {bankBlocks.length === 0 ? (
+              <p className="mt-3 text-sm text-[#6b635a]">
+                No blocks in the bank yet — check &ldquo;No date yet&rdquo; when adding one.
+              </p>
+            ) : (
+              <ul className="mt-3 flex flex-col gap-3">
+                {bankBlocks.map((b) => renderBlockCard(b, { bank: true }))}
+              </ul>
+            )}
+          </>
+        )}
+      </div>
+
+      {/* Scheduled day stack */}
+      {view !== "unscheduled" && (
+        <>
       <div className="mt-7 flex items-center justify-between gap-2">
         <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-          My day
+          Scheduled
         </p>
         <select
           value={view}
           onChange={(e) => setView(e.target.value as Horizon)}
           className="rounded-full border border-[#c9bfb0] bg-white px-3 py-1.5 text-sm font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
         >
-          {HORIZONS.map((h) => (
+          {HORIZONS.filter((h) => h.id !== "unscheduled").map((h) => (
             <option key={h.id} value={h.id}>
               {h.label}
             </option>
@@ -661,7 +924,7 @@ export function TimeBlockPanel({
 
       {grouped.length === 0 ? (
         <p className="mt-2 text-base text-[#6b635a]">
-          Nothing in{" "}
+          Nothing scheduled for{" "}
           {HORIZONS.find((h) => h.id === view)?.label.toLowerCase()} yet.
         </p>
       ) : (
@@ -697,142 +960,30 @@ export function TimeBlockPanel({
               )}
               {open && (
               <ul className="flex flex-col gap-3">
-                {dayBlocks.map((b) => (
-                  <li
-                    key={b.id}
-                    style={
-                      colorOn && b.projectId
-                        ? {
-                            borderLeftWidth: 5,
-                            borderLeftColor: projColor(b.projectId) ?? undefined,
-                            ...(decorative && b.status !== "missed"
-                              ? {
-                                  backgroundColor: `${projColor(b.projectId) ?? "#999"}0d`,
-                                }
-                              : {}),
-                          }
-                        : undefined
-                    }
-                    className={`rounded-2xl border border-[#d4cdc3] p-4 ${
-                      b.status === "completed" ? "opacity-60" : ""
-                    } ${b.status === "missed" ? "bg-[#a85c4a]/10" : "bg-white/85"}`}
-                  >
-                    <p className="text-base font-semibold text-[#1f1c19]">
-                      {formatBlockTime(b.startTime)} — {b.title}
-                    </p>
-                    <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#6b635a]">
-                      <span
-                        className="inline-block h-2.5 w-2.5 rounded-full"
-                        style={{ background: ENERGY_DOT[b.energy] }}
-                        title={`${b.energy} energy`}
-                      />
-                      <span className="rounded-full bg-[#1e4f4f]/10 px-2 py-0.5 font-semibold text-[#1e4f4f]">
-                        {formatDuration(b.durationMin)}
-                      </span>
-                      {projectName(b.projectId) && (
-                        <span className="inline-flex items-center gap-1">
-                          {colorOn && (
-                            <span
-                              className="inline-block h-2 w-2 rounded-full"
-                              style={{
-                                background: projColor(b.projectId) ?? "#999",
-                              }}
-                            />
-                          )}
-                          {projectName(b.projectId)}
-                        </span>
-                      )}
-                      {b.tag && (
-                        <span className="rounded-full bg-white/80 px-2 py-0.5">
-                          {b.tag}
-                        </span>
-                      )}
-                      {b.status !== "pending" && (
-                        <span className="capitalize">{b.status}</span>
-                      )}
-                    </div>
-                    <div className="mt-3 flex flex-wrap gap-2 text-sm font-semibold">
-                      <button
-                        type="button"
-                        onClick={() => onStart(b)}
-                        className="rounded-md bg-[#1e4f4f] px-3 py-1 text-white hover:bg-[#163a3a]"
-                      >
-                        ▶ Start now
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => edit(b)}
-                        className="rounded-md px-2.5 py-1 text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
-                      >
-                        ✏ Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          setSnoozeFor(snoozeFor === b.id ? null : b.id)
-                        }
-                        className="rounded-md px-2.5 py-1 text-[#6b635a] hover:bg-black/5"
-                      >
-                        ⏰ Snooze
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setBlocks(deleteTimeBlock(b.id))}
-                        className="rounded-md px-2.5 py-1 text-[#a85c4a] hover:bg-[#a85c4a]/10"
-                      >
-                        🗑 Delete
-                      </button>
-                    </div>
-                    <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[#6b635a]">
-                      <span>📅 Add to calendar:</span>
-                      <a
-                        href={googleCalUrl(b)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-semibold text-[#1e4f4f] hover:underline"
-                      >
-                        Google
-                      </a>
-                      <a
-                        href={outlookCalUrl(b)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-semibold text-[#1e4f4f] hover:underline"
-                      >
-                        Outlook
-                      </a>
-                      <button
-                        type="button"
-                        onClick={() => downloadIcs(b)}
-                        className="font-semibold text-[#1e4f4f] hover:underline"
-                      >
-                        .ics (Apple / other)
-                      </button>
-                    </div>
-                    {snoozeFor === b.id && (
-                      <div className="mt-2 flex flex-wrap gap-2">
-                        {SNOOZE.map((m) => (
-                          <button
-                            key={m}
-                            type="button"
-                            onClick={() => {
-                              setBlocks(snoozeBlock(b.id, m));
-                              setSnoozeFor(null);
-                            }}
-                            className="rounded-full bg-[#1e4f4f]/10 px-3 py-1 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/20"
-                          >
-                            {m === 120 ? "Later today" : `${m} min`}
-                          </button>
-                        ))}
-                      </div>
-                    )}
-                  </li>
-                ))}
+                {dayBlocks.map((b) => renderBlockCard(b))}
               </ul>
               )}
             </div>
             );
           })}
+        </div>
+      )}
+        </>
+      )}
+
+      {view === "unscheduled" && (
+        <div className="mt-4 flex justify-end">
+          <select
+            value={view}
+            onChange={(e) => setView(e.target.value as Horizon)}
+            className="rounded-full border border-[#c9bfb0] bg-white px-3 py-1.5 text-sm font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+          >
+            {HORIZONS.map((h) => (
+              <option key={h.id} value={h.id}>
+                {h.label}
+              </option>
+            ))}
+          </select>
         </div>
       )}
 

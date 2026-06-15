@@ -1,24 +1,47 @@
 "use client";
 
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
-import { companionAuthConfigStatus } from "@/lib/supabase/companionClient";
+import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
+import { companionAuthConfigStatus, companionAuthMisconfigHint } from "@/lib/supabase/companionClient";
 
 type Mode = "signin" | "signup";
 
-function ConfigBanner() {
-  const { configured, hasUrl, hasAnonKey, anonKeyLooksValid, anonKeyLength } =
-    companionAuthConfigStatus();
-  if (configured && anonKeyLooksValid) return null;
+function envSetupHint(hostname: string): string {
+  if (/localhost|127\.0\.0\.1/.test(hostname)) {
+    return "companion-app/.env.local — then restart npm run dev";
+  }
+  return "Vercel environment variables — then redeploy";
+}
 
+function ConfigBanner() {
+  const { configured: authReady, loading } = useCompanionAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted || loading || authReady) return null;
+
+  const {
+    hasUrl,
+    hasAnonKey,
+    urlLooksValid,
+    anonKeyLooksValid,
+    anonKeyLength,
+  } = companionAuthConfigStatus();
+
+  const misconfigHint = companionAuthMisconfigHint();
   const missing: string[] = [];
   if (!hasUrl) missing.push("NEXT_PUBLIC_SUPABASE_URL");
   if (!hasAnonKey) missing.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
+  const showMissingBanner = missing.length > 0 && !misconfigHint;
 
   return (
     <div className="flex flex-col gap-2">
-      {missing.length > 0 ? (
+      {showMissingBanner ? (
         <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
           Sign-in is almost ready — add{" "}
           {missing.map((name, i) => (
@@ -27,10 +50,25 @@ function ConfigBanner() {
               <code className="rounded bg-white/80 px-1">{name}</code>
             </span>
           ))}{" "}
-          in Vercel, then redeploy.
+          in {envSetupHint(window.location.hostname)}.
         </p>
       ) : null}
-      {hasAnonKey && !anonKeyLooksValid ? (
+      {misconfigHint ? (
+        <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
+          {misconfigHint}
+        </p>
+      ) : null}
+      {hasUrl && !urlLooksValid && !misconfigHint ? (
+        <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
+          <code className="rounded bg-white/80 px-1">NEXT_PUBLIC_SUPABASE_URL</code>{" "}
+          should be your Supabase project URL (e.g.{" "}
+          <code className="rounded bg-white/80 px-1">
+            https://xxxx.supabase.co
+          </code>
+          ), not an API key. Fix in {envSetupHint(window.location.hostname)}.
+        </p>
+      ) : null}
+      {hasAnonKey && !anonKeyLooksValid && !misconfigHint ? (
         <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
           Your Supabase API key does not look right ({anonKeyLength} characters).
           Use the full <strong>Publishable</strong> key from Supabase → Settings →
@@ -40,7 +78,7 @@ function ConfigBanner() {
           <code className="rounded bg-white/80 px-1">
             NEXT_PUBLIC_SUPABASE_ANON_KEY
           </code>
-          , then redeploy.
+          , then restart or redeploy.
         </p>
       ) : null}
     </div>
@@ -59,6 +97,7 @@ export function CompanionSignInForm({
   showClose?: boolean;
 }) {
   const { configured, loading, user, signIn, signUp } = useCompanionAuth();
+  const { t } = useCompanionLanguage();
   const [mode, setMode] = useState<Mode>(initialMode);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -99,11 +138,10 @@ export function CompanionSignInForm({
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault();
-    if (!configured || !companionAuthConfigStatus().anonKeyLooksValid) {
+    if (!configured) {
       setError(
-        companionAuthConfigStatus().anonKeyLooksValid
-          ? "Sign-in is not live yet — the site owner needs to add Supabase URL + key in Vercel."
-          : `Supabase API key does not look valid (${companionAuthConfigStatus().anonKeyLength} characters). Copy the full publishable or legacy anon key from Supabase, paste into Vercel, redeploy.`,
+        companionAuthMisconfigHint() ??
+          "Sign-in is not live yet — add your Supabase anon key in companion-app/.env.local, then restart npm run dev.",
       );
       return;
     }
@@ -148,7 +186,7 @@ export function CompanionSignInForm({
 
       <div>
         <h2 className="text-xl font-semibold text-[#1f1c19]">
-          {mode === "signin" ? "Sign in" : "Create your account"}
+          {mode === "signin" ? t("auth.signIn") : t("auth.signUp")}
         </h2>
         <p className="mt-1 text-sm text-[#6b635a]">
           {mode === "signin"
@@ -171,7 +209,7 @@ export function CompanionSignInForm({
       <form onSubmit={onSubmit} className="flex flex-col gap-3">
         {mode === "signup" ? (
           <label className="flex flex-col gap-1.5 text-sm">
-            <span className="font-medium text-[#4b463f]">Your name</span>
+            <span className="font-medium text-[#4b463f]">{t("auth.yourName")}</span>
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -182,7 +220,7 @@ export function CompanionSignInForm({
           </label>
         ) : null}
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-[#4b463f]">Email</span>
+          <span className="font-medium text-[#4b463f]">{t("auth.email")}</span>
           <input
             type="email"
             required
@@ -193,7 +231,7 @@ export function CompanionSignInForm({
           />
         </label>
         <label className="flex flex-col gap-1.5 text-sm">
-          <span className="font-medium text-[#4b463f]">Password</span>
+          <span className="font-medium text-[#4b463f]">{t("auth.password")}</span>
           <input
             type="password"
             required
@@ -214,8 +252,8 @@ export function CompanionSignInForm({
           {busy
             ? "One moment…"
             : mode === "signin"
-              ? "Sign in"
-              : "Create account"}
+              ? t("auth.signIn")
+              : t("auth.createAccount")}
         </button>
       </form>
 

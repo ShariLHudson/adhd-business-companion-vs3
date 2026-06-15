@@ -200,7 +200,9 @@ export function matchesPendingAcceptance(
       }
       if (
         section === "focus-audio" &&
-        /\b(?:focus audio|music|audio|sounds?|open|yes|sure)\b/i.test(t)
+        /\b(?:focus audio|music|audio|sounds?|calm|calming|motivat|relax|energiz|open|yes|sure)\b/i.test(
+          t,
+        )
       ) {
         return true;
       }
@@ -243,7 +245,9 @@ export function matchesPendingAcceptance(
         }
         if (
           tool === "focus-audio" &&
-          /\b(?:focus audio|music|audio|sounds?|listen)\b/i.test(t)
+          /\b(?:focus audio|music|audio|sounds?|calm|calming|motivat|relax|energiz)\b/i.test(
+            t,
+          )
         ) {
           return true;
         }

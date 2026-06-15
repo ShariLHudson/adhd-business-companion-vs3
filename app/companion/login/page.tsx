@@ -6,13 +6,12 @@ import { useEffect } from "react";
 
 import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
 import { APP_BRAND_LINE } from "@/lib/appSite";
-import { companionAuthConfigStatus } from "@/lib/supabase/companionClient";
-
 export default function CompanionLoginPage() {
   const router = useRouter();
-  const { loading, user } = useCompanionAuth();
-  const { configured: authReady } = companionAuthConfigStatus();
+  const { loading, user, configured: authReady } = useCompanionAuth();
+  const { t } = useCompanionLanguage();
 
   useEffect(() => {
     if (!loading && user) {
@@ -35,7 +34,7 @@ export default function CompanionLoginPage() {
           {APP_BRAND_LINE}
         </p>
         <h1 className="mt-3 text-center text-2xl font-semibold text-[#1f1c19]">
-          Welcome to your ADHD Ecosystem
+          {t("auth.welcome")}
         </h1>
         <p className="mt-2 text-center text-sm text-[#6b635a]">
           Sign in or create your account to get started.

@@ -24,7 +24,8 @@ export type AppSection =
   | "content-generator"
   | "google-workspace"
   | "business-profile"
-  | "client-avatars";
+  | "client-avatars"
+  | "how-do-i";
 
 export type SidebarNavId =
   | "chat"
@@ -35,7 +36,8 @@ export type SidebarNavId =
   | "projects"
   | "templates"
   | "saved-work"
-  | "playbook";
+  | "playbook"
+  | "how-do-i";
 
 export type SidebarToolId =
   | "voice"
@@ -82,10 +84,10 @@ export const MORE_NAV: {
   emoji: string;
   mode?: CoachingMode;
 }[] = [
+  { id: "templates", label: "Templates", emoji: "📚" },
   { id: "playbook", label: "Strategies", emoji: "📘" },
   { id: "projects", label: "Projects", emoji: "📁" },
-  { id: "templates", label: "Templates", emoji: "📚" },
-  { id: "saved-work", label: "Saved Work", emoji: "📂" },
+  { id: "how-do-i", label: "How Do I", emoji: "❓" },
 ];
 
 // Top-level nav items that open their own section (a panel) rather than
@@ -97,6 +99,7 @@ export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
   templates: "templates-library",
   "saved-work": "saved-work",
   playbook: "playbook",
+  "how-do-i": "how-do-i",
 };
 
 export const SIDEBAR_TOOLS: {

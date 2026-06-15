@@ -25,6 +25,7 @@ describe("pendingAction", () => {
       },
       actionBridge: null,
       bridge: null,
+      artifactExportOffer: null,
     });
     expect(pending?.kind).toBe("workspace");
   });
@@ -41,6 +42,7 @@ describe("pendingAction", () => {
       toolSuggestion: null,
       actionBridge: null,
       bridge: null,
+      artifactExportOffer: null,
     })!;
     expect(matchesPendingAcceptance("open time block", pending)).toBe(true);
     expect(matchesPendingAcceptance("schedule it", pending)).toBe(true);
@@ -70,6 +72,7 @@ describe("pendingAction", () => {
       },
       actionBridge: null,
       bridge: null,
+      artifactExportOffer: null,
     })!;
     expect(matchesPendingAcceptance("let me try the breathing then", pending)).toBe(
       true,

@@ -17,4 +17,22 @@ describe("detectAudioRequest", () => {
       "calm-brain",
     );
   });
+
+  it("routes calming audio without extra words", () => {
+    const req = detectAudioRequest("calming audio");
+    expect(req.isAudio).toBe(true);
+    expect(req.categoryId).toBe("calm-brain");
+  });
+
+  it("routes motivation requests to motivation-boost", () => {
+    const req = detectAudioRequest("I need motivation");
+    expect(req.isAudio).toBe(true);
+    expect(req.categoryId).toBe("motivation-boost");
+  });
+
+  it("routes motivational audio phrasing", () => {
+    const req = detectAudioRequest("play something motivational");
+    expect(req.isAudio).toBe(true);
+    expect(req.categoryId).toBe("motivation-boost");
+  });
 });

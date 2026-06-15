@@ -2,6 +2,7 @@
 // "Do it now" should help the user take the next tiny step — not auto-start Focus.
 
 import { assistantSuggestedAction } from "./assistedActionBridge";
+import { parseFocusMinutesFromText } from "./focusDuration";
 
 export type DoItNowKind =
   | "quick-physical"
@@ -108,7 +109,7 @@ export function extractExplicitFocusMinutes(text: string): number | null {
     return 25;
   }
 
-  return null;
+  return parseFocusMinutesFromText(t);
 }
 
 function summarizePhysical(text: string): string {

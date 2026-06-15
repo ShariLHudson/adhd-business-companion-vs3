@@ -107,6 +107,11 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
         matchTerms: ["newsletter"],
       },
       {
+        label: "Presentation",
+        emoji: "📊",
+        matchTerms: ["presentation", "slide deck", "slides", "deck"],
+      },
+      {
         label: "Social Campaign",
         emoji: "📱",
         matchTerms: ["social campaign", "social post", "social media campaign", "caption"],

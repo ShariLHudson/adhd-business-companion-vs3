@@ -41,6 +41,10 @@ export function FocusAudioPanel({
   const [links, setLinks] = useState<AudioLink[]>([]);
   const [howToOpen, setHowToOpen] = useState(false);
 
+  useEffect(() => {
+    if (initialCategory) setCategory(initialCategory);
+  }, [initialCategory]);
+
   // Add-your-own form
   const [myName, setMyName] = useState("");
   const [myUrl, setMyUrl] = useState("");

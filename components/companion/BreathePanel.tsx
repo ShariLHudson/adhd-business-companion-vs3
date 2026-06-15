@@ -110,6 +110,18 @@ function patternLine(p: Pattern): string {
   return p.phases.map((ph) => `${PHASE_WORD[ph.kind]} ${ph.seconds}s`).join(" → ");
 }
 
+type BreathTheme = "calm" | "focus" | "recovery" | "grounding" | "energize";
+
+function breathTheme(mode: Mode, patternId: string): BreathTheme {
+  if (mode === "energize") return "energize";
+  if (patternId === "relax478" || patternId === "calm" || patternId === "belly") {
+    return "recovery";
+  }
+  if (patternId === "coherent") return "grounding";
+  if (patternId === "box") return "focus";
+  return "calm";
+}
+
 function phaseAt(phases: BreathPhase[], elapsed: number) {
   const cycleLen = phases.reduce((s, p) => s + p.seconds, 0) || 1;
   let t = elapsed % cycleLen;
@@ -190,7 +202,8 @@ export function BreathePanel({ onDone }: { onDone?: () => void }) {
 
   const { phase, secondsLeft } = phaseAt(pattern.phases, elapsed);
   const fullness = active ? breathFullness(pattern.phases, elapsed + 1) : 0.6;
-  const orbScale = 0.5 + 0.5 * fullness;
+  const orbScale = 0.55 + 0.45 * fullness;
+  const theme = breathTheme(mode, pattern.id);
 
   const remaining = Math.max(0, total - elapsed);
   const timeLabel = `${Math.floor(remaining / 60)}:${String(remaining % 60).padStart(2, "0")}`;
@@ -287,28 +300,39 @@ export function BreathePanel({ onDone }: { onDone?: () => void }) {
         </div>
 
         {/* Breathing circle */}
-        <div
-          className="presence-breathe mt-8 flex h-44 w-44 items-center justify-center rounded-full border-4 border-white shadow-xl"
-          style={{
-            transform: `scale(${orbScale})`,
-            transitionProperty: "transform",
-            transitionTimingFunction: active ? "linear" : "ease-out",
-            transitionDuration: active ? "1000ms" : "600ms",
-          }}
-        >
-          <div>
-            <p className="text-2xl font-bold text-[#1e4f4f]">
-              {active
-                ? PHASE_LABEL[phase.kind]
-                : completed
-                  ? "Nicely done"
-                  : "Ready"}
-            </p>
-            {active && (
-              <p className="mt-1 font-mono text-5xl font-bold tabular-nums text-[#1e4f4f]">
-                {secondsLeft}
+        <div className="breathe-orb-wrap">
+          <div
+            className={`breathe-orb-pulse breathe-orb-pulse--${theme}`}
+            style={{
+              transform: `scale(${orbScale})`,
+              transition: active
+                ? "transform 1000ms linear"
+                : "transform 600ms ease-out",
+            }}
+          />
+          <div
+            className={`breathe-orb breathe-orb--${theme}`}
+            style={{
+              transform: `scale(${orbScale})`,
+              transitionProperty: "transform",
+              transitionTimingFunction: active ? "linear" : "ease-out",
+              transitionDuration: active ? "1000ms" : "600ms",
+            }}
+          >
+            <div>
+              <p className="breathe-orb-label text-2xl font-bold">
+                {active
+                  ? PHASE_LABEL[phase.kind]
+                  : completed
+                    ? "Nicely done"
+                    : "Ready"}
               </p>
-            )}
+              {active && (
+                <p className="breathe-orb-count mt-1 font-mono text-5xl font-bold tabular-nums">
+                  {secondsLeft}
+                </p>
+              )}
+            </div>
           </div>
         </div>
 

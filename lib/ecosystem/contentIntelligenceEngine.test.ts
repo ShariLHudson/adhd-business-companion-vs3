@@ -33,10 +33,10 @@ describe("ContentIntelligenceEngine", () => {
   it("creates opportunities from categorized inputs", () => {
     const engine = new ContentIntelligenceEngine(new MemoryContentOpportunitySink());
     const opportunities = engine.ingest({
-      struggles: [{ key: "overwhelm", count: 200 }],
-      questions: [{ key: "im_overwhelmed", count: 127 }],
-      userLanguage: [{ key: "overwhelm", count: 80 }],
-      productFeedback: [{ key: "overwhelm", count: 20 }],
+      struggles: [{ type: "user_struggle", key: "overwhelm", count: 200 }],
+      questions: [{ type: "user_question", key: "im_overwhelmed", count: 127 }],
+      userLanguage: [{ type: "user_language", key: "overwhelm", count: 80 }],
+      productFeedback: [{ type: "product_feedback", key: "overwhelm", count: 20 }],
     });
 
     expect(opportunities.length).toBeGreaterThan(0);
@@ -51,9 +51,9 @@ describe("ContentIntelligenceEngine", () => {
   it("ranks topics by opportunity score", () => {
     const engine = new ContentIntelligenceEngine(new MemoryContentOpportunitySink());
     engine.ingest({
-      struggles: [{ key: "focus", count: 12 }],
-      questions: [{ key: "help_me_prioritize", count: 80 }],
-      featureRequests: [{ key: "calendar_integration", count: 45 }],
+      struggles: [{ type: "user_struggle", key: "focus", count: 12 }],
+      questions: [{ type: "user_question", key: "help_me_prioritize", count: 80 }],
+      featureRequests: [{ type: "feature_request", key: "calendar_integration", count: 45 }],
     });
 
     const ranked = engine.getRankedOpportunities();
@@ -68,9 +68,9 @@ describe("ContentIntelligenceEngine", () => {
   it("suggests asset categories without generating content", () => {
     const engine = new ContentIntelligenceEngine(new MemoryContentOpportunitySink());
     engine.ingest({
-      struggles: [{ key: "overwhelm", count: 427 }],
-      questions: [{ key: "im_overwhelmed", count: 50 }],
-      userLanguage: [{ key: "overwhelm", count: 30 }],
+      struggles: [{ type: "user_struggle", key: "overwhelm", count: 427 }],
+      questions: [{ type: "user_question", key: "im_overwhelmed", count: 50 }],
+      userLanguage: [{ type: "user_language", key: "overwhelm", count: 30 }],
     });
 
     const opp = engine.getOpportunityByTopic("Overwhelm");
@@ -86,8 +86,8 @@ describe("ContentIntelligenceEngine", () => {
   it("exports PostCraft-ready payload", () => {
     const engine = new ContentIntelligenceEngine(new MemoryContentOpportunitySink());
     engine.ingest({
-      struggles: [{ key: "marketing", count: 40 }],
-      featureRequests: [{ key: "templates", count: 15 }],
+      struggles: [{ type: "user_struggle", key: "marketing", count: 40 }],
+      featureRequests: [{ type: "feature_request", key: "templates", count: 15 }],
     });
 
     const payload = engine.toPostCraftPayload();

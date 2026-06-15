@@ -27,6 +27,7 @@ import {
   normalizeCategory,
 } from "@/lib/brainDumpCategories";
 import type { AppSection } from "@/lib/companionUi";
+import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
 type TimeFilter = "today" | "week" | "month" | "30d" | "90d" | "all";
 
@@ -222,6 +223,7 @@ export function BrainDumpPanel({
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+      <WorkspaceGuide section="brain-dump" />
       <p className="text-2xl font-semibold text-[#1f1c19]">Clear My Mind</p>
       <p className="mt-2 text-base text-[#6b635a]">
         Get it out of your head. I&apos;ll sort it and tell you what wants to

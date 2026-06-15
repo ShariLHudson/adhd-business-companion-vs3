@@ -9,6 +9,11 @@ import {
   normalizeLanguageCommunication,
   type LanguageCommunicationPrefs,
 } from "./companionLanguage";
+import {
+  extractLanguagePrefs,
+  languagePrefsPatch,
+  pushLanguagePrefsToUser,
+} from "./companionUserLanguage";
 import { createCatalogTypeLabels } from "./createCatalog";
 
 export type {
@@ -22,14 +27,13 @@ export {
   normalizeLanguageCommunication,
   languageCommunicationSummary,
   getOutputLanguageContext,
-  hasPendingLanguagePreferences,
-  languageOptionLabel,
-  getLanguageOption,
-  isLanguageAvailable,
-  PENDING_LANGUAGE_NOTICE,
   LANGUAGE_OPTIONS,
   REGION_OPTIONS,
   DATE_FORMAT_OPTIONS,
+  withUnifiedAppLanguage,
+  speechLocaleForLanguage,
+  getInterfaceLanguageCode,
+  isRtlLanguage,
 } from "./companionLanguage";
 
 export type StoredMessage = {
@@ -1539,17 +1543,27 @@ export function getTimeBlocks(): TimeBlock[] {
   return sortBlocks(readBlocks());
 }
 
-// Upcoming scheduled blocks for a project (today onward, not finished/missed).
-// Projects are the source of truth; this is how a project shows its sessions.
+// Upcoming and bank blocks for a project — assignment does not remove from Time Bank.
 export function timeBlocksForProject(projectId: string): TimeBlock[] {
-  const today = todayStr();
   return getTimeBlocks().filter(
     (b) =>
       b.projectId === projectId &&
-      b.date >= today &&
       b.status !== "completed" &&
       b.status !== "missed",
   );
+}
+
+/** Scheduled project blocks (dated, today onward). */
+export function scheduledBlocksForProject(projectId: string): TimeBlock[] {
+  const today = todayStr();
+  return timeBlocksForProject(projectId).filter(
+    (b) => b.date && b.date >= today,
+  );
+}
+
+/** Unscheduled blocks assigned to a project — still in Time Bank. */
+export function bankBlocksForProject(projectId: string): TimeBlock[] {
+  return timeBlocksForProject(projectId).filter((b) => !b.date);
 }
 
 export function saveTimeBlock(
@@ -1872,7 +1886,140 @@ export function saveProject(
 export function deleteProject(id: string): Project[] {
   const next = readProjects().filter((p) => p.id !== id);
   writeProjects(next);
+  deleteProjectItemsForProject(id);
   return next;
+}
+
+// ---- Project breakdown (sections → tasks → subtasks) ----------------------
+
+export type ProjectItemKind = "section" | "task" | "subtask";
+
+export type ProjectItem = {
+  id: string;
+  projectId: string;
+  parentId?: string;
+  kind: ProjectItemKind;
+  title: string;
+  done: boolean;
+  sortOrder: number;
+  createdAt: string;
+};
+
+const PROJECT_ITEMS_KEY = "companion-project-items-v1";
+
+function readProjectItems(): ProjectItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(PROJECT_ITEMS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (i): i is ProjectItem =>
+        i &&
+        typeof i.id === "string" &&
+        typeof i.projectId === "string" &&
+        typeof i.title === "string",
+    );
+  } catch {
+    return [];
+  }
+}
+
+function writeProjectItems(list: ProjectItem[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(PROJECT_ITEMS_KEY, JSON.stringify(list));
+  } catch {
+    /* noop */
+  }
+}
+
+export function getProjectItems(projectId?: string): ProjectItem[] {
+  const list = readProjectItems();
+  const filtered = projectId
+    ? list.filter((i) => i.projectId === projectId)
+    : list;
+  return filtered.sort((a, b) => a.sortOrder - b.sortOrder);
+}
+
+export function saveProjectItem(
+  input: Partial<ProjectItem> & {
+    projectId: string;
+    kind: ProjectItemKind;
+    title: string;
+    parentId?: string;
+  },
+): ProjectItem[] {
+  const list = readProjectItems();
+  const now = new Date().toISOString();
+  if (input.id) {
+    const next = list.map((i) =>
+      i.id === input.id ? { ...i, ...input, title: input.title.trim() || i.title } : i,
+    );
+    writeProjectItems(next);
+    return next.filter((i) => i.projectId === input.projectId);
+  }
+  const siblings = list.filter(
+    (i) =>
+      i.projectId === input.projectId && i.parentId === input.parentId,
+  );
+  const item: ProjectItem = {
+    id: newId(),
+    projectId: input.projectId,
+    parentId: input.parentId,
+    kind: input.kind,
+    title: input.title.trim() || "Untitled",
+    done: false,
+    sortOrder: siblings.length,
+    createdAt: now,
+  };
+  const next = [...list, item];
+  writeProjectItems(next);
+  return next.filter((i) => i.projectId === input.projectId);
+}
+
+export function toggleProjectItemDone(id: string): ProjectItem[] {
+  const list = readProjectItems();
+  const target = list.find((i) => i.id === id);
+  if (!target) return list;
+  const next = list.map((i) =>
+    i.id === id ? { ...i, done: !i.done } : i,
+  );
+  writeProjectItems(next);
+  return next.filter((i) => i.projectId === target.projectId);
+}
+
+export function deleteProjectItem(id: string): ProjectItem[] {
+  const list = readProjectItems();
+  const target = list.find((i) => i.id === id);
+  if (!target) return list;
+  const removeIds = new Set<string>([id]);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const i of list) {
+      if (i.parentId && removeIds.has(i.parentId) && !removeIds.has(i.id)) {
+        removeIds.add(i.id);
+        changed = true;
+      }
+    }
+  }
+  const next = list.filter((i) => !removeIds.has(i.id));
+  writeProjectItems(next);
+  return next.filter((i) => i.projectId === target.projectId);
+}
+
+function deleteProjectItemsForProject(projectId: string) {
+  const next = readProjectItems().filter((i) => i.projectId !== projectId);
+  writeProjectItems(next);
+}
+
+/** Open tasks and subtasks across active projects — for Day Designer. */
+export function getOpenProjectTasks(limit = 12): ProjectItem[] {
+  return readProjectItems()
+    .filter((i) => (i.kind === "task" || i.kind === "subtask") && !i.done)
+    .slice(0, limit);
 }
 
 // ---- Continue memory -----------------------------------------------------
@@ -1950,8 +2097,8 @@ export type AiTone =
   | "encouraging"
   | "playful";
 
-// Color: none, meaning-based (color encodes type), or decorative (meaning +
-// tinted surfaces). Legacy "light"/"full" values are normalized on read.
+// Color: none, meaning-based (fixed category colors), or dynamic (adaptive
+// tints + brighter accents). Legacy "light"/"full" values normalize on read.
 export type VisualMode = "off" | "meaning" | "decorative";
 
 // How much weekly pattern reflection the user wants.
@@ -2052,8 +2199,12 @@ export function savePrefs(update: Partial<Prefs>): Prefs {
   if (typeof window !== "undefined") {
     try {
       localStorage.setItem(PREFS_KEY, JSON.stringify(next));
+      window.dispatchEvent(new Event("companion-prefs-updated"));
     } catch {
       /* noop */
+    }
+    if (languagePrefsPatch(update)) {
+      void pushLanguagePrefsToUser(extractLanguagePrefs(next));
     }
   }
   return next;

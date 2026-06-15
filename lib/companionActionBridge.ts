@@ -91,7 +91,7 @@ export function detectActionBridge(assistantText: string): ActionBridge | null {
   }
 
   if (
-    /\b(focus audio|open (?:the )?audio|background (?:music|sounds?)|calming (?:music|sounds?)|relaxing (?:music|audio|sounds?)|concentration music)\b/i.test(
+    /\b(focus audio|open (?:the )?audio|background (?:music|sounds?)|calming (?:music|sounds?|audio)|relaxing (?:music|audio|sounds?)|motivation(?:al)? (?:music|audio|sounds?)|concentration music)\b/i.test(
       lower,
     )
   ) {
