@@ -4,7 +4,6 @@ import {
   getRecentWorkItems,
   type RecentWorkItem,
 } from "./companionStore";
-import { sortByDropdownLabel } from "./dropdownSort";
 
 const HOME_RECENT_MAX = 8;
 
@@ -61,11 +60,11 @@ export function collectHomeRecentWork(): RecentWorkItem[] {
     .slice(0, HOME_RECENT_MAX);
 }
 
-/** Display order for the resume list — alphabetical by title for scanning. */
+/** Display order for the resume list — most recently active first. */
 export function sortHomeRecentWorkForDisplay(
   items: RecentWorkItem[],
 ): RecentWorkItem[] {
-  return sortByDropdownLabel(items, (i) => i.title);
+  return [...items].sort((a, b) => b.ts.localeCompare(a.ts));
 }
 
 export function recentWorkToLastActivity(

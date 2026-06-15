@@ -44,8 +44,6 @@ type IdentityBarProps = {
   welcomeLine?: string | null;
   /** Dismiss the welcome line for today (cognitive load offer). */
   onDismissWelcome?: () => void;
-  /** One-line memory cue — calm home only. */
-  memoryCue?: string | null;
   /** Primary question on calm home — replaces status line. */
   primaryQuestion?: string | null;
 };
@@ -64,7 +62,6 @@ export function IdentityBar({
   recognitionWin = false,
   welcomeLine = null,
   onDismissWelcome,
-  memoryCue = null,
   primaryQuestion = null,
 }: IdentityBarProps) {
   const status = primaryQuestion
@@ -178,9 +175,6 @@ export function IdentityBar({
           Hi, I&apos;m Shari
         </p>
         <p className="mt-0.5 text-base text-[#1e4f4f]">{BRAND.tagline}</p>
-        {memoryCue ? (
-          <p className="mt-2 text-sm italic text-[#6b635a]">{memoryCue}</p>
-        ) : null}
         {resumeLine && onResumeClick ? (
           <button
             type="button"

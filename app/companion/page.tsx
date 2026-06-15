@@ -21,10 +21,8 @@ import { SpinWheelPanel } from "@/components/companion/SpinWheelPanel";
 import { FocusAudioPanel } from "@/components/companion/FocusAudioPanel";
 import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
-import { markUserOnboarded } from "@/lib/companionOnboarding";
-import { HomeOnboardingOffer } from "@/components/companion/HomeOnboardingOffer";
+import { HomeResumeLink } from "@/components/companion/HomeResumeLink";
 import { discoveryContextForChat } from "@/lib/companionDiscovery";
-import { memoryCueFromLastActivity } from "@/lib/homeMemoryCue";
 import { useVisualMode } from "@/lib/useVisualMode";
 import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import type { ProfileSettingsSection } from "@/components/companion/ProfilePanel";
@@ -934,12 +932,6 @@ export default function CompanionPage() {
     }
     setLastAct(last);
   }, [activeSection]);
-
-  const homeMemoryCue = useMemo(
-    () =>
-      homeCalm && hasChatted ? memoryCueFromLastActivity(lastAct) : null,
-    [homeCalm, hasChatted, lastAct],
-  );
 
   // Soft execution bridge — ONE chip offered after a chat reply when the
   // conversation implied a deliverable but the user didn't command it.
@@ -5525,7 +5517,6 @@ export default function CompanionPage() {
                         }
                       : undefined
                 }
-                memoryCue={homeMemoryCue}
                 primaryQuestion={
                   homeCalm ? "What feels most important right now?" : null
                 }
@@ -5863,16 +5854,12 @@ export default function CompanionPage() {
                     }
                   />
                   {homeCalm ? (
-                    <HomeOnboardingOffer
-                      userId={user?.id}
-                      onSetup={() => {
-                        if (user?.id) markUserOnboarded(user.id);
-                        setProfileGettingToKnowYou(true);
-                        setOverlay("profile");
-                      }}
+                    <HomeResumeLink
+                      refreshKey={`${activeSection}-${lastAct?.ts ?? ""}`}
+                      onResume={(item) => continueWork(item)}
                     />
                   ) : null}
-                  {(homeCalm || !isIdle) && (
+                  {!homeCalm && (
                   <div className="mt-2 flex flex-col items-center justify-center gap-1">
                     <div className="flex items-center justify-center gap-3">
                       {(() => {

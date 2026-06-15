@@ -12,11 +12,26 @@ function item(
 }
 
 describe("homeRecentWork", () => {
-  it("sorts resume list alphabetically by title", () => {
+  it("sorts resume list by most recently active first", () => {
     const sorted = sortHomeRecentWorkForDisplay([
-      item({ id: "1", kind: "project", title: "VIP Offer" }),
-      item({ id: "2", kind: "project", title: "ADHD Workshop" }),
-      item({ id: "3", kind: "chat", title: "Membership Launch" }),
+      item({
+        id: "1",
+        kind: "project",
+        title: "VIP Offer",
+        ts: "2026-06-08T12:00:00.000Z",
+      }),
+      item({
+        id: "2",
+        kind: "project",
+        title: "ADHD Workshop",
+        ts: "2026-06-12T12:00:00.000Z",
+      }),
+      item({
+        id: "3",
+        kind: "chat",
+        title: "Membership Launch",
+        ts: "2026-06-10T12:00:00.000Z",
+      }),
     ]);
     expect(sorted.map((i) => i.title)).toEqual([
       "ADHD Workshop",
