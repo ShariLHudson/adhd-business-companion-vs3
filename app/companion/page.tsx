@@ -16,7 +16,7 @@ import {
   type ActiveWorkspaceItem,
 } from "@/components/companion/ActiveWorkspaceBar";
 import { FocusAreaPanel } from "@/components/companion/FocusAreaPanel";
-import { GamesPanel } from "@/components/companion/GamesPanel";
+import { CompanionActivitiesPanel } from "@/components/companion/CompanionActivitiesPanel";
 import { SpinWheelPanel } from "@/components/companion/SpinWheelPanel";
 import { FocusAudioPanel } from "@/components/companion/FocusAudioPanel";
 import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
@@ -303,6 +303,7 @@ import {
 } from "@/lib/savedArtifact";
 import {
   getSavedWorkById,
+  deleteSavedWork,
   searchSavedWork,
   type SavedWorkItem,
 } from "@/lib/savedWorkStore";
@@ -714,6 +715,27 @@ export default function CompanionPage() {
     setRecoveryOfferLine(null);
     setActivationOffer(null);
     setLoopOffer(null);
+    setRelationshipOffer(null);
+    setDecisionOffer(null);
+    setEnvironmentOffer(null);
+    setFutureShariOffer(null);
+    setMomentumOffer(null);
+    setOpportunityOffer(null);
+    setBusinessOSSortOffer(null);
+    setChiefOffer(null);
+    setPredictiveOffer(null);
+    setDayPlanView(null);
+    setDayDesignerSession(null);
+    setDayDesignerQuestion(null);
+    setRecognitionMoment(null);
+    setCognitiveLoad(null);
+    setUserHealth(null);
+    setRecovery(null);
+    setBridge(null);
+    setToolSuggestion(null);
+    setActionBridge(null);
+    setWorkspaceOffer(null);
+    setAssistedActionOffer(null);
   }, [homeCalm]);
 
   const hasInlineIntelligenceOffer = Boolean(
@@ -739,7 +761,11 @@ export default function CompanionPage() {
     return detectEmotionalState(signal);
   }, [input, messages]);
 
-  const displayEmotion = isIdle ? liveEmotion : emotion;
+  const displayEmotion = homeCalm
+    ? "unclear"
+    : isIdle
+      ? liveEmotion
+      : emotion;
   const stateHint = getStateHint(displayEmotion);
   const shellClass = EMOTION_SHELL_CLASS[displayEmotion];
 
@@ -791,25 +817,28 @@ export default function CompanionPage() {
   }, []);
 
   useEffect(() => {
-    if (!hydrated || !isIdle) {
+    if (!hydrated || !isIdle || homeCalm) {
       setRecognitionMoment(null);
       return;
     }
     refreshRecognition();
-  }, [hydrated, isIdle, refreshRecognition]);
+  }, [hydrated, isIdle, homeCalm, refreshRecognition]);
 
   useEffect(() => {
+    if (!hydrated || !isIdle || homeCalm) return;
     const onUpdate = () => {
-      if (hydrated && isIdle) refreshRecognition();
+      if (hydrated && isIdle && !homeCalm) refreshRecognition();
     };
     window.addEventListener(RECOGNITION_UPDATED_EVENT, onUpdate);
     return () =>
       window.removeEventListener(RECOGNITION_UPDATED_EVENT, onUpdate);
-  }, [hydrated, isIdle, refreshRecognition]);
+  }, [hydrated, isIdle, homeCalm, refreshRecognition]);
 
   useEffect(() => {
-    if (!hydrated || !isIdle) {
+    if (!hydrated || !isIdle || homeCalm) {
       setCognitiveLoad(null);
+      setUserHealth(null);
+      setRecovery(null);
       return;
     }
     const result = evaluateAndRecordCognitiveLoad({
@@ -844,7 +873,7 @@ export default function CompanionPage() {
         recognitionRecent: Boolean(recognitionMoment),
       }),
     );
-  }, [hydrated, isIdle, displayEmotion, input, messages, activationOffer?.state, loopOffer?.loopType, recognitionMoment]);
+  }, [hydrated, isIdle, homeCalm, displayEmotion, input, messages, activationOffer?.state, loopOffer?.loopType, recognitionMoment]);
 
   useEffect(() => {
     if (!hydrated || !isIdle || homeCalm) {
@@ -2586,8 +2615,8 @@ export default function CompanionPage() {
       case "time-block":
         openWorkspaceBesideChat("time-block", workspaceOpenAck("time-block"));
         break;
-      case "games":
-        setActiveSection("games");
+      case "activities":
+        setActiveSection("activities");
         break;
       case "spin-wheel":
         setActiveSection("spin-wheel");
@@ -4779,7 +4808,7 @@ export default function CompanionPage() {
     applyWorkspaceFocus(field);
   }
 
-  function closeWorkspacePanel() {
+  function closeWorkspacePanel(opts?: { preserveCreateSession?: boolean }) {
     const returnTo = companionReturnSectionRef.current;
     companionReturnSectionRef.current = null;
     setWorkspaceFirstSplit(false);
@@ -4789,7 +4818,9 @@ export default function CompanionPage() {
     setCreationContext(null);
     setSavedArtifact(null);
     setGoogleWorkspace(null);
-    clearCreateSession();
+    if (!opts?.preserveCreateSession) {
+      clearCreateSession();
+    }
     // Explicit close = the workspace is gone. Clear its recovery state and stop
     // referencing it in chat (no lingering "X is open beside us").
     clearWorkspaceSession();
@@ -4805,6 +4836,37 @@ export default function CompanionPage() {
       setActiveNav("chat");
     }
     setChatLayoutMode("split");
+  }
+
+  function saveCreateForLater() {
+    closeWorkspacePanel({ preserveCreateSession: true });
+  }
+
+  function startOverCreate() {
+    clearCreateSession();
+    setGenSeed(null);
+    setCreationContext(null);
+    setSavedArtifact(null);
+    setCreateExportReady(false);
+  }
+
+  function deleteCreateDraft() {
+    const record =
+      savedArtifactRef.current ?? loadCreateSession()?.savedArtifact ?? null;
+    const id = record?.savedWorkId ?? record?.templateId;
+    if (id) deleteSavedWork(id);
+    clearCreateSession();
+    clearLastActivity();
+    setGenSeed(null);
+    setCreationContext(null);
+    setSavedArtifact(null);
+    setCreateExportReady(false);
+    if (workspacePanel) {
+      closeWorkspacePanel();
+    } else {
+      setActiveSection("home");
+      setActiveNav("chat");
+    }
   }
 
   function renderWorkspacePanel(section: AppSection) {
@@ -4833,6 +4895,9 @@ export default function CompanionPage() {
             }}
             lockedArtifactType={lockedArtifactType}
             onChangeType={() => setCreationContext(null)}
+            onSaveForLater={saveCreateForLater}
+            onStartOver={startOverCreate}
+            onDeleteDraft={deleteCreateDraft}
             exportTrigger={exportTrigger}
             onExportTriggerHandled={() => setExportTrigger(null)}
             onOpenSection={openWorkspaceFromSection}
@@ -5467,6 +5532,7 @@ export default function CompanionPage() {
               <IdentityBar
                 emotion={displayEmotion}
                 compact={!isIdle}
+                calmHome={homeCalm}
                 photoError={photoError}
                 logoError={logoError}
                 onPhotoError={() => setPhotoError(true)}
@@ -5999,8 +6065,8 @@ export default function CompanionPage() {
             </WorkspaceShell>
           )}
 
-          {activeSection === "games" && (
-            <GamesPanel onOpen={(s) => setActiveSection(s)} />
+          {activeSection === "activities" && (
+            <CompanionActivitiesPanel onOpen={(s) => setActiveSection(s)} />
           )}
 
           {activeSection === "spin-wheel" && (
@@ -6136,6 +6202,12 @@ export default function CompanionPage() {
                     },
                   ]);
                 }}
+                onSaveForLater={() => {
+                  setActiveSection("home");
+                  setActiveNav("chat");
+                }}
+                onStartOver={startOverCreate}
+                onDeleteDraft={deleteCreateDraft}
               />
             </WorkspaceShell>
           )}

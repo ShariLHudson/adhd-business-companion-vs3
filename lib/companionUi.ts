@@ -16,7 +16,7 @@ export type AppSection =
   | "focus"
   | "progress"
   | "time-block"
-  | "games"
+  | "activities"
   | "spin-wheel"
   | "email-generator"
   | "snippets"
@@ -48,7 +48,7 @@ export type SidebarToolId =
   | "reset-day"
   | "new-chat"
   | "time-block"
-  | "games"
+  | "activities"
   | "spin-wheel";
 
 export const ASSETS = {
@@ -59,7 +59,7 @@ export const ASSETS = {
 
 export const BRAND = {
   name: "Spark Studio Companions",
-  tagline: "Your coach & Companion",
+  tagline: "Your Coach & Companion",
 } as const;
 
 // Primary doors — what a first-time, overwhelmed user sees. Three only.
@@ -186,7 +186,7 @@ export const TOOL_SECTION: Partial<Record<SidebarToolId, AppSection>> = {
   breathe: "breathe",
   "focus-audio": "focus-audio",
   "time-block": "time-block",
-  games: "games",
+  activities: "activities",
   "spin-wheel": "spin-wheel",
 };
 

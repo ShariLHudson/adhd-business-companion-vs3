@@ -37,7 +37,7 @@ export function HomeResumeLink({
         aria-expanded={open}
         className="text-sm font-semibold text-[#1e4f4f] hover:text-[#163a3a]"
       >
-        📌 Continue Previous Work {open ? "▲" : "▼"}
+        📌 Continue Building {open ? "▲" : "▼"}
       </button>
       {open ? (
         <ul className="companion-fade-in mt-2 flex flex-col gap-1.5">

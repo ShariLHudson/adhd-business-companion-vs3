@@ -24,6 +24,8 @@ const RING: Record<EmotionalState, string> = {
 
 type IdentityBarProps = {
   emotion: EmotionalState;
+  /** Calm home landing — greeting + question only; no coaching copy. */
+  calmHome?: boolean;
   photoError: boolean;
   logoError: boolean;
   onPhotoError: () => void;
@@ -55,6 +57,7 @@ export function IdentityBar({
   resumeLine,
   onResumeClick,
   compact = false,
+  calmHome = false,
   userBirthday = null,
   recognitionMoment = null,
   recoveryMode = false,
@@ -64,12 +67,17 @@ export function IdentityBar({
   onDismissWelcome,
   primaryQuestion = null,
 }: IdentityBarProps) {
-  const status = primaryQuestion
-    ? primaryQuestion
+  const effectiveWelcome = calmHome ? null : welcomeLine;
+  const effectivePrimary =
+    calmHome
+      ? (primaryQuestion ?? "What feels most important right now?")
+      : primaryQuestion;
+  const status = effectivePrimary
+    ? effectivePrimary
     : resumeLine
       ? resumeLine
-      : welcomeLine
-        ? welcomeLine
+      : effectiveWelcome
+        ? effectiveWelcome
         : emotion === "unclear"
           ? "Tell me how I can help"
           : (PRESENCE_LINES[emotion] ?? "I'm here with you");
@@ -87,17 +95,21 @@ export function IdentityBar({
     const milestoneCelebration = isAppAnniversaryToday(memberSince, now)
       ? ("app_anniversary" as const)
       : null;
-    const base = recognitionToShariPresence(recognitionMoment, {
-      now,
-      emotion,
-      userBirthday,
-      milestoneCelebration,
-      recoveryMode,
-      focusMode,
-      recognitionWin,
-    });
+    const base = recognitionToShariPresence(
+      calmHome ? null : recognitionMoment,
+      {
+        now,
+        emotion,
+        userBirthday,
+        milestoneCelebration,
+        recoveryMode: calmHome ? false : recoveryMode,
+        focusMode: calmHome ? false : focusMode,
+        recognitionWin: calmHome ? false : recognitionWin,
+      },
+    );
     return getShariImageState(base);
   }, [
+    calmHome,
     emotion,
     memberSince,
     userBirthday,
@@ -187,14 +199,14 @@ export function IdentityBar({
           <>
             <p
               className={`mt-2 text-lg ${
-                primaryQuestion
+                effectivePrimary || calmHome
                   ? "font-semibold text-[#1f1c19] not-italic"
                   : "italic text-[#6b635a]"
               }`}
             >
               {status}
             </p>
-            {welcomeLine && onDismissWelcome ? (
+            {effectiveWelcome && onDismissWelcome ? (
               <button
                 type="button"
                 onClick={onDismissWelcome}

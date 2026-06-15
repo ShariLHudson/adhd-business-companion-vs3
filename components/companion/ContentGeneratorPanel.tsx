@@ -26,6 +26,11 @@ import {
   type ArtifactExportAction,
 } from "@/lib/artifactType";
 import { CreateDraftImprove } from "@/components/companion/CreateDraftImprove";
+import { ConfirmDialog } from "@/components/companion/ConfirmDialog";
+import {
+  CreateOptionsMenu,
+  type CreateOptionsAction,
+} from "@/components/companion/CreateOptionsMenu";
 import { ArtifactWorkspaceHeader } from "@/components/companion/ArtifactWorkspaceHeader";
 import { ArtifactReadyPanel } from "@/components/companion/ArtifactReadyPanel";
 import { ProjectPickerModal } from "@/components/companion/ProjectPickerModal";
@@ -112,6 +117,9 @@ export function ContentGeneratorPanel({
   savedArtifact,
   onSavedArtifactChange,
   onChangeType,
+  onSaveForLater,
+  onStartOver,
+  onDeleteDraft,
   onOpenGoogleWorkspace,
   onArtifactReady,
   onExportGuidance,
@@ -142,6 +150,9 @@ export function ContentGeneratorPanel({
   onSavedArtifactChange?: (record: SavedArtifactRecord) => void;
   /** Unlock a wrongly-locked artifact type so the user can pick again. */
   onChangeType?: () => void;
+  onSaveForLater?: () => void;
+  onStartOver?: () => void;
+  onDeleteDraft?: () => void;
   onOpenGoogleWorkspace?: (session: GoogleWorkspaceSession) => void;
   onArtifactReady?: (message: string) => void;
   onExportGuidance?: (message: string) => void;
@@ -163,6 +174,7 @@ export function ContentGeneratorPanel({
   const [phase, setPhase] = useState<"building" | "ready">("building");
   const [createSearch, setCreateSearch] = useState("");
   const [workflow, setWorkflow] = useState<CreateWorkflowState>(EMPTY_CREATE_WORKFLOW);
+  const [confirmDeleteDraft, setConfirmDeleteDraft] = useState(false);
   const started = useRef(false);
   const lastSeedSig = useRef("");
   // Zero-hop: opened from chat with a clear type → straight to writing, never
@@ -590,8 +602,69 @@ export function ContentGeneratorPanel({
     void run(type, briefText, tone);
   }
 
+  function resetLocalCreateState() {
+    setType("");
+    setDraft("");
+    setTopic("");
+    setBrief("");
+    setTitle("");
+    setEditingTopic(false);
+    setWorkflow(EMPTY_CREATE_WORKFLOW);
+    setPhase("building");
+    started.current = false;
+    lastSeedSig.current = "";
+  }
+
+  function handleChangeType() {
+    if (onChangeType) {
+      onChangeType();
+      return;
+    }
+    resetLocalCreateState();
+  }
+
+  function handleCreateOption(action: CreateOptionsAction) {
+    if (action === "change-type") {
+      handleChangeType();
+      return;
+    }
+    if (action === "save-for-later") {
+      if (draft.trim()) handleSave();
+      onSaveForLater?.();
+      if (!onSaveForLater) note("Saved — pick this up anytime from Create.");
+      return;
+    }
+    if (action === "start-over") {
+      resetLocalCreateState();
+      onStartOver?.();
+      if (!onStartOver) note("Fresh start — choose what to create.");
+      return;
+    }
+    if (action === "delete-draft") {
+      setConfirmDeleteDraft(true);
+    }
+  }
+
+  const showCreateOptions =
+    workspaceMode || Boolean(type) || workflow.step !== "category" || Boolean(draft);
+
   return (
     <div className="companion-fade-in flex h-full min-h-0 flex-col">
+      <ConfirmDialog
+        open={confirmDeleteDraft}
+        title="Delete this draft permanently?"
+        message="This cannot be undone."
+        confirmLabel="Delete"
+        cancelLabel="Cancel"
+        destructive
+        onCancel={() => setConfirmDeleteDraft(false)}
+        onConfirm={() => {
+          setConfirmDeleteDraft(false);
+          resetLocalCreateState();
+          onDeleteDraft?.();
+          if (!onDeleteDraft) note("Draft removed.");
+        }}
+      />
       {!workspaceMode && (
         <WorkspaceSopProgress session={sopSession ?? null} />
       )}
@@ -600,6 +673,20 @@ export function ContentGeneratorPanel({
           workspaceMode ? "" : "mx-auto max-w-2xl overflow-y-auto px-6 py-8"
         }`}
       >
+      {showCreateOptions && (
+        <div
+          className={`flex shrink-0 items-center justify-end ${
+            workspaceMode
+              ? "border-b border-[#e7dfd4] bg-[#faf7f2]/98 px-4 py-2"
+              : "mb-3"
+          }`}
+        >
+          <CreateOptionsMenu
+            onAction={handleCreateOption}
+            changeTypeDisabled={typeLocked}
+          />
+        </div>
+      )}
       {!(workspaceMode && showDraftEditor) && !type && workflow.step === "category" && (
         <>
           <WorkspaceGuide section="content-generator" />
@@ -621,22 +708,6 @@ export function ContentGeneratorPanel({
               </>
             ) : null}
           </p>
-          {!typeLocked && (
-            <button
-              type="button"
-              onClick={() => {
-                setType("");
-                setDraft("");
-                setTopic("");
-                setBrief("");
-                setEditingTopic(false);
-                setWorkflow(EMPTY_CREATE_WORKFLOW);
-              }}
-              className="shrink-0 text-sm font-semibold text-[#1e4f4f] hover:underline"
-            >
-              Change type
-            </button>
-          )}
         </div>
       )}
 

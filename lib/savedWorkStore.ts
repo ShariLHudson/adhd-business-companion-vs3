@@ -1,6 +1,6 @@
 // Saved Work — user-created documents (separate from reusable Templates).
 
-export type SavedWorkStatus = "draft" | "saved" | "exported";
+export type SavedWorkStatus = "draft" | "saved" | "exported" | "archived";
 
 export type SavedWorkItem = {
   id: string;
@@ -66,9 +66,15 @@ export function savedWorkTypeFolder(artifactType: string): string {
   if (t.includes("post") || t.includes("blog") || t.includes("newsletter")) {
     return "Content";
   }
+  if (t.includes("workshop")) return "Workshops";
+  if (t.includes("presentation") || t.includes("deck") || t.includes("slides")) {
+    return "Presentations";
+  }
   if (t.includes("page") || t.includes("funnel") || t.includes("sales")) {
     return "Marketing";
   }
+  if (t.includes("strateg")) return "Strategies";
+  if (t.includes("asset") || t.includes("brand")) return "Business Assets";
   return "Documents";
 }
 
@@ -80,6 +86,14 @@ export function getSavedWork(): SavedWorkItem[] {
   return readAll().sort(
     (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
   );
+}
+
+export function getActiveSavedWork(): SavedWorkItem[] {
+  return getSavedWork().filter((w) => w.status !== "archived");
+}
+
+export function getArchivedSavedWork(): SavedWorkItem[] {
+  return getSavedWork().filter((w) => w.status === "archived");
 }
 
 export function getSavedWorkById(id: string): SavedWorkItem | undefined {
@@ -175,12 +189,46 @@ export function markSavedWorkExported(
 
 export function searchSavedWork(query: string): SavedWorkItem[] {
   const q = query.trim().toLowerCase();
-  if (!q) return getSavedWork();
-  return getSavedWork().filter(
+  const base = getActiveSavedWork();
+  if (!q) return base;
+  return base.filter(
     (w) =>
       w.title.toLowerCase().includes(q) ||
       w.artifactType.toLowerCase().includes(q) ||
       w.preview.toLowerCase().includes(q) ||
       w.tags.some((t) => t.toLowerCase().includes(q)),
   );
+}
+
+export function deleteSavedWork(id: string): boolean {
+  const all = readAll();
+  const next = all.filter((w) => w.id !== id);
+  if (next.length === all.length) return false;
+  writeAll(next);
+  return true;
+}
+
+export function duplicateSavedWork(id: string): SavedWorkItem | undefined {
+  const source = getSavedWorkById(id);
+  if (!source) return undefined;
+  return createSavedWork({
+    title: `${source.title} (copy)`,
+    artifactType: source.artifactType,
+    body: source.body,
+    status: source.status === "archived" ? "saved" : source.status,
+    sourceWorkspace: source.sourceWorkspace,
+    tags: [...source.tags],
+  });
+}
+
+export function archiveSavedWork(id: string): SavedWorkItem | undefined {
+  return updateSavedWork(id, { status: "archived" });
+}
+
+export function unarchiveSavedWork(id: string): SavedWorkItem | undefined {
+  const item = getSavedWorkById(id);
+  if (!item) return undefined;
+  const restored: SavedWorkStatus =
+    item.status === "archived" ? "saved" : item.status;
+  return updateSavedWork(id, { status: restored });
 }

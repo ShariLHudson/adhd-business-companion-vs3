@@ -65,10 +65,10 @@ const BOOSTERS: Option[] = [
     tool: "spin-wheel",
   },
   {
-    emoji: "🎮",
-    title: "Games",
-    desc: "Quick brain resets and momentum boosters.",
-    tool: "games",
+    emoji: "🧭",
+    title: "Help Me Right Now",
+    desc: "Activities for slow down, focus, calm, and more — by what you need.",
+    tool: "activities",
   },
 ];
 

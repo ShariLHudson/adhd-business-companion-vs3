@@ -1,10 +1,16 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  archiveSavedWork,
   createSavedWork,
+  deleteSavedWork,
+  duplicateSavedWork,
+  getActiveSavedWork,
+  getArchivedSavedWork,
   getSavedWork,
   savedWorkLocationLabel,
   savedWorkTypeFolder,
   searchSavedWork,
+  unarchiveSavedWork,
   updateSavedWork,
 } from "./savedWorkStore";
 
@@ -56,5 +62,37 @@ describe("savedWorkStore", () => {
     const updated = getSavedWork().find((w) => w.id === item.id);
     expect(updated?.status).toBe("saved");
     expect(updated?.body).toContain("Day 1-5");
+  });
+
+  it("archives, unarchives, duplicates, and deletes saved work", () => {
+    const item = createSavedWork({
+      title: "Workshop outline",
+      artifactType: "Workshop",
+      body: "Module 1 intro",
+    });
+    expect(getActiveSavedWork()).toHaveLength(1);
+    expect(getArchivedSavedWork()).toHaveLength(0);
+
+    archiveSavedWork(item.id);
+    expect(getActiveSavedWork()).toHaveLength(0);
+    expect(getArchivedSavedWork()).toHaveLength(1);
+    expect(searchSavedWork("Workshop")).toHaveLength(0);
+
+    unarchiveSavedWork(item.id);
+    expect(getActiveSavedWork()).toHaveLength(1);
+
+    const copy = duplicateSavedWork(item.id);
+    expect(copy?.title).toBe("Workshop outline (copy)");
+    expect(getSavedWork()).toHaveLength(2);
+
+    deleteSavedWork(item.id);
+    expect(getSavedWork()).toHaveLength(1);
+    expect(deleteSavedWork("missing")).toBe(false);
+  });
+
+  it("maps workshop and presentation folders", () => {
+    expect(savedWorkTypeFolder("Workshop")).toBe("Workshops");
+    expect(savedWorkTypeFolder("Sales deck")).toBe("Presentations");
+    expect(savedWorkTypeFolder("Brand asset")).toBe("Business Assets");
   });
 });

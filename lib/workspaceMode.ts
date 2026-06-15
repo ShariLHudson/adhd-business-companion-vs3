@@ -31,7 +31,7 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
 export const STANDALONE_SECTIONS: AppSection[] = [
   "breathe",
   "focus-audio",
-  "games",
+  "activities",
   "spin-wheel",
   "focus-timer",
   "energy",
@@ -56,6 +56,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "business-profile": "Business Profile",
   "client-avatars": "Client Avatar",
   "focus-audio": "Focus Audio",
+  activities: "Help Me Right Now",
 };
 
 export function workspaceTitle(section: AppSection): string {
