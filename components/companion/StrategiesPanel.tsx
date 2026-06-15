@@ -15,6 +15,7 @@ import {
   type Strategy,
   type StrategyGroupId,
 } from "@/lib/strategySystem";
+import { compareDropdownLabels } from "@/lib/dropdownSort";
 import {
   getUserStrategies,
   saveUserStrategy,
@@ -237,9 +238,7 @@ export function StrategiesPanel({
           className="mt-3 w-full max-w-sm rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
         >
           <option value="">Select an area…</option>
-          {[...subcats]
-            .sort((a, b) => a.label.localeCompare(b.label))
-            .map((cat) => (
+          {subcats.map((cat) => (
               <option key={cat.id} value={cat.id}>
                 {cat.emoji} {cat.label}
               </option>
@@ -256,8 +255,12 @@ export function StrategiesPanel({
               </p>
             );
           }
-          const builtins = strategiesFor(cat.id);
-          const mine = userStrategiesFor(cat.id);
+          const builtins = strategiesFor(cat.id).sort((a, b) =>
+            compareDropdownLabels(a.title, b.title),
+          );
+          const mine = userStrategiesFor(cat.id).sort((a, b) =>
+            compareDropdownLabels(a.title, b.title),
+          );
           if (builtins.length + mine.length === 0) {
             return (
               <p className="mt-6 text-base text-[#9a8f82]">
@@ -340,7 +343,7 @@ export function StrategiesPanel({
         >
           <option value="">Select a strategy…</option>
           {[...recs]
-            .sort((a, b) => a.title.localeCompare(b.title))
+            .sort((a, b) => compareDropdownLabels(a.title, b.title))
             .map((s) => (
               <option key={s.id} value={s.id}>
                 {s.title}

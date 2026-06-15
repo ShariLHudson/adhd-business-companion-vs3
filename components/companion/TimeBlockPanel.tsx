@@ -25,6 +25,7 @@ import {
   filterTimeBankBlocks,
   type TimeBankFilters,
 } from "@/lib/timeBank";
+import { sortByDropdownLabel } from "@/lib/dropdownSort";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
 type DurUnit = "min" | "hr" | "day" | "week" | "month";
@@ -316,8 +317,18 @@ export function TimeBlockPanel({
     for (const b of blocks) {
       if (!b.date && b.tag) set.add(b.tag);
     }
-    return [...set].sort();
+    return [...set].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
   }, [blocks]);
+
+  const sortedTags = useMemo(
+    () => [...tags].sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" })),
+    [tags],
+  );
+
+  const sortedProjects = useMemo(
+    () => sortByDropdownLabel(projects, (p) => p.name),
+    [projects],
+  );
 
   function renderBlockCard(b: TimeBlock, opts?: { bank?: boolean }) {
     return (
@@ -688,7 +699,7 @@ export function TimeBlockPanel({
                 className="min-w-0 flex-1 truncate rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
               >
                 <option value="">No project</option>
-                {projects.map((p) => (
+                {sortedProjects.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
                   </option>
@@ -708,7 +719,7 @@ export function TimeBlockPanel({
                   Type of work
                 </p>
                 <div className="mt-1.5 flex flex-wrap items-center gap-2">
-                  {tags.map((t) => (
+                  {sortedTags.map((t) => (
                     <button
                       key={t}
                       type="button"
@@ -849,7 +860,7 @@ export function TimeBlockPanel({
                 aria-label="Filter by project"
               >
                 <option value="all">All projects</option>
-                {projects.map((p) => (
+                {sortedProjects.map((p) => (
                   <option key={p.id} value={p.id}>
                     {p.name}
                   </option>

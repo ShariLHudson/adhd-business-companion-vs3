@@ -1,3 +1,5 @@
+import { sortByDropdownLabel, sortDropdownLabels } from "./dropdownSort";
+
 // Brain Dump taxonomy — specific buckets so dozens/hundreds of entries stay
 // findable. The classifier assigns the MOST specific one; users can override.
 export const BRAINDUMP_CATEGORY_GROUPS: {
@@ -44,4 +46,14 @@ export function normalizeCategory(value?: string | null): string {
   const v = value.trim().toLowerCase();
   const hit = BRAINDUMP_CATEGORIES.find((c) => c.toLowerCase() === v);
   return hit ?? "Other";
+}
+
+/** Dropdown order — groups and categories alphabetized within each group. */
+export function sortedBrainDumpCategoryGroups(): typeof BRAINDUMP_CATEGORY_GROUPS {
+  return sortByDropdownLabel(BRAINDUMP_CATEGORY_GROUPS, (g) => g.group).map(
+    (g) => ({
+      ...g,
+      categories: sortDropdownLabels(g.categories),
+    }),
+  );
 }

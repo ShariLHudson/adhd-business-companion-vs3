@@ -5,16 +5,17 @@ import {
   getBusinessProfile,
   saveBusinessProfile,
 } from "@/lib/companionStore";
+import { sortDropdownLabels } from "@/lib/dropdownSort";
 
-const ROLES = [
+const ROLES = sortDropdownLabels([
   "Coach",
   "Consultant",
   "Creator",
   "Service provider",
   "Business owner",
   "Product seller",
-];
-const GOALS = [
+]);
+const GOALS = sortDropdownLabels([
   "Get more clients",
   "Make consistent income",
   "Grow my audience",
@@ -22,8 +23,8 @@ const GOALS = [
   "Launch an offer",
   "Organize business systems",
   "Reduce overwhelm",
-];
-const TRAITS = [
+]);
+const TRAITS = sortDropdownLabels([
   "Overwhelmed easily",
   "Very busy",
   "Beginner level",
@@ -32,15 +33,15 @@ const TRAITS = [
   "Slow researcher",
   "Likes structure",
   "Hates structure",
-];
-const TONES = [
+]);
+const TONES = sortDropdownLabels([
   "Friendly",
   "Professional",
   "Warm",
   "Direct",
   "Playful",
   "Simple / ADHD-friendly",
-];
+]);
 
 const LAST_STEP = 7;
 

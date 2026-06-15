@@ -1,4 +1,5 @@
 export * from "./types";
+export * from "./personalDateOptions";
 export * from "./messageLibrary";
 export * from "./recognitionStore";
 export * from "./recognitionEngine";

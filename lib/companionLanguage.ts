@@ -1,6 +1,8 @@
 // Language & communication preferences — output/style only.
 // Intentionally separate from emotional detection, routing, and memory.
 
+import { sortByDropdownLabel } from "./dropdownSort";
+
 export type LanguageOption = {
   code: string;
   label: string;
@@ -39,6 +41,15 @@ export const DATE_FORMAT_OPTIONS = [
 ] as const;
 
 export type DateFormat = (typeof DATE_FORMAT_OPTIONS)[number]["code"];
+
+/** Alphabetical dropdown order (source arrays keep stable definition order). */
+export const SORTED_LANGUAGE_OPTIONS: readonly LanguageOption[] =
+  sortByDropdownLabel(LANGUAGE_OPTIONS, (o) => o.label);
+export const SORTED_REGION_OPTIONS = sortByDropdownLabel(REGION_OPTIONS, (o) => o.label);
+export const SORTED_DATE_FORMAT_OPTIONS = sortByDropdownLabel(
+  DATE_FORMAT_OPTIONS,
+  (o) => o.label,
+);
 
 export type LanguageCommunicationPrefs = {
   interfaceLanguage: LanguageCode;

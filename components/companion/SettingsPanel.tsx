@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { compareDropdownLabels, sortByDropdownLabel } from "@/lib/dropdownSort";
 import {
   getPrefs,
   savePrefs,
   getVoiceStatus,
   PLAN_LABEL,
   PLAN_VOICE_MINUTES,
-  LANGUAGE_OPTIONS,
-  REGION_OPTIONS,
-  DATE_FORMAT_OPTIONS,
+  SORTED_DATE_FORMAT_OPTIONS,
+  SORTED_LANGUAGE_OPTIONS,
+  SORTED_REGION_OPTIONS,
   languageCommunicationSummary,
   type LanguageCode,
   type RegionCode,
@@ -30,11 +31,14 @@ import {
   saveRecognitionStoreAndNotify,
   syncBirthday,
   syncCelebrationMode,
+  PERSONAL_DATE_CATEGORY_OPTIONS,
+  PERSONAL_DATE_KIND_OPTIONS,
   type CelebrationMode,
   type PersonalDate,
 } from "@/lib/recognition";
 
-const TONES: { id: AiTone; label: string; desc: string }[] = [
+const TONES: { id: AiTone; label: string; desc: string }[] = sortByDropdownLabel(
+  [
   { id: "calm", label: "Calm", desc: "Slow, grounding, spacious." },
   { id: "balanced", label: "Balanced", desc: "Warm but direct." },
   { id: "direct", label: "Direct", desc: "Brief and to the point." },
@@ -46,9 +50,12 @@ const TONES: { id: AiTone; label: string; desc: string }[] = [
     desc: "Affirming, celebrates small wins.",
   },
   { id: "playful", label: "Playful", desc: "Light, a little humor." },
-];
+  ],
+  (t) => t.label,
+);
 
-const HELP_MODES: { id: HelpMode; label: string; desc: string }[] = [
+const HELP_MODES: { id: HelpMode; label: string; desc: string }[] = sortByDropdownLabel(
+  [
   {
     id: "step-by-step",
     label: "Step-by-step guidance",
@@ -65,9 +72,12 @@ const HELP_MODES: { id: HelpMode; label: string; desc: string }[] = [
     label: "Take me to the right place",
     desc: "Point me to the tool that fits.",
   },
-];
+  ],
+  (h) => h.label,
+);
 
-const SUPPORT_STYLES: { id: SupportStyle; label: string; desc: string }[] = [
+const SUPPORT_STYLES: { id: SupportStyle; label: string; desc: string }[] = sortByDropdownLabel(
+  [
   { id: "solutions", label: "Solutions first", desc: "Just tell me what to do." },
   {
     id: "understand",
@@ -80,7 +90,9 @@ const SUPPORT_STYLES: { id: SupportStyle; label: string; desc: string }[] = [
     label: "SOS mode",
     desc: "When overwhelmed, help me stabilize before problem-solving.",
   },
-];
+  ],
+  (s) => s.label,
+);
 
 const PATTERNS: { id: PatternAwareness; label: string; desc: string }[] = [
   { id: "off", label: "Off", desc: "No weekly reflection." },
@@ -117,7 +129,9 @@ type Section =
 
 export type SettingsSection = Section;
 
-const CELEBRATION_MODES: { id: CelebrationMode; label: string; desc: string }[] = [
+const CELEBRATION_MODES: { id: CelebrationMode; label: string; desc: string }[] =
+  sortByDropdownLabel(
+  [
   {
     id: "full",
     label: "Full celebrations",
@@ -129,7 +143,9 @@ const CELEBRATION_MODES: { id: CelebrationMode; label: string; desc: string }[] 
     desc: "Just the message — no visual effects.",
   },
   { id: "off", label: "Off", desc: "No celebration prompts." },
-];
+  ],
+  (c) => c.label,
+);
 
 const MONTHS = [
   "January",
@@ -503,28 +519,28 @@ export function SettingsPanel({
             label={t("settings.companionResponseLanguage")}
             hint="Sets interface, chat, content, and voice together."
             value={responseLanguage}
-            options={LANGUAGE_OPTIONS}
+            options={SORTED_LANGUAGE_OPTIONS}
             onChange={(v) => saveLang({ responseLanguage: v as LanguageCode })}
           />
           <LanguageField
             id="lang-interface"
             label={t("settings.interfaceLanguage")}
             value={interfaceLanguage}
-            options={LANGUAGE_OPTIONS}
+            options={SORTED_LANGUAGE_OPTIONS}
             onChange={(v) => saveLang({ interfaceLanguage: v as LanguageCode })}
           />
           <LanguageField
             id="lang-content"
             label={t("settings.contentLanguage")}
             value={contentLanguage}
-            options={LANGUAGE_OPTIONS}
+            options={SORTED_LANGUAGE_OPTIONS}
             onChange={(v) => saveLang({ contentLanguage: v as LanguageCode })}
           />
           <LanguageField
             id="lang-voice"
             label={t("settings.voiceLanguage")}
             value={voiceLanguage}
-            options={LANGUAGE_OPTIONS}
+            options={SORTED_LANGUAGE_OPTIONS}
             onChange={(v) => saveLang({ voiceLanguage: v as LanguageCode })}
           />
           <LanguageField
@@ -532,14 +548,14 @@ export function SettingsPanel({
             label="Region / Date Format"
             hint="Region for dates and formatting preferences."
             value={region}
-            options={REGION_OPTIONS}
+            options={SORTED_REGION_OPTIONS}
             onChange={(v) => saveLang({ region: v as RegionCode })}
           />
           <LanguageField
             id="lang-date"
             label="Date format"
             value={dateFormat}
-            options={DATE_FORMAT_OPTIONS}
+            options={SORTED_DATE_FORMAT_OPTIONS}
             onChange={(v) => saveLang({ dateFormat: v as DateFormat })}
           />
         </div>
@@ -764,12 +780,11 @@ export function SettingsPanel({
                       }
                       className="rounded-lg border border-[#c9bfb0] px-2 py-1.5 text-sm"
                     >
-                      <option value="personal">Personal</option>
-                      <option value="family">Family</option>
-                      <option value="business">Business</option>
-                      <option value="travel">Travel</option>
-                      <option value="health">Health</option>
-                      <option value="custom">Custom</option>
+                      {PERSONAL_DATE_CATEGORY_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
                     </select>
                     <select
                       value={pd.kind}
@@ -780,15 +795,11 @@ export function SettingsPanel({
                       }
                       className="rounded-lg border border-[#c9bfb0] px-2 py-1.5 text-sm"
                     >
-                      <option value="custom">Custom</option>
-                      <option value="anniversary">Anniversary</option>
-                      <option value="vacation">Vacation countdown</option>
-                      <option value="milestone">Milestone</option>
-                      <option value="launch">Launch</option>
-                      <option value="workshop">Workshop</option>
-                      <option value="speaking">Speaking event</option>
-                      <option value="due_date">Due date</option>
-                      <option value="birthday">Birthday</option>
+                      {PERSONAL_DATE_KIND_OPTIONS.map((opt) => (
+                        <option key={opt.value} value={opt.value}>
+                          {opt.label}
+                        </option>
+                      ))}
                     </select>
                     {pd.kind === "vacation" ||
                     pd.kind === "launch" ||
@@ -1265,7 +1276,9 @@ export function SettingsPanel({
         Tap any item to change it — everything saves automatically.
       </p>
       <div className="mt-6 flex flex-col gap-2.5">
-        {ROWS.map((r) => (
+        {[...ROWS]
+          .sort((a, b) => compareDropdownLabels(a.label, b.label))
+          .map((r) => (
           <button
             key={r.id}
             type="button"

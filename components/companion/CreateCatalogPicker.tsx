@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import {
-  CREATE_CATALOG,
+  sortedCreateCatalog,
   type CreateCatalogItem,
 } from "@/lib/createCatalog";
 
@@ -17,18 +17,22 @@ export function CreateCatalogPicker({
 }) {
   const [filter, setFilter] = useState("");
 
+  const catalog = useMemo(() => sortedCreateCatalog(), []);
+
   const filtered = useMemo(() => {
     const q = filter.trim().toLowerCase();
-    if (!q) return CREATE_CATALOG;
-    return CREATE_CATALOG.map((cat) => ({
-      ...cat,
-      items: cat.items.filter(
-        (item) =>
-          item.label.toLowerCase().includes(q) ||
-          item.matchTerms?.some((t) => t.includes(q)),
-      ),
-    })).filter((cat) => cat.items.length > 0);
-  }, [filter]);
+    if (!q) return catalog;
+    return catalog
+      .map((cat) => ({
+        ...cat,
+        items: cat.items.filter(
+          (item) =>
+            item.label.toLowerCase().includes(q) ||
+            item.matchTerms?.some((t) => t.includes(q)),
+        ),
+      }))
+      .filter((cat) => cat.items.length > 0);
+  }, [filter, catalog]);
 
   return (
     <div className="flex flex-col gap-4">

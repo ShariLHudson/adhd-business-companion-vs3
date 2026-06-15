@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CREATE_CATALOG } from "@/lib/createCatalog";
+import { sortedCreateCatalog } from "@/lib/createCatalog";
 import {
   advanceAfterDiscoveryAnswer,
   advanceAfterTypePick,
@@ -56,7 +56,7 @@ export function CreateWorkflowPanel({
           Pick a category — we&apos;ll narrow from there. One step at a time.
         </p>
         <div className="mt-4 flex flex-col gap-2">
-          {CREATE_CATALOG.map((cat) => (
+          {sortedCreateCatalog().map((cat) => (
             <button
               key={cat.id}
               type="button"

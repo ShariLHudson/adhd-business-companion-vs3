@@ -5,6 +5,8 @@
 // what to try right now. Tone: warm coach, never clinical. Multi-line strings
 // render with whitespace-pre-line.
 
+import { sortByDropdownLabel } from "./dropdownSort";
+
 // Two top-level groups. Subcategories live under one of these.
 export type StrategyGroupId = "personal" | "business";
 
@@ -806,7 +808,10 @@ export function getCategory(id: string): StrategyCategory | undefined {
 
 // Subcategories belonging to a top-level group, in display order.
 export function categoriesForGroup(group: StrategyGroupId): StrategyCategory[] {
-  return STRATEGY_CATEGORIES.filter((c) => c.group === group);
+  return sortByDropdownLabel(
+    STRATEGY_CATEGORIES.filter((c) => c.group === group),
+    (c) => c.label,
+  );
 }
 
 export function strategiesFor(subcatId: string): Strategy[] {

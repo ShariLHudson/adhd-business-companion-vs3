@@ -15,6 +15,7 @@ import {
   pushLanguagePrefsToUser,
 } from "./companionUserLanguage";
 import { createCatalogTypeLabels } from "./createCatalog";
+import { sortByDropdownLabel, sortDropdownLabels } from "./dropdownSort";
 
 export type {
   LanguageCommunicationPrefs,
@@ -30,6 +31,9 @@ export {
   LANGUAGE_OPTIONS,
   REGION_OPTIONS,
   DATE_FORMAT_OPTIONS,
+  SORTED_LANGUAGE_OPTIONS,
+  SORTED_REGION_OPTIONS,
+  SORTED_DATE_FORMAT_OPTIONS,
   withUnifiedAppLanguage,
   speechLocaleForLanguage,
   getInterfaceLanguageCode,
@@ -390,6 +394,14 @@ export const TEMPLATE_SUBTYPES: Record<TemplateCategory, string[]> = {
   ],
   other: [],
 };
+
+export function sortedTemplateCategories(): TemplateCategory[] {
+  return sortByDropdownLabel(TEMPLATE_CATEGORIES, (c) => TEMPLATE_CATEGORY_LABEL[c]);
+}
+
+export function sortedTemplateSubtypes(category: TemplateCategory): string[] {
+  return sortDropdownLabels(TEMPLATE_SUBTYPES[category]);
+}
 
 const TEMPLATES_KEY = "companion-templates-v1";
 
@@ -833,13 +845,20 @@ export const SNIPPET_KIND_LABEL: Record<SnippetKind, string> = {
   other: "Other",
 };
 
-export const SNIPPET_TONES = [
+export const SNIPPET_TONES = sortDropdownLabels([
   "Friendly",
   "Professional",
   "Urgent",
   "Storytelling",
   "ADHD-simple",
-];
+]);
+
+export function sortedSnippetKinds(): SnippetKind[] {
+  return sortByDropdownLabel(
+    Object.keys(SNIPPET_KIND_LABEL) as SnippetKind[],
+    (k) => SNIPPET_KIND_LABEL[k],
+  );
+}
 
 const SNIPPETS_KEY = "companion-snippets-v1";
 const SNIPPETS_SEEDED_KEY = "companion-snippets-seeded-v1";
@@ -1024,12 +1043,12 @@ export function getCustomContentTypes(): string[] {
   }
 }
 
-// All types the user can pick from — built-ins first, then their custom ones.
+// All types the user can pick from — merged and alphabetized for dropdowns.
 export function getContentTypes(): string[] {
   const custom = getCustomContentTypes().filter(
     (c) => !DEFAULT_CONTENT_TYPES.includes(c),
   );
-  return [...DEFAULT_CONTENT_TYPES, ...custom];
+  return sortDropdownLabels([...DEFAULT_CONTENT_TYPES, ...custom]);
 }
 
 export function addContentType(name: string): string[] {
@@ -2056,6 +2075,7 @@ export function setLastActivity(a: Omit<LastActivity, "ts">): void {
       LAST_ACTIVITY_KEY,
       JSON.stringify({ ...a, ts: new Date().toISOString() }),
     );
+    pushRecentWork(a);
   } catch {
     /* noop */
   }
@@ -2064,6 +2084,63 @@ export function clearLastActivity(): void {
   if (typeof window === "undefined") return;
   try {
     localStorage.removeItem(LAST_ACTIVITY_KEY);
+  } catch {
+    /* noop */
+  }
+}
+
+// ---- Recent work (home resume picker — not shown until user asks) -----------
+export type RecentWorkItem = Omit<LastActivity, "ts"> & {
+  id: string;
+  ts: string;
+};
+
+const RECENT_WORK_KEY = "companion-recent-work-v1";
+const RECENT_WORK_MAX = 8;
+
+function recentWorkId(a: Omit<LastActivity, "ts">): string {
+  if (a.kind === "project" && a.projectId) return `project:${a.projectId}`;
+  if (a.kind === "draft") {
+    return `draft:${(a.contentType ?? "content").toLowerCase()}:${a.title.trim().toLowerCase()}`;
+  }
+  return `chat:${a.title.trim().toLowerCase()}`;
+}
+
+export function getRecentWorkItems(): RecentWorkItem[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = localStorage.getItem(RECENT_WORK_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.filter(
+      (x): x is RecentWorkItem =>
+        x &&
+        typeof x.id === "string" &&
+        typeof x.title === "string" &&
+        typeof x.kind === "string" &&
+        typeof x.ts === "string",
+    );
+  } catch {
+    return [];
+  }
+}
+
+export function pushRecentWork(a: Omit<LastActivity, "ts">): void {
+  if (typeof window === "undefined") return;
+  if (!a.title?.trim()) return;
+  try {
+    const id = recentWorkId(a);
+    const item: RecentWorkItem = {
+      ...a,
+      id,
+      ts: new Date().toISOString(),
+    };
+    const next = [
+      item,
+      ...getRecentWorkItems().filter((x) => x.id !== id),
+    ].slice(0, RECENT_WORK_MAX);
+    localStorage.setItem(RECENT_WORK_KEY, JSON.stringify(next));
   } catch {
     /* noop */
   }

@@ -1,6 +1,7 @@
 // Create catalog — categorized business assets users can build beside chat.
 
 import type { AppSection } from "./companionUi";
+import { sortByDropdownLabel, sortDropdownLabels } from "./dropdownSort";
 
 export type CreateCatalogItem = {
   label: string;
@@ -192,11 +193,21 @@ export function allCatalogItems(): CreateCatalogItem[] {
   return CREATE_CATALOG.flatMap((c) => c.items);
 }
 
+/** User-facing catalog — categories and types in alphabetical order. */
+export function sortedCreateCatalog(): CreateCatalogCategory[] {
+  return sortByDropdownLabel(CREATE_CATALOG, (c) => c.label).map((cat) => ({
+    ...cat,
+    items: sortByDropdownLabel(cat.items, (i) => i.label),
+  }));
+}
+
 /** Labels for content-type pickers (excludes routed tools). */
 export function createCatalogTypeLabels(): string[] {
-  return allCatalogItems()
-    .filter((i) => !i.route)
-    .map((i) => i.label);
+  return sortDropdownLabels(
+    allCatalogItems()
+      .filter((i) => !i.route)
+      .map((i) => i.label),
+  );
 }
 
 export function findCatalogItem(label: string): CreateCatalogItem | undefined {

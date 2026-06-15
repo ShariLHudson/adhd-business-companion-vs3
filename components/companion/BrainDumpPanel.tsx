@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   addBrainDump,
   addXp,
@@ -23,9 +23,10 @@ import {
 import { RefineActions } from "@/components/companion/RefineActions";
 import { MicButton } from "./MicButton";
 import {
-  BRAINDUMP_CATEGORY_GROUPS,
   normalizeCategory,
+  sortedBrainDumpCategoryGroups,
 } from "@/lib/brainDumpCategories";
+import { sortByDropdownLabel } from "@/lib/dropdownSort";
 import type { AppSection } from "@/lib/companionUi";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
@@ -212,7 +213,15 @@ export function BrainDumpPanel({
     },
     {},
   );
-  const summary = Object.entries(categoryCounts).sort((a, b) => b[1] - a[1]);
+  const summary = Object.entries(categoryCounts).sort((a, b) =>
+    a[0].localeCompare(b[0]),
+  );
+
+  const categoryGroups = useMemo(() => sortedBrainDumpCategoryGroups(), []);
+  const sortedProjects = useMemo(
+    () => sortByDropdownLabel(projects, (p) => p.name),
+    [projects],
+  );
 
   const chip = (active: boolean) =>
     `rounded-full px-3 py-1 text-xs font-semibold capitalize transition-colors ${
@@ -318,7 +327,7 @@ export function BrainDumpPanel({
                 className="mt-1 rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
               >
                 <option value="all">All Categories</option>
-                {BRAINDUMP_CATEGORY_GROUPS.map((g) => (
+                {categoryGroups.map((g) => (
                   <optgroup key={g.group} label={g.group}>
                     {g.categories.map((c) => (
                       <option key={c} value={c}>
@@ -450,7 +459,7 @@ export function BrainDumpPanel({
                         }
                         className="mt-1.5 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-sm text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
                       >
-                        {BRAINDUMP_CATEGORY_GROUPS.map((g) => (
+                        {categoryGroups.map((g) => (
                           <optgroup key={g.group} label={g.group}>
                             {g.categories.map((c) => (
                               <option key={c} value={c}>
@@ -476,7 +485,7 @@ export function BrainDumpPanel({
                           className="min-w-0 flex-1 rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-sm text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
                         >
                           <option value="">No project</option>
-                          {projects.map((p) => (
+                          {sortedProjects.map((p) => (
                             <option key={p.id} value={p.id}>
                               {p.name}
                             </option>

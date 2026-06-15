@@ -8,22 +8,14 @@ import {
   getSnippets,
   SNIPPET_KIND_LABEL,
   SNIPPET_TONES,
+  sortedSnippetKinds,
   updateSnippet,
   type Snippet,
   type SnippetKind,
 } from "@/lib/companionStore";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 
-const KINDS: SnippetKind[] = [
-  "hook",
-  "value",
-  "cta",
-  "opener",
-  "closing",
-  "story",
-  "objection",
-  "other",
-];
+const KINDS = sortedSnippetKinds();
 
 type Draft = {
   id?: string;

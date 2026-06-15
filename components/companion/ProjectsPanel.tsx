@@ -17,6 +17,7 @@ import {
   type ProjectHorizon,
   type ProjectStatus,
 } from "@/lib/companionStore";
+import { sortByDropdownLabel } from "@/lib/dropdownSort";
 import { ProjectBreakdown } from "@/components/companion/ProjectBreakdown";
 import { CollapsibleSection } from "@/components/companion/CollapsibleSection";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
@@ -46,6 +47,11 @@ const STATUSES: ProjectStatus[] = [
   "paused",
   "completed",
 ];
+
+const SORTED_STATUSES = sortByDropdownLabel(
+  STATUSES,
+  (s) => PROJECT_STATUS_LABEL[s],
+);
 
 export function ProjectsPanel({
   onOpen,
@@ -784,7 +790,7 @@ export function ProjectsPanel({
                     }
                     className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-2 py-1.5 text-sm"
                   >
-                    {STATUSES.map((s) => (
+                    {SORTED_STATUSES.map((s) => (
                       <option key={s} value={s}>
                         {PROJECT_STATUS_LABEL[s]}
                       </option>

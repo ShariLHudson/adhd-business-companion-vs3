@@ -4,6 +4,7 @@
  */
 
 import { CREATE_CATALOG, findCatalogItem, type CreateCatalogItem } from "./createCatalog";
+import { sortByDropdownLabel } from "./dropdownSort";
 
 export type CreateWorkflowStep =
   | "category"
@@ -274,7 +275,10 @@ export function catalogCategory(id: string) {
 export function creatableItemsInCategory(categoryId: string): CreateCatalogItem[] {
   const cat = catalogCategory(categoryId);
   if (!cat) return [];
-  return cat.items.filter((i) => !i.route);
+  return sortByDropdownLabel(
+    cat.items.filter((i) => !i.route),
+    (i) => i.label,
+  );
 }
 
 export function workflowStepLabel(step: CreateWorkflowStep): string {

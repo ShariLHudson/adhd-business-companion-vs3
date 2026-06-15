@@ -6,9 +6,9 @@ import {
   deleteTemplate,
   duplicateTemplate,
   getTemplates,
-  TEMPLATE_CATEGORIES,
+  sortedTemplateCategories,
+  sortedTemplateSubtypes,
   TEMPLATE_CATEGORY_LABEL,
-  TEMPLATE_SUBTYPES,
   updateTemplate,
   type TemplateCategory,
   type TemplateItem,
@@ -121,13 +121,13 @@ export function TemplatesLibrary({
             }
             className="min-w-0 flex-1 rounded-lg border border-[#c9bfb0] bg-white px-3 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
           >
-            {TEMPLATE_CATEGORIES.map((c) => (
+            {sortedTemplateCategories().map((c) => (
               <option key={c} value={c}>
                 {TEMPLATE_CATEGORY_LABEL[c]}
               </option>
             ))}
           </select>
-          {TEMPLATE_SUBTYPES[draft.category].length > 0 && (
+          {sortedTemplateSubtypes(draft.category).length > 0 && (
             <select
               value={draft.subcategory}
               onChange={(e) =>
@@ -136,7 +136,7 @@ export function TemplatesLibrary({
               className="min-w-0 flex-1 rounded-lg border border-[#c9bfb0] bg-white px-3 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
             >
               <option value="">Type (optional)…</option>
-              {TEMPLATE_SUBTYPES[draft.category].map((s) => (
+              {sortedTemplateSubtypes(draft.category).map((s) => (
                 <option key={s} value={s}>
                   {s}
                 </option>

@@ -1,32 +1,40 @@
 import type { TemplateCategory, TemplateItem, TemplateStatus } from "./companionStore";
-import { TEMPLATE_CATEGORY_LABEL } from "./companionStore";
+import { TEMPLATE_CATEGORIES, TEMPLATE_CATEGORY_LABEL } from "./companionStore";
+import { sortByDropdownLabel, sortWithPinnedValues } from "./dropdownSort";
 
 export type TemplateStatusFilter = TemplateStatus | "all";
 
 export const TEMPLATE_STATUS_OPTIONS: {
   value: TemplateStatusFilter;
   label: string;
-}[] = [
-  { value: "all", label: "All" },
-  { value: "saved", label: "Saved" },
-  { value: "draft", label: "Drafts" },
-  { value: "archived", label: "Archived" },
-];
+}[] = sortWithPinnedValues(
+  [
+    { value: "all", label: "All" },
+    { value: "saved", label: "Saved" },
+    { value: "draft", label: "Drafts" },
+    { value: "archived", label: "Archived" },
+  ],
+  (o) => o.value,
+  ["all"],
+  (o) => o.label,
+);
 
-/** Category dropdown order — search first, filter second. */
+/** Category dropdown — "All" pinned first, then alphabetical. */
 export const TEMPLATE_CATEGORY_OPTIONS: {
   value: TemplateCategory | "all";
   label: string;
-}[] = [
-  { value: "all", label: "All Templates" },
-  { value: "execution", label: "ADHD / Personal Execution" },
-  { value: "systems", label: "Business Systems" },
-  { value: "content", label: "Content" },
-  { value: "emails", label: "Emails" },
-  { value: "offers", label: "Offers" },
-  { value: "strategy", label: "Strategy" },
-  { value: "other", label: "Other" },
-];
+}[] = sortWithPinnedValues(
+  [
+    { value: "all", label: "All Templates" },
+    ...TEMPLATE_CATEGORIES.map((c) => ({
+      value: c,
+      label: TEMPLATE_CATEGORY_LABEL[c],
+    })),
+  ],
+  (o) => o.value,
+  ["all"],
+  (o) => o.label,
+);
 
 export function filterTemplates(
   items: TemplateItem[],

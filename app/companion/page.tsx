@@ -26,7 +26,7 @@ import { discoveryContextForChat } from "@/lib/companionDiscovery";
 import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import type { ProfileSettingsSection } from "@/components/companion/ProfilePanel";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
-import { memoryCueFromLastActivity } from "@/lib/homeMemoryCue";
+import { HomeResumeLink } from "@/components/companion/HomeResumeLink";
 import { RecognitionMomentCard } from "@/components/companion/RecognitionMomentCard";
 import { ActivationOfferCard } from "@/components/companion/ActivationOfferCard";
 import { RecoveryOfferCard } from "@/components/companion/RecoveryOfferCard";
@@ -379,7 +379,10 @@ import {
   getLastActivity,
   setLastActivity,
   clearLastActivity,
+  getRecentWorkItems,
+  pushRecentWork,
   type LastActivity,
+  type RecentWorkItem,
   getTimeBlocks,
   loadConversation,
   saveConversation,
@@ -925,13 +928,12 @@ export default function CompanionPage() {
     null,
   );
   useEffect(() => {
-    setLastAct(getLastActivity());
+    const last = getLastActivity();
+    if (last && getRecentWorkItems().length === 0) {
+      pushRecentWork(last);
+    }
+    setLastAct(last);
   }, [activeSection]);
-
-  const homeMemoryCue = useMemo(
-    () => (homeCalm && hasChatted ? memoryCueFromLastActivity(lastAct) : null),
-    [homeCalm, hasChatted, lastAct],
-  );
 
   // Soft execution bridge — ONE chip offered after a chat reply when the
   // conversation implied a deliverable but the user didn't command it.
@@ -1471,7 +1473,7 @@ export default function CompanionPage() {
     workspacePanel,
   ]);
 
-  function continueWork(a: LastActivity) {
+  function continueWork(a: LastActivity | RecentWorkItem) {
     if (a.kind === "draft") {
       if (isExplicitCreateResumeRequest(lastUserTextRef.current)) {
         if (restoreCreateSession()) return;
@@ -5507,13 +5509,20 @@ export default function CompanionPage() {
                         }
                       : undefined
                 }
-                memoryCue={homeCalm ? homeMemoryCue : null}
+                memoryCue={null}
                 primaryQuestion={
                   homeCalm ? "What feels most important right now?" : null
                 }
                 resumeLine={null}
                 onResumeClick={undefined}
               />
+
+              {homeCalm && hasChatted ? (
+                <HomeResumeLink
+                  refreshKey={`${activeSection}:${lastAct?.ts ?? ""}`}
+                  onResume={(item) => continueWork(item)}
+                />
+              ) : null}
 
               {homeCalm ? null : isIdle && recognitionMoment && !hasInlineIntelligenceOffer ? (
                 <RecognitionMomentCard

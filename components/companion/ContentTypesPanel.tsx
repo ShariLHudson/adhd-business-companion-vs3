@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   addContentType,
   deleteContentType,
   getCustomContentTypes,
   DEFAULT_CONTENT_TYPES,
 } from "@/lib/companionStore";
+import { sortDropdownLabels } from "@/lib/dropdownSort";
 
 // Manage the content types the system can generate and remix into. Built-ins
 // are fixed; users add their own (e.g. "Podcast outreach email").
@@ -23,6 +24,8 @@ export function ContentTypesPanel({
   useEffect(() => {
     setCustom(getCustomContentTypes());
   }, []);
+
+  const sortedCustom = useMemo(() => sortDropdownLabels(custom), [custom]);
 
   function add() {
     const name = draft.trim();
@@ -102,13 +105,13 @@ export function ContentTypesPanel({
         </button>
       </div>
 
-      {custom.length > 0 && (
+      {sortedCustom.length > 0 && (
         <>
           <p className="mt-6 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
             Your types
           </p>
           <div className="mt-2 flex flex-col gap-2">
-            {custom.map((t) => typeRow(t, true))}
+            {sortedCustom.map((t) => typeRow(t, true))}
           </div>
         </>
       )}
