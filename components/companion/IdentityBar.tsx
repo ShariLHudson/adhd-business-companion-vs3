@@ -179,7 +179,7 @@ export function IdentityBar({
         </p>
         <p className="mt-0.5 text-base text-[#1e4f4f]">{BRAND.tagline}</p>
         {memoryCue ? (
-          <p className="mt-2 text-base text-[#6b635a]">{memoryCue}</p>
+          <p className="mt-2 text-sm italic text-[#6b635a]">{memoryCue}</p>
         ) : null}
         {resumeLine && onResumeClick ? (
           <button

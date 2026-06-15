@@ -459,6 +459,31 @@ export function discoveryProgressSummary(): {
   };
 }
 
+/** Home discovery card — e.g. "1 discovery completed". */
+export function discoveryCompletedLabel(): string {
+  const count = Object.keys(getDiscoveryStore().answers).length;
+  if (count === 0) return "No discoveries yet";
+  return count === 1 ? "1 discovery completed" : `${count} discoveries completed`;
+}
+
+/** One discovery question per session — after meaningful chat usage. */
+export function nextHomeDiscoveryQuestion(
+  input: ProgressiveDiscoveryInput,
+): DiscoveryQuestion | null {
+  const now = input.now ?? new Date();
+  const store = getDiscoveryStore();
+  if (store.disabled || !input.hasMeaningfulUsage) return null;
+  if (store.lastAskedSession === sessionKey(now)) return null;
+
+  if (!store.firstVisitComplete) {
+    if (!store.welcomeSeen) {
+      markWelcomeSeen();
+    }
+    return nextFirstVisitQuestion();
+  }
+  return nextProgressiveQuestion(input);
+}
+
 export function isFirstVisitComplete(): boolean {
   return getDiscoveryStore().firstVisitComplete;
 }

@@ -21,11 +21,11 @@ export function memoryCueFromLastActivity(
   }
   if (act.kind === "draft") {
     const kind = act.contentType?.trim();
-    if (kind) return `Last time you were working on your ${kind.toLowerCase()}.`;
-    return `Last time you were working on ${lower}.`;
+    if (kind) return `Last time we worked on your ${kind.toLowerCase()}.`;
+    return `Last time we worked on ${lower}.`;
   }
   if (act.kind === "project") {
-    return `Last time we were working on ${lower}.`;
+    return `I remember your ${lower} project.`;
   }
-  return `Last time we were working on ${lower}.`;
+  return `Last time we worked on ${lower}.`;
 }

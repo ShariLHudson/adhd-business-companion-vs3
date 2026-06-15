@@ -23,11 +23,11 @@ import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
 import { CompanionDiscoveryPrompt } from "@/components/companion/CompanionDiscoveryPrompt";
 import { discoveryContextForChat } from "@/lib/companionDiscovery";
+import { memoryCueFromLastActivity } from "@/lib/homeMemoryCue";
 import { useVisualMode } from "@/lib/useVisualMode";
 import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import type { ProfileSettingsSection } from "@/components/companion/ProfilePanel";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
-import { HomeResumeLink } from "@/components/companion/HomeResumeLink";
 import { RecognitionMomentCard } from "@/components/companion/RecognitionMomentCard";
 import { ActivationOfferCard } from "@/components/companion/ActivationOfferCard";
 import { RecoveryOfferCard } from "@/components/companion/RecoveryOfferCard";
@@ -711,6 +711,13 @@ export default function CompanionPage() {
   const isIdle = !messages.some((m) => m.role === "user");
   const homeCalm = activeSection === "home" && isIdle;
 
+  useEffect(() => {
+    if (!homeCalm) return;
+    setRecoveryOfferLine(null);
+    setActivationOffer(null);
+    setLoopOffer(null);
+  }, [homeCalm]);
+
   const hasInlineIntelligenceOffer = Boolean(
     recoveryOfferLine ||
       activationOffer ||
@@ -846,7 +853,7 @@ export default function CompanionPage() {
   }, [hydrated, isIdle, displayEmotion, input, messages, activationOffer?.state, loopOffer?.loopType, recognitionMoment]);
 
   useEffect(() => {
-    if (!hydrated || !isIdle) {
+    if (!hydrated || !isIdle || homeCalm) {
       setLoopOffer(null);
       return;
     }
@@ -867,6 +874,7 @@ export default function CompanionPage() {
     messages,
     cognitiveLoad?.score.level,
     activationOffer?.state,
+    homeCalm,
   ]);
 
   // Block legacy Command Center section for end users (founder/admin workspace only).
@@ -931,6 +939,12 @@ export default function CompanionPage() {
     }
     setLastAct(last);
   }, [activeSection]);
+
+  const homeMemoryCue = useMemo(
+    () =>
+      homeCalm && hasChatted ? memoryCueFromLastActivity(lastAct) : null,
+    [homeCalm, hasChatted, lastAct],
+  );
 
   // Soft execution bridge — ONE chip offered after a chat reply when the
   // conversation implied a deliverable but the user didn't command it.
@@ -5450,7 +5464,7 @@ export default function CompanionPage() {
             onOpenAvatars={() => setActiveSection("client-avatars")}
             minimal={activeSection === "home"}
           />
-          <ActiveWorkspaceBar items={activeWorkspaceItems} />
+          {!homeCalm ? <ActiveWorkspaceBar items={activeWorkspaceItems} /> : null}
 
           {activeSection !== "home" && (
             <div className="shrink-0 px-4 pt-3 sm:px-6">
@@ -5471,22 +5485,32 @@ export default function CompanionPage() {
                 onPhotoError={() => setPhotoError(true)}
                 onLogoError={() => setLogoError(true)}
                 userBirthday={getRecognitionStore().birthday}
-                recognitionMoment={recognitionMoment}
-                recoveryMode={Boolean(
-                  recoveryOfferLine ||
-                    (recovery && recoveryOverridesProductivity(recovery)),
-                )}
-                focusMode={
-                  pomodoroTimer.isActive ||
-                  workspacePanel === "focus-timer" ||
-                  workspacePanel === "focus-audio"
+                recognitionMoment={homeCalm ? null : recognitionMoment}
+                recoveryMode={
+                  homeCalm
+                    ? false
+                    : Boolean(
+                        recoveryOfferLine ||
+                          (recovery && recoveryOverridesProductivity(recovery)),
+                      )
                 }
-                recognitionWin={Boolean(
-                  recognitionMoment &&
-                    (recognitionMoment.type === "project_milestone" ||
-                      recognitionMoment.type === "business_milestone" ||
-                      recognitionMoment.type === "conversation_milestone"),
-                )}
+                focusMode={
+                  homeCalm
+                    ? false
+                    : pomodoroTimer.isActive ||
+                      workspacePanel === "focus-timer" ||
+                      workspacePanel === "focus-audio"
+                }
+                recognitionWin={
+                  homeCalm
+                    ? false
+                    : Boolean(
+                        recognitionMoment &&
+                          (recognitionMoment.type === "project_milestone" ||
+                            recognitionMoment.type === "business_milestone" ||
+                            recognitionMoment.type === "conversation_milestone"),
+                      )
+                }
                 welcomeLine={
                   homeCalm
                     ? null
@@ -5506,20 +5530,13 @@ export default function CompanionPage() {
                         }
                       : undefined
                 }
-                memoryCue={null}
+                memoryCue={homeMemoryCue}
                 primaryQuestion={
                   homeCalm ? "What feels most important right now?" : null
                 }
                 resumeLine={null}
                 onResumeClick={undefined}
               />
-
-              {homeCalm && hasChatted ? (
-                <HomeResumeLink
-                  refreshKey={`${activeSection}:${lastAct?.ts ?? ""}`}
-                  onResume={(item) => continueWork(item)}
-                />
-              ) : null}
 
               {homeCalm ? null : isIdle && recognitionMoment && !hasInlineIntelligenceOffer ? (
                 <RecognitionMomentCard
@@ -5778,6 +5795,7 @@ export default function CompanionPage() {
                 <div className="mx-auto w-full max-w-xl">
                   {hydrated &&
                   founderActionBoard.currentAction &&
+                  !homeCalm &&
                   !pendingAction &&
                   !isLoading ? (
                     <FounderActionBar
@@ -5808,7 +5826,7 @@ export default function CompanionPage() {
                       }
                     />
                   ) : null}
-                  {pendingAction && !isLoading ? (
+                  {pendingAction && !isLoading && !homeCalm ? (
                     pendingAction.kind === "artifact-export" ? (
                       <ArtifactActionBar
                         artifactType={pendingAction.offer.artifactType}
@@ -5833,15 +5851,6 @@ export default function CompanionPage() {
                       />
                     )
                   ) : null}
-                  {homeCalm ? (
-                    <CompanionDiscoveryPrompt
-                      hasMeaningfulUsage={hasChatted}
-                      onOpenGettingToKnowYou={() => {
-                        setProfileGettingToKnowYou(true);
-                        setOverlay("profile");
-                      }}
-                    />
-                  ) : null}
                   <ChatInputBar
                     input={input}
                     isLoading={isLoading}
@@ -5858,9 +5867,10 @@ export default function CompanionPage() {
                         : undefined
                     }
                   />
-                  {/* Cold open stays bare: just starters + input. The voice
-                      chip and upsell only appear once a conversation exists. */}
-                  {!isIdle && (
+                  {homeCalm ? (
+                    <CompanionDiscoveryPrompt hasMeaningfulUsage={hasChatted} />
+                  ) : null}
+                  {(homeCalm || !isIdle) && (
                   <div className="mt-2 flex flex-col items-center justify-center gap-1">
                     <div className="flex items-center justify-center gap-3">
                       {(() => {
@@ -6155,7 +6165,7 @@ export default function CompanionPage() {
         </div>
       </div>
 
-      {warning && (
+      {warning && !homeCalm && (
         <div className="fixed bottom-4 left-1/2 z-40 w-[min(92%,28rem)] -translate-x-1/2">
           <div className="companion-fade-in flex items-center gap-3 rounded-2xl bg-[#1e4f4f] px-4 py-3 text-white shadow-2xl">
             <span aria-hidden="true">⏰</span>
