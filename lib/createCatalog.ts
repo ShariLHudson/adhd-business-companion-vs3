@@ -67,6 +67,11 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
         matchTerms: ["sop", "standard operating procedure", "procedure", "workflow doc"],
       },
       {
+        label: "Strategy",
+        emoji: "🎯",
+        matchTerms: ["strategy", "strategic plan", "growth strategy", "go-to-market"],
+      },
+      {
         label: "Business Plan",
         emoji: "🏢",
         matchTerms: ["business plan"],

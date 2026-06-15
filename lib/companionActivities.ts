@@ -482,3 +482,13 @@ export function activitiesForCategory(
 export function getActivityById(id: string): CompanionActivity | undefined {
   return COMPANION_ACTIVITIES.find((a) => a.id === id);
 }
+
+/** Alphabetical dropdown options for the activities picker. */
+export function activityCategoryDropdownOptions(): {
+  value: ActivityCategoryId;
+  label: string;
+}[] {
+  return [...ACTIVITY_CATEGORIES]
+    .sort((a, b) => a.label.localeCompare(b.label))
+    .map((c) => ({ value: c.id, label: c.label }));
+}

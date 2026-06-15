@@ -25,6 +25,8 @@ import {
   TEMPLATE_STATUS_OPTIONS,
   type TemplateStatusFilter,
 } from "@/lib/templateLibraryUx";
+import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
+import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 
 type Draft = {
   id?: string;
@@ -53,7 +55,9 @@ export function TemplatesLibrary({
 }) {
   const [items, setItems] = useState<TemplateItem[]>([]);
   const [status, setStatus] = useState<TemplateStatusFilter>("saved");
-  const [category, setCategory] = useState<TemplateCategory | "all">("all");
+  const [category, setCategory] = useState<TemplateCategory | typeof NO_CATEGORY>(
+    NO_CATEGORY,
+  );
   const [search, setSearch] = useState("");
   const [draft, setDraft] = useState<Draft | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
@@ -310,7 +314,7 @@ export function TemplatesLibrary({
         </div>
       </div>
       <p className="mt-1 text-base text-[#6b635a]">
-        Search or pick a category — one list at a time.
+        Pick a category first — or search across everything.
       </p>
 
       <input
@@ -323,22 +327,14 @@ export function TemplatesLibrary({
       />
 
       <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-        <label className="min-w-0 flex-1 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-          Category
-          <select
-            value={category}
-            onChange={(e) =>
-              setCategory(e.target.value as TemplateCategory | "all")
-            }
-            className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-          >
-            {TEMPLATE_CATEGORY_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </label>
+        <CategoryPickerSelect
+          className="min-w-0 flex-1"
+          label="Category"
+          value={category}
+          onChange={setCategory}
+          options={TEMPLATE_CATEGORY_OPTIONS}
+          placeholder="Select a category…"
+        />
         <label className="min-w-0 flex-1 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
           Status
           <select
@@ -359,7 +355,9 @@ export function TemplatesLibrary({
 
       {visible.length === 0 ? (
         <p className="mt-6 text-base text-[#6b635a]">
-          No templates match — try a different search or filter.
+          {!category && !search.trim()
+            ? CATEGORY_PICKER_EMPTY_LIST_HINT
+            : "No templates match — try a different search or category."}
         </p>
       ) : (
         <ul className="mt-5 flex flex-col gap-2">

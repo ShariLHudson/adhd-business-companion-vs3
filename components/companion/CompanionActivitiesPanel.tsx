@@ -4,30 +4,39 @@ import { useState } from "react";
 import { logMomentum } from "@/lib/companionStore";
 import {
   ACTIVITY_CATEGORIES,
-  COMPANION_ACTIVITIES,
+  activityCategoryDropdownOptions,
+  activitiesForCategory,
   type ActivityCategoryId,
   type CompanionActivity,
 } from "@/lib/companionActivities";
+import {
+  CATEGORY_PICKER_EMPTY_LIST_HINT,
+  CATEGORY_PICKER_HINT,
+  NO_CATEGORY,
+} from "@/lib/categoryRevealUx";
+import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 import type { AppSection } from "@/lib/companionUi";
 
 type Phase = "browse" | "active" | "stopped" | "complete";
 
 export function CompanionActivitiesPanel({
   onOpen,
+  onClose,
 }: {
   onOpen?: (section: AppSection) => void;
+  onClose?: () => void;
 }) {
   const [phase, setPhase] = useState<Phase>("browse");
-  const [categoryFilter, setCategoryFilter] = useState<ActivityCategoryId | "all">(
-    "all",
+  const [categoryId, setCategoryId] = useState<ActivityCategoryId | typeof NO_CATEGORY>(
+    NO_CATEGORY,
   );
   const [activity, setActivity] = useState<CompanionActivity | null>(null);
   const [stepIndex, setStepIndex] = useState(0);
 
+  const categoryOptions = activityCategoryDropdownOptions();
+  const selectedCategory = ACTIVITY_CATEGORIES.find((c) => c.id === categoryId);
   const visible =
-    categoryFilter === "all"
-      ? COMPANION_ACTIVITIES
-      : COMPANION_ACTIVITIES.filter((a) => a.categoryId === categoryFilter);
+    categoryId === NO_CATEGORY ? [] : activitiesForCategory(categoryId);
 
   function start(a: CompanionActivity) {
     setActivity(a);
@@ -202,75 +211,52 @@ export function CompanionActivitiesPanel({
   }
 
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
-      <header className="text-center">
-        <h1 className="text-2xl font-semibold text-[#1f1c19]">Help Me Right Now</h1>
-        <p className="mt-2 text-base leading-relaxed text-[#6b635a]">
-          Companion activities organized by what you need — pick support based on
-          how you feel, not a scoreboard.
-        </p>
-      </header>
-
-      <div className="mt-6 flex flex-wrap justify-center gap-2">
-        <button
-          type="button"
-          onClick={() => setCategoryFilter("all")}
-          className={`rounded-full px-3 py-1.5 text-sm font-semibold ${
-            categoryFilter === "all"
-              ? "bg-[#1e4f4f] text-white"
-              : "bg-white text-[#6b635a] ring-1 ring-[#e7dfd4]"
-          }`}
-        >
-          All
-        </button>
-        {ACTIVITY_CATEGORIES.map((cat) => (
+    <div className="companion-fade-in mx-auto flex h-full max-w-lg flex-col px-6 py-8">
+      <div className="flex items-start justify-between gap-3">
+        <header className="min-w-0 text-left">
+          <h1 className="text-2xl font-semibold text-[#1f1c19]">Help Me Right Now</h1>
+          <p className="mt-2 text-base leading-relaxed text-[#6b635a]">
+            {CATEGORY_PICKER_HINT} No scoreboard — just support when you need it.
+          </p>
+        </header>
+        {onClose ? (
           <button
-            key={cat.id}
             type="button"
-            onClick={() => setCategoryFilter(cat.id)}
-            className={`rounded-full px-3 py-1.5 text-sm font-semibold ${
-              categoryFilter === "all" || categoryFilter === cat.id
-                ? categoryFilter === cat.id
-                  ? "bg-[#1e4f4f] text-white"
-                  : "bg-white text-[#6b635a] ring-1 ring-[#e7dfd4]"
-                : "bg-white text-[#6b635a] ring-1 ring-[#e7dfd4]"
-            }`}
+            onClick={onClose}
+            aria-label="Close"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-[#6b635a] hover:bg-[#1e4f4f]/10"
           >
-            {cat.label}
+            ✕
           </button>
-        ))}
+        ) : null}
       </div>
 
-      {categoryFilter !== "all" ? (
-        <p className="mt-4 text-center text-sm text-[#6b635a]">
-          {ACTIVITY_CATEGORIES.find((c) => c.id === categoryFilter)?.description}
-        </p>
+      <div className="mt-6">
+        <CategoryPickerSelect
+          label="What kind of help do you need?"
+          value={categoryId}
+          onChange={setCategoryId}
+          options={categoryOptions}
+          placeholder="Select…"
+        />
+      </div>
+
+      {selectedCategory ? (
+        <p className="mt-3 text-sm text-[#6b635a]">{selectedCategory.description}</p>
       ) : null}
 
       <ul className="mt-5 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pb-4">
-        {categoryFilter === "all"
-          ? ACTIVITY_CATEGORIES.map((cat) => {
-              const items = COMPANION_ACTIVITIES.filter(
-                (a) => a.categoryId === cat.id,
-              );
-              return (
-                <li key={cat.id}>
-                  <p className="mb-2 text-sm font-bold uppercase tracking-wide text-[#1e4f4f]">
-                    {cat.label}
-                  </p>
-                  <ul className="flex flex-col gap-2">
-                    {items.map((a) => (
-                      <ActivityCard key={a.id} activity={a} onStart={start} />
-                    ))}
-                  </ul>
-                </li>
-              );
-            })
-          : visible.map((a) => (
-              <li key={a.id}>
-                <ActivityCard activity={a} onStart={start} />
-              </li>
-            ))}
+        {categoryId === NO_CATEGORY ? (
+          <li className="rounded-xl border border-dashed border-[#e7dfd4] px-4 py-6 text-center text-sm text-[#6b635a]">
+            {CATEGORY_PICKER_EMPTY_LIST_HINT}
+          </li>
+        ) : (
+          visible.map((a) => (
+            <li key={a.id}>
+              <ActivityCard activity={a} onStart={start} />
+            </li>
+          ))
+        )}
       </ul>
     </div>
   );

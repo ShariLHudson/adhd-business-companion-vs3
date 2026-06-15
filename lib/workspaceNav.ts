@@ -1,6 +1,7 @@
 // Split-view navigation — which sections open beside chat vs full screen.
-// Rule: chat stays left; only ONE workspace is active on the right.
-// Opening a new menu item replaces the current workspace — never stacks.
+// Rule: chat is always available but never auto-opens; user chooses "Work With Shari".
+// Only ONE workspace is active on the right when split. Opening a new menu item
+// replaces the current workspace — never stacks.
 
 import type { AppSection } from "./companionUi";
 import { supportsWorkspace } from "./workspaceMode";

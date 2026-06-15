@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ConfirmDialog } from "@/components/companion/ConfirmDialog";
+import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
+import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 import {
   archiveSavedWork,
   deleteSavedWork,
@@ -18,14 +19,12 @@ import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 
 type SavedWorkAction = "rename" | "duplicate" | "archive" | "unarchive" | "delete";
 
-const STATUS_TABS: { id: SavedWorkStatus | "all" | "archived"; label: string }[] =
-  [
-    { id: "all", label: "All" },
-    { id: "saved", label: "Saved" },
-    { id: "draft", label: "Drafts" },
-    { id: "exported", label: "Exported" },
-    { id: "archived", label: "Archived" },
-  ];
+const STATUS_OPTIONS: { id: SavedWorkStatus | "archived"; label: string }[] = [
+  { id: "archived", label: "Archived" },
+  { id: "draft", label: "Drafts" },
+  { id: "exported", label: "Exported" },
+  { id: "saved", label: "Saved" },
+];
 
 function SavedWorkItemMenu({
   item,
@@ -130,9 +129,9 @@ export function SavedWorkLibrary({
   onOpenInCreate?: (input: CreationWorkspaceInput) => void;
 }) {
   const [items, setItems] = useState<SavedWorkItem[]>([]);
-  const [status, setStatus] = useState<SavedWorkStatus | "all" | "archived">(
-    "all",
-  );
+  const [status, setStatus] = useState<
+    SavedWorkStatus | "archived" | typeof NO_CATEGORY
+  >(NO_CATEGORY);
   const [query, setQuery] = useState("");
   const [viewId, setViewId] = useState<string | null>(null);
   const [renaming, setRenaming] = useState<SavedWorkItem | null>(null);
@@ -148,12 +147,13 @@ export function SavedWorkLibrary({
   }, []);
 
   const baseList =
-    status === "archived" ? getArchivedSavedWork() : getActiveSavedWork();
+    status === NO_CATEGORY
+      ? []
+      : status === "archived"
+        ? getArchivedSavedWork()
+        : getActiveSavedWork().filter((w) => w.status === status);
 
   const visible = baseList.filter((w) => {
-    if (status !== "all" && status !== "archived" && w.status !== status) {
-      return false;
-    }
     if (!query.trim()) return true;
     const q = query.toLowerCase();
     return (
@@ -290,22 +290,14 @@ export function SavedWorkLibrary({
         ) : null}
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
-        {STATUS_TABS.map((tab) => (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => setStatus(tab.id)}
-            className={`rounded-full px-3 py-1 text-sm font-semibold ${
-              status === tab.id
-                ? "bg-[#1e4f4f] text-white"
-                : "bg-white text-[#6b635a] ring-1 ring-[#e7dfd4]"
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      <CategoryPickerSelect
+        label="Show"
+        value={status === NO_CATEGORY ? NO_CATEGORY : status}
+        onChange={(v) => setStatus(v === NO_CATEGORY ? NO_CATEGORY : v)}
+        options={STATUS_OPTIONS}
+        placeholder="Select…"
+        className="mt-4"
+      />
 
       <input
         value={query}
@@ -372,9 +364,11 @@ export function SavedWorkLibrary({
         <ul className="mt-4 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto">
           {visible.length === 0 ? (
             <li className="rounded-xl border border-dashed border-[#e7dfd4] p-6 text-center text-sm text-[#6b635a]">
-              {status === "archived"
-                ? "No archived items — archive something to hide it from active views."
-                : "No saved work yet — create something in Create and click Save."}
+              {status === NO_CATEGORY
+                ? CATEGORY_PICKER_EMPTY_LIST_HINT
+                : status === "archived"
+                  ? "No archived items — archive something to hide it from active views."
+                  : "No saved work in this category yet."}
             </li>
           ) : (
             visible.map((w) => (

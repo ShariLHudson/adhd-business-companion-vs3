@@ -13,7 +13,8 @@ import {
   type Snippet,
   type SnippetKind,
 } from "@/lib/companionStore";
-import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
+import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
+import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 
 const KINDS = sortedSnippetKinds();
 
@@ -42,7 +43,9 @@ export function SnippetsLibrary({
   onBuildWithShari?: (input: CreationWorkspaceInput) => void;
 }) {
   const [items, setItems] = useState<Snippet[]>([]);
-  const [filter, setFilter] = useState<SnippetKind | "all">("all");
+  const [filter, setFilter] = useState<SnippetKind | typeof NO_CATEGORY>(
+    NO_CATEGORY,
+  );
   const [draft, setDraft] = useState<Draft | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
 
@@ -94,7 +97,10 @@ export function SnippetsLibrary({
     setSuggestions((list) => list.filter((x) => x !== s));
   }
 
-  const visible = items.filter((s) => filter === "all" || s.kind === filter);
+  const visible =
+    filter === NO_CATEGORY
+      ? []
+      : items.filter((s) => s.kind === filter);
 
   function save() {
     if (!draft || !draft.content.trim()) return;
@@ -415,29 +421,24 @@ export function SnippetsLibrary({
         </div>
       )}
 
-      <div className="mt-4 flex flex-col">
-        <label className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-          Type
-        </label>
-        <select
-          value={filter}
-          onChange={(e) => setFilter(e.target.value as SnippetKind | "all")}
-          className="mt-1 w-full max-w-xs rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-        >
-          <option value="all">All</option>
-          {KINDS.map((k) => (
-            <option key={k} value={k}>
-              {SNIPPET_KIND_LABEL[k]}
-            </option>
-          ))}
-        </select>
-      </div>
+      <CategoryPickerSelect
+        label="Type"
+        value={filter}
+        onChange={setFilter}
+        options={KINDS.map((k) => ({
+          value: k,
+          label: SNIPPET_KIND_LABEL[k],
+        }))}
+        placeholder="Select a type…"
+        className="mt-4"
+      />
 
       <div className="mt-5 flex flex-col gap-3">
         {visible.length === 0 ? (
           <p className="text-base text-[#6b635a]">
-            Nothing here yet. Create one, or save a line from the email
-            generator.
+            {filter === NO_CATEGORY
+              ? CATEGORY_PICKER_EMPTY_LIST_HINT
+              : "Nothing here yet in this type. Create one, or save a line from the email generator."}
           </p>
         ) : (
           visible.map((s) => (

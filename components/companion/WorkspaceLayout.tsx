@@ -22,7 +22,7 @@ export function WorkspaceLayout({
   workspace,
   workspaceActive = Boolean(workspace),
   workspaceTitle = "Workspace",
-  chatLayoutMode = "split",
+  chatLayoutMode = "workspace-focus",
   onChatLayoutModeChange,
   onClose,
   revealKey = 0,
@@ -158,22 +158,13 @@ export function WorkspaceLayout({
             </div>
             <div className="flex flex-wrap items-center justify-end gap-1">
               {chatHidden ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => setLayout("split")}
-                    className={layoutBtn}
-                  >
-                    Show Chat
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLayout("split")}
-                    className={layoutBtnActive}
-                  >
-                    Chat + Workspace
-                  </button>
-                </>
+                <button
+                  type="button"
+                  onClick={() => setLayout("split")}
+                  className={layoutBtnActive}
+                >
+                  💬 Work With Shari
+                </button>
               ) : (
                 <>
                   <button
@@ -181,21 +172,14 @@ export function WorkspaceLayout({
                     onClick={() => setLayout("workspace-focus")}
                     className={layoutBtn}
                   >
-                    Hide Chat
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLayout("workspace-focus")}
-                    className={layoutBtnActive}
-                  >
-                    Focus on Workspace
+                    Focus on workspace
                   </button>
                   <button
                     type="button"
                     onClick={() => setLayout("split")}
-                    className={layoutBtn}
+                    className={layoutBtnActive}
                   >
-                    Chat + Workspace
+                    💬 Work With Shari
                   </button>
                 </>
               )}

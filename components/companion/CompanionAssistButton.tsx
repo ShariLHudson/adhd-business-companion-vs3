@@ -10,7 +10,7 @@ type CompanionAssistButtonProps = {
 /** Optional entry to companion chat while staying in a workspace. */
 export function CompanionAssistButton({
   onOpen,
-  label = "Ask Shari",
+  label = "Work With Shari",
   className = "",
   variant = "floating",
 }: CompanionAssistButtonProps) {

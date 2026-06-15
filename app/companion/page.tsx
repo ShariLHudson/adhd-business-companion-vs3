@@ -102,6 +102,18 @@ import {
   shouldOpenBesideChat,
 } from "@/lib/workspaceNav";
 import {
+  DEFAULT_CHAT_LAYOUT_MODE,
+  saveWorkspaceChatLayoutPreference,
+} from "@/lib/workspaceChatPreference";
+import {
+  bootstrapCreateBuilderSession,
+  createBuilderExportMessage,
+  formatCreateBuilderChatHint,
+  markCreateBuilderGenerated,
+  processCreateBuilderTurn,
+  type CreateBuilderSession,
+} from "@/lib/createBuilderChat";
+import {
   artifactLockHintForChat,
   conflictsWithLockedArtifact,
   detectArtifactExportOffer,
@@ -646,6 +658,19 @@ export default function CompanionPage() {
   const [activeSection, setActiveSection] = useState<AppSection>("home");
   const [activeNav, setActiveNav] = useState<SidebarNavId>("chat");
   const [messages, setMessages] = useState<Message[]>([]);
+  const [workspacePanel, setWorkspacePanelState] = useState<AppSection | null>(
+    null,
+  );
+  const workspacePanelRef = useRef<AppSection | null>(null);
+  const [chatLayoutMode, setChatLayoutModeState] =
+    useState<ChatLayoutMode>(DEFAULT_CHAT_LAYOUT_MODE);
+  const applyChatLayoutMode = useCallback((mode: ChatLayoutMode) => {
+    setChatLayoutModeState(mode);
+    saveWorkspaceChatLayoutPreference(mode);
+  }, []);
+  const focusWorkspaceLayout = useCallback(() => {
+    applyChatLayoutMode("workspace-focus");
+  }, [applyChatLayoutMode]);
   // True once we've restored any saved conversation from localStorage.
   // Gates the autosave effect so we never overwrite a saved chat with [].
   const [hydrated, setHydrated] = useState(false);
@@ -708,7 +733,9 @@ export default function CompanionPage() {
   const pomodoroTimer = usePomodoroTimer();
 
   const isIdle = !messages.some((m) => m.role === "user");
-  const homeCalm = activeSection === "home" && isIdle;
+  const splitCreateChat =
+    chatLayoutMode === "split" && workspacePanel === "content-generator";
+  const homeCalm = activeSection === "home" && isIdle && !splitCreateChat;
 
   useEffect(() => {
     if (!homeCalm) return;
@@ -991,21 +1018,25 @@ export default function CompanionPage() {
   const [preferredGoogleExportKind, setPreferredGoogleExportKind] =
     useState<GoogleFileKind | null>(null);
   const [createExportReady, setCreateExportReady] = useState(false);
+  const [createBuilderSession, setCreateBuilderSession] =
+    useState<CreateBuilderSession | null>(null);
+  const createBuilderSessionRef = useRef<CreateBuilderSession | null>(null);
+  createBuilderSessionRef.current = createBuilderSession;
+  const [chatBuildRequest, setChatBuildRequest] = useState<{
+    type: string;
+    brief: string;
+    key: number;
+  } | null>(null);
+  const createBuilderBootstrappedRef = useRef(false);
   const [googleWorkspace, setGoogleWorkspace] =
     useState<GoogleWorkspaceSession | null>(null);
   const googleWorkspaceRef = useRef<GoogleWorkspaceSession | null>(null);
   googleWorkspaceRef.current = googleWorkspace;
   const [doItNowOffer, setDoItNowOffer] = useState<DoItNowOffer | null>(null);
   const [physicalActionWaiting, setPhysicalActionWaiting] = useState(false);
-  const [workspacePanel, setWorkspacePanelState] = useState<AppSection | null>(
-    null,
-  );
-  const workspacePanelRef = useRef<AppSection | null>(null);
   const workspaceRevealSeqRef = useRef(0);
   const activeSectionRef = useRef<AppSection>("home");
   activeSectionRef.current = activeSection;
-  const [chatLayoutMode, setChatLayoutMode] =
-    useState<ChatLayoutMode>("split");
   const [workspaceFirstSplit, setWorkspaceFirstSplit] = useState(false);
   const [companionStandaloneSection, setCompanionStandaloneSection] =
     useState<AppSection | null>(null);
@@ -1041,7 +1072,7 @@ export default function CompanionPage() {
     patchWorkspacePanel("google-workspace");
     setActiveSection("home");
     activeSectionRef.current = "home";
-    setChatLayoutMode("split");
+    focusWorkspaceLayout();
     revealWorkspace();
     appendVerifiedWorkspaceMessage(
       "google-workspace",
@@ -1056,6 +1087,82 @@ export default function CompanionPage() {
 
   function handleExportGuidance(message: string) {
     setMessages((prev) => [...prev, { role: "assistant", content: message }]);
+  }
+
+  function syncCreateBuilderType(typeLabel: string) {
+    const ctx = toCreationContext("content-generator", {
+      itemType: typeLabel,
+      title: typeLabel,
+      brief: "",
+      stage: "discovery with Shari",
+      source: creationContext?.source ?? "generated",
+      artifactTypeLocked: shouldLockArtifactType(typeLabel),
+    });
+    setCreationContext((prev) =>
+      creationContextEqual(prev, ctx) ? prev : ctx,
+    );
+    setGenSeed((prev) => ({
+      type: typeLabel,
+      topic: typeLabel,
+      brief: "",
+      autoGenerate: false,
+    }));
+    setActiveNav("create");
+  }
+
+  function startCreateBuilderChat(typeHint?: string | null) {
+    const raw =
+      typeHint ??
+      creationContext?.itemType ??
+      genSeed?.type ??
+      lockedArtifactType ??
+      null;
+    const type =
+      raw && raw !== "content" && raw.trim() ? raw.trim() : null;
+    const { session, opener } = bootstrapCreateBuilderSession(type);
+    setCreateBuilderSession(session);
+    if (session.typeLabel) syncCreateBuilderType(session.typeLabel);
+    setMessages((prev) => {
+      if (
+        prev.some(
+          (m) =>
+            m.role === "assistant" &&
+            (m.content.includes("Builder") ||
+              m.content.includes("one question at a time")),
+        )
+      ) {
+        return prev;
+      }
+      return [...prev, { role: "assistant", content: opener }];
+    });
+    createBuilderBootstrappedRef.current = true;
+  }
+
+  function handleChatBuildComplete() {
+    const type = createBuilderSessionRef.current?.typeLabel ?? "draft";
+    setCreateBuilderSession((prev) =>
+      prev ? markCreateBuilderGenerated(prev) : prev,
+    );
+    setChatBuildRequest(null);
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: createBuilderExportMessage(type) },
+    ]);
+  }
+
+  function handleChatBuildFailed() {
+    setChatBuildRequest(null);
+    setCreateBuilderSession((prev) =>
+      prev ? { ...prev, phase: "readiness" } : prev,
+    );
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content:
+          "Generation hit a snag — want to try again? Reply **yes** when you're ready.",
+      },
+    ]);
   }
 
   function openCollaborativeDocument(
@@ -1637,7 +1744,7 @@ export default function CompanionPage() {
     ) {
       setActiveSection("home");
       setActiveNav("create");
-      setChatLayoutMode("split");
+      focusWorkspaceLayout();
       revealWorkspace();
       return;
     }
@@ -1774,7 +1881,7 @@ export default function CompanionPage() {
         opts?.savedArtifact ?? savedArtifactRef.current,
       );
     }
-    setChatLayoutMode("split");
+    focusWorkspaceLayout();
     revealWorkspace();
   }
 
@@ -1828,7 +1935,7 @@ export default function CompanionPage() {
       patchWorkspacePanel("content-generator");
       setActiveNav("create");
     }
-    setChatLayoutMode("split");
+    focusWorkspaceLayout();
     revealWorkspace();
   }
 
@@ -1990,7 +2097,7 @@ export default function CompanionPage() {
         appendAck ? route.ack : undefined,
       );
       if (!appendAck) {
-        setChatLayoutMode("split");
+        focusWorkspaceLayout();
         revealWorkspace();
       }
       return;
@@ -2001,7 +2108,7 @@ export default function CompanionPage() {
     patchWorkspacePanel(route.section);
     setWorkspaceDetail(emptyWorkspaceDetail());
     setActiveSection("home");
-    setChatLayoutMode("split");
+    focusWorkspaceLayout();
     setActiveNav(navForWorkspaceSection(route.section) ?? "chat");
     revealWorkspace();
     if (appendAck) {
@@ -2124,7 +2231,7 @@ export default function CompanionPage() {
         patchWorkspacePanel(section);
         setWorkspaceDetail(emptyWorkspaceDetail());
         setActiveSection("home");
-        setChatLayoutMode("split");
+        focusWorkspaceLayout();
         setActiveNav(navForWorkspaceSection(section) ?? "chat");
         revealWorkspace();
       },
@@ -2392,7 +2499,7 @@ export default function CompanionPage() {
     setActiveSection("home");
     setActiveNav("chat");
     setCoachingMode("today");
-    setChatLayoutMode("split");
+    focusWorkspaceLayout();
   }
 
   function navForWorkspaceSection(section: AppSection): SidebarNavId | null {
@@ -2423,7 +2530,7 @@ export default function CompanionPage() {
       if (workspacePanel === "content-generator") {
         setActiveSection("home");
         setActiveNav("create");
-        setChatLayoutMode("split");
+        focusWorkspaceLayout();
         revealWorkspace();
         return;
       }
@@ -2434,7 +2541,7 @@ export default function CompanionPage() {
           ),
         })
       ) {
-        setChatLayoutMode("split");
+        focusWorkspaceLayout();
         revealWorkspace();
         return;
       }
@@ -2442,7 +2549,7 @@ export default function CompanionPage() {
         isExplicitCreateResumeRequest(lastUserTextRef.current) &&
         restoreCreateSession()
       ) {
-        setChatLayoutMode("split");
+        focusWorkspaceLayout();
         revealWorkspace();
         return;
       }
@@ -2457,7 +2564,7 @@ export default function CompanionPage() {
         },
         { ackMessage: undefined },
       );
-      setChatLayoutMode("split");
+      focusWorkspaceLayout();
       revealWorkspace();
       return;
     }
@@ -2465,7 +2572,7 @@ export default function CompanionPage() {
     if (workspacePanel === section) {
       setActiveSection("home");
       if (nav) setActiveNav(nav);
-      setChatLayoutMode("split");
+      focusWorkspaceLayout();
       revealWorkspace();
       return;
     }
@@ -2475,7 +2582,7 @@ export default function CompanionPage() {
     setCreationContext(null);
     applyWorkspaceFocus(null);
     setActiveSection("home");
-    setChatLayoutMode("split");
+    focusWorkspaceLayout();
     setWorkspaceSession(null);
     setProjectsBootstrapCreate(false);
 
@@ -2518,7 +2625,7 @@ export default function CompanionPage() {
     setCompanionStandaloneSection(null);
     companionReturnSectionRef.current = null;
     patchWorkspacePanel(null);
-    setChatLayoutMode("split");
+    focusWorkspaceLayout();
     setActiveNav(nav);
 
     if (section === "content-generator") {
@@ -2530,11 +2637,11 @@ export default function CompanionPage() {
     setActiveSection(section);
   }
 
-  /** User chose companion help while working — workspace left, chat right. */
+  /** User chose companion help — chat left, workspace right. */
   function openCompanionAssist(sourceSection: AppSection) {
     companionReturnSectionRef.current = sourceSection;
-    setWorkspaceFirstSplit(true);
-    setChatLayoutMode("split");
+    setWorkspaceFirstSplit(false);
+    applyChatLayoutMode("split");
 
     if (supportsWorkspace(sourceSection)) {
       setCompanionStandaloneSection(null);
@@ -2552,6 +2659,14 @@ export default function CompanionPage() {
     setActiveNav(navForWorkspaceSection(sourceSection) ?? activeNav);
     setActiveSection("home");
     revealWorkspace();
+    if (
+      sourceSection === "content-generator" ||
+      (supportsWorkspace(sourceSection) && workspacePanel === "content-generator")
+    ) {
+      startCreateBuilderChat(
+        creationContext?.itemType ?? genSeed?.type ?? lockedArtifactType,
+      );
+    }
     inputRef.current?.focus();
   }
 
@@ -2746,6 +2861,22 @@ export default function CompanionPage() {
     [creationContext],
   );
 
+  useEffect(() => {
+    if (!splitCreateChat) {
+      createBuilderBootstrappedRef.current = false;
+      return;
+    }
+    if (createBuilderBootstrappedRef.current) return;
+    startCreateBuilderChat(
+      creationContext?.itemType ?? genSeed?.type ?? lockedArtifactType,
+    );
+  }, [
+    splitCreateChat,
+    creationContext?.itemType,
+    genSeed?.type,
+    lockedArtifactType,
+  ]);
+
   function runArtifactExport(action: ArtifactExportAction) {
     setArtifactExportOffer(null);
     if (
@@ -2758,7 +2889,7 @@ export default function CompanionPage() {
     if (workspacePanel === "content-generator") {
       setActiveSection("home");
       setActiveNav("create");
-      setChatLayoutMode("split");
+      focusWorkspaceLayout();
       revealWorkspace();
       setExportTrigger(action);
     }
@@ -2772,13 +2903,13 @@ export default function CompanionPage() {
       if (workspacePanel === "content-generator") {
         setActiveSection("home");
         setActiveNav("create");
-        setChatLayoutMode("split");
+        focusWorkspaceLayout();
         revealWorkspace();
       } else if (
         isExplicitCreateResumeRequest(lastUserTextRef.current) &&
         restoreCreateSession(undefined, ack)
       ) {
-        setChatLayoutMode("split");
+        focusWorkspaceLayout();
         revealWorkspace();
       } else if (
         tryOpenCreateForCurrentArtifact(lastUserTextRef.current, {
@@ -2806,7 +2937,7 @@ export default function CompanionPage() {
     if (workspacePanel === section) {
       setActiveSection("home");
       activeSectionRef.current = "home";
-      setChatLayoutMode("split");
+      focusWorkspaceLayout();
       revealWorkspace();
       appendVerifiedWorkspaceMessage(section, ack);
       return;
@@ -2816,7 +2947,7 @@ export default function CompanionPage() {
     setWorkspaceDetail(emptyWorkspaceDetail());
     setActiveSection("home");
     activeSectionRef.current = "home";
-    setChatLayoutMode("split");
+    focusWorkspaceLayout();
     if (section === "projects") {
       setActiveNav("projects");
       setProjectsBootstrapCreate(true);
@@ -2893,6 +3024,46 @@ export default function CompanionPage() {
   ) {
     const trimmed = (overrideText ?? input).trim();
     if (!trimmed || isLoading) return;
+
+    const builderSession = createBuilderSessionRef.current;
+    const builderChatActive =
+      chatLayoutMode === "split" &&
+      workspacePanel === "content-generator" &&
+      builderSession &&
+      builderSession.phase !== "done";
+
+    if (builderChatActive && !fresh) {
+      const userMessage: Message = { role: "user", content: trimmed };
+      setMessages((prev) => [...prev, userMessage]);
+      setInput("");
+      setIsLoading(false);
+
+      const turn = processCreateBuilderTurn(builderSession, trimmed);
+      setCreateBuilderSession(turn.session);
+
+      if (turn.session.typeLabel && turn.session.typeLabel !== creationContext?.itemType) {
+        syncCreateBuilderType(turn.session.typeLabel);
+      }
+
+      if (turn.reply) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: turn.reply },
+        ]);
+      }
+
+      if (turn.generateBrief && turn.generateType) {
+        setChatBuildRequest({
+          type: turn.generateType,
+          brief: turn.generateBrief,
+          key: Date.now(),
+        });
+      }
+
+      voiceUsedRef.current = false;
+      return;
+    }
+
     const isNewConversation = !messages.some((m) => m.role === "user");
     if (isNewConversation) recordConversationStart();
     lastUserTextRef.current = trimmed;
@@ -3697,7 +3868,7 @@ export default function CompanionPage() {
           buildGoogleDocRecoveryMessage(savedRecord),
         );
         revealWorkspace();
-        setChatLayoutMode("split");
+        focusWorkspaceLayout();
         setActiveSection("home");
         setActiveNav("create");
         return;
@@ -3724,7 +3895,7 @@ export default function CompanionPage() {
           buildGoogleDocRecoveryMessage(savedRecord),
         );
         revealWorkspace();
-        setChatLayoutMode("split");
+        focusWorkspaceLayout();
         setActiveSection("home");
         setActiveNav("create");
         return;
@@ -3813,7 +3984,7 @@ export default function CompanionPage() {
           ),
         );
         revealWorkspace();
-        setChatLayoutMode("split");
+        focusWorkspaceLayout();
         setActiveSection("home");
         setActiveNav("create");
         return;
@@ -3874,7 +4045,7 @@ export default function CompanionPage() {
                 );
           if (restoreCreateSession(undefined, recoveryAck)) {
             revealWorkspace();
-            setChatLayoutMode("split");
+            focusWorkspaceLayout();
             return;
           }
         }
@@ -3884,7 +4055,7 @@ export default function CompanionPage() {
           })
         ) {
           revealWorkspace();
-          setChatLayoutMode("split");
+          focusWorkspaceLayout();
           return;
         }
       }
@@ -4478,6 +4649,9 @@ export default function CompanionPage() {
                     : undefined,
               preferredGoogleExport: preferredGoogleExportKind,
             }),
+            splitCreateChat
+              ? formatCreateBuilderChatHint(createBuilderSession)
+              : null,
             !workspacePanel && hasActiveCreateSession()
               ? "STORED CREATE SESSION: A saved Create draft exists but the panel is closed. Do NOT say the draft is visible on screen. If they ask to see or continue it, tell them you are reopening Create — the app will restore it."
               : null,
@@ -4813,6 +4987,9 @@ export default function CompanionPage() {
     companionReturnSectionRef.current = null;
     setWorkspaceFirstSplit(false);
     setCompanionStandaloneSection(null);
+    setCreateBuilderSession(null);
+    setChatBuildRequest(null);
+    createBuilderBootstrappedRef.current = false;
     patchWorkspacePanel(null);
     setWorkspaceDetail(null);
     setCreationContext(null);
@@ -4835,7 +5012,7 @@ export default function CompanionPage() {
     } else {
       setActiveNav("chat");
     }
-    setChatLayoutMode("split");
+    focusWorkspaceLayout();
   }
 
   function saveCreateForLater() {
@@ -4908,6 +5085,10 @@ export default function CompanionPage() {
             onOpenGoogleWorkspace={handleOpenGoogleWorkspace}
             onArtifactReady={handleArtifactReadyChat}
             onExportGuidance={handleExportGuidance}
+            companionBuilderMode={splitCreateChat}
+            chatBuildRequest={chatBuildRequest}
+            onChatBuildComplete={handleChatBuildComplete}
+            onChatBuildFailed={handleChatBuildFailed}
           />
         );
       case "google-workspace":
@@ -5213,7 +5394,7 @@ export default function CompanionPage() {
       setActiveSection("home");
       activeSectionRef.current = "home";
       setActiveNav("create");
-      setChatLayoutMode("split");
+      focusWorkspaceLayout();
       revealWorkspace();
       appendVerifiedWorkspaceMessage("content-generator", action.openAck);
       return;
@@ -5986,7 +6167,7 @@ export default function CompanionPage() {
                       : "Workspace"
                 }
                 chatLayoutMode={chatLayoutMode}
-                onChatLayoutModeChange={setChatLayoutMode}
+                onChatLayoutModeChange={applyChatLayoutMode}
                 onClose={closeWorkspacePanel}
                 revealKey={workspaceRevealSeq}
                 workspaceFirst={workspaceFirstSplit}
@@ -6066,7 +6247,10 @@ export default function CompanionPage() {
           )}
 
           {activeSection === "activities" && (
-            <CompanionActivitiesPanel onOpen={(s) => setActiveSection(s)} />
+            <CompanionActivitiesPanel
+              onOpen={(s) => setActiveSection(s)}
+              onClose={goBack}
+            />
           )}
 
           {activeSection === "spin-wheel" && (
@@ -6086,7 +6270,11 @@ export default function CompanionPage() {
             />
           )}
 
-          {activeSection === "client-avatars" && <IdealClientBuilder />}
+          {activeSection === "client-avatars" && (
+            <WorkspaceShell onAskShari={() => openCompanionAssist("client-avatars")}>
+              <IdealClientBuilder />
+            </WorkspaceShell>
+          )}
 
           {activeSection === "projects" && (
             <WorkspaceShell onAskShari={() => openCompanionAssist("projects")}>
@@ -6125,7 +6313,7 @@ export default function CompanionPage() {
           )}
 
           {activeSection === "templates-library" && (
-            <WorkspaceShell showAssist={false}>
+            <WorkspaceShell onAskShari={() => openCompanionAssist("templates-library")}>
               <TemplatesLibrary
                 onOpen={(s) => setActiveSection(s)}
                 onGenerate={openGenerator}

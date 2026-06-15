@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { NO_CATEGORY } from "./categoryRevealUx";
 import { filterTemplates } from "./templateLibraryUx";
 import type { TemplateItem } from "./companionStore";
 
@@ -24,14 +25,23 @@ const sample: TemplateItem[] = [
 ];
 
 describe("filterTemplates", () => {
-  it("filters by search query", () => {
+  it("filters by search query across categories", () => {
     const out = filterTemplates(sample, {
       query: "welcome",
       status: "all",
-      category: "all",
+      category: NO_CATEGORY,
     });
     expect(out).toHaveLength(1);
     expect(out[0]?.title).toBe("Welcome Email");
+  });
+
+  it("returns empty until category or search", () => {
+    const out = filterTemplates(sample, {
+      query: "",
+      status: "all",
+      category: NO_CATEGORY,
+    });
+    expect(out).toHaveLength(0);
   });
 
   it("filters by category without accordions", () => {

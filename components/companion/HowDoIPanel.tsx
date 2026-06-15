@@ -75,14 +75,13 @@ export function HowDoIPanel({
       <WorkspaceGuide section="how-do-i" />
       <p className="text-2xl font-semibold text-[#1f1c19]">How Do I…</p>
       <p className="mt-1 text-base text-[#6b635a]">
-        Search how the app works — or ask Shari in chat anytime.
+        Search for how something works — we&apos;ll show matching answers only.
       </p>
       <input
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search — plan my day, focus, projects…"
         className="mt-4 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base outline-none focus:border-[#1e4f4f]"
-        autoFocus
       />
       <ul className="mt-4 flex flex-col gap-2">
         {results.map((entry) => (
@@ -98,7 +97,9 @@ export function HowDoIPanel({
         ))}
         {results.length === 0 ? (
           <li className="text-sm text-[#6b635a]">
-            No match — try chat: &ldquo;How do I…&rdquo;
+            {!query.trim()
+              ? "Type a search to see matching topics."
+              : "No match — try chat: “How do I…”"}
           </li>
         ) : null}
       </ul>

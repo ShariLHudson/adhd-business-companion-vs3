@@ -95,13 +95,12 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
 
 export function searchHowDoI(query: string): HowDoIEntry[] {
   const q = query.trim().toLowerCase();
-  const pool = q
-    ? HOW_DO_I_ENTRIES.filter(
-        (e) =>
-          e.question.toLowerCase().includes(q) ||
-          e.answer.toLowerCase().includes(q) ||
-          e.keywords.some((k) => k.includes(q) || q.includes(k)),
-      )
-    : HOW_DO_I_ENTRIES;
+  if (!q) return [];
+  const pool = HOW_DO_I_ENTRIES.filter(
+    (e) =>
+      e.question.toLowerCase().includes(q) ||
+      e.answer.toLowerCase().includes(q) ||
+      e.keywords.some((k) => k.includes(q) || q.includes(k)),
+  );
   return [...pool].sort((a, b) => a.question.localeCompare(b.question));
 }

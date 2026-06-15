@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { sortedCreateCatalog } from "@/lib/createCatalog";
+import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
+import { NO_CATEGORY } from "@/lib/categoryRevealUx";
 import {
   advanceAfterDiscoveryAnswer,
   advanceAfterTypePick,
@@ -48,37 +50,39 @@ export function CreateWorkflowPanel({
   const [draftAnswer, setDraftAnswer] = useState("");
 
   if (workflow.step === "category") {
+    const catalog = sortedCreateCatalog();
+    const categoryOptions = [...catalog]
+      .sort((a, b) => a.label.localeCompare(b.label))
+      .map((c) => ({ value: c.id, label: c.label }));
+
     return (
       <div className="companion-fade-in">
         <StepProgress step="category" />
-        <p className="mt-2 text-lg font-semibold text-[#1f1c19]">What kind of thing are you creating?</p>
-        <p className="mt-1 text-sm text-[#6b635a]">
-          Pick a category — we&apos;ll narrow from there. One step at a time.
+        <p className="mt-2 text-lg font-semibold text-[#1f1c19]">
+          What kind of thing are you creating?
         </p>
-        <div className="mt-4 flex flex-col gap-2">
-          {sortedCreateCatalog().map((cat) => (
-            <button
-              key={cat.id}
-              type="button"
-              onClick={() =>
-                onWorkflowChange({
-                  ...workflow,
-                  step: "type",
-                  categoryId: cat.id,
-                })
-              }
-              className="flex items-center gap-3 rounded-xl border border-[#d4cdc3] bg-white/85 px-4 py-3 text-left hover:border-[#1e4f4f]/40"
-            >
-              <span className="text-xl">{cat.items[0]?.emoji ?? "✨"}</span>
-              <span>
-                <span className="block font-semibold text-[#1f1c19]">{cat.label}</span>
-                <span className="text-sm text-[#6b635a]">
-                  {cat.items.filter((i) => !i.route).length} types
-                </span>
-              </span>
-            </button>
-          ))}
+        <p className="mt-1 text-sm text-[#6b635a]">
+          Pick one category — we&apos;ll narrow from there.
+        </p>
+        <div className="mt-4">
+          <CategoryPickerSelect
+            label="Category"
+            value={NO_CATEGORY}
+            onChange={(v) => {
+              if (!v) return;
+              onWorkflowChange({
+                ...workflow,
+                step: "type",
+                categoryId: v,
+              });
+            }}
+            options={categoryOptions}
+            placeholder="Select a category…"
+          />
         </div>
+        <p className="mt-4 text-sm text-[#9a8f82]">
+          Choose a category to see what you can create.
+        </p>
       </div>
     );
   }

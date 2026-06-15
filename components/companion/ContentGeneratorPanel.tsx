@@ -123,6 +123,10 @@ export function ContentGeneratorPanel({
   onOpenGoogleWorkspace,
   onArtifactReady,
   onExportGuidance,
+  companionBuilderMode = false,
+  chatBuildRequest,
+  onChatBuildComplete,
+  onChatBuildFailed,
 }: {
   seed: GenSeed;
   onOpen?: (s: AppSection) => void;
@@ -156,6 +160,12 @@ export function ContentGeneratorPanel({
   onOpenGoogleWorkspace?: (session: GoogleWorkspaceSession) => void;
   onArtifactReady?: (message: string) => void;
   onExportGuidance?: (message: string) => void;
+  /** Chat beside Create drives discovery — hide duplicate panel wizard. */
+  companionBuilderMode?: boolean;
+  /** Parent-triggered build from chat builder approval. */
+  chatBuildRequest?: { type: string; brief: string; key: number } | null;
+  onChatBuildComplete?: () => void;
+  onChatBuildFailed?: () => void;
 }) {
   const [type, setType] = useState(seed?.type ?? "");
   const [topic, setTopic] = useState(seed?.topic ?? seed?.brief ?? "");
@@ -250,8 +260,8 @@ export function ContentGeneratorPanel({
     window.setTimeout(() => setFlash(null), 2200);
   }
 
-  async function run(t: string, b: string, tn: string) {
-    if (!t.trim() && !b.trim()) return;
+  async function run(t: string, b: string, tn: string): Promise<boolean> {
+    if (!t.trim() && !b.trim()) return false;
     setLoading(true);
     setError(false);
     try {
@@ -278,9 +288,13 @@ export function ContentGeneratorPanel({
           contentType: t,
           content: data.result,
         });
-      } else setError(true);
+        return true;
+      }
+      setError(true);
+      return false;
     } catch {
       setError(true);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -596,11 +610,36 @@ export function ContentGeneratorPanel({
       ? emptySavedArtifact(type, artifactTitleValue())
       : null);
 
-  function handleBuildDraft(briefText: string) {
+  function handleBuildDraft(briefText: string, typeOverride?: string) {
+    const t = typeOverride?.trim() || type;
+    if (typeOverride?.trim() && typeOverride !== type) {
+      setType(typeOverride);
+    }
     setBrief(briefText);
     setTopic(briefText);
-    void run(type, briefText, tone);
+    setWorkflow((prev) => ({
+      ...prev,
+      buildApproved: true,
+      readinessConfirmed: true,
+      step: "improve",
+    }));
+    return run(t, briefText, tone);
   }
+
+  const lastChatBuildKey = useRef(0);
+  useEffect(() => {
+    if (!chatBuildRequest || chatBuildRequest.key === lastChatBuildKey.current) {
+      return;
+    }
+    lastChatBuildKey.current = chatBuildRequest.key;
+    void handleBuildDraft(chatBuildRequest.brief, chatBuildRequest.type).then(
+      (ok) => {
+        if (ok) onChatBuildComplete?.();
+        else onChatBuildFailed?.();
+      },
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatBuildRequest]);
 
   function resetLocalCreateState() {
     setType("");
@@ -786,6 +825,21 @@ export function ContentGeneratorPanel({
 
       {inGuidedCreate && !showDraftEditor && !(workspaceMode && phase === "ready") && (
         <div className="mt-5 flex flex-col gap-3">
+          {companionBuilderMode && type ? (
+            <div className="rounded-2xl border border-[#1e4f4f]/15 bg-[#f0f5f5]/80 px-4 py-5 text-center">
+              <p className="text-sm font-semibold text-[#1e4f4f]">
+                💬 Work With Shari
+              </p>
+              <p className="mt-2 text-base text-[#2d2926]">
+                Building your <span className="font-semibold">{type}</span> in
+                chat — one question at a time.
+              </p>
+              {loading ? (
+                <p className="mt-2 text-sm text-[#6b635a]">Generating draft…</p>
+              ) : null}
+            </div>
+          ) : (
+            <>
           {workflow.step === "category" && (
             <div className="companion-fade-in mb-2">
               <input
@@ -824,6 +878,8 @@ export function ContentGeneratorPanel({
             onBuildDraft={handleBuildDraft}
             building={loading}
           />
+            </>
+          )}
         </div>
       )}
 

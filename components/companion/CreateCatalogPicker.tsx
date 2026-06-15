@@ -5,6 +5,8 @@ import {
   sortedCreateCatalog,
   type CreateCatalogItem,
 } from "@/lib/createCatalog";
+import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
+import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 
 export function CreateCatalogPicker({
   onSelect,
@@ -16,35 +18,62 @@ export function CreateCatalogPicker({
   compact?: boolean;
 }) {
   const [filter, setFilter] = useState("");
+  const [categoryId, setCategoryId] = useState<string | typeof NO_CATEGORY>(
+    NO_CATEGORY,
+  );
 
   const catalog = useMemo(() => sortedCreateCatalog(), []);
 
+  const categoryOptions = useMemo(
+    () =>
+      [...catalog]
+        .sort((a, b) => a.label.localeCompare(b.label))
+        .map((c) => ({ value: c.id, label: c.label })),
+    [catalog],
+  );
+
   const filtered = useMemo(() => {
     const q = filter.trim().toLowerCase();
-    if (!q) return catalog;
-    return catalog
-      .map((cat) => ({
-        ...cat,
-        items: cat.items.filter(
-          (item) =>
-            item.label.toLowerCase().includes(q) ||
-            item.matchTerms?.some((t) => t.includes(q)),
-        ),
-      }))
-      .filter((cat) => cat.items.length > 0);
-  }, [filter, catalog]);
+    if (q) {
+      return catalog
+        .map((cat) => ({
+          ...cat,
+          items: cat.items.filter(
+            (item) =>
+              item.label.toLowerCase().includes(q) ||
+              item.matchTerms?.some((t) => t.includes(q)),
+          ),
+        }))
+        .filter((cat) => cat.items.length > 0);
+    }
+    if (!categoryId) return [];
+    const cat = catalog.find((c) => c.id === categoryId);
+    return cat ? [cat] : [];
+  }, [filter, catalog, categoryId]);
 
   return (
     <div className="flex flex-col gap-4">
+      <CategoryPickerSelect
+        label="What are you creating?"
+        value={categoryId}
+        onChange={setCategoryId}
+        options={categoryOptions}
+        placeholder="Select a category…"
+      />
+
       <div>
         <input
           type="search"
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          placeholder="Search — e.g. proposal, email, SOP…"
+          placeholder="Or search — e.g. proposal, email, SOP…"
           className="w-full rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
         />
       </div>
+
+      {!filter.trim() && categoryId === NO_CATEGORY ? (
+        <p className="text-sm text-[#9a8f82]">{CATEGORY_PICKER_EMPTY_LIST_HINT}</p>
+      ) : null}
 
       {filtered.map((cat) => (
         <section key={cat.id}>

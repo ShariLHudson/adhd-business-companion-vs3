@@ -19,6 +19,8 @@ import {
 import { sortByDropdownLabel } from "@/lib/dropdownSort";
 import { ProjectBreakdown } from "@/components/companion/ProjectBreakdown";
 import { CollapsibleSection } from "@/components/companion/CollapsibleSection";
+import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
+import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import { useVisualMode } from "@/lib/useVisualMode";
 import {
@@ -108,6 +110,9 @@ export function ProjectsPanel({
   // Project Brain
   const [generating, setGenerating] = useState(false);
   const [backups, setBackups] = useState<string[]>([]);
+  const [listGroup, setListGroup] = useState<ProjectListGroup | typeof NO_CATEGORY>(
+    NO_CATEGORY,
+  );
   const [listGroupsOpen, setListGroupsOpen] = useState<
     Record<ProjectListGroup, boolean>
   >({
@@ -948,18 +953,39 @@ export function ProjectsPanel({
         </button>
       </div>
       <p className="mt-1 text-base text-[#6b635a]">
-        Expand a group to see project names — one at a time.
+        Pick a group to see project names — one at a time.
       </p>
+
+      <CategoryPickerSelect
+        label="Project group"
+        value={listGroup}
+        onChange={setListGroup}
+        options={(
+          ["active", "completed", "not-started"] as ProjectListGroup[]
+        )
+          .map((g) => ({ value: g, label: PROJECT_LIST_GROUP_LABEL[g] }))
+          .sort((a, b) => a.label.localeCompare(b.label))}
+        placeholder="Select a group…"
+        className="mt-4"
+      />
 
       {projects.length === 0 ? (
         <p className="mt-6 text-base text-[#6b635a]">
           Nothing yet. Tap New Project to get started.
         </p>
+      ) : listGroup === NO_CATEGORY ? (
+        <p className="mt-6 text-base text-[#6b635a]">
+          {CATEGORY_PICKER_EMPTY_LIST_HINT}
+        </p>
       ) : (
         <div className="mt-4">
-          {renderListGroup("active")}
-          {renderListGroup("not-started")}
-          {renderListGroup("completed")}
+          {projectGroups[listGroup].length === 0 ? (
+            <p className="text-base text-[#6b635a]">No projects in this group.</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {projectGroups[listGroup].map((p) => renderCard(p))}
+            </ul>
+          )}
         </div>
       )}
     </div>

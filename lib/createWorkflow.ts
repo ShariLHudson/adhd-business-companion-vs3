@@ -156,18 +156,82 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
   SOP: [
     {
       id: "process",
-      prompt: "What process should this SOP cover?",
+      prompt: "What process are we documenting?",
       why: "So steps stay scoped to one workflow.",
     },
     {
       id: "who",
-      prompt: "Who will follow this SOP?",
-      why: "So instructions match their skill level.",
+      prompt: "Who performs it?",
+      why: "So instructions match their role and skill level.",
     },
     {
-      id: "pain",
-      prompt: "What usually goes wrong without it?",
-      why: "So the SOP prevents real mistakes.",
+      id: "trigger",
+      prompt: "What triggers it?",
+      why: "So people know exactly when to start.",
+    },
+    {
+      id: "first-step",
+      prompt: "Walk me through the first step.",
+      why: "So the SOP starts with something concrete.",
+    },
+    {
+      id: "next",
+      prompt: "What happens next?",
+      why: "So the flow continues clearly after step one.",
+    },
+  ],
+  Workshop: [
+    {
+      id: "topic",
+      prompt: "What is the workshop about?",
+      why: "So every activity supports one theme.",
+    },
+    {
+      id: "audience",
+      prompt: "Who is it for?",
+      why: "So examples and pace fit the room.",
+    },
+    {
+      id: "duration",
+      prompt: "How long is the session?",
+      why: "So the outline fits real time.",
+    },
+    {
+      id: "outcome",
+      prompt: "What should participants leave able to do?",
+      why: "So the workshop has a clear payoff.",
+    },
+    {
+      id: "first-segment",
+      prompt: "What's the first activity or segment?",
+      why: "So we open with something engaging and concrete.",
+    },
+  ],
+  Strategy: [
+    {
+      id: "focus",
+      prompt: "What strategy are we defining?",
+      why: "So we stay focused on one strategic question.",
+    },
+    {
+      id: "situation",
+      prompt: "What situation or challenge is this for?",
+      why: "So the strategy addresses reality, not theory.",
+    },
+    {
+      id: "stakeholders",
+      prompt: "Who needs to align on this?",
+      why: "So the plan accounts for the people involved.",
+    },
+    {
+      id: "outcome",
+      prompt: "What's the desired outcome in the next 90 days?",
+      why: "So actions tie to a measurable horizon.",
+    },
+    {
+      id: "constraint",
+      prompt: "What's the biggest constraint?",
+      why: "So the strategy is honest about limits.",
     },
   ],
   Offer: [
