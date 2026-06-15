@@ -386,7 +386,6 @@ import {
   type LastActivity,
   type RecentWorkItem,
   getTimeBlocks,
-  loadConversation,
   saveConversation,
   setBlockStatus,
   snoozeBlock,
@@ -770,12 +769,8 @@ export default function CompanionPage() {
     sceneSeed = activeSection;
   }
 
-  // Restore a saved conversation on first load (crash / reload insurance).
+  // Hydrate prefs and memory — keep calm home empty; don't reopen past chats.
   useEffect(() => {
-    const saved = loadConversation();
-    if (saved && saved.length > 0) {
-      setMessages(saved);
-    }
     setHasChatted(getPrefs().hasChatted);
     setHydrated(true);
     trackUserRegisteredOnce();
@@ -886,11 +881,10 @@ export default function CompanionPage() {
     }
   }, [activeSection]);
 
-  // Local-first autosave: persist the conversation whenever it changes, but
-  // only after hydration so we don't clobber a saved chat with the empty
-  // initial state.
+  // Persist active chats only — never wipe storage with an empty calm-home load.
   useEffect(() => {
     if (!hydrated) return;
+    if (!messages.some((m) => m.role === "user")) return;
     saveConversation(messages);
   }, [messages, hydrated]);
 
@@ -5550,7 +5544,7 @@ export default function CompanionPage() {
                 {/* Home stays calm: greeting up top, open space here, the chat
                     box below. No menus to scan. */}
                 <SimpleChat
-                  messages={messages}
+                  messages={homeCalm ? [] : messages}
                   stateHint={stateHint}
                   showHint={false}
                   hideEmptyState
