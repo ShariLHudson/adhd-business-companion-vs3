@@ -116,7 +116,7 @@ describe("intelligence stack e2e — offer priority", () => {
     const text = "I'm exhausted burned out overwhelmed stuck can't decide";
     const snap = evaluateEcosystem({ text, now: NOW });
     const suppressed = new Set(snap.suppressions);
-    if (snap.recommendedSurface === "recovery_support") {
+    if (snap.topSignal === "recovery_support") {
       expect(
         suppressed.has("opportunity_offer") || suppressed.has("momentum_offer"),
       ).toBe(true);

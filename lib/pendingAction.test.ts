@@ -72,7 +72,6 @@ describe("pendingAction", () => {
       },
       actionBridge: null,
       bridge: null,
-      artifactExportOffer: null,
     })!;
     expect(matchesPendingAcceptance("let me try the breathing then", pending)).toBe(
       true,

@@ -708,10 +708,6 @@ export default function CompanionPage() {
   const isIdle = !messages.some((m) => m.role === "user");
   const homeCalm = activeSection === "home" && isIdle;
 
-  useEffect(() => {
-    setVisualMode(getPrefs().visualMode);
-  }, [overlay, activeSection]);
-
   const hasInlineIntelligenceOffer = Boolean(
     recoveryOfferLine ||
       activationOffer ||
@@ -910,6 +906,11 @@ export default function CompanionPage() {
     useState<SettingsSection | null>(null);
   const [visualMode, setVisualMode] = useState<VisualMode>("off");
   const { configured: authConfigured, user } = useCompanionAuth();
+
+  useEffect(() => {
+    setVisualMode(getPrefs().visualMode);
+  }, [overlay, activeSection]);
+
   const openSignIn = useCallback(() => {
     if (authConfigured) setOverlay("signin");
     else router.push("/companion/login");
@@ -5483,7 +5484,7 @@ export default function CompanionPage() {
                 )}
                 focusMode={
                   pomodoroTimer.isActive ||
-                  activeSection === "focus-timer" ||
+                  workspacePanel === "focus-timer" ||
                   workspacePanel === "focus-audio"
                 }
                 recognitionWin={Boolean(

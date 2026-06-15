@@ -13,6 +13,8 @@ const INSTRUCTION: Record<Action, string> = {
     "Make it simpler and shorter. Plain, everyday language, no jargon. Keep only the core message.",
   "break-down":
     "Break it into clear, concrete steps or smaller parts. Return a short numbered or bulleted list, ordered if there's a natural sequence.",
+  modify:
+    "Apply the user's specific edit request. Change only what they asked for; keep the rest intact.",
 };
 
 export async function POST(request: NextRequest) {
