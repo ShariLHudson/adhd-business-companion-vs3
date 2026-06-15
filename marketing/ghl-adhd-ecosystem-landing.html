@@ -1,0 +1,931 @@
+<script>
+function getAffiliateRef() {
+  const params = new URLSearchParams(window.location.search);
+  // GHL Affiliate Manager uses am_id. Older/test links may use ref.
+  const affiliateId = params.get("am_id") || params.get("ref");
+  if (affiliateId) {
+    localStorage.setItem("affiliate_partner", affiliateId);
+    return affiliateId;
+  }
+  return localStorage.getItem("affiliate_partner");
+}
+function withAffiliateRef(url) {
+  const affiliateId = getAffiliateRef();
+  if (!affiliateId) return url;
+  const separator = url.includes("?") ? "&" : "?";
+  // Pass the GHL affiliate ID into FastPay checkout.
+  return url + separator + "am_id=" + encodeURIComponent(affiliateId);
+}
+</script>
+<section class="adhd-ecosystem-page">
+  <style>
+    .adhd-ecosystem-page{
+      --navy:#07183b;
+      --text:#273552;
+      --muted:#60708a;
+      --teal:#009c9a;
+      --teal-dark:#00777d;
+      --purple:#7447d8;
+      --lavender:#f3efff;
+      --orange:#ff7048;
+      --pink:#ff527f;
+      --teal-soft:#eefcfd;
+      --orange-soft:#fff1e9;
+      --pink-soft:#fff0f5;
+      --line:rgba(7,24,59,.12);
+      --shadow:0 18px 45px rgba(7,24,59,.12);
+      font-family:Inter,Arial,Helvetica,sans-serif;
+      color:var(--navy);
+      background:#fff;
+      overflow-x:hidden;
+    }
+    .adhd-ecosystem-page *{box-sizing:border-box;}
+    .adhd-wrap{width:min(1160px,calc(100% - 48px));margin:0 auto;}
+    .trial-strip{
+      background:linear-gradient(135deg,var(--orange),var(--pink));
+      color:#fff;
+      text-align:center;
+      font-weight:950;
+      font-size:15px;
+      line-height:1.4;
+      padding:11px 16px;
+    }
+    .adhd-nav{
+      height:76px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:24px;
+      position:relative;
+      z-index:5;
+    }
+    .spark-logo img{
+      width:68px;
+      max-width:none;
+      height:auto;
+      display:block;
+      object-fit:contain;
+      background:transparent!important;
+    }
+    .adhd-menu{
+      display:flex;
+      align-items:center;
+      gap:24px;
+      font-size:15px;
+      font-weight:850;
+    }
+    .adhd-menu a{color:var(--navy);text-decoration:none;}
+    .adhd-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      border:0;
+      border-radius:14px;
+      padding:16px 28px;
+      color:#fff!important;
+      background:linear-gradient(135deg,var(--teal),var(--teal-dark));
+      text-decoration:none;
+      font-weight:950;
+      font-size:16px;
+      box-shadow:0 12px 26px rgba(0,156,154,.26);
+      cursor:pointer;
+      text-align:center;
+    }
+    .adhd-btn.hot{
+      background:linear-gradient(135deg,var(--orange),var(--pink));
+      box-shadow:0 14px 30px rgba(255,82,127,.27);
+    }
+    .adhd-btn.purple{
+      background:linear-gradient(135deg,#9567f2,var(--purple));
+      box-shadow:0 14px 30px rgba(116,71,216,.27);
+    }
+    .adhd-btn.light{
+      background:#fff;
+      color:var(--teal-dark)!important;
+      border:1px solid var(--line);
+      box-shadow:0 10px 22px rgba(7,24,59,.08);
+    }
+    .hero{
+      min-height:640px;
+      display:flex;
+      align-items:center;
+      background:
+        linear-gradient(90deg,rgba(255,255,255,.98) 0%,rgba(255,255,255,.96) 42%,rgba(255,255,255,.72) 72%,rgba(255,255,255,.35) 100%),
+        url('https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=1800&q=90');
+      background-size:cover;
+      background-position:center right;
+      border-bottom:1px solid rgba(7,24,59,.08);
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:40px;
+      align-items:center;
+      min-height:640px;
+    }
+    .trial-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      background:linear-gradient(135deg,var(--orange),var(--pink));
+      color:#fff;
+      font-weight:900;
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+      padding:7px 15px;
+      border-radius:999px;
+      margin-bottom:16px;
+      box-shadow:0 6px 16px rgba(255,82,127,.2);
+    }
+    .hero h1{
+      font-size:clamp(42px,5.3vw,74px);
+      line-height:.98;
+      letter-spacing:-.06em;
+      margin:0 0 18px;
+      font-weight:950;
+      color:var(--navy);
+      max-width:780px;
+    }
+    .hero p{
+      font-size:21px;
+      line-height:1.55;
+      color:var(--text);
+      max-width:700px;
+      margin:0 0 22px;
+    }
+    .hero p strong{color:var(--navy);font-weight:950;}
+    .hero-proof{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin:20px 0 0;
+      max-width:720px;
+    }
+    .hero-proof-item{
+      background:rgba(255,255,255,.92);
+      border:1px solid rgba(7,24,59,.1);
+      border-radius:14px;
+      padding:13px 14px;
+      box-shadow:0 8px 20px rgba(7,24,59,.06);
+    }
+    .hero-proof-item strong{
+      display:block;
+      font-size:14px;
+      color:var(--navy);
+      margin-bottom:4px;
+    }
+    .hero-proof-item span{
+      display:block;
+      font-size:13px;
+      color:var(--text);
+      line-height:1.32;
+    }
+    .hero-actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:14px;
+      align-items:center;
+      margin-top:24px;
+    }
+    .note{
+      font-size:15px;
+      color:var(--muted);
+      margin-top:13px;
+      line-height:1.45;
+    }
+    .phone-area{
+      position:relative;
+      min-height:540px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .phone{
+      width:322px;
+      border-radius:44px;
+      background:#0b1021;
+      padding:12px;
+      box-shadow:0 34px 85px rgba(7,24,59,.35);
+      position:relative;
+      z-index:2;
+    }
+
+    .statusbar{
+      display:flex;
+      justify-content:space-between;
+      font-size:13px;
+      font-weight:900;
+      margin-bottom:18px;
+    }
+    .screen.companion-home-screen{
+      min-height:545px;
+      border-radius:34px;
+      background:
+        linear-gradient(180deg,rgba(247,240,230,.98) 0%,rgba(242,235,226,.96) 55%,rgba(235,228,218,.94) 100%),
+        url('https://images.unsplash.com/photo-1497366811353-6870744d04b2?auto=format&fit=crop&w=800&q=60');
+      background-size:cover;
+      background-position:center;
+      display:flex;
+      flex-direction:column;
+      padding:18px 14px 16px;
+      position:relative;
+      overflow:hidden;
+    }
+    .companion-home-screen .statusbar{margin-bottom:8px;}
+    .companion-home{
+      flex:1;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:8px 4px 0;
+    }
+    .companion-avatar{
+      width:64px;
+      height:64px;
+      border-radius:50%;
+      object-fit:cover;
+      object-position:center top;
+      box-shadow:0 0 0 4px rgba(30,79,79,.18),0 8px 20px rgba(7,24,59,.12);
+      margin-bottom:10px;
+    }
+    .companion-home h3{
+      font-size:16px;
+      font-weight:950;
+      margin:0 0 3px;
+      color:#1f1c19;
+      letter-spacing:-.02em;
+    }
+    .companion-tagline{
+      font-size:11px;
+      color:#1e4f4f;
+      font-weight:700;
+      margin-bottom:12px;
+    }
+    .companion-question{
+      font-size:12px;
+      font-weight:800;
+      color:#1f1c19;
+      line-height:1.35;
+      margin-bottom:14px;
+      max-width:250px;
+    }
+    .companion-input-wrap{width:100%;margin-top:auto;padding-top:10px;}
+    .companion-input{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      background:rgba(255,252,248,.92);
+      border:1px solid rgba(255,255,255,.75);
+      border-radius:999px;
+      padding:6px 6px 6px 8px;
+      box-shadow:0 4px 18px rgba(45,38,32,.08);
+    }
+    .companion-mic{
+      width:34px;height:34px;border-radius:50%;flex-shrink:0;
+      display:grid;place-items:center;
+      background:#f5f0e8;color:#1e4f4f;
+    }
+    .companion-mic svg{width:16px;height:16px;display:block;}
+    .companion-placeholder{
+      flex:1;font-size:9.5px;color:#6b635a;text-align:left;line-height:1.25;padding:0 2px;
+    }
+    .companion-send{
+      flex-shrink:0;
+      background:linear-gradient(135deg,#1e4f4f,#163a3a);
+      color:#fff;font-size:10px;font-weight:800;
+      padding:9px 14px;border-radius:999px;
+    }
+    .companion-continue{
+      margin-top:10px;
+      font-size:10px;
+      font-weight:800;
+      color:#1e4f4f;
+    }
+    .section{padding:50px 0;}
+    .section.compact{padding:38px 0;}
+    .section-title{text-align:center;margin:0 auto 30px;max-width:900px;}
+    .section-title h2{font-size:clamp(30px,3.8vw,44px);line-height:1.08;margin:0 0 10px;font-weight:950;color:var(--navy);letter-spacing:-.04em;}
+    .section-title p{font-size:18px;line-height:1.55;color:#40506d;margin:0;}
+    .familiar-band{
+      background:#fff;
+      border-top:1px solid rgba(7,24,59,.08);
+      border-bottom:1px solid rgba(7,24,59,.08);
+      padding:44px 0;
+    }
+    .familiar-box{
+      border-radius:28px;
+      background:linear-gradient(135deg,var(--teal-soft),#fff,var(--lavender));
+      box-shadow:var(--shadow);
+      border:1px solid var(--line);
+      padding:34px;
+      max-width:1020px;
+      margin:0 auto;
+    }
+    .familiar-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+      max-width:860px;
+      margin:0 auto 24px;
+    }
+    .familiar-item{
+      background:rgba(255,255,255,.84);
+      border:1px solid rgba(7,24,59,.09);
+      border-radius:16px;
+      padding:14px 16px;
+      font-size:16px;
+      line-height:1.35;
+      color:var(--text);
+      font-weight:750;
+    }
+    .familiar-item:before{
+      content:'✓';
+      font-weight:950;
+      color:var(--teal);
+      margin-right:8px;
+    }
+    .familiar-cta{text-align:center;margin-top:8px;}
+    .story-band{
+      background:linear-gradient(135deg,#fff8f1,#fff,#eefcfd);
+      border-top:1px solid rgba(7,24,59,.08);
+      border-bottom:1px solid rgba(7,24,59,.08);
+      padding:54px 0;
+    }
+    .story-card{
+      display:grid;
+      grid-template-columns:.92fr 1.08fr;
+      gap:34px;
+      align-items:center;
+      max-width:1080px;
+      margin:0 auto;
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:34px;
+    }
+    .shari-photo{
+      width:100%;
+      border-radius:24px;
+      display:block;
+      box-shadow:0 18px 42px rgba(7,24,59,.16);
+      object-fit:cover;
+      max-height:540px;
+      object-position:center top;
+    }
+    .story-badge{
+      display:inline-flex;
+      border-radius:999px;
+      background:var(--lavender);
+      color:var(--purple);
+      font-size:13px;
+      font-weight:950;
+      padding:7px 12px;
+      margin-bottom:14px;
+    }
+    .story-card h2{
+      font-size:clamp(30px,3.4vw,42px);
+      line-height:1.08;
+      letter-spacing:-.04em;
+      margin:0 0 14px;
+      color:var(--navy);
+    }
+    .story-card p{
+      font-size:17px;
+      line-height:1.58;
+      color:var(--text);
+      margin:0 0 13px;
+    }
+    .signature{
+      font-weight:950;
+      color:var(--navy);
+      margin-top:8px;
+      font-size:17px;
+    }
+    .mission-band{
+      padding:46px 0;
+      background:linear-gradient(135deg,var(--navy),#132f6a);
+      color:#fff;
+    }
+    .mission-box{
+      max-width:980px;
+      margin:0 auto;
+      text-align:center;
+      padding:10px 20px;
+    }
+    .mission-box h2{
+      font-size:clamp(30px,4vw,48px);
+      line-height:1.08;
+      letter-spacing:-.04em;
+      margin:0 0 14px;
+      color:#fff;
+    }
+    .mission-box p{
+      font-size:20px;
+      line-height:1.55;
+      color:rgba(255,255,255,.86);
+      margin:0 auto;
+      max-width:820px;
+    }
+    .no-question{
+      margin-top:24px;
+      border-radius:22px;
+      background:rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.24);
+      padding:22px;
+      font-size:22px;
+      font-weight:900;
+      line-height:1.35;
+      color:#fff;
+    }
+    .no-question small{
+      display:block;
+      font-size:15px;
+      font-weight:650;
+      color:rgba(255,255,255,.78);
+      margin-top:8px;
+    }
+    .compare-band{
+      background:linear-gradient(135deg,#f8fcfd,#fff6f1);
+      border-top:1px solid rgba(7,24,59,.08);
+      border-bottom:1px solid rgba(7,24,59,.08);
+      padding:54px 0;
+    }
+    .compare-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:22px;
+      max-width:1020px;
+      margin:0 auto;
+    }
+    .compare-col{
+      border-radius:22px;
+      padding:28px;
+      border:1px solid var(--line);
+      box-shadow:0 12px 28px rgba(7,24,59,.06);
+      background:#fff;
+    }
+    .compare-col.other{background:#f7f8fb;}
+    .compare-col.mine{background:linear-gradient(150deg,var(--teal-soft),#fff);border-color:rgba(0,156,154,.22);}
+    .compare-col h3{font-size:25px;margin:0 0 16px;}
+    .compare-col ul{list-style:none;padding:0;margin:0;display:grid;gap:12px;}
+    .compare-col li{font-size:16px;line-height:1.35;color:var(--text);}
+    .compare-col.other li:before{content:'×';font-weight:950;margin-right:8px;color:#9a4051;}
+    .compare-col.mine li:before{content:'✓';font-weight:950;margin-right:8px;color:var(--teal);}
+    .outcome-grid{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:14px;
+    }
+    .outcome-card{
+      border-radius:18px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:0 12px 26px rgba(7,24,59,.06);
+      padding:22px 18px;
+      min-height:186px;
+    }
+    .outcome-card .emoji{font-size:34px;margin-bottom:10px;}
+    .outcome-card h3{font-size:18px;line-height:1.15;margin:0 0 8px;color:var(--navy);}
+    .outcome-card p{font-size:14px;line-height:1.42;color:var(--text);margin:0;}
+    .steps-grid{
+      display:grid;
+      grid-template-columns:repeat(4,1fr);
+      gap:16px;
+    }
+    .step-card{
+      border-radius:18px;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:0 12px 26px rgba(7,24,59,.06);
+      padding:24px 20px;
+      min-height:180px;
+    }
+    .step-num{
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      color:#fff;
+      background:linear-gradient(135deg,var(--teal),var(--purple));
+      font-weight:950;
+      margin-bottom:14px;
+    }
+    .step-card h3{font-size:20px;line-height:1.15;margin:0 0 8px;}
+    .step-card p{font-size:15px;line-height:1.45;color:var(--text);margin:0;}
+    .pricing-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:28px;
+      max-width:990px;
+      margin:0 auto;
+    }
+    .price-card{
+      position:relative;
+      min-height:365px;
+      border-radius:20px;
+      padding:30px 28px;
+      text-align:center;
+      background:#fff;
+      border:1px solid var(--line);
+      box-shadow:0 13px 32px rgba(7,24,59,.07);
+    }
+    .price-card.text{background:linear-gradient(150deg,var(--teal-soft),#fff);border-color:rgba(0,156,154,.22);}
+    .price-card.voice{background:linear-gradient(150deg,var(--lavender),#fff);border-color:rgba(116,71,216,.22);}
+    .price-card.power{background:linear-gradient(150deg,var(--orange-soft),#fff);border-color:rgba(255,112,72,.22);}
+    .price-icon{
+      width:78px;
+      height:78px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      margin:0 auto 20px;
+      color:#fff;
+      font-size:36px;
+    }
+    .text .price-icon{background:linear-gradient(135deg,var(--teal),var(--teal-dark));}
+    .voice .price-icon{background:linear-gradient(135deg,#9567f2,var(--purple));}
+    .power .price-icon{background:linear-gradient(135deg,var(--orange),var(--orange));}
+    .popular{
+      position:absolute;
+      top:-1px;
+      right:24px;
+      width:82px;
+      height:82px;
+      background:linear-gradient(135deg,#9567f2,var(--purple));
+      color:#fff;
+      font-weight:950;
+      font-size:13px;
+      display:grid;
+      place-items:center;
+      clip-path:polygon(0 0,100% 0,100% 100%,50% 78%,0 100%);
+      text-align:center;
+      line-height:1.1;
+    }
+    .price-card h3{font-size:24px;margin:0 0 9px;}
+    .price-card .sub{font-size:16px;font-weight:900;margin-bottom:13px;}
+    .text .sub{color:var(--teal);}
+    .voice .sub{color:var(--purple);}
+    .power .sub{color:var(--orange);}
+    .price-card p{font-size:15px;line-height:1.5;color:var(--text);margin:0 0 18px;}
+    .price{font-size:38px;font-weight:950;margin-bottom:4px;}
+    .text .price{color:var(--teal);}
+    .voice .price{color:var(--purple);}
+    .power .price{color:var(--orange);}
+    .price small{font-size:15px;color:var(--text);}
+    .trial-subnote{font-size:14px;color:var(--pink);font-weight:800;margin:6px 0 12px;display:block;}
+    .price-card .adhd-btn{width:100%;padding:14px 18px;}
+    .faq-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:14px;
+    }
+    .faq-item{
+      border:1px solid var(--line);
+      border-radius:16px;
+      background:#fff;
+      box-shadow:0 10px 24px rgba(7,24,59,.06);
+      overflow:hidden;
+    }
+    .faq-item summary{
+      list-style:none;
+      cursor:pointer;
+      padding:18px 20px;
+      font-size:17px;
+      font-weight:900;
+      color:var(--navy);
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:center;
+    }
+    .faq-item summary::-webkit-details-marker{display:none;}
+    .faq-item summary:after{content:'+';font-size:24px;color:var(--teal);line-height:1;}
+    .faq-item[open] summary:after{content:'–';}
+    .faq-item p{
+      font-size:15px;
+      line-height:1.5;
+      color:var(--text);
+      margin:0;
+      padding:0 20px 20px;
+    }
+    .bottom-gradient{
+      background:linear-gradient(135deg,#009c9a,#7052d9 58%,#ff4f73);
+      color:#fff;
+      padding:42px 0;
+      text-align:center;
+    }
+    .bottom-gradient h2{
+      font-size:clamp(30px,4vw,46px);
+      line-height:1.08;
+      letter-spacing:-.04em;
+      margin:0 0 12px;
+      color:#fff;
+    }
+    .bottom-gradient p{
+      font-size:18px;
+      line-height:1.5;
+      color:rgba(255,255,255,.86);
+      max-width:760px;
+      margin:0 auto 22px;
+    }
+    .bottom-gradient small{
+      display:block;
+      margin-top:10px;
+      color:rgba(255,255,255,.8);
+    }
+    @media(max-width:980px){
+      .adhd-menu{display:none;}
+      .hero-grid,.story-card,.compare-grid,.outcome-grid,.steps-grid,.pricing-grid,.faq-grid{grid-template-columns:1fr;}
+      .hero{background-position:center;}
+      .phone-area{display:none;}
+      .outcome-grid,.steps-grid{max-width:620px;margin:0 auto;}
+    }
+    @media(max-width:640px){
+      .adhd-wrap{width:min(100% - 24px,1160px);}
+      .adhd-nav{height:auto;padding:16px 0;}
+      .hero{min-height:auto;padding:50px 0;}
+      .hero-grid{min-height:auto;}
+      .hero h1{font-size:40px;}
+      .hero p{font-size:18px;}
+      .hero-proof,.familiar-grid{grid-template-columns:1fr;}
+      .adhd-btn{width:100%;}
+      .hero-actions{display:grid;}
+      .familiar-box,.story-card{padding:24px;}
+      .section{padding:38px 0;}
+      .section-title p{font-size:16px;}
+    }
+  </style>
+  <div class="trial-strip">
+    🎉 Try ADHD Business Ecosystem free for 7 days — text or voice support, cancel anytime.
+  </div>
+  <div class="adhd-wrap">
+    <nav class="adhd-nav">
+      <div class="spark-logo">
+        <img src="https://assets.cdn.filesafe.space/bzwOUqZk2OyPMzDyqIUt/media/69fe48776ca44fd334a3bb2c.png" alt="Spark Studio Companions logo">
+      </div>
+      <div class="adhd-menu">
+        <a href="#familiar">Is This You?</a>
+        <a href="#story">Meet Shari</a>
+        <a href="#compare">Why Different</a>
+        <a href="#pricing">Free Trial</a>
+        <a href="#faq">FAQ</a>
+      </div>
+      <a class="adhd-btn" href="#pricing">Start Free Trial</a>
+    </nav>
+  </div>
+  <header class="hero">
+    <div class="adhd-wrap">
+      <div class="hero-grid">
+        <div>
+          <div class="trial-badge">🔥 Free 7-Day Trial</div>
+          <h1>Feeling overwhelmed, stuck, or scattered while building your business?</h1>
+          <p><strong>You are not broken.</strong> ADHD Business Ecosystem helps ADHD entrepreneurs calm the noise, understand what is happening, and take one doable next step.</p>
+          <div class="hero-proof">
+            <div class="hero-proof-item"><strong>Problem</strong><span>Overwhelmed, stuck, scattered, or avoiding?</span></div>
+            <div class="hero-proof-item"><strong>Solution</strong><span>Support that starts where you are right now.</span></div>
+            <div class="hero-proof-item"><strong>How to start</strong><span>Try it free for 7 days. Cancel anytime.</span></div>
+          </div>
+          <div class="hero-actions">
+            <a class="adhd-btn hot" href="#pricing">Start My Free 7-Day Trial →</a>
+            <a class="adhd-btn light" href="#familiar">See If This Sounds Like You</a>
+          </div>
+          <div class="note">✓ Text or Voice Support &nbsp; • &nbsp; ✓ Takes less than 60 seconds &nbsp; • &nbsp; ✓ Cancel anytime</div>
+        </div>
+        <div class="phone-area">
+          <div class="phone">
+            <div class="screen companion-home-screen">
+              <div class="statusbar"><span>9:41</span><span>●●●</span></div>
+              <div class="companion-home">
+                <img
+                  class="companion-avatar"
+                  src="https://assets.cdn.filesafe.space/bzwOUqZk2OyPMzDyqIUt/media/6a187cd93e043d8258f0aa3e.png"
+                  alt="Shari"
+                >
+                <h3>Hi, I'm Shari</h3>
+                <div class="companion-tagline">Your coach &amp; Companion</div>
+                <div class="companion-question">What feels most important right now?</div>
+              </div>
+              <div class="companion-input-wrap">
+                <div class="companion-input">
+                  <span class="companion-mic" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Z"/><path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V21H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-3.08A7 7 0 0 0 19 11Z"/></svg>
+                  </span>
+                  <span class="companion-placeholder">Type or talk — whatever feels right</span>
+                  <span class="companion-send">Send</span>
+                </div>
+                <div class="companion-continue">📌 Continue Previous Work ▼</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </div>
+      </div>
+    </div>
+  </header>
+  <section class="familiar-band" id="familiar">
+    <div class="adhd-wrap">
+      <div class="familiar-box">
+        <div class="section-title">
+          <h2>Does any of this sound familiar?</h2>
+          <p>If you are nodding your head, ADHD Business Ecosystem was built for moments just like this.</p>
+        </div>
+        <div class="familiar-grid">
+          <div class="familiar-item">You know what to do, but cannot seem to start.</div>
+          <div class="familiar-item">Your brain feels noisy, crowded, or overloaded.</div>
+          <div class="familiar-item">You jump between ideas, tabs, tasks, and decisions.</div>
+          <div class="familiar-item">You avoid the things that matter most.</div>
+          <div class="familiar-item">You are tired of starting over and feeling behind.</div>
+          <div class="familiar-item">You have tried planners, systems, and productivity apps before.</div>
+        </div>
+        <div class="familiar-cta">
+          <a class="adhd-btn hot" href="#pricing">Start My Free 7-Day Trial →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="story-band" id="story">
+    <div class="adhd-wrap">
+      <div class="story-card">
+        <div>
+          <img class="shari-photo" src="https://assets.cdn.filesafe.space/bzwOUqZk2OyPMzDyqIUt/media/6a187cd93e043d8258f0aa3e.png" alt="Shari Hudson, creator of ADHD Business Ecosystem">
+        </div>
+        <div>
+          <div class="story-badge">Meet the creator</div>
+          <h2>Meet Shari Hudson</h2>
+          <p><strong>Creator of ADHD Business Ecosystem</strong></p>
+          <p>For most of my life, I thought I simply needed to try harder.</p>
+          <p>I built businesses, raised a family, managed responsibilities, and kept moving forward.</p>
+          <p>At age 72, I discovered ADHD was part of my story. Suddenly years of overwhelm, unfinished projects, procrastination, emotional overload, and self-criticism made more sense.</p>
+          <p>I created ADHD Business Ecosystem because people should not have to spend decades wondering what is wrong with them.</p>
+          <p><strong>You are not broken. Sometimes you simply need support that understands how your brain works.</strong></p>
+          <div class="signature">— Shari Hudson</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="mission-band" id="mission">
+    <div class="adhd-wrap">
+      <div class="mission-box">
+        <h2>You shouldn’t have to fight your brain to build your business.</h2>
+        <p>With ADHD Business Ecosystem, you won’t have to figure it out alone. You get support that starts with what is happening right now — not with another perfect plan you have to maintain.</p>
+        <div class="no-question">
+          Is it unreasonable to want support that understands your ADHD brain before asking you to be productive?
+          <small>Most people do not need more pressure. They need support that actually fits.</small>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="compare-band" id="compare">
+    <div class="adhd-wrap">
+      <div class="section-title">
+        <h2>Other apps assume you are organized first.</h2>
+        <p>ADHD Business Ecosystem starts with real life.</p>
+      </div>
+      <div class="compare-grid">
+        <div class="compare-col other">
+          <h3>Other apps assume...</h3>
+          <ul>
+            <li>You are already focused.</li>
+            <li>You know exactly what to do.</li>
+            <li>You can follow the plan.</li>
+            <li>You just need more discipline.</li>
+            <li>You can stay consistent on command.</li>
+          </ul>
+        </div>
+        <div class="compare-col mine">
+          <h3>ADHD Business Ecosystem starts with...</h3>
+          <ul>
+            <li>You feel overwhelmed.</li>
+            <li>Your brain feels noisy.</li>
+            <li>You are avoiding something.</li>
+            <li>You need help restarting.</li>
+            <li>You need one doable next step.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+  <section class="section compact" id="changes">
+    <div class="adhd-wrap">
+      <div class="section-title">
+        <h2>What changes when support starts where you are?</h2>
+        <p>Features matter only when they help you feel supported, make progress, and keep moving.</p>
+      </div>
+      <div class="outcome-grid">
+        <article class="outcome-card"><div class="emoji">🌀</div><h3>Feel less overwhelmed</h3><p>So you can focus on what matters most.</p></article>
+        <article class="outcome-card"><div class="emoji">🔁</div><h3>Restart without shame</h3><p>So you can keep moving even after messy or inconsistent days.</p></article>
+        <article class="outcome-card"><div class="emoji">🎯</div><h3>Make decisions faster</h3><p>So you spend less time spinning and second-guessing.</p></article>
+        <article class="outcome-card"><div class="emoji">💛</div><h3>Feel supported</h3><p>So you stop carrying everything alone.</p></article>
+        <article class="outcome-card"><div class="emoji">⚡</div><h3>Build momentum</h3><p>So important projects actually move forward.</p></article>
+      </div>
+    </div>
+  </section>
+  <section class="section compact" id="how">
+    <div class="adhd-wrap">
+      <div class="section-title">
+        <h2>How it works</h2>
+        <p>Simple enough to understand quickly. Flexible enough for real ADHD business life.</p>
+      </div>
+      <div class="steps-grid">
+        <article class="step-card"><div class="step-num">1</div><h3>Start your free trial</h3><p>Choose text or voice support and get started in under 60 seconds.</p></article>
+        <article class="step-card"><div class="step-num">2</div><h3>Tell it what’s happening</h3><p>Overwhelmed, stuck, scattered, avoiding, ready to move, or needing a restart.</p></article>
+        <article class="step-card"><div class="step-num">3</div><h3>Get the right support</h3><p>Use support, coaching, focus help, decision help, or momentum prompts.</p></article>
+        <article class="step-card"><div class="step-num">4</div><h3>Take one next step</h3><p>Move forward without forcing yourself into another complicated system.</p></article>
+      </div>
+    </div>
+  </section>
+  <section class="section compact" id="pricing">
+    <div class="adhd-wrap">
+      <div class="section-title">
+        <h2>Start with a free 7-day trial.</h2>
+        <p>Choose the support style that fits you. Text if you like typing. Voice if you process best by talking things through.</p>
+      </div>
+      <div class="pricing-grid">
+        <article class="price-card text">
+          <div class="price-icon">💬</div>
+          <h3>Text Access</h3>
+          <div class="sub">Unlimited text conversations</div>
+          <p>Type through overwhelm, brain dumps, business ideas, focus struggles, procrastination, emotional overload, and next steps anytime.</p>
+          <div class="price">$19 <small>/month</small></div>
+          <span class="trial-subnote">✨ 7 Days Free, Then Subscribe</span>
+          <a class="adhd-btn" href="#" onclick="window.open(withAffiliateRef('https://link.fastpaydirect.com/payment-link/69ff893234d67b041e7e88a2'), '_blank'); return false;">Start My Free Trial</a>
+        </article>
+        <article class="price-card voice">
+          <div class="popular">MOST<br>POPULAR</div>
+          <div class="price-icon">🎙️</div>
+          <h3>Voice Lite</h3>
+          <div class="sub">Unlimited text + 120 minutes/month</div>
+          <p>Everything in Text Access plus voice support when you need to talk through overwhelm, decisions, emotions, focus, and business momentum.</p>
+          <div class="price">$29 <small>/month</small></div>
+          <span class="trial-subnote">✨ 7 Days Free, Then Subscribe</span>
+          <a class="adhd-btn purple" href="#" onclick="window.open(withAffiliateRef('https://link.fastpaydirect.com/payment-link/69ff6b3034d67b041e7e886e'), '_blank'); return false;">Start My Free Trial</a>
+        </article>
+        <article class="price-card power">
+          <div class="price-icon">🔊</div>
+          <h3>Power Voice</h3>
+          <div class="sub">Unlimited text + 300 minutes/month</div>
+          <p>Deeper voice access for ongoing support, longer conversations, emotional processing, business strategy, hyperfocus sessions, and ADHD guidance.</p>
+          <div class="price">$49 <small>/month</small></div>
+          <span class="trial-subnote">✨ 7 Days Free, Then Subscribe</span>
+          <a class="adhd-btn hot" href="#" onclick="window.open(withAffiliateRef('https://link.fastpaydirect.com/payment-link/69ff6b81c43a7488828c26be'), '_blank'); return false;">Start My Free Trial</a>
+        </article>
+      </div>
+    </div>
+  </section>
+  <section class="section compact" id="faq">
+    <div class="adhd-wrap">
+      <div class="section-title">
+        <h2>Frequently asked questions</h2>
+        <p>Quick answers before you start your free trial.</p>
+      </div>
+      <div class="faq-grid">
+        <details class="faq-item"><summary>Is this another productivity app?</summary><p>No. ADHD Business Ecosystem is not another planner, task list, or dashboard. It starts with what is happening right now and helps you take one doable next step.</p></details>
+        <details class="faq-item"><summary>What makes this different?</summary><p>Most tools assume you are already clear, motivated, and organized. This ecosystem starts with real ADHD life: how you feel, what feels too loud, what is pulling your attention, and what support would help you move forward.</p></details>
+        <details class="faq-item"><summary>Who is this for?</summary><p>It is built for ADHD entrepreneurs, solopreneurs, coaches, consultants, speakers, creators, business owners, multi-passionate people, and adults diagnosed later in life who want support without shame.</p></details>
+        <details class="faq-item"><summary>How does the 7-day free trial work?</summary><p>You can try any text or voice tier free for 7 days. Choose the support style that fits you. If it does not feel like the right fit, cancel during the trial and you will not be charged.</p></details>
+        <details class="faq-item"><summary>What if I struggle with consistency?</summary><p>That is exactly why Fresh Start is part of the experience. You can come back after inconsistent days, burnout, overwhelm, or avoidance without shame and simply begin again.</p></details>
+        <details class="faq-item"><summary>What if I procrastinate or avoid important work?</summary><p>The ecosystem includes procrastination support, perfectionism support, Need A Nudge, Fresh Start, and Coach Mode to help you lower the pressure and begin with one doable move.</p></details>
+        <details class="faq-item"><summary>What is included with voice?</summary><p>Voice tiers allow you to talk things through when typing is not enough. It can help with overwhelm, decision pressure, emotional processing, business momentum, and getting unstuck in the moment.</p></details>
+        <details class="faq-item"><summary>Which tier should I choose?</summary><p>Choose Text Access if you like typing through your thoughts. Choose Voice Lite if you process better by talking sometimes. Choose Power Voice if you want deeper or more frequent voice support.</p></details>
+        <details class="faq-item"><summary>Can I cancel anytime?</summary><p>Yes. You can cancel if it is not the right fit. The purpose of the free trial is to let you experience the support before deciding.</p></details>
+        <details class="faq-item"><summary>Is this therapy or medical treatment?</summary><p>No. ADHD Business Ecosystem is not therapy or medical treatment. It is a supportive ADHD business ecosystem designed for self-understanding, emotional support, momentum, focus, and business follow-through.</p></details>
+      </div>
+    </div>
+  </section>
+  <section class="bottom-gradient">
+    <div class="adhd-wrap">
+      <h2>You shouldn’t have to figure this out by yourself.</h2>
+      <p>Created by Shari Hudson, diagnosed with ADHD at age 72 after decades of wondering why some things felt harder than they should.</p>
+      <a class="adhd-btn hot" href="#pricing">Start My Free 7-Day Trial →</a>
+      <small>Choose text or voice support • Cancel anytime</small>
+    </div>
+  </section>
+  <div style="display:none;">
+    ADHD Business Ecosystem is an ADHD entrepreneur support app designed to help ADHD business owners, creators, coaches, consultants, solopreneurs, speakers, and professionals feel understood, reduce overwhelm, talk through emotions, navigate procrastination and perfectionism, find focus support, and take one doable next step with adaptive text and voice support.
+  </div>
+</section>
+<script>
+(function () {
+  function updateFastPayHrefLinks() {
+    const affiliateId = getAffiliateRef();
+    if (!affiliateId) return;
+    document.querySelectorAll('a[href*="link.fastpaydirect.com/payment-link/"]').forEach(function (link) {
+      const href = link.getAttribute('href');
+      if (!href || href.includes('am_id=') || href.includes('ref=')) return;
+      const separator = href.includes('?') ? '&' : '?';
+      link.setAttribute('href', href + separator + 'am_id=' + encodeURIComponent(affiliateId));
+    });
+  }
+  document.addEventListener('DOMContentLoaded', updateFastPayHrefLinks);
+  window.addEventListener('load', updateFastPayHrefLinks);
+  setTimeout(updateFastPayHrefLinks, 500);
+  setTimeout(updateFastPayHrefLinks, 1500);
+})();
+</script>
+</user_query>
