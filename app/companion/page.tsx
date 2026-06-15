@@ -21,7 +21,8 @@ import { SpinWheelPanel } from "@/components/companion/SpinWheelPanel";
 import { FocusAudioPanel } from "@/components/companion/FocusAudioPanel";
 import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
-import { ProgressiveDiscoveryCard } from "@/components/companion/ProgressiveDiscoveryCard";
+import { CompanionDiscoveryPrompt } from "@/components/companion/CompanionDiscoveryPrompt";
+import { discoveryContextForChat } from "@/lib/companionDiscovery";
 import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import type { ProfileSettingsSection } from "@/components/companion/ProfilePanel";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
@@ -47,12 +48,10 @@ import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm"
 import { CompanionSignInFromQuery } from "@/components/companion/CompanionSignInFromQuery";
 import { CompanionAuthGate } from "@/components/companion/CompanionAuthGate";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
-import { hasUserOnboarded } from "@/lib/companionOnboarding";
 import { EmailGeneratorPanel } from "@/components/companion/EmailGeneratorPanel";
 import { SnippetsLibrary } from "@/components/companion/SnippetsLibrary";
 import { BusinessProfilePanel } from "@/components/companion/BusinessProfilePanel";
 import { IdealClientBuilder } from "@/components/companion/IdealClientBuilder";
-import { OnboardingFlow } from "@/components/companion/OnboardingFlow";
 import { ContentTypesPanel } from "@/components/companion/ContentTypesPanel";
 import {
   ContentGeneratorPanel,
@@ -904,6 +903,7 @@ export default function CompanionPage() {
   >(null);
   const [settingsSection, setSettingsSection] =
     useState<SettingsSection | null>(null);
+  const [profileGettingToKnowYou, setProfileGettingToKnowYou] = useState(false);
   const [visualMode, setVisualMode] = useState<VisualMode>("off");
   const { configured: authConfigured, user } = useCompanionAuth();
 
@@ -919,10 +919,6 @@ export default function CompanionPage() {
   // Voice output — Shari speaks her replies (ElevenLabs).
   const [voiceOutput, setVoiceOutput] = useState(false);
   const [voiceBlocked, setVoiceBlocked] = useState(false);
-  const [showOnboarding, setShowOnboarding] = useState(false);
-  const openSetup = useCallback(() => setShowOnboarding(true), []);
-  const needsSetup = !hasUserOnboarded(user?.id);
-
   // Continue card — the home "you were working on…" memory re-entry.
   const [lastAct, setLastAct] = useState<LastActivity | null>(null);
   const [projectContinueId, setProjectContinueId] = useState<string | null>(
@@ -4394,7 +4390,12 @@ export default function CompanionPage() {
           helpMode: prefs.helpMode,
           supportStyle: prefs.supportStyle,
           userName: prefs.name || undefined,
-          businessContext: businessContextSummary(),
+          businessContext: (() => {
+            const parts = [businessContextSummary(), discoveryContextForChat()].filter(
+              Boolean,
+            );
+            return parts.length ? parts.join(" ") : undefined;
+          })(),
           intentHint:
             [
               intentHintForChat(resolved),
@@ -5431,12 +5432,6 @@ export default function CompanionPage() {
       <Suspense fallback={null}>
         <CompanionSignInFromQuery onOpen={openSignIn} />
       </Suspense>
-      {showOnboarding && (
-        <OnboardingFlow
-          userId={user?.id}
-          onDone={() => setShowOnboarding(false)}
-        />
-      )}
       <CompanionBackground page={scenePage} seed={sceneSeed} />
 
       <div className="relative z-10 flex h-full min-h-0 w-full overflow-hidden">
@@ -5833,13 +5828,11 @@ export default function CompanionPage() {
                     )
                   ) : null}
                   {homeCalm ? (
-                    <ProgressiveDiscoveryCard
-                      onOpenBusinessProfile={() => {
-                        setActiveSection("business-profile");
-                      }}
-                      onOpenSettings={() => {
-                        setSettingsSection("tone");
-                        setOverlay("settings");
+                    <CompanionDiscoveryPrompt
+                      hasMeaningfulUsage={hasChatted}
+                      onOpenGettingToKnowYou={() => {
+                        setProfileGettingToKnowYou(true);
+                        setOverlay("profile");
                       }}
                     />
                   ) : null}
@@ -6206,18 +6199,24 @@ export default function CompanionPage() {
 
       <ModalSheet
         open={overlay === "profile"}
-        onClose={() => setOverlay(null)}
+        onClose={() => {
+          setOverlay(null);
+          setProfileGettingToKnowYou(false);
+        }}
         title="Profile"
       >
         <ProfilePanel
           onSignIn={openSignIn}
+          openGettingToKnowYou={profileGettingToKnowYou}
           onOpen={(s) => {
             setOverlay(null);
+            setProfileGettingToKnowYou(false);
             setActiveSection(s);
           }}
           onOpenSettings={(section) => {
             setSettingsSection(section);
             setOverlay("settings");
+            setProfileGettingToKnowYou(false);
           }}
         />
       </ModalSheet>

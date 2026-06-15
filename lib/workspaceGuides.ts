@@ -29,8 +29,8 @@ export const WORKSPACE_GUIDES: Record<string, WorkspaceGuideContent> = {
     title: "Strategies",
     what: "Short coaching playbooks for your brain and your business.",
     why: "When you're stuck, a proven pattern beats inventing from scratch.",
-    how: "Search or pick a category, read the gist, tap Start or Talk it through.",
-    example: "Feeling overwhelmed → “Brain dump reset” → 10-minute apply with Shari.",
+    how: "Read what it is, why it helps, and when to use it — then say what you're struggling with and open the matching workspace.",
+    example: "Too many ideas → Open Clear My Mind. Too many tasks → Open Adjust My Day.",
   },
   "content-generator": {
     id: "content-generator",

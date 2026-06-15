@@ -8,13 +8,11 @@ import {
   getCategory,
   getStrategy,
   groupForStrategy,
-  recommendedActionFor,
   resolveSubcat,
   strategiesFor,
   timeForStrategy,
   warmthFor,
   type Strategy,
-  type StrategyActionId,
   type StrategyGroupId,
 } from "@/lib/strategySystem";
 import {
@@ -25,7 +23,7 @@ import {
   type UserStrategy,
 } from "@/lib/userStrategies";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
-import { appReferences } from "@/lib/appReferences";
+import { StrategyUseNow } from "@/components/companion/StrategyUseNow";
 import { getPrefs, saveProject } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
 
@@ -81,7 +79,6 @@ export function StrategiesPanel({
   const [newProblem, setNewProblem] = useState("");
   const [newSteps, setNewSteps] = useState("");
   const [openSubcat, setOpenSubcat] = useState<string | null>(null);
-  const [deepOpen, setDeepOpen] = useState(false);
   const visualMode = getPrefs().visualMode;
   const colorOn = visualMode !== "off";
   const decorative = visualMode === "decorative";
@@ -107,12 +104,6 @@ export function StrategiesPanel({
     });
     return () => registerBack?.(null);
   }, [view, registerBack]);
-
-  // Collapse the "deeper" section whenever we land on a new strategy.
-  const stratId = view.v === "strategy" ? view.stratId : null;
-  useEffect(() => {
-    setDeepOpen(false);
-  }, [stratId]);
 
   function accent(color: string) {
     return decorative ? (DECOR[color] ?? color) : color;
@@ -500,27 +491,11 @@ export function StrategiesPanel({
         <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">{u.title}</p>
         <p className="mt-1 text-sm italic text-[#9a8f82]">{u.whenToUse}</p>
 
-        <LessonHeading color={ucolor}>What this helps with</LessonHeading>
-        <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
-          {u.description}
+        <LessonHeading color={ucolor}>What is it?</LessonHeading>
+        <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">
+          {u.description || u.steps[0]}
         </p>
-
-        <LessonHeading color={ucolor}>Why it works</LessonHeading>
-        <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
-          {u.whyItWorks}
-        </p>
-
-        {u.example && (
-          <>
-            <LessonHeading color={ucolor}>For example</LessonHeading>
-            <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
-              {u.example}
-            </p>
-          </>
-        )}
-
-        <LessonHeading color={ucolor}>Try it right now</LessonHeading>
-        <ol className="mt-2 flex flex-col gap-2">
+        <ol className="mt-3 flex flex-col gap-2">
           {u.steps.map((step, i) => (
             <li key={i} className="flex items-start gap-3">
               <span
@@ -529,29 +504,31 @@ export function StrategiesPanel({
               >
                 {i + 1}
               </span>
-              <span className="text-base leading-relaxed text-[#1f1c19]">
-                {step}
-              </span>
+              <span className="text-base leading-relaxed text-[#1f1c19]">{step}</span>
             </li>
           ))}
         </ol>
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => onOpen?.("focus-timer")}
-            className="rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
-          >
-            ▶ Start now
-          </button>
-          <button
-            type="button"
-            onClick={() => onOpen?.("time-block")}
-            className="rounded-xl border border-[#1e4f4f]/40 bg-white px-5 py-3 text-base font-semibold text-[#1e4f4f]"
-          >
-            ⏱ Time block
-          </button>
-        </div>
+        <LessonHeading color={ucolor}>Why it helps</LessonHeading>
+        <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
+          {u.whyItWorks}
+        </p>
+
+        <LessonHeading color={ucolor}>When to use it</LessonHeading>
+        <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">{u.whenToUse}</p>
+        {u.example ? (
+          <p className="mt-2 whitespace-pre-line text-base leading-relaxed text-[#6b635a]">
+            {u.example}
+          </p>
+        ) : null}
+
+        <StrategyUseNow
+          key={u.id}
+          strategyTitle={u.title}
+          categoryId={u.category}
+          onOpen={onOpen}
+          onAsk={onAsk}
+        />
       </div>
     );
   }
@@ -563,84 +540,8 @@ export function StrategiesPanel({
     return null;
   }
   const cat = getCategory(resolveSubcat(s));
-  // Highlight the action that best matches this strategy (Talk needs onAsk).
-  const recAction: StrategyActionId = (() => {
-    const r = recommendedActionFor(s);
-    return r === "talk" && !onAsk ? "start" : r;
-  })();
-  // In-app features this strategy's content refers to → offer a door to each.
-  const refs = appReferences(
-    s.problem,
-    s.whyBrain,
-    s.whyWorks,
-    s.example,
-    s.deeper,
-    s.steps.join(" "),
-  );
-
-  // Action menu — one recommended action up top, the rest tucked in a dropdown.
-  const actions: { id: StrategyActionId; label: string; help: string; run: () => void }[] = [
-    {
-      id: "start",
-      label: "▶ Start now",
-      help: "Apply this strategy immediately.",
-      run: () => onOpen?.("focus-timer"),
-    },
-    {
-      id: "timeblock",
-      label: "⏱ Time block",
-      help: "Schedule time to try this later.",
-      run: () => onOpen?.("time-block"),
-    },
-    ...(onAsk
-      ? [
-          {
-            id: "talk" as StrategyActionId,
-            label: "💬 Talk it through",
-            help: "Have Shari help you apply it to your situation.",
-            run: () => onAsk(applyPrompt(s)),
-          },
-        ]
-      : []),
-    {
-      id: "save-mine",
-      label: "📌 Save as my strategy",
-      help: "Keep this in your personal library.",
-      run: () => {
-        const subcat = resolveSubcat(s);
-        const group = groupForStrategy(s);
-        saveUserStrategy({
-          title: s.title,
-          type: group,
-          category: subcat,
-          source: "user_generated",
-          description: s.problem,
-          whenToUse: s.whenToUse,
-          steps: s.steps,
-          whyItWorks: s.whyWorks,
-          example: s.example,
-        });
-        setView({ v: "saved" });
-      },
-    },
-    {
-      id: "save",
-      label: "📁 Save to project",
-      help: "Keep this strategy with a project for future reference.",
-      run: () => {
-        saveProject({
-          name: s.title,
-          goal: s.problem,
-          nextAction: s.steps[0] ?? "",
-          horizon: "now",
-          status: "in-progress",
-        });
-        onOpen?.("projects");
-      },
-    },
-  ];
-  const recItem = actions.find((a) => a.id === recAction) ?? actions[0]!;
-  const otherItems = actions.filter((a) => a.id !== recItem.id);
+  const subcat = resolveSubcat(s);
+  const accentColor = accent(cat?.color ?? "#1e4f4f");
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
@@ -654,209 +555,118 @@ export function StrategiesPanel({
 
       <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">{s.title}</p>
 
-      {/* Instant context chips — time + best-for, before any reading */}
       <div className="mt-2 flex flex-wrap gap-x-5 gap-y-1 text-sm text-[#6b635a]">
-        <span>⏱ Takes about {timeForStrategy(s)} minutes</span>
-        <span>
-          🎯 Best{" "}
-          {/^when\b/i.test(s.whenToUse)
-            ? s.whenToUse.charAt(0).toLowerCase() + s.whenToUse.slice(1)
-            : `for ${s.whenToUse}`}
-        </span>
+        <span>⏱ About {timeForStrategy(s)} minutes</span>
       </div>
 
-      {/* Companion warmth — one human line before the lesson */}
-      {warmthFor(resolveSubcat(s)) && (
-        <p className="mt-3 text-base italic text-[#1e4f4f]">
-          {warmthFor(resolveSubcat(s))}
-        </p>
+      {warmthFor(subcat) && (
+        <p className="mt-3 text-base italic text-[#1e4f4f]">{warmthFor(subcat)}</p>
       )}
 
-      {/* 2. The problem */}
-      <LessonHeading color={accent(cat?.color ?? "#1e4f4f")}>
-        The problem
-      </LessonHeading>
-      <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
-        {s.problem}
+      <LessonHeading color={accentColor}>What is it?</LessonHeading>
+      <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">
+        {s.whyWorks.split("\n")[0]}
       </p>
-
-      {/* 3. Why ADHD brains do this */}
-      <LessonHeading color={accent(cat?.color ?? "#1e4f4f")}>
-        Why ADHD brains do this
-      </LessonHeading>
-      <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
-        {s.whyBrain}
-      </p>
-
-      {/* 4. Why this works */}
-      <LessonHeading color={accent(cat?.color ?? "#1e4f4f")}>
-        Why this works
-      </LessonHeading>
-      <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
-        {s.whyWorks}
-      </p>
-
-      {/* 5. Example */}
-      <LessonHeading color={accent(cat?.color ?? "#1e4f4f")}>
-        For example
-      </LessonHeading>
-      <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
-        {s.example}
-      </p>
-
-      {/* 6. Try it right now */}
-      <LessonHeading color={accent(cat?.color ?? "#1e4f4f")}>
-        Try it right now
-      </LessonHeading>
-      <ol className="mt-2 flex flex-col gap-2">
+      <ol className="mt-3 flex flex-col gap-2">
         {s.steps.map((step, i) => (
           <li key={i} className="flex items-start gap-3">
             <span
               className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
-              style={{ background: accent(cat?.color ?? "#1e4f4f") }}
+              style={{ background: accentColor }}
             >
               {i + 1}
             </span>
-            <span className="text-base leading-relaxed text-[#1f1c19]">
-              {step}
-            </span>
+            <span className="text-base leading-relaxed text-[#1f1c19]">{step}</span>
           </li>
         ))}
       </ol>
 
-      {/* Execution layer — ACTION comes before extra theory. Softer divider +
-          extra breathing room so it doesn't read like one dense document. */}
-      <div className="mt-9 border-t border-[#1e4f4f]/10 pt-6">
-        <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-          Put this strategy into action
-        </p>
-        <p className="mt-1 text-sm text-[#6b635a]">
-          You don&apos;t need to remember this strategy. Choose one way to use it.
-        </p>
-        {/* One recommended action up top; everything else in a clean dropdown. */}
-        <div className="mt-3 flex flex-col gap-2">
-          <ActionRow
-            recommended
-            label={recItem.label}
-            help={recItem.help}
-            onClick={recItem.run}
-          />
-          <select
-            value=""
-            onChange={(e) => {
-              const a = actions.find((x) => x.id === e.target.value);
-              if (a) a.run();
-            }}
-            className="w-full rounded-xl border border-[#1e4f4f]/30 bg-white px-4 py-3 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-          >
-            <option value="">Another way to use this…</option>
-            {otherItems.map((a) => (
-              <option key={a.id} value={a.id}>
-                {a.label} — {a.help}
-              </option>
-            ))}
-          </select>
-        </div>
-      </div>
+      <LessonHeading color={accentColor}>Why it helps</LessonHeading>
+      <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
+        {s.whyBrain}
+      </p>
+      <p className="mt-2 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
+        {s.whyWorks}
+      </p>
 
-      {/* Optional deeper learning — now BELOW the action area. Most people want
-          to act or leave, not read another paragraph first. */}
-      {s.deeper && (
-        <div className="mt-6 rounded-2xl border border-[#1e4f4f]/15 bg-white/60">
+      <LessonHeading color={accentColor}>When to use it</LessonHeading>
+      <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">{s.whenToUse}</p>
+      <p className="mt-2 whitespace-pre-line text-base leading-relaxed text-[#6b635a]">
+        {s.example}
+      </p>
+
+      <StrategyUseNow
+        key={s.id}
+        strategyTitle={s.title}
+        strategyId={s.id}
+        categoryId={subcat}
+        onOpen={onOpen}
+        onAsk={onAsk}
+      />
+
+      <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold">
+        <button
+          type="button"
+          onClick={() => {
+            saveUserStrategy({
+              title: s.title,
+              type: groupForStrategy(s),
+              category: subcat,
+              source: "user_generated",
+              description: s.problem,
+              whenToUse: s.whenToUse,
+              steps: s.steps,
+              whyItWorks: s.whyWorks,
+              example: s.example,
+            });
+            setView({ v: "saved" });
+          }}
+          className="text-[#1e4f4f] underline decoration-[#1e4f4f]/30 underline-offset-2"
+        >
+          Save as my strategy
+        </button>
+        {onAsk ? (
           <button
             type="button"
-            onClick={() => setDeepOpen((o) => !o)}
-            className="flex w-full items-center justify-between px-4 py-3 text-left"
+            onClick={() => onAsk(applyPrompt(s))}
+            className="text-[#1e4f4f] underline decoration-[#1e4f4f]/30 underline-offset-2"
           >
-            <span className="text-base font-semibold text-[#1e4f4f]">
-              Want to understand this deeper?
-            </span>
-            <span className="text-[#9a8f82]">{deepOpen ? "▲" : "▼"}</span>
+            Coach me through this with Shari
           </button>
-          {deepOpen && (
-            <p className="whitespace-pre-line px-4 pb-4 text-base leading-relaxed text-[#2d2926]">
-              {s.deeper}
-            </p>
-          )}
-        </div>
-      )}
+        ) : null}
+        <button
+          type="button"
+          onClick={() => {
+            saveProject({
+              name: s.title,
+              goal: s.problem,
+              nextAction: s.steps[0] ?? "",
+              horizon: "now",
+              status: "in-progress",
+            });
+            onOpen?.("projects");
+          }}
+          className="text-[#6b635a] underline decoration-[#9a8f82]/40 underline-offset-2"
+        >
+          Attach to a project
+        </button>
+      </div>
 
-      {/* If the strategy mentions a feature we already have, offer the door. */}
-      {refs.length > 0 && (
-        <div className="mt-6 rounded-2xl border border-[#1e4f4f]/15 bg-[#1e4f4f]/[0.04] p-4">
-          <p className="text-sm font-semibold text-[#2d2926]">
-            💡 You can do this right here in the app:
+      {s.deeper ? (
+        <details className="mt-6 rounded-2xl border border-[#1e4f4f]/15 bg-white/60 px-4 py-3">
+          <summary className="cursor-pointer text-base font-semibold text-[#1e4f4f]">
+            Want to understand this deeper?
+          </summary>
+          <p className="mt-2 whitespace-pre-line pb-2 text-base leading-relaxed text-[#2d2926]">
+            {s.deeper}
           </p>
-          <div className="mt-2 flex flex-wrap gap-2">
-            {refs.map((r) => (
-              <button
-                key={r.section}
-                type="button"
-                onClick={() => onOpen?.(r.section)}
-                className="rounded-full border border-[#c9bfb0] bg-white px-4 py-2 text-sm font-medium text-[#4b463f] transition-colors hover:border-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
-              >
-                {r.emoji} Open {r.label} →
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
+        </details>
+      ) : null}
 
-      {/* Gentle companion-style closing — so the page doesn't just stop. */}
       <p className="mt-8 text-center text-sm italic text-[#9a8f82]">
         One strategy used today is worth more than ten remembered tomorrow.
       </p>
     </div>
-  );
-}
-
-function ActionRow({
-  label,
-  help,
-  onClick,
-  recommended,
-  disabled,
-}: {
-  label: string;
-  help: string;
-  onClick?: () => void;
-  recommended?: boolean;
-  disabled?: boolean;
-}) {
-  const filled = recommended && !disabled;
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      disabled={disabled}
-      className={`w-full rounded-xl border px-4 py-3 text-left transition-colors ${
-        disabled
-          ? "cursor-default border-dashed border-[#d4cdc3] bg-white/50 opacity-70"
-          : filled
-            ? "border-[#1e4f4f] bg-[#1e4f4f] hover:bg-[#163a3a]"
-            : "border-[#1e4f4f]/30 bg-white hover:border-[#1e4f4f]/60"
-      }`}
-    >
-      <span className="flex items-center gap-2">
-        <span
-          className={`text-base font-semibold ${
-            filled ? "text-white" : "text-[#1f1c19]"
-          }`}
-        >
-          {label}
-        </span>
-        {filled && (
-          <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold text-white">
-            Recommended
-          </span>
-        )}
-      </span>
-      <span
-        className={`mt-0.5 block text-sm ${filled ? "text-white/85" : "text-[#6b635a]"}`}
-      >
-        {help}
-      </span>
-    </button>
   );
 }
 

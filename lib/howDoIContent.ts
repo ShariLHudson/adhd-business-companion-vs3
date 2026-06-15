@@ -39,7 +39,7 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
     id: "use-strategies",
     question: "How do I use strategies?",
     answer:
-      "Open Strategies, search or pick a category, read the short lesson, then Start now or Talk it through with Shari.",
+      "Open Strategies, pick one, read the four sections, then under “Use this strategy right now” say what you're struggling with — ideas, projects, tasks, or decisions — and open the workspace it recommends.",
     keywords: ["strategy", "strategies", "playbook", "stuck", "pattern"],
     openSection: "playbook",
   },

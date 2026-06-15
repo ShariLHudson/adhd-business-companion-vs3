@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { getPrefs, savePrefs } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
-import { enableDiscovery } from "@/lib/progressiveDiscovery";
+import { discoveryProgressSummary } from "@/lib/companionDiscovery";
+import { GettingToKnowYouPanel } from "@/components/companion/GettingToKnowYouPanel";
 
 const SUPPORT_EMAIL = "info@visualsparkstudios.com";
 const SUPPORT_PHONE_DISPLAY = "515-954-9177";
@@ -24,12 +25,27 @@ export type ProfileSettingsSection =
   | "connections"
   | "account";
 
-const PREF_LINKS: {
-  label: string;
-  emoji: string;
-  settings: ProfileSettingsSection;
-  blurb: string;
-}[] = [
+type PrefLink =
+  | {
+      label: string;
+      emoji: string;
+      blurb: string;
+      settings: ProfileSettingsSection;
+    }
+  | {
+      label: string;
+      emoji: string;
+      blurb: string;
+      action: "getting-to-know-you";
+    };
+
+const PREF_LINKS: PrefLink[] = [
+  {
+    label: "Getting to know you",
+    emoji: "🌱",
+    blurb: "Review discoveries, edit answers, or turn categories off.",
+    action: "getting-to-know-you" as const,
+  },
   {
     label: "Communication style",
     emoji: "💬",
@@ -54,28 +70,29 @@ const PREF_LINKS: {
     settings: "language",
     blurb: "Interface, response, and content language.",
   },
-  {
-    label: "Onboarding preferences",
-    emoji: "🌱",
-    settings: "tone",
-    blurb: "Re-open gentle discovery questions.",
-  },
 ];
 
 export function ProfilePanel({
   onOpen,
   onSignIn,
   onOpenSettings,
+  openGettingToKnowYou,
 }: {
   onOpen?: (section: AppSection) => void;
   onSignIn?: () => void;
   onOpenSettings?: (section: ProfileSettingsSection) => void;
+  openGettingToKnowYou?: boolean;
 }) {
   const { configured, user, signOut } = useCompanionAuth();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [savedAt, setSavedAt] = useState<number | null>(null);
   const [supportOpen, setSupportOpen] = useState(false);
+  const [showGettingToKnowYou, setShowGettingToKnowYou] = useState(openGettingToKnowYou ?? false);
+
+  useEffect(() => {
+    if (openGettingToKnowYou) setShowGettingToKnowYou(true);
+  }, [openGettingToKnowYou]);
   const [ticketType, setTicketType] = useState<"bug" | "broken" | null>(null);
   const [ticketText, setTicketText] = useState("");
 
@@ -104,11 +121,22 @@ export function ProfilePanel({
   const linkBtn =
     "flex w-full items-center gap-3 rounded-xl border border-[#d4cdc3] bg-white/85 px-4 py-3 text-left transition-colors hover:border-[#1e4f4f]/40 hover:bg-white";
 
+  if (showGettingToKnowYou) {
+    return (
+      <GettingToKnowYouPanel onBack={() => setShowGettingToKnowYou(false)} />
+    );
+  }
+
+  const discoveryLabel = discoveryProgressSummary().label;
+
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
       <p className="text-2xl font-semibold text-[#1f1c19]">Profile</p>
       <p className="mt-1 text-sm text-[#6b635a]">
         Account, business context, and preferences — one place.
+        <span className="mt-1 block text-[#1e4f4f]">
+          Getting to know you · {discoveryLabel}
+        </span>
       </p>
 
       {/* Account — always at top */}
@@ -226,10 +254,11 @@ export function ProfilePanel({
             key={link.label}
             type="button"
             onClick={() => {
-              if (link.label === "Onboarding preferences") {
-                enableDiscovery();
+              if ("action" in link && link.action === "getting-to-know-you") {
+                setShowGettingToKnowYou(true);
+                return;
               }
-              onOpenSettings?.(link.settings);
+              if ("settings" in link) onOpenSettings?.(link.settings);
             }}
             className={linkBtn}
           >
