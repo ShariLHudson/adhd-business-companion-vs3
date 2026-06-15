@@ -35,7 +35,6 @@ export const MEANING_CATEGORY_SWATCHES = [
   { label: "Recovery", color: "#9a6fb0" },
   { label: "Relationships", color: "#c08090" },
   { label: "Planning", color: "#6b8e23" },
-  { label: "Opportunities", color: "#c08a3e" },
 ] as const;
 
 export function visualModeLabel(mode: VisualMode): string {

@@ -8,7 +8,6 @@ import {
   contextColor,
   deleteBrainDump,
   getBrainDumps,
-  getPrefs,
   getProjects,
   logMomentum,
   loadBrainDumpDraft,
@@ -29,6 +28,7 @@ import {
 import { sortByDropdownLabel } from "@/lib/dropdownSort";
 import type { AppSection } from "@/lib/companionUi";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { useVisualMode } from "@/lib/useVisualMode";
 
 type TimeFilter = "today" | "week" | "month" | "30d" | "90d" | "all";
 
@@ -94,7 +94,7 @@ export function BrainDumpPanel({
   const [viewed, setViewed] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [xpFlash, setXpFlash] = useState(false);
-  const visualMode = getPrefs().visualMode;
+  const visualMode = useVisualMode();
   const colorOn = visualMode !== "off";
   const decorative = visualMode === "decorative";
 

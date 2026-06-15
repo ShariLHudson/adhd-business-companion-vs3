@@ -11,6 +11,8 @@ import {
 const CARD =
   "w-full rounded-2xl border bg-white/90 p-4 text-left transition-colors";
 
+const LABEL = "text-sm font-bold uppercase tracking-wide text-[#6b635a]";
+
 type Props = {
   current: VisualMode;
   onPick: (mode: VisualMode) => void;
@@ -18,58 +20,64 @@ type Props = {
 
 function DynamicPreview() {
   const [index, setIndex] = useState(0);
-  const mode = DYNAMIC_MODE_SWATCHES[index];
+  const active = DYNAMIC_MODE_SWATCHES[index];
 
   useEffect(() => {
     const id = window.setInterval(() => {
       setIndex((i) => (i + 1) % DYNAMIC_MODE_SWATCHES.length);
-    }, 2400);
+    }, 2200);
     return () => window.clearInterval(id);
   }, []);
 
   return (
     <div className="mt-3 overflow-hidden rounded-xl border border-[#d4cdc3]">
       <div
-        className="visual-color-preview-shift px-4 py-5 transition-colors duration-700"
-        style={{ backgroundColor: mode.tint }}
-        key={mode.id}
+        className="px-4 py-5 transition-colors duration-500"
+        style={{ backgroundColor: active.tint }}
       >
         <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-          Live preview · adapts with you
+          Dynamic · shifts with your situation
         </p>
         <p
-          className="mt-2 text-lg font-semibold transition-colors duration-700"
-          style={{ color: mode.color }}
+          className="mt-2 text-lg font-semibold transition-colors duration-500"
+          style={{ color: active.color }}
         >
-          {mode.label} mode
+          {active.label} right now
         </p>
-        <div className="mt-3 flex gap-2">
-          <div
-            className="h-8 flex-1 rounded-lg transition-colors duration-700"
-            style={{ backgroundColor: mode.color }}
-          />
-          <div className="h-8 flex-1 rounded-lg border border-[#d4cdc3] bg-white/80" />
+        <div
+          className="mt-3 rounded-lg border px-3 py-2.5 transition-colors duration-500"
+          style={{
+            borderLeftWidth: 4,
+            borderLeftColor: active.color,
+            backgroundColor: "rgba(255,255,255,0.75)",
+          }}
+        >
+          <p className="text-sm font-medium text-[#3d3630]">Sample workspace row</p>
+          <p className="mt-0.5 text-xs text-[#6b635a]">
+            Accent color follows {active.label.toLowerCase()}, not the category.
+          </p>
         </div>
-        <p className="mt-2 text-sm text-[#6b635a]">
-          Backgrounds and accents shift with your energy, mood, and what you are
-          doing.
-        </p>
       </div>
-      <div className="flex flex-wrap gap-1.5 border-t border-[#e7dfd4] bg-white px-3 py-2.5">
+      <div className="grid grid-cols-5 gap-1 border-t border-[#e7dfd4] bg-white p-2">
         {DYNAMIC_MODE_SWATCHES.map((m, i) => (
-          <span
+          <button
             key={m.id}
-            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium transition-opacity ${
-              i === index ? "opacity-100" : "opacity-45"
+            type="button"
+            onClick={() => setIndex(i)}
+            className={`rounded-lg px-1 py-2 text-center transition-all ${
+              i === index ? "ring-2 ring-[#1e4f4f]/40" : "opacity-60 hover:opacity-90"
             }`}
+            style={{ backgroundColor: m.tint }}
           >
             <span
-              className="h-2.5 w-2.5 rounded-full"
+              className="mx-auto mb-1 block h-2.5 w-2.5 rounded-full"
               style={{ backgroundColor: m.color }}
               aria-hidden="true"
             />
-            {m.label}
-          </span>
+            <span className="block text-[10px] font-semibold leading-tight text-[#3d3630]">
+              {m.label}
+            </span>
+          </button>
         ))}
       </div>
     </div>
@@ -80,43 +88,24 @@ function MeaningPreview() {
   return (
     <div className="mt-3 overflow-hidden rounded-xl border border-[#d4cdc3] bg-[#faf7f2] px-4 py-5">
       <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-        Live preview · same color every time
+        Meaning-based · same color every time
       </p>
-      <p className="mt-2 text-sm text-[#4b463f]">
-        Each area keeps its color so you can scan at a glance.
+      <p className="mt-1 text-sm text-[#4b463f]">
+        Projects are always teal. Focus is always blue. Scan by color, not label.
       </p>
-      <div className="mt-3 flex flex-wrap gap-2">
-        {MEANING_CATEGORY_SWATCHES.map((cat) => (
-          <span
-            key={cat.label}
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#e7dfd4] bg-white px-2.5 py-1 text-sm font-medium text-[#3d3630]"
-          >
-            <span
-              className="h-2.5 w-2.5 shrink-0 rounded-full"
-              style={{ backgroundColor: cat.color }}
-              aria-hidden="true"
-            />
-            {cat.label}
-          </span>
-        ))}
-      </div>
       <div className="mt-3 space-y-1.5">
-        {MEANING_CATEGORY_SWATCHES.slice(0, 3).map((cat) => (
+        {MEANING_CATEGORY_SWATCHES.map((cat) => (
           <div
             key={cat.label}
             className="flex items-center gap-2 rounded-lg border border-[#e7dfd4] bg-white px-3 py-2"
+            style={{ borderLeftWidth: 4, borderLeftColor: cat.color }}
           >
+            <span className="text-sm font-medium text-[#3d3630]">{cat.label}</span>
             <span
-              className="h-3 w-1 shrink-0 rounded-full"
-              style={{ backgroundColor: cat.color }}
-              aria-hidden="true"
-            />
-            <span className="text-sm text-[#3d3630]">{cat.label}</span>
-            <span
-              className="ml-auto text-xs font-medium"
+              className="ml-auto text-xs font-semibold"
               style={{ color: cat.color }}
             >
-              always {cat.label.toLowerCase()}
+              fixed
             </span>
           </div>
         ))}
@@ -129,19 +118,19 @@ function NonePreview() {
   return (
     <div className="mt-3 rounded-xl border border-[#d4cdc3] bg-white px-4 py-5">
       <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-        Live preview · minimal
+        None · clean and neutral
       </p>
       <div className="mt-3 space-y-1.5">
-        {["Task", "Reminder", "Note"].map((label) => (
+        {["Projects", "Focus", "Planning"].map((label) => (
           <div
             key={label}
-            className="flex items-center gap-2 rounded-lg border border-[#e7dfd4] px-3 py-2 text-sm text-[#3d3630]"
+            className="rounded-lg border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2 text-sm text-[#3d3630]"
           >
             {label}
           </div>
         ))}
       </div>
-      <p className="mt-2 text-sm text-[#6b635a]">No color coding — text only.</p>
+      <p className="mt-2 text-sm text-[#6b635a]">No color coding — text and layout only.</p>
     </div>
   );
 }
@@ -154,13 +143,35 @@ function ModePreview({ mode }: { mode: VisualMode }) {
 
 export function VisualColorModePicker({ current, onPick }: Props) {
   const [previewMode, setPreviewMode] = useState<VisualMode>(current);
+  const [savedFlash, setSavedFlash] = useState(false);
 
   useEffect(() => {
     setPreviewMode(current);
   }, [current]);
 
+  useEffect(() => {
+    if (!savedFlash) return;
+    const id = window.setTimeout(() => setSavedFlash(false), 2200);
+    return () => window.clearTimeout(id);
+  }, [savedFlash]);
+
+  function pick(mode: VisualMode) {
+    setPreviewMode(mode);
+    onPick(mode);
+    setSavedFlash(true);
+  }
+
   return (
     <div className="mt-4 flex flex-col gap-4">
+      {savedFlash ? (
+        <p
+          className="companion-fade-in text-center text-sm font-semibold text-[#1e4f4f]"
+          role="status"
+        >
+          ✓ Appearance updated
+        </p>
+      ) : null}
+
       <div className="flex flex-col gap-2.5">
         {VISUAL_COLOR_OPTIONS.map((it) => {
           const active = it.id === current;
@@ -168,10 +179,7 @@ export function VisualColorModePicker({ current, onPick }: Props) {
             <button
               key={it.id}
               type="button"
-              onClick={() => {
-                setPreviewMode(it.id);
-                onPick(it.id);
-              }}
+              onClick={() => pick(it.id)}
               onMouseEnter={() => setPreviewMode(it.id)}
               onFocus={() => setPreviewMode(it.id)}
               className={`${CARD} ${
@@ -186,9 +194,7 @@ export function VisualColorModePicker({ current, onPick }: Props) {
                 </span>
                 {active && <span className="text-[#1e4f4f]">✓</span>}
               </span>
-              <span className="mt-0.5 block text-sm text-[#6b635a]">
-                {it.desc}
-              </span>
+              <span className="mt-0.5 block text-sm text-[#6b635a]">{it.desc}</span>
               {it.id === "decorative" && (
                 <span className="mt-2 flex flex-wrap gap-1">
                   {DYNAMIC_MODE_SWATCHES.map((m) => (
@@ -219,11 +225,9 @@ export function VisualColorModePicker({ current, onPick }: Props) {
       </div>
 
       <div aria-live="polite">
-        <p className={LABEL}>Preview</p>
+        <p className={LABEL}>Preview — {VISUAL_COLOR_OPTIONS.find((o) => o.id === previewMode)?.label}</p>
         <ModePreview mode={previewMode} />
       </div>
     </div>
   );
 }
-
-const LABEL = "text-sm font-bold uppercase tracking-wide text-[#6b635a]";

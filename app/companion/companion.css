@@ -347,6 +347,18 @@
   );
 }
 
+[data-visual-mode="meaning"] .identity-bar {
+  background: linear-gradient(
+    180deg,
+    rgba(30, 79, 79, 0.08) 0%,
+    rgba(244, 239, 231, 0) 100%
+  );
+}
+
+[data-visual-mode="off"] .identity-bar {
+  background: transparent;
+}
+
 [data-visual-mode="decorative"] .input-glass {
   border-color: rgba(13, 148, 136, 0.35);
   box-shadow: 0 0 0 1px rgba(13, 148, 136, 0.08);

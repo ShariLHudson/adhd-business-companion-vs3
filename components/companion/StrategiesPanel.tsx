@@ -24,8 +24,9 @@ import {
   type UserStrategy,
 } from "@/lib/userStrategies";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { useVisualMode } from "@/lib/useVisualMode";
 import { StrategyUseNow } from "@/components/companion/StrategyUseNow";
-import { getPrefs, saveProject } from "@/lib/companionStore";
+import { saveProject } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
 
 type View =
@@ -80,7 +81,7 @@ export function StrategiesPanel({
   const [newProblem, setNewProblem] = useState("");
   const [newSteps, setNewSteps] = useState("");
   const [openSubcat, setOpenSubcat] = useState<string | null>(null);
-  const visualMode = getPrefs().visualMode;
+  const visualMode = useVisualMode();
   const colorOn = visualMode !== "off";
   const decorative = visualMode === "decorative";
 

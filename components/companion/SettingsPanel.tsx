@@ -23,6 +23,7 @@ import {
   type VisualMode,
   type Plan,
 } from "@/lib/companionStore";
+import { useVisualMode } from "@/lib/useVisualMode";
 import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
 import { playChime, unlockChime } from "@/lib/chime";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
@@ -209,7 +210,7 @@ export function SettingsPanel({
   const [aiTone, setAiTone] = useState<AiTone>("balanced");
   const [helpMode, setHelpMode] = useState<HelpMode>("ask-first");
   const [supportStyle, setSupportStyle] = useState<SupportStyle>("balanced");
-  const [visualMode, setVisualMode] = useState<VisualMode>("off");
+  const visualMode = useVisualMode();
   const [pattern, setPattern] = useState<PatternAwareness>("light");
   const [plan, setPlan] = useState<Plan>("essential");
   const [advanced, setAdvanced] = useState(false);
@@ -254,7 +255,6 @@ export function SettingsPanel({
     setAiTone(p.aiTone);
     setHelpMode(p.helpMode);
     setSupportStyle(p.supportStyle);
-    setVisualMode(p.visualMode);
     setPattern(p.patternAwareness);
     setPlan(p.plan);
     setAdvanced(p.advancedAiTools);
@@ -605,7 +605,6 @@ export function SettingsPanel({
         <VisualColorModePicker
           current={visualMode}
           onPick={(v) => {
-            setVisualMode(v);
             savePrefs({ visualMode: v });
           }}
         />

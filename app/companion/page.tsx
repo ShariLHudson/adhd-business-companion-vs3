@@ -23,6 +23,7 @@ import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
 import { CompanionDiscoveryPrompt } from "@/components/companion/CompanionDiscoveryPrompt";
 import { discoveryContextForChat } from "@/lib/companionDiscovery";
+import { useVisualMode } from "@/lib/useVisualMode";
 import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import type { ProfileSettingsSection } from "@/components/companion/ProfilePanel";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
@@ -907,12 +908,8 @@ export default function CompanionPage() {
   const [settingsSection, setSettingsSection] =
     useState<SettingsSection | null>(null);
   const [profileGettingToKnowYou, setProfileGettingToKnowYou] = useState(false);
-  const [visualMode, setVisualMode] = useState<VisualMode>("off");
+  const visualMode = useVisualMode();
   const { configured: authConfigured, user } = useCompanionAuth();
-
-  useEffect(() => {
-    setVisualMode(getPrefs().visualMode);
-  }, [overlay, activeSection]);
 
   const openSignIn = useCallback(() => {
     if (authConfigured) setOverlay("signin");

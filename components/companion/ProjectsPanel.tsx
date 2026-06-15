@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   deleteProject,
   getDayState,
-  getPrefs,
   getProjectItems,
   getProjects,
   logMomentum,
@@ -21,6 +20,7 @@ import { sortByDropdownLabel } from "@/lib/dropdownSort";
 import { ProjectBreakdown } from "@/components/companion/ProjectBreakdown";
 import { CollapsibleSection } from "@/components/companion/CollapsibleSection";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { useVisualMode } from "@/lib/useVisualMode";
 import {
   groupProjectsByList,
   groupTimeBlocksByDate,
@@ -211,7 +211,7 @@ export function ProjectsPanel({
   useWorkspaceFieldFocus(focusField, focusStamp, focusElementId, [view, step]);
 
   const projectGroups = groupProjectsByList(projects);
-  const visualMode = getPrefs().visualMode;
+  const visualMode = useVisualMode();
   const colorOn = visualMode !== "off";
 
   function startCreate() {

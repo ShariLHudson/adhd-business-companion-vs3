@@ -9,7 +9,6 @@ import {
   formatDayLabel,
   formatDuration,
   getBlockTags,
-  getPrefs,
   getProjects,
   getTimeBlocks,
   saveProject,
@@ -27,6 +26,7 @@ import {
 } from "@/lib/timeBank";
 import { sortByDropdownLabel } from "@/lib/dropdownSort";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { useVisualMode } from "@/lib/useVisualMode";
 
 type DurUnit = "min" | "hr" | "day" | "week" | "month";
 const UNIT_MIN: Record<DurUnit, number> = {
@@ -281,7 +281,7 @@ export function TimeBlockPanel({
   const projColor = (id?: string) =>
     (id ? projects.find((p) => p.id === id)?.color : undefined) ??
     projectColor(id);
-  const visualMode = getPrefs().visualMode;
+  const visualMode = useVisualMode();
   const colorOn = visualMode !== "off";
   const decorative = visualMode === "decorative";
 
