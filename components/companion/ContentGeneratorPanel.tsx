@@ -25,7 +25,6 @@ import {
   normalizeArtifactType,
   type ArtifactExportAction,
 } from "@/lib/artifactType";
-import { CreateCatalogPicker } from "@/components/companion/CreateCatalogPicker";
 import { CreateDraftImprove } from "@/components/companion/CreateDraftImprove";
 import { ArtifactWorkspaceHeader } from "@/components/companion/ArtifactWorkspaceHeader";
 import { ArtifactReadyPanel } from "@/components/companion/ArtifactReadyPanel";
@@ -40,10 +39,17 @@ import { copyPasteFallbackMessage } from "@/lib/collaborativeDocumentWorkflow";
 import { type CreateCatalogItem, findCatalogItem } from "@/lib/createCatalog";
 import {
   CREATE_FEATURED,
-  createPromptQuestion,
   matchCreateSearch,
   resolveFeaturedType,
 } from "@/lib/createWorkspaceUx";
+import {
+  advanceAfterTypePick,
+  categoryIdForType,
+  EMPTY_CREATE_WORKFLOW,
+  type CreateWorkflowState,
+} from "@/lib/createWorkflow";
+import { CreateWorkflowPanel } from "@/components/companion/CreateWorkflowPanel";
+import { blankScaffoldForType } from "@/lib/createInitialization";
 import {
   emptySavedArtifact,
   recordAfterGoogleDoc,
@@ -156,6 +162,7 @@ export function ContentGeneratorPanel({
   const [locationPanelOpen, setLocationPanelOpen] = useState(false);
   const [phase, setPhase] = useState<"building" | "ready">("building");
   const [createSearch, setCreateSearch] = useState("");
+  const [workflow, setWorkflow] = useState<CreateWorkflowState>(EMPTY_CREATE_WORKFLOW);
   const started = useRef(false);
   const lastSeedSig = useRef("");
   // Zero-hop: opened from chat with a clear type → straight to writing, never
@@ -166,6 +173,8 @@ export function ContentGeneratorPanel({
   const exportPrintRef = useRef<HTMLButtonElement | null>(null);
   const typeLocked = Boolean(lockedArtifactType);
   const proposalMode = isProposalArtifact(lockedArtifactType ?? type);
+  const inGuidedCreate = !workflow.buildApproved;
+  const showDraftEditor = Boolean(draft) && workflow.buildApproved;
 
   const lastReportedDetail = useRef<string>("");
   const lastSessionSyncSig = useRef<string>("");
@@ -288,14 +297,31 @@ export function ContentGeneratorPanel({
     setEditingTopic(false);
 
     if (seed.draft) {
-      setDraft(seed.draft);
-      started.current = true;
-    } else if (seed.type && seed.autoGenerate) {
-      setDraft("");
-      started.current = true;
-      void run(seed.type, t, tone);
+      const resolvedType = lockedArtifactType
+        ? normalizeArtifactType(lockedArtifactType)
+        : (seed.type ?? "");
+      const scaffold = resolvedType ? blankScaffoldForType(resolvedType) : "";
+      const isScaffold =
+        scaffold.trim().length > 0 && seed.draft.trim() === scaffold.trim();
+      if (isScaffold) {
+        setDraft("");
+        setWorkflow(advanceAfterTypePick(resolvedType, categoryIdForType(resolvedType)));
+      } else {
+        setDraft(seed.draft);
+        setWorkflow({
+          ...EMPTY_CREATE_WORKFLOW,
+          step: "improve",
+          buildApproved: true,
+          readinessConfirmed: true,
+          categoryId: categoryIdForType(resolvedType),
+        });
+        started.current = true;
+      }
+    } else if (seed.type && seed.autoGenerate && false) {
+      // Create 2.0 — never auto-generate; user approves at readiness.
     } else if (seed.type) {
       setDraft("");
+      setWorkflow(advanceAfterTypePick(seed.type, categoryIdForType(seed.type)));
       started.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -507,6 +533,7 @@ export function ContentGeneratorPanel({
     setBrief("");
     setEditingTopic(false);
     setDraft("");
+    setWorkflow(advanceAfterTypePick(typeLabel, categoryIdForType(typeLabel)));
     started.current = false;
   }
 
@@ -553,9 +580,15 @@ export function ContentGeneratorPanel({
 
   const workspaceRecord =
     savedArtifact ??
-    (workspaceMode && type && draft
+    (workspaceMode && type && showDraftEditor
       ? emptySavedArtifact(type, artifactTitleValue())
       : null);
+
+  function handleBuildDraft(briefText: string) {
+    setBrief(briefText);
+    setTopic(briefText);
+    void run(type, briefText, tone);
+  }
 
   return (
     <div className="companion-fade-in flex h-full min-h-0 flex-col">
@@ -567,17 +600,17 @@ export function ContentGeneratorPanel({
           workspaceMode ? "" : "mx-auto max-w-2xl overflow-y-auto px-6 py-8"
         }`}
       >
-      {!(workspaceMode && draft) && !type && (
+      {!(workspaceMode && showDraftEditor) && !type && workflow.step === "category" && (
         <>
           <WorkspaceGuide section="content-generator" />
           <p className="text-2xl font-semibold text-[#1f1c19]">Create Something</p>
           <p className="mt-1 text-base text-[#6b635a]">
-            One step at a time — pick a type, say what it&apos;s for, then shape the draft.
+            We&apos;ll shape it together — category, a few questions, then your draft.
           </p>
         </>
       )}
 
-      {type && brief && draft && !(workspaceMode && phase === "ready") && (
+      {type && brief && showDraftEditor && !(workspaceMode && phase === "ready") && (
         <div className="mt-4 flex items-center justify-between gap-2">
           <p className="text-sm text-[#6b635a]">
             <span className="font-semibold text-[#1f1c19]">{type}</span>
@@ -597,7 +630,7 @@ export function ContentGeneratorPanel({
                 setTopic("");
                 setBrief("");
                 setEditingTopic(false);
-                started.current = false;
+                setWorkflow(EMPTY_CREATE_WORKFLOW);
               }}
               className="shrink-0 text-sm font-semibold text-[#1e4f4f] hover:underline"
             >
@@ -607,15 +640,13 @@ export function ContentGeneratorPanel({
         </div>
       )}
 
-      {/* Zero-hop: routed from chat with a clear type → no form, straight to
-          writing. The draft editor (below) takes over once it's ready. */}
-      {seeded && !draft && (
+      {loading && inGuidedCreate && workflow.readinessConfirmed && (
         <div className="companion-fade-in mt-8 text-center">
           <p className="text-xl font-semibold text-[#1f1c19]">
-            ✨ Writing your {(type || "draft").toLowerCase()}…
+            Building your {(type || "draft").toLowerCase()}…
           </p>
           <p className="mt-1 text-sm text-[#6b635a]">
-            Pulling it together from what you told me.
+            Using what you shared — not starting from a blank guess.
           </p>
           {error && (
             <button
@@ -628,7 +659,7 @@ export function ContentGeneratorPanel({
           )}
         </div>
       )}
-      {draft && workspaceMode && workspaceRecord && phase === "ready" && (
+      {showDraftEditor && workspaceMode && workspaceRecord && phase === "ready" && (
         <div className="flex min-h-0 flex-1 flex-col px-4 py-3">
           <ArtifactReadyPanel
             artifactType={type || "Document"}
@@ -654,7 +685,7 @@ export function ContentGeneratorPanel({
         </div>
       )}
 
-      {draft && workspaceMode && workspaceRecord && phase === "building" && (
+      {showDraftEditor && workspaceMode && workspaceRecord && phase === "building" && (
         <ArtifactWorkspaceHeader
           record={workspaceRecord}
           draft={draft}
@@ -682,117 +713,50 @@ export function ContentGeneratorPanel({
         />
       )}
 
-      {!seeded && !(workspaceMode && draft) && (
-      <div className="mt-5 flex flex-col gap-3">
-        {/* Step 1 — pick type */}
-        {!type && !draft ? (
-          <div className="companion-fade-in">
-            <input
-              type="search"
-              value={createSearch}
-              onChange={(e) => setCreateSearch(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  handleCreateSearchSubmit();
-                }
-              }}
-              placeholder="What would you like to create?"
-              className="w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-lg text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-              autoFocus
-            />
-            <p className="mt-3 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-              Suggestions
-            </p>
-            <div className="mt-2 flex flex-wrap gap-2">
-              {CREATE_FEATURED.map((item) => (
-                <button
-                  key={item.label}
-                  type="button"
-                  onClick={() => handleFeaturedSelect(item.label)}
-                  className="rounded-full border border-[#1e4f4f]/25 bg-white px-4 py-2 text-sm font-semibold text-[#1f1c19] hover:border-[#1e4f4f]/50 hover:bg-[#f0f5f5]"
-                >
-                  {item.emoji} {item.label}
-                </button>
-              ))}
-            </div>
-            {createSearch.trim() && (
-              <button
-                type="button"
-                onClick={handleCreateSearchSubmit}
-                className="mt-3 text-sm font-semibold text-[#1e4f4f] hover:underline"
-              >
-                Create &ldquo;{createSearch.trim()}&rdquo; →
-              </button>
-            )}
-            <details className="mt-4">
-              <summary className="cursor-pointer text-sm font-semibold text-[#6b635a] hover:text-[#1e4f4f]">
-                Browse all types
-              </summary>
-              <div className="mt-3">
-                <CreateCatalogPicker
-                  compact
-                  highlightLabel={lockedArtifactType}
-                  onSelect={handleCatalogSelect}
-                />
+      {inGuidedCreate && !showDraftEditor && !(workspaceMode && phase === "ready") && (
+        <div className="mt-5 flex flex-col gap-3">
+          {workflow.step === "category" && (
+            <div className="companion-fade-in mb-2">
+              <input
+                type="search"
+                value={createSearch}
+                onChange={(e) => setCreateSearch(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    handleCreateSearchSubmit();
+                  }
+                }}
+                placeholder="Or search for a type…"
+                className="w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base outline-none focus:border-[#1e4f4f]"
+              />
+              <div className="mt-3 flex flex-wrap gap-2">
+                {CREATE_FEATURED.map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    onClick={() => handleFeaturedSelect(item.label)}
+                    className="rounded-full border border-[#1e4f4f]/25 bg-white px-3 py-1.5 text-sm font-semibold text-[#1f1c19] hover:bg-[#f0f5f5]"
+                  >
+                    {item.emoji} {item.label}
+                  </button>
+                ))}
               </div>
-            </details>
-          </div>
-        ) : !draft ? (
-          /* Step 2 — minimum info */
-          <div className="companion-fade-in">
-            <div className="flex items-center justify-between gap-2">
-              <p className="text-lg font-semibold text-[#1f1c19]">{type}</p>
-              {!typeLocked && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    setType("");
-                    setBrief("");
-                    setTopic("");
-                  }}
-                  className="text-sm font-semibold text-[#1e4f4f] hover:underline"
-                >
-                  Change type
-                </button>
-              )}
             </div>
-            <label
-              className={`mt-4 block ${label}`}
-              htmlFor="workspace-field-create-brief"
-            >
-              {createPromptQuestion(type)}
-            </label>
-            <textarea
-              id="workspace-field-create-brief"
-              value={brief}
-              onChange={(e) => {
-                setBrief(e.target.value);
-                setTopic(e.target.value);
-              }}
-              placeholder="A sentence or two is enough."
-              className="mt-2 min-h-[140px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-              autoFocus
-            />
-            <button
-              type="button"
-              onClick={() => run(type, brief, tone)}
-              disabled={loading || !brief.trim()}
-              className="mt-4 w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50 sm:w-auto"
-            >
-              {loading ? "Writing…" : "Generate"}
-            </button>
-            {error && (
-              <p className="mt-2 text-sm text-[#a85c4a]">
-                Couldn&apos;t generate just now — try again.
-              </p>
-            )}
-          </div>
-        ) : null}
-      </div>
+          )}
+          <CreateWorkflowPanel
+            workflow={workflow}
+            typeLabel={type}
+            onWorkflowChange={setWorkflow}
+            onTypeSelect={(label) => setType(label)}
+            onRoutedItem={(section) => onOpenSection?.(section)}
+            onBuildDraft={handleBuildDraft}
+            building={loading}
+          />
+        </div>
       )}
 
-      {draft && !(workspaceMode && phase === "ready") && (
+      {showDraftEditor && !(workspaceMode && phase === "ready") && (
         <div
           className={`companion-fade-in flex min-h-0 flex-1 flex-col ${
             workspaceMode ? "overflow-y-auto px-4 py-3" : "mt-6"
@@ -825,68 +789,70 @@ export function ContentGeneratorPanel({
 
           {!workspaceMode && (
             <>
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            {onBuildWithShari && (
-              <button
-                type="button"
-                onClick={() =>
-                  onBuildWithShari({
-                    itemType: type || "content",
-                    title: title.trim() || topic || brief || type || "Draft",
-                    draftContent: draft,
-                    brief: brief || topic,
-                    stage: "editing draft",
-                  })
-                }
-                className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
-              >
-                ✨ Build With Shari
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={() => {
-                void navigator.clipboard?.writeText(draft);
-                note("Copied ✓");
-              }}
-              className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-            >
-              📋 Copy
-            </button>
-          </div>
-
-          <div className="sticky bottom-0 mt-4 -mx-6 border-t border-[#e7dfd4] bg-[#faf7f2]/95 px-6 py-3 backdrop-blur">
-            {flash && (
-              <p className="mb-2 text-sm font-semibold text-[#1e4f4f]">{flash}</p>
-            )}
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder={`Name this ${type || "content"} (for saving)`}
-              className="mb-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-            />
-            <div className="flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={handleSave}
-                className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
-              >
-                💾 Save to Templates
-              </button>
-              <button
-                type="button"
-                onClick={handleAddToProject}
-                className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f]"
-              >
-                📁 Add to Project
-              </button>
-            </div>
-            <ExportActions
-              text={draft}
-              title={title.trim() || type || "content"}
-              social={/post|social|tweet|thread|reel/i.test(type)}
-            />
-          </div>
+              <details className="mt-4 rounded-xl border border-[#d4cdc3] bg-white/70 p-3">
+                <summary className="cursor-pointer text-sm font-semibold text-[#6b635a] hover:text-[#1e4f4f]">
+                  More actions ▼
+                </summary>
+                <div className="mt-3 flex flex-col gap-3">
+                  {onBuildWithShari && (
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onBuildWithShari({
+                          itemType: type || "content",
+                          title: title.trim() || topic || brief || type || "Draft",
+                          draftContent: draft,
+                          brief: brief || topic,
+                          stage: "editing draft",
+                        })
+                      }
+                      className="w-fit rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
+                    >
+                      Continue with Shari in chat
+                    </button>
+                  )}
+                  <input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder={`Name this ${type || "content"} (for saving)`}
+                    className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base outline-none focus:border-[#1e4f4f]"
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void navigator.clipboard?.writeText(draft);
+                        note("Copied ✓");
+                      }}
+                      className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f]"
+                    >
+                      Copy
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSave}
+                      className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
+                    >
+                      Save to Saved Work
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleAddToProject}
+                      className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f]"
+                    >
+                      Add to project
+                    </button>
+                  </div>
+                  <ExportActions
+                    text={draft}
+                    title={title.trim() || type || "content"}
+                    social={/post|social|tweet|thread|reel/i.test(type)}
+                  />
+                </div>
+              </details>
+              {flash && (
+                <p className="mt-2 text-sm font-semibold text-[#1e4f4f]">{flash}</p>
+              )}
             </>
           )}
         </div>

@@ -47,7 +47,7 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
     id: "create-content",
     question: "How do I create content?",
     answer:
-      "Open Create, choose a type (email, post, proposal…), answer one question, then Improve or Update Draft until it fits.",
+      "Open Create, pick a category and type, answer a few questions one at a time, then tap Build my draft when you're ready. Improve with Update draft — nothing generates until you approve.",
     keywords: ["create", "content", "write", "email", "post", "proposal"],
     openSection: "content-generator",
   },

@@ -35,10 +35,10 @@ export const WORKSPACE_GUIDES: Record<string, WorkspaceGuideContent> = {
   "content-generator": {
     id: "content-generator",
     title: "Create",
-    what: "Draft emails, posts, proposals, and more with minimal setup.",
-    why: "Blank pages are hard; one question gets you moving.",
-    how: "Choose a type, answer one prompt, then Improve or Update Draft.",
-    example: "Proposal → “What is it for?” → draft → “Shorter” → Update Draft.",
+    what: "Guided creation — category, a few questions, then a draft you approve.",
+    why: "Blank-page generation overwhelms ADHD brains; shaping first builds trust.",
+    how: "Pick category → type → answer one question at a time → build draft → improve → save.",
+    example: "Proposal → who it's for → what you're solving → Build my draft → Update draft.",
   },
   "templates-library": {
     id: "templates-library",
