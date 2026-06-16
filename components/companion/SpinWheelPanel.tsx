@@ -8,7 +8,7 @@ import {
   updateBrainDump,
   type BrainDumpEntry,
 } from "@/lib/companionStore";
-import { dopamineHitItems } from "@/lib/dopamineHits";
+import { momentumBoostItems } from "@/lib/momentumBoosts";
 import { isPhysicalActionText } from "@/lib/doItNowActions";
 import { playChime, playSpin, unlockChime } from "@/lib/chime";
 import type { AppSection } from "@/lib/companionUi";
@@ -21,7 +21,7 @@ type Source = { emoji: string; label: string };
 type PoolItem = {
   id: string;
   text: string;
-  kind: "braindump" | "project" | "dopamine";
+  kind: "braindump" | "project" | "momentum-boost";
   source: Source;
   quick: boolean; // drives context-aware post-spin actions
 };
@@ -60,7 +60,7 @@ function shuffle<T>(arr: T[]): T[] {
 // Spin the Wheel — a sound-driven commitment engine. It picks ONE eligible
 // action and immediately reduces resistance with context-aware next steps.
 // Sources (priority): Clear My Mind (this week) → Project next actions →
-// Dopamine Hits. Momentum can come from a small enjoyable action too.
+// Momentum Boosts. A small enjoyable action can restart momentum too.
 export function SpinWheelPanel({
   onOpen,
   onAsk,
@@ -99,20 +99,20 @@ export function SpinWheelPanel({
         }),
       );
 
-    // 3) A few Dopamine Hits so the wheel isn't only work.
-    const dopa = shuffle(dopamineHitItems())
+    // 3) A few Momentum Boosts so the wheel isn't only work.
+    const boosts = shuffle(momentumBoostItems())
       .slice(0, 3)
       .map(
         (d): PoolItem => ({
           id: d.id,
           text: d.text,
-          kind: "dopamine",
-          source: { emoji: "⚡", label: "Dopamine Hit" },
+          kind: "momentum-boost",
+          source: { emoji: "⚡", label: "Momentum Boost" },
           quick: true,
         }),
       );
 
-    setPool([...dumps, ...projItems, ...dopa]);
+    setPool([...dumps, ...projItems, ...boosts]);
   }, []);
 
   function spin() {
@@ -274,7 +274,7 @@ export function SpinWheelPanel({
                 /* The whole job: remove choosing. Do it / Help / Schedule. */
                 <>
                   <p className="mt-2 text-sm text-[#6b635a]">
-                    {result.kind === "dopamine" ||
+                    {result.kind === "momentum-boost" ||
                     isPhysicalActionText(result.text)
                       ? "A small feel-good action — just do it."
                       : result.quick
@@ -315,7 +315,7 @@ export function SpinWheelPanel({
                   {/* Focus session is not a primary choice — only offered when a
                       task is big enough to benefit from it. */}
                   {!result.quick &&
-                    result.kind !== "dopamine" &&
+                    result.kind !== "momentum-boost" &&
                     !isPhysicalActionText(result.text) && (
                       <div className="mt-4 border-t border-[#1e4f4f]/15 pt-3">
                         <p className="text-xs text-[#6b635a]">

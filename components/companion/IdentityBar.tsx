@@ -6,6 +6,7 @@ import { ASSETS, BRAND } from "@/lib/companionUi";
 import { getShariImageState } from "@/lib/shariImageState";
 import { recognitionToShariPresence } from "@/lib/recognition/shariPresenceBridge";
 import type { RecognitionMoment } from "@/lib/recognition/types";
+import { useVisualMode } from "@/lib/useVisualMode";
 import {
   getMemberSinceIso,
   isAppAnniversaryToday,
@@ -81,7 +82,13 @@ export function IdentityBar({
         : emotion === "unclear"
           ? "Tell me how I can help"
           : (PRESENCE_LINES[emotion] ?? "I'm here with you");
-  const ring = RING[emotion] ?? "#d4a574";
+  const visualMode = useVisualMode();
+  const ring =
+    visualMode === "off"
+      ? "#b8a98f"
+      : visualMode === "meaning"
+        ? "#1e4f4f"
+        : RING[emotion] ?? "#d4a574";
 
   const [memberSince, setMemberSince] = useState<string | null>(null);
   const [imageSrc, setImageSrc] = useState<string>(ASSETS.profile);

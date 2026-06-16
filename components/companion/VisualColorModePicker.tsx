@@ -15,7 +15,7 @@ const LABEL = "text-sm font-bold uppercase tracking-wide text-[#6b635a]";
 
 type Props = {
   current: VisualMode;
-  onPick: (mode: VisualMode) => void;
+  onSave: (mode: VisualMode) => void;
 };
 
 function DynamicPreview() {
@@ -36,7 +36,7 @@ function DynamicPreview() {
         style={{ backgroundColor: active.tint }}
       >
         <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-          Dynamic · shifts with your situation
+          Adaptive · shifts with your situation
         </p>
         <p
           className="mt-2 text-lg font-semibold transition-colors duration-500"
@@ -88,7 +88,7 @@ function MeaningPreview() {
   return (
     <div className="mt-3 overflow-hidden rounded-xl border border-[#d4cdc3] bg-[#faf7f2] px-4 py-5">
       <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-        Meaning-based · same color every time
+        Category · same color every time
       </p>
       <p className="mt-1 text-sm text-[#4b463f]">
         Projects are always teal. Focus is always blue. Scan by color, not label.
@@ -118,7 +118,7 @@ function NonePreview() {
   return (
     <div className="mt-3 rounded-xl border border-[#d4cdc3] bg-white px-4 py-5">
       <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-        None · clean and neutral
+        Minimal · clean and neutral
       </p>
       <div className="mt-3 space-y-1.5">
         {["Projects", "Focus", "Planning"].map((label) => (
@@ -141,12 +141,12 @@ function ModePreview({ mode }: { mode: VisualMode }) {
   return <NonePreview />;
 }
 
-export function VisualColorModePicker({ current, onPick }: Props) {
-  const [previewMode, setPreviewMode] = useState<VisualMode>(current);
+export function VisualColorModePicker({ current, onSave }: Props) {
+  const [draft, setDraft] = useState<VisualMode>(current);
   const [savedFlash, setSavedFlash] = useState(false);
 
   useEffect(() => {
-    setPreviewMode(current);
+    setDraft(current);
   }, [current]);
 
   useEffect(() => {
@@ -155,35 +155,40 @@ export function VisualColorModePicker({ current, onPick }: Props) {
     return () => window.clearTimeout(id);
   }, [savedFlash]);
 
-  function pick(mode: VisualMode) {
-    setPreviewMode(mode);
-    onPick(mode);
+  const previewOption = VISUAL_COLOR_OPTIONS.find((o) => o.id === draft);
+  const dirty = draft !== current;
+
+  function save() {
+    onSave(draft);
     setSavedFlash(true);
   }
 
   return (
     <div className="mt-4 flex flex-col gap-4">
-      {savedFlash ? (
-        <p
-          className="companion-fade-in text-center text-sm font-semibold text-[#1e4f4f]"
-          role="status"
-        >
-          ✓ Appearance updated
-        </p>
-      ) : null}
+      <details className="rounded-xl border border-[#d4cdc3] bg-white/70 px-4 py-3">
+        <summary className="cursor-pointer text-sm font-semibold text-[#1f1c19] hover:text-[#1e4f4f]">
+          ▼ What do these color modes do?
+        </summary>
+        <div className="mt-3 flex flex-col gap-3 text-sm text-[#4b463f]">
+          {VISUAL_COLOR_OPTIONS.map((opt) => (
+            <div key={opt.id}>
+              <p className="font-semibold text-[#1f1c19]">{opt.label}</p>
+              <p className="mt-0.5 text-[#6b635a]">{opt.explanation}</p>
+            </div>
+          ))}
+        </div>
+      </details>
 
       <div className="flex flex-col gap-2.5">
         {VISUAL_COLOR_OPTIONS.map((it) => {
-          const active = it.id === current;
+          const selected = it.id === draft;
           return (
             <button
               key={it.id}
               type="button"
-              onClick={() => pick(it.id)}
-              onMouseEnter={() => setPreviewMode(it.id)}
-              onFocus={() => setPreviewMode(it.id)}
+              onClick={() => setDraft(it.id)}
               className={`${CARD} ${
-                active
+                selected
                   ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06] ring-1 ring-[#1e4f4f]/20"
                   : "border-[#d4cdc3] hover:border-[#1e4f4f]/45"
               }`}
@@ -192,7 +197,9 @@ export function VisualColorModePicker({ current, onPick }: Props) {
                 <span className="text-base font-semibold text-[#1f1c19]">
                   {it.label}
                 </span>
-                {active && <span className="text-[#1e4f4f]">✓</span>}
+                {selected && current === it.id ? (
+                  <span className="text-[#1e4f4f]">✓</span>
+                ) : null}
               </span>
               <span className="mt-0.5 block text-sm text-[#6b635a]">{it.desc}</span>
               {it.id === "decorative" && (
@@ -225,9 +232,36 @@ export function VisualColorModePicker({ current, onPick }: Props) {
       </div>
 
       <div aria-live="polite">
-        <p className={LABEL}>Preview — {VISUAL_COLOR_OPTIONS.find((o) => o.id === previewMode)?.label}</p>
-        <ModePreview mode={previewMode} />
+        <p className="text-sm text-[#6b635a]">
+          What you&apos;re seeing below is an example of how the app would look using
+          the selected color mode.
+        </p>
+        {previewOption ? (
+          <p className="mt-1 text-sm font-medium text-[#4b463f]">
+            {previewOption.previewNote}
+          </p>
+        ) : null}
+        <p className={`${LABEL} mt-3`}>Preview — {previewOption?.label}</p>
+        <ModePreview mode={draft} />
       </div>
+
+      {savedFlash ? (
+        <p
+          className="companion-fade-in text-center text-sm font-semibold text-[#1e4f4f]"
+          role="status"
+        >
+          ✓ Appearance updated
+        </p>
+      ) : null}
+
+      <button
+        type="button"
+        onClick={save}
+        disabled={!dirty && !savedFlash}
+        className="w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:cursor-default disabled:opacity-50"
+      >
+        Save Changes
+      </button>
     </div>
   );
 }

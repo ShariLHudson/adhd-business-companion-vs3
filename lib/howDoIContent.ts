@@ -285,37 +285,37 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
   },
   {
     id: "colors",
-    title: "Dynamic vs Meaning-Based Colors",
-    question: "What's the difference between Dynamic and Meaning-Based colors?",
+    title: "Adaptive vs Category Colors",
+    question: "What's the difference between Adaptive and Category colors?",
     whatItIs:
       "Two optional ways the app uses color. Neither changes how anything works — only how much color you see and what it means.",
     whenToUse:
       "When the interface feels too busy, too plain, or you want colors to always mean the same category.",
     details: [
       {
-        heading: "Dynamic Colors",
+        heading: "Adaptive Colors",
         body:
           "Colors shift with your situation — support, recovery, focus, celebration, or planning. The app adapts the mood of the interface to match how you're using it right now.",
       },
       {
-        heading: "Meaning-Based Colors",
+        heading: "Category Colors",
         body:
           "Each area keeps a fixed color — Projects, Focus, Recovery, Relationships, Planning — so you always know which part of the app you're in.",
       },
       {
-        heading: "None",
+        heading: "Minimal",
         body: "No color coding — clean and minimal.",
       },
     ],
     examples: [
-      "Dynamic: soft blue when you need support, teal when you're in focus mode, warm gold for a win.",
-      "Meaning-Based: Projects always teal, Focus always blue, Recovery always purple.",
+      "Adaptive: soft blue when you need support, teal when you're in focus mode, warm gold for a win.",
+      "Category: Projects always teal, Focus always blue, Recovery always purple.",
     ],
     steps: [
       "Open Settings (gear icon in the top bar).",
       "Tap Appearance.",
-      "Choose Dynamic Colors, Meaning-Based Colors, or None.",
-      "Use the preview, then save — you can change anytime.",
+      "Choose Adaptive Colors, Category Colors, or Minimal.",
+      "Use the preview, then tap Save Changes.",
     ],
     keywords: [
       "color",

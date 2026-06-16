@@ -599,12 +599,11 @@ export function SettingsPanel({
       <div className={wrap}>
         {header("Appearance")}
         <p className="mt-1 text-sm text-[#6b635a]">
-          Choose how color appears in the app. Dynamic colors shift with your
-          situation; meaning-based colors stay fixed per category.
+          Choose how color appears across the app. Pick a mode, preview it, then save.
         </p>
         <VisualColorModePicker
           current={visualMode}
-          onPick={(v) => {
+          onSave={(v) => {
             savePrefs({ visualMode: v });
           }}
         />

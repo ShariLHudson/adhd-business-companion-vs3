@@ -199,7 +199,7 @@ export function WorkspaceLayout({
             </div>
           </div>
           {/* Solid canvas — content never sits over the blurred wallpaper. */}
-          <div className="min-h-0 flex-1 overflow-y-auto bg-[#faf7f2] shadow-inner">
+          <div className="workspace-panel-canvas min-h-0 flex-1 overflow-y-auto bg-[#faf7f2] shadow-inner">
             {workspace}
           </div>
         </div>

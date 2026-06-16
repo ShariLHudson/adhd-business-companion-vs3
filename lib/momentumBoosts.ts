@@ -1,9 +1,8 @@
-// Dopamine Hits — small, genuinely enjoyable actions that create momentum
-// without being "work." The wheel can land on one of these so a stuck founder
-// gets a quick, pleasant win instead of only ever facing the to-do list.
-// Momentum sometimes comes from a tiny good feeling, not a task.
+// Momentum Boosts — small, genuinely enjoyable actions that create momentum
+// without being "work." The wheel can land on one so a stuck founder gets a
+// quick win instead of only ever facing the to-do list.
 
-export const DOPAMINE_HITS: string[] = [
+export const MOMENTUM_BOOSTS: string[] = [
   "Step outside for two minutes of fresh air",
   "Drink a full glass of water",
   "Put on one song you love and listen to all of it",
@@ -18,7 +17,6 @@ export const DOPAMINE_HITS: string[] = [
   "Step away from the screen and roll your shoulders",
 ];
 
-// A stable id per hit so the wheel can treat them like any other pool item.
-export function dopamineHitItems(): { id: string; text: string }[] {
-  return DOPAMINE_HITS.map((text, i) => ({ id: `dopamine-${i}`, text }));
+export function momentumBoostItems(): { id: string; text: string }[] {
+  return MOMENTUM_BOOSTS.map((text, i) => ({ id: `momentum-boost-${i}`, text }));
 }

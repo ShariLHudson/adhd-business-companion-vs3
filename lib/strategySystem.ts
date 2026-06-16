@@ -271,7 +271,7 @@ export const STRATEGIES: Strategy[] = [
     problem:
       "You keep editing the same thing, and somehow it's never quite finished.\nThere's always one more tweak, one more pass.\nWithout a clear finish line, the work expands to fill all the time you have.",
     whyBrain:
-      "ADHD makes endings fuzzy. Without a defined \"done,\" the brain has no signal to stop.\nAnd the small dopamine hits of tweaking feel productive even when they're not moving anything forward.\nSo you keep circling.",
+      "ADHD makes endings fuzzy. Without a defined \"done,\" the brain has no signal to stop.\nAnd the quick satisfaction of tweaking feels productive even when it's not moving anything forward.\nSo you keep circling.",
     whyWorks:
       "Deciding what \"done\" means before you start gives your brain a target it can actually hit.\nA time limit turns an endless task into a contained one.\nYou stop when you reach the bar — not when it feels perfect, because that feeling rarely comes.",
     example:
@@ -321,7 +321,7 @@ export const STRATEGIES: Strategy[] = [
     problem:
       "You have more ideas than time — a new offer, a podcast, a course, a rebrand, all at once.\nEach one is exciting, so you start several and finish none.\nThe ideas aren't the problem. Chasing all of them at once is.",
     whyBrain:
-      "ADHD brains are idea machines, drawn hard toward novelty.\nA fresh idea delivers a dopamine hit that an in-progress project can't compete with.\nSo attention keeps jumping to the newest shiny door instead of walking through one.",
+      "ADHD brains are idea machines, drawn hard toward novelty.\nA fresh idea delivers a quick rush that an in-progress project can't compete with.\nSo attention keeps jumping to the newest shiny door instead of walking through one.",
     whyWorks:
       "Picking one door doesn't kill the others — it just lines them up.\nFinishing one thing creates real results, and results fund and fuel the next idea.\nMomentum compounds when it's pointed in a single direction instead of scattered.",
     example:
@@ -1205,7 +1205,7 @@ export const STRATEGIES: Strategy[] = [
     problem:
       "Every proposal, onboarding email, and social post starts as a blank page.\nYou reinvent wording you've already solved — and it drains time you don't have.\nRepetition without templates is paying full price twice.",
     whyBrain:
-      "ADHD novelty bias makes templates feel boring even when they're efficient.\nEach blank page offers a tiny dopamine hit of creation.\nBut the cost is cumulative — hours lost to re-solving solved problems.",
+      "ADHD novelty bias makes templates feel boring even when they're efficient.\nEach blank page offers a tiny rush from creating.\nBut the cost is cumulative — hours lost to re-solving solved problems.",
     whyWorks:
       "A template is a decision already made — you fill in the variable parts and ship.\nGood enough template beats perfect blank page every time.\nImprove the template after you use it, not before you start.",
     example:
@@ -1291,7 +1291,7 @@ export const STRATEGIES: Strategy[] = [
     problem:
       "You're ready to build the full course, hire, or rebrand before testing whether anyone wants it.\nBig bets feel exciting — and expensive when they're wrong.\nScale multiplies both wins and mistakes.",
     whyBrain:
-      "ADHD enthusiasm can sprint to the grand vision before validating the first step.\nBuilding feels like progress even when nobody's bought yet.\nThe dopamine of creation outruns the slower work of testing.",
+      "ADHD enthusiasm can sprint to the grand vision before validating the first step.\nBuilding feels like progress even when nobody's bought yet.\nThe thrill of creation outruns the slower work of testing.",
     whyWorks:
       "A small test — five conversations, a paid pilot, a one-page offer — buys truth cheaply.\nYou scale what already showed signal, not what felt brilliant at 2 a.m.\nSmall bets protect the business; big bets without proof gamble it.",
     example:

@@ -6307,7 +6307,7 @@ export default function CompanionPage() {
               }}
             >
               <div
-                className="mx-auto min-h-full w-full max-w-3xl rounded-3xl bg-white/80 shadow-sm backdrop-blur-sm"
+                className="companion-panel-surface mx-auto min-h-full w-full max-w-3xl rounded-3xl bg-white/80 shadow-sm backdrop-blur-sm"
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}
               >
