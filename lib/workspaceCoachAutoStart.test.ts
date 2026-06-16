@@ -53,7 +53,7 @@ describe("workspaceCoachAutoStart", () => {
       title: "Strategies",
     } as WorkspaceContext);
     expect(msg?.content).toContain("Strategies");
-    expect(msg?.content).toContain("work through");
+    expect(msg?.content).toContain("how can I help");
   });
 
   it("builds stable seed keys per workspace", () => {

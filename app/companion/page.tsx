@@ -807,11 +807,14 @@ export default function CompanionPage() {
   const isIdle = !messages.some((m) => m.role === "user");
   const splitCreateChat =
     chatLayoutMode === "split" && workspacePanel === "content-generator";
-  const workspaceBesideChat =
-    chatLayoutMode === "split" &&
-    Boolean(workspacePanel || companionStandaloneSection || guideBesideSession);
+  const workspaceActiveBeside = Boolean(
+    workspacePanel || companionStandaloneSection || guideBesideSession,
+  );
   const homeCalm =
-    activeSection === "home" && isIdle && !splitCreateChat && !workspaceBesideChat;
+    activeSection === "home" &&
+    isIdle &&
+    !splitCreateChat &&
+    !workspaceActiveBeside;
 
   useEffect(() => {
     if (!homeCalm) return;
@@ -1849,7 +1852,7 @@ export default function CompanionPage() {
   );
 
   useEffect(() => {
-    if (chatLayoutMode !== "split") {
+    if (!workspaceActiveBeside) {
       workspaceCoachSeededRef.current = null;
       prevWorkspacePanelRef.current = null;
       return;
@@ -1885,6 +1888,7 @@ export default function CompanionPage() {
     pomodoroTimer.isActive,
     pomodoroTimer.label,
     pomodoroTimer.displayMins,
+    workspaceActiveBeside,
   ]);
 
   useEffect(() => {
@@ -2928,6 +2932,7 @@ export default function CompanionPage() {
     if (navId) setActiveNav(navId);
 
     revealWorkspace();
+    window.setTimeout(() => seedWorkspaceCoachAutoStart(true), 120);
   }
 
   function openCreateDirect() {
@@ -2993,7 +2998,6 @@ export default function CompanionPage() {
   }
 
   function resolveCoachSection(): AppSection | null {
-    if (chatLayoutMode !== "split") return null;
     if (workspacePanelRef.current) return workspacePanelRef.current;
     if (companionStandaloneSection) return companionStandaloneSection;
     if (guideBesideSession?.source.kind === "activity") return "activities";
@@ -3257,6 +3261,11 @@ export default function CompanionPage() {
       setActiveNav(nav);
       setActiveSection("home");
       inputRef.current?.focus();
+      return;
+    }
+
+    if (shouldOpenBesideChat(section)) {
+      openSectionBesideChat(section, nav);
       return;
     }
 
@@ -6375,6 +6384,43 @@ export default function CompanionPage() {
     creationContext?.itemType,
   ]);
 
+  const workspaceIdlePrompt = useMemo(() => {
+    if (!isIdle || activeSection !== "home" || !workspaceActiveBeside) return null;
+    const section =
+      workspacePanel ??
+      companionStandaloneSection ??
+      (guideBesideSession?.source.kind === "activity"
+        ? ("activities" as const)
+        : guideBesideSession?.source.kind === "section"
+          ? guideBesideSession.source.section
+          : null);
+    if (!section) return null;
+    const detail =
+      section === "projects"
+        ? resolveProjectWorkspaceDetail(workspaceDetail, projectContinueId)
+        : workspaceDetail;
+    const ctx = buildWorkspaceContext(section, detail);
+    const auto = buildWorkspaceCoachAutoStart(ctx, buildWorkspaceCoachExtrasFromState());
+    if (!auto) return null;
+    const { content } = extractFocusDirective(auto.content);
+    return content.replace(/\*\*/g, "");
+  }, [
+    isIdle,
+    activeSection,
+    workspaceActiveBeside,
+    workspacePanel,
+    workspaceDetail,
+    projectContinueId,
+    companionStandaloneSection,
+    guideBesideSession,
+    creationContext,
+    activitySession,
+    pomodoroTimer.isActive,
+    pomodoroTimer.label,
+    pomodoroTimer.displayMins,
+    pomodoroTimer.sessionMeta?.focusItem,
+  ]);
+
   function launchDoItNow(offer: DoItNowOffer) {
     setDoItNowOffer(null);
     setToolSuggestion(null);
@@ -6838,7 +6884,9 @@ export default function CompanionPage() {
                       : undefined
                 }
                 primaryQuestion={
-                  homeCalm ? "What feels most important right now?" : null
+                  homeCalm
+                    ? "What feels most important right now?"
+                    : workspaceIdlePrompt
                 }
                 resumeLine={null}
                 onResumeClick={undefined}

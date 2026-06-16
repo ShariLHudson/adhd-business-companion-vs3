@@ -111,7 +111,7 @@ function buildPlaybookCoachAutoStart(ctx: WorkspaceContext): WorkspaceCoachAutoS
   }
   return {
     content:
-      "I see **Strategies** is open. What are you trying to work through right now?",
+      "I see **Strategies** is open beside us — how can I help you today?",
     focusField: null,
   };
 }
