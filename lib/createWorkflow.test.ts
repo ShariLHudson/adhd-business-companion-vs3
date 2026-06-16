@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   advanceAfterDiscoveryAnswer,
   advanceAfterTypePick,
+  advanceToDiscovery,
   buildBriefFromDiscovery,
   getDiscoveryQuestions,
   readinessSummary,
@@ -24,7 +25,9 @@ describe("createWorkflow", () => {
   });
 
   it("moves to readiness after last discovery answer", () => {
-    const start = advanceAfterTypePick("Email", "content");
+    const confirm = advanceAfterTypePick("Email", "content");
+    expect(confirm.step).toBe("confirm");
+    const start = advanceToDiscovery(confirm);
     const qs = getDiscoveryQuestions("Email");
     let state = start;
     for (const q of qs) {

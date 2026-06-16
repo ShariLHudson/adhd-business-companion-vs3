@@ -9,7 +9,8 @@ import {
 describe("createBuilderChat", () => {
   it("resolves strategy and SOP from user text", () => {
     expect(resolveBuilderType("I need an SOP")).toBe("SOP");
-    expect(resolveBuilderType("marketing strategy")).toBe("Strategy");
+    expect(resolveBuilderType("marketing strategy")).toBe("Marketing Strategy");
+    expect(resolveBuilderType("business strategy")).toBe("Business Strategy");
   });
 
   it("opens SOP builder with first question", () => {
@@ -51,13 +52,16 @@ describe("createBuilderChat", () => {
   });
 
   it("branches strategy questions after kind is chosen", () => {
-    let { session } = bootstrapCreateBuilderSession("Strategy");
-    const kind = processCreateBuilderTurn(session, "Personal Companion strategy");
-    session = kind.session;
-    expect(kind.reply).toContain("Got it");
-    const next = processCreateBuilderTurn(
+    let { session } = bootstrapCreateBuilderSession("Personal Companion Strategy");
+    const first = processCreateBuilderTurn(
       session,
       "Staying focused during admin work",
+    );
+    session = first.session;
+    expect(first.reply.length).toBeGreaterThan(5);
+    const next = processCreateBuilderTurn(
+      session,
+      "Fewer context switches each afternoon",
     );
     expect(next.reply.length).toBeGreaterThan(5);
   });

@@ -41,12 +41,7 @@ import {
   type GoogleWorkspaceSession,
 } from "@/lib/googleWorkspace";
 import { copyPasteFallbackMessage } from "@/lib/collaborativeDocumentWorkflow";
-import { type CreateCatalogItem, findCatalogItem } from "@/lib/createCatalog";
-import {
-  CREATE_FEATURED,
-  matchCreateSearch,
-  resolveFeaturedType,
-} from "@/lib/createWorkspaceUx";
+import { findCatalogItem } from "@/lib/createCatalog";
 import {
   advanceAfterTypePick,
   categoryIdForType,
@@ -187,7 +182,6 @@ export function ContentGeneratorPanel({
   const [projectPickerOpen, setProjectPickerOpen] = useState(false);
   const [locationPanelOpen, setLocationPanelOpen] = useState(false);
   const [phase, setPhase] = useState<"building" | "ready">("building");
-  const [createSearch, setCreateSearch] = useState("");
   const [workflow, setWorkflow] = useState<CreateWorkflowState>(EMPTY_CREATE_WORKFLOW);
   const [confirmDeleteDraft, setConfirmDeleteDraft] = useState(false);
   const started = useRef(false);
@@ -553,7 +547,10 @@ export function ContentGeneratorPanel({
     setLocationPanelOpen((o) => !o);
   }
 
-  function pickCreateType(typeLabel: string, opts?: { bypassRoute?: boolean }) {
+  function pickCreateType(
+    typeLabel: string,
+    opts?: { bypassRoute?: boolean; categoryId?: string | null; skipWorkflow?: boolean },
+  ) {
     const item = findCatalogItem(typeLabel);
     if (item?.route && !opts?.bypassRoute) {
       onOpenSection?.(item.route);
@@ -564,45 +561,15 @@ export function ContentGeneratorPanel({
     setBrief("");
     setEditingTopic(false);
     setDraft("");
-    setWorkflow(advanceAfterTypePick(typeLabel, categoryIdForType(typeLabel)));
+    if (!opts?.skipWorkflow) {
+      setWorkflow(
+        advanceAfterTypePick(
+          typeLabel,
+          opts?.categoryId ?? categoryIdForType(typeLabel),
+        ),
+      );
+    }
     started.current = false;
-  }
-
-  function handleFeaturedSelect(label: string) {
-    const featured = CREATE_FEATURED.find((f) => f.label === label);
-    if (!featured) return;
-    if (featured.label === "Workshop") {
-      pickCreateType("Workshop", { bypassRoute: true });
-      return;
-    }
-    pickCreateType(resolveFeaturedType(featured));
-  }
-
-  function handleCreateSearchSubmit() {
-    const q = createSearch.trim();
-    if (!q) return;
-    const match = matchCreateSearch(q);
-    if (match?.route) {
-      onOpenSection?.(match.route);
-      return;
-    }
-    if (match?.type) {
-      pickCreateType(match.type);
-      setBrief(q);
-      setTopic(q);
-      return;
-    }
-    pickCreateType(q);
-    setBrief(q);
-    setTopic(q);
-  }
-
-  function handleCatalogSelect(item: CreateCatalogItem) {
-    if (item.route) {
-      onOpenSection?.(item.route);
-      return;
-    }
-    pickCreateType(item.label);
   }
 
   const inputCls =
@@ -779,7 +746,7 @@ export function ContentGeneratorPanel({
           <WorkspaceGuide section="content-generator" />
           <p className="text-2xl font-semibold text-[#1f1c19]">Create Something</p>
           <p className="mt-1 text-base text-[#6b635a]">
-            We&apos;ll shape it together — category, a few questions, then your draft.
+            Choose a category, then a type — one decision at a time.
           </p>
         </>
       )}
@@ -887,46 +854,22 @@ export function ContentGeneratorPanel({
               ) : null}
             </div>
           ) : (
-          <>
-          {workflow.step === "category" && (
-            <div className="companion-fade-in mb-2">
-              <input
-                type="search"
-                value={createSearch}
-                onChange={(e) => setCreateSearch(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    handleCreateSearchSubmit();
-                  }
-                }}
-                placeholder="Or search for a type…"
-                className="w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base outline-none focus:border-[#1e4f4f]"
-              />
-              <div className="mt-3 flex flex-wrap gap-2">
-                {CREATE_FEATURED.map((item) => (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={() => handleFeaturedSelect(item.label)}
-                    className="rounded-full border border-[#1e4f4f]/25 bg-white px-3 py-1.5 text-sm font-semibold text-[#1f1c19] hover:bg-[#f0f5f5]"
-                  >
-                    {item.emoji} {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
           <CreateWorkflowPanel
             workflow={workflow}
             typeLabel={type}
             onWorkflowChange={setWorkflow}
-            onTypeSelect={(label) => pickCreateType(label)}
+            onTypeSelect={(label, categoryId) =>
+              pickCreateType(label, {
+                categoryId,
+                bypassRoute: true,
+                skipWorkflow: true,
+              })
+            }
             onRoutedItem={(section) => onOpenSection?.(section)}
             onBuildDraft={handleBuildDraft}
+            onBuildWithShari={onBuildWithShari}
             building={loading}
           />
-          </>
           )}
         </div>
       )}

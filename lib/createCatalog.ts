@@ -20,140 +20,19 @@ export type CreateCatalogCategory = {
 
 export const CREATE_CATALOG: CreateCatalogCategory[] = [
   {
-    id: "business",
+    id: "business-assets",
     label: "Business Assets",
     items: [
       {
-        label: "Proposal",
-        emoji: "📄",
-        matchTerms: ["proposal", "scope of work", "sow", "statement of work"],
+        label: "Automation",
+        emoji: "🔄",
+        matchTerms: ["automation", "automate", "workflow automation"],
       },
       {
-        label: "Client Avatar",
-        emoji: "👤",
-        route: "client-avatars",
-        matchTerms: ["client avatar", "ideal client", "icp", "buyer persona"],
+        label: "Checklist",
+        emoji: "✅",
+        matchTerms: ["checklist", "task list"],
       },
-      {
-        label: "Offer",
-        emoji: "🎁",
-        matchTerms: ["offer", "offer stack", "pricing offer"],
-      },
-      {
-        label: "Sales Page",
-        emoji: "💰",
-        matchTerms: ["sales page", "landing page", "sales letter"],
-      },
-      {
-        label: "Funnel",
-        emoji: "🔽",
-        matchTerms: ["funnel", "sales funnel", "marketing funnel"],
-      },
-      {
-        label: "Workshop",
-        emoji: "🎓",
-        route: "projects",
-        matchTerms: [
-          "workshop",
-          "workshop plan",
-          "workshop outline",
-          "webinar plan",
-          "webinar",
-        ],
-      },
-      {
-        label: "SOP",
-        emoji: "📋",
-        matchTerms: ["sop", "standard operating procedure", "procedure", "workflow doc"],
-      },
-      {
-        label: "Strategy",
-        emoji: "🎯",
-        matchTerms: ["strategy", "strategic plan", "growth strategy", "go-to-market"],
-      },
-      {
-        label: "Business Plan",
-        emoji: "🏢",
-        matchTerms: ["business plan"],
-      },
-    ],
-  },
-  {
-    id: "content",
-    label: "Content",
-    items: [
-      {
-        label: "LinkedIn Post",
-        emoji: "💼",
-        matchTerms: ["linkedin post", "linkedin", "professional post"],
-      },
-      {
-        label: "Email",
-        emoji: "✉️",
-        matchTerms: ["email", "e-mail", "cold email", "follow-up email"],
-      },
-      {
-        label: "Email Sequence",
-        emoji: "📬",
-        matchTerms: ["email sequence", "email series", "drip sequence", "nurture sequence"],
-      },
-      {
-        label: "Blog",
-        emoji: "📝",
-        matchTerms: ["blog", "blog post", "article"],
-      },
-      {
-        label: "Script",
-        emoji: "🎬",
-        matchTerms: ["script", "video script", "podcast script"],
-      },
-      {
-        label: "Newsletter",
-        emoji: "📰",
-        matchTerms: ["newsletter"],
-      },
-      {
-        label: "Presentation",
-        emoji: "📊",
-        matchTerms: ["presentation", "slide deck", "slides", "deck"],
-      },
-      {
-        label: "Social Campaign",
-        emoji: "📱",
-        matchTerms: ["social campaign", "social post", "social media campaign", "caption"],
-      },
-    ],
-  },
-  {
-    id: "planning",
-    label: "Planning",
-    items: [
-      {
-        label: "Marketing Plan",
-        emoji: "🧭",
-        matchTerms: ["marketing plan", "content plan"],
-      },
-      {
-        label: "Launch Plan",
-        emoji: "🚀",
-        matchTerms: ["launch plan", "product launch"],
-      },
-      {
-        label: "5-Day Plan",
-        emoji: "📅",
-        matchTerms: ["5 day plan", "5-day plan", "five day plan"],
-      },
-      {
-        label: "Content Calendar",
-        emoji: "🗓️",
-        matchTerms: ["content calendar", "editorial calendar"],
-      },
-    ],
-  },
-  {
-    id: "implementation",
-    label: "Implementation",
-    items: [
       {
         label: "Claude Prompt",
         emoji: "🤖",
@@ -172,19 +51,233 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
         ],
       },
       {
-        label: "Automation",
-        emoji: "🔄",
-        matchTerms: ["automation", "automate", "workflow automation"],
+        label: "Newsletter",
+        emoji: "📰",
+        matchTerms: ["newsletter"],
       },
       {
-        label: "Checklist",
-        emoji: "✅",
-        matchTerms: ["checklist", "task list"],
+        label: "Offer",
+        emoji: "🎁",
+        matchTerms: ["offer", "offer stack", "pricing offer"],
       },
       {
         label: "Process",
         emoji: "🔁",
         matchTerms: ["process doc", "process document", "business process"],
+      },
+      {
+        label: "Sales Page",
+        emoji: "💰",
+        matchTerms: ["sales page", "landing page", "sales letter"],
+      },
+    ],
+  },
+  {
+    id: "content",
+    label: "Content",
+    items: [
+      {
+        label: "Blog Post",
+        emoji: "📝",
+        matchTerms: ["blog", "blog post", "article"],
+      },
+      {
+        label: "Email",
+        emoji: "✉️",
+        matchTerms: ["email", "e-mail", "cold email", "follow-up email"],
+      },
+      {
+        label: "Facebook Post",
+        emoji: "📘",
+        matchTerms: ["facebook", "facebook post", "fb post"],
+      },
+      {
+        label: "LinkedIn Post",
+        emoji: "💼",
+        matchTerms: ["linkedin post", "linkedin", "professional post"],
+      },
+      {
+        label: "Presentation",
+        emoji: "📊",
+        matchTerms: ["presentation", "slide deck", "slides", "deck"],
+      },
+      {
+        label: "Social Post",
+        emoji: "📱",
+        matchTerms: [
+          "social post",
+          "social campaign",
+          "social media",
+          "caption",
+          "instagram",
+        ],
+      },
+      {
+        label: "Video Script",
+        emoji: "🎬",
+        matchTerms: ["script", "video script", "podcast script"],
+      },
+      {
+        label: "Workshop",
+        emoji: "🎓",
+        matchTerms: [
+          "workshop",
+          "workshop plan",
+          "workshop outline",
+          "webinar plan",
+          "webinar",
+        ],
+      },
+    ],
+  },
+  {
+    id: "documents",
+    label: "Documents",
+    items: [
+      {
+        label: "Business Plan",
+        emoji: "🏢",
+        matchTerms: ["business plan"],
+      },
+      {
+        label: "Client Avatar",
+        emoji: "👤",
+        route: "client-avatars",
+        matchTerms: ["client avatar", "ideal client", "icp", "buyer persona"],
+      },
+      {
+        label: "Proposal",
+        emoji: "📄",
+        matchTerms: ["proposal", "scope of work", "sow", "statement of work"],
+      },
+      {
+        label: "SOP",
+        emoji: "📋",
+        matchTerms: [
+          "sop",
+          "standard operating procedure",
+          "procedure",
+          "workflow doc",
+        ],
+      },
+      {
+        label: "Training Guide",
+        emoji: "📖",
+        matchTerms: [
+          "training guide",
+          "training manual",
+          "course outline",
+          "training doc",
+        ],
+      },
+    ],
+  },
+  {
+    id: "marketing",
+    label: "Marketing",
+    items: [
+      {
+        label: "Content Strategy",
+        emoji: "🧭",
+        matchTerms: ["content strategy"],
+      },
+      {
+        label: "Email Campaign",
+        emoji: "📬",
+        matchTerms: [
+          "email campaign",
+          "email sequence",
+          "email series",
+          "drip sequence",
+          "nurture sequence",
+        ],
+      },
+      {
+        label: "Launch Plan",
+        emoji: "🚀",
+        matchTerms: ["launch plan", "product launch"],
+      },
+      {
+        label: "Marketing Strategy",
+        emoji: "🎯",
+        matchTerms: ["marketing strategy", "growth strategy", "go-to-market"],
+      },
+      {
+        label: "Sales Funnel",
+        emoji: "🔽",
+        matchTerms: ["funnel", "sales funnel", "marketing funnel"],
+      },
+    ],
+  },
+  {
+    id: "planning",
+    label: "Planning",
+    items: [
+      {
+        label: "5-Day Plan",
+        emoji: "📅",
+        matchTerms: ["5 day plan", "5-day plan", "five day plan"],
+      },
+      {
+        label: "Content Calendar",
+        emoji: "🗓️",
+        matchTerms: ["content calendar", "editorial calendar"],
+      },
+      {
+        label: "Marketing Plan",
+        emoji: "📋",
+        matchTerms: ["marketing plan", "content plan"],
+      },
+    ],
+  },
+  {
+    id: "relationships",
+    label: "Relationships",
+    items: [
+      {
+        label: "Client Check-In",
+        emoji: "🤝",
+        matchTerms: ["client check-in", "check in", "check-in"],
+      },
+      {
+        label: "Follow-Up Email",
+        emoji: "✉️",
+        matchTerms: ["follow up email", "follow-up email", "follow up"],
+      },
+      {
+        label: "Referral Request",
+        emoji: "💬",
+        matchTerms: ["referral request", "referral ask", "referral"],
+      },
+      {
+        label: "Testimonial Request",
+        emoji: "⭐",
+        matchTerms: ["testimonial request", "testimonial ask", "testimonial"],
+      },
+    ],
+  },
+  {
+    id: "strategies",
+    label: "Strategies",
+    items: [
+      {
+        label: "Business Strategy",
+        emoji: "🏢",
+        matchTerms: [
+          "business strategy",
+          "strategic plan",
+          "strategy doc",
+        ],
+      },
+      {
+        label: "Personal Companion Strategy",
+        emoji: "🧠",
+        matchTerms: [
+          "personal companion strategy",
+          "personal strategy",
+          "companion strategy",
+          "adhd strategy",
+        ],
       },
     ],
   },
@@ -206,6 +299,23 @@ export function sortedCreateCatalog(): CreateCatalogCategory[] {
   }));
 }
 
+export function catalogCategory(id: string) {
+  return CREATE_CATALOG.find((c) => c.id === id);
+}
+
+/** Dropdown label for step 2, e.g. "Content Types". */
+export function catalogTypesPickerLabel(categoryId: string): string {
+  const cat = catalogCategory(categoryId);
+  return cat ? `${cat.label} Types` : "Types";
+}
+
+/** All items in a category for the type dropdown (alphabetical). */
+export function dropdownItemsInCategory(categoryId: string): CreateCatalogItem[] {
+  const cat = catalogCategory(categoryId);
+  if (!cat) return [];
+  return sortByDropdownLabel(cat.items, (i) => i.label);
+}
+
 /** Labels for content-type pickers (excludes routed tools). */
 export function createCatalogTypeLabels(): string[] {
   return sortDropdownLabels(
@@ -225,10 +335,7 @@ export function catalogIntentTypeRules(): { type: string; re: RegExp }[] {
   return allCatalogItems()
     .filter((i) => !i.route)
     .map((item) => {
-      const terms = [
-        item.label,
-        ...(item.matchTerms ?? []),
-      ].map(escapeRegex);
+      const terms = [item.label, ...(item.matchTerms ?? [])].map(escapeRegex);
       return {
         type: item.label,
         re: new RegExp(`\\b(${terms.join("|")})\\b`, "gi"),

@@ -2713,7 +2713,10 @@ export default function CompanionPage() {
   }
 
   /** User chose companion help — chat left, workspace right. */
-  function openCompanionAssist(sourceSection: AppSection) {
+  function openCompanionAssist(
+    sourceSection: AppSection,
+    typeHint?: string | null,
+  ) {
     companionReturnSectionRef.current = sourceSection;
     setWorkspaceFirstSplit(false);
     applyChatLayoutMode("split");
@@ -2739,10 +2742,22 @@ export default function CompanionPage() {
       (supportsWorkspace(sourceSection) && workspacePanel === "content-generator")
     ) {
       startCreateBuilderChat(
-        creationContext?.itemType ?? genSeed?.type ?? lockedArtifactType,
+        typeHint ??
+          creationContext?.itemType ??
+          genSeed?.type ??
+          lockedArtifactType,
       );
     }
     inputRef.current?.focus();
+  }
+
+  function openCreateWithShari(input: CreationWorkspaceInput) {
+    openCreationWorkspace(
+      "content-generator",
+      { ...input, source: input.source ?? "generated" },
+      { silent: true },
+    );
+    openCompanionAssist("content-generator", input.itemType);
   }
 
   function openWorkspaceFromSection(section: AppSection) {
@@ -5140,12 +5155,7 @@ export default function CompanionPage() {
             sopSession={workspaceSession}
             onContextChange={handleWorkspaceDetailChange}
             onCreateSessionSync={handleCreateSessionSync}
-            onBuildWithShari={(input) =>
-              openCreationWorkspace("content-generator", {
-                ...input,
-                source: input.source ?? "generated",
-              })
-            }
+            onBuildWithShari={openCreateWithShari}
             onOpen={(s) => {
               if (s !== "content-generator") openWorkspaceFromSection(s);
             }}
@@ -6471,12 +6481,7 @@ export default function CompanionPage() {
             >
               <ContentGeneratorPanel
                 seed={genSeed}
-                onBuildWithShari={(input) =>
-                  openCreationWorkspace("content-generator", {
-                    ...input,
-                    source: input.source ?? "generated",
-                  })
-                }
+                onBuildWithShari={openCreateWithShari}
                 onOpen={(s) => setActiveSection(s)}
                 onWin={(label) => {
                   logMomentum("complete", `Win: ${label}`);

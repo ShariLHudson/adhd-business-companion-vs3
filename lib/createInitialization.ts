@@ -92,14 +92,14 @@ export const BLANK_ARTIFACT_SCAFFOLDS: Record<string, string> = {
     "",
     "Call to Action",
   ].join("\n"),
-  Funnel: [
+  "Sales Funnel": [
     "Funnel Name",
     "",
     "Audience",
     "",
     "Lead Magnet / Entry Point",
     "",
-    "Email Sequence",
+    "Email Campaign",
     "",
     "Core Offer",
     "",
@@ -122,7 +122,7 @@ export const BLANK_ARTIFACT_SCAFFOLDS: Record<string, string> = {
     "",
     "Metrics",
   ].join("\n"),
-  "Email Sequence": [
+  "Email Campaign": [
     "Sequence Name",
     "",
     "Audience",
@@ -284,7 +284,7 @@ export function inferArtifactTypeFromConversation(
   const t = userText.toLowerCase();
   if (/\bsop\b|standard operating procedure|workflow doc/.test(t)) return "SOP";
   if (/\bproposal\b|scope of work|\bsow\b/.test(t)) return "Proposal";
-  if (/\bemail sequence\b|drip sequence/.test(t)) return "Email Sequence";
+  if (/\bemail campaign\b|email sequence\b|drip sequence/.test(t)) return "Email Campaign";
   if (/\bemail\b/.test(t)) return "Email";
   if (/\bpost\b|linkedin/.test(t)) return "LinkedIn Post";
 

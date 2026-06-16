@@ -1,34 +1,26 @@
 "use client";
 
 import { useState } from "react";
-import { sortedCreateCatalog } from "@/lib/createCatalog";
+import {
+  catalogTypesPickerLabel,
+  dropdownItemsInCategory,
+  sortedCreateCatalog,
+  type CreateCatalogItem,
+} from "@/lib/createCatalog";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 import { NO_CATEGORY } from "@/lib/categoryRevealUx";
+import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import {
   advanceAfterDiscoveryAnswer,
   advanceAfterTypePick,
+  advanceToDiscovery,
   buildBriefFromDiscovery,
   catalogCategory,
-  creatableItemsInCategory,
   discoveryQuestionsForState,
   readinessSummary,
   skipDiscoveryQuestion,
   type CreateWorkflowState,
-  workflowStepLabel,
 } from "@/lib/createWorkflow";
-import type { CreateCatalogItem } from "@/lib/createCatalog";
-
-const progressSteps = ["category", "type", "discovery", "readiness"] as const;
-
-function StepProgress({ step }: { step: CreateWorkflowState["step"] }) {
-  const idx = progressSteps.indexOf(step as (typeof progressSteps)[number]);
-  if (idx < 0) return null;
-  return (
-    <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-      {workflowStepLabel(progressSteps[idx])} · step {idx + 1} of {progressSteps.length}
-    </p>
-  );
-}
 
 export function CreateWorkflowPanel({
   workflow,
@@ -37,6 +29,7 @@ export function CreateWorkflowPanel({
   onTypeSelect,
   onRoutedItem,
   onBuildDraft,
+  onBuildWithShari,
   building,
 }: {
   workflow: CreateWorkflowState;
@@ -45,24 +38,19 @@ export function CreateWorkflowPanel({
   onTypeSelect: (label: string, categoryId: string) => void;
   onRoutedItem: (section: NonNullable<CreateCatalogItem["route"]>) => void;
   onBuildDraft: (brief: string) => void;
+  onBuildWithShari?: (input: CreationWorkspaceInput) => void;
   building?: boolean;
 }) {
   const [draftAnswer, setDraftAnswer] = useState("");
 
   if (workflow.step === "category") {
     const catalog = sortedCreateCatalog();
-    const categoryOptions = [...catalog]
-      .sort((a, b) => a.label.localeCompare(b.label))
-      .map((c) => ({ value: c.id, label: c.label }));
+    const categoryOptions = catalog.map((c) => ({ value: c.id, label: c.label }));
 
     return (
       <div className="companion-fade-in">
-        <StepProgress step="category" />
-        <p className="mt-2 text-lg font-semibold text-[#1f1c19]">
-          What kind of thing are you creating?
-        </p>
-        <p className="mt-1 text-sm text-[#6b635a]">
-          Pick one category — we&apos;ll narrow from there.
+        <p className="text-lg font-semibold text-[#1f1c19]">
+          What would you like to create?
         </p>
         <div className="mt-4">
           <CategoryPickerSelect
@@ -74,57 +62,118 @@ export function CreateWorkflowPanel({
                 ...workflow,
                 step: "type",
                 categoryId: v,
+                selectedTypeLabel: null,
               });
             }}
             options={categoryOptions}
             placeholder="Select a category…"
           />
         </div>
-        <p className="mt-4 text-sm text-[#9a8f82]">
-          Choose a category to see what you can create.
-        </p>
       </div>
     );
   }
 
-  if (workflow.step === "type") {
-    const cat = workflow.categoryId ? catalogCategory(workflow.categoryId) : null;
-    const items = workflow.categoryId
-      ? creatableItemsInCategory(workflow.categoryId)
-      : [];
+  if (workflow.step === "type" && workflow.categoryId) {
+    const cat = catalogCategory(workflow.categoryId);
+    const items = dropdownItemsInCategory(workflow.categoryId);
+    const typeOptions = items.map((item) => ({
+      value: item.label,
+      label: item.label,
+    }));
+
     return (
       <div className="companion-fade-in">
         <button
           type="button"
-          onClick={() => onWorkflowChange({ ...workflow, step: "category", categoryId: null })}
+          onClick={() =>
+            onWorkflowChange({
+              ...workflow,
+              step: "category",
+              categoryId: null,
+              selectedTypeLabel: null,
+            })
+          }
           className="text-sm font-semibold text-[#1e4f4f]"
         >
           ‹ Category
         </button>
-        <StepProgress step="type" />
-        <p className="mt-2 text-lg font-semibold text-[#1f1c19]">
-          {cat?.label ?? "Pick a type"}
+        <p className="mt-3 text-lg font-semibold text-[#1f1c19]">
+          What would you like to create?
         </p>
-        <p className="mt-1 text-sm text-[#6b635a]">Which one fits best?</p>
-        <div className="mt-4 flex flex-col gap-2">
-          {items.map((item) => (
+        <div className="mt-4">
+          <CategoryPickerSelect
+            label={catalogTypesPickerLabel(workflow.categoryId)}
+            value={workflow.selectedTypeLabel ?? NO_CATEGORY}
+            onChange={(v) => {
+              if (!v) return;
+              onWorkflowChange(advanceAfterTypePick(v, workflow.categoryId));
+            }}
+            options={typeOptions}
+            placeholder={`Select ${cat?.label.toLowerCase() ?? "a"} type…`}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (workflow.step === "confirm" && workflow.selectedTypeLabel && workflow.categoryId) {
+    const selected = workflow.selectedTypeLabel;
+    const item = dropdownItemsInCategory(workflow.categoryId).find(
+      (i) => i.label === selected,
+    );
+    const routed = Boolean(item?.route);
+
+    return (
+      <div className="companion-fade-in">
+        <button
+          type="button"
+          onClick={() =>
+            onWorkflowChange({
+              ...workflow,
+              step: "type",
+              selectedTypeLabel: null,
+            })
+          }
+          className="text-sm font-semibold text-[#1e4f4f]"
+        >
+          ‹ Change type
+        </button>
+        <p className="mt-3 text-lg font-semibold text-[#1f1c19]">
+          Ready to create your {selected}?
+        </p>
+        <div className="mt-5 flex flex-col gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              if (routed && item?.route) {
+                onRoutedItem(item.route);
+                return;
+              }
+              onTypeSelect(selected, workflow.categoryId!);
+              onWorkflowChange(advanceToDiscovery(workflow));
+            }}
+            className="w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
+          >
+            {routed ? `Open ${selected}` : `Create ${selected}`}
+          </button>
+          {!routed && onBuildWithShari ? (
             <button
-              key={item.label}
               type="button"
               onClick={() => {
-                if (item.route) {
-                  onRoutedItem(item.route);
-                  return;
-                }
-                onTypeSelect(item.label, workflow.categoryId!);
-                onWorkflowChange(advanceAfterTypePick(item.label, workflow.categoryId));
+                onTypeSelect(selected, workflow.categoryId!);
+                onBuildWithShari({
+                  itemType: selected,
+                  title: selected,
+                  brief: "",
+                  stage: "discovery with Shari",
+                  source: "generated",
+                });
               }}
-              className="flex items-center gap-3 rounded-xl border border-[#d4cdc3] bg-white/85 px-4 py-3 text-left hover:border-[#1e4f4f]/40"
+              className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
             >
-              <span className="text-xl">{item.emoji}</span>
-              <span className="font-semibold text-[#1f1c19]">{item.label}</span>
+              💬 Work With Shari
             </button>
-          ))}
+          ) : null}
         </div>
       </div>
     );
@@ -143,20 +192,20 @@ export function CreateWorkflowPanel({
           onClick={() =>
             onWorkflowChange({
               ...workflow,
-              step: "type",
+              step: "confirm",
               discoveryIndex: 0,
               discoveryAnswers: {},
             })
           }
           className="text-sm font-semibold text-[#1e4f4f]"
         >
-          ‹ Change type
+          ‹ Back
         </button>
-        <StepProgress step="discovery" />
         <p className="mt-2 text-sm font-medium text-[#1e4f4f]">{typeLabel}</p>
         <p className="mt-2 text-lg font-semibold text-[#1f1c19]">{question.prompt}</p>
         <p className="mt-1 text-sm text-[#6b635a]">
-          <span className="font-medium text-[#4b463f]">Why I&apos;m asking:</span> {question.why}
+          <span className="font-medium text-[#4b463f]">Why I&apos;m asking:</span>{" "}
+          {question.why}
         </p>
         <textarea
           value={draftAnswer}
@@ -217,7 +266,6 @@ export function CreateWorkflowPanel({
         >
           ‹ Edit answers
         </button>
-        <StepProgress step="readiness" />
         <p className="mt-2 text-lg font-semibold text-[#1f1c19]">Ready to build your draft?</p>
         <p className="mt-1 text-sm text-[#6b635a]">
           I won&apos;t generate until you approve. Here&apos;s what I&apos;ll use:
@@ -254,9 +302,6 @@ export function CreateWorkflowPanel({
         >
           {building ? "Building your draft…" : "Build my draft"}
         </button>
-        <p className="mt-2 text-center text-xs text-[#9a8f82]">
-          You can improve it after — nothing is final yet.
-        </p>
       </div>
     );
   }

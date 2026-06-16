@@ -51,6 +51,10 @@ const BUILDER_NAMES: Record<string, string> = {
   Workshop: "Workshop Builder",
   Proposal: "Proposal Builder",
   Strategy: "Strategy Builder",
+  "Business Strategy": "Strategy Builder",
+  "Personal Companion Strategy": "Strategy Builder",
+  "Marketing Strategy": "Marketing Strategy Builder",
+  "Content Strategy": "Content Strategy Builder",
   Email: "Email Builder",
   Blog: "Blog Builder",
   Presentation: "Presentation Builder",
@@ -70,7 +74,7 @@ export function resolveBuilderType(text: string): string | null {
   if (!t) return null;
   const match = matchCatalogFromText(t);
   if (match?.type && !match.route) return match.type;
-  if (/\bstrateg(y|ies)\b/i.test(t)) return "Strategy";
+  if (/\bstrateg(y|ies)\b/i.test(t)) return "Business Strategy";
   if (/\bsop\b|standard operating procedure/i.test(t)) return "SOP";
   if (/\bworkshop\b|webinar\b/i.test(t)) return "Workshop";
   if (/\bproposal\b|\bsow\b/i.test(t)) return "Proposal";

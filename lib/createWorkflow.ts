@@ -3,12 +3,15 @@
  * Category → Type → Discovery (one Q at a time) → Readiness → Build → Improve → Export
  */
 
-import { CREATE_CATALOG, findCatalogItem, type CreateCatalogItem } from "./createCatalog";
+import { CREATE_CATALOG, findCatalogItem, type CreateCatalogItem, catalogCategory, dropdownItemsInCategory } from "./createCatalog";
+
+export { catalogCategory, dropdownItemsInCategory, catalogTypesPickerLabel } from "./createCatalog";
 import { sortByDropdownLabel } from "./dropdownSort";
 
 export type CreateWorkflowStep =
   | "category"
   | "type"
+  | "confirm"
   | "discovery"
   | "readiness"
   | "improve"
@@ -24,6 +27,8 @@ export type DiscoveryQuestion = {
 export type CreateWorkflowState = {
   step: CreateWorkflowStep;
   categoryId: string | null;
+  /** Chosen on the type step; confirmed on the confirm step. */
+  selectedTypeLabel: string | null;
   discoveryAnswers: Record<string, string>;
   discoveryIndex: number;
   readinessConfirmed: boolean;
@@ -33,6 +38,7 @@ export type CreateWorkflowState = {
 export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {
   step: "category",
   categoryId: null,
+  selectedTypeLabel: null,
   discoveryAnswers: {},
   discoveryIndex: 0,
   readinessConfirmed: false,
@@ -136,24 +142,42 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
       placeholder: "Comment, DM, link, or none…",
     },
   ],
-  "Social Campaign": [
+  "Social Post": [
     {
-      id: "campaign",
-      prompt: "What is the campaign about?",
-      why: "So all posts feel connected.",
+      id: "topic",
+      prompt: "What is the post about?",
+      why: "So we stay on one clear idea.",
     },
     {
       id: "platform",
-      prompt: "Where will this live?",
+      prompt: "Where will this be posted?",
       why: "So length and tone match the platform.",
     },
     {
-      id: "goal",
-      prompt: "What is the campaign trying to achieve?",
-      why: "So content supports a business goal.",
+      id: "cta",
+      prompt: "What action do you want (if any)?",
+      why: "So the ending feels intentional.",
+      placeholder: "Comment, DM, link, or none…",
     },
   ],
-  Blog: [
+  "Facebook Post": [
+    {
+      id: "topic",
+      prompt: "What's the post about?",
+      why: "So we stay on one clear idea.",
+    },
+    {
+      id: "audience",
+      prompt: "Who is this for?",
+      why: "So the tone fits your readers.",
+    },
+    {
+      id: "cta",
+      prompt: "What action do you want (if any)?",
+      why: "So the ending feels intentional.",
+    },
+  ],
+  "Blog Post": [
     {
       id: "topic",
       prompt: "What's the blog post about?",
@@ -340,6 +364,93 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
       why: "So it's worth opening next time.",
     },
   ],
+  "Video Script": [
+    {
+      id: "topic",
+      prompt: "What is the script for?",
+      why: "So the script stays focused on one purpose.",
+    },
+    {
+      id: "audience",
+      prompt: "Who is watching or listening?",
+      why: "So the tone fits them.",
+    },
+    {
+      id: "length",
+      prompt: "How long should it run?",
+      why: "So pacing matches your slot.",
+      placeholder: "60 seconds, 5 minutes, 20 minutes…",
+    },
+  ],
+  "Email Campaign": [
+    {
+      id: "goal",
+      prompt: "What is this campaign trying to achieve?",
+      why: "So every email supports one outcome.",
+    },
+    {
+      id: "audience",
+      prompt: "Who is on this list?",
+      why: "So messaging fits the people receiving it.",
+    },
+    {
+      id: "sequence",
+      prompt: "How many emails, and what is the arc?",
+      why: "So the sequence has a clear flow.",
+      placeholder: "3 emails over 5 days — welcome, value, offer…",
+    },
+  ],
+  "Sales Funnel": [
+    {
+      id: "offer",
+      prompt: "What are you selling?",
+      why: "So the funnel stays focused on one offer.",
+    },
+    {
+      id: "audience",
+      prompt: "Who is the ideal buyer?",
+      why: "So each step speaks to them.",
+    },
+    {
+      id: "entry",
+      prompt: "What is the entry point or lead magnet?",
+      why: "So the top of the funnel is concrete.",
+    },
+  ],
+  "Training Guide": [
+    {
+      id: "topic",
+      prompt: "What is the training about?",
+      why: "So the guide stays scoped to one topic.",
+    },
+    {
+      id: "audience",
+      prompt: "Who is it for?",
+      why: "So examples and pace fit learners.",
+    },
+    {
+      id: "outcome",
+      prompt: "What should they be able to do after?",
+      why: "So the guide has a clear payoff.",
+    },
+  ],
+  "Follow-Up Email": [
+    {
+      id: "recipient",
+      prompt: "Who are you following up with?",
+      why: "So it sounds personal, not generic.",
+    },
+    {
+      id: "context",
+      prompt: "What happened before this follow-up?",
+      why: "So the email picks up the right thread.",
+    },
+    {
+      id: "goal",
+      prompt: "What should this email accomplish?",
+      why: "So you know when it's done its job.",
+    },
+  ],
 };
 
 const STRATEGY_PERSONAL: DiscoveryQuestion[] = [
@@ -477,6 +588,10 @@ export function getDiscoveryQuestions(
   typeLabel: string,
   answers: Record<string, string> = {},
 ): DiscoveryQuestion[] {
+  if (typeLabel === "Personal Companion Strategy") return STRATEGY_PERSONAL;
+  if (typeLabel === "Business Strategy") return STRATEGY_BUSINESS;
+  if (typeLabel === "Marketing Strategy") return STRATEGY_MARKETING;
+  if (typeLabel === "Content Strategy") return STRATEGY_CONTENT;
   if (typeLabel === "Strategy") {
     return strategyDiscoveryQuestions(answers);
   }
@@ -490,23 +605,15 @@ export function categoryIdForType(typeLabel: string): string | null {
   return null;
 }
 
-export function catalogCategory(id: string) {
-  return CREATE_CATALOG.find((c) => c.id === id);
-}
-
 export function creatableItemsInCategory(categoryId: string): CreateCatalogItem[] {
-  const cat = catalogCategory(categoryId);
-  if (!cat) return [];
-  return sortByDropdownLabel(
-    cat.items.filter((i) => !i.route),
-    (i) => i.label,
-  );
+  return dropdownItemsInCategory(categoryId).filter((i) => !i.route);
 }
 
 export function workflowStepLabel(step: CreateWorkflowStep): string {
   const labels: Record<CreateWorkflowStep, string> = {
     category: "Category",
     type: "Type",
+    confirm: "Ready",
     discovery: "Discovery",
     readiness: "Readiness",
     improve: "Improve",
@@ -568,8 +675,16 @@ export function advanceAfterTypePick(
 ): CreateWorkflowState {
   return {
     ...EMPTY_CREATE_WORKFLOW,
-    step: "discovery",
+    step: "confirm",
     categoryId: categoryId ?? categoryIdForType(typeLabel),
+    selectedTypeLabel: typeLabel,
+  };
+}
+
+export function advanceToDiscovery(state: CreateWorkflowState): CreateWorkflowState {
+  return {
+    ...state,
+    step: "discovery",
     discoveryIndex: 0,
     discoveryAnswers: {},
   };
