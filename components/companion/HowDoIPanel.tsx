@@ -9,23 +9,26 @@ import {
   type HowDoIEntry,
 } from "@/lib/howDoIContent";
 import type { AppSection } from "@/lib/companionUi";
+import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
 function HowDoIDetail({
   entry,
   onBack,
   onOpen,
+  onOpenSettings,
   onAsk,
 }: {
   entry: HowDoIEntry;
   onBack: () => void;
   onOpen?: (section: AppSection) => void;
+  onOpenSettings?: (section: SettingsSection) => void;
   onAsk?: (prompt: string) => void;
 }) {
   const openSection = entry.openSection === "home" ? null : entry.openSection;
 
   return (
-    <div className="companion-fade-in flex min-h-0 flex-1 flex-col">
+    <div className="companion-fade-in w-full">
       <button
         type="button"
         onClick={onBack}
@@ -36,7 +39,7 @@ function HowDoIDetail({
 
       <h2 className="mt-3 text-xl font-semibold text-[#1f1c19]">{entry.title}</h2>
 
-      <div className="mt-4 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto text-base leading-relaxed text-[#4b463f]">
+      <div className="mt-4 flex flex-col gap-4 text-base leading-relaxed text-[#4b463f]">
         <section>
           <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
             What it is
@@ -50,6 +53,15 @@ function HowDoIDetail({
           </p>
           <p className="mt-1">{entry.whenToUse}</p>
         </section>
+
+        {entry.details?.map((block) => (
+          <section key={block.heading}>
+            <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
+              {block.heading}
+            </p>
+            <p className="mt-1">{block.body}</p>
+          </section>
+        ))}
 
         {entry.examples?.length ? (
           <section>
@@ -90,6 +102,15 @@ function HowDoIDetail({
               {entry.openLabel}
             </button>
           ) : null}
+          {entry.openSettingsSection && onOpenSettings ? (
+            <button
+              type="button"
+              onClick={() => onOpenSettings(entry.openSettingsSection!)}
+              className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+            >
+              {entry.openLabel}
+            </button>
+          ) : null}
           {entry.askPrompt && onAsk ? (
             <button
               type="button"
@@ -116,10 +137,12 @@ function HowDoIDetail({
 
 export function HowDoIPanel({
   onOpen,
+  onOpenSettings,
   onAsk,
   registerBack,
 }: {
   onOpen?: (section: AppSection) => void;
+  onOpenSettings?: (section: SettingsSection) => void;
   onAsk?: (prompt: string) => void;
   registerBack?: (fn: (() => boolean) | null) => void;
 }) {
@@ -157,7 +180,7 @@ export function HowDoIPanel({
   if (selected) {
     return (
       <div
-        className="relative z-10 mx-auto flex h-full min-h-0 max-w-xl flex-col px-6 py-8"
+        className="relative z-10 mx-auto w-full max-w-xl px-6 py-8"
         onClick={(e) => e.stopPropagation()}
         onMouseDown={(e) => e.stopPropagation()}
       >
@@ -165,6 +188,7 @@ export function HowDoIPanel({
           entry={selected}
           onBack={() => setSelected(null)}
           onOpen={onOpen}
+          onOpenSettings={onOpenSettings}
           onAsk={onAsk}
         />
       </div>
@@ -173,7 +197,7 @@ export function HowDoIPanel({
 
   return (
     <div
-      className="relative z-10 mx-auto flex h-full min-h-0 max-w-xl flex-col px-6 py-8"
+      className="relative z-10 mx-auto w-full max-w-xl px-6 py-8"
       onClick={(e) => e.stopPropagation()}
       onMouseDown={(e) => e.stopPropagation()}
     >
@@ -212,7 +236,7 @@ export function HowDoIPanel({
       <p className="mt-4 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
         {query.trim() ? "Matching topics" : "Popular topics"}
       </p>
-      <ul className="mt-2 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-4">
+      <ul className="mt-2 flex flex-col gap-2 pb-4">
         {listEntries.map((entry) => (
           <li key={entry.id}>
             <button

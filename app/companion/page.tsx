@@ -973,6 +973,11 @@ export default function CompanionPage() {
     else router.push("/companion/login");
   }, [authConfigured, router]);
 
+  const openHowDoISettings = useCallback((section: SettingsSection) => {
+    setSettingsSection(section);
+    setOverlay("settings");
+  }, []);
+
   // Voice output — Shari speaks her replies (ElevenLabs).
   const [voiceOutput, setVoiceOutput] = useState(false);
   const [voiceBlocked, setVoiceBlocked] = useState(false);
@@ -5183,6 +5188,7 @@ export default function CompanionPage() {
         return (
           <HowDoIPanel
             onOpen={openWorkspaceFromSection}
+            onOpenSettings={openHowDoISettings}
             onAsk={(prompt) => void handleSend(prompt, false, true)}
             registerBack={registerBack}
           />
@@ -6310,6 +6316,7 @@ export default function CompanionPage() {
             <WorkspaceShell showAssist={false}>
               <HowDoIPanel
                 onOpen={(s) => setActiveSection(s)}
+                onOpenSettings={openHowDoISettings}
                 onAsk={(prompt) => void handleSend(prompt, false, true)}
                 registerBack={registerBack}
               />

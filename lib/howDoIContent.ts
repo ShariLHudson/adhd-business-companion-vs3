@@ -1,4 +1,5 @@
 import type { AppSection } from "@/lib/companionUi";
+import type { SettingsSection } from "@/components/companion/SettingsPanel";
 
 export type HowDoIEntry = {
   id: string;
@@ -10,9 +11,13 @@ export type HowDoIEntry = {
   whenToUse: string;
   steps: string[];
   examples?: string[];
+  /** Extra detail blocks (e.g. mode comparisons). */
+  details?: { heading: string; body: string }[];
   keywords: string[];
   openSection?: AppSection;
   openLabel: string;
+  /** Opens Settings overlay to a section (companion home only). */
+  openSettingsSection?: SettingsSection;
   askPrompt?: string;
 };
 
@@ -280,21 +285,52 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
   },
   {
     id: "colors",
-    title: "How To: Choose Color Mode",
+    title: "Dynamic vs Meaning-Based Colors",
     question: "What's the difference between Dynamic and Meaning-Based colors?",
     whatItIs:
-      "Dynamic colors shift with your situation; Meaning-Based colors stay fixed per category.",
-    whenToUse: "When the interface feels distracting or you want consistent category colors.",
-    steps: [
-      "Open Settings.",
-      "Go to Appearance.",
-      "Choose Dynamic or Meaning-Based.",
-      "Preview and save.",
+      "Two optional ways the app uses color. Neither changes how anything works — only how much color you see and what it means.",
+    whenToUse:
+      "When the interface feels too busy, too plain, or you want colors to always mean the same category.",
+    details: [
+      {
+        heading: "Dynamic Colors",
+        body:
+          "Colors shift with your situation — support, recovery, focus, celebration, or planning. The app adapts the mood of the interface to match how you're using it right now.",
+      },
+      {
+        heading: "Meaning-Based Colors",
+        body:
+          "Each area keeps a fixed color — Projects, Focus, Recovery, Relationships, Planning — so you always know which part of the app you're in.",
+      },
+      {
+        heading: "None",
+        body: "No color coding — clean and minimal.",
+      },
     ],
-    keywords: ["color", "dynamic", "meaning", "appearance", "visual"],
-    openLabel: "Ask About Settings",
-    askPrompt:
-      "What's the difference between Dynamic and Meaning-Based colors, and how do I change them in Settings?",
+    examples: [
+      "Dynamic: soft blue when you need support, teal when you're in focus mode, warm gold for a win.",
+      "Meaning-Based: Projects always teal, Focus always blue, Recovery always purple.",
+    ],
+    steps: [
+      "Open Settings (gear icon in the top bar).",
+      "Tap Appearance.",
+      "Choose Dynamic Colors, Meaning-Based Colors, or None.",
+      "Use the preview, then save — you can change anytime.",
+    ],
+    keywords: [
+      "color",
+      "colors",
+      "colour",
+      "dynamic",
+      "dynami",
+      "meaning",
+      "meaning-based",
+      "appearance",
+      "visual",
+      "difference",
+    ],
+    openSettingsSection: "appearance",
+    openLabel: "Open Settings",
   },
 ];
 
@@ -328,6 +364,13 @@ function scoreEntry(entry: HowDoIEntry, rawQuery: string): number {
   for (const kw of entry.keywords) {
     if (q.includes(kw) || n.includes(kw)) score += 8;
     if (kw.includes(n) && n.length > 2) score += 5;
+  }
+
+  if (entry.details?.length) {
+    for (const block of entry.details) {
+      const blob = `${block.heading} ${block.body}`.toLowerCase();
+      if (blob.includes(q) || (n && blob.includes(n))) score += 4;
+    }
   }
 
   const tokens = n.split(/\s+/).filter((t) => t.length > 2);
@@ -393,6 +436,12 @@ export function formatHowDoIEntry(entry: HowDoIEntry): string {
 
   if (entry.examples?.length) {
     lines.push("", "**Examples:**", ...entry.examples.map((ex) => `- ${ex}`));
+  }
+
+  if (entry.details?.length) {
+    for (const block of entry.details) {
+      lines.push("", `**${block.heading}:** ${block.body}`);
+    }
   }
 
   lines.push("", "**Steps:**");

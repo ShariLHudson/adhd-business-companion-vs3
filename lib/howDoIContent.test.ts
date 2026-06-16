@@ -32,4 +32,13 @@ describe("howDoIContent", () => {
     expect(entry.steps.length).toBeGreaterThan(0);
     expect(entry.openLabel).toBeTruthy();
   });
+
+  it("finds dynamic vs meaning-based colors guide", () => {
+    const hits = searchHowDoI(
+      "what is the difference between dynamic and meaning based colors",
+    );
+    expect(hits[0]?.id).toBe("colors");
+    expect(hits[0]?.details?.length).toBeGreaterThan(1);
+    expect(hits[0]?.openSettingsSection).toBe("appearance");
+  });
 });
