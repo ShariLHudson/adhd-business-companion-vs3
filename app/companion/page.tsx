@@ -3299,9 +3299,10 @@ export default function CompanionPage() {
                 phase: "generating",
                 workflow: {
                   ...prev.workflow,
-                  buildApproved: true,
+                  draftStatus: "building",
                   readinessConfirmed: true,
-                  step: "improve",
+                  buildApproved: false,
+                  step: "readiness",
                 },
               }
             : prev,

@@ -30,6 +30,7 @@ import {
   resolvedTypeLabel,
   shouldOfferDiscovery,
   skipDiscoveryQuestion,
+  discoveryComplete,
   type CreateWorkflowState,
   type DiscoveryQuestion,
 } from "@/lib/createWorkflow";
@@ -410,7 +411,9 @@ export function CreateWorkflowPanel({
   if (workflow.step === "discovery" && resolvedType) {
     const question = discoveryQuestionsForState(resolvedType, workflow);
     if (!question) {
-      onWorkflowChange({ ...workflow, step: "readiness" });
+      if (discoveryComplete(resolvedType, workflow)) {
+        onWorkflowChange({ ...workflow, step: "readiness" });
+      }
       return null;
     }
     const { current, total } = discoveryQuestionProgress(resolvedType, workflow);

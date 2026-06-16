@@ -15,6 +15,7 @@ import {
   discoveryQuestionsForState,
   getDiscoveryQuestions,
   mergeCreateWorkflow,
+  requiredFieldsComplete,
   resolvedTypeLabel,
   type CreateWorkflowState,
   EMPTY_CREATE_WORKFLOW,
@@ -357,7 +358,13 @@ export function processCreateBuilderTurn(
 
     const question = discoveryQuestionsForState(typeLabel, session.workflow);
     if (!question) {
-      return enterReadiness(session, typeLabel);
+      if (discoveryComplete(typeLabel, session.workflow)) {
+        return enterReadiness(session, typeLabel);
+      }
+      return {
+        session,
+        reply: "Keep going — I still need a bit more before we build.",
+      };
     }
 
     const nextWorkflow = advanceAfterDiscoveryAnswer(

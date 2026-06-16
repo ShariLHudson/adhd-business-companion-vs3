@@ -187,20 +187,26 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
   ],
   "Social Post": [
     {
+      id: "audience",
+      prompt: "Who is this for?",
+      why: "So the post speaks to the right person.",
+    },
+    {
       id: "topic",
       prompt: "What is the post about?",
       why: "So we stay on one clear idea.",
     },
     {
+      id: "goal",
+      prompt: "What is the goal of this post?",
+      why: "So the post drives the outcome you want.",
+      placeholder: "Engagement, clicks, sign-ups, awareness…",
+    },
+    {
       id: "platform",
       prompt: "Where will this be posted?",
       why: "So length and tone match the platform.",
-    },
-    {
-      id: "cta",
-      prompt: "What action do you want (if any)?",
-      why: "So the ending feels intentional.",
-      placeholder: "Comment, DM, link, or none…",
+      placeholder: "Facebook, Instagram, LinkedIn…",
     },
   ],
   "Facebook Post": [
@@ -277,41 +283,31 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
   ],
   Workshop: [
     {
+      id: "audience",
+      prompt: "Who is the workshop for?",
+      why: "So examples and pace fit the room.",
+    },
+    {
       id: "topic",
       prompt: "What is the workshop topic?",
       why: "So every activity supports one theme.",
     },
     {
-      id: "audience",
-      prompt: "Who is it for?",
-      why: "So examples and pace fit the room.",
+      id: "duration",
+      prompt: "How long is the workshop?",
+      why: "So the outline fits real time.",
+      placeholder: "90 minutes, half-day, full day…",
     },
     {
-      id: "problem",
-      prompt: "What problem does it solve for them?",
-      why: "So the workshop leads with their real struggle.",
+      id: "format",
+      prompt: "What is the delivery format?",
+      why: "So the structure matches how you'll run it.",
+      placeholder: "Live virtual, in-person, hybrid, self-paced…",
     },
     {
       id: "outcome",
       prompt: "What should attendees leave with?",
       why: "So the workshop has a clear payoff.",
-    },
-    {
-      id: "duration",
-      prompt: "How long is the workshop?",
-      why: "So the outline fits real time.",
-    },
-    {
-      id: "offer",
-      prompt: "Will you make an offer at the end?",
-      why: "So we plan the close if you want one.",
-      placeholder: "Yes/no — and what you're offering, if so…",
-    },
-    {
-      id: "deliverables",
-      prompt: "What deliverables do you want?",
-      why: "So we build the right assets, not just an outline.",
-      placeholder: "Slides, workbook, speaking notes, promo copy…",
     },
   ],
   Strategy: [
@@ -375,14 +371,30 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
   ],
   Presentation: [
     {
-      id: "occasion",
-      prompt: "What is the presentation for?",
-      why: "So slides match the setting.",
+      id: "title",
+      prompt: "What is the presentation title?",
+      why: "So the deck has a clear headline.",
     },
     {
       id: "audience",
       prompt: "Who is in the room?",
       why: "So examples land with them.",
+    },
+    {
+      id: "purpose",
+      prompt: "What is the purpose of this presentation?",
+      why: "So slides match the setting and goal.",
+    },
+    {
+      id: "length",
+      prompt: "How long is the presentation?",
+      why: "So the outline fits your time slot.",
+      placeholder: "15 minutes, 30 minutes, 1 hour…",
+    },
+    {
+      id: "main-message",
+      prompt: "What is the main message?",
+      why: "So every slide supports one core idea.",
     },
     {
       id: "outcome",
@@ -392,19 +404,26 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
   ],
   Newsletter: [
     {
-      id: "theme",
-      prompt: "What's this issue about?",
-      why: "So the newsletter has one thread.",
-    },
-    {
       id: "reader",
-      prompt: "Who subscribes?",
+      prompt: "Who is the audience?",
       why: "So tone matches your list.",
     },
     {
-      id: "value",
-      prompt: "What value should they walk away with?",
-      why: "So it's worth opening next time.",
+      id: "theme",
+      prompt: "What is the topic?",
+      why: "So the newsletter has one thread.",
+    },
+    {
+      id: "goal",
+      prompt: "What is the goal of this newsletter?",
+      why: "So every section supports the outcome.",
+      placeholder: "Nurture, educate, sell, announce…",
+    },
+    {
+      id: "cta",
+      prompt: "What should readers do (CTA)?",
+      why: "So the ending drives action.",
+      placeholder: "Reply, click, book, shop…",
     },
   ],
   "Video Script": [
@@ -462,14 +481,25 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
   ],
   "Training Guide": [
     {
-      id: "topic",
-      prompt: "What is the training about?",
-      why: "So the guide stays scoped to one topic.",
+      id: "audience",
+      prompt: "Who is this training for?",
+      why: "So examples and pace fit learners.",
     },
     {
-      id: "audience",
-      prompt: "Who is it for?",
-      why: "So examples and pace fit learners.",
+      id: "purpose",
+      prompt: "What is the purpose of this training?",
+      why: "So the guide matches why it exists.",
+    },
+    {
+      id: "learning-goal",
+      prompt: "What is the learning goal?",
+      why: "So learners know what they'll gain.",
+    },
+    {
+      id: "key-topics",
+      prompt: "What are the key topics to cover?",
+      why: "So nothing important is left out.",
+      placeholder: "2–5 main topics or modules…",
     },
     {
       id: "outcome",
@@ -521,24 +551,30 @@ const STRATEGY_PERSONAL: DiscoveryQuestion[] = [
 
 const STRATEGY_BUSINESS: DiscoveryQuestion[] = [
   {
-    id: "focus",
-    prompt: "What business direction or decision is this strategy for?",
-    why: "So we stay focused on one strategic question.",
+    id: "goal",
+    prompt: "What is the business goal?",
+    why: "So the strategy aims at one clear outcome.",
   },
   {
-    id: "situation",
-    prompt: "What situation or challenge is this for?",
+    id: "audience",
+    prompt: "Who is the target audience?",
+    why: "So the strategy fits who you serve.",
+  },
+  {
+    id: "challenge",
+    prompt: "What is the current challenge?",
     why: "So the strategy addresses what's actually true.",
   },
   {
     id: "outcome",
-    prompt: "What's the desired outcome in the next 90 days?",
-    why: "So actions tie to a measurable horizon.",
+    prompt: "What is the desired result?",
+    why: "So actions tie to a measurable win.",
   },
   {
-    id: "constraint",
-    prompt: "What's the biggest constraint?",
-    why: "So the strategy is honest about limits.",
+    id: "timeframe",
+    prompt: "What is the timeframe?",
+    why: "So the plan fits a real horizon.",
+    placeholder: "30 days, 90 days, this quarter…",
   },
 ];
 
@@ -754,10 +790,13 @@ export function mergeCreateWorkflow(
   if (merged.buildApproved) return merged;
 
   const resolved = resolvedTypeLabel(merged) || typeLabel;
-  if (merged.step === "readiness" || discoveryComplete(resolved, merged)) {
+  if (
+    merged.step === "readiness" ||
+    discoveryComplete(resolved, merged)
+  ) {
     return {
       ...merged,
-      step: "readiness",
+      step: discoveryComplete(resolved, merged) ? "readiness" : "discovery",
       discoveryIndex: discoveryIndexForAnswers(resolved, discoveryAnswers),
     };
   }
@@ -786,7 +825,9 @@ export function discoveryQuestionsForState(
   state: CreateWorkflowState,
 ): DiscoveryQuestion | null {
   const questions = getDiscoveryQuestions(typeLabel, state.discoveryAnswers);
-  return questions[state.discoveryIndex] ?? null;
+  const idx = discoveryIndexForAnswers(typeLabel, state.discoveryAnswers);
+  if (idx >= questions.length) return null;
+  return questions[idx] ?? null;
 }
 
 export function discoveryQuestionProgress(
@@ -795,15 +836,27 @@ export function discoveryQuestionProgress(
 ): { current: number; total: number } {
   const questions = getDiscoveryQuestions(typeLabel, state.discoveryAnswers);
   const total = Math.max(questions.length, 1);
+  const idx = discoveryIndexForAnswers(typeLabel, state.discoveryAnswers);
   return {
-    current: Math.min(state.discoveryIndex + 1, total),
+    current: Math.min(idx + 1, total),
     total,
   };
 }
 
-export function discoveryComplete(typeLabel: string, state: CreateWorkflowState): boolean {
-  const questions = getDiscoveryQuestions(typeLabel, state.discoveryAnswers);
-  return state.discoveryIndex >= questions.length;
+/** True when every required discovery question has an answer. */
+export function requiredFieldsComplete(
+  typeLabel: string,
+  answers: Record<string, string>,
+): boolean {
+  const questions = getDiscoveryQuestions(typeLabel, answers);
+  return questions.every((q) => Boolean(answers[q.id]?.trim()));
+}
+
+export function discoveryComplete(
+  typeLabel: string,
+  state: CreateWorkflowState,
+): boolean {
+  return requiredFieldsComplete(typeLabel, state.discoveryAnswers);
 }
 
 export function answeredDiscoveryCount(state: CreateWorkflowState): number {
@@ -984,20 +1037,13 @@ export function advanceAfterDiscoveryAnswer(
   answer: string,
 ): CreateWorkflowState {
   const answers = { ...state.discoveryAnswers, [questionId]: answer };
-  const questions = getDiscoveryQuestions(typeLabel, answers);
-  const nextIndex = state.discoveryIndex + 1;
-  if (nextIndex >= questions.length) {
-    return {
-      ...state,
-      discoveryAnswers: answers,
-      discoveryIndex: nextIndex,
-      step: "readiness",
-    };
-  }
+  const idx = discoveryIndexForAnswers(typeLabel, answers);
+  const complete = requiredFieldsComplete(typeLabel, answers);
   return {
     ...state,
     discoveryAnswers: answers,
-    discoveryIndex: nextIndex,
+    discoveryIndex: idx,
+    step: complete ? "readiness" : "discovery",
   };
 }
 
@@ -1009,11 +1055,16 @@ export function skipDiscoveryQuestion(
   const answers = { ...state.discoveryAnswers };
   delete answers[questionId];
   const questions = getDiscoveryQuestions(typeLabel, answers);
-  const nextIndex = state.discoveryIndex + 1;
-  if (nextIndex >= questions.length) {
-    return { ...state, discoveryAnswers: answers, discoveryIndex: nextIndex, step: "readiness" };
-  }
-  return { ...state, discoveryAnswers: answers, discoveryIndex: nextIndex };
+  const nextIndex = Math.min(state.discoveryIndex + 1, questions.length);
+  const complete = requiredFieldsComplete(typeLabel, answers);
+  return {
+    ...state,
+    discoveryAnswers: answers,
+    discoveryIndex: complete
+      ? nextIndex
+      : discoveryIndexForAnswers(typeLabel, answers),
+    step: complete ? "readiness" : "discovery",
+  };
 }
 
 export function itemRoutedElsewhere(item: CreateCatalogItem): boolean {

@@ -61,6 +61,7 @@ import {
   logCreateError,
   validateCreateForBuild,
   enterAddDetailStep,
+  resolveCreateWorkspacePhase,
 } from "@/lib/createBuild";
 import { CreateWorkflowPanel } from "@/components/companion/CreateWorkflowPanel";
 import { CreateSplitScreenStatus } from "@/components/companion/CreateSplitScreenStatus";
@@ -222,15 +223,55 @@ export function ContentGeneratorPanel({
   const exportPrintRef = useRef<HTMLButtonElement | null>(null);
   const typeLocked = Boolean(lockedArtifactType);
   const proposalMode = isProposalArtifact(lockedArtifactType ?? type);
-  const isBuildingDraft = loading || workflow.draftStatus === "building";
-  const showBuildingState = isBuildingDraft && !draft.trim();
-  const showDraftEditor = Boolean(draft.trim()) && workflow.buildApproved;
+  const isGenerating =
+    loading ||
+    workflow.draftStatus === "building" ||
+    createBuilderPhase === "generating";
+  const showBuildingState = isGenerating && !draft.trim();
+  const showDraftEditor =
+    Boolean(draft.trim()) &&
+    (workflow.buildApproved || workflow.draftStatus === "ready");
   const splitScreenMode = companionBuilderMode || workflow.questionMode === "split_screen";
+  const workspacePhase = resolveCreateWorkspacePhase({
+    draft,
+    draftStatus: workflow.draftStatus,
+    buildApproved: workflow.buildApproved,
+    step: workflow.step,
+    builderPhase: createBuilderPhase,
+    loading,
+  });
   const inGuidedCreate =
-    !workflow.buildApproved && !isBuildingDraft && !splitScreenMode;
+    !workflow.buildApproved && !isGenerating && !splitScreenMode;
   const showSplitScreenStatus =
     splitScreenMode && !showDraftEditor && !showBuildingState;
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  useEffect(() => {
+    if (workflow.step !== "discovery" || splitScreenMode) return;
+    logCreateBuild("Create Session Started", {
+      itemType: resolvedTypeLabel(workflow) || type,
+      step: workflow.step,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [workflow.selectedTypeLabel, workflow.step, splitScreenMode]);
+
+  useEffect(() => {
+    if (workflow.step !== "readiness") return;
+    logCreateBuild("Questions Complete", {
+      itemType: resolvedTypeLabel(workflow) || type,
+      answersCount: Object.values(workflow.discoveryAnswers).filter((v) =>
+        v.trim(),
+      ).length,
+    });
+  }, [workflow.step, workflow.discoveryAnswers, workflow.selectedTypeLabel, type]);
+
+  useEffect(() => {
+    if (!draft.trim() || !workflow.buildApproved) return;
+    logCreateBuild("Draft Rendered", {
+      itemType: type || resolvedTypeLabel(workflow),
+      length: draft.length,
+    });
+  }, [draft, workflow.buildApproved, type, workflow]);
 
   useEffect(() => {
     if (!showBuildingState) {
@@ -420,7 +461,7 @@ export function ContentGeneratorPanel({
     setError(false);
     setBuildErrorMessage(null);
     setWorkflow((prev) => ({ ...prev, draftStatus: "building" }));
-    logCreateBuild("Generating Draft", {
+    logCreateBuild("Generation Started", {
       itemType: resolvedType,
       template: validation.templateName,
       answersCount: validation.answersCount,
@@ -456,6 +497,11 @@ export function ContentGeneratorPanel({
           step: "improve",
           readinessConfirmed: true,
         }));
+        logCreateBuild("Generation Finished");
+        logCreateBuild("Draft Saved", {
+          itemType: resolvedType,
+          length: content.length,
+        });
         logCreateBuild("Draft Generated Successfully", {
           itemType: resolvedType,
           length: content.length,
@@ -481,7 +527,7 @@ export function ContentGeneratorPanel({
         step: "parse",
         message: errMsg,
       });
-      logCreateBuild("Draft Failed", { message: errMsg });
+      logCreateBuild("Generation Failed", { message: errMsg });
       setError(true);
       setBuildErrorMessage(userMessage);
       setWorkflow((prev) => ({
@@ -500,7 +546,7 @@ export function ContentGeneratorPanel({
         step: "request",
         message: errMsg,
       });
-      logCreateBuild("Draft Failed", { message: errMsg });
+      logCreateBuild("Generation Failed", { message: errMsg });
       setError(true);
       setBuildErrorMessage(
         "Couldn’t reach the server. Check your connection and try again.",
@@ -825,6 +871,11 @@ export function ContentGeneratorPanel({
     } else if (resolved && resolved !== type) {
       setType(resolved);
     }
+    logCreateBuild("Build Draft Clicked", {
+      itemType: resolved,
+      answersCount: Object.values(wf.discoveryAnswers).filter((v) => v.trim())
+        .length,
+    });
     const fullBrief = briefText.trim() || buildFullCreateBrief(wf);
     setBrief(fullBrief);
     setTopic(fullBrief);
@@ -1002,12 +1053,15 @@ export function ContentGeneratorPanel({
       )}
 
       {showBuildingState && (
-        <div className="companion-fade-in mt-8 text-center">
+        <div className="companion-fade-in mt-8 flex flex-1 flex-col justify-center text-center">
           <p className="text-xl font-semibold text-[#1f1c19]">
-            {BUILD_DRAFT_LOADING_MESSAGES[loadingMessageIndex]}
+            Creating your draft…
           </p>
           <p className="mt-1 text-sm text-[#6b635a]">
-            Using what you shared — not starting from a blank guess.
+            This usually takes a few seconds.
+          </p>
+          <p className="mt-3 text-sm text-[#9a8f82]">
+            {BUILD_DRAFT_LOADING_MESSAGES[loadingMessageIndex]}
           </p>
         </div>
       )}
@@ -1017,8 +1071,7 @@ export function ContentGeneratorPanel({
           itemType={type || resolvedTypeLabel(workflow) || null}
           selectedSubtype={workflow.selectedSubtype}
           customSubtype={workflow.customSubtype}
-          builderPhase={createBuilderPhase}
-          draftStatus={workflow.draftStatus}
+          workspacePhase={workspacePhase}
         />
       )}
 

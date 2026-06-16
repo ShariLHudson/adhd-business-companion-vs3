@@ -7,6 +7,7 @@ import { resolveTemplateName } from "./createTemplates";
 import {
   answeredDiscoveryCount,
   discoveryComplete,
+  requiredFieldsComplete,
   resolvedTypeLabel,
   type CreateWorkflowState,
 } from "./createWorkflow";
@@ -37,10 +38,8 @@ export function validateCreateForBuild(
   if (answersCount === 0) missing.push("questionAnswers");
 
   const readyToBuild =
-    state.step === "readiness" ||
-    state.step === "add-detail" ||
-    state.readinessConfirmed ||
-    discoveryComplete(itemType, state);
+    (state.step === "readiness" || state.step === "add-detail") &&
+    requiredFieldsComplete(itemType, state.discoveryAnswers);
 
   if (!readyToBuild) missing.push("readyToBuild");
 
@@ -113,3 +112,36 @@ export type CreateBuildGenerationStep =
   | "request"
   | "parse"
   | "complete";
+
+export type CreateWorkspacePhase =
+  | "gathering"
+  | "ready"
+  | "generating"
+  | "draft-ready";
+
+export function resolveCreateWorkspacePhase(opts: {
+  draft: string;
+  draftStatus: CreateWorkflowState["draftStatus"];
+  buildApproved: boolean;
+  step: CreateWorkflowState["step"];
+  builderPhase?: string | null;
+  loading?: boolean;
+}): CreateWorkspacePhase {
+  if (
+    opts.draft.trim() &&
+    (opts.buildApproved || opts.draftStatus === "ready")
+  ) {
+    return "draft-ready";
+  }
+  if (
+    opts.loading ||
+    opts.draftStatus === "building" ||
+    opts.builderPhase === "generating"
+  ) {
+    return "generating";
+  }
+  if (opts.step === "readiness" || opts.step === "add-detail") {
+    return "ready";
+  }
+  return "gathering";
+}

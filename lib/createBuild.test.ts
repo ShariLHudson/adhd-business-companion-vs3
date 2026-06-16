@@ -3,28 +3,51 @@ import {
   appendExtraDetail,
   enterAddDetailStep,
   validateCreateForBuild,
+  resolveCreateWorkspacePhase,
 } from "./createBuild";
 import {
   advanceAfterDiscoveryAnswer,
   advanceFromTemplate,
   advanceAfterSubtypePick,
   advanceAfterItemPick,
+  requiredFieldsComplete,
+  getDiscoveryQuestions,
 } from "./createWorkflow";
 
 describe("createBuild", () => {
-  it("validates readiness workflow with answers", () => {
+  it("validates readiness workflow with all required answers", () => {
     let wf = advanceFromTemplate(
       advanceAfterSubtypePick(advanceAfterItemPick("Training Guide"), "Client Training"),
     );
-    const qs = ["audience", "goal", "format"] as const;
-    for (let i = 0; i < qs.length; i++) {
-      wf = advanceAfterDiscoveryAnswer(wf, "Training Guide", qs[i]!, `answer ${i}`);
+    const qs = getDiscoveryQuestions("Training Guide");
+    for (const q of qs) {
+      wf = advanceAfterDiscoveryAnswer(wf, "Training Guide", q.id, `answer-${q.id}`);
     }
     expect(wf.step).toBe("readiness");
+    expect(requiredFieldsComplete("Training Guide", wf.discoveryAnswers)).toBe(true);
     const v = validateCreateForBuild(wf);
     expect(v.ok).toBe(true);
-    expect(v.answersCount).toBeGreaterThan(0);
     expect(v.itemType).toBe("Training Guide");
+  });
+
+  it("resolves workspace phases", () => {
+    expect(
+      resolveCreateWorkspacePhase({
+        draft: "",
+        draftStatus: "building",
+        buildApproved: false,
+        step: "readiness",
+        builderPhase: "generating",
+      }),
+    ).toBe("generating");
+    expect(
+      resolveCreateWorkspacePhase({
+        draft: "Hello",
+        draftStatus: "ready",
+        buildApproved: true,
+        step: "improve",
+      }),
+    ).toBe("draft-ready");
   });
 
   it("appends extra detail and returns to readiness", () => {
