@@ -7,74 +7,84 @@ import {
   type DayLevel,
   type DayState,
 } from "@/lib/companionStore";
+import {
+  DAY_HELP_OTHER,
+  formatDayFeeling,
+  formatDayHelpDisplay,
+  formatDayNoteDisplay,
+  formatDaySnapshotTime,
+  normalizeDayHelpNeed,
+} from "@/lib/adjustMyDay";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
+import { HelpNeedDropdown } from "@/components/companion/HelpNeedDropdown";
 
 const LEVELS: DayLevel[] = ["low", "medium", "high"];
-const NEEDS = [
-  "Focus",
-  "Calm",
-  "Structure",
-  "Clarity",
-  "Support",
-  "Motivation",
-  "Just Start",
-];
+
+type PanelMode = "snapshot" | "edit";
 
 export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
+  const [mode, setMode] = useState<PanelMode>("edit");
+  const [snapshot, setSnapshot] = useState<DayState | null>(null);
+
   const [energy, setEnergy] = useState<DayLevel>("medium");
   const [overwhelm, setOverwhelm] = useState<DayLevel>("low");
-  const [needs, setNeeds] = useState<string[]>([]);
-  const [other, setOther] = useState("");
+  const [helpNeed, setHelpNeed] = useState("");
+  const [otherNeed, setOtherNeed] = useState("");
   const [note, setNote] = useState("");
 
-  // Progressive reveal — one decision per layer.
   const [energyTouched, setEnergyTouched] = useState(false);
   const [overwhelmTouched, setOverwhelmTouched] = useState(false);
-  const [showOther, setShowOther] = useState(false);
-  const [showNote, setShowNote] = useState(false);
-  const [saved, setSaved] = useState(false);
+
+  function loadFromState(existing: DayState) {
+    setEnergy(existing.energy);
+    setOverwhelm(existing.overwhelm);
+    const first = existing.needs[0];
+    const { selection, otherText } = normalizeDayHelpNeed(first);
+    setHelpNeed(selection);
+    setOtherNeed(otherText);
+    setNote(existing.note ?? "");
+    setEnergyTouched(true);
+    setOverwhelmTouched(true);
+    setSnapshot(existing);
+  }
 
   useEffect(() => {
     const existing = getDayState();
     if (existing) {
-      setEnergy(existing.energy);
-      setOverwhelm(existing.overwhelm);
-      setNeeds(existing.needs.filter((n) => NEEDS.includes(n)));
-      const custom = existing.needs.find((n) => !NEEDS.includes(n));
-      if (custom) {
-        setOther(custom);
-        setShowOther(true);
-      }
-      if (existing.note) {
-        setNote(existing.note);
-        setShowNote(true);
-      }
-      // Already set before — reveal everything for quick editing.
-      setEnergyTouched(true);
-      setOverwhelmTouched(true);
-      setSaved(true);
+      loadFromState(existing);
+      setMode("snapshot");
     }
   }, []);
 
-  const layer2 = energyTouched && overwhelmTouched;
-
-  function toggleNeed(n: string) {
-    setNeeds((prev) =>
-      prev.includes(n) ? prev.filter((x) => x !== n) : [...prev, n],
-    );
+  function startEdit() {
+    const existing = getDayState();
+    if (existing) loadFromState(existing);
+    setMode("edit");
   }
 
-  function setDay() {
-    const allNeeds = [...needs];
-    if (other.trim()) allNeeds.push(other.trim());
-    saveDayState({
+  function buildNeeds(): string[] {
+    if (helpNeed === DAY_HELP_OTHER) {
+      const custom = otherNeed.trim();
+      return custom ? [custom] : [];
+    }
+    return helpNeed ? [helpNeed] : [];
+  }
+
+  const canSave =
+    energyTouched &&
+    overwhelmTouched &&
+    (helpNeed === DAY_HELP_OTHER ? otherNeed.trim().length > 0 : Boolean(helpNeed));
+
+  function saveDay() {
+    const state = saveDayState({
       energy,
       overwhelm,
-      needs: allNeeds,
+      needs: buildNeeds(),
       note: note.trim() || undefined,
     });
-    onDone?.();
+    setSnapshot(state);
+    setMode("snapshot");
   }
 
   const levelBtn = (active: boolean) =>
@@ -84,19 +94,81 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
         : "border-[#c9bfb0] bg-white/80 text-[#3d3630] hover:bg-white"
     }`;
 
+  if (mode === "snapshot" && snapshot) {
+    const updated = formatDaySnapshotTime(snapshot);
+    return (
+      <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+        <WorkspaceGuide section="energy" />
+        <p className="text-2xl font-semibold text-[#1f1c19]">Adjust My Day</p>
+        <p className="mt-1 text-sm text-[#6b635a]">
+          Shari uses your latest update — change it anytime life shifts.
+          {updated ? ` Last updated ${updated}.` : ""}
+        </p>
+
+        <div className="mt-6 rounded-2xl border border-[#e7dfd4] bg-white/90 p-5 shadow-sm">
+          <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+            Current Day Snapshot
+          </p>
+
+          <div className="mt-4 space-y-4">
+            <div>
+              <p className="text-sm font-semibold text-[#1f1c19]">
+                How are you feeling today?
+              </p>
+              <p className="mt-1 text-base text-[#3d3630]">
+                {formatDayFeeling(snapshot)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-[#1f1c19]">
+                What would help right now?
+              </p>
+              <p className="mt-1 text-base text-[#3d3630]">
+                {formatDayHelpDisplay(snapshot)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-[#1f1c19]">
+                Anything else going on?
+              </p>
+              <p className="mt-1 text-base text-[#3d3630] whitespace-pre-wrap">
+                {formatDayNoteDisplay(snapshot)}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={startEdit}
+          className="mt-6 w-full rounded-xl bg-[#1e4f4f] px-8 py-3.5 text-lg font-semibold text-white shadow-md hover:bg-[#163a3a]"
+        >
+          Update My Day
+        </button>
+
+        {onDone ? (
+          <button
+            type="button"
+            onClick={onDone}
+            className="mt-3 w-full rounded-xl border border-[#c9bfb0] bg-white px-8 py-3 text-base font-semibold text-[#3d3630] hover:bg-[#faf8f5]"
+          >
+            Back to chat
+          </button>
+        ) : null}
+      </div>
+    );
+  }
+
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
       <WorkspaceGuide section="energy" />
       <p className="text-2xl font-semibold text-[#1f1c19]">
-        How is your brain today?
+        How are you feeling today?
       </p>
-      {saved && (
-        <p className="mt-1 text-sm text-[#6b635a]">
-          Shari is tuned to this until you change it.
-        </p>
-      )}
+      <p className="mt-1 text-sm text-[#6b635a]">
+        Quick check-in — update anytime your day changes.
+      </p>
 
-      {/* Layer 1 — Energy + Overwhelm */}
       <p className="mt-6 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
         Energy
       </p>
@@ -135,83 +207,58 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
         ))}
       </div>
 
-      {/* Layer 2 — appears once both are set */}
-      {layer2 && (
-        <div className="companion-fade-in">
-          <p className="mt-7 text-lg font-semibold text-[#1f1c19]">
-            What would help right now?
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {NEEDS.map((n) => (
-              <button
-                key={n}
-                type="button"
-                onClick={() => toggleNeed(n)}
-                className={`rounded-full px-4 py-2 text-sm font-semibold transition-colors ${
-                  needs.includes(n)
-                    ? "bg-[#1e4f4f] text-white shadow-sm"
-                    : "bg-white/80 text-[#3d3630] hover:bg-white"
-                }`}
-              >
-                {n}
-              </button>
-            ))}
-            {!showOther && (
-              <button
-                type="button"
-                onClick={() => setShowOther(true)}
-                className="rounded-full border border-dashed border-[#c9bfb0] px-4 py-2 text-sm font-semibold text-[#6b635a] hover:bg-white"
-              >
-                + Other
-              </button>
-            )}
-          </div>
-          {showOther && (
-            <input
-              value={other}
-              onChange={(e) => setOther(e.target.value)}
-              placeholder="Something else…"
-              autoFocus
-              className="companion-fade-in mt-3 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-            />
-          )}
+      <p className="mt-7 text-lg font-semibold text-[#1f1c19]">
+        What would help right now?
+      </p>
+      <HelpNeedDropdown
+        className="mt-2"
+        value={helpNeed}
+        onChange={(v) => {
+          setHelpNeed(v);
+          if (v !== DAY_HELP_OTHER) setOtherNeed("");
+        }}
+      />
+      {helpNeed === DAY_HELP_OTHER ? (
+        <input
+          value={otherNeed}
+          onChange={(e) => setOtherNeed(e.target.value)}
+          placeholder="Tell me what you need…"
+          className="mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+        />
+      ) : null}
 
-          {/* Layer 3 — optional note + final action, only after a need is
-              chosen. Each answer unlocks the next layer. */}
-          {(needs.length > 0 || other.trim()) && (
-            <div className="companion-fade-in">
-              <p className="mt-7 text-lg font-semibold text-[#1f1c19]">
-                Anything else going on?
-              </p>
-              {!showNote ? (
-                <button
-                  type="button"
-                  onClick={() => setShowNote(true)}
-                  className="mt-2 text-sm font-semibold text-[#1e4f4f]"
-                >
-                  + Add a note (optional)
-                </button>
-              ) : (
-                <VoiceAnswerField
-                  value={note}
-                  onChange={setNote}
-                  placeholder="Anything you want Shari to keep in mind today…"
-                  autoFocus
-                  inputClassName="min-h-[90px] w-full resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-                />
-              )}
+      <p className="mt-7 text-lg font-semibold text-[#1f1c19]">
+        Anything else going on?
+      </p>
+      <p className="mt-1 text-sm text-[#6b635a]">
+        Share anything you&apos;d like me to know. Optional.
+      </p>
+      <VoiceAnswerField
+        value={note}
+        onChange={setNote}
+        placeholder={`"I'm overwhelmed." "My knee hurts." "I have a sales call later."`}
+        className="mt-2"
+        inputClassName="min-h-[100px] w-full resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+      />
 
-              <button
-                type="button"
-                onClick={setDay}
-                className="mt-6 w-full rounded-xl bg-[#1e4f4f] px-8 py-3.5 text-lg font-semibold text-white shadow-md hover:bg-[#163a3a]"
-              >
-                Set My Day
-              </button>
-            </div>
-          )}
-        </div>
-      )}
+      <button
+        type="button"
+        onClick={saveDay}
+        disabled={!canSave}
+        className="mt-6 w-full rounded-xl bg-[#1e4f4f] px-8 py-3.5 text-lg font-semibold text-white shadow-md hover:bg-[#163a3a] disabled:cursor-not-allowed disabled:opacity-40"
+      >
+        {snapshot ? "Save My Day" : "Set My Day"}
+      </button>
+
+      {snapshot ? (
+        <button
+          type="button"
+          onClick={() => setMode("snapshot")}
+          className="mt-3 w-full rounded-xl border border-[#c9bfb0] bg-white px-8 py-3 text-base font-semibold text-[#3d3630] hover:bg-[#faf8f5]"
+        >
+          Cancel
+        </button>
+      ) : null}
     </div>
   );
 }

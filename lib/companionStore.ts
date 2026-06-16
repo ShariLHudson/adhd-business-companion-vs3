@@ -2173,12 +2173,7 @@ export function clearDayState() {
 }
 
 /** A compact line describing the day state, for the AI system prompt. */
-export function dayStateSummary(state: DayState | null): string | undefined {
-  if (!state) return undefined;
-  const needs = state.needs.length ? state.needs.join(", ") : "—";
-  const note = state.note?.trim() ? ` Note: ${state.note.trim()}` : "";
-  return `Energy: ${state.energy}. Overwhelm: ${state.overwhelm}. Needs most: ${needs}.${note}`;
-}
+export { dayStateSummary } from "./adjustMyDay";
 
 // ---- Settings + Profile preferences ---------------------------------------
 
