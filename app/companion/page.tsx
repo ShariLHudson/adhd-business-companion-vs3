@@ -23,6 +23,7 @@ import {
 } from "@/components/companion/CompanionActivitiesPanel";
 import { CrossWorkspaceSuggestionCard } from "@/components/companion/CrossWorkspaceSuggestionCard";
 import { SpinWheelPanel } from "@/components/companion/SpinWheelPanel";
+import { GamesPanel } from "@/components/companion/GamesPanel";
 import { FocusAudioPanel } from "@/components/companion/FocusAudioPanel";
 import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
@@ -3167,6 +3168,9 @@ export default function CompanionPage() {
         break;
       case "spin-wheel":
         setActiveSection("spin-wheel");
+        break;
+      case "games":
+        setActiveSection("games");
         break;
       case "reset-day":
         resetChat();
@@ -6900,6 +6904,8 @@ export default function CompanionPage() {
               onAsk={handlePlaybookAsk}
             />
           )}
+
+          {activeSection === "games" && <GamesPanel />}
 
           {activeSection === "business-profile" && (
             <BusinessProfilePanel

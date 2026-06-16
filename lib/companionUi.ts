@@ -18,6 +18,7 @@ export type AppSection =
   | "time-block"
   | "activities"
   | "spin-wheel"
+  | "games"
   | "email-generator"
   | "snippets"
   | "content-types"
@@ -49,7 +50,8 @@ export type SidebarToolId =
   | "new-chat"
   | "time-block"
   | "activities"
-  | "spin-wheel";
+  | "spin-wheel"
+  | "games";
 
 export const ASSETS = {
   background: "/images/companion-bg.jpg",
@@ -188,6 +190,7 @@ export const TOOL_SECTION: Partial<Record<SidebarToolId, AppSection>> = {
   "time-block": "time-block",
   activities: "activities",
   "spin-wheel": "spin-wheel",
+  games: "games",
 };
 
 export const INPUT_PLACEHOLDER = "";

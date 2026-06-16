@@ -131,7 +131,7 @@ const STRATEGY_TO_SUBCAT: Record<string, string> = {
   "brain-for-ideas": "memory",
   "notepad-by-bed": "memory",
   "reversible-or-permanent": "decision-making",
-  "elimination-round": "decision-making",
+  "decision-matrix": "decision-making",
   "protect-your-baseline": "burnout",
   "simplify-the-offer": "offers",
   "value-first-pricing": "pricing",
@@ -1091,22 +1091,22 @@ export const STRATEGIES: Strategy[] = [
     recommended: true,
   },
   {
-    id: "elimination-round",
+    id: "decision-matrix",
     categoryId: "decision-making",
-    title: "Elimination Round",
-    whenToUse: "When too many options are equally loud.",
+    title: "Decision Matrix",
+    whenToUse: "When you need to compare options against specific factors.",
     problem:
-      "You have five good options and can't rank them.\nEach has a case, so you keep all five alive and choose none.\nMore options feel like freedom but function like fog.",
+      "Every option has pros and cons and your gut keeps flip-flopping.\nYou can't hold all the variables in your head at once.\nAnalysis loops without a clear winner.",
     whyBrain:
-      "ADHD working memory struggles to compare many variables at once.\nEvery option stays bright instead of fading as you eliminate.\nThe brain wants the perfect pick, so it refuses to drop any contender.",
+      "ADHD working memory struggles to compare many variables simultaneously.\nEach factor feels equally loud without a structure to hold them.\nGut feel alone isn't enough — but spreadsheets feel like overkill.",
     whyWorks:
-      "Elimination is easier than selection — you're not picking the winner, you're dropping the clearly-wrong.\nTwo or three rounds leave one or two standing without a heroic ranking exercise.\nFewer finalists, faster clarity.",
+      "Rating options against named factors externalizes the comparison.\nYou see patterns in the tally instead of debating in circles.\nThe matrix gives your brain scaffolding without a giant pros/cons essay.",
     example:
-      "Three platforms for your course — all seem fine.\nYou eliminate the one with the worst onboarding for your tech comfort.\nThen the one your audience doesn't use. The remaining choice is obvious.",
+      "Three platforms for your course.\nFactors: ease of use, audience fit, price.\nOption B wins two of three — the matrix makes the lean obvious.",
     steps: [
-      "List the options — all of them.",
-      "Drop anything that's clearly wrong for one concrete reason.",
-      "Repeat until one or two remain, then pick between those.",
+      "Name the decision and list 2–4 options.",
+      "Pick the top 3 factors that matter.",
+      "Score which option wins each factor — count the wins.",
     ],
     recommended: true,
   },

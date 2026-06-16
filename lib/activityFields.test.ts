@@ -7,10 +7,10 @@ import { getActivityById } from "./companionActivities";
 import { stepField } from "./activityFields";
 
 describe("activityFields", () => {
-  it("requires filled options before advancing elimination round step 1", () => {
-    const activity = getActivityById("elimination-round");
+  it("requires filled options before advancing decision matrix options step", () => {
+    const activity = getActivityById("decision-matrix");
     expect(activity).toBeDefined();
-    const field = stepField(activity!.steps[0]);
+    const field = stepField(activity!.steps[1]);
     expect(field?.type).toBe("options");
     expect(canAdvanceActivityStep(field, { options: ["", ""] })).toBe(false);
     expect(
@@ -18,10 +18,12 @@ describe("activityFields", () => {
     ).toBe(true);
   });
 
-  it("copies options into finalists for elimination step", () => {
-    const activity = getActivityById("elimination-round");
-    const field = stepField(activity!.steps[2]);
-    expect(field?.type).toBe("eliminate-from");
+  it("copies options into finalists for elimination step (field type)", () => {
+    const field = {
+      type: "eliminate-from" as const,
+      key: "finalists",
+      fromKey: "options",
+    };
     const prepared = prepareStepAnswers(field, {
       options: ["A", "B", "C"],
     });

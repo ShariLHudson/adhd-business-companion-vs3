@@ -14,14 +14,7 @@ describe("companionActivities", () => {
       const items = activitiesForCategory(cat.id);
       expect(items.length).toBeGreaterThanOrEqual(4);
     }
-    expect(COMPANION_ACTIVITIES).toHaveLength(28);
-  });
-
-  it("includes suggested activity titles", () => {
-    const titles = COMPANION_ACTIVITIES.map((a) => a.title);
-    expect(titles).toContain("Five Senses Grounding");
-    expect(titles).toContain("Bad First Draft");
-    expect(titles).toContain("What Feels Heaviest?");
+    expect(COMPANION_ACTIVITIES).toHaveLength(31);
   });
 
   it("gives every activity steps and time estimate", () => {
@@ -35,12 +28,19 @@ describe("companionActivities", () => {
     }
   });
 
-  it("gives elimination round structured option fields", () => {
-    const activity = getActivityById("elimination-round");
+  it("includes unique strategy titles", () => {
+    const titles = COMPANION_ACTIVITIES.map((a) => a.title);
+    expect(titles).toContain("Focus Session");
+    expect(titles).toContain("Decision Matrix");
+    expect(titles).toContain("Clear My Mind");
+    expect(titles).toContain("Energy Check");
+    expect(titles).toContain("Five Senses Grounding");
+  });
+
+  it("gives decision matrix structured option fields", () => {
+    const activity = getActivityById("decision-matrix");
     expect(activity).toBeDefined();
-    expect(stepField(activity!.steps[0])?.type).toBe("options");
-    expect(stepField(activity!.steps[1])?.type).toBe("review-list");
-    expect(stepField(activity!.steps[2])?.type).toBe("eliminate-from");
+    expect(stepField(activity!.steps[1])?.type).toBe("options");
     expect(stepField(activity!.steps[3])?.type).toBe("pick-from");
   });
 });

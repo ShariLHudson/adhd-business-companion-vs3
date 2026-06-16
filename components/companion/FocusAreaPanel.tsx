@@ -59,6 +59,12 @@ const TOOLS: Option[] = [
 
 const BOOSTERS: Option[] = [
   {
+    emoji: "🎮",
+    title: "Momentum Games",
+    desc: "Fifteen playful games — pattern, memory, speed, and more.",
+    tool: "games",
+  },
+  {
     emoji: "🎡",
     title: "Spin The Wheel",
     desc: "Let the wheel choose when everything feels equally important.",
@@ -67,7 +73,7 @@ const BOOSTERS: Option[] = [
   {
     emoji: "🧭",
     title: "Help Me Right Now",
-    desc: "Activities for slow down, focus, calm, and more — by what you need.",
+    desc: "Unique strategies for calm, focus, decisions, and energy — each solves a different problem.",
     tool: "activities",
   },
 ];
