@@ -47,7 +47,7 @@ export type CreateBuilderSession = {
 export function emptyCreateBuilderSession(): CreateBuilderSession {
   return {
     typeLabel: null,
-    workflow: { ...EMPTY_CREATE_WORKFLOW },
+    workflow: { ...EMPTY_CREATE_WORKFLOW, questionMode: "split_screen" },
     phase: "pick-type",
   };
 }
@@ -113,15 +113,18 @@ const READINESS_PROMPT =
 
 function freshDiscoveryWorkflow(typeLabel: string): CreateWorkflowState {
   const picked = advanceAfterItemPick(typeLabel);
-  return advanceToDiscovery(
-    {
-      ...picked,
-      categoryId: picked.categoryId ?? categoryIdForType(typeLabel),
-      selectedTypeLabel: typeLabel,
-      step: "discovery",
-    },
-    { preserveAnswers: false },
-  );
+  return {
+    ...advanceToDiscovery(
+      {
+        ...picked,
+        categoryId: picked.categoryId ?? categoryIdForType(typeLabel),
+        selectedTypeLabel: typeLabel,
+        step: "discovery",
+      },
+      { preserveAnswers: false },
+    ),
+    questionMode: "split_screen",
+  };
 }
 
 export function panelWorkflowHasProgress(
@@ -142,6 +145,7 @@ export function bootstrapCreateBuilderFromWorkflow(
     ...panelWorkflow,
     selectedTypeLabel: panelWorkflow.selectedTypeLabel ?? resolved,
     categoryId: panelWorkflow.categoryId ?? categoryIdForType(resolved),
+    questionMode: "split_screen",
   };
 
   if (
@@ -210,7 +214,7 @@ export function bootstrapCreateBuilderSession(
     return {
       session: emptyCreateBuilderSession(),
       opener:
-        "I'm here to help you build something real — one question at a time.\n\nPick an item type in the workspace first, or tell me what you're creating (SOP, workshop, proposal, newsletter, training guide…).",
+        "I'm here to help you build something real — one question at a time.\n\nTell me what you're creating (SOP, workshop, proposal, newsletter, video script, training guide…).",
     };
   }
 
@@ -411,7 +415,11 @@ function enterReadiness(
     ...session,
     phase: "readiness",
     collectingExtra: false,
-    workflow: { ...session.workflow, step: "readiness" },
+    workflow: {
+      ...session.workflow,
+      step: "readiness",
+      questionMode: "split_screen",
+    },
   };
   return {
     session: ready,

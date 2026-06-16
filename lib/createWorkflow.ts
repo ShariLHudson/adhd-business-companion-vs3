@@ -19,12 +19,16 @@ import {
 
 export type DraftStatus = "idle" | "building" | "ready" | "error";
 
+/** Who asks discovery questions — Create panel alone, or Chat in split view. */
+export type CreateQuestionMode = "create_only" | "split_screen";
+
 export type CreateWorkflowStep =
   | "category"
   | "type"
   | "confirm"
   | "template"
   | "discovery"
+  | "add-detail"
   | "readiness"
   | "improve"
   | "export";
@@ -60,6 +64,8 @@ export type CreateWorkflowState = {
   useTemplate: boolean;
   draftStatus: DraftStatus;
   draftContent: string | null;
+  /** create_only = panel asks questions; split_screen = chat asks, panel shows output. */
+  questionMode: CreateQuestionMode;
 };
 
 export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {
@@ -79,6 +85,7 @@ export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {
   useTemplate: true,
   draftStatus: "idle",
   draftContent: null,
+  questionMode: "create_only",
 };
 
 const DEFAULT_DISCOVERY: DiscoveryQuestion[] = [
@@ -652,6 +659,7 @@ export function workflowStepLabel(step: CreateWorkflowStep): string {
     confirm: "Ready",
     template: "Template",
     discovery: "Discovery",
+    "add-detail": "Add detail",
     readiness: "Readiness",
     improve: "Improve",
     export: "Save / Export",
@@ -696,6 +704,7 @@ export function mergeCreateWorkflow(
     confirm: 2,
     template: 3,
     discovery: 4,
+    "add-detail": 5,
     readiness: 5,
     improve: 6,
     export: 7,
@@ -728,6 +737,11 @@ export function mergeCreateWorkflow(
             ? "error"
             : "idle",
     draftContent: incoming.draftContent ?? local.draftContent,
+    questionMode:
+      incoming.questionMode === "split_screen" ||
+      local.questionMode === "split_screen"
+        ? "split_screen"
+        : "create_only",
     step:
       stepRank[incoming.step] >= stepRank[local.step]
         ? incoming.step
@@ -809,6 +823,10 @@ export function buildBriefFromDiscovery(
       return `${q.prompt}\n${a}`;
     })
     .filter(Boolean) as string[];
+  const extra = answers["extra-detail"]?.trim();
+  if (extra) {
+    lines.push(`Additional detail\n${extra}`);
+  }
   const header = subtype
     ? `Content type: ${typeLabel} (${subtype})`
     : `Content type: ${typeLabel}`;
@@ -831,13 +849,18 @@ export function readinessSummary(
   answers: Record<string, string>,
 ): { label: string; value: string }[] {
   const questions = getDiscoveryQuestions(typeLabel, answers);
-  return questions
+  const rows = questions
     .map((q) => {
       const v = answers[q.id]?.trim();
       if (!v) return null;
       return { label: q.prompt, value: v };
     })
     .filter(Boolean) as { label: string; value: string }[];
+  const extra = answers["extra-detail"]?.trim();
+  if (extra) {
+    rows.push({ label: "Additional detail", value: extra });
+  }
+  return rows;
 }
 
 export function advanceAfterItemPick(typeLabel: string): CreateWorkflowState {

@@ -1257,7 +1257,18 @@ export default function CompanionPage() {
   function handleChatBuildFailed() {
     setChatBuildRequest(null);
     setCreateBuilderSession((prev) =>
-      prev ? { ...prev, phase: "readiness" } : prev,
+      prev
+        ? {
+            ...prev,
+            phase: "readiness",
+            workflow: {
+              ...prev.workflow,
+              draftStatus: "error",
+              buildApproved: false,
+              step: "readiness",
+            },
+          }
+        : prev,
     );
     setMessages((prev) => [
       ...prev,
@@ -5379,11 +5390,6 @@ export default function CompanionPage() {
             onCreateSessionSync={handleCreateSessionSync}
             onCreateWorkflowSync={(wf) => {
               createPanelWorkflowRef.current = wf;
-              if (splitCreateChat) {
-                setCreateBuilderSession((prev) =>
-                  prev ? { ...prev, workflow: wf } : prev,
-                );
-              }
             }}
             onBuildWithShari={openCreateWithShari}
             onOpen={(s) => {
@@ -5408,6 +5414,7 @@ export default function CompanionPage() {
             onArtifactReady={handleArtifactReadyChat}
             onExportGuidance={handleExportGuidance}
             companionBuilderMode={splitCreateChat}
+            createBuilderPhase={createBuilderSession?.phase ?? null}
             chatSyncedWorkflow={
               splitCreateChat ? createBuilderSession?.workflow ?? null : null
             }

@@ -56,7 +56,15 @@ import {
   BUILD_DRAFT_LOADING_MESSAGES,
   buildFullCreateBrief,
 } from "@/lib/createTemplates";
+import {
+  logCreateBuild,
+  logCreateError,
+  validateCreateForBuild,
+  enterAddDetailStep,
+} from "@/lib/createBuild";
 import { CreateWorkflowPanel } from "@/components/companion/CreateWorkflowPanel";
+import { CreateSplitScreenStatus } from "@/components/companion/CreateSplitScreenStatus";
+import type { CreateBuilderPhase } from "@/lib/createBuilderChat";
 import { blankScaffoldForType } from "@/lib/createInitialization";
 import {
   emptySavedArtifact,
@@ -129,6 +137,7 @@ export function ContentGeneratorPanel({
   onArtifactReady,
   onExportGuidance,
   companionBuilderMode = false,
+  createBuilderPhase = null,
   chatBuildRequest,
   onChatBuildComplete,
   onChatBuildFailed,
@@ -169,8 +178,10 @@ export function ContentGeneratorPanel({
   onOpenGoogleWorkspace?: (session: GoogleWorkspaceSession) => void;
   onArtifactReady?: (message: string) => void;
   onExportGuidance?: (message: string) => void;
-  /** Chat beside Create drives discovery — hide duplicate panel wizard. */
+  /** Chat beside Create drives discovery — panel shows status, not questions. */
   companionBuilderMode?: boolean;
+  /** Chat builder phase for split-screen status copy. */
+  createBuilderPhase?: CreateBuilderPhase | null;
   /** Parent-triggered build from chat builder approval. */
   chatBuildRequest?: { type: string; brief: string; key: number } | null;
   onChatBuildComplete?: () => void;
@@ -197,6 +208,8 @@ export function ContentGeneratorPanel({
   const [locationPanelOpen, setLocationPanelOpen] = useState(false);
   const [phase, setPhase] = useState<"building" | "ready">("building");
   const [workflow, setWorkflow] = useState<CreateWorkflowState>(EMPTY_CREATE_WORKFLOW);
+  const workflowRef = useRef(workflow);
+  workflowRef.current = workflow;
   const [confirmDeleteDraft, setConfirmDeleteDraft] = useState(false);
   const started = useRef(false);
   const lastSeedSig = useRef("");
@@ -209,9 +222,13 @@ export function ContentGeneratorPanel({
   const typeLocked = Boolean(lockedArtifactType);
   const proposalMode = isProposalArtifact(lockedArtifactType ?? type);
   const isBuildingDraft = loading || workflow.draftStatus === "building";
-  const inGuidedCreate = !workflow.buildApproved && !isBuildingDraft;
   const showBuildingState = isBuildingDraft && !draft.trim();
   const showDraftEditor = Boolean(draft.trim()) && workflow.buildApproved;
+  const splitScreenMode = companionBuilderMode || workflow.questionMode === "split_screen";
+  const inGuidedCreate =
+    !workflow.buildApproved && !isBuildingDraft && !splitScreenMode;
+  const showSplitScreenStatus =
+    splitScreenMode && !showDraftEditor && !showBuildingState;
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
 
   useEffect(() => {
@@ -274,25 +291,56 @@ export function ContentGeneratorPanel({
     onCreateWorkflowSync?.(workflow);
   }, [workflow, onCreateWorkflowSync]);
 
+  useEffect(() => {
+    if (!companionBuilderMode) return;
+    setWorkflow((prev) =>
+      prev.questionMode === "split_screen"
+        ? prev
+        : { ...prev, questionMode: "split_screen" },
+    );
+  }, [companionBuilderMode]);
+
+  useEffect(() => {
+    if (companionBuilderMode) return;
+    setWorkflow((prev) =>
+      prev.questionMode === "create_only"
+        ? prev
+        : { ...prev, questionMode: "create_only" },
+    );
+  }, [companionBuilderMode]);
+
   const lastChatSyncSig = useRef("");
   useEffect(() => {
-    if (!chatSyncedWorkflow) return;
-    const label = resolvedTypeLabel(chatSyncedWorkflow) || type;
-    if (!label) return;
+    if (!companionBuilderMode || !chatSyncedWorkflow) return;
+    const label =
+      resolvedTypeLabel(chatSyncedWorkflow) ||
+      chatSyncedWorkflow.selectedTypeLabel ||
+      type;
     const sig = JSON.stringify({
       step: chatSyncedWorkflow.step,
       answers: chatSyncedWorkflow.discoveryAnswers,
       subtype: chatSyncedWorkflow.selectedSubtype,
+      customSubtype: chatSyncedWorkflow.customSubtype,
       buildApproved: chatSyncedWorkflow.buildApproved,
+      draftStatus: chatSyncedWorkflow.draftStatus,
+      phase: createBuilderPhase,
     });
     if (sig === lastChatSyncSig.current) return;
     lastChatSyncSig.current = sig;
-    setWorkflow((prev) => mergeCreateWorkflow(prev, chatSyncedWorkflow, label));
+    setWorkflow({
+      ...chatSyncedWorkflow,
+      questionMode: "split_screen",
+    });
     const resolved = resolvedTypeLabel(chatSyncedWorkflow);
     if (resolved && resolved !== type) {
       setType(resolved);
+    } else if (
+      chatSyncedWorkflow.selectedTypeLabel &&
+      chatSyncedWorkflow.selectedTypeLabel !== type
+    ) {
+      setType(chatSyncedWorkflow.selectedTypeLabel);
     }
-  }, [chatSyncedWorkflow, type]);
+  }, [companionBuilderMode, chatSyncedWorkflow, createBuilderPhase, type]);
 
   const focusElementId =
     focusField === "create-topic"
@@ -311,10 +359,52 @@ export function ContentGeneratorPanel({
     window.setTimeout(() => setFlash(null), 2200);
   }
 
-  async function run(t: string, b: string, tn: string): Promise<boolean> {
-    const resolvedType = t.trim() || resolvedTypeLabel(workflow) || type;
-    const resolvedBrief = b.trim() || buildFullCreateBrief(workflow);
+  async function run(
+    t: string,
+    b: string,
+    tn: string,
+    wf: CreateWorkflowState = workflowRef.current,
+  ): Promise<boolean> {
+    const validation = validateCreateForBuild(wf);
+    logCreateBuild("Create Session Loaded", {
+      itemType: validation.itemType,
+      subtype: validation.subtype,
+      template: validation.templateName,
+      answersCount: validation.answersCount,
+      readyToBuild: validation.readyToBuild,
+      draftStatus: wf.draftStatus,
+    });
+    logCreateBuild(`Answers Found: ${validation.answersCount}`);
+
+    const resolvedType = t.trim() || validation.itemType || type;
+    const resolvedBrief = b.trim() || buildFullCreateBrief(wf);
+
+    if (!validation.ok) {
+      logCreateError({
+        itemType: validation.itemType || "(missing)",
+        template: validation.templateName,
+        answersCount: validation.answersCount,
+        step: "validate",
+        message: `Missing: ${validation.missing.join(", ")}`,
+      });
+      setError(true);
+      setWorkflow((prev) => ({
+        ...prev,
+        draftStatus: "error",
+        buildApproved: false,
+        step: prev.step === "improve" ? "readiness" : prev.step,
+      }));
+      return false;
+    }
+
     if (!resolvedType.trim() && !resolvedBrief.trim()) {
+      logCreateError({
+        itemType: resolvedType || "(missing)",
+        template: validation.templateName,
+        answersCount: validation.answersCount,
+        step: "validate",
+        message: "No type or brief to generate from",
+      });
       setError(true);
       setWorkflow((prev) => ({
         ...prev,
@@ -324,9 +414,16 @@ export function ContentGeneratorPanel({
       }));
       return false;
     }
+
     setLoading(true);
     setError(false);
     setWorkflow((prev) => ({ ...prev, draftStatus: "building" }));
+    logCreateBuild("Generating Draft", {
+      itemType: resolvedType,
+      template: validation.templateName,
+      answersCount: validation.answersCount,
+    });
+
     try {
       const { contentLanguageHint } = getOutputLanguageContext(getPrefs());
       const res = await fetch("/api/generate", {
@@ -340,9 +437,9 @@ export function ContentGeneratorPanel({
           contentLanguageHint,
         }),
       });
-      const data = await res.json();
+      const data = (await res.json()) as { result?: string; error?: string };
       if (res.ok && data.result) {
-        const content = data.result as string;
+        const content = data.result;
         setDraft(content);
         if (resolvedType && resolvedType !== type) setType(resolvedType);
         setWorkflow((prev) => ({
@@ -353,6 +450,10 @@ export function ContentGeneratorPanel({
           step: "improve",
           readinessConfirmed: true,
         }));
+        logCreateBuild("Draft Generated Successfully", {
+          itemType: resolvedType,
+          length: content.length,
+        });
         setLastActivity({
           kind: "draft",
           title: resolvedBrief || resolvedType || "Draft",
@@ -362,6 +463,15 @@ export function ContentGeneratorPanel({
         });
         return true;
       }
+      const errMsg = data.error || `HTTP ${res.status}`;
+      logCreateError({
+        itemType: resolvedType,
+        template: validation.templateName,
+        answersCount: validation.answersCount,
+        step: "parse",
+        message: errMsg,
+      });
+      logCreateBuild("Draft Failed", { message: errMsg });
       setError(true);
       setWorkflow((prev) => ({
         ...prev,
@@ -370,7 +480,16 @@ export function ContentGeneratorPanel({
         step: "readiness",
       }));
       return false;
-    } catch {
+    } catch (err) {
+      const errMsg = err instanceof Error ? err.message : "Network error";
+      logCreateError({
+        itemType: resolvedType,
+        template: validation.templateName,
+        answersCount: validation.answersCount,
+        step: "request",
+        message: errMsg,
+      });
+      logCreateBuild("Draft Failed", { message: errMsg });
       setError(true);
       setWorkflow((prev) => ({
         ...prev,
@@ -436,6 +555,13 @@ export function ContentGeneratorPanel({
         setWorkflow(
           mergeCreateWorkflow(seed.createWorkflow, seed.createWorkflow, label),
         );
+      } else if (companionBuilderMode) {
+        setWorkflow({
+          ...EMPTY_CREATE_WORKFLOW,
+          selectedTypeLabel: seed.type,
+          categoryId: categoryIdForType(seed.type),
+          questionMode: "split_screen",
+        });
       } else {
         setWorkflow(advanceAfterItemPick(seed.type));
       }
@@ -653,8 +779,15 @@ export function ContentGeneratorPanel({
     setBrief("");
     setEditingTopic(false);
     setDraft("");
-    if (!opts?.skipWorkflow) {
+    if (!opts?.skipWorkflow && !companionBuilderMode) {
       setWorkflow(advanceAfterItemPick(typeLabel));
+    } else if (companionBuilderMode) {
+      setWorkflow((prev) => ({
+        ...prev,
+        selectedTypeLabel: typeLabel,
+        categoryId: opts?.categoryId ?? categoryIdForType(typeLabel),
+        questionMode: "split_screen",
+      }));
     }
     started.current = false;
   }
@@ -670,17 +803,18 @@ export function ContentGeneratorPanel({
       : null);
 
   function handleBuildDraft(briefText: string, typeOverride?: string) {
+    const wf = workflowRef.current;
     const resolved =
-      typeOverride?.trim() || resolvedTypeLabel(workflow) || type;
+      typeOverride?.trim() || resolvedTypeLabel(wf) || type;
     if (typeOverride?.trim() && typeOverride !== type) {
       setType(typeOverride);
     } else if (resolved && resolved !== type) {
       setType(resolved);
     }
-    const fullBrief = briefText.trim() || buildFullCreateBrief(workflow);
+    const fullBrief = briefText.trim() || buildFullCreateBrief(wf);
     setBrief(fullBrief);
     setTopic(fullBrief);
-    return run(resolved, fullBrief, tone);
+    return run(resolved, fullBrief, tone, wf);
   }
 
   const lastChatBuildKey = useRef(0);
@@ -828,7 +962,8 @@ export function ContentGeneratorPanel({
       )}
       {!(workspaceMode && showDraftEditor) &&
         !type &&
-        workflow.step === "category" && (
+        workflow.step === "category" &&
+        !splitScreenMode && (
         <>
           <WorkspaceGuide section="content-generator" />
           <p className="text-2xl font-semibold text-[#1f1c19]">Create Something</p>
@@ -863,6 +998,16 @@ export function ContentGeneratorPanel({
         </div>
       )}
 
+      {showSplitScreenStatus && (
+        <CreateSplitScreenStatus
+          itemType={type || resolvedTypeLabel(workflow) || null}
+          selectedSubtype={workflow.selectedSubtype}
+          customSubtype={workflow.customSubtype}
+          builderPhase={createBuilderPhase}
+          draftStatus={workflow.draftStatus}
+        />
+      )}
+
       {inGuidedCreate &&
         !showDraftEditor &&
         !(workspaceMode && phase === "ready") &&
@@ -892,11 +1037,7 @@ export function ContentGeneratorPanel({
               setError(false);
             }}
             onAddMoreDetail={() =>
-              setWorkflow((prev) => ({
-                ...prev,
-                step: "discovery",
-                draftStatus: "idle",
-              }))
+              setWorkflow((prev) => enterAddDetailStep(prev))
             }
           />
         </div>

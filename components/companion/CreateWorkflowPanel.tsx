@@ -33,8 +33,10 @@ import {
   type CreateWorkflowState,
   type DiscoveryQuestion,
 } from "@/lib/createWorkflow";
+import { enterAddDetailStep } from "@/lib/createBuild";
 import { buildFullCreateBrief } from "@/lib/createTemplates";
 import { CreateTemplatePanel } from "@/components/companion/CreateTemplatePanel";
+import { CreateAddDetailPanel } from "@/components/companion/CreateAddDetailPanel";
 
 const btnPrimary =
   "w-full rounded-xl bg-[#1e4f4f] px-5 py-3 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:cursor-not-allowed disabled:opacity-40";
@@ -490,6 +492,22 @@ export function CreateWorkflowPanel({
     );
   }
 
+  // ── Add more detail (after readiness — does not restart discovery) ─────────
+  if (workflow.step === "add-detail" && resolvedType) {
+    return (
+      <div className="companion-fade-in mx-auto max-w-lg">
+        <CreateContextHeader itemLabel={itemLabel} subtypeLabel={subtypeLabel} />
+        <CreateAddDetailPanel
+          workflow={workflow}
+          onWorkflowChange={onWorkflowChange}
+          onBack={() =>
+            onWorkflowChange({ ...workflow, step: "readiness", draftStatus: "idle" })
+          }
+        />
+      </div>
+    );
+  }
+
   // ── Readiness ─────────────────────────────────────────────────────────────
   if (workflow.step === "readiness" && resolvedType) {
     const brief = buildFullCreateBrief(workflow);
@@ -500,10 +518,10 @@ export function CreateWorkflowPanel({
         <CreateContextHeader itemLabel={itemLabel} subtypeLabel={subtypeLabel} />
         <QuestionCard>
           <p className="text-lg font-semibold text-[#1f1c19]">
-            I think I have enough information.
+            Ready to create your {displayType}.
           </p>
           <p className="mt-1 text-sm text-[#6b635a]">
-            Would you like me to create the draft?
+            I have enough to draft this — review below, then create when you&apos;re ready.
           </p>
           <CreateTemplatePanel
             workflow={workflow}
@@ -519,11 +537,6 @@ export function CreateWorkflowPanel({
                   disabled={building}
                   onClick={() => {
                     onClearBuildError?.();
-                    onWorkflowChange({
-                      ...workflow,
-                      readinessConfirmed: true,
-                      draftStatus: "building",
-                    });
                     void onBuildDraft(brief);
                   }}
                   className={btnPrimary}
@@ -535,15 +548,7 @@ export function CreateWorkflowPanel({
                   disabled={building}
                   onClick={() => {
                     onClearBuildError?.();
-                    if (onAddMoreDetail) {
-                      onAddMoreDetail();
-                      return;
-                    }
-                    onWorkflowChange({
-                      ...workflow,
-                      step: "discovery",
-                      draftStatus: "idle",
-                    });
+                    onWorkflowChange(enterAddDetailStep(workflow));
                   }}
                   className={btnSecondary}
                 >
@@ -586,17 +591,10 @@ export function CreateWorkflowPanel({
             <button
               type="button"
               disabled={building}
-              onClick={() => {
-                onWorkflowChange({
-                  ...workflow,
-                  readinessConfirmed: true,
-                  draftStatus: "building",
-                });
-                void onBuildDraft(brief);
-              }}
+              onClick={() => void onBuildDraft(brief)}
               className={btnPrimary}
             >
-              {building ? `Building your ${displayType}…` : "Build Draft"}
+              {building ? `Creating your ${displayType}…` : "Create Draft"}
             </button>
             <button
               type="button"
@@ -606,11 +604,7 @@ export function CreateWorkflowPanel({
                   onAddMoreDetail();
                   return;
                 }
-                onWorkflowChange({
-                  ...workflow,
-                  step: "discovery",
-                  discoveryIndex: workflow.discoveryIndex,
-                });
+                onWorkflowChange(enterAddDetailStep(workflow));
               }}
               className={btnSecondary}
             >

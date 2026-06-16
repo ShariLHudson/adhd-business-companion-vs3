@@ -6,7 +6,7 @@ import {
   processCreateBuilderTurn,
   resolveBuilderType,
 } from "./createBuilderChat";
-import { advanceAfterTypePick, advanceToDiscovery } from "./createWorkflow";
+import { advanceAfterItemPick, advanceAfterTypePick, advanceToDiscovery } from "./createWorkflow";
 
 describe("createBuilderChat", () => {
   it("resolves strategy and SOP from user text", () => {
@@ -51,6 +51,21 @@ describe("createBuilderChat", () => {
     expect(isAffirmative("yes")).toBe(true);
     expect(isAffirmative("go ahead")).toBe(true);
     expect(isAffirmative("maybe later")).toBe(false);
+  });
+
+  it("marks chat builder workflow as split_screen", () => {
+    const { session } = bootstrapCreateBuilderSession("Video Script");
+    expect(session.workflow.questionMode).toBe("split_screen");
+  });
+
+  it("starts chat discovery when panel is still on subtype step", () => {
+    const { session } = bootstrapCreateBuilderFromWorkflow(
+      "Video Script",
+      advanceAfterItemPick("Video Script"),
+    );
+    expect(session.phase).toBe("discovery");
+    expect(session.workflow.step).not.toBe("type");
+    expect(session.workflow.questionMode).toBe("split_screen");
   });
 
   it("resumes from panel workflow at readiness without restarting", () => {
