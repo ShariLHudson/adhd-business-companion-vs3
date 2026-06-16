@@ -22,6 +22,7 @@ import {
   answeredDiscoveryCount,
 } from "./createWorkflow";
 import { buildFullCreateBrief } from "./createTemplates";
+import { logCreateBuild } from "./createBuild";
 import { DRAFT_QUICK_EDITS } from "./createWorkspaceUx";
 
 export type CreateBuilderPhase =
@@ -110,7 +111,7 @@ export const READINESS_ACTIONS: CreateBuilderAction[] = [
 ];
 
 const READINESS_PROMPT =
-  "I think I have enough information to build this. Would you like me to create the draft?";
+  "I'm ready to build this. Click **Build Draft** when you're ready.";
 
 function freshDiscoveryWorkflow(typeLabel: string): CreateWorkflowState {
   const picked = advanceAfterItemPick(typeLabel);
@@ -318,9 +319,13 @@ export function processCreateBuilderTurn(
     ) {
       const brief = buildFullCreateBrief(session.workflow);
       const generateType = resolvedTypeLabel(session.workflow) || typeLabel;
+      logCreateBuild("Build Draft clicked", {
+        itemType: generateType,
+        source: "chat",
+      });
       return {
         session: { ...session, phase: "generating", collectingExtra: false },
-        reply: `Building your **${generateType}** now — using everything you shared. Watch the workspace on the right.`,
+        reply: `Building your **${generateType}** now — using everything you shared.`,
         generateBrief: brief,
         generateType,
       };
@@ -373,6 +378,11 @@ export function processCreateBuilderTurn(
       question.id,
       trimmed,
     );
+    logCreateBuild("Answers collected", {
+      itemType: typeLabel,
+      questionId: question.id,
+      answersCount: answeredDiscoveryCount(nextWorkflow),
+    });
 
     if (discoveryComplete(typeLabel, nextWorkflow)) {
       return enterReadiness(
@@ -428,6 +438,10 @@ function enterReadiness(
       questionMode: "split_screen",
     },
   };
+  logCreateBuild("Ready to build", {
+    itemType: typeLabel,
+    answersCount: answeredDiscoveryCount(ready.workflow),
+  });
   return {
     session: ready,
     reply: READINESS_PROMPT,

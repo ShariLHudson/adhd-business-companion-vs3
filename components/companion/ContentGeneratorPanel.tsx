@@ -142,6 +142,7 @@ export function ContentGeneratorPanel({
   chatBuildRequest,
   onChatBuildComplete,
   onChatBuildFailed,
+  onCompanionBuilderAction,
   chatReviseRequest,
   onChatReviseComplete,
   chatSyncedWorkflow,
@@ -184,9 +185,15 @@ export function ContentGeneratorPanel({
   /** Chat builder phase for split-screen status copy. */
   createBuilderPhase?: CreateBuilderPhase | null;
   /** Parent-triggered build from chat builder approval. */
-  chatBuildRequest?: { type: string; brief: string; key: number } | null;
+  chatBuildRequest?: {
+    type: string;
+    brief: string;
+    key: number;
+    workflow?: CreateWorkflowState;
+  } | null;
   onChatBuildComplete?: () => void;
   onChatBuildFailed?: () => void;
+  onCompanionBuilderAction?: (action: "retry" | "add-detail") => void;
   /** Parent-triggered draft revision from chat builder. */
   chatReviseRequest?: { instruction: string; key: number } | null;
   onChatReviseComplete?: () => void;
@@ -227,7 +234,6 @@ export function ContentGeneratorPanel({
     loading ||
     workflow.draftStatus === "building" ||
     createBuilderPhase === "generating";
-  const showBuildingState = isGenerating && !draft.trim();
   const showDraftEditor =
     Boolean(draft.trim()) &&
     (workflow.buildApproved || workflow.draftStatus === "ready");
@@ -239,11 +245,12 @@ export function ContentGeneratorPanel({
     step: workflow.step,
     builderPhase: createBuilderPhase,
     loading,
+    hasError: error || workflow.draftStatus === "error",
   });
+  const showBuildingState = isGenerating && !draft.trim() && !splitScreenMode;
   const inGuidedCreate =
     !workflow.buildApproved && !isGenerating && !splitScreenMode;
-  const showSplitScreenStatus =
-    splitScreenMode && !showDraftEditor && !showBuildingState;
+  const showSplitScreenStatus = splitScreenMode && !showDraftEditor;
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
 
   useEffect(() => {
@@ -274,7 +281,7 @@ export function ContentGeneratorPanel({
   }, [draft, workflow.buildApproved, type, workflow]);
 
   useEffect(() => {
-    if (!showBuildingState) {
+    if (!showBuildingState && workspacePhase !== "generating") {
       setLoadingMessageIndex(0);
       return;
     }
@@ -282,7 +289,7 @@ export function ContentGeneratorPanel({
       setLoadingMessageIndex((i) => (i + 1) % BUILD_DRAFT_LOADING_MESSAGES.length);
     }, 2200);
     return () => window.clearInterval(id);
-  }, [showBuildingState]);
+  }, [showBuildingState, workspacePhase]);
 
   const lastReportedDetail = useRef<string>("");
   const lastSessionSyncSig = useRef<string>("");
@@ -461,6 +468,15 @@ export function ContentGeneratorPanel({
     setError(false);
     setBuildErrorMessage(null);
     setWorkflow((prev) => ({ ...prev, draftStatus: "building" }));
+    logCreateBuild("Workspace generating state set", {
+      itemType: resolvedType,
+      template: validation.templateName,
+    });
+    logCreateBuild("Draft generation called", {
+      itemType: resolvedType,
+      template: validation.templateName,
+      answersCount: validation.answersCount,
+    });
     logCreateBuild("Generation Started", {
       itemType: resolvedType,
       template: validation.templateName,
@@ -497,15 +513,11 @@ export function ContentGeneratorPanel({
           step: "improve",
           readinessConfirmed: true,
         }));
+        logCreateBuild("Draft generated", {
+          itemType: resolvedType,
+          length: content.length,
+        });
         logCreateBuild("Generation Finished");
-        logCreateBuild("Draft Saved", {
-          itemType: resolvedType,
-          length: content.length,
-        });
-        logCreateBuild("Draft Generated Successfully", {
-          itemType: resolvedType,
-          length: content.length,
-        });
         setLastActivity({
           kind: "draft",
           title: resolvedBrief || resolvedType || "Draft",
@@ -527,6 +539,7 @@ export function ContentGeneratorPanel({
         step: "parse",
         message: errMsg,
       });
+      logCreateBuild("Draft failed", { message: errMsg });
       logCreateBuild("Generation Failed", { message: errMsg });
       setError(true);
       setBuildErrorMessage(userMessage);
@@ -546,6 +559,7 @@ export function ContentGeneratorPanel({
         step: "request",
         message: errMsg,
       });
+      logCreateBuild("Draft failed", { message: errMsg });
       logCreateBuild("Generation Failed", { message: errMsg });
       setError(true);
       setBuildErrorMessage(
@@ -862,8 +876,16 @@ export function ContentGeneratorPanel({
       ? emptySavedArtifact(type, artifactTitleValue())
       : null);
 
-  function handleBuildDraft(briefText: string, typeOverride?: string) {
-    const wf = workflowRef.current;
+  function handleBuildDraft(
+    briefText: string,
+    typeOverride?: string,
+    wfOverride?: CreateWorkflowState,
+  ) {
+    const wf = wfOverride ?? workflowRef.current;
+    if (wfOverride) {
+      workflowRef.current = wfOverride;
+      setWorkflow(wfOverride);
+    }
     const resolved =
       typeOverride?.trim() || resolvedTypeLabel(wf) || type;
     if (typeOverride?.trim() && typeOverride !== type) {
@@ -888,12 +910,34 @@ export function ContentGeneratorPanel({
       return;
     }
     lastChatBuildKey.current = chatBuildRequest.key;
-    void handleBuildDraft(chatBuildRequest.brief, chatBuildRequest.type).then(
-      (ok) => {
-        if (ok) onChatBuildComplete?.();
-        else onChatBuildFailed?.();
-      },
-    );
+    const wf = {
+      ...(chatBuildRequest.workflow ?? workflowRef.current),
+      draftStatus: "building" as const,
+      questionMode: "split_screen" as const,
+      buildApproved: false,
+      step: "readiness" as const,
+    };
+    workflowRef.current = wf;
+    setWorkflow(wf);
+    setLoading(true);
+    setError(false);
+    setBuildErrorMessage(null);
+    logCreateBuild("Workspace generating state set", {
+      itemType: chatBuildRequest.type,
+      source: "chat-build-request",
+    });
+    logCreateBuild("Draft generation called", {
+      itemType: chatBuildRequest.type,
+      source: "chat-build-request",
+    });
+    void handleBuildDraft(
+      chatBuildRequest.brief,
+      chatBuildRequest.type,
+      wf,
+    ).then((ok) => {
+      if (ok) onChatBuildComplete?.();
+      else onChatBuildFailed?.();
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatBuildRequest]);
 
@@ -1072,6 +1116,28 @@ export function ContentGeneratorPanel({
           selectedSubtype={workflow.selectedSubtype}
           customSubtype={workflow.customSubtype}
           workspacePhase={workspacePhase}
+          loadingMessage={BUILD_DRAFT_LOADING_MESSAGES[loadingMessageIndex]}
+          errorMessage={buildErrorMessage}
+          onTryAgain={
+            workspacePhase === "error"
+              ? () => {
+                  setError(false);
+                  setBuildErrorMessage(null);
+                  setWorkflow((prev) => ({ ...prev, draftStatus: "idle" }));
+                  onCompanionBuilderAction?.("retry");
+                }
+              : undefined
+          }
+          onAddMoreDetail={
+            workspacePhase === "error"
+              ? () => {
+                  setError(false);
+                  setBuildErrorMessage(null);
+                  setWorkflow((prev) => enterAddDetailStep(prev));
+                  onCompanionBuilderAction?.("add-detail");
+                }
+              : undefined
+          }
         />
       )}
 

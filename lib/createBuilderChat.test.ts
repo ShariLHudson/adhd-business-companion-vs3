@@ -40,11 +40,12 @@ describe("createBuilderChat", () => {
       reply = turn.reply;
     }
     expect(session.phase).toBe("readiness");
-    expect(reply).toContain("Would you like me to create the draft");
+    expect(reply).toContain("Build Draft");
 
     const approved = processCreateBuilderTurn(session, "Build Draft");
     expect(approved.generateBrief).toContain("ElevenLabs");
     expect(approved.generateType).toBe("SOP");
+    expect(approved.reply).not.toContain("Watch the workspace");
   });
 
   it("detects affirmative approval", () => {

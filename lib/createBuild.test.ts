@@ -48,6 +48,14 @@ describe("createBuild", () => {
         step: "improve",
       }),
     ).toBe("draft-ready");
+    expect(
+      resolveCreateWorkspacePhase({
+        draft: "",
+        draftStatus: "error",
+        buildApproved: false,
+        step: "readiness",
+      }),
+    ).toBe("error");
   });
 
   it("appends extra detail and returns to readiness", () => {

@@ -117,7 +117,8 @@ export type CreateWorkspacePhase =
   | "gathering"
   | "ready"
   | "generating"
-  | "draft-ready";
+  | "draft-ready"
+  | "error";
 
 export function resolveCreateWorkspacePhase(opts: {
   draft: string;
@@ -126,12 +127,16 @@ export function resolveCreateWorkspacePhase(opts: {
   step: CreateWorkflowState["step"];
   builderPhase?: string | null;
   loading?: boolean;
+  hasError?: boolean;
 }): CreateWorkspacePhase {
   if (
     opts.draft.trim() &&
     (opts.buildApproved || opts.draftStatus === "ready")
   ) {
     return "draft-ready";
+  }
+  if (opts.draftStatus === "error" || opts.hasError) {
+    return "error";
   }
   if (
     opts.loading ||

@@ -122,6 +122,7 @@ import {
   type CreateBuilderSession,
 } from "@/lib/createBuilderChat";
 import { EMPTY_CREATE_WORKFLOW } from "@/lib/createWorkflow";
+import { logCreateBuild } from "@/lib/createBuild";
 import { CreateBuilderActionBar } from "@/components/companion/CreateBuilderActionBar";
 import {
   artifactLockHintForChat,
@@ -1046,6 +1047,7 @@ export default function CompanionPage() {
     type: string;
     brief: string;
     key: number;
+    workflow: import("@/lib/createWorkflow").CreateWorkflowState;
   } | null>(null);
   const [chatReviseRequest, setChatReviseRequest] = useState<{
     instruction: string;
@@ -2803,6 +2805,7 @@ export default function CompanionPage() {
   }
 
   function openCreateWithShari(input: CreationWorkspaceInput) {
+    logCreateBuild("Work With Shari opened", { itemType: input.itemType });
     openCreationWorkspace(
       "content-generator",
       { ...input, source: input.source ?? "generated" },
@@ -3292,24 +3295,32 @@ export default function CompanionPage() {
       }
 
       if (turn.generateBrief && turn.generateType) {
+        const wfForBuild = {
+          ...turn.session.workflow,
+          draftStatus: "building" as const,
+          readinessConfirmed: true,
+          buildApproved: false,
+          step: "readiness" as const,
+          questionMode: "split_screen" as const,
+        };
         setCreateBuilderSession((prev) =>
           prev
             ? {
                 ...prev,
                 phase: "generating",
-                workflow: {
-                  ...prev.workflow,
-                  draftStatus: "building",
-                  readinessConfirmed: true,
-                  buildApproved: false,
-                  step: "readiness",
-                },
+                workflow: wfForBuild,
               }
             : prev,
         );
+        createPanelWorkflowRef.current = wfForBuild;
+        logCreateBuild("Workspace generating state set", {
+          itemType: turn.generateType,
+          source: "chat-send",
+        });
         setChatBuildRequest({
           type: turn.generateType,
           brief: turn.generateBrief,
+          workflow: wfForBuild,
           key: Date.now(),
         });
       }
@@ -5422,6 +5433,13 @@ export default function CompanionPage() {
             chatBuildRequest={chatBuildRequest}
             onChatBuildComplete={handleChatBuildComplete}
             onChatBuildFailed={handleChatBuildFailed}
+            onCompanionBuilderAction={(action) => {
+              if (action === "retry") {
+                void handleSend("Build Draft", false, true);
+              } else if (action === "add-detail") {
+                void handleSend("Add more information", false, true);
+              }
+            }}
             chatReviseRequest={chatReviseRequest}
             onChatReviseComplete={() => setChatReviseRequest(null)}
           />

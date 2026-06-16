@@ -370,9 +370,7 @@ export function buildFullCreateBrief(state: CreateWorkflowState): string {
 }
 
 export const BUILD_DRAFT_LOADING_MESSAGES = [
-  "Creating your draft…",
-  "Using your answers…",
-  "Applying selected template…",
-  "Building sections…",
-  "Formatting draft…",
+  "Using your answers.",
+  "Applying your template.",
+  "Formatting your draft.",
 ] as const;
