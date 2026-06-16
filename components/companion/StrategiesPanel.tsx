@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   STRATEGIES,
   STRATEGY_GROUPS,
@@ -28,6 +28,11 @@ import { useVisualMode } from "@/lib/useVisualMode";
 import { StrategyUseNow } from "@/components/companion/StrategyUseNow";
 import { saveProject } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
+import { appReferences } from "@/lib/appReferences";
+import {
+  CATEGORY_COMPANION_TOOLS,
+  pickStrategyReflection,
+} from "@/lib/strategyReflections";
 
 type View =
   | { v: "home" }
@@ -265,7 +270,8 @@ export function StrategiesPanel({
           if (builtins.length + mine.length === 0) {
             return (
               <p className="mt-6 text-base text-[#9a8f82]">
-                More strategies coming to {cat.label} soon.
+                No strategies are listed here yet — check another area or save your
+                own from New strategy.
               </p>
             );
           }
@@ -543,15 +549,50 @@ export function StrategiesPanel({
     setView({ v: "home" });
     return null;
   }
+  return (
+    <StrategyBuiltinDetail
+      s={s}
+      accent={accent}
+      onOpen={onOpen}
+      onAsk={onAsk}
+      onBack={() => setView({ v: "group", group: groupForStrategy(s) })}
+      onSaved={() => setView({ v: "saved" })}
+    />
+  );
+}
+
+function StrategyBuiltinDetail({
+  s,
+  accent,
+  onOpen,
+  onAsk,
+  onBack,
+  onSaved,
+}: {
+  s: Strategy;
+  accent: (color: string) => string;
+  onOpen?: (section: AppSection) => void;
+  onAsk?: (prompt: string) => void;
+  onBack: () => void;
+  onSaved: () => void;
+}) {
   const cat = getCategory(resolveSubcat(s));
   const subcat = resolveSubcat(s);
   const accentColor = accent(cat?.color ?? "#1e4f4f");
+  const closingReflection = useMemo(
+    () => pickStrategyReflection(subcat, s),
+    [subcat, s],
+  );
+  const relatedTools = useMemo(
+    () => relatedCompanionTools(s, subcat),
+    [s, subcat],
+  );
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
       <button
         type="button"
-        onClick={() => setView({ v: "group", group: groupForStrategy(s) })}
+        onClick={onBack}
         className="self-start text-sm font-semibold text-[#1e4f4f]"
       >
         ‹ {cat?.label ?? "Back"}
@@ -563,15 +604,28 @@ export function StrategiesPanel({
         <span>⏱ About {timeForStrategy(s)} minutes</span>
       </div>
 
-      {warmthFor(subcat) && (
+      {warmthFor(subcat) ? (
         <p className="mt-3 text-base italic text-[#1e4f4f]">{warmthFor(subcat)}</p>
-      )}
+      ) : null}
 
-      <LessonHeading color={accentColor}>What is it?</LessonHeading>
-      <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">
-        {s.whyWorks.split("\n")[0]}
+      <LessonHeading color={accentColor}>What problem it solves</LessonHeading>
+      <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
+        {s.problem}
       </p>
-      <ol className="mt-3 flex flex-col gap-2">
+
+      <LessonHeading color={accentColor}>Why it works</LessonHeading>
+      <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
+        {s.whyWorks}
+      </p>
+      <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-[#6b635a]">
+        {s.whyBrain}
+      </p>
+
+      <LessonHeading color={accentColor}>When to use it</LessonHeading>
+      <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">{s.whenToUse}</p>
+
+      <LessonHeading color={accentColor}>How to use it</LessonHeading>
+      <ol className="mt-2 flex flex-col gap-2">
         {s.steps.map((step, i) => (
           <li key={i} className="flex items-start gap-3">
             <span
@@ -585,20 +639,31 @@ export function StrategiesPanel({
         ))}
       </ol>
 
-      <LessonHeading color={accentColor}>Why it helps</LessonHeading>
-      <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
-        {s.whyBrain}
-      </p>
-      <p className="mt-2 whitespace-pre-line text-base leading-relaxed text-[#2d2926]">
-        {s.whyWorks}
-      </p>
-
-      <LessonHeading color={accentColor}>When to use it</LessonHeading>
-      <p className="mt-1.5 text-base leading-relaxed text-[#2d2926]">{s.whenToUse}</p>
-      <p className="mt-2 whitespace-pre-line text-base leading-relaxed text-[#6b635a]">
+      <LessonHeading color={accentColor}>Real-life example</LessonHeading>
+      <p className="mt-1.5 whitespace-pre-line text-base leading-relaxed text-[#6b635a]">
         {s.example}
       </p>
 
+      <LessonHeading color={accentColor}>Try it right now</LessonHeading>
+      <div
+        className="mt-2 rounded-xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.04] p-4"
+        style={{ borderLeftWidth: 4, borderLeftColor: accentColor }}
+      >
+        <p className="text-sm font-medium text-[#1f1c19]">
+          Start with step 1: {s.steps[0]}
+        </p>
+        {onAsk ? (
+          <button
+            type="button"
+            onClick={() => onAsk(applyPrompt(s))}
+            className="mt-3 w-full rounded-xl bg-[#1e4f4f] px-4 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
+          >
+            Coach me through this with Shari
+          </button>
+        ) : null}
+      </div>
+
+      <LessonHeading color={accentColor}>Put this strategy into action</LessonHeading>
       <StrategyUseNow
         key={s.id}
         strategyTitle={s.title}
@@ -607,6 +672,25 @@ export function StrategiesPanel({
         onOpen={onOpen}
         onAsk={onAsk}
       />
+
+      {relatedTools.length > 0 ? (
+        <>
+          <LessonHeading color={accentColor}>Related Companion tools</LessonHeading>
+          <div className="mt-2 flex flex-wrap gap-2">
+            {relatedTools.map((tool) => (
+              <button
+                key={tool.section}
+                type="button"
+                onClick={() => onOpen?.(tool.section)}
+                disabled={!onOpen}
+                className="rounded-full border border-[#1e4f4f]/25 bg-white px-3 py-1.5 text-sm font-medium text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06] disabled:opacity-40"
+              >
+                {tool.emoji} {tool.label}
+              </button>
+            ))}
+          </div>
+        </>
+      ) : null}
 
       <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-sm font-semibold">
         <button
@@ -622,8 +706,9 @@ export function StrategiesPanel({
               steps: s.steps,
               whyItWorks: s.whyWorks,
               example: s.example,
+              reflections: s.reflections,
             });
-            setView({ v: "saved" });
+            onSaved();
           }}
           className="text-[#1e4f4f] underline decoration-[#1e4f4f]/30 underline-offset-2"
         >
@@ -668,7 +753,7 @@ export function StrategiesPanel({
       ) : null}
 
       <p className="mt-8 text-center text-sm italic text-[#9a8f82]">
-        One strategy used today is worth more than ten remembered tomorrow.
+        {closingReflection}
       </p>
     </div>
   );
@@ -689,4 +774,41 @@ function LessonHeading({
       {children}
     </h3>
   );
+}
+
+const TOOL_LABELS: Partial<Record<AppSection, { label: string; emoji: string }>> = {
+  "brain-dump": { label: "Clear My Mind", emoji: "🧠" },
+  "focus-timer": { label: "Focus Session", emoji: "🎯" },
+  breathe: { label: "Breathe & Reset", emoji: "🌿" },
+  energy: { label: "How Are You Feeling Today?", emoji: "💬" },
+  projects: { label: "Projects", emoji: "📁" },
+  "spin-wheel": { label: "Spin the Wheel", emoji: "🎡" },
+  "time-block": { label: "Time Block", emoji: "📅" },
+  "content-generator": { label: "Create", emoji: "✨" },
+  "email-generator": { label: "Email Generator", emoji: "✉️" },
+  snippets: { label: "Snippets", emoji: "📋" },
+  "templates-library": { label: "Templates", emoji: "📄" },
+  home: { label: "Chat with Shari", emoji: "💬" },
+};
+
+function relatedCompanionTools(s: Strategy, subcatId: string) {
+  const fromText = appReferences(
+    s.problem,
+    s.whyWorks,
+    s.whyBrain,
+    s.example,
+    s.deeper,
+    s.steps.join("\n"),
+  );
+  const seen = new Set(fromText.map((r) => r.section));
+  const merged = [...fromText];
+  for (const section of CATEGORY_COMPANION_TOOLS[subcatId] ?? []) {
+    if (seen.has(section)) continue;
+    const meta = TOOL_LABELS[section];
+    if (meta) {
+      merged.push({ section, label: meta.label, emoji: meta.emoji });
+      seen.add(section);
+    }
+  }
+  return merged.sort((a, b) => compareDropdownLabels(a.label, b.label));
 }

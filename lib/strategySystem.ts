@@ -60,6 +60,8 @@ export type Strategy = {
   tags?: string[]; // future: surfacing / "Recommended for me" matching
   deeper?: string; // optional "Want to understand this deeper?" (collapsed)
   recommended?: boolean; // surfaced first on the category page
+  /** Per-strategy closing reflections — used by pickStrategyReflection when set. */
+  reflections?: string[];
 };
 
 export const STRATEGY_CATEGORIES: StrategyCategory[] = [
@@ -71,6 +73,9 @@ export const STRATEGY_CATEGORIES: StrategyCategory[] = [
   { id: "burnout", group: "personal", label: "Burnout & Energy", emoji: "🌙", color: "#6b8e23", blurb: "When you're running on empty." },
   { id: "emotional-regulation", group: "personal", label: "Emotions & Self-Talk", emoji: "❤️", color: "#b0506f", blurb: "Working with hard feelings." },
   { id: "decision-making", group: "personal", label: "Decision Making", emoji: "🧭", color: "#2f4f7a", blurb: "When you're stuck choosing." },
+  { id: "future-thinking", group: "personal", label: "Future Thinking", emoji: "🔮", color: "#6366f1", blurb: "Helping future-you instead of rescuing them." },
+  { id: "visibility", group: "personal", label: "Visibility & Reminders", emoji: "👁️", color: "#c08a3e", blurb: "Making what matters impossible to miss." },
+  { id: "memory", group: "personal", label: "Memory & Capture", emoji: "📓", color: "#9a6fb0", blurb: "Freeing your brain from being a storage unit." },
   // ---- Business ----
   { id: "marketing", group: "business", label: "Marketing", emoji: "📣", color: "#c08a3e", blurb: "Getting seen by the right people." },
   { id: "sales", group: "business", label: "Sales", emoji: "💰", color: "#1e4f4f", blurb: "Turning interest into income." },
@@ -114,6 +119,29 @@ const STRATEGY_TO_SUBCAT: Record<string, string> = {
   "fix-it-fast": "customer-relations",
   "surprise-value": "customer-relations",
   "scope-before-start": "customer-relations",
+  "future-self-check": "future-thinking",
+  "first-tiny-step": "procrastination",
+  "dishes-need-friends": "overwhelm",
+  "reduce-scope": "overwhelm",
+  "one-thing-only": "focus",
+  "tab-closer": "focus",
+  "future-shari": "future-thinking",
+  "leave-breadcrumbs": "future-thinking",
+  "make-it-visible": "visibility",
+  "landing-strip": "visibility",
+  "brain-for-ideas": "memory",
+  "notepad-by-bed": "memory",
+  "reversible-or-permanent": "decision-making",
+  "elimination-round": "decision-making",
+  "protect-your-baseline": "burnout",
+  "simplify-the-offer": "offers",
+  "value-first-pricing": "pricing",
+  "raise-one-client": "pricing",
+  "template-the-repeat": "systems",
+  "batch-the-small": "productivity",
+  "monday-priority": "planning",
+  "good-enough-direction": "business-decisions",
+  "test-before-scale": "business-decisions",
 };
 
 // The subcategory a strategy lives in (map override → else its own categoryId).
@@ -800,6 +828,482 @@ export const STRATEGIES: Strategy[] = [
     ],
     recommended: true,
   },
+
+  // ============================ OVERWHELM (more) ============================
+  {
+    id: "dishes-need-friends",
+    categoryId: "overwhelm",
+    title: "The Dishes Need Friends Rule",
+    whenToUse: "When one unfinished thing spawns ten more.",
+    problem:
+      "You start one task and suddenly notice seventeen others — the desk, the inbox, the laundry, the launch.\nEach new thing you see becomes urgent, and the original task drowns.\nOne open loop pulls the whole room into focus at once.",
+    whyBrain:
+      "ADHD brains struggle to filter peripheral stimuli — everything in view registers as equally important.\nAn unfinished dish isn't just a dish; it's a signal that everything is behind.\nThe visual clutter becomes emotional clutter.",
+    whyWorks:
+      "The rule is simple: one thing can be out; everything else gets grouped or hidden.\nYou're not ignoring the rest — you're refusing to let it hijack the one thing you chose.\nFriends wait in the sink until the guest of honor is done.",
+    example:
+      "You sit down to invoice a client and spot unpaid bills, dirty mugs, and unread Slack.\nYou put the mug in the sink, close Slack, and invoice only.\nTwenty minutes later it's sent — the mugs can have their party after.",
+    steps: [
+      "Name the ONE task you're doing right now.",
+      "Put everything else out of sight or in a single \"later\" pile.",
+      "Finish the guest of honor before inviting the friends.",
+    ],
+    recommended: true,
+  },
+  {
+    id: "reduce-scope",
+    categoryId: "overwhelm",
+    title: "Reduce Scope",
+    whenToUse: "When the task grew bigger than today can hold.",
+    problem:
+      "What started as \"update the website\" is now a full rebrand in your head.\nThe scope expanded silently, and now it doesn't fit in any realistic day.\nSo you do nothing — because the version in your mind is impossible.",
+    whyBrain:
+      "ADHD all-or-nothing thinking turns a small improvement into a total overhaul without noticing.\nThe brain imagines the ideal end state, not the smallest useful slice.\nBig scope triggers freeze; tiny scope invites movement.",
+    whyWorks:
+      "Cutting scope isn't failure — it's honesty about capacity.\nA smaller version shipped beats a grand version imagined.\nYou can always expand after the first slice is real.",
+    example:
+      "\"Redo the whole sales page\" becomes \"Change the headline and one testimonial.\"\nYou ship that today.\nNext week you add a section — from momentum, not panic.",
+    steps: [
+      "Write what you thought you had to do.",
+      "Cut it to the smallest version that still helps.",
+      "Do only that slice today.",
+    ],
+    recommended: true,
+  },
+
+  // ============================ PROCRASTINATION (more) ============================
+  {
+    id: "first-tiny-step",
+    categoryId: "procrastination",
+    title: "First Tiny Step",
+    whenToUse: "When you keep waiting to feel ready.",
+    problem:
+      "You know what to do, but you keep waiting until you have the right energy, time, or mood.\n\"Ready\" keeps not arriving, and the task keeps aging.\nThe gap between knowing and starting feels uncrossable.",
+    whyBrain:
+      "ADHD waits for activation — a burst of interest or urgency — before engaging.\nReadiness is a feeling your brain may not manufacture on demand.\nSo the task stays theoretical while guilt compounds.",
+    whyWorks:
+      "A step so small it feels almost silly doesn't trigger the wall.\nYou're not committing to finish — only to touch the task.\nTouching it usually creates the activation you were waiting for.",
+    example:
+      "You've avoided calling a client back for two days.\nYou open their contact and write one sentence of what you'll say — don't dial yet.\nThat sentence becomes the call ten minutes later.",
+    steps: [
+      "Name the task you've been avoiding.",
+      "Define the first physical move — under two minutes.",
+      "Do only that move. Stopping is allowed.",
+    ],
+    reflections: [
+      "Momentum often begins before motivation.",
+      "The first inch is the hardest — after that, physics helps.",
+    ],
+    recommended: true,
+  },
+
+  // ============================ FOCUS (more) ============================
+  {
+    id: "one-thing-only",
+    categoryId: "focus",
+    title: "One Thing Only",
+    whenToUse: "When everything on your desk is competing for attention.",
+    problem:
+      "Your desk, tabs, and notes all scream for attention at once.\nYou switch every few minutes and end the hour with nothing finished.\nParallel isn't productive for a brain that pays full price for every switch.",
+    whyBrain:
+      "ADHD task-switching has a real cognitive cost — each jump leaves residue from the last thing.\nOpen loops in view pull attention like magnets.\nMultitasking feels efficient but fragments the very focus you need.",
+    whyWorks:
+      "One visible priority gives your brain permission to ignore the rest.\nEverything else still exists — it's just not today's job.\nSingle-threading is how depth actually happens.",
+    example:
+      "Six browser tabs, two notebooks, and a phone full of notifications.\nYou close everything except the doc you're writing and put your phone in another room.\nForty-five minutes later there's a finished draft.",
+    steps: [
+      "Pick one task — write it on a sticky where you'll see it.",
+      "Close or hide everything unrelated.",
+      "Work until the sticky task is done or the timer rings.",
+    ],
+    recommended: true,
+  },
+  {
+    id: "tab-closer",
+    categoryId: "focus",
+    title: "The Tab Closer",
+    whenToUse: "When your browser is a museum of half-started ideas.",
+    problem:
+      "You have thirty tabs open — research, tools, articles, half-drafted emails.\nEach tab is a tiny open loop tugging at your attention.\nThe browser becomes a to-do list that never shrinks.",
+    whyBrain:
+      "ADHD working memory can't hold thirty threads; visible tabs simulate holding them all.\nEvery favicon is a micro-distraction and a micro-decision.\nThe clutter reads as productivity while preventing depth.",
+    whyWorks:
+      "Closing tabs is a physical act of choosing — this session, this one thing.\nSaved bookmarks or a parking lot list hold the rest without the visual tax.\nFewer tabs, fewer loops, more finished work.",
+    example:
+      "You're writing a proposal with fourteen reference tabs open.\nYou bookmark three that matter, close the rest, keep only the doc.\nThe proposal gets done instead of another hour of \"research.\"",
+    steps: [
+      "Bookmark anything you truly need later.",
+      "Close every tab not required for this session.",
+      "Open only what this one task needs.",
+    ],
+    recommended: true,
+  },
+
+  // ============================ FUTURE THINKING ============================
+  {
+    id: "future-shari",
+    categoryId: "future-thinking",
+    title: "Future Shari",
+    whenToUse: "When you're handing today's work to a fantasy future-you.",
+    problem:
+      "You keep saying you'll do it \"when things calm down\" or \"this weekend when you're fresh.\"\nBut weekend-you has the same brain, the same load, and less time than you imagined.\nFuture-you becomes a scapegoat for present avoidance.",
+    whyBrain:
+      "ADHD weakens the felt connection to your future self — tomorrow feels like a different person.\nPresent-you gets relief by outsourcing; future-you inherits the panic.\nTime blindness makes the trade feel free.",
+    whyWorks:
+      "Talking to Future Shari by name makes the trade visible.\nYou ask what she'd need — a file started, a note, a calendar block — and do that now.\nSmall deposits prevent overdrafts later.",
+    example:
+      "A workshop is due Monday and you tell yourself Sunday is plenty.\nYou ask: what would Future Shari need Sunday morning to not panic?\nYou outline three slides tonight. Sunday is grateful.",
+    steps: [
+      "Name the thing you're postponing.",
+      "Ask: what would Future Me need to not be in crisis?",
+      "Do the smallest version of that gift right now.",
+    ],
+    reflections: [
+      "Future You is easier to help than rescue.",
+      "A five-minute gift today beats a Sunday scramble.",
+    ],
+    recommended: true,
+  },
+  {
+    id: "leave-breadcrumbs",
+    categoryId: "future-thinking",
+    title: "Leave Breadcrumbs",
+    whenToUse: "When you stop mid-task and can't find your place later.",
+    problem:
+      "You pause work \"for a minute\" and come back hours later with no idea where you were.\nRestarting costs as much energy as starting fresh.\nThe context vanished when you switched away.",
+    whyBrain:
+      "ADHD working memory dumps context the moment attention shifts.\nWhat felt obvious at pause is invisible on return.\nWithout an external trail, you pay the setup cost twice.",
+    whyWorks:
+      "A breadcrumb — a note, a highlighted line, \"next: fix paragraph 3\" — is a bridge for future-you.\nThirty seconds of trail-laying saves thirty minutes of re-orienting.\nYou're not over-organizing; you're buying back focus.",
+    example:
+      "You stop editing a contract mid-paragraph to take a call.\nBefore you go, you type: \"NEXT: payment terms, client asked for net-15.\"\nYou return and slide back in without rereading four pages.",
+    steps: [
+      "Before you pause, write where you stopped and what's next.",
+      "Leave the file open to that spot if you can.",
+      "Trust the breadcrumb — don't rely on memory.",
+    ],
+    recommended: true,
+  },
+
+  // ============================ VISIBILITY ============================
+  {
+    id: "make-it-visible",
+    categoryId: "visibility",
+    title: "Make It Visible Or It Doesn't Exist",
+    whenToUse: "When important things keep slipping because they're out of sight.",
+    problem:
+      "The bill, the follow-up, the daily habit — all forgotten until they're emergencies.\nIf it's not in front of your eyes, your brain acts like it isn't real.\nOut of sight isn't just out of mind — it's out of existence.",
+    whyBrain:
+      "ADHD relies heavily on environmental cues because internal reminders are unreliable.\nA task in a closed notebook might as well be on the moon.\nVisibility isn't decoration — it's the memory system.",
+    whyWorks:
+      "Putting the thing where your eyes land turns intention into frictionless action.\nSticky on the monitor, doc on the desktop, shoes by the door — each is a cue that doesn't require recall.\nYou stop depending on a brain that wasn't built for storage.",
+    example:
+      "You keep forgetting to send the proposal follow-up.\nYou pin a sticky on your keyboard: \"Follow up — Alex — today.\"\nIt goes out before lunch because you literally couldn't miss it.",
+    steps: [
+      "Pick one thing that keeps getting forgotten.",
+      "Put it where your eyes go without trying — desk, lock screen, doorway.",
+      "Remove it only when it's done.",
+    ],
+    recommended: true,
+  },
+  {
+    id: "landing-strip",
+    categoryId: "visibility",
+    title: "Landing Strip Thinking",
+    whenToUse: "When you need a clear runway for the next action.",
+    problem:
+      "You open your laptop and face a wall — files everywhere, no obvious starting point.\nThe friction of finding the thing eats the energy you needed for the work.\nEvery session starts with archaeology instead of progress.",
+    whyBrain:
+      "ADHD brains struggle to hold \"where was I?\" across gaps.\nA messy digital or physical desk is dozens of micro-decisions before the real task.\nDecision fatigue at the threshold prevents entry.",
+    whyWorks:
+      "A landing strip is a cleared, visible zone with only what the next session needs.\nYou end each work block by setting tomorrow's strip — one doc open, one note, one tab.\nStarting becomes landing, not searching.",
+    example:
+      "You end each day with your writing doc open to the next heading and research linked below.\nMorning-you opens the laptop and types immediately.\nNo folder spelunking, no \"where was I?\"",
+    steps: [
+      "Before you stop today, clear everything except what you'll need next.",
+      "Leave one obvious next step visible — a heading, a sticky, a tab.",
+      "Protect the strip: don't dump new clutter on it overnight.",
+    ],
+    recommended: true,
+  },
+
+  // ============================ MEMORY ============================
+  {
+    id: "brain-for-ideas",
+    categoryId: "memory",
+    title: "My Brain Is For Ideas, Not Storage",
+    whenToUse: "When you're trying to remember everything and dropping balls.",
+    problem:
+      "You juggle passwords, appointments, client details, and brilliant ideas in your head.\nSomething always slips — usually the thing that mattered most.\nYour brain is full, and there's no RAM left for thinking.",
+    whyBrain:
+      "ADHD working memory is limited and volatile under stress.\nTreating your head as a filing cabinet guarantees lost papers.\nIdeas need capture; storage needs a system outside your skull.",
+    whyWorks:
+      "Offloading to a trusted capture tool frees cognitive bandwidth for actual thinking.\nOne inbox — Clear My Mind, a notes app, a voice memo — beats twenty mental sticky notes.\nCapture fast, sort later, think now.",
+    example:
+      "A client mentions a deadline change in passing; you nod and forget by dinner.\nYou start saying \"let me write that down\" in every call and drop it in one inbox.\nNothing slips because nothing relies on recall.",
+    steps: [
+      "Pick one capture home — app, notebook, or Clear My Mind.",
+      "When something matters, get it out of your head in under ten seconds.",
+      "Sort the inbox once a day — capture is separate from organizing.",
+    ],
+    recommended: true,
+  },
+  {
+    id: "notepad-by-bed",
+    categoryId: "memory",
+    title: "The Notepad By The Bed",
+    whenToUse: "When thoughts strike at night and hijack your sleep.",
+    problem:
+      "You're almost asleep and suddenly remember the email, the idea, the thing you forgot.\nYou lie there looping so you won't forget — and now you can't rest.\nNight thoughts pretend they're urgent because you have nowhere to put them.",
+    whyBrain:
+      "ADHD hyperactivity doesn't always respect bedtime — ideas spike when the day quiets.\nWithout capture, the brain keeps rehearsing to prevent loss.\nThe rehearsal steals sleep, which steals tomorrow.",
+    whyWorks:
+      "A notepad and pen by the bed is a release valve — write it, trust it's held, sleep.\nThe brain relaxes when the idea has an external address.\nYou'll deal with it tomorrow; tonight is for rest.",
+    example:
+      "3 a.m. — perfect headline for tomorrow's post.\nYou scribble six words on the nightstand pad, turn off the light.\nYou sleep. Morning-you finds the headline and wins.",
+    steps: [
+      "Put paper and pen where you can reach them without getting up.",
+      "When a thought loops, write the minimum words to hold it.",
+      "Tell yourself: \"It's captured — sleep is allowed.\"",
+    ],
+    recommended: true,
+  },
+
+  // ============================ DECISION MAKING (more) ============================
+  {
+    id: "reversible-or-permanent",
+    categoryId: "decision-making",
+    title: "Reversible Or Permanent",
+    whenToUse: "When you're treating every choice like it can't be undone.",
+    problem:
+      "You're stuck because every option feels high-stakes and permanent.\nSo you research, compare, and delay — as if one wrong click ends the business.\nMost decisions aren't one-way doors, but your brain treats them all that way.",
+    whyBrain:
+      "ADHD fear of mistakes amplifies the cost of being wrong.\nWithout sorting reversible from permanent, everything gets one-way-door energy.\nThat mismatch is where paralysis lives.",
+    whyWorks:
+      "Label the decision: can I walk this back in a week?\nReversible choices deserve a fast pick and a learning loop.\nPermanent ones earn the extra care — but they're rarer than you think.",
+    example:
+      "You've spent days choosing an email subject line tool.\nYou realize: free trial, cancel anytime — fully reversible.\nYou pick one in ten minutes and learn by using it.",
+    steps: [
+      "Ask: if I'm wrong, can I undo this within a month?",
+      "If yes — pick good-enough fast and treat it as an experiment.",
+      "If no — name what makes it permanent and decide with that care.",
+    ],
+    recommended: true,
+  },
+  {
+    id: "elimination-round",
+    categoryId: "decision-making",
+    title: "Elimination Round",
+    whenToUse: "When too many options are equally loud.",
+    problem:
+      "You have five good options and can't rank them.\nEach has a case, so you keep all five alive and choose none.\nMore options feel like freedom but function like fog.",
+    whyBrain:
+      "ADHD working memory struggles to compare many variables at once.\nEvery option stays bright instead of fading as you eliminate.\nThe brain wants the perfect pick, so it refuses to drop any contender.",
+    whyWorks:
+      "Elimination is easier than selection — you're not picking the winner, you're dropping the clearly-wrong.\nTwo or three rounds leave one or two standing without a heroic ranking exercise.\nFewer finalists, faster clarity.",
+    example:
+      "Three platforms for your course — all seem fine.\nYou eliminate the one with the worst onboarding for your tech comfort.\nThen the one your audience doesn't use. The remaining choice is obvious.",
+    steps: [
+      "List the options — all of them.",
+      "Drop anything that's clearly wrong for one concrete reason.",
+      "Repeat until one or two remain, then pick between those.",
+    ],
+    recommended: true,
+  },
+
+  // ============================ BURNOUT (more) ============================
+  {
+    id: "protect-your-baseline",
+    categoryId: "burnout",
+    title: "Protect Your Baseline",
+    whenToUse: "When you're running on fumes but still adding commitments.",
+    problem:
+      "Sleep, meals, movement, and downtime keep getting sacrificed for \"just one more thing.\"\nYou dip below your baseline — the minimum that keeps you functional — and wonder why everything feels harder.\nYou're borrowing from tomorrow's energy to pay today's panic.",
+    whyBrain:
+      "ADHD hyperfocus and urgency make it easy to skip basics without noticing until you crash.\nThe baseline — sleep, food, hydration — feels optional until it isn't.\nWithout guardrails, you oscillate between sprint and collapse.",
+    whyWorks:
+      "Naming your non-negotiables — seven hours, one meal away from keyboard, a ten-minute walk — sets a floor.\nProtecting the floor keeps capacity steadier than any productivity hack.\nYou can't build on an empty tank.",
+    example:
+      "You're on your third late night and everything feels impossible.\nYou block 10 p.m. as lights-out non-negotiable for three nights.\nBy Thursday, tasks that felt brutal on Tuesday are manageable again.",
+    steps: [
+      "Name three basics that keep you functional — sleep, food, movement, or similar.",
+      "Treat them as appointments, not rewards.",
+      "When overloaded, cut work before you cut the baseline.",
+    ],
+    recommended: true,
+  },
+
+  // ============================ OFFERS (more) ============================
+  {
+    id: "simplify-the-offer",
+    categoryId: "offers",
+    title: "Simplify The Offer Stack",
+    whenToUse: "When buyers need a map to buy from you.",
+    problem:
+      "You have tiers, add-ons, bundles, and bonuses — each one seemed smart when you made it.\nBut prospects glaze over and say \"I'll think about it.\"\nYour generosity with options became their burden.",
+    whyBrain:
+      "ADHD creativity loves building variations — each new tier is stimulating to design.\nBut every option is a decision you export to a tired buyer.\nComplexity feels thorough; clarity actually converts.",
+    whyWorks:
+      "One primary offer with a clear outcome beats a menu of maybes.\nExtras can exist behind the yes — not in front of it.\nSimple stacks sell; clever stacks stall.",
+    example:
+      "Your page lists four packages and six add-ons.\nYou collapse to one signature offer with one price and one outcome sentence.\nInquiries go from \"confused\" to \"when can we start?\"",
+    steps: [
+      "Write your one-sentence outcome: \"I help X do Y.\"",
+      "Remove or hide every option that isn't required for that outcome.",
+      "Add complexity only after someone says yes.",
+    ],
+    recommended: true,
+  },
+
+  // ============================ PRICING ============================
+  {
+    id: "value-first-pricing",
+    categoryId: "pricing",
+    title: "Anchor To Value, Not Fear",
+    whenToUse: "When you're pricing from anxiety instead of outcomes.",
+    problem:
+      "You set prices by guessing what people will tolerate, not what the result is worth.\nFear of \"too expensive\" keeps you undercharging and overdelivering.\nThe number on the page doesn't match the transformation you provide.",
+    whyBrain:
+      "ADHD rejection sensitivity makes a high price feel like personal risk.\nSo you discount preemptively to avoid hearing no.\nBut underpricing attracts wrong-fit clients and burns you faster.",
+    whyWorks:
+      "Listing the concrete outcomes — time saved, revenue gained, pain removed — gives you a value anchor.\nPrice becomes a fraction of that value, not a referendum on your worth.\nYou're selling results, not hours of your anxiety.",
+    example:
+      "You charge $500 for work that saves a client ten hours a month.\nYou reframe: their time is worth $150/hour — that's $1,500/month.\n$1,200/month support fee suddenly feels reasonable — to you and them.",
+    steps: [
+      "List three measurable outcomes your client gets.",
+      "Estimate what those outcomes are worth in money or time.",
+      "Set price as a fair fraction of that value — not your fear.",
+    ],
+    recommended: true,
+  },
+  {
+    id: "raise-one-client",
+    categoryId: "pricing",
+    title: "Raise One Client First",
+    whenToUse: "When you know you're undercharging but can't face a global price change.",
+    problem:
+      "Your rates are stale but changing them everywhere feels huge and scary.\nSo you keep old prices for everyone and resent the gap.\nThe fear of one awkward conversation blocks a fair business.",
+    whyBrain:
+      "ADHD all-or-nothing thinking turns \"raise rates\" into \"rebuild entire pricing page tonight.\"\nThe scale feels catastrophic, so you do nothing.\nOne conversation is manageable; a revolution isn't.",
+    whyWorks:
+      "Raising one long-term client tests the message, the number, and your nerves at human scale.\nYou learn the words that work before rolling out broadly.\nOne yes proves the market can bear it; one no teaches you without ruin.",
+    example:
+      "You've wanted to raise rates for a year.\nYou pick your happiest retainer and explain the new value you've added.\nThey say yes — and you have proof for everyone else.",
+    steps: [
+      "Pick one client who values your work and has room to grow.",
+      "Write a short, warm note with the new rate and why.",
+      "Send it. Learn from the response before changing everyone else.",
+    ],
+    recommended: true,
+  },
+
+  // ============================ SYSTEMS (more) ============================
+  {
+    id: "template-the-repeat",
+    categoryId: "systems",
+    title: "Template The Repeat",
+    whenToUse: "When you rewrite the same email, doc, or post from scratch.",
+    problem:
+      "Every proposal, onboarding email, and social post starts as a blank page.\nYou reinvent wording you've already solved — and it drains time you don't have.\nRepetition without templates is paying full price twice.",
+    whyBrain:
+      "ADHD novelty bias makes templates feel boring even when they're efficient.\nEach blank page offers a tiny dopamine hit of creation.\nBut the cost is cumulative — hours lost to re-solving solved problems.",
+    whyWorks:
+      "A template is a decision already made — you fill in the variable parts and ship.\nGood enough template beats perfect blank page every time.\nImprove the template after you use it, not before you start.",
+    example:
+      "You write custom onboarding emails that are 90% identical.\nYou save one as a template with [NAME] and [START DATE] placeholders.\nOnboarding drops from forty minutes to ten.",
+    steps: [
+      "Notice the last thing you wrote that you'll write again.",
+      "Save it as a template with clear placeholders.",
+      "Use the template next time — tweak after, not during.",
+    ],
+    recommended: true,
+  },
+
+  // ============================ PRODUCTIVITY (more) ============================
+  {
+    id: "batch-the-small",
+    categoryId: "productivity",
+    title: "Batch The Small Stuff",
+    whenToUse: "When tiny tasks keep fracturing your day.",
+    problem:
+      "Emails, DMs, quick fixes — each one pulls you out of deep work for five minutes.\nBy afternoon you've touched twenty things and finished none.\nThe small stuff wins because it's loudest and easiest.",
+    whyBrain:
+      "ADHD brains chase quick wins — the fast reply delivers instant closure.\nBut constant switching leaves deep work orphaned.\nWithout a batch window, urgent trivia eats the calendar.",
+    whyWorks:
+      "One protected batch slot — thirty minutes for admin — contains the small stuff.\nOutside that window, it waits.\nDeep work gets long stretches; trivia gets a corral.",
+    example:
+      "You check email every time a notification pings.\nYou switch to two batch slots: 11 a.m. and 4 p.m., twenty minutes each.\nMorning deep work finally gets an hour uninterrupted.",
+    steps: [
+      "Pick one or two daily times for admin and quick replies.",
+      "Turn off notifications outside those windows.",
+      "When something small pops up, park it for the next batch.",
+    ],
+    recommended: true,
+  },
+
+  // ============================ PLANNING (more) ============================
+  {
+    id: "monday-priority",
+    categoryId: "planning",
+    title: "Monday Priority First",
+    whenToUse: "When weeks start in reactive chaos.",
+    problem:
+      "Monday arrives and email, Slack, and fires set the agenda.\nBy Wednesday you realize the important thing never got a slot.\nThe week happened to you instead of for you.",
+    whyBrain:
+      "ADHD urgency bias spotlights what's loudest, not what's important.\nWithout a Monday anchor, the week drifts on incoming noise.\nIntention needs a visible first domino.",
+    whyWorks:
+      "Before you open inbox Monday, you name the one outcome that would make the week a win.\nThat priority gets the first protected block — everything else queues behind it.\nOne anchor tilts the whole week toward progress.",
+    example:
+      "You used to open email first and lose the morning.\nNow you write \"Finish proposal\" on a sticky before the laptop fully boots.\nThe proposal ships Wednesday; email still gets handled, just not first.",
+    steps: [
+      "Sunday night or Monday morning — name the week's one must-move item.",
+      "Block the first focused hour for it before opening inbox.",
+      "Re-read the sticky when the day tries to hijack you.",
+    ],
+    recommended: true,
+  },
+
+  // ============================ BUSINESS DECISIONS ============================
+  {
+    id: "good-enough-direction",
+    categoryId: "business-decisions",
+    title: "Good Enough Direction",
+    whenToUse: "When you're waiting for certainty before moving the business.",
+    problem:
+      "You want the perfect strategy before you act — the right niche, platform, offer.\nResearch replaces risk, and quarters pass without a bet.\nCertainty rarely arrives; momentum does, from movement.",
+    whyBrain:
+      "ADHD intolerance of uncertainty makes ambiguous choices feel physically uncomfortable.\nPlanning feels productive while avoiding the vulnerability of a wrong turn.\nBut a business learns from doing, not from more tabs.",
+    whyWorks:
+      "A good-enough direction — clear for ninety days, not forever — gives you a runway to test.\nYou can correct course with data instead of hypotheticals.\nDirection beats precision when the map is still being drawn.",
+    example:
+      "You've debated niching for six months.\nYou pick one niche for ninety days and measure conversations and revenue.\nThe data tells you more than another brainstorm ever could.",
+    steps: [
+      "Write the direction you're leaning — one paragraph max.",
+      "Commit for a fixed window — 30 or 90 days.",
+      "At the end, review what you learned before changing course.",
+    ],
+    recommended: true,
+  },
+  {
+    id: "test-before-scale",
+    categoryId: "business-decisions",
+    title: "Test Before You Scale",
+    whenToUse: "When you're about to build big before anyone asked.",
+    problem:
+      "You're ready to build the full course, hire, or rebrand before testing whether anyone wants it.\nBig bets feel exciting — and expensive when they're wrong.\nScale multiplies both wins and mistakes.",
+    whyBrain:
+      "ADHD enthusiasm can sprint to the grand vision before validating the first step.\nBuilding feels like progress even when nobody's bought yet.\nThe dopamine of creation outruns the slower work of testing.",
+    whyWorks:
+      "A small test — five conversations, a paid pilot, a one-page offer — buys truth cheaply.\nYou scale what already showed signal, not what felt brilliant at 2 a.m.\nSmall bets protect the business; big bets without proof gamble it.",
+    example:
+      "You want a twelve-module course.\nYou sell a $200 beta workshop with three live sessions first.\nTwelve people pay — now you know it's worth filming twelve modules.",
+    steps: [
+      "Name the big thing you're tempted to build.",
+      "Design the smallest paid or committed test of demand.",
+      "Run the test before investing in the full build.",
+    ],
+    recommended: true,
+  },
 ];
 
 export function getCategory(id: string): StrategyCategory | undefined {
@@ -845,6 +1349,9 @@ const STRATEGY_WARMTH: Record<string, string> = {
   burnout: "You don't have to push harder right now.",
   "decision-making": "There's rarely one perfect choice — just a next one.",
   "emotional-regulation": "What you're feeling makes sense. Let's work with it gently.",
+  "future-thinking": "Future You is easier to help than rescue.",
+  visibility: "If it's not visible, your brain acts like it doesn't exist.",
+  memory: "Your brain is for thinking — give storage a home outside your head.",
   marketing: "You don't have to be everywhere — just findable.",
   sales: "Selling can just be offering help to someone who needs it.",
   content: "You already know more than enough to share.",
@@ -871,6 +1378,9 @@ const DEFAULT_ACTION: Record<string, StrategyActionId> = {
   burnout: "talk",
   "decision-making": "talk",
   "emotional-regulation": "talk",
+  "future-thinking": "timeblock",
+  visibility: "timeblock",
+  memory: "save",
   marketing: "timeblock",
   sales: "start",
   content: "timeblock",
@@ -897,6 +1407,9 @@ const DEFAULT_TIME: Record<string, number> = {
   burnout: 5,
   "decision-making": 5,
   "emotional-regulation": 5,
+  "future-thinking": 5,
+  visibility: 3,
+  memory: 2,
   marketing: 10,
   sales: 5,
   content: 10,

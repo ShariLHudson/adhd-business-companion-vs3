@@ -21,6 +21,8 @@ export type UserStrategy = {
   example?: string;
   actionButtons?: string[]; // e.g. ["focus-session", "time-block"]
   tags?: string[]; // future surfacing / "Recommended for me" matching
+  /** Closing reflection lines — rotated on strategy detail pages. */
+  reflections?: string[];
   createdAt: string;
   updatedAt: string;
 };
@@ -52,6 +54,41 @@ export function userStrategiesFor(subcatId: string): UserStrategy[] {
 }
 
 export type NewUserStrategy = Omit<UserStrategy, "id" | "createdAt" | "updatedAt">;
+
+/** Draft shape for Companion-generated strategies (confirmed by user before save). */
+export type CompanionStrategyDraft = {
+  title: string;
+  category: string;
+  description: string;
+  trigger?: string;
+  whenToUse: string;
+  steps: string[];
+  whyItWorks: string;
+  example?: string;
+  reflections?: string[];
+  tags?: string[];
+};
+
+/** Save a Companion-suggested strategy after the user confirms. */
+export function saveCompanionSuggestedStrategy(
+  draft: CompanionStrategyDraft,
+): UserStrategy[] {
+  const group =
+    STRATEGY_CATEGORIES.find((c) => c.id === draft.category)?.group ?? "personal";
+  return saveUserStrategy({
+    title: draft.title,
+    type: group,
+    category: draft.category,
+    source: "companion_suggested",
+    description: draft.trigger?.trim() || draft.description,
+    whenToUse: draft.whenToUse,
+    steps: draft.steps,
+    whyItWorks: draft.whyItWorks,
+    example: draft.example,
+    reflections: draft.reflections,
+    tags: draft.tags,
+  });
+}
 
 // Save a confirmed strategy. Returns the full list.
 export function saveUserStrategy(input: NewUserStrategy): UserStrategy[] {
@@ -95,6 +132,9 @@ const KEYWORDS: { subcat: string; words: string[] }[] = [
   { subcat: "procrastination", words: ["motivat", "drive", "momentum", "stuck in a rut", "can't get going"] },
   { subcat: "burnout", words: ["burnout", "exhaust", "depleted", "rest", "empty", "tired"] },
   { subcat: "decision-making", words: ["decide", "decision", "choose", "choice", "stuck between"] },
+  { subcat: "future-thinking", words: ["future me", "future self", "later", "tomorrow", "breadcrumb", "weekend when"] },
+  { subcat: "visibility", words: ["visible", "reminder", "forget", "out of sight", "sticky", "landing strip"] },
+  { subcat: "memory", words: ["remember", "memory", "notepad", "capture", "write it down", "storage"] },
   { subcat: "emotional-regulation", words: ["anxious", "fear", "imposter", "comparison", "feel", "shame", "overwhelmed emotionally"] },
   { subcat: "marketing", words: ["marketing", "audience", "reach", "visibility", "promote", "funnel", "ads"] },
   { subcat: "sales", words: ["sale", "sell", "close", "pitch", "follow up", "lead", "prospect", "fear builds"] },
