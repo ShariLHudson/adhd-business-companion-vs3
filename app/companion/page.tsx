@@ -6188,7 +6188,11 @@ export default function CompanionPage() {
                 if (e.target === e.currentTarget) goBack();
               }}
             >
-              <div className="mx-auto min-h-full w-full max-w-3xl rounded-3xl bg-white/80 shadow-sm backdrop-blur-sm">
+              <div
+                className="mx-auto min-h-full w-full max-w-3xl rounded-3xl bg-white/80 shadow-sm backdrop-blur-sm"
+                onClick={(e) => e.stopPropagation()}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
 
           {activeSection === "focus-timer" && (
             <WorkspaceShell onAskShari={() => openCompanionAssist("focus-timer")}>

@@ -2,105 +2,418 @@ import type { AppSection } from "@/lib/companionUi";
 
 export type HowDoIEntry = {
   id: string;
+  /** Display title, e.g. "How To: Create a Strategy" */
+  title: string;
+  /** Primary question phrasing for search and list */
   question: string;
-  answer: string;
+  whatItIs: string;
+  whenToUse: string;
+  steps: string[];
+  examples?: string[];
   keywords: string[];
   openSection?: AppSection;
+  openLabel: string;
   askPrompt?: string;
+};
+
+export const HOW_DO_I_OPEN_LABELS: Partial<Record<AppSection, string>> = {
+  playbook: "Open Strategies",
+  "content-generator": "Open Create",
+  "time-block": "Open Calendar",
+  projects: "Open Projects",
+  focus: "Open Focus",
+  "templates-library": "Open Templates",
+  "brain-dump": "Open Clear My Mind",
+  energy: "Open Adjust My Day",
+  "business-profile": "Open Business Profile",
+  settings: "Open Settings",
 };
 
 export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
   {
+    id: "create-strategy",
+    title: "How To: Create a Strategy",
+    question: "How do I create a strategy?",
+    whatItIs:
+      "A strategy is a repeatable way you solve a recurring problem — so you don't have to reinvent the answer every time.",
+    whenToUse:
+      "When the same challenge keeps showing up and you want a named approach you can reuse.",
+    examples: [
+      "The Dishes Need Friends Rule",
+      "Future Shari",
+      "Make It Visible Or It Doesn't Exist",
+    ],
+    steps: [
+      "Open Strategies.",
+      "Click New Strategy.",
+      "Describe the recurring challenge.",
+      "Describe what works for you.",
+      "Shari helps turn it into a reusable strategy you can open anytime.",
+    ],
+    keywords: [
+      "strategy",
+      "strategies",
+      "create strategy",
+      "new strategy",
+      "playbook",
+      "pattern",
+      "recurring",
+    ],
+    openSection: "playbook",
+    openLabel: "Open Strategies",
+    askPrompt:
+      "Help me create a new strategy for a recurring problem — one question at a time.",
+  },
+  {
+    id: "use-strategies",
+    title: "How To: Use a Strategy",
+    question: "How do I use strategies?",
+    whatItIs:
+      "Strategies are saved playbooks — short frameworks for problems that come back (procrastination, scope creep, decision fatigue).",
+    whenToUse:
+      "When you feel stuck and want a proven approach instead of starting from zero.",
+    steps: [
+      "Open Strategies.",
+      "Browse or search for a match.",
+      "Read the four sections.",
+      "Under “Use this strategy right now,” describe your situation.",
+      "Open the workspace Shari recommends (project, task, or decision).",
+    ],
+    keywords: ["strategy", "strategies", "playbook", "stuck", "use strategy"],
+    openSection: "playbook",
+    openLabel: "Open Strategies",
+  },
+  {
+    id: "schedule-appointment",
+    title: "How To: Schedule an Appointment",
+    question: "How do I schedule an appointment?",
+    whatItIs:
+      "Calendar (Time Bank) holds your time blocks — fixed commitments and work you assign to specific days.",
+    whenToUse:
+      "When you need to block time for a call, meeting, or focused work.",
+    steps: [
+      "Open Calendar.",
+      "Add a time block with a clear title.",
+      "Pick the date and start time.",
+      "Optional: link it to a project.",
+      "Shari can remind you when a block is about to start.",
+    ],
+    keywords: [
+      "schedule",
+      "appointment",
+      "meeting",
+      "calendar",
+      "book",
+      "block time",
+      "time block",
+    ],
+    openSection: "time-block",
+    openLabel: "Open Calendar",
+  },
+  {
+    id: "create-workshop",
+    title: "How To: Create a Workshop",
+    question: "How do I create a workshop?",
+    whatItIs:
+      "A workshop is a structured session you design for participants — agenda, outcomes, and activities.",
+    whenToUse:
+      "When you're planning a live session, webinar, or training and need an outline or materials.",
+    steps: [
+      "Open Create.",
+      "Choose Workshop (or search for it).",
+      "Answer Shari's questions one at a time in chat or the panel.",
+      "Approve when you're ready — then generate your draft.",
+      "Edit, print, save, or send to Google Docs from the workspace.",
+    ],
+    keywords: ["workshop", "webinar", "training", "session", "masterclass"],
+    openSection: "content-generator",
+    openLabel: "Open Create",
+    askPrompt: "Help me plan a workshop — one question at a time.",
+  },
+  {
     id: "plan-day",
+    title: "How To: Plan My Day",
     question: "How do I plan my day?",
-    answer:
-      "Open Adjust My Day or tell Shari “help me plan my day.” She’ll ask one question at a time and build a realistic plan for your energy.",
-    keywords: ["plan", "day", "schedule", "morning", "agenda"],
+    whatItIs:
+      "A realistic day plan matched to your energy — not an idealized to-do list.",
+    whenToUse: "Morning, after a pivot, or when the day already feels overloaded.",
+    steps: [
+      "Open Adjust My Day (or ask Shari to help plan your day).",
+      "Answer one question at a time about energy and priorities.",
+      "Review the plan Shari suggests.",
+      "Move or trim blocks in Calendar if needed.",
+    ],
+    keywords: ["plan", "day", "schedule", "morning", "agenda", "today"],
     openSection: "energy",
+    openLabel: "Open Adjust My Day",
     askPrompt: "Help me plan my day — one question at a time.",
   },
   {
     id: "use-focus",
+    title: "How To: Use Focus",
     question: "How do I use Focus?",
-    answer:
-      "Go to Focus in the sidebar. Pick a timer, calming audio, or breathing — then name one task. Everything else can wait.",
-    keywords: ["focus", "timer", "pomodoro", "concentrate", "deep work"],
+    whatItIs:
+      "Focus tools — timer, audio, breathing — to start one task without fighting your brain.",
+    whenToUse: "When you know what to do but can't seem to start.",
+    steps: [
+      "Open Focus from the sidebar.",
+      "Pick a timer, calming audio, or breathing.",
+      "Name one task — everything else can wait.",
+      "Start the session and work until the timer ends.",
+    ],
+    keywords: ["focus", "timer", "pomodoro", "concentrate", "deep work", "start"],
     openSection: "focus",
+    openLabel: "Open Focus",
   },
   {
     id: "create-project",
+    title: "How To: Create a Project",
     question: "How do I create a project?",
-    answer:
-      "Open Projects → New Project. Start blank, from a template, strategy, or Clear My Mind items — then add one next action.",
+    whatItIs:
+      "A project is a container for related work — outcome, tasks, and next actions in one place.",
+    whenToUse: "When work has multiple steps or lasts more than one session.",
+    steps: [
+      "Open Projects.",
+      "Click New Project.",
+      "Start blank, from a template, strategy, or Clear My Mind items.",
+      "Add one clear next action.",
+      "Optional: link Create drafts or time blocks to the project.",
+    ],
     keywords: ["project", "new", "create", "folder"],
     openSection: "projects",
-  },
-  {
-    id: "use-strategies",
-    question: "How do I use strategies?",
-    answer:
-      "Open Strategies, pick one, read the four sections, then under “Use this strategy right now” say what you're struggling with — ideas, projects, tasks, or decisions — and open the workspace it recommends.",
-    keywords: ["strategy", "strategies", "playbook", "stuck", "pattern"],
-    openSection: "playbook",
+    openLabel: "Open Projects",
   },
   {
     id: "create-content",
+    title: "How To: Create Content",
     question: "How do I create content?",
-    answer:
-      "Open Create, pick a category and type, answer a few questions one at a time, then tap Build my draft when you're ready. Improve with Update draft — nothing generates until you approve.",
-    keywords: ["create", "content", "write", "email", "post", "proposal"],
+    whatItIs:
+      "Create builds business assets — emails, posts, proposals, SOPs, and more — with guided questions.",
+    whenToUse: "When you need a draft, not a blank page.",
+    steps: [
+      "Open Create.",
+      "Pick a category and type.",
+      "Answer questions one at a time (chat or panel).",
+      "Approve generation when Shari has enough detail.",
+      "Edit, print, save, or export to Google Docs.",
+    ],
+    keywords: [
+      "create",
+      "content",
+      "write",
+      "email",
+      "post",
+      "proposal",
+      "sop",
+      "draft",
+    ],
     openSection: "content-generator",
+    openLabel: "Open Create",
   },
   {
     id: "time-blocks",
+    title: "How To: Use Time Bank & Calendar",
     question: "How do I use time blocks?",
-    answer:
-      "Open Time Bank. Add tasks without a time first; assign them to a day when you’re ready. Shari can remind you when a block starts.",
+    whatItIs:
+      "Time Bank holds unscheduled tasks; Calendar shows what is assigned to each day.",
+    whenToUse:
+      "When tasks need a time home, or you want to see the day at a glance.",
+    steps: [
+      "Open Calendar.",
+      "Add tasks to Time Bank without a date first.",
+      "Assign blocks to a day when you are ready.",
+      "Shari can remind you when a block starts.",
+    ],
     keywords: ["time", "block", "bank", "schedule", "calendar"],
     openSection: "time-block",
+    openLabel: "Open Calendar",
   },
   {
     id: "clear-mind",
+    title: "How To: Clear My Mind",
     question: "How do I clear my mind?",
-    answer:
-      "Open Clear My Mind from Tools. Dump everything out — no sorting required. Shari helps organize when you’re ready.",
+    whatItIs:
+      "Clear My Mind is a brain dump — get everything out without sorting first.",
+    whenToUse: "When your head feels full, noisy, or overwhelming.",
+    steps: [
+      "Open Clear My Mind from Tools.",
+      "Dump everything out — no organizing required.",
+      "Sort or send items to projects when you are ready.",
+      "Ask Shari to help prioritize if you want.",
+    ],
     keywords: ["brain", "dump", "clear", "overwhelm", "mind"],
     openSection: "brain-dump",
+    openLabel: "Open Clear My Mind",
   },
   {
     id: "templates",
+    title: "How To: Use Templates",
     question: "How do I use templates?",
-    answer:
-      "Templates Library holds frameworks. Search, pick one, open in Create, and personalize — templates are starting points, not final docs.",
+    whatItIs:
+      "Templates are starting frameworks — not finished documents.",
+    whenToUse: "When you want structure without starting from scratch.",
+    steps: [
+      "Open Templates.",
+      "Search or browse by category.",
+      "Pick a template and open it in Create.",
+      "Personalize with your details and approve generation.",
+    ],
     keywords: ["template", "framework", "reuse"],
     openSection: "templates-library",
+    openLabel: "Open Templates",
   },
   {
     id: "business-profile",
+    title: "How To: Set Up Business Profile",
     question: "How do I set up my business profile?",
-    answer:
-      "Profile → Business Profile. Add your business, who you serve, and goals — Shari uses this to personalize Create and recommendations.",
+    whatItIs:
+      "Your business profile tells Shari who you serve and what you are building.",
+    whenToUse: "Early setup, or when Create recommendations feel too generic.",
+    steps: [
+      "Open Business Profile from Profile.",
+      "Add your business, audience, and goals.",
+      "Shari uses this to personalize Create and suggestions.",
+    ],
     keywords: ["business", "profile", "setup", "personalize"],
     openSection: "business-profile",
+    openLabel: "Open Business Profile",
   },
   {
     id: "colors",
-    question: "What’s the difference between Dynamic and Meaning-Based colors?",
-    answer:
-      "Dynamic colors shift with your situation (support, focus, recovery). Meaning-Based colors stay fixed per category (Projects, Focus, Planning). Change in Settings → Appearance.",
+    title: "How To: Choose Color Mode",
+    question: "What's the difference between Dynamic and Meaning-Based colors?",
+    whatItIs:
+      "Dynamic colors shift with your situation; Meaning-Based colors stay fixed per category.",
+    whenToUse: "When the interface feels distracting or you want consistent category colors.",
+    steps: [
+      "Open Settings.",
+      "Go to Appearance.",
+      "Choose Dynamic or Meaning-Based.",
+      "Preview and save.",
+    ],
     keywords: ["color", "dynamic", "meaning", "appearance", "visual"],
-    openSection: "settings",
+    openLabel: "Ask About Settings",
+    askPrompt:
+      "What's the difference between Dynamic and Meaning-Based colors, and how do I change them in Settings?",
   },
 ];
 
+/** Strip filler words so “how do I create a strategy” matches strategy entries. */
+export function normalizeHowDoIQuery(query: string): string {
+  return query
+    .trim()
+    .toLowerCase()
+    .replace(/^how\s+(?:do\s+i|to|can\s+i)\s+/i, "")
+    .replace(/[?.!]+$/g, "")
+    .trim();
+}
+
+function scoreEntry(entry: HowDoIEntry, rawQuery: string): number {
+  const q = rawQuery.trim().toLowerCase();
+  const n = normalizeHowDoIQuery(rawQuery);
+  if (!q) return 0;
+
+  let score = 0;
+  const haystacks = [
+    entry.question.toLowerCase(),
+    entry.title.toLowerCase(),
+    entry.whatItIs.toLowerCase(),
+    ...entry.keywords,
+  ];
+
+  if (entry.question.toLowerCase().includes(q)) score += 20;
+  if (entry.title.toLowerCase().includes(n)) score += 15;
+  if (n && entry.question.toLowerCase().includes(n)) score += 12;
+
+  for (const kw of entry.keywords) {
+    if (q.includes(kw) || n.includes(kw)) score += 8;
+    if (kw.includes(n) && n.length > 2) score += 5;
+  }
+
+  const tokens = n.split(/\s+/).filter((t) => t.length > 2);
+  for (const token of tokens) {
+    if (haystacks.some((h) => h.includes(token))) score += 3;
+  }
+
+  return score;
+}
+
 export function searchHowDoI(query: string): HowDoIEntry[] {
-  const q = query.trim().toLowerCase();
-  if (!q) return [];
-  const pool = HOW_DO_I_ENTRIES.filter(
-    (e) =>
-      e.question.toLowerCase().includes(q) ||
-      e.answer.toLowerCase().includes(q) ||
-      e.keywords.some((k) => k.includes(q) || q.includes(k)),
-  );
-  return [...pool].sort((a, b) => a.question.localeCompare(b.question));
+  const q = query.trim();
+  if (!q) {
+    return [...HOW_DO_I_ENTRIES].sort((a, b) =>
+      a.question.localeCompare(b.question),
+    );
+  }
+
+  const scored = HOW_DO_I_ENTRIES.map((entry) => ({
+    entry,
+    score: scoreEntry(entry, q),
+  }))
+    .filter((row) => row.score > 0)
+    .sort((a, b) => b.score - a.score || a.entry.question.localeCompare(b.entry.question));
+
+  return scored.map((row) => row.entry);
+}
+
+/** Always returns the best guide — never null. */
+export function resolveHowDoI(query: string): HowDoIEntry {
+  const hits = searchHowDoI(query);
+  if (hits.length > 0) return hits[0]!;
+
+  const n = normalizeHowDoIQuery(query);
+  return {
+    id: "fallback",
+    title: `How To: ${query.trim() || "Get Help"}`,
+    question: query.trim() || "How do I…",
+    whatItIs:
+      "How Do I is your in-app guide — short explanations with steps and a button to open the right workspace.",
+    whenToUse: "Whenever you are not sure where something lives in the app.",
+    steps: [
+      "Try a shorter search (e.g. “strategy”, “calendar”, “create workshop”).",
+      "Tap a topic below if one fits.",
+      "Or ask Shari in chat — she can open the right place for you.",
+    ],
+    keywords: [],
+    openLabel: "Open Chat",
+    askPrompt: query.trim()
+      ? `How do I ${normalizeHowDoIQuery(query)}?`
+      : "Help me find the right tool in the app.",
+  };
+}
+
+export function formatHowDoIEntry(entry: HowDoIEntry): string {
+  const lines = [
+    entry.title,
+    "",
+    `**What it is:** ${entry.whatItIs}`,
+    "",
+    `**When to use it:** ${entry.whenToUse}`,
+  ];
+
+  if (entry.examples?.length) {
+    lines.push("", "**Examples:**", ...entry.examples.map((ex) => `- ${ex}`));
+  }
+
+  lines.push("", "**Steps:**");
+  entry.steps.forEach((step, i) => {
+    lines.push(`${i + 1}. ${step}`);
+  });
+
+  return lines.join("\n");
+}
+
+export const HOW_DO_I_FEATURED_IDS = [
+  "create-strategy",
+  "schedule-appointment",
+  "create-workshop",
+  "create-content",
+  "plan-day",
+  "use-focus",
+] as const;
+
+export function featuredHowDoIEntries(): HowDoIEntry[] {
+  return HOW_DO_I_FEATURED_IDS.map(
+    (id) => HOW_DO_I_ENTRIES.find((e) => e.id === id)!,
+  ).filter(Boolean);
 }

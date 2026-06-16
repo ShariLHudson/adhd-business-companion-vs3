@@ -1,9 +1,118 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { searchHowDoI, type HowDoIEntry } from "@/lib/howDoIContent";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  featuredHowDoIEntries,
+  formatHowDoIEntry,
+  resolveHowDoI,
+  searchHowDoI,
+  type HowDoIEntry,
+} from "@/lib/howDoIContent";
 import type { AppSection } from "@/lib/companionUi";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+
+function HowDoIDetail({
+  entry,
+  onBack,
+  onOpen,
+  onAsk,
+}: {
+  entry: HowDoIEntry;
+  onBack: () => void;
+  onOpen?: (section: AppSection) => void;
+  onAsk?: (prompt: string) => void;
+}) {
+  const openSection = entry.openSection === "home" ? null : entry.openSection;
+
+  return (
+    <div className="companion-fade-in flex min-h-0 flex-1 flex-col">
+      <button
+        type="button"
+        onClick={onBack}
+        className="self-start text-sm font-semibold text-[#1e4f4f]"
+      >
+        ‹ How Do I
+      </button>
+
+      <h2 className="mt-3 text-xl font-semibold text-[#1f1c19]">{entry.title}</h2>
+
+      <div className="mt-4 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto text-base leading-relaxed text-[#4b463f]">
+        <section>
+          <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
+            What it is
+          </p>
+          <p className="mt-1">{entry.whatItIs}</p>
+        </section>
+
+        <section>
+          <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
+            When to use it
+          </p>
+          <p className="mt-1">{entry.whenToUse}</p>
+        </section>
+
+        {entry.examples?.length ? (
+          <section>
+            <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
+              Examples
+            </p>
+            <ul className="mt-1 list-disc space-y-1 pl-5">
+              {entry.examples.map((ex) => (
+                <li key={ex}>{ex}</li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        <section>
+          <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
+            Step-by-step
+          </p>
+          <ol className="mt-1 list-decimal space-y-2 pl-5">
+            {entry.steps.map((step) => (
+              <li key={step}>{step}</li>
+            ))}
+          </ol>
+        </section>
+      </div>
+
+      <div className="mt-5 shrink-0 border-t border-[#e7dfd4] pt-4">
+        <p className="mb-2 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+          Take me there
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {openSection && onOpen ? (
+            <button
+              type="button"
+              onClick={() => onOpen(openSection)}
+              className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+            >
+              {entry.openLabel}
+            </button>
+          ) : null}
+          {entry.askPrompt && onAsk ? (
+            <button
+              type="button"
+              onClick={() => onAsk(entry.askPrompt!)}
+              className="rounded-xl border border-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
+            >
+              Ask Shari in Chat
+            </button>
+          ) : null}
+          {entry.id === "fallback" && onAsk ? (
+            <button
+              type="button"
+              onClick={() => onAsk(entry.askPrompt ?? entry.question)}
+              className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+            >
+              {entry.openLabel}
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function HowDoIPanel({
   onOpen,
@@ -16,8 +125,11 @@ export function HowDoIPanel({
 }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<HowDoIEntry | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const results = useMemo(() => searchHowDoI(query), [query]);
+  const featured = useMemo(() => featuredHowDoIEntries(), []);
+  const listEntries = query.trim() ? results : featured;
 
   useEffect(() => {
     registerBack?.(() => {
@@ -30,79 +142,114 @@ export function HowDoIPanel({
     return () => registerBack?.(null);
   }, [registerBack, selected]);
 
+  useEffect(() => {
+    const t = window.setTimeout(() => inputRef.current?.focus(), 50);
+    return () => window.clearTimeout(t);
+  }, []);
+
+  function submitQuery(raw?: string) {
+    const q = (raw ?? query).trim();
+    if (!q) return;
+    setQuery(q);
+    setSelected(resolveHowDoI(q));
+  }
+
   if (selected) {
     return (
-      <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
-        <button
-          type="button"
-          onClick={() => setSelected(null)}
-          className="self-start text-sm font-semibold text-[#1e4f4f]"
-        >
-          ‹ How Do I
-        </button>
-        <p className="mt-3 text-xl font-semibold text-[#1f1c19]">
-          {selected.question}
-        </p>
-        <p className="mt-3 text-base leading-relaxed text-[#4b463f]">
-          {selected.answer}
-        </p>
-        <div className="mt-5 flex flex-wrap gap-2">
-          {selected.openSection ? (
-            <button
-              type="button"
-              onClick={() => onOpen?.(selected.openSection!)}
-              className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
-            >
-              Open {selected.openSection === "energy" ? "Adjust My Day" : "it"}
-            </button>
-          ) : null}
-          {selected.askPrompt && onAsk ? (
-            <button
-              type="button"
-              onClick={() => onAsk(selected.askPrompt!)}
-              className="rounded-xl border border-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
-            >
-              Ask Shari
-            </button>
-          ) : null}
-        </div>
+      <div
+        className="relative z-10 mx-auto flex h-full min-h-0 max-w-xl flex-col px-6 py-8"
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        <HowDoIDetail
+          entry={selected}
+          onBack={() => setSelected(null)}
+          onOpen={onOpen}
+          onAsk={onAsk}
+        />
       </div>
     );
   }
 
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+    <div
+      className="relative z-10 mx-auto flex h-full min-h-0 max-w-xl flex-col px-6 py-8"
+      onClick={(e) => e.stopPropagation()}
+      onMouseDown={(e) => e.stopPropagation()}
+    >
       <WorkspaceGuide section="how-do-i" />
       <p className="text-2xl font-semibold text-[#1f1c19]">How Do I…</p>
       <p className="mt-1 text-base text-[#6b635a]">
-        Search for how something works — we&apos;ll show matching answers only.
+        Search or pick a topic — every answer includes steps and a button to open
+        the right place.
       </p>
-      <input
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-        placeholder="Search — plan my day, focus, projects…"
-        className="mt-4 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base outline-none focus:border-[#1e4f4f]"
-      />
-      <ul className="mt-4 flex flex-col gap-2">
-        {results.map((entry) => (
+
+      <form
+        className="relative z-10 mt-4"
+        onSubmit={(e) => {
+          e.preventDefault();
+          submitQuery();
+        }}
+      >
+        <input
+          ref={inputRef}
+          type="search"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="e.g. create a strategy, schedule an appointment…"
+          autoComplete="off"
+          enterKeyHint="search"
+          className="pointer-events-auto w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f] focus:ring-2 focus:ring-[#1e4f4f]/20"
+        />
+        <button
+          type="submit"
+          className="mt-2 w-full rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+        >
+          Show me how
+        </button>
+      </form>
+
+      <p className="mt-4 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+        {query.trim() ? "Matching topics" : "Popular topics"}
+      </p>
+      <ul className="mt-2 flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto pb-4">
+        {listEntries.map((entry) => (
           <li key={entry.id}>
             <button
               type="button"
               onClick={() => setSelected(entry)}
-              className="w-full rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-3 text-left text-base font-medium text-[#1f1c19] hover:border-[#1e4f4f]/40"
+              className="w-full rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-3 text-left hover:border-[#1e4f4f]/40"
             >
-              {entry.question}
+              <span className="block text-base font-semibold text-[#1f1c19]">
+                {entry.title}
+              </span>
+              <span className="mt-0.5 block text-sm text-[#6b635a]">
+                {entry.whatItIs.slice(0, 100)}
+                {entry.whatItIs.length > 100 ? "…" : ""}
+              </span>
             </button>
           </li>
         ))}
-        {results.length === 0 ? (
-          <li className="text-sm text-[#6b635a]">
-            {!query.trim()
-              ? "Type a search to see matching topics."
-              : "No match — try chat: “How do I…”"}
+        {query.trim() && results.length === 0 ? (
+          <li>
+            <button
+              type="button"
+              onClick={() => submitQuery(query)}
+              className="w-full rounded-xl border border-dashed border-[#1e4f4f]/35 bg-[#f0f5f5]/80 px-4 py-3 text-left"
+            >
+              <span className="block text-base font-semibold text-[#1e4f4f]">
+                Search for “{query.trim()}”
+              </span>
+              <span className="mt-0.5 block text-sm text-[#6b635a]">
+                We&apos;ll show the closest guide or help you ask Shari.
+              </span>
+            </button>
           </li>
         ) : null}
       </ul>
     </div>
   );
 }
+
+// Re-export for chat integrations
+export { formatHowDoIEntry };
