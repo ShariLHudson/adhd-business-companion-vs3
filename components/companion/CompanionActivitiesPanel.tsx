@@ -11,6 +11,15 @@ import {
   type CompanionActivity,
 } from "@/lib/companionActivities";
 import {
+  canAdvanceActivityStep,
+  defaultAnswersForField,
+  prepareStepAnswers,
+  stepField,
+  stepInstruction,
+  type ActivityAnswers,
+} from "@/lib/activityFields";
+import { ActivityStepFields } from "@/components/companion/ActivityStepFields";
+import {
   crossWorkspaceBesideLine,
   crossWorkspaceContextMessage,
 } from "@/lib/crossWorkspaceSuggestion";
@@ -32,6 +41,7 @@ export type ActivitySessionState = {
   categoryId: ActivityCategoryId | typeof NO_CATEGORY;
   linkedBesideDismissed: boolean;
   linkedBesideOpened: boolean;
+  answers: ActivityAnswers;
 };
 
 export const EMPTY_ACTIVITY_SESSION: ActivitySessionState = {
@@ -41,6 +51,7 @@ export const EMPTY_ACTIVITY_SESSION: ActivitySessionState = {
   categoryId: NO_CATEGORY,
   linkedBesideDismissed: false,
   linkedBesideOpened: false,
+  answers: {},
 };
 
 type OpenBesidePayload = {
@@ -101,6 +112,7 @@ export function CompanionActivitiesPanel({
       : activitiesForCategory(session.categoryId);
 
   function start(a: CompanionActivity) {
+    const firstField = stepField(a.steps[0]);
     patchSession({
       activityId: a.id,
       stepIndex: 0,
@@ -108,7 +120,31 @@ export function CompanionActivitiesPanel({
       categoryId: a.categoryId,
       linkedBesideDismissed: false,
       linkedBesideOpened: false,
+      answers: firstField ? { [firstField.key]: defaultAnswersForField(firstField) } : {},
     });
+  }
+
+  function ensureStepAnswers(
+    activity: CompanionActivity,
+    stepIndex: number,
+    answers: ActivityAnswers,
+  ): ActivityAnswers {
+    const field = stepField(activity.steps[stepIndex]);
+    if (!field) return answers;
+    let next = answers;
+    if (answers[field.key] === undefined && field.type !== "review-list") {
+      const initial = defaultAnswersForField(field);
+      if (initial !== undefined) {
+        next = { ...next, [field.key]: initial };
+      }
+    }
+    return prepareStepAnswers(field, next);
+  }
+
+  function goToStep(nextIndex: number) {
+    if (!activity) return;
+    const answers = ensureStepAnswers(activity, nextIndex, session.answers);
+    patchSession({ stepIndex: nextIndex, answers });
   }
 
   function stop() {
@@ -207,7 +243,11 @@ export function CompanionActivitiesPanel({
   if (session.phase === "active" && activity) {
     const cat = ACTIVITY_CATEGORIES.find((c) => c.id === activity.categoryId);
     const steps = activity.steps;
+    const currentStep = steps[session.stepIndex];
+    const field = stepField(currentStep);
+    const instruction = stepInstruction(currentStep);
     const isLast = session.stepIndex >= steps.length - 1;
+    const canAdvance = canAdvanceActivityStep(field, session.answers);
     const showLinkedSuggestion = shouldShowLinkedSuggestion(
       activity,
       session.stepIndex,
@@ -267,17 +307,22 @@ export function CompanionActivitiesPanel({
             Step {session.stepIndex + 1} of {steps.length}
           </p>
           <p className="mt-3 text-lg leading-relaxed text-[#1f1c19]">
-            {steps[session.stepIndex]}
+            {instruction}
           </p>
+          {field ? (
+            <ActivityStepFields
+              field={field}
+              answers={session.answers}
+              onChange={(answers) => patchSession({ answers })}
+            />
+          ) : null}
         </div>
 
         <div className="mt-4 flex shrink-0 flex-wrap gap-2">
           {session.stepIndex > 0 ? (
             <button
               type="button"
-              onClick={() =>
-                patchSession({ stepIndex: session.stepIndex - 1 })
-              }
+              onClick={() => goToStep(session.stepIndex - 1)}
               className="rounded-xl border border-[#c9bfb0] bg-white px-4 py-2.5 text-sm font-semibold text-[#4b463f]"
             >
               Back
@@ -286,18 +331,18 @@ export function CompanionActivitiesPanel({
           {!isLast ? (
             <button
               type="button"
-              onClick={() =>
-                patchSession({ stepIndex: session.stepIndex + 1 })
-              }
-              className="flex-1 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+              disabled={!canAdvance}
+              onClick={() => goToStep(session.stepIndex + 1)}
+              className="flex-1 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:cursor-not-allowed disabled:bg-[#9aaba8]"
             >
               Next step
             </button>
           ) : (
             <button
               type="button"
+              disabled={!canAdvance}
               onClick={finish}
-              className="flex-1 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+              className="flex-1 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:cursor-not-allowed disabled:bg-[#9aaba8]"
             >
               Done
             </button>

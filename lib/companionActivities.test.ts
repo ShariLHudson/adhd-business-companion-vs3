@@ -3,7 +3,9 @@ import {
   ACTIVITY_CATEGORIES,
   COMPANION_ACTIVITIES,
   activitiesForCategory,
+  getActivityById,
 } from "./companionActivities";
+import { stepField } from "./activityFields";
 
 describe("companionActivities", () => {
   it("has seven need-based categories with at least four activities each", () => {
@@ -27,6 +29,18 @@ describe("companionActivities", () => {
       expect(a.steps.length).toBeGreaterThanOrEqual(4);
       expect(a.timeLabel.length).toBeGreaterThan(0);
       expect(a.helpsWith.length).toBeGreaterThan(10);
+      for (const step of a.steps) {
+        expect(step.instruction.length).toBeGreaterThan(5);
+      }
     }
+  });
+
+  it("gives elimination round structured option fields", () => {
+    const activity = getActivityById("elimination-round");
+    expect(activity).toBeDefined();
+    expect(stepField(activity!.steps[0])?.type).toBe("options");
+    expect(stepField(activity!.steps[1])?.type).toBe("review-list");
+    expect(stepField(activity!.steps[2])?.type).toBe("eliminate-from");
+    expect(stepField(activity!.steps[3])?.type).toBe("pick-from");
   });
 });
