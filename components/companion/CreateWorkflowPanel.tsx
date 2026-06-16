@@ -92,8 +92,9 @@ export function CreateWorkflowPanel({
   }
 
   if (workflow.step === "type" && workflow.categoryId) {
-    const cat = catalogCategory(workflow.categoryId);
-    const items = dropdownItemsInCategory(workflow.categoryId);
+    const categoryId = workflow.categoryId;
+    const cat = catalogCategory(categoryId);
+    const items = dropdownItemsInCategory(categoryId);
     const typeOptions = items.map((item) => ({
       value: item.label,
       label: item.label,
@@ -120,17 +121,17 @@ export function CreateWorkflowPanel({
         </p>
         <div className="mt-4">
           <CategoryPickerSelect
-            label={catalogTypesPickerLabel(workflow.categoryId)}
+            label={catalogTypesPickerLabel(categoryId)}
             value={workflow.selectedTypeLabel ?? NO_CATEGORY}
             onChange={(v) => {
               if (!v) return;
               const item = items.find((i) => i.label === v);
-              const next = advanceAfterTypePick(v, workflow.categoryId);
+              const next = advanceAfterTypePick(v, categoryId);
               if (item?.route) {
                 onWorkflowChange(next);
                 return;
               }
-              onTypeSelect(v, workflow.categoryId);
+              onTypeSelect(v, categoryId);
               onWorkflowChange(advanceToDiscovery(next));
             }}
             options={typeOptions}
