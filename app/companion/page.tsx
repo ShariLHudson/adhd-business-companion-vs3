@@ -1150,6 +1150,33 @@ export default function CompanionPage() {
     createBuilderBootstrappedRef.current = true;
   }
 
+  /** When user picks a type in the Create panel while split chat is open. */
+  function syncCreateBuilderFromPanelType(typeLabel: string) {
+    const trimmed = typeLabel?.trim();
+    if (!trimmed || trimmed === "content") return;
+    const current = createBuilderSessionRef.current;
+    if (current?.typeLabel === trimmed && current.phase !== "pick-type") {
+      return;
+    }
+    if (
+      current &&
+      ["generating", "revise-offer", "done"].includes(current.phase)
+    ) {
+      return;
+    }
+    const { session, opener } = bootstrapCreateBuilderSession(trimmed);
+    setCreateBuilderSession(session);
+    syncCreateBuilderType(trimmed);
+    if (
+      !current?.typeLabel ||
+      current.phase === "pick-type" ||
+      current.typeLabel !== trimmed
+    ) {
+      setMessages((prev) => [...prev, { role: "assistant", content: opener }]);
+    }
+    createBuilderBootstrappedRef.current = true;
+  }
+
   function handleChatBuildComplete() {
     const type = createBuilderSessionRef.current?.typeLabel ?? "draft";
     setCreateBuilderSession((prev) =>
@@ -1410,8 +1437,16 @@ export default function CompanionPage() {
         };
         return genSeedEqual(prev, next) ? prev : next;
       });
+      if (
+        chatLayoutMode === "split" &&
+        workspacePanelRef.current === "content-generator" &&
+        live.type?.trim() &&
+        !live.draft?.trim()
+      ) {
+        syncCreateBuilderFromPanelType(live.type);
+      }
     },
-    [persistCreateSession],
+    [chatLayoutMode, persistCreateSession],
   );
 
   const handleSavedArtifactChange = useCallback(
