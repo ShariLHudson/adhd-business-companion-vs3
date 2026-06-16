@@ -107,7 +107,6 @@ const STRATEGY_TO_SUBCAT: Record<string, string> = {
   "borrow-belief": "emotional-regulation",
   "reduce-before-add": "burnout",
   "one-hard-thing": "focus",
-  "future-self-check": "procrastination",
   "one-channel": "marketing",
   "content-from-convos": "content",
   "repurpose-one": "content",

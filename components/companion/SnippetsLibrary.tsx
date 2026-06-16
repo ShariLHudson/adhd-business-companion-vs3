@@ -15,6 +15,7 @@ import {
 } from "@/lib/companionStore";
 import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
+import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 
 const KINDS = sortedSnippetKinds();
 

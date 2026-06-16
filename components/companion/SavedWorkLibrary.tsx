@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
+import { ConfirmDialog } from "@/components/companion/ConfirmDialog";
 import {
   archiveSavedWork,
   deleteSavedWork,
@@ -19,11 +20,11 @@ import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 
 type SavedWorkAction = "rename" | "duplicate" | "archive" | "unarchive" | "delete";
 
-const STATUS_OPTIONS: { id: SavedWorkStatus | "archived"; label: string }[] = [
-  { id: "archived", label: "Archived" },
-  { id: "draft", label: "Drafts" },
-  { id: "exported", label: "Exported" },
-  { id: "saved", label: "Saved" },
+const STATUS_OPTIONS: { value: SavedWorkStatus | "archived"; label: string }[] = [
+  { value: "archived", label: "Archived" },
+  { value: "draft", label: "Drafts" },
+  { value: "exported", label: "Exported" },
+  { value: "saved", label: "Saved" },
 ];
 
 function SavedWorkItemMenu({
