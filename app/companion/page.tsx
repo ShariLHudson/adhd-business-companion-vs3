@@ -728,6 +728,12 @@ export default function CompanionPage() {
     null,
   );
   const workspacePanelRef = useRef<AppSection | null>(null);
+  const [companionStandaloneSection, setCompanionStandaloneSection] =
+    useState<AppSection | null>(null);
+  const [guideBesideSession, setGuideBesideSession] = useState<{
+    source: { kind: "activity" } | { kind: "section"; section: AppSection };
+    targetSection: AppSection;
+  } | null>(null);
   const [chatLayoutMode, setChatLayoutModeState] =
     useState<ChatLayoutMode>(DEFAULT_CHAT_LAYOUT_MODE);
   const applyChatLayoutMode = useCallback((mode: ChatLayoutMode) => {
@@ -1152,14 +1158,8 @@ export default function CompanionPage() {
   const activeSectionRef = useRef<AppSection>("home");
   activeSectionRef.current = activeSection;
   const [workspaceFirstSplit, setWorkspaceFirstSplit] = useState(false);
-  const [companionStandaloneSection, setCompanionStandaloneSection] =
-    useState<AppSection | null>(null);
   const [activitySession, setActivitySession] =
     useState<ActivitySessionState>(EMPTY_ACTIVITY_SESSION);
-  const [guideBesideSession, setGuideBesideSession] = useState<{
-    source: { kind: "activity" } | { kind: "section"; section: AppSection };
-    targetSection: AppSection;
-  } | null>(null);
   const [workspaceContextBanner, setWorkspaceContextBanner] = useState<
     string | null
   >(null);
