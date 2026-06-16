@@ -776,12 +776,14 @@ export function ContentGeneratorPanel({
           />
         </div>
       )}
-      {!(workspaceMode && showDraftEditor) && !type && workflow.step === "category" && (
+      {!(workspaceMode && showDraftEditor) &&
+        !type &&
+        workflow.step === "category" && (
         <>
           <WorkspaceGuide section="content-generator" />
           <p className="text-2xl font-semibold text-[#1f1c19]">Create Something</p>
           <p className="mt-1 text-base text-[#6b635a]">
-            Pick an item type, narrow it down, then answer a few questions — one at a time.
+            Pick what you&apos;re making — then answer one question at a time.
           </p>
         </>
       )}
@@ -874,7 +876,7 @@ export function ContentGeneratorPanel({
       )}
 
       {inGuidedCreate && !showDraftEditor && !(workspaceMode && phase === "ready") && !loading && (
-        <div className="mt-5 flex flex-col gap-3">
+        <div className="mt-3 flex min-h-0 flex-1 flex-col">
           <CreateWorkflowPanel
             workflow={workflow}
             typeLabel={type}

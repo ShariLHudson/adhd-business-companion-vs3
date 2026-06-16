@@ -736,6 +736,18 @@ export function discoveryQuestionsForState(
   return questions[state.discoveryIndex] ?? null;
 }
 
+export function discoveryQuestionProgress(
+  typeLabel: string,
+  state: CreateWorkflowState,
+): { current: number; total: number } {
+  const questions = getDiscoveryQuestions(typeLabel, state.discoveryAnswers);
+  const total = Math.max(questions.length, 1);
+  return {
+    current: Math.min(state.discoveryIndex + 1, total),
+    total,
+  };
+}
+
 export function discoveryComplete(typeLabel: string, state: CreateWorkflowState): boolean {
   const questions = getDiscoveryQuestions(typeLabel, state.discoveryAnswers);
   return state.discoveryIndex >= questions.length;

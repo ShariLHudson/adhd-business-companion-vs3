@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import type { CreateCatalogItem } from "@/lib/createCatalog";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 import { NO_CATEGORY } from "@/lib/categoryRevealUx";
@@ -23,13 +23,80 @@ import {
   advanceToDiscovery,
   buildBriefFromWorkflow,
   categoryIdForType,
+  discoveryQuestionProgress,
   discoveryQuestionsForState,
   readinessSummary,
   resolvedTypeLabel,
   shouldOfferDiscovery,
   skipDiscoveryQuestion,
   type CreateWorkflowState,
+  type DiscoveryQuestion,
 } from "@/lib/createWorkflow";
+
+const btnPrimary =
+  "w-full rounded-xl bg-[#1e4f4f] px-5 py-3 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:cursor-not-allowed disabled:opacity-40";
+const btnSecondary =
+  "w-full rounded-xl border border-[#1e4f4f]/30 bg-white px-5 py-3 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-40";
+
+function questionHint(question: DiscoveryQuestion): string {
+  if (question.placeholder?.toLowerCase().includes("sentence")) {
+    return question.placeholder;
+  }
+  return "One sentence is enough.";
+}
+
+function CreateContextHeader({
+  itemLabel,
+  subtypeLabel,
+}: {
+  itemLabel: string;
+  subtypeLabel?: string | null;
+}) {
+  return (
+    <div className="mb-4 space-y-0.5 text-sm">
+      <p className="text-[#6b635a]">
+        Creating:{" "}
+        <span className="font-semibold text-[#1f1c19]">{itemLabel}</span>
+      </p>
+      {subtypeLabel ? (
+        <p className="text-[#6b635a]">
+          Type:{" "}
+          <span className="font-semibold text-[#1f1c19]">{subtypeLabel}</span>
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function CreateShariHelp({
+  onBuildWithShari,
+  disabled,
+}: {
+  onBuildWithShari: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div className="mt-6 border-t border-[#e7dfd4] pt-4 text-center">
+      <p className="text-sm text-[#6b635a]">Need help?</p>
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={onBuildWithShari}
+        className="mt-2 rounded-xl border border-[#1e4f4f]/25 bg-white px-5 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/5 disabled:opacity-40"
+      >
+        Work With Shari
+      </button>
+    </div>
+  );
+}
+
+function QuestionCard({ children }: { children: ReactNode }) {
+  return (
+    <div className="rounded-2xl border border-[#e7dfd4] bg-white p-5 shadow-sm">
+      {children}
+    </div>
+  );
+}
 
 export function CreateWorkflowPanel({
   workflow,
@@ -62,6 +129,14 @@ export function CreateWorkflowPanel({
 
   const resolvedType = resolvedTypeLabel(workflow) || typeLabel;
   const displayType = resolvedType || "item";
+  const itemLabel =
+    workflow.selectedTypeLabel === OTHER_OPTION
+      ? workflow.customTypeLabel?.trim() || "Custom item"
+      : workflow.selectedTypeLabel ?? displayType;
+  const subtypeLabel = effectiveSubtypeLabel(
+    workflow.selectedSubtype,
+    workflow.customSubtype,
+  );
 
   function shariInput(wf: CreateWorkflowState): CreationWorkspaceInput {
     const selected = resolvedTypeLabel(wf) || displayType;
@@ -86,63 +161,69 @@ export function CreateWorkflowPanel({
     const showingCustomItem = workflow.selectedTypeLabel === OTHER_OPTION;
 
     return (
-      <div className="companion-fade-in">
-        <p className="text-lg font-semibold text-[#1f1c19]">
-          What would you like to create?
-        </p>
-        <div className="mt-4">
-          <CategoryPickerSelect
-            label="Item type"
-            value={workflow.selectedTypeLabel ?? NO_CATEGORY}
-            onChange={(v) => {
-              if (!v) return;
-              if (v === OTHER_OPTION) {
-                onWorkflowChange(advanceAfterItemPick(v));
-                return;
-              }
-              const route = resolveCreateItemRoute(v);
-              if (route) {
-                onRoutedItem(route);
-                return;
-              }
-              const next = advanceAfterItemPick(v);
-              onTypeSelect(v, next.categoryId ?? categoryIdForType(v) ?? "content");
-              onWorkflowChange(next);
-            }}
-            options={itemOptions}
-            placeholder="Select an item type…"
-          />
-        </div>
-        {showingCustomItem ? (
+      <div className="companion-fade-in mx-auto max-w-lg">
+        <QuestionCard>
+          <p className="text-lg font-semibold text-[#1f1c19]">
+            What would you like to create?
+          </p>
           <div className="mt-4">
-            <label className="text-sm font-semibold text-[#4b463f]">
-              Tell me what you want to create.
-            </label>
-            <VoiceAnswerField
-              value={customItemText}
-              onChange={setCustomItemText}
-              multiline={false}
-              placeholder="e.g. Case study, podcast outline, onboarding packet…"
-              autoFocus
-              micTitle="Tell me what you want to create"
-            />
-            <button
-              type="button"
-              disabled={!customItemText.trim()}
-              onClick={() => {
-                const next = advanceAfterCustomItem(customItemText);
+            <CategoryPickerSelect
+              label="Item type"
+              value={workflow.selectedTypeLabel ?? NO_CATEGORY}
+              onChange={(v) => {
+                if (!v) return;
+                if (v === OTHER_OPTION) {
+                  onWorkflowChange(advanceAfterItemPick(v));
+                  return;
+                }
+                const route = resolveCreateItemRoute(v);
+                if (route) {
+                  onRoutedItem(route);
+                  return;
+                }
+                const next = advanceAfterItemPick(v);
                 onTypeSelect(
-                  customItemText.trim(),
-                  next.categoryId ?? "content",
+                  v,
+                  next.categoryId ?? categoryIdForType(v) ?? "content",
                 );
                 onWorkflowChange(next);
               }}
-              className="mt-3 rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-40"
-            >
-              Continue
-            </button>
+              options={itemOptions}
+              placeholder="Select an item type…"
+            />
           </div>
-        ) : null}
+          {showingCustomItem ? (
+            <div className="mt-4">
+              <p className="text-base font-semibold text-[#1f1c19]">
+                Tell me what you want to create.
+              </p>
+              <VoiceAnswerField
+                value={customItemText}
+                onChange={setCustomItemText}
+                multiline={false}
+                compact
+                placeholder="e.g. Case study, podcast outline…"
+                autoFocus
+                micTitle="Tell me what you want to create"
+              />
+              <button
+                type="button"
+                disabled={!customItemText.trim()}
+                onClick={() => {
+                  const next = advanceAfterCustomItem(customItemText);
+                  onTypeSelect(
+                    customItemText.trim(),
+                    next.categoryId ?? "content",
+                  );
+                  onWorkflowChange(next);
+                }}
+                className={`mt-4 ${btnPrimary}`}
+              >
+                Continue
+              </button>
+            </div>
+          ) : null}
+        </QuestionCard>
       </div>
     );
   }
@@ -157,7 +238,7 @@ export function CreateWorkflowPanel({
     const showingCustomSubtype = workflow.selectedSubtype === OTHER_OPTION;
 
     return (
-      <div className="companion-fade-in">
+      <div className="companion-fade-in mx-auto max-w-lg">
         <button
           type="button"
           onClick={() =>
@@ -170,69 +251,72 @@ export function CreateWorkflowPanel({
               customSubtype: null,
             })
           }
-          className="text-sm font-semibold text-[#1e4f4f]"
+          className="mb-3 text-sm font-semibold text-[#1e4f4f]"
         >
           ‹ Change item
         </button>
-        <p className="mt-3 text-sm font-medium text-[#1e4f4f]">{item}</p>
-        <p className="mt-1 text-lg font-semibold text-[#1f1c19]">
-          {subtypePickerLabel(item)}
-        </p>
-        <div className="mt-4">
-          <CategoryPickerSelect
-            label="Subtype"
-            value={workflow.selectedSubtype ?? NO_CATEGORY}
-            onChange={(v) => {
-              if (!v) return;
-              if (v === OTHER_OPTION) {
-                onWorkflowChange(advanceAfterSubtypePick(workflow, v));
-                return;
-              }
-              const categoryId =
-                workflow.categoryId ?? categoryIdForType(item) ?? "content";
-              onTypeSelect(item, categoryId);
-              onWorkflowChange(
-                advanceToDiscovery(advanceAfterSubtypePick(workflow, v), {
-                  preserveAnswers: true,
-                }),
-              );
-            }}
-            options={subtypeOptions}
-            placeholder="Select a subtype…"
-          />
-        </div>
-        {showingCustomSubtype ? (
+        <CreateContextHeader itemLabel={item} />
+        <QuestionCard>
+          <p className="text-lg font-semibold text-[#1f1c19]">
+            {subtypePickerLabel(item)}
+          </p>
           <div className="mt-4">
-            <label className="text-sm font-semibold text-[#4b463f]">
-              Tell me more specifically.
-            </label>
-            <VoiceAnswerField
-              value={customSubtypeText}
-              onChange={setCustomSubtypeText}
-              multiline={false}
-              placeholder={`What kind of ${item.toLowerCase()} is this?`}
-              autoFocus
-            />
-            <button
-              type="button"
-              disabled={!customSubtypeText.trim()}
-              onClick={() => {
+            <CategoryPickerSelect
+              label="Subtype"
+              value={workflow.selectedSubtype ?? NO_CATEGORY}
+              onChange={(v) => {
+                if (!v) return;
+                if (v === OTHER_OPTION) {
+                  onWorkflowChange(advanceAfterSubtypePick(workflow, v));
+                  return;
+                }
                 const categoryId =
                   workflow.categoryId ?? categoryIdForType(item) ?? "content";
                 onTypeSelect(item, categoryId);
                 onWorkflowChange(
-                  advanceToDiscovery(
-                    advanceAfterCustomSubtype(workflow, customSubtypeText),
-                    { preserveAnswers: true },
-                  ),
+                  advanceToDiscovery(advanceAfterSubtypePick(workflow, v), {
+                    preserveAnswers: true,
+                  }),
                 );
               }}
-              className="mt-3 rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-40"
-            >
-              Continue
-            </button>
+              options={subtypeOptions}
+              placeholder="Select a subtype…"
+            />
           </div>
-        ) : null}
+          {showingCustomSubtype ? (
+            <div className="mt-4">
+              <p className="text-base font-semibold text-[#1f1c19]">
+                Tell me more specifically.
+              </p>
+              <VoiceAnswerField
+                value={customSubtypeText}
+                onChange={setCustomSubtypeText}
+                multiline={false}
+                compact
+                placeholder={`What kind of ${item.toLowerCase()} is this?`}
+                autoFocus
+              />
+              <button
+                type="button"
+                disabled={!customSubtypeText.trim()}
+                onClick={() => {
+                  const categoryId =
+                    workflow.categoryId ?? categoryIdForType(item) ?? "content";
+                  onTypeSelect(item, categoryId);
+                  onWorkflowChange(
+                    advanceToDiscovery(
+                      advanceAfterCustomSubtype(workflow, customSubtypeText),
+                      { preserveAnswers: true },
+                    ),
+                  );
+                }}
+                className={`mt-4 ${btnPrimary}`}
+              >
+                Continue
+              </button>
+            </div>
+          ) : null}
+        </QuestionCard>
       </div>
     );
   }
@@ -245,26 +329,29 @@ export function CreateWorkflowPanel({
   ) {
     const selected = resolvedTypeLabel(workflow) || workflow.selectedTypeLabel;
     return (
-      <div className="companion-fade-in">
-        <p className="text-lg font-semibold text-[#1f1c19]">
-          Ready to shape your {selected}?
-        </p>
-        <button
-          type="button"
-          onClick={() => {
-            const categoryId =
-              workflow.categoryId ??
-              categoryIdForType(selected) ??
-              "content";
-            onTypeSelect(selected, categoryId);
-            onWorkflowChange(
-              advanceToDiscovery(workflow, { preserveAnswers: true }),
-            );
-          }}
-          className="mt-5 w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-        >
-          Answer a few questions
-        </button>
+      <div className="companion-fade-in mx-auto max-w-lg">
+        <CreateContextHeader itemLabel={selected} subtypeLabel={subtypeLabel} />
+        <QuestionCard>
+          <p className="text-lg font-semibold text-[#1f1c19]">
+            Ready to shape your {selected}?
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              const categoryId =
+                workflow.categoryId ??
+                categoryIdForType(selected) ??
+                "content";
+              onTypeSelect(selected, categoryId);
+              onWorkflowChange(
+                advanceToDiscovery(workflow, { preserveAnswers: true }),
+              );
+            }}
+            className={`mt-4 ${btnPrimary}`}
+          >
+            Continue
+          </button>
+        </QuestionCard>
       </div>
     );
   }
@@ -274,15 +361,17 @@ export function CreateWorkflowPanel({
     return null;
   }
 
-  // ── Discovery ─────────────────────────────────────────────────────────────
+  // ── Discovery — one question at a time ────────────────────────────────────
   if (workflow.step === "discovery" && resolvedType) {
     const question = discoveryQuestionsForState(resolvedType, workflow);
     if (!question) {
       onWorkflowChange({ ...workflow, step: "readiness" });
       return null;
     }
+    const { current, total } = discoveryQuestionProgress(resolvedType, workflow);
+
     return (
-      <div className="companion-fade-in">
+      <div className="companion-fade-in mx-auto max-w-lg">
         <button
           type="button"
           onClick={() =>
@@ -292,156 +381,154 @@ export function CreateWorkflowPanel({
               discoveryIndex: 0,
             })
           }
-          className="text-sm font-semibold text-[#1e4f4f]"
+          className="mb-3 text-sm font-semibold text-[#1e4f4f]"
         >
           ‹ Back
         </button>
-        <p className="mt-2 text-sm font-medium text-[#1e4f4f]">{displayType}</p>
-        {effectiveSubtypeLabel(workflow.selectedSubtype, workflow.customSubtype) ? (
-          <p className="text-sm text-[#6b635a]">
-            {effectiveSubtypeLabel(workflow.selectedSubtype, workflow.customSubtype)}
+        <CreateContextHeader itemLabel={itemLabel} subtypeLabel={subtypeLabel} />
+        <QuestionCard>
+          <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+            Question {current} of {total}
           </p>
+          <p className="mt-2 text-lg font-semibold text-[#1f1c19]">
+            {question.prompt}
+          </p>
+          <p className="mt-1 text-sm text-[#6b635a]">{questionHint(question)}</p>
+          <VoiceAnswerField
+            value={draftAnswer}
+            onChange={setDraftAnswer}
+            placeholder={question.placeholder ?? "Your answer…"}
+            autoFocus
+            compact
+            multiline={false}
+            className="mt-4"
+            micTitle={`Answer: ${question.prompt}`}
+          />
+          <div className="mt-4 flex flex-col gap-2">
+            <button
+              type="button"
+              disabled={!draftAnswer.trim()}
+              onClick={() => {
+                const next = advanceAfterDiscoveryAnswer(
+                  workflow,
+                  resolvedType,
+                  question.id,
+                  draftAnswer.trim(),
+                );
+                setDraftAnswer("");
+                onWorkflowChange(next);
+              }}
+              className={btnPrimary}
+            >
+              Continue
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                const next = skipDiscoveryQuestion(
+                  workflow,
+                  resolvedType,
+                  question.id,
+                );
+                setDraftAnswer("");
+                onWorkflowChange(next);
+              }}
+              className="text-sm font-semibold text-[#9a8f82] hover:text-[#6b635a]"
+            >
+              Skip this question
+            </button>
+          </div>
+        </QuestionCard>
+        {onBuildWithShari ? (
+          <CreateShariHelp
+            disabled={building}
+            onBuildWithShari={() => onBuildWithShari(shariInput(workflow))}
+          />
         ) : null}
-        <p className="mt-2 text-lg font-semibold text-[#1f1c19]">{question.prompt}</p>
-        <p className="mt-1 text-sm text-[#6b635a]">
-          <span className="font-medium text-[#4b463f]">Why I&apos;m asking:</span>{" "}
-          {question.why}
-        </p>
-        <VoiceAnswerField
-          value={draftAnswer}
-          onChange={setDraftAnswer}
-          placeholder={question.placeholder ?? "A sentence or two is enough."}
-          autoFocus
-          className="mt-4"
-          micTitle={`Answer: ${question.prompt}`}
-        />
-        <div className="mt-4 flex flex-wrap gap-2">
-          <button
-            type="button"
-            disabled={!draftAnswer.trim()}
-            onClick={() => {
-              const next = advanceAfterDiscoveryAnswer(
-                workflow,
-                resolvedType,
-                question.id,
-                draftAnswer.trim(),
-              );
-              setDraftAnswer("");
-              onWorkflowChange(next);
-            }}
-            className="rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-40"
-          >
-            Continue
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              const next = skipDiscoveryQuestion(
-                workflow,
-                resolvedType,
-                question.id,
-              );
-              setDraftAnswer("");
-              onWorkflowChange(next);
-            }}
-            className="rounded-xl border border-[#c9bfb0] px-4 py-2.5 text-sm font-semibold text-[#6b635a]"
-          >
-            Skip
-          </button>
-        </div>
       </div>
     );
   }
 
   // ── Readiness ─────────────────────────────────────────────────────────────
   if (workflow.step === "readiness" && resolvedType) {
-    const summary = readinessSummary(resolvedType, workflow.discoveryAnswers);
     const brief = buildBriefFromWorkflow(workflow);
-    const subtype = effectiveSubtypeLabel(
-      workflow.selectedSubtype,
-      workflow.customSubtype,
-    );
+    const summary = readinessSummary(resolvedType, workflow.discoveryAnswers);
 
     return (
-      <div className="companion-fade-in">
-        <button
-          type="button"
-          onClick={() =>
-            onWorkflowChange({
-              ...workflow,
-              step: "discovery",
-              discoveryIndex: 0,
-            })
-          }
-          className="text-sm font-semibold text-[#1e4f4f]"
-        >
-          ‹ Edit answers
-        </button>
-        <p className="mt-2 text-lg font-semibold text-[#1f1c19]">
-          Ready to build your {displayType}
-          {subtype ? ` (${subtype})` : ""}.
-        </p>
-        <p className="mt-1 text-sm text-[#6b635a]">
-          I think I have enough information to build this. Would you like me to create the draft?
-        </p>
-        {summary.length > 0 ? (
-          <ul className="mt-4 flex flex-col gap-3 rounded-xl border border-[#d4cdc3] bg-white/90 p-4">
-            {summary.map((row) => (
-              <li key={row.label}>
-                <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-                  {row.label}
-                </p>
-                <p className="mt-0.5 text-base text-[#1f1c19]">{row.value}</p>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-        <div className="mt-5 flex flex-col gap-3">
-          <button
-            type="button"
-            disabled={building}
-            onClick={() => {
-              onWorkflowChange({
-                ...workflow,
-                readinessConfirmed: true,
-                buildApproved: true,
-                step: "improve",
-              });
-              onBuildDraft(brief);
-            }}
-            className="w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
-          >
-            {building ? `Building your ${displayType}…` : "Build Draft"}
-          </button>
-          <button
-            type="button"
-            disabled={building}
-            onClick={() => {
-              if (onAddMoreDetail) {
-                onAddMoreDetail();
-                return;
-              }
-              onWorkflowChange({
-                ...workflow,
-                step: "discovery",
-                discoveryIndex: workflow.discoveryIndex,
-              });
-            }}
-            className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
-          >
-            Add More Detail
-          </button>
-          {onBuildWithShari ? (
+      <div className="companion-fade-in mx-auto max-w-lg">
+        <CreateContextHeader itemLabel={itemLabel} subtypeLabel={subtypeLabel} />
+        <QuestionCard>
+          <p className="text-lg font-semibold text-[#1f1c19]">
+            I think I have enough information.
+          </p>
+          <p className="mt-1 text-sm text-[#6b635a]">
+            Would you like me to create the draft?
+          </p>
+          {summary.length > 0 ? (
+            <details className="mt-4 rounded-xl border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2">
+              <summary className="cursor-pointer text-sm font-semibold text-[#6b635a]">
+                Review what you shared ({summary.length})
+              </summary>
+              <ul className="mt-2 space-y-2 text-sm text-[#4b463f]">
+                {summary.map((row) => (
+                  <li key={row.label}>
+                    <span className="font-semibold text-[#1f1c19]">
+                      {row.label}
+                    </span>
+                    <br />
+                    {row.value}
+                  </li>
+                ))}
+              </ul>
+            </details>
+          ) : null}
+          <div className="mt-5 flex flex-col gap-2">
             <button
               type="button"
               disabled={building}
-              onClick={() => onBuildWithShari(shariInput(workflow))}
-              className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
+              onClick={() => {
+                onWorkflowChange({
+                  ...workflow,
+                  readinessConfirmed: true,
+                  buildApproved: true,
+                  step: "improve",
+                });
+                onBuildDraft(brief);
+              }}
+              className={btnPrimary}
             >
-              💬 Work With Shari
+              {building ? `Building your ${displayType}…` : "Build Draft"}
             </button>
-          ) : null}
-        </div>
+            <button
+              type="button"
+              disabled={building}
+              onClick={() => {
+                if (onAddMoreDetail) {
+                  onAddMoreDetail();
+                  return;
+                }
+                onWorkflowChange({
+                  ...workflow,
+                  step: "discovery",
+                  discoveryIndex: workflow.discoveryIndex,
+                });
+              }}
+              className={btnSecondary}
+            >
+              Add More Detail
+            </button>
+            {onBuildWithShari ? (
+              <button
+                type="button"
+                disabled={building}
+                onClick={() => onBuildWithShari(shariInput(workflow))}
+                className={btnSecondary}
+              >
+                Work With Shari
+              </button>
+            ) : null}
+          </div>
+        </QuestionCard>
       </div>
     );
   }
