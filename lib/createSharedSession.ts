@@ -12,6 +12,7 @@ import {
 
 export type SharedCreateSessionSnapshot = {
   sessionId: string;
+  mode: "create_only" | "split_screen";
   itemType: string;
   subtype: string | null;
   templateId: string | null;
@@ -30,8 +31,11 @@ export function snapshotSharedCreateSession(
   sessionId?: string | null,
 ): SharedCreateSessionSnapshot {
   const itemType = resolvedTypeLabel(workflow);
+  const mode =
+    workflow.questionMode === "split_screen" ? "split_screen" : "create_only";
   return {
     sessionId: sessionId ?? workflow.sessionId ?? "local",
+    mode,
     itemType,
     subtype: workflow.selectedSubtype ?? workflow.customSubtype ?? null,
     templateId: workflow.selectedTemplateId ?? null,

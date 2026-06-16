@@ -124,6 +124,10 @@ import {
 import { EMPTY_CREATE_WORKFLOW } from "@/lib/createWorkflow";
 import { logCreateBuild } from "@/lib/createBuild";
 import {
+  logChatBuildDraftTriggered,
+  type CreateBuildDraftHandler,
+} from "@/lib/createBuildDraft";
+import {
   logSharedCreateSession,
   newCreateSessionId,
 } from "@/lib/createSharedSession";
@@ -1059,6 +1063,7 @@ export default function CompanionPage() {
   } | null>(null);
   const createBuilderBootstrappedRef = useRef(false);
   const createPanelWorkflowRef = useRef(EMPTY_CREATE_WORKFLOW);
+  const createPanelBuildRef = useRef<CreateBuildDraftHandler | null>(null);
   const [googleWorkspace, setGoogleWorkspace] =
     useState<GoogleWorkspaceSession | null>(null);
   const googleWorkspaceRef = useRef<GoogleWorkspaceSession | null>(null);
@@ -1178,7 +1183,7 @@ export default function CompanionPage() {
     };
     setCreateBuilderSession(withSession);
     createPanelWorkflowRef.current = withSession.workflow;
-    logSharedCreateSession("Active create session found", withSession.workflow, sessionId);
+    logSharedCreateSession("splitScreenCreateSession found", withSession.workflow, sessionId);
     if (session.typeLabel) syncCreateBuilderType(session.typeLabel);
     setMessages((prev) => {
       if (
@@ -1215,7 +1220,18 @@ export default function CompanionPage() {
       trimmed,
       createPanelWorkflowRef.current,
     );
-    setCreateBuilderSession(session);
+    const sessionId =
+      createPanelWorkflowRef.current.sessionId ?? newCreateSessionId();
+    const withSession = {
+      ...session,
+      workflow: {
+        ...session.workflow,
+        sessionId,
+        questionMode: "split_screen" as const,
+      },
+    };
+    setCreateBuilderSession(withSession);
+    createPanelWorkflowRef.current = withSession.workflow;
     syncCreateBuilderType(trimmed);
     if (
       !current?.typeLabel ||
@@ -1225,6 +1241,31 @@ export default function CompanionPage() {
       setMessages((prev) => [...prev, { role: "assistant", content: opener }]);
     }
     createBuilderBootstrappedRef.current = true;
+  }
+
+  async function triggerChatBuildDraft(
+    brief: string,
+    itemType: string,
+    workflow: import("@/lib/createWorkflow").CreateWorkflowState,
+  ): Promise<boolean> {
+    logChatBuildDraftTriggered({ type: itemType, workflow, mode: "split_screen" });
+    const handler = createPanelBuildRef.current;
+    if (handler) {
+      return handler({
+        brief,
+        type: itemType,
+        workflow,
+        fromChat: true,
+        mode: "split_screen",
+      });
+    }
+    setChatBuildRequest({
+      type: itemType,
+      brief,
+      workflow,
+      key: Date.now(),
+    });
+    return true;
   }
 
   function handleChatBuildComplete(result: {
@@ -1289,7 +1330,7 @@ export default function CompanionPage() {
 
   function handleChatBuildFailed() {
     setChatBuildRequest(null);
-    logCreateBuild("Generation failed", { source: "chat-build" });
+    logCreateBuild("draftGenerationFailed", { source: "chat-build" });
     setCreateBuilderSession((prev) =>
       prev
         ? {
@@ -3142,6 +3183,7 @@ export default function CompanionPage() {
     if (createBuilderBootstrappedRef.current) return;
     startCreateBuilderChat(
       creationContext?.itemType ?? genSeed?.type ?? lockedArtifactType,
+      createPanelWorkflowRef.current,
     );
   }, [
     splitCreateChat,
@@ -3324,10 +3366,10 @@ export default function CompanionPage() {
       };
       setCreateBuilderSession(nextSession);
       createPanelWorkflowRef.current = nextSession.workflow;
-      logSharedCreateSession("Chat answer saved", nextSession.workflow, sessionId);
+      logSharedCreateSession("chatAnswerSaved", nextSession.workflow, sessionId);
 
       if (nextSession.phase === "readiness") {
-        logCreateBuild("Ready to build set", {
+        logCreateBuild("readyToBuild true", {
           itemType: nextSession.typeLabel,
           sessionId,
         });
@@ -3363,21 +3405,29 @@ export default function CompanionPage() {
             : prev,
         );
         createPanelWorkflowRef.current = wfForBuild;
-        logCreateBuild("Build requested", {
-          itemType: turn.generateType,
-          source: "chat-send",
-          sessionId: wfForBuild.sessionId,
-        });
-        logCreateBuild("Workspace generating state set", {
-          itemType: turn.generateType,
-          source: "chat-send",
-        });
-        setChatBuildRequest({
-          type: turn.generateType,
-          brief: turn.generateBrief,
-          workflow: wfForBuild,
-          key: Date.now(),
-        });
+        const started = await triggerChatBuildDraft(
+          turn.generateBrief,
+          turn.generateType,
+          wfForBuild,
+        );
+        if (started) {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content: `Creating your **${turn.generateType}** draft now.`,
+            },
+          ]);
+        } else {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "assistant",
+              content:
+                "Something went wrong starting your draft — try **Build Draft** again.",
+            },
+          ]);
+        }
       }
 
       if (turn.reviseInstruction) {
@@ -5485,6 +5535,9 @@ export default function CompanionPage() {
             chatSyncedWorkflow={
               splitCreateChat ? createBuilderSession?.workflow ?? null : null
             }
+            onRegisterBuildDraft={(handler) => {
+              createPanelBuildRef.current = handler;
+            }}
             chatBuildRequest={chatBuildRequest}
             onChatBuildComplete={handleChatBuildComplete}
             onChatBuildFailed={handleChatBuildFailed}

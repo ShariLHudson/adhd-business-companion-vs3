@@ -328,7 +328,7 @@ export function processCreateBuilderTurn(
       });
       return {
         session: { ...session, phase: "generating", collectingExtra: false },
-        reply: `Building your **${generateType}** now — using everything you shared.`,
+        reply: "",
         generateBrief: brief,
         generateType,
       };

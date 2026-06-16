@@ -45,7 +45,7 @@ describe("createBuilderChat", () => {
     const approved = processCreateBuilderTurn(session, "Build Draft");
     expect(approved.generateBrief).toContain("ElevenLabs");
     expect(approved.generateType).toBe("SOP");
-    expect(approved.reply).not.toContain("Watch the workspace");
+    expect(approved.reply).toBe("");
   });
 
   it("detects affirmative approval", () => {

@@ -64,6 +64,14 @@ import {
   enterAddDetailStep,
   resolveCreateWorkspacePhase,
 } from "@/lib/createBuild";
+import {
+  logDraftGenerated,
+  logDraftGenerationFailed,
+  logDraftRenderedInWorkspace,
+  logSharedBuildDraftCalled,
+  type CreateBuildDraftHandler,
+  type CreateBuildDraftParams,
+} from "@/lib/createBuildDraft";
 import { CreateWorkflowPanel } from "@/components/companion/CreateWorkflowPanel";
 import { CreateSplitScreenStatus } from "@/components/companion/CreateSplitScreenStatus";
 import type { CreateBuilderPhase } from "@/lib/createBuilderChat";
@@ -147,6 +155,7 @@ export function ContentGeneratorPanel({
   chatReviseRequest,
   onChatReviseComplete,
   chatSyncedWorkflow,
+  onRegisterBuildDraft,
 }: {
   seed: GenSeed;
   onOpen?: (s: AppSection) => void;
@@ -203,6 +212,8 @@ export function ContentGeneratorPanel({
   onChatReviseComplete?: () => void;
   /** Chat builder workflow — kept in sync with the Create panel. */
   chatSyncedWorkflow?: CreateWorkflowState | null;
+  /** Register the shared build-draft handler (create-only + split-screen). */
+  onRegisterBuildDraft?: (handler: CreateBuildDraftHandler | null) => void;
 }) {
   const [type, setType] = useState(seed?.type ?? "");
   const [topic, setTopic] = useState(seed?.topic ?? seed?.brief ?? "");
@@ -367,9 +378,18 @@ export function ContentGeneratorPanel({
   useEffect(() => {
     if (!companionBuilderMode || !chatSyncedWorkflow) return;
     const local = workflowRef.current;
+    const chatAhead =
+      chatSyncedWorkflow.draftStatus === "ready" &&
+      Boolean(chatSyncedWorkflow.draftContent?.trim());
+    const panelAhead =
+      local.draftStatus === "building" ||
+      (local.draftStatus === "ready" && Boolean(local.draftContent?.trim()));
+    if (panelAhead && !chatAhead) {
+      return;
+    }
     if (
-      local.draftStatus === "ready" &&
-      Boolean(local.draftContent?.trim()) &&
+      local.draftStatus === "building" &&
+      chatSyncedWorkflow.draftStatus !== "building" &&
       chatSyncedWorkflow.draftStatus !== "ready"
     ) {
       return;
@@ -950,8 +970,9 @@ export function ContentGeneratorPanel({
     } else if (resolved && resolved !== type) {
       setType(resolved);
     }
-    logCreateBuild("Build Draft Clicked", {
+    logCreateBuild(fromChat ? "sharedBuildDraftCalled" : "Build Draft Clicked", {
       itemType: resolved,
+      mode: wf.questionMode ?? (companionBuilderMode ? "split_screen" : "create_only"),
       answersCount: Object.values(wf.discoveryAnswers).filter((v) => v.trim())
         .length,
     });
@@ -961,16 +982,25 @@ export function ContentGeneratorPanel({
     return run(resolved, fullBrief, tone, wf, { fromChatApproval: fromChat });
   }
 
-  const lastChatBuildKey = useRef(0);
-  useEffect(() => {
-    if (!chatBuildRequest || chatBuildRequest.key === lastChatBuildKey.current) {
-      return;
-    }
-    lastChatBuildKey.current = chatBuildRequest.key;
+  const sharedBuildDraftRef = useRef<
+    (params: CreateBuildDraftParams) => Promise<boolean>
+  >(async () => false);
+
+  sharedBuildDraftRef.current = async (params: CreateBuildDraftParams) => {
+    const mode =
+      params.mode ??
+      params.workflow.questionMode ??
+      (companionBuilderMode ? "split_screen" : "create_only");
+    logSharedBuildDraftCalled({
+      type: params.type,
+      fromChat: params.fromChat,
+      mode,
+    });
     const wf = {
-      ...(chatBuildRequest.workflow ?? workflowRef.current),
+      ...params.workflow,
       draftStatus: "building" as const,
-      questionMode: "split_screen" as const,
+      questionMode:
+        mode === "split_screen" ? ("split_screen" as const) : params.workflow.questionMode,
       buildApproved: false,
       step: "readiness" as const,
     };
@@ -980,29 +1010,51 @@ export function ContentGeneratorPanel({
     setError(false);
     setBuildErrorMessage(null);
     logCreateBuild("Workspace generating state set", {
-      itemType: chatBuildRequest.type,
-      source: "chat-build-request",
+      itemType: params.type,
+      source: params.fromChat ? "chat-build" : "create-only",
+      mode,
     });
-    logCreateBuild("Draft generation called", {
-      itemType: chatBuildRequest.type,
-      source: "chat-build-request",
-    });
-    void handleBuildDraft(
-      chatBuildRequest.brief,
-      chatBuildRequest.type,
+    const ok = await handleBuildDraft(
+      params.brief,
+      params.type,
       wf,
-      true,
-    ).then((ok) => {
-      if (ok) {
-        logCreateBuild("Workspace rendered draft", {
-          itemType: chatBuildRequest.type,
-          length: workflowRef.current.draftContent?.length ?? 0,
-        });
+      params.fromChat ?? false,
+    );
+    if (ok) {
+      const content = workflowRef.current.draftContent ?? "";
+      logDraftGenerated(params.type, content.length);
+      logDraftRenderedInWorkspace(params.type, content.length);
+      if (params.fromChat) {
         onChatBuildComplete?.({
-          draft: workflowRef.current.draftContent ?? "",
+          draft: content,
           workflow: workflowRef.current,
         });
-      } else onChatBuildFailed?.();
+      }
+    } else if (params.fromChat) {
+      logDraftGenerationFailed(params.type, "generation-failed");
+      onChatBuildFailed?.();
+    }
+    return ok;
+  };
+
+  useEffect(() => {
+    if (!onRegisterBuildDraft) return;
+    onRegisterBuildDraft((params) => sharedBuildDraftRef.current(params));
+    return () => onRegisterBuildDraft(null);
+  }, [onRegisterBuildDraft]);
+
+  const lastChatBuildKey = useRef(0);
+  useEffect(() => {
+    if (!chatBuildRequest || chatBuildRequest.key === lastChatBuildKey.current) {
+      return;
+    }
+    lastChatBuildKey.current = chatBuildRequest.key;
+    void sharedBuildDraftRef.current({
+      brief: chatBuildRequest.brief,
+      type: chatBuildRequest.type,
+      workflow: chatBuildRequest.workflow ?? workflowRef.current,
+      fromChat: true,
+      mode: "split_screen",
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatBuildRequest]);
@@ -1233,7 +1285,15 @@ export function ContentGeneratorPanel({
               })
             }
             onRoutedItem={(section) => onOpenSection?.(section)}
-            onBuildDraft={handleBuildDraft}
+            onBuildDraft={(briefText) =>
+              void sharedBuildDraftRef.current({
+                brief: briefText,
+                type: resolvedTypeLabel(workflow) || type,
+                workflow: workflowRef.current,
+                fromChat: false,
+                mode: companionBuilderMode ? "split_screen" : "create_only",
+              })
+            }
             onBuildWithShari={onBuildWithShari}
             building={loading}
             buildError={workflow.draftStatus === "error" || error}
@@ -1280,7 +1340,14 @@ export function ContentGeneratorPanel({
           onAddToProject={handleAddToProject}
           onRegenerate={
             workflow.buildApproved || workflow.draftStatus === "ready"
-              ? () => void handleBuildDraft()
+              ? () =>
+                  void sharedBuildDraftRef.current({
+                    brief: buildFullCreateBrief(workflowRef.current),
+                    type: resolvedTypeLabel(workflowRef.current) || type,
+                    workflow: workflowRef.current,
+                    fromChat: false,
+                    mode: companionBuilderMode ? "split_screen" : "create_only",
+                  })
               : undefined
           }
           onMoreAction={handleCreateOption}
