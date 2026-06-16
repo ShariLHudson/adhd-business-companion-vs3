@@ -12,15 +12,24 @@ import {
 
 export { catalogCategory, dropdownItemsInCategory, catalogTypesPickerLabel } from "./createCatalog";
 import { sortByDropdownLabel } from "./dropdownSort";
+import {
+  initializeTemplateForWorkflow,
+  type CreateTemplateSection,
+} from "./createTemplates";
+
+export type DraftStatus = "idle" | "building" | "ready" | "error";
 
 export type CreateWorkflowStep =
   | "category"
   | "type"
   | "confirm"
+  | "template"
   | "discovery"
   | "readiness"
   | "improve"
   | "export";
+
+export type { CreateTemplateSection };
 
 export type DiscoveryQuestion = {
   id: string;
@@ -44,6 +53,13 @@ export type CreateWorkflowState = {
   discoveryIndex: number;
   readinessConfirmed: boolean;
   buildApproved: boolean;
+  /** Preset or custom template id; "none" = freeform. */
+  selectedTemplateId: string | null;
+  selectedTemplateName: string | null;
+  templateSections: CreateTemplateSection[] | null;
+  useTemplate: boolean;
+  draftStatus: DraftStatus;
+  draftContent: string | null;
 };
 
 export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {
@@ -57,6 +73,12 @@ export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {
   discoveryIndex: 0,
   readinessConfirmed: false,
   buildApproved: false,
+  selectedTemplateId: null,
+  selectedTemplateName: null,
+  templateSections: null,
+  useTemplate: true,
+  draftStatus: "idle",
+  draftContent: null,
 };
 
 const DEFAULT_DISCOVERY: DiscoveryQuestion[] = [
@@ -628,6 +650,7 @@ export function workflowStepLabel(step: CreateWorkflowStep): string {
     category: "Item type",
     type: "Subtype",
     confirm: "Ready",
+    template: "Template",
     discovery: "Discovery",
     readiness: "Readiness",
     improve: "Improve",
@@ -671,10 +694,11 @@ export function mergeCreateWorkflow(
     category: 0,
     type: 1,
     confirm: 2,
-    discovery: 3,
-    readiness: 4,
-    improve: 5,
-    export: 6,
+    template: 3,
+    discovery: 4,
+    readiness: 5,
+    improve: 6,
+    export: 7,
   };
   const merged: CreateWorkflowState = {
     ...local,
@@ -689,6 +713,21 @@ export function mergeCreateWorkflow(
       incoming.categoryId ??
       local.categoryId ??
       categoryIdForType(typeLabel),
+    selectedTemplateId:
+      incoming.selectedTemplateId ?? local.selectedTemplateId,
+    selectedTemplateName:
+      incoming.selectedTemplateName ?? local.selectedTemplateName,
+    templateSections: incoming.templateSections ?? local.templateSections,
+    useTemplate: incoming.useTemplate ?? local.useTemplate,
+    draftStatus:
+      incoming.draftStatus === "ready" || local.draftStatus === "ready"
+        ? "ready"
+        : incoming.draftStatus === "building" || local.draftStatus === "building"
+          ? "building"
+          : incoming.draftStatus === "error" || local.draftStatus === "error"
+            ? "error"
+            : "idle",
+    draftContent: incoming.draftContent ?? local.draftContent,
     step:
       stepRank[incoming.step] >= stepRank[local.step]
         ? incoming.step
@@ -820,9 +859,9 @@ export function advanceAfterItemPick(typeLabel: string): CreateWorkflowState {
 
 export function advanceAfterCustomItem(customLabel: string): CreateWorkflowState {
   const trimmed = customLabel.trim();
-  return {
+  return initializeTemplateForWorkflow({
     ...EMPTY_CREATE_WORKFLOW,
-    step: "discovery",
+    step: "template",
     categoryId: null,
     selectedTypeLabel: OTHER_OPTION,
     customTypeLabel: trimmed,
@@ -830,7 +869,7 @@ export function advanceAfterCustomItem(customLabel: string): CreateWorkflowState
     customSubtype: null,
     discoveryIndex: 0,
     discoveryAnswers: {},
-  };
+  });
 }
 
 export function advanceAfterSubtypePick(
@@ -845,27 +884,40 @@ export function advanceAfterSubtypePick(
       customSubtype: "",
     };
   }
-  return {
+  return initializeTemplateForWorkflow({
     ...state,
-    step: "discovery",
+    step: "template",
     selectedSubtype: subtype,
     customSubtype: null,
     discoveryIndex: 0,
     discoveryAnswers: state.discoveryAnswers,
-  };
+  });
 }
 
 export function advanceAfterCustomSubtype(
   state: CreateWorkflowState,
   customSubtype: string,
 ): CreateWorkflowState {
-  return {
+  return initializeTemplateForWorkflow({
     ...state,
-    step: "discovery",
+    step: "template",
     selectedSubtype: OTHER_OPTION,
     customSubtype: customSubtype.trim(),
     discoveryIndex: 0,
     discoveryAnswers: state.discoveryAnswers,
+  });
+}
+
+export function advanceFromTemplate(
+  state: CreateWorkflowState,
+): CreateWorkflowState {
+  return {
+    ...initializeTemplateForWorkflow(state),
+    step: "discovery",
+    discoveryIndex: discoveryIndexForAnswers(
+      resolvedTypeLabel(state),
+      state.discoveryAnswers,
+    ),
   };
 }
 

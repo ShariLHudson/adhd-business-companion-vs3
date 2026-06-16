@@ -20,6 +20,7 @@ import {
   advanceAfterDiscoveryAnswer,
   advanceAfterItemPick,
   advanceAfterSubtypePick,
+  advanceFromTemplate,
   advanceToDiscovery,
   buildBriefFromWorkflow,
   categoryIdForType,
@@ -32,6 +33,8 @@ import {
   type CreateWorkflowState,
   type DiscoveryQuestion,
 } from "@/lib/createWorkflow";
+import { buildFullCreateBrief } from "@/lib/createTemplates";
+import { CreateTemplatePanel } from "@/components/companion/CreateTemplatePanel";
 
 const btnPrimary =
   "w-full rounded-xl bg-[#1e4f4f] px-5 py-3 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:cursor-not-allowed disabled:opacity-40";
@@ -108,16 +111,22 @@ export function CreateWorkflowPanel({
   onBuildWithShari,
   onAddMoreDetail,
   building,
+  buildError,
+  onClearBuildError,
+  onChangeTemplate,
 }: {
   workflow: CreateWorkflowState;
   typeLabel: string;
   onWorkflowChange: (next: CreateWorkflowState) => void;
   onTypeSelect: (label: string, categoryId: string) => void;
   onRoutedItem: (section: NonNullable<CreateCatalogItem["route"]>) => void;
-  onBuildDraft: (brief: string) => void;
+  onBuildDraft: (brief: string) => void | Promise<boolean>;
   onBuildWithShari?: (input: CreationWorkspaceInput) => void;
   onAddMoreDetail?: () => void;
   building?: boolean;
+  buildError?: boolean;
+  onClearBuildError?: () => void;
+  onChangeTemplate?: () => void;
 }) {
   const [draftAnswer, setDraftAnswer] = useState("");
   const [customItemText, setCustomItemText] = useState(
@@ -274,9 +283,7 @@ export function CreateWorkflowPanel({
                   workflow.categoryId ?? categoryIdForType(item) ?? "content";
                 onTypeSelect(item, categoryId);
                 onWorkflowChange(
-                  advanceToDiscovery(advanceAfterSubtypePick(workflow, v), {
-                    preserveAnswers: true,
-                  }),
+                  advanceFromTemplate(advanceAfterSubtypePick(workflow, v)),
                 );
               }}
               options={subtypeOptions}
@@ -304,9 +311,8 @@ export function CreateWorkflowPanel({
                     workflow.categoryId ?? categoryIdForType(item) ?? "content";
                   onTypeSelect(item, categoryId);
                   onWorkflowChange(
-                    advanceToDiscovery(
+                    advanceFromTemplate(
                       advanceAfterCustomSubtype(workflow, customSubtypeText),
-                      { preserveAnswers: true },
                     ),
                   );
                 }}
@@ -343,9 +349,7 @@ export function CreateWorkflowPanel({
                 categoryIdForType(selected) ??
                 "content";
               onTypeSelect(selected, categoryId);
-              onWorkflowChange(
-                advanceToDiscovery(workflow, { preserveAnswers: true }),
-              );
+              onWorkflowChange(advanceFromTemplate(workflow));
             }}
             className={`mt-4 ${btnPrimary}`}
           >
@@ -357,8 +361,45 @@ export function CreateWorkflowPanel({
   }
 
   if (workflow.step === "confirm" && !shouldOfferDiscovery(workflow)) {
-    onWorkflowChange({ ...workflow, step: "readiness" });
+    onWorkflowChange({ ...workflow, step: "template" });
     return null;
+  }
+
+  // ── Template selection / edit ─────────────────────────────────────────────
+  if (workflow.step === "template" && resolvedType) {
+    return (
+      <div className="companion-fade-in mx-auto max-w-lg">
+        <button
+          type="button"
+          onClick={() =>
+            onWorkflowChange({
+              ...workflow,
+              step: workflow.selectedSubtype ? "type" : "category",
+            })
+          }
+          className="mb-3 text-sm font-semibold text-[#1e4f4f]"
+        >
+          ‹ Back
+        </button>
+        <CreateContextHeader itemLabel={itemLabel} subtypeLabel={subtypeLabel} />
+        <QuestionCard>
+          <p className="text-lg font-semibold text-[#1f1c19]">
+            Choose how to structure your {displayType.toLowerCase()}
+          </p>
+          <p className="mt-1 text-sm text-[#6b635a]">
+            Pick a template, edit sections, or create without one.
+          </p>
+          <CreateTemplatePanel workflow={workflow} onWorkflowChange={onWorkflowChange} />
+          <button
+            type="button"
+            onClick={() => onWorkflowChange(advanceFromTemplate(workflow))}
+            className={`mt-5 ${btnPrimary}`}
+          >
+            Continue
+          </button>
+        </QuestionCard>
+      </div>
+    );
   }
 
   // ── Discovery — one question at a time ────────────────────────────────────
@@ -377,7 +418,7 @@ export function CreateWorkflowPanel({
           onClick={() =>
             onWorkflowChange({
               ...workflow,
-              step: workflow.selectedSubtype ? "type" : "category",
+              step: workflow.selectedSubtype ? "template" : "category",
               discoveryIndex: 0,
             })
           }
@@ -451,7 +492,7 @@ export function CreateWorkflowPanel({
 
   // ── Readiness ─────────────────────────────────────────────────────────────
   if (workflow.step === "readiness" && resolvedType) {
-    const brief = buildBriefFromWorkflow(workflow);
+    const brief = buildFullCreateBrief(workflow);
     const summary = readinessSummary(resolvedType, workflow.discoveryAnswers);
 
     return (
@@ -464,6 +505,65 @@ export function CreateWorkflowPanel({
           <p className="mt-1 text-sm text-[#6b635a]">
             Would you like me to create the draft?
           </p>
+          <CreateTemplatePanel
+            workflow={workflow}
+            onWorkflowChange={onWorkflowChange}
+            compact
+          />
+          {buildError ? (
+            <div className="mt-4 rounded-xl border border-[#e8c4c4] bg-[#fdf5f5] px-3 py-3 text-sm text-[#6b3a3a]">
+              <p className="font-semibold">Something went wrong creating your draft.</p>
+              <div className="mt-3 flex flex-col gap-2">
+                <button
+                  type="button"
+                  disabled={building}
+                  onClick={() => {
+                    onClearBuildError?.();
+                    onWorkflowChange({
+                      ...workflow,
+                      readinessConfirmed: true,
+                      draftStatus: "building",
+                    });
+                    void onBuildDraft(brief);
+                  }}
+                  className={btnPrimary}
+                >
+                  Try Again
+                </button>
+                <button
+                  type="button"
+                  disabled={building}
+                  onClick={() => {
+                    onClearBuildError?.();
+                    if (onAddMoreDetail) {
+                      onAddMoreDetail();
+                      return;
+                    }
+                    onWorkflowChange({
+                      ...workflow,
+                      step: "discovery",
+                      draftStatus: "idle",
+                    });
+                  }}
+                  className={btnSecondary}
+                >
+                  Add More Detail
+                </button>
+                <button
+                  type="button"
+                  disabled={building}
+                  onClick={() => {
+                    onClearBuildError?.();
+                    onChangeTemplate?.();
+                    onWorkflowChange({ ...workflow, step: "template", draftStatus: "idle" });
+                  }}
+                  className={btnSecondary}
+                >
+                  Change Template
+                </button>
+              </div>
+            </div>
+          ) : null}
           {summary.length > 0 ? (
             <details className="mt-4 rounded-xl border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2">
               <summary className="cursor-pointer text-sm font-semibold text-[#6b635a]">
@@ -490,10 +590,9 @@ export function CreateWorkflowPanel({
                 onWorkflowChange({
                   ...workflow,
                   readinessConfirmed: true,
-                  buildApproved: true,
-                  step: "improve",
+                  draftStatus: "building",
                 });
-                onBuildDraft(brief);
+                void onBuildDraft(brief);
               }}
               className={btnPrimary}
             >

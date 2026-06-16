@@ -20,6 +20,7 @@ import {
   EMPTY_CREATE_WORKFLOW,
   answeredDiscoveryCount,
 } from "./createWorkflow";
+import { buildFullCreateBrief } from "./createTemplates";
 import { DRAFT_QUICK_EDITS } from "./createWorkspaceUx";
 
 export type CreateBuilderPhase =
@@ -310,7 +311,7 @@ export function processCreateBuilderTurn(
       /^build it$/i.test(trimmed) ||
       /^create it$/i.test(trimmed)
     ) {
-      const brief = buildBriefFromWorkflow(session.workflow);
+      const brief = buildFullCreateBrief(session.workflow);
       const generateType = resolvedTypeLabel(session.workflow) || typeLabel;
       return {
         session: { ...session, phase: "generating", collectingExtra: false },

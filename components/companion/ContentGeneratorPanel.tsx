@@ -49,8 +49,13 @@ import {
   EMPTY_CREATE_WORKFLOW,
   mergeCreateWorkflow,
   resolvedTypeLabel,
+  buildBriefFromWorkflow,
   type CreateWorkflowState,
 } from "@/lib/createWorkflow";
+import {
+  BUILD_DRAFT_LOADING_MESSAGES,
+  buildFullCreateBrief,
+} from "@/lib/createTemplates";
 import { CreateWorkflowPanel } from "@/components/companion/CreateWorkflowPanel";
 import { blankScaffoldForType } from "@/lib/createInitialization";
 import {
@@ -203,8 +208,22 @@ export function ContentGeneratorPanel({
   const exportPrintRef = useRef<HTMLButtonElement | null>(null);
   const typeLocked = Boolean(lockedArtifactType);
   const proposalMode = isProposalArtifact(lockedArtifactType ?? type);
-  const inGuidedCreate = !workflow.buildApproved;
-  const showDraftEditor = Boolean(draft) && workflow.buildApproved;
+  const isBuildingDraft = loading || workflow.draftStatus === "building";
+  const inGuidedCreate = !workflow.buildApproved && !isBuildingDraft;
+  const showBuildingState = isBuildingDraft && !draft.trim();
+  const showDraftEditor = Boolean(draft.trim()) && workflow.buildApproved;
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  useEffect(() => {
+    if (!showBuildingState) {
+      setLoadingMessageIndex(0);
+      return;
+    }
+    const id = window.setInterval(() => {
+      setLoadingMessageIndex((i) => (i + 1) % BUILD_DRAFT_LOADING_MESSAGES.length);
+    }, 2200);
+    return () => window.clearInterval(id);
+  }, [showBuildingState]);
 
   const lastReportedDetail = useRef<string>("");
   const lastSessionSyncSig = useRef<string>("");
@@ -293,17 +312,29 @@ export function ContentGeneratorPanel({
   }
 
   async function run(t: string, b: string, tn: string): Promise<boolean> {
-    if (!t.trim() && !b.trim()) return false;
+    const resolvedType = t.trim() || resolvedTypeLabel(workflow) || type;
+    const resolvedBrief = b.trim() || buildFullCreateBrief(workflow);
+    if (!resolvedType.trim() && !resolvedBrief.trim()) {
+      setError(true);
+      setWorkflow((prev) => ({
+        ...prev,
+        draftStatus: "error",
+        buildApproved: false,
+        step: "readiness",
+      }));
+      return false;
+    }
     setLoading(true);
     setError(false);
+    setWorkflow((prev) => ({ ...prev, draftStatus: "building" }));
     try {
       const { contentLanguageHint } = getOutputLanguageContext(getPrefs());
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          type: t,
-          brief: b,
+          type: resolvedType,
+          brief: resolvedBrief,
           tone: tn,
           context: businessContextSummary(forAvatar),
           contentLanguageHint,
@@ -311,21 +342,42 @@ export function ContentGeneratorPanel({
       });
       const data = await res.json();
       if (res.ok && data.result) {
-        setDraft(data.result);
-        // Remember this draft so the home Continue card can resume it.
+        const content = data.result as string;
+        setDraft(content);
+        if (resolvedType && resolvedType !== type) setType(resolvedType);
+        setWorkflow((prev) => ({
+          ...prev,
+          buildApproved: true,
+          draftStatus: "ready",
+          draftContent: content,
+          step: "improve",
+          readinessConfirmed: true,
+        }));
         setLastActivity({
           kind: "draft",
-          title: b || t || "Draft",
-          subtitle: t || "content",
-          contentType: t,
-          content: data.result,
+          title: resolvedBrief || resolvedType || "Draft",
+          subtitle: resolvedType || "content",
+          contentType: resolvedType,
+          content,
         });
         return true;
       }
       setError(true);
+      setWorkflow((prev) => ({
+        ...prev,
+        buildApproved: false,
+        draftStatus: "error",
+        step: "readiness",
+      }));
       return false;
     } catch {
       setError(true);
+      setWorkflow((prev) => ({
+        ...prev,
+        buildApproved: false,
+        draftStatus: "error",
+        step: "readiness",
+      }));
       return false;
     } finally {
       setLoading(false);
@@ -618,19 +670,17 @@ export function ContentGeneratorPanel({
       : null);
 
   function handleBuildDraft(briefText: string, typeOverride?: string) {
-    const t = typeOverride?.trim() || type;
+    const resolved =
+      typeOverride?.trim() || resolvedTypeLabel(workflow) || type;
     if (typeOverride?.trim() && typeOverride !== type) {
       setType(typeOverride);
+    } else if (resolved && resolved !== type) {
+      setType(resolved);
     }
-    setBrief(briefText);
-    setTopic(briefText);
-    setWorkflow((prev) => ({
-      ...prev,
-      buildApproved: true,
-      readinessConfirmed: true,
-      step: "improve",
-    }));
-    return run(t, briefText, tone);
+    const fullBrief = briefText.trim() || buildFullCreateBrief(workflow);
+    setBrief(fullBrief);
+    setTopic(fullBrief);
+    return run(resolved, fullBrief, tone);
   }
 
   const lastChatBuildKey = useRef(0);
@@ -802,23 +852,53 @@ export function ContentGeneratorPanel({
         </div>
       )}
 
-      {loading && workflow.buildApproved && !draft && (
+      {showBuildingState && (
         <div className="companion-fade-in mt-8 text-center">
           <p className="text-xl font-semibold text-[#1f1c19]">
-            Building your {(type || "draft").toLowerCase()}…
+            {BUILD_DRAFT_LOADING_MESSAGES[loadingMessageIndex]}
           </p>
           <p className="mt-1 text-sm text-[#6b635a]">
             Using what you shared — not starting from a blank guess.
           </p>
-          {error && (
-            <button
-              type="button"
-              onClick={() => run(type, brief, tone)}
-              className="mt-3 rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
-            >
-              Try again
-            </button>
-          )}
+        </div>
+      )}
+
+      {inGuidedCreate &&
+        !showDraftEditor &&
+        !(workspaceMode && phase === "ready") &&
+        !showBuildingState && (
+        <div className="mt-3 flex min-h-0 flex-1 flex-col">
+          <CreateWorkflowPanel
+            workflow={workflow}
+            typeLabel={type}
+            onWorkflowChange={setWorkflow}
+            onTypeSelect={(label, categoryId) =>
+              pickCreateType(label, {
+                categoryId,
+                bypassRoute: true,
+                skipWorkflow: true,
+              })
+            }
+            onRoutedItem={(section) => onOpenSection?.(section)}
+            onBuildDraft={handleBuildDraft}
+            onBuildWithShari={onBuildWithShari}
+            building={loading}
+            buildError={workflow.draftStatus === "error" || error}
+            onClearBuildError={() => {
+              setError(false);
+              setWorkflow((prev) => ({ ...prev, draftStatus: "idle" }));
+            }}
+            onChangeTemplate={() => {
+              setError(false);
+            }}
+            onAddMoreDetail={() =>
+              setWorkflow((prev) => ({
+                ...prev,
+                step: "discovery",
+                draftStatus: "idle",
+              }))
+            }
+          />
         </div>
       )}
       {showDraftEditor && workspaceMode && workspaceRecord && phase === "ready" && (
@@ -875,26 +955,6 @@ export function ContentGeneratorPanel({
         />
       )}
 
-      {inGuidedCreate && !showDraftEditor && !(workspaceMode && phase === "ready") && !loading && (
-        <div className="mt-3 flex min-h-0 flex-1 flex-col">
-          <CreateWorkflowPanel
-            workflow={workflow}
-            typeLabel={type}
-            onWorkflowChange={setWorkflow}
-            onTypeSelect={(label, categoryId) =>
-              pickCreateType(label, {
-                categoryId,
-                bypassRoute: true,
-                skipWorkflow: true,
-              })
-            }
-            onRoutedItem={(section) => onOpenSection?.(section)}
-            onBuildDraft={handleBuildDraft}
-            onBuildWithShari={onBuildWithShari}
-            building={loading}
-          />
-        </div>
-      )}
 
       {showDraftEditor && !(workspaceMode && phase === "ready") && (
         <div
