@@ -270,9 +270,11 @@ import {
   type WorkspacePanelDetail,
 } from "@/lib/workspaceAwareness";
 import {
-  buildProjectCoachAutoStart,
-  projectCoachSeedKey,
-} from "@/lib/projectCoachAutoStart";
+  buildWorkspaceCoachAutoStart,
+  workspaceCoachSeedKey,
+  type WorkspaceCoachExtras,
+} from "@/lib/workspaceCoachAutoStart";
+import { getActivityById } from "@/lib/companionActivities";
 import { FromYesterdayFocusCard } from "@/components/companion/FromYesterdayFocusCard";
 import {
   createWorkspaceSession,
@@ -1022,7 +1024,7 @@ export default function CompanionPage() {
   const [projectContinueId, setProjectContinueId] = useState<string | null>(
     null,
   );
-  const projectCoachSeededRef = useRef<string | null>(null);
+  const workspaceCoachSeededRef = useRef<string | null>(null);
   useEffect(() => {
     const last = getLastActivity();
     if (last && getRecentWorkItems().length === 0) {
@@ -1772,14 +1774,38 @@ export default function CompanionPage() {
   );
 
   useEffect(() => {
-    if (chatLayoutMode !== "split" || workspacePanel !== "projects") {
-      if (chatLayoutMode !== "split") {
-        projectCoachSeededRef.current = null;
-      }
+    if (chatLayoutMode !== "split") {
+      workspaceCoachSeededRef.current = null;
       return;
     }
-    seedProjectCoachAutoStart(false);
-  }, [workspaceDetail, chatLayoutMode, workspacePanel]);
+    const section =
+      workspacePanel ??
+      companionStandaloneSection ??
+      (guideBesideSession?.source.kind === "activity"
+        ? ("activities" as const)
+        : guideBesideSession?.source.kind === "section"
+          ? guideBesideSession.source.section
+          : null);
+    if (!section) return;
+    if (
+      section === "content-generator" &&
+      createBuilderBootstrappedRef.current
+    ) {
+      return;
+    }
+    seedWorkspaceCoachAutoStart(false);
+  }, [
+    workspaceDetail,
+    chatLayoutMode,
+    workspacePanel,
+    companionStandaloneSection,
+    guideBesideSession,
+    creationContext,
+    activitySession,
+    pomodoroTimer.isActive,
+    pomodoroTimer.label,
+    pomodoroTimer.displayMins,
+  ]);
 
   useEffect(() => {
     if (!workspaceSession) return;
@@ -2867,16 +2893,55 @@ export default function CompanionPage() {
     setActiveSection(section);
   }
 
+  function buildWorkspaceCoachExtrasFromState(): WorkspaceCoachExtras {
+    const activity = activitySession.activityId
+      ? getActivityById(activitySession.activityId)
+      : undefined;
+    const stepIdx = activitySession.stepIndex ?? 0;
+    return {
+      creationContext: creationContextRef.current,
+      activityTitle: activity?.title ?? null,
+      activityStep: activity?.steps[stepIdx]?.instruction ?? null,
+      focusActive: pomodoroTimer.isActive,
+      focusTitle:
+        pomodoroTimer.label ??
+        pomodoroTimer.sessionMeta?.focusItem ??
+        null,
+      focusMinutesLeft: pomodoroTimer.isActive
+        ? pomodoroTimer.displayMins
+        : null,
+    };
+  }
+
+  function resolveCoachSection(): AppSection | null {
+    if (chatLayoutMode !== "split") return null;
+    if (workspacePanelRef.current) return workspacePanelRef.current;
+    if (companionStandaloneSection) return companionStandaloneSection;
+    if (guideBesideSession?.source.kind === "activity") return "activities";
+    if (guideBesideSession?.source.kind === "section") {
+      return guideBesideSession.source.section;
+    }
+    return null;
+  }
+
   /** User chose companion help — chat left, workspace right. */
-  function seedProjectCoachAutoStart(force = false) {
-    if (workspacePanelRef.current !== "projects") return;
-    const ctx = buildWorkspaceContext("projects", workspaceDetailRef.current);
-    const key = projectCoachSeedKey(ctx);
+  function seedWorkspaceCoachAutoStart(force = false) {
+    const section = resolveCoachSection();
+    if (!section) return;
+    if (
+      section === "content-generator" &&
+      createBuilderBootstrappedRef.current
+    ) {
+      return;
+    }
+    const extras = buildWorkspaceCoachExtrasFromState();
+    const ctx = buildWorkspaceContext(section, workspaceDetailRef.current);
+    const key = workspaceCoachSeedKey(ctx, extras);
     if (!key) return;
-    if (!force && projectCoachSeededRef.current === key) return;
-    const auto = buildProjectCoachAutoStart(ctx);
+    if (!force && workspaceCoachSeededRef.current === key) return;
+    const auto = buildWorkspaceCoachAutoStart(ctx, extras);
     if (!auto) return;
-    projectCoachSeededRef.current = key;
+    workspaceCoachSeededRef.current = key;
     const { field, content } = extractFocusDirective(auto.content);
     setMessages((prev) => [...prev, { role: "assistant", content }]);
     applyWorkspaceFocus(field ?? auto.focusField);
@@ -2923,9 +2988,9 @@ export default function CompanionPage() {
           lockedArtifactType,
         panelWorkflow,
       );
-    } else if (sourceSection === "projects") {
-      projectCoachSeededRef.current = null;
-      window.setTimeout(() => seedProjectCoachAutoStart(true), 150);
+    } else {
+      workspaceCoachSeededRef.current = null;
+      window.setTimeout(() => seedWorkspaceCoachAutoStart(true), 150);
     }
     inputRef.current?.focus();
   }
@@ -5552,6 +5617,7 @@ export default function CompanionPage() {
             onSuggestOpen={suggestCrossWorkspaceOpen}
             onAsk={handlePlaybookAsk}
             registerBack={registerBack}
+            onContextChange={handleWorkspaceDetailChange}
           />
         );
       case "time-block":
@@ -5773,6 +5839,7 @@ export default function CompanionPage() {
             contextBanner={workspaceContextBanner}
             onAsk={handlePlaybookAsk}
             registerBack={registerBack}
+            onContextChange={handleWorkspaceDetailChange}
           />
         );
       case "time-block":

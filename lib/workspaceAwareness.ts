@@ -41,9 +41,10 @@ import {
   PROJECT_GROUNDING_RULE,
 } from "./projectGrounding";
 import {
-  buildProjectCoachAutoStart,
-  projectCoachAutoStartHint,
-} from "./projectCoachAutoStart";
+  buildWorkspaceCoachAutoStart,
+  workspaceCoachAutoStartHint,
+  WORKSPACE_CONTEXT_RULE,
+} from "./workspaceCoachAutoStart";
 
 export type { WorkspaceMessageClass };
 export { classifyWorkspaceMessage, isHelpRequest, isProjectContent };
@@ -306,6 +307,7 @@ export function formatWorkspaceCoGuideHint(
   const next = suggestNextWorkspaceField(ctx, userText);
   const lines = [
     "WORKSPACE CO-GUIDE MODE (ACTIVE — panel is open beside chat):",
+    WORKSPACE_CONTEXT_RULE,
     "You are co-working IN the visible workspace, not giving generic advice.",
     "- Reference what they can SEE (project name, stage, fields on screen).",
     "- Move ONE field per reply. Prefix with [[focus:field-id]] when pointing to a field.",
@@ -324,7 +326,6 @@ export function formatWorkspaceCoGuideHint(
     lines.push(...workshopScopeLines(energy));
   } else if (ctx.section === "projects") {
     lines.push(PROJECT_GROUNDING_RULE);
-    lines.push(projectCoachAutoStartHint(ctx));
     if (energy === "low") {
       lines.push(
         "TODAY'S SCOPE (low energy — project): name + outcome only. Ignore next steps and extras.",
@@ -341,6 +342,8 @@ export function formatWorkspaceCoGuideHint(
   } else if (ctx.section === "content-generator") {
     lines.push(...createScopeLines(energy));
   }
+
+  lines.push(workspaceCoachAutoStartHint(ctx));
 
   if (next) {
     lines.push(
@@ -484,9 +487,11 @@ export function buildWorkspaceAcceptMessage(
   energy: DayLevel,
   userText = "",
   ctx?: WorkspaceContext | null,
+  extras?: import("./workspaceCoachAutoStart").WorkspaceCoachExtras,
 ): { content: string; focusField: WorkspaceFieldId | null } {
-  if (section === "projects" && ctx) {
-    const auto = buildProjectCoachAutoStart(ctx);
+  const fullCtx = ctx ?? buildWorkspaceContext(section, null);
+  if (fullCtx) {
+    const auto = buildWorkspaceCoachAutoStart(fullCtx, extras);
     if (auto) {
       const { field: focusField, content: stripped } = extractFocusDirective(
         auto.content,

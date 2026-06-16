@@ -74,7 +74,7 @@ export function buildProjectCoachAutoStart(
       !ctx.selectedItemGoal?.trim()
     ) {
       return {
-        content: `[[focus:project-goal]]I see **${name}** is open. The title looks good — let's talk about what success looks like for this project.`,
+        content: `[[focus:project-goal]]I see the title is finished. Let's talk about what success looks like for this project.`,
         focusField: "project-goal",
       };
     }
@@ -82,7 +82,7 @@ export function buildProjectCoachAutoStart(
     const taskCount = ctx.projectTaskCount ?? 0;
     if (taskCount === 0 && ctx.selectedItemGoal?.trim()) {
       return {
-        content: `[[focus:project-next-action]]Outcome's on screen for **${name}**. Let's figure out what needs to happen first — what's one task or first move?`,
+        content: `[[focus:project-next-action]]Let's figure out what needs to happen first — what's one task or small next move for **${name}**?`,
         focusField: "project-next-action",
       };
     }

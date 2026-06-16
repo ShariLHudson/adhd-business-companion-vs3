@@ -25,6 +25,7 @@ import {
 } from "@/lib/brainDumpCategories";
 import { sortByDropdownLabel } from "@/lib/dropdownSort";
 import type { AppSection } from "@/lib/companionUi";
+import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import { useVisualMode } from "@/lib/useVisualMode";
 
@@ -79,6 +80,7 @@ export function BrainDumpPanel({
   registerBack,
   contextBanner,
   onSuggestOpen,
+  onContextChange,
 }: {
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
@@ -87,6 +89,7 @@ export function BrainDumpPanel({
   contextBanner?: string | null;
   /** Ask before navigating to another section. */
   onSuggestOpen?: (section: AppSection) => void;
+  onContextChange?: (detail: WorkspacePanelDetail) => void;
 }) {
   const [entries, setEntries] = useState<BrainDumpEntry[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -110,6 +113,13 @@ export function BrainDumpPanel({
     setEntries(getBrainDumps());
     setProjects(getProjects());
   }, []);
+
+  useEffect(() => {
+    onContextChange?.({
+      view: panelMode === "library" ? "library" : "capture",
+      stage: panelMode === "library" ? "library" : "capture session",
+    });
+  }, [panelMode, onContextChange]);
 
   // Back press closes an open item detail first, then exits the panel.
   useEffect(() => {
