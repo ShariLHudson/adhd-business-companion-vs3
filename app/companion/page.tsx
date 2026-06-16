@@ -270,6 +270,11 @@ import {
   type WorkspacePanelDetail,
 } from "@/lib/workspaceAwareness";
 import {
+  buildProjectCoachAutoStart,
+  projectCoachSeedKey,
+} from "@/lib/projectCoachAutoStart";
+import { FromYesterdayFocusCard } from "@/components/companion/FromYesterdayFocusCard";
+import {
   createWorkspaceSession,
   extractNumberedOptions,
   extractSuggestedValue,
@@ -1017,6 +1022,7 @@ export default function CompanionPage() {
   const [projectContinueId, setProjectContinueId] = useState<string | null>(
     null,
   );
+  const projectCoachSeededRef = useRef<string | null>(null);
   useEffect(() => {
     const last = getLastActivity();
     if (last && getRecentWorkItems().length === 0) {
@@ -1764,6 +1770,16 @@ export default function CompanionPage() {
     },
     [applyWorkspaceFocus, revealWorkspace],
   );
+
+  useEffect(() => {
+    if (chatLayoutMode !== "split" || workspacePanel !== "projects") {
+      if (chatLayoutMode !== "split") {
+        projectCoachSeededRef.current = null;
+      }
+      return;
+    }
+    seedProjectCoachAutoStart(false);
+  }, [workspaceDetail, chatLayoutMode, workspacePanel]);
 
   useEffect(() => {
     if (!workspaceSession) return;
@@ -2852,6 +2868,20 @@ export default function CompanionPage() {
   }
 
   /** User chose companion help — chat left, workspace right. */
+  function seedProjectCoachAutoStart(force = false) {
+    if (workspacePanelRef.current !== "projects") return;
+    const ctx = buildWorkspaceContext("projects", workspaceDetailRef.current);
+    const key = projectCoachSeedKey(ctx);
+    if (!key) return;
+    if (!force && projectCoachSeededRef.current === key) return;
+    const auto = buildProjectCoachAutoStart(ctx);
+    if (!auto) return;
+    projectCoachSeededRef.current = key;
+    const { field, content } = extractFocusDirective(auto.content);
+    setMessages((prev) => [...prev, { role: "assistant", content }]);
+    applyWorkspaceFocus(field ?? auto.focusField);
+  }
+
   function openCompanionAssist(
     sourceSection: AppSection,
     typeHint?: string | null,
@@ -2865,7 +2895,12 @@ export default function CompanionPage() {
       setCompanionStandaloneSection(null);
       if (workspacePanel !== sourceSection) {
         patchWorkspacePanel(sourceSection);
-        if (sourceSection === "projects") {
+      }
+      if (sourceSection === "projects") {
+        const activeId = workspaceDetailRef.current?.selectedItemId;
+        if (activeId) {
+          setProjectContinueId(activeId);
+        } else {
           setProjectContinueId(null);
         }
       }
@@ -2888,6 +2923,9 @@ export default function CompanionPage() {
           lockedArtifactType,
         panelWorkflow,
       );
+    } else if (sourceSection === "projects") {
+      projectCoachSeededRef.current = null;
+      window.setTimeout(() => seedProjectCoachAutoStart(true), 150);
     }
     inputRef.current?.focus();
   }
@@ -6309,6 +6347,9 @@ export default function CompanionPage() {
               ) : null}
 
               <div className="flex-1 overflow-y-auto px-4 sm:px-6">
+                <FromYesterdayFocusCard
+                  onOpenMomentum={() => setActiveSection("progress")}
+                />
                 {/* Home stays calm: greeting up top, open space here, the chat
                     box below. No menus to scan. */}
                 <SimpleChat

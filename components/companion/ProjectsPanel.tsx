@@ -6,6 +6,7 @@ import {
   getDayState,
   getProjectItems,
   getProjects,
+  getProjectItems,
   logMomentum,
   PROJECT_HORIZON_LABEL,
   PROJECT_PALETTE,
@@ -238,6 +239,12 @@ export function ProjectsPanel({
         nextAction: null,
       };
     } else if (view === "detail" && current) {
+      const taskCount = getProjectItems(current.id).filter(
+        (i) => i.kind === "task" || i.kind === "subtask",
+      ).length;
+      const openSections = Object.entries(detailSectionsOpen)
+        .filter(([, open]) => open)
+        .map(([id]) => id);
       detail = {
         view: "detail" as const,
         stage: "Project detail",
@@ -250,6 +257,8 @@ export function ProjectsPanel({
         showProjectColor: true,
         projectConversationCount: countProjectConversations(current.id),
         projectFileCount,
+        projectTaskCount: taskCount,
+        openDetailSections: openSections,
         nextAction: current.nextAction.trim() || null,
       };
     } else {
@@ -260,7 +269,7 @@ export function ProjectsPanel({
     if (sig === lastReportedDetail.current) return;
     lastReportedDetail.current = sig;
     onContextChange(detail);
-  }, [view, step, what, why, current, onContextChange, colorOn, projectFileCount]);
+  }, [view, step, what, why, current, onContextChange, colorOn, projectFileCount, detailSectionsOpen]);
 
   const focusElementId =
     focusField === "project-title"

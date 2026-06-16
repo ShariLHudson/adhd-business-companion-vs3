@@ -40,6 +40,10 @@ import {
   isProjectFieldVisible,
   PROJECT_GROUNDING_RULE,
 } from "./projectGrounding";
+import {
+  buildProjectCoachAutoStart,
+  projectCoachAutoStartHint,
+} from "./projectCoachAutoStart";
 
 export type { WorkspaceMessageClass };
 export { classifyWorkspaceMessage, isHelpRequest, isProjectContent };
@@ -77,6 +81,9 @@ export type WorkspacePanelDetail = {
   showProjectColor?: boolean;
   projectConversationCount?: number;
   projectFileCount?: number;
+  projectTaskCount?: number;
+  /** Detail panel sections currently expanded (e.g. overview, tasks). */
+  openDetailSections?: string[];
   nextAction?: string | null;
   draftPreview?: string | null;
 };
@@ -249,6 +256,17 @@ export function suggestNextWorkspaceField(
           reason: groundedCoachReason("outcome", ctx),
         };
       }
+      if (
+        (ctx.projectTaskCount ?? 0) === 0 &&
+        ctx.selectedItemGoal?.trim()
+      ) {
+        return {
+          field: "project-next-action",
+          label: "First task or next step",
+          reason:
+            "Outcome is set — help them name the first task or small next move.",
+        };
+      }
       if (isProjectFieldVisible("nextStep", ctx)) {
         return {
           field: "project-next-action",
@@ -306,6 +324,7 @@ export function formatWorkspaceCoGuideHint(
     lines.push(...workshopScopeLines(energy));
   } else if (ctx.section === "projects") {
     lines.push(PROJECT_GROUNDING_RULE);
+    lines.push(projectCoachAutoStartHint(ctx));
     if (energy === "low") {
       lines.push(
         "TODAY'S SCOPE (low energy — project): name + outcome only. Ignore next steps and extras.",
@@ -362,6 +381,12 @@ export function formatWorkspaceContextForPrompt(
   if (ctx.stage) lines.push(`- Stage: ${ctx.stage}`);
   if (ctx.section === "projects") {
     lines.push(formatProjectGroundingForPrompt(ctx));
+    if (ctx.projectTaskCount != null) {
+      lines.push(`- Tasks on this project: ${ctx.projectTaskCount}`);
+    }
+    if (ctx.openDetailSections?.length) {
+      lines.push(`- Open sections on screen: ${ctx.openDetailSections.join(", ")}`);
+    }
   } else {
     if (ctx.selectedItemName) lines.push(`- Selected: ${ctx.selectedItemName}`);
     if (ctx.selectedItemGoal?.trim()) {
@@ -458,7 +483,21 @@ export function buildWorkspaceAcceptMessage(
   section: AppSection,
   energy: DayLevel,
   userText = "",
+  ctx?: WorkspaceContext | null,
 ): { content: string; focusField: WorkspaceFieldId | null } {
+  if (section === "projects" && ctx) {
+    const auto = buildProjectCoachAutoStart(ctx);
+    if (auto) {
+      const { field: focusField, content: stripped } = extractFocusDirective(
+        auto.content,
+      );
+      return {
+        content: stripped,
+        focusField: focusField ?? auto.focusField,
+      };
+    }
+  }
+
   const workshop = /\b(workshop|webinar|course|masterclass)\b/i.test(userText);
 
   if (section === "projects") {

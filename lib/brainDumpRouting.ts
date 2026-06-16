@@ -99,7 +99,7 @@ export function routeBrainDumpEntry(
       const t = tomorrowFocusTrustMessage(text);
       logMomentum("move", `Tomorrow focus: ${text.slice(0, 60)}`);
       return trust(
-        `Added to Tomorrow's Focus List: "${text}"`,
+        `Added to Tomorrow's Focus List.`,
         t.savedWhere,
         t.seeWhere,
         route,

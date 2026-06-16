@@ -21,6 +21,6 @@ describe("clearMyMindCapture", () => {
   });
 
   it("asks for the first thing initially", () => {
-    expect(capturePrompt("first", 0)).toContain("first thing");
+    expect(capturePrompt("first", 0)).toContain("first thing on your mind");
   });
 });

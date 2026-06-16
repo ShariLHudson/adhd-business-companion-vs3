@@ -59,6 +59,8 @@ export function panelDetailEqual(
     a.showProjectColor === b.showProjectColor &&
     a.projectConversationCount === b.projectConversationCount &&
     a.projectFileCount === b.projectFileCount &&
+    a.projectTaskCount === b.projectTaskCount &&
+    sectionsEqual(a.openDetailSections, b.openDetailSections) &&
     a.nextAction === b.nextAction &&
     a.draftPreview === b.draftPreview
   );
@@ -108,4 +110,11 @@ function optionsEqual(a: string[], b: string[]): boolean {
 function completedStepsEqual(a: string[], b: string[]): boolean {
   if (a.length !== b.length) return false;
   return a.every((v, i) => v === b[i]);
+}
+
+function sectionsEqual(a?: string[], b?: string[]): boolean {
+  const x = a ?? [];
+  const y = b ?? [];
+  if (x.length !== y.length) return false;
+  return x.every((v, i) => v === y[i]);
 }
