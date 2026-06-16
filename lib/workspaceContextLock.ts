@@ -199,7 +199,7 @@ export function tryStrategyWorkspaceLocalReply(
 
   if (/\bprocrastinat/i.test(t)) {
     return (
-      "I see **Strategies** is open. For procrastination, try **Just Start Ugly**, **Shrink the First Step**, or **Body Double** from ADHD Strategies — or tell me what's making this one hard and we'll pick together."
+      "Procrastination is the worst — I get it. **Start Ugly**, **Shrink the First Step**, and **Body Double** are all in the ADHD dropdown on the right. Pick one, or tell me what's making this hard and we'll choose together."
     );
   }
   if (/\b(?:market|marketing|visibility|content|audience|lead)\b/i.test(t)) {

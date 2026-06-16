@@ -4,6 +4,12 @@
 
 import type { AppSection } from "./companionUi";
 import { compareDropdownLabels } from "./dropdownSort";
+import {
+  STRATEGY_CATEGORIES,
+  STRATEGIES,
+  resolveSubcat,
+  type Strategy,
+} from "./strategySystem";
 
 export type AdhdStrategyRoute =
   | { kind: "builtin"; strategyId: string }
@@ -18,7 +24,21 @@ export type AdhdStrategyHubEntry = {
 
 /** ADHD strategies — tools and techniques to apply right now. */
 const ADHD_STRATEGY_HUB_RAW: AdhdStrategyHubEntry[] = [
-  { id: "body-double", label: "Body Double", route: { kind: "builtin", strategyId: "body-double" } },
+  {
+    id: "body-double",
+    label: "Body Double",
+    route: { kind: "builtin", strategyId: "body-double" },
+  },
+  {
+    id: "shrink-first-step",
+    label: "Shrink the First Step",
+    route: { kind: "builtin", strategyId: "shrink-first-step" },
+  },
+  {
+    id: "start-ugly",
+    label: "Start Ugly",
+    route: { kind: "builtin", strategyId: "ugly-first-draft" },
+  },
   {
     id: "brain-parking-lot",
     label: "Brain Parking Lot",
@@ -103,4 +123,63 @@ export const STRATEGIES_HUB = {
 
 export function adhdHubEntry(id: string): AdhdStrategyHubEntry | undefined {
   return ADHD_STRATEGY_HUB.find((e) => e.id === id);
+}
+
+export type AdhdDropdownOption =
+  | { kind: "builtin"; hubId: string; strategyId: string; label: string }
+  | { kind: "hub"; hubId: string; entry: AdhdStrategyHubEntry; label: string };
+
+/** ADHD strategies grouped by category, categories A–Z, options A–Z within. */
+export function adhdStrategyDropdownGroups(
+  filter?: string,
+): { category: string; options: AdhdDropdownOption[] }[] {
+  const q = filter?.trim().toLowerCase() ?? "";
+  const byStrategyId = new Map<string, AdhdDropdownOption>();
+
+  for (const entry of ADHD_STRATEGY_HUB) {
+    if (q && !entry.label.toLowerCase().includes(q)) continue;
+    if (entry.route.kind === "builtin") {
+      byStrategyId.set(entry.route.strategyId, {
+        kind: "builtin",
+        hubId: entry.id,
+        strategyId: entry.route.strategyId,
+        label: entry.label,
+      });
+    } else {
+      byStrategyId.set(`hub:${entry.id}`, {
+        kind: "hub",
+        hubId: entry.id,
+        entry,
+        label: entry.label,
+      });
+    }
+  }
+
+  const categoryLabel = (strategy: Strategy) => {
+    const sub = resolveSubcat(strategy);
+    return (
+      STRATEGY_CATEGORIES.find((c) => c.id === sub)?.label ?? "Strategies"
+    );
+  };
+
+  const groups = new Map<string, AdhdDropdownOption[]>();
+  for (const opt of byStrategyId.values()) {
+    let cat = "Tools & Activities";
+    if (opt.kind === "builtin") {
+      const s = STRATEGIES.find((x) => x.id === opt.strategyId);
+      if (s) cat = categoryLabel(s);
+    }
+    const list = groups.get(cat) ?? [];
+    list.push(opt);
+    groups.set(cat, list);
+  }
+
+  return [...groups.entries()]
+    .sort(([a], [b]) => compareDropdownLabels(a, b))
+    .map(([category, options]) => ({
+      category,
+      options: [...options].sort((a, b) =>
+        compareDropdownLabels(a.label, b.label),
+      ),
+    }));
 }

@@ -73,7 +73,7 @@ describe("workspaceContextLock", () => {
       ctx,
       "What would help with procrastination?",
     );
-    expect(reply).toContain("Strategies");
-    expect(reply).toContain("procrastination");
+    expect(reply).toContain("Start Ugly");
+    expect(reply).toContain("dropdown");
   });
 });

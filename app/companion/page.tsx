@@ -146,6 +146,11 @@ import {
   strategyDisambiguationMessage,
 } from "@/lib/strategyRouting";
 import {
+  resolveStrategyOpenFromChat,
+  strategyOpenAck,
+  type StrategyOpenTarget,
+} from "@/lib/strategyOpenFromChat";
+import {
   artifactLockHintForChat,
   conflictsWithLockedArtifact,
   detectArtifactExportOffer,
@@ -802,7 +807,11 @@ export default function CompanionPage() {
   const isIdle = !messages.some((m) => m.role === "user");
   const splitCreateChat =
     chatLayoutMode === "split" && workspacePanel === "content-generator";
-  const homeCalm = activeSection === "home" && isIdle && !splitCreateChat;
+  const workspaceBesideChat =
+    chatLayoutMode === "split" &&
+    Boolean(workspacePanel || companionStandaloneSection || guideBesideSession);
+  const homeCalm =
+    activeSection === "home" && isIdle && !splitCreateChat && !workspaceBesideChat;
 
   useEffect(() => {
     if (!homeCalm) return;
@@ -1106,6 +1115,11 @@ export default function CompanionPage() {
     useState<BusinessStrategySession | null>(null);
   const businessStrategySessionRef = useRef<BusinessStrategySession | null>(null);
   businessStrategySessionRef.current = businessStrategySession;
+  const [strategyPanelCommand, setStrategyPanelCommand] = useState<{
+    key: number;
+    strategyId?: string;
+    hubEntryId?: string;
+  } | null>(null);
   const [businessStrategyDraft, setBusinessStrategyDraft] = useState<{
     typeLabel: string;
     draft: string;
@@ -3015,7 +3029,16 @@ export default function CompanionPage() {
     if (!auto) return;
     workspaceCoachSeededRef.current = key;
     const { field, content } = extractFocusDirective(auto.content);
-    setMessages((prev) => [...prev, { role: "assistant", content }]);
+    setMessages((prev) => {
+      if (
+        prev
+          .slice(-5)
+          .some((m) => m.role === "assistant" && m.content === content)
+      ) {
+        return prev;
+      }
+      return [...prev, { role: "assistant", content }];
+    });
     applyWorkspaceFocus(field ?? auto.focusField);
     if (auto.showTopicPicker && section === "projects") {
       setProjectCoachTopicPickerVisible(true);
@@ -3417,6 +3440,35 @@ export default function CompanionPage() {
     });
   }
 
+  function openStrategyFromChat(target: StrategyOpenTarget) {
+    if (workspacePanel !== "playbook") {
+      patchWorkspacePanel("playbook");
+      setActiveSection("home");
+      activeSectionRef.current = "home";
+      setActiveNav("playbook");
+      applyChatLayoutMode("split");
+      revealWorkspace();
+    }
+    if (target.kind === "builtin") {
+      setStrategyPanelCommand({
+        key: Date.now(),
+        strategyId: target.strategyId,
+      });
+      return;
+    }
+    if (target.entry.route.kind === "builtin") {
+      setStrategyPanelCommand({
+        key: Date.now(),
+        strategyId: target.entry.route.strategyId,
+      });
+      return;
+    }
+    setStrategyPanelCommand({
+      key: Date.now(),
+      hubEntryId: target.entry.id,
+    });
+  }
+
   function renderStrategiesPanel(extra?: {
     registerBack?: (fn: (() => boolean) | null) => void;
   }) {
@@ -3428,6 +3480,7 @@ export default function CompanionPage() {
         onStartBusinessStrategy={startBusinessStrategyBuilder}
         onOpenActivity={handleStrategiesOpenActivity}
         registerBack={extra?.registerBack}
+        openCommand={strategyPanelCommand}
       />
     );
   }
@@ -4435,6 +4488,20 @@ export default function CompanionPage() {
     setInput("");
     voiceUsedRef.current = false;
     setError(null);
+
+    const strategyOpen = resolveStrategyOpenFromChat(trimmed);
+    if (strategyOpen) {
+      openStrategyFromChat(strategyOpen);
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: strategyOpenAck(strategyOpen.title) },
+      ]);
+      setWorkspaceOffer(null);
+      setToolSuggestion(null);
+      setActionBridge(null);
+      setBridge(null);
+      return;
+    }
 
     const lastAssistantText =
       [...nextMessages].reverse().find((m) => m.role === "assistant")?.content ??

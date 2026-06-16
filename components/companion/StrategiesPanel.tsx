@@ -19,6 +19,7 @@ import {
   ADHD_STRATEGY_HUB,
   BUSINESS_STRATEGY_TEMPLATES,
   STRATEGIES_HUB,
+  adhdStrategyDropdownGroups,
   type AdhdStrategyHubEntry,
 } from "@/lib/strategyCatalog";
 import { compareDropdownLabels } from "@/lib/dropdownSort";
@@ -87,6 +88,7 @@ export function StrategiesPanel({
   onStartBusinessStrategy,
   onOpenActivity,
   registerBack,
+  openCommand,
 }: {
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
@@ -95,11 +97,17 @@ export function StrategiesPanel({
   onStartBusinessStrategy?: (typeLabel: string) => void;
   onOpenActivity?: (activityId: string) => void;
   registerBack?: (fn: (() => boolean) | null) => void;
+  /** Parent-driven open (e.g. from chat: "open Start Ugly"). */
+  openCommand?: {
+    key: number;
+    strategyId?: string;
+    hubEntryId?: string;
+  } | null;
 }) {
   const [view, setView] = useState<View>({ v: "home" });
   const [search, setSearch] = useState("");
   const [hubOpen, setHubOpen] = useState<Record<string, boolean>>({
-    adhd: true,
+    adhd: false,
     business: false,
     recommended: false,
     saved: false,
@@ -197,12 +205,26 @@ export function StrategiesPanel({
     onStartBusinessStrategy?.(typeLabel);
   }
 
+  useEffect(() => {
+    if (!openCommand?.key) return;
+    if (openCommand.strategyId) {
+      setAdhdPick(openCommand.strategyId);
+      setView({ v: "strategy", stratId: openCommand.strategyId });
+      return;
+    }
+    if (openCommand.hubEntryId) {
+      const entry = ADHD_STRATEGY_HUB.find((e) => e.id === openCommand.hubEntryId);
+      if (entry) {
+        setAdhdPick(entry.id);
+        openAdhdEntry(entry);
+      }
+    }
+  }, [openCommand?.key]);
+
   // ---- Home: ADHD / Business / Recommended / Saved -----------------------
   if (view.v === "home") {
-    const q = search.trim().toLowerCase();
-    const adhdOptions = q
-      ? ADHD_STRATEGY_HUB.filter((e) => e.label.toLowerCase().includes(q))
-      : ADHD_STRATEGY_HUB;
+    const q = search.trim();
+    const adhdGroups = adhdStrategyDropdownGroups(q);
     const businessOptions = [...BUSINESS_STRATEGY_TEMPLATES].sort((a, b) =>
       compareDropdownLabels(a, b),
     );
@@ -244,19 +266,16 @@ export function StrategiesPanel({
               className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
             >
               <option value="">Select an ADHD strategy…</option>
-              {adhdOptions.map((e) => (
-                <option key={e.id} value={e.id}>
-                  {e.label}
-                </option>
+              {adhdGroups.map((group) => (
+                <optgroup key={group.category} label={group.category}>
+                  {group.options.map((opt) => (
+                    <option key={opt.hubId} value={opt.hubId}>
+                      {opt.label}
+                    </option>
+                  ))}
+                </optgroup>
               ))}
             </select>
-            <button
-              type="button"
-              onClick={() => setView({ v: "adhd" })}
-              className="mt-2 text-sm font-semibold text-[#1e4f4f]"
-            >
-              Browse all ADHD strategies →
-            </button>
           </HubSection>
 
           <HubSection
