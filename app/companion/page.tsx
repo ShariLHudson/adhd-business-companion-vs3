@@ -6261,6 +6261,7 @@ export default function CompanionPage() {
                 onClose={closeWorkspacePanel}
                 revealKey={workspaceRevealSeq}
                 workspaceFirst={workspaceFirstSplit}
+                hideAssistToggle={workspacePanel === "content-generator"}
               />
             </div>
           )}
@@ -6461,15 +6462,7 @@ export default function CompanionPage() {
           )}
 
           {activeSection === "content-generator" && !workspacePanel && (
-            <WorkspaceShell
-              onAskShari={() =>
-                openCompanionAssist(
-                  "content-generator",
-                  undefined,
-                  createPanelWorkflowRef.current,
-                )
-              }
-            >
+            <WorkspaceShell showAssist={false}>
               <ContentGeneratorPanel
                 seed={genSeed}
                 onBuildWithShari={openCreateWithShari}

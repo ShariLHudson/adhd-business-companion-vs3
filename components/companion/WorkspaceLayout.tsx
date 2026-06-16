@@ -27,6 +27,7 @@ export function WorkspaceLayout({
   onClose,
   revealKey = 0,
   workspaceFirst = false,
+  hideAssistToggle = false,
 }: {
   chat: ReactNode;
   workspace?: ReactNode | null;
@@ -40,6 +41,8 @@ export function WorkspaceLayout({
   revealKey?: number;
   /** Workspace on the left, companion chat on the right (user-initiated assist). */
   workspaceFirst?: boolean;
+  /** Hide layout toggles that open Work With Shari (e.g. guided Create flow). */
+  hideAssistToggle?: boolean;
 }) {
   const [mobileView, setMobileView] = useState<"chat" | "work">("chat");
   const workspacePaneRef = useRef<HTMLDivElement>(null);
@@ -157,7 +160,17 @@ export function WorkspaceLayout({
               </span>
             </div>
             <div className="flex flex-wrap items-center justify-end gap-1">
-              {chatHidden ? (
+              {hideAssistToggle ? (
+                !chatHidden ? (
+                  <button
+                    type="button"
+                    onClick={() => setLayout("workspace-focus")}
+                    className={layoutBtn}
+                  >
+                    Focus on workspace
+                  </button>
+                ) : null
+              ) : chatHidden ? (
                 <button
                   type="button"
                   onClick={() => setLayout("split")}

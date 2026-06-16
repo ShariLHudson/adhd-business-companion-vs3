@@ -42,8 +42,6 @@ export function CreateWorkflowPanel({
   building?: boolean;
 }) {
   const [draftAnswer, setDraftAnswer] = useState("");
-  const [addingMore, setAddingMore] = useState(false);
-  const [extraInfo, setExtraInfo] = useState("");
 
   function shariInput(
     selected: string,
@@ -126,7 +124,14 @@ export function CreateWorkflowPanel({
             value={workflow.selectedTypeLabel ?? NO_CATEGORY}
             onChange={(v) => {
               if (!v) return;
-              onWorkflowChange(advanceAfterTypePick(v, workflow.categoryId));
+              const item = items.find((i) => i.label === v);
+              const next = advanceAfterTypePick(v, workflow.categoryId);
+              if (item?.route) {
+                onWorkflowChange(next);
+                return;
+              }
+              onTypeSelect(v, workflow.categoryId);
+              onWorkflowChange(advanceToDiscovery(next));
             }}
             options={typeOptions}
             placeholder={`Select ${cat?.label.toLowerCase() ?? "a"} type…`}
@@ -163,30 +168,16 @@ export function CreateWorkflowPanel({
         </p>
         <div className="mt-5 flex flex-col gap-3">
           {!routed ? (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  onTypeSelect(selected, workflow.categoryId!);
-                  onWorkflowChange(advanceToDiscovery(workflow));
-                }}
-                className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-              >
-                Answer a few questions
-              </button>
-              {onBuildWithShari ? (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onTypeSelect(selected, workflow.categoryId!);
-                    onBuildWithShari(shariInput(selected, workflow.categoryId!, workflow));
-                  }}
-                  className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-                >
-                  💬 Work With Shari
-                </button>
-              ) : null}
-            </>
+            <button
+              type="button"
+              onClick={() => {
+                onTypeSelect(selected, workflow.categoryId!);
+                onWorkflowChange(advanceToDiscovery(workflow));
+              }}
+              className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+            >
+              Answer a few questions
+            </button>
           ) : (
             <button
               type="button"
@@ -214,7 +205,8 @@ export function CreateWorkflowPanel({
           onClick={() =>
             onWorkflowChange({
               ...workflow,
-              step: "confirm",
+              step: "type",
+              selectedTypeLabel: null,
               discoveryIndex: 0,
               discoveryAnswers: {},
             })
@@ -289,7 +281,7 @@ export function CreateWorkflowPanel({
           ‹ Edit answers
         </button>
         <p className="mt-2 text-lg font-semibold text-[#1f1c19]">
-          I think I have enough information to build this.
+          I think I have enough information to create your {typeLabel}.
         </p>
         <p className="mt-1 text-sm text-[#6b635a]">
           Here&apos;s what I&apos;ll use:
@@ -310,74 +302,47 @@ export function CreateWorkflowPanel({
             ))}
           </ul>
         )}
-        <div className="mt-5 flex flex-col gap-3">
-          {addingMore ? (
-            <div className="rounded-xl border border-[#d4cdc3] bg-white/90 p-4">
-              <p className="text-sm font-semibold text-[#1f1c19]">
-                What else should I know?
-              </p>
-              <textarea
-                value={extraInfo}
-                onChange={(e) => setExtraInfo(e.target.value)}
-                placeholder="Any extra detail before we build…"
-                className="mt-3 min-h-[96px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-base outline-none focus:border-[#1e4f4f]"
-              />
-              <button
-                type="button"
-                disabled={!extraInfo.trim()}
-                onClick={() => {
-                  onWorkflowChange({
-                    ...workflow,
-                    discoveryAnswers: {
-                      ...workflow.discoveryAnswers,
-                      "extra-info": extraInfo.trim(),
-                    },
-                  });
-                  setAddingMore(false);
-                }}
-                className="mt-3 rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-40"
-              >
-                Save detail
-              </button>
-            </div>
-          ) : null}
-          <button
-            type="button"
-            disabled={building}
-            onClick={() => {
-              onWorkflowChange({
-                ...workflow,
-                readinessConfirmed: true,
-                buildApproved: true,
-                step: "improve",
-              });
-              onBuildDraft(brief);
-            }}
-            className="w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
-          >
-            {building ? "Building your draft…" : "Build Draft"}
-          </button>
-          <button
-            type="button"
-            disabled={building}
-            onClick={() => setAddingMore(true)}
-            className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
-          >
-            Add More Information
-          </button>
-          {onBuildWithShari && workflow.categoryId ? (
+        <div className="mt-5 flex flex-col gap-5">
+          <div>
             <button
               type="button"
               disabled={building}
-              onClick={() =>
-                onBuildWithShari(
-                  shariInput(typeLabel, workflow.categoryId!, workflow),
-                )
-              }
-              className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
+              onClick={() => {
+                onWorkflowChange({
+                  ...workflow,
+                  readinessConfirmed: true,
+                  buildApproved: true,
+                  step: "improve",
+                });
+                onBuildDraft(brief);
+              }}
+              className="w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
             >
-              💬 Work With Shari
+              {building ? `Creating your ${typeLabel.toLowerCase()}…` : `Create ${typeLabel}`}
             </button>
+            <p className="mt-1.5 text-sm text-[#6b635a]">
+              Build the {typeLabel.toLowerCase()} now using the information already gathered.
+            </p>
+          </div>
+          {onBuildWithShari && workflow.categoryId ? (
+            <div>
+              <button
+                type="button"
+                disabled={building}
+                onClick={() =>
+                  onBuildWithShari(
+                    shariInput(typeLabel, workflow.categoryId!, workflow),
+                  )
+                }
+                className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
+              >
+                💬 Work With Shari
+              </button>
+              <p className="mt-1.5 text-sm text-[#6b635a]">
+                Open a side-by-side conversation where Shari helps you think through ideas,
+                add details, and refine the {typeLabel.toLowerCase()} before creating it.
+              </p>
+            </div>
           ) : null}
         </div>
       </div>
