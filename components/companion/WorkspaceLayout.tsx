@@ -28,6 +28,8 @@ export function WorkspaceLayout({
   revealKey = 0,
   workspaceFirst = false,
   hideAssistToggle = false,
+  leftPaneTitle = "Chat",
+  leftPaneEmoji = "💬",
 }: {
   chat: ReactNode;
   workspace?: ReactNode | null;
@@ -43,6 +45,9 @@ export function WorkspaceLayout({
   workspaceFirst?: boolean;
   /** Hide layout toggles that open Work With Shari (e.g. guided Create flow). */
   hideAssistToggle?: boolean;
+  /** Left pane tab label when not default chat (e.g. activity guide beside a tool). */
+  leftPaneTitle?: string;
+  leftPaneEmoji?: string;
 }) {
   const [mobileView, setMobileView] = useState<"chat" | "work">("chat");
   const workspacePaneRef = useRef<HTMLDivElement>(null);
@@ -102,7 +107,7 @@ export function WorkspaceLayout({
               : "text-[#1e4f4f]"
           }`}
         >
-          💬 Chat
+          {leftPaneEmoji} {leftPaneTitle}
         </button>
         <button
           type="button"
