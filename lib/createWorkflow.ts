@@ -69,18 +69,35 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
     },
     {
       id: "problem",
-      prompt: "What problem are you solving?",
+      prompt: "What problem are they trying to solve?",
       why: "So the proposal leads with their pain, not your features.",
     },
     {
       id: "deliverable",
-      prompt: "What are you proposing to deliver?",
+      prompt: "What are you offering?",
       why: "So scope stays clear and concrete.",
     },
     {
+      id: "included",
+      prompt: "What deliverables are included?",
+      why: "So expectations are spelled out up front.",
+    },
+    {
       id: "timeline",
-      prompt: "What's the rough timeline or scope?",
+      prompt: "What is the timeline?",
       why: "So expectations feel realistic from the start.",
+    },
+    {
+      id: "pricing",
+      prompt: "Is there pricing to include?",
+      why: "So money isn't an awkward afterthought.",
+      placeholder: "Amount, range, or \"discuss on call\"…",
+    },
+    {
+      id: "tone",
+      prompt: "What tone should it have?",
+      why: "So it sounds like you talking to them.",
+      placeholder: "Warm, professional, direct…",
     },
   ],
   Email: [
@@ -161,17 +178,17 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
     },
     {
       id: "who",
-      prompt: "Who performs it?",
+      prompt: "Who performs this process?",
       why: "So instructions match their role and skill level.",
     },
     {
       id: "trigger",
-      prompt: "What triggers it?",
+      prompt: "What triggers the process?",
       why: "So people know exactly when to start.",
     },
     {
       id: "first-step",
-      prompt: "Walk me through the first step.",
+      prompt: "What is the first step?",
       why: "So the SOP starts with something concrete.",
     },
     {
@@ -179,11 +196,22 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
       prompt: "What happens next?",
       why: "So the flow continues clearly after step one.",
     },
+    {
+      id: "tools",
+      prompt: "Are there tools, links, or files involved?",
+      why: "So nothing important is left out of the checklist.",
+      placeholder: "Apps, templates, folders, links…",
+    },
+    {
+      id: "complete",
+      prompt: "How do we know the process is complete?",
+      why: "So \"done\" is obvious, not fuzzy.",
+    },
   ],
   Workshop: [
     {
       id: "topic",
-      prompt: "What is the workshop about?",
+      prompt: "What is the workshop topic?",
       why: "So every activity supports one theme.",
     },
     {
@@ -192,46 +220,39 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
       why: "So examples and pace fit the room.",
     },
     {
-      id: "duration",
-      prompt: "How long is the session?",
-      why: "So the outline fits real time.",
+      id: "problem",
+      prompt: "What problem does it solve for them?",
+      why: "So the workshop leads with their real struggle.",
     },
     {
       id: "outcome",
-      prompt: "What should participants leave able to do?",
+      prompt: "What should attendees leave with?",
       why: "So the workshop has a clear payoff.",
     },
     {
-      id: "first-segment",
-      prompt: "What's the first activity or segment?",
-      why: "So we open with something engaging and concrete.",
+      id: "duration",
+      prompt: "How long is the workshop?",
+      why: "So the outline fits real time.",
+    },
+    {
+      id: "offer",
+      prompt: "Will you make an offer at the end?",
+      why: "So we plan the close if you want one.",
+      placeholder: "Yes/no — and what you're offering, if so…",
+    },
+    {
+      id: "deliverables",
+      prompt: "What deliverables do you want?",
+      why: "So we build the right assets, not just an outline.",
+      placeholder: "Slides, workbook, speaking notes, promo copy…",
     },
   ],
   Strategy: [
     {
-      id: "focus",
-      prompt: "What strategy are we defining?",
-      why: "So we stay focused on one strategic question.",
-    },
-    {
-      id: "situation",
-      prompt: "What situation or challenge is this for?",
-      why: "So the strategy addresses reality, not theory.",
-    },
-    {
-      id: "stakeholders",
-      prompt: "Who needs to align on this?",
-      why: "So the plan accounts for the people involved.",
-    },
-    {
-      id: "outcome",
-      prompt: "What's the desired outcome in the next 90 days?",
-      why: "So actions tie to a measurable horizon.",
-    },
-    {
-      id: "constraint",
-      prompt: "What's the biggest constraint?",
-      why: "So the strategy is honest about limits.",
+      id: "strategy-kind",
+      prompt:
+        "What kind of strategy are we building — personal Companion strategy, or business / marketing / content / sales?",
+      why: "So the questions match what you're actually planning.",
     },
   ],
   Offer: [
@@ -321,7 +342,144 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
   ],
 };
 
-export function getDiscoveryQuestions(typeLabel: string): DiscoveryQuestion[] {
+const STRATEGY_PERSONAL: DiscoveryQuestion[] = [
+  {
+    id: "focus",
+    prompt: "What personal or ADHD pattern are we strategizing around?",
+    why: "So the plan fits your brain, not a generic productivity template.",
+  },
+  {
+    id: "situation",
+    prompt: "What's happening right now that made this strategy necessary?",
+    why: "So we address reality, not theory.",
+  },
+  {
+    id: "outcome",
+    prompt: "What would success look like in the next few weeks?",
+    why: "So actions tie to something you can actually notice.",
+  },
+  {
+    id: "constraint",
+    prompt: "What's the biggest constraint — time, energy, or attention?",
+    why: "So the strategy is honest about limits.",
+  },
+];
+
+const STRATEGY_BUSINESS: DiscoveryQuestion[] = [
+  {
+    id: "focus",
+    prompt: "What business direction or decision is this strategy for?",
+    why: "So we stay focused on one strategic question.",
+  },
+  {
+    id: "situation",
+    prompt: "What situation or challenge is this for?",
+    why: "So the strategy addresses what's actually true.",
+  },
+  {
+    id: "outcome",
+    prompt: "What's the desired outcome in the next 90 days?",
+    why: "So actions tie to a measurable horizon.",
+  },
+  {
+    id: "constraint",
+    prompt: "What's the biggest constraint?",
+    why: "So the strategy is honest about limits.",
+  },
+];
+
+const STRATEGY_MARKETING: DiscoveryQuestion[] = [
+  {
+    id: "focus",
+    prompt: "What marketing goal are we strategizing for?",
+    why: "So tactics serve one clear outcome.",
+  },
+  {
+    id: "audience",
+    prompt: "Who are you trying to reach?",
+    why: "So messaging lands with the right people.",
+  },
+  {
+    id: "channel",
+    prompt: "Where do they already show up?",
+    why: "So the plan fits your real channels.",
+  },
+  {
+    id: "outcome",
+    prompt: "What would a win look like in 90 days?",
+    why: "So we know what we're aiming at.",
+  },
+];
+
+const STRATEGY_CONTENT: DiscoveryQuestion[] = [
+  {
+    id: "focus",
+    prompt: "What content strategy are we defining?",
+    why: "So we stay on one content lane.",
+  },
+  {
+    id: "audience",
+    prompt: "Who is the content for?",
+    why: "So topics and tone fit them.",
+  },
+  {
+    id: "cadence",
+    prompt: "How often can you realistically publish?",
+    why: "So the plan matches your capacity.",
+  },
+  {
+    id: "outcome",
+    prompt: "What should this content achieve?",
+    why: "So posts aren't just activity — they have a job.",
+  },
+];
+
+const STRATEGY_SALES: DiscoveryQuestion[] = [
+  {
+    id: "focus",
+    prompt: "What sales outcome is this strategy for?",
+    why: "So every step points toward revenue.",
+  },
+  {
+    id: "offer",
+    prompt: "What are you selling?",
+    why: "So the strategy stays tied to a real offer.",
+  },
+  {
+    id: "buyer",
+    prompt: "Who is the ideal buyer?",
+    why: "So outreach and messaging fit them.",
+  },
+  {
+    id: "outcome",
+    prompt: "What would a win look like in 90 days?",
+    why: "So we know when the strategy is working.",
+  },
+];
+
+function strategyFollowUpQuestions(kindAnswer: string): DiscoveryQuestion[] {
+  const k = kindAnswer.toLowerCase();
+  if (/personal|companion|adhd/i.test(k)) return STRATEGY_PERSONAL;
+  if (/marketing/i.test(k)) return STRATEGY_MARKETING;
+  if (/content/i.test(k)) return STRATEGY_CONTENT;
+  if (/sales/i.test(k)) return STRATEGY_SALES;
+  return STRATEGY_BUSINESS;
+}
+
+function strategyDiscoveryQuestions(answers: Record<string, string>): DiscoveryQuestion[] {
+  const kind = answers["strategy-kind"]?.trim();
+  const kindQ = DISCOVERY_BY_TYPE.Strategy![0]!;
+  if (!kind) return [kindQ];
+  return [kindQ, ...strategyFollowUpQuestions(kind)];
+}
+
+export function getDiscoveryQuestions(
+  typeLabel: string,
+  answers: Record<string, string> = {},
+): DiscoveryQuestion[] {
+  if (typeLabel === "Strategy") {
+    return strategyDiscoveryQuestions(answers);
+  }
   return DISCOVERY_BY_TYPE[typeLabel] ?? DEFAULT_DISCOVERY;
 }
 
@@ -361,12 +519,12 @@ export function discoveryQuestionsForState(
   typeLabel: string,
   state: CreateWorkflowState,
 ): DiscoveryQuestion | null {
-  const questions = getDiscoveryQuestions(typeLabel);
+  const questions = getDiscoveryQuestions(typeLabel, state.discoveryAnswers);
   return questions[state.discoveryIndex] ?? null;
 }
 
 export function discoveryComplete(typeLabel: string, state: CreateWorkflowState): boolean {
-  const questions = getDiscoveryQuestions(typeLabel);
+  const questions = getDiscoveryQuestions(typeLabel, state.discoveryAnswers);
   return state.discoveryIndex >= questions.length;
 }
 
@@ -378,7 +536,7 @@ export function buildBriefFromDiscovery(
   typeLabel: string,
   answers: Record<string, string>,
 ): string {
-  const questions = getDiscoveryQuestions(typeLabel);
+  const questions = getDiscoveryQuestions(typeLabel, answers);
   const lines = questions
     .map((q) => {
       const a = answers[q.id]?.trim();
@@ -394,7 +552,7 @@ export function readinessSummary(
   typeLabel: string,
   answers: Record<string, string>,
 ): { label: string; value: string }[] {
-  const questions = getDiscoveryQuestions(typeLabel);
+  const questions = getDiscoveryQuestions(typeLabel, answers);
   return questions
     .map((q) => {
       const v = answers[q.id]?.trim();
@@ -424,7 +582,7 @@ export function advanceAfterDiscoveryAnswer(
   answer: string,
 ): CreateWorkflowState {
   const answers = { ...state.discoveryAnswers, [questionId]: answer };
-  const questions = getDiscoveryQuestions(typeLabel);
+  const questions = getDiscoveryQuestions(typeLabel, answers);
   const nextIndex = state.discoveryIndex + 1;
   if (nextIndex >= questions.length) {
     return {
@@ -448,7 +606,7 @@ export function skipDiscoveryQuestion(
 ): CreateWorkflowState {
   const answers = { ...state.discoveryAnswers };
   delete answers[questionId];
-  const questions = getDiscoveryQuestions(typeLabel);
+  const questions = getDiscoveryQuestions(typeLabel, answers);
   const nextIndex = state.discoveryIndex + 1;
   if (nextIndex >= questions.length) {
     return { ...state, discoveryAnswers: answers, discoveryIndex: nextIndex, step: "readiness" };

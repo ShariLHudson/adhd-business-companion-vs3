@@ -127,6 +127,8 @@ export function ContentGeneratorPanel({
   chatBuildRequest,
   onChatBuildComplete,
   onChatBuildFailed,
+  chatReviseRequest,
+  onChatReviseComplete,
 }: {
   seed: GenSeed;
   onOpen?: (s: AppSection) => void;
@@ -166,6 +168,9 @@ export function ContentGeneratorPanel({
   chatBuildRequest?: { type: string; brief: string; key: number } | null;
   onChatBuildComplete?: () => void;
   onChatBuildFailed?: () => void;
+  /** Parent-triggered draft revision from chat builder. */
+  chatReviseRequest?: { instruction: string; key: number } | null;
+  onChatReviseComplete?: () => void;
 }) {
   const [type, setType] = useState(seed?.type ?? "");
   const [topic, setTopic] = useState(seed?.topic ?? seed?.brief ?? "");
@@ -641,6 +646,49 @@ export function ContentGeneratorPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatBuildRequest]);
 
+  const lastChatReviseKey = useRef(0);
+  useEffect(() => {
+    if (!chatReviseRequest || chatReviseRequest.key === lastChatReviseKey.current) {
+      return;
+    }
+    lastChatReviseKey.current = chatReviseRequest.key;
+    const instruction = chatReviseRequest.instruction;
+    if (!instruction || !draft.trim()) {
+      onChatReviseComplete?.();
+      return;
+    }
+    void (async () => {
+      try {
+        const res = await fetch("/api/refine", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: draft,
+            action: "modify",
+            instruction,
+            context: businessContextSummary(),
+          }),
+        });
+        const data = await res.json();
+        if (res.ok && data.result) {
+          setDraft(data.result);
+          setLastActivity({
+            kind: "draft",
+            title: brief || type || "Draft",
+            subtitle: type || "content",
+            contentType: type,
+            content: data.result,
+          });
+        }
+      } catch {
+        /* refine failed — user can retry from panel */
+      } finally {
+        onChatReviseComplete?.();
+      }
+    })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [chatReviseRequest]);
+
   function resetLocalCreateState() {
     setType("");
     setDraft("");
@@ -839,7 +887,7 @@ export function ContentGeneratorPanel({
               ) : null}
             </div>
           ) : (
-            <>
+          <>
           {workflow.step === "category" && (
             <div className="companion-fade-in mb-2">
               <input
@@ -873,12 +921,12 @@ export function ContentGeneratorPanel({
             workflow={workflow}
             typeLabel={type}
             onWorkflowChange={setWorkflow}
-            onTypeSelect={(label) => setType(label)}
+            onTypeSelect={(label) => pickCreateType(label)}
             onRoutedItem={(section) => onOpenSection?.(section)}
             onBuildDraft={handleBuildDraft}
             building={loading}
           />
-            </>
+          </>
           )}
         </div>
       )}
@@ -912,6 +960,10 @@ export function ContentGeneratorPanel({
               });
             }}
             disabled={loading}
+            onSave={handleSave}
+            onAddToProject={handleAddToProject}
+            onPrint={() => exportPrintRef.current?.click()}
+            onGoogleDoc={() => exportDocRef.current?.click()}
           />
 
           {!workspaceMode && (

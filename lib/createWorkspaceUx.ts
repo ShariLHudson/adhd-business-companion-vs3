@@ -54,19 +54,34 @@ export type DraftQuickEdit = {
 };
 
 export const DRAFT_QUICK_EDITS: DraftQuickEdit[] = [
-  { id: "shorter", label: "Shorter", instruction: "Make it shorter while keeping the main points." },
-  { id: "longer", label: "Longer", instruction: "Expand with more helpful detail and examples." },
-  { id: "friendlier", label: "Friendlier", instruction: "Make the tone warmer and friendlier." },
+  { id: "shorter", label: "Make it shorter", instruction: "Make it shorter while keeping the main points." },
+  { id: "longer", label: "Make it longer", instruction: "Expand with more helpful detail." },
+  { id: "warmer", label: "Make it warmer", instruction: "Make the tone warmer and more human." },
   {
     id: "professional",
-    label: "More Professional",
+    label: "More professional",
     instruction: "Make it more professional and polished.",
   },
-  { id: "simpler", label: "Simpler", instruction: "Simplify the language — plain and skimmable." },
+  { id: "simpler", label: "Make it simpler", instruction: "Simplify the language — plain and skimmable." },
   {
-    id: "cta",
-    label: "Stronger CTA",
-    instruction: "Add or strengthen the call to action.",
+    id: "detail",
+    label: "Add more detail",
+    instruction: "Add more helpful detail where it strengthens the piece.",
+  },
+  {
+    id: "examples",
+    label: "Add examples",
+    instruction: "Add concrete examples that make the content clearer.",
+  },
+  {
+    id: "pricing",
+    label: "Add pricing",
+    instruction: "Add or clarify pricing information where appropriate.",
+  },
+  {
+    id: "next-steps",
+    label: "Add next steps",
+    instruction: "Add clear next steps at the end.",
   },
 ];
 

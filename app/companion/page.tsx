@@ -107,12 +107,15 @@ import {
 } from "@/lib/workspaceChatPreference";
 import {
   bootstrapCreateBuilderSession,
+  createBuilderActionsForPhase,
   createBuilderExportMessage,
   formatCreateBuilderChatHint,
   markCreateBuilderGenerated,
   processCreateBuilderTurn,
+  type CreateBuilderAction,
   type CreateBuilderSession,
 } from "@/lib/createBuilderChat";
+import { CreateBuilderActionBar } from "@/components/companion/CreateBuilderActionBar";
 import {
   artifactLockHintForChat,
   conflictsWithLockedArtifact,
@@ -1032,6 +1035,10 @@ export default function CompanionPage() {
     brief: string;
     key: number;
   } | null>(null);
+  const [chatReviseRequest, setChatReviseRequest] = useState<{
+    instruction: string;
+    key: number;
+  } | null>(null);
   const createBuilderBootstrappedRef = useRef(false);
   const [googleWorkspace, setGoogleWorkspace] =
     useState<GoogleWorkspaceSession | null>(null);
@@ -1151,8 +1158,36 @@ export default function CompanionPage() {
     setChatBuildRequest(null);
     setMessages((prev) => [
       ...prev,
-      { role: "assistant", content: createBuilderExportMessage(type) },
+      {
+        role: "assistant",
+        content: createBuilderExportMessage(type),
+      },
     ]);
+  }
+
+  function handleCreateBuilderAction(action: CreateBuilderAction) {
+    if (action.id === "revise" && action.instruction === "__custom__") {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Tell me what you'd like to change — type it below.",
+        },
+      ]);
+      inputRef.current?.focus();
+      return;
+    }
+    if (action.id === "create-draft") {
+      void handleSend("Create Draft", false, true);
+      return;
+    }
+    if (action.id === "add-more-info") {
+      void handleSend("Add more information", false, true);
+      return;
+    }
+    if (action.id === "revise") {
+      void handleSend(action.label, false, true);
+    }
   }
 
   function handleChatBuildFailed() {
@@ -3061,6 +3096,13 @@ export default function CompanionPage() {
         setChatBuildRequest({
           type: turn.generateType,
           brief: turn.generateBrief,
+          key: Date.now(),
+        });
+      }
+
+      if (turn.reviseInstruction) {
+        setChatReviseRequest({
+          instruction: turn.reviseInstruction,
           key: Date.now(),
         });
       }
@@ -5094,6 +5136,8 @@ export default function CompanionPage() {
             chatBuildRequest={chatBuildRequest}
             onChatBuildComplete={handleChatBuildComplete}
             onChatBuildFailed={handleChatBuildFailed}
+            chatReviseRequest={chatReviseRequest}
+            onChatReviseComplete={() => setChatReviseRequest(null)}
           />
         );
       case "google-workspace":
@@ -6089,6 +6133,16 @@ export default function CompanionPage() {
                         }}
                       />
                     )
+                  ) : null}
+                  {splitCreateChat &&
+                  createBuilderActionsForPhase(createBuilderSession)?.length ? (
+                    <CreateBuilderActionBar
+                      actions={
+                        createBuilderActionsForPhase(createBuilderSession)!
+                      }
+                      onAction={handleCreateBuilderAction}
+                      disabled={isLoading}
+                    />
                   ) : null}
                   <ChatInputBar
                     input={input}

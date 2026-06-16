@@ -19,7 +19,7 @@ describe("createBuilderChat", () => {
     expect(opener).toContain("What process are we documenting?");
   });
 
-  it("walks discovery one question at a time then asks to generate", () => {
+  it("walks discovery one question at a time then asks to create draft", () => {
     let { session } = bootstrapCreateBuilderSession("SOP");
     const answers = [
       "ElevenLabs video export",
@@ -27,6 +27,8 @@ describe("createBuilderChat", () => {
       "New client deliverable due",
       "Open the project template",
       "Export at 1080p and upload",
+      "ElevenLabs app and Google Drive",
+      "File uploaded and client notified",
     ];
     let reply = "";
     for (const a of answers) {
@@ -35,9 +37,9 @@ describe("createBuilderChat", () => {
       reply = turn.reply;
     }
     expect(session.phase).toBe("readiness");
-    expect(reply).toContain("Would you like me to generate it");
+    expect(reply).toContain("Would you like me to create the draft");
 
-    const approved = processCreateBuilderTurn(session, "yes please");
+    const approved = processCreateBuilderTurn(session, "Create Draft");
     expect(approved.generateBrief).toContain("ElevenLabs");
     expect(approved.generateType).toBe("SOP");
   });
@@ -46,5 +48,17 @@ describe("createBuilderChat", () => {
     expect(isAffirmative("yes")).toBe(true);
     expect(isAffirmative("go ahead")).toBe(true);
     expect(isAffirmative("maybe later")).toBe(false);
+  });
+
+  it("branches strategy questions after kind is chosen", () => {
+    let { session } = bootstrapCreateBuilderSession("Strategy");
+    const kind = processCreateBuilderTurn(session, "Personal Companion strategy");
+    session = kind.session;
+    expect(kind.reply).toContain("Got it");
+    const next = processCreateBuilderTurn(
+      session,
+      "Staying focused during admin work",
+    );
+    expect(next.reply.length).toBeGreaterThan(5);
   });
 });
