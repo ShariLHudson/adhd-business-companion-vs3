@@ -134,6 +134,17 @@ import {
   newCreateSessionId,
 } from "@/lib/createSharedSession";
 import { CreateBuilderActionBar } from "@/components/companion/CreateBuilderActionBar";
+import { BusinessStrategyDraftPanel } from "@/components/companion/BusinessStrategyDraftPanel";
+import {
+  bootstrapBusinessStrategySession,
+  processBusinessStrategyTurn,
+  type BusinessStrategySession,
+} from "@/lib/businessStrategyBuilder";
+import {
+  classifyStrategyIntent,
+  parseStrategyDisambiguationChoice,
+  strategyDisambiguationMessage,
+} from "@/lib/strategyRouting";
 import {
   artifactLockHintForChat,
   conflictsWithLockedArtifact,
@@ -1086,6 +1097,16 @@ export default function CompanionPage() {
     useState<CreateBuilderSession | null>(null);
   const createBuilderSessionRef = useRef<CreateBuilderSession | null>(null);
   createBuilderSessionRef.current = createBuilderSession;
+  const [businessStrategySession, setBusinessStrategySession] =
+    useState<BusinessStrategySession | null>(null);
+  const businessStrategySessionRef = useRef<BusinessStrategySession | null>(null);
+  businessStrategySessionRef.current = businessStrategySession;
+  const [businessStrategyDraft, setBusinessStrategyDraft] = useState<{
+    typeLabel: string;
+    draft: string;
+  } | null>(null);
+  const [strategyDisambiguationPending, setStrategyDisambiguationPending] =
+    useState(false);
   const [chatBuildRequest, setChatBuildRequest] = useState<{
     type: string;
     brief: string;
@@ -3342,10 +3363,63 @@ export default function CompanionPage() {
 
   function handlePlaybookAsk(prompt: string) {
     setActiveSection("home");
-    setActiveNav("chat");
+    activeSectionRef.current = "home";
+    setActiveNav("playbook");
+    if (workspacePanel !== "playbook") {
+      patchWorkspacePanel("playbook");
+    }
+    applyChatLayoutMode("split");
+    revealWorkspace();
     setCoachingMode("playbook");
-    // Start a fresh conversation — not a continuation of the old one.
-    void handleSend(prompt, true);
+    void handleSend(prompt, true, true);
+  }
+
+  function startBusinessStrategyBuilder(typeLabel: string) {
+    setBusinessStrategyDraft(null);
+    setActiveSection("home");
+    activeSectionRef.current = "home";
+    setActiveNav("playbook");
+    patchWorkspacePanel("playbook");
+    setCompanionStandaloneSection(null);
+    setWorkspaceFirstSplit(false);
+    applyChatLayoutMode("split");
+    revealWorkspace();
+    workspaceCoachSeededRef.current = null;
+    const { session, opener } = bootstrapBusinessStrategySession(typeLabel);
+    setBusinessStrategySession(session);
+    setMessages((prev) => [...prev, { role: "assistant", content: opener }]);
+    inputRef.current?.focus();
+  }
+
+  function handleStrategiesOpenActivity(activityId: string) {
+    const activity = getActivityById(activityId);
+    if (!activity) return;
+    handleActivityOpenBeside("activities", {
+      session: {
+        ...EMPTY_ACTIVITY_SESSION,
+        activityId,
+        stepIndex: 0,
+        phase: "active",
+        categoryId: activity.categoryId,
+      },
+      contextMessage:
+        "Let's apply this ADHD strategy — I'll walk you one step at a time.",
+    });
+  }
+
+  function renderStrategiesPanel(extra?: {
+    registerBack?: (fn: (() => boolean) | null) => void;
+  }) {
+    return (
+      <StrategiesPanel
+        onOpen={openWorkspaceFromSection}
+        onAsk={handlePlaybookAsk}
+        onContextChange={handleWorkspaceDetailChange}
+        onStartBusinessStrategy={startBusinessStrategyBuilder}
+        onOpenActivity={handleStrategiesOpenActivity}
+        registerBack={extra?.registerBack}
+      />
+    );
   }
 
   function handleFocusSession(minutes: number) {
@@ -3556,6 +3630,91 @@ export default function CompanionPage() {
   ) {
     const trimmed = (overrideText ?? input).trim();
     if (!trimmed || isLoading) return;
+
+    if (strategyDisambiguationPending) {
+      const choice = parseStrategyDisambiguationChoice(trimmed);
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (choice === "business_create") {
+        setStrategyDisambiguationPending(false);
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        startBusinessStrategyBuilder("Business Strategy");
+        return;
+      }
+      if (choice === "adhd_apply") {
+        setStrategyDisambiguationPending(false);
+        setMessages((prev) => [
+          ...prev,
+          userMessage,
+          {
+            role: "assistant",
+            content:
+              "Got it — **ADHD strategy to use now**. Open the **ADHD Strategies** dropdown and pick one, or tell me what's happening (focus, overwhelm, deciding, getting started…).",
+          },
+        ]);
+        setInput("");
+        return;
+      }
+    }
+
+    if (
+      workspacePanel === "playbook" &&
+      !strategyDisambiguationPending &&
+      classifyStrategyIntent(trimmed) === "business_create"
+    ) {
+      const userMessage: Message = { role: "user", content: trimmed };
+      setMessages((prev) => [...prev, userMessage]);
+      setInput("");
+      const typeMatch = trimmed.match(
+        /\b(marketing|sales|launch|content|product|visibility)\b/i,
+      );
+      const label = typeMatch
+        ? `${typeMatch[1]!.charAt(0).toUpperCase()}${typeMatch[1]!.slice(1).toLowerCase()} Strategy`
+        : "Business Strategy";
+      startBusinessStrategyBuilder(label);
+      return;
+    }
+
+    if (
+      /\bstrateg/i.test(trimmed) &&
+      /\b(?:create|how\s+do)/i.test(trimmed)
+    ) {
+      const userMessage: Message = { role: "user", content: trimmed };
+      setMessages((prev) => [
+        ...prev,
+        userMessage,
+        { role: "assistant", content: strategyDisambiguationMessage() },
+      ]);
+      setStrategyDisambiguationPending(true);
+      setInput("");
+      return;
+    }
+
+    const bizSession = businessStrategySessionRef.current;
+    const bizChatActive =
+      chatLayoutMode === "split" &&
+      workspacePanel === "playbook" &&
+      bizSession &&
+      bizSession.phase !== "done";
+
+    if (bizChatActive && !fresh) {
+      const userMessage: Message = { role: "user", content: trimmed };
+      setMessages((prev) => [...prev, userMessage]);
+      setInput("");
+      setIsLoading(false);
+      const turn = processBusinessStrategyTurn(bizSession, trimmed);
+      setBusinessStrategySession(turn.session);
+      if (turn.reply) {
+        setMessages((prev) => [...prev, { role: "assistant", content: turn.reply }]);
+      }
+      if (turn.session.draft) {
+        setBusinessStrategyDraft({
+          typeLabel: turn.session.typeLabel,
+          draft: turn.session.draft,
+        });
+      }
+      return;
+    }
 
     const builderSession = createBuilderSessionRef.current;
     const builderChatActive =
@@ -5706,12 +5865,19 @@ export default function CompanionPage() {
           />
         );
       case "playbook":
-        return (
-          <StrategiesPanel
-            onOpen={suggestCrossWorkspaceOpen}
-            onAsk={handlePlaybookAsk}
-            registerBack={registerBack}
+        return businessStrategyDraft ? (
+          <BusinessStrategyDraftPanel
+            typeLabel={businessStrategyDraft.typeLabel}
+            draft={businessStrategyDraft.draft}
+            onBack={() => setBusinessStrategyDraft(null)}
+            onStartOver={() => {
+              setBusinessStrategyDraft(null);
+              setBusinessStrategySession(null);
+              startBusinessStrategyBuilder("Other Strategy");
+            }}
           />
+        ) : (
+          renderStrategiesPanel({ registerBack })
         );
       case "brain-dump":
         return (
@@ -5885,13 +6051,19 @@ export default function CompanionPage() {
           />
         );
       case "playbook":
-        return (
-          <StrategiesPanel
-            onOpen={openWorkspaceFromSection}
-            onAsk={handlePlaybookAsk}
-            onContextChange={handleWorkspaceDetailChange}
-            registerBack={registerBack}
+        return businessStrategyDraft ? (
+          <BusinessStrategyDraftPanel
+            typeLabel={businessStrategyDraft.typeLabel}
+            draft={businessStrategyDraft.draft}
+            onBack={() => setBusinessStrategyDraft(null)}
+            onStartOver={() => {
+              setBusinessStrategyDraft(null);
+              setBusinessStrategySession(null);
+              startBusinessStrategyBuilder("Other Strategy");
+            }}
           />
+        ) : (
+          renderStrategiesPanel({ registerBack })
         );
       case "how-do-i":
         return (
@@ -7108,12 +7280,20 @@ export default function CompanionPage() {
               assistLabel={getShariAssistLabel("playbook")}
               onAskShari={() => openCompanionAssist("playbook")}
             >
-              <StrategiesPanel
-                onOpen={suggestCrossWorkspaceOpen}
-                onAsk={handlePlaybookAsk}
-                onContextChange={handleWorkspaceDetailChange}
-                registerBack={registerBack}
-              />
+              {businessStrategyDraft ? (
+                <BusinessStrategyDraftPanel
+                  typeLabel={businessStrategyDraft.typeLabel}
+                  draft={businessStrategyDraft.draft}
+                  onBack={() => setBusinessStrategyDraft(null)}
+                  onStartOver={() => {
+                    setBusinessStrategyDraft(null);
+                    setBusinessStrategySession(null);
+                    startBusinessStrategyBuilder("Other Strategy");
+                  }}
+                />
+              ) : (
+                renderStrategiesPanel({ registerBack })
+              )}
             </WorkspaceShell>
           )}
 

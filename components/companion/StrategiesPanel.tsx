@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import {
   STRATEGIES,
   STRATEGY_GROUPS,
@@ -15,6 +15,12 @@ import {
   type Strategy,
   type StrategyGroupId,
 } from "@/lib/strategySystem";
+import {
+  ADHD_STRATEGY_HUB,
+  BUSINESS_STRATEGY_TEMPLATES,
+  STRATEGIES_HUB,
+  type AdhdStrategyHubEntry,
+} from "@/lib/strategyCatalog";
 import { compareDropdownLabels } from "@/lib/dropdownSort";
 import {
   getUserStrategies,
@@ -37,6 +43,8 @@ import {
 
 type View =
   | { v: "home" }
+  | { v: "adhd" }
+  | { v: "business" }
   | { v: "group"; group: StrategyGroupId }
   | { v: "recommended" }
   | { v: "saved" }
@@ -76,15 +84,29 @@ export function StrategiesPanel({
   onOpen,
   onAsk,
   onContextChange,
+  onStartBusinessStrategy,
+  onOpenActivity,
   registerBack,
 }: {
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
   onContextChange?: (detail: import("@/lib/workspaceAwareness").WorkspacePanelDetail) => void;
+  /** Start business strategy builder beside chat (Create flow). */
+  onStartBusinessStrategy?: (typeLabel: string) => void;
+  onOpenActivity?: (activityId: string) => void;
   registerBack?: (fn: (() => boolean) | null) => void;
 }) {
   const [view, setView] = useState<View>({ v: "home" });
   const [search, setSearch] = useState("");
+  const [hubOpen, setHubOpen] = useState<Record<string, boolean>>({
+    adhd: true,
+    business: false,
+    recommended: false,
+    saved: false,
+  });
+  const [adhdPick, setAdhdPick] = useState("");
+  const [businessPick, setBusinessPick] = useState("");
+  const [recPick, setRecPick] = useState("");
   const [newTitle, setNewTitle] = useState("");
   const [newProblem, setNewProblem] = useState("");
   const [newSteps, setNewSteps] = useState("");
@@ -106,7 +128,7 @@ export function StrategiesPanel({
         setView(u ? { v: "group", group: u.type } : { v: "saved" });
         return true;
       }
-      if (view.v === "group" || view.v === "recommended" || view.v === "saved" || view.v === "new") {
+      if (view.v === "group" || view.v === "recommended" || view.v === "saved" || view.v === "new" || view.v === "adhd" || view.v === "business") {
         setView({ v: "home" });
         return true;
       }
@@ -154,61 +176,48 @@ export function StrategiesPanel({
       : undefined;
   }
 
-  // ---- Home: Recommended / Personal / Business / Saved -------------------
+  function toggleHub(id: string) {
+    setHubOpen((prev) => ({ ...prev, [id]: !prev[id] }));
+  }
+
+  function openAdhdEntry(entry: AdhdStrategyHubEntry) {
+    const route = entry.route;
+    if (route.kind === "builtin") {
+      setView({ v: "strategy", stratId: route.strategyId });
+      return;
+    }
+    if (route.kind === "activity") {
+      onOpenActivity?.(route.activityId);
+      return;
+    }
+    onOpen?.(route.section);
+  }
+
+  function startBusiness(typeLabel: string) {
+    onStartBusinessStrategy?.(typeLabel);
+  }
+
+  // ---- Home: ADHD / Business / Recommended / Saved -----------------------
   if (view.v === "home") {
-    const savedCount = getUserStrategies().length;
-    const rows: { emoji: string; label: string; blurb: string; go: () => void }[] = [
-      {
-        emoji: "➕",
-        label: "New strategy",
-        blurb: "Create your own — something that works for you.",
-        go: () => setView({ v: "new" }),
-      },
-      {
-        emoji: "✨",
-        label: "Recommended for you",
-        blurb: "Solid starting points — more personal over time.",
-        go: () => setView({ v: "recommended" }),
-      },
-      {
-        emoji: "🌱",
-        label: "Personal & ADHD",
-        blurb: "How you work with your own brain.",
-        go: () => {
-          setOpenSubcat(null);
-          setView({ v: "group", group: "personal" });
-        },
-      },
-      {
-        emoji: "💼",
-        label: "Business",
-        blurb: "Growing and running the work.",
-        go: () => {
-          setOpenSubcat(null);
-          setView({ v: "group", group: "business" });
-        },
-      },
-      {
-        emoji: "📌",
-        label: "My saved strategies",
-        blurb: savedCount ? `${savedCount} saved` : "Strategies you save live here.",
-        go: () => setView({ v: "saved" }),
-      },
-    ];
     const q = search.trim().toLowerCase();
-    const filtered = q
-      ? rows.filter(
-          (r) =>
-            r.label.toLowerCase().includes(q) ||
-            r.blurb.toLowerCase().includes(q),
-        )
-      : rows;
+    const adhdOptions = q
+      ? ADHD_STRATEGY_HUB.filter((e) => e.label.toLowerCase().includes(q))
+      : ADHD_STRATEGY_HUB;
+    const businessOptions = [...BUSINESS_STRATEGY_TEMPLATES].sort((a, b) =>
+      compareDropdownLabels(a, b),
+    );
+    const recs = STRATEGIES.filter((s) => s.recommended)
+      .slice(0, 8)
+      .sort((a, b) => compareDropdownLabels(a.title, b.title));
+    const saved = getUserStrategies();
+    const savedCount = saved.length;
+
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
         <WorkspaceGuide section="playbook" />
         <p className="text-2xl font-semibold text-[#1f1c19]">Strategies</p>
         <p className="mt-1 text-base text-[#6b635a]">
-          Short playbooks for your brain and business. Search, then pick one.
+          Apply an ADHD technique now, or create a business strategy with Shari.
         </p>
         <input
           value={search}
@@ -216,28 +225,229 @@ export function StrategiesPanel({
           placeholder="Search strategies…"
           className="mt-4 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base outline-none focus:border-[#1e4f4f]"
         />
+
         <div className="mt-6 flex flex-col gap-3">
-          {filtered.map((r) => (
-            <button
-              key={r.label}
-              type="button"
-              onClick={r.go}
-              className="flex items-start gap-3 rounded-2xl border border-[#1e4f4f]/20 bg-white/85 p-4 text-left shadow-sm transition-colors hover:border-[#1e4f4f]/45 hover:bg-white"
+          <HubSection
+            title={STRATEGIES_HUB.adhd.title}
+            description={STRATEGIES_HUB.adhd.description}
+            open={hubOpen.adhd}
+            onToggle={() => toggleHub("adhd")}
+          >
+            <select
+              value={adhdPick}
+              onChange={(e) => {
+                const id = e.target.value;
+                setAdhdPick(id);
+                const entry = ADHD_STRATEGY_HUB.find((x) => x.id === id);
+                if (entry) openAdhdEntry(entry);
+              }}
+              className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
             >
-              <span aria-hidden="true" className="text-2xl">
-                {r.emoji}
-              </span>
-              <span>
-                <span className="block text-base font-semibold text-[#1f1c19]">
-                  {r.label}
-                </span>
-                <span className="mt-0.5 block text-sm text-[#6b635a]">
-                  {r.blurb}
-                </span>
-              </span>
+              <option value="">Select an ADHD strategy…</option>
+              {adhdOptions.map((e) => (
+                <option key={e.id} value={e.id}>
+                  {e.label}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => setView({ v: "adhd" })}
+              className="mt-2 text-sm font-semibold text-[#1e4f4f]"
+            >
+              Browse all ADHD strategies →
             </button>
-          ))}
+          </HubSection>
+
+          <HubSection
+            title={STRATEGIES_HUB.business.title}
+            description={STRATEGIES_HUB.business.description}
+            open={hubOpen.business}
+            onToggle={() => toggleHub("business")}
+          >
+            <select
+              value={businessPick}
+              onChange={(e) => {
+                const v = e.target.value;
+                setBusinessPick(v);
+                if (v) startBusiness(v);
+              }}
+              className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+            >
+              <option value="">Select a business strategy type…</option>
+              {businessOptions.map((label) => (
+                <option key={label} value={label}>
+                  {label}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              onClick={() => startBusiness("Other Strategy")}
+              className="mt-3 w-full rounded-xl border border-[#1e4f4f]/30 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+            >
+              Create New Strategy
+            </button>
+          </HubSection>
+
+          <HubSection
+            title={STRATEGIES_HUB.recommended.title}
+            description={STRATEGIES_HUB.recommended.description}
+            open={hubOpen.recommended}
+            onToggle={() => toggleHub("recommended")}
+          >
+            <select
+              value={recPick}
+              onChange={(e) => {
+                const id = e.target.value;
+                setRecPick(id);
+                if (id) setView({ v: "strategy", stratId: id });
+              }}
+              className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+            >
+              <option value="">Select a recommendation…</option>
+              {recs.map((s) => (
+                <option key={s.id} value={s.id}>
+                  {s.title}
+                </option>
+              ))}
+            </select>
+          </HubSection>
+
+          <HubSection
+            title={STRATEGIES_HUB.saved.title}
+            description={STRATEGIES_HUB.saved.description}
+            open={hubOpen.saved}
+            onToggle={() => toggleHub("saved")}
+          >
+            {savedCount === 0 ? (
+              <p className="text-sm text-[#6b635a]">
+                Nothing saved yet — create a business strategy or save one you build.
+              </p>
+            ) : (
+              <ul className="flex flex-col gap-2">
+                {[...saved]
+                  .sort((a, b) => compareDropdownLabels(a.title, b.title))
+                  .slice(0, 6)
+                  .map((u) => (
+                    <li key={u.id}>
+                      <button
+                        type="button"
+                        onClick={() => setView({ v: "userStrategy", id: u.id })}
+                        className="w-full rounded-xl border border-[#d4cdc3] bg-white/90 px-3 py-2.5 text-left text-sm font-semibold text-[#1f1c19] hover:border-[#1e4f4f]/40"
+                      >
+                        {u.title}
+                      </button>
+                    </li>
+                  ))}
+              </ul>
+            )}
+            {savedCount > 0 ? (
+              <button
+                type="button"
+                onClick={() => setView({ v: "saved" })}
+                className="mt-2 text-sm font-semibold text-[#1e4f4f]"
+              >
+                View all saved ({savedCount}) →
+              </button>
+            ) : null}
+          </HubSection>
         </div>
+      </div>
+    );
+  }
+
+  // ---- ADHD browse (full library) ----------------------------------------
+  if (view.v === "adhd") {
+    return (
+      <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+        <button
+          type="button"
+          onClick={() => setView({ v: "home" })}
+          className="self-start text-sm font-semibold text-[#1e4f4f]"
+        >
+          ‹ Strategies
+        </button>
+        <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">
+          {STRATEGIES_HUB.adhd.title}
+        </p>
+        <p className="mt-1 text-base text-[#6b635a]">
+          {STRATEGIES_HUB.adhd.description}
+        </p>
+        <select
+          value={adhdPick}
+          onChange={(e) => {
+            const id = e.target.value;
+            setAdhdPick(id);
+            const entry = ADHD_STRATEGY_HUB.find((x) => x.id === id);
+            if (entry) openAdhdEntry(entry);
+          }}
+          className="mt-4 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium outline-none focus:border-[#1e4f4f]"
+        >
+          <option value="">Select…</option>
+          {ADHD_STRATEGY_HUB.map((e) => (
+            <option key={e.id} value={e.id}>
+              {e.label}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={() => {
+            setOpenSubcat(null);
+            setView({ v: "group", group: "personal" });
+          }}
+          className="mt-4 text-sm font-semibold text-[#1e4f4f]"
+        >
+          Browse coaching library by topic →
+        </button>
+      </div>
+    );
+  }
+
+  // ---- Business browse ---------------------------------------------------
+  if (view.v === "business") {
+    const templates = [...BUSINESS_STRATEGY_TEMPLATES].sort((a, b) =>
+      compareDropdownLabels(a, b),
+    );
+    return (
+      <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+        <button
+          type="button"
+          onClick={() => setView({ v: "home" })}
+          className="self-start text-sm font-semibold text-[#1e4f4f]"
+        >
+          ‹ Strategies
+        </button>
+        <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">
+          {STRATEGIES_HUB.business.title}
+        </p>
+        <p className="mt-1 text-base text-[#6b635a]">
+          {STRATEGIES_HUB.business.description}
+        </p>
+        <select
+          value={businessPick}
+          onChange={(e) => {
+            const v = e.target.value;
+            setBusinessPick(v);
+            if (v) startBusiness(v);
+          }}
+          className="mt-4 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium outline-none focus:border-[#1e4f4f]"
+        >
+          <option value="">Select…</option>
+          {templates.map((label) => (
+            <option key={label} value={label}>
+              {label}
+            </option>
+          ))}
+        </select>
+        <button
+          type="button"
+          onClick={() => startBusiness("Other Strategy")}
+          className="mt-4 w-full rounded-xl bg-[#1e4f4f] px-5 py-3 text-sm font-semibold text-white"
+        >
+          Create New Strategy
+        </button>
       </div>
     );
   }
@@ -402,7 +612,7 @@ export function StrategiesPanel({
           ‹ Strategies
         </button>
         <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">
-          📌 My saved strategies
+          📌 Saved Strategies
         </p>
         {mine.length === 0 ? (
           <p className="mt-4 text-base text-[#6b635a]">
@@ -586,7 +796,11 @@ export function StrategiesPanel({
       accent={accent}
       onOpen={onOpen}
       onAsk={onAsk}
-      onBack={() => setView({ v: "group", group: groupForStrategy(s) })}
+      onBack={() =>
+        setView({
+          v: groupForStrategy(s) === "business" ? "business" : "adhd",
+        })
+      }
       onSaved={() => setView({ v: "saved" })}
     />
   );
@@ -786,6 +1000,38 @@ function StrategyBuiltinDetail({
       <p className="mt-8 text-center text-sm italic text-[#9a8f82]">
         {closingReflection}
       </p>
+    </div>
+  );
+}
+
+function HubSection({
+  title,
+  description,
+  open,
+  onToggle,
+  children,
+}: {
+  title: string;
+  description: string;
+  open: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-[#1e4f4f]/15 bg-white/85 shadow-sm">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left"
+      >
+        <span>
+          <span className="block text-base font-semibold text-[#1f1c19]">
+            {open ? "▼" : "▶"} {title}
+          </span>
+          <span className="mt-0.5 block text-sm text-[#6b635a]">{description}</span>
+        </span>
+      </button>
+      {open ? <div className="border-t border-[#e7dfd4] px-4 pb-4 pt-3">{children}</div> : null}
     </div>
   );
 }

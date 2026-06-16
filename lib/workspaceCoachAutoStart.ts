@@ -111,7 +111,7 @@ function buildPlaybookCoachAutoStart(ctx: WorkspaceContext): WorkspaceCoachAutoS
   }
   return {
     content:
-      "I see **Strategies** is open. Pick a playbook on the right, and I'll help you apply it to your situation — not just explain it.",
+      "I see **Strategies** is open. **ADHD Strategies** = apply a technique now. **Business Strategies** = create a plan with me, one question at a time. Which do you need?",
     focusField: null,
   };
 }

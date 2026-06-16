@@ -27,10 +27,10 @@ export const WORKSPACE_GUIDES: Record<string, WorkspaceGuideContent> = {
   playbook: {
     id: "playbook",
     title: "Strategies",
-    what: "Short coaching playbooks for your brain and your business.",
-    why: "When you're stuck, a proven pattern beats inventing from scratch.",
-    how: "Read what it is, why it helps, and when to use it — then say what you're struggling with and open the matching workspace.",
-    example: "Too many ideas → Open Clear My Mind. Too many tasks → Open Adjust My Day.",
+    what: "ADHD strategies to apply now, or business strategies to create with Shari.",
+    why: "Your brain needs techniques; your business needs plans — they're different jobs.",
+    how: "Open **ADHD Strategies** to use a technique now, or **Business Strategies** to build a plan one question at a time.",
+    example: "Overwhelmed → Body Double. Growing visibility → Create a Marketing Strategy.",
   },
   "content-generator": {
     id: "content-generator",
