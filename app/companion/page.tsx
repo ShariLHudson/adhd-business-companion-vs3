@@ -16,7 +16,12 @@ import {
   type ActiveWorkspaceItem,
 } from "@/components/companion/ActiveWorkspaceBar";
 import { FocusAreaPanel } from "@/components/companion/FocusAreaPanel";
-import { CompanionActivitiesPanel } from "@/components/companion/CompanionActivitiesPanel";
+import {
+  CompanionActivitiesPanel,
+  EMPTY_ACTIVITY_SESSION,
+  type ActivitySessionState,
+} from "@/components/companion/CompanionActivitiesPanel";
+import { CrossWorkspaceSuggestionCard } from "@/components/companion/CrossWorkspaceSuggestionCard";
 import { SpinWheelPanel } from "@/components/companion/SpinWheelPanel";
 import { FocusAudioPanel } from "@/components/companion/FocusAudioPanel";
 import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
@@ -209,6 +214,11 @@ import {
   trackToolSuggestionDismissed,
   trackToolSuggestionOffered,
 } from "@/lib/toolSuggestionAnalytics";
+import {
+  crossWorkspaceBesideLine,
+  crossWorkspaceContextMessage,
+  type CrossWorkspaceBesideOffer,
+} from "@/lib/crossWorkspaceSuggestion";
 import {
   detectDoingIntent,
   buildWorkspaceOfferChatReply,
@@ -1055,6 +1065,17 @@ export default function CompanionPage() {
   const [workspaceFirstSplit, setWorkspaceFirstSplit] = useState(false);
   const [companionStandaloneSection, setCompanionStandaloneSection] =
     useState<AppSection | null>(null);
+  const [activitySession, setActivitySession] =
+    useState<ActivitySessionState>(EMPTY_ACTIVITY_SESSION);
+  const [guideBesideSession, setGuideBesideSession] = useState<{
+    source: { kind: "activity" } | { kind: "section"; section: AppSection };
+    targetSection: AppSection;
+  } | null>(null);
+  const [workspaceContextBanner, setWorkspaceContextBanner] = useState<
+    string | null
+  >(null);
+  const [crossWorkspaceBesideOffer, setCrossWorkspaceBesideOffer] =
+    useState<CrossWorkspaceBesideOffer | null>(null);
   const companionReturnSectionRef = useRef<AppSection | null>(null);
   const patchWorkspacePanel = useCallback((next: AppSection | null) => {
     workspacePanelRef.current = next;
@@ -2779,7 +2800,104 @@ export default function CompanionPage() {
     openCompanionAssist("content-generator", input.itemType, input.createWorkflow);
   }
 
+  function resolveCurrentGuideSection(): AppSection | null {
+    if (guideBesideSession) {
+      return guideBesideSession.source.kind === "activity"
+        ? "activities"
+        : guideBesideSession.source.section;
+    }
+    if (activeSectionRef.current === "home") {
+      return workspacePanelRef.current ?? companionStandaloneSection;
+    }
+    return activeSectionRef.current;
+  }
+
+  function suggestCrossWorkspaceOpen(
+    targetSection: AppSection,
+    opts?: {
+      sourceTitle?: string;
+      contextMessage?: string;
+      line?: string;
+      hint?: string;
+    },
+  ) {
+    const source = resolveCurrentGuideSection();
+    if (!source || source === targetSection) {
+      if (shouldOpenBesideChat(targetSection)) {
+        openSectionBesideChat(targetSection);
+      } else {
+        setActiveSection(targetSection);
+      }
+      return;
+    }
+    const sourceTitle = opts?.sourceTitle ?? workspaceTitle(source);
+    setCrossWorkspaceBesideOffer({
+      sourceSection: source,
+      targetSection,
+      sourceTitle,
+      line: opts?.line ?? crossWorkspaceBesideLine(targetSection, opts?.hint),
+      contextMessage:
+        opts?.contextMessage ??
+        crossWorkspaceContextMessage(sourceTitle, targetSection),
+    });
+  }
+
+  function acceptCrossWorkspaceBeside(offer: CrossWorkspaceBesideOffer) {
+    setCrossWorkspaceBesideOffer(null);
+    const context =
+      offer.contextMessage ??
+      crossWorkspaceContextMessage(
+        offer.sourceTitle ?? workspaceTitle(offer.sourceSection),
+        offer.targetSection,
+      );
+    setWorkspaceContextBanner(context);
+    setGuideBesideSession({
+      source:
+        offer.sourceSection === "activities"
+          ? { kind: "activity" }
+          : { kind: "section", section: offer.sourceSection },
+      targetSection: offer.targetSection,
+    });
+    patchWorkspacePanel(offer.targetSection);
+    setCompanionStandaloneSection(null);
+    setWorkspaceFirstSplit(false);
+    setActiveSection("home");
+    activeSectionRef.current = "home";
+    applyChatLayoutMode("split");
+    const nav = navForWorkspaceSection(offer.sourceSection);
+    if (nav) setActiveNav(nav);
+    revealWorkspace();
+  }
+
+  function handleActivityOpenBeside(
+    section: AppSection,
+    payload: {
+      session: ActivitySessionState;
+      contextMessage: string;
+    },
+  ) {
+    setActivitySession(payload.session);
+    setWorkspaceContextBanner(payload.contextMessage);
+    setGuideBesideSession({
+      source: { kind: "activity" },
+      targetSection: section,
+    });
+    patchWorkspacePanel(section);
+    setCompanionStandaloneSection(null);
+    setWorkspaceFirstSplit(false);
+    setActiveSection("home");
+    activeSectionRef.current = "home";
+    setActiveNav("focus");
+    applyChatLayoutMode("split");
+    revealWorkspace();
+  }
+
   function openWorkspaceFromSection(section: AppSection) {
+    const source = resolveCurrentGuideSection();
+    if (source && source !== section && source !== "home") {
+      suggestCrossWorkspaceOpen(section);
+      return;
+    }
     if (shouldOpenBesideChat(section)) {
       openSectionBesideChat(section);
     } else {
@@ -5114,6 +5232,15 @@ export default function CompanionPage() {
   }
 
   function closeWorkspacePanel(opts?: { preserveCreateSession?: boolean }) {
+    const guideReturn =
+      guideBesideSession?.source.kind === "activity"
+        ? "activities"
+        : guideBesideSession?.source.kind === "section"
+          ? guideBesideSession.source.section
+          : null;
+    setGuideBesideSession(null);
+    setWorkspaceContextBanner(null);
+    setCrossWorkspaceBesideOffer(null);
     const returnTo = companionReturnSectionRef.current;
     companionReturnSectionRef.current = null;
     setWorkspaceFirstSplit(false);
@@ -5137,6 +5264,12 @@ export default function CompanionPage() {
     applyWorkspaceFocus(null);
     setProjectsBootstrapCreate(false);
     setProjectContinueId(null);
+    if (guideReturn && guideReturn !== "home") {
+      setActiveSection(guideReturn);
+      setActiveNav(navForWorkspaceSection(guideReturn) ?? "chat");
+      focusWorkspaceLayout();
+      return;
+    }
     if (returnTo && returnTo !== "home") {
       setActiveSection(returnTo);
       setActiveNav(navForWorkspaceSection(returnTo) ?? "chat");
@@ -5174,6 +5307,61 @@ export default function CompanionPage() {
     } else {
       setActiveSection("home");
       setActiveNav("chat");
+    }
+  }
+
+  function renderGuideBesideSection(section: AppSection) {
+    switch (section) {
+      case "projects":
+        return (
+          <ProjectsPanel
+            initialProjectId={projectContinueId}
+            onOpen={suggestCrossWorkspaceOpen}
+            onAsk={handlePlaybookAsk}
+            onBuildWithShari={(input) =>
+              openCreationWorkspace("projects", {
+                ...input,
+                source: "project",
+              })
+            }
+          />
+        );
+      case "playbook":
+        return (
+          <StrategiesPanel
+            onOpen={suggestCrossWorkspaceOpen}
+            onAsk={handlePlaybookAsk}
+            registerBack={registerBack}
+          />
+        );
+      case "brain-dump":
+        return (
+          <BrainDumpPanel
+            onOpen={openWorkspaceFromSection}
+            onSuggestOpen={suggestCrossWorkspaceOpen}
+            onAsk={handlePlaybookAsk}
+            registerBack={registerBack}
+          />
+        );
+      case "time-block":
+        return (
+          <TimeBlockPanel
+            onStart={startBlock}
+            onTestAlert={testAlert}
+            initialProjectId={
+              workspaceSession?.projectId ??
+              workspaceDetail?.selectedItemId ??
+              undefined
+            }
+          />
+        );
+      default:
+        return (
+          <p className="p-6 text-base text-[#6b635a]">
+            {workspaceTitle(section)} stays visible here while you use the tool
+            beside it.
+          </p>
+        );
     }
   }
 
@@ -5364,6 +5552,8 @@ export default function CompanionPage() {
         return (
           <BrainDumpPanel
             onOpen={openWorkspaceFromSection}
+            onSuggestOpen={suggestCrossWorkspaceOpen}
+            contextBanner={workspaceContextBanner}
             onAsk={handlePlaybookAsk}
             registerBack={registerBack}
           />
@@ -5849,6 +6039,24 @@ export default function CompanionPage() {
             <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
               <WorkspaceLayout
                 chat={
+            guideBesideSession ? (
+              <div className="flex h-full min-h-0 flex-col overflow-hidden bg-[#faf7f2]">
+                {guideBesideSession.source.kind === "activity" ? (
+                  <CompanionActivitiesPanel
+                    embedded
+                    session={activitySession}
+                    onSessionChange={setActivitySession}
+                    onOpenBeside={handleActivityOpenBeside}
+                  />
+                ) : (
+                  <div className="min-h-0 flex-1 overflow-y-auto">
+                    {renderGuideBesideSection(
+                      guideBesideSession.source.section,
+                    )}
+                  </div>
+                )}
+              </div>
+            ) : (
             <main className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
               <IdentityBar
                 emotion={displayEmotion}
@@ -6103,10 +6311,11 @@ export default function CompanionPage() {
                               WORKSPACE_EMOJI[workspaceOffer.section] ?? "🛠"
                             }
                             toolLabel={workspaceOffer.buttonLabel}
-                            showDismiss={false}
+                            keepTalkingLabel="Not now"
                             onAccept={() =>
                               acceptWorkspaceOffer(workspaceOffer)
                             }
+                            onDismiss={() => setWorkspaceOffer(null)}
                           />
                         ) : assistedActionOffer ? (
                           <ToolSuggestionCard
@@ -6271,9 +6480,13 @@ export default function CompanionPage() {
                 </div>
               </footer>
             </main>
-                }
+            )}
                 workspace={workspacePanelNode}
-                workspaceActive={Boolean(workspacePanel || companionStandaloneSection)}
+                workspaceActive={Boolean(
+                  workspacePanel ||
+                    companionStandaloneSection ||
+                    guideBesideSession,
+                )}
                 workspaceTitle={
                   companionStandaloneSection
                     ? workspaceTitle(companionStandaloneSection)
@@ -6288,7 +6501,18 @@ export default function CompanionPage() {
                 onClose={closeWorkspacePanel}
                 revealKey={workspaceRevealSeq}
                 workspaceFirst={workspaceFirstSplit}
-                hideAssistToggle={workspacePanel === "content-generator"}
+                hideAssistToggle={
+                  workspacePanel === "content-generator" ||
+                  Boolean(guideBesideSession)
+                }
+                leftPaneTitle={
+                  guideBesideSession
+                    ? guideBesideSession.source.kind === "activity"
+                      ? "Activity"
+                      : workspaceTitle(guideBesideSession.source.section)
+                    : "Chat"
+                }
+                leftPaneEmoji={guideBesideSession ? "📋" : "💬"}
               />
             </div>
           )}
@@ -6325,7 +6549,8 @@ export default function CompanionPage() {
           {activeSection === "brain-dump" && (
             <WorkspaceShell onAskShari={() => openCompanionAssist("brain-dump")}>
               <BrainDumpPanel
-                onOpen={(s) => setActiveSection(s)}
+                onOpen={openWorkspaceFromSection}
+                onSuggestOpen={suggestCrossWorkspaceOpen}
                 onAsk={handlePlaybookAsk}
                 registerBack={registerBack}
               />
@@ -6370,14 +6595,16 @@ export default function CompanionPage() {
 
           {activeSection === "activities" && (
             <CompanionActivitiesPanel
-              onOpen={(s) => setActiveSection(s)}
+              session={activitySession}
+              onSessionChange={setActivitySession}
+              onOpenBeside={handleActivityOpenBeside}
               onClose={goBack}
             />
           )}
 
           {activeSection === "spin-wheel" && (
             <SpinWheelPanel
-              onOpen={(s) => setActiveSection(s)}
+              onOpen={suggestCrossWorkspaceOpen}
               onAsk={handlePlaybookAsk}
             />
           )}
@@ -6402,7 +6629,7 @@ export default function CompanionPage() {
             <WorkspaceShell onAskShari={() => openCompanionAssist("projects")}>
               <ProjectsPanel
                 initialProjectId={projectContinueId}
-                onOpen={(s) => setActiveSection(s)}
+                onOpen={suggestCrossWorkspaceOpen}
                 onAsk={handlePlaybookAsk}
                 onBuildWithShari={(input) =>
                   openCreationWorkspace("projects", {
@@ -6417,7 +6644,7 @@ export default function CompanionPage() {
           {activeSection === "playbook" && (
             <WorkspaceShell onAskShari={() => openCompanionAssist("playbook")}>
               <StrategiesPanel
-                onOpen={(s) => setActiveSection(s)}
+                onOpen={suggestCrossWorkspaceOpen}
                 onAsk={handlePlaybookAsk}
                 registerBack={registerBack}
               />
@@ -6427,7 +6654,7 @@ export default function CompanionPage() {
           {activeSection === "how-do-i" && (
             <WorkspaceShell showAssist={false}>
               <HowDoIPanel
-                onOpen={(s) => setActiveSection(s)}
+                onOpen={suggestCrossWorkspaceOpen}
                 onOpenSettings={openHowDoISettings}
                 onAsk={(prompt) => void handleSend(prompt, false, true)}
                 registerBack={registerBack}
@@ -6438,7 +6665,7 @@ export default function CompanionPage() {
           {activeSection === "templates-library" && (
             <WorkspaceShell onAskShari={() => openCompanionAssist("templates-library")}>
               <TemplatesLibrary
-                onOpen={(s) => setActiveSection(s)}
+                onOpen={suggestCrossWorkspaceOpen}
                 onGenerate={openGenerator}
                 onBuildWithShari={(input) =>
                   openCreationWorkspace("content-generator", {
@@ -6453,7 +6680,7 @@ export default function CompanionPage() {
 
           {activeSection === "email-generator" && (
             <EmailGeneratorPanel
-              onOpen={(s) => setActiveSection(s)}
+              onOpen={suggestCrossWorkspaceOpen}
               onBuildWithShari={(input) =>
                 openCreationWorkspace("content-generator", {
                   ...input,
@@ -6620,6 +6847,21 @@ export default function CompanionPage() {
           onNotReady={() => blockNotReady(triggeredBlock)}
         />
       )}
+
+      {crossWorkspaceBesideOffer ? (
+        <div className="pointer-events-none fixed inset-x-0 bottom-4 z-50 flex justify-center px-4 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
+          <div className="pointer-events-auto w-full max-w-md">
+            <CrossWorkspaceSuggestionCard
+              line={crossWorkspaceBesideOffer.line}
+              targetSection={crossWorkspaceBesideOffer.targetSection}
+              onAccept={() =>
+                acceptCrossWorkspaceBeside(crossWorkspaceBesideOffer)
+              }
+              onDismiss={() => setCrossWorkspaceBesideOffer(null)}
+            />
+          </div>
+        </div>
+      ) : null}
     </div>
     </CompanionAuthGate>
   );

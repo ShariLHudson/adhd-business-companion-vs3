@@ -78,10 +78,16 @@ export function BrainDumpPanel({
   onOpen,
   onAsk,
   registerBack,
+  contextBanner,
+  onSuggestOpen,
 }: {
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
   registerBack?: (fn: (() => boolean) | null) => void;
+  /** Shown when opened beside another guide (e.g. Brain Parking Lot). */
+  contextBanner?: string | null;
+  /** Ask before navigating to another section. */
+  onSuggestOpen?: (section: AppSection) => void;
 }) {
   const [text, setText] = useState("");
   const [entries, setEntries] = useState<BrainDumpEntry[]>([]);
@@ -223,7 +229,7 @@ export function BrainDumpPanel({
     [projects],
   );
 
-  const chip = (active: boolean) =>
+  const suggestOpen = onSuggestOpen ?? onOpen;
     `rounded-full px-3 py-1 text-xs font-semibold capitalize transition-colors ${
       active
         ? "bg-[#1e4f4f] text-white"
@@ -232,6 +238,11 @@ export function BrainDumpPanel({
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+      {contextBanner ? (
+        <div className="mb-4 rounded-2xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/5 px-4 py-3 text-sm leading-relaxed text-[#2d2926]">
+          {contextBanner}
+        </div>
+      ) : null}
       <WorkspaceGuide section="brain-dump" />
       <p className="text-2xl font-semibold text-[#1f1c19]">Clear My Mind</p>
       <p className="mt-2 text-base text-[#6b635a]">
@@ -551,7 +562,7 @@ export function BrainDumpPanel({
                       <div className="mt-4 flex flex-wrap gap-2 text-sm font-semibold">
                         <button
                           type="button"
-                          onClick={() => onOpen?.("time-block")}
+                          onClick={() => suggestOpen?.("time-block")}
                           className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-white hover:bg-[#163a3a]"
                         >
                           ⏱ Time Block
@@ -560,7 +571,7 @@ export function BrainDumpPanel({
                           type="button"
                           onClick={() => {
                             newProjectFrom(entry);
-                            onOpen?.("projects");
+                            suggestOpen?.("projects");
                           }}
                           className="rounded-lg border border-[#1e4f4f]/40 bg-white px-3 py-1.5 text-[#1e4f4f]"
                         >
@@ -568,7 +579,7 @@ export function BrainDumpPanel({
                         </button>
                         <button
                           type="button"
-                          onClick={() => onOpen?.("focus-timer")}
+                          onClick={() => suggestOpen?.("focus-timer")}
                           className="rounded-lg border border-[#1e4f4f]/40 bg-white px-3 py-1.5 text-[#1e4f4f]"
                         >
                           ▶ Focus

@@ -26,6 +26,10 @@ export type CompanionActivity = {
   /** Opens a companion tool when the user is ready (optional). */
   linkedSection?: AppSection;
   linkedLabel?: string;
+  /** Step index (0-based) when the beside-this suggestion appears. Defaults to last step. */
+  suggestLinkedFromStep?: number;
+  /** Optional lead-in before the permission question. */
+  linkedSuggestionHint?: string;
 };
 
 export const ACTIVITY_CATEGORIES: ActivityCategory[] = [
@@ -157,6 +161,7 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
     ],
     linkedSection: "focus-timer",
     linkedLabel: "Open focus timer",
+    suggestLinkedFromStep: 3,
   },
   {
     id: "tab-closer",
@@ -202,6 +207,9 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
     ],
     linkedSection: "brain-dump",
     linkedLabel: "Open Clear My Mind",
+    suggestLinkedFromStep: 0,
+    linkedSuggestionHint:
+      "This works best if you can capture the thoughts somewhere.",
   },
   {
     id: "safe-for-today",
