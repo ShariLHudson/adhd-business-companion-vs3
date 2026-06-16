@@ -43,9 +43,12 @@ import {
 import { copyPasteFallbackMessage } from "@/lib/collaborativeDocumentWorkflow";
 import { findCatalogItem } from "@/lib/createCatalog";
 import {
+  advanceAfterItemPick,
   advanceAfterTypePick,
   categoryIdForType,
   EMPTY_CREATE_WORKFLOW,
+  mergeCreateWorkflow,
+  resolvedTypeLabel,
   type CreateWorkflowState,
 } from "@/lib/createWorkflow";
 import { CreateWorkflowPanel } from "@/components/companion/CreateWorkflowPanel";
@@ -74,6 +77,7 @@ export type GenSeed = {
   draft?: string; // restore a saved draft (Continue card)
   /** When true, auto-call /api/generate on open. Default false — never surprise with old/random drafts. */
   autoGenerate?: boolean;
+  createWorkflow?: CreateWorkflowState;
 } | null;
 
 const TONES = ["Warm & ADHD-friendly", "Friendly", "Professional", "Persuasive", "Storytelling"];
@@ -125,6 +129,7 @@ export function ContentGeneratorPanel({
   onChatBuildFailed,
   chatReviseRequest,
   onChatReviseComplete,
+  chatSyncedWorkflow,
 }: {
   seed: GenSeed;
   onOpen?: (s: AppSection) => void;
@@ -168,6 +173,8 @@ export function ContentGeneratorPanel({
   /** Parent-triggered draft revision from chat builder. */
   chatReviseRequest?: { instruction: string; key: number } | null;
   onChatReviseComplete?: () => void;
+  /** Chat builder workflow — kept in sync with the Create panel. */
+  chatSyncedWorkflow?: CreateWorkflowState | null;
 }) {
   const [type, setType] = useState(seed?.type ?? "");
   const [topic, setTopic] = useState(seed?.topic ?? seed?.brief ?? "");
@@ -247,6 +254,26 @@ export function ContentGeneratorPanel({
   useEffect(() => {
     onCreateWorkflowSync?.(workflow);
   }, [workflow, onCreateWorkflowSync]);
+
+  const lastChatSyncSig = useRef("");
+  useEffect(() => {
+    if (!chatSyncedWorkflow) return;
+    const label = resolvedTypeLabel(chatSyncedWorkflow) || type;
+    if (!label) return;
+    const sig = JSON.stringify({
+      step: chatSyncedWorkflow.step,
+      answers: chatSyncedWorkflow.discoveryAnswers,
+      subtype: chatSyncedWorkflow.selectedSubtype,
+      buildApproved: chatSyncedWorkflow.buildApproved,
+    });
+    if (sig === lastChatSyncSig.current) return;
+    lastChatSyncSig.current = sig;
+    setWorkflow((prev) => mergeCreateWorkflow(prev, chatSyncedWorkflow, label));
+    const resolved = resolvedTypeLabel(chatSyncedWorkflow);
+    if (resolved && resolved !== type) {
+      setType(resolved);
+    }
+  }, [chatSyncedWorkflow, type]);
 
   const focusElementId =
     focusField === "create-topic"
@@ -352,7 +379,14 @@ export function ContentGeneratorPanel({
       // Create 2.0 — never auto-generate; user approves at readiness.
     } else if (seed.type) {
       setDraft("");
-      setWorkflow(advanceAfterTypePick(seed.type, categoryIdForType(seed.type)));
+      if (seed.createWorkflow) {
+        const label = seed.type;
+        setWorkflow(
+          mergeCreateWorkflow(seed.createWorkflow, seed.createWorkflow, label),
+        );
+      } else {
+        setWorkflow(advanceAfterItemPick(seed.type));
+      }
       started.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -568,12 +602,7 @@ export function ContentGeneratorPanel({
     setEditingTopic(false);
     setDraft("");
     if (!opts?.skipWorkflow) {
-      setWorkflow(
-        advanceAfterTypePick(
-          typeLabel,
-          opts?.categoryId ?? categoryIdForType(typeLabel),
-        ),
-      );
+      setWorkflow(advanceAfterItemPick(typeLabel));
     }
     started.current = false;
   }
@@ -752,7 +781,7 @@ export function ContentGeneratorPanel({
           <WorkspaceGuide section="content-generator" />
           <p className="text-2xl font-semibold text-[#1f1c19]">Create Something</p>
           <p className="mt-1 text-base text-[#6b635a]">
-            Choose a category, then a type — one decision at a time.
+            Pick an item type, narrow it down, then answer a few questions — one at a time.
           </p>
         </>
       )}
@@ -771,7 +800,7 @@ export function ContentGeneratorPanel({
         </div>
       )}
 
-      {loading && inGuidedCreate && workflow.readinessConfirmed && (
+      {loading && workflow.buildApproved && !draft && (
         <div className="companion-fade-in mt-8 text-center">
           <p className="text-xl font-semibold text-[#1f1c19]">
             Building your {(type || "draft").toLowerCase()}…
@@ -844,7 +873,7 @@ export function ContentGeneratorPanel({
         />
       )}
 
-      {inGuidedCreate && !showDraftEditor && !(workspaceMode && phase === "ready") && (
+      {inGuidedCreate && !showDraftEditor && !(workspaceMode && phase === "ready") && !loading && (
         <div className="mt-5 flex flex-col gap-3">
           <CreateWorkflowPanel
             workflow={workflow}

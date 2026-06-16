@@ -7,13 +7,15 @@
 import { matchCatalogFromText } from "./createCatalog";
 import {
   advanceAfterDiscoveryAnswer,
-  advanceAfterTypePick,
+  advanceAfterItemPick,
   advanceToDiscovery,
-  buildBriefFromDiscovery,
+  buildBriefFromWorkflow,
   categoryIdForType,
   discoveryComplete,
   discoveryQuestionsForState,
   getDiscoveryQuestions,
+  mergeCreateWorkflow,
+  resolvedTypeLabel,
   type CreateWorkflowState,
   EMPTY_CREATE_WORKFLOW,
   answeredDiscoveryCount,
@@ -88,7 +90,7 @@ export function resolveBuilderType(text: string): string | null {
 
 export function isAffirmative(text: string): boolean {
   const t = text.trim().toLowerCase();
-  return /^(yes|yep|yeah|sure|ok|okay|please|go ahead|do it|generate|create it|create draft|build draft|sounds good|let's go|lets go|y)\b/.test(
+  return /^(yes|yep|yeah|sure|ok|okay|please|go ahead|do it|generate|create it|create draft|build draft|build it|ready|sounds good|let's go|lets go|y)\b/.test(
     t,
   );
 }
@@ -109,8 +111,15 @@ const READINESS_PROMPT =
   "I think I have enough information to build this. Would you like me to create the draft?";
 
 function freshDiscoveryWorkflow(typeLabel: string): CreateWorkflowState {
+  const picked = advanceAfterItemPick(typeLabel);
   return advanceToDiscovery(
-    advanceAfterTypePick(typeLabel, categoryIdForType(typeLabel)),
+    {
+      ...picked,
+      categoryId: picked.categoryId ?? categoryIdForType(typeLabel),
+      selectedTypeLabel: typeLabel,
+      step: "discovery",
+    },
+    { preserveAnswers: false },
   );
 }
 
@@ -131,8 +140,7 @@ export function bootstrapCreateBuilderFromWorkflow(
   const merged: CreateWorkflowState = {
     ...panelWorkflow,
     selectedTypeLabel: panelWorkflow.selectedTypeLabel ?? resolved,
-    categoryId:
-      panelWorkflow.categoryId ?? categoryIdForType(resolved),
+    categoryId: panelWorkflow.categoryId ?? categoryIdForType(resolved),
   };
 
   if (
@@ -201,7 +209,7 @@ export function bootstrapCreateBuilderSession(
     return {
       session: emptyCreateBuilderSession(),
       opener:
-        "I'm here to help you build something real — one question at a time.\n\nPick a category and type in the workspace first, or tell me what you're creating (SOP, workshop, proposal, strategy, email…).",
+        "I'm here to help you build something real — one question at a time.\n\nPick an item type in the workspace first, or tell me what you're creating (SOP, workshop, proposal, newsletter, training guide…).",
     };
   }
 
@@ -298,17 +306,17 @@ export function processCreateBuilderTurn(
     if (
       isAffirmative(trimmed) ||
       /^create draft$/i.test(trimmed) ||
-      /^build draft$/i.test(trimmed)
+      /^build draft$/i.test(trimmed) ||
+      /^build it$/i.test(trimmed) ||
+      /^create it$/i.test(trimmed)
     ) {
-      const brief = buildBriefFromDiscovery(
-        typeLabel,
-        session.workflow.discoveryAnswers,
-      );
+      const brief = buildBriefFromWorkflow(session.workflow);
+      const generateType = resolvedTypeLabel(session.workflow) || typeLabel;
       return {
         session: { ...session, phase: "generating", collectingExtra: false },
-        reply: `Building your **${typeLabel}** now — using everything you shared. Watch the workspace on the right.`,
+        reply: `Building your **${generateType}** now — using everything you shared. Watch the workspace on the right.`,
         generateBrief: brief,
-        generateType: typeLabel,
+        generateType,
       };
     }
     if (isAddMoreInformation(trimmed)) {
@@ -398,19 +406,6 @@ function enterReadiness(
   session: CreateBuilderSession,
   typeLabel: string,
 ): CreateBuilderTurnResult {
-  const answered = Object.values(session.workflow.discoveryAnswers).filter((v) =>
-    v.trim(),
-  ).length;
-  if (answered < 2) {
-    const nextQ = discoveryQuestionsForState(typeLabel, session.workflow);
-    if (nextQ) {
-      return {
-        session: { ...session, phase: "discovery" },
-        reply: `**${nextQ.prompt}**`,
-      };
-    }
-  }
-
   const ready: CreateBuilderSession = {
     ...session,
     phase: "readiness",

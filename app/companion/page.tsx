@@ -1177,7 +1177,10 @@ export default function CompanionPage() {
     ) {
       return;
     }
-    const { session, opener } = bootstrapCreateBuilderSession(trimmed);
+    const { session, opener } = bootstrapCreateBuilderFromWorkflow(
+      trimmed,
+      createPanelWorkflowRef.current,
+    );
     setCreateBuilderSession(session);
     syncCreateBuilderType(trimmed);
     if (
@@ -1850,6 +1853,7 @@ export default function CompanionPage() {
             draft: ctx.draftContent || undefined,
             sourceText:
               ctx.source === "snippet" ? ctx.draftContent : undefined,
+            createWorkflow: input.createWorkflow,
           })
         : null;
 
@@ -3145,6 +3149,7 @@ export default function CompanionPage() {
 
       const turn = processCreateBuilderTurn(builderSession, trimmed);
       setCreateBuilderSession(turn.session);
+      createPanelWorkflowRef.current = turn.session.workflow;
 
       if (turn.session.typeLabel && turn.session.typeLabel !== creationContext?.itemType) {
         syncCreateBuilderType(turn.session.typeLabel);
@@ -3158,6 +3163,20 @@ export default function CompanionPage() {
       }
 
       if (turn.generateBrief && turn.generateType) {
+        setCreateBuilderSession((prev) =>
+          prev
+            ? {
+                ...prev,
+                phase: "generating",
+                workflow: {
+                  ...prev.workflow,
+                  buildApproved: true,
+                  readinessConfirmed: true,
+                  step: "improve",
+                },
+              }
+            : prev,
+        );
         setChatBuildRequest({
           type: turn.generateType,
           brief: turn.generateBrief,
@@ -5172,6 +5191,11 @@ export default function CompanionPage() {
             onCreateSessionSync={handleCreateSessionSync}
             onCreateWorkflowSync={(wf) => {
               createPanelWorkflowRef.current = wf;
+              if (splitCreateChat) {
+                setCreateBuilderSession((prev) =>
+                  prev ? { ...prev, workflow: wf } : prev,
+                );
+              }
             }}
             onBuildWithShari={openCreateWithShari}
             onOpen={(s) => {
@@ -5196,6 +5220,9 @@ export default function CompanionPage() {
             onArtifactReady={handleArtifactReadyChat}
             onExportGuidance={handleExportGuidance}
             companionBuilderMode={splitCreateChat}
+            chatSyncedWorkflow={
+              splitCreateChat ? createBuilderSession?.workflow ?? null : null
+            }
             chatBuildRequest={chatBuildRequest}
             onChatBuildComplete={handleChatBuildComplete}
             onChatBuildFailed={handleChatBuildFailed}

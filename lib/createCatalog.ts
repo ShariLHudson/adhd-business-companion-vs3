@@ -140,6 +140,11 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
         matchTerms: ["business plan"],
       },
       {
+        label: "Document",
+        emoji: "📄",
+        matchTerms: ["document", "general document"],
+      },
+      {
         label: "Client Avatar",
         emoji: "👤",
         route: "client-avatars",

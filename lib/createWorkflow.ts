@@ -4,6 +4,11 @@
  */
 
 import { CREATE_CATALOG, findCatalogItem, type CreateCatalogItem, catalogCategory, dropdownItemsInCategory } from "./createCatalog";
+import {
+  effectiveCreateTypeLabel,
+  effectiveSubtypeLabel,
+  OTHER_OPTION,
+} from "./createTypePickers";
 
 export { catalogCategory, dropdownItemsInCategory, catalogTypesPickerLabel } from "./createCatalog";
 import { sortByDropdownLabel } from "./dropdownSort";
@@ -27,8 +32,14 @@ export type DiscoveryQuestion = {
 export type CreateWorkflowState = {
   step: CreateWorkflowStep;
   categoryId: string | null;
-  /** Chosen on the type step; confirmed on the confirm step. */
+  /** Primary item type (e.g. Newsletter, SOP). */
   selectedTypeLabel: string | null;
+  /** Subtype within the item (e.g. Educational, Client Onboarding). */
+  selectedSubtype: string | null;
+  /** When item type is Other — free-text label. */
+  customTypeLabel: string | null;
+  /** When subtype is Other — free-text detail. */
+  customSubtype: string | null;
   discoveryAnswers: Record<string, string>;
   discoveryIndex: number;
   readinessConfirmed: boolean;
@@ -39,6 +50,9 @@ export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {
   step: "category",
   categoryId: null,
   selectedTypeLabel: null,
+  selectedSubtype: null,
+  customTypeLabel: null,
+  customSubtype: null,
   discoveryAnswers: {},
   discoveryIndex: 0,
   readinessConfirmed: false,
@@ -611,8 +625,8 @@ export function creatableItemsInCategory(categoryId: string): CreateCatalogItem[
 
 export function workflowStepLabel(step: CreateWorkflowStep): string {
   const labels: Record<CreateWorkflowStep, string> = {
-    category: "Category",
-    type: "Type",
+    category: "Item type",
+    type: "Subtype",
     confirm: "Ready",
     discovery: "Discovery",
     readiness: "Readiness",
@@ -620,6 +634,98 @@ export function workflowStepLabel(step: CreateWorkflowStep): string {
     export: "Save / Export",
   };
   return labels[step];
+}
+
+/** Resolved label used for discovery, briefs, and generation. */
+export function resolvedTypeLabel(state: CreateWorkflowState): string {
+  return (
+    effectiveCreateTypeLabel(state.selectedTypeLabel, state.customTypeLabel) ||
+    state.selectedTypeLabel?.trim() ||
+    ""
+  );
+}
+
+export function discoveryIndexForAnswers(
+  typeLabel: string,
+  answers: Record<string, string>,
+): number {
+  const questions = getDiscoveryQuestions(typeLabel, answers);
+  for (let i = 0; i < questions.length; i++) {
+    const q = questions[i]!;
+    if (!answers[q.id]?.trim()) return i;
+  }
+  return questions.length;
+}
+
+/** Merge chat + panel workflow — furthest progress wins. */
+export function mergeCreateWorkflow(
+  local: CreateWorkflowState,
+  incoming: CreateWorkflowState,
+  typeLabel: string,
+): CreateWorkflowState {
+  const discoveryAnswers = {
+    ...local.discoveryAnswers,
+    ...incoming.discoveryAnswers,
+  };
+  const stepRank: Record<CreateWorkflowStep, number> = {
+    category: 0,
+    type: 1,
+    confirm: 2,
+    discovery: 3,
+    readiness: 4,
+    improve: 5,
+    export: 6,
+  };
+  const merged: CreateWorkflowState = {
+    ...local,
+    ...incoming,
+    discoveryAnswers,
+    selectedTypeLabel:
+      incoming.selectedTypeLabel ?? local.selectedTypeLabel ?? typeLabel,
+    selectedSubtype: incoming.selectedSubtype ?? local.selectedSubtype,
+    customTypeLabel: incoming.customTypeLabel ?? local.customTypeLabel,
+    customSubtype: incoming.customSubtype ?? local.customSubtype,
+    categoryId:
+      incoming.categoryId ??
+      local.categoryId ??
+      categoryIdForType(typeLabel),
+    step:
+      stepRank[incoming.step] >= stepRank[local.step]
+        ? incoming.step
+        : local.step,
+    buildApproved: local.buildApproved || incoming.buildApproved,
+    readinessConfirmed:
+      local.readinessConfirmed || incoming.readinessConfirmed,
+  };
+
+  if (merged.buildApproved) return merged;
+
+  const resolved = resolvedTypeLabel(merged) || typeLabel;
+  if (merged.step === "readiness" || discoveryComplete(resolved, merged)) {
+    return {
+      ...merged,
+      step: "readiness",
+      discoveryIndex: discoveryIndexForAnswers(resolved, discoveryAnswers),
+    };
+  }
+
+  const answered = answeredDiscoveryCount(merged);
+  if (answered > 0) {
+    const idx = discoveryIndexForAnswers(resolved, discoveryAnswers);
+    const questions = getDiscoveryQuestions(resolved, discoveryAnswers);
+    if (idx >= questions.length) {
+      return { ...merged, step: "readiness", discoveryIndex: idx };
+    }
+    return { ...merged, step: "discovery", discoveryIndex: idx };
+  }
+
+  return merged;
+}
+
+export function shouldOfferDiscovery(state: CreateWorkflowState): boolean {
+  if (state.buildApproved) return false;
+  if (state.step === "readiness") return false;
+  return answeredDiscoveryCount(state) === 0;
 }
 
 export function discoveryQuestionsForState(
@@ -642,6 +748,7 @@ export function answeredDiscoveryCount(state: CreateWorkflowState): number {
 export function buildBriefFromDiscovery(
   typeLabel: string,
   answers: Record<string, string>,
+  subtype?: string | null,
 ): string {
   const questions = getDiscoveryQuestions(typeLabel, answers);
   const lines = questions
@@ -651,8 +758,21 @@ export function buildBriefFromDiscovery(
       return `${q.prompt}\n${a}`;
     })
     .filter(Boolean) as string[];
-  if (!lines.length) return `Create a ${typeLabel}.`;
-  return [`Content type: ${typeLabel}`, ...lines].join("\n\n");
+  const header = subtype
+    ? `Content type: ${typeLabel} (${subtype})`
+    : `Content type: ${typeLabel}`;
+  if (!lines.length) {
+    return subtype
+      ? `Create a ${typeLabel} — ${subtype}.`
+      : `Create a ${typeLabel}.`;
+  }
+  return [header, ...lines].join("\n\n");
+}
+
+export function buildBriefFromWorkflow(state: CreateWorkflowState): string {
+  const typeLabel = resolvedTypeLabel(state);
+  const subtype = effectiveSubtypeLabel(state.selectedSubtype, state.customSubtype);
+  return buildBriefFromDiscovery(typeLabel, state.discoveryAnswers, subtype);
 }
 
 export function readinessSummary(
@@ -669,6 +789,74 @@ export function readinessSummary(
     .filter(Boolean) as { label: string; value: string }[];
 }
 
+export function advanceAfterItemPick(typeLabel: string): CreateWorkflowState {
+  if (typeLabel === OTHER_OPTION) {
+    return {
+      ...EMPTY_CREATE_WORKFLOW,
+      step: "category",
+      selectedTypeLabel: OTHER_OPTION,
+      customTypeLabel: "",
+    };
+  }
+  return {
+    ...EMPTY_CREATE_WORKFLOW,
+    step: "type",
+    categoryId: categoryIdForType(typeLabel),
+    selectedTypeLabel: typeLabel,
+  };
+}
+
+export function advanceAfterCustomItem(customLabel: string): CreateWorkflowState {
+  const trimmed = customLabel.trim();
+  return {
+    ...EMPTY_CREATE_WORKFLOW,
+    step: "discovery",
+    categoryId: null,
+    selectedTypeLabel: OTHER_OPTION,
+    customTypeLabel: trimmed,
+    selectedSubtype: null,
+    customSubtype: null,
+    discoveryIndex: 0,
+    discoveryAnswers: {},
+  };
+}
+
+export function advanceAfterSubtypePick(
+  state: CreateWorkflowState,
+  subtype: string,
+): CreateWorkflowState {
+  if (subtype === OTHER_OPTION) {
+    return {
+      ...state,
+      step: "type",
+      selectedSubtype: OTHER_OPTION,
+      customSubtype: "",
+    };
+  }
+  return {
+    ...state,
+    step: "discovery",
+    selectedSubtype: subtype,
+    customSubtype: null,
+    discoveryIndex: 0,
+    discoveryAnswers: state.discoveryAnswers,
+  };
+}
+
+export function advanceAfterCustomSubtype(
+  state: CreateWorkflowState,
+  customSubtype: string,
+): CreateWorkflowState {
+  return {
+    ...state,
+    step: "discovery",
+    selectedSubtype: OTHER_OPTION,
+    customSubtype: customSubtype.trim(),
+    discoveryIndex: 0,
+    discoveryAnswers: state.discoveryAnswers,
+  };
+}
+
 export function advanceAfterTypePick(
   typeLabel: string,
   categoryId: string | null,
@@ -678,15 +866,27 @@ export function advanceAfterTypePick(
     step: "confirm",
     categoryId: categoryId ?? categoryIdForType(typeLabel),
     selectedTypeLabel: typeLabel,
+    selectedSubtype: null,
+    customTypeLabel: null,
+    customSubtype: null,
   };
 }
 
-export function advanceToDiscovery(state: CreateWorkflowState): CreateWorkflowState {
+export function advanceToDiscovery(
+  state: CreateWorkflowState,
+  opts?: { preserveAnswers?: boolean },
+): CreateWorkflowState {
+  const preserve = opts?.preserveAnswers ?? false;
   return {
     ...state,
     step: "discovery",
-    discoveryIndex: 0,
-    discoveryAnswers: {},
+    discoveryIndex: preserve
+      ? discoveryIndexForAnswers(
+          resolvedTypeLabel(state),
+          state.discoveryAnswers,
+        )
+      : 0,
+    discoveryAnswers: preserve ? state.discoveryAnswers : {},
   };
 }
 

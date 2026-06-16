@@ -1,23 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import {
-  catalogTypesPickerLabel,
-  dropdownItemsInCategory,
-  sortedCreateCatalog,
-  type CreateCatalogItem,
-} from "@/lib/createCatalog";
+import type { CreateCatalogItem } from "@/lib/createCatalog";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 import { NO_CATEGORY } from "@/lib/categoryRevealUx";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import {
+  PRIMARY_CREATE_ITEMS,
+  OTHER_OPTION,
+  resolveCreateItemRoute,
+  subtypeOptionsForItem,
+  subtypePickerLabel,
+  effectiveSubtypeLabel,
+} from "@/lib/createTypePickers";
+import {
+  advanceAfterCustomItem,
+  advanceAfterCustomSubtype,
   advanceAfterDiscoveryAnswer,
-  advanceAfterTypePick,
+  advanceAfterItemPick,
+  advanceAfterSubtypePick,
   advanceToDiscovery,
-  buildBriefFromDiscovery,
-  catalogCategory,
+  buildBriefFromWorkflow,
+  categoryIdForType,
   discoveryQuestionsForState,
   readinessSummary,
+  resolvedTypeLabel,
+  shouldOfferDiscovery,
   skipDiscoveryQuestion,
   type CreateWorkflowState,
 } from "@/lib/createWorkflow";
@@ -30,6 +38,7 @@ export function CreateWorkflowPanel({
   onRoutedItem,
   onBuildDraft,
   onBuildWithShari,
+  onAddMoreDetail,
   building,
 }: {
   workflow: CreateWorkflowState;
@@ -39,31 +48,41 @@ export function CreateWorkflowPanel({
   onRoutedItem: (section: NonNullable<CreateCatalogItem["route"]>) => void;
   onBuildDraft: (brief: string) => void;
   onBuildWithShari?: (input: CreationWorkspaceInput) => void;
+  onAddMoreDetail?: () => void;
   building?: boolean;
 }) {
   const [draftAnswer, setDraftAnswer] = useState("");
+  const [customItemText, setCustomItemText] = useState(
+    workflow.customTypeLabel ?? "",
+  );
+  const [customSubtypeText, setCustomSubtypeText] = useState(
+    workflow.customSubtype ?? "",
+  );
 
-  function shariInput(
-    selected: string,
-    categoryId: string,
-    wf: CreateWorkflowState,
-  ): CreationWorkspaceInput {
+  const resolvedType = resolvedTypeLabel(workflow) || typeLabel;
+  const displayType = resolvedType || "item";
+
+  function shariInput(wf: CreateWorkflowState): CreationWorkspaceInput {
+    const selected = resolvedTypeLabel(wf) || displayType;
+    const categoryId =
+      wf.categoryId ?? categoryIdForType(selected) ?? "content";
     return {
       itemType: selected,
       title: selected,
-      brief: buildBriefFromDiscovery(selected, wf.discoveryAnswers),
-      stage:
-        wf.step === "readiness"
-          ? "ready to build"
-          : "discovery with Shari",
+      brief: buildBriefFromWorkflow(wf),
+      stage: wf.step === "readiness" ? "ready to build" : "discovery with Shari",
       source: "generated",
       createWorkflow: wf,
     };
   }
 
+  // ── Step 1: item type ─────────────────────────────────────────────────────
   if (workflow.step === "category") {
-    const catalog = sortedCreateCatalog();
-    const categoryOptions = catalog.map((c) => ({ value: c.id, label: c.label }));
+    const itemOptions = PRIMARY_CREATE_ITEMS.map((label) => ({
+      value: label,
+      label,
+    }));
+    const showingCustomItem = workflow.selectedTypeLabel === OTHER_OPTION;
 
     return (
       <div className="companion-fade-in">
@@ -72,33 +91,69 @@ export function CreateWorkflowPanel({
         </p>
         <div className="mt-4">
           <CategoryPickerSelect
-            label="Category"
-            value={NO_CATEGORY}
+            label="Item type"
+            value={workflow.selectedTypeLabel ?? NO_CATEGORY}
             onChange={(v) => {
               if (!v) return;
-              onWorkflowChange({
-                ...workflow,
-                step: "type",
-                categoryId: v,
-                selectedTypeLabel: null,
-              });
+              if (v === OTHER_OPTION) {
+                onWorkflowChange(advanceAfterItemPick(v));
+                return;
+              }
+              const route = resolveCreateItemRoute(v);
+              if (route) {
+                onRoutedItem(route);
+                return;
+              }
+              const next = advanceAfterItemPick(v);
+              onTypeSelect(v, next.categoryId ?? categoryIdForType(v) ?? "content");
+              onWorkflowChange(next);
             }}
-            options={categoryOptions}
-            placeholder="Select a category…"
+            options={itemOptions}
+            placeholder="Select an item type…"
           />
         </div>
+        {showingCustomItem ? (
+          <div className="mt-4">
+            <label className="text-sm font-semibold text-[#4b463f]">
+              Tell me what you want to create.
+            </label>
+            <input
+              type="text"
+              value={customItemText}
+              onChange={(e) => setCustomItemText(e.target.value)}
+              placeholder="e.g. Case study, podcast outline, onboarding packet…"
+              className="mt-2 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base outline-none focus:border-[#1e4f4f]"
+              autoFocus
+            />
+            <button
+              type="button"
+              disabled={!customItemText.trim()}
+              onClick={() => {
+                const next = advanceAfterCustomItem(customItemText);
+                onTypeSelect(
+                  customItemText.trim(),
+                  next.categoryId ?? "content",
+                );
+                onWorkflowChange(next);
+              }}
+              className="mt-3 rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-40"
+            >
+              Continue
+            </button>
+          </div>
+        ) : null}
       </div>
     );
   }
 
-  if (workflow.step === "type" && workflow.categoryId) {
-    const categoryId = workflow.categoryId;
-    const cat = catalogCategory(categoryId);
-    const items = dropdownItemsInCategory(categoryId);
-    const typeOptions = items.map((item) => ({
-      value: item.label,
-      label: item.label,
+  // ── Step 2: subtype ───────────────────────────────────────────────────────
+  if (workflow.step === "type" && workflow.selectedTypeLabel) {
+    const item = workflow.selectedTypeLabel;
+    const subtypeOptions = subtypeOptionsForItem(item).map((label) => ({
+      value: label,
+      label,
     }));
+    const showingCustomSubtype = workflow.selectedSubtype === OTHER_OPTION;
 
     return (
       <div className="companion-fade-in">
@@ -108,93 +163,120 @@ export function CreateWorkflowPanel({
             onWorkflowChange({
               ...workflow,
               step: "category",
-              categoryId: null,
               selectedTypeLabel: null,
+              selectedSubtype: null,
+              customTypeLabel: null,
+              customSubtype: null,
             })
           }
           className="text-sm font-semibold text-[#1e4f4f]"
         >
-          ‹ Category
+          ‹ Change item
         </button>
-        <p className="mt-3 text-lg font-semibold text-[#1f1c19]">
-          What would you like to create?
+        <p className="mt-3 text-sm font-medium text-[#1e4f4f]">{item}</p>
+        <p className="mt-1 text-lg font-semibold text-[#1f1c19]">
+          {subtypePickerLabel(item)}
         </p>
         <div className="mt-4">
           <CategoryPickerSelect
-            label={catalogTypesPickerLabel(categoryId)}
-            value={workflow.selectedTypeLabel ?? NO_CATEGORY}
+            label="Subtype"
+            value={workflow.selectedSubtype ?? NO_CATEGORY}
             onChange={(v) => {
               if (!v) return;
-              const item = items.find((i) => i.label === v);
-              const next = advanceAfterTypePick(v, categoryId);
-              if (item?.route) {
-                onWorkflowChange(next);
+              if (v === OTHER_OPTION) {
+                onWorkflowChange(advanceAfterSubtypePick(workflow, v));
                 return;
               }
-              onTypeSelect(v, categoryId);
-              onWorkflowChange(advanceToDiscovery(next));
+              const categoryId =
+                workflow.categoryId ?? categoryIdForType(item) ?? "content";
+              onTypeSelect(item, categoryId);
+              onWorkflowChange(
+                advanceToDiscovery(advanceAfterSubtypePick(workflow, v), {
+                  preserveAnswers: true,
+                }),
+              );
             }}
-            options={typeOptions}
-            placeholder={`Select ${cat?.label.toLowerCase() ?? "a"} type…`}
+            options={subtypeOptions}
+            placeholder="Select a subtype…"
           />
         </div>
+        {showingCustomSubtype ? (
+          <div className="mt-4">
+            <label className="text-sm font-semibold text-[#4b463f]">
+              Tell me more specifically.
+            </label>
+            <input
+              type="text"
+              value={customSubtypeText}
+              onChange={(e) => setCustomSubtypeText(e.target.value)}
+              placeholder={`What kind of ${item.toLowerCase()} is this?`}
+              className="mt-2 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base outline-none focus:border-[#1e4f4f]"
+              autoFocus
+            />
+            <button
+              type="button"
+              disabled={!customSubtypeText.trim()}
+              onClick={() => {
+                const categoryId =
+                  workflow.categoryId ?? categoryIdForType(item) ?? "content";
+                onTypeSelect(item, categoryId);
+                onWorkflowChange(
+                  advanceToDiscovery(
+                    advanceAfterCustomSubtype(workflow, customSubtypeText),
+                    { preserveAnswers: true },
+                  ),
+                );
+              }}
+              className="mt-3 rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-40"
+            >
+              Continue
+            </button>
+          </div>
+        ) : null}
       </div>
     );
   }
 
-  if (workflow.step === "confirm" && workflow.selectedTypeLabel && workflow.categoryId) {
-    const selected = workflow.selectedTypeLabel;
-    const item = dropdownItemsInCategory(workflow.categoryId).find(
-      (i) => i.label === selected,
-    );
-    const routed = Boolean(item?.route);
-
+  // ── Legacy confirm — only when discovery still needed ─────────────────────
+  if (
+    workflow.step === "confirm" &&
+    workflow.selectedTypeLabel &&
+    shouldOfferDiscovery(workflow)
+  ) {
+    const selected = resolvedTypeLabel(workflow) || workflow.selectedTypeLabel;
     return (
       <div className="companion-fade-in">
+        <p className="text-lg font-semibold text-[#1f1c19]">
+          Ready to shape your {selected}?
+        </p>
         <button
           type="button"
-          onClick={() =>
-            onWorkflowChange({
-              ...workflow,
-              step: "type",
-              selectedTypeLabel: null,
-            })
-          }
-          className="text-sm font-semibold text-[#1e4f4f]"
+          onClick={() => {
+            const categoryId =
+              workflow.categoryId ??
+              categoryIdForType(selected) ??
+              "content";
+            onTypeSelect(selected, categoryId);
+            onWorkflowChange(
+              advanceToDiscovery(workflow, { preserveAnswers: true }),
+            );
+          }}
+          className="mt-5 w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
         >
-          ‹ Change type
+          Answer a few questions
         </button>
-        <p className="mt-3 text-lg font-semibold text-[#1f1c19]">
-          Ready to create your {selected}?
-        </p>
-        <div className="mt-5 flex flex-col gap-3">
-          {!routed ? (
-            <button
-              type="button"
-              onClick={() => {
-                onTypeSelect(selected, workflow.categoryId!);
-                onWorkflowChange(advanceToDiscovery(workflow));
-              }}
-              className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-            >
-              Answer a few questions
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => item?.route && onRoutedItem(item.route)}
-              className="w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
-            >
-              Open {selected}
-            </button>
-          )}
-        </div>
       </div>
     );
   }
 
-  if (workflow.step === "discovery" && typeLabel) {
-    const question = discoveryQuestionsForState(typeLabel, workflow);
+  if (workflow.step === "confirm" && !shouldOfferDiscovery(workflow)) {
+    onWorkflowChange({ ...workflow, step: "readiness" });
+    return null;
+  }
+
+  // ── Discovery ─────────────────────────────────────────────────────────────
+  if (workflow.step === "discovery" && resolvedType) {
+    const question = discoveryQuestionsForState(resolvedType, workflow);
     if (!question) {
       onWorkflowChange({ ...workflow, step: "readiness" });
       return null;
@@ -206,17 +288,20 @@ export function CreateWorkflowPanel({
           onClick={() =>
             onWorkflowChange({
               ...workflow,
-              step: "type",
-              selectedTypeLabel: null,
+              step: workflow.selectedSubtype ? "type" : "category",
               discoveryIndex: 0,
-              discoveryAnswers: {},
             })
           }
           className="text-sm font-semibold text-[#1e4f4f]"
         >
           ‹ Back
         </button>
-        <p className="mt-2 text-sm font-medium text-[#1e4f4f]">{typeLabel}</p>
+        <p className="mt-2 text-sm font-medium text-[#1e4f4f]">{displayType}</p>
+        {effectiveSubtypeLabel(workflow.selectedSubtype, workflow.customSubtype) ? (
+          <p className="text-sm text-[#6b635a]">
+            {effectiveSubtypeLabel(workflow.selectedSubtype, workflow.customSubtype)}
+          </p>
+        ) : null}
         <p className="mt-2 text-lg font-semibold text-[#1f1c19]">{question.prompt}</p>
         <p className="mt-1 text-sm text-[#6b635a]">
           <span className="font-medium text-[#4b463f]">Why I&apos;m asking:</span>{" "}
@@ -236,7 +321,7 @@ export function CreateWorkflowPanel({
             onClick={() => {
               const next = advanceAfterDiscoveryAnswer(
                 workflow,
-                typeLabel,
+                resolvedType,
                 question.id,
                 draftAnswer.trim(),
               );
@@ -250,7 +335,11 @@ export function CreateWorkflowPanel({
           <button
             type="button"
             onClick={() => {
-              const next = skipDiscoveryQuestion(workflow, typeLabel, question.id);
+              const next = skipDiscoveryQuestion(
+                workflow,
+                resolvedType,
+                question.id,
+              );
               setDraftAnswer("");
               onWorkflowChange(next);
             }}
@@ -263,9 +352,15 @@ export function CreateWorkflowPanel({
     );
   }
 
-  if (workflow.step === "readiness" && typeLabel) {
-    const summary = readinessSummary(typeLabel, workflow.discoveryAnswers);
-    const brief = buildBriefFromDiscovery(typeLabel, workflow.discoveryAnswers);
+  // ── Readiness ─────────────────────────────────────────────────────────────
+  if (workflow.step === "readiness" && resolvedType) {
+    const summary = readinessSummary(resolvedType, workflow.discoveryAnswers);
+    const brief = buildBriefFromWorkflow(workflow);
+    const subtype = effectiveSubtypeLabel(
+      workflow.selectedSubtype,
+      workflow.customSubtype,
+    );
+
     return (
       <div className="companion-fade-in">
         <button
@@ -282,16 +377,13 @@ export function CreateWorkflowPanel({
           ‹ Edit answers
         </button>
         <p className="mt-2 text-lg font-semibold text-[#1f1c19]">
-          I think I have enough information to create your {typeLabel}.
+          Ready to build your {displayType}
+          {subtype ? ` (${subtype})` : ""}.
         </p>
         <p className="mt-1 text-sm text-[#6b635a]">
-          Here&apos;s what I&apos;ll use:
+          I think I have enough information to build this. Would you like me to create the draft?
         </p>
-        {summary.length === 0 ? (
-          <p className="mt-4 text-sm text-[#9a8f82]">
-            No answers yet — you can still build a starter draft, or go back and add detail.
-          </p>
-        ) : (
+        {summary.length > 0 ? (
           <ul className="mt-4 flex flex-col gap-3 rounded-xl border border-[#d4cdc3] bg-white/90 p-4">
             {summary.map((row) => (
               <li key={row.label}>
@@ -302,48 +394,51 @@ export function CreateWorkflowPanel({
               </li>
             ))}
           </ul>
-        )}
-        <div className="mt-5 flex flex-col gap-5">
-          <div>
+        ) : null}
+        <div className="mt-5 flex flex-col gap-3">
+          <button
+            type="button"
+            disabled={building}
+            onClick={() => {
+              onWorkflowChange({
+                ...workflow,
+                readinessConfirmed: true,
+                buildApproved: true,
+                step: "improve",
+              });
+              onBuildDraft(brief);
+            }}
+            className="w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
+          >
+            {building ? `Building your ${displayType}…` : "Build Draft"}
+          </button>
+          <button
+            type="button"
+            disabled={building}
+            onClick={() => {
+              if (onAddMoreDetail) {
+                onAddMoreDetail();
+                return;
+              }
+              onWorkflowChange({
+                ...workflow,
+                step: "discovery",
+                discoveryIndex: workflow.discoveryIndex,
+              });
+            }}
+            className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
+          >
+            Add More Detail
+          </button>
+          {onBuildWithShari ? (
             <button
               type="button"
               disabled={building}
-              onClick={() => {
-                onWorkflowChange({
-                  ...workflow,
-                  readinessConfirmed: true,
-                  buildApproved: true,
-                  step: "improve",
-                });
-                onBuildDraft(brief);
-              }}
-              className="w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
+              onClick={() => onBuildWithShari(shariInput(workflow))}
+              className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
             >
-              {building ? `Creating your ${typeLabel.toLowerCase()}…` : `Create ${typeLabel}`}
+              💬 Work With Shari
             </button>
-            <p className="mt-1.5 text-sm text-[#6b635a]">
-              Build the {typeLabel.toLowerCase()} now using the information already gathered.
-            </p>
-          </div>
-          {onBuildWithShari && workflow.categoryId ? (
-            <div>
-              <button
-                type="button"
-                disabled={building}
-                onClick={() =>
-                  onBuildWithShari(
-                    shariInput(typeLabel, workflow.categoryId!, workflow),
-                  )
-                }
-                className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
-              >
-                💬 Work With Shari
-              </button>
-              <p className="mt-1.5 text-sm text-[#6b635a]">
-                Open a side-by-side conversation where Shari helps you think through ideas,
-                add details, and refine the {typeLabel.toLowerCase()} before creating it.
-              </p>
-            </div>
           ) : null}
         </div>
       </div>
