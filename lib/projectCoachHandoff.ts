@@ -48,7 +48,7 @@ export function buildProjectCoachHandoff(
     const name = ctx.selectedItemName?.trim() ?? "";
     if (!isUntitledName(name)) {
       return {
-        content: `I see you're working on **${name}**. Would you like help with goals, tasks, planning, or next steps?`,
+        content: `I see you're working on **${name}**. Would you like help with outcome, goals, tasks, or next steps?`,
         focusField: null,
         showTopicPicker: true,
       };

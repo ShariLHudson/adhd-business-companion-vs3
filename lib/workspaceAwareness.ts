@@ -27,6 +27,7 @@ import {
   type DocumentPanelPhase,
 } from "./collaborativeDocumentWorkflow";
 import type { GoogleFileKind } from "./googleWorkspace";
+import type { WorkspaceOpenSnapshot } from "./workspaceExecution";
 import {
   formatCreationCoGuideHint,
   formatCreationContextForPrompt,
@@ -46,6 +47,7 @@ import {
   workspaceCoachAutoStartHint,
   WORKSPACE_CONTEXT_RULE,
 } from "./workspaceCoachAutoStart";
+import { buildActiveWorkspacePriorityHint } from "./workspaceContextLock";
 
 export type { WorkspaceMessageClass };
 export { classifyWorkspaceMessage, isHelpRequest, isProjectContent };
@@ -429,6 +431,7 @@ export function buildWorkspaceChatHints(
     createDraftVisible?: boolean;
     collaborativePhase?: DocumentPanelPhase;
     preferredGoogleExport?: GoogleFileKind | null;
+    openSnapshot?: WorkspaceOpenSnapshot | null;
   },
 ): string | undefined {
   if (!ctx?.section) return undefined;
@@ -452,6 +455,17 @@ export function buildWorkspaceChatHints(
     parts.push(formatSopSessionForPrompt(opts.sopSession));
   }
   if (opts.coGuideActive) {
+    const snap = opts.openSnapshot ?? {
+      panel: ctx.section,
+      activeSection: "home",
+      revealSeq: 1,
+    };
+    const lockHint = buildActiveWorkspacePriorityHint(
+      ctx,
+      opts.userText ?? "",
+      snap,
+    );
+    if (lockHint) parts.unshift(lockHint);
     if (createChat) {
       parts.push(
         formatCreationCoGuideHint(ctx, opts.creationContext ?? null, {

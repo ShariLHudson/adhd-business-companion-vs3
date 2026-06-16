@@ -67,7 +67,7 @@ function buildCreateCoachAutoStart(
   if (!type) {
     return {
       content:
-        "[[focus:create-topic]]I see Create is open beside us. What are you making — a newsletter, workshop, proposal, SOP, or something else?",
+        "[[focus:create-topic]]I see you're in **Create**. What are you making — I'll help one question at a time.",
       focusField: "create-topic",
     };
   }
@@ -75,7 +75,7 @@ function buildCreateCoachAutoStart(
   if (!topic && !cc?.brief?.trim()) {
     const article = /^[aeiou]/i.test(type) ? "an" : "a";
     return {
-      content: `[[focus:create-topic]]I see you're creating ${article} **${type}**. Let's figure out who it's for first — or tell me the topic in one line.`,
+      content: `[[focus:create-topic]]I see you're creating ${article} **${type}**. I'll help one question at a time — who is it for, or what's the topic in one line?`,
       focusField: "create-topic",
     };
   }
@@ -111,7 +111,7 @@ function buildPlaybookCoachAutoStart(ctx: WorkspaceContext): WorkspaceCoachAutoS
   }
   return {
     content:
-      "I see **Strategies** is open. **ADHD Strategies** = apply a technique now. **Business Strategies** = create a plan with me, one question at a time. Which do you need?",
+      "I see **Strategies** is open. What are you trying to work through right now?",
     focusField: null,
   };
 }
@@ -147,7 +147,7 @@ function buildFocusTimerCoachAutoStart(
   }
   return {
     content:
-      "I see you're starting a focus session. What would you like to accomplish before the timer ends?",
+      "I see you're starting a focus session. What do you want to focus on?",
     focusField: null,
   };
 }

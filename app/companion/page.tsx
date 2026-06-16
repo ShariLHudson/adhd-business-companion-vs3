@@ -232,6 +232,10 @@ import {
   type WorkspaceOpenSnapshot,
 } from "@/lib/workspaceExecution";
 import {
+  shouldSuppressCrossWorkspaceNavigation,
+  tryStrategyWorkspaceLocalReply,
+} from "@/lib/workspaceContextLock";
+import {
   trackToolSuggestionAccepted,
   trackToolSuggestionDismissed,
   trackToolSuggestionOffered,
@@ -1052,6 +1056,7 @@ export default function CompanionPage() {
   const projectContinueIdRef = useRef<string | null>(null);
   projectContinueIdRef.current = projectContinueId;
   const workspaceCoachSeededRef = useRef<string | null>(null);
+  const prevWorkspacePanelRef = useRef<AppSection | null>(null);
   const [projectCoachTopicPickerVisible, setProjectCoachTopicPickerVisible] =
     useState(false);
   const [projectCoachSession, setProjectCoachSession] =
@@ -1832,7 +1837,12 @@ export default function CompanionPage() {
   useEffect(() => {
     if (chatLayoutMode !== "split") {
       workspaceCoachSeededRef.current = null;
+      prevWorkspacePanelRef.current = null;
       return;
+    }
+    if (workspacePanel !== prevWorkspacePanelRef.current) {
+      workspaceCoachSeededRef.current = null;
+      prevWorkspacePanelRef.current = workspacePanel;
     }
     const section =
       workspacePanel ??
@@ -4230,6 +4240,17 @@ export default function CompanionPage() {
     const blockAutoWorkspace = shouldBlockAutoWorkspaceOpen(trimmed, {
       stayInConversation,
     });
+    const workspaceSnap = getWorkspaceSnapshot();
+
+    const suppressCrossWorkspace = (
+      target: AppSection,
+    ): boolean =>
+      shouldSuppressCrossWorkspaceNavigation(
+        workspacePanel,
+        target,
+        trimmed,
+        workspaceSnap,
+      );
 
     if (pendingDocumentTypeChoice) {
       const picked = parseDocumentTypeChoice(trimmed);
@@ -4312,7 +4333,8 @@ export default function CompanionPage() {
       !stayInConversation &&
       !blockAutoWorkspace &&
       !suppressCreateForPlanning &&
-      isDocumentCreationRequest(trimmed)
+      isDocumentCreationRequest(trimmed) &&
+      (!workspacePanel || !suppressCrossWorkspace("content-generator"))
     ) {
       if (needsDocumentTypeConfirmation(trimmed)) {
         commitUserLine();
@@ -4337,19 +4359,30 @@ export default function CompanionPage() {
 
     if (!distressed && !stayInConversation && !suppressCreateForPlanning) {
       const assetRoute = resolveAssetRoute(trimmed);
-      if (assetRoute && shouldAutoRouteAssetRequest(trimmed)) {
+      if (
+        assetRoute &&
+        shouldAutoRouteAssetRequest(trimmed) &&
+        !suppressCrossWorkspace(assetRoute.section)
+      ) {
         commitUserLine();
         openAssetRoute(assetRoute);
         return;
       }
 
-      if (resolved.action === "edit-draft" && resolved.draftContent) {
+      if (
+        resolved.action === "edit-draft" &&
+        resolved.draftContent &&
+        !suppressCrossWorkspace("content-generator")
+      ) {
         commitUserLine();
         openCreateFromIntent(resolved);
         return;
       }
 
-      if (resolved.action === "stabilize") {
+      if (
+        resolved.action === "stabilize" &&
+        !suppressCrossWorkspace("content-generator")
+      ) {
         commitUserLine();
         openCreationWorkspace(
           "content-generator",
@@ -4376,7 +4409,8 @@ export default function CompanionPage() {
       if (
         resolved.action === "make" &&
         resolved.confidence >= MAKE_CONFIDENCE_THRESHOLD &&
-        resolved.type
+        resolved.type &&
+        !suppressCrossWorkspace("content-generator")
       ) {
         commitUserLine();
         openCreateFromIntent(resolved);
@@ -4524,7 +4558,12 @@ export default function CompanionPage() {
       ]);
       return;
     }
-    if (directOpen && supportsWorkspace(directOpen) && !blockAutoWorkspace) {
+    if (
+      directOpen &&
+      supportsWorkspace(directOpen) &&
+      !blockAutoWorkspace &&
+      !suppressCrossWorkspace(directOpen)
+    ) {
       openWorkspaceBesideChat(directOpen);
       return;
     }
@@ -5149,6 +5188,22 @@ export default function CompanionPage() {
     }
 
     if (workspacePanel && workspaceContext) {
+      const strategyReply = tryStrategyWorkspaceLocalReply(
+        workspaceContext,
+        trimmed,
+      );
+      if (strategyReply) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: strategyReply },
+        ]);
+        setWorkspaceOffer(null);
+        setToolSuggestion(null);
+        setActionBridge(null);
+        setBridge(null);
+        return;
+      }
+
       if (projectCoachSession && workspacePanel === "projects") {
         const coachTurn = resolveProjectCoachTurn(
           projectCoachSession,
@@ -5428,6 +5483,7 @@ export default function CompanionPage() {
                       : "building"
                     : undefined,
               preferredGoogleExport: preferredGoogleExportKind,
+              openSnapshot: getWorkspaceSnapshot(),
             }),
             splitCreateChat
               ? formatCreateBuilderChatHint(createBuilderSession)
@@ -5482,13 +5538,25 @@ export default function CompanionPage() {
       );
       if (
         autoWorkspaceRoute &&
-        !isWorkspaceOpen(autoWorkspaceRoute.section, getWorkspaceSnapshot())
+        !isWorkspaceOpen(autoWorkspaceRoute.section, getWorkspaceSnapshot()) &&
+        !shouldSuppressCrossWorkspaceNavigation(
+          workspacePanelRef.current,
+          autoWorkspaceRoute.section,
+          trimmed,
+          getWorkspaceSnapshot(),
+        )
       ) {
         openAssetRoute(autoWorkspaceRoute, { appendAck: false });
       }
       if (
         shouldHandoffChatArtifactToWorkspace(assistantMsg, trimmed) &&
-        workspacePanel !== "content-generator"
+        workspacePanel !== "content-generator" &&
+        !shouldSuppressCrossWorkspaceNavigation(
+          workspacePanel,
+          "content-generator",
+          trimmed,
+          getWorkspaceSnapshot(),
+        )
       ) {
         const fromChat = extractArtifactFromChat(
           toChatTurns([

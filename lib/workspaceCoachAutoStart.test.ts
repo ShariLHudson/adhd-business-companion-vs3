@@ -47,6 +47,15 @@ describe("workspaceCoachAutoStart", () => {
     expect(msg?.content).toContain("apply");
   });
 
+  it("opens strategies without a selected strategy", () => {
+    const msg = buildWorkspaceCoachAutoStart({
+      section: "playbook",
+      title: "Strategies",
+    } as WorkspaceContext);
+    expect(msg?.content).toContain("Strategies");
+    expect(msg?.content).toContain("work through");
+  });
+
   it("builds stable seed keys per workspace", () => {
     const ctx = {
       section: "brain-dump",
