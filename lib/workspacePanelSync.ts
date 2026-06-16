@@ -55,6 +55,10 @@ export function panelDetailEqual(
     a.selectedItemGoal === b.selectedItemGoal &&
     a.selectedItemStatus === b.selectedItemStatus &&
     a.selectedItemHorizon === b.selectedItemHorizon &&
+    a.selectedItemColor === b.selectedItemColor &&
+    a.showProjectColor === b.showProjectColor &&
+    a.projectConversationCount === b.projectConversationCount &&
+    a.projectFileCount === b.projectFileCount &&
     a.nextAction === b.nextAction &&
     a.draftPreview === b.draftPreview
   );

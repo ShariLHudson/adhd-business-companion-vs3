@@ -2,16 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  addBrainDump,
   addXp,
   clearBrainDumpDraft,
   contextColor,
   deleteBrainDump,
   getBrainDumps,
   getProjects,
-  logMomentum,
-  loadBrainDumpDraft,
-  saveBrainDumpDraft,
   saveProject,
   todayStr,
   topicColor,
@@ -20,7 +16,9 @@ import {
   type Project,
 } from "@/lib/companionStore";
 import { RefineActions } from "@/components/companion/RefineActions";
-import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
+import { ClearMyMindSession } from "@/components/companion/ClearMyMindSession";
+import { newCaptureSessionId } from "@/lib/clearMyMindCapture";
+import { routeBrainDumpEntry } from "@/lib/brainDumpRouting";
 import {
   normalizeCategory,
   sortedBrainDumpCategoryGroups,
@@ -55,6 +53,7 @@ const SCHED = [
   { id: "today", label: "Today" },
   { id: "week", label: "This week" },
   { id: "later", label: "Later" },
+  { id: "tomorrow", label: "Tomorrow" },
 ];
 
 function isToday(iso: string) {
@@ -89,9 +88,11 @@ export function BrainDumpPanel({
   /** Ask before navigating to another section. */
   onSuggestOpen?: (section: AppSection) => void;
 }) {
-  const [text, setText] = useState("");
   const [entries, setEntries] = useState<BrainDumpEntry[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
+  const [panelMode, setPanelMode] = useState<"session" | "library">("session");
+  const [captureSessionId, setCaptureSessionId] = useState(newCaptureSessionId);
+  const [routeTrust, setRouteTrust] = useState<string | null>(null);
   // Filter-first: nothing shows until the user picks a filter (or a summary
   // chip / View items). Brain Dump should feel like a filing cabinet, not an
   // inbox dumping everything at you on open.
@@ -105,8 +106,7 @@ export function BrainDumpPanel({
   const decorative = visualMode === "decorative";
 
   useEffect(() => {
-    const draft = loadBrainDumpDraft();
-    if (draft) setText(draft);
+    clearBrainDumpDraft();
     setEntries(getBrainDumps());
     setProjects(getProjects());
   }, []);
@@ -122,53 +122,6 @@ export function BrainDumpPanel({
     });
     return () => registerBack?.(null);
   }, [expandedId, registerBack]);
-
-  function handleChange(value: string) {
-    setText(value);
-    saveBrainDumpDraft(value);
-  }
-
-  async function classify(id: string, note: string) {
-    try {
-      const res = await fetch("/api/braindump-classify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: note }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setEntries(
-          updateBrainDump(id, {
-            topic: data.topic,
-            category: data.category,
-            contextType: data.contextType,
-            suggestion: data.suggestion,
-          }),
-        );
-      }
-    } catch {
-      /* leave unclassified */
-    }
-  }
-
-  function handleSave() {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-    const list = addBrainDump(trimmed);
-    setEntries(list);
-    clearBrainDumpDraft();
-    setText("");
-    logMomentum("capture", "Brain dump captured");
-    void import("@/lib/ecosystem/eventTrackingEngine").then(({ trackEcosystemEvent }) => {
-      trackEcosystemEvent({
-        eventType: "feature.brain_dump_used",
-        feature: "brain-dump",
-        metadata: { entryKind: "capture" },
-      });
-    });
-    const id = list[0]?.id;
-    if (id) void classify(id, trimmed);
-  }
 
   const patch = (id: string, c: Partial<BrainDumpEntry>) =>
     setEntries(updateBrainDump(id, c));
@@ -230,6 +183,22 @@ export function BrainDumpPanel({
   );
 
   const suggestOpen = onSuggestOpen ?? onOpen;
+
+  function applyRoute(
+    entry: BrainDumpEntry,
+    route: Parameters<typeof routeBrainDumpEntry>[1],
+  ) {
+    const result = routeBrainDumpEntry(entry, route);
+    setEntries(getBrainDumps());
+    setRouteTrust(
+      `${result.headline} Saved to ${result.savedWhere}. You'll see it: ${result.seeWhere}`,
+    );
+    window.setTimeout(() => setRouteTrust(null), 4000);
+    if (route === "focus") suggestOpen?.("focus-timer");
+    if (route === "time-block") suggestOpen?.("time-block");
+    if (route === "project") suggestOpen?.("projects");
+  }
+
   const chip = (active: boolean) =>
     `rounded-full px-3 py-1 text-xs font-semibold capitalize transition-colors ${
       active
@@ -247,35 +216,57 @@ export function BrainDumpPanel({
       <WorkspaceGuide section="brain-dump" />
       <p className="text-2xl font-semibold text-[#1f1c19]">Clear My Mind</p>
       <p className="mt-2 text-base text-[#6b635a]">
-        Get it out of your head. I&apos;ll sort it and tell you what wants to
-        become action.
+        One thought at a time — each becomes its own card so nothing gets lost
+        in a blob.
       </p>
 
-      <VoiceAnswerField
-        value={text}
-        onChange={handleChange}
-        placeholder="Everything on your mind right now…"
-        className="mt-5"
-        inputClassName="min-h-[120px] resize-none rounded-2xl border-2 border-[#d4cdc3] bg-white/90 px-5 py-4 text-lg leading-relaxed text-[#1f1c19] placeholder:text-[#9a8f82] focus:border-[#1e4f4f] focus:outline-none focus:ring-2 focus:ring-[#1e4f4f]/15"
-      />
-      <div className="mt-3 flex items-center justify-end gap-2">
+      <div className="mt-5 flex gap-2">
         <button
           type="button"
-          disabled={!text.trim()}
-          onClick={handleSave}
-          className="rounded-xl bg-[#1e4f4f] px-8 py-2.5 text-base font-semibold text-white shadow-md hover:bg-[#163a3a] disabled:bg-[#9aaba8]"
+          onClick={() => {
+            setPanelMode("session");
+            setCaptureSessionId(newCaptureSessionId());
+          }}
+          className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
+            panelMode === "session"
+              ? "bg-[#1e4f4f] text-white"
+              : "bg-white/80 text-[#3d3630] border border-[#d4cdc3]"
+          }`}
         >
-          Save
+          Capture
+        </button>
+        <button
+          type="button"
+          onClick={() => setPanelMode("library")}
+          className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
+            panelMode === "library"
+              ? "bg-[#1e4f4f] text-white"
+              : "bg-white/80 text-[#3d3630] border border-[#d4cdc3]"
+          }`}
+        >
+          Library
         </button>
       </div>
 
-      {xpFlash && (
-        <p className="companion-fade-in mt-3 text-center text-base font-semibold text-[#1e4f4f]">
-          🎉 Nice — one less thing carrying mental weight.
+      {routeTrust ? (
+        <p className="companion-fade-in mt-3 rounded-xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/5 px-4 py-3 text-sm text-[#2d2926]">
+          {routeTrust}
         </p>
-      )}
+      ) : null}
 
-      {entries.some((e) => !e.done) && (
+      {panelMode === "session" ? (
+        <div className="mt-5">
+          <ClearMyMindSession
+            key={captureSessionId}
+            sessionId={captureSessionId}
+            onOpen={suggestOpen}
+            onViewLibrary={() => setPanelMode("library")}
+            onSessionComplete={() => setEntries(getBrainDumps())}
+          />
+        </div>
+      ) : null}
+
+      {panelMode === "library" && entries.some((e) => !e.done) && (
         <>
           {/* Filing-cabinet overview — clickable counts set the category. */}
           <p className="mt-7 text-sm font-bold uppercase tracking-wide text-[#7c7468]">
@@ -549,9 +540,13 @@ export function BrainDumpPanel({
                           <button
                             key={s.id}
                             type="button"
-                            onClick={() =>
-                              patch(entry.id, { schedulingIntent: s.id })
-                            }
+                            onClick={() => {
+                              if (s.id === "tomorrow") {
+                                applyRoute(entry, "tomorrow");
+                              } else {
+                                patch(entry.id, { schedulingIntent: s.id });
+                              }
+                            }}
                             className={chip(entry.schedulingIntent === s.id)}
                           >
                             {s.label}
@@ -562,24 +557,21 @@ export function BrainDumpPanel({
                       <div className="mt-4 flex flex-wrap gap-2 text-sm font-semibold">
                         <button
                           type="button"
-                          onClick={() => suggestOpen?.("time-block")}
+                          onClick={() => applyRoute(entry, "time-block")}
                           className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-white hover:bg-[#163a3a]"
                         >
                           ⏱ Time Block
                         </button>
                         <button
                           type="button"
-                          onClick={() => {
-                            newProjectFrom(entry);
-                            suggestOpen?.("projects");
-                          }}
+                          onClick={() => applyRoute(entry, "project")}
                           className="rounded-lg border border-[#1e4f4f]/40 bg-white px-3 py-1.5 text-[#1e4f4f]"
                         >
                           📁 To Project
                         </button>
                         <button
                           type="button"
-                          onClick={() => suggestOpen?.("focus-timer")}
+                          onClick={() => applyRoute(entry, "focus")}
                           className="rounded-lg border border-[#1e4f4f]/40 bg-white px-3 py-1.5 text-[#1e4f4f]"
                         >
                           ▶ Focus
@@ -608,6 +600,13 @@ export function BrainDumpPanel({
             </ul>
             ))}
         </>
+      )}
+
+      {panelMode === "library" && !entries.some((e) => !e.done) && (
+        <p className="mt-6 text-base text-[#6b635a]">
+          No saved items yet — switch to <strong>Capture</strong> and tell me
+          the first thing on your mind.
+        </p>
       )}
     </div>
   );

@@ -51,10 +51,10 @@ export const WORKSPACE_GUIDES: Record<string, WorkspaceGuideContent> = {
   "brain-dump": {
     id: "brain-dump",
     title: "Clear My Mind",
-    what: "Pour everything out — thoughts, tasks, worries — without organizing yet.",
-    why: "Getting it out of your head lowers cognitive load before sorting.",
-    how: "Type or talk freely; Shari helps sort into tasks, ideas, or reminders later.",
-    example: "“Client email, buy milk, launch idea, anxious about pricing…”",
+    what: "Capture one thought at a time — each becomes its own card.",
+    why: "One giant dump becomes a blob the app can't sort; one-at-a-time keeps each item actionable.",
+    how: "Answer “What's the first thing on your mind?” — then “Anything else?” until you're done. Sort each card after.",
+    example: "“Need to schedule my ultrasound” → one card. “Finish the ADHD sales page” → another card.",
   },
   energy: {
     id: "energy",

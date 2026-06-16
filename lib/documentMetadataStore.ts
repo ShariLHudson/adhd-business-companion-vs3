@@ -50,6 +50,10 @@ export function listDocumentMetadata(): DocumentMetadata[] {
   );
 }
 
+export function listDocumentsForProject(projectId: string): DocumentMetadata[] {
+  return listDocumentMetadata().filter((d) => d.projectId === projectId);
+}
+
 export function upsertDocumentMetadata(
   input: Omit<DocumentMetadata, "id" | "createdAt" | "updatedAt"> & {
     id?: string;
@@ -77,6 +81,13 @@ export function upsertDocumentMetadata(
     };
     items[existingIdx] = next;
     writeAll(items);
+    if (next.projectId && typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent("project-files-updated", {
+          detail: { projectId: next.projectId },
+        }),
+      );
+    }
     return next;
   }
 
@@ -93,6 +104,13 @@ export function upsertDocumentMetadata(
     updatedAt: now,
   };
   writeAll([record, ...items]);
+  if (record.projectId && typeof window !== "undefined") {
+    window.dispatchEvent(
+      new CustomEvent("project-files-updated", {
+        detail: { projectId: record.projectId },
+      }),
+    );
+  }
   return record;
 }
 

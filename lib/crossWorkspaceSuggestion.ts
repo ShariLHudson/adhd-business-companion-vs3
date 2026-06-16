@@ -57,7 +57,7 @@ export function crossWorkspaceContextMessage(
   const target = crossWorkspaceSectionLabel(targetSection);
   switch (targetSection) {
     case "brain-dump":
-      return `Capture the thoughts you want to park from ${sourceTitle}.`;
+      return `Capture one thought at a time in Clear My Mind — each on its own card.`;
     case "time-block":
       return `Block time for what you're working on in ${sourceTitle}.`;
     case "projects":

@@ -72,6 +72,11 @@ export type WorkspacePanelDetail = {
   selectedItemGoal?: string | null;
   selectedItemStatus?: string | null;
   selectedItemHorizon?: string | null;
+  selectedItemColor?: string | null;
+  /** True when project color swatch is shown on the list (visual mode on). */
+  showProjectColor?: boolean;
+  projectConversationCount?: number;
+  projectFileCount?: number;
   nextAction?: string | null;
   draftPreview?: string | null;
 };

@@ -94,4 +94,24 @@ describe("projectGrounding", () => {
     const g = buildProjectGrounding(detailCtx);
     expect(g.hiddenFromUser.some((h) => /next step/i.test(h))).toBe(true);
   });
+
+  it("includes color on detail and list when visual mode is on", () => {
+    expect(visibleProjectFields(detailCtx)).toContain("color");
+    expect(visibleProjectFields(detailCtx)).toContain("conversations");
+    expect(visibleProjectFields(detailCtx)).toContain("files");
+    expect(
+      visibleProjectFields({ ...listCtx, showProjectColor: true }),
+    ).toContain("color");
+    expect(visibleProjectFields(listCtx)).not.toContain("color");
+  });
+
+  it("prompt mentions conversations and files on detail", () => {
+    const prompt = formatProjectGroundingForPrompt({
+      ...detailCtx,
+      projectConversationCount: 2,
+      projectFileCount: 1,
+    });
+    expect(prompt).toContain("Conversations on screen: 2");
+    expect(prompt).toContain("Files on screen: 1");
+  });
 });

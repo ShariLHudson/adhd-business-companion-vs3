@@ -275,20 +275,23 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
     helpsWith: "Getting intrusive thoughts out of working memory so you can rest or focus.",
     timeLabel: "5–10 min",
     steps: [
-      s("Grab a place to capture — notes app, paper, or Clear My Mind in the companion."),
-      s("Dump every thought that won't leave you alone. Fragments are fine; no order needed.", {
-        type: "options",
-        key: "thoughts",
-        startCount: 4,
-        minFilled: 1,
-        addLabel: "Add another thought",
+      s("Open **Clear My Mind** beside us — we'll capture one thought per card, not one giant list."),
+      s("What's the first thing that won't leave you alone? One line only.", {
+        type: "text",
+        key: "thought-1",
+        label: "First thought",
       }),
-      s("Don't solve anything yet. Each line is parked, not assigned."),
-      s("When the rush slows, close the list. Your brain can let go because the words are stored."),
-      s("Optional: tag one item for tomorrow if something truly can't wait.", {
+      s("Anything else? Add one more if something else is nagging — still one at a time.", {
+        type: "text",
+        key: "thought-2",
+        label: "Second thought (optional)",
+        optional: true,
+      }),
+      s("Don't solve anything yet. Each line is parked on its own card."),
+      s("Optional: pick one to work on tomorrow if something truly can't wait.", {
         type: "pick-from",
         key: "tomorrow",
-        fromKey: "thoughts",
+        fromKey: "thought-1",
         label: "Anything for tomorrow? (optional)",
         optional: true,
       }),
@@ -297,7 +300,7 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
     linkedLabel: "Open Clear My Mind",
     suggestLinkedFromStep: 0,
     linkedSuggestionHint:
-      "This works best if you can capture the thoughts somewhere.",
+      "This works best with Clear My Mind beside us — one thought per card.",
   },
   {
     id: "safe-for-today",

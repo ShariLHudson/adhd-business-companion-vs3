@@ -42,6 +42,20 @@ import { useWorkspaceFieldFocus } from "@/lib/useWorkspaceFieldFocus";
 import { WorkspaceSopField, isSopPanelField } from "@/components/companion/WorkspaceSopField";
 import { WorkspaceSopProgress } from "@/components/companion/WorkspaceSopProgress";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
+import { listDocumentsForProject } from "@/lib/documentMetadataStore";
+import {
+  countProjectConversations,
+  listProjectConversations,
+  PROJECT_CONVERSATIONS_UPDATED,
+  type ProjectConversationEntry,
+} from "@/lib/projectConversations";
+import {
+  deleteProjectLink,
+  listProjectLinks,
+  PROJECT_LINKS_UPDATED,
+  saveProjectLink,
+  type ProjectLink,
+} from "@/lib/projectLinks";
 
 const STATUSES: ProjectStatus[] = [
   "not-started",
@@ -124,6 +138,24 @@ export function ProjectsPanel({
   const [detailSectionsOpen, setDetailSectionsOpen] = useState<
     Record<string, boolean>
   >({});
+  const [projectDataTick, setProjectDataTick] = useState(0);
+  const [newLinkLabel, setNewLinkLabel] = useState("");
+  const [newLinkUrl, setNewLinkUrl] = useState("");
+
+  const visualMode = useVisualMode();
+  const colorOn = visualMode !== "off";
+
+  useEffect(() => {
+    const bump = () => setProjectDataTick((n) => n + 1);
+    window.addEventListener(PROJECT_CONVERSATIONS_UPDATED, bump);
+    window.addEventListener(PROJECT_LINKS_UPDATED, bump);
+    window.addEventListener("project-files-updated", bump);
+    return () => {
+      window.removeEventListener(PROJECT_CONVERSATIONS_UPDATED, bump);
+      window.removeEventListener(PROJECT_LINKS_UPDATED, bump);
+      window.removeEventListener("project-files-updated", bump);
+    };
+  }, []);
 
   useEffect(() => {
     setProjects(getProjects());
@@ -144,6 +176,26 @@ export function ProjectsPanel({
     [projects, detailId],
   );
 
+  const projectConversations = useMemo((): ProjectConversationEntry[] => {
+    if (!current) return [];
+    void projectDataTick;
+    return listProjectConversations(current.id);
+  }, [current, projectDataTick]);
+
+  const projectDocs = useMemo(() => {
+    if (!current) return [];
+    void projectDataTick;
+    return listDocumentsForProject(current.id);
+  }, [current, projectDataTick]);
+
+  const projectLinks = useMemo((): ProjectLink[] => {
+    if (!current) return [];
+    void projectDataTick;
+    return listProjectLinks(current.id);
+  }, [current, projectDataTick]);
+
+  const projectFileCount = projectDocs.length + projectLinks.length;
+
   const lastReportedDetail = useRef<string>("");
 
   useEffect(() => {
@@ -158,6 +210,7 @@ export function ProjectsPanel({
         selectedItemName: null,
         selectedItemStatus: null,
         selectedItemHorizon: null,
+        showProjectColor: colorOn,
         nextAction: null,
       };
     } else if (view === "create-source") {
@@ -193,6 +246,10 @@ export function ProjectsPanel({
         selectedItemGoal: current.goal.trim() || null,
         selectedItemStatus: PROJECT_STATUS_LABEL[current.status],
         selectedItemHorizon: PROJECT_HORIZON_LABEL[current.horizon],
+        selectedItemColor: current.color,
+        showProjectColor: true,
+        projectConversationCount: countProjectConversations(current.id),
+        projectFileCount,
         nextAction: current.nextAction.trim() || null,
       };
     } else {
@@ -203,7 +260,7 @@ export function ProjectsPanel({
     if (sig === lastReportedDetail.current) return;
     lastReportedDetail.current = sig;
     onContextChange(detail);
-  }, [view, step, what, why, current, onContextChange]);
+  }, [view, step, what, why, current, onContextChange, colorOn, projectFileCount]);
 
   const focusElementId =
     focusField === "project-title"
@@ -214,11 +271,13 @@ export function ProjectsPanel({
           ? "workspace-field-project-next-action"
           : null;
 
-  useWorkspaceFieldFocus(focusField, focusStamp, focusElementId, [view, step]);
+  useWorkspaceFieldFocus(focusField, focusStamp, focusElementId, [
+    view,
+    step,
+    detailId,
+  ]);
 
   const projectGroups = groupProjectsByList(projects);
-  const visualMode = useVisualMode();
-  const colorOn = visualMode !== "off";
 
   function startCreate() {
     setView("create-source");
@@ -339,6 +398,12 @@ export function ProjectsPanel({
 
     const { field, value, stepId } = chatFieldFill;
     if (field === "project-title") {
+      const proj = currentRef.current;
+      if (view === "detail" && proj) {
+        patch(proj.id, { name: value });
+        if (stepId) onSopFieldChange?.(stepId, value);
+        return;
+      }
       if (view !== "create") {
         setWhat("");
         setWhy("");
@@ -678,9 +743,18 @@ export function ProjectsPanel({
           ‹ All projects
         </button>
 
-        <p className="mt-3 text-2xl font-semibold text-[#1f1c19]">
-          {current.name}
-        </p>
+        <label className="mt-3 block text-xs font-semibold uppercase tracking-wide text-[#6b635a]">
+          Project name
+          <VoiceAnswerField
+            id="workspace-field-project-title"
+            value={current.name}
+            onChange={(v) => patch(current.id, { name: v })}
+            placeholder="What are you building?"
+            className="mt-1"
+            inputClassName="w-full rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-2xl font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+            micTitle="Project name"
+          />
+        </label>
 
         <div className="mt-4 flex flex-col gap-1">
           <CollapsibleSection
@@ -690,22 +764,32 @@ export function ProjectsPanel({
             onToggle={toggleDetailSection}
           >
             <div className="space-y-4 rounded-xl border border-[#e4ddd2] bg-white/90 p-4">
-              <p
-                id="workspace-field-project-goal"
-                className={`text-base text-[#6b635a] ${current.goal ? "" : "italic"}`}
-              >
-                {current.goal || "Add a one-line outcome when you're ready."}
-              </p>
+              <label className="block text-xs font-semibold text-[#6b635a]">
+                Outcome
+                <VoiceAnswerField
+                  id="workspace-field-project-goal"
+                  value={current.goal}
+                  onChange={(v) => patch(current.id, { goal: v })}
+                  placeholder="Why does this matter right now?"
+                  className="mt-1"
+                  inputClassName="min-h-[72px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                  micTitle="Outcome — why it matters"
+                />
+              </label>
 
               {current.horizon === "now" && (
                 <div id="workspace-field-project-next-action">
-                  <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
+                  <label className="block text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
                     Next step
-                  </p>
-                  <p className="mt-1 text-lg font-semibold text-[#1f1c19]">
-                    {current.nextAction.trim() ||
-                      "Refresh next step when you want a suggestion."}
-                  </p>
+                    <VoiceAnswerField
+                      value={current.nextAction}
+                      onChange={(v) => patch(current.id, { nextAction: v })}
+                      placeholder="One small step you could take next"
+                      className="mt-1"
+                      inputClassName="min-h-[56px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-base font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                      micTitle="Next step"
+                    />
+                  </label>
                   {backups.length > 0 && (
                     <div className="mt-2 flex flex-col gap-1">
                       {backups.map((b) => (
@@ -919,25 +1003,161 @@ export function ProjectsPanel({
           <CollapsibleSection
             id="conversations"
             title="Conversations"
+            count={projectConversations.length}
             open={!!detailSectionsOpen.conversations}
             onToggle={toggleDetailSection}
           >
-            <p className="text-sm text-[#6b635a]">
-              Use <strong>Ask Shari</strong> in the companion panel to talk
-              through this project — chat stays beside you while you work.
-            </p>
+            {projectConversations.length === 0 ? (
+              <div className="space-y-3">
+                <p className="text-sm text-[#6b635a]">
+                  Chat with Shari while this project is open — your exchanges
+                  show up here.
+                </p>
+                {onAsk && (
+                  <button
+                    type="button"
+                    onClick={() =>
+                      onAsk(
+                        `I'm working on **${current.name}**. Help me think through the next move.`,
+                      )
+                    }
+                    className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-sm font-semibold text-white"
+                  >
+                    Ask Shari about this project
+                  </button>
+                )}
+              </div>
+            ) : (
+              <ul className="flex flex-col gap-2">
+                {projectConversations.map((entry) => (
+                  <li
+                    key={entry.id}
+                    className="rounded-lg border border-[#e4ddd2] bg-white px-3 py-2 text-sm"
+                  >
+                    <p className="text-xs text-[#9a8f82]">
+                      {new Date(entry.createdAt).toLocaleString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                    <p className="mt-1 font-semibold text-[#1f1c19]">
+                      You: {entry.userPreview}
+                    </p>
+                    <p className="mt-1 text-[#6b635a]">
+                      Shari: {entry.assistantPreview}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            )}
           </CollapsibleSection>
 
           <CollapsibleSection
             id="files"
             title="Files"
+            count={projectFileCount}
             open={!!detailSectionsOpen.files}
             onToggle={toggleDetailSection}
           >
-            <p className="text-sm text-[#6b635a]">
-              Export drafts to Google Docs from Create, or attach links in Notes
-              for now.
-            </p>
+            {projectFileCount === 0 ? (
+              <p className="text-sm text-[#6b635a]">
+                Google exports from Create appear here automatically. You can
+                also add a link below.
+              </p>
+            ) : (
+              <ul className="mb-3 flex flex-col gap-2">
+                {projectDocs.map((doc) => (
+                  <li
+                    key={doc.id}
+                    className="rounded-lg border border-[#e4ddd2] bg-white px-3 py-2 text-sm"
+                  >
+                    <span className="font-semibold text-[#1f1c19]">
+                      {doc.title}
+                    </span>
+                    <span className="ml-2 text-xs text-[#6b635a]">
+                      {doc.type}
+                      {doc.googleKind ? ` · ${doc.googleKind}` : ""}
+                    </span>
+                    {doc.googleUrl && (
+                      <a
+                        href={doc.googleUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 block text-xs font-semibold text-[#1e4f4f] hover:underline"
+                      >
+                        Open in Google
+                      </a>
+                    )}
+                  </li>
+                ))}
+                {projectLinks.map((link) => (
+                  <li
+                    key={link.id}
+                    className="flex items-start justify-between gap-2 rounded-lg border border-[#e4ddd2] bg-white px-3 py-2 text-sm"
+                  >
+                    <div>
+                      <span className="font-semibold text-[#1f1c19]">
+                        {link.label}
+                      </span>
+                      <a
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-1 block text-xs font-semibold text-[#1e4f4f] hover:underline"
+                      >
+                        {link.url}
+                      </a>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        deleteProjectLink(link.id);
+                        setProjectDataTick((n) => n + 1);
+                      }}
+                      className="text-xs text-[#a85c4a] hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
+            <div className="space-y-2 border-t border-[#e4ddd2] pt-3">
+              <p className="text-xs font-semibold text-[#6b635a]">Add a link</p>
+              <input
+                type="text"
+                value={newLinkLabel}
+                onChange={(e) => setNewLinkLabel(e.target.value)}
+                placeholder="Label (e.g. Figma board)"
+                className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-sm outline-none focus:border-[#1e4f4f]"
+              />
+              <input
+                type="url"
+                value={newLinkUrl}
+                onChange={(e) => setNewLinkUrl(e.target.value)}
+                placeholder="https://…"
+                className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-sm outline-none focus:border-[#1e4f4f]"
+              />
+              <button
+                type="button"
+                disabled={!newLinkUrl.trim()}
+                onClick={() => {
+                  saveProjectLink({
+                    projectId: current.id,
+                    label: newLinkLabel,
+                    url: newLinkUrl,
+                  });
+                  setNewLinkLabel("");
+                  setNewLinkUrl("");
+                  setProjectDataTick((n) => n + 1);
+                }}
+                className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
+              >
+                Save link
+              </button>
+            </div>
           </CollapsibleSection>
         </div>
       </div>

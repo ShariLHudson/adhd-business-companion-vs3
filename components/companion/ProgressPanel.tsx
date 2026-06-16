@@ -13,6 +13,11 @@ import {
 } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
 import { MicButton } from "./MicButton";
+import {
+  getTomorrowFocusForToday,
+  markTomorrowFocusDone,
+  type TomorrowFocusItem,
+} from "@/lib/tomorrowFocus";
 
 // Momentum is about *noticing* progress for the user — not asking them to log it.
 // Calm, lightweight, emotionally rewarding. Everything is derived from real
@@ -72,14 +77,19 @@ export function ProgressPanel({ onOpen }: { onOpen?: (s: AppSection) => void }) 
   const [saved, setSaved] = useState(false);
   const [open, setOpen] = useState<string | null>(null); // accordion — all collapsed
   const [moreOpen, setMoreOpen] = useState(false);
+  const [fromYesterday, setFromYesterday] = useState<TomorrowFocusItem[]>([]);
 
   function load() {
     setEvents(getTodayMomentum());
     setWeek(getWeekMomentum());
     setProjects(getProjects());
+    setFromYesterday(getTomorrowFocusForToday());
   }
   useEffect(() => {
     load();
+    const onUpdate = () => setFromYesterday(getTomorrowFocusForToday());
+    window.addEventListener("tomorrow-focus-updated", onUpdate);
+    return () => window.removeEventListener("tomorrow-focus-updated", onUpdate);
   }, []);
 
   function saveReflection() {
@@ -195,6 +205,34 @@ export function ProgressPanel({ onOpen }: { onOpen?: (s: AppSection) => void }) 
         <p className="text-lg font-bold leading-snug text-[#1f1c19]">{snapshot}</p>
         <p className="mt-2 text-base italic text-[#4b6b6b]">{observation}</p>
       </div>
+
+      {fromYesterday.length > 0 && (
+        <div className="mt-4 rounded-2xl border border-[#c9bfb0] bg-white/90 p-5">
+          <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
+            You wanted to revisit these today
+          </p>
+          <ul className="mt-3 flex flex-col gap-2">
+            {fromYesterday.map((item) => (
+              <li
+                key={item.id}
+                className="flex items-start justify-between gap-3 rounded-xl border border-[#e4ddd2] bg-[#faf6f0]/80 px-3 py-2"
+              >
+                <span className="text-base text-[#1f1c19]">{item.text}</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    markTomorrowFocusDone(item.id);
+                    setFromYesterday(getTomorrowFocusForToday());
+                  }}
+                  className="shrink-0 text-sm font-semibold text-[#1e4f4f] hover:underline"
+                >
+                  Done
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       {/* Accordion — all collapsed by default */}
       <div className="mt-5 flex flex-col gap-2.5">

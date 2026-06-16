@@ -135,7 +135,10 @@ export type BrainDumpEntry = {
   projectId?: string;
   estimateMin?: number;
   actionType?: string; // task | idea | reminder | someday | delegate
-  schedulingIntent?: string; // today | week | later
+  schedulingIntent?: string; // today | week | later | tomorrow
+  captureSessionId?: string;
+  routedAction?: string;
+  sorted?: boolean;
   done?: boolean;
 };
 
@@ -284,13 +287,17 @@ export function getBrainDumps(): BrainDumpEntry[] {
   }
 }
 
-export function addBrainDump(text: string): BrainDumpEntry[] {
+export function addBrainDump(
+  text: string,
+  opts?: { captureSessionId?: string },
+): BrainDumpEntry[] {
   const trimmed = text.trim();
   if (!trimmed || typeof window === "undefined") return getBrainDumps();
   const entry: BrainDumpEntry = {
     id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     text: trimmed,
     createdAt: new Date().toISOString(),
+    captureSessionId: opts?.captureSessionId,
   };
   const next = [entry, ...getBrainDumps()];
   try {

@@ -91,6 +91,7 @@ import {
   isDocumentRecoveryRequest,
   upsertDocumentMetadata,
 } from "@/lib/documentMetadataStore";
+import { recordProjectConversationIfOpen } from "@/lib/projectConversations";
 import { TimeBlockPanel } from "@/components/companion/TimeBlockPanel";
 import { TimeBlockTrigger } from "@/components/companion/TimeBlockTrigger";
 import { TopBar } from "@/components/companion/TopBar";
@@ -1113,14 +1114,22 @@ export default function CompanionPage() {
 
   function handleOpenGoogleWorkspace(session: GoogleWorkspaceSession) {
     setGoogleWorkspace(session);
+    const linkedProjectId =
+      savedArtifactRef.current?.projectId ??
+      workspaceDetailRef.current?.selectedItemId ??
+      undefined;
+    const linkedProjectName =
+      savedArtifactRef.current?.projectName ??
+      workspaceDetailRef.current?.selectedItemName ??
+      undefined;
     upsertDocumentMetadata({
       title: session.title,
       type: session.artifactType,
       googleUrl: session.url,
       googleFileId: session.fileId,
       googleKind: session.kind,
-      projectId: savedArtifactRef.current?.projectId,
-      projectName: savedArtifactRef.current?.projectName,
+      projectId: linkedProjectId,
+      projectName: linkedProjectName,
     });
     patchWorkspacePanel("google-workspace");
     setActiveSection("home");
@@ -5094,6 +5103,13 @@ export default function CompanionPage() {
         ...prev,
         { role: "assistant", content: assistantMsg },
       ]);
+      recordProjectConversationIfOpen(
+        workspacePanelRef.current,
+        workspaceDetailRef.current?.selectedItemId,
+        workspaceDetailRef.current?.view,
+        trimmed,
+        assistantMsg,
+      );
 
       const autoWorkspaceRoute = detectAssistantWorkspaceLaunch(
         assistantMsgRaw,

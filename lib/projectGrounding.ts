@@ -12,9 +12,12 @@ export type VisibleProjectField =
   | "nextStep"
   | "horizon"
   | "status"
+  | "color"
   | "tasks"
   | "timeBlocks"
-  | "notes";
+  | "notes"
+  | "conversations"
+  | "files";
 
 export type ProjectGroundingSnapshot = {
   view: WorkspacePanelDetail["view"];
@@ -30,6 +33,9 @@ export type ProjectGroundingSnapshot = {
     nextStep?: string | null;
     horizon?: string | null;
     status?: string | null;
+    color?: string | null;
+    conversationCount?: number;
+    fileCount?: number;
   };
 };
 
@@ -39,9 +45,12 @@ const FIELD_LABEL: Record<VisibleProjectField, string> = {
   nextStep: "Next step",
   horizon: "Time horizon",
   status: "Status",
+  color: "Project color",
   tasks: "Tasks & sections",
   timeBlocks: "Time blocks",
   notes: "Notes",
+  conversations: "Conversations",
+  files: "Files",
 };
 
 /** Internal / removed concepts the AI must never cite as project fields. */
@@ -77,7 +86,9 @@ export function visibleProjectFields(
   ctx: WorkspacePanelDetail,
 ): VisibleProjectField[] {
   if (ctx.view === "list") {
-    return ["name"];
+    const fields: VisibleProjectField[] = ["name"];
+    if (ctx.showProjectColor) fields.push("color");
+    return fields;
   }
   if (ctx.view === "create") {
     if (isCreateTitleStage(ctx)) return ["name"];
@@ -90,9 +101,12 @@ export function visibleProjectFields(
       "outcome",
       "horizon",
       "status",
+      "color",
       "tasks",
       "timeBlocks",
       "notes",
+      "conversations",
+      "files",
     ];
     if (isDetailHorizonNow(ctx)) fields.push("nextStep");
     return fields;
@@ -110,9 +124,12 @@ export function buildProjectGrounding(
     "nextStep",
     "horizon",
     "status",
+    "color",
     "tasks",
     "timeBlocks",
     "notes",
+    "conversations",
+    "files",
   ];
   const hiddenFromUser = allModelFields
     .filter((f) => !visible.includes(f))
@@ -130,6 +147,9 @@ export function buildProjectGrounding(
       nextStep: ctx.nextAction,
       horizon: ctx.selectedItemHorizon,
       status: ctx.selectedItemStatus,
+      color: ctx.selectedItemColor,
+      conversationCount: ctx.projectConversationCount,
+      fileCount: ctx.projectFileCount,
     },
   };
 }
@@ -187,6 +207,12 @@ export function groundedCoachReason(
       return "Horizon is visible in the project overview.";
     case "status":
       return "Status is visible in the project overview.";
+    case "color":
+      return "Project color is visible in the overview.";
+    case "conversations":
+      return "Past companion chats for this project are listed in Conversations.";
+    case "files":
+      return "Exported docs and saved links are listed in Files.";
     default:
       return "Guide using only what they can see in Projects.";
   }
@@ -241,6 +267,25 @@ export function formatProjectGroundingForPrompt(
   }
   if (isProjectFieldVisible("status", ctx) && g.values.status) {
     lines.push(`- Status on screen: ${g.values.status}`);
+  }
+  if (isProjectFieldVisible("color", ctx) && g.values.color) {
+    lines.push(`- Project color on screen: ${g.values.color}`);
+  }
+  if (isProjectFieldVisible("conversations", ctx)) {
+    const n = g.values.conversationCount ?? 0;
+    lines.push(
+      n > 0
+        ? `- Conversations on screen: ${n} saved chat${n === 1 ? "" : "s"} with Shari`
+        : "- Conversations: none saved yet for this project",
+    );
+  }
+  if (isProjectFieldVisible("files", ctx)) {
+    const n = g.values.fileCount ?? 0;
+    lines.push(
+      n > 0
+        ? `- Files on screen: ${n} linked doc${n === 1 ? "" : "s"} or link${n === 1 ? "" : "s"}`
+        : "- Files: none linked yet — exports from Create appear here",
+    );
   }
 
   return lines.join("\n");

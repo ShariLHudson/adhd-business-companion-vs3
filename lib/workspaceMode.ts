@@ -11,6 +11,7 @@
 import { audioSuggestionLine, detectAudioRequest } from "./audioSuggestions";
 import { matchCatalogFromText } from "./createCatalog";
 import type { AppSection } from "./companionUi";
+import { multiItemWorkspaceOfferLine } from "./multiItemWorkspace";
 
 export const WORKSPACE_SECTIONS: AppSection[] = [
   "projects",
@@ -232,7 +233,7 @@ function buildOfferLine(target: WorkspaceTarget, mixed: boolean): string {
       return "Want to open the planner and map it out side-by-side?";
     }
     if (target.section === "brain-dump") {
-      return "Let's get it out of your head — I'll stay right here beside the list.";
+      return multiItemWorkspaceOfferLine("brain-dump");
     }
     return "Would it help if we worked on that together, side-by-side?";
   }
