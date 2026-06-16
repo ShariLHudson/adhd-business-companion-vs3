@@ -13,6 +13,7 @@ import {
   subtypePickerLabel,
   effectiveSubtypeLabel,
 } from "@/lib/createTypePickers";
+import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import {
   advanceAfterCustomItem,
   advanceAfterCustomSubtype,
@@ -117,13 +118,13 @@ export function CreateWorkflowPanel({
             <label className="text-sm font-semibold text-[#4b463f]">
               Tell me what you want to create.
             </label>
-            <input
-              type="text"
+            <VoiceAnswerField
               value={customItemText}
-              onChange={(e) => setCustomItemText(e.target.value)}
+              onChange={setCustomItemText}
+              multiline={false}
               placeholder="e.g. Case study, podcast outline, onboarding packet…"
-              className="mt-2 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base outline-none focus:border-[#1e4f4f]"
               autoFocus
+              micTitle="Tell me what you want to create"
             />
             <button
               type="button"
@@ -205,12 +206,11 @@ export function CreateWorkflowPanel({
             <label className="text-sm font-semibold text-[#4b463f]">
               Tell me more specifically.
             </label>
-            <input
-              type="text"
+            <VoiceAnswerField
               value={customSubtypeText}
-              onChange={(e) => setCustomSubtypeText(e.target.value)}
+              onChange={setCustomSubtypeText}
+              multiline={false}
               placeholder={`What kind of ${item.toLowerCase()} is this?`}
-              className="mt-2 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base outline-none focus:border-[#1e4f4f]"
               autoFocus
             />
             <button
@@ -307,12 +307,13 @@ export function CreateWorkflowPanel({
           <span className="font-medium text-[#4b463f]">Why I&apos;m asking:</span>{" "}
           {question.why}
         </p>
-        <textarea
+        <VoiceAnswerField
           value={draftAnswer}
-          onChange={(e) => setDraftAnswer(e.target.value)}
+          onChange={setDraftAnswer}
           placeholder={question.placeholder ?? "A sentence or two is enough."}
-          className="mt-4 min-h-[120px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed outline-none focus:border-[#1e4f4f]"
           autoFocus
+          className="mt-4"
+          micTitle={`Answer: ${question.prompt}`}
         />
         <div className="mt-4 flex flex-wrap gap-2">
           <button

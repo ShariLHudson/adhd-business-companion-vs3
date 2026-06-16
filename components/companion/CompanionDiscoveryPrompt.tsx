@@ -10,6 +10,7 @@ import {
   type DiscoveryQuestion,
   type DiscoveryQuestionId,
 } from "@/lib/companionDiscovery";
+import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 
 function DiscoveryQuestionCard({
   question,
@@ -54,18 +55,20 @@ function DiscoveryQuestionCard({
       ) : null}
 
       {question.allowCustom || question.options.length === 0 ? (
-        <div className="mt-2 flex gap-2">
-          <input
+        <div className="mt-2">
+          <VoiceAnswerField
             value={custom}
-            onChange={(e) => setCustom(e.target.value)}
+            onChange={setCustom}
+            multiline={false}
             placeholder="Your answer…"
-            className="min-w-0 flex-1 rounded-lg border border-[#c9bfb0] bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[#1e4f4f]"
+            inputClassName="min-w-0 flex-1 rounded-lg border border-[#c9bfb0] bg-white px-2.5 py-1.5 text-sm outline-none focus:border-[#1e4f4f]"
+            micTitle={question.prompt}
           />
           <button
             type="button"
             disabled={!custom.trim()}
             onClick={() => onAnswer(custom.trim())}
-            className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
+            className="mt-2 rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-40"
           >
             Answer
           </button>

@@ -41,6 +41,7 @@ import { getCurrentSopStep, type WorkspaceSession } from "@/lib/workspaceSop";
 import { useWorkspaceFieldFocus } from "@/lib/useWorkspaceFieldFocus";
 import { WorkspaceSopField, isSopPanelField } from "@/components/companion/WorkspaceSopField";
 import { WorkspaceSopProgress } from "@/components/companion/WorkspaceSopProgress";
+import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 
 const STATUSES: ProjectStatus[] = [
   "not-started",
@@ -574,15 +575,14 @@ export function ProjectsPanel({
             ? "What are you trying to build?"
             : "Why does this matter right now?"}
         </p>
-        <textarea
+        <VoiceAnswerField
           id={
             step === 0
               ? "workspace-field-project-title"
               : "workspace-field-project-goal"
           }
           value={step === 0 ? what : why}
-          onChange={(e) => {
-            const v = e.target.value;
+          onChange={(v) => {
             if (step === 0) {
               setWhat(v);
               if (sopSession && onSopFieldChange) {
@@ -608,7 +608,13 @@ export function ProjectsPanel({
               ? "e.g. Grow my Instagram audience"
               : "A sentence on why it matters"
           }
-          className="mt-6 min-h-[140px] flex-1 resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+          className="mt-6 flex-1"
+          inputClassName="min-h-[140px] flex-1 resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+          micTitle={
+            step === 0
+              ? "What are you trying to build?"
+              : "Why does this matter right now?"
+          }
         />
         {sopSession && onSopFieldChange && (
           <WorkspaceSopField
@@ -902,11 +908,11 @@ export function ProjectsPanel({
             open={!!detailSectionsOpen.notes}
             onToggle={toggleDetailSection}
           >
-            <textarea
+            <VoiceAnswerField
               value={current.notes ?? ""}
-              onChange={(e) => patch(current.id, { notes: e.target.value })}
+              onChange={(v) => patch(current.id, { notes: v })}
               placeholder="Quick notes for this project"
-              className="min-h-[100px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-sm outline-none focus:border-[#1e4f4f]"
+              inputClassName="min-h-[100px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-sm outline-none focus:border-[#1e4f4f]"
             />
           </CollapsibleSection>
 

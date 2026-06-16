@@ -8,6 +8,7 @@ import {
   type DayState,
 } from "@/lib/companionStore";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 
 const LEVELS: DayLevel[] = ["low", "medium", "high"];
 const NEEDS = [
@@ -191,12 +192,12 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
                   + Add a note (optional)
                 </button>
               ) : (
-                <textarea
+                <VoiceAnswerField
                   value={note}
-                  onChange={(e) => setNote(e.target.value)}
+                  onChange={setNote}
                   placeholder="Anything you want Shari to keep in mind today…"
                   autoFocus
-                  className="companion-fade-in mt-2 min-h-[90px] w-full resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                  inputClassName="min-h-[90px] w-full resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
                 />
               )}
 

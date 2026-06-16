@@ -25,6 +25,7 @@ import {
 } from "@/lib/userStrategies";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import { useVisualMode } from "@/lib/useVisualMode";
+import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import { StrategyUseNow } from "@/components/companion/StrategyUseNow";
 import { saveProject } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
@@ -425,23 +426,26 @@ export function StrategiesPanel({
         <p className="mt-1 text-sm text-[#6b635a]">
           Something you&apos;ve noticed helps — save it for next time.
         </p>
-        <input
+        <VoiceAnswerField
           value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
+          onChange={setNewTitle}
+          multiline={false}
           placeholder="Strategy name"
-          className="mt-4 w-full rounded-lg border border-[#c9bfb0] px-3 py-2.5 text-base"
+          className="mt-4"
         />
-        <textarea
+        <VoiceAnswerField
           value={newProblem}
-          onChange={(e) => setNewProblem(e.target.value)}
+          onChange={setNewProblem}
           placeholder="What problem does this help with?"
-          className="mt-2 min-h-[80px] w-full rounded-lg border border-[#c9bfb0] px-3 py-2.5 text-base"
+          className="mt-2"
+          inputClassName="min-h-[80px] w-full rounded-lg border border-[#c9bfb0] px-3 py-2.5 text-base"
         />
-        <textarea
+        <VoiceAnswerField
           value={newSteps}
-          onChange={(e) => setNewSteps(e.target.value)}
+          onChange={setNewSteps}
           placeholder="Steps (one per line)"
-          className="mt-2 min-h-[100px] w-full rounded-lg border border-[#c9bfb0] px-3 py-2.5 text-base"
+          className="mt-2"
+          inputClassName="min-h-[100px] w-full rounded-lg border border-[#c9bfb0] px-3 py-2.5 text-base"
         />
         <button
           type="button"

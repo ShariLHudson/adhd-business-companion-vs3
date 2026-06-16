@@ -6,6 +6,7 @@ import {
   saveBusinessProfile,
 } from "@/lib/companionStore";
 import { sortDropdownLabels } from "@/lib/dropdownSort";
+import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 
 const ROLES = sortDropdownLabels([
   "Coach",
@@ -193,11 +194,13 @@ export function BusinessProfilePanel({
               </button>
             ))}
           </div>
-          <input
+          <VoiceAnswerField
             value={ROLES.includes(role) ? "" : role}
-            onChange={(e) => setRole(e.target.value)}
+            onChange={setRole}
+            multiline={false}
             placeholder="…or type your own"
-            className={input}
+            inputClassName={input}
+            micTitle={titles[1]}
           />
         </div>
       )}
@@ -221,19 +224,14 @@ export function BusinessProfilePanel({
             ))}
           </div>
 
-          <div className="mt-3 flex gap-2">
-            <input
+          <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-end">
+            <VoiceAnswerField
               value={customGoal}
-              onChange={(e) => setCustomGoal(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && customGoal.trim()) {
-                  if (!goals.includes(customGoal.trim()))
-                    setGoals([...goals, customGoal.trim()]);
-                  setCustomGoal("");
-                }
-              }}
+              onChange={setCustomGoal}
+              multiline={false}
               placeholder="Type your own goal…"
-              className={input}
+              inputClassName={`${input} min-w-0 flex-1`}
+              className="min-w-0 flex-1"
             />
             <button
               type="button"
@@ -289,12 +287,13 @@ export function BusinessProfilePanel({
       {/* Step 3 — sells */}
       {step === 3 && (
         <div className="mt-4">
-          <input
+          <VoiceAnswerField
             value={sells}
-            onChange={(e) => setSells(e.target.value)}
+            onChange={setSells}
+            multiline={false}
             placeholder="e.g. 1:1 coaching, a course, done-for-you services"
-            className={input}
-            autoFocus
+            inputClassName={input}
+            micTitle={titles[3]}
           />
           <p className="mt-2 text-sm text-[#6b635a]">
             Examples: coaching · services · digital products · consulting ·

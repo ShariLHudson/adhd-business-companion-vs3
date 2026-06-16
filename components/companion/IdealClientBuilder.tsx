@@ -14,6 +14,7 @@ import {
   type IdealClientAvatar,
   type AvatarResearch,
 } from "@/lib/companionStore";
+import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 
 // Curated identity marks — double as quick "icons" and emoji avatars.
 const EMOJI_CHOICES = [
@@ -386,17 +387,17 @@ export function IdealClientBuilder() {
         <div className="mt-6 flex-1">
           {current.key === "who" && (
             <div className="flex flex-col gap-3">
-              <input
+              <VoiceAnswerField
                 value={form.name}
-                onChange={(e) => setForm({ ...form, name: e.target.value })}
+                onChange={(name) => setForm({ ...form, name })}
+                multiline={false}
                 placeholder="Name (optional) — e.g. Burned Out Coach"
-                className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
               />
-              <textarea
+              <VoiceAnswerField
                 value={form.who}
-                onChange={(e) => setForm({ ...form, who: e.target.value })}
+                onChange={(who) => setForm({ ...form, who })}
                 placeholder="Describe who they are…"
-                className="min-h-[160px] resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                inputClassName="min-h-[160px] resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
               />
             </div>
           )}
@@ -405,16 +406,17 @@ export function IdealClientBuilder() {
             current.key === "goals" ||
             current.key === "currentBehavior" ||
             current.key === "solution") && (
-            <textarea
+            <VoiceAnswerField
               value={form[current.key as TextFieldKey]}
-              onChange={(e) =>
+              onChange={(v) =>
                 setForm({
                   ...form,
-                  [current.key as TextFieldKey]: e.target.value,
+                  [current.key as TextFieldKey]: v,
                 })
               }
               placeholder="Take your time — a sentence or two is plenty."
-              className="min-h-[200px] w-full resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+              inputClassName="min-h-[200px] w-full resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+              micTitle={current.q}
             />
           )}
 

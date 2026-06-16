@@ -20,7 +20,7 @@ import {
   type Project,
 } from "@/lib/companionStore";
 import { RefineActions } from "@/components/companion/RefineActions";
-import { MicButton } from "./MicButton";
+import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import {
   normalizeCategory,
   sortedBrainDumpCategoryGroups,
@@ -239,17 +239,15 @@ export function BrainDumpPanel({
         become action.
       </p>
 
-      <textarea
+      <VoiceAnswerField
         value={text}
-        onChange={(e) => handleChange(e.target.value)}
+        onChange={handleChange}
         placeholder="Everything on your mind right now…"
-        className="mt-5 min-h-[120px] resize-none rounded-2xl border-2 border-[#d4cdc3] bg-white/90 px-5 py-4 text-lg leading-relaxed text-[#1f1c19] placeholder:text-[#9a8f82] focus:border-[#1e4f4f] focus:outline-none focus:ring-2 focus:ring-[#1e4f4f]/15"
+        className="mt-5"
+        inputClassName="min-h-[120px] resize-none rounded-2xl border-2 border-[#d4cdc3] bg-white/90 px-5 py-4 text-lg leading-relaxed text-[#1f1c19] placeholder:text-[#9a8f82] focus:border-[#1e4f4f] focus:outline-none focus:ring-2 focus:ring-[#1e4f4f]/15"
+        micTitle="Speak your thoughts instead of typing"
       />
       <div className="mt-3 flex items-center justify-end gap-2">
-        <MicButton
-          onText={(t) => handleChange(text ? `${text} ${t}` : t)}
-          title="Speak your thoughts instead of typing"
-        />
         <button
           type="button"
           disabled={!text.trim()}

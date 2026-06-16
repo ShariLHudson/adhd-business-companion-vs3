@@ -5,10 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { speechLocaleForLanguage } from "@/lib/companionLanguage";
 import { getPrefs } from "@/lib/companionStore";
 
-// Global voice-input standard: "if I can type there, I can talk there."
-// Drop <MicButton onText={t => setValue(v => v ? v + " " + t : t)} /> next to any
-// text field. Speech converts to text in place — no modal, no extra screen.
-// Silently renders nothing if the browser has no speech recognition.
+// Global voice-input standard: use VoiceAnswerField next to any question field.
+// MicButton is the low-level control; speech fills the field — no auto-submit.
 
 type Recognition = {
   continuous: boolean;
