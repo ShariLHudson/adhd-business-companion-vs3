@@ -34,6 +34,12 @@ import {
   type CreationWorkspaceContext,
 } from "./workspaceCreation";
 import type { SavedArtifactRecord } from "./savedArtifact";
+import {
+  formatProjectGroundingForPrompt,
+  groundedCoachReason,
+  isProjectFieldVisible,
+  PROJECT_GROUNDING_RULE,
+} from "./projectGrounding";
 
 export type { WorkspaceMessageClass };
 export { classifyWorkspaceMessage, isHelpRequest, isProjectContent };
@@ -211,35 +217,41 @@ export function suggestNextWorkspaceField(
         return {
           field: "project-title",
           label: "Project name",
-          reason: "Title field is empty.",
+          reason: groundedCoachReason("name", ctx),
         };
       }
-      return {
-        field: "project-goal",
-        label: "Outcome",
-        reason: "Title is started — guide the outcome / why it matters.",
-      };
-    }
-    if (ctx.view === "detail") {
-      if (!ctx.selectedItemGoal?.trim()) {
+      if (onOutcome) {
         return {
           field: "project-goal",
           label: "Outcome",
-          reason: "Project exists but the outcome field is empty.",
-        };
-      }
-      if (!ctx.nextAction?.trim()) {
-        return {
-          field: "project-next-action",
-          label: "Next step",
-          reason: "Project exists but has no next step on screen.",
+          reason: groundedCoachReason("outcome", ctx),
         };
       }
       return {
-        field: "project-next-action",
-        label: "Next step",
-        reason: "Refine or confirm the visible next step only.",
+        field: "project-title",
+        label: "Project name",
+        reason: groundedCoachReason("name", ctx),
       };
+    }
+    if (ctx.view === "detail") {
+      if (
+        isProjectFieldVisible("outcome", ctx) &&
+        !ctx.selectedItemGoal?.trim()
+      ) {
+        return {
+          field: "project-goal",
+          label: "Outcome",
+          reason: groundedCoachReason("outcome", ctx),
+        };
+      }
+      if (isProjectFieldVisible("nextStep", ctx)) {
+        return {
+          field: "project-next-action",
+          label: "Next step",
+          reason: groundedCoachReason("nextStep", ctx),
+        };
+      }
+      return null;
     }
   }
 
@@ -288,6 +300,7 @@ export function formatWorkspaceCoGuideHint(
   if (ctx.section === "projects" && isWorkshopLike(ctx, userText)) {
     lines.push(...workshopScopeLines(energy));
   } else if (ctx.section === "projects") {
+    lines.push(PROJECT_GROUNDING_RULE);
     if (energy === "low") {
       lines.push(
         "TODAY'S SCOPE (low energy — project): name + outcome only. Ignore next steps and extras.",
@@ -342,14 +355,18 @@ export function formatWorkspaceContextForPrompt(
 
   if (ctx.view) lines.push(`- View: ${ctx.view}`);
   if (ctx.stage) lines.push(`- Stage: ${ctx.stage}`);
-  if (ctx.selectedItemName) lines.push(`- Selected: ${ctx.selectedItemName}`);
-  if (ctx.selectedItemGoal?.trim()) {
-    lines.push(`- Outcome / goal on screen: ${ctx.selectedItemGoal.trim()}`);
-  }
-  if (ctx.selectedItemStatus) lines.push(`- Status: ${ctx.selectedItemStatus}`);
-  if (ctx.selectedItemHorizon) lines.push(`- Horizon: ${ctx.selectedItemHorizon}`);
-  if (ctx.nextAction?.trim()) {
-    lines.push(`- Next step on screen: ${ctx.nextAction.trim()}`);
+  if (ctx.section === "projects") {
+    lines.push(formatProjectGroundingForPrompt(ctx));
+  } else {
+    if (ctx.selectedItemName) lines.push(`- Selected: ${ctx.selectedItemName}`);
+    if (ctx.selectedItemGoal?.trim()) {
+      lines.push(`- Outcome / goal on screen: ${ctx.selectedItemGoal.trim()}`);
+    }
+    if (ctx.selectedItemStatus) lines.push(`- Status: ${ctx.selectedItemStatus}`);
+    if (ctx.selectedItemHorizon) lines.push(`- Horizon: ${ctx.selectedItemHorizon}`);
+    if (ctx.nextAction?.trim()) {
+      lines.push(`- Next step on screen: ${ctx.nextAction.trim()}`);
+    }
   }
   if (ctx.draftPreview?.trim()) {
     lines.push(`- Draft in progress: ${ctx.draftPreview.trim().slice(0, 120)}…`);

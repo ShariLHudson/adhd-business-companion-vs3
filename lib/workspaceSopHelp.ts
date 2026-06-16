@@ -156,7 +156,7 @@ export function buildHelpTurn(
       "Shari is helping you define the outcome.",
     );
     return {
-      reply: `${focusPrefix(field)}Absolutely. Let's make it simple.\n\nFinish this sentence: *By the end of this workshop, people will be able to ______.*\n\nOr pick one:\n${formatOptionsList(options)}\n\nSay **number 2**, type your own, or edit the outcome field beside us.`,
+      reply: `${focusPrefix(field)}Absolutely. Let's make it simple.\n\nFinish this sentence: *By the end of this workshop, people will be able to ______.*\n\nOr pick one:\n${formatOptionsList(options)}\n\nSay **number 2**, type your own, or add the outcome in the panel beside us.`,
       focusField: field,
       sessionPatch: updated,
     };
