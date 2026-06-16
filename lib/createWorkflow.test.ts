@@ -4,6 +4,7 @@ import {
   advanceAfterTypePick,
   advanceToDiscovery,
   buildBriefFromDiscovery,
+  discoveryQuestionProgress,
   getDiscoveryQuestions,
   readinessSummary,
 } from "./createWorkflow";
@@ -22,6 +23,12 @@ describe("createWorkflow", () => {
     });
     expect(brief).toContain("Content type: Email");
     expect(brief).toContain("Sarah");
+  });
+
+  it("reports discovery question progress", () => {
+    const start = advanceToDiscovery(advanceAfterTypePick("Social Post", "content"));
+    const progress = discoveryQuestionProgress("Social Post", start);
+    expect(progress).toEqual({ current: 1, total: 3 });
   });
 
   it("moves to readiness after last discovery answer", () => {

@@ -149,6 +149,11 @@ export function prepareStepAnswers(
   return { ...answers, [field.key]: [...from] };
 }
 
+export function fieldStorageKey(field: ActivityFieldDef): string {
+  if (field.type === "review-list") return field.fromKey;
+  return field.key;
+}
+
 export function defaultAnswersForField(field: ActivityFieldDef): unknown {
   switch (field.type) {
     case "options": {

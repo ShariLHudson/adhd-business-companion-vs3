@@ -230,6 +230,7 @@ export function BrainDumpPanel({
   );
 
   const suggestOpen = onSuggestOpen ?? onOpen;
+  const chip = (active: boolean) =>
     `rounded-full px-3 py-1 text-xs font-semibold capitalize transition-colors ${
       active
         ? "bg-[#1e4f4f] text-white"

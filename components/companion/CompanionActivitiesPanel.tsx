@@ -13,6 +13,7 @@ import {
 import {
   canAdvanceActivityStep,
   defaultAnswersForField,
+  fieldStorageKey,
   prepareStepAnswers,
   stepField,
   stepInstruction,
@@ -120,7 +121,9 @@ export function CompanionActivitiesPanel({
       categoryId: a.categoryId,
       linkedBesideDismissed: false,
       linkedBesideOpened: false,
-      answers: firstField ? { [firstField.key]: defaultAnswersForField(firstField) } : {},
+      answers: firstField
+        ? { [fieldStorageKey(firstField)]: defaultAnswersForField(firstField) }
+        : {},
     });
   }
 
@@ -132,10 +135,10 @@ export function CompanionActivitiesPanel({
     const field = stepField(activity.steps[stepIndex]);
     if (!field) return answers;
     let next = answers;
-    if (answers[field.key] === undefined && field.type !== "review-list") {
+    if (answers[fieldStorageKey(field)] === undefined && field.type !== "review-list") {
       const initial = defaultAnswersForField(field);
       if (initial !== undefined) {
-        next = { ...next, [field.key]: initial };
+        next = { ...next, [fieldStorageKey(field)]: initial };
       }
     }
     return prepareStepAnswers(field, next);
