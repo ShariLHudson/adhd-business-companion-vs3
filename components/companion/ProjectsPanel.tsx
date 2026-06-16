@@ -12,6 +12,7 @@ import {
   PROJECT_PALETTE,
   PROJECT_STATUS_LABEL,
   saveProject,
+  saveProjectItem,
   timeBlocksForProject,
   type Project,
   type ProjectHorizon,
@@ -140,7 +141,7 @@ export function ProjectsPanel({
     Record<string, boolean>
   >({});
   const [projectDataTick, setProjectDataTick] = useState(0);
-  const [newLinkLabel, setNewLinkLabel] = useState("");
+  const [newGoal, setNewGoal] = useState("");
   const [newLinkUrl, setNewLinkUrl] = useState("");
 
   const visualMode = useVisualMode();
@@ -258,6 +259,7 @@ export function ProjectsPanel({
         projectConversationCount: countProjectConversations(current.id),
         projectFileCount,
         projectTaskCount: taskCount,
+        projectGoalCount: (current.goals ?? []).length,
         openDetailSections: openSections,
         nextAction: current.nextAction.trim() || null,
       };
@@ -430,6 +432,28 @@ export function ProjectsPanel({
       const proj = currentRef.current;
       if (view === "detail" && proj) {
         patch(proj.id, { goal: value });
+      }
+      return;
+    }
+    if (field === "project-goals") {
+      const proj = currentRef.current;
+      if (view === "detail" && proj) {
+        const goals = [...(proj.goals ?? [])];
+        if (value.trim() && !goals.includes(value.trim())) {
+          patch(proj.id, { goals: [...goals, value.trim()] });
+        }
+      }
+      return;
+    }
+    if (field === "project-tasks") {
+      const proj = currentRef.current;
+      if (view === "detail" && proj && value.trim()) {
+        saveProjectItem({
+          projectId: proj.id,
+          kind: "task",
+          title: value.trim(),
+        });
+        setProjectDataTick((n) => n + 1);
       }
       return;
     }
@@ -785,6 +809,63 @@ export function ProjectsPanel({
                   micTitle="Outcome — why it matters"
                 />
               </label>
+
+              <div id="workspace-field-project-goals">
+                <p className="text-xs font-semibold text-[#6b635a]">Goals</p>
+                <ul className="mt-2 space-y-2">
+                  {(current.goals ?? []).map((g, i) => (
+                    <li
+                      key={`${g}-${i}`}
+                      className="flex items-center justify-between gap-2 rounded-lg border border-[#e4ddd2] bg-white px-3 py-2 text-sm"
+                    >
+                      <span className="flex-1">{g}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          patch(current.id, {
+                            goals: (current.goals ?? []).filter((_, j) => j !== i),
+                          })
+                        }
+                        className="text-xs font-semibold text-[#a85c4a]"
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-2 flex gap-2">
+                  <input
+                    type="text"
+                    value={newGoal}
+                    onChange={(e) => setNewGoal(e.target.value)}
+                    placeholder="Add a goal"
+                    className="flex-1 rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                    onKeyDown={(e) => {
+                      if (e.key !== "Enter") return;
+                      const t = newGoal.trim();
+                      if (!t) return;
+                      const goals = current.goals ?? [];
+                      if (goals.includes(t)) return;
+                      patch(current.id, { goals: [...goals, t] });
+                      setNewGoal("");
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const t = newGoal.trim();
+                      if (!t) return;
+                      const goals = current.goals ?? [];
+                      if (goals.includes(t)) return;
+                      patch(current.id, { goals: [...goals, t] });
+                      setNewGoal("");
+                    }}
+                    className="rounded-xl bg-[#1e4f4f] px-3 py-2 text-sm font-semibold text-white"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
 
               {current.horizon === "now" && (
                 <div id="workspace-field-project-next-action">

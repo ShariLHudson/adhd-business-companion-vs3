@@ -9,6 +9,7 @@ import type { WorkspacePanelDetail } from "./workspaceAwareness";
 export type VisibleProjectField =
   | "name"
   | "outcome"
+  | "goals"
   | "nextStep"
   | "horizon"
   | "status"
@@ -42,6 +43,7 @@ export type ProjectGroundingSnapshot = {
 const FIELD_LABEL: Record<VisibleProjectField, string> = {
   name: "Project name",
   outcome: "Outcome (why it matters)",
+  goals: "Goals",
   nextStep: "Next step",
   horizon: "Time horizon",
   status: "Status",
@@ -99,6 +101,7 @@ export function visibleProjectFields(
     const fields: VisibleProjectField[] = [
       "name",
       "outcome",
+      "goals",
       "horizon",
       "status",
       "color",
@@ -121,6 +124,7 @@ export function buildProjectGrounding(
   const allModelFields: VisibleProjectField[] = [
     "name",
     "outcome",
+    "goals",
     "nextStep",
     "horizon",
     "status",

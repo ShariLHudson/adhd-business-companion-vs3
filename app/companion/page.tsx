@@ -276,6 +276,17 @@ import {
   type WorkspaceCoachExtras,
 } from "@/lib/workspaceCoachAutoStart";
 import { getActivityById } from "@/lib/companionActivities";
+import {
+  projectCoachTopicOpener,
+  type ProjectCoachTopic,
+} from "@/lib/projectCoachHandoff";
+import { ProjectCoachTopicPicker } from "@/components/companion/ProjectCoachTopicPicker";
+import {
+  projectCoachTrustHint,
+  resolveProjectCoachTurn,
+  startProjectCoachSession,
+  type ProjectCoachSession,
+} from "@/lib/projectCoachSession";
 import { FromYesterdayFocusCard } from "@/components/companion/FromYesterdayFocusCard";
 import {
   createWorkspaceSession,
@@ -1026,6 +1037,10 @@ export default function CompanionPage() {
     null,
   );
   const workspaceCoachSeededRef = useRef<string | null>(null);
+  const [projectCoachTopicPickerVisible, setProjectCoachTopicPickerVisible] =
+    useState(false);
+  const [projectCoachSession, setProjectCoachSession] =
+    useState<ProjectCoachSession | null>(null);
   useEffect(() => {
     const last = getLastActivity();
     if (last && getRecentWorkItems().length === 0) {
@@ -1634,6 +1649,9 @@ export default function CompanionPage() {
       setWorkspaceDetail((prev) =>
         panelDetailEqual(prev, detail) ? prev : detail,
       );
+      if (detail.selectedItemId) {
+        setProjectContinueId(detail.selectedItemId);
+      }
       if (detail.draftPreview) {
         setCreationContext((prev) => {
           if (!prev || prev.draftContent === detail.draftPreview) return prev;
@@ -2946,6 +2964,23 @@ export default function CompanionPage() {
     const { field, content } = extractFocusDirective(auto.content);
     setMessages((prev) => [...prev, { role: "assistant", content }]);
     applyWorkspaceFocus(field ?? auto.focusField);
+    if (auto.showTopicPicker && section === "projects") {
+      setProjectCoachTopicPickerVisible(true);
+    } else {
+      setProjectCoachTopicPickerVisible(false);
+    }
+  }
+
+  function selectProjectCoachTopic(topic: ProjectCoachTopic) {
+    setProjectCoachTopicPickerVisible(false);
+    const ctx = buildWorkspaceContext("projects", workspaceDetailRef.current);
+    if (!ctx?.selectedItemId) return;
+    const session = startProjectCoachSession(topic, ctx);
+    setProjectCoachSession(session);
+    const opener = projectCoachTopicOpener(topic, ctx);
+    const { field, content } = extractFocusDirective(opener.content);
+    setMessages((prev) => [...prev, { role: "assistant", content }]);
+    applyWorkspaceFocus(field ?? opener.focusField);
   }
 
   function openCompanionAssist(
@@ -2963,11 +2998,10 @@ export default function CompanionPage() {
         patchWorkspacePanel(sourceSection);
       }
       if (sourceSection === "projects") {
-        const activeId = workspaceDetailRef.current?.selectedItemId;
+        const activeId =
+          workspaceDetailRef.current?.selectedItemId ?? projectContinueId;
         if (activeId) {
           setProjectContinueId(activeId);
-        } else {
-          setProjectContinueId(null);
         }
       }
     } else {
@@ -4918,6 +4952,33 @@ export default function CompanionPage() {
     }
 
     if (workspacePanel && workspaceContext) {
+      if (projectCoachSession && workspacePanel === "projects") {
+        const coachTurn = resolveProjectCoachTurn(
+          projectCoachSession,
+          trimmed,
+          workspaceContext,
+        );
+        if (coachTurn) {
+          setProjectCoachSession(coachTurn.session);
+          if (coachTurn.fill) {
+            setWorkspaceChatFill({
+              field: coachTurn.fill.field,
+              value: coachTurn.fill.value,
+              key: Date.now(),
+            });
+          }
+          const { field: coachFocus, content: coachMsg } = extractFocusDirective(
+            coachTurn.reply,
+          );
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: coachMsg },
+          ]);
+          applyWorkspaceFocus(coachFocus ?? coachTurn.focusField ?? null);
+          return;
+        }
+      }
+
       const dayForCoach = getDayState();
       const coachEnergy = resolveWorkspaceEnergy(
         dayForCoach?.energy,
@@ -6435,6 +6496,15 @@ export default function CompanionPage() {
                       ? undefined
                       : !bridge && !isLoading && !pendingAction ? (
                       <>
+                        {projectCoachTopicPickerVisible &&
+                        workspacePanel === "projects" ? (
+                          <ProjectCoachTopicPicker
+                            onSelect={selectProjectCoachTopic}
+                            onDismiss={() =>
+                              setProjectCoachTopicPickerVisible(false)
+                            }
+                          />
+                        ) : null}
                         {recoveryOfferLine ? (
                           <RecoveryOfferCard
                             line={recoveryOfferLine}
@@ -6927,6 +6997,10 @@ export default function CompanionPage() {
             <WorkspaceShell onAskShari={() => openCompanionAssist("projects")}>
               <ProjectsPanel
                 initialProjectId={projectContinueId}
+                focusField={workspaceFocusField}
+                focusStamp={workspaceFocusStamp}
+                chatFieldFill={workspaceChatFill}
+                onContextChange={handleWorkspaceDetailChange}
                 onOpen={suggestCrossWorkspaceOpen}
                 onAsk={handlePlaybookAsk}
                 onBuildWithShari={(input) =>

@@ -8,6 +8,10 @@ import {
   buildProjectCoachAutoStart,
   projectCoachAutoStartHint,
 } from "./projectCoachAutoStart";
+import {
+  buildProjectCoachHandoff,
+  type ProjectCoachHandoff,
+} from "./projectCoachHandoff";
 import { workspaceTitle } from "./workspaceMode";
 import type { AppSection } from "./companionUi";
 import type { WorkspaceContext, WorkspaceFieldId } from "./workspaceAwareness";
@@ -26,6 +30,8 @@ export type WorkspaceCoachExtras = {
 export type WorkspaceCoachAutoStart = {
   content: string;
   focusField: WorkspaceFieldId | null;
+  /** Show project topic picker (Title / Outcome / Goals / …) after handoff message. */
+  showTopicPicker?: boolean;
 };
 
 function buildCreateCoachAutoStart(
@@ -191,7 +197,7 @@ export function buildWorkspaceCoachAutoStart(
 
   switch (ctx.section) {
     case "projects":
-      return buildProjectCoachAutoStart(ctx);
+      return buildProjectCoachHandoff(ctx);
     case "content-generator":
       return buildCreateCoachAutoStart(ctx, extras);
     case "brain-dump":

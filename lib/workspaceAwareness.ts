@@ -40,6 +40,7 @@ import {
   isProjectFieldVisible,
   PROJECT_GROUNDING_RULE,
 } from "./projectGrounding";
+import { projectCoachTrustHint } from "./projectCoachSession";
 import {
   buildWorkspaceCoachAutoStart,
   workspaceCoachAutoStartHint,
@@ -53,6 +54,8 @@ export { classifyWorkspaceMessage, isHelpRequest, isProjectContent };
 export type WorkspaceFieldId =
   | "project-title"
   | "project-goal"
+  | "project-goals"
+  | "project-tasks"
   | "project-next-action"
   | "project-horizon"
   | "project-status"
@@ -83,6 +86,7 @@ export type WorkspacePanelDetail = {
   projectConversationCount?: number;
   projectFileCount?: number;
   projectTaskCount?: number;
+  projectGoalCount?: number;
   /** Detail panel sections currently expanded (e.g. overview, tasks). */
   openDetailSections?: string[];
   nextAction?: string | null;
@@ -105,6 +109,8 @@ const FOCUS_DIRECTIVE_RE = /^\[\[focus:([a-z0-9-]+)\]\]\s*/i;
 const VALID_FOCUS_FIELDS = new Set<WorkspaceFieldId>([
   "project-title",
   "project-goal",
+  "project-goals",
+  "project-tasks",
   "project-next-action",
   "project-horizon",
   "project-status",
@@ -326,6 +332,7 @@ export function formatWorkspaceCoGuideHint(
     lines.push(...workshopScopeLines(energy));
   } else if (ctx.section === "projects") {
     lines.push(PROJECT_GROUNDING_RULE);
+    lines.push(projectCoachTrustHint(ctx));
     if (energy === "low") {
       lines.push(
         "TODAY'S SCOPE (low energy — project): name + outcome only. Ignore next steps and extras.",

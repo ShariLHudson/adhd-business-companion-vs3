@@ -1750,6 +1750,8 @@ export type Project = {
   id: string;
   name: string;
   goal: string;
+  /** Clear goals between outcome and tasks. */
+  goals: string[];
   horizon: ProjectHorizon;
   status: ProjectStatus;
   nextAction: string;
@@ -1843,10 +1845,17 @@ function readProjects(): Project[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (p): p is Project =>
-        p && typeof p.id === "string" && typeof p.name === "string",
-    );
+    return parsed
+      .filter(
+        (p): p is Project =>
+          p && typeof p.id === "string" && typeof p.name === "string",
+      )
+      .map((p) => ({
+        ...p,
+        goals: Array.isArray(p.goals)
+          ? p.goals.filter((g): g is string => typeof g === "string")
+          : [],
+      }));
   } catch {
     return [];
   }
@@ -1889,6 +1898,7 @@ export function saveProject(
     id: newId(),
     name: input.name?.trim() || "Untitled project",
     goal: input.goal ?? "",
+    goals: input.goals ?? [],
     horizon: input.horizon ?? "now",
     status: input.status ?? "in-progress",
     nextAction: input.nextAction ?? "",

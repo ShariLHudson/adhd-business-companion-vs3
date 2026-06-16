@@ -60,6 +60,7 @@ export function panelDetailEqual(
     a.projectConversationCount === b.projectConversationCount &&
     a.projectFileCount === b.projectFileCount &&
     a.projectTaskCount === b.projectTaskCount &&
+    a.projectGoalCount === b.projectGoalCount &&
     sectionsEqual(a.openDetailSections, b.openDetailSections) &&
     a.nextAction === b.nextAction &&
     a.draftPreview === b.draftPreview
