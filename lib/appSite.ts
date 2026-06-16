@@ -15,6 +15,11 @@ export function getAppSiteUrl(): string {
   const fromEnv = process.env.NEXT_PUBLIC_APP_URL?.trim();
   if (fromEnv && appUrlLooksValid(fromEnv)) return fromEnv.replace(/\/$/, "");
 
+  // Live site always uses the custom domain — not *.vercel.app project URLs.
+  if (process.env.VERCEL_ENV === "production") {
+    return COMPANION_APP_URL_DEFAULT;
+  }
+
   const vercel = process.env.VERCEL_URL?.trim();
   if (vercel) return `https://${vercel.replace(/\/$/, "")}`;
 
