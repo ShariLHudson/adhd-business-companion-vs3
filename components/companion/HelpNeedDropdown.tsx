@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { dayHelpNeedOptions } from "@/lib/adjustMyDay";
+import { dayHelpNeedOptions, labelForHelpNeed } from "@/lib/adjustMyDay";
 
 type HelpNeedDropdownProps = {
   value: string;
@@ -37,7 +37,9 @@ export function HelpNeedDropdown({
     return () => document.removeEventListener("mousedown", onPointerDown);
   }, [open]);
 
-  const display = value || "Select what would help…";
+  const display = value
+    ? labelForHelpNeed(value)
+    : "Select what would help…";
 
   return (
     <div ref={rootRef} className={`relative ${className}`}>

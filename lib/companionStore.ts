@@ -16,6 +16,11 @@ import {
 } from "./companionUserLanguage";
 import { createCatalogTypeLabels } from "./createCatalog";
 import { sortByDropdownLabel, sortDropdownLabels } from "./dropdownSort";
+import {
+  energyLevelToLegacy,
+  migrateLegacyDayState,
+  motivationLevelToLegacyOverwhelm,
+} from "./adjustMyDay";
 
 export type {
   LanguageCommunicationPrefs,
@@ -1697,9 +1702,37 @@ export function formatDayLabel(dateStr: string): string {
 
 export type DayLevel = "low" | "medium" | "high";
 
+export type DayEnergyLevelId =
+  | "off-charts"
+  | "full-tank"
+  | "ready-to-roll"
+  | "doing-okay"
+  | "running-on-fumes"
+  | "need-recharge";
+
+export type DayMotivationLevelId =
+  | "cant-wait"
+  | "lets-do-this"
+  | "get-it-done"
+  | "need-push"
+  | "dragging"
+  | "not-happening";
+
+export type DayVibeId =
+  | "feeling-good"
+  | "doing-okay"
+  | "mixed-bag"
+  | "struggling"
+  | "rough-day";
+
 export type DayState = {
+  /** Legacy coaching heuristics — derived on save from energyLevel. */
   energy: DayLevel;
+  /** Legacy — derived on save from motivationLevel. */
   overwhelm: DayLevel;
+  energyLevel?: DayEnergyLevelId;
+  motivationLevel?: DayMotivationLevelId;
+  vibe?: DayVibeId | null;
   needs: string[];
   note?: string;
   setAt: string;
@@ -1714,16 +1747,33 @@ export function getDayState(): DayState | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as DayState;
     if (!parsed || typeof parsed.energy !== "string") return null;
-    return { ...parsed, needs: Array.isArray(parsed.needs) ? parsed.needs : [] };
+    const base = {
+      ...parsed,
+      needs: Array.isArray(parsed.needs) ? parsed.needs : [],
+    };
+    return migrateLegacyDayState(base);
   } catch {
     return null;
   }
 }
 
 export function saveDayState(
-  input: Omit<DayState, "setAt">,
+  input: Omit<DayState, "setAt" | "energy" | "overwhelm"> & {
+    energy?: DayLevel;
+    overwhelm?: DayLevel;
+  },
 ): DayState {
-  const state: DayState = { ...input, setAt: new Date().toISOString() };
+  const energyLevel = input.energyLevel ?? "doing-okay";
+  const motivationLevel = input.motivationLevel ?? "get-it-done";
+  const state: DayState = {
+    ...input,
+    energyLevel,
+    motivationLevel,
+    energy: input.energy ?? energyLevelToLegacy(energyLevel),
+    overwhelm:
+      input.overwhelm ?? motivationLevelToLegacyOverwhelm(motivationLevel),
+    setAt: new Date().toISOString(),
+  };
   if (typeof window !== "undefined") {
     try {
       localStorage.setItem(DAY_STATE_KEY, JSON.stringify(state));

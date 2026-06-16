@@ -1,35 +1,78 @@
 import { describe, expect, it } from "vitest";
 import {
-  DAY_HELP_NEEDS,
+  DAY_HELP_OPTIONS,
   dayHelpNeedOptions,
+  dayStateSummary,
+  energyLevelToLegacy,
+  formatDayEnergyDisplay,
   formatDayFeeling,
+  formatDayMotivationDisplay,
+  migrateLegacyDayState,
+  motivationLevelToLegacyOverwhelm,
   normalizeDayHelpNeed,
   primaryHelpNeedFromState,
 } from "./adjustMyDay";
 import type { DayState } from "./companionStore";
 
 describe("adjustMyDay", () => {
-  it("lists help needs alphabetically with Other last", () => {
+  it("lists help options in spec order with Other last", () => {
     const labels = dayHelpNeedOptions().map((o) => o.label);
-    const sorted = [...DAY_HELP_NEEDS].sort((a, b) => a.localeCompare(b));
-    expect(labels.slice(0, -1)).toEqual(sorted);
-    expect(labels[labels.length - 1]).toBe("Other");
+    expect(labels).toEqual(DAY_HELP_OPTIONS.map((o) => o.label));
+    expect(labels[labels.length - 1]).toBe("✏️ Other");
   });
 
-  it("maps legacy need chips", () => {
-    expect(normalizeDayHelpNeed("Focus").selection).toBe("Find Focus");
-    expect(normalizeDayHelpNeed("Custom thing").selection).toBe("Other");
+  it("maps legacy need chips to new ids", () => {
+    expect(normalizeDayHelpNeed("Focus").selection).toBe("focus-session");
+    expect(normalizeDayHelpNeed("Custom thing").selection).toBe("other");
     expect(normalizeDayHelpNeed("Custom thing").otherText).toBe("Custom thing");
   });
 
-  it("formats feeling for snapshot", () => {
+  it("formats feeling for snapshot with emoji labels", () => {
     const state: DayState = {
       energy: "medium",
       overwhelm: "low",
-      needs: ["Find Focus"],
+      energyLevel: "doing-okay",
+      motivationLevel: "lets-do-this",
+      needs: ["focus-session"],
       setAt: new Date().toISOString(),
     };
-    expect(formatDayFeeling(state)).toBe("Medium energy · Low overwhelm");
-    expect(primaryHelpNeedFromState(state)).toBe("Find Focus");
+    expect(formatDayFeeling(state)).toBe("🙂 Doing Okay · ✨ Let's Do This");
+    expect(formatDayEnergyDisplay(state)).toBe("🙂 Doing Okay");
+    expect(formatDayMotivationDisplay(state)).toBe("✨ Let's Do This");
+    expect(primaryHelpNeedFromState(state)).toBe("🎯 Focus Session");
+  });
+
+  it("migrates legacy day state", () => {
+    const legacy: DayState = {
+      energy: "high",
+      overwhelm: "high",
+      needs: ["Brain Dump"],
+      setAt: new Date().toISOString(),
+    };
+    const migrated = migrateLegacyDayState(legacy);
+    expect(migrated.energyLevel).toBe("full-tank");
+    expect(migrated.motivationLevel).toBe("dragging");
+    expect(energyLevelToLegacy("full-tank")).toBe("high");
+    expect(motivationLevelToLegacyOverwhelm("dragging")).toBe("high");
+    expect(primaryHelpNeedFromState(migrated)).toBe("🧠 Brain Dump");
+  });
+
+  it("builds day state summary for Shari context", () => {
+    const state: DayState = {
+      energy: "medium",
+      overwhelm: "medium",
+      energyLevel: "ready-to-roll",
+      motivationLevel: "need-push",
+      vibe: "mixed-bag",
+      needs: ["make-a-plan"],
+      note: "Big meeting at 3.",
+      setAt: new Date().toISOString(),
+    };
+    const summary = dayStateSummary(state);
+    expect(summary).toContain("😊 Ready To Roll");
+    expect(summary).toContain("🤷 Need A Little Push");
+    expect(summary).toContain("😐 Mixed Bag");
+    expect(summary).toContain("📋 Make A Plan");
+    expect(summary).toContain("Big meeting at 3.");
   });
 });

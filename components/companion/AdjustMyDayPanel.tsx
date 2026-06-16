@@ -4,48 +4,53 @@ import { useEffect, useState } from "react";
 import {
   getDayState,
   saveDayState,
-  type DayLevel,
+  type DayEnergyLevelId,
+  type DayMotivationLevelId,
   type DayState,
+  type DayVibeId,
 } from "@/lib/companionStore";
 import {
+  DAY_ENERGY_LEVELS,
   DAY_HELP_OTHER,
-  formatDayFeeling,
+  DAY_MOTIVATION_LEVELS,
+  DAY_VIBES,
+  formatDayEnergyDisplay,
   formatDayHelpDisplay,
+  formatDayMotivationDisplay,
   formatDayNoteDisplay,
   formatDaySnapshotTime,
+  formatDayVibeDisplay,
   normalizeDayHelpNeed,
 } from "@/lib/adjustMyDay";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import { HelpNeedDropdown } from "@/components/companion/HelpNeedDropdown";
 
-const LEVELS: DayLevel[] = ["low", "medium", "high"];
-
 type PanelMode = "snapshot" | "edit";
+
+const selectClass =
+  "mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
 
 export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
   const [mode, setMode] = useState<PanelMode>("edit");
   const [snapshot, setSnapshot] = useState<DayState | null>(null);
 
-  const [energy, setEnergy] = useState<DayLevel>("medium");
-  const [overwhelm, setOverwhelm] = useState<DayLevel>("low");
+  const [vibe, setVibe] = useState<DayVibeId | null>(null);
+  const [energyLevel, setEnergyLevel] = useState<DayEnergyLevelId | "">("");
+  const [motivationLevel, setMotivationLevel] = useState<DayMotivationLevelId | "">("");
   const [helpNeed, setHelpNeed] = useState("");
   const [otherNeed, setOtherNeed] = useState("");
   const [note, setNote] = useState("");
 
-  const [energyTouched, setEnergyTouched] = useState(false);
-  const [overwhelmTouched, setOverwhelmTouched] = useState(false);
-
   function loadFromState(existing: DayState) {
-    setEnergy(existing.energy);
-    setOverwhelm(existing.overwhelm);
+    setVibe(existing.vibe ?? null);
+    setEnergyLevel(existing.energyLevel ?? "doing-okay");
+    setMotivationLevel(existing.motivationLevel ?? "get-it-done");
     const first = existing.needs[0];
     const { selection, otherText } = normalizeDayHelpNeed(first);
     setHelpNeed(selection);
     setOtherNeed(otherText);
     setNote(existing.note ?? "");
-    setEnergyTouched(true);
-    setOverwhelmTouched(true);
     setSnapshot(existing);
   }
 
@@ -72,14 +77,16 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
   }
 
   const canSave =
-    energyTouched &&
-    overwhelmTouched &&
+    Boolean(energyLevel) &&
+    Boolean(motivationLevel) &&
     (helpNeed === DAY_HELP_OTHER ? otherNeed.trim().length > 0 : Boolean(helpNeed));
 
   function saveDay() {
+    if (!energyLevel || !motivationLevel) return;
     const state = saveDayState({
-      energy,
-      overwhelm,
+      energyLevel,
+      motivationLevel,
+      vibe: vibe ?? undefined,
       needs: buildNeeds(),
       note: note.trim() || undefined,
     });
@@ -87,15 +94,27 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
     setMode("snapshot");
   }
 
-  const levelBtn = (active: boolean) =>
-    `flex-1 rounded-xl border px-3 py-2.5 text-base font-semibold capitalize transition-colors ${
-      active
-        ? "border-[#1e4f4f] bg-[#1e4f4f] text-white shadow-sm"
-        : "border-[#c9bfb0] bg-white/80 text-[#3d3630] hover:bg-white"
-    }`;
+  const vibeChip = (id: DayVibeId, label: string) => {
+    const active = vibe === id;
+    return (
+      <button
+        key={id}
+        type="button"
+        onClick={() => setVibe(active ? null : id)}
+        className={`rounded-full border px-3 py-2 text-sm font-semibold transition-colors ${
+          active
+            ? "border-[#1e4f4f] bg-[#1e4f4f] text-white shadow-sm"
+            : "border-[#c9bfb0] bg-white/80 text-[#3d3630] hover:bg-white"
+        }`}
+      >
+        {label}
+      </button>
+    );
+  };
 
   if (mode === "snapshot" && snapshot) {
     const updated = formatDaySnapshotTime(snapshot);
+    const vibeDisplay = formatDayVibeDisplay(snapshot);
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
         <WorkspaceGuide section="energy" />
@@ -111,12 +130,22 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
           </p>
 
           <div className="mt-4 space-y-4">
+            {snapshot.vibe ? (
+              <div>
+                <p className="text-sm font-semibold text-[#1f1c19]">Today&apos;s vibe</p>
+                <p className="mt-1 text-base text-[#3d3630]">{vibeDisplay}</p>
+              </div>
+            ) : null}
             <div>
-              <p className="text-sm font-semibold text-[#1f1c19]">
-                How are you feeling today?
-              </p>
+              <p className="text-sm font-semibold text-[#1f1c19]">Energy level</p>
               <p className="mt-1 text-base text-[#3d3630]">
-                {formatDayFeeling(snapshot)}
+                {formatDayEnergyDisplay(snapshot)}
+              </p>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-[#1f1c19]">Motivation level</p>
+              <p className="mt-1 text-base text-[#3d3630]">
+                {formatDayMotivationDisplay(snapshot)}
               </p>
             </div>
             <div>
@@ -131,7 +160,7 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
               <p className="text-sm font-semibold text-[#1f1c19]">
                 Anything else going on?
               </p>
-              <p className="mt-1 text-base text-[#3d3630] whitespace-pre-wrap">
+              <p className="mt-1 whitespace-pre-wrap text-base text-[#3d3630]">
                 {formatDayNoteDisplay(snapshot)}
               </p>
             </div>
@@ -162,52 +191,57 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
       <WorkspaceGuide section="energy" />
-      <p className="text-2xl font-semibold text-[#1f1c19]">
-        How are you feeling today?
-      </p>
+      <p className="text-2xl font-semibold text-[#1f1c19]">Adjust My Day</p>
       <p className="mt-1 text-sm text-[#6b635a]">
         Quick check-in — update anytime your day changes.
       </p>
 
-      <p className="mt-6 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-        Energy
+      <p className="mt-6 text-sm font-semibold text-[#1f1c19]">
+        Today&apos;s vibe? <span className="font-normal text-[#6b635a]">(optional)</span>
       </p>
-      <div className="mt-2 flex gap-2">
-        {LEVELS.map((l) => (
-          <button
-            key={l}
-            type="button"
-            onClick={() => {
-              setEnergy(l);
-              setEnergyTouched(true);
-            }}
-            className={levelBtn(energy === l && energyTouched)}
-          >
-            {l}
-          </button>
-        ))}
+      <div className="mt-2 flex flex-wrap gap-2">
+        {DAY_VIBES.map((v) => vibeChip(v.id, v.label))}
       </div>
 
-      <p className="mt-5 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-        Overwhelm
-      </p>
-      <div className="mt-2 flex gap-2">
-        {LEVELS.map((l) => (
-          <button
-            key={l}
-            type="button"
-            onClick={() => {
-              setOverwhelm(l);
-              setOverwhelmTouched(true);
-            }}
-            className={levelBtn(overwhelm === l && overwhelmTouched)}
-          >
-            {l}
-          </button>
-        ))}
-      </div>
+      <label className="mt-6 block">
+        <span className="text-lg font-semibold text-[#1f1c19]">Energy Level</span>
+        <span className="mt-0.5 block text-sm text-[#6b635a]">
+          How much fuel is in the tank today?
+        </span>
+        <select
+          value={energyLevel}
+          onChange={(e) => setEnergyLevel(e.target.value as DayEnergyLevelId)}
+          className={selectClass}
+        >
+          <option value="">Select energy level…</option>
+          {DAY_ENERGY_LEVELS.map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </label>
 
-      <p className="mt-7 text-lg font-semibold text-[#1f1c19]">
+      <label className="mt-5 block">
+        <span className="text-lg font-semibold text-[#1f1c19]">Motivation Level</span>
+        <span className="mt-0.5 block text-sm text-[#6b635a]">
+          How much do you feel like doing things today?
+        </span>
+        <select
+          value={motivationLevel}
+          onChange={(e) => setMotivationLevel(e.target.value as DayMotivationLevelId)}
+          className={selectClass}
+        >
+          <option value="">Select motivation level…</option>
+          {DAY_MOTIVATION_LEVELS.map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <p className="mt-6 text-lg font-semibold text-[#1f1c19]">
         What would help right now?
       </p>
       <HelpNeedDropdown
@@ -219,26 +253,24 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
         }}
       />
       {helpNeed === DAY_HELP_OTHER ? (
-        <input
+        <VoiceAnswerField
           value={otherNeed}
-          onChange={(e) => setOtherNeed(e.target.value)}
+          onChange={setOtherNeed}
           placeholder="Tell me what you need…"
-          className="mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+          className="mt-2"
+          inputClassName="min-h-[80px] w-full resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
         />
       ) : null}
 
-      <p className="mt-7 text-lg font-semibold text-[#1f1c19]">
+      <p className="mt-6 text-lg font-semibold text-[#1f1c19]">
         Anything else going on?
-      </p>
-      <p className="mt-1 text-sm text-[#6b635a]">
-        Share anything you&apos;d like me to know. Optional.
       </p>
       <VoiceAnswerField
         value={note}
         onChange={setNote}
-        placeholder={`"I'm overwhelmed." "My knee hurts." "I have a sales call later."`}
+        placeholder="Health, family, business, emotions, wins, frustrations, lack of sleep, exciting news... anything you'd like me to know."
         className="mt-2"
-        inputClassName="min-h-[100px] w-full resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+        inputClassName="min-h-[120px] w-full resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
       />
 
       <button
