@@ -276,6 +276,7 @@ import {
   type WorkspaceCoachExtras,
 } from "@/lib/workspaceCoachAutoStart";
 import { getActivityById } from "@/lib/companionActivities";
+import { getShariAssistLabel } from "@/lib/shariAssistLabels";
 import {
   projectCoachTopicOpener,
   type ProjectCoachTopic,
@@ -2921,6 +2922,7 @@ export default function CompanionPage() {
       creationContext: creationContextRef.current,
       activityTitle: activity?.title ?? null,
       activityStep: activity?.steps[stepIdx]?.instruction ?? null,
+      activityCategoryId: activity?.categoryId ?? null,
       focusActive: pomodoroTimer.isActive,
       focusTitle:
         pomodoroTimer.label ??
@@ -5851,6 +5853,7 @@ export default function CompanionPage() {
           <StrategiesPanel
             onOpen={openWorkspaceFromSection}
             onAsk={handlePlaybookAsk}
+            onContextChange={handleWorkspaceDetailChange}
             registerBack={registerBack}
           />
         );
@@ -6002,6 +6005,32 @@ export default function CompanionPage() {
       handleWorkspaceProjectSaved,
     ],
   );
+
+  const shariAssistLabel = useMemo(() => {
+    const activity = activitySession.activityId
+      ? getActivityById(activitySession.activityId)
+      : undefined;
+    const section =
+      companionStandaloneSection ??
+      workspacePanel ??
+      (guideBesideSession?.source.kind === "activity"
+        ? "activities"
+        : guideBesideSession?.source.kind === "section"
+          ? guideBesideSession.source.section
+          : null);
+    return getShariAssistLabel(section, {
+      activityCategoryId: activity?.categoryId,
+      selectedItemName: workspaceDetail?.selectedItemName,
+      createItemType: creationContext?.itemType,
+    });
+  }, [
+    activitySession.activityId,
+    companionStandaloneSection,
+    workspacePanel,
+    guideBesideSession,
+    workspaceDetail?.selectedItemName,
+    creationContext?.itemType,
+  ]);
 
   function launchDoItNow(offer: DoItNowOffer) {
     setDoItNowOffer(null);
@@ -6878,6 +6907,7 @@ export default function CompanionPage() {
                     : "Chat"
                 }
                 leftPaneEmoji={guideBesideSession ? "📋" : "💬"}
+                assistLabel={shariAssistLabel}
               />
             </div>
           )}
@@ -6902,7 +6932,10 @@ export default function CompanionPage() {
               >
 
           {activeSection === "focus-timer" && (
-            <WorkspaceShell onAskShari={() => openCompanionAssist("focus-timer")}>
+            <WorkspaceShell
+              assistLabel={getShariAssistLabel("focus-timer")}
+              onAskShari={() => openCompanionAssist("focus-timer")}
+            >
               <FocusTimerPanel
                 timer={pomodoroTimer}
                 onStartSession={handleFocusSession}
@@ -6914,7 +6947,10 @@ export default function CompanionPage() {
           )}
 
           {activeSection === "brain-dump" && (
-            <WorkspaceShell onAskShari={() => openCompanionAssist("brain-dump")}>
+            <WorkspaceShell
+              assistLabel={getShariAssistLabel("brain-dump")}
+              onAskShari={() => openCompanionAssist("brain-dump")}
+            >
               <BrainDumpPanel
                 onOpen={openWorkspaceFromSection}
                 onSuggestOpen={suggestCrossWorkspaceOpen}
@@ -6940,7 +6976,10 @@ export default function CompanionPage() {
           )}
 
           {activeSection === "focus" && (
-            <WorkspaceShell onAskShari={() => openCompanionAssist("focus")}>
+            <WorkspaceShell
+              assistLabel={getShariAssistLabel("focus")}
+              onAskShari={() => openCompanionAssist("focus")}
+            >
               <FocusAreaPanel
                 onOpen={handleToolSelect}
                 onGetUnstuck={() => {
@@ -6955,7 +6994,10 @@ export default function CompanionPage() {
           )}
 
           {activeSection === "time-block" && (
-            <WorkspaceShell onAskShari={() => openCompanionAssist("time-block")}>
+            <WorkspaceShell
+              assistLabel={getShariAssistLabel("time-block")}
+              onAskShari={() => openCompanionAssist("time-block")}
+            >
               <TimeBlockPanel onStart={startBlock} onTestAlert={testAlert} />
             </WorkspaceShell>
           )}
@@ -6990,13 +7032,19 @@ export default function CompanionPage() {
           )}
 
           {activeSection === "client-avatars" && (
-            <WorkspaceShell onAskShari={() => openCompanionAssist("client-avatars")}>
+            <WorkspaceShell
+              assistLabel={getShariAssistLabel("client-avatars")}
+              onAskShari={() => openCompanionAssist("client-avatars")}
+            >
               <IdealClientBuilder />
             </WorkspaceShell>
           )}
 
           {activeSection === "projects" && (
-            <WorkspaceShell onAskShari={() => openCompanionAssist("projects")}>
+            <WorkspaceShell
+              assistLabel={getShariAssistLabel("projects")}
+              onAskShari={() => openCompanionAssist("projects")}
+            >
               <ProjectsPanel
                 initialProjectId={projectContinueId}
                 focusField={workspaceFocusField}
@@ -7016,17 +7064,24 @@ export default function CompanionPage() {
           )}
 
           {activeSection === "playbook" && (
-            <WorkspaceShell onAskShari={() => openCompanionAssist("playbook")}>
+            <WorkspaceShell
+              assistLabel={getShariAssistLabel("playbook")}
+              onAskShari={() => openCompanionAssist("playbook")}
+            >
               <StrategiesPanel
                 onOpen={suggestCrossWorkspaceOpen}
                 onAsk={handlePlaybookAsk}
+                onContextChange={handleWorkspaceDetailChange}
                 registerBack={registerBack}
               />
             </WorkspaceShell>
           )}
 
           {activeSection === "how-do-i" && (
-            <WorkspaceShell showAssist={false}>
+            <WorkspaceShell
+              assistLabel={getShariAssistLabel("how-do-i")}
+              onAskShari={() => openCompanionAssist("how-do-i")}
+            >
               <HowDoIPanel
                 onOpen={suggestCrossWorkspaceOpen}
                 onOpenSettings={openHowDoISettings}
@@ -7037,7 +7092,10 @@ export default function CompanionPage() {
           )}
 
           {activeSection === "templates-library" && (
-            <WorkspaceShell onAskShari={() => openCompanionAssist("templates-library")}>
+            <WorkspaceShell
+              assistLabel={getShariAssistLabel("templates-library")}
+              onAskShari={() => openCompanionAssist("templates-library")}
+            >
               <TemplatesLibrary
                 onOpen={suggestCrossWorkspaceOpen}
                 onGenerate={openGenerator}

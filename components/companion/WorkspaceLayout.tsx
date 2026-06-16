@@ -28,6 +28,7 @@ export function WorkspaceLayout({
   revealKey = 0,
   workspaceFirst = false,
   hideAssistToggle = false,
+  assistLabel = "Work With Shari",
   leftPaneTitle = "Chat",
   leftPaneEmoji = "💬",
 }: {
@@ -45,6 +46,8 @@ export function WorkspaceLayout({
   workspaceFirst?: boolean;
   /** Hide layout toggles that open Work With Shari (e.g. guided Create flow). */
   hideAssistToggle?: boolean;
+  /** Context-specific assist label (e.g. Build With Shari, Create With Shari). */
+  assistLabel?: string;
   /** Left pane tab label when not default chat (e.g. activity guide beside a tool). */
   leftPaneTitle?: string;
   leftPaneEmoji?: string;
@@ -181,7 +184,7 @@ export function WorkspaceLayout({
                   onClick={() => setLayout("split")}
                   className={layoutBtnActive}
                 >
-                  💬 Work With Shari
+                  💬 {assistLabel}
                 </button>
               ) : (
                 <>
@@ -197,7 +200,7 @@ export function WorkspaceLayout({
                     onClick={() => setLayout("split")}
                     className={layoutBtnActive}
                   >
-                    💬 Work With Shari
+                    💬 {assistLabel}
                   </button>
                 </>
               )}

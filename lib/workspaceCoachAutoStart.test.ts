@@ -24,7 +24,7 @@ describe("workspaceCoachAutoStart", () => {
       view: "capture",
       stage: "capture session",
     } as WorkspaceContext);
-    expect(msg?.content).toContain("first thing on your mind");
+    expect(msg?.content).toContain("loudest thought");
   });
 
   it("coaches brain dump library mode", () => {
@@ -34,15 +34,17 @@ describe("workspaceCoachAutoStart", () => {
       view: "library",
       stage: "library",
     } as WorkspaceContext);
-    expect(msg?.content).toContain("saved items");
+    expect(msg?.content).toContain("saved thoughts");
   });
 
-  it("coaches strategies workspace", () => {
+  it("coaches strategies workspace with strategy name", () => {
     const msg = buildWorkspaceCoachAutoStart({
       section: "playbook",
       title: "Strategies",
+      selectedItemName: "Body Double",
     } as WorkspaceContext);
-    expect(msg?.content).toContain("Strategies");
+    expect(msg?.content).toContain("Body Double");
+    expect(msg?.content).toContain("apply");
   });
 
   it("builds stable seed keys per workspace", () => {

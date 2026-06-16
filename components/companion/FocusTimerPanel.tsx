@@ -26,6 +26,7 @@ type FocusTimerPanelProps = {
   onStartSession?: (minutes: number) => void;
   onSessionStarted?: (setup: FocusSessionSetup) => void;
   onAskShari?: () => void;
+  askShariLabel?: string;
   onDebrief?: (outcome: FocusDebriefOutcome, snapshot: Timer["debriefPending"]) => void;
 };
 
@@ -34,6 +35,7 @@ export function FocusTimerPanel({
   onStartSession,
   onSessionStarted,
   onAskShari,
+  askShariLabel = "Focus With Shari",
   onDebrief,
 }: FocusTimerPanelProps) {
   const {
@@ -252,7 +254,7 @@ export function FocusTimerPanel({
             onClick={onAskShari}
             className="shrink-0 rounded-full border border-[#1e4f4f]/25 bg-white px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
           >
-            Ask Shari
+            {askShariLabel}
           </button>
         ) : null}
       </div>

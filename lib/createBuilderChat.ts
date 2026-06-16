@@ -234,12 +234,12 @@ export function bootstrapCreateBuilderSession(
 }
 
 function formatBuilderOpener(typeLabel: string, firstQuestion?: string): string {
-  const name = createBuilderLabel(typeLabel);
-  const intro = `**${name}** — let's shape your **${typeLabel}** together. I'll ask one question at a time; you answer in chat.`;
+  const article = /^[aeiou]/i.test(typeLabel) ? "an" : "a";
+  const intro = `I see you're creating ${article} **${typeLabel}**.`;
   if (!firstQuestion) {
-    return `${intro}\n\nTell me what you're working on.`;
+    return `${intro} What should we tackle first?`;
   }
-  return `${intro}\n\n**${firstQuestion}**`;
+  return `${intro} ${firstQuestion}`;
 }
 
 export type CreateBuilderTurnResult = {

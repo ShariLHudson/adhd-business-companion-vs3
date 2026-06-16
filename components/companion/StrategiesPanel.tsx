@@ -75,10 +75,12 @@ function applyPrompt(s: Strategy): string {
 export function StrategiesPanel({
   onOpen,
   onAsk,
+  onContextChange,
   registerBack,
 }: {
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
+  onContextChange?: (detail: import("@/lib/workspaceAwareness").WorkspacePanelDetail) => void;
   registerBack?: (fn: (() => boolean) | null) => void;
 }) {
   const [view, setView] = useState<View>({ v: "home" });
@@ -112,6 +114,31 @@ export function StrategiesPanel({
     });
     return () => registerBack?.(null);
   }, [view, registerBack]);
+
+  useEffect(() => {
+    if (!onContextChange) return;
+    if (view.v === "strategy") {
+      const s = getStrategy(view.stratId);
+      onContextChange({
+        view: "strategy",
+        stage: "detail",
+        selectedItemId: view.stratId,
+        selectedItemName: s?.title ?? null,
+      });
+      return;
+    }
+    if (view.v === "userStrategy") {
+      const u = getUserStrategies().find((x) => x.id === view.id);
+      onContextChange({
+        view: "userStrategy",
+        stage: "detail",
+        selectedItemId: view.id,
+        selectedItemName: u?.title ?? null,
+      });
+      return;
+    }
+    onContextChange({ view: view.v, stage: view.v });
+  }, [view, onContextChange]);
 
   function accent(color: string) {
     return decorative ? (DECOR[color] ?? color) : color;

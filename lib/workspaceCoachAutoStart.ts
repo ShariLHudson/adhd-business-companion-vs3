@@ -22,6 +22,7 @@ export type WorkspaceCoachExtras = {
   /** Active Help Me Right Now activity title, if any. */
   activityTitle?: string | null;
   activityStep?: string | null;
+  activityCategoryId?: import("./companionActivities").ActivityCategoryId | null;
   focusActive?: boolean;
   focusTitle?: string | null;
   focusMinutesLeft?: number | null;
@@ -66,14 +67,15 @@ function buildCreateCoachAutoStart(
   if (!type) {
     return {
       content:
-        "[[focus:create-topic]]I see Create is open beside us. What are you making — pick a type in the panel or tell me in one line.",
+        "[[focus:create-topic]]I see Create is open beside us. What are you making — a newsletter, workshop, proposal, SOP, or something else?",
       focusField: "create-topic",
     };
   }
 
   if (!topic && !cc?.brief?.trim()) {
+    const article = /^[aeiou]/i.test(type) ? "an" : "a";
     return {
-      content: `[[focus:create-topic]]I see you're working on a **${type}**. What's it about — one line in the topic field?`,
+      content: `[[focus:create-topic]]I see you're creating ${article} **${type}**. Let's figure out who it's for first — or tell me the topic in one line.`,
       focusField: "create-topic",
     };
   }
@@ -88,29 +90,43 @@ function buildBrainDumpCoachAutoStart(ctx: WorkspaceContext): WorkspaceCoachAuto
   if (ctx.stage?.includes("library")) {
     return {
       content:
-        "Clear My Mind is open on your saved items. Want to sort one, or capture something new?",
+        "I see your saved thoughts in Clear My Mind. Want to sort one, prioritize what matters now, or capture something new?",
       focusField: null,
     };
   }
   return {
     content:
-      "Clear My Mind is beside us — **what is the first thing on your mind?** We'll capture one card at a time.",
+      "I see Clear My Mind is open — **what's the loudest thought right now?** We'll sort it out one piece at a time.",
     focusField: null,
   };
 }
 
-function buildPlaybookCoachAutoStart(): WorkspaceCoachAutoStart {
+function buildPlaybookCoachAutoStart(ctx: WorkspaceContext): WorkspaceCoachAutoStart {
+  const name = ctx.selectedItemName?.trim();
+  if (name) {
+    return {
+      content: `I see you're working through **${name}**. Let's apply it to your real situation — one step at a time.`,
+      focusField: null,
+    };
+  }
   return {
     content:
-      "I see **Strategies** beside us. Which playbook are you in, or what decision are you working through?",
+      "I see **Strategies** is open. Pick a playbook on the right, and I'll help you apply it to your situation — not just explain it.",
     focusField: null,
   };
 }
 
-function buildTemplatesCoachAutoStart(): WorkspaceCoachAutoStart {
+function buildTemplatesCoachAutoStart(ctx: WorkspaceContext): WorkspaceCoachAutoStart {
+  const name = ctx.selectedItemName?.trim();
+  if (name) {
+    return {
+      content: `I see you're looking at **${name}**. Want to customize it for your business, or open it in Create?`,
+      focusField: null,
+    };
+  }
   return {
     content:
-      "Templates is open — browsing for a pattern, or ready to open one in Create?",
+      "I see Templates is open — pick one and I'll help you tailor it to your needs.",
     focusField: null,
   };
 }
@@ -131,7 +147,40 @@ function buildFocusTimerCoachAutoStart(
   }
   return {
     content:
-      "Focus Session is open — what are you working on, and how long do you want this block?",
+      "I see you're starting a focus session. What would you like to accomplish before the timer ends?",
+    focusField: null,
+  };
+}
+
+function buildFocusAreaCoachAutoStart(): WorkspaceCoachAutoStart {
+  return {
+    content:
+      "I see Focus is open — what do you want to start, stay on, or push through right now?",
+    focusField: null,
+  };
+}
+
+function buildHowDoICoachAutoStart(): WorkspaceCoachAutoStart {
+  return {
+    content:
+      "I see How Do I is open — what do you want to learn or walk through step by step?",
+    focusField: null,
+  };
+}
+
+function buildDecideCoachAutoStart(
+  extras?: WorkspaceCoachExtras,
+): WorkspaceCoachAutoStart {
+  const title = extras?.activityTitle?.trim();
+  if (title) {
+    return {
+      content: `I see you're in **${title}** — let's compare your options and land a choice. What are you deciding between?`,
+      focusField: null,
+    };
+  }
+  return {
+    content:
+      "I see a decision tool is open — what choice are you circling, and what are the options?",
     focusField: null,
   };
 }
@@ -139,6 +188,10 @@ function buildFocusTimerCoachAutoStart(
 function buildActivitiesCoachAutoStart(
   extras?: WorkspaceCoachExtras,
 ): WorkspaceCoachAutoStart {
+  if (extras?.activityCategoryId === "decide") {
+    return buildDecideCoachAutoStart(extras);
+  }
+
   const title = extras?.activityTitle?.trim();
   if (title) {
     return {
@@ -156,7 +209,7 @@ function buildActivitiesCoachAutoStart(
 function buildClientAvatarsCoachAutoStart(): WorkspaceCoachAutoStart {
   return {
     content:
-      "Client Avatar is open — who are we defining today? Start with who they are in one sentence.",
+      "I see you're defining a client avatar. Tell me about the person you most enjoy helping.",
     focusField: null,
   };
 }
@@ -203,11 +256,17 @@ export function buildWorkspaceCoachAutoStart(
     case "brain-dump":
       return buildBrainDumpCoachAutoStart(ctx);
     case "playbook":
-      return buildPlaybookCoachAutoStart();
+      return buildPlaybookCoachAutoStart(ctx);
     case "templates-library":
-      return buildTemplatesCoachAutoStart();
+      return buildTemplatesCoachAutoStart(ctx);
     case "focus-timer":
       return buildFocusTimerCoachAutoStart(extras);
+    case "focus":
+      return buildFocusAreaCoachAutoStart();
+    case "how-do-i":
+      return buildHowDoICoachAutoStart();
+    case "spin-wheel":
+      return buildDecideCoachAutoStart(extras);
     case "activities":
       return buildActivitiesCoachAutoStart(extras);
     case "client-avatars":

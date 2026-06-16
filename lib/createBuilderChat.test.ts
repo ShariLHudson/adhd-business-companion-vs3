@@ -18,7 +18,7 @@ describe("createBuilderChat", () => {
   it("opens SOP builder with first question", () => {
     const { session, opener } = bootstrapCreateBuilderSession("SOP");
     expect(session.phase).toBe("discovery");
-    expect(opener).toContain("SOP Builder");
+    expect(opener).toContain("creating a **SOP**");
     expect(opener).toContain("What process are we documenting?");
   });
 

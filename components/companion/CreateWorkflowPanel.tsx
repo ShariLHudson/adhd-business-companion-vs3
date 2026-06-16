@@ -90,7 +90,7 @@ function CreateShariHelp({
         onClick={onBuildWithShari}
         className="mt-2 rounded-xl border border-[#1e4f4f]/25 bg-white px-5 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/5 disabled:opacity-40"
       >
-        Work With Shari
+        Create With Shari
       </button>
     </div>
   );
@@ -625,7 +625,7 @@ export function CreateWorkflowPanel({
                 onClick={() => onBuildWithShari(shariInput(workflow))}
                 className={btnSecondary}
               >
-                Work With Shari
+                Create With Shari
               </button>
             ) : null}
           </div>
