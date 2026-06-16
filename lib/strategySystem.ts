@@ -206,12 +206,13 @@ export const STRATEGIES: Strategy[] = [
     example:
       "You've been dodging your inbox all week.\nYou hop on a video call with a friend, both working in silence.\nForty minutes later, inbox cleared — because someone was there.",
     steps: [
-      "Get a person present — same room, or on video.",
-      "Tell them the one thing you'll do.",
-      "Start while they're there. They don't have to do anything.",
+      "Pick one clear outcome for this block.",
+      "Remove one distraction — close a tab or silence a notification.",
+      "Start the timer and work only on that outcome.",
+      "Optional: Shari can check in, or a quiet coworking stream if you want company.",
     ],
     deeper:
-      "No human available? A coworking livestream, a focus-timer app with others, or even Shari checking in can stand in. The mechanism is witnessed effort, not the specific person.",
+      "Self-guided focus works: name the task, set a done-enough line, and use the timer. If you want extra accountability later, you can ask for a body double or coworking stream — not required to start.",
   },
 
   // ============================ PERFECTIONISM ============================

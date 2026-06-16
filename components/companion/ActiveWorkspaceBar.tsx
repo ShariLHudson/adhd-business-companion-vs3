@@ -80,11 +80,12 @@ export function focusTimerWorkspaceItem(
   const time = `${String(timer.displayMins).padStart(2, "0")}:${String(
     timer.displaySecs,
   ).padStart(2, "0")}`;
+  const focusTitle = timer.sessionMeta?.focusItem ?? timer.label;
   return {
     id: "focus-timer",
-    emoji: "⏱",
-    label: timer.label ?? "Focus Session",
-    detail: `${time} left`,
+    emoji: "🎯",
+    label: `Focus Session — ${time} left`,
+    detail: focusTitle?.trim() ? focusTitle.trim().slice(0, 48) : undefined,
     running: timer.running,
     onOpen,
     onPause: timer.pause,

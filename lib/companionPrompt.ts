@@ -221,7 +221,7 @@ export type CoachingMode =
 
 export const COACHING_MODE_MODIFIERS: Record<CoachingMode, string> = {
   today: `Today — open support; detect intent and route to the best next step.`,
-  focus: `Focus — direct execution; minimal text.`,
+  focus: `Focus — direct execution; minimal text. Focus sessions are self-guided by default — do not suggest body doubling or another person unless the user explicitly asks for it.`,
   "how-do-i": `How-to — one clear method, not a list.`,
   playbook: `Strategy — give ONE strategy with 1–3 concrete steps, then offer to start it; only ask if genuinely needed.`,
   progress: `Progress — reflect on patterns; one gentle forward step.`,

@@ -25,7 +25,7 @@ const PRIMARY: Option[] = [
   {
     emoji: "🎯",
     title: "Focus Session",
-    desc: "Work with a timer and stay on track.",
+    desc: "Answer a few quick questions, then work with a timer.",
     tool: "focus-timer",
   },
   {

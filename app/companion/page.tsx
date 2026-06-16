@@ -756,6 +756,12 @@ export default function CompanionPage() {
   const voiceUsedRef = useRef(false);
   const pomodoroTimer = usePomodoroTimer();
 
+  useEffect(() => {
+    if (pomodoroTimer.debriefPending) {
+      setActiveSection("focus-timer");
+    }
+  }, [pomodoroTimer.debriefPending]);
+
   const isIdle = !messages.some((m) => m.role === "user");
   const splitCreateChat =
     chatLayoutMode === "split" && workspacePanel === "content-generator";
@@ -3115,7 +3121,8 @@ export default function CompanionPage() {
     if (block.timerEnabled) {
       setBlockStatus(block.id, "triggered");
       pomodoroTimer.startWith(Math.min(block.durationMin, 480), block.title);
-      setActiveSection("focus-timer");
+      setActiveSection("home");
+      setActiveNav("focus");
       return;
     }
     // Otherwise a gentle, energy-adapted hand-off into chat.
@@ -3158,6 +3165,28 @@ export default function CompanionPage() {
     logMomentum("start", `Focus session — ${minutes} min`);
     setActiveNav("focus");
     setCoachingMode("focus");
+  }
+
+  function handleFocusSessionStarted() {
+    setActiveSection("home");
+    if (workspacePanel === "focus-timer") {
+      patchWorkspacePanel(null);
+    }
+  }
+
+  function handleFocusDebrief(
+    outcome: import("@/lib/focusSession").FocusDebriefOutcome,
+  ) {
+    if (outcome === "done" || outcome === "progress") {
+      logMomentum("complete", `Focus session — ${outcome}`);
+    }
+    if (outcome === "stuck") {
+      void handleSend(
+        "I got stuck during my focus session — can you help me find the smallest next step?",
+        true,
+        true,
+      );
+    }
   }
 
   function clearAllPendingOffers() {
@@ -5709,6 +5738,8 @@ export default function CompanionPage() {
           <FocusTimerPanel
             timer={pomodoroTimer}
             onStartSession={handleFocusSession}
+            onSessionStarted={handleFocusSessionStarted}
+            onDebrief={handleFocusDebrief}
           />
         );
       default:
@@ -5727,6 +5758,8 @@ export default function CompanionPage() {
           <FocusTimerPanel
             timer={pomodoroTimer}
             onStartSession={handleFocusSession}
+            onSessionStarted={handleFocusSessionStarted}
+            onDebrief={handleFocusDebrief}
           />
         );
       case "focus":
@@ -5832,7 +5865,7 @@ export default function CompanionPage() {
     savePreferredFocusMinutes(mins);
     logMomentum("start", `Focus session from Do It Now — ${mins} min`);
     pomodoroTimer.startWith(mins);
-    setActiveSection("focus-timer");
+    setActiveSection("home");
     setActiveNav("focus");
     setCoachingMode("focus");
     setMessages((prev) => [
@@ -5955,7 +5988,7 @@ export default function CompanionPage() {
       savePreferredFocusMinutes(mins);
       logMomentum("start", `Focus session from chat — ${mins} min`);
       pomodoroTimer.startWith(mins);
-      setActiveSection("focus-timer");
+      setActiveSection("home");
       setActiveNav("focus");
       setCoachingMode("focus");
       return;
@@ -6014,9 +6047,8 @@ export default function CompanionPage() {
   const activeWorkspaceItems = useMemo(() => {
     const items: ActiveWorkspaceItem[] = [];
     const focus = focusTimerWorkspaceItem(pomodoroTimer, () => {
-      setActiveSection("home");
+      setActiveSection("focus-timer");
       setActiveNav("focus");
-      setCoachingMode("focus");
     });
     if (focus) items.push(focus);
 
@@ -6675,7 +6707,9 @@ export default function CompanionPage() {
               <FocusTimerPanel
                 timer={pomodoroTimer}
                 onStartSession={handleFocusSession}
+                onSessionStarted={handleFocusSessionStarted}
                 onAskShari={() => openCompanionAssist("focus-timer")}
+                onDebrief={handleFocusDebrief}
               />
             </WorkspaceShell>
           )}
