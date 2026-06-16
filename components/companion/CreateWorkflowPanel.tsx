@@ -114,6 +114,7 @@ export function CreateWorkflowPanel({
   onAddMoreDetail,
   building,
   buildError,
+  buildErrorMessage,
   onClearBuildError,
   onChangeTemplate,
 }: {
@@ -127,6 +128,7 @@ export function CreateWorkflowPanel({
   onAddMoreDetail?: () => void;
   building?: boolean;
   buildError?: boolean;
+  buildErrorMessage?: string | null;
   onClearBuildError?: () => void;
   onChangeTemplate?: () => void;
 }) {
@@ -530,7 +532,10 @@ export function CreateWorkflowPanel({
           />
           {buildError ? (
             <div className="mt-4 rounded-xl border border-[#e8c4c4] bg-[#fdf5f5] px-3 py-3 text-sm text-[#6b3a3a]">
-              <p className="font-semibold">Something went wrong creating your draft.</p>
+              <p className="font-semibold">
+                {buildErrorMessage ??
+                  "Something went wrong creating your draft."}
+              </p>
               <div className="mt-3 flex flex-col gap-2">
                 <button
                   type="button"

@@ -202,6 +202,7 @@ export function ContentGeneratorPanel({
   const [draft, setDraft] = useState(seed?.draft ?? "");
   const [title, setTitle] = useState("");
   const [error, setError] = useState(false);
+  const [buildErrorMessage, setBuildErrorMessage] = useState<string | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
   const [forAvatar, setForAvatar] = useState<string | undefined>(undefined);
   const [projectPickerOpen, setProjectPickerOpen] = useState(false);
@@ -417,6 +418,7 @@ export function ContentGeneratorPanel({
 
     setLoading(true);
     setError(false);
+    setBuildErrorMessage(null);
     setWorkflow((prev) => ({ ...prev, draftStatus: "building" }));
     logCreateBuild("Generating Draft", {
       itemType: resolvedType,
@@ -437,7 +439,11 @@ export function ContentGeneratorPanel({
           contentLanguageHint,
         }),
       });
-      const data = (await res.json()) as { result?: string; error?: string };
+      const data = (await res.json()) as {
+        result?: string;
+        error?: string;
+        code?: string;
+      };
       if (res.ok && data.result) {
         const content = data.result;
         setDraft(content);
@@ -464,6 +470,10 @@ export function ContentGeneratorPanel({
         return true;
       }
       const errMsg = data.error || `HTTP ${res.status}`;
+      const userMessage =
+        data.code === "missing_api_key" || /api key/i.test(errMsg)
+          ? "Draft generation isn’t set up on the server yet. The site admin needs to add OPENAI_API_KEY in Vercel and redeploy."
+          : "Something went wrong creating your draft. Try again, or add more detail.";
       logCreateError({
         itemType: resolvedType,
         template: validation.templateName,
@@ -473,6 +483,7 @@ export function ContentGeneratorPanel({
       });
       logCreateBuild("Draft Failed", { message: errMsg });
       setError(true);
+      setBuildErrorMessage(userMessage);
       setWorkflow((prev) => ({
         ...prev,
         buildApproved: false,
@@ -491,6 +502,9 @@ export function ContentGeneratorPanel({
       });
       logCreateBuild("Draft Failed", { message: errMsg });
       setError(true);
+      setBuildErrorMessage(
+        "Couldn’t reach the server. Check your connection and try again.",
+      );
       setWorkflow((prev) => ({
         ...prev,
         buildApproved: false,
@@ -1029,8 +1043,10 @@ export function ContentGeneratorPanel({
             onBuildWithShari={onBuildWithShari}
             building={loading}
             buildError={workflow.draftStatus === "error" || error}
+            buildErrorMessage={buildErrorMessage}
             onClearBuildError={() => {
               setError(false);
+              setBuildErrorMessage(null);
               setWorkflow((prev) => ({ ...prev, draftStatus: "idle" }));
             }}
             onChangeTemplate={() => {

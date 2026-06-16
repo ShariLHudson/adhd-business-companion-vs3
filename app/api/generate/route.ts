@@ -1,13 +1,24 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cleanText } from "@/lib/contentFormat";
+import { resolveOpenAiApiKey } from "@/lib/openai/resolveOpenAiApiKey";
 
 // Generic content generator — create any content type (incl. user-created
 // types) from a short brief. Returns ready-to-use text.
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = process.env.OPENAI_API_KEY;
+    const apiKey = resolveOpenAiApiKey();
     if (!apiKey) {
-      return NextResponse.json({ error: "No API key." }, { status: 500 });
+      console.error(
+        "CREATE ERROR: OPENAI_API_KEY is not set in the server environment.",
+      );
+      return NextResponse.json(
+        {
+          error:
+            "Draft generation is not configured on the server yet. OPENAI_API_KEY must be set in Vercel → Settings → Environment Variables (Production), then redeploy.",
+          code: "missing_api_key",
+        },
+        { status: 503 },
+      );
     }
     const body = await request.json();
     const type = (body.type as string)?.trim() || "piece of content";
