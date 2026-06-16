@@ -99,6 +99,7 @@ export function ContentGeneratorPanel({
   onContextChange,
   onBuildWithShari,
   onCreateSessionSync,
+  onCreateWorkflowSync,
   workspaceMode = false,
   focusField,
   focusStamp = 0,
@@ -137,6 +138,7 @@ export function ContentGeneratorPanel({
     draft: string;
     title: string;
   }) => void;
+  onCreateWorkflowSync?: (workflow: CreateWorkflowState) => void;
   workspaceMode?: boolean;
   focusField?: WorkspaceFieldId | null;
   focusStamp?: number;
@@ -241,6 +243,10 @@ export function ContentGeneratorPanel({
       title,
     });
   }, [type, topic, brief, draft, title, workspaceMode, onCreateSessionSync]);
+
+  useEffect(() => {
+    onCreateWorkflowSync?.(workflow);
+  }, [workflow, onCreateWorkflowSync]);
 
   const focusElementId =
     focusField === "create-topic"
@@ -840,20 +846,6 @@ export function ContentGeneratorPanel({
 
       {inGuidedCreate && !showDraftEditor && !(workspaceMode && phase === "ready") && (
         <div className="mt-5 flex flex-col gap-3">
-          {companionBuilderMode && type ? (
-            <div className="rounded-2xl border border-[#1e4f4f]/15 bg-[#f0f5f5]/80 px-4 py-5 text-center">
-              <p className="text-sm font-semibold text-[#1e4f4f]">
-                💬 Work With Shari
-              </p>
-              <p className="mt-2 text-base text-[#2d2926]">
-                Building your <span className="font-semibold">{type}</span> in
-                chat — one question at a time.
-              </p>
-              {loading ? (
-                <p className="mt-2 text-sm text-[#6b635a]">Generating draft…</p>
-              ) : null}
-            </div>
-          ) : (
           <CreateWorkflowPanel
             workflow={workflow}
             typeLabel={type}
@@ -870,7 +862,6 @@ export function ContentGeneratorPanel({
             onBuildWithShari={onBuildWithShari}
             building={loading}
           />
-          )}
         </div>
       )}
 
@@ -905,6 +896,10 @@ export function ContentGeneratorPanel({
             disabled={loading}
             onSave={handleSave}
             onAddToProject={handleAddToProject}
+            onCopy={() => {
+              void navigator.clipboard?.writeText(draft);
+              note("Copied ✓");
+            }}
             onPrint={() => exportPrintRef.current?.click()}
             onGoogleDoc={() => exportDocRef.current?.click()}
           />

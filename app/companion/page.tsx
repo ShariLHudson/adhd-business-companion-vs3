@@ -92,7 +92,6 @@ import { TopBar } from "@/components/companion/TopBar";
 import { SimpleChat } from "@/components/companion/SimpleChat";
 import { ToolSuggestionCard } from "@/components/companion/ToolSuggestionCard";
 import { PendingActionBar } from "@/components/companion/PendingActionBar";
-import { FounderActionBar } from "@/components/companion/FounderActionBar";
 import { ArtifactActionBar } from "@/components/companion/ArtifactActionBar";
 import { ActionBridgeChip } from "@/components/companion/ActionBridgeChip";
 import { WorkspaceLayout } from "@/components/companion/WorkspaceLayout";
@@ -107,6 +106,8 @@ import {
 } from "@/lib/workspaceChatPreference";
 import {
   bootstrapCreateBuilderSession,
+  bootstrapCreateBuilderFromWorkflow,
+  panelWorkflowHasProgress,
   createBuilderActionsForPhase,
   createBuilderExportMessage,
   formatCreateBuilderChatHint,
@@ -115,6 +116,7 @@ import {
   type CreateBuilderAction,
   type CreateBuilderSession,
 } from "@/lib/createBuilderChat";
+import { EMPTY_CREATE_WORKFLOW } from "@/lib/createWorkflow";
 import { CreateBuilderActionBar } from "@/components/companion/CreateBuilderActionBar";
 import {
   artifactLockHintForChat,
@@ -1040,6 +1042,7 @@ export default function CompanionPage() {
     key: number;
   } | null>(null);
   const createBuilderBootstrappedRef = useRef(false);
+  const createPanelWorkflowRef = useRef(EMPTY_CREATE_WORKFLOW);
   const [googleWorkspace, setGoogleWorkspace] =
     useState<GoogleWorkspaceSession | null>(null);
   const googleWorkspaceRef = useRef<GoogleWorkspaceSession | null>(null);
@@ -1122,7 +1125,10 @@ export default function CompanionPage() {
     setActiveNav("create");
   }
 
-  function startCreateBuilderChat(typeHint?: string | null) {
+  function startCreateBuilderChat(
+    typeHint?: string | null,
+    panelWorkflow?: import("@/lib/createWorkflow").CreateWorkflowState | null,
+  ) {
     const raw =
       typeHint ??
       creationContext?.itemType ??
@@ -1131,11 +1137,18 @@ export default function CompanionPage() {
       null;
     const type =
       raw && raw !== "content" && raw.trim() ? raw.trim() : null;
-    const { session, opener } = bootstrapCreateBuilderSession(type);
+    const resume =
+      type && panelWorkflowHasProgress(panelWorkflow ?? createPanelWorkflowRef.current);
+    const wf = panelWorkflow ?? createPanelWorkflowRef.current;
+    const { session, opener } =
+      resume && wf
+        ? bootstrapCreateBuilderFromWorkflow(type, wf)
+        : bootstrapCreateBuilderSession(type);
     setCreateBuilderSession(session);
     if (session.typeLabel) syncCreateBuilderType(session.typeLabel);
     setMessages((prev) => {
       if (
+        !resume &&
         prev.some(
           (m) =>
             m.role === "assistant" &&
@@ -1205,7 +1218,7 @@ export default function CompanionPage() {
       return;
     }
     if (action.id === "create-draft") {
-      void handleSend("Create Draft", false, true);
+      void handleSend("Build Draft", false, true);
       return;
     }
     if (action.id === "add-more-info") {
@@ -2716,6 +2729,7 @@ export default function CompanionPage() {
   function openCompanionAssist(
     sourceSection: AppSection,
     typeHint?: string | null,
+    panelWorkflow?: import("@/lib/createWorkflow").CreateWorkflowState | null,
   ) {
     companionReturnSectionRef.current = sourceSection;
     setWorkspaceFirstSplit(false);
@@ -2746,6 +2760,7 @@ export default function CompanionPage() {
           creationContext?.itemType ??
           genSeed?.type ??
           lockedArtifactType,
+        panelWorkflow,
       );
     }
     inputRef.current?.focus();
@@ -2757,7 +2772,7 @@ export default function CompanionPage() {
       { ...input, source: input.source ?? "generated" },
       { silent: true },
     );
-    openCompanionAssist("content-generator", input.itemType);
+    openCompanionAssist("content-generator", input.itemType, input.createWorkflow);
   }
 
   function openWorkspaceFromSection(section: AppSection) {
@@ -5155,6 +5170,9 @@ export default function CompanionPage() {
             sopSession={workspaceSession}
             onContextChange={handleWorkspaceDetailChange}
             onCreateSessionSync={handleCreateSessionSync}
+            onCreateWorkflowSync={(wf) => {
+              createPanelWorkflowRef.current = wf;
+            }}
             onBuildWithShari={openCreateWithShari}
             onOpen={(s) => {
               if (s !== "content-generator") openWorkspaceFromSection(s);
@@ -6121,39 +6139,6 @@ export default function CompanionPage() {
 
               <footer className="input-footer sticky bottom-0 shrink-0 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6">
                 <div className="mx-auto w-full max-w-xl">
-                  {hydrated &&
-                  founderActionBoard.currentAction &&
-                  !homeCalm &&
-                  !pendingAction &&
-                  !isLoading ? (
-                    <FounderActionBar
-                      action={founderActionBoard.currentAction}
-                      onOpen={() =>
-                        respondToFounderAction(
-                          founderActionBoard.currentAction!,
-                          "open",
-                        )
-                      }
-                      onDone={() =>
-                        respondToFounderAction(
-                          founderActionBoard.currentAction!,
-                          "done",
-                        )
-                      }
-                      onLater={() =>
-                        respondToFounderAction(
-                          founderActionBoard.currentAction!,
-                          "later",
-                        )
-                      }
-                      onDismiss={() =>
-                        respondToFounderAction(
-                          founderActionBoard.currentAction!,
-                          "dismiss",
-                        )
-                      }
-                    />
-                  ) : null}
                   {pendingAction && !isLoading && !homeCalm ? (
                     pendingAction.kind === "artifact-export" ? (
                       <ArtifactActionBar
@@ -6477,11 +6462,20 @@ export default function CompanionPage() {
 
           {activeSection === "content-generator" && !workspacePanel && (
             <WorkspaceShell
-              onAskShari={() => openCompanionAssist("content-generator")}
+              onAskShari={() =>
+                openCompanionAssist(
+                  "content-generator",
+                  undefined,
+                  createPanelWorkflowRef.current,
+                )
+              }
             >
               <ContentGeneratorPanel
                 seed={genSeed}
                 onBuildWithShari={openCreateWithShari}
+                onCreateWorkflowSync={(wf) => {
+                  createPanelWorkflowRef.current = wf;
+                }}
                 onOpen={(s) => setActiveSection(s)}
                 onWin={(label) => {
                   logMomentum("complete", `Win: ${label}`);

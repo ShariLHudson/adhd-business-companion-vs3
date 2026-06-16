@@ -13,6 +13,7 @@ export function CreateDraftImprove({
   disabled,
   onSave,
   onAddToProject,
+  onCopy,
   onPrint,
   onGoogleDoc,
 }: {
@@ -21,6 +22,7 @@ export function CreateDraftImprove({
   disabled?: boolean;
   onSave?: () => void;
   onAddToProject?: () => void;
+  onCopy?: () => void;
   onPrint?: () => void;
   onGoogleDoc?: () => void;
 }) {
@@ -101,26 +103,6 @@ export function CreateDraftImprove({
         >
           {busy ? "Updating…" : "Update draft"}
         </button>
-        {onSave ? (
-          <button
-            type="button"
-            disabled={disabled || busy}
-            onClick={onSave}
-            className="rounded-xl border border-[#1e4f4f]/40 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f]"
-          >
-            Save
-          </button>
-        ) : null}
-        {onAddToProject ? (
-          <button
-            type="button"
-            disabled={disabled || busy}
-            onClick={onAddToProject}
-            className="rounded-xl border border-[#1e4f4f]/40 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f]"
-          >
-            Add to project
-          </button>
-        ) : null}
       </div>
 
       <details className="mt-4">
@@ -128,6 +110,36 @@ export function CreateDraftImprove({
           More actions ▼
         </summary>
         <div className="mt-3 flex flex-wrap gap-2">
+          {onSave ? (
+            <button
+              type="button"
+              disabled={disabled || busy}
+              onClick={onSave}
+              className={chip}
+            >
+              Save
+            </button>
+          ) : null}
+          {onAddToProject ? (
+            <button
+              type="button"
+              disabled={disabled || busy}
+              onClick={onAddToProject}
+              className={chip}
+            >
+              Add to project
+            </button>
+          ) : null}
+          {onCopy ? (
+            <button
+              type="button"
+              disabled={disabled || busy}
+              onClick={onCopy}
+              className={chip}
+            >
+              Copy
+            </button>
+          ) : null}
           {onPrint ? (
             <button
               type="button"

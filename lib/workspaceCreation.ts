@@ -9,6 +9,7 @@ import {
   type SavedArtifactRecord,
 } from "./savedArtifact";
 import type { AppSection } from "./companionUi";
+import type { CreateWorkflowState } from "./createWorkflow";
 import type { WorkspaceSession } from "./workspaceSop";
 import { getWorkflow } from "./workspaceSop";
 
@@ -45,6 +46,8 @@ export type CreationWorkspaceInput = {
   snippetKind?: string;
   /** When true, itemType stays fixed unless the user explicitly changes it. */
   artifactTypeLocked?: boolean;
+  /** Panel discovery answers — preserved when opening Work With Shari. */
+  createWorkflow?: CreateWorkflowState;
 };
 
 export type CreationWorkspaceContext = CreationWorkspaceInput & {

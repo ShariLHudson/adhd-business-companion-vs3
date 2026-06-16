@@ -7,13 +7,16 @@
 import { matchCatalogFromText } from "./createCatalog";
 import {
   advanceAfterDiscoveryAnswer,
+  advanceAfterTypePick,
+  advanceToDiscovery,
   buildBriefFromDiscovery,
+  categoryIdForType,
   discoveryComplete,
   discoveryQuestionsForState,
   getDiscoveryQuestions,
   type CreateWorkflowState,
   EMPTY_CREATE_WORKFLOW,
-  advanceAfterTypePick,
+  answeredDiscoveryCount,
 } from "./createWorkflow";
 import { DRAFT_QUICK_EDITS } from "./createWorkspaceUx";
 
@@ -85,7 +88,7 @@ export function resolveBuilderType(text: string): string | null {
 
 export function isAffirmative(text: string): boolean {
   const t = text.trim().toLowerCase();
-  return /^(yes|yep|yeah|sure|ok|okay|please|go ahead|do it|generate|create it|create draft|sounds good|let's go|lets go|y)\b/.test(
+  return /^(yes|yep|yeah|sure|ok|okay|please|go ahead|do it|generate|create it|create draft|build draft|sounds good|let's go|lets go|y)\b/.test(
     t,
   );
 }
@@ -98,9 +101,82 @@ export function isAddMoreInformation(text: string): boolean {
 }
 
 export const READINESS_ACTIONS: CreateBuilderAction[] = [
-  { id: "create-draft", label: "Create Draft" },
+  { id: "create-draft", label: "Build Draft" },
   { id: "add-more-info", label: "Add More Information" },
 ];
+
+const READINESS_PROMPT =
+  "I think I have enough information to build this. Would you like me to create the draft?";
+
+function freshDiscoveryWorkflow(typeLabel: string): CreateWorkflowState {
+  return advanceToDiscovery(
+    advanceAfterTypePick(typeLabel, categoryIdForType(typeLabel)),
+  );
+}
+
+export function panelWorkflowHasProgress(
+  panelWorkflow: CreateWorkflowState | null | undefined,
+): boolean {
+  if (!panelWorkflow) return false;
+  if (panelWorkflow.step === "readiness") return true;
+  return answeredDiscoveryCount(panelWorkflow) > 0;
+}
+
+/** Resume chat builder from answers already collected in the Create panel. */
+export function bootstrapCreateBuilderFromWorkflow(
+  typeLabel: string,
+  panelWorkflow: CreateWorkflowState,
+): { session: CreateBuilderSession; opener: string } {
+  const resolved = typeLabel.trim();
+  const merged: CreateWorkflowState = {
+    ...panelWorkflow,
+    selectedTypeLabel: panelWorkflow.selectedTypeLabel ?? resolved,
+    categoryId:
+      panelWorkflow.categoryId ?? categoryIdForType(resolved),
+  };
+
+  if (
+    merged.step === "readiness" ||
+    discoveryComplete(resolved, merged)
+  ) {
+    const session: CreateBuilderSession = {
+      typeLabel: resolved,
+      workflow: { ...merged, step: "readiness" },
+      phase: "readiness",
+    };
+    return {
+      session,
+      opener:
+        `I have your answers for **${resolved}**.\n\n` +
+        `${READINESS_PROMPT}`,
+    };
+  }
+
+  const answered = answeredDiscoveryCount(merged);
+  if (answered > 0) {
+    const workflow: CreateWorkflowState = { ...merged, step: "discovery" };
+    const nextQ = discoveryQuestionsForState(resolved, workflow);
+    const session: CreateBuilderSession = {
+      typeLabel: resolved,
+      workflow,
+      phase: "discovery",
+    };
+    if (nextQ) {
+      return {
+        session,
+        opener:
+          `I have your answers so far for **${resolved}**.\n\n` +
+          `**${nextQ.prompt}**`,
+      };
+    }
+    return bootstrapCreateBuilderFromWorkflow(resolved, {
+      ...workflow,
+      step: "readiness",
+    });
+  }
+
+  return bootstrapCreateBuilderSession(resolved);
+}
 
 export function reviseOfferActions(): CreateBuilderAction[] {
   return [
@@ -131,7 +207,7 @@ export function bootstrapCreateBuilderSession(
 
   const session: CreateBuilderSession = {
     typeLabel: resolved,
-    workflow: advanceAfterTypePick(resolved, null),
+    workflow: freshDiscoveryWorkflow(resolved),
     phase: "discovery",
   };
   const first = discoveryQuestionsForState(resolved, session.workflow);
@@ -188,7 +264,7 @@ export function processCreateBuilderTurn(
     }
     const next: CreateBuilderSession = {
       typeLabel: type,
-      workflow: advanceAfterTypePick(type, null),
+      workflow: freshDiscoveryWorkflow(type),
       phase: "discovery",
     };
     const first = discoveryQuestionsForState(type, next.workflow);
@@ -219,7 +295,11 @@ export function processCreateBuilderTurn(
   }
 
   if (session.phase === "readiness") {
-    if (isAffirmative(trimmed) || /^create draft$/i.test(trimmed)) {
+    if (
+      isAffirmative(trimmed) ||
+      /^create draft$/i.test(trimmed) ||
+      /^build draft$/i.test(trimmed)
+    ) {
       const brief = buildBriefFromDiscovery(
         typeLabel,
         session.workflow.discoveryAnswers,
@@ -236,8 +316,7 @@ export function processCreateBuilderTurn(
     }
     return {
       session,
-      reply:
-        "I think I have enough information to build this. Would you like me to create the draft?",
+      reply: READINESS_PROMPT,
       actions: READINESS_ACTIONS,
     };
   }
@@ -340,8 +419,7 @@ function enterReadiness(
   };
   return {
     session: ready,
-    reply:
-      "I think I have enough information to build this. Would you like me to create the draft?",
+    reply: READINESS_PROMPT,
     actions: READINESS_ACTIONS,
   };
 }

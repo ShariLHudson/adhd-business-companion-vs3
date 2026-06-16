@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   bootstrapCreateBuilderSession,
+  bootstrapCreateBuilderFromWorkflow,
   isAffirmative,
   processCreateBuilderTurn,
   resolveBuilderType,
 } from "./createBuilderChat";
+import { advanceAfterTypePick, advanceToDiscovery } from "./createWorkflow";
 
 describe("createBuilderChat", () => {
   it("resolves strategy and SOP from user text", () => {
@@ -40,7 +42,7 @@ describe("createBuilderChat", () => {
     expect(session.phase).toBe("readiness");
     expect(reply).toContain("Would you like me to create the draft");
 
-    const approved = processCreateBuilderTurn(session, "Create Draft");
+    const approved = processCreateBuilderTurn(session, "Build Draft");
     expect(approved.generateBrief).toContain("ElevenLabs");
     expect(approved.generateType).toBe("SOP");
   });
@@ -51,18 +53,25 @@ describe("createBuilderChat", () => {
     expect(isAffirmative("maybe later")).toBe(false);
   });
 
-  it("branches strategy questions after kind is chosen", () => {
-    let { session } = bootstrapCreateBuilderSession("Personal Companion Strategy");
-    const first = processCreateBuilderTurn(
-      session,
-      "Staying focused during admin work",
-    );
-    session = first.session;
-    expect(first.reply.length).toBeGreaterThan(5);
-    const next = processCreateBuilderTurn(
-      session,
-      "Fewer context switches each afternoon",
-    );
-    expect(next.reply.length).toBeGreaterThan(5);
+  it("resumes from panel workflow at readiness without restarting", () => {
+    let wf = advanceToDiscovery(advanceAfterTypePick("Email", "content"));
+    const answers = {
+      recipient: "Sarah",
+      goal: "Book a call",
+      context: "Met at conference",
+    };
+    const qs = ["recipient", "goal", "context"] as const;
+    for (let i = 0; i < qs.length; i++) {
+      wf = {
+        ...wf,
+        discoveryAnswers: { ...wf.discoveryAnswers, [qs[i]]: answers[qs[i]] },
+        discoveryIndex: i + 1,
+      };
+    }
+    wf = { ...wf, step: "readiness" };
+    const { session, opener } = bootstrapCreateBuilderFromWorkflow("Email", wf);
+    expect(session.phase).toBe("readiness");
+    expect(opener).toContain("I have your answers");
+    expect(opener).not.toContain("Who is receiving");
   });
 });

@@ -42,6 +42,26 @@ export function CreateWorkflowPanel({
   building?: boolean;
 }) {
   const [draftAnswer, setDraftAnswer] = useState("");
+  const [addingMore, setAddingMore] = useState(false);
+  const [extraInfo, setExtraInfo] = useState("");
+
+  function shariInput(
+    selected: string,
+    categoryId: string,
+    wf: CreateWorkflowState,
+  ): CreationWorkspaceInput {
+    return {
+      itemType: selected,
+      title: selected,
+      brief: buildBriefFromDiscovery(selected, wf.discoveryAnswers),
+      stage:
+        wf.step === "readiness"
+          ? "ready to build"
+          : "discovery with Shari",
+      source: "generated",
+      createWorkflow: wf,
+    };
+  }
 
   if (workflow.step === "category") {
     const catalog = sortedCreateCatalog();
@@ -142,38 +162,40 @@ export function CreateWorkflowPanel({
           Ready to create your {selected}?
         </p>
         <div className="mt-5 flex flex-col gap-3">
-          <button
-            type="button"
-            onClick={() => {
-              if (routed && item?.route) {
-                onRoutedItem(item.route);
-                return;
-              }
-              onTypeSelect(selected, workflow.categoryId!);
-              onWorkflowChange(advanceToDiscovery(workflow));
-            }}
-            className="w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
-          >
-            {routed ? `Open ${selected}` : `Create ${selected}`}
-          </button>
-          {!routed && onBuildWithShari ? (
+          {!routed ? (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  onTypeSelect(selected, workflow.categoryId!);
+                  onWorkflowChange(advanceToDiscovery(workflow));
+                }}
+                className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+              >
+                Answer a few questions
+              </button>
+              {onBuildWithShari ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onTypeSelect(selected, workflow.categoryId!);
+                    onBuildWithShari(shariInput(selected, workflow.categoryId!, workflow));
+                  }}
+                  className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+                >
+                  💬 Work With Shari
+                </button>
+              ) : null}
+            </>
+          ) : (
             <button
               type="button"
-              onClick={() => {
-                onTypeSelect(selected, workflow.categoryId!);
-                onBuildWithShari({
-                  itemType: selected,
-                  title: selected,
-                  brief: "",
-                  stage: "discovery with Shari",
-                  source: "generated",
-                });
-              }}
-              className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+              onClick={() => item?.route && onRoutedItem(item.route)}
+              className="w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
             >
-              💬 Work With Shari
+              Open {selected}
             </button>
-          ) : null}
+          )}
         </div>
       </div>
     );
@@ -266,9 +288,11 @@ export function CreateWorkflowPanel({
         >
           ‹ Edit answers
         </button>
-        <p className="mt-2 text-lg font-semibold text-[#1f1c19]">Ready to build your draft?</p>
+        <p className="mt-2 text-lg font-semibold text-[#1f1c19]">
+          I think I have enough information to build this.
+        </p>
         <p className="mt-1 text-sm text-[#6b635a]">
-          I won&apos;t generate until you approve. Here&apos;s what I&apos;ll use:
+          Here&apos;s what I&apos;ll use:
         </p>
         {summary.length === 0 ? (
           <p className="mt-4 text-sm text-[#9a8f82]">
@@ -286,22 +310,76 @@ export function CreateWorkflowPanel({
             ))}
           </ul>
         )}
-        <button
-          type="button"
-          disabled={building}
-          onClick={() => {
-            onWorkflowChange({
-              ...workflow,
-              readinessConfirmed: true,
-              buildApproved: true,
-              step: "improve",
-            });
-            onBuildDraft(brief);
-          }}
-          className="mt-5 w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
-        >
-          {building ? "Building your draft…" : "Build my draft"}
-        </button>
+        <div className="mt-5 flex flex-col gap-3">
+          {addingMore ? (
+            <div className="rounded-xl border border-[#d4cdc3] bg-white/90 p-4">
+              <p className="text-sm font-semibold text-[#1f1c19]">
+                What else should I know?
+              </p>
+              <textarea
+                value={extraInfo}
+                onChange={(e) => setExtraInfo(e.target.value)}
+                placeholder="Any extra detail before we build…"
+                className="mt-3 min-h-[96px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-base outline-none focus:border-[#1e4f4f]"
+              />
+              <button
+                type="button"
+                disabled={!extraInfo.trim()}
+                onClick={() => {
+                  onWorkflowChange({
+                    ...workflow,
+                    discoveryAnswers: {
+                      ...workflow.discoveryAnswers,
+                      "extra-info": extraInfo.trim(),
+                    },
+                  });
+                  setAddingMore(false);
+                }}
+                className="mt-3 rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:opacity-40"
+              >
+                Save detail
+              </button>
+            </div>
+          ) : null}
+          <button
+            type="button"
+            disabled={building}
+            onClick={() => {
+              onWorkflowChange({
+                ...workflow,
+                readinessConfirmed: true,
+                buildApproved: true,
+                step: "improve",
+              });
+              onBuildDraft(brief);
+            }}
+            className="w-full rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-50"
+          >
+            {building ? "Building your draft…" : "Build Draft"}
+          </button>
+          <button
+            type="button"
+            disabled={building}
+            onClick={() => setAddingMore(true)}
+            className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
+          >
+            Add More Information
+          </button>
+          {onBuildWithShari && workflow.categoryId ? (
+            <button
+              type="button"
+              disabled={building}
+              onClick={() =>
+                onBuildWithShari(
+                  shariInput(typeLabel, workflow.categoryId!, workflow),
+                )
+              }
+              className="w-full rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50"
+            >
+              💬 Work With Shari
+            </button>
+          ) : null}
+        </div>
       </div>
     );
   }
