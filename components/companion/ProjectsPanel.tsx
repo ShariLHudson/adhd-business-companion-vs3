@@ -6,7 +6,6 @@ import {
   getDayState,
   getProjectItems,
   getProjects,
-  getProjectItems,
   logMomentum,
   PROJECT_HORIZON_LABEL,
   PROJECT_PALETTE,
