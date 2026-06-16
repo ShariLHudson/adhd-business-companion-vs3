@@ -277,6 +277,7 @@ import {
 } from "@/lib/workspaceCoachAutoStart";
 import { getActivityById } from "@/lib/companionActivities";
 import { getShariAssistLabel } from "@/lib/shariAssistLabels";
+import { resolveProjectWorkspaceDetail } from "@/lib/projectWorkspaceDetail";
 import {
   projectCoachTopicOpener,
   type ProjectCoachTopic,
@@ -1037,6 +1038,8 @@ export default function CompanionPage() {
   const [projectContinueId, setProjectContinueId] = useState<string | null>(
     null,
   );
+  const projectContinueIdRef = useRef<string | null>(null);
+  projectContinueIdRef.current = projectContinueId;
   const workspaceCoachSeededRef = useRef<string | null>(null);
   const [projectCoachTopicPickerVisible, setProjectCoachTopicPickerVisible] =
     useState(false);
@@ -1491,10 +1494,13 @@ export default function CompanionPage() {
     setWorkspaceRevealSeq((s) => s + 1);
   }, []);
 
-  const workspaceContext = useMemo(
-    () => buildWorkspaceContext(workspacePanel, workspaceDetail),
-    [workspacePanel, workspaceDetail],
-  );
+  const workspaceContext = useMemo(() => {
+    const detail =
+      workspacePanel === "projects"
+        ? resolveProjectWorkspaceDetail(workspaceDetail, projectContinueId)
+        : workspaceDetail;
+    return buildWorkspaceContext(workspacePanel, detail);
+  }, [workspacePanel, workspaceDetail, projectContinueId]);
 
   const applyWorkspaceFocus = useCallback((field: WorkspaceFieldId | null) => {
     setWorkspaceFocusField(field);
@@ -1647,9 +1653,18 @@ export default function CompanionPage() {
 
   const handleWorkspaceDetailChange = useCallback(
     (detail: WorkspacePanelDetail) => {
-      setWorkspaceDetail((prev) =>
-        panelDetailEqual(prev, detail) ? prev : detail,
-      );
+      setWorkspaceDetail((prev) => {
+        if (
+          detail.view === "list" &&
+          !detail.selectedItemId &&
+          prev?.view === "detail" &&
+          prev.selectedItemId &&
+          workspacePanelRef.current === "projects"
+        ) {
+          return prev;
+        }
+        return panelDetailEqual(prev, detail) ? prev : detail;
+      });
       if (detail.selectedItemId) {
         setProjectContinueId(detail.selectedItemId);
       }
@@ -2854,7 +2869,9 @@ export default function CompanionPage() {
     }
 
     patchWorkspacePanel(section);
-    setWorkspaceDetail(emptyWorkspaceDetail());
+    if (section !== "projects") {
+      setWorkspaceDetail(emptyWorkspaceDetail());
+    }
     setCreationContext(null);
     applyWorkspaceFocus(null);
     setActiveSection("home");
@@ -2864,10 +2881,6 @@ export default function CompanionPage() {
 
     const navId = nav ?? navForWorkspaceSection(section);
     if (navId) setActiveNav(navId);
-
-    if (section === "projects") {
-      setProjectContinueId(null);
-    }
 
     revealWorkspace();
   }
@@ -2956,7 +2969,14 @@ export default function CompanionPage() {
       return;
     }
     const extras = buildWorkspaceCoachExtrasFromState();
-    const ctx = buildWorkspaceContext(section, workspaceDetailRef.current);
+    const detail =
+      section === "projects"
+        ? resolveProjectWorkspaceDetail(
+            workspaceDetailRef.current,
+            projectContinueIdRef.current,
+          )
+        : workspaceDetailRef.current;
+    const ctx = buildWorkspaceContext(section, detail);
     const key = workspaceCoachSeedKey(ctx, extras);
     if (!key) return;
     if (!force && workspaceCoachSeededRef.current === key) return;
@@ -2975,7 +2995,13 @@ export default function CompanionPage() {
 
   function selectProjectCoachTopic(topic: ProjectCoachTopic) {
     setProjectCoachTopicPickerVisible(false);
-    const ctx = buildWorkspaceContext("projects", workspaceDetailRef.current);
+    const ctx = buildWorkspaceContext(
+      "projects",
+      resolveProjectWorkspaceDetail(
+        workspaceDetailRef.current,
+        projectContinueIdRef.current,
+      ),
+    );
     if (!ctx?.selectedItemId) return;
     const session = startProjectCoachSession(topic, ctx);
     setProjectCoachSession(session);
@@ -3001,9 +3027,19 @@ export default function CompanionPage() {
       }
       if (sourceSection === "projects") {
         const activeId =
-          workspaceDetailRef.current?.selectedItemId ?? projectContinueId;
+          workspaceDetailRef.current?.selectedItemId ?? projectContinueIdRef.current;
         if (activeId) {
+          projectContinueIdRef.current = activeId;
           setProjectContinueId(activeId);
+          const resolved = resolveProjectWorkspaceDetail(
+            workspaceDetailRef.current,
+            activeId,
+          );
+          if (resolved?.selectedItemId) {
+            setWorkspaceDetail((prev) =>
+              panelDetailEqual(prev, resolved) ? prev : resolved,
+            );
+          }
         }
       }
     } else {
@@ -7050,6 +7086,10 @@ export default function CompanionPage() {
                 focusField={workspaceFocusField}
                 focusStamp={workspaceFocusStamp}
                 chatFieldFill={workspaceChatFill}
+                workspaceWorkflowAction={workspaceWorkflowAction}
+                sopSession={workspaceSession}
+                onSopFieldChange={handleSopFieldChange}
+                onProjectSaved={handleWorkspaceProjectSaved}
                 onContextChange={handleWorkspaceDetailChange}
                 onOpen={suggestCrossWorkspaceOpen}
                 onAsk={handlePlaybookAsk}

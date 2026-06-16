@@ -58,6 +58,17 @@ import {
   type ProjectLink,
 } from "@/lib/projectLinks";
 
+function initialProjectView(initialProjectId?: string | null): {
+  view: "list" | "create-source" | "create" | "detail";
+  detailId: string | null;
+} {
+  if (!initialProjectId) return { view: "list", detailId: null };
+  const exists = getProjects().some((p) => p.id === initialProjectId);
+  return exists
+    ? { view: "detail", detailId: initialProjectId }
+    : { view: "list", detailId: null };
+}
+
 const STATUSES: ProjectStatus[] = [
   "not-started",
   "in-progress",
@@ -115,8 +126,10 @@ export function ProjectsPanel({
   const [projects, setProjects] = useState<Project[]>([]);
   const [view, setView] = useState<
     "list" | "create-source" | "create" | "detail"
-  >("list");
-  const [detailId, setDetailId] = useState<string | null>(null);
+  >(() => initialProjectView(initialProjectId).view);
+  const [detailId, setDetailId] = useState<string | null>(
+    () => initialProjectView(initialProjectId).detailId,
+  );
 
   // Guided create
   const [step, setStep] = useState(0);
@@ -203,6 +216,9 @@ export function ProjectsPanel({
   useEffect(() => {
     if (!onContextChange) return;
 
+    // Avoid wiping parent context while bootstrapping to initialProjectId.
+    if (view === "list" && initialProjectId && !detailId) return;
+
     let detail;
     if (view === "list") {
       detail = {
@@ -271,7 +287,7 @@ export function ProjectsPanel({
     if (sig === lastReportedDetail.current) return;
     lastReportedDetail.current = sig;
     onContextChange(detail);
-  }, [view, step, what, why, current, onContextChange, colorOn, projectFileCount, detailSectionsOpen]);
+  }, [view, step, what, why, current, onContextChange, colorOn, projectFileCount, detailSectionsOpen, initialProjectId, detailId]);
 
   const focusElementId =
     focusField === "project-title"
