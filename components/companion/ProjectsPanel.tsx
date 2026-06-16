@@ -141,6 +141,7 @@ export function ProjectsPanel({
   >({});
   const [projectDataTick, setProjectDataTick] = useState(0);
   const [newGoal, setNewGoal] = useState("");
+  const [newLinkLabel, setNewLinkLabel] = useState("");
   const [newLinkUrl, setNewLinkUrl] = useState("");
 
   const visualMode = useVisualMode();

@@ -189,10 +189,11 @@ export function TemplatesLibrary({
   // ---- Open / read a single template -------------------------------------
   const viewing = viewId ? items.find((t) => t.id === viewId) : null;
   if (viewing) {
-    const itemType = itemTypeFromTemplate(viewing);
+    const template = viewing;
+    const itemType = itemTypeFromTemplate(template);
 
     async function exportToGoogle() {
-      if (!viewing.body.trim()) {
+      if (!template.body.trim()) {
         setGoogleExportError("There is no content to export.");
         return;
       }
@@ -203,8 +204,8 @@ export function TemplatesLibrary({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            title: viewing.title,
-            content: viewing.body,
+            title: template.title,
+            content: template.body,
             kind: "doc",
           }),
         });
@@ -224,11 +225,11 @@ export function TemplatesLibrary({
     }
 
     function downloadTemplate() {
-      const blob = new Blob([viewing.body], { type: "text/plain;charset=utf-8" });
+      const blob = new Blob([template.body], { type: "text/plain;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${viewing.title.replace(/[^\w.-]+/g, "-").slice(0, 40)}.txt`;
+      a.download = `${template.title.replace(/[^\w.-]+/g, "-").slice(0, 40)}.txt`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -239,7 +240,7 @@ export function TemplatesLibrary({
       const w = window.open("", "_blank", "width=720,height=900");
       if (!w) return;
       w.document.write(
-        `<html><head><title>${viewing.title}</title></head><body><pre style="white-space:pre-wrap;font-family:system-ui;padding:28px;">${viewing.body.replace(/</g, "&lt;")}</pre></body></html>`,
+        `<html><head><title>${template.title}</title></head><body><pre style="white-space:pre-wrap;font-family:system-ui;padding:28px;">${template.body.replace(/</g, "&lt;")}</pre></body></html>`,
       );
       w.document.close();
       w.focus();
@@ -257,12 +258,12 @@ export function TemplatesLibrary({
         </button>
         <DraftWorkspacePanel
           itemType={itemType}
-          templateName={viewing.title}
-          draft={viewing.body}
+          templateName={template.title}
+          draft={template.body}
           editable={false}
           onApplyDraft={() => {}}
           onGoogleDoc={exportToGoogle}
-          onCopy={() => void navigator.clipboard?.writeText(viewing.body)}
+          onCopy={() => void navigator.clipboard?.writeText(template.body)}
           onPrint={printTemplate}
           onDownload={downloadTemplate}
           onAddToProject={
