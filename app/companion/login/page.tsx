@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
@@ -47,15 +46,8 @@ export default function CompanionLoginPage() {
         </div>
         {!authReady ? (
           <p className="mt-6 text-center text-sm text-[#6b635a]">
-            <Link
-              href="/companion"
-              className="font-medium text-[#1e4f4f] hover:underline"
-            >
-              Continue without signing in
-            </Link>
-            <span className="block mt-1 text-xs">
-              (Only while sign-in is being configured)
-            </span>
+            Sign-in is still being configured on this environment. Try again
+            shortly, or contact support if this persists.
           </p>
         ) : null}
       </div>

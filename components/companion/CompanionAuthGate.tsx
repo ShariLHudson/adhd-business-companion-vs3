@@ -5,18 +5,18 @@ import { useEffect, type ReactNode } from "react";
 
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 
-/** Sends visitors to /companion/login when auth is configured but they are not signed in. */
+/** Unauthenticated visitors always go to sign-in before using the app. */
 export function CompanionAuthGate({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { configured, loading, user } = useCompanionAuth();
+  const { loading, user } = useCompanionAuth();
 
   useEffect(() => {
-    if (configured && !loading && !user) {
+    if (!loading && !user) {
       router.replace("/companion/login");
     }
-  }, [configured, loading, user, router]);
+  }, [loading, user, router]);
 
-  if (configured && loading) {
+  if (loading) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]">
         Loading your account…
@@ -24,9 +24,13 @@ export function CompanionAuthGate({ children }: { children: ReactNode }) {
     );
   }
 
-  if (configured && !user) {
-    return null;
+  if (!user) {
+    return (
+      <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]">
+        Redirecting to sign in…
+      </main>
+    );
   }
 
-  return children;
+  return <>{children}</>;
 }

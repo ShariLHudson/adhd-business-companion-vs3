@@ -131,7 +131,7 @@ async function resendSignUpConfirmationDirect(
       type: "signup",
       email: trimmed,
       options: {
-        emailRedirectTo: `${getAppSiteUrl()}/companion`,
+        emailRedirectTo: `${getAppSiteUrl()}/companion/login`,
       },
     });
     if (error) return { error: sanitizeSupabaseAuthError(error.message) };
