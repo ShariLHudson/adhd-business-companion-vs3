@@ -77,12 +77,15 @@ function shouldShowLinkedSuggestion(
 
 export function CompanionActivitiesPanel({
   onOpenBeside,
+  onOpenGames,
   onClose,
   embedded = false,
   session: controlledSession,
   onSessionChange,
 }: {
   onOpenBeside?: (section: AppSection, payload: OpenBesidePayload) => void;
+  /** Open Momentum Games (playful resets). */
+  onOpenGames?: () => void;
   onClose?: () => void;
   embedded?: boolean;
   session?: ActivitySessionState;
@@ -377,6 +380,30 @@ export function CompanionActivitiesPanel({
           </button>
         ) : null}
       </div>
+
+      {onOpenGames ? (
+        <button
+          type="button"
+          onClick={onOpenGames}
+          className="mt-5 flex w-full items-start gap-3 rounded-2xl border border-[#1e4f4f]/25 bg-gradient-to-br from-[#f0f5f5] to-white p-4 text-left transition-colors hover:border-[#1e4f4f]/45"
+        >
+          <span className="text-3xl" aria-hidden="true">
+            🎮
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-base font-semibold text-[#1f1c19]">
+              Momentum Games
+            </span>
+            <span className="mt-0.5 block text-sm leading-relaxed text-[#6b635a]">
+              Fifteen playful games — pattern, memory, speed, and more. A light
+              break that isn&apos;t another list or brain dump.
+            </span>
+          </span>
+          <span className="shrink-0 self-center rounded-xl bg-[#1e4f4f] px-3 py-2 text-sm font-semibold text-white">
+            Play
+          </span>
+        </button>
+      ) : null}
 
       <div className="mt-6">
         <CategoryPickerSelect

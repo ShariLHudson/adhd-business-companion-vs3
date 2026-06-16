@@ -6399,6 +6399,7 @@ export default function CompanionPage() {
                     session={activitySession}
                     onSessionChange={setActivitySession}
                     onOpenBeside={handleActivityOpenBeside}
+                    onOpenGames={() => handleToolSelect("games")}
                   />
                 ) : (
                   <div className="min-h-0 flex-1 overflow-y-auto">
@@ -6964,6 +6965,7 @@ export default function CompanionPage() {
               session={activitySession}
               onSessionChange={setActivitySession}
               onOpenBeside={handleActivityOpenBeside}
+              onOpenGames={() => handleToolSelect("games")}
               onClose={goBack}
             />
           )}
