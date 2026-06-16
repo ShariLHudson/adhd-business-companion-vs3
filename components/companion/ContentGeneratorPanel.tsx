@@ -31,8 +31,6 @@ import {
   CreateOptionsMenu,
   type CreateOptionsAction,
 } from "@/components/companion/CreateOptionsMenu";
-import { ArtifactWorkspaceHeader } from "@/components/companion/ArtifactWorkspaceHeader";
-import { ArtifactReadyPanel } from "@/components/companion/ArtifactReadyPanel";
 import { ProjectPickerModal } from "@/components/companion/ProjectPickerModal";
 import {
   artifactReadyMessage,
@@ -55,7 +53,10 @@ import {
 import {
   BUILD_DRAFT_LOADING_MESSAGES,
   buildFullCreateBrief,
+  reconcileTemplateForType,
+  resolveTemplateName,
 } from "@/lib/createTemplates";
+import { DraftWorkspacePanel } from "@/components/companion/DraftWorkspacePanel";
 import {
   logCreateBuild,
   logCreateError,
@@ -211,6 +212,7 @@ export function ContentGeneratorPanel({
   const [title, setTitle] = useState("");
   const [error, setError] = useState(false);
   const [buildErrorMessage, setBuildErrorMessage] = useState<string | null>(null);
+  const [googleExportError, setGoogleExportError] = useState<string | null>(null);
   const [flash, setFlash] = useState<string | null>(null);
   const [forAvatar, setForAvatar] = useState<string | undefined>(undefined);
   const [projectPickerOpen, setProjectPickerOpen] = useState(false);
@@ -376,10 +378,12 @@ export function ContentGeneratorPanel({
     });
     if (sig === lastChatSyncSig.current) return;
     lastChatSyncSig.current = sig;
-    setWorkflow({
-      ...chatSyncedWorkflow,
-      questionMode: "split_screen",
-    });
+    setWorkflow(
+      reconcileTemplateForType({
+        ...chatSyncedWorkflow,
+        questionMode: "split_screen",
+      }),
+    );
     const resolved = resolvedTypeLabel(chatSyncedWorkflow);
     if (resolved && resolved !== type) {
       setType(resolved);
@@ -622,12 +626,14 @@ export function ContentGeneratorPanel({
       }
     } else if (seed.type && seed.autoGenerate && false) {
       // Create 2.0 — never auto-generate; user approves at readiness.
-    } else if (seed.type) {
+      } else if (seed.type) {
       setDraft("");
       if (seed.createWorkflow) {
         const label = seed.type;
         setWorkflow(
-          mergeCreateWorkflow(seed.createWorkflow, seed.createWorkflow, label),
+          reconcileTemplateForType(
+            mergeCreateWorkflow(seed.createWorkflow, seed.createWorkflow, label),
+          ),
         );
       } else if (companionBuilderMode) {
         setWorkflow({
@@ -680,7 +686,7 @@ export function ContentGeneratorPanel({
       void navigator.clipboard?.writeText(draft);
       note("Copied ✓");
     } else if (exportTrigger === "google-doc") {
-      exportDocRef.current?.click();
+      void handleOpenGoogle("doc");
     } else if (exportTrigger === "print") {
       exportPrintRef.current?.click();
     } else if (exportTrigger === "add-to-project") {
@@ -792,6 +798,11 @@ export function ContentGeneratorPanel({
       note(block);
       return;
     }
+    if (!draft.trim()) {
+      setGoogleExportError("There is no draft content to export yet.");
+      return;
+    }
+    setGoogleExportError(null);
     try {
       const r = await fetch("/api/google/create-doc", {
         method: "POST",
@@ -802,26 +813,42 @@ export function ContentGeneratorPanel({
           kind,
         }),
       });
+      const j = (await r.json()) as { url?: string; id?: string; error?: string };
       if (!r.ok) {
         const short =
           r.status === 401
             ? "Connect Google in Settings first."
-            : "Couldn't open Google — try again.";
-        note(short);
-        onExportGuidance?.(
-          `${short}\n\n${copyPasteFallbackMessage(kind)}`,
-        );
+            : j.error || "Something went wrong sending this to Google Docs.";
+        setGoogleExportError(short);
+        onExportGuidance?.(`${short}\n\n${copyPasteFallbackMessage(kind)}`);
         return;
       }
-      const j = await r.json();
       if (j.url) {
-        handleGoogleDocCreated(j.url, j.id as string | undefined, kind);
+        handleGoogleDocCreated(j.url, j.id, kind);
+        note("Opened in Google Docs ✓");
       } else {
+        setGoogleExportError("Something went wrong sending this to Google Docs.");
         onExportGuidance?.(copyPasteFallbackMessage(kind));
       }
     } catch {
-      note("Couldn't open Google — try again.");
+      setGoogleExportError("Something went wrong sending this to Google Docs.");
       onExportGuidance?.(copyPasteFallbackMessage(kind));
+    }
+  }
+
+  function handleDownloadDraft() {
+    try {
+      const blob = new Blob([draft], { type: "text/plain;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${artifactTitleValue().replace(/[^\w.-]+/g, "-").slice(0, 40)}.txt`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      note("Couldn't download.");
     }
   }
 
@@ -854,14 +881,16 @@ export function ContentGeneratorPanel({
     setEditingTopic(false);
     setDraft("");
     if (!opts?.skipWorkflow && !companionBuilderMode) {
-      setWorkflow(advanceAfterItemPick(typeLabel));
+      setWorkflow(reconcileTemplateForType(advanceAfterItemPick(typeLabel)));
     } else if (companionBuilderMode) {
-      setWorkflow((prev) => ({
-        ...prev,
-        selectedTypeLabel: typeLabel,
-        categoryId: opts?.categoryId ?? categoryIdForType(typeLabel),
-        questionMode: "split_screen",
-      }));
+      setWorkflow((prev) =>
+        reconcileTemplateForType({
+          ...prev,
+          selectedTypeLabel: typeLabel,
+          categoryId: opts?.categoryId ?? categoryIdForType(typeLabel),
+          questionMode: "split_screen",
+        }),
+      );
     }
     started.current = false;
   }
@@ -1028,7 +1057,8 @@ export function ContentGeneratorPanel({
   }
 
   const showCreateOptions =
-    workspaceMode || Boolean(type) || workflow.step !== "category" || Boolean(draft);
+    !showDraftEditor &&
+    (workspaceMode || Boolean(type) || workflow.step !== "category" || Boolean(draft));
 
   return (
     <div className="companion-fade-in flex h-full min-h-0 flex-col">
@@ -1177,62 +1207,60 @@ export function ContentGeneratorPanel({
           />
         </div>
       )}
-      {showDraftEditor && workspaceMode && workspaceRecord && phase === "ready" && (
-        <div className="flex min-h-0 flex-1 flex-col px-4 py-3">
-          <ArtifactReadyPanel
-            artifactType={type || "Document"}
-            title={artifactTitleValue()}
-            draft={draft}
-            onOpenGoogle={handleOpenGoogle}
-            onCopy={() => {
-              void navigator.clipboard?.writeText(draft);
-              note("Copied ✓");
-            }}
-            onDownloadPdf={handleDownloadPdf}
-            onEditInCreate={() => setPhase("building")}
-            onAddToProject={handleAddToProject}
-          />
-          <div className="sr-only" aria-hidden>
-            <ExportActions
-              text={draft}
-              title={artifactTitleValue()}
-              printButtonRef={exportPrintRef}
-              variant="workspace"
-            />
-          </div>
-        </div>
-      )}
-
-      {showDraftEditor && workspaceMode && workspaceRecord && phase === "building" && (
-        <ArtifactWorkspaceHeader
-          record={workspaceRecord}
+      {showDraftEditor && workspaceMode && (
+        <DraftWorkspacePanel
+          itemType={type || resolvedTypeLabel(workflow) || "Draft"}
+          templateName={
+            workflow.useTemplate ? resolveTemplateName(workflow) : null
+          }
           draft={draft}
-          title={title}
-          onTitleChange={setTitle}
-          onEdit={() => draftRef.current?.focus()}
-          onSave={handleSave}
-          onSaveAgain={handleSave}
-          onAddToProject={handleAddToProject}
-          onShowLocation={handleShowLocation}
-          onOpenSavedWork={onOpenSavedWork}
-          onMarkReady={handleMarkReady}
-          googleFirst
+          onDraftChange={setDraft}
+          onApplyDraft={(next) => {
+            setDraft(next);
+            setLastActivity({
+              kind: "draft",
+              title: brief || type || "Draft",
+              subtitle: type || "content",
+              contentType: type,
+              content: next,
+            });
+          }}
+          onGoogleDoc={() => handleOpenGoogle("doc")}
           onCopy={() => {
             void navigator.clipboard?.writeText(draft);
             note("Copied ✓");
           }}
-          docButtonRef={exportDocRef}
-          printButtonRef={exportPrintRef}
-          onGoogleDocCreated={handleGoogleDocCreated}
-          onBeforeExport={exportGuard}
-          flash={flash}
-          locationOpen={locationPanelOpen}
-          onLocationOpenChange={setLocationPanelOpen}
+          onPrint={() => exportPrintRef.current?.click()}
+          onDownload={handleDownloadDraft}
+          onAddToProject={handleAddToProject}
+          onRegenerate={
+            workflow.buildApproved || workflow.draftStatus === "ready"
+              ? () => void handleBuildDraft()
+              : undefined
+          }
+          onMoreAction={handleCreateOption}
+          changeTypeDisabled={typeLocked}
+          googleExportError={googleExportError}
+          onClearGoogleError={() => setGoogleExportError(null)}
+          busy={loading}
         />
       )}
 
+      {showDraftEditor && workspaceMode ? (
+        <div className="sr-only" aria-hidden>
+          <ExportActions
+            text={draft}
+            title={artifactTitleValue()}
+            printButtonRef={exportPrintRef}
+            docButtonRef={exportDocRef}
+            onGoogleDocCreated={handleGoogleDocCreated}
+            variant="workspace"
+            onBeforeAction={exportGuard}
+          />
+        </div>
+      ) : null}
 
-      {showDraftEditor && !(workspaceMode && phase === "ready") && (
+      {showDraftEditor && !workspaceMode && (
         <div
           className={`companion-fade-in flex min-h-0 flex-1 flex-col ${
             workspaceMode ? "overflow-y-auto px-4 py-3" : "mt-6"

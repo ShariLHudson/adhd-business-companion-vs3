@@ -122,8 +122,8 @@ export function ArtifactWorkspaceHeader({
         </p>
       ) : (
         <p className="mt-1 text-sm text-[#6b635a]">
-          Build here with me — when you&apos;re happy, mark it ready and open in
-          Google Docs, Sheets, or Forms.
+          Review your draft below. You can edit it, copy it, send it to Google
+          Docs, print it, or add it to a project.
         </p>
       )}
 

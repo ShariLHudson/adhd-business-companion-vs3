@@ -12,6 +12,7 @@ type CreateOptionsMenuProps = {
   onAction: (action: CreateOptionsAction) => void;
   /** Hide change type when artifact type is locked. */
   changeTypeDisabled?: boolean;
+  triggerLabel?: string;
   className?: string;
 };
 
@@ -25,6 +26,7 @@ const ITEMS: { id: CreateOptionsAction; label: string }[] = [
 export function CreateOptionsMenu({
   onAction,
   changeTypeDisabled = false,
+  triggerLabel = "Options",
   className = "",
 }: CreateOptionsMenuProps) {
   const [open, setOpen] = useState(false);
@@ -53,7 +55,7 @@ export function CreateOptionsMenu({
         aria-haspopup="menu"
         className="rounded-lg border border-[#1e4f4f]/25 bg-white px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
       >
-        Options ▾
+        {triggerLabel} ▾
       </button>
       {open ? (
         <div

@@ -147,6 +147,10 @@ export function ExportActions({
       kind === "sheet"
         ? { name: "Sheet", blank: "https://sheets.new" }
         : { name: "Doc", blank: "https://docs.google.com/document/create" };
+    if (!text.trim()) {
+      note("Add some content before exporting to Google Docs.");
+      return;
+    }
     if (workspaceMode && googleConnected === false) {
       note(
         "Google Docs isn't connected yet — connect in Settings, or keep working here.",
@@ -197,12 +201,23 @@ export function ExportActions({
         );
         return;
       }
+      if (workspaceMode) {
+        let errMsg = "Something went wrong sending this to Google Docs.";
+        try {
+          const errBody = (await r.json()) as { error?: string };
+          if (errBody.error) errMsg = errBody.error;
+        } catch {
+          /* noop */
+        }
+        note(errMsg);
+        return;
+      }
     } catch {
       /* fall through to copy-and-open */
     }
     if (workspaceMode) {
       note(
-        "Couldn't create the Google Doc right now — try again or save here first.",
+        "Something went wrong sending this to Google Docs. Try again, or copy your draft.",
       );
       return;
     }

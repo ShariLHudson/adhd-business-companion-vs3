@@ -9,6 +9,7 @@ import {
   buildGenerationBrief,
   defaultTemplateFor,
   listPresetTemplates,
+  reconcileTemplateForType,
   resolveTemplateName,
 } from "./createTemplates";
 
@@ -66,5 +67,17 @@ describe("createTemplates", () => {
     expect(resolveTemplateName({ ...wf, useTemplate: false, selectedTemplateId: "none" })).toBe(
       "No template (freeform)",
     );
+  });
+
+  it("replaces stale email template when item type changes to Workshop", () => {
+    const wf = reconcileTemplateForType({
+      ...advanceAfterItemPick("Workshop"),
+      selectedTemplateId: "email-default",
+      selectedTemplateName: "Default Email Template",
+      useTemplate: true,
+      step: "discovery",
+    });
+    expect(wf.selectedTemplateId).toBe("workshop-default");
+    expect(resolveTemplateName(wf)).toContain("Workshop");
   });
 });

@@ -16,6 +16,7 @@ export function CreateDraftImprove({
   onCopy,
   onPrint,
   onGoogleDoc,
+  hideMoreActions = false,
 }: {
   draft: string;
   onApply: (next: string) => void;
@@ -25,6 +26,7 @@ export function CreateDraftImprove({
   onCopy?: () => void;
   onPrint?: () => void;
   onGoogleDoc?: () => void;
+  hideMoreActions?: boolean;
 }) {
   const [instruction, setInstruction] = useState("");
   const [busy, setBusy] = useState(false);
@@ -105,6 +107,7 @@ export function CreateDraftImprove({
         </button>
       </div>
 
+      {!hideMoreActions ? (
       <details className="mt-4">
         <summary className="cursor-pointer text-sm font-semibold text-[#6b635a] hover:text-[#1e4f4f]">
           More actions ▼
@@ -165,6 +168,7 @@ export function CreateDraftImprove({
           Examples: {DRAFT_EDIT_EXAMPLES.join(" · ")}
         </p>
       </details>
+      ) : null}
 
       {error ? (
         <p className="mt-2 text-sm text-[#a85c4a]">

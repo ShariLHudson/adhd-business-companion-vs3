@@ -72,6 +72,23 @@ const TRAINING_SECTIONS: CreateTemplateSection[] = [
   section("summary", "Summary"),
 ];
 
+const WORKSHOP_SECTIONS: CreateTemplateSection[] = [
+  section("overview", "Workshop Overview"),
+  section("outcomes", "Learning Outcomes"),
+  section("agenda", "Agenda"),
+  section("activities", "Activities"),
+  section("materials", "Materials Needed"),
+  section("closing", "Closing & Next Steps"),
+];
+
+const PROPOSAL_SECTIONS: CreateTemplateSection[] = [
+  section("summary", "Executive Summary"),
+  section("scope", "Scope of Work"),
+  section("approach", "Approach"),
+  section("timeline", "Timeline"),
+  section("investment", "Investment"),
+];
+
 const GENERIC_SECTIONS: CreateTemplateSection[] = [
   section("intro", "Introduction"),
   section("main", "Main Content"),
@@ -130,6 +147,18 @@ const PRESET_TEMPLATES: CreateTemplatePreset[] = [
     sections: [...TRAINING_SECTIONS],
   },
   {
+    id: "workshop-default",
+    name: "Default Workshop Template",
+    itemType: "Workshop",
+    sections: [...WORKSHOP_SECTIONS],
+  },
+  {
+    id: "proposal-default",
+    name: "Default Proposal Template",
+    itemType: "Proposal",
+    sections: [...PROPOSAL_SECTIONS],
+  },
+  {
     id: "generic-default",
     name: "Default Template",
     itemType: "*",
@@ -174,6 +203,46 @@ export function findPresetTemplate(id: string): CreateTemplatePreset | null {
   return PRESET_TEMPLATES.find((p) => p.id === id) ?? null;
 }
 
+export function presetMatchesItemType(
+  preset: CreateTemplatePreset,
+  itemType: string,
+): boolean {
+  return preset.itemType === "*" || preset.itemType === itemType;
+}
+
+/** Reset template selection when it no longer matches the current item type. */
+export function reconcileTemplateForType(
+  state: CreateWorkflowState,
+): CreateWorkflowState {
+  const itemType = resolvedTypeLabel(state);
+  if (!itemType) return state;
+
+  const id = state.selectedTemplateId;
+  if (id && id !== "none") {
+    const preset = findPresetTemplate(id);
+    if (preset && !presetMatchesItemType(preset, itemType)) {
+      return initializeTemplateForWorkflow({
+        ...state,
+        selectedTemplateId: null,
+        selectedTemplateName: null,
+        templateSections: null,
+      });
+    }
+    const custom = findCustomTemplate(id);
+    if (custom && custom.itemType !== itemType) {
+      return initializeTemplateForWorkflow({
+        ...state,
+        selectedTemplateId: null,
+        selectedTemplateName: null,
+        templateSections: null,
+      });
+    }
+    return state;
+  }
+
+  return initializeTemplateForWorkflow(state);
+}
+
 export function defaultTemplateFor(
   itemType: string,
   subtype?: string | null,
@@ -183,6 +252,8 @@ export function defaultTemplateFor(
     const match = list.find((p) => p.subtype === subtype);
     if (match) return match;
   }
+  const specific = list.find((p) => p.itemType === itemType);
+  if (specific) return specific;
   return (
     list[0] ??
     PRESET_TEMPLATES.find((p) => p.id === "generic-default") ?? {
@@ -266,15 +337,25 @@ export function resolveTemplateSections(
   }
   const id = state.selectedTemplateId;
   if (!id || id === "none") return null;
-  const custom = findCustomTemplate(id);
-  if (custom) return custom.sections;
-  const preset = findPresetTemplate(id);
-  if (preset) return preset.sections;
   const itemType = resolvedTypeLabel(state);
   const subtype = effectiveSubtypeLabel(
     state.selectedSubtype,
     state.customSubtype,
   );
+  const custom = findCustomTemplate(id);
+  if (custom) {
+    if (custom.itemType !== itemType) {
+      return defaultTemplateFor(itemType, subtype).sections;
+    }
+    return custom.sections;
+  }
+  const preset = findPresetTemplate(id);
+  if (preset) {
+    if (!presetMatchesItemType(preset, itemType)) {
+      return defaultTemplateFor(itemType, subtype).sections;
+    }
+    return preset.sections;
+  }
   return defaultTemplateFor(itemType, subtype).sections;
 }
 
@@ -322,9 +403,17 @@ export function applyTemplateSelection(
 export function initializeTemplateForWorkflow(
   state: CreateWorkflowState,
 ): CreateWorkflowState {
-  if (state.selectedTemplateId) return state;
   const itemType = resolvedTypeLabel(state);
   if (!itemType) return state;
+
+  const id = state.selectedTemplateId;
+  if (id && id !== "none") {
+    const preset = findPresetTemplate(id);
+    if (preset && presetMatchesItemType(preset, itemType)) return state;
+    const custom = findCustomTemplate(id);
+    if (custom && custom.itemType === itemType) return state;
+  }
+
   const subtype = effectiveSubtypeLabel(
     state.selectedSubtype,
     state.customSubtype,

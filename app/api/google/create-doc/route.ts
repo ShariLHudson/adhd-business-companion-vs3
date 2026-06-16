@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { G_COOKIE, parseTokens, refreshIfNeeded } from "@/lib/google";
+import { applyContentToGoogleDoc } from "@/lib/googleDocContent";
 
-// Create a real Google Doc with the given content and return its URL.
-// Uses Drive's multipart upload: text/plain converted to a Google Doc.
+/** Create a Google Doc/Sheet with content and return its URL + file id. */
 export async function POST(request: NextRequest) {
   const stored = parseTokens(request.cookies.get(G_COOKIE)?.value);
   if (!stored) {
@@ -16,59 +16,96 @@ export async function POST(request: NextRequest) {
   const kind =
     rawKind === "sheet" ? "sheet" : rawKind === "form" ? "form" : "doc";
 
+  if (!content.trim()) {
+    return NextResponse.json(
+      { error: "No draft content to export." },
+      { status: 400 },
+    );
+  }
+
   const tokens = await refreshIfNeeded(stored);
 
-  const mimeType =
-    kind === "sheet"
-      ? "application/vnd.google-apps.spreadsheet"
-      : "application/vnd.google-apps.document";
-  const partType = kind === "sheet" ? "text/csv" : "text/plain";
   const fileTitle =
     kind === "form" && !title.toLowerCase().includes("form")
       ? `Form: ${title}`
       : title;
 
-  const boundary = `spark${Date.now()}`;
-  const metadata = { name: fileTitle, mimeType };
-  const multipart =
-    `--${boundary}\r\n` +
-    `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
-    `${JSON.stringify(metadata)}\r\n` +
-    `--${boundary}\r\n` +
-    `Content-Type: ${partType}; charset=UTF-8\r\n\r\n` +
-    `${content}\r\n` +
-    `--${boundary}--`;
-
   try {
-    const r = await fetch(
-      "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",
-      {
+    let fileId: string;
+
+    if (kind === "doc" || kind === "form") {
+      const createRes = await fetch("https://www.googleapis.com/drive/v3/files", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${tokens.access_token}`,
-          "Content-Type": `multipart/related; boundary=${boundary}`,
+          "Content-Type": "application/json",
         },
-        body: multipart,
-      },
-    );
-    if (!r.ok) {
-      const detail = await r.text();
-      console.error("Drive create error:", detail);
-      // Token likely expired/invalid — signal the client to reconnect.
-      return NextResponse.json(
-        { error: "Couldn't create the doc." },
-        { status: r.status === 401 ? 401 : 502 },
+        body: JSON.stringify({
+          name: fileTitle,
+          mimeType: "application/vnd.google-apps.document",
+        }),
+      });
+      if (!createRes.ok) {
+        const detail = await createRes.text();
+        console.error("Drive create error:", detail);
+        return NextResponse.json(
+          { error: "Couldn't create the doc." },
+          { status: createRes.status === 401 ? 401 : 502 },
+        );
+      }
+      const created = await createRes.json();
+      fileId = created.id as string;
+
+      const applied = await applyContentToGoogleDoc(
+        tokens.access_token,
+        fileId,
+        content,
       );
+      if (!applied.ok) {
+        return NextResponse.json({ error: applied.error }, { status: 502 });
+      }
+    } else {
+      const mimeType = "application/vnd.google-apps.spreadsheet";
+      const boundary = `spark${Date.now()}`;
+      const metadata = { name: fileTitle, mimeType };
+      const multipart =
+        `--${boundary}\r\n` +
+        `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+        `${JSON.stringify(metadata)}\r\n` +
+        `--${boundary}\r\n` +
+        `Content-Type: text/csv; charset=UTF-8\r\n\r\n` +
+        `${content}\r\n` +
+        `--${boundary}--`;
+
+      const r = await fetch(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${tokens.access_token}`,
+            "Content-Type": `multipart/related; boundary=${boundary}`,
+          },
+          body: multipart,
+        },
+      );
+      if (!r.ok) {
+        const detail = await r.text();
+        console.error("Drive create error:", detail);
+        return NextResponse.json(
+          { error: "Couldn't create the sheet." },
+          { status: r.status === 401 ? 401 : 502 },
+        );
+      }
+      const j = await r.json();
+      fileId = j.id as string;
     }
-    const j = await r.json();
+
     const url =
       kind === "sheet"
-        ? `https://docs.google.com/spreadsheets/d/${j.id}/edit`
-        : kind === "form"
-          ? `https://docs.google.com/document/d/${j.id}/edit`
-          : `https://docs.google.com/document/d/${j.id}/edit`;
-    const res = NextResponse.json({ url });
-    // Persist any refreshed access token.
+        ? `https://docs.google.com/spreadsheets/d/${fileId}/edit`
+        : `https://docs.google.com/document/d/${fileId}/edit`;
+
+    const res = NextResponse.json({ url, id: fileId });
     if (tokens.access_token !== stored.access_token) {
       res.cookies.set(G_COOKIE, JSON.stringify(tokens), {
         httpOnly: true,
