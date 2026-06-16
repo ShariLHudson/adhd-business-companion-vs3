@@ -64,6 +64,8 @@ export type CreateWorkflowState = {
   useTemplate: boolean;
   draftStatus: DraftStatus;
   draftContent: string | null;
+  /** Stable id shared between chat builder and Create panel. */
+  sessionId?: string | null;
   /** create_only = panel asks questions; split_screen = chat asks, panel shows output. */
   questionMode: CreateQuestionMode;
 };

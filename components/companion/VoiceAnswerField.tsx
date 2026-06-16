@@ -18,14 +18,14 @@ type VoiceAnswerFieldProps = {
   multiline?: boolean;
   className?: string;
   inputClassName?: string;
+  /** Accessibility label for the mic — not shown visually. */
   micTitle?: string;
-  /** Compact layout: answer field + Speak row — no large voice header. */
+  /** @deprecated Layout is always compact (icon beside field). */
   compact?: boolean;
 };
 
 /**
- * Standard question answer UI: voice row above the text field.
- * Speech fills the field; user edits or taps mic again before submitting.
+ * Standard question answer UI: text field with mic icon beside it (no visible label).
  */
 export function VoiceAnswerField({
   value,
@@ -36,22 +36,17 @@ export function VoiceAnswerField({
   multiline = true,
   className = "",
   inputClassName,
-  micTitle = "Speak your answer instead of typing",
-  compact = false,
+  micTitle = "Voice input",
 }: VoiceAnswerFieldProps) {
   const fieldCls =
     inputClassName ??
     (multiline
-      ? compact
-        ? "min-h-[3.25rem] w-full resize-none rounded-xl border border-[#d4cdc3] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f] focus:ring-2 focus:ring-[#1e4f4f]/10"
-        : "min-h-[120px] w-full resize-none rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-      : compact
-        ? "w-full rounded-xl border border-[#d4cdc3] bg-white px-4 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f] focus:ring-2 focus:ring-[#1e4f4f]/10"
-        : "w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]");
+      ? "min-h-[3.25rem] flex-1 resize-none rounded-xl border border-[#d4cdc3] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f] focus:ring-2 focus:ring-[#1e4f4f]/10"
+      : "min-h-[2.75rem] flex-1 rounded-xl border border-[#d4cdc3] bg-white px-4 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f] focus:ring-2 focus:ring-[#1e4f4f]/10");
 
-  if (compact) {
-    return (
-      <div className={className}>
+  return (
+    <div className={className}>
+      <div className="flex items-start gap-2">
         {multiline ? (
           <textarea
             id={id}
@@ -72,46 +67,11 @@ export function VoiceAnswerField({
             className={fieldCls}
           />
         )}
-        <div className="mt-2 flex items-center gap-2">
-          <MicButton
-            onText={(t) => onChange(appendVoiceText(value, t))}
-            title={micTitle}
-          />
-          <span className="text-sm font-semibold text-[#1e4f4f]">Speak</span>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className={className}>
-      <div className="flex items-center gap-2">
         <MicButton
           onText={(t) => onChange(appendVoiceText(value, t))}
           title={micTitle}
         />
-        <span className="text-sm font-semibold text-[#1e4f4f]">Voice Input</span>
       </div>
-      {multiline ? (
-        <textarea
-          id={id}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          autoFocus={autoFocus}
-          className={`mt-2 ${fieldCls}`}
-        />
-      ) : (
-        <input
-          id={id}
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          autoFocus={autoFocus}
-          className={`mt-2 ${fieldCls}`}
-        />
-      )}
     </div>
   );
 }

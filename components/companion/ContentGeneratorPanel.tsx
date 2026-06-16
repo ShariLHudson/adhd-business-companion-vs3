@@ -192,7 +192,10 @@ export function ContentGeneratorPanel({
     key: number;
     workflow?: CreateWorkflowState;
   } | null;
-  onChatBuildComplete?: () => void;
+  onChatBuildComplete?: (result: {
+    draft: string;
+    workflow: CreateWorkflowState;
+  }) => void;
   onChatBuildFailed?: () => void;
   onCompanionBuilderAction?: (action: "retry" | "add-detail") => void;
   /** Parent-triggered draft revision from chat builder. */
@@ -363,6 +366,14 @@ export function ContentGeneratorPanel({
   const lastChatSyncSig = useRef("");
   useEffect(() => {
     if (!companionBuilderMode || !chatSyncedWorkflow) return;
+    const local = workflowRef.current;
+    if (
+      local.draftStatus === "ready" &&
+      Boolean(local.draftContent?.trim()) &&
+      chatSyncedWorkflow.draftStatus !== "ready"
+    ) {
+      return;
+    }
     const label =
       resolvedTypeLabel(chatSyncedWorkflow) ||
       chatSyncedWorkflow.selectedTypeLabel ||
@@ -384,6 +395,12 @@ export function ContentGeneratorPanel({
         questionMode: "split_screen",
       }),
     );
+    if (
+      chatSyncedWorkflow.draftContent?.trim() &&
+      chatSyncedWorkflow.draftStatus === "ready"
+    ) {
+      setDraft(chatSyncedWorkflow.draftContent);
+    }
     const resolved = resolvedTypeLabel(chatSyncedWorkflow);
     if (resolved && resolved !== type) {
       setType(resolved);
@@ -417,8 +434,13 @@ export function ContentGeneratorPanel({
     b: string,
     tn: string,
     wf: CreateWorkflowState = workflowRef.current,
+    opts?: { fromChatApproval?: boolean },
   ): Promise<boolean> {
-    const validation = validateCreateForBuild(wf);
+    const resolvedBrief = b.trim() || buildFullCreateBrief(wf);
+    const validation = validateCreateForBuild(wf, {
+      fromChatApproval: opts?.fromChatApproval,
+      brief: resolvedBrief,
+    });
     logCreateBuild("Create Session Loaded", {
       itemType: validation.itemType,
       subtype: validation.subtype,
@@ -430,7 +452,6 @@ export function ContentGeneratorPanel({
     logCreateBuild(`Answers Found: ${validation.answersCount}`);
 
     const resolvedType = t.trim() || validation.itemType || type;
-    const resolvedBrief = b.trim() || buildFullCreateBrief(wf);
 
     if (!validation.ok) {
       logCreateError({
@@ -509,15 +530,21 @@ export function ContentGeneratorPanel({
         const content = data.result;
         setDraft(content);
         if (resolvedType && resolvedType !== type) setType(resolvedType);
-        setWorkflow((prev) => ({
-          ...prev,
+        const nextWorkflow: CreateWorkflowState = {
+          ...wf,
           buildApproved: true,
           draftStatus: "ready",
           draftContent: content,
           step: "improve",
           readinessConfirmed: true,
-        }));
-        logCreateBuild("Draft generated", {
+        };
+        workflowRef.current = nextWorkflow;
+        setWorkflow(nextWorkflow);
+        logCreateBuild("Draft generator returned", {
+          itemType: resolvedType,
+          length: content.length,
+        });
+        logCreateBuild("Draft content saved", {
           itemType: resolvedType,
           length: content.length,
         });
@@ -909,6 +936,7 @@ export function ContentGeneratorPanel({
     briefText: string,
     typeOverride?: string,
     wfOverride?: CreateWorkflowState,
+    fromChat = false,
   ) {
     const wf = wfOverride ?? workflowRef.current;
     if (wfOverride) {
@@ -930,7 +958,7 @@ export function ContentGeneratorPanel({
     const fullBrief = briefText.trim() || buildFullCreateBrief(wf);
     setBrief(fullBrief);
     setTopic(fullBrief);
-    return run(resolved, fullBrief, tone, wf);
+    return run(resolved, fullBrief, tone, wf, { fromChatApproval: fromChat });
   }
 
   const lastChatBuildKey = useRef(0);
@@ -963,9 +991,18 @@ export function ContentGeneratorPanel({
       chatBuildRequest.brief,
       chatBuildRequest.type,
       wf,
+      true,
     ).then((ok) => {
-      if (ok) onChatBuildComplete?.();
-      else onChatBuildFailed?.();
+      if (ok) {
+        logCreateBuild("Workspace rendered draft", {
+          itemType: chatBuildRequest.type,
+          length: workflowRef.current.draftContent?.length ?? 0,
+        });
+        onChatBuildComplete?.({
+          draft: workflowRef.current.draftContent ?? "",
+          workflow: workflowRef.current,
+        });
+      } else onChatBuildFailed?.();
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatBuildRequest]);
@@ -1165,6 +1202,14 @@ export function ContentGeneratorPanel({
                   setBuildErrorMessage(null);
                   setWorkflow((prev) => enterAddDetailStep(prev));
                   onCompanionBuilderAction?.("add-detail");
+                }
+              : undefined
+          }
+          onCopyAnswers={
+            workspacePhase === "error"
+              ? () => {
+                  const text = buildFullCreateBrief(workflowRef.current);
+                  if (text.trim()) void navigator.clipboard?.writeText(text);
                 }
               : undefined
           }

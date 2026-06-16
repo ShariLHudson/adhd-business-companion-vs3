@@ -51,6 +51,8 @@ describe("createBuilderChat", () => {
   it("detects affirmative approval", () => {
     expect(isAffirmative("yes")).toBe(true);
     expect(isAffirmative("go ahead")).toBe(true);
+    expect(isAffirmative("generate it")).toBe(true);
+    expect(isAffirmative("draft it")).toBe(true);
     expect(isAffirmative("maybe later")).toBe(false);
   });
 

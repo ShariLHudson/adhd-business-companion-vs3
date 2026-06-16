@@ -38,6 +38,7 @@ export function CreateSplitScreenStatus({
   errorMessage,
   onTryAgain,
   onAddMoreDetail,
+  onCopyAnswers,
 }: {
   itemType: string | null;
   selectedSubtype?: string | null;
@@ -47,6 +48,7 @@ export function CreateSplitScreenStatus({
   errorMessage?: string | null;
   onTryAgain?: () => void;
   onAddMoreDetail?: () => void;
+  onCopyAnswers?: () => void;
 }) {
   const subtype = effectiveSubtypeLabel(selectedSubtype ?? null, customSubtype ?? null);
   const displayType = itemType?.trim() || null;
@@ -96,7 +98,8 @@ export function CreateSplitScreenStatus({
             ? errorMessage
             : copy.detail}
         </p>
-        {workspacePhase === "error" && (onTryAgain || onAddMoreDetail) ? (
+        {workspacePhase === "error" &&
+        (onTryAgain || onAddMoreDetail || onCopyAnswers) ? (
           <div className="mt-5 flex flex-wrap justify-center gap-2">
             {onTryAgain ? (
               <button
@@ -114,6 +117,15 @@ export function CreateSplitScreenStatus({
                 onClick={onAddMoreDetail}
               >
                 Add More Detail
+              </button>
+            ) : null}
+            {onCopyAnswers ? (
+              <button
+                type="button"
+                className="rounded-lg border border-[#c9bfb0] bg-white px-4 py-2 text-sm font-semibold text-[#1f1c19] hover:bg-[#faf8f5]"
+                onClick={onCopyAnswers}
+              >
+                Copy Answers
               </button>
             ) : null}
           </div>

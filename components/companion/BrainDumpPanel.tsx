@@ -257,7 +257,6 @@ export function BrainDumpPanel({
         placeholder="Everything on your mind right now…"
         className="mt-5"
         inputClassName="min-h-[120px] resize-none rounded-2xl border-2 border-[#d4cdc3] bg-white/90 px-5 py-4 text-lg leading-relaxed text-[#1f1c19] placeholder:text-[#9a8f82] focus:border-[#1e4f4f] focus:outline-none focus:ring-2 focus:ring-[#1e4f4f]/15"
-        micTitle="Speak your thoughts instead of typing"
       />
       <div className="mt-3 flex items-center justify-end gap-2">
         <button

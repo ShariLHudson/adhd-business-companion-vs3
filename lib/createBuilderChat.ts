@@ -23,6 +23,7 @@ import {
 } from "./createWorkflow";
 import { buildFullCreateBrief } from "./createTemplates";
 import { logCreateBuild } from "./createBuild";
+import { logSharedCreateSession } from "./createSharedSession";
 import { DRAFT_QUICK_EDITS } from "./createWorkspaceUx";
 
 export type CreateBuilderPhase =
@@ -95,7 +96,7 @@ export function isAffirmative(text: string): boolean {
   const t = text.trim().toLowerCase();
   return /^(yes|yep|yeah|sure|ok|okay|please|go ahead|do it|generate|create it|create draft|build draft|build it|ready|sounds good|let's go|lets go|y)\b/.test(
     t,
-  );
+  ) || /^(generate it|draft it|create it|build it)$/i.test(t.trim());
 }
 
 export function isAddMoreInformation(text: string): boolean {
@@ -315,11 +316,13 @@ export function processCreateBuilderTurn(
       /^create draft$/i.test(trimmed) ||
       /^build draft$/i.test(trimmed) ||
       /^build it$/i.test(trimmed) ||
-      /^create it$/i.test(trimmed)
+      /^create it$/i.test(trimmed) ||
+      /^generate it$/i.test(trimmed) ||
+      /^draft it$/i.test(trimmed)
     ) {
       const brief = buildFullCreateBrief(session.workflow);
       const generateType = resolvedTypeLabel(session.workflow) || typeLabel;
-      logCreateBuild("Build Draft clicked", {
+      logCreateBuild("Build requested", {
         itemType: generateType,
         source: "chat",
       });
@@ -378,7 +381,7 @@ export function processCreateBuilderTurn(
       question.id,
       trimmed,
     );
-    logCreateBuild("Answers collected", {
+    logCreateBuild("Chat answer saved", {
       itemType: typeLabel,
       questionId: question.id,
       answersCount: answeredDiscoveryCount(nextWorkflow),
@@ -436,12 +439,14 @@ function enterReadiness(
       ...session.workflow,
       step: "readiness",
       questionMode: "split_screen",
+      readinessConfirmed: true,
     },
   };
-  logCreateBuild("Ready to build", {
+  logCreateBuild("Ready to build set", {
     itemType: typeLabel,
     answersCount: answeredDiscoveryCount(ready.workflow),
   });
+  logSharedCreateSession("Ready to build", ready.workflow, ready.workflow.sessionId);
   return {
     session: ready,
     reply: READINESS_PROMPT,

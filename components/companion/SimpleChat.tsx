@@ -102,7 +102,7 @@ export function SimpleChat({
 
       {visible.length === 0 && !isLoading && !stateHint && !hideEmptyState && (
         <p className="mb-6 text-center text-lg leading-relaxed text-[#5c534a]">
-          Start typing or tap the mic — I&apos;m listening.
+          Start typing — I&apos;m listening.
         </p>
       )}
 

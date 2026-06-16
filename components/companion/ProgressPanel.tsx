@@ -290,7 +290,7 @@ export function ProgressPanel({ onOpen }: { onOpen?: (s: AppSection) => void }) 
               onKeyDown={(e) => {
                 if (e.key === "Enter") saveReflection();
               }}
-              placeholder="Type or tap 🎤 to speak…"
+              placeholder="Optional reflection…"
               className="min-w-0 flex-1 rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
             />
             <MicButton

@@ -25,7 +25,7 @@ type SpeechResultEvent = {
 
 export function MicButton({
   onText,
-  title = "Speak instead of typing",
+  title = "Voice input",
   className,
   lang,
 }: {

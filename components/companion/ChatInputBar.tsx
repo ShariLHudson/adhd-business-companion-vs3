@@ -33,7 +33,7 @@ export function ChatInputBar({
         type="button"
         onClick={onToggleListening}
         disabled={!speechSupported || isLoading}
-        aria-label={isListening ? "Stop listening" : "Start voice input"}
+        aria-label={isListening ? "Stop listening" : "Voice input"}
         aria-pressed={isListening}
         title={
           speechSupported ? "Voice input" : "Voice not supported in this browser"

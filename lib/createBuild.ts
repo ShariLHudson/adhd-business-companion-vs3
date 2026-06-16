@@ -24,6 +24,7 @@ export type CreateBuildValidation = {
 
 export function validateCreateForBuild(
   state: CreateWorkflowState,
+  options?: { fromChatApproval?: boolean; brief?: string },
 ): CreateBuildValidation {
   const itemType = resolvedTypeLabel(state);
   const subtype = effectiveSubtypeLabel(
@@ -37,9 +38,17 @@ export function validateCreateForBuild(
   if (!itemType.trim()) missing.push("itemType");
   if (answersCount === 0) missing.push("questionAnswers");
 
+  const fieldsComplete = requiredFieldsComplete(itemType, state.discoveryAnswers);
+  const chatReady =
+    Boolean(options?.fromChatApproval) &&
+    answersCount > 0 &&
+    Boolean(itemType.trim()) &&
+    Boolean(options?.brief?.trim());
+
   const readyToBuild =
-    (state.step === "readiness" || state.step === "add-detail") &&
-    requiredFieldsComplete(itemType, state.discoveryAnswers);
+    chatReady ||
+    ((state.step === "readiness" || state.step === "add-detail") &&
+      fieldsComplete);
 
   if (!readyToBuild) missing.push("readyToBuild");
 

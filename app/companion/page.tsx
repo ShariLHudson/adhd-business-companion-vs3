@@ -123,6 +123,10 @@ import {
 } from "@/lib/createBuilderChat";
 import { EMPTY_CREATE_WORKFLOW } from "@/lib/createWorkflow";
 import { logCreateBuild } from "@/lib/createBuild";
+import {
+  logSharedCreateSession,
+  newCreateSessionId,
+} from "@/lib/createSharedSession";
 import { CreateBuilderActionBar } from "@/components/companion/CreateBuilderActionBar";
 import {
   artifactLockHintForChat,
@@ -1163,11 +1167,18 @@ export default function CompanionPage() {
     const resume =
       type && panelWorkflowHasProgress(panelWorkflow ?? createPanelWorkflowRef.current);
     const wf = panelWorkflow ?? createPanelWorkflowRef.current;
+    const sessionId = wf.sessionId ?? newCreateSessionId();
     const { session, opener } =
       resume && wf
         ? bootstrapCreateBuilderFromWorkflow(type, wf)
         : bootstrapCreateBuilderSession(type);
-    setCreateBuilderSession(session);
+    const withSession = {
+      ...session,
+      workflow: { ...session.workflow, sessionId, questionMode: "split_screen" as const },
+    };
+    setCreateBuilderSession(withSession);
+    createPanelWorkflowRef.current = withSession.workflow;
+    logSharedCreateSession("Active create session found", withSession.workflow, sessionId);
     if (session.typeLabel) syncCreateBuilderType(session.typeLabel);
     setMessages((prev) => {
       if (
@@ -1216,12 +1227,32 @@ export default function CompanionPage() {
     createBuilderBootstrappedRef.current = true;
   }
 
-  function handleChatBuildComplete() {
+  function handleChatBuildComplete(result: {
+    draft: string;
+    workflow: import("@/lib/createWorkflow").CreateWorkflowState;
+  }) {
     const type = createBuilderSessionRef.current?.typeLabel ?? "draft";
+    const mergedWorkflow = {
+      ...result.workflow,
+      draftContent: result.draft,
+      draftStatus: "ready" as const,
+      buildApproved: true,
+      step: "improve" as const,
+    };
+    createPanelWorkflowRef.current = mergedWorkflow;
     setCreateBuilderSession((prev) =>
-      prev ? markCreateBuilderGenerated(prev) : prev,
+      prev
+        ? {
+            ...markCreateBuilderGenerated(prev),
+            workflow: mergedWorkflow,
+          }
+        : prev,
     );
     setChatBuildRequest(null);
+    logCreateBuild("Draft generator returned", {
+      itemType: type,
+      length: result.draft.length,
+    });
     setMessages((prev) => [
       ...prev,
       {
@@ -1258,6 +1289,7 @@ export default function CompanionPage() {
 
   function handleChatBuildFailed() {
     setChatBuildRequest(null);
+    logCreateBuild("Generation failed", { source: "chat-build" });
     setCreateBuilderSession((prev) =>
       prev
         ? {
@@ -3280,8 +3312,26 @@ export default function CompanionPage() {
       setIsLoading(false);
 
       const turn = processCreateBuilderTurn(builderSession, trimmed);
-      setCreateBuilderSession(turn.session);
-      createPanelWorkflowRef.current = turn.session.workflow;
+      const sessionId =
+        builderSession.workflow.sessionId ?? newCreateSessionId();
+      const nextSession = {
+        ...turn.session,
+        workflow: {
+          ...turn.session.workflow,
+          sessionId,
+          questionMode: "split_screen" as const,
+        },
+      };
+      setCreateBuilderSession(nextSession);
+      createPanelWorkflowRef.current = nextSession.workflow;
+      logSharedCreateSession("Chat answer saved", nextSession.workflow, sessionId);
+
+      if (nextSession.phase === "readiness") {
+        logCreateBuild("Ready to build set", {
+          itemType: nextSession.typeLabel,
+          sessionId,
+        });
+      }
 
       if (turn.session.typeLabel && turn.session.typeLabel !== creationContext?.itemType) {
         syncCreateBuilderType(turn.session.typeLabel);
@@ -3296,7 +3346,7 @@ export default function CompanionPage() {
 
       if (turn.generateBrief && turn.generateType) {
         const wfForBuild = {
-          ...turn.session.workflow,
+          ...nextSession.workflow,
           draftStatus: "building" as const,
           readinessConfirmed: true,
           buildApproved: false,
@@ -3313,6 +3363,11 @@ export default function CompanionPage() {
             : prev,
         );
         createPanelWorkflowRef.current = wfForBuild;
+        logCreateBuild("Build requested", {
+          itemType: turn.generateType,
+          source: "chat-send",
+          sessionId: wfForBuild.sessionId,
+        });
         logCreateBuild("Workspace generating state set", {
           itemType: turn.generateType,
           source: "chat-send",

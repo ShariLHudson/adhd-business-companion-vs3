@@ -70,4 +70,19 @@ describe("createBuild", () => {
     expect(next.discoveryAnswers["extra-detail"]).toContain("April workshop");
     expect(next.discoveryAnswers.recipient).toBe("Sam");
   });
+
+  it("allows chat-approved build with brief even when fields incomplete", () => {
+    const wf = advanceAfterItemPick("Social Post");
+    const brief = "Post about ADHD Business Ecosystem launching July 1, 2026.";
+    const v = validateCreateForBuild(
+      {
+        ...wf,
+        step: "readiness",
+        discoveryAnswers: { topic: brief },
+      },
+      { fromChatApproval: true, brief },
+    );
+    expect(v.ok).toBe(true);
+    expect(v.readyToBuild).toBe(true);
+  });
 });
