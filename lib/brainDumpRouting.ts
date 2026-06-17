@@ -58,7 +58,7 @@ export const ROUTE_LABEL: Record<ClearMindRoute, string> = {
   project: "Project",
   focus: "Focus Session",
   tomorrow: "Work on tomorrow",
-  done: "Done for now",
+  done: "Keep in Library",
 };
 
 function trust(
@@ -120,7 +120,7 @@ export function routeBrainDumpEntry(
       logMomentum("start", `Time block: ${text.slice(0, 60)}`);
       return trust(
         `Added to Time Bank: "${text}"`,
-        "Time Bank",
+        "Time Bank",h
         "Open **Time Bank** to schedule it on your calendar.",
         route,
       );
