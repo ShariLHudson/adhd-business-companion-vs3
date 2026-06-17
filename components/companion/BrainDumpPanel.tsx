@@ -8,7 +8,7 @@ import {
   deleteBrainDump,
   getBrainDumps,
   getProjects,
-  saveProject,h
+  saveProject,
   todayStr,
   topicColor,
   updateBrainDump,
