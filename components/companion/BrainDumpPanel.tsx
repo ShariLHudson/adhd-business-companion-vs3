@@ -8,7 +8,7 @@ import {
   deleteBrainDump,
   getBrainDumps,
   getProjects,
-  saveProject,
+  saveProject,h
   todayStr,
   topicColor,
   updateBrainDump,
@@ -96,12 +96,12 @@ export function BrainDumpPanel({
   const [panelMode, setPanelMode] = useState<"session" | "library">("session");
   const [captureSessionId, setCaptureSessionId] = useState(newCaptureSessionId);
   const [routeTrust, setRouteTrust] = useState<string | null>(null);
-  // Filter-first: nothing shows until the user picks a filter (or a summary
+  // Filter-first: nothing shows until the user picks a filter (or a shummary
   // chip / View items). Brain Dump should feel like a filing cabinet, not an
   // inbox dumping everything at you on open.
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>("week");
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [viewed, setViewed] = useState(false);
+  const [viewed, setViewed] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [xpFlash, setXpFlash] = useState(false);
   const visualMode = useVisualMode();
@@ -280,7 +280,7 @@ export function BrainDumpPanel({
         <>
           {/* Filing-cabinet overview — clickable counts set the category. */}
           <p className="mt-7 text-sm font-bold uppercase tracking-wide text-[#7c7468]">
-            Your Clear My Mind items
+            Your saved thoughts
           </p>
           <p className="mt-1 text-sm text-[#6b635a]">
             You have {activeEntries.length}{" "}
@@ -290,7 +290,7 @@ export function BrainDumpPanel({
             timeframe and category to see what needs your attention.
           </p>
           {summary.length > 0 && (
-            <div className="mt-2 flex flex-wrap gap-1.5">
+            <div className="mt-3 flex flex-col gap-1.5">
               {summary.map(([cat, count]) => (
                 <button
                   key={cat}
@@ -301,7 +301,7 @@ export function BrainDumpPanel({
                   }}
                   className="rounded-full border border-[#d4cdc3] bg-white/80 px-3 py-1 text-sm font-medium text-[#3d3630] transition-colors hover:border-[#1e4f4f] hover:bg-white"
                 >
-                  {cat} <span className="text-[#6b635a]">({count})</span>
+                  {cat} <span className="text-[#6b635a]">— {count} {count === 1 ? "card" : "cards"}</span>
                 </button>
               ))}
             </div>
