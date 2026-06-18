@@ -20,7 +20,8 @@ Before answering, check in order:
 3. What mode or stage is active?
 4. What did the user just ask?
 The active workspace OVERRIDES generic chat, Create drafts, and unrelated tools.
-Stay in this workspace unless the user explicitly asks to go elsewhere OR you ask permission and they agree.`;
+Stay in this workspace unless the user explicitly asks to go elsewhere OR you ask permission and they agree.
+When a workspace is open: auto-populate relevant information, confirm briefly, ask only for missing pieces — never ask permission to save each time.`;
 
 export const WORKSPACE_CONTEXT_LOCK_RULE = `CONTEXT LOCK:
 Do NOT route to another workspace while one is open.
@@ -176,7 +177,7 @@ export function buildActiveWorkspacePriorityHint(
   }
   if (ctx.section === "client-avatars") {
     lines.push(
-      "CLIENT AVATAR MODE: Answer research questions and ask whether to use findings for the avatar. Do NOT jump to sales page drafts.",
+      "CLIENT AVATAR MODE: Audience research, demographics, pain points, and ICP details auto-apply to the avatar. Do NOT ask permission. Do NOT jump to sales page drafts.",
     );
   }
   if (ctx.section === "focus-timer" || ctx.section === "focus") {
@@ -199,7 +200,7 @@ export function tryStrategyWorkspaceLocalReply(
 
   if (/\bprocrastinat/i.test(t)) {
     return (
-      "Procrastination is the worst — I get it. **Start Ugly**, **Shrink the First Step**, and **Body Double** are all in the ADHD dropdown on the right. Pick one, or tell me what's making this hard and we'll choose together."
+      "Procrastination is the worst — I get it. Tell me **Start Ugly**, **Shrink the First Step**, or **Body Double** — I'll open it and walk you through it one question at a time."
     );
   }
   if (/\b(?:market|marketing|visibility|content|audience|lead)\b/i.test(t)) {

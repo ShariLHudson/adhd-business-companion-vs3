@@ -5,6 +5,10 @@ import {
   shouldLockArtifactType,
 } from "./artifactType";
 import {
+  isUnresolvedCreateType,
+  userFacingCreateTypeLabel,
+} from "./createTypePickers";
+import {
   formatSavedArtifactForPrompt,
   type SavedArtifactRecord,
 } from "./savedArtifact";
@@ -48,6 +52,9 @@ export type CreationWorkspaceInput = {
   artifactTypeLocked?: boolean;
   /** Panel discovery answers — preserved when opening Work With Shari. */
   createWorkflow?: CreateWorkflowState;
+  /** Parent plan/project when this is a child artifact. */
+  parentWorkflowTitle?: string | null;
+  parentWorkflowPanel?: AppSection | null;
 };
 
 export type CreationWorkspaceContext = CreationWorkspaceInput & {
@@ -62,7 +69,8 @@ export function toCreationContext(
   input: CreationWorkspaceInput,
 ): CreationWorkspaceContext {
   const draft = input.draftContent ?? "";
-  const itemType = normalizeArtifactType(input.itemType);
+  const raw = (input.itemType ?? "").trim();
+  const itemType = raw ? normalizeArtifactType(raw) : "";
   return {
     section,
     itemType,
@@ -79,6 +87,8 @@ export function toCreationContext(
     snippetKind: input.snippetKind,
     artifactTypeLocked:
       input.artifactTypeLocked ?? shouldLockArtifactType(itemType),
+    parentWorkflowTitle: input.parentWorkflowTitle ?? null,
+    parentWorkflowPanel: input.parentWorkflowPanel ?? null,
   };
 }
 
@@ -88,9 +98,14 @@ export function formatCreationContextForPrompt(
 ): string | undefined {
   if (!ctx) return undefined;
 
+  const displayType = userFacingCreateTypeLabel(ctx.itemType);
   const lines = [
     "CURRENT CREATION WORKSPACE:",
-    `- Artifact type: ${ctx.itemType}${ctx.artifactTypeLocked ? " (LOCKED — do not switch to another format)" : ""}`,
+    ...(displayType
+      ? [
+          `- Creating: ${displayType}${ctx.artifactTypeLocked ? " (LOCKED — do not switch to another format)" : ""}`,
+        ]
+      : ["- Creating: (type not chosen yet — ask what they want to make)"]),
     `- Title: ${ctx.title || "(untitled)"}`,
     `- Draft exists: ${ctx.draftContent.trim() ? "yes" : "no"}`,
     `- Linked project: ${ctx.linkedProjectName?.trim() || "none"}`,
@@ -112,6 +127,13 @@ export function formatCreationContextForPrompt(
     lines.push("", `Brief / notes: ${ctx.brief.trim().slice(0, 1200)}`);
   }
 
+  if (ctx.parentWorkflowTitle?.trim()) {
+    lines.push(
+      "",
+      `PARENT WORKFLOW: ${ctx.parentWorkflowTitle} (stay in this context — child draft beside chat, not a new generic Create session).`,
+    );
+  }
+
   lines.push("", CREATION_COACH_RULES);
 
   const savedBlock = formatSavedArtifactForPrompt(savedArtifact);
@@ -125,10 +147,8 @@ export const CREATION_COACH_RULES = `CREATE WORKSPACE RULES (Business Asset Buil
 - Never tell the user their work is "in chat" when a draft is visible in Create — it lives in the workspace.
 - Chat is a normal conversation: answer questions, explain, brainstorm, research, coach, and review.
 - Never mention workflow steps, fields (Audience, Topic, CTA), or "we're on step X".
-- Never write the user's chat message into the draft or any field unless they explicitly ask to apply/update/add it.
-- Before applying chat suggestions to the draft, ask: "Would you like me to apply this to the draft?"
-- The draft in the panel is the source of truth. Suggest changes in chat; offer "Would you like me to add that to the draft?" or similar before applying.
-- User may brainstorm in chat — that is thinking out loud, not content to save.
+- When Create is open beside chat, relevant content auto-applies to the draft — NEVER ask "Would you like me to apply/save/add this?"
+- User may brainstorm idea lists in chat — those stay in chat until they pick a direction; then auto-apply the chosen content.
 - Reference what's already visible (type, title, draft). Never ask "what's your title?" if the title is on screen.
 - Reference templates, snippets, business profile, and audience when asked.`;
 
@@ -159,9 +179,9 @@ export function formatCreationCoGuideHint(
     opts?.draftVisible === false
       ? "- The draft is NOT visible in the panel right now. Do NOT tell the user they can see it on screen."
       : hasDraft
-        ? "- A draft is visible in the panel. Reference it. Offer to update it; do not silently change it."
+        ? "- A draft is visible in the panel. Reference it. Update it automatically when they provide content — do NOT ask permission."
         : "- Help while the draft generates or while they compose in the panel.",
-    "- When they say 'use those' / 'add that' / 'update the plan': acknowledge and offer to apply to the draft.",
+    "- When they share content for the draft: apply it silently to the panel and continue the conversation.",
   ];
 
   return lines.join("\n");
@@ -171,17 +191,21 @@ export function buildCreationWorkspaceOpenMessage(
   ctx: CreationWorkspaceContext,
 ): string {
   const hasDraft = Boolean(ctx.draftContent.trim());
-  const typeLabel = ctx.itemType || "content";
+  const displayType = userFacingCreateTypeLabel(ctx.itemType);
 
-  if (hasDraft) {
+  if (hasDraft && displayType) {
     const titlePart = ctx.title.trim() ? ` — **${ctx.title.trim()}**` : "";
     const proj = ctx.linkedProjectName?.trim()
       ? ` It's linked to **${ctx.linkedProjectName.trim()}**.`
       : "";
-    return `I can see your **${typeLabel}** draft beside us${titlePart}.${proj} Ask me anything while you edit — explain, brainstorm, tighten wording, or say what to change.`;
+    return `I can see your **${displayType}** draft beside us${titlePart}.${proj} Ask me anything while you edit — explain, brainstorm, tighten wording, or say what to change.`;
   }
 
-  return `Let's build this **${typeLabel}** together. Talk through ideas here while you work in the panel beside you.`;
+  if (displayType) {
+    return `Let's build this **${displayType}** together. Talk through ideas here while you work in the panel beside you.`;
+  }
+
+  return "What would you like to create? Pick a type in the panel or tell me here.";
 }
 
 /** Skip SOP step-one when user already has a draft open beside chat. */

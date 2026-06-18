@@ -20,8 +20,11 @@ import {
   BUSINESS_STRATEGY_TEMPLATES,
   STRATEGIES_HUB,
   adhdStrategyDropdownGroups,
+  businessBuiltinStrategyCount,
   type AdhdStrategyHubEntry,
 } from "@/lib/strategyCatalog";
+import { BusinessStrategyDock } from "@/components/companion/BusinessStrategyDock";
+import type { BusinessStrategySession } from "@/lib/businessStrategyBuilder";
 import { compareDropdownLabels } from "@/lib/dropdownSort";
 import {
   getUserStrategies,
@@ -31,9 +34,13 @@ import {
   type UserStrategy,
 } from "@/lib/userStrategies";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { StrategyApplyPanel } from "@/components/companion/StrategyApplyPanel";
+import type { StrategyApplySession } from "@/lib/strategyApplyCoach";
 import { useVisualMode } from "@/lib/useVisualMode";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import { StrategyUseNow } from "@/components/companion/StrategyUseNow";
+import { CoachingLibraryPicker } from "@/components/companion/CoachingLibraryPicker";
+import { applyPromptForStrategy } from "@/lib/strategyApplyOptions";
 import { saveProject } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
 import { appReferences } from "@/lib/appReferences";
@@ -64,21 +71,6 @@ const DECOR: Record<string, string> = {
   "#6b8e23": "#22c55e",
 };
 
-// Apply Mode — turns a strategy into a guided, step-by-step coaching prompt so
-// Shari walks the user through THEIR situation instead of repeating the lesson.
-function applyPrompt(s: Strategy): string {
-  const questions =
-    s.coach && s.coach.length
-      ? s.coach
-      : s.steps.map((step) => `Help me with this part: ${step}`);
-  return [
-    `I want to actually apply the "${s.title}" strategy to my real situation right now — please coach me through it, don't just explain it again.`,
-    `Ask me these one at a time, waiting for my answer before moving to the next. Keep each question short and warm:`,
-    questions.map((q, i) => `${i + 1}. ${q}`).join("\n"),
-    `After the last one, give me a short encouraging close and offer to start a Focus Session or Time Block. Begin now with just the first question — nothing else.`,
-  ].join("\n\n");
-}
-
 // Category → Strategy → Action. ADHD-friendly: never more than 3 meaningful
 // choices on screen. Categories are navigation; strategies are action-first.
 export function StrategiesPanel({
@@ -86,15 +78,24 @@ export function StrategiesPanel({
   onAsk,
   onContextChange,
   onStartBusinessStrategy,
+  onStartStrategyApply,
   onOpenActivity,
   registerBack,
   openCommand,
+  strategyApplySession,
+  onDismissStrategyApply,
+  businessStrategySession,
+  businessStrategyDraft,
+  onDismissBusinessBuild,
+  onTalkBusinessWithShari,
 }: {
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
   onContextChange?: (detail: import("@/lib/workspaceAwareness").WorkspacePanelDetail) => void;
   /** Start business strategy builder beside chat (Create flow). */
   onStartBusinessStrategy?: (typeLabel: string) => void;
+  /** Start ADHD strategy apply coach beside chat. */
+  onStartStrategyApply?: (strategyId: string) => void;
   onOpenActivity?: (activityId: string) => void;
   registerBack?: (fn: (() => boolean) | null) => void;
   /** Parent-driven open (e.g. from chat: "open Start Ugly"). */
@@ -103,6 +104,13 @@ export function StrategiesPanel({
     strategyId?: string;
     hubEntryId?: string;
   } | null;
+  /** Active ADHD apply coach — shown on the matching strategy, not over the whole hub. */
+  strategyApplySession?: StrategyApplySession | null;
+  onDismissStrategyApply?: () => void;
+  businessStrategySession?: BusinessStrategySession | null;
+  businessStrategyDraft?: { typeLabel: string; draft: string } | null;
+  onDismissBusinessBuild?: () => void;
+  onTalkBusinessWithShari?: () => void;
 }) {
   const [view, setView] = useState<View>({ v: "home" });
   const [search, setSearch] = useState("");
@@ -201,8 +209,33 @@ export function StrategiesPanel({
     onOpen?.(route.section);
   }
 
+  function goToView(next: View) {
+    if (
+      strategyApplySession &&
+      (next.v !== "strategy" || next.stratId !== strategyApplySession.strategyId)
+    ) {
+      onDismissStrategyApply?.();
+    }
+    setView(next);
+  }
+
+  function openBusinessLibrary(subcatId?: string) {
+    setOpenSubcat(subcatId ?? null);
+    goToView({ v: "group", group: "business" });
+  }
+
+  const dockedPlan = (
+    <BusinessStrategyDock
+      session={businessStrategySession}
+      draft={businessStrategyDraft}
+      onTalkWithShari={onTalkBusinessWithShari}
+      onDismiss={onDismissBusinessBuild}
+    />
+  );
+
   function startBusiness(typeLabel: string) {
     onStartBusinessStrategy?.(typeLabel);
+    setBusinessPick("");
   }
 
   useEffect(() => {
@@ -237,6 +270,7 @@ export function StrategiesPanel({
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
         <WorkspaceGuide section="playbook" />
+        {dockedPlan}
         <p className="text-2xl font-semibold text-[#1f1c19]">Strategies</p>
         <p className="mt-1 text-base text-[#6b635a]">
           Apply an ADHD technique now, or create a business strategy with Shari.
@@ -276,6 +310,16 @@ export function StrategiesPanel({
                 </optgroup>
               ))}
             </select>
+            <button
+              type="button"
+              onClick={() => {
+                setOpenSubcat(null);
+                goToView({ v: "group", group: "personal" });
+              }}
+              className="mt-3 text-sm font-semibold text-[#1e4f4f]"
+            >
+              Browse all ADHD strategies by topic →
+            </button>
           </HubSection>
 
           <HubSection
@@ -284,6 +328,35 @@ export function StrategiesPanel({
             open={hubOpen.business}
             onToggle={() => toggleHub("business")}
           >
+            <p className="text-sm font-semibold text-[#1f1c19]">
+              Coaching library ({businessBuiltinStrategyCount()} strategies)
+            </p>
+            <p className="mt-0.5 text-sm text-[#6b635a]">
+              Proven moves for marketing, sales, content, pricing, and more —
+              pick a category, then a strategy.
+            </p>
+            <div className="mt-3">
+              <CoachingLibraryPicker
+                variant="hub"
+                onOpenStrategy={(id) => goToView({ v: "strategy", stratId: id })}
+                onApplyWithShari={(id) => onStartStrategyApply?.(id)}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => openBusinessLibrary()}
+              className="mt-3 text-sm font-semibold text-[#1e4f4f]"
+            >
+              Browse all business strategies by topic →
+            </button>
+
+            <p className="mt-5 text-sm font-semibold text-[#1f1c19]">
+              Build a custom plan with Shari
+            </p>
+            <p className="mt-0.5 text-sm text-[#6b635a]">
+              For a full marketing plan, 8-week roadmap, etc. — chat builds it
+              while you keep the library here.
+            </p>
             <select
               value={businessPick}
               onChange={(e) => {
@@ -291,9 +364,9 @@ export function StrategiesPanel({
                 setBusinessPick(v);
                 if (v) startBusiness(v);
               }}
-              className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+              className="mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
             >
-              <option value="">Select a business strategy type…</option>
+              <option value="">Select a plan type to build…</option>
               {businessOptions.map((label) => (
                 <option key={label} value={label}>
                   {label}
@@ -320,7 +393,7 @@ export function StrategiesPanel({
               onChange={(e) => {
                 const id = e.target.value;
                 setRecPick(id);
-                if (id) setView({ v: "strategy", stratId: id });
+                if (id) goToView({ v: "strategy", stratId: id });
               }}
               className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
             >
@@ -444,6 +517,31 @@ export function StrategiesPanel({
         <p className="mt-1 text-base text-[#6b635a]">
           {STRATEGIES_HUB.business.description}
         </p>
+
+        <p className="mt-5 text-sm font-semibold text-[#1f1c19]">
+          Coaching strategies
+        </p>
+        <div className="mt-2">
+          <CoachingLibraryPicker
+            variant="page"
+            onOpenStrategy={(id) => goToView({ v: "strategy", stratId: id })}
+            onApplyWithShari={(id) => onStartStrategyApply?.(id)}
+          />
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setOpenSubcat(null);
+            goToView({ v: "group", group: "business" });
+          }}
+          className="mt-3 text-sm font-semibold text-[#1e4f4f]"
+        >
+          Browse all business strategies by topic →
+        </button>
+
+        <p className="mt-6 text-sm font-semibold text-[#1f1c19]">
+          Build a custom plan with Shari
+        </p>
         <select
           value={businessPick}
           onChange={(e) => {
@@ -451,9 +549,9 @@ export function StrategiesPanel({
             setBusinessPick(v);
             if (v) startBusiness(v);
           }}
-          className="mt-4 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium outline-none focus:border-[#1e4f4f]"
+          className="mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium outline-none focus:border-[#1e4f4f]"
         >
-          <option value="">Select…</option>
+          <option value="">Select a plan type…</option>
           {templates.map((label) => (
             <option key={label} value={label}>
               {label}
@@ -477,6 +575,7 @@ export function StrategiesPanel({
     const subcats = categoriesForGroup(view.group);
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+        {dockedPlan}
         <button
           type="button"
           onClick={() => setView({ v: "home" })}
@@ -538,7 +637,7 @@ export function StrategiesPanel({
                 <li key={s.id}>
                   <button
                     type="button"
-                    onClick={() => setView({ v: "strategy", stratId: s.id })}
+                    onClick={() => goToView({ v: "strategy", stratId: s.id })}
                     style={tint(cat.color)}
                     className="w-full rounded-2xl border border-[#d4cdc3] bg-white/85 p-4 text-left transition-colors hover:border-[#1e4f4f]/45 hover:bg-white"
                   >
@@ -601,7 +700,7 @@ export function StrategiesPanel({
           value=""
           onChange={(e) => {
             if (e.target.value)
-              setView({ v: "strategy", stratId: e.target.value });
+              goToView({ v: "strategy", stratId: e.target.value });
           }}
           className="mt-5 w-full max-w-sm rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
         >
@@ -806,22 +905,37 @@ export function StrategiesPanel({
   // ---- Strategy detail ----------------------------------------------------
   const s: Strategy | undefined = getStrategy(view.stratId);
   if (!s) {
-    setView({ v: "home" });
+    goToView({ v: "home" });
     return null;
   }
+  if (
+    strategyApplySession &&
+    strategyApplySession.strategyId === s.id
+  ) {
+    return (
+      <StrategyApplyPanel
+        session={strategyApplySession}
+        onBack={onDismissStrategyApply}
+      />
+    );
+  }
   return (
-    <StrategyBuiltinDetail
-      s={s}
-      accent={accent}
-      onOpen={onOpen}
-      onAsk={onAsk}
-      onBack={() =>
-        setView({
-          v: groupForStrategy(s) === "business" ? "business" : "adhd",
-        })
-      }
-      onSaved={() => setView({ v: "saved" })}
-    />
+    <div className="flex h-full flex-col overflow-y-auto">
+      <div className="px-6 pt-6">{dockedPlan}</div>
+      <StrategyBuiltinDetail
+        s={s}
+        accent={accent}
+        onOpen={onOpen}
+        onAsk={onAsk}
+        onStartStrategyApply={onStartStrategyApply}
+        onBack={() =>
+          setView({
+            v: groupForStrategy(s) === "business" ? "business" : "adhd",
+          })
+        }
+        onSaved={() => setView({ v: "saved" })}
+      />
+    </div>
   );
 }
 
@@ -830,6 +944,7 @@ function StrategyBuiltinDetail({
   accent,
   onOpen,
   onAsk,
+  onStartStrategyApply,
   onBack,
   onSaved,
 }: {
@@ -837,6 +952,7 @@ function StrategyBuiltinDetail({
   accent: (color: string) => string;
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
+  onStartStrategyApply?: (strategyId: string) => void;
   onBack: () => void;
   onSaved: () => void;
 }) {
@@ -916,13 +1032,17 @@ function StrategyBuiltinDetail({
         <p className="text-sm font-medium text-[#1f1c19]">
           Start with step 1: {s.steps[0]}
         </p>
-        {onAsk ? (
+        {(onStartStrategyApply ?? onAsk) ? (
           <button
             type="button"
-            onClick={() => onAsk(applyPrompt(s))}
+            onClick={() =>
+              onStartStrategyApply
+                ? onStartStrategyApply(s.id)
+                : onAsk?.(applyPromptForStrategy(s))
+            }
             className="mt-3 w-full rounded-xl bg-[#1e4f4f] px-4 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
           >
-            Coach me through this with Shari
+            Apply this with Shari
           </button>
         ) : null}
       </div>
@@ -978,13 +1098,17 @@ function StrategyBuiltinDetail({
         >
           Save as my strategy
         </button>
-        {onAsk ? (
+        {(onStartStrategyApply ?? onAsk) ? (
           <button
             type="button"
-            onClick={() => onAsk(applyPrompt(s))}
+            onClick={() =>
+              onStartStrategyApply
+                ? onStartStrategyApply(s.id)
+                : onAsk?.(applyPromptForStrategy(s))
+            }
             className="text-[#1e4f4f] underline decoration-[#1e4f4f]/30 underline-offset-2"
           >
-            Coach me through this with Shari
+            Apply with Shari
           </button>
         ) : null}
         <button

@@ -47,8 +47,8 @@ const GUIDANCE_BY_SUPPORT: Record<SupportStyle, string[]> = {
     "Mirror what they noticed, lightly.",
   ],
   education: [
-    "Explain the why in a sentence before the how.",
-    "Point to the in-app tool that teaches it.",
+    "Teach like a coach: one small concept, then a question — not a lecture.",
+    "Offer paths (simple / example / apply / build together) before going deep.",
   ],
 };
 
@@ -59,7 +59,7 @@ const OPENERS_BY_SUPPORT: Record<SupportStyle, string[]> = {
   accountability: ["Last time you planned to… how did it go?", "Want me to check back on this?"],
   planning: ["Let's lay this out in order.", "Here's a simple plan:"],
   reflection: ["Before we move — what stood out this week?", "How did that sit with you?"],
-  education: ["Quick why first:", "Here's how this works:"],
+  education: ["One idea at a time:", "Let's take this one step:"],
 };
 
 export function adaptResponse(profile: CompanionProfile): ResponseAdaptation {

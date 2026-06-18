@@ -4,6 +4,7 @@ import {
   collaborativeScaffoldForType,
   extractArtifactFromChat,
   extractTitleFromArtifact,
+  inferArtifactTypeFromConversation,
   isExplicitCreateResumeRequest,
   isExportArtifactRequest,
   resolveCurrentArtifact,
@@ -57,12 +58,18 @@ describe("createInitialization", () => {
     expect(resolved?.draftContent).toContain("ElevenLabs");
   });
 
-  it("does not use stored session without explicit resume", () => {
+  it("does not use stored session or last activity without explicit resume", () => {
     const resolved = resolveCurrentArtifact({
       userText: "create a google doc",
       messages: SOP_CHAT,
       creationContext: null,
-      lastActivity: null,
+      lastActivity: {
+        kind: "draft",
+        title: "Old post",
+        contentType: "Post",
+        content: "Simple Steps to Attract More Clients\n\nStep one...",
+        ts: new Date().toISOString(),
+      },
       storedSession: {
         genSeed: {
           type: "Post",
@@ -80,7 +87,7 @@ describe("createInitialization", () => {
         workspaceDetail: null,
         updatedAt: new Date().toISOString(),
       },
-      allowStoredSession: false,
+      allowResumeFromMemory: false,
     });
     expect(resolved?.draftContent).toContain("ElevenLabs");
     expect(resolved?.draftContent).not.toContain("Attract More Clients");
@@ -99,6 +106,27 @@ describe("createInitialization", () => {
     expect(resolved?.source).toBe("blank");
     expect(resolved?.draftContent).toContain("Prepared For");
     expect(blankScaffoldForType("Proposal")).toContain("Investment");
+  });
+
+  it("brainstorming FB post — does not resolve chat artifact or blank Facebook Post", () => {
+    const userText =
+      "I need some ideas to create a FB social media post but I don't have any ideas.";
+    const assistantText = `1. **Client win** — share a quick result.
+2. **Behind the scenes** — show your process.
+3. **Tip** — one actionable idea.
+4. **Question** — ask what they need.
+5. **Story** — before and after.`;
+    const resolved = resolveCurrentArtifact({
+      userText,
+      messages: [
+        { role: "user", content: userText },
+        { role: "assistant", content: assistantText },
+      ],
+      creationContext: null,
+      lastActivity: null,
+      storedSession: null,
+    });
+    expect(resolved).toBeNull();
   });
 
   it("builds default collaborative scaffold with title overview sections", () => {
@@ -130,5 +158,12 @@ describe("createInitialization", () => {
     expect(extractTitleFromArtifact(content, "questionnaire")).toBe(
       "New questionnaire",
     );
+  });
+
+  it("preserves Facebook platform — does not default generic post to LinkedIn", () => {
+    const text =
+      "I need some ideas to create a FB social media post but I don't have any ideas.";
+    expect(inferArtifactTypeFromConversation(text)).toBe("Facebook Post");
+    expect(inferArtifactTypeFromConversation(text)).not.toBe("LinkedIn Post");
   });
 });

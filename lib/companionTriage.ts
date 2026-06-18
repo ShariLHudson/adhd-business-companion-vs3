@@ -8,6 +8,9 @@ import {
   type ChatTurn,
   type DiscoveryPhase,
 } from "./companionIntelligence";
+import {
+  shouldRunEmotionalTriage,
+} from "./messageClassification";
 
 export type TriagePhase = "none" | "needs_question" | "needs_paths" | "ready";
 
@@ -20,9 +23,6 @@ export type TriageInput = {
   askingHow: boolean;
   messages?: ChatTurn[];
 };
-
-const DISCOVERY_TRIGGER_RE =
-  /\b(overwhelm|overwhelmed|bored|boring|unmotivated|not motivated|no motivation|can'?t get motivated|can'?t motivate|stuck|low energy|no energy|can'?t focus|cannot focus|can'?t concentrate|don'?t know what to do|don'?t know what to work on|too many (?:things|choices|options)|can'?t decide what|nothing sounds good|don'?t feel like (?:working|doing)|avoiding|procrastinat|frozen|can'?t start|can'?t get started|where (?:do i|to) start|paralyz|frazzled|anxious|stressed|worried|exhausted|drained|frustrated)\b/i;
 
 function discoveryToTriage(phase: DiscoveryPhase): TriagePhase {
   switch (phase) {
@@ -39,7 +39,7 @@ function discoveryToTriage(phase: DiscoveryPhase): TriagePhase {
 }
 
 export function matchesTriageOpening(text: string): boolean {
-  return DISCOVERY_TRIGGER_RE.test(text.trim());
+  return shouldRunEmotionalTriage(text);
 }
 
 /** @deprecated Use getDiscoveryPhase from companionIntelligence */

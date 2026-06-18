@@ -8,29 +8,76 @@ import type { AppSection } from "./companionUi";
 
 export const OTHER_OPTION = "Other";
 
-/** Curated primary create types — alphabetical, with Other last. */
-const PRIMARY_ITEMS_SORTED = sortDropdownLabels([
-  "Blog Post",
-  "Business Plan",
-  "Client Avatar",
-  "Document",
-  "Email",
-  "Newsletter",
-  "Offer",
-  "Presentation",
-  "Proposal",
-  "Sales Page",
-  "Social Post",
-  "SOP",
-  "Training Guide",
-  "Video Script",
-  "Workshop",
+/** Internal generation depth — never shown in Create UI. */
+export const INTERNAL_GENERATION_DEPTH_OPTIONS = [
+  "Detailed",
+  "Quick Start",
+  "Standard",
+] as const;
+
+export const DEFAULT_INTERNAL_GENERATION_DEPTH = "Standard";
+
+const UNRESOLVED_CREATE_TYPES = new Set([
+  "",
+  "content",
+  "general",
+  "new piece",
+  "draft",
+  "untitled",
 ]);
 
+/** Catalog label → user-facing label in workspace and chat. */
+export const USER_FACING_CREATE_LABELS: Record<string, string> = {
+  "Social Post": "Social Media Post",
+  "Training Guide": "Training",
+  "Sales Funnel": "Funnel",
+  "Lead Magnet": "Lead Magnet",
+  "Landing Page": "Landing Page",
+};
+
+/** Curated primary create outcomes — user-facing order, Other last. */
 export const PRIMARY_CREATE_ITEMS: string[] = [
-  ...PRIMARY_ITEMS_SORTED,
+  "Social Post",
+  "Email",
+  "Newsletter",
+  "Workshop",
+  "SOP",
+  "Sales Funnel",
+  "Marketing Plan",
+  "Lead Magnet",
+  "Landing Page",
   OTHER_OPTION,
 ];
+
+export function isUnresolvedCreateType(type: string | null | undefined): boolean {
+  return UNRESOLVED_CREATE_TYPES.has((type ?? "").trim().toLowerCase());
+}
+
+export function isInternalGenerationDepth(label: string | null | undefined): boolean {
+  if (!label?.trim()) return false;
+  return (
+    INTERNAL_GENERATION_DEPTH_OPTIONS.includes(
+      label as (typeof INTERNAL_GENERATION_DEPTH_OPTIONS)[number],
+    ) || label.trim().toLowerCase() === "general"
+  );
+}
+
+export function userFacingCreateTypeLabel(
+  catalogLabel: string | null | undefined,
+): string | null {
+  const raw = catalogLabel?.trim();
+  if (!raw || isUnresolvedCreateType(raw)) return null;
+  return USER_FACING_CREATE_LABELS[raw] ?? raw;
+}
+
+export function catalogTypeFromUserPhrase(text: string): string | null {
+  const t = text.trim().toLowerCase();
+  if (!t) return null;
+  for (const [catalog, label] of Object.entries(USER_FACING_CREATE_LABELS)) {
+    if (t === label.toLowerCase()) return catalog;
+  }
+  return null;
+}
 
 const SUBTYPES: Record<string, string[]> = {
   "Blog Post": [
@@ -141,18 +188,24 @@ const SUBTYPES: Record<string, string[]> = {
   ],
 };
 
+export function userFacingSubtypeOptionsForItem(_itemLabel: string): string[] {
+  return [];
+}
+
 export function subtypeOptionsForItem(itemLabel: string): string[] {
   const base = SUBTYPES[itemLabel];
   if (!base) {
-    return [
-      ...sortDropdownLabels(["Detailed", "Quick Start", "Standard"]),
-      OTHER_OPTION,
-    ];
+    return [...INTERNAL_GENERATION_DEPTH_OPTIONS];
   }
-  return [
-    ...sortDropdownLabels(base.filter((s) => s !== OTHER_OPTION)),
-    OTHER_OPTION,
-  ];
+  return sortDropdownLabels(base.filter((s) => s !== OTHER_OPTION));
+}
+
+export function defaultInternalSubtypeForItem(itemLabel: string): string | null {
+  const options = subtypeOptionsForItem(itemLabel);
+  if (!options.length) return DEFAULT_INTERNAL_GENERATION_DEPTH;
+  return options.includes(DEFAULT_INTERNAL_GENERATION_DEPTH)
+    ? DEFAULT_INTERNAL_GENERATION_DEPTH
+    : options[0] ?? null;
 }
 
 export function subtypePickerLabel(itemLabel: string): string {
@@ -189,4 +242,16 @@ export function effectiveSubtypeLabel(
   }
   if (selectedSubtype === OTHER_OPTION) return null;
   return selectedSubtype;
+}
+
+/** Subtype line in Create UI — hides auto-assigned internal depths. */
+export function userFacingSubtypeLabel(
+  selectedSubtype: string | null,
+  customSubtype: string | null,
+  opts?: { userSelected?: boolean },
+): string | null {
+  if (!opts?.userSelected) return null;
+  const raw = effectiveSubtypeLabel(selectedSubtype, customSubtype);
+  if (!raw || isInternalGenerationDepth(raw)) return null;
+  return raw;
 }

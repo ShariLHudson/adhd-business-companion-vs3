@@ -23,7 +23,7 @@ import {
   normalizeCategory,
   sortedBrainDumpCategoryGroups,
 } from "@/lib/brainDumpCategories";
-import { sortByDropdownLabel } from "@/lib/dropdownSort";
+import { sortByDropdownLabel, sortDropdownLabels } from "@/lib/dropdownSort";
 import type { AppSection } from "@/lib/companionUi";
 import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
@@ -48,7 +48,13 @@ const TYPE_EMOJI: Record<string, string> = {
   emotional: "🌿",
   idea: "📌",
 };
-const ACTION_TYPES = ["task", "idea", "reminder", "someday", "delegate"];
+const ACTION_TYPES = sortDropdownLabels([
+  "task",
+  "idea",
+  "reminder",
+  "someday",
+  "delegate",
+]);
 const ESTIMATES = [5, 15, 30, 60];
 const SCHED = [
   { id: "today", label: "Today" },
@@ -96,12 +102,11 @@ export function BrainDumpPanel({
   const [panelMode, setPanelMode] = useState<"session" | "library">("session");
   const [captureSessionId, setCaptureSessionId] = useState(newCaptureSessionId);
   const [routeTrust, setRouteTrust] = useState<string | null>(null);
-  // Filter-first: nothing shows until the user picks a filter (or a shummary
-  // chip / View items). Brain Dump should feel like a filing cabinet, not an
-  // inbox dumping everything at you on open.
+  // Filter-first: summary chips first; items reveal after category or filter pick.
   const [timeFilter, setTimeFilter] = useState<TimeFilter>("all");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [viewed, setViewed] = useState(true);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [viewed, setViewed] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [xpFlash, setXpFlash] = useState(false);
   const visualMode = useVisualMode();
@@ -194,6 +199,15 @@ export function BrainDumpPanel({
 
   const suggestOpen = onSuggestOpen ?? onOpen;
 
+  function openLibraryView() {
+    setEntries(getBrainDumps());
+    setPanelMode("library");
+    setViewed(false);
+    setFiltersOpen(false);
+    setTimeFilter("all");
+    setCategoryFilter("all");
+  }
+
   function applyRoute(
     entry: BrainDumpEntry,
     route: Parameters<typeof routeBrainDumpEntry>[1],
@@ -226,8 +240,11 @@ export function BrainDumpPanel({
       <WorkspaceGuide section="brain-dump" />
       <p className="text-2xl font-semibold text-[#1f1c19]">Clear My Mind</p>
       <p className="mt-2 text-base text-[#6b635a]">
-        One thought at a time — each becomes its own card so nothing gets lost
-        in a blob.
+        Get this out of your head — capture, group similar ideas, find priorities,
+        and shape next steps. One thought per card.
+      </p>
+      <p className="mt-2 text-sm text-[#6b635a]">
+        Saved on this device. Open <strong>Library</strong> to find them.
       </p>
 
       <div className="mt-5 flex gap-2">
@@ -247,7 +264,7 @@ export function BrainDumpPanel({
         </button>
         <button
           type="button"
-          onClick={() => setPanelMode("library")}
+          onClick={openLibraryView}
           className={`rounded-full px-4 py-1.5 text-sm font-semibold ${
             panelMode === "library"
               ? "bg-[#1e4f4f] text-white"
@@ -270,8 +287,8 @@ export function BrainDumpPanel({
             key={captureSessionId}
             sessionId={captureSessionId}
             onOpen={suggestOpen}
-            onViewLibrary={() => setPanelMode("library")}
-            onSessionComplete={() => setEntries(getBrainDumps())}
+            onViewLibrary={openLibraryView}
+            onSessionComplete={openLibraryView}
           />
         </div>
       ) : null}
@@ -307,8 +324,21 @@ export function BrainDumpPanel({
             </div>
           )}
 
-          {/* Filter bar */}
-          <div className="mt-4 flex flex-wrap items-end gap-3">
+          {/* Filter bar — collapsed until opened */}
+          <details
+            className="mt-4 rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/80 px-3 py-2"
+            open={filtersOpen}
+            onToggle={(e) =>
+              setFiltersOpen((e.target as HTMLDetailsElement).open)
+            }
+          >
+            <summary className="cursor-pointer list-none text-sm font-semibold text-[#6b635a] marker:content-none [&::-webkit-details-marker]:hidden">
+              Filter items
+              {timeFilter !== "all" || categoryFilter !== "all" ? (
+                <span className="ml-2 font-normal text-[#1e4f4f]">(filtered)</span>
+              ) : null}
+            </summary>
+            <div className="mt-3 flex flex-wrap items-end gap-3">
             <label className="flex flex-col text-xs font-bold uppercase tracking-wide text-[#6b635a]">
               Time
               <select
@@ -348,21 +378,21 @@ export function BrainDumpPanel({
                 ))}
               </select>
             </label>
-            {!viewed && (
-              <button
-                type="button"
-                onClick={() => setViewed(true)}
-                className="rounded-xl bg-[#1e4f4f] px-5 py-2 text-base font-semibold text-white hover:bg-[#163a3a]"
-              >
-                View items
-              </button>
-            )}
-          </div>
+            </div>
+          </details>
+
+          {!viewed && activeEntries.length > 0 ? (
+            <p className="mt-4 text-base text-[#6b635a]">
+              Tap a category above or open filters to see your items.
+            </p>
+          ) : null}
 
           {viewed &&
             (visible.length === 0 ? (
             <p className="mt-4 text-base text-[#6b635a]">
-              Nothing here for this filter.
+              {activeEntries.length > 0
+                ? "Nothing matches this filter — try Everything or All Categories."
+                : "No saved items yet — switch to Capture and tell me the first thing on your mind."}
             </p>
           ) : (
             <ul className="mt-4 flex flex-col gap-3">
@@ -570,7 +600,7 @@ export function BrainDumpPanel({
                           onClick={() => applyRoute(entry, "time-block")}
                           className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-white hover:bg-[#163a3a]"
                         >
-                          ⏱ Time Block
+                          ⏱ Momentum Appointment
                         </button>
                         <button
                           type="button"

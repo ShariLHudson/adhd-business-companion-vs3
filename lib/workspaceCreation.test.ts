@@ -17,10 +17,10 @@ describe("workspaceCreation", () => {
       source: "generated",
     });
     const block = formatCreationContextForPrompt(ctx)!;
-    expect(block).toContain("Artifact type: Marketing Plan");
+    expect(block).toContain("Creating: Marketing Plan");
     expect(block).toContain("Draft exists: yes");
     expect(block).toContain("Day 1:");
-    expect(block).toContain("source of truth");
+    expect(block.toLowerCase()).toContain("source of truth");
   });
 
   it("opens with a collaborative message when draft exists", () => {
@@ -33,6 +33,17 @@ describe("workspaceCreation", () => {
     );
     expect(msg).toContain("draft beside us");
     expect(msg).toContain("Marketing Plan");
+  });
+
+  it("keeps empty item type unresolved instead of content", () => {
+    const ctx = toCreationContext("content-generator", {
+      itemType: "",
+      title: "Create with Shari",
+    });
+    expect(ctx.itemType).toBe("");
+    const msg = buildCreationWorkspaceOpenMessage(ctx);
+    expect(msg).toContain("What would you like to create?");
+    expect(msg).not.toContain("content");
   });
 
   it("bootstraps SOP session to draft step when draft exists", () => {

@@ -13,6 +13,10 @@ import {
   supportsWorkspace,
   type WorkspaceOffer,
 } from "./workspaceMode";
+import {
+  detectAudioRequest,
+  isRhetoricalSoundUsage,
+} from "./audioSuggestions";
 
 export type MakeBridge = {
   type: string;
@@ -198,13 +202,10 @@ export function matchesPendingAcceptance(
       if (section === "playbook" && /\b(?:strategies|playbook)\b/i.test(t)) {
         return true;
       }
-      if (
-        section === "focus-audio" &&
-        /\b(?:focus audio|music|audio|sounds?|calm|calming|motivat|relax|energiz|open|yes|sure)\b/i.test(
-          t,
-        )
-      ) {
-        return true;
+      if (section === "focus-audio") {
+        if (isRhetoricalSoundUsage(t)) return false;
+        if (/\b(?:yes|yeah|yep|sure|ok|okay|open)\b/i.test(t)) return true;
+        return detectAudioRequest(t).isAudio;
       }
       return false;
     }
@@ -243,13 +244,10 @@ export function matchesPendingAcceptance(
         ) {
           return true;
         }
-        if (
-          tool === "focus-audio" &&
-          /\b(?:focus audio|music|audio|sounds?|calm|calming|motivat|relax|energiz)\b/i.test(
-            t,
-          )
-        ) {
-          return true;
+        if (tool === "focus-audio") {
+          if (isRhetoricalSoundUsage(t)) return false;
+          if (/\b(?:yes|yeah|yep|sure|ok|okay|open)\b/i.test(t)) return true;
+          return detectAudioRequest(t).isAudio;
         }
         if (
           tool === "focus-timer" &&
@@ -323,7 +321,7 @@ export function detectOpenSectionRequest(text: string): AppSection | null {
 export function workspaceOpenAck(section: AppSection): string {
   const title =
     section === "time-block"
-      ? "Time Block"
+      ? "Momentum Appointments"
       : section === "brain-dump"
         ? "Clear My Mind"
         : section === "content-generator"

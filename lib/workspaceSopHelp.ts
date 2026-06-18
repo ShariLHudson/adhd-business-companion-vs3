@@ -128,7 +128,7 @@ export function buildHelpTurn(
     const examples = stepExamples(session, field);
     const updated = setSopOptions(session, examples, `Examples for ${step.label}.`);
     return {
-      reply: `${focusPrefix(field)}Sure — here are examples for **${step.label.toLowerCase()}**:\n\n${formatOptionsList(examples)}\n\nPick one (**number 2**), adapt them, or type your own in the field beside us.`,
+      reply: `${focusPrefix(field)}Sure — here are examples for **${step.label.toLowerCase()}**:\n\n${formatOptionsList(examples)}\n\nPick one (**number 2**), adapt them, or type your own in the field beside us. Would you like me to add any of these?`,
       focusField: field,
       sessionPatch: updated,
     };

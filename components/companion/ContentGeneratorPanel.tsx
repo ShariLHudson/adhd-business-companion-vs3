@@ -19,7 +19,7 @@ import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import type { WorkspaceSession } from "@/lib/workspaceSop";
 import { useWorkspaceFieldFocus } from "@/lib/useWorkspaceFieldFocus";
 import { WorkspaceSopProgress } from "@/components/companion/WorkspaceSopProgress";
-import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { WorkspaceStepCard } from "@/components/companion/WorkspaceStepCard";
 import {
   isProposalArtifact,
   normalizeArtifactType,
@@ -48,6 +48,8 @@ import {
   mergeCreateWorkflow,
   resolvedTypeLabel,
   buildBriefFromWorkflow,
+  normalizeSimplifiedCreateWorkflow,
+  discoveryQuestionsForState,
   type CreateWorkflowState,
 } from "@/lib/createWorkflow";
 import {
@@ -73,9 +75,13 @@ import {
   type CreateBuildDraftParams,
 } from "@/lib/createBuildDraft";
 import { CreateWorkflowPanel } from "@/components/companion/CreateWorkflowPanel";
-import { CreateSplitScreenStatus } from "@/components/companion/CreateSplitScreenStatus";
+import { CreateDiscoveryWorkspace } from "@/components/companion/CreateDiscoveryWorkspace";
+import { CreateTypePicker } from "@/components/companion/CreateTypePicker";
 import type { CreateBuilderPhase } from "@/lib/createBuilderChat";
 import { blankScaffoldForType } from "@/lib/createInitialization";
+import { liveCreateWorkflowState } from "@/lib/liveCreateWorkspace";
+import { isUnresolvedCreateType } from "@/lib/createTypePickers";
+import { combinedCompanionContextForAI } from "@/lib/activeCompanions";
 import {
   emptySavedArtifact,
   recordAfterGoogleDoc,
@@ -152,10 +158,14 @@ export function ContentGeneratorPanel({
   onChatBuildComplete,
   onChatBuildFailed,
   onCompanionBuilderAction,
+  onDiscoveryAudiencePick,
   chatReviseRequest,
   onChatReviseComplete,
   chatSyncedWorkflow,
   onRegisterBuildDraft,
+  draftScrollTarget = null,
+  draftScrollStamp = 0,
+  onCompanionTypePick,
 }: {
   seed: GenSeed;
   onOpen?: (s: AppSection) => void;
@@ -206,7 +216,10 @@ export function ContentGeneratorPanel({
     workflow: CreateWorkflowState;
   }) => void;
   onChatBuildFailed?: () => void;
-  onCompanionBuilderAction?: (action: "retry" | "add-detail") => void;
+  onCompanionBuilderAction?: (
+    action: "retry" | "add-detail" | "build-draft",
+  ) => void;
+  onDiscoveryAudiencePick?: (audienceLabel: string) => void;
   /** Parent-triggered draft revision from chat builder. */
   chatReviseRequest?: { instruction: string; key: number } | null;
   onChatReviseComplete?: () => void;
@@ -214,6 +227,11 @@ export function ContentGeneratorPanel({
   chatSyncedWorkflow?: CreateWorkflowState | null;
   /** Register the shared build-draft handler (create-only + split-screen). */
   onRegisterBuildDraft?: (handler: CreateBuildDraftHandler | null) => void;
+  /** Scroll draft editor to a section after chat apply. */
+  draftScrollTarget?: string | null;
+  draftScrollStamp?: number;
+  /** Panel type pick while split chat is open — starts companion conversation. */
+  onCompanionTypePick?: (typeLabel: string) => void;
 }) {
   const [type, setType] = useState(seed?.type ?? "");
   const [topic, setTopic] = useState(seed?.topic ?? seed?.brief ?? "");
@@ -252,8 +270,11 @@ export function ContentGeneratorPanel({
     createBuilderPhase === "generating";
   const showDraftEditor =
     Boolean(draft.trim()) &&
-    (workflow.buildApproved || workflow.draftStatus === "ready");
+    (workflow.buildApproved ||
+      workflow.draftStatus === "ready" ||
+      workflow.draftStatus === "building");
   const splitScreenMode = companionBuilderMode || workflow.questionMode === "split_screen";
+  const resolvedCreateType = resolvedTypeLabel(workflow) || type || null;
   const workspacePhase = resolveCreateWorkspacePhase({
     draft,
     draftStatus: workflow.draftStatus,
@@ -266,7 +287,22 @@ export function ContentGeneratorPanel({
   const showBuildingState = isGenerating && !draft.trim() && !splitScreenMode;
   const inGuidedCreate =
     !workflow.buildApproved && !isGenerating && !splitScreenMode;
-  const showSplitScreenStatus = splitScreenMode && !showDraftEditor;
+  const showSplitScreenStatus =
+    splitScreenMode && !showDraftEditor && Boolean(resolvedCreateType);
+  const showSplitTypePicker =
+    splitScreenMode &&
+    !showDraftEditor &&
+    !resolvedCreateType &&
+    workflow.step === "category";
+  const currentDiscoveryQuestion =
+    resolvedCreateType && splitScreenMode
+      ? discoveryQuestionsForState(resolvedCreateType, workflow)
+      : null;
+  const audienceStepActive = currentDiscoveryQuestion?.id === "audience";
+  const selectedAudienceNames = (workflow.discoveryAnswers.audience ?? "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
 
   useEffect(() => {
@@ -316,9 +352,9 @@ export function ContentGeneratorPanel({
       ? "Editing draft"
       : seeded && loading
         ? "Generating draft"
-        : type
+          : type
           ? "Compose setup"
-          : "Choosing content type";
+          : "Choosing what to create";
     const detail = {
       view: "create" as const,
       stage,
@@ -401,6 +437,10 @@ export function ContentGeneratorPanel({
     const sig = JSON.stringify({
       step: chatSyncedWorkflow.step,
       answers: chatSyncedWorkflow.discoveryAnswers,
+      sectionContent: chatSyncedWorkflow.sectionContent,
+      activeSectionId: chatSyncedWorkflow.activeSectionId,
+      discoverySubphase: chatSyncedWorkflow.discoverySubphase,
+      pendingSectionOptions: chatSyncedWorkflow.pendingSectionOptions,
       subtype: chatSyncedWorkflow.selectedSubtype,
       customSubtype: chatSyncedWorkflow.customSubtype,
       buildApproved: chatSyncedWorkflow.buildApproved,
@@ -537,7 +577,7 @@ export function ContentGeneratorPanel({
           type: resolvedType,
           brief: resolvedBrief,
           tone: tn,
-          context: businessContextSummary(forAvatar),
+          context: combinedCompanionContextForAI(businessContextSummary(forAvatar)),
           contentLanguageHint,
         }),
       });
@@ -642,7 +682,9 @@ export function ContentGeneratorPanel({
     setType(
       lockedArtifactType
         ? normalizeArtifactType(lockedArtifactType)
-        : (seed.type ?? ""),
+        : isUnresolvedCreateType(seed.type)
+          ? ""
+          : (seed.type ?? ""),
     );
     const t = seed.topic ?? seed.brief ?? "";
     setTopic(t);
@@ -657,23 +699,27 @@ export function ContentGeneratorPanel({
       const scaffold = resolvedType ? blankScaffoldForType(resolvedType) : "";
       const isScaffold =
         scaffold.trim().length > 0 && seed.draft.trim() === scaffold.trim();
-      if (isScaffold) {
+      const liveDraftActive =
+        workflowRef.current.step === "improve" && workflowRef.current.buildApproved;
+      if (liveDraftActive && seed.type === type) {
+        setDraft(seed.draft);
+        setWorkflow(liveCreateWorkflowState(resolvedType, workflowRef.current));
+        started.current = true;
+      } else if (isScaffold && workspaceMode) {
+        setDraft(seed.draft);
+        setWorkflow(liveCreateWorkflowState(resolvedType));
+        started.current = true;
+      } else if (isScaffold) {
         setDraft("");
         setWorkflow(advanceAfterTypePick(resolvedType, categoryIdForType(resolvedType)));
       } else {
         setDraft(seed.draft);
-        setWorkflow({
-          ...EMPTY_CREATE_WORKFLOW,
-          step: "improve",
-          buildApproved: true,
-          readinessConfirmed: true,
-          categoryId: categoryIdForType(resolvedType),
-        });
+        setWorkflow(liveCreateWorkflowState(resolvedType, workflowRef.current));
         started.current = true;
       }
     } else if (seed.type && seed.autoGenerate && false) {
       // Create 2.0 — never auto-generate; user approves at readiness.
-      } else if (seed.type) {
+    } else if (seed.type && !isUnresolvedCreateType(seed.type)) {
       setDraft("");
       if (seed.createWorkflow) {
         const label = seed.type;
@@ -683,15 +729,22 @@ export function ContentGeneratorPanel({
           ),
         );
       } else if (companionBuilderMode) {
-        setWorkflow({
-          ...EMPTY_CREATE_WORKFLOW,
-          selectedTypeLabel: seed.type,
-          categoryId: categoryIdForType(seed.type),
-          questionMode: "split_screen",
-        });
+        setWorkflow(
+          reconcileTemplateForType({
+            ...advanceAfterItemPick(seed.type),
+            questionMode: "split_screen",
+          }),
+        );
       } else {
-        setWorkflow(advanceAfterItemPick(seed.type));
+        setWorkflow(normalizeSimplifiedCreateWorkflow(advanceAfterItemPick(seed.type)));
       }
+      started.current = true;
+    } else if (companionBuilderMode) {
+      setDraft("");
+      setWorkflow({
+        ...EMPTY_CREATE_WORKFLOW,
+        questionMode: "split_screen",
+      });
       started.current = true;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -701,6 +754,21 @@ export function ContentGeneratorPanel({
   useEffect(() => {
     if (draft) draftRef.current?.focus();
   }, [draft]);
+
+  useEffect(() => {
+    if (!draftScrollTarget?.trim() || !draftScrollStamp) return;
+    const el = document.querySelector<HTMLTextAreaElement>(
+      "[data-draft-workspace-editor]",
+    );
+    if (!el) return;
+    const target = draftScrollTarget.trim().toLowerCase();
+    const idx = el.value.toLowerCase().indexOf(target);
+    if (idx >= 0) {
+      el.focus();
+      el.setSelectionRange(idx, idx + draftScrollTarget.trim().length);
+      el.scrollTop = Math.max(0, idx / 2 - 80);
+    }
+  }, [draftScrollTarget, draftScrollStamp, draft]);
 
   useEffect(() => {
     if (
@@ -930,14 +998,13 @@ export function ContentGeneratorPanel({
     if (!opts?.skipWorkflow && !companionBuilderMode) {
       setWorkflow(reconcileTemplateForType(advanceAfterItemPick(typeLabel)));
     } else if (companionBuilderMode) {
-      setWorkflow((prev) =>
-        reconcileTemplateForType({
-          ...prev,
-          selectedTypeLabel: typeLabel,
-          categoryId: opts?.categoryId ?? categoryIdForType(typeLabel),
-          questionMode: "split_screen",
-        }),
-      );
+      const advanced = reconcileTemplateForType(advanceAfterItemPick(typeLabel));
+      setWorkflow({
+        ...advanced,
+        questionMode: "split_screen",
+        sessionId: workflowRef.current.sessionId ?? advanced.sessionId,
+      });
+      onCompanionTypePick?.(typeLabel);
     }
     started.current = false;
   }
@@ -1079,7 +1146,7 @@ export function ContentGeneratorPanel({
             text: draft,
             action: "modify",
             instruction,
-            context: businessContextSummary(),
+            context: combinedCompanionContextForAI(businessContextSummary()),
           }),
         });
         const data = await res.json();
@@ -1188,19 +1255,6 @@ export function ContentGeneratorPanel({
           />
         </div>
       )}
-      {!(workspaceMode && showDraftEditor) &&
-        !type &&
-        workflow.step === "category" &&
-        !splitScreenMode && (
-        <>
-          <WorkspaceGuide section="content-generator" />
-          <p className="text-2xl font-semibold text-[#1f1c19]">Create Something</p>
-          <p className="mt-1 text-base text-[#6b635a]">
-            Pick what you&apos;re making — then answer one question at a time.
-          </p>
-        </>
-      )}
-
       {type && brief && showDraftEditor && !(workspaceMode && phase === "ready") && (
         <div className="mt-4 flex items-center justify-between gap-2">
           <p className="text-sm text-[#6b635a]">
@@ -1229,14 +1283,46 @@ export function ContentGeneratorPanel({
         </div>
       )}
 
+      {showSplitTypePicker && (
+        <CreateTypePicker
+          onPick={(label) =>
+            pickCreateType(label, {
+              bypassRoute: true,
+              categoryId: categoryIdForType(label),
+            })
+          }
+        />
+      )}
+
       {showSplitScreenStatus && (
-        <CreateSplitScreenStatus
-          itemType={type || resolvedTypeLabel(workflow) || null}
-          selectedSubtype={workflow.selectedSubtype}
-          customSubtype={workflow.customSubtype}
+        <CreateDiscoveryWorkspace
+          workflow={workflow}
           workspacePhase={workspacePhase}
-          loadingMessage={BUILD_DRAFT_LOADING_MESSAGES[loadingMessageIndex]}
+          loadingMessageIndex={loadingMessageIndex}
           errorMessage={buildErrorMessage}
+          building={loading || workflow.draftStatus === "building"}
+          audienceStepActive={audienceStepActive}
+          selectedAudienceNames={selectedAudienceNames}
+          onAudienceChange={(names) => {
+            const label = names.join(", ");
+            setWorkflow((prev) => ({
+              ...prev,
+              discoveryAnswers: { ...prev.discoveryAnswers, audience: label },
+            }));
+          }}
+          onAudienceConfirm={
+            onDiscoveryAudiencePick
+              ? () => {
+                  const label = workflowRef.current.discoveryAnswers.audience?.trim();
+                  if (label) onDiscoveryAudiencePick(label);
+                }
+              : undefined
+          }
+          onBuildDraft={
+            workspacePhase === "ready"
+              ? () => onCompanionBuilderAction?.("build-draft")
+              : undefined
+          }
           onTryAgain={
             workspacePhase === "error"
               ? () => {
@@ -1303,12 +1389,10 @@ export function ContentGeneratorPanel({
               setBuildErrorMessage(null);
               setWorkflow((prev) => ({ ...prev, draftStatus: "idle" }));
             }}
-            onChangeTemplate={() => {
-              setError(false);
-            }}
             onAddMoreDetail={() =>
               setWorkflow((prev) => enterAddDetailStep(prev))
             }
+            companionDriven={Boolean(onBuildWithShari)}
           />
         </div>
       )}
@@ -1372,6 +1456,16 @@ export function ContentGeneratorPanel({
         </div>
       ) : null}
 
+      {showDraftEditor && workflow.draftStatus === "building" && (
+        <div className="mb-3 rounded-xl border border-[#d4a574]/40 bg-[#faf3e8] px-4 py-2 text-sm text-[#5c4f3f]">
+          <span className="font-semibold text-[#1f1c19]">Draft status: Building</span>
+          <span className="text-[#6b635a]">
+            {" "}
+            — add hooks, anecdotes, stories, and CTAs in chat; pieces merge here.
+          </span>
+        </div>
+      )}
+
       {showDraftEditor && !workspaceMode && (
         <div
           className={`companion-fade-in flex min-h-0 flex-1 flex-col ${
@@ -1418,23 +1512,6 @@ export function ContentGeneratorPanel({
                   More actions ▼
                 </summary>
                 <div className="mt-3 flex flex-col gap-3">
-                  {onBuildWithShari && (
-                    <button
-                      type="button"
-                      onClick={() =>
-                        onBuildWithShari({
-                          itemType: type || "content",
-                          title: title.trim() || topic || brief || type || "Draft",
-                          draftContent: draft,
-                          brief: brief || topic,
-                          stage: "editing draft",
-                        })
-                      }
-                      className="w-fit rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
-                    >
-                      Continue with Shari in chat
-                    </button>
-                  )}
                   <input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}

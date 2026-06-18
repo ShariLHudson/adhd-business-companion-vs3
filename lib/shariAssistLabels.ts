@@ -10,18 +10,21 @@ export type ShariAssistContext = {
   activityCategoryId?: ActivityCategoryId | null;
   selectedItemName?: string | null;
   createItemType?: string | null;
+  /** Custom business plan being built (e.g. Marketing Strategy). */
+  businessStrategyLabel?: string | null;
+  businessStrategyPhase?: "building" | "coaching" | null;
 };
 
 const SECTION_LABELS: Partial<Record<AppSection, string>> = {
   projects: "Build With Shari",
-  "content-generator": "Create With Shari",
+  "content-generator": "Build With Shari",
   focus: "Focus With Shari",
   "focus-timer": "Focus With Shari",
   "focus-audio": "Focus With Shari",
   playbook: "Apply With Shari",
   "client-avatars": "Define With Shari",
   "brain-dump": "Sort It Out With Shari",
-  "templates-library": "Customize With Shari",
+  "templates-library": "Build With Shari",
   "how-do-i": "Learn With Shari",
   "spin-wheel": "Decide With Shari",
   "time-block": "Focus With Shari",
@@ -40,7 +43,7 @@ function activityCategoryLabel(categoryId: ActivityCategoryId): string {
     case "energize":
       return "Focus With Shari";
     case "creativity":
-      return "Create With Shari";
+      return "Build With Shari";
     default:
       return "Focus With Shari";
   }
@@ -55,6 +58,18 @@ export function getShariAssistLabel(
 
   if (section === "activities" && ctx?.activityCategoryId) {
     return activityCategoryLabel(ctx.activityCategoryId);
+  }
+
+  if (section === "playbook" && ctx?.businessStrategyLabel) {
+    const short = ctx.businessStrategyLabel.replace(/\s+strategy$/i, "").trim();
+    if (ctx.businessStrategyPhase === "coaching") {
+      return `Plan ${short} With Shari`;
+    }
+    return `Build ${short} With Shari`;
+  }
+
+  if (section === "playbook" && ctx?.createItemType) {
+    return `Build ${ctx.createItemType} With Shari`;
   }
 
   return SECTION_LABELS[section] ?? "Work With Shari";

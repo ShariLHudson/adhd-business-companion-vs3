@@ -68,7 +68,17 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
       {
         label: "Sales Page",
         emoji: "💰",
-        matchTerms: ["sales page", "landing page", "sales letter"],
+        matchTerms: ["sales page", "sales letter"],
+      },
+      {
+        label: "Landing Page",
+        emoji: "🌐",
+        matchTerms: ["landing page", "lead capture page"],
+      },
+      {
+        label: "Lead Magnet",
+        emoji: "🧲",
+        matchTerms: ["lead magnet", "freebie", "opt-in", "opt in"],
       },
     ],
   },
@@ -89,7 +99,7 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
       {
         label: "Facebook Post",
         emoji: "📘",
-        matchTerms: ["facebook", "facebook post", "fb post"],
+        matchTerms: ["facebook", "facebook post", "fb post", "fb"],
       },
       {
         label: "LinkedIn Post",
@@ -106,6 +116,7 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
         emoji: "📱",
         matchTerms: [
           "social post",
+          "social media post",
           "social campaign",
           "social media",
           "caption",

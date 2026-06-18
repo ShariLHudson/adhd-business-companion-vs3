@@ -7,6 +7,8 @@ import type { ProjectCoachTopic } from "./projectCoachHandoff";
 import { projectCoachTopicLabel } from "./projectCoachHandoff";
 import type { WorkspaceContext } from "./workspaceAwareness";
 import type { WorkspaceFieldId } from "./workspaceAwareness";
+import { isWorkspaceDiscoveryRequest } from "./messageClassification";
+import { isFieldContentIntent } from "./workspaceIntent";
 
 export type ProjectCoachSession = {
   topic: ProjectCoachTopic;
@@ -49,9 +51,17 @@ export function resolveProjectCoachTurn(
   session: ProjectCoachSession,
   userText: string,
   ctx: WorkspaceContext | null,
+  lastAssistantText = "",
 ): ProjectCoachTurn | null {
   const trimmed = userText.trim();
   if (!trimmed) return null;
+
+  if (
+    isWorkspaceDiscoveryRequest(trimmed, lastAssistantText) ||
+    !isFieldContentIntent(trimmed, lastAssistantText)
+  ) {
+    return null;
+  }
 
   const lower = trimmed.toLowerCase();
 

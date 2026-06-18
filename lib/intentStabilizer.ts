@@ -1,6 +1,12 @@
 // Pre-routing intent normalization — runs before Chat, Create, or bridge decisions.
 
 import { catalogIntentTypeRules } from "./createCatalog";
+import { isInformationIntent } from "./companionIntentRouting";
+import {
+  isExplicitCreationRequest,
+  isContentBrainstorming,
+  shouldSuppressCreatePending,
+} from "./messageClassification";
 
 export type IntentAction = "chat" | "make" | "stabilize" | "edit-draft";
 
@@ -193,6 +199,10 @@ export function effectiveIntentText(text: string): {
 }
 
 export function hasCreateIntent(text: string): boolean {
+  if (isInformationIntent(text)) return false;
+  if (isContentBrainstorming(text)) return false;
+  if (isExplicitCreationRequest(text)) return true;
+  if (shouldSuppressCreatePending(text)) return false;
   if (CREATE_VERB_RE.test(text)) return true;
   if (NEED_WANT_DELIVERABLE_RE.test(text) && findLastMakeType(text)) return true;
   if (MAKE_DELIVERABLE_RE.test(text) && findLastMakeType(text)) return true;
@@ -254,6 +264,13 @@ export function resolveIntent(
     return buildIntent("chat", rawText, {
       confidence: 0,
       reason: "empty input",
+    });
+  }
+
+  if (isInformationIntent(rawText)) {
+    return buildIntent("chat", rawText, {
+      confidence: 1,
+      reason: "information intent — stay in chat",
     });
   }
 
@@ -351,6 +368,7 @@ export function resolveIntent(
 export function bridgeFromResolved(
   resolved: ResolvedIntent,
 ): { type: string; brief: string; label: string } | null {
+  if (shouldSuppressCreatePending(resolved.rawText)) return null;
   if (
     resolved.multiIntent ||
     resolved.action === "make" ||

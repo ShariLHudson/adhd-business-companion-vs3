@@ -13,7 +13,7 @@ import { NetworkDashboardPanel } from "./NetworkDashboardPanel";
 function Panel({
   title,
   children,
-  defaultOpen = true,
+  defaultOpen = false,
 }: {
   title: string;
   children: ReactNode;
@@ -83,7 +83,7 @@ export function FounderCommandCenter({
         onWork={() => onWorkOnNext?.(cc.nextAction.action)}
       />
 
-      <Panel title="Today">
+      <Panel title="Today" defaultOpen={false}>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {cc.today.focus ? <Stat label="Focus" value={cc.today.focus} /> : null}
           {cc.today.topPriority ? (

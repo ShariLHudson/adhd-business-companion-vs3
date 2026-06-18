@@ -1,6 +1,9 @@
 /**
  * Global UX: category libraries never open with every section expanded.
  * Default = picker only; reveal items after one category is chosen.
+ *
+ * Collapsed-by-default: accordions, hub sections, filter panels, and nested
+ * menus start closed on page load. Deep-link navigation may open one target.
  */
 
 /** Empty value — no category selected yet. */

@@ -43,7 +43,7 @@ function addDays(dateStr: string, n: number): string {
 }
 
 export function timeBlockDateGroup(block: TimeBlock): TimeBlockDateGroup {
-  if (block.status === "completed" || block.status === "missed") return "completed";
+  if (block.status === "completed" || block.status === "missed" || block.status === "not-today") return "completed";
   if (!block.date) return "bank";
   const today = todayStr();
   if (block.date === today) return "today";

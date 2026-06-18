@@ -1,6 +1,10 @@
 // Block premature tool/workspace opens — conversation first when prioritizing.
 
 import { isMultiIntent } from "./intentStabilizer";
+import {
+  isPrioritizingConversation,
+  shouldStayConversationalOnly,
+} from "./messageClassification";
 
 const PRIORITY_LANGUAGE_RE =
   /\b(priorit|which (?:one|should|to do) first|what to (?:work on|do|focus on) first|what should i (?:work on|do|focus on)|choose between|decide (?:which|what|between)|can'?t decide|not sure which|not sure what to|uncertain|what matters most|blocking the others|biggest momentum|where to start|what first)\b/i;
@@ -25,6 +29,7 @@ export function isTaskDump(text: string): boolean {
 export function isPriorityDiscussion(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (isPrioritizingConversation(t)) return true;
   if (PRIORITY_LANGUAGE_RE.test(t)) return true;
   if (isMultiIntent(t)) return true;
   if (isTaskDump(t)) return true;
@@ -50,6 +55,7 @@ export function shouldStayInConversation(
   opts?: { multiIntent?: boolean },
 ): boolean {
   if (opts?.multiIntent) return true;
+  if (shouldStayConversationalOnly(text)) return true;
   return isPriorityDiscussion(text);
 }
 

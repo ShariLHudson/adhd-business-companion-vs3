@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 
-import { provisionCompanionUser } from "@/lib/companionAuthProvision";
+import { provisionCompanionUser, normalizeCompanionEmail } from "@/lib/companionAuthProvision";
 import { sanitizeSupabaseAuthError } from "@/lib/supabase/authErrors";
 import {
   companionAuthConfigured,
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       password?: string;
       name?: string;
     };
-    email = body.email?.trim() ?? "";
+    email = normalizeCompanionEmail(body.email ?? "");
     password = body.password ?? "";
     name = body.name?.trim() ?? "";
   } catch {

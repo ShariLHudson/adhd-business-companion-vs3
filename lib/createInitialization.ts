@@ -1,7 +1,11 @@
 // Create open logic — load the current artifact only; never surprise with old drafts.
 
 import type { CreateSessionSnapshot } from "./createSessionStore";
-import { matchCatalogFromText } from "./createCatalog";
+import {
+  isPartialComponentRequest,
+  looksLikeDraftFragment,
+  resolveCollaborativeDraftTitle,
+} from "./collaborativeDrafting";
 import { normalizeArtifactType, shouldLockArtifactType } from "./artifactType";
 import type { CreationWorkspaceContext } from "./workspaceCreation";
 import { isCreateResumeRequest } from "./workspaceIntent";
@@ -10,6 +14,16 @@ import {
   isSavedDocumentRecoveryRequest,
 } from "./savedArtifact";
 import type { LastActivity } from "./companionStore";
+import {
+  isExplicitCreationRequest,
+  shouldBlockArtifactPipeline,
+} from "./messageClassification";
+import { isInformationIntent } from "./companionIntentRouting";
+import {
+  lastUserTextFromChatTurns,
+  shouldBlockDraftPanelFromChat,
+} from "./draftPermissionGate";
+import { matchCatalogFromText } from "./createCatalog";
 
 export type ChatTurn = { role: "user" | "assistant"; content: string };
 
@@ -17,7 +31,7 @@ export type ResolvedArtifact = {
   itemType: string;
   title: string;
   draftContent: string;
-  source: "context" | "chat" | "last-activity" | "stored" | "blank" | "none";
+  source: "context" | "chat" | "last-activity" | "stored" | "blank" | "none" | "generated";
   artifactTypeLocked: boolean;
 };
 
@@ -27,9 +41,18 @@ export type ResolveArtifactInput = {
   creationContext: CreationWorkspaceContext | null | undefined;
   lastActivity: LastActivity | null | undefined;
   storedSession: CreateSessionSnapshot | null | undefined;
-  /** True only for explicit resume phrases — allows stored session fallback. */
-  allowStoredSession: boolean;
+  /**
+   * True only when the user explicitly chose Resume — allows stored session
+   * and last-activity draft memory to open in Create.
+   */
+  allowResumeFromMemory?: boolean;
+  /** @deprecated use allowResumeFromMemory */
+  allowStoredSession?: boolean;
 };
+
+function resumeFromMemoryAllowed(input: ResolveArtifactInput): boolean {
+  return Boolean(input.allowResumeFromMemory ?? input.allowStoredSession);
+}
 
 const MIN_ARTIFACT_CHARS = 160;
 
@@ -282,11 +305,19 @@ export function inferArtifactTypeFromConversation(
   content?: string,
 ): string {
   const t = userText.toLowerCase();
+  const combined = `${userText}\n${content ?? ""}`.toLowerCase();
+
+  if (/\b(?:facebook|fb)\b/.test(t) || /\b(?:facebook|fb)\b/.test(combined)) {
+    return "Facebook Post";
+  }
+  if (/\blinkedin\b/.test(t) || /\blinkedin\b/.test(combined)) {
+    return "LinkedIn Post";
+  }
+
   if (/\bsop\b|standard operating procedure|workflow doc/.test(t)) return "SOP";
   if (/\bproposal\b|scope of work|\bsow\b/.test(t)) return "Proposal";
   if (/\bemail campaign\b|email sequence\b|drip sequence/.test(t)) return "Email Campaign";
   if (/\bemail\b/.test(t)) return "Email";
-  if (/\bpost\b|linkedin/.test(t)) return "LinkedIn Post";
 
   const fromUser = matchCatalogFromText(userText);
   if (fromUser?.type) return fromUser.type;
@@ -294,13 +325,14 @@ export function inferArtifactTypeFromConversation(
   const catalog = matchCatalogFromText(`${userText}\n${content ?? ""}`);
   if (catalog?.type) return catalog.type;
 
-  const combined = `${userText}\n${content ?? ""}`.toLowerCase();
   if (/\bsop\b|standard operating procedure|workflow doc/.test(combined)) {
     return "SOP";
   }
   if (/\bproposal\b|scope of work|\bsow\b/.test(combined)) return "Proposal";
   if (/\bemail\b/.test(combined)) return "Email";
-  if (/\bpost\b|linkedin/.test(combined)) return "LinkedIn Post";
+  if (/\b(?:instagram|insta|ig)\b/.test(combined)) return "Social Post";
+  if (/\bsocial media\b/.test(combined)) return "Social Post";
+  if (/\bpost\b/.test(combined)) return "Social Post";
   return "Document";
 }
 
@@ -358,18 +390,27 @@ export function extractArtifactFromChat(
   messages: ChatTurn[],
   hintType?: string | null,
 ): Omit<ResolvedArtifact, "source" | "artifactTypeLocked"> | null {
+  const lastUser = lastUserTextFromChatTurns(messages);
+  const lastAssistant =
+    [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
+  if (lastUser && shouldBlockDraftPanelFromChat(lastUser, lastAssistant)) {
+    return null;
+  }
+
   const recent = messages.slice(-14);
 
   for (let i = recent.length - 1; i >= 0; i--) {
     const m = recent[i];
     if (m.role !== "assistant") continue;
-    if (!looksLikeArtifactContent(m.content)) continue;
 
     const userText = recent
       .slice(0, i + 1)
       .filter((t) => t.role === "user")
       .map((t) => t.content)
       .join("\n");
+
+    const fragment = looksLikeDraftFragment(m.content, userText);
+    if (!looksLikeArtifactContent(m.content) && !fragment) continue;
 
     const itemType = inferArtifactTypeFromConversation(
       userText,
@@ -379,9 +420,16 @@ export function extractArtifactFromChat(
       ? normalizeArtifactType(hintType)
       : normalizeArtifactType(itemType);
 
+    const title = fragment
+      ? resolveCollaborativeDraftTitle({
+          itemType: normalized,
+          userText,
+        })
+      : extractTitleFromArtifact(m.content, normalized);
+
     return {
       itemType: normalized,
-      title: extractTitleFromArtifact(m.content, normalized),
+      title,
       draftContent: m.content.trim(),
     };
   }
@@ -506,25 +554,27 @@ export function resolveCurrentArtifact(
   const { userText, messages, creationContext, lastActivity, storedSession } =
     input;
   const exportRequest = isExportArtifactRequest(userText);
-  const newRequest = /\b(?:need|want|create|make|write|build|draft)\b/i.test(
-    userText,
-  );
+  const blockNewFromChat =
+    shouldBlockDraftPanelFromChat(userText) && !isExplicitCreationRequest(userText);
 
   if (creationContext?.draftContent?.trim()) {
     const fromCtx = fromContext(creationContext);
     if (fromCtx) return fromCtx;
   }
 
-  const chatArtifact = extractArtifactFromChat(messages);
-  if (chatArtifact) {
-    return {
-      ...chatArtifact,
-      source: "chat",
-      artifactTypeLocked: shouldLockArtifactType(chatArtifact.itemType),
-    };
+  if (!blockNewFromChat) {
+    const chatArtifact = extractArtifactFromChat(messages);
+    if (chatArtifact) {
+      return {
+        ...chatArtifact,
+        source: "chat",
+        artifactTypeLocked: shouldLockArtifactType(chatArtifact.itemType),
+      };
+    }
   }
 
   if (
+    resumeFromMemoryAllowed(input) &&
     isFreshDraftActivity(lastActivity) &&
     (!exportRequest || refersToCurrentArtifact(userText))
   ) {
@@ -532,10 +582,15 @@ export function resolveCurrentArtifact(
     if (fromAct) return fromAct;
   }
 
-  if (input.allowStoredSession && storedSession) {
+  if (resumeFromMemoryAllowed(input) && storedSession) {
     const fromStore = fromStoredSession(storedSession);
     if (fromStore) return fromStore;
   }
+
+  const newRequest =
+    !blockNewFromChat &&
+    !isInformationIntent(userText) &&
+    /\b(?:need|want|create|make|write|build|draft)\b/i.test(userText);
 
   if (newRequest && !exportRequest) {
     const blank = newArtifactFromRequest(userText);
@@ -597,12 +652,12 @@ export function collectArtifactCandidates(
     });
   }
 
-  if (isFreshDraftActivity(lastActivity)) {
+  if (resumeFromMemoryAllowed(input) && isFreshDraftActivity(lastActivity)) {
     const fromAct = fromLastActivity(lastActivity!);
     if (fromAct) out.push(fromAct);
   }
 
-  if (input.allowStoredSession && storedSession) {
+  if (resumeFromMemoryAllowed(input) && storedSession) {
     const fromStore = fromStoredSession(storedSession);
     if (fromStore) out.push(fromStore);
   }

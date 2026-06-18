@@ -2,6 +2,11 @@
 // Only `fieldContent` may populate project fields.
 
 import type { AppSection } from "./companionUi";
+import {
+  isExplicitProjectRequest,
+  isWorkspaceDiscoveryRequest,
+  shouldStayConversationalOnly,
+} from "./messageClassification";
 import type { WorkspaceFieldId } from "./workspaceAwareness";
 import {
   parseOptionSelection,
@@ -9,6 +14,10 @@ import {
   type WorkspaceSession,
 } from "./workspaceSop";
 import { getEffectiveSuggestionCount } from "./workspaceSuggestion";
+import {
+  isBuilderAddCommand,
+  isBuilderApprovalPhrase,
+} from "./builderContentSync";
 
 export type WorkspaceIntent =
   | "conversation"
@@ -21,7 +30,8 @@ export type WorkspaceIntent =
   | "navigation"
   | "confirmation"
   | "feedback"
-  | "clarification";
+  | "clarification"
+  | "discovery";
 
 export type ClassifiedWorkspaceIntent = {
   intent: WorkspaceIntent;
@@ -201,6 +211,8 @@ function looksLikeFieldContent(
     return false;
   }
   if (t.length < 2 || NON_CONTENT_SHORT_RE.test(t)) return false;
+  if (isBuilderApprovalPhrase(t) || isBuilderAddCommand(t)) return false;
+  if (isWorkspaceDiscoveryRequest(t, lastAssistantText)) return false;
   if (/\?/.test(t)) return false;
   if (
     QUESTION_START_RE.test(t) ||
@@ -232,6 +244,20 @@ export function classifyWorkspaceIntent(
   if (!t) return { intent: "conversation" };
 
   const session = opts?.session ?? null;
+  const inWorkspaceCoach = Boolean(session);
+
+  if (isWorkspaceDiscoveryRequest(t, lastAssistantText)) {
+    return { intent: "discovery" };
+  }
+
+  if (
+    !inWorkspaceCoach &&
+    shouldStayConversationalOnly(t) &&
+    !isExplicitProjectRequest(t) &&
+    !WORKSPACE_ACTION_RE.test(t)
+  ) {
+    return { intent: "conversation" };
+  }
   const suggestionCount = getEffectiveSuggestionCount(session, lastAssistantText);
 
   // 1. Pending suggestion selection — never field content
@@ -267,21 +293,21 @@ export function classifyWorkspaceIntent(
     };
   }
 
-  // 4. Research / apply-selection — always conversation, never field fills
-  if (
-    RESEARCH_REQUEST_RE.test(t) ||
-    APPLY_SELECTION_RE.test(t) ||
-    isReturnToContentTopic(t)
-  ) {
+  // Research / apply-selection — discovery-adjacent
+  if (RESEARCH_REQUEST_RE.test(t) || APPLY_SELECTION_RE.test(t)) {
+    return { intent: "discovery" };
+  }
+
+  if (isReturnToContentTopic(t)) {
     return { intent: "conversation" };
   }
 
-  // 5. Help (brainstorming, naming) — coach or API, not silent field writes
+  // Help (naming, phrasing) — coach or API, not silent field writes
   if (HELP_RE.test(t)) {
     return { intent: "helpRequest" };
   }
 
-  // 6. Review
+  // Review
   if (REVIEW_TITLE_RE.test(t)) {
     return {
       intent: "reviewRequest",
@@ -314,8 +340,13 @@ export function classifyWorkspaceIntent(
     };
   }
 
-  // 6. Project lookup
-  if (PROJECT_LOOKUP_RE.test(t)) {
+  // 6. Project lookup — explicit only; never during prioritizing/thinking
+  if (
+    PROJECT_LOOKUP_RE.test(t) &&
+    !shouldStayConversationalOnly(t) &&
+    (isExplicitProjectRequest(t) ||
+      /\b(?:where (?:is|did)|find my|show me my|looking for my)\b/i.test(t))
+  ) {
     return {
       intent: "projectLookup",
       projectQuery: extractProjectQuery(t) ?? undefined,
@@ -346,7 +377,10 @@ export function classifyWorkspaceIntent(
   }
 
   if (QUESTION_START_RE.test(t) || QUESTION_PHRASE_RE.test(t) || t.includes("?")) {
-    if (/\b(?:where.*project|project.*go|find my|lost my)\b/i.test(t)) {
+    if (
+      /\b(?:where.*project|project.*go|find my|lost my)\b/i.test(t) &&
+      !shouldStayConversationalOnly(t)
+    ) {
       return {
         intent: "projectLookup",
         projectQuery: extractProjectQuery(t) ?? undefined,
@@ -395,6 +429,8 @@ export function classifyWorkspaceMessage(
       return "projectContent";
     case "helpRequest":
       return "helpRequest";
+    case "discovery":
+      return "question";
     case "navigation":
       return "navigation";
     case "confirmation":
@@ -413,6 +449,17 @@ export function isProjectContent(
   opts?: ClassifyWorkspaceIntentOptions,
 ): boolean {
   return isFieldContentIntent(userText, lastAssistantText, opts);
+}
+
+export function isDiscoveryIntent(
+  userText: string,
+  lastAssistantText = "",
+  opts?: ClassifyWorkspaceIntentOptions,
+): boolean {
+  return (
+    classifyWorkspaceIntent(userText, lastAssistantText, opts).intent ===
+    "discovery"
+  );
 }
 
 export function isHelpRequest(text: string): boolean {

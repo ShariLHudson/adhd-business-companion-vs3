@@ -24,6 +24,7 @@ export type EcosystemTrackEventType =
   | "feature.focus_audio_completed"
   | "feature.time_block_started"
   | "feature.time_block_completed"
+  | "feature.momentum_appointment_checkin"
   | "feature.clear_my_mind_used"
   | "feature.brain_dump_used"
   | "document.google_doc_created"

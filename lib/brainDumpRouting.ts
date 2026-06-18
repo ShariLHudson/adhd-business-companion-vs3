@@ -120,7 +120,7 @@ export function routeBrainDumpEntry(
       logMomentum("start", `Time block: ${text.slice(0, 60)}`);
       return trust(
         `Added to Time Bank: "${text}"`,
-        "Time Bank",h
+        "Time Bank",
         "Open **Time Bank** to schedule it on your calendar.",
         route,
       );
@@ -223,12 +223,15 @@ export function routeBrainDumpEntry(
       );
     }
     case "done": {
-      updateBrainDump(entry.id, { done: true, routedAction: "done" });
-      logMomentum("complete", `Cleared: ${text.slice(0, 60)}`);
+      updateBrainDump(entry.id, {
+        sorted: true,
+        routedAction: "library",
+      });
+      logMomentum("complete", `Kept in library: ${text.slice(0, 60)}`);
       return trust(
-        `Marked done: "${text}"`,
-        "Clear My Mind",
-        "It moves out of your active list.",
+        `Kept in your Library: "${text}"`,
+        "Clear My Mind → Library",
+        "Find it anytime under **Library** — nothing was removed.",
         route,
       );
     }

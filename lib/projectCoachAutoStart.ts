@@ -28,8 +28,7 @@ export function buildProjectCoachAutoStart(
 
   if (ctx.view === "list" || !ctx.view) {
     return {
-      content:
-        "I see your project list — pick one to open, or tap **+ New Project**. I'll pick up from wherever you land.",
+      content: "What project are we working on today?",
       focusField: null,
     };
   }

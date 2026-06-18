@@ -12,6 +12,11 @@ import { audioSuggestionLine, detectAudioRequest } from "./audioSuggestions";
 import { matchCatalogFromText } from "./createCatalog";
 import type { AppSection } from "./companionUi";
 import { multiItemWorkspaceOfferLine } from "./multiItemWorkspace";
+import {
+  isExplicitCreationRequest,
+  isContentBrainstorming,
+  shouldSuppressCreatePending,
+} from "./messageClassification";
 
 export const WORKSPACE_SECTIONS: AppSection[] = [
   "projects",
@@ -51,7 +56,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   playbook: "Strategies",
   "how-do-i": "How Do I",
   "brain-dump": "Clear My Mind",
-  "time-block": "Time Block",
+  "time-block": "Momentum Appointments",
   "email-generator": "Email",
   snippets: "Snippets",
   "business-profile": "Business Profile",
@@ -182,7 +187,7 @@ function matchWorkspaceTarget(t: string): WorkspaceTarget | null {
   ) {
     return {
       section: "time-block",
-      buttonLabel: "Open Time Block",
+      buttonLabel: "Open Momentum Appointments",
       topic: "plan",
       topicLabel: "plan",
     };
@@ -205,6 +210,12 @@ function hasSchedulingIntent(t: string): boolean {
 }
 
 function hasDoingIntent(t: string): boolean {
+  if (isContentBrainstorming(t) && !isExplicitCreationRequest(t)) {
+    return false;
+  }
+  if (shouldSuppressCreatePending(t) && !isExplicitCreationRequest(t)) {
+    return false;
+  }
   if (hasSchedulingIntent(t)) return true;
   if (/\b(brain dump|clear my (?:head|mind)|get it (?:all )?out)\b/i.test(t)) {
     return true;

@@ -30,8 +30,13 @@ import {
   NO_CATEGORY,
 } from "@/lib/categoryRevealUx";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
+import { DecisionCompassPanel } from "@/components/companion/DecisionCompassPanel";
 import { CrossWorkspaceSuggestionCard } from "@/components/companion/CrossWorkspaceSuggestionCard";
 import type { AppSection } from "@/lib/companionUi";
+import {
+  HELP_ME_RIGHT_NOW_MENU,
+  type HelpMeRightNowMenuItem,
+} from "@/lib/focusToolDefinitions";
 
 export type ActivityPhase = "browse" | "active" | "stopped" | "complete";
 
@@ -78,6 +83,7 @@ function shouldShowLinkedSuggestion(
 export function CompanionActivitiesPanel({
   onOpenBeside,
   onOpenGames,
+  onQuickTool,
   onClose,
   embedded = false,
   session: controlledSession,
@@ -86,6 +92,8 @@ export function CompanionActivitiesPanel({
   onOpenBeside?: (section: AppSection, payload: OpenBesidePayload) => void;
   /** Open Momentum Games (playful resets). */
   onOpenGames?: () => void;
+  /** Featured Help Me Right Now menu — open section, activity, or chat. */
+  onQuickTool?: (item: HelpMeRightNowMenuItem) => void;
   onClose?: () => void;
   embedded?: boolean;
   session?: ActivitySessionState;
@@ -128,6 +136,17 @@ export function CompanionActivitiesPanel({
         ? { [fieldStorageKey(firstField)]: defaultAnswersForField(firstField) }
         : {},
     });
+  }
+
+  function launchQuickTool(item: HelpMeRightNowMenuItem) {
+    if (onQuickTool) {
+      onQuickTool(item);
+      return;
+    }
+    if (item.kind === "activity" && item.activityId) {
+      const a = getActivityById(item.activityId);
+      if (a) start(a);
+    }
   }
 
   function ensureStepAnswers(
@@ -247,6 +266,17 @@ export function CompanionActivitiesPanel({
   }
 
   if (session.phase === "active" && activity) {
+    if (activity.customUi === "decision-compass") {
+      return (
+        <div className={shellClass}>
+          <DecisionCompassPanel
+            onStop={stop}
+            onClose={finish}
+          />
+        </div>
+      );
+    }
+
     const cat = ACTIVITY_CATEGORIES.find((c) => c.id === activity.categoryId);
     const steps = activity.steps;
     const currentStep = steps[session.stepIndex];
@@ -366,7 +396,8 @@ export function CompanionActivitiesPanel({
             Help Me Right Now
           </h1>
           <p className="mt-2 text-base leading-relaxed text-[#6b635a]">
-            {CATEGORY_PICKER_HINT} No scoreboard — just support when you need it.
+            Each tool solves a different problem — pick the one that matches
+            right now.
           </p>
         </header>
         {onClose && !embedded ? (
@@ -405,7 +436,42 @@ export function CompanionActivitiesPanel({
         </button>
       ) : null}
 
+      <div className="mt-5">
+        <p className="text-sm font-bold uppercase tracking-wide text-[#7c7468]">
+          Quick picks
+        </p>
+        <ul className="mt-2 flex flex-col gap-2">
+          {HELP_ME_RIGHT_NOW_MENU.map((item) => (
+            <li key={item.id}>
+              <button
+                type="button"
+                onClick={() => launchQuickTool(item)}
+                className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/80 px-3.5 py-3 text-left transition-colors hover:border-[#1e4f4f]/40 hover:bg-white"
+              >
+                <span aria-hidden="true" className="text-xl">
+                  {item.emoji}
+                </span>
+                <span className="min-w-0">
+                  <span className="block text-base font-semibold text-[#1f1c19]">
+                    {item.title}
+                  </span>
+                  <span className="mt-0.5 block text-sm text-[#6b635a]">
+                    {item.purpose}
+                  </span>
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
       <div className="mt-6">
+        <p className="text-sm font-bold uppercase tracking-wide text-[#7c7468]">
+          Browse by category
+        </p>
+      </div>
+
+      <div className="mt-3">
         <CategoryPickerSelect
           label="What kind of help do you need?"
           value={session.categoryId}

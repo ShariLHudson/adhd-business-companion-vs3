@@ -1,5 +1,6 @@
 import type { AppSection } from "@/lib/companionUi";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
+import { compareDropdownLabels } from "@/lib/dropdownSort";
 
 export type HowDoIEntry = {
   id: string;
@@ -460,6 +461,72 @@ export const HOW_DO_I_FEATURED_IDS = [
   "plan-day",
   "use-focus",
 ] as const;
+
+export type HowDoITopicGroupId =
+  | "business"
+  | "clear-mind"
+  | "create"
+  | "focus"
+  | "projects"
+  | "settings"
+  | "strategies"
+  | "templates"
+  | "time";
+
+export type HowDoITopicGroup = {
+  id: HowDoITopicGroupId;
+  label: string;
+};
+
+const HOW_DO_I_TOPIC_GROUP_BY_ENTRY: Record<string, HowDoITopicGroupId> = {
+  "create-strategy": "strategies",
+  "use-strategies": "strategies",
+  "schedule-appointment": "time",
+  "create-workshop": "create",
+  "plan-day": "focus",
+  "use-focus": "focus",
+  "create-project": "projects",
+  "create-content": "create",
+  "time-blocks": "time",
+  "clear-mind": "clear-mind",
+  templates: "templates",
+  "business-profile": "business",
+  colors: "settings",
+};
+
+const HOW_DO_I_TOPIC_GROUPS = (
+  [
+    { id: "business", label: "Business profile" },
+    { id: "clear-mind", label: "Clear My Mind" },
+    { id: "create", label: "Create & workshops" },
+    { id: "focus", label: "Focus & energy" },
+    { id: "projects", label: "Projects" },
+    { id: "settings", label: "Settings & appearance" },
+    { id: "strategies", label: "Strategies" },
+    { id: "templates", label: "Templates" },
+    { id: "time", label: "Calendar & time blocks" },
+  ] satisfies HowDoITopicGroup[]
+).sort((a, b) => compareDropdownLabels(a.label, b.label));
+
+export function howDoITopicGroups(): {
+  group: HowDoITopicGroup;
+  entries: HowDoIEntry[];
+}[] {
+  const buckets = new Map<HowDoITopicGroupId, HowDoIEntry[]>();
+  for (const entry of HOW_DO_I_ENTRIES) {
+    if (entry.id === "fallback") continue;
+    const groupId = HOW_DO_I_TOPIC_GROUP_BY_ENTRY[entry.id] ?? "settings";
+    const list = buckets.get(groupId) ?? [];
+    list.push(entry);
+    buckets.set(groupId, list);
+  }
+  return HOW_DO_I_TOPIC_GROUPS.map((group) => ({
+    group,
+    entries: (buckets.get(group.id) ?? []).sort((a, b) =>
+      compareDropdownLabels(a.title, b.title),
+    ),
+  })).filter((row) => row.entries.length > 0);
+}
 
 export function featuredHowDoIEntries(): HowDoIEntry[] {
   return HOW_DO_I_FEATURED_IDS.map(

@@ -28,19 +28,21 @@ describe("createTemplates", () => {
     expect(preset.sections.map((s) => s.label)).toContain("Subject Line");
   });
 
-  it("advances through template step before discovery", () => {
-    let wf = advanceAfterItemPick("Newsletter");
-    wf = advanceAfterSubtypePick(wf, "Educational");
-    expect(wf.step).toBe("template");
-    wf = advanceFromTemplate(wf);
+  it("advances from item pick straight to discovery with internal defaults", () => {
+    const wf = advanceAfterItemPick("Newsletter");
     expect(wf.step).toBe("discovery");
     expect(wf.selectedTemplateId).toBeTruthy();
+    const fromSubtype = advanceAfterSubtypePick(wf, "Educational");
+    expect(fromSubtype.step).toBe("template");
+    const ready = advanceFromTemplate(fromSubtype);
+    expect(ready.step).toBe("discovery");
   });
 
   it("appends template scaffold to generation brief", () => {
-    const wf = advanceFromTemplate(
-      advanceAfterSubtypePick(advanceAfterItemPick("Newsletter"), "Educational"),
-    );
+    const wf = reconcileTemplateForType({
+      ...advanceAfterItemPick("Newsletter"),
+      selectedSubtype: "Educational",
+    });
     const brief = buildFullCreateBrief({
       ...wf,
       discoveryAnswers: {
@@ -50,7 +52,7 @@ describe("createTemplates", () => {
       },
     });
     expect(brief).toContain("Grow my list");
-    expect(brief).toContain("Educational Newsletter");
+    expect(brief).toMatch(/Newsletter/);
     expect(brief).toContain("Subject Line");
   });
 

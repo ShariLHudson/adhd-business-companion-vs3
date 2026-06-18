@@ -11,7 +11,7 @@ const sample: TemplateItem[] = [
     category: "emails",
     status: "saved",
     createdAt: "",
-    updatedAt: "",
+    updatedAt: "2026-01-02",
   },
   {
     id: "2",
@@ -20,7 +20,7 @@ const sample: TemplateItem[] = [
     category: "systems",
     status: "draft",
     createdAt: "",
-    updatedAt: "",
+    updatedAt: "2026-06-01",
   },
 ];
 
@@ -35,13 +35,23 @@ describe("filterTemplates", () => {
     expect(out[0]?.title).toBe("Welcome Email");
   });
 
-  it("returns empty until category or search", () => {
+  it("shows all templates when no category or search filter", () => {
     const out = filterTemplates(sample, {
       query: "",
       status: "all",
       category: NO_CATEGORY,
     });
-    expect(out).toHaveLength(0);
+    expect(out).toHaveLength(2);
+  });
+
+  it("sorts by updatedAt descending when no search", () => {
+    const out = filterTemplates(sample, {
+      query: "",
+      status: "all",
+      category: NO_CATEGORY,
+    });
+    expect(out[0]?.title).toBe("Workshop SOP");
+    expect(out[1]?.title).toBe("Welcome Email");
   });
 
   it("filters by category without accordions", () => {

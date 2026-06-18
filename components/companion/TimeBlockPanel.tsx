@@ -7,7 +7,6 @@ import {
   deleteTimeBlock,
   formatBlockTime,
   formatDayLabel,
-  formatDuration,
   getBlockTags,
   getProjects,
   getTimeBlocks,
@@ -25,6 +24,18 @@ import {
   type TimeBankFilters,
 } from "@/lib/timeBank";
 import { sortByDropdownLabel } from "@/lib/dropdownSort";
+import {
+  DEFAULT_MOMENTUM_GOAL,
+  MOMENTUM_APPOINTMENT_BANK,
+  MOMENTUM_APPOINTMENT_TITLE,
+  MOMENTUM_DURATION_OPTIONS,
+  MOMENTUM_WHEN_OPTIONS,
+  applyWhenPreset,
+  formatMomentumDuration,
+  formatMomentumWhen,
+  momentumStatusDisplay,
+  type MomentumWhenPreset,
+} from "@/lib/momentumAppointment";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import { useVisualMode } from "@/lib/useVisualMode";
 
@@ -123,15 +134,18 @@ const ENERGY: { id: BlockEnergy; label: string }[] = [
   { id: "low", label: "Low" },
 ];
 
-const DURATIONS = [15, 30, 60];
+const DURATIONS = [...MOMENTUM_DURATION_OPTIONS];
 const SNOOZE = [5, 10, 30, 120];
 
 type Form = {
   id?: string;
   title: string;
+  goal: string;
   date: string;
   startTime: string;
+  whenPreset: MomentumWhenPreset;
   durationMin: number;
+  durationFlexible: boolean;
   custom: string;
   customUnit: DurUnit;
   energy: BlockEnergy;
@@ -144,9 +158,12 @@ type Form = {
 function emptyForm(): Form {
   return {
     title: "",
+    goal: DEFAULT_MOMENTUM_GOAL,
     date: todayStr(),
     startTime: "09:00",
+    whenPreset: "morning",
     durationMin: 30,
+    durationFlexible: false,
     custom: "",
     customUnit: "min",
     energy: "medium",
@@ -177,7 +194,7 @@ const HORIZONS: { id: Horizon; label: string }[] = [
   { id: "week", label: "This week" },
   { id: "nextweek", label: "Next week" },
   { id: "later", label: "Later" },
-  { id: "unscheduled", label: "Time Bank" },
+  { id: "unscheduled", label: MOMENTUM_APPOINTMENT_BANK },
 ];
 
 // Single-bucket horizons don't need per-day headers.
@@ -207,20 +224,21 @@ export function TimeBlockPanel({
   onStart,
   onTestAlert,
   initialProjectId,
+  initialBlockId,
 }: {
   onStart: (block: TimeBlock) => void;
   onTestAlert?: () => void;
   /** Inherit project context when opened from a project ("schedule time to work on X"). */
   initialProjectId?: string;
+  /** Scroll to and highlight a block opened from Projects. */
+  initialBlockId?: string;
 }) {
   const [blocks, setBlocks] = useState<TimeBlock[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [form, setForm] = useState<Form>(emptyForm());
   const [snoozeFor, setSnoozeFor] = useState<string | null>(null);
   const [view, setView] = useState<Horizon>("today");
-  const [openDays, setOpenDays] = useState<Set<string>>(
-    () => new Set([todayStr()]),
-  );
+  const [openDays, setOpenDays] = useState<Set<string>>(() => new Set());
 
   const [durTouched, setDurTouched] = useState(false);
   const [showTag, setShowTag] = useState(false);
@@ -230,7 +248,7 @@ export function TimeBlockPanel({
   const [addingTag, setAddingTag] = useState(false);
   const [newProject, setNewProject] = useState("");
   const [addingProject, setAddingProject] = useState(false);
-  const [bankOpen, setBankOpen] = useState(true);
+  const [bankOpen, setBankOpen] = useState(false);
   const [bankFilters, setBankFilters] = useState<TimeBankFilters>(
     DEFAULT_TIME_BANK_FILTERS,
   );
@@ -255,6 +273,26 @@ export function TimeBlockPanel({
       }));
     }
   }, [initialProjectId]);
+
+  useEffect(() => {
+    if (!initialBlockId) return;
+    const block = blocks.find((b) => b.id === initialBlockId);
+    if (!block) return;
+    if (block.date) {
+      if (inHorizon(block.date, "today")) setView("today");
+      else if (inHorizon(block.date, "week")) setView("week");
+      else if (inHorizon(block.date, "later")) setView("later");
+      setOpenDays((s) => new Set(s).add(block.date));
+    } else {
+      setView("unscheduled");
+      setBankOpen(true);
+    }
+    window.setTimeout(() => {
+      document
+        .getElementById(`time-block-${block.id}`)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }, 120);
+  }, [initialBlockId, blocks]);
 
   function createProject() {
     const name = newProject.trim();
@@ -285,8 +323,9 @@ export function TimeBlockPanel({
   const colorOn = visualMode !== "off";
   const decorative = visualMode === "decorative";
 
-  const durationMin =
-    form.durationMin === -1
+  const durationMin = form.durationFlexible
+    ? 30
+    : form.durationMin === -1
       ? (Number(form.custom) || 0) * UNIT_MIN[form.customUnit]
       : form.durationMin;
   const hasTitle = form.title.trim().length > 0;
@@ -331,15 +370,19 @@ export function TimeBlockPanel({
   );
 
   function renderBlockCard(b: TimeBlock, opts?: { bank?: boolean }) {
+    const focused = initialBlockId === b.id;
+    const status = momentumStatusDisplay(b.status);
+    const goal = b.goal?.trim() || DEFAULT_MOMENTUM_GOAL;
     return (
       <li
         key={b.id}
+        id={`time-block-${b.id}`}
         style={
           colorOn && b.projectId
             ? {
                 borderLeftWidth: 5,
                 borderLeftColor: projColor(b.projectId) ?? undefined,
-                ...(decorative && b.status !== "missed"
+                ...(decorative && status.tone !== "soft"
                   ? {
                       backgroundColor: `${projColor(b.projectId) ?? "#999"}0d`,
                     }
@@ -348,14 +391,13 @@ export function TimeBlockPanel({
             : undefined
         }
         className={`rounded-2xl border border-[#d4cdc3] p-4 ${
-          b.status === "completed" ? "opacity-60" : ""
-        } ${b.status === "missed" ? "bg-[#a85c4a]/10" : "bg-white/85"}`}
+          b.status === "completed" ? "opacity-70" : ""
+        } ${status.tone === "soft" ? "bg-[#f5f2ed]" : "bg-white/85"} ${
+          focused ? "ring-2 ring-[#1e4f4f]" : ""
+        }`}
       >
-        <p className="text-base font-semibold text-[#1f1c19]">
-          {opts?.bank || !b.date
-            ? b.title
-            : `${formatBlockTime(b.startTime)} — ${b.title}`}
-        </p>
+        <p className="text-base font-semibold text-[#1f1c19]">{b.title}</p>
+        <p className="mt-1 text-sm text-[#6b635a]">Goal: {goal}</p>
         <div className="mt-1 flex flex-wrap items-center gap-2 text-xs text-[#6b635a]">
           <span
             className="inline-block h-2.5 w-2.5 rounded-full"
@@ -363,8 +405,14 @@ export function TimeBlockPanel({
             title={`${b.energy} energy`}
           />
           <span className="rounded-full bg-[#1e4f4f]/10 px-2 py-0.5 font-semibold text-[#1e4f4f]">
-            {formatDuration(b.durationMin)}
+            {formatMomentumDuration(b)}
           </span>
+          {!opts?.bank && b.date && (
+            <span className="rounded-full bg-white/80 px-2 py-0.5">
+              {formatMomentumWhen(b)}
+              {b.whenPreset === "specific" ? ` · ${formatBlockTime(b.startTime)}` : ""}
+            </span>
+          )}
           {projectName(b.projectId) && (
             <span className="inline-flex items-center gap-1 rounded-full bg-[#1e4f4f]/8 px-2 py-0.5 font-semibold text-[#1e4f4f]">
               {colorOn && (
@@ -375,15 +423,23 @@ export function TimeBlockPanel({
                   }}
                 />
               )}
-              Assigned to: {projectName(b.projectId)}
+              {projectName(b.projectId)}
             </span>
           )}
           {b.tag && (
             <span className="rounded-full bg-white/80 px-2 py-0.5">{b.tag}</span>
           )}
-          {b.status !== "pending" && (
-            <span className="capitalize">{b.status}</span>
-          )}
+          <span
+            className={`rounded-full px-2 py-0.5 font-semibold ${
+              status.tone === "positive"
+                ? "bg-[#1e4f4f]/10 text-[#1e4f4f]"
+                : status.tone === "soft"
+                  ? "bg-[#d4cdc3]/40 text-[#6b635a]"
+                  : "bg-white/80 text-[#6b635a]"
+            }`}
+          >
+            {status.symbol} {status.label}
+          </span>
         </div>
         <div className="mt-3 flex flex-wrap gap-2 text-sm font-semibold">
           <button
@@ -474,18 +530,29 @@ export function TimeBlockPanel({
   }
 
   function submit() {
-    if (!form.title.trim() || durationMin <= 0) return;
+    if (!form.title.trim() || (!form.durationFlexible && durationMin <= 0)) return;
+    const when =
+      form.date === ""
+        ? { date: "", startTime: form.startTime, whenPreset: form.whenPreset }
+        : applyWhenPreset(form.whenPreset, {
+            date: form.date,
+            startTime: form.startTime,
+          });
     const saved = saveTimeBlock({
       id: form.id,
       title: form.title.trim(),
-      date: form.date,
-      startTime: form.startTime,
-      durationMin,
+      goal: form.goal.trim() || DEFAULT_MOMENTUM_GOAL,
+      date: when.date,
+      startTime: when.startTime,
+      whenPreset: when.whenPreset,
+      durationMin: form.durationFlexible ? 30 : durationMin,
+      durationFlexible: form.durationFlexible,
       energy: form.energy,
       tag: form.tag,
       note: form.note.trim() || undefined,
       projectId: form.projectId,
       timerEnabled: form.timerEnabled,
+      status: "pending",
     });
     setBlocks(saved);
     if (!form.id) {
@@ -507,14 +574,18 @@ export function TimeBlockPanel({
   }
 
   function edit(b: TimeBlock) {
-    const preset = DURATIONS.includes(b.durationMin);
+    const preset =
+      !b.durationFlexible && DURATIONS.includes(b.durationMin as (typeof DURATIONS)[number]);
     setForm({
       id: b.id,
       title: b.title,
-      date: b.date || todayStr(),
+      goal: b.goal?.trim() || DEFAULT_MOMENTUM_GOAL,
+      date: b.date || "",
       startTime: b.startTime,
-      durationMin: preset ? b.durationMin : -1,
-      custom: preset ? "" : String(b.durationMin),
+      whenPreset: b.whenPreset ?? (b.date ? "specific" : "morning"),
+      durationMin: b.durationFlexible ? 30 : preset ? b.durationMin : -1,
+      durationFlexible: !!b.durationFlexible,
+      custom: preset || b.durationFlexible ? "" : String(b.durationMin),
       customUnit: "min",
       energy: b.energy,
       tag: b.tag,
@@ -538,7 +609,9 @@ export function TimeBlockPanel({
     <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
       <WorkspaceGuide section="time-block" />
       <div className="flex items-center justify-between gap-3">
-        <p className="text-2xl font-semibold text-[#1f1c19]">Time Blocks</p>
+        <p className="text-2xl font-semibold text-[#1f1c19]">
+          {MOMENTUM_APPOINTMENT_TITLE}
+        </p>
         {onTestAlert && (
           <button
             type="button"
@@ -550,7 +623,7 @@ export function TimeBlockPanel({
         )}
       </div>
       <p className="mt-1 text-base text-[#6b635a]">
-        Scheduled intentions — I&apos;ll nudge you when it&apos;s time.
+        Gentle intentions for momentum — every outcome counts, including progress.
       </p>
 
       {/* Create / edit form — progressive */}
@@ -558,38 +631,106 @@ export function TimeBlockPanel({
         <input
           value={form.title}
           onChange={(e) => setForm({ ...form, title: e.target.value })}
-          placeholder="What are you doing? e.g. Write content"
+          placeholder="What are you moving forward? e.g. Marketing plan"
           className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
         />
 
         {hasTitle && (
           <div className="companion-fade-in">
-            <div className="mt-3 flex flex-wrap items-center gap-3">
-              <label className="text-sm font-semibold text-[#6b635a]">
-                Date
-                <input
-                  type="date"
-                  value={form.date}
-                  onChange={(e) => setForm({ ...form, date: e.target.value })}
-                  className="ml-2 rounded-lg border border-[#c9bfb0] bg-white px-2 py-1.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-                />
-              </label>
-              <label className="text-sm font-semibold text-[#6b635a]">
-                Start
-                <input
-                  type="time"
-                  value={form.startTime}
-                  onChange={(e) =>
-                    setForm({ ...form, startTime: e.target.value })
-                  }
-                  className="ml-2 rounded-lg border border-[#c9bfb0] bg-white px-2 py-1.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-                />
-              </label>
+            <label className="mt-3 block text-sm font-semibold text-[#6b635a]">
+              Goal
+              <input
+                value={form.goal}
+                onChange={(e) => setForm({ ...form, goal: e.target.value })}
+                placeholder={DEFAULT_MOMENTUM_GOAL}
+                className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+              />
+            </label>
+
+            <p className="mt-3 text-sm font-semibold text-[#6b635a]">Time</p>
+            <div className="mt-1.5 flex flex-wrap gap-2">
+              {DURATIONS.map((d) => (
+                <button
+                  key={d}
+                  type="button"
+                  onClick={() => {
+                    setForm({
+                      ...form,
+                      durationMin: d,
+                      durationFlexible: false,
+                    });
+                    setDurTouched(true);
+                  }}
+                  className={chip(
+                    !form.durationFlexible && form.durationMin === d && durTouched,
+                  )}
+                >
+                  {d} min
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => {
+                  setForm({ ...form, durationFlexible: true });
+                  setDurTouched(true);
+                }}
+                className={chip(form.durationFlexible && durTouched)}
+              >
+                Flexible
+              </button>
             </div>
+
+            <p className="mt-3 text-sm font-semibold text-[#6b635a]">When</p>
+            <div className="mt-1.5 flex flex-wrap gap-2">
+              {MOMENTUM_WHEN_OPTIONS.map((w) => (
+                <button
+                  key={w.id}
+                  type="button"
+                  onClick={() => {
+                    const applied = applyWhenPreset(w.id);
+                    setForm({
+                      ...form,
+                      whenPreset: w.id,
+                      date: w.id === "specific" ? form.date || todayStr() : applied.date,
+                      startTime: applied.startTime,
+                    });
+                    setDurTouched(true);
+                  }}
+                  className={chip(form.whenPreset === w.id)}
+                >
+                  {w.label}
+                </button>
+              ))}
+            </div>
+
+            {form.whenPreset === "specific" && (
+              <div className="mt-3 flex flex-wrap items-center gap-3">
+                <label className="text-sm font-semibold text-[#6b635a]">
+                  Date
+                  <input
+                    type="date"
+                    value={form.date || todayStr()}
+                    onChange={(e) => setForm({ ...form, date: e.target.value })}
+                    className="ml-2 rounded-lg border border-[#c9bfb0] bg-white px-2 py-1.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                  />
+                </label>
+                <label className="text-sm font-semibold text-[#6b635a]">
+                  Start
+                  <input
+                    type="time"
+                    value={form.startTime}
+                    onChange={(e) =>
+                      setForm({ ...form, startTime: e.target.value })
+                    }
+                    className="ml-2 rounded-lg border border-[#c9bfb0] bg-white px-2 py-1.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                  />
+                </label>
+              </div>
+            )}
             <label className="mt-2 flex items-center gap-2 text-sm text-[#6b635a]">
               <input
                 type="checkbox"
-                checked={!form.date}
+                checked={!form.date && form.whenPreset !== "specific"}
                 onChange={(e) =>
                   setForm({
                     ...form,
@@ -598,62 +739,8 @@ export function TimeBlockPanel({
                 }
                 className="h-4 w-4 accent-[#1e4f4f]"
               />
-              No date yet — save to Time Bank
+              No date yet — save to {MOMENTUM_APPOINTMENT_BANK}
             </label>
-
-            <p className="mt-3 text-sm font-semibold text-[#6b635a]">Duration</p>
-            <div className="mt-1.5 flex flex-wrap gap-2">
-              {DURATIONS.map((d) => (
-                <button
-                  key={d}
-                  type="button"
-                  onClick={() => {
-                    setForm({ ...form, durationMin: d });
-                    setDurTouched(true);
-                  }}
-                  className={chip(form.durationMin === d && durTouched)}
-                >
-                  {d === 60 ? "1 hr" : `${d} min`}
-                </button>
-              ))}
-              <button
-                type="button"
-                onClick={() => {
-                  setForm({ ...form, durationMin: -1 });
-                  setDurTouched(true);
-                }}
-                className={chip(form.durationMin === -1)}
-              >
-                Custom
-              </button>
-              {form.durationMin === -1 && (
-                <span className="inline-flex items-center gap-1.5">
-                  <input
-                    type="number"
-                    min={1}
-                    value={form.custom}
-                    onChange={(e) =>
-                      setForm({ ...form, custom: e.target.value })
-                    }
-                    placeholder="#"
-                    className="w-16 rounded-lg border border-[#c9bfb0] bg-white px-2 py-1.5 text-base outline-none focus:border-[#1e4f4f]"
-                  />
-                  <select
-                    value={form.customUnit}
-                    onChange={(e) =>
-                      setForm({ ...form, customUnit: e.target.value as DurUnit })
-                    }
-                    className="rounded-lg border border-[#c9bfb0] bg-white px-2 py-1.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-                  >
-                    <option value="min">min</option>
-                    <option value="hr">hours</option>
-                    <option value="day">days</option>
-                    <option value="week">weeks</option>
-                    <option value="month">months</option>
-                  </select>
-                </span>
-              )}
-            </div>
           </div>
         )}
 
@@ -804,11 +891,11 @@ export function TimeBlockPanel({
               )}
               <button
                 type="button"
-                disabled={!form.title.trim() || durationMin <= 0}
+                disabled={!form.title.trim() || (!form.durationFlexible && durationMin <= 0)}
                 onClick={submit}
                 className="rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-base font-semibold text-white disabled:bg-[#9aaba8]"
               >
-                {form.id ? "Update Time Block" : "Add time block"}
+                {form.id ? "Update appointment" : "Add momentum appointment"}
               </button>
             </div>
           </div>
@@ -823,7 +910,7 @@ export function TimeBlockPanel({
           className="flex w-full items-center gap-2 text-left"
         >
           <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-            Time Bank
+            {MOMENTUM_APPOINTMENT_BANK}
           </p>
           <span className="rounded-full bg-[#1e4f4f]/10 px-2 py-0.5 text-xs font-semibold text-[#1e4f4f]">
             {bankBlocks.length}
@@ -831,7 +918,7 @@ export function TimeBlockPanel({
           <span className="ml-auto text-sm text-[#6b635a]">{bankOpen ? "▾" : "▸"}</span>
         </button>
         <p className="mt-1 text-sm text-[#6b635a]">
-          Saved blocks without a date — assign to projects without losing them here.
+          Saved without a date — still available whenever you&apos;re ready.
         </p>
         {bankOpen && (
           <>

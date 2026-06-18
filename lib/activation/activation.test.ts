@@ -32,6 +32,22 @@ describe("activation intelligence", () => {
     expect(blockers.some((b) => b.type === "task_friction")).toBe(true);
   });
 
+  it("does not surface activation offer during emotional distress", () => {
+    const snap = evaluateActivation({
+      text: "I am overwhelmed",
+      emotionalState: "emotional",
+      cognitiveLoadLevel: "overloaded",
+    });
+    expect(snap.companionOffer).toMatch(/carrying a lot/i);
+    expect(shouldSurfaceActivationOffer(snap)).toBe(false);
+    expect(shouldSurfaceActivationOffer(snap, "I am overwhelmed")).toBe(false);
+    expect(
+      shouldSurfaceActivationOffer(snap, "I am overwhelmed", [
+        { role: "user", content: "I am overwhelmed" },
+      ]),
+    ).toBe(false);
+  });
+
   it("produces ActivationSnapshot with small companion offer", () => {
     const snap = evaluateActivation({
       text: "I'm stuck — the task feels too big",
@@ -41,7 +57,9 @@ describe("activation intelligence", () => {
     expect(snap.state).toMatch(/stuck|frozen|hesitant/);
     expect(snap.likelyBlockers.length).toBeGreaterThan(0);
     expect(snap.suggestedNextStep.length).toBeGreaterThan(5);
-    expect(shouldSurfaceActivationOffer(snap)).toBe(true);
+    expect(shouldSurfaceActivationOffer(snap, "I'm stuck — the task feels too big")).toBe(
+      true,
+    );
     expect(snap.companionOffer).toMatch(/tiny|5-minute|shrink|small|friction|step/i);
     expect(snap.companionOffer).not.toMatch(/try harder|lazy|failing/i);
   });

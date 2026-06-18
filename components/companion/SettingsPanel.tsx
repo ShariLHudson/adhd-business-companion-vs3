@@ -38,22 +38,7 @@ import {
   type PersonalDate,
 } from "@/lib/recognition";
 
-const TONES: { id: AiTone; label: string; desc: string }[] = sortByDropdownLabel(
-  [
-  { id: "calm", label: "Calm", desc: "Slow, grounding, spacious." },
-  { id: "balanced", label: "Balanced", desc: "Warm but direct." },
-  { id: "direct", label: "Direct", desc: "Brief and to the point." },
-  { id: "minimal", label: "Minimal", desc: "Very few words — just the next step." },
-  { id: "gentle", label: "Gentle", desc: "Soft, reassuring, lots of warmth." },
-  {
-    id: "encouraging",
-    label: "Encouraging",
-    desc: "Affirming, celebrates small wins.",
-  },
-  { id: "playful", label: "Playful", desc: "Light, a little humor." },
-  ],
-  (t) => t.label,
-);
+import { AI_TONE_GUIDES, aiToneLabel } from "@/lib/aiToneGuide";
 
 const HELP_MODES: { id: HelpMode; label: string; desc: string }[] = sortByDropdownLabel(
   [
@@ -112,7 +97,6 @@ const PATTERNS: { id: PatternAwareness; label: string; desc: string }[] = [
 
 import { visualModeLabel } from "@/lib/visualColorModes";
 import { VisualColorModePicker } from "@/components/companion/VisualColorModePicker";
-import { AI_TONE_GUIDES } from "@/lib/aiToneGuide";
 
 type Section =
   | "tone"
@@ -311,7 +295,7 @@ export function SettingsPanel({
   const desktopOn = desktop && perm === "granted";
 
   const ROWS: { id: Section; label: string; value: string }[] = [
-    { id: "tone", label: "AI Tone", value: TONES.find((t) => t.id === aiTone)?.label ?? "" },
+    { id: "tone", label: "AI Tone", value: aiToneLabel(aiTone) },
     { id: "help", label: "Help Mode", value: HELP_MODES.find((h) => h.id === helpMode)?.label ?? "" },
     { id: "support", label: "Support Style", value: SUPPORT_STYLES.find((s) => s.id === supportStyle)?.label ?? "" },
     {
@@ -444,7 +428,17 @@ export function SettingsPanel({
     return (
       <div className={wrap}>
         {header("AI Tone")}
-        <p className="mt-1 text-sm text-[#6b635a]">How Shari sounds.</p>
+        <p className="mt-1 text-sm text-[#6b635a]">
+          How Shari sounds. Each tone maps to a different kind of day.
+        </p>
+        <div className="mt-3 grid gap-2 text-xs text-[#6b635a] sm:grid-cols-2">
+          <span>Overwhelmed → Gentle</span>
+          <span>Normal day → Balanced</span>
+          <span>Procrastinating → Direct</span>
+          <span>Stressed → Playful</span>
+          <span>Planning → Strategic</span>
+          <span>Stuck → Motivational</span>
+        </div>
         <div className="mt-4 flex flex-col gap-3">
           {AI_TONE_GUIDES.map((tone) => {
             const active = aiTone === tone.id;
@@ -464,7 +458,7 @@ export function SettingsPanel({
               >
                 <span className="flex items-center justify-between gap-2">
                   <span className="text-base font-semibold text-[#1f1c19]">
-                    {tone.label}
+                    {tone.emoji} {tone.label}
                   </span>
                   {active ? <span className="text-[#1e4f4f]">✓</span> : null}
                 </span>
@@ -472,12 +466,15 @@ export function SettingsPanel({
                   {tone.desc}
                 </span>
                 <span className="mt-2 block text-sm text-[#4b463f]">
+                  <strong>Feels like:</strong> {tone.feelsLike}
+                </span>
+                <span className="mt-1 block text-sm text-[#4b463f]">
                   <strong>Best for:</strong> {tone.bestFor}
                 </span>
                 <span className="mt-1 block text-sm text-[#4b463f]">
                   <strong>What changes:</strong> {tone.whatChanges}
                 </span>
-                <span className="mt-1 block text-sm italic text-[#6b635a]">
+                <span className="mt-2 block text-sm italic text-[#6b635a]">
                   {tone.example}
                 </span>
               </button>

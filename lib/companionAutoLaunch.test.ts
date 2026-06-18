@@ -47,7 +47,7 @@ describe("companionAutoLaunch", () => {
     ).toBe(true);
   });
 
-  it("auto-launches after assistant offers focus in the same turn", () => {
+  it("does not auto-launch after assistant mentions a tool in the same turn", () => {
     expect(
       shouldAutoLaunchAfterAssistantOffer(
         "10",
@@ -55,6 +55,6 @@ describe("companionAutoLaunch", () => {
         "Great — starting a 10-minute focus session.",
         focusBridge,
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 });

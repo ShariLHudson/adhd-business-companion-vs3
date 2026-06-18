@@ -1,9 +1,11 @@
 // Context-aware routing — business assets open in the right workspace, not generic chat.
 
 import { allCatalogItems, matchCatalogFromText } from "./createCatalog";
+import { isInformationIntent } from "./companionIntentRouting";
 import { blankScaffoldForType } from "./createInitialization";
 import type { AppSection } from "./companionUi";
 import { workspaceTitle } from "./workspaceMode";
+import { shouldBlockDraftPanelFromChat } from "./draftPermissionGate";
 
 export type AssetRoute = {
   section: AppSection;
@@ -57,8 +59,11 @@ export function isBareCatalogPick(text: string): boolean {
 export function shouldAutoRouteAssetRequest(text: string): boolean {
   const t = text.trim();
   if (!t || !matchCatalogFromText(t)) return false;
+  if (isInformationIntent(t)) return false;
+  if (isBareCatalogPick(t)) return true;
+  if (shouldBlockDraftPanelFromChat(t)) return false;
   if (ASSET_REQUEST_RE.test(t)) return true;
-  return isBareCatalogPick(t);
+  return false;
 }
 
 /** Assistant said it is opening a workspace — honor the user's catalog pick. */
@@ -66,6 +71,12 @@ export function detectAssistantWorkspaceLaunch(
   assistantText: string,
   userText: string,
 ): AssetRoute | null {
+  if (
+    !isBareCatalogPick(userText) &&
+    shouldBlockDraftPanelFromChat(userText, assistantText)
+  ) {
+    return null;
+  }
   if (!ASSISTANT_OPENING_RE.test(assistantText)) return null;
   const fromUser = resolveAssetRoute(userText);
   if (fromUser) return fromUser;

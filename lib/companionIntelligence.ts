@@ -1,6 +1,14 @@
 // Companion Intelligence Layer — multi-message understanding, discovery, invisible advisors.
 
 import type { EmotionalObstacle, EmotionalState } from "./companionEmotions";
+import {
+  classifyUserMessage,
+  hasClearEmotionalSignal,
+  isContentBrainstorming,
+  isOrdinaryTaskLanguage,
+  isPracticalTaskFriction,
+  shouldSuppressEmotionalTools,
+} from "./messageClassification";
 import type { AppSection } from "./companionUi";
 import { hasConcreteWorkspaceTarget } from "./workspaceMode";
 
@@ -66,8 +74,22 @@ export type CompanionIntelligence = {
   threadConnection: string | null;
 };
 
-const DISCOVERY_TRIGGER_RE =
-  /\b(overwhelm|overwhelmed|bored|boring|unmotivated|not motivated|no motivation|can'?t get motivated|stuck|low energy|no energy|can'?t focus|don'?t know what to do|too many (?:things|choices)|avoiding|procrastinat|frozen|can'?t start|exhausted|drained|frustrated|anxious|stressed|worried|frazzled)\b/i;
+const EMOTIONAL_DISCOVERY_TRIGGER_RE =
+  /\b(overwhelm|overwhelmed|bored|boring|unmotivated|not motivated|no motivation|can'?t get motivated|low energy|no energy|can'?t focus|cannot focus|too many (?:things|choices)|avoiding|procrastinat|frozen|can'?t start|exhausted|drained|frustrated|anxious|stressed|worried|frazzled)\b/i;
+
+function matchesEmotionalDiscoveryTrigger(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  if (shouldSuppressEmotionalTools(t)) return false;
+  if (isOrdinaryTaskLanguage(t) || isPracticalTaskFriction(t)) return false;
+  if (isContentBrainstorming(t) && !hasClearEmotionalSignal(t)) return false;
+  if (EMOTIONAL_DISCOVERY_TRIGGER_RE.test(t)) return true;
+  if (/\b(stuck|frozen)\b/i.test(t) && hasClearEmotionalSignal(t)) return true;
+  if (/\bdon'?t know what to do\b/i.test(t) && hasClearEmotionalSignal(t)) {
+    return true;
+  }
+  return false;
+}
 
 const DISCOVERY_ISSUE_Q_RE =
   /\b(is the (?:problem|issue)|what feels|does (?:the )?work feel|too big|pointless|low on energy|which feels|is it more|or are you|what kind of|what'?s making|weighing on you most|help me understand|what'?s going on)\b/i;
@@ -171,7 +193,7 @@ export function buildThreadConnection(topics: RecurringTopic[]): string | null {
   if (!recurring.length) return null;
   const top = recurring[0]!;
   if (top.id === "inbox") {
-    return `Thread: user mentioned their inbox ${top.mentionCount} times. Connect explicitly — e.g. "You've mentioned your inbox a couple of times. Is that one of the things weighing on you most right now?"`;
+    return `Thread: user mentioned their inbox ${top.mentionCount} times. Connect explicitly — e.g. "You've mentioned your inbox a couple of times — is clearing it one of the things on your mind right now?"`;
   }
   if (top.id === "energy") {
     return `Thread: low energy came up ${top.mentionCount} times. Link to other topics they raised — don't treat this message in isolation.`;
@@ -194,7 +216,7 @@ function inDiscoveryThread(messages: ChatTurn[]): boolean {
   const userTexts = messages
     .filter((m) => m.role === "user")
     .map((m) => m.content);
-  if (userTexts.some((t) => DISCOVERY_TRIGGER_RE.test(t))) return true;
+  if (userTexts.some((t) => matchesEmotionalDiscoveryTrigger(t))) return true;
   return messages.some(
     (m) =>
       m.role === "assistant" &&
@@ -208,7 +230,9 @@ export function getDiscoveryPhase(
   input: CompanionIntelligenceInput,
 ): DiscoveryPhase {
   if (input.askingHow) return "none";
+  if (shouldSuppressEmotionalTools(input.text)) return "none";
   if (hasConcreteWorkspaceTarget(input.text)) return "none";
+  if (classifyUserMessage(input.text) === "practical_task") return "none";
   if (READY_FOR_TOOL_RE.test(input.text.trim())) return "ready";
   if (!inDiscoveryThread(input.messages)) return "none";
 
@@ -225,6 +249,7 @@ export function classifyProblem(
   obstacle: EmotionalObstacle | null,
 ): ProblemType {
   const combined = userMessages.join(" ").toLowerCase();
+  const latest = userMessages[userMessages.length - 1] ?? "";
 
   if (/\b(inbox|organiz|clutter|sort|pile|messy|behind on)\b/.test(combined)) {
     return "organization";
@@ -245,7 +270,12 @@ export function classifyProblem(
   if (/\b(low energy|exhausted|drained|can'?t get started)\b/.test(combined)) {
     return "low_energy";
   }
-  if (/\b(anxious|stressed|worried|frustrated)\b/.test(combined)) return "anxiety";
+  if (
+    !shouldSuppressEmotionalTools(latest) &&
+    /\b(anxious|stressed|worried|frustrated)\b/.test(combined)
+  ) {
+    return "anxiety";
+  }
   if (/\b(marketing|launch|campaign|promot)\b/.test(combined)) return "marketing";
   if (/\b(grow|revenue|sales|clients|customers)\b/.test(combined)) {
     return "business_growth";

@@ -190,6 +190,11 @@ export const STRATEGIES: Strategy[] = [
       "Make it absurdly small — almost embarrassingly so.",
       "Do just that. Nothing else is required.",
     ],
+    coach: [
+      "What task feels too big to begin right now?",
+      "What's the very first physical action — open a file, write one sentence, send one text?",
+      "Can you make that step even smaller — almost silly small?",
+    ],
     recommended: true,
   },
   {
@@ -210,6 +215,11 @@ export const STRATEGIES: Strategy[] = [
       "Remove one distraction — close a tab or silence a notification.",
       "Start the timer and work only on that outcome.",
       "Optional: Shari can check in, or a quiet coworking stream if you want company.",
+    ],
+    coach: [
+      "What one outcome do you want from this focused block?",
+      "What distraction can you remove for the next 25 minutes?",
+      "Do you have someone who could body-double, or should we use a timer solo for now?",
     ],
     deeper:
       "Self-guided focus works: name the task, set a done-enough line, and use the timer. If you want extra accountability later, you can ask for a body double or coworking stream — not required to start.",
@@ -261,6 +271,11 @@ export const STRATEGIES: Strategy[] = [
       "Give yourself explicit permission for it to be bad.",
       "Produce a rough version fast — speed over quality.",
       "Refine later. Not now. Now is only for getting it out.",
+    ],
+    coach: [
+      "What are you trying to create or finish right now?",
+      "What's making it hard to start — perfection, overwhelm, or something else?",
+      "What's the smallest ugly version you could produce in the next 10 minutes?",
     ],
     recommended: true,
   },

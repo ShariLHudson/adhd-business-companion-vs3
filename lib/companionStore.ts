@@ -292,25 +292,47 @@ export function getBrainDumps(): BrainDumpEntry[] {
   }
 }
 
-export function addBrainDump(
-  text: string,
-  opts?: { captureSessionId?: string },
-): BrainDumpEntry[] {
-  const trimmed = text.trim();
-  if (!trimmed || typeof window === "undefined") return getBrainDumps();
-  const entry: BrainDumpEntry = {
-    id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-    text: trimmed,
-    createdAt: new Date().toISOString(),
-    captureSessionId: opts?.captureSessionId,
-  };
-  const next = [entry, ...getBrainDumps()];
+function newBrainDumpId(): string {
+  if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+    return `bd-${crypto.randomUUID()}`;
+  }
+  return `bd-${Date.now()}-${Math.random().toString(36).slice(2, 10)}-${Math.random().toString(36).slice(2, 10)}`;
+}
+
+function writeBrainDumps(next: BrainDumpEntry[]): BrainDumpEntry[] {
+  if (typeof window === "undefined") return next;
   try {
     localStorage.setItem(BRAIN_DUMP_LIST_KEY, JSON.stringify(next));
   } catch {
     /* noop */
   }
   return next;
+}
+
+/** Save multiple captured thoughts atomically — one card per line/thought. */
+export function addBrainDumps(
+  texts: string[],
+  opts?: { captureSessionId?: string },
+): BrainDumpEntry[] {
+  if (typeof window === "undefined") return getBrainDumps();
+  const parts = texts.map((t) => t.trim()).filter(Boolean);
+  if (!parts.length) return getBrainDumps();
+
+  const baseMs = Date.now();
+  const newEntries: BrainDumpEntry[] = parts.map((text, index) => ({
+    id: newBrainDumpId(),
+    text,
+    createdAt: new Date(baseMs + index).toISOString(),
+    captureSessionId: opts?.captureSessionId,
+  }));
+  return writeBrainDumps([...newEntries, ...getBrainDumps()]);
+}
+
+export function addBrainDump(
+  text: string,
+  opts?: { captureSessionId?: string },
+): BrainDumpEntry[] {
+  return addBrainDumps([text], opts);
 }
 
 export function updateBrainDump(
@@ -320,26 +342,11 @@ export function updateBrainDump(
   const next = getBrainDumps().map((e) =>
     e.id === id ? { ...e, ...changes } : e,
   );
-  if (typeof window !== "undefined") {
-    try {
-      localStorage.setItem(BRAIN_DUMP_LIST_KEY, JSON.stringify(next));
-    } catch {
-      /* noop */
-    }
-  }
-  return next;
+  return writeBrainDumps(next);
 }
 
 export function deleteBrainDump(id: string): BrainDumpEntry[] {
-  const next = getBrainDumps().filter((e) => e.id !== id);
-  if (typeof window !== "undefined") {
-    try {
-      localStorage.setItem(BRAIN_DUMP_LIST_KEY, JSON.stringify(next));
-    } catch {
-      /* noop */
-    }
-  }
-  return next;
+  return writeBrainDumps(getBrainDumps().filter((e) => e.id !== id));
 }
 
 // ---- Templates Library ----------------------------------------------------
@@ -1460,6 +1467,8 @@ export function avatarBehaviorGuidance(a: IdealClientAvatar): string {
 
 // ---- Time Blocks ----------------------------------------------------------
 
+const TIME_BLOCKS_KEY = "companion-time-blocks-v1";
+
 export type BlockEnergy = "high" | "medium" | "low";
 export type BlockTag = string; // free-form: defaults + user-created tags
 
@@ -1501,8 +1510,11 @@ export function addBlockTag(name: string): string[] {
 export type BlockStatus =
   | "pending"
   | "triggered"
+  | "progress"
   | "completed"
   | "snoozed"
+  | "not-today"
+  /** @deprecated Use not-today — migrated on read */
   | "missed";
 
 export type TimeBlock = {
@@ -1514,6 +1526,10 @@ export type TimeBlock = {
   energy: BlockEnergy;
   tag?: BlockTag;
   note?: string;
+  /** Movement goal — default "Move this forward." */
+  goal?: string;
+  whenPreset?: import("./momentumAppointment").MomentumWhenPreset;
+  durationFlexible?: boolean;
   projectId?: string;
   timerEnabled?: boolean;
   status: BlockStatus;
@@ -1534,7 +1550,7 @@ export function blockDateTime(b: TimeBlock): Date {
   return d;
 }
 
-const TIME_BLOCKS_KEY = "companion-time-blocks-v1";
+import { normalizeTimeBlock } from "./momentumAppointment";
 
 function readBlocks(): TimeBlock[] {
   if (typeof window === "undefined") return [];
@@ -1543,13 +1559,15 @@ function readBlocks(): TimeBlock[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (b): b is TimeBlock =>
-        b &&
-        typeof b.id === "string" &&
-        typeof b.title === "string" &&
-        typeof b.startTime === "string",
-    );
+    return parsed
+      .filter(
+        (b): b is TimeBlock =>
+          b &&
+          typeof b.id === "string" &&
+          typeof b.title === "string" &&
+          typeof b.startTime === "string",
+      )
+      .map((b) => normalizeTimeBlock(b as TimeBlock));
   } catch {
     return [];
   }
@@ -1580,6 +1598,7 @@ export function timeBlocksForProject(projectId: string): TimeBlock[] {
     (b) =>
       b.projectId === projectId &&
       b.status !== "completed" &&
+      b.status !== "not-today" &&
       b.status !== "missed",
   );
 }
@@ -1610,16 +1629,19 @@ export function saveTimeBlock(
   }
   const block: TimeBlock = {
     id: newId(),
-    title: input.title?.trim() || "Untitled block",
+    title: input.title?.trim() || "Untitled appointment",
     date: input.date ?? todayStr(),
     startTime: input.startTime ?? "09:00",
     durationMin: input.durationMin ?? 30,
     energy: input.energy ?? "medium",
     tag: input.tag,
     note: input.note,
+    goal: input.goal?.trim() || undefined,
+    whenPreset: input.whenPreset,
+    durationFlexible: input.durationFlexible,
     projectId: input.projectId,
     timerEnabled: input.timerEnabled,
-    status: "pending",
+    status: input.status ?? "pending",
     createdAt: new Date().toISOString(),
   };
   const next = [...list, block];
@@ -2213,6 +2235,47 @@ export function pushRecentWork(a: Omit<LastActivity, "ts">): void {
   }
 }
 
+/** Drop draft rows from recent work — used when a draft is permanently deleted. */
+export function removeRecentWorkDrafts(): void {
+  if (typeof window === "undefined") return;
+  try {
+    const next = getRecentWorkItems().filter((x) => x.kind !== "draft");
+    if (next.length === 0) {
+      localStorage.removeItem(RECENT_WORK_KEY);
+    } else {
+      localStorage.setItem(RECENT_WORK_KEY, JSON.stringify(next));
+    }
+  } catch {
+    /* noop */
+  }
+}
+
+/** Remove a deleted draft from activity memory without wiping other activity. */
+export function clearDraftActivityMemory(matchingContent?: string): void {
+  if (typeof window === "undefined") return;
+  const needle = matchingContent?.trim();
+  const last = getLastActivity();
+  if (last?.kind === "draft") {
+    if (!needle || last.content?.trim() === needle) {
+      clearLastActivity();
+    }
+  }
+  try {
+    const next = getRecentWorkItems().filter(
+      (x) =>
+        x.kind !== "draft" ||
+        (needle ? x.content?.trim() !== needle : false),
+    );
+    if (next.length === 0) {
+      localStorage.removeItem(RECENT_WORK_KEY);
+    } else {
+      localStorage.setItem(RECENT_WORK_KEY, JSON.stringify(next));
+    }
+  } catch {
+    /* noop */
+  }
+}
+
 export function clearDayState() {
   if (typeof window === "undefined") return;
   try {
@@ -2228,13 +2291,38 @@ export { dayStateSummary } from "./adjustMyDay";
 // ---- Settings + Profile preferences ---------------------------------------
 
 export type AiTone =
-  | "calm"
+  | "gentle"
   | "balanced"
   | "direct"
-  | "minimal"
-  | "gentle"
-  | "encouraging"
-  | "playful";
+  | "playful"
+  | "strategic"
+  | "motivational";
+
+const AI_TONE_IDS: AiTone[] = [
+  "gentle",
+  "balanced",
+  "direct",
+  "playful",
+  "strategic",
+  "motivational",
+];
+
+const LEGACY_AI_TONE: Record<string, AiTone> = {
+  calm: "gentle",
+  minimal: "direct",
+  encouraging: "motivational",
+};
+
+/** Map saved prefs — legacy calm/minimal/encouraging → new six-tone set. */
+export function normalizeAiTone(value: unknown): AiTone {
+  if (typeof value === "string" && AI_TONE_IDS.includes(value as AiTone)) {
+    return value as AiTone;
+  }
+  if (typeof value === "string" && LEGACY_AI_TONE[value]) {
+    return LEGACY_AI_TONE[value];
+  }
+  return "balanced";
+}
 
 // Color: none, meaning-based (fixed category colors), or dynamic (adaptive
 // tints + brighter accents). Legacy "light"/"full" values normalize on read.
@@ -2273,6 +2361,8 @@ export type Prefs = {
   patternAwareness: PatternAwareness;
   plan: Plan;
   activeAvatarId: string; // the client avatar currently "in use" app-wide
+  /** Product companion voices shaping guidance app-wide (max 3). */
+  activeCompanionIds: string[];
   advancedAiTools: boolean; // unlocks Multi-Avatar output mode (opt-in)
   onboarded: boolean; // has the user completed (or skipped) first-run onboarding
   hasChatted: boolean; // has the user ever sent a message (returning vs first-time)
@@ -2297,6 +2387,7 @@ const DEFAULT_PREFS: Prefs = {
   patternAwareness: "light",
   plan: "essential",
   activeAvatarId: "",
+  activeCompanionIds: ["adhd-business"],
   advancedAiTools: false,
   onboarded: false,
   hasChatted: false,
@@ -2325,6 +2416,7 @@ export function getPrefs(): Prefs {
     const parsed = JSON.parse(raw) as Partial<Prefs>;
     const merged = { ...DEFAULT_PREFS, ...parsed };
     merged.visualMode = normalizeVisualMode(merged.visualMode);
+    merged.aiTone = normalizeAiTone(merged.aiTone);
     Object.assign(merged, normalizeLanguageCommunication(merged));
     return merged;
   } catch {

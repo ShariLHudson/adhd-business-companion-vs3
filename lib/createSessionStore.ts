@@ -1,5 +1,6 @@
 // Persist active Create workspace — draft + context survive navigation and refresh.
 
+import { isCreatePersistencePaused } from "./createPersistencePause";
 import type { WorkspacePanelDetail } from "./workspaceAwareness";
 import type { CreationWorkspaceContext } from "./workspaceCreation";
 import type { SavedArtifactRecord } from "./savedArtifact";
@@ -27,6 +28,7 @@ export function saveCreateSession(
   snapshot: Omit<CreateSessionSnapshot, "updatedAt">,
 ): void {
   if (typeof window === "undefined") return;
+  if (isCreatePersistencePaused()) return;
   if (!snapshot.genSeed.type && !snapshot.genSeed.draft?.trim()) return;
   try {
     localStorage.setItem(

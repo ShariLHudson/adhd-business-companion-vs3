@@ -49,7 +49,7 @@ const CONVERSATIONAL_PHRASES: Array<{
   { input: "I don't know what to call it.", expectedIntent: "helpRequest" },
   {
     input: "Can you give me better title ideas?",
-    expectedIntent: "helpRequest",
+    expectedIntent: "discovery",
   },
   {
     input: "What does this section mean?",
@@ -63,7 +63,7 @@ const CONVERSATIONAL_PHRASES: Array<{
     input: "I don't understand what I'm supposed to put here.",
     expectedIntent: "clarification",
   },
-  { input: "Can you give me examples?", expectedIntent: "helpRequest" },
+  { input: "Can you give me examples?", expectedIntent: "discovery" },
   { input: "I like number 2.", expectedIntent: "confirmation" },
   { input: "Actually, I don't like that title.", expectedIntent: "feedback" },
   {

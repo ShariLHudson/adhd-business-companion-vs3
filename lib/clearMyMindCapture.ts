@@ -38,7 +38,7 @@ export function splitCaptureInput(raw: string): string[] {
 
 export function capturePrompt(phase: CapturePhase, count: number): string {
   if (phase === "first" || count === 0) {
-    return "What is the first thing on your mind?";
+    return "What's taking up space in your head right now?";
   }
   if (phase === "more") {
     return "Anything else?";

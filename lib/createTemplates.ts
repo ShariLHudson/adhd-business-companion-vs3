@@ -5,6 +5,7 @@
 import { sortDropdownLabels } from "./dropdownSort";
 import type { CreateWorkflowState } from "./createWorkflow";
 import { buildBriefFromDiscovery, resolvedTypeLabel } from "./createWorkflow";
+import { outlineSectionBriefLines } from "./createSectionDiscovery";
 import { effectiveSubtypeLabel, OTHER_OPTION } from "./createTypePickers";
 
 export type CreateTemplateSection = { id: string; label: string };
@@ -455,7 +456,12 @@ export function buildFullCreateBrief(state: CreateWorkflowState): string {
     state.discoveryAnswers,
     subtype,
   );
-  return buildGenerationBrief(state, discoveryBrief);
+  const sectionLines = outlineSectionBriefLines(state);
+  const withSections =
+    sectionLines.length > 0
+      ? `${discoveryBrief}\n\nTemplate sections:\n${sectionLines.join("\n\n")}`
+      : discoveryBrief;
+  return buildGenerationBrief(state, withSections);
 }
 
 export const BUILD_DRAFT_LOADING_MESSAGES = [

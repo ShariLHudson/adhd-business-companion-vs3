@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  addBrainDump,
+  addBrainDumps,
   getBrainDumps,
   updateBrainDump,
   type BrainDumpEntry,
@@ -116,22 +116,23 @@ export function ClearMyMindSession({
     const parts = splitCaptureInput(input);
     if (!parts.length) return;
 
-    if (parts.length > 1) {
+    const all = addBrainDumps(parts, { captureSessionId: sessionId });
+    const sessionSaved = all.filter(
+      (e) => e.captureSessionId === sessionId && !e.done,
+    );
+
+    if (sessionSaved.length > 1) {
       setSplitNotice(
-        `I saved ${parts.length} separate items — one thought per card.`,
+        `I saved ${sessionSaved.length} separate items — one thought per card.`,
       );
     } else {
       setSplitNotice(null);
     }
 
-    let lastId: string | undefined;
-    for (const part of parts) {
-      const list = addBrainDump(part, { captureSessionId: sessionId });
-      lastId = list[0]?.id;
-    }
-    refresh();
+    setEntries(sessionSaved);
     setInput("");
     setPhase("more");
+    const lastId = sessionSaved[sessionSaved.length - 1]?.id;
     if (lastId) void classify(lastId, parts[parts.length - 1]!);
 
     void import("@/lib/ecosystem/eventTrackingEngine").then(
@@ -141,7 +142,7 @@ export function ClearMyMindSession({
           feature: "brain-dump",
           metadata: {
             entryKind: "capture",
-            count: parts.length,
+            count: sessionSaved.length,
             sessionId,
           },
         });
@@ -217,6 +218,11 @@ export function ClearMyMindSession({
           {splitNotice ? (
             <p className="text-sm text-[#6b635a]">{splitNotice}</p>
           ) : null}
+          {sessionItems.length > 0 && (
+            <p className="text-sm text-[#6b635a]">
+              Saved on this device. Open <strong>Library</strong> to find them.
+            </p>
+          )}
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
@@ -264,6 +270,13 @@ export function ClearMyMindSession({
             </li>
           ))}
         </ul>
+      )}
+
+      {phase === "sorting" && (
+        <p className="text-sm leading-relaxed text-[#6b635a]">
+          These cards are saved. Sorting just helps you decide what to do with
+          each one. You can skip any — they&apos;ll stay in your Library.
+        </p>
       )}
 
       {phase === "sorting" && currentSortItem && (

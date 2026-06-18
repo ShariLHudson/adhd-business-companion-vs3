@@ -3,67 +3,109 @@ import type { AiTone } from "@/lib/companionStore";
 export type AiToneGuide = {
   id: AiTone;
   label: string;
+  emoji: string;
   desc: string;
+  purpose: string;
+  feelsLike: string;
   bestFor: string;
   whatChanges: string;
   example: string;
 };
 
+/** ADHD entrepreneur states → best tone (for coaching hints and future auto-suggest). */
+export const TONE_BY_FOUNDER_STATE: Readonly<
+  Record<string, { tone: AiTone; label: string }>
+> = {
+  overwhelmed: { tone: "gentle", label: "Overwhelmed" },
+  normal: { tone: "balanced", label: "Normal day" },
+  procrastinating: { tone: "direct", label: "Procrastinating" },
+  stressed: { tone: "playful", label: "Stressed" },
+  planning: { tone: "strategic", label: "Planning business" },
+  stuck: { tone: "motivational", label: "Stuck" },
+};
+
 export const AI_TONE_GUIDES: AiToneGuide[] = [
   {
-    id: "calm",
-    label: "Calm",
-    desc: "Slow, grounding, spacious.",
-    bestFor: "Overwhelm, anxiety, or when you need to slow down before acting.",
-    whatChanges: "Longer pauses between ideas, fewer items per reply, softer language.",
-    example: "“Let’s take one breath. What’s the smallest true next step?”",
+    id: "gentle",
+    label: "Gentle",
+    emoji: "❤️",
+    desc: "Emotional safety, validation, reduced pressure.",
+    purpose: "Emotional safety · validation · reduced pressure",
+    feelsLike: "Therapist · Best friend · Compassionate coach",
+    bestFor: "Overwhelm — when you need to feel safe before acting.",
+    whatChanges:
+      "Leads with warmth and validation; never rushes productivity; one soft question at a time.",
+    example:
+      "“You've been carrying a lot. Before we worry about everything else, let's find one thing that would make today feel a little easier. What's weighing on you most right now?”",
   },
   {
     id: "balanced",
     label: "Balanced",
-    desc: "Warm but direct.",
-    bestFor: "Everyday coaching — empathy plus clear next steps.",
-    whatChanges: "Mix of validation and action; default for most conversations.",
-    example: "“That makes sense. Want to pick one thing to move forward?”",
+    emoji: "⚖️",
+    desc: "Default companion — trusted partner energy.",
+    purpose: "Everyday coaching — empathy plus clarity",
+    feelsLike: "Trusted partner · Companion · Thoughtful coach",
+    bestFor: "Normal days — your everyday default.",
+    whatChanges:
+      "Brief empathy, then structure; helps you see what's competing for attention.",
+    example:
+      "“It sounds like you're feeling overwhelmed. Let's get a quick picture of what's on your plate and decide what deserves your attention first. What are the biggest things competing for your attention today?”",
   },
   {
     id: "direct",
     label: "Direct",
-    desc: "Brief and to the point.",
-    bestFor: "When you already know what you need and want less preamble.",
-    whatChanges: "Shorter replies, bullets, leads with the answer.",
-    example: "“Do this next: send the outline. Everything else can wait.”",
-  },
-  {
-    id: "minimal",
-    label: "Minimal",
-    desc: "Very few words — just the next step.",
-    bestFor: "Low bandwidth days or when chat feels like too much to read.",
-    whatChanges: "One line when possible; no extra framing.",
-    example: "“Next: 10 minutes on the intro.”",
-  },
-  {
-    id: "gentle",
-    label: "Gentle",
-    desc: "Soft, reassuring, lots of warmth.",
-    bestFor: "Hard emotions, self-criticism, or fragile confidence.",
-    whatChanges: "More reassurance; never rushes you toward productivity.",
-    example: "“You’re not behind. We can make today lighter together.”",
-  },
-  {
-    id: "encouraging",
-    label: "Encouraging",
-    desc: "Affirming, celebrates small wins.",
-    bestFor: "Building momentum and noticing progress you might skip.",
-    whatChanges: "Names what you did right; ties small steps to bigger goals.",
-    example: "“You opened the doc — that’s the hard part. Ready for five more minutes?”",
+    emoji: "🎯",
+    desc: "Action, momentum, decision-making.",
+    purpose: "Action · momentum · decisions",
+    feelsLike: "Executive assistant · Productivity coach",
+    bestFor: "Procrastinating — when you need a push, not a pep talk.",
+    whatChanges:
+      "Cuts preamble; uses lists and sorting frames (must do / should do / can wait).",
+    example:
+      "“Stop for a second. List the top 5 things you think you need to do today. We'll sort them into: Must do · Should do · Can wait.”",
   },
   {
     id: "playful",
     label: "Playful",
-    desc: "Light, a little humor.",
-    bestFor: "When energy is up and you want coaching to feel less heavy.",
-    whatChanges: "Warmer metaphors, light humor — never at your expense.",
-    example: "“Your to-do list is doing theater again. Pick one real scene.”",
+    emoji: "😄",
+    desc: "Lower anxiety through lightness.",
+    purpose: "Lower anxiety · lightness · ADHD-friendly humor",
+    feelsLike: "ADHD friend · Funny coworker · Cheerleader",
+    bestFor: "Stress — when everything feels heavy and you need air.",
+    whatChanges:
+      "Light metaphors and humor — never at your expense; makes planning feel less grim.",
+    example:
+      "“Sounds like your brain opened 47 tabs this morning and none of them are loading. Let's see what's actually on the menu today. What's bouncing around in your head right now?”",
+  },
+  {
+    id: "strategic",
+    label: "Strategic",
+    emoji: "🧠",
+    desc: "Zoom out — outcomes over tasks.",
+    purpose: "Business planning · prioritization · big picture",
+    feelsLike: "CEO advisor · Board member · Business strategist",
+    bestFor: "Planning business — when you need zoom-out, not more tasks.",
+    whatChanges:
+      "Challenges false urgency; connects work to outcomes; questions what actually matters this week.",
+    example:
+      "“Let's zoom out. Being overwhelmed usually means everything feels equally important. It isn't. What outcomes are you trying to create this week?”",
+  },
+  {
+    id: "motivational",
+    label: "Motivational",
+    emoji: "🔥",
+    desc: "Encouragement and the next 15 minutes.",
+    purpose: "Unstick · momentum · forward motion",
+    feelsLike: "Encourager · Momentum coach",
+    bestFor: "Stuck — when you know what to do but can't start.",
+    whatChanges:
+      "Affirms capability without toxic positivity; focuses on one small next step in the next 15 minutes.",
+    example:
+      "“You've handled harder things than this. Let's not spend today staring at the mountain. What's the next step you can take in the next 15 minutes?”",
   },
 ];
+
+export function aiToneLabel(id: AiTone): string {
+  const guide = AI_TONE_GUIDES.find((g) => g.id === id);
+  return guide ? `${guide.emoji} ${guide.label}` : id;
+}

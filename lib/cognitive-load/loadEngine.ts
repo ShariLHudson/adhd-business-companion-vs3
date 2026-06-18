@@ -17,6 +17,10 @@ import {
   buildLoadSummaryText,
   buildLoadSummaries,
 } from "./loadMessages";
+import {
+  shouldDeferToolCardOnFirstDistress,
+  userExplicitlyRequestedInterventionHelp,
+} from "@/lib/messageClassification";
 import { buildCognitiveLoadScore } from "./loadScoring";
 import {
   isLoadOfferDismissedToday,
@@ -62,14 +66,10 @@ export function gatherCognitiveLoadInput(
   const blocksToday = allBlocks.filter((b) => b.date === today);
   const missedBlocksToday =
     partial.missedBlocksToday ??
-    blocksToday.filter((b) => b.status === "missed").length;
+    blocksToday.filter((b) => b.status === "missed" || b.status === "not-today").length;
   const overdueTaskCount =
     partial.overdueTaskCount ??
-    allBlocks.filter(
-      (b) =>
-        b.status === "missed" ||
-        (b.date < today && b.status === "pending"),
-    ).length;
+    allBlocks.filter((b) => b.status === "missed" || b.status === "not-today").length;
 
   return {
     ...partial,
@@ -110,10 +110,17 @@ export function evaluateCognitiveLoad(
   const score = buildCognitiveLoadScore(contributors, now);
   const summaries = buildLoadSummaries(score);
   const recommendations = buildLoadRecommendations(score);
-  const companionOffer = buildCompanionLoadOffer(
-    score.level,
-    isLoadOfferDismissedToday(now),
-  );
+  const recentText = input.recentText?.trim();
+  const suppressLoadOffer =
+    recentText &&
+    !userExplicitlyRequestedInterventionHelp(recentText) &&
+    shouldDeferToolCardOnFirstDistress(
+      recentText ? [{ role: "user", content: recentText }] : [],
+      recentText,
+    );
+  const companionOffer = suppressLoadOffer
+    ? null
+    : buildCompanionLoadOffer(score.level, isLoadOfferDismissedToday(now));
 
   return { score, summaries, recommendations, companionOffer };
 }

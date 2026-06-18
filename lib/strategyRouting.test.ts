@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  absorbBusinessStrategyFromUserMessage,
   bootstrapBusinessStrategySession,
-  processBusinessStrategyTurn,
+  buildBusinessStrategyDraft,
 } from "./businessStrategyBuilder";
 import { classifyStrategyIntent, parseStrategyDisambiguationChoice } from "./strategyRouting";
 
@@ -29,25 +30,44 @@ describe("strategyRouting", () => {
 });
 
 describe("businessStrategyBuilder", () => {
-  it("walks one question at a time", () => {
-    let { session } = bootstrapBusinessStrategySession("Marketing Strategy");
-    let r = processBusinessStrategyTurn(session, "Grow my email list");
-    session = r.session;
-    expect(r.reply).toContain("outcome");
-    r = processBusinessStrategyTurn(session, "500 subscribers");
-    session = r.session;
-    expect(session.questionIndex).toBeGreaterThan(0);
+  it("opens with conversational coaching, not a fixed first question", () => {
+    const { session, opener } = bootstrapBusinessStrategySession("Marketing Strategy");
+    expect(session.phase).toBe("coaching");
+    expect(opener).not.toMatch(/^\*\*What is this strategy for\?\*\*$/m);
+    expect(opener.toLowerCase()).toContain("no checklist");
   });
 
-  it("reaches readiness after all answers", () => {
-    let { session } = bootstrapBusinessStrategySession("Sales Strategy");
-    const answers = ["More clients", "Steady revenue", "Small business owners", "Predictable pipeline", "Fear of outreach"];
-    for (const a of answers) {
-      const r = processBusinessStrategyTurn(session, a);
-      session = r.session;
-    }
-    expect(session.phase).toBe("readiness");
-    const built = processBusinessStrategyTurn(session, "Build Strategy");
-    expect(built.session.draft).toContain("Sales Strategy");
+  it("absorbs natural language into the plan draft", () => {
+    let { session } = bootstrapBusinessStrategySession("Product Strategy");
+    session = absorbBusinessStrategyFromUserMessage(
+      session,
+      "I'm launching a group coaching program for ADHD entrepreneurs over the next 8 weeks. Success is 12 signups.",
+      "",
+    );
+    expect(session.answers.purpose ?? session.answers.notes).toBeTruthy();
+    expect(session.draft).toContain("Product Strategy");
+  });
+
+  it("builds weekly outline when timeframe mentions weeks", () => {
+    let { session } = bootstrapBusinessStrategySession("Marketing Strategy");
+    session = absorbBusinessStrategyFromUserMessage(
+      session,
+      "8 week visibility push for my workshop",
+      "What's the timeframe?",
+    );
+    expect(session.answers.timeframe).toMatch(/8 week/i);
+    const draft = buildBusinessStrategyDraft(session);
+    expect(draft).toContain("Week 1");
+  });
+
+  it("build strategy command refreshes draft", () => {
+    let { session } = bootstrapBusinessStrategySession("Marketing Strategy");
+    session = absorbBusinessStrategyFromUserMessage(
+      session,
+      "Grow my email list for coaches",
+      "",
+    );
+    session = absorbBusinessStrategyFromUserMessage(session, "build strategy", "");
+    expect(session.draft).toContain("Marketing Strategy");
   });
 });

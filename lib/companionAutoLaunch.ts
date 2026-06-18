@@ -83,9 +83,8 @@ export function matchesExperienceFollowUp(
       }
       if (
         action.offer.section === "focus-audio" &&
-        /\b(?:focus audio|music|sounds?|calm|calming|motivat|relax|energiz)\b/i.test(
-          priorAssistantText,
-        )
+        (detectAudioRequest(priorAssistantText).isAudio ||
+          /\b(?:focus audio|focus music|music|audio)\b/i.test(priorAssistantText))
       ) {
         return true;
       }
@@ -112,9 +111,8 @@ export function matchesExperienceFollowUp(
       }
       if (
         action.suggestion.action.tool === "focus-audio" &&
-        /\b(?:focus audio|music|sounds?|calm|calming|motivat|relax|energiz)\b/i.test(
-          priorAssistantText,
-        )
+        (detectAudioRequest(priorAssistantText).isAudio ||
+          /\b(?:focus audio|focus music|music|audio)\b/i.test(priorAssistantText))
       ) {
         return true;
       }
@@ -145,50 +143,16 @@ export function shouldAutoLaunchPendingAction(
     return true;
   }
   if (matchesDurationFollowUp(userText, priorAssistantText, action)) return true;
-  if (matchesExperienceFollowUp(userText, priorAssistantText, action)) return true;
   return false;
 }
 
-/** After the API reply, auto-launch when the user already agreed this turn. */
+/** Never auto-launch tools because the assistant mentioned them — consent required. */
 export function shouldAutoLaunchAfterAssistantOffer(
-  userText: string,
-  priorAssistantText: string,
-  assistantResponse: string,
-  action: PendingAction,
+  _userText: string,
+  _priorAssistantText: string,
+  _assistantResponse: string,
+  _action: PendingAction,
 ): boolean {
-  if (shouldAutoLaunchPendingAction(userText, priorAssistantText, action)) {
-    return true;
-  }
-  if (!assistantResponse.trim()) return false;
-
-  if (action.kind === "action-bridge") {
-    if (
-      ASSISTANT_EXPERIENCE_RE.test(assistantResponse) &&
-      (AFFIRMATION_RE.test(userText) ||
-        extractExplicitFocusMinutes(userText) !== null ||
-        matchesDurationFollowUp(userText, priorAssistantText, action))
-    ) {
-      return true;
-    }
-  }
-
-  if (
-    isFocusRelatedAction(action) &&
-    ASSISTANT_FOCUS_RE.test(assistantResponse) &&
-    (matchesDurationFollowUp(userText, priorAssistantText, action) ||
-      extractExplicitFocusMinutes(userText) !== null ||
-      AFFIRMATION_RE.test(userText))
-  ) {
-    return true;
-  }
-
-  if (
-    isActionAcceptance(userText) &&
-    ASSISTANT_EXPERIENCE_RE.test(assistantResponse)
-  ) {
-    return true;
-  }
-
   return false;
 }
 

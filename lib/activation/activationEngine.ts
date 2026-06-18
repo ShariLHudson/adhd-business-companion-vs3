@@ -26,6 +26,15 @@ import {
   notifyActivationUpdated,
   recordActivationSnapshot,
 } from "./activationStore";
+import {
+  userExpressedExplicitBlocker,
+} from "@/lib/conversationIntervention";
+import {
+  isGenuineEmotionalDistress,
+  shouldDeferToolCardOnFirstDistress,
+  shouldRunEmotionalTriage,
+  userExplicitlyRequestedInterventionHelp,
+} from "@/lib/messageClassification";
 import type { ActivationInput, ActivationSnapshot } from "./types";
 
 export function gatherActivationInput(
@@ -92,9 +101,12 @@ export function evaluateActivation(
     input.dayEnergyLow,
   );
 
+  const textGrounded = hasTextGroundedBlocker(hits, text);
   const showOffer =
-    (state === "stuck" || state === "frozen" || state === "hesitant") &&
-    (shouldEvaluateActivation(text) || likelyBlockers.length > 0) &&
+    textGrounded &&
+    (state === "stuck" ||
+      state === "frozen" ||
+      (state === "hesitant" && shouldEvaluateActivation(text))) &&
     !isActivationOfferDismissedToday(now);
 
   return {
@@ -109,6 +121,27 @@ export function evaluateActivation(
 
 function dayKey(now: Date): string {
   return now.toISOString().slice(0, 10);
+}
+
+/** Context-only signals must not surface cards without user-stated stuck/confusion. */
+const CONTEXT_ONLY_SIGNALS = new Set([
+  "high cognitive load",
+  "stuck emotional state",
+  "emotional distress tone",
+  "low energy check-in",
+  "missing next action on project",
+  "many open captures",
+  "repeated task avoidance",
+]);
+
+function hasTextGroundedBlocker(
+  hits: ReturnType<typeof detectActivationSignals>,
+  text: string,
+): boolean {
+  if (shouldEvaluateActivation(text)) return true;
+  return hits.some(
+    (h) => !CONTEXT_ONLY_SIGNALS.has(h.signal) && h.weight >= 3,
+  );
 }
 
 /** Evaluate and persist snapshot for founder reporting. */
@@ -126,6 +159,19 @@ export function evaluateAndRecordActivation(
 /** Whether companion should surface the activation offer for this message. */
 export function shouldSurfaceActivationOffer(
   snapshot: ActivationSnapshot,
+  userText?: string,
+  messages?: { role: string; content: string }[],
 ): boolean {
-  return Boolean(snapshot.companionOffer.trim());
+  if (!snapshot.companionOffer.trim()) return false;
+  const t = userText?.trim();
+  if (!t) return false;
+  if (userExplicitlyRequestedInterventionHelp(t)) return true;
+  if (userExpressedExplicitBlocker(t)) return true;
+  if (isGenuineEmotionalDistress(t) || shouldRunEmotionalTriage(t)) {
+    return false;
+  }
+  if (messages?.length && shouldDeferToolCardOnFirstDistress(messages, t)) {
+    return false;
+  }
+  return true;
 }

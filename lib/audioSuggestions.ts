@@ -67,6 +67,8 @@ export function audioBackgroundMood(categoryId: string): AudioBackgroundMood {
 /**
  * Detects when a chat message is really asking for music/audio, and which
  * category fits. Used to route the conversation straight to Focus Audio.
+ *
+ * Does NOT trigger on rhetorical "sound" (copy/tone: "sounds good", "sound like a tool").
  */
 const ENERGIZE_AUDIO_RE =
   /\b(energi[sz]e|energi[sz]ing|pep (?:me )?up|pick me up|need (?:more )?energy|get (?:me )?going|wake me up|uplift(?:ing)?|something to energi[sz]e)\b/;
@@ -81,10 +83,34 @@ const SLEEP_AUDIO_RE =
   /\b(sleep(?:\s+(?:audio|music|sounds?))?|wind[- ]?down(?:\s+(?:audio|music|sounds?))?|bedtime (?:sounds?|music)|nap sounds?)\b/i;
 
 const FOCUS_AUDIO_RE =
-  /\b(focus audio|background (?:music|sounds?)|concentration music|deep work (?:music|audio|sounds?)|study (?:music|audio|sounds?))\b/i;
+  /\b(focus audio|focus music|background (?:music|sounds?|audio)|concentration music|deep work (?:music|audio|sounds?)|study (?:music|audio|sounds?))\b/i;
 
-const MUSIC_WORD_RE =
-  /\b(music|audio|sound|sounds|soundtrack|playlist|lo-?fi|lofi|noise|song|songs|tunes|listen|beats|ambien|something to (listen|play))\b/;
+/** Explicit Focus Audio triggers — never bare "sound" / "sounds". */
+const EXPLICIT_FOCUS_AUDIO_RE =
+  /\b(?:focus (?:audio|music)|(?:brown|white|pink) noise|rain sounds?|calming sounds?|background (?:sound|music|audio)|play (?:music|audio|brown|white|rain|something)|open (?:focus )?(?:audio|music)|help me focus with (?:sound|music|audio)|(?:i )?need (?:audio|music) to focus|music to focus|open music)\b/i;
+
+const MUSIC_MEDIA_RE =
+  /\b(music|audio|playlist|lo-?fi|lofi|soundtrack|song|songs|tunes|beats)\b/i;
+
+const LISTEN_FOR_AUDIO_RE =
+  /\b(?:something to listen to|listen to (?:music|something|calm|rain))\b/i;
+
+/** Copy/tone "sound" — not a Focus Audio request. */
+export function isRhetoricalSoundUsage(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  if (
+    /\b(?:that|this|it)\s+sounds?\b/i.test(t) ||
+    /\bsounds?\s+(?:good|bad|wrong|right|like|too|warm|warmer|cold|corporate|chatgpt|better|off|weird|great|fine|okay|ok|perfect|terrible|robotic|generic|salesy|stiff)\b/i.test(t) ||
+    /\b(?:make|making|want(?:ed)?|don't|do not|should|shouldn't|need|needs)\b[^.!?]{0,60}\b(?:to\s+)?sound\b/i.test(t) ||
+    /\bdoes\s+this\s+sound\b/i.test(t) ||
+    /\bto\s+sound\s+like\b/i.test(t) ||
+    /\bsound\s+like\s+(?:a\s+)?(?:tool|planner|ecosystem|chatgpt|robot|corporate)\b/i.test(t)
+  ) {
+    return true;
+  }
+  return false;
+}
 
 export function resolveFocusAudioCategory(text: string): string {
   const t = text.toLowerCase();
@@ -110,6 +136,10 @@ export function detectAudioRequest(text: string): {
   isAudio: boolean;
   categoryId: string;
 } {
+  if (isRhetoricalSoundUsage(text)) {
+    return { isAudio: false, categoryId: "deep-work" };
+  }
+
   const t = text.toLowerCase();
   const wantsEnergize = ENERGIZE_AUDIO_RE.test(t);
   const moodAudioIntent =
@@ -119,7 +149,12 @@ export function detectAudioRequest(text: string): {
     SLEEP_AUDIO_RE.test(t) ||
     FOCUS_AUDIO_RE.test(t);
 
-  const isAudio = MUSIC_WORD_RE.test(t) || moodAudioIntent;
+  const explicitAudio =
+    EXPLICIT_FOCUS_AUDIO_RE.test(text) ||
+    MUSIC_MEDIA_RE.test(t) ||
+    LISTEN_FOR_AUDIO_RE.test(t);
+
+  const isAudio = explicitAudio || moodAudioIntent;
 
   return {
     isAudio,

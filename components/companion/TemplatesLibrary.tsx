@@ -20,14 +20,14 @@ import type { AppSection } from "@/lib/companionUi";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import { itemTypeFromTemplate } from "@/lib/templateItemType";
+import { templateToCreationInput } from "@/lib/templateBuildWithShari";
 import {
   filterTemplates,
-  TEMPLATE_CATEGORY_OPTIONS,
+  groupTemplatesByCategory,
   TEMPLATE_STATUS_OPTIONS,
   type TemplateStatusFilter,
 } from "@/lib/templateLibraryUx";
-import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
-import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
+import { NO_CATEGORY } from "@/lib/categoryRevealUx";
 
 type Draft = {
   id?: string;
@@ -44,24 +44,80 @@ const EMPTY_DRAFT: Draft = {
   subcategory: "",
 };
 
+type PendingConsent =
+  | { kind: "chat"; template: TemplateItem }
+  | { kind: "create"; template: TemplateItem; action: "regenerate" | "addToProject" };
+
+function TemplateConsentGate({
+  variant,
+  templateTitle,
+  onConfirm,
+  onCancel,
+}: {
+  variant: "chat" | "create";
+  templateTitle: string;
+  onConfirm: () => void;
+  onCancel: () => void;
+}) {
+  return (
+    <div className="rounded-2xl border border-[#1e4f4f]/20 bg-[#f0f5f5] p-4">
+      <p className="text-base font-semibold text-[#1f1c19]">
+        {variant === "create"
+          ? "Want to open Create and build from this template?"
+          : `Build from “${templateTitle}” with Shari in chat?`}
+      </p>
+      <p className="mt-1 text-sm text-[#6b635a]">
+        {variant === "create"
+          ? "Nothing opens until you choose Yes."
+          : "Shari will ask one question first — nothing drafts until you agree."}
+      </p>
+      <div className="mt-3 flex flex-wrap gap-2">
+        <button
+          type="button"
+          onClick={onConfirm}
+          className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
+        >
+          {variant === "create" ? "Yes, open Create" : "Yes — start in chat"}
+        </button>
+        <button
+          type="button"
+          onClick={onCancel}
+          className="rounded-lg px-4 py-2 text-sm font-semibold text-[#6b635a] hover:bg-black/5"
+        >
+          Not now
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function TemplatesLibrary({
   onBack,
   onBuildWithShari,
+  onOpenInCreate,
 }: {
   onBack?: () => void;
   /** @deprecated Snippets / generate moved to Create — kept for call-site compat */
   onOpen?: (section: AppSection) => void;
   onGenerate?: (seed: { type?: string; brief?: string }) => void;
   onBuildWithShari?: (input: CreationWorkspaceInput) => void;
+  /** Opens Create only after in-panel consent (Regenerate / Add To Project). */
+  onOpenInCreate?: (input: CreationWorkspaceInput) => void;
 }) {
   const [items, setItems] = useState<TemplateItem[]>([]);
-  const [status, setStatus] = useState<TemplateStatusFilter>("saved");
-  const [category, setCategory] = useState<TemplateCategory | typeof NO_CATEGORY>(
-    NO_CATEGORY,
-  );
+  const [status, setStatus] = useState<TemplateStatusFilter>("all");
   const [search, setSearch] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
+  const [pendingBuildId, setPendingBuildId] = useState<string | null>(null);
+  const [pendingConsent, setPendingConsent] = useState<PendingConsent | null>(
+    null,
+  );
+  /** Accordion — at most one category open; null = all collapsed. */
+  const [openCategory, setOpenCategory] = useState<TemplateCategory | null>(
+    null,
+  );
   const [googleExportError, setGoogleExportError] = useState<string | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -70,9 +126,84 @@ export function TemplatesLibrary({
   }, []);
 
   const visible = useMemo(
-    () => filterTemplates(items, { query: search, status, category }),
-    [items, search, status, category],
+    () =>
+      filterTemplates(items, {
+        query: search,
+        status,
+        category: NO_CATEGORY,
+      }),
+    [items, search, status],
   );
+
+  const grouped = useMemo(
+    () => groupTemplatesByCategory(visible),
+    [visible],
+  );
+
+  const categoryDisplayLabel = (cat: TemplateCategory): string => {
+    if (cat === "offers") return "Sales";
+    if (cat === "emails") return "Email";
+    if (cat === "systems") return "Operations";
+    return TEMPLATE_CATEGORY_LABEL[cat];
+  };
+
+  function toggleCategory(cat: TemplateCategory) {
+    setOpenCategory((prev) => (prev === cat ? null : cat));
+  }
+
+  function closeCategory() {
+    setOpenCategory(null);
+  }
+
+  function renderTemplateRow(t: TemplateItem) {
+    return (
+      <li
+        key={t.id}
+        className="rounded-lg border border-[#e7dfd4] bg-[#faf7f2]/60 p-3"
+      >
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <button
+            type="button"
+            onClick={() => setViewId(t.id)}
+            className="min-w-0 flex-1 text-left text-base font-semibold text-[#1f1c19] hover:text-[#1e4f4f]"
+          >
+            {t.title}
+          </button>
+          {onBuildWithShari ? (
+            pendingBuildId === t.id ? (
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPendingBuildId(null);
+                    onBuildWithShari(templateToCreationInput(t));
+                  }}
+                  className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-sm font-semibold text-white"
+                >
+                  Yes — start in chat
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPendingBuildId(null)}
+                  className="rounded-lg px-3 py-1.5 text-sm font-semibold text-[#6b635a] hover:bg-black/5"
+                >
+                  Not now
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setPendingBuildId(t.id)}
+                className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+              >
+                Build With Shari
+              </button>
+            )
+          ) : null}
+        </div>
+      </li>
+    );
+  }
 
   function saveDraft() {
     const body = draft?.body.trim();
@@ -108,7 +239,34 @@ export function TemplatesLibrary({
         <p className="text-2xl font-semibold text-[#1f1c19]">
           {draft.id ? "Edit template" : "New template"}
         </p>
+        <p className="mt-1 text-sm text-[#6b635a]">
+          Advanced: edit the framework directly. Prefer{" "}
+          <strong>Build With Shari</strong> on the list if you want help shaping
+          it in chat first.
+        </p>
 
+        {onBuildWithShari && (
+          <button
+            type="button"
+            onClick={() =>
+              onBuildWithShari({
+                itemType: "template",
+                title: draft.title.trim() || "New template",
+                brief: draft.title.trim() || "new template",
+                draftContent: draft.body,
+                source: "template",
+                stage: "shaping",
+              })
+            }
+            className="mt-4 self-start rounded-xl border-2 border-[#1e4f4f]/30 bg-[#f0f5f5] px-4 py-3 text-left text-sm font-semibold text-[#1e4f4f] hover:border-[#1e4f4f] hover:bg-white"
+          >
+            ✨ Help me start
+            <span className="mt-0.5 block text-xs font-normal text-[#6b635a]">
+              Opens chat with one gentle question — nothing saves until you
+              agree.
+            </span>
+          </button>
+        )}
         <input
           value={draft.title}
           onChange={(e) => setDraft({ ...draft, title: e.target.value })}
@@ -267,30 +425,22 @@ export function TemplatesLibrary({
           onPrint={printTemplate}
           onDownload={downloadTemplate}
           onAddToProject={
-            onBuildWithShari
+            onOpenInCreate
               ? () =>
-                  onBuildWithShari({
-                    itemType,
-                    title: viewing.title,
-                    draftContent: viewing.body,
-                    brief: viewing.title,
-                    templateId: viewing.id,
-                    source: "template",
-                    stage: "using template",
+                  setPendingConsent({
+                    kind: "create",
+                    template: viewing,
+                    action: "addToProject",
                   })
               : undefined
           }
           onRegenerate={
-            onBuildWithShari
+            onOpenInCreate
               ? () =>
-                  onBuildWithShari({
-                    itemType,
-                    title: viewing.title,
-                    draftContent: viewing.body,
-                    brief: viewing.title,
-                    templateId: viewing.id,
-                    source: "template",
-                    stage: "using template",
+                  setPendingConsent({
+                    kind: "create",
+                    template: viewing,
+                    action: "regenerate",
                   })
               : undefined
           }
@@ -298,6 +448,48 @@ export function TemplatesLibrary({
           onClearGoogleError={() => setGoogleExportError(null)}
           busy={googleLoading}
         />
+        {pendingConsent?.kind === "create" &&
+        pendingConsent.template.id === viewing.id ? (
+          <div className="mx-auto w-full max-w-3xl px-4 pb-2">
+            <TemplateConsentGate
+              variant="create"
+              templateTitle={viewing.title}
+              onConfirm={() => {
+                onOpenInCreate?.(templateToCreationInput(pendingConsent.template));
+                setPendingConsent(null);
+              }}
+              onCancel={() => setPendingConsent(null)}
+            />
+          </div>
+        ) : null}
+        <div className="mx-auto flex w-full max-w-3xl flex-wrap gap-2 px-4 pb-2">
+          {onBuildWithShari &&
+            (pendingConsent?.kind === "chat" &&
+            pendingConsent.template.id === viewing.id ? (
+              <TemplateConsentGate
+                variant="chat"
+                templateTitle={viewing.title}
+                onConfirm={() => {
+                  onBuildWithShari(templateToCreationInput(viewing));
+                  setPendingConsent(null);
+                }}
+                onCancel={() => setPendingConsent(null)}
+              />
+            ) : (
+              <button
+                type="button"
+                onClick={() =>
+                  setPendingConsent({
+                    kind: "chat",
+                    template: viewing,
+                  })
+                }
+                className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
+              >
+                ✨ Build With Shari
+              </button>
+            ))}
+        </div>
         <div className="mx-auto flex w-full max-w-3xl flex-wrap gap-2 px-4 pb-6 text-sm font-semibold">
           <button
             type="button"
@@ -354,16 +546,9 @@ export function TemplatesLibrary({
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
       <WorkspaceGuide section="templates-library" />
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-start justify-between gap-3">
         <p className="text-2xl font-semibold text-[#1f1c19]">Templates</p>
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setDraft({ ...EMPTY_DRAFT })}
-            className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
-          >
-            + New
-          </button>
+        <div className="flex shrink-0 items-center gap-2">
           {onBack && (
             <button
               type="button"
@@ -376,35 +561,71 @@ export function TemplatesLibrary({
           )}
         </div>
       </div>
-      <p className="mt-1 text-base text-[#6b635a]">
-        Pick a category first — or search across everything.
-      </p>
+      <div className="mt-1 space-y-1 text-base text-[#6b635a]">
+        <p>Templates are reusable starting points saved on this device.</p>
+        <p>
+          Build With Shari opens a conversation to adapt the template together.
+          Nothing is drafted until you agree.
+        </p>
+      </div>
+
+      {onBuildWithShari && (
+        <button
+          type="button"
+          onClick={() =>
+            onBuildWithShari({
+              itemType: "template",
+              title: "New template",
+              brief: "new template",
+              source: "template",
+              stage: "shaping",
+            })
+          }
+          className="mt-5 w-full rounded-xl bg-[#1e4f4f] px-4 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-[#163a3a]"
+        >
+          ✨ Build With Shari
+        </button>
+      )}
+
+      <button
+        type="button"
+        onClick={() => setDraft({ ...EMPTY_DRAFT })}
+        className="mt-2 self-start text-sm font-semibold text-[#1e4f4f] hover:underline"
+      >
+        Start from blank →
+      </button>
 
       <input
         type="search"
         value={search}
-        onChange={(e) => setSearch(e.target.value)}
+        onChange={(e) => {
+          setSearch(e.target.value);
+          setOpenCategory(null);
+        }}
         placeholder="Search templates…"
         className="mt-5 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-lg text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
         autoFocus
       />
 
-      <div className="mt-4 flex flex-col gap-3 sm:flex-row">
-        <CategoryPickerSelect
-          className="min-w-0 flex-1"
-          label="Category"
-          value={category}
-          onChange={setCategory}
-          options={TEMPLATE_CATEGORY_OPTIONS}
-          placeholder="Select a category…"
-        />
-        <label className="min-w-0 flex-1 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+      <details
+        className="mt-3 rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/80 px-3 py-2"
+        open={filtersOpen}
+        onToggle={(e) => setFiltersOpen((e.target as HTMLDetailsElement).open)}
+      >
+        <summary className="cursor-pointer list-none text-sm font-semibold text-[#6b635a] marker:content-none [&::-webkit-details-marker]:hidden">
+          Filter templates
+          {status !== "all" ? (
+            <span className="ml-2 font-normal text-[#1e4f4f]">(filtered)</span>
+          ) : null}
+        </summary>
+        <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-[#6b635a]">
           Status
           <select
             value={status}
-            onChange={(e) =>
-              setStatus(e.target.value as TemplateStatusFilter)
-            }
+            onChange={(e) => {
+              setStatus(e.target.value as TemplateStatusFilter);
+              setOpenCategory(null);
+            }}
             className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
           >
             {TEMPLATE_STATUS_OPTIONS.map((opt) => (
@@ -414,33 +635,54 @@ export function TemplatesLibrary({
             ))}
           </select>
         </label>
-      </div>
+      </details>
 
       {visible.length === 0 ? (
         <p className="mt-6 text-base text-[#6b635a]">
-          {!category && !search.trim()
-            ? CATEGORY_PICKER_EMPTY_LIST_HINT
-            : "No templates match — try a different search or category."}
+          {search.trim() || status !== "all"
+            ? "No templates match — try a different search or filter."
+            : "No saved templates yet — tap Build With Shari above or start from blank."}
         </p>
       ) : (
-        <ul className="mt-5 flex flex-col gap-2">
-          {visible.map((t) => (
-            <li key={t.id}>
-              <button
-                type="button"
-                onClick={() => setViewId(t.id)}
-                className="flex w-full items-center justify-between gap-3 rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-3 text-left transition-colors hover:border-[#1e4f4f]/40 hover:bg-white"
+        <div className="mt-5 flex flex-col gap-2">
+          {grouped.map((group) => {
+            const open = openCategory === group.category;
+            return (
+              <section
+                key={group.category}
+                className="rounded-xl border border-[#d4cdc3] bg-white/90"
               >
-                <span className="min-w-0 truncate text-base font-semibold text-[#1f1c19]">
-                  {t.title}
-                </span>
-                <span className="shrink-0 text-[#9a8f82]" aria-hidden>
-                  ›
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
+                <button
+                  type="button"
+                  onClick={() => toggleCategory(group.category)}
+                  aria-expanded={open}
+                  className="flex w-full items-center justify-between gap-2 px-4 py-3.5 text-left"
+                >
+                  <span className="text-base font-semibold text-[#1f1c19]">
+                    {categoryDisplayLabel(group.category)} Templates
+                  </span>
+                  <span className="text-sm font-medium text-[#6b635a]">
+                    ({group.templates.length}) {open ? "▾" : "▸"}
+                  </span>
+                </button>
+                {open ? (
+                  <div className="border-t border-[#e7dfd4] px-3 py-3">
+                    <ul className="flex flex-col gap-2">
+                      {group.templates.map((t) => renderTemplateRow(t))}
+                    </ul>
+                    <button
+                      type="button"
+                      onClick={closeCategory}
+                      className="mt-3 w-full rounded-lg border border-[#1e4f4f]/25 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+                    >
+                      Close category
+                    </button>
+                  </div>
+                ) : null}
+              </section>
+            );
+          })}
+        </div>
       )}
 
       {onBack && (

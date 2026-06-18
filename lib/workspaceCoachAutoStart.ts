@@ -3,6 +3,11 @@
  * Shari's context. Order of opening (workspace first vs chat first) must not matter.
  */
 
+import { resolvedCreateTopic } from "./createBuilderChat";
+import {
+  isUnresolvedCreateType,
+  userFacingCreateTypeLabel,
+} from "./createTypePickers";
 import type { CreationWorkspaceContext } from "./workspaceCreation";
 import {
   buildProjectCoachAutoStart,
@@ -16,9 +21,10 @@ import { workspaceTitle } from "./workspaceMode";
 import type { AppSection } from "./companionUi";
 import type { WorkspaceContext, WorkspaceFieldId } from "./workspaceAwareness";
 import { suggestNextWorkspaceField } from "./workspaceAwareness";
-
 export type WorkspaceCoachExtras = {
   creationContext?: CreationWorkspaceContext | null;
+  /** Create + chat split builder is driving discovery — no parallel coach opener. */
+  splitScreenCreateActive?: boolean;
   /** Active Help Me Right Now activity title, if any. */
   activityTitle?: string | null;
   activityStep?: string | null;
@@ -39,9 +45,17 @@ function buildCreateCoachAutoStart(
   ctx: WorkspaceContext,
   extras?: WorkspaceCoachExtras,
 ): WorkspaceCoachAutoStart | null {
+  if (extras?.splitScreenCreateActive) {
+    return null;
+  }
   const cc = extras?.creationContext;
-  const type = cc?.itemType?.trim() || ctx.selectedItemName?.split(" — ")[0]?.trim();
-  const topic = cc?.title?.trim() || cc?.brief?.trim();
+  const rawType =
+    cc?.itemType?.trim() || ctx.selectedItemName?.split(" — ")[0]?.trim() || "";
+  const type =
+    rawType && !isUnresolvedCreateType(rawType)
+      ? userFacingCreateTypeLabel(rawType) ?? rawType
+      : null;
+  const topic = resolvedCreateTopic(rawType, cc?.title, cc?.brief);
   const hasDraft = Boolean(
     cc?.draftContent?.trim() || ctx.draftPreview?.trim(),
   );
@@ -66,13 +80,12 @@ function buildCreateCoachAutoStart(
 
   if (!type) {
     return {
-      content:
-        "[[focus:create-topic]]I see you're in **Create**. What are you making — I'll help one question at a time.",
+      content: "What would you like to create?",
       focusField: "create-topic",
     };
   }
 
-  if (!topic && !cc?.brief?.trim()) {
+  if (!topic) {
     const article = /^[aeiou]/i.test(type) ? "an" : "a";
     return {
       content: `[[focus:create-topic]]I see you're creating ${article} **${type}**. I'll help one question at a time — who is it for, or what's the topic in one line?`,
@@ -111,7 +124,7 @@ function buildPlaybookCoachAutoStart(ctx: WorkspaceContext): WorkspaceCoachAutoS
   }
   return {
     content:
-      "I see **Strategies** is open beside us — how can I help you today?",
+      "I see you've opened **Strategies**. What challenge are you trying to solve?",
     focusField: null,
   };
 }
@@ -154,8 +167,7 @@ function buildFocusTimerCoachAutoStart(
 
 function buildFocusAreaCoachAutoStart(): WorkspaceCoachAutoStart {
   return {
-    content:
-      "I see Focus is open — what do you want to start, stay on, or push through right now?",
+    content: "What are you trying to focus on right now?",
     focusField: null,
   };
 }
@@ -206,12 +218,9 @@ function buildActivitiesCoachAutoStart(
   };
 }
 
-function buildClientAvatarsCoachAutoStart(): WorkspaceCoachAutoStart {
-  return {
-    content:
-      "I see you're defining a client avatar. Tell me about the person you most enjoy helping.",
-    focusField: null,
-  };
+function buildClientAvatarsCoachAutoStart(): WorkspaceCoachAutoStart | null {
+  // Client Avatar coaching starts via builder kickoff (New Avatar / Define With Shari).
+  return null;
 }
 
 function buildTimeBlockCoachAutoStart(): WorkspaceCoachAutoStart {
@@ -332,7 +341,8 @@ export function workspaceCoachAutoStartHint(
 
   if (ctx.section === "content-generator" && extras?.creationContext) {
     const cc = extras.creationContext;
-    if (cc.itemType) lines.push(`- Create type: ${cc.itemType}`);
+    const display = userFacingCreateTypeLabel(cc.itemType);
+    if (display) lines.push(`- Creating: ${display}`);
     if (cc.title?.trim()) lines.push(`- Create title: ${cc.title.trim()}`);
     if (cc.draftContent?.trim()) lines.push("- Draft: visible in panel");
   }

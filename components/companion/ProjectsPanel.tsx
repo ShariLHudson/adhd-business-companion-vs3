@@ -85,6 +85,7 @@ const SORTED_STATUSES = sortByDropdownLabel(
 export function ProjectsPanel({
   onOpen,
   onAsk,
+  onOpenTimeBlock,
   initialProjectId,
   onContextChange,
   focusField,
@@ -100,6 +101,7 @@ export function ProjectsPanel({
 }: {
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
+  onOpenTimeBlock?: (projectId: string, blockId?: string) => void;
   onBuildWithShari?: (input: CreationWorkspaceInput) => void;
   initialProjectId?: string | null;
   onContextChange?: (detail: WorkspacePanelDetail) => void;
@@ -142,13 +144,6 @@ export function ProjectsPanel({
   const [listGroup, setListGroup] = useState<ProjectListGroup | typeof NO_CATEGORY>(
     NO_CATEGORY,
   );
-  const [listGroupsOpen, setListGroupsOpen] = useState<
-    Record<ProjectListGroup, boolean>
-  >({
-    active: false,
-    "not-started": false,
-    completed: false,
-  });
   const [detailSectionsOpen, setDetailSectionsOpen] = useState<
     Record<string, boolean>
   >({});
@@ -317,13 +312,6 @@ export function ProjectsPanel({
     setView("create");
   }
 
-  function toggleListGroup(id: string) {
-    setListGroupsOpen((g) => ({
-      ...g,
-      [id]: !g[id as ProjectListGroup],
-    }));
-  }
-
   function toggleDetailSection(id: string) {
     setDetailSectionsOpen((s) => ({ ...s, [id]: !s[id] }));
   }
@@ -464,11 +452,17 @@ export function ProjectsPanel({
     if (field === "project-tasks") {
       const proj = currentRef.current;
       if (view === "detail" && proj && value.trim()) {
-        saveProjectItem({
-          projectId: proj.id,
-          kind: "task",
-          title: value.trim(),
-        });
+        const lines = value
+          .split("\n")
+          .map((line) => line.replace(/^\s*(?:[*•\-]|\d+[.)])\s*/, "").trim())
+          .filter(Boolean);
+        for (const title of lines) {
+          saveProjectItem({
+            projectId: proj.id,
+            kind: "task",
+            title,
+          });
+        }
         setProjectDataTick((n) => n + 1);
       }
       return;
@@ -584,24 +578,6 @@ export function ProjectsPanel({
           </span>
         </button>
       </li>
-    );
-  }
-
-  function renderListGroup(group: ProjectListGroup) {
-    const items = projectGroups[group];
-    if (items.length === 0) return null;
-    return (
-      <CollapsibleSection
-        key={group}
-        id={group}
-        title={PROJECT_LIST_GROUP_LABEL[group]}
-        count={items.length}
-        open={listGroupsOpen[group]}
-        onToggle={toggleListGroup}
-        className="mt-3"
-      >
-        <ul className="flex flex-col gap-2">{items.map(renderCard)}</ul>
-      </CollapsibleSection>
     );
   }
 
@@ -954,10 +930,14 @@ export function ProjectsPanel({
                 </button>
                 <button
                   type="button"
-                  onClick={() => onOpen?.("time-block")}
+                  onClick={() =>
+                    onOpenTimeBlock
+                      ? onOpenTimeBlock(current.id)
+                      : onOpen?.("time-block")
+                  }
                   className="rounded-lg border border-[#1e4f4f]/30 px-3 py-1.5 text-sm font-semibold text-[#1e4f4f]"
                 >
-                  ⏱ Time block
+                  ⏱ Momentum appointment
                 </button>
               </div>
 
@@ -1047,14 +1027,14 @@ export function ProjectsPanel({
 
           <CollapsibleSection
             id="time-blocks"
-            title="Time Blocks"
+            title="Momentum Appointments"
             count={blocks.length}
             open={!!detailSectionsOpen["time-blocks"]}
             onToggle={toggleDetailSection}
           >
             {blocks.length === 0 ? (
               <p className="text-sm text-[#6b635a]">
-                No time blocks yet — schedule one from Overview.
+                No momentum appointments yet — add one from Overview.
               </p>
             ) : (
               <div className="flex flex-col gap-3">
@@ -1072,16 +1052,19 @@ export function ProjectsPanel({
                     >
                       <ul className="flex flex-col gap-1.5">
                         {list.map((b) => (
-                          <li
-                            key={b.id}
-                            className="rounded-lg border border-[#e4ddd2] bg-white px-3 py-2 text-sm"
-                          >
-                            <span className="font-semibold text-[#1f1c19]">
-                              {b.title}
-                            </span>
-                            <span className="ml-2 text-xs text-[#6b635a]">
-                              {fmt(b.date, b.startTime)} · {b.durationMin} min
-                            </span>
+                          <li key={b.id}>
+                            <button
+                              type="button"
+                              onClick={() => onOpenTimeBlock?.(current.id, b.id)}
+                              className="flex w-full items-center justify-between gap-2 rounded-lg border border-[#e4ddd2] bg-white px-3 py-2 text-left text-sm transition-colors hover:border-[#1e4f4f]/40 hover:bg-[#f0f5f5]"
+                            >
+                              <span className="font-semibold text-[#1f1c19]">
+                                {b.title}
+                              </span>
+                              <span className="shrink-0 text-xs text-[#6b635a]">
+                                {fmt(b.date, b.startTime)} · {b.durationMin} min
+                              </span>
+                            </button>
                           </li>
                         ))}
                       </ul>

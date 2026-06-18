@@ -107,6 +107,7 @@ export function CompanionSignInForm({
   const [resendBusy, setResendBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [authHint, setAuthHint] = useState<string | null>(null);
   const [showResend, setShowResend] = useState(false);
 
   if (loading) {
@@ -173,11 +174,13 @@ export function CompanionSignInForm({
     setBusy(true);
     setError(null);
     setNotice(null);
+    setAuthHint(null);
     try {
       if (mode === "signin") {
         const result = await signIn(email, password);
         if (result.error) {
           setError(result.error);
+          setAuthHint(result.hint ?? null);
           setShowResend(
             /not confirmed|confirmation/i.test(result.error),
           );
@@ -227,6 +230,26 @@ export function CompanionSignInForm({
         <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
           {error}
         </p>
+      ) : null}
+      {authHint === "create_account" || authHint === "reset_via_signup" ? (
+        <button
+          type="button"
+          onClick={() => {
+            setError(null);
+            setAuthHint(null);
+            setNotice(
+              authHint === "reset_via_signup"
+                ? "Enter the password you want, then create your account — we'll sign you in right after."
+                : "Create your account with the email and password above.",
+            );
+            setMode("signup");
+          }}
+          className="rounded-xl border border-[#1e4f4f]/40 bg-[#1e4f4f]/8 px-4 py-2.5 text-left text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/12"
+        >
+          {authHint === "reset_via_signup"
+            ? "Set a new password & sign in"
+            : "Create account with this email"}
+        </button>
       ) : null}
       {notice ? (
         <p className="rounded-lg border border-[#1e4f4f]/30 bg-[#1e4f4f]/8 px-3 py-2 text-sm text-[#1e4f4f]">
@@ -300,6 +323,7 @@ export function CompanionSignInForm({
         onClick={() => {
           setError(null);
           setNotice(null);
+          setAuthHint(null);
           setShowResend(false);
           setMode((m) => (m === "signin" ? "signup" : "signin"));
         }}

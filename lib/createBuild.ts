@@ -7,6 +7,7 @@ import { resolveTemplateName } from "./createTemplates";
 import {
   answeredDiscoveryCount,
   discoveryComplete,
+  hasEnoughDiscoveryForDraft,
   requiredFieldsComplete,
   resolvedTypeLabel,
   type CreateWorkflowState,
@@ -39,6 +40,10 @@ export function validateCreateForBuild(
   if (answersCount === 0) missing.push("questionAnswers");
 
   const fieldsComplete = requiredFieldsComplete(itemType, state.discoveryAnswers);
+  const splitComplete =
+    state.questionMode === "split_screen"
+      ? discoveryComplete(itemType, state)
+      : fieldsComplete || hasEnoughDiscoveryForDraft(state.discoveryAnswers);
   const chatReady =
     Boolean(options?.fromChatApproval) &&
     answersCount > 0 &&
@@ -48,7 +53,7 @@ export function validateCreateForBuild(
   const readyToBuild =
     chatReady ||
     ((state.step === "readiness" || state.step === "add-detail") &&
-      fieldsComplete);
+      splitComplete);
 
   if (!readyToBuild) missing.push("readyToBuild");
 

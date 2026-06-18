@@ -1,16 +1,46 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
-  featuredHowDoIEntries,
   formatHowDoIEntry,
+  howDoITopicGroups,
   resolveHowDoI,
   searchHowDoI,
   type HowDoIEntry,
+  type HowDoITopicGroup,
 } from "@/lib/howDoIContent";
 import type { AppSection } from "@/lib/companionUi";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+
+function TopicGroupSection({
+  group,
+  open,
+  onToggle,
+  children,
+}: {
+  group: HowDoITopicGroup;
+  open: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="rounded-2xl border border-[#1e4f4f]/15 bg-white/85 shadow-sm">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left"
+      >
+        <span className="block text-base font-semibold text-[#1f1c19]">
+          {open ? "▼" : "▶"} {group.label}
+        </span>
+      </button>
+      {open ? (
+        <div className="border-t border-[#e7dfd4] px-4 pb-4 pt-2">{children}</div>
+      ) : null}
+    </div>
+  );
+}
 
 function HowDoIDetail({
   entry,
@@ -135,6 +165,30 @@ function HowDoIDetail({
   );
 }
 
+function TopicEntryButton({
+  entry,
+  onSelect,
+}: {
+  entry: HowDoIEntry;
+  onSelect: (entry: HowDoIEntry) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(entry)}
+      className="w-full rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-3 text-left hover:border-[#1e4f4f]/40"
+    >
+      <span className="block text-base font-semibold text-[#1f1c19]">
+        {entry.title}
+      </span>
+      <span className="mt-0.5 block text-sm text-[#6b635a]">
+        {entry.whatItIs.slice(0, 100)}
+        {entry.whatItIs.length > 100 ? "…" : ""}
+      </span>
+    </button>
+  );
+}
+
 export function HowDoIPanel({
   onOpen,
   onOpenSettings,
@@ -148,11 +202,14 @@ export function HowDoIPanel({
 }) {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<HowDoIEntry | null>(null);
+  const [topicGroupsOpen, setTopicGroupsOpen] = useState<Record<string, boolean>>(
+    {},
+  );
   const inputRef = useRef<HTMLInputElement>(null);
 
   const results = useMemo(() => searchHowDoI(query), [query]);
-  const featured = useMemo(() => featuredHowDoIEntries(), []);
-  const listEntries = query.trim() ? results : featured;
+  const topicGroups = useMemo(() => howDoITopicGroups(), []);
+  const searching = Boolean(query.trim());
 
   useEffect(() => {
     registerBack?.(() => {
@@ -175,6 +232,10 @@ export function HowDoIPanel({
     if (!q) return;
     setQuery(q);
     setSelected(resolveHowDoI(q));
+  }
+
+  function toggleTopicGroup(id: string) {
+    setTopicGroupsOpen((prev) => ({ ...prev, [id]: !prev[id] }));
   }
 
   if (selected) {
@@ -204,8 +265,8 @@ export function HowDoIPanel({
       <WorkspaceGuide section="how-do-i" />
       <p className="text-2xl font-semibold text-[#1f1c19]">How Do I…</p>
       <p className="mt-1 text-base text-[#6b635a]">
-        Search or pick a topic — every answer includes steps and a button to open
-        the right place.
+        Search or open a topic group — every answer includes steps and a button
+        to open the right place.
       </p>
 
       <form
@@ -233,44 +294,60 @@ export function HowDoIPanel({
         </button>
       </form>
 
-      <p className="mt-4 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-        {query.trim() ? "Matching topics" : "Popular topics"}
-      </p>
-      <ul className="mt-2 flex flex-col gap-2 pb-4">
-        {listEntries.map((entry) => (
-          <li key={entry.id}>
-            <button
-              type="button"
-              onClick={() => setSelected(entry)}
-              className="w-full rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-3 text-left hover:border-[#1e4f4f]/40"
-            >
-              <span className="block text-base font-semibold text-[#1f1c19]">
-                {entry.title}
-              </span>
-              <span className="mt-0.5 block text-sm text-[#6b635a]">
-                {entry.whatItIs.slice(0, 100)}
-                {entry.whatItIs.length > 100 ? "…" : ""}
-              </span>
-            </button>
-          </li>
-        ))}
-        {query.trim() && results.length === 0 ? (
-          <li>
-            <button
-              type="button"
-              onClick={() => submitQuery(query)}
-              className="w-full rounded-xl border border-dashed border-[#1e4f4f]/35 bg-[#f0f5f5]/80 px-4 py-3 text-left"
-            >
-              <span className="block text-base font-semibold text-[#1e4f4f]">
-                Search for “{query.trim()}”
-              </span>
-              <span className="mt-0.5 block text-sm text-[#6b635a]">
-                We&apos;ll show the closest guide or help you ask Shari.
-              </span>
-            </button>
-          </li>
-        ) : null}
-      </ul>
+      {searching ? (
+        <>
+          <p className="mt-4 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+            Matching topics
+          </p>
+          <ul className="mt-2 flex flex-col gap-2 pb-4">
+            {results.map((entry) => (
+              <li key={entry.id}>
+                <TopicEntryButton entry={entry} onSelect={setSelected} />
+              </li>
+            ))}
+            {results.length === 0 ? (
+              <li>
+                <button
+                  type="button"
+                  onClick={() => submitQuery(query)}
+                  className="w-full rounded-xl border border-dashed border-[#1e4f4f]/35 bg-[#f0f5f5]/80 px-4 py-3 text-left"
+                >
+                  <span className="block text-base font-semibold text-[#1e4f4f]">
+                    Search for “{query.trim()}”
+                  </span>
+                  <span className="mt-0.5 block text-sm text-[#6b635a]">
+                    We&apos;ll show the closest guide or help you ask Shari.
+                  </span>
+                </button>
+              </li>
+            ) : null}
+          </ul>
+        </>
+      ) : (
+        <>
+          <p className="mt-4 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+            Browse by topic
+          </p>
+          <div className="mt-2 flex flex-col gap-2 pb-4">
+            {topicGroups.map(({ group, entries }) => (
+              <TopicGroupSection
+                key={group.id}
+                group={group}
+                open={!!topicGroupsOpen[group.id]}
+                onToggle={() => toggleTopicGroup(group.id)}
+              >
+                <ul className="flex flex-col gap-2">
+                  {entries.map((entry) => (
+                    <li key={entry.id}>
+                      <TopicEntryButton entry={entry} onSelect={setSelected} />
+                    </li>
+                  ))}
+                </ul>
+              </TopicGroupSection>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }

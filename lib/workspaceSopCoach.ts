@@ -48,6 +48,7 @@ import {
   isFieldContentIntent,
   isKnowledgeQuestion,
 } from "./workspaceIntent";
+import { isWorkspaceDiscoveryRequest } from "./messageClassification";
 import {
   getEffectiveSuggestions,
   tryResolveSuggestionSelection,
@@ -198,6 +199,10 @@ function buildContentTurn(
   energy: DayLevel,
   lastAssistantText = "",
 ): WorkspaceCoachTurn {
+  if (isWorkspaceDiscoveryRequest(userText, lastAssistantText)) {
+    return buildHelpTurn(session, userText);
+  }
+
   if (tryResolveSuggestionSelection(userText, session, lastAssistantText)) {
     const selection = tryResolveSuggestionSelection(
       userText,
@@ -337,6 +342,17 @@ export function resolveSopCoachTurn(
     return buildHelpTurn(active, userText);
   }
 
+  if (intent === "discovery") {
+    if (
+      /\b(?:examples?|brainstorm|ideas?|what should i put|give me|research|what do you think)\b/i.test(
+        userText,
+      )
+    ) {
+      return buildHelpTurn(active, userText);
+    }
+    return null;
+  }
+
   if (intent === "confirmation") {
     return buildConfirmTurn(active, userText);
   }
@@ -354,13 +370,16 @@ export function resolveSopCoachTurn(
   }
 
   if (intent === "conversation") {
-    if (isKnowledgeQuestion(userText)) return null;
+    if (isKnowledgeQuestion(userText) || isWorkspaceDiscoveryRequest(userText)) {
+      return null;
+    }
     if (isProgressQuestion(userText)) return buildProgressTurn(active);
     return buildConversationTurn(active, userText);
   }
 
   if (
     intent === "fieldContent" &&
+    !isWorkspaceDiscoveryRequest(userText, lastAssistantText) &&
     isFieldContentIntent(userText, lastAssistantText, { session: active })
   ) {
     return buildContentTurn(active, userText, energy, lastAssistantText);

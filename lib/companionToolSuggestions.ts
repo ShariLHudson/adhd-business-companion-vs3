@@ -7,6 +7,7 @@ import {
   type ChatTurn,
 } from "./companionIntelligence";
 import type { TriageInput } from "./companionTriage";
+import { shouldSuppressEmotionalTools } from "./messageClassification";
 import { hasConcreteWorkspaceTarget } from "./workspaceMode";
 
 export type ToolSuggestionKind =
@@ -87,6 +88,8 @@ export function suggestSupportTool(
 
   const t = input.text.trim();
   if (!t) return null;
+
+  if (shouldSuppressEmotionalTools(t)) return null;
 
   // Concrete create/build intent → workspace offer wins over Get Unstuck / etc.
   if (hasConcreteWorkspaceTarget(t)) return null;

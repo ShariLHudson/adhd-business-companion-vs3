@@ -34,7 +34,7 @@ type CompanionAuthContextValue = {
   signIn: (
     email: string,
     password: string,
-  ) => Promise<{ error: string | null }>;
+  ) => Promise<{ error: string | null; hint?: string }>;
   signUp: (
     email: string,
     password: string,
@@ -68,7 +68,7 @@ function syncUserToPrefs(user: User | null) {
 async function signInDirect(
   email: string,
   password: string,
-): Promise<{ error: string | null }> {
+): Promise<{ error: string | null; hint?: string }> {
   const supabase = getCompanionSupabase();
   if (!supabase) {
     return { error: "Could not connect to Supabase in your browser." };
@@ -91,7 +91,9 @@ async function signInDirect(
       const message = isEmailNotConfirmedError(err)
         ? emailNotConfirmedMessage()
         : sanitizeSupabaseAuthError(err);
-      return { error: message };
+      const hint =
+        typeof data.hint === "string" ? data.hint : undefined;
+      return { error: message, hint };
     }
 
     const session = data.session as

@@ -19,7 +19,7 @@ const PRIMARY: Option[] = [
   {
     emoji: "🧠",
     title: "Clear My Mind",
-    desc: "Get everything out of your head.",
+    desc: "Reduce mental clutter — get thoughts out and find next steps.",
     tool: "brain-dump",
   },
   {
@@ -40,7 +40,7 @@ const TOOLS: Option[] = [
   {
     emoji: "📅",
     title: "Block Out Time",
-    desc: "Plan your next work block.",
+    desc: "Set a momentum appointment — movement counts.",
     tool: "time-block",
   },
   {
@@ -73,7 +73,7 @@ const BOOSTERS: Option[] = [
   {
     emoji: "🧭",
     title: "Help Me Right Now",
-    desc: "Unique strategies for calm, focus, decisions, and energy — each solves a different problem.",
+    desc: "Adjust My Day, parking lot, Safe For Today, spin, focus — each solves a different problem.",
     tool: "activities",
   },
 ];

@@ -74,6 +74,6 @@ describe("workspaceContextLock", () => {
       "What would help with procrastination?",
     );
     expect(reply).toContain("Start Ugly");
-    expect(reply).toContain("dropdown");
+    expect(reply).toContain("one question at a time");
   });
 });

@@ -19,6 +19,7 @@ export const CROSS_WORKSPACE_SECTIONS: AppSection[] = [
   "saved-work",
   "email-generator",
   "snippets",
+  "client-avatars",
 ];
 
 export function isCrossWorkspaceSection(section: AppSection): boolean {
@@ -57,6 +58,9 @@ export function crossWorkspaceContextMessage(
   const target = crossWorkspaceSectionLabel(targetSection);
   switch (targetSection) {
     case "brain-dump":
+      if (/brain parking lot/i.test(sourceTitle)) {
+        return "Park this idea in Clear My Mind (Later / Someday) — then return to your task.";
+      }
       return `Capture one thought at a time in Clear My Mind — each on its own card.`;
     case "time-block":
       return `Block time for what you're working on in ${sourceTitle}.`;
@@ -74,6 +78,11 @@ export function crossWorkspaceContextMessage(
       return `Take a breath, then return to ${sourceTitle} when you're ready.`;
     case "how-do-i":
       return `Look up how-to steps while keeping ${sourceTitle} visible.`;
+    case "client-avatars":
+      return (
+        `Build your ideal client here while keeping **${sourceTitle}** in context — ` +
+        `chat stays visible and I'll prefill what we already know.`
+      );
     default:
       return `Use ${target} alongside ${sourceTitle} — your place here is saved.`;
   }
@@ -85,4 +94,6 @@ export type CrossWorkspaceBesideOffer = {
   line: string;
   contextMessage?: string;
   sourceTitle?: string;
+  /** Client Avatar handoff — return to source workflow when avatar is saved. */
+  clientAvatarHandoff?: boolean;
 };

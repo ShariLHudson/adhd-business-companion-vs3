@@ -34,7 +34,7 @@ export function filterTimeBankBlocks(
   return blocks
     .filter((b) => {
       if (!isTimeBankBlock(b)) return false;
-      if (b.status === "completed" || b.status === "missed") return false;
+      if (b.status === "completed" || b.status === "missed" || b.status === "not-today") return false;
       if (filters.assignment === "unassigned" && b.projectId) return false;
       if (filters.assignment === "assigned" && !b.projectId) return false;
       if (filters.projectId !== "all" && b.projectId !== filters.projectId) {

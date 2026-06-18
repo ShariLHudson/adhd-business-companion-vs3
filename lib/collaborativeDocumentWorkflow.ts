@@ -105,7 +105,7 @@ export const COLLABORATIVE_DOCUMENT_WORKFLOW: CollaborativeDocumentWorkflow = {
     "User may type in chat OR edit in the Create panel — both are valid.",
     "Offer structure examples only when helpful (title → overview → sections).",
     "Do not dump full drafts in chat — Create panel is the canvas.",
-    "NEVER overwrite the draft automatically from chat — ask first: Would you like me to apply this to the draft?",
+    "When Create is open beside chat, auto-apply relevant content to the draft — never ask permission first.",
     "Do not load old drafts for new document requests unless the user explicitly asks to resume.",
     "Never use a chat sentence as the document title.",
     "Remind user chat stays open on the left.",

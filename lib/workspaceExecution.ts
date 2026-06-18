@@ -25,6 +25,11 @@ export function isAnyWorkspaceOpen(snap: WorkspaceOpenSnapshot): boolean {
   return Boolean(snap.panel) && snap.activeSection === "home" && snap.revealSeq > 0;
 }
 
+/** Panel mounted in split view — use for context lock (lenient vs isWorkspaceOpen). */
+export function isWorkspaceBesideChat(snap: WorkspaceOpenSnapshot): boolean {
+  return Boolean(snap.panel) && snap.activeSection === "home";
+}
+
 export function workspaceOpenSuccessAck(section: AppSection): string {
   const title = workspaceTitle(section);
   return `**${title}** is open beside us — chat stays right here.`;

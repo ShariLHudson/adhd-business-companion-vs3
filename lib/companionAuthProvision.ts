@@ -20,15 +20,45 @@ export type ProvisionCompanionUserResult =
       status: number;
     };
 
-function normalizeEmail(email: string): string {
+export function normalizeCompanionEmail(email: string): string {
   return email.trim().toLowerCase();
+}
+
+export type CompanionAuthAccountLookup =
+  | { status: "no_admin" }
+  | { status: "not_found" }
+  | { status: "exists"; emailConfirmed: boolean };
+
+/** Server-only: whether this email already has a Supabase auth user. */
+export async function lookupCompanionAuthAccount(
+  email: string,
+): Promise<CompanionAuthAccountLookup> {
+  const admin = getFounderSupabaseAdmin();
+  if (!admin) return { status: "no_admin" };
+  const existing = await findCompanionUserByEmail(
+    admin,
+    normalizeCompanionEmail(email),
+  );
+  if (!existing) return { status: "not_found" };
+  return {
+    status: "exists",
+    emailConfirmed: Boolean(existing.email_confirmed_at),
+  };
+}
+
+export function isInvalidLoginCredentialsError(message: string): boolean {
+  const lower = message.toLowerCase();
+  return (
+    lower.includes("invalid login credentials") ||
+    lower.includes("invalid email or password")
+  );
 }
 
 async function findCompanionUserByEmail(
   admin: NonNullable<ReturnType<typeof getFounderSupabaseAdmin>>,
   email: string,
 ): Promise<User | null> {
-  const normalized = normalizeEmail(email);
+  const normalized = normalizeCompanionEmail(email);
   let page = 1;
   const perPage = 200;
 
@@ -58,7 +88,7 @@ export async function provisionCompanionUser(
     };
   }
 
-  const email = normalizeEmail(input.email);
+  const email = normalizeCompanionEmail(input.email);
   const password = input.password;
   const name = input.name?.trim();
 

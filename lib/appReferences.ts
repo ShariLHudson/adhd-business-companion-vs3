@@ -21,7 +21,19 @@ const RULES: RefRule[] = [
     section: "brain-dump",
     label: "Clear My Mind",
     emoji: "🧠",
-    re: /\b(idea )?parking lot|brain ?dump|clear (your|my|the) (head|mind)|capture (your |the )?(ideas|thoughts)|get it (all )?out of your head|empty your head|write (it|them|every idea) down|park (your |the )?ideas\b/i,
+    re: /\bbrain ?dump|clear (your|my|the) (head|mind)|mental clutter|crowded (head|brain)|can't think straight|get it (all )?out of your head|empty your head|sort (my|your) thoughts|too many thoughts\b/i,
+  },
+  {
+    section: "activities",
+    label: "Brain Parking Lot",
+    emoji: "🅿️",
+    re: /\bbrain parking lot|park (this|that|it) for later|save (this|that|it) for later|idea (?:just )?popped up|don't want to lose (?:it|this)|while (?:i'm |im )?working\b/i,
+  },
+  {
+    section: "activities",
+    label: "Safe For Today",
+    emoji: "🛡️",
+    re: /\bsafe for today|permission not to|not (?:solving|doing) (?:this|it) today|can't deal with (?:this|it) today|postpone (?:the )?guilt\b/i,
   },
   {
     section: "spin-wheel",
@@ -37,7 +49,7 @@ const RULES: RefRule[] = [
   },
   {
     section: "time-block",
-    label: "Time Block",
+    label: "Momentum Appointments",
     emoji: "📅",
     re: /\btime ?block|schedule (it|time|the)|put it on (your|the) calendar|block (out )?time\b/i,
   },

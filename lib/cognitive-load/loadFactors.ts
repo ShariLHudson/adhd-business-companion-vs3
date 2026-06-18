@@ -288,13 +288,13 @@ export function collectLoadContributors(
   }
 
   const missed = input.missedBlocksToday ?? 0;
-  if (missed > 0 && overdue === 0) {
+  if (missed >= 3 && overdue === 0) {
     out.push({
-      id: "schedule_pressure",
+      id: "schedule_density_soft",
       domain: "environmental",
-      label: "Schedule pressure",
-      points: Math.min(10, missed * 5),
-      detail: `${missed} block${missed === 1 ? "" : "s"} missed today — schedule may feel tight`,
+      label: "Full day",
+      points: Math.min(6, missed * 2),
+      detail: `${missed} appointments moved to another time today — consider a lighter plan`,
     });
   }
 

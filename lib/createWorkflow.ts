@@ -5,17 +5,19 @@
 
 import { CREATE_CATALOG, findCatalogItem, type CreateCatalogItem, catalogCategory, dropdownItemsInCategory } from "./createCatalog";
 import {
+  defaultInternalSubtypeForItem,
   effectiveCreateTypeLabel,
   effectiveSubtypeLabel,
   OTHER_OPTION,
 } from "./createTypePickers";
+import { initializeTemplateForWorkflow } from "./createTemplates";
+import { templateOutlineComplete, materializeDiscoverySections } from "./createSectionDiscovery";
+
+export type DiscoverySubphase = "questions" | "sections";
 
 export { catalogCategory, dropdownItemsInCategory, catalogTypesPickerLabel } from "./createCatalog";
 import { sortByDropdownLabel } from "./dropdownSort";
-import {
-  initializeTemplateForWorkflow,
-  type CreateTemplateSection,
-} from "./createTemplates";
+import type { CreateTemplateSection } from "./createTemplates";
 
 export type DraftStatus = "idle" | "building" | "ready" | "error";
 
@@ -54,6 +56,14 @@ export type CreateWorkflowState = {
   /** When subtype is Other — free-text detail. */
   customSubtype: string | null;
   discoveryAnswers: Record<string, string>;
+  /** Explicit content per template section id (split-screen section discovery). */
+  sectionContent?: Record<string, string>;
+  /** Section currently being filled in chat. */
+  activeSectionId?: string | null;
+  /** After initial questions: collaborate on empty template sections. */
+  discoverySubphase?: DiscoverySubphase | null;
+  /** Numbered options from the last Discovery Help reply (awaiting user pick). */
+  pendingSectionOptions?: string[] | null;
   discoveryIndex: number;
   readinessConfirmed: boolean;
   buildApproved: boolean;
@@ -66,6 +76,8 @@ export type CreateWorkflowState = {
   draftContent: string | null;
   /** Stable id shared between chat builder and Create panel. */
   sessionId?: string | null;
+  /** Question ids skipped — not required for readiness or brief. */
+  skippedQuestionIds?: string[];
   /** create_only = panel asks questions; split_screen = chat asks, panel shows output. */
   questionMode: CreateQuestionMode;
 };
@@ -78,6 +90,10 @@ export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {
   customTypeLabel: null,
   customSubtype: null,
   discoveryAnswers: {},
+  sectionContent: {},
+  activeSectionId: null,
+  discoverySubphase: null,
+  pendingSectionOptions: null,
   discoveryIndex: 0,
   readinessConfirmed: false,
   buildApproved: false,
@@ -189,26 +205,21 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
   ],
   "Social Post": [
     {
-      id: "audience",
-      prompt: "Who is this for?",
-      why: "So the post speaks to the right person.",
-    },
-    {
       id: "topic",
       prompt: "What is the post about?",
       why: "So we stay on one clear idea.",
     },
     {
-      id: "goal",
-      prompt: "What is the goal of this post?",
-      why: "So the post drives the outcome you want.",
-      placeholder: "Engagement, clicks, sign-ups, awareness…",
+      id: "audience",
+      prompt: "Who is it for?",
+      why: "So the post speaks to the right person.",
+      placeholder: "Pick avatars below or describe your audience…",
     },
     {
-      id: "platform",
-      prompt: "Where will this be posted?",
-      why: "So length and tone match the platform.",
-      placeholder: "Facebook, Instagram, LinkedIn…",
+      id: "goal",
+      prompt: "What outcome do you want?",
+      why: "So the post drives the result you care about.",
+      placeholder: "Engagement, Leads, Sales, Awareness, Comments…",
     },
   ],
   "Facebook Post": [
@@ -285,14 +296,19 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
   ],
   Workshop: [
     {
+      id: "topic",
+      prompt: "What is the workshop about?",
+      why: "So every activity supports one theme.",
+    },
+    {
       id: "audience",
-      prompt: "Who is the workshop for?",
+      prompt: "Who is it for?",
       why: "So examples and pace fit the room.",
     },
     {
-      id: "topic",
-      prompt: "What is the workshop topic?",
-      why: "So every activity supports one theme.",
+      id: "outcome",
+      prompt: "What outcome do you want attendees to achieve?",
+      why: "So the workshop has a clear payoff.",
     },
     {
       id: "duration",
@@ -301,15 +317,10 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
       placeholder: "90 minutes, half-day, full day…",
     },
     {
-      id: "format",
-      prompt: "What is the delivery format?",
-      why: "So the structure matches how you'll run it.",
-      placeholder: "Live virtual, in-person, hybrid, self-paced…",
-    },
-    {
-      id: "outcome",
-      prompt: "What should attendees leave with?",
-      why: "So the workshop has a clear payoff.",
+      id: "deliverables",
+      prompt: "What deliverables do you want?",
+      why: "So we know what to build alongside the outline.",
+      placeholder: "Slides, workbook, facilitator guide…",
     },
   ],
   Strategy: [
@@ -406,24 +417,23 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
   ],
   Newsletter: [
     {
+      id: "theme",
+      prompt: "What is this newsletter about?",
+      why: "So the newsletter has one clear thread.",
+    },
+    {
       id: "reader",
-      prompt: "Who is the audience?",
+      prompt: "Who is it for?",
       why: "So tone matches your list.",
     },
     {
-      id: "theme",
-      prompt: "What is the topic?",
-      why: "So the newsletter has one thread.",
-    },
-    {
       id: "goal",
-      prompt: "What is the goal of this newsletter?",
-      why: "So every section supports the outcome.",
-      placeholder: "Nurture, educate, sell, announce…",
+      prompt: "What is the main message?",
+      why: "So every section supports one core idea.",
     },
     {
       id: "cta",
-      prompt: "What should readers do (CTA)?",
+      prompt: "What action should readers take?",
       why: "So the ending drives action.",
       placeholder: "Reply, click, book, shop…",
     },
@@ -717,10 +727,13 @@ export function resolvedTypeLabel(state: CreateWorkflowState): string {
 export function discoveryIndexForAnswers(
   typeLabel: string,
   answers: Record<string, string>,
+  skippedQuestionIds: string[] = [],
 ): number {
   const questions = getDiscoveryQuestions(typeLabel, answers);
+  const skipped = new Set(skippedQuestionIds);
   for (let i = 0; i < questions.length; i++) {
     const q = questions[i]!;
+    if (skipped.has(q.id)) continue;
     if (!answers[q.id]?.trim()) return i;
   }
   return questions.length;
@@ -735,6 +748,10 @@ export function mergeCreateWorkflow(
   const discoveryAnswers = {
     ...local.discoveryAnswers,
     ...incoming.discoveryAnswers,
+  };
+  const sectionContent = {
+    ...local.sectionContent,
+    ...incoming.sectionContent,
   };
   const stepRank: Record<CreateWorkflowStep, number> = {
     category: 0,
@@ -751,6 +768,13 @@ export function mergeCreateWorkflow(
     ...local,
     ...incoming,
     discoveryAnswers,
+    sectionContent,
+    activeSectionId: incoming.activeSectionId ?? local.activeSectionId ?? null,
+    discoverySubphase: incoming.discoverySubphase ?? local.discoverySubphase ?? null,
+    pendingSectionOptions:
+      incoming.pendingSectionOptions !== undefined
+        ? incoming.pendingSectionOptions
+        : local.pendingSectionOptions ?? null,
     selectedTypeLabel:
       incoming.selectedTypeLabel ?? local.selectedTypeLabel ?? typeLabel,
     selectedSubtype: incoming.selectedSubtype ?? local.selectedSubtype,
@@ -787,7 +811,15 @@ export function mergeCreateWorkflow(
     buildApproved: local.buildApproved || incoming.buildApproved,
     readinessConfirmed:
       local.readinessConfirmed || incoming.readinessConfirmed,
+    skippedQuestionIds: [
+      ...new Set([
+        ...(local.skippedQuestionIds ?? []),
+        ...(incoming.skippedQuestionIds ?? []),
+      ]),
+    ],
   };
+
+  const mergedSkipped = merged.skippedQuestionIds ?? [];
 
   if (merged.buildApproved) return merged;
 
@@ -799,13 +831,21 @@ export function mergeCreateWorkflow(
     return {
       ...merged,
       step: discoveryComplete(resolved, merged) ? "readiness" : "discovery",
-      discoveryIndex: discoveryIndexForAnswers(resolved, discoveryAnswers),
+      discoveryIndex: discoveryIndexForAnswers(
+        resolved,
+        discoveryAnswers,
+        mergedSkipped,
+      ),
     };
   }
 
   const answered = answeredDiscoveryCount(merged);
   if (answered > 0) {
-    const idx = discoveryIndexForAnswers(resolved, discoveryAnswers);
+    const idx = discoveryIndexForAnswers(
+      resolved,
+      discoveryAnswers,
+      mergedSkipped,
+    );
     const questions = getDiscoveryQuestions(resolved, discoveryAnswers);
     if (idx >= questions.length) {
       return { ...merged, step: "readiness", discoveryIndex: idx };
@@ -827,7 +867,11 @@ export function discoveryQuestionsForState(
   state: CreateWorkflowState,
 ): DiscoveryQuestion | null {
   const questions = getDiscoveryQuestions(typeLabel, state.discoveryAnswers);
-  const idx = discoveryIndexForAnswers(typeLabel, state.discoveryAnswers);
+  const idx = discoveryIndexForAnswers(
+    typeLabel,
+    state.discoveryAnswers,
+    state.skippedQuestionIds ?? [],
+  );
   if (idx >= questions.length) return null;
   return questions[idx] ?? null;
 }
@@ -838,27 +882,44 @@ export function discoveryQuestionProgress(
 ): { current: number; total: number } {
   const questions = getDiscoveryQuestions(typeLabel, state.discoveryAnswers);
   const total = Math.max(questions.length, 1);
-  const idx = discoveryIndexForAnswers(typeLabel, state.discoveryAnswers);
+  const idx = discoveryIndexForAnswers(
+    typeLabel,
+    state.discoveryAnswers,
+    state.skippedQuestionIds ?? [],
+  );
   return {
     current: Math.min(idx + 1, total),
     total,
   };
 }
 
-/** True when every required discovery question has an answer. */
+/** True when every required discovery question has an answer or was skipped. */
 export function requiredFieldsComplete(
   typeLabel: string,
   answers: Record<string, string>,
+  skippedQuestionIds: string[] = [],
 ): boolean {
   const questions = getDiscoveryQuestions(typeLabel, answers);
-  return questions.every((q) => Boolean(answers[q.id]?.trim()));
+  const skipped = new Set(skippedQuestionIds);
+  return questions.every(
+    (q) => skipped.has(q.id) || Boolean(answers[q.id]?.trim()),
+  );
 }
 
 export function discoveryComplete(
   typeLabel: string,
   state: CreateWorkflowState,
 ): boolean {
-  return requiredFieldsComplete(typeLabel, state.discoveryAnswers);
+  const questionsDone = requiredFieldsComplete(
+    typeLabel,
+    state.discoveryAnswers,
+    state.skippedQuestionIds ?? [],
+  );
+  if (!questionsDone) return false;
+  if (state.questionMode === "split_screen") {
+    return templateOutlineComplete(state);
+  }
+  return true;
 }
 
 export function answeredDiscoveryCount(state: CreateWorkflowState): number {
@@ -883,8 +944,8 @@ export function buildBriefFromDiscovery(
     lines.push(`Additional detail\n${extra}`);
   }
   const header = subtype
-    ? `Content type: ${typeLabel} (${subtype})`
-    : `Content type: ${typeLabel}`;
+    ? `Creating: ${typeLabel} (${subtype})`
+    : `Creating: ${typeLabel}`;
   if (!lines.length) {
     return subtype
       ? `Create a ${typeLabel} — ${subtype}.`
@@ -918,6 +979,59 @@ export function readinessSummary(
   return rows;
 }
 
+/** One answered question is enough before first draft (create-only panel mode). */
+export const SIMPLIFIED_DISCOVERY_ANSWER_TARGET = 1;
+
+export function hasEnoughDiscoveryForDraft(
+  answers: Record<string, string>,
+): boolean {
+  return (
+    Object.values(answers).filter((v) => v.trim()).length >=
+    SIMPLIFIED_DISCOVERY_ANSWER_TARGET
+  );
+}
+
+export function discoveryReadyForDraft(
+  typeLabel: string,
+  state: CreateWorkflowState,
+): boolean {
+  if (state.questionMode === "split_screen") {
+    return discoveryComplete(typeLabel, state);
+  }
+  if (hasEnoughDiscoveryForDraft(state.discoveryAnswers)) return true;
+  return discoveryComplete(typeLabel, state);
+}
+
+/** Initial discovery questions answered — may still need template sections. */
+export function initialQuestionsComplete(
+  typeLabel: string,
+  state: CreateWorkflowState,
+): boolean {
+  return requiredFieldsComplete(
+    typeLabel,
+    state.discoveryAnswers,
+    state.skippedQuestionIds ?? [],
+  );
+}
+
+function withDefaultTemplate(
+  state: CreateWorkflowState,
+): CreateWorkflowState {
+  const typeLabel =
+    effectiveCreateTypeLabel(state.selectedTypeLabel, state.customTypeLabel) ||
+    state.selectedTypeLabel?.trim() ||
+    "";
+  const withSubtype =
+    state.selectedSubtype == null && typeLabel
+      ? {
+          ...state,
+          selectedSubtype: defaultInternalSubtypeForItem(typeLabel),
+        }
+      : state;
+  return advanceFromTemplate(initializeTemplateForWorkflow(withSubtype));
+}
+
+/** Skip subtype + template screens — outcome → one Shari question → draft. */
 export function advanceAfterItemPick(typeLabel: string): CreateWorkflowState {
   if (typeLabel === OTHER_OPTION) {
     return {
@@ -927,20 +1041,18 @@ export function advanceAfterItemPick(typeLabel: string): CreateWorkflowState {
       customTypeLabel: "",
     };
   }
-  return {
+  return withDefaultTemplate({
     ...EMPTY_CREATE_WORKFLOW,
-    step: "type",
     categoryId: categoryIdForType(typeLabel),
     selectedTypeLabel: typeLabel,
-  };
+  });
 }
 
 export function advanceAfterCustomItem(customLabel: string): CreateWorkflowState {
   const trimmed = customLabel.trim();
-  return initializeTemplateForWorkflow({
+  return withDefaultTemplate({
     ...EMPTY_CREATE_WORKFLOW,
-    step: "template",
-    categoryId: null,
+    categoryId: categoryIdForType(trimmed),
     selectedTypeLabel: OTHER_OPTION,
     customTypeLabel: trimmed,
     selectedSubtype: null,
@@ -948,6 +1060,42 @@ export function advanceAfterCustomItem(customLabel: string): CreateWorkflowState
     discoveryIndex: 0,
     discoveryAnswers: {},
   });
+}
+
+/** Normalize legacy sessions that still sit on subtype/template steps. */
+export function normalizeSimplifiedCreateWorkflow(
+  state: CreateWorkflowState,
+): CreateWorkflowState {
+  if (
+    state.step !== "type" &&
+    state.step !== "template" &&
+    state.step !== "confirm"
+  ) {
+    return state;
+  }
+  if (!resolvedTypeLabel(state) && !state.selectedTypeLabel) return state;
+  return withDefaultTemplate(state);
+}
+
+/** Apply a chat line as the current discovery answer when Create is open. */
+export function applyCreateDiscoveryFromChat(
+  state: CreateWorkflowState,
+  userText: string,
+): CreateWorkflowState | null {
+  const typeLabel = resolvedTypeLabel(state);
+  const text = userText.trim();
+  if (!typeLabel || !text || state.step !== "discovery") return null;
+  if (text.length < 4 || /^(?:yes|no|ok|okay|skip|next)$/i.test(text)) {
+    return null;
+  }
+  const question = discoveryQuestionsForState(typeLabel, state);
+  if (!question) return null;
+  return advanceAfterDiscoveryAnswer(
+    state,
+    typeLabel,
+    question.id,
+    text,
+  );
 }
 
 export function advanceAfterSubtypePick(
@@ -995,6 +1143,7 @@ export function advanceFromTemplate(
     discoveryIndex: discoveryIndexForAnswers(
       resolvedTypeLabel(state),
       state.discoveryAnswers,
+      state.skippedQuestionIds ?? [],
     ),
   };
 }
@@ -1026,9 +1175,11 @@ export function advanceToDiscovery(
       ? discoveryIndexForAnswers(
           resolvedTypeLabel(state),
           state.discoveryAnswers,
+          state.skippedQuestionIds ?? [],
         )
       : 0,
     discoveryAnswers: preserve ? state.discoveryAnswers : {},
+    skippedQuestionIds: preserve ? state.skippedQuestionIds : [],
   };
 }
 
@@ -1039,12 +1190,27 @@ export function advanceAfterDiscoveryAnswer(
   answer: string,
 ): CreateWorkflowState {
   const answers = { ...state.discoveryAnswers, [questionId]: answer };
-  const idx = discoveryIndexForAnswers(typeLabel, answers);
-  const complete = requiredFieldsComplete(typeLabel, answers);
+  const skipped = state.skippedQuestionIds ?? [];
+  const idx = discoveryIndexForAnswers(typeLabel, answers, skipped);
+  const withAnswers = { ...state, discoveryAnswers: answers };
+  const materialized =
+    state.questionMode === "split_screen"
+      ? materializeDiscoverySections(typeLabel, withAnswers)
+      : withAnswers;
+  const fieldsComplete = requiredFieldsComplete(typeLabel, answers, skipped);
+  const outlineComplete = templateOutlineComplete(materialized);
+  const complete =
+    state.questionMode === "split_screen"
+      ? outlineComplete
+      : hasEnoughDiscoveryForDraft(answers) || fieldsComplete;
+  const enterSections =
+    state.questionMode === "split_screen" && fieldsComplete && !outlineComplete;
   return {
-    ...state,
-    discoveryAnswers: answers,
+    ...materialized,
     discoveryIndex: idx,
+    discoverySubphase: enterSections
+      ? "sections"
+      : materialized.discoverySubphase,
     step: complete ? "readiness" : "discovery",
   };
 }
@@ -1056,15 +1222,34 @@ export function skipDiscoveryQuestion(
 ): CreateWorkflowState {
   const answers = { ...state.discoveryAnswers };
   delete answers[questionId];
+  const skippedQuestionIds = [
+    ...new Set([...(state.skippedQuestionIds ?? []), questionId]),
+  ];
   const questions = getDiscoveryQuestions(typeLabel, answers);
-  const nextIndex = Math.min(state.discoveryIndex + 1, questions.length);
-  const complete = requiredFieldsComplete(typeLabel, answers);
-  return {
+  const fieldsComplete = requiredFieldsComplete(
+    typeLabel,
+    answers,
+    skippedQuestionIds,
+  );
+  const withSkipped = {
     ...state,
     discoveryAnswers: answers,
-    discoveryIndex: complete
-      ? nextIndex
-      : discoveryIndexForAnswers(typeLabel, answers),
+    skippedQuestionIds,
+  };
+  const outlineComplete = templateOutlineComplete(withSkipped);
+  const complete =
+    state.questionMode === "split_screen"
+      ? fieldsComplete && outlineComplete
+      : fieldsComplete;
+  return {
+    ...withSkipped,
+    discoveryIndex: fieldsComplete
+      ? questions.length
+      : discoveryIndexForAnswers(typeLabel, answers, skippedQuestionIds),
+    discoverySubphase:
+      state.questionMode === "split_screen" && fieldsComplete && !outlineComplete
+        ? "sections"
+        : state.discoverySubphase,
     step: complete ? "readiness" : "discovery",
   };
 }

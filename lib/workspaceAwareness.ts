@@ -21,6 +21,17 @@ import {
   isSuggestionSelection,
   tryResolveSuggestionSelection,
 } from "./workspaceSuggestion";
+import {
+  isBuilderAddCommand,
+  isBuilderApprovalPhrase,
+  isInvalidBuilderFieldValue,
+  isUserQuestionText,
+  tryResolveBuilderApproval,
+} from "./builderContentSync";
+import {
+  discoveryModeHintForChat,
+  isWorkspaceDiscoveryRequest,
+} from "./messageClassification";
 import { parseOptionSelection } from "./workspaceSop";
 import {
   formatCollaborativeDocumentCoachHint,
@@ -47,7 +58,20 @@ import {
   workspaceCoachAutoStartHint,
   WORKSPACE_CONTEXT_RULE,
 } from "./workspaceCoachAutoStart";
-import { buildActiveWorkspacePriorityHint } from "./workspaceContextLock";
+import { buildActiveWorkspacePriorityHint, buildWorkspaceBoardAdvisorHint } from "./workspaceContextLock";
+import {
+  formatBusinessStrategyForPrompt,
+  primaryAdvisorForStrategyType,
+} from "./businessStrategyBuilder";
+import {
+  inferPendingApprovalField,
+  tryResolveWorkspaceApprovalTurn,
+  workspaceApprovalSyncHintForChat,
+} from "./workspaceApprovalSync";
+import {
+  activeWorkspaceAutoApplyHint,
+  isAutoApplyWorkspaceSection,
+} from "./activeWorkspaceAutoApply";
 
 export type { WorkspaceMessageClass };
 export { classifyWorkspaceMessage, isHelpRequest, isProjectContent };
@@ -72,7 +96,50 @@ export type WorkspaceFieldId =
   | "create-audience"
   | "create-hook"
   | "create-main-point"
-  | "create-cta";
+  | "create-cta"
+  | "avatar-who"
+  | "avatar-name"
+  | "avatar-tagline"
+  | "avatar-pain"
+  | "avatar-goals"
+  | "avatar-behavior"
+  | "avatar-solution";
+
+/** Fields where Research With Shari (audience/market patterns) is appropriate. */
+const RESEARCH_CAPABLE_FIELDS = new Set<WorkspaceFieldId>([
+  "avatar-who",
+  "avatar-pain",
+  "avatar-goals",
+  "avatar-behavior",
+  "avatar-solution",
+  "project-goal",
+  "workshop-audience",
+  "workshop-problem",
+  "workshop-sections",
+  "create-brief",
+  "create-topic",
+]);
+
+export function isResearchCapableWorkspaceField(
+  field: WorkspaceFieldId | null | undefined,
+): boolean {
+  return Boolean(field && RESEARCH_CAPABLE_FIELDS.has(field));
+}
+
+/** Research With Shari — chat-only research beside research-capable fields. */
+export function researchWithShariHintForField(
+  field: WorkspaceFieldId,
+  fieldLabel?: string | null,
+): string {
+  const label = fieldLabel?.trim() || field;
+  return [
+    `RESEARCH WITH SHARI (active field: ${label}):`,
+    "- User may ask what research says, common struggles, or market patterns.",
+    "- Summarize patterns and examples in chat — never [[fill:]] on the research turn.",
+    '- End with: "Would you like me to add any of these?"',
+    "- Apply content only after explicit approval.",
+  ].join("\n");
+}
 
 export type WorkspacePanelDetail = {
   view?: string;
@@ -107,6 +174,7 @@ export type WorkspaceFieldGuide = {
 };
 
 const FOCUS_DIRECTIVE_RE = /^\[\[focus:([a-z0-9-]+)\]\]\s*/i;
+const FILL_DIRECTIVE_RE = /^\[\[fill:([a-z0-9-]+):([\s\S]*?)\]\]\s*/i;
 
 const VALID_FOCUS_FIELDS = new Set<WorkspaceFieldId>([
   "project-title",
@@ -128,6 +196,13 @@ const VALID_FOCUS_FIELDS = new Set<WorkspaceFieldId>([
   "create-hook",
   "create-main-point",
   "create-cta",
+  "avatar-who",
+  "avatar-name",
+  "avatar-tagline",
+  "avatar-pain",
+  "avatar-goals",
+  "avatar-behavior",
+  "avatar-solution",
 ]);
 
 export function emptyWorkspaceDetail(): WorkspacePanelDetail {
@@ -304,6 +379,66 @@ export function suggestNextWorkspaceField(
     }
   }
 
+  if (ctx.section === "client-avatars" && ctx.view === "build") {
+    const stage = ctx.stage as string | undefined;
+    if (stage === "who" || !stage) {
+      if (!ctx.selectedItemName?.trim()) {
+        return {
+          field: "avatar-name",
+          label: "Audience name",
+          reason: "Step 1 — give the avatar a simple name.",
+        };
+      }
+      if (!ctx.selectedItemGoal?.trim()) {
+        return {
+          field: "avatar-who",
+          label: "Who they are",
+          reason: "Step 1 — short description of who they are.",
+        };
+      }
+      return {
+        field: "avatar-who",
+        label: "Who they are",
+        reason: "Step 1 complete — user can click Next.",
+      };
+    }
+    if (stage === "identity") {
+      return {
+        field: "avatar-tagline",
+        label: "Tagline",
+        reason: "Step 2 — face and one-line tagline.",
+      };
+    }
+    if (stage === "painPoints") {
+      return {
+        field: "avatar-pain",
+        label: "Struggles",
+        reason: "What they struggle with most.",
+      };
+    }
+    if (stage === "goals") {
+      return {
+        field: "avatar-goals",
+        label: "Goals",
+        reason: "What they want to achieve.",
+      };
+    }
+    if (stage === "currentBehavior") {
+      return {
+        field: "avatar-behavior",
+        label: "Obstacles",
+        reason: "What holds them back.",
+      };
+    }
+    if (stage === "solution") {
+      return {
+        field: "avatar-solution",
+        label: "Your edge",
+        reason: "How you help differently.",
+      };
+    }
+  }
+
   return null;
 }
 
@@ -319,6 +454,7 @@ export function formatWorkspaceCoGuideHint(
     "You are co-working IN the visible workspace, not giving generic advice.",
     "- Reference what they can SEE (project name, stage, fields on screen).",
     "- Move ONE field per reply. Prefix with [[focus:field-id]] when pointing to a field.",
+    "- When the user provides field content, auto-apply with [[fill:field-id:value]] — never ask permission to save.",
     "- NO app navigation instructions. NO multi-step plans outside the panel.",
     "- If nothing exists yet, guide creation NOW in the open panel (title first).",
     "- Stop when today's energy scope is complete — celebrate, don't add more.",
@@ -379,6 +515,28 @@ export function extractFocusDirective(assistantText: string): {
   };
 }
 
+/** Strip [[fill:field-id:value]] and [[focus:field-id]] from assistant output. */
+export function extractWorkspaceDirectives(assistantText: string): {
+  field: WorkspaceFieldId | null;
+  fill: { field: WorkspaceFieldId; value: string } | null;
+  content: string;
+} {
+  let content = assistantText;
+  let fill: { field: WorkspaceFieldId; value: string } | null = null;
+
+  const fillMatch = content.match(FILL_DIRECTIVE_RE);
+  if (fillMatch?.[1] && fillMatch[2] != null) {
+    const id = fillMatch[1] as WorkspaceFieldId;
+    if (VALID_FOCUS_FIELDS.has(id)) {
+      fill = { field: id, value: fillMatch[2].trim() };
+    }
+    content = content.replace(FILL_DIRECTIVE_RE, "").trimStart();
+  }
+
+  const focus = extractFocusDirective(content);
+  return { field: focus.field, fill, content: focus.content };
+}
+
 export function formatWorkspaceContextForPrompt(
   ctx: WorkspaceContext | null,
 ): string | undefined {
@@ -432,6 +590,8 @@ export function buildWorkspaceChatHints(
     collaborativePhase?: DocumentPanelPhase;
     preferredGoogleExport?: GoogleFileKind | null;
     openSnapshot?: WorkspaceOpenSnapshot | null;
+    businessStrategySession?: import("./businessStrategyBuilder").BusinessStrategySession | null;
+    businessStrategyDraft?: string | null;
   },
 ): string | undefined {
   if (!ctx?.section) return undefined;
@@ -466,6 +626,26 @@ export function buildWorkspaceChatHints(
       snap,
     );
     if (lockHint) parts.unshift(lockHint);
+    if (isAutoApplyWorkspaceSection(ctx.section)) {
+      parts.unshift(activeWorkspaceAutoApplyHint(ctx.section));
+    }
+    const bizPlan = formatBusinessStrategyForPrompt(
+      opts.businessStrategySession,
+      opts.businessStrategyDraft,
+    );
+    if (bizPlan && ctx.section !== "client-avatars") {
+      const label =
+        opts.businessStrategySession?.typeLabel ?? "Business Strategy";
+      if (primaryAdvisorForStrategyType(label) === "marketing") {
+        parts.push(
+          buildWorkspaceBoardAdvisorHint(
+            `${label} marketing audience content visibility`,
+            ctx.section,
+          ),
+        );
+      }
+      parts.push(bizPlan);
+    }
     if (createChat) {
       parts.push(
         formatCreationCoGuideHint(ctx, opts.creationContext ?? null, {
@@ -493,6 +673,20 @@ export function buildWorkspaceChatHints(
       );
     } else {
       parts.push(formatWorkspaceCoGuideHint(ctx, opts.energy, opts.userText ?? ""));
+    }
+    const userText = opts.userText?.trim() ?? "";
+    if (userText && isWorkspaceDiscoveryRequest(userText)) {
+      const next = suggestNextWorkspaceField(ctx, userText);
+      const field = next?.field ?? null;
+      parts.push(
+        discoveryModeHintForChat({
+          fieldLabel: next?.label ?? field,
+          researchCapable: isResearchCapableWorkspaceField(field),
+        }),
+      );
+      if (field && isResearchCapableWorkspaceField(field)) {
+        parts.push(researchWithShariHintForField(field, next?.label));
+      }
     }
   } else {
     parts.push(
@@ -823,10 +1017,27 @@ export function resolveWorkspaceCoachTurn(
   energy: DayLevel,
   lastAssistantText = "",
   sopSession?: WorkspaceSession | null,
+  createWorkflow?: import("./createWorkflow").CreateWorkflowState | null,
 ): WorkspaceCoachTurn | null {
   // Create workspace = conversational chat + draft canvas. No SOP / field wizard.
   if (isCreateWorkspaceChat(ctx)) {
     return null;
+  }
+
+  const approvalTurn = tryResolveWorkspaceApprovalTurn({
+    userText,
+    lastAssistantText,
+    ctx,
+    sopSession,
+    createWorkflow,
+  });
+  if (approvalTurn) {
+    return {
+      reply: approvalTurn.reply,
+      fill: approvalTurn.fill,
+      focusField: approvalTurn.focusField,
+      sessionPatch: approvalTurn.sessionPatch,
+    };
   }
 
   const coachPhrase = tryWorkspaceLocalReply(ctx, userText, energy);
@@ -872,6 +1083,22 @@ export function resolveWorkspaceCoachTurn(
   }
 
   if (intent === "confirmation") {
+    const approvalTurn = tryResolveWorkspaceApprovalTurn({
+      userText,
+      lastAssistantText,
+      ctx,
+      sopSession,
+      createWorkflow,
+    });
+    if (approvalTurn) {
+      return {
+        reply: approvalTurn.reply,
+        fill: approvalTurn.fill,
+        focusField: approvalTurn.focusField,
+        sessionPatch: approvalTurn.sessionPatch,
+      };
+    }
+
     const count = getEffectiveSuggestionCount(sopSession ?? null, lastAssistantText);
     if (
       count >= 1 &&
@@ -894,6 +1121,7 @@ export function resolveWorkspaceCoachTurn(
     intent === "feedback" ||
     intent === "clarification" ||
     intent === "helpRequest" ||
+    intent === "discovery" ||
     intent === "projectLookup" ||
     intent === "resumeRequest" ||
     intent === "reviewRequest"
@@ -957,6 +1185,59 @@ function looksLikeOutcome(text: string): boolean {
   );
 }
 
+export function inferAvatarFieldFromContext(
+  lastAssistantText: string,
+  userText: string,
+): WorkspaceFieldId {
+  const la = lastAssistantText.toLowerCase();
+  if (
+    /\[\[focus:avatar-tagline\]\]|tagline|one.?line|slogan/i.test(la)
+  ) {
+    return "avatar-tagline";
+  }
+  if (/\[\[focus:avatar-name\]\]|simple name|audience name|give them a name/i.test(la)) {
+    return "avatar-name";
+  }
+  if (
+    /\[\[focus:avatar-pain\]\]|struggl|pain point|what are they struggling|biggest challenge|frustrat/i.test(
+      la,
+    )
+  ) {
+    return "avatar-pain";
+  }
+  if (
+    /\[\[focus:avatar-goals\]\]|what do they want|goal|dream|outcome they want|hoping to achieve/i.test(
+      la,
+    )
+  ) {
+    return "avatar-goals";
+  }
+  if (
+    /\[\[focus:avatar-behavior\]\]|how do they (?:act|behave)|current behavior|what do they do now/i.test(
+      la,
+    )
+  ) {
+    return "avatar-behavior";
+  }
+  if (
+    /\[\[focus:avatar-solution\]\]|how (?:can|do) you help|solution|what you offer/i.test(
+      la,
+    )
+  ) {
+    return "avatar-solution";
+  }
+  if (
+    /\b(?:pain|struggle|challenge|frustrat)\b/i.test(userText) &&
+    !/\b(?:who|demographic|audience)\b/i.test(userText)
+  ) {
+    return "avatar-pain";
+  }
+  if (/\b(?:goal|want|dream|achieve)\b/i.test(userText)) {
+    return "avatar-goals";
+  }
+  return "avatar-who";
+}
+
 /** Map a chat line to a workspace field when co-guide is active. */
 export function inferWorkspaceChatFill(
   ctx: WorkspaceContext,
@@ -965,10 +1246,37 @@ export function inferWorkspaceChatFill(
 ): { field: WorkspaceFieldId; value: string } | null {
   const t = userText.trim();
   if (!t || isWorkspaceCoachPhrase(t)) return null;
+  if (isWorkspaceDiscoveryRequest(t, lastAssistantText)) return null;
   if (isSuggestionSelection(t, null, lastAssistantText)) return null;
+  if (ctx.section === "client-avatars") {
+    if (isSuggestionSelection(t, null, lastAssistantText)) return null;
+    if (isUserQuestionText(t)) return null;
+    const next = suggestNextWorkspaceField(ctx, t);
+    const field = next?.field ?? inferAvatarFieldFromContext(lastAssistantText, t);
+    const approvalFill = tryResolveBuilderApproval(t, lastAssistantText, field);
+    if (approvalFill) return approvalFill;
+    if (isBuilderAddCommand(t)) return null;
+    if (!isFieldContentIntent(t, lastAssistantText)) return null;
+    if (isBuilderApprovalPhrase(t)) return null;
+    if (t.length < 8) return null;
+    if (isInvalidBuilderFieldValue(t, t)) return null;
+    return {
+      field,
+      value: t,
+    };
+  }
+
   if (!isFieldContentIntent(t, lastAssistantText)) return null;
 
   if (ctx.section === "projects") {
+    const field =
+      suggestNextWorkspaceField(ctx, t)?.field ??
+      inferPendingApprovalField(ctx, lastAssistantText, t);
+    if (field) {
+      const approvalFill = tryResolveBuilderApproval(t, lastAssistantText, field);
+      if (approvalFill) return approvalFill;
+    }
+    if (isBuilderAddCommand(t)) return null;
     if (looksLikeOutcome(t)) {
       const value = normalizeGoalText(t);
       if (ctx.view === "create" && ctx.selectedItemName?.trim()) {
@@ -1007,6 +1315,26 @@ export function buildWorkspaceFillAck(
       return `[[focus:project-goal]]Great — that sounds like your outcome: ${short}. That's enough for today if your energy is low.`;
     }
     return `[[focus:project-goal]]Great — that sounds like your outcome: ${short}. Next we can shape one clear next step when you're ready.`;
+  }
+  if (fill.field === "project-tasks") {
+    const lines = fill.value
+      .split("\n")
+      .map((l) => l.trim())
+      .filter(Boolean);
+    const count = lines.length;
+    return `[[focus:project-tasks]]Added ${count} step${count === 1 ? "" : "s"} to your project.`;
+  }
+  if (fill.field === "avatar-name") {
+    return `[[fill:avatar-name:${fill.value}]]Great — I added **${fill.value}** as the audience name.`;
+  }
+  if (fill.field === "avatar-who") {
+    return `[[fill:avatar-who:${fill.value}]]I've added that description beside you.`;
+  }
+  if (fill.field === "avatar-tagline") {
+    return `[[fill:avatar-tagline:${fill.value}]]I added that tagline. Click **Next** when you're ready.`;
+  }
+  if (fill.field === "avatar-pain" || fill.field === "avatar-goals" || fill.field === "avatar-behavior" || fill.field === "avatar-solution") {
+    return `[[fill:${fill.field}:${fill.value}]]I've added that beside you. Click **Next** when you're ready.`;
   }
   return `[[focus:${fill.field}]]I've added that to the ${fill.field.replace(/-/g, " ")} field beside you.`;
 }

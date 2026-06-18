@@ -7,6 +7,8 @@ import { compareDropdownLabels } from "./dropdownSort";
 import {
   STRATEGY_CATEGORIES,
   STRATEGIES,
+  getCategory,
+  groupForStrategy,
   resolveSubcat,
   type Strategy,
 } from "./strategySystem";
@@ -52,7 +54,7 @@ const ADHD_STRATEGY_HUB_RAW: AdhdStrategyHubEntry[] = [
   {
     id: "decision-helper",
     label: "Decision Helper",
-    route: { kind: "activity", activityId: "two-option" },
+    route: { kind: "activity", activityId: "decision-compass" },
   },
   {
     id: "first-physical-step",
@@ -182,4 +184,48 @@ export function adhdStrategyDropdownGroups(
         compareDropdownLabels(a.label, b.label),
       ),
     }));
+}
+
+export type BusinessDropdownOption = {
+  strategyId: string;
+  label: string;
+};
+
+/** Built-in business coaching strategies, grouped by category A–Z. */
+export function businessStrategyDropdownGroups(
+  filter?: string,
+): { category: string; options: BusinessDropdownOption[] }[] {
+  const q = filter?.trim().toLowerCase() ?? "";
+  const groups = new Map<string, BusinessDropdownOption[]>();
+
+  for (const s of STRATEGIES) {
+    if (groupForStrategy(s) !== "business") continue;
+    const sub = resolveSubcat(s);
+    const cat = getCategory(sub);
+    const category = cat?.label ?? "Business";
+    const label = s.title;
+    if (
+      q &&
+      !label.toLowerCase().includes(q) &&
+      !category.toLowerCase().includes(q)
+    ) {
+      continue;
+    }
+    const list = groups.get(category) ?? [];
+    list.push({ strategyId: s.id, label });
+    groups.set(category, list);
+  }
+
+  return [...groups.entries()]
+    .sort(([a], [b]) => compareDropdownLabels(a, b))
+    .map(([category, options]) => ({
+      category,
+      options: [...options].sort((a, b) =>
+        compareDropdownLabels(a.label, b.label),
+      ),
+    }));
+}
+
+export function businessBuiltinStrategyCount(): number {
+  return STRATEGIES.filter((s) => groupForStrategy(s) === "business").length;
 }

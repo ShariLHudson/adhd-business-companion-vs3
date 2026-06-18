@@ -23,7 +23,7 @@ describe("crossWorkspaceSuggestion", () => {
 
   it("builds contextual tool prompts", () => {
     expect(crossWorkspaceContextMessage("Brain Parking Lot", "brain-dump")).toBe(
-      "Capture the thoughts you want to park from Brain Parking Lot.",
+      "Park this idea in Clear My Mind (Later / Someday) — then return to your task.",
     );
   });
 

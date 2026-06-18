@@ -41,7 +41,6 @@ export function filterTemplates(
   },
 ): TemplateItem[] {
   const q = opts.query.trim().toLowerCase();
-  if (!opts.category && !q) return [];
   return items
     .filter((t) => {
       if (opts.status !== "all" && t.status !== opts.status) return false;
@@ -57,5 +56,25 @@ export function filterTemplates(
         .toLowerCase();
       return hay.includes(q);
     })
-    .sort((a, b) => a.title.localeCompare(b.title));
+    .sort((a, b) => {
+      const touch = b.updatedAt.localeCompare(a.updatedAt);
+      if (touch !== 0) return touch;
+      return a.title.localeCompare(b.title);
+    });
+}
+
+export function groupTemplatesByCategory(
+  items: TemplateItem[],
+): { category: TemplateCategory; label: string; templates: TemplateItem[] }[] {
+  const buckets = new Map<TemplateCategory, TemplateItem[]>();
+  for (const item of items) {
+    const list = buckets.get(item.category) ?? [];
+    list.push(item);
+    buckets.set(item.category, list);
+  }
+  return TEMPLATE_CATEGORY_OPTIONS.map((opt) => ({
+    category: opt.value,
+    label: `${opt.label} Templates`,
+    templates: buckets.get(opt.value) ?? [],
+  })).filter((g) => g.templates.length > 0);
 }

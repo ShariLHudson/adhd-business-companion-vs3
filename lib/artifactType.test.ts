@@ -30,6 +30,24 @@ describe("artifactType", () => {
     expect(shouldLockArtifactType("Proposal")).toBe(true);
   });
 
+  it("preserves distinct catalog types — newsletter is not email", () => {
+    expect(normalizeArtifactType("Newsletter")).toBe("Newsletter");
+    expect(normalizeArtifactType("newsletter")).toBe("Newsletter");
+    expect(normalizeArtifactType("Newsletter")).not.toBe("Email");
+  });
+
+  it("preserves workshop and social post catalog labels", () => {
+    expect(normalizeArtifactType("Workshop")).toBe("Workshop");
+    expect(normalizeArtifactType("Social Post")).toBe("Social Post");
+    expect(normalizeArtifactType("social media post")).toBe("Social Post");
+    expect(normalizeArtifactType("Workshop")).not.toBe("content");
+  });
+
+  it("still normalizes plain email variants", () => {
+    expect(normalizeArtifactType("email")).toBe("Email");
+    expect(normalizeArtifactType("cold email")).toBe("Email");
+  });
+
   it("blocks email assisted action when proposal is locked", () => {
     expect(
       filterAssistedActionForArtifact(emailAction, "Proposal"),

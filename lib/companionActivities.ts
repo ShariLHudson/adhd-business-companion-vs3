@@ -26,6 +26,8 @@ export type CompanionActivity = {
   /** Display string, e.g. "3–5 min" */
   timeLabel: string;
   steps: ActivityStep[];
+  /** Custom interactive UI instead of linear steps. */
+  customUi?: "decision-compass";
   /** Opens a companion tool when the user is ready (optional). */
   linkedSection?: AppSection;
   linkedLabel?: string;
@@ -345,84 +347,90 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
     id: "brain-parking-lot",
     categoryId: "calm",
     title: "Brain Parking Lot",
-    helpsWith: "Getting thoughts out of your head — capture only, no sorting or solving.",
-    timeLabel: "3–5 min",
+    helpsWith:
+      "Saving a stray idea while you stay on task — quick capture only, no sorting or solving.",
+    timeLabel: "1–3 min",
     steps: [
-      s("Thoughts belong on the lot, not on your desk. One thought per line — no lists, no categories."),
-      s("What's the first thing that won't leave you alone?", {
+      s("You're working. An idea shows up. Park it here — you don't owe it attention right now."),
+      s("What do you want to save for later?", {
         type: "text",
-        key: "thought-1",
-        label: "First thought",
+        key: "parked",
+        label: "Idea to save for later",
+        multiline: true,
       }),
-      s("Another? Only if it's truly separate — still one line.", {
+      s("Optional tag — one word so future-you recognizes it (e.g. marketing, kid, health).", {
         type: "text",
-        key: "thought-2",
-        label: "Second thought (optional)",
+        key: "tag",
+        label: "Tag (optional)",
         optional: true,
       }),
-      s("Optional third — then stop. Parking is not solving.", {
-        type: "text",
-        key: "thought-3",
-        label: "Third thought (optional)",
-        optional: true,
-      }),
-      s("Close the lot. These thoughts are stored — you don't owe them answers tonight."),
+      s("Say: \"Saved for later. Back to what I was doing.\""),
+      s("Close the lot. No organizing tonight — review when you're ready."),
     ],
+    linkedSection: "brain-dump",
+    linkedLabel: "Open Clear My Mind to park it",
+    suggestLinkedFromStep: 1,
+    linkedSuggestionHint:
+      "Park this in **Clear My Mind** (Later / Someday) — then return to your task.",
   },
   {
     id: "clear-my-mind-priority",
     categoryId: "calm",
     title: "Clear My Mind",
-    helpsWith: "Reducing overwhelm by processing one loud thought — not dumping everything at once.",
-    timeLabel: "4–6 min",
+    helpsWith:
+      "Reducing mental clutter — dump, group, find priorities, and shape next steps (not mid-focus parking).",
+    timeLabel: "5–8 min",
     steps: [
-      s("If several thoughts are swirling, open **Clear My Mind** beside us — one card at a time."),
-      s("Which ONE feels loudest right now? Not biggest — loudest.", {
+      s("Open **Clear My Mind** beside us if several thoughts are swirling — one card at a time."),
+      s("What's taking up space in your head right now?", {
         type: "text",
         key: "loudest",
-        label: "The loudest thought",
+        label: "What's taking up space",
         multiline: true,
       }),
-      s("We're processing only that one. Everything else waits off-stage."),
-      s("What does this thought want — action, reassurance, or just to be named?", {
-        type: "choice",
-        key: "want",
-        label: "What it wants",
-        choices: ["Action", "Reassurance", "Just to be named"],
-      }),
-      s("One small response to that loudest thought only — not the whole pile.", {
+      s("Name one more if it's truly separate — still one line each.", {
         type: "text",
-        key: "response",
-        label: "One small response",
+        key: "second",
+        label: "Another thought (optional)",
+        optional: true,
+      }),
+      s("Which cluster feels loudest — not biggest, loudest?", {
+        type: "text",
+        key: "cluster",
+        label: "Loudest cluster",
+      }),
+      s("One small next step from that cluster — not solving everything today.", {
+        type: "text",
+        key: "next",
+        label: "One next step",
       }),
     ],
     linkedSection: "brain-dump",
     linkedLabel: "Open Clear My Mind",
     suggestLinkedFromStep: 0,
     linkedSuggestionHint:
-      "Works best with Clear My Mind beside us — one thought per card.",
+      "Works best with **Clear My Mind** open — capture, sort, and find priorities there.",
   },
   {
     id: "safe-for-today",
     categoryId: "calm",
     title: "Safe For Today",
-    helpsWith: "Reducing pressure by defining what \"okay\" looks like — not listing every worry.",
+    helpsWith:
+      "Releasing guilt by naming what you're intentionally not solving today — not a brain dump or worry list.",
     timeLabel: "3–4 min",
     steps: [
-      s("No brain dump. No worry lists. Just one question:"),
-      s("\"What would make today feel okay?\" Not perfect — okay.", {
+      s("This is not a brain dump. No sorting pile. Just permission."),
+      s("What are you giving yourself permission not to solve today?", {
         type: "text",
-        key: "okay",
-        label: "What would make today feel okay?",
+        key: "permission",
+        label: "Not solving today",
         multiline: true,
+        placeholder:
+          "e.g. clean the garage, figure out marketing, organize photos…",
       }),
-      s("What's the smallest piece of that you could touch in ten minutes?", {
-        type: "text",
-        key: "small",
-        label: "Smallest piece (10 min)",
-      }),
-      s("Say out loud: \"Okay is enough today.\""),
-      s("If the weight returns, re-read your okay sentence. It's still true."),
+      s("Say out loud: \"I'm allowed to leave this for another day.\""),
+      s("If guilt returns, re-read your permission line. It's still true."),
+      s("Relief counts — you didn't fail, you chose scope."),
     ],
   },
   {
@@ -602,10 +610,20 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
   },
   // Decide — each strategy uses different decision logic
   {
+    id: "decision-compass",
+    categoryId: "decide",
+    title: "ADHD Decision Compass",
+    helpsWith:
+      "Adaptive paths for action, strategy, and emotional decisions — with an optional mind map.",
+    timeLabel: "8–15 min",
+    steps: [],
+    customUi: "decision-compass",
+  },
+  {
     id: "two-option",
     categoryId: "decide",
     title: "Two Option Decision",
-    helpsWith: "Comparing two specific choices by what you'd actually do first.",
+    helpsWith: "Quick action comparison — first hour, then momentum.",
     timeLabel: "5–8 min",
     steps: [
       s("Write the two options in plain language — no pros/cons yet.", {

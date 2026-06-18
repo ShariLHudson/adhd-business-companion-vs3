@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
-  STRATEGY_STRUGGLES,
-  struggleById,
-  suggestedStruggleForStrategy,
-  type StrategyStruggleId,
-} from "@/lib/strategyWorkspace";
+  buildStrategyApplyChatPrompt,
+  getStrategyApplyOptions,
+  pickActiveProjectName,
+  suggestedApplyOptionId,
+  type StrategyApplyOption,
+} from "@/lib/strategyApplyOptions";
 import type { AppSection } from "@/lib/companionUi";
 
 export function StrategyUseNow({
@@ -22,39 +23,70 @@ export function StrategyUseNow({
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
 }) {
-  const [selected, setSelected] = useState<StrategyStruggleId | null>(null);
+  const activeProjectName = useMemo(() => pickActiveProjectName(), []);
+  const options = useMemo(
+    () =>
+      getStrategyApplyOptions(strategyId, categoryId, {
+        strategyTitle,
+        activeProjectName,
+      }),
+    [strategyId, categoryId, strategyTitle, activeProjectName],
+  );
+  const suggestedId = useMemo(
+    () =>
+      suggestedApplyOptionId(options, {
+        strategyTitle,
+        strategyId,
+        categoryId: categoryId ?? "",
+        activeProjectName,
+      }),
+    [options, strategyTitle, strategyId, categoryId, activeProjectName],
+  );
 
-  const route = selected ? struggleById(selected) : null;
-  const suggested =
-    strategyId && categoryId
-      ? suggestedStruggleForStrategy(strategyId, categoryId)
-      : null;
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected: StrategyApplyOption | null =
+    options.find((o) => o.id === selectedId) ?? null;
 
-  function openRoute() {
-    if (!route) return;
-    const prompt = route.chatPrompt?.(strategyTitle);
+  function openRoute(option: StrategyApplyOption) {
+    const ctx = {
+      strategyTitle,
+      strategyId,
+      categoryId: categoryId ?? "",
+      activeProjectName,
+    };
+    const prompt = buildStrategyApplyChatPrompt(option, ctx);
     if (prompt && onAsk) {
       onAsk(prompt);
       return;
     }
-    onOpen?.(route.section);
+    if (option.section) {
+      onOpen?.(option.section);
+    }
   }
 
   return (
     <div className="mt-8 rounded-2xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.04] p-4">
       <p className="text-base font-semibold text-[#1f1c19]">
-        Use this strategy right now
+        Use this strategy now
       </p>
-      <p className="mt-1 text-sm text-[#6b635a]">What are you struggling with?</p>
+      <p className="mt-1 text-sm text-[#6b635a]">
+        What do you want to do with &ldquo;{strategyTitle}&rdquo;?
+      </p>
+      {activeProjectName ? (
+        <p className="mt-1 text-xs text-[#9a8f82]">
+          Current focus: {activeProjectName} — we&apos;ll weave it in only if it
+          fits.
+        </p>
+      ) : null}
       <div className="mt-3 flex flex-wrap gap-2">
-        {STRATEGY_STRUGGLES.map((s) => {
-          const active = selected === s.id;
-          const isSuggested = !selected && suggested === s.id;
+        {options.map((opt) => {
+          const active = selectedId === opt.id;
+          const isSuggested = !selectedId && suggestedId === opt.id;
           return (
             <button
-              key={s.id}
+              key={opt.id}
               type="button"
-              onClick={() => setSelected(s.id)}
+              onClick={() => setSelectedId(opt.id)}
               className={`rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
                 active
                   ? "border-[#1e4f4f] bg-[#1e4f4f] text-white"
@@ -63,31 +95,37 @@ export function StrategyUseNow({
                     : "border-[#1e4f4f]/25 bg-white text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
               }`}
             >
-              {s.label}
+              {opt.label}
             </button>
           );
         })}
       </div>
 
-      {route ? (
+      {selected ? (
         <div className="mt-4 rounded-xl border border-[#d4cdc3] bg-white/90 p-4">
           <p className="text-sm font-medium text-[#1f1c19]">
-            Using <span className="text-[#1e4f4f]">{strategyTitle}</span> when you
-            have {route.label.toLowerCase()}
+            <span className="text-[#1e4f4f]">{strategyTitle}</span>
+            {" · "}
+            {selected.label}
           </p>
-          <p className="mt-1 text-sm text-[#6b635a]">{route.hint}</p>
+          <p className="mt-1 text-sm text-[#6b635a]">{selected.hint}</p>
           <button
             type="button"
-            onClick={openRoute}
-            disabled={!onOpen && !(route.chatPrompt && onAsk)}
+            onClick={() => openRoute(selected)}
+            disabled={
+              !onOpen &&
+              !(selected.chatPrompt && onAsk) &&
+              !selected.section
+            }
             className="mt-3 w-full rounded-xl bg-[#1e4f4f] px-4 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-40"
           >
-            {route.openLabel} →
+            {selected.openLabel} →
           </button>
         </div>
       ) : (
         <p className="mt-3 text-sm text-[#9a8f82]">
-          Pick what feels most true — I&apos;ll send you to the right workspace.
+          Pick the move that matches where you are — I&apos;ll coach you through
+          it.
         </p>
       )}
     </div>

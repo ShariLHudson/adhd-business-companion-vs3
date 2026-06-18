@@ -15,6 +15,10 @@ import {
   type AvatarResearch,
 } from "@/lib/companionStore";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
+import type { WorkspaceFieldId } from "@/lib/workspaceAwareness";
+import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
+import type { ClientAvatarStepKey } from "@/lib/clientAvatarCoach";
+import { snapshotFromBuilderInput } from "@/lib/clientAvatarCoach";
 
 // Curated identity marks — double as quick "icons" and emoji avatars.
 const EMOJI_CHOICES = [
@@ -170,6 +174,33 @@ type Form = {
   research: AvatarResearch;
 };
 
+const AVATAR_FIELD_TO_FORM: Partial<
+  Record<
+    WorkspaceFieldId,
+    keyof Pick<Form, TextFieldKey | "who" | "name" | "tagline">
+  >
+> = {
+  "avatar-name": "name",
+  "avatar-who": "who",
+  "avatar-tagline": "tagline",
+  "avatar-pain": "painPoints",
+  "avatar-goals": "goals",
+  "avatar-behavior": "currentBehavior",
+  "avatar-solution": "solution",
+};
+
+const AVATAR_FIELD_TO_STEP: Partial<Record<WorkspaceFieldId, StepKey>> = {
+  "avatar-name": "who",
+  "avatar-who": "who",
+  "avatar-tagline": "identity",
+  "avatar-pain": "painPoints",
+  "avatar-goals": "goals",
+  "avatar-behavior": "currentBehavior",
+  "avatar-solution": "solution",
+};
+
+const AVATAR_REPLACE_FIELDS = new Set(["name", "who", "tagline"]);
+
 const EMPTY: Form = {
   name: "",
   who: "",
@@ -211,7 +242,35 @@ function AvatarMark({
   );
 }
 
-export function IdealClientBuilder() {
+export function IdealClientBuilder({
+  focusField,
+  focusStamp,
+  chatFieldFill,
+  coachKickoff,
+  onStartNew,
+  onAvatarSaved,
+  onContextChange,
+  onStepAdvance,
+  onBuildComplete,
+  onCoachSnapshot,
+}: {
+  focusField?: WorkspaceFieldId | null;
+  focusStamp?: number;
+  chatFieldFill?: {
+    field: WorkspaceFieldId;
+    value: string;
+    key: number;
+  } | null;
+  /** When set, starts a fresh coach-guided build flow. */
+  coachKickoff?: number;
+  /** Opens split chat + Step 1 kickoff (New Avatar). */
+  onStartNew?: () => void;
+  onAvatarSaved?: (avatar: IdealClientAvatar) => void;
+  onContextChange?: (detail: WorkspacePanelDetail) => void;
+  onStepAdvance?: (step: ClientAvatarStepKey, stepIndex: number) => void;
+  onBuildComplete?: () => void;
+  onCoachSnapshot?: (snapshot: ReturnType<typeof snapshotFromBuilderInput>) => void;
+} = {}) {
   const [avatars, setAvatars] = useState<IdealClientAvatar[]>([]);
   const [activeId, setActiveId] = useState<string | undefined>(undefined);
   const [building, setBuilding] = useState(false);
@@ -219,6 +278,8 @@ export function IdealClientBuilder() {
   const [form, setForm] = useState<Form>(EMPTY);
   const [aiBusy, setAiBusy] = useState(false);
   const fileRef = useRef<HTMLInputElement>(null);
+  const appliedChatFillKey = useRef<number | null>(null);
+  const focusTargetRef = useRef<HTMLDivElement | null>(null);
 
   function refresh() {
     setAvatars(getAvatars());
@@ -228,10 +289,115 @@ export function IdealClientBuilder() {
     refresh();
   }, []);
 
+  useEffect(() => {
+    if (!coachKickoff) return;
+    setForm({ ...EMPTY });
+    setStep(0);
+    setBuilding(true);
+  }, [coachKickoff]);
+
+  useEffect(() => {
+    if (!onContextChange) return;
+    onContextChange({
+      view: building ? "build" : "list",
+      stage: building ? STEPS[step]?.key : undefined,
+      selectedItemName: form.name.trim() || null,
+      selectedItemGoal: form.who.trim() || null,
+      draftPreview: form.tagline.trim() || null,
+    });
+  }, [building, step, form.name, form.who, form.tagline, onContextChange]);
+
+  useEffect(() => {
+    if (!onCoachSnapshot) return;
+    const stepKey = STEPS[step]?.key;
+    if (!stepKey) return;
+    onCoachSnapshot(
+      snapshotFromBuilderInput({
+        stepIndex: step,
+        stepKey: stepKey as ClientAvatarStepKey,
+        building,
+        form,
+      }),
+    );
+  }, [
+    building,
+    step,
+    form,
+    onCoachSnapshot,
+  ]);
+
+  useEffect(() => {
+    if (!chatFieldFill) return;
+    if (appliedChatFillKey.current === chatFieldFill.key) return;
+    appliedChatFillKey.current = chatFieldFill.key;
+
+    const formKey = AVATAR_FIELD_TO_FORM[chatFieldFill.field];
+    const stepKey = AVATAR_FIELD_TO_STEP[chatFieldFill.field];
+    if (!formKey) return;
+
+    if (!building) {
+      setBuilding(true);
+      const active = getActiveAvatar();
+      const base: Form = active
+        ? {
+            id: active.id,
+            name: active.name,
+            who: active.who,
+            painPoints: active.painPoints,
+            goals: active.goals,
+            currentBehavior: active.currentBehavior,
+            solution: active.solution,
+            tagline: active.tagline,
+            emoji: active.emoji ?? "👤",
+            image: active.image,
+            revenue: active.revenue,
+            behaviorTraits: active.behaviorTraits ?? [],
+            motivations: active.motivations,
+            objections: active.objections,
+            triggers: active.triggers,
+            contentPrefs: active.contentPrefs,
+            research: active.research ?? {},
+          }
+        : { ...EMPTY };
+      const current = String(base[formKey] ?? "").trim();
+      const nextValue =
+        AVATAR_REPLACE_FIELDS.has(formKey) || !current
+          ? chatFieldFill.value.trim()
+          : `${current}\n${chatFieldFill.value.trim()}`;
+      setForm({ ...base, [formKey]: nextValue });
+    } else {
+      setForm((prev) => {
+        const current = String(prev[formKey] ?? "").trim();
+        const nextValue =
+          AVATAR_REPLACE_FIELDS.has(formKey) || !current
+            ? chatFieldFill.value.trim()
+            : `${current}\n${chatFieldFill.value.trim()}`;
+        return { ...prev, [formKey]: nextValue };
+      });
+    }
+
+    if (stepKey) {
+      const idx = STEPS.findIndex((s) => s.key === stepKey);
+      if (idx >= 0) setStep((current) => Math.max(current, idx));
+    }
+  }, [chatFieldFill, building]);
+
+  useEffect(() => {
+    if (!focusField || !focusStamp) return;
+    const stepKey = AVATAR_FIELD_TO_STEP[focusField];
+    if (!stepKey) return;
+    const idx = STEPS.findIndex((s) => s.key === stepKey);
+    if (idx >= 0) setStep((current) => Math.max(current, idx));
+    requestAnimationFrame(() => {
+      focusTargetRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  }, [focusField, focusStamp]);
+
   function startNew() {
     setForm({ ...EMPTY });
     setStep(0);
     setBuilding(true);
+    onStartNew?.();
   }
 
   function startEdit(a: IdealClientAvatar) {
@@ -328,11 +494,16 @@ export function IdealClientBuilder() {
   }
 
   function finish() {
-    saveAvatar({ ...form });
+    const saved = { ...form };
+    const list = saveAvatar(saved);
+    const persisted =
+      list.find((a) => a.id === saved.id) ?? list[0] ?? null;
     refresh();
     setBuilding(false);
     setForm({ ...EMPTY });
     setStep(0);
+    if (persisted) onAvatarSaved?.(persisted);
+    onBuildComplete?.();
   }
 
   function onUpload(file: File) {
@@ -386,18 +557,20 @@ export function IdealClientBuilder() {
 
         <div className="mt-6 flex-1">
           {current.key === "who" && (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-3" ref={focusTargetRef}>
               <VoiceAnswerField
                 value={form.name}
                 onChange={(name) => setForm({ ...form, name })}
                 multiline={false}
+                id="avatar-name"
                 placeholder="Name (optional) — e.g. Burned Out Coach"
+                inputClassName="rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
               />
               <VoiceAnswerField
                 value={form.who}
                 onChange={(who) => setForm({ ...form, who })}
+                id="avatar-who"
                 placeholder="Describe who they are…"
-                inputClassName="min-h-[160px] resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
               />
             </div>
           )}
@@ -523,7 +696,6 @@ export function IdealClientBuilder() {
                 <details
                   key={m.key}
                   className="rounded-xl border border-[#d4cdc3] bg-white/85 p-3"
-                  open={Boolean(form.research[m.key])}
                 >
                   <summary className="flex cursor-pointer items-center justify-between text-base font-semibold text-[#1f1c19]">
                     <span>
@@ -690,6 +862,7 @@ export function IdealClientBuilder() {
               </div>
 
               <input
+                id="avatar-tagline"
                 value={form.tagline}
                 onChange={(e) => setForm({ ...form, tagline: e.target.value })}
                 placeholder="A one-line tagline (optional)"
@@ -740,7 +913,18 @@ export function IdealClientBuilder() {
               </button>
               <button
                 type="button"
-                onClick={() => (isLast ? finish() : setStep(step + 1))}
+                onClick={() => {
+                  if (isLast) {
+                    finish();
+                    return;
+                  }
+                  const next = step + 1;
+                  setStep(next);
+                  const nextKey = STEPS[next]?.key;
+                  if (nextKey) {
+                    onStepAdvance?.(nextKey as ClientAvatarStepKey, next);
+                  }
+                }}
                 className="rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
               >
                 {isLast ? "Save client" : "Next"}

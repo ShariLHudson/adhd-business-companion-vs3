@@ -20,7 +20,22 @@ describe("clearMyMindCapture", () => {
     expect(splitCaptureInput("- first\n- second")).toEqual(["first", "second"]);
   });
 
-  it("asks for the first thing initially", () => {
-    expect(capturePrompt("first", 0)).toContain("first thing on your mind");
+  it("splits semicolon lists when three or more short clauses", () => {
+    expect(
+      splitCaptureInput("call mom; email team; fix homepage"),
+    ).toEqual(["call mom", "email team", "fix homepage"]);
+  });
+
+  it("splits the P0 four-line sales repro input", () => {
+    expect(
+      splitCaptureInput(
+        "Work on ADHD App\nCreate Automation for Sales Calls\nRevise Marketing Plan\nCreate Affiliate Plan",
+      ),
+    ).toEqual([
+      "Work on ADHD App",
+      "Create Automation for Sales Calls",
+      "Revise Marketing Plan",
+      "Create Affiliate Plan",
+    ]);
   });
 });

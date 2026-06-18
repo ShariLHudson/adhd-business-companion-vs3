@@ -1,3 +1,12 @@
+import {
+  classifyUserMessage,
+  hasClearEmotionalSignal,
+  isContentBrainstorming,
+  isOrdinaryTaskLanguage,
+  isPracticalTaskFriction,
+  shouldSuppressEmotionalTools,
+} from "./messageClassification";
+
 export type EmotionalState =
   | "stuck"
   | "overwhelmed"
@@ -84,12 +93,56 @@ export function detectEmotionalState(
 
   if (!source) return "unclear";
 
+  const category = classifyUserMessage(text);
+  if (category === "practical_task") {
+    if (
+      /\b(write|draft|email|create|build|plan|playbook|proposal|newsletter|marketing|content|strategy|document|letter|blog|copy|structure|post|linkedin)\b/.test(
+        source,
+      )
+    ) {
+      return "building";
+    }
+    return "unclear";
+  }
+
+  if (category === "mixed_emotional_task") {
+    return hasClearEmotionalSignal(text) ? "overwhelmed" : "building";
+  }
+
+  if (shouldSuppressEmotionalTools(text)) {
+    if (
+      /\b(write|draft|email|create|build|plan|content|post|linkedin|system|app|routing|code|debug)\b/.test(
+        source,
+      )
+    ) {
+      return "building";
+    }
+    return "unclear";
+  }
+
+  if (
+    isOrdinaryTaskLanguage(text) ||
+    isPracticalTaskFriction(text) ||
+    (isContentBrainstorming(text) && !hasClearEmotionalSignal(text))
+  ) {
+    if (
+      /\b(write|draft|email|create|build|plan|content|post|linkedin)\b/.test(
+        source,
+      )
+    ) {
+      return "building";
+    }
+    return "unclear";
+  }
+
   if (
     EMOTIONAL_BLEND_RE.test(source) ||
     SCARCITY_FEAR_RE.test(source) ||
-    /\b(sad|anxious|anxiety|frustrated|frustrating|tired|exhausted|lonely|scared|worried|worrying|can'?t stop worrying|upset|cry|crying|might cry|tearful|hopeless|helpless|discouraged|drained|low energy|heavy|numb|defeated|ashamed|embarrassed|falling apart|breaking down|on the verge|feel awful|awful|i'?m done|can'?t do this|burned out|burnt out|failure|failing|fraud|imposter|impostor|faking it|not good enough|feel sick|feeling sick|makes me sick|nauseous|nauseated|throw up|sick to my stomach|stomach in knots|knot in (my )?stomach|chest tight|can'?t breathe|panic|dread|can't cope)\b/.test(
+    /\b(sad|anxious|anxiety|tired|exhausted|lonely|scared|worried|worrying|can'?t stop worrying|upset|cry|crying|might cry|tearful|hopeless|helpless|discouraged|drained|low energy|heavy|numb|defeated|ashamed|embarrassed|falling apart|breaking down|on the verge|feel awful|awful|i'?m done|can'?t do this|burned out|burnt out|failure|failing|fraud|imposter|impostor|faking it|not good enough|feel sick|feeling sick|makes me sick|nauseous|nauseated|throw up|sick to my stomach|stomach in knots|knot in (my )?stomach|chest tight|can'?t breathe|panic|dread|can't cope)\b/.test(
       source,
-    )
+    ) ||
+    (/\b(frustrated|frustrating)\b/.test(source) &&
+      !shouldSuppressEmotionalTools(text))
   ) {
     return "emotional";
   }
@@ -104,9 +157,11 @@ export function detectEmotionalState(
   }
 
   if (
-    /\b(stuck|can'?t start|cannot start|can'?t begin|can'?t get started|can'?t get moving|procrastinat|frozen|freeze|shut down|where to begin|don't know where to start|paralyzed|avoiding my inbox|avoiding it|avoiding|putting off|haven't started|body won'?t (start|move)|can'?t make myself|staring at|can'?t open (my )?inbox|can'?t open inbox|can'?t open|can'?t dial|can'?t send|can'?t hit (publish|send))\b/.test(
+    /\b(stuck|can'?t start|cannot start|can'?t begin|can'?t get started|can'?t get moving|procrastinat|frozen|freeze|shut down|where to begin|don't know where to start|paralyzed|avoiding my inbox|avoiding it|avoiding|putting off|haven't started|body won'?t (?:start|move)|can'?t make myself|staring at|can'?t open (my )?inbox|can'?t open inbox|can'?t open|can'?t dial|can'?t send|can'?t hit (publish|send))\b/.test(
       source,
-    )
+    ) &&
+    !isPracticalTaskFriction(text) &&
+    !isContentBrainstorming(text)
   ) {
     return "stuck";
   }

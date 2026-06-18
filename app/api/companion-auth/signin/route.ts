@@ -1,6 +1,11 @@
 import { NextResponse } from "next/server";
 
-import { confirmCompanionUserEmail } from "@/lib/companionAuthProvision";
+import {
+  confirmCompanionUserEmail,
+  isInvalidLoginCredentialsError,
+  lookupCompanionAuthAccount,
+  normalizeCompanionEmail,
+} from "@/lib/companionAuthProvision";
 import {
   isEmailNotConfirmedError,
   sanitizeSupabaseAuthError,
@@ -34,7 +39,7 @@ export async function POST(request: Request) {
   let password = "";
   try {
     const body = (await request.json()) as { email?: string; password?: string };
-    email = body.email?.trim() ?? "";
+    email = normalizeCompanionEmail(body.email ?? "");
     password = body.password ?? "";
   } catch {
     return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400 });
@@ -70,6 +75,31 @@ export async function POST(request: Request) {
       }
     }
     if (error) {
+      if (isInvalidLoginCredentialsError(error.message)) {
+        const lookup = await lookupCompanionAuthAccount(email);
+        if (lookup.status === "not_found") {
+          return NextResponse.json(
+            {
+              ok: false,
+              error:
+                "No account found for this email. Use Create an account below to get started.",
+              hint: "create_account",
+            },
+            { status: 401 },
+          );
+        }
+        if (lookup.status === "exists") {
+          return NextResponse.json(
+            {
+              ok: false,
+              error:
+                "That password doesn't match. Use Create an account with the same email to set a new password and sign in.",
+              hint: "reset_via_signup",
+            },
+            { status: 401 },
+          );
+        }
+      }
       return NextResponse.json({ ok: false, error: error.message }, { status: 401 });
     }
     if (!data.session) {

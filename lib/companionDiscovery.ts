@@ -234,7 +234,7 @@ export const ALL_DISCOVERY_QUESTIONS: DiscoveryQuestion[] = [
     phase: "progressive",
     prompt: "How would you like me to communicate?",
     why: "This changes my communication style, not my abilities.",
-    options: ["Balanced", "Direct", "Gentle", "Encouraging", "Minimal", "Playful"],
+    options: ["Gentle", "Balanced", "Direct", "Playful", "Strategic", "Motivational"],
   },
   {
     id: "celebrations-prefs",
@@ -612,9 +612,11 @@ function applyDiscoveryAnswer(id: DiscoveryQuestionId, answer: string) {
       Balanced: "balanced",
       Direct: "direct",
       Gentle: "gentle",
-      Encouraging: "encouraging",
-      Minimal: "minimal",
       Playful: "playful",
+      Strategic: "strategic",
+      Motivational: "motivational",
+      Encouraging: "motivational",
+      Minimal: "direct",
     };
     const tone = map[answer];
     if (tone) savePrefs({ aiTone: tone });

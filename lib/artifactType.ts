@@ -1,6 +1,7 @@
-// Locked artifact types — prevent proposal ↔ email drift during Create sessions.
+// Locked artifact types — preserve catalog labels; only collapse true aliases.
 
 import type { AssistedAction } from "./assistedActionBridge";
+import { allCatalogItems } from "./createCatalog";
 import type { CreationWorkspaceContext } from "./workspaceCreation";
 
 export type ArtifactExportAction =
@@ -21,19 +22,50 @@ export type ArtifactExportOffer = {
 const EXPLICIT_TYPE_CHANGE_RE =
   /\b(?:make it (?:an? )?|change (?:it )?to|switch to|actually (?:an? )?|instead (?:of|make))\s*(?:an? )?(?:email|proposal|post|plan)\b/i;
 
+/** User-facing phrases → canonical catalog label. */
+const TYPE_ALIASES: Record<string, string> = {
+  "social media post": "Social Post",
+  "fb post": "Facebook Post",
+  funnel: "Sales Funnel",
+  "sales funnel": "Sales Funnel",
+  "lead magnet": "Lead Magnet",
+  "landing page": "Landing Page",
+  "marketing plan": "Marketing Plan",
+  "business plan": "Business Plan",
+  "video script": "Video Script",
+  "training guide": "Training Guide",
+  "email campaign": "Email Campaign",
+  "sales page": "Sales Page",
+  "linkedin post": "LinkedIn Post",
+  "blog post": "Blog Post",
+};
+
+function catalogLabelFor(raw: string): string | null {
+  const t = raw.trim().toLowerCase();
+  if (!t) return null;
+  for (const item of allCatalogItems()) {
+    if (item.label.toLowerCase() === t) return item.label;
+    for (const term of item.matchTerms ?? []) {
+      if (term.toLowerCase() === t) return item.label;
+    }
+  }
+  const alias = TYPE_ALIASES[t];
+  if (alias) return alias;
+  return null;
+}
+
 export function normalizeArtifactType(type: string | undefined | null): string {
   const raw = (type ?? "").trim();
   if (!raw) return "content";
+
+  const catalog = catalogLabelFor(raw);
+  if (catalog) return catalog;
+
   const t = raw.toLowerCase();
   if (/\bproposal\b|\bscope of work\b|\bsow\b|statement of work/.test(t)) {
     return "Proposal";
   }
-  if (
-    /^emails?$/.test(t) ||
-    t === "e-mail" ||
-    /\bnewsletter\b/.test(t) ||
-    /\bcold email\b/.test(t)
-  ) {
+  if (/^e-?mails?$/.test(t) || t === "e-mail" || /\bcold email\b/.test(t)) {
     return "Email";
   }
   if (raw === raw.toUpperCase() && raw.length <= 6) return raw;

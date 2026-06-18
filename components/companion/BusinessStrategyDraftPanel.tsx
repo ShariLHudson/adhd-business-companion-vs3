@@ -6,11 +6,13 @@ export function BusinessStrategyDraftPanel({
   typeLabel,
   draft,
   onBack,
+  onTalkWithShari,
   onStartOver,
 }: {
   typeLabel: string;
   draft: string;
   onBack?: () => void;
+  onTalkWithShari?: () => void;
   onStartOver?: () => void;
 }) {
   return (
@@ -26,8 +28,18 @@ export function BusinessStrategyDraftPanel({
       ) : null}
       <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">{typeLabel}</p>
       <p className="mt-1 text-sm text-[#6b635a]">
-        Your draft strategy — edit in chat or save for later.
+        Your plan outline — use chat with Shari to flesh out weeks, content, and
+        instructions.
       </p>
+      {onTalkWithShari ? (
+        <button
+          type="button"
+          onClick={onTalkWithShari}
+          className="mt-4 w-full rounded-xl bg-[#1e4f4f] px-4 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
+        >
+          Talk it out with Shari
+        </button>
+      ) : null}
       <pre className="mt-4 min-h-[200px] flex-1 overflow-y-auto whitespace-pre-wrap rounded-2xl border border-[#e7dfd4] bg-white p-4 text-sm leading-relaxed text-[#2d2926]">
         {draft}
       </pre>
@@ -37,7 +49,7 @@ export function BusinessStrategyDraftPanel({
           onClick={() => void navigator.clipboard?.writeText(draft)}
           className="flex-1 rounded-xl border border-[#1e4f4f]/25 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
         >
-          Copy draft
+          Copy plan
         </button>
         <button
           type="button"
@@ -54,7 +66,7 @@ export function BusinessStrategyDraftPanel({
                 .filter((l) => /^\d+\./.test(l.trim()))
                 .map((l) => l.replace(/^\d+\.\s*/, ""))
                 .slice(0, 5),
-              whyItWorks: "Built from your answers with Shari.",
+              whyItWorks: "Built with Shari from your answers and coaching.",
             });
           }}
           className="flex-1 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
