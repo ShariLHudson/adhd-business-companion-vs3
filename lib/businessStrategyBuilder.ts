@@ -69,14 +69,14 @@ function parseWeekCount(timeframe?: string): number | null {
 }
 
 function weekOutline(weeks: number): string[] {
-  const lines: string[] = ["", "## Weekly Plan", ""];
+  const lines: string[] = ["", "Weekly plan", ""];
   for (let w = 1; w <= weeks; w++) {
     lines.push(
-      `### Week ${w}`,
-      "- Focus:",
-      "- Content / visibility:",
-      "- Sales or conversion move:",
-      "- One measurable win:",
+      `Week ${w}`,
+      "• Focus:",
+      "• Content / visibility:",
+      "• Sales or conversion move:",
+      "• One measurable win:",
       "",
     );
   }
@@ -90,39 +90,39 @@ export function buildBusinessStrategyDraft(session: BusinessStrategySession): st
   const weeks = parseWeekCount(a.timeframe);
 
   const sections = [
-    `# ${title}`,
+    title,
     "",
-    "## Purpose",
+    "Purpose",
     a.purpose?.trim() || "—",
     "",
-    "## Desired Outcome",
+    "Desired outcome",
     a.outcome?.trim() || "—",
     "",
-    "## Who It Impacts",
+    "Who it impacts",
     a.impacts?.trim() || "—",
     "",
-    "## Success Looks Like",
+    "Success looks like",
     a.success?.trim() || "—",
     "",
-    "## Obstacles & Mitigations",
+    "Obstacles and mitigations",
     a.obstacles?.trim() || "—",
   ];
 
-  if (a.timeframe?.trim()) sections.push("", "## Timeframe", a.timeframe.trim());
-  if (a.audience?.trim()) sections.push("", "## Target Audience", a.audience.trim());
-  if (a.channels?.trim()) sections.push("", "## Channels", a.channels.trim());
-  if (a.offers?.trim()) sections.push("", "## Offers & CTAs", a.offers.trim());
-  if (a.themes?.trim()) sections.push("", "## Content Themes", a.themes.trim());
-  if (a.pipeline?.trim()) sections.push("", "## Pipeline / Warm Leads", a.pipeline.trim());
-  if (a.launch_offer?.trim()) sections.push("", "## Launch Offer", a.launch_offer.trim());
-  if (a.notes?.trim()) sections.push("", "## Notes from our conversation", a.notes.trim());
+  if (a.timeframe?.trim()) sections.push("", "Timeframe", a.timeframe.trim());
+  if (a.audience?.trim()) sections.push("", "Target audience", a.audience.trim());
+  if (a.channels?.trim()) sections.push("", "Channels", a.channels.trim());
+  if (a.offers?.trim()) sections.push("", "Offers and CTAs", a.offers.trim());
+  if (a.themes?.trim()) sections.push("", "Content themes", a.themes.trim());
+  if (a.pipeline?.trim()) sections.push("", "Pipeline / warm leads", a.pipeline.trim());
+  if (a.launch_offer?.trim()) sections.push("", "Launch offer", a.launch_offer.trim());
+  if (a.notes?.trim()) sections.push("", "Notes from our conversation", a.notes.trim());
 
   if (isMarketing && weeks) {
     sections.push(...weekOutline(weeks));
   }
 
   if (a.extra?.trim()) {
-    sections.push("", "## Additional detail", a.extra.trim());
+    sections.push("", "Additional detail", a.extra.trim());
   }
 
   return sections.join("\n");
@@ -142,8 +142,8 @@ export function bootstrapBusinessStrategySession(
 
   const isMarketing = /marketing/i.test(label);
   const opener = isMarketing
-    ? `Let's shape your **${label}** together — no checklist.\n\nTell me what you're building, who it's for, and what "done" looks like (8 weeks, a launch, steady visibility — whatever's real for you). I'll respond to what you share and we'll build the plan on the right as we go.`
-    : `Let's build your **${label}** together — conversation first, not a form.\n\nWhat's the situation, what are you trying to make happen, and what's been getting in the way? I'll follow your lead and only ask what I actually need.`;
+    ? `Let's shape your ${label} together — no checklist.\n\nTell me what you're building, who it's for, and what "done" looks like (8 weeks, a launch, steady visibility — whatever's real for you). I'll respond to what you share and we'll build the plan on the right as we go.`
+    : `Let's build your ${label} together — conversation first, not a form.\n\nWhat's the situation, what are you trying to make happen, and what's been getting in the way? I'll follow your lead and only ask what I actually need.`;
 
   return { session, opener };
 }

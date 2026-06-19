@@ -2,6 +2,7 @@ import { APP_FEATURE_KNOWLEDGE_COMPACT } from "./appFeatureKnowledge";
 import { focusToolDifferentiationHintForChat } from "./focusToolDefinitions";
 import { momentumAppointmentHintForChat } from "./momentumAppointment";
 import { decisionCompassHintForChat } from "./decisionCompass";
+import { plainLanguageFormattingHintForPrompt } from "./plainLanguageFormatting";
 
 // Spark Studio Companion — AI Routing Engine. This system prompt drives Shari:
 // silently detect intent, category, and emotional state, then route to the
@@ -352,6 +353,7 @@ export function buildCompanionSystemPrompt(
 
   const blocks = [
     COMPANION_SYSTEM_PROMPT,
+    plainLanguageFormattingHintForPrompt(),
     APP_FEATURE_KNOWLEDGE_COMPACT,
     focusToolDifferentiationHintForChat(),
     momentumAppointmentHintForChat(),

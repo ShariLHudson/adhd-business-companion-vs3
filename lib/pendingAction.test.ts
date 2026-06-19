@@ -46,7 +46,7 @@ describe("pendingAction", () => {
     })!;
     expect(matchesPendingAcceptance("open time block", pending)).toBe(true);
     expect(matchesPendingAcceptance("schedule it", pending)).toBe(true);
-    expect(matchesPendingAcceptance("yes", pending)).toBe(true);
+    expect(matchesPendingAcceptance("yes", pending, { allowGenericAcceptance: true })).toBe(true);
   });
 
   it("detects direct open section requests", () => {

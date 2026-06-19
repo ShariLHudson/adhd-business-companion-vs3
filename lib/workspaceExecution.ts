@@ -25,6 +25,20 @@ export function isAnyWorkspaceOpen(snap: WorkspaceOpenSnapshot): boolean {
   return Boolean(snap.panel) && snap.activeSection === "home" && snap.revealSeq > 0;
 }
 
+/** Split workspace panel is on screen beside chat (verified). */
+export function isWorkspaceVisibleBesideChat(
+  snap: WorkspaceOpenSnapshot,
+): boolean {
+  return isAnyWorkspaceOpen(snap);
+}
+
+/** Single source of truth for API co-guide visibility — use live snapshot, not stale turn state. */
+export function coGuideActiveFromSnapshot(
+  snap: WorkspaceOpenSnapshot,
+): boolean {
+  return isWorkspaceVisibleBesideChat(snap);
+}
+
 /** Panel mounted in split view — use for context lock (lenient vs isWorkspaceOpen). */
 export function isWorkspaceBesideChat(snap: WorkspaceOpenSnapshot): boolean {
   return Boolean(snap.panel) && snap.activeSection === "home";

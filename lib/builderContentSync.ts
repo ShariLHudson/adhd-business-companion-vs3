@@ -10,7 +10,7 @@ const BUILDER_APPROVAL_EXACT_RE =
   /^(?:yes|yes please|yep|yeah|yup|ok|okay|sure|sounds good|works for me|perfect|i like it|that'?s good|that'?s fine|that works|looks good|correct|right|good|that one|use that|let'?s do it|please do|go ahead|these are good|those are good|that'?s right|use those|use these|save that|add them|add this|put that in)\.?$/i;
 
 const BUILDER_APPROVAL_LOOSE_RE =
-  /\b(?:yes please|looks good|these are good|those are good|that'?s right|use those|use these|save that|sounds good|perfect|add them|add this|put that in|i like (?:it|them|those)|that works)\b/i;
+  /\b(?:yes please|looks good|these are good|those are good|that'?s right|use those|use these|save that|use this|i like that one|i like this one|that one works|go with that|sounds good|perfect|add them|add this|put that in|i like (?:it|them|those)|that works)\b/i;
 
 const BUILDER_ADD_COMMAND_RE =
   /\b(?:add (?:information|info|this|those|them|it)(?:\s+to(?:\s+the)?\s+avatar)?|add to (?:the )?avatar|save to (?:the )?avatar|put (?:that|this|those|them) in(?:\s+the\s+avatar)?)\b/i;
@@ -18,10 +18,27 @@ const BUILDER_ADD_COMMAND_RE =
 const BUILDER_OFFER_ADD_RE =
   /\bwould you like me to add (?:these|those|this|them)\b|\b(?:shall|should) i add (?:these|those)\b|\badd (?:these|those) (?:as |to |in )/i;
 
+/** User is asking for ideas — not providing field content. */
+export function isHelpSeekingAnswer(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  if (
+    /^(?:i don'?t know|not sure|idk|unsure|no idea|you decide|you pick|your call|help me|any ideas?)\.?$/i.test(
+      t,
+    )
+  ) {
+    return true;
+  }
+  return /\b(?:i don'?t know|not sure|no idea|help me|what do you suggest|any ideas?|you decide|give me options|suggest something|pick for me|need (?:some )?options|can you (?:suggest|recommend|help)|what should i (?:put|write|say)|make something up)\b/i.test(
+    t,
+  );
+}
+
 /** User is asking — not providing field content. */
 export function isUserQuestionText(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (isHelpSeekingAnswer(t)) return true;
   if (/\?\s*$/.test(t)) return true;
   return /^(?:what|why|how|when|where|who|can you|could you|should i|is it|are they|do i|does|would|will)\b/i.test(
     t,
@@ -121,6 +138,7 @@ export function isInvalidBuilderFieldValue(
 ): boolean {
   const v = value.trim();
   if (!v) return true;
+  if (isHelpSeekingAnswer(v)) return true;
   if (isUserQuestionText(v)) return true;
   if (isBuilderApprovalPhrase(v)) return true;
   if (userText.trim() && v === userText.trim() && isUserQuestionText(userText)) {
@@ -136,7 +154,7 @@ export function builderContentSyncHintForChat(): string {
     "- Approval phrases: yes, looks good, perfect, these are good, add them, add to avatar, save that, use those, etc.",
     "- NEVER write approval phrases into fields.",
     "- When you generate a list or draft for the current step, end with: Would you like me to add these to the avatar?",
-    "- On approval: apply the generated content with [[fill:field-id:value]], confirm what was added, prompt the next step.",
+    "- Help-seeking replies (I don't know, not sure, help me, give me options, you decide) are NOT content — generate 3–5 numbered suggestions in chat; never [[fill:]] them.",
     "- Chat = thinking/coaching; builder = storage. The user is never the copy/paste bridge.",
   ].join("\n");
 }

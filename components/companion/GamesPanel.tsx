@@ -2,40 +2,101 @@
 
 import { useRef, useState } from "react";
 import { logMomentum } from "@/lib/companionStore";
+import { recommendMomentumGame } from "@/lib/momentumGameRecommend";
 import {
-  MOMENTUM_GAME_CATEGORIES,
-  MOMENTUM_GAMES,
+  gamesForNeed,
+  getMomentumNeedCategory,
+  MOMENTUM_NEED_CATEGORIES,
+  playableMomentumGames,
   type MomentumGameDef,
+  type MomentumNeedId,
 } from "@/lib/momentumGames";
 import { MomentumGameRunner } from "./games/MomentumGameRunner";
 import { rand } from "./games/gameUtils";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
-type Phase = "menu" | "pick" | "play" | "done";
+type Phase = "menu" | "category" | "play" | "done";
 
-export function GamesPanel() {
+function GameMeta({ game }: { game: MomentumGameDef }) {
+  return (
+    <p className="mt-1.5 text-xs leading-snug text-[#6b635a]">
+      🎯 Helps with: {game.helpsWith} · ⏱ {game.time} · 😊 Energy:{" "}
+      {game.energy}
+    </p>
+  );
+}
+
+function CategoryCard({
+  emoji,
+  title,
+  tagline,
+  onClick,
+}: {
+  emoji: string;
+  title: string;
+  tagline: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/85 px-3.5 py-3.5 text-left shadow-sm transition-colors hover:border-[#1e4f4f]/35 hover:bg-white"
+    >
+      <span
+        aria-hidden="true"
+        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f5f1ea] text-xl"
+      >
+        {emoji}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-base font-semibold text-[#1f1c19]">
+          {title}
+        </span>
+        <span className="mt-0.5 block text-sm leading-snug text-[#6b635a]">
+          {tagline}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+export function GamesPanel({
+  onOpenSpinWheel,
+}: {
+  onOpenSpinWheel?: () => void;
+}) {
   const [phase, setPhase] = useState<Phase>("menu");
+  const [activeNeed, setActiveNeed] = useState<MomentumNeedId | null>(null);
   const [current, setCurrent] = useState<MomentumGameDef | null>(null);
   const recentRef = useRef<string[]>([]);
-  const lastCatRef = useRef<string | null>(null);
+  const lastNeedRef = useRef<MomentumNeedId | null>(null);
+
+  const recommendation = recommendMomentumGame();
 
   function pickSurprise(): MomentumGameDef {
     const recent = recentRef.current;
-    const lastCat = lastCatRef.current;
-    let pool = MOMENTUM_GAMES.filter(
-      (g) => !recent.includes(g.id) && g.category !== lastCat,
+    const lastNeed = lastNeedRef.current;
+    let pool = playableMomentumGames().filter(
+      (g) => !recent.includes(g.id) && g.need !== lastNeed,
     );
     if (pool.length === 0) {
-      pool = MOMENTUM_GAMES.filter((g) => g.id !== recent[recent.length - 1]);
+      pool = playableMomentumGames().filter(
+        (g) => g.id !== recent[recent.length - 1],
+      );
     }
-    if (pool.length === 0) pool = MOMENTUM_GAMES;
+    if (pool.length === 0) pool = playableMomentumGames();
     const pick = pool[rand(pool.length)]!;
     recentRef.current = [...recent, pick.id].slice(-4);
-    lastCatRef.current = pick.category;
+    lastNeedRef.current = pick.need;
     return pick;
   }
 
   function startGame(game: MomentumGameDef) {
+    if (game.externalTool === "spin-wheel") {
+      onOpenSpinWheel?.();
+      return;
+    }
     setCurrent(game);
     setPhase("play");
   }
@@ -45,8 +106,13 @@ export function GamesPanel() {
     setPhase("done");
   }
 
+  function openCategory(need: MomentumNeedId) {
+    setActiveNeed(need);
+    setPhase("category");
+  }
+
   if (phase === "play" && current) {
-    const cat = MOMENTUM_GAME_CATEGORIES[current.category];
+    const cat = getMomentumNeedCategory(current.need);
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-md flex-col px-6 py-8">
         <div className="flex w-full items-center justify-between">
@@ -54,7 +120,7 @@ export function GamesPanel() {
             className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide"
             style={{ backgroundColor: `${cat.color}1a`, color: cat.color }}
           >
-            {cat.label}
+            {cat.title}
           </span>
           <button
             type="button"
@@ -65,7 +131,11 @@ export function GamesPanel() {
           </button>
         </div>
         <div className="mt-8 w-full">
-          <MomentumGameRunner key={current.id + Date.now()} gameId={current.id} onDone={finishGame} />
+          <MomentumGameRunner
+            key={current.id + Date.now()}
+            gameId={current.id}
+            onDone={finishGame}
+          />
         </div>
       </div>
     );
@@ -89,13 +159,6 @@ export function GamesPanel() {
           </button>
           <button
             type="button"
-            onClick={() => setPhase("pick")}
-            className="rounded-xl border-2 border-[#d4cdc3] bg-white px-5 py-2.5 text-base font-bold text-[#1f1c19]"
-          >
-            Pick a game
-          </button>
-          <button
-            type="button"
             onClick={() => setPhase("menu")}
             className="rounded-xl bg-[#1e4f4f] px-6 py-2.5 text-base font-bold text-white"
           >
@@ -106,33 +169,50 @@ export function GamesPanel() {
     );
   }
 
-  if (phase === "pick") {
+  if (phase === "category" && activeNeed) {
+    const cat = getMomentumNeedCategory(activeNeed);
+    const games = gamesForNeed(activeNeed);
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
         <WorkspaceGuide section="focus" />
-        <p className="text-2xl font-semibold text-[#1f1c19]">Momentum Games</p>
-        <p className="mt-1 text-base text-[#6b635a]">Pick one — each game works differently.</p>
-        <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
-          {MOMENTUM_GAMES.map((g) => (
-            <button
-              key={g.id}
-              type="button"
-              onClick={() => startGame(g)}
-              className="rounded-2xl border border-[#d4cdc3] bg-white/80 p-3 text-left hover:border-[#1e4f4f]/40"
-            >
-              <span className="text-2xl">{g.emoji}</span>
-              <span className="mt-1 block text-sm font-semibold text-[#1f1c19]">{g.label}</span>
-              <span className="mt-0.5 block text-xs text-[#6b635a]">{g.blurb}</span>
-            </button>
-          ))}
-        </div>
         <button
           type="button"
           onClick={() => setPhase("menu")}
-          className="mt-4 text-sm font-semibold text-[#6b635a]"
+          className="mb-3 self-start text-sm font-semibold text-[#6b635a] hover:text-[#1e4f4f]"
         >
           ← Back
         </button>
+        <p className="text-2xl font-semibold text-[#1f1c19]">
+          {cat.emoji} {cat.title}
+        </p>
+        <p className="mt-1 text-base text-[#6b635a]">{cat.tagline}</p>
+        <ul className="mt-5 flex flex-col gap-2">
+          {games.map((g) => (
+            <li key={g.id}>
+              <button
+                type="button"
+                onClick={() => startGame(g)}
+                className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/85 px-3.5 py-3 text-left shadow-sm transition-colors hover:border-[#1e4f4f]/35 hover:bg-white"
+              >
+                <span
+                  aria-hidden="true"
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f5f1ea] text-lg"
+                >
+                  {g.emoji}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-base font-semibold text-[#1f1c19]">
+                    {g.label}
+                  </span>
+                  <span className="mt-0.5 block text-sm leading-snug text-[#6b635a]">
+                    {g.description}
+                  </span>
+                  <GameMeta game={g} />
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
       </div>
     );
   }
@@ -141,27 +221,51 @@ export function GamesPanel() {
     <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
       <WorkspaceGuide section="focus" />
       <p className="text-2xl font-semibold text-[#1f1c19]">Momentum Games</p>
-      <p className="mt-2 text-base leading-relaxed text-[#6b635a]">
-        Playful, light resets when your brain needs a different kind of break — not another
-        list, not another brain dump. Fifteen different games, each with its own feel.
+      <p className="mt-1 text-base text-[#6b635a]">
+        Choose what your brain needs right now.
       </p>
+
+      {recommendation && (
+        <div className="mt-5 rounded-2xl border border-[#1e4f4f]/25 bg-[#f0f5f5] px-4 py-4">
+          <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
+            Shari Recommends
+          </p>
+          <p className="mt-2 text-base font-semibold text-[#1f1c19]">
+            {recommendation.game.emoji} {recommendation.game.label}
+          </p>
+          <p className="mt-1 text-sm leading-snug text-[#6b635a]">
+            {recommendation.reason}
+          </p>
+          <button
+            type="button"
+            onClick={() => startGame(recommendation.game)}
+            className="mt-3 rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-bold text-white"
+          >
+            Play Now
+          </button>
+        </div>
+      )}
+
+      <ul className="mt-5 flex flex-col gap-2">
+        {MOMENTUM_NEED_CATEGORIES.map((cat) => (
+          <li key={cat.id}>
+            <CategoryCard
+              emoji={cat.emoji}
+              title={cat.title}
+              tagline={cat.tagline}
+              onClick={() => openCategory(cat.id)}
+            />
+          </li>
+        ))}
+      </ul>
+
       <button
         type="button"
         onClick={() => startGame(pickSurprise())}
-        className="mt-8 rounded-2xl bg-[#1e4f4f] px-10 py-4 text-xl font-bold text-white shadow-md hover:bg-[#163a3a]"
+        className="mt-6 rounded-2xl border-2 border-[#1e4f4f]/30 bg-white px-6 py-3 text-base font-bold text-[#1e4f4f]"
       >
         Surprise me 🎲
       </button>
-      <button
-        type="button"
-        onClick={() => setPhase("pick")}
-        className="mt-3 rounded-2xl border-2 border-[#1e4f4f]/30 bg-white px-10 py-3 text-base font-bold text-[#1e4f4f]"
-      >
-        Browse all games
-      </button>
-      <p className="mt-4 text-center text-sm text-[#9a8f82]">
-        Pattern · Memory · Speed · Words · and more
-      </p>
     </div>
   );
 }

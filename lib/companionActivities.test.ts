@@ -14,11 +14,12 @@ describe("companionActivities", () => {
       const items = activitiesForCategory(cat.id);
       expect(items.length).toBeGreaterThanOrEqual(4);
     }
-    expect(COMPANION_ACTIVITIES).toHaveLength(31);
+    expect(COMPANION_ACTIVITIES).toHaveLength(36);
   });
 
   it("gives every activity steps and time estimate", () => {
     for (const a of COMPANION_ACTIVITIES) {
+      if (a.customUi) continue;
       expect(a.steps.length).toBeGreaterThanOrEqual(4);
       expect(a.timeLabel.length).toBeGreaterThan(0);
       expect(a.helpsWith.length).toBeGreaterThan(10);

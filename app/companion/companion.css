@@ -404,3 +404,30 @@
 [data-visual-mode="off"] .companion-panel-surface {
   border-color: rgba(212, 205, 195, 0.9);
 }
+
+/* Split workspace proportions — driven by --companion-chat-flex / --companion-workspace-flex */
+.companion-split-layout {
+  --companion-chat-flex: 50;
+  --companion-workspace-flex: 50;
+}
+
+.companion-split-chat-pane {
+  flex: var(--companion-chat-flex) 1 0%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.companion-split-workspace-pane {
+  flex: var(--companion-workspace-flex) 1 0%;
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 767px) {
+  .companion-split-chat-pane,
+  .companion-split-workspace-pane {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 100%;
+  }
+}

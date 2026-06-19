@@ -1,5 +1,6 @@
 import type { AppSection } from "./companionUi";
 import { activityStep, type ActivityStep } from "./activityFields";
+import { sortByDropdownLabel } from "./dropdownSort";
 
 const s = activityStep;
 
@@ -622,8 +623,8 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
   {
     id: "two-option",
     categoryId: "decide",
-    title: "Two Option Decision",
-    helpsWith: "Quick action comparison — first hour, then momentum.",
+    title: "Quick Two Option Choice",
+    helpsWith: "A fast 4-step helper for simple choices.",
     timeLabel: "5–8 min",
     steps: [
       s("Write the two options in plain language — no pros/cons yet.", {
@@ -705,7 +706,7 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
   {
     id: "future-me-test",
     categoryId: "decide",
-    title: "Future Me Test",
+    title: "Future Me",
     helpsWith: "Imagining living with each choice six months from now.",
     timeLabel: "6–8 min",
     steps: [
@@ -736,6 +737,170 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
         type: "text",
         key: "step",
         label: "One small step",
+      }),
+    ],
+  },
+  {
+    id: "priority-sort",
+    categoryId: "decide",
+    title: "Priority Sort",
+    helpsWith: "Rank what matters most without building a giant task list.",
+    timeLabel: "5–8 min",
+    steps: [
+      s("Name three things competing for attention — not full tasks, just what's pulling.", {
+        type: "options",
+        key: "items",
+        startCount: 3,
+        minFilled: 2,
+        itemLabel: (i) => `Item ${i + 1}`,
+        addLabel: "Add another",
+      }),
+      s("Which one would matter most if you only did one thing today?", {
+        type: "pick-from",
+        key: "top",
+        fromKey: "items",
+        label: "Most important today",
+      }),
+      s("Which feels second — still worth naming, not fixing everything.", {
+        type: "pick-from",
+        key: "second",
+        fromKey: "items",
+        label: "Second priority",
+      }),
+      s("One sentence on why the top pick wins right now.", {
+        type: "text",
+        key: "why",
+        label: "Why this one first",
+      }),
+      s("Park the rest honestly. Sorted ≠ scheduled — you chose direction."),
+    ],
+  },
+  {
+    id: "values-check",
+    categoryId: "decide",
+    title: "Values Check",
+    helpsWith: "See which choice aligns with what you care about most.",
+    timeLabel: "6–8 min",
+    steps: [
+      s("Name the decision in one line.", {
+        type: "text",
+        key: "decision",
+        label: "Decision",
+      }),
+      s("List two or three values that matter most to you right now.", {
+        type: "options",
+        key: "values",
+        startCount: 3,
+        minFilled: 2,
+        itemLabel: (i) => `Value ${i + 1}`,
+        addLabel: "Add value",
+      }),
+      s("Option A — how well does it honor those values?", {
+        type: "text",
+        key: "fitA",
+        label: "Option A and your values",
+        multiline: true,
+      }),
+      s("Option B — same question.", {
+        type: "text",
+        key: "fitB",
+        label: "Option B and your values",
+        multiline: true,
+      }),
+      s("Which option feels more aligned — not perfect, more aligned?", {
+        type: "choice",
+        key: "pick",
+        label: "More aligned",
+        choices: ["Option A", "Option B", "Neither clearly"],
+      }),
+      s("One small step that honors your values today.", {
+        type: "text",
+        key: "step",
+        label: "One values-aligned step",
+      }),
+    ],
+  },
+  {
+    id: "goal-clarifier",
+    categoryId: "focus",
+    title: "Goal Clarifier",
+    helpsWith: "Name one goal and what done actually looks like.",
+    timeLabel: "5–8 min",
+    steps: [
+      s("Write the goal as it lives in your head — messy is fine.", {
+        type: "text",
+        key: "goal",
+        label: "The goal",
+        multiline: true,
+      }),
+      s("Why does this goal matter to you right now? One honest sentence.", {
+        type: "text",
+        key: "why",
+        label: "Why it matters",
+      }),
+      s("What would \"done enough\" look like — not perfect, enough?", {
+        type: "text",
+        key: "done",
+        label: "Done enough",
+        multiline: true,
+      }),
+      s("What's one piece of evidence you'd have when you get there?", {
+        type: "text",
+        key: "evidence",
+        label: "Evidence of done",
+      }),
+      s("Name the smallest next move toward that version of done.", {
+        type: "text",
+        key: "next",
+        label: "Smallest next move",
+      }),
+    ],
+  },
+  {
+    id: "project-breakdown",
+    categoryId: "overwhelm",
+    title: "Project Breakdown",
+    helpsWith: "Turn one project into a few honest next moves.",
+    timeLabel: "6–10 min",
+    steps: [
+      s("Name the project — one line, no scope creep.", {
+        type: "text",
+        key: "project",
+        label: "Project",
+      }),
+      s("What's the outcome you're aiming for?", {
+        type: "text",
+        key: "outcome",
+        label: "Desired outcome",
+        multiline: true,
+      }),
+      s("List three chunks — big pieces, not micro-tasks.", {
+        type: "options",
+        key: "chunks",
+        startCount: 3,
+        minFilled: 2,
+        itemLabel: (i) => `Chunk ${i + 1}`,
+        addLabel: "Add chunk",
+      }),
+      s("Which chunk is the best door to open first?", {
+        type: "pick-from",
+        key: "first",
+        fromKey: "chunks",
+        label: "First chunk",
+      }),
+      s("Break that chunk into up to three next moves.", {
+        type: "options",
+        key: "moves",
+        startCount: 3,
+        minFilled: 1,
+        itemLabel: (i) => `Move ${i + 1}`,
+        addLabel: "Add move",
+      }),
+      s("Pick one move you could start in the next 30 minutes.", {
+        type: "pick-from",
+        key: "start",
+        fromKey: "moves",
+        label: "Start here",
       }),
     ],
   },
@@ -1026,7 +1191,10 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
 export function activitiesForCategory(
   categoryId: ActivityCategoryId,
 ): CompanionActivity[] {
-  return COMPANION_ACTIVITIES.filter((a) => a.categoryId === categoryId);
+  return sortByDropdownLabel(
+    COMPANION_ACTIVITIES.filter((a) => a.categoryId === categoryId),
+    (a) => a.title,
+  );
 }
 
 export function getActivityById(id: string): CompanionActivity | undefined {
@@ -1038,7 +1206,8 @@ export function activityCategoryDropdownOptions(): {
   value: ActivityCategoryId;
   label: string;
 }[] {
-  return [...ACTIVITY_CATEGORIES]
-    .sort((a, b) => a.label.localeCompare(b.label))
-    .map((c) => ({ value: c.id, label: c.label }));
+  return sortByDropdownLabel(ACTIVITY_CATEGORIES, (c) => c.label).map((c) => ({
+    value: c.id,
+    label: c.label,
+  }));
 }

@@ -453,12 +453,26 @@ export function evaluateCompanionTurn(input: CompanionGovernorInput): TurnSurfac
   };
 }
 
+/** Governor authorized a chat-turn workspace or tool open (explicit or consent path). */
+export function governorAuthorizedChatTurnOpen(surface: TurnSurface): boolean {
+  return surface.outcome === "workspace_open" || surface.outcome === "tool_open";
+}
+
+/**
+ * Block duplicate auto-routing when Governor returned chat_only.
+ * UI clicks and governorAuthorizedChatTurnOpen paths are unaffected.
+ */
+export function governorBlocksChatTurnAutoOpen(surface: TurnSurface): boolean {
+  return surface.outcome === "chat_only";
+}
+
 export function governorAllowsPreChatWorkspaceOpen(
   surface: TurnSurface,
   section: AppSection,
 ): boolean {
-  if (surface.outcome === "workspace_open" && surface.targetSection === section) {
-    return true;
+  if (governorAuthorizedChatTurnOpen(surface)) {
+    if (surface.outcome === "tool_open") return false;
+    return surface.targetSection === section;
   }
   if (surface.outcome === "active_workflow") return false;
   if (surface.suppressWorkspaceRouting) return false;

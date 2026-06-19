@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   DECISION_TYPE_META,
   advanceDecisionCompass,
@@ -8,14 +8,22 @@ import {
   canAdvanceStep,
   computeDecisionResult,
   currentStep,
-  emptyDecisionCompassState,
+  personalizeStepLabel,
   optionLabels,
   setDecisionType,
+  stateFromDecisionCompassPrefill,
   suggestDecisionType,
+  type DecisionCompassPrefill,
   type DecisionCompassState,
   type DecisionType,
   type MindMapNode,
 } from "@/lib/decisionCompass";
+import {
+  panelStateFromSnapshot,
+  snapshotFromPanelState,
+  hasResumableDecisionCompassProgress,
+  type PersistedDecisionCompassSession,
+} from "@/lib/decisionCompassSessionStore";
 
 function MindMapBranch({ node, depth = 0 }: { node: MindMapNode; depth?: number }) {
   const colors = ["#1e4f4f", "#a85c4a", "#4a6fa5", "#6b8e23"];
@@ -46,16 +54,61 @@ function MindMapBranch({ node, depth = 0 }: { node: MindMapNode; depth?: number 
 export function DecisionCompassPanel({
   onClose,
   onStop,
+  onComplete,
+  onScrollToExploration,
+  initialPrefill = null,
+  restoredSession = null,
+  onSessionChange,
+  hideInlineMap = false,
 }: {
   onClose?: () => void;
   onStop?: () => void;
+  onComplete?: () => void;
+  onScrollToExploration?: (
+    target: "action-plan" | "save-project" | "explore" | "export",
+  ) => void;
+  /** Prefill from chat when user already named the decision or options. */
+  initialPrefill?: DecisionCompassPrefill | null;
+  /** Restored session from local storage — takes priority over prefill. */
+  restoredSession?: PersistedDecisionCompassSession | null;
+  onSessionChange?: (snapshot: PersistedDecisionCompassSession) => void;
+  /** When true, visual canvas in workspace handles the map. */
+  hideInlineMap?: boolean;
 }) {
-  const [state, setState] = useState<DecisionCompassState>(
-    emptyDecisionCompassState(),
-  );
-  const [optionA, setOptionA] = useState("");
-  const [optionB, setOptionB] = useState("");
-  const [draft, setDraft] = useState("");
+  const seeded = useMemo(() => {
+    if (restoredSession) return panelStateFromSnapshot(restoredSession);
+    return stateFromDecisionCompassPrefill(initialPrefill);
+  }, [initialPrefill, restoredSession]);
+  const [state, setState] = useState<DecisionCompassState>(seeded.state);
+  const [optionA, setOptionA] = useState(seeded.optionA);
+  const [optionB, setOptionB] = useState(seeded.optionB);
+  const [draft, setDraft] = useState(seeded.draft);
+  const lastEmittedTouch = useRef(restoredSession?.lastTouchedAt ?? "");
+
+  useEffect(() => {
+    if (!restoredSession?.lastTouchedAt) return;
+    if (restoredSession.lastTouchedAt === lastEmittedTouch.current) return;
+    const next = panelStateFromSnapshot(restoredSession);
+    setState(next.state);
+    setOptionA(next.optionA);
+    setOptionB(next.optionB);
+    setDraft(next.draft);
+  }, [restoredSession]);
+
+  useEffect(() => {
+    if (!onSessionChange) return;
+    const snapshot = snapshotFromPanelState(
+      state,
+      optionA,
+      optionB,
+      draft,
+      restoredSession?.sessionId,
+      restoredSession,
+    );
+    if (!state.complete && !hasResumableDecisionCompassProgress(snapshot)) return;
+    lastEmittedTouch.current = snapshot.lastTouchedAt;
+    onSessionChange(snapshot);
+  }, [state, optionA, optionB, draft, onSessionChange, restoredSession?.sessionId]);
 
   const step = currentStep(state);
   const { a: labelA, b: labelB } = optionLabels(state.answers);
@@ -132,26 +185,55 @@ export function DecisionCompassPanel({
           revisit.
         </p>
 
-        <div className="mt-6 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => setState((s) => ({ ...s, showMap: !s.showMap }))}
-            className="rounded-xl border border-[#d4cdc3] bg-white px-4 py-2.5 text-sm font-semibold text-[#1f1c19] hover:border-[#1e4f4f]/40"
-          >
-            {state.showMap ? "Hide map" : "🗺️ Show Decision Map"}
-          </button>
-          {onClose ? (
+        <div className="mt-6 flex flex-col gap-3">
+          <p className="text-sm font-semibold text-[#1f1c19]">
+            What would you like to do next?
+          </p>
+          <div className="flex flex-col gap-2">
             <button
               type="button"
-              onClick={onClose}
+              onClick={() => onScrollToExploration?.("action-plan")}
               className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white"
             >
-              Done
+              Create Action Plan
             </button>
-          ) : null}
+            <button
+              type="button"
+              onClick={() => onScrollToExploration?.("save-project")}
+              className="rounded-xl border border-[#1e4f4f]/40 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f]"
+            >
+              Save to Project
+            </button>
+            <button
+              type="button"
+              onClick={() => onScrollToExploration?.("explore")}
+              className="rounded-xl border border-[#d4cdc3] bg-white px-4 py-2.5 text-sm font-semibold text-[#1f1c19]"
+            >
+              Continue Exploring
+            </button>
+            <button
+              type="button"
+              onClick={() => onScrollToExploration?.("export")}
+              className="rounded-xl border border-[#d4cdc3] bg-white px-4 py-2.5 text-sm font-semibold text-[#1f1c19]"
+            >
+              Export
+            </button>
+            {onClose ? (
+              <button
+                type="button"
+                onClick={() => {
+                  onComplete?.();
+                  onClose();
+                }}
+                className="mt-1 self-start px-2 py-1 text-sm font-medium text-[#6b635a] hover:text-[#1f1c19]"
+              >
+                Done
+              </button>
+            ) : null}
+          </div>
         </div>
 
-        {state.showMap ? (
+        {!hideInlineMap && state.showMap ? (
           <div className="mt-6 rounded-2xl border border-[#d4cdc3] bg-white/80 p-4">
             <p className="text-sm font-semibold text-[#6b635a]">
               👁️ Your thinking at a glance
@@ -203,6 +285,7 @@ export function DecisionCompassPanel({
         ) : null}
       </div>
 
+      {!hideInlineMap ? (
       <div className="mt-4 flex gap-2">
         <button
           type="button"
@@ -212,8 +295,9 @@ export function DecisionCompassPanel({
           {state.showMap ? "Hide map" : "🗺️ Decision Map"}
         </button>
       </div>
+      ) : null}
 
-      {state.showMap && state.answers.decision ? (
+      {!hideInlineMap && state.showMap && state.answers.decision ? (
         <div className="mt-3 max-h-40 overflow-y-auto rounded-xl border border-[#d4cdc3] bg-white/70 p-3">
           <ul className="list-none pl-0">
             <MindMapBranch node={mindMap} />
@@ -225,7 +309,7 @@ export function DecisionCompassPanel({
         {step.kind === "text" ? (
           <>
             <label className="block text-base font-medium text-[#1f1c19]">
-              {step.label}
+              {personalizeStepLabel(step.label, labelA, labelB)}
             </label>
             <textarea
               value={draft || state.answers[step.id] || ""}
@@ -301,7 +385,9 @@ export function DecisionCompassPanel({
 
         {step.kind === "pick-ab" ? (
           <>
-            <p className="text-base font-medium text-[#1f1c19]">{step.label}</p>
+            <p className="text-base font-medium text-[#1f1c19]">
+              {personalizeStepLabel(step.label, labelA, labelB)}
+            </p>
             <div className="mt-3 flex flex-col gap-2">
               <button
                 type="button"

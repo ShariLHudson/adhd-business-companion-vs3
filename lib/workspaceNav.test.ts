@@ -4,6 +4,7 @@ import { isSplitWorkspaceSection, shouldOpenBesideChat } from "./workspaceNav";
 describe("workspaceNav", () => {
   it("treats menu workspace sections as split-capable", () => {
     expect(shouldOpenBesideChat("templates-library")).toBe(true);
+    expect(shouldOpenBesideChat("snippets")).toBe(true);
     expect(shouldOpenBesideChat("content-generator")).toBe(true);
     expect(shouldOpenBesideChat("playbook")).toBe(true);
     expect(shouldOpenBesideChat("brain-dump")).toBe(true);

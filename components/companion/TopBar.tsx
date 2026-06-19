@@ -5,6 +5,7 @@ import {
   ACTIVE_AVATARS,
   ACTIVE_COMPANIONS_TOOLTIP,
   formatActiveAvatarsSummary,
+  getActiveAvatarsForIds,
   getActiveCompanionIds,
   MAX_ACTIVE_COMPANIONS,
   toggleActiveCompanion,
@@ -27,10 +28,12 @@ function AvatarPortrait({
   emoji,
   image,
   size = 36,
+  className = "",
 }: {
   emoji: string;
   image?: string;
   size?: number;
+  className?: string;
 }) {
   if (image) {
     return (
@@ -38,19 +41,112 @@ function AvatarPortrait({
       <img
         src={image}
         alt=""
-        className="shrink-0 rounded-full object-cover"
+        className={`shrink-0 rounded-full object-cover ${className}`}
         style={{ width: size, height: size }}
       />
     );
   }
   return (
     <div
-      className="flex shrink-0 items-center justify-center rounded-full bg-[#1e4f4f]/10"
+      className={`flex shrink-0 items-center justify-center rounded-full bg-[#1e4f4f]/10 ${className}`}
       style={{ width: size, height: size, fontSize: size * 0.45 }}
       aria-hidden="true"
     >
       {emoji}
     </div>
+  );
+}
+
+function ActiveAvatarsTrigger({
+  activeAvatarIds,
+  showChevron = true,
+  compact = false,
+}: {
+  activeAvatarIds: string[];
+  showChevron?: boolean;
+  compact?: boolean;
+}) {
+  const avatars = getActiveAvatarsForIds(activeAvatarIds);
+  const portraitSize = compact ? 24 : 28;
+
+  if (avatars.length === 1) {
+    const avatar = avatars[0]!;
+    return (
+      <>
+        <AvatarPortrait
+          emoji={avatar.emoji}
+          image={avatar.image}
+          size={portraitSize}
+        />
+        {!compact ? (
+          <span className="hidden max-w-[9rem] truncate sm:inline">{avatar.label}</span>
+        ) : null}
+        {showChevron ? (
+          <span aria-hidden="true" className="text-xs">
+            ▾
+          </span>
+        ) : null}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <span className="flex items-center -space-x-1.5">
+        {avatars.slice(0, 3).map((avatar) => (
+          <AvatarPortrait
+            key={avatar.id}
+            emoji={avatar.emoji}
+            image={avatar.image}
+            size={compact ? 22 : 24}
+            className="ring-2 ring-white"
+          />
+        ))}
+      </span>
+      {!compact ? (
+        <span className="font-semibold">{avatars.length} avatars</span>
+      ) : null}
+      {showChevron ? (
+        <span aria-hidden="true" className="text-xs">
+          ▾
+        </span>
+      ) : null}
+    </>
+  );
+}
+
+function AvatarPickerList({
+  activeAvatarIds,
+  onToggle,
+}: {
+  activeAvatarIds: string[];
+  onToggle: (id: string) => void;
+}) {
+  return (
+    <>
+      {ACTIVE_AVATARS.map((avatar) => {
+        const checked = activeAvatarIds.includes(avatar.id);
+        const atLimit =
+          !checked && activeAvatarIds.length >= MAX_ACTIVE_COMPANIONS;
+        return (
+          <button
+            key={avatar.id}
+            type="button"
+            disabled={atLimit}
+            onClick={() => onToggle(avatar.id)}
+            className={`flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-[#f0f5f5] disabled:cursor-not-allowed disabled:opacity-50 ${
+              checked ? "text-[#1e4f4f]" : "text-[#3d3630]"
+            }`}
+          >
+            <AvatarPortrait emoji={avatar.emoji} image={avatar.image} />
+            <span className="min-w-0 flex-1 text-sm font-medium">{avatar.label}</span>
+            <span className="shrink-0 text-base" aria-hidden="true">
+              {checked ? "☑" : "☐"}
+            </span>
+          </button>
+        );
+      })}
+    </>
   );
 }
 
@@ -66,6 +162,7 @@ export function TopBar({
   const [convoOpen, setConvoOpen] = useState(false);
   const [avatarMenuOpen, setAvatarMenuOpen] = useState(false);
   const [overflowOpen, setOverflowOpen] = useState(false);
+  const [avatarListExpanded, setAvatarListExpanded] = useState(false);
   const [activeAvatarIds, setActiveAvatarIds] = useState<string[]>([]);
 
   function refreshState() {
@@ -83,7 +180,24 @@ export function TopBar({
     };
   }, []);
 
+  useEffect(() => {
+    if (overflowOpen) setAvatarListExpanded(false);
+  }, [overflowOpen]);
+
+  useEffect(() => {
+    if (avatarMenuOpen) setAvatarListExpanded(false);
+  }, [avatarMenuOpen]);
+
   const avatarSummary = formatActiveAvatarsSummary(activeAvatarIds);
+
+  function handleAvatarToggle(id: string) {
+    setActiveAvatarIds(toggleActiveCompanion(id));
+  }
+
+  function closeAvatarMenus() {
+    setAvatarMenuOpen(false);
+    setAvatarListExpanded(false);
+  }
 
   function avatarPicker(dropdownClass: string) {
     return (
@@ -91,38 +205,51 @@ export function TopBar({
         <p className="px-4 py-2 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
           Active Avatars
         </p>
-        {ACTIVE_AVATARS.map((avatar) => {
-          const checked = activeAvatarIds.includes(avatar.id);
-          const atLimit =
-            !checked && activeAvatarIds.length >= MAX_ACTIVE_COMPANIONS;
-          return (
+
+        <button
+          type="button"
+          onClick={() => setAvatarListExpanded((open) => !open)}
+          aria-expanded={avatarListExpanded}
+          className="flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left hover:bg-[#f0f5f5]"
+        >
+          <span className="flex min-w-0 flex-1 items-center gap-2">
+            <ActiveAvatarsTrigger
+              activeAvatarIds={activeAvatarIds}
+              showChevron={false}
+            />
+          </span>
+          <span className="shrink-0 text-xs text-[#6b635a]" aria-hidden="true">
+            {avatarListExpanded ? "▴" : "▾"}
+          </span>
+        </button>
+
+        {avatarListExpanded ? (
+          <>
+            <AvatarPickerList
+              activeAvatarIds={activeAvatarIds}
+              onToggle={handleAvatarToggle}
+            />
             <button
-              key={avatar.id}
               type="button"
-              disabled={atLimit}
-              onClick={() => {
-                setActiveAvatarIds(toggleActiveCompanion(avatar.id));
-              }}
-              className={`flex w-full items-center gap-3 px-4 py-2.5 text-left hover:bg-[#f0f5f5] disabled:cursor-not-allowed disabled:opacity-50 ${
-                checked ? "text-[#1e4f4f]" : "text-[#3d3630]"
-              }`}
+              onClick={() => setAvatarListExpanded(false)}
+              className="w-full border-t border-[#e7dfd4] px-4 py-2.5 text-center text-xs font-semibold text-[#6b635a] hover:bg-[#f0f5f5]"
             >
-              <AvatarPortrait emoji={avatar.emoji} image={avatar.image} />
-              <span className="min-w-0 flex-1 text-sm font-medium">
-                {avatar.label}
-              </span>
-              <span className="shrink-0 text-base" aria-hidden="true">
-                {checked ? "☑" : "☐"}
-              </span>
+              Close
             </button>
-          );
-        })}
-        <div className="border-t border-[#e7dfd4] px-4 py-2.5">
-          <p className="text-xs font-semibold text-[#1f1c19]">
-            {avatarSummary.countLine}
-          </p>
-          <p className="mt-0.5 text-xs text-[#6b635a]">{avatarSummary.detailLine}</p>
-        </div>
+          </>
+        ) : (
+          <div className="border-b border-[#e7dfd4] px-4 pb-2.5">
+            <p className="text-xs font-semibold text-[#1f1c19]">
+              {avatarSummary.countLine}
+            </p>
+            <p className="mt-0.5 text-xs text-[#6b635a]">
+              {avatarSummary.detailLine}
+            </p>
+            <p className="mt-1 text-[11px] text-[#9a8f82]">
+              Tap above to choose from {ACTIVE_AVATARS.length} voices
+            </p>
+          </div>
+        )}
       </div>
     );
   }
@@ -143,10 +270,16 @@ export function TopBar({
         <div className="relative">
           <button
             type="button"
-            onClick={() => setOverflowOpen((o) => !o)}
+            onClick={() => {
+              refreshState();
+              setOverflowOpen((open) => {
+                if (open) setAvatarListExpanded(false);
+                return !open;
+              });
+            }}
             aria-expanded={overflowOpen}
             aria-label="Menu"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#d8cfc2] bg-white/80 text-xl leading-none text-[#3d3630] hover:bg-white"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-[#c9bdb0] bg-white text-[26px] leading-none text-[#3d3630] shadow-sm transition-colors hover:bg-[#fff8ef]"
           >
             ⋯
           </button>
@@ -154,7 +287,10 @@ export function TopBar({
             <>
               <div
                 className="fixed inset-0 z-10"
-                onClick={() => setOverflowOpen(false)}
+                onClick={() => {
+                  setOverflowOpen(false);
+                  setAvatarListExpanded(false);
+                }}
                 aria-hidden="true"
               />
               <div className="absolute right-0 z-20 mt-1 w-72 overflow-hidden rounded-xl border border-[#d8cfc2] bg-white shadow-lg">
@@ -190,20 +326,17 @@ export function TopBar({
             setAvatarMenuOpen((o) => !o);
           }}
           aria-expanded={avatarMenuOpen}
+          aria-label="Active avatars"
           className={BTN}
           title={ACTIVE_COMPANIONS_TOOLTIP}
         >
-          <span className="hidden sm:inline">Active Avatars:</span>{" "}
-          <span className="font-semibold">{activeAvatarIds.length}</span>
-          <span aria-hidden="true" className="text-xs">
-            ▾
-          </span>
+          <ActiveAvatarsTrigger activeAvatarIds={activeAvatarIds} />
         </button>
         {avatarMenuOpen && (
           <>
             <div
               className="fixed inset-0 z-10"
-              onClick={() => setAvatarMenuOpen(false)}
+              onClick={closeAvatarMenus}
               aria-hidden="true"
             />
             {avatarPicker(

@@ -2217,7 +2217,7 @@ export function getRecentWorkItems(): RecentWorkItem[] {
 
 export function pushRecentWork(a: Omit<LastActivity, "ts">): void {
   if (typeof window === "undefined") return;
-  if (!a.title?.trim()) return;
+  if (!a.title?.trim() || a.kind === "chat") return;
   try {
     const id = recentWorkId(a);
     const item: RecentWorkItem = {

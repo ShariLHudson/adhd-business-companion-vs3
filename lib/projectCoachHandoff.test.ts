@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { buildProjectCoachHandoff } from "./projectCoachHandoff";
+import {
+  buildProjectCoachHandoff,
+  projectCoachTopicOpener,
+} from "./projectCoachHandoff";
 import type { WorkspaceContext } from "./workspaceAwareness";
 
 describe("projectCoachHandoff", () => {
@@ -12,6 +15,7 @@ describe("projectCoachHandoff", () => {
       selectedItemName: "ADHD Business Ecosystem Development",
     } as WorkspaceContext);
     expect(msg?.content).toContain("ADHD Business Ecosystem Development");
+    expect(msg?.content).toContain("What kind of help do you need right now?");
     expect(msg?.showTopicPicker).toBe(true);
   });
 
@@ -25,5 +29,26 @@ describe("projectCoachHandoff", () => {
     } as WorkspaceContext);
     expect(msg?.content).toContain("title");
     expect(msg?.showTopicPicker).toBeFalsy();
+  });
+
+  it("opens planning with overview focus", () => {
+    const opener = projectCoachTopicOpener(
+      { need: "planning", focus: "plan-overview" },
+      {
+        section: "projects",
+        selectedItemName: "Launch Workshop",
+      } as WorkspaceContext,
+    );
+    expect(opener.content).toContain("overview");
+    expect(opener.focusField).toBe("project-goal");
+  });
+
+  it("opens tasks with next-action focus", () => {
+    const opener = projectCoachTopicOpener(
+      { need: "tasks", focus: "task-next-action" },
+      null,
+    );
+    expect(opener.content).toContain("next action");
+    expect(opener.focusField).toBe("project-next-action");
   });
 });

@@ -241,6 +241,49 @@ export function emptyDecisionCompassState(): DecisionCompassState {
   };
 }
 
+export type DecisionCompassPrefill = {
+  decision: string;
+  optionA?: string;
+  optionB?: string;
+};
+
+/** Seed compass state from chat — lands on the right setup step. */
+export function stateFromDecisionCompassPrefill(
+  prefill?: DecisionCompassPrefill | null,
+): {
+  state: DecisionCompassState;
+  optionA: string;
+  optionB: string;
+  draft: string;
+} {
+  const base = emptyDecisionCompassState();
+  if (!prefill?.decision?.trim()) {
+    return { state: base, optionA: "", optionB: "", draft: "" };
+  }
+
+  const decision = prefill.decision.trim();
+  const optionA = prefill.optionA?.trim() ?? "";
+  const optionB = prefill.optionB?.trim() ?? "";
+  const answers: DecisionCompassAnswers = { decision };
+
+  if (optionA && optionB) {
+    answers.options = `${optionA}\n---\n${optionB}`;
+    return {
+      state: { ...base, stepIndex: 2, answers },
+      optionA,
+      optionB,
+      draft: "",
+    };
+  }
+
+  return {
+    state: { ...base, stepIndex: 1, answers },
+    optionA,
+    optionB,
+    draft: decision,
+  };
+}
+
 export function currentStep(state: DecisionCompassState): DecisionCompassStep | null {
   const steps = allStepsForState(state);
   return steps[state.stepIndex] ?? null;
@@ -256,6 +299,73 @@ export function optionLabels(answers: DecisionCompassAnswers): {
     a: parts[0]?.trim() || "Option A",
     b: parts[1]?.trim() || "Option B",
   };
+}
+
+/** Use the user's option names in question copy instead of generic Option A/B. */
+export function personalizeStepLabel(
+  label: string,
+  labelA: string,
+  labelB: string,
+): string {
+  return label
+    .replace(/\bOption A\b/g, labelA)
+    .replace(/\bOption B\b/g, labelB);
+}
+
+const MIND_MAP_SHORT_LABELS: Record<string, string> = {
+  "why-a": "Reason",
+  "why-b": "Reason",
+  "concern-a": "Concern",
+  "concern-b": "Concern",
+  "success-a": "Success",
+  "success-b": "Success",
+  "first-hour-a": "First hour",
+  "first-hour-b": "First hour",
+  "fear-a": "Fear",
+  "fear-b": "Fear",
+  "hope-a": "Hope",
+  "hope-b": "Hope",
+  inaction: "If nothing changes",
+  clearer: "Clearer path",
+  momentum: "Momentum",
+  values: "Values",
+  relief: "Feels lighter",
+  "future-me": "Future You",
+  freedom: "More freedom",
+  growth: "More growth",
+  stress: "Less stress",
+  alignment: "Long-term fit",
+};
+
+function mindMapPickLabel(
+  step: DecisionCompassStep & { kind: "pick-ab" | "tradeoff" },
+  answers: DecisionCompassAnswers,
+  labelA: string,
+  labelB: string,
+): MindMapNode | null {
+  const val = answers[step.id];
+  if (val !== "A" && val !== "B") return null;
+  const pick = val === "A" ? labelA : labelB;
+  const short = MIND_MAP_SHORT_LABELS[step.id] ?? step.label;
+  return { id: step.id, label: `${short}: ${pick}` };
+}
+
+function mindMapTextNodesForSide(
+  steps: DecisionCompassStep[],
+  side: "a" | "b",
+  answers: DecisionCompassAnswers,
+): MindMapNode[] {
+  return steps
+    .filter((s): s is Extract<DecisionCompassStep, { kind: "text" }> => {
+      return s.kind === "text" && s.id.endsWith(`-${side}`);
+    })
+    .map((s) => {
+      const val = answers[s.id]?.trim();
+      if (!val) return null;
+      const short = MIND_MAP_SHORT_LABELS[s.id] ?? "Note";
+      return { id: s.id, label: `${short}: ${val}` };
+    })
+    .filter((n): n is MindMapNode => n !== null);
 }
 
 export function canAdvanceStep(
@@ -430,43 +540,70 @@ export type MindMapNode = {
 /** ADHD-friendly mind map from answers — optional visual aid. */
 export function buildDecisionMindMap(state: DecisionCompassState): MindMapNode {
   const decision = state.answers.decision?.trim() || "Your decision";
-  const { a, b } = optionLabels(state.answers);
+  const { a: labelA, b: labelB } = optionLabels(state.answers);
   const type = state.decisionType;
 
-  const typeBranches: MindMapNode[] = (
-    ["action", "strategic", "emotional"] as DecisionType[]
-  ).map((t) => {
-    const meta = DECISION_TYPE_META[t];
-    const active = type === t;
-    const children: MindMapNode[] = active
-      ? stepsForType(t)
-          .filter((s) => s.kind === "text" || s.kind === "pick-ab" || s.kind === "tradeoff")
-          .map((s) => {
-            const val = state.answers[s.id];
-            if (!val?.trim()) return null;
-            const display =
-              val === "A" ? a : val === "B" ? b : val.trim();
-            return { id: s.id, label: `${s.label}: ${display}` };
-          })
-          .filter((n): n is MindMapNode => n !== null)
-      : [];
+  if (!type) {
     return {
-      id: t,
-      label: `${meta.emoji} ${meta.title}`,
-      children: active
-        ? [
-            { id: "opt-a", label: `A: ${a}` },
-            { id: "opt-b", label: `B: ${b}` },
-            ...children,
-          ]
-        : undefined,
+      id: "root",
+      label: decision,
+      children: [
+        { id: "opt-a", label: labelA },
+        { id: "opt-b", label: labelB },
+      ],
     };
-  });
+  }
 
+  const steps = stepsForType(type);
+  const sharedText = steps.filter(
+    (s): s is Extract<DecisionCompassStep, { kind: "text" }> =>
+      s.kind === "text" && !s.id.endsWith("-a") && !s.id.endsWith("-b"),
+  );
+  const picks = steps.filter(
+    (s): s is Extract<DecisionCompassStep, { kind: "pick-ab" | "tradeoff" }> =>
+      s.kind === "pick-ab" || s.kind === "tradeoff",
+  );
+
+  const branchA: MindMapNode = {
+    id: "opt-a",
+    label: labelA,
+    children: mindMapTextNodesForSide(steps, "a", state.answers),
+  };
+  const branchB: MindMapNode = {
+    id: "opt-b",
+    label: labelB,
+    children: mindMapTextNodesForSide(steps, "b", state.answers),
+  };
+
+  const sharedNodes: MindMapNode[] = [
+    ...sharedText
+      .map((s) => {
+        const val = state.answers[s.id]?.trim();
+        if (!val) return null;
+        const short = MIND_MAP_SHORT_LABELS[s.id] ?? s.label;
+        return { id: s.id, label: `${short}: ${val}` };
+      })
+      .filter((n): n is MindMapNode => n !== null),
+    ...picks
+      .map((s) => mindMapPickLabel(s, state.answers, labelA, labelB))
+      .filter((n): n is MindMapNode => n !== null),
+  ];
+
+  const meta = DECISION_TYPE_META[type];
   return {
     id: "root",
     label: decision,
-    children: typeBranches,
+    children: [
+      {
+        id: type,
+        label: `${meta.emoji} ${meta.title}`,
+        children: [
+          ...(branchA.children?.length ? [branchA] : []),
+          ...(branchB.children?.length ? [branchB] : []),
+          ...sharedNodes,
+        ],
+      },
+    ],
   };
 }
 

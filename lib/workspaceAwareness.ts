@@ -39,6 +39,7 @@ import {
 } from "./collaborativeDocumentWorkflow";
 import type { GoogleFileKind } from "./googleWorkspace";
 import type { WorkspaceOpenSnapshot } from "./workspaceExecution";
+import { isAnyWorkspaceOpen } from "./workspaceExecution";
 import {
   formatCreationCoGuideHint,
   formatCreationContextForPrompt,
@@ -595,7 +596,11 @@ export function buildWorkspaceChatHints(
   },
 ): string | undefined {
   if (!ctx?.section) return undefined;
-  if (!opts.coGuideActive) {
+  const coGuideActive =
+    opts.openSnapshot != null
+      ? isAnyWorkspaceOpen(opts.openSnapshot)
+      : opts.coGuideActive;
+  if (!coGuideActive) {
     return (
       "WORKSPACE NOT VISIBLE: Do NOT say any workspace is open beside chat. " +
       "If the user asks to work in Create or Projects, say you are opening it — do not claim it is already on screen."
@@ -614,7 +619,7 @@ export function buildWorkspaceChatHints(
   if (opts.sopSession && !createChat) {
     parts.push(formatSopSessionForPrompt(opts.sopSession));
   }
-  if (opts.coGuideActive) {
+  if (coGuideActive) {
     const snap = opts.openSnapshot ?? {
       panel: ctx.section,
       activeSection: "home",
@@ -744,7 +749,7 @@ export function buildWorkspaceAcceptMessage(
   }
 
   return {
-    content: `I'm here beside your ${workspaceTitle(section)} workspace. Tell me what you see, and we'll take the next small step together.`,
+    content: `I'm here beside your ${workspaceTitle(section)} workspace. Say what you'd like to do next, or ask for help with the next field.`,
     focusField: null,
   };
 }
@@ -769,6 +774,19 @@ export function buildWorkspaceContext(
     ...emptyWorkspaceDetail(),
     ...detail,
   };
+}
+
+/** Align workspace context with verified on-screen panel (avoids stale React state). */
+export function workspaceContextForSnapshot(
+  snap: WorkspaceOpenSnapshot,
+  fallback: WorkspaceContext | null,
+  detailForPanel: (panel: AppSection) => WorkspacePanelDetail | null,
+): WorkspaceContext | null {
+  if (!isAnyWorkspaceOpen(snap) || !snap.panel) {
+    return fallback;
+  }
+  if (fallback?.section === snap.panel) return fallback;
+  return buildWorkspaceContext(snap.panel, detailForPanel(snap.panel));
 }
 
 /** @deprecated Use WorkspaceMessageClass */
@@ -842,7 +860,11 @@ function continuationReply(
       }
     }
   }
-  return `[[focus:project-title]]I can see ${ctx.title} beside us. Tell me what you see on screen, and we'll take the next small step together.`;
+  const next = suggestNextWorkspaceField(ctx, "");
+  if (next) {
+    return `[[focus:${next.field}]]I can see ${ctx.title} beside us. Next up: **${next.label}**. ${next.reason}`;
+  }
+  return `[[focus:project-title]]I can see ${ctx.title} beside us. What would you like to work on first?`;
 }
 
 /** Deterministic co-guide replies — avoids generic coaching when workspace is open. */
@@ -1006,7 +1028,7 @@ function buildWorkspaceConfirmReply(
 
   return {
     reply:
-      "Got it. Tell me what you see in the workspace, and we'll take the next small step.",
+      "Got it. What's the next piece you'd like to fill in — or say help and I'll suggest one?",
   };
 }
 

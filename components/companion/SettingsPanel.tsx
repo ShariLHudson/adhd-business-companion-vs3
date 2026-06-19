@@ -27,6 +27,7 @@ import { useVisualMode } from "@/lib/useVisualMode";
 import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
 import { playChime, unlockChime } from "@/lib/chime";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import {
   getRecognitionStore,
   saveRecognitionStoreAndNotify,
@@ -382,7 +383,7 @@ export function SettingsPanel({
     </>
   );
 
-  const wrap = "companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8";
+  const wrap = `${workspacePanelShellClass({ width: "standard" })} companion-fade-in mx-auto flex h-full max-w-xl flex-col`;
   const selectCls =
     "mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
 

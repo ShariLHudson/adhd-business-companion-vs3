@@ -15,7 +15,9 @@ const base = {
 
 describe("companionTriage", () => {
   it("detects triage openings", () => {
-    expect(matchesTriageOpening("I'm bored and can't get motivated")).toBe(true);
+    expect(matchesTriageOpening("I'm overwhelmed and can't get motivated")).toBe(
+      true,
+    );
     expect(matchesTriageOpening("I'm overwhelmed")).toBe(true);
     expect(matchesTriageOpening("write me a linkedin post")).toBe(false);
   });

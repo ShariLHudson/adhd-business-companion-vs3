@@ -65,6 +65,19 @@ const REFERS_TO_CURRENT_RE =
 const CHAT_OFFER_ONLY_RE =
   /\b(?:would you like|want me to help|i can open create|tell me what section)\b/i;
 
+export function looksLikeEmailDraft(text: string): boolean {
+  const t = text.trim();
+  if (t.length < 80) return false;
+  if (CHAT_OFFER_ONLY_RE.test(t) && t.length < 200) return false;
+  return (
+    /^subject:/im.test(t) ||
+    /\bto:\s*\S+/i.test(t) ||
+    /\bdear\b/i.test(t) ||
+    /\bhi [a-z][a-z\s,'-]{0,40},/i.test(t) ||
+    (/\b(?:best|regards|sincerely|thanks),?\s*$/im.test(t) && t.length >= 100)
+  );
+}
+
 /** Blank structures for new artifact requests — not fake marketing copy. */
 export const BLANK_ARTIFACT_SCAFFOLDS: Record<string, string> = {
   Proposal: [
@@ -145,6 +158,7 @@ export const BLANK_ARTIFACT_SCAFFOLDS: Record<string, string> = {
     "",
     "Metrics",
   ].join("\n"),
+  Email: ["Subject:", "", "", ""].join("\n"),
   "Email Campaign": [
     "Sequence Name",
     "",
@@ -410,7 +424,8 @@ export function extractArtifactFromChat(
       .join("\n");
 
     const fragment = looksLikeDraftFragment(m.content, userText);
-    if (!looksLikeArtifactContent(m.content) && !fragment) continue;
+    const emailish = looksLikeEmailDraft(m.content);
+    if (!looksLikeArtifactContent(m.content) && !fragment && !emailish) continue;
 
     const itemType = inferArtifactTypeFromConversation(
       userText,
@@ -420,7 +435,7 @@ export function extractArtifactFromChat(
       ? normalizeArtifactType(hintType)
       : normalizeArtifactType(itemType);
 
-    const title = fragment
+    const title = fragment || emailish
       ? resolveCollaborativeDraftTitle({
           itemType: normalized,
           userText,
@@ -563,7 +578,8 @@ export function resolveCurrentArtifact(
   }
 
   if (!blockNewFromChat) {
-    const chatArtifact = extractArtifactFromChat(messages);
+    const hintType = /\bemail\b/i.test(userText) ? "Email" : null;
+    const chatArtifact = extractArtifactFromChat(messages, hintType);
     if (chatArtifact) {
       return {
         ...chatArtifact,
@@ -621,8 +637,8 @@ export function buildCreateOpenAck(artifact: ResolvedArtifact): string {
 
 export function missingArtifactExportMessage(): string {
   return (
-    "I don't have the content loaded yet. **Paste it here** or tell me what we just built — " +
-    "then I can open **Create** with the right draft for Google Doc / print."
+    "I don't have the content loaded yet. Paste it here or tell me what we just built — " +
+    "then I can open Create with the right draft for Google Doc or print."
   );
 }
 

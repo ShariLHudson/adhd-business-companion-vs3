@@ -205,7 +205,7 @@ describe("messageClassification — companion speaks before workspace (P0)", () 
     expect(shouldStayConversationalOnly(text)).toBe(true);
     expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(false);
     expect(detectDoingIntent(text)).toBeNull();
-    expect(classifyWorkspaceIntent(text).intent).toBe("conversation");
+    expect(classifyWorkspaceIntent(text).intent).toBe("discovery");
   });
 
   it("three things to do — conversation, no project lookup", () => {

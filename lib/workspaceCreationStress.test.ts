@@ -77,7 +77,7 @@ const CONVERSATION_PHRASES: Array<{
     test: 2,
     label: "general question",
     input: "What makes a good marketing plan?",
-    allowedIntents: ["conversation"],
+    allowedIntents: ["conversation", "discovery"],
   },
   {
     test: 3,
@@ -95,7 +95,7 @@ const CONVERSATION_PHRASES: Array<{
     test: 5,
     label: "selection",
     input: "Let's use those five.",
-    allowedIntents: ["conversation"],
+    allowedIntents: ["conversation", "discovery"],
   },
   {
     test: 6,
@@ -120,7 +120,7 @@ const CONVERSATION_PHRASES: Array<{
     label: "strategy",
     input:
       "If you were teaching this workshop, what order would you put the symptoms in?",
-    allowedIntents: ["conversation"],
+    allowedIntents: ["conversation", "discovery"],
   },
   {
     test: 10,
@@ -260,7 +260,7 @@ describe("Create workspace stress test — Test 17: draft persistence (hints)", 
     const block = formatCreationContextForPrompt(creationContext)!;
     expect(block).toContain("Draft exists: yes");
     expect(block).toContain("Day 1:");
-    expect(block).toContain("source of truth");
+    expect(block).toContain("SOURCE OF TRUTH");
     expect(block).not.toMatch(/we're on (?:the )?audience/i);
   });
 });

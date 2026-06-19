@@ -8,6 +8,7 @@ import {
 } from "./companionIntelligence";
 import type { TriageInput } from "./companionTriage";
 import { shouldSuppressEmotionalTools } from "./messageClassification";
+import { isStressRoutingSignal } from "./stressRouting";
 import { hasConcreteWorkspaceTarget } from "./workspaceMode";
 
 export type ToolSuggestionKind =
@@ -90,6 +91,8 @@ export function suggestSupportTool(
   if (!t) return null;
 
   if (shouldSuppressEmotionalTools(t)) return null;
+
+  if (isStressRoutingSignal(t)) return null;
 
   // Concrete create/build intent → workspace offer wins over Get Unstuck / etc.
   if (hasConcreteWorkspaceTarget(t)) return null;

@@ -16,6 +16,7 @@ export type AppFeatureId =
   | "focus-audio"
   | "time-block"
   | "momentum-games"
+  | "guided-exercises"
   | "spin-wheel"
   | "help-me-right-now"
   | "create"
@@ -49,7 +50,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
     name: "Focus",
     navigation: "Sidebar **Focus**",
     howTo:
-      "Calm support menu — expand **Start Here**, **Focus Tools**, or **Momentum Boosters** for timers, audio, games, and more.",
+      "Calm support menu — expand **Start Here**, **Focus Tools**, **Help Me Right Now**, or **Momentum Boosters**.",
     match: [/\bfocus\b(?!\s*session|\s*audio)/i, /\bfocus menu\b/i],
   },
   {
@@ -70,7 +71,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
     id: "brain-parking-lot",
     name: "Brain Parking Lot",
     navigation:
-      "Sidebar **Focus** → **Momentum Boosters** → **Help Me Right Now** → **Brain Parking Lot**",
+      "Sidebar **Focus** → **Help Me Right Now** → **Brain Parking Lot**",
     howTo:
       "Save a stray idea for later while staying on task — quick park and tag, no sorting now.",
     match: [
@@ -84,7 +85,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
     id: "safe-for-today",
     name: "Safe For Today",
     navigation:
-      "Sidebar **Focus** → **Momentum Boosters** → **Help Me Right Now** → **Safe For Today**",
+      "Sidebar **Focus** → **Help Me Right Now** → **Safe For Today**",
     howTo:
       "Permission to postpone — name what you're not solving today; relief, not a worry list.",
     match: [/\bsafe for today\b/i, /\bpermission not to\b/i, /\bnot doing this today\b/i],
@@ -135,7 +136,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
     navigation:
       "Sidebar **Focus** → expand **Momentum Boosters** → **Momentum Games**",
     howTo:
-      "Fifteen playful mini-games — pattern, memory, speed, and more. Built into the app under Focus.",
+      "Playful mini-games organized by what your brain needs — focus, momentum, ideas, reset, or fun. Built into the app under Focus.",
     match: [
       /\bmomentum games?\b/i,
       /\bfind the games?\b/i,
@@ -154,12 +155,27 @@ export const APP_FEATURES: AppFeatureEntry[] = [
     match: [/\bspin(?:ning)? (?:the )?wheel\b/i, /\bwheel\b/i],
   },
   {
+    id: "guided-exercises",
+    name: "Guided Exercises",
+    navigation:
+      "Sidebar **Focus** → **Momentum Boosters** → **Guided Exercises**",
+    howTo:
+      "Structured thinking — ADHD Decision Compass, values, goals, priority sort, project breakdown, and more.",
+    match: [
+      /\bguided exercises?\b/i,
+      /\bdecision compass\b/i,
+      /\bvalues check\b/i,
+      /\bgoal clarifier\b/i,
+      /\bpriority sort\b/i,
+      /\bproject breakdown\b/i,
+    ],
+  },
+  {
     id: "help-me-right-now",
     name: "Help Me Right Now",
-    navigation:
-      "Sidebar **Focus** → **Momentum Boosters** → **Help Me Right Now**",
+    navigation: "Sidebar **Focus** → **Help Me Right Now**",
     howTo:
-      "Quick strategies for calm, focus, decisions, and energy — each solves a different problem.",
+      "Immediate relief — Adjust My Day, Brain Parking Lot, Clear My Mind, Safe For Today, Focus Session, ADHD Decision Compass.",
     match: [/\bhelp me right now\b/i, /\bright now\b.*\bstrateg/i],
   },
   {
@@ -273,15 +289,16 @@ export const APP_FEATURES: AppFeatureEntry[] = [
 
 /** Compact reference always included in the system prompt. */
 export const APP_FEATURE_KNOWLEDGE_COMPACT = `APP FEATURE KNOWLEDGE (authoritative — use for how-to/navigation; never deny these):
-• Focus hub: Sidebar Focus → Start Here / Focus Tools / Momentum Boosters
+• Focus hub: Sidebar Focus → Start Here / Focus Tools / Help Me Right Now / Momentum Boosters
 • Clear My Mind: Focus → Start Here → Clear My Mind
 • Focus Session: Focus → Start Here → Focus Session
 • Breathe & Reset: Focus → Focus Tools → Breathe & Reset
 • Focus Audio: Focus → Focus Tools → Focus Audio
 • Time Blocks: Focus → Focus Tools → Block Out Time
+• Help Me Right Now: Focus → Help Me Right Now (relief tools)
+• Guided Exercises: Focus → Momentum Boosters → Guided Exercises
 • Momentum Games: Focus → Momentum Boosters → Momentum Games (games ARE in the app)
 • Spin The Wheel: Focus → Momentum Boosters → Spin The Wheel
-• Help Me Right Now: Focus → Momentum Boosters → Help Me Right Now
 • Snippets: More → Snippets (reusable text blocks)
 • Create: Sidebar Create
 • Templates: More → Templates (reusable starting points on this device; Build With Shari in chat before drafting)
@@ -410,7 +427,7 @@ export function appFeatureKnowledgeHintForChat(text: string): string | undefined
   }
 
   const lines = matches.slice(0, 3).map(
-    (f) => `• **${f.name}**: ${f.navigation} — ${f.howTo}`,
+    (f) => `• ${f.name}: ${f.navigation.replace(/\*\*/g, "")} — ${f.howTo.replace(/\*\*/g, "")}`,
   );
 
   return [

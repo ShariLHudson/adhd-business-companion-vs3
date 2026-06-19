@@ -34,13 +34,13 @@ import {
   type UserStrategy,
 } from "@/lib/userStrategies";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { StrategyApplyPanel } from "@/components/companion/StrategyApplyPanel";
 import type { StrategyApplySession } from "@/lib/strategyApplyCoach";
 import { useVisualMode } from "@/lib/useVisualMode";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import { StrategyUseNow } from "@/components/companion/StrategyUseNow";
 import { CoachingLibraryPicker } from "@/components/companion/CoachingLibraryPicker";
-import { applyPromptForStrategy } from "@/lib/strategyApplyOptions";
 import { saveProject } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
 import { appReferences } from "@/lib/appReferences";
@@ -268,7 +268,7 @@ export function StrategiesPanel({
     const savedCount = saved.length;
 
     return (
-      <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+      <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
         <WorkspaceGuide section="playbook" />
         {dockedPlan}
         <p className="text-2xl font-semibold text-[#1f1c19]">Strategies</p>
@@ -1032,22 +1032,8 @@ function StrategyBuiltinDetail({
         <p className="text-sm font-medium text-[#1f1c19]">
           Start with step 1: {s.steps[0]}
         </p>
-        {(onStartStrategyApply ?? onAsk) ? (
-          <button
-            type="button"
-            onClick={() =>
-              onStartStrategyApply
-                ? onStartStrategyApply(s.id)
-                : onAsk?.(applyPromptForStrategy(s))
-            }
-            className="mt-3 w-full rounded-xl bg-[#1e4f4f] px-4 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
-          >
-            Apply this with Shari
-          </button>
-        ) : null}
       </div>
 
-      <LessonHeading color={accentColor}>Put this strategy into action</LessonHeading>
       <StrategyUseNow
         key={s.id}
         strategyTitle={s.title}
@@ -1055,6 +1041,7 @@ function StrategyBuiltinDetail({
         categoryId={subcat}
         onOpen={onOpen}
         onAsk={onAsk}
+        onStartStrategyApply={onStartStrategyApply}
       />
 
       {relatedTools.length > 0 ? (
@@ -1098,19 +1085,6 @@ function StrategyBuiltinDetail({
         >
           Save as my strategy
         </button>
-        {(onStartStrategyApply ?? onAsk) ? (
-          <button
-            type="button"
-            onClick={() =>
-              onStartStrategyApply
-                ? onStartStrategyApply(s.id)
-                : onAsk?.(applyPromptForStrategy(s))
-            }
-            className="text-[#1e4f4f] underline decoration-[#1e4f4f]/30 underline-offset-2"
-          >
-            Apply with Shari
-          </button>
-        ) : null}
         <button
           type="button"
           onClick={() => {

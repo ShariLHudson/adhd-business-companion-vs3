@@ -4,6 +4,7 @@ import {
   extractPendingBuilderContent,
   isBuilderAddCommand,
   isBuilderApprovalPhrase,
+  isHelpSeekingAnswer,
   isInvalidBuilderFieldValue,
   isUserQuestionText,
   tryResolveBuilderApproval,
@@ -28,18 +29,25 @@ Would you like me to add these to the avatar?`;
 
   it("rejects questions as field values", () => {
     expect(isUserQuestionText("What should the description say?")).toBe(true);
+    expect(isHelpSeekingAnswer("I don't know")).toBe(true);
+    expect(isHelpSeekingAnswer("not sure")).toBe(true);
+    expect(isHelpSeekingAnswer("give me options")).toBe(true);
     expect(
       isInvalidBuilderFieldValue(
         "What should the description say?",
         "What should the description say?",
       ),
     ).toBe(true);
+    expect(isInvalidBuilderFieldValue("I don't know", "I don't know")).toBe(true);
   });
 
   it("detects approval phrases", () => {
     expect(isBuilderApprovalPhrase("These are good.")).toBe(true);
     expect(isBuilderApprovalPhrase("looks good")).toBe(true);
     expect(isBuilderApprovalPhrase("yes please")).toBe(true);
+    expect(isBuilderApprovalPhrase("use this")).toBe(true);
+    expect(isBuilderApprovalPhrase("save that")).toBe(true);
+    expect(isBuilderApprovalPhrase("I like that one")).toBe(true);
   });
 
   it("detects add-to-avatar commands as approval not content", () => {

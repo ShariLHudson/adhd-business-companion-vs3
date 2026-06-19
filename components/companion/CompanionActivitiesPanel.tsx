@@ -4,8 +4,6 @@ import { useState } from "react";
 import { logMomentum } from "@/lib/companionStore";
 import {
   ACTIVITY_CATEGORIES,
-  activityCategoryDropdownOptions,
-  activitiesForCategory,
   getActivityById,
   type ActivityCategoryId,
   type CompanionActivity,
@@ -24,19 +22,19 @@ import {
   crossWorkspaceBesideLine,
   crossWorkspaceContextMessage,
 } from "@/lib/crossWorkspaceSuggestion";
-import {
-  CATEGORY_PICKER_EMPTY_LIST_HINT,
-  CATEGORY_PICKER_HINT,
-  NO_CATEGORY,
-} from "@/lib/categoryRevealUx";
-import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
+import { NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { DecisionCompassPanel } from "@/components/companion/DecisionCompassPanel";
 import { CrossWorkspaceSuggestionCard } from "@/components/companion/CrossWorkspaceSuggestionCard";
+import type { DecisionCompassPrefill } from "@/lib/decisionCompass";
+import type { PersistedDecisionCompassSession } from "@/lib/decisionCompassSessionStore";
 import type { AppSection } from "@/lib/companionUi";
 import {
   HELP_ME_RIGHT_NOW_MENU,
   type HelpMeRightNowMenuItem,
 } from "@/lib/focusToolDefinitions";
+import { guidedExerciseMenu } from "@/lib/guidedExercises";
+
+export type ActivityPanelVariant = "help-now" | "guided";
 
 export type ActivityPhase = "browse" | "active" | "stopped" | "complete";
 
@@ -82,22 +80,35 @@ function shouldShowLinkedSuggestion(
 
 export function CompanionActivitiesPanel({
   onOpenBeside,
-  onOpenGames,
   onQuickTool,
+  onOpenDecisionCompass,
   onClose,
   embedded = false,
+  variant = "help-now",
   session: controlledSession,
   onSessionChange,
+  decisionCompassPrefill = null,
+  decisionCompassSession = null,
+  onDecisionCompassSessionChange,
+  onDecisionCompassComplete,
 }: {
   onOpenBeside?: (section: AppSection, payload: OpenBesidePayload) => void;
-  /** Open Momentum Games (playful resets). */
-  onOpenGames?: () => void;
   /** Featured Help Me Right Now menu — open section, activity, or chat. */
   onQuickTool?: (item: HelpMeRightNowMenuItem) => void;
+  /** Opens ADHD Decision Compass split workspace (not the legacy step exercise). */
+  onOpenDecisionCompass?: () => void;
   onClose?: () => void;
   embedded?: boolean;
+  /** Relief tools vs structured guided exercises. */
+  variant?: ActivityPanelVariant;
   session?: ActivitySessionState;
   onSessionChange?: (session: ActivitySessionState) => void;
+  decisionCompassPrefill?: DecisionCompassPrefill | null;
+  decisionCompassSession?: PersistedDecisionCompassSession | null;
+  onDecisionCompassSessionChange?: (
+    snapshot: PersistedDecisionCompassSession,
+  ) => void;
+  onDecisionCompassComplete?: () => void;
 }) {
   const [internalSession, setInternalSession] =
     useState<ActivitySessionState>(EMPTY_ACTIVITY_SESSION);
@@ -114,14 +125,13 @@ export function CompanionActivitiesPanel({
       ? getActivityById(session.activityId) ?? null
       : null;
 
-  const categoryOptions = activityCategoryDropdownOptions();
-  const selectedCategory = ACTIVITY_CATEGORIES.find(
-    (c) => c.id === session.categoryId,
-  );
-  const visible =
-    session.categoryId === NO_CATEGORY
-      ? []
-      : activitiesForCategory(session.categoryId);
+  const guidedExercises = guidedExerciseMenu();
+  const browseTitle =
+    variant === "guided" ? "Guided Exercises" : "Help Me Right Now";
+  const browseSubtitle =
+    variant === "guided"
+      ? "Structured thinking and self-reflection — go deeper when you have a few minutes."
+      : "Immediate relief and momentum — pick what matches right now.";
 
   function start(a: CompanionActivity) {
     const firstField = stepField(a.steps[0]);
@@ -138,14 +148,22 @@ export function CompanionActivitiesPanel({
     });
   }
 
+  function launchGuidedExercise(activityId: string) {
+    if (activityId === "decision-compass") {
+      onOpenDecisionCompass?.();
+      return;
+    }
+    const a = getActivityById(activityId);
+    if (a) start(a);
+  }
+
   function launchQuickTool(item: HelpMeRightNowMenuItem) {
     if (onQuickTool) {
       onQuickTool(item);
       return;
     }
     if (item.kind === "activity" && item.activityId) {
-      const a = getActivityById(item.activityId);
-      if (a) start(a);
+      launchGuidedExercise(item.activityId);
     }
   }
 
@@ -203,8 +221,12 @@ export function CompanionActivitiesPanel({
   }
 
   const shellClass = embedded
-    ? "flex h-full min-h-0 flex-col overflow-hidden px-4 py-5"
-    : "companion-fade-in mx-auto flex h-full max-w-lg flex-col px-6 py-8";
+    ? "flex h-full min-h-0 w-full max-w-xl flex-col overflow-hidden px-4 py-5"
+    : "companion-fade-in flex h-full min-h-0 w-full max-w-xl flex-col px-6 py-8";
+
+  const browseShellClass = embedded
+    ? "flex h-full min-h-0 w-full max-w-xl flex-col overflow-hidden"
+    : "companion-fade-in mx-auto flex h-full min-h-0 w-full max-w-xl flex-col px-6 py-8";
 
   if (session.phase === "stopped") {
     return (
@@ -233,7 +255,7 @@ export function CompanionActivitiesPanel({
             onClick={backToBrowse}
             className="rounded-xl bg-[#1e4f4f] px-6 py-2.5 text-sm font-semibold text-white"
           >
-            Back to activities
+            Back to {variant === "guided" ? "exercises" : "activities"}
           </button>
         </div>
       </div>
@@ -270,6 +292,10 @@ export function CompanionActivitiesPanel({
       return (
         <div className={shellClass}>
           <DecisionCompassPanel
+            initialPrefill={decisionCompassPrefill}
+            restoredSession={decisionCompassSession}
+            onSessionChange={onDecisionCompassSessionChange}
+            onComplete={onDecisionCompassComplete}
             onStop={stop}
             onClose={finish}
           />
@@ -389,147 +415,86 @@ export function CompanionActivitiesPanel({
   }
 
   return (
-    <div className={shellClass}>
-      <div className="flex items-start justify-between gap-3">
-        <header className="min-w-0 text-left">
-          <h1 className="text-2xl font-semibold text-[#1f1c19]">
-            Help Me Right Now
-          </h1>
-          <p className="mt-2 text-base leading-relaxed text-[#6b635a]">
-            Each tool solves a different problem — pick the one that matches
-            right now.
-          </p>
-        </header>
-        {onClose && !embedded ? (
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label="Close"
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-[#6b635a] hover:bg-[#1e4f4f]/10"
-          >
-            ✕
-          </button>
-        ) : null}
-      </div>
-
-      {onOpenGames ? (
-        <button
-          type="button"
-          onClick={onOpenGames}
-          className="mt-5 flex w-full items-start gap-3 rounded-2xl border border-[#1e4f4f]/25 bg-gradient-to-br from-[#f0f5f5] to-white p-4 text-left transition-colors hover:border-[#1e4f4f]/45"
-        >
-          <span className="text-3xl" aria-hidden="true">
-            🎮
-          </span>
-          <span className="min-w-0 flex-1">
-            <span className="block text-base font-semibold text-[#1f1c19]">
-              Momentum Games
-            </span>
-            <span className="mt-0.5 block text-sm leading-relaxed text-[#6b635a]">
-              Fifteen playful games — pattern, memory, speed, and more. A light
-              break that isn&apos;t another list or brain dump.
-            </span>
-          </span>
-          <span className="shrink-0 self-center rounded-xl bg-[#1e4f4f] px-3 py-2 text-sm font-semibold text-white">
-            Play
-          </span>
-        </button>
-      ) : null}
-
-      <div className="mt-5">
-        <p className="text-sm font-bold uppercase tracking-wide text-[#7c7468]">
-          Quick picks
-        </p>
-        <ul className="mt-2 flex flex-col gap-2">
-          {HELP_ME_RIGHT_NOW_MENU.map((item) => (
-            <li key={item.id}>
-              <button
-                type="button"
-                onClick={() => launchQuickTool(item)}
-                className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/80 px-3.5 py-3 text-left transition-colors hover:border-[#1e4f4f]/40 hover:bg-white"
-              >
-                <span aria-hidden="true" className="text-xl">
-                  {item.emoji}
-                </span>
-                <span className="min-w-0">
-                  <span className="block text-base font-semibold text-[#1f1c19]">
-                    {item.title}
-                  </span>
-                  <span className="mt-0.5 block text-sm text-[#6b635a]">
-                    {item.purpose}
-                  </span>
-                </span>
-              </button>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mt-6">
-        <p className="text-sm font-bold uppercase tracking-wide text-[#7c7468]">
-          Browse by category
-        </p>
-      </div>
-
-      <div className="mt-3">
-        <CategoryPickerSelect
-          label="What kind of help do you need?"
-          value={session.categoryId}
-          onChange={(categoryId) => patchSession({ categoryId })}
-          options={categoryOptions}
-          placeholder="Select…"
-        />
-      </div>
-
-      {selectedCategory ? (
-        <p className="mt-3 text-sm text-[#6b635a]">
-          {selectedCategory.description}
-        </p>
-      ) : null}
-
-      <ul className="mt-5 flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto pb-4">
-        {session.categoryId === NO_CATEGORY ? (
-          <li className="rounded-xl border border-dashed border-[#e7dfd4] px-4 py-6 text-center text-sm text-[#6b635a]">
-            {CATEGORY_PICKER_EMPTY_LIST_HINT}
-          </li>
-        ) : (
-          visible.map((a) => (
-            <li key={a.id}>
-              <ActivityCard activity={a} onStart={start} />
-            </li>
-          ))
-        )}
-      </ul>
-    </div>
-  );
-}
-
-function ActivityCard({
-  activity,
-  onStart,
-}: {
-  activity: CompanionActivity;
-  onStart: (a: CompanionActivity) => void;
-}) {
-  return (
-    <div className="rounded-2xl border border-[#e7dfd4] bg-white p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0 text-left">
-          <h3 className="font-semibold text-[#1f1c19]">{activity.title}</h3>
-          <p className="mt-1 text-sm leading-relaxed text-[#6b635a]">
-            {activity.helpsWith}
-          </p>
-          <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-[#9a8f82]">
-            {activity.timeLabel}
-          </p>
+    <div
+      className={
+        embedded
+          ? shellClass
+          : "companion-fade-in flex h-full min-h-0 w-full justify-center overflow-y-auto px-4 py-6 sm:px-6"
+      }
+    >
+      <div className={embedded ? "min-h-0 flex-1" : browseShellClass}>
+        <div className="flex items-start justify-between gap-3">
+          <header className="min-w-0 text-left">
+            <h1 className="text-2xl font-semibold text-[#1f1c19]">
+              {browseTitle}
+            </h1>
+            <p className="mt-2 text-base leading-relaxed text-[#6b635a]">
+              {browseSubtitle}
+            </p>
+          </header>
+          {onClose && !embedded ? (
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-xl text-[#6b635a] hover:bg-[#1e4f4f]/10"
+            >
+              ✕
+            </button>
+          ) : null}
         </div>
-        <button
-          type="button"
-          onClick={() => onStart(activity)}
-          className="shrink-0 rounded-xl bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
-        >
-          Start
-        </button>
+
+        <ul className="mt-6 flex flex-col gap-2">
+          {variant === "guided"
+            ? guidedExercises.map((item) => (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => launchGuidedExercise(item.activityId)}
+                    className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/85 px-3.5 py-3 text-left shadow-sm transition-colors hover:border-[#1e4f4f]/35 hover:bg-white"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f5f1ea] text-lg"
+                    >
+                      {item.emoji}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-base font-semibold text-[#1f1c19]">
+                        {item.title}
+                      </span>
+                      <span className="mt-0.5 block text-sm leading-snug text-[#6b635a]">
+                        {item.purpose}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              ))
+            : HELP_ME_RIGHT_NOW_MENU.map((item) => (
+                <li key={item.id}>
+                  <button
+                    type="button"
+                    onClick={() => launchQuickTool(item)}
+                    className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/85 px-3.5 py-3 text-left shadow-sm transition-colors hover:border-[#1e4f4f]/35 hover:bg-white"
+                  >
+                    <span
+                      aria-hidden="true"
+                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f5f1ea] text-lg"
+                    >
+                      {item.emoji}
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-base font-semibold text-[#1f1c19]">
+                        {item.title}
+                      </span>
+                      <span className="mt-0.5 block text-sm leading-snug text-[#6b635a]">
+                        {item.purpose}
+                      </span>
+                    </span>
+                  </button>
+                </li>
+              ))}
+        </ul>
       </div>
     </div>
   );

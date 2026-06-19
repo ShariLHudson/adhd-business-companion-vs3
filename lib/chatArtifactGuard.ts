@@ -106,8 +106,8 @@ export function buildChatArtifactHandoffMessage(
   title: string,
 ): string {
   return (
-    `Your **${itemType}** “${title}” is in **Create** beside us now — that's your workspace. ` +
-    `Edit, **Save**, **Create Google Doc**, **Print**, or **Add to Project** from the header above the draft.`
+    `Your ${itemType} "${title}" is in Create beside us now — that's your workspace. ` +
+    `Edit, Save, Create Google Doc, Print, or Add to Project from the header above the draft.`
   );
 }
 

@@ -42,7 +42,7 @@ describe("resolveIntent — create routing", () => {
   it("routes 'draft a funnel' to make", () => {
     const r = resolveIntent("draft a funnel");
     expect(r.action).toBe("make");
-    expect(r.type).toBe("Funnel");
+    expect(r.type).toBe("Sales Funnel");
   });
 
   it("stays in chat for how-to questions", () => {

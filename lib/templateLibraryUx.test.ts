@@ -1,6 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { NO_CATEGORY } from "./categoryRevealUx";
-import { filterTemplates } from "./templateLibraryUx";
+import {
+  filterTemplates,
+  sortedTemplateDropdownOptions,
+  templateDropdownLabel,
+  templatePickerCategoryLabel,
+} from "./templateLibraryUx";
 import type { TemplateItem } from "./companionStore";
 
 const sample: TemplateItem[] = [
@@ -61,5 +66,53 @@ describe("filterTemplates", () => {
       category: "emails",
     });
     expect(out).toHaveLength(1);
+  });
+});
+
+describe("template picker dropdown", () => {
+  it("formats labels as Template — Category", () => {
+    expect(templateDropdownLabel(sample[0]!)).toBe("Welcome Email — Email");
+    expect(templatePickerCategoryLabel("execution")).toBe(
+      "ADHD / Personal Execution",
+    );
+    expect(templatePickerCategoryLabel("systems")).toBe("Operations");
+  });
+
+  it("sorts options alphabetically by full label", () => {
+    const items: TemplateItem[] = [
+      {
+        id: "a",
+        title: "Weekly Review",
+        body: "",
+        category: "execution",
+        status: "saved",
+        createdAt: "",
+        updatedAt: "",
+      },
+      {
+        id: "b",
+        title: "Follow-Up Email",
+        body: "",
+        category: "emails",
+        status: "saved",
+        createdAt: "",
+        updatedAt: "",
+      },
+      {
+        id: "c",
+        title: "Launch Checklist",
+        body: "",
+        category: "strategy",
+        status: "saved",
+        createdAt: "",
+        updatedAt: "",
+      },
+    ];
+    const labels = sortedTemplateDropdownOptions(items).map(templateDropdownLabel);
+    expect(labels).toEqual([
+      "Follow-Up Email — Email",
+      "Launch Checklist — Strategy",
+      "Weekly Review — ADHD / Personal Execution",
+    ]);
   });
 });

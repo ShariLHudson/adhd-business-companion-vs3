@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { evaluateCompanionTurn } from "./companionGovernor";
 import { extractArtifactFromChat, resolveCurrentArtifact } from "./createInitialization";
 import {
   shouldHandoffChatArtifactToWorkspace,
@@ -15,6 +16,7 @@ import {
   isContentBrainstorming,
   shouldStayConversationalOnly,
 } from "./messageClassification";
+import { resolveIntent } from "./intentStabilizer";
 
 const FB_BRAINSTORM =
   "I need some ideas to create a FB social media post but I don't have any ideas.";
@@ -142,5 +144,17 @@ What part of your day would you love to see more of from me?`,
     expect(
       shouldBlockDraftPanelFromChat(fact, "", { liveCreateOpen: true }),
     ).toBe(false);
+  });
+
+  it("deciding conversation does not grant draft permission", () => {
+    expect(userGrantedDraftPermission("I need to make a decision")).toBe(false);
+    expect(
+      evaluateCompanionTurn({
+        userText: "I need to make a decision",
+        workspacePanel: null,
+        workspaceSnap: { panel: null, activeSection: "home", revealSeq: 0 },
+        resolvedIntent: resolveIntent("I need to make a decision"),
+      }).outcome,
+    ).toBe("chat_only");
   });
 });

@@ -19,7 +19,10 @@ import {
   isExplicitWorkspaceSwitchRequest,
 } from "./workspaceContextLock";
 import type { WorkspaceOpenSnapshot } from "./workspaceExecution";
-import { isWorkspaceBesideChat } from "./workspaceExecution";
+import {
+  isAnyWorkspaceOpen,
+  isWorkspaceBesideChat,
+} from "./workspaceExecution";
 
 export type TurnArbiterDecision =
   | "active_workflow"
@@ -204,7 +207,6 @@ export function arbitrateCompanionTurn(
 ): TurnArbitration {
   const userText = input.userText.trim();
   const panel = input.workspacePanel;
-  const beside = isWorkspaceBesideChat(input.workspaceSnap);
   const locked = isWorkspaceLocked(panel, input.workspaceSnap, userText);
 
   const base: TurnArbitration = {
@@ -212,7 +214,7 @@ export function arbitrateCompanionTurn(
     activeWorkflow: null,
     workspacePanel: panel,
     workspaceLocked: locked,
-    workspaceBesideChat: beside && Boolean(panel),
+    workspaceBesideChat: isAnyWorkspaceOpen(input.workspaceSnap),
     ...blockAllAuto(),
   };
 
@@ -372,6 +374,10 @@ export function arbitrationHintForChat(arbitration: TurnArbitration): string | u
 
 export function coGuideActiveFromArbitration(
   arbitration: TurnArbitration,
+  snap?: WorkspaceOpenSnapshot,
 ): boolean {
+  if (snap) {
+    return isAnyWorkspaceOpen(snap);
+  }
   return arbitration.workspaceBesideChat;
 }

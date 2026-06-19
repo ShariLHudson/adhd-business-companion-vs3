@@ -9,6 +9,7 @@
 // first, then offer workspace — never let emotional tools erase concrete work.
 
 import { audioSuggestionLine, detectAudioRequest } from "./audioSuggestions";
+import { shouldBlockStressAutoToolRouting } from "./stressRouting";
 import { matchCatalogFromText } from "./createCatalog";
 import type { AppSection } from "./companionUi";
 import { multiItemWorkspaceOfferLine } from "./multiItemWorkspace";
@@ -20,6 +21,7 @@ import {
 
 export const WORKSPACE_SECTIONS: AppSection[] = [
   "projects",
+  "my-work",
   "content-generator",
   "google-workspace",
   "templates-library",
@@ -32,12 +34,16 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
   "snippets",
   "business-profile",
   "client-avatars",
+  "decision-compass",
+  "today",
+  "wins-this-week",
 ];
 
 export const STANDALONE_SECTIONS: AppSection[] = [
   "breathe",
   "focus-audio",
   "activities",
+  "guided-exercises",
   "spin-wheel",
   "focus-timer",
   "energy",
@@ -49,6 +55,7 @@ export function supportsWorkspace(section: AppSection): boolean {
 
 export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   projects: "Projects",
+  "my-work": "My Work",
   "content-generator": "Create",
   "google-workspace": "Google Workspace",
   "templates-library": "Templates",
@@ -61,8 +68,10 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   snippets: "Snippets",
   "business-profile": "Business Profile",
   "client-avatars": "Client Avatar",
+  "decision-compass": "Decision Compass",
+  today: "Today",
+  "wins-this-week": "Wins This Week",
   "focus-audio": "Focus Audio",
-  activities: "Help Me Right Now",
 };
 
 export function workspaceTitle(section: AppSection): string {
@@ -71,6 +80,7 @@ export function workspaceTitle(section: AppSection): string {
 
 export const WORKSPACE_EMOJI: Partial<Record<AppSection, string>> = {
   projects: "📁",
+  "my-work": "🏠",
   "content-generator": "✨",
   "google-workspace": "📝",
   "templates-library": "📚",
@@ -82,6 +92,9 @@ export const WORKSPACE_EMOJI: Partial<Record<AppSection, string>> = {
   snippets: "📝",
   "business-profile": "💼",
   "client-avatars": "👤",
+  "decision-compass": "🧭",
+  today: "📅",
+  "wins-this-week": "🌟",
   "focus-audio": "🎧",
 };
 
@@ -269,6 +282,7 @@ function buildOfferLine(target: WorkspaceTarget, mixed: boolean): string {
 }
 
 export function detectAudioIntent(text: string): WorkspaceOffer | null {
+  if (shouldBlockStressAutoToolRouting(text)) return null;
   const { isAudio, categoryId } = detectAudioRequest(text);
   if (!isAudio) return null;
   return {

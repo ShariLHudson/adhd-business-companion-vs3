@@ -157,17 +157,26 @@ export function formatActiveAvatarsSummary(ids?: string[]): {
   );
   if (labels.length === 0) {
     return {
-      countLine: "Using 1 Avatar",
-      detailLine: ACTIVE_AVATARS[1]!.label,
+      countLine: "1 avatar active",
+      detailLine: "Shapes voice and examples across the app.",
     };
   }
   if (labels.length === 1) {
-    return { countLine: "Using 1 Avatar", detailLine: labels[0]! };
+    return {
+      countLine: "1 avatar active",
+      detailLine: labels[0]!,
+    };
   }
   return {
-    countLine: `Using ${labels.length} Avatars`,
-    detailLine: labels.join(" + "),
+    countLine: `${labels.length} avatars active`,
+    detailLine: "Combined for Create, chat, and suggestions.",
   };
+}
+
+export function getActiveAvatarsForIds(ids: string[]): ActiveAvatar[] {
+  const idSet = new Set(ids);
+  const active = ACTIVE_AVATARS.filter((avatar) => idSet.has(avatar.id));
+  return active.length ? active : [ACTIVE_AVATARS[1]!];
 }
 
 export function activeCompanionsContextForAI(): string | undefined {

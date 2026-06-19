@@ -6,6 +6,7 @@ import type { AppSection } from "@/lib/companionUi";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { discoveryProgressSummary } from "@/lib/companionDiscovery";
 import { GettingToKnowYouPanel } from "@/components/companion/GettingToKnowYouPanel";
+import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
 const SUPPORT_EMAIL = "info@visualsparkstudios.com";
 const SUPPORT_PHONE_DISPLAY = "515-954-9177";
@@ -130,7 +131,7 @@ export function ProfilePanel({
   const discoveryLabel = discoveryProgressSummary().label;
 
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+    <div className={workspacePanelShellClass({ width: "narrow" })}>
       <p className="text-2xl font-semibold text-[#1f1c19]">Profile</p>
       <p className="mt-1 text-sm text-[#6b635a]">
         Account, business context, and preferences — one place.

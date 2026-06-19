@@ -43,24 +43,23 @@ describe("activeWorkspaceAutoApply", () => {
     ).toBe(false);
   });
 
-  it("hint tells model not to ask permission", () => {
+  it("hint tells model to offer approval before applying lists", () => {
     expect(activeWorkspaceAutoApplyHint("client-avatars")).toMatch(
-      /NEVER ask/i,
+      /Would you like me to add/i,
     );
     expect(activeWorkspaceAutoApplyHint("content-generator")).toMatch(
       /auto-apply|automatically/i,
     );
   });
 
-  it("infers client avatar fills from audience research", () => {
+  it("does not silently infer client avatar fills without approval", () => {
     const ctx = buildWorkspaceContext("client-avatars", null)!;
     const fill = inferWorkspaceChatFill(
       ctx,
       "Women 40-55 who feel stuck marketing their coaching business.",
       "Tell me about the person you help most often.",
     );
-    expect(fill?.field).toBe("avatar-who");
-    expect(fill?.value).toContain("coaching");
+    expect(fill).toBeNull();
   });
 
   it("does not treat how-to as auto-apply workspace", () => {

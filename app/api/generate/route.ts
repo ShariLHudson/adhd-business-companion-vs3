@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cleanText } from "@/lib/contentFormat";
+import { plainLanguageFormattingHintForPrompt } from "@/lib/plainLanguageFormatting";
 import { resolveOpenAiApiKey } from "@/lib/openai/resolveOpenAiApiKey";
 
 // Generic content generator — create any content type (incl. user-created
@@ -27,12 +28,14 @@ export async function POST(request: NextRequest) {
     const context = (body.context as string)?.trim() || "";
     const contentLanguageHint = (body.contentLanguageHint as string)?.trim() || "";
 
-    const system = `You create content for an ADHD founder. Produce a ready-to-use "${type}" in a ${tone} tone. If the brief is a template or scaffold, fill it in with real, usable content.
+    const system = `${plainLanguageFormattingHintForPrompt()}
+
+You create content for an ADHD founder. Produce a ready-to-use "${type}" in a ${tone} tone. If the brief is a template or scaffold, fill it in with real, usable content.
 
 FORMAT IT EXACTLY AS IT SHOULD LOOK WHEN PASTED INTO ITS DESTINATION (a social platform, an email client, a doc). That means:
 - Real line breaks and blank lines between sections — never run everything into one paragraph.
 - Put each list item / step / tip on its OWN line.
-- Do NOT use any markdown symbols — no **, no *, no #, no backticks. Destinations show them literally.
+- Do NOT use any markdown symbols — no **, no *, no #, no ---, no backticks. Destinations show them literally.
 - It should be copy-paste-ready as-is.
 Return ONLY the content, nothing else.${
       contentLanguageHint ? `\n\n${contentLanguageHint}` : ""

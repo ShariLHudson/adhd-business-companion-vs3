@@ -16,6 +16,7 @@ import {
 import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
+import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
 const KINDS = sortedSnippetKinds();
 
@@ -40,8 +41,10 @@ const EMPTY: Draft = {
 
 export function SnippetsLibrary({
   onBuildWithShari,
+  onBack,
 }: {
   onBuildWithShari?: (input: CreationWorkspaceInput) => void;
+  onBack?: () => void;
 }) {
   const [items, setItems] = useState<Snippet[]>([]);
   const [filter, setFilter] = useState<SnippetKind | typeof NO_CATEGORY>(
@@ -138,7 +141,7 @@ export function SnippetsLibrary({
   // ---- Editor -------------------------------------------------------------
   if (draft) {
     return (
-      <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+      <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
         <p className="text-2xl font-semibold text-[#1f1c19]">
           {draft.id ? "Edit snippet" : "New snippet"}
         </p>
@@ -237,7 +240,7 @@ export function SnippetsLibrary({
   const viewing = viewId ? items.find((s) => s.id === viewId) : null;
   if (viewing) {
     return (
-      <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+      <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
         <button
           type="button"
           onClick={() => setViewId(null)}
@@ -360,16 +363,28 @@ export function SnippetsLibrary({
 
   // ---- List ---------------------------------------------------------------
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+    <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
       <div className="flex items-center justify-between gap-3">
         <p className="text-2xl font-semibold text-[#1f1c19]">🧩 Snippets</p>
-        <button
-          type="button"
-          onClick={() => setDraft({ ...EMPTY })}
-          className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
-        >
-          + New
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setDraft({ ...EMPTY })}
+            className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+          >
+            + New
+          </button>
+          {onBack ? (
+            <button
+              type="button"
+              onClick={onBack}
+              aria-label="Close"
+              className="flex h-10 w-10 items-center justify-center rounded-full text-xl text-[#6b635a] hover:bg-[#1e4f4f]/10"
+            >
+              ✕
+            </button>
+          ) : null}
+        </div>
       </div>
       <p className="mt-1 text-base text-[#6b635a]">
         Small reusable building blocks — drop them into emails, posts, or

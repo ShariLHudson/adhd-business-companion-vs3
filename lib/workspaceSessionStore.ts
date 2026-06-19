@@ -10,11 +10,14 @@ export type PersistedWorkspaceSnapshot = {
   workflowType: WorkspaceSession["workflowId"];
   currentStep: WorkspaceSession["currentStepId"];
   savedStatus: WorkspaceSession["savedStatus"];
+  /** ISO timestamp — set on save only, never fabricated on read. */
+  lastTouchedAt?: string;
   session: WorkspaceSession;
 };
 
 export function toPersistedSnapshot(
   session: WorkspaceSession,
+  lastTouchedAt: string,
 ): PersistedWorkspaceSnapshot {
   return {
     projectId: session.projectId,
@@ -22,31 +25,50 @@ export function toPersistedSnapshot(
     workflowType: session.workflowId,
     currentStep: session.currentStepId,
     savedStatus: session.savedStatus,
+    lastTouchedAt,
     session,
   };
 }
 
-export function loadWorkspaceSession(): WorkspaceSession | null {
+function readPersistedSnapshot(): PersistedWorkspaceSnapshot | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as PersistedWorkspaceSnapshot;
-    const s = parsed.session ?? parsed;
-    if (!s?.workflowId || !s?.currentStepId) return null;
-    return normalizeSession(s as WorkspaceSession);
+    if (!parsed?.session?.workflowId || !parsed.session?.currentStepId) {
+      return null;
+    }
+    return parsed;
   } catch {
     return null;
   }
+}
+
+export function loadWorkspaceSessionMeta(): {
+  session: WorkspaceSession;
+  lastTouchedAt: string | null;
+} | null {
+  const parsed = readPersistedSnapshot();
+  if (!parsed) return null;
+  return {
+    session: normalizeSession(parsed.session),
+    lastTouchedAt: parsed.lastTouchedAt ?? null,
+  };
+}
+
+export function loadWorkspaceSession(): WorkspaceSession | null {
+  return loadWorkspaceSessionMeta()?.session ?? null;
 }
 
 export function saveWorkspaceSession(session: WorkspaceSession): void {
   if (typeof window === "undefined") return;
   try {
     const normalized = normalizeSession(session);
+    const lastTouchedAt = new Date().toISOString();
     localStorage.setItem(
       STORAGE_KEY,
-      JSON.stringify(toPersistedSnapshot(normalized)),
+      JSON.stringify(toPersistedSnapshot(normalized, lastTouchedAt)),
     );
   } catch {
     /* noop */

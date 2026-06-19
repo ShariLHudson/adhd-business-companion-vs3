@@ -7,6 +7,7 @@ import { hasCreateIntent } from "./intentStabilizer";
 import {
   classifyConversationalMode,
   isContentBrainstorming,
+  isDecidingConversation,
   isExplicitCreationRequest,
   isExplicitProjectRequest,
   shouldBlockArtifactPipeline,
@@ -14,6 +15,10 @@ import {
 } from "./messageClassification";
 import { isExplicitWorkspaceOpenRequest } from "./conversationGating";
 import { shariOfferedToApplyDraft } from "./liveCreateWorkspace";
+import {
+  shariOfferedCreateHandoff,
+  userAcceptedCreateHandoff,
+} from "./chatCreateHandoff";
 import {
   isAutoApplyWorkspaceSection,
   shouldBlockAutoApplyFromChat,
@@ -53,6 +58,7 @@ export function userGrantedDraftPermission(
 ): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (isDecidingConversation(t)) return false;
   if (isExplicitCreationRequest(t)) return true;
   if (isExplicitProjectRequest(t)) return true;
   if (isExplicitWorkspaceOpenRequest(t)) return true;
@@ -61,6 +67,12 @@ export function userGrantedDraftPermission(
     return true;
   }
   if (lastAssistantText && shariOfferedToApplyDraft(lastAssistantText) && userAcceptedDraftOffer(t)) {
+    return true;
+  }
+  if (lastAssistantText && shariOfferedCreateHandoff(lastAssistantText) && userAcceptedCreateHandoff(t, lastAssistantText)) {
+    return true;
+  }
+  if (userAcceptedCreateHandoff(t, lastAssistantText)) {
     return true;
   }
   return false;

@@ -2,6 +2,21 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
+  FinishTheSentence,
+  FirstStepFinder,
+  HiddenObjects,
+  OppositeThinking,
+  RandomActionGenerator,
+  RandomIdeaGenerator,
+  RandomTrivia,
+  StoryStarter,
+  ThisOrThatFun,
+  TinyWinChallenge,
+  TwoTruthsLie,
+  WhatIfChallenge,
+  WouldYouRather,
+} from "./momentumPromptGames";
+import {
   GameFrame,
   SHAPES,
   SWATCHES,
@@ -535,6 +550,32 @@ export function MomentumGameRunner({ gameId, onDone }: { gameId: string; onDone:
       return <ThisOrThat onDone={onDone} />;
     case "find-duplicate":
       return <FindDuplicate onDone={onDone} />;
+    case "first-step-finder":
+      return <FirstStepFinder onDone={onDone} />;
+    case "random-action-generator":
+      return <RandomActionGenerator onDone={onDone} />;
+    case "tiny-win-challenge":
+      return <TinyWinChallenge onDone={onDone} />;
+    case "opposite-thinking":
+      return <OppositeThinking onDone={onDone} />;
+    case "random-idea-generator":
+      return <RandomIdeaGenerator onDone={onDone} />;
+    case "story-starter":
+      return <StoryStarter onDone={onDone} />;
+    case "what-if-challenge":
+      return <WhatIfChallenge onDone={onDone} />;
+    case "hidden-objects":
+      return <HiddenObjects onDone={onDone} />;
+    case "would-you-rather":
+      return <WouldYouRather onDone={onDone} />;
+    case "two-truths-lie":
+      return <TwoTruthsLie onDone={onDone} />;
+    case "finish-the-sentence":
+      return <FinishTheSentence onDone={onDone} />;
+    case "random-trivia":
+      return <RandomTrivia onDone={onDone} />;
+    case "this-or-that-fun":
+      return <ThisOrThatFun onDone={onDone} />;
     default:
       return <PatternMatch onDone={onDone} />;
   }

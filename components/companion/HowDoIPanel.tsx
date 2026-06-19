@@ -46,12 +46,14 @@ function HowDoIDetail({
   entry,
   onBack,
   onOpen,
+  onOpenActivity,
   onOpenSettings,
   onAsk,
 }: {
   entry: HowDoIEntry;
   onBack: () => void;
   onOpen?: (section: AppSection) => void;
+  onOpenActivity?: (activityId: string) => void;
   onOpenSettings?: (section: SettingsSection) => void;
   onAsk?: (prompt: string) => void;
 }) {
@@ -132,6 +134,15 @@ function HowDoIDetail({
               {entry.openLabel}
             </button>
           ) : null}
+          {entry.openActivityId && onOpenActivity ? (
+            <button
+              type="button"
+              onClick={() => onOpenActivity(entry.openActivityId!)}
+              className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+            >
+              {entry.openLabel}
+            </button>
+          ) : null}
           {entry.openSettingsSection && onOpenSettings ? (
             <button
               type="button"
@@ -191,11 +202,13 @@ function TopicEntryButton({
 
 export function HowDoIPanel({
   onOpen,
+  onOpenActivity,
   onOpenSettings,
   onAsk,
   registerBack,
 }: {
   onOpen?: (section: AppSection) => void;
+  onOpenActivity?: (activityId: string) => void;
   onOpenSettings?: (section: SettingsSection) => void;
   onAsk?: (prompt: string) => void;
   registerBack?: (fn: (() => boolean) | null) => void;
@@ -249,6 +262,7 @@ export function HowDoIPanel({
           entry={selected}
           onBack={() => setSelected(null)}
           onOpen={onOpen}
+          onOpenActivity={onOpenActivity}
           onOpenSettings={onOpenSettings}
           onAsk={onAsk}
         />

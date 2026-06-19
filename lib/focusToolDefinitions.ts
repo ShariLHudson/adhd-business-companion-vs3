@@ -132,21 +132,20 @@ export type HelpMeRightNowMenuId =
   | "clear-my-mind"
   | "brain-parking-lot"
   | "safe-for-today"
-  | "spin-the-wheel"
-  | "focus-session"
-  | "talk-to-shari";
+  | "decision-compass"
+  | "focus-session";
 
 export type HelpMeRightNowMenuItem = {
   id: HelpMeRightNowMenuId;
   title: string;
   purpose: string;
   emoji: string;
-  kind: "section" | "activity" | "chat";
+  kind: "section" | "activity";
   section?: AppSection;
   activityId?: string;
 };
 
-/** Featured Help Me Right Now menu — each row solves a different problem. */
+/** Immediate relief — not games, spin, or deep guided exercises. */
 export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
   {
     id: "adjust-my-day",
@@ -157,6 +156,14 @@ export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
     section: "energy",
   },
   {
+    id: "brain-parking-lot",
+    title: "Brain Parking Lot",
+    purpose: "Save ideas while staying focused",
+    emoji: "📌",
+    kind: "activity",
+    activityId: "brain-parking-lot",
+  },
+  {
     id: "clear-my-mind",
     title: "Clear My Mind",
     purpose: "Reduce mental clutter",
@@ -165,28 +172,12 @@ export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
     section: "brain-dump",
   },
   {
-    id: "brain-parking-lot",
-    title: "Brain Parking Lot",
-    purpose: "Save ideas while staying focused",
-    emoji: "🅿️",
-    kind: "activity",
-    activityId: "brain-parking-lot",
-  },
-  {
     id: "safe-for-today",
     title: "Safe For Today",
-    purpose: "Release pressure and postpone guilt",
-    emoji: "🛡️",
+    purpose: "Release pressure",
+    emoji: "🛡",
     kind: "activity",
     activityId: "safe-for-today",
-  },
-  {
-    id: "spin-the-wheel",
-    title: "Spin The Wheel",
-    purpose: "Pick a starting point",
-    emoji: "🎡",
-    kind: "section",
-    section: "spin-wheel",
   },
   {
     id: "focus-session",
@@ -197,11 +188,12 @@ export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
     section: "focus-timer",
   },
   {
-    id: "talk-to-shari",
-    title: "Talk To Shari",
-    purpose: "Coaching & support",
-    emoji: "💬",
-    kind: "chat",
+    id: "decision-compass",
+    title: "ADHD Decision Compass",
+    purpose: "Work through a decision with visual thinking beside chat",
+    emoji: "🧭",
+    kind: "activity",
+    activityId: "decision-compass",
   },
 ];
 

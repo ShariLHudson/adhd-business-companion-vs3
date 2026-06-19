@@ -46,7 +46,7 @@ const CONVERSATIONAL_PHRASES: Array<{
   input: string;
   expectedIntent: string;
 }> = [
-  { input: "I don't know what to call it.", expectedIntent: "helpRequest" },
+  { input: "I don't know what to call it.", expectedIntent: "discovery" },
   {
     input: "Can you give me better title ideas?",
     expectedIntent: "discovery",

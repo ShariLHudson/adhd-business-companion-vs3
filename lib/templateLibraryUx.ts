@@ -78,3 +78,41 @@ export function groupTemplatesByCategory(
     templates: buckets.get(opt.value) ?? [],
   })).filter((g) => g.templates.length > 0);
 }
+
+/** Short category label for the template picker dropdown. */
+export function templatePickerCategoryLabel(
+  category: TemplateCategory,
+): string {
+  switch (category) {
+    case "offers":
+      return "Sales";
+    case "emails":
+      return "Email";
+    case "systems":
+      return "Operations";
+    case "execution":
+      return "ADHD / Personal Execution";
+    case "content":
+      return "Content";
+    case "strategy":
+      return "Strategy";
+    default:
+      return TEMPLATE_CATEGORY_LABEL[category];
+  }
+}
+
+export function templateDropdownLabel(template: TemplateItem): string {
+  return `${template.title} — ${templatePickerCategoryLabel(template.category)}`;
+}
+
+/** All templates for the picker — alphabetical by full dropdown label. */
+export function sortedTemplateDropdownOptions(
+  items: TemplateItem[],
+): TemplateItem[] {
+  return sortByDropdownLabel(items, templateDropdownLabel);
+}
+
+/** Templates shown in the default picker — saved and drafts, not archived. */
+export function templatesForDefaultPicker(items: TemplateItem[]): TemplateItem[] {
+  return items.filter((t) => t.status !== "archived");
+}

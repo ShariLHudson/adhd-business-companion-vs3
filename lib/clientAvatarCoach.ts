@@ -381,7 +381,7 @@ export function processClientAvatarCoachTurn(
     return null;
   }
 
-  if (isBuilderApprovalPhrase(t) || isUserQuestionText(t)) {
+  if ((isBuilderApprovalPhrase(t) || isUserQuestionText(t)) && !wantsTaglineHelp(t)) {
     return null;
   }
 

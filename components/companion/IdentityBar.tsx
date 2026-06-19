@@ -49,6 +49,8 @@ type IdentityBarProps = {
   onDismissWelcome?: () => void;
   /** Primary question on calm home — replaces status line. */
   primaryQuestion?: string | null;
+  /** Returning user — show welcome back instead of cold greeting question. */
+  welcomeBack?: boolean;
 };
 
 export function IdentityBar({
@@ -67,12 +69,15 @@ export function IdentityBar({
   welcomeLine = null,
   onDismissWelcome,
   primaryQuestion = null,
+  welcomeBack = false,
 }: IdentityBarProps) {
   const effectiveWelcome = calmHome ? null : welcomeLine;
   const effectivePrimary =
-    calmHome
-      ? (primaryQuestion ?? "What feels most important right now?")
-      : primaryQuestion;
+    calmHome && welcomeBack
+      ? "Welcome back"
+      : calmHome
+        ? null
+        : primaryQuestion;
   const status = effectivePrimary
     ? effectivePrimary
     : resumeLine

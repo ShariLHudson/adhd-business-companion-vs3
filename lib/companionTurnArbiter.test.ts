@@ -111,4 +111,12 @@ describe("companionTurnArbiter", () => {
     expect(r.decision).toBe("workspace_first");
     expect(r.hintForChat).toMatch(/Clear My Mind panel/i);
   });
+
+  it("workspaceBesideChat follows snapshot when workspacePanel state lags", () => {
+    const r = arbitrate("What should I focus on?", {
+      workspacePanel: null,
+      workspaceSnap: snap("projects"),
+    });
+    expect(r.workspaceBesideChat).toBe(true);
+  });
 });

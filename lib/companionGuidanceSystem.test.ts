@@ -37,7 +37,26 @@ describe("companionGuidanceSystem", () => {
     ).toBe(true);
   });
 
-  it("extracts avatar prefills from conversation history", () => {
+  it("extracts avatar prefills only when chat supplies field content", () => {
+    const fills = extractConversationPrefill(
+      [
+        {
+          role: "assistant",
+          content: "Tell me about the person you help most often.",
+        },
+        {
+          role: "user",
+          content:
+            "ADHD entrepreneurs who struggle with marketing need clarity and simple systems.",
+        },
+      ],
+      "client-avatars",
+    );
+    expect(fills.length).toBeGreaterThan(0);
+    expect(fills[0]?.field).toBe("avatar-who");
+  });
+
+  it("does not prefill avatar from help-seeking I-help phrasing alone", () => {
     const fills = extractConversationPrefill(
       [
         {
@@ -51,8 +70,7 @@ describe("companionGuidanceSystem", () => {
       ],
       "client-avatars",
     );
-    expect(fills.length).toBeGreaterThan(0);
-    expect(fills[0]?.field).toBe("avatar-who");
+    expect(fills.length).toBe(0);
   });
 
   it("builds prefill summary message", () => {

@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { CreateDraftImprove } from "@/components/companion/CreateDraftImprove";
+import { CreateDraftReviewChat } from "@/components/companion/CreateDraftReviewChat";
+import { CreateExecutionActionBar } from "@/components/companion/CreateExecutionActionBar";
 import { CreateOptionsMenu, type CreateOptionsAction } from "@/components/companion/CreateOptionsMenu";
+import type { ExecutionActionId } from "@/lib/createExecution";
+import type { DraftReviewContext } from "@/lib/createDraftReview";
 
 const btn =
   "rounded-lg px-3 py-2 text-sm font-semibold transition-colors";
@@ -27,6 +31,10 @@ export function DraftWorkspacePanel({
   googleExportError,
   onClearGoogleError,
   busy = false,
+  reviewContext,
+  onReviewReceipt,
+  executionActions,
+  onExecutionAction,
 }: {
   itemType: string;
   templateName?: string | null;
@@ -45,6 +53,10 @@ export function DraftWorkspacePanel({
   googleExportError?: string | null;
   onClearGoogleError?: () => void;
   busy?: boolean;
+  reviewContext?: DraftReviewContext | null;
+  onReviewReceipt?: (message: string) => void;
+  executionActions?: ExecutionActionId[];
+  onExecutionAction?: (action: ExecutionActionId) => void;
 }) {
   const [googleLoading, setGoogleLoading] = useState(false);
   const displayType = itemType?.trim() || "Draft";
@@ -175,12 +187,30 @@ export function DraftWorkspacePanel({
         </div>
       </div>
 
+      {executionActions?.length && onExecutionAction ? (
+        <CreateExecutionActionBar
+          actions={executionActions}
+          onAction={onExecutionAction}
+          disabled={busy || !draft.trim()}
+        />
+      ) : null}
+
       {editable ? (
         <CreateDraftImprove
           draft={draft}
           onApply={onApplyDraft}
           disabled={busy}
           hideMoreActions
+        />
+      ) : null}
+
+      {reviewContext ? (
+        <CreateDraftReviewChat
+          context={reviewContext}
+          draft={draft}
+          onApplyDraft={onApplyDraft}
+          onReceipt={onReviewReceipt}
+          disabled={busy}
         />
       ) : null}
     </div>

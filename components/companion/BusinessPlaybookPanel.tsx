@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
 // Business Playbook — exactly three visible sections per the engine spec:
 // "What are you trying to do?" (the entry), Templates, and Deep Dives.
@@ -83,7 +84,7 @@ export function BusinessPlaybookPanel({
   const [tab, setTab] = useState<PlaybookTab>("start");
 
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+    <div className={workspacePanelShellClass({ width: "standard" })}>
       <div className="flex items-center justify-between gap-3">
         <p className="text-2xl font-semibold text-[#1f1c19]">
           Business Playbook

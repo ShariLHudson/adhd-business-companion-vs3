@@ -1,4 +1,5 @@
 import type { CoachingMode } from "./companionPrompt";
+import { sortByDropdownLabel } from "./dropdownSort";
 
 export type AppSection =
   | "home"
@@ -13,10 +14,12 @@ export type AppSection =
   | "energy"
   | "templates-library"
   | "saved-work"
+  | "my-work"
   | "focus"
   | "progress"
   | "time-block"
   | "activities"
+  | "guided-exercises"
   | "spin-wheel"
   | "games"
   | "email-generator"
@@ -26,7 +29,10 @@ export type AppSection =
   | "google-workspace"
   | "business-profile"
   | "client-avatars"
-  | "how-do-i";
+  | "how-do-i"
+  | "decision-compass"
+  | "today"
+  | "wins-this-week";
 
 export type SidebarNavId =
   | "chat"
@@ -36,9 +42,14 @@ export type SidebarNavId =
   | "progress"
   | "projects"
   | "templates"
+  | "snippets"
   | "saved-work"
+  | "my-work"
   | "playbook"
-  | "how-do-i";
+  | "client-avatars"
+  | "settings"
+  | "how-do-i"
+  | "wins-this-week";
 
 export type SidebarToolId =
   | "voice"
@@ -50,6 +61,7 @@ export type SidebarToolId =
   | "new-chat"
   | "time-block"
   | "activities"
+  | "guided-exercises"
   | "spin-wheel"
   | "games";
 
@@ -64,32 +76,43 @@ export const BRAND = {
   tagline: "Your Coach & Companion",
 } as const;
 
-// Primary doors — what a first-time, overwhelmed user sees. Three only.
-// "Would someone need this before they've talked to Shari once?" If no → MORE.
+// Primary doors — Chat, Focus, Create, and My Work (home base for everything).
 export const SIDEBAR_NAV: {
   id: SidebarNavId;
   label: string;
   emoji: string;
   mode?: CoachingMode;
 }[] = [
-  // Each door answers "what am I doing right now?" — no overlapping intent.
-  { id: "chat", label: "Chat", emoji: "💬", mode: "today" }, // think / get unstuck
-  { id: "focus", label: "Focus", emoji: "🎯", mode: "focus" }, // execute / focus / start
-  { id: "create", label: "Create", emoji: "✨" }, // produce content
+  { id: "chat", label: "Chat", emoji: "💬", mode: "today" },
+  { id: "focus", label: "Focus", emoji: "🎯", mode: "focus" },
+  { id: "create", label: "Create", emoji: "✨" },
+  { id: "my-work", label: "My Work", emoji: "🏠" },
 ];
 
 // Everything else stays in the product but leaves the main path. Shari can
 // send people here; users don't choose a "mode" on day one.
-export const MORE_NAV: {
+const MORE_NAV_SOURCE: {
   id: SidebarNavId;
   label: string;
   emoji: string;
   mode?: CoachingMode;
 }[] = [
-  { id: "templates", label: "Templates", emoji: "📚" },
-  { id: "playbook", label: "Strategies", emoji: "📘" },
   { id: "projects", label: "Projects", emoji: "📁" },
+  { id: "snippets", label: "Snippets", emoji: "🧩" },
+  { id: "saved-work", label: "Saved Work", emoji: "📂" },
+  { id: "wins-this-week", label: "Wins This Week", emoji: "🌟" },
+  { id: "playbook", label: "Strategies", emoji: "📘" },
+  { id: "templates", label: "Templates", emoji: "📚" },
   { id: "how-do-i", label: "How Do I", emoji: "❓" },
+];
+
+/** Alphabetical by label; How Do I always last. */
+export const MORE_NAV: typeof MORE_NAV_SOURCE = [
+  ...sortByDropdownLabel(
+    MORE_NAV_SOURCE.filter((item) => item.id !== "how-do-i"),
+    (item) => item.label,
+  ),
+  ...MORE_NAV_SOURCE.filter((item) => item.id === "how-do-i"),
 ];
 
 // Top-level nav items that open their own section (a panel) rather than
@@ -97,9 +120,12 @@ export const MORE_NAV: {
 export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
   focus: "focus",
   create: "content-generator",
+  "my-work": "my-work",
   projects: "projects",
   templates: "templates-library",
+  snippets: "snippets",
   "saved-work": "saved-work",
+  "wins-this-week": "wins-this-week",
   playbook: "playbook",
   "how-do-i": "how-do-i",
 };
@@ -189,6 +215,7 @@ export const TOOL_SECTION: Partial<Record<SidebarToolId, AppSection>> = {
   "focus-audio": "focus-audio",
   "time-block": "time-block",
   activities: "activities",
+  "guided-exercises": "guided-exercises",
   "spin-wheel": "spin-wheel",
   games: "games",
 };

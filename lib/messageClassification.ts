@@ -6,6 +6,7 @@
  */
 
 import type { AppSection } from "./companionUi";
+import { isHelpSeekingAnswer } from "./builderContentSync";
 import { isInformationIntent } from "./companionIntentRouting";
 import { isExplicitWorkspaceOpenRequest } from "./conversationGating";
 
@@ -30,7 +31,7 @@ const PRIORITIZING_RE =
   /\b(?:help me prioritize?|prioritiz(?:e|ing)|what should i (?:do|work on|focus on) first|which (?:one|should i) first|what to (?:do|work on|focus on) first|focus on first|if (?:you|i) could only (?:finish|do|pick|choose) one|which would you choose|(?:two|three|four|five|several|a few|multiple) things(?:\s+(?:to|i need|on my plate))?|\d+ things(?:\s+(?:to|i need))?)\b/i;
 
 const DECIDING_RE =
-  /\b(?:what do you think|which would you|help me decide|choose between|can'?t decide|not sure which|should i .+ or .+)\b/i;
+  /\b(?:what do you think|which would you|help me decide|choose between|can'?t decide|not sure which|should i .+ or .+|i need to make a decision|i don'?t know where to start with this decision|compare two options|i need help choosing)\b/i;
 
 const THINKING_RE =
   /\b(?:help me think|thinking through|process(?:ing)? this|reflect on|figure out what|what am i missing|don'?t know where to start|not sure where to start)\b/i;
@@ -42,7 +43,7 @@ const TASK_DUMP_ACTION_RE =
   /\b(finish|complete|create|build|make|write|set up|launch|develop|design|update|redo|practice|continue|prepare|send|post|draft)\b/i;
 
 const CLEAR_EMOTIONAL_SIGNAL_RE =
-  /\b(overwhelm(?:ed|ing)?|anxious|anxiety|exhausted|drained|feel(?:ing)? stuck|i'?m stuck\b|i am stuck\b|ashamed|discouraged|can'?t handle|panicking|panic(?:king)?|shutting down|feels? too hard|feel(?:ing)? frozen|defeated|hopeless|helpless|can'?t cope|breaking down|falling apart)\b/i;
+  /\b(overwhelm(?:ed|ing)?|anxious|anxiety|exhausted|drained|feel(?:ing)? stuck|i'?m stuck\b|i am stuck\b|ashamed|discouraged|can'?t handle|panicking|panic(?:king)?|shutting down|feels? too hard|feel(?:ing)? frozen|defeated|hopeless|helpless|can'?t cope|breaking down|falling apart|stress(?:ed|ing)?|calm down|brain (?:is )?spinning|head (?:is )?spinning)\b/i;
 
 /** Frustration about a problem — not necessarily emotional distress. */
 const CONTEXTUAL_FRUSTRATION_RE =
@@ -268,6 +269,7 @@ export function isWorkspaceDiscoveryRequest(
 ): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (isHelpSeekingAnswer(t)) return true;
   if (WORKSPACE_DISCOVERY_SHORT_RE.test(t)) return true;
   if (WORKSPACE_DISCOVERY_RE.test(t)) return true;
   if (isContentBrainstorming(t)) return true;
@@ -646,7 +648,8 @@ export function classificationHintForChat(
     case "emotional_distress":
       return (
         `MESSAGE CLASSIFICATION — EMOTIONAL DISTRESS: User signaled real distress — "${text.slice(0, 80)}". ` +
-        `Gentle acknowledgment, ONE clarifying question. No practical content assumptions. No Create/tools on this turn.`
+        `Brief empathy — different things help depending on what's causing the stress. ` +
+        `Do NOT open or name a specific tool. Relief options appear in the UI below your message.`
       );
     default:
       return undefined;

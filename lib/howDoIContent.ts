@@ -16,6 +16,8 @@ export type HowDoIEntry = {
   details?: { heading: string; body: string }[];
   keywords: string[];
   openSection?: AppSection;
+  /** Opens a guided activity (e.g. Decision Compass). */
+  openActivityId?: string;
   openLabel: string;
   /** Opens Settings overlay to a section (companion home only). */
   openSettingsSection?: SettingsSection;
@@ -36,6 +38,45 @@ export const HOW_DO_I_OPEN_LABELS: Partial<Record<AppSection, string>> = {
 };
 
 export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
+  {
+    id: "decision-compass",
+    title: "ADHD Decision Compass",
+    question: "How do I work through a decision?",
+    whatItIs:
+      "Work through decisions, compare options, evaluate tradeoffs, and choose a next step.",
+    whenToUse:
+      "When you are stuck between options, weighing tradeoffs, or need a structured way to decide.",
+    steps: [
+      "Open Decision Compass.",
+      "Name the decision in plain language.",
+      "Follow the path that fits — action, strategy, or emotional.",
+      "Compare options and note tradeoffs.",
+      "Choose a next step you can act on.",
+    ],
+    keywords: [
+      "decision",
+      "decisions",
+      "decision maker",
+      "decision compass",
+      "help me decide",
+      "compare two options",
+      "compare options",
+      "choose between options",
+      "choose between",
+      "should i",
+      "a or b",
+      "strategic decision",
+      "emotional decision",
+      "decide",
+      "tradeoff",
+      "tradeoffs",
+      "two options",
+      "stuck choosing",
+    ],
+    openActivityId: "decision-compass",
+    openLabel: "Open Decision Compass",
+    askPrompt: "Help me work through a decision — one question at a time.",
+  },
   {
     id: "create-strategy",
     title: "How To: Create a Strategy",
@@ -335,6 +376,11 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
   },
 ];
 
+/** Canonical browse/search order — alphabetical by title; never re-sorted by relevance. */
+export const HOW_DO_I_STABLE_ORDER: HowDoIEntry[] = [...HOW_DO_I_ENTRIES].sort(
+  (a, b) => compareDropdownLabels(a.title, b.title),
+);
+
 /** Strip filler words so “how do I create a strategy” matches strategy entries. */
 export function normalizeHowDoIQuery(query: string): string {
   return query
@@ -367,6 +413,15 @@ function scoreEntry(entry: HowDoIEntry, rawQuery: string): number {
     if (kw.includes(n) && n.length > 2) score += 5;
   }
 
+  if (
+    entry.id === "decision-compass" &&
+    /\bdecision|decide|choose between|compare.*option|tradeoff|help me decide|should i|a or b/i.test(
+      q,
+    )
+  ) {
+    score += 12;
+  }
+
   if (entry.details?.length) {
     for (const block of entry.details) {
       const blob = `${block.heading} ${block.body}`.toLowerCase();
@@ -385,25 +440,40 @@ function scoreEntry(entry: HowDoIEntry, rawQuery: string): number {
 export function searchHowDoI(query: string): HowDoIEntry[] {
   const q = query.trim();
   if (!q) {
-    return [...HOW_DO_I_ENTRIES].sort((a, b) =>
-      a.question.localeCompare(b.question),
-    );
+    return [...HOW_DO_I_STABLE_ORDER];
   }
+
+  const matchingIds = new Set(
+    HOW_DO_I_ENTRIES.filter((entry) => scoreEntry(entry, q) > 0).map(
+      (entry) => entry.id,
+    ),
+  );
+
+  return HOW_DO_I_STABLE_ORDER.filter((entry) => matchingIds.has(entry.id));
+}
+
+/** Best single match for explicit search submit — uses relevance, not display order. */
+export function bestHowDoIMatch(query: string): HowDoIEntry | null {
+  const q = query.trim();
+  if (!q) return null;
 
   const scored = HOW_DO_I_ENTRIES.map((entry) => ({
     entry,
     score: scoreEntry(entry, q),
   }))
     .filter((row) => row.score > 0)
-    .sort((a, b) => b.score - a.score || a.entry.question.localeCompare(b.entry.question));
+    .sort(
+      (a, b) =>
+        b.score - a.score ||
+        compareDropdownLabels(a.entry.title, b.entry.title),
+    );
 
-  return scored.map((row) => row.entry);
+  return scored[0]?.entry ?? null;
 }
 
-/** Always returns the best guide — never null. */
 export function resolveHowDoI(query: string): HowDoIEntry {
-  const hits = searchHowDoI(query);
-  if (hits.length > 0) return hits[0]!;
+  const best = bestHowDoIMatch(query);
+  if (best) return best;
 
   const n = normalizeHowDoIQuery(query);
   return {
@@ -466,6 +536,7 @@ export type HowDoITopicGroupId =
   | "business"
   | "clear-mind"
   | "create"
+  | "decisions"
   | "focus"
   | "projects"
   | "settings"
@@ -479,6 +550,7 @@ export type HowDoITopicGroup = {
 };
 
 const HOW_DO_I_TOPIC_GROUP_BY_ENTRY: Record<string, HowDoITopicGroupId> = {
+  "decision-compass": "decisions",
   "create-strategy": "strategies",
   "use-strategies": "strategies",
   "schedule-appointment": "time",
@@ -499,6 +571,7 @@ const HOW_DO_I_TOPIC_GROUPS = (
     { id: "business", label: "Business profile" },
     { id: "clear-mind", label: "Clear My Mind" },
     { id: "create", label: "Create & workshops" },
+    { id: "decisions", label: "Decisions" },
     { id: "focus", label: "Focus & energy" },
     { id: "projects", label: "Projects" },
     { id: "settings", label: "Settings & appearance" },

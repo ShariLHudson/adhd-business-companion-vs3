@@ -3,6 +3,8 @@ import {
   evaluateCompanionTurn,
   governorAllowsArtifactHandoff,
   governorAllowsPreChatWorkspaceOpen,
+  governorAuthorizedChatTurnOpen,
+  governorBlocksChatTurnAutoOpen,
   governorSuppressesInterventionSurfaces,
 } from "./companionGovernor";
 import { resolveIntent } from "./intentStabilizer";
@@ -91,6 +93,8 @@ describe("companionGovernor", () => {
     const s = gov("Open Momentum Games");
     expect(s.outcome).toBe("tool_open");
     expect(s.targetTool).toBe("games");
+    expect(governorAuthorizedChatTurnOpen(s)).toBe(true);
+    expect(governorBlocksChatTurnAutoOpen(s)).toBe(false);
   });
 
   it("7 — Help me prioritize my week → chat_only", () => {

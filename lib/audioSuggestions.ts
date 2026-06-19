@@ -74,7 +74,7 @@ const ENERGIZE_AUDIO_RE =
   /\b(energi[sz]e|energi[sz]ing|pep (?:me )?up|pick me up|need (?:more )?energy|get (?:me )?going|wake me up|uplift(?:ing)?|something to energi[sz]e)\b/;
 
 const CALM_AUDIO_RE =
-  /\b(calm(?:ing)?(?:\s+(?:audio|music|sounds?|playlist))?|relax(?:ing)?(?:\s+(?:audio|music|sounds?))?|soothe|soothing|grounding(?:\s+(?:audio|music|sounds?))?|quiet(?:\s+(?:audio|music|sounds?))?|calm my brain|something calm|need (?:something )?calm)\b/i;
+  /\b(?:calm(?:ing)?\s+(?:audio|music|sounds?|playlist)|relax(?:ing)?\s+(?:audio|music|sounds?)|soothe|soothing|grounding\s+(?:audio|music|sounds?)|quiet\s+(?:audio|music|sounds?)|calm my brain|something calm(?:\s+to\s+listen)?|need something calm)\b/i;
 
 const MOTIVATION_AUDIO_RE =
   /\b(motivat(?:e|ing|ion(?:al)?)(?:\s+(?:audio|music|sounds?|playlist))?|motivation boost|pump[- ]?up|pep (?:me )?up|energy boost|hype (?:music|playlist)|get (?:me )?going|something motivat)\b/i;

@@ -1,4 +1,5 @@
-import { isDiscoveryModeQuestion } from '../messageClassification';
+import { describe, expect, test } from "vitest";
+import { isDiscoveryModeQuestion } from "../messageClassification";
 
 describe('isDiscoveryModeQuestion returns TRUE', () => {
   test.each([

@@ -58,6 +58,11 @@ describe("detectAudioRequest — allowed Focus Audio triggers", () => {
     expect(req.categoryId).toBe("calm-brain");
   });
 
+  it("does not route I need to calm down to Focus Audio", () => {
+    expect(detectAudioRequest("I need to calm down").isAudio).toBe(false);
+    expect(detectAudioIntent("I need to calm down")).toBeNull();
+  });
+
   it("routes motivation requests to motivation-boost", () => {
     const req = detectAudioRequest("I need motivation");
     expect(req.isAudio).toBe(true);

@@ -1,6 +1,7 @@
 "use client";
 
 import { type ReactNode } from "react";
+import { toPlainLanguageDisplay } from "@/lib/plainLanguageFormatting";
 
 type Message = {
   role: "user" | "assistant" | "system";
@@ -20,24 +21,11 @@ type SimpleChatProps = {
   afterLastAssistant?: ReactNode;
 };
 
-// Render **bold** spans within a line of text.
-function renderInline(text: string, key: string): ReactNode[] {
-  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
-    if (/^\*\*[^*]+\*\*$/.test(part)) {
-      return (
-        <strong key={`${key}-${i}`} className="font-semibold text-[#1f1c19]">
-          {part.slice(2, -2)}
-        </strong>
-      );
-    }
-    return <span key={`${key}-${i}`}>{part}</span>;
-  });
-}
-
 // Turn an assistant message into readable blocks: bullet runs become lists,
-// other lines become short paragraphs. Bold markdown is honored.
+// other lines become short paragraphs.
 function renderAssistant(content: string): ReactNode[] {
-  const lines = content.split("\n").map((l) => l.trim());
+  const normalized = toPlainLanguageDisplay(content);
+  const lines = normalized.split("\n").map((l) => l.trim());
   const blocks: ReactNode[] = [];
   let bullets: string[] = [];
 
@@ -51,7 +39,7 @@ function renderAssistant(content: string): ReactNode[] {
         className="list-disc space-y-1.5 pl-5 text-lg leading-[1.7] text-[#1f1c19]"
       >
         {items.map((b, i) => (
-          <li key={i}>{renderInline(b, `b-${blocks.length}-${i}`)}</li>
+          <li key={i}>{b}</li>
         ))}
       </ul>,
     );
@@ -62,14 +50,14 @@ function renderAssistant(content: string): ReactNode[] {
       flushBullets();
       return;
     }
-    const bullet = line.match(/^(?:[-•*])\s+(.*)$/);
+    const bullet = line.match(/^(?:•|[-*])\s+(.*)$/);
     if (bullet) {
       bullets.push(bullet[1]);
     } else {
       flushBullets();
       blocks.push(
         <p key={`p-${i}`} className="text-lg leading-[1.75] text-[#1f1c19]">
-          {renderInline(line, `p-${i}`)}
+          {line}
         </p>,
       );
     }

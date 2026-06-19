@@ -17,6 +17,7 @@ import {
   type SavedWorkStatus,
 } from "@/lib/savedWorkStore";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
+import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
 type SavedWorkAction = "rename" | "duplicate" | "archive" | "unarchive" | "delete";
 
@@ -125,9 +126,12 @@ function SavedWorkItemMenu({
 export function SavedWorkLibrary({
   onBack,
   onOpenInCreate,
+  embedded = false,
 }: {
   onBack?: () => void;
   onOpenInCreate?: (input: CreationWorkspaceInput) => void;
+  /** When true, renders inside My Work Hub without standalone chrome. */
+  embedded?: boolean;
 }) {
   const [items, setItems] = useState<SavedWorkItem[]>([]);
   const [status, setStatus] = useState<
@@ -211,7 +215,13 @@ export function SavedWorkLibrary({
   }
 
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-3xl flex-col px-6 py-8">
+    <div
+      className={
+        embedded
+          ? workspacePanelShellClass({ width: "wide", inSplit: true, extra: "flex flex-col" })
+          : workspacePanelShellClass({ width: "wide" })
+      }
+    >
       <ConfirmDialog
         open={Boolean(deleteTarget)}
         title="Delete this item permanently?"
@@ -272,24 +282,26 @@ export function SavedWorkLibrary({
         </div>
       ) : null}
 
-      <div className="flex items-start justify-between gap-3">
-        <div>
-          <p className="text-2xl font-semibold text-[#1f1c19]">📂 Saved Work</p>
-          <p className="mt-1 text-base text-[#6b635a]">
-            Your created documents — proposals, SOPs, plans, and more. Archive to
-            hide from active views; recover anytime from Archived.
-          </p>
+      {!embedded ? (
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <p className="text-2xl font-semibold text-[#1f1c19]">📂 Saved Work</p>
+            <p className="mt-1 text-base text-[#6b635a]">
+              Your created documents — proposals, SOPs, plans, and more. Archive to
+              hide from active views; recover anytime from Archived.
+            </p>
+          </div>
+          {onBack ? (
+            <button
+              type="button"
+              onClick={onBack}
+              className="shrink-0 text-sm font-semibold text-[#1e4f4f] hover:underline"
+            >
+              ← Back
+            </button>
+          ) : null}
         </div>
-        {onBack ? (
-          <button
-            type="button"
-            onClick={onBack}
-            className="shrink-0 text-sm font-semibold text-[#1e4f4f] hover:underline"
-          >
-            ← Back
-          </button>
-        ) : null}
-      </div>
+      ) : null}
 
       <CategoryPickerSelect
         label="Show"
@@ -297,7 +309,7 @@ export function SavedWorkLibrary({
         onChange={(v) => setStatus(v === NO_CATEGORY ? NO_CATEGORY : v)}
         options={STATUS_OPTIONS}
         placeholder="Select…"
-        className="mt-4"
+        className={embedded ? "mt-0" : "mt-4"}
       />
 
       <input

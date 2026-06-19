@@ -34,7 +34,8 @@ export type EcosystemTrackEventType =
   | "document.copy_used"
   | "companion.conversation_started"
   | "companion.recommendation_given"
-  | "companion.recommendation_accepted";
+  | "companion.recommendation_accepted"
+  | "companion.route_executed";
 
 export type EcosystemFeature =
   | "user"

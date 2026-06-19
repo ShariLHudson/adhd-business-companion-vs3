@@ -49,7 +49,7 @@ describe("intelligence stack e2e — companion messages", () => {
   it("stuck task → activation tiny step", () => {
     const text = "I'm stuck. This task feels too big.";
     const activation = evaluateActivation({ text, now: NOW });
-    expect(shouldSurfaceActivationOffer(activation)).toBe(true);
+    expect(shouldSurfaceActivationOffer(activation, text)).toBe(true);
     expect(activation.companionOffer).toMatch(/tiny|small|one|step|start/i);
     expect(activation.companionOffer).not.toMatch(SHAME_RE);
   });

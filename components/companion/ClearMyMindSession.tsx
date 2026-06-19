@@ -30,6 +30,8 @@ type Props = {
   onOpen?: (section: AppSection) => void;
   onSessionComplete?: () => void;
   onViewLibrary?: () => void;
+  /** Live session entries for visual cluster panel. */
+  onSessionEntriesChange?: (entries: BrainDumpEntry[]) => void;
 };
 
 function TrustBanner({ result }: { result: RouteTrustResult }) {
@@ -52,6 +54,7 @@ export function ClearMyMindSession({
   onOpen,
   onSessionComplete,
   onViewLibrary,
+  onSessionEntriesChange,
 }: Props) {
   const [sessionId] = useState(
     () => sessionIdProp ?? newCaptureSessionId(),
@@ -82,6 +85,10 @@ export function ClearMyMindSession({
       ),
     [entries],
   );
+
+  useEffect(() => {
+    onSessionEntriesChange?.(sessionItems);
+  }, [sessionItems, onSessionEntriesChange]);
 
   const unsortedItems = useMemo(
     () => sessionItems.filter((e) => !e.sorted && !e.routedAction),

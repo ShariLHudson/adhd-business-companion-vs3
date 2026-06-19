@@ -4,6 +4,7 @@
 
 import { isActionAcceptance } from "./assistedActionBridge";
 import { detectAudioRequest } from "./audioSuggestions";
+import { shouldBlockStressAutoToolRouting } from "./stressRouting";
 import { extractExplicitFocusMinutes } from "./doItNowActions";
 import { parseFocusMinutesFromText } from "./focusDuration";
 import type { PendingAction } from "./pendingAction";
@@ -134,7 +135,13 @@ export function shouldAutoLaunchPendingAction(
   priorAssistantText: string,
   action: PendingAction,
 ): boolean {
-  if (matchesPendingAcceptance(userText, action)) return true;
+  if (
+    matchesPendingAcceptance(userText, action, {
+      allowGenericAcceptance: true,
+    })
+  ) {
+    return true;
+  }
   if (extractExplicitFocusMinutes(userText) !== null && isFocusRelatedAction(action)) {
     return true;
   }
@@ -174,7 +181,9 @@ export function shouldAutoOpenWorkspaceFromIntent(
         t,
       );
     case "focus-audio":
-      return detectAudioRequest(t).isAudio;
+      return (
+        detectAudioRequest(t).isAudio && !shouldBlockStressAutoToolRouting(t)
+      );
     case "content-generator":
       return /\b(?:open create|start (?:a )?draft|write (?:a |the )?(?:post|email|script|caption))\b/i.test(
         t,
@@ -183,6 +192,8 @@ export function shouldAutoOpenWorkspaceFromIntent(
       return /\b(?:open (?:my )?strategies|show (?:me )?strategies)\b/i.test(t);
     case "templates-library":
       return /\bopen (?:the )?templates?\b/i.test(t);
+    case "snippets":
+      return /\bopen (?:the )?snippets?\b/i.test(t);
     case "projects":
       return /\bopen (?:my )?projects?\b/i.test(t);
     default:

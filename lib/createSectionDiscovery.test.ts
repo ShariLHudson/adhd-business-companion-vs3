@@ -19,6 +19,9 @@ describe("createSectionDiscovery", () => {
     expect(isDiscoveryHelpRequest("help me create a subject line")).toBe(true);
     expect(isDiscoveryHelpRequest("what should the subject line be")).toBe(true);
     expect(isDiscoveryHelpRequest("give me options")).toBe(true);
+    expect(isDiscoveryHelpRequest("I don't know")).toBe(true);
+    expect(isDiscoveryHelpRequest("not sure")).toBe(true);
+    expect(isDiscoveryHelpRequest("you decide")).toBe(true);
     expect(isDiscoveryHelpRequest("ADHD founders on my list")).toBe(false);
   });
 
@@ -72,6 +75,49 @@ describe("createSectionDiscovery", () => {
     expect(view!.templateSections.find((s) => s.id === "subject")?.status).toBe(
       "empty",
     );
+  });
+
+  it("does not save I don't know as section content", () => {
+    let { session } = bootstrapCreateBuilderSession("Newsletter");
+    for (const answer of [
+      "Perfectionism traps",
+      "ADHD founders",
+      "Educate and nurture",
+      "Reply with your biggest struggle",
+    ]) {
+      session = processCreateBuilderTurn(session, answer).session;
+    }
+
+    session = {
+      ...session,
+      workflow: {
+        ...session.workflow,
+        activeSectionId: "subject",
+      },
+    };
+
+    const turn = processCreateBuilderTurn(session, "I don't know");
+    expect(turn.reply).toBe("");
+    expect(turn.session.workflow.sectionContent?.subject).toBeUndefined();
+  });
+
+  it("prepareDiscoveryHelpContext sets active section from assistant prompt", () => {
+    let { session } = bootstrapCreateBuilderSession("Newsletter");
+    for (const answer of [
+      "Perfectionism traps",
+      "ADHD founders",
+      "Educate and nurture",
+      "Reply with your biggest struggle",
+    ]) {
+      session = processCreateBuilderTurn(session, answer).session;
+    }
+
+    const help = prepareDiscoveryHelpContext(
+      session,
+      "I don't know",
+      "What would you like the subject line to be?",
+    );
+    expect(help.workflow.activeSectionId).toBe("subject");
   });
 
   it("does not save Discovery Help text as section content", () => {
@@ -167,6 +213,22 @@ describe("createSectionDiscovery", () => {
       "Perfectionism is a trap",
     );
     expect(turn.reply).toContain("Added to **Subject Line**");
+  });
+
+  it("applies use #2 option approval", () => {
+    const wf = {
+      ...advanceAfterItemPick("Newsletter"),
+      questionMode: "split_screen" as const,
+      discoverySubphase: "sections" as const,
+      activeSectionId: "subject",
+      pendingSectionOptions: [
+        "Stop waiting for perfect",
+        "Perfectionism is a trap",
+        "Done beats perfect",
+      ],
+    };
+    const pick = tryResolveSectionOptionApproval("use #2", wf);
+    expect(pick?.value).toBe("Perfectionism is a trap");
   });
 
   it("allows explicit build approval with open sections", () => {

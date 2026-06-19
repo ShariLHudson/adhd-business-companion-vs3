@@ -16,6 +16,7 @@ import {
 import {
   advanceAfterDiscoveryAnswer,
   discoveryQuestionsForState,
+  requiredFieldsComplete,
   skipDiscoveryQuestion,
 } from "./createWorkflow";
 import {
@@ -54,7 +55,13 @@ describe("createWorkflowRecord shared state", () => {
       record = turn.record;
       saveWorkflowRecord(record);
     }
-    expect(recordDiscoveryComplete(record)).toBe(true);
+    expect(
+      requiredFieldsComplete(
+        "Email",
+        record.collectedAnswers,
+        record.skippedQuestions,
+      ),
+    ).toBe(true);
     expect(record.collectedAnswers.recipient).toBe("Sarah at Acme");
     const loaded = loadWorkflowRecord();
     expect(loaded?.collectedAnswers.recipient).toBe("Sarah at Acme");
@@ -72,7 +79,13 @@ describe("createWorkflowRecord shared state", () => {
       record = mergeRecordFromWorkflow(record, wf, "panel");
       saveWorkflowRecord(record);
     });
-    expect(recordDiscoveryComplete(record)).toBe(true);
+    expect(
+      requiredFieldsComplete(
+        "Email",
+        record.collectedAnswers,
+        record.skippedQuestions,
+      ),
+    ).toBe(true);
     const session = builderSessionFromRecord(loadWorkflowRecord()!);
     expect(session.workflow.discoveryAnswers.goal).toBe("Follow up");
   });
@@ -90,7 +103,13 @@ describe("createWorkflowRecord shared state", () => {
     expect(record.collectedAnswers.recipient).toBe("Sarah");
     expect(record.collectedAnswers.goal).toBe("Book a demo");
     expect(record.collectedAnswers.context).toBe("Met at webinar");
-    expect(recordDiscoveryComplete(record)).toBe(true);
+    expect(
+      requiredFieldsComplete(
+        "Email",
+        record.collectedAnswers,
+        record.skippedQuestions,
+      ),
+    ).toBe(true);
   });
 
   it("closing and reopening Create restores workflow record", () => {
@@ -127,7 +146,13 @@ describe("createWorkflowRecord shared state", () => {
     const brief = buildBriefFromRecord(record);
     expect(brief).toContain("Sam");
     expect(brief).toContain("Reply to quote");
-    expect(recordDiscoveryComplete(record)).toBe(true);
+    expect(
+      requiredFieldsComplete(
+        "Email",
+        record.collectedAnswers,
+        record.skippedQuestions,
+      ),
+    ).toBe(true);
   });
 
   it("skipping a question does not repeat it", () => {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import {
   deleteProject,
   getDayState,
@@ -43,7 +44,14 @@ import { useWorkspaceFieldFocus } from "@/lib/useWorkspaceFieldFocus";
 import { WorkspaceSopField, isSopPanelField } from "@/components/companion/WorkspaceSopField";
 import { WorkspaceSopProgress } from "@/components/companion/WorkspaceSopProgress";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
-import { listDocumentsForProject } from "@/lib/documentMetadataStore";
+import {
+  groupUnifiedProjectFiles,
+  listUnifiedProjectFiles,
+  projectFileCategoryLabel,
+  PROJECT_FILES_UPDATED,
+  type ProjectFileCategory,
+} from "@/lib/projectFiles";
+import { PROJECT_EXECUTION_LINKS_UPDATED } from "@/lib/projectExecutionLinks";
 import {
   countProjectConversations,
   listProjectConversations,
@@ -51,12 +59,15 @@ import {
   type ProjectConversationEntry,
 } from "@/lib/projectConversations";
 import {
-  deleteProjectLink,
-  listProjectLinks,
   PROJECT_LINKS_UPDATED,
   saveProjectLink,
-  type ProjectLink,
 } from "@/lib/projectLinks";
+import { loadProjectContinuity } from "@/lib/projectContinuityStore";
+
+function resolveInitialProjectId(initialProjectId?: string | null): string | null {
+  if (initialProjectId) return initialProjectId;
+  return loadProjectContinuity()?.projectContinueId ?? null;
+}
 
 function initialProjectView(initialProjectId?: string | null): {
   view: "list" | "create-source" | "create" | "detail";
@@ -128,9 +139,9 @@ export function ProjectsPanel({
   const [projects, setProjects] = useState<Project[]>([]);
   const [view, setView] = useState<
     "list" | "create-source" | "create" | "detail"
-  >(() => initialProjectView(initialProjectId).view);
+  >(() => initialProjectView(resolveInitialProjectId(initialProjectId)).view);
   const [detailId, setDetailId] = useState<string | null>(
-    () => initialProjectView(initialProjectId).detailId,
+    () => initialProjectView(resolveInitialProjectId(initialProjectId)).detailId,
   );
 
   // Guided create
@@ -160,10 +171,14 @@ export function ProjectsPanel({
     window.addEventListener(PROJECT_CONVERSATIONS_UPDATED, bump);
     window.addEventListener(PROJECT_LINKS_UPDATED, bump);
     window.addEventListener("project-files-updated", bump);
+    window.addEventListener(PROJECT_EXECUTION_LINKS_UPDATED, bump);
+    window.addEventListener(PROJECT_FILES_UPDATED, bump);
     return () => {
       window.removeEventListener(PROJECT_CONVERSATIONS_UPDATED, bump);
       window.removeEventListener(PROJECT_LINKS_UPDATED, bump);
       window.removeEventListener("project-files-updated", bump);
+      window.removeEventListener(PROJECT_EXECUTION_LINKS_UPDATED, bump);
+      window.removeEventListener(PROJECT_FILES_UPDATED, bump);
     };
   }, []);
 
@@ -192,19 +207,18 @@ export function ProjectsPanel({
     return listProjectConversations(current.id);
   }, [current, projectDataTick]);
 
-  const projectDocs = useMemo(() => {
+  const unifiedFiles = useMemo(() => {
     if (!current) return [];
     void projectDataTick;
-    return listDocumentsForProject(current.id);
+    return listUnifiedProjectFiles(current.id);
   }, [current, projectDataTick]);
 
-  const projectLinks = useMemo((): ProjectLink[] => {
-    if (!current) return [];
-    void projectDataTick;
-    return listProjectLinks(current.id);
-  }, [current, projectDataTick]);
+  const filesByCategory = useMemo(
+    () => groupUnifiedProjectFiles(unifiedFiles),
+    [unifiedFiles],
+  );
 
-  const projectFileCount = projectDocs.length + projectLinks.length;
+  const projectFileCount = unifiedFiles.length;
 
   const lastReportedDetail = useRef<string>("");
 
@@ -614,7 +628,7 @@ export function ProjectsPanel({
       },
     ] as const;
     return (
-      <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+      <div className={workspacePanelShellClass({ width: "narrow", inSplit: true })}>
         <button
           type="button"
           onClick={() => setView("list")}
@@ -656,7 +670,7 @@ export function ProjectsPanel({
     return (
       <div className="companion-fade-in flex h-full flex-col">
         <WorkspaceSopProgress session={sopSession ?? null} />
-        <div className="mx-auto flex max-w-xl flex-1 flex-col overflow-y-auto px-6 py-8">
+        <div className={`${workspacePanelShellClass({ width: "narrow", inSplit: true })} flex-1 overflow-y-auto`}>
         <p className="text-sm font-medium text-[#9a8f82]">
           New project · step {step + 1} of 2
         </p>
@@ -759,7 +773,7 @@ export function ProjectsPanel({
         : "Time Bank";
 
     return (
-      <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+      <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
         <button
           type="button"
           onClick={() => setView("list")}
@@ -1152,66 +1166,67 @@ export function ProjectsPanel({
           >
             {projectFileCount === 0 ? (
               <p className="text-sm text-[#6b635a]">
-                Google exports from Create appear here automatically. You can
-                also add a link below.
+                Google exports from Create and Decision Compass appear here
+                automatically. You can also add a link below.
               </p>
             ) : (
-              <ul className="mb-3 flex flex-col gap-2">
-                {projectDocs.map((doc) => (
-                  <li
-                    key={doc.id}
-                    className="rounded-lg border border-[#e4ddd2] bg-white px-3 py-2 text-sm"
-                  >
-                    <span className="font-semibold text-[#1f1c19]">
-                      {doc.title}
-                    </span>
-                    <span className="ml-2 text-xs text-[#6b635a]">
-                      {doc.type}
-                      {doc.googleKind ? ` · ${doc.googleKind}` : ""}
-                    </span>
-                    {doc.googleUrl && (
-                      <a
-                        href={doc.googleUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-1 block text-xs font-semibold text-[#1e4f4f] hover:underline"
-                      >
-                        Open in Google
-                      </a>
-                    )}
-                  </li>
-                ))}
-                {projectLinks.map((link) => (
-                  <li
-                    key={link.id}
-                    className="flex items-start justify-between gap-2 rounded-lg border border-[#e4ddd2] bg-white px-3 py-2 text-sm"
-                  >
-                    <div>
-                      <span className="font-semibold text-[#1f1c19]">
-                        {link.label}
-                      </span>
-                      <a
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-1 block text-xs font-semibold text-[#1e4f4f] hover:underline"
-                      >
-                        {link.url}
-                      </a>
+              <div className="mb-3 flex flex-col gap-4">
+                {(
+                  [
+                    "documents",
+                    "spreadsheets",
+                    "forms",
+                    "images",
+                    "pdfs",
+                    "exports",
+                    "links",
+                  ] as ProjectFileCategory[]
+                ).map((category) => {
+                  const files = filesByCategory[category];
+                  if (!files.length) return null;
+                  return (
+                    <div key={category}>
+                      <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+                        {projectFileCategoryLabel(category)}
+                      </p>
+                      <ul className="mt-2 flex flex-col gap-2">
+                        {files.map((file) => (
+                          <li
+                            key={file.id}
+                            className="rounded-lg border border-[#e4ddd2] bg-white px-3 py-2 text-sm"
+                          >
+                            <div className="flex items-start justify-between gap-2">
+                              <div>
+                                <span className="mr-1">{file.icon}</span>
+                                <span className="font-semibold text-[#1f1c19]">
+                                  {file.title}
+                                </span>
+                                <p className="mt-0.5 text-xs text-[#6b635a]">
+                                  {file.source} ·{" "}
+                                  {new Date(file.createdAt).toLocaleDateString(
+                                    undefined,
+                                    { month: "short", day: "numeric" },
+                                  )}
+                                </p>
+                              </div>
+                              {file.url ? (
+                                <a
+                                  href={file.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="shrink-0 rounded-lg border border-[#1e4f4f]/30 px-2.5 py-1 text-xs font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+                                >
+                                  Open
+                                </a>
+                              ) : null}
+                            </div>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        deleteProjectLink(link.id);
-                        setProjectDataTick((n) => n + 1);
-                      }}
-                      className="text-xs text-[#a85c4a] hover:underline"
-                    >
-                      Remove
-                    </button>
-                  </li>
-                ))}
-              </ul>
+                  );
+                })}
+              </div>
             )}
             <div className="space-y-2 border-t border-[#e4ddd2] pt-3">
               <p className="text-xs font-semibold text-[#6b635a]">Add a link</p>
@@ -1255,7 +1270,7 @@ export function ProjectsPanel({
 
   // ---- List ---------------------------------------------------------------
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+    <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
       <div className="flex items-center justify-between gap-3">
         <WorkspaceGuide section="projects" />
         <p className="text-2xl font-semibold text-[#1f1c19]">Projects</p>

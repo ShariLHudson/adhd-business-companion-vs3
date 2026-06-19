@@ -15,7 +15,9 @@ const ROLES = sortDropdownLabels([
   "Service provider",
   "Business owner",
   "Product seller",
+  "Other",
 ]);
+const PRESET_ROLES = ROLES.filter((r) => r !== "Other");
 const GOALS = sortDropdownLabels([
   "Get more clients",
   "Make consistent income",
@@ -187,18 +189,24 @@ export function BusinessProfilePanel({
               <button
                 key={r}
                 type="button"
-                onClick={() => setRole(r)}
-                className={chip(role === r)}
+                onClick={() => setRole(r === "Other" ? "Other" : r)}
+                className={chip(
+                  r === "Other"
+                    ? role === "Other" || !PRESET_ROLES.includes(role)
+                    : role === r,
+                )}
               >
                 {r}
               </button>
             ))}
           </div>
           <VoiceAnswerField
-            value={ROLES.includes(role) ? "" : role}
+            value={
+              PRESET_ROLES.includes(role) ? "" : role === "Other" ? "" : role
+            }
             onChange={setRole}
             multiline={false}
-            placeholder="…or type your own"
+            placeholder="Describe your role…"
             inputClassName={input}
             micTitle={titles[1]}
           />

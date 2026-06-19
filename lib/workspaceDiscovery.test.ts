@@ -52,7 +52,13 @@ describe("workspace discovery mode — Phase 3", () => {
       selectedItemId: "p1",
       selectedItemName: "Untitled project",
     } as WorkspaceContext;
-    const session = startProjectCoachSession("title", ctx);
+    const session = {
+      topic: "title" as const,
+      need: "other" as const,
+      projectId: "p1",
+      projectName: "Untitled project",
+      phase: "coaching" as const,
+    };
     const turn = resolveProjectCoachTurn(
       session,
       "What should I put here?",

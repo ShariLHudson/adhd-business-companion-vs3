@@ -7,12 +7,15 @@ export function ProjectPickerModal({
   open,
   artifactTitle,
   preferredProjectName,
+  sortRecentFirst = false,
   onClose,
   onSelect,
 }: {
   open: boolean;
   artifactTitle: string;
   preferredProjectName?: string;
+  /** Sort by most recently updated first. */
+  sortRecentFirst?: boolean;
   onClose: () => void;
   onSelect: (project: Project) => void;
 }) {
@@ -23,13 +26,17 @@ export function ProjectPickerModal({
   if (!open) return null;
 
   const preferred = preferredProjectName?.trim().toLowerCase();
-  const sortedProjects = preferred
-    ? [...projects].sort((a, b) => {
-        const aMatch = a.name.toLowerCase().includes(preferred) ? 1 : 0;
-        const bMatch = b.name.toLowerCase().includes(preferred) ? 1 : 0;
-        return bMatch - aMatch;
-      })
-    : projects;
+  const sortedProjects = [...projects].sort((a, b) => {
+    if (sortRecentFirst) {
+      const timeDiff =
+        new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+      if (timeDiff !== 0) return timeDiff;
+    }
+    if (!preferred) return 0;
+    const aMatch = a.name.toLowerCase().includes(preferred) ? 1 : 0;
+    const bMatch = b.name.toLowerCase().includes(preferred) ? 1 : 0;
+    return bMatch - aMatch;
+  });
 
   function handleCreate() {
     const name = newName.trim();

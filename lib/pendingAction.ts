@@ -17,6 +17,7 @@ import {
   detectAudioRequest,
   isRhetoricalSoundUsage,
 } from "./audioSuggestions";
+import { shouldBlockStressAutoToolRouting } from "./stressRouting";
 
 export type MakeBridge = {
   type: string;
@@ -161,12 +162,18 @@ function labelFragmentMatches(text: string, label: string): boolean {
 export function matchesPendingAcceptance(
   text: string,
   action: PendingAction,
+  opts?: { allowGenericAcceptance?: boolean },
 ): boolean {
   const t = text.trim();
   if (!t) return false;
   const lower = t.toLowerCase();
 
-  if (isActionAcceptance(t) || SHORT_ACCEPT_RE.test(t)) return true;
+  if (
+    opts?.allowGenericAcceptance &&
+    (isActionAcceptance(t) || SHORT_ACCEPT_RE.test(t))
+  ) {
+    return true;
+  }
 
   switch (action.kind) {
     case "workspace": {
@@ -204,6 +211,7 @@ export function matchesPendingAcceptance(
       }
       if (section === "focus-audio") {
         if (isRhetoricalSoundUsage(t)) return false;
+        if (shouldBlockStressAutoToolRouting(t)) return false;
         if (/\b(?:yes|yeah|yep|sure|ok|okay|open)\b/i.test(t)) return true;
         return detectAudioRequest(t).isAudio;
       }
@@ -246,6 +254,7 @@ export function matchesPendingAcceptance(
         }
         if (tool === "focus-audio") {
           if (isRhetoricalSoundUsage(t)) return false;
+          if (shouldBlockStressAutoToolRouting(t)) return false;
           if (/\b(?:yes|yeah|yep|sure|ok|okay|open)\b/i.test(t)) return true;
           return detectAudioRequest(t).isAudio;
         }
@@ -331,8 +340,10 @@ export function workspaceOpenAck(section: AppSection): string {
             : section === "templates-library"
               ? "Templates"
               : section === "projects"
-              ? "Projects"
-              : section === "saved-work"
+                ? "Projects"
+                : section === "decision-compass"
+                  ? "Decision Compass"
+                  : section === "saved-work"
                 ? "Saved Work"
                 : "workspace";
   return `Opening **${title}** beside us — chat stays right here.`;

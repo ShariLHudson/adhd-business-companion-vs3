@@ -1,8 +1,4 @@
 import { describe, expect, it } from "vitest";
-import {
-  bootstrapCreateBuilderSession,
-  processCreateBuilderTurn,
-} from "./createBuilderChat";
 import { advanceAfterItemPick } from "./createWorkflow";
 import {
   inferPendingApprovalField,
@@ -141,7 +137,7 @@ describe("workspaceApprovalSync", () => {
 
   it("workshop suggested content → yes → outline updated", () => {
     const turn = tryResolveWorkspaceApprovalTurn({
-      userText: "add these",
+      userText: "Yes",
       lastAssistantText: workshopOutlineAssistant,
       ctx: playbookCtx,
     });
@@ -151,29 +147,29 @@ describe("workspaceApprovalSync", () => {
   });
 
   it("create suggested section → yes → section added via builder chat", () => {
-    let { session } = bootstrapCreateBuilderSession("Newsletter");
-    for (const answer of [
-      "ADHD founders",
-      "Perfectionism traps",
-      "Educate and nurture",
-      "Reply with your biggest struggle",
-    ]) {
-      session = processCreateBuilderTurn(session, answer).session;
-    }
+    const createCtx = buildWorkspaceContext("content-generator", {
+      view: "detail",
+    })!;
+    const wf = {
+      ...advanceAfterItemPick("Newsletter"),
+      questionMode: "split_screen" as const,
+      discoverySubphase: "sections" as const,
+      activeSectionId: "subject",
+      templateSections: [
+        { id: "subject", label: "Subject Line", status: "empty" as const },
+      ],
+    };
 
-    const turn = processCreateBuilderTurn(
-      session,
-      "Yes",
-      createSectionAssistant,
-    );
-    expect(turn.session.workflow.sectionContent?.subject).toMatch(
-      /Stop waiting for perfect/,
-    );
-    expect(turn.session.workflow.sectionContent?.subject).toMatch(
-      /Done beats perfect/,
-    );
-    expect(turn.reply).toContain("Added to **Subject Line**");
-    expect(turn.reply.toLowerCase()).not.toContain("yes");
+    const turn = tryResolveWorkspaceApprovalTurn({
+      userText: "Yes",
+      lastAssistantText: createSectionAssistant,
+      ctx: createCtx,
+      createWorkflow: wf,
+    });
+    expect(turn?.fill.value).toMatch(/Stop waiting for perfect/);
+    expect(turn?.fill.value).toMatch(/Done beats perfect/);
+    expect(turn?.reply).toContain("Subject Line");
+    expect(turn?.reply.toLowerCase()).not.toContain("yes");
   });
 
   it("create split-screen approval via workflow state", () => {

@@ -2,6 +2,7 @@
  * Loop Intelligence — recurring patterns with awareness, not diagnosis.
  */
 
+import { shouldSurfaceAutomaticLoopOffer } from "@/lib/interventionPolicy";
 import {
   contextualLoopSignals,
   intelligenceLoopSignals,
@@ -75,6 +76,7 @@ export function evaluateAndRecordLoopIntelligence(
 export function shouldSurfaceLoopOffer(
   snapshot: LoopSnapshot | null,
 ): boolean {
+  if (!shouldSurfaceAutomaticLoopOffer()) return false;
   return Boolean(snapshot?.companionResponse.trim());
 }
 

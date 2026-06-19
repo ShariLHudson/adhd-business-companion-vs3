@@ -29,6 +29,7 @@ import {
 import { enterAddDetailStep } from "@/lib/createBuild";
 import { buildFullCreateBrief } from "@/lib/createTemplates";
 import { CreateAddDetailPanel } from "@/components/companion/CreateAddDetailPanel";
+import { CreateInspirationLayer } from "@/components/companion/CreateInspirationLayer";
 import { WorkspaceStepCard } from "@/components/companion/WorkspaceStepCard";
 
 const btnPrimary =
@@ -89,6 +90,7 @@ export function CreateWorkflowPanel({
   buildErrorMessage,
   onClearBuildError,
   companionDriven = false,
+  onOpenSavedWork,
 }: {
   workflow: CreateWorkflowState;
   typeLabel: string;
@@ -104,6 +106,7 @@ export function CreateWorkflowPanel({
   onClearBuildError?: () => void;
   /** Chat owns discovery — panel only shows the type picker. */
   companionDriven?: boolean;
+  onOpenSavedWork?: (savedWorkId: string) => void;
 }) {
   const [draftAnswer, setDraftAnswer] = useState("");
   const [customItemText, setCustomItemText] = useState(
@@ -178,6 +181,12 @@ export function CreateWorkflowPanel({
           title="What would you like to create?"
           footer="You can also tell Shari in chat."
         >
+          <CreateInspirationLayer
+            onPick={(item) => {
+              if (item.createType) pickOutcome(item.createType);
+            }}
+            onOpenSavedWork={onOpenSavedWork}
+          />
           <CategoryPickerSelect
               label="Content type"
               hideLabel

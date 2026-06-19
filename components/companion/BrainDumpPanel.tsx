@@ -27,6 +27,8 @@ import { sortByDropdownLabel, sortDropdownLabels } from "@/lib/dropdownSort";
 import type { AppSection } from "@/lib/companionUi";
 import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+import { BrainDumpVisualPanel } from "@/components/visual-thinking/BrainDumpVisualPanel";
 import { useVisualMode } from "@/lib/useVisualMode";
 
 type TimeFilter = "today" | "week" | "month" | "30d" | "90d" | "all";
@@ -109,6 +111,9 @@ export function BrainDumpPanel({
   const [viewed, setViewed] = useState(false);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [xpFlash, setXpFlash] = useState(false);
+  const [sessionVisualEntries, setSessionVisualEntries] = useState<
+    BrainDumpEntry[]
+  >([]);
   const visualMode = useVisualMode();
   const colorOn = visualMode !== "off";
   const decorative = visualMode === "decorative";
@@ -162,6 +167,8 @@ export function BrainDumpPanel({
     id ? projects.find((p) => p.id === id)?.name : undefined;
 
   const activeEntries = entries.filter((e) => !e.done);
+  const visualEntries =
+    panelMode === "session" ? sessionVisualEntries : activeEntries;
   const inTime = (iso: string) => {
     if (timeFilter === "all") return true;
     if (timeFilter === "today") return isToday(iso);
@@ -231,7 +238,8 @@ export function BrainDumpPanel({
     }`;
 
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+    <div className="companion-fade-in flex h-full min-h-0 flex-col lg:flex-row">
+      <div className={`${workspacePanelShellClass({ width: "full", inSplit: true })} min-w-0 flex-1 overflow-y-auto`}>
       {contextBanner ? (
         <div className="mb-4 rounded-2xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/5 px-4 py-3 text-sm leading-relaxed text-[#2d2926]">
           {contextBanner}
@@ -289,6 +297,7 @@ export function BrainDumpPanel({
             onOpen={suggestOpen}
             onViewLibrary={openLibraryView}
             onSessionComplete={openLibraryView}
+            onSessionEntriesChange={setSessionVisualEntries}
           />
         </div>
       ) : null}
@@ -648,6 +657,8 @@ export function BrainDumpPanel({
           the first thing on your mind.
         </p>
       )}
+      </div>
+      <BrainDumpVisualPanel entries={visualEntries} />
     </div>
   );
 }

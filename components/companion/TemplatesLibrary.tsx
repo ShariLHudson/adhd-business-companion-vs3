@@ -12,7 +12,6 @@ import {
   updateTemplate,
   type TemplateCategory,
   type TemplateItem,
-  type TemplateStatus,
 } from "@/lib/companionStore";
 import { RefineActions } from "@/components/companion/RefineActions";
 import { DraftWorkspacePanel } from "@/components/companion/DraftWorkspacePanel";
@@ -23,11 +22,14 @@ import { itemTypeFromTemplate } from "@/lib/templateItemType";
 import { templateToCreationInput } from "@/lib/templateBuildWithShari";
 import {
   filterTemplates,
-  groupTemplatesByCategory,
+  sortedTemplateDropdownOptions,
+  templateDropdownLabel,
+  templatesForDefaultPicker,
   TEMPLATE_STATUS_OPTIONS,
   type TemplateStatusFilter,
 } from "@/lib/templateLibraryUx";
 import { NO_CATEGORY } from "@/lib/categoryRevealUx";
+import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
 type Draft = {
   id?: string;
@@ -107,15 +109,10 @@ export function TemplatesLibrary({
   const [items, setItems] = useState<TemplateItem[]>([]);
   const [status, setStatus] = useState<TemplateStatusFilter>("all");
   const [search, setSearch] = useState("");
-  const [filtersOpen, setFiltersOpen] = useState(false);
   const [draft, setDraft] = useState<Draft | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
-  const [pendingBuildId, setPendingBuildId] = useState<string | null>(null);
+  const [pickerSelection, setPickerSelection] = useState("");
   const [pendingConsent, setPendingConsent] = useState<PendingConsent | null>(
-    null,
-  );
-  /** Accordion — at most one category open; null = all collapsed. */
-  const [openCategory, setOpenCategory] = useState<TemplateCategory | null>(
     null,
   );
   const [googleExportError, setGoogleExportError] = useState<string | null>(null);
@@ -125,7 +122,12 @@ export function TemplatesLibrary({
     setItems(getTemplates());
   }, []);
 
-  const visible = useMemo(
+  const pickerOptions = useMemo(
+    () => sortedTemplateDropdownOptions(templatesForDefaultPicker(items)),
+    [items],
+  );
+
+  const advancedResults = useMemo(
     () =>
       filterTemplates(items, {
         query: search,
@@ -135,76 +137,7 @@ export function TemplatesLibrary({
     [items, search, status],
   );
 
-  const grouped = useMemo(
-    () => groupTemplatesByCategory(visible),
-    [visible],
-  );
-
-  const categoryDisplayLabel = (cat: TemplateCategory): string => {
-    if (cat === "offers") return "Sales";
-    if (cat === "emails") return "Email";
-    if (cat === "systems") return "Operations";
-    return TEMPLATE_CATEGORY_LABEL[cat];
-  };
-
-  function toggleCategory(cat: TemplateCategory) {
-    setOpenCategory((prev) => (prev === cat ? null : cat));
-  }
-
-  function closeCategory() {
-    setOpenCategory(null);
-  }
-
-  function renderTemplateRow(t: TemplateItem) {
-    return (
-      <li
-        key={t.id}
-        className="rounded-lg border border-[#e7dfd4] bg-[#faf7f2]/60 p-3"
-      >
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <button
-            type="button"
-            onClick={() => setViewId(t.id)}
-            className="min-w-0 flex-1 text-left text-base font-semibold text-[#1f1c19] hover:text-[#1e4f4f]"
-          >
-            {t.title}
-          </button>
-          {onBuildWithShari ? (
-            pendingBuildId === t.id ? (
-              <div className="flex flex-wrap gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPendingBuildId(null);
-                    onBuildWithShari(templateToCreationInput(t));
-                  }}
-                  className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-sm font-semibold text-white"
-                >
-                  Yes — start in chat
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setPendingBuildId(null)}
-                  className="rounded-lg px-3 py-1.5 text-sm font-semibold text-[#6b635a] hover:bg-black/5"
-                >
-                  Not now
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => setPendingBuildId(t.id)}
-                className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
-              >
-                Build With Shari
-              </button>
-            )
-          ) : null}
-        </div>
-      </li>
-    );
-  }
-
+  const advancedActive = Boolean(search.trim()) || status !== "all";
   function saveDraft() {
     const body = draft?.body.trim();
     if (!draft || !body) return;
@@ -235,7 +168,7 @@ export function TemplatesLibrary({
   // ---- Editor view --------------------------------------------------------
   if (draft) {
     return (
-      <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+      <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
         <p className="text-2xl font-semibold text-[#1f1c19]">
           {draft.id ? "Edit template" : "New template"}
         </p>
@@ -542,9 +475,9 @@ export function TemplatesLibrary({
     );
   }
 
-  // ---- List view — search first, filter second, flat results ---------------
+  // ---- List view — calm picker + optional advanced search ------------------
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+    <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
       <WorkspaceGuide section="templates-library" />
       <div className="flex items-start justify-between gap-3">
         <p className="text-2xl font-semibold text-[#1f1c19]">Templates</p>
@@ -561,13 +494,10 @@ export function TemplatesLibrary({
           )}
         </div>
       </div>
-      <div className="mt-1 space-y-1 text-base text-[#6b635a]">
-        <p>Templates are reusable starting points saved on this device.</p>
-        <p>
-          Build With Shari opens a conversation to adapt the template together.
-          Nothing is drafted until you agree.
-        </p>
-      </div>
+      <p className="mt-1 text-base text-[#6b635a]">
+        Reusable starting points saved on this device. Build With Shari adapts a
+        template in chat — nothing drafts until you agree.
+      </p>
 
       {onBuildWithShari && (
         <button
@@ -581,51 +511,63 @@ export function TemplatesLibrary({
               stage: "shaping",
             })
           }
-          className="mt-5 w-full rounded-xl bg-[#1e4f4f] px-4 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-[#163a3a]"
+          className="mt-6 w-full rounded-xl bg-[#1e4f4f] px-4 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-[#163a3a]"
         >
           ✨ Build With Shari
         </button>
       )}
 
+      <label className="mt-5 block text-sm font-semibold text-[#1f1c19]">
+        Choose a template
+        <select
+          value={pickerSelection}
+          onChange={(e) => {
+            const id = e.target.value;
+            setPickerSelection(id);
+            if (id) {
+              setViewId(id);
+              setPickerSelection("");
+            }
+          }}
+          className="mt-2 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+        >
+          <option value="">
+            {pickerOptions.length
+              ? "Select a template…"
+              : "No templates yet — start with Build With Shari"}
+          </option>
+          {pickerOptions.map((t) => (
+            <option key={t.id} value={t.id}>
+              {templateDropdownLabel(t)}
+            </option>
+          ))}
+        </select>
+      </label>
+
       <button
         type="button"
         onClick={() => setDraft({ ...EMPTY_DRAFT })}
-        className="mt-2 self-start text-sm font-semibold text-[#1e4f4f] hover:underline"
+        className="mt-4 w-full rounded-xl border border-[#1e4f4f]/25 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
       >
-        Start from blank →
+        Start from blank
       </button>
 
-      <input
-        type="search"
-        value={search}
-        onChange={(e) => {
-          setSearch(e.target.value);
-          setOpenCategory(null);
-        }}
-        placeholder="Search templates…"
-        className="mt-5 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-lg text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-        autoFocus
-      />
-
-      <details
-        className="mt-3 rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/80 px-3 py-2"
-        open={filtersOpen}
-        onToggle={(e) => setFiltersOpen((e.target as HTMLDetailsElement).open)}
-      >
+      <details className="mt-8 rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/80 px-3 py-2">
         <summary className="cursor-pointer list-none text-sm font-semibold text-[#6b635a] marker:content-none [&::-webkit-details-marker]:hidden">
-          Filter templates
-          {status !== "all" ? (
-            <span className="ml-2 font-normal text-[#1e4f4f]">(filtered)</span>
-          ) : null}
+          Advanced template search
         </summary>
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search templates…"
+          className="mt-3 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+        />
         <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-[#6b635a]">
           Status
           <select
             value={status}
-            onChange={(e) => {
-              setStatus(e.target.value as TemplateStatusFilter);
-              setOpenCategory(null);
-            }}
+            onChange={(e) => setStatus(e.target.value as TemplateStatusFilter)}
             className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
           >
             {TEMPLATE_STATUS_OPTIONS.map((opt) => (
@@ -635,61 +577,38 @@ export function TemplatesLibrary({
             ))}
           </select>
         </label>
+        {advancedActive ? (
+          advancedResults.length === 0 ? (
+            <p className="mt-3 text-sm text-[#6b635a]">
+              No templates match — try a different search or status.
+            </p>
+          ) : (
+            <ul className="mt-3 flex flex-col gap-1.5">
+              {sortedTemplateDropdownOptions(advancedResults).map((t) => (
+                <li key={t.id}>
+                  <button
+                    type="button"
+                    onClick={() => setViewId(t.id)}
+                    className="w-full rounded-lg px-2 py-2 text-left text-sm font-medium text-[#1f1c19] hover:bg-white/80 hover:text-[#1e4f4f]"
+                  >
+                    {templateDropdownLabel(t)}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )
+        ) : (
+          <p className="mt-3 text-xs text-[#9a8f82]">
+            Search or filter by status to browse the full library.
+          </p>
+        )}
       </details>
-
-      {visible.length === 0 ? (
-        <p className="mt-6 text-base text-[#6b635a]">
-          {search.trim() || status !== "all"
-            ? "No templates match — try a different search or filter."
-            : "No saved templates yet — tap Build With Shari above or start from blank."}
-        </p>
-      ) : (
-        <div className="mt-5 flex flex-col gap-2">
-          {grouped.map((group) => {
-            const open = openCategory === group.category;
-            return (
-              <section
-                key={group.category}
-                className="rounded-xl border border-[#d4cdc3] bg-white/90"
-              >
-                <button
-                  type="button"
-                  onClick={() => toggleCategory(group.category)}
-                  aria-expanded={open}
-                  className="flex w-full items-center justify-between gap-2 px-4 py-3.5 text-left"
-                >
-                  <span className="text-base font-semibold text-[#1f1c19]">
-                    {categoryDisplayLabel(group.category)} Templates
-                  </span>
-                  <span className="text-sm font-medium text-[#6b635a]">
-                    ({group.templates.length}) {open ? "▾" : "▸"}
-                  </span>
-                </button>
-                {open ? (
-                  <div className="border-t border-[#e7dfd4] px-3 py-3">
-                    <ul className="flex flex-col gap-2">
-                      {group.templates.map((t) => renderTemplateRow(t))}
-                    </ul>
-                    <button
-                      type="button"
-                      onClick={closeCategory}
-                      className="mt-3 w-full rounded-lg border border-[#1e4f4f]/25 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-                    >
-                      Close category
-                    </button>
-                  </div>
-                ) : null}
-              </section>
-            );
-          })}
-        </div>
-      )}
 
       {onBack && (
         <button
           type="button"
           onClick={onBack}
-          className="mt-6 self-start rounded-xl border-2 border-[#1e4f4f] bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f]"
+          className="mt-8 self-start rounded-xl border-2 border-[#1e4f4f] bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f]"
         >
           Back
         </button>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   businessContextSummary,
   getContentTypes,
@@ -26,6 +26,7 @@ import {
   type ArtifactExportAction,
 } from "@/lib/artifactType";
 import { CreateDraftImprove } from "@/components/companion/CreateDraftImprove";
+import { CreateDraftReviewChat } from "@/components/companion/CreateDraftReviewChat";
 import { ConfirmDialog } from "@/components/companion/ConfirmDialog";
 import {
   CreateOptionsMenu,
@@ -80,6 +81,7 @@ import { CreateTypePicker } from "@/components/companion/CreateTypePicker";
 import type { CreateBuilderPhase } from "@/lib/createBuilderChat";
 import { blankScaffoldForType } from "@/lib/createInitialization";
 import { liveCreateWorkflowState } from "@/lib/liveCreateWorkspace";
+import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { isUnresolvedCreateType } from "@/lib/createTypePickers";
 import { combinedCompanionContextForAI } from "@/lib/activeCompanions";
 import {
@@ -92,11 +94,32 @@ import {
 } from "@/lib/savedArtifact";
 import {
   createSavedWork,
+  getSavedWorkById,
   linkSavedWorkToProject,
   markSavedWorkExported,
   updateSavedWork,
 } from "@/lib/savedWorkStore";
 import type { Project } from "@/lib/companionStore";
+import { buildDraftReviewContext, summarizeSourceConversation } from "@/lib/createDraftReview";
+import { loadStashedConversation } from "@/lib/conversationHandoffRecovery";
+import { newCreateSessionId } from "@/lib/createSharedSession";
+import {
+  googleFailureReceipt,
+  googleReceiptForKind,
+  isGoogleCreateSuccess,
+  saveReceipt,
+} from "@/lib/saveExportTrust";
+import { SaveStatusBanner } from "@/components/companion/SaveStatusBanner";
+import {
+  buildTaskSheetCsv,
+  createProjectFromDocument,
+  detectExecutionCapability,
+  executionActionsForCapability,
+  extractTasksFromDocument,
+  linkGoogleAssetToProject,
+  type ExecutionActionId,
+} from "@/lib/createExecution";
+import { receiptProjectCreated } from "@/lib/executionReceipts";
 
 export type GenSeed = {
   type?: string;
@@ -817,6 +840,66 @@ export function ContentGeneratorPanel({
     return (title.trim() || topic || brief || type || "Draft").slice(0, 80);
   }
 
+  const draftReviewSessionId = useMemo(() => {
+    if (workflow.sessionId) return workflow.sessionId;
+    if (savedArtifact?.savedWorkId) return savedArtifact.savedWorkId;
+    if (draft.trim()) {
+      return `create-review-${type || "draft"}-${draft.length}`;
+    }
+    return newCreateSessionId();
+  }, [workflow.sessionId, savedArtifact?.savedWorkId, draft, type]);
+
+  const draftReviewContext = useMemo(() => {
+    if (!draft.trim()) return null;
+    const stash = loadStashedConversation();
+    return buildDraftReviewContext({
+      sessionId: draftReviewSessionId,
+      draftTitle: artifactTitleValue(),
+      draftType: type || resolvedTypeLabel(workflow) || "Draft",
+      draftContent: draft,
+      projectName: savedArtifact?.projectName ?? null,
+      projectId: savedArtifact?.projectId ?? null,
+      sourceConversationSummary: stash
+        ? summarizeSourceConversation(stash.messages)
+        : null,
+      sessionMetadata: {
+        workflowStep: workflow.step,
+        draftStatus: workflow.draftStatus,
+        template: workflow.selectedTemplateName ?? "none",
+        brief: (brief || topic || "").slice(0, 120),
+      },
+    });
+  }, [
+    draft,
+    draftReviewSessionId,
+    type,
+    workflow,
+    savedArtifact?.projectName,
+    savedArtifact?.projectId,
+    brief,
+    topic,
+    title,
+  ]);
+
+  const executionCapability = useMemo(
+    () =>
+      draft.trim()
+        ? detectExecutionCapability(
+            type || resolvedTypeLabel(workflow) || "Draft",
+            draft,
+          )
+        : null,
+    [draft, type, workflow],
+  );
+
+  const executionActions = useMemo(
+    () =>
+      executionCapability && showDraftEditor && workflow.draftStatus === "ready"
+        ? executionActionsForCapability(executionCapability)
+        : [],
+    [executionCapability, showDraftEditor, workflow.draftStatus],
+  );
+
   function exportGuard(): string | null {
     return validateArtifactForExport(savedArtifact, draft, artifactTitleValue());
   }
@@ -860,7 +943,7 @@ export function ContentGeneratorPanel({
       );
     }
     setLocationPanelOpen(true);
-    note(existingId ? "Updated in Saved Work ✓" : "Saved to Saved Work ✓");
+    note(existingId ? saveReceipt("saved-work") : saveReceipt("saved-work"));
     onWin?.(artifactTitle);
   }
 
@@ -872,7 +955,7 @@ export function ContentGeneratorPanel({
       linkSavedWorkToProject(base.savedWorkId, project.id, project.name);
     }
     onSavedArtifactChange(recordAfterProjectLink(base, project.id, project.name));
-    note(`Added to project “${project.name}” ✓`);
+    note(saveReceipt("project", project.name));
   }
 
   function handleAddToProject() {
@@ -895,7 +978,14 @@ export function ContentGeneratorPanel({
     });
     if (session && onOpenGoogleWorkspace) {
       onOpenGoogleWorkspace(session);
-      return;
+    }
+    if (savedArtifact?.projectId) {
+      linkGoogleAssetToProject(savedArtifact.projectId, {
+        kind: kind === "sheet" ? "sheet" : kind === "form" ? "form" : "doc",
+        url,
+        fileId: docId,
+        label: artifactTitleValue(),
+      });
     }
     if (!onSavedArtifactChange) return;
     const base =
@@ -904,7 +994,7 @@ export function ContentGeneratorPanel({
       markSavedWorkExported(base.savedWorkId, url, docId);
     }
     onSavedArtifactChange(recordAfterGoogleDoc(base, url, docId));
-    note("Created Google Doc ✓");
+    note(googleReceiptForKind(kind));
   }
 
   async function handleOpenGoogle(kind: GoogleFileKind) {
@@ -928,25 +1018,32 @@ export function ContentGeneratorPanel({
           kind,
         }),
       });
-      const j = (await r.json()) as { url?: string; id?: string; error?: string };
+      const j = (await r.json()) as {
+        url?: string;
+        id?: string;
+        error?: string;
+        message?: string;
+      };
       if (!r.ok) {
         const short =
           r.status === 401
             ? "Connect Google in Settings first."
-            : j.error || "Something went wrong sending this to Google Docs.";
+            : j.error === "not-form-friendly"
+              ? "Would you like me to turn this into form questions first?"
+              : j.error || googleFailureReceipt(kind);
         setGoogleExportError(short);
         onExportGuidance?.(`${short}\n\n${copyPasteFallbackMessage(kind)}`);
         return;
       }
-      if (j.url) {
+      if (isGoogleCreateSuccess(r.status, j) && j.url) {
         handleGoogleDocCreated(j.url, j.id, kind);
-        note("Opened in Google Docs ✓");
+        note(googleReceiptForKind(kind));
       } else {
-        setGoogleExportError("Something went wrong sending this to Google Docs.");
+        setGoogleExportError(googleFailureReceipt(kind));
         onExportGuidance?.(copyPasteFallbackMessage(kind));
       }
     } catch {
-      setGoogleExportError("Something went wrong sending this to Google Docs.");
+      setGoogleExportError(saveReceipt("export-fail"));
       onExportGuidance?.(copyPasteFallbackMessage(kind));
     }
   }
@@ -962,8 +1059,98 @@ export function ContentGeneratorPanel({
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+      note(saveReceipt("download-pdf"));
     } catch {
-      note("Couldn't download.");
+      note(saveReceipt("export-fail"));
+    }
+  }
+
+  function handleExecutionAction(action: ExecutionActionId) {
+    if (!draft.trim()) return;
+    const artifactType = type || resolvedTypeLabel(workflow) || "Draft";
+    const title = artifactTitleValue();
+
+    switch (action) {
+      case "add-to-project":
+        handleAddToProject();
+        return;
+      case "create-project":
+      case "action-plan":
+      case "task-list": {
+        const tasks =
+          action === "task-list" || action === "action-plan"
+            ? extractTasksFromDocument(draft)
+            : undefined;
+        const result = createProjectFromDocument({
+          title,
+          artifactType,
+          body: draft,
+          tasks,
+        });
+        if (onSavedArtifactChange) {
+          onSavedArtifactChange(
+            recordAfterProjectLink(
+              recordAfterSavedWorkSave(
+                savedArtifact ?? emptySavedArtifact(artifactType, title),
+                artifactType,
+                title,
+                result.savedWorkId,
+                draft,
+              ),
+              result.projectId,
+              result.projectName,
+            ),
+          );
+        }
+        note(
+          receiptProjectCreated(
+            result.projectName,
+            result.milestoneCount,
+            result.taskCount,
+          ),
+        );
+        return;
+      }
+      case "google-doc":
+        void handleOpenGoogle("doc");
+        return;
+      case "google-sheet":
+        void handleOpenGoogleSheetTasks();
+        return;
+      case "download-pdf":
+        handleDownloadDraft();
+        return;
+      default:
+        return;
+    }
+  }
+
+  async function handleOpenGoogleSheetTasks() {
+    const tasks = extractTasksFromDocument(draft);
+    const csv = buildTaskSheetCsv(tasks.length ? tasks : [artifactTitleValue()]);
+    const r = await fetch("/api/google/create-doc", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: `${artifactTitleValue()} — Tasks`,
+        content: csv,
+        kind: "sheet",
+      }),
+    });
+    const j = (await r.json()) as { url?: string; id?: string; error?: string };
+    if (isGoogleCreateSuccess(r.status, j) && j.url) {
+      handleGoogleDocCreated(j.url, j.id, "sheet");
+      if (savedArtifact?.projectId) {
+        linkGoogleAssetToProject(savedArtifact.projectId, {
+          kind: "sheet",
+          url: j.url,
+          fileId: j.id,
+          label: `${artifactTitleValue()} — Tasks`,
+        });
+      }
+      note(googleReceiptForKind("sheet", j.url));
+    } else {
+      note(saveReceipt("google-fail"));
     }
   }
 
@@ -1238,7 +1425,9 @@ export function ContentGeneratorPanel({
       )}
       <div
         className={`flex min-h-0 flex-1 flex-col ${
-          workspaceMode ? "" : "mx-auto max-w-2xl overflow-y-auto px-6 py-8"
+          workspaceMode
+            ? workspacePanelShellClass({ inSplit: true, width: "full", extra: "overflow-y-auto" })
+            : workspacePanelShellClass({ width: "standard", extra: "overflow-y-auto" })
         }`}
       >
       {showCreateOptions && (
@@ -1393,10 +1582,25 @@ export function ContentGeneratorPanel({
               setWorkflow((prev) => enterAddDetailStep(prev))
             }
             companionDriven={Boolean(onBuildWithShari)}
+            onOpenSavedWork={(id) => {
+              const item = getSavedWorkById(id);
+              if (!item) return;
+              pickCreateType(item.artifactType, {
+                bypassRoute: true,
+                skipWorkflow: true,
+              });
+              setDraft(item.body);
+              setWorkflow((prev) => ({
+                ...prev,
+                draftContent: item.body,
+                draftStatus: "ready",
+              }));
+            }}
           />
         </div>
       )}
       {showDraftEditor && workspaceMode && (
+        <>
         <DraftWorkspacePanel
           itemType={type || resolvedTypeLabel(workflow) || "Draft"}
           templateName={
@@ -1439,7 +1643,15 @@ export function ContentGeneratorPanel({
           googleExportError={googleExportError}
           onClearGoogleError={() => setGoogleExportError(null)}
           busy={loading}
+          reviewContext={draftReviewContext}
+          onReviewReceipt={(msg) => note(msg)}
+          executionActions={executionActions}
+          onExecutionAction={handleExecutionAction}
         />
+        <div className="mx-auto max-w-3xl px-4 pb-4">
+          <SaveStatusBanner level="resume" />
+        </div>
+        </>
       )}
 
       {showDraftEditor && workspaceMode ? (
@@ -1504,6 +1716,25 @@ export function ContentGeneratorPanel({
             onPrint={() => exportPrintRef.current?.click()}
             onGoogleDoc={() => exportDocRef.current?.click()}
           />
+
+          {draftReviewContext ? (
+            <CreateDraftReviewChat
+              context={draftReviewContext}
+              draft={draft}
+              onApplyDraft={(next) => {
+                setDraft(next);
+                setLastActivity({
+                  kind: "draft",
+                  title: brief || type || "Draft",
+                  subtitle: type || "content",
+                  contentType: type,
+                  content: next,
+                });
+              }}
+              onReceipt={(msg) => note(msg)}
+              disabled={loading}
+            />
+          ) : null}
 
           {!workspaceMode && (
             <>

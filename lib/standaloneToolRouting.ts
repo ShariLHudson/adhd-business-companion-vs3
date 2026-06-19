@@ -5,6 +5,7 @@ import {
   focusAudioOpenAck,
 } from "./audioSuggestions";
 import type { SidebarToolId } from "./companionUi";
+import { shouldBlockStressAutoToolRouting } from "./stressRouting";
 
 export type StandaloneToolLaunch = {
   tool: SidebarToolId;
@@ -21,7 +22,7 @@ export function detectStandaloneToolRequest(
   if (!t) return null;
 
   const audio = detectAudioRequest(text);
-  if (audio.isAudio) {
+  if (audio.isAudio && !shouldBlockStressAutoToolRouting(text)) {
     return { tool: "focus-audio", focusAudioCategory: audio.categoryId };
   }
 
@@ -29,10 +30,12 @@ export function detectStandaloneToolRequest(
     (OPEN_VERB_RE.test(t) || /\b(?:let me try|i'll try)\b/i.test(t)) &&
     /\b(?:breathe(?:\s+and\s+reset)?|breathing|breath)\b/i.test(t)
   ) {
+    if (shouldBlockStressAutoToolRouting(text)) return null;
     return { tool: "breathe" };
   }
 
   if (OPEN_VERB_RE.test(t) && /\b(?:focus timer|focus session)\b/i.test(t)) {
+    if (shouldBlockStressAutoToolRouting(text)) return null;
     return { tool: "focus-timer" };
   }
 

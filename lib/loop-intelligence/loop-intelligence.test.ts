@@ -56,7 +56,7 @@ describe("loop intelligence", () => {
     expect(snap?.loopType).toBe("research_loop");
     expect(snap?.relatedSignals.length).toBeGreaterThan(0);
     expect(snap?.possiblePurpose).toMatch(/uncertainty/i);
-    expect(shouldSurfaceLoopOffer(snap)).toBe(true);
+    expect(shouldSurfaceLoopOffer(snap)).toBe(false);
   });
 
   it("uses non-labeling companion language", () => {

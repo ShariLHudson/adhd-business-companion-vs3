@@ -11,6 +11,7 @@ import {
   shouldBlockArtifactPipeline,
 } from "./messageClassification";
 import { isDraftDirectionSelectionOnly } from "./draftPermissionGate";
+import { isHelpSeekingAnswer } from "./builderContentSync";
 
 /** Workspaces where open panel = implicit consent to store relevant chat content. */
 export const AUTO_APPLY_WORKSPACE_SECTIONS: AppSection[] = [
@@ -32,6 +33,7 @@ export function shouldBlockAutoApplyFromChat(
   lastAssistantText = "",
 ): boolean {
   if (shouldBlockArtifactPipeline(userText)) return true;
+  if (isHelpSeekingAnswer(userText)) return true;
   if (isDraftDirectionSelectionOnly(userText)) return true;
   if (classifyConversationalMode(userText) === "brainstorming") return true;
   if (isContentBrainstorming(userText)) return true;

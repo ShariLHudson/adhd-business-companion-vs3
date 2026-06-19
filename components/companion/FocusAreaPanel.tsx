@@ -1,171 +1,210 @@
 "use client";
 
 import { useState } from "react";
-import type { SidebarToolId } from "@/lib/companionUi";
+import {
+  FOCUS_FEELING_ENTRIES,
+  focusFeelingById,
+  type FocusFeelingId,
+  type FocusHubAction,
+  type FocusHubTool,
+  type FocusHubToolGroup,
+} from "@/lib/focusHub";
+import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
-// Focus = a calm support menu. Three primary actions always visible; the rest
-// live in two collapsed-by-default sections so the first view is only THREE
-// decisions — everything stays one tap away (nothing hidden on another screen).
-type Option = {
-  emoji: string;
-  title: string;
-  desc: string;
-  tool?: SidebarToolId; // routes via onOpen
-  getUnstuck?: boolean; // conversational — routes to chat, not a tool
-};
-
-const PRIMARY: Option[] = [
-  {
-    emoji: "🧠",
-    title: "Clear My Mind",
-    desc: "Reduce mental clutter — get thoughts out and find next steps.",
-    tool: "brain-dump",
-  },
-  {
-    emoji: "🎯",
-    title: "Focus Session",
-    desc: "Answer a few quick questions, then work with a timer.",
-    tool: "focus-timer",
-  },
-  {
-    emoji: "🚶",
-    title: "Get Unstuck",
-    desc: "Talk it through and find the smallest next step.",
-    getUnstuck: true,
-  },
-];
-
-const TOOLS: Option[] = [
-  {
-    emoji: "📅",
-    title: "Block Out Time",
-    desc: "Set a momentum appointment — movement counts.",
-    tool: "time-block",
-  },
-  {
-    emoji: "🌿",
-    title: "Breathe & Reset",
-    desc: "Calm your nervous system and regroup.",
-    tool: "breathe",
-  },
-  {
-    emoji: "🎧",
-    title: "Focus Audio",
-    desc: "Background sound to help you stay with it.",
-    tool: "focus-audio",
-  },
-];
-
-const BOOSTERS: Option[] = [
-  {
-    emoji: "🎮",
-    title: "Momentum Games",
-    desc: "Fifteen playful games — pattern, memory, speed, and more.",
-    tool: "games",
-  },
-  {
-    emoji: "🎡",
-    title: "Spin The Wheel",
-    desc: "Let the wheel choose when everything feels equally important.",
-    tool: "spin-wheel",
-  },
-  {
-    emoji: "🧭",
-    title: "Help Me Right Now",
-    desc: "Adjust My Day, parking lot, Safe For Today, spin, focus — each solves a different problem.",
-    tool: "activities",
-  },
-];
-
-export function FocusAreaPanel({
-  onOpen,
-  onGetUnstuck,
+function FeelingButton({
+  emoji,
+  label,
+  tagline,
+  onClick,
 }: {
-  onOpen: (tool: SidebarToolId) => void;
-  onGetUnstuck?: () => void;
+  emoji: string;
+  label: string;
+  tagline?: string;
+  onClick: () => void;
 }) {
-  // Every section starts collapsed — opening Focus shows only the three
-  // section headers, nothing expanded.
-  const [primaryOpen, setPrimaryOpen] = useState(false);
-  const [toolsOpen, setToolsOpen] = useState(false);
-  const [boostersOpen, setBoostersOpen] = useState(false);
-
-  const go = (o: Option) => {
-    if (o.getUnstuck) onGetUnstuck?.();
-    else if (o.tool) onOpen(o.tool);
-  };
-
-  const card = (o: Option, large: boolean) => (
+  return (
     <button
-      key={o.title}
       type="button"
-      onClick={() => go(o)}
-      className={`flex items-start gap-3 rounded-2xl border text-left transition-colors ${
-        large
-          ? "border-[#1e4f4f]/20 bg-white/85 p-4 shadow-sm hover:border-[#1e4f4f]/45 hover:bg-white"
-          : "border-[#d4cdc3] bg-white/70 px-3.5 py-3 hover:border-[#1e4f4f]/40 hover:bg-white"
-      }`}
+      onClick={onClick}
+      className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/70 px-3.5 py-3 text-left transition-colors hover:border-[#1e4f4f]/40 hover:bg-white"
     >
-      <span aria-hidden="true" className={large ? "text-2xl" : "text-xl"}>
-        {o.emoji}
+      <span
+        aria-hidden="true"
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f5f1ea] text-lg"
+      >
+        {emoji}
       </span>
-      <span>
-        <span className="block text-base font-semibold text-[#1f1c19]">
-          {o.title}
-        </span>
-        <span className="mt-0.5 block text-sm text-[#6b635a]">{o.desc}</span>
+      <span className="min-w-0">
+        <span className="block text-base font-semibold text-[#1f1c19]">{label}</span>
+        {tagline ? (
+          <span className="mt-0.5 block text-sm leading-snug text-[#6b635a]">
+            {tagline}
+          </span>
+        ) : null}
       </span>
     </button>
   );
+}
 
-  const section = (
-    label: string,
-    open: boolean,
-    toggle: () => void,
-    items: Option[],
-  ) => (
-    <div className="mt-4">
-      <button
-        type="button"
-        onClick={toggle}
-        aria-expanded={open}
-        className="flex w-full items-center justify-between rounded-xl border border-[#d4cdc3] bg-white/70 px-4 py-3 text-left transition-colors hover:bg-white"
-      >
-        <span className="text-base font-semibold text-[#1f1c19]">{label}</span>
-        <span aria-hidden="true" className="text-[#7c7468]">
-          {open ? "▾" : "▸"}
+function ToolButton({
+  item,
+  starred,
+  onSelect,
+}: {
+  item: FocusHubTool;
+  starred?: boolean;
+  onSelect: (action: FocusHubAction) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onSelect(item.action)}
+      data-testid={`focus-tool-${item.id}`}
+      className="flex w-full items-start gap-2 rounded-xl border border-[#e4ddd2] bg-[#faf7f2] px-3 py-2.5 text-left transition-colors hover:border-[#1e4f4f]/35 hover:bg-white"
+    >
+      <span className="min-w-0 flex-1">
+        <span className="block text-sm font-semibold text-[#1f1c19]">
+          {starred ? "⭐ " : null}
+          {item.label}
+          {starred ? (
+            <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide text-[#1e4f4f]">
+              Recommended
+            </span>
+          ) : null}
         </span>
-      </button>
-      {open && (
-        <div className="companion-fade-in mt-2 flex flex-col gap-2">
-          {items.map((o) => card(o, false))}
-        </div>
-      )}
-    </div>
+        {item.description ? (
+          <span className="mt-0.5 block text-xs leading-snug text-[#6b635a]">
+            {item.description}
+          </span>
+        ) : null}
+      </span>
+    </button>
+  );
+}
+
+function ToolGroupSection({
+  group,
+  recommendedId,
+  onSelect,
+}: {
+  group: FocusHubToolGroup;
+  recommendedId?: string;
+  onSelect: (action: FocusHubAction) => void;
+}) {
+  return (
+    <section className="flex flex-col gap-2" data-testid={`focus-group-${group.id}`}>
+      <h3 className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+        {group.title}
+      </h3>
+      <ul className="flex flex-col gap-1.5">
+        {group.tools.map((item) => (
+          <li key={item.id}>
+            <ToolButton
+              item={item}
+              starred={item.id === recommendedId}
+              onSelect={onSelect}
+            />
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
+export function FocusAreaPanel({
+  onAction,
+}: {
+  onAction: (action: FocusHubAction) => void;
+}) {
+  const [selectedFeeling, setSelectedFeeling] = useState<FocusFeelingId | null>(
+    null,
   );
 
+  const category = selectedFeeling ? focusFeelingById(selectedFeeling) : null;
+
+  function handleFeelingSelect(id: FocusFeelingId) {
+    const feeling = focusFeelingById(id);
+    if (!feeling) return;
+    if (feeling.immediate) {
+      onAction({ kind: "need-shari", toolId: "need-shari" });
+      return;
+    }
+    setSelectedFeeling(id);
+  }
+
+  function handleBack() {
+    setSelectedFeeling(null);
+  }
+
+  if (category && !category.immediate) {
+    return (
+      <div
+        className={workspacePanelShellClass({ width: "narrow" })}
+        data-testid="focus-area-panel"
+        data-focus-view="category"
+        data-focus-category={category.id}
+      >
+        <button
+          type="button"
+          onClick={handleBack}
+          className="mb-3 self-start text-sm font-semibold text-[#1e4f4f]"
+        >
+          ‹ Focus
+        </button>
+        <p className="text-2xl font-semibold text-[#1f1c19]">
+          {category.emoji} {category.label}
+        </p>
+        <p className="mt-1 text-sm text-[#6b635a]">{category.tagline}</p>
+
+        {category.recommended ? (
+          <div className="mt-5">
+            <ToolButton
+              item={category.recommended}
+              starred
+              onSelect={onAction}
+            />
+          </div>
+        ) : null}
+
+        <div className="mt-5 flex flex-col gap-5">
+          {category.groups.map((group) => (
+            <ToolGroupSection
+              key={group.id}
+              group={group}
+              recommendedId={category.recommended?.id}
+              onSelect={onAction}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+    <div
+      className={workspacePanelShellClass({ width: "narrow" })}
+      data-testid="focus-area-panel"
+      data-focus-view="feelings"
+    >
       <WorkspaceGuide section="focus" />
       <p className="text-2xl font-semibold text-[#1f1c19]">Focus</p>
-      <p className="mt-1 text-base text-[#6b635a]">What would help right now?</p>
+      <p className="mt-1 text-base text-[#6b635a]">
+        How are you feeling right now?
+      </p>
 
-      <div className="mt-5 flex flex-col gap-0.5">
-        {section(
-          "🧭 Start Here",
-          primaryOpen,
-          () => setPrimaryOpen((o) => !o),
-          PRIMARY,
-        )}
-        {section("🧰 Focus Tools", toolsOpen, () => setToolsOpen((o) => !o), TOOLS)}
-        {section(
-          "⚡ Momentum Boosters",
-          boostersOpen,
-          () => setBoostersOpen((o) => !o),
-          BOOSTERS,
-        )}
-      </div>
+      <ul className="mt-5 flex flex-col gap-2">
+        {FOCUS_FEELING_ENTRIES.map((feeling) => (
+          <li key={feeling.id}>
+            <FeelingButton
+              emoji={feeling.emoji}
+              label={feeling.label}
+              tagline={feeling.immediate ? feeling.tagline : undefined}
+              onClick={() => handleFeelingSelect(feeling.id)}
+            />
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

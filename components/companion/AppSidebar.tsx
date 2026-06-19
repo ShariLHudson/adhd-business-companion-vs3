@@ -10,7 +10,7 @@ import {
   type AppSection,
   type SidebarNavId,
 } from "@/lib/companionUi";
-import { getLastActivity } from "@/lib/companionStore";
+import { findLatestHomeResumeItem } from "@/lib/homeResumeItem";
 import type { CoachingMode } from "@/lib/companionPrompt";
 
 type AppSidebarProps = {
@@ -28,7 +28,8 @@ export function AppSidebar({
 }: AppSidebarProps) {
   // Is one of the backstage sections currently open? Keep "More" expanded if so.
   const moreActive = MORE_NAV.some(
-    (item) => SECTION_NAV[item.id] === activeSection,
+    (item) =>
+      SECTION_NAV[item.id] === activeSection || activeNav === item.id,
   );
   const [moreOpen, setMoreOpen] = useState(false);
   const showMore = moreOpen || moreActive;
@@ -37,7 +38,7 @@ export function AppSidebar({
   // users elsewhere in the app know there's something to come back to.
   const [hasContinue, setHasContinue] = useState(false);
   useEffect(() => {
-    setHasContinue(Boolean(getLastActivity()));
+    setHasContinue(Boolean(findLatestHomeResumeItem()));
   }, [activeSection]);
 
   function renderItem(item: {

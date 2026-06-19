@@ -5,6 +5,7 @@ import {
   sortedCreateCatalog,
   type CreateCatalogItem,
 } from "@/lib/createCatalog";
+import { compareDropdownLabels } from "@/lib/dropdownSort";
 import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
 
@@ -27,7 +28,7 @@ export function CreateCatalogPicker({
   const categoryOptions = useMemo(
     () =>
       [...catalog]
-        .sort((a, b) => a.label.localeCompare(b.label))
+        .sort((a, b) => compareDropdownLabels(a.label, b.label))
         .map((c) => ({ value: c.id, label: c.label })),
     [catalog],
   );

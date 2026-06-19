@@ -17,6 +17,7 @@ import { getEffectiveSuggestionCount } from "./workspaceSuggestion";
 import {
   isBuilderAddCommand,
   isBuilderApprovalPhrase,
+  isHelpSeekingAnswer,
 } from "./builderContentSync";
 
 export type WorkspaceIntent =
@@ -210,6 +211,7 @@ function looksLikeFieldContent(
   if (suggestionCount >= 1 && parseOptionSelection(t, suggestionCount) !== null) {
     return false;
   }
+  if (isHelpSeekingAnswer(t)) return false;
   if (t.length < 2 || NON_CONTENT_SHORT_RE.test(t)) return false;
   if (isBuilderApprovalPhrase(t) || isBuilderAddCommand(t)) return false;
   if (isWorkspaceDiscoveryRequest(t, lastAssistantText)) return false;

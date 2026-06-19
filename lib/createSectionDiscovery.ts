@@ -13,7 +13,7 @@ import {
   resolveTemplateSections,
   type CreateTemplateSection,
 } from "./createTemplates";
-import { isInvalidBuilderFieldValue } from "./builderContentSync";
+import { isHelpSeekingAnswer, isInvalidBuilderFieldValue } from "./builderContentSync";
 import { extractNumberedOptions, parseOptionSelection } from "./workspaceSop";
 
 /** Discovery question id → template section id, per item type. */
@@ -194,6 +194,7 @@ export function isSectionExplorationRequest(text: string): boolean {
 export function isDiscoveryHelpRequest(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (isHelpSeekingAnswer(t)) return true;
   if (isSectionExplorationRequest(t)) return true;
   return (
     /\bhelp me (?:create|write|draft|come up with|with|build)\b/i.test(t) ||
@@ -316,12 +317,31 @@ export function tryResolveSectionOptionApproval(
   if (options.length < 1) return null;
 
   const t = userText.trim().toLowerCase();
-  const useBare = t.match(/\buse\s+(\d+)\b/);
+  const useBare = t.match(/\b(?:use|pick|choose|take|save)\s*#?\s*(\d+)\b/);
   if (useBare) {
     const idx = parseInt(useBare[1]!, 10) - 1;
     const value = options[idx]?.trim();
     if (value && !isUnsaveableSectionText(value)) {
       return { sectionId, value, index: idx };
+    }
+  }
+
+  const useBareLegacy = t.match(/\buse\s+(\d+)\b/);
+  if (useBareLegacy) {
+    const idx = parseInt(useBareLegacy[1]!, 10) - 1;
+    const value = options[idx]?.trim();
+    if (value && !isUnsaveableSectionText(value)) {
+      return { sectionId, value, index: idx };
+    }
+  }
+
+  if (
+    /^(?:i like that one|use this|save that)\.?$/i.test(userText.trim()) &&
+    options.length === 1
+  ) {
+    const value = options[0]?.trim();
+    if (value && !isUnsaveableSectionText(value)) {
+      return { sectionId, value, index: 0 };
     }
   }
 
@@ -346,6 +366,7 @@ export function captureDiscoveryHelpOptions(
 export function prepareDiscoveryHelpContext(
   session: { typeLabel: string | null; workflow: CreateWorkflowState },
   userText: string,
+  lastAssistantText = "",
 ): { typeLabel: string | null; workflow: CreateWorkflowState } {
   const typeLabel = session.typeLabel;
   if (!typeLabel) return session;
@@ -353,14 +374,19 @@ export function prepareDiscoveryHelpContext(
   const allSections = resolveTemplateSections(session.workflow) ?? [];
   const incomplete = incompleteTemplateSections(session.workflow);
   const pool = incomplete.length ? incomplete : allSections;
-  const matched = matchSectionFromText(userText, pool);
+  const matched =
+    matchSectionFromText(userText, pool) ??
+    matchSectionFromText(lastAssistantText, pool);
 
   const workflow: CreateWorkflowState = {
     ...session.workflow,
     discoverySubphase:
       session.workflow.discoverySubphase ??
       (isInSectionDiscoveryPhase(session.workflow) ? "sections" : null),
-    activeSectionId: matched?.id ?? session.workflow.activeSectionId ?? null,
+    activeSectionId:
+      matched?.id ??
+      session.workflow.activeSectionId ??
+      null,
     pendingSectionOptions: null,
   };
 
@@ -388,7 +414,7 @@ export function discoveryHelpHintForChat(
       : "",
     `User asked: "${userText.trim()}"`,
     "Do NOT save their question as section content.",
-    "Do NOT say you added anything to the workspace yet.",
+    "Help-seeking replies (I don't know, not sure, help me, give me options, you decide) are NOT content.",
     "Generate 3–5 concrete numbered options tied to their topic and audience.",
     'End with: "Would you like to use one of these, revise one, or see more?"',
     "Stay in discovery — do NOT enter build-ready.",

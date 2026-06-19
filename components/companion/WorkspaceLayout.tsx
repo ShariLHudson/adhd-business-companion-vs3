@@ -2,7 +2,19 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { ChatLayoutMode } from "@/lib/workspaceNav";
+import {
+  SPLIT_CHAT_PANE_CLASS,
+  SPLIT_WORKSPACE_PANE_CLASS,
+  WORKSPACE_HEADER_MIN_HEIGHT_CLASS,
+} from "@/lib/workspaceLayoutTokens";
+import {
+  mobileSplitLayout,
+  splitLayoutClassName,
+  splitLayoutStyle,
+  type WorkspaceViewSizePreset,
+} from "@/lib/workspaceViewSize";
 import { BackButton } from "@/components/companion/BackButton";
+import { WorkspaceViewSizeControl } from "@/components/companion/WorkspaceViewSizeControl";
 
 // Workspace Mode shell — Chat + working area together. Presentational only, so
 // page.tsx can adopt it incrementally: pass the chat node and (optionally) an
@@ -31,6 +43,8 @@ export function WorkspaceLayout({
   assistLabel = "Work With Shari",
   leftPaneTitle = "Chat",
   leftPaneEmoji = "💬",
+  viewSizePreset = "balanced",
+  onViewSizePresetChange,
 }: {
   chat: ReactNode;
   workspace?: ReactNode | null;
@@ -51,6 +65,8 @@ export function WorkspaceLayout({
   /** Left pane tab label when not default chat (e.g. activity guide beside a tool). */
   leftPaneTitle?: string;
   leftPaneEmoji?: string;
+  viewSizePreset?: WorkspaceViewSizePreset;
+  onViewSizePresetChange?: (preset: WorkspaceViewSizePreset) => void;
 }) {
   const [mobileView, setMobileView] = useState<"chat" | "work">("chat");
   const workspacePaneRef = useRef<HTMLDivElement>(null);
@@ -94,9 +110,15 @@ export function WorkspaceLayout({
     return <div className="h-full w-full">{chat}</div>;
   }
 
+  const mobileLayout = mobileSplitLayout();
+
   return (
-    <div className="flex h-full min-h-0 w-full flex-col overflow-hidden">
-      {/* Mobile tab switch — chat is always one tap away */}
+    <div
+      className={`flex h-full min-h-0 w-full flex-col overflow-hidden ${splitLayoutClassName(viewSizePreset)}`}
+      style={splitLayoutStyle(viewSizePreset)}
+      data-mobile-split-layout={mobileLayout}
+    >
+      {/* Mobile tab switch — chat is always one tap away; never side-by-side shrink */}
       <div className="flex shrink-0 gap-1 border-b border-[#1e4f4f]/10 bg-white/70 p-1 md:hidden">
         <button
           type="button"
@@ -135,12 +157,12 @@ export function WorkspaceLayout({
       >
         {/* Chat pane — kept mounted when hidden so state is preserved */}
         <div
-          className={`h-full min-h-0 flex-col overflow-hidden border-[#1e4f4f]/10 md:max-h-full md:border-r ${
+          className={`${SPLIT_CHAT_PANE_CLASS} h-full min-h-0 flex-col overflow-hidden border-[#1e4f4f]/10 md:max-h-full md:border-r ${
             chatHidden
               ? "hidden"
               : mobileView === "chat"
                 ? "flex w-full"
-                : "hidden md:flex md:w-2/5"
+                : "hidden md:flex"
           }`}
         >
           {chat}
@@ -150,7 +172,7 @@ export function WorkspaceLayout({
         <div
           ref={workspacePaneRef}
           tabIndex={-1}
-          className={`min-h-0 flex-1 flex-col outline-none ring-2 ring-transparent focus:ring-[#1e4f4f]/30 md:sticky md:top-0 md:max-h-full md:self-start ${
+          className={`${SPLIT_WORKSPACE_PANE_CLASS} min-h-0 flex-col outline-none ring-2 ring-transparent focus:ring-[#1e4f4f]/30 md:sticky md:top-0 md:max-h-full md:self-start ${
             chatHidden
               ? "flex w-full"
               : mobileView === "work"
@@ -158,7 +180,9 @@ export function WorkspaceLayout({
                 : "hidden md:flex md:h-full"
           }`}
         >
-          <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[#1e4f4f]/10 bg-white/60 px-3 py-2">
+          <div
+            className={`flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[#1e4f4f]/10 bg-white/60 px-3 py-2 ${WORKSPACE_HEADER_MIN_HEIGHT_CLASS}`}
+          >
             <div className="flex min-w-0 items-center gap-2">
               {onClose ? (
                 <BackButton onClick={onClose} size="compact" label="Back" />
@@ -167,7 +191,13 @@ export function WorkspaceLayout({
                 {workspaceTitle}
               </span>
             </div>
-            <div className="flex flex-wrap items-center justify-end gap-1">
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {onViewSizePresetChange ? (
+                <WorkspaceViewSizeControl
+                  value={viewSizePreset}
+                  onChange={onViewSizePresetChange}
+                />
+              ) : null}
               {hideAssistToggle ? (
                 !chatHidden ? (
                   <button

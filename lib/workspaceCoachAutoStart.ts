@@ -207,7 +207,7 @@ function buildActivitiesCoachAutoStart(
   const title = extras?.activityTitle?.trim();
   if (title) {
     return {
-      content: `We're in **${title}** beside chat — I'll walk you one step at a time. ${extras?.activityStep ? `You're on: ${extras.activityStep}.` : "What's on screen right now?"}`,
+      content: `We're in **${title}** beside chat — I'll walk you one step at a time.${extras?.activityStep ? ` You're on: ${extras.activityStep}.` : ""}`,
       focusField: null,
     };
   }
@@ -244,8 +244,15 @@ function buildGenericWorkspaceCoachAutoStart(
     };
   }
   const stage = ctx.stage ? ` (${ctx.stage})` : "";
+  const item = ctx.selectedItemName?.trim();
+  if (item) {
+    return {
+      content: `I'm beside **${title}**${stage} on "${item}". Say what you'd like to change or what to do next.`,
+      focusField: null,
+    };
+  }
   return {
-    content: `I'm beside **${title}**${stage}. Tell me what you see on screen and we'll take the next small step.`,
+    content: `I'm beside **${title}**${stage}. Say what you'd like to do next, or ask for help with the next step.`,
     focusField: null,
   };
 }

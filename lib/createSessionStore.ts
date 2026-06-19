@@ -24,12 +24,18 @@ export type CreateSessionSnapshot = {
 
 const STORAGE_KEY = "companion-create-session-v1";
 
+let memorySession: CreateSessionSnapshot | null = null;
+
 export function saveCreateSession(
   snapshot: Omit<CreateSessionSnapshot, "updatedAt">,
 ): void {
-  if (typeof window === "undefined") return;
   if (isCreatePersistencePaused()) return;
   if (!snapshot.genSeed.type && !snapshot.genSeed.draft?.trim()) return;
+  memorySession = {
+    ...snapshot,
+    updatedAt: new Date().toISOString(),
+  };
+  if (typeof window === "undefined") return;
   try {
     localStorage.setItem(
       STORAGE_KEY,
@@ -44,6 +50,7 @@ export function saveCreateSession(
 }
 
 export function loadCreateSession(): CreateSessionSnapshot | null {
+  if (memorySession) return memorySession;
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -59,6 +66,7 @@ export function loadCreateSession(): CreateSessionSnapshot | null {
 }
 
 export function clearCreateSession(): void {
+  memorySession = null;
   if (typeof window === "undefined") return;
   try {
     localStorage.removeItem(STORAGE_KEY);
