@@ -6,7 +6,9 @@ End users connect in **Settings → Connections → Connect Google**. This doc i
 ## Production: ecosystem.visualsparkstudios.com
 
 1. **Google Cloud Console** → your project → **APIs & Services → Library** →
-   enable **Google Drive API** (and **Google Forms API** if you export forms).
+   enable **Google Drive API** (required). Optionally enable **Google Docs API**
+   for richer heading/bullet formatting on export (plain text export works with
+   Drive API only). Enable **Google Forms API** if you export forms.
 
 2. **OAuth consent screen** → External → add test users → scopes:
    - `.../auth/drive.file`

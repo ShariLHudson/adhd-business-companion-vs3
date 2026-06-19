@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { G_COOKIE, parseTokens, refreshIfNeeded } from "@/lib/google";
-import { applyContentToGoogleDoc } from "@/lib/googleDocContent";
+import {
+  applyContentToGoogleDoc,
+  createGoogleDocWithContent,
+} from "@/lib/googleDocContent";
 import {
   createGoogleFormWithQuestions,
   extractFormQuestions,
@@ -100,36 +103,21 @@ export async function POST(request: NextRequest) {
       fileId = j.id as string;
       url = googleUrlForFile("sheet", fileId);
     } else {
-      const createRes = await fetch("https://www.googleapis.com/drive/v3/files", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${tokens.access_token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name: title,
-          mimeType: "application/vnd.google-apps.document",
-        }),
-      });
-      if (!createRes.ok) {
-        const detail = await createRes.text();
-        console.error("Drive create error:", detail);
-        return NextResponse.json(
-          { error: "Couldn't create the doc." },
-          { status: createRes.status === 401 ? 401 : 502 },
-        );
-      }
-      const created = await createRes.json();
-      fileId = created.id as string;
-
-      const applied = await applyContentToGoogleDoc(
+      const created = await createGoogleDocWithContent(
         tokens.access_token,
-        fileId,
+        title,
         content,
       );
-      if (!applied.ok) {
-        return NextResponse.json({ error: applied.error }, { status: 502 });
+      if (!created.ok) {
+        return NextResponse.json(
+          { error: created.error },
+          { status: created.error.includes("connected") ? 401 : 502 },
+        );
       }
+      fileId = created.fileId;
+      // Best-effort headings/bullets when Google Docs API is enabled; content
+      // is already in the file from the Drive upload above.
+      await applyContentToGoogleDoc(tokens.access_token, fileId, content);
       url = googleUrlForFile("doc", fileId);
     }
 
