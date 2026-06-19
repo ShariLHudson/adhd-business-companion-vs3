@@ -267,10 +267,10 @@ export function ExportActions({
   const showGoogle = shouldShowGoogleExportButtons(googleConfigured, googleConnected);
   const googleModeLabel =
     googleConfigured === false
-      ? "Google: not configured (copy/paste)"
+      ? "Connect Google in Settings to save directly to Docs, Sheets, or Forms."
       : googleConnected
         ? null
-        : "Google: copy/paste mode — connect in Settings for one-click";
+        : "Google not connected — connect in Settings to save directly, or use Copy.";
 
   return (
     <div className={compact ? "mt-2" : "mt-2"}>

@@ -1,23 +1,48 @@
-# Connect Google (one-click Google Docs)
+# Connect Google (developer setup)
 
-The app can create a real Google Doc from any finished piece — but it needs
-**your** Google OAuth credentials. This is a one-time developer setup.
+End users connect in **Settings → Connections → Connect Google**. This doc is for
+**you** (deploy / local dev) — never shown in the app UI.
 
-## 1. Create OAuth credentials
-1. Go to https://console.cloud.google.com/ and create (or pick) a project.
-2. **APIs & Services → Library** → enable **Google Drive API**.
-3. **APIs & Services → OAuth consent screen**: choose **External**, fill in app
-   name + your email, and add yourself as a **Test user**. Add the scope
-   `.../auth/drive.file` (and `openid`, `email`).
-4. **APIs & Services → Credentials → Create credentials → OAuth client ID**:
-   - Application type: **Web application**
-   - Authorized redirect URI:
-     `http://localhost:3000/api/google/callback`
-     (use your real domain in production)
-5. Copy the **Client ID** and **Client secret**.
+## Production: ecosystem.visualsparkstudios.com
 
-## 2. Add env vars
-Create / edit `.env.local` in `companion-app/`:
+1. **Google Cloud Console** → your project → **APIs & Services → Library** →
+   enable **Google Drive API** (and **Google Forms API** if you export forms).
+
+2. **OAuth consent screen** → External → add test users → scopes:
+   - `.../auth/drive.file`
+   - `.../auth/forms.body` (for Forms export)
+   - `openid`, `email`
+
+3. **Credentials → OAuth client ID** → Web application → **Authorized redirect
+   URIs** (add both if you use local + prod):
+
+   ```
+   https://ecosystem.visualsparkstudios.com/api/google/callback
+   http://localhost:3000/api/google/callback
+   ```
+
+   If you also use `ecosystems.visualsparkstudios.com`, add that domain’s
+   callback URL the same way.
+
+4. **Vercel → Project → Settings → Environment Variables** (Production):
+
+   | Variable | Example value |
+   |----------|-----------------|
+   | `GOOGLE_CLIENT_ID` | From Google Console |
+   | `GOOGLE_CLIENT_SECRET` | From Google Console |
+   | `GOOGLE_REDIRECT_URI` | `https://ecosystem.visualsparkstudios.com/api/google/callback` |
+
+5. **Redeploy** Production (`main`) after saving env vars.
+
+6. In the live app: **Settings → Connections → Connect Google** → Allow.
+
+Until step 4–5 are done, the app shows **Google Saving Not Available Yet** (no
+Connect button). After env vars are set, users see **Connect Google** and the
+four-step “How it works” instructions.
+
+## Local development
+
+Create `.env.local` in the repo root:
 
 ```
 GOOGLE_CLIENT_ID=your-client-id
@@ -25,21 +50,12 @@ GOOGLE_CLIENT_SECRET=your-client-secret
 GOOGLE_REDIRECT_URI=http://localhost:3000/api/google/callback
 ```
 
-Restart `npm run dev` after changing env vars.
-
-## 3. Connect
-Open the app → **Settings → Connections → Connect Google**, approve access.
-You'll bounce back with the account connected.
-
-## 4. Use it
-On any draft (Content generator, Email generator, or a saved Template) tap
-**📝 Google Docs** in the export row — it creates the doc and opens it. If you
-ever disconnect (Settings → Connections), it falls back to copy-and-paste.
+Restart `npm run dev` after changes.
 
 ## Notes
-- Scope is `drive.file`: the app can only see/manage docs **it** creates — it
-  cannot read the rest of your Drive.
-- Tokens are stored in an httpOnly cookie. Fine for a single-user / local app;
-  for a multi-user production deploy, move them to a server session/DB.
-- Until the env vars are set, the "Connect Google" button stays hidden and
-  Google Docs export uses copy-and-paste.
+
+- Scope `drive.file`: the app only sees/manages files **it** creates.
+- Tokens live in an httpOnly cookie (`g_tokens`). Fine for single-user / local;
+  multi-tenant production may need server-side session storage later.
+- Google app in **Testing** mode: up to 100 test users; “unverified app” on
+  consent screen is normal — users tap Advanced → Continue.

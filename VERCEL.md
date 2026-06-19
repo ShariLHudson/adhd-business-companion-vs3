@@ -43,6 +43,11 @@ After adding or changing any variable, **Redeploy** the latest `main` Production
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (Supabase → Project Settings → API) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase publishable / anon key (client-safe) |
 | `SUPABASE_SERVICE_ROLE_KEY` | **Server-only** — required for **Create account** / sales-funnel sign-up (provisions users without email confirmation). Supabase → Project Settings → API → **service_role** secret. Never use a `NEXT_PUBLIC_*` name. |
+| `GOOGLE_CLIENT_ID` | Google OAuth client ID — enables **Settings → Connect Google** and save to Docs/Sheets/Forms |
+| `GOOGLE_CLIENT_SECRET` | Google OAuth client secret (server-only) |
+| `GOOGLE_REDIRECT_URI` | `https://ecosystem.visualsparkstudios.com/api/google/callback` — must match Google Console redirect URI exactly |
+
+See `GOOGLE_SETUP.md` for Google Cloud Console steps. Until these three Google variables are set and Production is redeployed, users see “Google Saving Not Available Yet” instead of Connect Google.
 
 Alternative name accepted by the app: `SUPABASE_SECRET_KEY` (same value as service role).
 

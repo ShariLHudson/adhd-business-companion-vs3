@@ -1054,117 +1054,129 @@ export function SettingsPanel({
       <div className={wrap}>
         {header("Connections")}
         <p className="mt-1 text-sm text-[#6b635a]">
-          Connect Google for one-click Docs, and paste your social profile
-          links so the export buttons open the right place.
+          Connect your Google account to save work directly to Docs, Sheets,
+          Forms, and Drive. Add social links so export buttons open the right
+          place.
         </p>
-
-        <details className="mt-3 rounded-xl border border-[#d4cdc3] bg-white/85 p-3">
-          <summary className="cursor-pointer text-sm font-semibold text-[#1e4f4f]">
-            How connecting works
-          </summary>
-          <div className="mt-2 text-sm leading-relaxed text-[#4b463f]">
-            <p>
-              <span className="font-semibold">Google:</span> tap{" "}
-              <span className="font-semibold">Connect Google</span> below and
-              approve access — one connection powers both{" "}
-              <span className="font-semibold">📝 Google Docs</span> and{" "}
-              <span className="font-semibold">📊 Google Sheets</span>. After
-              connecting, those buttons create the file and open it
-              automatically.{" "}
-              <span className="font-semibold">📅 Calendar</span> opens a
-              pre-filled event — no connection needed.
-            </p>
-            <p className="mt-1.5">
-              If you see a &ldquo;Google hasn&apos;t verified this app&rdquo;
-              notice, that&apos;s normal while the app is in testing — tap{" "}
-              <span className="font-semibold">Advanced → continue</span>. It only
-              touches Docs it creates for you.
-            </p>
-            <p className="mt-1.5">
-              <span className="font-semibold">Social:</span> paste your Facebook,
-              Instagram, and LinkedIn links below. On a social post, the network
-              buttons copy your post and open your page so you can paste it.
-            </p>
-          </div>
-        </details>
 
         {/* Google account */}
         <div className="mt-4 rounded-xl border border-[#d4cdc3] bg-white/85 p-4">
           <div className="flex flex-wrap items-center gap-2">
-            <p className="text-base font-semibold text-[#1f1c19]">
-              Google account
-            </p>
-            <span
-              className={`rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide ${
-                !g.configured
-                  ? "bg-[#9a8f82]/15 text-[#6b635a]"
-                  : g.connected
-                    ? "bg-[#1e4f4f]/15 text-[#1e4f4f]"
-                    : "bg-[#c08a3e]/15 text-[#a86f1a]"
-              }`}
-            >
-              {!g.configured
-                ? "Not configured"
-                : g.connected
-                  ? "Connected · one-click export"
-                  : "Not connected · copy/paste mode"}
+            <span className="text-lg" aria-hidden="true">
+              {g.connected ? "🟢" : "🔴"}
             </span>
-          </div>
-          {!g.configured ? (
-            <p className="mt-2 text-sm text-[#6b635a]">
-              OAuth keys are not set yet. Add{" "}
-              <code className="text-xs">GOOGLE_CLIENT_ID</code>,{" "}
-              <code className="text-xs">GOOGLE_CLIENT_SECRET</code>, and{" "}
-              <code className="text-xs">GOOGLE_REDIRECT_URI</code> to{" "}
-              <code className="text-xs">.env.local</code> (see{" "}
-              <span className="font-semibold">GOOGLE_SETUP.md</span>). Until
-              then, use <span className="font-semibold">Copy</span> and paste
-              into Google Docs manually — one-click export buttons stay hidden.
+            <p className="text-base font-semibold text-[#1f1c19]">
+              {g.connected ? "Google Connected" : "Google Not Connected"}
             </p>
+          </div>
+
+          {!g.configured ? (
+            <>
+              <p className="mt-3 text-sm leading-relaxed text-[#6b635a]">
+                Saving directly to Google isn&apos;t turned on for this site
+                yet. Your work is always saved here in the app.
+              </p>
+              <p className="mt-2 text-sm text-[#6b635a]">
+                You can still copy your work and paste it into Google Docs,
+                Sheets, or Forms manually, or download and print from any export
+                menu.
+              </p>
+              <p className="mt-3 text-sm text-[#6b635a]">
+                Need Google saving enabled?{" "}
+                <a
+                  href="mailto:info@visualsparkstudios.com"
+                  className="font-semibold text-[#1e4f4f] hover:underline"
+                >
+                  Contact support
+                </a>
+                .
+              </p>
+            </>
           ) : g.connected ? (
-            <div className="mt-2 flex items-center justify-between gap-2">
-              <span className="text-sm font-semibold text-[#1e4f4f]">
-                ✓ Connected{g.email ? ` · ${g.email}` : ""}
-              </span>
-              <button
-                type="button"
-                onClick={() =>
-                  fetch("/api/google/disconnect", { method: "POST" })
-                    .then(() => refreshGoogle())
-                    .catch(() => {})
-                }
-                className="rounded-md px-2.5 py-1 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
-              >
-                Disconnect
-              </button>
-            </div>
-          ) : (
             <>
               <p className="mt-2 text-sm text-[#6b635a]">
-                Keys are configured but no account is connected. Connect below
-                to enable one-click Google Docs, Sheets, and Forms. Until then,
-                use <span className="font-semibold">Copy</span> and paste
-                manually.
+                Connected as:{" "}
+                <span className="font-semibold text-[#1e4f4f]">
+                  {g.email ?? "your Google account"}
+                </span>
+              </p>
+              <p className="mt-2 text-sm text-[#6b635a]">
+                Files can now be saved directly to your Google Drive.
+              </p>
+              <ul className="mt-3 space-y-1 text-sm text-[#2d2926]">
+                <li>✓ Google Docs</li>
+                <li>✓ Google Sheets</li>
+                <li>✓ Google Forms</li>
+                <li>✓ Google Drive</li>
+              </ul>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <a
+                  href="/api/google/auth"
+                  className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+                >
+                  Reconnect
+                </a>
+                <button
+                  type="button"
+                  onClick={() =>
+                    fetch("/api/google/disconnect", { method: "POST" })
+                      .then(() => refreshGoogle())
+                      .catch(() => {})
+                  }
+                  className="rounded-lg px-4 py-2 text-sm font-semibold text-[#a85c4a] hover:bg-[#a85c4a]/10"
+                >
+                  Disconnect
+                </button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="mt-3 text-sm leading-relaxed text-[#6b635a]">
+                Connect your Google account to save work directly to Google Docs,
+                Sheets, Forms, and Drive.
+              </p>
+              <p className="mt-2 text-sm text-[#6b635a]">
+                When connected, anything you choose to save can be created
+                automatically in your Google Drive.
               </p>
               <a
                 href="/api/google/auth"
-                className="mt-3 inline-block rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
+                className="mt-4 inline-block rounded-lg bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
               >
                 Connect Google
               </a>
+              <details className="mt-4 rounded-lg border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2">
+                <summary className="cursor-pointer text-sm font-semibold text-[#1e4f4f]">
+                  How it works
+                </summary>
+                <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-[#4b463f]">
+                  <li>Click Connect Google</li>
+                  <li>Choose your Google account</li>
+                  <li>Click Allow</li>
+                  <li>Return to the ADHD Business Ecosystem</li>
+                </ol>
+                <p className="mt-2 text-sm text-[#6b635a]">That&apos;s it.</p>
+                <p className="mt-3 text-sm text-[#6b635a]">
+                  If Google shows an &ldquo;unverified app&rdquo; notice, tap{" "}
+                  <span className="font-semibold">Advanced</span> →{" "}
+                  <span className="font-semibold">Continue</span>. We only
+                  access files this app creates for you.
+                </p>
+              </details>
+              <p className="mt-3 text-sm text-[#9a8f82]">
+                Until you connect: use <span className="font-semibold">Copy</span>{" "}
+                on any draft, then paste into Google manually. Your work stays
+                safe here.
+              </p>
             </>
           )}
-          {g.configured && g.connected ? (
-            <p className="mt-2 text-xs text-[#9a8f82]">
-              One-click export is on — Docs, Sheets, and Forms buttons create
-              files in your Drive automatically.
-            </p>
-          ) : null}
 
-          {/* Quick links to open your Google apps anytime */}
-          <div className="mt-3 border-t border-[#e7dfd4] pt-3">
+          <div className="mt-4 border-t border-[#e7dfd4] pt-3">
             <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-              Open your Google apps
+              Shortcuts — open Google in your browser
+            </p>
+            <p className="mt-1 text-xs text-[#9a8f82]">
+              These open Google; they don&apos;t save from here.
             </p>
             <div className="mt-2 flex flex-wrap gap-2">
               {[
@@ -1172,15 +1184,15 @@ export function SettingsPanel({
                 { label: "📝 Docs", url: "https://docs.google.com" },
                 { label: "📊 Sheets", url: "https://sheets.google.com" },
                 { label: "📁 Drive", url: "https://drive.google.com" },
-              ].map((g) => (
+              ].map((link) => (
                 <a
-                  key={g.label}
-                  href={g.url}
+                  key={link.label}
+                  href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="rounded-lg border border-[#1e4f4f]/30 bg-white px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
                 >
-                  {g.label}
+                  {link.label}
                 </a>
               ))}
             </div>
@@ -1217,9 +1229,8 @@ export function SettingsPanel({
           )}
         </div>
         <p className="mt-4 text-sm text-[#9a8f82]">
-          Note: social posting uses copy-and-paste. Google uses copy-and-paste
-          until OAuth is configured and your account is connected.
-          One-click posting needs connected accounts, which we can add later.
+          Social posts use copy-and-paste: the app copies your text and opens
+          your profile page so you can paste it there.
         </p>
       </div>
     );
