@@ -3,6 +3,14 @@
 import { useEffect, useState, type RefObject } from "react";
 import { getPrefs } from "@/lib/companionStore";
 import { isProposalArtifact } from "@/lib/artifactType";
+import {
+  formConversionOffer,
+  googleFailureReceipt,
+  googleReceiptForKind,
+  isGoogleCreateSuccess,
+  saveReceipt,
+  shouldShowGoogleExportButtons,
+} from "@/lib/saveExportTrust";
 
 // Send a finished piece where it's going: copy, print, push to a new Google
 // Doc, download, or copy-and-open the right social network to paste into.
@@ -55,6 +63,7 @@ export function ExportActions({
 }) {
   const [flash, setFlash] = useState<string | null>(null);
   const [googleConnected, setGoogleConnected] = useState<boolean | null>(null);
+  const [googleConfigured, setGoogleConfigured] = useState<boolean | null>(null);
   const workspaceMode = variant === "workspace" || variant === "proposal";
   const proposalMode =
     workspaceMode || isProposalArtifact(artifactType ?? title);
@@ -64,10 +73,16 @@ export function ExportActions({
     fetch("/api/google/status")
       .then((r) => r.json())
       .then((j) => {
-        if (!cancelled) setGoogleConnected(Boolean(j.connected));
+        if (!cancelled) {
+          setGoogleConnected(Boolean(j.connected));
+          setGoogleConfigured(j.configured !== false);
+        }
       })
       .catch(() => {
-        if (!cancelled) setGoogleConnected(false);
+        if (!cancelled) {
+          setGoogleConnected(false);
+          setGoogleConfigured(false);
+        }
       });
     return () => {
       cancelled = true;
@@ -137,23 +152,19 @@ export function ExportActions({
     if (workspaceMode) note("Opening print…");
   }
 
-  async function googleFile(kind: "doc" | "sheet" | "form") {
+  async function googleFile(kind: "doc" | "sheet" | "form", forceExport = false) {
     const block = onBeforeAction?.();
     if (block) {
       note(block);
       return;
     }
-    const labels =
-      kind === "sheet"
-        ? { name: "Sheet", blank: "https://sheets.new" }
-        : { name: "Doc", blank: "https://docs.google.com/document/create" };
     if (!text.trim()) {
-      note("Add some content before exporting to Google Docs.");
+      note("Add some content before exporting.");
       return;
     }
-    if (workspaceMode && googleConnected === false) {
+    if (!shouldShowGoogleExportButtons(googleConfigured, googleConnected)) {
       note(
-        "Google Docs isn't connected yet — connect in Settings, or keep working here.",
+        "Google isn't connected yet — connect in Settings. Your work stays saved here.",
       );
       return;
     }
@@ -161,73 +172,60 @@ export function ExportActions({
       const r = await fetch("/api/google/create-doc", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: title || "Content", content: text, kind }),
+        body: JSON.stringify({
+          title: title || "Content",
+          content: text,
+          kind,
+          forceExport,
+        }),
       });
-      if (r.ok) {
-        const j = await r.json();
-        if (j.url) {
-          if (!embedInPanel) {
-            window.open(j.url, "_blank");
-          }
-          onGoogleDocCreated?.(j.url, j.id as string | undefined, kind);
-          void import("@/lib/ecosystem/eventTrackingEngine").then(({ trackEcosystemEvent }) => {
-            trackEcosystemEvent({
-              eventType:
-                kind === "sheet"
-                  ? "document.google_sheet_created"
-                  : kind === "form"
-                    ? "document.google_form_created"
-                    : "document.google_doc_created",
-              feature: "documents",
-              metadata: {
-                documentId: (j.id as string | undefined) ?? "",
-                artifactType: artifactType ?? title ?? kind,
-              },
-            });
-          });
-          note(
-            embedInPanel
-              ? `Opening in Google ${labels.name}s…`
-              : workspaceMode
-                ? "Created Google Doc ✓"
-                : `Created in Google ${labels.name}s ✓`,
-          );
-          return;
-        }
+      const j = (await r.json()) as {
+        url?: string;
+        id?: string;
+        error?: string;
+        message?: string;
+      };
+
+      if (r.status === 422 && j.error === "not-form-friendly") {
+        note(formConversionOffer());
+        return;
       }
-      if (workspaceMode && r.status === 401) {
+
+      if (isGoogleCreateSuccess(r.status, j)) {
+        if (!embedInPanel) {
+          window.open(j.url, "_blank");
+        }
+        onGoogleDocCreated?.(j.url, j.id, kind);
+        void import("@/lib/ecosystem/eventTrackingEngine").then(({ trackEcosystemEvent }) => {
+          trackEcosystemEvent({
+            eventType:
+              kind === "sheet"
+                ? "document.google_sheet_created"
+                : kind === "form"
+                  ? "document.google_form_created"
+                  : "document.google_doc_created",
+            feature: "documents",
+            metadata: {
+              documentId: j.id,
+              artifactType: artifactType ?? title ?? kind,
+            },
+          });
+        });
+        note(googleReceiptForKind(kind));
+        return;
+      }
+
+      if (r.status === 401) {
         note(
-          "Google Docs isn't connected yet — connect in Settings, or keep working here.",
+          "Google isn't connected yet — connect in Settings. Your work stays saved here.",
         );
         return;
       }
-      if (workspaceMode) {
-        let errMsg = "Something went wrong sending this to Google Docs.";
-        try {
-          const errBody = (await r.json()) as { error?: string };
-          if (errBody.error) errMsg = errBody.error;
-        } catch {
-          /* noop */
-        }
-        note(errMsg);
-        return;
-      }
+
+      note(googleFailureReceipt(kind));
     } catch {
-      /* fall through to copy-and-open */
+      note(saveReceipt("export-fail"));
     }
-    if (workspaceMode) {
-      note(
-        "Something went wrong sending this to Google Docs. Try again, or copy your draft.",
-      );
-      return;
-    }
-    const ok = await clip();
-    window.open(labels.blank, "_blank");
-    note(
-      ok
-        ? `Copied — paste into the new ${labels.name} (Ctrl/Cmd+V)`
-        : `Opened a new ${labels.name} — copy your text in.`,
-    );
   }
 
   function calendar() {
@@ -266,11 +264,22 @@ export function ExportActions({
   const btn =
     "rounded-lg border border-[#1e4f4f]/40 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]";
 
+  const showGoogle = shouldShowGoogleExportButtons(googleConfigured, googleConnected);
+  const googleModeLabel =
+    googleConfigured === false
+      ? "Google: not configured (copy/paste)"
+      : googleConnected
+        ? null
+        : "Google: copy/paste mode — connect in Settings for one-click";
+
   return (
     <div className={compact ? "mt-2" : "mt-2"}>
       {flash && !compact && (
         <p className="mb-2 text-sm font-semibold text-[#1e4f4f]">{flash}</p>
       )}
+      {googleModeLabel && !compact ? (
+        <p className="mb-2 text-xs font-medium text-[#9a8f82]">{googleModeLabel}</p>
+      ) : null}
       <div className="flex flex-wrap gap-2">
         {!compact && (
           <button type="button" onClick={copy} className={btn}>
@@ -283,25 +292,40 @@ export function ExportActions({
           onClick={print}
           className={btn}
         >
-          {workspaceMode ? "🖨 Print" : "🖨 Print"}
+          🖨 Print
         </button>
-        <button
-          ref={docButtonRef}
-          type="button"
-          onClick={() => googleFile("doc")}
-          className={btn}
-        >
-          {workspaceMode ? "📝 Create Google Doc" : "📝 Google Docs"}
-        </button>
-        {!compact && (
+        {showGoogle ? (
           <>
             <button
+              ref={docButtonRef}
               type="button"
-              onClick={() => googleFile("sheet")}
+              onClick={() => void googleFile("doc")}
               className={btn}
             >
-              📊 Google Sheets
+              {workspaceMode ? "📝 Google Docs" : "📝 Google Docs"}
             </button>
+            {!compact ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => void googleFile("sheet")}
+                  className={btn}
+                >
+                  📊 Google Sheets
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void googleFile("form")}
+                  className={btn}
+                >
+                  📋 Google Forms
+                </button>
+              </>
+            ) : null}
+          </>
+        ) : null}
+        {!compact && (
+          <>
             <button type="button" onClick={calendar} className={btn}>
               📅 Calendar
             </button>

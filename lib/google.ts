@@ -4,7 +4,7 @@
 
 export const G_COOKIE = "g_tokens";
 export const GOOGLE_SCOPE =
-  "https://www.googleapis.com/auth/drive.file openid email";
+  "https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/forms.body openid email";
 
 export type GTokens = {
   access_token: string;

@@ -1090,14 +1090,36 @@ export function SettingsPanel({
 
         {/* Google account */}
         <div className="mt-4 rounded-xl border border-[#d4cdc3] bg-white/85 p-4">
-          <p className="text-base font-semibold text-[#1f1c19]">
-            Google account
-          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <p className="text-base font-semibold text-[#1f1c19]">
+              Google account
+            </p>
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-xs font-bold uppercase tracking-wide ${
+                !g.configured
+                  ? "bg-[#9a8f82]/15 text-[#6b635a]"
+                  : g.connected
+                    ? "bg-[#1e4f4f]/15 text-[#1e4f4f]"
+                    : "bg-[#c08a3e]/15 text-[#a86f1a]"
+              }`}
+            >
+              {!g.configured
+                ? "Not configured"
+                : g.connected
+                  ? "Connected · one-click export"
+                  : "Not connected · copy/paste mode"}
+            </span>
+          </div>
           {!g.configured ? (
-            <p className="mt-1 text-sm text-[#6b635a]">
-              Not set up yet — add Google OAuth keys (see GOOGLE_SETUP.md) to
-              turn on one-click Google Docs. Until then, the Google Docs export
-              copies and opens a blank doc to paste into.
+            <p className="mt-2 text-sm text-[#6b635a]">
+              OAuth keys are not set yet. Add{" "}
+              <code className="text-xs">GOOGLE_CLIENT_ID</code>,{" "}
+              <code className="text-xs">GOOGLE_CLIENT_SECRET</code>, and{" "}
+              <code className="text-xs">GOOGLE_REDIRECT_URI</code> to{" "}
+              <code className="text-xs">.env.local</code> (see{" "}
+              <span className="font-semibold">GOOGLE_SETUP.md</span>). Until
+              then, use <span className="font-semibold">Copy</span> and paste
+              into Google Docs manually — one-click export buttons stay hidden.
             </p>
           ) : g.connected ? (
             <div className="mt-2 flex items-center justify-between gap-2">
@@ -1117,17 +1139,27 @@ export function SettingsPanel({
               </button>
             </div>
           ) : (
-            <a
-              href="/api/google/auth"
-              className="mt-2 inline-block rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
-            >
-              Connect Google
-            </a>
+            <>
+              <p className="mt-2 text-sm text-[#6b635a]">
+                Keys are configured but no account is connected. Connect below
+                to enable one-click Google Docs, Sheets, and Forms. Until then,
+                use <span className="font-semibold">Copy</span> and paste
+                manually.
+              </p>
+              <a
+                href="/api/google/auth"
+                className="mt-3 inline-block rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
+              >
+                Connect Google
+              </a>
+            </>
           )}
-          <p className="mt-2 text-xs text-[#9a8f82]">
-            When connected, the &ldquo;Google Docs&rdquo; export creates the doc
-            for you automatically.
-          </p>
+          {g.configured && g.connected ? (
+            <p className="mt-2 text-xs text-[#9a8f82]">
+              One-click export is on — Docs, Sheets, and Forms buttons create
+              files in your Drive automatically.
+            </p>
+          ) : null}
 
           {/* Quick links to open your Google apps anytime */}
           <div className="mt-3 border-t border-[#e7dfd4] pt-3">
@@ -1185,7 +1217,8 @@ export function SettingsPanel({
           )}
         </div>
         <p className="mt-4 text-sm text-[#9a8f82]">
-          Note: posting and Google Docs still work by copy-and-paste for now.
+          Note: social posting uses copy-and-paste. Google uses copy-and-paste
+          until OAuth is configured and your account is connected.
           One-click posting needs connected accounts, which we can add later.
         </p>
       </div>

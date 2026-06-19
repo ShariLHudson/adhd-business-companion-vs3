@@ -1,8 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { G_COOKIE, parseTokens, refreshIfNeeded } from "@/lib/google";
 import { applyContentToGoogleDoc } from "@/lib/googleDocContent";
+import {
+  createGoogleFormWithQuestions,
+  extractFormQuestions,
+  formDescriptionFromContent,
+  isFormFriendlyContent,
+} from "@/lib/googleFormContent";
+import { contentToSheetCsv } from "@/lib/googleSheetContent";
+import { googleUrlForFile } from "@/lib/googleDriveServer";
+import type { GoogleFileKind } from "@/lib/googleWorkspace";
 
-/** Create a Google Doc/Sheet with content and return its URL + file id. */
+/** Create a Google Doc/Sheet/Form with content and return its URL + file id. */
 export async function POST(request: NextRequest) {
   const stored = parseTokens(request.cookies.get(G_COOKIE)?.value);
   if (!stored) {
@@ -13,8 +22,9 @@ export async function POST(request: NextRequest) {
   const title = ((body.title as string) || "Untitled").slice(0, 120);
   const content = (body.content as string) || "";
   const rawKind = (body.kind as string) ?? "doc";
-  const kind =
+  const kind: GoogleFileKind =
     rawKind === "sheet" ? "sheet" : rawKind === "form" ? "form" : "doc";
+  const forceExport = Boolean(body.forceExport);
 
   if (!content.trim()) {
     return NextResponse.json(
@@ -23,17 +33,73 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const tokens = await refreshIfNeeded(stored);
+  if (kind === "form" && !forceExport && !isFormFriendlyContent(content)) {
+    return NextResponse.json(
+      {
+        error: "not-form-friendly",
+        message: "Would you like me to turn this into form questions first?",
+      },
+      { status: 422 },
+    );
+  }
 
-  const fileTitle =
-    kind === "form" && !title.toLowerCase().includes("form")
-      ? `Form: ${title}`
-      : title;
+  const tokens = await refreshIfNeeded(stored);
 
   try {
     let fileId: string;
+    let url: string;
 
-    if (kind === "doc" || kind === "form") {
+    if (kind === "form") {
+      const questions = extractFormQuestions(content);
+      const description = formDescriptionFromContent(content, title);
+      const result = await createGoogleFormWithQuestions(
+        tokens.access_token,
+        title,
+        description,
+        questions.length ? questions : [content.split("\n")[0]?.trim() || title],
+      );
+      if ("error" in result) {
+        return NextResponse.json({ error: result.error }, { status: 502 });
+      }
+      fileId = result.fileId;
+      url = result.url;
+    } else if (kind === "sheet") {
+      const csv = contentToSheetCsv(content);
+      const mimeType = "application/vnd.google-apps.spreadsheet";
+      const boundary = `spark${Date.now()}`;
+      const metadata = { name: title.slice(0, 120), mimeType };
+      const multipart =
+        `--${boundary}\r\n` +
+        `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
+        `${JSON.stringify(metadata)}\r\n` +
+        `--${boundary}\r\n` +
+        `Content-Type: text/csv; charset=UTF-8\r\n\r\n` +
+        `${csv}\r\n` +
+        `--${boundary}--`;
+
+      const r = await fetch(
+        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${tokens.access_token}`,
+            "Content-Type": `multipart/related; boundary=${boundary}`,
+          },
+          body: multipart,
+        },
+      );
+      if (!r.ok) {
+        const detail = await r.text();
+        console.error("Drive sheet create error:", detail);
+        return NextResponse.json(
+          { error: "Couldn't create the sheet." },
+          { status: r.status === 401 ? 401 : 502 },
+        );
+      }
+      const j = await r.json();
+      fileId = j.id as string;
+      url = googleUrlForFile("sheet", fileId);
+    } else {
       const createRes = await fetch("https://www.googleapis.com/drive/v3/files", {
         method: "POST",
         headers: {
@@ -41,7 +107,7 @@ export async function POST(request: NextRequest) {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: fileTitle,
+          name: title,
           mimeType: "application/vnd.google-apps.document",
         }),
       });
@@ -64,48 +130,10 @@ export async function POST(request: NextRequest) {
       if (!applied.ok) {
         return NextResponse.json({ error: applied.error }, { status: 502 });
       }
-    } else {
-      const mimeType = "application/vnd.google-apps.spreadsheet";
-      const boundary = `spark${Date.now()}`;
-      const metadata = { name: fileTitle, mimeType };
-      const multipart =
-        `--${boundary}\r\n` +
-        `Content-Type: application/json; charset=UTF-8\r\n\r\n` +
-        `${JSON.stringify(metadata)}\r\n` +
-        `--${boundary}\r\n` +
-        `Content-Type: text/csv; charset=UTF-8\r\n\r\n` +
-        `${content}\r\n` +
-        `--${boundary}--`;
-
-      const r = await fetch(
-        "https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${tokens.access_token}`,
-            "Content-Type": `multipart/related; boundary=${boundary}`,
-          },
-          body: multipart,
-        },
-      );
-      if (!r.ok) {
-        const detail = await r.text();
-        console.error("Drive create error:", detail);
-        return NextResponse.json(
-          { error: "Couldn't create the sheet." },
-          { status: r.status === 401 ? 401 : 502 },
-        );
-      }
-      const j = await r.json();
-      fileId = j.id as string;
+      url = googleUrlForFile("doc", fileId);
     }
 
-    const url =
-      kind === "sheet"
-        ? `https://docs.google.com/spreadsheets/d/${fileId}/edit`
-        : `https://docs.google.com/document/d/${fileId}/edit`;
-
-    const res = NextResponse.json({ url, id: fileId });
+    const res = NextResponse.json({ url, id: fileId, kind });
     if (tokens.access_token !== stored.access_token) {
       res.cookies.set(G_COOKIE, JSON.stringify(tokens), {
         httpOnly: true,
