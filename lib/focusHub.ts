@@ -13,8 +13,7 @@ export type FocusFeelingId =
   | "crowded"
   | "stuck"
   | "need-work"
-  | "need-break"
-  | "need-shari";
+  | "need-break";
 
 export type FocusHubAction =
   | { kind: "tool"; tool: SidebarToolId; toolId: string }
@@ -22,8 +21,7 @@ export type FocusHubAction =
   | { kind: "activity"; activityId: string; toolId: string }
   | { kind: "strategy"; strategyId: string; toolId: string }
   | { kind: "audio"; categoryId: string; toolId: string }
-  | { kind: "chat"; prompt: string; toolId: string }
-  | { kind: "need-shari"; toolId: "need-shari" };
+  | { kind: "chat"; prompt: string; toolId: string };
 
 export type FocusHubTool = {
   id: string;
@@ -36,6 +34,10 @@ export type FocusHubToolGroup = {
   id: string;
   title: string;
   tools: FocusHubTool[];
+  /** When true, group renders as an expandable dropdown in the Focus panel. */
+  collapsible?: boolean;
+  /** Initial open state for collapsible groups. */
+  defaultOpen?: boolean;
 };
 
 export type FocusFeelingCategory = {
@@ -58,8 +60,7 @@ function tool(
     | { kind: "activity"; activityId: string; toolId?: string }
     | { kind: "strategy"; strategyId: string; toolId?: string }
     | { kind: "audio"; categoryId: string; toolId?: string }
-    | { kind: "chat"; prompt: string; toolId?: string }
-    | { kind: "need-shari"; toolId?: string },
+    | { kind: "chat"; prompt: string; toolId?: string },
   description?: string,
 ): FocusHubTool {
   const { toolId: _drop, ...rest } = action;
@@ -71,7 +72,7 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
     id: "crowded",
     emoji: "🧠",
     label: "My Brain Feels Crowded",
-    tagline: "Overwhelm, clutter, and too many thoughts at once.",
+    tagline: "Too many thoughts at once.",
     recommended: tool(
       "clear-my-mind",
       "Clear My Mind",
@@ -90,46 +91,20 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
             "Capture, sort, and find what matters.",
           ),
           tool(
-            "brain-dump",
-            "Brain Dump",
-            { kind: "tool", tool: "brain-dump", toolId: "brain-dump" },
-            "Get everything out of your head fast.",
+            "decision-compass-crowded",
+            "Decision Compass",
+            {
+              kind: "activity",
+              activityId: "decision-compass",
+              toolId: "decision-compass-crowded",
+            },
+            "Work through competing options and priorities.",
           ),
           tool(
             "mind-map",
             "Mind Map My Thoughts",
-            { kind: "activity", activityId: "decision-compass", toolId: "mind-map" },
-            "See options and connections visually.",
-          ),
-        ],
-      },
-      {
-        id: "crowded-other",
-        title: "Other Ways To Help",
-        tools: [
-          tool(
-            "talk-crowded",
-            "Talk It Through With Shari",
-            {
-              kind: "chat",
-              prompt:
-                "My brain feels crowded — can you help me sort through what's on my mind?",
-              toolId: "talk-crowded",
-            },
-          ),
-          tool(
-            "decision-compass-crowded",
-            "Decision Compass",
-            { kind: "activity", activityId: "decision-compass", toolId: "decision-compass-crowded" },
-          ),
-          tool(
-            "organize-thoughts",
-            "Organize My Thoughts",
-            {
-              kind: "activity",
-              activityId: "clear-my-mind-priority",
-              toolId: "organize-thoughts",
-            },
+            { kind: "section", section: "brain-dump", toolId: "mind-map" },
+            "See connections visually.",
           ),
         ],
       },
@@ -141,15 +116,10 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
     label: "I'm Stuck",
     tagline: "Paralysis, avoidance, and fear of starting.",
     recommended: tool(
-      "get-unstuck",
-      "Get Unstuck",
-      {
-        kind: "chat",
-        prompt:
-          "I'm feeling stuck — can you help me find the smallest next step?",
-        toolId: "get-unstuck",
-      },
-      "Talk through the block with Shari.",
+      "next-small-step",
+      "Next Small Step",
+      { kind: "activity", activityId: "first-step-finder", toolId: "next-small-step" },
+      "Find the easiest place to begin.",
     ),
     groups: [
       {
@@ -157,49 +127,22 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
         title: "Most People Start Here",
         tools: [
           tool(
-            "get-unstuck",
-            "Get Unstuck",
-            {
-              kind: "chat",
-              prompt:
-                "I'm feeling stuck — can you help me find the smallest next step?",
-              toolId: "get-unstuck",
-            },
-          ),
-          tool(
             "next-small-step",
             "Next Small Step",
             { kind: "activity", activityId: "first-step-finder", toolId: "next-small-step" },
-          ),
-          tool(
-            "decision-compass-stuck",
-            "Decision Compass",
-            { kind: "activity", activityId: "decision-compass", toolId: "decision-compass-stuck" },
-          ),
-        ],
-      },
-      {
-        id: "stuck-other",
-        title: "Other Ways To Help",
-        tools: [
-          tool(
-            "talk-stuck",
-            "Talk It Through With Shari",
-            {
-              kind: "chat",
-              prompt: "I'm stuck and not sure where to start — can we talk it through?",
-              toolId: "talk-stuck",
-            },
+            "Find the easiest place to begin.",
           ),
           tool(
             "prioritize-options",
             "Prioritize My Options",
             { kind: "activity", activityId: "priority-sort", toolId: "prioritize-options" },
+            "Figure out what matters most right now.",
           ),
           tool(
             "break-smaller",
             "Break It Into Smaller Pieces",
             { kind: "activity", activityId: "project-breakdown", toolId: "break-smaller" },
+            "Turn a big task into manageable steps.",
           ),
         ],
       },
@@ -211,15 +154,39 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
     label: "I Need To Work",
     tagline: "Execution, productivity, and momentum.",
     recommended: tool(
-      "focus-session",
-      "Focus Session",
-      { kind: "activity", activityId: "focus-session", toolId: "focus-session" },
-      "Name the task, set a block, and start.",
+      "continue-active-project",
+      "Continue Active Project",
+      { kind: "section", section: "projects", toolId: "continue-active-project" },
     ),
     groups: [
       {
         id: "work-start",
         title: "Most People Start Here",
+        collapsible: true,
+        defaultOpen: true,
+        tools: [
+          tool(
+            "continue-active-project",
+            "Continue Active Project",
+            { kind: "section", section: "projects", toolId: "continue-active-project" },
+          ),
+          tool(
+            "start-new-project",
+            "Start A New Project",
+            { kind: "section", section: "projects", toolId: "start-new-project" },
+          ),
+          tool(
+            "choose-something-fun",
+            "Choose Something Fun For Me",
+            { kind: "tool", tool: "spin-wheel", toolId: "choose-something-fun" },
+          ),
+        ],
+      },
+      {
+        id: "work-focus",
+        title: "Work Focus",
+        collapsible: true,
+        defaultOpen: false,
         tools: [
           tool(
             "focus-session",
@@ -239,8 +206,10 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
         ],
       },
       {
-        id: "work-focus-support",
-        title: "Focus Support",
+        id: "work-more",
+        title: "More Focus Support",
+        collapsible: true,
+        defaultOpen: false,
         tools: [
           tool(
             "focus-audio",
@@ -260,29 +229,10 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
         ],
       },
       {
-        id: "work-planning",
-        title: "Planning",
-        tools: [
-          tool(
-            "open-active-project",
-            "Open Active Project",
-            { kind: "section", section: "projects", toolId: "open-active-project" },
-          ),
-          tool(
-            "work-on-project",
-            "Work On A Project",
-            { kind: "section", section: "projects", toolId: "work-on-project" },
-          ),
-          tool(
-            "pick-next-task",
-            "Pick My Next Task",
-            { kind: "tool", tool: "spin-wheel", toolId: "pick-next-task" },
-          ),
-        ],
-      },
-      {
         id: "work-refocus",
         title: "When Attention Drifts",
+        collapsible: true,
+        defaultOpen: false,
         tools: [
           tool(
             "distraction-shield",
@@ -318,11 +268,14 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
       {
         id: "break-start",
         title: "Most People Start Here",
+        collapsible: true,
+        defaultOpen: true,
         tools: [
           tool(
             "breathe-reset",
             "Breathe & Reset",
             { kind: "tool", tool: "breathe", toolId: "breathe-reset" },
+            "Calm your nervous system before you continue.",
           ),
           tool(
             "quick-reset",
@@ -345,6 +298,8 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
       {
         id: "break-audio",
         title: "Audio",
+        collapsible: true,
+        defaultOpen: false,
         tools: [
           tool(
             "calm-audio",
@@ -366,6 +321,8 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
       {
         id: "break-recharge",
         title: "Recharge",
+        collapsible: true,
+        defaultOpen: false,
         tools: [
           tool(
             "brain-break-games",
@@ -385,14 +342,6 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
         ],
       },
     ],
-  },
-  {
-    id: "need-shari",
-    emoji: "💬",
-    label: "I Just Need Shari",
-    tagline: "Not sure what you need — talk first.",
-    immediate: true,
-    groups: [],
   },
 ];
 
@@ -451,16 +400,13 @@ export const REQUIRED_FOCUS_ASSET_IDS = [
   "pomodoro",
   "block-time",
   "clear-my-mind",
-  "brain-dump",
   "decision-compass-crowded",
-  "get-unstuck",
+  "next-small-step",
   "breathe-reset",
-  "need-shari",
 ] as const;
 
 export function missingRequiredFocusAssets(): string[] {
   const ids = new Set(focusHubToolIds());
-  ids.add("need-shari");
   return REQUIRED_FOCUS_ASSET_IDS.filter((id) => !ids.has(id));
 }
 

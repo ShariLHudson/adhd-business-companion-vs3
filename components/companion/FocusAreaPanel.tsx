@@ -92,22 +92,60 @@ function ToolGroupSection({
   recommendedId?: string;
   onSelect: (action: FocusHubAction) => void;
 }) {
+  const [open, setOpen] = useState(group.defaultOpen ?? !group.collapsible);
+
+  const toolList = (
+    <ul className="flex flex-col gap-1.5">
+      {group.tools.map((item) => (
+        <li key={item.id}>
+          <ToolButton
+            item={item}
+            starred={item.id === recommendedId}
+            onSelect={onSelect}
+          />
+        </li>
+      ))}
+    </ul>
+  );
+
+  if (!group.collapsible) {
+    return (
+      <section className="flex flex-col gap-2" data-testid={`focus-group-${group.id}`}>
+        <h3 className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+          {group.title}
+        </h3>
+        {toolList}
+      </section>
+    );
+  }
+
   return (
-    <section className="flex flex-col gap-2" data-testid={`focus-group-${group.id}`}>
-      <h3 className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-        {group.title}
-      </h3>
-      <ul className="flex flex-col gap-1.5">
-        {group.tools.map((item) => (
-          <li key={item.id}>
-            <ToolButton
-              item={item}
-              starred={item.id === recommendedId}
-              onSelect={onSelect}
-            />
-          </li>
-        ))}
-      </ul>
+    <section
+      className="overflow-hidden rounded-2xl border border-[#e7dfd4] bg-white/90"
+      data-testid={`focus-group-${group.id}`}
+    >
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+        aria-controls={`focus-group-panel-${group.id}`}
+        className="flex w-full items-center justify-between gap-3 px-3.5 py-3 text-left"
+      >
+        <span className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+          {group.title}
+        </span>
+        <span className="text-[#9a9289]" aria-hidden="true">
+          {open ? "▾" : "▸"}
+        </span>
+      </button>
+      {open ? (
+        <div
+          id={`focus-group-panel-${group.id}`}
+          className="border-t border-[#efe8de] px-3 pb-3 pt-2"
+        >
+          {toolList}
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -124,12 +162,6 @@ export function FocusAreaPanel({
   const category = selectedFeeling ? focusFeelingById(selectedFeeling) : null;
 
   function handleFeelingSelect(id: FocusFeelingId) {
-    const feeling = focusFeelingById(id);
-    if (!feeling) return;
-    if (feeling.immediate) {
-      onAction({ kind: "need-shari", toolId: "need-shari" });
-      return;
-    }
     setSelectedFeeling(id);
   }
 
@@ -137,7 +169,12 @@ export function FocusAreaPanel({
     setSelectedFeeling(null);
   }
 
-  if (category && !category.immediate) {
+  if (category) {
+    const recommendedInFirstGroup = Boolean(
+      category.recommended &&
+        category.groups[0]?.tools.some((t) => t.id === category.recommended?.id),
+    );
+
     return (
       <div
         className={workspacePanelShellClass({ width: "narrow" })}
@@ -157,7 +194,7 @@ export function FocusAreaPanel({
         </p>
         <p className="mt-1 text-sm text-[#6b635a]">{category.tagline}</p>
 
-        {category.recommended ? (
+        {category.recommended && !recommendedInFirstGroup ? (
           <div className="mt-5">
             <ToolButton
               item={category.recommended}
@@ -167,7 +204,7 @@ export function FocusAreaPanel({
           </div>
         ) : null}
 
-        <div className="mt-5 flex flex-col gap-5">
+        <div className="mt-5 flex flex-col gap-3">
           {category.groups.map((group) => (
             <ToolGroupSection
               key={group.id}

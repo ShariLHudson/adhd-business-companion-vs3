@@ -133,6 +133,10 @@ import {
 } from "@/lib/workspaceViewSize";
 import type { FocusHubAction } from "@/lib/focusHub";
 import {
+  saveBrainDumpVisualView,
+  saveBrainDumpVisualVisible,
+} from "@/lib/brainDumpVisualPreference";
+import {
   applyCreateBuilderChatOpener,
   filterChatLines,
   createBuilderLabel,
@@ -5316,21 +5320,35 @@ export default function CompanionPage() {
 
   function handleFocusHubAction(action: FocusHubAction) {
     switch (action.kind) {
-      case "need-shari":
-        clearSplitBesideWorkspace();
-        setActiveSection("home");
-        activeSectionRef.current = "home";
-        setActiveNav("chat");
-        applyChatLayoutMode("split");
-        inputRef.current?.focus();
-        break;
       case "tool":
         handleToolSelectCore(action.tool);
         break;
       case "section":
+        if (action.toolId === "mind-map") {
+          saveBrainDumpVisualVisible(true);
+          saveBrainDumpVisualView("mindmap");
+        }
         if (action.section === "decision-compass") {
           openDecisionCompass();
           break;
+        }
+        if (action.section === "projects") {
+          if (action.toolId === "start-new-project") {
+            setProjectsBootstrapCreate(true);
+            setProjectContinueId(null);
+            projectContinueIdRef.current = null;
+          } else if (action.toolId === "continue-active-project") {
+            setProjectsBootstrapCreate(false);
+            const projects = getProjects();
+            const active =
+              projects.find((p) => p.status === "active-focus") ??
+              projects.find((p) => p.status === "in-progress") ??
+              projects[0];
+            if (active) {
+              setProjectContinueId(active.id);
+              projectContinueIdRef.current = active.id;
+            }
+          }
         }
         if (supportsWorkspace(action.section)) {
           openWorkspaceBesideChatCore(

@@ -3,7 +3,6 @@ import {
   allFocusHubTools,
   distinctRecommendedOutcomes,
   FOCUS_FEELING_ENTRIES,
-  focusFeelingById,
   focusHubOpensSidebarTool,
   missingRequiredFocusAssets,
   recommendedToolForFeeling,
@@ -11,14 +10,13 @@ import {
 import { FOCUS_MENU } from "./companionUi";
 
 describe("Focus V2 — feelings first, tools second", () => {
-  it("shows five emotional entry points on the home screen", () => {
-    expect(FOCUS_FEELING_ENTRIES).toHaveLength(5);
+  it("shows four emotional entry points on the home screen", () => {
+    expect(FOCUS_FEELING_ENTRIES).toHaveLength(4);
     expect(FOCUS_FEELING_ENTRIES.map((f) => f.label)).toEqual([
       "My Brain Feels Crowded",
       "I'm Stuck",
       "I Need To Work",
       "I Need A Break",
-      "I Just Need Shari",
     ]);
   });
 
@@ -54,22 +52,16 @@ describe("Focus V2 — feelings first, tools second", () => {
     expect(recommendedToolForFeeling("crowded")?.id).toBe("clear-my-mind");
   });
 
-  it("recommends Get Unstuck for I'm Stuck", () => {
-    expect(recommendedToolForFeeling("stuck")?.id).toBe("get-unstuck");
+  it("recommends Next Small Step for I'm Stuck", () => {
+    expect(recommendedToolForFeeling("stuck")?.id).toBe("next-small-step");
   });
 
-  it("recommends Focus Session for I Need To Work", () => {
-    expect(recommendedToolForFeeling("need-work")?.id).toBe("focus-session");
+  it("recommends Continue Active Project for I Need To Work", () => {
+    expect(recommendedToolForFeeling("need-work")?.id).toBe("continue-active-project");
   });
 
   it("recommends Breathe & Reset for I Need A Break", () => {
     expect(recommendedToolForFeeling("need-break")?.id).toBe("breathe-reset");
-  });
-
-  it("opens chat immediately for I Just Need Shari", () => {
-    const shari = focusFeelingById("need-shari");
-    expect(shari?.immediate).toBe(true);
-    expect(shari?.groups).toHaveLength(0);
   });
 
   it("gives each feeling a distinct recommended outcome", () => {
