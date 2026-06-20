@@ -46,14 +46,15 @@ describe("companionGovernor", () => {
     expect(s.suppressArtifactHandoff).toBe(true);
   });
 
-  it("3 — Now draft it → workspace_open Create", () => {
+  it("3 — Now draft it → chat_only (conversation-only mode)", () => {
     const s = gov(
       "Now draft it",
       "Would you like me to draft this for you?",
     );
-    expect(s.outcome).toBe("workspace_open");
-    expect(s.targetSection).toBe("content-generator");
-    expect(governorAllowsArtifactHandoff(s)).toBe(true);
+    expect(s.outcome).toBe("chat_only");
+    expect(s.suppressWorkspaceRouting).toBe(true);
+    expect(governorAllowsArtifactHandoff(s)).toBe(false);
+    expect(s.promptHints.join(" ")).toMatch(/CHAT ROLE RESET/i);
   });
 
   it("4 — I am stressed → chat_only", () => {
@@ -89,12 +90,12 @@ describe("companionGovernor", () => {
     expect(s.promptHints.join(" ")).toMatch(/one stage at a time/i);
   });
 
-  it("6 — Open Momentum Games → tool_open", () => {
+  it("6 — Open Momentum Games → chat_only (use UI to open)", () => {
     const s = gov("Open Momentum Games");
-    expect(s.outcome).toBe("tool_open");
-    expect(s.targetTool).toBe("games");
-    expect(governorAuthorizedChatTurnOpen(s)).toBe(true);
-    expect(governorBlocksChatTurnAutoOpen(s)).toBe(false);
+    expect(s.outcome).toBe("chat_only");
+    expect(s.targetTool).toBeUndefined();
+    expect(governorAuthorizedChatTurnOpen(s)).toBe(false);
+    expect(governorBlocksChatTurnAutoOpen(s)).toBe(true);
   });
 
   it("7 — Help me prioritize my week → chat_only", () => {
@@ -109,12 +110,11 @@ describe("companionGovernor", () => {
     expect(s.suppressWorkspaceRouting).toBe(true);
   });
 
-  it("9 — Resume my draft → workspace_open only if saved draft exists", () => {
+  it("9 — Resume my draft → chat_only; user opens Create from UI", () => {
     vi.spyOn(createSessionStore, "hasActiveCreateSession").mockReturnValue(true);
     const yes = gov("Resume my draft");
-    expect(yes.outcome).toBe("workspace_open");
-    expect(yes.targetSection).toBe("content-generator");
-    expect(yes.suppressRestore).toBe(false);
+    expect(yes.outcome).toBe("chat_only");
+    expect(yes.suppressRestore).toBe(true);
 
     vi.spyOn(createSessionStore, "hasActiveCreateSession").mockReturnValue(false);
     const no = gov("Resume my draft");

@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import type { CreateWorkspacePhase } from "@/lib/createBuild";
 import { BUILD_DRAFT_LOADING_MESSAGES } from "@/lib/createTemplates";
 import {
@@ -8,7 +9,11 @@ import {
 } from "@/lib/createDiscoveryWorkspace";
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
 import { userFacingCreateTypeLabel } from "@/lib/createTypePickers";
-import { CreateAudienceMultiPicker } from "@/components/companion/CreateAudienceMultiPicker";
+import { AudienceSelector } from "@/components/companion/AudienceSelector";
+import { selectedAudienceLabel } from "@/lib/contentAudience";
+import { CreateTemplateProgress } from "@/components/companion/CreateTemplateProgress";
+import { hasGuidedTemplateFields } from "@/lib/createTemplateFields";
+import { resolvedTypeLabel } from "@/lib/createWorkflow";
 
 function SectionRow({
   section,
@@ -19,10 +24,10 @@ function SectionRow({
 }) {
   const statusLabel =
     section.status === "filled"
-      ? "Ready for draft"
+      ? "Added"
       : section.status === "partial"
-        ? "In progress"
-        : "Waiting";
+        ? "Taking shape"
+        : "Open";
 
   return (
     <div
@@ -44,7 +49,7 @@ function SectionRow({
         </p>
       ) : (
         <p className="mt-1.5 text-sm italic text-[#9a8f82]">
-          Shari will draft this from your answers.
+          We'll shape this together in chat.
         </p>
       )}
     </div>
@@ -80,12 +85,18 @@ export function CreateDiscoveryWorkspace({
   onCopyAnswers?: () => void;
   building?: boolean;
 }) {
+  const [templateOpen, setTemplateOpen] = useState(false);
   const view = buildDiscoveryWorkspaceView(workflow);
   if (!view) return null;
 
   const displayType = userFacingCreateTypeLabel(view.itemType);
   const title = displayType ? `Creating: ${displayType}` : "Creating";
   const loadingMessage = BUILD_DRAFT_LOADING_MESSAGES[loadingMessageIndex];
+  const guidedProgress = hasGuidedTemplateFields(resolvedTypeLabel(workflow));
+  const filledSections = view.templateSections.filter(
+    (s) => s.status === "filled" || s.status === "partial",
+  ).length;
+  const totalSections = view.templateSections.length;
 
   if (workspacePhase === "generating") {
     return (
@@ -114,7 +125,7 @@ export function CreateDiscoveryWorkspace({
             Something went wrong
           </p>
           <p className="mt-2 text-sm text-[#6b3a3a]">
-            {errorMessage ?? "Try again or add more detail in chat."}
+            {errorMessage ?? "Try again or keep talking in chat."}
           </p>
           <div className="mt-4 flex flex-col gap-2">
             {onTryAgain ? (
@@ -132,7 +143,7 @@ export function CreateDiscoveryWorkspace({
                 onClick={onAddMoreDetail}
                 className="w-full rounded-xl border border-[#1e4f4f]/30 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
               >
-                Add More Detail
+                Keep Working
               </button>
             ) : null}
             {onCopyAnswers ? (
@@ -141,7 +152,7 @@ export function CreateDiscoveryWorkspace({
                 onClick={onCopyAnswers}
                 className="text-xs font-semibold text-[#1e4f4f] underline decoration-[#1e4f4f]/40"
               >
-                Copy answers to clipboard
+                Copy notes to clipboard
               </button>
             ) : null}
           </div>
@@ -152,38 +163,34 @@ export function CreateDiscoveryWorkspace({
 
   const progressLabel =
     workspacePhase === "ready"
-      ? "All sections complete — approve in chat or below."
-      : view.incompleteSectionLabels.length > 0
-        ? `${view.incompleteSectionLabels.length} section${view.incompleteSectionLabels.length === 1 ? "" : "s"} still open — answer in chat.`
-        : view.currentQuestion
-          ? `Question ${view.progress.current} of ${view.progress.total} — answer in chat.`
-          : `Gathering details — ${view.progress.current} of ${view.progress.total}.`;
+      ? "Your plan looks ready — approve in chat when you want the first draft."
+      : guidedProgress
+        ? `${view.progress.current} of ${view.progress.total} required sections complete — keep chatting with Shari.`
+        : totalSections > 0
+          ? `${filledSections} of ${totalSections} sections taking shape — keep chatting with Shari.`
+          : "Talk with Shari in chat — your plan builds here as you go.";
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4 py-4">
       <div className="companion-fade-in mx-auto w-full max-w-lg">
         <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-          Create
+          Living plan
         </p>
         <h2 className="mt-1 text-lg font-semibold text-[#1f1c19]">{title}</h2>
-        {view.templateName ? (
-          <p className="mt-0.5 text-sm text-[#6b635a]">{view.templateName}</p>
-        ) : null}
         <p className="mt-2 text-sm text-[#6b635a]">{progressLabel}</p>
 
         {audienceStepActive && onAudienceChange ? (
-          <div className="mt-4 rounded-2xl border border-[#d4cdc3] bg-white/85 p-4 shadow-sm">
-            <p className="text-sm font-semibold text-[#1f1c19]">Who is it for?</p>
-            <CreateAudienceMultiPicker
-              value={selectedAudienceNames}
-              onChange={onAudienceChange}
+          <div className="mt-4">
+            <AudienceSelector
+              compact
+              showTone={false}
+              onChange={() => onAudienceChange([selectedAudienceLabel()])}
             />
             {onAudienceConfirm ? (
               <button
                 type="button"
-                disabled={selectedAudienceNames.length === 0}
                 onClick={onAudienceConfirm}
-                className="mt-3 w-full rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:cursor-not-allowed disabled:opacity-40"
+                className="mt-3 w-full rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
               >
                 Continue
               </button>
@@ -191,49 +198,48 @@ export function CreateDiscoveryWorkspace({
           </div>
         ) : null}
 
-        {view.collectedAnswers.length > 0 ? (
+        {guidedProgress ? (
           <div className="mt-4">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-              Your answers
-            </p>
-            <ul className="mt-2 space-y-2">
-              {view.collectedAnswers.map((row) => (
-                <li
-                  key={row.label}
-                  className="rounded-xl border border-[#e7dfd4] bg-white px-3 py-2"
-                >
-                  <p className="text-xs font-semibold text-[#6b635a]">{row.label}</p>
-                  <p className="mt-0.5 text-sm text-[#1f1c19]">{row.value}</p>
-                </li>
-              ))}
-            </ul>
+            <CreateTemplateProgress workflow={workflow} />
           </div>
         ) : null}
 
-        {view.templateSections.length > 0 ? (
-          <div className="mt-4">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
-              Template outline
-            </p>
-            <div className="mt-2 space-y-2">
-              {view.templateSections.map((section) => (
-                <SectionRow
-                  key={section.id}
-                  section={section}
-                  active={workflow.activeSectionId === section.id}
-                />
-              ))}
-            </div>
+        {!guidedProgress && view.templateSections.length > 0 ? (
+          <div className="mt-4 rounded-2xl border border-[#d4cdc3] bg-white/85 shadow-sm">
+            <button
+              type="button"
+              onClick={() => setTemplateOpen((open) => !open)}
+              className="flex w-full items-center justify-between gap-2 px-4 py-3 text-left"
+              aria-expanded={templateOpen}
+            >
+              <span className="text-sm font-semibold text-[#1f1c19]">
+                {view.templateName ?? "Template"}
+              </span>
+              <span className="text-xs font-semibold text-[#1e4f4f]">
+                {templateOpen ? "Collapse" : "Expand"}
+              </span>
+            </button>
+            {templateOpen ? (
+              <div className="space-y-2 border-t border-[#e7dfd4] px-3 pb-3 pt-2">
+                {view.templateSections.map((section) => (
+                  <SectionRow
+                    key={section.id}
+                    section={section}
+                    active={workflow.activeSectionId === section.id}
+                  />
+                ))}
+              </div>
+            ) : null}
           </div>
         ) : null}
 
         {workspacePhase === "ready" && onBuildDraft ? (
           <div className="mt-5 rounded-2xl border border-[#d4cdc3] bg-white/85 p-4 shadow-sm">
             <p className="text-sm font-semibold text-[#1f1c19]">
-              Ready to build your {displayType}?
+              Ready for a first draft?
             </p>
             <p className="mt-1 text-sm text-[#6b635a]">
-              Shari has enough for a first draft. You can refine after.
+              You can also keep working in chat — no rush.
             </p>
             <button
               type="button"
@@ -241,7 +247,7 @@ export function CreateDiscoveryWorkspace({
               onClick={onBuildDraft}
               className="mt-3 w-full rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:cursor-not-allowed disabled:opacity-50"
             >
-              {building ? `Building your ${displayType}…` : "Build Draft"}
+              {building ? `Creating your ${displayType}…` : "Create Draft"}
             </button>
           </div>
         ) : null}

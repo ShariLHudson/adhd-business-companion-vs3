@@ -32,10 +32,10 @@ describe("activeWorkspaceAutoApply", () => {
     ).toBe(false);
   });
 
-  it("allows substantive content when workspace is open", () => {
+  it("conversation-only mode blocks auto-apply even with substantive content", () => {
     const msg =
       "My ideal client is a 35-year-old entrepreneur with ADHD who runs a service business.";
-    expect(isActiveWorkspaceAutoApplyMode("client-avatars", msg)).toBe(true);
+    expect(isActiveWorkspaceAutoApplyMode("client-avatars", msg)).toBe(false);
     expect(
       shouldBlockDraftPanelFromChat(msg, "", {
         activeWorkspaceSection: "client-avatars",
@@ -43,12 +43,12 @@ describe("activeWorkspaceAutoApply", () => {
     ).toBe(false);
   });
 
-  it("hint tells model to offer approval before applying lists", () => {
+  it("hint tells model chat is conversation only when workspace is open", () => {
     expect(activeWorkspaceAutoApplyHint("client-avatars")).toMatch(
-      /Would you like me to add/i,
+      /conversation only/i,
     );
     expect(activeWorkspaceAutoApplyHint("content-generator")).toMatch(
-      /auto-apply|automatically/i,
+      /conversation only/i,
     );
   });
 

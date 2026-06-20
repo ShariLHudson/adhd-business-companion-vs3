@@ -2,15 +2,16 @@
 
 import type { CreateWorkspacePhase } from "@/lib/createBuild";
 import { userFacingCreateTypeLabel } from "@/lib/createTypePickers";
-import { CreateAudienceMultiPicker } from "@/components/companion/CreateAudienceMultiPicker";
+import { AudienceSelector } from "@/components/companion/AudienceSelector";
+import { selectedAudienceLabel } from "@/lib/contentAudience";
 import { WorkspaceStepCard } from "@/components/companion/WorkspaceStepCard";
 
 const PHASE_DETAIL: Record<CreateWorkspacePhase, string> = {
-  gathering: "Answer in chat — your draft appears here when ready.",
-  ready: "Approve in chat when you're set.",
+  gathering: "Chat with Shari — your living plan fills in beside you.",
+  ready: "Approve in chat when you're ready for a first draft.",
   generating: "This usually takes a few seconds.",
   "draft-ready": "Ask Shari in chat if you'd like changes.",
-  error: "Try again or add more detail in chat.",
+  error: "Try again or keep talking in chat.",
 };
 
 export function CreateSplitScreenStatus({
@@ -58,16 +59,16 @@ export function CreateSplitScreenStatus({
       <WorkspaceStepCard sectionLabel="Create" title={title} footer={detail}>
         {audienceStepActive && onAudienceChange ? (
           <>
-            <CreateAudienceMultiPicker
-              value={selectedAudienceNames}
-              onChange={onAudienceChange}
+            <AudienceSelector
+              compact
+              showTone={false}
+              onChange={() => onAudienceChange([selectedAudienceLabel()])}
             />
             {onAudienceConfirm ? (
               <button
                 type="button"
-                disabled={selectedAudienceNames.length === 0}
                 onClick={onAudienceConfirm}
-                className="mt-3 w-full rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a] disabled:cursor-not-allowed disabled:opacity-40"
+                className="mt-3 w-full rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
               >
                 Continue
               </button>

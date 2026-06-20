@@ -70,6 +70,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "client-avatars": "Client Avatar",
   "decision-compass": "Decision Compass",
   today: "Today",
+  "plan-my-day": "Plan My Day",
   "wins-this-week": "Wins This Week",
   "focus-audio": "Focus Audio",
 };
@@ -94,6 +95,7 @@ export const WORKSPACE_EMOJI: Partial<Record<AppSection, string>> = {
   "client-avatars": "👤",
   "decision-compass": "🧭",
   today: "📅",
+  "plan-my-day": "📋",
   "wins-this-week": "🌟",
   "focus-audio": "🎧",
 };

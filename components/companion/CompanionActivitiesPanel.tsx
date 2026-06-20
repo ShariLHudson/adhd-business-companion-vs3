@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { logMomentum } from "@/lib/companionStore";
 import {
   ACTIVITY_CATEGORIES,
@@ -28,10 +28,6 @@ import { CrossWorkspaceSuggestionCard } from "@/components/companion/CrossWorksp
 import type { DecisionCompassPrefill } from "@/lib/decisionCompass";
 import type { PersistedDecisionCompassSession } from "@/lib/decisionCompassSessionStore";
 import type { AppSection } from "@/lib/companionUi";
-import {
-  HELP_ME_RIGHT_NOW_MENU,
-  type HelpMeRightNowMenuItem,
-} from "@/lib/focusToolDefinitions";
 import { guidedExerciseMenu } from "@/lib/guidedExercises";
 
 export type ActivityPanelVariant = "help-now" | "guided";
@@ -80,21 +76,22 @@ function shouldShowLinkedSuggestion(
 
 export function CompanionActivitiesPanel({
   onOpenBeside,
-  onQuickTool,
   onOpenDecisionCompass,
   onClose,
   embedded = false,
   variant = "help-now",
   session: controlledSession,
   onSessionChange,
+  registerBack,
+  onBeforeActivityStart,
+  returnToLabel,
+  onExitActivity,
   decisionCompassPrefill = null,
   decisionCompassSession = null,
   onDecisionCompassSessionChange,
   onDecisionCompassComplete,
 }: {
   onOpenBeside?: (section: AppSection, payload: OpenBesidePayload) => void;
-  /** Featured Help Me Right Now menu — open section, activity, or chat. */
-  onQuickTool?: (item: HelpMeRightNowMenuItem) => void;
   /** Opens ADHD Decision Compass split workspace (not the legacy step exercise). */
   onOpenDecisionCompass?: () => void;
   onClose?: () => void;
@@ -103,6 +100,14 @@ export function CompanionActivitiesPanel({
   variant?: ActivityPanelVariant;
   session?: ActivitySessionState;
   onSessionChange?: (session: ActivitySessionState) => void;
+  /** Global ← Back — inner screens first, then parent history. */
+  registerBack?: (fn: (() => boolean) | null) => void;
+  /** Push navigation restore before leaving browse for an activity. */
+  onBeforeActivityStart?: () => void;
+  /** Label for the parent screen when exiting an activity (e.g. ADHD Strategies). */
+  returnToLabel?: string;
+  /** Clear session and return to the parent screen — bypasses inner back interceptors. */
+  onExitActivity?: () => void;
   decisionCompassPrefill?: DecisionCompassPrefill | null;
   decisionCompassSession?: PersistedDecisionCompassSession | null;
   onDecisionCompassSessionChange?: (
@@ -127,13 +132,14 @@ export function CompanionActivitiesPanel({
 
   const guidedExercises = guidedExerciseMenu();
   const browseTitle =
-    variant === "guided" ? "Guided Exercises" : "Help Me Right Now";
+    variant === "guided" ? "Guided Exercises" : "Focus";
   const browseSubtitle =
     variant === "guided"
       ? "Structured thinking and self-reflection — go deeper when you have a few minutes."
-      : "Immediate relief and momentum — pick what matches right now.";
+      : "Pick a feeling or tool from Focus — relief tools live there now.";
 
   function start(a: CompanionActivity) {
+    onBeforeActivityStart?.();
     const firstField = stepField(a.steps[0]);
     patchSession({
       activityId: a.id,
@@ -155,16 +161,6 @@ export function CompanionActivitiesPanel({
     }
     const a = getActivityById(activityId);
     if (a) start(a);
-  }
-
-  function launchQuickTool(item: HelpMeRightNowMenuItem) {
-    if (onQuickTool) {
-      onQuickTool(item);
-      return;
-    }
-    if (item.kind === "activity" && item.activityId) {
-      launchGuidedExercise(item.activityId);
-    }
   }
 
   function ensureStepAnswers(
@@ -201,9 +197,54 @@ export function CompanionActivitiesPanel({
     patchSession({ phase: "complete" });
   }
 
-  function backToBrowse() {
+  const parentLabel =
+    returnToLabel ?? (variant === "guided" ? "Guided Exercises" : "Focus");
+
+  function exitToParent() {
+    if (onExitActivity) {
+      onExitActivity();
+      return;
+    }
+    if (variant === "help-now" && onClose) {
+      onClose();
+      return;
+    }
     patchSession({ ...EMPTY_ACTIVITY_SESSION, categoryId: session.categoryId });
   }
+
+  function backToBrowse() {
+    exitToParent();
+  }
+
+  function exitActivityView() {
+    if (variant === "help-now" && onClose) {
+      onClose();
+      return;
+    }
+    backToBrowse();
+  }
+
+  useEffect(() => {
+    registerBack?.(() => {
+      if (session.phase === "stopped") {
+        patchSession({ phase: "active" });
+        return true;
+      }
+      if (session.phase === "complete") {
+        exitActivityView();
+        return true;
+      }
+      if (session.phase === "active") {
+        if (session.stepIndex > 0) {
+          goToStep(session.stepIndex - 1);
+          return true;
+        }
+        return false;
+      }
+      return false;
+    });
+    return () => registerBack?.(null);
+  }, [registerBack, session.phase, session.stepIndex, session.activityId]);
 
   function acceptLinkedBeside(a: CompanionActivity) {
     if (!a.linkedSection || !onOpenBeside) return;
@@ -252,10 +293,10 @@ export function CompanionActivitiesPanel({
           ) : null}
           <button
             type="button"
-            onClick={backToBrowse}
+            onClick={exitToParent}
             className="rounded-xl bg-[#1e4f4f] px-6 py-2.5 text-sm font-semibold text-white"
           >
-            Back to {variant === "guided" ? "exercises" : "activities"}
+            ‹ Back to {parentLabel}
           </button>
         </div>
       </div>
@@ -470,30 +511,23 @@ export function CompanionActivitiesPanel({
                   </button>
                 </li>
               ))
-            : HELP_ME_RIGHT_NOW_MENU.map((item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    onClick={() => launchQuickTool(item)}
-                    className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/85 px-3.5 py-3 text-left shadow-sm transition-colors hover:border-[#1e4f4f]/35 hover:bg-white"
-                  >
-                    <span
-                      aria-hidden="true"
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f5f1ea] text-lg"
+            : (
+                <li>
+                  <p className="rounded-2xl border border-[#d4cdc3] bg-white/85 px-3.5 py-3 text-sm text-[#6b635a]">
+                    Relief tools live under <strong>Focus</strong> — pick how you&apos;re
+                    feeling or open a tool from there.
+                  </p>
+                  {onClose ? (
+                    <button
+                      type="button"
+                      onClick={onClose}
+                      className="mt-3 w-full rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white"
                     >
-                      {item.emoji}
-                    </span>
-                    <span className="min-w-0 flex-1">
-                      <span className="block text-base font-semibold text-[#1f1c19]">
-                        {item.title}
-                      </span>
-                      <span className="mt-0.5 block text-sm leading-snug text-[#6b635a]">
-                        {item.purpose}
-                      </span>
-                    </span>
-                  </button>
+                      Go to Focus
+                    </button>
+                  ) : null}
                 </li>
-              ))}
+              )}
         </ul>
       </div>
     </div>

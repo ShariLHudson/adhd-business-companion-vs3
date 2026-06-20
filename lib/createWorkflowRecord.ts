@@ -111,6 +111,7 @@ function builderPhaseFromRecord(
   const p = record.currentPhase;
   if (
     p === "pick-type" ||
+    p === "workspace" ||
     p === "discovery" ||
     p === "readiness" ||
     p === "generating" ||

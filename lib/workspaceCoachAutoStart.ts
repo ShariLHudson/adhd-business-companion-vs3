@@ -213,7 +213,7 @@ function buildActivitiesCoachAutoStart(
   }
   return {
     content:
-      "Help Me Right Now is open — pick an exercise and I'll stay beside you, one step at a time.",
+      "Focus is open — pick how you're feeling or tell me what you need right now.",
     focusField: null,
   };
 }
@@ -278,7 +278,9 @@ export function buildWorkspaceCoachAutoStart(
     case "focus-timer":
       return buildFocusTimerCoachAutoStart(extras);
     case "focus":
-      return buildFocusAreaCoachAutoStart();
+      return extras?.activityTitle
+        ? buildActivitiesCoachAutoStart(extras)
+        : buildFocusAreaCoachAutoStart();
     case "how-do-i":
       return buildHowDoICoachAutoStart();
     case "spin-wheel":
@@ -310,7 +312,7 @@ export function workspaceCoachSeedKey(
   if (ctx.section === "focus-timer") {
     return `${base}:${extras?.focusActive ? "active" : "idle"}:${extras?.focusTitle ?? ""}`;
   }
-  if (ctx.section === "activities") {
+  if (ctx.section === "focus" || ctx.section === "activities") {
     return `${base}:${extras?.activityTitle ?? ""}:${extras?.activityStep ?? ""}`;
   }
   if (ctx.section === "projects" && ctx.selectedItemId) {

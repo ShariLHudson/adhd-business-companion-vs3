@@ -20,7 +20,7 @@ const focusBridge: PendingAction = {
 };
 
 describe("companionAutoLaunch", () => {
-  it("auto-launches on duration follow-up after a minutes question", () => {
+  it("does not auto-launch on duration follow-up in conversation-only mode", () => {
     expect(
       matchesDurationFollowUp(
         "10",
@@ -34,17 +34,17 @@ describe("companionAutoLaunch", () => {
         "Would 10 or 15 minutes work?",
         focusBridge,
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 
-  it("auto-opens brain dump when user clearly asked for it", () => {
+  it("does not auto-open brain dump in conversation-only mode", () => {
     expect(
       shouldAutoOpenWorkspaceFromIntent("I need to clear my mind", {
         section: "brain-dump",
         line: "",
         buttonLabel: "Open Clear My Mind",
       }),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it("does not auto-launch after assistant mentions a tool in the same turn", () => {

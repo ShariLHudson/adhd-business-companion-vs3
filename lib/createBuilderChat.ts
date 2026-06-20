@@ -30,6 +30,7 @@ import {
   requiredFieldsComplete,
   resolvedTypeLabel,
   type CreateWorkflowState,
+  type PendingFieldApproval,
   EMPTY_CREATE_WORKFLOW,
   answeredDiscoveryCount,
 } from "./createWorkflow";
@@ -39,8 +40,12 @@ import {
   formatSectionCollectionPrompt,
   incompleteTemplateSections,
   isDiscoveryHelpRequest,
+  isDraftWithWhatWeHaveRequest,
+  draftWithWhatWeHaveConfirmation,
   isExplicitBuildApproval,
+  WORKSPACE_SECTION_NUDGE,
   isInSectionDiscoveryPhase,
+  isSectionPickIntent,
   isUnsaveableSectionText,
   matchSectionFromText,
   materializeDiscoverySections,
@@ -54,10 +59,27 @@ import {
 } from "./builderContentSync";
 import { logCreateBuild } from "./createBuild";
 import { logSharedCreateSession } from "./createSharedSession";
-import { DRAFT_QUICK_EDITS } from "./createWorkspaceUx";
+import { guidedProgressForWorkflow } from "./createGuidedSession";
+import {
+  catalogLabelToCreateType,
+  getTemplateFields,
+  hasGuidedTemplateFields,
+} from "./createTemplateFields";
+import { isCreateExplorationRequest } from "./createExplorationMode";
+import {
+  isCreateBuilderKeepTalkingPhrase,
+  isCreateBuilderRevisePhrase,
+  shouldCaptureFieldAnswer,
+  shouldRevisePendingValue,
+} from "./createBuilderModes";
+import { isInvalidBuilderFieldValue } from "./builderContentSync";
+import { CREATE_THINKING_PARTNER_PRINCIPLES } from "./createVision";
+import { createDepthHintForChat, isThankYouEmailIntent } from "./createDepth";
+import type { CreateTemplateSection } from "./createTemplates";
 
 export type CreateBuilderPhase =
   | "pick-type"
+  | "workspace"
   | "discovery"
   | "readiness"
   | "generating"
@@ -66,6 +88,11 @@ export type CreateBuilderPhase =
 
 export type CreateBuilderAction =
   | { id: "create-draft"; label: string }
+  | { id: "keep-working"; label: string }
+  | { id: "review-template"; label: string }
+  | { id: "use-this"; label: string }
+  | { id: "revise-it"; label: string }
+  | { id: "keep-talking"; label: string }
   | { id: "add-more-info"; label: string }
   | { id: "revise"; label: string; instruction: string };
 
@@ -76,6 +103,12 @@ export type CreateBuilderSession = {
   /** Collecting optional extra context before readiness. */
   collectingExtra?: boolean;
 };
+
+export function pendingApprovalForSession(
+  session: CreateBuilderSession | null | undefined,
+): PendingFieldApproval | null | undefined {
+  return session?.workflow.pendingFieldApproval;
+}
 
 export function emptyCreateBuilderSession(): CreateBuilderSession {
   return {
@@ -151,14 +184,277 @@ export function resolveBuilderType(text: string): string | null {
   if (/\bworkshop\b|webinar\b/i.test(t)) return "Workshop";
   if (/\bproposal\b|\bsow\b/i.test(t)) return "Proposal";
   if (/\bemail\b/i.test(t)) return "Email";
+  if (isThankYouEmailIntent(t)) return "Thank-You Email";
   if (/\bnewsletter\b/i.test(t)) return "Newsletter";
   if (/\bpresentation\b|\bslides\b/i.test(t)) return "Presentation";
   if (/\bsocial media post\b/i.test(t)) return "Social Post";
   if (/\blead magnet\b/i.test(t)) return "Lead Magnet";
   if (/\blanding page\b/i.test(t)) return "Landing Page";
   if (/\bfunnel\b/i.test(t)) return "Sales Funnel";
+  if (/\bemail sequence\b/i.test(t)) return "Email Sequence";
+  if (/\bcourse outline\b/i.test(t)) return "Course Outline";
+  if (/\bclient onboarding\b/i.test(t)) return "Client Onboarding";
+  if (/\bmarketing plan\b/i.test(t)) return "Marketing Plan";
   if (/\btraining\b/i.test(t)) return "Training Guide";
+  if (/\bsocial media\b/i.test(t)) return "Social Post";
   return null;
+}
+
+export function isPendingApprovalAcceptance(text: string): boolean {
+  const t = text.trim().toLowerCase().replace(/[.!]+$/g, "");
+  if (!t) return false;
+  const exact = new Set([
+    "yes",
+    "yep",
+    "yeah",
+    "y",
+    "ok",
+    "okay",
+    "use this",
+    "use that",
+    "yes use that",
+    "yes use this",
+    "sounds good",
+    "looks good",
+    "look good",
+    "correct",
+    "that's right",
+    "that is right",
+    "that works",
+    "approved",
+    "perfect",
+    "great",
+    "do it",
+  ]);
+  if (exact.has(t)) return true;
+  return /^(yes|yep|yeah|ok|okay)\b/.test(t) && t.length <= 24;
+}
+
+function isReviseApproval(text: string): boolean {
+  return isCreateBuilderRevisePhrase(text);
+}
+
+function isKeepTalkingApproval(text: string): boolean {
+  return isCreateBuilderKeepTalkingPhrase(text);
+}
+
+function approvalSummaryForQuestion(questionId: string, answer: string): string {
+  return answer.trim();
+}
+
+function fieldLabelForPending(
+  typeLabel: string,
+  pending: PendingFieldApproval,
+): string {
+  if (pending.fieldLabel?.trim()) return pending.fieldLabel.trim();
+  if (pending.sectionLabel?.trim()) return pending.sectionLabel.trim();
+  const id = pending.questionId ?? "";
+  const labels: Record<string, string> = {
+    audience: "Audience",
+    reader: "Audience",
+    topic: "Topic",
+    theme: "Topic",
+    goal: "Goal",
+    outcome: "Outcome",
+    problem: "Problem",
+    offer: "Offer",
+    client: "Client",
+    process: "Process",
+  };
+  if (labels[id]) return labels[id];
+  const guidedType = catalogLabelToCreateType(typeLabel);
+  if (guidedType) {
+    const guidedField = getTemplateFields(guidedType).find((f) => f.id === id);
+    if (guidedField) return guidedField.label;
+  }
+  const q = getDiscoveryQuestions(typeLabel, {}).find((item) => item.id === id);
+  if (!q) return "Section";
+  const short = q.prompt.replace(/\?$/, "").trim();
+  if (short.length <= 32) return short;
+  return short.split(/\s+/).slice(0, 4).join(" ");
+}
+
+function withPendingApproval(
+  session: CreateBuilderSession,
+  pending: PendingFieldApproval | null,
+): CreateBuilderSession {
+  return {
+    ...session,
+    workflow: {
+      ...session.workflow,
+      pendingFieldApproval: pending,
+    },
+  };
+}
+
+function formatApprovalPrompt(
+  questionId: string,
+  summary: string,
+  sectionLabel?: string,
+): string {
+  const text = summary.trim();
+  if (sectionLabel) {
+    return (
+      `For **${sectionLabel}**, it sounds like:\n\n${text}\n\n` +
+      `Would you like me to use that?`
+    );
+  }
+  if (questionId === "audience" || questionId === "reader") {
+    return (
+      `It sounds like your audience is **${text}**.\n\n` +
+      `Would you like me to use that?`
+    );
+  }
+  if (questionId === "problem") {
+    return (
+      `It sounds like the problem is:\n\n**${text}**\n\n` +
+      `Would you like me to use that?`
+    );
+  }
+  return `It sounds like **${text}**.\n\nWould you like me to use that?`;
+}
+
+function offerFieldApproval(
+  session: CreateBuilderSession,
+  pending: PendingFieldApproval,
+): CreateBuilderTurnResult {
+  const withPending = withPendingApproval(session, pending);
+  return {
+    session: withPending,
+    reply: formatApprovalPrompt(
+      pending.questionId ?? "",
+      pending.summary,
+      pending.sectionLabel,
+    ),
+    actions: APPROVAL_ACTIONS,
+  };
+}
+
+function commitPendingApproval(
+  session: CreateBuilderSession,
+  typeLabel: string,
+): CreateBuilderTurnResult {
+  const pending = session.workflow.pendingFieldApproval;
+  if (!pending) {
+    return { session, reply: "" };
+  }
+  const cleared = withPendingApproval(session, null);
+  const savedValue = pending.summary.trim() || pending.rawAnswer.trim();
+  if (isInvalidBuilderFieldValue(savedValue)) {
+    return {
+      session: cleared,
+      reply:
+        "That doesn't look like field content — tell me what you'd like to save, or ask for ideas.",
+    };
+  }
+  const fieldLabel = fieldLabelForPending(typeLabel, pending);
+
+  if (pending.kind === "discovery" && pending.questionId) {
+    const nextWorkflow = advanceAfterDiscoveryAnswer(
+      cleared.workflow,
+      typeLabel,
+      pending.questionId,
+      savedValue,
+    );
+    logCreateBuild("Chat answer saved", {
+      itemType: typeLabel,
+      questionId: pending.questionId,
+      answersCount: answeredDiscoveryCount(nextWorkflow),
+    });
+    if (initialQuestionsComplete(typeLabel, nextWorkflow)) {
+      if (discoveryReadyForDraft(typeLabel, nextWorkflow)) {
+        return enterReadiness(
+          { ...cleared, workflow: nextWorkflow },
+          typeLabel,
+        );
+      }
+      return transitionToSectionDiscovery(
+        { ...cleared, workflow: nextWorkflow },
+        typeLabel,
+        nextWorkflow,
+      );
+    }
+    const nextQ = discoveryQuestionsForState(typeLabel, nextWorkflow);
+    const savedLine =
+      pending.questionId === "audience" || pending.questionId === "reader"
+        ? `Done — I added **${savedValue}** as your audience.`
+        : `Done — I added **${savedValue}** to **${fieldLabel}**.`;
+    const progress = guidedProgressForWorkflow(typeLabel, nextWorkflow);
+    const progressLine = progress
+      ? `\n\n${progress.completed} of ${progress.total} required sections complete.`
+      : "";
+    return {
+      session: {
+        ...cleared,
+        workflow: nextWorkflow,
+        phase: "discovery",
+      },
+      reply: nextQ
+        ? `${savedLine}${progressLine}\n\n**${nextQ.prompt}**`
+        : savedLine,
+    };
+  }
+
+  if (pending.kind === "section" && pending.sectionId) {
+    const workflow = setSectionContent(
+      cleared.workflow,
+      pending.sectionId,
+      savedValue,
+    );
+    const sections = resolveTemplateSections(workflow) ?? [];
+    const section = sections.find((s) => s.id === pending.sectionId);
+    const stillIncomplete = incompleteTemplateSections(workflow);
+    const label = section?.label ?? fieldLabel;
+    const savedLine = `Done — I added **${savedValue}** to **${label}**.`;
+    if (stillIncomplete.length === 0) {
+      return enterReadiness({ ...cleared, workflow }, typeLabel);
+    }
+    return {
+      session: { ...cleared, workflow, phase: "discovery" },
+      reply:
+        `${savedLine}\n\n` +
+        incompleteSectionsReply(workflow, stillIncomplete),
+    };
+  }
+
+  return { session: cleared, reply: `Done — saved **${savedValue}**.` };
+}
+
+function handlePendingApprovalTurn(
+  session: CreateBuilderSession,
+  typeLabel: string,
+  trimmed: string,
+): CreateBuilderTurnResult | null {
+  const pending = session.workflow.pendingFieldApproval;
+  if (!pending) return null;
+
+  if (isPendingApprovalAcceptance(trimmed)) {
+    return commitPendingApproval(session, typeLabel);
+  }
+  if (isKeepTalkingApproval(trimmed)) {
+    return {
+      session: withPendingApproval(session, null),
+      reply: "Sure — tell me more. Questions welcome anytime.",
+    };
+  }
+  if (isReviseApproval(trimmed)) {
+    return {
+      session: withPendingApproval(session, null),
+      reply: "No problem — how would you like to put that?",
+    };
+  }
+  if (isCreateExplorationRequest(trimmed)) {
+    return { session, reply: "" };
+  }
+  if (!shouldRevisePendingValue(trimmed)) {
+    return { session, reply: "" };
+  }
+
+  return offerFieldApproval(session, {
+    ...pending,
+    summary: approvalSummaryForQuestion(pending.questionId ?? "", trimmed),
+    rawAnswer: trimmed,
+  });
 }
 
 export function isAffirmative(text: string): boolean {
@@ -176,12 +472,51 @@ export function isAddMoreInformation(text: string): boolean {
 }
 
 export const READINESS_ACTIONS: CreateBuilderAction[] = [
-  { id: "create-draft", label: "Build Draft" },
-  { id: "add-more-info", label: "Add More Information" },
+  { id: "create-draft", label: "Create Draft" },
+  { id: "keep-working", label: "Keep Working" },
+  { id: "review-template", label: "Review Template" },
+];
+
+function workspacePanelVisible(workflow: CreateWorkflowState): boolean {
+  return workflow.questionMode === "split_screen";
+}
+
+function incompleteSectionsReply(
+  workflow: CreateWorkflowState,
+  incomplete: CreateTemplateSection[],
+  prefix?: string,
+): string {
+  const body = formatIncompleteSectionsPrompt(incomplete, {
+    workspacePanelVisible: workspacePanelVisible(workflow),
+  });
+  if (!body) return prefix ?? "";
+  return prefix ? `${prefix}\n\n${body}` : body;
+}
+
+function offerDraftWithWhatWeHave(
+  session: CreateBuilderSession,
+  workflow: CreateWorkflowState,
+): CreateBuilderTurnResult {
+  return {
+    session: {
+      ...session,
+      workflow,
+      phase: "readiness",
+      collectingExtra: false,
+    },
+    reply: draftWithWhatWeHaveConfirmation(),
+    actions: READINESS_ACTIONS,
+  };
+}
+
+export const APPROVAL_ACTIONS: CreateBuilderAction[] = [
+  { id: "use-this", label: "Use This" },
+  { id: "revise-it", label: "Revise It" },
+  { id: "keep-talking", label: "Keep Talking" },
 ];
 
 const READINESS_PROMPT =
-  "I'm ready to build this. Click **Build Draft** when you're ready.";
+  "I think we have enough to create the first draft. Ready?";
 
 function freshDiscoveryWorkflow(typeLabel: string): CreateWorkflowState {
   const picked = advanceAfterItemPick(typeLabel);
@@ -315,7 +650,7 @@ export function bootstrapCreateBuilderFromWorkflow(
       return {
         session,
         opener: incomplete.length
-          ? `I have your answers so far for **${resolved}**.\n\n${formatIncompleteSectionsPrompt(incomplete)}`
+          ? `I have your answers so far for **${resolved}**.\n\n${incompleteSectionsReply(sectionWorkflow, incomplete)}`
           : `I have your answers so far for **${resolved}**.`,
       };
     }
@@ -343,19 +678,8 @@ export function bootstrapCreateBuilderFromWorkflow(
   return bootstrapCreateBuilderSession(resolved);
 }
 
-export function reviseOfferActions(): CreateBuilderAction[] {
-  return [
-    ...DRAFT_QUICK_EDITS.map((e) => ({
-      id: "revise" as const,
-      label: e.label,
-      instruction: e.instruction,
-    })),
-    {
-      id: "revise",
-      label: "Custom change",
-      instruction: "__custom__",
-    },
-  ];
+export function reviseOfferActions(): CreateBuilderAction[] | undefined {
+  return undefined;
 }
 
 export function bootstrapCreateBuilderSession(
@@ -383,15 +707,15 @@ export function bootstrapCreateBuilderSession(
 
 function formatBuilderOpener(typeLabel: string, firstQuestion?: string): string {
   const display = userFacingCreateTypeLabel(typeLabel) ?? typeLabel;
+  const intro =
+    `Let's think through your **${display}** together — no rush to draft.\n\n` +
+    `We'll explore the idea first; the workspace fills as you approve decisions.`;
   if (firstQuestion?.trim()) {
     const q = firstQuestion.trim();
-    if (typeLabel === "Newsletter") {
-      return `Great — let's create your **${display}**. ${q}`;
-    }
-    return q;
+    return `${intro}\n\n**${q}**`;
   }
   const article = /^[aeiou]/i.test(display) ? "an" : "a";
-  return `What should we tackle first for ${article} **${display}**?`;
+  return `${intro}\n\nWhat should we explore first for ${article} **${display}**?`;
 }
 
 export type CreateBuilderTurnResult = {
@@ -428,7 +752,7 @@ export function processCreateBuilderTurn(
       return {
         session,
         reply:
-          "Pick one from the list — for example **Social Media Post**, **Email**, **SOP**, or **Workshop**.",
+          "Pick one from the dropdown — for example **Marketing Plan**, **Workshop**, **Lead Magnet**, or **SOP**.",
       };
     }
     const next: CreateBuilderSession = {
@@ -452,14 +776,10 @@ export function processCreateBuilderTurn(
   }
 
   if (session.phase === "revise-offer") {
-    const quick = DRAFT_QUICK_EDITS.find(
-      (e) => e.label.toLowerCase() === trimmed.toLowerCase(),
-    );
-    const instruction = quick?.instruction ?? trimmed;
     return {
       session,
-      reply: `Updating your **${typeLabel}** draft — ${quick ? quick.label.toLowerCase() : "with your changes"}.`,
-      reviseInstruction: instruction,
+      reply: `Updating your **${typeLabel}** draft.`,
+      reviseInstruction: trimmed,
     };
   }
 
@@ -486,8 +806,16 @@ export function processCreateBuilderTurn(
         generateType,
       };
     }
-    if (isAddMoreInformation(trimmed)) {
+    if (isAddMoreInformation(trimmed) || /^keep working$/i.test(trimmed)) {
       return enterExtraDiscovery(session, typeLabel);
+    }
+    if (/^review template$/i.test(trimmed)) {
+      return {
+        session,
+        reply:
+          "Your living template is in the panel beside chat — expand any section there, or tell me what you'd like to adjust.",
+        actions: READINESS_ACTIONS,
+      };
     }
     return {
       session,
@@ -497,6 +825,9 @@ export function processCreateBuilderTurn(
   }
 
   if (session.phase === "discovery") {
+    const pendingTurn = handlePendingApprovalTurn(session, typeLabel, trimmed);
+    if (pendingTurn) return pendingTurn;
+
     if (session.collectingExtra) {
       const answers = {
         ...session.workflow.discoveryAnswers,
@@ -527,10 +858,17 @@ export function processCreateBuilderTurn(
     }
 
     if (isInSectionDiscoveryPhase(session.workflow)) {
+      if (isDraftWithWhatWeHaveRequest(trimmed)) {
+        return offerDraftWithWhatWeHave(session, session.workflow);
+      }
       return handleSectionDiscoveryTurn(session, typeLabel, trimmed, lastAssistantText);
     }
 
-    if (isDiscoveryHelpRequest(trimmed)) {
+    if (isDraftWithWhatWeHaveRequest(trimmed)) {
+      return offerDraftWithWhatWeHave(session, session.workflow);
+    }
+
+    if (!shouldCaptureFieldAnswer(trimmed, false)) {
       return { session, reply: "" };
     }
 
@@ -545,41 +883,22 @@ export function processCreateBuilderTurn(
       }
       return {
         session,
-        reply: "Keep going — I still need a bit more before we build.",
+        reply: "Keep going — tell me a bit more when you're ready.",
       };
     }
 
-    const nextWorkflow = advanceAfterDiscoveryAnswer(
-      session.workflow,
-      typeLabel,
-      question.id,
-      trimmed,
-    );
-    logCreateBuild("Chat answer saved", {
-      itemType: typeLabel,
+    return offerFieldApproval(session, {
+      kind: "discovery",
       questionId: question.id,
-      answersCount: answeredDiscoveryCount(nextWorkflow),
+      fieldLabel: fieldLabelForPending(typeLabel, {
+        kind: "discovery",
+        questionId: question.id,
+        summary: trimmed,
+        rawAnswer: trimmed,
+      }),
+      summary: approvalSummaryForQuestion(question.id, trimmed),
+      rawAnswer: trimmed,
     });
-
-    if (initialQuestionsComplete(typeLabel, nextWorkflow)) {
-      if (discoveryReadyForDraft(typeLabel, nextWorkflow)) {
-        return enterReadiness(
-          { ...session, workflow: nextWorkflow },
-          typeLabel,
-        );
-      }
-      return transitionToSectionDiscovery(session, typeLabel, nextWorkflow);
-    }
-
-    const nextQ = discoveryQuestionsForState(typeLabel, nextWorkflow);
-    return {
-      session: {
-        ...session,
-        workflow: nextWorkflow,
-        phase: "discovery",
-      },
-      reply: nextQ ? `Got it.\n\n**${nextQ.prompt}**` : "Thanks — one more thing…",
-    };
   }
 
   if (session.phase === "generating") {
@@ -595,6 +914,9 @@ function handleSectionDiscoveryTurn(
   trimmed: string,
   lastAssistantText = "",
 ): CreateBuilderTurnResult {
+  const pendingTurn = handlePendingApprovalTurn(session, typeLabel, trimmed);
+  if (pendingTurn) return pendingTurn;
+
   let workflow: CreateWorkflowState = materializeDiscoverySections(typeLabel, {
     ...session.workflow,
     discoverySubphase: "sections",
@@ -603,6 +925,10 @@ function handleSectionDiscoveryTurn(
 
   if (isExplicitBuildApproval(trimmed)) {
     return enterReadiness({ ...session, workflow }, typeLabel);
+  }
+
+  if (isDraftWithWhatWeHaveRequest(trimmed)) {
+    return offerDraftWithWhatWeHave({ ...session, workflow }, workflow);
   }
 
   const optionPick = tryResolveSectionOptionApproval(
@@ -618,36 +944,35 @@ function handleSectionDiscoveryTurn(
     if (
       pending &&
       activeSection &&
+      !isUnsaveableSectionText(pending) &&
       verifySectionWrite(workflow, activeId, pending)
     ) {
-      workflow = setSectionContent(workflow, activeId, pending);
-      const stillIncomplete = incompleteTemplateSections(workflow);
-      if (stillIncomplete.length === 0) {
-        return enterReadiness({ ...session, workflow }, typeLabel);
-      }
-      return {
-        session: { ...session, workflow, phase: "discovery" },
-        reply:
-          `Added to **${activeSection.label}**:\n${pending}\n\n` +
-          formatIncompleteSectionsPrompt(stillIncomplete),
-      };
+      return offerFieldApproval(
+        { ...session, workflow },
+        {
+          kind: "section",
+          sectionId: activeId,
+          sectionLabel: activeSection.label,
+          summary: pending,
+          rawAnswer: pending,
+        },
+      );
     }
   }
   if (optionPick) {
     const sections = resolveTemplateSections(workflow) ?? [];
     const section = sections.find((s) => s.id === optionPick.sectionId);
     if (section && verifySectionWrite(workflow, optionPick.sectionId, optionPick.value)) {
-      workflow = setSectionContent(workflow, optionPick.sectionId, optionPick.value);
-      const stillIncomplete = incompleteTemplateSections(workflow);
-      if (stillIncomplete.length === 0) {
-        return enterReadiness({ ...session, workflow }, typeLabel);
-      }
-      return {
-        session: { ...session, workflow, phase: "discovery" },
-        reply:
-          `Added to **${section.label}**:\n${optionPick.value}\n\n` +
-          formatIncompleteSectionsPrompt(stillIncomplete),
-      };
+      return offerFieldApproval(
+        { ...session, workflow },
+        {
+          kind: "section",
+          sectionId: optionPick.sectionId,
+          sectionLabel: section.label,
+          summary: optionPick.value,
+          rawAnswer: optionPick.value,
+        },
+      );
     }
   }
 
@@ -666,17 +991,16 @@ function handleSectionDiscoveryTurn(
     const activeSection = sections.find((s) => s.id === activeId);
     if (activeSection && !isUnsaveableSectionText(trimmed)) {
       if (verifySectionWrite(workflow, activeId, trimmed)) {
-        workflow = setSectionContent(workflow, activeId, trimmed);
-        const stillIncomplete = incompleteTemplateSections(workflow);
-        if (stillIncomplete.length === 0) {
-          return enterReadiness({ ...session, workflow }, typeLabel);
-        }
-        return {
-          session: { ...session, workflow, phase: "discovery" },
-          reply:
-            `Added to **${activeSection.label}**:\n${trimmed}\n\n` +
-            formatIncompleteSectionsPrompt(stillIncomplete),
-        };
+        return offerFieldApproval(
+          { ...session, workflow },
+          {
+            kind: "section",
+            sectionId: activeId,
+            sectionLabel: activeSection.label,
+            summary: trimmed.trim(),
+            rawAnswer: trimmed.trim(),
+          },
+        );
       }
       return {
         session: { ...session, workflow, phase: "discovery" },
@@ -686,7 +1010,7 @@ function handleSectionDiscoveryTurn(
   }
 
   const picked = matchSectionFromText(trimmed, incomplete);
-  if (picked && !isUnsaveableSectionText(trimmed)) {
+  if (picked && isSectionPickIntent(trimmed, picked)) {
     return {
       session: {
         ...session,
@@ -699,7 +1023,7 @@ function handleSectionDiscoveryTurn(
 
   return {
     session: { ...session, workflow, phase: "discovery" },
-    reply: formatIncompleteSectionsPrompt(incomplete),
+    reply: incompleteSectionsReply(workflow, incomplete),
   };
 }
 
@@ -708,6 +1032,9 @@ function transitionToSectionDiscovery(
   typeLabel: string,
   workflow: CreateWorkflowState,
 ): CreateBuilderTurnResult {
+  if (hasGuidedTemplateFields(typeLabel)) {
+    return enterReadiness({ ...session, workflow }, typeLabel);
+  }
   const materialized = materializeDiscoverySections(typeLabel, workflow);
   const incomplete = incompleteTemplateSections(materialized);
   if (incomplete.length === 0) {
@@ -723,7 +1050,7 @@ function transitionToSectionDiscovery(
     session: { ...session, workflow: nextWorkflow, phase: "discovery" },
     reply:
       `Got it — I've captured your answers.\n\n` +
-      formatIncompleteSectionsPrompt(incomplete),
+      incompleteSectionsReply(nextWorkflow, incomplete),
   };
 }
 
@@ -748,7 +1075,7 @@ function enterExtraDiscovery(
     },
     reply:
       incomplete.length > 0
-        ? `Sure — what else should we add?\n\n${formatIncompleteSectionsPrompt(incomplete)}`
+        ? `Sure — what else should we add?\n\n${incompleteSectionsReply(workflow, incomplete)}`
         : `Sure — what else should I know before we build your **${typeLabel}**?`,
   };
 }
@@ -789,7 +1116,7 @@ export function markCreateBuilderGenerated(
 export function createBuilderExportMessage(typeLabel: string): string {
   return (
     `Your **${typeLabel}** draft is in the workspace.\n\n` +
-    "**What would you like to change?** Pick an option below, or tell me in your own words."
+    "Use **Edit**, **Save**, **Export**, or **Social** in the panel — and keep chatting here to review, improve, or rethink any section together."
   );
 }
 
@@ -797,6 +1124,8 @@ export function createBuilderActionsForPhase(
   session: CreateBuilderSession | null,
 ): CreateBuilderAction[] | undefined {
   if (!session) return undefined;
+  if (session.phase === "workspace") return undefined;
+  if (session.workflow.pendingFieldApproval) return APPROVAL_ACTIONS;
   if (session.phase === "readiness") return READINESS_ACTIONS;
   if (session.phase === "revise-offer") return reviseOfferActions();
   return undefined;
@@ -818,12 +1147,13 @@ export function formatCreateBuilderChatHint(
 
   const lines = [
     `ACTIVE MODE: ${name} (Create workspace beside chat).`,
-    "You are a collaborative builder sitting beside the user — NOT generic coaching.",
-    "- Ask ONE question per reply. Never dump a list of questions.",
-    "- Do NOT generate a full draft in chat — the Create panel is the canvas.",
-    "- Do NOT tell the user to fill out a form elsewhere.",
-    "- Do NOT skip to generation without user approval at readiness.",
-    "- Do NOT say you are ready to build while template sections remain empty.",
+    CREATE_THINKING_PARTNER_PRINCIPLES,
+    createDepthHintForChat(type),
+    "- Ask ONE question per reply when moving the conversation forward.",
+    "- Welcome research, brainstorming, and I don't know — those stay in chat until they pick and approve.",
+    "- Summarize candidate answers and ask approval (Use This / Revise / Keep Talking) before the workspace updates.",
+    "- Do NOT generate a full draft in chat — the Create panel is the living thinking board.",
+    "- Do NOT skip to generation without explicit user approval at readiness.",
     `- Artifact type: ${type}. Phase: ${session.phase}.`,
   ];
 
@@ -832,9 +1162,18 @@ export function formatCreateBuilderChatHint(
       "SECTION DISCOVERY: Initial questions are done. Help fill empty template outline sections.",
     );
     if (incomplete.length) {
-      lines.push(
-        `INCOMPLETE SECTIONS: ${incomplete.map((s) => s.label).join(", ")}`,
-      );
+      if (workspacePanelVisible(session.workflow)) {
+        lines.push(
+          "INCOMPLETE SECTIONS: visible in the workspace panel — do NOT list section names in chat.",
+        );
+        lines.push(
+          `Nudge: "${WORKSPACE_SECTION_NUDGE}"`,
+        );
+      } else {
+        lines.push(
+          `INCOMPLETE SECTIONS: ${incomplete.map((s) => s.label).join(", ")}`,
+        );
+      }
     }
     const activeId = session.workflow.activeSectionId;
     if (activeId) {
@@ -847,22 +1186,25 @@ export function formatCreateBuilderChatHint(
       "If the user asks for ideas, examples, or suggestions: give 3–5 concrete options tied to their topic and audience. Offer to use one or brainstorm more. Stay in discovery — do NOT enter build-ready.",
     );
     lines.push(
-      "After they pick content for a section, confirm briefly and ask which remaining section to work on next.",
+      "After they pick content for a section, confirm briefly. Do NOT list remaining sections in chat when the workspace panel shows them.",
     );
   } else if (session.phase === "discovery" && q) {
-    lines.push(`CURRENT QUESTION (ask only this): ${q.prompt}`);
+    lines.push(`CURRENT TOPIC (explore together): ${q.prompt}`);
     lines.push(
-      "If the user asks what a concept means: brief answer tied to this build, then repeat the current question. Do NOT enter Teaching Mode or offer learning paths.",
+      'If they say "I don\'t know" or ask for ideas: brainstorm in chat (e.g. "Let\'s explore that" + options). Do NOT save options until they approve a choice.',
+    );
+    lines.push(
+      "Research questions (what do you think, what would make a good X) are thinking moments — answer fully, do not save as field content.",
     );
   }
   if (session.phase === "readiness") {
     lines.push(
-      "READINESS: Say — I think I have enough information to build this. Would you like me to create the draft?",
+      "READINESS: Enough decisions are on the thinking board. Ask if they want the first draft — or they can keep exploring.",
     );
   }
   if (session.phase === "revise-offer") {
     lines.push(
-      "REVISE: Draft is in the workspace. Ask what they want to change; offer shorter, longer, warmer, etc.",
+      "REVISE: Draft is in the workspace. User edits via Edit / Save / Export / Social dropdowns — do NOT offer quick-edit chip buttons in chat.",
     );
   }
 

@@ -51,9 +51,9 @@ function poolForSituation(
     return [
       step({
         id: "reset-day",
-        label: "Reset Day",
-        description: "Fresh start — clear the mental clutter",
-        emoji: "🔄",
+        label: "Clear Today's Context",
+        description: "Reset where you are right now — nothing important gets deleted",
+        emoji: "🧹",
         tool: "reset-day",
         mode: "today",
       }),

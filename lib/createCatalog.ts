@@ -97,6 +97,17 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
         matchTerms: ["email", "e-mail", "cold email", "follow-up email"],
       },
       {
+        label: "Email Sequence",
+        emoji: "📬",
+        matchTerms: [
+          "email sequence",
+          "email series",
+          "email campaign",
+          "nurture sequence",
+          "drip campaign",
+        ],
+      },
+      {
         label: "Facebook Post",
         emoji: "📘",
         matchTerms: ["facebook", "facebook post", "fb post", "fb"],
@@ -154,6 +165,26 @@ export const CREATE_CATALOG: CreateCatalogCategory[] = [
         label: "Document",
         emoji: "📄",
         matchTerms: ["document", "general document"],
+      },
+      {
+        label: "Course Outline",
+        emoji: "📚",
+        matchTerms: [
+          "course outline",
+          "course plan",
+          "curriculum outline",
+          "module outline",
+        ],
+      },
+      {
+        label: "Client Onboarding",
+        emoji: "🤝",
+        matchTerms: [
+          "client onboarding",
+          "onboarding process",
+          "onboarding plan",
+          "new client onboarding",
+        ],
       },
       {
         label: "Client Avatar",

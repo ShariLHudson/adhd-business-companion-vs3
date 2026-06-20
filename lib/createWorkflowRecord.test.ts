@@ -27,6 +27,19 @@ import {
   saveWorkflowRecordForLater,
 } from "./createWorkflowRecordStore";
 
+function answerChatWithApproval(
+  record: ReturnType<typeof startNewWorkflowRecord>,
+  answer: string,
+) {
+  let turn = processCreateBuilderTurnWithRecord(record, answer);
+  let next = turn.record;
+  if (turn.session.workflow.pendingFieldApproval) {
+    turn = processCreateBuilderTurnWithRecord(next, "yes");
+    next = turn.record;
+  }
+  return next;
+}
+
 describe("createWorkflowRecord shared state", () => {
   beforeEach(() => {
     const mem = new Map<string, string>();
@@ -51,8 +64,7 @@ describe("createWorkflowRecord shared state", () => {
       "We met at the conference last week",
     ];
     for (const a of answers) {
-      const turn = processCreateBuilderTurnWithRecord(record, a);
-      record = turn.record;
+      record = answerChatWithApproval(record, a);
       saveWorkflowRecord(record);
     }
     expect(
@@ -92,14 +104,11 @@ describe("createWorkflowRecord shared state", () => {
 
   it("mixing chat + panel answers shares one record", () => {
     let record = startNewWorkflowRecord("Email", "chat");
-    record = processCreateBuilderTurnWithRecord(record, "Sarah").record;
+    record = answerChatWithApproval(record, "Sarah");
     let wf = workflowStateFromRecord(record);
     wf = advanceAfterDiscoveryAnswer(wf, "Email", "goal", "Book a demo");
     record = mergeRecordFromWorkflow(record, wf, "panel");
-    record = processCreateBuilderTurnWithRecord(
-      record,
-      "Met at webinar",
-    ).record;
+    record = answerChatWithApproval(record, "Met at webinar");
     expect(record.collectedAnswers.recipient).toBe("Sarah");
     expect(record.collectedAnswers.goal).toBe("Book a demo");
     expect(record.collectedAnswers.context).toBe("Met at webinar");
@@ -189,16 +198,13 @@ describe("createWorkflowRecord shared state", () => {
 
   it("does not repeat questions already answered in chat", () => {
     let record = startNewWorkflowRecord("Email", "chat");
-    record = processCreateBuilderTurnWithRecord(record, "Jordan").record;
+    record = answerChatWithApproval(record, "Jordan");
     const q2 = discoveryQuestionsForState(
       "Email",
       workflowStateFromRecord(record),
     );
     expect(q2?.id).not.toBe("recipient");
-    const turn = processCreateBuilderTurnWithRecord(
-      record,
-      "Jordan",
-    );
+    const turn = processCreateBuilderTurnWithRecord(record, "Schedule a call");
     expect(turn.reply).not.toMatch(/\*\*Who is receiving/i);
   });
 });

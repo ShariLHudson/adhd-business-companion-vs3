@@ -4,6 +4,7 @@
  */
 
 import type { AppSection } from "./companionUi";
+import { isChatConversationOnlyMode } from "./chatConversationOnly";
 import { workspaceTitle } from "./workspaceMode";
 import {
   classifyConversationalMode,
@@ -49,6 +50,7 @@ export function isActiveWorkspaceAutoApplyMode(
   userText: string,
   lastAssistantText = "",
 ): boolean {
+  if (isChatConversationOnlyMode()) return false;
   if (!isAutoApplyWorkspaceSection(section)) return false;
   return !shouldBlockAutoApplyFromChat(userText, lastAssistantText);
 }
@@ -58,7 +60,20 @@ import {
 } from "./workspaceApprovalSync";
 import { builderContentSyncHintForChat } from "./builderContentSync";
 
-export function activeWorkspaceAutoApplyHint(section: AppSection): string {
+export function activeWorkspaceAutoApplyHint(
+  section: AppSection,
+  opts?: { createWorkspaceV2?: boolean },
+): string {
+  if (isChatConversationOnlyMode()) {
+    return [
+      `WORKSPACE OPEN (${workspaceTitle(section)}):`,
+      "- Chat is conversation only — discuss what they see; do not write into fields or claim saves.",
+      '- If they ask you to act, say: "I can help you decide what to do. Use the button in the workspace when you\'re ready."',
+    ].join("\n");
+  }
+  if (opts?.createWorkspaceV2 && section === "content-generator") {
+    return "";
+  }
   const title = workspaceTitle(section);
   const assetNote =
     section === "content-generator"
@@ -76,7 +91,7 @@ export function activeWorkspaceAutoApplyHint(section: AppSection): string {
     section === "client-avatars"
       ? "- Client Avatar mode: audience research, demographics, pain points, and ICP detail ALL belong in the avatar automatically. Never save approval phrases as field content."
       : "",
-    section === "client-avatars" || section === "content-generator" || section === "projects"
+    section === "client-avatars" || section === "projects"
       ? builderContentSyncHintForChat()
       : "",
     section === "projects" || section === "client-avatars" || section === "playbook"

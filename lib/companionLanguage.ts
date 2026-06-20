@@ -11,7 +11,7 @@ export type LanguageOption = {
 export const LANGUAGE_OPTIONS: readonly LanguageOption[] = [
   { code: "en", label: "English" },
   { code: "es", label: "Spanish (Español)" },
-  { code: "ur", label: "Urdu (اردو)" },
+  { code: "ur", label: "Roman Urdu" },
   { code: "tl", label: "Filipino / Tagalog" },
   { code: "fr", label: "French (Français)" },
   { code: "de", label: "German (Deutsch)" },
@@ -76,7 +76,7 @@ const DATE_FORMAT_CODES = new Set(DATE_FORMAT_OPTIONS.map((o) => o.code));
 const PROMPT_LANGUAGE_NAMES: Record<LanguageCode, string> = {
   en: "English",
   es: "Spanish",
-  ur: "Urdu",
+  ur: "Roman Urdu",
   tl: "Filipino",
   fr: "French",
   de: "German",
@@ -103,7 +103,7 @@ const SPEECH_LOCALES: Partial<Record<LanguageCode, string>> = {
   ja: "ja-JP",
 };
 
-const RTL_LANGUAGES = new Set<LanguageCode>(["ur"]);
+const RTL_LANGUAGES = new Set<LanguageCode>([]);
 
 export function getLanguageOption(code: string): LanguageOption | undefined {
   return LANGUAGE_OPTIONS.find((o) => o.code === code);

@@ -1,15 +1,23 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cleanText } from "@/lib/contentFormat";
 
-// Suggest reusable snippets (hooks, CTAs, openers) tuned to the user's business
-// + client avatar context.
-const SYSTEM = `Generate 6 short, reusable content snippets for an ADHD founder, tuned to their business and audience. Use a mix of hooks, CTAs, openers, and a story starter. Return STRICT JSON only:
+// Audience-first snippet suggestions — language, pain points, and CTAs must
+// match the selected audience, not generic motivational copy.
+const SYSTEM = `You generate short, reusable content snippets for a specific audience.
 
+AUDIENCE-FIRST RULES:
+- The audience in the user message is PRIMARY — more important than snippet type or tone.
+- Use audience-specific language, examples, pain points, desired outcomes, and calls to action.
+- Do NOT write generic content that could apply to anyone.
+- BAD (generic): "Feeling overwhelmed by perfectionism? Remember, done is better than perfect."
+- GOOD (ADHD business): "ADHD entrepreneurs often spend hours trying to perfect a task before sharing it. What would happen if you shipped version one today?"
+
+Return STRICT JSON only:
 {"snippets":[
-  {"content":"the line, 1–2 lines, ready to paste","kind":"hook|cta|opener|value|story|objection","tone":"a short tone word","whenToUse":"when this fits","whereToUse":"e.g. Email hook · Social post"}
+  {"content":"the line, 1–2 lines, ready to paste","kind":"hook|cta|opener|value|story|objection","tone":"optional short tone word or empty","whenToUse":"when this fits","whereToUse":"e.g. Email hook · Social post"}
 ]}
 
-Match the audience's psychology and buying behavior. Plain text, no markdown.`;
+Plain text in content fields — no markdown.`;
 
 const KINDS = ["hook", "cta", "opener", "value", "story", "objection", "other"];
 
@@ -21,7 +29,9 @@ export async function POST(request: NextRequest) {
     }
     const body = await request.json();
     const context = (body.context as string)?.trim() || "";
-    const user = context || "General small-business audience.";
+    const user = context
+      ? `${context}\n\nGenerate 6 snippets for this audience. Mix hooks, CTAs, openers, value lines, a story starter, and an objection response. Honor the voice/tone in the context.`
+      : "No audience context provided — use ADHD Business Clients with ADHD-aware language.";
 
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",

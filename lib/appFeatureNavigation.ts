@@ -119,7 +119,7 @@ export function resolveAppFeatureNavTarget(
     "time-block": "time-block",
     "momentum-games": "games",
     "spin-wheel": "spin-wheel",
-    "help-me-right-now": "activities",
+    "help-me-right-now": "focus",
     snippets: "snippets",
     create: "content-generator",
     templates: "templates-library",

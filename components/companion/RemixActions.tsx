@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import {
-  businessContextSummary,
   createTemplate,
   getContentTypes,
 } from "@/lib/companionStore";
+import { buildGenerationContextWithBusiness } from "@/lib/contentAudience";
 
 // Remix layer — convert any content into another format. Drop it under any
 // block of content. Result previews first; nothing is lost.
@@ -40,7 +40,7 @@ export function RemixActions({
         body: JSON.stringify({
           content,
           target,
-          context: businessContextSummary(),
+          context: buildGenerationContextWithBusiness(),
         }),
       });
       const data = await res.json();

@@ -2,6 +2,7 @@
  * Auto-launch when the user already agreed — one decision, one action.
  */
 
+import { isChatConversationOnlyMode } from "./chatConversationOnly";
 import { isActionAcceptance } from "./assistedActionBridge";
 import { detectAudioRequest } from "./audioSuggestions";
 import { shouldBlockStressAutoToolRouting } from "./stressRouting";
@@ -135,6 +136,7 @@ export function shouldAutoLaunchPendingAction(
   priorAssistantText: string,
   action: PendingAction,
 ): boolean {
+  if (isChatConversationOnlyMode()) return false;
   if (
     matchesPendingAcceptance(userText, action, {
       allowGenericAcceptance: true,
@@ -168,6 +170,7 @@ export function shouldAutoOpenWorkspaceFromIntent(
   userText: string,
   offer: WorkspaceOffer,
 ): boolean {
+  if (isChatConversationOnlyMode()) return false;
   const t = userText.trim();
   if (!t) return false;
 

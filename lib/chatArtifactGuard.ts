@@ -17,6 +17,7 @@ import {
   isActiveWorkspaceAutoApplyMode,
   shouldBlockAutoApplyFromChat,
 } from "./activeWorkspaceAutoApply";
+import { isChatConversationOnlyMode } from "./chatConversationOnly";
 import {
   looksLikeDraftFragment,
 } from "./collaborativeDrafting";
@@ -65,6 +66,7 @@ export function shouldSyncChatArtifactToCreate(
   priorAssistantText = "",
 ): boolean {
   if (!createOpen) return false;
+  if (isChatConversationOnlyMode()) return false;
   const u = userText.trim();
   if (/^(?:thanks|thank you)[!.?]*$/i.test(u)) return false;
   if (looksLikeDraftFragment(assistantText, u)) return true;

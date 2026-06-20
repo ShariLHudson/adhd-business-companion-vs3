@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { businessContextSummary } from "@/lib/companionStore";
+import { buildGenerationContextWithBusiness } from "@/lib/contentAudience";
 import {
   addDraftReviewNote,
   appendDraftReviewMessage,
@@ -111,7 +111,7 @@ export function CreateDraftReviewChat({
             text: draft,
             action: "modify",
             instruction: `${suggestion.summary}. ${suggestion.proposedText}`,
-            context: businessContextSummary(),
+            context: buildGenerationContextWithBusiness(),
           }),
         });
         const data = await res.json();

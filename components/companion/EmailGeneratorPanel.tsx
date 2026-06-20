@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 import {
-  businessContextSummary,
   createSnippet,
   createTemplate,
   saveProject,
   type SnippetKind,
 } from "@/lib/companionStore";
+import { buildGenerationContextWithBusiness } from "@/lib/contentAudience";
 import { ClientPicker } from "@/components/companion/ClientPicker";
 import { RefineActions } from "@/components/companion/RefineActions";
 import { RemixActions } from "@/components/companion/RemixActions";
@@ -92,7 +92,7 @@ export function EmailGeneratorPanel({
           audience,
           tone,
           personalization,
-          context: businessContextSummary(forAvatar),
+          context: buildGenerationContextWithBusiness({ avatarId: forAvatar }),
         }),
       });
       const data = await res.json();
@@ -124,7 +124,7 @@ export function EmailGeneratorPanel({
           goal,
           audience,
           baseEmail: bodies[vIdx] ?? "",
-          context: businessContextSummary(forAvatar),
+          context: buildGenerationContextWithBusiness({ avatarId: forAvatar }),
         }),
       });
       const data = await res.json();

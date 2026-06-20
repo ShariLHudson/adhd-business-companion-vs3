@@ -42,28 +42,28 @@ describe("chatArtifactGuard", () => {
     ).toBe(true);
   });
 
-  it("syncs revisions into open Create", () => {
+  it("does not sync revisions into Create in conversation-only mode", () => {
     expect(
       shouldSyncChatArtifactToCreate(
         SAMPLE_DRAFT,
         "Revise the draft and add a troubleshooting section",
         true,
       ),
-    ).toBe(true);
+    ).toBe(false);
     expect(
       shouldSyncChatArtifactToCreate(
         SAMPLE_DRAFT,
         "Apply that to the draft",
         true,
       ),
-    ).toBe(true);
+    ).toBe(false);
     expect(
       shouldSyncChatArtifactToCreate(
         SAMPLE_DRAFT,
         "Here is more detail for the ElevenLabs SOP steps section.",
         true,
       ),
-    ).toBe(true);
+    ).toBe(false);
     expect(
       shouldSyncChatArtifactToCreate(SAMPLE_DRAFT, "Thanks!", true),
     ).toBe(false);
@@ -77,7 +77,7 @@ describe("chatArtifactGuard", () => {
         true,
         "Would you like me to apply this to the draft?",
       ),
-    ).toBe(true);
+    ).toBe(false);
   });
 
   it("Facebook post brainstorming — no handoff, no sync, no artifact resolve", () => {

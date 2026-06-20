@@ -18,7 +18,6 @@ export type AppFeatureId =
   | "momentum-games"
   | "guided-exercises"
   | "spin-wheel"
-  | "help-me-right-now"
   | "create"
   | "templates"
   | "strategies"
@@ -50,7 +49,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
     name: "Focus",
     navigation: "Sidebar **Focus**",
     howTo:
-      "Calm support menu — expand **Start Here**, **Focus Tools**, **Help Me Right Now**, or **Momentum Boosters**.",
+      "Calm support menu — pick how you're feeling, then open the tool that fits.",
     match: [/\bfocus\b(?!\s*session|\s*audio)/i, /\bfocus menu\b/i],
   },
   {
@@ -71,7 +70,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
     id: "brain-parking-lot",
     name: "Brain Parking Lot",
     navigation:
-      "Sidebar **Focus** → **Help Me Right Now** → **Brain Parking Lot**",
+      "Sidebar **Focus** → **I'm Stuck** or **I Need To Work** (activity tools)",
     howTo:
       "Save a stray idea for later while staying on task — quick park and tag, no sorting now.",
     match: [
@@ -85,7 +84,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
     id: "safe-for-today",
     name: "Safe For Today",
     navigation:
-      "Sidebar **Focus** → **Help Me Right Now** → **Safe For Today**",
+      "Sidebar **Focus** → pick a feeling, then open **Safe For Today** from Strategies or Focus tools",
     howTo:
       "Permission to postpone — name what you're not solving today; relief, not a worry list.",
     match: [/\bsafe for today\b/i, /\bpermission not to\b/i, /\bnot doing this today\b/i],
@@ -169,14 +168,6 @@ export const APP_FEATURES: AppFeatureEntry[] = [
       /\bpriority sort\b/i,
       /\bproject breakdown\b/i,
     ],
-  },
-  {
-    id: "help-me-right-now",
-    name: "Help Me Right Now",
-    navigation: "Sidebar **Focus** → **Help Me Right Now**",
-    howTo:
-      "Immediate relief — Adjust My Day, Brain Parking Lot, Clear My Mind, Safe For Today, Focus Session, ADHD Decision Compass.",
-    match: [/\bhelp me right now\b/i, /\bright now\b.*\bstrateg/i],
   },
   {
     id: "snippets",
@@ -289,13 +280,13 @@ export const APP_FEATURES: AppFeatureEntry[] = [
 
 /** Compact reference always included in the system prompt. */
 export const APP_FEATURE_KNOWLEDGE_COMPACT = `APP FEATURE KNOWLEDGE (authoritative — use for how-to/navigation; never deny these):
-• Focus hub: Sidebar Focus → Start Here / Focus Tools / Help Me Right Now / Momentum Boosters
+• Focus hub: Sidebar Focus → feelings-first tools (Clear My Mind, Focus Session, Guided Exercises, etc.)
 • Clear My Mind: Focus → Start Here → Clear My Mind
 • Focus Session: Focus → Start Here → Focus Session
 • Breathe & Reset: Focus → Focus Tools → Breathe & Reset
 • Focus Audio: Focus → Focus Tools → Focus Audio
 • Time Blocks: Focus → Focus Tools → Block Out Time
-• Help Me Right Now: Focus → Help Me Right Now (relief tools)
+• Plan My Day: Top bar 📅 or Today panel
 • Guided Exercises: Focus → Momentum Boosters → Guided Exercises
 • Momentum Games: Focus → Momentum Boosters → Momentum Games (games ARE in the app)
 • Spin The Wheel: Focus → Momentum Boosters → Spin The Wheel
@@ -433,7 +424,7 @@ export function appFeatureKnowledgeHintForChat(text: string): string | undefined
   return [
     "APP FEATURE KNOWLEDGE (authoritative for this turn — use this, not general AI knowledge):",
     ...lines,
-    "COMPANION FIRST: Give a 1–2 sentence brief answer, then offer to open this feature/workspace BESIDE chat — do NOT stop at navigation instructions.",
+    "COMPANION FIRST (conversation-only): Give a 1–2 sentence brief answer, then name the UI button or menu path — chat does not open workspaces.",
     "Do NOT open Create to draft an explanation. Do NOT send users to documentation.",
     "Answer with the exact navigation path only if they decline the offer. Do NOT say these features are missing or unavailable.",
     `If the question is outside this list: "${APP_FEATURE_UNSURE}"`,

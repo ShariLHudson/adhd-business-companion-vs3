@@ -1,6 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  initialCollapsedSectionMap,
+  toggleSectionInMap,
+} from "@/lib/expandableUi";
 import {
   STRATEGIES,
   STRATEGY_GROUPS,
@@ -34,6 +38,7 @@ import {
   type UserStrategy,
 } from "@/lib/userStrategies";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { StrategyApplyPanel } from "@/components/companion/StrategyApplyPanel";
 import type { StrategyApplySession } from "@/lib/strategyApplyCoach";
@@ -103,6 +108,7 @@ export function StrategiesPanel({
     key: number;
     strategyId?: string;
     hubEntryId?: string;
+    openView?: "home" | "adhd" | "business" | "saved" | "recommended";
   } | null;
   /** Active ADHD apply coach — shown on the matching strategy, not over the whole hub. */
   strategyApplySession?: StrategyApplySession | null;
@@ -114,12 +120,9 @@ export function StrategiesPanel({
 }) {
   const [view, setView] = useState<View>({ v: "home" });
   const [search, setSearch] = useState("");
-  const [hubOpen, setHubOpen] = useState<Record<string, boolean>>({
-    adhd: false,
-    business: false,
-    recommended: false,
-    saved: false,
-  });
+  const [hubOpen, setHubOpen] = useState<Record<string, boolean>>(() =>
+    initialCollapsedSectionMap("adhd", "business", "recommended", "saved"),
+  );
   const [adhdPick, setAdhdPick] = useState("");
   const [businessPick, setBusinessPick] = useState("");
   const [recPick, setRecPick] = useState("");
@@ -127,21 +130,16 @@ export function StrategiesPanel({
   const [newProblem, setNewProblem] = useState("");
   const [newSteps, setNewSteps] = useState("");
   const [openSubcat, setOpenSubcat] = useState<string | null>(null);
+  const strategyReturnRef = useRef<View>({ v: "home" });
   const visualMode = useVisualMode();
   const colorOn = visualMode !== "off";
   const decorative = visualMode === "decorative";
 
-  // Global Back steps inward-first: detail → group → home → exit.
+  // Global Back steps inward-first: detail → parent list → home → exit.
   useEffect(() => {
     registerBack?.(() => {
-      if (view.v === "strategy") {
-        const s = getStrategy(view.stratId);
-        setView(s ? { v: "group", group: groupForStrategy(s) } : { v: "home" });
-        return true;
-      }
-      if (view.v === "userStrategy") {
-        const u = getUserStrategies().find((x) => x.id === view.id);
-        setView(u ? { v: "group", group: u.type } : { v: "saved" });
+      if (view.v === "strategy" || view.v === "userStrategy") {
+        setView(strategyReturnRef.current);
         return true;
       }
       if (view.v === "group" || view.v === "recommended" || view.v === "saved" || view.v === "new" || view.v === "adhd" || view.v === "business") {
@@ -193,13 +191,13 @@ export function StrategiesPanel({
   }
 
   function toggleHub(id: string) {
-    setHubOpen((prev) => ({ ...prev, [id]: !prev[id] }));
+    setHubOpen((prev) => toggleSectionInMap(prev, id));
   }
 
   function openAdhdEntry(entry: AdhdStrategyHubEntry) {
     const route = entry.route;
     if (route.kind === "builtin") {
-      setView({ v: "strategy", stratId: route.strategyId });
+      goToView({ v: "strategy", stratId: route.strategyId });
       return;
     }
     if (route.kind === "activity") {
@@ -216,7 +214,35 @@ export function StrategiesPanel({
     ) {
       onDismissStrategyApply?.();
     }
+    if (next.v === "strategy" || next.v === "userStrategy") {
+      strategyReturnRef.current = view;
+    }
     setView(next);
+  }
+
+  function returnFromStrategyDetail() {
+    goToView(strategyReturnRef.current);
+  }
+
+  function strategyDetailBackLabel(from: View): string {
+    switch (from.v) {
+      case "home":
+        return "Strategies";
+      case "adhd":
+        return STRATEGIES_HUB.adhd.title;
+      case "business":
+        return STRATEGIES_HUB.business.title;
+      case "group": {
+        const group = STRATEGY_GROUPS.find((g) => g.id === from.group);
+        return group?.label ?? "Strategies";
+      }
+      case "recommended":
+        return STRATEGIES_HUB.recommended.title;
+      case "saved":
+        return STRATEGIES_HUB.saved.title;
+      default:
+        return "Strategies";
+    }
   }
 
   function openBusinessLibrary(subcatId?: string) {
@@ -240,9 +266,13 @@ export function StrategiesPanel({
 
   useEffect(() => {
     if (!openCommand?.key) return;
+    if (openCommand.openView) {
+      setView({ v: openCommand.openView });
+      return;
+    }
     if (openCommand.strategyId) {
       setAdhdPick(openCommand.strategyId);
-      setView({ v: "strategy", stratId: openCommand.strategyId });
+      goToView({ v: "strategy", stratId: openCommand.strategyId });
       return;
     }
     if (openCommand.hubEntryId) {
@@ -269,6 +299,7 @@ export function StrategiesPanel({
 
     return (
       <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
+        <WorkspaceAreaWorksGuide areaId="playbook" />
         <WorkspaceGuide section="playbook" />
         {dockedPlan}
         <p className="text-2xl font-semibold text-[#1f1c19]">Strategies</p>
@@ -425,7 +456,7 @@ export function StrategiesPanel({
                     <li key={u.id}>
                       <button
                         type="button"
-                        onClick={() => setView({ v: "userStrategy", id: u.id })}
+                        onClick={() => goToView({ v: "userStrategy", id: u.id })}
                         className="w-full rounded-xl border border-[#d4cdc3] bg-white/90 px-3 py-2.5 text-left text-sm font-semibold text-[#1f1c19] hover:border-[#1e4f4f]/40"
                       >
                         {u.title}
@@ -654,7 +685,7 @@ export function StrategiesPanel({
                 <li key={u.id}>
                   <button
                     type="button"
-                    onClick={() => setView({ v: "userStrategy", id: u.id })}
+                    onClick={() => goToView({ v: "userStrategy", id: u.id })}
                     style={tint(cat.color)}
                     className="w-full rounded-2xl border border-[#d4cdc3] bg-white/85 p-4 text-left transition-colors hover:border-[#1e4f4f]/45 hover:bg-white"
                   >
@@ -746,7 +777,7 @@ export function StrategiesPanel({
                 <li key={u.id}>
                   <button
                     type="button"
-                    onClick={() => setView({ v: "userStrategy", id: u.id })}
+                    onClick={() => goToView({ v: "userStrategy", id: u.id })}
                     style={tint(cat?.color ?? "#1e4f4f")}
                     className="w-full rounded-2xl border border-[#d4cdc3] bg-white/85 p-4 text-left transition-colors hover:border-[#1e4f4f]/45 hover:bg-white"
                   >
@@ -852,10 +883,10 @@ export function StrategiesPanel({
       <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
         <button
           type="button"
-          onClick={() => setView({ v: "group", group: u.type })}
+          onClick={returnFromStrategyDetail}
           className="self-start text-sm font-semibold text-[#1e4f4f]"
         >
-          ‹ {ucat?.label ?? "Back"}
+          ‹ Back to {strategyDetailBackLabel(strategyReturnRef.current)}
         </button>
         <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">{u.title}</p>
         <p className="mt-1 text-sm italic text-[#9a8f82]">{u.whenToUse}</p>
@@ -928,11 +959,8 @@ export function StrategiesPanel({
         onOpen={onOpen}
         onAsk={onAsk}
         onStartStrategyApply={onStartStrategyApply}
-        onBack={() =>
-          setView({
-            v: groupForStrategy(s) === "business" ? "business" : "adhd",
-          })
-        }
+        onBack={returnFromStrategyDetail}
+        backLabel={strategyDetailBackLabel(strategyReturnRef.current)}
         onSaved={() => setView({ v: "saved" })}
       />
     </div>
@@ -946,6 +974,7 @@ function StrategyBuiltinDetail({
   onAsk,
   onStartStrategyApply,
   onBack,
+  backLabel,
   onSaved,
 }: {
   s: Strategy;
@@ -954,6 +983,7 @@ function StrategyBuiltinDetail({
   onAsk?: (prompt: string) => void;
   onStartStrategyApply?: (strategyId: string) => void;
   onBack: () => void;
+  backLabel: string;
   onSaved: () => void;
 }) {
   const cat = getCategory(resolveSubcat(s));
@@ -975,7 +1005,7 @@ function StrategyBuiltinDetail({
         onClick={onBack}
         className="self-start text-sm font-semibold text-[#1e4f4f]"
       >
-        ‹ {cat?.label ?? "Back"}
+        ‹ Back to {backLabel}
       </button>
 
       <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">{s.title}</p>

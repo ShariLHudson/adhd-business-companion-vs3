@@ -24,13 +24,13 @@ const RULES: RefRule[] = [
     re: /\bbrain ?dump|clear (your|my|the) (head|mind)|mental clutter|crowded (head|brain)|can't think straight|get it (all )?out of your head|empty your head|sort (my|your) thoughts|too many thoughts\b/i,
   },
   {
-    section: "activities",
+    section: "focus",
     label: "Brain Parking Lot",
     emoji: "🅿️",
     re: /\bbrain parking lot|park (this|that|it) for later|save (this|that|it) for later|idea (?:just )?popped up|don't want to lose (?:it|this)|while (?:i'm |im )?working\b/i,
   },
   {
-    section: "activities",
+    section: "focus",
     label: "Safe For Today",
     emoji: "🛡️",
     re: /\bsafe for today|permission not to|not (?:solving|doing) (?:this|it) today|can't deal with (?:this|it) today|postpone (?:the )?guilt\b/i,

@@ -153,7 +153,7 @@ export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
     purpose: "Rebuild today's plan",
     emoji: "⚡",
     kind: "section",
-    section: "energy",
+    section: "plan-my-day",
   },
   {
     id: "brain-parking-lot",

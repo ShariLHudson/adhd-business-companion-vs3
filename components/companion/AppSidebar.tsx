@@ -63,7 +63,7 @@ export function AppSidebar({
         }
         className={`flex w-full items-center justify-start gap-2 rounded-lg px-2 py-2.5 text-left leading-tight transition-colors md:px-3 ${
           active
-            ? "bg-[#1e4f4f] text-white shadow-sm"
+            ? "companion-nav-active shadow-sm"
             : "text-white/80 hover:bg-white/10"
         }`}
       >
@@ -90,7 +90,7 @@ export function AppSidebar({
 
   return (
     <aside
-      className="sticky top-0 flex h-dvh w-14 shrink-0 flex-col self-start overflow-y-auto border-r border-black/10 bg-[#6e6a66] text-white backdrop-blur-md md:w-44"
+      className="companion-app-sidebar sticky top-0 flex h-dvh w-14 shrink-0 flex-col self-start overflow-y-auto border-r border-black/10 text-white backdrop-blur-md md:w-44"
       aria-label="Navigation"
     >
       {/* Brand header — the identity anchor, above all navigation. */}

@@ -24,6 +24,7 @@ import {
   hasResumableDecisionCompassProgress,
   type PersistedDecisionCompassSession,
 } from "@/lib/decisionCompassSessionStore";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 
 function MindMapBranch({ node, depth = 0 }: { node: MindMapNode; depth?: number }) {
   const colors = ["#1e4f4f", "#a85c4a", "#4a6fa5", "#6b8e23"];
@@ -263,6 +264,7 @@ export function DecisionCompassPanel({
 
   return (
     <div className="companion-fade-in flex h-full min-h-0 flex-col px-4 py-6">
+      <WorkspaceAreaWorksGuide areaId="decision-compass" />
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">

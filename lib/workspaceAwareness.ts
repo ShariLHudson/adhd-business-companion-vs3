@@ -593,6 +593,8 @@ export function buildWorkspaceChatHints(
     openSnapshot?: WorkspaceOpenSnapshot | null;
     businessStrategySession?: import("./businessStrategyBuilder").BusinessStrategySession | null;
     businessStrategyDraft?: string | null;
+    /** Create V2 workspace-first — suppress legacy auto-apply / draft-sync hints. */
+    createWorkspaceV2Active?: boolean;
   },
 ): string | undefined {
   if (!ctx?.section) return undefined;
@@ -631,7 +633,7 @@ export function buildWorkspaceChatHints(
       snap,
     );
     if (lockHint) parts.unshift(lockHint);
-    if (isAutoApplyWorkspaceSection(ctx.section)) {
+    if (isAutoApplyWorkspaceSection(ctx.section) && !opts.createWorkspaceV2Active) {
       parts.unshift(activeWorkspaceAutoApplyHint(ctx.section));
     }
     const bizPlan = formatBusinessStrategyForPrompt(
@@ -651,7 +653,7 @@ export function buildWorkspaceChatHints(
       }
       parts.push(bizPlan);
     }
-    if (createChat) {
+    if (createChat && !opts.createWorkspaceV2Active) {
       parts.push(
         formatCreationCoGuideHint(ctx, opts.creationContext ?? null, {
           draftVisible: opts.createDraftVisible !== false,

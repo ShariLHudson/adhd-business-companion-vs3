@@ -137,5 +137,14 @@ export function dismissHomeResumeForSession(itemId: string): void {
   }
 }
 
+export function clearHomeResumeDismissForSession(): void {
+  if (typeof sessionStorage === "undefined") return;
+  try {
+    sessionStorage.removeItem(SESSION_DISMISS_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 // Re-export for callers that need full manifest access.
 export { buildContinuityManifest } from "./continuityManifest";

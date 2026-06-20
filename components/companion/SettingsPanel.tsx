@@ -98,6 +98,13 @@ const PATTERNS: { id: PatternAwareness; label: string; desc: string }[] = [
 
 import { visualModeLabel } from "@/lib/visualColorModes";
 import { VisualColorModePicker } from "@/components/companion/VisualColorModePicker";
+import {
+  getDefaultPlanningView,
+  PLANNING_VIEW_OPTIONS,
+  planningViewLabel,
+  setDefaultPlanningView,
+  type PlanningViewMode,
+} from "@/lib/planMyDay";
 
 type Section =
   | "tone"
@@ -106,6 +113,7 @@ type Section =
   | "language"
   | "notifications"
   | "appearance"
+  | "planning"
   | "celebrations"
   | "pattern"
   | "plan"
@@ -197,6 +205,7 @@ export function SettingsPanel({
   const [supportStyle, setSupportStyle] = useState<SupportStyle>("balanced");
   const visualMode = useVisualMode();
   const [pattern, setPattern] = useState<PatternAwareness>("light");
+  const [planningView, setPlanningView] = useState<PlanningViewMode>("list");
   const [plan, setPlan] = useState<Plan>("essential");
   const [advanced, setAdvanced] = useState(false);
   const [alerts, setAlerts] = useState(true);
@@ -241,6 +250,7 @@ export function SettingsPanel({
     setHelpMode(p.helpMode);
     setSupportStyle(p.supportStyle);
     setPattern(p.patternAwareness);
+    setPlanningView(getDefaultPlanningView() ?? "list");
     setPlan(p.plan);
     setAdvanced(p.advancedAiTools);
     setAlerts(p.timeBlockAlerts);
@@ -313,6 +323,11 @@ export function SettingsPanel({
     },
     { id: "notifications", label: "Notifications", value: alerts ? "On" : "Off" },
     { id: "appearance", label: "Appearance", value: visualModeLabel(visualMode) },
+    {
+      id: "planning",
+      label: "Planning",
+      value: planningViewLabel(planningView),
+    },
     {
       id: "celebrations",
       label: "Celebrations",
@@ -603,6 +618,25 @@ export function SettingsPanel({
           current={visualMode}
           onSave={(v) => {
             savePrefs({ visualMode: v });
+          }}
+        />
+      </div>
+    );
+  }
+  if (open === "planning") {
+    return (
+      <div className={wrap}>
+        {header("Planning")}
+        <p className="mt-1 text-sm text-[#6b635a]">
+          Choose how Plan My Day opens by default. You can switch views anytime.
+        </p>
+        <p className={`${LABEL} mt-4`}>Default planning view</p>
+        <Options
+          items={PLANNING_VIEW_OPTIONS}
+          current={planningView}
+          onPick={(v) => {
+            setPlanningView(v);
+            setDefaultPlanningView(v);
           }}
         />
       </div>

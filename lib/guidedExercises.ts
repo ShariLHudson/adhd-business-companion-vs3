@@ -89,5 +89,5 @@ export function isGuidedExerciseActivity(activityId: string): boolean {
 }
 
 export function standaloneSectionForActivity(activityId: string): AppSection {
-  return isGuidedExerciseActivity(activityId) ? "guided-exercises" : "activities";
+  return isGuidedExerciseActivity(activityId) ? "guided-exercises" : "focus";
 }

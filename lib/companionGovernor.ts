@@ -46,6 +46,10 @@ import {
 } from "./activeWorkflowContextLock";
 import type { ResolvedIntent } from "./intentStabilizer";
 import type { WorkspaceOpenSnapshot } from "./workspaceExecution";
+import {
+  enforceConversationOnlyTurnSurface,
+  isChatConversationOnlyMode,
+} from "./chatConversationOnly";
 
 export type TurnOutcome =
   | "chat_only"
@@ -115,6 +119,10 @@ function laneLabel(text: string): string {
 
 /** Single entry — exactly one terminal outcome per turn. */
 export function evaluateCompanionTurn(input: CompanionGovernorInput): TurnSurface {
+  return enforceConversationOnlyTurnSurface(evaluateCompanionTurnCore(input));
+}
+
+function evaluateCompanionTurnCore(input: CompanionGovernorInput): TurnSurface {
   const text = input.userText.trim();
   const lastAssistant = input.lastAssistantText?.trim() ?? "";
   const hints: string[] = [];

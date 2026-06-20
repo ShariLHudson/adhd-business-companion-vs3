@@ -1,4 +1,5 @@
 import type { TemplateItem } from "./companionStore";
+import { selectedAudienceLabel } from "./contentAudience";
 import { itemTypeFromTemplate } from "./templateItemType";
 import type { CreationWorkspaceInput } from "./workspaceCreation";
 
@@ -21,7 +22,7 @@ export function templateBuildWithShariChatPrompt(template: {
     (excerpt
       ? `\n\nTemplate excerpt:\n${excerpt.slice(0, 600)}${excerpt.length > 600 ? "…" : ""}`
       : "") +
-    `\n\nHelp me adapt it for what I need now — ask me one question before we draft anything.`
+    `\n\nHelp me adapt it for **${selectedAudienceLabel()}** — ask me one question before we draft anything.`
   );
 }
 
@@ -35,11 +36,12 @@ export function templateBlankEditorHelpPrompt(): string {
 
 export function templateToCreationInput(template: TemplateItem): CreationWorkspaceInput {
   const itemType = itemTypeFromTemplate(template);
+  const audience = selectedAudienceLabel();
   return {
     itemType,
     title: template.title,
     draftContent: template.body,
-    brief: template.title,
+    brief: `Audience: ${audience}. Template: ${template.title}`,
     templateId: template.id,
     source: "template",
     stage: "using template",

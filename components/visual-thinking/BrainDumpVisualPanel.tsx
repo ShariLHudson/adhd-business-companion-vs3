@@ -21,12 +21,23 @@ import { BrainDumpMindMapView } from "./BrainDumpMindMapView";
 
 export function BrainDumpVisualPanel({
   entries,
+  variant = "sidebar",
+  initialVisible,
+  initialViewMode,
+  allowHide = true,
 }: {
   entries: BrainDumpEntry[];
+  /** Sidebar beside capture; primary fills the panel (mind map view). */
+  variant?: "sidebar" | "primary";
+  initialVisible?: boolean;
+  initialViewMode?: BrainDumpVisualViewMode;
+  allowHide?: boolean;
 }) {
-  const [visible, setVisible] = useState(loadBrainDumpVisualVisible);
+  const [visible, setVisible] = useState(
+    () => initialVisible ?? loadBrainDumpVisualVisible(),
+  );
   const [viewMode, setViewMode] = useState<BrainDumpVisualViewMode>(
-    loadBrainDumpVisualView,
+    () => initialViewMode ?? loadBrainDumpVisualView(),
   );
   const [exporting, setExporting] = useState(false);
   const infographicRef = useRef<HTMLDivElement>(null);
@@ -43,7 +54,7 @@ export function BrainDumpVisualPanel({
     saveBrainDumpVisualView(mode);
   }
 
-  if (!visible) {
+  if (!visible && allowHide) {
     return (
       <div className="flex shrink-0 items-center justify-center border-t border-[#e7dfd4] bg-[#faf7f2]/90 px-3 py-2 lg:border-t-0 lg:border-l">
         <button
@@ -51,20 +62,22 @@ export function BrainDumpVisualPanel({
           onClick={toggleVisible}
           className="rounded-full bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white shadow-md"
         >
-          🧠 Show Thought Clusters
+          🧠 Show visual view
         </button>
       </div>
     );
   }
 
+  const shellClass =
+    variant === "primary"
+      ? "flex h-full min-h-0 min-w-0 flex-1 flex-col border-t border-[#e7dfd4] bg-gradient-to-b from-[#faf7f2] to-[#f5efe6] lg:border-t-0"
+      : "flex h-full min-h-0 min-w-0 flex-col border-t border-[#e7dfd4] bg-gradient-to-b from-[#faf7f2] to-[#f5efe6] lg:w-[min(42%,400px)] lg:shrink-0 lg:border-t-0 lg:border-l";
+
   return (
-    <div
-      className="flex h-full min-h-0 min-w-0 flex-col border-t border-[#e7dfd4] bg-gradient-to-b from-[#faf7f2] to-[#f5efe6] lg:w-[min(42%,400px)] lg:shrink-0 lg:border-t-0 lg:border-l"
-      data-testid="brain-dump-visual-panel"
-    >
+    <div className={shellClass} data-testid="brain-dump-visual-panel">
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[#e7dfd4]/80 bg-white/70 px-3 py-2">
         <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
-          Thought Clusters
+          {viewMode === "mindmap" ? "Mind Map" : "Thought Clusters"}
         </p>
         <div className="flex flex-wrap items-center gap-1">
           {(

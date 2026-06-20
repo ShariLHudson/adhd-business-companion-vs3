@@ -52,8 +52,8 @@ describe("companionFirstWorkflow", () => {
       null,
     );
     expect(hint).toMatch(/COMPANION FIRST/i);
-    expect(hint).toMatch(/Do NOT give navigation-only/i);
-    expect(hint).toMatch(/Do NOT open Create to write an explanation/i);
+    expect(hint).toMatch(/conversation-only/i);
+    expect(hint).toMatch(/do NOT offer to open it from chat/i);
   });
 
   it("does not re-offer when workspace already open", () => {

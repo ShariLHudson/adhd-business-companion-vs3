@@ -25,7 +25,7 @@ export function CollapsibleSection({
         className="flex w-full items-center gap-2 rounded-lg py-2 text-left hover:bg-black/[0.03]"
       >
         <span className="text-sm text-[#6b635a]" aria-hidden>
-          {open ? "▾" : "▸"}
+          {open ? "▼" : "▶"}
         </span>
         <span className="text-sm font-semibold text-[#1f1c19]">{title}</span>
         {count !== undefined && count > 0 && (

@@ -29,7 +29,6 @@ import {
 import { enterAddDetailStep } from "@/lib/createBuild";
 import { buildFullCreateBrief } from "@/lib/createTemplates";
 import { CreateAddDetailPanel } from "@/components/companion/CreateAddDetailPanel";
-import { CreateInspirationLayer } from "@/components/companion/CreateInspirationLayer";
 import { WorkspaceStepCard } from "@/components/companion/WorkspaceStepCard";
 
 const btnPrimary =
@@ -179,14 +178,8 @@ export function CreateWorkflowPanel({
       <div className="companion-fade-in flex flex-1 flex-col justify-center px-4 py-6">
         <QuestionCard
           title="What would you like to create?"
-          footer="You can also tell Shari in chat."
+          footer="Choose a type — then we'll talk it through together."
         >
-          <CreateInspirationLayer
-            onPick={(item) => {
-              if (item.createType) pickOutcome(item.createType);
-            }}
-            onOpenSavedWork={onOpenSavedWork}
-          />
           <CategoryPickerSelect
               label="Content type"
               hideLabel
@@ -196,7 +189,7 @@ export function CreateWorkflowPanel({
                 pickOutcome(v);
               }}
               options={itemOptions}
-              placeholder="Social Media Post, Email, Newsletter…"
+              placeholder="Marketing Plan, Workshop, Lead Magnet…"
             />
           {showingCustomItem ? (
             <div className="mt-4">
@@ -388,7 +381,7 @@ export function CreateWorkflowPanel({
               onClick={() => void onBuildDraft(brief)}
               className={btnPrimary}
             >
-              {building ? `Building your ${displayType}…` : "Build Draft"}
+              {building ? `Creating your ${displayType}…` : "Create Draft"}
             </button>
             <button
               type="button"

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
+  businessContextSummary,
   createTemplate,
   deleteTemplate,
   duplicateTemplate,
@@ -16,19 +17,28 @@ import {
 import { RefineActions } from "@/components/companion/RefineActions";
 import { DraftWorkspacePanel } from "@/components/companion/DraftWorkspacePanel";
 import type { AppSection } from "@/lib/companionUi";
-import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import { itemTypeFromTemplate } from "@/lib/templateItemType";
 import { templateToCreationInput } from "@/lib/templateBuildWithShari";
+import { TEMPLATE_CATEGORY_OPTIONS, parseFrameworkSections } from "@/lib/templateLibraryUx";
+import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
+import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
+import { AudienceTypeGenerateBar } from "@/components/companion/AudienceTypeGenerateBar";
 import {
-  filterTemplates,
-  sortedTemplateDropdownOptions,
-  templateDropdownLabel,
-  templatesForDefaultPicker,
-  TEMPLATE_STATUS_OPTIONS,
-  type TemplateStatusFilter,
-} from "@/lib/templateLibraryUx";
-import { NO_CATEGORY } from "@/lib/categoryRevealUx";
+  LibraryCloseButton,
+  LibraryHelpText,
+  LibraryPanelHeader,
+  LibraryResultActions,
+} from "@/components/companion/LibraryOrientationChrome";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
+import {
+  buildContentGenerationContext,
+  CONTENT_VOICE_TONES,
+  getSelectedContentAudienceId,
+  getSelectedContentToneId,
+  setContentToneId,
+  type ContentVoiceToneId,
+} from "@/lib/contentAudience";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
 type Draft = {
@@ -107,37 +117,123 @@ export function TemplatesLibrary({
   onOpenInCreate?: (input: CreationWorkspaceInput) => void;
 }) {
   const [items, setItems] = useState<TemplateItem[]>([]);
-  const [status, setStatus] = useState<TemplateStatusFilter>("all");
-  const [search, setSearch] = useState("");
+  const [filter, setFilter] = useState<TemplateCategory | typeof NO_CATEGORY>(
+    NO_CATEGORY,
+  );
   const [draft, setDraft] = useState<Draft | null>(null);
   const [viewId, setViewId] = useState<string | null>(null);
-  const [pickerSelection, setPickerSelection] = useState("");
   const [pendingConsent, setPendingConsent] = useState<PendingConsent | null>(
     null,
   );
   const [googleExportError, setGoogleExportError] = useState<string | null>(null);
   const [googleLoading, setGoogleLoading] = useState(false);
 
+  type TemplateSuggestion = {
+    title: string;
+    body: string;
+    category: TemplateCategory;
+    subcategory: string;
+  };
+  const [suggesting, setSuggesting] = useState(false);
+  const [generateToneId, setGenerateToneId] = useState<ContentVoiceToneId>(
+    getSelectedContentToneId,
+  );
+  const [suggestions, setSuggestions] = useState<TemplateSuggestion[]>([]);
+  const [sugErr, setSugErr] = useState(false);
+  const [templateType, setTemplateType] = useState<TemplateCategory>("emails");
+
   useEffect(() => {
     setItems(getTemplates());
   }, []);
 
-  const pickerOptions = useMemo(
-    () => sortedTemplateDropdownOptions(templatesForDefaultPicker(items)),
-    [items],
-  );
+  function closePanel() {
+    onBack?.();
+  }
 
-  const advancedResults = useMemo(
-    () =>
-      filterTemplates(items, {
-        query: search,
-        status,
-        category: NO_CATEGORY,
+  async function suggest() {
+    if (suggesting) return;
+    setSuggesting(true);
+    setSugErr(false);
+    try {
+      const audienceId = getSelectedContentAudienceId();
+      const context = buildContentGenerationContext({
+        audienceId,
+        toneId: generateToneId,
+        businessContext: businessContextSummary(
+          audienceId.startsWith("avatar:")
+            ? audienceId.slice("avatar:".length)
+            : undefined,
+        ),
+      });
+      const res = await fetch("/api/templates", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          context,
+          templateCategory: TEMPLATE_CATEGORY_LABEL[templateType],
+        }),
+      });
+      const d = await res.json();
+      if (res.ok && Array.isArray(d.templates)) setSuggestions(d.templates);
+      else setSugErr(true);
+    } catch {
+      setSugErr(true);
+    } finally {
+      setSuggesting(false);
+    }
+  }
+
+  function saveSuggestion(s: TemplateSuggestion) {
+    setItems(
+      createTemplate({
+        title: s.title,
+        body: s.body,
+        category: s.category,
+        subcategory: s.subcategory || undefined,
+        status: "saved",
       }),
-    [items, search, status],
-  );
+    );
+    setSuggestions((list) => list.filter((x) => x !== s));
+  }
 
-  const advancedActive = Boolean(search.trim()) || status !== "all";
+  function dismissSuggestion(s: TemplateSuggestion) {
+    setSuggestions((list) => list.filter((x) => x !== s));
+  }
+
+  function useTemplateFramework(
+    title: string,
+    body: string,
+    category: TemplateCategory = templateType,
+  ) {
+    const input: CreationWorkspaceInput = {
+      itemType: itemTypeFromTemplate({
+        id: "draft",
+        title,
+        body,
+        category,
+        status: "saved",
+        createdAt: "",
+        updatedAt: "",
+      }),
+      title,
+      draftContent: body,
+      brief: title,
+      source: "template",
+      stage: "shaping",
+    };
+    if (onOpenInCreate) {
+      onOpenInCreate(input);
+      return;
+    }
+    onBuildWithShari?.(input);
+  }
+
+  const visible =
+    filter === NO_CATEGORY
+      ? []
+      : items.filter(
+          (t) => t.category === filter && t.status !== "archived",
+        );
   function saveDraft() {
     const body = draft?.body.trim();
     if (!draft || !body) return;
@@ -160,7 +256,6 @@ export function TemplatesLibrary({
           status: "saved",
         }),
       );
-      setStatus("saved");
     }
     setDraft(null);
   }
@@ -169,9 +264,12 @@ export function TemplatesLibrary({
   if (draft) {
     return (
       <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
-        <p className="text-2xl font-semibold text-[#1f1c19]">
-          {draft.id ? "Edit template" : "New template"}
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-2xl font-semibold text-[#1f1c19]">
+            {draft.id ? "Edit template" : "New template"}
+          </p>
+          <LibraryCloseButton onClose={closePanel} />
+        </div>
         <p className="mt-1 text-sm text-[#6b635a]">
           Advanced: edit the framework directly. Prefer{" "}
           <strong>Build With Shari</strong> on the list if you want help shaping
@@ -340,45 +438,56 @@ export function TemplatesLibrary({
 
     return (
       <div className="companion-fade-in flex h-full min-h-0 flex-col">
-        <button
-          type="button"
-          onClick={() => setViewId(null)}
-          className="mx-4 mt-4 self-start text-sm font-semibold text-[#1e4f4f]"
-        >
-          ‹ Templates
-        </button>
+        <div className="mx-4 mt-4 flex items-start justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setViewId(null)}
+            className="text-sm font-semibold text-[#1e4f4f]"
+          >
+            ‹ Templates
+          </button>
+          <LibraryCloseButton onClose={closePanel} />
+        </div>
         <DraftWorkspacePanel
           itemType={itemType}
           templateName={template.title}
           draft={template.body}
           editable={false}
-          onApplyDraft={() => {}}
-          onGoogleDoc={exportToGoogle}
-          onCopy={() => void navigator.clipboard?.writeText(template.body)}
-          onPrint={printTemplate}
-          onDownload={downloadTemplate}
-          onAddToProject={
-            onOpenInCreate
-              ? () =>
-                  setPendingConsent({
-                    kind: "create",
-                    template: viewing,
-                    action: "addToProject",
-                  })
-              : undefined
-          }
-          onRegenerate={
-            onOpenInCreate
-              ? () =>
-                  setPendingConsent({
-                    kind: "create",
-                    template: viewing,
-                    action: "regenerate",
-                  })
-              : undefined
-          }
+          templateSections={[]}
+          onEditAction={() => {}}
+          onSaveAction={(action) => {
+            if (
+              action === "save-google-docs" ||
+              action === "add-existing-project"
+            ) {
+              if (action === "add-existing-project" && onOpenInCreate) {
+                setPendingConsent({
+                  kind: "create",
+                  template: viewing,
+                  action: "addToProject",
+                });
+              } else {
+                void exportToGoogle();
+              }
+            } else if (action === "save-google-drive") {
+              window.open("https://drive.google.com", "_blank");
+            }
+          }}
+          onExportAction={(action) => {
+            if (action === "copy-text") {
+              void navigator.clipboard?.writeText(template.body);
+            } else if (action === "print") {
+              printTemplate();
+            } else if (action === "export-pdf") {
+              downloadTemplate();
+            } else if (action === "export-docx") {
+              void exportToGoogle();
+            }
+          }}
+          onSocialAction={() => {}}
           googleExportError={googleExportError}
           onClearGoogleError={() => setGoogleExportError(null)}
+          onRetryGoogle={exportToGoogle}
           busy={googleLoading}
         />
         {pendingConsent?.kind === "create" &&
@@ -475,144 +584,158 @@ export function TemplatesLibrary({
     );
   }
 
-  // ---- List view — calm picker + optional advanced search ------------------
+  // ---- List view -----------------------------------------------------------
   return (
     <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
-      <WorkspaceGuide section="templates-library" />
-      <div className="flex items-start justify-between gap-3">
-        <p className="text-2xl font-semibold text-[#1f1c19]">Templates</p>
-        <div className="flex shrink-0 items-center gap-2">
-          {onBack && (
-            <button
-              type="button"
-              onClick={onBack}
-              aria-label="Close"
-              className="flex h-10 w-10 items-center justify-center rounded-full text-xl text-[#6b635a] hover:bg-[#1e4f4f]/10"
-            >
-              ✕
-            </button>
-          )}
-        </div>
+      <LibraryPanelHeader
+        title="Templates"
+        description="Reusable frameworks that help you create content faster."
+        onClose={closePanel}
+      />
+
+      <div className="mt-4">
+        <WorkspaceAreaWorksGuide areaId="templates-library" />
+        <LibraryHelpText>
+          <li>Choose an audience, tone, and template type.</li>
+          <li>Templates provide a starting structure.</li>
+          <li>You can customize them before using them.</li>
+          <li>Save the ones you want to reuse later.</li>
+        </LibraryHelpText>
       </div>
-      <p className="mt-1 text-base text-[#6b635a]">
-        Reusable starting points saved on this device. Build With Shari adapts a
-        template in chat — nothing drafts until you agree.
-      </p>
 
-      {onBuildWithShari && (
-        <button
-          type="button"
-          onClick={() =>
-            onBuildWithShari({
-              itemType: "template",
-              title: "New template",
-              brief: "new template",
-              source: "template",
-              stage: "shaping",
-            })
-          }
-          className="mt-6 w-full rounded-xl bg-[#1e4f4f] px-4 py-3.5 text-base font-semibold text-white shadow-sm hover:bg-[#163a3a]"
-        >
-          ✨ Build With Shari
-        </button>
-      )}
-
-      <label className="mt-5 block text-sm font-semibold text-[#1f1c19]">
-        Choose a template
-        <select
-          value={pickerSelection}
-          onChange={(e) => {
-            const id = e.target.value;
-            setPickerSelection(id);
-            if (id) {
-              setViewId(id);
-              setPickerSelection("");
-            }
+      <div className="mt-3">
+        <AudienceTypeGenerateBar
+          typeOptions={CONTENT_VOICE_TONES.map((t) => ({
+            value: t.id,
+            label: t.label,
+          }))}
+          typeValue={generateToneId}
+          onTypeChange={(id) => {
+            const toneId = id as ContentVoiceToneId;
+            setGenerateToneId(toneId);
+            setContentToneId(toneId);
           }}
-          className="mt-2 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-        >
-          <option value="">
-            {pickerOptions.length
-              ? "Select a template…"
-              : "No templates yet — start with Build With Shari"}
-          </option>
-          {pickerOptions.map((t) => (
-            <option key={t.id} value={t.id}>
-              {templateDropdownLabel(t)}
-            </option>
-          ))}
-        </select>
-      </label>
+          typeLabel="Voice / Tone"
+          typeShowPlaceholder={false}
+          extraOptions={TEMPLATE_CATEGORY_OPTIONS.map((o) => ({
+            value: o.value,
+            label: o.label,
+          }))}
+          extraValue={templateType}
+          onExtraChange={(v) => setTemplateType(v as TemplateCategory)}
+          extraLabel="Type"
+          onGenerate={suggest}
+          generating={suggesting}
+          generateLabel="Generate"
+        />
+      </div>
+
+      {sugErr ? (
+        <p className="mt-3 text-sm text-[#a85c4a]">
+          Couldn&apos;t load templates just now — try again.
+        </p>
+      ) : null}
+
+      {suggestions.length > 0 ? (
+        <div className="companion-fade-in mt-5">
+          <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
+            Template results
+          </p>
+          <div className="mt-2 flex flex-col gap-3">
+            {suggestions.map((s, i) => {
+              const sections = parseFrameworkSections(s.body);
+              return (
+                <div
+                  key={i}
+                  className="rounded-xl border border-[#d4cdc3] bg-white px-4 py-3"
+                >
+                  <p className="text-base font-semibold text-[#1f1c19]">
+                    {s.title}
+                  </p>
+                  <p className="mt-0.5 text-xs font-semibold uppercase tracking-wide text-[#9a8f82]">
+                    {TEMPLATE_CATEGORY_LABEL[s.category]}
+                    {s.subcategory ? ` · ${s.subcategory}` : ""}
+                  </p>
+                  <ul className="mt-3 space-y-2 border-t border-[#e7dfd4] pt-3">
+                    {sections.map((sec) => (
+                      <li key={sec.label}>
+                        <p className="text-sm font-semibold text-[#1e4f4f]">
+                          {sec.label}
+                        </p>
+                        <p className="mt-0.5 text-sm leading-relaxed text-[#4b463f]">
+                          {sec.content}
+                        </p>
+                      </li>
+                    ))}
+                  </ul>
+                  <LibraryResultActions
+                    onSave={() => saveSuggestion(s)}
+                    onUse={() =>
+                      useTemplateFramework(s.title, s.body, s.category)
+                    }
+                    onDelete={() => dismissSuggestion(s)}
+                  />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
+      <p className="mt-6 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+        Your saved templates
+      </p>
+      <CategoryPickerSelect
+        label="Browse by category"
+        value={filter}
+        onChange={setFilter}
+        options={TEMPLATE_CATEGORY_OPTIONS.map((o) => ({
+          value: o.value,
+          label: o.label,
+        }))}
+        placeholder="Select a category…"
+        className="mt-2"
+      />
+
+      <div className="mt-4 flex flex-col gap-3">
+        {visible.length === 0 ? (
+          <p className="text-base text-[#6b635a]">
+            {filter === NO_CATEGORY
+              ? CATEGORY_PICKER_EMPTY_LIST_HINT
+              : "Nothing saved in this category yet — show templates above."}
+          </p>
+        ) : (
+          visible.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setViewId(t.id)}
+              className="flex items-center justify-between gap-3 rounded-xl border border-[#d4cdc3] bg-white/85 px-4 py-3 text-left transition-colors hover:border-[#1e4f4f]/45 hover:bg-white"
+            >
+              <span className="min-w-0">
+                <span className="block truncate text-base font-semibold text-[#1f1c19]">
+                  {t.title}
+                </span>
+                <span className="text-xs font-semibold uppercase tracking-wide text-[#1e4f4f]">
+                  {TEMPLATE_CATEGORY_LABEL[t.category]}
+                  {t.subcategory ? ` · ${t.subcategory}` : ""}
+                </span>
+              </span>
+              <span aria-hidden="true" className="shrink-0 text-[#9a8f82]">
+                ›
+              </span>
+            </button>
+          ))
+        )}
+      </div>
 
       <button
         type="button"
-        onClick={() => setDraft({ ...EMPTY_DRAFT })}
-        className="mt-4 w-full rounded-xl border border-[#1e4f4f]/25 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+        onClick={() => setDraft({ ...EMPTY_DRAFT, category: templateType })}
+        className="mt-4 text-sm font-semibold text-[#1e4f4f] hover:underline"
       >
-        Start from blank
+        + Start from a blank template
       </button>
-
-      <details className="mt-8 rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/80 px-3 py-2">
-        <summary className="cursor-pointer list-none text-sm font-semibold text-[#6b635a] marker:content-none [&::-webkit-details-marker]:hidden">
-          Advanced template search
-        </summary>
-        <input
-          type="search"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search templates…"
-          className="mt-3 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-        />
-        <label className="mt-3 block text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-          Status
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value as TemplateStatusFilter)}
-            className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-          >
-            {TEMPLATE_STATUS_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </label>
-        {advancedActive ? (
-          advancedResults.length === 0 ? (
-            <p className="mt-3 text-sm text-[#6b635a]">
-              No templates match — try a different search or status.
-            </p>
-          ) : (
-            <ul className="mt-3 flex flex-col gap-1.5">
-              {sortedTemplateDropdownOptions(advancedResults).map((t) => (
-                <li key={t.id}>
-                  <button
-                    type="button"
-                    onClick={() => setViewId(t.id)}
-                    className="w-full rounded-lg px-2 py-2 text-left text-sm font-medium text-[#1f1c19] hover:bg-white/80 hover:text-[#1e4f4f]"
-                  >
-                    {templateDropdownLabel(t)}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )
-        ) : (
-          <p className="mt-3 text-xs text-[#9a8f82]">
-            Search or filter by status to browse the full library.
-          </p>
-        )}
-      </details>
-
-      {onBack && (
-        <button
-          type="button"
-          onClick={onBack}
-          className="mt-8 self-start rounded-xl border-2 border-[#1e4f4f] bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f]"
-        >
-          Back
-        </button>
-      )}
     </div>
   );
 }

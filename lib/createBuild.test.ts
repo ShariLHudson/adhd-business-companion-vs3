@@ -12,7 +12,7 @@ import {
 } from "./createWorkflow";
 
 describe("createBuild", () => {
-  it("validates readiness workflow with one discovery answer", () => {
+  it("stays in discovery after only the first answer", () => {
     let wf = advanceAfterItemPick("Training Guide");
     const qs = getDiscoveryQuestions("Training Guide");
     wf = advanceAfterDiscoveryAnswer(
@@ -21,9 +21,9 @@ describe("createBuild", () => {
       qs[0]!.id,
       "answer-first",
     );
-    expect(wf.step).toBe("readiness");
+    expect(wf.step).toBe("discovery");
     const v = validateCreateForBuild(wf);
-    expect(v.ok).toBe(true);
+    expect(v.ok).toBe(false);
     expect(v.itemType).toBe("Training Guide");
   });
 

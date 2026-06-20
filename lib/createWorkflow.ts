@@ -12,6 +12,18 @@ import {
 } from "./createTypePickers";
 import { initializeTemplateForWorkflow } from "./createTemplates";
 import { templateOutlineComplete, materializeDiscoverySections } from "./createSectionDiscovery";
+import {
+  catalogLabelToCreateType,
+  getNextRequiredField,
+  getRequiredFields,
+  getTemplateProgress,
+  guidedRequiredFieldsComplete,
+  hasGuidedTemplateFields,
+} from "./createTemplateFields";
+import {
+  guidedDiscoveryQuestions,
+  templateFieldToDiscoveryQuestion,
+} from "./createGuidedBridge";
 
 export type DiscoverySubphase = "questions" | "sections";
 
@@ -42,6 +54,17 @@ export type DiscoveryQuestion = {
   prompt: string;
   why: string;
   placeholder?: string;
+};
+
+/** Awaiting user approval before writing to the template. */
+export type PendingFieldApproval = {
+  kind: "discovery" | "section";
+  questionId?: string;
+  sectionId?: string;
+  sectionLabel?: string;
+  fieldLabel?: string;
+  summary: string;
+  rawAnswer: string;
 };
 
 export type CreateWorkflowState = {
@@ -78,8 +101,14 @@ export type CreateWorkflowState = {
   sessionId?: string | null;
   /** Question ids skipped — not required for readiness or brief. */
   skippedQuestionIds?: string[];
+  /** Template section ids marked N/A by the user (workspace-first Create). */
+  skippedSectionIds?: string[];
   /** create_only = panel asks questions; split_screen = chat asks, panel shows output. */
   questionMode: CreateQuestionMode;
+  /** User must approve before this summary is saved to the template. */
+  pendingFieldApproval?: PendingFieldApproval | null;
+  /** Workspace-first Create V2 — user edits sections; chat does not auto-fill. */
+  workspaceFirst?: boolean;
 };
 
 export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {
@@ -104,6 +133,8 @@ export const EMPTY_CREATE_WORKFLOW: CreateWorkflowState = {
   draftStatus: "idle",
   draftContent: null,
   questionMode: "create_only",
+  pendingFieldApproval: null,
+  skippedSectionIds: [],
 };
 
 const DEFAULT_DISCOVERY: DiscoveryQuestion[] = [
@@ -183,6 +214,24 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
       prompt: "What context should I know?",
       why: "So the draft doesn't miss important background.",
       placeholder: "Prior conversation, offer, deadline…",
+    },
+  ],
+  "Thank-You Email": [
+    {
+      id: "recipient",
+      prompt: "Who is it for?",
+      why: "So the thank-you feels personal.",
+    },
+    {
+      id: "reason",
+      prompt: "Why are you thanking them?",
+      why: "So the note names something specific, not generic gratitude.",
+    },
+    {
+      id: "tone",
+      prompt: "What tone do you want?",
+      why: "So it sounds like you.",
+      placeholder: "Warm, professional, brief…",
     },
   ],
   "LinkedIn Post": [
@@ -367,19 +416,91 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
   ],
   "Marketing Plan": [
     {
-      id: "business",
-      prompt: "What business or offer is this plan for?",
-      why: "So marketing ties to something real.",
+      id: "audience",
+      prompt: "Who is this marketing plan for?",
+      why: "So every tactic speaks to the right people.",
+      placeholder: "ADHD entrepreneurs, coaches, your ideal client…",
     },
+    {
+      id: "outcome",
+      prompt: "What result are you helping them achieve?",
+      why: "So the plan stays outcome-focused, not busywork.",
+    },
+    {
+      id: "struggle",
+      prompt: "What are they struggling with right now?",
+      why: "So messaging meets them where they are.",
+    },
+  ],
+  "Landing Page": [
+    {
+      id: "offer",
+      prompt: "What are you offering on this page?",
+      why: "So the page has one clear promise.",
+    },
+    {
+      id: "audience",
+      prompt: "Who is this page for?",
+      why: "So headlines speak to their situation.",
+    },
+    {
+      id: "action",
+      prompt: "What should visitors do?",
+      why: "So the page drives one primary action.",
+      placeholder: "Sign up, book a call, buy…",
+    },
+  ],
+  "Email Sequence": [
     {
       id: "goal",
-      prompt: "What are you trying to grow?",
-      why: "So tactics align with the goal.",
+      prompt: "What is this email sequence trying to achieve?",
+      why: "So every email supports one outcome.",
     },
     {
-      id: "channel",
-      prompt: "Where do your people already show up?",
-      why: "So the plan is realistic for your capacity.",
+      id: "audience",
+      prompt: "Who is on this list?",
+      why: "So messaging fits the people receiving it.",
+    },
+    {
+      id: "sequence",
+      prompt: "How many emails, and what is the arc?",
+      why: "So the sequence has a clear flow.",
+      placeholder: "3 emails over 5 days — welcome, value, offer…",
+    },
+  ],
+  "Course Outline": [
+    {
+      id: "audience",
+      prompt: "Who is this course for?",
+      why: "So modules match their level and goals.",
+    },
+    {
+      id: "transformation",
+      prompt: "What transformation should they walk away with?",
+      why: "So the outline builds toward a real result.",
+    },
+    {
+      id: "modules",
+      prompt: "What are the main modules or topics?",
+      why: "So the structure is clear before we draft.",
+      placeholder: "3–6 modules or key themes…",
+    },
+  ],
+  "Client Onboarding": [
+    {
+      id: "client",
+      prompt: "Who is the client you're onboarding?",
+      why: "So steps fit how you actually work together.",
+    },
+    {
+      id: "start",
+      prompt: "What happens right after they say yes?",
+      why: "So the first steps are concrete.",
+    },
+    {
+      id: "deliver",
+      prompt: "What do they need from you in the first week?",
+      why: "So nothing important falls through the cracks.",
     },
   ],
   Presentation: [
@@ -430,6 +551,12 @@ const DISCOVERY_BY_TYPE: Record<string, DiscoveryQuestion[]> = {
       id: "goal",
       prompt: "What is the main message?",
       why: "So every section supports one core idea.",
+    },
+    {
+      id: "takeaways",
+      prompt: "What are the key takeaways?",
+      why: "So readers leave with something concrete.",
+      placeholder: "2–3 things they should remember…",
     },
     {
       id: "cta",
@@ -679,6 +806,8 @@ export function getDiscoveryQuestions(
   typeLabel: string,
   answers: Record<string, string> = {},
 ): DiscoveryQuestion[] {
+  const guided = guidedDiscoveryQuestions(typeLabel);
+  if (guided) return guided;
   if (typeLabel === "Personal Companion Strategy") return STRATEGY_PERSONAL;
   if (typeLabel === "Business Strategy") return STRATEGY_BUSINESS;
   if (typeLabel === "Marketing Strategy") return STRATEGY_MARKETING;
@@ -729,6 +858,17 @@ export function discoveryIndexForAnswers(
   answers: Record<string, string>,
   skippedQuestionIds: string[] = [],
 ): number {
+  const guidedType = catalogLabelToCreateType(typeLabel);
+  if (guidedType && getRequiredFields(guidedType).length) {
+    const required = getRequiredFields(guidedType);
+    const skipped = new Set(skippedQuestionIds);
+    for (let i = 0; i < required.length; i++) {
+      const field = required[i]!;
+      if (skipped.has(field.id)) continue;
+      if (!answers[field.id]?.trim()) return i;
+    }
+    return required.length;
+  }
   const questions = getDiscoveryQuestions(typeLabel, answers);
   const skipped = new Set(skippedQuestionIds);
   for (let i = 0; i < questions.length; i++) {
@@ -866,6 +1006,12 @@ export function discoveryQuestionsForState(
   typeLabel: string,
   state: CreateWorkflowState,
 ): DiscoveryQuestion | null {
+  const guidedType = catalogLabelToCreateType(typeLabel);
+  if (guidedType && getRequiredFields(guidedType).length) {
+    const next = getNextRequiredField(guidedType, state.discoveryAnswers);
+    if (!next) return null;
+    return templateFieldToDiscoveryQuestion(next);
+  }
   const questions = getDiscoveryQuestions(typeLabel, state.discoveryAnswers);
   const idx = discoveryIndexForAnswers(
     typeLabel,
@@ -880,6 +1026,11 @@ export function discoveryQuestionProgress(
   typeLabel: string,
   state: CreateWorkflowState,
 ): { current: number; total: number } {
+  const guidedType = catalogLabelToCreateType(typeLabel);
+  if (guidedType && getRequiredFields(guidedType).length) {
+    const progress = getTemplateProgress(guidedType, state.discoveryAnswers);
+    return { current: progress.completed, total: progress.total };
+  }
   const questions = getDiscoveryQuestions(typeLabel, state.discoveryAnswers);
   const total = Math.max(questions.length, 1);
   const idx = discoveryIndexForAnswers(
@@ -899,6 +1050,10 @@ export function requiredFieldsComplete(
   answers: Record<string, string>,
   skippedQuestionIds: string[] = [],
 ): boolean {
+  const guidedType = catalogLabelToCreateType(typeLabel);
+  if (guidedType && getRequiredFields(guidedType).length) {
+    return guidedRequiredFieldsComplete(guidedType, answers);
+  }
   const questions = getDiscoveryQuestions(typeLabel, answers);
   const skipped = new Set(skippedQuestionIds);
   return questions.every(
@@ -916,6 +1071,9 @@ export function discoveryComplete(
     state.skippedQuestionIds ?? [],
   );
   if (!questionsDone) return false;
+  if (hasGuidedTemplateFields(typeLabel)) {
+    return true;
+  }
   if (state.questionMode === "split_screen") {
     return templateOutlineComplete(state);
   }
@@ -979,27 +1137,42 @@ export function readinessSummary(
   return rows;
 }
 
-/** One answered question is enough before first draft (create-only panel mode). */
+/** @deprecated Prefer hasEnoughClarityForDraft(typeLabel, state). */
 export const SIMPLIFIED_DISCOVERY_ANSWER_TARGET = 1;
 
+/** All discovery questions answered for this type — never true after one answer. */
 export function hasEnoughDiscoveryForDraft(
   answers: Record<string, string>,
+  typeLabel?: string,
 ): boolean {
-  return (
-    Object.values(answers).filter((v) => v.trim()).length >=
-    SIMPLIFIED_DISCOVERY_ANSWER_TARGET
-  );
+  if (!typeLabel) {
+    return Object.values(answers).filter((v) => v.trim()).length >= 2;
+  }
+  const questions = getDiscoveryQuestions(typeLabel, answers);
+  return questions.every((q) => answers[q.id]?.trim());
 }
 
-export function discoveryReadyForDraft(
+export function hasEnoughClarityForDraft(
   typeLabel: string,
   state: CreateWorkflowState,
 ): boolean {
   if (state.questionMode === "split_screen") {
     return discoveryComplete(typeLabel, state);
   }
-  if (hasEnoughDiscoveryForDraft(state.discoveryAnswers)) return true;
-  return discoveryComplete(typeLabel, state);
+  if (hasGuidedTemplateFields(typeLabel)) {
+    const guidedType = catalogLabelToCreateType(typeLabel);
+    if (guidedType) {
+      return guidedRequiredFieldsComplete(guidedType, state.discoveryAnswers);
+    }
+  }
+  return hasEnoughDiscoveryForDraft(state.discoveryAnswers, typeLabel);
+}
+
+export function discoveryReadyForDraft(
+  typeLabel: string,
+  state: CreateWorkflowState,
+): boolean {
+  return hasEnoughClarityForDraft(typeLabel, state);
 }
 
 /** Initial discovery questions answered — may still need template sections. */
@@ -1085,6 +1258,7 @@ export function applyCreateDiscoveryFromChat(
   const typeLabel = resolvedTypeLabel(state);
   const text = userText.trim();
   if (!typeLabel || !text || state.step !== "discovery") return null;
+  if (state.workspaceFirst) return null;
   if (text.length < 4 || /^(?:yes|no|ok|okay|skip|next)$/i.test(text)) {
     return null;
   }
@@ -1198,13 +1372,17 @@ export function advanceAfterDiscoveryAnswer(
       ? materializeDiscoverySections(typeLabel, withAnswers)
       : withAnswers;
   const fieldsComplete = requiredFieldsComplete(typeLabel, answers, skipped);
-  const outlineComplete = templateOutlineComplete(materialized);
+  const guided = hasGuidedTemplateFields(typeLabel);
+  const outlineComplete = guided ? fieldsComplete : templateOutlineComplete(materialized);
   const complete =
     state.questionMode === "split_screen"
       ? outlineComplete
-      : hasEnoughDiscoveryForDraft(answers) || fieldsComplete;
+      : hasEnoughClarityForDraft(typeLabel, materialized);
   const enterSections =
-    state.questionMode === "split_screen" && fieldsComplete && !outlineComplete;
+    state.questionMode === "split_screen" &&
+    fieldsComplete &&
+    !outlineComplete &&
+    !guided;
   return {
     ...materialized,
     discoveryIndex: idx,

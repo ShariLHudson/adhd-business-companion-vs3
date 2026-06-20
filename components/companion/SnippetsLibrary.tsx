@@ -15,6 +15,26 @@ import {
 } from "@/lib/companionStore";
 import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
+import {
+  AudienceBadge,
+} from "@/components/companion/AudienceSelector";
+import { AudienceTypeGenerateBar } from "@/components/companion/AudienceTypeGenerateBar";
+import {
+  LibraryCloseButton,
+  LibraryHelpText,
+  LibraryPanelHeader,
+  LibraryResultActions,
+} from "@/components/companion/LibraryOrientationChrome";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
+import {
+  audienceIdsForStorage,
+  buildContentGenerationContext,
+  CONTENT_VOICE_TONES,
+  getSelectedContentAudienceId,
+  getSelectedContentToneId,
+  setContentToneId,
+  type ContentVoiceToneId,
+} from "@/lib/contentAudience";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
@@ -61,6 +81,9 @@ export function SnippetsLibrary({
     whereToUse: string;
   };
   const [suggesting, setSuggesting] = useState(false);
+  const [generateToneId, setGenerateToneId] = useState<ContentVoiceToneId>(
+    getSelectedContentToneId,
+  );
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [sugErr, setSugErr] = useState(false);
 
@@ -73,10 +96,20 @@ export function SnippetsLibrary({
     setSuggesting(true);
     setSugErr(false);
     try {
+      const audienceId = getSelectedContentAudienceId();
+      const context = buildContentGenerationContext({
+        audienceId,
+        toneId: generateToneId,
+        businessContext: businessContextSummary(
+          audienceId.startsWith("avatar:")
+            ? audienceId.slice("avatar:".length)
+            : undefined,
+        ),
+      });
       const res = await fetch("/api/snippets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ context: businessContextSummary() }),
+        body: JSON.stringify({ context }),
       });
       const d = await res.json();
       if (res.ok && Array.isArray(d.snippets)) setSuggestions(d.snippets);
@@ -88,6 +121,32 @@ export function SnippetsLibrary({
     }
   }
 
+  function dismissSuggestion(s: Suggestion) {
+    setSuggestions((list) => list.filter((x) => x !== s));
+  }
+
+  function useSnippetContent(
+    content: string,
+    kind: SnippetKind,
+    whenToUse?: string,
+  ) {
+    if (!onBuildWithShari) return;
+    onBuildWithShari({
+      itemType: SNIPPET_KIND_LABEL[kind],
+      title: `${SNIPPET_KIND_LABEL[kind]} snippet`,
+      draftContent: content,
+      brief: whenToUse
+        ? `Use this ${SNIPPET_KIND_LABEL[kind].toLowerCase()} snippet. When: ${whenToUse}`
+        : `Use this ${SNIPPET_KIND_LABEL[kind].toLowerCase()} snippet`,
+      snippetKind: kind,
+      stage: "using snippet in draft",
+    });
+  }
+
+  function closePanel() {
+    onBack?.();
+  }
+
   function saveSuggestion(s: Suggestion) {
     setItems(
       createSnippet({
@@ -96,6 +155,7 @@ export function SnippetsLibrary({
         tone: s.tone || undefined,
         whenToUse: s.whenToUse || undefined,
         whereToUse: s.whereToUse || undefined,
+        audienceIds: audienceIdsForStorage(),
       }),
     );
     setSuggestions((list) => list.filter((x) => x !== s));
@@ -142,9 +202,12 @@ export function SnippetsLibrary({
   if (draft) {
     return (
       <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
-        <p className="text-2xl font-semibold text-[#1f1c19]">
-          {draft.id ? "Edit snippet" : "New snippet"}
-        </p>
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-2xl font-semibold text-[#1f1c19]">
+            {draft.id ? "Edit snippet" : "New snippet"}
+          </p>
+          <LibraryCloseButton onClose={closePanel} />
+        </div>
         <textarea
           value={draft.content}
           onChange={(e) => setDraft({ ...draft, content: e.target.value })}
@@ -241,122 +304,72 @@ export function SnippetsLibrary({
   if (viewing) {
     return (
       <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
-        <button
-          type="button"
-          onClick={() => setViewId(null)}
-          className="self-start text-sm font-semibold text-[#1e4f4f]"
-        >
-          ‹ Snippets
-        </button>
-        <p className="mt-3 whitespace-pre-wrap rounded-2xl border border-[#d4cdc3] bg-white/85 p-4 text-lg leading-relaxed text-[#1f1c19]">
+        <div className="flex items-start justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setViewId(null)}
+            className="text-sm font-semibold text-[#1e4f4f]"
+          >
+            ‹ Snippets
+          </button>
+          <LibraryCloseButton onClose={closePanel} />
+        </div>
+        <p className="mt-3 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+          Snippet
+        </p>
+        <p className="mt-1 whitespace-pre-wrap rounded-2xl border border-[#d4cdc3] bg-white/85 p-4 text-lg leading-relaxed text-[#1f1c19]">
           {viewing.content}
         </p>
-        <div className="mt-3 flex flex-wrap gap-1.5 text-xs">
-          <span className="rounded-full bg-[#1e4f4f]/10 px-2 py-0.5 font-semibold text-[#1e4f4f]">
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <AudienceBadge />
+          <span className="rounded-full bg-[#1e4f4f]/10 px-2 py-0.5 text-xs font-semibold text-[#1e4f4f]">
             {SNIPPET_KIND_LABEL[viewing.kind]}
           </span>
-          {viewing.tone && (
+          {viewing.tone ? (
             <span className="rounded-full bg-white/80 px-2 py-0.5 font-semibold text-[#3d3630]">
               {viewing.tone}
             </span>
-          )}
-          {viewing.category && (
-            <span className="rounded-full bg-white/80 px-2 py-0.5 text-[#6b635a]">
-              {viewing.category}
-            </span>
-          )}
+          ) : null}
         </div>
-        {viewing.whenToUse && (
+        {viewing.whenToUse ? (
           <p className="mt-3 text-base text-[#4b463f]">
             <span className="font-semibold">When:</span> {viewing.whenToUse}
           </p>
-        )}
-        {viewing.whereToUse && (
-          <p className="mt-1 text-base text-[#4b463f]">
-            <span className="font-semibold">Where:</span> {viewing.whereToUse}
-          </p>
-        )}
-        <div className="mt-5 flex flex-wrap gap-2 text-sm font-semibold">
-          {onBuildWithShari && (
-            <>
-              <button
-                type="button"
-                onClick={() =>
-                  onBuildWithShari({
-                    itemType: SNIPPET_KIND_LABEL[viewing.kind],
-                    title: `${SNIPPET_KIND_LABEL[viewing.kind]} snippet`,
-                    draftContent: viewing.content,
-                    brief: viewing.whenToUse
-                      ? `Use this ${SNIPPET_KIND_LABEL[viewing.kind].toLowerCase()} snippet. When: ${viewing.whenToUse}`
-                      : `Use this ${SNIPPET_KIND_LABEL[viewing.kind].toLowerCase()} snippet`,
-                    snippetKind: viewing.kind,
-                    stage: "using snippet in draft",
-                  })
-                }
-                className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-white hover:bg-[#163a3a]"
-              >
-                ✨ Use in Draft
-              </button>
-              <button
-                type="button"
-                onClick={() =>
-                  onBuildWithShari({
-                    itemType: SNIPPET_KIND_LABEL[viewing.kind],
-                    title: `${SNIPPET_KIND_LABEL[viewing.kind]} snippet`,
-                    draftContent: viewing.content,
-                    brief: `Adapt this snippet for my audience: ${viewing.content}`,
-                    snippetKind: viewing.kind,
-                    stage: "adapting snippet",
-                  })
-                }
-                className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-[#1e4f4f] hover:bg-[#f0f5f5]"
-              >
-                💬 Ask Shari to adapt this
-              </button>
-            </>
-          )}
-          <button
-            type="button"
-            onClick={() => {
-              try {
-                void navigator.clipboard?.writeText(viewing.content);
-              } catch {
-                /* noop */
-              }
-            }}
-            className="rounded-lg border border-[#1e4f4f]/40 bg-white px-4 py-2 text-[#1e4f4f] hover:bg-[#f0f5f5]"
-          >
-            📋 Copy
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setDraft({
-                id: viewing.id,
-                content: viewing.content,
-                kind: viewing.kind,
-                tone: viewing.tone ?? "",
-                whenToUse: viewing.whenToUse ?? "",
-                whereToUse: viewing.whereToUse ?? "",
-                category: viewing.category ?? "",
-              });
-              setViewId(null);
-            }}
-            className="rounded-lg px-3 py-2 text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
-          >
-            ✏️ Edit
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              setItems(deleteSnippet(viewing.id));
-              setViewId(null);
-            }}
-            className="rounded-lg px-3 py-2 text-[#a85c4a] hover:bg-[#a85c4a]/10"
-          >
-            Delete
-          </button>
-        </div>
+        ) : null}
+        <LibraryResultActions
+          onUse={
+            onBuildWithShari
+              ? () =>
+                  useSnippetContent(
+                    viewing.content,
+                    viewing.kind,
+                    viewing.whenToUse,
+                  )
+              : undefined
+          }
+          onDelete={() => {
+            setItems(deleteSnippet(viewing.id));
+            setViewId(null);
+          }}
+        />
+        <button
+          type="button"
+          onClick={() => {
+            setDraft({
+              id: viewing.id,
+              content: viewing.content,
+              kind: viewing.kind,
+              tone: viewing.tone ?? "",
+              whenToUse: viewing.whenToUse ?? "",
+              whereToUse: viewing.whereToUse ?? "",
+              category: viewing.category ?? "",
+            });
+            setViewId(null);
+          }}
+          className="mt-2 text-sm font-semibold text-[#1e4f4f] hover:underline"
+        >
+          Edit details
+        </button>
       </div>
     );
   }
@@ -364,81 +377,86 @@ export function SnippetsLibrary({
   // ---- List ---------------------------------------------------------------
   return (
     <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-2xl font-semibold text-[#1f1c19]">🧩 Snippets</p>
-        <div className="flex shrink-0 items-center gap-2">
-          <button
-            type="button"
-            onClick={() => setDraft({ ...EMPTY })}
-            className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
-          >
-            + New
-          </button>
-          {onBack ? (
-            <button
-              type="button"
-              onClick={onBack}
-              aria-label="Close"
-              className="flex h-10 w-10 items-center justify-center rounded-full text-xl text-[#6b635a] hover:bg-[#1e4f4f]/10"
-            >
-              ✕
-            </button>
-          ) : null}
-        </div>
-      </div>
-      <p className="mt-1 text-base text-[#6b635a]">
-        Small reusable building blocks — drop them into emails, posts, or
-        scripts.
-      </p>
+      <LibraryPanelHeader
+        title="Snippets"
+        description="Small reusable content blocks you can use in emails, social posts, newsletters, landing pages, workshops, and more."
+        onClose={closePanel}
+      />
 
-      <button
-        type="button"
-        onClick={suggest}
-        disabled={suggesting}
-        className="mt-3 self-start rounded-xl border border-[#1e4f4f]/30 bg-white/85 px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-white disabled:opacity-50"
-      >
-        {suggesting ? "Thinking…" : "✨ Suggest snippets for my audience"}
-      </button>
-      {sugErr && (
-        <p className="mt-2 text-sm text-[#a85c4a]">
-          Couldn&apos;t suggest just now — try again.
+      <div className="mt-4">
+        <WorkspaceAreaWorksGuide areaId="snippets" />
+        <LibraryHelpText>
+          <li>Choose an audience and tone.</li>
+          <li>Click Generate to create fresh snippet ideas.</li>
+          <li>Save the ones you like for future use.</li>
+          <li>Use them anywhere in your business.</li>
+        </LibraryHelpText>
+      </div>
+
+      <div className="mt-3">
+        <AudienceTypeGenerateBar
+          typeOptions={CONTENT_VOICE_TONES.map((t) => ({
+            value: t.id,
+            label: t.label,
+          }))}
+          typeValue={generateToneId}
+          onTypeChange={(id) => {
+            const toneId = id as ContentVoiceToneId;
+            setGenerateToneId(toneId);
+            setContentToneId(toneId);
+          }}
+          typeLabel="Voice / Tone"
+          typeShowPlaceholder={false}
+          onGenerate={suggest}
+          generating={suggesting}
+          generateLabel="Generate"
+        />
+      </div>
+
+      {sugErr ? (
+        <p className="mt-3 text-sm text-[#a85c4a]">
+          Couldn&apos;t generate just now — try again.
         </p>
-      )}
-      {suggestions.length > 0 && (
-        <div className="companion-fade-in mt-3 rounded-2xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/[0.04] p-3">
+      ) : null}
+
+      {suggestions.length > 0 ? (
+        <div className="companion-fade-in mt-5">
           <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
-            Tuned to your business — tap to save
+            Generated results
           </p>
-          <div className="mt-2 flex flex-col gap-2">
+          <div className="mt-2 flex flex-col gap-3">
             {suggestions.map((s, i) => (
               <div
                 key={i}
-                className="flex items-start justify-between gap-2 rounded-lg border border-[#d4cdc3] bg-white px-3 py-2"
+                className="rounded-xl border border-[#d4cdc3] bg-white px-4 py-3"
               >
-                <span className="min-w-0">
-                  <span className="block text-base text-[#1f1c19]">
-                    {s.content}
-                  </span>
-                  <span className="text-xs font-semibold uppercase tracking-wide text-[#9a8f82]">
-                    {SNIPPET_KIND_LABEL[s.kind]}
-                    {s.tone ? ` · ${s.tone}` : ""}
-                  </span>
-                </span>
-                <button
-                  type="button"
-                  onClick={() => saveSuggestion(s)}
-                  className="shrink-0 rounded-md bg-[#1e4f4f] px-2.5 py-1 text-xs font-semibold text-white hover:bg-[#163a3a]"
-                >
-                  Save
-                </button>
+                <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+                  Snippet · {SNIPPET_KIND_LABEL[s.kind]}
+                </p>
+                <p className="mt-2 whitespace-pre-wrap text-base leading-relaxed text-[#1f1c19]">
+                  {s.content}
+                </p>
+                <LibraryResultActions
+                  onSave={() => saveSuggestion(s)}
+                  onUse={
+                    onBuildWithShari
+                      ? () =>
+                          useSnippetContent(s.content, s.kind, s.whenToUse)
+                      : undefined
+                  }
+                  onDelete={() => dismissSuggestion(s)}
+                />
               </div>
             ))}
           </div>
         </div>
-      )}
+      ) : null}
 
+      <p className="mt-6 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+        Your saved snippets
+      </p>
       <CategoryPickerSelect
-        label="Type"
+        label="Browse by type"
         value={filter}
         onChange={setFilter}
         options={KINDS.map((k) => ({
@@ -446,15 +464,15 @@ export function SnippetsLibrary({
           label: SNIPPET_KIND_LABEL[k],
         }))}
         placeholder="Select a type…"
-        className="mt-4"
+        className="mt-2"
       />
 
-      <div className="mt-5 flex flex-col gap-3">
+      <div className="mt-4 flex flex-col gap-3">
         {visible.length === 0 ? (
           <p className="text-base text-[#6b635a]">
             {filter === NO_CATEGORY
               ? CATEGORY_PICKER_EMPTY_LIST_HINT
-              : "Nothing here yet in this type. Create one, or save a line from the email generator."}
+              : "Nothing saved in this type yet — generate snippets above."}
           </p>
         ) : (
           visible.map((s) => (
@@ -480,6 +498,14 @@ export function SnippetsLibrary({
           ))
         )}
       </div>
+
+      <button
+        type="button"
+        onClick={() => setDraft({ ...EMPTY })}
+        className="mt-4 text-sm font-semibold text-[#1e4f4f] hover:underline"
+      >
+        + Write a snippet by hand
+      </button>
     </div>
   );
 }

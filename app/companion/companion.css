@@ -338,21 +338,200 @@
   animation: companionFadeIn 0.5s ease-out;
 }
 
-/* Visual color modes — shell tint makes dynamic vs meaning-based obvious app-wide */
+/* Visual color modes — design tokens on the app shell */
+[data-visual-mode] {
+  --cm-bg: #faf7f2;
+  --cm-canvas: #faf7f2;
+  --cm-card: #ffffff;
+  --cm-border: #d4cdc3;
+  --cm-accent: #1e4f4f;
+  --cm-accent-contrast: #ffffff;
+  --cm-accent-tint: #e6f0f0;
+  --cm-text: #2d2926;
+  --cm-muted: #6b635a;
+  --cm-nav-active: #1e4f4f;
+  --cm-sidebar-tint: #6e6a66;
+  --cm-header-band: transparent;
+  color: var(--cm-text);
+  background-color: var(--cm-bg);
+  transition:
+    background-color 0.45s ease,
+    color 0.35s ease;
+}
+
+[data-visual-mode="off"] {
+  --cm-bg: #fafaf8;
+  --cm-canvas: #ffffff;
+  --cm-card: #ffffff;
+  --cm-border: #e5e5e0;
+  --cm-accent: #1e4f4f;
+  --cm-accent-tint: #f5f5f4;
+  --cm-muted: #7a736c;
+  --cm-nav-active: #1e4f4f;
+  --cm-sidebar-tint: #6e6a66;
+  --cm-header-band: transparent;
+}
+
+[data-visual-mode="meaning"] {
+  --cm-bg: #f2f7f4;
+  --cm-canvas: #f8fbf9;
+  --cm-card: #ffffff;
+  --cm-border: #c5d9ce;
+  --cm-accent: #1e4f4f;
+  --cm-accent-tint: #e3f0ec;
+  --cm-text: #1a2e28;
+  --cm-muted: #5a6f66;
+  --cm-nav-active: #1e4f4f;
+  --cm-sidebar-tint: #3d5c52;
+  --cm-header-band: rgba(30, 79, 79, 0.16);
+}
+
+[data-visual-mode="decorative"][data-adaptive-context="support"] {
+  --cm-bg: #e8f0f8;
+  --cm-canvas: #f2f7fb;
+  --cm-border: #a8c4e8;
+  --cm-accent: #5b8fc9;
+  --cm-accent-contrast: #ffffff;
+  --cm-accent-tint: #d8e6f4;
+  --cm-text: #2a3d52;
+  --cm-muted: #5a6f85;
+  --cm-nav-active: #4a7fb8;
+  --cm-sidebar-tint: #5a7a9e;
+  --cm-header-band: rgba(91, 143, 201, 0.22);
+}
+
+[data-visual-mode="decorative"][data-adaptive-context="recovery"] {
+  --cm-bg: #f2eff8;
+  --cm-canvas: #f7f5fb;
+  --cm-border: #d0c5e8;
+  --cm-accent: #9b87c4;
+  --cm-accent-contrast: #ffffff;
+  --cm-accent-tint: #e4dcf2;
+  --cm-text: #3d3450;
+  --cm-muted: #6b6080;
+  --cm-nav-active: #8a75b8;
+  --cm-sidebar-tint: #7a6a9e;
+  --cm-header-band: rgba(155, 135, 196, 0.22);
+}
+
+[data-visual-mode="decorative"][data-adaptive-context="focus"] {
+  --cm-bg: #eaf4f4;
+  --cm-canvas: #f2f9f9;
+  --cm-border: #a8d4d4;
+  --cm-accent: #4f9e9e;
+  --cm-accent-contrast: #ffffff;
+  --cm-accent-tint: #d4eaea;
+  --cm-text: #2a4545;
+  --cm-muted: #5a7575;
+  --cm-nav-active: #458f8f;
+  --cm-sidebar-tint: #4a8585;
+  --cm-header-band: rgba(79, 158, 158, 0.22);
+}
+
+[data-visual-mode="decorative"][data-adaptive-context="celebration"] {
+  --cm-bg: #faf5eb;
+  --cm-canvas: #fdf9f2;
+  --cm-border: #e5d4a8;
+  --cm-accent: #c4a05a;
+  --cm-accent-contrast: #3d3018;
+  --cm-accent-tint: #f2e8d4;
+  --cm-text: #3d3018;
+  --cm-muted: #7a6840;
+  --cm-nav-active: #b08e4a;
+  --cm-sidebar-tint: #9a7e45;
+  --cm-header-band: rgba(196, 160, 90, 0.25);
+}
+
+[data-visual-mode="decorative"][data-adaptive-context="planning"] {
+  --cm-bg: #faf0f2;
+  --cm-canvas: #fcf5f6;
+  --cm-border: #e8c4cc;
+  --cm-accent: #c48992;
+  --cm-accent-contrast: #ffffff;
+  --cm-accent-tint: #f2dde1;
+  --cm-text: #4a3238;
+  --cm-muted: #8a6068;
+  --cm-nav-active: #b07882;
+  --cm-sidebar-tint: #a07078;
+  --cm-header-band: rgba(196, 137, 146, 0.22);
+}
+
+.companion-app-sidebar {
+  background: linear-gradient(
+    180deg,
+    var(--cm-sidebar-tint) 0%,
+    #5c5854 100%
+  ) !important;
+}
+
+.companion-nav-active {
+  background: var(--cm-nav-active) !important;
+  color: var(--cm-accent-contrast) !important;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--cm-accent) 40%, transparent);
+}
+
+.companion-top-bar {
+  background: color-mix(in srgb, var(--cm-canvas) 82%, transparent) !important;
+  border-bottom: 3px solid var(--cm-accent);
+}
+
+[data-visual-mode="off"] .companion-app-sidebar {
+  background: #6e6a66 !important;
+}
+
+[data-visual-mode="off"] .companion-top-bar {
+  border-bottom-width: 1px;
+  border-bottom-color: var(--cm-border);
+  background: #ffffff !important;
+}
+
+[data-visual-mode="off"] .companion-nav-active {
+  box-shadow: none;
+}
+
+[data-visual-mode="off"] .companion-panel-surface {
+  border-left-width: 1px;
+}
+
+[data-visual-mode="off"] .workspace-panel-canvas {
+  box-shadow: none !important;
+}
+
+.companion-visual-mode-badge {
+  border-color: var(--cm-accent);
+  background: var(--cm-accent-tint);
+  color: var(--cm-text);
+}
+
+.companion-visual-mode-swatch {
+  background: var(--cm-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--cm-accent) 35%, transparent);
+}
+
+.companion-btn-primary {
+  background: var(--cm-accent) !important;
+  color: var(--cm-accent-contrast) !important;
+}
+
+.companion-btn-primary:hover {
+  filter: brightness(0.92);
+}
+
 [data-visual-mode="decorative"] .identity-bar {
   background: linear-gradient(
     180deg,
-    rgba(126, 184, 218, 0.12) 0%,
-    rgba(244, 239, 231, 0) 100%
+    var(--cm-header-band) 0%,
+    transparent 100%
   );
 }
 
 [data-visual-mode="meaning"] .identity-bar {
   background: linear-gradient(
     180deg,
-    rgba(30, 79, 79, 0.08) 0%,
-    rgba(244, 239, 231, 0) 100%
+    var(--cm-header-band) 0%,
+    transparent 100%
   );
+  box-shadow: inset 0 -1px 0 color-mix(in srgb, var(--cm-accent) 18%, transparent);
 }
 
 [data-visual-mode="off"] .identity-bar {
@@ -360,12 +539,13 @@
 }
 
 [data-visual-mode="decorative"] .input-glass {
-  border-color: rgba(13, 148, 136, 0.35);
-  box-shadow: 0 0 0 1px rgba(13, 148, 136, 0.08);
+  border-color: color-mix(in srgb, var(--cm-accent) 55%, #c9bfb0);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--cm-accent) 12%, transparent);
 }
 
 [data-visual-mode="meaning"] .input-glass {
-  border-color: rgba(30, 79, 79, 0.28);
+  border-color: color-mix(in srgb, var(--cm-accent) 45%, #c9bfb0);
+  border-left-width: 3px;
 }
 
 [data-visual-mode="off"] .input-glass {
@@ -375,35 +555,76 @@
 [data-visual-mode="decorative"] .workspace-panel-canvas {
   background: linear-gradient(
     180deg,
-    rgba(126, 184, 218, 0.1) 0%,
-    #faf7f2 140px
-  );
+    var(--cm-header-band) 0%,
+    var(--cm-canvas) 160px
+  ) !important;
 }
 
 [data-visual-mode="meaning"] .workspace-panel-canvas {
-  background: linear-gradient(
-    180deg,
-    rgba(30, 79, 79, 0.07) 0%,
-    #faf7f2 120px
-  );
-  box-shadow: inset 0 3px 0 rgba(30, 79, 79, 0.12);
+  background: var(--cm-canvas) !important;
+  box-shadow: inset 4px 0 0 var(--cm-accent);
 }
 
 [data-visual-mode="off"] .workspace-panel-canvas {
-  background: #faf7f2;
+  background: var(--cm-canvas) !important;
 }
 
 [data-visual-mode="decorative"] .companion-panel-surface {
-  border-color: rgba(126, 184, 218, 0.22);
+  border-color: color-mix(in srgb, var(--cm-accent) 35%, var(--cm-border));
+  background: color-mix(in srgb, var(--cm-card) 92%, var(--cm-accent-tint));
+}
+
+[data-visual-mode="decorative"] .companion-split-layout {
+  background: var(--cm-canvas);
+}
+
+[data-visual-mode="decorative"] .companion-split-chat-pane {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--cm-accent-tint) 55%, var(--cm-canvas)) 0%,
+    var(--cm-canvas) 200px
+  );
+}
+
+[data-visual-mode="decorative"] .companion-split-workspace-pane {
+  background: var(--cm-canvas);
+}
+
+[data-visual-mode="decorative"] .companion-top-bar {
+  border-bottom-width: 2px;
+  background: color-mix(in srgb, var(--cm-canvas) 90%, var(--cm-accent-tint)) !important;
+}
+
+[data-visual-mode="decorative"] .companion-app-sidebar {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--cm-sidebar-tint) 65%, #5c5854) 0%,
+    #5c5854 100%
+  ) !important;
+}
+
+[data-visual-mode="decorative"] .companion-nav-active {
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--cm-accent) 28%, transparent);
 }
 
 [data-visual-mode="meaning"] .companion-panel-surface {
-  border-color: rgba(30, 79, 79, 0.18);
+  border-color: color-mix(in srgb, var(--cm-accent) 28%, var(--cm-border));
+  border-left-width: 3px;
 }
 
 [data-visual-mode="off"] .companion-panel-surface {
-  border-color: rgba(212, 205, 195, 0.9);
+  border-color: var(--cm-border);
 }
+
+/* Plan My Day — view-specific shells */
+[data-plan-view="visual-focus"] .plan-day-view-surface {
+  background: #faf7f2;
+}
+
+[data-plan-view="timeline"] .plan-day-timeline-rail {
+  border-left: 3px solid var(--cm-accent);
+}
+
 
 /* Split workspace proportions — driven by --companion-chat-flex / --companion-workspace-flex */
 .companion-split-layout {

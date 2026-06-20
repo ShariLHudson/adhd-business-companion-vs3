@@ -22,7 +22,7 @@ describe("collaborativeDrafting", () => {
       itemType: "Social Post",
       userText: "anecdote for my social media post",
     });
-    expect(title).toBe("Social Media Post");
+    expect(title).toBe("Social Media Content");
   });
 
   it("merges fragments under section headings", () => {

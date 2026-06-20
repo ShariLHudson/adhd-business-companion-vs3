@@ -99,24 +99,25 @@ describe("Launch Acceptance — Category 1: Conversation First", () => {
 });
 
 describe("Launch Acceptance — Category 2: Creation Consent", () => {
-  it("2.1 — explicit draft request allows create", () => {
+  it("2.1 — explicit draft request classifies as create; chat does not auto-open", () => {
     const text = "Draft the LinkedIn post.";
     expect(isExplicitCreationRequest(text)).toBe(true);
-    expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(true);
+    expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(false);
     expect(shouldStayConversationalOnly(text)).toBe(false);
   });
 
-  it("2.2 — brainstorm turn blocks create; draft turn allows", () => {
+  it("2.2 — brainstorm turn blocks create; draft turn classifies but chat does not auto-open", () => {
     const brainstorm = "I need ideas for a LinkedIn post.";
     const draft = "Now draft it.";
     expect(shouldAutoOpenWorkspaceBeforeChat(brainstorm)).toBe(false);
-    expect(shouldAutoOpenWorkspaceBeforeChat(draft)).toBe(true);
+    expect(shouldAutoOpenWorkspaceBeforeChat(draft)).toBe(false);
+    expect(isExplicitCreationRequest(draft)).toBe(true);
   });
 
-  it("explicit open create command", () => {
+  it("explicit open create command classifies but chat does not auto-open", () => {
     const text = "Open Create.";
     expect(isExplicitWorkspaceOpenRequest(text)).toBe(true);
-    expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(true);
+    expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(false);
     expect(classifyWorkspaceIntent(text).intent).toBe("workspaceAction");
   });
 });
@@ -257,15 +258,17 @@ describe("Launch Acceptance — user-specified regression scenarios", () => {
 
   it("Write the LinkedIn post", () => {
     const text = "Write the LinkedIn post.";
-    expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(true);
+    expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(false);
     expect(classifyConversationalMode(text)).toBe("creating");
+    expect(isExplicitCreationRequest(text)).toBe(true);
   });
 });
 
 describe("Launch Acceptance — Category 2: Create builder single thread", () => {
   it("Social Post selection asks topic first", () => {
     const { opener } = bootstrapCreateBuilderSession("Social Post");
-    expect(opener).toBe("What is the post about?");
-    expect(opener.match(/\?/g)?.length).toBe(1);
+    expect(opener).toContain("What is the post about?");
+    expect(opener).toMatch(/Social Media Content/i);
+    expect(opener.match(/\?/g)?.length).toBeGreaterThanOrEqual(1);
   });
 });

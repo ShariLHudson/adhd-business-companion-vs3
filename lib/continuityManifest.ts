@@ -21,7 +21,7 @@ import {
 import type { CreateWorkflowRecord } from "./createWorkflowRecord";
 import { shouldPersistWorkflowRecord } from "./createWorkflowRecord";
 import { userFacingCreateTypeLabel } from "./createTypePickers";
-import { getActiveSavedWork } from "./savedWorkStore";
+import { getActiveSavedWork, getSavedWorkById } from "./savedWorkStore";
 import { getCurrentSopStep, getScopedSteps, getWorkflow } from "./workspaceSop";
 import {
   loadWorkspaceSession,
@@ -104,6 +104,7 @@ function createWorkflowItem(record: CreateWorkflowRecord): ContinuityManifestIte
       ? userFacingCreateTypeLabel(record.itemType) ?? record.itemType
       : "Create draft");
 
+  let location = "Create (draft in progress)";
   let nextStep = "Continue your draft";
   if (!record.draftContent?.trim()) {
     if (!record.itemType) nextStep = "Choose what to create";
@@ -112,6 +113,25 @@ function createWorkflowItem(record: CreateWorkflowRecord): ContinuityManifestIte
     } else {
       nextStep = "Build your draft";
     }
+  } else {
+    const session = loadCreateSession();
+    const savedId = session?.savedArtifact?.savedWorkId;
+    const savedItem = savedId ? getSavedWorkById(savedId) : undefined;
+    if (savedItem) {
+      location = savedItem.savedLocation;
+      nextStep = "Open from My Work";
+    } else {
+      const match = getActiveSavedWork().find(
+        (w) =>
+          w.body.trim() === record.draftContent?.trim() &&
+          (!record.itemType ||
+            w.artifactType.toLowerCase() === record.itemType.toLowerCase()),
+      );
+      if (match) {
+        location = match.savedLocation;
+        nextStep = "Open from My Work";
+      }
+    }
   }
 
   return {
@@ -119,7 +139,7 @@ function createWorkflowItem(record: CreateWorkflowRecord): ContinuityManifestIte
     title,
     type: "create-draft",
     lastTouchedAt: record.lastUpdated,
-    location: "Create (draft in progress)",
+    location,
     storageKey: CONTINUITY_STORAGE_KEYS.createWorkflow,
     resumeAction: "restore-create",
     nextStep,
@@ -146,7 +166,9 @@ function createSessionItem(): ContinuityManifestItem | null {
     title,
     type: "create-draft",
     lastTouchedAt: session.updatedAt,
-    location: "Create (saved session)",
+    location:
+      session.savedArtifact?.savedLocationDetail ??
+      (draft ? "Create (saved session)" : "Create"),
     storageKey: CONTINUITY_STORAGE_KEYS.createSession,
     resumeAction: "restore-create",
     nextStep: draft ? "Continue your draft" : "Choose what to create",
@@ -328,7 +350,9 @@ function savedWorkItems(): ContinuityManifestItem[] {
     storageKey: CONTINUITY_STORAGE_KEYS.savedWork,
     resumeAction: "open-saved-work" as const,
     nextStep:
-      w.status === "draft" ? "Continue editing in Saved Work" : "Open in Saved Work",
+      w.status === "draft"
+        ? "Continue editing in My Work"
+        : "Open in My Work",
   }));
 }
 

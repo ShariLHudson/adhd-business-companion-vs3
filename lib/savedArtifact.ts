@@ -253,7 +253,7 @@ export function recordFromSavedWork(item: SavedWorkItem): SavedArtifactRecord {
         : item.status === "saved"
           ? "saved"
           : "draft",
-    savedLocation: "Saved Work",
+    savedLocation: "My Work",
     savedLocationDetail: item.savedLocation,
     savedWorkId: item.id,
     projectId: item.projectId,
@@ -284,8 +284,8 @@ export function recordAfterSavedWorkSave(
     artifactType,
     artifactTitle,
     savedStatus: "saved",
-    savedLocation: "Saved Work",
-    savedLocationDetail: savedWorkLocationLabel(folder),
+    savedLocation: "My Work",
+    savedLocationDetail: savedWorkLocationLabel(folder, artifactTitle),
     savedWorkId,
     projectId: prev?.projectId,
     projectName: prev?.projectName,

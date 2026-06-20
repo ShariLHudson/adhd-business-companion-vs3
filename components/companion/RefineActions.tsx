@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { businessContextSummary } from "@/lib/companionStore";
+import { buildGenerationContextWithBusiness } from "@/lib/contentAudience";
 
 // The editing / help layer. Drop it under any editable text: refine, rewrite,
 // simplify, or break it down. The result previews first — nothing changes until
@@ -40,7 +40,7 @@ export function RefineActions({
         body: JSON.stringify({
           text,
           action,
-          context: businessContextSummary(),
+          context: buildGenerationContextWithBusiness(),
         }),
       });
       const data = await res.json();

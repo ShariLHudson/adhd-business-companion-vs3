@@ -9,6 +9,7 @@ import {
   type FocusHubTool,
   type FocusHubToolGroup,
 } from "@/lib/focusHub";
+import { initialSectionOpen } from "@/lib/expandableUi";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
@@ -92,7 +93,9 @@ function ToolGroupSection({
   recommendedId?: string;
   onSelect: (action: FocusHubAction) => void;
 }) {
-  const [open, setOpen] = useState(group.defaultOpen ?? !group.collapsible);
+  const [open, setOpen] = useState(
+    group.collapsible ? initialSectionOpen() : true,
+  );
 
   const toolList = (
     <ul className="flex flex-col gap-1.5">

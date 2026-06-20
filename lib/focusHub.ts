@@ -77,7 +77,7 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
       "clear-my-mind",
       "Clear My Mind",
       { kind: "section", section: "brain-dump", toolId: "clear-my-mind" },
-      "Capture, sort, and find what matters.",
+      "Get thoughts out of your head — capture, sort, then pick how to view.",
     ),
     groups: [
       {
@@ -88,7 +88,7 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
             "clear-my-mind",
             "Clear My Mind",
             { kind: "section", section: "brain-dump", toolId: "clear-my-mind" },
-            "Capture, sort, and find what matters.",
+            "Get thoughts out of your head — capture, sort, then pick how to view.",
           ),
           tool(
             "decision-compass-crowded",
@@ -99,12 +99,6 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
               toolId: "decision-compass-crowded",
             },
             "Work through competing options and priorities.",
-          ),
-          tool(
-            "mind-map",
-            "Mind Map My Thoughts",
-            { kind: "section", section: "brain-dump", toolId: "mind-map" },
-            "See connections visually.",
           ),
         ],
       },
@@ -163,7 +157,7 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
         id: "work-start",
         title: "Most People Start Here",
         collapsible: true,
-        defaultOpen: true,
+        defaultOpen: false,
         tools: [
           tool(
             "continue-active-project",
@@ -269,7 +263,7 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
         id: "break-start",
         title: "Most People Start Here",
         collapsible: true,
-        defaultOpen: true,
+        defaultOpen: false,
         tools: [
           tool(
             "breathe-reset",

@@ -6,6 +6,7 @@
  */
 
 import type { AppSection } from "./companionUi";
+import { isChatConversationOnlyMode } from "./chatConversationOnly";
 import { isHelpSeekingAnswer } from "./builderContentSync";
 import { isInformationIntent } from "./companionIntentRouting";
 import { isExplicitWorkspaceOpenRequest } from "./conversationGating";
@@ -427,6 +428,7 @@ const EXPLICIT_WRITE_IT_RE =
  * Companion speaks first for everything else (brainstorm, prioritize, vague create, asset discovery).
  */
 export function shouldAutoOpenWorkspaceBeforeChat(text: string): boolean {
+  if (isChatConversationOnlyMode()) return false;
   const t = text.trim();
   if (!t) return false;
   if (isInformationIntent(t)) return false;

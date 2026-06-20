@@ -216,10 +216,10 @@ describe("messageClassification — companion speaks before workspace (P0)", () 
     expect(classifyWorkspaceIntent(text).intent).toBe("conversation");
   });
 
-  it("write the LinkedIn post — explicit create allowed before chat", () => {
+  it("write the LinkedIn post — explicit create intent, chat does not auto-open", () => {
     const text = "Write the LinkedIn post.";
     expect(isExplicitCreationRequest(text)).toBe(true);
-    expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(true);
+    expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(false);
     expect(shouldStayConversationalOnly(text)).toBe(false);
     expect(classifyConversationalMode(text)).toBe("creating");
   });
@@ -236,9 +236,9 @@ describe("messageClassification — companion speaks before workspace (P0)", () 
     expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(false);
   });
 
-  it("open create — explicit workspace command allowed", () => {
+  it("open create — explicit command detected but chat does not auto-open", () => {
     const text = "Open Create.";
-    expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(true);
+    expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(false);
     expect(isExplicitWorkspaceOpenRequest(text)).toBe(true);
     expect(classifyWorkspaceIntent(text).intent).toBe("workspaceAction");
   });

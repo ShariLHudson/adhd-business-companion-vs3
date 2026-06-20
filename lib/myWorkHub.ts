@@ -251,7 +251,7 @@ function savedWorkToItem(w: SavedWorkItem): MyWorkHubItem {
         ? "Continue editing"
         : w.projectId
           ? `In ${w.projectName ?? "project"}`
-          : "Open in Saved Work",
+          : "Open in My Work",
     projectId: w.projectId,
     projectName: w.projectName,
     savedWorkId: w.id,

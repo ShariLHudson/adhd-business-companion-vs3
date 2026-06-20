@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { businessContextSummary } from "@/lib/companionStore";
+import { buildGenerationContextWithBusiness } from "@/lib/contentAudience";
 import {
   DRAFT_EDIT_EXAMPLES,
   DRAFT_QUICK_EDITS,
@@ -45,7 +45,7 @@ export function CreateDraftImprove({
           text: draft,
           action: "modify",
           instruction: trimmed,
-          context: businessContextSummary(),
+          context: buildGenerationContextWithBusiness(),
         }),
       });
       const data = await res.json();

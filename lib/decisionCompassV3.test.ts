@@ -174,7 +174,7 @@ describe("Decision Compass V3", () => {
     const saved = getSavedWork().find((w) => w.id === itemId);
     expect(saved).toBeDefined();
     expect(saved?.projectId).toBe("proj-1");
-    expect(location).toMatch(/Saved Work/);
+    expect(location).toMatch(/My Work/);
     expect(buildDecisionSaveBody(session)).toMatch(/Hire a salesperson/i);
   });
 

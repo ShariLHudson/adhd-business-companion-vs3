@@ -8,6 +8,10 @@ import type { AppSection } from "./companionUi";
 import { supportsWorkspace } from "./workspaceMode";
 import { workspaceTitle } from "./workspaceMode";
 import type { WorkspaceOffer } from "./workspaceMode";
+import {
+  conversationOnlyFirstWorkflowHint,
+  isChatConversationOnlyMode,
+} from "./chatConversationOnly";
 
 export type CompanionFirstTarget = {
   section: AppSection;
@@ -147,7 +151,6 @@ const FEATURE_ID_TO_SECTION: Partial<
   "focus-audio": { section: "focus-audio" },
   "time-block": { section: "time-block" },
   "momentum-games": { section: "games" },
-  "help-me-right-now": { section: "activities" },
   snippets: { section: "snippets" },
 };
 
@@ -248,7 +251,7 @@ export function usesSplitWalkthrough(target: CompanionFirstTarget): boolean {
     target.section === "breathe" ||
     target.section === "focus-timer" ||
     target.section === "focus-audio" ||
-    target.section === "activities" ||
+    target.section === "focus" ||
     target.section === "games"
   );
 }
@@ -257,6 +260,26 @@ export function companionFirstWorkflowHintForChat(
   text: string,
   activePanel: AppSection | null,
 ): string {
+  if (isChatConversationOnlyMode()) {
+    const parts = [conversationOnlyFirstWorkflowHint()];
+    const target = detectCompanionFirstTarget(text);
+    if (target) {
+      parts.push(
+        `THIS TURN: User asked about **${target.label}**.`,
+        `1. Reply with ONLY: "${target.briefAnswer}"`,
+        `2. Tell them where to open it in the app (e.g. sidebar, workspace button) — do NOT offer to open from chat.`,
+        activePanel === target.section
+          ? `3. **${target.label}** is already open — discuss it; do not write into the panel from chat.`
+          : `3. They use UI buttons when ready — you help them decide.`,
+      );
+    } else if (isCompanionFirstQuestion(text)) {
+      parts.push(
+        "THIS TURN: Brief answer, then name the workspace or button path — do not open from chat.",
+      );
+    }
+    return parts.join("\n");
+  }
+
   const target = detectCompanionFirstTarget(text);
   const parts = [COMPANION_FIRST_CORE_RULE, COMPANION_FIRST_UNIVERSAL_RULES];
 

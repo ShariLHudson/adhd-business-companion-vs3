@@ -2358,6 +2358,19 @@ export type Prefs = {
   timeBlockAlerts: boolean;
   desktopNotifications: boolean;
   visualMode: VisualMode;
+  defaultPlanningView?:
+    | "list"
+    | "timeline"
+    | "cards"
+    | "kanban"
+    | "visual-focus";
+  /** Last view the user picked in Plan My Day — wins over default until changed. */
+  lastPlanningView?:
+    | "list"
+    | "timeline"
+    | "cards"
+    | "kanban"
+    | "visual-focus";
   patternAwareness: PatternAwareness;
   plan: Plan;
   activeAvatarId: string; // the client avatar currently "in use" app-wide

@@ -59,6 +59,8 @@ Would you like me to add these to the avatar?`;
     expect(isBuilderApprovalPhrase("They struggle with focus and time management daily")).toBe(
       false,
     );
+    expect(isBuilderApprovalPhrase("Done beats perfect")).toBe(false);
+    expect(isBuilderApprovalPhrase("Stop waiting for perfect")).toBe(false);
   });
 
   it("extracts bullet list from assistant message", () => {

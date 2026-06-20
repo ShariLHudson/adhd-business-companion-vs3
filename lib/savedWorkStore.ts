@@ -24,6 +24,8 @@ export type SavedWorkItem = {
 
 const STORAGE_KEY = "companion-saved-work-v1";
 
+export const SAVED_WORK_UPDATED_EVENT = "companion-saved-work-updated";
+
 function newId(): string {
   return `sw-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -51,6 +53,7 @@ function writeAll(list: SavedWorkItem[]) {
   if (typeof window === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    window.dispatchEvent(new Event(SAVED_WORK_UPDATED_EVENT));
   } catch {
     /* noop */
   }
@@ -78,8 +81,15 @@ export function savedWorkTypeFolder(artifactType: string): string {
   return "Documents";
 }
 
-export function savedWorkLocationLabel(typeFolder: string): string {
-  return `Saved Work > ${typeFolder}`;
+export function savedWorkLocationLabel(
+  typeFolder: string,
+  title?: string | null,
+): string {
+  const folder = typeFolder.trim() || "Documents";
+  const name = title?.trim();
+  return name
+    ? `My Work > ${folder} > ${name}`
+    : `My Work > ${folder}`;
 }
 
 export function getSavedWork(): SavedWorkItem[] {
@@ -111,14 +121,15 @@ export function createSavedWork(input: {
   const body = input.body.trim();
   const now = new Date().toISOString();
   const typeFolder = savedWorkTypeFolder(input.artifactType);
+  const title = input.title.trim() || "Untitled";
   const item: SavedWorkItem = {
     id: newId(),
-    title: input.title.trim() || "Untitled",
+    title,
     artifactType: input.artifactType,
     body,
     status: input.status ?? "saved",
     typeFolder,
-    savedLocation: savedWorkLocationLabel(typeFolder),
+    savedLocation: savedWorkLocationLabel(typeFolder, title),
     preview: body.slice(0, 240),
     tags: input.tags ?? [],
     sourceWorkspace: input.sourceWorkspace ?? "content-generator",
@@ -153,11 +164,12 @@ export function updateSavedWork(
       ? savedWorkTypeFolder(changes.artifactType)
       : w.typeFolder;
     const body = changes.body ?? w.body;
+    const title = changes.title ?? w.title;
     updated = {
       ...w,
       ...changes,
       typeFolder,
-      savedLocation: savedWorkLocationLabel(typeFolder),
+      savedLocation: savedWorkLocationLabel(typeFolder, title),
       preview: (changes.body ?? w.body).slice(0, 240),
       updatedAt: new Date().toISOString(),
     };

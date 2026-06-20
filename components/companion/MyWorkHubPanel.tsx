@@ -12,6 +12,9 @@ import {
   type MyWorkHubProjectRow,
 } from "@/lib/myWorkHub";
 import { continuityToHomeResume } from "@/lib/myWorkHubResume";
+import { SAVED_WORK_UPDATED_EVENT } from "@/lib/savedWorkStore";
+import { initialSectionOpen } from "@/lib/expandableUi";
+import { useCategoryColorCoding } from "@/lib/useCategoryColorCoding";
 import { projectFileCategoryLabel } from "@/lib/projectFiles";
 import { SavedWorkLibrary } from "@/components/companion/SavedWorkLibrary";
 import {
@@ -44,7 +47,6 @@ function HubSection({
   title,
   subtitle,
   count,
-  defaultOpen = false,
   accent,
   children,
 }: {
@@ -52,11 +54,10 @@ function HubSection({
   title: string;
   subtitle?: string;
   count?: number;
-  defaultOpen?: boolean;
   accent?: string;
   children: React.ReactNode;
 }) {
-  const [open, setOpen] = useState(defaultOpen);
+  const [open, setOpen] = useState(initialSectionOpen);
 
   return (
     <section
@@ -83,8 +84,8 @@ function HubSection({
             <p className="mt-0.5 text-xs text-[#6b635a]">{subtitle}</p>
           ) : null}
         </div>
-        <span className="mt-0.5 text-[#9a9289]" aria-hidden="true">
-          {open ? "▾" : "▸"}
+        <span className="text-sm text-[#6b635a]" aria-hidden>
+          {open ? "▼" : "▶"}
         </span>
       </button>
       {open ? (
@@ -194,17 +195,25 @@ export function MyWorkHubPanel({
 }: MyWorkHubPanelProps) {
   const [query, setQuery] = useState("");
   const [googleConnected, setGoogleConnected] = useState<boolean | null>(null);
+  const [savedWorkTick, setSavedWorkTick] = useState(0);
+  const colorCoding = useCategoryColorCoding();
 
   const hub = useMemo(
     () => buildMyWorkHub(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [refreshKey],
+    [refreshKey, savedWorkTick],
   );
 
   const searchGroups = useMemo(
     () => (query.trim() ? searchMyWorkHub(query, hub) : []),
     [query, hub],
   );
+
+  useEffect(() => {
+    const onUpdate = () => setSavedWorkTick((t) => t + 1);
+    window.addEventListener(SAVED_WORK_UPDATED_EVENT, onUpdate);
+    return () => window.removeEventListener(SAVED_WORK_UPDATED_EVENT, onUpdate);
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -335,8 +344,7 @@ export function MyWorkHubPanel({
               title="Continue Working"
               subtitle="Pick up where you left off"
               count={hub.continueWorking.length}
-              defaultOpen
-              accent="#c5e0e0"
+              accent={colorCoding ? "#c5e0e0" : undefined}
             >
               {hub.continueWorking.length === 0 ? (
                 <p className="text-sm text-[#6b635a]">
@@ -362,7 +370,6 @@ export function MyWorkHubPanel({
               title="Active Projects"
               subtitle="Active focus · In progress · Paused"
               count={allProjects.length}
-              defaultOpen={allProjects.length > 0}
             >
               {allProjects.length === 0 ? (
                 <p className="text-sm text-[#6b635a]">
@@ -618,8 +625,7 @@ export function MyWorkHubPanel({
               id="wins"
               title="Wins This Week"
               subtitle="Encouragement and progress — not on Today"
-              defaultOpen={false}
-              accent="#e8dfd0"
+              accent={colorCoding ? "#e8dfd0" : undefined}
             >
               {hub.momentum.length === 0 ? (
                 <p className="text-sm text-[#6b635a]">

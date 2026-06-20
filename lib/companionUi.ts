@@ -32,6 +32,7 @@ export type AppSection =
   | "how-do-i"
   | "decision-compass"
   | "today"
+  | "plan-my-day"
   | "wins-this-week";
 
 export type SidebarNavId =
@@ -137,7 +138,7 @@ export const SIDEBAR_TOOLS: {
 }[] = [
   { id: "brain-dump", label: "Clear My Mind", emoji: "🧠" },
   { id: "focus-timer", label: "Pomodoro", emoji: "⏱" },
-  { id: "reset-day", label: "Fresh Start", emoji: "🔄" },
+  { id: "reset-day", label: "Clear Today's Context", emoji: "🧹" },
   { id: "breathe", label: "Breathe", emoji: "🌬" },
   { id: "voice", label: "Voice", emoji: "🎤" },
 ];

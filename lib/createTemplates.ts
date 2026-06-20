@@ -6,6 +6,7 @@ import { sortDropdownLabels } from "./dropdownSort";
 import type { CreateWorkflowState } from "./createWorkflow";
 import { buildBriefFromDiscovery, resolvedTypeLabel } from "./createWorkflow";
 import { outlineSectionBriefLines } from "./createSectionDiscovery";
+import { buildWorkspaceV2Brief, CREATE_WORKSPACE_V2 } from "./createWorkspaceV2";
 import { effectiveSubtypeLabel, OTHER_OPTION } from "./createTypePickers";
 
 export type CreateTemplateSection = { id: string; label: string };
@@ -90,6 +91,61 @@ const PROPOSAL_SECTIONS: CreateTemplateSection[] = [
   section("investment", "Investment"),
 ];
 
+const MARKETING_PLAN_SECTIONS: CreateTemplateSection[] = [
+  section("audience", "Audience"),
+  section("positioning", "Positioning"),
+  section("channels", "Channels & Tactics"),
+  section("content", "Content Plan"),
+  section("metrics", "Goals & Metrics"),
+];
+
+const LEAD_MAGNET_SECTIONS: CreateTemplateSection[] = [
+  section("audience", "Who is it for?"),
+  section("problem", "Problem"),
+  section("outcome", "Desired Outcome"),
+  section("promotion", "Promotion"),
+  section("format", "Format"),
+  section("promise", "Promise"),
+  section("outline", "Outline"),
+  section("cta", "Delivery & CTA"),
+];
+
+const LANDING_PAGE_SECTIONS: CreateTemplateSection[] = [
+  section("headline", "Headline"),
+  section("problem", "Problem"),
+  section("solution", "Solution"),
+  section("proof", "Proof"),
+  section("cta", "Call to Action"),
+];
+
+const FUNNEL_SECTIONS: CreateTemplateSection[] = [
+  section("offer", "Offer"),
+  section("entry", "Entry Point"),
+  section("nurture", "Nurture"),
+  section("conversion", "Conversion"),
+];
+
+const EMAIL_SEQUENCE_SECTIONS: CreateTemplateSection[] = [
+  section("goal", "Sequence Goal"),
+  section("arc", "Email Arc"),
+  section("emails", "Email Summaries"),
+  section("cta", "Primary CTA"),
+];
+
+const COURSE_OUTLINE_SECTIONS: CreateTemplateSection[] = [
+  section("audience", "Audience"),
+  section("transformation", "Transformation"),
+  section("modules", "Modules"),
+  section("delivery", "Delivery Format"),
+];
+
+const CLIENT_ONBOARDING_SECTIONS: CreateTemplateSection[] = [
+  section("welcome", "Welcome"),
+  section("kickoff", "Kickoff Steps"),
+  section("deliverables", "First-Week Deliverables"),
+  section("communication", "Communication"),
+];
+
 const GENERIC_SECTIONS: CreateTemplateSection[] = [
   section("intro", "Introduction"),
   section("main", "Main Content"),
@@ -158,6 +214,48 @@ const PRESET_TEMPLATES: CreateTemplatePreset[] = [
     name: "Default Proposal Template",
     itemType: "Proposal",
     sections: [...PROPOSAL_SECTIONS],
+  },
+  {
+    id: "marketing-plan-default",
+    name: "Default Marketing Plan Template",
+    itemType: "Marketing Plan",
+    sections: [...MARKETING_PLAN_SECTIONS],
+  },
+  {
+    id: "lead-magnet-default",
+    name: "Default Lead Magnet Template",
+    itemType: "Lead Magnet",
+    sections: [...LEAD_MAGNET_SECTIONS],
+  },
+  {
+    id: "landing-page-default",
+    name: "Default Landing Page Template",
+    itemType: "Landing Page",
+    sections: [...LANDING_PAGE_SECTIONS],
+  },
+  {
+    id: "funnel-default",
+    name: "Default Sales Funnel Template",
+    itemType: "Sales Funnel",
+    sections: [...FUNNEL_SECTIONS],
+  },
+  {
+    id: "email-sequence-default",
+    name: "Default Email Sequence Template",
+    itemType: "Email Sequence",
+    sections: [...EMAIL_SEQUENCE_SECTIONS],
+  },
+  {
+    id: "course-outline-default",
+    name: "Default Course Outline Template",
+    itemType: "Course Outline",
+    sections: [...COURSE_OUTLINE_SECTIONS],
+  },
+  {
+    id: "client-onboarding-default",
+    name: "Default Client Onboarding Template",
+    itemType: "Client Onboarding",
+    sections: [...CLIENT_ONBOARDING_SECTIONS],
   },
   {
     id: "generic-default",
@@ -446,6 +544,12 @@ export function newSectionId(): string {
 }
 
 export function buildFullCreateBrief(state: CreateWorkflowState): string {
+  if (CREATE_WORKSPACE_V2 && state.workspaceFirst && state.useTemplate) {
+    const workspaceBrief = buildWorkspaceV2Brief(state);
+    if (workspaceBrief.trim()) {
+      return buildGenerationBrief(state, workspaceBrief);
+    }
+  }
   const typeLabel = resolvedTypeLabel(state);
   const subtype = effectiveSubtypeLabel(
     state.selectedSubtype,

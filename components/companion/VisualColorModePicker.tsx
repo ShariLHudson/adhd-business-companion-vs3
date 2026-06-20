@@ -7,6 +7,7 @@ import {
   MEANING_CATEGORY_SWATCHES,
   VISUAL_COLOR_OPTIONS,
 } from "@/lib/visualColorModes";
+import { activeColorModeProofLabel } from "@/lib/visualColorCoding";
 
 const CARD =
   "w-full rounded-2xl border bg-white/90 p-4 text-left transition-colors";
@@ -36,7 +37,7 @@ function DynamicPreview() {
         style={{ backgroundColor: active.tint }}
       >
         <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-          Adaptive · shifts with your situation
+          Adaptive · soft rainbow
         </p>
         <p
           className="mt-2 text-lg font-semibold transition-colors duration-500"
@@ -58,7 +59,7 @@ function DynamicPreview() {
           </p>
         </div>
       </div>
-      <div className="grid grid-cols-5 gap-1 border-t border-[#e7dfd4] bg-white p-2">
+      <div className="grid grid-cols-4 gap-1 border-t border-[#e7dfd4] bg-white p-2 sm:grid-cols-7">
         {DYNAMIC_MODE_SWATCHES.map((m, i) => (
           <button
             key={m.id}
@@ -165,6 +166,14 @@ export function VisualColorModePicker({ current, onSave }: Props) {
 
   return (
     <div className="mt-4 flex flex-col gap-4">
+      <p
+        className="rounded-xl border border-dashed border-[#c9bfb0] bg-white px-4 py-2.5 text-sm font-semibold text-[#1f1c19]"
+        role="status"
+        aria-live="polite"
+      >
+        {activeColorModeProofLabel(current)}
+      </p>
+
       <details className="rounded-xl border border-[#d4cdc3] bg-white/70 px-4 py-3">
         <summary className="cursor-pointer text-sm font-semibold text-[#1f1c19] hover:text-[#1e4f4f]">
           ▼ What do these color modes do?
@@ -250,7 +259,7 @@ export function VisualColorModePicker({ current, onSave }: Props) {
           className="companion-fade-in text-center text-sm font-semibold text-[#1e4f4f]"
           role="status"
         >
-          ✓ Appearance updated
+          ✓ Appearance updated — {activeColorModeProofLabel(draft)}
         </p>
       ) : null}
 

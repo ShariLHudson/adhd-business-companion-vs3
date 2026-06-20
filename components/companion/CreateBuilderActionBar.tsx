@@ -27,7 +27,7 @@ export function CreateBuilderActionBar({
             disabled={disabled}
             onClick={() => onAction(action)}
             className={`rounded-full px-3 py-1.5 text-sm font-semibold transition-colors disabled:opacity-50 ${
-              action.id === "create-draft"
+              action.id === "create-draft" || action.id === "use-this"
                 ? "bg-[#1e4f4f] text-white hover:bg-[#163a3a]"
                 : "border border-[#1e4f4f]/30 bg-white text-[#1e4f4f] hover:bg-[#1e4f4f]/8"
             }`}

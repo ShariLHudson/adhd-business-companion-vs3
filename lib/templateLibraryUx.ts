@@ -116,3 +116,31 @@ export function sortedTemplateDropdownOptions(
 export function templatesForDefaultPicker(items: TemplateItem[]): TemplateItem[] {
   return items.filter((t) => t.status !== "archived");
 }
+
+/** Split template body into labeled sections for display (Hook, Story, CTA, etc.). */
+export function parseFrameworkSections(
+  body: string,
+): { label: string; content: string }[] {
+  const trimmed = body.trim();
+  if (!trimmed) return [];
+
+  const blocks = trimmed.split(/\n{2,}/);
+  const sections: { label: string; content: string }[] = [];
+
+  for (const block of blocks) {
+    const lines = block.split("\n");
+    const first = lines[0]?.trim() ?? "";
+    const rest = lines.slice(1).join("\n").trim();
+    const headerMatch = /^([A-Za-z][A-Za-z0-9 /&-]{0,48}):?\s*$/.exec(first);
+    if (headerMatch && (rest || lines.length === 1)) {
+      sections.push({
+        label: headerMatch[1]!.trim(),
+        content: rest || "…",
+      });
+    } else {
+      sections.push({ label: "Outline", content: block.trim() });
+    }
+  }
+
+  return sections.length > 0 ? sections : [{ label: "Framework", content: trimmed }];
+}

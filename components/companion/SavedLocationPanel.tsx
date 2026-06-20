@@ -29,7 +29,7 @@ export function SavedLocationPanel({
   return (
     <div className="mt-3 rounded-xl border border-[#1e4f4f]/20 bg-white/90 p-4">
       <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-        Saved location
+        Saved to
       </p>
       <dl className="mt-2 space-y-1.5 text-sm text-[#2d2926]">
         <div className="flex gap-2">

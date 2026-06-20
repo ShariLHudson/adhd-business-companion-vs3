@@ -10,7 +10,23 @@ const BUILDER_APPROVAL_EXACT_RE =
   /^(?:yes|yes please|yep|yeah|yup|ok|okay|sure|sounds good|works for me|perfect|i like it|that'?s good|that'?s fine|that works|looks good|correct|right|good|that one|use that|let'?s do it|please do|go ahead|these are good|those are good|that'?s right|use those|use these|save that|add them|add this|put that in)\.?$/i;
 
 const BUILDER_APPROVAL_LOOSE_RE =
-  /\b(?:yes please|looks good|these are good|those are good|that'?s right|use those|use these|save that|use this|i like that one|i like this one|that one works|go with that|sounds good|perfect|add them|add this|put that in|i like (?:it|them|those)|that works)\b/i;
+  /\b(?:yes please|looks good|these are good|those are good|that'?s right|use those|use these|save that|use this|i like that one|i like this one|that one works|go with that|sounds good|add them|add this|put that in|i like (?:it|them|those)|that works)\b/i;
+
+/** Multi-word replies with approval-adjacent words are usually field content, not acceptance. */
+function isSubstantiveBuilderReply(text: string): boolean {
+  const t = text.trim();
+  if (
+    /^(?:i like (?:it|that one|this one|them|those)|that sounds good|that works|looks good|sounds good|these are good|those are good)\.?\s*$/i.test(
+      t,
+    )
+  ) {
+    return false;
+  }
+  const words = t.split(/\s+/).filter(Boolean);
+  if (words.length >= 4) return true;
+  if (words.length < 3) return false;
+  return !/^(?:yes|yep|yeah|ok|okay|sure)\b/i.test(t);
+}
 
 const BUILDER_ADD_COMMAND_RE =
   /\b(?:add (?:information|info|this|those|them|it)(?:\s+to(?:\s+the)?\s+avatar)?|add to (?:the )?avatar|save to (?:the )?avatar|put (?:that|this|those|them) in(?:\s+the\s+avatar)?)\b/i;
@@ -50,7 +66,10 @@ export function isBuilderApprovalPhrase(text: string): boolean {
   const t = text.trim().replace(/[.!?]+$/g, "").trim();
   if (!t) return false;
   if (BUILDER_APPROVAL_EXACT_RE.test(t)) return true;
-  if (t.length <= 48 && BUILDER_APPROVAL_LOOSE_RE.test(t)) return true;
+  if (/^yes\s+(?:use that|use this|sounds good|looks good)$/i.test(t)) return true;
+  if (t.length <= 48 && BUILDER_APPROVAL_LOOSE_RE.test(t)) {
+    return !isSubstantiveBuilderReply(t);
+  }
   return false;
 }
 

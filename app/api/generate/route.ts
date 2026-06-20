@@ -24,13 +24,26 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const type = (body.type as string)?.trim() || "piece of content";
     const brief = (body.brief as string)?.trim() || "";
-    const tone = (body.tone as string)?.trim() || "warm and clear";
+    const tone = (body.tone as string)?.trim() || "match audience";
     const context = (body.context as string)?.trim() || "";
     const contentLanguageHint = (body.contentLanguageHint as string)?.trim() || "";
 
+    const audienceRules = context
+      ? `${context}\n\n`
+      : "";
+
+    const toneInstruction =
+      tone === "match audience" || tone.includes("match")
+        ? "Match the audience's natural voice from the context above — do not default to generic motivational tone."
+        : `Use a ${tone} tone while staying audience-specific.`;
+
     const system = `${plainLanguageFormattingHintForPrompt()}
 
-You create content for an ADHD founder. Produce a ready-to-use "${type}" in a ${tone} tone. If the brief is a template or scaffold, fill it in with real, usable content.
+${audienceRules}You create content for a specific audience. The audience context above is PRIMARY — it drives language, examples, pain points, stories, and calls to action. ${toneInstruction}
+
+Do NOT write generic content that could apply to anyone.
+
+Produce a ready-to-use "${type}". If the brief is a template or scaffold, fill it in with real, usable content tuned to the audience.
 
 FORMAT IT EXACTLY AS IT SHOULD LOOK WHEN PASTED INTO ITS DESTINATION (a social platform, an email client, a doc). That means:
 - Real line breaks and blank lines between sections — never run everything into one paragraph.
@@ -55,7 +68,7 @@ Return ONLY the content, nothing else.${
         messages: [
           {
             role: "system",
-            content: context ? `${context}\n\n${system}` : system,
+            content: system,
           },
           { role: "user", content: user },
         ],

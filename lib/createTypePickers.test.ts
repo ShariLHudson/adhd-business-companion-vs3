@@ -11,7 +11,7 @@ describe("createTypePickers", () => {
     expect(isUnresolvedCreateType("content")).toBe(true);
     expect(isUnresolvedCreateType("")).toBe(true);
     expect(userFacingCreateTypeLabel("content")).toBeNull();
-    expect(userFacingCreateTypeLabel("Social Post")).toBe("Social Media Post");
+    expect(userFacingCreateTypeLabel("Social Post")).toBe("Social Media Content");
     expect(isInternalGenerationDepth("Standard")).toBe(true);
     expect(userFacingSubtypeLabel("Standard", null)).toBeNull();
   });

@@ -32,7 +32,10 @@ describe("savedWorkStore", () => {
   it("maps artifact types to Saved Work folders", () => {
     expect(savedWorkTypeFolder("SOP")).toBe("SOPs");
     expect(savedWorkTypeFolder("Proposal")).toBe("Proposals");
-    expect(savedWorkLocationLabel("SOPs")).toBe("Saved Work > SOPs");
+    expect(savedWorkLocationLabel("SOPs")).toBe("My Work > SOPs");
+    expect(savedWorkLocationLabel("Workshops", "ADHD Focus Workshop")).toBe(
+      "My Work > Workshops > ADHD Focus Workshop",
+    );
   });
 
   it("creates and searches saved work", () => {
@@ -43,7 +46,9 @@ describe("savedWorkStore", () => {
     });
     const items = getSavedWork();
     expect(items).toHaveLength(1);
-    expect(items[0].savedLocation).toBe("Saved Work > SOPs");
+    expect(items[0].savedLocation).toBe(
+      "My Work > SOPs > ElevenLabs Video SOP",
+    );
     expect(items[0].status).toBe("saved");
 
     const hits = searchSavedWork("ElevenLabs");

@@ -20,20 +20,7 @@ export const CREATE_STEP1_QUESTION = "What would you like to create?";
 
 export const CREATE_STEP1_CHAT = `**What would you like to create?**
 
-For example:
-• Social Media Post
-• Email
-• Newsletter
-• Blog Post
-• SOP
-• Workshop
-• Lead Magnet
-• Landing Page
-• Sales Page
-• Funnel
-• Presentation
-• Training
-• Other`;
+Pick from the dropdown beside chat — or tell me here.`;
 
 export type BuilderKickoffSection =
   | "client-avatars"

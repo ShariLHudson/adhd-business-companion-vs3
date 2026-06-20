@@ -26,6 +26,32 @@ export function groupProjectsByList(projects: Project[]): Record<ProjectListGrou
   return groups;
 }
 
+export type ProjectListSort = "recent" | "name";
+
+export function sortProjects(
+  projects: Project[],
+  sort: ProjectListSort = "recent",
+): Project[] {
+  const copy = [...projects];
+  if (sort === "name") {
+    return copy.sort((a, b) => a.name.localeCompare(b.name));
+  }
+  return copy.sort(
+    (a, b) =>
+      new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime(),
+  );
+}
+
+export function recentActiveProjects(
+  projects: Project[],
+  limit = 5,
+): Project[] {
+  return sortProjects(
+    projects.filter((p) => p.status !== "completed"),
+    "recent",
+  ).slice(0, limit);
+}
+
 export type TimeBlockDateGroup = "today" | "week" | "upcoming" | "bank" | "completed";
 
 export const TIME_BLOCK_GROUP_LABEL: Record<TimeBlockDateGroup, string> = {

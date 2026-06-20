@@ -37,6 +37,7 @@ import {
   type MomentumWhenPreset,
 } from "@/lib/momentumAppointment";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { useVisualMode } from "@/lib/useVisualMode";
 
 type DurUnit = "min" | "hr" | "day" | "week" | "month";
@@ -136,6 +137,10 @@ const ENERGY: { id: BlockEnergy; label: string }[] = [
 
 const DURATIONS = [...MOMENTUM_DURATION_OPTIONS];
 const SNOOZE = [5, 10, 30, 120];
+
+/** Compact filter pills — never stretch full row when wrapped alone. */
+const FILTER_SELECT_CLASS =
+  "w-auto max-w-[min(100%,400px)] min-w-[7.5rem] shrink-0 self-start rounded-full border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
 
 type Form = {
   id?: string;
@@ -607,6 +612,7 @@ export function TimeBlockPanel({
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
+      <WorkspaceAreaWorksGuide areaId="time-block" />
       <WorkspaceGuide section="time-block" />
       <div className="flex items-center justify-between gap-3">
         <p className="text-2xl font-semibold text-[#1f1c19]">
@@ -777,13 +783,13 @@ export function TimeBlockPanel({
             <p className="mt-4 text-sm font-semibold text-[#6b635a]">
               Project <span className="font-normal text-[#9a8f82]">(optional)</span>
             </p>
-            <div className="mt-1.5 flex items-center gap-2">
+            <div className="mt-1.5 flex flex-wrap items-center gap-2">
               <select
                 value={form.projectId ?? ""}
                 onChange={(e) =>
                   setForm({ ...form, projectId: e.target.value || undefined })
                 }
-                className="min-w-0 flex-1 truncate rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                className="w-auto max-w-[min(100%,400px)] min-w-[10rem] truncate rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
               >
                 <option value="">No project</option>
                 {sortedProjects.map((p) => (
@@ -922,7 +928,7 @@ export function TimeBlockPanel({
         </p>
         {bankOpen && (
           <>
-            <div className="mt-3 flex flex-wrap gap-2">
+            <div className="mt-3 flex flex-wrap items-start gap-2">
               <select
                 value={bankFilters.assignment}
                 onChange={(e) =>
@@ -931,7 +937,7 @@ export function TimeBlockPanel({
                     assignment: e.target.value as TimeBankFilters["assignment"],
                   }))
                 }
-                className="rounded-full border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                className={FILTER_SELECT_CLASS}
                 aria-label="Filter by assignment"
               >
                 <option value="all">All</option>
@@ -943,7 +949,7 @@ export function TimeBlockPanel({
                 onChange={(e) =>
                   setBankFilters((f) => ({ ...f, projectId: e.target.value }))
                 }
-                className="rounded-full border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                className={FILTER_SELECT_CLASS}
                 aria-label="Filter by project"
               >
                 <option value="all">All projects</option>
@@ -959,7 +965,7 @@ export function TimeBlockPanel({
                   onChange={(e) =>
                     setBankFilters((f) => ({ ...f, tag: e.target.value }))
                   }
-                  className="rounded-full border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                  className={FILTER_SELECT_CLASS}
                   aria-label="Filter by category"
                 >
                   <option value="all">All categories</option>
@@ -978,7 +984,7 @@ export function TimeBlockPanel({
                     duration: e.target.value as TimeBankFilters["duration"],
                   }))
                 }
-                className="rounded-full border border-[#c9bfb0] bg-white px-3 py-1.5 text-xs font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                className={FILTER_SELECT_CLASS}
                 aria-label="Filter by duration"
               >
                 <option value="all">Any duration</option>

@@ -27,6 +27,7 @@ import { sortByDropdownLabel, sortDropdownLabels } from "@/lib/dropdownSort";
 import type { AppSection } from "@/lib/companionUi";
 import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { BrainDumpVisualPanel } from "@/components/visual-thinking/BrainDumpVisualPanel";
 import { useVisualMode } from "@/lib/useVisualMode";
@@ -245,6 +246,7 @@ export function BrainDumpPanel({
           {contextBanner}
         </div>
       ) : null}
+      <WorkspaceAreaWorksGuide areaId="brain-dump" />
       <WorkspaceGuide section="brain-dump" />
       <p className="text-2xl font-semibold text-[#1f1c19]">Clear My Mind</p>
       <p className="mt-2 text-base text-[#6b635a]">

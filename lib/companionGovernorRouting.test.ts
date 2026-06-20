@@ -61,22 +61,21 @@ describe("companionGovernorRouting — Phase B", () => {
     expect(detectDoingIntent("I need to make a decision")).toBeNull();
   });
 
-  it("5 — open create → workspace_open authorizes Create", () => {
+  it("5 — open create → chat_only; UI buttons open workspaces", () => {
     const s = gov("open create");
-    expect(s.outcome).toBe("workspace_open");
-    expect(s.targetSection).toBe("content-generator");
-    expect(governorAuthorizedChatTurnOpen(s)).toBe(true);
-    expect(governorBlocksChatTurnAutoOpen(s)).toBe(false);
+    expect(s.outcome).toBe("chat_only");
+    expect(governorAuthorizedChatTurnOpen(s)).toBe(false);
+    expect(governorBlocksChatTurnAutoOpen(s)).toBe(true);
     expect(
       governorAllowsPreChatWorkspaceOpen(s, "content-generator"),
-    ).toBe(true);
+    ).toBe(false);
   });
 
-  it("6 — Open Momentum Games → tool_open", () => {
+  it("6 — Open Momentum Games → chat_only", () => {
     const s = gov("Open Momentum Games");
-    expect(s.outcome).toBe("tool_open");
-    expect(governorAuthorizedChatTurnOpen(s)).toBe(true);
-    expect(governorBlocksChatTurnAutoOpen(s)).toBe(false);
+    expect(s.outcome).toBe("chat_only");
+    expect(governorAuthorizedChatTurnOpen(s)).toBe(false);
+    expect(governorBlocksChatTurnAutoOpen(s)).toBe(true);
   });
 
   it("7 — chat_only blocks shouldAutoOpenWorkspaceFromIntent", () => {
@@ -88,15 +87,14 @@ describe("companionGovernorRouting — Phase B", () => {
         buttonLabel: "Clear My Mind",
         line: "",
       }),
-    ).toBe(true);
-    // page.tsx gates the call with !governorChatOnly — intent alone must not open.
+    ).toBe(false);
   });
 
-  it("8 — governor workspace_open is the only chat-turn open authority", () => {
+  it("8 — chat never authorizes workspace_open from text", () => {
     const blocked = gov("I need ideas for a Facebook post");
-    const allowed = gov("open create");
+    const explicit = gov("open create");
     expect(governorBlocksChatTurnAutoOpen(blocked)).toBe(true);
-    expect(governorAuthorizedChatTurnOpen(allowed)).toBe(true);
+    expect(governorAuthorizedChatTurnOpen(explicit)).toBe(false);
     expect(governorAllowsPreChatWorkspaceOpen(blocked, "content-generator")).toBe(
       false,
     );

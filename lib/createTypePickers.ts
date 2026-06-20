@@ -6,7 +6,8 @@ import { findCatalogItem } from "./createCatalog";
 import { sortDropdownLabels } from "./dropdownSort";
 import type { AppSection } from "./companionUi";
 
-export const OTHER_OPTION = "Other";
+/** Free-form create type — shown as "Custom" in the UI. */
+export const OTHER_OPTION = "Custom";
 
 /** Internal generation depth — never shown in Create UI. */
 export const INTERNAL_GENERATION_DEPTH_OPTIONS = [
@@ -28,24 +29,28 @@ const UNRESOLVED_CREATE_TYPES = new Set([
 
 /** Catalog label → user-facing label in workspace and chat. */
 export const USER_FACING_CREATE_LABELS: Record<string, string> = {
-  "Social Post": "Social Media Post",
+  "Social Post": "Social Media Content",
+  "Email Campaign": "Email Sequence",
   "Training Guide": "Training",
-  "Sales Funnel": "Funnel",
+  "Sales Funnel": "Sales Funnel",
   "Lead Magnet": "Lead Magnet",
   "Landing Page": "Landing Page",
+  [OTHER_OPTION]: "Custom",
 };
 
-/** Curated primary create outcomes — user-facing order, Other last. */
+/** Curated primary create outcomes — conversation-first entry, Custom last. */
 export const PRIMARY_CREATE_ITEMS: string[] = [
-  "Social Post",
-  "Email",
-  "Newsletter",
-  "Workshop",
-  "SOP",
-  "Sales Funnel",
   "Marketing Plan",
+  "Workshop",
   "Lead Magnet",
+  "Email Sequence",
+  "Newsletter",
+  "SOP",
   "Landing Page",
+  "Social Post",
+  "Sales Funnel",
+  "Course Outline",
+  "Client Onboarding",
   OTHER_OPTION,
 ];
 
@@ -73,6 +78,9 @@ export function userFacingCreateTypeLabel(
 export function catalogTypeFromUserPhrase(text: string): string | null {
   const t = text.trim().toLowerCase();
   if (!t) return null;
+  if (t === "social media content" || t === "social media") return "Social Post";
+  if (t === "email sequence") return "Email Sequence";
+  if (t === "custom") return OTHER_OPTION;
   for (const [catalog, label] of Object.entries(USER_FACING_CREATE_LABELS)) {
     if (t === label.toLowerCase()) return catalog;
   }

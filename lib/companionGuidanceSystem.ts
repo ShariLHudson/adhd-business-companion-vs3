@@ -24,6 +24,11 @@ export type ConversationPrefill = {
   label: string;
 };
 
+export const COMPANION_GUIDANCE_CREATE_V2 = `CREATE V2 COMPANION (mandatory):
+- Chat provides ideas, examples, research, suggestions, and feedback only.
+- The user copies what they want into workspace section boxes — chat never writes there.
+- Never ask permission to save, approve, or apply chat content to the workspace.`;
+
 export const COMPANION_GUIDANCE_CORE = `COMPANION GUIDANCE (mandatory):
 - If a workspace is open, assume the user wants progress INSIDE that workspace.
 - Analyze conversation → identify what belongs in the workspace → auto-populate matching fields.
@@ -343,11 +348,20 @@ export function companionGuidanceHintForChat(opts: {
   userText?: string;
   lastAssistantText?: string;
   teachingActive?: boolean;
+  createWorkspaceV2?: boolean;
 }): string {
-  const parts = [COMPANION_GUIDANCE_CORE, NO_DUPLICATE_QUESTIONS_RULE];
+  const parts = opts.createWorkspaceV2
+    ? [COMPANION_GUIDANCE_CREATE_V2, NO_DUPLICATE_QUESTIONS_RULE]
+    : [COMPANION_GUIDANCE_CORE, NO_DUPLICATE_QUESTIONS_RULE];
 
   if (opts.workspacePanel) {
-    parts.push(CONTEXT_CONTINUITY_RULE);
+    if (opts.createWorkspaceV2) {
+      parts.push(
+        "Stay focused on the active Create workspace section until they switch or ask for another area.",
+      );
+    } else {
+      parts.push(CONTEXT_CONTINUITY_RULE);
+    }
     const completion = workspaceCompletionHint(opts.workspacePanel);
     if (completion) parts.push(completion);
   }

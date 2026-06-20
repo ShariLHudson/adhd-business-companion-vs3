@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { businessContextSummary } from "@/lib/companionStore";
+import { buildGenerationContextWithBusiness } from "@/lib/contentAudience";
 
 type Dimension = { name: string; rating: string; reason: string };
 type Assessment = { dimensions: Dimension[]; overall: string };
@@ -50,7 +50,7 @@ export function ScoreActions({
         body: JSON.stringify({
           content,
           kind,
-          context: businessContextSummary(),
+          context: buildGenerationContextWithBusiness(),
         }),
       });
       const data = await res.json();
@@ -83,7 +83,7 @@ export function ScoreActions({
           kind,
           mode: "rewrite",
           focus,
-          context: businessContextSummary(),
+          context: buildGenerationContextWithBusiness(),
         }),
       });
       const data = await res.json();

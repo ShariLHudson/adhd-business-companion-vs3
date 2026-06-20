@@ -14,6 +14,11 @@ import {
   type ProjectExecutionLink,
 } from "./projectExecutionLinks";
 import { listProjectLinks, type ProjectLink } from "./projectLinks";
+import {
+  listProjectAssetFiles,
+  type ProjectAssetFile,
+  projectAssetFileKindLabel,
+} from "./projectAssets";
 
 export type ProjectFileCategory =
   | "documents"
@@ -113,6 +118,26 @@ function fromExecutionLink(link: ProjectExecutionLink): UnifiedProjectFile {
   };
 }
 
+function fromUploadedFile(file: ProjectAssetFile): UnifiedProjectFile {
+  const category: ProjectFileCategory =
+    file.kind === "pdf"
+      ? "pdfs"
+      : file.kind === "image"
+        ? "images"
+        : file.kind === "xlsx" || file.kind === "csv"
+          ? "spreadsheets"
+          : "documents";
+  return {
+    id: `upload:${file.id}`,
+    projectId: file.projectId,
+    category,
+    title: file.name,
+    source: `Uploaded ${projectAssetFileKindLabel(file.kind)}`,
+    url: file.dataUrl,
+    createdAt: file.createdAt,
+    icon: CATEGORY_META[category].icon,
+  };
+}
 function fromProjectLink(link: ProjectLink): UnifiedProjectFile {
   return {
     id: `link:${link.id}`,
@@ -140,6 +165,9 @@ export function listUnifiedProjectFiles(projectId: string): UnifiedProjectFile[]
   for (const doc of listDocumentsForProject(projectId)) add(fromMetadata(doc));
   for (const link of listProjectExecutionLinks(projectId)) {
     add(fromExecutionLink(link));
+  }
+  for (const uploaded of listProjectAssetFiles(projectId)) {
+    add(fromUploadedFile(uploaded));
   }
   for (const link of listProjectLinks(projectId)) add(fromProjectLink(link));
 

@@ -41,7 +41,7 @@ describe("createWorkflow", () => {
     expect(wf.selectedTemplateId).toBeTruthy();
   });
 
-  it("reaches readiness after one discovery answer (simplified Create)", () => {
+  it("does not reach readiness after one discovery answer", () => {
     const start = advanceAfterItemPick("Social Post");
     const qs = getDiscoveryQuestions("Social Post");
     const state = advanceAfterDiscoveryAnswer(
@@ -50,30 +50,32 @@ describe("createWorkflow", () => {
       qs[0]!.id,
       "founders on LinkedIn",
     );
-    expect(state.step).toBe("readiness");
-    expect(hasEnoughDiscoveryForDraft(state.discoveryAnswers)).toBe(true);
-  });
-
-  it("still supports full discovery when more answers are given", () => {
-    const start = advanceAfterItemPick("Email");
-    const qs = getDiscoveryQuestions("Email");
-    let state = start;
-    for (const q of qs) {
-      state = advanceAfterDiscoveryAnswer(state, "Email", q.id, "answer");
-    }
-    expect(state.step).toBe("readiness");
-    expect(readinessSummary("Email", state.discoveryAnswers).length).toBe(
-      qs.length,
+    expect(state.step).toBe("discovery");
+    expect(hasEnoughDiscoveryForDraft(state.discoveryAnswers, "Social Post")).toBe(
+      false,
     );
   });
 
-  it("applies chat text as the current discovery answer", () => {
+  it("reaches readiness when all light-create questions are answered", () => {
+    const start = advanceAfterItemPick("Social Post");
+    const qs = getDiscoveryQuestions("Social Post");
+    let state = start;
+    for (const q of qs) {
+      state = advanceAfterDiscoveryAnswer(state, "Social Post", q.id, "answer");
+    }
+    expect(state.step).toBe("readiness");
+    expect(hasEnoughDiscoveryForDraft(state.discoveryAnswers, "Social Post")).toBe(
+      true,
+    );
+  });
+
+  it("applies chat text as the current discovery answer without skipping remaining questions", () => {
     const start = advanceAfterItemPick("Proposal");
     const next = applyCreateDiscoveryFromChat(
       start,
       "Acme Corp needs a Q3 retainer scope",
     );
-    expect(next?.step).toBe("readiness");
+    expect(next?.step).toBe("discovery");
     expect(next?.discoveryAnswers.client).toContain("Acme");
   });
 

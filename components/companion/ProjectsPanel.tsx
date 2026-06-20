@@ -21,18 +21,19 @@ import {
 import { sortByDropdownLabel } from "@/lib/dropdownSort";
 import { ProjectBreakdown } from "@/components/companion/ProjectBreakdown";
 import { CollapsibleSection } from "@/components/companion/CollapsibleSection";
-import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
-import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
+import { ProjectAssetsPanel } from "@/components/companion/ProjectAssetsPanel";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { useVisualMode } from "@/lib/useVisualMode";
 import {
-  groupProjectsByList,
   groupTimeBlocksByDate,
-  PROJECT_LIST_GROUP_LABEL,
+  recentActiveProjects,
+  sortProjects,
   TIME_BLOCK_GROUP_LABEL,
-  type ProjectListGroup,
+  type ProjectListSort,
   type TimeBlockDateGroup,
 } from "@/lib/projectGrouping";
+import { initialSectionOpen } from "@/lib/expandableUi";
 import type { AppSection } from "@/lib/companionUi";
 import type {
   WorkspaceFieldId,
@@ -45,12 +46,10 @@ import { WorkspaceSopField, isSopPanelField } from "@/components/companion/Works
 import { WorkspaceSopProgress } from "@/components/companion/WorkspaceSopProgress";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import {
-  groupUnifiedProjectFiles,
   listUnifiedProjectFiles,
-  projectFileCategoryLabel,
   PROJECT_FILES_UPDATED,
-  type ProjectFileCategory,
 } from "@/lib/projectFiles";
+import { PROJECT_ASSETS_UPDATED } from "@/lib/projectAssets";
 import { PROJECT_EXECUTION_LINKS_UPDATED } from "@/lib/projectExecutionLinks";
 import {
   countProjectConversations,
@@ -58,25 +57,19 @@ import {
   PROJECT_CONVERSATIONS_UPDATED,
   type ProjectConversationEntry,
 } from "@/lib/projectConversations";
-import {
-  PROJECT_LINKS_UPDATED,
-  saveProjectLink,
-} from "@/lib/projectLinks";
-import { loadProjectContinuity } from "@/lib/projectContinuityStore";
+import { listProjectAssetNotes, listProjectAssetFiles } from "@/lib/projectAssets";
+import { listProjectLinks } from "@/lib/projectLinks";
 
-function resolveInitialProjectId(initialProjectId?: string | null): string | null {
-  if (initialProjectId) return initialProjectId;
-  return loadProjectContinuity()?.projectContinueId ?? null;
-}
-
-function initialProjectView(initialProjectId?: string | null): {
+function initialProjectView(
+  resumeProjectId?: string | null,
+): {
   view: "list" | "create-source" | "create" | "detail";
   detailId: string | null;
 } {
-  if (!initialProjectId) return { view: "list", detailId: null };
-  const exists = getProjects().some((p) => p.id === initialProjectId);
+  if (!resumeProjectId) return { view: "list", detailId: null };
+  const exists = getProjects().some((p) => p.id === resumeProjectId);
   return exists
-    ? { view: "detail", detailId: initialProjectId }
+    ? { view: "detail", detailId: resumeProjectId }
     : { view: "list", detailId: null };
 }
 
@@ -97,7 +90,6 @@ export function ProjectsPanel({
   onOpen,
   onAsk,
   onOpenTimeBlock,
-  initialProjectId,
   onContextChange,
   focusField,
   focusStamp = 0,
@@ -109,12 +101,16 @@ export function ProjectsPanel({
   onSopFieldChange,
   onProjectSaved,
   onBuildWithShari,
+  resumeProjectId,
+  onResumeConsumed,
 }: {
   onOpen?: (section: AppSection) => void;
   onAsk?: (prompt: string) => void;
   onOpenTimeBlock?: (projectId: string, blockId?: string) => void;
   onBuildWithShari?: (input: CreationWorkspaceInput) => void;
-  initialProjectId?: string | null;
+  /** Open one project on mount — explicit Resume/Continue only, not sidebar browse. */
+  resumeProjectId?: string | null;
+  onResumeConsumed?: () => void;
   onContextChange?: (detail: WorkspacePanelDetail) => void;
   focusField?: WorkspaceFieldId | null;
   focusStamp?: number;
@@ -139,10 +135,18 @@ export function ProjectsPanel({
   const [projects, setProjects] = useState<Project[]>([]);
   const [view, setView] = useState<
     "list" | "create-source" | "create" | "detail"
-  >(() => initialProjectView(resolveInitialProjectId(initialProjectId)).view);
+  >(() => initialProjectView(resumeProjectId).view);
   const [detailId, setDetailId] = useState<string | null>(
-    () => initialProjectView(resolveInitialProjectId(initialProjectId)).detailId,
+    () => initialProjectView(resumeProjectId).detailId,
   );
+  const [listQuery, setListQuery] = useState("");
+  const [listSort, setListSort] = useState<ProjectListSort>("recent");
+  const [expandedListIds, setExpandedListIds] = useState<Record<string, boolean>>(
+    {},
+  );
+  const [recentSectionOpen, setRecentSectionOpen] = useState(initialSectionOpen);
+  const [allProjectsSectionOpen, setAllProjectsSectionOpen] = useState(initialSectionOpen);
+  const [completedOpen, setCompletedOpen] = useState(initialSectionOpen);
 
   // Guided create
   const [step, setStep] = useState(0);
@@ -152,16 +156,11 @@ export function ProjectsPanel({
   // Project Brain
   const [generating, setGenerating] = useState(false);
   const [backups, setBackups] = useState<string[]>([]);
-  const [listGroup, setListGroup] = useState<ProjectListGroup | typeof NO_CATEGORY>(
-    NO_CATEGORY,
-  );
   const [detailSectionsOpen, setDetailSectionsOpen] = useState<
     Record<string, boolean>
   >({});
   const [projectDataTick, setProjectDataTick] = useState(0);
   const [newGoal, setNewGoal] = useState("");
-  const [newLinkLabel, setNewLinkLabel] = useState("");
-  const [newLinkUrl, setNewLinkUrl] = useState("");
 
   const visualMode = useVisualMode();
   const colorOn = visualMode !== "off";
@@ -169,13 +168,15 @@ export function ProjectsPanel({
   useEffect(() => {
     const bump = () => setProjectDataTick((n) => n + 1);
     window.addEventListener(PROJECT_CONVERSATIONS_UPDATED, bump);
-    window.addEventListener(PROJECT_LINKS_UPDATED, bump);
+    window.addEventListener(PROJECT_ASSETS_UPDATED, bump);
+    window.addEventListener("project-links-updated", bump);
     window.addEventListener("project-files-updated", bump);
     window.addEventListener(PROJECT_EXECUTION_LINKS_UPDATED, bump);
     window.addEventListener(PROJECT_FILES_UPDATED, bump);
     return () => {
       window.removeEventListener(PROJECT_CONVERSATIONS_UPDATED, bump);
-      window.removeEventListener(PROJECT_LINKS_UPDATED, bump);
+      window.removeEventListener(PROJECT_ASSETS_UPDATED, bump);
+      window.removeEventListener("project-links-updated", bump);
       window.removeEventListener("project-files-updated", bump);
       window.removeEventListener(PROJECT_EXECUTION_LINKS_UPDATED, bump);
       window.removeEventListener(PROJECT_FILES_UPDATED, bump);
@@ -187,13 +188,15 @@ export function ProjectsPanel({
   }, []);
 
   useEffect(() => {
-    if (!initialProjectId) return;
+    if (!resumeProjectId) return;
     const list = getProjects();
-    if (list.some((p) => p.id === initialProjectId)) {
-      setDetailId(initialProjectId);
+    if (list.some((p) => p.id === resumeProjectId)) {
+      setDetailId(resumeProjectId);
+      setDetailSectionsOpen({});
       setView("detail");
+      onResumeConsumed?.();
     }
-  }, [initialProjectId]);
+  }, [resumeProjectId, onResumeConsumed]);
 
   // Declared before the effects that depend on it (avoids a TDZ crash).
   const current = useMemo(
@@ -207,18 +210,19 @@ export function ProjectsPanel({
     return listProjectConversations(current.id);
   }, [current, projectDataTick]);
 
-  const unifiedFiles = useMemo(() => {
-    if (!current) return [];
+  const projectAssetCount = useMemo(() => {
+    if (!current) return 0;
     void projectDataTick;
-    return listUnifiedProjectFiles(current.id);
+    const unified = listUnifiedProjectFiles(current.id).filter(
+      (f) => f.category !== "links" && !f.id.startsWith("upload:"),
+    );
+    return (
+      listProjectAssetFiles(current.id).length +
+      unified.length +
+      listProjectLinks(current.id).length +
+      listProjectAssetNotes(current.id).length
+    );
   }, [current, projectDataTick]);
-
-  const filesByCategory = useMemo(
-    () => groupUnifiedProjectFiles(unifiedFiles),
-    [unifiedFiles],
-  );
-
-  const projectFileCount = unifiedFiles.length;
 
   const lastReportedDetail = useRef<string>("");
 
@@ -226,7 +230,7 @@ export function ProjectsPanel({
     if (!onContextChange) return;
 
     // Avoid wiping parent context while bootstrapping to initialProjectId.
-    if (view === "list" && initialProjectId && !detailId) return;
+    if (view === "list" && resumeProjectId && !detailId) return;
 
     let detail;
     if (view === "list") {
@@ -280,9 +284,9 @@ export function ProjectsPanel({
         selectedItemStatus: PROJECT_STATUS_LABEL[current.status],
         selectedItemHorizon: PROJECT_HORIZON_LABEL[current.horizon],
         selectedItemColor: current.color,
-        showProjectColor: true,
+        showProjectColor: colorOn,
         projectConversationCount: countProjectConversations(current.id),
-        projectFileCount,
+        projectFileCount: projectAssetCount,
         projectTaskCount: taskCount,
         projectGoalCount: (current.goals ?? []).length,
         openDetailSections: openSections,
@@ -296,7 +300,7 @@ export function ProjectsPanel({
     if (sig === lastReportedDetail.current) return;
     lastReportedDetail.current = sig;
     onContextChange(detail);
-  }, [view, step, what, why, current, onContextChange, colorOn, projectFileCount, detailSectionsOpen, initialProjectId, detailId]);
+  }, [view, step, what, why, current, onContextChange, colorOn, projectAssetCount, detailSectionsOpen, resumeProjectId, detailId]);
 
   const focusElementId =
     focusField === "project-title"
@@ -313,7 +317,58 @@ export function ProjectsPanel({
     detailId,
   ]);
 
-  const projectGroups = groupProjectsByList(projects);
+  const recentProjects = useMemo(
+    () => recentActiveProjects(projects, 5),
+    [projects],
+  );
+
+  const filteredProjects = useMemo(() => {
+    const q = listQuery.trim().toLowerCase();
+    const base = sortProjects(projects, listSort);
+    if (!q) return base;
+    return base.filter(
+      (p) =>
+        p.name.toLowerCase().includes(q) ||
+        p.goal.toLowerCase().includes(q) ||
+        (p.nextAction ?? "").toLowerCase().includes(q),
+    );
+  }, [projects, listQuery, listSort]);
+
+  const activeProjects = useMemo(
+    () => filteredProjects.filter((p) => p.status !== "completed"),
+    [filteredProjects],
+  );
+
+  const completedProjects = useMemo(
+    () => filteredProjects.filter((p) => p.status === "completed"),
+    [filteredProjects],
+  );
+
+  const allProjectsList = useMemo(() => activeProjects, [activeProjects]);
+
+  function toggleListSection(id: string) {
+    if (id === "recent-projects") {
+      setRecentSectionOpen((o) => !o);
+      return;
+    }
+    if (id === "all-projects") {
+      setAllProjectsSectionOpen((o) => !o);
+      return;
+    }
+    if (id === "completed-projects") {
+      setCompletedOpen((o) => !o);
+    }
+  }
+
+  function openProject(id: string) {
+    setDetailId(id);
+    setDetailSectionsOpen({});
+    setView("detail");
+  }
+
+  function toggleListExpand(id: string) {
+    setExpandedListIds((prev) => ({ ...prev, [id]: !prev[id] }));
+  }
 
   function startCreate() {
     setView("create-source");
@@ -561,37 +616,87 @@ export function ProjectsPanel({
     setBackups((b) => b.filter((x) => x !== text));
   }
 
-  function renderCard(p: Project) {
+  function renderListRow(p: Project) {
+    const expanded = Boolean(expandedListIds[p.id]);
     return (
-      <li key={p.id}>
-        <button
-          type="button"
-          onClick={() => {
-            setDetailId(p.id);
-            setDetailSectionsOpen({});
-            setView("detail");
-          }}
-          style={
-            colorOn
-              ? {
-                  borderLeftWidth: 4,
-                  borderLeftColor: p.color,
-                }
-              : undefined
-          }
-          className="w-full rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-3 text-left transition-colors hover:border-[#1e4f4f]/40 hover:bg-white"
-        >
-          <span className="flex items-center gap-2 text-base font-semibold text-[#1f1c19]">
-            {colorOn && (
+      <li key={p.id} className="border-b border-[#e7dfd4]/70 last:border-b-0">
+        <div className="flex items-center gap-1 py-1.5 pl-1 pr-0.5">
+          <button
+            type="button"
+            onClick={() => toggleListExpand(p.id)}
+            className="flex min-w-0 flex-1 items-center gap-2 text-left"
+            aria-expanded={expanded}
+            aria-label={expanded ? `Collapse ${p.name}` : `Expand ${p.name}`}
+          >
+            <span className="w-3 shrink-0 text-center text-[10px] text-[#9a8f82]">
+              {expanded ? "▼" : "▶"}
+            </span>
+            {colorOn ? (
               <span
-                className="inline-block h-2 w-2 shrink-0 rounded-full"
-                style={{ background: p.color }}
+                className="h-2 w-2 shrink-0 rounded-full"
+                style={{ backgroundColor: p.color }}
+                aria-hidden
               />
+            ) : null}
+            <span className="min-w-0 truncate text-sm font-medium text-[#1f1c19]">
+              {p.name}
+            </span>
+            <span className="shrink-0 rounded bg-[#f0f5f5] px-1.5 py-0.5 text-[10px] font-semibold text-[#4b6b6b]">
+              {PROJECT_STATUS_LABEL[p.status]}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => openProject(p.id)}
+            className="shrink-0 rounded px-2 py-1 text-xs font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
+          >
+            Open
+          </button>
+        </div>
+        {expanded ? (
+          <div className="border-t border-[#e7dfd4]/50 bg-[#faf7f2]/50 px-3 py-2 text-xs leading-relaxed text-[#6b635a]">
+            {p.goal.trim() ? (
+              <p>
+                <span className="font-semibold text-[#1f1c19]">Outcome:</span>{" "}
+                {p.goal}
+              </p>
+            ) : (
+              <p className="text-[#9a8f82]">No outcome written yet.</p>
             )}
-            {p.name}
-          </span>
-        </button>
+            {p.nextAction?.trim() ? (
+              <p className="mt-1">
+                <span className="font-semibold text-[#1f1c19]">Next:</span>{" "}
+                {p.nextAction}
+              </p>
+            ) : null}
+            <div className="mt-2 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => openProject(p.id)}
+                className="rounded bg-[#1e4f4f] px-2 py-1 text-xs font-semibold text-white hover:bg-[#163a3a]"
+              >
+                Open project
+              </button>
+              <button
+                type="button"
+                onClick={() => toggleListExpand(p.id)}
+                className="rounded px-2 py-1 text-xs font-semibold text-[#6b635a] hover:bg-black/5"
+              >
+                Collapse
+              </button>
+            </div>
+          </div>
+        ) : null}
       </li>
+    );
+  }
+
+  function projectListUl(items: Project[]) {
+    if (items.length === 0) return null;
+    return (
+      <ul className="overflow-hidden rounded-lg border border-[#e4ddd2] bg-white/80">
+        {items.map((p) => renderListRow(p))}
+      </ul>
     );
   }
 
@@ -1158,110 +1263,17 @@ export function ProjectsPanel({
           </CollapsibleSection>
 
           <CollapsibleSection
-            id="files"
-            title="Files"
-            count={projectFileCount}
-            open={!!detailSectionsOpen.files}
+            id="assets"
+            title="Project Assets"
+            count={projectAssetCount}
+            open={Boolean(detailSectionsOpen.assets || detailSectionsOpen.files)}
             onToggle={toggleDetailSection}
           >
-            {projectFileCount === 0 ? (
-              <p className="text-sm text-[#6b635a]">
-                Google exports from Create and Decision Compass appear here
-                automatically. You can also add a link below.
-              </p>
-            ) : (
-              <div className="mb-3 flex flex-col gap-4">
-                {(
-                  [
-                    "documents",
-                    "spreadsheets",
-                    "forms",
-                    "images",
-                    "pdfs",
-                    "exports",
-                    "links",
-                  ] as ProjectFileCategory[]
-                ).map((category) => {
-                  const files = filesByCategory[category];
-                  if (!files.length) return null;
-                  return (
-                    <div key={category}>
-                      <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-                        {projectFileCategoryLabel(category)}
-                      </p>
-                      <ul className="mt-2 flex flex-col gap-2">
-                        {files.map((file) => (
-                          <li
-                            key={file.id}
-                            className="rounded-lg border border-[#e4ddd2] bg-white px-3 py-2 text-sm"
-                          >
-                            <div className="flex items-start justify-between gap-2">
-                              <div>
-                                <span className="mr-1">{file.icon}</span>
-                                <span className="font-semibold text-[#1f1c19]">
-                                  {file.title}
-                                </span>
-                                <p className="mt-0.5 text-xs text-[#6b635a]">
-                                  {file.source} ·{" "}
-                                  {new Date(file.createdAt).toLocaleDateString(
-                                    undefined,
-                                    { month: "short", day: "numeric" },
-                                  )}
-                                </p>
-                              </div>
-                              {file.url ? (
-                                <a
-                                  href={file.url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="shrink-0 rounded-lg border border-[#1e4f4f]/30 px-2.5 py-1 text-xs font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
-                                >
-                                  Open
-                                </a>
-                              ) : null}
-                            </div>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-            <div className="space-y-2 border-t border-[#e4ddd2] pt-3">
-              <p className="text-xs font-semibold text-[#6b635a]">Add a link</p>
-              <input
-                type="text"
-                value={newLinkLabel}
-                onChange={(e) => setNewLinkLabel(e.target.value)}
-                placeholder="Label (e.g. Figma board)"
-                className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-sm outline-none focus:border-[#1e4f4f]"
-              />
-              <input
-                type="url"
-                value={newLinkUrl}
-                onChange={(e) => setNewLinkUrl(e.target.value)}
-                placeholder="https://…"
-                className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-sm outline-none focus:border-[#1e4f4f]"
-              />
-              <button
-                type="button"
-                disabled={!newLinkUrl.trim()}
-                onClick={() => {
-                  saveProjectLink({
-                    projectId: current.id,
-                    label: newLinkLabel,
-                    url: newLinkUrl,
-                  });
-                  setNewLinkLabel("");
-                  setNewLinkUrl("");
-                  setProjectDataTick((n) => n + 1);
-                }}
-                className="rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-sm font-semibold text-white disabled:opacity-50"
-              >
-                Save link
-              </button>
-            </div>
+            <ProjectAssetsPanel
+              projectId={current.id}
+              refreshKey={projectDataTick}
+              onChanged={() => setProjectDataTick((n) => n + 1)}
+            />
           </CollapsibleSection>
         </div>
       </div>
@@ -1271,51 +1283,111 @@ export function ProjectsPanel({
   // ---- List ---------------------------------------------------------------
   return (
     <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
-      <div className="flex items-center justify-between gap-3">
-        <WorkspaceGuide section="projects" />
-        <p className="text-2xl font-semibold text-[#1f1c19]">Projects</p>
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <WorkspaceAreaWorksGuide areaId="projects" />
+          <WorkspaceGuide section="projects" />
+          <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">Projects</p>
+          <p className="mt-1 text-base text-[#6b635a]">
+            Your filing cabinet — pick a project when you&apos;re ready.
+          </p>
+        </div>
         <button
           type="button"
           onClick={startCreate}
-          className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
+          className="shrink-0 rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163a3a]"
         >
           + New Project
         </button>
       </div>
-      <p className="mt-1 text-base text-[#6b635a]">
-        Pick a group to see project names — one at a time.
-      </p>
 
-      <CategoryPickerSelect
-        label="Project group"
-        value={listGroup}
-        onChange={setListGroup}
-        options={(
-          ["active", "completed", "not-started"] as ProjectListGroup[]
-        )
-          .map((g) => ({ value: g, label: PROJECT_LIST_GROUP_LABEL[g] }))
-          .sort((a, b) => a.label.localeCompare(b.label))}
-        placeholder="Select a group…"
-        className="mt-4"
-      />
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end">
+        <label className="min-w-0 flex-1 text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+          Search
+          <input
+            type="search"
+            value={listQuery}
+            onChange={(e) => setListQuery(e.target.value)}
+            placeholder="Search projects…"
+            className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-sm text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+          />
+        </label>
+        <label className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+          Sort
+          <select
+            value={listSort}
+            onChange={(e) => setListSort(e.target.value as ProjectListSort)}
+            className="mt-1 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2 text-sm text-[#1f1c19] outline-none focus:border-[#1e4f4f] sm:w-44"
+          >
+            <option value="recent">Recently active</option>
+            <option value="name">Name A–Z</option>
+          </select>
+        </label>
+      </div>
 
       {projects.length === 0 ? (
-        <p className="mt-6 text-base text-[#6b635a]">
-          Nothing yet. Tap New Project to get started.
+        <p className="mt-5 text-sm text-[#6b635a]">
+          Nothing yet. Tap <strong>New Project</strong> to get started.
         </p>
-      ) : listGroup === NO_CATEGORY ? (
-        <p className="mt-6 text-base text-[#6b635a]">
-          {CATEGORY_PICKER_EMPTY_LIST_HINT}
-        </p>
-      ) : (
+      ) : listQuery.trim() ? (
         <div className="mt-4">
-          {projectGroups[listGroup].length === 0 ? (
-            <p className="text-base text-[#6b635a]">No projects in this group.</p>
-          ) : (
-            <ul className="flex flex-col gap-2">
-              {projectGroups[listGroup].map((p) => renderCard(p))}
-            </ul>
-          )}
+          <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+            Results
+            <span className="ml-2 font-normal normal-case text-[#9a8f82]">
+              ({activeProjects.length + completedProjects.length} match)
+            </span>
+          </p>
+          <div className="mt-2">
+            {projectListUl(activeProjects)}
+            {completedProjects.length > 0 ? (
+              <div className="mt-3">{projectListUl(completedProjects)}</div>
+            ) : null}
+          </div>
+          {activeProjects.length === 0 && completedProjects.length === 0 ? (
+            <p className="mt-3 text-sm text-[#6b635a]">
+              No projects match that search.
+            </p>
+          ) : null}
+        </div>
+      ) : (
+        <div className="mt-4 flex flex-col gap-1">
+          {recentProjects.length > 0 ? (
+            <CollapsibleSection
+              id="recent-projects"
+              title="Recent Projects"
+              count={recentProjects.length}
+              open={recentSectionOpen}
+              onToggle={toggleListSection}
+            >
+              {projectListUl(recentProjects)}
+            </CollapsibleSection>
+          ) : null}
+
+          <CollapsibleSection
+            id="all-projects"
+            title="All Projects"
+            count={allProjectsList.length}
+            open={allProjectsSectionOpen}
+            onToggle={toggleListSection}
+          >
+            {allProjectsList.length === 0 ? (
+              <p className="text-sm text-[#6b635a]">No active projects yet.</p>
+            ) : (
+              projectListUl(allProjectsList)
+            )}
+          </CollapsibleSection>
+
+          {completedProjects.length > 0 ? (
+            <CollapsibleSection
+              id="completed-projects"
+              title="Completed"
+              count={completedProjects.length}
+              open={completedOpen}
+              onToggle={toggleListSection}
+            >
+              {projectListUl(completedProjects)}
+            </CollapsibleSection>
+          ) : null}
         </div>
       )}
     </div>

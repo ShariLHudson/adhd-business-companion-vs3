@@ -1,6 +1,10 @@
 "use client";
 
 import { NO_CATEGORY } from "@/lib/categoryRevealUx";
+import {
+  COMPANION_SELECT_CLASS,
+  COMPANION_SETUP_LABEL_CLASS,
+} from "@/lib/companionFormControls";
 
 export type CategoryOption<T extends string = string> = {
   value: T;
@@ -19,8 +23,7 @@ type CategoryPickerSelectProps<T extends string> = {
   hideLabel?: boolean;
 };
 
-const SELECT_CLASS =
-  "w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
+const SELECT_CLASS = COMPANION_SELECT_CLASS;
 
 export function CategoryPickerSelect<T extends string>({
   label,
@@ -65,7 +68,7 @@ export function CategoryPickerSelect<T extends string>({
   return (
     <label
       htmlFor={selectId}
-      className={`block text-xs font-bold uppercase tracking-wide text-[#6b635a] ${className}`}
+      className={`block ${COMPANION_SETUP_LABEL_CLASS} ${className}`}
     >
       {label}
       <select
@@ -76,7 +79,7 @@ export function CategoryPickerSelect<T extends string>({
             e.target.value ? (e.target.value as T) : NO_CATEGORY,
           )
         }
-        className={`mt-1 ${SELECT_CLASS}`}
+        className={`mt-0.5 ${SELECT_CLASS}`}
       >
         <option value="">{placeholder}</option>
         {options.map((opt) => (

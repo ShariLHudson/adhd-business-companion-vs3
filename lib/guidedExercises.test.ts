@@ -26,7 +26,7 @@ describe("guidedExercises", () => {
     expect(standaloneSectionForActivity("priority-sort")).toBe(
       "guided-exercises",
     );
-    expect(standaloneSectionForActivity("brain-parking-lot")).toBe("activities");
+    expect(standaloneSectionForActivity("brain-parking-lot")).toBe("focus");
   });
 });
 

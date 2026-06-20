@@ -46,3 +46,12 @@ export function dismissPlanMyDayForSession(): void {
     /* ignore quota / private mode */
   }
 }
+
+export function clearPlanMyDayDismissForSession(): void {
+  if (typeof sessionStorage === "undefined") return;
+  try {
+    sessionStorage.removeItem(PLAN_MY_DAY_DISMISS_KEY);
+  } catch {
+    /* ignore */
+  }
+}

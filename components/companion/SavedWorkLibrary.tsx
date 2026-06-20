@@ -11,6 +11,7 @@ import {
   getActiveSavedWork,
   getArchivedSavedWork,
   getSavedWork,
+  SAVED_WORK_UPDATED_EVENT,
   unarchiveSavedWork,
   updateSavedWork,
   type SavedWorkItem,
@@ -149,6 +150,9 @@ export function SavedWorkLibrary({
 
   useEffect(() => {
     refresh();
+    const onUpdate = () => refresh();
+    window.addEventListener(SAVED_WORK_UPDATED_EVENT, onUpdate);
+    return () => window.removeEventListener(SAVED_WORK_UPDATED_EVENT, onUpdate);
   }, []);
 
   const baseList =

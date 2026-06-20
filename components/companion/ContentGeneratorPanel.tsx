@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
-  businessContextSummary,
   getContentTypes,
   getPrefs,
   getOutputLanguageContext,
@@ -25,7 +24,6 @@ import {
   normalizeArtifactType,
   type ArtifactExportAction,
 } from "@/lib/artifactType";
-import { CreateDraftImprove } from "@/components/companion/CreateDraftImprove";
 import { CreateDraftReviewChat } from "@/components/companion/CreateDraftReviewChat";
 import { ConfirmDialog } from "@/components/companion/ConfirmDialog";
 import {
@@ -60,6 +58,19 @@ import {
   resolveTemplateName,
 } from "@/lib/createTemplates";
 import { DraftWorkspacePanel } from "@/components/companion/DraftWorkspacePanel";
+import { DraftActionBar } from "@/components/companion/DraftActionBar";
+import { CreateDraftSectionEdit } from "@/components/companion/CreateDraftSectionEdit";
+import {
+  refineInstructionForEditAction,
+  SOCIAL_PLATFORM_URLS,
+  type DraftEditAction,
+  type DraftExportAction,
+  type DraftSaveAction,
+  type DraftSocialAction,
+} from "@/lib/createDraftActions";
+import { catalogLabelToCreateType } from "@/lib/createTemplateFields";
+import { getTemplateSectionsForEdit } from "@/lib/createTemplateSections";
+import type { DraftGuidedEditRequest } from "@/components/companion/DraftWorkspacePanel";
 import {
   logCreateBuild,
   logCreateError,
@@ -77,13 +88,33 @@ import {
 } from "@/lib/createBuildDraft";
 import { CreateWorkflowPanel } from "@/components/companion/CreateWorkflowPanel";
 import { CreateDiscoveryWorkspace } from "@/components/companion/CreateDiscoveryWorkspace";
+import { CreateWorkspaceV2Panel } from "@/components/companion/CreateWorkspaceV2Panel";
+import { CreateDraftResumeList } from "@/components/companion/CreateDraftResumeList";
 import { CreateTypePicker } from "@/components/companion/CreateTypePicker";
+import {
+  CREATE_WORKSPACE_V2,
+  initializeWorkspaceV2Workflow,
+  needIdeasPromptForSection,
+} from "@/lib/createWorkspaceV2";
 import type { CreateBuilderPhase } from "@/lib/createBuilderChat";
 import { blankScaffoldForType } from "@/lib/createInitialization";
 import { liveCreateWorkflowState } from "@/lib/liveCreateWorkspace";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
+import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import { isUnresolvedCreateType } from "@/lib/createTypePickers";
-import { combinedCompanionContextForAI } from "@/lib/activeCompanions";
+import {
+  AudienceBadge,
+  AudienceSelector,
+} from "@/components/companion/AudienceSelector";
+import {
+  avatarIdFromAudienceId,
+  buildGenerationContextWithBusiness,
+  getSelectedContentAudienceId,
+  getSelectedContentToneId,
+  resolveToneForGeneration,
+  selectedAudienceLabel,
+} from "@/lib/contentAudience";
 import {
   emptySavedArtifact,
   recordAfterGoogleDoc,
@@ -93,7 +124,15 @@ import {
   type SavedArtifactRecord,
 } from "@/lib/savedArtifact";
 import {
-  createSavedWork,
+  buildDraftSavedAnnouncement,
+  persistGeneratedDraft,
+} from "@/lib/createDraftPersistence";
+import {
+  deleteCreateDraftEntry,
+  duplicateCreateDraftEntry,
+  renameCreateDraftEntry,
+} from "@/lib/createDraftLibrary";
+import {
   getSavedWorkById,
   linkSavedWorkToProject,
   markSavedWorkExported,
@@ -113,8 +152,6 @@ import { SaveStatusBanner } from "@/components/companion/SaveStatusBanner";
 import {
   buildTaskSheetCsv,
   createProjectFromDocument,
-  detectExecutionCapability,
-  executionActionsForCapability,
   extractTasksFromDocument,
   linkGoogleAssetToProject,
   type ExecutionActionId,
@@ -132,7 +169,9 @@ export type GenSeed = {
   createWorkflow?: CreateWorkflowState;
 } | null;
 
-const TONES = ["Warm & ADHD-friendly", "Friendly", "Professional", "Persuasive", "Storytelling"];
+function forAvatarFromSelection(): string | undefined {
+  return avatarIdFromAudienceId(getSelectedContentAudienceId());
+}
 
 function categoryFor(type: string): TemplateCategory {
   const t = type.toLowerCase();
@@ -172,9 +211,12 @@ export function ContentGeneratorPanel({
   onSaveForLater,
   onStartOver,
   onDeleteDraft,
+  onOpenCreateDraft,
+  onDeleteCreateDraftEntry,
   onOpenGoogleWorkspace,
   onArtifactReady,
   onExportGuidance,
+  onDraftGuidedEdit,
   companionBuilderMode = false,
   createBuilderPhase = null,
   chatBuildRequest,
@@ -188,7 +230,10 @@ export function ContentGeneratorPanel({
   onRegisterBuildDraft,
   draftScrollTarget = null,
   draftScrollStamp = 0,
+  workspaceV2HighlightSectionId = null,
+  workspaceV2HighlightKey = 0,
   onCompanionTypePick,
+  onWorkspaceNeedIdeas,
 }: {
   seed: GenSeed;
   onOpen?: (s: AppSection) => void;
@@ -220,9 +265,14 @@ export function ContentGeneratorPanel({
   onSaveForLater?: () => void;
   onStartOver?: () => void;
   onDeleteDraft?: () => void;
+  /** Open a saved Create workspace draft from the resume list. */
+  onOpenCreateDraft?: (id: string) => void;
+  onDeleteCreateDraftEntry?: (id: string) => void;
   onOpenGoogleWorkspace?: (session: GoogleWorkspaceSession) => void;
   onArtifactReady?: (message: string) => void;
   onExportGuidance?: (message: string) => void;
+  /** Start a focused Shari chat turn for section editing. */
+  onDraftGuidedEdit?: (request: DraftGuidedEditRequest) => void;
   /** Chat beside Create drives discovery — panel shows status, not questions. */
   companionBuilderMode?: boolean;
   /** Chat builder phase for split-screen status copy. */
@@ -253,15 +303,22 @@ export function ContentGeneratorPanel({
   /** Scroll draft editor to a section after chat apply. */
   draftScrollTarget?: string | null;
   draftScrollStamp?: number;
+  workspaceV2HighlightSectionId?: string | null;
+  workspaceV2HighlightKey?: number;
   /** Panel type pick while split chat is open — starts companion conversation. */
   onCompanionTypePick?: (typeLabel: string) => void;
+  /** User asked for ideas on a workspace section — route to support chat only. */
+  onWorkspaceNeedIdeas?: (
+    sectionId: string,
+    sectionLabel: string,
+    prompt: string,
+  ) => void;
 }) {
   const [type, setType] = useState(seed?.type ?? "");
   const [topic, setTopic] = useState(seed?.topic ?? seed?.brief ?? "");
   const [brief, setBrief] = useState(seed?.topic ?? seed?.brief ?? "");
   const [sourceText, setSourceText] = useState(seed?.sourceText ?? "");
   const [editingTopic, setEditingTopic] = useState(false);
-  const [tone, setTone] = useState(TONES[0]);
   const [loading, setLoading] = useState(false);
   const [draft, setDraft] = useState(seed?.draft ?? "");
   const [title, setTitle] = useState("");
@@ -309,14 +366,23 @@ export function ContentGeneratorPanel({
   });
   const showBuildingState = isGenerating && !draft.trim() && !splitScreenMode;
   const inGuidedCreate =
-    !workflow.buildApproved && !isGenerating && !splitScreenMode;
+    !CREATE_WORKSPACE_V2 &&
+    !workflow.buildApproved &&
+    !isGenerating &&
+    !splitScreenMode;
+  const showWorkspaceV2 =
+    CREATE_WORKSPACE_V2 && !showDraftEditor && Boolean(resolvedCreateType);
   const showSplitScreenStatus =
-    splitScreenMode && !showDraftEditor && Boolean(resolvedCreateType);
-  const showSplitTypePicker =
+    !CREATE_WORKSPACE_V2 &&
     splitScreenMode &&
     !showDraftEditor &&
+    Boolean(resolvedCreateType);
+  const showCreateTypePicker =
+    !showDraftEditor &&
     !resolvedCreateType &&
-    workflow.step === "category";
+    workflow.step === "category" &&
+    (splitScreenMode || CREATE_WORKSPACE_V2);
+  const showSplitTypePicker = showCreateTypePicker && splitScreenMode;
   const currentDiscoveryQuestion =
     resolvedCreateType && splitScreenMode
       ? discoveryQuestionsForState(resolvedCreateType, workflow)
@@ -327,6 +393,14 @@ export function ContentGeneratorPanel({
     .map((s) => s.trim())
     .filter(Boolean);
   const [loadingMessageIndex, setLoadingMessageIndex] = useState(0);
+
+  useEffect(() => {
+    const syncAvatar = () => setForAvatar(forAvatarFromSelection());
+    syncAvatar();
+    window.addEventListener("content-audience-updated", syncAvatar);
+    return () =>
+      window.removeEventListener("content-audience-updated", syncAvatar);
+  }, []);
 
   useEffect(() => {
     if (workflow.step !== "discovery" || splitScreenMode) return;
@@ -515,7 +589,6 @@ export function ContentGeneratorPanel({
   async function run(
     t: string,
     b: string,
-    tn: string,
     wf: CreateWorkflowState = workflowRef.current,
     opts?: { fromChatApproval?: boolean },
   ): Promise<boolean> {
@@ -593,14 +666,17 @@ export function ContentGeneratorPanel({
 
     try {
       const { contentLanguageHint } = getOutputLanguageContext(getPrefs());
+      const toneForApi = resolveToneForGeneration(getSelectedContentToneId());
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           type: resolvedType,
           brief: resolvedBrief,
-          tone: tn,
-          context: combinedCompanionContextForAI(businessContextSummary(forAvatar)),
+          tone: toneForApi,
+          context: buildGenerationContextWithBusiness({
+            avatarId: forAvatar ?? forAvatarFromSelection(),
+          }),
           contentLanguageHint,
         }),
       });
@@ -639,6 +715,25 @@ export function ContentGeneratorPanel({
           contentType: resolvedType,
           content,
         });
+        const artifactTitle = (
+          title.trim() ||
+          resolvedBrief ||
+          resolvedType ||
+          "Draft"
+        ).slice(0, 80);
+        if (onSavedArtifactChange) {
+          const { record } = persistGeneratedDraft({
+            draft: content,
+            artifactType: resolvedType,
+            title: artifactTitle,
+            existingSavedWorkId:
+              savedArtifact?.savedWorkId ?? savedArtifact?.templateId,
+            prevArtifact: savedArtifact ?? null,
+          });
+          onSavedArtifactChange(record);
+          setLocationPanelOpen(true);
+          onArtifactReady?.(buildDraftSavedAnnouncement(record));
+        }
         return true;
       }
       const errMsg = data.error || `HTTP ${res.status}`;
@@ -799,7 +894,8 @@ export function ContentGeneratorPanel({
       !draft.trim() ||
       !type ||
       savedArtifact ||
-      !onSavedArtifactChange
+      !onSavedArtifactChange ||
+      workflow.buildApproved
     ) {
       return;
     }
@@ -815,6 +911,7 @@ export function ContentGeneratorPanel({
     topic,
     brief,
     onSavedArtifactChange,
+    workflow.buildApproved,
   ]);
 
   useEffect(() => {
@@ -881,24 +978,11 @@ export function ContentGeneratorPanel({
     title,
   ]);
 
-  const executionCapability = useMemo(
-    () =>
-      draft.trim()
-        ? detectExecutionCapability(
-            type || resolvedTypeLabel(workflow) || "Draft",
-            draft,
-          )
-        : null,
-    [draft, type, workflow],
-  );
-
-  const executionActions = useMemo(
-    () =>
-      executionCapability && showDraftEditor && workflow.draftStatus === "ready"
-        ? executionActionsForCapability(executionCapability)
-        : [],
-    [executionCapability, showDraftEditor, workflow.draftStatus],
-  );
+  const templateEditSections = useMemo(() => {
+    const createType =
+      catalogLabelToCreateType(type || resolvedTypeLabel(workflow)) ?? "custom";
+    return getTemplateSectionsForEdit(createType);
+  }, [type, workflow]);
 
   function exportGuard(): string | null {
     return validateArtifactForExport(savedArtifact, draft, artifactTitleValue());
@@ -908,42 +992,18 @@ export function ContentGeneratorPanel({
     if (!draft.trim()) return;
     const artifactTitle = artifactTitleValue();
     const artifactType = type || "content";
-    const existingId = savedArtifact?.savedWorkId ?? savedArtifact?.templateId;
-    let savedWorkId = existingId;
+    const { record } = persistGeneratedDraft({
+      draft,
+      artifactType,
+      title: artifactTitle,
+      existingSavedWorkId:
+        savedArtifact?.savedWorkId ?? savedArtifact?.templateId,
+      prevArtifact: savedArtifact ?? null,
+    });
 
-    if (existingId) {
-      updateSavedWork(existingId, {
-        title: artifactTitle,
-        body: draft,
-        artifactType,
-        status: "saved",
-      });
-    } else {
-      const item = createSavedWork({
-        title: artifactTitle,
-        artifactType,
-        body: draft,
-        status: "saved",
-        sourceWorkspace: "content-generator",
-      });
-      savedWorkId = item.id;
-    }
-
-    if (!savedWorkId) return;
-
-    if (onSavedArtifactChange) {
-      onSavedArtifactChange(
-        recordAfterSavedWorkSave(
-          savedArtifact ?? null,
-          artifactType,
-          artifactTitle,
-          savedWorkId,
-          draft,
-        ),
-      );
-    }
+    onSavedArtifactChange?.(record);
     setLocationPanelOpen(true);
-    note(existingId ? saveReceipt("saved-work") : saveReceipt("saved-work"));
+    note(saveReceipt("saved-work"));
     onWin?.(artifactTitle);
   }
 
@@ -1065,6 +1125,115 @@ export function ContentGeneratorPanel({
     }
   }
 
+  function applyDraftRefine(instruction: string) {
+    const trimmed = instruction.trim();
+    if (!trimmed || !draft.trim() || loading) return;
+    void (async () => {
+      try {
+        const res = await fetch("/api/refine", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: draft,
+            action: "modify",
+            instruction: trimmed,
+            context: buildGenerationContextWithBusiness(),
+          }),
+        });
+        const data = await res.json();
+        if (res.ok && data.result) {
+          setDraft(data.result);
+          setLastActivity({
+            kind: "draft",
+            title: brief || type || "Draft",
+            subtitle: type || "content",
+            contentType: type,
+            content: data.result,
+          });
+          note("Draft updated ✓");
+        } else {
+          note("Couldn't update just now — try again.");
+        }
+      } catch {
+        note("Couldn't update just now — try again.");
+      }
+    })();
+  }
+
+  function startDraftGuidedEdit(sectionId: string, opener: string) {
+    onDraftGuidedEdit?.({ sectionId, opener });
+  }
+
+  function handleDraftSectionEdit(request: DraftGuidedEditRequest) {
+    startDraftGuidedEdit(request.sectionId, request.opener);
+  }
+
+  function handleDraftEditAction(action: DraftEditAction) {
+    if (!draft.trim()) return;
+    if (action === "custom-change") {
+      startDraftGuidedEdit("other", "What would you like to change?");
+      return;
+    }
+    const instruction = refineInstructionForEditAction(action);
+    if (instruction) applyDraftRefine(instruction);
+  }
+
+  function handleDraftSaveAction(action: DraftSaveAction) {
+    if (!draft.trim()) return;
+    switch (action) {
+      case "save-google-docs":
+        void handleOpenGoogle("doc");
+        return;
+      case "save-google-drive":
+        window.open("https://drive.google.com", "_blank");
+        note("Opened Google Drive — save your doc there when ready.");
+        return;
+      case "add-existing-project":
+        handleAddToProject();
+        return;
+      default:
+        return;
+    }
+  }
+
+  function handleDraftExportAction(action: DraftExportAction) {
+    if (!draft.trim()) return;
+    switch (action) {
+      case "copy-text":
+        void navigator.clipboard?.writeText(draft);
+        note("Copied ✓");
+        return;
+      case "print":
+        exportPrintRef.current?.click();
+        return;
+      case "export-pdf":
+        handleDownloadDraft();
+        return;
+      case "export-docx":
+        void handleOpenGoogle("doc");
+        note("Opened in Google Docs — use File → Download → DOCX if you need Word format.");
+        return;
+      default:
+        return;
+    }
+  }
+
+  function handleDraftSocialAction(action: DraftSocialAction) {
+    switch (action) {
+      case "open-linkedin":
+        window.open(SOCIAL_PLATFORM_URLS.linkedin, "_blank");
+        return;
+      case "open-facebook":
+        window.open(SOCIAL_PLATFORM_URLS.facebook, "_blank");
+        return;
+      case "open-instagram":
+        window.open(SOCIAL_PLATFORM_URLS.instagram, "_blank");
+        return;
+      default:
+        return;
+    }
+  }
+
   function handleExecutionAction(action: ExecutionActionId) {
     if (!draft.trim()) return;
     const artifactType = type || resolvedTypeLabel(workflow) || "Draft";
@@ -1183,15 +1352,21 @@ export function ContentGeneratorPanel({
     setEditingTopic(false);
     setDraft("");
     if (!opts?.skipWorkflow && !companionBuilderMode) {
-      setWorkflow(reconcileTemplateForType(advanceAfterItemPick(typeLabel)));
-    } else if (companionBuilderMode) {
-      const advanced = reconcileTemplateForType(advanceAfterItemPick(typeLabel));
+      if (CREATE_WORKSPACE_V2) {
+        setWorkflow(initializeWorkspaceV2Workflow(typeLabel));
+      } else {
+        setWorkflow(reconcileTemplateForType(advanceAfterItemPick(typeLabel)));
+      }
+    } else if (companionBuilderMode || CREATE_WORKSPACE_V2) {
+      const advanced = CREATE_WORKSPACE_V2
+        ? initializeWorkspaceV2Workflow(typeLabel)
+        : reconcileTemplateForType(advanceAfterItemPick(typeLabel));
       setWorkflow({
         ...advanced,
-        questionMode: "split_screen",
+        questionMode: companionBuilderMode ? "split_screen" : advanced.questionMode,
         sessionId: workflowRef.current.sessionId ?? advanced.sessionId,
       });
-      onCompanionTypePick?.(typeLabel);
+      if (companionBuilderMode) onCompanionTypePick?.(typeLabel);
     }
     started.current = false;
   }
@@ -1233,7 +1408,7 @@ export function ContentGeneratorPanel({
     const fullBrief = briefText.trim() || buildFullCreateBrief(wf);
     setBrief(fullBrief);
     setTopic(fullBrief);
-    return run(resolved, fullBrief, tone, wf, { fromChatApproval: fromChat });
+    return run(resolved, fullBrief, wf, { fromChatApproval: fromChat });
   }
 
   const sharedBuildDraftRef = useRef<
@@ -1333,7 +1508,7 @@ export function ContentGeneratorPanel({
             text: draft,
             action: "modify",
             instruction,
-            context: combinedCompanionContextForAI(businessContextSummary()),
+            context: buildGenerationContextWithBusiness(),
           }),
         });
         const data = await res.json();
@@ -1430,6 +1605,12 @@ export function ContentGeneratorPanel({
             : workspacePanelShellClass({ width: "standard", extra: "overflow-y-auto" })
         }`}
       >
+      {!showDraftEditor ? (
+        <div className="shrink-0 px-4 pt-4 sm:px-6">
+          <WorkspaceAreaWorksGuide areaId="content-generator" />
+          <WorkspaceGuide section="content-generator" />
+        </div>
+      ) : null}
       {showCreateOptions && (
         <div
           className={`flex shrink-0 items-center justify-end ${
@@ -1444,6 +1625,28 @@ export function ContentGeneratorPanel({
           />
         </div>
       )}
+      {workspaceMode && !showDraftEditor ? (
+        <div className="border-b border-[#e7dfd4] bg-[#faf7f2]/98 px-4 py-2">
+          <AudienceSelector
+            compact
+            onChange={(_id, _tone) => {
+              const label = selectedAudienceLabel();
+              setWorkflow((prev) => ({
+                ...prev,
+                discoveryAnswers: {
+                  ...prev.discoveryAnswers,
+                  audience: label,
+                },
+              }));
+            }}
+          />
+        </div>
+      ) : null}
+      {workspaceMode && showDraftEditor ? (
+        <div className="border-b border-[#e7dfd4] bg-[#faf7f2]/98 px-4 py-2">
+          <AudienceBadge />
+        </div>
+      ) : null}
       {type && brief && showDraftEditor && !(workspaceMode && phase === "ready") && (
         <div className="mt-4 flex items-center justify-between gap-2">
           <p className="text-sm text-[#6b635a]">
@@ -1472,13 +1675,71 @@ export function ContentGeneratorPanel({
         </div>
       )}
 
-      {showSplitTypePicker && (
+      {showCreateTypePicker && onOpenCreateDraft ? (
+        <CreateDraftResumeList
+          onOpen={onOpenCreateDraft}
+          onRename={(id, title) => renameCreateDraftEntry(id, title)}
+          onDuplicate={(id) => {
+            duplicateCreateDraftEntry(id);
+          }}
+          onDelete={(id) => {
+            if (onDeleteCreateDraftEntry) {
+              onDeleteCreateDraftEntry(id);
+            } else {
+              deleteCreateDraftEntry(id);
+            }
+          }}
+        />
+      ) : null}
+
+      {showCreateTypePicker && (
         <CreateTypePicker
           onPick={(label) =>
             pickCreateType(label, {
               bypassRoute: true,
               categoryId: categoryIdForType(label),
             })
+          }
+        />
+      )}
+
+      {showWorkspaceV2 && (
+        <CreateWorkspaceV2Panel
+          workflow={workflow}
+          workspacePhase={workspacePhase}
+          loadingMessageIndex={loadingMessageIndex}
+          errorMessage={buildErrorMessage}
+          building={loading || workflow.draftStatus === "building"}
+          highlightSectionId={workspaceV2HighlightSectionId}
+          highlightKey={workspaceV2HighlightKey}
+          onWorkflowChange={setWorkflow}
+          onNeedIdeas={(sectionId, sectionLabel) => {
+            const itemType = resolvedCreateType ?? type;
+            if (!itemType) return;
+            onWorkspaceNeedIdeas?.(
+              sectionId,
+              sectionLabel,
+              needIdeasPromptForSection(itemType, sectionLabel),
+            );
+          }}
+          onBuildDraft={() =>
+            void sharedBuildDraftRef.current({
+              brief: buildFullCreateBrief(workflowRef.current),
+              type: resolvedCreateType || type,
+              workflow: workflowRef.current,
+              fromChat: false,
+              mode: companionBuilderMode ? "split_screen" : "create_only",
+            })
+          }
+          onDeleteDraft={onDeleteDraft}
+          onTryAgain={
+            workspacePhase === "error"
+              ? () => {
+                  setError(false);
+                  setBuildErrorMessage(null);
+                  setWorkflow((prev) => ({ ...prev, draftStatus: "idle" }));
+                }
+              : undefined
           }
         />
       )}
@@ -1608,45 +1869,16 @@ export function ContentGeneratorPanel({
           }
           draft={draft}
           onDraftChange={setDraft}
-          onApplyDraft={(next) => {
-            setDraft(next);
-            setLastActivity({
-              kind: "draft",
-              title: brief || type || "Draft",
-              subtitle: type || "content",
-              contentType: type,
-              content: next,
-            });
-          }}
-          onGoogleDoc={() => handleOpenGoogle("doc")}
-          onCopy={() => {
-            void navigator.clipboard?.writeText(draft);
-            note("Copied ✓");
-          }}
-          onPrint={() => exportPrintRef.current?.click()}
-          onDownload={handleDownloadDraft}
-          onAddToProject={handleAddToProject}
-          onRegenerate={
-            workflow.buildApproved || workflow.draftStatus === "ready"
-              ? () =>
-                  void sharedBuildDraftRef.current({
-                    brief: buildFullCreateBrief(workflowRef.current),
-                    type: resolvedTypeLabel(workflowRef.current) || type,
-                    workflow: workflowRef.current,
-                    fromChat: false,
-                    mode: companionBuilderMode ? "split_screen" : "create_only",
-                  })
-              : undefined
-          }
-          onMoreAction={handleCreateOption}
-          changeTypeDisabled={typeLocked}
+          onEditAction={handleDraftEditAction}
+          onSaveAction={handleDraftSaveAction}
+          onExportAction={handleDraftExportAction}
+          onSocialAction={handleDraftSocialAction}
+          templateSections={templateEditSections}
+          onSectionEdit={handleDraftSectionEdit}
           googleExportError={googleExportError}
           onClearGoogleError={() => setGoogleExportError(null)}
+          onRetryGoogle={() => handleOpenGoogle("doc")}
           busy={loading}
-          reviewContext={draftReviewContext}
-          onReviewReceipt={(msg) => note(msg)}
-          executionActions={executionActions}
-          onExecutionAction={handleExecutionAction}
         />
         <div className="mx-auto max-w-3xl px-4 pb-4">
           <SaveStatusBanner level="resume" />
@@ -1694,30 +1926,25 @@ export function ContentGeneratorPanel({
             }`}
           />
 
-          <CreateDraftImprove
-            draft={draft}
-            onApply={(next) => {
-              setDraft(next);
-              setLastActivity({
-                kind: "draft",
-                title: brief || type || "Draft",
-                subtitle: type || "content",
-                contentType: type,
-                content: next,
-              });
-            }}
-            disabled={loading}
-            onSave={handleSave}
-            onAddToProject={handleAddToProject}
-            onCopy={() => {
-              void navigator.clipboard?.writeText(draft);
-              note("Copied ✓");
-            }}
-            onPrint={() => exportPrintRef.current?.click()}
-            onGoogleDoc={() => exportDocRef.current?.click()}
+          <CreateDraftSectionEdit
+            sections={templateEditSections}
+            onSelectSection={(sectionId, opener) =>
+              handleDraftSectionEdit({ sectionId, opener })
+            }
+            disabled={loading || !draft.trim()}
           />
 
-          {draftReviewContext ? (
+          <div className="mt-4">
+            <DraftActionBar
+              onEditAction={handleDraftEditAction}
+              onSaveAction={handleDraftSaveAction}
+              onExportAction={handleDraftExportAction}
+              onSocialAction={handleDraftSocialAction}
+              disabled={loading || !draft.trim()}
+            />
+          </div>
+
+          {draftReviewContext && !companionBuilderMode ? (
             <CreateDraftReviewChat
               context={draftReviewContext}
               draft={draft}

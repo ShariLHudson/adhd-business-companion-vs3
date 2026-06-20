@@ -19,6 +19,7 @@ import type { WorkspaceFieldId } from "@/lib/workspaceAwareness";
 import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
 import type { ClientAvatarStepKey } from "@/lib/clientAvatarCoach";
 import { snapshotFromBuilderInput } from "@/lib/clientAvatarCoach";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 
 // Curated identity marks — double as quick "icons" and emoji avatars.
 const EMOJI_CHOICES = [
@@ -952,6 +953,9 @@ export function IdealClientBuilder({
       <p className="mt-1 text-base text-[#6b635a]">
         Who you help. Everything Shari writes adapts to whoever&apos;s in use.
       </p>
+      <div className="mt-4">
+        <WorkspaceAreaWorksGuide areaId="client-avatars" />
+      </div>
       {(() => {
         const active = avatars.find((a) => a.id === activeId);
         return active ? (

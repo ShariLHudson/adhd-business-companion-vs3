@@ -7,11 +7,16 @@ import { resolveTemplateName } from "./createTemplates";
 import {
   answeredDiscoveryCount,
   discoveryComplete,
-  hasEnoughDiscoveryForDraft,
+  hasEnoughClarityForDraft,
   requiredFieldsComplete,
   resolvedTypeLabel,
   type CreateWorkflowState,
 } from "./createWorkflow";
+import {
+  CREATE_WORKSPACE_V2,
+  workspaceV2HasBuildableContent,
+  workspaceV2Sections,
+} from "./createWorkspaceV2";
 
 export type CreateBuildValidation = {
   ok: boolean;
@@ -37,13 +42,31 @@ export function validateCreateForBuild(
   const missing: string[] = [];
 
   if (!itemType.trim()) missing.push("itemType");
+
+  if (CREATE_WORKSPACE_V2 && state.workspaceFirst) {
+    const hasContent = workspaceV2HasBuildableContent(state);
+    if (!hasContent) missing.push("workspaceContent");
+    const readyToBuild = hasContent && Boolean(itemType.trim());
+    return {
+      ok: missing.length === 0,
+      missing,
+      itemType,
+      subtype: subtype || null,
+      templateName,
+      answersCount: workspaceV2Sections(state).filter(
+        (s) => s.skipped || s.content.trim(),
+      ).length,
+      readyToBuild,
+    };
+  }
+
   if (answersCount === 0) missing.push("questionAnswers");
 
   const fieldsComplete = requiredFieldsComplete(itemType, state.discoveryAnswers);
   const splitComplete =
     state.questionMode === "split_screen"
       ? discoveryComplete(itemType, state)
-      : fieldsComplete || hasEnoughDiscoveryForDraft(state.discoveryAnswers);
+      : hasEnoughClarityForDraft(itemType, state);
   const chatReady =
     Boolean(options?.fromChatApproval) &&
     answersCount > 0 &&

@@ -45,6 +45,7 @@ export function WorkspaceLayout({
   leftPaneEmoji = "💬",
   viewSizePreset = "balanced",
   onViewSizePresetChange,
+  chatFocusKey = 0,
 }: {
   chat: ReactNode;
   workspace?: ReactNode | null;
@@ -67,11 +68,14 @@ export function WorkspaceLayout({
   leftPaneEmoji?: string;
   viewSizePreset?: WorkspaceViewSizePreset;
   onViewSizePresetChange?: (preset: WorkspaceViewSizePreset) => void;
+  /** Increment to bring chat into view (e.g. Create → Need Ideas). */
+  chatFocusKey?: number;
 }) {
   const [mobileView, setMobileView] = useState<"chat" | "work">("chat");
   const workspacePaneRef = useRef<HTMLDivElement>(null);
   const prevActiveRef = useRef(false);
   const lastRevealKeyRef = useRef(0);
+  const lastChatFocusKeyRef = useRef(0);
   const chatHidden = chatLayoutMode === "workspace-focus";
 
   useEffect(() => {
@@ -99,6 +103,13 @@ export function WorkspaceLayout({
       el.focus({ preventScroll: false });
     });
   }, [workspaceActive, revealKey]);
+
+  useEffect(() => {
+    if (!chatFocusKey || chatFocusKey === lastChatFocusKeyRef.current) return;
+    lastChatFocusKeyRef.current = chatFocusKey;
+    setMobileView("chat");
+    onChatLayoutModeChange?.("split");
+  }, [chatFocusKey, onChatLayoutModeChange]);
 
   function setLayout(mode: ChatLayoutMode) {
     onChatLayoutModeChange?.(mode);
@@ -237,7 +248,7 @@ export function WorkspaceLayout({
             </div>
           </div>
           {/* Solid canvas — content never sits over the blurred wallpaper. */}
-          <div className="workspace-panel-canvas min-h-0 flex-1 overflow-y-auto bg-[#faf7f2] shadow-inner">
+          <div className="workspace-panel-canvas min-h-0 flex-1 overflow-y-auto shadow-inner">
             {workspace}
           </div>
         </div>

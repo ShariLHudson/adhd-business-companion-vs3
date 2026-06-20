@@ -1,17 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { CreateDraftImprove } from "@/components/companion/CreateDraftImprove";
-import { CreateDraftReviewChat } from "@/components/companion/CreateDraftReviewChat";
-import { CreateExecutionActionBar } from "@/components/companion/CreateExecutionActionBar";
-import { CreateOptionsMenu, type CreateOptionsAction } from "@/components/companion/CreateOptionsMenu";
-import type { ExecutionActionId } from "@/lib/createExecution";
-import type { DraftReviewContext } from "@/lib/createDraftReview";
+import { CreateDraftSectionEdit } from "@/components/companion/CreateDraftSectionEdit";
+import { DraftActionBar } from "@/components/companion/DraftActionBar";
+import type {
+  DraftEditAction,
+  DraftExportAction,
+  DraftSaveAction,
+  DraftSocialAction,
+} from "@/lib/createDraftActions";
+import type { TemplateSectionForEdit } from "@/lib/createTemplateSections";
 
-const btn =
-  "rounded-lg px-3 py-2 text-sm font-semibold transition-colors";
-const btnPrimary = `${btn} bg-[#1e4f4f] text-white hover:bg-[#163a3a] disabled:opacity-50`;
-const btnSecondary = `${btn} border border-[#1e4f4f]/40 bg-white text-[#1e4f4f] hover:bg-[#f0f5f5] disabled:opacity-50`;
+export type DraftGuidedEditRequest = {
+  sectionId: string;
+  opener: string;
+};
+
+const btnPrimary =
+  "rounded-lg px-3 py-2 text-sm font-semibold bg-[#1e4f4f] text-white hover:bg-[#163a3a] disabled:opacity-50";
 
 export function DraftWorkspacePanel({
   itemType,
@@ -19,54 +25,43 @@ export function DraftWorkspacePanel({
   draft,
   onDraftChange,
   editable = true,
-  onApplyDraft,
-  onGoogleDoc,
-  onCopy,
-  onPrint,
-  onDownload,
-  onAddToProject,
-  onRegenerate,
-  onMoreAction,
-  changeTypeDisabled,
+  onEditAction,
+  onSaveAction,
+  onExportAction,
+  onSocialAction,
+  templateSections,
+  onSectionEdit,
   googleExportError,
   onClearGoogleError,
+  onRetryGoogle,
   busy = false,
-  reviewContext,
-  onReviewReceipt,
-  executionActions,
-  onExecutionAction,
 }: {
   itemType: string;
   templateName?: string | null;
   draft: string;
   onDraftChange?: (value: string) => void;
   editable?: boolean;
-  onApplyDraft: (next: string) => void;
-  onGoogleDoc: () => void | Promise<void>;
-  onCopy: () => void;
-  onPrint: () => void;
-  onDownload?: () => void;
-  onAddToProject?: () => void;
-  onRegenerate?: () => void;
-  onMoreAction?: (action: CreateOptionsAction) => void;
-  changeTypeDisabled?: boolean;
+  onEditAction: (action: DraftEditAction) => void;
+  onSaveAction: (action: DraftSaveAction) => void;
+  onExportAction: (action: DraftExportAction) => void;
+  onSocialAction: (action: DraftSocialAction) => void;
+  templateSections: TemplateSectionForEdit[];
+  onSectionEdit?: (request: DraftGuidedEditRequest) => void;
   googleExportError?: string | null;
   onClearGoogleError?: () => void;
+  onRetryGoogle?: () => void | Promise<void>;
   busy?: boolean;
-  reviewContext?: DraftReviewContext | null;
-  onReviewReceipt?: (message: string) => void;
-  executionActions?: ExecutionActionId[];
-  onExecutionAction?: (action: ExecutionActionId) => void;
 }) {
   const [googleLoading, setGoogleLoading] = useState(false);
   const displayType = itemType?.trim() || "Draft";
+  const actionsDisabled = busy || !draft.trim();
 
-  async function handleGoogleDoc() {
-    if (!draft.trim() || googleLoading) return;
+  async function handleRetryGoogle() {
+    if (!onRetryGoogle || googleLoading) return;
     onClearGoogleError?.();
     setGoogleLoading(true);
     try {
-      await onGoogleDoc();
+      await onRetryGoogle();
     } finally {
       setGoogleLoading(false);
     }
@@ -88,32 +83,35 @@ export function DraftWorkspacePanel({
           </p>
         ) : null}
         <p className="mt-2 text-sm text-[#6b635a]">
-          Review your draft below. You can edit it, copy it, send it to Google
-          Docs, print it, or add it to a project.
+          Review your draft below. Use <strong>Edit</strong> to refine it with
+          Shari, or <strong>Save</strong>, <strong>Export</strong>, and{" "}
+          <strong>Social</strong> when you are ready to share.
         </p>
 
         {googleExportError ? (
           <div className="mt-4 rounded-xl border border-[#e8c4bc] bg-[#fdf6f4] p-4">
             <p className="text-sm font-semibold text-[#8a3d32]">
-              Something went wrong sending this to Google Docs.
+              Something went wrong sending this to Google.
             </p>
             <p className="mt-1 text-sm text-[#6b635a]">{googleExportError}</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button
-                type="button"
-                onClick={() => void handleGoogleDoc()}
-                className={btnPrimary}
-              >
-                Try Again
-              </button>
-              <button type="button" onClick={onCopy} className={btnSecondary}>
-                Copy Draft
-              </button>
-              {onDownload ? (
-                <button type="button" onClick={onDownload} className={btnSecondary}>
-                  Download
+              {onRetryGoogle ? (
+                <button
+                  type="button"
+                  disabled={googleLoading}
+                  onClick={() => void handleRetryGoogle()}
+                  className={btnPrimary}
+                >
+                  {googleLoading ? "Trying…" : "Try Again"}
                 </button>
               ) : null}
+              <button
+                type="button"
+                onClick={() => onExportAction("copy-text")}
+                className="rounded-lg border border-[#1e4f4f]/40 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+              >
+                Copy Draft
+              </button>
             </div>
           </div>
         ) : null}
@@ -133,86 +131,26 @@ export function DraftWorkspacePanel({
           )}
         </div>
 
-        <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-[#e7dfd4] pt-4">
-          {editable ? (
-            <button
-              type="button"
-              onClick={() => {
-                const el = document.querySelector<HTMLTextAreaElement>(
-                  "[data-draft-workspace-editor]",
-                );
-                el?.focus();
-              }}
-              className={btnSecondary}
-            >
-              Edit
-            </button>
-          ) : null}
-          <button type="button" onClick={onCopy} className={btnSecondary}>
-            Copy
-          </button>
-          <button
-            type="button"
-            disabled={!draft.trim() || googleLoading || busy}
-            onClick={() => void handleGoogleDoc()}
-            className={btnPrimary}
-          >
-            {googleLoading ? "Opening…" : "Google Docs"}
-          </button>
-          <button type="button" onClick={onPrint} className={btnSecondary}>
-            Print
-          </button>
-          {onAddToProject ? (
-            <button type="button" onClick={onAddToProject} className={btnSecondary}>
-              Add To Project
-            </button>
-          ) : null}
-          {onRegenerate ? (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={onRegenerate}
-              className={btnSecondary}
-            >
-              Regenerate
-            </button>
-          ) : null}
-          {onMoreAction ? (
-            <CreateOptionsMenu
-              onAction={onMoreAction}
-              changeTypeDisabled={changeTypeDisabled}
-              triggerLabel="More Actions"
-            />
-          ) : null}
+        {onSectionEdit && templateSections.length > 0 ? (
+          <CreateDraftSectionEdit
+            sections={templateSections}
+            onSelectSection={(sectionId, opener) =>
+              onSectionEdit({ sectionId, opener })
+            }
+            disabled={actionsDisabled}
+          />
+        ) : null}
+
+        <div className="mt-5 border-t border-[#e7dfd4] pt-4">
+          <DraftActionBar
+            onEditAction={onEditAction}
+            onSaveAction={onSaveAction}
+            onExportAction={onExportAction}
+            onSocialAction={onSocialAction}
+            disabled={actionsDisabled}
+          />
         </div>
       </div>
-
-      {executionActions?.length && onExecutionAction ? (
-        <CreateExecutionActionBar
-          actions={executionActions}
-          onAction={onExecutionAction}
-          disabled={busy || !draft.trim()}
-        />
-      ) : null}
-
-      {editable ? (
-        <CreateDraftImprove
-          draft={draft}
-          onApply={onApplyDraft}
-          disabled={busy}
-          hideMoreActions
-        />
-      ) : null}
-
-      {reviewContext ? (
-        <CreateDraftReviewChat
-          context={reviewContext}
-          draft={draft}
-          onApplyDraft={onApplyDraft}
-          onReceipt={onReviewReceipt}
-          disabled={busy}
-        />
-      ) : null}
     </div>
   );
 }

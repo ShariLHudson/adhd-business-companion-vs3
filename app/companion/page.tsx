@@ -31,9 +31,19 @@ import { IdentityBar } from "@/components/companion/IdentityBar";
 import { SimpleHomeWelcome } from "@/components/companion/SimpleHomeWelcome";
 import { StressReliefOptionsCard } from "@/components/companion/StressReliefOptionsCard";
 import { TodayPanel } from "@/components/companion/TodayPanel";
+import { PlanMyDayPanel } from "@/components/companion/PlanMyDayPanel";
+import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { WinsThisWeekPanel } from "@/components/companion/WinsThisWeekPanel";
 import type { HomeResumeItem } from "@/lib/homeResumeItem";
 import { findLatestHomeResumeItem } from "@/lib/homeResumeItem";
+import { activityReturnLabel as resolveActivityReturnLabel } from "@/lib/activityReturnLabel";
+import {
+  BEGIN_NEW_DAY_GREETING,
+  type FreshStartKind,
+  freshStartCopy,
+} from "@/lib/freshStartCopy";
+import { clearDailySessionFlags } from "@/lib/freshStartSession";
+import { resetTodayPlanForNewDay } from "@/lib/planMyDay/planDayItems";
 import {
   dismissPlanMyDayForSession,
   dismissTodayResume,
@@ -43,6 +53,7 @@ import {
 import type { StartupOpenTarget } from "@/lib/startupFriction";
 import { discoveryContextForChat } from "@/lib/companionDiscovery";
 import { useVisualMode } from "@/lib/useVisualMode";
+import { resolveAdaptiveVisualContext } from "@/lib/adaptiveVisualContext";
 import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import type { ProfileSettingsSection } from "@/components/companion/ProfilePanel";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
@@ -109,6 +120,7 @@ import { recordProjectConversationIfOpen } from "@/lib/projectConversations";
 import { TimeBlockPanel } from "@/components/companion/TimeBlockPanel";
 import { TimeBlockTrigger } from "@/components/companion/TimeBlockTrigger";
 import { TopBar } from "@/components/companion/TopBar";
+import { FreshStartConfirmDialog } from "@/components/companion/FreshStartConfirmDialog";
 import { SimpleChat } from "@/components/companion/SimpleChat";
 import { ToolSuggestionCard } from "@/components/companion/ToolSuggestionCard";
 import { PendingActionBar } from "@/components/companion/PendingActionBar";
@@ -153,6 +165,15 @@ import {
   type CreateBuilderSession,
 } from "@/lib/createBuilderChat";
 import {
+  bootstrapWorkspaceV2Session,
+  bootstrapCreateWorkspaceV2FromWorkflow,
+  CREATE_WORKSPACE_V2,
+  formatCreateWorkspaceV2ChatHint,
+  isCreateWorkspaceV2Phase,
+  setWorkspaceV2ActiveSection,
+  shouldUseCreateBuilderChatTurns,
+} from "@/lib/createWorkspaceV2";
+import {
   isUnresolvedCreateType,
   userFacingCreateTypeLabel,
 } from "@/lib/createTypePickers";
@@ -175,6 +196,12 @@ import {
   pauseCreatePersistence,
   resumeCreatePersistence,
 } from "@/lib/createPersistence";
+import {
+  deleteCreateDraftEntry,
+  getCreateDraftEntry,
+  upsertCreateDraftEntry,
+} from "@/lib/createDraftLibrary";
+import { createNavigationHistoryStack } from "@/lib/navigationHistory";
 import {
   loadWorkflowRecord,
   saveWorkflowRecord,
@@ -386,6 +413,7 @@ import {
   governorSuppressesInterventionSurfaces,
   mergeGovernorHints,
 } from "@/lib/companionGovernor";
+import { isChatConversationOnlyMode } from "@/lib/chatConversationOnly";
 import {
   createCompanionRoutingExecutor,
   recordCompanionRoute,
@@ -623,7 +651,6 @@ import {
   shouldResumeWorkspaceCoach,
   workspaceCoachResumeSeedKey,
 } from "@/lib/workspaceCoachResume";
-import type { HelpMeRightNowMenuItem } from "@/lib/focusToolDefinitions";
 import { getActivityById } from "@/lib/companionActivities";
 import {
   isGuidedExerciseActivity,
@@ -1066,6 +1093,8 @@ export default function CompanionPage() {
   const router = useRouter();
   const [activeSection, setActiveSection] = useState<AppSection>("home");
   const [activeNav, setActiveNav] = useState<SidebarNavId>("chat");
+  const activeNavRef = useRef<SidebarNavId>("chat");
+  activeNavRef.current = activeNav;
   const [messages, setMessages] = useState<Message[]>([]);
   const [workspacePanel, setWorkspacePanelState] = useState<AppSection | null>(
     null,
@@ -1084,6 +1113,8 @@ export default function CompanionPage() {
   );
   const [companionStandaloneSection, setCompanionStandaloneSection] =
     useState<AppSection | null>(null);
+  const companionStandaloneSectionRef = useRef<AppSection | null>(null);
+  companionStandaloneSectionRef.current = companionStandaloneSection;
   const [guideBesideSession, setGuideBesideSession] = useState<{
     source: { kind: "activity" } | { kind: "section"; section: AppSection };
     targetSection: AppSection;
@@ -1121,6 +1152,21 @@ export default function CompanionPage() {
   const focusWorkspaceLayout = useCallback(() => {
     applyChatLayoutMode("workspace-focus");
   }, [applyChatLayoutMode]);
+  const openChatBesideWorkspace = useCallback(() => {
+    applyChatLayoutMode("split");
+    setChatFocusSeq((n) => n + 1);
+  }, [applyChatLayoutMode]);
+  const stayInCreateSplitScreen = useCallback(() => {
+    applyChatLayoutMode("split");
+    setActiveSection("home");
+    setActiveNav("create");
+  }, [applyChatLayoutMode]);
+  const isInCreateWorkspacePhase = useCallback(() => {
+    return isCreateWorkspaceV2Phase(
+      createPanelWorkflowRef.current,
+      createBuilderSessionRef.current?.phase ?? null,
+    );
+  }, []);
   // True once we've restored any saved conversation from localStorage.
   // Gates the autosave effect so we never overwrite a saved chat with [].
   const [hydrated, setHydrated] = useState(false);
@@ -1475,6 +1521,7 @@ export default function CompanionPage() {
   // Universal back navigation — remembers the section you came from so every
   // screen has a way out (falls back to the chat/home dashboard).
   const sectionHistoryRef = useRef<AppSection[]>([]);
+  const navHistoryRef = useRef(createNavigationHistoryStack());
   const prevSectionRef = useRef<AppSection>(activeSection);
   const goingBackRef = useRef(false);
 
@@ -1488,14 +1535,50 @@ export default function CompanionPage() {
     prevSectionRef.current = activeSection;
   }, [activeSection]);
 
+  // Help Me Right Now is retired — legacy links land on Focus instead.
+  useEffect(() => {
+    if (activeSection !== "activities") return;
+    setActivitySession(EMPTY_ACTIVITY_SESSION);
+    setActiveSection("focus");
+    activeSectionRef.current = "focus";
+    setActiveNav("focus");
+  }, [activeSection]);
+
   // Settings / Profile / Sign-in open as modal sheets on top of the app (not pages).
   const [overlay, setOverlay] = useState<
     null | "settings" | "profile" | "signin"
   >(null);
+  const [planMyDayDrawerOpen, setPlanMyDayDrawerOpen] = useState(false);
+  const [planMyDayOpenItemId, setPlanMyDayOpenItemId] = useState<string | null>(
+    null,
+  );
+  const [freshStartDialog, setFreshStartDialog] =
+    useState<FreshStartKind | null>(null);
+  const [activityReturnLabel, setActivityReturnLabel] = useState<string | null>(
+    null,
+  );
   const [settingsSection, setSettingsSection] =
     useState<SettingsSection | null>(null);
   const [profileGettingToKnowYou, setProfileGettingToKnowYou] = useState(false);
   const visualMode = useVisualMode();
+  const adaptiveVisualContext = useMemo(
+    () =>
+      resolveAdaptiveVisualContext({
+        activeSection,
+        workspacePanel,
+        companionStandaloneSection,
+        focusMode:
+          pomodoroTimer.isActive ||
+          workspacePanel === "focus-timer" ||
+          workspacePanel === "focus-audio",
+      }),
+    [
+      activeSection,
+      workspacePanel,
+      companionStandaloneSection,
+      pomodoroTimer.isActive,
+    ],
+  );
   const { configured: authConfigured, user } = useCompanionAuth();
 
   const openSignIn = useCallback(() => {
@@ -1551,8 +1634,11 @@ export default function CompanionPage() {
   const [projectContinueId, setProjectContinueId] = useState<string | null>(
     null,
   );
+  const [projectsResumeId, setProjectsResumeId] = useState<string | null>(null);
   const projectContinueIdRef = useRef<string | null>(null);
+  const projectsResumeIdRef = useRef<string | null>(null);
   projectContinueIdRef.current = projectContinueId;
+  projectsResumeIdRef.current = projectsResumeId;
   const workspaceCoachSeededRef = useRef<string | null>(null);
   const workspaceChatScopeRef = useRef<WorkspaceChatScope | null>(null);
   const [avatarCoachActive, setAvatarCoachActive] = useState(false);
@@ -1605,6 +1691,9 @@ export default function CompanionPage() {
   const [createDraftScrollTarget, setCreateDraftScrollTarget] = useState<
     string | null
   >(null);
+  const [activeDraftEditSection, setActiveDraftEditSection] = useState<
+    string | null
+  >(null);
   const [createDraftScrollStamp, setCreateDraftScrollStamp] = useState(0);
   const [exportTrigger, setExportTrigger] =
     useState<ArtifactExportAction | null>(null);
@@ -1631,6 +1720,7 @@ export default function CompanionPage() {
     key: number;
     strategyId?: string;
     hubEntryId?: string;
+    openView?: "home" | "adhd" | "business" | "saved" | "recommended";
   } | null>(null);
   const [businessStrategyDraft, setBusinessStrategyDraft] = useState<{
     typeLabel: string;
@@ -1666,8 +1756,15 @@ export default function CompanionPage() {
   const activeSectionRef = useRef<AppSection>("home");
   activeSectionRef.current = activeSection;
   const [workspaceFirstSplit, setWorkspaceFirstSplit] = useState(false);
+  const [chatFocusSeq, setChatFocusSeq] = useState(0);
+  const [workspaceV2Highlight, setWorkspaceV2Highlight] = useState<{
+    sectionId: string;
+    key: number;
+  } | null>(null);
   const [activitySession, setActivitySession] =
     useState<ActivitySessionState>(EMPTY_ACTIVITY_SESSION);
+  const activitySessionRef = useRef<ActivitySessionState>(EMPTY_ACTIVITY_SESSION);
+  activitySessionRef.current = activitySession;
   const [workspaceContextBanner, setWorkspaceContextBanner] = useState<
     string | null
   >(null);
@@ -1808,9 +1905,14 @@ export default function CompanionPage() {
       type && panelWorkflowHasProgress(panelWorkflow ?? createPanelWorkflowRef.current);
     const wf = panelWorkflow ?? createPanelWorkflowRef.current;
     const sessionId = wf.sessionId ?? newCreateSessionId();
-    const { session, opener } =
-      resume && wf
-        ? bootstrapCreateBuilderFromWorkflow(type, wf)
+    const { session, opener } = CREATE_WORKSPACE_V2
+      ? resume && type && wf
+        ? bootstrapCreateWorkspaceV2FromWorkflow(type, wf)
+        : type
+          ? bootstrapWorkspaceV2Session(type)
+          : bootstrapCreateBuilderSession(type)
+      : resume && wf
+        ? bootstrapCreateBuilderFromWorkflow(type!, wf)
         : bootstrapCreateBuilderSession(type);
     const withSession = {
       ...session,
@@ -1867,10 +1969,9 @@ export default function CompanionPage() {
       createPanelWorkflowRef.current,
       createPanelWorkflowRef.current.sessionId,
     );
-    const { session, opener } = bootstrapCreateBuilderFromWorkflow(
-      trimmed,
-      panelWf,
-    );
+    const { session, opener } = CREATE_WORKSPACE_V2
+      ? bootstrapWorkspaceV2Session(trimmed)
+      : bootstrapCreateBuilderFromWorkflow(trimmed, panelWf);
     const sessionId = panelWf.sessionId ?? newCreateSessionId();
     const withSession = {
       ...session,
@@ -1954,13 +2055,6 @@ export default function CompanionPage() {
       itemType: type,
       length: result.draft.length,
     });
-    setMessages((prev) => [
-      ...prev,
-      {
-        role: "assistant",
-        content: createBuilderExportMessage(type),
-      },
-    ]);
   }
 
   function handleCreateBuilderAction(action: CreateBuilderAction) {
@@ -1976,11 +2070,27 @@ export default function CompanionPage() {
       return;
     }
     if (action.id === "create-draft") {
-      void handleSend("Build Draft", false, true);
+      void handleSend("Create Draft", false, true);
       return;
     }
-    if (action.id === "add-more-info") {
-      void handleSend("Add more information", false, true);
+    if (action.id === "keep-working" || action.id === "add-more-info") {
+      void handleSend("Keep Working", false, true);
+      return;
+    }
+    if (action.id === "review-template") {
+      void handleSend("Review Template", false, true);
+      return;
+    }
+    if (action.id === "use-this") {
+      void handleSend("Use This", false, true);
+      return;
+    }
+    if (action.id === "revise-it") {
+      void handleSend("Revise It", false, true);
+      return;
+    }
+    if (action.id === "keep-talking") {
+      void handleSend("Keep Talking", false, true);
       return;
     }
     if (action.id === "revise") {
@@ -2168,6 +2278,7 @@ export default function CompanionPage() {
       const wf = workflowStateFromRecord(record);
       createPanelWorkflowRef.current = wf;
       saveWorkflowRecord(record);
+      upsertCreateDraftEntry(record);
       setCreateBuilderSession(builderSessionFromRecord(record));
       const type = record.itemType;
       if (type || record.draftContent?.trim()) {
@@ -2350,6 +2461,7 @@ export default function CompanionPage() {
 
   const handleSavedArtifactChange = useCallback(
     (record: SavedArtifactRecord) => {
+      savedArtifactRef.current = record;
       setSavedArtifact(record);
       if (record.savedStatus === "saved" || record.savedStatus === "exported") {
         trackEcosystemEvent({
@@ -2598,7 +2710,7 @@ export default function CompanionPage() {
       (guideBesideSession?.source.kind === "activity"
         ? activitySession.activityId
           ? standaloneSectionForActivity(activitySession.activityId)
-          : ("activities" as const)
+          : ("focus" as const)
         : guideBesideSession?.source.kind === "section"
           ? guideBesideSession.source.section
           : null);
@@ -2752,15 +2864,18 @@ export default function CompanionPage() {
       case "project":
         setProjectContinueId(item.projectId ?? null);
         if (item.projectId) {
+          setProjectsResumeId(item.projectId);
           saveProjectContinuity({
             projectContinueId: item.projectId,
             projectName: item.title,
             view: "detail",
             workspacePanelOpen: false,
           });
+          openSectionBesideChatCore("projects", "projects");
+        } else {
+          setActiveSection("projects");
+          setActiveNav("projects");
         }
-        setActiveSection("projects");
-        setActiveNav("projects");
         appendRecoveryMessage(
           resumeReceiptForContinuityType("project", item.title),
         );
@@ -3201,7 +3316,17 @@ export default function CompanionPage() {
         opts?.savedArtifact ?? savedArtifactRef.current,
       );
     }
-    focusWorkspaceLayout();
+    if (
+      section === "content-generator" &&
+      isCreateWorkspaceV2Phase(
+        createPanelWorkflowRef.current,
+        createBuilderSessionRef.current?.phase ?? null,
+      )
+    ) {
+      applyChatLayoutMode("split");
+    } else {
+      focusWorkspaceLayout();
+    }
     revealWorkspace();
   }
 
@@ -3535,7 +3660,16 @@ export default function CompanionPage() {
       setActiveNav("create");
     }
     setActiveSection("home");
-    focusWorkspaceLayout();
+    if (
+      isCreateWorkspaceV2Phase(
+        wf,
+        createBuilderSessionRef.current?.phase ?? null,
+      )
+    ) {
+      stayInCreateSplitScreen();
+    } else {
+      focusWorkspaceLayout();
+    }
     revealWorkspace();
     scrollCreateDraftTo(merged.scrollTarget);
   }
@@ -3610,6 +3744,7 @@ export default function CompanionPage() {
   }
 
   function ensureLiveCreateBesideChat(userText: string): boolean {
+    if (isChatConversationOnlyMode()) return false;
     if (isLiveCreateWorkspaceActive()) return false;
     if (getActiveParentWorkflow()) return false;
     if (isChildArtifactRequest(userText)) return false;
@@ -4244,8 +4379,81 @@ export default function CompanionPage() {
     backInterceptorRef.current = fn;
   }, []);
 
-  function goBack() {
-    if (backInterceptorRef.current?.()) return;
+  type NavigationSnapshot = {
+    activeSection: AppSection;
+    activeNav: SidebarNavId;
+    workspacePanel: AppSection | null;
+    companionStandaloneSection: AppSection | null;
+    activitySession: ActivitySessionState;
+    strategyOpenView?: "home" | "adhd" | "business" | "saved" | "recommended";
+  };
+
+  function captureNavigationSnapshot(
+    strategyOpenView?: NavigationSnapshot["strategyOpenView"],
+  ): NavigationSnapshot {
+    return {
+      activeSection: activeSectionRef.current,
+      activeNav: activeNavRef.current,
+      workspacePanel: workspacePanelRef.current,
+      companionStandaloneSection: companionStandaloneSectionRef.current,
+      activitySession: { ...activitySessionRef.current },
+      strategyOpenView,
+    };
+  }
+
+  const restoreNavigationSnapshot = useCallback(
+    (snap: NavigationSnapshot) => {
+      goingBackRef.current = true;
+      setActiveSection(snap.activeSection);
+      activeSectionRef.current = snap.activeSection;
+      setActiveNav(snap.activeNav);
+      patchWorkspacePanel(snap.workspacePanel);
+      setCompanionStandaloneSection(snap.companionStandaloneSection);
+      setActivitySession(snap.activitySession);
+      if (snap.strategyOpenView) {
+        setStrategyPanelCommand({
+          key: Date.now(),
+          openView: snap.strategyOpenView,
+        });
+      }
+    },
+    [patchWorkspacePanel],
+  );
+
+  const pushNavigationRestore = useCallback(
+    (strategyOpenView?: NavigationSnapshot["strategyOpenView"]) => {
+      const snap = captureNavigationSnapshot(strategyOpenView);
+      navHistoryRef.current.push(() => restoreNavigationSnapshot(snap));
+    },
+    [restoreNavigationSnapshot],
+  );
+
+  function goBack(options?: { skipInterceptor?: boolean }) {
+    if (!options?.skipInterceptor && backInterceptorRef.current?.()) return;
+
+    if (overlay) {
+      setOverlay(null);
+      setSettingsSection(null);
+      setProfileGettingToKnowYou(false);
+      return;
+    }
+
+    if (planMyDayDrawerOpen) {
+      setPlanMyDayDrawerOpen(false);
+      return;
+    }
+
+    if (activeSection === "home" && workspacePanel) {
+      closeWorkspacePanel();
+      return;
+    }
+
+    const navRestore = navHistoryRef.current.pop();
+    if (navRestore) {
+      navRestore();
+      return;
+    }
+
     const prev = sectionHistoryRef.current.pop() ?? "home";
     goingBackRef.current = true;
     if (prev === "home") setActiveNav("chat");
@@ -4415,7 +4623,7 @@ export default function CompanionPage() {
     setMessages((prev) => [...prev, { role: "system", content }]);
   }
 
-  function resetChat() {
+  function clearTodayContext() {
     recognitionRef.current?.stop();
     setIsListening(false);
     clearConversation();
@@ -4448,9 +4656,46 @@ export default function CompanionPage() {
     setIsLoading(false);
     setActiveSection("home");
     setActiveNav("chat");
+    setGuideBesideSession(null);
+    setActivitySession(EMPTY_ACTIVITY_SESSION);
+    activitySessionRef.current = EMPTY_ACTIVITY_SESSION;
+    setPlanMyDayDrawerOpen(false);
+    setPlanMyDayOpenItemId(null);
+    setOverlay((current) => (current === "signin" ? current : null));
+    sectionHistoryRef.current = [];
+    navHistoryRef.current = createNavigationHistoryStack();
     setCoachingMode("today");
     resumeCreatePersistence();
     focusWorkspaceLayout();
+  }
+
+  function requestClearTodayContext() {
+    setFreshStartDialog("clear-context");
+  }
+
+  function requestBeginNewDay() {
+    setFreshStartDialog("begin-new-day");
+  }
+
+  function confirmFreshStart() {
+    if (freshStartDialog === "begin-new-day") {
+      beginNewDay();
+    } else if (freshStartDialog === "clear-context") {
+      clearTodayContext();
+    }
+    setFreshStartDialog(null);
+  }
+
+  function beginNewDay() {
+    clearTodayContext();
+    clearDailySessionFlags();
+    resetTodayPlanForNewDay();
+    setMessages([
+      {
+        role: "assistant",
+        content: BEGIN_NEW_DAY_GREETING,
+      },
+    ]);
   }
 
   function navForWorkspaceSection(section: AppSection): SidebarNavId | null {
@@ -4540,8 +4785,14 @@ export default function CompanionPage() {
       return;
     }
 
+    pushNavigationRestore();
     patchWorkspacePanel(section);
+    if (section === "projects" && !projectsResumeIdRef.current) {
+      setProjectsResumeId(null);
+    }
     if (section !== "projects") {
+      setWorkspaceDetail(emptyWorkspaceDetail());
+    } else if (!projectsResumeIdRef.current) {
       setWorkspaceDetail(emptyWorkspaceDetail());
     }
     setCreationContext(null);
@@ -4612,7 +4863,7 @@ export default function CompanionPage() {
     if (guideBesideSession?.source.kind === "activity") {
       return activitySession.activityId
         ? standaloneSectionForActivity(activitySession.activityId)
-        : "activities";
+        : "focus";
     }
     if (guideBesideSession?.source.kind === "section") {
       return guideBesideSession.source.section;
@@ -4917,7 +5168,7 @@ export default function CompanionPage() {
       return guideBesideSession.source.kind === "activity"
         ? activitySession.activityId
           ? standaloneSectionForActivity(activitySession.activityId)
-          : "activities"
+          : "focus"
         : guideBesideSession.source.section;
     }
     if (activeSectionRef.current === "home") {
@@ -5108,6 +5359,7 @@ export default function CompanionPage() {
     setGuideBesideSession({
       source:
         offer.sourceSection === "activities" ||
+        offer.sourceSection === "focus" ||
         offer.sourceSection === "guided-exercises"
           ? { kind: "activity" }
           : { kind: "section", section: offer.sourceSection },
@@ -5145,14 +5397,21 @@ export default function CompanionPage() {
     patchWorkspacePanel(null);
   }
 
-  /** Help Me Right Now activities — full-page only; never the split workspace pane. */
+  /** Relief / guided activities — full-page only; never the split workspace pane. */
   function openActivityFullPageCore(
     session: ActivitySessionState,
-    options?: { decisionCompassPrefill?: DecisionCompassPrefill | null },
+    options?: {
+      decisionCompassPrefill?: DecisionCompassPrefill | null;
+      pushRestore?: boolean;
+      strategyOpenView?: NavigationSnapshot["strategyOpenView"];
+    },
   ) {
     if (session.activityId === "decision-compass") {
       openDecisionCompass(options?.decisionCompassPrefill ?? null);
       return;
+    }
+    if (options?.pushRestore !== false) {
+      pushNavigationRestore(options?.strategyOpenView);
     }
     clearParallelCoachingOffers();
     clearSplitBesideWorkspace();
@@ -5161,7 +5420,10 @@ export default function CompanionPage() {
     setActivitySession(session);
     const section = session.activityId
       ? standaloneSectionForActivity(session.activityId)
-      : "activities";
+      : "focus";
+    setActivityReturnLabel(
+      resolveActivityReturnLabel(options?.strategyOpenView, section),
+    );
     setActiveSection(section);
     activeSectionRef.current = section;
     setActiveNav("focus");
@@ -5185,7 +5447,11 @@ export default function CompanionPage() {
   ) {
     setActivitySession(payload.session);
 
-    if (section === "activities" || section === "guided-exercises") {
+    if (
+      section === "guided-exercises" ||
+      section === "focus" ||
+      section === "activities"
+    ) {
       openActivityFullPageCore(payload.session);
       return;
     }
@@ -5287,13 +5553,10 @@ export default function CompanionPage() {
         openWorkspaceBesideChatCore("time-block", workspaceOpenAck("time-block"));
         break;
       case "activities":
-        clearSplitBesideWorkspace();
-        setActivitySession(EMPTY_ACTIVITY_SESSION);
-        setActiveSection("activities");
-        activeSectionRef.current = "activities";
-        setActiveNav("focus");
+        openStandaloneFocusSectionCore("focus");
         break;
       case "guided-exercises":
+        pushNavigationRestore();
         clearSplitBesideWorkspace();
         setActivitySession(EMPTY_ACTIVITY_SESSION);
         setActiveSection("guided-exercises");
@@ -5307,8 +5570,7 @@ export default function CompanionPage() {
         openStandaloneFocusSectionCore("games");
         break;
       case "reset-day":
-        resetChat();
-        appendSystemMessage("Fresh start — I'm here with you.");
+        requestClearTodayContext();
         break;
       case "voice":
         toggleVoiceMode();
@@ -5347,6 +5609,7 @@ export default function CompanionPage() {
             if (active) {
               setProjectContinueId(active.id);
               projectContinueIdRef.current = active.id;
+              setProjectsResumeId(active.id);
             }
           }
         }
@@ -5395,17 +5658,6 @@ export default function CompanionPage() {
       body: content,
       status: "draft",
     });
-  }
-
-  function handleNewDayChat() {
-    resetChat();
-    // A daily reset thread — fresh, but warm (light memory is kept in storage).
-    setMessages([
-      {
-        role: "assistant",
-        content: "New day — fresh start. What feels most important right now?",
-      },
-    ]);
   }
 
   function testAlert() {
@@ -5761,34 +6013,26 @@ export default function CompanionPage() {
     return null;
   }
 
+  function handleExitActivity() {
+    setActivitySession(EMPTY_ACTIVITY_SESSION);
+    activitySessionRef.current = EMPTY_ACTIVITY_SESSION;
+    setActivityReturnLabel(null);
+    goBack({ skipInterceptor: true });
+  }
+
   function handleStrategiesOpenActivity(activityId: string) {
     const activity = getActivityById(activityId);
     if (!activity) return;
-    openActivityFullPageCore({
-      ...EMPTY_ACTIVITY_SESSION,
-      activityId,
-      stepIndex: 0,
-      phase: "active",
-      categoryId: activity.categoryId,
-    });
-  }
-
-  function handleHelpMeRightNowQuickTool(item: HelpMeRightNowMenuItem) {
-    if (item.kind === "activity" && item.activityId) {
-      const activity = getActivityById(item.activityId);
-      if (!activity) return;
-      openActivityFullPageCore({
+    openActivityFullPageCore(
+      {
         ...EMPTY_ACTIVITY_SESSION,
-        activityId: item.activityId,
+        activityId,
         stepIndex: 0,
         phase: "active",
         categoryId: activity.categoryId,
-      });
-      return;
-    }
-    if (item.kind === "section" && item.section) {
-      openStandaloneFocusSectionCore(item.section);
-    }
+      },
+      { pushRestore: true, strategyOpenView: "adhd" },
+    );
   }
 
   function openStrategyFromChat(target: StrategyOpenTarget) {
@@ -6484,6 +6728,7 @@ export default function CompanionPage() {
       workspacePanel,
     );
     const discoveryHelpBypass =
+      shouldUseCreateBuilderChatTurns() &&
       createBuilderWorkflowActive &&
       shouldBypassCreateBuilderForSectionHelp(builderSession, trimmed);
     if (discoveryHelpBypass && builderSession) {
@@ -6510,6 +6755,7 @@ export default function CompanionPage() {
       setCreateBuilderSession({ ...builderSession, workflow: helpSession.workflow });
     }
     const builderChatActive =
+      shouldUseCreateBuilderChatTurns() &&
       chatLayoutMode === "split" &&
       createBuilderWorkflowActive &&
       !isWorkflowConceptQuestion(trimmed) &&
@@ -6620,6 +6866,9 @@ export default function CompanionPage() {
       }
 
       voiceUsedRef.current = false;
+      if (splitCreateChat && workspacePanel === "content-generator") {
+        stayInCreateSplitScreen();
+      }
       return;
     }
 
@@ -7997,45 +8246,50 @@ export default function CompanionPage() {
     if (
       workspacePanel &&
       workspaceContext &&
-      !createBuilderWorkflowActive &&
       !applyChatActive
     ) {
-      const approvalTurn = tryResolveWorkspaceApprovalTurn({
-        userText: trimmed,
-        lastAssistantText,
-        ctx: workspaceContext,
-        sopSession: workspaceSession ?? loadWorkspaceSession(),
-        createWorkflow:
-          workspacePanel === "content-generator"
-            ? createPanelWorkflowRef.current
-            : null,
-      });
-      if (approvalTurn) {
-        applyWorkspaceWrite(
-          workspaceFillAction(
-            workspacePanel,
-            approvalTurn.fill.field,
-            approvalTurn.fill.value,
-            "approval",
-            { stepId: approvalTurn.fill.stepId },
-          ),
-          { userText: trimmed },
-        );
-        const { field: coachFocus, content: coachMsg } = extractFocusDirective(
-          approvalTurn.reply,
-        );
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: coachMsg },
-        ]);
-        applyWorkspaceFocus(coachFocus ?? approvalTurn.focusField ?? null);
-        setWorkspaceOffer(null);
-        setToolSuggestion(null);
-        setActionBridge(null);
-        setBridge(null);
-        setIsLoading(false);
-        inputRef.current?.focus();
-        return;
+      if (!createBuilderWorkflowActive && !isInCreateWorkspacePhase()) {
+        const approvalTurn = tryResolveWorkspaceApprovalTurn({
+          userText: trimmed,
+          lastAssistantText,
+          ctx: workspaceContext,
+          sopSession: workspaceSession ?? loadWorkspaceSession(),
+          createWorkflow:
+            workspacePanel === "content-generator"
+              ? createPanelWorkflowRef.current
+              : null,
+        });
+        if (approvalTurn) {
+          commitUserLine();
+          applyWorkspaceWrite(
+            workspaceFillAction(
+              workspacePanel,
+              approvalTurn.fill.field,
+              approvalTurn.fill.value,
+              "approval",
+              { stepId: approvalTurn.fill.stepId },
+            ),
+            { userText: trimmed },
+          );
+          const { field: coachFocus, content: coachMsg } = extractFocusDirective(
+            approvalTurn.reply,
+          );
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: coachMsg },
+          ]);
+          applyWorkspaceFocus(coachFocus ?? approvalTurn.focusField ?? null);
+          if (workspacePanel === "content-generator" && splitCreateChat) {
+            stayInCreateSplitScreen();
+          }
+          setWorkspaceOffer(null);
+          setToolSuggestion(null);
+          setActionBridge(null);
+          setBridge(null);
+          setIsLoading(false);
+          inputRef.current?.focus();
+          return;
+        }
       }
     }
 
@@ -8475,37 +8729,39 @@ export default function CompanionPage() {
         )
       ) {
         const wf = createPanelWorkflowRef.current;
-        const nextWf = applyCreateDiscoveryFromChat(wf, trimmed);
-        if (nextWf) {
-          const base =
-            createWorkflowRecordRef.current ??
-            loadWorkflowRecord() ??
-            workflowRecordFromState(wf, {
-              source: "panel",
-              itemType: resolvedTypeLabel(wf) ?? undefined,
-            });
-          const record = mergeRecordFromWorkflow(base, nextWf, "chat");
-          commitCreateWorkflowRecord(record);
-          const typeLabel =
-            resolvedTypeLabel(nextWf) ?? creationContext?.itemType ?? "draft";
-          setMessages((prev) => [
-            ...prev,
-            { role: "user", content: trimmed },
-            {
-              role: "assistant",
-              content:
-                nextWf.step === "readiness"
-                  ? `Got it — I have enough for a first **${typeLabel}** draft.\n\nClick **Build Draft** in the panel when you're ready, or say **Build Draft** here.`
-                  : `Got it — I've added that to your **${typeLabel}**.`,
-            },
-          ]);
-          setInput("");
-          setIsLoading(false);
-          setWorkspaceOffer(null);
-          setToolSuggestion(null);
-          setActionBridge(null);
-          setBridge(null);
-          return;
+        if (!wf.workspaceFirst) {
+          const nextWf = applyCreateDiscoveryFromChat(wf, trimmed);
+          if (nextWf) {
+            const base =
+              createWorkflowRecordRef.current ??
+              loadWorkflowRecord() ??
+              workflowRecordFromState(wf, {
+                source: "panel",
+                itemType: resolvedTypeLabel(wf) ?? undefined,
+              });
+            const record = mergeRecordFromWorkflow(base, nextWf, "chat");
+            commitCreateWorkflowRecord(record);
+            const typeLabel =
+              resolvedTypeLabel(nextWf) ?? creationContext?.itemType ?? "draft";
+            setMessages((prev) => [
+              ...prev,
+              { role: "user", content: trimmed },
+              {
+                role: "assistant",
+                content:
+                  nextWf.step === "readiness"
+                    ? `Got it — I have enough for a first **${typeLabel}** draft.\n\nClick **Build Draft** in the panel when you're ready, or say **Build Draft** here.`
+                    : `Got it — I've added that to your **${typeLabel}**.`,
+              },
+            ]);
+            setInput("");
+            setIsLoading(false);
+            setWorkspaceOffer(null);
+            setToolSuggestion(null);
+            setActionBridge(null);
+            setBridge(null);
+            return;
+          }
         }
       }
 
@@ -8703,6 +8959,10 @@ export default function CompanionPage() {
               )
             : workspaceDetailRef.current,
       );
+      const createWorkspaceV2Active = isCreateWorkspaceV2Phase(
+        createPanelWorkflowRef.current,
+        createBuilderSessionRef.current?.phase ?? null,
+      );
       const res = await fetch("/api/companion-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -8824,9 +9084,12 @@ export default function CompanionPage() {
                     : undefined,
               preferredGoogleExport: preferredGoogleExportKind,
               openSnapshot: apiWorkspaceSnap,
+              createWorkspaceV2Active,
             }),
             splitCreateChat && shouldBootstrapCreateBuilder()
-              ? formatCreateBuilderChatHint(createBuilderSession)
+              ? CREATE_WORKSPACE_V2
+                ? formatCreateWorkspaceV2ChatHint(createBuilderSession)
+                : formatCreateBuilderChatHint(createBuilderSession)
               : null,
             workspacePanel === "decision-compass" && compassSessionForApi
               ? [
@@ -8854,6 +9117,7 @@ export default function CompanionPage() {
               teachingActive: teachingModeActive(trimmed, lastAssistantText, {
                 activeWorkflowLocked: shouldSuppressTeachingMode(workflowLockInput),
               }),
+              createWorkspaceV2: createWorkspaceV2Active,
             }),
             companionFirstWorkflowHintForChat(trimmed, workspacePanel),
             crossWorkspaceGuidanceHintForChat({
@@ -8911,6 +9175,7 @@ export default function CompanionPage() {
         { role: "assistant", content: assistantMsg },
       ]);
       if (
+        shouldUseCreateBuilderChatTurns() &&
         workspacePanelRef.current === "content-generator" &&
         createBuilderSessionRef.current?.phase === "discovery" &&
         (discoveryHelpBypass || isDiscoveryHelpRequest(trimmed))
@@ -9495,7 +9760,7 @@ export default function CompanionPage() {
       guideBesideSession?.source.kind === "activity"
         ? activitySession.activityId
           ? standaloneSectionForActivity(activitySession.activityId)
-          : "activities"
+          : "focus"
         : guideBesideSession?.source.kind === "section"
           ? guideBesideSession.source.section
           : null;
@@ -9592,10 +9857,41 @@ export default function CompanionPage() {
       createWorkflowRecordRef.current ?? loadWorkflowRecord() ?? null;
     if (record && shouldPersistWorkflowRecord(record)) {
       saveWorkflowRecordForLater(record);
+      upsertCreateDraftEntry(record);
     }
     closeWorkspacePanel({
       recoveryContext: { savedForLater: true, panel: "content-generator" },
     });
+  }
+
+  function openCreateDraftFromLibrary(id: string) {
+    const entry = getCreateDraftEntry(id);
+    if (!entry) return;
+    pauseCreatePersistence();
+    saveWorkflowRecord(entry.record);
+    createWorkflowRecordRef.current = entry.record;
+    createPanelWorkflowRef.current = workflowStateFromRecord(entry.record);
+    setCreateBuilderSession(builderSessionFromRecord(entry.record));
+    resumeCreatePersistence();
+    restoreCreateSession(createSessionFromWorkflowRecord(entry.record));
+  }
+
+  function deleteCreateDraftFromLibrary(id: string) {
+    const currentId =
+      createWorkflowRecordRef.current?.workflowId ??
+      loadWorkflowRecord()?.workflowId;
+    deleteCreateDraftEntry(id);
+    if (currentId !== id) return;
+    pauseCreatePersistence();
+    clearAllCreatePersistence({ preserveSavedForLater: true });
+    createWorkflowRecordRef.current = null;
+    createPanelWorkflowRef.current = EMPTY_CREATE_WORKFLOW;
+    setCreateBuilderSession(null);
+    createBuilderBootstrappedRef.current = false;
+    setGenSeed(null);
+    setCreationContext(null);
+    setSavedArtifact(null);
+    resumeCreatePersistence();
   }
 
   function startOverCreate() {
@@ -9606,6 +9902,10 @@ export default function CompanionPage() {
       return;
     }
     pauseCreatePersistence();
+    const currentId =
+      createWorkflowRecordRef.current?.workflowId ??
+      loadWorkflowRecord()?.workflowId;
+    if (currentId) deleteCreateDraftEntry(currentId);
     clearAllCreatePersistence({ preserveSavedForLater: true });
     createWorkflowRecordRef.current = null;
     createPanelWorkflowRef.current = EMPTY_CREATE_WORKFLOW;
@@ -9633,6 +9933,11 @@ export default function CompanionPage() {
       savedArtifactRef.current ?? loadCreateSession()?.savedArtifact ?? null;
     const id = record?.savedWorkId ?? record?.templateId;
     if (id) deleteSavedWork(id);
+
+    const workflowId =
+      createWorkflowRecordRef.current?.workflowId ??
+      loadWorkflowRecord()?.workflowId;
+    if (workflowId) deleteCreateDraftEntry(workflowId);
 
     clearDraftActivityMemory(draftBody || undefined);
     clearAllCreatePersistence();
@@ -9662,7 +9967,8 @@ export default function CompanionPage() {
       case "projects":
         return (
           <ProjectsPanel
-            initialProjectId={projectContinueId}
+            resumeProjectId={projectsResumeId}
+            onResumeConsumed={() => setProjectsResumeId(null)}
             onOpen={suggestCrossWorkspaceOpen}
             onAsk={handleProjectAsk}
             onOpenTimeBlock={handleOpenProjectTimeBlock}
@@ -9718,10 +10024,18 @@ export default function CompanionPage() {
             onContextChange={handleWorkspaceDetailChange}
             onCreateSessionSync={handleCreateSessionSync}
             onCreateWorkflowSync={(wf) => {
+              createPanelWorkflowRef.current = wf;
+              if (CREATE_WORKSPACE_V2 && createBuilderSessionRef.current) {
+                setCreateBuilderSession((prev) =>
+                  prev
+                    ? { ...prev, workflow: wf, phase: "workspace" }
+                    : prev,
+                );
+              }
               if (isCreatePersistencePaused()) return;
               const base =
                 createWorkflowRecordRef.current ?? loadWorkflowRecord();
-              const record = mergeRecordFromWorkflow(base, wf, "panel");
+              const record = mergeRecordFromWorkflow(base, wf, "panel", "workspace");
               commitCreateWorkflowRecord(record);
             }}
             onBuildWithShari={openCreateWithShari}
@@ -9736,6 +10050,8 @@ export default function CompanionPage() {
             onSaveForLater={saveCreateForLater}
             onStartOver={startOverCreate}
             onDeleteDraft={deleteCreateDraft}
+            onOpenCreateDraft={openCreateDraftFromLibrary}
+            onDeleteCreateDraftEntry={deleteCreateDraftFromLibrary}
             exportTrigger={exportTrigger}
             onExportTriggerHandled={() => setExportTrigger(null)}
             onOpenSection={openWorkspaceFromSection}
@@ -9746,7 +10062,34 @@ export default function CompanionPage() {
             onOpenGoogleWorkspace={handleOpenGoogleWorkspace}
             onArtifactReady={handleArtifactReadyChat}
             onExportGuidance={handleExportGuidance}
+            onDraftGuidedEdit={({ sectionId, opener }) => {
+              setActiveDraftEditSection(sectionId);
+              setMessages((prev) => [
+                ...prev,
+                { role: "assistant", content: opener },
+              ]);
+            }}
             onCompanionTypePick={syncCreateBuilderFromPanelType}
+            onWorkspaceNeedIdeas={(sectionId, _sectionLabel, prompt) => {
+              const wf = createPanelWorkflowRef.current;
+              if (sectionId) {
+                const nextWf = setWorkspaceV2ActiveSection(wf, sectionId);
+                const baseRecord =
+                  createWorkflowRecordRef.current ??
+                  loadWorkflowRecord() ??
+                  workflowRecordFromState(wf, {
+                    source: "panel",
+                    itemType: resolvedTypeLabel(wf) ?? undefined,
+                  });
+                commitCreateWorkflowRecord(
+                  mergeRecordFromWorkflow(baseRecord, nextWf, "panel"),
+                );
+              }
+              openChatBesideWorkspace();
+              void handleSend(prompt, false, true);
+            }}
+            workspaceV2HighlightSectionId={workspaceV2Highlight?.sectionId ?? null}
+            workspaceV2HighlightKey={workspaceV2Highlight?.key ?? 0}
             companionBuilderMode={splitCreateChat}
             createBuilderPhase={createBuilderSession?.phase ?? null}
             chatSyncedWorkflow={
@@ -9762,6 +10105,7 @@ export default function CompanionPage() {
               void handleSend(audienceLabel, false, true);
             }}
             onCompanionBuilderAction={(action) => {
+              if (CREATE_WORKSPACE_V2) return;
               if (action === "retry" || action === "build-draft") {
                 void handleSend("Build Draft", false, true);
               } else if (action === "add-detail") {
@@ -9820,13 +10164,32 @@ export default function CompanionPage() {
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
             onResume={resumeHomeItem}
             onResumeLater={handleTodayResumeLater}
-            onPlanMyDay={() =>
-              openWorkspaceBesideChatCore(
-                "time-block",
-                workspaceOpenAck("time-block"),
-              )
-            }
+            onPlanMyDay={() => openSectionBesideChatCore("plan-my-day")}
             onPlanMyDayLater={handleTodayPlanLater}
+          />
+        );
+      case "plan-my-day":
+        return (
+          <PlanMyDayPanel
+            onBack={closeWorkspacePanel}
+            onOpenSettings={() => openHowDoISettings("planning")}
+            onStartFocus={() => {
+              openSectionBesideChatCore("focus-timer");
+            }}
+            registerBack={registerBack}
+            onOpenProject={(projectId) => {
+              setProjectContinueId(projectId);
+              setProjectsResumeId(projectId);
+              saveProjectContinuity({
+                projectContinueId: projectId,
+                projectName:
+                  getProjects().find((p) => p.id === projectId)?.name ?? null,
+                view: "detail",
+                workspacePanelOpen: false,
+              });
+              openSectionBesideChatCore("projects", "projects");
+            }}
+            initialOpenItemId={planMyDayOpenItemId}
           />
         );
       case "wins-this-week":
@@ -9845,6 +10208,7 @@ export default function CompanionPage() {
             onResume={resumeHomeItem}
             onOpenProject={(projectId) => {
               setProjectContinueId(projectId);
+              setProjectsResumeId(projectId);
               saveProjectContinuity({
                 projectContinueId: projectId,
                 projectName:
@@ -9937,7 +10301,8 @@ export default function CompanionPage() {
       case "projects":
         return (
           <ProjectsPanel
-            initialProjectId={projectContinueId}
+            resumeProjectId={projectsResumeId}
+            onResumeConsumed={() => setProjectsResumeId(null)}
             focusField={workspaceFocusField}
             focusStamp={workspaceFocusStamp}
             chatFieldFill={workspaceChatFill}
@@ -10141,7 +10506,7 @@ export default function CompanionPage() {
       (guideBesideSession?.source.kind === "activity"
         ? activitySession.activityId
           ? standaloneSectionForActivity(activitySession.activityId)
-          : "activities"
+          : "focus"
         : guideBesideSession?.source.kind === "section"
           ? guideBesideSession.source.section
           : null);
@@ -10726,8 +11091,9 @@ export default function CompanionPage() {
   return (
     <CompanionAuthGate>
     <div
-      className={`relative flex h-dvh max-h-dvh overflow-hidden text-lg text-[#2d2926] ${shellClass}`}
+      className={`relative flex h-dvh max-h-dvh overflow-hidden text-lg ${shellClass}`}
       data-visual-mode={visualMode}
+      data-adaptive-context={adaptiveVisualContext}
     >
       <Suspense fallback={null}>
         <CompanionSignInFromQuery onOpen={openSignIn} />
@@ -10744,16 +11110,20 @@ export default function CompanionPage() {
         <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           <TopBar
             onAdjustDay={() => setActiveSection("energy")}
-            onNewChat={resetChat}
-            onNewDayChat={handleNewDayChat}
-            onSettings={() => setOverlay("settings")}
-            onProfile={() => setOverlay("profile")}
+            onRequestClearTodayContext={requestClearTodayContext}
+            onRequestBeginNewDay={requestBeginNewDay}
+            onOpenSettings={(section) => {
+              setSettingsSection(section ?? null);
+              setOverlay("settings");
+            }}
+            onOpenProfile={() => setOverlay("profile")}
             onOpenAvatars={() => setActiveSection("client-avatars")}
-            minimal={activeSection === "home"}
+            showPlanMyDay={!homeCalm}
+            onOpenPlanMyDay={() => openSectionBesideChatCore("plan-my-day")}
           />
           {!homeCalm ? <ActiveWorkspaceBar items={activeWorkspaceItems} /> : null}
 
-          {activeSection !== "home" && (
+          {(activeSection !== "home" || workspacePanel || overlay) && (
             <div className="shrink-0 px-4 pt-3 sm:px-6">
               <BackButton onClick={goBack} />
             </div>
@@ -10781,8 +11151,11 @@ export default function CompanionPage() {
                     session={activitySession}
                     onSessionChange={setActivitySession}
                     onOpenBeside={handleActivityOpenBeside}
-                    onQuickTool={handleHelpMeRightNowQuickTool}
                     onOpenDecisionCompass={() => openDecisionCompass()}
+                    registerBack={registerBack}
+                    onBeforeActivityStart={pushNavigationRestore}
+                    returnToLabel={activityReturnLabel ?? undefined}
+                    onExitActivity={handleExitActivity}
                     decisionCompassPrefill={decisionCompassPrefill}
                     decisionCompassSession={decisionCompassSession}
                     onDecisionCompassSessionChange={
@@ -11273,6 +11646,7 @@ export default function CompanionPage() {
                 onViewSizePresetChange={applyViewSizePreset}
                 onClose={closeWorkspacePanel}
                 revealKey={workspaceRevealSeq}
+                chatFocusKey={chatFocusSeq}
                 workspaceFirst={workspaceFirstSplit}
                 hideAssistToggle={
                   workspacePanel === "content-generator" ||
@@ -11354,14 +11728,34 @@ export default function CompanionPage() {
             />
           )}
 
-          {activeSection === "focus" && (
+          {activeSection === "focus" &&
+          activitySession.phase !== "browse" &&
+          activitySession.activityId &&
+          !isGuidedExerciseActivity(activitySession.activityId) ? (
+            <CompanionActivitiesPanel
+              variant="help-now"
+              session={activitySession}
+              onSessionChange={setActivitySession}
+              onOpenBeside={handleActivityOpenBeside}
+              onOpenDecisionCompass={() => openDecisionCompass()}
+              onClose={() => goBack()}
+              registerBack={registerBack}
+              onBeforeActivityStart={pushNavigationRestore}
+              returnToLabel={activityReturnLabel ?? undefined}
+              onExitActivity={handleExitActivity}
+              decisionCompassPrefill={decisionCompassPrefill}
+              decisionCompassSession={decisionCompassSession}
+              onDecisionCompassSessionChange={handleDecisionCompassSessionChange}
+              onDecisionCompassComplete={handleDecisionCompassComplete}
+            />
+          ) : activeSection === "focus" ? (
             <WorkspaceShell
               assistLabel={getShariAssistLabel("focus")}
               onAskShari={() => openCompanionAssist("focus")}
             >
               <FocusAreaPanel onAction={handleFocusHubAction} />
             </WorkspaceShell>
-          )}
+          ) : null}
 
           {activeSection === "time-block" && (
             <WorkspaceShell
@@ -11372,22 +11766,6 @@ export default function CompanionPage() {
             </WorkspaceShell>
           )}
 
-          {activeSection === "activities" && (
-            <CompanionActivitiesPanel
-              variant="help-now"
-              session={activitySession}
-              onSessionChange={setActivitySession}
-              onOpenBeside={handleActivityOpenBeside}
-              onQuickTool={handleHelpMeRightNowQuickTool}
-              onOpenDecisionCompass={() => openDecisionCompass()}
-              onClose={goBack}
-              decisionCompassPrefill={decisionCompassPrefill}
-              decisionCompassSession={decisionCompassSession}
-              onDecisionCompassSessionChange={handleDecisionCompassSessionChange}
-              onDecisionCompassComplete={handleDecisionCompassComplete}
-            />
-          )}
-
           {activeSection === "guided-exercises" && (
             <CompanionActivitiesPanel
               variant="guided"
@@ -11395,7 +11773,11 @@ export default function CompanionPage() {
               onSessionChange={setActivitySession}
               onOpenBeside={handleActivityOpenBeside}
               onOpenDecisionCompass={() => openDecisionCompass()}
-              onClose={goBack}
+              onClose={() => goBack()}
+              registerBack={registerBack}
+              onBeforeActivityStart={pushNavigationRestore}
+              returnToLabel={activityReturnLabel ?? undefined}
+              onExitActivity={handleExitActivity}
               decisionCompassPrefill={decisionCompassPrefill}
               decisionCompassSession={decisionCompassSession}
               onDecisionCompassSessionChange={handleDecisionCompassSessionChange}
@@ -11483,7 +11865,8 @@ export default function CompanionPage() {
               onAskShari={() => openCompanionAssist("projects")}
             >
               <ProjectsPanel
-                initialProjectId={projectContinueId}
+                resumeProjectId={projectsResumeId}
+                onResumeConsumed={() => setProjectsResumeId(null)}
                 focusField={workspaceFocusField}
                 focusStamp={workspaceFocusStamp}
                 chatFieldFill={workspaceChatFill}
@@ -11555,6 +11938,7 @@ export default function CompanionPage() {
 
           {activeSection === "snippets" && (
             <SnippetsLibrary
+              onBack={goBack}
               onBuildWithShari={(input) =>
                 openCreateWithShari({
                   ...input,
@@ -11605,6 +11989,8 @@ export default function CompanionPage() {
                 }}
                 onStartOver={startOverCreate}
                 onDeleteDraft={deleteCreateDraft}
+                onOpenCreateDraft={openCreateDraftFromLibrary}
+                onDeleteCreateDraftEntry={deleteCreateDraftFromLibrary}
               />
             </WorkspaceShell>
           )}
@@ -11643,6 +12029,15 @@ export default function CompanionPage() {
         </div>
       )}
 
+      <PlanMyDayQuickDrawer
+        open={planMyDayDrawerOpen}
+        onClose={() => setPlanMyDayDrawerOpen(false)}
+        onOpenFull={(itemId) => {
+          setPlanMyDayOpenItemId(itemId ?? null);
+          openSectionBesideChatCore("plan-my-day");
+        }}
+      />
+
       <ModalSheet
         open={overlay === "signin"}
         onClose={() => setOverlay(null)}
@@ -11669,6 +12064,7 @@ export default function CompanionPage() {
         <SettingsPanel
           onSignIn={openSignIn}
           initialSection={settingsSection}
+          registerBack={registerBack}
         />
       </ModalSheet>
 
@@ -11727,6 +12123,13 @@ export default function CompanionPage() {
           </div>
         </div>
       ) : null}
+
+      <FreshStartConfirmDialog
+        open={freshStartDialog !== null}
+        copy={freshStartCopy(freshStartDialog ?? "clear-context")}
+        onConfirm={confirmFreshStart}
+        onCancel={() => setFreshStartDialog(null)}
+      />
     </div>
     </CompanionAuthGate>
   );

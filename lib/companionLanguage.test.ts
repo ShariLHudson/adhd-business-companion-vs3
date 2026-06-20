@@ -6,6 +6,7 @@ import {
   effectiveOutputLanguage,
   getOutputLanguageContext,
   isRtlLanguage,
+  SORTED_LANGUAGE_OPTIONS,
   speechLocaleForLanguage,
   withUnifiedAppLanguage,
 } from "@/lib/companionLanguage";
@@ -38,11 +39,17 @@ describe("companionLanguage", () => {
     });
   });
 
-  it("marks Urdu as RTL and maps speech locales", () => {
-    expect(isRtlLanguage("ur")).toBe(true);
+  it("maps Roman Urdu speech locale and keeps it LTR", () => {
+    expect(isRtlLanguage("ur")).toBe(false);
     expect(isRtlLanguage("es")).toBe(false);
     expect(speechLocaleForLanguage("ur")).toBe("ur-PK");
     expect(speechLocaleForLanguage("tl")).toBe("fil-PH");
+  });
+
+  it("lists Roman Urdu in language options", () => {
+    expect(
+      SORTED_LANGUAGE_OPTIONS.some((o) => o.code === "ur" && o.label === "Roman Urdu"),
+    ).toBe(true);
   });
 
   it("falls back UI strings to English when no translation pack exists", () => {

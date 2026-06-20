@@ -82,7 +82,7 @@ describe("Companion intent routing — open Create (explicit creation)", () => {
     expect(isInformationIntent(text)).toBe(false);
     expect(classifyCompanionIntentBucket(text)).toBe("content_creation");
     expect(shouldOpenCreateWorkspace(text)).toBe(true);
-    expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(true);
+    expect(shouldAutoOpenWorkspaceBeforeChat(text)).toBe(false);
     expect(shouldBlockArtifactPipeline(text)).toBe(false);
     expect(resolveIntent(text).action).toBe("make");
   });

@@ -14,6 +14,14 @@ import {
   type CreateTemplateSection,
 } from "./createTemplates";
 import { isHelpSeekingAnswer, isInvalidBuilderFieldValue } from "./builderContentSync";
+import { isCreateExplorationRequest } from "./createExplorationMode";
+import { shouldCaptureFieldAnswer } from "./createBuilderModes";
+import {
+  createThinkingPartnerHint,
+  CREATE_THINKING_PARTNER_PRINCIPLES,
+  DRAFT_WITH_WHAT_WE_HAVE_PROMPT,
+} from "./createVision";
+import { CREATE_WORKSPACE_V2, formatCreateWorkspaceV2ExplorationHint } from "./createWorkspaceV2";
 import { extractNumberedOptions, parseOptionSelection } from "./workspaceSop";
 
 /** Discovery question id → template section id, per item type. */
@@ -29,6 +37,7 @@ const DISCOVERY_SECTION_MAP: Record<string, Record<string, string>> = {
     reader: "opening",
     theme: "main",
     goal: "main",
+    takeaways: "main",
     cta: "cta",
   },
   SOP: {
@@ -51,6 +60,48 @@ const DISCOVERY_SECTION_MAP: Record<string, Record<string, string>> = {
     timeline: "timeline",
     pricing: "investment",
     tone: "approach",
+  },
+  "Marketing Plan": {
+    audience: "audience",
+    outcome: "positioning",
+    struggle: "content",
+  },
+  "Lead Magnet": {
+    audience: "audience",
+    problem: "problem",
+    desiredOutcome: "outcome",
+    promotion: "promotion",
+    format: "format",
+    promise: "promise",
+    outline: "outline",
+    cta: "cta",
+    tone: "notes",
+    avoid: "notes",
+  },
+  "Landing Page": {
+    offer: "headline",
+    audience: "problem",
+    action: "cta",
+  },
+  "Email Sequence": {
+    goal: "goal",
+    audience: "arc",
+    sequence: "emails",
+  },
+  "Course Outline": {
+    audience: "audience",
+    transformation: "transformation",
+    modules: "modules",
+  },
+  "Client Onboarding": {
+    client: "welcome",
+    start: "kickoff",
+    deliver: "deliverables",
+  },
+  "Sales Funnel": {
+    offer: "offer",
+    audience: "nurture",
+    entry: "entry",
   },
   "Social Post": {
     topic: "body",
@@ -159,7 +210,60 @@ export function isInSectionDiscoveryPhase(workflow: CreateWorkflowState): boolea
   return questionsDone || workflow.discoverySubphase === "sections";
 }
 
+const SECTION_PICK_RE =
+  /^(?:let'?s\s+)?(?:work on|fill in|do|tackle|start with|move to|switch to)\s+(?:the\s+)?(.+?)[\s.?!]*$/i;
+
+function findSectionByFragment(
+  fragment: string,
+  sections: CreateTemplateSection[],
+): CreateTemplateSection | null {
+  const f = fragment.trim().toLowerCase();
+  if (!f) return null;
+
+  for (const section of sections) {
+    const label = section.label.toLowerCase();
+    if (f === label) return section;
+    const aliases = SECTION_ALIASES[section.id] ?? [];
+    for (const alias of aliases) {
+      if (f === alias.toLowerCase()) return section;
+    }
+  }
+
+  if (f.length > 40) return null;
+
+  for (const section of sections) {
+    const label = section.label.toLowerCase();
+    if (label.startsWith(f) || f.startsWith(label)) return section;
+    const aliases = SECTION_ALIASES[section.id] ?? [];
+    for (const alias of aliases) {
+      const a = alias.toLowerCase();
+      if (a.startsWith(f) || f.startsWith(a)) return section;
+    }
+  }
+
+  return null;
+}
+
 export function matchSectionFromText(
+  text: string,
+  sections: CreateTemplateSection[],
+): CreateTemplateSection | null {
+  const raw = text.trim();
+  if (!raw) return null;
+
+  const pickMatch = raw.match(SECTION_PICK_RE);
+  if (pickMatch?.[1]) {
+    const found = findSectionByFragment(pickMatch[1], sections);
+    if (found) return found;
+  }
+
+  if (raw.length > 48) return null;
+
+  return findSectionByFragment(raw, sections);
+}
+
+/** Looser match for help/exploration — finds section names inside a longer question. */
+export function inferSectionFromHelpText(
   text: string,
   sections: CreateTemplateSection[],
 ): CreateTemplateSection | null {
@@ -168,13 +272,27 @@ export function matchSectionFromText(
 
   for (const section of sections) {
     const label = section.label.toLowerCase();
-    if (t === label || t.includes(label)) return section;
+    if (label.length >= 3 && t.includes(label)) return section;
     const aliases = SECTION_ALIASES[section.id] ?? [];
     for (const alias of aliases) {
-      if (t === alias || t.includes(alias)) return section;
+      const a = alias.toLowerCase();
+      if (a.length >= 3 && t.includes(a)) return section;
     }
+    if (section.id.length >= 4 && t.includes(section.id)) return section;
   }
   return null;
+}
+
+/** True when the user is naming a section to work on — not offering section body text. */
+export function isSectionPickIntent(
+  text: string,
+  section: CreateTemplateSection,
+): boolean {
+  const raw = text.trim();
+  if (!raw || isUnsaveableSectionText(raw)) return false;
+  if (raw.length > 48) return false;
+  const found = matchSectionFromText(raw, [section]);
+  return found?.id === section.id;
 }
 
 export function isSectionExplorationRequest(text: string): boolean {
@@ -192,17 +310,7 @@ export function isSectionExplorationRequest(text: string): boolean {
 
 /** User is asking for Discovery Help — not providing section content. */
 export function isDiscoveryHelpRequest(text: string): boolean {
-  const t = text.trim();
-  if (!t) return false;
-  if (isHelpSeekingAnswer(t)) return true;
-  if (isSectionExplorationRequest(t)) return true;
-  return (
-    /\bhelp me (?:create|write|draft|come up with|with|build)\b/i.test(t) ||
-    /\bwhat should (?:the |my )?.+ be\b/i.test(t) ||
-    /\bsuggest (?:a |an |the |some )?\b/i.test(t) ||
-    /\bgive me (?:some )?options\b/i.test(t) ||
-    /\bwhat could i put (?:here|in)\b/i.test(t)
-  );
+  return isCreateExplorationRequest(text);
 }
 
 export function isUnsaveableSectionText(text: string): boolean {
@@ -222,10 +330,35 @@ export function isExplicitBuildApproval(text: string): boolean {
   );
 }
 
+/** User wants to draft now with partial / current content. */
+export function isDraftWithWhatWeHaveRequest(text: string): boolean {
+  const t = text.trim().toLowerCase();
+  if (!t) return false;
+  return (
+    /\b(?:write|draft|create|build)\b.*\b(?:with what we have|with what (?:we|i) have|anyway|as is|what we have)\b/i.test(
+      t,
+    ) ||
+    /\b(?:just|go ahead and)\s+(?:write|draft|create)\b/i.test(t) ||
+    /\buse what we have\b/i.test(t) ||
+    /\bwrite (?:the |it |this )?(?:letter|draft|piece)\b/i.test(t)
+  );
+}
+
+export function draftWithWhatWeHaveConfirmation(): string {
+  return DRAFT_WITH_WHAT_WE_HAVE_PROMPT;
+}
+
+export const WORKSPACE_SECTION_NUDGE =
+  "You can choose a section from the workspace, or tell me what you want to change.";
+
 export function formatIncompleteSectionsPrompt(
   sections: CreateTemplateSection[],
+  options?: { workspacePanelVisible?: boolean },
 ): string {
   if (!sections.length) return "";
+  if (options?.workspacePanelVisible) {
+    return WORKSPACE_SECTION_NUDGE;
+  }
   const bullets = sections.map((s) => `• ${s.label}`).join("\n");
   return (
     `We still have a few sections we can strengthen:\n${bullets}\n\n` +
@@ -375,6 +508,8 @@ export function prepareDiscoveryHelpContext(
   const incomplete = incompleteTemplateSections(session.workflow);
   const pool = incomplete.length ? incomplete : allSections;
   const matched =
+    inferSectionFromHelpText(userText, pool) ??
+    inferSectionFromHelpText(lastAssistantText, pool) ??
     matchSectionFromText(userText, pool) ??
     matchSectionFromText(lastAssistantText, pool);
 
@@ -397,6 +532,18 @@ export function discoveryHelpHintForChat(
   session: { typeLabel: string | null; workflow: CreateWorkflowState },
   userText: string,
 ): string {
+  if (CREATE_WORKSPACE_V2 && session.workflow.workspaceFirst) {
+    const sections = resolveTemplateSections(session.workflow) ?? [];
+    const active = sections.find(
+      (s) => s.id === session.workflow.activeSectionId,
+    );
+    return formatCreateWorkspaceV2ExplorationHint(
+      session,
+      userText,
+      active?.label,
+    );
+  }
+
   const typeLabel = session.typeLabel ?? "content";
   const activeId = session.workflow.activeSectionId;
   const sections = resolveTemplateSections(session.workflow) ?? [];
@@ -404,20 +551,16 @@ export function discoveryHelpHintForChat(
   const incomplete = incompleteTemplateSections(session.workflow);
 
   return [
-    "DISCOVERY HELP MODE (Create template section — mandatory):",
-    `User is building a **${typeLabel}** beside the Create workspace.`,
+    "EXPLORATION MODE (Create workflow — mandatory):",
+    createThinkingPartnerHint(typeLabel, session.workflow, userText),
     active
-      ? `ACTIVE SECTION: **${active.label}** — all suggestions apply here until they pick another section.`
-      : "Infer the section from their message if they named one.",
-    incomplete.length
-      ? `Still open: ${incomplete.map((s) => s.label).join(", ")}`
+      ? `ACTIVE SECTION: **${active.label}** — suggestions apply here until they pick another.`
       : "",
-    `User asked: "${userText.trim()}"`,
-    "Do NOT save their question as section content.",
-    "Help-seeking replies (I don't know, not sure, help me, give me options, you decide) are NOT content.",
-    "Generate 3–5 concrete numbered options tied to their topic and audience.",
-    'End with: "Would you like to use one of these, revise one, or see more?"',
-    "Stay in discovery — do NOT enter build-ready.",
+    incomplete.length
+      ? `Thinking board still open: ${incomplete.map((s) => s.label).join(", ")}`
+      : "",
+    "Generate 3–5 concrete numbered options when useful.",
+    "When they offer a candidate answer, they confirm separately — never auto-save.",
   ]
     .filter(Boolean)
     .join("\n");
@@ -484,12 +627,14 @@ export function buildOutlineSectionStatuses(
   });
 }
 
-/** Route Discovery Help to the LLM instead of the state machine. */
+/** Route thinking / exploration to the LLM instead of the state machine. */
 export function shouldBypassCreateBuilderForSectionHelp(
   session: { phase: string; workflow: CreateWorkflowState; typeLabel?: string | null } | null,
   text: string,
 ): boolean {
   if (!session || session.phase !== "discovery") return false;
   if (!session.typeLabel) return false;
-  return isDiscoveryHelpRequest(text);
+  if (session.workflow.pendingFieldApproval) return false;
+  if (isDiscoveryHelpRequest(text)) return true;
+  return !shouldCaptureFieldAnswer(text, false);
 }

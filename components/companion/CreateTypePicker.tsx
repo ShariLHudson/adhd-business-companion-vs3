@@ -4,6 +4,7 @@ import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelec
 import { WorkspaceStepCard } from "@/components/companion/WorkspaceStepCard";
 import { NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
+import { CREATE_WORKSPACE_V2 } from "@/lib/createWorkspaceV2";
 import {
   OTHER_OPTION,
   PRIMARY_CREATE_ITEMS,
@@ -39,7 +40,11 @@ export function CreateTypePicker({
         sectionLabel="Create"
         title="What would you like to create?"
         showCreateTooltip
-        footer="You can also tell Shari in chat."
+        footer={
+          CREATE_WORKSPACE_V2
+            ? "Choose a type — your blueprint opens in the workspace."
+            : "Choose a type — then we'll talk it through together."
+        }
       >
         <CategoryPickerSelect
           label="Content type"
@@ -50,7 +55,7 @@ export function CreateTypePicker({
             handlePick(v);
           }}
           options={itemOptions}
-          placeholder="Social Media Post, Email, Newsletter…"
+          placeholder="Marketing Plan, Workshop, Lead Magnet…"
         />
         {showingCustom ? (
           <div className="mt-3">

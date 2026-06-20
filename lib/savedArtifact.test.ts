@@ -27,10 +27,10 @@ describe("savedArtifact recovery", () => {
     expect(isSavedDocumentRecoveryRequest(phrase)).toBe(true);
   });
 
-  it("builds recovery message with Saved Work location", () => {
+  it("builds recovery message with My Work location", () => {
     const msg = buildSavedArtifactRecoveryMessage(saved, true);
     expect(msg).toContain("ElevenLabs Video Process");
-    expect(msg).toContain("Saved Work");
+    expect(msg).toContain("My Work");
     expect(msg).toContain("SOPs");
     expect(msg).toContain("Create Google Doc");
     expect(msg).toContain("not been added to a project yet");
