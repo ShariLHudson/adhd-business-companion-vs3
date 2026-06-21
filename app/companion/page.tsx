@@ -10565,7 +10565,6 @@ export default function CompanionPage() {
               setActiveNav("chat");
               setActiveSection("home");
             }}
-            onOpenAvatars={() => setActiveSection("client-avatars")}
           />
         );
       case "brain-dump":
@@ -11312,7 +11311,6 @@ export default function CompanionPage() {
               setOverlay("settings");
             }}
             onOpenProfile={() => setOverlay("profile")}
-            onOpenAvatars={() => setActiveSection("client-avatars")}
             showPlanMyDay={!homeCalm}
             onOpenPlanMyDay={() => openSectionBesideChatCore("plan-my-day")}
           />
@@ -12001,7 +11999,6 @@ export default function CompanionPage() {
                 setActiveNav("chat");
                 setActiveSection("home");
               }}
-              onOpenAvatars={() => setActiveSection("client-avatars")}
             />
           )}
 
