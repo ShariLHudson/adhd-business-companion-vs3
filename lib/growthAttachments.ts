@@ -61,3 +61,41 @@ export function linkAttachment(url: string, label?: string): GrowthAttachment {
     url: trimmed,
   };
 }
+
+export function attachmentTypeLabel(kind: GrowthAttachmentKind): string {
+  switch (kind) {
+    case "image":
+      return "Image";
+    case "pdf":
+      return "PDF";
+    case "video":
+      return "Video link";
+    case "link":
+      return "Link";
+    default:
+      return "File";
+  }
+}
+
+export function downloadGrowthAttachment(att: GrowthAttachment): void {
+  if (typeof window === "undefined") return;
+  const anchor = document.createElement("a");
+  anchor.href = att.url;
+  anchor.download = att.name || "attachment";
+  if (att.url.startsWith("http")) {
+    anchor.target = "_blank";
+    anchor.rel = "noopener noreferrer";
+  }
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+}
+
+export function openGrowthAttachment(att: GrowthAttachment): void {
+  if (typeof window === "undefined") return;
+  if (att.url.startsWith("http")) {
+    window.open(att.url, "_blank", "noopener,noreferrer");
+    return;
+  }
+  downloadGrowthAttachment(att);
+}

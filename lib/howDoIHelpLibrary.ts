@@ -4,6 +4,10 @@ import {
 } from "./howDoIEcosystemSearch";
 import { HOW_DO_I_HELP_ARTICLES } from "./howDoIHelpArticles";
 import {
+  howDoIBrowseSections,
+  browseLocationForArticle,
+} from "./howDoIHelpBrowseStructure";
+import {
   additionalHelpArticles,
   additionalHelpTopicGroups,
 } from "./howDoIAdditionalTopics";
@@ -43,6 +47,13 @@ export {
   ADDITIONAL_HELP_TOPIC_GROUPS,
 } from "./howDoIAdditionalTopics";
 export {
+  howDoIBrowseSections,
+  browseLocationForArticle,
+  articlesForNewUserStart,
+  articlesForBrowseSubgroup,
+  isHelpCenterBrowseArticle,
+} from "./howDoIHelpBrowseStructure";
+export {
   ONBOARDING_EXPERIENCE,
   ONBOARDING_EXPERIENCE_CONTENT,
 } from "./onboardingExperienceContent";
@@ -72,15 +83,16 @@ function buildHelpBrowseOrderIndex(): Map<string, number> {
   const order = new Map<string, number>();
   let index = 0;
 
-  for (const id of NEW_USER_START_HERE_IDS) {
-    order.set(id, index++);
-  }
-  for (const id of HELP_CENTER_ARTICLE_IDS) {
-    order.set(id, index++);
-  }
-  for (const group of additionalHelpTopicGroups()) {
-    for (const article of group.articles) {
-      if (!order.has(article.id)) order.set(article.id, index++);
+  for (const section of howDoIBrowseSections()) {
+    if (section.articleIds) {
+      for (const id of section.articleIds) {
+        if (!order.has(id)) order.set(id, index++);
+      }
+    }
+    for (const subgroup of section.subgroups ?? []) {
+      for (const id of subgroup.articleIds) {
+        if (!order.has(id)) order.set(id, index++);
+      }
     }
   }
 

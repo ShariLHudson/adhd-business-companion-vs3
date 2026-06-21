@@ -23,7 +23,16 @@ import {
   GrowthAttachmentsList,
 } from "@/components/companion/GrowthAttachmentsField";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
+import {
+  GrowthArchiveBar,
+  GrowthSectionHeader,
+} from "@/components/companion/GrowthSectionHeader";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+import {
+  isInGrowthArchivePeriod,
+  type GrowthArchivePeriod,
+} from "@/lib/growthArchive";
+import type { GrowthPanelNav } from "@/lib/growthNavigation";
 
 const INPUT_CLASS =
   "mt-1 w-full rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5 text-sm text-[#2d2926] placeholder:text-[#9a8f82] focus:border-[#c9a66b] focus:outline-none focus:ring-2 focus:ring-[#c9a66b]/25";
@@ -130,7 +139,13 @@ function EntryCard({
   );
 }
 
-export function ConfidenceVaultPanel({ refreshKey = 0 }: { refreshKey?: string | number }) {
+export function ConfidenceVaultPanel({
+  refreshKey = 0,
+  nav,
+}: {
+  refreshKey?: string | number;
+  nav: GrowthPanelNav;
+}) {
   const [entries, setEntries] = useState<ConfidenceEntry[]>([]);
   const [filter, setFilter] = useState<ConfidenceVaultFilter>("all");
   const [search, setSearch] = useState("");
@@ -202,17 +217,16 @@ export function ConfidenceVaultPanel({ refreshKey = 0 }: { refreshKey?: string |
     reload();
   }
 
+  function closeAll() {
+    setExpandedId(null);
+    setShowForm(false);
+    setDraft(EMPTY_CONFIDENCE_DRAFT);
+    setQuickText("");
+  }
+
   return (
     <section className={workspacePanelShellClass({ width: "standard" })}>
-      <div>
-        <h2 className="text-3xl font-bold text-[#2f261f]">💎 Confidence Vault</h2>
-        <p className="mt-1 text-[#6f6259]">
-          Proof that you have value, experience, knowledge, and accomplishments.
-        </p>
-        <p className="mt-2 text-sm text-[#9a8f82]">
-          What proof exists that I have value? — Part of 🌱 Growth
-        </p>
-      </div>
+      <GrowthSectionHeader nav={nav} onCloseAll={closeAll} />
 
       <WorkspaceAreaWorksGuide areaId="confidence-vault" />
 
@@ -232,10 +246,10 @@ export function ConfidenceVaultPanel({ refreshKey = 0 }: { refreshKey?: string |
       {stats.total === 0 ? (
         <div className="mt-5 rounded-3xl border border-[#e7d9c8] bg-gradient-to-b from-[#faf7f2] to-white p-5 text-center">
           <p className="font-semibold text-[#2f261f]">
-            Everyone accumulates proof of value.
+            Start collecting your highlights.
           </p>
           <p className="mt-2 text-sm text-[#6f6259]">
-            Save compliments, accomplishments, credentials, testimonials, and moments
+            Save accomplishments, praise, expertise, credentials, testimonials, and moments
             that remind you of your strengths.
           </p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
@@ -394,7 +408,7 @@ export function ConfidenceVaultPanel({ refreshKey = 0 }: { refreshKey?: string |
               disabled={!draft.title.trim()}
               className="rounded-full bg-[#2f261f] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-40"
             >
-              Save to Confidence Vault
+              Save to My Highlights
             </button>
           </div>
         </div>

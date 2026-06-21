@@ -9,6 +9,7 @@ const GOLD_LABEL = "text-xs font-bold uppercase tracking-wide text-[#b45309]";
 export function HowDoIWorkflowCard({
   article,
   open,
+  highlighted = false,
   onToggle,
   onOpen,
   onOpenActivity,
@@ -18,6 +19,7 @@ export function HowDoIWorkflowCard({
 }: {
   article: HowDoIHelpArticle;
   open: boolean;
+  highlighted?: boolean;
   onToggle: () => void;
   onOpen?: (section: AppSection) => void;
   onOpenActivity?: (activityId: string) => void;
@@ -33,7 +35,13 @@ export function HowDoIWorkflowCard({
 
   return (
     <div ref={cardRef} id={`help-article-${article.id}`}>
-      <article className="overflow-hidden rounded-xl border border-[#e4ddd2] bg-white shadow-sm">
+      <article
+        className={`overflow-hidden rounded-xl border bg-white shadow-sm transition-shadow ${
+          highlighted
+            ? "border-[#b45309] ring-2 ring-[#b45309]/35"
+            : "border-[#e4ddd2]"
+        }`}
+      >
         <button
           type="button"
           onClick={onToggle}

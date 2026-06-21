@@ -329,3 +329,32 @@ export const EMPTY_JOURNEY_DRAFT: JourneyEntryInput = {
   whatWisdom: "",
   attachments: [],
 };
+
+const JOURNEY_PREFILL_KEY = "companion-journey-prefill-v1";
+
+export type JourneyPrefill = {
+  title?: string;
+  whatHappened?: string;
+  category?: JourneyCategory;
+};
+
+export function setJourneyPrefill(prefill: JourneyPrefill): void {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.setItem(JOURNEY_PREFILL_KEY, JSON.stringify(prefill));
+  } catch {
+    /* noop */
+  }
+}
+
+export function consumeJourneyPrefill(): JourneyPrefill | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(JOURNEY_PREFILL_KEY);
+    sessionStorage.removeItem(JOURNEY_PREFILL_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as JourneyPrefill;
+  } catch {
+    return null;
+  }
+}

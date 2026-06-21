@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
+  consumeJourneyPrefill,
   createJourneyEntry,
   deleteJourneyEntry,
   EMPTY_JOURNEY_DRAFT,
@@ -19,7 +20,9 @@ import {
 } from "@/lib/myJourneyStore";
 import { GrowthAttachmentsField, GrowthAttachmentsList } from "@/components/companion/GrowthAttachmentsField";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
+import { GrowthSectionHeader } from "@/components/companion/GrowthSectionHeader";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+import type { GrowthPanelNav } from "@/lib/growthNavigation";
 
 const INPUT_CLASS =
   "mt-1 w-full rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5 text-sm text-[#2d2926] placeholder:text-[#9a8f82] focus:border-[#c9a66b] focus:outline-none focus:ring-2 focus:ring-[#c9a66b]/25";
@@ -56,7 +59,13 @@ function StatPill({ label, value }: { label: string; value: number }) {
   );
 }
 
-export function MyJourneyPanel({ refreshKey = 0 }: { refreshKey?: string | number }) {
+export function MyJourneyPanel({
+  refreshKey = 0,
+  nav,
+}: {
+  refreshKey?: string | number;
+  nav: GrowthPanelNav;
+}) {
   const [entries, setEntries] = useState<JourneyEntry[]>([]);
   const [view, setView] = useState<"timeline" | "chapters">("timeline");
   const [filter, setFilter] = useState<JourneyFilter>("all");
@@ -77,6 +86,18 @@ export function MyJourneyPanel({ refreshKey = 0 }: { refreshKey?: string | numbe
     window.addEventListener(MY_JOURNEY_UPDATED_EVENT, onUpdate);
     return () => window.removeEventListener(MY_JOURNEY_UPDATED_EVENT, onUpdate);
   }, [reload]);
+
+  useEffect(() => {
+    const prefill = consumeJourneyPrefill();
+    if (!prefill) return;
+    setDraft((d) => ({
+      ...d,
+      title: prefill.title ?? d.title,
+      whatHappened: prefill.whatHappened ?? d.whatHappened,
+      category: prefill.category ?? d.category,
+    }));
+    setShowForm(true);
+  }, [refreshKey]);
 
   const stats = useMemo(() => getJourneyDashboardStats(), [entries]);
   const visible = useMemo(() => {
@@ -109,6 +130,12 @@ export function MyJourneyPanel({ refreshKey = 0 }: { refreshKey?: string | numbe
     setDraft(EMPTY_JOURNEY_DRAFT);
     setShowForm(false);
     reload();
+  }
+
+  function closeAll() {
+    setExpandedId(null);
+    setShowForm(false);
+    setDraft(EMPTY_JOURNEY_DRAFT);
   }
 
   function renderEntry(entry: JourneyEntry) {
@@ -172,19 +199,7 @@ export function MyJourneyPanel({ refreshKey = 0 }: { refreshKey?: string | numbe
 
   return (
     <section className={workspacePanelShellClass({ width: "standard" })}>
-      <div>
-        <h2 className="text-3xl font-bold text-[#2f261f]">🌿 My Journey</h2>
-        <p className="mt-1 text-[#6f6259]">
-          Your personal and professional story — experiences, lessons, milestones, and wisdom.
-        </p>
-        <p className="mt-2 text-sm text-[#9a8f82]">
-          Not a resume. Not Evidence Bank. Not Confidence Vault. This is the story of who you are
-          and who you are becoming.
-        </p>
-        <p className="mt-1 text-sm italic text-[#9a8f82]">
-          Who am I? What has shaped me? What have I learned? — Part of 🌱 Growth
-        </p>
-      </div>
+      <GrowthSectionHeader nav={nav} onCloseAll={closeAll} />
 
       <WorkspaceAreaWorksGuide areaId="my-journey" />
 

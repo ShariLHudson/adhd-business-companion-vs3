@@ -10,19 +10,12 @@ import {
   type ContinuityItemType,
   type ContinuityManifestItem,
 } from "./continuityManifest";
-import {
-  getAvatars,
-  getBrainDumps,
-  getProjects,
-  getProjectItems,
-  type IdealClientAvatar,
-  type Project,
-} from "./companionStore";
+import { getAvatars, getBrainDumps, getProjects, getProjectItems, getSnippets, getTemplates, type IdealClientAvatar, type Project } from "./companionStore";
 import { loadDecisionCompassSession } from "./decisionCompassSessionStore";
 import { buildWeeklyWins } from "./weeklyWins";
 import { loadStrategyApplySession } from "./strategyApplySessionStore";
 import { loadWorkflowRecord } from "./createWorkflowRecordStore";
-import { getActiveSavedWork, type SavedWorkItem } from "./savedWorkStore";
+import { getActiveSavedWork, getArchivedSavedWork, type SavedWorkItem } from "./savedWorkStore";
 import { getUserStrategies, type UserStrategy } from "./userStrategies";
 import {
   listAllUnifiedFiles,
@@ -619,6 +612,121 @@ export type MyWorkHubSearchGroup = {
   items: MyWorkHubItem[];
 };
 
+const SEARCH_GROUP_ORDER = [
+  "Continue Working",
+  "Favorites",
+  "Recently Active",
+  "Projects",
+  "Created Content",
+  "Saved Work",
+  "Strategies",
+  "Templates",
+  "Snippets",
+  "Archive",
+  "Files",
+  "Client Avatars",
+  "Decisions",
+  "Drafts",
+] as const;
+
+function searchGroupLabel(item: MyWorkHubItem, inContinue: boolean): string {
+  if (inContinue) return "Continue Working";
+  if (item.kind === "project") return "Projects";
+  if (item.kind === "strategy") return "Strategies";
+  if (item.kind === "file") return "Files";
+  if (item.kind === "client-avatar") return "Client Avatars";
+  if (item.kind === "decision") return "Decisions";
+  if (item.kind === "create-draft") return "Drafts";
+  if (item.typeLabel === "Template") return "Templates";
+  if (item.typeLabel === "Snippet") return "Snippets";
+  if (item.typeLabel === "Archived") return "Archive";
+  if (item.kind === "saved-work") return "Created Content";
+  return "Saved Work";
+}
+
+function templateSearchItems(): MyWorkHubItem[] {
+  return getTemplates().map((t) => ({
+    id: `template:${t.id}`,
+    kind: "saved-work" as const,
+    title: t.title,
+    typeLabel: "Template",
+    status: t.status === "archived" ? ("complete" as const) : ("saved" as const),
+    date: t.updatedAt,
+    relativeDate: relativeDateLabel(t.updatedAt),
+    openTarget: {
+      kind: "section" as const,
+      section: "templates-library" as const,
+      nav: "templates" as const,
+    },
+    searchText: normalizeSearch(t.title, t.body, t.category),
+  }));
+}
+
+function snippetSearchItems(): MyWorkHubItem[] {
+  return getSnippets().map((s) => {
+    const title =
+      s.content.trim().slice(0, 60) + (s.content.length > 60 ? "…" : "");
+    return {
+      id: `snippet:${s.id}`,
+      kind: "saved-work" as const,
+      title,
+      typeLabel: "Snippet",
+      status: "saved" as const,
+      date: s.updatedAt,
+      relativeDate: relativeDateLabel(s.updatedAt),
+      openTarget: {
+        kind: "section" as const,
+        section: "snippets" as const,
+        nav: "snippets" as const,
+      },
+      searchText: normalizeSearch(title, s.content, s.category, s.kind),
+    };
+  });
+}
+
+function archiveSearchItems(): MyWorkHubItem[] {
+  const items: MyWorkHubItem[] = [];
+  for (const w of getArchivedSavedWork()) {
+    items.push({
+      ...savedWorkToItem(w),
+      id: `archive-saved:${w.id}`,
+      typeLabel: "Archived",
+    });
+  }
+  for (const p of getProjects().filter((proj) => proj.status === "completed")) {
+    items.push({
+      id: `archive-project:${p.id}`,
+      kind: "project",
+      title: p.name,
+      typeLabel: "Archived",
+      status: "complete",
+      date: p.updatedAt,
+      relativeDate: relativeDateLabel(p.updatedAt),
+      projectId: p.id,
+      openTarget: { kind: "project", projectId: p.id },
+      searchText: normalizeSearch(p.name, p.nextAction, "archived"),
+    });
+  }
+  for (const t of getTemplates().filter((tmpl) => tmpl.status === "archived")) {
+    items.push({
+      id: `archive-template:${t.id}`,
+      kind: "saved-work",
+      title: t.title,
+      typeLabel: "Archived",
+      status: "complete",
+      date: t.updatedAt,
+      relativeDate: relativeDateLabel(t.updatedAt),
+      openTarget: {
+        kind: "section",
+        section: "templates-library",
+        nav: "templates",
+      },
+      searchText: normalizeSearch(t.title, t.body, "archived template"),
+    });
+  }
+  return items;
+}
+
 export function searchMyWorkHub(
   query: string,
   snapshot?: MyWorkHubSnapshot,
@@ -627,10 +735,15 @@ export function searchMyWorkHub(
   if (!q) return [];
 
   const hub = snapshot ?? buildMyWorkHub();
+  const continueIds = new Set(hub.continueWorking.map((i) => i.id));
+  const recentIds = new Set(
+    hub.recentWork.flatMap((g) => g.items).map((i) => i.id),
+  );
+
   const pool: MyWorkHubItem[] = [
     ...hub.continueWorking,
-    ...hub.savedWork,
     ...hub.recentWork.flatMap((g) => g.items),
+    ...hub.savedWork,
     ...hub.projects.map((p) => ({
       id: `search-project:${p.id}`,
       kind: "project" as const,
@@ -673,33 +786,27 @@ export function searchMyWorkHub(
       openTarget: s.openTarget,
       searchText: normalizeSearch(s.title, s.category),
     })),
+    ...templateSearchItems(),
+    ...snippetSearchItems(),
+    ...archiveSearchItems(),
   ];
 
   const hits = dedupeHubItems(pool).filter((i) => i.searchText.includes(q));
   const groups: Record<string, MyWorkHubItem[]> = {};
   for (const item of hits) {
-    const label =
-      item.kind === "file"
-        ? "Files"
-        : item.kind === "decision"
-          ? "Decisions"
-          : item.kind === "project"
-            ? "Projects"
-            : item.kind === "strategy"
-              ? "Strategies"
-              : item.kind === "client-avatar"
-                ? "Client Avatars"
-                : item.kind === "create-draft"
-                  ? "Drafts"
-                  : "Saved Work";
+    let label = searchGroupLabel(item, continueIds.has(item.id));
+    if (recentIds.has(item.id) && !continueIds.has(item.id)) {
+      label = "Recently Active";
+    }
     groups[label] ??= [];
     groups[label]!.push(item);
   }
 
-  return Object.entries(groups).map(([label, items]) => ({
-    label,
-    items: items.sort((a, b) => b.date.localeCompare(a.date)),
-  }));
+  return SEARCH_GROUP_ORDER.filter((label) => groups[label]?.length)
+    .map((label) => ({
+      label,
+      items: groups[label]!.sort((a, b) => b.date.localeCompare(a.date)),
+    }));
 }
 
 export { continuityToHomeResume };

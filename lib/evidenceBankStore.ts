@@ -134,6 +134,79 @@ export function deleteEvidenceEntry(id: string): void {
   writeAll(readAll().filter((e) => e.id !== id));
 }
 
+export function updateEvidenceEntry(
+  id: string,
+  patch: Partial<EvidenceEntryInput>,
+): EvidenceEntry | null {
+  const list = readAll();
+  const idx = list.findIndex((e) => e.id === id);
+  if (idx < 0) return null;
+  const updated: EvidenceEntry = {
+    ...list[idx],
+    ...patch,
+    updatedAt: new Date().toISOString(),
+  };
+  list[idx] = updated;
+  writeAll(list);
+  return updated;
+}
+
+export function getEvidenceEntryById(id: string): EvidenceEntry | null {
+  return readAll().find((e) => e.id === id) ?? null;
+}
+
+export function formatEvidenceEntryForExport(entry: EvidenceEntry): string {
+  const lines = [
+    `Evidence Bank Entry`,
+    `Category: ${entry.category}`,
+    `Date: ${new Date(entry.createdAt).toLocaleString()}`,
+    ``,
+    `What happened:`,
+    entry.whatHappened,
+  ];
+  if (entry.whatImproved.trim()) lines.push(``, `What improved:`, entry.whatImproved);
+  if (entry.whatMovedForward.trim())
+    lines.push(``, `What moved forward:`, entry.whatMovedForward);
+  if (entry.whatProblemSolved.trim())
+    lines.push(``, `Problem solved:`, entry.whatProblemSolved);
+  if (entry.whoBenefited.trim()) lines.push(``, `Who benefited:`, entry.whoBenefited);
+  if (entry.whyItMattered.trim()) lines.push(``, `Why it mattered:`, entry.whyItMattered);
+  if (entry.whatThisProves.trim()) lines.push(``, `What this proves:`, entry.whatThisProves);
+  if (entry.attachments.length > 0) {
+    lines.push(``, `Attachments:`);
+    for (const att of entry.attachments) {
+      lines.push(`- ${att.name} (${att.kind})`);
+    }
+  }
+  return lines.join("\n");
+}
+
+export function downloadEvidenceEntry(entry: EvidenceEntry): void {
+  if (typeof window === "undefined") return;
+  const blob = new Blob([formatEvidenceEntryForExport(entry)], {
+    type: "text/plain;charset=utf-8",
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `evidence-${entry.id}.txt`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
+}
+
+export function printEvidenceEntry(entry: EvidenceEntry): void {
+  if (typeof window === "undefined") return;
+  const html = `<!DOCTYPE html><html><head><title>Evidence</title></head><body><pre style="font-family:system-ui,sans-serif;padding:24px;white-space:pre-wrap;">${formatEvidenceEntryForExport(entry).replace(/</g, "&lt;")}</pre></body></html>`;
+  const win = window.open("", "_blank");
+  if (!win) return;
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  win.print();
+}
+
 export function setEvidencePrefill(prefill: EvidencePrefill): void {
   if (typeof window === "undefined") return;
   try {

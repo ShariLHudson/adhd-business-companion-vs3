@@ -40,7 +40,8 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
   "evidence-bank",
   "growth",
   "confidence-vault",
-  "my-journey",
+  "plan-my-day",
+  "focus-timer",
 ];
 
 export const STANDALONE_SECTIONS: AppSection[] = [
@@ -63,7 +64,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "content-generator": "Create",
   "google-workspace": "Google Workspace",
   "templates-library": "Templates",
-  "saved-work": "Saved Work",
+  "saved-work": "Created Content",
   playbook: "Strategies",
   "how-do-i": "How Do I",
   "brain-dump": "Clear My Mind",
@@ -71,20 +72,57 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "email-generator": "Email",
   snippets: "Snippets",
   "business-profile": "Business Profile",
-  "client-avatars": "Client Avatar",
+  "client-avatars": "Audience Profile",
   "decision-compass": "Decision Compass",
   today: "Today",
   "plan-my-day": "Plan My Day",
   "wins-this-week": "Wins This Week",
   "evidence-bank": "Evidence Bank",
   growth: "Growth",
-  "confidence-vault": "Confidence Vault",
+  "confidence-vault": "My Highlights",
   "my-journey": "My Journey",
   "focus-audio": "Focus Audio",
+  "focus-timer": "Focus",
+  settings: "Settings",
+  profile: "Profile",
+  focus: "Focus",
+  progress: "Progress",
+  activities: "Activities",
 };
 
+const EXTRA_AREA_TITLES: Partial<Record<AppSection, string>> = {
+  home: "Chat",
+  settings: "Settings",
+  profile: "Profile",
+  focus: "Focus",
+  progress: "Progress",
+  energy: "Energy",
+  activities: "Activities",
+  "guided-exercises": "Guided Exercises",
+  "spin-wheel": "Spin Wheel",
+  games: "Games",
+  "content-types": "Content Types",
+  breathe: "Breathe",
+};
+
+function humanizeSectionId(section: AppSection): string {
+  return section
+    .split("-")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+/** User-facing name for any ecosystem area — never returns the word "Workspace". */
+export function workspaceAreaTitle(section: AppSection): string {
+  return (
+    WORKSPACE_TITLES[section] ??
+    EXTRA_AREA_TITLES[section] ??
+    humanizeSectionId(section)
+  );
+}
+
 export function workspaceTitle(section: AppSection): string {
-  return WORKSPACE_TITLES[section] ?? "Workspace";
+  return workspaceAreaTitle(section);
 }
 
 export const WORKSPACE_EMOJI: Partial<Record<AppSection, string>> = {
@@ -104,10 +142,10 @@ export const WORKSPACE_EMOJI: Partial<Record<AppSection, string>> = {
   "decision-compass": "🧭",
   today: "📅",
   "plan-my-day": "📋",
-  "wins-this-week": "🌟",
-  "evidence-bank": "🏆",
+  "wins-this-week": "🏆",
+  "evidence-bank": "📈",
   growth: "🌱",
-  "confidence-vault": "💎",
+  "confidence-vault": "🌟",
   "my-journey": "🌿",
   "focus-audio": "🎧",
 };

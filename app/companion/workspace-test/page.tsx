@@ -190,7 +190,7 @@ export default function WorkspaceTestPage() {
         chat={chat}
         workspace={workspaceSection ? renderWorkspace() : null}
         workspaceTitle={
-          workspaceSection ? workspaceTitle(workspaceSection) : "Workspace"
+          workspaceSection ? workspaceTitle(workspaceSection) : "Create"
         }
         onClose={closeWorkspace}
       />

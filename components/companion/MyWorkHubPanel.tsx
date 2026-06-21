@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import type { AppSection, SidebarNavId } from "@/lib/companionUi";
 import type { HomeResumeItem } from "@/lib/homeResumeItem";
@@ -9,18 +9,17 @@ import {
   searchMyWorkHub,
   type MyWorkHubItem,
   type MyWorkHubOpenTarget,
-  type MyWorkHubProjectRow,
 } from "@/lib/myWorkHub";
 import { continuityToHomeResume } from "@/lib/myWorkHubResume";
-import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
-import { SAVED_WORK_UPDATED_EVENT } from "@/lib/savedWorkStore";
-import { initialSectionOpen } from "@/lib/expandableUi";
-import { useCategoryColorCoding } from "@/lib/useCategoryColorCoding";
-import { projectFileCategoryLabel } from "@/lib/projectFiles";
-import { SavedWorkLibrary } from "@/components/companion/SavedWorkLibrary";
+import { GrowthPanelBackButton } from "@/components/companion/GrowthPanelBackButton";
 import {
-  WORKSPACE_PANEL_PADDING_COMPACT_CLASS,
-} from "@/lib/workspaceLayoutTokens";
+  EcosystemCloseAllButton,
+  EcosystemCollapsibleSection,
+  EcosystemSubsectionLabel,
+} from "@/components/companion/EcosystemCollapsibleSection";
+import { SAVED_WORK_UPDATED_EVENT, getArchivedSavedWork } from "@/lib/savedWorkStore";
+import { getProjects, getSnippets, getTemplates } from "@/lib/companionStore";
+import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
 type MyWorkHubPanelProps = {
   onOpenSection: (section: AppSection, nav?: SidebarNavId) => void;
@@ -29,7 +28,21 @@ type MyWorkHubPanelProps = {
   onOpenSavedWork: (savedWorkId: string) => void;
   onOpenDecision: () => void;
   onOpenInCreate?: (input: CreationWorkspaceInput) => void;
+  onBack?: () => void;
+  backLabel?: string | null;
+  registerBack?: (fn: (() => boolean) | null) => void;
   refreshKey?: string | number;
+};
+
+type MyWorkSectionId = "continue" | "browse";
+
+type BrowseDestination = {
+  id: string;
+  title: string;
+  count: number;
+  description: string;
+  isArchive?: boolean;
+  onOpen: () => void;
 };
 
 function formatShortDate(iso: string): string {
@@ -43,145 +56,98 @@ function formatShortDate(iso: string): string {
   }
 }
 
-function HubSection({
-  id,
-  title,
-  subtitle,
-  count,
-  accent,
-  children,
-}: {
-  id: string;
-  title: string;
-  subtitle?: string;
-  count?: number;
-  accent?: string;
-  children: React.ReactNode;
-}) {
-  const [open, setOpen] = useState(initialSectionOpen);
-
-  return (
-    <section
-      className="overflow-hidden rounded-2xl border border-[#e7dfd4] bg-white/90 shadow-sm"
-      style={accent ? { borderColor: accent } : undefined}
-    >
-      <button
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        aria-controls={`hub-${id}`}
-        className="flex w-full items-start justify-between gap-3 px-4 py-3.5 text-left"
-      >
-        <div>
-          <p className="text-sm font-bold text-[#1f1c19]">
-            {title}
-            {typeof count === "number" ? (
-              <span className="ml-2 rounded-full bg-[#f0ebe3] px-2 py-0.5 text-xs font-semibold text-[#6b635a]">
-                {count}
-              </span>
-            ) : null}
-          </p>
-          {subtitle ? (
-            <p className="mt-0.5 text-xs text-[#6b635a]">{subtitle}</p>
-          ) : null}
-        </div>
-        <span className="text-sm text-[#6b635a]" aria-hidden>
-          {open ? "▼" : "▶"}
-        </span>
-      </button>
-      {open ? (
-        <div
-          id={`hub-${id}`}
-          className="border-t border-[#efe8de] px-4 py-3"
-        >
-          {children}
-        </div>
-      ) : null}
-    </section>
-  );
-}
-
-function ContinueCard({
+function HubListItem({
   item,
-  onContinue,
+  onOpen,
+  actionLabel = "Open",
 }: {
   item: MyWorkHubItem;
-  onContinue: () => void;
+  onOpen: () => void;
+  actionLabel?: string;
 }) {
   return (
-    <li className="rounded-xl border border-[#d4e8e8] bg-gradient-to-br from-[#f5fafa] to-[#faf7f2] p-3.5">
-      <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]/70">
-        {item.typeLabel}
-      </p>
-      <p className="mt-1 font-semibold text-[#1f1c19]">{item.title}</p>
-      <p className="mt-1 text-xs text-[#6b635a]">
-        {item.relativeDate ?? formatShortDate(item.date)}
-        {item.nextStep ? ` · ${item.nextStep}` : ""}
-      </p>
+    <li className="flex items-center justify-between gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3">
+      <div className="min-w-0">
+        <p className="text-xs font-bold uppercase tracking-wide text-teal-800/70">
+          {item.typeLabel}
+        </p>
+        <p className="mt-0.5 truncate font-semibold text-stone-900">{item.title}</p>
+        <p className="mt-0.5 text-xs text-stone-500">
+          {item.relativeDate ?? formatShortDate(item.date)}
+          {item.nextStep ? ` · ${item.nextStep}` : ""}
+        </p>
+      </div>
       <button
         type="button"
-        onClick={onContinue}
-        className="mt-2.5 rounded-lg bg-[#1e4f4f] px-3 py-1.5 text-xs font-semibold text-white"
+        onClick={onOpen}
+        className="shrink-0 rounded-full bg-teal-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-teal-800"
       >
-        Continue →
+        {actionLabel}
       </button>
     </li>
   );
 }
 
-function ProjectCard({
-  project,
+function BrowseRow({
+  title,
+  count,
+  description,
+  open,
+  isArchive,
+  onToggle,
   onOpen,
 }: {
-  project: MyWorkHubProjectRow;
+  title: string;
+  count: number;
+  description: string;
+  open?: boolean;
+  isArchive?: boolean;
+  onToggle?: () => void;
   onOpen: () => void;
 }) {
-  const statusColor =
-    project.status === "active-focus"
-      ? "text-[#1e4f4f] bg-[#e8f4f4]"
-      : project.status === "paused"
-        ? "text-[#8a7355] bg-[#f5efe8]"
-        : "text-[#5c554c] bg-[#f0ebe3]";
-
-  return (
-    <li className="rounded-xl border border-[#e4ddd2] bg-[#faf7f2] p-3.5">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <div className="flex flex-wrap items-center gap-2">
-            <p className="font-semibold text-[#1f1c19]">{project.name}</p>
-            <span
-              className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${statusColor}`}
-            >
-              {project.statusLabel}
-            </span>
-          </div>
-          <p className="mt-1 text-xs text-[#6b635a]">
-            {project.openTasks} open task{project.openTasks === 1 ? "" : "s"}
-            {project.totalTasks > 0
-              ? ` · ${project.completionPercent}% complete`
-              : ""}
-          </p>
-          {project.nextAction ? (
-            <p className="mt-1 text-xs text-[#5c554c]">Next: {project.nextAction}</p>
-          ) : null}
-          {project.totalTasks > 0 ? (
-            <div className="mt-2 h-1.5 w-full max-w-[12rem] overflow-hidden rounded-full bg-[#e7dfd4]">
-              <div
-                className="h-full rounded-full bg-[#1e4f4f]/70 transition-all"
-                style={{ width: `${project.completionPercent}%` }}
-              />
-            </div>
-          ) : null}
-        </div>
+  if (isArchive) {
+    return (
+      <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white">
         <button
           type="button"
-          onClick={onOpen}
-          className="shrink-0 rounded-lg border border-[#1e4f4f]/30 bg-white px-2.5 py-1 text-xs font-semibold text-[#1e4f4f]"
+          onClick={onToggle}
+          aria-expanded={open}
+          className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-stone-50"
         >
-          Open
+          <span className="min-w-0 flex-1">
+            <span className="block font-semibold text-stone-900">{title}</span>
+            <span className="block text-xs text-stone-500">{description}</span>
+          </span>
+          {count > 0 ? (
+            <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-bold text-stone-700">
+              {count}
+            </span>
+          ) : null}
+          <span className="text-xs text-stone-400" aria-hidden="true">
+            {open ? "▲" : "▼"}
+          </span>
         </button>
       </div>
-    </li>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onOpen}
+      className="flex w-full items-center gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3 text-left hover:bg-stone-50"
+    >
+      <span className="min-w-0 flex-1">
+        <span className="block font-semibold text-stone-900">{title}</span>
+        <span className="block text-xs text-stone-500">{description}</span>
+      </span>
+      {count > 0 ? (
+        <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-bold text-stone-700">
+          {count}
+        </span>
+      ) : null}
+      <span className="text-xs font-semibold text-teal-800">Open →</span>
+    </button>
   );
 }
 
@@ -191,13 +157,15 @@ export function MyWorkHubPanel({
   onOpenProject,
   onOpenSavedWork,
   onOpenDecision,
-  onOpenInCreate,
   refreshKey = 0,
+  onBack,
+  backLabel,
+  registerBack,
 }: MyWorkHubPanelProps) {
   const [query, setQuery] = useState("");
-  const [googleConnected, setGoogleConnected] = useState<boolean | null>(null);
   const [savedWorkTick, setSavedWorkTick] = useState(0);
-  const colorCoding = useCategoryColorCoding();
+  const [openSections, setOpenSections] = useState<Set<MyWorkSectionId>>(new Set());
+  const [archiveOpen, setArchiveOpen] = useState(false);
 
   const hub = useMemo(
     () => buildMyWorkHub(),
@@ -210,6 +178,85 @@ export function MyWorkHubPanel({
     [query, hub],
   );
 
+  const counts = useMemo(() => {
+    const allProjects = getProjects();
+    const activeProjects = allProjects.filter((p) => p.status !== "completed");
+    const completedProjects = allProjects.filter((p) => p.status === "completed");
+    const templates = getTemplates().filter((t) => t.status !== "archived");
+    const archivedTemplates = getTemplates().filter((t) => t.status === "archived");
+    const archivedSaved = getArchivedSavedWork();
+
+    return {
+      continue: hub.continueWorking.length,
+      projects: activeProjects.length,
+      createdContent: hub.savedWork.length,
+      strategies: hub.strategies.length,
+      templates: templates.length,
+      snippets: getSnippets().length,
+      archive:
+        archivedSaved.length + completedProjects.length + archivedTemplates.length,
+      completedProjects,
+      archivedSaved,
+      archivedTemplates,
+    };
+  }, [hub]);
+
+  const recentActive = useMemo(
+    () => hub.recentWork.flatMap((g) => g.items).slice(0, 8),
+    [hub],
+  );
+
+  const favorites: MyWorkHubItem[] = useMemo(() => [], []);
+
+  const browseDestinations: BrowseDestination[] = useMemo(
+    () => [
+      {
+        id: "created-content",
+        title: "Created Content",
+        description: "Workshops, plans, emails, SOPs, and drafts.",
+        count: counts.createdContent,
+        onOpen: () => onOpenSection("saved-work", "my-work"),
+      },
+      {
+        id: "projects",
+        title: "Projects",
+        description: "Larger work with multiple steps.",
+        count: counts.projects,
+        onOpen: () => onOpenSection("projects", "my-work"),
+      },
+      {
+        id: "snippets",
+        title: "Snippets",
+        description: "Reusable phrases, hooks, CTAs, and content blocks.",
+        count: counts.snippets,
+        onOpen: () => onOpenSection("snippets", "my-work"),
+      },
+      {
+        id: "strategies",
+        title: "Strategies",
+        description: "Saved ADHD and business strategies.",
+        count: counts.strategies,
+        onOpen: () => onOpenSection("playbook", "my-work"),
+      },
+      {
+        id: "templates",
+        title: "Templates",
+        description: "Reusable frameworks and starting points.",
+        count: counts.templates,
+        onOpen: () => onOpenSection("templates-library", "my-work"),
+      },
+      {
+        id: "archive",
+        title: "Archive",
+        description: "Finished or older work you may need later.",
+        count: counts.archive,
+        isArchive: true,
+        onOpen: () => setArchiveOpen((o) => !o),
+      },
+    ],
+    [counts, onOpenSection],
+  );
+
   useEffect(() => {
     const onUpdate = () => setSavedWorkTick((t) => t + 1);
     window.addEventListener(SAVED_WORK_UPDATED_EVENT, onUpdate);
@@ -217,24 +264,31 @@ export function MyWorkHubPanel({
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    fetch("/api/google/status")
-      .then((r) => r.json())
-      .then((j) => {
-        if (!cancelled) setGoogleConnected(Boolean(j.connected));
-      })
-      .catch(() => {
-        if (!cancelled) setGoogleConnected(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    registerBack?.(() => false);
+    return () => registerBack?.(null);
+  }, [registerBack]);
+
+  function toggleSection(id: MyWorkSectionId) {
+    setOpenSections((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function closeAll() {
+    setOpenSections(new Set());
+    setArchiveOpen(false);
+  }
+
+  const hasExpanded =
+    openSections.size > 0 || archiveOpen || expandedCardsExist(openSections, archiveOpen);
 
   function handleOpen(target: MyWorkHubOpenTarget) {
     switch (target.kind) {
       case "section":
-        onOpenSection(target.section, target.nav);
+        onOpenSection(target.section, "my-work");
         break;
       case "project":
         onOpenProject(target.projectId);
@@ -269,69 +323,69 @@ export function MyWorkHubPanel({
     handleOpen(item.openTarget);
   }
 
-  const allProjects = [
-    ...hub.activeProjects.activeFocus,
-    ...hub.activeProjects.inProgress,
-    ...hub.activeProjects.paused,
-  ];
-
   return (
-    <div
-      className="flex h-full flex-col overflow-hidden bg-[#f5f0e8]"
+    <section
+      className={workspacePanelShellClass({
+        width: "standard",
+        extra: "bg-[#FBF6EE]",
+      })}
       data-testid="my-work-hub"
     >
-      <header className={`shrink-0 border-b border-[#e7dfd4] bg-[#faf7f2] ${WORKSPACE_PANEL_PADDING_COMPACT_CLASS}`}>
-        <h1 className="text-xl font-bold text-[#1f1c19]">My Work</h1>
-        <p className="mt-1 text-sm text-[#6b635a]">
-          Everything you&apos;ve created, saved, and started — one trusted home.
-        </p>
-        <WorkspaceAreaWorksGuide areaId="my-work" />
-        <input
-          type="search"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search saved work, projects, decisions, strategies…"
-          aria-label="Search my work"
-          data-testid="my-work-search"
-          className="mt-3 w-full rounded-xl border border-[#d4cdc3] bg-white px-3 py-2.5 text-sm text-[#1f1c19] shadow-sm placeholder:text-[#9a9289] focus:border-[#1e4f4f] focus:outline-none"
-        />
+      <header className="space-y-4">
+        {onBack ? (
+          <GrowthPanelBackButton onBack={onBack} label={backLabel ?? "Chat"} />
+        ) : null}
+
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div>
+            <h1 className="text-3xl font-bold text-stone-900">My Work</h1>
+            <p className="mt-1 text-stone-600">
+              Find what you started, saved, created, or want to come back to.
+            </p>
+          </div>
+          <EcosystemCloseAllButton onClick={closeAll} disabled={!hasExpanded} />
+        </div>
+
+        <div>
+          <label htmlFor="my-work-search" className="sr-only">
+            Search Everything
+          </label>
+          <input
+            id="my-work-search"
+            type="search"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search Everything"
+            aria-label="Search Everything"
+            data-testid="my-work-search"
+            className="w-full rounded-full border border-stone-300 bg-white px-4 py-2.5 text-sm text-stone-900 shadow-sm placeholder:text-stone-400 focus:border-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-700/20"
+          />
+        </div>
       </header>
 
-      <div className={`flex-1 overflow-y-auto ${WORKSPACE_PANEL_PADDING_COMPACT_CLASS}`}>
+      <div className="mt-6 min-h-0 flex-1 overflow-y-auto">
         {query.trim() ? (
           <div className="flex flex-col gap-4">
             {searchGroups.length === 0 ? (
-              <p className="text-sm text-[#6b635a]">
+              <p className="text-sm text-stone-600">
                 No matches for &ldquo;{query}&rdquo;.
               </p>
             ) : (
               searchGroups.map((group) => (
                 <div key={group.label}>
-                  <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+                  <p className="text-xs font-bold uppercase tracking-wide text-stone-500">
                     {group.label}
                   </p>
                   <ul className="mt-2 flex flex-col gap-2">
                     {group.items.map((item) => (
-                      <li
+                      <HubListItem
                         key={item.id}
-                        className="flex items-center justify-between rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5"
-                      >
-                        <div>
-                          <p className="font-semibold text-[#1f1c19]">
-                            {item.title}
-                          </p>
-                          <p className="text-xs text-[#6b635a]">
-                            {item.typeLabel}
-                          </p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleOpen(item.openTarget)}
-                          className="rounded-lg bg-[#1e4f4f] px-2.5 py-1 text-xs font-semibold text-white"
-                        >
-                          Open
-                        </button>
-                      </li>
+                        item={item}
+                        onOpen={() => handleOpen(item.openTarget)}
+                        actionLabel={
+                          group.label === "Continue Working" ? "Continue" : "Open"
+                        }
+                      />
                     ))}
                   </ul>
                 </div>
@@ -339,340 +393,179 @@ export function MyWorkHubPanel({
             )}
           </div>
         ) : (
-          <div className="flex flex-col gap-3">
-            {/* Section 1 — Continue Working */}
-            <HubSection
-              id="continue"
+          <div className="flex flex-col gap-3" data-testid="my-work-hub-grid">
+            <EcosystemCollapsibleSection
               title="Continue Working"
-              subtitle="Pick up where you left off"
-              count={hub.continueWorking.length}
-              accent={colorCoding ? "#c5e0e0" : undefined}
+              description="Pick up where you left off."
+              emoji="⏱️"
+              open={openSections.has("continue")}
+              onToggle={() => toggleSection("continue")}
+              count={counts.continue}
+              testId="my-work-continue-featured"
+              accentClass="border-stone-200 border-t-4 border-t-amber-800"
             >
+              <EcosystemSubsectionLabel>Favorites</EcosystemSubsectionLabel>
+              {favorites.length === 0 ? (
+                <p className="px-1 text-sm text-stone-600">
+                  Nothing pinned yet. Favorite items will appear here.
+                </p>
+              ) : (
+                <ul className="flex flex-col gap-2">
+                  {favorites.map((item) => (
+                    <HubListItem
+                      key={item.id}
+                      item={item}
+                      onOpen={() => handleContinue(item)}
+                      actionLabel="Open"
+                    />
+                  ))}
+                </ul>
+              )}
+
+              <EcosystemSubsectionLabel>Recently Active</EcosystemSubsectionLabel>
+              {recentActive.length === 0 ? (
+                <p className="px-1 text-sm text-stone-600">
+                  Recent work will show up here as you use the ecosystem.
+                </p>
+              ) : (
+                <ul className="flex flex-col gap-2">
+                  {recentActive.map((item) => (
+                    <HubListItem
+                      key={item.id}
+                      item={item}
+                      onOpen={() => handleContinue(item)}
+                    />
+                  ))}
+                </ul>
+              )}
+
+              <EcosystemSubsectionLabel>Resume Items</EcosystemSubsectionLabel>
               {hub.continueWorking.length === 0 ? (
-                <p className="text-sm text-[#6b635a]">
+                <p className="px-1 text-sm text-stone-600">
                   Nothing in progress right now. Start in Chat or Create — it
                   will show up here.
                 </p>
               ) : (
                 <ul className="flex flex-col gap-2">
                   {hub.continueWorking.map((item) => (
-                    <ContinueCard
+                    <HubListItem
                       key={item.id}
                       item={item}
-                      onContinue={() => handleContinue(item)}
+                      onOpen={() => handleContinue(item)}
+                      actionLabel="Continue"
                     />
                   ))}
                 </ul>
               )}
-            </HubSection>
+            </EcosystemCollapsibleSection>
 
-            {/* Section 2 — Active Projects */}
-            <HubSection
-              id="projects"
-              title="Active Projects"
-              subtitle="Active focus · In progress · Paused"
-              count={allProjects.length}
+            <EcosystemCollapsibleSection
+              title="Browse My Work"
+              description="Projects, content, strategies, templates, snippets, and archive."
+              open={openSections.has("browse")}
+              onToggle={() => toggleSection("browse")}
+              testId="my-work-browse"
             >
-              {allProjects.length === 0 ? (
-                <p className="text-sm text-[#6b635a]">
-                  No active projects yet. Create one from a plan or open
-                  Projects.
-                </p>
-              ) : (
-                <ul className="flex flex-col gap-2">
-                  {allProjects.map((p) => (
-                    <ProjectCard
-                      key={p.id}
-                      project={p}
-                      onOpen={() => onOpenProject(p.id)}
+              <div className="flex flex-col gap-2">
+                {browseDestinations.map((dest) => (
+                  <div key={dest.id}>
+                    <BrowseRow
+                      title={dest.title}
+                      count={dest.count}
+                      description={dest.description}
+                      isArchive={dest.isArchive}
+                      open={archiveOpen}
+                      onToggle={dest.isArchive ? () => setArchiveOpen((o) => !o) : undefined}
+                      onOpen={dest.onOpen}
                     />
-                  ))}
-                </ul>
-              )}
-            </HubSection>
+                    {dest.isArchive && archiveOpen ? (
+                      <div className="mt-2 space-y-4 border-l-2 border-stone-200 pl-3">
+                        {counts.archivedSaved.length > 0 ? (
+                          <section>
+                            <h3 className="text-sm font-bold text-stone-800">
+                              Archived saved work
+                            </h3>
+                            <ul className="mt-2 flex flex-col gap-2">
+                              {counts.archivedSaved.map((item) => (
+                                <li
+                                  key={item.id}
+                                  className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white px-4 py-3"
+                                >
+                                  <div className="min-w-0">
+                                    <p className="font-semibold text-stone-900">
+                                      {item.title}
+                                    </p>
+                                    <p className="text-xs text-stone-500">
+                                      {item.artifactType} ·{" "}
+                                      {formatShortDate(item.updatedAt)}
+                                    </p>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => onOpenSavedWork(item.id)}
+                                    className="shrink-0 rounded-full border border-teal-700/30 px-3 py-1.5 text-xs font-semibold text-teal-800 hover:bg-teal-700/10"
+                                  >
+                                    Open
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </section>
+                        ) : null}
 
-            {/* Section 3 — Recent Work */}
-            <HubSection
-              id="recent"
-              title="Recent Work"
-              subtitle="Last 20 items across the ecosystem"
-            >
-              {hub.recentWork.length === 0 ? (
-                <p className="text-sm text-[#6b635a]">No recent work yet.</p>
-              ) : (
-                <div className="flex flex-col gap-4">
-                  {hub.recentWork.map((group) => (
-                    <div key={group.dateLabel}>
-                      <p className="text-xs font-bold text-[#6b635a]">
-                        {group.dateLabel}
-                      </p>
-                      <ul className="mt-2 flex flex-col gap-1.5">
-                        {group.items.map((item) => (
-                          <li
-                            key={item.id}
-                            className="flex items-center justify-between rounded-lg bg-[#faf7f2] px-3 py-2"
-                          >
-                            <div className="min-w-0">
-                              <p className="truncate text-sm font-medium text-[#1f1c19]">
-                                {item.title}
-                              </p>
-                              <p className="text-xs text-[#6b635a]">
-                                {item.typeLabel}
-                                {item.status === "complete" ||
-                                item.status === "exported"
-                                  ? " · Completed"
-                                  : item.status === "draft"
-                                    ? " · Edited"
-                                    : " · Updated"}
-                              </p>
-                            </div>
-                            <button
-                              type="button"
-                              onClick={() => handleOpen(item.openTarget)}
-                              className="ml-2 shrink-0 text-xs font-semibold text-[#1e4f4f]"
-                            >
-                              Open
-                            </button>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </HubSection>
+                        {counts.completedProjects.length > 0 ? (
+                          <section>
+                            <h3 className="text-sm font-bold text-stone-800">
+                              Completed projects
+                            </h3>
+                            <ul className="mt-2 flex flex-col gap-2">
+                              {counts.completedProjects.map((project) => (
+                                <li
+                                  key={project.id}
+                                  className="flex items-center justify-between rounded-2xl border border-stone-200 bg-white px-4 py-3"
+                                >
+                                  <div className="min-w-0">
+                                    <p className="font-semibold text-stone-900">
+                                      {project.name}
+                                    </p>
+                                    <p className="text-xs text-stone-500">
+                                      Completed · {formatShortDate(project.updatedAt)}
+                                    </p>
+                                  </div>
+                                  <button
+                                    type="button"
+                                    onClick={() => onOpenProject(project.id)}
+                                    className="shrink-0 rounded-full border border-teal-700/30 px-3 py-1.5 text-xs font-semibold text-teal-800 hover:bg-teal-700/10"
+                                  >
+                                    Open
+                                  </button>
+                                </li>
+                              ))}
+                            </ul>
+                          </section>
+                        ) : null}
 
-            {/* Section 4 — Saved Work Library (embedded) */}
-            <HubSection
-              id="saved-work"
-              title="Saved Work"
-              subtitle="SOPs, plans, workshops, emails, documents"
-              count={hub.savedWork.length}
-            >
-              {onOpenInCreate ? (
-                <SavedWorkLibrary embedded onOpenInCreate={onOpenInCreate} />
-              ) : (
-                <p className="text-sm text-[#6b635a]">
-                  {hub.savedWork.length} saved item
-                  {hub.savedWork.length === 1 ? "" : "s"}.
-                </p>
-              )}
-            </HubSection>
-
-            {/* Section 5 — Files */}
-            <HubSection
-              id="files"
-              title="Files"
-              subtitle="Google Docs, Sheets, Forms, PDFs, exports"
-              count={hub.files.length}
-            >
-              {hub.files.length === 0 ? (
-                <p className="text-sm text-[#6b635a]">
-                  Exports from Create and Decision Compass appear here
-                  automatically.
-                </p>
-              ) : (
-                <ul className="flex flex-col gap-2">
-                  {hub.files.slice(0, 15).map((f) => (
-                    <li
-                      key={f.id}
-                      className="flex items-start justify-between gap-3 rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5"
-                    >
-                      <div className="min-w-0">
-                        <p className="font-semibold text-[#1f1c19]">
-                          <span aria-hidden="true">{f.icon} </span>
-                          {f.title}
-                        </p>
-                        <p className="mt-0.5 text-xs text-[#6b635a]">
-                          {projectFileCategoryLabel(f.category)} · {f.source}
-                          {f.projectName ? ` · ${f.projectName}` : ""} ·{" "}
-                          {formatShortDate(f.date)}
-                        </p>
+                        {counts.archive === 0 ? (
+                          <p className="text-sm text-stone-600">
+                            No archived work yet.
+                          </p>
+                        ) : null}
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => handleOpen(f.openTarget)}
-                        className="shrink-0 rounded-lg bg-[#1e4f4f] px-2.5 py-1 text-xs font-semibold text-white"
-                      >
-                        Open
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </HubSection>
-
-            {/* Section 6 — Ideas Waiting */}
-            <HubSection
-              id="ideas"
-              title="Ideas Waiting"
-              subtitle="Clear My Mind — sort, route, or review"
-              count={hub.ideasWaiting.total}
-            >
-              <div className="mb-3 grid grid-cols-3 gap-2 text-center">
-                <div className="rounded-xl bg-[#faf7f2] px-2 py-2">
-                  <p className="text-lg font-bold text-[#1f1c19]">
-                    {hub.ideasWaiting.unsorted}
-                  </p>
-                  <p className="text-[10px] font-semibold uppercase text-[#6b635a]">
-                    Unsorted
-                  </p>
-                </div>
-                <div className="rounded-xl bg-[#faf7f2] px-2 py-2">
-                  <p className="text-lg font-bold text-[#1f1c19]">
-                    {hub.ideasWaiting.linkedToProjects}
-                  </p>
-                  <p className="text-[10px] font-semibold uppercase text-[#6b635a]">
-                    Linked
-                  </p>
-                </div>
-                <div className="rounded-xl bg-[#faf7f2] px-2 py-2">
-                  <p className="text-lg font-bold text-[#1f1c19]">
-                    {hub.ideasWaiting.needingReview}
-                  </p>
-                  <p className="text-[10px] font-semibold uppercase text-[#6b635a]">
-                    Review
-                  </p>
-                </div>
+                    ) : null}
+                  </div>
+                ))}
               </div>
-              <button
-                type="button"
-                onClick={() => onOpenSection("brain-dump")}
-                className="w-full rounded-xl border border-[#1e4f4f]/30 bg-white py-2.5 text-sm font-semibold text-[#1e4f4f]"
-              >
-                Review Clear My Mind →
-              </button>
-            </HubSection>
-
-            {/* Section 7 — Client Avatars */}
-            <HubSection
-              id="avatars"
-              title="Client Avatars"
-              count={hub.avatars.length}
-            >
-              {hub.avatars.length === 0 ? (
-                <p className="text-sm text-[#6b635a]">No avatars yet.</p>
-              ) : (
-                <ul className="flex flex-col gap-2">
-                  {hub.avatars.map((a) => (
-                    <li
-                      key={a.id}
-                      className="flex items-center justify-between rounded-xl border border-[#e4ddd2] bg-[#faf7f2] px-3 py-2.5"
-                    >
-                      <div>
-                        <p className="font-semibold text-[#1f1c19]">
-                          {a.isPrimary ? "⭐ " : ""}
-                          {a.name}
-                        </p>
-                        <p className="text-xs text-[#6b635a]">
-                          {a.isPrimary ? "Primary" : "Secondary"}
-                          {a.tagline ? ` · ${a.tagline}` : ""}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleOpen(a.openTarget)}
-                        className="rounded-lg border border-[#1e4f4f]/30 bg-white px-2.5 py-1 text-xs font-semibold text-[#1e4f4f]"
-                      >
-                        Open
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </HubSection>
-
-            {/* Section 8 — Strategies */}
-            <HubSection
-              id="strategies"
-              title="Strategies"
-              count={hub.strategies.length}
-            >
-              {hub.strategies.length === 0 ? (
-                <p className="text-sm text-[#6b635a]">No saved strategies yet.</p>
-              ) : (
-                <ul className="flex flex-col gap-2">
-                  {hub.strategies.map((s) => (
-                    <li
-                      key={s.id}
-                      className="flex items-center justify-between rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5"
-                    >
-                      <div>
-                        <p className="font-semibold text-[#1f1c19]">
-                          {s.title}
-                        </p>
-                        <p className="text-xs text-[#6b635a]">
-                          {s.isActiveSession
-                            ? "Active session"
-                            : s.source === "companion_suggested"
-                              ? "Companion suggested"
-                              : "Saved strategy"}
-                        </p>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => handleOpen(s.openTarget)}
-                        className="text-xs font-semibold text-[#1e4f4f]"
-                      >
-                        Open
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </HubSection>
-
-            {/* Section 9 — Wins This Week (full view) */}
-            <HubSection
-              id="wins"
-              title="Wins This Week"
-              subtitle="Encouragement and progress — not on Today"
-              accent={colorCoding ? "#e8dfd0" : undefined}
-            >
-              {hub.momentum.length === 0 ? (
-                <p className="text-sm text-[#6b635a]">
-                  No wins recorded yet this week. Every small step counts.
-                </p>
-              ) : (
-                <ul className="space-y-1 text-sm text-[#2f261f]">
-                  {hub.momentum.map((stat) => (
-                    <li key={stat.id}>
-                      {stat.icon} {stat.count} {stat.label.toLowerCase()}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              <button
-                type="button"
-                onClick={() => onOpenSection("growth", "growth")}
-                className="mt-3 text-xs font-semibold text-[#1e4f4f]"
-              >
-                Open Growth →
-              </button>
-            </HubSection>
+            </EcosystemCollapsibleSection>
           </div>
         )}
       </div>
-
-      <footer
-        className="shrink-0 border-t border-[#e7dfd4] bg-[#faf7f2] px-4 py-3 text-xs text-[#6b635a]"
-        data-testid="my-work-trust"
-      >
-        <p className="font-semibold text-[#1f1c19]">Your work is safe here</p>
-        <p className="mt-1">
-          {hub.trust.projectCount} active project
-          {hub.trust.projectCount === 1 ? "" : "s"} · {hub.trust.savedWorkCount}{" "}
-          saved · {hub.trust.resumeItemCount} to continue · Google{" "}
-          {googleConnected === null
-            ? "…"
-            : googleConnected
-              ? "connected"
-              : "not connected"}
-          {hub.trust.lastSaveAt
-            ? ` · Last save ${formatShortDate(hub.trust.lastSaveAt)}`
-            : ""}
-        </p>
-      </footer>
-    </div>
+    </section>
   );
+}
+
+function expandedCardsExist(
+  openSections: Set<MyWorkSectionId>,
+  archiveOpen: boolean,
+): boolean {
+  return openSections.size > 0 || archiveOpen;
 }

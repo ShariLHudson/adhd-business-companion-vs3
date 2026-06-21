@@ -16,6 +16,7 @@ export type WorkspaceHelpAreaId =
   | "wins-this-week"
   | "client-avatars"
   | "settings"
+  | "growth"
   | "time-block"
   | "decision-compass"
   | "confidence-vault"
@@ -34,8 +35,11 @@ const HELP_ARTICLE_ID: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "wins-this-week": "wins-this-week",
   "client-avatars": "client-avatars",
   settings: "settings-personalization",
+  growth: "growth-center",
   "time-block": "momentum-appointments",
   "decision-compass": "decision-compass",
+  "confidence-vault": "my-highlights",
+  "my-journey": "my-journey",
 };
 
 const AREA_DISPLAY_NAME: Partial<Record<WorkspaceHelpAreaId, string>> = {
@@ -46,6 +50,7 @@ const AREA_DISPLAY_NAME: Partial<Record<WorkspaceHelpAreaId, string>> = {
   settings: "Settings",
   "time-block": "Momentum Appointments",
   "decision-compass": "Decision Compass",
+  growth: "Growth Center",
 };
 
 const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
@@ -64,11 +69,13 @@ const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
   snippets:
     "Feeds Create and marketing workflows. Pair with Client Avatars for voice and tone.",
   "my-work":
-    "Hub for Projects, Saved Work, Create drafts, decisions, and files — search when you know the name but not the workspace.",
+    "Hub with Search Everything, Continue Working (favorites, recently active, resume items), and Browse My Work (Created Content, Projects, Snippets, Strategies, Templates, Archive).",
   "evidence-bank":
-    "Separate from Wins This Week — wins capture what happened; evidence captures why it mattered. Save from Wins when ready.",
+    "Separate from Wins This Week — wins capture what happened; evidence captures why it mattered. Part of 🌱 Growth alongside My Highlights and My Journey.",
   "wins-this-week":
-    "Companion to Evidence Bank — weekly encouragement without scorekeeping. Save a moment to Evidence Bank when you want the deeper story.",
+    "Companion to Evidence Bank and My Highlights — weekly encouragement without scorekeeping. Review via Growth Inbox on the Growth hub.",
+  growth:
+    "Hub for Wins This Week, Evidence Bank, My Highlights, and My Journey — open each from navigation cards. Growth Inbox and Growth Reports live here too.",
   "client-avatars":
     "Informs Create, Templates, Snippets, and Strategies so messaging stays personal.",
   settings:
@@ -92,24 +99,42 @@ export type WorkspaceHelpContent = {
 };
 
 const LOCAL_GROWTH_HELP: Record<
-  "confidence-vault" | "my-journey",
+  "growth" | "confidence-vault" | "my-journey",
   Omit<WorkspaceHelpContent, "areaId" | "helpsToday" | "strengthens">
 > = {
-  "confidence-vault": {
-    areaName: "Confidence Vault",
+  growth: {
+    areaName: "Growth Center",
     whatItIs:
-      "A permanent collection of proof that you have value — testimonials, praise, credentials, and accomplishments.",
+      "Your hub for progress, impact, highlights, and story — open each area from navigation cards. Growth Inbox and Growth Reports live here.",
     whenToUse:
-      "When imposter syndrome, self-doubt, or forgetting your strengths shows up.",
+      "When you want the big picture of how you are growing — not just today's tasks.",
     workflow: [
-      "Quick Save praise or testimonials as they arrive.",
-      "Add credentials and accomplishments when you earn them.",
-      "Star the most meaningful items.",
-      "Open when you need to remember reality.",
+      "Open Wins, Evidence Bank, My Highlights, or My Journey from the hub cards.",
+      "Process Growth Inbox on Wins This Week — save moments where they belong or dismiss.",
+      "Generate a Growth Report when you want a combined printable view.",
     ],
     tips: [
-      "This is not ego — it is remembering reality when self-doubt appears.",
-      "Separate from Evidence Bank: value proof vs. impact proof.",
+      "Reviewing progress strengthens pattern recognition and self-awareness over time.",
+      "Nothing is logged without your review in Growth Inbox.",
+    ],
+    relatedAreas:
+      "Wins, Evidence Bank, My Highlights, and My Journey — each area has its own workspace.",
+  },
+  "confidence-vault": {
+    areaName: "My Highlights",
+    whatItIs:
+      "A place to collect meaningful accomplishments, expertise, recognition, praise, credentials, testimonials, certifications, awards, and important moments that remind you of your growth, value, and capabilities.",
+    whenToUse:
+      "When you want to remember your strengths, preserve recognition, or celebrate what you have achieved.",
+    workflow: [
+      "Quick Save praise, testimonials, or recognition as they arrive.",
+      "Add credentials and accomplishments when you earn them.",
+      "Star the most meaningful items.",
+      "Open when you need to remember what you have accomplished.",
+    ],
+    tips: [
+      "Recognizing accomplishments is not ego — it is remembering reality when self-doubt appears.",
+      "Separate from Evidence Bank: highlights celebrate you; evidence captures impact.",
     ],
     relatedAreas:
       "Part of 🌱 Growth alongside Wins, Evidence Bank, and My Journey.",
@@ -131,7 +156,7 @@ const LOCAL_GROWTH_HELP: Record<
       "Preserve meaning — not a profile form.",
     ],
     relatedAreas:
-      "Distinct from Evidence Bank (impact) and Confidence Vault (value proof).",
+      "Distinct from Evidence Bank (impact) and My Highlights (accomplishments and recognition).",
   },
 };
 

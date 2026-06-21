@@ -1,23 +1,26 @@
 import type { HowDoIHelpArticle } from "./howDoIHelpTypes";
 import { HOW_DO_I_HELP_ARTICLES } from "./howDoIHelpArticles";
+import { howDoIBrowseSections } from "./howDoIHelpBrowseStructure";
 
 /**
- * Main Areas — one card per major ecosystem destination.
- * Workflow order (matches Core Workflow), never alphabetical.
+ * Main Areas — grouped in How Do I browse (Daily Use, Growth, Resources).
+ * Flat list kept for search indexing and legacy callers.
  */
 export const HELP_CENTER_ARTICLE_IDS = [
+  "clear-my-mind",
+  "create-overview",
+  "focus-sessions",
   "plan-my-day",
   "projects",
-  "create-overview",
-  "clear-my-mind",
-  "strategies",
-  "templates",
-  "snippets",
-  "my-work",
   "evidence-bank",
+  "my-highlights",
+  "my-journey",
   "wins-this-week",
   "client-avatars",
-  "settings-personalization",
+  "my-work",
+  "snippets",
+  "strategies",
+  "templates",
 ] as const;
 
 export type HelpCenterArticleId = (typeof HELP_CENTER_ARTICLE_IDS)[number];
@@ -36,4 +39,9 @@ export function helpCenterArticles(): HowDoIHelpArticle[] {
 
 export function isHelpCenterArticle(id: string): boolean {
   return (HELP_CENTER_ARTICLE_IDS as readonly string[]).includes(id);
+}
+
+export function mainAreaBrowseSubgroups() {
+  const main = howDoIBrowseSections().find((s) => s.id === "main-areas");
+  return main?.subgroups ?? [];
 }

@@ -6,6 +6,7 @@ import type { AppSection } from "@/lib/companionUi";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { discoveryProgressSummary } from "@/lib/companionDiscovery";
 import { GettingToKnowYouPanel } from "@/components/companion/GettingToKnowYouPanel";
+import { ActiveCompanionsPicker } from "@/components/companion/ActiveCompanionsPicker";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
 const SUPPORT_EMAIL = "info@visualsparkstudios.com";
@@ -236,10 +237,10 @@ export function ProfilePanel({
           </span>
           <span>
             <span className="block text-base font-semibold text-[#1f1c19]">
-              Ideal client (avatar)
+              Audience Profile
             </span>
             <span className="block text-sm text-[#6b635a]">
-              Pain points and goals — powers Create, marketing, and proposals.
+              Who you help — powers Create and messaging.
             </span>
           </span>
         </button>
@@ -292,6 +293,8 @@ export function ProfilePanel({
           </span>
         </button>
       </div>
+
+      <ActiveCompanionsPicker />
 
       {/* Subscription */}
       <div className="mt-6 overflow-hidden rounded-xl border border-[#d4cdc3] bg-white/85">

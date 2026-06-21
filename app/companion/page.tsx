@@ -132,6 +132,10 @@ import { PendingActionBar } from "@/components/companion/PendingActionBar";
 import { ArtifactActionBar } from "@/components/companion/ArtifactActionBar";
 import { ActionBridgeChip } from "@/components/companion/ActionBridgeChip";
 import { WorkspaceLayout } from "@/components/companion/WorkspaceLayout";
+import {
+  SplitWorkspaceAreaPanel,
+  SplitWorkspaceBesideEmptyState,
+} from "@/components/companion/SplitWorkspacePanelState";
 import { WorkspaceShell } from "@/components/companion/WorkspaceShell";
 import {
   type ChatLayoutMode,
@@ -751,6 +755,18 @@ import {
   type SavedWorkItem,
 } from "@/lib/savedWorkStore";
 import { setEvidencePrefill } from "@/lib/evidenceBankStore";
+import { setConfidencePrefill } from "@/lib/confidenceVaultStore";
+import { setJourneyPrefill } from "@/lib/myJourneyStore";
+import {
+  growthPanelBackLabel,
+  isGrowthPanelSection,
+  type GrowthPanelNav,
+  type GrowthSectionId,
+} from "@/lib/growthNavigation";
+import {
+  isMyWorkPanelSection,
+  myWorkPanelBackLabel,
+} from "@/lib/myWorkNavigation";
 import {
   blankScaffoldForType,
   buildCreateOpenAck,
@@ -1529,6 +1545,10 @@ export default function CompanionPage() {
   // screen has a way out (falls back to the chat/home dashboard).
   const sectionHistoryRef = useRef<AppSection[]>([]);
   const navHistoryRef = useRef(createNavigationHistoryStack());
+  const panelBackStackRef = useRef<(string | null)[]>([]);
+  const [workspacePanelBackLabel, setWorkspacePanelBackLabel] = useState<
+    string | null
+  >(null);
   const prevSectionRef = useRef<AppSection>(activeSection);
   const goingBackRef = useRef(false);
 
@@ -4451,12 +4471,26 @@ export default function CompanionPage() {
     }
 
     if (activeSection === "home" && workspacePanel) {
+      if (
+        activeNavRef.current === "my-work" &&
+        workspacePanel !== "my-work"
+      ) {
+        returnToMyWorkHub();
+        return;
+      }
       closeWorkspacePanel();
       return;
     }
 
     const navRestore = navHistoryRef.current.pop();
     if (navRestore) {
+      if (panelBackStackRef.current.length > 0) {
+        panelBackStackRef.current.pop();
+        const nextLabel =
+          panelBackStackRef.current[panelBackStackRef.current.length - 1] ??
+          null;
+        setWorkspacePanelBackLabel(nextLabel);
+      }
       navRestore();
       return;
     }
@@ -4705,6 +4739,32 @@ export default function CompanionPage() {
     ]);
   }
 
+  function buildGrowthPanelNav(current: GrowthSectionId): GrowthPanelNav {
+    return {
+      current,
+      onBack: goBack,
+      backLabel: workspacePanelBackLabel,
+      onOpenSection: (section) => openSectionBesideChatCore(section, "growth"),
+    };
+  }
+
+  function isMyWorkFlow(): boolean {
+    return activeNavRef.current === "my-work";
+  }
+
+  function returnToMyWorkHub() {
+    goingBackRef.current = true;
+    openSectionBesideChatCore("my-work", "my-work");
+  }
+
+  function workspacePanelBack() {
+    if (isMyWorkFlow()) {
+      returnToMyWorkHub();
+      return;
+    }
+    closeWorkspacePanel();
+  }
+
   function navForWorkspaceSection(section: AppSection): SidebarNavId | null {
     switch (section) {
       case "content-generator":
@@ -4797,6 +4857,28 @@ export default function CompanionPage() {
       focusWorkspaceLayout();
       revealWorkspace();
       return;
+    }
+
+    if (
+      isGrowthPanelSection(section) ||
+      isGrowthPanelSection(workspacePanelRef.current)
+    ) {
+      const label = growthPanelBackLabel(
+        workspacePanelRef.current,
+        activeSectionRef.current,
+      );
+      panelBackStackRef.current.push(label);
+      setWorkspacePanelBackLabel(label);
+    } else if (
+      isMyWorkPanelSection(section) ||
+      isMyWorkPanelSection(workspacePanelRef.current)
+    ) {
+      const label = myWorkPanelBackLabel(
+        workspacePanelRef.current,
+        activeSectionRef.current,
+      );
+      panelBackStackRef.current.push(label);
+      setWorkspacePanelBackLabel(label);
     }
 
     pushNavigationRestore();
@@ -10181,11 +10263,15 @@ export default function CompanionPage() {
             }}
             onPrintPdf={() => window.open(googleWorkspace.url, "_blank")}
           />
-        ) : null;
+        ) : (
+          <SplitWorkspaceBesideEmptyState
+            onOpenSection={(s) => openSectionBesideChatCore(s)}
+          />
+        );
       case "saved-work":
         return (
           <SavedWorkLibrary
-            onBack={closeWorkspacePanel}
+            onBack={workspacePanelBack}
             onOpenInCreate={(input) => {
               const item = input.templateId
                 ? getSavedWorkById(input.templateId)
@@ -10245,56 +10331,67 @@ export default function CompanionPage() {
         return (
           <WinsThisWeekPanel
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+            nav={buildGrowthPanelNav("wins-this-week")}
             onSaveToEvidenceBank={(whatHappened, sourceWinId) => {
               setEvidencePrefill({ whatHappened, sourceWinId });
               openSectionBesideChatCore("evidence-bank", "growth");
             }}
-            onOpenEvidenceBank={() =>
-              openSectionBesideChatCore("evidence-bank", "growth")
-            }
-            onOpenGrowth={() => openSectionBesideChatCore("growth", "growth")}
+            onSaveEvidence={(text, sourceId) => {
+              setEvidencePrefill({ whatHappened: text, sourceWinId: sourceId });
+              openSectionBesideChatCore("evidence-bank", "growth");
+            }}
+            onSaveProof={(text) => {
+              setConfidencePrefill({
+                title: text.slice(0, 80),
+                description: text,
+                category: "Praise & Compliments",
+              });
+              openSectionBesideChatCore("confidence-vault", "growth");
+            }}
+            onSaveJourney={(text) => {
+              setJourneyPrefill({
+                title: text.slice(0, 80),
+                whatHappened: text,
+              });
+              openSectionBesideChatCore("my-journey", "growth");
+            }}
           />
         );
       case "evidence-bank":
         return (
           <EvidenceBankPanel
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+            nav={buildGrowthPanelNav("evidence-bank")}
           />
         );
       case "growth":
         return (
           <GrowthCenterPanel
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
-            onOpenWins={() =>
-              openSectionBesideChatCore("wins-this-week", "growth")
-            }
-            onOpenEvidence={() =>
-              openSectionBesideChatCore("evidence-bank", "growth")
-            }
-            onOpenConfidence={() =>
-              openSectionBesideChatCore("confidence-vault", "growth")
-            }
-            onOpenJourney={() =>
-              openSectionBesideChatCore("my-journey", "growth")
-            }
+            nav={buildGrowthPanelNav("growth")}
           />
         );
       case "confidence-vault":
         return (
           <ConfidenceVaultPanel
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+            nav={buildGrowthPanelNav("confidence-vault")}
           />
         );
       case "my-journey":
         return (
           <MyJourneyPanel
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+            nav={buildGrowthPanelNav("my-journey")}
           />
         );
       case "my-work":
         return (
           <MyWorkHubPanel
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+            onBack={goBack}
+            backLabel={workspacePanelBackLabel}
+            registerBack={registerBack}
             onOpenSection={(section, nav) =>
               openSectionBesideChatCore(section, nav)
             }
@@ -10419,7 +10516,7 @@ export default function CompanionPage() {
             onGenerate={openGenerator}
             onBuildWithShari={handleTemplateBuildWithShari}
             onOpenInCreate={handleTemplateOpenInCreate}
-            onBack={closeWorkspacePanel}
+            onBack={workspacePanelBack}
           />
         );
       case "playbook":
@@ -10440,7 +10537,7 @@ export default function CompanionPage() {
       case "snippets":
         return (
           <SnippetsLibrary
-            onBack={closeWorkspacePanel}
+            onBack={workspacePanelBack}
             onBuildWithShari={(input) =>
               openCreationWorkspaceCore("content-generator", {
                 ...input,
@@ -10524,9 +10621,13 @@ export default function CompanionPage() {
         );
       default:
         return (
-          <p className="p-6 text-base text-[#6b635a]">
-            {workspaceTitle(section)} isn&apos;t available in split view yet.
-          </p>
+          <SplitWorkspaceAreaPanel
+            section={section}
+            onOpenFullScreen={() => {
+              closeWorkspacePanel();
+              setActiveSection(section);
+            }}
+          />
         );
     }
   }
@@ -11729,10 +11830,12 @@ export default function CompanionPage() {
                   companionStandaloneSection
                     ? workspaceTitle(companionStandaloneSection)
                     : workspacePanel === "google-workspace" && googleWorkspace
-                    ? googleWorkspaceTitle(googleWorkspace.kind)
-                    : workspacePanel
-                      ? workspaceTitle(workspacePanel)
-                      : "Workspace"
+                      ? googleWorkspaceTitle(googleWorkspace.kind)
+                      : workspacePanel
+                        ? workspaceTitle(workspacePanel)
+                        : guideBesideSession?.targetSection
+                          ? workspaceTitle(guideBesideSession.targetSection)
+                          : "Chat"
                 }
                 chatLayoutMode={chatLayoutMode}
                 onChatLayoutModeChange={applyChatLayoutMode}

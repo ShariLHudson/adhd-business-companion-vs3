@@ -1,22 +1,38 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   consumeEvidencePrefill,
   createEvidenceEntry,
   deleteEvidenceEntry,
+  downloadEvidenceEntry,
   EMPTY_EVIDENCE_DRAFT,
   EVIDENCE_BANK_UPDATED_EVENT,
   EVIDENCE_CATEGORIES,
   getEvidenceDashboardStats,
   getEvidenceEntries,
+  printEvidenceEntry,
+  updateEvidenceEntry,
   type EvidenceCategory,
   type EvidenceEntry,
   type EvidenceEntryInput,
 } from "@/lib/evidenceBankStore";
-import { GrowthAttachmentsField, GrowthAttachmentsList } from "@/components/companion/GrowthAttachmentsField";
+import {
+  GrowthAttachmentsField,
+  GrowthAttachmentsList,
+} from "@/components/companion/GrowthAttachmentsField";
+import {
+  GrowthArchiveBar,
+  GrowthSectionHeader,
+} from "@/components/companion/GrowthSectionHeader";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+import {
+  isInGrowthArchivePeriod,
+  type GrowthArchivePeriod,
+} from "@/lib/growthArchive";
+import type { GrowthPanelNav } from "@/lib/growthNavigation";
 
 const INPUT_CLASS =
   "mt-1 w-full rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5 text-sm text-[#2d2926] placeholder:text-[#9a8f82] focus:border-[#c9a66b] focus:outline-none focus:ring-2 focus:ring-[#c9a66b]/25";
@@ -41,16 +57,54 @@ function StatTile({ label, value }: { label: string; value: number }) {
   );
 }
 
+function ActionButton({
+  children,
+  onClick,
+  tone = "neutral",
+}: {
+  children: ReactNode;
+  onClick: () => void;
+  tone?: "neutral" | "danger";
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`rounded-full border px-2.5 py-1 text-[11px] font-semibold ${
+        tone === "danger"
+          ? "border-[#e7d9c8] text-[#9a6b6b] hover:bg-[#faf7f2]"
+          : "border-[#e7d9c8] bg-white text-[#2f261f] hover:bg-[#faf7f2]"
+      }`}
+    >
+      {children}
+    </button>
+  );
+}
+
 function EvidenceCard({
   entry,
   expanded,
+  editing,
+  editDraft,
   onToggle,
+  onEdit,
+  onCancelEdit,
+  onSaveEdit,
+  onEditDraftChange,
   onDelete,
+  onAttach,
 }: {
   entry: EvidenceEntry;
   expanded: boolean;
+  editing: boolean;
+  editDraft: EvidenceEntryInput;
   onToggle: () => void;
+  onEdit: () => void;
+  onCancelEdit: () => void;
+  onSaveEdit: () => void;
+  onEditDraftChange: (draft: EvidenceEntryInput) => void;
   onDelete: () => void;
+  onAttach: () => void;
 }) {
   return (
     <article className="overflow-hidden rounded-2xl border border-[#e7d9c8] bg-white">
@@ -71,11 +125,16 @@ function EvidenceCard({
             <span className="text-xs text-[#9a8f82]">
               {formatEvidenceDate(entry.createdAt)}
             </span>
+            {entry.attachments.length > 0 ? (
+              <span className="text-xs text-[#9a8f82]">
+                📎 {entry.attachments.length}
+              </span>
+            ) : null}
           </div>
           <p className="mt-1.5 text-sm font-medium text-[#2f261f]">
             {entry.whatHappened}
           </p>
-          {entry.whyItMattered.trim() ? (
+          {entry.whyItMattered.trim() && !expanded ? (
             <p className="mt-1 text-sm text-[#6f6259]">
               <span className="font-medium text-[#4b463f]">Why it mattered: </span>
               {entry.whyItMattered}
@@ -86,44 +145,131 @@ function EvidenceCard({
 
       {expanded ? (
         <div className="border-t border-[#efe8de] px-4 pb-4 pt-3 text-sm text-[#4b463f]">
-          {entry.whatImproved.trim() ? (
-            <p className="mt-2">
-              <span className="font-semibold text-[#2f261f]">What improved: </span>
-              {entry.whatImproved}
-            </p>
+          {editing ? (
+            <div className="space-y-3">
+              <div>
+                <label className={LABEL_CLASS}>Category</label>
+                <select
+                  value={editDraft.category}
+                  onChange={(e) =>
+                    onEditDraftChange({
+                      ...editDraft,
+                      category: e.target.value as EvidenceCategory,
+                    })
+                  }
+                  className={INPUT_CLASS}
+                >
+                  {EVIDENCE_CATEGORIES.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {(
+                [
+                  ["whatHappened", "What happened?"],
+                  ["whatImproved", "What improved?"],
+                  ["whatMovedForward", "What moved forward?"],
+                  ["whatProblemSolved", "Problem solved?"],
+                  ["whoBenefited", "Who benefited?"],
+                  ["whyItMattered", "Why did it matter?"],
+                  ["whatThisProves", "What does this prove?"],
+                ] as const
+              ).map(([key, label]) => (
+                <div key={key}>
+                  <label className={LABEL_CLASS}>{label}</label>
+                  <textarea
+                    rows={2}
+                    value={editDraft[key]}
+                    onChange={(e) =>
+                      onEditDraftChange({ ...editDraft, [key]: e.target.value })
+                    }
+                    className={INPUT_CLASS}
+                  />
+                </div>
+              ))}
+              <GrowthAttachmentsField
+                attachments={editDraft.attachments}
+                onAttachmentsChange={(next) =>
+                  onEditDraftChange({ ...editDraft, attachments: next })
+                }
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={onSaveEdit}
+                  className="rounded-full bg-[#2f261f] px-4 py-2 text-xs font-semibold text-white"
+                >
+                  Save changes
+                </button>
+                <button
+                  type="button"
+                  onClick={onCancelEdit}
+                  className="rounded-full border border-[#e7d9c8] px-4 py-2 text-xs font-semibold text-[#6f6259]"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {entry.whatImproved.trim() ? (
+                <p className="mt-2">
+                  <span className="font-semibold text-[#2f261f]">What improved: </span>
+                  {entry.whatImproved}
+                </p>
+              ) : null}
+              {entry.whatMovedForward.trim() ? (
+                <p className="mt-2">
+                  <span className="font-semibold text-[#2f261f]">What moved forward: </span>
+                  {entry.whatMovedForward}
+                </p>
+              ) : null}
+              {entry.whatProblemSolved.trim() ? (
+                <p className="mt-2">
+                  <span className="font-semibold text-[#2f261f]">Problem solved: </span>
+                  {entry.whatProblemSolved}
+                </p>
+              ) : null}
+              {entry.whoBenefited.trim() ? (
+                <p className="mt-2">
+                  <span className="font-semibold text-[#2f261f]">Who benefited: </span>
+                  {entry.whoBenefited}
+                </p>
+              ) : null}
+              {entry.whyItMattered.trim() ? (
+                <p className="mt-2">
+                  <span className="font-semibold text-[#2f261f]">Why it mattered: </span>
+                  {entry.whyItMattered}
+                </p>
+              ) : null}
+              {entry.whatThisProves.trim() ? (
+                <p className="mt-2">
+                  <span className="font-semibold text-[#2f261f]">What this proves: </span>
+                  {entry.whatThisProves}
+                </p>
+              ) : null}
+              <GrowthAttachmentsList attachments={entry.attachments} />
+            </>
+          )}
+
+          {!editing ? (
+            <div className="mt-4 flex flex-wrap gap-2">
+              <ActionButton onClick={onToggle}>Open</ActionButton>
+              <ActionButton onClick={onEdit}>Edit</ActionButton>
+              <ActionButton onClick={onAttach}>Attach</ActionButton>
+              <ActionButton onClick={() => printEvidenceEntry(entry)}>
+                Print
+              </ActionButton>
+              <ActionButton onClick={() => downloadEvidenceEntry(entry)}>
+                Export
+              </ActionButton>
+              <ActionButton onClick={onDelete} tone="danger">
+                Delete
+              </ActionButton>
+            </div>
           ) : null}
-          {entry.whatMovedForward.trim() ? (
-            <p className="mt-2">
-              <span className="font-semibold text-[#2f261f]">What moved forward: </span>
-              {entry.whatMovedForward}
-            </p>
-          ) : null}
-          {entry.whatProblemSolved.trim() ? (
-            <p className="mt-2">
-              <span className="font-semibold text-[#2f261f]">Problem solved: </span>
-              {entry.whatProblemSolved}
-            </p>
-          ) : null}
-          {entry.whoBenefited.trim() ? (
-            <p className="mt-2">
-              <span className="font-semibold text-[#2f261f]">Who benefited: </span>
-              {entry.whoBenefited}
-            </p>
-          ) : null}
-          {entry.whatThisProves.trim() ? (
-            <p className="mt-2">
-              <span className="font-semibold text-[#2f261f]">What this proves: </span>
-              {entry.whatThisProves}
-            </p>
-          ) : null}
-          <GrowthAttachmentsList attachments={entry.attachments} />
-          <button
-            type="button"
-            onClick={onDelete}
-            className="mt-4 text-xs font-semibold text-[#9a6b6b] hover:text-[#7f4f4f]"
-          >
-            Remove entry
-          </button>
         </div>
       ) : null}
     </article>
@@ -132,13 +278,20 @@ function EvidenceCard({
 
 export function EvidenceBankPanel({
   refreshKey = 0,
+  nav,
 }: {
   refreshKey?: string | number;
+  nav: GrowthPanelNav;
 }) {
   const [entries, setEntries] = useState<EvidenceEntry[]>([]);
+  const [search, setSearch] = useState("");
+  const [archivePeriod, setArchivePeriod] = useState<GrowthArchivePeriod>("all");
   const [showForm, setShowForm] = useState(false);
   const [draft, setDraft] = useState<EvidenceEntryInput>(EMPTY_EVIDENCE_DRAFT);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editDraft, setEditDraft] = useState<EvidenceEntryInput>(EMPTY_EVIDENCE_DRAFT);
+  const [attachEntryId, setAttachEntryId] = useState<string | null>(null);
 
   const reload = useCallback(() => {
     setEntries(getEvidenceEntries());
@@ -167,6 +320,28 @@ export function EvidenceBankPanel({
 
   const stats = useMemo(() => getEvidenceDashboardStats(), [entries]);
 
+  const visibleEntries = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return entries.filter((e) => {
+      if (!isInGrowthArchivePeriod(e.createdAt, archivePeriod)) return false;
+      if (!q) return true;
+      const haystack = [
+        e.whatHappened,
+        e.whyItMattered,
+        e.whatImproved,
+        e.whatMovedForward,
+        e.whatProblemSolved,
+        e.whoBenefited,
+        e.whatThisProves,
+        e.category,
+        ...e.attachments.map((a) => a.name),
+      ]
+        .join(" ")
+        .toLowerCase();
+      return haystack.includes(q);
+    });
+  }, [entries, search, archivePeriod]);
+
   function updateDraft<K extends keyof EvidenceEntryInput>(
     key: K,
     value: EvidenceEntryInput[K],
@@ -188,26 +363,72 @@ export function EvidenceBankPanel({
   function handleDelete(id: string) {
     deleteEvidenceEntry(id);
     if (expandedId === id) setExpandedId(null);
+    if (editingId === id) setEditingId(null);
     reload();
+  }
+
+  function startEdit(entry: EvidenceEntry) {
+    setEditingId(entry.id);
+    setExpandedId(entry.id);
+    setEditDraft({
+      category: entry.category,
+      whatHappened: entry.whatHappened,
+      whatImproved: entry.whatImproved,
+      whatMovedForward: entry.whatMovedForward,
+      whatProblemSolved: entry.whatProblemSolved,
+      whoBenefited: entry.whoBenefited,
+      whyItMattered: entry.whyItMattered,
+      whatThisProves: entry.whatThisProves,
+      attachments: [...entry.attachments],
+      sourceWinId: entry.sourceWinId,
+    });
+  }
+
+  function saveEdit() {
+    if (!editingId || !editDraft.whatHappened.trim()) return;
+    updateEvidenceEntry(editingId, {
+      ...editDraft,
+      whatHappened: editDraft.whatHappened.trim(),
+    });
+    setEditingId(null);
+    reload();
+  }
+
+  const attachEntry = attachEntryId
+    ? entries.find((e) => e.id === attachEntryId)
+    : null;
+
+  function closeAll() {
+    setExpandedId(null);
+    setEditingId(null);
+    setEditDraft(EMPTY_EVIDENCE_DRAFT);
+    setShowForm(false);
+    setDraft(EMPTY_EVIDENCE_DRAFT);
+    setAttachEntryId(null);
   }
 
   return (
     <section className={workspacePanelShellClass({ width: "standard" })}>
-      <div>
-        <h2 className="text-3xl font-bold text-[#2f261f]">Evidence Bank</h2>
-        <p className="mt-1 text-[#6f6259]">
-          Proof that you are making progress, creating impact, and moving forward.
-        </p>
-        <p className="mt-2 text-sm text-[#9a8f82]">
-          Core question: What changed because of what I did?
-        </p>
-        <p className="mt-1 text-sm text-[#9a8f82]">
-          Part of 🌱 Growth — wins capture what happened; evidence captures why it
-          mattered.
-        </p>
-      </div>
+      <GrowthSectionHeader
+        nav={nav}
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search evidence…"
+        onCloseAll={closeAll}
+        onQuickAttach={(atts) => {
+          setDraft((d) => ({
+            ...d,
+            attachments: [...d.attachments, ...atts],
+          }));
+          setShowForm(true);
+        }}
+      />
 
       <WorkspaceAreaWorksGuide areaId="evidence-bank" />
+
+      <div className="mt-4">
+        <GrowthArchiveBar period={archivePeriod} onPeriodChange={setArchivePeriod} />
+      </div>
 
       <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         <StatTile label="Total entries" value={stats.totalEntries} />
@@ -287,7 +508,6 @@ export function EvidenceBankPanel({
                   value={draft.whatImproved}
                   onChange={(e) => updateDraft("whatImproved", e.target.value)}
                   className={INPUT_CLASS}
-                  placeholder="What got better because of this?"
                 />
               </div>
 
@@ -301,7 +521,6 @@ export function EvidenceBankPanel({
                   value={draft.whatMovedForward}
                   onChange={(e) => updateDraft("whatMovedForward", e.target.value)}
                   className={INPUT_CLASS}
-                  placeholder="What progressed — even a small step counts"
                 />
               </div>
 
@@ -328,7 +547,6 @@ export function EvidenceBankPanel({
                   value={draft.whoBenefited}
                   onChange={(e) => updateDraft("whoBenefited", e.target.value)}
                   className={INPUT_CLASS}
-                  placeholder="You, a client, your team, your family…"
                 />
               </div>
 
@@ -342,7 +560,6 @@ export function EvidenceBankPanel({
                   value={draft.whyItMattered}
                   onChange={(e) => updateDraft("whyItMattered", e.target.value)}
                   className={INPUT_CLASS}
-                  placeholder="Why this counts as real progress"
                 />
               </div>
 
@@ -356,7 +573,6 @@ export function EvidenceBankPanel({
                   value={draft.whatThisProves}
                   onChange={(e) => updateDraft("whatThisProves", e.target.value)}
                   className={INPUT_CLASS}
-                  placeholder="The capability or truth this shows about you"
                 />
               </div>
 
@@ -378,26 +594,61 @@ export function EvidenceBankPanel({
         )}
       </div>
 
+      {attachEntry ? (
+        <div className="mt-4 rounded-3xl border border-[#e7d9c8] bg-[#faf7f2] p-4">
+          <div className="flex items-center justify-between gap-2">
+            <h3 className="text-sm font-bold text-[#2f261f]">Attach proof</h3>
+            <button
+              type="button"
+              onClick={() => setAttachEntryId(null)}
+              className="text-xs font-semibold text-[#9a8f82]"
+            >
+              Done
+            </button>
+          </div>
+          <p className="mt-1 text-xs text-[#6f6259] truncate">{attachEntry.whatHappened}</p>
+          <div className="mt-3">
+            <GrowthAttachmentsField
+              attachments={attachEntry.attachments}
+              onAttachmentsChange={(next) => {
+                updateEvidenceEntry(attachEntry.id, { attachments: next });
+                reload();
+              }}
+            />
+          </div>
+        </div>
+      ) : null}
+
       <div className="mt-6">
         <h3 className="text-sm font-bold text-[#2f261f]">Your evidence</h3>
         <p className="mt-1 text-xs text-[#6f6259]">
-          Wins capture what happened. Evidence captures why it mattered.
+          Attach screenshots, certificates, and documents to each entry.
         </p>
-        {entries.length === 0 ? (
+        {visibleEntries.length === 0 ? (
           <p className="mt-4 rounded-2xl border border-dashed border-[#e7d9c8] bg-[#faf7f2]/50 px-4 py-6 text-center text-sm text-[#6f6259]">
-            No evidence yet. Add your first entry — or save one from Wins This Week.
+            No evidence for this period — add an entry or check Growth Inbox.
           </p>
         ) : (
           <ul className="mt-3 space-y-3">
-            {entries.map((entry) => (
+            {visibleEntries.map((entry) => (
               <li key={entry.id}>
                 <EvidenceCard
                   entry={entry}
                   expanded={expandedId === entry.id}
+                  editing={editingId === entry.id}
+                  editDraft={editDraft}
                   onToggle={() =>
                     setExpandedId((id) => (id === entry.id ? null : entry.id))
                   }
+                  onEdit={() => startEdit(entry)}
+                  onCancelEdit={() => setEditingId(null)}
+                  onSaveEdit={saveEdit}
+                  onEditDraftChange={setEditDraft}
                   onDelete={() => handleDelete(entry.id)}
+                  onAttach={() => {
+                    setAttachEntryId(entry.id);
+                    setExpandedId(entry.id);
+                  }}
                 />
               </li>
             ))}

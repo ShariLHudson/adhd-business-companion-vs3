@@ -33,7 +33,7 @@ export function WorkspaceLayout({
   chat,
   workspace,
   workspaceActive = Boolean(workspace),
-  workspaceTitle = "Workspace",
+  workspaceTitle = "Create",
   chatLayoutMode = "workspace-focus",
   onChatLayoutModeChange,
   onClose,
@@ -216,7 +216,7 @@ export function WorkspaceLayout({
                     onClick={() => setLayout("workspace-focus")}
                     className={layoutBtn}
                   >
-                    Focus on workspace
+                    Focus on {workspaceTitle}
                   </button>
                 ) : null
               ) : chatHidden ? (
@@ -234,7 +234,7 @@ export function WorkspaceLayout({
                     onClick={() => setLayout("workspace-focus")}
                     className={layoutBtn}
                   >
-                    Focus on workspace
+                    Focus on {workspaceTitle}
                   </button>
                   <button
                     type="button"

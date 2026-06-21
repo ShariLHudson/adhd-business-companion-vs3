@@ -2,7 +2,10 @@
 
 import { useState } from "react";
 import {
+  attachmentTypeLabel,
+  downloadGrowthAttachment,
   linkAttachment,
+  openGrowthAttachment,
   readFileAsAttachment,
   type GrowthAttachment,
 } from "@/lib/growthAttachments";
@@ -10,6 +13,69 @@ import {
 const LABEL_CLASS = "text-xs font-bold uppercase tracking-wide text-[#9a8f82]";
 const INPUT_CLASS =
   "mt-1 w-full rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5 text-sm text-[#2d2926] placeholder:text-[#9a8f82] focus:border-[#c9a66b] focus:outline-none focus:ring-2 focus:ring-[#c9a66b]/25";
+
+function AttachmentRow({
+  att,
+  onRemove,
+  compact,
+}: {
+  att: GrowthAttachment;
+  onRemove?: () => void;
+  compact?: boolean;
+}) {
+  return (
+    <li
+      className={`flex gap-3 rounded-lg border border-[#efe8de] bg-[#faf7f2]/60 px-3 py-2 ${
+        compact ? "text-xs" : "text-sm"
+      } text-[#4b463f]`}
+    >
+      {att.kind === "image" && att.url ? (
+        <img
+          src={att.url}
+          alt={att.name}
+          className="h-12 w-12 shrink-0 rounded-md border border-[#e7d9c8] object-cover"
+        />
+      ) : (
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-[#e7d9c8] bg-white text-lg">
+          {att.kind === "pdf" ? "📄" : att.kind === "video" ? "🎥" : att.kind === "link" ? "🔗" : "📎"}
+        </span>
+      )}
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-medium text-[#2f261f]">{att.name}</p>
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-[#9a8f82]">
+          {attachmentTypeLabel(att.kind)}
+        </p>
+        <div className="mt-1 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => openGrowthAttachment(att)}
+            className="text-xs font-semibold text-[#b45309] hover:underline"
+          >
+            {att.url.startsWith("http") ? "Open" : "Download"}
+          </button>
+          {att.kind === "image" ? (
+            <button
+              type="button"
+              onClick={() => downloadGrowthAttachment(att)}
+              className="text-xs font-semibold text-[#6f6259] hover:underline"
+            >
+              Download
+            </button>
+          ) : null}
+          {onRemove ? (
+            <button
+              type="button"
+              onClick={onRemove}
+              className="text-xs font-semibold text-[#9a6b6b] hover:text-[#7f4f4f]"
+            >
+              Remove
+            </button>
+          ) : null}
+        </div>
+      </div>
+    </li>
+  );
+}
 
 export function GrowthAttachmentsField({
   attachments,
@@ -53,12 +119,12 @@ export function GrowthAttachmentsField({
       <div>
         <p className={LABEL_CLASS}>Attachments</p>
         <p className="mt-0.5 text-xs text-[#9a8f82]">
-          Screenshots, certificates, PDFs, links, or video URLs
+          Screenshots, certificates, PDFs, documents, links, or video URLs
         </p>
         <input
           type="file"
           multiple
-          accept="image/*,.pdf,.doc,.docx"
+          accept="image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx"
           onChange={(e) => {
             void handleFiles(e.target.files);
             e.target.value = "";
@@ -92,40 +158,15 @@ export function GrowthAttachmentsField({
       </div>
 
       {attachments.length > 0 ? (
-        <ul className="space-y-1.5">
+        <ul className="space-y-2">
           {attachments.map((att) => (
-            <li
+            <AttachmentRow
               key={att.id}
-              className="flex items-center justify-between gap-2 rounded-lg border border-[#efe8de] bg-[#faf7f2]/60 px-3 py-2 text-xs text-[#4b463f]"
-            >
-              <span className="min-w-0 truncate">
-                {att.kind === "image" ? "🖼 " : att.kind === "pdf" ? "📄 " : att.kind === "video" ? "🎥 " : "📎 "}
-                {att.name}
-              </span>
-              <div className="flex shrink-0 gap-2">
-                {att.url.startsWith("http") ? (
-                  <a
-                    href={att.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-semibold text-[#b45309] hover:underline"
-                  >
-                    Open
-                  </a>
-                ) : null}
-                <button
-                  type="button"
-                  onClick={() =>
-                    onAttachmentsChange(
-                      attachments.filter((a) => a.id !== att.id),
-                    )
-                  }
-                  className="font-semibold text-[#9a6b6b] hover:text-[#7f4f4f]"
-                >
-                  Remove
-                </button>
-              </div>
-            </li>
+              att={att}
+              onRemove={() =>
+                onAttachmentsChange(attachments.filter((a) => a.id !== att.id))
+              }
+            />
           ))}
         </ul>
       ) : null}
@@ -136,9 +177,13 @@ export function GrowthAttachmentsField({
 export function GrowthAttachmentsList({
   attachments,
   link,
+  onAttachmentsChange,
+  compact,
 }: {
   attachments: GrowthAttachment[];
   link?: string;
+  onAttachmentsChange?: (next: GrowthAttachment[]) => void;
+  compact?: boolean;
 }) {
   const items = [...attachments];
   if (link?.trim() && !items.some((a) => a.url === link.trim())) {
@@ -146,22 +191,21 @@ export function GrowthAttachmentsList({
   }
   if (items.length === 0) return null;
   return (
-    <ul className="mt-2 space-y-1 text-xs text-[#4b463f]">
+    <ul className={`mt-2 space-y-2 ${compact ? "" : ""}`}>
       {items.map((att) => (
-        <li key={att.id}>
-          {att.url.startsWith("http") ? (
-            <a
-              href={att.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-[#b45309] hover:underline"
-            >
-              {att.name}
-            </a>
-          ) : (
-            <span>{att.name}</span>
-          )}
-        </li>
+        <AttachmentRow
+          key={att.id}
+          att={att}
+          compact={compact}
+          onRemove={
+            onAttachmentsChange
+              ? () =>
+                  onAttachmentsChange(
+                    attachments.filter((a) => a.id !== att.id),
+                  )
+              : undefined
+          }
+        />
       ))}
     </ul>
   );

@@ -84,7 +84,7 @@ export const BRAND = {
   tagline: "Your Coach & Companion",
 } as const;
 
-// Primary doors — Chat, Focus, Create, and Growth (progress & impact).
+// Six sidebar doors — companion-first daily path; libraries live inside hubs.
 export const SIDEBAR_NAV: {
   id: SidebarNavId;
   label: string;
@@ -95,30 +95,17 @@ export const SIDEBAR_NAV: {
   { id: "focus", label: "Focus", emoji: "🎯", mode: "focus" },
   { id: "create", label: "Create", emoji: "✨" },
   { id: "growth", label: "Growth", emoji: "🌱" },
+  { id: "my-work", label: "My Work", emoji: "🏠" },
+  { id: "how-do-i", label: "How Do I", emoji: "❓" },
 ];
 
-// Everything else stays in the product but leaves the main path. Shari can
-// send people here; users don't choose a "mode" on day one.
-const MORE_NAV_SOURCE: {
+/** @deprecated More menu removed — My Work and How Do I are primary sidebar items. */
+export const MORE_NAV: {
   id: SidebarNavId;
   label: string;
   emoji: string;
   mode?: CoachingMode;
-}[] = [
-  { id: "my-work", label: "My Work", emoji: "🏠" },
-  { id: "projects", label: "Projects", emoji: "📁" },
-  { id: "snippets", label: "Snippets", emoji: "🧩" },
-  { id: "saved-work", label: "Saved Work", emoji: "📂" },
-  { id: "playbook", label: "Strategies", emoji: "📘" },
-  { id: "templates", label: "Templates", emoji: "📚" },
-  { id: "how-do-i", label: "How Do I", emoji: "❓" },
-];
-
-/** Workflow order from MORE_NAV_SOURCE; How Do I always last — not alphabetical. */
-export const MORE_NAV: typeof MORE_NAV_SOURCE = [
-  ...MORE_NAV_SOURCE.filter((item) => item.id !== "how-do-i"),
-  ...MORE_NAV_SOURCE.filter((item) => item.id === "how-do-i"),
-];
+}[] = [];
 
 // Top-level nav items that open their own section (a panel) rather than
 // switching the chat into a coaching mode.
@@ -130,7 +117,6 @@ export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
   projects: "projects",
   templates: "templates-library",
   snippets: "snippets",
-  "saved-work": "saved-work",
   playbook: "playbook",
   "how-do-i": "how-do-i",
 };

@@ -82,9 +82,10 @@ export const COGNITIVE_GROWTH_BY_AREA: Record<string, CognitiveGrowthProfile> = 
     skills: ["Pattern Recognition", "Reflection", "Confidence Building"],
   },
   "confidence-vault": {
-    helpsToday: "Preserves praise, testimonials, and proof of your value.",
+    helpsToday:
+      "Preserves praise, testimonials, accomplishments, and recognition you want to remember.",
     strengthens:
-      "Builds self-trust and confidence when imposter syndrome shows up.",
+      "Helps you recognize accomplishments, remember strengths, and celebrate milestones over time.",
     skills: ["Confidence Building", "Self Awareness"],
   },
   "my-journey": {
@@ -98,6 +99,13 @@ export const COGNITIVE_GROWTH_BY_AREA: Record<string, CognitiveGrowthProfile> = 
     strengthens:
       "Builds reflection and confidence — noticing what went well trains your brain to see momentum.",
     skills: ["Reflection", "Confidence Building"],
+  },
+  growth: {
+    helpsToday:
+      "Shows your progress, impact, highlights, and story in one place.",
+    strengthens:
+      "Strengthens reflection and pattern recognition — reviewing what you have built over time.",
+    skills: ["Reflection", "Pattern Recognition", "Self Awareness"],
   },
   "client-avatars": {
     helpsToday: "Clarifies who you serve so messaging feels personal, not generic.",

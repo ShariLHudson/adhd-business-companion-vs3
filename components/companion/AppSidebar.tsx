@@ -19,8 +19,7 @@ type AppSidebarProps = {
   onNavSelect: (nav: SidebarNavId, mode?: CoachingMode) => void;
 };
 
-// Three primary doors (Chat · Focus · Create) + a collapsible "More" for backstage
-// areas. One navigation system; the top bar collapses to "⋯" on home.
+// Six sidebar doors — Chat, Focus, Create, Growth, My Work, How Do I.
 export function AppSidebar({
   activeNav,
   activeSection,
@@ -110,27 +109,33 @@ export function AppSidebar({
       <nav className="flex flex-1 flex-col gap-1 p-2">
         {SIDEBAR_NAV.map(renderItem)}
 
-        {/* More — backstage doors, off the main path but one tap away. */}
-        <button
-          type="button"
-          onClick={() => setMoreOpen((o) => !o)}
-          aria-expanded={showMore}
-          title="More sections"
-          aria-label="More sections"
-          className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 px-2 py-2.5 text-left leading-tight text-white/80 transition-colors hover:bg-white/10 md:justify-start md:px-3"
-        >
-          <span aria-hidden="true" className="flex w-6 shrink-0 justify-center">
-            {showMore ? "▾" : "⋯"}
-          </span>
-          <span className="hidden text-left text-base font-medium md:inline">
-            More
-          </span>
-        </button>
-        {showMore && (
-          <div className="flex flex-col gap-1 md:pl-2">
-            {MORE_NAV.map(renderItem)}
-          </div>
-        )}
+        {MORE_NAV.length > 0 ? (
+          <>
+            <button
+              type="button"
+              onClick={() => setMoreOpen((o) => !o)}
+              aria-expanded={showMore}
+              title="More sections"
+              aria-label="More sections"
+              className="mt-1 flex w-full items-center justify-center gap-2 rounded-lg border border-white/15 px-2 py-2.5 text-left leading-tight text-white/80 transition-colors hover:bg-white/10 md:justify-start md:px-3"
+            >
+              <span
+                aria-hidden="true"
+                className="flex w-6 shrink-0 justify-center"
+              >
+                {showMore ? "▾" : "⋯"}
+              </span>
+              <span className="hidden text-left text-base font-medium md:inline">
+                More
+              </span>
+            </button>
+            {showMore ? (
+              <div className="flex flex-col gap-1 md:pl-2">
+                {MORE_NAV.map(renderItem)}
+              </div>
+            ) : null}
+          </>
+        ) : null}
       </nav>
 
       {/* Google quick links — open your apps from anywhere. */}

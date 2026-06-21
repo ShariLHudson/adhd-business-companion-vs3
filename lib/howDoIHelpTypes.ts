@@ -51,7 +51,7 @@ export const HOW_DO_I_CORE_WORKFLOW = {
     "Use Create to build content.",
     "Use Plan My Day to schedule work.",
     "Save finished work in My Work.",
-    "Track progress through Wins This Week and Evidence Bank.",
+    "Track progress in 🌱 Growth — Wins, Evidence Bank, My Highlights, and My Journey.",
   ],
 } as const;
 
@@ -102,7 +102,7 @@ export const HOW_DO_I_CATEGORIES: HowDoIHelpCategory[] = [
     id: "personal-growth",
     label: "Personal Growth",
     emoji: "🌱",
-    description: "Wins, evidence, and confidence.",
+    description: "Growth Center, wins, evidence, highlights, and journey.",
   },
   {
     id: "adhd-support",
