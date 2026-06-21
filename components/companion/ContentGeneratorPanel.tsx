@@ -101,7 +101,6 @@ import { blankScaffoldForType } from "@/lib/createInitialization";
 import { liveCreateWorkflowState } from "@/lib/liveCreateWorkspace";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
-import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import { isUnresolvedCreateType } from "@/lib/createTypePickers";
 import {
   AudienceBadge,
@@ -1608,7 +1607,6 @@ export function ContentGeneratorPanel({
       {!showDraftEditor ? (
         <div className="shrink-0 px-4 pt-4 sm:px-6">
           <WorkspaceAreaWorksGuide areaId="content-generator" />
-          <WorkspaceGuide section="content-generator" />
         </div>
       ) : null}
       {showCreateOptions && (

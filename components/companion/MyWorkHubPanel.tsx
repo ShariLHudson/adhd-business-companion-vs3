@@ -12,6 +12,7 @@ import {
   type MyWorkHubProjectRow,
 } from "@/lib/myWorkHub";
 import { continuityToHomeResume } from "@/lib/myWorkHubResume";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { SAVED_WORK_UPDATED_EVENT } from "@/lib/savedWorkStore";
 import { initialSectionOpen } from "@/lib/expandableUi";
 import { useCategoryColorCoding } from "@/lib/useCategoryColorCoding";
@@ -284,6 +285,7 @@ export function MyWorkHubPanel({
         <p className="mt-1 text-sm text-[#6b635a]">
           Everything you&apos;ve created, saved, and started — one trusted home.
         </p>
+        <WorkspaceAreaWorksGuide areaId="my-work" />
         <input
           type="search"
           value={query}

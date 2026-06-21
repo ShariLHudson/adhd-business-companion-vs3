@@ -2,55 +2,85 @@
 
 import { useState } from "react";
 import { initialSectionOpen } from "@/lib/expandableUi";
-import { getWorkspaceAreaWorkflow } from "@/lib/workspaceAreaWorkflows";
+import { getWorkspaceHelpContent } from "@/lib/workspaceHelpContent";
 
-/** Top-level workflow overview — collapsed by default; coexists with section help. */
+const GOLD_LABEL = "text-xs font-bold uppercase tracking-wide text-[#b45309]";
+
+/**
+ * Single workspace help dropdown — PostCraft How To style.
+ * Replaces "How This Area Works", "What Is This?", "How To Use This?", etc.
+ */
 export function WorkspaceAreaWorksGuide({ areaId }: { areaId: string }) {
-  const workflow = getWorkspaceAreaWorkflow(areaId);
+  const help = getWorkspaceHelpContent(areaId);
   const [open, setOpen] = useState(initialSectionOpen);
 
-  if (!workflow?.steps.length) return null;
+  if (!help) return null;
 
   return (
-    <div className="mb-4 overflow-hidden rounded-2xl border border-[#1e4f4f]/15 bg-white/85 shadow-sm">
+    <div className="mb-4 overflow-hidden rounded-xl border border-[#e4ddd2] bg-white shadow-sm">
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-[#f0f5f5]/60"
+        className="flex w-full items-center gap-2 px-4 py-3.5 text-left hover:bg-[#faf7f2]/80"
         aria-expanded={open}
       >
-        <span className="text-[#9a8f82]" aria-hidden="true">
+        <span className="shrink-0 text-sm text-[#9a8f82]" aria-hidden="true">
           {open ? "▼" : "▶"}
         </span>
-        <span className="text-sm font-semibold text-[#1e4f4f]">
-          How This Area Works
+        <span className="min-w-0 flex-1 text-sm font-semibold text-[#1f1c19]">
+          How To Use {help.areaName}
         </span>
       </button>
+
       {open ? (
-        <div className="border-t border-[#e7dfd4] px-4 py-4">
-          <ol className="flex flex-col gap-2.5">
-            {workflow.steps.map((step, index) => (
-              <li key={step} className="flex items-start gap-3">
-                <span
-                  className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#1e4f4f] text-xs font-bold text-white"
-                  aria-hidden="true"
-                >
-                  {index + 1}
-                </span>
-                <span className="text-sm leading-relaxed text-[#4b463f]">
-                  {step}
-                </span>
-              </li>
-            ))}
-          </ol>
-          {workflow.tip ? (
-            <p className="mt-4 rounded-xl border border-[#1e4f4f]/15 bg-[#f0f5f5] px-3 py-2.5 text-sm leading-relaxed text-[#2d2926]">
-              <span className="font-semibold text-[#1e4f4f]">Tip: </span>
-              {workflow.tip}
+        <div className="border-t border-[#efe8de] px-4 pb-4 pt-3">
+          <section>
+            <p className={GOLD_LABEL}>What this area is</p>
+            <p className="mt-1 text-sm leading-relaxed text-[#2d2926]">
+              {help.whatItIs}
             </p>
+          </section>
+
+          <section className="mt-3">
+            <p className={GOLD_LABEL}>When to use it</p>
+            <p className="mt-1 text-sm leading-relaxed text-[#2d2926]">
+              {help.whenToUse}
+            </p>
+          </section>
+
+          <section className="mt-3">
+            <p className={GOLD_LABEL}>Recommended workflow</p>
+            <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm leading-relaxed text-[#2d2926]">
+              {help.workflow.map((step) => (
+                <li key={step}>{step}</li>
+              ))}
+            </ol>
+          </section>
+
+          {help.tips.length > 0 ? (
+            <section className="mt-3">
+              <p className={GOLD_LABEL}>Helpful tips</p>
+              <ul className="mt-1 list-disc space-y-1 pl-5 text-sm leading-relaxed text-[#4b463f]">
+                {help.tips.map((tip) => (
+                  <li key={tip}>{tip}</li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          {help.relatedAreas ? (
+            <section className="mt-3">
+              <p className={GOLD_LABEL}>How it connects</p>
+              <p className="mt-1 text-sm leading-relaxed text-[#4b463f]">
+                {help.relatedAreas}
+              </p>
+            </section>
           ) : null}
         </div>
       ) : null}
     </div>
   );
 }
+
+/** Alias for clarity in new code. */
+export const WorkspaceHowToUseGuide = WorkspaceAreaWorksGuide;

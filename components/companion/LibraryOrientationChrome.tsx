@@ -1,8 +1,5 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
-import { initialSectionOpen } from "@/lib/expandableUi";
-
 /** Always-visible exit — users should never wonder how to leave. */
 export function LibraryCloseButton({ onClose }: { onClose: () => void }) {
   return (
@@ -37,33 +34,6 @@ export function LibraryPanelHeader({
       </div>
       <LibraryCloseButton onClose={onClose} />
     </header>
-  );
-}
-
-export function LibraryHelpText({ children }: { children: ReactNode }) {
-  const [open, setOpen] = useState(initialSectionOpen);
-
-  return (
-    <div className="rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/90">
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-[#f5f0e8]/80"
-        aria-expanded={open}
-      >
-        <span className="text-sm text-[#6b635a]" aria-hidden>
-          {open ? "▼" : "▶"}
-        </span>
-        <span className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-          How To Use This?
-        </span>
-      </button>
-      {open ? (
-        <ul className="list-inside list-disc space-y-1 border-t border-[#e7dfd4]/80 px-4 pb-3 pt-2 text-sm leading-relaxed text-[#4b463f]">
-          {children}
-        </ul>
-      ) : null}
-    </div>
   );
 }
 

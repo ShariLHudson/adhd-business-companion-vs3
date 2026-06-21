@@ -55,6 +55,7 @@ import { discoveryContextForChat } from "@/lib/companionDiscovery";
 import { useVisualMode } from "@/lib/useVisualMode";
 import { resolveAdaptiveVisualContext } from "@/lib/adaptiveVisualContext";
 import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
+import type { EcosystemSearchResult } from "@/lib/howDoIHelpLibrary";
 import type { ProfileSettingsSection } from "@/components/companion/ProfilePanel";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import { RecognitionMomentCard } from "@/components/companion/RecognitionMomentCard";
@@ -246,6 +247,7 @@ import {
   strategyOpenAck,
   type StrategyOpenTarget,
 } from "@/lib/strategyOpenFromChat";
+import { STRATEGIES } from "@/lib/strategySystem";
 import {
   artifactLockHintForChat,
   conflictsWithLockedArtifact,
@@ -6035,6 +6037,41 @@ export default function CompanionPage() {
     );
   }
 
+  function handleHowDoIEcosystemOpen(result: EcosystemSearchResult) {
+    const action = result.action;
+    switch (action.kind) {
+      case "section":
+        openHowDoIToolWalkthrough(action.section);
+        break;
+      case "activity":
+        if (action.activityId === "decision-compass") {
+          openDecisionCompass();
+        } else {
+          handleStrategiesOpenActivity(action.activityId);
+        }
+        break;
+      case "strategy": {
+        const strategy = STRATEGIES.find((s) => s.id === action.strategyId);
+        if (strategy) {
+          openStrategyFromChat({
+            kind: "builtin",
+            strategyId: strategy.id,
+            title: strategy.title,
+          });
+        }
+        break;
+      }
+      case "tool":
+        handleToolSelectCore(action.tool);
+        break;
+      case "settings":
+        openHowDoISettings(action.section as SettingsSection);
+        break;
+      case "help-article":
+        break;
+    }
+  }
+
   function openStrategyFromChat(target: StrategyOpenTarget) {
     if (workspacePanel !== "playbook") {
       patchWorkspacePanel("playbook");
@@ -10339,6 +10376,7 @@ export default function CompanionPage() {
               if (activityId === "decision-compass") openDecisionCompass();
             }}
             onOpenSettings={openHowDoISettings}
+            onOpenEcosystemResult={handleHowDoIEcosystemOpen}
             onAsk={(prompt) => void handleSend(prompt, false, true)}
             registerBack={registerBack}
           />
@@ -11903,6 +11941,7 @@ export default function CompanionPage() {
                   if (activityId === "decision-compass") openDecisionCompass();
                 }}
                 onOpenSettings={openHowDoISettings}
+                onOpenEcosystemResult={handleHowDoIEcosystemOpen}
                 onAsk={(prompt) => void handleSend(prompt, false, true)}
                 registerBack={registerBack}
               />

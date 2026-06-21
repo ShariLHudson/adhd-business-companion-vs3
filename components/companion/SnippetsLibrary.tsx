@@ -21,7 +21,6 @@ import {
 import { AudienceTypeGenerateBar } from "@/components/companion/AudienceTypeGenerateBar";
 import {
   LibraryCloseButton,
-  LibraryHelpText,
   LibraryPanelHeader,
   LibraryResultActions,
 } from "@/components/companion/LibraryOrientationChrome";
@@ -385,12 +384,6 @@ export function SnippetsLibrary({
 
       <div className="mt-4">
         <WorkspaceAreaWorksGuide areaId="snippets" />
-        <LibraryHelpText>
-          <li>Choose an audience and tone.</li>
-          <li>Click Generate to create fresh snippet ideas.</li>
-          <li>Save the ones you like for future use.</li>
-          <li>Use them anywhere in your business.</li>
-        </LibraryHelpText>
       </div>
 
       <div className="mt-3">

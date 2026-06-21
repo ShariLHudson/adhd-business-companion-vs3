@@ -6,6 +6,7 @@ import {
   formatWeeklyWinLine,
   getWeeklyWinsHistory,
 } from "@/lib/weeklyWins";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
 export function WinsThisWeekPanel({ refreshKey = 0 }: { refreshKey?: string | number }) {
@@ -20,6 +21,9 @@ export function WinsThisWeekPanel({ refreshKey = 0 }: { refreshKey?: string | nu
           Progress matters more than completion. Every small step counts.
         </p>
       </div>
+
+      <WorkspaceAreaWorksGuide areaId="wins-this-week" />
+      <WorkspaceAreaWorksGuide areaId="evidence-bank" />
 
       <div className="mt-5 rounded-3xl border border-[#e7d9c8] bg-white p-5">
         <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">

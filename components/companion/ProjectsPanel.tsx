@@ -22,7 +22,6 @@ import { sortByDropdownLabel } from "@/lib/dropdownSort";
 import { ProjectBreakdown } from "@/components/companion/ProjectBreakdown";
 import { CollapsibleSection } from "@/components/companion/CollapsibleSection";
 import { ProjectAssetsPanel } from "@/components/companion/ProjectAssetsPanel";
-import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { useVisualMode } from "@/lib/useVisualMode";
 import {
@@ -1286,7 +1285,6 @@ export function ProjectsPanel({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <WorkspaceAreaWorksGuide areaId="projects" />
-          <WorkspaceGuide section="projects" />
           <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">Projects</p>
           <p className="mt-1 text-base text-[#6b635a]">
             Your filing cabinet — pick a project when you&apos;re ready.

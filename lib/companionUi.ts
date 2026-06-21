@@ -1,5 +1,4 @@
 import type { CoachingMode } from "./companionPrompt";
-import { sortByDropdownLabel } from "./dropdownSort";
 
 export type AppSection =
   | "home"
@@ -107,12 +106,9 @@ const MORE_NAV_SOURCE: {
   { id: "how-do-i", label: "How Do I", emoji: "❓" },
 ];
 
-/** Alphabetical by label; How Do I always last. */
+/** Workflow order from MORE_NAV_SOURCE; How Do I always last — not alphabetical. */
 export const MORE_NAV: typeof MORE_NAV_SOURCE = [
-  ...sortByDropdownLabel(
-    MORE_NAV_SOURCE.filter((item) => item.id !== "how-do-i"),
-    (item) => item.label,
-  ),
+  ...MORE_NAV_SOURCE.filter((item) => item.id !== "how-do-i"),
   ...MORE_NAV_SOURCE.filter((item) => item.id === "how-do-i"),
 ];
 

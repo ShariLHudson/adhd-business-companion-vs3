@@ -37,7 +37,6 @@ import {
   userStrategiesFor,
   type UserStrategy,
 } from "@/lib/userStrategies";
-import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { StrategyApplyPanel } from "@/components/companion/StrategyApplyPanel";
@@ -300,7 +299,6 @@ export function StrategiesPanel({
     return (
       <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
         <WorkspaceAreaWorksGuide areaId="playbook" />
-        <WorkspaceGuide section="playbook" />
         {dockedPlan}
         <p className="text-2xl font-semibold text-[#1f1c19]">Strategies</p>
         <p className="mt-1 text-base text-[#6b635a]">

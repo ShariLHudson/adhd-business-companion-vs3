@@ -1,6 +1,7 @@
 /**
- * Global dropdown standard — alphabetical by display label unless a caller
- * documents an intentional exception (workflow sequence, dates, priority).
+ * Alphabetical sorting for searchable libraries and pickers only
+ * (categories, avatars, templates, snippets, strategies, saved work lists).
+ * Primary ecosystem navigation uses intentional workflow order instead.
  */
 
 export function compareDropdownLabels(a: string, b: string): number {

@@ -27,6 +27,7 @@ import { useVisualMode } from "@/lib/useVisualMode";
 import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
 import { playChime, unlockChime } from "@/lib/chime";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import {
   getRecognitionStore,
@@ -1349,6 +1350,7 @@ export function SettingsPanel({
       <p className="mt-1 text-sm text-[#6b635a]">
         Tap any item to change it — everything saves automatically.
       </p>
+      <WorkspaceAreaWorksGuide areaId="settings" />
       <div className="mt-6 flex flex-col gap-2.5">
         {[...ROWS]
           .sort((a, b) => compareDropdownLabels(a.label, b.label))

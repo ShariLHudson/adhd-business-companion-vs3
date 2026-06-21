@@ -26,7 +26,6 @@ import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelec
 import { AudienceTypeGenerateBar } from "@/components/companion/AudienceTypeGenerateBar";
 import {
   LibraryCloseButton,
-  LibraryHelpText,
   LibraryPanelHeader,
   LibraryResultActions,
 } from "@/components/companion/LibraryOrientationChrome";
@@ -595,12 +594,6 @@ export function TemplatesLibrary({
 
       <div className="mt-4">
         <WorkspaceAreaWorksGuide areaId="templates-library" />
-        <LibraryHelpText>
-          <li>Choose an audience, tone, and template type.</li>
-          <li>Templates provide a starting structure.</li>
-          <li>You can customize them before using them.</li>
-          <li>Save the ones you want to reuse later.</li>
-        </LibraryHelpText>
       </div>
 
       <div className="mt-3">

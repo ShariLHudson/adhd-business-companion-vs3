@@ -26,7 +26,6 @@ import {
 import { sortByDropdownLabel, sortDropdownLabels } from "@/lib/dropdownSort";
 import type { AppSection } from "@/lib/companionUi";
 import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
-import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { BrainDumpVisualPanel } from "@/components/visual-thinking/BrainDumpVisualPanel";
@@ -247,7 +246,6 @@ export function BrainDumpPanel({
         </div>
       ) : null}
       <WorkspaceAreaWorksGuide areaId="brain-dump" />
-      <WorkspaceGuide section="brain-dump" />
       <p className="text-2xl font-semibold text-[#1f1c19]">Clear My Mind</p>
       <p className="mt-2 text-base text-[#6b635a]">
         Get this out of your head — capture, group similar ideas, find priorities,

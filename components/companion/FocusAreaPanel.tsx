@@ -11,7 +11,6 @@ import {
 } from "@/lib/focusHub";
 import { initialSectionOpen } from "@/lib/expandableUi";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
-import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
 function FeelingButton({
   emoji,
@@ -227,7 +226,6 @@ export function FocusAreaPanel({
       data-testid="focus-area-panel"
       data-focus-view="feelings"
     >
-      <WorkspaceGuide section="focus" />
       <p className="text-2xl font-semibold text-[#1f1c19]">Focus</p>
       <p className="mt-1 text-base text-[#6b635a]">
         How are you feeling right now?
