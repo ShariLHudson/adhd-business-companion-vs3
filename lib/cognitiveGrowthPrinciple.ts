@@ -81,6 +81,18 @@ export const COGNITIVE_GROWTH_BY_AREA: Record<string, CognitiveGrowthProfile> = 
       "Helps you recognize impact, patterns, strengths, and results over time.",
     skills: ["Pattern Recognition", "Reflection", "Confidence Building"],
   },
+  "confidence-vault": {
+    helpsToday: "Preserves praise, testimonials, and proof of your value.",
+    strengthens:
+      "Builds self-trust and confidence when imposter syndrome shows up.",
+    skills: ["Confidence Building", "Self Awareness"],
+  },
+  "my-journey": {
+    helpsToday: "Keeps your story, milestones, and lessons in one place.",
+    strengthens:
+      "Strengthens reflection, wisdom, identity, and meaning-making over time.",
+    skills: ["Reflection", "Self Awareness", "Learning From Experience"],
+  },
   "wins-this-week": {
     helpsToday: "Celebrates progress without scorekeeping pressure.",
     strengthens:

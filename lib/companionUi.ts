@@ -33,7 +33,10 @@ export type AppSection =
   | "today"
   | "plan-my-day"
   | "wins-this-week"
-  | "evidence-bank";
+  | "evidence-bank"
+  | "growth"
+  | "confidence-vault"
+  | "my-journey";
 
 export type SidebarNavId =
   | "chat"
@@ -51,7 +54,10 @@ export type SidebarNavId =
   | "settings"
   | "how-do-i"
   | "wins-this-week"
-  | "evidence-bank";
+  | "evidence-bank"
+  | "growth"
+  | "confidence-vault"
+  | "my-journey";
 
 export type SidebarToolId =
   | "voice"
@@ -78,7 +84,7 @@ export const BRAND = {
   tagline: "Your Coach & Companion",
 } as const;
 
-// Primary doors — Chat, Focus, Create, and My Work (home base for everything).
+// Primary doors — Chat, Focus, Create, and Growth (progress & impact).
 export const SIDEBAR_NAV: {
   id: SidebarNavId;
   label: string;
@@ -88,7 +94,7 @@ export const SIDEBAR_NAV: {
   { id: "chat", label: "Chat", emoji: "💬", mode: "today" },
   { id: "focus", label: "Focus", emoji: "🎯", mode: "focus" },
   { id: "create", label: "Create", emoji: "✨" },
-  { id: "my-work", label: "My Work", emoji: "🏠" },
+  { id: "growth", label: "Growth", emoji: "🌱" },
 ];
 
 // Everything else stays in the product but leaves the main path. Shari can
@@ -99,11 +105,10 @@ const MORE_NAV_SOURCE: {
   emoji: string;
   mode?: CoachingMode;
 }[] = [
+  { id: "my-work", label: "My Work", emoji: "🏠" },
   { id: "projects", label: "Projects", emoji: "📁" },
   { id: "snippets", label: "Snippets", emoji: "🧩" },
   { id: "saved-work", label: "Saved Work", emoji: "📂" },
-  { id: "evidence-bank", label: "Evidence Bank", emoji: "🏆" },
-  { id: "wins-this-week", label: "Wins This Week", emoji: "🌟" },
   { id: "playbook", label: "Strategies", emoji: "📘" },
   { id: "templates", label: "Templates", emoji: "📚" },
   { id: "how-do-i", label: "How Do I", emoji: "❓" },
@@ -120,13 +125,12 @@ export const MORE_NAV: typeof MORE_NAV_SOURCE = [
 export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
   focus: "focus",
   create: "content-generator",
+  growth: "growth",
   "my-work": "my-work",
   projects: "projects",
   templates: "templates-library",
   snippets: "snippets",
   "saved-work": "saved-work",
-  "evidence-bank": "evidence-bank",
-  "wins-this-week": "wins-this-week",
   playbook: "playbook",
   "how-do-i": "how-do-i",
 };

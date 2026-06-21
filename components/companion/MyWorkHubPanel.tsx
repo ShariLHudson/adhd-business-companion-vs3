@@ -644,10 +644,10 @@ export function MyWorkHubPanel({
               )}
               <button
                 type="button"
-                onClick={() => onOpenSection("wins-this-week", "wins-this-week")}
+                onClick={() => onOpenSection("growth", "growth")}
                 className="mt-3 text-xs font-semibold text-[#1e4f4f]"
               >
-                Open Wins This Week →
+                Open Growth →
               </button>
             </HubSection>
           </div>

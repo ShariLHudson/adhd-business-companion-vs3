@@ -38,6 +38,9 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
   "today",
   "wins-this-week",
   "evidence-bank",
+  "growth",
+  "confidence-vault",
+  "my-journey",
 ];
 
 export const STANDALONE_SECTIONS: AppSection[] = [
@@ -74,6 +77,9 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "plan-my-day": "Plan My Day",
   "wins-this-week": "Wins This Week",
   "evidence-bank": "Evidence Bank",
+  growth: "Growth",
+  "confidence-vault": "Confidence Vault",
+  "my-journey": "My Journey",
   "focus-audio": "Focus Audio",
 };
 
@@ -100,6 +106,9 @@ export const WORKSPACE_EMOJI: Partial<Record<AppSection, string>> = {
   "plan-my-day": "📋",
   "wins-this-week": "🌟",
   "evidence-bank": "🏆",
+  growth: "🌱",
+  "confidence-vault": "💎",
+  "my-journey": "🌿",
   "focus-audio": "🎧",
 };
 

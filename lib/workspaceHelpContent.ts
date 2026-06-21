@@ -17,9 +17,11 @@ export type WorkspaceHelpAreaId =
   | "client-avatars"
   | "settings"
   | "time-block"
-  | "decision-compass";
+  | "decision-compass"
+  | "confidence-vault"
+  | "my-journey";
 
-const HELP_ARTICLE_ID: Record<WorkspaceHelpAreaId, string> = {
+const HELP_ARTICLE_ID: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "plan-my-day": "plan-my-day",
   projects: "projects",
   "content-generator": "create-overview",
@@ -89,10 +91,65 @@ export type WorkspaceHelpContent = {
   strengthens?: string;
 };
 
+const LOCAL_GROWTH_HELP: Record<
+  "confidence-vault" | "my-journey",
+  Omit<WorkspaceHelpContent, "areaId" | "helpsToday" | "strengthens">
+> = {
+  "confidence-vault": {
+    areaName: "Confidence Vault",
+    whatItIs:
+      "A permanent collection of proof that you have value — testimonials, praise, credentials, and accomplishments.",
+    whenToUse:
+      "When imposter syndrome, self-doubt, or forgetting your strengths shows up.",
+    workflow: [
+      "Quick Save praise or testimonials as they arrive.",
+      "Add credentials and accomplishments when you earn them.",
+      "Star the most meaningful items.",
+      "Open when you need to remember reality.",
+    ],
+    tips: [
+      "This is not ego — it is remembering reality when self-doubt appears.",
+      "Separate from Evidence Bank: value proof vs. impact proof.",
+    ],
+    relatedAreas:
+      "Part of 🌱 Growth alongside Wins, Evidence Bank, and My Journey.",
+  },
+  "my-journey": {
+    areaName: "My Journey",
+    whatItIs:
+      "Your personal and professional story — experiences, lessons, milestones, and wisdom. Not a resume.",
+    whenToUse:
+      "When you want to preserve what shaped you, what you learned, and who you are becoming.",
+    workflow: [
+      "Add entries as milestones and lessons happen.",
+      "Assign a life chapter (Early Life, Career, ADHD Discovery, etc.).",
+      "Attach photos, letters, certificates, or links.",
+      "Browse Timeline or Chapters when you need perspective.",
+    ],
+    tips: [
+      "Core questions: Who am I? What has shaped me? What have I learned?",
+      "Preserve meaning — not a profile form.",
+    ],
+    relatedAreas:
+      "Distinct from Evidence Bank (impact) and Confidence Vault (value proof).",
+  },
+};
+
 export function getWorkspaceHelpContent(
   areaId: string,
 ): WorkspaceHelpContent | null {
   const key = areaId as WorkspaceHelpAreaId;
+  const local = LOCAL_GROWTH_HELP[key as keyof typeof LOCAL_GROWTH_HELP];
+  if (local) {
+    const growth = getCognitiveGrowthProfile(key);
+    return {
+      areaId: key,
+      ...local,
+      helpsToday: growth?.helpsToday,
+      strengthens: growth?.strengthens,
+    };
+  }
+
   const articleId = HELP_ARTICLE_ID[key];
   if (!articleId) return null;
 

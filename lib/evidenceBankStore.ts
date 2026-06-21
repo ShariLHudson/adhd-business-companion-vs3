@@ -3,6 +3,8 @@
  * Core question: "What changed because of what I did?"
  */
 
+import type { GrowthAttachment } from "./growthAttachments";
+
 export const EVIDENCE_CATEGORIES = [
   "Business Growth",
   "Client Impact",
@@ -24,6 +26,7 @@ export type EvidenceEntry = {
   whoBenefited: string;
   whyItMattered: string;
   whatThisProves: string;
+  attachments: GrowthAttachment[];
   createdAt: string;
   updatedAt: string;
   /** Momentum event or win moment id when saved from Wins This Week */
@@ -59,13 +62,18 @@ function readAll(): EvidenceEntry[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (e): e is EvidenceEntry =>
-        e &&
-        typeof e.id === "string" &&
-        typeof e.whatHappened === "string" &&
-        typeof e.category === "string",
-    );
+    return parsed
+      .filter(
+        (e): e is EvidenceEntry =>
+          e &&
+          typeof e.id === "string" &&
+          typeof e.whatHappened === "string" &&
+          typeof e.category === "string",
+      )
+      .map((e) => ({
+        ...e,
+        attachments: Array.isArray(e.attachments) ? e.attachments : [],
+      }));
   } catch {
     return [];
   }
@@ -156,6 +164,7 @@ export const EMPTY_EVIDENCE_DRAFT: EvidenceEntryInput = {
   whoBenefited: "",
   whyItMattered: "",
   whatThisProves: "",
+  attachments: [],
 };
 
 export function categoryLabel(category: EvidenceCategory): string {

@@ -65,6 +65,9 @@ const MAIN_AREA_SECTION: Record<string, AppSection> = {
   "my-work": "my-work",
   "evidence-bank": "evidence-bank",
   "wins-this-week": "wins-this-week",
+  growth: "growth",
+  "confidence-vault": "confidence-vault",
+  "my-journey": "my-journey",
   "client-avatars": "client-avatars",
   "settings-personalization": "settings",
 };

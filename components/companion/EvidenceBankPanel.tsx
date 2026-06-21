@@ -14,6 +14,7 @@ import {
   type EvidenceEntry,
   type EvidenceEntryInput,
 } from "@/lib/evidenceBankStore";
+import { GrowthAttachmentsField, GrowthAttachmentsList } from "@/components/companion/GrowthAttachmentsField";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
@@ -115,6 +116,7 @@ function EvidenceCard({
               {entry.whatThisProves}
             </p>
           ) : null}
+          <GrowthAttachmentsList attachments={entry.attachments} />
           <button
             type="button"
             onClick={onDelete}
@@ -198,6 +200,10 @@ export function EvidenceBankPanel({
         </p>
         <p className="mt-2 text-sm text-[#9a8f82]">
           Core question: What changed because of what I did?
+        </p>
+        <p className="mt-1 text-sm text-[#9a8f82]">
+          Part of 🌱 Growth — wins capture what happened; evidence captures why it
+          mattered.
         </p>
       </div>
 
@@ -353,6 +359,11 @@ export function EvidenceBankPanel({
                   placeholder="The capability or truth this shows about you"
                 />
               </div>
+
+              <GrowthAttachmentsField
+                attachments={draft.attachments}
+                onAttachmentsChange={(next) => updateDraft("attachments", next)}
+              />
 
               <button
                 type="button"

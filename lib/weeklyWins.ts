@@ -364,3 +364,36 @@ export function getWeeklyWinMoments(now = new Date()): WeeklyWinMoment[] {
     (a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime(),
   );
 }
+
+/** All win moments — for Growth timeline (not limited to current week). */
+export function getAllWinMoments(): WeeklyWinMoment[] {
+  const events = getMomentumEvents(600);
+  const moments: WeeklyWinMoment[] = [];
+
+  for (const event of events) {
+    const label = momentumWinLabel(event);
+    if (!label) continue;
+    moments.push({
+      id: `momentum-${event.id}`,
+      whatHappened: label,
+      ts: event.ts,
+      icon: momentumWinIcon(event),
+      sourceWinId: event.id,
+    });
+  }
+
+  const session = loadDecisionCompassSession();
+  if (session?.complete && session.decision?.trim()) {
+    moments.push({
+      id: `decision-${session.lastTouchedAt}`,
+      whatHappened: `Made a decision: ${session.decision}`,
+      ts: session.lastTouchedAt,
+      icon: "🧭",
+      sourceWinId: `decision-${session.lastTouchedAt}`,
+    });
+  }
+
+  return moments.sort(
+    (a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime(),
+  );
+}

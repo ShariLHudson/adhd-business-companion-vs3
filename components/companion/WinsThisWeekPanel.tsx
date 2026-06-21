@@ -15,10 +15,12 @@ export function WinsThisWeekPanel({
   refreshKey = 0,
   onSaveToEvidenceBank,
   onOpenEvidenceBank,
+  onOpenGrowth,
 }: {
   refreshKey?: string | number;
   onSaveToEvidenceBank?: (whatHappened: string, sourceWinId: string) => void;
   onOpenEvidenceBank?: () => void;
+  onOpenGrowth?: () => void;
 }) {
   const snapshot = useMemo(() => buildWeeklyWins(), [refreshKey]);
   const history = useMemo(() => getWeeklyWinsHistory(), [refreshKey]);
@@ -31,15 +33,26 @@ export function WinsThisWeekPanel({
         <p className="text-[#6f6259]">
           What happened this week — progress matters more than completion.
         </p>
-        {onOpenEvidenceBank ? (
-          <button
-            type="button"
-            onClick={onOpenEvidenceBank}
-            className="mt-2 text-sm font-semibold text-[#b45309] hover:underline"
-          >
-            Open Evidence Bank →
-          </button>
-        ) : null}
+        <div className="mt-2 flex flex-wrap gap-3">
+          {onOpenGrowth ? (
+            <button
+              type="button"
+              onClick={onOpenGrowth}
+              className="text-sm font-semibold text-[#b45309] hover:underline"
+            >
+              ← Back to Growth
+            </button>
+          ) : null}
+          {onOpenEvidenceBank ? (
+            <button
+              type="button"
+              onClick={onOpenEvidenceBank}
+              className="text-sm font-semibold text-[#b45309] hover:underline"
+            >
+              Open Evidence Bank →
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <WorkspaceAreaWorksGuide areaId="wins-this-week" />

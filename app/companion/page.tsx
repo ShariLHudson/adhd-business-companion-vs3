@@ -35,6 +35,9 @@ import { PlanMyDayPanel } from "@/components/companion/PlanMyDayPanel";
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { WinsThisWeekPanel } from "@/components/companion/WinsThisWeekPanel";
 import { EvidenceBankPanel } from "@/components/companion/EvidenceBankPanel";
+import { GrowthCenterPanel } from "@/components/companion/GrowthCenterPanel";
+import { ConfidenceVaultPanel } from "@/components/companion/ConfidenceVaultPanel";
+import { MyJourneyPanel } from "@/components/companion/MyJourneyPanel";
 import type { HomeResumeItem } from "@/lib/homeResumeItem";
 import { findLatestHomeResumeItem } from "@/lib/homeResumeItem";
 import { activityReturnLabel as resolveActivityReturnLabel } from "@/lib/activityReturnLabel";
@@ -4722,10 +4725,13 @@ export default function CompanionPage() {
         return "client-avatars";
       case "how-do-i":
         return "how-do-i";
+      case "growth":
+        return "growth";
       case "wins-this-week":
-        return "wins-this-week";
       case "evidence-bank":
-        return "evidence-bank";
+      case "confidence-vault":
+      case "my-journey":
+        return "growth";
       default:
         return null;
     }
@@ -10241,16 +10247,47 @@ export default function CompanionPage() {
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
             onSaveToEvidenceBank={(whatHappened, sourceWinId) => {
               setEvidencePrefill({ whatHappened, sourceWinId });
-              openSectionBesideChatCore("evidence-bank", "evidence-bank");
+              openSectionBesideChatCore("evidence-bank", "growth");
             }}
             onOpenEvidenceBank={() =>
-              openSectionBesideChatCore("evidence-bank", "evidence-bank")
+              openSectionBesideChatCore("evidence-bank", "growth")
             }
+            onOpenGrowth={() => openSectionBesideChatCore("growth", "growth")}
           />
         );
       case "evidence-bank":
         return (
           <EvidenceBankPanel
+            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+          />
+        );
+      case "growth":
+        return (
+          <GrowthCenterPanel
+            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+            onOpenWins={() =>
+              openSectionBesideChatCore("wins-this-week", "growth")
+            }
+            onOpenEvidence={() =>
+              openSectionBesideChatCore("evidence-bank", "growth")
+            }
+            onOpenConfidence={() =>
+              openSectionBesideChatCore("confidence-vault", "growth")
+            }
+            onOpenJourney={() =>
+              openSectionBesideChatCore("my-journey", "growth")
+            }
+          />
+        );
+      case "confidence-vault":
+        return (
+          <ConfidenceVaultPanel
+            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+          />
+        );
+      case "my-journey":
+        return (
+          <MyJourneyPanel
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
           />
         );
