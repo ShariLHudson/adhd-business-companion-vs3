@@ -1,3 +1,4 @@
+import { getCognitiveGrowthProfile } from "./cognitiveGrowthPrinciple";
 import { HOW_DO_I_HELP_ARTICLES } from "./howDoIHelpArticles";
 import { getWorkspaceAreaWorkflow } from "./workspaceAreaWorkflows";
 
@@ -82,6 +83,10 @@ export type WorkspaceHelpContent = {
   workflow: string[];
   tips: string[];
   relatedAreas?: string;
+  /** Cognitive Growth Principle — Question 1 */
+  helpsToday?: string;
+  /** Cognitive Growth Principle — Question 2 */
+  strengthens?: string;
 };
 
 export function getWorkspaceHelpContent(
@@ -104,6 +109,8 @@ export function getWorkspaceHelpContent(
     tips.push(legacyWorkflow.tip);
   }
 
+  const growth = getCognitiveGrowthProfile(key);
+
   return {
     areaId: key,
     areaName: AREA_DISPLAY_NAME[key] ?? article.title,
@@ -112,5 +119,7 @@ export function getWorkspaceHelpContent(
     workflow,
     tips,
     relatedAreas: RELATED_AREAS[key],
+    helpsToday: growth?.helpsToday,
+    strengthens: growth?.strengthens,
   };
 }

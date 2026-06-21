@@ -76,6 +76,30 @@ export function WorkspaceAreaWorksGuide({ areaId }: { areaId: string }) {
               </p>
             </section>
           ) : null}
+
+          {help.helpsToday || help.strengthens ? (
+            <section className="mt-4 rounded-lg border border-[#efe8de] bg-[#faf7f2]/60 px-3 py-3">
+              <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+                Support now · Growth over time
+              </p>
+              {help.helpsToday ? (
+                <p className="mt-2 text-sm leading-relaxed text-[#2d2926]">
+                  <span className="font-medium text-[#1f1c19]">
+                    Helps you today:{" "}
+                  </span>
+                  {help.helpsToday}
+                </p>
+              ) : null}
+              {help.strengthens ? (
+                <p className="mt-2 text-sm leading-relaxed text-[#4b463f]">
+                  <span className="font-medium text-[#1f1c19]">
+                    Strengthens over time:{" "}
+                  </span>
+                  {help.strengthens}
+                </p>
+              ) : null}
+            </section>
+          ) : null}
         </div>
       ) : null}
     </div>

@@ -1,4 +1,5 @@
 import { APP_FEATURE_KNOWLEDGE_COMPACT } from "./appFeatureKnowledge";
+import { COGNITIVE_GROWTH_PROMPT_BLOCK } from "./cognitiveGrowthPrinciple";
 import { focusToolDifferentiationHintForChat } from "./focusToolDefinitions";
 import { momentumAppointmentHintForChat } from "./momentumAppointment";
 import { decisionCompassHintForChat } from "./decisionCompass";
@@ -344,6 +345,7 @@ export function buildCompanionSystemPrompt(
 
   const blocks = [
     COMPANION_SYSTEM_PROMPT,
+    COGNITIVE_GROWTH_PROMPT_BLOCK,
     plainLanguageFormattingHintForPrompt(),
     APP_FEATURE_KNOWLEDGE_COMPACT,
     focusToolDifferentiationHintForChat(),
