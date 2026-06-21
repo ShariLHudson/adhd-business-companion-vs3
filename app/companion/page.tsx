@@ -11311,7 +11311,7 @@ export default function CompanionPage() {
               setOverlay("settings");
             }}
             onOpenProfile={() => setOverlay("profile")}
-            showPlanMyDay={!homeCalm}
+            showPlanMyDay
             onOpenPlanMyDay={() => openSectionBesideChatCore("plan-my-day")}
           />
           {!homeCalm ? <ActiveWorkspaceBar items={activeWorkspaceItems} /> : null}
