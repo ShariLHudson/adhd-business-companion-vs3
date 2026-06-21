@@ -37,6 +37,7 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
   "decision-compass",
   "today",
   "wins-this-week",
+  "evidence-bank",
 ];
 
 export const STANDALONE_SECTIONS: AppSection[] = [
@@ -72,6 +73,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   today: "Today",
   "plan-my-day": "Plan My Day",
   "wins-this-week": "Wins This Week",
+  "evidence-bank": "Evidence Bank",
   "focus-audio": "Focus Audio",
 };
 
@@ -97,6 +99,7 @@ export const WORKSPACE_EMOJI: Partial<Record<AppSection, string>> = {
   today: "📅",
   "plan-my-day": "📋",
   "wins-this-week": "🌟",
+  "evidence-bank": "🏆",
   "focus-audio": "🎧",
 };
 

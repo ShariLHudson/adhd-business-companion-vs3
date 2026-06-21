@@ -63,7 +63,7 @@ const MAIN_AREA_SECTION: Record<string, AppSection> = {
   templates: "templates-library",
   snippets: "snippets",
   "my-work": "my-work",
-  "evidence-bank": "wins-this-week",
+  "evidence-bank": "evidence-bank",
   "wins-this-week": "wins-this-week",
   "client-avatars": "client-avatars",
   "settings-personalization": "settings",

@@ -76,10 +76,10 @@ export const COGNITIVE_GROWTH_BY_AREA: Record<string, CognitiveGrowthProfile> = 
     skills: ["Self Awareness", "Problem Solving"],
   },
   "evidence-bank": {
-    helpsToday: "Captures meaningful progress so it doesn't disappear.",
+    helpsToday: "Captures meaningful progress and why it mattered.",
     strengthens:
       "Helps you recognize impact, patterns, strengths, and results over time.",
-    skills: ["Pattern Recognition", "Reflection"],
+    skills: ["Pattern Recognition", "Reflection", "Confidence Building"],
   },
   "wins-this-week": {
     helpsToday: "Celebrates progress without scorekeeping pressure.",

@@ -26,6 +26,15 @@ export type WeeklyWinsSnapshot = {
 
 export type WeeklyWinsHistoryEntry = WeeklyWinsSnapshot;
 
+/** Individual promotable moment — "what happened" for Wins This Week → Evidence Bank. */
+export type WeeklyWinMoment = {
+  id: string;
+  whatHappened: string;
+  ts: string;
+  icon: string;
+  sourceWinId: string;
+};
+
 const HISTORY_KEY = "companion-weekly-wins-history-v1";
 const ARCHIVE_CURSOR_KEY = "companion-weekly-wins-archive-cursor-v1";
 
@@ -278,4 +287,80 @@ export function buildWeeklyWins(now = new Date()): WeeklyWinsSnapshot {
 export function getWeeklyWinsHistory(): WeeklyWinsHistoryEntry[] {
   archivePriorWeekIfNeeded();
   return readHistory();
+}
+
+function momentumWinLabel(event: MomentumEvent): string | null {
+  switch (event.type) {
+    case "complete":
+      return event.label.replace(/^Win:\s*/i, "").trim() || "Completed something meaningful";
+    case "move":
+      return event.label.trim() || "Advanced a project";
+    case "capture":
+      return event.label.trim() || "Captured an idea";
+    case "resilience":
+      return event.label.trim() || "Followed through on something hard";
+    case "start":
+      if (/focus|pomodoro|timer/i.test(event.label)) {
+        return event.label.trim() || "Completed a focus session";
+      }
+      return null;
+    default:
+      return null;
+  }
+}
+
+function momentumWinIcon(event: MomentumEvent): string {
+  switch (event.type) {
+    case "complete":
+      return "✅";
+    case "move":
+      return "📁";
+    case "capture":
+      return "💡";
+    case "resilience":
+      return "💪";
+    case "start":
+      return "🎯";
+    default:
+      return "🌟";
+  }
+}
+
+/** Individual win moments this week — for Save to Evidence Bank. */
+export function getWeeklyWinMoments(now = new Date()): WeeklyWinMoment[] {
+  archivePriorWeekIfNeeded(now);
+  const weekKey = weekKeyForDate(now);
+  const events = getMomentumEvents(600).filter((e) => isInWeek(e.ts, weekKey));
+  const moments: WeeklyWinMoment[] = [];
+
+  for (const event of events) {
+    const label = momentumWinLabel(event);
+    if (!label) continue;
+    moments.push({
+      id: `momentum-${event.id}`,
+      whatHappened: label,
+      ts: event.ts,
+      icon: momentumWinIcon(event),
+      sourceWinId: event.id,
+    });
+  }
+
+  const session = loadDecisionCompassSession();
+  if (
+    session?.complete &&
+    session.decision?.trim() &&
+    isInWeek(session.lastTouchedAt, weekKey)
+  ) {
+    moments.push({
+      id: `decision-${session.lastTouchedAt}`,
+      whatHappened: `Made a decision: ${session.decision}`,
+      ts: session.lastTouchedAt,
+      icon: "🧭",
+      sourceWinId: `decision-${session.lastTouchedAt}`,
+    });
+  }
+
+  return moments.sort(
+    (a, b) => new Date(b.ts).getTime() - new Date(a.ts).getTime(),
+  );
 }

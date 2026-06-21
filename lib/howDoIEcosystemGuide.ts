@@ -227,18 +227,18 @@ export const HOW_DO_I_ECOSYSTEM_CARDS: HowDoIEcosystemCard[] = [
     title: "Evidence Bank",
     emoji: "🏆",
     whatItIs:
-      "Proof you are making progress — wins, completions, exports, and momentum.",
+      "Proof that you are making progress — what changed because of what you did.",
     whenToUse:
-      "When imposter syndrome shows up or you need to see what you have accomplished.",
+      "When imposter syndrome shows up or you need to see real impact.",
     workflow: [
-      "Log wins as you go.",
-      "Completed work builds evidence over time.",
-      "Review Wins This Week for a summary.",
-      "Use proof when planning or talking about your business.",
+      "Add evidence when something mattered.",
+      "Save from Wins This Week to capture the deeper story.",
+      "Review when planning or talking about your business.",
+      "Use proof when pricing or pitching.",
     ],
-    tips: ["Progress matters more than perfection."],
-    keywords: ["evidence", "proof", "wins", "momentum", "progress"],
-    openSection: "wins-this-week",
+    tips: ["Wins capture what happened. Evidence captures why it mattered."],
+    keywords: ["evidence", "proof", "wins", "momentum", "progress", "impact"],
+    openSection: "evidence-bank",
     openLabel: "Open Evidence Bank",
   },
   {
@@ -251,10 +251,13 @@ export const HOW_DO_I_ECOSYSTEM_CARDS: HowDoIEcosystemCard[] = [
     workflow: [
       "Open Wins This Week from More.",
       "Review what was noticed this week.",
-      "Add a win manually if needed.",
+      "Save a moment to Evidence Bank when you want the deeper story.",
       "Glance at previous weeks for perspective.",
     ],
-    tips: ["Every small step counts — including showing up."],
+    tips: [
+      "Wins capture what happened. Evidence Bank captures why it mattered.",
+      "Every small step counts — including showing up.",
+    ],
     keywords: ["wins", "week", "weekly", "celebration"],
     openSection: "wins-this-week",
     openLabel: "Open Wins This Week",

@@ -34,6 +34,7 @@ import { TodayPanel } from "@/components/companion/TodayPanel";
 import { PlanMyDayPanel } from "@/components/companion/PlanMyDayPanel";
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { WinsThisWeekPanel } from "@/components/companion/WinsThisWeekPanel";
+import { EvidenceBankPanel } from "@/components/companion/EvidenceBankPanel";
 import type { HomeResumeItem } from "@/lib/homeResumeItem";
 import { findLatestHomeResumeItem } from "@/lib/homeResumeItem";
 import { activityReturnLabel as resolveActivityReturnLabel } from "@/lib/activityReturnLabel";
@@ -746,6 +747,7 @@ import {
   searchSavedWork,
   type SavedWorkItem,
 } from "@/lib/savedWorkStore";
+import { setEvidencePrefill } from "@/lib/evidenceBankStore";
 import {
   blankScaffoldForType,
   buildCreateOpenAck,
@@ -4720,6 +4722,10 @@ export default function CompanionPage() {
         return "client-avatars";
       case "how-do-i":
         return "how-do-i";
+      case "wins-this-week":
+        return "wins-this-week";
+      case "evidence-bank":
+        return "evidence-bank";
       default:
         return null;
     }
@@ -10232,6 +10238,19 @@ export default function CompanionPage() {
       case "wins-this-week":
         return (
           <WinsThisWeekPanel
+            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+            onSaveToEvidenceBank={(whatHappened, sourceWinId) => {
+              setEvidencePrefill({ whatHappened, sourceWinId });
+              openSectionBesideChatCore("evidence-bank", "evidence-bank");
+            }}
+            onOpenEvidenceBank={() =>
+              openSectionBesideChatCore("evidence-bank", "evidence-bank")
+            }
+          />
+        );
+      case "evidence-bank":
+        return (
+          <EvidenceBankPanel
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
           />
         );

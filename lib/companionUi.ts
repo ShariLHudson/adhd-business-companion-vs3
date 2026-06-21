@@ -32,7 +32,8 @@ export type AppSection =
   | "decision-compass"
   | "today"
   | "plan-my-day"
-  | "wins-this-week";
+  | "wins-this-week"
+  | "evidence-bank";
 
 export type SidebarNavId =
   | "chat"
@@ -49,7 +50,8 @@ export type SidebarNavId =
   | "client-avatars"
   | "settings"
   | "how-do-i"
-  | "wins-this-week";
+  | "wins-this-week"
+  | "evidence-bank";
 
 export type SidebarToolId =
   | "voice"
@@ -100,6 +102,7 @@ const MORE_NAV_SOURCE: {
   { id: "projects", label: "Projects", emoji: "📁" },
   { id: "snippets", label: "Snippets", emoji: "🧩" },
   { id: "saved-work", label: "Saved Work", emoji: "📂" },
+  { id: "evidence-bank", label: "Evidence Bank", emoji: "🏆" },
   { id: "wins-this-week", label: "Wins This Week", emoji: "🌟" },
   { id: "playbook", label: "Strategies", emoji: "📘" },
   { id: "templates", label: "Templates", emoji: "📚" },
@@ -122,6 +125,7 @@ export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
   templates: "templates-library",
   snippets: "snippets",
   "saved-work": "saved-work",
+  "evidence-bank": "evidence-bank",
   "wins-this-week": "wins-this-week",
   playbook: "playbook",
   "how-do-i": "how-do-i",

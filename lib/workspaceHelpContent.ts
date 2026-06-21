@@ -64,9 +64,9 @@ const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "my-work":
     "Hub for Projects, Saved Work, Create drafts, decisions, and files — search when you know the name but not the workspace.",
   "evidence-bank":
-    "Built from Wins This Week, completed work in My Work, and exports from Create. Review when planning or pitching.",
+    "Separate from Wins This Week — wins capture what happened; evidence captures why it mattered. Save from Wins when ready.",
   "wins-this-week":
-    "Companion to Evidence Bank — weekly encouragement without scorekeeping. Log wins from any workspace as you go.",
+    "Companion to Evidence Bank — weekly encouragement without scorekeeping. Save a moment to Evidence Bank when you want the deeper story.",
   "client-avatars":
     "Informs Create, Templates, Snippets, and Strategies so messaging stays personal.",
   settings:

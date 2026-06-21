@@ -49,7 +49,8 @@ export function AppSidebar({
   }) {
     const sectionFor = SECTION_NAV[item.id];
     const active = sectionFor
-      ? activeSection === sectionFor
+      ? activeSection === sectionFor ||
+        (activeSection === "home" && activeNav === item.id)
       : activeNav === item.id && activeSection === "home";
     const showDot = item.id === "chat" && hasContinue && !active;
     return (
