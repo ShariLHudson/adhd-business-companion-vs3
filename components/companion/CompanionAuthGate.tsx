@@ -5,18 +5,18 @@ import { useEffect, type ReactNode } from "react";
 
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 
-/** Unauthenticated visitors always go to sign-in before using the app. */
+/** Unauthenticated visitors go to sign-in when Supabase auth is configured. */
 export function CompanionAuthGate({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const { loading, user } = useCompanionAuth();
+  const { configured, loading, user } = useCompanionAuth();
 
   useEffect(() => {
-    if (!loading && !user) {
+    if (configured && !loading && !user) {
       router.replace("/companion/login");
     }
-  }, [loading, user, router]);
+  }, [configured, loading, user, router]);
 
-  if (loading) {
+  if (configured && loading) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]">
         Loading your account…
@@ -24,7 +24,7 @@ export function CompanionAuthGate({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!user) {
+  if (configured && !user) {
     return (
       <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]">
         Redirecting to sign in…

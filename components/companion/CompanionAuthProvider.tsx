@@ -202,41 +202,43 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let mounted = true;
     let unsubscribe: (() => void) | undefined;
+    const loadingTimeout = window.setTimeout(() => {
+      if (mounted) setLoading(false);
+    }, 10_000);
 
     void (async () => {
-      const ready =
-        companionAuthConfigured() || (await bootstrapCompanionSupabaseConfig());
-      if (!mounted) return;
-      setConfigured(ready);
-      if (!ready) {
-        setLoading(false);
-        return;
+      try {
+        const ready =
+          companionAuthConfigured() ||
+          (await bootstrapCompanionSupabaseConfig());
+        if (!mounted) return;
+        setConfigured(ready);
+        if (!ready) return;
+
+        const supabase = getCompanionSupabase();
+        if (!supabase) return;
+
+        const { data } = await supabase.auth.getSession();
+        if (!mounted) return;
+        setSession(data.session);
+        setUser(data.session?.user ?? null);
+        syncUserToPrefs(data.session?.user ?? null);
+
+        const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
+          setSession(sess);
+          setUser(sess?.user ?? null);
+          syncUserToPrefs(sess?.user ?? null);
+          setLoading(false);
+        });
+        unsubscribe = () => sub.subscription.unsubscribe();
+      } finally {
+        if (mounted) setLoading(false);
       }
-
-      const supabase = getCompanionSupabase();
-      if (!supabase) {
-        setLoading(false);
-        return;
-      }
-
-      const { data } = await supabase.auth.getSession();
-      if (!mounted) return;
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      syncUserToPrefs(data.session?.user ?? null);
-      setLoading(false);
-
-      const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
-        setSession(sess);
-        setUser(sess?.user ?? null);
-        syncUserToPrefs(sess?.user ?? null);
-        setLoading(false);
-      });
-      unsubscribe = () => sub.subscription.unsubscribe();
     })();
 
     return () => {
       mounted = false;
+      window.clearTimeout(loadingTimeout);
       unsubscribe?.();
     };
   }, []);

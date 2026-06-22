@@ -40,7 +40,12 @@ export async function bootstrapCompanionSupabaseConfig(): Promise<boolean> {
 
   bootstrapPromise = (async () => {
     try {
-      const res = await fetch("/api/companion-auth/config");
+      const controller = new AbortController();
+      const timeout = window.setTimeout(() => controller.abort(), 8_000);
+      const res = await fetch("/api/companion-auth/config", {
+        signal: controller.signal,
+      });
+      window.clearTimeout(timeout);
       const data = (await res.json()) as {
         configured?: boolean;
         url?: string;

@@ -17,11 +17,14 @@ export function ModalSheet({
   title?: string;
   children: ReactNode;
 }) {
-  const [shown, setShown] = useState(false);
+  const [shown, setShown] = useState(open);
 
   // Trigger the slide-in each time it opens.
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setShown(false);
+      return;
+    }
     setShown(false);
     const id = requestAnimationFrame(() => setShown(true));
     return () => cancelAnimationFrame(id);
@@ -40,7 +43,11 @@ export function ModalSheet({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
+    <div
+      className={`fixed inset-0 z-50 flex justify-end ${
+        shown ? "" : "pointer-events-none"
+      }`}
+    >
       {/* Backdrop — click to close. Stays partly transparent so you can see
           you're still in the app. */}
       <button
@@ -48,7 +55,7 @@ export function ModalSheet({
         aria-label="Close"
         onClick={onClose}
         className={`absolute inset-0 bg-black/30 transition-opacity duration-300 ${
-          shown ? "opacity-100" : "opacity-0"
+          shown ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
         }`}
       />
 
@@ -58,7 +65,9 @@ export function ModalSheet({
         aria-modal="true"
         aria-label={title}
         className={`relative flex h-full w-full max-w-md flex-col bg-[#faf7f2] shadow-2xl transition-transform duration-300 ease-out ${
-          shown ? "translate-x-0" : "translate-x-full"
+          shown
+            ? "pointer-events-auto translate-x-0"
+            : "pointer-events-none translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between gap-3 px-5 py-3">
