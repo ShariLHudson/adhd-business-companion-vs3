@@ -42,22 +42,18 @@ export function ModalSheet({
 
   if (!open) return null;
 
+  // Absolute (not fixed) so the sheet only covers the main pane — sidebar stays
+  // clickable. Backdrop mounts only after shown to avoid invisible click traps.
   return (
-    <div
-      className={`fixed inset-0 z-50 flex justify-end ${
-        shown ? "" : "pointer-events-none"
-      }`}
-    >
-      {/* Backdrop — click to close. Stays partly transparent so you can see
-          you're still in the app. */}
-      <button
-        type="button"
-        aria-label="Close"
-        onClick={onClose}
-        className={`absolute inset-0 bg-black/30 transition-opacity duration-300 ${
-          shown ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
-        }`}
-      />
+    <div className="pointer-events-none absolute inset-0 z-50 flex justify-end overflow-hidden">
+      {shown ? (
+        <button
+          type="button"
+          aria-label="Close"
+          onClick={onClose}
+          className="pointer-events-auto absolute inset-0 bg-black/30 opacity-100 transition-opacity duration-300"
+        />
+      ) : null}
 
       {/* Panel */}
       <div

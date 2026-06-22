@@ -11301,7 +11301,7 @@ export default function CompanionPage() {
           onNavSelect={handleNavSelect}
         />
 
-        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+        <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
           <TopBar
             onAdjustDay={() => setActiveSection("energy")}
             onRequestClearTodayContext={requestClearTodayContext}
@@ -12201,6 +12201,69 @@ export default function CompanionPage() {
               </div>
             </div>
           )}
+
+          <PlanMyDayQuickDrawer
+            open={planMyDayDrawerOpen}
+            onClose={() => setPlanMyDayDrawerOpen(false)}
+            onOpenFull={(itemId) => {
+              setPlanMyDayOpenItemId(itemId ?? null);
+              openSectionBesideChatCore("plan-my-day");
+            }}
+          />
+
+          <ModalSheet
+            open={overlay === "signin"}
+            onClose={() => setOverlay(null)}
+            title="Account"
+          >
+            <div className="px-5 pb-8">
+              <CompanionSignInForm
+                showClose
+                onClose={() => setOverlay(null)}
+                onSuccess={() => setOverlay(null)}
+              />
+            </div>
+          </ModalSheet>
+
+          <ModalSheet
+            open={overlay === "settings"}
+            onClose={() => {
+              setOverlay(null);
+              setSettingsSection(null);
+              setActiveNav((nav) => (nav === "settings" ? "chat" : nav));
+            }}
+            title="Settings"
+          >
+            <SettingsPanel
+              onSignIn={openSignIn}
+              initialSection={settingsSection}
+              registerBack={registerBack}
+            />
+          </ModalSheet>
+
+          <ModalSheet
+            open={overlay === "profile"}
+            onClose={() => {
+              setOverlay(null);
+              setProfileGettingToKnowYou(false);
+            }}
+            title="Profile"
+          >
+            <ProfilePanel
+              onSignIn={openSignIn}
+              openGettingToKnowYou={profileGettingToKnowYou}
+              onOpen={(s) => {
+                setOverlay(null);
+                setProfileGettingToKnowYou(false);
+                setActiveSection(s);
+              }}
+              onOpenSettings={(section) => {
+                setSettingsSection(section);
+                setOverlay("settings");
+                setProfileGettingToKnowYou(false);
+              }}
+            />
+          </ModalSheet>
         </div>
       </div>
 
@@ -12223,69 +12286,6 @@ export default function CompanionPage() {
           </div>
         </div>
       )}
-
-      <PlanMyDayQuickDrawer
-        open={planMyDayDrawerOpen}
-        onClose={() => setPlanMyDayDrawerOpen(false)}
-        onOpenFull={(itemId) => {
-          setPlanMyDayOpenItemId(itemId ?? null);
-          openSectionBesideChatCore("plan-my-day");
-        }}
-      />
-
-      <ModalSheet
-        open={overlay === "signin"}
-        onClose={() => setOverlay(null)}
-        title="Account"
-      >
-        <div className="px-5 pb-8">
-          <CompanionSignInForm
-            showClose
-            onClose={() => setOverlay(null)}
-            onSuccess={() => setOverlay(null)}
-          />
-        </div>
-      </ModalSheet>
-
-      <ModalSheet
-        open={overlay === "settings"}
-        onClose={() => {
-          setOverlay(null);
-          setSettingsSection(null);
-          setActiveNav((nav) => (nav === "settings" ? "chat" : nav));
-        }}
-        title="Settings"
-      >
-        <SettingsPanel
-          onSignIn={openSignIn}
-          initialSection={settingsSection}
-          registerBack={registerBack}
-        />
-      </ModalSheet>
-
-      <ModalSheet
-        open={overlay === "profile"}
-        onClose={() => {
-          setOverlay(null);
-          setProfileGettingToKnowYou(false);
-        }}
-        title="Profile"
-      >
-        <ProfilePanel
-          onSignIn={openSignIn}
-          openGettingToKnowYou={profileGettingToKnowYou}
-          onOpen={(s) => {
-            setOverlay(null);
-            setProfileGettingToKnowYou(false);
-            setActiveSection(s);
-          }}
-          onOpenSettings={(section) => {
-            setSettingsSection(section);
-            setOverlay("settings");
-            setProfileGettingToKnowYou(false);
-          }}
-        />
-      </ModalSheet>
 
       {triggeredBlock && (
         <TimeBlockTrigger

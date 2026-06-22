@@ -90,7 +90,7 @@ export function AppSidebar({
 
   return (
     <aside
-      className="companion-app-sidebar relative z-30 sticky top-0 flex h-dvh w-14 shrink-0 flex-col self-start overflow-y-auto border-r border-black/10 text-white backdrop-blur-md md:w-44"
+      className="companion-app-sidebar relative z-[60] sticky top-0 flex h-dvh w-14 shrink-0 flex-col self-start overflow-y-auto border-r border-black/10 text-white backdrop-blur-md md:w-44"
       aria-label="Navigation"
     >
       {/* Brand header — the identity anchor, above all navigation. */}
