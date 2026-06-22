@@ -89,7 +89,7 @@ import {
 import { CreateWorkflowPanel } from "@/components/companion/CreateWorkflowPanel";
 import { CreateDiscoveryWorkspace } from "@/components/companion/CreateDiscoveryWorkspace";
 import { CreateWorkspaceV2Panel } from "@/components/companion/CreateWorkspaceV2Panel";
-import { CreateEcosystemHub } from "@/components/companion/CreateEcosystemHub";
+import { CreateLauncherPanel } from "@/components/companion/CreateLauncherPanel";
 import { CreateDraftResumeList } from "@/components/companion/CreateDraftResumeList";
 import { CreateTypePicker } from "@/components/companion/CreateTypePicker";
 import {
@@ -103,6 +103,7 @@ import { liveCreateWorkflowState } from "@/lib/liveCreateWorkspace";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { isUnresolvedCreateType } from "@/lib/createTypePickers";
+import { resolveCreateLauncherType } from "@/lib/createLauncherTypes";
 import {
   AudienceBadge,
   AudienceSelector,
@@ -128,10 +129,8 @@ import {
   persistGeneratedDraft,
 } from "@/lib/createDraftPersistence";
 import {
-  CREATE_DRAFT_LIBRARY_UPDATED_EVENT,
   deleteCreateDraftEntry,
   duplicateCreateDraftEntry,
-  listCreateDraftEntries,
   renameCreateDraftEntry,
 } from "@/lib/createDraftLibrary";
 import {
@@ -336,10 +335,6 @@ export function ContentGeneratorPanel({
   const workflowRef = useRef(workflow);
   workflowRef.current = workflow;
   const [confirmDeleteDraft, setConfirmDeleteDraft] = useState(false);
-  type CreateLauncherView = "hub" | "new-draft" | "resume";
-  const [createLauncherView, setCreateLauncherView] =
-    useState<CreateLauncherView>("hub");
-  const [resumeDraftCount, setResumeDraftCount] = useState(0);
   const started = useRef(false);
   const lastSeedSig = useRef("");
   // Zero-hop: opened from chat with a clear type → straight to writing, never
@@ -388,16 +383,13 @@ export function ContentGeneratorPanel({
     !resolvedCreateType &&
     workflow.step === "category" &&
     (splitScreenMode || CREATE_WORKSPACE_V2) &&
-    (!workspaceMode || createLauncherView === "new-draft");
+    !workspaceMode;
   const showCreateHub =
     workspaceMode &&
     !showDraftEditor &&
     !resolvedCreateType &&
     workflow.step === "category" &&
-    createLauncherView === "hub" &&
     !isGenerating;
-  const showCreateResume =
-    workspaceMode && createLauncherView === "resume" && Boolean(onOpenCreateDraft);
   const showSplitTypePicker = showCreateTypePicker && splitScreenMode;
   const currentDiscoveryQuestion =
     resolvedCreateType && splitScreenMode
@@ -417,20 +409,6 @@ export function ContentGeneratorPanel({
     return () =>
       window.removeEventListener("content-audience-updated", syncAvatar);
   }, []);
-
-  useEffect(() => {
-    const refresh = () => setResumeDraftCount(listCreateDraftEntries().length);
-    refresh();
-    window.addEventListener(CREATE_DRAFT_LIBRARY_UPDATED_EVENT, refresh);
-    return () =>
-      window.removeEventListener(CREATE_DRAFT_LIBRARY_UPDATED_EVENT, refresh);
-  }, []);
-
-  useEffect(() => {
-    if (!type && !draft.trim() && workflow.step === "category") {
-      setCreateLauncherView("hub");
-    }
-  }, [type, draft, workflow.step]);
 
   useEffect(() => {
     if (workflow.step !== "discovery" || splitScreenMode) return;
@@ -1367,6 +1345,15 @@ export function ContentGeneratorPanel({
     setLocationPanelOpen((o) => !o);
   }
 
+  function handleLauncherCreate(display: string, customLabel?: string) {
+    if (customLabel?.trim()) {
+      pickCreateType(customLabel.trim(), { bypassRoute: true });
+      return;
+    }
+    const { catalogLabel } = resolveCreateLauncherType(display);
+    pickCreateType(catalogLabel, { bypassRoute: true });
+  }
+
   function pickCreateType(
     typeLabel: string,
     opts?: { bypassRoute?: boolean; categoryId?: string | null; skipWorkflow?: boolean },
@@ -1570,7 +1557,6 @@ export function ContentGeneratorPanel({
     setEditingTopic(false);
     setWorkflow(EMPTY_CREATE_WORKFLOW);
     setPhase("building");
-    setCreateLauncherView("hub");
     started.current = false;
     lastSeedSig.current = "";
   }
@@ -1636,34 +1622,13 @@ export function ContentGeneratorPanel({
             : workspacePanelShellClass({ width: "standard", extra: "overflow-y-auto" })
         }`}
       >
-      {!showDraftEditor ? (
+      {!showDraftEditor && !showCreateHub ? (
         <div className="shrink-0 px-4 pt-4 sm:px-6">
           <WorkspaceAreaWorksGuide areaId="content-generator" />
         </div>
       ) : null}
       {showCreateHub ? (
-        <CreateEcosystemHub
-          onNewDraft={() => setCreateLauncherView("new-draft")}
-          onStartFromTemplate={() => onOpenSection?.("templates-library")}
-          onStartFromSnippet={() => onOpenSection?.("snippets")}
-          onAudienceProfile={() => onOpenSection?.("client-avatars")}
-          onResumeDraft={() => setCreateLauncherView("resume")}
-          resumeDraftCount={resumeDraftCount}
-        />
-      ) : null}
-      {(createLauncherView === "new-draft" || createLauncherView === "resume") &&
-      workspaceMode &&
-      !showDraftEditor &&
-      !resolvedCreateType ? (
-        <div className="px-4 pb-2 sm:px-6">
-          <button
-            type="button"
-            onClick={() => setCreateLauncherView("hub")}
-            className="text-sm font-semibold text-[#1e4f4f] hover:underline"
-          >
-            ← Back to Create
-          </button>
-        </div>
+        <CreateLauncherPanel onCreate={handleLauncherCreate} />
       ) : null}
       {showCreateOptions && (
         <div
@@ -1679,7 +1644,7 @@ export function ContentGeneratorPanel({
           />
         </div>
       )}
-      {workspaceMode && !showDraftEditor ? (
+      {workspaceMode && !showDraftEditor && !showCreateHub ? (
         <div className="border-b border-[#e7dfd4] bg-[#faf7f2]/98 px-4 py-2">
           <AudienceSelector
             compact
@@ -1729,12 +1694,10 @@ export function ContentGeneratorPanel({
         </div>
       )}
 
-      {(showCreateResume ||
-        (showCreateTypePicker && onOpenCreateDraft && !workspaceMode)) ? (
+      {showCreateTypePicker && onOpenCreateDraft && !workspaceMode ? (
         <CreateDraftResumeList
           onOpen={(id) => {
-            setCreateLauncherView("hub");
-            onOpenCreateDraft?.(id);
+            onOpenCreateDraft(id);
           }}
           onRename={(id, title) => renameCreateDraftEntry(id, title)}
           onDuplicate={(id) => {
@@ -1748,11 +1711,6 @@ export function ContentGeneratorPanel({
             }
           }}
         />
-      ) : null}
-      {showCreateResume && resumeDraftCount === 0 ? (
-        <p className="px-4 pb-4 text-sm text-[#6b635a] sm:px-6">
-          No drafts in progress. Start a New Draft from Create.
-        </p>
       ) : null}
 
       {showCreateTypePicker && (
