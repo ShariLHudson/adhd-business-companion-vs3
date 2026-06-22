@@ -12,6 +12,7 @@ import {
   isSignalBusDiagnosticsEnabled,
   isUnifiedSignalBusEnabled,
 } from "./featureFlags";
+import { getLastChatBusSummary } from "./ingest";
 
 const MAX_DISCREPANCIES = 200;
 const MAX_PARITY_HISTORY = 100;
@@ -164,6 +165,17 @@ export function compareEmittedParity(
   };
   pushDiscrepancy(discrepancy);
   return { pass: false, discrepancy };
+}
+
+/** Call after chat ingest when diagnostics enabled. */
+export function reportShadowParityAfterChatTurn(): void {
+  if (!isUnifiedSignalBusEnabled() || !isSignalBusDiagnosticsEnabled()) {
+    return;
+  }
+  const summary = getLastChatBusSummary();
+  if (!summary) return;
+  const shadowKeys = summary.emitted.map((s) => `${s.domain}:${s.category}`);
+  compareEmittedParity(summary.legacyKeys, shadowKeys);
 }
 
 /** Dev-only global for founder QA (not exposed in production UI). */

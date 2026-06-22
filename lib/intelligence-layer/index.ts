@@ -49,11 +49,12 @@ export {
   recordBusinessActivitySignal,
   recordEnergySignal,
   recordTrustSignal,
+  getLastChatBusSummary,
 } from "./ingest";
 
 export { resolveSignalTraitMapping, listMappedSignalCategories } from "./signalMapping";
 
-// Sprint 1 PR-A — Unified Signal Bus infrastructure (shadow mode; flags default OFF)
+// Sprint 1 — Unified Signal Bus (shadow mode; flags default OFF)
 export {
   isUnifiedSignalBusEnabled,
   isSignalBusValidationStrict,
@@ -93,9 +94,21 @@ export {
   getShadowBusMetrics,
   compareSignalParity,
   compareEmittedParity,
+  reportShadowParityAfterChatTurn,
   exposeShadowMetricsToWindow,
   resetShadowDiagnosticsForTests,
 } from "./shadowDiagnostics";
+
+export {
+  classifyAndEmitChatSignals,
+  legacyKeysFromClassified,
+} from "./chatSignalAdapter";
+
+export {
+  mirrorIntelligenceSignalToBus,
+  mirrorIntelligenceSignalsToBus,
+  legacyKeyFromIntelligenceSignal,
+} from "./legacySignalMirror";
 
 export { SHADOW_SIGNAL_STORE_KEY, queryShadowSignals } from "./shadowSignalStore";
 

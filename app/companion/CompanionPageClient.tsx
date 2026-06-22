@@ -834,6 +834,8 @@ import {
   observeUserSignalsFromText,
   userIntelligenceEngine,
 } from "@/lib/ecosystem/userIntelligenceEngine";
+import { ingestClassifiedUserSignals } from "@/lib/intelligence-layer";
+import { reportShadowParityAfterChatTurn } from "@/lib/intelligence-layer/shadowDiagnostics";
 import {
   buildActionDashboard,
   executeFounderAction,
@@ -7068,12 +7070,18 @@ export default function CompanionPageClient() {
       });
       window.sessionStorage.setItem("ecosystem-chat-started-v1", "1");
     }
+    const detectedEmotion = detectEmotionalState(trimmed);
     const classifiedSignals = observeUserSignalsFromText({
       text: trimmed,
-      emotionalState: detectEmotionalState(trimmed),
+      emotionalState: detectedEmotion,
       source: "chat",
     });
     void syncClassifiedSignalsToServer(classifiedSignals);
+    ingestClassifiedUserSignals(classifiedSignals, {
+      source: "chat",
+      emotionalState: detectedEmotion,
+    });
+    reportShadowParityAfterChatTurn();
 
     const messageCategory = classifyUserMessage(trimmed, {
       workspaceOpen: workspacePanel,

@@ -1,6 +1,10 @@
 import type { ClassifiedUserSignals } from "@/lib/ecosystem/userIntelligenceEngine";
 import type { EmotionalState } from "@/lib/companionEmotions";
 
+import { mirrorIntelligenceSignalToBus } from "./legacySignalMirror";
+import { classifyAndEmitChatSignals } from "./chatSignalAdapter";
+import type { ChatBusEmitSummary } from "./chatSignalAdapter";
+import { isUnifiedSignalBusEnabled } from "./featureFlags";
 import { applySignalIncrementally } from "./profileEvolution";
 import { appendIntelligenceSignal } from "./signalStore";
 import type {
@@ -8,6 +12,13 @@ import type {
   IntelligenceSignalDomain,
   IntelligenceSignalValence,
 } from "./types";
+
+let lastChatBusSummary: ChatBusEmitSummary | null = null;
+
+/** Diagnostics only — last shadow bus emit from chat ingest. */
+export function getLastChatBusSummary(): ChatBusEmitSummary | null {
+  return lastChatBusSummary;
+}
 
 function struggleToDomain(category: string): IntelligenceSignalDomain {
   if (category === "content_creation" || category === "marketing") return "business";
@@ -79,6 +90,15 @@ export function ingestClassifiedUserSignals(
     }
   }
 
+  lastChatBusSummary = null;
+  if (isUnifiedSignalBusEnabled()) {
+    try {
+      lastChatBusSummary = classifyAndEmitChatSignals(classified, opts);
+    } catch {
+      /* shadow bus must never affect legacy path */
+    }
+  }
+
   return recorded;
 }
 
@@ -143,6 +163,13 @@ export function recordIntelligenceSignal(
 ): IntelligenceSignal {
   const signal = appendIntelligenceSignal(input);
   applySignalIncrementally(signal);
+  if (isUnifiedSignalBusEnabled()) {
+    try {
+      mirrorIntelligenceSignalToBus(signal);
+    } catch {
+      /* shadow bus must never affect legacy path */
+    }
+  }
   return signal;
 }
 
