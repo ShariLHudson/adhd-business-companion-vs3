@@ -7,6 +7,7 @@ import {
   clusterReliefAcknowledgement,
   formatClusterDotWeight,
 } from "@/lib/brainDumpClusterModel";
+import { generateMentalLandscapeInsight } from "@/lib/mentalLandscapeInsight";
 
 const ACK_DISMISS_MS = 5000;
 
@@ -16,6 +17,10 @@ export function ClearMyMindReliefClusters({
   entries: BrainDumpEntry[];
 }) {
   const graph = useMemo(() => buildBrainDumpClusterGraph(entries), [entries]);
+  const insight = useMemo(
+    () => generateMentalLandscapeInsight(graph.clusters, graph.totalThoughts),
+    [graph.clusters, graph.totalThoughts],
+  );
   const [activeClusterId, setActiveClusterId] = useState<string | null>(null);
 
   const toggleCluster = useCallback((clusterId: string) => {
@@ -48,6 +53,14 @@ export function ClearMyMindReliefClusters({
     >
       <p className="text-lg font-semibold leading-snug text-[#1f1c19]">
         Everything is held.
+      </p>
+
+      <p
+        className="mt-2 text-base leading-relaxed text-[#5a5248]"
+        role="note"
+        data-testid="mental-landscape-insight"
+      >
+        {insight}
       </p>
 
       <ul className="mt-4 flex flex-col gap-2.5" role="list">

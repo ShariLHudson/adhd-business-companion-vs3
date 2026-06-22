@@ -165,4 +165,19 @@ describe("Clear My Mind visual clusters", () => {
     expect(clusterReliefAcknowledgement(8)).toContain("8 thoughts");
     expect(clusterReliefAcknowledgement(8)).toContain("safe");
   });
+
+  it("focus suggestion is observational without organizing prompts", () => {
+    const entries = Array.from({ length: 4 }, (_, i) =>
+      entry({
+        id: `m-${i}`,
+        text: `Marketing task ${i}`,
+        category: "Marketing",
+        topic: "Launch",
+      }),
+    );
+    const graph = buildBrainDumpClusterGraph(entries);
+    expect(graph.focusSuggestion).toContain("common theme");
+    expect(graph.focusSuggestion?.toLowerCase()).not.toContain("organiz");
+    expect(graph.focusSuggestion?.toLowerCase()).not.toContain("would you like");
+  });
 });

@@ -223,7 +223,7 @@ function focusSuggestionFromGraph(
   if (subCounts.size === 0) return null;
   const top = [...subCounts.entries()].sort((a, b) => b[1] - a[1])[0];
   if (!top || top[1] < 3) return null;
-  return `Most thoughts today involve **${top[0]}**. Would you like help organizing those?`;
+  return `There appears to be a common theme around **${top[0]}**.`;
 }
 
 export function buildBrainDumpClusterGraph(

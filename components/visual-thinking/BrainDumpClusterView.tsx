@@ -2,7 +2,7 @@
 
 import { useMemo } from "react";
 import type { BrainDumpEntry } from "@/lib/companionStore";
-import { buildBrainDumpClusterGraph } from "@/lib/brainDumpClusterModel";
+import { buildBrainDumpClusterGraph, formatClusterDotWeight } from "@/lib/brainDumpClusterModel";
 import { VISUAL_THINKING_COLORS } from "@/lib/visualThinkingColors";
 import { VisualConnector } from "./VisualCanvasNode";
 
@@ -11,7 +11,6 @@ function ClusterCard({
   icon,
   count,
   tone,
-  overwhelm,
   subClusters,
 }: {
   label: string;
@@ -27,50 +26,36 @@ function ClusterCard({
   }[];
 }) {
   const palette = VISUAL_THINKING_COLORS[tone];
+  const { dots, suffix } = formatClusterDotWeight(count);
   return (
     <div
-      className="companion-fade-in rounded-2xl border-2 p-4 shadow-md"
+      className="rounded-2xl border-2 p-4 shadow-md"
       style={{
         background: palette.bgGradient,
         borderColor: palette.border,
         boxShadow: palette.shadow,
       }}
     >
-      <div className="flex items-center justify-between gap-2">
+      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
         <p className="text-base font-bold sm:text-lg" style={{ color: palette.text }}>
           {icon} {label}
         </p>
         <span
-          className="shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold"
-          style={{ background: `${palette.border}44`, color: palette.text }}
+          className="text-sm tracking-[0.2em]"
+          style={{ color: palette.text }}
+          aria-hidden="true"
         >
-          {overwhelm ? "🔥 " : ""}
-          {count}
+          {dots}
+          {suffix ? (
+            <span className="ml-1.5 tracking-normal opacity-70">{suffix}</span>
+          ) : null}
         </span>
       </div>
-      <div className="mt-3 space-y-2">
-        {subClusters.map((sub) => (
-          <div
-            key={sub.label}
-            className="rounded-xl border border-white/60 bg-white/50 px-3 py-2"
-          >
-            <p className="text-xs font-bold uppercase tracking-wide opacity-70">
-              {sub.label}
-              {sub.overwhelm ? " 🔥" : ""}
-            </p>
-            <ul className="mt-1 space-y-1">
-              {sub.visibleThoughts.map((t, i) => (
-                <li key={i} className="text-sm leading-snug" style={{ color: palette.text }}>
-                  {t.text}
-                </li>
-              ))}
-            </ul>
-            {sub.moreCount > 0 ? (
-              <p className="mt-1 text-xs font-semibold opacity-70">+{sub.moreCount} more</p>
-            ) : null}
-          </div>
-        ))}
-      </div>
+      {subClusters.length > 1 ? (
+        <p className="mt-2 text-xs opacity-70" style={{ color: palette.text }}>
+          {subClusters.length} themes grouped here
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -121,13 +106,13 @@ export function BrainDumpClusterView({
           <p className="mt-1 px-2 text-xs font-bold sm:text-sm" style={{ color: palette.text }}>
             {graph.centerLabel}
           </p>
-          <p className="text-[10px] font-semibold opacity-70" style={{ color: palette.text }}>
-            {graph.totalThoughts} thoughts
+          <p className="text-[10px] font-medium opacity-70" style={{ color: palette.text }}>
+            Safely held
           </p>
         </div>
 
         {graph.focusSuggestion ? (
-          <p className="max-w-sm rounded-2xl border border-[#fcd34d]/50 bg-amber-50/80 px-4 py-3 text-center text-sm text-amber-950">
+          <p className="max-w-sm rounded-2xl border border-[#e7dfd4] bg-[#faf7f2]/90 px-4 py-3 text-center text-sm leading-relaxed text-[#5a5248]">
             {graph.focusSuggestion.replace(/\*\*/g, "")}
           </p>
         ) : null}
