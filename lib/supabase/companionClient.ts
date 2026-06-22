@@ -18,9 +18,10 @@ function companionAuthFetch(
 ): Promise<Response> {
   const url = String(input);
   if (Date.now() < authBackoffUntil && url.includes("/auth/v1/")) {
+    // Return empty 200 during backoff so Supabase does not retry in a tight loop.
     return Promise.resolve(
-      new Response(JSON.stringify({ message: "Auth rate limited — paused" }), {
-        status: 429,
+      new Response(JSON.stringify({}), {
+        status: 200,
         headers: { "Content-Type": "application/json" },
       }),
     );

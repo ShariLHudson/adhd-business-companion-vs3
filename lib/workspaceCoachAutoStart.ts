@@ -21,6 +21,30 @@ import { workspaceTitle } from "./workspaceMode";
 import type { AppSection } from "./companionUi";
 import type { WorkspaceContext, WorkspaceFieldId } from "./workspaceAwareness";
 import { suggestNextWorkspaceField } from "./workspaceAwareness";
+
+/** Self-contained panels — no parallel chat coach message on open. */
+export const WORKSPACE_COACH_SILENT_SECTIONS: ReadonlySet<AppSection> =
+  new Set([
+    "today",
+    "plan-my-day",
+    "focus-timer",
+    "breathe",
+    "focus-audio",
+    "focus",
+    "wins-this-week",
+    "time-block",
+    "brain-dump",
+    "spin-wheel",
+    "activities",
+    "google-workspace",
+    "saved-work",
+    "how-do-i",
+  ]);
+
+export function isWorkspaceCoachSilent(section: AppSection): boolean {
+  return WORKSPACE_COACH_SILENT_SECTIONS.has(section);
+}
+
 export type WorkspaceCoachExtras = {
   creationContext?: CreationWorkspaceContext | null;
   /** Create + chat split builder is driving discovery — no parallel coach opener. */

@@ -1,6 +1,6 @@
 import { ASSETS } from "./companionUi";
 
-const PROBE_CACHE_KEY = "companion-shari-photos-v1";
+const PROBE_CACHE_KEY = "companion-shari-photos-v2";
 
 /** Optional drops in public/images/shari/ — enable rotation when files are added. */
 export const SHARI_OPTIONAL_PHOTOS = Array.from(
@@ -20,6 +20,12 @@ export function pickDailyShariPhoto(): string {
 export function probeAvailableShariPhotos(): Promise<string[]> {
   if (typeof window === "undefined") {
     return Promise.resolve([ASSETS.profile]);
+  }
+
+  try {
+    window.sessionStorage.removeItem("companion-shari-photos-v1");
+  } catch {
+    /* ignore */
   }
 
   try {

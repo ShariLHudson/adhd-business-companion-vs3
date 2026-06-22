@@ -12,7 +12,7 @@ export function CompanionSidebarPortal({ children }: { children: ReactNode }) {
   }, []);
 
   const shell = (
-    <div className="companion-sidebar-portal fixed inset-y-0 left-0 z-[9999] flex">
+    <div className="companion-sidebar-portal pointer-events-auto fixed inset-y-0 left-0 z-[9999] flex">
       {children}
     </div>
   );

@@ -634,6 +634,7 @@ import {
 } from "@/lib/companionFirstWorkflow";
 import {
   buildWorkspaceCoachAutoStart,
+  isWorkspaceCoachSilent,
   workspaceCoachSeedKey,
   type WorkspaceCoachExtras,
 } from "@/lib/workspaceCoachAutoStart";
@@ -1288,6 +1289,7 @@ export default function CompanionPageClient() {
   const workspaceActiveBeside = Boolean(
     workspacePanel || companionStandaloneSection || guideBesideSession,
   );
+  const intelligenceIdle = isIdle && !workspaceActiveBeside;
   const homeCalm =
     activeSection === "home" &&
     isIdle &&
@@ -1435,25 +1437,25 @@ export default function CompanionPageClient() {
   }, []);
 
   useEffect(() => {
-    if (!hydrated || !isIdle || homeCalm) {
+    if (!hydrated || !intelligenceIdle || homeCalm) {
       setRecognitionMoment(null);
       return;
     }
     refreshRecognition();
-  }, [hydrated, isIdle, homeCalm, refreshRecognition]);
+  }, [hydrated, intelligenceIdle, homeCalm, refreshRecognition]);
 
   useEffect(() => {
-    if (!hydrated || !isIdle || homeCalm) return;
+    if (!hydrated || !intelligenceIdle || homeCalm) return;
     const onUpdate = () => {
-      if (hydrated && isIdle && !homeCalm) refreshRecognition();
+      if (hydrated && intelligenceIdle && !homeCalm) refreshRecognition();
     };
     window.addEventListener(RECOGNITION_UPDATED_EVENT, onUpdate);
     return () =>
       window.removeEventListener(RECOGNITION_UPDATED_EVENT, onUpdate);
-  }, [hydrated, isIdle, homeCalm, refreshRecognition]);
+  }, [hydrated, intelligenceIdle, homeCalm, refreshRecognition]);
 
   useEffect(() => {
-    if (!hydrated || !isIdle || homeCalm) {
+    if (!hydrated || !intelligenceIdle || homeCalm) {
       setCognitiveLoad(null);
       setUserHealth(null);
       setRecovery(null);
@@ -1491,10 +1493,10 @@ export default function CompanionPageClient() {
         recognitionRecent: Boolean(recognitionMoment),
       }),
     );
-  }, [hydrated, isIdle, homeCalm, displayEmotion, input, messages, activationOffer?.state, loopOffer?.loopType, recognitionMoment]);
+  }, [hydrated, intelligenceIdle, homeCalm, displayEmotion, input, messages, activationOffer?.state, loopOffer?.loopType, recognitionMoment]);
 
   useEffect(() => {
-    if (!hydrated || !isIdle || homeCalm || splitCreateChat) {
+    if (!hydrated || !intelligenceIdle || homeCalm || splitCreateChat) {
       setLoopOffer(null);
       return;
     }
@@ -1539,7 +1541,7 @@ export default function CompanionPageClient() {
     );
   }, [
     hydrated,
-    isIdle,
+    intelligenceIdle,
     input,
     messages,
     cognitiveLoad?.score.level,
@@ -2768,6 +2770,7 @@ export default function CompanionPageClient() {
           ? guideBesideSession.source.section
           : null);
     if (!section) return;
+    if (isWorkspaceCoachSilent(section)) return;
     if (section === "client-avatars" && avatarCoachActive) {
       return;
     }
@@ -4930,7 +4933,10 @@ export default function CompanionPageClient() {
     revealWorkspace();
     if (isPurityScopedSection(section)) {
       beginWorkspaceChat({ section }, resolveWorkspaceOpener(section));
-    } else if (section !== "client-avatars") {
+    } else if (
+      section !== "client-avatars" &&
+      !isWorkspaceCoachSilent(section)
+    ) {
       window.setTimeout(() => seedWorkspaceCoachAutoStart(true), 120);
     }
   }
@@ -5000,6 +5006,7 @@ export default function CompanionPageClient() {
   ) {
     const section = sectionOverride ?? resolveCoachSection();
     if (!section) return;
+    if (isWorkspaceCoachSilent(section)) return;
     if (section === "content-generator" && splitCreateChat) {
       return;
     }
@@ -11102,6 +11109,9 @@ export default function CompanionPageClient() {
       .find((m) => m.role === "user")
       ?.content?.trim();
     if (!lastUser) {
+      if (workspacePanel || companionStandaloneSection || guideBesideSession) {
+        return true;
+      }
       return (
         shouldSuppressParallelCoaching(createBuilderSession, splitCreateChat) ||
         builderKickoffActive
@@ -11153,6 +11163,8 @@ export default function CompanionPageClient() {
   }, [
     messages,
     workspacePanel,
+    companionStandaloneSection,
+    guideBesideSession,
     chatLayoutMode,
     createBuilderSession,
     splitCreateChat,
