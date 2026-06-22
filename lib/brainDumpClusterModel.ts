@@ -8,6 +8,7 @@ import {
   normalizeCategory,
 } from "./brainDumpCategories";
 import type { BrainDumpEntry } from "./companionStore";
+import { isVisibleInMentalLandscape } from "./thoughtLifecycle";
 import type { VisualThinkingTone } from "./visualThinkingColors";
 import { truncateItem } from "./visualThinkingEngine";
 
@@ -229,7 +230,7 @@ function focusSuggestionFromGraph(
 export function buildBrainDumpClusterGraph(
   entries: BrainDumpEntry[],
 ): BrainDumpClusterGraph {
-  const active = entries.filter((e) => !e.done);
+  const active = entries.filter(isVisibleInMentalLandscape);
   if (!active.length) {
     return {
       centerLabel: "My Thoughts",

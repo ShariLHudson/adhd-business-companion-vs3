@@ -23,6 +23,7 @@ import {
   normalizeCategory,
   sortedBrainDumpCategoryGroups,
 } from "@/lib/brainDumpCategories";
+import { isVisibleInMentalLandscape } from "@/lib/thoughtLifecycle";
 import { sortByDropdownLabel, sortDropdownLabels } from "@/lib/dropdownSort";
 import type { AppSection } from "@/lib/companionUi";
 import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
@@ -166,7 +167,7 @@ export function BrainDumpPanel({
   const projectName = (id?: string) =>
     id ? projects.find((p) => p.id === id)?.name : undefined;
 
-  const activeEntries = entries.filter((e) => !e.done);
+  const activeEntries = entries.filter(isVisibleInMentalLandscape);
   const visualEntries =
     panelMode === "session" ? sessionVisualEntries : activeEntries;
   const inTime = (iso: string) => {
@@ -302,7 +303,7 @@ export function BrainDumpPanel({
         </div>
       ) : null}
 
-      {panelMode === "library" && entries.some((e) => !e.done) && (
+      {panelMode === "library" && entries.some(isVisibleInMentalLandscape) && (
         <>
           {/* Filing-cabinet overview — clickable counts set the category. */}
           <p className="mt-7 text-sm font-bold uppercase tracking-wide text-[#7c7468]">
@@ -651,7 +652,7 @@ export function BrainDumpPanel({
         </>
       )}
 
-      {panelMode === "library" && !entries.some((e) => !e.done) && (
+      {panelMode === "library" && !entries.some(isVisibleInMentalLandscape) && (
         <p className="mt-6 text-base text-[#6b635a]">
           No saved items yet — switch to <strong>Capture</strong> and tell me
           the first thing on your mind.

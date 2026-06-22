@@ -22,6 +22,10 @@ import {
   type RouteTrustResult,
 } from "@/lib/brainDumpRouting";
 import { normalizeCategory } from "@/lib/brainDumpCategories";
+import {
+  isHeldThought,
+  isVisibleInMentalLandscape,
+} from "@/lib/thoughtLifecycle";
 import type { AppSection } from "@/lib/companionUi";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import { ClearMyMindReliefClusters } from "@/components/companion/ClearMyMindReliefClusters";
@@ -77,7 +81,7 @@ export function ClearMyMindSession({
   const refresh = useCallback(() => {
     setEntries(
       getBrainDumps().filter(
-        (e) => e.captureSessionId === sessionId && !e.done,
+        (e) => e.captureSessionId === sessionId && isVisibleInMentalLandscape(e),
       ),
     );
   }, [sessionId]);
@@ -104,7 +108,7 @@ export function ClearMyMindSession({
   }, [input]);
 
   const unsortedItems = useMemo(
-    () => sessionItems.filter((e) => !e.sorted && !e.routedAction),
+    () => sessionItems.filter(isHeldThought),
     [sessionItems],
   );
 
@@ -138,7 +142,7 @@ export function ClearMyMindSession({
     const all = addBrainDumps(parts, { captureSessionId: sessionId });
     const createdItems = all.slice(0, parts.length);
     const sessionSaved = all.filter(
-      (e) => e.captureSessionId === sessionId && !e.done,
+      (e) => e.captureSessionId === sessionId && isVisibleInMentalLandscape(e),
     );
 
     if (sessionSaved.length > 1) {
@@ -224,10 +228,7 @@ export function ClearMyMindSession({
       refresh();
       const remaining = getBrainDumps().filter(
         (e) =>
-          e.captureSessionId === sessionId &&
-          !e.done &&
-          !e.sorted &&
-          !e.routedAction,
+          e.captureSessionId === sessionId && isHeldThought(e),
       );
       if (remaining.length === 0) {
         setPhase("complete");

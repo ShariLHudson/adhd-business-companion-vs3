@@ -8,6 +8,7 @@ import {
   updateBrainDump,
   type BrainDumpEntry,
 } from "@/lib/companionStore";
+import { isVisibleInMentalLandscape } from "@/lib/thoughtLifecycle";
 import { momentumBoostItems } from "@/lib/momentumBoosts";
 import { isPhysicalActionText } from "@/lib/doItNowActions";
 import { playChime, playSpin, unlockChime } from "@/lib/chime";
@@ -85,7 +86,7 @@ export function SpinWheelPanel({
   const [showPicker, setShowPicker] = useState(false);
 
   useEffect(() => {
-    const bd = getBrainDumps().filter((e) => !e.done);
+    const bd = getBrainDumps().filter(isVisibleInMentalLandscape);
     const thisWeek = bd.filter(
       (e) => e.schedulingIntent === "today" || e.schedulingIntent === "week",
     );

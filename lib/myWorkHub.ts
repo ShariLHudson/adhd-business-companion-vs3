@@ -11,6 +11,11 @@ import {
   type ContinuityManifestItem,
 } from "./continuityManifest";
 import { getAvatars, getBrainDumps, getProjects, getProjectItems, getSnippets, getTemplates, type IdealClientAvatar, type Project } from "./companionStore";
+import {
+  isHeldThought,
+  isSortedIdleThought,
+  isVisibleInMentalLandscape,
+} from "./thoughtLifecycle";
 import { loadDecisionCompassSession } from "./decisionCompassSessionStore";
 import { buildWeeklyWins } from "./weeklyWins";
 import { loadStrategyApplySession } from "./strategyApplySessionStore";
@@ -395,12 +400,10 @@ function buildRecentGroups(items: MyWorkHubItem[]): MyWorkHubRecentGroup[] {
 }
 
 function buildIdeasSummary(): MyWorkHubIdeasSummary {
-  const dumps = getBrainDumps().filter((e) => !e.done);
-  const unsorted = dumps.filter((e) => !e.sorted && !e.routedAction).length;
+  const dumps = getBrainDumps().filter(isVisibleInMentalLandscape);
+  const unsorted = dumps.filter(isHeldThought).length;
   const linkedToProjects = dumps.filter((e) => Boolean(e.projectId)).length;
-  const needingReview = dumps.filter(
-    (e) => e.sorted && !e.routedAction,
-  ).length;
+  const needingReview = dumps.filter(isSortedIdleThought).length;
   return {
     unsorted,
     linkedToProjects,

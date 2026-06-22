@@ -9,6 +9,7 @@ import {
   getTimeBlocks,
   todayStr,
 } from "@/lib/companionStore";
+import { isVisibleInMentalLandscape } from "@/lib/thoughtLifecycle";
 import { userIntelligenceEngine } from "@/lib/ecosystem/userIntelligenceEngine";
 import { collectLoadContributors } from "./loadFactors";
 import {
@@ -46,7 +47,7 @@ export function gatherCognitiveLoadInput(
 
   const openBrainDumpCount =
     partial.openBrainDumpCount ??
-    brainDumps.filter((e) => !e.done).length;
+    brainDumps.filter(isVisibleInMentalLandscape).length;
   const projectsMissingNextAction =
     partial.projectsMissingNextAction ??
     projects.filter(
