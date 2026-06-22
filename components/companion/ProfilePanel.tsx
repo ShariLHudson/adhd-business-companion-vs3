@@ -9,6 +9,10 @@ import { GettingToKnowYouPanel } from "@/components/companion/GettingToKnowYouPa
 import { ActiveCompanionsPicker } from "@/components/companion/ActiveCompanionsPicker";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
+function settingsHref(section: ProfileSettingsSection): string {
+  return `/companion?overlay=settings&settings=${encodeURIComponent(section)}`;
+}
+
 const SUPPORT_EMAIL = "info@visualsparkstudios.com";
 const SUPPORT_PHONE_DISPLAY = "515-954-9177";
 const SUPPORT_PHONE_TEL = "+15159549177";
@@ -251,30 +255,52 @@ export function ProfilePanel({
         Preferences
       </p>
       <div className="mt-2 flex flex-col gap-2">
-        {PREF_LINKS.map((link) => (
-          <button
-            key={link.label}
-            type="button"
-            onClick={() => {
-              if ("action" in link && link.action === "getting-to-know-you") {
-                setShowGettingToKnowYou(true);
-                return;
-              }
-              if ("settings" in link) onOpenSettings?.(link.settings);
-            }}
-            className={linkBtn}
-          >
-            <span aria-hidden="true" className="text-xl">
-              {link.emoji}
-            </span>
-            <span>
-              <span className="block text-base font-semibold text-[#1f1c19]">
-                {link.label}
-              </span>
-              <span className="block text-sm text-[#6b635a]">{link.blurb}</span>
-            </span>
-          </button>
-        ))}
+        {PREF_LINKS.map((link) => {
+          if ("action" in link && link.action === "getting-to-know-you") {
+            return (
+              <button
+                key={link.label}
+                type="button"
+                onClick={() => setShowGettingToKnowYou(true)}
+                className={linkBtn}
+              >
+                <span aria-hidden="true" className="text-xl">
+                  {link.emoji}
+                </span>
+                <span>
+                  <span className="block text-base font-semibold text-[#1f1c19]">
+                    {link.label}
+                  </span>
+                  <span className="block text-sm text-[#6b635a]">{link.blurb}</span>
+                </span>
+              </button>
+            );
+          }
+          if ("settings" in link) {
+            return (
+              <a
+                key={link.label}
+                href={settingsHref(link.settings)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  onOpenSettings?.(link.settings);
+                }}
+                className={linkBtn}
+              >
+                <span aria-hidden="true" className="text-xl">
+                  {link.emoji}
+                </span>
+                <span>
+                  <span className="block text-base font-semibold text-[#1f1c19]">
+                    {link.label}
+                  </span>
+                  <span className="block text-sm text-[#6b635a]">{link.blurb}</span>
+                </span>
+              </a>
+            );
+          }
+          return null;
+        })}
         <button
           type="button"
           onClick={() => onOpen?.("how-do-i")}

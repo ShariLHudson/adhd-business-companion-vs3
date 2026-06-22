@@ -4,6 +4,8 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import { useRouter } from "next/navigation";
 import { BackButton } from "@/components/companion/BackButton";
 import { AppSidebar } from "@/components/companion/AppSidebar";
+import { CompanionSidebarPortal } from "@/components/companion/CompanionSidebarPortal";
+import { CompanionUrlNavigation } from "@/components/companion/CompanionUrlNavigation";
 import { AdjustMyDayPanel } from "@/components/companion/AdjustMyDayPanel";
 import { BrainDumpPanel } from "@/components/companion/BrainDumpPanel";
 import { DecisionCompassWorkspace } from "@/components/companion/DecisionCompassWorkspace";
@@ -11296,19 +11298,27 @@ export default function CompanionPageClient() {
       data-adaptive-context={clientMounted ? adaptiveVisualContext : "support"}
       suppressHydrationWarning
     >
+      <CompanionUrlNavigation
+        onNav={handleNavSelect}
+        onOverlay={(overlay) => setOverlay(overlay)}
+        onSettingsSection={(section) => {
+          setSettingsSection(section);
+          setOverlay("settings");
+        }}
+      />
       <Suspense fallback={null}>
         <CompanionSignInFromQuery onOpen={openSignIn} />
       </Suspense>
       <CompanionBackground page={scenePage} seed={sceneSeed} />
 
-      <div className="relative z-10 flex h-full min-h-0 w-full overflow-hidden">
-        <div className="relative isolate z-[100] shrink-0 self-start">
+      <div className="relative z-10 flex h-full min-h-0 w-full overflow-hidden pl-14 md:pl-44">
+        <CompanionSidebarPortal>
           <AppSidebar
             activeNav={activeNav}
             activeSection={activeSection}
             onNavSelect={handleNavSelect}
           />
-        </div>
+        </CompanionSidebarPortal>
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <TopBar

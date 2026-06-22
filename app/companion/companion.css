@@ -466,7 +466,9 @@
 
 .companion-app-sidebar button,
 .companion-app-sidebar a,
-.companion-top-bar button {
+.companion-top-bar button,
+.companion-top-bar a,
+.companion-sidebar-portal {
   pointer-events: auto;
   touch-action: manipulation;
 }

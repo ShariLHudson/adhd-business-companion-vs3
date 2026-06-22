@@ -11,6 +11,7 @@ import {
   type SidebarNavId,
 } from "@/lib/companionUi";
 import { findLatestHomeResumeItem } from "@/lib/homeResumeItem";
+import { companionNavHref } from "@/lib/companionNavUrl";
 import type { CoachingMode } from "@/lib/companionPrompt";
 
 type AppSidebarProps = {
@@ -52,15 +53,22 @@ export function AppSidebar({
         (activeSection === "home" && activeNav === item.id)
       : activeNav === item.id && activeSection === "home";
     const showDot = item.id === "chat" && hasContinue && !active;
+    const href = companionNavHref(item.id, item.mode);
     return (
-      <button
+      <a
         key={item.id}
-        type="button"
-        onClick={() => onNavSelect(item.id, item.mode)}
+        href={href}
+        data-nav-id={item.id}
+        {...(item.mode ? { "data-nav-mode": item.mode } : {})}
+        onClick={(e) => {
+          e.preventDefault();
+          onNavSelect(item.id, item.mode);
+        }}
         title={item.label}
         aria-label={
           showDot ? `${item.label} — you have something to continue` : item.label
         }
+        aria-current={active ? "page" : undefined}
         className={`flex w-full items-center justify-start gap-2 rounded-lg px-2 py-2.5 text-left leading-tight transition-colors md:px-3 ${
           active
             ? "companion-nav-active shadow-sm"
@@ -84,13 +92,13 @@ export function AppSidebar({
             </span>
           )}
         </span>
-      </button>
+      </a>
     );
   }
 
   return (
     <aside
-      className="companion-app-sidebar relative z-[100] sticky top-0 flex h-dvh w-14 shrink-0 flex-col self-start overflow-y-auto border-r border-black/10 text-white backdrop-blur-md md:w-44"
+      className="companion-app-sidebar relative flex h-dvh w-14 shrink-0 flex-col overflow-y-auto border-r border-black/10 text-white backdrop-blur-md md:w-44"
       aria-label="Navigation"
     >
       {/* Brand header — the identity anchor, above all navigation. */}

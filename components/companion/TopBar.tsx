@@ -10,6 +10,7 @@ import {
   BEGIN_NEW_DAY_COPY,
   CLEAR_TODAY_CONTEXT_COPY,
 } from "@/lib/freshStartCopy";
+import { companionOverlayHref } from "@/lib/companionNavUrl";
 
 type TopBarProps = {
   showPlanMyDay?: boolean;
@@ -45,21 +46,18 @@ function HeaderActionButton({
   emoji,
   label,
   onClick,
+  href,
   badge,
 }: {
   emoji: string;
   label: string;
   onClick: () => void;
+  href?: string;
   badge?: number;
 }) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={BTN}
-      title={label}
-      aria-label={badge ? `${label}, ${badge} active items` : label}
-    >
+  const className = BTN;
+  const content = (
+    <>
       <span aria-hidden="true">{emoji}</span>
       <span className="hidden sm:inline">{label}</span>
       {badge != null && badge > 0 ? (
@@ -67,6 +65,35 @@ function HeaderActionButton({
           {badge}
         </span>
       ) : null}
+    </>
+  );
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        onClick={(e) => {
+          e.preventDefault();
+          onClick();
+        }}
+        className={className}
+        title={label}
+        aria-label={badge ? `${label}, ${badge} active items` : label}
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={className}
+      title={label}
+      aria-label={badge ? `${label}, ${badge} active items` : label}
+    >
+      {content}
     </button>
   );
 }
@@ -126,12 +153,14 @@ export function TopBar({
       <HeaderActionButton
         emoji="🧍"
         label="Profile"
+        href={companionOverlayHref("profile")}
         onClick={() => runHeaderAction(onOpenProfile)}
       />
 
       <HeaderActionButton
         emoji="⚙️"
         label="Settings"
+        href={companionOverlayHref("settings")}
         onClick={() => runHeaderAction(() => onOpenSettings(null))}
       />
 
