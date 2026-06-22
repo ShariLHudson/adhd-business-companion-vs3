@@ -103,7 +103,6 @@ export function WorkspaceLayout({
     if (!el) return;
     requestAnimationFrame(() => {
       el.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      el.focus({ preventScroll: false });
     });
   }, [workspaceActive, revealKey]);
 
@@ -169,7 +168,7 @@ export function WorkspaceLayout({
           workspaceFirst ? "md:flex-row-reverse" : ""
         }`}
       >
-        {/* Chat pane — kept mounted when hidden so state is preserved */}
+        {/* Chat pane — unmount when workspace-focus so the hidden chat tree cannot freeze the UI */}
         <div
           className={`${SPLIT_CHAT_PANE_CLASS} h-full min-h-0 flex-col overflow-hidden border-[#1e4f4f]/10 md:max-h-full md:border-r ${
             chatHidden
@@ -179,7 +178,7 @@ export function WorkspaceLayout({
                 : "hidden md:flex"
           }`}
         >
-          {chat}
+          {!chatHidden ? chat : null}
         </div>
 
         {/* Workspace pane — sticky on desktop so Create stays visible while chat scrolls */}

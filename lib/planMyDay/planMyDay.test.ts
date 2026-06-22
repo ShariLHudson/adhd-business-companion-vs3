@@ -8,6 +8,7 @@ import {
   countActivePlanItems,
   isPlanItemActive,
   loadTodayPlanItems,
+  readTodayPlanItems,
   movePlanItemKanban,
   currentFocusItem,
 } from "./planDayItems";
@@ -86,6 +87,18 @@ describe("planMyDay capacity views", () => {
 });
 
 describe("planMyDay quick access", () => {
+  it("readTodayPlanItems never writes or dispatches", () => {
+    const dispatch = vi.fn();
+    vi.stubGlobal("window", { dispatchEvent: dispatch });
+    const today = todayStr();
+    lsStore[PLAN_STORE_KEY] = JSON.stringify({ date: today, items: [] });
+
+    readTodayPlanItems();
+    readTodayPlanItems();
+
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+
   it("does not dispatch update storms when today plan is empty", () => {
     const dispatch = vi.fn();
     vi.stubGlobal("window", { dispatchEvent: dispatch });

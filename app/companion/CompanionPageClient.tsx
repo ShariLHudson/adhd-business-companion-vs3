@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { BackButton } from "@/components/companion/BackButton";
 import { AppSidebar } from "@/components/companion/AppSidebar";
@@ -33,7 +34,20 @@ import { IdentityBar } from "@/components/companion/IdentityBar";
 import { SimpleHomeWelcome } from "@/components/companion/SimpleHomeWelcome";
 import { StressReliefOptionsCard } from "@/components/companion/StressReliefOptionsCard";
 import { TodayPanel } from "@/components/companion/TodayPanel";
-import { PlanMyDayPanel } from "@/components/companion/PlanMyDayPanel";
+const PlanMyDayPanel = dynamic(
+  () =>
+    import("@/components/companion/PlanMyDayPanel").then((mod) => ({
+      default: mod.PlanMyDayPanel,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex min-h-[12rem] items-center justify-center p-6 text-sm text-[#6b635a]">
+        Loading Plan My Day…
+      </div>
+    ),
+  },
+);
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { WinsThisWeekPanel } from "@/components/companion/WinsThisWeekPanel";
 import { EvidenceBankPanel } from "@/components/companion/EvidenceBankPanel";
@@ -2840,9 +2854,9 @@ export default function CompanionPageClient() {
   ]);
 
   useEffect(() => {
-    if (activeSection === "home") {
-      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-    }
+    if (activeSection !== "home") return;
+    if (workspacePanel && chatLayoutMode === "workspace-focus") return;
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [
     messages,
     isLoading,
@@ -2851,6 +2865,7 @@ export default function CompanionPageClient() {
     actionBridge,
     workspaceOffer,
     workspacePanel,
+    chatLayoutMode,
   ]);
 
   function appendRecoveryMessage(content: string) {

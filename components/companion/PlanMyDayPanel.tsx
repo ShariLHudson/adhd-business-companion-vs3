@@ -10,6 +10,7 @@ import {
   formatPlanTime,
   isPlanItemActive,
   loadTodayPlanItems,
+  readTodayPlanItems,
   movePlanItemKanban,
   nextFocusOptions,
   planItemMetaLabel,
@@ -385,7 +386,7 @@ export function PlanMyDayPanel({
 
   useEffect(() => {
     setItems(loadTodayPlanItems());
-    const sync = () => setItems(loadTodayPlanItems());
+    const sync = () => setItems(readTodayPlanItems());
     window.addEventListener(PLAN_MY_DAY_UPDATED, sync);
     return () => window.removeEventListener(PLAN_MY_DAY_UPDATED, sync);
   }, []);

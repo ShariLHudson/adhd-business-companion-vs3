@@ -10,6 +10,7 @@ import {
   currentFocusItem,
   isPlanItemActive,
   loadTodayPlanItems,
+  readTodayPlanItems,
   PLAN_MY_DAY_UPDATED,
   planItemMetaLabel,
   planItemStyle,
@@ -37,7 +38,7 @@ export function PlanMyDayQuickDrawer({ open, onClose, onOpenFull }: Props) {
   }, [open]);
 
   useEffect(() => {
-    const sync = () => setItems(loadTodayPlanItems());
+    const sync = () => setItems(readTodayPlanItems());
     window.addEventListener(PLAN_MY_DAY_UPDATED, sync);
     return () => window.removeEventListener(PLAN_MY_DAY_UPDATED, sync);
   }, []);

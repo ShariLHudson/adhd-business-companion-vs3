@@ -13,9 +13,16 @@ const DEFERRED_STORE_KEY = "companion-plan-my-day-deferred-v1";
 
 export const PLAN_MY_DAY_UPDATED = "companion-plan-my-day-updated";
 
+let planUpdateNotifyQueued = false;
+
 function notifyPlanUpdated(): void {
   if (typeof window === "undefined") return;
-  window.dispatchEvent(new Event(PLAN_MY_DAY_UPDATED));
+  if (planUpdateNotifyQueued) return;
+  planUpdateNotifyQueued = true;
+  queueMicrotask(() => {
+    planUpdateNotifyQueued = false;
+    window.dispatchEvent(new Event(PLAN_MY_DAY_UPDATED));
+  });
 }
 
 type StoredDay = {
@@ -237,6 +244,16 @@ export function loadTodayPlanItems(): PlanDayItem[] {
   }
 
   return items;
+}
+
+/** Read today's plan from storage only — no seeding, writes, or events. */
+export function readTodayPlanItems(): PlanDayItem[] {
+  const today = todayStr();
+  const stored = readStored();
+  if (stored?.date === today) {
+    return stored.items;
+  }
+  return [];
 }
 
 /** Archive the current plan snapshot and clear today's planning view for a new-day reset. */
@@ -512,7 +529,7 @@ export type QuickPlanItemInput = {
 };
 
 export function countActivePlanItems(): number {
-  return loadTodayPlanItems().filter(isPlanItemActive).length;
+  return readTodayPlanItems().filter(isPlanItemActive).length;
 }
 
 export function addQuickPlanItem(
