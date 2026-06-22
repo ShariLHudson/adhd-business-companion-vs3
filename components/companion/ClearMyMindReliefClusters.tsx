@@ -1,15 +1,26 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { BrainDumpEntry } from "@/lib/companionStore";
 import {
   buildBrainDumpClusterGraph,
+  clusterOffersThoughtPreview,
   clusterReliefAcknowledgement,
+  clusterThoughtExpansionFallback,
   formatClusterDotWeight,
+  getClusterVisibleThoughts,
 } from "@/lib/brainDumpClusterModel";
 import { generateMentalLandscapeInsight } from "@/lib/mentalLandscapeInsight";
+import {
+  INITIAL_RELIEF_CLUSTER_EXPANSION,
+  reliefClusterHideThoughts,
+  reliefClusterShowThoughts,
+  reliefClusterTap,
+  type ReliefClusterExpansionState,
+} from "@/lib/reliefClusterExpansion";
 
-const ACK_DISMISS_MS = 5000;
+const toggleLinkClass =
+  "mt-2 text-sm font-semibold text-[#1e4f4f] underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/35";
 
 export function ClearMyMindReliefClusters({
   entries,
@@ -21,20 +32,21 @@ export function ClearMyMindReliefClusters({
     () => generateMentalLandscapeInsight(graph.clusters, graph.totalThoughts),
     [graph.clusters, graph.totalThoughts],
   );
-  const [activeClusterId, setActiveClusterId] = useState<string | null>(null);
+  const [expansion, setExpansion] = useState<ReliefClusterExpansionState>(
+    INITIAL_RELIEF_CLUSTER_EXPANSION,
+  );
 
-  const toggleCluster = useCallback((clusterId: string) => {
-    setActiveClusterId((prev) => (prev === clusterId ? null : clusterId));
+  const handleClusterTap = useCallback((clusterId: string) => {
+    setExpansion((prev) => reliefClusterTap(prev, clusterId));
   }, []);
 
-  useEffect(() => {
-    if (!activeClusterId) return;
-    const timer = window.setTimeout(
-      () => setActiveClusterId(null),
-      ACK_DISMISS_MS,
-    );
-    return () => window.clearTimeout(timer);
-  }, [activeClusterId]);
+  const handleShowThoughts = useCallback((clusterId: string) => {
+    setExpansion((prev) => reliefClusterShowThoughts(prev, clusterId));
+  }, []);
+
+  const handleHideThoughts = useCallback(() => {
+    setExpansion((prev) => reliefClusterHideThoughts(prev));
+  }, []);
 
   if (!graph.hasContent) {
     return (
@@ -66,50 +78,105 @@ export function ClearMyMindReliefClusters({
       <ul className="mt-4 flex flex-col gap-2.5" role="list">
         {graph.clusters.map((cluster) => {
           const { dots, suffix } = formatClusterDotWeight(cluster.count);
-          const isActive = activeClusterId === cluster.id;
+          const isActive = expansion.activeClusterId === cluster.id;
+          const thoughtsVisible =
+            expansion.thoughtsVisibleClusterId === cluster.id;
           const thoughtLabel =
             cluster.count === 1 ? "1 thought" : `${cluster.count} thoughts`;
+          const visibleThoughts = getClusterVisibleThoughts(cluster);
+          const fallback = clusterThoughtExpansionFallback(cluster);
+          const canPreview = clusterOffersThoughtPreview(cluster);
 
           return (
             <li key={cluster.id}>
-              <button
-                type="button"
-                onClick={() => toggleCluster(cluster.id)}
-                aria-expanded={isActive}
-                aria-label={`${cluster.label}, ${thoughtLabel}`}
-                className={`w-full rounded-xl border-2 px-4 py-3 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/35 ${
+              <div
+                className={`rounded-xl border-2 transition-colors ${
                   isActive
                     ? "border-[#1e4f4f]/35 bg-white shadow-sm"
-                    : "border-transparent bg-white/75 hover:bg-white"
+                    : "border-transparent bg-white/75"
                 }`}
               >
-                <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                  <span className="text-base font-semibold text-[#1f1c19]">
-                    <span aria-hidden="true">{cluster.icon} </span>
-                    {cluster.label}
-                  </span>
-                  <span
-                    className="text-sm tracking-[0.2em] text-[#7c7468]"
-                    aria-hidden="true"
-                  >
-                    {dots}
-                    {suffix ? (
-                      <span className="ml-1.5 tracking-normal text-[#9a8f82]">
-                        {suffix}
-                      </span>
-                    ) : null}
-                  </span>
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleClusterTap(cluster.id)}
+                  aria-expanded={isActive}
+                  aria-label={`${cluster.label}, ${thoughtLabel}`}
+                  className="w-full rounded-xl px-4 py-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/35"
+                >
+                  <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                    <span className="text-base font-semibold text-[#1f1c19]">
+                      <span aria-hidden="true">{cluster.icon} </span>
+                      {cluster.label}
+                    </span>
+                    <span
+                      className="text-sm tracking-[0.2em] text-[#7c7468]"
+                      aria-hidden="true"
+                    >
+                      {dots}
+                      {suffix ? (
+                        <span className="ml-1.5 tracking-normal text-[#9a8f82]">
+                          {suffix}
+                        </span>
+                      ) : null}
+                    </span>
+                  </div>
+                </button>
+
                 {isActive ? (
-                  <p
-                    className="companion-fade-in mt-2 text-sm leading-relaxed text-[#1e4f4f]"
-                    role="status"
-                    aria-live="polite"
+                  <div
+                    className="companion-fade-in px-4 pb-3"
+                    data-testid={`cluster-expansion-${cluster.id}`}
                   >
-                    {clusterReliefAcknowledgement(cluster.count)}
-                  </p>
+                    <p
+                      className="text-sm leading-relaxed text-[#1e4f4f]"
+                      role="status"
+                      aria-live="polite"
+                      data-testid="cluster-relief-acknowledgement"
+                    >
+                      {clusterReliefAcknowledgement(cluster.count)}
+                    </p>
+
+                    {thoughtsVisible ? (
+                      <>
+                        {fallback ? (
+                          <p
+                            className="mt-2 text-sm leading-relaxed text-[#5a5248]"
+                            data-testid="cluster-thought-fallback"
+                          >
+                            {fallback}
+                          </p>
+                        ) : (
+                          <ul
+                            className="mt-2 list-none space-y-1.5 pl-0 text-sm leading-relaxed text-[#2d2926]"
+                            data-testid="cluster-thought-list"
+                          >
+                            {visibleThoughts.map((thought) => (
+                              <li key={thought.id}>{thought.text}</li>
+                            ))}
+                          </ul>
+                        )}
+                        <button
+                          type="button"
+                          onClick={handleHideThoughts}
+                          className={toggleLinkClass}
+                          data-testid="hide-cluster-thoughts"
+                        >
+                          Hide thoughts
+                        </button>
+                      </>
+                    ) : canPreview ? (
+                      <button
+                        type="button"
+                        onClick={() => handleShowThoughts(cluster.id)}
+                        className={toggleLinkClass}
+                        data-testid="view-cluster-thoughts"
+                      >
+                        View thoughts
+                      </button>
+                    ) : null}
+                  </div>
                 ) : null}
-              </button>
+              </div>
             </li>
           );
         })}

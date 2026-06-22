@@ -1,9 +1,13 @@
 import { describe, expect, it, beforeEach, vi } from "vitest";
 import {
   buildBrainDumpClusterGraph,
+  clusterOffersThoughtPreview,
   clusterReliefAcknowledgement,
+  clusterThoughtExpansionFallback,
   formatClusterDotWeight,
+  getClusterVisibleThoughts,
   MAX_MAJOR_CLUSTERS,
+  MORE_CLUSTER_FALLBACK,
   toneForEntry,
 } from "./brainDumpClusterModel";
 import {
@@ -179,5 +183,48 @@ describe("Clear My Mind visual clusters", () => {
     expect(graph.focusSuggestion).toContain("common theme");
     expect(graph.focusSuggestion?.toLowerCase()).not.toContain("organiz");
     expect(graph.focusSuggestion?.toLowerCase()).not.toContain("would you like");
+  });
+
+  it("exposes visible thoughts for cluster expansion", () => {
+    const graph = buildBrainDumpClusterGraph([
+      entry({
+        id: "1",
+        text: "Call doctor",
+        category: "Health",
+        topic: "Health",
+      }),
+      entry({
+        id: "2",
+        text: "Schedule ultrasound",
+        category: "Health",
+        topic: "Health",
+      }),
+    ]);
+    const health = graph.clusters.find((c) => c.label === "Health");
+    expect(health).toBeDefined();
+    const thoughts = getClusterVisibleThoughts(health!);
+    expect(thoughts.map((t) => t.text)).toEqual(
+      expect.arrayContaining(["Call doctor", "Schedule ultrasound"]),
+    );
+    expect(clusterOffersThoughtPreview(health!)).toBe(true);
+    expect(clusterThoughtExpansionFallback(health!)).toBeNull();
+  });
+
+  it("__more__ cluster offers calm fallback without visible thoughts", () => {
+    const topics = ["Alpha", "Beta", "Gamma", "Delta", "Epsilon", "Zeta"];
+    const entries = topics.map((topic, i) =>
+      entry({
+        id: `c-${i}`,
+        text: `Thought about ${topic}`,
+        category: "Sales",
+        topic,
+      }),
+    );
+    const graph = buildBrainDumpClusterGraph(entries);
+    const more = graph.clusters.find((c) => c.id === "__more__");
+    expect(more).toBeDefined();
+    expect(getClusterVisibleThoughts(more!)).toEqual([]);
+    expect(clusterThoughtExpansionFallback(more!)).toBe(MORE_CLUSTER_FALLBACK);
+    expect(clusterOffersThoughtPreview(more!)).toBe(true);
   });
 });

@@ -36,6 +36,32 @@ export function clusterReliefAcknowledgement(count: number): string {
   return "I've got these thoughts here. They're safe.";
 }
 
+export const MORE_CLUSTER_FALLBACK =
+  "More thoughts are safely held here.";
+
+/** Flatten visible thought previews for a major cluster (max per sub-cluster). */
+export function getClusterVisibleThoughts(
+  cluster: ThoughtCluster,
+): ThoughtItem[] {
+  return cluster.subClusters.flatMap((sub) => sub.visibleThoughts);
+}
+
+/** Calm copy when a cluster has no thought list to reveal. */
+export function clusterThoughtExpansionFallback(
+  cluster: ThoughtCluster,
+): string | null {
+  if (cluster.id === "__more__") return MORE_CLUSTER_FALLBACK;
+  if (getClusterVisibleThoughts(cluster).length === 0) {
+    return MORE_CLUSTER_FALLBACK;
+  }
+  return null;
+}
+
+export function clusterOffersThoughtPreview(cluster: ThoughtCluster): boolean {
+  if (cluster.id === "__more__") return true;
+  return getClusterVisibleThoughts(cluster).length > 0;
+}
+
 export type ThoughtItem = {
   id: string;
   text: string;
