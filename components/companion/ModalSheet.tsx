@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useState, type ReactNode } from "react";
 
 // A light, ADHD-friendly modal sheet that slides in from the right. It never
 // feels like leaving the app: the background stays partly visible and dimmed.
@@ -17,17 +17,15 @@ export function ModalSheet({
   title?: string;
   children: ReactNode;
 }) {
-  const [shown, setShown] = useState(open);
+  const [entered, setEntered] = useState(open);
 
-  // Trigger the slide-in each time it opens.
-  useEffect(() => {
+  // Slide-in runs after paint; panel stays interactive immediately on open.
+  useLayoutEffect(() => {
     if (!open) {
-      setShown(false);
+      setEntered(false);
       return;
     }
-    setShown(false);
-    const id = requestAnimationFrame(() => setShown(true));
-    return () => cancelAnimationFrame(id);
+    setEntered(true);
   }, [open]);
 
   // ESC closes.
@@ -43,27 +41,23 @@ export function ModalSheet({
   if (!open) return null;
 
   // Absolute (not fixed) so the sheet only covers the main pane — sidebar stays
-  // clickable. Backdrop mounts only after shown to avoid invisible click traps.
+  // clickable. No pointer-events-none wrapper; panel is interactive as soon as open.
   return (
-    <div className="pointer-events-none absolute inset-0 z-50 flex justify-end overflow-hidden">
-      {shown ? (
-        <button
-          type="button"
-          aria-label="Close"
-          onClick={onClose}
-          className="pointer-events-auto absolute inset-0 bg-black/30 opacity-100 transition-opacity duration-300"
-        />
-      ) : null}
+    <div className="absolute inset-0 z-50 flex justify-end overflow-hidden">
+      <button
+        type="button"
+        aria-label="Close"
+        onClick={onClose}
+        className="absolute inset-0 bg-black/30 transition-opacity duration-300"
+      />
 
       {/* Panel */}
       <div
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative flex h-full w-full max-w-md flex-col bg-[#faf7f2] shadow-2xl transition-transform duration-300 ease-out ${
-          shown
-            ? "pointer-events-auto translate-x-0"
-            : "pointer-events-none translate-x-full"
+        className={`relative z-10 flex h-full w-full max-w-md flex-col bg-[#faf7f2] shadow-2xl transition-transform duration-300 ease-out ${
+          entered ? "translate-x-0" : "translate-x-full"
         }`}
       >
         <div className="flex items-center justify-between gap-3 px-5 py-3">

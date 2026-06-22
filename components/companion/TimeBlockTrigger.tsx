@@ -40,9 +40,16 @@ type Phase =
   | "other-important-what"
   | "other-important-update";
 
+const OVERLAY_CLASS = {
+  fixed: "fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4",
+  scoped:
+    "absolute inset-0 z-[70] flex items-center justify-center bg-black/30 p-4",
+} as const;
+
 // Shame-free check-in when a Momentum Appointment arrives.
 export function TimeBlockTrigger({
   block,
+  scoped = false,
   onCheckIn,
   onOtherImportant,
   onNotTodayAction,
@@ -50,6 +57,8 @@ export function TimeBlockTrigger({
   onDismiss,
 }: {
   block: TimeBlock;
+  /** Cover the main pane only — keeps the sidebar clickable. */
+  scoped?: boolean;
   onCheckIn: (outcome: MomentumCheckInOutcome) => void;
   onOtherImportant: (payload: MomentumOtherImportantPayload) => void;
   onNotTodayAction: (action: MomentumNotTodayAction) => void;
@@ -60,10 +69,11 @@ export function TimeBlockTrigger({
   const [attention, setAttention] = useState("");
   const goal = block.goal?.trim() || "Move this forward.";
   const duration = formatMomentumDuration(block);
+  const overlayClass = OVERLAY_CLASS[scoped ? "scoped" : "fixed"];
 
   if (phase === "other-important-what") {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+      <div className={overlayClass}>
         <div className="companion-fade-in w-full max-w-md rounded-2xl bg-[#faf6f0] p-6 shadow-2xl">
           <p className="text-lg font-semibold text-[#1f1c19]">
             {otherImportantFollowUpPrompt(block.title)}
@@ -93,7 +103,7 @@ export function TimeBlockTrigger({
 
   if (phase === "other-important-update") {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+      <div className={overlayClass}>
         <div className="companion-fade-in w-full max-w-md rounded-2xl bg-[#faf6f0] p-6 shadow-2xl">
           <p className="text-base leading-relaxed text-[#2d2926]">
             {otherImportantUpdateOffer(attention)}
@@ -132,7 +142,7 @@ export function TimeBlockTrigger({
 
   if (phase === "not-today") {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+      <div className={overlayClass}>
         <div className="companion-fade-in w-full max-w-md rounded-2xl bg-[#faf6f0] p-6 shadow-2xl">
           <p className="text-base leading-relaxed text-[#2d2926]">
             Looks like today went a different direction. What would you like to
@@ -163,7 +173,7 @@ export function TimeBlockTrigger({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4">
+    <div className={overlayClass}>
       <div className="companion-fade-in w-full max-w-md rounded-2xl bg-[#faf6f0] p-6 shadow-2xl">
         <p className="text-sm font-semibold text-[#1e4f4f]">
           Momentum Appointment

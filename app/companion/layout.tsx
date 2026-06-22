@@ -3,6 +3,8 @@ import { CompanionLanguageProvider } from "@/components/companion/CompanionLangu
 
 import "./companion.css";
 
+export const dynamic = "force-dynamic";
+
 export default function CompanionLayout({
   children,
 }: Readonly<{

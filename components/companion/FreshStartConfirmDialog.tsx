@@ -47,15 +47,23 @@ function CheckList({
 
 export function FreshStartConfirmDialog({
   open,
+  scoped = false,
   copy,
   onConfirm,
   onCancel,
-}: FreshStartConfirmDialogProps) {
+}: FreshStartConfirmDialogProps & {
+  /** Cover the main pane only — keeps the sidebar clickable. */
+  scoped?: boolean;
+}) {
   if (!open) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4"
+      className={
+        scoped
+          ? "absolute inset-0 z-[70] flex items-center justify-center bg-black/40 p-4"
+          : "fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4"
+      }
       role="presentation"
       onClick={onCancel}
     >
