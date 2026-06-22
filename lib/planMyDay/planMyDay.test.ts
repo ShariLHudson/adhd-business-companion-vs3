@@ -7,6 +7,7 @@ import {
   addQuickPlanItem,
   countActivePlanItems,
   isPlanItemActive,
+  loadTodayPlanItems,
   movePlanItemKanban,
   currentFocusItem,
 } from "./planDayItems";
@@ -16,7 +17,9 @@ import {
   setLastPlanningView,
 } from "./planMyDayPrefs";
 import type { PlanDayItem } from "./types";
+import { todayStr } from "@/lib/companionStore";
 
+const PLAN_STORE_KEY = "companion-plan-my-day-items-v1";
 const lsStore: Record<string, string> = {};
 
 describe("planMyDay view resolution", () => {
@@ -83,6 +86,30 @@ describe("planMyDay capacity views", () => {
 });
 
 describe("planMyDay quick access", () => {
+  it("does not dispatch update storms when today plan is empty", () => {
+    const dispatch = vi.fn();
+    vi.stubGlobal("window", { dispatchEvent: dispatch });
+    const today = todayStr();
+    lsStore[PLAN_STORE_KEY] = JSON.stringify({ date: today, items: [] });
+
+    loadTodayPlanItems();
+    loadTodayPlanItems();
+    loadTodayPlanItems();
+
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+
+  it("persists seeded plan at most once across repeated loads", () => {
+    const dispatch = vi.fn();
+    vi.stubGlobal("window", { dispatchEvent: dispatch });
+    delete lsStore[PLAN_STORE_KEY];
+
+    loadTodayPlanItems();
+    loadTodayPlanItems();
+
+    expect(dispatch.mock.calls.length).toBeLessThanOrEqual(1);
+  });
+
   it("counts only incomplete items", () => {
     const items = [
       { id: "a", title: "One", column: "ready" as const, done: false },

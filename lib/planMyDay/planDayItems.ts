@@ -39,7 +39,10 @@ function readStored(): StoredDay | null {
 function writeStored(data: StoredDay): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    const payload = JSON.stringify(data);
+    const existing = localStorage.getItem(STORE_KEY);
+    if (existing === payload) return;
+    localStorage.setItem(STORE_KEY, payload);
     notifyPlanUpdated();
   } catch {
     /* storage unavailable */
@@ -61,7 +64,10 @@ function readDeferred(): Record<string, PlanDayItem[]> {
 function writeDeferred(data: Record<string, PlanDayItem[]>): void {
   if (typeof window === "undefined") return;
   try {
-    localStorage.setItem(DEFERRED_STORE_KEY, JSON.stringify(data));
+    const payload = JSON.stringify(data);
+    const existing = localStorage.getItem(DEFERRED_STORE_KEY);
+    if (existing === payload) return;
+    localStorage.setItem(DEFERRED_STORE_KEY, payload);
     notifyPlanUpdated();
   } catch {
     /* storage unavailable */
@@ -210,24 +216,23 @@ export function loadTodayPlanItems(): PlanDayItem[] {
   const today = todayStr();
   const stored = readStored();
   let items: PlanDayItem[];
+  let shouldPersist = false;
 
-  if (stored?.date === today && stored.items.length > 0) {
+  if (stored?.date === today) {
+    // Already hydrated for today — including an intentional empty plan.
     items = stored.items;
   } else {
     items = seedPlanItemsFromSources();
+    shouldPersist = true;
   }
 
   const deferred = consumeDeferredForDate(today);
   if (deferred.length > 0) {
     items = assignDefaultTimes([...items, ...deferred]);
+    shouldPersist = true;
   }
 
-  if (
-    deferred.length > 0 ||
-    !stored ||
-    stored.date !== today ||
-    stored.items.length === 0
-  ) {
+  if (shouldPersist) {
     writeStored({ date: today, items });
   }
 
