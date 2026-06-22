@@ -48,6 +48,20 @@ const PlanMyDayPanel = dynamic(
     ),
   },
 );
+const VisualFocusWorkspacePanel = dynamic(
+  () =>
+    import("@/components/companion/VisualFocusWorkspacePanel").then((mod) => ({
+      default: mod.VisualFocusWorkspacePanel,
+    })),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex min-h-[12rem] items-center justify-center p-6 text-sm text-[#6b635a]">
+        Loading Visual Focus…
+      </div>
+    ),
+  },
+);
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { WinsThisWeekPanel } from "@/components/companion/WinsThisWeekPanel";
 import { EvidenceBankPanel } from "@/components/companion/EvidenceBankPanel";
@@ -10395,6 +10409,13 @@ export default function CompanionPageClient() {
               openSectionBesideChatCore("projects", "projects");
             }}
             initialOpenItemId={planMyDayOpenItemId}
+          />
+        );
+      case "visual-focus":
+        return (
+          <VisualFocusWorkspacePanel
+            onBack={closeWorkspacePanel}
+            registerBack={registerBack}
           />
         );
       case "wins-this-week":

@@ -124,6 +124,7 @@ export function ClearMyMindSession({
     if (!parts.length) return;
 
     const all = addBrainDumps(parts, { captureSessionId: sessionId });
+    const createdItems = all.slice(0, parts.length);
     const sessionSaved = all.filter(
       (e) => e.captureSessionId === sessionId && !e.done,
     );
@@ -139,8 +140,13 @@ export function ClearMyMindSession({
     setEntries(sessionSaved);
     setInput("");
     setPhase("more");
-    const lastId = sessionSaved[sessionSaved.length - 1]?.id;
-    if (lastId) void classify(lastId, parts[parts.length - 1]!);
+    createdItems.forEach((item, index) => {
+      const itemId = item.id;
+      const text = parts[index];
+      if (itemId && text) {
+        void classify(itemId, text);
+      }
+    });
 
     void import("@/lib/ecosystem/eventTrackingEngine").then(
       ({ trackEcosystemEvent }) => {
