@@ -98,18 +98,19 @@ export function queryShadowSignals(opts?: {
   since?: string;
   limit?: number;
 }): CompanionSignal[] {
+  const { domain, category, since, limit } = opts ?? {};
   let result = getShadowSignalStore().signals;
-  if (opts?.domain) {
-    result = result.filter((s) => s.domain === opts.domain);
+  if (domain) {
+    result = result.filter((s) => s.domain === domain);
   }
-  if (opts?.category) {
-    result = result.filter((s) => s.category === opts.category);
+  if (category) {
+    result = result.filter((s) => s.category === category);
   }
-  if (opts?.since) {
-    result = result.filter((s) => s.at >= opts.since);
+  if (since) {
+    result = result.filter((s) => s.at >= since);
   }
-  if (opts?.limit) {
-    result = result.slice(-opts.limit);
+  if (limit) {
+    result = result.slice(-limit);
   }
   return result;
 }
