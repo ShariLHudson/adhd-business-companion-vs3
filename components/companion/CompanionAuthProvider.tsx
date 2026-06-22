@@ -5,10 +5,11 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
-import type { Session, User } from "@supabase/supabase-js";
+import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 
 import { getAppSiteUrl } from "@/lib/appSite";
 import { languagePrefsFromUserMetadata } from "@/lib/companionUserLanguage";
@@ -47,6 +48,14 @@ type CompanionAuthContextValue = {
 const CompanionAuthContext = createContext<CompanionAuthContextValue | null>(
   null,
 );
+
+function shouldSyncPrefs(event: AuthChangeEvent): boolean {
+  return (
+    event === "SIGNED_IN" ||
+    event === "INITIAL_SESSION" ||
+    event === "USER_UPDATED"
+  );
+}
 
 function syncUserToPrefs(user: User | null) {
   if (!user) return;
@@ -198,13 +207,20 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const initRef = useRef(false);
 
   useEffect(() => {
+    if (initRef.current) return;
+    initRef.current = true;
+
     let mounted = true;
     let unsubscribe: (() => void) | undefined;
-    const loadingTimeout = window.setTimeout(() => {
+
+    const finishLoading = () => {
       if (mounted) setLoading(false);
-    }, 10_000);
+    };
+
+    const loadingTimeout = window.setTimeout(finishLoading, 8_000);
 
     void (async () => {
       try {
@@ -218,21 +234,35 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
         const supabase = getCompanionSupabase();
         if (!supabase) return;
 
-        const { data } = await supabase.auth.getSession();
-        if (!mounted) return;
-        setSession(data.session);
-        setUser(data.session?.user ?? null);
-        syncUserToPrefs(data.session?.user ?? null);
-
-        const { data: sub } = supabase.auth.onAuthStateChange((_event, sess) => {
+        const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
+          if (!mounted) return;
           setSession(sess);
           setUser(sess?.user ?? null);
-          syncUserToPrefs(sess?.user ?? null);
-          setLoading(false);
+          if (shouldSyncPrefs(event)) {
+            syncUserToPrefs(sess?.user ?? null);
+          }
+          finishLoading();
         });
         unsubscribe = () => sub.subscription.unsubscribe();
+
+        const { data, error } = await supabase.auth.getSession();
+        if (!mounted) return;
+
+        if (error) {
+          const status = (error as { status?: number }).status;
+          if (status === 429) {
+            await supabase.auth.signOut({ scope: "local" });
+          }
+          return;
+        }
+
+        setSession(data.session);
+        setUser(data.session?.user ?? null);
+        if (data.session?.user) {
+          syncUserToPrefs(data.session.user);
+        }
       } finally {
-        if (mounted) setLoading(false);
+        finishLoading();
       }
     })();
 

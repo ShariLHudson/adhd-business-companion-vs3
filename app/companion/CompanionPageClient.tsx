@@ -1365,36 +1365,59 @@ export default function CompanionPageClient() {
   useEffect(() => {
     setHasChatted(getPrefs().hasChatted);
     setHydrated(true);
-    installCompanionRouteLogging();
-    installContinuityAuditHook();
-    trackUserRegisteredOnce();
-    trackUserActiveSession();
-    void reconcileUserIntelligenceWithServer(userIntelligenceEngine.getCounts());
 
-    const projectSnap = loadProjectContinuity();
-    if (projectSnap?.projectContinueId) {
-      setProjectContinueId(projectSnap.projectContinueId);
-    }
+    let cancelled = false;
+    const runDeferred = () => {
+      if (cancelled) return;
+      installCompanionRouteLogging();
+      installContinuityAuditHook();
+      trackUserRegisteredOnce();
+      trackUserActiveSession();
+      void reconcileUserIntelligenceWithServer(userIntelligenceEngine.getCounts());
 
-    const strategySnap = loadStrategyApplySession();
-    if (strategySnap) {
-      setStrategyApplySession(toStrategyApplySession(strategySnap));
-      setStrategyPanelCommand({
-        key: Date.now(),
-        strategyId: strategySnap.strategyId,
-      });
-      if (strategySnap.workspacePanelOpen) {
-        patchWorkspacePanel("playbook");
-        setActiveNav("playbook");
-        applyChatLayoutMode("split");
-        revealWorkspace();
+      const projectSnap = loadProjectContinuity();
+      if (projectSnap?.projectContinueId) {
+        setProjectContinueId(projectSnap.projectContinueId);
       }
+
+      const strategySnap = loadStrategyApplySession();
+      if (strategySnap) {
+        setStrategyApplySession(toStrategyApplySession(strategySnap));
+        setStrategyPanelCommand({
+          key: Date.now(),
+          strategyId: strategySnap.strategyId,
+        });
+        if (strategySnap.workspacePanelOpen) {
+          patchWorkspacePanel("playbook");
+          setActiveNav("playbook");
+          applyChatLayoutMode("split");
+          revealWorkspace();
+        }
+      }
+
+      const decisionSnap = loadDecisionCompassSession();
+      if (decisionSnap) {
+        setDecisionCompassSession(decisionSnap);
+      }
+    };
+
+    let idleId: number | undefined;
+    let timeoutId: number | undefined;
+    if (typeof requestIdleCallback !== "undefined") {
+      idleId = requestIdleCallback(runDeferred, { timeout: 2000 });
+    } else {
+      timeoutId = window.setTimeout(runDeferred, 50);
     }
 
-    const decisionSnap = loadDecisionCompassSession();
-    if (decisionSnap) {
-      setDecisionCompassSession(decisionSnap);
-    }
+    return () => {
+      cancelled = true;
+      if (idleId !== undefined && typeof cancelIdleCallback !== "undefined") {
+        cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== undefined) {
+        window.clearTimeout(timeoutId);
+      }
+    };
   }, []);
 
   const refreshRecognition = useCallback(() => {

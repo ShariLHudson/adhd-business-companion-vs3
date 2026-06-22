@@ -9,6 +9,29 @@ import { isBrowserSafeSupabaseKey } from "@/lib/supabase/supabaseKeyRoles";
 let browserClient: SupabaseClient | null = null;
 let runtimeConfig: { url: string; key: string } | null = null;
 let bootstrapPromise: Promise<boolean> | null = null;
+/** Pause auth network calls after Supabase returns 429 (rate limit). */
+let authBackoffUntil = 0;
+
+function companionAuthFetch(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> {
+  const url = String(input);
+  if (Date.now() < authBackoffUntil && url.includes("/auth/v1/")) {
+    return Promise.resolve(
+      new Response(JSON.stringify({ message: "Auth rate limited — paused" }), {
+        status: 429,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+  }
+  return fetch(input, init).then((res) => {
+    if (res.status === 429 && url.includes("/auth/v1/")) {
+      authBackoffUntil = Date.now() + 60_000;
+    }
+    return res;
+  });
+}
 
 /** Safe prefix for deploy debug — never exposes full secrets. */
 export function envValuePrefix(value: string): string {
@@ -141,10 +164,12 @@ export function getCompanionSupabase(): SupabaseClient | null {
     getCompanionSupabaseUrl(),
     getCompanionSupabaseAnonKey(),
     {
+      global: { fetch: companionAuthFetch },
       auth: {
         persistSession: true,
         autoRefreshToken: true,
         detectSessionInUrl: true,
+        storageKey: "companion-supabase-auth",
       },
     },
   );

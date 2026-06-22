@@ -6,7 +6,6 @@ import {
   pickDailyShariPhoto,
   probeAvailableShariPhotos,
   SHARI_PHOTO_ROTATION_MS,
-  SHARI_ROTATION_PHOTOS,
 } from "./shariPhotoRotation";
 
 export function useRotatingShariPhoto(
@@ -18,7 +17,7 @@ export function useRotatingShariPhoto(
 
   useEffect(() => {
     let cancelled = false;
-    void probeAvailableShariPhotos(SHARI_ROTATION_PHOTOS).then((found) => {
+    void probeAvailableShariPhotos().then((found) => {
       if (cancelled) return;
       setAvailable(found);
       const daily = pickDailyShariPhoto();

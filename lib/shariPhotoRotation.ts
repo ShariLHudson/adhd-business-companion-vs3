@@ -1,45 +1,44 @@
 import { ASSETS } from "./companionUi";
 
-/** Default profile plus optional drops in public/images/shari/. */
-export const SHARI_ROTATION_PHOTOS = [
-  ASSETS.profile,
-  ...Array.from(
-    { length: 8 },
-    (_, index) => `/images/shari/shari-${index + 1}.jpg`,
-  ),
-];
+const PROBE_CACHE_KEY = "companion-shari-photos-v1";
+
+/** Optional drops in public/images/shari/ — enable rotation when files are added. */
+export const SHARI_OPTIONAL_PHOTOS = Array.from(
+  { length: 8 },
+  (_, index) => `/images/shari/shari-${index + 1}.jpg`,
+);
+
+export const SHARI_ROTATION_PHOTOS = [ASSETS.profile, ...SHARI_OPTIONAL_PHOTOS];
 
 export const SHARI_PHOTO_ROTATION_MS = 9000;
 
-export function pickDailyShariPhoto(now = new Date()): string {
-  const today = now.toDateString();
-  let hash = 0;
-  for (let i = 0; i < today.length; i++) {
-    hash = today.charCodeAt(i) + ((hash << 5) - hash);
-  }
-  const index = Math.abs(hash) % SHARI_ROTATION_PHOTOS.length;
-  return SHARI_ROTATION_PHOTOS[index]!;
+export function pickDailyShariPhoto(): string {
+  return ASSETS.profile;
 }
 
-export function probeAvailableShariPhotos(
-  candidates: readonly string[] = SHARI_ROTATION_PHOTOS,
-): Promise<string[]> {
+/** Returns profile immediately; optional shari-N.jpg files are not probed until shipped. */
+export function probeAvailableShariPhotos(): Promise<string[]> {
   if (typeof window === "undefined") {
     return Promise.resolve([ASSETS.profile]);
   }
 
-  return Promise.all(
-    candidates.map(
-      (src) =>
-        new Promise<string | null>((resolve) => {
-          const image = new Image();
-          image.onload = () => resolve(src);
-          image.onerror = () => resolve(null);
-          image.src = src;
-        }),
-    ),
-  ).then((results) => {
-    const found = results.filter((src): src is string => Boolean(src));
-    return found.length ? found : [ASSETS.profile];
-  });
+  try {
+    const cached = window.sessionStorage.getItem(PROBE_CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached) as string[];
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return Promise.resolve(parsed);
+      }
+    }
+  } catch {
+    /* ignore corrupt cache */
+  }
+
+  const found = [ASSETS.profile];
+  try {
+    window.sessionStorage.setItem(PROBE_CACHE_KEY, JSON.stringify(found));
+  } catch {
+    /* quota */
+  }
+  return Promise.resolve(found);
 }
