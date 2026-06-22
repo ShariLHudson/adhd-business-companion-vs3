@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { classifyFromDictionary } from "@/lib/categoryIntelligenceDictionary";
 import { normalizeCategory } from "@/lib/brainDumpCategories";
 
 // Silently classify a brain-dump note so it can be organized + routed.
@@ -19,14 +20,20 @@ No prose, JSON only.`;
 
 export async function POST(request: NextRequest) {
   try {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      return NextResponse.json({ error: "No API key." }, { status: 500 });
-    }
     const body = await request.json();
     const text = (body.text as string) ?? "";
     if (!text.trim()) {
       return NextResponse.json({ error: "Empty note." }, { status: 400 });
+    }
+
+    const dictionaryResult = classifyFromDictionary(text);
+    if (dictionaryResult) {
+      return NextResponse.json(dictionaryResult);
+    }
+
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: "No API key." }, { status: 500 });
     }
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
