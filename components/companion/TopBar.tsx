@@ -88,6 +88,11 @@ export function TopBar({
     setDayToolsOpen(false);
   }
 
+  function runHeaderAction(action: () => void) {
+    closeMenu();
+    action();
+  }
+
   useEffect(() => {
     if (!dayToolsOpen) return;
     const onPointerDown = (event: PointerEvent) => {
@@ -113,17 +118,21 @@ export function TopBar({
         <HeaderActionButton
           emoji="📅"
           label="Plan My Day"
-          onClick={onOpenPlanMyDay}
+          onClick={() => runHeaderAction(onOpenPlanMyDay)}
           badge={planActiveCount}
         />
       ) : null}
 
-      <HeaderActionButton emoji="🧍" label="Profile" onClick={onOpenProfile} />
+      <HeaderActionButton
+        emoji="🧍"
+        label="Profile"
+        onClick={() => runHeaderAction(onOpenProfile)}
+      />
 
       <HeaderActionButton
         emoji="⚙️"
         label="Settings"
-        onClick={() => onOpenSettings(null)}
+        onClick={() => runHeaderAction(() => onOpenSettings(null))}
       />
 
       <div ref={dayToolsRef} className="relative z-50">

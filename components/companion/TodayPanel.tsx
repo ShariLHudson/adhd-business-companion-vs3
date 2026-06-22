@@ -31,7 +31,7 @@ export function TodayPanel({
     () => isPlanMyDayDismissedForSession(),
   );
   const [resumeOpen, setResumeOpen] = useState(initialSectionOpen);
-  const [planOpen, setPlanOpen] = useState(initialSectionOpen);
+  const [planOpen, setPlanOpen] = useState(true);
 
   const activeItem = useMemo(() => {
     if (resumeDismissed) return null;

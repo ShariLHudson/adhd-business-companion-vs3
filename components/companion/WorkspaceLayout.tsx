@@ -96,6 +96,9 @@ export function WorkspaceLayout({
       return;
     }
     lastRevealKeyRef.current = revealKey;
+    // Always show the workspace pane when a panel opens or changes — on mobile
+    // split layout the chat tab can hide the workspace even after a header click.
+    setMobileView("work");
     const el = workspacePaneRef.current;
     if (!el) return;
     requestAnimationFrame(() => {
