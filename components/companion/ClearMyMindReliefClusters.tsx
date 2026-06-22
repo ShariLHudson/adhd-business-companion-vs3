@@ -18,16 +18,56 @@ import {
   reliefClusterTap,
   type ReliefClusterExpansionState,
 } from "@/lib/reliefClusterExpansion";
+import {
+  applyThoughtAction,
+  thoughtActionOpensSection,
+  type ThoughtAction,
+  type ThoughtActionResult,
+} from "@/lib/thoughtActions";
+import type { AppSection } from "@/lib/companionUi";
+import { ThoughtActionSheet } from "@/components/companion/ThoughtActionSheet";
 
 const toggleLinkClass =
   "mt-2 text-sm font-semibold text-[#1e4f4f] underline-offset-2 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/35";
 
+const thoughtButtonClass =
+  "w-full rounded-lg px-2 py-1.5 text-left text-sm leading-relaxed text-[#2d2926] hover:bg-[#1e4f4f]/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/35";
+
+const thoughtButtonActiveClass =
+  "w-full rounded-lg bg-[#1e4f4f]/8 px-2 py-1.5 text-left text-sm font-medium leading-relaxed text-[#1f1c19] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/35";
+
+function ThoughtActionTrust({ result }: { result: ThoughtActionResult }) {
+  if (!result.ok) return null;
+  return (
+    <div
+      className="companion-fade-in mt-3 rounded-xl border border-[#1e4f4f]/25 bg-[#1e4f4f]/[0.07] px-4 py-3 text-sm leading-relaxed text-[#2d2926]"
+      data-testid="thought-action-trust"
+    >
+      <p className="font-semibold text-[#1e4f4f]">{result.headline}</p>
+      <p className="mt-1">
+        <span className="font-medium">Saved to:</span> {result.savedWhere}
+      </p>
+      <p className="mt-0.5">
+        <span className="font-medium">You&apos;ll see it:</span> {result.seeWhere}
+      </p>
+    </div>
+  );
+}
+
 export function ClearMyMindReliefClusters({
   entries,
+  onOpen,
+  onEntriesChange,
 }: {
   entries: BrainDumpEntry[];
+  onOpen?: (section: AppSection) => void;
+  onEntriesChange?: () => void;
 }) {
   const graph = useMemo(() => buildBrainDumpClusterGraph(entries), [entries]);
+  const entryById = useMemo(
+    () => new Map(entries.map((e) => [e.id, e])),
+    [entries],
+  );
   const insight = useMemo(
     () => generateMentalLandscapeInsight(graph.clusters, graph.totalThoughts),
     [graph.clusters, graph.totalThoughts],
@@ -35,18 +75,46 @@ export function ClearMyMindReliefClusters({
   const [expansion, setExpansion] = useState<ReliefClusterExpansionState>(
     INITIAL_RELIEF_CLUSTER_EXPANSION,
   );
+  const [selectedThoughtId, setSelectedThoughtId] = useState<string | null>(
+    null,
+  );
+  const [trust, setTrust] = useState<ThoughtActionResult | null>(null);
 
   const handleClusterTap = useCallback((clusterId: string) => {
+    setSelectedThoughtId(null);
+    setTrust(null);
     setExpansion((prev) => reliefClusterTap(prev, clusterId));
   }, []);
 
   const handleShowThoughts = useCallback((clusterId: string) => {
+    setSelectedThoughtId(null);
+    setTrust(null);
     setExpansion((prev) => reliefClusterShowThoughts(prev, clusterId));
   }, []);
 
   const handleHideThoughts = useCallback(() => {
+    setSelectedThoughtId(null);
+    setTrust(null);
     setExpansion((prev) => reliefClusterHideThoughts(prev));
   }, []);
+
+  const handleThoughtAction = useCallback(
+    (entry: BrainDumpEntry, action: ThoughtAction) => {
+      const result = applyThoughtAction(entry, action);
+      setTrust(result);
+      onEntriesChange?.();
+
+      const section = thoughtActionOpensSection(action);
+      if (section) onOpen?.(section);
+
+      if (result.removedFromLandscape) {
+        setSelectedThoughtId(null);
+      }
+
+      window.setTimeout(() => setTrust(null), 3200);
+    },
+    [onEntriesChange, onOpen],
+  );
 
   if (!graph.hasContent) {
     return (
@@ -74,6 +142,8 @@ export function ClearMyMindReliefClusters({
       >
         {insight}
       </p>
+
+      {trust ? <ThoughtActionTrust result={trust} /> : null}
 
       <ul className="mt-4 flex flex-col gap-2.5" role="list">
         {graph.clusters.map((cluster) => {
@@ -147,12 +217,42 @@ export function ClearMyMindReliefClusters({
                           </p>
                         ) : (
                           <ul
-                            className="mt-2 list-none space-y-1.5 pl-0 text-sm leading-relaxed text-[#2d2926]"
+                            className="mt-2 list-none space-y-1 pl-0"
                             data-testid="cluster-thought-list"
                           >
-                            {visibleThoughts.map((thought) => (
-                              <li key={thought.id}>{thought.text}</li>
-                            ))}
+                            {visibleThoughts.map((thought) => {
+                              const entry = entryById.get(thought.id);
+                              const isSelected = selectedThoughtId === thought.id;
+                              return (
+                                <li key={thought.id}>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setTrust(null);
+                                      setSelectedThoughtId(
+                                        isSelected ? null : thought.id,
+                                      );
+                                    }}
+                                    className={
+                                      isSelected
+                                        ? thoughtButtonActiveClass
+                                        : thoughtButtonClass
+                                    }
+                                    data-testid={`cluster-thought-${thought.id}`}
+                                  >
+                                    {thought.text}
+                                  </button>
+                                  {isSelected && entry ? (
+                                    <ThoughtActionSheet
+                                      entry={entry}
+                                      onAction={(action) =>
+                                        handleThoughtAction(entry, action)
+                                      }
+                                    />
+                                  ) : null}
+                                </li>
+                              );
+                            })}
                           </ul>
                         )}
                         <button

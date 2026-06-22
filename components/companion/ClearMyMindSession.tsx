@@ -367,7 +367,11 @@ export function ClearMyMindSession({
 
       {phase === "sorting" && !showSortQueue && (
         <>
-          <ClearMyMindReliefClusters entries={sessionItems} />
+          <ClearMyMindReliefClusters
+            entries={sessionItems}
+            onOpen={onOpen}
+            onEntriesChange={refresh}
+          />
           <button
             type="button"
             onClick={() => setShowSortQueue(true)}

@@ -6,6 +6,7 @@ import {
   updateBrainDump,
   type BrainDumpEntry,
 } from "./companionStore";
+import { addQuickPlanItem } from "./planMyDay/planDayItems";
 import { addTomorrowFocus, tomorrowFocusTrustMessage } from "./tomorrowFocus";
 
 export type ClearMindRoute =
@@ -16,6 +17,7 @@ export type ClearMindRoute =
   | "project"
   | "focus"
   | "tomorrow"
+  | "plan-my-day"
   | "done";
 
 export type RouteTrustResult = {
@@ -58,6 +60,7 @@ export const ROUTE_LABEL: Record<ClearMindRoute, string> = {
   project: "Project",
   focus: "Focus Session",
   tomorrow: "Work on tomorrow",
+  "plan-my-day": "Plan My Day",
   done: "Keep in Library",
 };
 
@@ -219,6 +222,21 @@ export function routeBrainDumpEntry(
         `Ready for a focus session: "${text}"`,
         "Focus Session",
         "Open **Focus Session** — your item is tagged for today.",
+        route,
+      );
+    }
+    case "plan-my-day": {
+      addQuickPlanItem(text.slice(0, 200));
+      updateBrainDump(entry.id, {
+        actionType: "task",
+        schedulingIntent: "today",
+        routedAction: "plan-my-day",
+      });
+      logMomentum("move", `Plan my day: ${text.slice(0, 60)}`);
+      return trust(
+        `Added to Plan My Day: "${text}"`,
+        "Plan My Day",
+        "Open **Plan My Day** to see it on today's list.",
         route,
       );
     }
