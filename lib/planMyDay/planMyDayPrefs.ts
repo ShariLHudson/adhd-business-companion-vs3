@@ -7,16 +7,15 @@ const VALID_VIEWS: PlanningViewMode[] = [
   "timeline",
   "cards",
   "kanban",
-  "visual-focus",
 ];
 
 function isPlanningViewMode(v: unknown): v is PlanningViewMode {
+  if (v === "visual-focus") return false;
   return (
     v === "list" ||
     v === "timeline" ||
     v === "cards" ||
-    v === "kanban" ||
-    v === "visual-focus"
+    v === "kanban"
   );
 }
 
@@ -56,7 +55,6 @@ export function planningViewLabel(mode: PlanningViewMode): string {
     timeline: "Timeline",
     cards: "Cards",
     kanban: "Kanban",
-    "visual-focus": "Visual Focus",
   };
   return labels[mode];
 }

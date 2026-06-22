@@ -10,15 +10,13 @@ export const WORKSPACE_VIEW_SIZE_STORAGE_KEY = "companion-workspace-view-size-v1
 export type WorkspaceViewSizePreset =
   | "balanced"
   | "chat-focus"
-  | "workspace-focus"
-  | "visual-focus";
+  | "workspace-focus";
 
 export const VIEW_SIZE_PRESET_LABELS: Record<WorkspaceViewSizePreset, string> =
   {
     balanced: "Balanced",
     "chat-focus": "Chat Focus",
     "workspace-focus": "Workspace Focus",
-    "visual-focus": "Visual Focus",
   };
 
 export const VIEW_SIZE_PRESETS: Record<
@@ -36,18 +34,12 @@ export const VIEW_SIZE_PRESETS: Record<
     workspace: 65,
     label: VIEW_SIZE_PRESET_LABELS["workspace-focus"],
   },
-  "visual-focus": {
-    chat: 25,
-    workspace: 75,
-    label: VIEW_SIZE_PRESET_LABELS["visual-focus"],
-  },
 };
 
 const ALL_PRESETS: WorkspaceViewSizePreset[] = [
   "balanced",
   "chat-focus",
   "workspace-focus",
-  "visual-focus",
 ];
 
 export function isWorkspaceViewSizePreset(
@@ -64,7 +56,8 @@ export function defaultViewSizeForSection(
   switch (section) {
     case "decision-compass":
     case "brain-dump":
-      return "visual-focus";
+    case "visual-focus":
+      return "workspace-focus";
     case "content-generator":
     case "projects":
       return "workspace-focus";
@@ -89,6 +82,7 @@ export function loadWorkspaceViewSizePreference(): WorkspaceViewSizePreset | nul
   if (typeof window === "undefined") return null;
   try {
     const stored = localStorage.getItem(WORKSPACE_VIEW_SIZE_STORAGE_KEY);
+    if (stored === "visual-focus") return "workspace-focus";
     return isWorkspaceViewSizePreset(stored) ? stored : null;
   } catch {
     return null;
@@ -136,6 +130,7 @@ export function splitWorkspacePanelWidth(
   switch (section) {
     case "decision-compass":
     case "brain-dump":
+    case "visual-focus":
     case "templates-library":
     case "saved-work":
     case "my-work":

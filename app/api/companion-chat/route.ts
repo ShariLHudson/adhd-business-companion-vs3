@@ -60,6 +60,7 @@ export async function POST(request: NextRequest) {
     const businessOSHint = body.businessOSHint as string | undefined;
     const chiefHint = body.chiefHint as string | undefined;
     const ecosystemGuidance = body.ecosystemGuidance as string | undefined;
+    const intelligenceContext = body.intelligenceContext as string | undefined;
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -104,10 +105,13 @@ export async function POST(request: NextRequest) {
     const ecosystemBlock = ecosystemGuidance
       ? `\n\n${ecosystemGuidance}`
       : `${recoveryBlock}${healthBlock}${decisionBlock}${environmentBlock}${futureBlock}${momentumBlock}${businessOSBlock}${chiefBlock}`;
+    const intelligenceBlock = intelligenceContext
+      ? `\n\n${intelligenceContext}`
+      : "";
 
     const finalSystem = `${
       businessContext ? `${systemPrompt}\n\n${businessContext}` : systemPrompt
-    }${attune}${ecosystemBlock}${adaptiveBlock}${workspaceBlock}${offerBlock}`;
+    }${attune}${ecosystemBlock}${intelligenceBlock}${adaptiveBlock}${workspaceBlock}${offerBlock}`;
 
     const baseTemp = MODE_TEMPERATURE[coachingMode] ?? 0.75;
     const temperature =

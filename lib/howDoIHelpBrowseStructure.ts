@@ -49,6 +49,7 @@ const MAIN_AREA_SUBGROUPS: readonly HowDoIBrowseSubgroup[] = [
       "create-overview",
       "focus-sessions",
       "plan-my-day",
+      "visual-focus",
       "projects",
     ],
   },

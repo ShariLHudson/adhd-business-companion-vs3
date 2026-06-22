@@ -174,6 +174,6 @@ export function builderContentSyncHintForChat(): string {
     "- NEVER write approval phrases into fields.",
     "- When you generate a list or draft for the current step, end with: Would you like me to add these to the avatar?",
     "- Help-seeking replies (I don't know, not sure, help me, give me options, you decide) are NOT content — generate 3–5 numbered suggestions in chat; never [[fill:]] them.",
-    "- Chat = thinking/coaching; builder = storage. The user is never the copy/paste bridge.",
+    "- Chat = thinking/coaching; workspace = storage. When chat cannot auto-apply, the user copies from chat or uses workspace buttons — never imply silent transfer.",
   ].join("\n");
 }

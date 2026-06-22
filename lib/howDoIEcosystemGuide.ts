@@ -35,9 +35,9 @@ export const HOW_DO_I_ECOSYSTEM_CARDS: HowDoIEcosystemCard[] = [
     title: "Plan My Day",
     emoji: "📅",
     whatItIs:
-      "Turns tasks into a visual daily plan — list, timeline, kanban, or one-thing-at-a-time focus.",
+      "Turns tasks into a visual daily plan — list, timeline, cards, or kanban.",
     whenToUse:
-      "When you need structure, focus, or help deciding what to do next.",
+      "When you need structure or help deciding what to do next.",
     workflow: [
       "Add tasks or pull from projects.",
       "Choose a view that fits your brain.",
@@ -45,12 +45,34 @@ export const HOW_DO_I_ECOSYSTEM_CARDS: HowDoIEcosystemCard[] = [
       "Mark done or park what is not for today.",
     ],
     tips: [
-      "Use Visual Focus when overwhelmed.",
-      "Use Kanban for larger task lists.",
+      "List when overwhelmed. Kanban for larger task lists.",
+      "Open Visual Focus when you want to think spatially.",
     ],
     keywords: ["plan", "day", "today", "schedule", "kanban", "tasks"],
     openSection: "plan-my-day",
     openLabel: "Open Plan My Day",
+  },
+  {
+    id: "visual-focus",
+    title: "Visual Focus",
+    emoji: "🎨",
+    whatItIs:
+      "A cognitive workspace for visual thinking — mind maps, decision trees, project maps, and spatial planning.",
+    whenToUse:
+      "When you organize ideas through pictures, relationships, clusters, or branching decisions.",
+    workflow: [
+      "Choose how you want to think — mind map, decision tree, project map, and more.",
+      "Create a new map or open a saved one.",
+      "Add branches, clusters, and connections as ideas unfold.",
+      "Use Visual Kanban when you want flexible grouping.",
+    ],
+    tips: [
+      "Visual Focus is for thinking — Plan My Day is for today's tasks.",
+      "Find it from Focus when your brain feels crowded or stuck.",
+    ],
+    keywords: ["visual", "mind map", "decision tree", "spatial", "thinking"],
+    openSection: "visual-focus",
+    openLabel: "Open Visual Focus",
   },
   {
     id: "projects",

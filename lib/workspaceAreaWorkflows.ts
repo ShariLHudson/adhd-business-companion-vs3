@@ -9,13 +9,24 @@ export const WORKSPACE_AREA_WORKFLOWS: Record<string, WorkspaceAreaWorkflow> = {
     id: "plan-my-day",
     steps: [
       "Add what matters today — quick capture or pull from projects.",
-      "Pick a view that fits your brain (List, Timeline, Kanban, Visual Focus).",
+      "Pick a view that fits your brain (List, Timeline, Cards, or Kanban).",
       "Move one item to Doing when you're ready to start.",
       "Open an item for duration, notes, or a linked momentum appointment.",
       "Park what isn't happening today — nothing gets deleted.",
       "Mark done when finished; reference items can stay visible if helpful.",
     ],
-    tip: "Low energy? Visual Focus shows one thing at a time — no clutter.",
+    tip: "Low energy? List keeps today simple. Open Visual Focus when you want to think spatially.",
+  },
+  "visual-focus": {
+    id: "visual-focus",
+    steps: [
+      "Choose how you want to think — mind map, decision tree, project map, and more.",
+      "Create a new map or open a saved one.",
+      "Add branches, clusters, and connections as ideas unfold.",
+      "Use Visual Kanban when you want flexible grouping beyond task columns.",
+      "Chat stays open for coaching while you organize visually.",
+    ],
+    tip: "Visual Focus is for thinking — Plan My Day is for today's tasks.",
   },
   "brain-dump": {
     id: "brain-dump",

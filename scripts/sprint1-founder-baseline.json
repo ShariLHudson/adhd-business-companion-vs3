@@ -1,0 +1,899 @@
+{
+  "busEnabled": false,
+  "turns": [
+    {
+      "text": "I have 17 things on my list and my brain is shutting down.",
+      "emotion": "overwhelmed",
+      "messageCategory": "emotional_distress",
+      "classified": {
+        "struggles": [],
+        "questions": [],
+        "emotions": [
+          "frustrated"
+        ]
+      },
+      "ecosystemPriority": "calm_presence",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm"
+      ],
+      "profileSignalCount": 2,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I know I need sales calls but I've been avoiding them for three days.",
+      "emotion": "stuck",
+      "messageCategory": "casual_conversation",
+      "classified": {
+        "struggles": [],
+        "questions": [],
+        "emotions": [
+          "stuck"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck"
+      ],
+      "profileSignalCount": 4,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I have so many business ideas I can't pick one.",
+      "emotion": "overwhelmed",
+      "messageCategory": "casual_conversation",
+      "classified": {
+        "struggles": [
+          "prioritization"
+        ],
+        "questions": [],
+        "emotions": [
+          "frustrated"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization"
+      ],
+      "profileSignalCount": 7,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I have four half-finished projects and I feel like a failure.",
+      "emotion": "emotional",
+      "messageCategory": "casual_conversation",
+      "classified": {
+        "struggles": [],
+        "questions": [],
+        "emotions": [
+          "frustrated"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization"
+      ],
+      "profileSignalCount": 9,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "Who am I to charge these prices? Everyone seems more put together.",
+      "emotion": "unclear",
+      "messageCategory": "casual_conversation",
+      "classified": {
+        "struggles": [],
+        "questions": [],
+        "emotions": [
+          "confused"
+        ]
+      },
+      "ecosystemPriority": "calm_presence",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused"
+      ],
+      "profileSignalCount": 10,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I sat down at 9 and suddenly it's 3pm. Where did the day go?",
+      "emotion": "overwhelmed",
+      "messageCategory": "casual_conversation",
+      "classified": {
+        "struggles": [],
+        "questions": [],
+        "emotions": [
+          "frustrated"
+        ]
+      },
+      "ecosystemPriority": "calm_presence",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused"
+      ],
+      "profileSignalCount": 12,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I've been staring at a blank doc for an hour. I need to post something.",
+      "emotion": "building",
+      "messageCategory": "practical_task",
+      "classified": {
+        "struggles": [],
+        "questions": [],
+        "emotions": [
+          "excited"
+        ]
+      },
+      "ecosystemPriority": "calm_presence",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created"
+      ],
+      "profileSignalCount": 14,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I know what to do but my body won't start. Like I'm frozen.",
+      "emotion": "stuck",
+      "messageCategory": "emotional_distress",
+      "classified": {
+        "struggles": [],
+        "questions": [],
+        "emotions": [
+          "stuck"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created"
+      ],
+      "profileSignalCount": 16,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I've rewritten this email six times and still won't send it.",
+      "emotion": "building",
+      "messageCategory": "practical_task",
+      "classified": {
+        "struggles": [],
+        "questions": [],
+        "emotions": [
+          "excited"
+        ]
+      },
+      "ecosystemPriority": "future_shari_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created"
+      ],
+      "profileSignalCount": 18,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I'm exhausted and anxious and everything feels heavy.",
+      "emotion": "emotional",
+      "messageCategory": "emotional_distress",
+      "classified": {
+        "struggles": [],
+        "questions": [],
+        "emotions": [
+          "frustrated"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "Energy looks low. Want to pick the smallest possible step, not a big push?",
+      "recoveryLevel": "strained",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created"
+      ],
+      "profileSignalCount": 20,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "Help me prioritize — everything feels urgent right now.",
+      "emotion": "overwhelmed",
+      "messageCategory": "casual_conversation",
+      "classified": {
+        "struggles": [],
+        "questions": [],
+        "emotions": [
+          "frustrated"
+        ]
+      },
+      "ecosystemPriority": "momentum_acknowledgment",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created"
+      ],
+      "profileSignalCount": 22,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I don't know where to start with this launch.",
+      "emotion": "stuck",
+      "messageCategory": "casual_conversation",
+      "classified": {
+        "struggles": [
+          "marketing"
+        ],
+        "questions": [
+          "dont_know_where_to_start"
+        ],
+        "emotions": [
+          "stuck"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "It looks like you may be carrying a lot right now. Would it help to sort this into what matters today, what can wait, and what can be parked?",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created",
+        "business:marketing",
+        "conversation:dont_know_where_to_start"
+      ],
+      "profileSignalCount": 26,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I'm stuck on this task. It feels too big.",
+      "emotion": "stuck",
+      "messageCategory": "casual_conversation",
+      "classified": {
+        "struggles": [],
+        "questions": [],
+        "emotions": [
+          "stuck"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "It sounds like the task may be too big right now. Want to shrink it to the first 5-minute step?",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created",
+        "business:marketing",
+        "conversation:dont_know_where_to_start"
+      ],
+      "profileSignalCount": 28,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "Can you help me plan my day? I'm overwhelmed.",
+      "emotion": "overwhelmed",
+      "messageCategory": "emotional_distress",
+      "classified": {
+        "struggles": [
+          "overwhelm"
+        ],
+        "questions": [
+          "im_overwhelmed"
+        ],
+        "emotions": [
+          "frustrated"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "It looks like you may be carrying a lot right now. Would it help to sort this into what matters today, what can wait, and what can be parked?",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created",
+        "business:marketing",
+        "conversation:dont_know_where_to_start",
+        "conversation:im_overwhelmed"
+      ],
+      "profileSignalCount": 32,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I keep replaying that conversation in my head.",
+      "emotion": "unclear",
+      "messageCategory": "casual_conversation",
+      "classified": {
+        "struggles": [],
+        "questions": [],
+        "emotions": [
+          "confused"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created",
+        "business:marketing",
+        "conversation:dont_know_where_to_start",
+        "conversation:im_overwhelmed"
+      ],
+      "profileSignalCount": 33,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I need to write a newsletter but I'm procrastinating.",
+      "emotion": "building",
+      "messageCategory": "practical_task",
+      "classified": {
+        "struggles": [
+          "content_creation"
+        ],
+        "questions": [],
+        "emotions": [
+          "excited"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created",
+        "business:marketing",
+        "conversation:dont_know_where_to_start",
+        "conversation:im_overwhelmed",
+        "business:content_creation"
+      ],
+      "profileSignalCount": 36,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "What should I work on first today?",
+      "emotion": "unclear",
+      "messageCategory": "casual_conversation",
+      "classified": {
+        "struggles": [],
+        "questions": [
+          "what_should_i_work_on"
+        ],
+        "emotions": [
+          "confused"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created",
+        "business:marketing",
+        "conversation:dont_know_where_to_start",
+        "conversation:im_overwhelmed",
+        "business:content_creation",
+        "conversation:what_should_i_work_on"
+      ],
+      "profileSignalCount": 38,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I'm frustrated that I can't follow through on anything.",
+      "emotion": "emotional",
+      "messageCategory": "casual_conversation",
+      "classified": {
+        "struggles": [
+          "follow_through"
+        ],
+        "questions": [],
+        "emotions": [
+          "frustrated"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created",
+        "business:marketing",
+        "conversation:dont_know_where_to_start",
+        "conversation:im_overwhelmed",
+        "business:content_creation",
+        "conversation:what_should_i_work_on",
+        "conversation:follow_through"
+      ],
+      "profileSignalCount": 41,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I want to create content but I'm scared people will judge me.",
+      "emotion": "building",
+      "messageCategory": "practical_task",
+      "classified": {
+        "struggles": [
+          "content_creation"
+        ],
+        "questions": [],
+        "emotions": [
+          "excited"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "It looks like you may be carrying a lot right now. Would it help to sort this into what matters today, what can wait, and what can be parked?",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created",
+        "business:marketing",
+        "conversation:dont_know_where_to_start",
+        "conversation:im_overwhelmed",
+        "business:content_creation",
+        "conversation:what_should_i_work_on",
+        "conversation:follow_through"
+      ],
+      "profileSignalCount": 44,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    },
+    {
+      "text": "I'm excited about my new offer but also terrified to launch it.",
+      "emotion": "unclear",
+      "messageCategory": "casual_conversation",
+      "classified": {
+        "struggles": [
+          "marketing"
+        ],
+        "questions": [],
+        "emotions": [
+          "excited",
+          "confused"
+        ]
+      },
+      "ecosystemPriority": "activation_support",
+      "ecosystemSuppressed": [],
+      "activationOffer": "",
+      "recoveryLevel": "stable",
+      "loadLevel": "light",
+      "legacySignalKeys": [
+        "emotional:frustrated",
+        "emotional:overwhelm",
+        "emotional:stuck",
+        "conversation:prioritization",
+        "emotional:confused",
+        "emotional:excited",
+        "creation:content_created",
+        "business:marketing",
+        "conversation:dont_know_where_to_start",
+        "conversation:im_overwhelmed",
+        "business:content_creation",
+        "conversation:what_should_i_work_on",
+        "conversation:follow_through"
+      ],
+      "profileSignalCount": 47,
+      "shadowSignalCount": 0,
+      "parityPass": false
+    }
+  ],
+  "profileSummary": {
+    "signalCount": 47,
+    "updatedAt": "2026-06-22T16:25:21.722Z"
+  },
+  "shadowSignals": [],
+  "metrics": {
+    "totalEmits": 0,
+    "dedupedEmits": 0,
+    "registryMisses": 0,
+    "validationFailures": 0,
+    "parityChecks": 20,
+    "parityPasses": 0,
+    "parityPassRate": 0,
+    "duplicateRate": 0,
+    "lastDiscrepancies": [
+      {
+        "at": "2026-06-22T16:25:21.722Z",
+        "legacyKeys": [
+          "business:marketing",
+          "emotional:excited",
+          "emotional:confused"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "business:marketing",
+          "emotional:excited",
+          "emotional:confused"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.720Z",
+        "legacyKeys": [
+          "business:content_creation",
+          "emotional:excited",
+          "creation:content_created"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "business:content_creation",
+          "emotional:excited",
+          "creation:content_created"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.719Z",
+        "legacyKeys": [
+          "conversation:follow_through",
+          "emotional:frustrated"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "conversation:follow_through",
+          "emotional:frustrated"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.717Z",
+        "legacyKeys": [
+          "conversation:what_should_i_work_on",
+          "emotional:confused"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "conversation:what_should_i_work_on",
+          "emotional:confused"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.716Z",
+        "legacyKeys": [
+          "business:content_creation",
+          "emotional:excited",
+          "creation:content_created"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "business:content_creation",
+          "emotional:excited",
+          "creation:content_created"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.716Z",
+        "legacyKeys": [
+          "emotional:confused"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:confused"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.715Z",
+        "legacyKeys": [
+          "emotional:overwhelm",
+          "conversation:im_overwhelmed",
+          "emotional:frustrated"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:overwhelm",
+          "conversation:im_overwhelmed",
+          "emotional:frustrated"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.714Z",
+        "legacyKeys": [
+          "emotional:stuck"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:stuck"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.713Z",
+        "legacyKeys": [
+          "business:marketing",
+          "conversation:dont_know_where_to_start",
+          "emotional:stuck"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "business:marketing",
+          "conversation:dont_know_where_to_start",
+          "emotional:stuck"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.712Z",
+        "legacyKeys": [
+          "emotional:frustrated",
+          "emotional:overwhelm"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:frustrated",
+          "emotional:overwhelm"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.707Z",
+        "legacyKeys": [
+          "emotional:frustrated"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:frustrated"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.705Z",
+        "legacyKeys": [
+          "emotional:excited",
+          "creation:content_created"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:excited",
+          "creation:content_created"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.703Z",
+        "legacyKeys": [
+          "emotional:stuck"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:stuck"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.702Z",
+        "legacyKeys": [
+          "emotional:excited",
+          "creation:content_created"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:excited",
+          "creation:content_created"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.701Z",
+        "legacyKeys": [
+          "emotional:frustrated",
+          "emotional:overwhelm"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:frustrated",
+          "emotional:overwhelm"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.700Z",
+        "legacyKeys": [
+          "emotional:confused"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:confused"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.699Z",
+        "legacyKeys": [
+          "emotional:frustrated"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:frustrated"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.697Z",
+        "legacyKeys": [
+          "conversation:prioritization",
+          "emotional:frustrated",
+          "emotional:overwhelm"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "conversation:prioritization",
+          "emotional:frustrated",
+          "emotional:overwhelm"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.696Z",
+        "legacyKeys": [
+          "emotional:stuck"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:stuck"
+        ],
+        "extraInShadow": []
+      },
+      {
+        "at": "2026-06-22T16:25:21.692Z",
+        "legacyKeys": [
+          "emotional:frustrated",
+          "emotional:overwhelm"
+        ],
+        "shadowKeys": [],
+        "missingInShadow": [
+          "emotional:frustrated",
+          "emotional:overwhelm"
+        ],
+        "extraInShadow": []
+      }
+    ]
+  }
+}

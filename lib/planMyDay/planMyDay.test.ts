@@ -56,7 +56,7 @@ describe("planMyDay view resolution", () => {
   });
 
   it("falls back to capacity suggestion when no prefs", () => {
-    expect(resolveInitialPlanningView("low")).toBe("visual-focus");
+    expect(resolveInitialPlanningView("low")).toBe("list");
     expect(resolveInitialPlanningView("medium")).toBe("cards");
     expect(resolveInitialPlanningView("high")).toBe("kanban");
   });
@@ -67,8 +67,8 @@ describe("planMyDay view resolution", () => {
 });
 
 describe("planMyDay capacity views", () => {
-  it("maps low energy to visual focus", () => {
-    expect(suggestedViewForCapacity("low")).toBe("visual-focus");
+  it("maps low energy to list", () => {
+    expect(suggestedViewForCapacity("low")).toBe("list");
   });
 
   it("maps medium energy to cards", () => {

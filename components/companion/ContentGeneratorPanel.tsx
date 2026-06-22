@@ -39,6 +39,7 @@ import {
 } from "@/lib/googleWorkspace";
 import { copyPasteFallbackMessage } from "@/lib/collaborativeDocumentWorkflow";
 import { findCatalogItem } from "@/lib/createCatalog";
+import { recordCreationSignal } from "@/lib/intelligence-layer";
 import {
   advanceAfterItemPick,
   advanceAfterTypePick,
@@ -1346,6 +1347,7 @@ export function ContentGeneratorPanel({
   }
 
   function handleLauncherCreate(display: string, customLabel?: string) {
+    recordCreationSignal(customLabel?.trim() || display);
     if (customLabel?.trim()) {
       pickCreateType(customLabel.trim(), { bypassRoute: true });
       return;

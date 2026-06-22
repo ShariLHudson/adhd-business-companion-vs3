@@ -18,14 +18,6 @@ export const PLAN_VIEW_SECTION_HELP: Partial<
       "Parked — not today; stays on the plan without pressure.",
     ],
   },
-  "visual-focus": {
-    title: "Visual Focus",
-    bullets: [
-      "Shows one active item at a time — built for low-capacity days.",
-      "Pick next when you finish or need a change.",
-      "No columns or lists — just the thing in front of you.",
-    ],
-  },
 };
 
 export function planViewSectionHelp(

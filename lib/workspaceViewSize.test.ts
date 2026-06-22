@@ -90,12 +90,20 @@ describe("workspace view size + layout tokens", () => {
     );
   });
 
-  it("Visual Focus preset applies correct split config", () => {
-    expect(VIEW_SIZE_PRESETS["visual-focus"].chat).toBe(25);
-    expect(VIEW_SIZE_PRESETS["visual-focus"].workspace).toBe(75);
-    expect(splitLayoutClassName("visual-focus")).toBe(
-      `${SPLIT_LAYOUT_ROOT_CLASS} companion-split--visual-focus`,
-    );
+  it("migrates legacy visual-focus layout preference to workspace-focus", () => {
+    localStorage.setItem(WORKSPACE_VIEW_SIZE_STORAGE_KEY, "visual-focus");
+    expect(loadWorkspaceViewSizePreference()).toBe("workspace-focus");
+  });
+
+  it("Decision Compass defaults to Workspace Focus without saved preference", () => {
+    expect(defaultViewSizeForSection("decision-compass")).toBe("workspace-focus");
+    expect(
+      resolveEffectiveViewSize("decision-compass", null),
+    ).toBe("workspace-focus");
+  });
+
+  it("Visual Focus workspace defaults to Workspace Focus layout", () => {
+    expect(defaultViewSizeForSection("visual-focus")).toBe("workspace-focus");
   });
 
   it("preference persists in companion-workspace-view-size-v1", () => {
@@ -105,13 +113,6 @@ describe("workspace view size + layout tokens", () => {
       "chat-focus",
     );
     expect(loadWorkspaceViewSizePreference()).toBe("chat-focus");
-  });
-
-  it("Decision Compass defaults to Visual Focus without saved preference", () => {
-    expect(defaultViewSizeForSection("decision-compass")).toBe("visual-focus");
-    expect(
-      resolveEffectiveViewSize("decision-compass", null),
-    ).toBe("visual-focus");
   });
 
   it("Create defaults to Workspace Focus without saved preference", () => {

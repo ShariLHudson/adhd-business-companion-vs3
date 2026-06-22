@@ -56,6 +56,7 @@ type IndexEntry = {
 
 const MAIN_AREA_SECTION: Record<string, AppSection> = {
   "plan-my-day": "plan-my-day",
+  "visual-focus": "visual-focus",
   projects: "projects",
   "create-overview": "content-generator",
   "clear-my-mind": "brain-dump",

@@ -41,6 +41,7 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
   "growth",
   "confidence-vault",
   "plan-my-day",
+  "visual-focus",
   "focus-timer",
 ];
 
@@ -76,6 +77,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "decision-compass": "Decision Compass",
   today: "Today",
   "plan-my-day": "Plan My Day",
+  "visual-focus": "Visual Focus",
   "wins-this-week": "Wins This Week",
   "evidence-bank": "Evidence Bank",
   growth: "Growth",
@@ -142,6 +144,7 @@ export const WORKSPACE_EMOJI: Partial<Record<AppSection, string>> = {
   "decision-compass": "🧭",
   today: "📅",
   "plan-my-day": "📋",
+  "visual-focus": "🎨",
   "wins-this-week": "🏆",
   "evidence-bank": "📈",
   growth: "🌱",

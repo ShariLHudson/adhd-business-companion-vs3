@@ -5,6 +5,7 @@ import { getWorkspaceAreaWorkflow } from "./workspaceAreaWorkflows";
 /** Workspace keys used by panels — maps to How Do I help articles. */
 export type WorkspaceHelpAreaId =
   | "plan-my-day"
+  | "visual-focus"
   | "projects"
   | "content-generator"
   | "brain-dump"
@@ -24,6 +25,7 @@ export type WorkspaceHelpAreaId =
 
 const HELP_ARTICLE_ID: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "plan-my-day": "plan-my-day",
+  "visual-focus": "visual-focus",
   projects: "projects",
   "content-generator": "create-overview",
   "brain-dump": "clear-my-mind",
@@ -56,6 +58,8 @@ const AREA_DISPLAY_NAME: Partial<Record<WorkspaceHelpAreaId, string>> = {
 const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "plan-my-day":
     "Pulls from Projects and Clear My Mind. Finished work lands in My Work; wins and proof build in Wins This Week and Evidence Bank.",
+  "visual-focus":
+    "Separate from Plan My Day — use for mind maps, decision trees, and spatial thinking. Plan My Day stays for today's task views.",
   projects:
     "Links to Plan My Day, Create, Clear My Mind, and My Work. Chat can sit beside a project while you think.",
   "content-generator":

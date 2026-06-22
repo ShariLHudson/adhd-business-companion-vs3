@@ -9,7 +9,6 @@ const PRESET_ORDER: WorkspaceViewSizePreset[] = [
   "balanced",
   "chat-focus",
   "workspace-focus",
-  "visual-focus",
 ];
 
 export function WorkspaceViewSizeControl({

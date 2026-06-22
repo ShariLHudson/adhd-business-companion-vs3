@@ -4,8 +4,7 @@ export type PlanningViewMode =
   | "list"
   | "timeline"
   | "cards"
-  | "kanban"
-  | "visual-focus";
+  | "kanban";
 
 export type PlanItemColumn = "ready" | "doing" | "done" | "parked";
 
@@ -42,7 +41,7 @@ export type PlanDayItem = {
   snoozedUntil?: string;
   /** Completed but kept visible for reference */
   keptForReference?: boolean;
-  /** Higher = shown first in Visual Focus when multiple items are Doing */
+  /** Higher = shown first when multiple items are Doing */
   focusRank?: number;
 };
 
@@ -90,10 +89,5 @@ export const PLANNING_VIEW_OPTIONS: {
     id: "kanban",
     label: "Kanban",
     desc: "Ready · Doing · Done · Parked — drag tasks as you go.",
-  },
-  {
-    id: "visual-focus",
-    label: "Visual Focus",
-    desc: "One thing at a time. No clutter.",
   },
 ];

@@ -73,7 +73,7 @@ export function workspaceOpenAckVerified(
 const GOOGLE_OPEN_CLAIM_RE =
   /\*\*Google (?:Docs?|Sheets?|Forms?)\*\* is open beside us[^\n]*/gi;
 
-/** Drop assistant lines that claim a workspace is open when it is not verified. */
+/** Drop assistant claims that a workspace is open when it is not verified. */
 export function scrubFalseWorkspaceClaims(
   text: string,
   snap: WorkspaceOpenSnapshot,
@@ -88,11 +88,11 @@ export function scrubFalseWorkspaceClaims(
   const panelClaims: { section: AppSection; re: RegExp }[] = [
     {
       section: "content-generator",
-      re: /\*\*Create\*\* is open beside us[^\n]*/gi,
+      re: /\*\*Create\*\* is open beside us[.!?]?\s*/gi,
     },
     {
       section: "client-avatars",
-      re: /\*\*Client Avatar\*\* is open beside us[^\n]*/gi,
+      re: /\*\*Client Avatar\*\* is open beside us[.!?]?\s*/gi,
     },
   ];
 
@@ -102,7 +102,7 @@ export function scrubFalseWorkspaceClaims(
     }
   }
 
-  return result.replace(/\n{3,}/g, "\n\n").trim() || text.trim();
+  return result.replace(/\n{3,}/g, "\n\n").trim();
 }
 
 export function workspaceVerificationHint(

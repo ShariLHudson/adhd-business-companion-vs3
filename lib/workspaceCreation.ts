@@ -16,6 +16,7 @@ import type { AppSection } from "./companionUi";
 import type { CreateWorkflowState } from "./createWorkflow";
 import type { WorkspaceSession } from "./workspaceSop";
 import { getWorkflow } from "./workspaceSop";
+import { isChatConversationOnlyMode } from "./chatConversationOnly";
 
 export type CreatePanelContext = {
   section?: AppSection;
@@ -143,12 +144,12 @@ export function formatCreationContextForPrompt(
 }
 
 export const CREATION_COACH_RULES = `CREATE WORKSPACE RULES (Business Asset Builder — NOT a chat generator, NOT a form wizard):
-- The workspace beside chat is the SOURCE OF TRUTH. Chat guides; the panel stores, saves, and exports.
+- The workspace beside chat is the SOURCE OF TRUTH for draft content. Chat guides; the panel stores, saves, and exports.
 - Never tell the user their work is "in chat" when a draft is visible in Create — it lives in the workspace.
 - Chat is a normal conversation: answer questions, explain, brainstorm, research, coach, and review.
 - Never mention workflow steps, fields (Audience, Topic, CTA), or "we're on step X".
-- When Create is open beside chat, relevant content auto-applies to the draft — NEVER ask "Would you like me to apply/save/add this?"
-- User may brainstorm idea lists in chat — those stay in chat until they pick a direction; then auto-apply the chosen content.
+- In conversation-only mode: never claim you added or saved to the draft — user copies/pastes or uses panel buttons.
+- User may brainstorm idea lists in chat — those stay in chat until they pick a direction and transfer manually.
 - Reference what's already visible (type, title, draft). Never ask "what's your title?" if the title is on screen.
 - Reference templates, snippets, business profile, and audience when asked.`;
 
@@ -169,6 +170,8 @@ export function formatCreationCoGuideHint(
       creationContext?.draftContent?.trim() || ctx.draftPreview?.trim(),
     );
 
+  const chatOnly = isChatConversationOnlyMode();
+
   const lines = [
     "CREATE WORKSPACE MODE (ACTIVE — draft canvas beside chat):",
     "Behave like ChatGPT beside a Google Doc. Talk naturally. No form wizard.",
@@ -179,9 +182,13 @@ export function formatCreationCoGuideHint(
     opts?.draftVisible === false
       ? "- The draft is NOT visible in the panel right now. Do NOT tell the user they can see it on screen."
       : hasDraft
-        ? "- A draft is visible in the panel. Reference it. Update it automatically when they provide content — do NOT ask permission."
+        ? chatOnly
+          ? "- A draft is visible in the panel. Reference it — do NOT claim you updated it from chat. User copies/pastes or edits in the panel."
+          : "- A draft is visible in the panel. Reference it. Update it automatically when they provide content — do NOT ask permission."
         : "- Help while the draft generates or while they compose in the panel.",
-    "- When they share content for the draft: apply it silently to the panel and continue the conversation.",
+    chatOnly
+      ? "- Chat holds ideas; the workspace panel holds the draft. Never claim you saved or moved content — encourage copy/paste or panel buttons."
+      : "- When they share content for the draft: apply it silently to the panel and continue the conversation.",
   ];
 
   return lines.join("\n");

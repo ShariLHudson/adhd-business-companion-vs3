@@ -5,14 +5,12 @@ import { getDayState } from "@/lib/companionStore";
 import {
   addQuickPlanItem,
   capacitySuggestionCopy,
-  currentFocusItem,
   durationLabel,
   formatPlanTime,
   isPlanItemActive,
   loadTodayPlanItems,
   readTodayPlanItems,
   movePlanItemKanban,
-  nextFocusOptions,
   planItemMetaLabel,
   planItemStyle,
   PLAN_MY_DAY_UPDATED,
@@ -252,110 +250,6 @@ function CardsView({
   );
 }
 
-function VisualFocusView({
-  items,
-  onStart,
-  onOpenItem,
-  onPickNext,
-  onTakeBreak,
-}: {
-  items: PlanDayItem[];
-  onStart: (id: string) => void;
-  onOpenItem: (id: string, mode?: PlanItemDetailMode) => void;
-  onPickNext: (id: string) => void;
-  onTakeBreak: () => void;
-}) {
-  const [justFinished, setJustFinished] = useState<string | null>(null);
-  const focus = currentFocusItem(items);
-  const next = nextFocusOptions(items, justFinished ?? focus?.id);
-
-  if (justFinished) {
-    return (
-      <div className="rounded-2xl border border-[#c5e0e0] bg-gradient-to-br from-[#f0f8f8] to-white px-6 py-8 text-center">
-        <p className="text-2xl font-semibold text-[#1f1c19]">Nice work.</p>
-        <p className="mt-2 text-base text-[#6b635a]">
-          What would you like next?
-        </p>
-        <ul className="mt-5 flex flex-col gap-2 text-left">
-          {next.map((item) => (
-            <li key={item.id}>
-              <button
-                type="button"
-                onClick={() => {
-                  setJustFinished(null);
-                  onPickNext(item.id);
-                }}
-                className="flex w-full items-center gap-2 rounded-xl border border-[#d4cdc3] bg-white px-4 py-3 text-left text-base font-semibold text-[#1f1c19] hover:border-[#1e4f4f]/40"
-              >
-                <span aria-hidden>▶</span>
-                {item.title}
-              </button>
-            </li>
-          ))}
-          <li>
-            <button
-              type="button"
-              onClick={() => {
-                setJustFinished(null);
-                onTakeBreak();
-              }}
-              className="flex w-full items-center gap-2 rounded-xl border border-dashed border-[#d4cdc3] bg-[#faf7f2] px-4 py-3 text-left text-base font-semibold text-[#6b635a]"
-            >
-              <span aria-hidden>▶</span>
-              Take a Break
-            </button>
-          </li>
-        </ul>
-      </div>
-    );
-  }
-
-  if (!focus) {
-    return (
-      <p className="text-center text-base text-[#6b635a]">
-        You&apos;re clear for today — add something above when you&apos;re ready.
-      </p>
-    );
-  }
-
-  return (
-    <div className="plan-day-view-surface rounded-2xl border border-[#e7dfd4]/80 bg-[#faf7f2] p-1">
-      <div className="rounded-2xl border border-[#1e4f4f]/15 bg-white px-6 py-10 text-center shadow-sm">
-        <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
-          Current Focus
-        </p>
-        <button
-          type="button"
-          onClick={() => onOpenItem(focus.id)}
-          className="mt-4 block w-full text-3xl font-semibold text-[#1f1c19] hover:text-[#1e4f4f]"
-        >
-          {focus.title}
-        </button>
-        <p className="mt-2 text-lg text-[#6b635a]">{durationLabel(focus)}</p>
-        <div className="mt-8 flex flex-col gap-2 sm:flex-row sm:justify-center">
-          <button
-            type="button"
-            onClick={() => onStart(focus.id)}
-            className="companion-btn-primary rounded-xl px-8 py-3 text-base font-semibold"
-          >
-            Start Now
-          </button>
-          <button
-            type="button"
-            onClick={() => onOpenItem(focus.id, "mark-done")}
-            className="rounded-xl border border-[#1e4f4f]/35 bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f]"
-          >
-            Mark Done
-          </button>
-        </div>
-        <p className="mt-6 text-sm text-[#9a8f82]">
-          Nothing else on screen — one thing at a time.
-        </p>
-      </div>
-    </div>
-  );
-}
-
 export function PlanMyDayPanel({
   onBack,
   onOpenSettings,
@@ -457,20 +351,6 @@ export function PlanMyDayPanel({
     );
     const item = items.find((i) => i.id === id);
     if (item) onStartFocus?.(item);
-  }
-
-  function handlePickNext(id: string) {
-    const next = items.map((it) =>
-      it.id === id
-        ? {
-            ...it,
-            column: "doing" as const,
-            done: false,
-            focusRank: Date.now(),
-          }
-        : it,
-    );
-    refresh(saveTodayPlanItems(next));
   }
 
   function handleAdd(input: QuickPlanItemInput) {
@@ -608,15 +488,6 @@ export function PlanMyDayPanel({
                 onOpen={(id) => handleOpenItem(id)}
                 onDrop={handleKanbanDrop}
                 colorCoding={colorCoding}
-              />
-            ) : null}
-            {view === "visual-focus" ? (
-              <VisualFocusView
-                items={items}
-                onStart={handleStartFocus}
-                onOpenItem={handleOpenItem}
-                onPickNext={handlePickNext}
-                onTakeBreak={() => handleViewChange("list")}
               />
             ) : null}
           </div>

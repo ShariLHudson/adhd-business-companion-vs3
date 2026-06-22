@@ -1,0 +1,95 @@
+{
+  "generatedAt": "2026-06-22T16:25:21.756Z",
+  "messageCount": 20,
+  "behavioralDiffs": [
+    {
+      "index": 0,
+      "text": "I have 17 things on my list and my brain is shutting down.",
+      "field": "ecosystemPriority",
+      "before": "calm_presence",
+      "after": "activation_support"
+    },
+    {
+      "index": 2,
+      "text": "I have so many business ideas I can't pick one.",
+      "field": "activationOffer",
+      "before": "",
+      "after": "It looks like you may be carrying a lot right now. Would it help to sort this into what matters today, what can wait, and what can be parked?"
+    },
+    {
+      "index": 4,
+      "text": "Who am I to charge these prices? Everyone seems more put together.",
+      "field": "ecosystemPriority",
+      "before": "calm_presence",
+      "after": "activation_support"
+    },
+    {
+      "index": 5,
+      "text": "I sat down at 9 and suddenly it's 3pm. Where did the day go?",
+      "field": "ecosystemPriority",
+      "before": "calm_presence",
+      "after": "activation_support"
+    },
+    {
+      "index": 6,
+      "text": "I've been staring at a blank doc for an hour. I need to post something.",
+      "field": "ecosystemPriority",
+      "before": "calm_presence",
+      "after": "activation_support"
+    },
+    {
+      "index": 7,
+      "text": "I know what to do but my body won't start. Like I'm frozen.",
+      "field": "activationOffer",
+      "before": "",
+      "after": "It looks like you may be carrying a lot right now. Would it help to sort this into what matters today, what can wait, and what can be parked?"
+    },
+    {
+      "index": 8,
+      "text": "I've rewritten this email six times and still won't send it.",
+      "field": "ecosystemPriority",
+      "before": "future_shari_support",
+      "after": "activation_support"
+    },
+    {
+      "index": 9,
+      "text": "I'm exhausted and anxious and everything feels heavy.",
+      "field": "activationOffer",
+      "before": "Energy looks low. Want to pick the smallest possible step, not a big push?",
+      "after": "It looks like you may be carrying a lot right now. Would it help to sort this into what matters today, what can wait, and what can be parked?"
+    },
+    {
+      "index": 10,
+      "text": "Help me prioritize — everything feels urgent right now.",
+      "field": "ecosystemPriority",
+      "before": "momentum_acknowledgment",
+      "after": "activation_support"
+    },
+    {
+      "index": 12,
+      "text": "I'm stuck on this task. It feels too big.",
+      "field": "activationOffer",
+      "before": "It sounds like the task may be too big right now. Want to shrink it to the first 5-minute step?",
+      "after": "It looks like you may be carrying a lot right now. Would it help to sort this into what matters today, what can wait, and what can be parked?"
+    }
+  ],
+  "behavioralParity": false,
+  "registryCoverage": {
+    "totalMappingCategories": 39,
+    "registeredCategories": 39,
+    "missingCategories": [],
+    "coveragePercent": 100
+  },
+  "shadowParity": {
+    "passes": 2,
+    "total": 20,
+    "percent": 10
+  },
+  "performance": {
+    "avgMs": 0.1,
+    "p95Ms": 1,
+    "totalMs": 10
+  },
+  "duplicateRate": 0.723404255319149,
+  "shadowSignalCount": 13
+}

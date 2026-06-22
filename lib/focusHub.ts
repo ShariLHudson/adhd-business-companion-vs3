@@ -100,6 +100,12 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
             },
             "Work through competing options and priorities.",
           ),
+          tool(
+            "visual-focus-crowded",
+            "Visual Focus",
+            { kind: "section", section: "visual-focus", toolId: "visual-focus-crowded" },
+            "Think spatially — mind maps, decisions, and connections.",
+          ),
         ],
       },
     ],
@@ -131,6 +137,12 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
             "Prioritize My Options",
             { kind: "activity", activityId: "priority-sort", toolId: "prioritize-options" },
             "Figure out what matters most right now.",
+          ),
+          tool(
+            "visual-focus-stuck",
+            "Visual Focus",
+            { kind: "section", section: "visual-focus", toolId: "visual-focus-stuck" },
+            "Map ideas and decisions visually.",
           ),
           tool(
             "break-smaller",

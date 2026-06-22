@@ -5,7 +5,7 @@ import type { PlanningViewMode } from "./types";
 export function suggestedViewForCapacity(
   energy: DayLevel | null | undefined,
 ): PlanningViewMode {
-  if (energy === "low") return "visual-focus";
+  if (energy === "low") return "list";
   if (energy === "medium") return "cards";
   return "kanban";
 }
@@ -14,7 +14,7 @@ export function capacitySuggestionCopy(
   energy: DayLevel | null | undefined,
 ): string | null {
   if (energy === "low") {
-    return "Low capacity today — Visual Focus shows one thing at a time.";
+    return "Low capacity — List keeps today simple. Open Visual Focus when you want to think spatially.";
   }
   if (energy === "medium") {
     return "Medium capacity — Card view lets you see a few things without overwhelm.";

@@ -32,6 +32,7 @@ export type AppSection =
   | "decision-compass"
   | "today"
   | "plan-my-day"
+  | "visual-focus"
   | "wins-this-week"
   | "evidence-bank"
   | "growth"
