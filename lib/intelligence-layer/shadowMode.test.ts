@@ -8,6 +8,8 @@ import { getIntelligenceProfile } from "./profileStore";
 import { getShadowSignalStore } from "./shadowSignalStore";
 import {
   compareEmittedParity,
+  exposeShadowMetricsToWindow,
+  getShadowBusMetrics,
   resetShadowDiagnosticsForTests,
 } from "./shadowDiagnostics";
 import { clearShadowSignalStoreForTests } from "./shadowSignalStore";
@@ -145,5 +147,35 @@ describe("shadow mode integration", () => {
     const shadowKeys = summary!.emitted.map((s) => `${s.domain}:${s.category}`);
     const { pass } = compareEmittedParity(summary!.legacyKeys, shadowKeys);
     expect(pass).toBe(true);
+  });
+});
+
+describe("exposeShadowMetricsToWindow", () => {
+  beforeEach(() => {
+    mockStorage();
+    resetShadowDiagnosticsForTests();
+    localStorage.removeItem(SIGNAL_BUS_FLAG_KEYS.diagnostics);
+  });
+
+  it("exposes __companionSignalBusMetrics when diagnostics flag is on", () => {
+    const win: Record<string, unknown> = {
+      dispatchEvent: vi.fn(),
+      localStorage: globalThis.localStorage,
+    };
+    vi.stubGlobal("window", win);
+    localStorage.setItem(SIGNAL_BUS_FLAG_KEYS.diagnostics, "1");
+    exposeShadowMetricsToWindow();
+    expect(typeof win.__companionSignalBusMetrics).toBe("function");
+    expect(win.__companionSignalBusMetrics?.()).toEqual(getShadowBusMetrics());
+  });
+
+  it("does not expose when diagnostics flag is off", () => {
+    const win: Record<string, unknown> = {
+      dispatchEvent: vi.fn(),
+      localStorage: globalThis.localStorage,
+    };
+    vi.stubGlobal("window", win);
+    exposeShadowMetricsToWindow();
+    expect(win.__companionSignalBusMetrics).toBeUndefined();
   });
 });

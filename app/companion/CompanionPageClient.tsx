@@ -835,7 +835,10 @@ import {
   userIntelligenceEngine,
 } from "@/lib/ecosystem/userIntelligenceEngine";
 import { ingestClassifiedUserSignals } from "@/lib/intelligence-layer";
-import { reportShadowParityAfterChatTurn } from "@/lib/intelligence-layer/shadowDiagnostics";
+import {
+  exposeShadowMetricsToWindow,
+  reportShadowParityAfterChatTurn,
+} from "@/lib/intelligence-layer/shadowDiagnostics";
 import {
   buildActionDashboard,
   executeFounderAction,
@@ -1133,6 +1136,11 @@ function toChatTurns(
 
 export default function CompanionPageClient() {
   const router = useRouter();
+
+  useEffect(() => {
+    exposeShadowMetricsToWindow();
+  }, []);
+
   const [activeSection, setActiveSection] = useState<AppSection>("home");
   const [activeNav, setActiveNav] = useState<SidebarNavId>("chat");
   const activeNavRef = useRef<SidebarNavId>("chat");
