@@ -25,6 +25,10 @@ import { normalizeCategory } from "@/lib/brainDumpCategories";
 import type { AppSection } from "@/lib/companionUi";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
 import { ClearMyMindReliefClusters } from "@/components/companion/ClearMyMindReliefClusters";
+import {
+  detectThoughtSplitProposal,
+  type ThoughtSplitProposal,
+} from "@/lib/clearMyMindThoughtSplitter";
 
 type Props = {
   sessionId?: string;
@@ -66,6 +70,9 @@ export function ClearMyMindSession({
   const [trust, setTrust] = useState<RouteTrustResult | null>(null);
   const [splitNotice, setSplitNotice] = useState<string | null>(null);
   const [showSortQueue, setShowSortQueue] = useState(false);
+  const [pendingSplit, setPendingSplit] = useState<ThoughtSplitProposal | null>(
+    null,
+  );
 
   const refresh = useCallback(() => {
     setEntries(
@@ -91,6 +98,10 @@ export function ClearMyMindSession({
   useEffect(() => {
     onSessionEntriesChange?.(sessionItems);
   }, [sessionItems, onSessionEntriesChange]);
+
+  useEffect(() => {
+    setPendingSplit(null);
+  }, [input]);
 
   const unsortedItems = useMemo(
     () => sessionItems.filter((e) => !e.sorted && !e.routedAction),
@@ -121,8 +132,7 @@ export function ClearMyMindSession({
     }
   }
 
-  function addThoughts() {
-    const parts = splitCaptureInput(input);
+  function saveThoughtParts(parts: string[]) {
     if (!parts.length) return;
 
     const all = addBrainDumps(parts, { captureSessionId: sessionId });
@@ -141,6 +151,7 @@ export function ClearMyMindSession({
 
     setEntries(sessionSaved);
     setInput("");
+    setPendingSplit(null);
     setPhase("more");
     createdItems.forEach((item, index) => {
       const itemId = item.id;
@@ -163,6 +174,31 @@ export function ClearMyMindSession({
         });
       },
     );
+  }
+
+  function addThoughts() {
+    const parts = splitCaptureInput(input);
+    if (!parts.length) return;
+
+    if (parts.length === 1) {
+      const proposal = detectThoughtSplitProposal(parts[0]!);
+      if (proposal) {
+        setPendingSplit(proposal);
+        return;
+      }
+    }
+
+    saveThoughtParts(parts);
+  }
+
+  function confirmSplit() {
+    if (!pendingSplit) return;
+    saveThoughtParts(pendingSplit.segments);
+  }
+
+  function leaveAsIs() {
+    if (!pendingSplit) return;
+    saveThoughtParts([pendingSplit.raw]);
   }
 
   function finishCapture() {
@@ -235,6 +271,45 @@ export function ClearMyMindSession({
           {splitNotice ? (
             <p className="text-sm text-[#6b635a]">{splitNotice}</p>
           ) : null}
+          {pendingSplit ? (
+            <div
+              className="rounded-2xl border border-[#e7dfd4] bg-[#faf7f2]/90 p-4"
+              data-testid="thought-split-offer"
+            >
+              <p className="text-base font-semibold text-[#1f1c19]">
+                I found {pendingSplit.count} separate thoughts in there.
+              </p>
+              <p className="mt-1 text-sm text-[#6b635a]">
+                Want me to split them?
+              </p>
+              <details className="mt-3">
+                <summary className="cursor-pointer text-sm text-[#9a8f82] marker:content-none [&::-webkit-details-marker]:hidden">
+                  See what I&apos;d split
+                </summary>
+                <ul className="mt-2 list-none space-y-1 pl-0 text-sm text-[#6b635a]">
+                  {pendingSplit.segments.map((segment, index) => (
+                    <li key={`${index}-${segment}`}>{segment}</li>
+                  ))}
+                </ul>
+              </details>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={confirmSplit}
+                  className="rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white"
+                >
+                  Split Them
+                </button>
+                <button
+                  type="button"
+                  onClick={leaveAsIs}
+                  className="rounded-xl border-2 border-[#d4cdc3] bg-white px-5 py-2.5 text-sm font-semibold text-[#3d3630]"
+                >
+                  Leave It As Is
+                </button>
+              </div>
+            </div>
+          ) : null}
           {sessionItems.length > 0 && (
             <p className="text-sm text-[#6b635a]">
               Saved on this device. Open <strong>Library</strong> to find them.
@@ -243,7 +318,7 @@ export function ClearMyMindSession({
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              disabled={!input.trim()}
+              disabled={!input.trim() || pendingSplit !== null}
               onClick={addThoughts}
               className="rounded-xl bg-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-white disabled:bg-[#9aaba8]"
             >
