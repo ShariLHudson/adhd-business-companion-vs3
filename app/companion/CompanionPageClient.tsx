@@ -81,7 +81,6 @@ import { ProfilePanel } from "@/components/companion/ProfilePanel";
 import { ModalSheet } from "@/components/companion/ModalSheet";
 import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm";
 import { CompanionSignInFromQuery } from "@/components/companion/CompanionSignInFromQuery";
-import { CompanionAuthGate } from "@/components/companion/CompanionAuthGate";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { EmailGeneratorPanel } from "@/components/companion/EmailGeneratorPanel";
 import { SnippetsLibrary } from "@/components/companion/SnippetsLibrary";
@@ -11289,7 +11288,6 @@ export default function CompanionPageClient() {
   ]);
 
   return (
-    <CompanionAuthGate>
     <div
       className={`relative flex h-dvh max-h-dvh overflow-hidden text-lg ${
         clientMounted ? shellClass : EMOTION_SHELL_CLASS.unclear
@@ -11312,7 +11310,7 @@ export default function CompanionPageClient() {
           />
         </div>
 
-        <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
+        <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <TopBar
             onAdjustDay={() => setActiveSection("energy")}
             onRequestClearTodayContext={requestClearTodayContext}
@@ -12339,6 +12337,5 @@ export default function CompanionPageClient() {
         </div>
       ) : null}
     </div>
-    </CompanionAuthGate>
   );
 }

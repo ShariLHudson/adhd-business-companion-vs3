@@ -43,20 +43,22 @@ export function ModalSheet({
   // Absolute (not fixed) so the sheet only covers the main pane — sidebar stays
   // clickable. No pointer-events-none wrapper; panel is interactive as soon as open.
   return (
-    <div className="absolute inset-0 z-50 flex justify-end overflow-hidden">
-      <button
-        type="button"
-        aria-label="Close"
-        onClick={onClose}
-        className="absolute inset-0 bg-black/30 transition-opacity duration-300"
-      />
+    <div className="pointer-events-none absolute inset-0 z-50 flex justify-end overflow-hidden">
+      {entered ? (
+        <button
+          type="button"
+          aria-label="Close"
+          onClick={onClose}
+          className="pointer-events-auto absolute inset-0 bg-black/30 transition-opacity duration-300"
+        />
+      ) : null}
 
       {/* Panel */}
       <div
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className={`relative z-10 flex h-full w-full max-w-md flex-col bg-[#faf7f2] shadow-2xl transition-transform duration-300 ease-out ${
+        className={`pointer-events-auto relative z-10 flex h-full w-full max-w-md flex-col bg-[#faf7f2] shadow-2xl transition-transform duration-300 ease-out ${
           entered ? "translate-x-0" : "translate-x-full"
         }`}
       >

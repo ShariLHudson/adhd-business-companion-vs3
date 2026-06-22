@@ -464,6 +464,13 @@
   ) !important;
 }
 
+.companion-app-sidebar button,
+.companion-app-sidebar a,
+.companion-top-bar button {
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
 .companion-nav-active {
   background: var(--cm-nav-active) !important;
   color: var(--cm-accent-contrast) !important;
