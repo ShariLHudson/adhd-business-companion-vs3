@@ -1,6 +1,8 @@
 import { describe, expect, it, beforeEach, vi } from "vitest";
 import {
   buildBrainDumpClusterGraph,
+  clusterReliefAcknowledgement,
+  formatClusterDotWeight,
   MAX_MAJOR_CLUSTERS,
   toneForEntry,
 } from "./brainDumpClusterModel";
@@ -148,5 +150,19 @@ describe("Clear My Mind visual clusters", () => {
     saveBrainDumpVisualView("infographic");
     expect(loadBrainDumpVisualView()).toBe("infographic");
     expect(loadBrainDumpVisualVisible()).toBe(true);
+  });
+
+  it("formats cluster dot weight without dominant counts", () => {
+    expect(formatClusterDotWeight(3).dots).toBe("●●●");
+    expect(formatClusterDotWeight(3).suffix).toBeNull();
+    expect(formatClusterDotWeight(8).dots).toBe("●●●●●●●●");
+    expect(formatClusterDotWeight(9).suffix).toBe("+ more");
+    expect(formatClusterDotWeight(9).dots).toBe("●●●●●●●●");
+  });
+
+  it("relief acknowledgement copy is calming and count-aware", () => {
+    expect(clusterReliefAcknowledgement(1)).toContain("this thought");
+    expect(clusterReliefAcknowledgement(8)).toContain("8 thoughts");
+    expect(clusterReliefAcknowledgement(8)).toContain("safe");
   });
 });

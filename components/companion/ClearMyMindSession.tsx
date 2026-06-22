@@ -24,6 +24,7 @@ import {
 import { normalizeCategory } from "@/lib/brainDumpCategories";
 import type { AppSection } from "@/lib/companionUi";
 import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
+import { ClearMyMindReliefClusters } from "@/components/companion/ClearMyMindReliefClusters";
 
 type Props = {
   sessionId?: string;
@@ -64,6 +65,7 @@ export function ClearMyMindSession({
   const [entries, setEntries] = useState<BrainDumpEntry[]>([]);
   const [trust, setTrust] = useState<RouteTrustResult | null>(null);
   const [splitNotice, setSplitNotice] = useState<string | null>(null);
+  const [showSortQueue, setShowSortQueue] = useState(false);
 
   const refresh = useCallback(() => {
     setEntries(
@@ -165,6 +167,7 @@ export function ClearMyMindSession({
 
   function finishCapture() {
     if (sessionItems.length === 0) return;
+    setShowSortQueue(false);
     setPhase("sorting");
     setTrust(null);
   }
@@ -198,10 +201,11 @@ export function ClearMyMindSession({
   }
 
   const prompt = capturePrompt(phase, sessionItems.length);
+  const inReliefView = phase === "sorting" && !showSortQueue;
 
   return (
     <div className="flex flex-col gap-4">
-      {phase !== "complete" && (
+      {phase !== "complete" && !inReliefView && (
         <>
           <p className="text-lg font-semibold leading-snug text-[#1f1c19]">
             {prompt}
@@ -285,14 +289,27 @@ export function ClearMyMindSession({
         </ul>
       )}
 
-      {phase === "sorting" && (
+      {phase === "sorting" && !showSortQueue && (
+        <>
+          <ClearMyMindReliefClusters entries={sessionItems} />
+          <button
+            type="button"
+            onClick={() => setShowSortQueue(true)}
+            className="self-start text-sm text-[#9a8f82] underline-offset-2 hover:text-[#6b635a] hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/30"
+          >
+            Ready to sort? →
+          </button>
+        </>
+      )}
+
+      {phase === "sorting" && showSortQueue && (
         <p className="text-sm leading-relaxed text-[#6b635a]">
           These cards are saved. Sorting just helps you decide what to do with
           each one. You can skip any — they&apos;ll stay in your Library.
         </p>
       )}
 
-      {phase === "sorting" && currentSortItem && (
+      {phase === "sorting" && showSortQueue && currentSortItem && (
         <div className="rounded-2xl border-2 border-[#1e4f4f]/30 bg-white p-4">
           <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
             {unsortedItems.length} item{unsortedItems.length === 1 ? "" : "s"}{" "}
@@ -324,7 +341,7 @@ export function ClearMyMindSession({
         </div>
       )}
 
-      {phase === "sorting" && !currentSortItem && sessionItems.length > 0 && (
+      {phase === "sorting" && showSortQueue && !currentSortItem && sessionItems.length > 0 && (
         <p className="text-sm text-[#6b635a]">All items sorted for now.</p>
       )}
 

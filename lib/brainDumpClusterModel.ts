@@ -14,6 +14,26 @@ import { truncateItem } from "./visualThinkingEngine";
 export const MAX_MAJOR_CLUSTERS = 5;
 export const MAX_VISIBLE_THOUGHTS = 3;
 export const OVERWHELM_THRESHOLD = 8;
+export const MAX_CLUSTER_DOT_WEIGHT = 8;
+
+/** Visual dot weight for relief clusters — no dominant numeric counts. */
+export function formatClusterDotWeight(count: number): {
+  dots: string;
+  suffix: string | null;
+} {
+  const n = Math.max(0, Math.floor(count));
+  if (n === 0) return { dots: "", suffix: null };
+  if (n <= MAX_CLUSTER_DOT_WEIGHT) {
+    return { dots: "●".repeat(n), suffix: null };
+  }
+  return { dots: "●".repeat(MAX_CLUSTER_DOT_WEIGHT), suffix: "+ more" };
+}
+
+export function clusterReliefAcknowledgement(count: number): string {
+  if (count === 1) return "I've got this thought here. It's safe.";
+  if (count > 1) return `I've got ${count} thoughts here. They're safe.`;
+  return "I've got these thoughts here. They're safe.";
+}
 
 export type ThoughtItem = {
   id: string;
