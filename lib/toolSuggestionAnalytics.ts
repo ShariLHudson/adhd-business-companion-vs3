@@ -2,6 +2,8 @@
 // No conversation text is stored.
 
 import type { ToolSuggestionKind } from "./companionToolSuggestions";
+import { recordTrustEvidence } from "./intelligence-layer/trustSignals";
+import type { TrustSignalCategory } from "./intelligence-layer/trustSignals";
 
 export type ToolSuggestionAction = "offered" | "accepted" | "dismissed";
 
@@ -15,6 +17,8 @@ export type ToolSuggestionAnalytics = {
 
 const STORAGE_KEY = "companion-tool-suggestion-analytics-v1";
 
+const TRUST_EMITTER = "toolSuggestionAnalytics";
+
 const KINDS: ToolSuggestionKind[] = [
   "clear-mind",
   "focus-session",
@@ -22,6 +26,28 @@ const KINDS: ToolSuggestionKind[] = [
   "breathe",
   "get-unstuck",
 ];
+
+/** Approved PR 6 mapping: UI kind → intervention registry offerKey. */
+const TOOL_KIND_OFFER_KEYS: Record<ToolSuggestionKind, string> = {
+  "clear-mind": "clear-mind",
+  breathe: "breathe",
+  "get-unstuck": "get-unstuck",
+  "focus-session": "focus-session",
+  "spin-wheel": "spin-wheel",
+};
+
+const ACTION_TRUST_CATEGORY: Record<
+  ToolSuggestionAction,
+  TrustSignalCategory
+> = {
+  offered: "trust.offer_rendered",
+  accepted: "trust.suggestion_accepted",
+  dismissed: "trust.suggestion_dismissed",
+};
+
+export function toolKindToOfferKey(kind: ToolSuggestionKind): string {
+  return TOOL_KIND_OFFER_KEYS[kind];
+}
 
 function zeroCounts(): ToolSuggestionCounts {
   return {
@@ -74,13 +100,32 @@ function persist(data: ToolSuggestionAnalytics): ToolSuggestionAnalytics {
   return data;
 }
 
+function recordTrustForToolSuggestion(
+  action: ToolSuggestionAction,
+  kind: ToolSuggestionKind,
+): void {
+  try {
+    recordTrustEvidence({
+      category: ACTION_TRUST_CATEGORY[action],
+      offerKey: toolKindToOfferKey(kind),
+      source: `tool-suggestion:${action}:${kind}`,
+      emitter: TRUST_EMITTER,
+      causationType: "user_action",
+    });
+  } catch {
+    /* trust collection must never affect analytics or UI */
+  }
+}
+
 function bump(
   action: ToolSuggestionAction,
   kind: ToolSuggestionKind,
 ): ToolSuggestionAnalytics {
   const data = getToolSuggestionAnalytics();
   data[action][kind] += 1;
-  return persist(data);
+  const result = persist(data);
+  recordTrustForToolSuggestion(action, kind);
+  return result;
 }
 
 export function trackToolSuggestionOffered(

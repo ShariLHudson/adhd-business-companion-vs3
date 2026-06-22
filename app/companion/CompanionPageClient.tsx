@@ -835,6 +835,7 @@ import {
   userIntelligenceEngine,
 } from "@/lib/ecosystem/userIntelligenceEngine";
 import { ingestClassifiedUserSignals } from "@/lib/intelligence-layer";
+import { initCompanionSession } from "@/lib/intelligence-layer/companionSession";
 import {
   exposeShadowMetricsToWindow,
   reportShadowParityAfterChatTurn,
@@ -1139,6 +1140,7 @@ export default function CompanionPageClient() {
 
   useEffect(() => {
     exposeShadowMetricsToWindow();
+    initCompanionSession();
   }, []);
 
   const [activeSection, setActiveSection] = useState<AppSection>("home");

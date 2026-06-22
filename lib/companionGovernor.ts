@@ -50,6 +50,7 @@ import {
   enforceConversationOnlyTurnSurface,
   isChatConversationOnlyMode,
 } from "./chatConversationOnly";
+import { observeGovernorTurnSurface } from "@/lib/intelligence-layer/governorTrustSignals";
 
 export type TurnOutcome =
   | "chat_only"
@@ -119,7 +120,15 @@ function laneLabel(text: string): string {
 
 /** Single entry — exactly one terminal outcome per turn. */
 export function evaluateCompanionTurn(input: CompanionGovernorInput): TurnSurface {
-  return enforceConversationOnlyTurnSurface(evaluateCompanionTurnCore(input));
+  const surface = enforceConversationOnlyTurnSurface(
+    evaluateCompanionTurnCore(input),
+  );
+  try {
+    observeGovernorTurnSurface(surface, input);
+  } catch {
+    /* observational only — must not affect governor outcomes */
+  }
+  return surface;
 }
 
 function evaluateCompanionTurnCore(input: CompanionGovernorInput): TurnSurface {

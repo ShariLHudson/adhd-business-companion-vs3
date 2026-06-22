@@ -4,6 +4,11 @@ import {
   getIntelligenceProfile,
   saveIntelligenceProfile,
 } from "./profileStore";
+import {
+  isProfileLearningEnabled,
+  shouldEvolveFromSignal,
+  type TrustAttributionMvp,
+} from "./learningGates";
 import { resolveSignalTraitMapping } from "./signalMapping";
 import type {
   IntelligenceProfile,
@@ -139,17 +144,29 @@ function applySignalToProfile(
   return next;
 }
 
+function syncProfileSignalCount(profile: IntelligenceProfile): IntelligenceProfile {
+  const next = structuredClone(profile);
+  next.signalCount = getIntelligenceSignalStore().signals.length;
+  next.updatedAt = new Date().toISOString();
+  return next;
+}
+
 /** Evolve profile from all stored signals (idempotent full replay). */
 export function evolveIntelligenceProfileFromSignals(): IntelligenceProfile {
   const signals = getIntelligenceSignalStore().signals;
-  let profile = createEmptyIntelligenceProfile(
-    getIntelligenceProfile().userId,
-  );
-  const createdAt = getIntelligenceProfile().createdAt;
-  profile.createdAt = createdAt;
+  const current = getIntelligenceProfile();
+
+  if (!isProfileLearningEnabled()) {
+    return saveIntelligenceProfile(syncProfileSignalCount(current));
+  }
+
+  let profile = createEmptyIntelligenceProfile(current.userId);
+  profile.createdAt = current.createdAt;
 
   for (const signal of signals) {
-    profile = applySignalToProfile(profile, signal);
+    if (shouldEvolveFromSignal(signal)) {
+      profile = applySignalToProfile(profile, signal);
+    }
   }
 
   profile.signalCount = signals.length;
@@ -160,8 +177,12 @@ export function evolveIntelligenceProfileFromSignals(): IntelligenceProfile {
 /** Apply a single new signal incrementally (faster path after record). */
 export function applySignalIncrementally(
   signal: IntelligenceSignal,
+  attribution?: TrustAttributionMvp | null,
 ): IntelligenceProfile {
   const current = getIntelligenceProfile();
+  if (!shouldEvolveFromSignal(signal, attribution)) {
+    return saveIntelligenceProfile(syncProfileSignalCount(current));
+  }
   const next = applySignalToProfile(current, signal);
   next.signalCount = getIntelligenceSignalStore().signals.length;
   return saveIntelligenceProfile(next);

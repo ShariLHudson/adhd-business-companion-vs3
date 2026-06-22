@@ -203,9 +203,37 @@ const MAP: Record<string, SignalTraitMapping> = {
     ],
     weight: 10,
   },
+  suggestion_dismissed: {
+    paths: ["relationship.trust.disengages_from_nagging"],
+    weight: 10,
+  },
   suggestion_ignored: {
     paths: ["relationship.trust.ignores_generic_suggestions"],
     weight: 8,
+  },
+  intervention_completed: {
+    paths: ["relationship.trust.momentum_from_interventions"],
+    weight: 10,
+  },
+  intervention_started: {
+    paths: [],
+    weight: 0,
+  },
+  intervention_abandoned: {
+    paths: [],
+    weight: 0,
+  },
+  offer_rendered: {
+    paths: [],
+    weight: 0,
+  },
+  offer_suppressed: {
+    paths: [],
+    weight: 0,
+  },
+  offer_blocked: {
+    paths: [],
+    weight: 0,
   },
 
   // Learning

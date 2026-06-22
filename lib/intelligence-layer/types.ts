@@ -213,7 +213,8 @@ export type IntelligenceSignalDomain =
   | "emotional"
   | "energy"
   | "business"
-  | "action";
+  | "action"
+  | "trust";
 
 export type IntelligenceSignalValence = "positive" | "neutral" | "negative";
 

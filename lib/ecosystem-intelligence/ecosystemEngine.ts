@@ -16,6 +16,7 @@ import {
   notifyEcosystemUpdated,
   recordEcosystemSnapshot,
 } from "./ecosystemStore";
+import { observeEcosystemSuppressions } from "@/lib/intelligence-layer/governorTrustSignals";
 import type { EcosystemInput, EcosystemSnapshot, EcosystemSuppression } from "./types";
 
 export function evaluateEcosystem(
@@ -30,6 +31,11 @@ export function evaluateAndRecordEcosystem(
 ): EcosystemSnapshot {
   const snapshot = evaluateEcosystem(input);
   recordEcosystemSnapshot(snapshot);
+  try {
+    observeEcosystemSuppressions(snapshot);
+  } catch {
+    /* observational only */
+  }
   notifyEcosystemUpdated();
   return snapshot;
 }

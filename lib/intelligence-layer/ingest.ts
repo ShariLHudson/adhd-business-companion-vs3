@@ -6,6 +6,7 @@ import { classifyAndEmitChatSignals } from "./chatSignalAdapter";
 import type { ChatBusEmitSummary } from "./chatSignalAdapter";
 import { isUnifiedSignalBusEnabled } from "./featureFlags";
 import { applySignalIncrementally } from "./profileEvolution";
+import { recordTrustEvidence } from "./trustSignals";
 import { appendIntelligenceSignal } from "./signalStore";
 import type {
   IntelligenceSignal,
@@ -229,10 +230,13 @@ export function recordTrustSignal(
   accepted: boolean,
   source: string,
 ): IntelligenceSignal {
-  return recordIntelligenceSignal({
-    domain: "action",
-    category: accepted ? "suggestion_accepted" : "suggestion_ignored",
+  const offerKey = source.startsWith("suggestion:")
+    ? source.slice("suggestion:".length)
+    : source;
+  return recordTrustEvidence({
+    category: accepted ? "trust.suggestion_accepted" : "trust.suggestion_ignored",
+    offerKey,
     source,
-    valence: accepted ? "positive" : "neutral",
-  });
+    emitter: "recordTrustSignal",
+  }).signal;
 }

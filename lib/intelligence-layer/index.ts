@@ -61,8 +61,87 @@ export {
   isSignalBusDedupEnabled,
   isSignalBusDiagnosticsEnabled,
   isSignalBusDevWarningsEnabled,
+  isProfileLearningEnabled,
+  isTrustInspectorEnabled,
   SIGNAL_BUS_FLAG_KEYS,
+  PROFILE_LEARNING_FLAG_KEYS,
+  TRUST_INSPECTOR_FLAG_KEYS,
 } from "./featureFlags";
+
+export {
+  isTrustLearningAllowed,
+  isTrustSignal,
+  shouldEvolveFromSignal,
+} from "./learningGates";
+
+export type { TrustAttributionMvp, TrustCausationType } from "./trustAttribution";
+
+export {
+  recordTrustEvidence,
+  ensureTrustSession,
+  TRUST_PIPELINE_EMITTER,
+} from "./trustSignals";
+
+export type {
+  TrustSignalCategory,
+  RecordTrustEvidenceInput,
+  RecordTrustEvidenceResult,
+} from "./trustSignals";
+
+export {
+  getTrustCollectionDiagnostics,
+  resetTrustDiagnosticsForTests,
+} from "./trustDiagnostics";
+
+export {
+  appendTrustAuditEntry,
+  clearTrustAuditLog,
+  getTrustAuditLog as getPersistedTrustAuditLog,
+  resetTrustAuditLogForTests,
+} from "./trustEvolutionAudit";
+
+export type { TrustAuditEntry, TrustAuditTraitDelta } from "./trustEvolutionAudit";
+
+export {
+  getTrustAuditLog,
+  getTrustInspectorSummary,
+  getTrustTraitSnapshot,
+  buildTrustInspectorReport,
+  exposeTrustInspectorToWindow,
+} from "./trustInspector";
+
+export type {
+  TrustAuditLogFilter,
+  TrustInspectorSummary,
+  TrustTraitSnapshot,
+  TrustTraitSnapshotItem,
+  TrustTraitStatus,
+} from "./trustInspector";
+
+export type {
+  TrustEvolutionDecision,
+  TrustEvolutionBlockedReason,
+  TrustCollectionDiagnostics,
+} from "./trustDiagnostics";
+
+export {
+  resolveOfferBucket,
+  isRegisteredInterventionBucket,
+  listInterventionBuckets,
+} from "./interventionRegistry";
+
+export {
+  initCompanionSession,
+  touchCompanionSession,
+  getCompanionSession,
+  getOrCreateCompanionSession,
+} from "./companionSession";
+
+export {
+  observeEcosystemSuppressions,
+  observeGovernorTurnSurface,
+  GOVERNOR_TRUST_EMITTER,
+} from "./governorTrustSignals";
 
 export type {
   CompanionSignal,

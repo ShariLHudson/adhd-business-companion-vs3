@@ -66,9 +66,16 @@ const CATEGORY_DOMAIN: Record<string, SignalDomain> = {
   workspace_opened: "workspace",
   field_completed: "workspace",
   task_broken_down: "workspace",
-  // Action / trust (recordTrustSignal uses action domain today)
+  // Action / trust (recordTrustSignal legacy action domain)
   suggestion_accepted: "action",
   suggestion_ignored: "action",
+  suggestion_dismissed: "trust",
+  intervention_started: "trust",
+  intervention_completed: "trust",
+  intervention_abandoned: "trust",
+  offer_suppressed: "trust",
+  offer_blocked: "trust",
+  offer_rendered: "trust",
   tool_used: "action",
   recovery_taken: "action",
   brain_dump: "action",
@@ -97,7 +104,10 @@ const DEFAULT_VALENCE: Partial<
   evening_productive: "positive",
   content_created: "positive",
   suggestion_accepted: "positive",
+  suggestion_dismissed: "negative",
   suggestion_ignored: "neutral",
+  intervention_completed: "positive",
+  intervention_abandoned: "negative",
   im_overwhelmed: "negative",
 };
 
@@ -148,6 +158,21 @@ function buildRegistry(): Record<string, RegistryEntry> {
     if (!registry[key]) {
       registry[key] = buildEntry(category, domain);
     }
+  }
+
+  const trustCategories = [
+    "suggestion_accepted",
+    "suggestion_dismissed",
+    "suggestion_ignored",
+    "intervention_started",
+    "intervention_completed",
+    "intervention_abandoned",
+    "offer_suppressed",
+    "offer_blocked",
+    "offer_rendered",
+  ] as const;
+  for (const category of trustCategories) {
+    registry[registryKey("trust", category)] = buildEntry(category, "trust");
   }
 
   return registry;
