@@ -6,6 +6,7 @@ import {
 } from "./audioSuggestions";
 import type { SidebarToolId } from "./companionUi";
 import { shouldBlockStressAutoToolRouting } from "./stressRouting";
+import { isExplicitBreatheRequest } from "./explicitBreatheRouting";
 
 export type StandaloneToolLaunch = {
   tool: SidebarToolId;
@@ -20,6 +21,10 @@ export function detectStandaloneToolRequest(
 ): StandaloneToolLaunch | null {
   const t = text.trim().toLowerCase();
   if (!t) return null;
+
+  if (isExplicitBreatheRequest(text)) {
+    return { tool: "breathe" };
+  }
 
   const audio = detectAudioRequest(text);
   if (audio.isAudio && !shouldBlockStressAutoToolRouting(text)) {

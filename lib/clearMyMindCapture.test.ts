@@ -20,10 +20,17 @@ describe("clearMyMindCapture", () => {
     expect(splitCaptureInput("- first\n- second")).toEqual(["first", "second"]);
   });
 
-  it("splits semicolon lists when three or more short clauses", () => {
+  it("splits semicolon lists when two or more clauses", () => {
+    expect(splitCaptureInput("call mom; email team")).toEqual([
+      "call mom",
+      "email team",
+    ]);
+  });
+
+  it("splits period-separated sentences", () => {
     expect(
-      splitCaptureInput("call mom; email team; fix homepage"),
-    ).toEqual(["call mom", "email team", "fix homepage"]);
+      splitCaptureInput("Call doctor. Finish newsletter. Text Izna."),
+    ).toEqual(["Call doctor", "Finish newsletter", "Text Izna"]);
   });
 
   it("splits the P0 four-line sales repro input", () => {

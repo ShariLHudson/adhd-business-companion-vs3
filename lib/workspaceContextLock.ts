@@ -6,6 +6,7 @@
 import type { AppSection } from "./companionUi";
 import { workspaceTitle } from "./workspaceMode";
 import type { WorkspaceContext } from "./workspaceAwareness";
+import { buildFilteredBoardAdvisorHint } from "./adhdEntrepreneurIntelligence";
 import {
   isAnyWorkspaceOpen,
   isWorkspaceOpen,
@@ -136,8 +137,7 @@ export function buildWorkspaceBoardAdvisorHint(
   section?: AppSection | null,
 ): string {
   const role = resolveWorkspaceAdvisorRole(userText, section);
-  const label = ADVISOR_LABELS[role];
-  return `BOARD ADVISOR (invisible — one voice): Lean on ${label} for this reply. Support the business goal AND any ADHD friction underneath.`;
+  return buildFilteredBoardAdvisorHint(role);
 }
 
 export function buildActiveWorkspacePriorityHint(

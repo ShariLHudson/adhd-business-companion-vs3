@@ -60,3 +60,7 @@ export function freshStartCopy(kind: FreshStartKind): FreshStartCopy {
 
 export const BEGIN_NEW_DAY_GREETING =
   "New day — fresh start. What feels most important right now?";
+
+/** Top navigation — short labels; confirm dialogs keep full copy in title/intro. */
+export const TOP_BAR_RESET_WORKSPACE_LABEL = "Reset workspace";
+export const TOP_BAR_NEW_DAY_LABEL = "New day";

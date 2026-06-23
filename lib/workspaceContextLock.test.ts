@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildActiveWorkspacePriorityHint,
+  buildWorkspaceBoardAdvisorHint,
   isExplicitWorkspaceSwitchRequest,
   resolveWorkspaceAdvisorRole,
   shouldSuppressCrossWorkspaceNavigation,
@@ -65,6 +66,12 @@ describe("workspaceContextLock", () => {
       "mindset",
     );
     expect(resolveWorkspaceAdvisorRole("hello", "projects")).toBe("planning");
+  });
+
+  it("board advisor hint is filtered through ADHD entrepreneur layer", () => {
+    const hint = buildWorkspaceBoardAdvisorHint("I need to market my business");
+    expect(hint).toMatch(/Layer 3 — advisory only/i);
+    expect(hint).toMatch(/ADHD Entrepreneur Intelligence first/i);
   });
 
   it("replies locally for procrastination in strategies", () => {

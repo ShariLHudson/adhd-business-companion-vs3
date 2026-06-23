@@ -72,7 +72,7 @@ export function AppSidebar({
         className={`flex w-full items-center justify-start gap-2 rounded-lg px-2 py-2.5 text-left leading-tight transition-colors md:px-3 ${
           active
             ? "companion-nav-active shadow-sm"
-            : "text-white/80 hover:bg-white/10"
+            : "text-white hover:bg-white/10"
         }`}
       >
         <span

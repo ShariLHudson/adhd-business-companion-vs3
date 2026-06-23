@@ -24,16 +24,16 @@ export function BrainDumpInfographic({
   const overwhelm = graph.clusters.filter((c) => c.overwhelm);
 
   return (
-    <div ref={exportRef} className="mx-auto max-w-lg px-4 py-5" data-testid="brain-dump-infographic">
+    <div ref={exportRef} className="mx-auto max-w-2xl px-4 py-5 print:text-[14pt]" data-testid="brain-dump-infographic">
       <div
         className="overflow-hidden rounded-3xl border-2 shadow-xl"
         style={{ borderColor: VISUAL_THINKING_COLORS.decision.border }}
       >
         <div className="border-b border-[#e7dfd4] bg-white/90 px-6 py-4 text-center">
-          <p className="text-xs font-bold uppercase tracking-widest text-[#9a8f82]">
+          <p className="text-sm font-bold uppercase tracking-widest text-[#9a8f82] print:text-base">
             Clear My Mind
           </p>
-          <p className="mt-2 text-2xl font-bold text-[#1f1c19]">
+          <p className="mt-2 text-3xl font-bold text-[#1f1c19] print:text-4xl">
             🧠 {graph.totalThoughts} thoughts organized
           </p>
         </div>
@@ -53,14 +53,14 @@ export function BrainDumpInfographic({
                     borderColor: p.border,
                   }}
                 >
-                  <p className="font-bold" style={{ color: p.text }}>
+                  <p className="text-lg font-bold" style={{ color: p.text }}>
                     {c.icon} {c.label}{" "}
-                    <span className="text-sm font-semibold opacity-80">
+                    <span className="text-base font-semibold opacity-80">
                       {c.overwhelm ? "🔥 " : ""}({c.count})
                     </span>
                   </p>
                   {c.subClusters[0] ? (
-                    <p className="mt-1 text-sm" style={{ color: p.text }}>
+                    <p className="mt-1 text-base" style={{ color: p.text }}>
                       {c.subClusters[0].visibleThoughts[0]?.text ?? c.subClusters[0].label}
                     </p>
                   ) : null}
@@ -76,8 +76,8 @@ export function BrainDumpInfographic({
                 className="rounded-xl p-3"
                 style={{ background: VISUAL_THINKING_COLORS.benefit.bgGradient }}
               >
-                <p className="text-xs font-bold text-emerald-900">Top themes</p>
-                <p className="text-sm font-semibold text-emerald-950">
+                <p className="text-sm font-bold text-emerald-900 print:text-base">Top themes</p>
+                <p className="text-base font-semibold text-emerald-950 print:text-lg">
                   {topBenefits[0].label}
                 </p>
               </div>
@@ -87,8 +87,8 @@ export function BrainDumpInfographic({
                 className="rounded-xl p-3"
                 style={{ background: VISUAL_THINKING_COLORS.concern.bgGradient }}
               >
-                <p className="text-xs font-bold text-rose-900">Stress points</p>
-                <p className="text-sm font-semibold text-rose-950">
+                <p className="text-sm font-bold text-rose-900 print:text-base">Stress points</p>
+                <p className="text-base font-semibold text-rose-950 print:text-lg">
                   {topConcerns[0].label}
                 </p>
               </div>
@@ -98,7 +98,7 @@ export function BrainDumpInfographic({
 
         {overwhelm.length > 0 ? (
           <div className="border-t border-amber-200 bg-amber-50 px-5 py-4 text-center">
-            <p className="text-sm font-semibold text-amber-950">
+            <p className="text-base font-semibold text-amber-950 print:text-lg">
               🔥 {overwhelm.map((c) => c.label).join(", ")} — lots on your mind here. No
               judgment — just noticing.
             </p>

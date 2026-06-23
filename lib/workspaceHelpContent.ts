@@ -1,4 +1,5 @@
 import { getCognitiveGrowthProfile } from "./cognitiveGrowthPrinciple";
+import { CLEAR_MY_MIND_HELP } from "./clearMyMindHelpContent";
 import { HOW_DO_I_HELP_ARTICLES } from "./howDoIHelpArticles";
 import { getWorkspaceAreaWorkflow } from "./workspaceAreaWorkflows";
 
@@ -65,7 +66,7 @@ const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "content-generator":
     "Uses Client Avatars and Templates for context. Drafts export to My Work; Snippets help with short-form copy.",
   "brain-dump":
-    "First step in the Core Workflow — route captures to Projects, Plan My Day, Strategies, or Create when ready.",
+    "Pairs with Plan My Day and Projects when you use Thought Actions to move a captured thought.",
   playbook:
     "Opens Focus, Clear My Mind, and Plan My Day when a strategy points there. Business strategies can flow into Create.",
   "templates-library":
@@ -168,6 +169,17 @@ export function getWorkspaceHelpContent(
   areaId: string,
 ): WorkspaceHelpContent | null {
   const key = areaId as WorkspaceHelpAreaId;
+
+  if (key === "brain-dump") {
+    const growth = getCognitiveGrowthProfile(key);
+    return {
+      areaId: key,
+      ...CLEAR_MY_MIND_HELP,
+      helpsToday: growth?.helpsToday,
+      strengthens: growth?.strengthens,
+    };
+  }
+
   const local = LOCAL_GROWTH_HELP[key as keyof typeof LOCAL_GROWTH_HELP];
   if (local) {
     const growth = getCognitiveGrowthProfile(key);

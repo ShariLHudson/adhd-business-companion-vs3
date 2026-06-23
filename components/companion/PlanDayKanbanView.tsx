@@ -58,7 +58,7 @@ function KanbanCard({
 
   return (
     <li
-      className={`flex items-stretch gap-1 rounded-xl border bg-white text-sm shadow-sm transition-opacity ${
+      className={`flex items-stretch gap-1 rounded-xl border bg-white text-base shadow-sm transition-opacity ${
         isDragging ? "opacity-40" : ""
       }`}
       style={{
@@ -87,12 +87,12 @@ function KanbanCard({
       <button
         type="button"
         onClick={() => onOpen(item.id)}
-        className="min-w-0 flex-1 px-2 py-2 text-left"
+        className="min-w-0 flex-1 px-3 py-2.5 text-left"
       >
-        <span className="block font-medium text-[#1f1c19] hover:text-[#1e4f4f]">
+        <span className="block text-base font-medium text-[#1f1c19] hover:text-[#1e4f4f]">
           {item.title}
         </span>
-        <span className="mt-0.5 block text-xs text-[#6b635a]">
+        <span className="mt-0.5 block text-sm text-[#6b635a]">
           {durationLabel(item)}
         </span>
         {colorCoding ? (
@@ -154,14 +154,14 @@ function KanbanColumn({
       onDrop={onDrop}
     >
       <div className="px-1">
-        <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
+        <p className="text-sm font-bold uppercase tracking-wide text-[#6b635a]">
           {label}
         </p>
-        <p className="text-[10px] text-[#9a8f82]">{hint}</p>
+        <p className="text-xs text-[#9a8f82]">{hint}</p>
       </div>
       <ul className="mt-2 flex flex-1 flex-col gap-2">
         {items.length === 0 ? (
-          <li className="rounded-lg border border-dashed border-[#d4cdc3] px-2 py-6 text-center text-xs text-[#9a8f82]">
+          <li className="rounded-lg border border-dashed border-[#d4cdc3] px-2 py-6 text-center text-sm text-[#9a8f82]">
             Drop here
           </li>
         ) : (
@@ -220,7 +220,7 @@ export function PlanDayKanbanView({
 
   return (
     <div>
-      <p className="text-sm text-[#6b635a]">
+      <p className="text-base text-[#6b635a]">
         Drag tasks between columns — click a card to open details.
       </p>
       <div className="mt-3 flex gap-3 overflow-x-auto pb-2">

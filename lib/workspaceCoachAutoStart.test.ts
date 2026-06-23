@@ -24,17 +24,17 @@ describe("workspaceCoachAutoStart", () => {
       view: "capture",
       stage: "capture session",
     } as WorkspaceContext);
-    expect(msg?.content).toContain("loudest thought");
+    expect(msg?.content).toContain("safely held");
   });
 
-  it("coaches brain dump library mode", () => {
+  it("coaches brain dump mental landscape mode", () => {
     const msg = buildWorkspaceCoachAutoStart({
       section: "brain-dump",
       title: "Clear My Mind",
-      view: "library",
-      stage: "library",
+      view: "relief",
+      stage: "mental landscape",
     } as WorkspaceContext);
-    expect(msg?.content).toContain("saved thoughts");
+    expect(msg?.content).toContain("safely held");
   });
 
   it("coaches strategies workspace with strategy name", () => {

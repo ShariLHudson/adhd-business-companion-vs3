@@ -120,7 +120,21 @@ export function matchesExperienceFollowUp(
       }
       return false;
     case "action-bridge":
-      return /\b(?:open|start|try|let'?s)\b/i.test(priorAssistantText);
+      if (
+        action.bridge.tool === "breathe" &&
+        /\b(?:breathe|breathing|breath|reset)\b/i.test(priorAssistantText)
+      ) {
+        return true;
+      }
+      if (
+        action.bridge.tool === "brain-dump" &&
+        /\b(?:clear my mind|brain dump)\b/i.test(priorAssistantText)
+      ) {
+        return true;
+      }
+      return /\b(?:open|start|try|let'?s|would you like|want me to)\b/i.test(
+        priorAssistantText,
+      );
     case "do-it-now":
       return action.offer.kind === "focus" && ASSISTANT_FOCUS_RE.test(priorAssistantText);
     case "assisted":

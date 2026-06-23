@@ -21,7 +21,7 @@ export function generateMentalLandscapeInsight(
   }
 
   if (totalThoughts >= 2 && totalThoughts <= 3) {
-    return "You captured a few things that were asking for attention.";
+    return "A few things are safely held here now.";
   }
 
   const sorted = [...major].sort((a, b) => b.count - a.count);

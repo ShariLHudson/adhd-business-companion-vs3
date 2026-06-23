@@ -31,13 +31,14 @@ export const WORKSPACE_AREA_WORKFLOWS: Record<string, WorkspaceAreaWorkflow> = {
   "brain-dump": {
     id: "brain-dump",
     steps: [
-      "Capture each thought as its own card — don't organize yet.",
-      "Group similar cards when you're ready to see patterns.",
-      "Route cards to a project, create task, strategy, or park for later.",
-      "Use Brain Parking Lot for ideas that don't need action today.",
-      "Open Library to revisit saved brain dumps anytime.",
+      "Capture — add as many thoughts as you want; separate with commas.",
+      "If offered Smart Split, choose Separate Them or Keep As Entered.",
+      "Tap See what's held to open the Mental Landscape.",
+      "Tap a cluster, then View thoughts when you're ready.",
+      "Select a thought for actions — schedule, move to project, keep here, and more.",
+      "Tap Add More Thoughts anytime to continue the same session.",
     ],
-    tip: "Capture first, sort second — perfection can wait.",
+    tip: "Relief first — you choose when to view thoughts or take action.",
   },
   projects: {
     id: "projects",

@@ -17,7 +17,7 @@ export function isMultiItemWorkspaceSection(section: AppSection): boolean {
 export function multiItemWorkspaceOfferLine(section: AppSection): string {
   const labels: Partial<Record<AppSection, string>> = {
     "brain-dump":
-      "This works best with **Clear My Mind** beside us so we can see each thought separately — one at a time.",
+      "This works best in **Clear My Mind** — a calm space to capture thoughts one at a time.",
     activities:
       "This exercise works best with the workspace beside us so you can see each item on its own.",
     projects:

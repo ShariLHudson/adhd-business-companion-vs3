@@ -28,7 +28,6 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
   "saved-work",
   "playbook",
   "how-do-i",
-  "brain-dump",
   "time-block",
   "email-generator",
   "snippets",
@@ -46,6 +45,7 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
 ];
 
 export const STANDALONE_SECTIONS: AppSection[] = [
+  "brain-dump",
   "breathe",
   "focus-audio",
   "activities",
@@ -263,7 +263,7 @@ function matchWorkspaceTarget(t: string): WorkspaceTarget | null {
   if (/\b(brain dump|clear my (head|mind)|get it (all )?out|dump)\b/.test(t)) {
     return {
       section: "brain-dump",
-      buttonLabel: "Open Clear My Mind & Keep Chatting",
+      buttonLabel: "Open Clear My Mind",
       topic: "thoughts",
       topicLabel: "thoughts",
     };

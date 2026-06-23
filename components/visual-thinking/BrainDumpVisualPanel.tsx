@@ -25,6 +25,9 @@ export function BrainDumpVisualPanel({
   initialVisible,
   initialViewMode,
   allowHide = true,
+  hideClusterCenter = false,
+  /** Wider panel when Mental Landscape uses a two-column desktop layout. */
+  expanded = false,
 }: {
   entries: BrainDumpEntry[];
   /** Sidebar beside capture; primary fills the panel (mind map view). */
@@ -32,6 +35,9 @@ export function BrainDumpVisualPanel({
   initialVisible?: boolean;
   initialViewMode?: BrainDumpVisualViewMode;
   allowHide?: boolean;
+  /** Hide the center hub when relief landscape already shows "Everything is held." */
+  hideClusterCenter?: boolean;
+  expanded?: boolean;
 }) {
   const [visible, setVisible] = useState(
     () => initialVisible ?? loadBrainDumpVisualVisible(),
@@ -69,21 +75,25 @@ export function BrainDumpVisualPanel({
   }
 
   const shellClass =
-    variant === "primary"
-      ? "flex h-full min-h-0 min-w-0 flex-1 flex-col border-t border-[#e7dfd4] bg-gradient-to-b from-[#faf7f2] to-[#f5efe6] lg:border-t-0"
-      : "flex h-full min-h-0 min-w-0 flex-col border-t border-[#e7dfd4] bg-gradient-to-b from-[#faf7f2] to-[#f5efe6] lg:w-[min(42%,400px)] lg:shrink-0 lg:border-t-0 lg:border-l";
+    variant === "primary" || expanded
+      ? "flex h-full min-h-0 min-w-0 flex-1 flex-col border-t border-[#e7dfd4] bg-gradient-to-b from-[#faf7f2] to-[#f5efe6] lg:border-t-0 lg:border-l"
+      : "flex h-full min-h-0 min-w-0 flex-col border-t border-[#e7dfd4] bg-gradient-to-b from-[#faf7f2] to-[#f5efe6] lg:w-[min(44%,480px)] lg:shrink-0 lg:border-t-0 lg:border-l";
 
   return (
     <div className={shellClass} data-testid="brain-dump-visual-panel">
       <div className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[#e7dfd4]/80 bg-white/70 px-3 py-2">
-        <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
-          {viewMode === "mindmap" ? "Mind Map" : "Thought Clusters"}
+        <p className="text-sm font-bold uppercase tracking-wide text-[#1e4f4f]">
+          {viewMode === "mindmap"
+            ? "Related Thoughts"
+            : viewMode === "infographic"
+              ? "Summary"
+              : "Thought Clusters"}
         </p>
         <div className="flex flex-wrap items-center gap-1">
           {(
             [
               ["cluster", "Clusters"],
-              ["mindmap", "Connections"],
+              ["mindmap", "Related"],
               ["infographic", "Summary"],
             ] as const
           ).map(([mode, label]) => (
@@ -91,7 +101,7 @@ export function BrainDumpVisualPanel({
               key={mode}
               type="button"
               onClick={() => switchView(mode)}
-              className={`rounded-lg px-2 py-1 text-xs font-semibold ${
+              className={`rounded-lg px-2.5 py-1.5 text-sm font-semibold ${
                 viewMode === mode
                   ? "bg-[#1e4f4f] text-white"
                   : "text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
@@ -107,7 +117,7 @@ export function BrainDumpVisualPanel({
               setExporting(true);
               void exportBrainDumpVisualPng(graph).finally(() => setExporting(false));
             }}
-            className="rounded-lg px-2 py-1 text-xs font-semibold text-[#6b635a] hover:bg-black/5 disabled:opacity-40"
+            className="rounded-lg px-2.5 py-1.5 text-sm font-semibold text-[#6b635a] hover:bg-black/5 disabled:opacity-40"
           >
             PNG
           </button>
@@ -115,21 +125,21 @@ export function BrainDumpVisualPanel({
             type="button"
             disabled={!graph.hasContent}
             onClick={() => exportBrainDumpVisualPdf(graph)}
-            className="rounded-lg px-2 py-1 text-xs font-semibold text-[#6b635a] hover:bg-black/5 disabled:opacity-40"
+            className="rounded-lg px-2.5 py-1.5 text-sm font-semibold text-[#6b635a] hover:bg-black/5 disabled:opacity-40"
           >
             PDF
           </button>
           <button
             type="button"
             onClick={() => printBrainDumpVisual(infographicRef.current)}
-            className="rounded-lg px-2 py-1 text-xs font-semibold text-[#6b635a] hover:bg-black/5"
+            className="rounded-lg px-2.5 py-1.5 text-sm font-semibold text-[#6b635a] hover:bg-black/5"
           >
             Print
           </button>
           <button
             type="button"
             onClick={toggleVisible}
-            className="rounded-lg px-2 py-1 text-xs font-semibold text-[#6b635a] hover:bg-black/5"
+            className="rounded-lg px-2.5 py-1.5 text-sm font-semibold text-[#6b635a] hover:bg-black/5"
           >
             Hide
           </button>
@@ -138,7 +148,10 @@ export function BrainDumpVisualPanel({
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         {viewMode === "cluster" ? (
-          <BrainDumpClusterView entries={entries} />
+          <BrainDumpClusterView
+            entries={entries}
+            hideCenterHub={hideClusterCenter}
+          />
         ) : viewMode === "mindmap" ? (
           <BrainDumpMindMapView entries={entries} />
         ) : (

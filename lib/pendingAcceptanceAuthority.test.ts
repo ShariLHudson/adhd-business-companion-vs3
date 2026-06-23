@@ -43,7 +43,8 @@ describe("pendingAcceptanceAuthority", () => {
     });
     expect(result.outcome).toBe("conversation");
     if (result.outcome === "conversation") {
-      expect(result.message).toMatch(/what would you like/i);
+      expect(result.message).not.toMatch(/what would you like help with next/i);
+      expect(result.message).toMatch(/still here|next step|next piece/i);
     }
   });
 
@@ -212,5 +213,27 @@ describe("pendingAcceptanceAuthority", () => {
 
   it("audit inventory covers acceptance sources", () => {
     expect(ACCEPTANCE_PATH_AUDIT.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it("accepts action bridge with generic yes when assistant offered breathe", () => {
+    const result = resolvePendingAcceptance({
+      userText: "sure",
+      lastAssistantText:
+        "Let's take a moment — I can open a breathing reset for you.",
+      currentTurn: 3,
+      workspacePanel: null,
+      record: null,
+      pendingAction: {
+        kind: "action-bridge",
+        bridge: {
+          id: "breathe",
+          label: "Start Breathe & Reset",
+          emoji: "🌿",
+          tool: "breathe",
+        },
+      },
+      createConsent: null,
+    });
+    expect(result.outcome).toBe("accept");
   });
 });

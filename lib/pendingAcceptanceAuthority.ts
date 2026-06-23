@@ -4,13 +4,18 @@
  */
 
 import { isActionAcceptance } from "./assistedActionBridge";
+import type { OutcomeThread } from "./companionOutcomeThread";
+import { threadAwareAcceptanceFallback } from "./companionOutcomeThread";
 import type { AppSection } from "./companionUi";
 import type { PendingCreateOpenPayload } from "./createOpenAuthority";
 import {
   matchesPendingAcceptance,
   type PendingAction,
 } from "./pendingAction";
-import { shouldAutoLaunchPendingAction } from "./companionAutoLaunch";
+import {
+  matchesExperienceFollowUp,
+  shouldAutoLaunchPendingAction,
+} from "./companionAutoLaunch";
 
 /** Generic affirmations that must not act without pending context. */
 export const GENERIC_ACCEPTANCE_RE =
@@ -53,6 +58,8 @@ export type ResolvePendingAcceptanceInput = {
   createConsent: PendingCreateOpenPayload | null;
   /** User turns since the offer (0 = same turn as offer message). */
   turnsSinceOffer?: number;
+  /** Active outcome thread — avoids forbidden conversation resets on yes/sure. */
+  outcomeThread?: OutcomeThread | null;
 };
 
 export type ResolvePendingAcceptanceResult =
@@ -118,12 +125,18 @@ export function isPendingAcceptanceExpired(
   return false;
 }
 
-export function ambiguousAcceptanceReply(): string {
-  return "Got it. What would you like help with next?";
+export function ambiguousAcceptanceReply(thread?: OutcomeThread | null): string {
+  return threadAwareAcceptanceFallback(thread ?? null);
 }
 
-export function expiredAcceptanceReply(): string {
-  return "That offer may have passed — what would you like to work on now?";
+export function expiredAcceptanceReply(thread?: OutcomeThread | null): string {
+  if (thread?.pendingAction) {
+    return `That earlier offer may have passed — we were on **${thread.pendingAction}**. Want to pick that back up or shift to something new?`;
+  }
+  if (thread?.currentProblem) {
+    return `That offer may have passed — we were working through: "${thread.currentProblem.slice(0, 100)}". What's the next piece?`;
+  }
+  return "That offer may have passed — what's the next piece you want to look at?";
 }
 
 export function acceptanceAckForKind(
@@ -173,6 +186,8 @@ export function acceptanceAckForWorkspace(
       return "Opening Momentum Appointments.";
     case "brain-dump":
       return "Opening Clear My Mind.";
+    case "energy":
+      return "Opening Adapt My Day.";
     case "focus-audio":
       return "Opening Focus Audio.";
     case "templates-library":
@@ -216,10 +231,16 @@ export function resolvePendingAcceptance(
       })
     ) {
       if (!input.record) {
-        return { outcome: "conversation", message: ambiguousAcceptanceReply() };
+        return {
+          outcome: "conversation",
+          message: ambiguousAcceptanceReply(input.outcomeThread),
+        };
       }
       if (isPendingAcceptanceExpired(input.record, input)) {
-        return { outcome: "expired", message: expiredAcceptanceReply() };
+        return {
+          outcome: "expired",
+          message: expiredAcceptanceReply(input.outcomeThread),
+        };
       }
       return {
         outcome: "accept",
@@ -237,13 +258,53 @@ export function resolvePendingAcceptance(
   }
 
   if (!hasActivePending(input)) {
-    return { outcome: "conversation", message: ambiguousAcceptanceReply() };
+    if (
+      input.pendingAction &&
+      (shouldAutoLaunchPendingAction(
+        t,
+        input.lastAssistantText,
+        input.pendingAction,
+      ) ||
+        matchesExperienceFollowUp(
+          t,
+          input.lastAssistantText,
+          input.pendingAction,
+        ))
+    ) {
+      const section =
+        input.pendingAction.kind === "workspace"
+          ? input.pendingAction.offer.section
+          : undefined;
+      return {
+        outcome: "accept",
+        kind:
+          input.pendingAction.kind === "action-bridge"
+            ? "tool"
+            : input.pendingAction.kind === "tool"
+              ? "tool"
+              : input.pendingAction.kind === "workspace"
+                ? "workspace"
+                : "assisted",
+        ack: acceptanceAckForKind(
+          input.pendingAction.kind === "workspace" ? "workspace" : "tool",
+          { section },
+        ),
+        via: bareGeneric ? "generic" : "specific",
+      };
+    }
+    return {
+      outcome: "conversation",
+      message: ambiguousAcceptanceReply(input.outcomeThread),
+    };
   }
 
   const record = input.record!;
 
   if (isPendingAcceptanceExpired(record, input)) {
-    return { outcome: "expired", message: expiredAcceptanceReply() };
+    return {
+      outcome: "expired",
+      message: expiredAcceptanceReply(input.outcomeThread),
+    };
   }
 
   if (
@@ -290,7 +351,10 @@ export function resolvePendingAcceptance(
     }
   }
 
-  return { outcome: "conversation", message: ambiguousAcceptanceReply() };
+  return {
+    outcome: "conversation",
+    message: ambiguousAcceptanceReply(input.outcomeThread),
+  };
 }
 
 export function topicChangeInvalidatesOffer(

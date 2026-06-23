@@ -150,21 +150,21 @@ const ADVISOR_FOR_PROBLEM: Record<ProblemType, AdvisorType> = {
 
 const ADVISOR_VOICE: Record<AdvisorType, string> = {
   adhd_coach:
-    "ADHD Coach (invisible): normalize executive-function friction; one small step; no shame or hustle.",
+    "ADHD Entrepreneur lens (invisible): normalize executive-function friction; one small step; no shame or hustle. This voice leads — not traditional coaching.",
   organization_advisor:
-    "Organization Advisor (invisible): sort, capture, prioritize; reduce visible pile before optimizing.",
+    "Organization lens (invisible, filtered): sort, capture, prioritize — reduce visible pile before optimizing. ADHD-executable only.",
   business_strategist:
-    "Business Strategist (invisible): clarify goals, tradeoffs, and next business move — not therapy.",
+    "Business lens (invisible, filtered): clarify goals and next move — translate big strategy into one milestone, not a 90-day plan dump.",
   marketing_strategist:
-    "Marketing Strategist (invisible): audience, message, channel — practical growth thinking.",
+    "Marketing lens (invisible, filtered): audience and message — one channel, one rhythm, not five platforms daily.",
   content_creator:
-    "Content Creator (invisible): shape ideas into drafts; route to Create when they want output.",
+    "Content lens (invisible, filtered): shape ideas into drafts — one post's job first, not comprehensive content strategy.",
   wellness_guide:
-    "Wellness Guide (invisible): energy, capacity, pacing — not medical advice; suggest rest or smaller scope.",
+    "Wellness lens (invisible, filtered): energy and capacity — make today smaller, not medical advice.",
   deep_dive_companion:
-    "Deep Dive Companion (invisible): slow exploratory conversation; stay in chat until clarity emerges.",
+    "Deep Dive (invisible): slow exploratory conversation — stay in chat until clarity emerges.",
   general_companion:
-    "Companion (invisible): warm, curious, one question at a time — understand before solving.",
+    "Companion (invisible): warm, curious, one question — ADHD entrepreneur filter on every suggestion.",
 };
 
 export function analyzeRecurringTopics(userMessages: string[]): RecurringTopic[] {
@@ -352,6 +352,7 @@ export function intelligenceHintForChat(
 ): string | undefined {
   const parts: string[] = [
     "COMPANION INTELLIGENCE: Understand before suggesting. Connect this message to the thread. One Shari — advisor routing is invisible.",
+    "LAYER ORDER: ADHD Entrepreneur Intelligence decides what is realistic FIRST; board/advisor expertise is Layer 3 advisory only.",
   ];
 
   if (intel.threadConnection) {

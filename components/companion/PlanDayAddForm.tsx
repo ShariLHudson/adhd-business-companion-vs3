@@ -8,7 +8,7 @@ import {
 } from "@/lib/planMyDay";
 
 const FIELD =
-  "rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-sm text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
+  "rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
 
 type Props = {
   onAdd: (input: QuickPlanItemInput) => void;
@@ -40,7 +40,7 @@ export function PlanDayAddForm({ onAdd, compact = false }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-2.5 rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/60 p-3">
+    <div className="flex flex-col gap-3 rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/60 p-4">
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -58,7 +58,7 @@ export function PlanDayAddForm({ onAdd, compact = false }: Props) {
       <div
         className={`flex flex-wrap gap-2 ${compact ? "flex-col sm:flex-row sm:items-center" : "items-center"}`}
       >
-        <label className="flex min-w-0 flex-1 items-center gap-2 text-sm font-semibold text-[#6b635a]">
+        <label className="flex min-w-0 flex-1 items-center gap-2 text-base font-semibold text-[#6b635a]">
           <span className="shrink-0">Category</span>
           <select
             value={category}
@@ -76,7 +76,7 @@ export function PlanDayAddForm({ onAdd, compact = false }: Props) {
           </select>
         </label>
 
-        <label className="flex items-center gap-2 text-sm font-semibold text-[#6b635a]">
+        <label className="flex items-center gap-2 text-base font-semibold text-[#6b635a]">
           <input
             type="checkbox"
             checked={hasTime}
@@ -101,7 +101,7 @@ export function PlanDayAddForm({ onAdd, compact = false }: Props) {
         type="button"
         onClick={submit}
         disabled={!title.trim()}
-        className="companion-btn-primary w-full rounded-xl px-4 py-2.5 text-sm font-semibold disabled:opacity-40 sm:w-auto sm:self-end"
+        className="companion-btn-primary w-full rounded-xl px-5 py-3 text-base font-semibold disabled:opacity-40 sm:w-auto sm:self-end"
       >
         Add to today
       </button>

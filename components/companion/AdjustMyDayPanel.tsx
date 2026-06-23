@@ -29,10 +29,19 @@ import { HelpNeedDropdown } from "@/components/companion/HelpNeedDropdown";
 type PanelMode = "snapshot" | "edit";
 
 const selectClass =
-  "mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
+  "mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-lg text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
 
-export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
-  const [mode, setMode] = useState<PanelMode>("edit");
+export function AdjustMyDayPanel({
+  onDone,
+  embedded = false,
+  initialMode = "edit",
+}: {
+  onDone?: () => void;
+  /** Render inside Plan My Day without full-page chrome. */
+  embedded?: boolean;
+  initialMode?: PanelMode;
+}) {
+  const [mode, setMode] = useState<PanelMode>(initialMode);
   const [snapshot, setSnapshot] = useState<DayState | null>(null);
 
   const [vibe, setVibe] = useState<DayVibeId | null>(null);
@@ -58,9 +67,9 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
     const existing = getDayState();
     if (existing) {
       loadFromState(existing);
-      setMode("snapshot");
+      setMode(initialMode === "edit" ? "edit" : "snapshot");
     }
-  }, []);
+  }, [initialMode]);
 
   function startEdit() {
     const existing = getDayState();
@@ -91,7 +100,11 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
       note: note.trim() || undefined,
     });
     setSnapshot(state);
-    setMode("snapshot");
+    if (embedded) {
+      onDone?.();
+    } else {
+      setMode("snapshot");
+    }
   }
 
   const vibeChip = (id: DayVibeId, label: string) => {
@@ -101,7 +114,7 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
         key={id}
         type="button"
         onClick={() => setVibe(active ? null : id)}
-        className={`rounded-full border px-3 py-2 text-sm font-semibold transition-colors ${
+        className={`rounded-full border px-3 py-2 text-base font-semibold transition-colors ${
           active
             ? "border-[#1e4f4f] bg-[#1e4f4f] text-white shadow-sm"
             : "border-[#c9bfb0] bg-white/80 text-[#3d3630] hover:bg-white"
@@ -112,15 +125,20 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
     );
   };
 
-  if (mode === "snapshot" && snapshot) {
+  const shellClass = embedded
+    ? "companion-fade-in flex flex-col"
+    : "companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8";
+
+  if (mode === "snapshot" && snapshot && !embedded) {
     const updated = formatDaySnapshotTime(snapshot);
     const vibeDisplay = formatDayVibeDisplay(snapshot);
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
         <WorkspaceGuide section="energy" />
-        <p className="text-2xl font-semibold text-[#1f1c19]">Adjust My Day</p>
+        <p className="text-2xl font-semibold text-[#1f1c19]">Adapt My Day</p>
         <p className="mt-1 text-sm text-[#6b635a]">
-          Shari uses your latest update — change it anytime life shifts.
+          Current Reality Intelligence™ — who showed up today? Shari uses your
+          latest update when shaping support.
           {updated ? ` Last updated ${updated}.` : ""}
         </p>
 
@@ -189,11 +207,14 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
   }
 
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
-      <WorkspaceGuide section="energy" />
-      <p className="text-2xl font-semibold text-[#1f1c19]">Adjust My Day</p>
-      <p className="mt-1 text-sm text-[#6b635a]">
-        Quick check-in — update anytime your day changes.
+    <div className={shellClass}>
+      {!embedded ? <WorkspaceGuide section="energy" /> : null}
+      <p className="text-2xl font-semibold text-[#1f1c19]">Adapt My Day</p>
+      <p className="mt-1 text-base leading-relaxed text-[#6b635a]">
+        Current Reality Intelligence™ — who showed up today?
+      </p>
+      <p className="mt-2 text-base leading-relaxed text-[#9a8f82]">
+        Your day can change. Update this anytime.
       </p>
 
       <p className="mt-6 text-sm font-semibold text-[#1f1c19]">
@@ -205,7 +226,7 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
 
       <label className="mt-6 block">
         <span className="text-lg font-semibold text-[#1f1c19]">Energy Level</span>
-        <span className="mt-0.5 block text-sm text-[#6b635a]">
+        <span className="mt-0.5 block text-base text-[#6b635a]">
           How much fuel is in the tank today?
         </span>
         <select
@@ -224,7 +245,7 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
 
       <label className="mt-5 block">
         <span className="text-lg font-semibold text-[#1f1c19]">Motivation Level</span>
-        <span className="mt-0.5 block text-sm text-[#6b635a]">
+        <span className="mt-0.5 block text-base text-[#6b635a]">
           How much do you feel like doing things today?
         </span>
         <select
@@ -279,7 +300,7 @@ export function AdjustMyDayPanel({ onDone }: { onDone?: () => void }) {
         disabled={!canSave}
         className="mt-6 w-full rounded-xl bg-[#1e4f4f] px-8 py-3.5 text-lg font-semibold text-white shadow-md hover:bg-[#163a3a] disabled:cursor-not-allowed disabled:opacity-40"
       >
-        {snapshot ? "Save My Day" : "Set My Day"}
+        Update My Day
       </button>
 
       {snapshot ? (

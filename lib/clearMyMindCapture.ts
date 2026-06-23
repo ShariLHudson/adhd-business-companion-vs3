@@ -7,10 +7,29 @@ export function newCaptureSessionId(): string {
 }
 
 const BULLET_RE = /^\s*(?:[-*•]|\d+[.)])\s+/;
+const PERIOD_CLAUSE_RE = /\.\s+(?=[A-Za-z])/;
+
+function splitPeriodClauses(text: string): string[] | null {
+  if (!PERIOD_CLAUSE_RE.test(text)) return null;
+  const parts = text
+    .split(PERIOD_CLAUSE_RE)
+    .map((part) => part.replace(/\.$/, "").trim())
+    .filter((part) => part.length >= 3);
+  return parts.length >= 2 ? parts : null;
+}
+
+function splitSemicolonClauses(text: string): string[] | null {
+  if (!text.includes(";")) return null;
+  const parts = text
+    .split(";")
+    .map((part) => part.trim())
+    .filter((part) => part.length > 2);
+  return parts.length >= 2 ? parts : null;
+}
 
 /**
  * Split pasted multi-line / bulleted input into separate thoughts.
- * Never store multiple distinct thoughts as one item.
+ * Comma/period lists are offered via Smart Split — not auto-split here.
  */
 export function splitCaptureInput(raw: string): string[] {
   const text = raw.trim();
@@ -21,19 +40,17 @@ export function splitCaptureInput(raw: string): string[] {
     .map((l) => l.replace(BULLET_RE, "").trim())
     .filter(Boolean);
 
-  if (lines.length <= 1) {
-    // Also split obvious "item1; item2; item3" only when short clauses
-    if (text.includes(";") && text.split(";").length >= 3) {
-      const parts = text
-        .split(";")
-        .map((p) => p.trim())
-        .filter((p) => p.length > 2);
-      if (parts.length >= 2) return parts;
-    }
-    return [text];
+  if (lines.length > 1) {
+    return lines;
   }
 
-  return lines;
+  const semicolonParts = splitSemicolonClauses(text);
+  if (semicolonParts) return semicolonParts;
+
+  const periodParts = splitPeriodClauses(text);
+  if (periodParts) return periodParts;
+
+  return [text];
 }
 
 export function capturePrompt(phase: CapturePhase, count: number): string {
@@ -41,12 +58,12 @@ export function capturePrompt(phase: CapturePhase, count: number): string {
     return "What's taking up space in your head right now?";
   }
   if (phase === "more") {
-    return "Anything else?";
+    return "Want to add another thought?";
   }
   if (phase === "sorting") {
-    return "Let's sort what you captured — one item at a time.";
+    return "When you're ready, you can sort what you captured.";
   }
-  return "Nice — your mind is a little clearer.";
+  return "Your thoughts are resting here.";
 }
 
 export function captureAck(count: number): string {

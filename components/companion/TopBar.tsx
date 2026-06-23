@@ -9,15 +9,16 @@ import {
 import {
   BEGIN_NEW_DAY_COPY,
   CLEAR_TODAY_CONTEXT_COPY,
+  TOP_BAR_NEW_DAY_LABEL,
+  TOP_BAR_RESET_WORKSPACE_LABEL,
 } from "@/lib/freshStartCopy";
-import { companionOverlayHref } from "@/lib/companionNavUrl";
 
 type TopBarProps = {
   showPlanMyDay?: boolean;
   onOpenPlanMyDay?: () => void;
+  onOpenClearMyMind?: () => void;
   onOpenSettings: (section?: SettingsSection | null) => void;
   onOpenProfile: () => void;
-  onAdjustDay: () => void;
   onRequestClearTodayContext: () => void;
   onRequestBeginNewDay: () => void;
 };
@@ -25,11 +26,8 @@ type TopBarProps = {
 const BTN =
   "relative z-50 flex h-11 items-center gap-1.5 rounded-full border border-[#d8cfc2] bg-white/80 px-3.5 text-sm font-medium text-[#3d3630] transition-colors hover:bg-white";
 
-const MENU_BTN =
-  "block w-full px-4 py-2.5 text-left text-sm font-medium text-[#3d3630] hover:bg-[#f0f5f5]";
-
-const MENU_BTN_HINT =
-  "block w-full px-4 py-2.5 text-left hover:bg-[#f0f5f5]";
+const ACCOUNT_MENU_BTN =
+  "block w-full px-4 py-3 text-left text-base font-semibold text-[#1f1c19] hover:bg-[#f0f5f5]";
 
 function usePlanActiveCount(): number {
   const [count, setCount] = useState(0);
@@ -101,18 +99,18 @@ function HeaderActionButton({
 export function TopBar({
   showPlanMyDay = false,
   onOpenPlanMyDay,
+  onOpenClearMyMind,
   onOpenSettings,
   onOpenProfile,
-  onAdjustDay,
   onRequestClearTodayContext,
   onRequestBeginNewDay,
 }: TopBarProps) {
   const planActiveCount = usePlanActiveCount();
-  const [dayToolsOpen, setDayToolsOpen] = useState(false);
-  const dayToolsRef = useRef<HTMLDivElement>(null);
+  const [accountMenuOpen, setAccountMenuOpen] = useState(false);
+  const accountMenuRef = useRef<HTMLDivElement>(null);
 
   function closeMenu() {
-    setDayToolsOpen(false);
+    setAccountMenuOpen(false);
   }
 
   function runHeaderAction(action: () => void) {
@@ -121,15 +119,15 @@ export function TopBar({
   }
 
   useEffect(() => {
-    if (!dayToolsOpen) return;
+    if (!accountMenuOpen) return;
     const onPointerDown = (event: PointerEvent) => {
-      const root = dayToolsRef.current;
+      const root = accountMenuRef.current;
       if (root && !root.contains(event.target as Node)) {
-        setDayToolsOpen(false);
+        setAccountMenuOpen(false);
       }
     };
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setDayToolsOpen(false);
+      if (event.key === "Escape") setAccountMenuOpen(false);
     };
     document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
@@ -137,10 +135,18 @@ export function TopBar({
       document.removeEventListener("pointerdown", onPointerDown);
       document.removeEventListener("keydown", onKeyDown);
     };
-  }, [dayToolsOpen]);
+  }, [accountMenuOpen]);
 
   return (
     <div className="companion-top-bar sticky top-0 z-50 flex shrink-0 items-center justify-end gap-2 px-4 py-2.5 backdrop-blur-sm sm:px-6">
+      {onOpenClearMyMind ? (
+        <HeaderActionButton
+          emoji="🧠"
+          label="Clear My Mind"
+          onClick={() => runHeaderAction(onOpenClearMyMind)}
+        />
+      ) : null}
+
       {showPlanMyDay && onOpenPlanMyDay ? (
         <HeaderActionButton
           emoji="📅"
@@ -151,79 +157,62 @@ export function TopBar({
       ) : null}
 
       <HeaderActionButton
-        emoji="🧍"
-        label="Profile"
-        href={companionOverlayHref("profile")}
-        onClick={() => runHeaderAction(onOpenProfile)}
+        emoji={CLEAR_TODAY_CONTEXT_COPY.menuEmoji}
+        label={TOP_BAR_RESET_WORKSPACE_LABEL}
+        onClick={() => runHeaderAction(onRequestClearTodayContext)}
       />
 
       <HeaderActionButton
-        emoji="⚙️"
-        label="Settings"
-        href={companionOverlayHref("settings")}
-        onClick={() => runHeaderAction(() => onOpenSettings(null))}
+        emoji={BEGIN_NEW_DAY_COPY.menuEmoji}
+        label={TOP_BAR_NEW_DAY_LABEL}
+        onClick={() => runHeaderAction(onRequestBeginNewDay)}
       />
 
-      <div ref={dayToolsRef} className="relative z-50">
+      <div ref={accountMenuRef} className="relative z-50">
         <button
           type="button"
-          onClick={() => setDayToolsOpen((open) => !open)}
-          aria-expanded={dayToolsOpen}
-          aria-label="Day tools"
-          title="Day tools"
+          onClick={() => setAccountMenuOpen((open) => !open)}
+          aria-expanded={accountMenuOpen}
+          aria-haspopup="menu"
+          aria-label="Account"
+          title="Account"
           className="relative z-50 flex h-11 w-11 items-center justify-center rounded-full border border-[#c9bdb0] bg-white text-[26px] leading-none text-[#3d3630] shadow-sm transition-colors hover:bg-[#fff8ef]"
         >
           ⋯
         </button>
-        {dayToolsOpen ? (
-          <div className="absolute right-0 z-[60] mt-1 w-72 overflow-hidden rounded-xl border border-[#d8cfc2] bg-white shadow-lg">
-            <p className="border-b border-[#e7dfd4] px-4 py-2 text-[10px] font-bold uppercase tracking-wide text-[#9a8f82]">
-              Day tools
-            </p>
-            <p className="border-b border-[#e7dfd4] px-4 py-2 text-xs leading-snug text-[#6b635a]">
-              Plan My Day is your daily list. These tools reset or reshape
-              today&apos;s context.
+        {accountMenuOpen ? (
+          <div
+            className="absolute right-0 z-[60] mt-1 w-56 overflow-hidden rounded-xl border border-[#d8cfc2] bg-white shadow-lg"
+            role="menu"
+            aria-label="Account"
+            data-testid="account-menu"
+          >
+            <p className="border-b border-[#e7dfd4] px-4 py-2 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+              Account
             </p>
             <button
               type="button"
+              role="menuitem"
               onClick={() => {
                 closeMenu();
-                onAdjustDay();
+                onOpenProfile();
               }}
-              className={MENU_BTN}
+              className={ACCOUNT_MENU_BTN}
+              data-testid="account-menu-profile"
             >
-              ⚡ Adjust My Day
+              🧍 Profile
             </button>
             <button
               type="button"
+              role="menuitem"
               onClick={() => {
                 closeMenu();
-                onRequestClearTodayContext();
+                onOpenSettings(null);
               }}
-              className={MENU_BTN_HINT}
+              className={ACCOUNT_MENU_BTN}
+              data-testid="account-menu-settings"
             >
-              <span className="block text-sm font-semibold text-[#3d3630]">
-                {CLEAR_TODAY_CONTEXT_COPY.menuEmoji}{" "}
-                {CLEAR_TODAY_CONTEXT_COPY.menuLabel}
-              </span>
-              <span className="mt-0.5 block text-xs font-normal leading-snug text-[#8a7f72]">
-                {CLEAR_TODAY_CONTEXT_COPY.menuHint}
-              </span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                closeMenu();
-                onRequestBeginNewDay();
-              }}
-              className={MENU_BTN_HINT}
-            >
-              <span className="block text-sm font-semibold text-[#3d3630]">
-                {BEGIN_NEW_DAY_COPY.menuEmoji} {BEGIN_NEW_DAY_COPY.menuLabel}
-              </span>
-              <span className="mt-0.5 block text-xs font-normal leading-snug text-[#8a7f72]">
-                {BEGIN_NEW_DAY_COPY.menuHint}
-              </span>
+              ⚙️ Settings
             </button>
           </div>
         ) : null}

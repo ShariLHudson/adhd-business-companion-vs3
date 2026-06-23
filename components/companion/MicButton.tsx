@@ -7,6 +7,7 @@ import { getPrefs } from "@/lib/companionStore";
 
 // Global voice-input standard: use VoiceAnswerField next to any question field.
 // MicButton is the low-level control; speech fills the field — no auto-submit.
+// Uses continuous recognition (same as main chat) so long brain dumps are not cut off.
 
 type Recognition = {
   continuous: boolean;
@@ -37,6 +38,7 @@ export function MicButton({
   const recRef = useRef<Recognition | null>(null);
   const onTextRef = useRef(onText);
   onTextRef.current = onText;
+  const listeningRef = useRef(false);
   const [listening, setListening] = useState(false);
   const [supported, setSupported] = useState(true);
 
@@ -51,8 +53,8 @@ export function MicButton({
       return;
     }
     const rec = new SR();
-    rec.continuous = false;
-    rec.interimResults = false;
+    rec.continuous = true;
+    rec.interimResults = true;
     rec.lang = lang ?? speechLocaleForLanguage(getPrefs().voiceLanguage);
     rec.onresult = (e) => {
       let finalText = "";
@@ -63,10 +65,25 @@ export function MicButton({
       const t = finalText.trim();
       if (t) onTextRef.current(t);
     };
-    rec.onend = () => setListening(false);
-    rec.onerror = () => setListening(false);
+    rec.onend = () => {
+      if (listeningRef.current) {
+        try {
+          rec.start();
+        } catch {
+          listeningRef.current = false;
+          setListening(false);
+        }
+        return;
+      }
+      setListening(false);
+    };
+    rec.onerror = () => {
+      listeningRef.current = false;
+      setListening(false);
+    };
     recRef.current = rec;
     return () => {
+      listeningRef.current = false;
       try {
         rec.stop();
       } catch {
@@ -83,6 +100,7 @@ export function MicButton({
     if (!rec) return;
     rec.lang = lang ?? speechLocaleForLanguage(getPrefs().voiceLanguage);
     if (listening) {
+      listeningRef.current = false;
       try {
         rec.stop();
       } catch {
@@ -90,11 +108,19 @@ export function MicButton({
       }
       setListening(false);
     } else {
+      listeningRef.current = true;
       try {
         rec.start();
         setListening(true);
       } catch {
-        /* already started / blocked */
+        try {
+          rec.stop();
+          rec.start();
+          setListening(true);
+        } catch {
+          listeningRef.current = false;
+          setListening(false);
+        }
       }
     }
   }

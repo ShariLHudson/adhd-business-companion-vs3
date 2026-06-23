@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { getPrefs, savePrefs } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
-import { discoveryProgressSummary } from "@/lib/companionDiscovery";
 import { GettingToKnowYouPanel } from "@/components/companion/GettingToKnowYouPanel";
 import { ActiveCompanionsPicker } from "@/components/companion/ActiveCompanionsPicker";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
@@ -18,18 +17,8 @@ const SUPPORT_PHONE_DISPLAY = "515-954-9177";
 const SUPPORT_PHONE_TEL = "+15159549177";
 const GHL_BILLING_URL = "";
 
-export type ProfileSettingsSection =
-  | "tone"
-  | "help"
-  | "support"
-  | "language"
-  | "notifications"
-  | "appearance"
-  | "celebrations"
-  | "pattern"
-  | "plan"
-  | "connections"
-  | "account";
+/** Settings sections Profile may deep-link into (companion prefs only — not app config). */
+export type ProfileSettingsSection = "tone" | "plan";
 
 type PrefLink =
   | {
@@ -45,36 +34,21 @@ type PrefLink =
       action: "getting-to-know-you";
     };
 
-const PREF_LINKS: PrefLink[] = [
-  {
-    label: "Getting to know you",
-    emoji: "🌱",
-    blurb: "Review discoveries, edit answers, or turn categories off.",
-    action: "getting-to-know-you" as const,
-  },
+const COMPANION_PREF_LINKS: PrefLink[] = [
   {
     label: "Communication style",
     emoji: "💬",
     settings: "tone",
-    blurb: "AI tone, help mode, and support style.",
+    blurb: "How Shari talks with you — tone, help mode, and support style.",
   },
+];
+
+const PERSONAL_CONTEXT_LINKS: PrefLink[] = [
   {
-    label: "Celebrations",
-    emoji: "🎉",
-    settings: "celebrations",
-    blurb: "Birthdays, milestones, and recognition.",
-  },
-  {
-    label: "Memory & appearance",
-    emoji: "🎨",
-    settings: "appearance",
-    blurb: "Colors, pattern awareness, and visual mode.",
-  },
-  {
-    label: "Language",
-    emoji: "🌐",
-    settings: "language",
-    blurb: "Interface, response, and content language.",
+    label: "Getting to know you",
+    emoji: "🌱",
+    blurb: "What Shari has learned about you — review or update anytime.",
+    action: "getting-to-know-you" as const,
   },
 ];
 
@@ -133,16 +107,11 @@ export function ProfilePanel({
     );
   }
 
-  const discoveryLabel = discoveryProgressSummary().label;
-
   return (
     <div className={workspacePanelShellClass({ width: "narrow" })}>
       <p className="text-2xl font-semibold text-[#1f1c19]">Profile</p>
       <p className="mt-1 text-sm text-[#6b635a]">
-        Account, business context, and preferences — one place.
-        <span className="mt-1 block text-[#1e4f4f]">
-          Getting to know you · {discoveryLabel}
-        </span>
+        Who you are and what Shari should know about you and your business.
       </p>
 
       {/* Account — always at top */}
@@ -191,7 +160,7 @@ export function ProfilePanel({
               onClick={onSignIn}
               className="rounded-xl border border-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
             >
-              {user ? "Manage sign-in" : "Sign in"}
+              {user ? "Your account" : "Sign in"}
             </button>
           ) : null}
           {user ? (
@@ -250,74 +219,60 @@ export function ProfilePanel({
         </button>
       </div>
 
-      {/* Preferences */}
+      {/* Personal context */}
       <p className="mt-6 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-        Preferences
+        Personal context
       </p>
       <div className="mt-2 flex flex-col gap-2">
-        {PREF_LINKS.map((link) => {
-          if ("action" in link && link.action === "getting-to-know-you") {
-            return (
-              <button
-                key={link.label}
-                type="button"
-                onClick={() => setShowGettingToKnowYou(true)}
-                className={linkBtn}
-              >
-                <span aria-hidden="true" className="text-xl">
-                  {link.emoji}
+        {PERSONAL_CONTEXT_LINKS.map((link) => (
+          <button
+            key={link.label}
+            type="button"
+            onClick={() => setShowGettingToKnowYou(true)}
+            className={linkBtn}
+          >
+            <span aria-hidden="true" className="text-xl">
+              {link.emoji}
+            </span>
+            <span>
+              <span className="block text-base font-semibold text-[#1f1c19]">
+                {link.label}
+              </span>
+              <span className="block text-sm text-[#6b635a]">{link.blurb}</span>
+            </span>
+          </button>
+        ))}
+      </div>
+
+      {/* Companion preferences */}
+      <p className="mt-6 text-sm font-bold uppercase tracking-wide text-[#6b635a]">
+        Companion preferences
+      </p>
+      <div className="mt-2 flex flex-col gap-2">
+        {COMPANION_PREF_LINKS.map((link) => {
+          if (!("settings" in link)) return null;
+          return (
+            <a
+              key={link.label}
+              href={settingsHref(link.settings)}
+              onClick={(e) => {
+                e.preventDefault();
+                onOpenSettings?.(link.settings);
+              }}
+              className={linkBtn}
+            >
+              <span aria-hidden="true" className="text-xl">
+                {link.emoji}
+              </span>
+              <span>
+                <span className="block text-base font-semibold text-[#1f1c19]">
+                  {link.label}
                 </span>
-                <span>
-                  <span className="block text-base font-semibold text-[#1f1c19]">
-                    {link.label}
-                  </span>
-                  <span className="block text-sm text-[#6b635a]">{link.blurb}</span>
-                </span>
-              </button>
-            );
-          }
-          if ("settings" in link) {
-            return (
-              <a
-                key={link.label}
-                href={settingsHref(link.settings)}
-                onClick={(e) => {
-                  e.preventDefault();
-                  onOpenSettings?.(link.settings);
-                }}
-                className={linkBtn}
-              >
-                <span aria-hidden="true" className="text-xl">
-                  {link.emoji}
-                </span>
-                <span>
-                  <span className="block text-base font-semibold text-[#1f1c19]">
-                    {link.label}
-                  </span>
-                  <span className="block text-sm text-[#6b635a]">{link.blurb}</span>
-                </span>
-              </a>
-            );
-          }
-          return null;
+                <span className="block text-sm text-[#6b635a]">{link.blurb}</span>
+              </span>
+            </a>
+          );
         })}
-        <button
-          type="button"
-          onClick={() => onOpen?.("how-do-i")}
-          className={linkBtn}
-        >
-          <span aria-hidden="true" className="text-xl">
-            ❓
-          </span>
-          <span>
-            <span className="block text-base font-semibold text-[#1f1c19]">
-              How Do I
-            </span>
-            <span className="block text-sm text-[#6b635a]">
-              Searchable learning center for the app.
-            </span>
-          </span>
-        </button>
       </div>
 
       <ActiveCompanionsPicker />

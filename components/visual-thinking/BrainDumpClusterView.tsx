@@ -29,7 +29,7 @@ function ClusterCard({
   const { dots, suffix } = formatClusterDotWeight(count);
   return (
     <div
-      className="rounded-2xl border-2 p-4 shadow-md"
+      className="rounded-2xl border-2 p-5 shadow-md sm:p-6"
       style={{
         background: palette.bgGradient,
         borderColor: palette.border,
@@ -37,7 +37,7 @@ function ClusterCard({
       }}
     >
       <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-        <p className="text-base font-bold sm:text-lg" style={{ color: palette.text }}>
+        <p className="text-lg font-bold sm:text-xl" style={{ color: palette.text }}>
           {icon} {label}
         </p>
         <span
@@ -52,7 +52,7 @@ function ClusterCard({
         </span>
       </div>
       {subClusters.length > 1 ? (
-        <p className="mt-2 text-xs opacity-70" style={{ color: palette.text }}>
+        <p className="mt-2 text-sm opacity-70" style={{ color: palette.text }}>
           {subClusters.length} themes grouped here
         </p>
       ) : null}
@@ -62,8 +62,11 @@ function ClusterCard({
 
 export function BrainDumpClusterView({
   entries,
+  hideCenterHub = false,
 }: {
   entries: BrainDumpEntry[];
+  /** Omit the center circle when relief landscape already shows the held state. */
+  hideCenterHub?: boolean;
 }) {
   const graph = useMemo(
     () => buildBrainDumpClusterGraph(entries),
@@ -91,28 +94,30 @@ export function BrainDumpClusterView({
       role="img"
       aria-label={`${graph.totalThoughts} thoughts in ${graph.clusters.length} clusters`}
     >
-      <div className="mx-auto flex max-w-lg flex-col items-center gap-4">
-        <div
-          className="flex h-28 w-28 flex-col items-center justify-center rounded-full border-[3px] text-center shadow-lg sm:h-32 sm:w-32"
-          style={{
-            background: palette.bgGradient,
-            borderColor: palette.border,
-            boxShadow: palette.shadow,
-          }}
-        >
-          <span className="text-3xl" aria-hidden>
-            {graph.centerIcon}
-          </span>
-          <p className="mt-1 px-2 text-xs font-bold sm:text-sm" style={{ color: palette.text }}>
-            {graph.centerLabel}
-          </p>
-          <p className="text-[10px] font-medium opacity-70" style={{ color: palette.text }}>
-            Safely held
-          </p>
-        </div>
+      <div className="mx-auto flex w-full max-w-3xl flex-col items-center gap-5">
+        {!hideCenterHub ? (
+          <div
+            className="flex h-32 w-32 flex-col items-center justify-center rounded-full border-[3px] text-center shadow-lg sm:h-36 sm:w-36"
+            style={{
+              background: palette.bgGradient,
+              borderColor: palette.border,
+              boxShadow: palette.shadow,
+            }}
+          >
+            <span className="text-3xl" aria-hidden>
+              {graph.centerIcon}
+            </span>
+            <p className="mt-1 px-2 text-sm font-bold sm:text-base" style={{ color: palette.text }}>
+              {graph.centerLabel}
+            </p>
+            <p className="text-[10px] font-medium opacity-70" style={{ color: palette.text }}>
+              Safely held
+            </p>
+          </div>
+        ) : null}
 
         {graph.focusSuggestion ? (
-          <p className="max-w-sm rounded-2xl border border-[#e7dfd4] bg-[#faf7f2]/90 px-4 py-3 text-center text-sm leading-relaxed text-[#5a5248]">
+          <p className="max-w-md rounded-2xl border border-[#e7dfd4] bg-[#faf7f2]/90 px-4 py-3 text-center text-base leading-relaxed text-[#5a5248]">
             {graph.focusSuggestion.replace(/\*\*/g, "")}
           </p>
         ) : null}

@@ -123,17 +123,10 @@ function buildCreateCoachAutoStart(
   };
 }
 
-function buildBrainDumpCoachAutoStart(ctx: WorkspaceContext): WorkspaceCoachAutoStart {
-  if (ctx.stage?.includes("library")) {
-    return {
-      content:
-        "I see your saved thoughts in Clear My Mind. Want to sort one, prioritize what matters now, or capture something new?",
-      focusField: null,
-    };
-  }
+function buildBrainDumpCoachAutoStart(_ctx: WorkspaceContext): WorkspaceCoachAutoStart {
   return {
     content:
-      "I see Clear My Mind is open — **what's the loudest thought right now?** We'll sort it out one piece at a time.",
+      "I see Clear My Mind is open — what's on your mind right now? Add as many thoughts as you want; everything you capture stays safely held.",
     focusField: null,
   };
 }

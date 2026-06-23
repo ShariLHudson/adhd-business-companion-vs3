@@ -4,6 +4,7 @@
  */
 
 import { detectAudioRequest } from "./audioSuggestions";
+import { isExplicitBreatheRequest } from "./explicitBreatheRouting";
 import {
   isGenuineEmotionalDistress,
   shouldSuppressEmotionalTools,
@@ -101,7 +102,7 @@ function matchesStressToolPhrase(text: string): StressReliefOptionId | null {
     return "clear-mind";
   }
   if (
-    /\b(?:breathing exercise|breathe(?:\s+and\s+reset)?|breathing exercise|do breathing)\b/.test(
+    /\b(?:breathing exercise|breathe(?:\s+and\s+reset)?|breathing exercise|do breathing|take a breath|take a moment to breathe|just breathe|need to breathe)\b/.test(
       t,
     )
   ) {
@@ -176,6 +177,7 @@ export function isExplicitStressToolRequest(text: string): boolean {
 
 /** Block auto-opening any tool when the user is expressing distress, not requesting one. */
 export function shouldBlockStressAutoToolRouting(text: string): boolean {
+  if (isExplicitBreatheRequest(text)) return false;
   if (!isStressRoutingSignal(text)) return false;
   return !isExplicitStressToolRequest(text);
 }

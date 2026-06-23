@@ -10,7 +10,7 @@ export type ThoughtSplitProposal = {
 };
 
 const MAX_SEGMENTS = 12;
-const MIN_SEGMENT_LENGTH = 6;
+const MIN_SEGMENT_LENGTH = 3;
 
 const CONTINUATION_START =
   /^(but|and|so|which|who|whom|whose|because|although|though|while|when|if|or)\b/i;
@@ -52,6 +52,17 @@ const ACTION_PREFIXES = [
   "ping",
   "contact",
   "meet",
+  "order",
+  "organize",
+  "remind",
+  "cancel",
+  "reschedule",
+  "submit",
+  "file",
+  "clean",
+  "wash",
+  "walk",
+  "feed",
   "get",
   "do",
   "go",
@@ -74,6 +85,74 @@ function isActionLedSegment(segment: string, isFirst: boolean): boolean {
   );
 }
 
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+/**
+ * Voice input often omits commas — detect multiple action-led phrases in one line.
+ */
+function splitOnActionBoundaries(text: string): string[] | null {
+  const trimmed = text.trim();
+  if (
+    !trimmed ||
+    trimmed.includes(",") ||
+    trimmed.includes(";") ||
+    /\r?\n/.test(trimmed)
+  ) {
+    return null;
+  }
+
+  const prefixPattern = ACTION_PREFIXES.map(escapeRegExp).join("|");
+  const boundaryRe = new RegExp(
+    `(?:^|\\s+)(${prefixPattern})(?=\\s|$)`,
+    "gi",
+  );
+  const starts: number[] = [];
+  let match: RegExpExecArray | null;
+  while ((match = boundaryRe.exec(trimmed)) !== null) {
+    const prefix = match[1] ?? "";
+    const prefixStart = match.index + match[0].length - prefix.length;
+    starts.push(prefixStart);
+  }
+
+  const uniqueStarts = [...new Set(starts)].sort((a, b) => a - b);
+  if (uniqueStarts.length < 2) return null;
+
+  const segments = uniqueStarts
+    .map((start, index) => {
+      const end = uniqueStarts[index + 1] ?? trimmed.length;
+      return trimmed.slice(start, end).trim();
+    })
+    .filter(Boolean);
+
+  if (segments.length < 2 || segments.length > MAX_SEGMENTS) return null;
+
+  for (const segment of segments) {
+    if (segment.length < MIN_SEGMENT_LENGTH) return null;
+    if (CONTINUATION_START.test(segment)) return null;
+  }
+
+  return segments;
+}
+
+function splitOnClauseDelimiters(text: string): string[] | null {
+  const delimiter = text.includes(",") ? /,\s*/ : /\.\s+/;
+  const segments = text
+    .split(delimiter)
+    .map((segment) => segment.replace(/\.$/, "").trim())
+    .filter(Boolean);
+
+  if (segments.length < 2 || segments.length > MAX_SEGMENTS) return null;
+
+  for (const segment of segments) {
+    if (segment.length < MIN_SEGMENT_LENGTH) return null;
+    if (CONTINUATION_START.test(segment)) return null;
+  }
+
+  return segments;
+}
+
 /** Normalize segments after user confirms split — light touch on first segment only. */
 export function normalizeSplitSegments(segments: string[]): string[] {
   if (!segments.length) return [];
@@ -85,31 +164,35 @@ export function normalizeSplitSegments(segments: string[]): string[] {
 }
 
 /**
- * Detect high-confidence comma-separated action dumps worth offering to split.
+ * Detect comma- or period-separated dumps worth offering to split.
  * Returns null when confidence is not high enough.
  */
+function resolveSplitSegments(text: string): string[] | null {
+  return splitOnClauseDelimiters(text) ?? splitOnActionBoundaries(text);
+}
+
 export function detectThoughtSplitProposal(
   raw: string,
 ): ThoughtSplitProposal | null {
   const text = raw.trim();
-  if (!text.includes(",")) return null;
+  if (!text) return null;
 
-  const segments = text
-    .split(/,\s*/)
-    .map((s) => s.trim())
-    .filter(Boolean);
+  const segments = resolveSplitSegments(text);
+  if (!segments) return null;
 
-  if (segments.length < 2 || segments.length > MAX_SEGMENTS) return null;
-
-  for (const segment of segments) {
-    if (segment.length < MIN_SEGMENT_LENGTH) return null;
-    if (CONTINUATION_START.test(segment)) return null;
-  }
-
-  const actionLed = segments.map((segment, index) =>
+  const actionLedCount = segments.filter((segment, index) =>
     isActionLedSegment(segment, index === 0),
-  );
-  if (!actionLed.every(Boolean)) return null;
+  ).length;
+
+  const shortClauseCount = segments.filter(
+    (segment) => segment.length <= 72,
+  ).length;
+
+  const looksLikeList =
+    actionLedCount >= 2 ||
+    (shortClauseCount === segments.length && segments.length >= 2);
+
+  if (!looksLikeList) return null;
 
   const normalized = normalizeSplitSegments(segments);
   if (normalized.length < 2) return null;

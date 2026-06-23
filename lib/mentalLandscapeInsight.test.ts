@@ -43,7 +43,7 @@ describe("generateMentalLandscapeInsight", () => {
         ],
         2,
       ),
-    ).toBe("You captured a few things that were asking for attention.");
+    ).toBe("A few things are safely held here now.");
   });
 
   it("reflects business-heavy capture when dominant", () => {

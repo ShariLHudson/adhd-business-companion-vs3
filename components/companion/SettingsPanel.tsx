@@ -212,8 +212,6 @@ export function SettingsPanel({
   const [alerts, setAlerts] = useState(true);
   const [desktop, setDesktop] = useState(true);
   const [perm, setPerm] = useState<NotifPerm>("default");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
   const [fb, setFb] = useState("");
   const [ig, setIg] = useState("");
   const [li, setLi] = useState("");
@@ -256,8 +254,6 @@ export function SettingsPanel({
     setAdvanced(p.advancedAiTools);
     setAlerts(p.timeBlockAlerts);
     setDesktop(p.desktopNotifications);
-    setName(p.name);
-    setEmail(p.email);
     setFb(p.facebookUrl);
     setIg(p.instagramUrl);
     setLi(p.linkedinUrl);
@@ -346,7 +342,11 @@ export function SettingsPanel({
           ? `${[fb, ig, li].filter(Boolean).length} linked`
           : "Not set",
     },
-    { id: "account", label: "Account", value: name || email || "Not set" },
+    {
+      id: "account",
+      label: "Sign-in & security",
+      value: user?.email ?? (authConfigured ? "Not signed in" : "Not set"),
+    },
   ];
 
   // Reusable selectable list (radio-style cards).
@@ -1274,7 +1274,10 @@ export function SettingsPanel({
   if (open === "account") {
     return (
       <div className={wrap}>
-        {header("Account")}
+        {header("Sign-in & security")}
+        <p className="mt-1 text-sm text-[#6b635a]">
+          Sign in, sign out, and manage access. Name and email live in Profile.
+        </p>
         <div className="mt-4 flex flex-col gap-4">
           {authConfigured ? (
             <div className="rounded-lg border border-[#e7dfd4] bg-[#faf7f2] px-3 py-2.5 text-sm text-[#4b463f]">
@@ -1294,7 +1297,7 @@ export function SettingsPanel({
                 onClick={onSignIn}
                 className="rounded-xl border border-[#1e4f4f] px-5 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06]"
               >
-                {user ? "Account & sign-in" : "Sign in"}
+                {user ? "Your account" : "Sign in"}
               </button>
               {user ? (
                 <button
@@ -1307,37 +1310,6 @@ export function SettingsPanel({
               ) : null}
             </div>
           ) : null}
-          <div>
-            <label className={LABEL} htmlFor="acct-name">
-              Name
-            </label>
-            <input
-              id="acct-name"
-              value={name}
-              onChange={(e) => {
-                setName(e.target.value);
-                savePrefs({ name: e.target.value });
-              }}
-              className="mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-              placeholder="What should Shari call you?"
-            />
-          </div>
-          <div>
-            <label className={LABEL} htmlFor="acct-email">
-              Email
-            </label>
-            <input
-              id="acct-email"
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                savePrefs({ email: e.target.value });
-              }}
-              className="mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-              placeholder="you@example.com"
-            />
-          </div>
         </div>
       </div>
     );
@@ -1348,7 +1320,7 @@ export function SettingsPanel({
     <div className={wrap}>
       <p className="text-2xl font-semibold text-[#1f1c19]">Settings</p>
       <p className="mt-1 text-sm text-[#6b635a]">
-        Tap any item to change it — everything saves automatically.
+        How the app behaves — language, appearance, notifications, and more.
       </p>
       <WorkspaceAreaWorksGuide areaId="settings" />
       <div className="mt-6 flex flex-col gap-2.5">

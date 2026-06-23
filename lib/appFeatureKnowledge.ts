@@ -55,9 +55,9 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "clear-my-mind",
     name: "Clear My Mind",
-    navigation: "Sidebar **Focus** → **Start Here** → **Clear My Mind**",
+    navigation: "Top navigation **🧠 Clear My Mind** (or Sidebar **Focus**)",
     howTo:
-      "Reduce mental clutter — capture thoughts, group ideas, find priorities, shape next steps. One card per thought.",
+      "Empty your head safely — capture thoughts (commas are fine), see everything held, explore clusters, and act on thoughts when ready.",
     match: [
       /\bclear my mind\b/i,
       /\bbrain dump\b/i,

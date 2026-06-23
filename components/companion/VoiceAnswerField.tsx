@@ -6,7 +6,11 @@ import { MicButton } from "@/components/companion/MicButton";
 export function appendVoiceText(current: string, spoken: string): string {
   const t = spoken.trim();
   if (!t) return current;
-  return current.trim() ? `${current.trim()} ${t}` : t;
+  const base = current.trim();
+  if (!base) return t;
+  // Pauses between voice finals usually mark separate thoughts — commas help Smart Split.
+  const separator = base.endsWith(",") ? " " : ", ";
+  return `${base}${separator}${t}`;
 }
 
 type VoiceAnswerFieldProps = {

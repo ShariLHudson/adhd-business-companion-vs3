@@ -33,6 +33,56 @@ describe("clearMyMindThoughtSplitter", () => {
     expect(proposal!.count).toBe(3);
   });
 
+  it("proposes split for the sprint repro comma dump", () => {
+    const proposal = detectThoughtSplitProposal(
+      "Call doctor, finish newsletter, text Izna, order groceries",
+    );
+    expect(proposal).not.toBeNull();
+    expect(proposal!.count).toBe(4);
+    expect(proposal!.segments).toEqual([
+      "Call doctor",
+      "finish newsletter",
+      "text Izna",
+      "order groceries",
+    ]);
+  });
+
+  it("proposes split for the critical repro comma dump", () => {
+    const proposal = detectThoughtSplitProposal(
+      "Check microphone, call doctor, order groceries, text Izna",
+    );
+    expect(proposal).not.toBeNull();
+    expect(proposal!.count).toBe(4);
+    expect(proposal!.segments).toEqual([
+      "Check microphone",
+      "call doctor",
+      "order groceries",
+      "text Izna",
+    ]);
+  });
+
+  it("proposes split for voice-style space-separated action dump", () => {
+    const proposal = detectThoughtSplitProposal(
+      "check microphone call doctor order groceries text Izna",
+    );
+    expect(proposal).not.toBeNull();
+    expect(proposal!.count).toBe(4);
+    expect(proposal!.segments).toEqual([
+      "check microphone",
+      "call doctor",
+      "order groceries",
+      "text Izna",
+    ]);
+  });
+
+  it("proposes split for period-separated action clauses", () => {
+    const proposal = detectThoughtSplitProposal(
+      "Call doctor. Finish newsletter. Text Izna.",
+    );
+    expect(proposal).not.toBeNull();
+    expect(proposal!.count).toBe(3);
+  });
+
   it("proposes split for long natural dump with leading I need to on first clause", () => {
     const proposal = detectThoughtSplitProposal(QA_LONG_DUMP);
     expect(proposal).not.toBeNull();

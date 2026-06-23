@@ -99,6 +99,7 @@ import { RelationshipRememberCard } from "@/components/companion/RelationshipRem
 import { OpportunityOfferCard } from "@/components/companion/OpportunityOfferCard";
 import { DecisionOfferCard } from "@/components/companion/DecisionOfferCard";
 import { DecisionCompassOfferCard } from "@/components/companion/DecisionCompassOfferCard";
+import { BusinessConfidenceOfferCard } from "@/components/companion/BusinessConfidenceOfferCard";
 import { EnvironmentOfferCard } from "@/components/companion/EnvironmentOfferCard";
 import { FutureShariOfferCard } from "@/components/companion/FutureShariOfferCard";
 import { MomentumOfferCard } from "@/components/companion/MomentumOfferCard";
@@ -514,6 +515,7 @@ import {
 } from "@/lib/createOpenAuthority";
 import {
   createPendingAcceptanceRecord,
+  isBareGenericAcceptance,
   isAcceptanceAttempt,
   isPendingAcceptanceExpired,
   resolvePendingAcceptance,
@@ -521,6 +523,74 @@ import {
   type PendingAcceptanceKind,
   type PendingAcceptanceRecord,
 } from "@/lib/pendingAcceptanceAuthority";
+import {
+  adaptMyDayOfferLine,
+  adaptMyDayOpenAck,
+  isAdaptMyDayIntent,
+} from "@/lib/adaptMyDayChatRouting";
+import {
+  companionEcosystemRoutingHintForChat,
+  detectEcosystemProblemIntent,
+  ecosystemIntentToWorkspaceOffer,
+} from "@/lib/companionEcosystemIntent";
+import {
+  adhdNativeHintForChat,
+  analyzeAdhdNativeTurn,
+  shouldDeferEcosystemRouting,
+} from "@/lib/adhdNativeIntelligence";
+import {
+  adaptiveUserIntelligenceHintForChat,
+  adhdEntrepreneurPrimaryHintForChat,
+  analyzeAdhdEntrepreneurTurn,
+} from "@/lib/adhdEntrepreneurIntelligence";
+import {
+  buildSprint5Intelligence,
+  recordConfidenceWin,
+} from "@/lib/companionSprint5Intelligence";
+import {
+  actionBiasHintForChat,
+  analyzeActionBias,
+  discoveryOverrideForActionBias,
+  shouldDeferRoutingForActionBias,
+} from "@/lib/companionActionBias";
+import {
+  analyzeIntuitiveAwareness,
+  intuitiveAwarenessHintForChat,
+} from "@/lib/companionIntuitiveAwareness";
+import { resolveWorkspaceAdvisorRole } from "@/lib/workspaceContextLock";
+import {
+  clearOutcomeThread,
+  getOutcomeThread,
+  outcomeThreadHintForChat,
+  registerFeatureOpened,
+  registerPendingOffer,
+  registerProblemFromUser,
+  registerWorkflowContinuation,
+  topicChangeClearsThread,
+} from "@/lib/companionOutcomeThread";
+import {
+  createConversationWorkflow,
+  type ConversationWorkflow,
+  type WorkflowContinuationResult,
+} from "@/lib/conversationWorkflowContinuation";
+import {
+  resolveCompanionAcceptanceTurn,
+  trackConversationOffer,
+} from "@/lib/companionIntelligenceRouter";
+import { isExplicitBreatheRequest } from "@/lib/explicitBreatheRouting";
+import {
+  isBusinessAdviceRequest,
+  primaryBusinessAdviceDomain,
+} from "@/lib/businessAdviceIntent";
+import {
+  businessIntelligenceConfidenceHintForChat,
+} from "@/lib/businessIntelligenceConfidence";
+import {
+  buildBusinessConfidenceOffer,
+  businessConfidenceContinueAck,
+  type BusinessConfidenceOffer,
+} from "@/lib/businessIntelligenceConfidenceOffer";
+import { loadBusinessIntelligenceConfidence } from "@/lib/businessIntelligenceConfidenceClient";
 import { userGrantedDraftPermission } from "@/lib/draftPermissionGate";
 import {
   assembleConversationArtifact,
@@ -561,6 +631,20 @@ import {
   trackToolSuggestionDismissed,
   trackToolSuggestionOffered,
 } from "@/lib/toolSuggestionAnalytics";
+import {
+  buildClosedLoopContext,
+  captureOfferShown,
+  captureOfferAccepted,
+  captureOfferDismissed,
+  captureWorkspaceOpened,
+  captureWorkspaceUsed,
+  captureWorkspaceCompleted,
+  captureWorkspaceAbandoned,
+  captureWorkspaceReturned,
+  captureToolOfferShown,
+  captureToolOfferAccepted,
+  captureToolOfferDismissed,
+} from "@/lib/companionClosedLoopWiring";
 import {
   crossWorkspaceBesideLine,
   crossWorkspaceContextMessage,
@@ -609,6 +693,7 @@ import {
   detectStandaloneToolRequest,
   standaloneToolAck,
 } from "@/lib/standaloneToolRouting";
+import { isClearMyMindSection } from "@/lib/clearMyMindRouting";
 import {
   shouldAutoLaunchPendingAction,
   shouldAutoOpenWorkspaceFromIntent,
@@ -1275,9 +1360,16 @@ export default function CompanionPageClient() {
     useState<DecisionCompassPrefill | null>(null);
   const [decisionCompassSession, setDecisionCompassSession] =
     useState<PersistedDecisionCompassSession | null>(null);
+  const [conversationWorkflow, setConversationWorkflow] =
+    useState<ConversationWorkflow | null>(null);
+  const [businessConfidenceOffer, setBusinessConfidenceOffer] =
+    useState<BusinessConfidenceOffer | null>(null);
+  const businessConfidenceBypassRef = useRef(false);
+  const businessConfidencePendingTextRef = useRef<string | null>(null);
   const hasInlineIntelligenceOffer = Boolean(
     stressReliefOffer ||
       decisionCompassOffer ||
+      businessConfidenceOffer ||
       activationOffer ||
       dayPlanView ||
       (dayDesignerQuestion && dayDesignerSession) ||
@@ -1779,6 +1871,7 @@ export default function CompanionPageClient() {
     useState<PendingAcceptanceRecord | null>(null);
   const chatTurnRef = useRef(0);
   const lastWorkspaceOfferLineRef = useRef<string | null>(null);
+  const lastEmotionalStateRef = useRef<EmotionalState | null>(null);
   const [assistedActionOffer, setAssistedActionOffer] =
     useState<AssistedAction | null>(null);
   const [artifactExportOffer, setArtifactExportOffer] =
@@ -2630,6 +2723,25 @@ export default function CompanionPageClient() {
           );
           return next;
         });
+        const panel = workspacePanelRef.current;
+        if (panel) {
+          captureWorkspaceUsed(
+            panel,
+            { action: "draft_edit" },
+            buildClosedLoopContext({
+              emotionalState: lastEmotionalStateRef.current,
+            }),
+          );
+        }
+      }
+      if (detail.selectedItemId && workspacePanelRef.current === "projects") {
+        captureWorkspaceUsed(
+          "projects",
+          { action: "project_selected" },
+          buildClosedLoopContext({
+            emotionalState: lastEmotionalStateRef.current,
+          }),
+        );
       }
     },
     [persistCreateSession],
@@ -2940,6 +3052,13 @@ export default function CompanionPageClient() {
         break;
       }
       case "create-draft":
+        captureWorkspaceReturned(
+          "content-generator",
+          buildClosedLoopContext({
+            emotionalState: lastEmotionalStateRef.current,
+            routingReason: "home_resume",
+          }),
+        );
         restoreCreateSession(undefined, resumeReceiptForContinuityType("create-draft"));
         break;
       case "resume": {
@@ -2993,6 +3112,13 @@ export default function CompanionPageClient() {
         );
         break;
       case "decision-compass":
+        captureWorkspaceReturned(
+          "decision-compass",
+          buildClosedLoopContext({
+            emotionalState: lastEmotionalStateRef.current,
+            routingReason: "home_resume",
+          }),
+        );
         openDecisionCompass();
         appendRecoveryMessage(resumeReceiptForContinuityType("decision-compass"));
         break;
@@ -4227,6 +4353,25 @@ export default function CompanionPageClient() {
     }
   }
 
+  function closedLoopCtx(
+    overrides?: Parameters<typeof buildClosedLoopContext>[0],
+  ) {
+    return buildClosedLoopContext({
+      emotionalState: lastEmotionalStateRef.current,
+      ...overrides,
+    });
+  }
+
+  function noteWorkspaceOpened(
+    section: AppSection,
+    routingReason?: string,
+  ) {
+    captureWorkspaceOpened(
+      section,
+      closedLoopCtx({ routingReason: routingReason ?? section }),
+    );
+  }
+
   function emitFounderActionEvent(
     action: FounderAction,
     status: FounderActionStatus,
@@ -4745,6 +4890,9 @@ export default function CompanionPageClient() {
     setEmotion("unclear");
     setBridge(null);
     setWorkspaceOffer(null);
+    setBusinessConfidenceOffer(null);
+    businessConfidenceBypassRef.current = false;
+    businessConfidencePendingTextRef.current = null;
     setAssistedActionOffer(null);
     pauseCreatePersistence();
     patchWorkspacePanel(null);
@@ -4872,6 +5020,10 @@ export default function CompanionPageClient() {
     section: AppSection,
     nav?: SidebarNavId,
   ) {
+    if (isClearMyMindSection(section)) {
+      openClearMyMindStandaloneCore();
+      return;
+    }
     if (section === "content-generator") {
       if (workspacePanel === "content-generator") {
         setActiveSection("home");
@@ -5608,6 +5760,13 @@ export default function CompanionPageClient() {
     setActiveNav(navForWorkspaceSection(section) ?? "focus");
   }
 
+  /** Full-screen Clear My Mind — top navigation entry (no split chat). */
+  function openClearMyMindStandaloneCore() {
+    trackWorkspaceEcosystemEvent("brain-dump");
+    noteWorkspaceOpened("brain-dump", "nav_or_recommendation");
+    openStandaloneFocusSectionCore("brain-dump");
+  }
+
   function handleActivityOpenBeside(
     section: AppSection,
     payload: {
@@ -5701,6 +5860,7 @@ export default function CompanionPageClient() {
     setFocusAudioCategory(
       categoryId ?? (fromIntent.isAudio ? fromIntent.categoryId : null),
     );
+    noteWorkspaceOpened("focus-audio", "recommendation_or_nav");
     setActiveSection("focus-audio");
     setActiveNav("focus");
   }
@@ -5708,7 +5868,7 @@ export default function CompanionPageClient() {
   function handleToolSelectCore(tool: SidebarToolId) {
     switch (tool) {
       case "brain-dump":
-        openWorkspaceBesideChatCore("brain-dump", workspaceOpenAck("brain-dump"));
+        openClearMyMindStandaloneCore();
         break;
       case "focus-timer":
         openStandaloneFocusSectionCore("focus-timer");
@@ -5756,6 +5916,10 @@ export default function CompanionPageClient() {
         handleToolSelectCore(action.tool);
         break;
       case "section":
+        if (isClearMyMindSection(action.section)) {
+          openClearMyMindStandaloneCore();
+          break;
+        }
         if (action.toolId === "mind-map") {
           saveBrainDumpVisualVisible(true);
           saveBrainDumpVisualView("mindmap");
@@ -6097,6 +6261,7 @@ export default function CompanionPageClient() {
   }
 
   function handleDecisionCompassComplete() {
+    captureWorkspaceCompleted("decision-compass", closedLoopCtx());
     setDecisionCompassPrefill(null);
   }
 
@@ -6350,6 +6515,181 @@ export default function CompanionPageClient() {
     setPendingAcceptanceRecord(null);
   }
 
+  function applyWorkflowContinuation(
+    result: WorkflowContinuationResult,
+    userMessage: Message,
+    fresh: boolean,
+  ): boolean {
+    const continuedKind =
+      conversationWorkflow?.kind ??
+      result.nextWorkflow?.kind ??
+      "guided_continue";
+    setConversationWorkflow(result.nextWorkflow ?? null);
+
+    if (result.action === "open_section") {
+      registerFeatureOpened(result.section, result.message);
+      recordConfidenceWin({
+        kind: "momentum_progress",
+        label: `Opened ${result.section.replace(/-/g, " ")}`,
+        context: result.message.slice(0, 120),
+      });
+    }
+    registerWorkflowContinuation(continuedKind, result.message);
+
+    if (result.action === "open_section") {
+      switch (result.section) {
+        case "brain-dump":
+          openClearMyMindStandaloneCore();
+          break;
+        case "decision-compass":
+          openDecisionCompass();
+          break;
+        case "energy":
+          setActiveSection("energy");
+          activeSectionRef.current = "energy";
+          break;
+        case "plan-my-day":
+          openSectionBesideChatCore("plan-my-day");
+          break;
+        default:
+          openSectionBesideChatCore(result.section);
+          break;
+      }
+    } else if (result.action === "open_tool") {
+      handleToolSelectCore(result.tool);
+    }
+
+    if (fresh) clearConversation();
+    setMessages((prev) => [
+      ...(fresh ? [] : prev),
+      userMessage,
+      { role: "assistant", content: result.message },
+    ]);
+    setInput("");
+    voiceUsedRef.current = false;
+    setIsLoading(false);
+    inputRef.current?.focus();
+    return true;
+  }
+
+  function publishConversationOffer(
+    offerLine: string,
+    workspaceOffer?: WorkspaceOffer | null,
+  ) {
+    const { workflow } = trackConversationOffer({
+      offerLine,
+      offeredAtTurn: chatTurnRef.current,
+      workspaceOffer,
+    });
+    if (workflow) setConversationWorkflow(workflow);
+    if (workspaceOffer) {
+      registerPendingOffer({
+        offerSummary: workspaceOffer.buttonLabel,
+        section: workspaceOffer.section,
+        workflowKind: workflow?.kind,
+        pendingQuestion: offerLine,
+      });
+    }
+  }
+
+  function tryContinueConversationWorkflow(
+    trimmed: string,
+    lastAssistantText: string,
+    fresh: boolean,
+  ): boolean {
+    const userMessage: Message = { role: "user", content: trimmed };
+
+    const exportOffer = detectArtifactExportOffer(trimmed, creationContext);
+    const pendingNow = resolvePendingAction({
+      workspaceOffer,
+      artifactExportOffer: exportOffer ?? artifactExportOffer,
+      assistedActionOffer,
+      doItNowOffer,
+      toolSuggestion,
+      actionBridge,
+      bridge,
+      lockedArtifactType,
+    });
+
+    const resolution = resolveCompanionAcceptanceTurn({
+      userText: trimmed,
+      lastAssistantText,
+      currentTurn: chatTurnRef.current,
+      workflow: conversationWorkflow,
+      outcomeThread: getOutcomeThread(),
+      pendingInput: {
+        workspacePanel: workspacePanelRef.current,
+        record: pendingAcceptanceRecord,
+        pendingAction: pendingNow,
+        createConsent: pendingCreateOpen,
+      },
+    });
+
+    if (resolution.kind === "workflow") {
+      return applyWorkflowContinuation(resolution.continuation, userMessage, fresh);
+    }
+
+    if (resolution.kind === "pending") {
+      const pending = resolution.result;
+      if (
+        pending.outcome === "conversation" ||
+        pending.outcome === "expired"
+      ) {
+        if (fresh) clearConversation();
+        setMessages((prev) => [
+          ...(fresh ? [] : prev),
+          userMessage,
+          { role: "assistant", content: pending.message },
+        ]);
+        setInput("");
+        voiceUsedRef.current = false;
+        setIsLoading(false);
+        inputRef.current?.focus();
+        return true;
+      }
+      if (dispatchResolvedAcceptance(pending, pendingNow)) {
+        if (fresh) clearConversation();
+        setMessages((prev) => [...(fresh ? [] : prev), userMessage]);
+        setInput("");
+        voiceUsedRef.current = false;
+        setIsLoading(false);
+        inputRef.current?.focus();
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  function openBusinessIntelligenceProfile(section: AppSection) {
+    setBusinessConfidenceOffer(null);
+    if (section === "business-profile") {
+      setActiveSection("business-profile");
+      activeSectionRef.current = "business-profile";
+      return;
+    }
+    if (section === "client-avatars") {
+      openSectionBesideChatCore("client-avatars");
+      return;
+    }
+    openSectionBesideChatCore(section);
+  }
+
+  function continueBusinessAdviceAnyway() {
+    businessConfidenceBypassRef.current = true;
+    setBusinessConfidenceOffer(null);
+    const pending = businessConfidencePendingTextRef.current;
+    businessConfidencePendingTextRef.current = null;
+    if (pending) {
+      void handleSend(pending, false, false);
+      return;
+    }
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: businessConfidenceContinueAck() },
+    ]);
+  }
+
   function registerPendingAcceptance(
     kind: PendingAcceptanceKind,
     offerSummary: string,
@@ -6453,6 +6793,7 @@ export default function CompanionPageClient() {
     setDoItNowOffer(null);
     setToolSuggestion(null);
     setStressReliefOffer(null);
+    setBusinessConfidenceOffer(null);
     setActionBridge(null);
     setBridge(null);
     setPendingCreateOpen(null);
@@ -6482,6 +6823,7 @@ export default function CompanionPageClient() {
         workspacePanelRef.current,
       ),
     );
+    captureOfferShown(workspaceOffer, closedLoopCtx());
   }, [workspaceOffer]);
 
   useEffect(() => {
@@ -6498,6 +6840,36 @@ export default function CompanionPageClient() {
       );
     });
   }, [assistedActionOffer, workspaceOffer]);
+
+  useEffect(() => {
+    if (!toolSuggestion || workspaceOffer || assistedActionOffer) return;
+    setPendingAcceptanceRecord((prev) => {
+      if (prev?.kind === "create_consent" || prev?.kind === "draft_switch") {
+        return prev;
+      }
+      return createPendingAcceptanceRecord(
+        "tool",
+        toolSuggestion.line,
+        chatTurnRef.current,
+        workspacePanelRef.current,
+      );
+    });
+  }, [toolSuggestion, workspaceOffer, assistedActionOffer]);
+
+  useEffect(() => {
+    if (!actionBridge || workspaceOffer || toolSuggestion) return;
+    setPendingAcceptanceRecord((prev) => {
+      if (prev?.kind === "create_consent" || prev?.kind === "draft_switch") {
+        return prev;
+      }
+      return createPendingAcceptanceRecord(
+        "tool",
+        actionBridge.label,
+        chatTurnRef.current,
+        workspacePanelRef.current,
+      );
+    });
+  }, [actionBridge, workspaceOffer, toolSuggestion]);
 
   useEffect(() => {
     if (!splitCreateChat) {
@@ -6591,6 +6963,10 @@ export default function CompanionPageClient() {
     section: AppSection,
     ack = workspaceOpenAck(section),
   ) {
+    if (isClearMyMindSection(section)) {
+      openClearMyMindStandaloneCore();
+      return;
+    }
     clearParallelCoachingOffers();
     if (section === "content-generator") {
       if (workspacePanel === "content-generator") {
@@ -6624,6 +7000,7 @@ export default function CompanionPageClient() {
         );
       }
       trackWorkspaceEcosystemEvent("content-generator");
+      noteWorkspaceOpened("content-generator", "beside_chat");
       return;
     }
 
@@ -6661,6 +7038,7 @@ export default function CompanionPageClient() {
     }
     revealWorkspace();
     trackWorkspaceEcosystemEvent(section);
+    noteWorkspaceOpened(section, "beside_chat");
     if (isPurityScopedSection(section)) {
       beginWorkspaceChat({ section }, resolveWorkspaceOpener(section));
     } else {
@@ -6735,6 +7113,46 @@ export default function CompanionPageClient() {
     if (!trimmed || isLoading) return;
 
     chatTurnRef.current += 1;
+
+    if (topicChangeClearsThread(trimmed)) {
+      clearOutcomeThread();
+    } else if (
+      trimmed.length >= 12 &&
+      !isBareGenericAcceptance(trimmed) &&
+      !isAcceptanceAttempt(trimmed)
+    ) {
+      registerProblemFromUser(trimmed);
+    }
+
+    if (
+      conversationWorkflow &&
+      !isAcceptanceAttempt(trimmed) &&
+      topicChangeInvalidatesOffer(trimmed, {
+        id: conversationWorkflow.kind,
+        kind: "assisted",
+        createdAt: 0,
+        offeredAtTurn: conversationWorkflow.offeredAtTurn,
+        workspacePanelAtOffer: null,
+        offerSummary: conversationWorkflow.offerSummary,
+      })
+    ) {
+      setConversationWorkflow(null);
+    }
+
+    if (businessConfidenceOffer) {
+      const lower = trimmed.toLowerCase();
+      if (
+        /continue anyway/i.test(lower) ||
+        (isAcceptanceAttempt(trimmed) &&
+          /continue|anyway|without (?:the )?profile/i.test(lower))
+      ) {
+        const userMessage: Message = { role: "user", content: trimmed };
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        continueBusinessAdviceAnyway();
+        return;
+      }
+    }
 
     if (
       pendingAcceptanceRecord &&
@@ -7095,6 +7513,7 @@ export default function CompanionPageClient() {
       window.sessionStorage.setItem("ecosystem-chat-started-v1", "1");
     }
     const detectedEmotion = detectEmotionalState(trimmed);
+    lastEmotionalStateRef.current = detectedEmotion;
     const classifiedSignals = observeUserSignalsFromText({
       text: trimmed,
       emotionalState: detectedEmotion,
@@ -7188,6 +7607,7 @@ export default function CompanionPageClient() {
     }
 
     const sendEmotion = detectEmotionalState(trimmed);
+    lastEmotionalStateRef.current = sendEmotion;
     const recoverySnap = evaluateAndRecordRecovery({
       text: trimmed,
       emotionalState: sendEmotion,
@@ -7795,6 +8215,48 @@ export default function CompanionPageClient() {
     const lastAssistantText =
       [...nextMessages].reverse().find((m) => m.role === "assistant")?.content ??
       "";
+
+    if (decisionCompassOffer && isAcceptanceAttempt(trimmed)) {
+      const snap = decisionCompassOffer;
+      setDecisionCompassOffer(null);
+      clearAllPendingOffers();
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        { role: "assistant", content: decisionCompassOpenAck() },
+      ]);
+      setInput("");
+      openDecisionCompass(snap.prefill);
+      setIsLoading(false);
+      inputRef.current?.focus();
+      return;
+    }
+
+    if (tryContinueConversationWorkflow(trimmed, lastAssistantText, fresh)) {
+      return;
+    }
+
+    if (isExplicitBreatheRequest(trimmed) && !governorChatOnly) {
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        {
+          role: "assistant",
+          content: standaloneToolAck("breathe"),
+        },
+      ]);
+      setInput("");
+      setStressReliefOffer(null);
+      clearAllPendingOffers();
+      handleToolSelectCore("breathe");
+      setIsLoading(false);
+      inputRef.current?.focus();
+      return;
+    }
 
     if (userAffirmedApplyToDraft(trimmed, lastAssistantText)) {
       const parent = getActiveParentWorkflow();
@@ -8417,12 +8879,10 @@ export default function CompanionPageClient() {
         (recovery === "brain-dump" || recovery === "any") &&
         workspacePanel === "brain-dump"
       ) {
-        setActiveSection("home");
-        activeSectionRef.current = "home";
-        revealWorkspace();
+        openClearMyMindStandaloneCore();
         appendVerifiedWorkspaceMessage(
           "brain-dump",
-          "**Clear My Mind** is open beside you — check the panel on the right.",
+          "**Clear My Mind** is open — capture what's on your mind whenever you're ready.",
         );
         return;
       }
@@ -8650,6 +9110,43 @@ export default function CompanionPageClient() {
       somatic,
       askingHow,
       workspaceOpen: Boolean(workspacePanel),
+    });
+    const ecosystemProblemMatch = detectEcosystemProblemIntent(trimmed);
+    const adhdNative = analyzeAdhdNativeTurn({
+      text: trimmed,
+      messages: nextMessages,
+      emotionalState: detected,
+      obstacle: obstacle ?? null,
+      discoveryPhase: intelligence.discoveryPhase,
+      shouldDeferTools: intelligence.shouldDeferTools,
+      hasEcosystemFeatureMatch: Boolean(ecosystemProblemMatch),
+    });
+    const adhdEntrepreneur = analyzeAdhdEntrepreneurTurn({
+      userText: trimmed,
+      adhdNative,
+      multiTurn: adhdNative.multiTurn,
+      boardDomain: resolveWorkspaceAdvisorRole(trimmed, workspacePanel),
+    });
+    const sprint5 = buildSprint5Intelligence({
+      outcomeThread: getOutcomeThread(),
+      multiTurn: adhdNative.multiTurn,
+      featureLabel: ecosystemProblemMatch?.featureLabel ?? null,
+      frictionLabel: adhdNative.primaryFriction?.replace(/_/g, " ") ?? null,
+    });
+    const actionBias = analyzeActionBias({
+      messages: nextMessages,
+      userText: trimmed,
+      emotionalState: detected,
+      adhdNative,
+      multiTurn: adhdNative.multiTurn,
+    });
+    const intuitiveAwareness = analyzeIntuitiveAwareness({
+      messages: nextMessages,
+      userText: trimmed,
+      emotionalState: detected,
+      adhdNative,
+      multiTurn: adhdNative.multiTurn,
+      actionBias,
     });
     const rawWorkspaceOffer =
       willBridge ||
@@ -9035,6 +9532,69 @@ export default function CompanionPageClient() {
       !workspaceOffer &&
       !turnArbitration?.blockAutoRouteAsset
     ) {
+      const ecosystemMatch = ecosystemProblemMatch;
+      if (
+        ecosystemMatch &&
+        !shouldDeferRoutingForActionBias(actionBias) &&
+        !shouldDeferEcosystemRouting(
+          adhdNative,
+          intelligence.shouldDeferTools,
+          ecosystemMatch.section,
+        )
+      ) {
+        const userMessage: Message = { role: "user", content: trimmed };
+        const wsOffer = ecosystemIntentToWorkspaceOffer(ecosystemMatch);
+        if (fresh) clearConversation();
+        setMessages((prev) => [
+          ...(fresh ? [] : prev),
+          userMessage,
+          { role: "assistant", content: wsOffer.line },
+        ]);
+        setWorkspaceOffer(wsOffer);
+        publishConversationOffer(wsOffer.line, wsOffer);
+        registerPendingAcceptance("workspace", ecosystemMatch.featureLabel);
+        setInput("");
+        setIsLoading(false);
+        inputRef.current?.focus();
+        return;
+      }
+    }
+
+    if (
+      !workspacePanel &&
+      !pendingWorkspaceOffer &&
+      !workspaceOffer &&
+      !turnArbitration?.blockAutoRouteAsset &&
+      isAdaptMyDayIntent(trimmed) &&
+      !isExplicitBreatheRequest(trimmed)
+    ) {
+      const userMessage: Message = { role: "user", content: trimmed };
+      const offerLine = adaptMyDayOfferLine();
+      if (fresh) clearConversation();
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        { role: "assistant", content: offerLine },
+      ]);
+      const energyOffer: WorkspaceOffer = {
+        section: "energy",
+        buttonLabel: "Open Adapt My Day",
+        line: offerLine,
+      };
+      setWorkspaceOffer(energyOffer);
+      publishConversationOffer(offerLine, energyOffer);
+      setInput("");
+      setIsLoading(false);
+      inputRef.current?.focus();
+      return;
+    }
+
+    if (
+      !workspacePanel &&
+      !pendingWorkspaceOffer &&
+      !workspaceOffer &&
+      !turnArbitration?.blockAutoRouteAsset
+    ) {
       const companionFirst = detectCompanionFirstTarget(trimmed);
       if (companionFirst && workspacePanel !== companionFirst.section) {
         companionFirstTargetRef.current = companionFirst;
@@ -9043,7 +9603,9 @@ export default function CompanionPageClient() {
           ...prev,
           { role: "assistant", content: offerLine },
         ]);
-        setWorkspaceOffer(toWorkspaceOffer(companionFirst));
+        const wsOffer = toWorkspaceOffer(companionFirst);
+        setWorkspaceOffer(wsOffer);
+        publishConversationOffer(offerLine, wsOffer);
         setToolSuggestion(null);
         setActionBridge(null);
         setBridge(null);
@@ -9070,9 +9632,37 @@ export default function CompanionPageClient() {
           { role: "assistant", content: offerLine },
         ]);
         setWorkspaceOffer(researchOffer);
+        publishConversationOffer(offerLine, researchOffer);
         setToolSuggestion(null);
         setActionBridge(null);
         setBridge(null);
+        setIsLoading(false);
+        inputRef.current?.focus();
+        return;
+      }
+    }
+
+    if (
+      isBusinessAdviceRequest(trimmed) &&
+      !businessConfidenceBypassRef.current &&
+      !businessConfidenceOffer
+    ) {
+      const confidence = loadBusinessIntelligenceConfidence();
+      if (confidence.level === "low") {
+        const offer = buildBusinessConfidenceOffer(
+          confidence,
+          primaryBusinessAdviceDomain(trimmed),
+        );
+        businessConfidencePendingTextRef.current = trimmed;
+        const userMessage: Message = { role: "user", content: trimmed };
+        if (fresh) clearConversation();
+        setMessages((prev) => [
+          ...(fresh ? [] : prev),
+          userMessage,
+          { role: "assistant", content: offer.message },
+        ]);
+        setBusinessConfidenceOffer(offer);
+        setInput("");
         setIsLoading(false);
         inputRef.current?.focus();
         return;
@@ -9212,8 +9802,15 @@ export default function CompanionPageClient() {
                   classifyCompanionIntentBucket(trimmed),
                   trimmed,
                 ),
+                isBusinessAdviceRequest(trimmed)
+                  ? businessIntelligenceConfidenceHintForChat(
+                      loadBusinessIntelligenceConfidence(),
+                    )
+                  : null,
                 clearMyMindTrustHintForChat(trimmed, {
-                  brainDumpPanelOpen: workspacePanel === "brain-dump",
+                  brainDumpPanelOpen:
+                    workspacePanel === "brain-dump" ||
+                    activeSection === "brain-dump",
                 }),
                 classificationHintForChat(messageCategory, trimmed),
                 frustrationContextHintForChat(trimmed),
@@ -9245,6 +9842,19 @@ export default function CompanionPageClient() {
                   ? builderContentSyncHintForChat()
                   : null,
                 parentWorkflowCoachHint(getActiveParentWorkflow()),
+                outcomeThreadHintForChat(getOutcomeThread()),
+                sprint5.trustHint,
+                sprint5.confidenceHint,
+                sprint5.adaptiveHint,
+                actionBiasHintForChat(actionBias),
+                discoveryOverrideForActionBias(actionBias),
+                intuitiveAwarenessHintForChat(intuitiveAwareness),
+                adhdEntrepreneurPrimaryHintForChat({
+                  analysis: adhdEntrepreneur,
+                  adhdNative,
+                }),
+                adhdNativeHintForChat(adhdNative),
+                companionEcosystemRoutingHintForChat(trimmed),
                 intelligenceHintForChat(intelligence, trimmed),
                 assistedActionHintForChat(lastAssistantText, lockedArtifactType),
                 artifactLockHintForChat(creationContext),
@@ -9697,6 +10307,7 @@ export default function CompanionPageClient() {
         setDecisionCompassOffer(null);
       } else if (pendingToolOffer) {
         trackToolSuggestionOffered(pendingToolOffer.kind);
+        captureToolOfferShown(pendingToolOffer.kind, closedLoopCtx());
         setToolSuggestion(pendingToolOffer);
         setWorkspaceOffer(null);
         setActionBridge(null);
@@ -9709,6 +10320,13 @@ export default function CompanionPageClient() {
         setDecisionCompassOffer(null);
         setDoItNowOffer(nextDoItNow);
         setActionBridge(nextActionBridge);
+      }
+      const workflowFromReply = createConversationWorkflow(
+        assistantMsg,
+        chatTurnRef.current,
+      );
+      if (workflowFromReply) {
+        setConversationWorkflow(workflowFromReply);
       }
       if (voiceOutput && data.message) void playTTS(data.message);
     } catch (err) {
@@ -9739,8 +10357,10 @@ export default function CompanionPageClient() {
   }
 
   function acceptWorkspaceOfferCore(offer: WorkspaceOffer) {
+    captureOfferAccepted(offer, closedLoopCtx());
     clearAllPendingOffers();
     if (offer.section === "content-generator") {
+      noteWorkspaceOpened("content-generator", "workspace_offer");
       if (workspacePanel === "content-generator") {
         setActiveSection("home");
         setActiveNav("create");
@@ -9773,11 +10393,18 @@ export default function CompanionPageClient() {
       return;
     }
     if (offer.section === "brain-dump") {
-      openWorkspaceBesideChatCore("brain-dump", workspaceOpenAck("brain-dump"));
+      openClearMyMindStandaloneCore();
       return;
     }
     if (offer.section === "focus-audio") {
       openFocusAudioCore(detectAudioRequest(lastUserTextRef.current).categoryId);
+      return;
+    }
+    if (offer.section === "energy") {
+      noteWorkspaceOpened("energy", "workspace_offer");
+      setActiveSection("energy");
+      activeSectionRef.current = "energy";
+      setActiveNav("chat");
       return;
     }
 
@@ -9805,6 +10432,7 @@ export default function CompanionPageClient() {
     setWorkspaceSession(normalized);
     saveWorkspaceSession(normalized);
     revealWorkspace();
+    noteWorkspaceOpened(offer.section, "workspace_offer");
     const ackContent = buildSopAcceptMessage(normalized);
     const { field, content } = extractFocusDirective(ackContent);
     const prefillNote = applyConversationPrefillsToWorkspace(offer.section);
@@ -9981,6 +10609,9 @@ export default function CompanionPageClient() {
           : null;
 
     if (mode === "discard") {
+      if (closingPanel) {
+        captureWorkspaceAbandoned(closingPanel, closedLoopCtx());
+      }
       pauseCreatePersistence();
     }
 
@@ -10202,8 +10833,6 @@ export default function CompanionPageClient() {
           <BrainDumpPanel
             onOpen={openWorkspaceFromSection}
             onSuggestOpen={suggestCrossWorkspaceOpen}
-            onAsk={handlePlaybookAsk}
-            registerBack={registerBack}
             onContextChange={handleWorkspaceDetailChange}
           />
         );
@@ -10407,6 +11036,11 @@ export default function CompanionPageClient() {
                 workspacePanelOpen: false,
               });
               openSectionBesideChatCore("projects", "projects");
+            }}
+            onOpenAdaptMyDay={() => {
+              setActiveSection("energy");
+              activeSectionRef.current = "energy";
+              setActiveNav("focus");
             }}
             initialOpenItemId={planMyDayOpenItemId}
           />
@@ -10664,8 +11298,6 @@ export default function CompanionPageClient() {
             onOpen={openWorkspaceFromSection}
             onSuggestOpen={suggestCrossWorkspaceOpen}
             contextBanner={workspaceContextBanner}
-            onAsk={handlePlaybookAsk}
-            registerBack={registerBack}
             onContextChange={handleWorkspaceDetailChange}
           />
         );
@@ -11030,7 +11662,7 @@ export default function CompanionPageClient() {
     }
     if (action.type === "section") {
       if (action.section === "brain-dump") {
-        openWorkspaceBesideChatCore("brain-dump", workspaceOpenAck("brain-dump"));
+        openClearMyMindStandaloneCore();
         return;
       }
       openStandaloneFocusSectionCore(action.section);
@@ -11057,6 +11689,7 @@ export default function CompanionPageClient() {
 
   function acceptToolSuggestion(offer: ToolSuggestion) {
     trackToolSuggestionAccepted(offer.kind);
+    captureToolOfferAccepted(offer.kind, closedLoopCtx());
     clearAllPendingOffers();
     if (offer.action.type === "tool") {
       if (offer.action.tool === "focus-audio") {
@@ -11081,7 +11714,7 @@ export default function CompanionPageClient() {
       return;
     }
     if (bridge.tool === "brain-dump") {
-      openWorkspaceBesideChatCore("brain-dump", workspaceOpenAck("brain-dump"));
+      openClearMyMindStandaloneCore();
       return;
     }
     if (bridge.tool === "focus-timer") {
@@ -11293,20 +11926,6 @@ export default function CompanionPageClient() {
       });
     }
 
-    if (workspacePanel === "brain-dump") {
-      items.push({
-        id: "brain-dump",
-        emoji: "🧠",
-        label: "Clear My Mind",
-        detail: "Session active",
-        onOpen: () => {
-          setActiveSection("home");
-          revealWorkspace();
-        },
-        onClose: closeWorkspacePanel,
-      });
-    }
-
     if (workspacePanel === "time-block") {
       items.push({
         id: "time-block",
@@ -11411,7 +12030,7 @@ export default function CompanionPageClient() {
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <TopBar
-            onAdjustDay={() => setActiveSection("energy")}
+            onOpenClearMyMind={openClearMyMindStandaloneCore}
             onRequestClearTodayContext={requestClearTodayContext}
             onRequestBeginNewDay={requestBeginNewDay}
             onOpenSettings={(section) => {
@@ -11567,7 +12186,17 @@ export default function CompanionPageClient() {
                             }
                           />
                         ) : null}
-                        {stressReliefOffer ? (
+                        {businessConfidenceOffer ? (
+                          <BusinessConfidenceOfferCard
+                            offer={businessConfidenceOffer}
+                            onUpdateProfile={() =>
+                              openBusinessIntelligenceProfile(
+                                businessConfidenceOffer.updateSection,
+                              )
+                            }
+                            onContinueAnyway={continueBusinessAdviceAnyway}
+                          />
+                        ) : stressReliefOffer ? (
                           <StressReliefOptionsCard
                             offer={stressReliefOffer}
                             onSelectOption={acceptStressReliefOption}
@@ -11766,7 +12395,15 @@ export default function CompanionPageClient() {
                             onAccept={() =>
                               acceptWorkspaceOffer(workspaceOffer)
                             }
-                            onDismiss={() => setWorkspaceOffer(null)}
+                            onDismiss={() => {
+                              if (workspaceOffer) {
+                                captureOfferDismissed(
+                                  workspaceOffer,
+                                  closedLoopCtx(),
+                                );
+                              }
+                              setWorkspaceOffer(null);
+                            }}
                           />
                         ) : assistedActionOffer ? (
                           <ToolSuggestionCard
@@ -11797,6 +12434,10 @@ export default function CompanionPageClient() {
                             onAccept={() => acceptToolSuggestion(toolSuggestion)}
                             onDismiss={() => {
                               trackToolSuggestionDismissed(toolSuggestion.kind);
+                              captureToolOfferDismissed(
+                                toolSuggestion.kind,
+                                closedLoopCtx(),
+                              );
                               setToolSuggestion(null);
                               dismissOfferKeepTalking();
                             }}
@@ -12003,17 +12644,12 @@ export default function CompanionPageClient() {
           )}
 
           {activeSection === "brain-dump" && (
-            <WorkspaceShell
-              assistLabel={getShariAssistLabel("brain-dump")}
-              onAskShari={() => openCompanionAssist("brain-dump")}
-            >
-              <BrainDumpPanel
-                onOpen={openWorkspaceFromSection}
-                onSuggestOpen={suggestCrossWorkspaceOpen}
-                onAsk={handlePlaybookAsk}
-                registerBack={registerBack}
-              />
-            </WorkspaceShell>
+            <BrainDumpPanel
+              standalone
+              onOpen={openWorkspaceFromSection}
+              onSuggestOpen={suggestCrossWorkspaceOpen}
+              onContextChange={handleWorkspaceDetailChange}
+            />
           )}
 
           {activeSection === "breathe" && (

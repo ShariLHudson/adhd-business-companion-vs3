@@ -160,7 +160,7 @@ describe("Clear My Mind visual clusters", () => {
     expect(formatClusterDotWeight(3).dots).toBe("●●●");
     expect(formatClusterDotWeight(3).suffix).toBeNull();
     expect(formatClusterDotWeight(8).dots).toBe("●●●●●●●●");
-    expect(formatClusterDotWeight(9).suffix).toBe("+ more");
+    expect(formatClusterDotWeight(9).suffix).toBe("· · ·");
     expect(formatClusterDotWeight(9).dots).toBe("●●●●●●●●");
   });
 

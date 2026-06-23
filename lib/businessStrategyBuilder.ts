@@ -244,7 +244,7 @@ export function businessStrategyCoachHintForChat(
     "Do NOT march through a fixed questionnaire or repeat scripted readiness lines.",
     "Respond to what they actually said: reflect, connect dots, one natural follow-up at a time.",
     "If they already gave context, do NOT re-ask it. Build on it.",
-    "For marketing/product plans: think like the Marketing board advisor — audience, message, channels, realistic weekly moves for ADHD energy.",
+    "For marketing/product plans: think like marketing expertise filtered through ADHD Entrepreneur Intelligence — one channel, one rhythm, realistic weekly moves for ADHD energy.",
     "When helpful, suggest concrete plan sections (week-by-week, emails, posts) they can see updating on the right.",
     `Plan type: ${session.typeLabel}.`,
     "When Strategies is open, chat content auto-applies to the plan — never ask permission to save or add.",

@@ -27,7 +27,7 @@ export function formatClusterDotWeight(count: number): {
   if (n <= MAX_CLUSTER_DOT_WEIGHT) {
     return { dots: "●".repeat(n), suffix: null };
   }
-  return { dots: "●".repeat(MAX_CLUSTER_DOT_WEIGHT), suffix: "+ more" };
+  return { dots: "●".repeat(MAX_CLUSTER_DOT_WEIGHT), suffix: "· · ·" };
 }
 
 export function clusterReliefAcknowledgement(count: number): string {
@@ -37,7 +37,7 @@ export function clusterReliefAcknowledgement(count: number): string {
 }
 
 export const MORE_CLUSTER_FALLBACK =
-  "More thoughts are safely held here.";
+  "Other thoughts are safely held here.";
 
 /** Flatten visible thought previews for a major cluster (max per sub-cluster). */
 export function getClusterVisibleThoughts(
@@ -95,6 +95,64 @@ export type ThoughtRelationship = {
   toLabel: string;
   reason: string;
 };
+
+/** Theme groups for Related Thoughts view — human-readable, not pairwise graphs. */
+export type ThoughtThemeGroup = {
+  reason: string;
+  themeLabel: string;
+  thoughts: string[];
+  observation: string;
+};
+
+function themeLabelForReason(reason: string): string {
+  const trimmed = reason.trim();
+  if (!trimmed) return "Related thoughts";
+  const lower = trimmed.toLowerCase();
+  if (lower === "worries") return "Worries";
+  if (/^(health|business|personal|family|work)$/i.test(trimmed)) {
+    return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)} theme`;
+  }
+  return `${trimmed.charAt(0).toUpperCase()}${trimmed.slice(1)} theme`;
+}
+
+function themeObservation(reason: string, count: number): string {
+  const label = themeLabelForReason(reason).replace(/ theme$/i, "").toLowerCase();
+  if (count <= 1) {
+    return "This thought stood out on its own — still safely held.";
+  }
+  if (count === 2) {
+    return `These two thoughts seem to connect around ${label}.`;
+  }
+  return `Several thoughts relate to ${label} — they're grouped so you can see the pattern without sorting everything now.`;
+}
+
+/** Group pairwise relationships into theme cards with bullet lists. */
+export function groupRelationshipsByTheme(
+  relationships: ThoughtRelationship[],
+): ThoughtThemeGroup[] {
+  const byReason = new Map<string, Set<string>>();
+
+  for (const rel of relationships) {
+    const set = byReason.get(rel.reason) ?? new Set<string>();
+    set.add(rel.fromLabel);
+    set.add(rel.toLabel);
+    byReason.set(rel.reason, set);
+  }
+
+  return [...byReason.entries()]
+    .map(([reason, thoughtSet]) => {
+      const thoughts = [...thoughtSet].sort((a, b) =>
+        a.localeCompare(b, undefined, { sensitivity: "base" }),
+      );
+      return {
+        reason,
+        themeLabel: themeLabelForReason(reason),
+        thoughts,
+        observation: themeObservation(reason, thoughts.length),
+      };
+    })
+    .sort((a, b) => b.thoughts.length - a.thoughts.length);
+}
 
 export type BrainDumpClusterGraph = {
   centerLabel: string;

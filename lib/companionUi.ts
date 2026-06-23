@@ -129,7 +129,7 @@ export const SIDEBAR_TOOLS: {
 }[] = [
   { id: "brain-dump", label: "Clear My Mind", emoji: "🧠" },
   { id: "focus-timer", label: "Pomodoro", emoji: "⏱" },
-  { id: "reset-day", label: "Clear Today's Context", emoji: "🧹" },
+  { id: "reset-day", label: "Reset workspace", emoji: "🧹" },
   { id: "breathe", label: "Breathe", emoji: "🌬" },
   { id: "voice", label: "Voice", emoji: "🎤" },
 ];
