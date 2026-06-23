@@ -8,6 +8,7 @@ import {
   capabilityRoutingHintForChat,
   matchRegisteredCapabilityForText,
 } from "./companionCapabilityRegistry";
+import { strategyIntelligenceHintForChat } from "./strategyIntelligence";
 
 export type EcosystemIntentMatch = {
   section: AppSection;
@@ -44,5 +45,7 @@ export function ecosystemIntentToWorkspaceOffer(
 
 /** Injected when API handles a message that maps to an ecosystem feature. */
 export function companionEcosystemRoutingHintForChat(text: string): string | null {
-  return capabilityRoutingHintForChat(text);
+  return [capabilityRoutingHintForChat(text), strategyIntelligenceHintForChat(text)]
+    .filter(Boolean)
+    .join("\n\n") || null;
 }

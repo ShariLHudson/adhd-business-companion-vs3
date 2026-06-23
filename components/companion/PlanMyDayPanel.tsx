@@ -427,7 +427,10 @@ export function PlanMyDayPanel({
             The same plan — shown the way your brain works today.
           </p>
         </div>
-        {onBack ? <LibraryCloseButton onClose={onBack} /> : null}
+        <div className="flex items-center gap-3">
+          <ViewDropdown active={view} onChange={handleViewChange} />
+          {onBack ? <LibraryCloseButton onClose={onBack} /> : null}
+        </div>
       </div>
 
       <WorkspaceAreaWorksGuide areaId="plan-my-day" />
@@ -469,22 +472,15 @@ export function PlanMyDayPanel({
           />
         </div>
       ) : (
-        <div className="mt-4 md:grid md:grid-cols-[minmax(260px,20rem)_1fr] md:items-start md:gap-6 lg:gap-8">
-          <div className="flex flex-col gap-4">
-            <TodaysRealityCard
-              refreshKey={realityKey}
-              onUpdate={openAdaptFlow}
-            />
-            <ViewDropdown active={view} onChange={handleViewChange} />
-            <PlanDayAddForm onAdd={handleAdd} />
-          </div>
-
-          <div className="mt-6 md:mt-0">
-            {renderTaskView()}
-          </div>
-
+        <div className="mt-4 flex flex-col gap-4">
+          <TodaysRealityCard
+            refreshKey={realityKey}
+            onUpdate={openAdaptFlow}
+          />
+          {renderTaskView()}
+          <PlanDayAddForm onAdd={handleAdd} />
           {onOpenSettings ? (
-            <p className="mt-6 text-base text-[#6b635a] md:col-span-2">
+            <p className="mt-6 text-base text-[#6b635a]">
               Set your default view in{" "}
               <button
                 type="button"
