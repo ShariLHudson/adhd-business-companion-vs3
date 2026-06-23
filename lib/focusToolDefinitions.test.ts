@@ -23,7 +23,7 @@ describe("focusToolDefinitions", () => {
 
   it("lists the Help Me Right Now relief menu in product order", () => {
     expect(HELP_ME_RIGHT_NOW_MENU.map((t) => t.title)).toEqual([
-      "Adjust My Day",
+      "Adapt My Day",
       "Brain Parking Lot",
       "Clear My Mind",
       "Safe For Today",

@@ -61,7 +61,7 @@ export const WORKSPACE_GUIDES: Record<string, WorkspaceGuideContent> = {
     title: "Adapt My Day",
     what: "Current Reality Intelligence™ — share how you're showing up today so support fits your real energy.",
     why: "Rigid plans break; knowing today's reality keeps momentum without guilt.",
-    how: "Open Plan My Day → Adapt My Day; update energy, motivation, and how you feel anytime life shifts.",
+    how: "Open Adapt My Day from the top navigation (🌤️); update energy, motivation, and how you feel anytime life shifts.",
     example: "Poor sleep morning → Adapt My Day → lighter plan in Plan My Day.",
   },
   "time-block": {
@@ -94,7 +94,7 @@ export const WORKSPACE_GUIDES: Record<string, WorkspaceGuideContent> = {
     what: "Searchable answers for how the app works — or ask Shari in chat.",
     why: "You shouldn't have to memorize features to use them.",
     how: "Search a question, read the short guide, or tap Ask Shari.",
-    example: "“How do I plan my day?” → steps + open Adjust My Day.",
+    example: "“How do I plan my day?” → steps + open Adapt My Day from the top bar.",
   },
 };
 

@@ -10,12 +10,13 @@ export const PLAN_VIEW_SECTION_HELP: Partial<
   Record<PlanningViewMode, PlanViewSectionHelp>
 > = {
   kanban: {
-    title: "Kanban",
+    title: "Daily workflow",
     bullets: [
-      "Ready — planned but not started.",
-      "Doing — what you're working on now (drag cards between columns).",
-      "Done — completed; you get a small celebration.",
-      "Parked — not today; stays on the plan without pressure.",
+      "Considering Today — what is on your radar.",
+      "Today's Focus — what matters most today.",
+      "In Progress — what you are actively doing.",
+      "Complete — tap ✓; items archive to progress history and leave the board.",
+      "Use Chat Workspace → New Day's Chat when starting a fresh day — this board is intentionally temporary.",
     ],
   },
 };

@@ -1,4 +1,10 @@
 import type { HowDoIHelpArticle } from "./howDoIHelpTypes";
+import {
+  CHAT_WORKSPACE_NAV_MODEL,
+  NEW_CHAT_INSTRUCTION,
+  NEW_DAYS_CHAT_INSTRUCTION,
+  TOP_NAV_COMPANION_WORKSPACES,
+} from "./chatWorkspaceHelpContent";
 
 /** Full help library — search indexes every article. */
 export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
@@ -12,7 +18,8 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whenToUse: "Brand-new to the ecosystem — right after login.",
     workflow: [
       "Read the Core Workflow box at the top of How Do I.",
-      "Open Clear My Mind from the top navigation and capture what's on your mind.",
+      `Top bar: ${TOP_NAV_COMPANION_WORKSPACES}, plus Chat Workspace (💬) for conversation context.`,
+      "Open Clear My Mind (🧠) and capture what's on your mind.",
       "Open Chat and tell the Companion what you need today.",
       "Pick one main area from the cards below when you are ready.",
     ],
@@ -110,6 +117,8 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whenToUse: "When you are unsure which section fits what you need.",
     workflow: [
       "Sidebar: Chat, Focus, Create, Growth, My Work, How Do I.",
+      `Top bar companion workspaces: ${TOP_NAV_COMPANION_WORKSPACES}.`,
+      "Chat Workspace (💬) — New Chat or New Day's Chat when you need a fresh conversation or fresh daily start.",
       "Create: New Draft, Start From Template, Snippet, Audience Profile, Resume Draft.",
       "My Work: Search, Continue Working, Browse (Created Content, Projects, libraries, Archive).",
       "Growth: My Wins, Evidence Bank, My Highlights, My Journey.",
@@ -132,6 +141,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "Do I need setup first? — No. Capture a thought or chat — value first.",
       "Will tools open without me? — No. You confirm before anything opens.",
       "Where should I start? — Clear My Mind or Chat. Both are safe first steps.",
+      "How do I start fresh? — Chat Workspace → New Chat (conversation only) or New Day's Chat (new day + Plan My Day reset).",
       "How does memory work? — Business context you provide shapes guidance — you stay in control.",
     ],
     tips: ["Search Help at the top of How Do I finds any topic instantly."],
@@ -245,6 +255,39 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     keywords: ["workspace", "split", "panel", "beside", "chat vs"],
     askPrompt: "What is the difference between chat and workspace panels?",
   },
+  {
+    id: "chat-workspace",
+    categoryId: "conversation",
+    title: "Chat Workspace",
+    emoji: "💬",
+    featured: true,
+    whatItIs: CHAT_WORKSPACE_NAV_MODEL,
+    whenToUse:
+      "When you want a fresh conversation or a fresh daily start without losing projects, memory, or goals.",
+    workflow: [
+      `Top bar: ${TOP_NAV_COMPANION_WORKSPACES} open companion workspaces.`,
+      "Chat Workspace ▼ manages the conversation you are in right now.",
+      `${NEW_CHAT_INSTRUCTION.label} — ${NEW_CHAT_INSTRUCTION.summary} Use when: "${NEW_CHAT_INSTRUCTION.useWhen}"`,
+      `${NEW_DAYS_CHAT_INSTRUCTION.label} — ${NEW_DAYS_CHAT_INSTRUCTION.summary} Use when: "${NEW_DAYS_CHAT_INSTRUCTION.useWhen}"`,
+      `${NEW_DAYS_CHAT_INSTRUCTION.label} also: ${NEW_DAYS_CHAT_INSTRUCTION.behavior.slice(0, 3).join("; ")}.`,
+    ],
+    tips: [
+      "New Chat when the thread feels done but today's plan still fits.",
+      "New Day's Chat when you are starting a new day and want a clean daily workspace.",
+      "Neither option deletes your projects, memory, or Founder Intelligence™ learning.",
+    ],
+    keywords: [
+      "chat workspace",
+      "new chat",
+      "new day's chat",
+      "fresh conversation",
+      "reset",
+      "context",
+      "day options",
+      "start over",
+    ],
+    askPrompt: "Explain Chat Workspace, New Chat, and New Day's Chat.",
+  },
 
   // —— Focus & Momentum ——
   {
@@ -291,7 +334,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whatItIs: "Tune today's plan to how you actually feel.",
     whenToUse: "Morning check-in, burnout, or when the plan no longer fits.",
     workflow: [
-      "Open Adjust My Day or tell Chat your energy level.",
+      "Open Adapt My Day from the top bar (🌤️) or tell Chat your energy level.",
       "Accept a lighter plan or one priority shift.",
       "Move heavy tasks to a better window in Plan My Day.",
       "Protect recovery — it is part of productivity.",
@@ -299,7 +342,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     tips: ["Matching energy prevents the shame spiral."],
     keywords: ["energy", "adjust", "capacity", "burnout", "tired"],
     openSection: "energy",
-    openLabel: "Open Adjust My Day",
+    openLabel: "Open Adapt My Day",
   },
   {
     id: "overwhelm-recovery",
@@ -327,7 +370,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whatItIs: "A shame-free path back in after time away or missed plans.",
     whenToUse: "Guilt about backlog, missed days, or abandoned projects.",
     workflow: [
-      "Clear Today's Context if yesterday's plan is haunting you.",
+      `Use Chat Workspace → ${NEW_CHAT_INSTRUCTION.label} if yesterday's conversation is haunting you.`,
       "Dump the mental load in Clear My Mind — no sorting.",
       "Pick one tiny next action in Plan My Day.",
       "Log one win for showing up again.",
@@ -342,19 +385,26 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
   {
     id: "plan-my-day",
     categoryId: "planning",
-    title: "Plan My Day",
+    title: "Plan My Day™",
     emoji: "📅",
     featured: true,
-    whatItIs: "Turns tasks into a visual daily plan — list, timeline, cards, or kanban.",
-    whenToUse: "When you need structure or help deciding what to do next.",
+    whatItIs:
+      "A daily decision workspace — decide what is realistic for today based on your energy, time, and capacity. Not a task manager or long-term planner.",
+    whenToUse:
+      "When you need to answer: what fits today's reality? Pull from Clear My Mind, Projects, yesterday's unfinished work, or new ideas — then choose what matters most today.",
     workflow: [
-      "Add tasks or pull from projects.",
-      "Choose a view that fits your brain (List, Timeline, Cards, or Kanban).",
-      "Move one item to Doing when ready.",
-      "Mark done or park what is not for today.",
+      "Add tasks, ideas, reminders, or commitments competing for your attention today.",
+      "Consider your time, energy, appointments, motivation, and current stress.",
+      "Move items into progress when you begin; complete to archive — they leave the board.",
+      "Park or move elsewhere what does not belong today.",
+      "When starting a new day, use Chat Workspace → New Day's Chat — this workspace is intentionally temporary.",
     ],
-    tips: ["List when overwhelmed. Kanban for bigger lists. Open Visual Focus when you want to think spatially."],
-    keywords: ["plan", "day", "today", "schedule", "kanban"],
+    tips: [
+      "The goal is not to do everything — it is to identify what matters most today.",
+      "Use Adapt My Day when your reality shifts; Plan My Day stays aligned as the day evolves.",
+      "Kanban: Considering Today → Today's Focus → In Progress — no permanent Done column.",
+    ],
+    keywords: ["plan", "day", "today", "realistic", "capacity", "kanban", "daily"],
     openSection: "plan-my-day",
     openLabel: "Open Plan My Day",
   },
@@ -450,16 +500,21 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     categoryId: "planning",
     title: "Kanban Planning",
     emoji: "📋",
-    whatItIs: "Ready → Doing → Done columns for visible progress.",
-    whenToUse: "Multiple tasks and you need to see movement.",
+    whatItIs:
+      "Considering Today → Today's Focus → In Progress — complete to archive. No permanent Done column.",
+    whenToUse: "When you want to see today's decision flow without turning the board into storage.",
     workflow: [
-      "Open Plan My Day and switch to Kanban view.",
-      "Drag one card to Doing — only one active if possible.",
-      "Celebrate Done — small completion feedback matters.",
-      "Park cards that are not for today.",
+      "Open Plan My Day™ and switch to Kanban view.",
+      "Considering Today — ideas still on your radar.",
+      "Today's Focus — what matters most today.",
+      "In Progress — what you are actively doing.",
+      "Tap ✓ to complete — items archive to progress history and leave the board.",
     ],
-    tips: ["Dragging counts as executive function support."],
-    keywords: ["kanban", "columns", "doing", "done", "board"],
+    tips: [
+      "Use Chat Workspace → New Day's Chat when starting a fresh day — this board is intentionally temporary.",
+      "Dragging counts as executive function support.",
+    ],
+    keywords: ["kanban", "columns", "doing", "complete", "board", "daily"],
     openSection: "plan-my-day",
     openLabel: "Open Plan My Day",
   },
@@ -1299,7 +1354,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "Plan My Day with fewer items.",
       "Use list view — one thing visible.",
       "Open Visual Focus when you need to think spatially.",
-      "Match plan to energy via Adjust My Day.",
+      "Match plan to energy via Adapt My Day.",
       "Park the rest without guilt.",
     ],
     tips: ["A plan you follow beats a plan you admire."],

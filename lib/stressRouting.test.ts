@@ -67,7 +67,7 @@ describe("stressRouting", () => {
     );
     expect(recommendForStressCause("calm-body").primary.id).toBe("breathe");
     expect(recommendForStressCause("too-much-to-do").primary.label).toBe(
-      "Adjust My Day",
+      "Adapt My Day",
     );
   });
 

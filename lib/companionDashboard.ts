@@ -51,9 +51,10 @@ function poolForSituation(
     return [
       step({
         id: "reset-day",
-        label: "Reset workspace",
-        description: "Reset where you are right now — nothing important gets deleted",
-        emoji: "🧹",
+        label: "New Chat",
+        description:
+          "Start a fresh conversation from Chat Workspace — nothing important gets deleted",
+        emoji: "💬",
         tool: "reset-day",
         mode: "today",
       }),

@@ -3,7 +3,7 @@ import type { EmotionalState } from "./companionEmotions";
 /** One subtle UI hint per state — not a button, not a card. */
 export const STATE_UI_HINT: Record<EmotionalState, string | null> = {
   stuck: "When you're ready, Clear My Mind can help unload what's stuck.",
-  overwhelmed: "Reset workspace can help slow everything down.",
+  overwhelmed: "Chat Workspace → New Chat can help slow everything down.",
   focused: "Pomodoro is here when you want a focus block.",
   unclear: null,
   building: null,

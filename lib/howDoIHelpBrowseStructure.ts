@@ -91,7 +91,7 @@ const ADDITIONAL_HELP_SUBGROUPS: readonly HowDoIBrowseSubgroup[] = [
   {
     id: "companion-features",
     label: "Companion Features",
-    articleIds: ["chat-companion", "memory", "privacy", "voice-conversations"],
+    articleIds: ["chat-companion", "chat-workspace", "memory", "privacy", "voice-conversations"],
   },
   {
     id: "productivity-growth",

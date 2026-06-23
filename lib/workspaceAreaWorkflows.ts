@@ -8,14 +8,14 @@ export const WORKSPACE_AREA_WORKFLOWS: Record<string, WorkspaceAreaWorkflow> = {
   "plan-my-day": {
     id: "plan-my-day",
     steps: [
-      "Add what matters today — quick capture or pull from projects.",
-      "Pick a view that fits your brain (List, Timeline, Cards, or Kanban).",
-      "Move one item to Doing when you're ready to start.",
-      "Open an item for duration, notes, or a linked momentum appointment.",
-      "Park what isn't happening today — nothing gets deleted.",
-      "Mark done when finished; reference items can stay visible if helpful.",
+      "Add tasks, ideas, reminders, or commitments competing for your attention today — from Clear My Mind, Projects, yesterday's work, or new ideas.",
+      "Decide what fits your actual reality: time, energy, appointments, motivation, and capacity.",
+      "Pick a view (List, Timeline, Cards, or Kanban) — Kanban follows Considering Today → Today's Focus → In Progress.",
+      "Move items into progress when you begin; complete when finished — completed items archive and leave the board.",
+      "Move elsewhere what does not belong today.",
+      "At end of day, use Chat Workspace → New Day's Chat when starting a fresh day.",
     ],
-    tip: "Low energy? List keeps today simple. Open Visual Focus when you want to think spatially.",
+    tip: "Adapt My Day is not a one-time check-in — update when your plan no longer matches your energy or capacity.",
   },
   "visual-focus": {
     id: "visual-focus",

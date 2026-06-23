@@ -53,11 +53,11 @@ const ROUTES: Record<ToolRouteId, RouteDef> = {
     mode: "today",
   }),
   "reset-day": route("reset-day", {
-    label: "Reset workspace",
+    label: "New Chat",
     description:
-      "Reset where you are right now — nothing important gets deleted",
-    emoji: "🧹",
-    buttonLabel: "Reset workspace",
+      "Start a fresh conversation — memory, projects, and learning stay safe",
+    emoji: "💬",
+    buttonLabel: "Start New Chat",
     tool: "reset-day",
     mode: "today",
   }),

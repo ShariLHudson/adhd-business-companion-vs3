@@ -15,12 +15,12 @@ const CHIP_POOL: Record<
   stuck: {
     think: ["Clear my head", "Break into steps"],
     do: ["Get one step", "Start Clear My Mind"],
-    reset: ["Clear today's context", "Clear my head"],
+    reset: ["New Chat", "Clear my head"],
   },
   overwhelmed: {
-    reset: ["Clear today's context", "Clear my head"],
+    reset: ["New Chat", "Clear my head"],
     think: ["Start breathing", "Pause and organize"],
-    do: ["One small step", "Clear today's context"],
+    do: ["One small step", "New Chat"],
   },
   focused: {
     do: ["Start 30-min focus session", "Start 25-min Pomodoro"],
@@ -32,7 +32,7 @@ const CHIP_POOL: Record<
   },
   emotional: {
     think: ["Start breathing", "Talk it through"],
-    reset: ["Clear today's context", "Clear my head"],
+    reset: ["New Chat", "Clear my head"],
   },
   unclear: {
     think: ["Talk it through", "Get one step"],
@@ -42,8 +42,7 @@ const CHIP_POOL: Record<
 const CHIP_TO_ROUTE: Record<string, ToolRouteId> = {
   "Clear my head": "brain-dump",
   "Start Clear My Mind": "brain-dump",
-  "Clear today's context": "reset-day",
-  "Start Reset Day": "reset-day",
+  "New Chat": "reset-day",
   "Get one step": "one-step",
   "One small step": "one-step",
   "Start breathing": "breathe",

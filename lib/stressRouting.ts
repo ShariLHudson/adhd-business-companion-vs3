@@ -260,7 +260,7 @@ export function recommendForStressCause(cause: StressCauseId): {
       return { primary: option("breathe") };
     case "too-much-to-do":
       return {
-        primary: { id: "adjust-day", emoji: "⚡", label: "Adjust My Day" },
+        primary: { id: "adjust-day", emoji: "⚡", label: "Adapt My Day" },
       };
     case "something-else":
     default:
@@ -313,7 +313,7 @@ export function stressToolOpenAck(id: StressReliefOptionId): string {
     case "safe-for-today":
       return "Opening **Safe For Today** — permission to postpone, not a guilt list.";
     case "adjust-day":
-      return "Opening **Adjust My Day** — let's rebuild today to fit your real energy.";
+      return "Opening **Adapt My Day** — let's rebuild today to fit your real energy.";
     case "talk-through":
       return "I'm here — let's talk it through.";
   }

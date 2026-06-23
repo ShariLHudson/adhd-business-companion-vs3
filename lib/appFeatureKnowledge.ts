@@ -9,6 +9,8 @@ import { isConceptTeachingRequest } from "./teachingMode";
 export type AppFeatureId =
   | "focus"
   | "clear-my-mind"
+  | "plan-my-day"
+  | "chat-workspace"
   | "brain-parking-lot"
   | "safe-for-today"
   | "focus-session"
@@ -64,6 +66,35 @@ export const APP_FEATURES: AppFeatureEntry[] = [
       /\bmental clutter\b/i,
       /\bcrowded (head|brain)\b/i,
       /\btoo many thoughts\b/i,
+    ],
+  },
+  {
+    id: "plan-my-day",
+    name: "Plan My Day",
+    navigation: "Top navigation **📅 Plan My Day**",
+    howTo:
+      "Daily decision workspace — choose what fits today's energy, time, and capacity. Not a long-term task manager.",
+    match: [
+      /\bplan my day\b/i,
+      /\bplan(?:ning)? (?:for )?today\b/i,
+      /\btoday'?s plan\b/i,
+      /\bdaily plan\b/i,
+    ],
+  },
+  {
+    id: "chat-workspace",
+    name: "Chat Workspace",
+    navigation: "Top navigation **💬 Chat Workspace** ▼",
+    howTo:
+      "**New Chat** — fresh conversation; memory, projects, goals, and learning stay. **New Day's Chat** — fresh daily start; resets Plan My Day™ and clears daily planning items; memory and projects stay.",
+    match: [
+      /\bchat workspace\b/i,
+      /\bnew chat\b/i,
+      /\bnew day'?s? chat\b/i,
+      /\bfresh conversation\b/i,
+      /\bclear (?:today'?s? )?context\b/i,
+      /\bstart (?:a )?new (?:conversation|chat)\b/i,
+      /\bday options\b/i,
     ],
   },
   {
@@ -233,7 +264,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "settings",
     name: "Settings",
-    navigation: "Top bar **⋯** menu → **Settings**",
+    navigation: "Top bar **Account (⋯)** → **Settings**",
     howTo:
       "System preferences — tone, language, connections, celebrations, and **Appearance** (colors).",
     match: [/\bsettings?\b/i, /\bpreferences?\b/i],
@@ -241,7 +272,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "profile",
     name: "Profile",
-    navigation: "Top bar **⋯** menu → **Profile**",
+    navigation: "Top bar **Account (⋯)** → **Profile**",
     howTo:
       "Name, account, communication style, and **Memory & appearance** (links to color settings).",
     match: [/\bprofile\b/i, /\bmy account\b/i],
@@ -249,23 +280,28 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "client-avatars",
     name: "Client Avatars",
-    navigation: "Top bar **⋯** menu → **Client Avatars**",
+    navigation: "Sidebar **Growth** or **My Work** → **Client Avatars** (or Profile settings)",
     howTo: "Client/persona profiles for content tailored to specific audiences.",
     match: [/\bclient avatars?\b/i, /\bavatars?\b/i],
   },
   {
     id: "adjust-my-day",
-    name: "Adjust My Day",
-    navigation: "Top bar **⋯** menu → **Adjust My Day**",
+    name: "Adapt My Day",
+    navigation: "Top navigation **🌤️ Adapt My Day**",
     howTo:
-      "Tune today's plan to how you feel and what energy you have.",
-    match: [/\badjust my day\b/i, /\benergy\b.*\bday\b/i],
+      "Share today's energy, motivation, and vibe so support and Plan My Day fit your real capacity.",
+    match: [
+      /\badapt my day\b/i,
+      /\badjust my day\b/i,
+      /\benergy\b.*\bday\b/i,
+      /\btoday'?s (?:vibe|reality)\b/i,
+    ],
   },
   {
     id: "settings-appearance",
     name: "Appearance / Colors",
     navigation:
-      "Top bar **⋯** → **Settings** → **Appearance** (or **Profile** → **Memory & appearance**)",
+      "Top bar **Account (⋯)** → **Settings** → **Appearance** (or **Profile** → **Memory & appearance**)",
     howTo:
       "Pick a visual color mode: **Adaptive Colors**, **Category Colors**, or **Minimal** — preview, then save.",
     match: [
@@ -280,13 +316,16 @@ export const APP_FEATURES: AppFeatureEntry[] = [
 
 /** Compact reference always included in the system prompt. */
 export const APP_FEATURE_KNOWLEDGE_COMPACT = `APP FEATURE KNOWLEDGE (authoritative — use for how-to/navigation; never deny these):
-• Focus hub: Sidebar Focus → feelings-first tools (Clear My Mind, Focus Session, Guided Exercises, etc.)
-• Clear My Mind: Focus → Start Here → Clear My Mind
+• Companion-first top bar: Clear My Mind (🧠), Plan My Day (📅), Adapt My Day (🌤️) — companion workspaces; Chat Workspace (💬) manages conversation context (New Chat / New Day's Chat)
+• Focus hub: Sidebar Focus → feelings-first tools (Focus Session, Guided Exercises, etc.)
+• Clear My Mind: Top bar 🧠 or Focus → Start Here → Clear My Mind
+• Plan My Day: Top bar 📅 — daily decision workspace (not long-term task manager)
+• Adapt My Day: Top bar 🌤️ — today's energy and reality check-in
+• Chat Workspace: Top bar 💬 → New Chat (fresh conversation) or New Day's Chat (fresh daily start + Plan My Day reset)
 • Focus Session: Focus → Start Here → Focus Session
 • Breathe & Reset: Focus → Focus Tools → Breathe & Reset
 • Focus Audio: Focus → Focus Tools → Focus Audio
 • Time Blocks: Focus → Focus Tools → Block Out Time
-• Plan My Day: Top bar 📅 or Today panel
 • Guided Exercises: Focus → Momentum Boosters → Guided Exercises
 • Momentum Games: Focus → Momentum Boosters → Momentum Games (games ARE in the app)
 • Spin The Wheel: Focus → Momentum Boosters → Spin The Wheel
@@ -296,10 +335,8 @@ export const APP_FEATURE_KNOWLEDGE_COMPACT = `APP FEATURE KNOWLEDGE (authoritati
 • Strategies: More → Strategies → ADHD Strategies or Business Strategies
 • Projects: More → Projects (tasks, time blocks, notes, files)
 • How Do I: More → How Do I
-• Settings: ⋯ menu → Settings (Appearance for colors)
-• Profile: ⋯ menu → Profile (Memory & appearance → colors)
-• Client Avatars: ⋯ menu → Client Avatars
-• Adjust My Day: ⋯ menu → Adjust My Day
+• Settings: Account (⋯) → Settings (Appearance for colors)
+• Profile: Account (⋯) → Profile (Memory & appearance → colors)
 If unsure about layout: "${APP_FEATURE_UNSURE}" — do NOT invent features or deny listed ones.`;
 
 function scoreFeature(text: string, entry: AppFeatureEntry): number {

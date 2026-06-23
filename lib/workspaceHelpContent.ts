@@ -1,5 +1,6 @@
 import { getCognitiveGrowthProfile } from "./cognitiveGrowthPrinciple";
 import { CLEAR_MY_MIND_HELP } from "./clearMyMindHelpContent";
+import { NEW_DAYS_CHAT_INSTRUCTION } from "./chatWorkspaceHelpContent";
 import { HOW_DO_I_HELP_ARTICLES } from "./howDoIHelpArticles";
 import { getWorkspaceAreaWorkflow } from "./workspaceAreaWorkflows";
 
@@ -103,6 +104,34 @@ export type WorkspaceHelpContent = {
   strengthens?: string;
 };
 
+const LOCAL_PLAN_MY_DAY_HELP: Omit<
+  WorkspaceHelpContent,
+  "areaId" | "helpsToday" | "strengthens"
+> = {
+  areaName: "Plan My Day™",
+  whatItIs:
+    "A daily decision workspace — not a task manager, project manager, or long-term planner. It answers one question: what is realistic for me today?",
+  whenToUse:
+    "When competing priorities need a reality check against your energy, time, appointments, motivation, and mental bandwidth today.",
+  workflow: [
+    "Start by adding tasks, ideas, reminders, commitments, or priorities competing for your attention today.",
+    "These may come from Clear My Mind, Projects, yesterday's unfinished work, new ideas, calendar commitments, or things you do not want to forget.",
+    "Then decide what fits your actual reality — time, energy, appointments, motivation, and current stress.",
+    "As you work: move items into progress when you begin; complete when finished (items archive and leave the board).",
+    "Move elsewhere what does not belong today.",
+    "When starting a new day, use Chat Workspace → New Day's Chat to reset this workspace.",
+  ],
+  tips: [
+    "The goal is not to do everything — it is to identify what matters most today.",
+    "This workspace is intentionally temporary so it does not become another overwhelming task list.",
+    "Use Adapt My Day when your plan no longer matches your energy or capacity.",
+    NEW_DAYS_CHAT_INSTRUCTION.menuPath.replace(/\*\*/g, "") +
+      " when you want a clean daily start.",
+  ],
+  relatedAreas:
+    "Pulls from Clear My Mind and Projects. Completed work lands in progress history, My Work, and Founder Intelligence learning.",
+};
+
 const LOCAL_GROWTH_HELP: Record<
   "growth" | "confidence-vault" | "my-journey",
   Omit<WorkspaceHelpContent, "areaId" | "helpsToday" | "strengthens">
@@ -115,6 +144,7 @@ const LOCAL_GROWTH_HELP: Record<
       "When you want the big picture of how you are growing — not just today's tasks.",
     workflow: [
       "Open Wins, Evidence Bank, My Highlights, or My Journey from the hub cards.",
+      "Define Outcome Goals — measurable results, not task lists.",
       "Process Growth Inbox on Wins This Week — save moments where they belong or dismiss.",
       "Generate a Growth Report when you want a combined printable view.",
     ],
@@ -175,6 +205,16 @@ export function getWorkspaceHelpContent(
     return {
       areaId: key,
       ...CLEAR_MY_MIND_HELP,
+      helpsToday: growth?.helpsToday,
+      strengthens: growth?.strengthens,
+    };
+  }
+
+  if (key === "plan-my-day") {
+    const growth = getCognitiveGrowthProfile(key);
+    return {
+      areaId: key,
+      ...LOCAL_PLAN_MY_DAY_HELP,
       helpsToday: growth?.helpsToday,
       strengthens: growth?.strengthens,
     };

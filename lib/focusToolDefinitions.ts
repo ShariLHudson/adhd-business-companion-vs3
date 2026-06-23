@@ -90,7 +90,7 @@ export const FOCUS_CLARITY_TOOLS: Record<FocusClarityToolId, FocusClarityTool> =
   },
   "adjust-my-day": {
     id: "adjust-my-day",
-    title: "Adjust My Day",
+    title: "Adapt My Day",
     tagline: "Rebuild today's plan.",
     problem: "My plan isn't working.",
     useWhen: [
@@ -149,7 +149,7 @@ export type HelpMeRightNowMenuItem = {
 export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
   {
     id: "adjust-my-day",
-    title: "Adjust My Day",
+    title: "Adapt My Day",
     purpose: "Rebuild today's plan",
     emoji: "⚡",
     kind: "section",

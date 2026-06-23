@@ -32,7 +32,7 @@ export const HOW_DO_I_OPEN_LABELS: Partial<Record<AppSection, string>> = {
   focus: "Open Focus",
   "templates-library": "Open Templates",
   "brain-dump": "Open Clear My Mind",
-  energy: "Open Adjust My Day",
+  energy: "Open Adapt My Day",
   "business-profile": "Open Business Profile",
   settings: "Open Settings",
 };
@@ -185,14 +185,14 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
       "A realistic day plan matched to your energy — not an idealized to-do list.",
     whenToUse: "Morning, after a pivot, or when the day already feels overloaded.",
     steps: [
-      "Open Adjust My Day (or ask Shari to help plan your day).",
+      "Open Adapt My Day (🌤️ top bar) or Plan My Day (📅) when you know your energy.",
       "Answer one question at a time about energy and priorities.",
       "Review the plan Shari suggests.",
       "Move or trim blocks in Calendar if needed.",
     ],
     keywords: ["plan", "day", "schedule", "morning", "agenda", "today"],
     openSection: "energy",
-    openLabel: "Open Adjust My Day",
+    openLabel: "Open Adapt My Day",
     askPrompt: "Help me plan my day — one question at a time.",
   },
   {
@@ -328,6 +328,31 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
     openLabel: "Open Business Profile",
   },
   {
+    id: "chat-workspace",
+    title: "How To: Chat Workspace",
+    question: "How do I start a new chat or new day?",
+    whatItIs:
+      "Chat Workspace manages your current conversation context — separate from Clear My Mind™, Plan My Day™, and Adapt My Day™.",
+    whenToUse:
+      "When you want a fresh conversation or a fresh daily start without losing projects, memory, or goals.",
+    steps: [
+      "Open Chat Workspace (💬) in the top navigation.",
+      "Choose New Chat for a completely fresh conversation — memory, projects, goals, analytics, and Founder Intelligence™ stay.",
+      "Choose New Day's Chat when starting a new day — fresh daily conversation, Plan My Day™ reset, daily planning cleared; memory and projects stay.",
+      "Confirm in the dialog — nothing important is deleted.",
+    ],
+    keywords: [
+      "chat workspace",
+      "new chat",
+      "new day",
+      "fresh",
+      "reset",
+      "context",
+      "conversation",
+    ],
+    openLabel: "Learn in How Do I",
+  },
+  {
     id: "colors",
     title: "Adaptive vs Category Colors",
     question: "What's the difference between Adaptive and Category colors?",
@@ -356,7 +381,7 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
       "Category: Projects always teal, Focus always blue, Recovery always purple.",
     ],
     steps: [
-      "Open Settings (gear icon in the top bar).",
+      "Open Account (⋯) in the top bar → Settings.",
       "Tap Appearance.",
       "Choose Adaptive Colors, Category Colors, or Minimal.",
       "Use the preview, then tap Save Changes.",
