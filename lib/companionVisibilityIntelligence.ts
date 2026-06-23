@@ -51,11 +51,11 @@ const PATTERN_RULES: { pattern: VisibilityAdhdPattern; re: RegExp }[] = [
   },
   {
     pattern: "visibility_fear",
-    re: /\b(?:scared to (?:post|be seen|go live)|afraid (?:to be seen|people will)|fear of (?:being seen|visibility)|terrified|nobody will show up)\b/i,
+    re: /\b(?:scared to (?:post|be seen|go live)|afraid (?:to be seen|people will)|fear of (?:being seen|visibility)|terrified|nobody will show up|don'?t want people (?:watching|seeing)|being watched)\b/i,
   },
   {
     pattern: "fear_of_judgment",
-    re: /\b(?:look foolish|looking stupid|people will judge|fear of judgment|what will people think)\b/i,
+    re: /\b(?:look foolish|looking stupid|people will judge|fear of judgment|what will people think|who am i to (?:teach|tell|share))\b/i,
   },
   {
     pattern: "fear_of_criticism",
@@ -83,7 +83,7 @@ const PATTERN_RULES: { pattern: VisibilityAdhdPattern; re: RegExp }[] = [
   },
   {
     pattern: "visibility_hangover",
-    re: /\b(?:posted once and vanish(?:ed)?|disappeared after posting|posted and went quiet|visibility hangover)\b/i,
+    re: /\b(?:posted once and vanish(?:ed)?|disappeared after posting|posted and went quiet|visibility hangover|posted and now i regret|regret posting)\b/i,
   },
   {
     pattern: "fear_of_success",
@@ -154,7 +154,6 @@ function visibilitySignals(patterns: VisibilityAdhdPattern[]): IntuitiveSignal[]
     patterns.some((p) =>
       [
         "visibility_fear",
-        "fear_of_judgment",
         "fear_of_criticism",
         "rejection_sensitivity",
         "fear_of_success",
@@ -162,6 +161,10 @@ function visibilitySignals(patterns: VisibilityAdhdPattern[]): IntuitiveSignal[]
     )
   ) {
     signals.add("resistance");
+  }
+  if (patterns.includes("fear_of_judgment")) {
+    signals.add("resistance");
+    signals.add("discouragement");
   }
   if (
     patterns.some((p) =>

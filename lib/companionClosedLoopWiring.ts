@@ -13,6 +13,10 @@ import {
   type ClosedLoopCaptureContext,
 } from "./closedLoopLearning";
 import type { AppSection } from "./companionUi";
+import {
+  recordBehavioralMistakeSignal,
+  storeLastInterventionForMistake,
+} from "./companionMistakeRecovery";
 
 export function buildClosedLoopContext(input?: {
   emotionalState?: EmotionalState | null;
@@ -37,8 +41,10 @@ export function captureOfferShown(
   offer: WorkspaceOffer,
   context?: ClosedLoopCaptureContext,
 ): void {
+  const capability = SECTION_TO_CAPABILITY[offer.section] ?? offer.section;
+  storeLastInterventionForMistake(capability);
   captureBehaviorEvent({
-    capability: SECTION_TO_CAPABILITY[offer.section] ?? offer.section,
+    capability,
     eventType: "offer_shown",
     context: { ...context, routingReason: context?.routingReason ?? offer.section },
   });
@@ -59,10 +65,15 @@ export function captureOfferDismissed(
   offer: WorkspaceOffer,
   context?: ClosedLoopCaptureContext,
 ): void {
+  const capability = SECTION_TO_CAPABILITY[offer.section] ?? offer.section;
   captureBehaviorEvent({
-    capability: SECTION_TO_CAPABILITY[offer.section] ?? offer.section,
+    capability,
     eventType: "offer_dismissed",
     context,
+  });
+  recordBehavioralMistakeSignal({
+    interventionId: capability,
+    kind: "dismissed",
   });
 }
 
@@ -105,10 +116,15 @@ export function captureWorkspaceAbandoned(
   section: AppSection,
   context?: ClosedLoopCaptureContext,
 ): void {
+  const capability = SECTION_TO_CAPABILITY[section] ?? section;
   captureBehaviorEvent({
-    capability: SECTION_TO_CAPABILITY[section] ?? section,
+    capability,
     eventType: "workspace_abandoned",
     context,
+  });
+  recordBehavioralMistakeSignal({
+    interventionId: capability,
+    kind: "abandoned",
   });
 }
 
@@ -156,6 +172,10 @@ export function captureToolOfferDismissed(
     capability: cap,
     eventType: "offer_dismissed",
     context,
+  });
+  recordBehavioralMistakeSignal({
+    interventionId: cap,
+    kind: "dismissed",
   });
 }
 

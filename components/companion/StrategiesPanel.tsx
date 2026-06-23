@@ -49,6 +49,14 @@ import { saveProject } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
 import { appReferences } from "@/lib/appReferences";
 import {
+  POPULAR_STRATEGIES,
+  browseCategoriesForLibrary,
+  getStrategiesForWhatYoureDealingWith,
+  getStrategyLibraryCounts,
+  searchStrategies,
+  trackStrategyEvent,
+} from "@/lib/strategyIntelligence";
+import {
   CATEGORY_COMPANION_TOOLS,
   pickStrategyReflection,
 } from "@/lib/strategyReflections";
@@ -124,7 +132,6 @@ export function StrategiesPanel({
   );
   const [adhdPick, setAdhdPick] = useState("");
   const [businessPick, setBusinessPick] = useState("");
-  const [recPick, setRecPick] = useState("");
   const [newTitle, setNewTitle] = useState("");
   const [newProblem, setNewProblem] = useState("");
   const [newSteps, setNewSteps] = useState("");
@@ -216,6 +223,9 @@ export function StrategiesPanel({
     if (next.v === "strategy" || next.v === "userStrategy") {
       strategyReturnRef.current = view;
     }
+    if (next.v === "strategy") {
+      trackStrategyEvent(next.stratId, "viewed");
+    }
     setView(next);
   }
 
@@ -286,13 +296,14 @@ export function StrategiesPanel({
   // ---- Home: ADHD / Business / Recommended / Saved -----------------------
   if (view.v === "home") {
     const q = search.trim();
+    const counts = getStrategyLibraryCounts();
+    const searchResults = q ? searchStrategies(q) : [];
     const adhdGroups = adhdStrategyDropdownGroups(q);
     const businessOptions = [...BUSINESS_STRATEGY_TEMPLATES].sort((a, b) =>
       compareDropdownLabels(a, b),
     );
-    const recs = STRATEGIES.filter((s) => s.recommended)
-      .slice(0, 8)
-      .sort((a, b) => compareDropdownLabels(a.title, b.title));
+    const dealingWith = getStrategiesForWhatYoureDealingWith();
+    const browseCats = browseCategoriesForLibrary();
     const saved = getUserStrategies();
     const savedCount = saved.length;
 
@@ -300,20 +311,106 @@ export function StrategiesPanel({
       <div className={workspacePanelShellClass({ width: "standard", inSplit: true })}>
         <WorkspaceAreaWorksGuide areaId="playbook" />
         {dockedPlan}
-        <p className="text-2xl font-semibold text-[#1f1c19]">Strategies</p>
-        <p className="mt-1 text-base text-[#6b635a]">
-          Apply an ADHD technique now, or create a business strategy with Shari.
+        <p className="text-2xl font-semibold text-[#1f1c19]">
+          ADHD Entrepreneur Strategy Library™
         </p>
+        <p className="mt-1 text-base text-[#6b635a]">
+          Browse proven strategies for real problems — or build your own custom strategy with Shari.
+        </p>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <span className="rounded-full bg-[#f0f5f5] px-3 py-1 text-sm font-semibold text-[#1e4f4f]">
+            ADHD Strategies ({counts.adhdStrategies})
+          </span>
+          <span className="rounded-full bg-[#f0f5f5] px-3 py-1 text-sm font-semibold text-[#1e4f4f]">
+            Business Strategies ({counts.businessStrategies})
+          </span>
+          <span className="rounded-full bg-[#f0f5f5] px-3 py-1 text-sm font-semibold text-[#1e4f4f]">
+            Recommended ({counts.recommendedStrategies})
+          </span>
+          <span className="rounded-full bg-[#f0f5f5] px-3 py-1 text-sm font-semibold text-[#1e4f4f]">
+            Saved ({counts.savedStrategies})
+          </span>
+        </div>
+
+        <p className="mt-4 text-sm text-[#6b635a]">
+          Browse proven strategies for:{" "}
+          {browseCats.map((c) => c.label).join(" · ")}.
+        </p>
+
         <input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          placeholder="Search strategies…"
+          placeholder={`Search by problem — e.g. "I can't get started" or "sales"`}
           className="mt-4 w-full rounded-xl border border-[#c9bfb0] bg-white px-4 py-3 text-base outline-none focus:border-[#1e4f4f]"
         />
 
+        {q && searchResults.length > 0 ? (
+          <div className="mt-4 rounded-xl border border-[#d4cdc3] bg-white/90 p-3">
+            <p className="text-sm font-semibold text-[#1f1c19]">
+              Matches for &ldquo;{q}&rdquo;
+            </p>
+            <ul className="mt-2 flex flex-col gap-2">
+              {searchResults.map((r) => (
+                <li key={r.strategyId}>
+                  <button
+                    type="button"
+                    onClick={() => goToView({ v: "strategy", stratId: r.strategyId })}
+                    className="w-full rounded-lg border border-[#d4cdc3] bg-white px-3 py-2.5 text-left hover:border-[#1e4f4f]/40"
+                  >
+                    <span className="text-sm font-semibold text-[#1f1c19]">{r.title}</span>
+                    <span className="mt-0.5 block text-xs text-[#6b635a]">{r.subtitle}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : q ? (
+          <p className="mt-3 text-sm text-[#6b635a]">
+            No exact match — try a different phrase or build a custom strategy below.
+          </p>
+        ) : null}
+
+        <div className="mt-6">
+          <p className="text-sm font-bold uppercase tracking-wide text-[#1e4f4f]">
+            Popular Strategies
+          </p>
+          <ul className="mt-2 flex flex-col gap-2">
+            {POPULAR_STRATEGIES.map((pop) => (
+              <li key={pop.id}>
+                <button
+                  type="button"
+                  onClick={() => goToView({ v: "strategy", stratId: pop.strategyId })}
+                  className="w-full rounded-xl border border-[#d4cdc3] bg-white/90 px-3 py-2.5 text-left hover:border-[#1e4f4f]/40"
+                >
+                  <span className="text-sm font-semibold text-[#1f1c19]">
+                    ⭐ {pop.label}
+                  </span>
+                  <span className="mt-0.5 block text-xs text-[#6b635a]">{pop.problem}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="mt-6 rounded-2xl border-2 border-[#1e4f4f]/25 bg-[#f0f5f5] p-5">
+          <p className="text-lg font-semibold text-[#1f1c19]">Can&apos;t Find What You Need?</p>
+          <p className="mt-1 text-sm text-[#6b635a]">
+            Build a custom strategy with Shari based on your business, goals, ADHD patterns, and
+            current challenge.
+          </p>
+          <button
+            type="button"
+            onClick={() => startBusiness("Other Strategy")}
+            className="mt-4 w-full rounded-xl bg-[#1e4f4f] px-4 py-3 text-base font-semibold text-white hover:bg-[#163d3d]"
+          >
+            Build My Strategy
+          </button>
+        </div>
+
         <div className="mt-6 flex flex-col gap-3">
           <HubSection
-            title={STRATEGIES_HUB.adhd.title}
+            title={`${STRATEGIES_HUB.adhd.title} (${counts.adhdStrategies})`}
             description={STRATEGIES_HUB.adhd.description}
             open={hubOpen.adhd}
             onToggle={() => toggleHub("adhd")}
@@ -352,7 +449,7 @@ export function StrategiesPanel({
           </HubSection>
 
           <HubSection
-            title={STRATEGIES_HUB.business.title}
+            title={`${STRATEGIES_HUB.business.title} (${counts.businessStrategies})`}
             description={STRATEGIES_HUB.business.description}
             open={hubOpen.business}
             onToggle={() => toggleHub("business")}
@@ -417,26 +514,33 @@ export function StrategiesPanel({
             open={hubOpen.recommended}
             onToggle={() => toggleHub("recommended")}
           >
-            <select
-              value={recPick}
-              onChange={(e) => {
-                const id = e.target.value;
-                setRecPick(id);
-                if (id) goToView({ v: "strategy", stratId: id });
-              }}
-              className="w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-            >
-              <option value="">Select a recommendation…</option>
-              {recs.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.title}
-                </option>
+            <ul className="flex flex-col gap-2">
+              {dealingWith.map((sit) => (
+                <li key={sit.situationId}>
+                  <p className="text-sm font-semibold text-[#1f1c19]">{sit.situationLabel}</p>
+                  <div className="mt-1 flex flex-wrap gap-2">
+                    {sit.strategyIds.slice(0, 3).map((id) => {
+                      const strat = getStrategy(id);
+                      if (!strat) return null;
+                      return (
+                        <button
+                          key={id}
+                          type="button"
+                          onClick={() => goToView({ v: "strategy", stratId: id })}
+                          className="rounded-lg border border-[#d4cdc3] bg-white px-2.5 py-1.5 text-xs font-semibold text-[#1e4f4f] hover:border-[#1e4f4f]/40"
+                        >
+                          {strat.title}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </li>
               ))}
-            </select>
+            </ul>
           </HubSection>
 
           <HubSection
-            title={STRATEGIES_HUB.saved.title}
+            title={`${STRATEGIES_HUB.saved.title} (${savedCount})`}
             description={STRATEGIES_HUB.saved.description}
             open={hubOpen.saved}
             onToggle={() => toggleHub("saved")}

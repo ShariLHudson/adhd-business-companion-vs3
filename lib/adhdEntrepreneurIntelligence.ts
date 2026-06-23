@@ -27,7 +27,15 @@ export type AdhdBusinessPattern =
   | "hyperfocus_crash"
   | "dopamine_chasing"
   | "decision_paralysis"
-  | "inconsistent_execution";
+  | "inconsistent_execution"
+  | "financial_avoidance"
+  | "pricing_guilt"
+  | "revenue_anxiety"
+  | "delegation_resistance"
+  | "control_bias"
+  | "launch_perfectionism"
+  | "launch_panic"
+  | "imposter_syndrome";
 
 export type IntelligenceLayer =
   | "adhd_entrepreneur"
@@ -165,6 +173,54 @@ export const ADHD_ENTREPRENEUR_KNOWLEDGE_BASE: PatternSpec[] = [
     label: "Inconsistent execution",
     re: /\b(?:start strong then stop|never follow through|inconsistent|fall off)\b/i,
     filterNote: "Repeatable beats ambitious — one rhythm at a time.",
+  },
+  {
+    id: "financial_avoidance",
+    label: "Financial avoidance",
+    re: /\b(?:haven'?t looked at (?:my )?(?:revenue|numbers)|avoiding (?:my )?books|scared to open)\b/i,
+    filterNote: "One tiny numbers glance — not a financial overhaul.",
+  },
+  {
+    id: "pricing_guilt",
+    label: "Pricing guilt",
+    re: /\b(?:feel bad charging|guilty charging|too much to charge)\b/i,
+    filterNote: "Worthiness issue — anchor in value delivered, not shame.",
+  },
+  {
+    id: "revenue_anxiety",
+    label: "Revenue anxiety",
+    re: /\b(?:this month (?:is|was) terrible|slow month|income dropped)\b/i,
+    filterNote: "Separate month from identity — one controllable action.",
+  },
+  {
+    id: "delegation_resistance",
+    label: "Delegation resistance",
+    re: /\b(?:takes longer to explain|faster if i do it|easier to do it myself)\b/i,
+    filterNote: "One low-risk delegated task — not full team systems.",
+  },
+  {
+    id: "control_bias",
+    label: "Control bias",
+    re: /\b(?:no one does it right|only i can|need to control|micromanage)\b/i,
+    filterNote: "Good enough outcomes beat perfect control.",
+  },
+  {
+    id: "launch_perfectionism",
+    label: "Launch perfectionism",
+    re: /\b(?:just one more (?:thing|tweak)|almost ready to launch|not ready to launch)\b/i,
+    filterNote: "Define launch-ready — stop endless prep.",
+  },
+  {
+    id: "launch_panic",
+    label: "Launch panic",
+    re: /\b(?:what if nobody (?:buys|shows up)|scared to launch)\b/i,
+    filterNote: "Normalize uncertainty — smallest launch exposure step.",
+  },
+  {
+    id: "imposter_syndrome",
+    label: "Expert imposter syndrome",
+    re: /\b(?:who am i to (?:teach|tell|share)|not qualified to|imposter)\b/i,
+    filterNote: "Reconnect to evidence of expertise — not generic motivation.",
   },
 ];
 

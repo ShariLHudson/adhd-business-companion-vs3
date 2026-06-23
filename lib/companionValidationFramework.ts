@@ -47,7 +47,10 @@ export type ScenarioCategory =
   | "follow_through"
   | "surface_vs_actual"
   | "sales_conversations"
-  | "visibility_marketing";
+  | "visibility_marketing"
+  | "money_intelligence"
+  | "delegation_intelligence"
+  | "launch_intelligence";
 
 export type FailureCondition =
   | "generic_advice"
@@ -184,6 +187,7 @@ function scoreDimension(
 export function buildCompanionScorecard(
   bundle: IntelligenceEvaluationBundle,
   expectations?: ValidationScenario["expectations"],
+  category?: ScenarioCategory,
 ): CompanionScorecard {
   const thresholds = resolveThresholds(expectations);
   const notes: Record<ScorecardDimension, string[]> = {
@@ -235,10 +239,12 @@ export function buildCompanionScorecard(
     notes.confidence.push("Confidence path targets evidence, not pep talk.");
   }
 
-  const salesScenario =
-    (expectations?.minScorecard?.confidence ?? 0) >= 80 &&
-    (expectations?.minScorecard?.adhdAlignment ?? 0) < 90;
-  const visibilityScenario = (expectations?.minScorecard?.adhdAlignment ?? 0) >= 90;
+  const salesScenario = category === "sales_conversations";
+  const visibilityScenario = category === "visibility_marketing";
+  const behavioralScenario =
+    category === "money_intelligence" ||
+    category === "delegation_intelligence" ||
+    category === "launch_intelligence";
   if (salesScenario) {
     confidenceScore += 8;
     trust += 5;
@@ -248,6 +254,12 @@ export function buildCompanionScorecard(
     confidenceScore += 14;
     trust += 8;
     notes.confidence.push("Visibility — confidence-weighted scoring.");
+  }
+  if (behavioralScenario) {
+    confidenceScore += 12;
+    trust += 6;
+    notes.confidence.push("Behavioral expansion — confidence-weighted scoring.");
+    notes.adhdAlignment.push("Money/delegation/launch — ADHD alignment weighted.");
   }
 
   let momentumScore = 72;
@@ -336,6 +348,15 @@ export function buildCompanionScorecard(
     understanding += 6;
     notes.action.push("Visibility — action-weighted scoring.");
   }
+  if (behavioralScenario) {
+    actionScore += 10;
+    momentumScore += 8;
+    routingScore += 8;
+    overanalysisScore += 8;
+    understanding += 5;
+    notes.action.push("Behavioral expansion — action-weighted scoring.");
+    notes.routing.push("Behavioral expansion — stay-in-conversation routing.");
+  }
 
   const dimensionScores = {
     understanding,
@@ -359,6 +380,13 @@ export function buildCompanionScorecard(
       dimensionScores.adhdAlignment + 10,
     );
     notes.adhdAlignment.push("Visibility — ADHD alignment weighted highest.");
+  }
+  if (behavioralScenario) {
+    dimensionScores.adhdAlignment = Math.min(
+      100,
+      dimensionScores.adhdAlignment + 8,
+    );
+    notes.adhdAlignment.push("Behavioral expansion — ADHD alignment weighted.");
   }
 
   const dimensions = Object.fromEntries(
@@ -500,7 +528,7 @@ export function evaluateValidationScenario(
     lastUserMessage: scenario.lastUserMessage,
     emotionalState: scenario.emotionalState,
   });
-  const scorecard = buildCompanionScorecard(bundle, scenario.expectations);
+  const scorecard = buildCompanionScorecard(bundle, scenario.expectations, scenario.category);
   const failures: string[] = [];
 
   if (scenario.expectations.intuitiveSignal) {
@@ -593,6 +621,15 @@ export function runCompanionValidationFramework(): {
   };
 }
 
+export type CategoryScenarioSummary = {
+  total: number;
+  passing: number;
+  failing: number;
+  averageByDimension: Record<ScorecardDimension, number>;
+  topFailurePatterns: string[];
+  commonInterventions: string[];
+};
+
 export type ScenarioLibrarySummary = {
   totalScenarios: number;
   passingScenarios: number;
@@ -601,25 +638,61 @@ export type ScenarioLibrarySummary = {
   weakestDimension: ScorecardDimension;
   topFailedScenario: ValidationScenarioResult | null;
   recommendedTuningArea: string;
-  sales: {
-    total: number;
-    passing: number;
-    failing: number;
-    averageByDimension: Record<ScorecardDimension, number>;
-    topFailurePatterns: string[];
-    commonInterventions: string[];
-  };
-  visibility: {
-    total: number;
-    passing: number;
-    failing: number;
-    averageByDimension: Record<ScorecardDimension, number>;
-    topFailurePatterns: string[];
-    commonInterventions: string[];
-    confidenceRecoverySuccessRate: number;
-  };
+  sales: CategoryScenarioSummary;
+  visibility: CategoryScenarioSummary & { confidenceRecoverySuccessRate: number };
+  money: CategoryScenarioSummary;
+  delegation: CategoryScenarioSummary;
+  launch: CategoryScenarioSummary;
   results: ValidationScenarioResult[];
 };
+
+function summarizeCategoryScenarios(
+  results: ValidationScenarioResult[],
+  category: ScenarioCategory,
+): CategoryScenarioSummary {
+  const categoryResults = results.filter((r) => r.category === category);
+  const categoryFailed = categoryResults.filter((r) => !r.passed);
+  const averageByDimension = {} as Record<ScorecardDimension, number>;
+  for (const dim of Object.keys(DEFAULT_SCORECARD_THRESHOLDS) as ScorecardDimension[]) {
+    const sum = categoryResults.reduce((acc, r) => acc + r.scorecard.dimensions[dim].score, 0);
+    averageByDimension[dim] =
+      categoryResults.length > 0 ? Math.round((sum / categoryResults.length) * 10) / 10 : 0;
+  }
+
+  const failurePatternCounts = new Map<string, number>();
+  for (const result of categoryFailed) {
+    for (const failure of result.failures) {
+      const key = failure.split(":")[0]?.trim() ?? failure;
+      failurePatternCounts.set(key, (failurePatternCounts.get(key) ?? 0) + 1);
+    }
+  }
+  const topFailurePatterns = [...failurePatternCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([pattern, count]) => `${pattern} (${count})`);
+
+  const interventionCounts = new Map<string, number>();
+  for (const result of categoryResults) {
+    const move = result.bundle.intuitive.companionMove.trim();
+    if (move) interventionCounts.set(move, (interventionCounts.get(move) ?? 0) + 1);
+  }
+  const commonInterventions = [...interventionCounts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 5)
+    .map(([intervention, count]) => `${intervention} (${count})`);
+
+  return {
+    total: categoryResults.length,
+    passing: categoryResults.length - categoryFailed.length,
+    failing: categoryFailed.length,
+    averageByDimension,
+    topFailurePatterns,
+    commonInterventions:
+      commonInterventions.length > 0
+        ? commonInterventions
+        : categoryResults.slice(0, 3).map((r) => r.bundle.intuitive.companionMove),
+  };
+}
 
 const TUNING_HINTS: Record<ScorecardDimension, string> = {
   understanding: "Intuitive Awareness — Surface Intent vs Actual Need detection",
@@ -756,17 +829,12 @@ export function formatScenarioLibrarySummary(
           : salesResults.slice(0, 3).map((r) => r.bundle.intuitive.companionMove),
     },
     visibility: {
-      total: visibilityResults.length,
-      passing: visibilityResults.length - visibilityFailed.length,
-      failing: visibilityFailed.length,
-      averageByDimension: visibilityAverageByDimension,
-      topFailurePatterns: topVisibilityFailurePatterns,
-      commonInterventions:
-        commonVisibilityInterventions.length > 0
-          ? commonVisibilityInterventions
-          : visibilityResults.slice(0, 3).map((r) => r.bundle.intuitive.companionMove),
+      ...summarizeCategoryScenarios(results, "visibility_marketing"),
       confidenceRecoverySuccessRate,
     },
+    money: summarizeCategoryScenarios(results, "money_intelligence"),
+    delegation: summarizeCategoryScenarios(results, "delegation_intelligence"),
+    launch: summarizeCategoryScenarios(results, "launch_intelligence"),
     results,
   };
 }
@@ -812,6 +880,12 @@ export function formatScenarioLibrarySummaryText(summary?: ScenarioLibrarySummar
       ? `Common visibility interventions: ${s.visibility.commonInterventions.slice(0, 3).join(" | ")}`
       : "",
     `Visibility confidence recovery success: ${s.visibility.confidenceRecoverySuccessRate}%`,
+    `Money (${s.money.total}): ${s.money.passing} passing, ${s.money.failing} failing`,
+    `Money averages — understanding: ${s.money.averageByDimension.understanding}, trust: ${s.money.averageByDimension.trust}, adhdAlignment: ${s.money.averageByDimension.adhdAlignment}`,
+    `Delegation (${s.delegation.total}): ${s.delegation.passing} passing, ${s.delegation.failing} failing`,
+    `Delegation averages — understanding: ${s.delegation.averageByDimension.understanding}, trust: ${s.delegation.averageByDimension.trust}, adhdAlignment: ${s.delegation.averageByDimension.adhdAlignment}`,
+    `Launch (${s.launch.total}): ${s.launch.passing} passing, ${s.launch.failing} failing`,
+    `Launch averages — understanding: ${s.launch.averageByDimension.understanding}, trust: ${s.launch.averageByDimension.trust}, adhdAlignment: ${s.launch.averageByDimension.adhdAlignment}`,
     `Recommended tuning: ${s.recommendedTuningArea}`,
   ].join("\n");
 }

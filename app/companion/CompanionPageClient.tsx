@@ -646,6 +646,11 @@ import {
   captureToolOfferDismissed,
 } from "@/lib/companionClosedLoopWiring";
 import {
+  mistakeRecoveryHintForChat,
+  processMistakeSignalsFromUserTurn,
+  recordRecoveryOutcome,
+} from "@/lib/companionMistakeRecovery";
+import {
   crossWorkspaceBesideLine,
   crossWorkspaceContextMessage,
   type CrossWorkspaceBesideOffer,
@@ -7524,6 +7529,21 @@ export default function CompanionPageClient() {
       source: "chat",
       emotionalState: detectedEmotion,
     });
+    const lastAssistantBeforeSend =
+      [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
+    const mistakeRecord = processMistakeSignalsFromUserTurn({
+      userText: trimmed,
+      lastAssistantText: lastAssistantBeforeSend,
+      hadRecentOffer: Boolean(workspaceOffer || toolSuggestion),
+    });
+    if (mistakeRecord) {
+      recordRecoveryOutcome({
+        mistakeId: mistakeRecord.id,
+        repairAttempted: false,
+        conversationContinued: true,
+        outcomeAchieved: false,
+      });
+    }
     reportShadowParityAfterChatTurn();
 
     const messageCategory = classifyUserMessage(trimmed, {
@@ -9846,6 +9866,7 @@ export default function CompanionPageClient() {
                 sprint5.trustHint,
                 sprint5.confidenceHint,
                 sprint5.adaptiveHint,
+                mistakeRecoveryHintForChat(),
                 actionBiasHintForChat(actionBias),
                 discoveryOverrideForActionBias(actionBias),
                 intuitiveAwarenessHintForChat(intuitiveAwareness),

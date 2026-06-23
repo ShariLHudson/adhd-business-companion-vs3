@@ -17,6 +17,22 @@ import {
   analyzeVisibilityIntelligence,
   mergeVisibilityIntoIntuitive,
 } from "./companionVisibilityIntelligence";
+import {
+  analyzeMoneyIntelligence,
+  mergeMoneyIntoIntuitive,
+} from "./companionMoneyIntelligence";
+import {
+  analyzeDelegationIntelligence,
+  mergeDelegationIntoIntuitive,
+} from "./companionDelegationIntelligence";
+import {
+  analyzeLaunchIntelligence,
+  mergeLaunchIntoIntuitive,
+} from "./companionLaunchIntelligence";
+import {
+  mergeAtlasIntoIntuitive,
+  resolveSituation,
+} from "./adhdEntrepreneurSituationAtlas";
 import type { ActionBiasAnalysis } from "./companionActionBias";
 
 export type IntuitiveSignal =
@@ -46,6 +62,8 @@ export type IntuitiveAwarenessAnalysis = {
   gapDetected: boolean;
   threadAnchor: string | null;
   companionMove: string;
+  situationId?: string | null;
+  situationName?: string | null;
 };
 
 export type AnalyzeIntuitiveAwarenessInput = {
@@ -416,16 +434,119 @@ export function analyzeIntuitiveAwareness(
     companionMove = merged.companionMove;
   }
 
+  const money = analyzeMoneyIntelligence({
+    userText: input.userText,
+    messages: input.messages,
+  });
+  if (money && (money.primaryPattern || money.patterns.length > 0) && !sales?.inSalesContext) {
+    const merged = mergeMoneyIntoIntuitive({
+      money,
+      existingSignals: finalSignals,
+      existingActualNeed: finalActualNeed,
+    });
+    finalSignals = merged.signals;
+    if (money.actualNeed) finalActualNeed = merged.actualNeed;
+    companionMove = merged.companionMove;
+  }
+
+  const delegation = analyzeDelegationIntelligence({
+    userText: input.userText,
+    messages: input.messages,
+  });
+  if (delegation && (delegation.primaryPattern || delegation.patterns.length > 0)) {
+    const merged = mergeDelegationIntoIntuitive({
+      delegation,
+      existingSignals: finalSignals,
+      existingActualNeed: finalActualNeed,
+    });
+    finalSignals = merged.signals;
+    if (delegation.actualNeed) finalActualNeed = merged.actualNeed;
+    companionMove = merged.companionMove;
+  }
+
+  const launch = analyzeLaunchIntelligence({
+    userText: input.userText,
+    messages: input.messages,
+  });
+  if (
+    launch &&
+    (launch.primaryPattern || launch.patterns.length > 0) &&
+    !visibility?.inVisibilityContext
+  ) {
+    const merged = mergeLaunchIntoIntuitive({
+      launch,
+      existingSignals: finalSignals,
+      existingActualNeed: finalActualNeed,
+    });
+    finalSignals = merged.signals;
+    if (launch.actualNeed) finalActualNeed = merged.actualNeed;
+    companionMove = merged.companionMove;
+  }
+
+  const launchResolved = Boolean(
+    launch?.primaryPattern && (launch.inLaunchContext || launch.actualNeed),
+  );
+  const visibilityResolved = Boolean(
+    visibility?.primaryPattern && visibility.inVisibilityContext,
+  );
+  const moneyResolved = Boolean(money?.primaryPattern && money.inMoneyContext);
+  const delegationResolved = Boolean(
+    delegation?.primaryPattern && delegation.inDelegationContext,
+  );
+  const salesResolved = Boolean(sales?.primaryPattern || sales?.stage);
+
+  const atlasResolution = resolveSituation({
+    userText: input.userText,
+    messages: input.messages,
+  });
+  const domainIntelligenceLocked =
+    salesResolved || visibilityResolved || moneyResolved || delegationResolved || launchResolved;
+
+  if (
+    atlasResolution.matched &&
+    atlasResolution.primary &&
+    !domainIntelligenceLocked &&
+    (atlasResolution.primary.confidence === "high" ||
+      atlasResolution.primary.confidence === "medium")
+  ) {
+    const atlasMerged = mergeAtlasIntoIntuitive({
+      resolution: atlasResolution,
+      existingSignals: finalSignals,
+      existingActualNeed: finalActualNeed,
+      existingMove: companionMove,
+    });
+    finalSignals = atlasMerged.signals;
+    if (atlasMerged.actualNeed) finalActualNeed = atlasMerged.actualNeed;
+    companionMove = atlasMerged.companionMove;
+  }
+
+  let situationId: string | null = null;
+  let situationName: string | null = null;
+  if (atlasResolution.matched && !domainIntelligenceLocked) {
+    situationId = atlasResolution.situationId;
+    situationName = atlasResolution.situationName;
+  }
+
   const confidence = inferConfidence(finalSignals, finalActualNeed);
   const gapDetected = Boolean(
     finalActualNeed &&
       surfaceIntent &&
       (sales?.inSalesContext ||
         visibility?.inVisibilityContext ||
+        money?.inMoneyContext ||
+        delegation?.inDelegationContext ||
+        launch?.inLaunchContext ||
         !surfaceIntent.toLowerCase().includes(finalActualNeed.replace(/_/g, " ").slice(0, 8))),
   );
 
-  if (gapDetected && !sales && !visibility?.inVisibilityContext) {
+  if (
+    gapDetected &&
+    !sales &&
+    !visibility?.inVisibilityContext &&
+    !money?.inMoneyContext &&
+    !delegation?.inDelegationContext &&
+    !launch?.inLaunchContext
+  ) {
     companionMove = companionMoveFor(finalActualNeed, true);
   }
 
@@ -438,6 +559,8 @@ export function analyzeIntuitiveAwareness(
     gapDetected,
     threadAnchor,
     companionMove,
+    situationId,
+    situationName,
   };
 }
 
@@ -472,6 +595,12 @@ export function intuitiveAwarenessHintForChat(
   if (analysis.actualNeed) {
     parts.push(`Likely actual need: ${analysis.actualNeed.replace(/_/g, " ")}.`);
     parts.push(`Move: ${analysis.companionMove}`);
+  }
+
+  if (analysis.situationName) {
+    parts.push(
+      `Situation recognized: ${analysis.situationName} — respond to the human situation, not only keywords.`,
+    );
   }
 
   parts.push(

@@ -14,6 +14,7 @@ import {
   resetInterventionLearningForTests,
 } from "./companionInterventionLearning";
 import { resetEffectivenessForTests } from "./companionEffectiveness";
+import { resetMistakeRecoveryForTests } from "./companionMistakeRecovery";
 
 describe("closedLoopLearning", () => {
   beforeEach(() => {
@@ -28,6 +29,7 @@ describe("closedLoopLearning", () => {
     resetClosedLoopLearningForTests();
     resetInterventionLearningForTests();
     resetEffectivenessForTests();
+    resetMistakeRecoveryForTests();
   });
 
   it("emits behavior events through the offer lifecycle", () => {

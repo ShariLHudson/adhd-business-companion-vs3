@@ -13,6 +13,7 @@ import {
   rankInterventionsForContext,
   type InterventionLifecycleStage,
 } from "./companionInterventionLearning";
+import { getMistakeRecoveryDashboardSlice } from "./companionMistakeRecovery";
 import {
   recordLearningStyleOffer,
   recordUserOutcome,
@@ -366,6 +367,7 @@ export type CompanionEffectivenessDashboard = {
   momentumImpact: Record<string, number>;
   attributions: InterventionAttribution[];
   learningStyleByAction: LearningStyleEffectiveness[];
+  mistakeRecovery: ReturnType<typeof getMistakeRecoveryDashboardSlice>;
   recentEvents: UserBehaviorEvent[];
 };
 
@@ -415,6 +417,7 @@ export function buildCompanionEffectivenessDashboard(): CompanionEffectivenessDa
     momentumImpact,
     attributions: getInterventionAttributions().slice(0, 20),
     learningStyleByAction: computeLearningStyleEffectiveness(),
+    mistakeRecovery: getMistakeRecoveryDashboardSlice(),
     recentEvents: events.slice(0, 25),
   };
 }

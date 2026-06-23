@@ -20,6 +20,7 @@ import { FounderDayDesignerPanel } from "./FounderDayDesignerPanel";
 import { FounderRelationshipPanel } from "./FounderRelationshipPanel";
 import { FounderOpportunityPanel } from "./FounderOpportunityPanel";
 import { FounderAdaptiveCompanionPanel } from "./FounderAdaptiveCompanionPanel";
+import { FounderCommandCenterPanel } from "./FounderCommandCenterPanel";
 import { FounderUserHealthPanel } from "./FounderUserHealthPanel";
 import { FounderDecisionPanel } from "./FounderDecisionPanel";
 import { FounderRecoveryPanel } from "./FounderRecoveryPanel";
@@ -134,6 +135,8 @@ export function FounderDashboard({
       <FounderMorningBriefingPanel />
 
       <FounderEcosystemHubPanel />
+
+      <FounderCommandCenterPanel />
 
       <FounderActionCenter task={recommendedTask} handlers={actionHandlers} />
 

@@ -7,6 +7,7 @@
 
 import type { CompanionCapabilityId } from "./companionCapabilityRegistry";
 import type { LearningStyleId } from "./companionAdaptiveUserEngine";
+import { getMistakePenaltyForIntervention, shouldSuppressIntervention } from "./companionMistakeRecovery";
 
 export type InterventionLearningId =
   | CompanionCapabilityId
@@ -31,7 +32,9 @@ export type InterventionLifecycleStage =
   | "returned_to"
   | "reported_helpful"
   | "momentum_improved"
-  | "confidence_improved";
+  | "confidence_improved"
+  | "misread"
+  | "rejected";
 
 export type InterventionLifecycleCounts = {
   recommended: number;
@@ -44,6 +47,8 @@ export type InterventionLifecycleCounts = {
   reportedHelpful: number;
   momentumImproved: number;
   confidenceImproved: number;
+  misread: number;
+  rejected: number;
 };
 
 export type InterventionRateMetrics = {
@@ -131,6 +136,8 @@ function emptyCounts(): InterventionLifecycleCounts {
     reportedHelpful: 0,
     momentumImproved: 0,
     confidenceImproved: 0,
+    misread: 0,
+    rejected: 0,
   };
 }
 
@@ -182,6 +189,10 @@ function stageField(stage: InterventionLifecycleStage): keyof InterventionLifecy
       return "momentumImproved";
     case "confidence_improved":
       return "confidenceImproved";
+    case "misread":
+      return "misread";
+    case "rejected":
+      return "rejected";
     default:
       return null;
   }
@@ -266,13 +277,19 @@ export function computeInterventionRates(
     ? Math.round((counts.confidenceImproved / counts.completed) * 100)
     : 0;
 
-  const adaptiveWeight = Math.round(
+  const negativeSignals = counts.dismissed + counts.misread + counts.rejected;
+  const failureRate = counts.recommended
+    ? negativeSignals / counts.recommended
+    : 0;
+
+  let adaptiveWeight = Math.round(
     acceptanceRate * 0.25 +
       completionRate * 0.3 +
       reportedUsefulness * 0.15 +
       momentumImpact * 0.15 +
       confidenceImpact * 0.15,
   );
+  adaptiveWeight = Math.round(adaptiveWeight * (1 - failureRate * 0.35));
 
   return {
     acceptanceRate,
@@ -325,7 +342,8 @@ export function getAdaptiveInterventionWeight(interventionId: string): number {
   const profile = getInterventionEffectivenessProfile();
   const counts = profile.interventions[String(id)];
   if (!counts || counts.recommended < 1) return 50;
-  return computeInterventionRates(counts).adaptiveWeight;
+  const base = computeInterventionRates(counts).adaptiveWeight;
+  return getMistakePenaltyForIntervention(String(id), base);
 }
 
 export function rankInterventionsForContext(input?: {
@@ -341,6 +359,9 @@ export function rankInterventionsForContext(input?: {
       return buildInterventionEffectivenessEntry(id as InterventionLearningId, counts);
     })
     .sort((a, b) => {
+      const aSuppressed = shouldSuppressIntervention(String(a.id));
+      const bSuppressed = shouldSuppressIntervention(String(b.id));
+      if (aSuppressed !== bSuppressed) return aSuppressed ? 1 : -1;
       if (input?.preferConversation) {
         if (a.id === "conversation_coaching") return -1;
         if (b.id === "conversation_coaching") return 1;
@@ -451,6 +472,8 @@ export function seedInterventionLearningDemoData(): void {
       reportedHelpful: 54,
       momentumImproved: 49,
       confidenceImproved: 42,
+      misread: 3,
+      rejected: 2,
     },
     decision_compass: {
       recommended: 50,
@@ -463,6 +486,8 @@ export function seedInterventionLearningDemoData(): void {
       reportedHelpful: 5,
       momentumImproved: 3,
       confidenceImproved: 4,
+      misread: 8,
+      rejected: 5,
     },
     conversation_coaching: {
       recommended: 200,
@@ -475,6 +500,8 @@ export function seedInterventionLearningDemoData(): void {
       reportedHelpful: 95,
       momentumImproved: 70,
       confidenceImproved: 65,
+      misread: 4,
+      rejected: 1,
     },
   };
 

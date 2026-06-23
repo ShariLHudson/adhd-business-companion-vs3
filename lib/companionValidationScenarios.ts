@@ -5,6 +5,9 @@
 import type { ValidationScenario } from "./companionValidationFramework";
 import { SALES_SCORECARD_THRESHOLDS } from "./companionSalesIntelligence";
 import { VISIBILITY_SCORECARD_THRESHOLDS } from "./companionVisibilityIntelligence";
+import { MONEY_SCORECARD_THRESHOLDS } from "./companionMoneyIntelligence";
+import { DELEGATION_SCORECARD_THRESHOLDS } from "./companionDelegationIntelligence";
+import { LAUNCH_SCORECARD_THRESHOLDS } from "./companionLaunchIntelligence";
 
 const SCENARIO_THRESHOLDS = {
   understanding: 75,
@@ -1153,9 +1156,414 @@ export const VISIBILITY_SCENARIOS: ValidationScenario[] = [
   },
 ];
 
+const B = MONEY_SCORECARD_THRESHOLDS;
+const D = DELEGATION_SCORECARD_THRESHOLDS;
+const L = LAUNCH_SCORECARD_THRESHOLDS;
+
+/** Money Intelligence™ — financial avoidance, pricing, revenue stress */
+export const MONEY_SCENARIOS: ValidationScenario[] = [
+  {
+    id: "money-avoid-look-at-numbers",
+    label: "Avoid Looking At Numbers",
+    category: "money_intelligence",
+    description:
+      "User avoids revenue review — financial avoidance, one small step not a planning project.",
+    turns: [
+      { role: "user", content: "I should probably check how the business is doing" },
+      { role: "assistant", content: "What feels hard about that?" },
+      { role: "user", content: "I haven't looked at my revenue in months" },
+    ],
+    lastUserMessage: "I haven't looked at my revenue in months",
+    emotionalState: "stuck",
+    expectedSurfaceIntent: /revenue/i,
+    expectations: {
+      intuitiveSignal: "avoidance",
+      actualNeed: "start_execution",
+      recommendedEnd: "next_step",
+      minScorecard: { ...B },
+      failureConditions: ["unfiltered_traditional_advice", "generic_advice"],
+    },
+  },
+  {
+    id: "money-raising-prices",
+    label: "Raising Prices",
+    category: "money_intelligence",
+    description:
+      "User considers raising rates — confidence and value, not complex pricing models.",
+    turns: [
+      { role: "user", content: "My coaching package has been the same price for a year" },
+      { role: "assistant", content: "Thinking about changing it?" },
+      { role: "user", content: "I think I need to raise my rates" },
+    ],
+    lastUserMessage: "I think I need to raise my rates",
+    emotionalState: "unclear",
+    expectedSurfaceIntent: /raise my rates/i,
+    expectations: {
+      intuitiveSignal: "hesitation",
+      actualNeed: "make_decision",
+      recommendedEnd: "next_step",
+      minScorecard: { ...B },
+      failureConditions: ["generic_advice"],
+    },
+  },
+  {
+    id: "money-pricing-guilt",
+    label: "Pricing Guilt",
+    category: "money_intelligence",
+    description: "User feels guilty charging — worthiness and confidence, not shame.",
+    turns: [
+      { role: "user", content: "A client asked for my price" },
+      { role: "assistant", content: "How did that feel?" },
+      { role: "user", content: "I feel bad charging that much" },
+    ],
+    lastUserMessage: "I feel bad charging that much",
+    emotionalState: "emotional",
+    expectedSurfaceIntent: /charging/i,
+    expectations: {
+      intuitiveSignal: "hesitation",
+      actualNeed: "build_confidence",
+      recommendedEnd: "next_step",
+      minScorecard: { ...B },
+      failureConditions: ["generic_advice"],
+    },
+  },
+  {
+    id: "money-inconsistent-revenue",
+    label: "Inconsistent Revenue Stress",
+    category: "money_intelligence",
+    description:
+      "Slow month — emotional regulation and controllable actions, not identity collapse.",
+    turns: [
+      { role: "user", content: "I'm reviewing my business finances" },
+      { role: "assistant", content: "How's it looking?" },
+      { role: "user", content: "This month is terrible" },
+    ],
+    lastUserMessage: "This month is terrible",
+    emotionalState: "emotional",
+    expectedSurfaceIntent: /terrible/i,
+    expectations: {
+      intuitiveSignal: "discouragement",
+      actualNeed: "build_confidence",
+      recommendedEnd: "next_step",
+      minScorecard: { ...B },
+      failureConditions: ["generic_advice"],
+    },
+  },
+  {
+    id: "money-avoidance-loop",
+    label: "Money Avoidance Loop",
+    category: "money_intelligence",
+    description: "User avoids invoices — smallest possible financial action.",
+    turns: [
+      { role: "user", content: "I need to get my books in order" },
+      { role: "assistant", content: "What's stuck?" },
+      { role: "user", content: "I keep putting off sending invoices" },
+    ],
+    lastUserMessage: "I keep putting off sending invoices",
+    emotionalState: "stuck",
+    expectedSurfaceIntent: /invoices/i,
+    expectations: {
+      intuitiveSignal: "avoidance",
+      actualNeed: "start_execution",
+      recommendedEnd: "next_step",
+      minScorecard: { ...B },
+      failureConditions: ["unfiltered_traditional_advice"],
+    },
+  },
+];
+
+/** Delegation Intelligence™ */
+export const DELEGATION_SCENARIOS: ValidationScenario[] = [
+  {
+    id: "delegation-first-va-resistance",
+    label: "First VA Resistance",
+    category: "delegation_intelligence",
+    description: "Explaining takes too long — control concerns, one low-risk task.",
+    turns: [
+      { role: "user", content: "I'm thinking about hiring a VA" },
+      { role: "assistant", content: "What's holding you back?" },
+      { role: "user", content: "It takes longer to explain than to do it myself" },
+    ],
+    lastUserMessage: "It takes longer to explain than to do it myself",
+    emotionalState: "stuck",
+    expectedSurfaceIntent: /longer to explain/i,
+    expectations: {
+      intuitiveSignal: "resistance",
+      actualNeed: "make_decision",
+      recommendedEnd: "next_step",
+      minScorecard: { ...D },
+      failureConditions: ["generic_advice", "unfiltered_traditional_advice"],
+    },
+  },
+  {
+    id: "delegation-do-it-myself",
+    label: "I'll Just Do It Myself",
+    category: "delegation_intelligence",
+    description: "Faster to do it alone — challenge assumption, find one delegation opportunity.",
+    turns: [
+      { role: "user", content: "My inbox is overwhelming" },
+      { role: "assistant", content: "Could anyone help?" },
+      { role: "user", content: "It's faster if I do it" },
+    ],
+    lastUserMessage: "It's faster if I do it",
+    emotionalState: "overwhelmed",
+    expectedSurfaceIntent: /faster if i do/i,
+    expectations: {
+      intuitiveSignal: "resistance",
+      actualNeed: "make_decision",
+      recommendedEnd: "next_step",
+      minScorecard: { ...D },
+      failureConditions: ["generic_advice"],
+    },
+  },
+  {
+    id: "delegation-micromanagement",
+    label: "Micromanagement Pattern",
+    category: "delegation_intelligence",
+    description: "No one does it right — acceptable outcomes, not perfection.",
+    turns: [
+      { role: "user", content: "I tried delegating email triage" },
+      { role: "assistant", content: "How did it go?" },
+      { role: "user", content: "No one does it right" },
+    ],
+    lastUserMessage: "No one does it right",
+    emotionalState: "emotional",
+    expectedSurfaceIntent: /no one does it right/i,
+    expectations: {
+      intuitiveSignal: "resistance",
+      actualNeed: "reduce_complexity",
+      recommendedEnd: "next_step",
+      minScorecard: { ...D },
+      failureConditions: ["generic_advice"],
+    },
+  },
+  {
+    id: "delegation-failure-recovery",
+    label: "Delegation Failure Recovery",
+    category: "delegation_intelligence",
+    description: "Bad delegation experience — trust repair, don't abandon delegation entirely.",
+    turns: [
+      { role: "user", content: "I handed off social media last month" },
+      { role: "assistant", content: "What happened?" },
+      { role: "user", content: "I delegated and it went badly" },
+    ],
+    lastUserMessage: "I delegated and it went badly",
+    emotionalState: "emotional",
+    expectedSurfaceIntent: /went badly/i,
+    expectations: {
+      intuitiveSignal: "discouragement",
+      actualNeed: "build_confidence",
+      recommendedEnd: "next_step",
+      minScorecard: { ...D },
+      failureConditions: ["generic_advice"],
+    },
+  },
+  {
+    id: "delegation-team-communication",
+    label: "Team Communication Avoidance",
+    category: "delegation_intelligence",
+    description: "Avoiding expectation conversations — draft communication, reduce resistance.",
+    turns: [
+      { role: "user", content: "My contractor keeps missing the mark" },
+      { role: "assistant", content: "Have you clarified what you need?" },
+      { role: "user", content: "I don't know how to tell them what I want" },
+    ],
+    lastUserMessage: "I don't know how to tell them what I want",
+    emotionalState: "stuck",
+    expectedSurfaceIntent: /tell them what i want/i,
+    expectations: {
+      intuitiveSignal: "hesitation",
+      actualNeed: "start_execution",
+      recommendedEnd: "next_step",
+      minScorecard: { ...D },
+      failureConditions: ["generic_advice"],
+    },
+  },
+];
+
+/** Launch Intelligence™ */
+export const LAUNCH_SCENARIOS: ValidationScenario[] = [
+  {
+    id: "launch-delay-almost-ready",
+    label: "Launch Delay",
+    category: "launch_intelligence",
+    description: "Almost ready — test if blockers are real, move toward launch.",
+    turns: [
+      { role: "user", content: "My course launch is this month" },
+      { role: "assistant", content: "What's left?" },
+      { role: "user", content: "I'm almost ready to launch but not quite" },
+    ],
+    lastUserMessage: "I'm almost ready to launch but not quite",
+    emotionalState: "stuck",
+    expectedSurfaceIntent: /almost ready/i,
+    expectations: {
+      intuitiveSignal: "avoidance",
+      actualNeed: "launch_move",
+      recommendedEnd: "next_step",
+      minScorecard: { ...L },
+      failureConditions: ["ignores_surface_actual_gap"],
+    },
+  },
+  {
+    id: "launch-one-more-improvement",
+    label: "One More Improvement",
+    category: "launch_intelligence",
+    description: "Just one more thing — perfectionism, define launch-ready.",
+    turns: [
+      { role: "user", content: "I want to open enrollment Friday" },
+      { role: "assistant", content: "What's in the way?" },
+      { role: "user", content: "Just one more thing before I launch" },
+    ],
+    lastUserMessage: "Just one more thing before I launch",
+    emotionalState: "stuck",
+    expectedSurfaceIntent: /one more thing/i,
+    expectations: {
+      intuitiveSignal: "avoidance",
+      actualNeed: "launch_move",
+      recommendedEnd: "next_step",
+      minScorecard: { ...L },
+      failureConditions: ["generic_advice"],
+    },
+  },
+  {
+    id: "launch-panic-nobody-buys",
+    label: "Launch Panic",
+    category: "launch_intelligence",
+    description: "Fear nobody buys — confidence and expectation management.",
+    turns: [
+      { role: "user", content: "Launch day is tomorrow" },
+      { role: "assistant", content: "How are you feeling?" },
+      { role: "user", content: "What if nobody buys?" },
+    ],
+    lastUserMessage: "What if nobody buys?",
+    emotionalState: "emotional",
+    expectedSurfaceIntent: /nobody buys/i,
+    expectations: {
+      intuitiveSignal: "resistance",
+      actualNeed: "build_confidence",
+      recommendedEnd: "next_step",
+      minScorecard: { ...L },
+      failureConditions: ["generic_advice"],
+    },
+  },
+  {
+    id: "launch-post-launch-crash",
+    label: "Post-Launch Crash",
+    category: "launch_intelligence",
+    description: "After launch confusion — protect confidence, re-entry path.",
+    turns: [
+      { role: "user", content: "We launched the offer yesterday" },
+      { role: "assistant", content: "How did it go?" },
+      { role: "user", content: "I don't know what to do now" },
+    ],
+    lastUserMessage: "I don't know what to do now",
+    emotionalState: "unclear",
+    expectedSurfaceIntent: /what to do now/i,
+    expectations: {
+      intuitiveSignal: "hesitation",
+      actualNeed: "clarify_direction",
+      recommendedEnd: "next_step",
+      minScorecard: { ...L },
+      failureConditions: ["generic_advice"],
+    },
+  },
+  {
+    id: "launch-abandonment-reentry",
+    label: "Launch Abandonment Re-Entry",
+    category: "launch_intelligence",
+    description: "Disappeared mid-launch — no-shame resume thread.",
+    turns: [
+      { role: "user", content: "I was launching my membership last week" },
+      { role: "assistant", content: "Where did you leave off?" },
+      { role: "user", content: "Sorry I disappeared during the launch" },
+    ],
+    lastUserMessage: "Sorry I disappeared during the launch",
+    emotionalState: "emotional",
+    expectedSurfaceIntent: /disappeared/i,
+    expectations: {
+      intuitiveSignal: "discouragement",
+      actualNeed: "start_execution",
+      recommendedEnd: "next_step",
+      minScorecard: { ...L },
+      failureConditions: ["generic_advice"],
+    },
+  },
+];
+
+/** Additional visibility scenarios — fear of being seen, imposter, hangover regret */
+export const VISIBILITY_EXPANSION_SCENARIOS: ValidationScenario[] = [
+  {
+    id: "visibility-fear-being-seen",
+    label: "Fear Of Being Seen",
+    category: "visibility_marketing",
+    description: "User fears being watched — reduce scope, increase safety.",
+    turns: [
+      { role: "user", content: "I want to go live with my offer" },
+      { role: "assistant", content: "What feels risky?" },
+      { role: "user", content: "I don't want people watching me" },
+    ],
+    lastUserMessage: "I don't want people watching me",
+    emotionalState: "emotional",
+    expectedSurfaceIntent: /watching me/i,
+    expectations: {
+      intuitiveSignal: "resistance",
+      actualNeed: "build_confidence",
+      recommendedEnd: "next_step",
+      minScorecard: { ...V },
+      failureConditions: ["generic_advice"],
+    },
+  },
+  {
+    id: "visibility-expert-imposter",
+    label: "Expert Imposter Syndrome",
+    category: "visibility_marketing",
+    description: "Who am I to teach — reconnect to expertise, not generic motivation.",
+    turns: [
+      { role: "user", content: "I'm planning a workshop" },
+      { role: "assistant", content: "What's the topic?" },
+      { role: "user", content: "Who am I to teach this?" },
+    ],
+    lastUserMessage: "Who am I to teach this?",
+    emotionalState: "emotional",
+    expectedSurfaceIntent: /who am i to teach/i,
+    expectations: {
+      intuitiveSignal: "discouragement",
+      actualNeed: "build_confidence",
+      recommendedEnd: "next_step",
+      minScorecard: { ...V },
+      failureConditions: ["generic_advice"],
+    },
+  },
+  {
+    id: "visibility-hangover-regret",
+    label: "Visibility Hangover Regret",
+    category: "visibility_marketing",
+    description: "Posted and regrets it — normalize discomfort, support continued visibility.",
+    turns: [
+      { role: "user", content: "I finally posted yesterday" },
+      { role: "assistant", content: "How do you feel today?" },
+      { role: "user", content: "I posted and now I regret it" },
+    ],
+    lastUserMessage: "I posted and now I regret it",
+    emotionalState: "emotional",
+    expectedSurfaceIntent: /regret/i,
+    expectations: {
+      intuitiveSignal: "discouragement",
+      actualNeed: "build_confidence",
+      recommendedEnd: "next_step",
+      minScorecard: { ...V },
+      failureConditions: ["generic_advice"],
+    },
+  },
+];
+
 export const ALL_VALIDATION_SCENARIOS: ValidationScenario[] = [
   ...FOUNDATION_SCENARIOS,
   ...EXPANDED_SCENARIOS,
   ...SALES_SCENARIOS,
   ...VISIBILITY_SCENARIOS,
+  ...VISIBILITY_EXPANSION_SCENARIOS,
+  ...MONEY_SCENARIOS,
+  ...DELEGATION_SCENARIOS,
+  ...LAUNCH_SCENARIOS,
 ];

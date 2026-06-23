@@ -73,8 +73,10 @@ import {
 } from "./companionSprint5Intelligence";
 import { resolveWorkspaceAdvisorRole } from "./workspaceContextLock";
 import { capabilityRoutingHintForChat } from "./companionCapabilityRegistry";
+import { strategyIntelligenceHintForChat } from "./strategyIntelligence";
 import { interventionLearningHintForChat } from "./companionInterventionLearning";
 import { effectivenessHintForChat } from "./companionEffectiveness";
+import { mistakeRecoveryHintForChat } from "./companionMistakeRecovery";
 import type { WorkspaceOffer } from "./workspaceMode";
 
 export type UserStateSnapshot = {
@@ -182,8 +184,10 @@ export function buildCompanionTurnIntelligence(input: {
     intuitiveAwarenessHintForChat(intuitiveAwareness);
   const capabilityHint = [
     capabilityRoutingHintForChat(input.userText),
+    strategyIntelligenceHintForChat(input.userText),
     interventionLearningHintForChat(),
     effectivenessHintForChat(),
+    mistakeRecoveryHintForChat(),
   ]
     .filter(Boolean)
     .join("\n\n");

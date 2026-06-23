@@ -107,19 +107,19 @@ export type BusinessStrategyTemplate = (typeof BUSINESS_STRATEGY_TEMPLATES)[numb
 export const STRATEGIES_HUB = {
   adhd: {
     title: "ADHD Strategies",
-    description: "Tools and techniques that help you work with your brain.",
+    description: "Proven techniques for overwhelm, procrastination, focus, and decision making.",
   },
   business: {
     title: "Business Strategies",
-    description: "Plans and systems that help grow your business.",
+    description: "Marketing, sales, content, pricing, launches, and growth moves.",
   },
   recommended: {
-    title: "Recommended For You",
-    description: "Personalized suggestions to try next.",
+    title: "Strategies For What You're Dealing With Right Now",
+    description: "Situation-aware picks — visibility fear, pricing anxiety, launch avoidance, and more.",
   },
   saved: {
     title: "Saved Strategies",
-    description: "Strategies you created or saved.",
+    description: "Custom strategies you built with Shari or saved from the library.",
   },
 } as const;
 

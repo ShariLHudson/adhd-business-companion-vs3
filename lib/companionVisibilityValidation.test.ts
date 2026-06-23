@@ -48,20 +48,20 @@ describe("companionVisibilityValidation", () => {
 
   it("summary includes visibility category metrics", () => {
     const summary = formatScenarioLibrarySummary();
-    expect(summary.visibility.total).toBe(12);
-    expect(summary.visibility.passing).toBe(12);
+    expect(summary.visibility.total).toBe(15);
+    expect(summary.visibility.passing).toBe(15);
     expect(summary.visibility.averageByDimension.confidence).toBeGreaterThanOrEqual(85);
     expect(summary.visibility.averageByDimension.adhdAlignment).toBeGreaterThanOrEqual(90);
     expect(summary.visibility.confidenceRecoverySuccessRate).toBeGreaterThanOrEqual(80);
 
     const text = formatScenarioLibrarySummaryText(summary);
-    expect(text).toMatch(/Visibility \(12\)/);
+    expect(text).toMatch(/Visibility \(15\)/);
     expect(text).toMatch(/confidence recovery success/);
   });
 
   it("full library passes with visibility expansion", () => {
     const { failed, passed } = runCompanionValidationFramework();
     expect(failed).toBe(0);
-    expect(passed).toBeGreaterThanOrEqual(47);
+    expect(passed).toBeGreaterThanOrEqual(65);
   });
 });
