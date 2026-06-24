@@ -1,16 +1,19 @@
 /**
  * ADHD Business Ecosystem™ — Relationship phase registry.
- * Phases 1–7 are active product layers; 8–10 and 11 extend the roadmap.
+ * Phases 1–11 — highest qualifying phase wins (11 → 10 → 9 → 8 → 7 → … → 1).
  */
 
+import { isPhase8AutonomousPreparationActive } from "./autonomousPreparation";
+import { isPhase7BusinessIntelligenceEcosystemActive } from "./businessIntelligenceEcosystem";
+import { isPhase11EcosystemIntelligenceActive } from "./ecosystemIntelligence";
 import { isPhase1OnboardingComplete } from "./phase1Onboarding";
 import { isPhase2DiscoveryActive, getPhase2DiscoveryState } from "./phase2ProgressiveDiscovery";
 import { isPhase3AdaptiveRelationshipActive } from "./phase3AdaptiveRelationship";
 import { isPhase4BusinessOperatingPartnerActive } from "./phase4BusinessOperatingPartner";
 import { isPhase5CompanionIntelligenceEcosystemActive } from "./phase5CompanionIntelligenceEcosystem";
 import { isPhase6CompanionIntelligenceNetworkActive } from "./phase6CompanionIntelligenceNetwork";
-import { isPhase7BusinessIntelligenceEcosystemActive } from "./businessIntelligenceEcosystem";
-import { isPhase11EcosystemIntelligenceActive } from "./ecosystemIntelligence";
+import { isPhase10TransformationIntelligenceActive } from "./transformationIntelligence";
+import { isPhase9WisdomIntelligenceActive } from "./wisdomIntelligence";
 
 export type RelationshipPhaseId =
   | "phase_1_initial_trust"
@@ -99,7 +102,7 @@ export const RELATIONSHIP_PHASES: RelationshipPhaseMeta[] = [
     name: "Autonomous Preparation",
     tagline: "Prepare before the user asks.",
     milestone: "Work is ready when you arrive.",
-    status: "future",
+    status: "active",
   },
   {
     id: "phase_9_wisdom_intelligence",
@@ -107,15 +110,15 @@ export const RELATIONSHIP_PHASES: RelationshipPhaseMeta[] = [
     name: "Wisdom Intelligence",
     tagline: "Long-horizon wisdom.",
     milestone: "Wisdom over time.",
-    status: "future",
+    status: "active",
   },
   {
     id: "phase_10_legacy_transformation",
     number: 10,
     name: "Legacy & Transformation",
     tagline: "Transformation and legacy.",
-    milestone: "The business and founder transformed.",
-    status: "future",
+    milestone: "I've changed more than I realized.",
+    status: "active",
   },
   {
     id: "phase_11_ecosystem_intelligence",
@@ -133,6 +136,15 @@ export function getCurrentRelationshipPhase(): RelationshipPhaseMeta {
   }
   if (isPhase11EcosystemIntelligenceActive()) {
     return RELATIONSHIP_PHASES[10]!;
+  }
+  if (isPhase10TransformationIntelligenceActive()) {
+    return RELATIONSHIP_PHASES[9]!;
+  }
+  if (isPhase9WisdomIntelligenceActive()) {
+    return RELATIONSHIP_PHASES[8]!;
+  }
+  if (isPhase8AutonomousPreparationActive()) {
+    return RELATIONSHIP_PHASES[7]!;
   }
   if (isPhase7BusinessIntelligenceEcosystemActive()) {
     return RELATIONSHIP_PHASES[6]!;

@@ -107,10 +107,10 @@ Days and sessions are necessary but not sufficient. Phases require **observed si
 `getCurrentRelationshipPhase()` returns the **highest** qualifying phase:
 
 ```
-11 → 10 → 7 → 6 → 5 → 4 → 3 → 2 → 1
+11 → 10 → 9 → 8 → 7 → 6 → 5 → 4 → 3 → 2 → 1
 ```
 
-**Known gap:** Phases 8 and 9 are registered but **not consulted** by the resolver today. This is documented technical debt (Section 9).
+Phases 8 and 9 are consulted when activation gates are met. Highest qualifying phase wins. See `docs/adr/ADR-011-relationship-phase-resolver-order.md`.
 
 ---
 
@@ -141,8 +141,8 @@ Relationship phases span seven architectural layers. This mapping shows **where 
 | 5 | | | ● | ● | ● | ● | ● |
 | 6 | | | ● | ● | ● | ● | ● |
 | 7 | ● | | ● | ● | ● | ● | ● |
-| 8 | | | ● | ○ | ● | ○ | ○ |
-| 9 | | | ○ | ● | ○ | ○ | ● |
+| 8 | | | ● | ○ | ● | ● | ● |
+| 9 | | | ● | ● | ● | ● | ● |
 | 10 | ● | | ● | ● | ● | ● | ● |
 | 11 | ● | | ● | ● | ● | ● | ● |
 
@@ -175,7 +175,8 @@ Relationship phases span seven architectural layers. This mapping shows **where 
 | `lib/companionRelationshipPhases.ts` | Registry + `getCurrentRelationshipPhase()` |
 | `lib/phase1Onboarding.ts` … `lib/phase6CompanionIntelligenceNetwork.ts` | Per-phase `isPhaseNActive()` gates |
 | `lib/businessIntelligenceEcosystem.ts` | Phase 7 gate |
-| `lib/autonomousPreparation.ts` | Phase 8 gate (unwired to resolver) |
+| `lib/autonomousPreparation.ts` | Phase 8 gate |
+| `lib/wisdomIntelligence.ts` | Phase 9 gate |
 | `lib/transformationIntelligence.ts` | Phase 10 gate |
 | `lib/ecosystemIntelligence.ts` | Phase 11 gate |
 
@@ -233,7 +234,7 @@ From `lib/adaptiveCompanionArchitecture.ts` and `docs-companion-intelligence/23_
 | **Dual user intelligence** | Local profile vs server `userIntelligenceEngine` |
 | **Dual prediction** | `lib/predictive-support/` vs `lib/ecosystem/digitalTwin/` |
 | **Triple relationship memory** | `companion-relationship-memory`, `relationship-intelligence/`, founder memory graph |
-| **Phase 9 split** | Wisdom lives in Phase 5 module, not Phase 9 |
+| **Phase 9 split** | Resolved — dedicated `wisdomIntelligence.ts`; Phase 5 Wisdom Engine hidden when Phase 9 active |
 | **Resolver skip** | Phases 8–9 bypassed in `getCurrentRelationshipPhase()` |
 | **Governor gap** | `CompanionPageClient.tsx` orchestrates ~15 systems per turn; OS doc targets single governor |
 
@@ -353,8 +354,8 @@ Every `isPhaseN…Active()` function follows this structure:
 | 5 | Phase 4 + ≥90 days or ≥20 sessions |
 | 6 | Phase 5 + knowledge graph ≥4 nodes |
 | 7 | Phase 6 + business depth + business graph ≥3 nodes |
-| 8 | Phase 7 + ≥2 prepared kits (not in resolver) |
-| 9 | *No gate — reserved* |
+| 8 | Phase 7 + ≥2 prepared kits |
+| 9 | Phase 7 + history floor + patterns + wisdom evidence |
 | 10 | Phase 7 + ≥90 days + transformation snapshot thresholds |
 | 11 | Phase 7 + ≥4 life domains + ≥2 interconnection chains |
 
@@ -404,11 +405,8 @@ These belong in feature modules, Founder Ecosystem phases, or the Companion Oper
 
 ### Completing existing phases before adding new ones
 
-Priority debt (Section 9) must be resolved or explicitly ADR'd before Phase 12 consideration:
+Priority debt before Phase 12 consideration:
 
-- Wire Phase 8
-- Implement Phase 9 as dedicated module
-- Insert Phases 8–9 into resolver order
 - Reduce orchestration fragmentation (Governor)
 
 ---
@@ -427,16 +425,14 @@ Priority debt (Section 9) must be resolved or explicitly ADR'd before Phase 12 c
 ### ADR-002: Phase 8 — implemented but unwired
 
 - **Decision:** `lib/autonomousPreparation.ts` built with full test suite
-- **Status:** Accepted — wiring deferred
-- **Gap:** Not in `getCurrentRelationshipPhase()`, not in `CompanionPageClient.tsx`, not in Getting To Know You panel
-- **Registry:** `status: "future"` despite module existence
+- **Status:** **Superseded** by ADR-009 (2026-06-24) — wired to chat, panel, resolver
+- **See:** `docs/adr/ADR-009-wire-phase-8.md`
 
 ### ADR-003: Phase 9 — partially implemented
 
 - **Decision:** Wisdom Intelligence specified; no dedicated module created
-- **Status:** Accepted — partial implementation in Phase 5
-- **Gap:** `wisdomInsights` in `phase5CompanionIntelligenceEcosystem.ts`; no `isPhase9WisdomIntelligenceActive()`; no dedicated tests
-- **Registry:** `status: "future"`
+- **Status:** **Superseded** by ADR-010 (2026-06-24) — `lib/wisdomIntelligence.ts` created and wired
+- **See:** `docs/adr/ADR-010-phase-9-wisdom-module.md`
 
 ### ADR-004: Phase 10 — active
 
@@ -460,10 +456,21 @@ Priority debt (Section 9) must be resolved or explicitly ADR'd before Phase 12 c
 
 ### ADR-007: Resolver skips Phases 8 and 9
 
-- **Decision:** `getCurrentRelationshipPhase()` jumps 7 → 10 → 11
-- **Status:** Known technical debt
-- **Risk:** Users may qualify for Phase 8 capabilities without phase label; Phase 9 wisdom fires under Phase 5 gate
-- **Remediation:** Wire Phase 8 → implement Phase 9 → update resolver order: 11 → 10 → 9 → 8 → 7 → …
+- **Decision:** `getCurrentRelationshipPhase()` jumped 7 → 10 → 11
+- **Status:** **Superseded** by ADR-011 (2026-06-24) — resolver now 11 → 10 → 9 → 8 → 7 → …
+- **See:** `docs/adr/ADR-011-relationship-phase-resolver-order.md`
+
+### ADR-009: Wire Phase 8
+
+- **Status:** Accepted — see `docs/adr/ADR-009-wire-phase-8.md`
+
+### ADR-010: Phase 9 wisdom module
+
+- **Status:** Accepted — see `docs/adr/ADR-010-phase-9-wisdom-module.md`
+
+### ADR-011: Resolver order
+
+- **Status:** Accepted — see `docs/adr/ADR-011-relationship-phase-resolver-order.md`
 
 ### ADR-008: Documentation recovered from chat
 

@@ -636,17 +636,35 @@ import {
   recordNetworkReuseOfferShown,
 } from "@/lib/phase6CompanionIntelligenceNetwork";
 import {
+  maybeAutonomousPreparationOffer,
+  observeAutonomousPreparationTurn,
+  phase8AutonomousPreparationHintForChat,
+  recordPreparationOfferShown,
+} from "@/lib/autonomousPreparation";
+import {
   maybeBusinessIntelligenceInsight,
   observePhase7BusinessTurn,
   phase7BusinessIntelligenceHintForChat,
   recordBusinessIntelligenceInsightShown,
 } from "@/lib/businessIntelligenceEcosystem";
 import {
+  maybeWisdomReflection,
+  observeWisdomIntelligenceTurn,
+  phase9WisdomIntelligenceHintForChat,
+  recordWisdomReflectionShown,
+} from "@/lib/wisdomIntelligence";
+import {
   maybeEcosystemInsight,
   observeEcosystemIntelligenceTurn,
   phase11EcosystemIntelligenceHintForChat,
   recordEcosystemInsightShown,
 } from "@/lib/ecosystemIntelligence";
+import {
+  maybeTransformationReflection,
+  observeTransformationIntelligenceTurn,
+  phase10TransformationIntelligenceHintForChat,
+  recordTransformationReflectionShown,
+} from "@/lib/transformationIntelligence";
 import { relationshipPhaseSummaryForChat } from "@/lib/companionRelationshipPhases";
 import {
   createConversationWorkflow,
@@ -8383,6 +8401,9 @@ export default function CompanionPageClient() {
     let phase6ReuseOffer: string | null = null;
     let phase6DiscoveryOffer: string | null = null;
     let phase7BusinessInsight: string | null = null;
+    let phase8PreparationOffer: string | null = null;
+    let phase9WisdomReflection: string | null = null;
+    let phase10TransformationReflection: string | null = null;
     let phase11EcosystemInsight: string | null = null;
     if (isPhase1OnboardingComplete()) {
       observeFromConversationTurn({
@@ -8397,6 +8418,9 @@ export default function CompanionPageClient() {
       observePhase5EcosystemTurn({ userText: trimmed });
       observePhase6NetworkTurn({ userText: trimmed });
       observePhase7BusinessTurn({ userText: trimmed });
+      observeAutonomousPreparationTurn({ userText: trimmed });
+      observeWisdomIntelligenceTurn({ userText: trimmed });
+      observeTransformationIntelligenceTurn({ userText: trimmed });
       observeEcosystemIntelligenceTurn({ userText: trimmed });
       phase2TrustMoment = maybeTrustBuildingMoment();
       if (phase2TrustMoment) recordTrustBuildingMomentShown();
@@ -8417,6 +8441,12 @@ export default function CompanionPageClient() {
         messages: toChatTurns(nextMessages),
       });
       if (phase7BusinessInsight) recordBusinessIntelligenceInsightShown();
+      phase8PreparationOffer = maybeAutonomousPreparationOffer({ userText: trimmed });
+      if (phase8PreparationOffer) recordPreparationOfferShown();
+      phase9WisdomReflection = maybeWisdomReflection({ userText: trimmed });
+      if (phase9WisdomReflection) recordWisdomReflectionShown();
+      phase10TransformationReflection = maybeTransformationReflection({ userText: trimmed });
+      if (phase10TransformationReflection) recordTransformationReflectionShown();
       phase11EcosystemInsight = maybeEcosystemInsight({ userText: trimmed });
       if (phase11EcosystemInsight) recordEcosystemInsightShown();
     }
@@ -10180,6 +10210,18 @@ export default function CompanionPageClient() {
                   insight: phase7BusinessInsight,
                   userText: trimmed,
                   messages: toChatTurns(nextMessages),
+                }),
+                phase8AutonomousPreparationHintForChat({
+                  preparationOffer: phase8PreparationOffer,
+                  userText: trimmed,
+                }),
+                phase9WisdomIntelligenceHintForChat({
+                  reflection: phase9WisdomReflection,
+                  userText: trimmed,
+                }),
+                phase10TransformationIntelligenceHintForChat({
+                  reflection: phase10TransformationReflection,
+                  userText: trimmed,
                 }),
                 phase11EcosystemIntelligenceHintForChat({
                   insight: phase11EcosystemInsight,

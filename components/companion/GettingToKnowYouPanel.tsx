@@ -53,9 +53,21 @@ import {
   isPhase7BusinessIntelligenceEcosystemActive,
 } from "@/lib/businessIntelligenceEcosystem";
 import {
+  formatPreparedWorkspaceForPanel,
+  isPhase8AutonomousPreparationActive,
+} from "@/lib/autonomousPreparation";
+import {
+  formatWisdomIntelligenceForPanel,
+  isPhase9WisdomIntelligenceActive,
+} from "@/lib/wisdomIntelligence";
+import {
   formatEcosystemIntelligenceForPanel,
   isPhase11EcosystemIntelligenceActive,
 } from "@/lib/ecosystemIntelligence";
+import {
+  formatTransformationIntelligenceForPanel,
+  isPhase10TransformationIntelligenceActive,
+} from "@/lib/transformationIntelligence";
 
 function ManualSection({
   title,
@@ -126,7 +138,10 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
     window.addEventListener("companion-phase5-ecosystem-updated", fn);
     window.addEventListener("companion-phase6-network-updated", fn);
     window.addEventListener("companion-phase7-business-intelligence-updated", fn);
+    window.addEventListener("companion-phase8-preparation-updated", fn);
+    window.addEventListener("companion-phase9-wisdom-updated", fn);
     window.addEventListener("companion-phase11-ecosystem-updated", fn);
+    window.addEventListener("companion-phase10-transformation-updated", fn);
     return () => {
       window.removeEventListener("companion-discovery-updated", fn);
       window.removeEventListener("companion-phase2-discovery-updated", fn);
@@ -135,7 +150,10 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
       window.removeEventListener("companion-phase5-ecosystem-updated", fn);
       window.removeEventListener("companion-phase6-network-updated", fn);
       window.removeEventListener("companion-phase7-business-intelligence-updated", fn);
+      window.removeEventListener("companion-phase8-preparation-updated", fn);
+      window.removeEventListener("companion-phase9-wisdom-updated", fn);
       window.removeEventListener("companion-phase11-ecosystem-updated", fn);
+      window.removeEventListener("companion-phase10-transformation-updated", fn);
     };
   }, []);
 
@@ -158,6 +176,9 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
   const phase5Active = isPhase5CompanionIntelligenceEcosystemActive();
   const phase6Active = isPhase6CompanionIntelligenceNetworkActive();
   const phase7Active = isPhase7BusinessIntelligenceEcosystemActive();
+  const phase8Active = isPhase8AutonomousPreparationActive();
+  const phase9Active = isPhase9WisdomIntelligenceActive();
+  const phase10Active = isPhase10TransformationIntelligenceActive();
   const phase11Active = isPhase11EcosystemIntelligenceActive();
   const phase5State = phase5Active ? getPhase5EcosystemState() : null;
   const businessStage = phase5State?.businessStage ?? phase1Profile.businessStage;
@@ -290,12 +311,14 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
           <ManualSection title="Personal Operating Manual™">
             <PanelMarkdown text={formatPersonalOperatingManualForDisplay()} />
           </ManualSection>
-          <ManualSection title="Wisdom Engine™">
-            <p className="text-sm text-[#6b635a]">
-              Personal insights only — specific to you, not generic advice.
-            </p>
-            <PanelMarkdown text={formatWisdomEngineForDisplay()} />
-          </ManualSection>
+          {!phase9Active ? (
+            <ManualSection title="Wisdom Engine™">
+              <p className="text-sm text-[#6b635a]">
+                Personal insights only — specific to you, not generic advice.
+              </p>
+              <PanelMarkdown text={formatWisdomEngineForDisplay()} />
+            </ManualSection>
+          ) : null}
           <ManualSection title="What We've Built Together">
             <PanelMarkdown text={formatWhatWeveBuiltTogetherForDisplay()} />
             <div className="mt-4 border-t border-[#e7dfd4] pt-3">
@@ -320,6 +343,33 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
             How your business grows, struggles, and where focus matters most — in plain language.
           </p>
           <PanelMarkdown text={formatBusinessIntelligenceForPanel()} />
+        </ManualSection>
+      ) : null}
+
+      {phase8Active ? (
+        <ManualSection title="Prepared For You">
+          <p className="text-sm text-[#6b635a]">
+            Resources gathered before you ask — you decide what to use.
+          </p>
+          <PanelMarkdown text={formatPreparedWorkspaceForPanel()} />
+        </ManualSection>
+      ) : null}
+
+      {phase9Active ? (
+        <ManualSection title="Personal Wisdom">
+          <p className="text-sm text-[#6b635a]">
+            What you&apos;ve learned works for you — earned from experience, not theory.
+          </p>
+          <PanelMarkdown text={formatWisdomIntelligenceForPanel()} />
+        </ManualSection>
+      ) : null}
+
+      {phase10Active ? (
+        <ManualSection title="Legacy & Transformation Intelligence™">
+          <p className="text-sm text-[#6b635a]">
+            Who you were, who you&apos;re becoming — growth, legacy, and evidence of change.
+          </p>
+          <PanelMarkdown text={formatTransformationIntelligenceForPanel()} />
         </ManualSection>
       ) : null}
 

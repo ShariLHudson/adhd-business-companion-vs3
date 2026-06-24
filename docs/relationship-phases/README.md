@@ -41,7 +41,7 @@ The codebase contains **two independent phase numbering systems**. They must not
 | 6 | `lib/phase6CompanionIntelligenceNetwork.ts` | `lib/phase6CompanionIntelligenceNetwork.test.ts` |
 | 7 | `lib/businessIntelligenceEcosystem.ts` | `lib/BusinessIntelligenceValidation.test.ts` |
 | 8 | `lib/autonomousPreparation.ts` | `lib/AutonomousPreparationValidation.test.ts` |
-| 9 | *No dedicated module* — partial in Phase 5 | *No dedicated test file* |
+| 9 | `lib/wisdomIntelligence.ts` | `lib/WisdomIntelligenceValidation.test.ts` |
 | 10 | `lib/transformationIntelligence.ts` | `lib/TransformationIntelligenceValidation.test.ts` |
 | 11 | `lib/ecosystemIntelligence.ts` | `lib/EcosystemIntelligenceValidation.test.ts` |
 
@@ -71,25 +71,23 @@ The codebase contains **two independent phase numbering systems**. They must not
 | 5 | active | Yes | Yes | Yes | Yes |
 | 6 | active | Yes | Yes | Yes | Yes |
 | 7 | active | Yes | Yes | Yes | Yes |
-| 8 | **future** | Yes | **No** | **No** | **No** |
-| 9 | **future** | **Partial** | **No** | Partial (via Phase 5 Wisdom Engine) | **No** |
+| 8 | active | Yes | Yes | Yes | Yes |
+| 9 | active | Yes | Yes | Yes | Yes |
 | 10 | active | Yes | Yes | Yes | Yes |
 | 11 | active | Yes | Yes | Yes | Yes |
 
-**Important:** `getCurrentRelationshipPhase()` resolves 11 → 10 → 7 → 6 → 5 → 4 → 3 → 2 → 1. Phases **8 and 9 are not consulted** by the resolver today, even though Phase 8 has a full module.
+**Resolver:** `getCurrentRelationshipPhase()` evaluates **11 → 10 → 9 → 8 → 7 → 6 → 5 → 4 → 3 → 2 → 1** (highest qualifying phase wins).
 
 ---
 
 ## Future recommended build order
 
-Based on registry dependencies and current wiring gaps (not new feature invention):
+Based on registry dependencies and current wiring gaps:
 
-1. **Stabilize navigation and Phase 1 onboarding** — Phase 1 guards affect workspace routing; documented in `HANDOFF.md` and prior implementation notes.
-2. **Complete Phase 10** — validate tests, ensure production build.
-3. **Wire Phase 8** — module and tests exist; add chat hints, panel section, resolver integration.
-4. **Implement Phase 9 as dedicated module** — elevate Wisdom Engine out of Phase 5 stub per original specification (reserved).
-5. **Validate Phase 11** — module largely complete; QA cross-domain insights.
-6. **Founder Ecosystem phases** — only after relationship-phase chat integration is stable; separate track under `lib/ecosystem/`.
+1. **Stabilize navigation and Phase 1 onboarding** — Phase 1 guards affect workspace routing.
+2. **Validate Phases 8–11 in production** — wiring complete; QA cross-domain insights and preparation offers.
+3. **Reduce orchestration fragmentation** — Companion Governor single entry (see Constitution).
+4. **Founder Ecosystem phases** — separate track under `lib/ecosystem/`; do not merge with relationship phases.
 
 ---
 

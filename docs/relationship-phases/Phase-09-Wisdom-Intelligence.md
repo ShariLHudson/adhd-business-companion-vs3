@@ -1,10 +1,11 @@
 # Phase 9 — Wisdom Intelligence
 
 **Registry ID:** `phase_9_wisdom_intelligence`  
-**Dedicated module:** **Not found**  
-**Partial implementation:** `lib/phase5CompanionIntelligenceEcosystem.ts` (Wisdom Engine™)  
-**Registry status:** `future`  
-**Implementation status:** Partial only — no activation gate, no chat wiring, not in phase resolver
+**Dedicated module:** `lib/wisdomIntelligence.ts`  
+**Storage key:** `companion-phase9-wisdom-intelligence-v1`  
+**Partial legacy:** `lib/phase5CompanionIntelligenceEcosystem.ts` (Wisdom Engine™ — hidden when Phase 9 active)  
+**Registry status:** `active`  
+**Implementation status:** Dedicated module wired — chat, panel, resolver, tests
 
 ---
 
@@ -21,7 +22,9 @@ Long-horizon wisdom — what has **actually worked for this person**, not generi
 Registry tagline: *"Long-horizon wisdom."*  
 Registry milestone: *"Wisdom over time."*
 
-Original specification (recovered from chat, not in repo): transform conversations, decisions, projects, strategies, successes, failures, and patterns into **practical personal wisdom**.
+Turns repeated experience into earned insight: lessons learned, repeated patterns, avoided traps, future-self guidance, hard-won strengths, recurring business/life wisdom.
+
+Tone: practical and human — not mystical, preachy, clinical, or generic.
 
 ---
 
@@ -33,104 +36,94 @@ The user should feel:
 - The companion learns what repeatedly helps *them*
 - Wisdom accumulates quietly over months/years
 
-**Current panel behavior:** When Phase 5 is active, Getting To Know You shows **Wisdom Engine™** via `formatWisdomEngineForDisplay()` — personal insights from `wisdomInsights[]`.
+**Panel:** Getting To Know You shows **Personal Wisdom** via `formatWisdomIntelligenceForPanel()` when Phase 9 is active. Phase 5 Wisdom Engine™ is suppressed when Phase 9 is active.
 
 ---
 
 ## Intelligence Goal
 
-Develop a **wisdom layer** distinct from memory and analytics — actionable lessons with evidence levels.
-
-**Reserved for future specification:** dedicated `wisdomIntelligence.ts` module and `isPhase9WisdomIntelligenceActive()` gate.
+Develop a **wisdom layer** distinct from memory and analytics — actionable lessons with evidence levels and conservative activation.
 
 ---
 
 ## Activation Requirements
 
-| Item | Status |
-|------|--------|
-| `isPhase9WisdomIntelligenceActive()` | **Not found in codebase** |
-| Registry | `status: "future"` |
-| Phase resolver | **Not consulted** |
+`isPhase9WisdomIntelligenceActive(now)` requires **all**:
 
-**Recovered from implementation behavior:** Wisdom insights are recorded when Phase 5 is active via `observePhase5EcosystemTurn()` — not gated on a Phase 9 flag.
+1. Phase 7 active
+2. Meaningful relationship history: ≥60 days **or** ≥15 sessions
+3. ≥2 strong patterns (`countStrongPatterns`)
+4. ≥3 wisdom items with ≥1 at `growing` or `strong` confidence
+
+No activation from a single conversation. Weak evidence returns inactive.
+
+**Resolver:** Consulted in `getCurrentRelationshipPhase()` after Phase 10 and before Phase 8.
 
 ---
 
 ## Companion Behaviors
 
-*Partial — via Phase 5 module today.*
+| Function | Behavior |
+|----------|----------|
+| `isPhase9WisdomIntelligenceActive()` | Conservative activation gate |
+| `observeWisdomIntelligenceTurn()` | Record lessons, traps, patterns from user text |
+| `maybeWisdomReflection()` | Permission-based chat reflection |
+| `recordWisdomReflectionShown()` | Cooldown tracking |
+| `phase9WisdomIntelligenceHintForChat()` | Internal chat hint block |
+| `buildWisdomIntelligenceSummary()` | Snapshot builder |
+| `formatWisdomIntelligenceForPanel()` | Panel display |
 
-| Behavior | Source |
-|----------|--------|
-| Record wisdom from interventions | `recordWisdomFromInterventions()` |
-| Record lesson patterns from user text | `observePhase5EcosystemTurn()` |
-| Display wisdom list | `formatWisdomEngineForDisplay()` |
-| Wisdom insight types | `source: "pattern" \| "intervention" \| "outcome" \| "lesson"` |
-| Confidence levels | `early` \| `growing` \| `strong` |
+Reflection cooldown: `REFLECTION_COOLDOWN_MS` (5 days).
 
-**Not implemented:** dedicated chat hints, dedicated panel gate, phase-specific observation loop.
+**Wiring:** `CompanionPageClient.tsx` — observe turn, maybe reflection, record shown, chat hint (after Phase 8, before Phase 10).
 
 ---
 
 ## Intelligence Collected
 
-`WisdomInsight` (in Phase 5 state):
+`WisdomItem` kinds: `lesson_learned`, `repeated_pattern`, `avoided_trap`, `future_self`, `hard_won_strength`, `recurring_advice`
 
-```typescript
-{
-  text: string;
-  source: "pattern" | "intervention" | "outcome" | "lesson";
-  confidence: "early" | "growing" | "strong";
-  recordedAt: string;
-}
-```
+Confidence: `early` | `growing` | `strong`
 
-Stored in `Phase5EcosystemState.wisdomInsights` (max ~25 entries, recovered from implementation).
+Merges Phase 5 `wisdomInsights`, intervention effectiveness, and pattern wisdom.
 
 ---
 
 ## Outputs
 
-- Wisdom Engine™ panel section (when Phase 5 active)
-- `founderMetrics.wisdomInsightsRecorded` counter
-
-**Reserved for future specification:**
-
-- Standalone wisdom snapshot builder
-- Chat reflections citing wisdom with evidence
-- Validation test suite (`WisdomIntelligenceValidation.test.ts`)
+- Personal Wisdom panel section
+- Permission-based chat reflections
+- Validation: `lib/WisdomIntelligenceValidation.test.ts`
+- Resolver test: `lib/companionRelationshipPhases.test.ts`
 
 ---
 
 ## Example Conversations
 
-*Recovered from implementation behavior (Phase 5 wisdom recording).*
+**Lesson reflection**
 
-**Lesson capture**
+> **Shari:** You've learned that pushing harder usually backfires when your energy is low. (Only if that still fits — correct me if not.)
 
-> **User:** I learned that batching content on Sunday mornings actually works for me — I shipped three posts.  
-> *(Wisdom entry with source `lesson`, confidence `early`.)*
+**Pattern wisdom**
 
-**Pattern-based wisdom**
+> **Shari:** A pattern I've noticed is that clarity comes after you talk it out, not before.
 
-> *(After repeated visibility wins — wisdom entry from pattern with confidence `growing`.)*
+**Past experience**
 
-**Panel display**
-
-> ## Wisdom Engine™  
-> _Personal wisdom — specific to you, not generic advice._  
-> • Short focused sessions beat long planning blocks for you.  
-> • Decision Compass helped when options felt equal-weighted.
+> **Shari:** This sounds like one of those moments where your past experience may already have the answer.
 
 ---
 
-## Future Expansion Opportunities
+## Avoid in user-facing copy
 
-Reserved for future specification (from original Phase 9 prompt, not yet implemented):
+- "As your Wisdom Intelligence…"
+- "Phase 9 says…"
+- "Based on your intelligence layer…"
+- "You always…" / "You never…"
 
-- Create `lib/wisdomIntelligence.ts` with dedicated state and activation
-- Wisdom validation framework (accuracy, evidence requirements)
-- Wire chat hints and phase resolver between Phase 8 and Phase 10
-- Elevate wisdom out of Phase 5 to avoid conflating ecosystem growth with wisdom maturity
-- Integration with `lib/companionInterventionLearning.ts` outcome attribution
+---
+
+## Architecture
+
+- **ADR:** `docs/adr/ADR-010-phase-9-wisdom-module.md`
+- **Resolver order:** `docs/adr/ADR-011-relationship-phase-resolver-order.md`

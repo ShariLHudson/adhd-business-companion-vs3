@@ -120,10 +120,12 @@ The relationship phases model how the companion **learns, adapts, and deepens tr
 | **Purpose** | Prepare before the user asks — user remains in control. |
 | **Primary outcome** | Milestone: *"Work is ready when you arrive."* |
 | **Activation** | Phase 7 active; ≥2 prepared kits with readiness ≠ `emerging`. |
-| **Status** | `future` (registry) — **module implemented, not wired to chat/resolver** |
+| **Status** | `active` |
 | **Dependencies** | Phase 7 |
 | **Intelligence evolution** | Preparation kits (conversation, decision, launch, content, sales, re-entry, opportunity); business readiness. |
 | **Module** | `lib/autonomousPreparation.ts` |
+| **UI** | Chat hints, "Prepared For You" panel section |
+| **Tests** | `AutonomousPreparationValidation.test.ts`, `companionRelationshipPhases.test.ts` |
 
 ---
 
@@ -133,11 +135,13 @@ The relationship phases model how the companion **learns, adapts, and deepens tr
 |-------|--------|
 | **Purpose** | Long-horizon wisdom — what actually works for this person. |
 | **Primary outcome** | Milestone: *"Wisdom over time."* |
-| **Activation** | **Reserved for future specification** — no `isPhase9WisdomIntelligenceActive()` in codebase. |
-| **Status** | `future` |
-| **Dependencies** | Intended after Phase 8 (per original chat specification); not enforced in code. |
-| **Intelligence evolution** | Partial: `WisdomInsight` records in Phase 5 (`wisdomInsights`, `formatWisdomEngineForDisplay`). |
-| **Module** | **Not found** — recovered behavior lives in `lib/phase5CompanionIntelligenceEcosystem.ts` |
+| **Activation** | Phase 7 active; ≥60 days or ≥15 sessions; ≥2 strong patterns; ≥3 wisdom items (≥1 growing+). |
+| **Status** | `active` |
+| **Dependencies** | Phase 7 (narrative after Phase 8 in roadmap; resolver checks 9 before 8) |
+| **Intelligence evolution** | Lessons, patterns, traps, future-self guidance, hard-won strengths; merges Phase 5 wisdom signals. |
+| **Module** | `lib/wisdomIntelligence.ts` |
+| **UI** | Chat hints, "Personal Wisdom" panel section |
+| **Tests** | `WisdomIntelligenceValidation.test.ts`, `companionRelationshipPhases.test.ts` |
 
 ---
 
@@ -174,11 +178,13 @@ The relationship phases model how the companion **learns, adapts, and deepens tr
 `getCurrentRelationshipPhase()` evaluates **highest applicable phase first**:
 
 ```
-11 (Ecosystem) → 10 (Transformation) → 7 (Business) → 6 (Network) → 5 (Ecosystem companion)
-→ 4 (Operating Partner) → 3 (Adaptive) → 2 (Discovery) → 1 (Initial Trust)
+11 (Ecosystem) → 10 (Transformation) → 9 (Wisdom) → 8 (Autonomous Preparation)
+→ 7 (Business) → 6 (Network) → 5 (Companion Ecosystem) → 4 → 3 → 2 → 1
 ```
 
-Phases **8 and 9 are omitted** from resolution today.
+When multiple phases qualify, the **highest** number wins (e.g. Phase 11 supersedes Phase 10). Narrative roadmap order is 1–11; resolver reflects maturity ceiling, not chronological step.
+
+**ADR:** `docs/adr/ADR-011-relationship-phase-resolver-order.md`
 
 ---
 

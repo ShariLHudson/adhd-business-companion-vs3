@@ -55,7 +55,7 @@ Build a **transformation intelligence snapshot** comparing origin state to curre
    - ≥**1** emerging strength
    - ≥**1** business legacy item
 
-**Note:** Phase resolver checks Phase 10 **before** Phase 7 display when both qualify — Phase 11 supersedes Phase 10.
+**Note:** Phase resolver checks highest qualifying phase first: 11 → 10 → 9 → 8 → 7 → …. Phase 11 supersedes Phase 10 when both qualify.
 
 ---
 
