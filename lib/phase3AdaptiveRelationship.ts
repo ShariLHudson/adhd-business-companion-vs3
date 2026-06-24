@@ -406,10 +406,65 @@ export function markCheckpointShown(mark: 30 | 60 | 90): void {
   });
 }
 
+export function buildCompanionLearningObservations(): string[] {
+  const p3 = readState();
+  const p2 = getPhase2DiscoveryState();
+  const observations: string[] = [];
+
+  for (const pattern of p3.predictivePatterns.filter((p) => p.count >= 2).slice(0, 3)) {
+    observations.push(`You often gain momentum after ${pattern.label.toLowerCase()}.`);
+  }
+  if (p2.learningStyle.primary === "visual" || p2.learningStyle.secondary === "visual") {
+    observations.push("You tend to make faster decisions when using visual tools.");
+  }
+  const compass = p2.resources.find((r) => r.id === "decision_compass" && r.helpfulScore >= 50);
+  if (compass) {
+    observations.push("Decision mapping seems to reduce overwhelm for you.");
+  }
+  if (p2.challenges.some((c) => /visibility/i.test(c.label))) {
+    observations.push("Visibility feels easier when connected to helping others.");
+  }
+
+  return [...new Set(observations)].slice(0, 4);
+}
+
+export function formatMyOperatingManualForPanel(
+  manual = buildUserOperatingManual(),
+): string {
+  const momentum = manual.bestResources.length
+    ? manual.bestResources
+    : manual.supportStyles;
+  const lines = [
+    "## My Operating Manual™",
+    "",
+    "_The companion already knows you — this is your living guide._",
+    "",
+    "### How I Work Best",
+    manual.supportStyles[0] ?? "Still learning — every conversation adds detail.",
+    "",
+    "### What Creates Momentum",
+    ...momentum.map((item) => `• ${item}`),
+    "",
+    "### What Creates Friction",
+    ...(manual.frictionPatterns.length
+      ? manual.frictionPatterns.map((f) => `• ${f}`)
+      : ["• Still emerging from our work together"]),
+    "",
+    "### Best Resources For Me",
+    ...(manual.bestResources.length
+      ? manual.bestResources.map((r) => `• ${r}`)
+      : ["• Still learning which tools help most"]),
+    "",
+    "### What The Companion Is Learning",
+    ...buildCompanionLearningObservations().map((o) => `• ${o}`),
+  ];
+  return lines.join("\n");
+}
+
 export function formatUserOperatingManualForDisplay(
   manual = buildUserOperatingManual(),
 ): string {
-  const lines = ["## User Operating Manual™", "", "_Continuously evolving — not a form you filled out._"];
+  const lines = ["## My Operating Manual™", "", "_Continuously evolving — not a form you filled out._"];
   if (manual.businessProfile.type || manual.businessProfile.primaryGoal) {
     lines.push("", "### Business Profile");
     if (manual.businessProfile.type) lines.push(`Business Type: ${manual.businessProfile.type}`);
@@ -433,12 +488,7 @@ export function formatUserOperatingManualForDisplay(
     lines.push("", "### Most Effective Support Style", ...manual.supportStyles);
   }
   if (manual.bestTimeToWork) {
-    lines.push(
-      "",
-      "### Best Time To Work",
-      manual.bestTimeToWork.window,
-      `Confidence: ${manual.bestTimeToWork.confidence}`,
-    );
+    lines.push("", "### Best Time To Work", manual.bestTimeToWork.window);
   }
   if (manual.frictionPatterns.length) {
     lines.push(

@@ -7,6 +7,7 @@ import { isPhase1OnboardingComplete } from "./phase1Onboarding";
 import { isPhase2DiscoveryActive, getPhase2DiscoveryState } from "./phase2ProgressiveDiscovery";
 import { isPhase3AdaptiveRelationshipActive } from "./phase3AdaptiveRelationship";
 import { isPhase4BusinessOperatingPartnerActive } from "./phase4BusinessOperatingPartner";
+import { isPhase5CompanionIntelligenceEcosystemActive } from "./phase5CompanionIntelligenceEcosystem";
 
 export type RelationshipPhaseId =
   | "phase_1_initial_trust"
@@ -117,6 +118,9 @@ export const RELATIONSHIP_PHASES: RelationshipPhaseMeta[] = [
 export function getCurrentRelationshipPhase(): RelationshipPhaseMeta {
   if (!isPhase1OnboardingComplete()) {
     return RELATIONSHIP_PHASES[0]!;
+  }
+  if (isPhase5CompanionIntelligenceEcosystemActive()) {
+    return RELATIONSHIP_PHASES[4]!;
   }
   if (isPhase4BusinessOperatingPartnerActive()) {
     return RELATIONSHIP_PHASES[3]!;

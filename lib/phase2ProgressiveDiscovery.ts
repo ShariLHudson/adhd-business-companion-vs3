@@ -710,6 +710,46 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
+export function formatWhatIveLearnedForPanel(
+  profile = buildWhatIveLearnedProfile(),
+): string {
+  const lines: string[] = ["### What I've Learned So Far"];
+  if (profile.business.type) lines.push("", `**Business:** ${profile.business.type}`);
+  if (profile.challenges[0]) lines.push(`**Current Challenge:** ${profile.challenges[0]}`);
+  if (profile.business.currentGoal) lines.push(`**Current Goal:** ${profile.business.currentGoal}`);
+  return lines.join("\n");
+}
+
+export function formatPhase2DiscoveryForPanel(
+  profile = buildWhatIveLearnedProfile(),
+  phaseLabel: string,
+): string {
+  const harder = profile.challenges.slice(1);
+  return [
+    "### Relationship Phase",
+    phaseLabel,
+    "",
+    "### Goals",
+    profile.business.currentGoal ? `• ${profile.business.currentGoal}` : "• Still emerging",
+    "",
+    "### Challenges",
+    ...profile.challenges.map((c) => `• ${c}`),
+    "",
+    "### Resources Helping Most",
+    ...(profile.helpfulResources.length
+      ? profile.helpfulResources.map((r) => `• ${r}`)
+      : ["• Still learning"]),
+    "",
+    "### Strengths I'm Noticing",
+    ...(profile.strengths.length
+      ? profile.strengths.map((s) => `• ${s}`)
+      : ["• Still emerging"]),
+    "",
+    "### Things That Seem Harder",
+    ...(harder.length ? harder.map((c) => `• ${c}`) : ["• Still emerging"]),
+  ].join("\n");
+}
+
 export function formatWhatIveLearnedForDisplay(
   profile = buildWhatIveLearnedProfile(),
 ): string {
@@ -737,12 +777,7 @@ export function formatWhatIveLearnedForDisplay(
       ...profile.helpfulResources.map((r) => `• ${r}`),
     );
   }
-  lines.push(
-    "",
-    "### Work Style",
-    `${profile.workStyle}`,
-    `Confidence: ${capitalize(profile.workStyleConfidence)}`,
-  );
+  lines.push("", "### Work Style", `${profile.workStyle}`);
   return lines.join("\n");
 }
 

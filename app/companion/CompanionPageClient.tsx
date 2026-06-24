@@ -616,9 +616,16 @@ import {
 } from "@/lib/phase3AdaptiveRelationship";
 import {
   observePhase4BusinessTurn,
+  maybeProactiveBusinessSupport,
   phase4BusinessOperatingPartnerHintForChat,
   recordProactiveBusinessOfferShown,
 } from "@/lib/phase4BusinessOperatingPartner";
+import {
+  maybePredictiveOpportunityOffer,
+  observePhase5EcosystemTurn,
+  phase5CompanionIntelligenceEcosystemHintForChat,
+  recordOpportunityOfferShown,
+} from "@/lib/phase5CompanionIntelligenceEcosystem";
 import { relationshipPhaseSummaryForChat } from "@/lib/companionRelationshipPhases";
 import {
   createConversationWorkflow,
@@ -8347,6 +8354,7 @@ export default function CompanionPageClient() {
     let phase3AwarenessMoment: string | null = null;
     let phase3AnticipatorySupport: string | null = null;
     let phase4ProactiveSupport: string | null = null;
+    let phase5OpportunityOffer: string | null = null;
     if (isPhase1OnboardingComplete()) {
       observeFromConversationTurn({
         userText: trimmed,
@@ -8357,6 +8365,7 @@ export default function CompanionPageClient() {
         userText: trimmed,
         resourceUsed: resourcePreferenceFromAppSection(workspacePanel) ?? undefined,
       });
+      observePhase5EcosystemTurn({ userText: trimmed });
       phase2TrustMoment = maybeTrustBuildingMoment();
       if (phase2TrustMoment) recordTrustBuildingMomentShown();
       phase3AwarenessMoment = maybeCompanionAwarenessMoment();
@@ -8365,6 +8374,8 @@ export default function CompanionPageClient() {
       if (phase3AnticipatorySupport) recordAnticipatoryOfferShown();
       phase4ProactiveSupport = maybeProactiveBusinessSupport({ userText: trimmed });
       if (phase4ProactiveSupport) recordProactiveBusinessOfferShown();
+      phase5OpportunityOffer = maybePredictiveOpportunityOffer();
+      if (phase5OpportunityOffer) recordOpportunityOfferShown();
     }
 
     let compassSessionForApi = decisionCompassSession;
@@ -10110,6 +10121,10 @@ export default function CompanionPageClient() {
                 }),
                 phase4BusinessOperatingPartnerHintForChat({
                   proactiveSupport: phase4ProactiveSupport,
+                  userText: trimmed,
+                }),
+                phase5CompanionIntelligenceEcosystemHintForChat({
+                  opportunityOffer: phase5OpportunityOffer,
                   userText: trimmed,
                 }),
                 sprint5.trustHint,

@@ -12,31 +12,93 @@ import {
   enableDiscovery,
   enableDiscoverySection,
   getDiscoveryStore,
-  getQuestion,
   isSectionDisabled,
   restartDiscovery,
   updateDiscoveryAnswer,
   type DiscoveryQuestionId,
   type DiscoverySectionId,
 } from "@/lib/companionDiscovery";
+import { getCurrentRelationshipPhase } from "@/lib/companionRelationshipPhases";
+import { getPhase1OnboardingState } from "@/lib/phase1Onboarding";
 import {
   buildWhatIveLearnedProfile,
-  formatWhatIveLearnedForDisplay,
+  formatPhase2DiscoveryForPanel,
+  formatWhatIveLearnedForPanel,
   getPhase2DiscoveryState,
   isPhase2DiscoveryActive,
   MILESTONE_LABELS,
 } from "@/lib/phase2ProgressiveDiscovery";
 import {
-  formatUserOperatingManualForDisplay,
+  formatMyOperatingManualForPanel,
   isPhase3AdaptiveRelationshipActive,
 } from "@/lib/phase3AdaptiveRelationship";
 import {
-  buildBusinessHealthDashboard,
-  formatBusinessHealthForDisplay,
-  formatBusinessOperatingManualForDisplay,
+  formatBusinessOperatingManualForPanel,
   isPhase4BusinessOperatingPartnerActive,
 } from "@/lib/phase4BusinessOperatingPartner";
-import { getCurrentRelationshipPhase } from "@/lib/companionRelationshipPhases";
+import {
+  formatLegacyIntelligenceForDisplay,
+  formatPersonalOperatingManualForDisplay,
+  formatWhatWeveBuiltTogetherForDisplay,
+  formatWisdomEngineForDisplay,
+  getPhase5EcosystemState,
+  isPhase5CompanionIntelligenceEcosystemActive,
+} from "@/lib/phase5CompanionIntelligenceEcosystem";
+
+function ManualSection({
+  title,
+  children,
+  onAccurate,
+  onUpdate,
+  showCorrection,
+}: {
+  title: string;
+  children: React.ReactNode;
+  onAccurate?: () => void;
+  onUpdate?: () => void;
+  showCorrection?: boolean;
+}) {
+  const [updateHint, setUpdateHint] = useState(false);
+  return (
+    <div className="mt-6 overflow-hidden rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-4">
+      <p className="text-base font-semibold text-[#1f1c19]">{title}</p>
+      <div className="mt-3 font-sans text-sm text-[#3d3630]">{children}</div>
+      {showCorrection !== false ? (
+        <div className="mt-4 border-t border-[#e7dfd4] pt-3">
+          {updateHint ? (
+            <p className="text-sm text-[#6b635a]">
+              Tell me in chat what to adjust — I&apos;ll refine this over time.
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-3 text-xs font-semibold">
+              <button
+                type="button"
+                onClick={onAccurate}
+                className="rounded-lg border border-[#b8d4d4] px-3 py-1.5 text-[#1e4f4f]"
+              >
+                That&apos;s accurate
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setUpdateHint(true);
+                  onUpdate?.();
+                }}
+                className="text-[#6b635a] underline"
+              >
+                Update this
+              </button>
+            </div>
+          )}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function PanelMarkdown({ text }: { text: string }) {
+  return <pre className="whitespace-pre-wrap font-sans text-sm text-[#3d3630]">{text}</pre>;
+}
 
 export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
   const [tick, setTick] = useState(0);
@@ -49,28 +111,35 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
     window.addEventListener("companion-phase2-discovery-updated", fn);
     window.addEventListener("companion-phase3-relationship-updated", fn);
     window.addEventListener("companion-phase4-partner-updated", fn);
+    window.addEventListener("companion-phase5-ecosystem-updated", fn);
     return () => {
       window.removeEventListener("companion-discovery-updated", fn);
       window.removeEventListener("companion-phase2-discovery-updated", fn);
       window.removeEventListener("companion-phase3-relationship-updated", fn);
       window.removeEventListener("companion-phase4-partner-updated", fn);
+      window.removeEventListener("companion-phase5-ecosystem-updated", fn);
     };
   }, []);
 
   const store = getDiscoveryStore();
   const progress = discoveryProgressSummary();
   const sections = Object.keys(DISCOVERY_SECTION_LABELS) as DiscoverySectionId[];
+  const relationshipPhase = getCurrentRelationshipPhase();
+  const phaseNumber = relationshipPhase.number;
+  const panelTitle = phaseNumber >= 3 ? "My Operating Manual™" : "Getting To Know You™";
+  const phase1Profile = getPhase1OnboardingState().profile;
   const phase2Active = isPhase2DiscoveryActive();
   const phase2State = phase2Active ? getPhase2DiscoveryState() : null;
   const learnedProfile =
-    phase2State && phase2State.sessionCount >= 2
+    phase2State && phase2State.sessionCount >= 1
       ? buildWhatIveLearnedProfile(phase2State)
       : null;
   const milestonesReached = learnedProfile?.milestonesReached ?? [];
-  const relationshipPhase = getCurrentRelationshipPhase();
   const phase3Active = isPhase3AdaptiveRelationshipActive();
   const phase4Active = isPhase4BusinessOperatingPartnerActive();
-  const businessHealth = phase4Active ? buildBusinessHealthDashboard() : null;
+  const phase5Active = isPhase5CompanionIntelligenceEcosystemActive();
+  const phase5State = phase5Active ? getPhase5EcosystemState() : null;
+  const businessStage = phase5State?.businessStage ?? phase1Profile.businessStage;
 
   function startEdit(id: DiscoveryQuestionId) {
     setEditing(id);
@@ -85,6 +154,25 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
     setTick((t) => t + 1);
   }
 
+  const phase1Summary = [
+    phase1Profile.businessType ? `**Business:** ${phase1Profile.businessType}` : null,
+    phase1Profile.primaryChallenge
+      ? `**Current Challenge:** ${phase1Profile.primaryChallenge}`
+      : learnedProfile?.challenges[0]
+        ? `**Current Challenge:** ${learnedProfile.challenges[0]}`
+        : null,
+    phase1Profile.immediateGoal || phase1Profile.desiredOutcome
+      ? `**Current Goal:** ${phase1Profile.immediateGoal ?? phase1Profile.desiredOutcome}`
+      : learnedProfile?.business.currentGoal
+        ? `**Current Goal:** ${learnedProfile.business.currentGoal}`
+        : null,
+    phase1Profile.successDefinition || phase1Profile.winDefinition
+      ? `**Success This Week:** ${phase1Profile.successDefinition ?? phase1Profile.winDefinition}`
+      : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
       {onBack ? (
@@ -97,10 +185,12 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
         </button>
       ) : null}
 
-      <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">Getting to know you</p>
+      <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">{panelTitle}</p>
       <p className="mt-1 text-base text-[#6b635a]">{progress.label}</p>
       <p className="mt-1 text-sm text-[#9a8f82]">
-        Relationship-building, not a checklist. Edit, skip, or turn off anytime.
+        {phaseNumber >= 3
+          ? "A living guide to how you work — human, supportive, and always yours to correct."
+          : "Relationship-building, not a checklist. Edit, skip, or turn off anytime."}
       </p>
       <p className="mt-2 text-sm font-medium text-[#1e4f4f]">
         Phase {relationshipPhase.number}: {relationshipPhase.name}
@@ -132,14 +222,13 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
         </button>
       </div>
 
-      {learnedProfile ? (
-        <div className="mt-6 overflow-hidden rounded-xl border border-[#b8d4d4] bg-[#f4faf9] px-4 py-4">
-          <p className="text-base font-semibold text-[#1e4f4f]">
-            What I&apos;ve learned about you
-          </p>
-          <p className="mt-1 text-sm text-[#6b635a]">
-            A living profile — updated as we work together, not a form you filled out.
-          </p>
+      {phaseNumber <= 2 && (phase1Summary || learnedProfile) ? (
+        <ManualSection title="What I've Learned So Far">
+          {phase1Summary ? (
+            <PanelMarkdown text={phase1Summary} />
+          ) : learnedProfile ? (
+            <PanelMarkdown text={formatWhatIveLearnedForPanel(learnedProfile)} />
+          ) : null}
           {milestonesReached.length > 0 ? (
             <ul className="mt-3 flex flex-col gap-1 text-sm text-[#3d3630]">
               {milestonesReached.map((id) => (
@@ -147,34 +236,56 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
               ))}
             </ul>
           ) : null}
-          <pre className="mt-3 whitespace-pre-wrap font-sans text-sm text-[#3d3630]">
-            {formatWhatIveLearnedForDisplay(learnedProfile)}
-          </pre>
-        </div>
+        </ManualSection>
+      ) : null}
+
+      {phaseNumber === 2 && learnedProfile ? (
+        <ManualSection title="Progressive Discovery™">
+          <PanelMarkdown
+            text={formatPhase2DiscoveryForPanel(
+              learnedProfile,
+              `Phase ${relationshipPhase.number}: ${relationshipPhase.name}`,
+            )}
+          />
+        </ManualSection>
       ) : null}
 
       {phase3Active ? (
-        <div className="mt-6 overflow-hidden rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-4">
-          <p className="text-base font-semibold text-[#1f1c19]">User Operating Manual™</p>
-          <pre className="mt-3 whitespace-pre-wrap font-sans text-sm text-[#3d3630]">
-            {formatUserOperatingManualForDisplay()}
-          </pre>
-        </div>
+        <ManualSection title="My Operating Manual™">
+          <PanelMarkdown text={formatMyOperatingManualForPanel()} />
+        </ManualSection>
       ) : null}
 
       {phase4Active ? (
-        <div className="mt-6 overflow-hidden rounded-xl border border-[#c9d4e8] bg-[#f6f8fc] px-4 py-4">
-          <p className="text-base font-semibold text-[#2f3d5c]">Business Operating Partner™</p>
-          <pre className="mt-3 whitespace-pre-wrap font-sans text-sm text-[#3d3630]">
-            {formatBusinessHealthForDisplay(businessHealth!)}
-          </pre>
-          <pre className="mt-4 whitespace-pre-wrap font-sans text-sm text-[#3d3630]">
-            {formatBusinessOperatingManualForDisplay()}
-          </pre>
-        </div>
+        <ManualSection title="Business Operating Manual™">
+          <PanelMarkdown
+            text={formatBusinessOperatingManualForPanel(undefined, businessStage)}
+          />
+        </ManualSection>
+      ) : null}
+
+      {phase5Active ? (
+        <>
+          <ManualSection title="Personal Operating Manual™">
+            <PanelMarkdown text={formatPersonalOperatingManualForDisplay()} />
+          </ManualSection>
+          <ManualSection title="Wisdom Engine™">
+            <p className="text-sm text-[#6b635a]">
+              Personal insights only — specific to you, not generic advice.
+            </p>
+            <PanelMarkdown text={formatWisdomEngineForDisplay()} />
+          </ManualSection>
+          <ManualSection title="What We've Built Together">
+            <PanelMarkdown text={formatWhatWeveBuiltTogetherForDisplay()} />
+            <div className="mt-4 border-t border-[#e7dfd4] pt-3">
+              <PanelMarkdown text={formatLegacyIntelligenceForDisplay()} />
+            </div>
+          </ManualSection>
+        </>
       ) : null}
 
       <div className="mt-6 flex flex-col gap-4">
+        <p className="text-sm font-semibold text-[#6b635a]">Discovery answers</p>
         {sections.map((sectionId) => {
           const meta = DISCOVERY_SECTION_LABELS[sectionId];
           const questions = ALL_DISCOVERY_QUESTIONS.filter((q) => q.section === sectionId);

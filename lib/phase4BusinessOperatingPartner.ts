@@ -471,6 +471,37 @@ export function markBusinessCheckpointShown(mark: 90 | 180 | 365): void {
   });
 }
 
+export function formatBusinessOperatingManualForPanel(
+  manual = buildBusinessOperatingManual(),
+  stage?: string,
+): string {
+  const g = manual.howBusinessGrows;
+  const stageLabel = stage
+    ? stage.charAt(0).toUpperCase() + stage.slice(1)
+    : "Growth";
+  return [
+    "## Business Operating Manual™",
+    "",
+    "### Business Stage",
+    stageLabel,
+    "",
+    "### What Creates Business Growth",
+    ...(g.highestMomentumActivities.length
+      ? g.highestMomentumActivities.map((a) => `• ${a}`)
+      : ["• Still emerging"]),
+    "",
+    "### Common Bottlenecks",
+    ...(g.recurringBottlenecks.length
+      ? g.recurringBottlenecks.map((b) => `• ${b}`)
+      : ["• Still emerging"]),
+    "",
+    "### Opportunities Worth Exploring",
+    ...(g.avoidancePatterns.length
+      ? g.avoidancePatterns.map((a) => `• ${a.replace(/_/g, " ")}`)
+      : ["• Will surface gently as patterns emerge"]),
+  ].join("\n");
+}
+
 export function formatBusinessOperatingManualForDisplay(
   manual = buildBusinessOperatingManual(),
 ): string {
