@@ -16,7 +16,7 @@ const RESOURCE_LABELS: Record<ResourceCandidate["id"], string> = {
   conversation: "Conversation",
 };
 
-const OFFER_THRESHOLD = 0.62;
+const OFFER_THRESHOLD = 0.7;
 
 function baseConfidence(
   id: ResourceCandidate["id"],

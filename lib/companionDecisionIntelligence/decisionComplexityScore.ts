@@ -4,6 +4,12 @@
 
 import type { ChatTurn } from "../companionIntelligence";
 import { countAssistantQuestions } from "../companionActionBias";
+import {
+  computeFrameworkConfidence,
+  detectLikelyFramework,
+  maxDiscoveryQuestions,
+  shouldOfferFrameworkNow,
+} from "../progressiveDiscoveryIntelligence";
 import type { DecisionComplexityLevel, DecisionComplexityScore } from "./types";
 
 const PRODUCT_EXPANSION_RE =
@@ -85,14 +91,7 @@ function messagesMentionExpansion(messages: ChatTurn[]): boolean {
 }
 
 function targetQuestionsForLevel(level: DecisionComplexityLevel): number {
-  switch (level) {
-    case "low":
-      return 0;
-    case "medium":
-      return 3;
-    case "high":
-      return 4;
-  }
+  return maxDiscoveryQuestions(level);
 }
 
 export function scoreDecisionComplexity(input: {
@@ -108,11 +107,20 @@ export function scoreDecisionComplexity(input: {
     contextSignals,
   });
   const targetDiscoveryQuestions = targetQuestionsForLevel(level);
+  const frameworkId = detectLikelyFramework(input.userText, input.messages);
+  const frameworkConfidence = computeFrameworkConfidence({
+    frameworkId,
+    userText: input.userText,
+    messages: input.messages,
+    complexityLevel: level,
+    contextSignals,
+    questionsAsked: questionCount,
+  });
   const discoveryComplete =
     level === "low" ||
-    (questionCount >= Math.min(2, targetDiscoveryQuestions) &&
-      contextSignals >= 2) ||
-    questionCount >= targetDiscoveryQuestions;
+    shouldOfferFrameworkNow(frameworkConfidence) ||
+    (questionCount >= targetDiscoveryQuestions && contextSignals >= 1) ||
+    (questionCount >= Math.min(2, targetDiscoveryQuestions) && contextSignals >= 2);
 
   return {
     level,

@@ -39,7 +39,7 @@ describe("companionEntry entry layer gate", () => {
     ).toBe(true);
     expect(
       companionEntryLayerHintForChat("I want to add a new product line"),
-    ).toMatch(/BUSINESS EXPANSION/i);
+    ).toMatch(/PROGRESSIVE DISCOVERY/i);
   });
 
   it("allows specific practical requests", () => {

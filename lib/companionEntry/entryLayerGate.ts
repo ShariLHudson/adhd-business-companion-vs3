@@ -73,11 +73,12 @@ function deferEntryLayerHint(text: string): string {
     )
   ) {
     return [
-      "UNDERSTAND BEFORE SUGGESTING™ (mandatory):",
-      "User is exploring product or offer expansion — a BUSINESS EXPANSION decision, not a simple product pick.",
-      "DO NOT list options or solutions on this turn. DO NOT open Decision Compass™ yet.",
-      "Ask 2–4 high-value questions only — e.g. current customers, revenue source, relationship between offers, pricing difference, audience overlap, risk tolerance, business goals.",
-      "After enough context: offer Decision Compass™ with permission to compare keep / replace / both / phased.",
+      "PROGRESSIVE DISCOVERY INTELLIGENCE™ (P0.10.1 — mandatory):",
+      "Framework: Decision Compass™ (business expansion — not a simple product pick).",
+      "Turn 1 — ask ONLY: Is this replacing your current offer, adding alongside it, or something completely different?",
+      "Turn 2 (if needed) — ask ONLY: Same audience or different audience?",
+      "Never list 3–5 questions in one message. One question. Wait. Then offer Decision Compass when confidence ≥70%.",
+      "Goal: minimum viable context to open the framework — not to solve the entire expansion in chat.",
     ].join("\n");
   }
 

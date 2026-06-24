@@ -40,7 +40,7 @@ export function resolveExperienceMode(input: {
 export function experienceModeHintForChat(mode: ExperienceMode): string {
   const hints: Record<ExperienceMode, string> = {
     discovery:
-      "EXPERIENCE MODE: Discovery — ask 2–4 high-value questions only. No solutions yet. No workspace offers yet.",
+      "EXPERIENCE MODE: Discovery — ONE question this turn only (max 1 simple / 2 moderate / 3 complex before framework). No solutions yet. No workspace offers until framework confidence ≥70%.",
     decision:
       "EXPERIENCE MODE: Decision — enough context exists. Synthesize, compare options, offer Decision Compass if confidence is high. Permission first.",
     action:

@@ -53,7 +53,7 @@ describe("ProductExpansionDecision", () => {
     expect(intel.shouldOfferTopResource).toBe(false);
     expect(intel.complexity.level).not.toBe("low");
     expect(companionEntryLayerHintForChat(lastUser)).toMatch(
-      /BUSINESS EXPANSION/i,
+      /PROGRESSIVE DISCOVERY/i,
     );
   });
 
