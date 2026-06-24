@@ -5,46 +5,40 @@ import {
 } from "./companionEcosystemIntent";
 
 describe("companionEcosystemIntent", () => {
-  it("routes mental load to Clear My Mind", () => {
-    const match = detectEcosystemProblemIntent(
-      "I have too much on my mind right now",
-    );
-    expect(match?.section).toBe("brain-dump");
-    expect(match?.workflowKind).toBe("open_clear_my_mind");
-    expect(match?.offerLine).toMatch(/Clear My Mind/i);
-    expect(match?.offerLine).toMatch(/stay in chat/i);
+  it("does not match vague overwhelm to Clear My Mind", () => {
+    expect(detectEcosystemProblemIntent("I'm overwhelmed")).toBeNull();
   });
 
-  it("routes indecision to Decision Compass", () => {
-    const match = detectEcosystemProblemIntent(
-      "I can't decide which offer to launch",
-    );
-    expect(match?.section).toBe("decision-compass");
-    expect(match?.offerLine).not.toMatch(/pros and cons/i);
+  it("does not match many ideas to a workspace instantly", () => {
+    expect(detectEcosystemProblemIntent("I have 15 ideas")).toBeNull();
   });
 
-  it("routes focus confusion to Plan My Day", () => {
-    const match = detectEcosystemProblemIntent(
-      "I don't know what to focus on today",
-    );
-    expect(match?.section).toBe("plan-my-day");
+  it("does not match hiring VA to Decision Compass instantly", () => {
+    expect(
+      detectEcosystemProblemIntent("I'm thinking about hiring a VA"),
+    ).toBeNull();
   });
 
-  it("routes content ideas to Create", () => {
-    const match = detectEcosystemProblemIntent("I need content ideas for LinkedIn");
+  it("still matches specific mental load phrasing when not deferred", () => {
+    const match = detectEcosystemProblemIntent(
+      "help me organize my workshop launch checklist in a project",
+    );
+    expect(match).toBeNull();
+  });
+
+  it("builds explain-first workspace offer shape", () => {
+    const match = detectEcosystemProblemIntent(
+      "I need content ideas for LinkedIn",
+    );
     expect(match?.section).toBe("content-generator");
+    const offer = ecosystemIntentToWorkspaceOffer(match!);
+    expect(offer.buttonLabel).toMatch(/Open/);
+    expect(offer.line).toMatch(/When we're finished you'll have/i);
   });
 
   it("does not intercept explicit write requests", () => {
     expect(
       detectEcosystemProblemIntent("help me write a newsletter draft"),
     ).toBeNull();
-  });
-
-  it("builds workspace offer shape", () => {
-    const match = detectEcosystemProblemIntent("my head is full of stuff")!;
-    const offer = ecosystemIntentToWorkspaceOffer(match);
-    expect(offer.buttonLabel).toMatch(/Open/);
-    expect(offer.section).toBe("brain-dump");
   });
 });

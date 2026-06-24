@@ -535,6 +535,10 @@ import {
 } from "@/lib/companionEcosystemIntent";
 import { queueVisualFocusOpen, peekVisualFocusPendingOpen, requestVisualFocusStudio } from "@/lib/visualFocus";
 import {
+  companionEntryLayerHintForChat,
+  shouldDeferKeywordWorkspaceOffer,
+} from "@/lib/companionEntry";
+import {
   adhdNativeHintForChat,
   analyzeAdhdNativeTurn,
   shouldDeferEcosystemRouting,
@@ -9551,6 +9555,7 @@ export default function CompanionPageClient() {
       const ecosystemMatch = ecosystemProblemMatch;
       if (
         ecosystemMatch &&
+        !shouldDeferKeywordWorkspaceOffer(trimmed) &&
         !shouldDeferRoutingForActionBias(actionBias) &&
         !shouldDeferEcosystemRouting(
           adhdNative,
@@ -9871,6 +9876,7 @@ export default function CompanionPageClient() {
                   adhdNative,
                 }),
                 adhdNativeHintForChat(adhdNative),
+                companionEntryLayerHintForChat(trimmed),
                 companionEcosystemRoutingHintForChat(trimmed),
                 intelligenceHintForChat(intelligence, trimmed),
                 assistedActionHintForChat(lastAssistantText, lockedArtifactType),

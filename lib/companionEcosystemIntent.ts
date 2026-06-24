@@ -5,6 +5,12 @@
 
 import type { AppSection } from "./companionUi";
 import {
+  companionEntryLayerHintForChat,
+  shouldDeferKeywordWorkspaceOffer,
+  explainFirstOfferForSection,
+  formatExplainFirstOfferMessage,
+} from "./companionEntry";
+import {
   capabilityRoutingHintForChat,
   matchRegisteredCapabilityForText,
 } from "./companionCapabilityRegistry";
@@ -30,21 +36,32 @@ export type EcosystemIntentMatch = {
 export function detectEcosystemProblemIntent(
   text: string,
 ): EcosystemIntentMatch | null {
+  if (shouldDeferKeywordWorkspaceOffer(text)) return null;
   return matchRegisteredCapabilityForText(text);
 }
 
 export function ecosystemIntentToWorkspaceOffer(
   match: EcosystemIntentMatch,
 ): { section: AppSection; buttonLabel: string; line: string } {
+  const explain = explainFirstOfferForSection(
+    match.section,
+    match.featureLabel,
+    match.whyItHelps,
+  );
   return {
     section: match.section,
     buttonLabel: `Open ${match.featureLabel}`,
-    line: match.offerLine,
+    line: formatExplainFirstOfferMessage(explain),
   };
 }
 
 /** Injected when API handles a message that maps to an ecosystem feature. */
 export function companionEcosystemRoutingHintForChat(text: string): string | null {
+  const entryHint = companionEntryLayerHintForChat(text);
+  if (entryHint) return entryHint;
+
+  if (shouldDeferKeywordWorkspaceOffer(text)) return null;
+
   return [capabilityRoutingHintForChat(text), strategyIntelligenceHintForChat(text)]
     .filter(Boolean)
     .join("\n\n") || null;

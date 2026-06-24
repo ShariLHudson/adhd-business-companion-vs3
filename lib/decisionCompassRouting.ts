@@ -3,6 +3,11 @@
  * Recommend the compass for decision intent; never auto-open Create.
  */
 
+import {
+  explainFirstOfferForSection,
+  formatExplainFirstOfferMessage,
+  shouldDeferKeywordWorkspaceOffer,
+} from "@/lib/companionEntry";
 import type { DecisionCompassPrefill } from "./decisionCompass";
 
 export type DecisionCompassOffer = {
@@ -90,14 +95,18 @@ export function extractDecisionCompassPrefill(text: string): DecisionCompassPref
 }
 
 export function buildDecisionCompassOffer(text: string): DecisionCompassOffer {
+  const explain = explainFirstOfferForSection(
+    "decision-compass",
+    "Decision Compass™",
+  );
   return {
     prefill: extractDecisionCompassPrefill(text),
-    companionLine:
-      "It sounds like you're trying to work through a decision. Would you like to open ADHD Decision Compass?",
+    companionLine: formatExplainFirstOfferMessage(explain),
   };
 }
 
 export function shouldOfferDecisionCompass(text: string): boolean {
+  if (shouldDeferKeywordWorkspaceOffer(text)) return false;
   if (!isDecisionCompassOfferSignal(text)) return false;
   if (isExplicitDecisionCompassRequest(text)) return false;
   if (isDecisionCompassOfferDismissedForSession()) return false;
