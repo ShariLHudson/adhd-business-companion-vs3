@@ -286,7 +286,7 @@ import {
   strategyOpenAck,
   type StrategyOpenTarget,
 } from "@/lib/strategyOpenFromChat";
-import { STRATEGIES } from "@/lib/strategySystem";
+import { STRATEGIES, getStrategy } from "@/lib/strategySystem";
 import {
   artifactLockHintForChat,
   conflictsWithLockedArtifact,
@@ -532,7 +532,7 @@ import {
   detectEcosystemProblemIntent,
   ecosystemIntentToWorkspaceOffer,
 } from "@/lib/companionEcosystemIntent";
-import { queueVisualFocusOpen, peekVisualFocusPendingOpen, requestVisualFocusStudio } from "@/lib/visualFocus";
+import { queueVisualFocusOpen, peekVisualFocusPendingOpen, requestVisualFocusStudio, createAndActivateMap } from "@/lib/visualFocus";
 import {
   companionEntryLayerHintForChat,
   shouldDeferKeywordWorkspaceOffer,
@@ -693,12 +693,96 @@ import {
   frictionlessPendingFromToolOffer,
   frictionlessPendingFromWorkspaceOffer,
   isFrictionlessAffirmation,
+  isFrictionlessPendingAlignedWithAssistant,
+  isFrictionlessPendingExpired,
   loadFrictionlessPending,
   resolveFrictionlessAction,
   resolveFrictionlessContinuation,
   saveFrictionlessPending,
   shouldSuppressRelationshipForFrictionless,
 } from "@/lib/frictionlessActionLayer";
+import { shouldSuppressRelationshipIntelligenceForUserText } from "@/lib/relationshipIntelligenceBoundaries";
+import { resolveHardNavigationCommand } from "@/lib/hardNavigationCommands";
+import {
+  logCreateOfferRegistration,
+  logYesContinuationResolution,
+} from "@/lib/yesContinuationTrace";
+import {
+  googleSheetsHintForChat,
+  googleSheetsCreateHintForArtifact,
+  resolveGoogleSheetsTurn,
+  type GoogleSheetPendingPayload,
+} from "@/lib/googleSheetsIntelligence";
+import {
+  clearGoogleSheetIntakeSession,
+  loadGoogleSheetIntakeSession,
+  saveGoogleSheetIntakeSession,
+} from "@/lib/googleSheetsSessionStore";
+import {
+  clearReminderIntakeSession,
+  loadReminderIntakeSession,
+  saveReminderIntakeSession,
+} from "@/lib/reminderStore";
+import { resolveReminderTurn } from "@/lib/reminderIntelligence";
+import {
+  afterReminderFired,
+  collectDueReminderAlerts,
+} from "@/lib/reminderAlerts";
+import {
+  createGoogleSheetFromPayload,
+  googleSheetCreateAck,
+  googleSheetCreateFailureAck,
+} from "@/lib/googleSheetsCreateAction";
+import type { FrictionlessPendingAction } from "@/lib/frictionlessActionLayer";
+import {
+  recoverStrategyOfferPendingFromChat,
+  registerStrategyOfferFromAssistant,
+  saveStrategyOfferPending,
+  strategyOfferAck,
+  isStrategyIntelligenceOfferMessage,
+} from "@/lib/strategyOfferContinuation";
+import {
+  clearVisualThinkingMenuPending,
+  isVisualThinkingMenuOfferMessage,
+  isVisualThinkingPendingAction,
+  loadVisualThinkingMenuPending,
+  recoverVisualThinkingMenuFromChat,
+  registerVisualThinkingMenuFromAssistant,
+  resolveVisualMenuSelection,
+  saveVisualThinkingMenuPending,
+  visualMenuSelectionAck,
+} from "@/lib/visualThinkingContinuation";
+import {
+  visualThinkingViewTitle,
+  type VisualThinkingViewId,
+} from "@/lib/visualThinkingStudio";
+import type { VisualFocusMode } from "@/lib/visualFocus/types";
+import {
+  CREATE_PANEL_SECTION,
+  isCreatePanelOpen,
+  logHardNavCreate,
+} from "@/lib/openCreateWorkspace";
+import {
+  buildCreateOpenLiveSnapshot,
+  nextCreateOpenTraceId,
+  publishCreateOpenLiveTrace,
+  scheduleCreateOpenLiveTrace,
+  type CreateOpenLiveTraceSnapshot,
+  type CreateOpenLiveTraceStage,
+} from "@/lib/createOpenLiveTrace";
+import { WorkspaceDebugBanner } from "@/components/companion/WorkspaceDebugBanner";
+import {
+  auditPromptBlocks,
+  CompanionLatencyProfiler,
+  logCompanionLatency,
+  measureKnowledgeDetection,
+  resolveCompanionResponseRoute,
+  type CompanionSpeedProfile,
+} from "@/lib/companionLatencyProfiler";
+import {
+  logCreatePendingAction,
+  resolvedArtifactFromCreatePending,
+} from "@/lib/createPendingAction";
 import {
   buildRelationshipLeadParagraph,
   warnIfRelationshipContractViolation,
@@ -875,6 +959,14 @@ import {
   staggerPrefillKeys,
 } from "@/lib/companionGuidanceSystem";
 import { teachingModeActive } from "@/lib/teachingMode";
+import {
+  applyMenuContinuationRoutingOverrides,
+  loadPendingMenuSelection,
+  menuContinuationHintForChat,
+  registerPendingMenuFromAssistant,
+  resolveMenuContinuation,
+  type MenuContinuationResolution,
+} from "@/lib/menuContinuationIntelligence";
 import {
   isCreateBuilderWorkflowActive,
   isWorkspaceGuidedCoachActive,
@@ -1298,6 +1390,11 @@ function presenceDelay() {
   );
 }
 
+function companionPresenceDelay(skip: boolean) {
+  if (skip) return Promise.resolve();
+  return presenceDelay();
+}
+
 function toApiMessages(messages: Message[]): Message[] {
   return messages.filter((m) => m.role === "user" || m.role === "assistant");
 }
@@ -1400,6 +1497,88 @@ export default function CompanionPageClient() {
   );
   const workspacePanelRef = useRef<AppSection | null>(null);
   const routingHandlersRef = useRef<CompanionRoutingHandlers | null>(null);
+
+  function armCreateOpenGuard(source: string, ms = 2000) {
+    createOpenGuardRef.current = { until: Date.now() + ms, source };
+  }
+
+  function isCreateOpenGuardActive(): boolean {
+    const guard = createOpenGuardRef.current;
+    if (!guard) return false;
+    if (Date.now() > guard.until) {
+      createOpenGuardRef.current = null;
+      return false;
+    }
+    return true;
+  }
+
+  function publishLiveWorkspaceTrace(
+    stage: CreateOpenLiveTraceStage,
+    extra?: {
+      command?: string;
+      matchedHardNav?: boolean;
+      hardNavTarget?: string | null;
+      createOpenRequest?: boolean | null;
+      builderBootstrap?: boolean | null;
+      hideWorkspacePanel?: boolean;
+      patchBlocked?: boolean;
+      patchFrom?: AppSection | null;
+      patchTo?: AppSection | null;
+      note?: string;
+    },
+  ) {
+    const traceId =
+      createOpenTraceRef.current ?? nextCreateOpenTraceId(extra?.command ?? "create");
+    createOpenTraceRef.current = traceId;
+    const panel = workspacePanelRef.current;
+    const workspaceActive = Boolean(
+      panel || companionStandaloneSectionRef.current || guideBesideSession,
+    );
+    publishCreateOpenLiveTrace(
+      buildCreateOpenLiveSnapshot({
+        traceId,
+        stage,
+        command: extra?.command,
+        matchedHardNav: extra?.matchedHardNav,
+        hardNavTarget: extra?.hardNavTarget,
+        workspacePanel: panel,
+        chatLayoutMode: chatLayoutModeRef.current,
+        workspaceActive,
+        activeSection: activeSectionRef.current,
+        activeNav: activeNavRef.current,
+        createOpenRequest: extra?.createOpenRequest,
+        builderBootstrap:
+          extra?.builderBootstrap ?? createBuilderBootstrappedRef.current,
+        hideWorkspacePanel: extra?.hideWorkspacePanel,
+        patchBlocked: extra?.patchBlocked,
+        patchFrom: extra?.patchFrom,
+        patchTo: extra?.patchTo,
+        extra: extra?.note,
+      }),
+    );
+  }
+
+  function scheduleLiveWorkspaceTraceDelays(command: string) {
+    const build =
+      (stage: CreateOpenLiveTraceStage) => (): CreateOpenLiveTraceSnapshot => {
+        const traceId =
+          createOpenTraceRef.current ?? nextCreateOpenTraceId(command);
+        const panel = workspacePanelRef.current;
+        return buildCreateOpenLiveSnapshot({
+          traceId,
+          stage,
+          command,
+          workspacePanel: panel,
+          chatLayoutMode: chatLayoutModeRef.current,
+          workspaceActive: Boolean(panel || companionStandaloneSectionRef.current),
+          activeSection: activeSectionRef.current,
+          activeNav: activeNavRef.current,
+          builderBootstrap: createBuilderBootstrappedRef.current,
+        });
+      };
+    scheduleCreateOpenLiveTrace(100, build("after_react_settle_100ms"));
+    scheduleCreateOpenLiveTrace(500, build("after_react_settle_500ms"));
+  }
   const governorRouteCtxRef = useRef({
     userText: "",
     lastAssistantText: "",
@@ -1420,7 +1599,13 @@ export default function CompanionPageClient() {
   } | null>(null);
   const [chatLayoutMode, setChatLayoutModeState] =
     useState<ChatLayoutMode>(DEFAULT_CHAT_LAYOUT_MODE);
+  const chatLayoutModeRef = useRef<ChatLayoutMode>(DEFAULT_CHAT_LAYOUT_MODE);
+  const createOpenTraceRef = useRef<string | null>(null);
+  const createOpenGuardRef = useRef<{ until: number; source: string } | null>(
+    null,
+  );
   const applyChatLayoutMode = useCallback((mode: ChatLayoutMode) => {
+    chatLayoutModeRef.current = mode;
     setChatLayoutModeState(mode);
     saveWorkspaceChatLayoutPreference(mode);
   }, []);
@@ -1550,6 +1735,7 @@ export default function CompanionPageClient() {
   // A time block starting in ~15 minutes (shows a gentle heads-up toast).
   const [warning, setWarning] = useState<TimeBlock | null>(null);
   const warnedRef = useRef<Set<string>>(new Set());
+  const remindedRef = useRef<Set<string>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
@@ -1992,13 +2178,15 @@ export default function CompanionPageClient() {
 
   useEffect(() => {
     if (!shouldDeferWorkspaceRoutingForPhase1()) return;
+    if (isCreateOpenGuardActive()) return;
     workspacePanelRef.current = null;
     setWorkspacePanelState(null);
     setCompanionStandaloneSection(null);
     setGuideBesideSession(null);
     workspaceCoachSeededRef.current = null;
     applyChatLayoutMode("workspace-focus");
-  }, [applyChatLayoutMode]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- phase1 reset runs once on mount only
+  }, []);
 
   useEffect(() => {
     const last = getLastActivity();
@@ -2134,19 +2322,40 @@ export default function CompanionPageClient() {
     next: AppSection | null,
     options?: { userInitiated?: boolean },
   ) => {
+    const prev = workspacePanelRef.current;
+    if (!next && isCreateOpenGuardActive()) {
+      publishLiveWorkspaceTrace("after_patch_workspace_panel", {
+        patchBlocked: true,
+        patchFrom: prev,
+        patchTo: next,
+        note: `blocked null patch — guard ${createOpenGuardRef.current?.source}`,
+      });
+      dbgWorkspace("setWorkspacePanel blocked — create open guard", { from: prev });
+      return;
+    }
     if (next && shouldBlockWorkspaceOpenForPhase1(options)) {
+      publishLiveWorkspaceTrace("after_patch_workspace_panel", {
+        patchBlocked: true,
+        patchFrom: prev,
+        patchTo: next,
+        note: "blocked phase1 without userInitiated",
+      });
       dbgWorkspace("setWorkspacePanel blocked — phase1 onboarding", { to: next });
       return;
     }
     workspacePanelRef.current = next;
-    setWorkspacePanelState((prev) => {
-      if (prev === next) return prev;
-      dbgWorkspace("setWorkspacePanel", { from: prev, to: next });
+    setWorkspacePanelState((prevState) => {
+      if (prevState === next) return prevState;
+      dbgWorkspace("setWorkspacePanel", { from: prevState, to: next });
       const resource = resourcePreferenceFromAppSection(next);
       if (resource) {
         observeResourcePreference({ resource, outcome: "opened" });
       }
       return next;
+    });
+    publishLiveWorkspaceTrace("after_patch_workspace_panel", {
+      patchFrom: prev,
+      patchTo: next,
     });
   }, []);
 
@@ -3132,6 +3341,13 @@ export default function CompanionPageClient() {
     saveWorkspaceSession(workspaceSession);
   }, [workspaceSession]);
 
+  useEffect(() => {
+    if (!workspacePanel) return;
+    publishLiveWorkspaceTrace("workspace_layout_render", {
+      note: `panel=${workspacePanel} layout=${chatLayoutMode}`,
+    });
+  }, [workspacePanel, chatLayoutMode, workspaceRevealSeq]);
+
   // Create is a workspace, not a full-page section — keep split view mounted.
   useEffect(() => {
     if (!workspacePanel || activeSection === "home") return;
@@ -3541,6 +3757,7 @@ export default function CompanionPageClient() {
     userText?: string;
     consentGranted?: boolean;
     skipConsentCheck?: boolean;
+    skipWorkspaceChatReset?: boolean;
     conversationHandoff?: boolean;
     artifact?: import("@/lib/createInitialization").ResolvedArtifact;
   };
@@ -3551,6 +3768,7 @@ export default function CompanionPageClient() {
     switch (source) {
       case "ui_nav":
       case "ui_button":
+      case "hard_nav":
         return "ui_nav";
       case "governor":
         return "governor";
@@ -3575,6 +3793,7 @@ export default function CompanionPageClient() {
       silent?: boolean;
       seedOverride?: GenSeed;
       savedArtifact?: SavedArtifactRecord | null;
+      userInitiated?: boolean;
     },
   ) {
     const ctx = toCreationContext(section, input);
@@ -3651,7 +3870,9 @@ export default function CompanionPageClient() {
 
     if (section === "content-generator") {
       setGenSeed((prev) => (genSeedEqual(prev, nextSeed) ? prev : nextSeed));
-      patchWorkspacePanel("content-generator");
+      patchWorkspacePanel("content-generator", {
+        userInitiated: opts?.userInitiated,
+      });
       setActiveNav("other");
     } else if (section === "projects") {
       setProjectContinueId(ctx.linkedProjectId ?? null);
@@ -3725,12 +3946,15 @@ export default function CompanionPageClient() {
     }
     if (
       section === "content-generator" &&
-      isCreateWorkspaceV2Phase(
-        createPanelWorkflowRef.current,
-        createBuilderSessionRef.current?.phase ?? null,
-      )
+      (opts?.userInitiated ||
+        isCreateWorkspaceV2Phase(
+          createPanelWorkflowRef.current,
+          createBuilderSessionRef.current?.phase ?? null,
+        ))
     ) {
       applyChatLayoutMode("split");
+    } else if (section === "content-generator") {
+      focusWorkspaceLayout();
     } else {
       focusWorkspaceLayout();
     }
@@ -3822,7 +4046,11 @@ export default function CompanionPageClient() {
       itemType: input.itemType || undefined,
     });
 
-    executeCreateOpenInternal(section, input, { ...opts, silent: true });
+    executeCreateOpenInternal(section, input, {
+      ...opts,
+      silent: true,
+      userInitiated: meta?.userInitiated,
+    });
 
     if (decision.action !== "open") return false;
 
@@ -3834,6 +4062,10 @@ export default function CompanionPageClient() {
         { section: "content-generator" },
         `${receipt}\n\n${buildRecoveryOfferLine()}`,
       );
+    } else if (meta?.skipWorkspaceChatReset) {
+      if (!opts?.silent && opts?.ackMessage) {
+        postCreateTransparencyMessage(opts.ackMessage);
+      }
     } else if (meta?.userInitiated) {
       beginWorkspaceChat(
         { section: "content-generator" },
@@ -4279,7 +4511,14 @@ export default function CompanionPageClient() {
     exportAction?: ArtifactExportAction | null,
     meta?: CreateOpenMeta,
   ) {
-    if (draftPermissionBlocked(lastUserTextRef.current)) {
+    if (
+      !meta?.skipConsentCheck &&
+      !meta?.consentGranted &&
+      draftPermissionBlocked(
+        lastUserTextRef.current,
+        buildCreateOpenContext().lastAssistantText,
+      )
+    ) {
       postCreateTransparencyMessage(
         draftPermissionBlockMessage(
           lastUserTextRef.current,
@@ -4989,6 +5228,14 @@ export default function CompanionPageClient() {
           );
         }
       }
+      // Chat reminders (P0.24).
+      for (const alert of collectDueReminderAlerts(now)) {
+        if (remindedRef.current.has(alert.reminder.id)) continue;
+        remindedRef.current.add(alert.reminder.id);
+        playChime();
+        notify(alert.title, alert.body);
+        afterReminderFired(alert.reminder, now);
+      }
     }
 
     check();
@@ -5191,6 +5438,153 @@ export default function CompanionPageClient() {
     return sidebarNavForSection(section);
   }
 
+  function openCreateWorkspace(opts?: {
+    source?: CreateOpenSource;
+    initialPrompt?: string;
+    artifactType?: string;
+    hardNavCommand?: string;
+  }): boolean {
+    const source = opts?.source ?? "ui_nav";
+    const prompt = opts?.initialPrompt?.trim() ?? lastUserTextRef.current;
+    const isHardNav = source === "hard_nav";
+    const beforePanel = workspacePanelRef.current;
+    const beforeSection = activeSectionRef.current;
+
+    publishLiveWorkspaceTrace("after_open_create_workspace", {
+      command: opts?.hardNavCommand ?? prompt,
+      note: `source=${source}`,
+    });
+
+    clearParallelCoachingOffers();
+
+    if (workspacePanelRef.current === CREATE_PANEL_SECTION) {
+      setActiveSection("home");
+      activeSectionRef.current = "home";
+      setActiveNav("other");
+      applyChatLayoutMode("split");
+      revealWorkspace();
+      if (opts?.hardNavCommand) {
+        logHardNavCreate({
+          matched: true,
+          command: opts.hardNavCommand,
+          target: CREATE_PANEL_SECTION,
+          beforeWorkspacePanel: beforePanel,
+          beforeActiveSection: beforeSection,
+          calledOpenSectionBesideChatCore: true,
+          calledRequestCreateOpen: false,
+          requestCreateOpenResult: true,
+          afterWorkspacePanel: workspacePanelRef.current,
+          afterActiveSection: activeSectionRef.current,
+          rightPanelVisible: workspacePanelRef.current === CREATE_PANEL_SECTION,
+        });
+        scheduleLiveWorkspaceTraceDelays(opts.hardNavCommand);
+      }
+      return true;
+    }
+
+    if (!isHardNav) {
+      if (
+        tryOpenCreateForCurrentArtifact(prompt, {
+          allowStoredSession: isExplicitCreateResumeRequest(prompt),
+        })
+      ) {
+        applyChatLayoutMode("split");
+        setActiveSection("home");
+        activeSectionRef.current = "home";
+        setActiveNav("other");
+        revealWorkspace();
+        return true;
+      }
+
+      if (isExplicitCreateResumeRequest(prompt) && restoreCreateSession()) {
+        applyChatLayoutMode("split");
+        revealWorkspace();
+        return true;
+      }
+    }
+
+    armCreateOpenGuard(isHardNav ? "hard_nav" : source);
+    createPanelWorkflowRef.current = EMPTY_CREATE_WORKFLOW;
+    createBuilderBootstrappedRef.current = false;
+
+    const createInput = {
+      itemType: opts?.artifactType ?? "",
+      title: "Create with Shari",
+      brief: prompt,
+      stage: "choosing what to create",
+      source: "generated" as const,
+    };
+
+    let opened = false;
+    if (isHardNav) {
+      executeCreateOpenInternal(CREATE_PANEL_SECTION, createInput, {
+        silent: true,
+        userInitiated: true,
+      });
+      opened = isCreatePanelOpen({
+        workspacePanel: workspacePanelRef.current,
+        activeSection: activeSectionRef.current,
+        chatLayoutMode: chatLayoutModeRef.current,
+      });
+      publishLiveWorkspaceTrace("after_request_create_open", {
+        command: opts?.hardNavCommand ?? prompt,
+        createOpenRequest: false,
+        note: "hard_nav direct executeCreateOpenInternal",
+      });
+    } else {
+      opened = requestCreateOpen(
+        CREATE_PANEL_SECTION,
+        createInput,
+        { silent: true },
+        {
+          source,
+          userInitiated: true,
+          skipConsentCheck: true,
+          skipWorkspaceChatReset: false,
+          userText: prompt,
+        },
+      );
+      publishLiveWorkspaceTrace("after_request_create_open", {
+        command: prompt,
+        createOpenRequest: opened,
+      });
+    }
+
+    if (opened) {
+      startCreateBuilderChat(opts?.artifactType, undefined, { skipChatSync: true });
+    }
+    applyChatLayoutMode("split");
+    setActiveSection("home");
+    activeSectionRef.current = "home";
+    setActiveNav("other");
+    revealWorkspace();
+    trackWorkspaceEcosystemEvent(CREATE_PANEL_SECTION);
+    noteWorkspaceOpened(CREATE_PANEL_SECTION, "beside_chat");
+
+    if (opts?.hardNavCommand) {
+      logHardNavCreate({
+        matched: true,
+        command: opts.hardNavCommand,
+        target: CREATE_PANEL_SECTION,
+        beforeWorkspacePanel: beforePanel,
+        beforeActiveSection: beforeSection,
+        calledOpenSectionBesideChatCore: true,
+        calledRequestCreateOpen: !isHardNav,
+        requestCreateOpenResult: opened,
+        afterWorkspacePanel: workspacePanelRef.current,
+        afterActiveSection: activeSectionRef.current,
+        rightPanelVisible: isCreatePanelOpen({
+          workspacePanel: workspacePanelRef.current,
+          activeSection: activeSectionRef.current,
+          chatLayoutMode: chatLayoutModeRef.current,
+        }),
+      });
+      scheduleLiveWorkspaceTraceDelays(opts.hardNavCommand);
+    }
+
+    return opened;
+  }
+
   /** Menu / in-panel navigation — replace right workspace, keep chat on the left. */
   function openSectionBesideChatCore(
     section: AppSection,
@@ -5203,51 +5597,7 @@ export default function CompanionPageClient() {
       return;
     }
     if (section === "content-generator") {
-      if (workspacePanel === "content-generator") {
-        setActiveSection("home");
-        setActiveNav("other");
-        focusWorkspaceLayout();
-        revealWorkspace();
-        return;
-      }
-      if (
-        tryOpenCreateForCurrentArtifact(lastUserTextRef.current, {
-          allowStoredSession: isExplicitCreateResumeRequest(
-            lastUserTextRef.current,
-          ),
-        })
-      ) {
-        focusWorkspaceLayout();
-        revealWorkspace();
-        return;
-      }
-      if (
-        isExplicitCreateResumeRequest(lastUserTextRef.current) &&
-        restoreCreateSession()
-      ) {
-        focusWorkspaceLayout();
-        revealWorkspace();
-        return;
-      }
-      requestCreateOpen(
-        "content-generator",
-        {
-          itemType: "",
-          title: "Create with Shari",
-          brief: "",
-          stage: "choosing what to create",
-          source: "generated",
-        },
-        undefined,
-        { source: "ui_nav", userInitiated: true },
-      );
-      applyChatLayoutMode("split");
-      createPanelWorkflowRef.current = EMPTY_CREATE_WORKFLOW;
-      createBuilderBootstrappedRef.current = false;
-      clearParallelCoachingOffers();
-      startCreateBuilderChat(undefined, undefined, { skipChatSync: true });
-      focusWorkspaceLayout();
-      revealWorkspace();
+      openCreateWorkspace({ source: "ui_nav" });
       return;
     }
 
@@ -5319,7 +5669,7 @@ export default function CompanionPageClient() {
   }
 
   function openCreateDirect() {
-    openSectionBesideChatCore("content-generator", "other");
+    openCreateWorkspace({ source: "ui_nav" });
   }
 
   /** Menu navigation — open the workspace directly without forcing chat. */
@@ -5896,6 +6246,13 @@ export default function CompanionPageClient() {
   }
 
   function clearSplitBesideWorkspace() {
+    if (isCreateOpenGuardActive()) {
+      publishLiveWorkspaceTrace("after_patch_workspace_panel", {
+        patchBlocked: true,
+        note: "clearSplitBesideWorkspace blocked by create open guard",
+      });
+      return;
+    }
     setGuideBesideSession(null);
     setWorkspaceContextBanner(null);
     setCrossWorkspaceBesideOffer(null);
@@ -7328,6 +7685,116 @@ export default function CompanionPageClient() {
     clearAllPendingOffers();
   }
 
+  async function executeGoogleSheetCreateFromPending(
+    pending: FrictionlessPendingAction,
+  ): Promise<string> {
+    if (!pending.sheetTitle || !pending.sheetCsv || !pending.sheetType) {
+      return "I lost the sheet details — tell me what tracker or calendar you want again.";
+    }
+    const payload: GoogleSheetPendingPayload = {
+      sheetType: pending.sheetType,
+      title: pending.sheetTitle,
+      csv: pending.sheetCsv,
+      columns: pending.sheetColumns ?? [],
+      artifactType: pending.artifactType ?? "Google Sheet",
+    };
+    const session = loadGoogleSheetIntakeSession();
+    const result = await createGoogleSheetFromPayload(payload, {
+      projectId: session?.projectId,
+      projectName: session?.projectId ? undefined : undefined,
+    });
+    clearGoogleSheetIntakeSession();
+    if (!result.ok) {
+      return googleSheetCreateFailureAck(result.error);
+    }
+    return googleSheetCreateAck(payload.title, result.url);
+  }
+
+  function saveGoogleSheetFrictionlessPending(
+    pending: GoogleSheetPendingPayload,
+    offeredAtTurn: number,
+  ): void {
+    saveFrictionlessPending({
+      type: "create_google_sheet",
+      target: "google-workspace",
+      context: pending.sheetType,
+      sheetType: pending.sheetType,
+      sheetTitle: pending.title,
+      sheetCsv: pending.csv,
+      sheetColumns: pending.columns,
+      artifactType: pending.artifactType,
+      offeredAtTurn,
+      offerSummary: "Create Google Sheet",
+    });
+    registerPendingAcceptance("workspace", "Create Google Sheet");
+  }
+
+  function completeStrategyOfferFromPending(
+    pending: FrictionlessPendingAction,
+    ack: string,
+  ) {
+    const strategyId = pending.strategyId;
+    const title =
+      pending.strategyTitle ??
+      (strategyId ? getStrategy(strategyId)?.title : null) ??
+      "that strategy";
+    if (pending.initialPrompt?.trim()) {
+      lastUserTextRef.current = pending.initialPrompt.trim();
+    }
+    if (strategyId) {
+      openStrategyFromChat({
+        kind: "builtin",
+        strategyId,
+        title,
+      });
+      setBusinessStrategyDraft(null);
+      setBusinessStrategySession(null);
+      const boot = bootstrapStrategyApplySession(strategyId, {
+        activeProjectName: pickActiveProjectName(),
+      });
+      if (boot) {
+        setStrategyApplySession(boot.session);
+        saveStrategyApplySession(boot.session, { workspacePanelOpen: true });
+      }
+      setActiveNav("playbook");
+      applyChatLayoutMode("split");
+      revealWorkspace();
+    } else {
+      openSectionBesideChatCore("playbook", undefined, { userInitiated: true });
+    }
+    clearFrictionlessPending();
+    clearPendingAcceptanceAuthority();
+    setToolSuggestion(null);
+    setWorkspaceOffer(null);
+    setDecisionCompassOffer(null);
+    setActionBridge(null);
+    setBridge(null);
+    return ack || strategyOfferAck(title);
+  }
+
+  function completeVisualThinkingOpen(input: {
+    mode: VisualFocusMode;
+    viewId?: VisualThinkingViewId;
+    viewTitle?: string;
+    purposeAnswer?: string;
+    ack: string;
+  }) {
+    const prompt = input.purposeAnswer?.trim();
+    if (prompt) lastUserTextRef.current = prompt;
+    const map = createAndActivateMap(input.mode, prompt || undefined);
+    queueVisualFocusOpen(map.id);
+    openSectionBesideChatCore("visual-focus", undefined, { userInitiated: true });
+    clearVisualThinkingMenuPending();
+    clearFrictionlessPending();
+    clearPendingAcceptanceAuthority();
+    setToolSuggestion(null);
+    setWorkspaceOffer(null);
+    setDecisionCompassOffer(null);
+    setActionBridge(null);
+    setBridge(null);
+    return input.ack;
+  }
+
   async function handleSend(
     overrideText?: string,
     fresh = false,
@@ -7337,49 +7804,482 @@ export default function CompanionPageClient() {
     if (!trimmed || isLoading) return;
 
     chatTurnRef.current += 1;
+    const latencyProfiler = new CompanionLatencyProfiler(
+      chatTurnRef.current,
+      trimmed,
+    );
+    const finishLatencyTurn = (opts?: {
+      localReply?: boolean;
+      calledApi?: boolean;
+    }) => {
+      if (opts?.localReply) latencyProfiler.usedLocalReply = true;
+      if (opts?.calledApi) latencyProfiler.calledApi = true;
+      logCompanionLatency(latencyProfiler.report());
+    };
 
-    const frictionlessPendingEarly = loadFrictionlessPending();
-    if (frictionlessPendingEarly && isFrictionlessAffirmation(trimmed)) {
+    const activeReminderSession = loadReminderIntakeSession();
+    if (
+      activeReminderSession?.phase === "collecting" &&
+      !isFrictionlessAffirmation(trimmed)
+    ) {
+      const reminderTurn = resolveReminderTurn({
+        userText: trimmed,
+        draft: activeReminderSession.draft,
+        timeBlocks: getTimeBlocks(),
+      });
+      if (reminderTurn.kind === "ask" || reminderTurn.kind === "confirm") {
+        const userMessage: Message = { role: "user", content: trimmed };
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        voiceUsedRef.current = false;
+        if (reminderTurn.kind === "confirm") {
+          clearReminderIntakeSession();
+        } else {
+          saveReminderIntakeSession({
+            ...activeReminderSession,
+            draft: reminderTurn.draft,
+          });
+        }
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: reminderTurn.reply },
+        ]);
+        setIsLoading(false);
+        inputRef.current?.focus();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    const activeSheetSession = loadGoogleSheetIntakeSession();
+    if (
+      activeSheetSession?.phase === "collecting" &&
+      !isFrictionlessAffirmation(trimmed)
+    ) {
+      const intakeTurn = resolveGoogleSheetsTurn({
+        userText: trimmed,
+        currentTurn: chatTurnRef.current,
+        session: activeSheetSession,
+        isAffirmation: false,
+      });
+      if (intakeTurn.outcome === "ask" || intakeTurn.outcome === "offer") {
+        const userMessage: Message = { role: "user", content: trimmed };
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        voiceUsedRef.current = false;
+        saveGoogleSheetIntakeSession(intakeTurn.session);
+        if (intakeTurn.outcome === "offer") {
+          saveGoogleSheetFrictionlessPending(
+            intakeTurn.pending,
+            chatTurnRef.current,
+          );
+        }
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: intakeTurn.reply },
+        ]);
+        setIsLoading(false);
+        inputRef.current?.focus();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    const frictionlessPendingRaw = loadFrictionlessPending();
+    if (
+      frictionlessPendingRaw &&
+      isFrictionlessPendingExpired(frictionlessPendingRaw, chatTurnRef.current)
+    ) {
+      clearFrictionlessPending();
+      clearVisualThinkingMenuPending();
+    }
+    const frictionlessPending =
+      frictionlessPendingRaw &&
+      !isFrictionlessPendingExpired(frictionlessPendingRaw, chatTurnRef.current)
+        ? frictionlessPendingRaw
+        : null;
+    const lastAssistantForYesEarly =
+      [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
+    const priorUserForYesEarly = [...messages]
+      .reverse()
+      .find((m) => m.role === "user")?.content;
+
+    const visualMenuPendingEarly =
+      loadVisualThinkingMenuPending() ??
+      (isVisualThinkingMenuOfferMessage(lastAssistantForYesEarly)
+        ? recoverVisualThinkingMenuFromChat({
+            userText: trimmed,
+            lastAssistantText: lastAssistantForYesEarly,
+            priorUserText: priorUserForYesEarly,
+            currentTurn: chatTurnRef.current,
+          })
+        : null);
+    if (visualMenuPendingEarly) {
+      const menuPick = resolveVisualMenuSelection(trimmed, visualMenuPendingEarly);
+      if (menuPick) {
+        const userMessage: Message = { role: "user", content: trimmed };
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        voiceUsedRef.current = false;
+        const ack = completeVisualThinkingOpen({
+          mode: menuPick.mode,
+          viewId: menuPick.viewId,
+          viewTitle: visualThinkingViewTitle(menuPick.viewId),
+          purposeAnswer:
+            visualMenuPendingEarly.initialPrompt?.trim() ?? priorUserForYesEarly,
+          ack: visualMenuSelectionAck(menuPick.viewId),
+        });
+        setMessages((prev) => [...prev, { role: "assistant", content: ack }]);
+        setIsLoading(false);
+        inputRef.current?.focus();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    const strategyOfferOnLastTurn =
+      isFrictionlessAffirmation(trimmed) &&
+      isStrategyIntelligenceOfferMessage(lastAssistantForYesEarly);
+    const recoveredStrategyPending = strategyOfferOnLastTurn
+      ? recoverStrategyOfferPendingFromChat({
+          userText: trimmed,
+          lastAssistantText: lastAssistantForYesEarly,
+          priorUserText: priorUserForYesEarly,
+          currentTurn: chatTurnRef.current,
+        })
+      : null;
+    const strategyPendingForYes =
+      recoveredStrategyPending ??
+      (frictionlessPending?.type === "strategy_offer"
+        ? frictionlessPending
+        : null);
+
+    if (strategyPendingForYes && strategyOfferOnLastTurn) {
       const continuation = resolveFrictionlessContinuation(
         trimmed,
-        frictionlessPendingEarly,
+        strategyPendingForYes,
         chatTurnRef.current,
+        lastAssistantForYesEarly,
       );
       if (continuation?.execute) {
         const userMessage: Message = { role: "user", content: trimmed };
         setMessages((prev) => [...prev, userMessage]);
         setInput("");
         voiceUsedRef.current = false;
-        lastUserTextRef.current = trimmed;
-        if (frictionlessPendingEarly.target === "focus-audio") {
-          openFocusAudioCore(
-            frictionlessPendingEarly.focusAudioCategory ?? "calm-brain",
-          );
-        } else if (frictionlessPendingEarly.target === "breathe") {
-          handleToolSelectCore("breathe");
-        } else if (frictionlessPendingEarly.target === "brain-dump") {
-          handleToolSelectCore("brain-dump");
-        } else if (frictionlessPendingEarly.target === "decision-compass") {
-          openDecisionCompass("");
-        } else if (frictionlessPendingEarly.target === "content-generator") {
-          acceptWorkspaceOffer({
-            section: "content-generator",
-            buttonLabel: "Open Create",
-            line: "",
-          });
-        }
+        const ack = completeStrategyOfferFromPending(
+          strategyPendingForYes,
+          continuation.ack,
+        );
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: continuation.ack },
+          { role: "assistant", content: ack },
         ]);
+        setIsLoading(false);
+        inputRef.current?.focus();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    if (
+      frictionlessPending &&
+      isFrictionlessAffirmation(trimmed) &&
+      !strategyOfferOnLastTurn
+    ) {
+      const lastAssistantForYes = lastAssistantForYesEarly;
+      if (
+        !isFrictionlessPendingAlignedWithAssistant(
+          frictionlessPending,
+          lastAssistantForYes,
+          chatTurnRef.current,
+        )
+      ) {
+        clearFrictionlessPending();
+        clearVisualThinkingMenuPending();
+      } else {
+      const continuation = resolveFrictionlessContinuation(
+        trimmed,
+        frictionlessPending,
+        chatTurnRef.current,
+        lastAssistantForYes,
+      );
+      logYesContinuationResolution({
+        userText: trimmed,
+        pendingAction: frictionlessPending,
+        frictionlessContinuation: continuation,
+        menuContinuation: resolveMenuContinuation({
+          userText: trimmed,
+          lastAssistantText: lastAssistantForYes,
+        }),
+        hardNav: resolveHardNavigationCommand(trimmed),
+      });
+      if (continuation?.execute) {
+        const userMessage: Message = { role: "user", content: trimmed };
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        voiceUsedRef.current = false;
+        if (frictionlessPending.type === "create_google_sheet") {
+          const sheetMsg = await executeGoogleSheetCreateFromPending(
+            frictionlessPending,
+          );
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: sheetMsg },
+          ]);
+          clearFrictionlessPending();
+          clearPendingAcceptanceAuthority();
+          setToolSuggestion(null);
+          setWorkspaceOffer(null);
+          setIsLoading(false);
+          inputRef.current?.focus();
+          finishLatencyTurn({ localReply: true });
+          return;
+        }
+        if (frictionlessPending.type === "strategy_offer") {
+          const ack = completeStrategyOfferFromPending(
+            frictionlessPending,
+            continuation.ack,
+          );
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: ack },
+          ]);
+          setIsLoading(false);
+          inputRef.current?.focus();
+          finishLatencyTurn({ localReply: true });
+          return;
+        }
+        if (frictionlessPending.target === "playbook") {
+          lastUserTextRef.current = trimmed;
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: continuation.ack },
+          ]);
+          openSectionBesideChatCore("playbook", undefined, {
+            userInitiated: true,
+          });
+          clearFrictionlessPending();
+          clearPendingAcceptanceAuthority();
+          setToolSuggestion(null);
+          setWorkspaceOffer(null);
+          setIsLoading(false);
+          inputRef.current?.focus();
+          finishLatencyTurn({ localReply: true });
+          return;
+        }
+        if (frictionlessPending.target === "focus-audio") {
+          lastUserTextRef.current = trimmed;
+          openFocusAudioCore(
+            frictionlessPending.focusAudioCategory ?? "calm-brain",
+          );
+        } else if (frictionlessPending.target === "breathe") {
+          lastUserTextRef.current = trimmed;
+          handleToolSelectCore("breathe");
+        } else if (frictionlessPending.target === "brain-dump") {
+          lastUserTextRef.current = trimmed;
+          handleToolSelectCore("brain-dump");
+        } else if (frictionlessPending.target === "decision-compass") {
+          lastUserTextRef.current = trimmed;
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: continuation.ack },
+          ]);
+          openDecisionCompass();
+        } else if (frictionlessPending.target === "visual-focus") {
+          const prompt =
+            frictionlessPending.initialPrompt?.trim() ?? trimmed;
+          lastUserTextRef.current = prompt;
+          const ack = completeVisualThinkingOpen({
+            mode:
+              frictionlessPending.visualFocusMode ??
+              "mind-map",
+            viewId: frictionlessPending.viewId,
+            viewTitle: frictionlessPending.viewTitle,
+            purposeAnswer: prompt,
+            ack: continuation.ack,
+          });
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: ack },
+          ]);
+        } else if (
+          frictionlessPending.type === "visual_thinking_menu" ||
+          frictionlessPending.type === "visual_recommendation"
+        ) {
+          const prompt =
+            frictionlessPending.initialPrompt?.trim() ?? trimmed;
+          lastUserTextRef.current = prompt;
+          const viewId = frictionlessPending.viewId;
+          const mode =
+            frictionlessPending.visualFocusMode ??
+            (viewId ? undefined : "mind-map");
+          const ack = completeVisualThinkingOpen({
+            mode: mode ?? "mind-map",
+            viewId,
+            viewTitle: frictionlessPending.viewTitle,
+            purposeAnswer: prompt,
+            ack: continuation.ack,
+          });
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: ack },
+          ]);
+        } else if (frictionlessPending.target === "content-generator") {
+          const prompt = frictionlessPending.initialPrompt?.trim() ?? "";
+          if (prompt) lastUserTextRef.current = prompt;
+          const ack = continuation.ack;
+          logCreatePendingAction("target workspace", {
+            target: frictionlessPending.target,
+            artifactType: frictionlessPending.artifactType,
+            initialPrompt: prompt,
+          });
+          const artifact = resolvedArtifactFromCreatePending({
+            type: "open_workspace",
+            target: frictionlessPending.target,
+            artifactType: frictionlessPending.artifactType,
+            initialPrompt: prompt,
+          });
+          setMessages((prev) => [...prev, { role: "assistant", content: ack }]);
+          armCreateOpenGuard("frictionless_yes");
+          setActiveNav("other");
+          if (artifact) {
+            executeCreateOpenInternal(
+              CREATE_PANEL_SECTION,
+              {
+                itemType: artifact.itemType,
+                title: resolveCollaborativeDraftTitle({
+                  itemType: artifact.itemType,
+                  userText: prompt,
+                  existingTitle: artifact.title,
+                }),
+                draftContent: artifact.draftContent,
+                brief: artifact.title,
+                stage: "starting compose",
+                source: "generated",
+                artifactTypeLocked: artifact.artifactTypeLocked,
+              },
+              {
+                silent: true,
+                userInitiated: true,
+                seedOverride: {
+                  type: artifact.itemType,
+                  topic: artifact.title,
+                  brief: artifact.title,
+                  draft: artifact.draftContent || undefined,
+                  autoGenerate: false,
+                },
+              },
+            );
+            logCreatePendingAction("workspace opened", {
+              target: "content-generator",
+              artifactType: artifact.itemType,
+            });
+          } else {
+            openCreateWorkspace({
+              source: "hard_nav",
+              initialPrompt: prompt,
+              artifactType: frictionlessPending.artifactType,
+            });
+          }
+          applyChatLayoutMode("split");
+          setActiveSection("home");
+          activeSectionRef.current = "home";
+          revealWorkspace();
+          logCreatePendingAction("active panel after open", {
+            activePanel: workspacePanelRef.current ?? "content-generator",
+          });
+        } else {
+          lastUserTextRef.current = trimmed;
+        }
+        if (frictionlessPending.target !== "content-generator") {
+          if (frictionlessPending.target !== "visual-focus") {
+            setMessages((prev) => [
+              ...prev,
+              { role: "assistant", content: continuation.ack },
+            ]);
+          }
+        }
         clearFrictionlessPending();
         clearPendingAcceptanceAuthority();
         setToolSuggestion(null);
         setWorkspaceOffer(null);
         setIsLoading(false);
         inputRef.current?.focus();
+        finishLatencyTurn({ localReply: true });
         return;
       }
+      }
+    }
+
+    const hardNav = resolveHardNavigationCommand(trimmed);
+    if (hardNav) {
+      createOpenTraceRef.current = nextCreateOpenTraceId(trimmed);
+      publishLiveWorkspaceTrace("before_handler", {
+        command: trimmed,
+        matchedHardNav: true,
+        hardNavTarget:
+          hardNav.target.kind === "workspace"
+            ? hardNav.target.section
+            : hardNav.target.kind,
+      });
+      publishLiveWorkspaceTrace("after_resolve_hard_nav", {
+        command: trimmed,
+        matchedHardNav: true,
+        hardNavTarget:
+          hardNav.target.kind === "workspace"
+            ? hardNav.target.section
+            : hardNav.target.kind,
+      });
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      setMessages((prev) =>
+        fresh
+          ? [userMessage, { role: "assistant", content: hardNav.localReply }]
+          : [
+              ...prev,
+              userMessage,
+              { role: "assistant", content: hardNav.localReply },
+            ],
+      );
+      setInput("");
+      voiceUsedRef.current = false;
+      lastUserTextRef.current = trimmed;
+      clearAllPendingOffers();
+      clearFrictionlessPending();
+      if (
+        hardNav.target.kind === "workspace" &&
+        hardNav.target.section === CREATE_PANEL_SECTION
+      ) {
+        openCreateWorkspace({
+          source: "hard_nav",
+          initialPrompt: trimmed,
+          hardNavCommand: trimmed,
+        });
+      } else {
+        switch (hardNav.target.kind) {
+          case "workspace":
+            openSectionBesideChatCore(hardNav.target.section, hardNav.target.nav, {
+              userInitiated: true,
+            });
+            break;
+          case "decision-compass":
+            openDecisionCompass();
+            break;
+          case "focus-audio":
+            openFocusAudioCore();
+            break;
+          case "adapt-my-day":
+            openAdaptMyDayCore();
+            break;
+          case "clear-my-mind":
+            openClearMyMindStandaloneCore();
+            break;
+        }
+      }
+      setIsLoading(false);
+      inputRef.current?.focus();
+      finishLatencyTurn({ localReply: true });
+      return;
     }
 
     if (topicChangeClearsThread(trimmed)) {
@@ -8464,13 +9364,15 @@ export default function CompanionPageClient() {
 
     const detected = detectEmotionalState(trimmed);
     setEmotion(detected);
-    const turnIntentRouting = resolveIntentRouting({
+    latencyProfiler.mark("intentRouting");
+    let turnIntentRouting = resolveIntentRouting({
       userText: trimmed,
       workspace: workspacePanel,
       supportStyle: getPrefs().supportStyle,
       emotionalState: detected,
       overwhelmed: detected === "overwhelmed",
     });
+    latencyProfiler.measure("intentRouting");
     const learnFastPath = turnIntentRouting.learnFastPath;
 
     const inputType = voiceUsedRef.current ? "voice" : "text";
@@ -8489,6 +9391,45 @@ export default function CompanionPageClient() {
     const lastAssistantText =
       [...nextMessages].reverse().find((m) => m.role === "assistant")?.content ??
       "";
+
+    const userTurns = nextMessages.filter((m) => m.role === "user");
+    const priorUserText =
+      userTurns.length >= 2
+        ? userTurns[userTurns.length - 2]?.content
+        : undefined;
+    const menuContinuation: MenuContinuationResolution = resolveMenuContinuation({
+      userText: trimmed,
+      lastAssistantText,
+      priorUserText,
+    });
+    if (menuContinuation.active) {
+      turnIntentRouting = applyMenuContinuationRoutingOverrides(turnIntentRouting);
+    }
+
+    latencyProfiler.mark("frictionlessAction");
+    const frictionlessAction = resolveFrictionlessAction({
+      userText: trimmed,
+      lastAssistantText,
+      currentTurn: chatTurnRef.current,
+      emotionalState: detected,
+      overwhelmed: detected === "overwhelmed",
+      workspace: workspacePanel,
+      timeBlocks: getTimeBlocks(),
+      reminderDraft: loadReminderIntakeSession()?.draft ?? null,
+    });
+    latencyProfiler.measure("frictionlessAction");
+    const knowledgeTiming = measureKnowledgeDetection(trimmed);
+    latencyProfiler.recordTiming("knowledgeDetection", knowledgeTiming.ms);
+    const speedProfile: CompanionSpeedProfile = resolveCompanionResponseRoute({
+      userText: trimmed,
+      routing: turnIntentRouting,
+      frictionless: frictionlessAction,
+      isYesContinuation:
+        Boolean(loadFrictionlessPending()) && isFrictionlessAffirmation(trimmed),
+      hasPendingFrictionless: Boolean(loadFrictionlessPending()),
+      isMenuContinuation: menuContinuation.active,
+    });
+    latencyProfiler.applySpeedProfile(speedProfile);
 
     const phase1OnboardingTurn = isPhase1OnboardingActive()
       ? applyPhase1OnboardingTurn({
@@ -8510,7 +9451,8 @@ export default function CompanionPageClient() {
     let phase9WisdomReflection: string | null = null;
     let phase10TransformationReflection: string | null = null;
     let phase11EcosystemInsight: string | null = null;
-    if (isPhase1OnboardingComplete() && !learnFastPath) {
+    if (isPhase1OnboardingComplete() && !speedProfile.skipLayers.phaseObservers && !menuContinuation.active) {
+      latencyProfiler.mark("observationEngine");
       observeFromConversationTurn({
         userText: trimmed,
         usedVoice: usedVoiceThisTurn,
@@ -8554,6 +9496,7 @@ export default function CompanionPageClient() {
       if (phase10TransformationReflection) recordTransformationReflectionShown();
       phase11EcosystemInsight = maybeEcosystemInsight({ userText: trimmed });
       if (phase11EcosystemInsight) recordEcosystemInsightShown();
+      latencyProfiler.measure("observationEngine");
     }
 
     let compassSessionForApi = decisionCompassSession;
@@ -9493,16 +10436,6 @@ export default function CompanionPageClient() {
     // engine, which decides (and gates) whether audio is appropriate.
     const obstacle = detectObstacle(trimmed);
     const somatic = detectSomaticAvoidance(trimmed);
-    const frictionlessAction = resolveFrictionlessAction({
-      userText: trimmed,
-      lastAssistantText:
-        [...nextMessages].reverse().find((m) => m.role === "assistant")?.content ??
-        "",
-      currentTurn: chatTurnRef.current,
-      emotionalState: detected,
-      overwhelmed: detected === "overwhelmed",
-      workspace: workspacePanel,
-    });
     if (
       turnIntentRouting.surfaceClarificationUi &&
       turnIntentRouting.routeMode === "clarify" &&
@@ -9523,12 +10456,41 @@ export default function CompanionPageClient() {
         ...prev,
         { role: "assistant", content: frictionlessAction.localReply! },
       ]);
+      if (frictionlessAction.immediateVisualOpen) {
+        completeVisualThinkingOpen(frictionlessAction.immediateVisualOpen);
+        setInput("");
+        setIsLoading(false);
+        inputRef.current?.focus();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
       if (frictionlessAction.pendingAction) {
-        saveFrictionlessPending(frictionlessAction.pendingAction);
+        const pendingAction = frictionlessAction.pendingAction;
+        if (isVisualThinkingPendingAction(pendingAction)) {
+          saveVisualThinkingMenuPending(pendingAction);
+        } else {
+          saveFrictionlessPending(pendingAction);
+        }
         registerPendingAcceptance(
           frictionlessAction.workspaceOffer ? "workspace" : "tool",
-          frictionlessAction.pendingAction.offerSummary,
+          pendingAction.offerSummary,
         );
+        logCreateOfferRegistration({
+          pendingAction,
+          pendingMenuSelection: loadPendingMenuSelection(),
+          pendingAcceptance: {
+            kind: frictionlessAction.workspaceOffer ? "workspace" : "tool",
+            offerSummary: frictionlessAction.pendingAction.offerSummary,
+          },
+        });
+      }
+      if (frictionlessAction.googleSheetIntake) {
+        saveGoogleSheetIntakeSession(frictionlessAction.googleSheetIntake);
+      }
+      if (frictionlessAction.reminderIntake) {
+        saveReminderIntakeSession(frictionlessAction.reminderIntake);
+      } else if (frictionlessAction.category === "reminder") {
+        clearReminderIntakeSession();
       }
       if (frictionlessAction.toolSuggestion) {
         setToolSuggestion(frictionlessAction.toolSuggestion);
@@ -9538,6 +10500,7 @@ export default function CompanionPageClient() {
       }
       setIsLoading(false);
       inputRef.current?.focus();
+      finishLatencyTurn({ localReply: true });
       return;
     }
     const willBridge =
@@ -9552,28 +10515,44 @@ export default function CompanionPageClient() {
       askingHow,
       workspaceOpen: Boolean(workspacePanel),
     });
-    const ecosystemProblemMatch = detectEcosystemProblemIntent(trimmed);
-    const adhdNative = analyzeAdhdNativeTurn({
-      text: trimmed,
-      messages: nextMessages,
-      emotionalState: detected,
-      obstacle: obstacle ?? null,
-      discoveryPhase: intelligence.discoveryPhase,
-      shouldDeferTools: intelligence.shouldDeferTools,
-      hasEcosystemFeatureMatch: Boolean(ecosystemProblemMatch),
-    });
-    const adhdEntrepreneur = analyzeAdhdEntrepreneurTurn({
-      userText: trimmed,
-      adhdNative,
-      multiTurn: adhdNative.multiTurn,
-      boardDomain: resolveWorkspaceAdvisorRole(trimmed, workspacePanel),
-    });
-    const sprint5 = buildSprint5Intelligence({
-      outcomeThread: getOutcomeThread(),
-      multiTurn: adhdNative.multiTurn,
-      featureLabel: ecosystemProblemMatch?.featureLabel ?? null,
-      frictionLabel: adhdNative.primaryFriction?.replace(/_/g, " ") ?? null,
-    });
+    const ecosystemProblemMatch = speedProfile.skipLayers.adhdOS
+      ? null
+      : detectEcosystemProblemIntent(trimmed);
+    const adhdNative = speedProfile.skipLayers.adhdOS
+      ? analyzeAdhdNativeTurn({
+          text: trimmed,
+          messages: nextMessages,
+          emotionalState: detected,
+          obstacle: obstacle ?? null,
+          discoveryPhase: "none",
+          shouldDeferTools: true,
+          hasEcosystemFeatureMatch: false,
+        })
+      : analyzeAdhdNativeTurn({
+          text: trimmed,
+          messages: nextMessages,
+          emotionalState: detected,
+          obstacle: obstacle ?? null,
+          discoveryPhase: intelligence.discoveryPhase,
+          shouldDeferTools: intelligence.shouldDeferTools,
+          hasEcosystemFeatureMatch: Boolean(ecosystemProblemMatch),
+        });
+    const adhdEntrepreneur = speedProfile.skipLayers.adhdOS
+      ? null
+      : analyzeAdhdEntrepreneurTurn({
+          userText: trimmed,
+          adhdNative,
+          multiTurn: adhdNative.multiTurn,
+          boardDomain: resolveWorkspaceAdvisorRole(trimmed, workspacePanel),
+        });
+    const sprint5 = speedProfile.skipLayers.adhdOS
+      ? { trustHint: null, confidenceHint: null, adaptiveHint: null }
+      : buildSprint5Intelligence({
+          outcomeThread: getOutcomeThread(),
+          multiTurn: adhdNative.multiTurn,
+          featureLabel: ecosystemProblemMatch?.featureLabel ?? null,
+          frictionLabel: adhdNative.primaryFriction?.replace(/_/g, " ") ?? null,
+        });
     const actionBias = analyzeActionBias({
       messages: nextMessages,
       userText: trimmed,
@@ -9581,14 +10560,16 @@ export default function CompanionPageClient() {
       adhdNative,
       multiTurn: adhdNative.multiTurn,
     });
-    const intuitiveAwareness = analyzeIntuitiveAwareness({
-      messages: nextMessages,
-      userText: trimmed,
-      emotionalState: detected,
-      adhdNative,
-      multiTurn: adhdNative.multiTurn,
-      actionBias,
-    });
+    const intuitiveAwareness = speedProfile.skipLayers.adhdOS
+      ? null
+      : analyzeIntuitiveAwareness({
+          messages: nextMessages,
+          userText: trimmed,
+          emotionalState: detected,
+          adhdNative,
+          multiTurn: adhdNative.multiTurn,
+          actionBias,
+        });
     const decisionIntelligence = buildCompanionDecisionIntelligence({
       messages: nextMessages,
       userText: trimmed,
@@ -9739,6 +10720,10 @@ export default function CompanionPageClient() {
         frictionlessPendingFromWorkspaceOffer(
           pendingWorkspaceOffer,
           chatTurnRef.current,
+          {
+            userText: trimmed,
+            artifactKind: turnIntentRouting.artifactKind,
+          },
         ),
       );
       registerPendingAcceptance("workspace", pendingWorkspaceOffer.buttonLabel);
@@ -10165,7 +11150,8 @@ export default function CompanionPageClient() {
     setIsLoading(true);
 
     try {
-      await presenceDelay();
+      latencyProfiler.mark("promptConstruction");
+      await companionPresenceDelay(speedProfile.skipLayers.presenceDelay);
 
       const prefs = getPrefs();
       const day = getDayState();
@@ -10225,21 +11211,31 @@ export default function CompanionPageClient() {
         userHealthStatus: healthSnapshot.status,
         loopType: loop?.loopType ?? null,
       });
-      const businessOSSnapshot = evaluateAndRecordBusinessOS({
-        text: trimmed,
-      });
-      const chiefSnapshot = evaluateAndRecordChiefOfStaff({
-        text: trimmed,
-      });
-      const ecosystemSnapshot = evaluateAndRecordEcosystem({
-        text: trimmed,
-        recognitionActive: Boolean(recognitionMoment),
-        activationOfferActive: Boolean(activationOffer),
-        loopOfferActive: Boolean(loopOffer),
-        dayDesignerActive: Boolean(dayDesignerSession),
-        dayPlanActive: Boolean(dayPlanView),
-      });
-      evaluateAndRecordPredictiveSupport({ text: trimmed });
+      const businessOSSnapshot = speedProfile.skipLayers.ecosystemSnapshots
+        ? null
+        : evaluateAndRecordBusinessOS({
+            text: trimmed,
+          });
+      const chiefSnapshot = speedProfile.skipLayers.ecosystemSnapshots
+        ? null
+        : evaluateAndRecordChiefOfStaff({
+            text: trimmed,
+          });
+      const ecosystemSnapshot = speedProfile.skipLayers.ecosystemSnapshots
+        ? null
+        : evaluateAndRecordEcosystem({
+            text: trimmed,
+            recognitionActive: Boolean(recognitionMoment),
+            activationOfferActive: Boolean(activationOffer),
+            loopOfferActive: Boolean(loopOffer),
+            dayDesignerActive: Boolean(dayDesignerSession),
+            dayPlanActive: Boolean(dayPlanView),
+          });
+      if (!speedProfile.skipLayers.ecosystemSnapshots) {
+        latencyProfiler.mark("ecosystemIntelligence");
+        evaluateAndRecordPredictiveSupport({ text: trimmed });
+        latencyProfiler.measure("ecosystemIntelligence");
+      }
       turnArbitration = turnSurface.arbitration;
       const apiWorkspaceSnap = getWorkspaceSnapshot();
       const apiWorkspaceContext = workspaceContextForSnapshot(
@@ -10258,6 +11254,9 @@ export default function CompanionPageClient() {
         createBuilderSessionRef.current?.phase ?? null,
       );
       const suppressRelationshipIntelligence =
+        menuContinuation.active ||
+        speedProfile.skipHeavyLayers ||
+        shouldSuppressRelationshipIntelligenceForUserText(trimmed) ||
         shouldSuppressRelationshipIntelligenceForRouting(turnIntentRouting) ||
         shouldSuppressRelationshipForFrictionless(frictionlessAction);
       const businessContextForApi = (() => {
@@ -10349,6 +11348,38 @@ export default function CompanionPageClient() {
         ...relationshipTurnClientMeta,
         phase: "pre-api",
       });
+      latencyProfiler.setPromptAudit(
+        auditPromptBlocks({
+          blocks: [
+            {
+              name: "relationshipIntelligencePriority",
+              text: relationshipIntelligencePriority,
+            },
+            {
+              name: "relationshipLeadParagraph",
+              text: relationshipLeadParagraph,
+            },
+            {
+              name: "relationshipGuardrails",
+              text: relationshipGuardrailsHint,
+            },
+          ],
+          skippedBlockNames: speedProfile.skipHeavyLayers
+            ? [
+                "relationshipObservation",
+                "adhdOS",
+                "wisdom",
+                "transformation",
+                "ecosystem",
+                "responseContract",
+                "heavyPhaseHints",
+              ]
+            : [],
+        }),
+      );
+      latencyProfiler.measure("promptConstruction");
+      latencyProfiler.mark("apiModel");
+      latencyProfiler.calledApi = true;
       const res = await fetch("/api/companion-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -10373,7 +11404,15 @@ export default function CompanionPageClient() {
             mergeGovernorHints(
               [
                 intentRoutingHintForChat(turnIntentRouting),
+                menuContinuation.active
+                  ? menuContinuationHintForChat(
+                      menuContinuation,
+                      trimmed,
+                      lastAssistantText,
+                    )
+                  : null,
                 learnFastPath ? knowledgeIntelligenceHintForChat(trimmed) : null,
+                googleSheetsHintForChat(loadGoogleSheetIntakeSession()),
                 frictionlessHintForChat(frictionlessAction),
                 relationshipGuardrailsHint,
                 appFeatureKnowledgeHintForChat(trimmed),
@@ -10437,69 +11476,106 @@ export default function CompanionPageClient() {
                   ? phase1OnboardingHintForChat(phase1OnboardingEval)
                   : null,
                 isEstablishedRelationshipForChat() &&
+                !speedProfile.skipLayers.heavyPhaseHints &&
                 !turnIntentRouting.suppressConversationSummary
                   ? establishedRelationshipCoachHintForChat()
                   : isPhase1OnboardingComplete() &&
+                      !speedProfile.skipLayers.heavyPhaseHints &&
                       !turnIntentRouting.suppressConversationSummary
                     ? phase2ProgressiveDiscoveryHintForChat({
                         trustMoment: phase2TrustMoment,
                       })
                     : null,
-                turnIntentRouting.suppressConversationSummary
+                turnIntentRouting.suppressConversationSummary ||
+                speedProfile.skipLayers.heavyPhaseHints
                   ? null
                   : phase3AdaptiveRelationshipHintForChat({
                       awarenessMoment: phase3AwarenessMoment,
                       anticipatorySupport: phase3AnticipatorySupport,
                     }),
-                phase4BusinessOperatingPartnerHintForChat({
-                  proactiveSupport: phase4ProactiveSupport,
-                  userText: trimmed,
-                }),
-                phase5CompanionIntelligenceEcosystemHintForChat({
-                  opportunityOffer: phase5OpportunityOffer,
-                  userText: trimmed,
-                }),
-                phase6CompanionIntelligenceNetworkHintForChat({
-                  reuseOffer: phase6ReuseOffer,
-                  discoveryOffer: phase6DiscoveryOffer,
-                  userText: trimmed,
-                }),
-                phase7BusinessIntelligenceHintForChat({
-                  insight: phase7BusinessInsight,
-                  userText: trimmed,
-                  messages: toChatTurns(nextMessages),
-                }),
-                phase8AutonomousPreparationHintForChat({
-                  preparationOffer: phase8PreparationOffer,
-                  userText: trimmed,
-                }),
-                phase9WisdomIntelligenceHintForChat({
-                  reflection: phase9WisdomReflection,
-                  userText: trimmed,
-                }),
-                phase10TransformationIntelligenceHintForChat({
-                  reflection: phase10TransformationReflection,
-                  userText: trimmed,
-                }),
-                phase11EcosystemIntelligenceHintForChat({
-                  insight: phase11EcosystemInsight,
-                  userText: trimmed,
-                }),
-                sprint5.trustHint,
-                sprint5.confidenceHint,
-                sprint5.adaptiveHint,
-                mistakeRecoveryHintForChat(),
-                actionBiasHintForChat(actionBias),
-                discoveryOverrideForActionBias(actionBias),
-                intuitiveAwarenessHintForChat(intuitiveAwareness),
-                adhdEntrepreneurPrimaryHintForChat({
-                  analysis: adhdEntrepreneur,
-                  adhdNative,
-                }),
-                adhdNativeHintForChat(adhdNative),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : phase4BusinessOperatingPartnerHintForChat({
+                      proactiveSupport: phase4ProactiveSupport,
+                      userText: trimmed,
+                    }),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : phase5CompanionIntelligenceEcosystemHintForChat({
+                      opportunityOffer: phase5OpportunityOffer,
+                      userText: trimmed,
+                    }),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : phase6CompanionIntelligenceNetworkHintForChat({
+                      reuseOffer: phase6ReuseOffer,
+                      discoveryOffer: phase6DiscoveryOffer,
+                      userText: trimmed,
+                    }),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : phase7BusinessIntelligenceHintForChat({
+                      insight: phase7BusinessInsight,
+                      userText: trimmed,
+                      messages: toChatTurns(nextMessages),
+                    }),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : phase8AutonomousPreparationHintForChat({
+                      preparationOffer: phase8PreparationOffer,
+                      userText: trimmed,
+                    }),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : phase9WisdomIntelligenceHintForChat({
+                      reflection: phase9WisdomReflection,
+                      userText: trimmed,
+                    }),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : phase10TransformationIntelligenceHintForChat({
+                      reflection: phase10TransformationReflection,
+                      userText: trimmed,
+                    }),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : phase11EcosystemIntelligenceHintForChat({
+                      insight: phase11EcosystemInsight,
+                      userText: trimmed,
+                    }),
+                speedProfile.skipLayers.heavyPhaseHints ? null : sprint5.trustHint,
+                speedProfile.skipLayers.heavyPhaseHints ? null : sprint5.confidenceHint,
+                speedProfile.skipLayers.heavyPhaseHints ? null : sprint5.adaptiveHint,
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : mistakeRecoveryHintForChat(),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : actionBiasHintForChat(actionBias),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : discoveryOverrideForActionBias(actionBias),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : intuitiveAwareness
+                    ? intuitiveAwarenessHintForChat(intuitiveAwareness)
+                    : null,
+                speedProfile.skipLayers.heavyPhaseHints || !adhdEntrepreneur
+                  ? null
+                  : adhdEntrepreneurPrimaryHintForChat({
+                      analysis: adhdEntrepreneur,
+                      adhdNative,
+                    }),
+                speedProfile.skipLayers.heavyPhaseHints || !adhdNative
+                  ? null
+                  : adhdNativeHintForChat(adhdNative),
                 companionEntryLayerHintForChat(trimmed),
-                companionEcosystemRoutingHintForChat(trimmed),
-                intelligenceHintForChat(intelligence, trimmed),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : companionEcosystemRoutingHintForChat(trimmed),
+                speedProfile.skipLayers.heavyPhaseHints
+                  ? null
+                  : intelligenceHintForChat(intelligence, trimmed),
                 assistedActionHintForChat(lastAssistantText, lockedArtifactType),
                 artifactLockHintForChat(creationContext),
                 creationContext?.draftContent?.trim() &&
@@ -10587,11 +11663,13 @@ export default function CompanionPageClient() {
               workspaceContext,
               userText: trimmed,
               lastAssistantText,
-              teachingActive: learnFastPath
-                ? false
-                : teachingModeActive(trimmed, lastAssistantText, {
-                activeWorkflowLocked: shouldSuppressTeachingMode(workflowLockInput),
-              }),
+              teachingActive:
+                menuContinuation.active ||
+                (learnFastPath
+                  ? false
+                  : teachingModeActive(trimmed, lastAssistantText, {
+                      activeWorkflowLocked: shouldSuppressTeachingMode(workflowLockInput),
+                    })),
               createWorkspaceV2: createWorkspaceV2Active,
             }),
             companionFirstWorkflowHintForChat(trimmed, workspacePanel),
@@ -10611,6 +11689,9 @@ export default function CompanionPageClient() {
                 crossWorkspaceBesideOffer?.clientAvatarHandoff,
               ),
             }),
+            googleSheetsCreateHintForArtifact(
+              createBuilderSession?.typeLabel ?? creationContext?.itemType,
+            ),
           ]
             .filter(Boolean)
             .join("\n\n") || undefined,
@@ -10625,11 +11706,15 @@ export default function CompanionPageClient() {
           obstacle: obstacle ?? undefined,
           somatic: somatic || undefined,
           adaptiveModeHint: adaptiveHintForChat(adaptiveDecision),
-          ecosystemGuidance: ecosystemGuidanceForChat(ecosystemSnapshot),
+          ecosystemGuidance: ecosystemSnapshot
+            ? ecosystemGuidanceForChat(ecosystemSnapshot)
+            : undefined,
         }),
       });
 
       const data = await res.json();
+      latencyProfiler.measure("apiModel");
+      latencyProfiler.mark("responseEnforcement");
       if (!res.ok) {
         throw new Error(data.error ?? "Something went wrong.");
       }
@@ -10733,7 +11818,41 @@ export default function CompanionPageClient() {
         trimmed,
       );
 
+      latencyProfiler.measure("responseEnforcement");
+      latencyProfiler.mark("uiRender");
+
       rememberChatArtifactFromAssistant(assistantMsg, trimmed);
+      const menuPending = registerPendingMenuFromAssistant(
+        assistantMsg,
+        menuContinuation.active ? (priorUserText ?? trimmed) : trimmed,
+        chatTurnRef.current,
+      );
+      if (!menuPending) {
+        const strategyPending = registerStrategyOfferFromAssistant({
+          assistantText: assistantMsg,
+          priorUserText: menuContinuation.active ? (priorUserText ?? trimmed) : trimmed,
+          offeredAtTurn: chatTurnRef.current,
+        });
+        if (strategyPending) {
+          clearAllPendingOffers();
+          saveStrategyOfferPending(strategyPending);
+          registerPendingAcceptance(
+            "strategy_selection",
+            strategyPending.offerSummary,
+          );
+        } else {
+          const visualPending = registerVisualThinkingMenuFromAssistant({
+            assistantText: assistantMsg,
+            priorUserText: menuContinuation.active ? (priorUserText ?? trimmed) : trimmed,
+            offeredAtTurn: chatTurnRef.current,
+          });
+          if (visualPending) {
+            clearAllPendingOffers();
+            saveVisualThinkingMenuPending(visualPending);
+            registerPendingAcceptance("workspace", visualPending.offerSummary);
+          }
+        }
+      }
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: assistantMsg, relationshipTrace: uiTrace },
@@ -11097,6 +12216,10 @@ export default function CompanionPageClient() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
+      if (latencyProfiler.calledApi) {
+        latencyProfiler.measure("uiRender");
+        finishLatencyTurn({ calledApi: true });
+      }
       setIsLoading(false);
       inputRef.current?.focus();
     }
@@ -12806,7 +13929,17 @@ export default function CompanionPageClient() {
           ) : null}
 
           {activeSection === "home" && (
-            <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+            <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+              <WorkspaceDebugBanner
+                workspacePanel={workspacePanel}
+                chatLayoutMode={chatLayoutMode}
+                workspaceActive={Boolean(
+                  workspacePanel ||
+                    companionStandaloneSection ||
+                    guideBesideSession,
+                )}
+                createMounted={workspacePanel === CREATE_PANEL_SECTION}
+              />
               <WorkspaceLayout
                 chat={
             guideBesideSession &&

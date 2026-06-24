@@ -58,7 +58,8 @@ const AUDIENCE_RE =
 const STRATEGY_RE =
   /\b(?:marketing plan|business strategy|go to market|gtm|launch plan|growth plan)\b/i;
 
-const FUNNEL_RE = /\b(?:sales funnel|funnel|customer journey)\b/i;
+const FUNNEL_RE =
+  /\b(?:sales funnel|marketing funnel|lead(?:\s+generation)? funnel|email funnel|webinar funnel|workshop funnel|launch funnel|course funnel|membership funnel|automation funnel|customer journey|funnel)\b/i;
 
 const WORKSHOP_RE = /\b(?:workshop|webinar|masterclass|course launch)\b/i;
 
@@ -76,7 +77,7 @@ const TEACHING_TO_WORKSPACE: {
       "We have a **Client Avatar** builder — want to create one while we're talking about it?",
   },
   {
-    re: /\b(?:sales funnel|funnel|customer journey)\b/i,
+    re: /\b(?:sales funnel|marketing funnel|lead(?:\s+generation)? funnel|email funnel|webinar funnel|workshop funnel|launch funnel|course funnel|membership funnel|automation funnel|customer journey|funnel)\b/i,
     section: "content-generator",
     workspaceLabel: "Create",
     offer:

@@ -502,7 +502,7 @@ export function buildBusinessLegacy(now = new Date()): BusinessLegacyItem[] {
     });
   }
 
-  for (const p of projects.filter((p) => p.status !== "archived").slice(0, 4)) {
+  for (const p of projects.filter((p) => p.status !== "completed").slice(0, 4)) {
     items.push({
       kind: "project",
       label: p.name,

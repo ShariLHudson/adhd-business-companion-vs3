@@ -35,6 +35,15 @@ export type VisualThinkingPendingAction = FrictionlessPendingAction & {
   menuOffer?: VisualThinkingMenuOffer;
 };
 
+export function isVisualThinkingPendingAction(
+  pending: FrictionlessPendingAction,
+): pending is VisualThinkingPendingAction {
+  return (
+    pending.type === "visual_thinking_menu" ||
+    pending.type === "visual_recommendation"
+  );
+}
+
 const PENDING_KEY = "companion-visual-thinking-menu-v1";
 
 const LEGACY_MENU_OFFER_RE =
@@ -178,13 +187,14 @@ export function recoverVisualThinkingMenuFromChat(input: {
   lastAssistantText: string;
   priorUserText?: string;
   lastAssistantContent?: string;
+  currentTurn?: number;
 }): VisualThinkingPendingAction | null {
   if (!isVisualThinkingMenuOfferMessage(input.lastAssistantText)) return null;
   const prompt = input.priorUserText?.trim() ?? "";
   if (!prompt) return null;
   return buildVisualThinkingMenuPendingAction({
     initialPrompt: prompt,
-    offeredAtTurn: 0,
+    offeredAtTurn: Math.max(1, (input.currentTurn ?? 1) - 1),
     lastAssistantText: input.lastAssistantContent,
   });
 }

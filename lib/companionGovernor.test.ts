@@ -78,16 +78,16 @@ describe("companionGovernor", () => {
     expect(s.outcome).toBe("chat_only");
     expect(s.lane).toBe("teaching");
     expect(s.suppressCards).toBe(true);
-    expect(s.promptHints.join(" ")).toMatch(/TEACHING MODE/i);
-    expect(s.promptHints.join(" ")).toMatch(/Do NOT write a long guide/i);
+    expect(s.promptHints.join(" ")).toMatch(/LEARNING PATH MENU/i);
+    expect(s.promptHints.join(" ")).toMatch(/Deep Dive/i);
   });
 
   it("path pick after teaching menu → teaching continuation", () => {
     const menu =
-      "A sales funnel is simply the journey from hearing about you to becoming a customer.\n\nWould you like:\n1. Simple explanation\n2. Real-world example\n3. Apply to my business\n4. Build one together";
-    const s = gov("Build one together", menu);
+      "A sales funnel is simply the journey from hearing about you to becoming a customer.\n\nWould you like:\n1. Quick Answer\n2. Example\n3. Apply to My Business\n4. Deep Dive";
+    const s = gov("4", menu);
     expect(s.lane).toBe("teaching");
-    expect(s.promptHints.join(" ")).toMatch(/one stage at a time/i);
+    expect(s.promptHints.join(" ")).toMatch(/DEEP DIVE/i);
   });
 
   it("6 — Open Momentum Games → chat_only (use UI to open)", () => {

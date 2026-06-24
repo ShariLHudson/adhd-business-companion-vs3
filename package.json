@@ -3,13 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3000 --webpack",
-    "build": "next build",
+    "dev": "node scripts/companion-audit-guardrail.mjs dev && next dev -p 3000 --webpack",
+    "build": "next build && node scripts/companion-audit-guardrail.mjs post-build",
     "start": "next start -p 3000",
     "lint": "eslint",
     "test": "vitest run",
     "audit:companion": "vitest run lib/companionBehaviorAudit.test.ts",
-    "audit:companion:report": "vitest run lib/companionBehaviorAudit.test.ts --reporter=verbose"
+    "audit:companion:record": "vitest run lib/companionBehaviorAudit.test.ts && node scripts/companion-audit-guardrail.mjs record",
+    "audit:companion:report": "vitest run lib/companionBehaviorAudit.test.ts --reporter=verbose",
+    "audit:companion:latency": "vitest run lib/companionLatencyProfiler.test.ts && npx tsx scripts/companion-latency-qa.ts",
+    "audit:companion:check": "node scripts/companion-audit-guardrail.mjs check",
+    "setup:hooks": "node scripts/install-companion-git-hooks.mjs",
+    "postinstall": "node scripts/install-companion-git-hooks.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.1",

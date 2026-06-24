@@ -2,12 +2,20 @@
 
 import type { RelationshipResponseUiTrace } from "@/lib/relationshipResponseTrace";
 
+/** Visible only when explicitly enabled — default OFF even in development. */
+export function isRelationshipDebugUiEnabled(): boolean {
+  return (
+    process.env.NODE_ENV === "development" &&
+    process.env.NEXT_PUBLIC_SHOW_RELATIONSHIP_DEBUG === "true"
+  );
+}
+
 export function RelationshipResponseDevBadge({
   trace,
 }: {
   trace: RelationshipResponseUiTrace;
 }) {
-  if (process.env.NODE_ENV !== "development") return null;
+  if (!isRelationshipDebugUiEnabled()) return null;
 
   const receiveMatchesRender =
     trace.firstParagraphAtApiReceive.slice(0, 80) ===

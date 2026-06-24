@@ -66,6 +66,9 @@ export type RelationshipTurnDebugFull = RelationshipTurnDebugClientMeta &
     relationshipResponseRewriteReason?: string | null;
     relationshipEnforcementRan?: boolean;
     relationshipEnforcementSkipReason?: string | null;
+    relationshipResponseId?: string | null;
+    uiTraceFirstParagraphAtReceive?: string | null;
+    uiTraceFirstParagraphAtRender?: string | null;
     phase?: "pre-api" | "post-api";
   };
 

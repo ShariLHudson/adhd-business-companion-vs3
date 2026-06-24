@@ -77,7 +77,7 @@ const VISUAL_GOAL_RULES: {
   {
     test: /\b(?:business\s+model|how (?:my )?business works|business ecosystem)\b/i,
     recommended: ["business-ecosystem-map", "customer-journey-map"],
-    other: ["funnel-map", "relationship-map", "project-map"],
+    other: ["funnel-map", "customer-journey-map", "project-map"],
   },
   {
     test: /\b(?:organize my ideas|structure my ideas|plan (?:a |an |my )?(?:course|launch|project))\b/i,

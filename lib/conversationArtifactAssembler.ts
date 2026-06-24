@@ -82,7 +82,7 @@ const TYPE_IN_COMMAND: { type: AssemblyArtifactType; re: RegExp }[] = [
   { type: "Checklist", re: /\bchecklist\b/i },
   {
     type: "Email Campaign",
-    re: /\b(?:email sequence|email series|drip sequence|nurture sequence)\b/i,
+    re: /\b(?:email sequence|email series|drip sequence|nurture sequence|follow-?up sequence|sales sequence)\b/i,
   },
   { type: "Project Plan", re: /\bproject plan\b/i },
   { type: "Document", re: /\b(?:general )?document\b/i },

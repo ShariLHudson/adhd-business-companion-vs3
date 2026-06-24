@@ -11,6 +11,11 @@
 import { audioSuggestionLine, detectAudioRequest } from "./audioSuggestions";
 import { shouldBlockStressAutoToolRouting } from "./stressRouting";
 import { matchCatalogFromText } from "./createCatalog";
+import {
+  containsVisualStructurePhrase,
+  resolveDecisionStructureWorkspaceOffer,
+  resolveVisualStructureWorkspaceOffer,
+} from "./visualStructureRouting";
 import type { AppSection } from "./companionUi";
 import { multiItemWorkspaceOfferLine } from "./multiItemWorkspace";
 import {
@@ -158,6 +163,7 @@ export type WorkspaceOffer = {
   section: AppSection;
   buttonLabel: string;
   line: string;
+  visualFocusMode?: import("./visualFocus/types").VisualFocusMode;
   secondary?: {
     section: AppSection;
     buttonLabel: string;
@@ -190,6 +196,25 @@ export function hasEmotionalBarrier(text: string): boolean {
 }
 
 function matchWorkspaceTarget(t: string): WorkspaceTarget | null {
+  const visualOffer = resolveVisualStructureWorkspaceOffer(t);
+  if (visualOffer) {
+    return {
+      section: visualOffer.section,
+      buttonLabel: "Open Visual Thinking",
+      topic: visualOffer.visualFocusMode ?? visualOffer.section,
+      topicLabel: "Visual Thinking",
+    };
+  }
+  const decisionOffer = resolveDecisionStructureWorkspaceOffer(t);
+  if (decisionOffer) {
+    return {
+      section: decisionOffer.section,
+      buttonLabel: "Open Decision Compass",
+      topic: decisionOffer.section,
+      topicLabel: "Decision Compass",
+    };
+  }
+
   const catalog = matchCatalogFromText(t);
   if (catalog?.route) {
     return {

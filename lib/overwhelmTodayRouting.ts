@@ -55,6 +55,7 @@ export function isOverwhelmTodayStartIntent(text: string): boolean {
   if (hasOverwhelm && hasToday && /\b(?:start|work on|first|getting started)\b/i.test(t)) {
     return true;
   }
+  if (START_TODAY_SIGNAL_RE.test(t)) return true;
   if (START_TODAY_SIGNAL_RE.test(t) && hasToday) return true;
 
   return false;

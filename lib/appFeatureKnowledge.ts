@@ -4,6 +4,7 @@
  * and verified UI (FocusAreaPanel, companionUi, SettingsPanel, StrategiesPanel).
  */
 
+import { isHowToLearningQuestion } from "./howToLearningIntelligence";
 import { isConceptTeachingRequest } from "./teachingMode";
 
 export type AppFeatureId =
@@ -394,6 +395,7 @@ export function isAppHowToQuestion(text: string): boolean {
   if (isConceptTeachingRequest(t)) return false;
 
   if (/\bhow do i\b/i.test(t)) {
+    if (isHowToLearningQuestion(t)) return false;
     if (matchAppFeatures(t).length > 0) return true;
     if (
       /\b(?:find|open|change|access|use)\b/i.test(t) &&

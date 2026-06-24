@@ -44,6 +44,7 @@ import {
 import { visualThinkingStudioHintForChat } from "./visualThinkingStudio";
 import { visualThinkingOverreachHintForChat } from "./visualThinkingOverreach";
 import { visualRecommendationEngineHintForChat } from "./visualRecommendationEngine";
+import { isHowToLearningQuestion, howToLearningHintForChat } from "./howToLearningIntelligence";
 import { visualLearnBoundaryHintForChat } from "./visualLearnBoundary";
 import { visualThinkingGuardsHintForChat } from "./visualThinkingGuards";
 import { visualTypeAvailabilityHintForChat } from "./visualTypeAvailability";
@@ -152,7 +153,11 @@ const LEARN_RE =
   /\b(?:teach me|explain (?:how|what|why)|how does (?:this|it) work|walk me through|what is a[n]?)\b/i;
 
 function isLearnIntent(text: string): boolean {
-  return isKnowledgeQuestion(text) || LEARN_RE.test(text.trim());
+  return (
+    isHowToLearningQuestion(text) ||
+    isKnowledgeQuestion(text) ||
+    LEARN_RE.test(text.trim())
+  );
 }
 
 const DECIDE_RE =
@@ -372,7 +377,7 @@ function buildNavigationLine(
   if (section === "decision-compass" || category === "decide") {
     return `This sounds like a ${label} conversation. Would you like to open ${label}?`;
   }
-  if (section === "plan-my-day" || (category === "plan" && section === "plan-my-day")) {
+  if (section === "plan-my-day" || category === "plan") {
     return `We can do this here, or I can open ${label}. Would you like to open ${label}?`;
   }
   if (section === "projects" && SOP_BUILD_RE.test(userText)) {

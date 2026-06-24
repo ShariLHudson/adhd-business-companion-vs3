@@ -1,6 +1,6 @@
 // Pre-routing intent normalization — runs before Chat, Create, or bridge decisions.
 
-import { catalogIntentTypeRules } from "./createCatalog";
+import { catalogIntentTypeRules } from "./createCatalogData";
 import { isInformationIntent } from "./companionIntentRouting";
 import {
   isExplicitCreationRequest,
@@ -41,7 +41,14 @@ const NEED_WANT_DELIVERABLE_RE =
 const MAKE_DELIVERABLE_RE =
   /\b(?:make|making)\s+(?:a|an|the|my)\s+(?!it\b|this\b|that\b)/i;
 
-const TYPE_RULES: { type: string; re: RegExp }[] = catalogIntentTypeRules();
+let typeRulesCache: { type: string; re: RegExp }[] | null = null;
+
+function getTypeRules(): { type: string; re: RegExp }[] {
+  if (!typeRulesCache) {
+    typeRulesCache = catalogIntentTypeRules();
+  }
+  return typeRulesCache;
+}
 
 const OTHER_TASK_RE =
   /\b(homepage|home\s+page|website|fix\s+my|invoice|bookkeeping|taxes|call\s+the|meeting|schedule)\b/gi;
@@ -125,7 +132,7 @@ export function extractTopic(text: string, makeType?: string | null): string {
       " ",
     );
 
-  for (const { re } of TYPE_RULES) {
+  for (const { re } of getTypeRules()) {
     s = s.replace(re, " ");
   }
   if (makeType) {
@@ -212,7 +219,7 @@ export function hasCreateIntent(text: string): boolean {
 
 export function findLastMakeType(text: string): string | null {
   let best: { type: string; index: number } | null = null;
-  for (const { type, re } of TYPE_RULES) {
+  for (const { type, re } of getTypeRules()) {
     re.lastIndex = 0;
     let m: RegExpExecArray | null;
     while ((m = re.exec(text)) !== null) {
@@ -224,7 +231,7 @@ export function findLastMakeType(text: string): string | null {
 
 function countDistinctMakeTypes(text: string): number {
   const found = new Set<string>();
-  for (const { type, re } of TYPE_RULES) {
+  for (const { type, re } of getTypeRules()) {
     re.lastIndex = 0;
     if (re.test(text)) found.add(type);
   }

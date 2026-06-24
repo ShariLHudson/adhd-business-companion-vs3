@@ -7,7 +7,7 @@ import {
   firstParagraphForTrace,
   logRelationshipResponseTrace,
 } from "@/lib/relationshipResponseTrace";
-import { RelationshipResponseDevBadge } from "@/components/companion/RelationshipResponseDevBadge";
+import { RelationshipResponseDevBadge, isRelationshipDebugUiEnabled } from "@/components/companion/RelationshipResponseDevBadge";
 
 type Message = {
   role: "user" | "assistant" | "system";
@@ -108,7 +108,9 @@ function AssistantMessageWithTrace({
       >
         {renderAssistant(content)}
       </div>
-      {trace ? <RelationshipResponseDevBadge trace={trace} /> : null}
+      {trace && isRelationshipDebugUiEnabled() ? (
+        <RelationshipResponseDevBadge trace={trace} />
+      ) : null}
     </>
   );
 }

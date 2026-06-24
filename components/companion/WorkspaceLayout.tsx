@@ -3,6 +3,12 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import type { ChatLayoutMode } from "@/lib/workspaceNav";
 import {
+  buildCreateOpenLiveSnapshot,
+  isWorkspaceDebugEnabled,
+  publishCreateOpenLiveTrace,
+} from "@/lib/createOpenLiveTrace";
+import { CREATE_PANEL_SECTION } from "@/lib/openCreateWorkspace";
+import {
   SPLIT_CHAT_PANE_CLASS,
   SPLIT_WORKSPACE_PANE_CLASS,
   WORKSPACE_HEADER_MIN_HEIGHT_CLASS,
@@ -77,6 +83,23 @@ export function WorkspaceLayout({
   const lastRevealKeyRef = useRef(0);
   const lastChatFocusKeyRef = useRef(0);
   const chatHidden = chatLayoutMode === "workspace-focus";
+
+  useEffect(() => {
+    if (!isWorkspaceDebugEnabled() || !workspaceActive) return;
+    publishCreateOpenLiveTrace(
+      buildCreateOpenLiveSnapshot({
+        traceId: "workspace-layout",
+        stage: "workspace_layout_render",
+        workspacePanel: workspaceActive ? CREATE_PANEL_SECTION : null,
+        chatLayoutMode,
+        workspaceActive,
+        activeSection: "home",
+        activeNav: null,
+        hideWorkspacePanel: !workspaceActive || !workspace,
+        extra: `chatHidden=${chatHidden} hasWorkspaceNode=${Boolean(workspace)}`,
+      }),
+    );
+  }, [workspaceActive, workspace, chatLayoutMode, chatHidden, revealKey]);
 
   useEffect(() => {
     if (workspaceActive && !prevActiveRef.current) {

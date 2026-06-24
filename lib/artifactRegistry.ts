@@ -3,6 +3,9 @@
  * Maps user language → artifact kind for Create routing and execute override.
  */
 
+import { isCompanionFirstQuestion } from "./companionFirstWorkflow";
+import { containsVisualStructurePhrase } from "./visualStructureRouting";
+
 export type RegistryArtifactKind =
   | "email"
   | "sop"
@@ -77,10 +80,16 @@ export function hasArtifactExecuteVerb(text: string): boolean {
   return ARTIFACT_EXECUTE_VERB_RE.test(text.trim());
 }
 
+const FEATURE_DISCOVERY_RE =
+  /\b(?:is there a feature|does this app|can this app|where (?:do|can) i (?:find|save|access))\b/i;
+
 /** User wants to build/produce a registered business deliverable now. */
 export function isRegistryArtifactExecution(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (containsVisualStructurePhrase(t)) return false;
+  if (isCompanionFirstQuestion(t)) return false;
+  if (FEATURE_DISCOVERY_RE.test(t)) return false;
   if (!detectRegistryArtifact(t)) return false;
   if (hasArtifactExecuteVerb(t)) return true;
   if (ARTIFACT_NEED_VERB_RE.test(t)) return true;
@@ -123,6 +132,50 @@ export function registryArtifactLabel(kind: RegistryArtifactKind): string {
       return "social post";
     case "client_avatar":
       return "client avatar";
+  }
+}
+
+/** Canonical Create catalog label for registry artifact kinds (P0.10.2). */
+export function registryArtifactKindToCreateItemType(
+  kind: RegistryArtifactKind,
+): string {
+  switch (kind) {
+    case "email":
+      return "Email";
+    case "sop":
+      return "SOP";
+    case "marketing_plan":
+      return "Marketing Plan";
+    case "content_plan":
+      return "Content Plan";
+    case "proposal":
+      return "Proposal";
+    case "checklist":
+      return "Checklist";
+    case "workflow":
+      return "Workflow";
+    case "content":
+      return "Document";
+    case "funnel":
+      return "Sales Funnel";
+    case "email_sequence":
+      return "Email Sequence";
+    case "landing_page":
+      return "Landing Page";
+    case "lead_magnet":
+      return "Lead Magnet";
+    case "offer":
+      return "Offer";
+    case "sales_page":
+      return "Sales Page";
+    case "sales_script":
+      return "Sales Script";
+    case "social_post":
+      return "Social Post";
+    case "client_avatar":
+      return "Client Avatar";
+    default:
+      return registryArtifactLabel(kind);
   }
 }
 

@@ -40,4 +40,5 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-.vercel
+# companion audit guardrail state (local)
+.companion-audit-state.json

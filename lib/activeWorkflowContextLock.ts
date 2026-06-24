@@ -241,7 +241,7 @@ export function activeWorkflowConceptHintForChat(opts: {
     `User is already building **${opts.workflow.label}** — they are NOT starting from zero.`,
     `They asked about **${topic}** while a workflow question was pending.`,
     "Do NOT enter Teaching Mode.",
-    "Do NOT offer: Simple explanation / Real-world example / Apply to my business / Build one together.",
+    "Do NOT offer: Quick Answer / Example / Apply to My Business / Deep Dive.",
     "Do NOT restart discovery, offer learning paths, or open unrelated workspaces.",
     "Instead:",
     "1) Brief plain-language answer (2–4 sentences max).",

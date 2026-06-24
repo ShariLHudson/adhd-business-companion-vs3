@@ -20,6 +20,10 @@ function escapeCsvCell(cell: string): string {
   return c;
 }
 
+export function rowsToCsv(rows: string[][]): string {
+  return rows.map((row) => row.map(escapeCsvCell).join(",")).join("\n");
+}
+
 function markdownTableToRows(content: string): string[][] | null {
   const lines = content.split("\n").map((l) => l.trim()).filter(Boolean);
   const tableLines = lines.filter((l) => l.includes("|"));

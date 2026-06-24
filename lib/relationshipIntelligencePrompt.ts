@@ -3,6 +3,7 @@
  * Prepended to the LLM system prompt so it overrides generic coaching openers.
  */
 
+import { shouldSuppressRelationshipIntelligenceForUserText } from "./relationshipIntelligenceBoundaries";
 import { isPhase7BusinessIntelligenceEcosystemActive } from "./businessIntelligenceEcosystem";
 import {
   getCurrentRelationshipPhase,
@@ -217,6 +218,9 @@ export function buildRelationshipIntelligencePriorityBlock(
   now = new Date(),
   options?: { suppressContractForRouting?: boolean; workspace?: string | null },
 ): string | null {
+  if (userText && shouldSuppressRelationshipIntelligenceForUserText(userText)) {
+    return null;
+  }
   const confidence = assessRelationshipMemoryConfidence();
   if (confidence === "none") return null;
 

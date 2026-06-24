@@ -27,9 +27,12 @@ const LAYERS_SKIPPED_ON_LEARN = [
 /** Rough tokens not sent on the learn fast path (prompt budget estimate). */
 const ESTIMATED_TOKENS_PER_LAYER = 400;
 
+import { isHowToLearningQuestion } from "./howToLearningIntelligence";
+
 export function isKnowledgeQuestion(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (isHowToLearningQuestion(t)) return true;
   if (isAppHowToQuestion(t)) return false;
   if (isRegistryArtifactExecution(t)) return false;
   if (USER_FOCUSED_UNDERSTAND_RE.test(t)) return false;

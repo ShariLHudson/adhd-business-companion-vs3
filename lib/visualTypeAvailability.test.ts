@@ -34,6 +34,14 @@ describe("visualTypeAvailability (P0.20.4 planned fallbacks)", () => {
       expect(reply).toContain("signup → email → kickoff call");
     });
 
+    it("with unrelated prior question asks for steps instead of drafting", () => {
+      const reply = resolveUnavailableVisualTypeReply("create a flowchart", {
+        priorContent: "What process would you like the flowchart to show?",
+      });
+      expect(reply).toMatch(/What are the steps you want included\?/);
+      expect(reply).not.toMatch(/→/);
+    });
+
     it("extracts comma-separated steps after a label", () => {
       expect(extractFlowStepsFromContent("Onboarding: signup, email, kickoff call.")).toEqual(
         ["signup", "email", "kickoff call"],

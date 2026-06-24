@@ -5,6 +5,11 @@
  */
 
 import { detectAudioRequest } from "./audioSuggestions";
+import {
+  adhdEmotionalFrictionHintForChat,
+  buildAdhdEmotionalFrictionReply,
+  isAdhdEmotionalFrictionTurn,
+} from "./adhdEmotionalFrictionIntelligence";
 import type { ToolSuggestion } from "./companionToolSuggestions";
 import type { AppSection } from "./companionUi";
 import {
@@ -35,6 +40,7 @@ import {
 } from "./overwhelmTodayRouting";
 import {
   buildStrategyOfferPendingFromRecommendation,
+  isStrategyIntelligenceOfferMessage,
   shouldSkipStrategyOfferForUserText,
 } from "./strategyOfferContinuation";
 import { recommendStrategyFromUserText } from "./strategyIntelligence";
@@ -42,6 +48,7 @@ import {
   resolveUnavailableVisualTypeReply,
 } from "./visualTypeAvailability";
 import { clearVisualRecommendationPending } from "./visualThinkingContinuation";
+import { isVisualThinkingMenuOfferMessage } from "./visualThinkingContinuation";
 import {
   isActivationProblem,
   isMotivationProblem,
@@ -73,14 +80,27 @@ import {
   type GoogleSheetTypeId,
 } from "./googleSheetsIntelligence";
 import type { WorkspaceOffer } from "./workspaceMode";
+import type { TimeBlock } from "./companionStore";
+import {
+  reminderHintForChat,
+  resolveReminderTurn,
+  type ReminderDraft,
+} from "./reminderIntelligence";
+import type { ReminderIntakeSession } from "./reminderStore";
+import {
+  buildVisualSourceAskReply,
+  validateVisualSourceContent,
+} from "./visualSourceContentValidation";
 
 export type FrictionlessActionCategory =
   | "direct_action"
   | "tool_open"
   | "emotional_regulation"
+  | "adhd_emotional_friction"
   | "focus_support"
   | "decision_support"
   | "google_sheet"
+  | "reminder"
   | "none";
 
 export type FrictionlessPendingAction = {
@@ -120,6 +140,8 @@ export type FrictionlessActionInput = {
   emotionalState?: string;
   overwhelmed?: boolean;
   workspace?: AppSection | null;
+  timeBlocks?: TimeBlock[];
+  reminderDraft?: ReminderDraft | null;
 };
 
 export type FrictionlessActionDecision = {
@@ -134,6 +156,7 @@ export type FrictionlessActionDecision = {
   workspaceOffer: WorkspaceOffer | null;
   intentRouting: IntentRoutingDecision | null;
   googleSheetIntake?: GoogleSheetIntakeSession;
+  reminderIntake?: ReminderIntakeSession | null;
   immediateVisualOpen?: {
     mode: import("./visualFocus/types").VisualFocusMode;
     viewId: VisualThinkingViewId;
@@ -280,9 +303,17 @@ export function frictionlessPendingFromToolOffer(
 ): FrictionlessPendingAction {
   const tool =
     suggestion.action.type === "tool" ? suggestion.action.tool : "focus-audio";
+  const target = (
+    tool === "focus-audio" ||
+    tool === "breathe" ||
+    tool === "focus-timer" ||
+    tool === "brain-dump"
+      ? tool
+      : "focus-audio"
+  ) satisfies FrictionlessPendingAction["target"];
   return {
     type: "open_tool",
-    target: tool,
+    target,
     context: suggestion.line,
     focusAudioCategory: tool === "focus-audio" ? "calm-brain" : undefined,
     offeredAtTurn,
@@ -364,6 +395,64 @@ function buildAudioPending(
   };
 }
 
+function buildAdhdEmotionalFrictionDecision(
+  userText: string,
+  currentTurn: number,
+): FrictionlessActionDecision {
+  return {
+    category: "adhd_emotional_friction",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: adhdEmotionalFrictionHintForChat(userText),
+    localReply: buildAdhdEmotionalFrictionReply(userText),
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: null,
+  };
+}
+
+function buildReminderDecision(
+  userText: string,
+  currentTurn: number,
+  input: FrictionlessActionInput,
+): FrictionlessActionDecision | null {
+  const outcome = resolveReminderTurn({
+    userText,
+    draft: input.reminderDraft ?? null,
+    timeBlocks: input.timeBlocks ?? [],
+  });
+  if (outcome.kind === "not_reminder") return null;
+
+  const base: FrictionlessActionDecision = {
+    category: "reminder",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: reminderHintForChat(),
+    localReply: outcome.reply,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: null,
+    reminderIntake: null,
+  };
+
+  if (outcome.kind === "ask") {
+    return {
+      ...base,
+      reminderIntake: {
+        phase: "collecting",
+        draft: outcome.draft,
+        startedAtTurn: currentTurn,
+      },
+    };
+  }
+
+  return base;
+}
+
 function buildFocusSupportDecision(
   currentTurn: number,
 ): FrictionlessActionDecision {
@@ -422,6 +511,22 @@ function buildGoogleSheetsIntakeDecision(
   currentTurn: number,
 ): FrictionlessActionDecision {
   const started = startGoogleSheetIntake(sheetType, userText);
+  if (started.outcome !== "ask") {
+    return {
+      category: "google_sheet",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "GOOGLE SHEETS INTELLIGENCE (P0.18): One intake question at a time. Offer Google Sheet when ready — not Create.",
+      localReply: "What's the first detail to capture?",
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: null,
+      googleSheetIntake: undefined,
+    };
+  }
   return {
     category: "google_sheet",
     suppressRelationship: true,
@@ -776,6 +881,26 @@ export function resolveFrictionlessAction(
     if (isVisualConversionRequest(userText) && input.lastAssistantText?.trim()) {
       const view = detectConversionTargetView(userText);
       if (view) {
+        const sourceValidation = validateVisualSourceContent({
+          userText,
+          sourceContent: input.lastAssistantText,
+          currentTurn,
+        });
+        if (!sourceValidation.ok) {
+          return {
+            category: "direct_action",
+            suppressRelationship: true,
+            suppressRecap: true,
+            suppressReflectionFirst: true,
+            responseHint:
+              "VISUAL SOURCE VALIDATION (P0.20.5): Prior content failed validation — ask for source instead of converting.",
+            localReply: buildVisualSourceAskReply(userText, sourceValidation),
+            pendingAction: null,
+            toolSuggestion: null,
+            workspaceOffer: null,
+            intentRouting: routing,
+          };
+        }
         return {
           category: "direct_action",
           suppressRelationship: true,
@@ -824,14 +949,25 @@ export function resolveFrictionlessAction(
     );
   }
 
-  const audio = buildAudioPending(userText, currentTurn);
-  if (audio) return audio;
+  const reminderDecision = buildReminderDecision(userText, currentTurn, input);
+  if (reminderDecision) return reminderDecision;
 
   if (
     EMOTIONAL_REGULATION_RE.test(userText) &&
     !PRODUCTIVITY_FRAMING_RE.test(userText)
   ) {
     return buildEmotionalRegulationDecision(currentTurn);
+  }
+
+  if (isAdhdEmotionalFrictionTurn(userText)) {
+    return buildAdhdEmotionalFrictionDecision(userText, currentTurn);
+  }
+
+  const audio = buildAudioPending(userText, currentTurn);
+  if (audio) return audio;
+
+  if (FOCUS_SUPPORT_RE.test(userText) && !/\boverwhelm/i.test(userText)) {
+    return buildFocusSupportDecision(currentTurn);
   }
 
   if (isOverwhelmProblem(userText)) {
@@ -843,11 +979,7 @@ export function resolveFrictionlessAction(
     if (overwhelm) return overwhelm;
   }
 
-  if (FOCUS_SUPPORT_RE.test(userText) && !/\boverwhelm/i.test(userText)) {
-    return buildFocusSupportDecision(currentTurn);
-  }
-
-  if (isMotivationProblem(userText)) {
+  if (isMotivationProblem(userText) && !isAdhdEmotionalFrictionTurn(userText)) {
     return buildMotivationSupportDecision(currentTurn);
   }
 
@@ -922,6 +1054,11 @@ export function frictionlessHintForChat(
   if (decision.category === "emotional_regulation") {
     lines.push("No productivity or business framing.");
   }
+  if (decision.category === "adhd_emotional_friction") {
+    lines.push(
+      "Acknowledge first. One question only. No task planning or tools until they answer.",
+    );
+  }
   if (decision.category === "focus_support") {
     lines.push("Ask what needs attention OR offer Focus Mode / Focus Audio.");
   }
@@ -930,16 +1067,112 @@ export function frictionlessHintForChat(
       "One question at a time for sheet intake. Offer Google Sheet creation when ready.",
     );
   }
+  if (decision.category === "reminder") {
+    lines.push("Short confirmation only. No relationship layer or tool offers.");
+  }
   return lines.join("\n");
+}
+
+export function isFrictionlessPendingAlignedWithAssistant(
+  pending: FrictionlessPendingAction,
+  lastAssistantText: string,
+  currentTurn: number,
+): boolean {
+  if (isFrictionlessPendingExpired(pending, currentTurn)) return false;
+
+  const assistant = lastAssistantText.trim();
+  if (!assistant) return false;
+
+  if (pending.type === "strategy_offer") {
+    return isStrategyIntelligenceOfferMessage(assistant);
+  }
+
+  if (
+    pending.type === "visual_recommendation" ||
+    pending.type === "visual_thinking_menu"
+  ) {
+    return isVisualThinkingMenuOfferMessage(assistant);
+  }
+
+  if (pending.type === "create_google_sheet") {
+    return /\b(?:google sheet|spreadsheet|create (?:the |your |a )?sheet)\b/i.test(
+      assistant,
+    );
+  }
+
+  if (pending.target === "content-generator") {
+    return (
+      /\b(?:open create|create workspace|draft (?:a|an|the)|would you like (?:me )?to (?:create|draft|open))\b/i.test(
+        assistant,
+      ) ||
+      Boolean(
+        pending.artifactType &&
+          assistant.toLowerCase().includes(pending.artifactType.toLowerCase()),
+      )
+    );
+  }
+
+  if (pending.target === "brain-dump") {
+    return /\bclear my mind\b/i.test(assistant);
+  }
+
+  if (pending.target === "plan-my-day") {
+    return /\bplan my day\b/i.test(assistant);
+  }
+
+  if (pending.target === "decision-compass") {
+    return /\bdecision compass\b/i.test(assistant);
+  }
+
+  if (pending.target === "focus-audio") {
+    return /\bfocus audio\b/i.test(assistant);
+  }
+
+  if (pending.target === "breathe") {
+    return /\bbreathe\b/i.test(assistant);
+  }
+
+  if (pending.target === "playbook") {
+    return (
+      /\bstrateg(?:y|ies)\b/i.test(assistant) &&
+      /\b(?:would you like|open)\b/i.test(assistant)
+    );
+  }
+
+  if (pending.target === "visual-focus") {
+    return (
+      /\bvisual thinking\b/i.test(assistant) ||
+      /\b(?:mind map|decision tree|flowchart|diagram)\b/i.test(assistant)
+    );
+  }
+
+  const summary = pending.offerSummary?.trim();
+  if (summary && summary.length >= 8) {
+    const fragment = summary.slice(0, 28).toLowerCase();
+    if (assistant.toLowerCase().includes(fragment)) return true;
+  }
+
+  return pending.offeredAtTurn >= currentTurn - 1;
 }
 
 export function resolveFrictionlessContinuation(
   userText: string,
   pending: FrictionlessPendingAction,
   currentTurn: number,
+  lastAssistantText?: string,
 ): { execute: boolean; ack: string } | null {
   if (!isFrictionlessAffirmation(userText)) return null;
   if (isFrictionlessPendingExpired(pending, currentTurn)) return null;
+  if (
+    lastAssistantText &&
+    !isFrictionlessPendingAlignedWithAssistant(
+      pending,
+      lastAssistantText,
+      currentTurn,
+    )
+  ) {
+    return null;
+  }
   if (pending.target === "content-generator") {
     logCreatePendingAction("accepted pending action", {
       target: pending.target,

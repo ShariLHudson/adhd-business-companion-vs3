@@ -26,6 +26,7 @@ import {
 import { useVisualMode } from "@/lib/useVisualMode";
 import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
 import { playChime, unlockChime } from "@/lib/chime";
+import { RemindersPanel } from "@/components/companion/RemindersPanel";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
@@ -1058,6 +1059,8 @@ export function SettingsPanel({
           >
             🔔 Test sound
           </button>
+
+          <RemindersPanel />
         </div>
       </div>
     );

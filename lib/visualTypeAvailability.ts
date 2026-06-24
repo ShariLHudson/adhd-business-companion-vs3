@@ -5,6 +5,7 @@
 
 import type { VisualFocusMode } from "./visualFocus/types";
 import type { VisualThinkingViewId } from "./visualThinkingStudio";
+import { validateVisualSourceContent } from "./visualSourceContentValidation";
 
 export type VisualTypeId =
   | "mind_map"
@@ -117,11 +118,16 @@ export function isPlannedVisualTypeRequest(text: string): boolean {
   return VISUAL_TYPES[typeId].status === "planned";
 }
 
+import { isHowToLearningQuestion } from "./howToLearningIntelligence";
+
 const VISUAL_CREATE_RE =
   /\b(?:create|build|make|open|start|help me (?:create|make|build|open)|map out|turn (?:this|it|that) into|visuali[sz]e)\b/i;
 
 export function isVisualCreateIntent(text: string): boolean {
-  return VISUAL_CREATE_RE.test(text.trim());
+  const t = text.trim();
+  if (!t) return false;
+  if (isHowToLearningQuestion(t)) return false;
+  return VISUAL_CREATE_RE.test(t);
 }
 
 export type PlannedVisualFallbackContext = {
@@ -172,16 +178,22 @@ export function buildPlannedVisualTypeFallbackReply(
   switch (typeId) {
     case "flowchart": {
       if (prior) {
-        const steps = extractFlowStepsFromContent(prior);
-        if (steps.length >= 2) {
-          return [
-            "Flowcharts aren't fully built into Visual Thinking yet, but I can turn those steps into a draft flow here.",
-            "",
-            formatFlowOutline(steps),
-            alt.trim(),
-          ]
-            .filter(Boolean)
-            .join("\n");
+        const validation = validateVisualSourceContent({
+          userText: `create a ${typeId.replace("_", " ")}`,
+          sourceContent: prior,
+        });
+        if (validation.ok) {
+          const steps = extractFlowStepsFromContent(prior);
+          if (steps.length >= 2) {
+            return [
+              "Flowcharts aren't fully built into Visual Thinking yet, but I can turn those steps into a draft flow here.",
+              "",
+              formatFlowOutline(steps),
+              alt.trim(),
+            ]
+              .filter(Boolean)
+              .join("\n");
+          }
         }
       }
       return [

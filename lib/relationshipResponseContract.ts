@@ -7,6 +7,7 @@ import {
   assessRelationshipMemoryConfidence,
   type RelationshipMemoryConfidence,
 } from "./relationshipIntelligencePrompt";
+import { shouldSuppressRelationshipIntelligenceForUserText } from "./relationshipIntelligenceBoundaries";
 import {
   buildRelationshipObservations,
   type ObservationRankingContext,
@@ -88,6 +89,9 @@ export function buildRelationshipLeadParagraph(
   },
 ): string | null {
   if (context?.suppressForRouting) return null;
+  if (userText && shouldSuppressRelationshipIntelligenceForUserText(userText)) {
+    return null;
+  }
   const confidence = assessRelationshipMemoryConfidence();
   if (!isRelationshipResponseContractActive(confidence)) return null;
 

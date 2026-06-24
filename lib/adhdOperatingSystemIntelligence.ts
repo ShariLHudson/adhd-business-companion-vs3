@@ -172,7 +172,7 @@ function collectEvidence(now: Date): EvidenceBundle {
     momentumSignals: manual.whatCreatesMomentum ?? [],
     frictionSignals: [
       ...userManual.frictionPatterns,
-      ...(buildWhatIveLearnedProfile().challenges.map((c) => c.label) ?? []),
+      ...(buildWhatIveLearnedProfile().challenges ?? []),
     ],
     decisionSignals: manual.howIMakeDecisions ?? [],
     learningStyle: p2.learningStyle.primary ?? null,

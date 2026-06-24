@@ -1045,7 +1045,14 @@ export function deleteSnippet(id: string): Snippet[] {
 
 // ---- Content types (expandable: built-ins + user-created) ------------------
 
-export const DEFAULT_CONTENT_TYPES = createCatalogTypeLabels();
+let defaultContentTypesCache: string[] | null = null;
+
+export function getDefaultContentTypes(): string[] {
+  if (!defaultContentTypesCache) {
+    defaultContentTypesCache = createCatalogTypeLabels();
+  }
+  return defaultContentTypesCache;
+}
 
 const CONTENT_TYPES_KEY = "companion-content-types-v1";
 
@@ -1065,9 +1072,9 @@ export function getCustomContentTypes(): string[] {
 // All types the user can pick from — merged and alphabetized for dropdowns.
 export function getContentTypes(): string[] {
   const custom = getCustomContentTypes().filter(
-    (c) => !DEFAULT_CONTENT_TYPES.includes(c),
+    (c) => !getDefaultContentTypes().includes(c),
   );
-  return sortDropdownLabels([...DEFAULT_CONTENT_TYPES, ...custom]);
+  return sortDropdownLabels([...getDefaultContentTypes(), ...custom]);
 }
 
 export function addContentType(name: string): string[] {
@@ -1076,7 +1083,7 @@ export function addContentType(name: string): string[] {
   const custom = getCustomContentTypes();
   if (
     custom.includes(clean) ||
-    DEFAULT_CONTENT_TYPES.includes(clean) ||
+    getDefaultContentTypes().includes(clean) ||
     typeof window === "undefined"
   )
     return custom;

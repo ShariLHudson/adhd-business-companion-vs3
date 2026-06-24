@@ -5,7 +5,7 @@ import {
   addContentType,
   deleteContentType,
   getCustomContentTypes,
-  DEFAULT_CONTENT_TYPES,
+  getDefaultContentTypes,
 } from "@/lib/companionStore";
 import { sortDropdownLabels } from "@/lib/dropdownSort";
 
@@ -120,7 +120,7 @@ export function ContentTypesPanel({
         Built-in
       </p>
       <div className="mt-2 flex flex-col gap-2">
-        {DEFAULT_CONTENT_TYPES.map((t) => typeRow(t, false))}
+        {getDefaultContentTypes().map((t) => typeRow(t, false))}
       </div>
     </div>
   );

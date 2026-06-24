@@ -330,7 +330,7 @@ export function maybeWisdomReflection(input: {
   ) {
     const compass = p2.resources.find((r) => r.id === "decision_compass" && r.helpfulScore >= 50);
     const overload = p2.adhdPatterns.find(
-      (p) => p.id === "decision_overload_after_ideas" && p.count >= 2,
+      (p) => p.id === "shiny_object_syndrome" && p.count >= 2,
     );
     const parts: string[] = [];
     if (compass) parts.push("clarity often comes after you talk it out or map options visually");

@@ -4,6 +4,7 @@ import {
   inferHandoffDestination,
   rememberChatArtifactFromAssistant,
   resolveChatHandoffArtifact,
+  shariOfferedCreateHandoff,
   userAcceptedCreateHandoff,
 } from "./chatCreateHandoff";
 import { looksLikeEmailDraft } from "./createInitialization";
@@ -40,6 +41,13 @@ describe("chatCreateHandoff", () => {
         "Would you like me to create the draft in the email tool?",
       ),
     ).toBe(true);
+  });
+
+  it("recognizes frictionless Create offer lines (P0.16.3)", () => {
+    const offer =
+      "I can help with that. Would you like to open Create to draft your email?";
+    expect(shariOfferedCreateHandoff(offer)).toBe(true);
+    expect(userAcceptedCreateHandoff("yes", offer)).toBe(true);
   });
 
   it("does not treat doc numbered choice as email handoff", () => {

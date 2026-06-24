@@ -35,6 +35,8 @@ export type AuditCategory =
   | "organize"
   | "focus"
   | "calm"
+  | "strategy"
+  | "emotional"
   | "relationship"
   | "navigate"
   | "yes_continuation";
@@ -52,12 +54,19 @@ export type AuditIntent =
   | "navigate"
   | "continuation"
   | "clarify"
-  | "conversation";
+  | "conversation"
+  | "strategy"
+  | "emotional";
 
 export type AuditRouteMode =
   | RouteMode
   | FrictionlessActionCategory
-  | "continuation";
+  | "continuation"
+  | "strategy"
+  | "focus"
+  | "organize"
+  | "emotional"
+  | "learn";
 
 export type SuppressionExpectations = {
   /** true = relationship layer should be suppressed */
@@ -199,6 +208,8 @@ function frictionlessOverridesRouting(
 ): boolean {
   return (
     category === "emotional_regulation" ||
+    category === "adhd_emotional_friction" ||
+    category === "reminder" ||
     category === "focus_support" ||
     category === "decision_support" ||
     category === "tool_open" ||
@@ -249,6 +260,8 @@ function deriveActualIntent(input: {
   if (input.visualThinkingMenu) return "plan";
   if (frictionlessOverridesRouting(input.frictionlessCategory)) {
     if (input.frictionlessCategory === "emotional_regulation") return "calm";
+    if (input.frictionlessCategory === "adhd_emotional_friction") return "understand";
+    if (input.frictionlessCategory === "reminder") return "execute";
     if (input.frictionlessCategory === "focus_support") return "focus";
     if (input.frictionlessCategory === "decision_support") return "decide";
     if (input.frictionlessCategory === "tool_open") return "navigate";
@@ -479,7 +492,7 @@ export function evaluateCompanionBehaviorCase(
     buildCompanionDecisionIntelligence({
       userText,
       messages,
-      lastAssistantText: priorMessages.at(-1)?.content,
+      lastAssistantText: priorMessages.at(-1)?.content ?? "",
     });
   }
 
@@ -1142,7 +1155,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p017-book-adhd",
     category: "create",
     userInput: "I want to write a book about ADHD and my experiences.",
-    expectedIntent: ["build", "execute", "conversation"],
+    expectedIntent: ["create", "execute", "conversation"],
     expectedRoute: ["conversation", "direct_action", "feature_offer"],
     expectedSuppressionFlags: { relationship: true, reflectionFirst: true },
     forbiddenOpeners: ["I've noticed"],
@@ -1152,7 +1165,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p017-marketing-plan-how",
     category: "create",
     userInput: "How do I create a marketing plan?",
-    expectedIntent: ["build", "execute", "learn", "navigate"],
+    expectedIntent: ["create", "execute", "learn", "navigate"],
     expectedRoute: ["feature_offer", "conversation", "direct_action"],
     expectedSuppressionFlags: { relationship: true },
     forbiddenOpeners: ["I've noticed"],
@@ -1176,7 +1189,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p017-write-email",
     category: "create",
     userInput: "I need to write an email.",
-    expectedIntent: ["execute", "build"],
+    expectedIntent: ["execute", "create"],
     expectedRoute: ["direct_action", "feature_offer"],
     expectedFeature: "Create",
     expectedSuppressionFlags: { relationship: true },
@@ -1205,7 +1218,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p0172-decision-tree",
     category: "create",
     userInput: "create a decision tree",
-    expectedIntent: ["build", "execute"],
+    expectedIntent: ["create", "execute"],
     expectedRoute: "direct_action",
     expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
@@ -1215,7 +1228,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p0172-build-decision-tree",
     category: "create",
     userInput: "build a decision tree",
-    expectedIntent: ["build", "execute"],
+    expectedIntent: ["create", "execute"],
     expectedRoute: "direct_action",
     expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
@@ -1225,7 +1238,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p0172-mind-map",
     category: "create",
     userInput: "create a mind map",
-    expectedIntent: ["build", "execute"],
+    expectedIntent: ["create", "execute"],
     expectedRoute: "direct_action",
     expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
@@ -1235,7 +1248,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p0172-help-mind-map",
     category: "create",
     userInput: "help me make a mind map",
-    expectedIntent: ["build", "execute", "create"],
+    expectedIntent: ["create", "execute", "create"],
     expectedRoute: "direct_action",
     expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
@@ -1245,7 +1258,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p0172-visual-map",
     category: "create",
     userInput: "visual map",
-    expectedIntent: ["build", "execute", "conversation"],
+    expectedIntent: ["create", "execute", "conversation"],
     expectedRoute: "direct_action",
     expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
@@ -1255,7 +1268,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p0172-concept-map",
     category: "create",
     userInput: "concept map",
-    expectedIntent: ["build", "execute", "conversation"],
+    expectedIntent: ["create", "execute", "conversation"],
     expectedRoute: "direct_action",
     expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
@@ -1265,7 +1278,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p0172-project-map",
     category: "create",
     userInput: "project map",
-    expectedIntent: ["build", "execute", "conversation"],
+    expectedIntent: ["create", "execute", "conversation"],
     expectedRoute: "direct_action",
     expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
@@ -1276,7 +1289,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p020-flowchart",
     category: "create",
     userInput: "create a flowchart",
-    expectedIntent: ["build", "execute"],
+    expectedIntent: ["create", "execute"],
     expectedRoute: "direct_action",
     expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
@@ -1286,7 +1299,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p020-course-launch-visual",
     category: "create",
     userInput: "I want to launch a course",
-    expectedIntent: ["plan", "build", "execute"],
+    expectedIntent: ["plan", "create", "execute"],
     expectedRoute: "direct_action",
     expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
@@ -1296,7 +1309,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p020-hierarchy",
     category: "create",
     userInput: "build a hierarchy map",
-    expectedIntent: ["build", "execute"],
+    expectedIntent: ["create", "execute"],
     expectedRoute: "direct_action",
     expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },
@@ -1360,7 +1373,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     id: "p0201-planned-flowchart",
     category: "create",
     userInput: "Create a flowchart",
-    expectedIntent: ["build", "execute"],
+    expectedIntent: ["create", "execute"],
     expectedRoute: "direct_action",
     expectedFeature: "Visual Thinking",
     expectedSuppressionFlags: { relationship: true },

@@ -61,6 +61,7 @@ function writeAll(list: SavedWorkItem[]) {
 
 export function savedWorkTypeFolder(artifactType: string): string {
   const t = artifactType.trim().toLowerCase();
+  if (t.includes("google sheet")) return "Google Sheets";
   if (t.includes("sop") || t.includes("procedure")) return "SOPs";
   if (t.includes("proposal")) return "Proposals";
   if (t.includes("avatar")) return "Client Avatars";
@@ -154,15 +155,19 @@ export function updateSavedWork(
       | "googleDocId"
       | "googleDocUrl"
       | "tags"
+      | "typeFolder"
+      | "savedLocation"
     >
   >,
 ): SavedWorkItem | undefined {
   let updated: SavedWorkItem | undefined;
   const next = readAll().map((w) => {
     if (w.id !== id) return w;
-    const typeFolder = changes.artifactType
-      ? savedWorkTypeFolder(changes.artifactType)
-      : w.typeFolder;
+    const typeFolder = changes.typeFolder
+      ? changes.typeFolder
+      : changes.artifactType
+        ? savedWorkTypeFolder(changes.artifactType)
+        : w.typeFolder;
     const body = changes.body ?? w.body;
     const title = changes.title ?? w.title;
     updated = {

@@ -131,6 +131,33 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
     openLabel: "Open Strategies",
   },
   {
+    id: "deep-dives",
+    title: "How To: Deep Dives",
+    question: "What are Deep Dives?",
+    whatItIs:
+      "Deep Dives are richer learning conversations about one business concept — positioning, pricing, content, niche, audience growth — without jumping to relationship reflection.",
+    whenToUse:
+      "When you want to understand a topic more deeply, not just a quick definition.",
+    steps: [
+      "Ask a learning question in chat (e.g. “What is a sales funnel?”).",
+      "Pick from the menu: Quick Answer, Example, Apply to My Business, or Deep Dive.",
+      "Or ask directly: “Give me a deep dive on positioning.”",
+      "Shari stays on the concept — one richer explanation, then you can apply or build.",
+    ],
+    keywords: [
+      "deep dive",
+      "deep dives",
+      "dive deeper",
+      "learn more",
+      "positioning",
+      "pricing",
+      "niche",
+      "content that converts",
+    ],
+    openLabel: "Ask in Chat",
+    askPrompt: "Give me a deep dive on positioning for my business.",
+  },
+  {
     id: "schedule-appointment",
     title: "How To: Schedule an Appointment",
     question: "How do I schedule an appointment?",
@@ -580,6 +607,7 @@ const HOW_DO_I_TOPIC_GROUP_BY_ENTRY: Record<string, HowDoITopicGroupId> = {
   "decision-compass": "decisions",
   "create-strategy": "strategies",
   "use-strategies": "strategies",
+  "deep-dives": "strategies",
   "schedule-appointment": "time",
   "create-workshop": "create",
   "plan-day": "focus",

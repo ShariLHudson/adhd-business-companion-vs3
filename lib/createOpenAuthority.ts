@@ -38,7 +38,8 @@ export type CreateOpenSource =
   | "companion_assist"
   | "founder"
   | "ensure_live_create"
-  | "resume";
+  | "resume"
+  | "hard_nav";
 
 export type CreateReceiptKind =
   | "draft_created"
@@ -90,6 +91,7 @@ export type CreateOpenDecision =
 export const UI_INITIATED_SOURCES: ReadonlySet<CreateOpenSource> = new Set([
   "ui_button",
   "ui_nav",
+  "hard_nav",
   "template",
   "snippet",
   "saved_work",

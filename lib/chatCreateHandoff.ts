@@ -19,7 +19,7 @@ const SHARI_EMAIL_TOOL_OFFER_RE =
   /\b(?:email tool|create (?:the )?draft in (?:the )?email|put (?:this|it) in (?:the )?email(?: tool)?|move (?:this|it) to (?:the )?email|draft (?:this|it) in (?:the )?email)\b/i;
 
 const SHARI_CREATE_DRAFT_OFFER_RE =
-  /\b(?:would you like me to (?:create|draft)|want me to (?:create|draft)|shall i (?:create|draft)|ready for me to (?:create|draft)|create the draft|turn (?:that|this) into a draft|open create (?:and|to) draft)\b/i;
+  /\b(?:would you like (?:me to )?(?:open create|to open create)|want me to (?:create|draft|open create)|shall i (?:create|draft)|ready for me to (?:create|draft)|create the draft|turn (?:that|this) into a draft|open create(?:\s+and|\s+to)?\s+draft)\b/i;
 
 const SHARI_GOOGLE_DOC_OFFER_RE =
   /\b(?:google doc|put (?:this|it) in a doc|export to docs?|create a document)\b/i;
