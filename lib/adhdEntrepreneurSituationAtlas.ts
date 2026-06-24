@@ -602,6 +602,32 @@ export const SITUATION_ATLAS: SituationAtlasEntry[] = [
   }),
   // Marketing
   defineSituation({
+    id: "product-expansion-uncertainty",
+    name: "Product Expansion Uncertainty",
+    category: "launch",
+    surfaceStatements: [
+      /\bnew product(?:\s+line)?\b/i,
+      /\badd(?:ing)? (?:a )?(?:new )?(?:product|offer|service|line)\b/i,
+      /\bexpand(?:ing)? (?:my )?(?:product|offer|line)\b/i,
+      /\b(?:keep both|replace (?:my )?(?:current|existing)|offer both)\b/i,
+      /\bgroup program\b/i,
+    ],
+    actualNeed: "decision",
+    adhdPatterns: ["decision_paralysis", "fear", "overwhelm"],
+    emotionalStates: ["unclear", "anxious", "stuck"],
+    companionGoals: ["enable_decision", "clarify_direction", "protect_trust"],
+    recommendedInterventions: ["decision_compass", "conversation"],
+    antiPatterns: [
+      "list options before understanding",
+      "immediate product recommendations",
+      "conversation reset after yes",
+    ],
+    validationLinks: ["product-expansion-uncertainty"],
+    relatedBusinessPatterns: ["offer_hopping", "decision_paralysis"],
+    companionMove:
+      "Business expansion — discover current customers, revenue, pricing, and risk before comparing keep / replace / both / phased.",
+  }),
+  defineSituation({
     id: "offer-confusion",
     name: "Offer Confusion",
     category: "marketing",

@@ -150,10 +150,13 @@ export function outcomeThreadHintForChat(thread: OutcomeThread | null): string |
 /** Non-resetting reply when acceptance cannot be resolved but a thread exists. */
 export function threadAwareAcceptanceFallback(thread: OutcomeThread | null): string {
   if (thread?.pendingAction) {
-    return `I'm still with you on **${thread.pendingAction}**. Want to continue that, or shift to something else?`;
+    return `Continuing **${thread.pendingAction}** — here's the next step on that.`;
+  }
+  if (thread?.pendingDecision) {
+    return `Let's keep going on **${thread.pendingDecision}** — which path feels closest right now?`;
   }
   if (thread?.currentProblem) {
-    return `We were working through: "${thread.currentProblem.slice(0, 120)}". What's the next piece you want to look at?`;
+    return `Picking up **${thread.currentProblem.slice(0, 120)}** — what's the piece that feels most uncertain?`;
   }
-  return "I'm still here with you — what's the next step on what we were working on?";
+  return "Continuing where we left off — what's the one variable you want to tackle first?";
 }

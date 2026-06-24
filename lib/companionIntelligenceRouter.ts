@@ -78,6 +78,11 @@ import { interventionLearningHintForChat } from "./companionInterventionLearning
 import { effectivenessHintForChat } from "./companionEffectiveness";
 import { mistakeRecoveryHintForChat } from "./companionMistakeRecovery";
 import type { WorkspaceOffer } from "./workspaceMode";
+import {
+  buildCompanionDecisionIntelligence,
+  companionDecisionIntelligenceHintForChat,
+  type CompanionDecisionIntelligence,
+} from "./companionDecisionIntelligence";
 
 export type UserStateSnapshot = {
   emotionalState: EmotionalState;
@@ -102,6 +107,8 @@ export type CompanionTurnIntelligence = {
   businessConfidence?: BusinessIntelligenceConfidence;
   businessConfidenceHint?: string;
   businessAdviceGate?: BusinessConfidenceOffer | null;
+  decisionIntelligence?: CompanionDecisionIntelligence;
+  decisionIntelligenceHint?: string;
 };
 
 export type CompanionAcceptanceResolution =
@@ -119,6 +126,7 @@ export function buildCompanionTurnIntelligence(input: {
   checkBusinessAdvice?: boolean;
   hasEcosystemFeatureMatch?: boolean;
   boardDomain?: ReturnType<typeof resolveWorkspaceAdvisorRole>;
+  outcomeThread?: OutcomeThread | null;
 }): CompanionTurnIntelligence {
   const intelligence = buildCompanionIntelligence({
     messages: input.messages,
@@ -215,6 +223,15 @@ export function buildCompanionTurnIntelligence(input: {
     }
   }
 
+  const decisionIntelligence = buildCompanionDecisionIntelligence({
+    messages: input.messages,
+    userText: input.userText,
+    lastAssistantText: input.lastAssistantText,
+    outcomeThread: input.outcomeThread,
+  });
+  const decisionIntelligenceHint =
+    companionDecisionIntelligenceHintForChat(decisionIntelligence);
+
   return {
     userState: input.userState,
     intelligence,
@@ -232,6 +249,8 @@ export function buildCompanionTurnIntelligence(input: {
     businessConfidence,
     businessConfidenceHint,
     businessAdviceGate,
+    decisionIntelligence,
+    decisionIntelligenceHint,
   };
 }
 

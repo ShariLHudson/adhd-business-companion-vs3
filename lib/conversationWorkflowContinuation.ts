@@ -142,10 +142,18 @@ export function inferConversationWorkflowFromAssistant(
     };
   }
 
-  if (/\bdecision compass\b/i.test(t) || /\bhelp you decide\b/i.test(t)) {
+  if (/\bdecision compass\b/i.test(t)) {
     return {
       kind: "open_decision_compass",
       offerSummary: "Open Decision Compass",
+      assistantQuestion: t,
+    };
+  }
+
+  if (/\bhelp you decide\b/i.test(t)) {
+    return {
+      kind: "guided_continue",
+      offerSummary: "Structured decision support",
       assistantQuestion: t,
     };
   }
@@ -302,12 +310,74 @@ export function continuationForWorkflow(
         nextWorkflow: null,
       };
     case "guided_continue":
-      return {
-        action: "reply",
-        message: "Great — let's keep going. What's the next piece you want to look at?",
-        nextWorkflow: workflow,
-      };
+      return continuationForGuidedWorkflow(workflow);
   }
+}
+
+export type GuidedContinuationContext = {
+  pendingDecision?: string;
+  currentProblem?: string;
+};
+
+/** Guided continuation with decision-intelligence context — no conversation reset. */
+export function continuationForGuidedWorkflow(
+  workflow: ConversationWorkflow,
+  context?: GuidedContinuationContext,
+): WorkflowContinuationResult {
+  if (context?.pendingDecision) {
+    return {
+      action: "reply",
+      message: `Let's keep going on **${context.pendingDecision}**. Based on what you shared, the three paths are: keep your current offer, replace it, or run both. Which feels closest — even if you're not sure yet?`,
+      nextWorkflow: {
+        kind: "guided_continue",
+        offeredAtTurn: workflow.offeredAtTurn,
+        offerSummary: context.pendingDecision,
+        assistantQuestion: workflow.assistantQuestion,
+      },
+    };
+  }
+  if (context?.currentProblem) {
+    return {
+      action: "reply",
+      message: `Picking up **${context.currentProblem.slice(0, 100)}** — tell me one thing you're most unsure about: customers, pricing, or timing?`,
+      nextWorkflow: workflow,
+    };
+  }
+  const q = workflow.assistantQuestion;
+  if (/\bdecision compass\b/i.test(q)) {
+    return {
+      action: "open_section",
+      section: "decision-compass",
+      message:
+        "Perfect — I've opened **Decision Compass**. We'll compare keep both, replace, or phasing in — one step at a time.",
+      nextWorkflow: null,
+    };
+  }
+  if (/\b(?:expansion|product line|new offer|group program)\b/i.test(q)) {
+    return {
+      action: "reply",
+      message:
+        "Great — who buys your current offer today, and who would the new line serve?",
+      nextWorkflow: workflow,
+    };
+  }
+  return {
+    action: "reply",
+    message:
+      "Great — let's work through this together. What's the one variable that worries you most: existing customers, pricing, or adoption?",
+    nextWorkflow: workflow,
+  };
+}
+
+/** Alias for decision-intelligence callers. */
+export function continuationForWorkflowWithIntent(
+  workflow: ConversationWorkflow,
+  context?: GuidedContinuationContext,
+): WorkflowContinuationResult {
+  if (workflow.kind === "guided_continue") {
+    return continuationForGuidedWorkflow(workflow, context);
+  }
+  return continuationForWorkflow(workflow);
 }
 
 export function resolveConversationWorkflowAcceptance(input: {

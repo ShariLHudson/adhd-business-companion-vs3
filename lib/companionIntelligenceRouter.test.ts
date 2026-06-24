@@ -28,6 +28,27 @@ describe("companionIntelligenceRouter", () => {
     expect(turn.businessConfidence).toBeDefined();
   });
 
+  it("includes decision intelligence for product expansion", () => {
+    const turn = buildCompanionTurnIntelligence({
+      messages: [
+        { role: "user", content: "I want to add a new product line to my business" },
+      ],
+      userText: "I want to add a new product line to my business",
+      lastAssistantText: "",
+      userState: {
+        emotionalState: "unclear",
+        obstacle: null,
+        somatic: false,
+      },
+      workspaceOpen: false,
+    });
+    expect(turn.decisionIntelligence?.situation.decisionType).toBe(
+      "business_expansion",
+    );
+    expect(turn.decisionIntelligence?.experienceMode).toBe("discovery");
+    expect(turn.decisionIntelligenceHint).toMatch(/COMPANION DECISION INTELLIGENCE/i);
+  });
+
   it("continues project workflow before generic acceptance reply", () => {
     const assistant =
       "Would you like to list those projects so we can start sorting through them together?";

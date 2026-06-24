@@ -574,6 +574,10 @@ import {
   topicChangeClearsThread,
 } from "@/lib/companionOutcomeThread";
 import {
+  buildCompanionDecisionIntelligence,
+  companionDecisionIntelligenceHintForChat,
+} from "@/lib/companionDecisionIntelligence";
+import {
   createConversationWorkflow,
   type ConversationWorkflow,
   type WorkflowContinuationResult,
@@ -9168,6 +9172,12 @@ export default function CompanionPageClient() {
       multiTurn: adhdNative.multiTurn,
       actionBias,
     });
+    const decisionIntelligence = buildCompanionDecisionIntelligence({
+      messages: nextMessages,
+      userText: trimmed,
+      lastAssistantText,
+      outcomeThread: getOutcomeThread(),
+    });
     const rawWorkspaceOffer =
       willBridge ||
       skipToolOffer ||
@@ -9864,6 +9874,7 @@ export default function CompanionPageClient() {
                   : null,
                 parentWorkflowCoachHint(getActiveParentWorkflow()),
                 outcomeThreadHintForChat(getOutcomeThread()),
+                companionDecisionIntelligenceHintForChat(decisionIntelligence),
                 sprint5.trustHint,
                 sprint5.confidenceHint,
                 sprint5.adaptiveHint,
