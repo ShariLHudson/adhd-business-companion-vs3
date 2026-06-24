@@ -1,22 +1,30 @@
 import { describe, expect, it } from "vitest";
 import {
+  detectArtifactRequest,
   intentRoutingHintForChat,
+  isExecuteArtifactOverride,
   resolveIntentRouting,
+  shouldSuppressRelationshipIntelligenceForRouting,
   shouldSuppressRelationshipLeadForRouting,
   shouldSurfaceRoutingOfferUi,
 } from "./intentRoutingIntelligence";
+import { buildRelationshipLeadParagraph } from "./relationshipResponseContract";
 
 describe("intentRoutingIntelligence", () => {
-  it("routes SOP build requests to Projects with permission-first navigation", () => {
+  it("routes SOP build requests to Create with permission-first navigation", () => {
     const decision = resolveIntentRouting({
       userText: "Help me create an SOP.",
     });
     expect(decision.category).toBe("build");
     expect(decision.routeMode).toBe("feature_offer");
-    expect(decision.workspaceOffer?.section).toBe("projects");
+    expect(decision.artifactDetected).toBe(true);
+    expect(decision.artifactKind).toBe("sop");
+    expect(decision.workspaceOffer?.section).toBe("content-generator");
+    expect(decision.workspaceOffer?.buttonLabel).toBe("Open Create");
     expect(decision.surfaceOfferUi).toBe(true);
-    expect(decision.navigationLine).toMatch(/easier in Projects/i);
-    expect(decision.navigationLine).toMatch(/Would you like to open it/i);
+    expect(decision.navigationLine).toMatch(/Create/i);
+    expect(decision.navigationLine).toMatch(/Would you like to open/i);
+    expect(decision.suppressRelationshipIntelligence).toBe(true);
     expect(decision.suppressRelationshipLead).toBe(true);
     expect(decision.continuity?.projectType).toBe("SOP");
   });
@@ -80,16 +88,17 @@ describe("intentRoutingIntelligence", () => {
     expect(decision.clarifyPrompt).toMatch(/Organize my thoughts/i);
   });
 
-  it("keeps feature fit available but not visible for softer build phrasing", () => {
+  it("keeps feature fit available for softer artifact phrasing with execute override", () => {
     const decision = resolveIntentRouting({
       userText: "I need a marketing plan for my launch.",
     });
-    expect(decision.category).toBe("build");
-    expect(decision.workspaceOffer).toBeTruthy();
-    expect(decision.surfaceOfferUi).toBe(false);
+    expect(decision.category).toBe("execute");
+    expect(decision.artifactKind).toBe("marketing_plan");
+    expect(decision.workspaceOffer?.section).toBe("content-generator");
+    expect(decision.suppressRelationshipIntelligence).toBe(true);
+    expect(decision.surfaceOfferUi).toBe(true);
     const hint = intentRoutingHintForChat(decision);
-    expect(hint).toMatch(/background/i);
-    expect(hint).toMatch(/NOT shown/i);
+    expect(hint).toMatch(/EXECUTE OVERRIDE/i);
   });
 
   it("does not surface Adapt My Day UI on implicit low-energy plan shifts", () => {
@@ -213,6 +222,140 @@ describe("intentRoutingIntelligence", () => {
       expect(decision.workspaceOffer).toBeNull();
       expect(decision.suppressRelationshipLead).toBe(false);
       expect(decision.suppressConversationSummary).toBe(false);
+    });
+  });
+
+  describe("P0.7.3 execute artifact override", () => {
+    const executeCases = [
+      "i need to write an email",
+      "help me create an SOP",
+      "write a marketing plan",
+      "i need a proposal",
+    ] as const;
+
+    it.each(executeCases)("routes %s to Create with relationship suppressed", (userText) => {
+      const decision = resolveIntentRouting({ userText });
+      expect(detectArtifactRequest(userText)).toBeTruthy();
+      expect(decision.artifactDetected).toBe(true);
+      expect(["build", "execute"]).toContain(decision.category);
+      expect(decision.workspaceOffer?.section).toBe("content-generator");
+      expect(decision.suppressRelationshipIntelligence).toBe(true);
+      expect(decision.suppressReflectionFirst).toBe(true);
+      expect(shouldSuppressRelationshipIntelligenceForRouting(decision)).toBe(true);
+      expect(isExecuteArtifactOverride(decision)).toBe(true);
+      const hint = intentRoutingHintForChat(decision);
+      expect(hint).toMatch(/EXECUTE OVERRIDE/i);
+      expect(hint).toMatch(/FORBIDDEN: I've noticed/i);
+    });
+
+    it.each(executeCases)("skips relationship lead paragraph when execute override is active", (userText) => {
+      const decision = resolveIntentRouting({ userText });
+      expect(shouldSuppressRelationshipIntelligenceForRouting(decision)).toBe(true);
+      expect(
+        buildRelationshipLeadParagraph(userText, new Date(), {
+          suppressForRouting: shouldSuppressRelationshipIntelligenceForRouting(decision),
+        }),
+      ).toBeNull();
+    });
+
+    it("surfaces Create offer UI for direct email execute requests", () => {
+      const decision = resolveIntentRouting({ userText: "i need to write an email" });
+      expect(decision.category).toBe("execute");
+      expect(decision.routeMode).toBe("feature_offer");
+      expect(decision.surfaceOfferUi).toBe(true);
+      expect(decision.navigationLine).toMatch(/I can help with that/i);
+      expect(decision.navigationLine).toMatch(/Create/i);
+    });
+
+    const funnelAndSequenceTerms = [
+      "sales funnel",
+      "marketing funnel",
+      "lead funnel",
+      "lead generation funnel",
+      "email funnel",
+      "webinar funnel",
+      "workshop funnel",
+      "launch funnel",
+      "course funnel",
+      "membership funnel",
+      "customer journey",
+      "automation funnel",
+      "follow-up sequence",
+      "nurture sequence",
+      "sales sequence",
+    ] as const;
+
+    it.each(funnelAndSequenceTerms)(
+      "detects %s as artifact when user wants to build it",
+      (term) => {
+        const userText = `help me build my ${term}`;
+        expect(detectArtifactRequest(userText)).toBeTruthy();
+        const decision = resolveIntentRouting({ userText });
+        expect(decision.artifactDetected).toBe(true);
+        expect(decision.workspaceOffer?.section).toBe("content-generator");
+        expect(decision.suppressRelationshipIntelligence).toBe(true);
+      },
+    );
+  });
+
+  describe("P0.9.1 artifact registry — sales funnel routing", () => {
+    const executeCases = [
+      {
+        userText: "I need to create a sales funnel",
+        artifactKind: "funnel",
+        navigation: /map out the funnel|Create/i,
+      },
+      {
+        userText: "Build a lead magnet funnel",
+        artifactKind: "funnel",
+        navigation: /Create|funnel/i,
+      },
+      {
+        userText: "Create a nurture sequence",
+        artifactKind: "email_sequence",
+        navigation: /Create|email sequence/i,
+      },
+      {
+        userText: "Write a sales sequence",
+        artifactKind: "email_sequence",
+        navigation: /Create|email sequence/i,
+      },
+      {
+        userText: "Design a landing page",
+        artifactKind: "landing_page",
+        navigation: /Create|landing page/i,
+      },
+    ] as const;
+
+    it.each(executeCases)(
+      "routes $userText to Create with relationship suppressed",
+      ({ userText, artifactKind, navigation }) => {
+        const decision = resolveIntentRouting({ userText });
+        expect(decision.artifactDetected).toBe(true);
+        expect(decision.artifactKind).toBe(artifactKind);
+        expect(["build", "execute"]).toContain(decision.category);
+        expect(decision.routeMode).toBe("feature_offer");
+        expect(decision.workspaceOffer?.section).toBe("content-generator");
+        expect(decision.suppressRelationshipIntelligence).toBe(true);
+        expect(decision.suppressRelationshipLead).toBe(true);
+        expect(decision.suppressReflectionFirst).toBe(true);
+        expect(decision.navigationLine).toMatch(navigation);
+        expect(
+          buildRelationshipLeadParagraph(userText, new Date(), {
+            suppressForRouting: shouldSuppressRelationshipIntelligenceForRouting(decision),
+          }),
+        ).toBeNull();
+        const hint = intentRoutingHintForChat(decision);
+        expect(hint).toMatch(/EXECUTE OVERRIDE|FORBIDDEN: I've noticed/i);
+      },
+    );
+
+    it("does not suppress relationship for funnel learning questions", () => {
+      const decision = resolveIntentRouting({
+        userText: "What is a sales funnel?",
+      });
+      expect(decision.artifactDetected).toBe(true);
+      expect(decision.suppressRelationshipIntelligence).toBe(false);
     });
   });
 });

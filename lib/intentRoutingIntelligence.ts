@@ -27,6 +27,12 @@ import {
   type OverwhelmTodayRoute,
 } from "./overwhelmTodayRouting";
 import {
+  buildRegistryArtifactOfferLine,
+  detectRegistryArtifact,
+  isRegistryArtifactExecution,
+  type RegistryArtifactKind,
+} from "./artifactRegistry";
+import {
   detectDoingIntent,
   type WorkspaceOffer,
   workspaceTitle,
@@ -83,6 +89,10 @@ export type IntentRoutingDecision = {
   surfaceClarificationUi: boolean;
   decisionCompassRecommended: boolean;
   clarifyPrompt: string | null;
+  artifactDetected: boolean;
+  artifactKind: ArtifactKind | null;
+  /** P0.7.3 — hard suppress relationship intelligence + observation engine */
+  suppressRelationshipIntelligence: boolean;
   suppressRelationshipLead: boolean;
   suppressReflectionFirst: boolean;
   suppressConversationSummary: boolean;
@@ -95,6 +105,10 @@ export type IntentRoutingDecision = {
   stayHereLabel: string;
   featureLabel: string | null;
 };
+
+export type ArtifactKind = RegistryArtifactKind;
+
+const CREATE_ARTIFACT_SECTION: AppSection = "content-generator";
 
 export type IntentRoutingInput = {
   userText: string;
@@ -123,10 +137,53 @@ const ORGANIZE_RE =
   /\b(?:brain is (?:spinning|full|noisy)|my brain is|too many ideas|all over the place|everything in my head|head is (?:full|crowded)|clear my (?:head|mind)|get (?:it|these thoughts) out|dump (?:everything|my thoughts)|mental clutter)\b/i;
 
 const BUILD_RE =
-  /\b(?:help me (?:create|build|make|write|draft)|create (?:an? )?(?:sop|marketing plan|funnel|strategy|checklist|template)|build (?:an? )?(?:sop|marketing plan|funnel|strategy)|marketing plan|draft the|write the)\b/i;
+  /\b(?:help me (?:create|build|make|write|draft|design|develop|generate)|(?:create|build|design|develop|draft|write|generate|make) (?:an? )?(?:sop|marketing plan|content plan|funnel|strategy|checklist|template|email|proposal|landing page|lead magnet|sales page|sales script|social post|offer|client avatar|(?:follow-?up|nurture|sales|email) sequence))\b/i;
 
 const EXECUTE_RE =
-  /\b(?:write the email|draft the post|create the sop|build the checklist|send the email|finish the draft)\b/i;
+  /\b(?:write|draft|create|build|make|design|develop|generate)\s+(?:an?|the|my)?\s*(?:email|sop|marketing plan|content plan|proposal|checklist|workflow|content|landing page|lead magnet|sales page|sales script|social post|offer|client avatar|(?:\w+\s+)*funnel|(?:follow-?up|nurture|sales|email) sequence)\b/i;
+
+const FUNNEL_ARTIFACT_RE =
+  /\b(?:sales funnel|marketing funnel|lead generation funnel|lead funnel|email funnel|webinar funnel|workshop funnel|launch funnel|course funnel|membership funnel|automation funnel|customer journey|(?:lead magnet|product sale|membership|webinar|workshop)\s+funnel|funnel)\b/i;
+
+/** Detect concrete artifact the user wants to produce (email, SOP, funnel, etc.). */
+export function detectArtifactRequest(text: string): ArtifactKind | null {
+  return detectRegistryArtifact(text);
+}
+
+/** User wants to produce the artifact now — not just discuss it. */
+export function isArtifactExecutionIntent(text: string): boolean {
+  return isRegistryArtifactExecution(text);
+}
+
+/** P0.7.3 hard override — skip all relationship layers during artifact execution. */
+export function isExecuteArtifactOverride(decision: IntentRoutingDecision): boolean {
+  return decision.suppressRelationshipIntelligence;
+}
+
+export function shouldSuppressRelationshipIntelligenceForRouting(
+  decision: IntentRoutingDecision,
+): boolean {
+  if (decision.suppressRelationshipIntelligence) return true;
+  return shouldSuppressRelationshipLeadForRouting(decision);
+}
+
+function createSectionForArtifact(kind: ArtifactKind): AppSection {
+  if (kind === "client_avatar") return "client-avatars";
+  return CREATE_ARTIFACT_SECTION;
+}
+
+function buildCreateArtifactOffer(
+  kind: ArtifactKind,
+  category: IntentCategory,
+): WorkspaceOffer {
+  const execCategory = category === "build" ? "build" : "execute";
+  const section = createSectionForArtifact(kind);
+  return {
+    section,
+    buttonLabel: section === "client-avatars" ? "Open Client Avatar" : "Open Create",
+    line: buildRegistryArtifactOfferLine(kind, execCategory),
+  };
+}
 
 const VAGUE_HELP_RE =
   /^(?:help(?: me)?|i need help|not sure what i need)\.?$/i;
@@ -137,7 +194,8 @@ const EXPLICIT_OPEN_RE =
 const EXPLICIT_FEATURE_NAME_RE =
   /\b(?:clear my mind|decision compass|plan my day|adapt my day|projects|create mode)\b/i;
 
-const MARKETING_BUILD_RE = /\b(?:marketing plan|marketing strategy|content plan|funnel)\b/i;
+const MARKETING_BUILD_RE =
+  /\b(?:marketing plan|marketing strategy|content plan|(?:sales|marketing|lead(?:\s+generation)?|email|webinar|workshop|launch|course|membership|automation)\s+funnel|customer journey|funnel|(?:follow-?up|nurture|sales|email) sequence)\b/i;
 const SOP_BUILD_RE = /\b(?:sop|standard operating|operating procedure|checklist|workflow doc)\b/i;
 const STRENGTH_UNDERSTAND_RE =
   /\b(?:biggest strength|my strength|what am i good at|what i'?m good at)\b/i;
@@ -156,6 +214,12 @@ function detectIntentCategory(text: string): IntentCategory {
   if (DECIDE_RE.test(t) || isDecisionCompassOfferSignal(t)) return "decide";
   if (ORGANIZE_RE.test(t)) return "organize";
   if (PLAN_RE.test(t) || isAdaptMyDayIntent(t)) return "plan";
+
+  const artifactKind = detectArtifactRequest(t);
+  if (artifactKind && isArtifactExecutionIntent(t)) {
+    return /\bhelp me\b/i.test(t) ? "build" : "execute";
+  }
+
   if (EXECUTE_RE.test(t)) return "execute";
   if (BUILD_RE.test(t) || detectDoingIntent(t)) return "build";
   return "conversation";
@@ -244,7 +308,7 @@ function supportStyleGuidance(
 
 function featureLabelForSection(section: AppSection): string {
   if (section === "brain-dump") return "Clear My Mind";
-  if (section === "content-generator") return "Create Mode";
+  if (section === "content-generator") return "Create";
   if (section === "projects") return "Projects";
   if (section === "plan-my-day") return "Plan My Day";
   if (section === "decision-compass") return "Decision Compass";
@@ -268,13 +332,17 @@ function buildNavigationLine(
     return `We can do this here, or I can open ${label}. Would you like to open ${label}?`;
   }
   if (section === "projects" && SOP_BUILD_RE.test(userText)) {
-    return `Let's build the SOP. This may be easier in Projects/Create Mode. Would you like to open it?`;
+    return `Let's build the SOP in Create. Would you like to open Create?`;
   }
   if (section === "projects") {
     return `This may be easier in ${label}. Would you like to open it?`;
   }
-  if (section === "content-generator" || MARKETING_BUILD_RE.test(userText)) {
-    return `Let's work on this together. ${label} may be the best place to build it. Would you like to open it?`;
+  if (section === "content-generator" || section === CREATE_ARTIFACT_SECTION) {
+    if (detectArtifactRequest(userText)) {
+      const kind = detectArtifactRequest(userText)!;
+      return buildCreateArtifactOffer(kind, category).line;
+    }
+    return `Let's work on this together. Create may be the best place to build it. Would you like to open Create?`;
   }
   return `Would you like to open ${label}?`;
 }
@@ -299,7 +367,7 @@ function buildWorkspaceContinuity(
   const t = userText.trim();
   if (!t) return null;
 
-  if (section === "projects" && SOP_BUILD_RE.test(t)) {
+  if (section === CREATE_ARTIFACT_SECTION && SOP_BUILD_RE.test(t)) {
     return {
       section,
       projectType: "SOP",
@@ -307,7 +375,15 @@ function buildWorkspaceContinuity(
       goalSummary: goal.summary,
     };
   }
-  if (section === "content-generator" && MARKETING_BUILD_RE.test(t)) {
+  if (section === CREATE_ARTIFACT_SECTION && FUNNEL_ARTIFACT_RE.test(t)) {
+    return {
+      section,
+      projectType: "Sales Funnel",
+      initialPrompt: t,
+      goalSummary: goal.summary,
+    };
+  }
+  if (section === CREATE_ARTIFACT_SECTION && MARKETING_BUILD_RE.test(t)) {
     return {
       section,
       projectType: "Marketing Plan",
@@ -347,9 +423,23 @@ function detectFeatureOffer(
   text: string,
   category: IntentCategory,
   overwhelmRoute?: OverwhelmTodayRoute | null,
+  artifactKind?: ArtifactKind | null,
 ): WorkspaceOffer | null {
   if (category === "understand" || category === "learn" || category === "clarify") {
     return null;
+  }
+
+  if (artifactKind && isRegistryArtifactExecution(text)) {
+    const execCategory: "build" | "execute" =
+      category === "build" ? "build" : "execute";
+    return buildCreateArtifactOffer(artifactKind, execCategory);
+  }
+
+  if (
+    artifactKind &&
+    (category === "build" || category === "execute")
+  ) {
+    return buildCreateArtifactOffer(artifactKind, category);
   }
 
   if (overwhelmRoute) {
@@ -398,11 +488,7 @@ function detectFeatureOffer(
   }
 
   if (SOP_BUILD_RE.test(text)) {
-    return {
-      section: "projects",
-      buttonLabel: "Open Projects",
-      line: buildNavigationLine("projects", text, category),
-    };
+    return buildCreateArtifactOffer("sop", category);
   }
 
   const doing = detectDoingIntent(text);
@@ -417,9 +503,17 @@ function detectFeatureOffer(
 function resolveRouteMode(
   category: IntentCategory,
   offer: WorkspaceOffer | null,
+  artifactKind?: ArtifactKind | null,
 ): RouteMode {
   if (category === "clarify") return "clarify";
   if (category === "understand" || category === "learn") return "conversation";
+  if (
+    artifactKind &&
+    (category === "execute" || category === "build") &&
+    offer
+  ) {
+    return "feature_offer";
+  }
   if (category === "execute") return "execute_inline";
   if (offer) return "feature_offer";
   return "conversation";
@@ -456,6 +550,14 @@ export function shouldSurfaceRoutingOfferUi(
 
   if (category === "execute" && EXECUTE_RE.test(t)) return true;
 
+  if (
+    (category === "execute" || category === "build") &&
+    detectArtifactRequest(t) &&
+    isArtifactExecutionIntent(t)
+  ) {
+    return true;
+  }
+
   return false;
 }
 
@@ -467,6 +569,7 @@ export function shouldSurfaceClarificationUi(text: string): boolean {
 export function shouldSuppressRelationshipLeadForRouting(
   decision: IntentRoutingDecision,
 ): boolean {
+  if (decision.suppressRelationshipIntelligence) return true;
   if (decision.overwhelmTodayRoute) return true;
   if (decision.suppressConversationSummary) return true;
   if (decision.routeMode === "feature_offer") return true;
@@ -480,8 +583,14 @@ export function shouldSuppressRelationshipLeadForRouting(
 
 export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDecision {
   const text = input.userText.trim();
+  const artifactKind = detectArtifactRequest(text);
+  const artifactDetected = artifactKind !== null;
+  const artifactExecution = isRegistryArtifactExecution(text);
   const overwhelmTodayRoute = detectOverwhelmTodayRoute(text);
-  const category = detectIntentCategory(text);
+  let category = detectIntentCategory(text);
+  if (artifactExecution) {
+    category = /\bhelp me\b/i.test(text) ? "build" : "execute";
+  }
   const goal = detectGoal(text, category, overwhelmTodayRoute);
   const supportStyle = resolveSupportStyle(input.supportStyle, category);
   const overwhelmed = Boolean(
@@ -491,7 +600,12 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     input.energyLevel === "low" ||
     /\b(?:low energy|no energy|exhausted|drained|tired)\b/i.test(text);
 
-  const workspaceOffer = detectFeatureOffer(text, category, overwhelmTodayRoute);
+  const workspaceOffer = detectFeatureOffer(
+    text,
+    category,
+    overwhelmTodayRoute,
+    artifactKind,
+  );
   const overwhelmOffers = overwhelmTodayRoute
     ? buildOverwhelmTodayOffers(text, overwhelmTodayRoute)
     : null;
@@ -505,6 +619,12 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     overwhelmTodayRoute === "adapt_primary";
 
   let offer = workspaceOffer;
+  if (!offer && artifactExecution && artifactKind) {
+    offer = buildCreateArtifactOffer(
+      artifactKind,
+      category === "build" ? "build" : "execute",
+    );
+  }
   if (overwhelmed && category === "organize" && !offer && !overwhelmTodayRoute) {
     offer = {
       section: "brain-dump",
@@ -525,14 +645,20 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     };
   }
 
-  const routeMode = resolveRouteMode(category, offer);
-  const surfaceOfferUi = shouldSurfaceRoutingOfferUi(text, category, offer);
+  const routeMode =
+    artifactExecution && offer
+      ? "feature_offer"
+      : resolveRouteMode(category, offer, artifactKind);
+  const surfaceOfferUi =
+    shouldSurfaceRoutingOfferUi(text, category, offer) ||
+    Boolean(artifactExecution && offer);
   const surfaceClarificationUi = shouldSurfaceClarificationUi(text);
   const continuity =
     offer && routeMode === "feature_offer"
       ? buildWorkspaceContinuity(offer.section, text, goal)
       : null;
   const suppressConversationSummary = Boolean(overwhelmTodayRoute);
+  const suppressRelationshipIntelligence = artifactExecution;
 
   const decision: IntentRoutingDecision = {
     category,
@@ -550,8 +676,12 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     surfaceClarificationUi,
     decisionCompassRecommended,
     clarifyPrompt: routeMode === "clarify" ? buildClarificationPrompt() : null,
+    artifactDetected,
+    artifactKind,
+    suppressRelationshipIntelligence,
     suppressRelationshipLead: false,
     suppressReflectionFirst:
+      suppressRelationshipIntelligence ||
       Boolean(overwhelmTodayRoute) ||
       category === "build" ||
       category === "execute" ||
@@ -565,7 +695,14 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     supportStyleGuidance: supportStyleGuidance(supportStyle, category),
     adaptMyDayRecommended,
     continuity,
-    navigationLine: offer?.line ?? null,
+    navigationLine:
+      offer?.line ??
+      (artifactExecution && artifactKind
+        ? buildRegistryArtifactOfferLine(
+            artifactKind,
+            category === "build" ? "build" : "execute",
+          )
+        : null),
     stayHereLabel: STAY_HERE_LABEL,
     featureLabel: offer ? featureLabelForSection(offer.section) : null,
   };
@@ -594,7 +731,15 @@ export function intentRoutingHintForChat(
     decision.suppressReflectionFirst
       ? "Do NOT lead with relationship reflection. Route or build first."
       : null,
-    decision.suppressRelationshipLead
+    decision.suppressRelationshipIntelligence
+      ? [
+          "EXECUTE OVERRIDE (P0.7.3): Direct action only — minimal clarification or Create redirect.",
+          "SKIP relationship observations, observation engine, and reflection-first openers entirely.",
+          "FORBIDDEN: I've noticed…, behavioral analysis, ADHD pattern explanations, user history recap.",
+          "ALLOWED: 'I can help with that.', 'Would you like to open Create?', 'What kind of email is it?'",
+        ].join("\n")
+      : null,
+    decision.suppressRelationshipLead && !decision.suppressRelationshipIntelligence
       ? "Do NOT open with relationship observations for this turn."
       : null,
     decision.clarifyPrompt && !decision.surfaceClarificationUi
