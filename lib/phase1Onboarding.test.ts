@@ -9,6 +9,7 @@ import {
   PHASE1_OPENING_MESSAGE,
   phase1OnboardingHintForChat,
   resetPhase1OnboardingForTests,
+  shouldBlockWorkspaceOpenForPhase1,
   shouldDeferWorkspaceRoutingForPhase1,
   shouldSuppressWorkspaceCoachForPhase1,
 } from "./phase1Onboarding";
@@ -192,5 +193,16 @@ describe("phase1Onboarding", () => {
 
     expect(confirmed.complete).toBe(true);
     expect(isPhase1OnboardingActive()).toBe(false);
+  });
+
+  it("blocks auto workspace opens during Phase 1 but allows explicit sidebar navigation", () => {
+    expect(shouldBlockWorkspaceOpenForPhase1()).toBe(true);
+    expect(shouldBlockWorkspaceOpenForPhase1({ userInitiated: false })).toBe(
+      true,
+    );
+    expect(shouldBlockWorkspaceOpenForPhase1({ userInitiated: true })).toBe(
+      false,
+    );
+    expect(shouldDeferWorkspaceRoutingForPhase1()).toBe(true);
   });
 });

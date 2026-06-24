@@ -595,6 +595,7 @@ import {
   PHASE1_INPUT_PLACEHOLDER,
   phase1OnboardingHintForChat,
   phase1RelationshipProfileForChat,
+  shouldBlockWorkspaceOpenForPhase1,
   shouldDeferWorkspaceRoutingForPhase1,
   shouldSuppressWorkspaceCoachForPhase1,
 } from "@/lib/phase1Onboarding";
@@ -2068,8 +2069,11 @@ export default function CompanionPageClient() {
     useState<AppFeatureNavOffer | null>(null);
   const workspaceSessionKeyRef = useRef<string | null>(null);
   const companionReturnSectionRef = useRef<AppSection | null>(null);
-  const patchWorkspacePanel = useCallback((next: AppSection | null) => {
-    if (next && shouldDeferWorkspaceRoutingForPhase1()) {
+  const patchWorkspacePanel = useCallback((
+    next: AppSection | null,
+    options?: { userInitiated?: boolean },
+  ) => {
+    if (next && shouldBlockWorkspaceOpenForPhase1(options)) {
       dbgWorkspace("setWorkspacePanel blocked — phase1 onboarding", { to: next });
       return;
     }
@@ -5120,8 +5124,9 @@ export default function CompanionPageClient() {
   function openSectionBesideChatCore(
     section: AppSection,
     nav?: SidebarNavId,
+    options?: { userInitiated?: boolean },
   ) {
-    if (shouldDeferWorkspaceRoutingForPhase1()) return;
+    if (shouldBlockWorkspaceOpenForPhase1(options)) return;
     if (isClearMyMindSection(section)) {
       openClearMyMindStandaloneCore();
       return;
@@ -5209,7 +5214,7 @@ export default function CompanionPageClient() {
     }
 
     pushNavigationRestore();
-    patchWorkspacePanel(section);
+    patchWorkspacePanel(section, options);
     if (section === "visual-focus" && !peekVisualFocusPendingOpen()) {
       requestVisualFocusStudio();
     }
@@ -5926,7 +5931,7 @@ export default function CompanionPageClient() {
       return;
     }
     if (shouldOpenBesideChat(section)) {
-      openSectionBesideChatCore(section);
+      openSectionBesideChatCore(section, undefined, { userInitiated: true });
     } else {
       setActiveSection(section);
     }
@@ -5964,7 +5969,7 @@ export default function CompanionPageClient() {
     }
 
     if (shouldOpenBesideChat(section)) {
-      openSectionBesideChatCore(section, normalizedNav);
+      openSectionBesideChatCore(section, normalizedNav, { userInitiated: true });
       return;
     }
 
@@ -11451,6 +11456,8 @@ export default function CompanionPageClient() {
             nav={buildGrowthPanelNav("evidence-bank")}
           />
         );
+      case "focus":
+        return <FocusAreaPanel onAction={handleFocusHubAction} />;
       case "growth":
         return (
           <GrowthCenterPanel
@@ -11480,7 +11487,9 @@ export default function CompanionPageClient() {
             backLabel={workspacePanelBackLabel}
             registerBack={registerBack}
             onOpenSection={(section, nav) =>
-              openSectionBesideChatCore(section, nav ?? "other")
+              openSectionBesideChatCore(section, nav ?? "other", {
+                userInitiated: true,
+              })
             }
             onOpenProject={(projectId) => {
               setProjectContinueId(projectId);
@@ -12383,7 +12392,11 @@ export default function CompanionPageClient() {
             }}
             onOpenProfile={() => setOverlay("profile")}
             showPlanMyDay
-            onOpenPlanMyDay={() => openSectionBesideChatCore("plan-my-day")}
+            onOpenPlanMyDay={() =>
+              openSectionBesideChatCore("plan-my-day", undefined, {
+                userInitiated: true,
+              })
+            }
           />
           {!homeCalm ? <ActiveWorkspaceBar items={activeWorkspaceItems} /> : null}
 

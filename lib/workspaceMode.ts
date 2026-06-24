@@ -41,6 +41,7 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
   "confidence-vault",
   "plan-my-day",
   "visual-focus",
+  "focus",
   "focus-timer",
 ];
 

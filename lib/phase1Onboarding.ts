@@ -156,6 +156,13 @@ export function shouldDeferWorkspaceRoutingForPhase1(): boolean {
   return isPhase1OnboardingActive();
 }
 
+/** Block auto workspace opens during Phase 1 — not explicit sidebar or panel clicks. */
+export function shouldBlockWorkspaceOpenForPhase1(options?: {
+  userInitiated?: boolean;
+}): boolean {
+  return shouldDeferWorkspaceRoutingForPhase1() && !options?.userInitiated;
+}
+
 export function shouldSuppressWorkspaceCoachForPhase1(): boolean {
   return isPhase1OnboardingActive();
 }
