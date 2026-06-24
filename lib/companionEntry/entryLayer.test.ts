@@ -13,6 +13,11 @@ import {
 describe("companionEntry entry layer gate", () => {
   it("defers keyword workspace offers for overwhelmed", () => {
     expect(shouldDeferKeywordWorkspaceOffer("I'm overwhelmed")).toBe(true);
+    expect(
+      shouldDeferKeywordWorkspaceOffer(
+        "I'm overwhelmed and not sure where to start today.",
+      ),
+    ).toBe(false);
     expect(companionEntryLayerHintForChat("I'm overwhelmed")).toMatch(
       /UNDERSTAND BEFORE SUGGESTING/i,
     );

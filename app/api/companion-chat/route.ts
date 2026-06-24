@@ -4,6 +4,18 @@ import {
   type CoachingMode,
 } from "@/lib/companionPrompt";
 import { resolveOpenAiApiKey } from "@/lib/openai/resolveOpenAiApiKey";
+import { buildRelationshipTurnDebugApiPayload } from "@/lib/relationshipIntelligenceTurnDebug";
+import {
+  enforceRelationshipResponse,
+  type RelationshipResponseEnforcementResult,
+} from "@/lib/relationshipResponseContract";
+import type { RelationshipMemoryConfidence } from "@/lib/relationshipIntelligencePrompt";
+import {
+  buildRelationshipResponseTraceSummary,
+  createRelationshipResponseId,
+  firstParagraphForTrace,
+  logRelationshipResponseTrace,
+} from "@/lib/relationshipResponseTrace";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -45,6 +57,15 @@ export async function POST(request: NextRequest) {
     const userName = body.userName as string | undefined;
     const businessContext = body.businessContext as string | undefined;
     const intentHint = body.intentHint as string | undefined;
+    const relationshipIntelligencePriority = body.relationshipIntelligencePriority as
+      | string
+      | undefined;
+    const relationshipLeadParagraph = body.relationshipLeadParagraph as
+      | string
+      | undefined;
+    const memoryConfidence = body.memoryConfidence as
+      | RelationshipMemoryConfidence
+      | undefined;
     const toolOfferHint = body.toolOfferHint as string | undefined;
     const workspaceContextHint = body.workspaceContextHint as string | undefined;
     const responseLanguageHint = body.responseLanguageHint as string | undefined;
@@ -109,13 +130,35 @@ export async function POST(request: NextRequest) {
       ? `\n\n${intelligenceContext}`
       : "";
 
-    const finalSystem = `${
+    const priorityBlock = relationshipIntelligencePriority?.trim()
+      ? `${relationshipIntelligencePriority.trim()}\n\n`
+      : "";
+
+    const finalSystem = `${priorityBlock}${
       businessContext ? `${systemPrompt}\n\n${businessContext}` : systemPrompt
     }${attune}${ecosystemBlock}${intelligenceBlock}${adaptiveBlock}${workspaceBlock}${offerBlock}`;
+
+    if (process.env.NODE_ENV === "development" && relationshipIntelligencePriority) {
+      console.debug("[relationship-intelligence-debug] API priority received", {
+        priorityBlockLength: relationshipIntelligencePriority.length,
+        priorityStartsWith: relationshipIntelligencePriority.slice(0, 80),
+      });
+    }
 
     const baseTemp = MODE_TEMPERATURE[coachingMode] ?? 0.75;
     const temperature =
       inputType === "voice" ? Math.min(baseTemp + 0.05, 0.9) : baseTemp;
+
+    const relationshipResponseId = createRelationshipResponseId();
+    const userProbe = messages[messages.length - 1]?.content ?? "";
+
+    logRelationshipResponseTrace({
+      responseId: relationshipResponseId,
+      stage: "pre-llm",
+      firstParagraph: "(pending)",
+      memoryConfidence,
+      relationshipLeadParagraphLength: relationshipLeadParagraph?.length ?? 0,
+    });
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -139,9 +182,132 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json();
-    const message = data.choices?.[0]?.message?.content ?? "";
+    const rawMessage = data.choices?.[0]?.message?.content ?? "";
 
-    return NextResponse.json({ message });
+    logRelationshipResponseTrace({
+      responseId: relationshipResponseId,
+      stage: "post-llm",
+      firstParagraph: firstParagraphForTrace(rawMessage),
+      memoryConfidence,
+      relationshipLeadParagraphLength: relationshipLeadParagraph?.length ?? 0,
+      relationshipResponseRewritten: false,
+    });
+
+    let enforcement: RelationshipResponseEnforcementResult = {
+      message: rawMessage,
+      rewritten: false,
+      enforcementRan: false,
+      skipReason: "enforcement not invoked",
+    };
+    const enforcementEligible =
+      Boolean(memoryConfidence) &&
+      Boolean(relationshipLeadParagraph?.trim()) &&
+      (memoryConfidence === "forming" || memoryConfidence === "sufficient");
+
+    if (enforcementEligible && memoryConfidence) {
+      enforcement = enforceRelationshipResponse({
+        response: rawMessage,
+        relationshipLeadParagraph,
+        memoryConfidence,
+        userText: userProbe,
+      });
+    } else if (!relationshipLeadParagraph?.trim()) {
+      enforcement = {
+        message: rawMessage,
+        rewritten: false,
+        enforcementRan: false,
+        skipReason: relationshipLeadParagraph
+          ? "empty relationshipLeadParagraph"
+          : "relationshipLeadParagraph not sent to API",
+      };
+    } else if (!memoryConfidence) {
+      enforcement = {
+        message: rawMessage,
+        rewritten: false,
+        enforcementRan: false,
+        skipReason: "memoryConfidence not sent to API",
+      };
+    }
+
+    const message = enforcement.message;
+
+    logRelationshipResponseTrace({
+      responseId: relationshipResponseId,
+      stage: "post-enforcement",
+      firstParagraph: firstParagraphForTrace(message),
+      memoryConfidence,
+      relationshipLeadParagraphLength: relationshipLeadParagraph?.length ?? 0,
+      relationshipResponseRewritten: enforcement.rewritten,
+      enforcementRan: enforcement.enforcementRan,
+      skipReason: enforcement.skipReason,
+      violationReason: enforcement.violation?.reason,
+    });
+
+    logRelationshipResponseTrace({
+      responseId: relationshipResponseId,
+      stage: "api-return",
+      firstParagraph: firstParagraphForTrace(message),
+      memoryConfidence,
+      relationshipLeadParagraphLength: relationshipLeadParagraph?.length ?? 0,
+      relationshipResponseRewritten: enforcement.rewritten,
+      enforcementRan: enforcement.enforcementRan,
+      skipReason: enforcement.skipReason,
+      violationReason: enforcement.violation?.reason,
+    });
+
+    const traceSummary = buildRelationshipResponseTraceSummary({
+      responseId: relationshipResponseId,
+      memoryConfidence,
+      relationshipLeadParagraphLength: relationshipLeadParagraph?.length ?? 0,
+      llmRawMessage: rawMessage,
+      enforcedMessage: message,
+      enforcementRewritten: enforcement.rewritten,
+      enforcementRan: enforcement.enforcementRan,
+      enforcementSkipReason: enforcement.skipReason,
+      violationReason: enforcement.violation?.reason,
+    });
+
+    const apiDebug =
+      process.env.NODE_ENV === "development"
+        ? buildRelationshipTurnDebugApiPayload({
+            relationshipIntelligencePriority,
+            finalSystem,
+          })
+        : undefined;
+
+    if (process.env.NODE_ENV === "development") {
+      const shouldEmphasize =
+        /building new things instead of finishing/i.test(userProbe) ||
+        Boolean(relationshipIntelligencePriority?.trim());
+
+      const logPayload = {
+        userText: userProbe.slice(0, 160),
+        ...apiDebug,
+        ...traceSummary,
+        lastUserMessage: userProbe,
+      };
+
+      if (shouldEmphasize) {
+        console.warn("[relationship-intelligence-debug] API", logPayload);
+      } else {
+        console.debug("[relationship-intelligence-debug] API", logPayload);
+      }
+    }
+
+    return NextResponse.json({
+      message,
+      relationshipResponseId,
+      ...(apiDebug
+        ? {
+            _relationshipTurnDebug: {
+              ...apiDebug,
+              ...traceSummary,
+            },
+          }
+        : process.env.NODE_ENV === "development"
+          ? { _relationshipTurnDebug: traceSummary }
+          : {}),
+    });
   } catch (error) {
     console.error("Companion chat error:", error);
     return NextResponse.json(

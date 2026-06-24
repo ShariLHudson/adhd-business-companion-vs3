@@ -12,6 +12,7 @@ import {
 } from "./phase5CompanionIntelligenceEcosystem";
 import { resetPhase6NetworkForTests } from "./phase6CompanionIntelligenceNetwork";
 import { resetPhase7BusinessIntelligenceForTests } from "./businessIntelligenceEcosystem";
+import { isPhase7BusinessIntelligenceEcosystemActive } from "./businessIntelligenceEcosystem";
 import {
   buildWisdomIntelligenceSummary,
   isPhase9WisdomIntelligenceActive,
@@ -198,5 +199,24 @@ describe("WisdomIntelligenceValidation", () => {
     const hint = phase9WisdomIntelligenceHintForChat({ now });
     expect(hint).toMatch(/PHASE 9 WISDOM INTELLIGENCE/i);
     expect(hint).toMatch(/NEVER.*always\/never/i);
+  });
+
+  it("reflects shiny-object / finishing pattern when phase 7 is active", () => {
+    seedPhase7Base(20, "2025-01-01T10:00:00.000Z");
+    const now = new Date("2025-02-15T10:00:00.000Z");
+    const reflection = maybeWisdomReflection({
+      userText: "Why do I keep building new things instead of finishing what I started?",
+      now,
+    });
+    expect(reflection).toMatch(/new ideas|finishing|smaller scope/i);
+  });
+
+  it("provides wisdom hint when phase 7 is active", () => {
+    seedPhase7Base(20, "2025-01-01T10:00:00.000Z");
+    const now = new Date("2025-01-25T10:00:00.000Z");
+    expect(isPhase7BusinessIntelligenceEcosystemActive(now)).toBe(true);
+    const hint = phase9WisdomIntelligenceHintForChat({ now });
+    expect(hint).toBeTruthy();
+    expect(hint).toMatch(/WISDOM/i);
   });
 });

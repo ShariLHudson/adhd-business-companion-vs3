@@ -158,6 +158,10 @@ export type WorkspaceOffer = {
   section: AppSection;
   buttonLabel: string;
   line: string;
+  secondary?: {
+    section: AppSection;
+    buttonLabel: string;
+  };
 };
 
 const DOING_VERB_RE =

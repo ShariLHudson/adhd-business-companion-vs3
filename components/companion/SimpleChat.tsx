@@ -1,11 +1,18 @@
 "use client";
 
-import { type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { toPlainLanguageDisplay } from "@/lib/plainLanguageFormatting";
+import type { RelationshipResponseUiTrace } from "@/lib/relationshipResponseTrace";
+import {
+  firstParagraphForTrace,
+  logRelationshipResponseTrace,
+} from "@/lib/relationshipResponseTrace";
+import { RelationshipResponseDevBadge } from "@/components/companion/RelationshipResponseDevBadge";
 
 type Message = {
   role: "user" | "assistant" | "system";
   content: string;
+  relationshipTrace?: RelationshipResponseUiTrace;
 };
 
 type SimpleChatProps = {
@@ -66,6 +73,46 @@ function renderAssistant(content: string): ReactNode[] {
   return blocks;
 }
 
+function AssistantMessageWithTrace({
+  content,
+  trace,
+  isGreeting,
+}: {
+  content: string;
+  trace?: RelationshipResponseUiTrace;
+  isGreeting: boolean;
+}) {
+  useEffect(() => {
+    if (!trace) return;
+    logRelationshipResponseTrace({
+      responseId: trace.responseId,
+      stage: "ui-render",
+      firstParagraph: firstParagraphForTrace(content),
+      relationshipResponseRewritten: trace.rewritten,
+      memoryConfidence: trace.memoryConfidence,
+      relationshipLeadParagraphLength: trace.relationshipLeadParagraphLength,
+      enforcementRan: trace.enforcementRan,
+      skipReason: trace.enforcementSkipReason,
+      violationReason: trace.violationReason,
+    });
+  }, [content, trace]);
+
+  return (
+    <>
+      <div
+        className={
+          isGreeting
+            ? "mx-auto max-w-md space-y-2 rounded-2xl bg-white/85 px-5 py-4 text-center shadow-sm backdrop-blur-sm"
+            : "max-w-[90%] space-y-2 rounded-2xl bg-white/85 px-4 py-3 shadow-sm backdrop-blur-sm"
+        }
+      >
+        {renderAssistant(content)}
+      </div>
+      {trace ? <RelationshipResponseDevBadge trace={trace} /> : null}
+    </>
+  );
+}
+
 export function SimpleChat({
   messages,
   stateHint,
@@ -116,15 +163,11 @@ export function SimpleChat({
                   {msg.content}
                 </p>
               ) : (
-                <div
-                  className={
-                    isGreeting
-                      ? "mx-auto max-w-md space-y-2 rounded-2xl bg-white/85 px-5 py-4 text-center shadow-sm backdrop-blur-sm"
-                      : "max-w-[90%] space-y-2 rounded-2xl bg-white/85 px-4 py-3 shadow-sm backdrop-blur-sm"
-                  }
-                >
-                  {renderAssistant(msg.content)}
-                </div>
+                <AssistantMessageWithTrace
+                  content={msg.content}
+                  trace={msg.relationshipTrace}
+                  isGreeting={isGreeting}
+                />
               )}
               {afterLastAssistant && i === lastAssistantIdx && (
                 <div className="mt-2 w-full max-w-[90%]">{afterLastAssistant}</div>

@@ -14,6 +14,7 @@ import { isPhase5CompanionIntelligenceEcosystemActive } from "./phase5CompanionI
 import { isPhase6CompanionIntelligenceNetworkActive } from "./phase6CompanionIntelligenceNetwork";
 import { isPhase10TransformationIntelligenceActive } from "./transformationIntelligence";
 import { isPhase9WisdomIntelligenceActive } from "./wisdomIntelligence";
+import { buildWhatIveLearnedProfile } from "./phase2ProgressiveDiscovery";
 
 export type RelationshipPhaseId =
   | "phase_1_initial_trust"
@@ -181,4 +182,87 @@ function daysSince(iso: string, now = new Date()): number {
   const start = new Date(iso).getTime();
   if (Number.isNaN(start)) return 0;
   return Math.max(0, Math.floor((now.getTime() - start) / 86_400_000));
+}
+
+/** Minimum phase before companion stops discovery-style onboarding tone. */
+const ESTABLISHED_RELATIONSHIP_PHASE = 4;
+
+export function isEstablishedRelationshipForChat(): boolean {
+  if (!isPhase1OnboardingComplete()) return false;
+  return getCurrentRelationshipPhase().number >= ESTABLISHED_RELATIONSHIP_PHASE;
+}
+
+export function relationshipMemoryContextForChat(): string | undefined {
+  if (!isPhase1OnboardingComplete()) return undefined;
+
+  const current = getCurrentRelationshipPhase();
+  const profile = buildWhatIveLearnedProfile();
+  const p2 = getPhase2DiscoveryState();
+  const parts = [
+    relationshipPhaseSummaryForChat(),
+    `Sessions together: ${p2.sessionCount}.`,
+  ];
+
+  if (profile.challenges.length) {
+    parts.push(`Recurring challenges: ${profile.challenges.slice(0, 4).join("; ")}.`);
+  }
+  if (profile.strengths.length) {
+    parts.push(`Known strengths: ${profile.strengths.slice(0, 3).join("; ")}.`);
+  }
+  const patterns = p2.adhdPatterns
+    .filter((p) => p.count >= 2)
+    .slice(0, 4)
+    .map((p) => p.id.replace(/_/g, " "));
+  if (patterns.length) {
+    parts.push(`Observed ADHD patterns: ${patterns.join("; ")}.`);
+  }
+  if (profile.business.type) {
+    parts.push(`Business: ${profile.business.type}.`);
+  }
+  if (profile.business.currentGoal) {
+    parts.push(`Current goal signal: ${profile.business.currentGoal}.`);
+  }
+
+  if (current.number >= ESTABLISHED_RELATIONSHIP_PHASE) {
+    parts.push(
+      "ESTABLISHED RELATIONSHIP: Use this history. Reflect what you already know before asking exploratory questions.",
+    );
+  }
+
+  return parts.join(" ");
+}
+
+export function establishedRelationshipCoachHintForChat(): string | null {
+  if (!isEstablishedRelationshipForChat()) return null;
+
+  const current = getCurrentRelationshipPhase();
+  const profile = buildWhatIveLearnedProfile();
+  const p2 = getPhase2DiscoveryState();
+  const patterns = p2.adhdPatterns
+    .filter((p) => p.count >= 2)
+    .map((p) => p.id.replace(/_/g, " "));
+
+  const parts = [
+    "ESTABLISHED RELATIONSHIP COACHING (mandatory when history exists):",
+    `Relationship depth: Phase ${current.number}. This is NOT onboarding or first-week discovery.`,
+    "FIRST: Offer a reflective read using known patterns, ADHD tendencies, business context, and prior challenges.",
+    "THEN: At most ONE follow-up question — only if something essential is still missing.",
+    "FORBIDDEN: generic 'common challenge' openers, 'what do you think is driving…' as the lead, questionnaire tone.",
+  ];
+
+  if (patterns.length) {
+    parts.push(`Known patterns to reference if relevant: ${patterns.join(", ")}.`);
+  }
+  if (profile.challenges[0]) {
+    parts.push(`Recurring challenge: ${profile.challenges[0]}.`);
+  }
+  if (profile.helpfulResources[0]) {
+    parts.push(`What has helped before: ${profile.helpfulResources[0]}.`);
+  }
+
+  parts.push(
+    "For shiny-object / finish-what-you-started questions: name novelty-vs-completion tension, perfectionism, or overwhelm if patterns support it — then invite correction.",
+  );
+
+  return parts.join("\n");
 }

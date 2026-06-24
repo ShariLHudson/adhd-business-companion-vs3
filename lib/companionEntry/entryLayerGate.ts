@@ -3,6 +3,7 @@
  * Understand before suggesting; no keyword-first workspace jumps.
  */
 
+import { isOverwhelmTodayRoutingExempt } from "../overwhelmTodayRouting";
 import { companionBusinessCanvasEntryHintForChat } from "./businessCanvasEntry";
 
 /** Situations that need clarification before any workspace recommendation. */
@@ -33,6 +34,7 @@ const CLARIFY_OVERWHELMED_OPTIONS = [
 export function shouldDeferKeywordWorkspaceOffer(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (isOverwhelmTodayRoutingExempt(t)) return false;
   return DEFER_KEYWORD_OFFER_PATTERNS.some((re) => re.test(t));
 }
 

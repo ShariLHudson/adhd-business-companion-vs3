@@ -11,6 +11,7 @@ import {
 } from "./messageClassification";
 import type { AppSection } from "./companionUi";
 import { hasConcreteWorkspaceTarget } from "./workspaceMode";
+import { isEstablishedRelationshipForChat } from "./companionRelationshipPhases";
 
 export type ChatTurn = {
   role: "user" | "assistant" | "system";
@@ -229,6 +230,7 @@ function inDiscoveryThread(messages: ChatTurn[]): boolean {
 export function getDiscoveryPhase(
   input: CompanionIntelligenceInput,
 ): DiscoveryPhase {
+  if (isEstablishedRelationshipForChat()) return "none";
   if (input.askingHow) return "none";
   if (shouldSuppressEmotionalTools(input.text)) return "none";
   if (hasConcreteWorkspaceTarget(input.text)) return "none";
@@ -372,7 +374,7 @@ export function intelligenceHintForChat(
   );
 
   const discovery = discoveryHint(intel.discoveryPhase, userText);
-  if (discovery) parts.push(discovery);
+  if (discovery && !isEstablishedRelationshipForChat()) parts.push(discovery);
 
   if (intel.shouldDeferTools) {
     parts.push(

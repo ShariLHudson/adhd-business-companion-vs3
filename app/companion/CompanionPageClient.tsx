@@ -665,7 +665,35 @@ import {
   phase10TransformationIntelligenceHintForChat,
   recordTransformationReflectionShown,
 } from "@/lib/transformationIntelligence";
-import { relationshipPhaseSummaryForChat } from "@/lib/companionRelationshipPhases";
+import {
+  establishedRelationshipCoachHintForChat,
+  isEstablishedRelationshipForChat,
+  relationshipMemoryContextForChat,
+  relationshipPhaseSummaryForChat,
+} from "@/lib/companionRelationshipPhases";
+import {
+  buildRelationshipIntelligencePriorityBlock,
+  relationshipResponseQualityGuardrails,
+} from "@/lib/relationshipIntelligencePrompt";
+import {
+  buildRelationshipTurnDebugClientMeta,
+  detectGenericOpeningViolation,
+  logRelationshipIntelligenceTurnDebug,
+  warnIfGenericOpeningDespitePriority,
+} from "@/lib/relationshipIntelligenceTurnDebug";
+import {
+  intentRoutingHintForChat,
+  resolveIntentRouting,
+} from "@/lib/intentRoutingIntelligence";
+import {
+  buildRelationshipLeadParagraph,
+  warnIfRelationshipContractViolation,
+} from "@/lib/relationshipResponseContract";
+import {
+  firstParagraphForTrace,
+  logRelationshipResponseTrace,
+  type RelationshipResponseUiTrace,
+} from "@/lib/relationshipResponseTrace";
 import {
   createConversationWorkflow,
   type ConversationWorkflow,
@@ -1247,6 +1275,7 @@ type SpeechRecognitionEvent = Event & {
 type Message = {
   role: "user" | "assistant" | "system";
   content: string;
+  relationshipTrace?: import("@/lib/relationshipResponseTrace").RelationshipResponseUiTrace;
 };
 
 function presenceDelay() {
@@ -5080,6 +5109,16 @@ export default function CompanionPageClient() {
 
   function requestBeginNewDay() {
     setFreshStartDialog("begin-new-day");
+  }
+
+  function handleStartCleanConversation() {
+    clearTodayContext();
+  }
+
+  function handleStartNewDayConversation() {
+    clearTodayContext();
+    clearDailySessionFlags();
+    resetTodayPlanForNewDay();
   }
 
   function confirmFreshStart() {
@@ -9388,6 +9427,28 @@ export default function CompanionPageClient() {
     // engine, which decides (and gates) whether audio is appropriate.
     const obstacle = detectObstacle(trimmed);
     const somatic = detectSomaticAvoidance(trimmed);
+    const turnIntentRouting = resolveIntentRouting({
+      userText: trimmed,
+      workspace: workspacePanel,
+      supportStyle: getPrefs().supportStyle,
+      emotionalState: detected,
+      overwhelmed: detected === "overwhelmed",
+    });
+    if (
+      turnIntentRouting.surfaceClarificationUi &&
+      turnIntentRouting.routeMode === "clarify" &&
+      turnIntentRouting.clarifyPrompt &&
+      !workspacePanel
+    ) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: turnIntentRouting.clarifyPrompt! },
+      ]);
+      setInput("");
+      setIsLoading(false);
+      inputRef.current?.focus();
+      return;
+    }
     const willBridge =
       !suppressCreatePending && bridgeFromResolved(resolved) !== null;
     const intelligence = buildCompanionIntelligence({
@@ -9469,7 +9530,9 @@ export default function CompanionPageClient() {
       suppressCreatePending ||
       turnSurface.suppressCards
         ? null
-        : detectDoingIntent(trimmed);
+        : turnIntentRouting.surfaceOfferUi
+          ? turnIntentRouting.workspaceOffer ?? detectDoingIntent(trimmed)
+          : null;
     const stressCause = detectStressCauseChoice(trimmed);
     const pendingDecisionCompassOffer: DecisionCompassOffer | null =
       shouldDeferWorkspaceRoutingForPhase1()
@@ -9566,10 +9629,9 @@ export default function CompanionPageClient() {
         return;
       }
 
-      const offerReply = buildWorkspaceOfferChatReply(
-        pendingWorkspaceOffer,
-        trimmed,
-      );
+      const offerReply =
+        turnIntentRouting.navigationLine ??
+        buildWorkspaceOfferChatReply(pendingWorkspaceOffer, trimmed);
       if (
         shouldAutoOpenWorkspaceFromIntent(trimmed, pendingWorkspaceOffer) &&
         !governorChatOnly
@@ -9898,7 +9960,8 @@ export default function CompanionPageClient() {
       !workspaceOffer &&
       !turnArbitration?.blockAutoRouteAsset &&
       isAdaptMyDayIntent(trimmed) &&
-      !isExplicitBreatheRequest(trimmed)
+      !isExplicitBreatheRequest(trimmed) &&
+      !turnIntentRouting.overwhelmTodayRoute
     ) {
       const userMessage: Message = { role: "user", content: trimmed };
       const offerLine = adaptMyDayOfferLine();
@@ -10096,6 +10159,81 @@ export default function CompanionPageClient() {
         createPanelWorkflowRef.current,
         createBuilderSessionRef.current?.phase ?? null,
       );
+      const businessContextForApi = (() => {
+        const suppressSummary = turnIntentRouting.suppressConversationSummary;
+        const parts = [
+          businessContextSummary(),
+          activeCompanionsContextForAI(),
+          suppressSummary ? null : discoveryContextForChat(),
+          suppressSummary ? null : phase1RelationshipProfileForChat(),
+          suppressSummary ? null : relationshipMemoryContextForChat(),
+          suppressSummary || !isPhase1OnboardingComplete()
+            ? null
+            : relationshipPhaseSummaryForChat(),
+        ].filter(Boolean);
+        return parts.length ? parts.join(" ") : undefined;
+      })();
+      const relationshipIntelligencePriority =
+        buildRelationshipIntelligencePriorityBlock(trimmed, new Date(), {
+          suppressContractForRouting:
+            turnIntentRouting.suppressRelationshipLead ||
+            turnIntentRouting.suppressConversationSummary,
+          workspace: workspacePanel,
+        });
+      const establishedRelationshipHint = establishedRelationshipCoachHintForChat();
+      const phase9HintPreview = phase9WisdomIntelligenceHintForChat({
+        reflection: phase9WisdomReflection,
+        userText: trimmed,
+      });
+      const phase10HintPreview = phase10TransformationIntelligenceHintForChat({
+        reflection: phase10TransformationReflection,
+        userText: trimmed,
+      });
+      const phase11HintPreview = phase11EcosystemIntelligenceHintForChat({
+        insight: phase11EcosystemInsight,
+        userText: trimmed,
+      });
+      const relationshipGuardrailsHint = relationshipIntelligencePriority
+        ? relationshipResponseQualityGuardrails()
+        : null;
+      const relationshipLeadParagraph = buildRelationshipLeadParagraph(trimmed, new Date(), {
+        workspace: workspacePanel,
+        suppressForRouting:
+          turnIntentRouting.suppressRelationshipLead ||
+          turnIntentRouting.suppressConversationSummary,
+      });
+      const activeHintNames: string[] = [];
+      if (relationshipIntelligencePriority) {
+        activeHintNames.push("relationshipIntelligencePriority");
+        activeHintNames.push("relationshipResponseQualityGuardrails");
+      }
+      if (relationshipLeadParagraph) {
+        activeHintNames.push("relationshipResponseContract");
+      }
+      if (establishedRelationshipHint) activeHintNames.push("establishedRelationshipCoach");
+      if (phase9HintPreview) activeHintNames.push("phase9WisdomIntelligence");
+      if (phase10HintPreview) activeHintNames.push("phase10Transformation");
+      if (phase11HintPreview) activeHintNames.push("phase11Ecosystem");
+      if (phase7BusinessInsight) activeHintNames.push("phase7BusinessInsight");
+      if (phase9WisdomReflection) activeHintNames.push("phase9WisdomReflection");
+      if (intelligence.discoveryPhase !== "none") {
+        activeHintNames.push(`companionDiscovery:${intelligence.discoveryPhase}`);
+      }
+      activeHintNames.push(`companionProblemType:${intelligence.problemType}`);
+      if (adhdEntrepreneur) activeHintNames.push("adhdEntrepreneurPrimary");
+      if (adhdNative) activeHintNames.push("adhdNative");
+      activeHintNames.push(`actionBias:${actionBias.investigationPhase}`);
+      const relationshipTurnClientMeta = buildRelationshipTurnDebugClientMeta({
+        userText: trimmed,
+        relationshipPriorityBlock: relationshipIntelligencePriority,
+        activeHintNames,
+        relationshipLeadParagraph,
+      });
+      logRelationshipIntelligenceTurnDebug({
+        userText: trimmed,
+        ...relationshipTurnClientMeta,
+        phase: "pre-api",
+      });
       const res = await fetch("/api/companion-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -10106,27 +10244,21 @@ export default function CompanionPageClient() {
           ),
           inputType,
           coachingMode,
+          relationshipIntelligencePriority: relationshipIntelligencePriority ?? undefined,
+          relationshipLeadParagraph: relationshipLeadParagraph ?? undefined,
+          memoryConfidence: relationshipTurnClientMeta.memoryConfidence,
           emotionalState: EMOTION_LABELS[detected],
           dayState: dayStateSummary(getDayState()),
           aiTone: prefs.aiTone,
           helpMode: prefs.helpMode,
           supportStyle: prefs.supportStyle,
           userName: prefs.name || undefined,
-          businessContext: (() => {
-            const parts = [
-              businessContextSummary(),
-              activeCompanionsContextForAI(),
-              discoveryContextForChat(),
-              phase1RelationshipProfileForChat(),
-              isPhase1OnboardingComplete()
-                ? relationshipPhaseSummaryForChat()
-                : null,
-            ].filter(Boolean);
-            return parts.length ? parts.join(" ") : undefined;
-          })(),
+          businessContext: businessContextForApi,
           intentHint:
             mergeGovernorHints(
               [
+                intentRoutingHintForChat(turnIntentRouting),
+                relationshipGuardrailsHint,
                 appFeatureKnowledgeHintForChat(trimmed),
                 appFeatureNavigationHintForChat(trimmed),
                 arbitrationHintForChat(turnArbitration),
@@ -10181,18 +10313,24 @@ export default function CompanionPageClient() {
                 outcomeThreadHintForChat(getOutcomeThread()),
                 companionDecisionIntelligenceHintForChat(decisionIntelligence),
                 surveyIntelligenceHintForChat(surveyIntelligence),
-                phase1OnboardingEval
+                phase1OnboardingEval && !turnIntentRouting.suppressConversationSummary
                   ? phase1OnboardingHintForChat(phase1OnboardingEval)
                   : null,
-                isPhase1OnboardingComplete()
-                  ? phase2ProgressiveDiscoveryHintForChat({
-                      trustMoment: phase2TrustMoment,
-                    })
-                  : null,
-                phase3AdaptiveRelationshipHintForChat({
-                  awarenessMoment: phase3AwarenessMoment,
-                  anticipatorySupport: phase3AnticipatorySupport,
-                }),
+                isEstablishedRelationshipForChat() &&
+                !turnIntentRouting.suppressConversationSummary
+                  ? establishedRelationshipCoachHintForChat()
+                  : isPhase1OnboardingComplete() &&
+                      !turnIntentRouting.suppressConversationSummary
+                    ? phase2ProgressiveDiscoveryHintForChat({
+                        trustMoment: phase2TrustMoment,
+                      })
+                    : null,
+                turnIntentRouting.suppressConversationSummary
+                  ? null
+                  : phase3AdaptiveRelationshipHintForChat({
+                      awarenessMoment: phase3AwarenessMoment,
+                      anticipatorySupport: phase3AnticipatorySupport,
+                    }),
                 phase4BusinessOperatingPartnerHintForChat({
                   proactiveSupport: phase4ProactiveSupport,
                   userText: trimmed,
@@ -10376,6 +10514,18 @@ export default function CompanionPageClient() {
 
       const rawAssistantMsg =
         typeof data.message === "string" ? data.message : "";
+      const apiTurnDebug = data._relationshipTurnDebug as
+        | Record<string, unknown>
+        | undefined;
+      const relationshipResponseId =
+        (typeof data.relationshipResponseId === "string"
+          ? data.relationshipResponseId
+          : undefined) ??
+        (typeof apiTurnDebug?.relationshipResponseId === "string"
+          ? apiTurnDebug.relationshipResponseId
+          : undefined) ??
+        "unknown";
+
       const {
         field: focusField,
         fill: assistantFill,
@@ -10384,10 +10534,87 @@ export default function CompanionPageClient() {
       const assistantMsg = toPlainLanguageDisplay(
         scrubFalseWorkspaceClaims(assistantMsgRaw, getWorkspaceSnapshot()),
       );
+
+      const uiTrace: RelationshipResponseUiTrace = {
+        responseId: relationshipResponseId,
+        rewritten: Boolean(apiTurnDebug?.relationshipResponseRewritten),
+        memoryConfidence: relationshipTurnClientMeta.memoryConfidence,
+        relationshipLeadParagraphLength:
+          relationshipLeadParagraph?.length ??
+          relationshipTurnClientMeta.relationshipLeadParagraph?.length ??
+          0,
+        enforcementRan: Boolean(apiTurnDebug?.relationshipEnforcementRan),
+        enforcementSkipReason:
+          (apiTurnDebug?.relationshipEnforcementSkipReason as string | null) ??
+          null,
+        violationReason:
+          (apiTurnDebug?.relationshipResponseRewriteReason as string | null) ??
+          null,
+        firstParagraphAtApiReceive: firstParagraphForTrace(rawAssistantMsg),
+        firstParagraphAfterDirectives: firstParagraphForTrace(assistantMsgRaw),
+        firstParagraphAtRender: firstParagraphForTrace(assistantMsg),
+        confidenceObservationsCount:
+          relationshipTurnClientMeta.confidenceObservationsCount,
+        confidenceSignalCount: relationshipTurnClientMeta.confidenceSignalCount,
+        confidenceResultReason: relationshipTurnClientMeta.confidenceResultReason,
+        confidenceFloorApplied: relationshipTurnClientMeta.confidenceFloorApplied,
+      };
+
+      logRelationshipResponseTrace({
+        responseId: relationshipResponseId,
+        stage: "ui-receive",
+        firstParagraph: uiTrace.firstParagraphAtApiReceive,
+        relationshipResponseRewritten: uiTrace.rewritten,
+        memoryConfidence: uiTrace.memoryConfidence,
+        relationshipLeadParagraphLength: uiTrace.relationshipLeadParagraphLength,
+        enforcementRan: uiTrace.enforcementRan,
+        skipReason: uiTrace.enforcementSkipReason,
+        violationReason: uiTrace.violationReason,
+      });
+
+      const contractViolation = warnIfRelationshipContractViolation({
+        response: rawAssistantMsg,
+        relationshipPriorityBlockLength:
+          relationshipTurnClientMeta.relationshipPriorityBlockLength,
+        userText: trimmed,
+        memoryConfidence: relationshipTurnClientMeta.memoryConfidence,
+      });
+      logRelationshipIntelligenceTurnDebug({
+        userText: trimmed,
+        ...relationshipTurnClientMeta,
+        ...(apiTurnDebug ?? {}),
+        assistantResponsePreview: rawAssistantMsg,
+        genericOpeningViolation: detectGenericOpeningViolation(rawAssistantMsg),
+        relationshipContractViolation: contractViolation?.reason ?? null,
+        relationshipResponseRewritten: Boolean(
+          (apiTurnDebug as { relationshipResponseRewritten?: boolean } | undefined)
+            ?.relationshipResponseRewritten,
+        ),
+        relationshipResponseRewriteReason:
+          (apiTurnDebug as { relationshipResponseRewriteReason?: string } | undefined)
+            ?.relationshipResponseRewriteReason ?? null,
+        relationshipEnforcementRan: Boolean(
+          (apiTurnDebug as { relationshipEnforcementRan?: boolean } | undefined)
+            ?.relationshipEnforcementRan,
+        ),
+        relationshipEnforcementSkipReason:
+          (apiTurnDebug as { relationshipEnforcementSkipReason?: string } | undefined)
+            ?.relationshipEnforcementSkipReason ?? null,
+        relationshipResponseId,
+        uiTraceFirstParagraphAtReceive: uiTrace.firstParagraphAtApiReceive,
+        uiTraceFirstParagraphAtRender: uiTrace.firstParagraphAtRender,
+        phase: "post-api",
+      });
+      warnIfGenericOpeningDespitePriority(
+        relationshipTurnClientMeta.relationshipPriorityBlockLength,
+        rawAssistantMsg,
+        trimmed,
+      );
+
       rememberChatArtifactFromAssistant(assistantMsg, trimmed);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: assistantMsg },
+        { role: "assistant", content: assistantMsg, relationshipTrace: uiTrace },
       ]);
       if (
         shouldUseCreateBuilderChatTurns() &&
@@ -12427,7 +12654,8 @@ export default function CompanionPageClient() {
           <TopBar
             onOpenClearMyMind={openClearMyMindStandaloneCore}
             onOpenAdaptMyDay={openAdaptMyDayCore}
-            onRequestNewConversation={requestClearTodayContext}
+            onRequestNewConversation={handleStartCleanConversation}
+            onRequestNewDayConversation={handleStartNewDayConversation}
             onOpenSettings={(section) => {
               setSettingsSection(section ?? null);
               setOverlay("settings");
@@ -12790,7 +13018,25 @@ export default function CompanionPageClient() {
                               WORKSPACE_EMOJI[workspaceOffer.section] ?? "🛠"
                             }
                             toolLabel={workspaceOffer.buttonLabel}
-                            keepTalkingLabel="Not now"
+                            keepTalkingLabel="Stay Here"
+                            secondaryEmoji={
+                              workspaceOffer.secondary
+                                ? WORKSPACE_EMOJI[workspaceOffer.secondary.section] ??
+                                  "🛠"
+                                : undefined
+                            }
+                            secondaryLabel={workspaceOffer.secondary?.buttonLabel}
+                            onSecondaryAccept={
+                              workspaceOffer.secondary
+                                ? () =>
+                                    acceptWorkspaceOffer({
+                                      section: workspaceOffer.secondary!.section,
+                                      buttonLabel:
+                                        workspaceOffer.secondary!.buttonLabel,
+                                      line: workspaceOffer.line,
+                                    })
+                                : undefined
+                            }
                             onAccept={() =>
                               acceptWorkspaceOffer(workspaceOffer)
                             }

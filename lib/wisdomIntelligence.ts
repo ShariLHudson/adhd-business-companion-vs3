@@ -85,6 +85,12 @@ const PATTERN_WISDOM: {
     reflection:
       "A pattern I've noticed is that clarity often comes after you talk it out, not before.",
   },
+  {
+    patternId: "shiny_object_syndrome",
+    label: "Shiny object syndrome",
+    reflection:
+      "New ideas feel energizing — but you've learned that finishing usually needs a smaller scope on what's already in motion.",
+  },
 ];
 
 function defaultState(): WisdomIntelligenceState {
@@ -257,11 +263,13 @@ export function maybeWisdomReflection(input: {
   userText: string;
   now?: Date;
 }): string | null {
-  if (!isPhase9WisdomIntelligenceActive(input.now)) return null;
+  if (!isPhase7BusinessIntelligenceEcosystemActive(input.now)) return null;
 
   const now = input.now ?? new Date();
   const cur = readState();
-  if (!cooldownClear(cur.lastReflectionOfferAt, now)) return null;
+  if (isPhase9WisdomIntelligenceActive(now) && !cooldownClear(cur.lastReflectionOfferAt, now)) {
+    return null;
+  }
 
   const text = input.userText.trim();
   if (!text) return null;
@@ -301,6 +309,37 @@ export function maybeWisdomReflection(input: {
     const vis = p2.adhdPatterns.find((p) => p.id === "visibility_resistance" && p.count >= 2);
     if (vis) {
       return "Posting rarely works when you wait for perfect — a smaller visible step has helped you before. Want one now?";
+    }
+  }
+
+  if (
+    /\b(?:new (?:things|projects|ideas)|building new|instead of finishing|finish what|half.?finished|abandon|keep starting|never finish)\b/i.test(
+      text,
+    )
+  ) {
+    const shiny = p2.adhdPatterns.find((p) => p.id === "shiny_object_syndrome" && p.count >= 2);
+    const follow = p2.adhdPatterns.find((p) => p.id === "follow_through_challenges" && p.count >= 2);
+    if (shiny || follow) {
+      return "New ideas feel energizing — but a pattern I've noticed is that finishing usually needs a smaller scope on what's already in motion, not another fresh start. (Only if that fits — correct me if not.)";
+    }
+  }
+
+  if (
+    /\b(?:patterns?|noticed|observe).*(?:decision|decide|choos)/i.test(text) ||
+    /\bhow i make decisions?\b/i.test(text)
+  ) {
+    const compass = p2.resources.find((r) => r.id === "decision_compass" && r.helpfulScore >= 50);
+    const overload = p2.adhdPatterns.find(
+      (p) => p.id === "decision_overload_after_ideas" && p.count >= 2,
+    );
+    const parts: string[] = [];
+    if (compass) parts.push("clarity often comes after you talk it out or map options visually");
+    if (overload) parts.push("too many options at once creates friction — especially after idea bursts");
+    if (p2.learningStyle.primary === "visual") {
+      parts.push("seeing choices side-by-side tends to help more than holding them in your head");
+    }
+    if (parts.length) {
+      return `From our conversations, I've noticed: ${parts.join("; ")}. (Correct me if that's shifted.)`;
     }
   }
 
@@ -411,26 +450,40 @@ export function phase9WisdomIntelligenceHintForChat(input?: {
   reflection?: string | null;
   now?: Date;
 }): string | null {
-  if (!isPhase9WisdomIntelligenceActive(input?.now)) return null;
+  const now = input?.now;
+  const phase9Active = isPhase9WisdomIntelligenceActive(now);
+  const phase7Active = isPhase7BusinessIntelligenceEcosystemActive(now);
+  if (!phase9Active && !phase7Active) return null;
 
-  const summary = buildWisdomIntelligenceSummary(input?.now);
+  const summary = phase9Active ? buildWisdomIntelligenceSummary(now) : null;
+  const p2 = getPhase2DiscoveryState();
   const reflection =
     input?.reflection ??
-    (input?.userText ? maybeWisdomReflection({ userText: input.userText, now: input?.now }) : null);
+    (input?.userText ? maybeWisdomReflection({ userText: input.userText, now }) : null);
 
-  const parts = [
-    "PHASE 9 WISDOM INTELLIGENCE™ (earned insight — practical, human, never preachy):",
-    "Sound like a friend who remembers what worked — not a coach lecturing.",
-    "NEVER: mystical, clinical, 'you always/never', phase names, intelligence jargon.",
-    "MAY: gentle pattern reflections with permission to correct.",
-    `Wisdom items: ${summary.items.length}. Lessons: ${summary.lessonCount}.`,
-    summary.items
-      .filter((i) => i.confidence !== "early")
-      .slice(0, 3)
-      .map((i) => i.text)
-      .join(" | ") || "Still forming",
-    "Examples: pushing harder backfires on low energy; clarity after talking it out; smaller first steps.",
-  ];
+  const patternLines = PATTERN_WISDOM.filter((p) =>
+    p2.adhdPatterns.some((ap) => ap.id === p.patternId && ap.count >= 2),
+  ).map((p) => p.reflection);
+
+  const parts = phase9Active
+    ? [
+        "PHASE 9 WISDOM INTELLIGENCE™ (earned insight — practical, human, never preachy):",
+        "Sound like a friend who remembers what worked — not a coach lecturing.",
+        "NEVER: mystical, clinical, 'you always/never', phase names, intelligence jargon.",
+        "MAY: gentle pattern reflections with permission to correct.",
+        `Wisdom items: ${summary!.items.length}. Lessons: ${summary!.lessonCount}.`,
+        summary!
+          .items.filter((i) => i.confidence !== "early")
+          .slice(0, 3)
+          .map((i) => i.text)
+          .join(" | ") || "Still forming",
+        "Examples: pushing harder backfires on low energy; clarity after talking it out; smaller first steps.",
+      ]
+    : [
+        "RELATIONSHIP WISDOM (forming — use known patterns, not generic discovery):",
+        "Reflect observed ADHD patterns and challenges BEFORE asking what drives the urge.",
+        patternLines.slice(0, 3).join(" | ") || "Patterns still forming from conversation.",
+      ];
 
   if (reflection) {
     parts.push("WISDOM REFLECTION (optional — user may correct):", `"${reflection}"`);
