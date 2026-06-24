@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start -p 3000",
     "lint": "eslint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "audit:companion": "vitest run lib/companionBehaviorAudit.test.ts",
+    "audit:companion:report": "vitest run lib/companionBehaviorAudit.test.ts --reporter=verbose"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.1",

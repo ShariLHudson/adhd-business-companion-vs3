@@ -38,6 +38,10 @@ import {
   type WorkspaceOffer,
   workspaceTitle,
 } from "./workspaceMode";
+import { isCompanionFirstQuestion } from "./companionFirstWorkflow";
+
+const FEATURE_DISCOVERY_RE =
+  /\b(?:is there a feature|does this app|can this app help)\b/i;
 
 export type IntentCategory =
   | "understand"
@@ -138,13 +142,13 @@ function isLearnIntent(text: string): boolean {
 }
 
 const DECIDE_RE =
-  /\b(?:help me decide|help me choose|which (?:offer|option|one) should|should i launch|what should i do first|can'?t decide|stuck between|torn between|compare (?:these|two) options)\b/i;
+  /\b(?:help me decide|help me choose|which (?:offer|option|one) should|should i (?:add|launch|keep)|what should i do first|can'?t decide|stuck between|torn between|compare (?:these|two) options)\b/i;
 
 const PLAN_RE =
   /\b(?:plan my day|help me plan(?: my day)?|what should i work on|what should i focus on|what to work on today|prioritize my day|adapt my day|adjust my day)\b/i;
 
 const ORGANIZE_RE =
-  /\b(?:brain is (?:spinning|full|noisy)|my brain is|too many ideas|all over the place|everything in my head|head is (?:full|crowded)|clear my (?:head|mind)|get (?:it|these thoughts) out|dump (?:everything|my thoughts)|mental clutter)\b/i;
+  /\b(?:brain is (?:spinning|full|noisy)|my brain is|too many ideas|all over the place|everything (?:is )?in my (?:head|mind)|head is (?:full|crowded)|clear my (?:head|mind)|get (?:it|these thoughts) out|dump (?:everything|my thoughts)|mental clutter)\b/i;
 
 const BUILD_RE =
   /\b(?:help me (?:create|build|make|write|draft|design|develop|generate)|(?:create|build|design|develop|draft|write|generate|make) (?:an? )?(?:sop|marketing plan|content plan|funnel|strategy|checklist|template|email|proposal|landing page|lead magnet|sales page|sales script|social post|offer|client avatar|(?:follow-?up|nurture|sales|email) sequence))\b/i;
@@ -214,6 +218,11 @@ function detectIntentCategory(text: string): IntentCategory {
   const t = text.trim();
   if (!t) return "clarify";
   if (VAGUE_HELP_RE.test(t)) return "clarify";
+  if (FEATURE_DISCOVERY_RE.test(t)) {
+    if (/\bdecision\b/i.test(t)) return "decide";
+    return "conversation";
+  }
+  if (isCompanionFirstQuestion(t)) return "conversation";
   if (STRENGTH_UNDERSTAND_RE.test(t) || UNDERSTAND_RE.test(t)) return "understand";
 
   if (isRegistryArtifactExecution(t)) {

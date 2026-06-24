@@ -10,7 +10,12 @@ import type { AppSection } from "./companionUi";
 import {
   buildRegistryArtifactOfferLine,
   isRegistryArtifactExecution,
+  type RegistryArtifactKind,
 } from "./artifactRegistry";
+import {
+  inferCreateItemTypeFromText,
+  logCreatePendingAction,
+} from "./createPendingAction";
 import { isDecisionCompassOfferSignal } from "./decisionCompassRouting";
 import {
   detectArtifactRequest,
@@ -30,7 +35,10 @@ export type FrictionlessActionCategory =
 export type FrictionlessPendingAction = {
   type: "open_tool" | "open_workspace";
   target: AppSection | "focus-audio" | "breathe" | "focus-timer" | "brain-dump";
+  label?: string;
   context: string;
+  artifactType?: string;
+  initialPrompt?: string;
   focusAudioCategory?: string;
   offeredAtTurn: number;
   offerSummary: string;
@@ -62,7 +70,7 @@ const STORAGE_KEY = "companion-frictionless-pending-v1";
 const PENDING_TURN_LIMIT = 3;
 
 const FOCUS_SUPPORT_RE =
-  /\b(?:need to focus|help me focus|can'?t concentrate|trouble concentrating|stay focused|hard to focus|lose focus|losing focus)\b/i;
+  /\b(?:need to focus|help me focus|help me concentrate|can'?t concentrate|trouble concentrating|stay focused|hard to focus|lose focus|losing focus|can'?t stay on task|stay on task)\b/i;
 
 const EMOTIONAL_REGULATION_RE =
   /\b(?:can'?t catch (?:my )?breath|breathless|panicking|panic attack|having a panic|need to calm down|calm me down|help me calm|feel(?:ing)? anxious|i am anxious|i'?m anxious)\b/i;
@@ -137,7 +145,17 @@ export function frictionlessPendingAck(action: FrictionlessPendingAction): strin
 export function frictionlessPendingFromWorkspaceOffer(
   offer: WorkspaceOffer,
   offeredAtTurn: number,
+  opts?: { userText?: string; artifactKind?: RegistryArtifactKind | null },
 ): FrictionlessPendingAction {
+  if (offer.section === "content-generator" && opts?.userText?.trim()) {
+    return buildCreateFrictionlessPending({
+      target: offer.section,
+      userText: opts.userText,
+      offeredAtTurn,
+      artifactKind: opts.artifactKind,
+      offerSummary: offer.buttonLabel,
+    });
+  }
   return {
     type: "open_workspace",
     target: offer.section,
@@ -316,8 +334,39 @@ function buildDecisionSupportDecision(
   };
 }
 
+function buildCreateFrictionlessPending(input: {
+  target: AppSection;
+  userText: string;
+  offeredAtTurn: number;
+  artifactKind?: RegistryArtifactKind | null;
+  offerSummary?: string;
+}): FrictionlessPendingAction {
+  const artifactType = inferCreateItemTypeFromText(
+    input.userText,
+    input.artifactKind,
+  );
+  const pending: FrictionlessPendingAction = {
+    type: "open_workspace",
+    target: input.target,
+    label: "Create",
+    context: input.artifactKind ?? artifactType ?? "create",
+    artifactType,
+    initialPrompt: input.userText.trim(),
+    offeredAtTurn: input.offeredAtTurn,
+    offerSummary: input.offerSummary ?? "Open Create",
+  };
+  logCreatePendingAction("saved pending action", {
+    target: pending.target,
+    artifactType: pending.artifactType,
+    initialPrompt: pending.initialPrompt,
+  });
+  return pending;
+}
+
 function buildDirectActionDecision(
   routing: IntentRoutingDecision,
+  userText: string,
+  currentTurn: number,
 ): FrictionlessActionDecision {
   const execCategory = routing.category === "build" ? "build" : "execute";
   const localReply =
@@ -333,15 +382,24 @@ function buildDirectActionDecision(
     responseHint:
       "DIRECT ACTION (P0.9): Start the work or ask ONE needed detail. No relationship observations.",
     localReply,
-    pendingAction: routing.workspaceOffer
-      ? {
-          type: "open_workspace",
-          target: routing.workspaceOffer.section,
-          context: routing.artifactKind ?? "create",
-          offeredAtTurn: 0,
-          offerSummary: routing.featureLabel ?? "Create",
-        }
-      : null,
+    pendingAction:
+      routing.workspaceOffer?.section === "content-generator"
+        ? buildCreateFrictionlessPending({
+            target: "content-generator",
+            userText,
+            offeredAtTurn: currentTurn,
+            artifactKind: routing.artifactKind,
+            offerSummary: routing.featureLabel ?? "Create",
+          })
+        : routing.workspaceOffer
+          ? {
+              type: "open_workspace",
+              target: routing.workspaceOffer.section,
+              context: routing.artifactKind ?? "create",
+              offeredAtTurn: currentTurn,
+              offerSummary: routing.featureLabel ?? "Create",
+            }
+          : null,
     toolSuggestion: null,
     workspaceOffer: routing.workspaceOffer,
     intentRouting: routing,
@@ -377,14 +435,14 @@ export function resolveFrictionlessAction(
 
   const artifact = detectArtifactRequest(userText);
   if (artifact && isRegistryArtifactExecution(userText)) {
-    const direct = buildDirectActionDecision({
-      ...routing,
-      suppressRelationshipIntelligence: true,
-    });
-    if (direct.pendingAction) {
-      direct.pendingAction.offeredAtTurn = currentTurn;
-    }
-    return direct;
+    return buildDirectActionDecision(
+      {
+        ...routing,
+        suppressRelationshipIntelligence: true,
+      },
+      userText,
+      currentTurn,
+    );
   }
 
   const audio = buildAudioPending(userText, currentTurn);
@@ -406,6 +464,18 @@ export function resolveFrictionlessAction(
     /\bhelp me decide\b/i.test(userText)
   ) {
     return buildDecisionSupportDecision(routing, currentTurn);
+  }
+
+  if (routing.learnFastPath) {
+    return {
+      ...none,
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "LEARN FAST PATH (P0.10): Answer the concept directly — no relationship layer.",
+      intentRouting: routing,
+    };
   }
 
   if (routing.suppressRelationshipIntelligence) {
@@ -457,6 +527,13 @@ export function resolveFrictionlessContinuation(
 ): { execute: boolean; ack: string } | null {
   if (!isFrictionlessAffirmation(userText)) return null;
   if (isFrictionlessPendingExpired(pending, currentTurn)) return null;
+  if (pending.target === "content-generator") {
+    logCreatePendingAction("accepted pending action", {
+      target: pending.target,
+      artifactType: pending.artifactType,
+      initialPrompt: pending.initialPrompt,
+    });
+  }
   return { execute: true, ack: frictionlessPendingAck(pending) };
 }
 
