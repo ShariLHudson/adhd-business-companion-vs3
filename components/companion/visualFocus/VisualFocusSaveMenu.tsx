@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { MENU_DROPDOWN_ITEM } from "@/lib/menuNavStyles";
 
 export function VisualFocusSaveMenu({
   pinned,
@@ -52,49 +53,49 @@ export function VisualFocusSaveMenu({
         <div className="absolute right-0 z-20 mt-2 min-w-[200px] rounded-xl border border-[#e7dfd4] bg-white py-1 shadow-lg">
           <button
             type="button"
-            className="block w-full px-4 py-2 text-left text-sm hover:bg-[#faf7f2]"
+            className={MENU_DROPDOWN_ITEM}
             onClick={() => act(onSave)}
           >
             Save
           </button>
           <button
             type="button"
-            className="block w-full px-4 py-2 text-left text-sm hover:bg-[#faf7f2]"
+            className={MENU_DROPDOWN_ITEM}
             onClick={() => act(onSaveAs)}
           >
             Save As…
           </button>
           <button
             type="button"
-            className="block w-full px-4 py-2 text-left text-sm hover:bg-[#faf7f2]"
+            className={MENU_DROPDOWN_ITEM}
             onClick={() => act(onRename)}
           >
             Rename
           </button>
           <button
             type="button"
-            className="block w-full px-4 py-2 text-left text-sm hover:bg-[#faf7f2]"
+            className={MENU_DROPDOWN_ITEM}
             onClick={() => act(onDuplicate)}
           >
             Duplicate
           </button>
           <button
             type="button"
-            className="block w-full px-4 py-2 text-left text-sm hover:bg-[#faf7f2]"
+            className={MENU_DROPDOWN_ITEM}
             onClick={() => act(onSaveVersion)}
           >
             Save Version™
           </button>
           <button
             type="button"
-            className="block w-full px-4 py-2 text-left text-sm hover:bg-[#faf7f2]"
+            className={MENU_DROPDOWN_ITEM}
             onClick={() => act(onVersionHistory)}
           >
             Version History{versionCount > 0 ? ` (${versionCount})` : ""}
           </button>
           <button
             type="button"
-            className="block w-full px-4 py-2 text-left text-sm hover:bg-[#faf7f2]"
+            className={MENU_DROPDOWN_ITEM}
             onClick={() => act(onPin)}
           >
             {pinned ? "Unpin" : "⭐ Pin"}
@@ -102,7 +103,7 @@ export function VisualFocusSaveMenu({
           {archived && onUnarchive ? (
             <button
               type="button"
-              className="block w-full px-4 py-2 text-left text-sm hover:bg-[#faf7f2]"
+              className={MENU_DROPDOWN_ITEM}
               onClick={() => act(onUnarchive)}
             >
               Restore from Archive
@@ -110,7 +111,7 @@ export function VisualFocusSaveMenu({
           ) : (
             <button
               type="button"
-              className="block w-full px-4 py-2 text-left text-sm hover:bg-[#faf7f2]"
+              className={MENU_DROPDOWN_ITEM}
               onClick={() => act(onArchive)}
             >
               Archive

@@ -60,6 +60,7 @@ import {
   CATEGORY_COMPANION_TOOLS,
   pickStrategyReflection,
 } from "@/lib/strategyReflections";
+import { MENU_LIST_LABEL, MENU_TEXT } from "@/lib/menuNavStyles";
 
 type View =
   | { v: "home" }
@@ -559,7 +560,7 @@ export function StrategiesPanel({
                       <button
                         type="button"
                         onClick={() => goToView({ v: "userStrategy", id: u.id })}
-                        className="w-full rounded-xl border border-[#d4cdc3] bg-white/90 px-3 py-2.5 text-left text-sm font-semibold text-[#1f1c19] hover:border-[#1e4f4f]/40"
+                        className="w-full rounded-xl border border-[#d4cdc3] bg-white/90 px-3 py-2.5 text-left text-sm font-semibold text-black hover:border-[#1e4f4f]/40 hover:text-black"
                       >
                         {u.title}
                       </button>
@@ -1274,10 +1275,10 @@ function HubSection({
         className="flex w-full items-start justify-between gap-3 px-4 py-3 text-left"
       >
         <span>
-          <span className="block text-base font-semibold text-[#1f1c19]">
+          <span className={`block ${MENU_LIST_LABEL}`}>
             {open ? "▼" : "▶"} {title}
           </span>
-          <span className="mt-0.5 block text-sm text-[#6b635a]">{description}</span>
+          <span className={`mt-0.5 block text-sm ${MENU_TEXT}`}>{description}</span>
         </span>
       </button>
       {open ? <div className="border-t border-[#e7dfd4] px-4 pb-4 pt-3">{children}</div> : null}

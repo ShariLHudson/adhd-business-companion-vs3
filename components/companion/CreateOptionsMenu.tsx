@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { MENU_DROPDOWN_ITEM, MENU_TEXT } from "@/lib/menuNavStyles";
 
 export type CreateOptionsAction =
   | "change-type"
@@ -53,7 +54,7 @@ export function CreateOptionsMenu({
         onClick={() => setOpen((v) => !v)}
         aria-expanded={open}
         aria-haspopup="menu"
-        className="rounded-lg border border-[#1e4f4f]/25 bg-white px-3 py-1.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+        className={`rounded-lg border border-[#1e4f4f]/25 bg-white px-3 py-1.5 text-sm font-semibold ${MENU_TEXT} hover:bg-[#f0f5f5] hover:text-black`}
       >
         {triggerLabel} ▾
       </button>
@@ -72,10 +73,10 @@ export function CreateOptionsMenu({
                 role="menuitem"
                 disabled={disabled}
                 onClick={() => !disabled && pick(item.id)}
-                className={`block w-full px-4 py-2.5 text-left text-sm font-medium ${
+                className={`${MENU_DROPDOWN_ITEM} px-4 py-2.5 ${
                   item.id === "delete-draft"
-                    ? "text-[#a85c4a] hover:bg-[#a85c4a]/8"
-                    : "text-[#1f1c19] hover:bg-[#f5f0e8]"
+                    ? "text-[#a85c4a] hover:bg-[#a85c4a]/8 hover:text-[#a85c4a]"
+                    : ""
                 } disabled:cursor-not-allowed disabled:opacity-40`}
               >
                 {item.label}

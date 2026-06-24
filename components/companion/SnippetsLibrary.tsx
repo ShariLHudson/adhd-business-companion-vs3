@@ -476,7 +476,7 @@ export function SnippetsLibrary({
               className="flex items-center justify-between gap-3 rounded-xl border border-[#d4cdc3] bg-white/85 px-4 py-3 text-left transition-colors hover:border-[#1e4f4f]/45 hover:bg-white"
             >
               <span className="min-w-0">
-                <span className="block truncate text-base font-semibold text-[#1f1c19]">
+                <span className="block truncate text-base font-semibold text-black">
                   {s.content}
                 </span>
                 <span className="text-xs font-semibold uppercase tracking-wide text-[#1e4f4f]">

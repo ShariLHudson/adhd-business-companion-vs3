@@ -7,6 +7,12 @@ import {
   PLAN_MY_DAY_UPDATED,
 } from "@/lib/planMyDay";
 import { TOP_BAR_NEW_CONVERSATION_LABEL } from "@/lib/freshStartCopy";
+import {
+  MENU_DROPDOWN_ITEM_LG,
+  MENU_DROPDOWN_ROW,
+  MENU_SECTION_HEADING,
+  MENU_TRIGGER_BTN,
+} from "@/lib/menuNavStyles";
 
 type TopBarProps = {
   showPlanMyDay?: boolean;
@@ -16,13 +22,12 @@ type TopBarProps = {
   onOpenSettings: (section?: SettingsSection | null) => void;
   onOpenProfile: () => void;
   onRequestNewConversation: () => void;
+  onRequestNewDayConversation: () => void;
 };
 
-const BTN =
-  "relative z-50 flex h-11 items-center gap-1.5 rounded-full border border-[#d8cfc2] bg-white/80 px-3.5 text-sm font-medium text-[#3d3630] transition-colors hover:bg-white";
+const BTN = MENU_TRIGGER_BTN;
 
-const MENU_BTN =
-  "block w-full px-4 py-3 text-left text-base font-semibold text-[#1f1c19] hover:bg-[#f0f5f5]";
+const MENU_BTN = MENU_DROPDOWN_ITEM_LG;
 
 function usePlanActiveCount(): number {
   const [count, setCount] = useState(0);
@@ -91,6 +96,85 @@ function HeaderActionButton({
   );
 }
 
+function NewConversationDropdown({
+  onNewConversation,
+  onNewDayConversation,
+}: {
+  onNewConversation: () => void;
+  onNewDayConversation: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const handleClick = (e: PointerEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpen(false);
+    };
+    document.addEventListener("pointerdown", handleClick);
+    document.addEventListener("keydown", handleKey);
+    return () => {
+      document.removeEventListener("pointerdown", handleClick);
+      document.removeEventListener("keydown", handleKey);
+    };
+  }, [open]);
+
+  const btnClass = MENU_TRIGGER_BTN;
+  const itemClass = MENU_DROPDOWN_ROW;
+
+  return (
+    <div ref={ref} className="relative z-50">
+      <button
+        type="button"
+        className={btnClass}
+        title={TOP_BAR_NEW_CONVERSATION_LABEL}
+        aria-label={TOP_BAR_NEW_CONVERSATION_LABEL}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span aria-hidden="true">💬</span>
+        <span className="hidden sm:inline">{TOP_BAR_NEW_CONVERSATION_LABEL}</span>
+        <span style={{ fontSize: 9, opacity: 0.5, marginLeft: 1 }}>▾</span>
+      </button>
+      {open && (
+        <div
+          role="menu"
+          className="absolute right-0 z-[60] mt-1 w-52 overflow-hidden rounded-xl border border-[#d8cfc2] bg-white shadow-lg"
+        >
+          <button
+            type="button"
+            role="menuitem"
+            className={itemClass}
+            onClick={() => {
+              setOpen(false);
+              onNewConversation();
+            }}
+          >
+            <span>💬</span>
+            <span>New Conversation</span>
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className={`${itemClass} border-t border-[#f0e9e0]`}
+            onClick={() => {
+              setOpen(false);
+              onNewDayConversation();
+            }}
+          >
+            <span>🌅</span>
+            <span>New Day Conversation</span>
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function TopBar({
   showPlanMyDay = false,
   onOpenPlanMyDay,
@@ -99,6 +183,7 @@ export function TopBar({
   onOpenSettings,
   onOpenProfile,
   onRequestNewConversation,
+  onRequestNewDayConversation,
 }: TopBarProps) {
   const planActiveCount = usePlanActiveCount();
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
@@ -160,10 +245,9 @@ export function TopBar({
         />
       ) : null}
 
-      <HeaderActionButton
-        emoji="💬"
-        label={TOP_BAR_NEW_CONVERSATION_LABEL}
-        onClick={() => runHeaderAction(onRequestNewConversation)}
+      <NewConversationDropdown
+        onNewConversation={() => runHeaderAction(onRequestNewConversation)}
+        onNewDayConversation={() => runHeaderAction(onRequestNewDayConversation)}
       />
 
       <div ref={accountMenuRef} className="relative z-50">
@@ -174,7 +258,7 @@ export function TopBar({
           aria-haspopup="menu"
           aria-label="Account"
           title="Account"
-          className="relative z-50 flex h-11 w-11 items-center justify-center rounded-full border border-[#c9bdb0] bg-white text-[26px] leading-none text-[#3d3630] shadow-sm transition-colors hover:bg-[#fff8ef]"
+          className="relative z-50 flex h-11 w-11 items-center justify-center rounded-full border border-[#c9bdb0] bg-white text-[26px] leading-none text-black shadow-sm transition-colors hover:bg-[#fff8ef] hover:text-black"
         >
           ⋯
         </button>
@@ -184,7 +268,7 @@ export function TopBar({
             role="menu"
             aria-label="Account"
           >
-            <p className="border-b border-[#e7dfd4] px-4 py-2 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+            <p className={`border-b border-[#e7dfd4] px-4 py-2 ${MENU_SECTION_HEADING}`}>
               Account
             </p>
             <button

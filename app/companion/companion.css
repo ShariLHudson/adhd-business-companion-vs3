@@ -457,11 +457,19 @@
 }
 
 .companion-app-sidebar {
-  background: linear-gradient(
-    180deg,
-    var(--cm-sidebar-tint) 0%,
-    #5c5854 100%
-  ) !important;
+  background: var(--cm-canvas, #faf7f2) !important;
+  color: #000000;
+  border-right: 1px solid var(--cm-border, #e7dfd4) !important;
+}
+
+.companion-app-sidebar a,
+.companion-app-sidebar button {
+  color: #000000;
+}
+
+.companion-app-sidebar a:hover,
+.companion-app-sidebar button:hover {
+  color: #000000;
 }
 
 .companion-app-sidebar button,
@@ -474,9 +482,9 @@
 }
 
 .companion-nav-active {
-  background: var(--cm-nav-active) !important;
-  color: var(--cm-accent-contrast) !important;
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--cm-accent) 40%, transparent);
+  background: var(--cm-accent-tint, #e6f0f0) !important;
+  color: #000000 !important;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--cm-accent) 35%, transparent);
 }
 
 .companion-top-bar {
@@ -485,7 +493,7 @@
 }
 
 [data-visual-mode="off"] .companion-app-sidebar {
-  background: #6e6a66 !important;
+  background: #faf7f2 !important;
 }
 
 [data-visual-mode="off"] .companion-top-bar {

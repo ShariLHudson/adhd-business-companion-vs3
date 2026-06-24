@@ -2,9 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { DraftMenuGroup } from "@/lib/createDraftActions";
+import { MENU_DROPDOWN_ITEM, MENU_SECTION_HEADING, MENU_TEXT } from "@/lib/menuNavStyles";
 
 const triggerClass =
-  "rounded-xl border border-[#1e4f4f]/30 bg-white px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] shadow-sm hover:bg-[#f0f5f5] disabled:cursor-not-allowed disabled:opacity-50";
+  `rounded-xl border border-[#1e4f4f]/30 bg-white px-4 py-2.5 text-sm font-semibold ${MENU_TEXT} shadow-sm hover:bg-[#f0f5f5] hover:text-black disabled:cursor-not-allowed disabled:opacity-50`;
 
 export function DraftDropdownMenu({
   label,
@@ -58,7 +59,7 @@ export function DraftDropdownMenu({
           {groups.map((group, gi) => (
             <div key={group.label ?? `group-${gi}`}>
               {group.label ? (
-                <p className="px-4 pb-1 pt-2 text-[10px] font-bold uppercase tracking-wide text-[#9a8f82]">
+                <p className={`px-4 pb-1 pt-2 text-[10px] ${MENU_SECTION_HEADING}`}>
                   {group.label}
                 </p>
               ) : null}
@@ -68,7 +69,7 @@ export function DraftDropdownMenu({
                   type="button"
                   role="menuitem"
                   onClick={() => pick(item.id)}
-                  className="block w-full px-4 py-2 text-left text-sm font-medium text-[#1f1c19] hover:bg-[#f5f0e8]"
+                  className={MENU_DROPDOWN_ITEM}
                 >
                   {item.label}
                 </button>

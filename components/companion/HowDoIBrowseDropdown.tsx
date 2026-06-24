@@ -5,9 +5,10 @@ import type { HowDoIHelpArticle } from "@/lib/howDoIHelpTypes";
 import type { AppSection } from "@/lib/companionUi";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import { HowDoIWorkflowCard } from "@/components/companion/HowDoIWorkflowCard";
+import { MENU_LIST_LABEL, MENU_SECTION_HEADING, MENU_TEXT } from "@/lib/menuNavStyles";
 
 const SECTION_BTN =
-  "flex w-full items-center gap-2 px-4 py-3.5 text-left hover:bg-[#faf7f2]/80";
+  "flex w-full items-center gap-2 px-4 py-3.5 text-left text-black hover:bg-[#faf7f2]/80 hover:text-black";
 
 export function HowDoIBrowseDropdown({
   id,
@@ -41,12 +42,12 @@ export function HowDoIBrowseDropdown({
           {emoji}
         </span>
         <span className="min-w-0 flex-1">
-          <span className="block text-base font-semibold text-[#1f1c19]">
+          <span className={`block ${MENU_LIST_LABEL}`}>
             {label}
           </span>
-          <span className="block text-xs text-[#6b635a]">{description}</span>
+          <span className={`block text-xs ${MENU_TEXT}`}>{description}</span>
         </span>
-        <span className="shrink-0 text-sm text-[#9a8f82]" aria-hidden="true">
+        <span className={`shrink-0 text-sm ${MENU_TEXT}`} aria-hidden="true">
           {open ? "▲" : "▼"}
         </span>
       </button>
@@ -89,7 +90,7 @@ export function HowDoISubgroupBlock({
   return (
     <div className="mb-4 last:mb-0">
       {showLabel ? (
-        <p className="mb-2 px-1 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
+        <p className={`mb-2 px-1 ${MENU_SECTION_HEADING}`}>
           {label}
         </p>
       ) : null}

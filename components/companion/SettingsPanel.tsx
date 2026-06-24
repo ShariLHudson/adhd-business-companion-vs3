@@ -29,6 +29,7 @@ import { playChime, unlockChime } from "@/lib/chime";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+import { MENU_LIST_LABEL, MENU_SECTION_HEADING } from "@/lib/menuNavStyles";
 import {
   getRecognitionStore,
   saveRecognitionStoreAndNotify,
@@ -183,7 +184,7 @@ function readPerm(): NotifPerm {
 
 const CARD =
   "w-full rounded-2xl border bg-white/90 p-4 text-left transition-colors";
-const LABEL = "text-sm font-bold uppercase tracking-wide text-[#6b635a]";
+const LABEL = MENU_SECTION_HEADING;
 
 export function SettingsPanel({
   registerBack,
@@ -371,7 +372,7 @@ export function SettingsPanel({
               className={`${CARD} ${active ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06]" : "border-[#d4cdc3] hover:border-[#1e4f4f]/45"}`}
             >
               <span className="flex items-center justify-between gap-2">
-                <span className="text-base font-semibold text-[#1f1c19]">
+                <span className={MENU_LIST_LABEL}>
                   {it.label}
                 </span>
                 {active && <span className="text-[#1e4f4f]">✓</span>}
@@ -474,7 +475,7 @@ export function SettingsPanel({
                 }`}
               >
                 <span className="flex items-center justify-between gap-2">
-                  <span className="text-base font-semibold text-[#1f1c19]">
+                  <span className={MENU_LIST_LABEL}>
                     {tone.emoji} {tone.label}
                   </span>
                   {active ? <span className="text-[#1e4f4f]">✓</span> : null}
@@ -982,7 +983,7 @@ export function SettingsPanel({
           className={`${CARD} mt-4 ${advanced ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06]" : "border-[#d4cdc3]"}`}
         >
           <span className="flex items-center justify-between">
-            <span className="text-base font-semibold text-[#1f1c19]">
+            <span className={MENU_LIST_LABEL}>
               🧪 Multi-Avatar output mode
             </span>
             <span className="text-[#1e4f4f]">{advanced ? "On ✓" : "Off"}</span>
@@ -1011,7 +1012,7 @@ export function SettingsPanel({
             className={`${CARD} ${alerts ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06]" : "border-[#d4cdc3]"}`}
           >
             <span className="flex items-center justify-between">
-              <span className="text-base font-semibold text-[#1f1c19]">
+              <span className={MENU_LIST_LABEL}>
                 Time block alerts
               </span>
               <span className="text-[#1e4f4f]">{alerts ? "On ✓" : "Off"}</span>
@@ -1028,7 +1029,7 @@ export function SettingsPanel({
             className={`${CARD} disabled:opacity-50 ${desktopOn ? "border-[#1e4f4f] bg-[#1e4f4f]/[0.06]" : "border-[#d4cdc3]"}`}
           >
             <span className="flex items-center justify-between">
-              <span className="text-base font-semibold text-[#1f1c19]">
+              <span className={MENU_LIST_LABEL}>
                 Desktop notifications
               </span>
               <span className="text-[#1e4f4f]">
@@ -1333,12 +1334,12 @@ export function SettingsPanel({
             onClick={() => setOpen(r.id)}
             className={`${CARD} flex items-center justify-between border-[#d4cdc3] hover:border-[#1e4f4f]/45 hover:bg-white`}
           >
-            <span className="text-base font-semibold text-[#1f1c19]">
+            <span className={MENU_LIST_LABEL}>
               {r.label}
             </span>
-            <span className="flex items-center gap-2 text-sm text-[#6b635a]">
+            <span className="flex items-center gap-2 text-sm text-black">
               {r.value}
-              <span className="text-[#9a8f82]">›</span>
+              <span className="text-black">›</span>
             </span>
           </button>
         ))}

@@ -19,6 +19,7 @@ import {
 } from "@/lib/savedWorkStore";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+import { MENU_DROPDOWN_ITEM, MENU_TEXT } from "@/lib/menuNavStyles";
 
 type SavedWorkAction = "rename" | "duplicate" | "archive" | "unarchive" | "delete";
 
@@ -65,7 +66,7 @@ function SavedWorkItemMenu({
         aria-expanded={open}
         aria-haspopup="menu"
         aria-label="Item actions"
-        className="rounded-lg border border-[#d4cdc3] bg-white px-2 py-1 text-sm font-semibold text-[#6b635a] hover:bg-[#faf7f2]"
+        className={`rounded-lg border border-[#d4cdc3] bg-white px-2 py-1 text-sm font-semibold ${MENU_TEXT} hover:bg-[#faf7f2] hover:text-black`}
       >
         ⋯
       </button>
@@ -79,7 +80,7 @@ function SavedWorkItemMenu({
             type="button"
             role="menuitem"
             onClick={() => pick("rename")}
-            className="block w-full px-4 py-2 text-left text-sm font-medium text-[#1f1c19] hover:bg-[#f5f0e8]"
+            className={MENU_DROPDOWN_ITEM}
           >
             Rename
           </button>
@@ -87,7 +88,7 @@ function SavedWorkItemMenu({
             type="button"
             role="menuitem"
             onClick={() => pick("duplicate")}
-            className="block w-full px-4 py-2 text-left text-sm font-medium text-[#1f1c19] hover:bg-[#f5f0e8]"
+            className={MENU_DROPDOWN_ITEM}
           >
             Duplicate
           </button>
@@ -96,7 +97,7 @@ function SavedWorkItemMenu({
               type="button"
               role="menuitem"
               onClick={() => pick("unarchive")}
-              className="block w-full px-4 py-2 text-left text-sm font-medium text-[#1f1c19] hover:bg-[#f5f0e8]"
+              className={MENU_DROPDOWN_ITEM}
             >
               Unarchive
             </button>
@@ -105,7 +106,7 @@ function SavedWorkItemMenu({
               type="button"
               role="menuitem"
               onClick={() => pick("archive")}
-              className="block w-full px-4 py-2 text-left text-sm font-medium text-[#1f1c19] hover:bg-[#f5f0e8]"
+              className={MENU_DROPDOWN_ITEM}
             >
               Archive
             </button>
