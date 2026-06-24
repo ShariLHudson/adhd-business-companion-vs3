@@ -87,9 +87,97 @@ Bad: Productivity scores, red/yellow KPIs, shame language, nagging every turn.
 
 Prefer **chat hints** and light context over new dashboards.
 
+### Visual Thinking™ intelligence surfaces
+
+Visual Thinking™ tools are **not standalone file tools**. They are **intelligence surfaces** owned by Companion Intelligence™.
+
+Every map, canvas, framework, and future visual workspace must:
+
+1. Start with understanding  
+2. Ask clarifying questions when needed  
+3. Build structure from the user's situation  
+4. Generate visual output  
+5. Generate insights  
+6. Generate recommendations  
+7. Capture learning signals  
+8. Feed Founder Intelligence™  
+9. Improve future recommendations  
+
+**Layer ownership**
+
+| Layer | Role |
+|-------|------|
+| Companion Intelligence™ | Owns the experience — purpose, clarification, framework choice |
+| Thinking framework | Structures the user's situation (Mind Map™, Business Canvas™, etc.) |
+| Visual output | Map layer — renders thinking, not the product itself |
+| Insights & recommendations | Intelligence panel — the insight is the product |
+| Learning & analytics | `lib/visualFocus/companionIntelligence/` → signal bus → Founder Intelligence™ |
+
+**Predefined structure exception:** Business Canvas™ requires nine sections. Other frameworks should emerge from the user's situation unless the framework itself requires fixed sections.
+
+**Future surfaces** (register in `VISUAL_THINKING_FRAMEWORK_REGISTRY`, implement without pipeline rewrite): Living Canvas™, What-If Analysis™, Business Simulations™, Opportunity Mapping™, Board of Directors™ Intelligence™, Predictive Business Guidance™.
+
+Canonical implementation: `lib/visualFocus/companionIntelligence/`.
+
 ---
 
-## 6. Cognitive load limits
+## 6. Future-first architecture (Companion Intelligence™ Ecosystem)
+
+**Core principle:** Build simple user experiences. Build powerful architecture underneath.
+
+Users experience simplicity, clarity, guidance, and momentum. The system maintains intelligence, memory, relationships, learning, analytics, and pattern recognition.
+
+### Three-layer design rule
+
+Every major feature must answer:
+
+| Layer | Question | Example (Business Canvas™) |
+|-------|----------|----------------------------|
+| **User value** | What problem does this solve today? | Helps users understand how their business works |
+| **Intelligence value** | What can the ecosystem learn? | Audience, revenue, offer, marketing, relationship patterns |
+| **Future value** | What future systems become possible? | Living Canvas™, What-If Analysis™, Ripple Effects™, BoD Analysis™ |
+
+### Companion Intelligence™ pipeline
+
+```
+User Situation → Understanding → Clarification → Pattern Recognition
+→ Framework Selection → Visual / Interactive Experience → Insights
+→ Recommendations → Learning Signals → Future Intelligence
+```
+
+The intelligence layer owns the experience. Tools visualize thinking; intelligence is the product.
+
+### Intelligence analytics (not just usage)
+
+Track pattern categories: Founder Decision™, Momentum™, Overwhelm™, Business Growth™, Planning™, Content Creation™, Execution™, Energy™, Confidence™, Opportunity™.
+
+### Learning signals
+
+Every major system must produce learning signals (see `ECOSYSTEM_MAJOR_SYSTEMS` in `lib/companionIntelligenceEcosystem/systems.ts`).
+
+### Founder Intelligence™ & Board of Directors™
+
+Founder Intelligence™ learns how the user thinks, plans, decides, grows, and what creates friction vs momentum.
+
+Future Board of Directors™ systems draw from user data, patterns, decisions, Business Canvas data, Visual Thinking data, projects, and goals.
+
+### Building rule
+
+Do **not** build future features now. Build today's features so future features are possible.
+
+### Final test (before any major feature)
+
+1. What value does this create today?  
+2. What intelligence does this capture?  
+3. What future systems could use this?
+
+Use `evaluateFutureFirstFeature()` + `validateCapabilityDesign()` + `runVision2029Test()`.
+
+Canonical module: `lib/companionIntelligenceEcosystem/`.
+
+---
+
+## 7. Cognitive load limits
 
 From the Constitution — enforce in UI:
 - **At most three meaningful choices** per screen when possible.
@@ -99,7 +187,7 @@ From the Constitution — enforce in UI:
 
 ---
 
-## 7. Forbidden feature patterns
+## 8. Forbidden feature patterns
 
 Do **not** implement without explicit product-owner approval:
 
@@ -113,7 +201,7 @@ Do **not** implement without explicit product-owner approval:
 
 ---
 
-## 8. Adapt My Day™ integration
+## 9. Adapt My Day™ integration
 
 Adapt My Day™ stays linked to Plan My Day™.
 
@@ -125,7 +213,7 @@ Adapt My Day lives in the **top menu**, not buried inside Plan My Day.
 
 ---
 
-## 9. Implementation checklist
+## 10. Implementation checklist
 
 Before shipping a feature, confirm:
 
@@ -135,11 +223,13 @@ Before shipping a feature, confirm:
 - [ ] Is consent required before action?
 - [ ] Are insights supportive, not punitive?
 - [ ] Does copy match daily-decision vs long-term-planning framing?
+- [ ] Does `evaluateFutureFirstFeature()` pass (user, intelligence, future value)?
 
 ---
 
-## 10. Related documents
+## 11. Related documents
 
 - `docs-companion-intelligence/21_Companion_Constitution.md`
 - `docs-companion-intelligence/00_Companion_Operating_System_v1.md`
 - `lib/appFeatureKnowledge.ts` (how-to truth)
+- `lib/companionIntelligenceEcosystem/` (future-first three-layer rule)

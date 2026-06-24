@@ -49,15 +49,9 @@ describe("Momentum Sprint #1 — startup friction", () => {
   });
 
   it("focus feelings are emotional entry points only", () => {
-    expect(FOCUS_START_OPTIONS).toHaveLength(4);
-    expect(FOCUS_START_OPTIONS.find((o) => o.id === "crowded")?.label).toBe(
-      "My Brain Feels Crowded",
-    );
+    expect(FOCUS_START_OPTIONS).toHaveLength(2);
     expect(FOCUS_START_OPTIONS.find((o) => o.id === "stuck")?.label).toBe(
       "I'm Stuck",
-    );
-    expect(FOCUS_START_OPTIONS.find((o) => o.id === "need-work")?.label).toBe(
-      "I Need To Work",
     );
     expect(FOCUS_START_OPTIONS.find((o) => o.id === "need-break")?.label).toBe(
       "I Need A Break",

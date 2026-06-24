@@ -303,6 +303,7 @@ export function resolveCompanionAcceptanceTurn(input: {
         lastAssistantText: input.lastAssistantText,
         workflow: input.workflow,
         currentTurn: input.currentTurn,
+        outcomeThread: input.outcomeThread,
       })
     : null;
 
@@ -312,6 +313,7 @@ export function resolveCompanionAcceptanceTurn(input: {
       t,
       input.lastAssistantText,
       input.currentTurn,
+      input.outcomeThread,
     );
 
   if (workflowHit) {
@@ -335,6 +337,7 @@ export function resolveCompanionAcceptanceTurn(input: {
       t,
       input.lastAssistantText,
       input.currentTurn,
+      input.outcomeThread,
     );
     if (retryWorkflow) {
       return { kind: "workflow", continuation: retryWorkflow };

@@ -65,6 +65,21 @@ describe("conversationWorkflowContinuation", () => {
     }
   });
 
+  it("opens decision compass with pending decision context — no reset", () => {
+    const assistant =
+      "Would you like to walk through it in **Decision Compass** — comparing keep both, replace, or phasing in the group offer?";
+    const result = resolveWorkflowFromLastAssistant("yes", assistant, 6, {
+      pendingDecision: "keep current, replace, or offer both",
+      updatedAt: new Date().toISOString(),
+    });
+    expect(result?.action).toBe("open_section");
+    if (result?.action === "open_section") {
+      expect(result.section).toBe("decision-compass");
+      expect(result.message).toMatch(/keep current, replace, or offer both/i);
+      expect(result.message).not.toMatch(/what(?:'s| is) the decision in front of you/i);
+    }
+  });
+
   it("opens workspace from companion-first offer line", () => {
     const assistant =
       "Want me to open **Snippets** beside us so we can do it together?";

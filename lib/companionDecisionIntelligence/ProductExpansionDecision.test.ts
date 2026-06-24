@@ -11,6 +11,7 @@ import {
   PRODUCT_EXPANSION_SCENARIO,
 } from "./productExpansionScenario";
 import { countAssistantQuestions } from "../companionActionBias";
+import { syncOutcomeThreadFromDecisionIntelligence } from "./outcomeThreadSync";
 
 function messagesUpToTurn(turns: ChatTurn[], userTurnCount: number): {
   messages: ChatTurn[];
@@ -112,16 +113,22 @@ describe("ProductExpansionDecision", () => {
     const lastAssistant = turns[turns.length - 2]!.content;
     const lastUser = "Yes";
 
+    const intelBeforeAccept = buildCompanionDecisionIntelligence({
+      messages: messages.slice(0, -1),
+      userText: turns[turns.length - 3]!.content,
+      lastAssistantText: turns[turns.length - 4]!.content,
+    });
+    const thread = syncOutcomeThreadFromDecisionIntelligence(
+      intelBeforeAccept,
+      turns[turns.length - 3]!.content,
+    );
+
     const resolution = resolveCompanionAcceptanceTurn({
       userText: lastUser,
       lastAssistantText: lastAssistant,
       currentTurn: messages.length + 1,
       workflow: null,
-      outcomeThread: {
-        pendingDecision: "keep current, replace, or offer both",
-        currentProblem: "adding a new product line",
-        updatedAt: new Date().toISOString(),
-      },
+      outcomeThread: thread,
       pendingInput: {
         workspacePanel: null,
         record: null,

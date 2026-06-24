@@ -9,11 +9,7 @@ import {
   type SidebarToolId,
 } from "./companionUi";
 
-export type FocusFeelingId =
-  | "crowded"
-  | "stuck"
-  | "need-work"
-  | "need-break";
+export type FocusFeelingId = "stuck" | "need-break";
 
 export type FocusHubAction =
   | { kind: "tool"; tool: SidebarToolId; toolId: string }
@@ -69,50 +65,8 @@ function tool(
 
 export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
   {
-    id: "crowded",
-    emoji: "🧠",
-    label: "My Brain Feels Crowded",
-    tagline: "Too many thoughts at once.",
-    recommended: tool(
-      "clear-my-mind",
-      "Clear My Mind",
-      { kind: "section", section: "brain-dump", toolId: "clear-my-mind" },
-      "Get thoughts out of your head — capture, sort, then pick how to view.",
-    ),
-    groups: [
-      {
-        id: "crowded-start",
-        title: "Most People Start Here",
-        tools: [
-          tool(
-            "clear-my-mind",
-            "Clear My Mind",
-            { kind: "section", section: "brain-dump", toolId: "clear-my-mind" },
-            "Get thoughts out of your head — capture, sort, then pick how to view.",
-          ),
-          tool(
-            "decision-compass-crowded",
-            "Decision Compass",
-            {
-              kind: "activity",
-              activityId: "decision-compass",
-              toolId: "decision-compass-crowded",
-            },
-            "Work through competing options and priorities.",
-          ),
-          tool(
-            "visual-focus-crowded",
-            "Visual Focus",
-            { kind: "section", section: "visual-focus", toolId: "visual-focus-crowded" },
-            "Think spatially — mind maps, decisions, and connections.",
-          ),
-        ],
-      },
-    ],
-  },
-  {
     id: "stuck",
-    emoji: "🚶",
+    emoji: "🚧",
     label: "I'm Stuck",
     tagline: "Paralysis, avoidance, and fear of starting.",
     recommended: tool(
@@ -139,121 +93,10 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
             "Figure out what matters most right now.",
           ),
           tool(
-            "visual-focus-stuck",
-            "Visual Focus",
-            { kind: "section", section: "visual-focus", toolId: "visual-focus-stuck" },
-            "Map ideas and decisions visually.",
-          ),
-          tool(
             "break-smaller",
             "Break It Into Smaller Pieces",
             { kind: "activity", activityId: "project-breakdown", toolId: "break-smaller" },
             "Turn a big task into manageable steps.",
-          ),
-        ],
-      },
-    ],
-  },
-  {
-    id: "need-work",
-    emoji: "🎯",
-    label: "I Need To Work",
-    tagline: "Execution, productivity, and momentum.",
-    recommended: tool(
-      "continue-active-project",
-      "Continue Active Project",
-      { kind: "section", section: "projects", toolId: "continue-active-project" },
-    ),
-    groups: [
-      {
-        id: "work-start",
-        title: "Most People Start Here",
-        collapsible: true,
-        defaultOpen: false,
-        tools: [
-          tool(
-            "continue-active-project",
-            "Continue Active Project",
-            { kind: "section", section: "projects", toolId: "continue-active-project" },
-          ),
-          tool(
-            "start-new-project",
-            "Start A New Project",
-            { kind: "section", section: "projects", toolId: "start-new-project" },
-          ),
-          tool(
-            "choose-something-fun",
-            "Choose Something Fun For Me",
-            { kind: "tool", tool: "spin-wheel", toolId: "choose-something-fun" },
-          ),
-        ],
-      },
-      {
-        id: "work-focus",
-        title: "Work Focus",
-        collapsible: true,
-        defaultOpen: false,
-        tools: [
-          tool(
-            "focus-session",
-            "Focus Session",
-            { kind: "activity", activityId: "focus-session", toolId: "focus-session" },
-          ),
-          tool(
-            "body-double",
-            "Body Double",
-            { kind: "strategy", strategyId: "body-double", toolId: "body-double" },
-          ),
-          tool(
-            "block-time",
-            "Block Out Time",
-            { kind: "tool", tool: "time-block", toolId: "block-time" },
-          ),
-        ],
-      },
-      {
-        id: "work-more",
-        title: "More Focus Support",
-        collapsible: true,
-        defaultOpen: false,
-        tools: [
-          tool(
-            "focus-audio",
-            "Focus Audio",
-            { kind: "audio", categoryId: "deep-work", toolId: "focus-audio" },
-          ),
-          tool(
-            "energize-audio",
-            "Energize Audio",
-            { kind: "audio", categoryId: "motivation-boost", toolId: "energize-audio" },
-          ),
-          tool(
-            "pomodoro",
-            "Pomodoro Timer",
-            { kind: "tool", tool: "focus-timer", toolId: "pomodoro" },
-          ),
-        ],
-      },
-      {
-        id: "work-refocus",
-        title: "When Attention Drifts",
-        collapsible: true,
-        defaultOpen: false,
-        tools: [
-          tool(
-            "distraction-shield",
-            "Distraction Shield",
-            { kind: "activity", activityId: "distraction-shield", toolId: "distraction-shield" },
-          ),
-          tool(
-            "one-thing-only",
-            "One Thing Only",
-            { kind: "activity", activityId: "one-thing-only", toolId: "one-thing-only" },
-          ),
-          tool(
-            "momentum-restart",
-            "Momentum Restart",
-            { kind: "activity", activityId: "momentum-restart", toolId: "momentum-restart" },
           ),
         ],
       },
@@ -284,20 +127,16 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
             "Calm your nervous system before you continue.",
           ),
           tool(
-            "quick-reset",
-            "Quick Reset",
-            { kind: "tool", tool: "breathe", toolId: "quick-reset" },
-            "A short breathing reset.",
-          ),
-          tool(
             "stretch-break",
             "Stretch Break",
             { kind: "activity", activityId: "recharge-menu", toolId: "stretch-break" },
+            "Physical movement and body reset.",
           ),
           tool(
             "calm-moment",
             "Calm Moment",
             { kind: "activity", activityId: "five-senses", toolId: "calm-moment" },
+            "A quiet pause before returning.",
           ),
         ],
       },
@@ -311,6 +150,11 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
             "calm-audio",
             "Calm Audio",
             { kind: "audio", categoryId: "calm-brain", toolId: "calm-audio" },
+          ),
+          tool(
+            "focus-audio",
+            "Focus Audio",
+            { kind: "audio", categoryId: "deep-work", toolId: "focus-audio" },
           ),
           tool(
             "nature-audio",
@@ -399,21 +243,18 @@ export function focusHubToolIds(): string[] {
 export const REQUIRED_FOCUS_ASSET_IDS = [
   "focus-audio",
   "calm-audio",
-  "energize-audio",
   "sleep-audio",
   "brain-break-games",
-  "body-double",
-  "pomodoro",
-  "block-time",
-  "clear-my-mind",
-  "decision-compass-crowded",
-  "next-small-step",
   "breathe-reset",
+  "next-small-step",
 ] as const;
 
 export function missingRequiredFocusAssets(): string[] {
   const ids = new Set(focusHubToolIds());
-  return REQUIRED_FOCUS_ASSET_IDS.filter((id) => !ids.has(id));
+  const actionIds = new Set(
+    allFocusHubTools().map((t) => t.action.toolId),
+  );
+  return REQUIRED_FOCUS_ASSET_IDS.filter((id) => !ids.has(id) && !actionIds.has(id));
 }
 
 export function focusHubOpensSidebarTool(tool: SidebarToolId): boolean {
@@ -427,14 +268,14 @@ export function focusHubOpensSidebarTool(tool: SidebarToolId): boolean {
     ) {
       return true;
     }
-    if (t.action.kind === "audio" && tool === "focus-audio") return true;
+    if (t.action.kind === "audio" && t.action.toolId === tool) return true;
     return false;
   });
 }
 
 /** Each feeling should recommend a distinct primary tool. */
 export function distinctRecommendedOutcomes(): boolean {
-  const ids = ["crowded", "stuck", "need-work", "need-break"] as const;
+  const ids = ["stuck", "need-break"] as const;
   const recs = ids.map((id) => recommendedToolForFeeling(id)?.id).filter(Boolean);
   return new Set(recs).size === recs.length;
 }

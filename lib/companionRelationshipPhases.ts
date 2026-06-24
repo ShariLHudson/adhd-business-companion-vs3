@@ -1,6 +1,6 @@
 /**
  * ADHD Business Ecosystem™ — Relationship phase registry.
- * Phases 1–5 are active product layers; 6–10 are future capability gates.
+ * Phases 1–7 are active product layers; 8–10 and 11 extend the roadmap.
  */
 
 import { isPhase1OnboardingComplete } from "./phase1Onboarding";
@@ -10,6 +10,7 @@ import { isPhase4BusinessOperatingPartnerActive } from "./phase4BusinessOperatin
 import { isPhase5CompanionIntelligenceEcosystemActive } from "./phase5CompanionIntelligenceEcosystem";
 import { isPhase6CompanionIntelligenceNetworkActive } from "./phase6CompanionIntelligenceNetwork";
 import { isPhase7BusinessIntelligenceEcosystemActive } from "./businessIntelligenceEcosystem";
+import { isPhase11EcosystemIntelligenceActive } from "./ecosystemIntelligence";
 
 export type RelationshipPhaseId =
   | "phase_1_initial_trust"
@@ -21,7 +22,8 @@ export type RelationshipPhaseId =
   | "phase_7_business_intelligence_ecosystem"
   | "phase_8_autonomous_preparation"
   | "phase_9_wisdom_intelligence"
-  | "phase_10_legacy_transformation";
+  | "phase_10_legacy_transformation"
+  | "phase_11_ecosystem_intelligence";
 
 export type RelationshipPhaseStatus = "active" | "future";
 
@@ -115,11 +117,22 @@ export const RELATIONSHIP_PHASES: RelationshipPhaseMeta[] = [
     milestone: "The business and founder transformed.",
     status: "future",
   },
+  {
+    id: "phase_11_ecosystem_intelligence",
+    number: 11,
+    name: "Ecosystem Intelligence",
+    tagline: "Understand the whole life system.",
+    milestone: "This companion understands my life, not just my business.",
+    status: "active",
+  },
 ];
 
 export function getCurrentRelationshipPhase(): RelationshipPhaseMeta {
   if (!isPhase1OnboardingComplete()) {
     return RELATIONSHIP_PHASES[0]!;
+  }
+  if (isPhase11EcosystemIntelligenceActive()) {
+    return RELATIONSHIP_PHASES[10]!;
   }
   if (isPhase7BusinessIntelligenceEcosystemActive()) {
     return RELATIONSHIP_PHASES[6]!;

@@ -7,6 +7,7 @@ import {
   getCapabilitiesByCategory,
   runVision2029Test,
   validateCapabilityDesign,
+  validateFutureFirstCapability,
 } from "./futureCapabilityArchitecture";
 
 describe("futureCapabilityArchitecture", () => {
@@ -62,5 +63,33 @@ describe("futureCapabilityArchitecture", () => {
     const text = formatFutureCapabilityReviewText(portfolio);
     expect(text).toMatch(/Future Capability Architecture Review/);
     expect(text).toMatch(/Companion Intelligence/);
+  });
+
+  it("validateFutureFirstCapability combines three-layer and design gates", () => {
+    const aligned = validateFutureFirstCapability({
+      userValue: "Helps users understand their business",
+      intelligenceCaptures: ["Audience patterns"],
+      futureEnables: ["Living Canvas™"],
+      observable: true,
+      learnable: true,
+      personalizable: true,
+      predictable: true,
+      companionConnected: true,
+    });
+    expect(aligned.aligned).toBe(true);
+    expect(aligned.blockers).toHaveLength(0);
+
+    const rejected = validateFutureFirstCapability({
+      userValue: "",
+      intelligenceCaptures: [],
+      futureEnables: [],
+      observable: true,
+      learnable: true,
+      personalizable: true,
+      predictable: true,
+      companionConnected: true,
+    });
+    expect(rejected.aligned).toBe(false);
+    expect(rejected.blockers.length).toBeGreaterThan(0);
   });
 });

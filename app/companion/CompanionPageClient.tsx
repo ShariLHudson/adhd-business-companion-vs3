@@ -640,6 +640,12 @@ import {
   phase7BusinessIntelligenceHintForChat,
   recordBusinessIntelligenceInsightShown,
 } from "@/lib/businessIntelligenceEcosystem";
+import {
+  maybeEcosystemInsight,
+  observeEcosystemIntelligenceTurn,
+  phase11EcosystemIntelligenceHintForChat,
+  recordEcosystemInsightShown,
+} from "@/lib/ecosystemIntelligence";
 import { relationshipPhaseSummaryForChat } from "@/lib/companionRelationshipPhases";
 import {
   createConversationWorkflow,
@@ -1929,7 +1935,7 @@ export default function CompanionPageClient() {
     setCompanionStandaloneSection(null);
     setGuideBesideSession(null);
     workspaceCoachSeededRef.current = null;
-    applyChatLayoutMode("chat");
+    applyChatLayoutMode("workspace-focus");
   }, [applyChatLayoutMode]);
 
   useEffect(() => {
@@ -8372,6 +8378,7 @@ export default function CompanionPageClient() {
     let phase6ReuseOffer: string | null = null;
     let phase6DiscoveryOffer: string | null = null;
     let phase7BusinessInsight: string | null = null;
+    let phase11EcosystemInsight: string | null = null;
     if (isPhase1OnboardingComplete()) {
       observeFromConversationTurn({
         userText: trimmed,
@@ -8385,6 +8392,7 @@ export default function CompanionPageClient() {
       observePhase5EcosystemTurn({ userText: trimmed });
       observePhase6NetworkTurn({ userText: trimmed });
       observePhase7BusinessTurn({ userText: trimmed });
+      observeEcosystemIntelligenceTurn({ userText: trimmed });
       phase2TrustMoment = maybeTrustBuildingMoment();
       if (phase2TrustMoment) recordTrustBuildingMomentShown();
       phase3AwarenessMoment = maybeCompanionAwarenessMoment();
@@ -8404,6 +8412,8 @@ export default function CompanionPageClient() {
         messages: toChatTurns(nextMessages),
       });
       if (phase7BusinessInsight) recordBusinessIntelligenceInsightShown();
+      phase11EcosystemInsight = maybeEcosystemInsight({ userText: trimmed });
+      if (phase11EcosystemInsight) recordEcosystemInsightShown();
     }
 
     let compassSessionForApi = decisionCompassSession;
@@ -8448,11 +8458,12 @@ export default function CompanionPageClient() {
         messages: nextMessages,
       });
       if (survey.template) {
+        const template = survey.template;
         const userMessage: Message = { role: "user", content: trimmed };
         if (fresh) clearConversation();
-        recordSurveyCreated(survey.template.id, { influencedDecision: true });
+        recordSurveyCreated(template.id, { influencedDecision: true });
         openCreateWithShari(
-          buildSurveyCreationInput(survey.template, survey.recommendedLength),
+          buildSurveyCreationInput(template, survey.recommendedLength),
         );
         setMessages((prev) => [
           ...(fresh ? [] : prev),
@@ -8460,7 +8471,7 @@ export default function CompanionPageClient() {
           {
             role: "assistant",
             content:
-              `I've opened **${survey.template.name}** with proven questions already loaded — ` +
+              `I've opened **${template.name}** with proven questions already loaded — ` +
               "not a blank page. Edit anything to match your voice.",
           },
         ]);
@@ -10164,6 +10175,10 @@ export default function CompanionPageClient() {
                   insight: phase7BusinessInsight,
                   userText: trimmed,
                   messages: toChatTurns(nextMessages),
+                }),
+                phase11EcosystemIntelligenceHintForChat({
+                  insight: phase11EcosystemInsight,
+                  userText: trimmed,
                 }),
                 sprint5.trustHint,
                 sprint5.confidenceHint,

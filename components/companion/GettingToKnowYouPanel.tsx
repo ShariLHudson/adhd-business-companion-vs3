@@ -52,6 +52,10 @@ import {
   formatBusinessIntelligenceForPanel,
   isPhase7BusinessIntelligenceEcosystemActive,
 } from "@/lib/businessIntelligenceEcosystem";
+import {
+  formatEcosystemIntelligenceForPanel,
+  isPhase11EcosystemIntelligenceActive,
+} from "@/lib/ecosystemIntelligence";
 
 function ManualSection({
   title,
@@ -122,6 +126,7 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
     window.addEventListener("companion-phase5-ecosystem-updated", fn);
     window.addEventListener("companion-phase6-network-updated", fn);
     window.addEventListener("companion-phase7-business-intelligence-updated", fn);
+    window.addEventListener("companion-phase11-ecosystem-updated", fn);
     return () => {
       window.removeEventListener("companion-discovery-updated", fn);
       window.removeEventListener("companion-phase2-discovery-updated", fn);
@@ -130,6 +135,7 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
       window.removeEventListener("companion-phase5-ecosystem-updated", fn);
       window.removeEventListener("companion-phase6-network-updated", fn);
       window.removeEventListener("companion-phase7-business-intelligence-updated", fn);
+      window.removeEventListener("companion-phase11-ecosystem-updated", fn);
     };
   }, []);
 
@@ -152,6 +158,7 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
   const phase5Active = isPhase5CompanionIntelligenceEcosystemActive();
   const phase6Active = isPhase6CompanionIntelligenceNetworkActive();
   const phase7Active = isPhase7BusinessIntelligenceEcosystemActive();
+  const phase11Active = isPhase11EcosystemIntelligenceActive();
   const phase5State = phase5Active ? getPhase5EcosystemState() : null;
   const businessStage = phase5State?.businessStage ?? phase1Profile.businessStage;
 
@@ -313,6 +320,15 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
             How your business grows, struggles, and where focus matters most — in plain language.
           </p>
           <PanelMarkdown text={formatBusinessIntelligenceForPanel()} />
+        </ManualSection>
+      ) : null}
+
+      {phase11Active ? (
+        <ManualSection title="Ecosystem Intelligence™">
+          <p className="text-sm text-[#6b635a]">
+            Your whole life system — capacity, energy, purpose, and how everything connects.
+          </p>
+          <PanelMarkdown text={formatEcosystemIntelligenceForPanel()} />
         </ManualSection>
       ) : null}
 

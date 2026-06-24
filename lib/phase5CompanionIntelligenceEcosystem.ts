@@ -273,6 +273,14 @@ function inferBusinessStage(text: string, cur: BusinessEvolutionStage): Business
   return cur;
 }
 
+function wisdomEntry(
+  text: string,
+  source: WisdomInsight["source"],
+  confidence: WisdomInsight["confidence"],
+): WisdomInsight {
+  return { text, source, confidence, recordedAt: new Date().toISOString() };
+}
+
 function recordWisdomFromInterventions(insights: WisdomInsight[]): WisdomInsight[] {
   const effective = getUserInterventionEffectiveness()
     .filter((e) => e.rates.adaptiveWeight >= 70 && e.counts.completed >= 2)
@@ -282,15 +290,7 @@ function recordWisdomFromInterventions(insights: WisdomInsight[]): WisdomInsight
   for (const e of effective) {
     const text = `${e.label} consistently helps this user move forward.`;
     if (next.some((w) => w.text === text)) continue;
-    next = [
-      {
-        text,
-        source: "intervention",
-        confidence: "growing",
-        recordedAt: new Date().toISOString(),
-      },
-      ...next,
-    ].slice(0, 25);
+    next = [wisdomEntry(text, "intervention", "growing"), ...next].slice(0, 25);
   }
   return next;
 }
@@ -320,12 +320,7 @@ export function observePhase5EcosystemTurn(input: {
   if (/\b(?:learned|lesson|realized|now i know)\b/i.test(t)) {
     memory = pushMemory(memory, "lesson", t);
     wisdomInsights = [
-      {
-        text: t.slice(0, 160),
-        source: "lesson",
-        confidence: "early",
-        recordedAt: new Date().toISOString(),
-      },
+      wisdomEntry(t.slice(0, 160), "lesson", "early"),
       ...wisdomInsights,
     ].slice(0, 25);
   }
@@ -356,12 +351,7 @@ export function observePhase5EcosystemTurn(input: {
     const text = `Recurring pattern: ${pattern.label}`;
     if (!wisdomInsights.some((w) => w.text === text)) {
       wisdomInsights = [
-        {
-          text,
-          source: "pattern",
-          confidence: pattern.confidence,
-          recordedAt: new Date().toISOString(),
-        },
+        wisdomEntry(text, "pattern", pattern.confidence),
         ...wisdomInsights,
       ].slice(0, 25);
     }

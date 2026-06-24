@@ -26,7 +26,7 @@ export const ONBOARDING_EXPERIENCE = {
 export const ONBOARDING_EXPERIENCE_CONTENT = {
   meta: ONBOARDING_EXPERIENCE,
   checklistItems: [
-    "First Conversation",
+    "First Conversation (Phase 1 onboarding)",
     "First Win",
     "First Project",
     "First Growth Entry",

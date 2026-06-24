@@ -6,7 +6,10 @@
  *
  * Human-readable spec: docs-companion-intelligence/24_Future_Capability_Architecture.md
  * Intelligence layers: lib/adaptiveCompanionArchitecture.ts
+ * Future-first three-layer rule: lib/companionIntelligenceEcosystem/
  */
+
+import { evaluateFutureFirstFeature } from "./companionIntelligenceEcosystem";
 
 import type { LayerMaturity } from "./adaptiveCompanionArchitecture";
 
@@ -890,6 +893,45 @@ export function validateCapabilityDesign(input: {
   };
 }
 
+/**
+ * Combined gate — future-first three-layer rule + five-dimension capability design.
+ */
+export function validateFutureFirstCapability(input: {
+  userValue: string;
+  intelligenceCaptures: string[];
+  futureEnables: string[];
+  observable: boolean;
+  learnable: boolean;
+  personalizable: boolean;
+  predictable: boolean;
+  companionConnected: boolean;
+}): {
+  futureFirst: ReturnType<typeof evaluateFutureFirstFeature>;
+  design: CapabilityDesignValidation;
+  aligned: boolean;
+  blockers: string[];
+} {
+  const futureFirst = evaluateFutureFirstFeature({
+    userValue: input.userValue,
+    intelligenceCaptures: input.intelligenceCaptures,
+    futureEnables: input.futureEnables,
+  });
+  const design = validateCapabilityDesign({
+    observable: input.observable,
+    learnable: input.learnable,
+    personalizable: input.personalizable,
+    predictable: input.predictable,
+    companionConnected: input.companionConnected,
+  });
+  const blockers = [...futureFirst.blockers, ...design.blockers];
+  return {
+    futureFirst,
+    design,
+    aligned: futureFirst.aligned && design.passesArchitectureRule,
+    blockers,
+  };
+}
+
 /** 2029 vision test — before major implementation. */
 export function runVision2029Test(input: {
   scalesTenX: boolean;
@@ -979,6 +1021,6 @@ export function formatFutureCapabilityReviewText(portfolio?: FutureCapabilityPor
       ? `Shipped but unregistered: ${unregistered.join(", ")}`
       : "No partial/production capabilities lack registration.",
     "Registration channels: intervention_registry | signal_registry | app_feature_knowledge | ecosystem_intelligence_layer | companion_ecosystem_intent",
-    "Before building: validateCapabilityDesign() + runVision2029Test()",
+    "Before building: evaluateFutureFirstFeature() + validateCapabilityDesign() + runVision2029Test()",
   ].join("\n");
 }

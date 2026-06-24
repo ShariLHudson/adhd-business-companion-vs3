@@ -5,6 +5,7 @@
 
 import type { AppSection } from "./companionUi";
 import type { SidebarToolId } from "./companionUi";
+import type { OutcomeThread } from "./companionOutcomeThread";
 import { workspaceTitle } from "./workspaceMode";
 import { assistantEndsWithQuestion } from "./conversationIntervention";
 import { isBareGenericAcceptance } from "./pendingAcceptanceAuthority";
@@ -231,8 +232,20 @@ export function userDeclinedWorkflow(text: string): boolean {
   return DECLINE_RE.test(text.trim());
 }
 
+function guidedContinuationContextFromThread(
+  thread?: OutcomeThread | null,
+): GuidedContinuationContext | undefined {
+  if (!thread) return undefined;
+  if (!thread.pendingDecision && !thread.currentProblem) return undefined;
+  return {
+    pendingDecision: thread.pendingDecision,
+    currentProblem: thread.currentProblem,
+  };
+}
+
 export function continuationForWorkflow(
   workflow: ConversationWorkflow,
+  context?: GuidedContinuationContext,
 ): WorkflowContinuationResult {
   switch (workflow.kind) {
     case "project_list":
@@ -263,6 +276,14 @@ export function continuationForWorkflow(
         nextWorkflow: null,
       };
     case "open_decision_compass":
+      if (context?.pendingDecision) {
+        return {
+          action: "open_section",
+          section: "decision-compass",
+          message: `Perfect — I've opened **Decision Compass** to work through: ${context.pendingDecision}. We'll compare your options step by step.`,
+          nextWorkflow: null,
+        };
+      }
       return {
         action: "open_section",
         section: "decision-compass",
@@ -310,7 +331,7 @@ export function continuationForWorkflow(
         nextWorkflow: null,
       };
     case "guided_continue":
-      return continuationForGuidedWorkflow(workflow);
+      return continuationForGuidedWorkflow(workflow, context);
   }
 }
 
@@ -374,10 +395,7 @@ export function continuationForWorkflowWithIntent(
   workflow: ConversationWorkflow,
   context?: GuidedContinuationContext,
 ): WorkflowContinuationResult {
-  if (workflow.kind === "guided_continue") {
-    return continuationForGuidedWorkflow(workflow, context);
-  }
-  return continuationForWorkflow(workflow);
+  return continuationForWorkflow(workflow, context);
 }
 
 export function resolveConversationWorkflowAcceptance(input: {
@@ -386,6 +404,7 @@ export function resolveConversationWorkflowAcceptance(input: {
   workflow: ConversationWorkflow | null;
   currentTurn: number;
   maxTurnsSinceOffer?: number;
+  outcomeThread?: OutcomeThread | null;
 }): WorkflowContinuationResult | null {
   const t = input.userText.trim();
   if (!t || !input.workflow) return null;
@@ -396,7 +415,10 @@ export function resolveConversationWorkflowAcceptance(input: {
   const limit = input.maxTurnsSinceOffer ?? 3;
   if (turnsSince > limit) return null;
 
-  return continuationForWorkflow(input.workflow);
+  return continuationForWorkflowWithIntent(
+    input.workflow,
+    guidedContinuationContextFromThread(input.outcomeThread),
+  );
 }
 
 /** Infer workflow from the last assistant turn when no record was stored yet. */
@@ -404,6 +426,7 @@ export function resolveWorkflowFromLastAssistant(
   userText: string,
   lastAssistantText: string,
   currentTurn: number,
+  outcomeThread?: OutcomeThread | null,
 ): WorkflowContinuationResult | null {
   if (!isBareGenericAcceptance(userText.trim())) return null;
   const workflow = createConversationWorkflow(lastAssistantText, currentTurn - 1);
@@ -413,5 +436,6 @@ export function resolveWorkflowFromLastAssistant(
     lastAssistantText,
     workflow,
     currentTurn,
+    outcomeThread,
   });
 }
