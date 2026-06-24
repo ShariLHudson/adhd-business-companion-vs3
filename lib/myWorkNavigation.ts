@@ -32,7 +32,7 @@ export function myWorkPanelBackLabel(
   fromPanel: AppSection | null,
   activeSection: AppSection,
 ): string | null {
-  if (fromPanel === "my-work") return "My Work";
+  if (fromPanel === "my-work") return "Other";
   if (fromPanel) return workspaceTitle(fromPanel);
   if (activeSection === "home") return "Chat";
   return workspaceTitle(activeSection);

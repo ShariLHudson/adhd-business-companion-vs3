@@ -6,6 +6,18 @@ import type { HomeResumeItem } from "./homeResumeItem";
 import type { ContinuityItemType } from "./continuityManifest";
 import type { MyWorkHubItem } from "./myWorkHub";
 
+function resumeFields(item: MyWorkHubItem): Pick<
+  HomeResumeItem,
+  "typeLabel" | "lastAction" | "nextStep"
+> {
+  const nextStep = item.nextStep ?? "Continue where you left off";
+  return {
+    typeLabel: item.typeLabel,
+    lastAction: nextStep,
+    nextStep,
+  };
+}
+
 export function continuityToHomeResume(item: MyWorkHubItem): HomeResumeItem | null {
   if (item.openTarget.kind !== "resume") {
     if (item.openTarget.kind === "project") {
@@ -13,7 +25,7 @@ export function continuityToHomeResume(item: MyWorkHubItem): HomeResumeItem | nu
         id: item.id,
         kind: "project",
         title: item.title,
-        nextStep: item.nextStep ?? "Continue where you left off",
+        ...resumeFields(item),
         ts: item.date,
         projectId: item.openTarget.projectId,
       };
@@ -28,7 +40,7 @@ export function continuityToHomeResume(item: MyWorkHubItem): HomeResumeItem | nu
     id: item.id,
     kind,
     title: item.title,
-    nextStep: item.nextStep ?? "Continue where you left off",
+    ...resumeFields(item),
     ts: item.date,
     projectId: item.openTarget.projectId,
     avatarId: item.openTarget.avatarId,
@@ -52,6 +64,8 @@ function continuityKindToHome(
       return "decision-compass";
     case "strategy-apply":
       return "strategy";
+    case "visual-focus-map":
+      return "visual-focus";
     default:
       return "project";
   }

@@ -11,8 +11,8 @@ export const SPLIT_BESIDE_SUGGESTIONS: readonly {
   label: string;
 }[] = [
   { section: "projects", label: "Projects" },
-  { section: "content-generator", label: "Create" },
-  { section: "my-work", label: "My Work" },
+  { section: "my-work", label: "Other" },
+  { section: "visual-focus", label: "Visual Thinking" },
   { section: "growth", label: "Growth" },
   { section: "templates-library", label: "Templates" },
   { section: "playbook", label: "Strategies" },

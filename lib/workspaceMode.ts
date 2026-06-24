@@ -61,8 +61,8 @@ export function supportsWorkspace(section: AppSection): boolean {
 
 export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   projects: "Projects",
-  "my-work": "My Work",
-  "content-generator": "Create",
+  "my-work": "Other",
+  "content-generator": "Documents",
   "google-workspace": "Google Workspace",
   "templates-library": "Templates",
   "saved-work": "Created Content",
@@ -77,7 +77,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "decision-compass": "Decision Compass",
   today: "Today",
   "plan-my-day": "Plan My Day",
-  "visual-focus": "Visual Focus",
+  "visual-focus": "Visual Thinking",
   "wins-this-week": "Wins This Week",
   "evidence-bank": "Evidence Bank",
   growth: "Growth",
@@ -87,7 +87,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "focus-timer": "Focus",
   settings: "Settings",
   profile: "Profile",
-  focus: "Focus",
+  focus: "Focus My Brain",
   progress: "Progress",
   activities: "Activities",
 };
@@ -96,7 +96,7 @@ const EXTRA_AREA_TITLES: Partial<Record<AppSection, string>> = {
   home: "Chat",
   settings: "Settings",
   profile: "Profile",
-  focus: "Focus",
+  focus: "Focus My Brain",
   progress: "Progress",
   energy: "Energy",
   activities: "Activities",
