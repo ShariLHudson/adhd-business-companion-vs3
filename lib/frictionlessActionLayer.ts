@@ -748,7 +748,9 @@ export function resolveFrictionlessAction(
     };
   }
 
-  const plannedVisualReply = resolveUnavailableVisualTypeReply(userText);
+  const plannedVisualReply = resolveUnavailableVisualTypeReply(userText, {
+    priorContent: input.lastAssistantText,
+  });
   if (plannedVisualReply) {
     return {
       category: "direct_action",
@@ -756,7 +758,7 @@ export function resolveFrictionlessAction(
       suppressRecap: true,
       suppressReflectionFirst: true,
       responseHint:
-        "PLANNED VISUAL TYPE (P0.20.1): Feature not built yet — outline in chat or offer mind map.",
+        "PLANNED VISUAL TYPE (P0.20.4): Not built yet — draft outline in chat; optional Mind Map offer. Never Create.",
       localReply: plannedVisualReply,
       pendingAction: null,
       toolSuggestion: null,

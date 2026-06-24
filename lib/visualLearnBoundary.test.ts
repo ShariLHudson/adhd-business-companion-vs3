@@ -65,14 +65,14 @@ describe("visualLearnBoundary (P0.20.1)", () => {
       expect(isVisualTypeAvailable("flowchart")).toBe(false);
       expect(detectVisualTypeInText("create a flowchart")).toBe("flowchart");
       expect(resolveUnavailableVisualTypeReply("create a flowchart")).toMatch(
-        /aren't built into Visual Thinking yet/i,
+        /aren't fully built into Visual Thinking yet/i,
       );
       const decision = resolveFrictionlessAction({
         userText: "create a flowchart",
         currentTurn: 1,
       });
       expect(decision.immediateVisualOpen).toBeUndefined();
-      expect(decision.localReply).toMatch(/aren't built into Visual Thinking yet/i);
+      expect(decision.localReply).toMatch(/What are the steps you want included\?/);
     });
 
     it("create a decision tree opens when available", () => {
