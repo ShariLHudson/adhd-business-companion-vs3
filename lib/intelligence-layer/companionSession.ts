@@ -3,6 +3,8 @@
  * Same session across workspace transitions; new session after idle gap.
  */
 
+import { recordPhase2SessionStart } from "../phase2ProgressiveDiscovery";
+
 export const COMPANION_SESSION_IDLE_MS = 30 * 60 * 1000;
 
 export type TrustProductId = "ecosystem";
@@ -44,6 +46,7 @@ export function initCompanionSession(now: Date = new Date()): CompanionSessionMv
   const nowMs = now.getTime();
   if (!currentSession || isSessionExpired(currentSession, nowMs)) {
     currentSession = createSession(at);
+    recordPhase2SessionStart(now);
   }
   return currentSession;
 }
@@ -68,6 +71,7 @@ export function touchCompanionSession(now: Date = new Date()): CompanionSessionM
   const nowMs = now.getTime();
   if (!currentSession || isSessionExpired(currentSession, nowMs)) {
     currentSession = createSession(at);
+    recordPhase2SessionStart(now);
     return currentSession;
   }
   currentSession = { ...currentSession, lastActivityAt: at };

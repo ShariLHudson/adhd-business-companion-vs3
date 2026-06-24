@@ -406,7 +406,6 @@ import {
   extractDecisionCompassPrefill,
   isDecisionCompassOfferSignal,
   isExplicitDecisionCompassRequest,
-  shouldOfferDecisionCompass,
   type DecisionCompassOffer,
 } from "@/lib/decisionCompassRouting";
 import type { DecisionCompassPrefill } from "@/lib/decisionCompass";
@@ -576,7 +575,51 @@ import {
 import {
   buildCompanionDecisionIntelligence,
   companionDecisionIntelligenceHintForChat,
-} from "@/lib/companionDecisionIntelligence";
+} from "@/lib/companionDecisionIntelligence/companionDecisionIntelligence";
+import { shouldOfferDecisionCompassForTurn } from "@/lib/companionDecisionIntelligence/decisionCompassOfferGate";
+import { syncOutcomeThreadFromDecisionIntelligence } from "@/lib/companionDecisionIntelligence/outcomeThreadSync";
+import {
+  SURVEY_TEMPLATES,
+  buildSurveyCreationInput,
+  evaluateSurveyIntelligence,
+  inferSurveyTypeFromAssistantOffer,
+  isExplicitSurveyCreateRequest,
+  recordSurveyCreated,
+  surveyIntelligenceHintForChat,
+} from "@/lib/surveyIntelligence";
+import {
+  applyPhase1OnboardingTurn,
+  evaluatePhase1Onboarding,
+  isPhase1OnboardingActive,
+  isPhase1OnboardingComplete,
+  PHASE1_INPUT_PLACEHOLDER,
+  phase1OnboardingHintForChat,
+  phase1RelationshipProfileForChat,
+  shouldDeferWorkspaceRoutingForPhase1,
+  shouldSuppressWorkspaceCoachForPhase1,
+} from "@/lib/phase1Onboarding";
+import {
+  maybeTrustBuildingMoment,
+  observeFromConversationTurn,
+  observeResourcePreference,
+  phase2ProgressiveDiscoveryHintForChat,
+  recordTrustBuildingMomentShown,
+  resourcePreferenceFromAppSection,
+} from "@/lib/phase2ProgressiveDiscovery";
+import {
+  maybeAnticipatorySupport,
+  maybeCompanionAwarenessMoment,
+  observePhase3Turn,
+  phase3AdaptiveRelationshipHintForChat,
+  recordAnticipatoryOfferShown,
+  recordAwarenessMomentShown,
+} from "@/lib/phase3AdaptiveRelationship";
+import {
+  observePhase4BusinessTurn,
+  phase4BusinessOperatingPartnerHintForChat,
+  recordProactiveBusinessOfferShown,
+} from "@/lib/phase4BusinessOperatingPartner";
+import { relationshipPhaseSummaryForChat } from "@/lib/companionRelationshipPhases";
 import {
   createConversationWorkflow,
   type ConversationWorkflow,
@@ -1857,6 +1900,17 @@ export default function CompanionPageClient() {
     useState(false);
   const [projectCoachSession, setProjectCoachSession] =
     useState<ProjectCoachSession | null>(null);
+
+  useEffect(() => {
+    if (!shouldDeferWorkspaceRoutingForPhase1()) return;
+    workspacePanelRef.current = null;
+    setWorkspacePanelState(null);
+    setCompanionStandaloneSection(null);
+    setGuideBesideSession(null);
+    workspaceCoachSeededRef.current = null;
+    applyChatLayoutMode("chat");
+  }, [applyChatLayoutMode]);
+
   useEffect(() => {
     const last = getLastActivity();
     if (last && getRecentWorkItems().length === 0) {
@@ -1988,10 +2042,18 @@ export default function CompanionPageClient() {
   const workspaceSessionKeyRef = useRef<string | null>(null);
   const companionReturnSectionRef = useRef<AppSection | null>(null);
   const patchWorkspacePanel = useCallback((next: AppSection | null) => {
+    if (next && shouldDeferWorkspaceRoutingForPhase1()) {
+      dbgWorkspace("setWorkspacePanel blocked — phase1 onboarding", { to: next });
+      return;
+    }
     workspacePanelRef.current = next;
     setWorkspacePanelState((prev) => {
       if (prev === next) return prev;
       dbgWorkspace("setWorkspacePanel", { from: prev, to: next });
+      const resource = resourcePreferenceFromAppSection(next);
+      if (resource) {
+        observeResourcePreference({ resource, outcome: "opened" });
+      }
       return next;
     });
   }, []);
@@ -2923,6 +2985,7 @@ export default function CompanionPageClient() {
       setBuilderKickoffActive(false);
       return;
     }
+    if (shouldSuppressWorkspaceCoachForPhase1()) return;
     if (workspacePanel !== prevWorkspacePanelRef.current) {
       workspaceCoachSeededRef.current = null;
       prevWorkspacePanelRef.current = workspacePanel;
@@ -5031,6 +5094,7 @@ export default function CompanionPageClient() {
     section: AppSection,
     nav?: SidebarNavId,
   ) {
+    if (shouldDeferWorkspaceRoutingForPhase1()) return;
     if (isClearMyMindSection(section)) {
       openClearMyMindStandaloneCore();
       return;
@@ -5214,6 +5278,7 @@ export default function CompanionPageClient() {
     sectionOverride?: AppSection | null,
     force = false,
   ) {
+    if (shouldSuppressWorkspaceCoachForPhase1()) return;
     const section = sectionOverride ?? resolveCoachSection();
     if (!section) return;
     if (isWorkspaceCoachSilent(section)) return;
@@ -6623,6 +6688,36 @@ export default function CompanionPageClient() {
     fresh: boolean,
   ): boolean {
     const userMessage: Message = { role: "user", content: trimmed };
+
+    const surveyOfferType = inferSurveyTypeFromAssistantOffer(lastAssistantText);
+    if (surveyOfferType && isAcceptanceAttempt(trimmed)) {
+      const template = SURVEY_TEMPLATES[surveyOfferType];
+      recordSurveyCreated(surveyOfferType, { influencedDecision: true });
+      registerPendingOffer({
+        offerSummary: template.name,
+        section: "content-generator",
+        pendingQuestion: lastAssistantText,
+      });
+      openCreateWithShari(
+        buildSurveyCreationInput(template, "standard"),
+      );
+      if (fresh) clearConversation();
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        {
+          role: "assistant",
+          content:
+            `I've opened **${template.name}** in Create with proven questions already loaded — ` +
+            "edit anything to match your voice, then share it with customers.",
+        },
+      ]);
+      setInput("");
+      voiceUsedRef.current = false;
+      setIsLoading(false);
+      inputRef.current?.focus();
+      return true;
+    }
 
     const exportOffer = detectArtifactExportOffer(trimmed, creationContext);
     const pendingNow = resolvePendingAction({
@@ -8232,8 +8327,45 @@ export default function CompanionPageClient() {
 
     setMessages(nextMessages);
     setInput("");
+    const usedVoiceThisTurn = voiceUsedRef.current;
     voiceUsedRef.current = false;
     setError(null);
+
+    const lastAssistantText =
+      [...nextMessages].reverse().find((m) => m.role === "assistant")?.content ??
+      "";
+
+    const phase1OnboardingTurn = isPhase1OnboardingActive()
+      ? applyPhase1OnboardingTurn({
+          messages: toChatTurns(nextMessages),
+          userText: trimmed,
+          lastAssistantText,
+        })
+      : null;
+
+    let phase2TrustMoment: string | null = null;
+    let phase3AwarenessMoment: string | null = null;
+    let phase3AnticipatorySupport: string | null = null;
+    let phase4ProactiveSupport: string | null = null;
+    if (isPhase1OnboardingComplete()) {
+      observeFromConversationTurn({
+        userText: trimmed,
+        usedVoice: usedVoiceThisTurn,
+      });
+      observePhase3Turn({ userText: trimmed });
+      observePhase4BusinessTurn({
+        userText: trimmed,
+        resourceUsed: resourcePreferenceFromAppSection(workspacePanel) ?? undefined,
+      });
+      phase2TrustMoment = maybeTrustBuildingMoment();
+      if (phase2TrustMoment) recordTrustBuildingMomentShown();
+      phase3AwarenessMoment = maybeCompanionAwarenessMoment();
+      if (phase3AwarenessMoment) recordAwarenessMomentShown();
+      phase3AnticipatorySupport = maybeAnticipatorySupport({ userText: trimmed });
+      if (phase3AnticipatorySupport) recordAnticipatoryOfferShown();
+      phase4ProactiveSupport = maybeProactiveBusinessSupport({ userText: trimmed });
+      if (phase4ProactiveSupport) recordProactiveBusinessOfferShown();
+    }
 
     let compassSessionForApi = decisionCompassSession;
     if (workspacePanel === "decision-compass") {
@@ -8253,10 +8385,6 @@ export default function CompanionPageClient() {
       }
     }
 
-    const lastAssistantText =
-      [...nextMessages].reverse().find((m) => m.role === "assistant")?.content ??
-      "";
-
     if (decisionCompassOffer && isAcceptanceAttempt(trimmed)) {
       const snap = decisionCompassOffer;
       setDecisionCompassOffer(null);
@@ -8273,6 +8401,35 @@ export default function CompanionPageClient() {
       setIsLoading(false);
       inputRef.current?.focus();
       return;
+    }
+
+    if (isExplicitSurveyCreateRequest(trimmed)) {
+      const survey = evaluateSurveyIntelligence({
+        userText: trimmed,
+        messages: nextMessages,
+      });
+      if (survey.template) {
+        const userMessage: Message = { role: "user", content: trimmed };
+        if (fresh) clearConversation();
+        recordSurveyCreated(survey.template.id, { influencedDecision: true });
+        openCreateWithShari(
+          buildSurveyCreationInput(survey.template, survey.recommendedLength),
+        );
+        setMessages((prev) => [
+          ...(fresh ? [] : prev),
+          userMessage,
+          {
+            role: "assistant",
+            content:
+              `I've opened **${survey.template.name}** with proven questions already loaded — ` +
+              "not a blank page. Edit anything to match your voice.",
+          },
+        ]);
+        setInput("");
+        setIsLoading(false);
+        inputRef.current?.focus();
+        return;
+      }
     }
 
     if (tryContinueConversationWorkflow(trimmed, lastAssistantText, fresh)) {
@@ -8339,7 +8496,9 @@ export default function CompanionPageClient() {
       }
     }
 
-    ensureLiveCreateBesideChat(trimmed);
+    if (!shouldDeferWorkspaceRoutingForPhase1()) {
+      ensureLiveCreateBesideChat(trimmed);
+    }
 
     if (turnSurface.outcome === "tool_open" && turnSurface.targetTool === "games") {
       routingExecutorRef.current.execute({
@@ -8352,7 +8511,11 @@ export default function CompanionPageClient() {
       return;
     }
 
-    if (turnSurface.outcome === "workspace_open" && turnSurface.targetSection) {
+    if (
+      !shouldDeferWorkspaceRoutingForPhase1() &&
+      turnSurface.outcome === "workspace_open" &&
+      turnSurface.targetSection
+    ) {
       const section = turnSurface.targetSection;
       governorChatMessagesRef.current = nextMessages;
       governorRouteCtxRef.current = {
@@ -9195,10 +9358,28 @@ export default function CompanionPageClient() {
       lastAssistantText,
       outcomeThread: getOutcomeThread(),
     });
+    syncOutcomeThreadFromDecisionIntelligence(decisionIntelligence, trimmed);
+    const surveyIntelligence = evaluateSurveyIntelligence({
+      messages: nextMessages,
+      userText: trimmed,
+      situationId: decisionIntelligence.situation.situationId,
+      decisionType: decisionIntelligence.situation.decisionType,
+      discoveryComplete: decisionIntelligence.complexity.discoveryComplete,
+    });
+    const phase1OnboardingEval =
+      phase1OnboardingTurn ??
+      (isPhase1OnboardingActive()
+        ? evaluatePhase1Onboarding({
+            messages: nextMessages,
+            userText: trimmed,
+            lastAssistantText,
+          })
+        : null);
     const rawWorkspaceOffer =
       willBridge ||
       skipToolOffer ||
       intelligence.shouldDeferTools ||
+      decisionIntelligence.shouldDeferSolutions ||
       stayInConversation ||
       suppressCreatePending ||
       turnSurface.suppressCards
@@ -9206,33 +9387,42 @@ export default function CompanionPageClient() {
         : detectDoingIntent(trimmed);
     const stressCause = detectStressCauseChoice(trimmed);
     const pendingDecisionCompassOffer: DecisionCompassOffer | null =
-      shouldOfferDecisionCompass(trimmed)
-        ? buildDecisionCompassOffer(trimmed)
-        : null;
-    const pendingStressOffer: StressReliefOffer | null = pendingDecisionCompassOffer
-      ? null
-      : stressCause && !isExplicitStressToolRequest(trimmed)
-        ? buildStressCauseRecommendation(stressCause)
-        : shouldOfferStressRelief(trimmed, nextMessages)
-          ? buildStressReliefOffer()
+      shouldDeferWorkspaceRoutingForPhase1()
+        ? null
+        : shouldOfferDecisionCompassForTurn({
+            text: trimmed,
+            decisionIntelligence,
+          })
+          ? buildDecisionCompassOffer(trimmed)
           : null;
+    const pendingStressOffer: StressReliefOffer | null =
+      shouldDeferWorkspaceRoutingForPhase1() || pendingDecisionCompassOffer
+        ? null
+        : stressCause && !isExplicitStressToolRequest(trimmed)
+          ? buildStressCauseRecommendation(stressCause)
+          : shouldOfferStressRelief(trimmed, nextMessages)
+            ? buildStressReliefOffer()
+            : null;
     const pendingWorkspaceOffer =
-      rawWorkspaceOffer &&
-      !shouldSuppressWorkspaceOffer(workspaceContext, rawWorkspaceOffer) &&
-      !pendingStressOffer &&
-      !pendingDecisionCompassOffer
-        ? rawWorkspaceOffer
-        : null;
+      shouldDeferWorkspaceRoutingForPhase1() ||
+      !rawWorkspaceOffer ||
+      shouldSuppressWorkspaceOffer(workspaceContext, rawWorkspaceOffer) ||
+      pendingStressOffer ||
+      pendingDecisionCompassOffer
+        ? null
+        : rawWorkspaceOffer;
     const deferToolCards = shouldDeferToolCardOnFirstDistress(
       nextMessages,
       trimmed,
     );
     const pendingToolOffer =
+      shouldDeferWorkspaceRoutingForPhase1() ||
       willBridge ||
       skipToolOffer ||
       deferToolCards ||
       turnSurface.suppressCards ||
       shouldSuppressEmotionalTools(trimmed) ||
+      decisionIntelligence.shouldDeferSolutions ||
       pendingWorkspaceOffer ||
       pendingStressOffer ||
       pendingDecisionCompassOffer ||
@@ -9250,7 +9440,12 @@ export default function CompanionPageClient() {
             messages: nextMessages,
           });
 
-    if (pendingWorkspaceOffer && !workspacePanel && !blockAutoWorkspace) {
+    if (
+      !shouldDeferWorkspaceRoutingForPhase1() &&
+      pendingWorkspaceOffer &&
+      !workspacePanel &&
+      !blockAutoWorkspace
+    ) {
       const lookupQuery = extractProjectQuery(trimmed);
       if (lookupQuery && pendingWorkspaceOffer.section === "projects") {
         const existing = searchProjects(lookupQuery);
@@ -9308,7 +9503,11 @@ export default function CompanionPageClient() {
       return;
     }
 
-    if (workspacePanel && workspaceContext) {
+    if (
+      !shouldDeferWorkspaceRoutingForPhase1() &&
+      workspacePanel &&
+      workspaceContext
+    ) {
       if (
         avatarCoachActive &&
         workspacePanel === "client-avatars" &&
@@ -9833,6 +10032,10 @@ export default function CompanionPageClient() {
               businessContextSummary(),
               activeCompanionsContextForAI(),
               discoveryContextForChat(),
+              phase1RelationshipProfileForChat(),
+              isPhase1OnboardingComplete()
+                ? relationshipPhaseSummaryForChat()
+                : null,
             ].filter(Boolean);
             return parts.length ? parts.join(" ") : undefined;
           })(),
@@ -9892,6 +10095,23 @@ export default function CompanionPageClient() {
                 parentWorkflowCoachHint(getActiveParentWorkflow()),
                 outcomeThreadHintForChat(getOutcomeThread()),
                 companionDecisionIntelligenceHintForChat(decisionIntelligence),
+                surveyIntelligenceHintForChat(surveyIntelligence),
+                phase1OnboardingEval
+                  ? phase1OnboardingHintForChat(phase1OnboardingEval)
+                  : null,
+                isPhase1OnboardingComplete()
+                  ? phase2ProgressiveDiscoveryHintForChat({
+                      trustMoment: phase2TrustMoment,
+                    })
+                  : null,
+                phase3AdaptiveRelationshipHintForChat({
+                  awarenessMoment: phase3AwarenessMoment,
+                  anticipatorySupport: phase3AnticipatorySupport,
+                }),
+                phase4BusinessOperatingPartnerHintForChat({
+                  proactiveSupport: phase4ProactiveSupport,
+                  userText: trimmed,
+                }),
                 sprint5.trustHint,
                 sprint5.confidenceHint,
                 sprint5.adaptiveHint,
@@ -9926,7 +10146,15 @@ export default function CompanionPageClient() {
                 .join("\n\n") || undefined,
               turnSurface,
             ),
-          workspaceContextHint: [
+          workspaceContextHint: phase1OnboardingEval?.active
+            ? [
+                "PHASE 1 ONBOARDING OVERRIDE: No workspace is active for this conversation. Ignore any stale panel state.",
+                "Do NOT respond as workspace coach. Do NOT mention being beside Other or any workspace.",
+                phase1OnboardingHintForChat(phase1OnboardingEval),
+              ]
+                .filter(Boolean)
+                .join("\n\n")
+            : [
             workspaceVerificationHint(apiWorkspaceSnap),
             googleWorkspace
               ? formatGoogleWorkspaceEditHint(googleWorkspace)
@@ -10102,6 +10330,7 @@ export default function CompanionPageClient() {
         trimmed,
       );
       if (
+        !shouldDeferWorkspaceRoutingForPhase1() &&
         autoWorkspaceRoute &&
         !governorChatOnly &&
         !draftPermissionBlocked(trimmed, lastAssistantText) &&
@@ -10378,6 +10607,20 @@ export default function CompanionPageClient() {
       );
       if (workflowFromReply) {
         setConversationWorkflow(workflowFromReply);
+        if (workflowFromReply.kind === "open_decision_compass") {
+          registerPendingOffer({
+            offerSummary: workflowFromReply.offerSummary,
+            section: "decision-compass",
+            workflowKind: workflowFromReply.kind,
+            pendingQuestion: workflowFromReply.assistantQuestion,
+          });
+        } else if (workflowFromReply.kind === "guided_continue") {
+          registerPendingOffer({
+            offerSummary: workflowFromReply.offerSummary,
+            workflowKind: workflowFromReply.kind,
+            pendingQuestion: workflowFromReply.assistantQuestion,
+          });
+        }
       }
       if (voiceOutput && data.message) void playTTS(data.message);
     } catch (err) {
@@ -12547,7 +12790,9 @@ export default function CompanionPageClient() {
                     onSend={() => void handleSend()}
                     placeholder={
                       homeCalm
-                        ? "What would help most right now?"
+                        ? isPhase1OnboardingActive()
+                          ? PHASE1_INPUT_PLACEHOLDER
+                          : "What would help most right now?"
                         : undefined
                     }
                   />

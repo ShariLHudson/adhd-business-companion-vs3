@@ -12,6 +12,8 @@ import {
   type SupportStyle,
 } from "@/lib/companionStore";
 import { saveRecognitionStore } from "@/lib/recognition";
+import { isPhase1OnboardingComplete } from "@/lib/phase1Onboarding";
+import { shouldOfferProgressiveDiscoveryQuestion } from "@/lib/phase2ProgressiveDiscovery";
 
 const STORE_KEY = "companion-discovery-v2";
 const LEGACY_KEY = "companion-progressive-discovery-v1";
@@ -470,10 +472,13 @@ export function discoveryCompletedLabel(): string {
 export function nextHomeDiscoveryQuestion(
   input: ProgressiveDiscoveryInput,
 ): DiscoveryQuestion | null {
+  if (!isPhase1OnboardingComplete()) return null;
+
   const now = input.now ?? new Date();
   const store = getDiscoveryStore();
   if (store.disabled || !input.hasMeaningfulUsage) return null;
   if (store.lastAskedSession === sessionKey(now)) return null;
+  if (!shouldOfferProgressiveDiscoveryQuestion()) return null;
 
   if (!store.firstVisitComplete) {
     if (!store.welcomeSeen) {

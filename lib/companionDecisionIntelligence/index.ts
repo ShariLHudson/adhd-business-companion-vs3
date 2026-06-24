@@ -27,3 +27,8 @@ export {
   PRODUCT_EXPANSION_SCENARIO,
   evaluateProductExpansionTurn,
 } from "./productExpansionScenario";
+export {
+  pendingDecisionLabelForIntelligence,
+  syncOutcomeThreadFromDecisionIntelligence,
+} from "./outcomeThreadSync";
+export { shouldOfferDecisionCompassForTurn } from "./decisionCompassOfferGate";

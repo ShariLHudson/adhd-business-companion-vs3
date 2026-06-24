@@ -19,6 +19,24 @@ import {
   type DiscoveryQuestionId,
   type DiscoverySectionId,
 } from "@/lib/companionDiscovery";
+import {
+  buildWhatIveLearnedProfile,
+  formatWhatIveLearnedForDisplay,
+  getPhase2DiscoveryState,
+  isPhase2DiscoveryActive,
+  MILESTONE_LABELS,
+} from "@/lib/phase2ProgressiveDiscovery";
+import {
+  formatUserOperatingManualForDisplay,
+  isPhase3AdaptiveRelationshipActive,
+} from "@/lib/phase3AdaptiveRelationship";
+import {
+  buildBusinessHealthDashboard,
+  formatBusinessHealthForDisplay,
+  formatBusinessOperatingManualForDisplay,
+  isPhase4BusinessOperatingPartnerActive,
+} from "@/lib/phase4BusinessOperatingPartner";
+import { getCurrentRelationshipPhase } from "@/lib/companionRelationshipPhases";
 
 export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
   const [tick, setTick] = useState(0);
@@ -28,12 +46,31 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
   useEffect(() => {
     const fn = () => setTick((t) => t + 1);
     window.addEventListener("companion-discovery-updated", fn);
-    return () => window.removeEventListener("companion-discovery-updated", fn);
+    window.addEventListener("companion-phase2-discovery-updated", fn);
+    window.addEventListener("companion-phase3-relationship-updated", fn);
+    window.addEventListener("companion-phase4-partner-updated", fn);
+    return () => {
+      window.removeEventListener("companion-discovery-updated", fn);
+      window.removeEventListener("companion-phase2-discovery-updated", fn);
+      window.removeEventListener("companion-phase3-relationship-updated", fn);
+      window.removeEventListener("companion-phase4-partner-updated", fn);
+    };
   }, []);
 
   const store = getDiscoveryStore();
   const progress = discoveryProgressSummary();
   const sections = Object.keys(DISCOVERY_SECTION_LABELS) as DiscoverySectionId[];
+  const phase2Active = isPhase2DiscoveryActive();
+  const phase2State = phase2Active ? getPhase2DiscoveryState() : null;
+  const learnedProfile =
+    phase2State && phase2State.sessionCount >= 2
+      ? buildWhatIveLearnedProfile(phase2State)
+      : null;
+  const milestonesReached = learnedProfile?.milestonesReached ?? [];
+  const relationshipPhase = getCurrentRelationshipPhase();
+  const phase3Active = isPhase3AdaptiveRelationshipActive();
+  const phase4Active = isPhase4BusinessOperatingPartnerActive();
+  const businessHealth = phase4Active ? buildBusinessHealthDashboard() : null;
 
   function startEdit(id: DiscoveryQuestionId) {
     setEditing(id);
@@ -65,6 +102,9 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
       <p className="mt-1 text-sm text-[#9a8f82]">
         Relationship-building, not a checklist. Edit, skip, or turn off anytime.
       </p>
+      <p className="mt-2 text-sm font-medium text-[#1e4f4f]">
+        Phase {relationshipPhase.number}: {relationshipPhase.name}
+      </p>
 
       <div className="mt-4 flex flex-wrap gap-2">
         <button
@@ -91,6 +131,48 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
           Restart onboarding
         </button>
       </div>
+
+      {learnedProfile ? (
+        <div className="mt-6 overflow-hidden rounded-xl border border-[#b8d4d4] bg-[#f4faf9] px-4 py-4">
+          <p className="text-base font-semibold text-[#1e4f4f]">
+            What I&apos;ve learned about you
+          </p>
+          <p className="mt-1 text-sm text-[#6b635a]">
+            A living profile — updated as we work together, not a form you filled out.
+          </p>
+          {milestonesReached.length > 0 ? (
+            <ul className="mt-3 flex flex-col gap-1 text-sm text-[#3d3630]">
+              {milestonesReached.map((id) => (
+                <li key={id}>✓ {MILESTONE_LABELS[id]}</li>
+              ))}
+            </ul>
+          ) : null}
+          <pre className="mt-3 whitespace-pre-wrap font-sans text-sm text-[#3d3630]">
+            {formatWhatIveLearnedForDisplay(learnedProfile)}
+          </pre>
+        </div>
+      ) : null}
+
+      {phase3Active ? (
+        <div className="mt-6 overflow-hidden rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-4">
+          <p className="text-base font-semibold text-[#1f1c19]">User Operating Manual™</p>
+          <pre className="mt-3 whitespace-pre-wrap font-sans text-sm text-[#3d3630]">
+            {formatUserOperatingManualForDisplay()}
+          </pre>
+        </div>
+      ) : null}
+
+      {phase4Active ? (
+        <div className="mt-6 overflow-hidden rounded-xl border border-[#c9d4e8] bg-[#f6f8fc] px-4 py-4">
+          <p className="text-base font-semibold text-[#2f3d5c]">Business Operating Partner™</p>
+          <pre className="mt-3 whitespace-pre-wrap font-sans text-sm text-[#3d3630]">
+            {formatBusinessHealthForDisplay(businessHealth!)}
+          </pre>
+          <pre className="mt-4 whitespace-pre-wrap font-sans text-sm text-[#3d3630]">
+            {formatBusinessOperatingManualForDisplay()}
+          </pre>
+        </div>
+      ) : null}
 
       <div className="mt-6 flex flex-col gap-4">
         {sections.map((sectionId) => {

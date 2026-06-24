@@ -107,3 +107,6 @@ export function companionDecisionIntelligenceHintForChat(
 
   return parts.join("\n");
 }
+
+export { syncOutcomeThreadFromDecisionIntelligence, pendingDecisionLabelForIntelligence } from "./outcomeThreadSync";
+export { shouldOfferDecisionCompassForTurn } from "./decisionCompassOfferGate";

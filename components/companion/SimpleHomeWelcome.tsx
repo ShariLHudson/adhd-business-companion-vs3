@@ -6,6 +6,10 @@ import {
   incrementHomeVisitCount,
   shouldShowIntroCopy,
 } from "@/lib/homeWelcome";
+import {
+  isPhase1OnboardingActive,
+  PHASE1_OPENING_MESSAGE,
+} from "@/lib/phase1Onboarding";
 import { useRotatingShariPhoto } from "@/lib/useRotatingShariPhoto";
 
 type SimpleHomeWelcomeProps = {
@@ -14,6 +18,7 @@ type SimpleHomeWelcomeProps = {
 
 export function SimpleHomeWelcome({ onOpenToday }: SimpleHomeWelcomeProps) {
   const [showIntro, setShowIntro] = useState(false);
+  const [onboardingActive, setOnboardingActive] = useState(false);
   const photo = useRotatingShariPhoto();
   const [photoSrc, setPhotoSrc] = useState(photo);
 
@@ -24,6 +29,11 @@ export function SimpleHomeWelcome({ onOpenToday }: SimpleHomeWelcomeProps) {
   useEffect(() => {
     const count = incrementHomeVisitCount();
     setShowIntro(shouldShowIntroCopy(count));
+    setOnboardingActive(isPhase1OnboardingActive());
+    const refresh = () => setOnboardingActive(isPhase1OnboardingActive());
+    window.addEventListener("companion-phase1-onboarding-updated", refresh);
+    return () =>
+      window.removeEventListener("companion-phase1-onboarding-updated", refresh);
   }, []);
 
   return (
@@ -47,6 +57,14 @@ export function SimpleHomeWelcome({ onOpenToday }: SimpleHomeWelcomeProps) {
       ) : (
         <p className="text-2xl font-semibold text-[#2f261f]">Welcome back.</p>
       )}
+
+      {onboardingActive ? (
+        <div className="max-w-lg space-y-3 text-left text-base leading-relaxed text-[#4b463f]">
+          {PHASE1_OPENING_MESSAGE.split("\n\n").map((paragraph) => (
+            <p key={paragraph.slice(0, 24)}>{paragraph}</p>
+          ))}
+        </div>
+      ) : null}
 
       <button
         type="button"
