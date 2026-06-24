@@ -37,13 +37,13 @@ export const GROWTH_SECTION_META: Record<
   { title: string; emoji: string; subtitle: string }
 > = {
   growth: {
-    emoji: "🌱",
+    emoji: "📈",
     title: "Growth",
-    subtitle: "Track progress, impact, highlights, and your story over time.",
+    subtitle: "Outcome goals, wins, evidence, highlights, journey, and growth reports.",
   },
   "wins-this-week": {
     emoji: "🏆",
-    title: "My Wins",
+    title: "Wins",
     subtitle: "Recent progress and accomplishments.",
   },
   "evidence-bank": {
@@ -52,7 +52,7 @@ export const GROWTH_SECTION_META: Record<
     subtitle: "Proof of impact, improvements, progress, and problems solved.",
   },
   "confidence-vault": {
-    emoji: "🌟",
+    emoji: "✨",
     title: "My Highlights",
     subtitle:
       "Save accomplishments, recognition, praise, expertise, credentials, and meaningful moments you want to remember.",
@@ -79,4 +79,50 @@ export type GrowthPanelNav = {
   onBack: () => void;
   backLabel?: string | null;
   onOpenSection: (section: GrowthSectionId) => void;
+};
+
+/** Visual identity per Growth reflection destination — scan-friendly, not identical. */
+export const GROWTH_DESTINATION_STYLES: Record<
+  Exclude<GrowthSectionId, "growth">,
+  {
+    accentBorder: string;
+    headerBg: string;
+    iconRing: string;
+    actionBorder: string;
+    actionFg: string;
+    actionHover: string;
+  }
+> = {
+  "wins-this-week": {
+    accentBorder: "border-t-amber-500",
+    headerBg: "bg-gradient-to-br from-amber-50/90 to-white",
+    iconRing: "bg-amber-100 text-amber-800",
+    actionBorder: "border-amber-300",
+    actionFg: "text-amber-900",
+    actionHover: "hover:bg-amber-50",
+  },
+  "evidence-bank": {
+    accentBorder: "border-t-sky-500",
+    headerBg: "bg-gradient-to-br from-sky-50/90 to-white",
+    iconRing: "bg-sky-100 text-sky-800",
+    actionBorder: "border-sky-300",
+    actionFg: "text-sky-900",
+    actionHover: "hover:bg-sky-50",
+  },
+  "confidence-vault": {
+    accentBorder: "border-t-violet-500",
+    headerBg: "bg-gradient-to-br from-violet-50/90 to-white",
+    iconRing: "bg-violet-100 text-violet-800",
+    actionBorder: "border-violet-300",
+    actionFg: "text-violet-900",
+    actionHover: "hover:bg-violet-50",
+  },
+  "my-journey": {
+    accentBorder: "border-t-emerald-600",
+    headerBg: "bg-gradient-to-br from-emerald-50/90 to-white",
+    iconRing: "bg-emerald-100 text-emerald-800",
+    actionBorder: "border-emerald-300",
+    actionFg: "text-emerald-900",
+    actionHover: "hover:bg-emerald-50",
+  },
 };

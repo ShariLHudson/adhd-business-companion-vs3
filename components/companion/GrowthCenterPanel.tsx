@@ -2,76 +2,86 @@
 
 import { useCallback, useEffect, useState } from "react";
 import type { GrowthPanelNav, GrowthSectionId } from "@/lib/growthNavigation";
+import { GROWTH_DESTINATION_STYLES } from "@/lib/growthNavigation";
 import { GrowthSectionHeader } from "@/components/companion/GrowthSectionHeader";
 import { GrowthReportsPanel } from "@/components/companion/GrowthReportsPanel";
+import { OutcomeGoalsPanel } from "@/components/companion/OutcomeGoalsPanel";
+import { GrowthHubInboxStrip } from "@/components/companion/GrowthHubInboxStrip";
+import { GrowthSaveSuggestionBanner } from "@/components/companion/GrowthSaveSuggestionBanner";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import {
   EcosystemCloseAllButton,
   EcosystemCollapsibleSection,
 } from "@/components/companion/EcosystemCollapsibleSection";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+import { createSavedGrowthWin } from "@/lib/growthWinsStore";
+import { setEvidencePrefill } from "@/lib/evidenceBankStore";
+import { setJourneyPrefill } from "@/lib/myJourneyStore";
+import { setConfidencePrefill } from "@/lib/confidenceVaultStore";
 
-type GrowthBrowseSection = {
-  id: GrowthSectionId;
+type GrowthReflectionCard = {
+  id: Exclude<GrowthSectionId, "growth">;
   title: string;
+  routingLine: string;
   description: string;
   actionLabel: string;
   emoji: string;
 };
 
-const GROWTH_BROWSE_SECTIONS: GrowthBrowseSection[] = [
+/** Narrative order: Wins → Evidence → Highlights → Journey */
+const GROWTH_REFLECTION_CARDS: GrowthReflectionCard[] = [
   {
     id: "wins-this-week",
     title: "My Wins",
-    description: "Recent progress and accomplishments.",
+    routingLine: "Something went well — forward motion, done, or showed up.",
+    description: "Recent successes, progress, and accomplishments.",
     actionLabel: "Open My Wins",
     emoji: "🏆",
   },
   {
     id: "evidence-bank",
     title: "Evidence Bank",
-    description: "Proof of impact, improvements, and problems solved.",
+    routingLine: "Proof it mattered — impact, results, problems solved.",
+    description: "Proof, testimonials, impact, results, and feedback.",
     actionLabel: "Open Evidence Bank",
     emoji: "📈",
   },
   {
     id: "confidence-vault",
     title: "My Highlights",
-    description:
-      "Accomplishments, expertise, praise, recognition, and credentials.",
+    routingLine: "Praise, recognition, credentials, accomplishments.",
+    description: "Recognition, expertise, credentials, and achievements.",
     actionLabel: "Open My Highlights",
-    emoji: "🌟",
+    emoji: "✨",
   },
   {
     id: "my-journey",
     title: "My Journey",
-    description: "Experiences, lessons, milestones, and personal growth.",
+    routingLine: "Milestones, lessons, story — who you are becoming.",
+    description: "Lessons learned, milestones, and growth moments.",
     actionLabel: "Open My Journey",
-    emoji: "🌿",
+    emoji: "🌱",
   },
 ];
 
-function GrowthBrowseRow({
-  title,
-  description,
+function GrowthCardAction({
+  routingLine,
   actionLabel,
   onOpen,
+  style,
 }: {
-  title: string;
-  description: string;
+  routingLine: string;
   actionLabel: string;
   onOpen: () => void;
+  style: (typeof GROWTH_DESTINATION_STYLES)[keyof typeof GROWTH_DESTINATION_STYLES];
 }) {
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#e7dfd4] bg-white px-4 py-3">
-      <div className="min-w-0">
-        <p className="font-semibold text-[#1f1c19]">{title}</p>
-        <p className="mt-0.5 text-xs text-[#6b635a]">{description}</p>
-      </div>
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <p className="text-sm text-[#6b635a]">{routingLine}</p>
       <button
         type="button"
         onClick={onOpen}
-        className="shrink-0 rounded-full bg-[#1e4f4f] px-3 py-1.5 text-xs font-semibold text-white hover:bg-[#163c3c]"
+        className={`shrink-0 rounded-full border bg-white px-4 py-2 text-sm font-semibold ${style.actionBorder} ${style.actionFg} ${style.actionHover}`}
       >
         {actionLabel}
       </button>
@@ -106,12 +116,13 @@ export function GrowthCenterPanel({
 
   const closeAll = useCallback(() => setOpenSections(new Set()), []);
 
+  function openSection(id: GrowthSectionId) {
+    nav.onOpenSection(id);
+  }
+
   return (
     <section className={workspacePanelShellClass({ width: "standard" })}>
-      <GrowthSectionHeader
-        nav={nav}
-        onOpenReports={() => setReportsOpen(true)}
-      />
+      <GrowthSectionHeader nav={nav} />
 
       <div className="mt-4 flex justify-end">
         <EcosystemCloseAllButton
@@ -122,29 +133,98 @@ export function GrowthCenterPanel({
 
       <WorkspaceAreaWorksGuide areaId="growth" />
 
-      <GrowthReportsPanel open={reportsOpen} onClose={() => setReportsOpen(false)} />
+      <GrowthSaveSuggestionBanner
+        onSaveToWins={(text) => {
+          createSavedGrowthWin({
+            whatHappened: text,
+            ts: new Date().toISOString(),
+            icon: "🎯",
+            attachments: [],
+          });
+        }}
+        onSaveToEvidence={(text) => {
+          setEvidencePrefill({ whatHappened: text });
+          openSection("evidence-bank");
+        }}
+        onSaveToJourney={(text) => {
+          setJourneyPrefill({
+            title: text.slice(0, 80),
+            whatHappened: text,
+          });
+          openSection("my-journey");
+        }}
+        onSaveToHighlights={(text) => {
+          setConfidencePrefill({
+            title: text.slice(0, 80),
+            description: text,
+            category: "Accomplishments",
+          });
+          openSection("confidence-vault");
+        }}
+      />
+
+      <div
+        className="mt-4 rounded-2xl border border-[#1e4f4f]/20 bg-white p-4"
+        data-testid="growth-outcome-goals"
+      >
+        <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
+          Outcome Goals™
+        </p>
+        <div className="mt-2">
+          <OutcomeGoalsPanel hubMode />
+        </div>
+      </div>
+
+      <div className="mt-4">
+        <GrowthHubInboxStrip onOpenWins={() => openSection("wins-this-week")} />
+      </div>
 
       <div className="mt-4 flex flex-col gap-3" data-testid="growth-hub-sections">
-        {GROWTH_BROWSE_SECTIONS.map((section) => (
-          <EcosystemCollapsibleSection
-            key={section.id}
-            title={section.title}
-            description={section.description}
-            emoji={section.emoji}
-            open={openSections.has(section.id)}
-            onToggle={() => toggleSection(section.id)}
-            testId={`growth-section-${section.id}`}
-            accentClass="border-[#e7dfd4]"
-          >
-            <GrowthBrowseRow
+        {GROWTH_REFLECTION_CARDS.map((section) => {
+          const style = GROWTH_DESTINATION_STYLES[section.id];
+          return (
+            <EcosystemCollapsibleSection
+              key={section.id}
               title={section.title}
               description={section.description}
-              actionLabel={section.actionLabel}
-              onOpen={() => nav.onOpenSection(section.id)}
-            />
-          </EcosystemCollapsibleSection>
-        ))}
+              emoji={section.emoji}
+              open={openSections.has(section.id)}
+              onToggle={() => toggleSection(section.id)}
+              testId={`growth-section-${section.id}`}
+              accentClass={`border-[#e7dfd4] border-t-4 ${style.accentBorder}`}
+              headerClassName={`${style.headerBg} hover:brightness-[0.99]`}
+              emojiClassName={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg ${style.iconRing}`}
+            >
+              <GrowthCardAction
+                routingLine={section.routingLine}
+                actionLabel={section.actionLabel}
+                onOpen={() => openSection(section.id)}
+                style={style}
+              />
+            </EcosystemCollapsibleSection>
+          );
+        })}
       </div>
+
+      <div
+        className="mt-4 rounded-2xl border border-[#e7dfd4] bg-white p-4"
+        data-testid="growth-reports-entry"
+      >
+        <p className="text-sm font-semibold text-[#1f1c19]">Growth Reports™</p>
+        <p className="mt-1 text-sm text-[#6b635a]">
+          Periodic reflection — a printable story of wins, evidence, highlights,
+          and journey. Not a live dashboard.
+        </p>
+        <button
+          type="button"
+          onClick={() => setReportsOpen(true)}
+          className="mt-3 rounded-xl border border-[#1e4f4f]/35 px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+        >
+          Build a Growth Report →
+        </button>
+      </div>
+
+      <GrowthReportsPanel open={reportsOpen} onClose={() => setReportsOpen(false)} />
     </section>
   );
 }

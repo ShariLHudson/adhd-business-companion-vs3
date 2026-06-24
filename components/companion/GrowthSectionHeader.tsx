@@ -12,7 +12,6 @@ import {
 } from "@/lib/growthNavigation";
 
 import { readFileAsAttachment, type GrowthAttachment } from "@/lib/growthAttachments";
-import { GrowthReportsButton } from "@/components/companion/GrowthReportsPanel";
 
 const TOOL_BTN =
   "rounded-full border border-[#e7d9c8] bg-white px-3 py-1.5 text-xs font-semibold text-[#2f261f] hover:bg-[#faf7f2]";
@@ -27,7 +26,6 @@ export function GrowthSectionHeader({
   searchPlaceholder,
   onPrint,
   onQuickAttach,
-  onOpenReports,
   onCloseAll,
 }: {
   nav: GrowthPanelNav;
@@ -36,7 +34,6 @@ export function GrowthSectionHeader({
   searchPlaceholder?: string;
   onPrint?: () => void;
   onQuickAttach?: (attachments: GrowthAttachment[]) => void;
-  onOpenReports?: () => void;
   onCloseAll?: () => void;
 }) {
   const showSearch = onSearchChange != null;
@@ -59,14 +56,10 @@ export function GrowthSectionHeader({
     <header className="space-y-4">
       {isSubPage ? (
         <div className="flex flex-wrap items-center gap-2">
-          <button
-            type="button"
-            onClick={() => nav.onOpenSection("growth")}
-            className={SUB_HEADER_BTN}
-          >
-            <span aria-hidden="true">←</span>
-            Back to Growth
-          </button>
+          <GrowthPanelBackButton
+            onBack={nav.onBack}
+            label={nav.backLabel ?? "Growth"}
+          />
           {onCloseAll ? (
             <button type="button" onClick={onCloseAll} className={SUB_HEADER_BTN}>
               Close All
@@ -151,12 +144,6 @@ export function GrowthSectionHeader({
               </>
             ) : null}
           </div>
-        </div>
-      ) : null}
-
-      {nav.current === "growth" && onOpenReports ? (
-        <div className="flex flex-wrap items-center gap-2">
-          <GrowthReportsButton onClick={onOpenReports} />
         </div>
       ) : null}
     </header>

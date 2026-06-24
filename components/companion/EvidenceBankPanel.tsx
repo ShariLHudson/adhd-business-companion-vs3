@@ -430,12 +430,21 @@ export function EvidenceBankPanel({
         <GrowthArchiveBar period={archivePeriod} onPeriodChange={setArchivePeriod} />
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-        <StatTile label="Total entries" value={stats.totalEntries} />
-        <StatTile label="Problems solved" value={stats.problemsSolved} />
-        <StatTile label="Things improved" value={stats.thingsImproved} />
-        <StatTile label="People benefited" value={stats.peopleBenefited} />
-        <StatTile label="Courage moments" value={stats.courageMoments} />
+      <div className="mt-5">
+        {stats.totalEntries > 0 ? (
+          <details className="rounded-2xl border border-[#e7d9c8] bg-[#faf7f2]/50 px-4 py-3">
+            <summary className="cursor-pointer text-sm font-semibold text-[#6f6259]">
+              View totals (optional)
+            </summary>
+            <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
+              <StatTile label="Total entries" value={stats.totalEntries} />
+              <StatTile label="Problems solved" value={stats.problemsSolved} />
+              <StatTile label="Things improved" value={stats.thingsImproved} />
+              <StatTile label="People benefited" value={stats.peopleBenefited} />
+              <StatTile label="Courage moments" value={stats.courageMoments} />
+            </div>
+          </details>
+        ) : null}
       </div>
 
       <div className="mt-5">

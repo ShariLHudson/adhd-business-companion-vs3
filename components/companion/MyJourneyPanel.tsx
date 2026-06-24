@@ -203,16 +203,23 @@ export function MyJourneyPanel({
 
       <WorkspaceAreaWorksGuide areaId="my-journey" />
 
-      <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatPill label="Life Chapters" value={stats.lifeChapters} />
-        <StatPill label="Lessons Learned" value={stats.lessonsLearned} />
-        <StatPill label="Career Experiences" value={stats.careerExperiences} />
-        <StatPill label="Businesses Built" value={stats.businessesBuilt} />
-        <StatPill label="Education" value={stats.education} />
-        <StatPill label="Milestones" value={stats.milestones} />
-        <StatPill label="Personal Growth Entries" value={stats.personalGrowth} />
-        <StatPill label="Wisdom Entries" value={stats.wisdomEntries} />
-      </div>
+      {stats.total > 0 ? (
+        <details className="mt-5 rounded-2xl border border-[#e7d9c8] bg-[#faf7f2]/50 px-4 py-3">
+          <summary className="cursor-pointer text-sm font-semibold text-[#6f6259]">
+            View entry totals (optional)
+          </summary>
+          <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <StatPill label="Life Chapters" value={stats.lifeChapters} />
+            <StatPill label="Lessons Learned" value={stats.lessonsLearned} />
+            <StatPill label="Career Experiences" value={stats.careerExperiences} />
+            <StatPill label="Businesses Built" value={stats.businessesBuilt} />
+            <StatPill label="Education" value={stats.education} />
+            <StatPill label="Milestones" value={stats.milestones} />
+            <StatPill label="Personal Growth Entries" value={stats.personalGrowth} />
+            <StatPill label="Wisdom Entries" value={stats.wisdomEntries} />
+          </div>
+        </details>
+      ) : null}
 
       {stats.total === 0 ? (
         <div className="mt-5 rounded-3xl border border-[#e7d9c8] bg-gradient-to-b from-[#faf7f2] to-white p-5 text-center">

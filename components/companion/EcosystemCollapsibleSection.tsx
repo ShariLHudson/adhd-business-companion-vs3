@@ -35,6 +35,8 @@ export function EcosystemCollapsibleSection({
   children,
   testId,
   accentClass = "border-[#e4ddd2]",
+  headerClassName,
+  emojiClassName,
 }: {
   id?: string;
   title: string;
@@ -46,6 +48,8 @@ export function EcosystemCollapsibleSection({
   children: ReactNode;
   testId?: string;
   accentClass?: string;
+  headerClassName?: string;
+  emojiClassName?: string;
 }) {
   return (
     <div
@@ -57,12 +61,18 @@ export function EcosystemCollapsibleSection({
         type="button"
         onClick={onToggle}
         aria-expanded={open}
-        className={SECTION_BTN}
+        className={`${SECTION_BTN} ${headerClassName ?? ""}`}
       >
         {emoji ? (
-          <span className="text-lg leading-none" aria-hidden="true">
-            {emoji}
-          </span>
+          emojiClassName ? (
+            <span className={emojiClassName} aria-hidden="true">
+              {emoji}
+            </span>
+          ) : (
+            <span className="text-lg leading-none" aria-hidden="true">
+              {emoji}
+            </span>
+          )
         ) : (
           <span
             className="shrink-0 text-sm text-[#9a8f82]"
