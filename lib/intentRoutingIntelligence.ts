@@ -32,6 +32,7 @@ import {
   isRegistryArtifactExecution,
   type RegistryArtifactKind,
 } from "./artifactRegistry";
+import { isKnowledgeQuestion } from "./knowledgeIntelligence";
 import {
   detectDoingIntent,
   type WorkspaceOffer,
@@ -96,6 +97,11 @@ export type IntentRoutingDecision = {
   suppressRelationshipLead: boolean;
   suppressReflectionFirst: boolean;
   suppressConversationSummary: boolean;
+  /** P0.10 — concept question fast path */
+  learnFastPath: boolean;
+  suppressWisdomIntelligence: boolean;
+  suppressTransformationIntelligence: boolean;
+  suppressObservationEngine: boolean;
   stayHereChatGuidance: string | null;
   supportStyle: RoutingSupportStyle;
   supportStyleGuidance: string | null;
@@ -126,6 +132,10 @@ const UNDERSTAND_RE =
 
 const LEARN_RE =
   /\b(?:teach me|explain (?:how|what|why)|how does (?:this|it) work|walk me through|what is a[n]?)\b/i;
+
+function isLearnIntent(text: string): boolean {
+  return isKnowledgeQuestion(text) || LEARN_RE.test(text.trim());
+}
 
 const DECIDE_RE =
   /\b(?:help me decide|help me choose|which (?:offer|option|one) should|should i launch|what should i do first|can'?t decide|stuck between|torn between|compare (?:these|two) options)\b/i;
@@ -205,7 +215,13 @@ function detectIntentCategory(text: string): IntentCategory {
   if (!t) return "clarify";
   if (VAGUE_HELP_RE.test(t)) return "clarify";
   if (STRENGTH_UNDERSTAND_RE.test(t) || UNDERSTAND_RE.test(t)) return "understand";
-  if (LEARN_RE.test(t)) return "learn";
+
+  if (isRegistryArtifactExecution(t)) {
+    return /\bhelp me\b/i.test(t) ? "build" : "execute";
+  }
+
+  if (isLearnIntent(t)) return "learn";
+
   const overwhelmRoute = detectOverwhelmTodayRoute(t);
   if (overwhelmRoute === "brain_dump_primary") return "organize";
   if (overwhelmRoute === "adapt_primary" || overwhelmRoute === "plan_primary") {
@@ -263,7 +279,7 @@ function detectGoal(
       summary = "Produce output now with minimal friction";
       break;
     case "learn":
-      summary = "Understand how something works";
+      summary = "Answer the concept directly — educational, not personal";
       break;
     case "clarify":
       summary = "Clarify what kind of help is needed";
@@ -282,7 +298,8 @@ function resolveSupportStyle(
   if (pref === "solutions") return "direct";
   if (pref === "understand") return "reflective";
   if (category === "build" || category === "execute") return "direct";
-  if (category === "understand" || category === "learn") return "reflective";
+  if (category === "learn") return "direct";
+  if (category === "understand") return "reflective";
   if (category === "decide" && pref === "balanced") return "strategic";
   return "guided";
 }
@@ -658,7 +675,9 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
       ? buildWorkspaceContinuity(offer.section, text, goal)
       : null;
   const suppressConversationSummary = Boolean(overwhelmTodayRoute);
-  const suppressRelationshipIntelligence = artifactExecution;
+  const learnFastPath = category === "learn" && isLearnIntent(text);
+  const suppressRelationshipIntelligence = artifactExecution || learnFastPath;
+  const suppressDeepIntelligence = learnFastPath;
 
   const decision: IntentRoutingDecision = {
     category,
@@ -682,12 +701,17 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     suppressRelationshipLead: false,
     suppressReflectionFirst:
       suppressRelationshipIntelligence ||
+      learnFastPath ||
       Boolean(overwhelmTodayRoute) ||
       category === "build" ||
       category === "execute" ||
       category === "organize" ||
       routeMode === "feature_offer",
-    suppressConversationSummary,
+    suppressConversationSummary: suppressConversationSummary || learnFastPath,
+    learnFastPath,
+    suppressWisdomIntelligence: suppressDeepIntelligence,
+    suppressTransformationIntelligence: suppressDeepIntelligence,
+    suppressObservationEngine: suppressDeepIntelligence || artifactExecution,
     stayHereChatGuidance: overwhelmTodayRoute
       ? OVERWHELM_TODAY_STAY_HERE_GUIDANCE
       : null,
@@ -731,7 +755,14 @@ export function intentRoutingHintForChat(
     decision.suppressReflectionFirst
       ? "Do NOT lead with relationship reflection. Route or build first."
       : null,
-    decision.suppressRelationshipIntelligence
+    decision.learnFastPath
+      ? [
+          "LEARN FAST PATH (P0.10): Answer the concept directly — no relationship layer.",
+          "FORBIDDEN: I've noticed…, It sounds like…, You seem to…, You're looking to…",
+          "Skip observations, wisdom, transformation, and user-pattern framing.",
+        ].join("\n")
+      : null,
+    decision.suppressRelationshipIntelligence && !decision.learnFastPath
       ? [
           "EXECUTE OVERRIDE (P0.7.3): Direct action only — minimal clarification or Create redirect.",
           "SKIP relationship observations, observation engine, and reflection-first openers entirely.",

@@ -350,12 +350,16 @@ describe("intentRoutingIntelligence", () => {
       },
     );
 
-    it("does not suppress relationship for funnel learning questions", () => {
+    it("routes knowledge questions on learn fast path with relationship suppressed", () => {
       const decision = resolveIntentRouting({
         userText: "What is a sales funnel?",
       });
+      expect(decision.category).toBe("learn");
+      expect(decision.learnFastPath).toBe(true);
       expect(decision.artifactDetected).toBe(true);
-      expect(decision.suppressRelationshipIntelligence).toBe(false);
+      expect(decision.suppressRelationshipIntelligence).toBe(true);
+      expect(decision.suppressRelationshipLead).toBe(true);
+      expect(decision.suppressWisdomIntelligence).toBe(true);
     });
   });
 });

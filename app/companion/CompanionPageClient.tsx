@@ -684,7 +684,21 @@ import {
 import {
   intentRoutingHintForChat,
   resolveIntentRouting,
+  shouldSuppressRelationshipIntelligenceForRouting,
 } from "@/lib/intentRoutingIntelligence";
+import { knowledgeIntelligenceHintForChat } from "@/lib/knowledgeIntelligence";
+import {
+  clearFrictionlessPending,
+  frictionlessHintForChat,
+  frictionlessPendingFromToolOffer,
+  frictionlessPendingFromWorkspaceOffer,
+  isFrictionlessAffirmation,
+  loadFrictionlessPending,
+  resolveFrictionlessAction,
+  resolveFrictionlessContinuation,
+  saveFrictionlessPending,
+  shouldSuppressRelationshipForFrictionless,
+} from "@/lib/frictionlessActionLayer";
 import {
   buildRelationshipLeadParagraph,
   warnIfRelationshipContractViolation,
@@ -7324,6 +7338,50 @@ export default function CompanionPageClient() {
 
     chatTurnRef.current += 1;
 
+    const frictionlessPendingEarly = loadFrictionlessPending();
+    if (frictionlessPendingEarly && isFrictionlessAffirmation(trimmed)) {
+      const continuation = resolveFrictionlessContinuation(
+        trimmed,
+        frictionlessPendingEarly,
+        chatTurnRef.current,
+      );
+      if (continuation?.execute) {
+        const userMessage: Message = { role: "user", content: trimmed };
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        voiceUsedRef.current = false;
+        lastUserTextRef.current = trimmed;
+        if (frictionlessPendingEarly.target === "focus-audio") {
+          openFocusAudioCore(
+            frictionlessPendingEarly.focusAudioCategory ?? "calm-brain",
+          );
+        } else if (frictionlessPendingEarly.target === "breathe") {
+          handleToolSelectCore("breathe");
+        } else if (frictionlessPendingEarly.target === "brain-dump") {
+          handleToolSelectCore("brain-dump");
+        } else if (frictionlessPendingEarly.target === "decision-compass") {
+          openDecisionCompass("");
+        } else if (frictionlessPendingEarly.target === "content-generator") {
+          acceptWorkspaceOffer({
+            section: "content-generator",
+            buttonLabel: "Open Create",
+            line: "",
+          });
+        }
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: continuation.ack },
+        ]);
+        clearFrictionlessPending();
+        clearPendingAcceptanceAuthority();
+        setToolSuggestion(null);
+        setWorkspaceOffer(null);
+        setIsLoading(false);
+        inputRef.current?.focus();
+        return;
+      }
+    }
+
     if (topicChangeClearsThread(trimmed)) {
       clearOutcomeThread();
     } else if (
@@ -8406,6 +8464,14 @@ export default function CompanionPageClient() {
 
     const detected = detectEmotionalState(trimmed);
     setEmotion(detected);
+    const turnIntentRouting = resolveIntentRouting({
+      userText: trimmed,
+      workspace: workspacePanel,
+      supportStyle: getPrefs().supportStyle,
+      emotionalState: detected,
+      overwhelmed: detected === "overwhelmed",
+    });
+    const learnFastPath = turnIntentRouting.learnFastPath;
 
     const inputType = voiceUsedRef.current ? "voice" : "text";
     const userMessage: Message = { role: "user", content: trimmed };
@@ -8444,7 +8510,7 @@ export default function CompanionPageClient() {
     let phase9WisdomReflection: string | null = null;
     let phase10TransformationReflection: string | null = null;
     let phase11EcosystemInsight: string | null = null;
-    if (isPhase1OnboardingComplete()) {
+    if (isPhase1OnboardingComplete() && !learnFastPath) {
       observeFromConversationTurn({
         userText: trimmed,
         usedVoice: usedVoiceThisTurn,
@@ -9427,12 +9493,15 @@ export default function CompanionPageClient() {
     // engine, which decides (and gates) whether audio is appropriate.
     const obstacle = detectObstacle(trimmed);
     const somatic = detectSomaticAvoidance(trimmed);
-    const turnIntentRouting = resolveIntentRouting({
+    const frictionlessAction = resolveFrictionlessAction({
       userText: trimmed,
-      workspace: workspacePanel,
-      supportStyle: getPrefs().supportStyle,
+      lastAssistantText:
+        [...nextMessages].reverse().find((m) => m.role === "assistant")?.content ??
+        "",
+      currentTurn: chatTurnRef.current,
       emotionalState: detected,
       overwhelmed: detected === "overwhelmed",
+      workspace: workspacePanel,
     });
     if (
       turnIntentRouting.surfaceClarificationUi &&
@@ -9445,6 +9514,28 @@ export default function CompanionPageClient() {
         { role: "assistant", content: turnIntentRouting.clarifyPrompt! },
       ]);
       setInput("");
+      setIsLoading(false);
+      inputRef.current?.focus();
+      return;
+    }
+    if (frictionlessAction.localReply) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: frictionlessAction.localReply! },
+      ]);
+      if (frictionlessAction.pendingAction) {
+        saveFrictionlessPending(frictionlessAction.pendingAction);
+        registerPendingAcceptance(
+          frictionlessAction.workspaceOffer ? "workspace" : "tool",
+          frictionlessAction.pendingAction.offerSummary,
+        );
+      }
+      if (frictionlessAction.toolSuggestion) {
+        setToolSuggestion(frictionlessAction.toolSuggestion);
+      }
+      if (frictionlessAction.workspaceOffer) {
+        setWorkspaceOffer(frictionlessAction.workspaceOffer);
+      }
       setIsLoading(false);
       inputRef.current?.focus();
       return;
@@ -9644,6 +9735,13 @@ export default function CompanionPageClient() {
         { role: "assistant", content: offerReply },
       ]);
       setWorkspaceOffer(pendingWorkspaceOffer);
+      saveFrictionlessPending(
+        frictionlessPendingFromWorkspaceOffer(
+          pendingWorkspaceOffer,
+          chatTurnRef.current,
+        ),
+      );
+      registerPendingAcceptance("workspace", pendingWorkspaceOffer.buttonLabel);
       setToolSuggestion(null);
       setActionBridge(null);
       setBridge(null);
@@ -10159,8 +10257,14 @@ export default function CompanionPageClient() {
         createPanelWorkflowRef.current,
         createBuilderSessionRef.current?.phase ?? null,
       );
+      const suppressRelationshipIntelligence =
+        shouldSuppressRelationshipIntelligenceForRouting(turnIntentRouting) ||
+        shouldSuppressRelationshipForFrictionless(frictionlessAction);
       const businessContextForApi = (() => {
-        const suppressSummary = turnIntentRouting.suppressConversationSummary;
+        const suppressSummary =
+          turnIntentRouting.suppressConversationSummary ||
+          suppressRelationshipIntelligence ||
+          frictionlessAction.suppressRecap;
         const parts = [
           businessContextSummary(),
           activeCompanionsContextForAI(),
@@ -10173,35 +10277,46 @@ export default function CompanionPageClient() {
         ].filter(Boolean);
         return parts.length ? parts.join(" ") : undefined;
       })();
-      const relationshipIntelligencePriority =
-        buildRelationshipIntelligencePriorityBlock(trimmed, new Date(), {
-          suppressContractForRouting:
-            turnIntentRouting.suppressRelationshipLead ||
-            turnIntentRouting.suppressConversationSummary,
-          workspace: workspacePanel,
-        });
-      const establishedRelationshipHint = establishedRelationshipCoachHintForChat();
-      const phase9HintPreview = phase9WisdomIntelligenceHintForChat({
-        reflection: phase9WisdomReflection,
-        userText: trimmed,
-      });
-      const phase10HintPreview = phase10TransformationIntelligenceHintForChat({
-        reflection: phase10TransformationReflection,
-        userText: trimmed,
-      });
-      const phase11HintPreview = phase11EcosystemIntelligenceHintForChat({
-        insight: phase11EcosystemInsight,
-        userText: trimmed,
-      });
+      const relationshipIntelligencePriority = suppressRelationshipIntelligence
+        ? null
+        : buildRelationshipIntelligencePriorityBlock(trimmed, new Date(), {
+            suppressContractForRouting:
+              turnIntentRouting.suppressRelationshipLead ||
+              turnIntentRouting.suppressConversationSummary,
+            workspace: workspacePanel,
+          });
+      const establishedRelationshipHint = suppressRelationshipIntelligence
+        ? null
+        : establishedRelationshipCoachHintForChat();
+      const phase9HintPreview = suppressRelationshipIntelligence
+        ? null
+        : phase9WisdomIntelligenceHintForChat({
+            reflection: phase9WisdomReflection,
+            userText: trimmed,
+          });
+      const phase10HintPreview = suppressRelationshipIntelligence
+        ? null
+        : phase10TransformationIntelligenceHintForChat({
+            reflection: phase10TransformationReflection,
+            userText: trimmed,
+          });
+      const phase11HintPreview = suppressRelationshipIntelligence
+        ? null
+        : phase11EcosystemIntelligenceHintForChat({
+            insight: phase11EcosystemInsight,
+            userText: trimmed,
+          });
       const relationshipGuardrailsHint = relationshipIntelligencePriority
         ? relationshipResponseQualityGuardrails()
         : null;
-      const relationshipLeadParagraph = buildRelationshipLeadParagraph(trimmed, new Date(), {
-        workspace: workspacePanel,
-        suppressForRouting:
-          turnIntentRouting.suppressRelationshipLead ||
-          turnIntentRouting.suppressConversationSummary,
-      });
+      const relationshipLeadParagraph = suppressRelationshipIntelligence
+        ? null
+        : buildRelationshipLeadParagraph(trimmed, new Date(), {
+            workspace: workspacePanel,
+            suppressForRouting:
+              turnIntentRouting.suppressRelationshipLead ||
+              turnIntentRouting.suppressConversationSummary,
+          });
       const activeHintNames: string[] = [];
       if (relationshipIntelligencePriority) {
         activeHintNames.push("relationshipIntelligencePriority");
@@ -10258,6 +10373,8 @@ export default function CompanionPageClient() {
             mergeGovernorHints(
               [
                 intentRoutingHintForChat(turnIntentRouting),
+                learnFastPath ? knowledgeIntelligenceHintForChat(trimmed) : null,
+                frictionlessHintForChat(frictionlessAction),
                 relationshipGuardrailsHint,
                 appFeatureKnowledgeHintForChat(trimmed),
                 appFeatureNavigationHintForChat(trimmed),
@@ -10311,7 +10428,10 @@ export default function CompanionPageClient() {
                   : null,
                 parentWorkflowCoachHint(getActiveParentWorkflow()),
                 outcomeThreadHintForChat(getOutcomeThread()),
-                companionDecisionIntelligenceHintForChat(decisionIntelligence),
+                companionDecisionIntelligenceHintForChat(decisionIntelligence, {
+                  userText: trimmed,
+                  messages: toChatTurns(nextMessages),
+                }),
                 surveyIntelligenceHintForChat(surveyIntelligence),
                 phase1OnboardingEval && !turnIntentRouting.suppressConversationSummary
                   ? phase1OnboardingHintForChat(phase1OnboardingEval)
@@ -10467,7 +10587,9 @@ export default function CompanionPageClient() {
               workspaceContext,
               userText: trimmed,
               lastAssistantText,
-              teachingActive: teachingModeActive(trimmed, lastAssistantText, {
+              teachingActive: learnFastPath
+                ? false
+                : teachingModeActive(trimmed, lastAssistantText, {
                 activeWorkflowLocked: shouldSuppressTeachingMode(workflowLockInput),
               }),
               createWorkspaceV2: createWorkspaceV2Active,
@@ -10931,6 +11053,13 @@ export default function CompanionPageClient() {
         trackToolSuggestionOffered(pendingToolOffer.kind);
         captureToolOfferShown(pendingToolOffer.kind, closedLoopCtx());
         setToolSuggestion(pendingToolOffer);
+        saveFrictionlessPending(
+          frictionlessPendingFromToolOffer(
+            pendingToolOffer,
+            chatTurnRef.current,
+          ),
+        );
+        registerPendingAcceptance("tool", pendingToolOffer.toolLabel);
         setWorkspaceOffer(null);
         setActionBridge(null);
         setStressReliefOffer(null);

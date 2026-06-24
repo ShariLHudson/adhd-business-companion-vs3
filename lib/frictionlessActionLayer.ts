@@ -28,7 +28,7 @@ export type FrictionlessActionCategory =
   | "none";
 
 export type FrictionlessPendingAction = {
-  type: "open_tool";
+  type: "open_tool" | "open_workspace";
   target: AppSection | "focus-audio" | "breathe" | "focus-timer" | "brain-dump";
   context: string;
   focusAudioCategory?: string;
@@ -71,7 +71,7 @@ const PRODUCTIVITY_FRAMING_RE =
   /\b(?:plan my day|marketing plan|launch|revenue|clients?|business|productivity|get more done|prioritize my day)\b/i;
 
 const AFFIRMATION_RE =
-  /^(?:yes|yep|yeah|yup|sure|ok(?:ay)?|please|open it|do it|go ahead|let'?s do it|sounds good|that works|perfect|great)\.?$/i;
+  /^(?:yes|yep|yeah|yup|sure|ok(?:ay)?|please|do that|open it|do it|go ahead|let'?s do it|sounds good|that works|perfect|great)\.?$/i;
 
 export function isFrictionlessAffirmation(text: string): boolean {
   return AFFIRMATION_RE.test(text.trim());
@@ -132,6 +132,19 @@ export function frictionlessPendingAck(action: FrictionlessPendingAction): strin
     return "Opening **Plan My Day**.";
   }
   return "On it.";
+}
+
+export function frictionlessPendingFromWorkspaceOffer(
+  offer: WorkspaceOffer,
+  offeredAtTurn: number,
+): FrictionlessPendingAction {
+  return {
+    type: "open_workspace",
+    target: offer.section,
+    context: offer.line,
+    offeredAtTurn,
+    offerSummary: offer.buttonLabel,
+  };
 }
 
 export function frictionlessPendingFromToolOffer(
@@ -322,7 +335,7 @@ function buildDirectActionDecision(
     localReply,
     pendingAction: routing.workspaceOffer
       ? {
-          type: "open_tool",
+          type: "open_workspace",
           target: routing.workspaceOffer.section,
           context: routing.artifactKind ?? "create",
           offeredAtTurn: 0,
