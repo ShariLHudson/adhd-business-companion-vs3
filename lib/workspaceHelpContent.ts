@@ -61,7 +61,7 @@ const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "plan-my-day":
     "Pulls from Projects and Clear My Mind. Finished work lands in My Work; wins and proof build in Wins This Week and Evidence Bank.",
   "visual-focus":
-    "Separate from Plan My Day — use for mind maps, decision trees, and spatial thinking. Plan My Day stays for today's task views.",
+    "Studio hub with teaching cards — separate from Plan My Day (tasks) and Decision Compass™ (choosing which option is best). Decision Tree™ here explores what happens if you choose a path.",
   projects:
     "Links to Plan My Day, Create, Clear My Mind, and My Work. Chat can sit beside a project while you think.",
   "content-generator":
@@ -114,17 +114,17 @@ const LOCAL_PLAN_MY_DAY_HELP: Omit<
   whenToUse:
     "When competing priorities need a reality check against your energy, time, appointments, motivation, and mental bandwidth today.",
   workflow: [
-    "Start by adding tasks, ideas, reminders, commitments, or priorities competing for your attention today.",
-    "These may come from Clear My Mind, Projects, yesterday's unfinished work, new ideas, calendar commitments, or things you do not want to forget.",
-    "Then decide what fits your actual reality — time, energy, appointments, motivation, and current stress.",
-    "As you work: move items into progress when you begin; complete when finished (items archive and leave the board).",
-    "Move elsewhere what does not belong today.",
+    "Add a task above the board — ideas from Clear My Mind, Projects, yesterday's work, or new commitments.",
+    "Decide where it belongs: Considering Today, Today's Focus, or In Progress.",
+    "Work the board — move items as you begin and finish; tap ✓ to complete (items archive and leave the board).",
+    "Defer or remove what does not belong today.",
+    "Check Today's Reality in the compact summary; update via Adapt My Day in the top bar when your capacity shifts.",
     "When starting a new day, use Chat Workspace → New Day's Chat to reset this workspace.",
   ],
   tips: [
     "The goal is not to do everything — it is to identify what matters most today.",
     "This workspace is intentionally temporary so it does not become another overwhelming task list.",
-    "Use Adapt My Day when your plan no longer matches your energy or capacity.",
+    "Kanban has three columns only — no Done column. Completion archives to progress history and Founder Intelligence.",
     NEW_DAYS_CHAT_INSTRUCTION.menuPath.replace(/\*\*/g, "") +
       " when you want a clean daily start.",
   ],
@@ -143,10 +143,11 @@ const LOCAL_GROWTH_HELP: Record<
     whenToUse:
       "When you want the big picture of how you are growing — not just today's tasks.",
     workflow: [
-      "Open Wins, Evidence Bank, My Highlights, or My Journey from the hub cards.",
-      "Define Outcome Goals — measurable results, not task lists.",
-      "Process Growth Inbox on Wins This Week — save moments where they belong or dismiss.",
-      "Generate a Growth Report when you want a combined printable view.",
+      "Define Outcome Goals — where you are headed (not a task list).",
+      "Open Plan My Day™ when you are ready to choose what fits today.",
+      "Open My Wins, Evidence Bank, My Highlights, or My Journey from the hub cards.",
+      "Check Growth Inbox for moments the app noticed — save where they belong or dismiss.",
+      "Tap Growth Reports for a printable reflection — not a live dashboard.",
     ],
     tips: [
       "Reviewing progress strengthens pattern recognition and self-awareness over time.",

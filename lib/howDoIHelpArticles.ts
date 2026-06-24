@@ -1,4 +1,5 @@
 import type { HowDoIHelpArticle } from "./howDoIHelpTypes";
+import { visualThinkingToolHelpTips } from "./visualFocus/studioCards";
 import {
   CHAT_WORKSPACE_NAV_MODEL,
   NEW_CHAT_INSTRUCTION,
@@ -393,15 +394,16 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whenToUse:
       "When you need to answer: what fits today's reality? Pull from Clear My Mind, Projects, yesterday's unfinished work, or new ideas — then choose what matters most today.",
     workflow: [
-      "Add tasks, ideas, reminders, or commitments competing for your attention today.",
-      "Consider your time, energy, appointments, motivation, and current stress.",
-      "Move items into progress when you begin; complete to archive — they leave the board.",
-      "Park or move elsewhere what does not belong today.",
+      "Add a task above the board — then decide which column it belongs in.",
+      "Work the board: Considering Today → Today's Focus → In Progress.",
+      "Tap ✓ to complete — items archive to progress history and leave the board.",
+      "Defer or remove what does not belong today.",
+      "Update Today's Reality via Adapt My Day in the top bar when your capacity shifts.",
       "When starting a new day, use Chat Workspace → New Day's Chat — this workspace is intentionally temporary.",
     ],
     tips: [
       "The goal is not to do everything — it is to identify what matters most today.",
-      "Use Adapt My Day when your reality shifts; Plan My Day stays aligned as the day evolves.",
+      "Today's Reality shows as a compact summary in Plan My Day — use Adapt My Day in the top bar when your capacity shifts.",
       "Kanban: Considering Today → Today's Focus → In Progress — no permanent Done column.",
     ],
     keywords: ["plan", "day", "today", "realistic", "capacity", "kanban", "daily"],
@@ -411,35 +413,36 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
   {
     id: "visual-focus",
     categoryId: "planning",
-    title: "Visual Focus",
-    emoji: "🎨",
+    title: "Visual Thinking™",
+    emoji: "💡",
     featured: true,
     whatItIs:
-      "A cognitive workspace for visual thinking — mind maps, decision trees, project maps, strategy boards, and flexible visual kanban.",
+      "A visual thinking studio — understand, explore, connect, decide, and strategize. The insight is the product, not the file.",
     whenToUse:
-      "When you think in pictures, relationships, clusters, or branching ideas — not when you need today's task list.",
+      "When linear lists fail and you need to see relationships, paths, or patterns — not when you need today's task list.",
     workflow: [
-      "Choose a mode — mind map, decision tree, project map, and more.",
-      "Create a new map or open a saved one.",
-      "Add branches, clusters, and connections as ideas unfold.",
-      "Use Visual Kanban for flexible grouping beyond task columns.",
-      "Chat stays open for coaching while you organize visually.",
+      "Open Visual Thinking™ from the sidebar.",
+      "Pick a card that matches what you're figuring out — each shows what it is, when to use it, and what you'll receive.",
+      "Build your map, then Generate for visuals, insights, recommendations, and next steps.",
+      "Continue Thinking™ resumes active work (up to 3 maps). Save intentionally when something is worth keeping.",
+      "Pinned favorites live in Other™ → Saved™ — not on the studio dashboard.",
+      "Use Work With Shari when you're not sure which thinking style fits.",
     ],
-    tips: [
-      "Visual Focus answers how you want to think — Plan My Day answers how you want to view tasks.",
-      "Start from Focus hub when your brain feels crowded or stuck.",
-    ],
+    tips: visualThinkingToolHelpTips(),
     keywords: [
-      "visual",
+      "visual thinking",
       "mind map",
       "decision tree",
-      "spatial",
-      "thinking",
-      "kanban",
-      "strategy",
+      "relationship map",
+      "business canvas",
+      "strategy map",
+      "project map",
+      "visual kanban",
+      "studio",
+      "continue thinking",
     ],
     openSection: "visual-focus",
-    openLabel: "Open Visual Focus",
+    openLabel: "Open Visual Thinking™",
   },
   {
     id: "momentum-appointments",
