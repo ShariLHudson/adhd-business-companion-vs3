@@ -5,6 +5,7 @@
 
 import { isRegistryArtifactExecution } from "./artifactRegistry";
 import { isAppHowToQuestion } from "./appFeatureKnowledge";
+import { learningPathMenuHintForChat } from "./learningPathMenu";
 
 const USER_FOCUSED_UNDERSTAND_RE =
   /\b(?:why do i|what patterns|patterns have you noticed|how have i changed|how have i grown|why am i stuck|what have you noticed|what do you notice about me|how do i usually|what'?s my pattern|help me understand (?:my|why i|how i)|my biggest strength|what am i good at)\b/i;
@@ -56,8 +57,6 @@ export function extractKnowledgeTopic(text: string): string | null {
   }
   return null;
 }
-
-import { learningPathMenuHintForChat } from "./learningPathMenu";
 
 export function knowledgeIntelligenceHintForChat(userText: string): string {
   const topic = extractKnowledgeTopic(userText);
