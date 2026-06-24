@@ -1745,7 +1745,8 @@ export type DayVibeId =
   | "doing-okay"
   | "mixed-bag"
   | "struggling"
-  | "rough-day";
+  | "rough-day"
+  | "other";
 
 export type DayState = {
   /** Legacy coaching heuristics — derived on save from energyLevel. */
@@ -1755,6 +1756,8 @@ export type DayState = {
   energyLevel?: DayEnergyLevelId;
   motivationLevel?: DayMotivationLevelId;
   vibe?: DayVibeId | null;
+  /** Custom vibe text when vibe is "other". */
+  vibeNote?: string;
   needs: string[];
   note?: string;
   setAt: string;

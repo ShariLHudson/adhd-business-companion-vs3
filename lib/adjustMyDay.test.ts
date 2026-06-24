@@ -1,12 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
   DAY_HELP_OPTIONS,
+  DAY_VIBE_DROPDOWN_OPTIONS,
+  DAY_VIBE_OTHER,
   dayHelpNeedOptions,
   dayStateSummary,
   energyLevelToLegacy,
   formatDayEnergyDisplay,
   formatDayFeeling,
   formatDayMotivationDisplay,
+  formatDayVibeDisplay,
+  labelForVibe,
   migrateLegacyDayState,
   motivationLevelToLegacyOverwhelm,
   normalizeDayHelpNeed,
@@ -40,6 +44,36 @@ describe("adjustMyDay", () => {
     expect(formatDayEnergyDisplay(state)).toBe("🙂 Doing Okay");
     expect(formatDayMotivationDisplay(state)).toBe("✨ Let's Do This");
     expect(primaryHelpNeedFromState(state)).toBe("🎯 Focus Session");
+  });
+
+  it("lists vibe dropdown options with Other last", () => {
+    const labels = DAY_VIBE_DROPDOWN_OPTIONS.map((o) => o.label);
+    expect(labels).toEqual([
+      "Feeling good",
+      "Doing okay",
+      "Mixed bag",
+      "Struggling a bit",
+      "Rough day",
+      "Other",
+    ]);
+    expect(DAY_VIBE_DROPDOWN_OPTIONS[labels.length - 1]?.id).toBe(DAY_VIBE_OTHER);
+  });
+
+  it("uses custom text for Other vibe in display and summary", () => {
+    const state: DayState = {
+      energy: "medium",
+      overwhelm: "medium",
+      energyLevel: "doing-okay",
+      motivationLevel: "get-it-done",
+      vibe: "other",
+      vibeNote: "Quiet but focused",
+      needs: [],
+      setAt: new Date().toISOString(),
+    };
+    expect(labelForVibe("other", "Quiet but focused")).toBe("Quiet but focused");
+    expect(labelForVibe("other")).toBe("Other");
+    expect(formatDayVibeDisplay(state)).toBe("Quiet but focused");
+    expect(dayStateSummary(state)).toContain("Vibe: Quiet but focused.");
   });
 
   it("migrates legacy day state", () => {

@@ -5757,8 +5757,14 @@ export default function CompanionPageClient() {
     setActiveNav("focus");
   }
 
+  /** Open full-page Adapt My Day — energy / today's reality check-in. */
+  function openAdaptMyDayCore() {
+    openStandaloneFocusSectionCore("energy");
+  }
+
   /** Standalone focus tools (Clear My Mind, spin wheel, energy, etc.). */
   function openStandaloneFocusSectionCore(section: AppSection) {
+    pushNavigationRestore();
     clearParallelCoachingOffers();
     clearSplitBesideWorkspace();
     setActiveSection(section);
@@ -12054,8 +12060,8 @@ export default function CompanionPageClient() {
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <TopBar
             onOpenClearMyMind={openClearMyMindStandaloneCore}
-            onRequestClearTodayContext={requestClearTodayContext}
-            onRequestBeginNewDay={requestBeginNewDay}
+            onOpenAdaptMyDay={openAdaptMyDayCore}
+            onRequestNewConversation={requestClearTodayContext}
             onOpenSettings={(section) => {
               setSettingsSection(section ?? null);
               setOverlay("settings");
@@ -12958,12 +12964,7 @@ export default function CompanionPageClient() {
           )}
 
           {activeSection === "energy" && (
-            <AdjustMyDayPanel
-              onDone={() => {
-                setActiveNav("chat");
-                setActiveSection("home");
-              }}
-            />
+            <AdjustMyDayPanel onDone={goBack} />
           )}
               </div>
             </div>

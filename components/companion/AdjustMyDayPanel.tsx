@@ -13,7 +13,8 @@ import {
   DAY_ENERGY_LEVELS,
   DAY_HELP_OTHER,
   DAY_MOTIVATION_LEVELS,
-  DAY_VIBES,
+  DAY_VIBE_DROPDOWN_OPTIONS,
+  DAY_VIBE_OTHER,
   formatDayEnergyDisplay,
   formatDayHelpDisplay,
   formatDayMotivationDisplay,
@@ -44,7 +45,8 @@ export function AdjustMyDayPanel({
   const [mode, setMode] = useState<PanelMode>(initialMode);
   const [snapshot, setSnapshot] = useState<DayState | null>(null);
 
-  const [vibe, setVibe] = useState<DayVibeId | null>(null);
+  const [vibe, setVibe] = useState<DayVibeId | "">("");
+  const [vibeNote, setVibeNote] = useState("");
   const [energyLevel, setEnergyLevel] = useState<DayEnergyLevelId | "">("");
   const [motivationLevel, setMotivationLevel] = useState<DayMotivationLevelId | "">("");
   const [helpNeed, setHelpNeed] = useState("");
@@ -52,7 +54,8 @@ export function AdjustMyDayPanel({
   const [note, setNote] = useState("");
 
   function loadFromState(existing: DayState) {
-    setVibe(existing.vibe ?? null);
+    setVibe(existing.vibe ?? "");
+    setVibeNote(existing.vibeNote ?? "");
     setEnergyLevel(existing.energyLevel ?? "doing-okay");
     setMotivationLevel(existing.motivationLevel ?? "get-it-done");
     const first = existing.needs[0];
@@ -95,7 +98,11 @@ export function AdjustMyDayPanel({
     const state = saveDayState({
       energyLevel,
       motivationLevel,
-      vibe: vibe ?? undefined,
+      vibe: vibe || undefined,
+      vibeNote:
+        vibe === DAY_VIBE_OTHER && vibeNote.trim()
+          ? vibeNote.trim()
+          : undefined,
       needs: buildNeeds(),
       note: note.trim() || undefined,
     });
@@ -106,24 +113,6 @@ export function AdjustMyDayPanel({
       setMode("snapshot");
     }
   }
-
-  const vibeChip = (id: DayVibeId, label: string) => {
-    const active = vibe === id;
-    return (
-      <button
-        key={id}
-        type="button"
-        onClick={() => setVibe(active ? null : id)}
-        className={`rounded-full border px-3 py-2 text-base font-semibold transition-colors ${
-          active
-            ? "border-[#1e4f4f] bg-[#1e4f4f] text-white shadow-sm"
-            : "border-[#c9bfb0] bg-white/80 text-[#3d3630] hover:bg-white"
-        }`}
-      >
-        {label}
-      </button>
-    );
-  };
 
   const shellClass = embedded
     ? "companion-fade-in flex flex-col"
@@ -199,7 +188,7 @@ export function AdjustMyDayPanel({
             onClick={onDone}
             className="mt-3 w-full rounded-xl border border-[#c9bfb0] bg-white px-8 py-3 text-base font-semibold text-[#3d3630] hover:bg-[#faf8f5]"
           >
-            Back to chat
+            Back
           </button>
         ) : null}
       </div>
@@ -217,12 +206,34 @@ export function AdjustMyDayPanel({
         Your day can change. Update this anytime.
       </p>
 
-      <p className="mt-6 text-sm font-semibold text-[#1f1c19]">
-        Today&apos;s vibe? <span className="font-normal text-[#6b635a]">(optional)</span>
-      </p>
-      <div className="mt-2 flex flex-wrap gap-2">
-        {DAY_VIBES.map((v) => vibeChip(v.id, v.label))}
-      </div>
+      <label className="mt-6 block">
+        <span className="text-lg font-semibold text-[#1f1c19]">Today&apos;s vibe</span>
+        <select
+          value={vibe}
+          onChange={(e) => {
+            const next = e.target.value as DayVibeId | "";
+            setVibe(next);
+            if (next !== DAY_VIBE_OTHER) setVibeNote("");
+          }}
+          className={selectClass}
+        >
+          <option value="">Select today&apos;s vibe…</option>
+          {DAY_VIBE_DROPDOWN_OPTIONS.map((o) => (
+            <option key={o.id} value={o.id}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+      </label>
+      {vibe === DAY_VIBE_OTHER ? (
+        <VoiceAnswerField
+          value={vibeNote}
+          onChange={setVibeNote}
+          placeholder="Tell me what today feels like..."
+          className="mt-2"
+          inputClassName="min-h-[80px] w-full resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+        />
+      ) : null}
 
       <label className="mt-6 block">
         <span className="text-lg font-semibold text-[#1f1c19]">Energy Level</span>

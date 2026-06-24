@@ -26,6 +26,18 @@ export const DAY_VIBES = [
   { id: "rough-day", label: "😩 Rough Day" },
 ] as const;
 
+/** Plain labels for Adapt My Day vibe dropdown (no emoji). */
+export const DAY_VIBE_DROPDOWN_OPTIONS = [
+  { id: "feeling-good", label: "Feeling good" },
+  { id: "doing-okay", label: "Doing okay" },
+  { id: "mixed-bag", label: "Mixed bag" },
+  { id: "struggling", label: "Struggling a bit" },
+  { id: "rough-day", label: "Rough day" },
+  { id: "other", label: "Other" },
+] as const;
+
+export const DAY_VIBE_OTHER = "other" as const;
+
 export const DAY_HELP_OPTIONS = [
   { id: "brain-dump", label: "🧠 Brain Dump" },
   { id: "build-something", label: "🛠️ Build Something" },
@@ -42,7 +54,7 @@ export const DAY_HELP_OPTIONS = [
 
 export type DayEnergyLevelId = (typeof DAY_ENERGY_LEVELS)[number]["id"];
 export type DayMotivationLevelId = (typeof DAY_MOTIVATION_LEVELS)[number]["id"];
-export type DayVibeId = (typeof DAY_VIBES)[number]["id"];
+export type DayVibeId = (typeof DAY_VIBES)[number]["id"] | typeof DAY_VIBE_OTHER;
 export type DayHelpOptionId = (typeof DAY_HELP_OPTIONS)[number]["id"];
 
 export const DAY_HELP_OTHER = "other" as const;
@@ -83,8 +95,14 @@ export function labelForMotivationLevel(id: string | undefined | null): string {
   return DAY_MOTIVATION_LEVELS.find((o) => o.id === id)?.label ?? "—";
 }
 
-export function labelForVibe(id: string | undefined | null): string {
+export function labelForVibe(
+  id: string | undefined | null,
+  custom?: string,
+): string {
   if (!id) return "—";
+  if (id === DAY_VIBE_OTHER) {
+    return custom?.trim() || "Other";
+  }
   return DAY_VIBES.find((o) => o.id === id)?.label ?? "—";
 }
 
@@ -174,7 +192,7 @@ export function formatDayFeeling(state: DayState | null): string {
 }
 
 export function formatDayVibeDisplay(state: DayState | null): string {
-  return labelForVibe(state?.vibe ?? null);
+  return labelForVibe(state?.vibe ?? null, state?.vibeNote);
 }
 
 export function formatDayHelpDisplay(state: DayState | null): string {
@@ -233,7 +251,9 @@ export function dayStateSummary(state: DayState | null): string | undefined {
   if (!state) return undefined;
   const s = migrateLegacyDayState(state);
   const vibe =
-    s.vibe && s.vibe !== undefined ? ` Vibe: ${labelForVibe(s.vibe)}.` : "";
+    s.vibe && s.vibe !== undefined
+      ? ` Vibe: ${labelForVibe(s.vibe, s.vibeNote)}.`
+      : "";
   const energy = formatDayEnergyDisplay(s);
   const motivation = formatDayMotivationDisplay(s);
   const help = formatDayHelpDisplay(s);

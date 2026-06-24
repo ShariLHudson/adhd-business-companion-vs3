@@ -6,27 +6,22 @@ import {
   countActivePlanItems,
   PLAN_MY_DAY_UPDATED,
 } from "@/lib/planMyDay";
-import {
-  BEGIN_NEW_DAY_COPY,
-  CLEAR_TODAY_CONTEXT_COPY,
-  TOP_BAR_NEW_DAY_LABEL,
-  TOP_BAR_RESET_WORKSPACE_LABEL,
-} from "@/lib/freshStartCopy";
+import { TOP_BAR_NEW_CONVERSATION_LABEL } from "@/lib/freshStartCopy";
 
 type TopBarProps = {
   showPlanMyDay?: boolean;
   onOpenPlanMyDay?: () => void;
+  onOpenAdaptMyDay?: () => void;
   onOpenClearMyMind?: () => void;
   onOpenSettings: (section?: SettingsSection | null) => void;
   onOpenProfile: () => void;
-  onRequestClearTodayContext: () => void;
-  onRequestBeginNewDay: () => void;
+  onRequestNewConversation: () => void;
 };
 
 const BTN =
   "relative z-50 flex h-11 items-center gap-1.5 rounded-full border border-[#d8cfc2] bg-white/80 px-3.5 text-sm font-medium text-[#3d3630] transition-colors hover:bg-white";
 
-const ACCOUNT_MENU_BTN =
+const MENU_BTN =
   "block w-full px-4 py-3 text-left text-base font-semibold text-[#1f1c19] hover:bg-[#f0f5f5]";
 
 function usePlanActiveCount(): number {
@@ -99,35 +94,36 @@ function HeaderActionButton({
 export function TopBar({
   showPlanMyDay = false,
   onOpenPlanMyDay,
+  onOpenAdaptMyDay,
   onOpenClearMyMind,
   onOpenSettings,
   onOpenProfile,
-  onRequestClearTodayContext,
-  onRequestBeginNewDay,
+  onRequestNewConversation,
 }: TopBarProps) {
   const planActiveCount = usePlanActiveCount();
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
 
-  function closeMenu() {
+  function closeMenus() {
     setAccountMenuOpen(false);
   }
 
   function runHeaderAction(action: () => void) {
-    closeMenu();
+    closeMenus();
     action();
   }
 
   useEffect(() => {
     if (!accountMenuOpen) return;
     const onPointerDown = (event: PointerEvent) => {
-      const root = accountMenuRef.current;
-      if (root && !root.contains(event.target as Node)) {
-        setAccountMenuOpen(false);
+      const accountRoot = accountMenuRef.current;
+      if (accountRoot?.contains(event.target as Node)) {
+        return;
       }
+      closeMenus();
     };
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setAccountMenuOpen(false);
+      if (event.key === "Escape") closeMenus();
     };
     document.addEventListener("pointerdown", onPointerDown);
     document.addEventListener("keydown", onKeyDown);
@@ -156,16 +152,18 @@ export function TopBar({
         />
       ) : null}
 
-      <HeaderActionButton
-        emoji={CLEAR_TODAY_CONTEXT_COPY.menuEmoji}
-        label={TOP_BAR_RESET_WORKSPACE_LABEL}
-        onClick={() => runHeaderAction(onRequestClearTodayContext)}
-      />
+      {onOpenAdaptMyDay ? (
+        <HeaderActionButton
+          emoji="🌤️"
+          label="Adapt My Day"
+          onClick={() => runHeaderAction(onOpenAdaptMyDay)}
+        />
+      ) : null}
 
       <HeaderActionButton
-        emoji={BEGIN_NEW_DAY_COPY.menuEmoji}
-        label={TOP_BAR_NEW_DAY_LABEL}
-        onClick={() => runHeaderAction(onRequestBeginNewDay)}
+        emoji="💬"
+        label={TOP_BAR_NEW_CONVERSATION_LABEL}
+        onClick={() => runHeaderAction(onRequestNewConversation)}
       />
 
       <div ref={accountMenuRef} className="relative z-50">
@@ -185,7 +183,6 @@ export function TopBar({
             className="absolute right-0 z-[60] mt-1 w-56 overflow-hidden rounded-xl border border-[#d8cfc2] bg-white shadow-lg"
             role="menu"
             aria-label="Account"
-            data-testid="account-menu"
           >
             <p className="border-b border-[#e7dfd4] px-4 py-2 text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
               Account
@@ -193,26 +190,18 @@ export function TopBar({
             <button
               type="button"
               role="menuitem"
-              onClick={() => {
-                closeMenu();
-                onOpenProfile();
-              }}
-              className={ACCOUNT_MENU_BTN}
-              data-testid="account-menu-profile"
+              onClick={() => runHeaderAction(() => onOpenSettings(null))}
+              className={MENU_BTN}
             >
-              🧍 Profile
+              ⚙️ Settings
             </button>
             <button
               type="button"
               role="menuitem"
-              onClick={() => {
-                closeMenu();
-                onOpenSettings(null);
-              }}
-              className={ACCOUNT_MENU_BTN}
-              data-testid="account-menu-settings"
+              onClick={() => runHeaderAction(onOpenProfile)}
+              className={MENU_BTN}
             >
-              ⚙️ Settings
+              👤 Profile
             </button>
           </div>
         ) : null}
