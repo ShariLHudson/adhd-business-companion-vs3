@@ -12,6 +12,7 @@ import {
   movePlanItemKanban,
   currentFocusItem,
 } from "./planDayItems";
+import { getPlanCompletionHistory, resetPlanCompletionForTests } from "./planTaskCompletion";
 import {
   resolveInitialPlanningView,
   setDefaultPlanningView,
@@ -167,10 +168,35 @@ describe("planMyDay kanban", () => {
     { id: "b", title: "Second", column: "ready", done: false, startTime: "10:00" },
   ];
 
-  it("marks done when dropped on done column", () => {
+  beforeEach(() => {
+    const storage = {
+      getItem: (k: string) => lsStore[k] ?? null,
+      setItem: (k: string, v: string) => {
+        lsStore[k] = v;
+      },
+      removeItem: (k: string) => {
+        delete lsStore[k];
+      },
+    };
+    vi.stubGlobal("window", { dispatchEvent: vi.fn(), localStorage: storage });
+    vi.stubGlobal("localStorage", storage);
+    resetPlanCompletionForTests();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("moves task to today column", () => {
+    const result = movePlanItemKanban(items, "b", "today");
+    expect(result.items.find((i) => i.id === "b")?.column).toBe("today");
+  });
+
+  it("completes and removes task when finishing via completion flow", () => {
     const result = movePlanItemKanban(items, "a", "done");
-    expect(result.enteredDone).toBe(true);
-    expect(result.items.find((i) => i.id === "a")?.done).toBe(true);
+    expect(result.completed).not.toBeNull();
+    expect(result.items.find((i) => i.id === "a")).toBeUndefined();
+    expect(getPlanCompletionHistory().some((h) => h.planItemId === "a")).toBe(true);
   });
 
   it("sets focus rank when moved to doing", () => {

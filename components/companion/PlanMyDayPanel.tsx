@@ -10,6 +10,7 @@ import {
   loadTodayPlanItems,
   readTodayPlanItems,
   movePlanItemKanban,
+  finishPlanItem,
   planItemMetaLabel,
   planItemStyle,
   PLAN_MY_DAY_UPDATED,
@@ -23,18 +24,24 @@ import {
   type QuickPlanItemInput,
 } from "@/lib/planMyDay";
 import { PlanDayAddForm } from "@/components/companion/PlanDayAddForm";
-import { BackButton } from "@/components/companion/BackButton";
 import { PlanDayKanbanView } from "@/components/companion/PlanDayKanbanView";
+import { TodaysRealitySummary } from "@/components/companion/TodaysRealitySummary";
 import {
   PlanDayItemDetail,
   type PlanItemDetailMode,
 } from "@/components/companion/PlanDayItemDetail";
-import { LibraryCloseButton } from "@/components/companion/LibraryOrientationChrome";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
-import { TodaysRealityCard } from "@/components/companion/TodaysRealityCard";
-import { AdjustMyDayPanel } from "@/components/companion/AdjustMyDayPanel";
+import {
+  dismissPlanRealityPrompt,
+  evaluatePlanRealityMismatch,
+  type RealityMismatchPrompt,
+} from "@/lib/planMyDay/planRealityAlignment";
 import { useCategoryColorCoding } from "@/lib/useCategoryColorCoding";
-import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+
+/** Readable centered column — matches other companion workspaces. */
+const PLAN_CENTERED_CLASS = "mx-auto w-full max-w-3xl";
+/** Kanban board — centered but wider than the header/entry column. */
+const PLAN_KANBAN_BOARD_CLASS = "mx-auto w-full min-w-0 max-w-6xl";
 
 const VIEW_SELECT =
   "min-w-[10rem] rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-base font-semibold text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
@@ -140,8 +147,7 @@ function TimelineView({
     .sort((a, b) => (a.startTime ?? "").localeCompare(b.startTime ?? ""));
   return (
     <div className="plan-day-timeline-rail pl-4">
-      <p className="text-lg font-semibold text-[#1f1c19]">Timeline</p>
-      <ul className="mt-3 flex flex-col gap-2">
+      <ul className="flex flex-col gap-2">
         {sorted.map((item) => {
           const style = planItemStyle(item, colorCoding);
           return (
@@ -244,7 +250,6 @@ function CardsView({
 }
 
 export function PlanMyDayPanel({
-  onBack,
   onOpenSettings,
   onStartFocus,
   onOpenProject,
@@ -272,8 +277,8 @@ export function PlanMyDayPanel({
   );
   const [detailMode, setDetailMode] = useState<PlanItemDetailMode>("form");
   const [kanbanToast, setKanbanToast] = useState<string | null>(null);
-  const [adaptFlowOpen, setAdaptFlowOpen] = useState(false);
-  const [realityKey, setRealityKey] = useState(0);
+  const [realityPrompt, setRealityPrompt] =
+    useState<RealityMismatchPrompt | null>(null);
 
   useEffect(() => {
     setItems(loadTodayPlanItems());
@@ -292,10 +297,6 @@ export function PlanMyDayPanel({
   useEffect(() => {
     if (!registerBack) return;
     registerBack(() => {
-      if (adaptFlowOpen) {
-        setAdaptFlowOpen(false);
-        return true;
-      }
       if (openItemId) {
         if (detailMode !== "form") {
           setDetailMode("form");
@@ -308,7 +309,7 @@ export function PlanMyDayPanel({
       return false;
     });
     return () => registerBack(null);
-  }, [registerBack, openItemId, detailMode, adaptFlowOpen]);
+  }, [registerBack, openItemId, detailMode]);
 
   const openItem = openItemId
     ? items.find((i) => i.id === openItemId) ?? null
@@ -328,12 +329,32 @@ export function PlanMyDayPanel({
     setDetailMode("form");
   }
 
+  function showCompletionToast(message: string) {
+    setKanbanToast(message);
+    window.setTimeout(() => setKanbanToast(null), 2800);
+  }
+
+  function handleCompleteItem(id: string) {
+    const result = finishPlanItem(items, id, { sourceWorkspace: "kanban" });
+    if (!result) return;
+    refresh(result.items);
+    showCompletionToast(result.toast);
+    if (openItemId === id) {
+      setOpenItemId(null);
+      setDetailMode("form");
+    }
+  }
+
   function handleKanbanDrop(id: string, column: PlanItemColumn) {
     const result = movePlanItemKanban(items, id, column);
     refresh(result.items);
-    if (result.enteredDone) {
-      setKanbanToast(`✓ ${result.itemTitle} completed`);
-      window.setTimeout(() => setKanbanToast(null), 2800);
+    if (result.completed) {
+      showCompletionToast(result.completed.toast);
+      if (openItemId === id) {
+        setOpenItemId(null);
+        setDetailMode("form");
+      }
+      return;
     }
   }
 
@@ -350,7 +371,11 @@ export function PlanMyDayPanel({
   }
 
   function handleAdd(input: QuickPlanItemInput) {
-    refresh(addQuickPlanItem(input));
+    const next = addQuickPlanItem(input);
+    refresh(next);
+    const title = typeof input === "string" ? input : input.title;
+    const prompt = evaluatePlanRealityMismatch(next, { newItemTitle: title });
+    if (prompt) setRealityPrompt(prompt);
   }
 
   function handleViewChange(mode: PlanningViewMode) {
@@ -358,14 +383,14 @@ export function PlanMyDayPanel({
     setLastPlanningView(mode);
   }
 
-  function openAdaptFlow() {
-    setAdaptFlowOpen(true);
+  function handleUpdateTodaysReality() {
+    setRealityPrompt(null);
     onOpenAdaptMyDay?.();
   }
 
-  function closeAdaptFlow() {
-    setAdaptFlowOpen(false);
-    setRealityKey((key) => key + 1);
+  function handleKeepCurrentReality() {
+    dismissPlanRealityPrompt(items);
+    setRealityPrompt(null);
   }
 
   function renderTaskView() {
@@ -406,6 +431,7 @@ export function PlanMyDayPanel({
             items={items}
             onOpen={(id) => handleOpenItem(id)}
             onDrop={handleKanbanDrop}
+            onComplete={handleCompleteItem}
             colorCoding={colorCoding}
           />
         ) : null}
@@ -415,48 +441,33 @@ export function PlanMyDayPanel({
 
   return (
     <div
-      className={`${workspacePanelShellClass({ width: "full", inSplit: true })} companion-panel-surface`}
+      className="companion-fade-in companion-panel-surface flex h-full min-h-0 w-full flex-col overflow-y-auto px-6 py-8"
       data-plan-view={view}
     >
-      <div className="flex items-start justify-between gap-3 border-b border-[#e7dfd4] pb-4">
-        <div>
-          <h1 className="text-2xl font-semibold text-[#1f1c19] lg:text-3xl">
-            Plan My Day
-          </h1>
-          <p className="mt-1 text-base leading-relaxed text-[#6b635a] lg:text-lg">
-            The same plan — shown the way your brain works today.
-          </p>
+      {!openItem ? (
+        <div className={PLAN_CENTERED_CLASS}>
+          <WorkspaceAreaWorksGuide areaId="plan-my-day" />
         </div>
-        <div className="flex items-center gap-3">
-          <ViewDropdown active={view} onChange={handleViewChange} />
-          {onBack ? <LibraryCloseButton onClose={onBack} /> : null}
+      ) : null}
+
+      <div className={`${PLAN_CENTERED_CLASS} ${openItem ? "" : "mt-4"}`}>
+        <div className="flex flex-col gap-3 border-b border-[#e7dfd4] pb-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="min-w-0">
+            <h1 className="text-2xl font-semibold text-[#1f1c19] lg:text-3xl">
+              Plan My Day™
+            </h1>
+            <p className="mt-1 text-base leading-relaxed text-[#6b635a] lg:text-lg">
+              Choose what fits today&apos;s reality — not everything on your mind.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 sm:justify-end sm:gap-3">
+            <ViewDropdown active={view} onChange={handleViewChange} />
+          </div>
         </div>
       </div>
 
-      <WorkspaceAreaWorksGuide areaId="plan-my-day" />
-
-      {adaptFlowOpen ? (
-        <div className="mt-4">
-          <BackButton
-            onClick={closeAdaptFlow}
-            label="Back to Plan My Day"
-            size="compact"
-            className="mb-3"
-          />
-          <AdjustMyDayPanel
-            embedded
-            initialMode="edit"
-            onDone={closeAdaptFlow}
-          />
-        </div>
-      ) : openItem ? (
-        <div className="mt-4">
-          <BackButton
-            onClick={handleCloseItem}
-            label="Back to Plan My Day"
-            size="compact"
-            className="mb-3"
-          />
+      {openItem ? (
+        <div className={`mt-4 ${PLAN_CENTERED_CLASS}`}>
           <PlanDayItemDetail
             key={`${openItem.id}-${detailMode}`}
             item={openItem}
@@ -469,30 +480,78 @@ export function PlanMyDayPanel({
             initialMode={detailMode}
             onModeChange={setDetailMode}
             hideClose
+            onCompleted={showCompletionToast}
           />
         </div>
       ) : (
-        <div className="mt-4 flex flex-col gap-4">
-          <TodaysRealityCard
-            refreshKey={realityKey}
-            onUpdate={openAdaptFlow}
-          />
-          {renderTaskView()}
-          <PlanDayAddForm onAdd={handleAdd} />
-          {onOpenSettings ? (
-            <p className="mt-6 text-base text-[#6b635a]">
-              Set your default view in{" "}
-              <button
-                type="button"
-                onClick={onOpenSettings}
-                className="font-semibold text-[#1e4f4f] hover:underline"
+        <>
+          <div className={`mt-4 flex flex-col gap-4 ${PLAN_CENTERED_CLASS}`}>
+            {realityPrompt ? (
+              <div
+                className="rounded-xl border border-[#c9bfb0] bg-[#faf7f2] p-4"
+                role="status"
+                aria-live="polite"
               >
-                Settings → Planning
-              </button>
-              .
+                <p className="text-base font-semibold text-[#1f1c19]">
+                  Your plan may have changed since your last check-in.
+                </p>
+                <p className="mt-2 text-sm text-[#6b635a]">You originally said:</p>
+                <ul className="mt-1 list-inside list-disc text-sm text-[#6b635a]">
+                  {realityPrompt.realitySummary.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
+                <p className="mt-2 text-sm text-[#6b635a]">
+                  {realityPrompt.reasons[0]}
+                </p>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={handleKeepCurrentReality}
+                    className="rounded-xl border border-[#c9bfb0] bg-white px-3 py-2 text-sm font-semibold text-[#6b635a] hover:bg-[#f5f0ea]"
+                  >
+                    Keep Current Reality
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleUpdateTodaysReality}
+                    className="rounded-xl border border-[#1e4f4f]/30 bg-[#1e4f4f] px-3 py-2 text-sm font-semibold text-white hover:bg-[#163c3c]"
+                  >
+                    Update Today&apos;s Reality
+                  </button>
+                </div>
+              </div>
+            ) : null}
+            <TodaysRealitySummary />
+            <p className="text-center text-sm text-[#9a8f82]">
+              Add a task → decide where it belongs → work the board. Kanban:
+              Considering Today → Today&apos;s Focus → In Progress. Tap ✓ to
+              complete — items archive and leave the board.
             </p>
+            <PlanDayAddForm onAdd={handleAdd} />
+            {view !== "kanban" ? renderTaskView() : null}
+          </div>
+          {view === "kanban" ? (
+            <div className={`mt-4 ${PLAN_KANBAN_BOARD_CLASS}`}>
+              {renderTaskView()}
+            </div>
           ) : null}
-        </div>
+          {onOpenSettings ? (
+            <div className={`mt-4 ${PLAN_CENTERED_CLASS}`}>
+              <p className="text-base text-[#6b635a]">
+                Set your default view in{" "}
+                <button
+                  type="button"
+                  onClick={onOpenSettings}
+                  className="font-semibold text-[#1e4f4f] hover:underline"
+                >
+                  Settings → Planning
+                </button>
+                .
+              </p>
+            </div>
+          ) : null}
+        </>
       )}
     </div>
   );

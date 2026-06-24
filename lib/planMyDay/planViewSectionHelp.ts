@@ -12,6 +12,7 @@ export const PLAN_VIEW_SECTION_HELP: Partial<
   kanban: {
     title: "Daily workflow",
     bullets: [
+      "Add tasks above the board — then decide which column they belong in.",
       "Considering Today — what is on your radar.",
       "Today's Focus — what matters most today.",
       "In Progress — what you are actively doing.",

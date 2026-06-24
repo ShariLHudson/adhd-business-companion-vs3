@@ -7,6 +7,12 @@ import {
 import type { PlanDayItem, PlanItemColumn, PlanItemPriority } from "./types";
 import type { PlanLifeDomain } from "./types";
 import { inferPlanLifeDomain, PLAN_DOMAIN_PALETTE } from "./planItemColors";
+import {
+  completePlanItem,
+  type CompletePlanItemResult,
+  type PlanTaskSourceWorkspace,
+} from "./planTaskCompletion";
+import { recordPlanBehaviorEvent } from "./planBehaviorLearning";
 
 const STORE_KEY = "companion-plan-my-day-items-v1";
 const DEFERRED_STORE_KEY = "companion-plan-my-day-deferred-v1";
@@ -128,6 +134,30 @@ export function planItemPriorityWeight(item: PlanDayItem): number {
   return PRIORITY_WEIGHT[item.priority ?? "medium"];
 }
 
+function sanitizeActiveItems(items: PlanDayItem[]): PlanDayItem[] {
+  return items
+    .filter((i) => !i.done && i.column !== "done")
+    .map((i) => {
+      if (i.column === "parked") {
+        return { ...i, column: "ready" as PlanItemColumn };
+      }
+      return i;
+    });
+}
+
+export function finishPlanItem(
+  items: PlanDayItem[],
+  id: string,
+  options?: { sourceWorkspace?: PlanTaskSourceWorkspace },
+): CompletePlanItemResult | null {
+  const result = completePlanItem(items, id, options);
+  if (!result) return null;
+  return {
+    ...result,
+    items: saveTodayPlanItems(result.items),
+  };
+}
+
 function uid(): string {
   return `plan-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
@@ -161,7 +191,7 @@ export function seedPlanItemsFromSources(): PlanDayItem[] {
   const items: PlanDayItem[] = [];
 
   const blocks = getTimeBlocks().filter(
-    (b) => b.date === today && b.status !== "not-today",
+    (b) => b.date === today && b.status !== "not-today" && b.status !== "completed",
   );
   for (const b of blocks) {
     const key = b.title.trim().toLowerCase();
@@ -226,8 +256,10 @@ export function loadTodayPlanItems(): PlanDayItem[] {
   let shouldPersist = false;
 
   if (stored?.date === today) {
-    // Already hydrated for today — including an intentional empty plan.
-    items = stored.items;
+    items = sanitizeActiveItems(stored.items);
+    if (items.length !== stored.items.length) {
+      shouldPersist = true;
+    }
   } else {
     items = seedPlanItemsFromSources();
     shouldPersist = true;
@@ -254,6 +286,38 @@ export function readTodayPlanItems(): PlanDayItem[] {
     return stored.items;
   }
   return [];
+}
+
+/** Reset Day — clear today's active plan and start again (same calendar day). */
+export function resetPlanDayView(): PlanDayItem[] {
+  return saveTodayPlanItems([]);
+}
+
+/** Remove completed items from today's active plan list. */
+export function clearCompletedPlanItems(): PlanDayItem[] {
+  return saveTodayPlanItems(
+    readTodayPlanItems().filter((i) => !i.done && i.column !== "done"),
+  );
+}
+
+/** New Day — keep unfinished tasks, drop completed from active view. */
+export function carryForwardUnfinishedPlanItems(): PlanDayItem[] {
+  const unfinished = sanitizeActiveItems(readTodayPlanItems()).map((i) => ({
+    ...i,
+    done: false,
+    column:
+      i.column === "doing"
+        ? ("today" as PlanItemColumn)
+        : i.column === "done"
+          ? ("ready" as PlanItemColumn)
+          : i.column,
+  }));
+  return saveTodayPlanItems(unfinished);
+}
+
+/** Archive today's plan snapshot and clear the planning view. */
+export function archiveTodayPlan(): void {
+  resetTodayPlanForNewDay();
 }
 
 /** Archive the current plan snapshot and clear today's planning view for a new-day reset. */
@@ -297,11 +361,11 @@ export function movePlanItemColumn(
 export type KanbanMoveResult = {
   items: PlanDayItem[];
   enteredDoing: boolean;
-  enteredDone: boolean;
+  completed: CompletePlanItemResult | null;
   itemTitle: string;
 };
 
-/** Kanban drag — updates column immediately with focus + completion side effects. */
+/** Kanban drag — column moves only (completion is separate). */
 export function movePlanItemKanban(
   items: PlanDayItem[],
   id: string,
@@ -312,27 +376,30 @@ export function movePlanItemKanban(
     return {
       items,
       enteredDoing: false,
-      enteredDone: false,
+      completed: null,
       itemTitle: "",
     };
   }
 
-  const prevColumn = item.column;
-  const patch: Partial<PlanDayItem> = { column };
-
   if (column === "done") {
-    patch.done = true;
-    patch.keptForReference = false;
-  } else {
-    patch.done = false;
+    const completed = finishPlanItem(items, id, { sourceWorkspace: "kanban" });
+    return {
+      items: completed?.items ?? items,
+      enteredDoing: false,
+      completed,
+      itemTitle: item.title,
+    };
   }
+
+  const prevColumn = item.column;
+  const patch: Partial<PlanDayItem> = { column, done: false };
 
   if (column === "doing") {
     patch.snoozedUntil = undefined;
     patch.focusRank = Date.now();
   }
 
-  if (column === "parked" || column === "ready") {
+  if (column === "parked" || column === "ready" || column === "today") {
     patch.snoozedUntil = undefined;
   }
 
@@ -343,7 +410,7 @@ export function movePlanItemKanban(
   return {
     items: next,
     enteredDoing: column === "doing" && prevColumn !== "doing",
-    enteredDone: column === "done" && prevColumn !== "done",
+    completed: null,
     itemTitle: item.title,
   };
 }
@@ -351,14 +418,21 @@ export function movePlanItemKanban(
 export function togglePlanItemDone(
   items: PlanDayItem[],
   id: string,
-): PlanDayItem[] {
+): CompletePlanItemResult | { items: PlanDayItem[]; completed: null } {
   const item = items.find((i) => i.id === id);
-  if (!item) return items;
-  const done = !item.done;
-  return updatePlanItem(items, id, {
-    done,
-    column: done ? "done" : item.column === "done" ? "ready" : item.column,
-  });
+  if (!item) return { items, completed: null };
+  if (item.done) {
+    return {
+      items: updatePlanItem(items, id, {
+        done: false,
+        column: item.column === "done" ? "ready" : item.column,
+      }),
+      completed: null,
+    };
+  }
+  const completed = finishPlanItem(items, id, { sourceWorkspace: "plan-my-day" });
+  if (!completed) return { items, completed: null };
+  return completed;
 }
 
 /** Active in today's working list — not completed, parked, or snoozed. */
@@ -402,6 +476,14 @@ export function snoozePlanItem(
   id: string,
   minutes = 30,
 ): PlanDayItem[] {
+  const item = items.find((i) => i.id === id);
+  if (item) {
+    recordPlanBehaviorEvent({
+      kind: "snoozed",
+      planItemId: item.id,
+      title: item.title,
+    });
+  }
   const until = new Date(Date.now() + minutes * 60_000).toISOString();
   return updatePlanItem(items, id, { snoozedUntil: until });
 }
@@ -414,6 +496,12 @@ export function deferPlanItemToDate(
 ): PlanDayItem[] {
   const item = items.find((i) => i.id === id);
   if (!item || targetDate === todayStr()) return items;
+
+  recordPlanBehaviorEvent({
+    kind: "deferred",
+    planItemId: item.id,
+    title: item.title,
+  });
 
   const moved: PlanDayItem = {
     ...item,

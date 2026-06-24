@@ -6,7 +6,7 @@ export type PlanningViewMode =
   | "cards"
   | "kanban";
 
-export type PlanItemColumn = "ready" | "doing" | "done" | "parked";
+export type PlanItemColumn = "ready" | "today" | "doing" | "done" | "parked";
 
 export type PlanLifeDomain =
   | "business"
@@ -59,10 +59,9 @@ export const KANBAN_COLUMNS: {
   label: string;
   hint: string;
 }[] = [
-  { id: "ready", label: "Ready", hint: "Planned but not started" },
-  { id: "doing", label: "Doing", hint: "Currently being worked on" },
-  { id: "done", label: "Done", hint: "Completed" },
-  { id: "parked", label: "Parked", hint: "Not doing today" },
+  { id: "ready", label: "Considering Today", hint: "Ideas still on your radar" },
+  { id: "today", label: "Today's Focus", hint: "What matters most today" },
+  { id: "doing", label: "In Progress", hint: "What you are working on now" },
 ];
 
 export const PLANNING_VIEW_OPTIONS: {
@@ -73,21 +72,21 @@ export const PLANNING_VIEW_OPTIONS: {
   {
     id: "list",
     label: "List",
-    desc: "Simple checklist — today’s focus at a glance.",
+    desc: "Today's focus at a glance — a daily decision list, not long-term storage.",
   },
   {
     id: "timeline",
     label: "Timeline",
-    desc: "See your day in time blocks.",
+    desc: "See what fits in the time you actually have today.",
   },
   {
     id: "cards",
     label: "Cards",
-    desc: "Visual separation with duration on each card.",
+    desc: "Visual separation for what belongs in today's plan.",
   },
   {
     id: "kanban",
     label: "Kanban",
-    desc: "Ready · Doing · Done · Parked — drag tasks as you go.",
+    desc: "Considering Today → Today's Focus → In Progress — complete to archive.",
   },
 ];

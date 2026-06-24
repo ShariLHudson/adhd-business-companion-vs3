@@ -77,7 +77,7 @@ import {
   freshStartCopy,
 } from "@/lib/freshStartCopy";
 import { clearDailySessionFlags } from "@/lib/freshStartSession";
-import { resetTodayPlanForNewDay } from "@/lib/planMyDay/planDayItems";
+import { resetTodayPlanForNewDay, resetPlanDayView } from "@/lib/planMyDay/planDayItems";
 import {
   dismissPlanMyDayForSession,
   dismissTodayResume,
@@ -4962,6 +4962,10 @@ export default function CompanionPageClient() {
     setFreshStartDialog("clear-context");
   }
 
+  function requestResetDay() {
+    setFreshStartDialog("reset-day");
+  }
+
   function requestBeginNewDay() {
     setFreshStartDialog("begin-new-day");
   }
@@ -4969,10 +4973,17 @@ export default function CompanionPageClient() {
   function confirmFreshStart() {
     if (freshStartDialog === "begin-new-day") {
       beginNewDay();
+    } else if (freshStartDialog === "reset-day") {
+      resetPlanDay();
     } else if (freshStartDialog === "clear-context") {
       clearTodayContext();
     }
     setFreshStartDialog(null);
+  }
+
+  function resetPlanDay() {
+    resetPlanDayView();
+    setPlanMyDayOpenItemId(null);
   }
 
   function beginNewDay() {
@@ -11051,15 +11062,12 @@ export default function CompanionPageClient() {
           <TodayPanel
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
             onResume={resumeHomeItem}
-            onResumeLater={handleTodayResumeLater}
-            onPlanMyDay={() => openSectionBesideChatCore("plan-my-day")}
-            onPlanMyDayLater={handleTodayPlanLater}
           />
         );
       case "plan-my-day":
         return (
           <PlanMyDayPanel
-            onBack={closeWorkspacePanel}
+            onBack={goBack}
             onOpenSettings={() => openHowDoISettings("planning")}
             onStartFocus={() => {
               openSectionBesideChatCore("focus-timer");
@@ -11077,11 +11085,7 @@ export default function CompanionPageClient() {
               });
               openSectionBesideChatCore("projects", "projects");
             }}
-            onOpenAdaptMyDay={() => {
-              setActiveSection("energy");
-              activeSectionRef.current = "energy";
-              setActiveNav("focus");
-            }}
+            onOpenAdaptMyDay={openAdaptMyDayCore}
             initialOpenItemId={planMyDayOpenItemId}
           />
         );

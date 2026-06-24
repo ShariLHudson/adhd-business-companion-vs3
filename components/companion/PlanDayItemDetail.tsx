@@ -7,6 +7,7 @@ import {
   deferPlanItemToDate,
   deletePlanItem,
   duplicatePlanItem,
+  finishPlanItem,
   formatPlanDueDate,
   formatPlanItemCreated,
   movePlanItemColumn,
@@ -37,6 +38,7 @@ type Props = {
   onStartNow?: (item: PlanDayItem) => void;
   onOpenProject?: (projectId: string) => void;
   onOpenNextItem?: (id: string) => void;
+  onCompleted?: (message: string) => void;
   initialMode?: PlanItemDetailMode;
   onModeChange?: (mode: PlanItemDetailMode) => void;
   hideClose?: boolean;
@@ -107,6 +109,7 @@ export function PlanDayItemDetail({
   onStartNow,
   onOpenProject,
   onOpenNextItem,
+  onCompleted,
   initialMode = "form",
   onModeChange,
   hideClose = false,
@@ -189,32 +192,20 @@ export function PlanDayItemDetail({
   }
 
   function handleMarkDoneChoice(
-    choice: "keep-reference" | "move-completed" | "duplicate" | "open-next",
+    choice: "complete" | "duplicate" | "open-next",
   ) {
-    let next = updatePlanItem(items, item.id, buildPatch());
-    if (choice === "keep-reference") {
-      apply(
-        updatePlanItem(next, item.id, {
-          keptForReference: true,
-          done: false,
-          snoozedUntil: undefined,
-        }),
-      );
-      onClose();
-      return;
-    }
-    if (choice === "move-completed") {
-      apply(movePlanItemColumn(next, item.id, "done"));
-      onClose();
-      return;
-    }
+    const next = updatePlanItem(items, item.id, buildPatch());
     if (choice === "duplicate") {
       apply(duplicatePlanItem(next, item.id));
       onClose();
       return;
     }
-    const followUp = nextFocusOptions(next, item.id)[0];
-    apply(movePlanItemColumn(next, item.id, "done"));
+    const followUp =
+      choice === "open-next" ? nextFocusOptions(next, item.id)[0] : undefined;
+    const result = finishPlanItem(next, item.id, { sourceWorkspace: "plan-my-day" });
+    if (!result) return;
+    onItemsChange(result.items);
+    onCompleted?.(result.toast);
     if (followUp) {
       onOpenNextItem?.(followUp.id);
     } else {
@@ -253,8 +244,7 @@ export function PlanDayItemDetail({
         <ul className="mt-4 flex flex-col gap-2" role="radiogroup">
           {(
             [
-              ["keep-reference", "Keep it for reference"],
-              ["move-completed", "Move to completed"],
+              ["complete", "Done — remove from today"],
               ["duplicate", "Duplicate it"],
               ["open-next", "Open next item"],
             ] as const

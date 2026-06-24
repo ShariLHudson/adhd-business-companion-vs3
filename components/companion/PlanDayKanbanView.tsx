@@ -16,6 +16,7 @@ type Props = {
   items: PlanDayItem[];
   onOpen: (id: string) => void;
   onDrop: (id: string, column: PlanItemColumn) => void;
+  onComplete: (id: string) => void;
   colorCoding: boolean;
 };
 
@@ -23,16 +24,13 @@ function itemsForColumn(
   items: PlanDayItem[],
   column: PlanItemColumn,
 ): PlanDayItem[] {
-  if (column === "done") {
-    return items.filter((i) => i.done || i.column === "done");
-  }
-  if (column === "parked") {
-    return items.filter((i) => i.column === "parked" && !i.done);
-  }
   if (column === "doing") {
     return items
       .filter((i) => i.column === "doing" && !i.done)
       .sort((a, b) => (b.focusRank ?? 0) - (a.focusRank ?? 0));
+  }
+  if (column === "today") {
+    return items.filter((i) => i.column === "today" && isPlanItemActive(i));
   }
   return items.filter((i) => i.column === "ready" && isPlanItemActive(i));
 }
@@ -43,6 +41,7 @@ function KanbanCard({
   isDragging,
   isTopFocus,
   onOpen,
+  onComplete,
   onBeginDrag,
   onDragEnd,
 }: {
@@ -51,6 +50,7 @@ function KanbanCard({
   isDragging: boolean;
   isTopFocus?: boolean;
   onOpen: (id: string) => void;
+  onComplete: (id: string) => void;
   onBeginDrag: (id: string) => void;
   onDragEnd: () => void;
 }) {
@@ -109,6 +109,18 @@ function KanbanCard({
           </span>
         ) : null}
       </button>
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onComplete(item.id);
+        }}
+        className="flex shrink-0 items-center px-2.5 text-lg font-semibold text-[#1e4f4f] hover:bg-[#f0f5f5]"
+        aria-label={`Complete ${item.title}`}
+        title="Mark complete"
+      >
+        ✓
+      </button>
     </li>
   );
 }
@@ -122,6 +134,7 @@ function KanbanColumn({
   isDropTarget,
   draggingId,
   onOpen,
+  onComplete,
   onBeginDrag,
   onDragEnd,
   onDragOver,
@@ -136,6 +149,7 @@ function KanbanColumn({
   isDropTarget: boolean;
   draggingId: string | null;
   onOpen: (id: string) => void;
+  onComplete: (id: string) => void;
   onBeginDrag: (id: string) => void;
   onDragEnd: () => void;
   onDragOver: (e: DragEvent) => void;
@@ -144,7 +158,7 @@ function KanbanColumn({
 }) {
   return (
     <div
-      className={`flex min-h-[12rem] min-w-[min(100%,220px)] flex-1 flex-col rounded-2xl border p-2 transition-colors ${
+      className={`flex min-h-[12rem] flex-col rounded-2xl border p-2 transition-colors ${
         isDropTarget
           ? "border-[#1e4f4f]/50 bg-[#f0f8f8]/90 ring-2 ring-[#1e4f4f]/20"
           : "border-[#e7dfd4] bg-[#faf7f2]/80"
@@ -173,6 +187,7 @@ function KanbanColumn({
               isDragging={draggingId === item.id}
               isTopFocus={column === "doing" && index === 0}
               onOpen={onOpen}
+              onComplete={onComplete}
               onBeginDrag={onBeginDrag}
               onDragEnd={onDragEnd}
             />
@@ -187,6 +202,7 @@ export function PlanDayKanbanView({
   items,
   onOpen,
   onDrop,
+  onComplete,
   colorCoding,
 }: Props) {
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -219,11 +235,11 @@ export function PlanDayKanbanView({
   }
 
   return (
-    <div>
-      <p className="text-base text-[#6b635a]">
+    <div className="w-full min-w-0">
+      <p className="text-center text-base text-[#6b635a]">
         Drag tasks between columns — click a card to open details.
       </p>
-      <div className="mt-3 flex gap-3 overflow-x-auto pb-2">
+      <div className="mt-3 grid grid-cols-1 gap-3 min-[960px]:grid-cols-3">
         {KANBAN_COLUMNS.map((col) => (
           <KanbanColumn
             key={col.id}
@@ -235,6 +251,7 @@ export function PlanDayKanbanView({
             isDropTarget={dropTarget === col.id}
             draggingId={draggingId}
             onOpen={onOpen}
+            onComplete={onComplete}
             onBeginDrag={beginDrag}
             onDragEnd={endDrag}
             onDragOver={(e) => handleDragOver(e, col.id)}
