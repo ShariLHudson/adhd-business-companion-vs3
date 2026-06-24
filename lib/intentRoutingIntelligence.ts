@@ -33,6 +33,20 @@ import {
   type RegistryArtifactKind,
 } from "./artifactRegistry";
 import { isKnowledgeQuestion } from "./knowledgeIntelligence";
+import { shouldSuppressRelationshipIntelligenceForUserText } from "./relationshipIntelligenceBoundaries";
+import {
+  containsVisualStructurePhrase,
+  isVisualStructureExecution,
+  resolveDecisionStructureWorkspaceOffer,
+  resolveVisualStructureWorkspaceOffer,
+  visualStructureRoutingHintForChat,
+} from "./visualStructureRouting";
+import { visualThinkingStudioHintForChat } from "./visualThinkingStudio";
+import { visualThinkingOverreachHintForChat } from "./visualThinkingOverreach";
+import { visualRecommendationEngineHintForChat } from "./visualRecommendationEngine";
+import { visualLearnBoundaryHintForChat } from "./visualLearnBoundary";
+import { visualThinkingGuardsHintForChat } from "./visualThinkingGuards";
+import { visualTypeAvailabilityHintForChat } from "./visualTypeAvailability";
 import {
   detectDoingIntent,
   type WorkspaceOffer,
@@ -231,6 +245,10 @@ function detectIntentCategory(text: string): IntentCategory {
 
   if (isLearnIntent(t)) return "learn";
 
+  if (isVisualStructureExecution(t)) {
+    return /\bhelp me\b/i.test(t) ? "build" : "execute";
+  }
+
   const overwhelmRoute = detectOverwhelmTodayRoute(t);
   if (overwhelmRoute === "brain_dump_primary") return "organize";
   if (overwhelmRoute === "adapt_primary" || overwhelmRoute === "plan_primary") {
@@ -364,6 +382,9 @@ function buildNavigationLine(
     return `This may be easier in ${label}. Would you like to open it?`;
   }
   if (section === "content-generator" || section === CREATE_ARTIFACT_SECTION) {
+    if (containsVisualStructurePhrase(userText)) {
+      return resolveVisualStructureWorkspaceOffer(userText)?.line ?? "";
+    }
     if (detectArtifactRequest(userText)) {
       const kind = detectArtifactRequest(userText)!;
       return buildCreateArtifactOffer(kind, category).line;
@@ -451,6 +472,12 @@ function detectFeatureOffer(
   overwhelmRoute?: OverwhelmTodayRoute | null,
   artifactKind?: ArtifactKind | null,
 ): WorkspaceOffer | null {
+  const visualOffer = resolveVisualStructureWorkspaceOffer(text);
+  if (visualOffer) return visualOffer;
+
+  const decisionOffer = resolveDecisionStructureWorkspaceOffer(text);
+  if (decisionOffer && category === "decide") return decisionOffer;
+
   if (category === "understand" || category === "learn" || category === "clarify") {
     return null;
   }
@@ -685,8 +712,10 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
       : null;
   const suppressConversationSummary = Boolean(overwhelmTodayRoute);
   const learnFastPath = category === "learn" && isLearnIntent(text);
-  const suppressRelationshipIntelligence = artifactExecution || learnFastPath;
-  const suppressDeepIntelligence = learnFastPath;
+  const suppressRelationshipIntelligence =
+    shouldSuppressRelationshipIntelligenceForUserText(text);
+  const suppressDeepIntelligence =
+    suppressRelationshipIntelligence || learnFastPath;
 
   const decision: IntentRoutingDecision = {
     category,
@@ -720,7 +749,8 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     learnFastPath,
     suppressWisdomIntelligence: suppressDeepIntelligence,
     suppressTransformationIntelligence: suppressDeepIntelligence,
-    suppressObservationEngine: suppressDeepIntelligence || artifactExecution,
+    suppressObservationEngine:
+      suppressRelationshipIntelligence || learnFastPath || artifactExecution,
     stayHereChatGuidance: overwhelmTodayRoute
       ? OVERWHELM_TODAY_STAY_HERE_GUIDANCE
       : null,
@@ -740,7 +770,9 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     featureLabel: offer ? featureLabelForSection(offer.section) : null,
   };
 
-  decision.suppressRelationshipLead = shouldSuppressRelationshipLeadForRouting(decision);
+  decision.suppressRelationshipLead =
+    suppressRelationshipIntelligence ||
+    shouldSuppressRelationshipLeadForRouting(decision);
   return decision;
 }
 
@@ -773,6 +805,15 @@ export function intentRoutingHintForChat(
       : null,
     decision.suppressRelationshipIntelligence && !decision.learnFastPath
       ? [
+          "RELATIONSHIP INTELLIGENCE BOUNDARIES™ (P0.17): This is NOT a self-understanding turn.",
+          "ACTION FIRST — answer directly; help them learn, create, plan, decide, or execute.",
+          visualStructureRoutingHintForChat(),
+          visualThinkingStudioHintForChat(),
+          visualThinkingOverreachHintForChat(),
+          visualRecommendationEngineHintForChat(),
+          visualLearnBoundaryHintForChat(),
+          visualThinkingGuardsHintForChat(),
+          visualTypeAvailabilityHintForChat(),
           "EXECUTE OVERRIDE (P0.7.3): Direct action only — minimal clarification or Create redirect.",
           "SKIP relationship observations, observation engine, and reflection-first openers entirely.",
           "FORBIDDEN: I've noticed…, behavioral analysis, ADHD pattern explanations, user history recap.",

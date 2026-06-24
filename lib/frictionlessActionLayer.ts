@@ -22,6 +22,56 @@ import {
   resolveIntentRouting,
   type IntentRoutingDecision,
 } from "./intentRoutingIntelligence";
+import { shouldSuppressRelationshipIntelligenceForUserText } from "./relationshipIntelligenceBoundaries";
+import {
+  containsVisualStructurePhrase,
+  resolveVisualStructureRoute,
+  resolveVisualStructureWorkspaceOffer,
+} from "./visualStructureRouting";
+import { shouldSuppressVisualThinkingForLearn } from "./visualLearnBoundary";
+import {
+  buildOverwhelmTodayOffers,
+  detectOverwhelmTodayRoute,
+} from "./overwhelmTodayRouting";
+import {
+  buildStrategyOfferPendingFromRecommendation,
+  shouldSkipStrategyOfferForUserText,
+} from "./strategyOfferContinuation";
+import { recommendStrategyFromUserText } from "./strategyIntelligence";
+import {
+  resolveUnavailableVisualTypeReply,
+} from "./visualTypeAvailability";
+import { clearVisualRecommendationPending } from "./visualThinkingContinuation";
+import {
+  isActivationProblem,
+  isMotivationProblem,
+  isOverwhelmProblem,
+  isRelationshipQuestion,
+  isStrategyProblem,
+  shouldSuppressVisualRecommendation,
+} from "./visualThinkingGuards";
+import {
+  buildVisualRecommendationReply,
+  recommendVisualStructures,
+  shouldOfferVisualRecommendation,
+  visualRecommendationPendingFromReply,
+} from "./visualRecommendationEngine";
+import { shouldBlockVisualThinking } from "./visualThinkingOverreach";
+import {
+  detectConversionTargetView,
+  detectExplicitVisualView,
+  immediateVisualOpenAck,
+  isVisualConversionRequest,
+  shouldRouteBusinessStrategyToCreate,
+  type VisualThinkingViewId,
+} from "./visualThinkingStudio";
+import {
+  detectSheetIntent,
+  shouldExcludeSheetOffer,
+  startGoogleSheetIntake,
+  type GoogleSheetIntakeSession,
+  type GoogleSheetTypeId,
+} from "./googleSheetsIntelligence";
 import type { WorkspaceOffer } from "./workspaceMode";
 
 export type FrictionlessActionCategory =
@@ -30,16 +80,35 @@ export type FrictionlessActionCategory =
   | "emotional_regulation"
   | "focus_support"
   | "decision_support"
+  | "google_sheet"
   | "none";
 
 export type FrictionlessPendingAction = {
-  type: "open_tool" | "open_workspace";
-  target: AppSection | "focus-audio" | "breathe" | "focus-timer" | "brain-dump";
+  type:
+    | "open_tool"
+    | "open_workspace"
+    | "create_google_sheet"
+    | "strategy_offer"
+    | "visual_thinking_menu"
+    | "visual_recommendation";
+  target: AppSection | "focus-audio" | "breathe" | "focus-timer" | "brain-dump" | "google-workspace";
   label?: string;
   context: string;
   artifactType?: string;
   initialPrompt?: string;
+  visualFocusMode?: import("./visualFocus/types").VisualFocusMode;
+  viewId?: VisualThinkingViewId;
+  viewTitle?: string;
+  menuOffer?: import("./visualThinkingStudio").VisualThinkingMenuOffer;
+  recommendations?: import("./visualRecommendationEngine").VisualRecommendationItem[];
+  sourceText?: string;
   focusAudioCategory?: string;
+  sheetType?: GoogleSheetTypeId;
+  sheetTitle?: string;
+  sheetCsv?: string;
+  sheetColumns?: string[];
+  strategyId?: string;
+  strategyTitle?: string;
   offeredAtTurn: number;
   offerSummary: string;
 };
@@ -64,6 +133,14 @@ export type FrictionlessActionDecision = {
   toolSuggestion: ToolSuggestion | null;
   workspaceOffer: WorkspaceOffer | null;
   intentRouting: IntentRoutingDecision | null;
+  googleSheetIntake?: GoogleSheetIntakeSession;
+  immediateVisualOpen?: {
+    mode: import("./visualFocus/types").VisualFocusMode;
+    viewId: VisualThinkingViewId;
+    viewTitle: string;
+    purposeAnswer?: string;
+    ack: string;
+  };
 };
 
 const STORAGE_KEY = "companion-frictionless-pending-v1";
@@ -79,7 +156,7 @@ const PRODUCTIVITY_FRAMING_RE =
   /\b(?:plan my day|marketing plan|launch|revenue|clients?|business|productivity|get more done|prioritize my day)\b/i;
 
 const AFFIRMATION_RE =
-  /^(?:yes|yep|yeah|yup|sure|ok(?:ay)?|please|do that|open it|do it|go ahead|let'?s do it|sounds good|that works|perfect|great)\.?$/i;
+  /^(?:yes|yep|yeah|yup|sure|ok(?:ay)?|please|do that|open it|do it|go ahead|let'?s do it|use it|let'?s use it|sounds good|that works|perfect|great)\.?$/i;
 
 export function isFrictionlessAffirmation(text: string): boolean {
   return AFFIRMATION_RE.test(text.trim());
@@ -128,16 +205,39 @@ export function frictionlessPendingAck(action: FrictionlessPendingAction): strin
     return "Opening **Breathe & Reset** — follow along on screen.";
   }
   if (action.target === "content-generator") {
-    return "Opening **Create**.";
+    return "Opening Create.";
   }
   if (action.target === "decision-compass") {
-    return "Opening **Decision Compass**.";
+    return "Opening Decision Compass.";
+  }
+  if (action.target === "visual-focus") {
+    const title = action.viewTitle?.trim();
+    return title
+      ? `Opening **${title}** in Visual Thinking.`
+      : "Opening Visual Thinking.";
+  }
+  if (
+    (action.type === "visual_thinking_menu" ||
+      action.type === "visual_recommendation") &&
+    action.viewTitle
+  ) {
+    return `Opening **${action.viewTitle}** in Visual Thinking.`;
   }
   if (action.target === "brain-dump") {
     return "Opening **Clear My Mind**.";
   }
   if (action.target === "plan-my-day") {
     return "Opening **Plan My Day**.";
+  }
+  if (action.type === "create_google_sheet") {
+    return "Creating your Google Sheet.";
+  }
+  if (action.type === "strategy_offer") {
+    const title = action.strategyTitle?.trim();
+    return title ? `Opening **${title}**.` : "Opening that strategy.";
+  }
+  if (action.target === "playbook") {
+    return "Opening Strategies.";
   }
   return "On it.";
 }
@@ -156,12 +256,21 @@ export function frictionlessPendingFromWorkspaceOffer(
       offerSummary: offer.buttonLabel,
     });
   }
+  const view =
+    opts?.userText?.trim() && offer.visualFocusMode
+      ? detectExplicitVisualView(opts.userText) ??
+        detectConversionTargetView(opts.userText)
+      : null;
   return {
     type: "open_workspace",
     target: offer.section,
     context: offer.line,
     offeredAtTurn,
     offerSummary: offer.buttonLabel,
+    initialPrompt: opts?.userText?.trim(),
+    visualFocusMode: offer.visualFocusMode,
+    viewId: view?.id,
+    viewTitle: view?.title,
   };
 }
 
@@ -307,6 +416,28 @@ function buildEmotionalRegulationDecision(
   };
 }
 
+function buildGoogleSheetsIntakeDecision(
+  sheetType: GoogleSheetTypeId,
+  userText: string,
+  currentTurn: number,
+): FrictionlessActionDecision {
+  const started = startGoogleSheetIntake(sheetType, userText);
+  return {
+    category: "google_sheet",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "GOOGLE SHEETS INTELLIGENCE (P0.18): One intake question at a time. Offer Google Sheet when ready — not Create.",
+    localReply: started.reply,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: null,
+    googleSheetIntake: started.session,
+  };
+}
+
 function buildDecisionSupportDecision(
   routing: IntentRoutingDecision,
   currentTurn: number,
@@ -363,6 +494,177 @@ function buildCreateFrictionlessPending(input: {
   return pending;
 }
 
+function buildVisualStructureDecision(
+  offer: WorkspaceOffer,
+  userText: string,
+  currentTurn: number,
+  routing: IntentRoutingDecision,
+  route: ReturnType<typeof resolveVisualStructureRoute>,
+): FrictionlessActionDecision {
+  const view =
+    route?.viewId != null
+      ? detectExplicitVisualView(userText) ?? detectConversionTargetView(userText)
+      : null;
+
+  if (route?.immediate && view) {
+    const purpose = isVisualConversionRequest(userText)
+      ? userText
+      : userText.trim();
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "VISUAL THINKING STUDIO (P0.20 Path B): Open Visual Thinking immediately — never Create.",
+      localReply: immediateVisualOpenAck(view),
+      pendingAction: null,
+      immediateVisualOpen: {
+        mode: view.mode,
+        viewId: view.id,
+        viewTitle: view.title,
+        purposeAnswer: purpose,
+        ack: immediateVisualOpenAck(view),
+      },
+      toolSuggestion: null,
+      workspaceOffer: offer,
+      intentRouting: routing,
+    };
+  }
+
+  return {
+    category: "direct_action",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "VISUAL STRUCTURE (P0.17.2): Route to Visual Thinking or Decision Compass — never Create.",
+    localReply: offer.line,
+    pendingAction: frictionlessPendingFromWorkspaceOffer(offer, currentTurn, {
+      userText,
+    }),
+    toolSuggestion: null,
+    workspaceOffer: offer,
+    intentRouting: routing,
+  };
+}
+
+function buildMotivationSupportDecision(
+  currentTurn: number,
+): FrictionlessActionDecision {
+  return {
+    category: "focus_support",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "MOTIVATION SUPPORT (P0.20.3): One small step first — not Visual Thinking. Offer Focus Mode or Focus Audio if helpful.",
+    localReply:
+      "Let's find one small step forward. What's the smallest piece you could touch right now?\n\nIf it helps, we can use **Focus Mode** or **Focus Audio** — want either?",
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: null,
+  };
+}
+
+function buildOverwhelmFrictionlessDecision(
+  userText: string,
+  currentTurn: number,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const route = detectOverwhelmTodayRoute(userText);
+  if (!route) return null;
+  const offers = buildOverwhelmTodayOffers(userText, route);
+  const offer = offers.primary;
+  return {
+    category: "direct_action",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "OVERWHELM (P0.20.3): Route to Plan My Day / Clear My Mind — never Visual Thinking.",
+    localReply: offer.line,
+    pendingAction: frictionlessPendingFromWorkspaceOffer(offer, currentTurn, {
+      userText,
+    }),
+    toolSuggestion: null,
+    workspaceOffer: offer,
+    intentRouting: routing,
+  };
+}
+
+function buildStrategyFrictionlessDecision(
+  userText: string,
+  currentTurn: number,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  if (shouldSkipStrategyOfferForUserText(userText)) return null;
+  if (
+    !isStrategyProblem(userText) &&
+    !isRelationshipQuestion(userText) &&
+    !isActivationProblem(userText)
+  ) {
+    return null;
+  }
+  const rec = recommendStrategyFromUserText(userText);
+  if (!rec || rec.confidence === "low") return null;
+  const pending = buildStrategyOfferPendingFromRecommendation(
+    rec,
+    userText,
+    currentTurn,
+  );
+  return {
+    category: "direct_action",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "STRATEGY INTELLIGENCE (P0.20.3): Offer matching strategy before Visual Thinking.",
+    localReply: rec.offerMessage,
+    pendingAction: pending,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+  };
+}
+
+function buildVisualRecommendationDecision(
+  userText: string,
+  currentTurn: number,
+  routing: IntentRoutingDecision,
+  lastAssistantText?: string,
+): FrictionlessActionDecision {
+  const pending = visualRecommendationPendingFromReply({
+    userText,
+    context: { lastAssistantText },
+    offeredAtTurn: currentTurn,
+  });
+  const reply = buildVisualRecommendationReply(
+    recommendVisualStructures({
+      userText,
+      context: { lastAssistantText },
+    }),
+  );
+  return {
+    category: "direct_action",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "VISUAL RECOMMENDATION ENGINE (P0.20 Path B): Recommend 2–3 structures with reasons — never for ADHD friction.",
+    localReply: reply,
+    pendingAction: pending,
+    toolSuggestion: null,
+    workspaceOffer: {
+      section: "visual-focus",
+      buttonLabel: "Open Visual Thinking",
+      line: reply,
+    },
+    intentRouting: routing,
+  };
+}
+
 function buildDirectActionDecision(
   routing: IntentRoutingDecision,
   userText: string,
@@ -413,9 +715,9 @@ export function resolveFrictionlessAction(
   const currentTurn = input.currentTurn ?? 0;
   const none: FrictionlessActionDecision = {
     category: "none",
-    suppressRelationship: false,
+    suppressRelationship: shouldSuppressRelationshipIntelligenceForUserText(userText),
     suppressRecap: false,
-    suppressReflectionFirst: false,
+    suppressReflectionFirst: shouldSuppressRelationshipIntelligenceForUserText(userText),
     responseHint: null,
     localReply: null,
     pendingAction: null,
@@ -432,6 +734,81 @@ export function resolveFrictionlessAction(
     emotionalState: input.emotionalState,
     overwhelmed: input.overwhelmed,
   });
+
+  if (routing.learnFastPath || shouldSuppressVisualThinkingForLearn(userText)) {
+    clearVisualRecommendationPending();
+    return {
+      ...none,
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "LEARN FAST PATH (P0.20.1): Answer the concept directly — no Visual Thinking open.",
+      intentRouting: routing,
+    };
+  }
+
+  const plannedVisualReply = resolveUnavailableVisualTypeReply(userText);
+  if (plannedVisualReply) {
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "PLANNED VISUAL TYPE (P0.20.1): Feature not built yet — outline in chat or offer mind map.",
+      localReply: plannedVisualReply,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    };
+  }
+
+  const visualRoute = resolveVisualStructureRoute(userText);
+  const visualOffer = resolveVisualStructureWorkspaceOffer(userText);
+  if (
+    visualOffer?.section === "visual-focus" &&
+    !shouldBlockVisualThinking(userText)
+  ) {
+    if (isVisualConversionRequest(userText) && input.lastAssistantText?.trim()) {
+      const view = detectConversionTargetView(userText);
+      if (view) {
+        return {
+          category: "direct_action",
+          suppressRelationship: true,
+          suppressRecap: true,
+          suppressReflectionFirst: true,
+          responseHint:
+            "VISUAL CONVERSION (P0.20): Reuse chat content; open Visual Thinking immediately.",
+          localReply: immediateVisualOpenAck(view),
+          pendingAction: null,
+          immediateVisualOpen: {
+            mode: view.mode,
+            viewId: view.id,
+            viewTitle: view.title,
+            purposeAnswer: input.lastAssistantText.trim(),
+            ack: immediateVisualOpenAck(view),
+          },
+          toolSuggestion: null,
+          workspaceOffer: visualOffer,
+          intentRouting: routing,
+        };
+      }
+    }
+    return buildVisualStructureDecision(
+      visualOffer,
+      userText,
+      currentTurn,
+      routing,
+      visualRoute,
+    );
+  }
+
+  const sheetType = detectSheetIntent(userText);
+  if (sheetType && !shouldExcludeSheetOffer(userText)) {
+    return buildGoogleSheetsIntakeDecision(sheetType, userText, currentTurn);
+  }
 
   const artifact = detectArtifactRequest(userText);
   if (artifact && isRegistryArtifactExecution(userText)) {
@@ -455,18 +832,32 @@ export function resolveFrictionlessAction(
     return buildEmotionalRegulationDecision(currentTurn);
   }
 
+  if (isOverwhelmProblem(userText)) {
+    const overwhelm = buildOverwhelmFrictionlessDecision(
+      userText,
+      currentTurn,
+      routing,
+    );
+    if (overwhelm) return overwhelm;
+  }
+
   if (FOCUS_SUPPORT_RE.test(userText) && !/\boverwhelm/i.test(userText)) {
     return buildFocusSupportDecision(currentTurn);
   }
 
-  if (
-    isDecisionCompassOfferSignal(userText) ||
-    /\bhelp me decide\b/i.test(userText)
-  ) {
-    return buildDecisionSupportDecision(routing, currentTurn);
+  if (isMotivationProblem(userText)) {
+    return buildMotivationSupportDecision(currentTurn);
   }
 
+  const strategyDecision = buildStrategyFrictionlessDecision(
+    userText,
+    currentTurn,
+    routing,
+  );
+  if (strategyDecision) return strategyDecision;
+
   if (routing.learnFastPath) {
+    clearVisualRecommendationPending();
     return {
       ...none,
       suppressRelationship: true,
@@ -478,22 +869,37 @@ export function resolveFrictionlessAction(
     };
   }
 
-  if (routing.suppressRelationshipIntelligence) {
-    return {
-      ...none,
-      category: "direct_action",
-      suppressRelationship: true,
-      suppressRecap: true,
-      suppressReflectionFirst: true,
-      responseHint: routing.suppressRelationshipIntelligence
-        ? "EXECUTE OVERRIDE: direct action only — no relationship lead."
-        : null,
-      workspaceOffer: routing.workspaceOffer,
-      intentRouting: routing,
-    };
+  if (
+    isDecisionCompassOfferSignal(userText) ||
+    /\bhelp me decide\b/i.test(userText)
+  ) {
+    return buildDecisionSupportDecision(routing, currentTurn);
   }
 
-  return none;
+  if (
+    !shouldRouteBusinessStrategyToCreate(userText) &&
+    routing.category !== "learn" &&
+    !routing.learnFastPath &&
+    !shouldSuppressVisualRecommendation(userText) &&
+    shouldOfferVisualRecommendation(userText)
+  ) {
+    return buildVisualRecommendationDecision(
+      userText,
+      currentTurn,
+      routing,
+      input.lastAssistantText,
+    );
+  }
+
+  return {
+    ...none,
+    suppressRelationship:
+      none.suppressRelationship || routing.suppressRelationshipIntelligence,
+    suppressReflectionFirst:
+      none.suppressReflectionFirst || routing.suppressReflectionFirst,
+    suppressRecap: none.suppressRecap || routing.suppressConversationSummary,
+    intentRouting: routing,
+  };
 }
 
 export function shouldSuppressRelationshipForFrictionless(
@@ -517,6 +923,11 @@ export function frictionlessHintForChat(
   if (decision.category === "focus_support") {
     lines.push("Ask what needs attention OR offer Focus Mode / Focus Audio.");
   }
+  if (decision.category === "google_sheet") {
+    lines.push(
+      "One question at a time for sheet intake. Offer Google Sheet creation when ready.",
+    );
+  }
   return lines.join("\n");
 }
 
@@ -533,6 +944,9 @@ export function resolveFrictionlessContinuation(
       artifactType: pending.artifactType,
       initialPrompt: pending.initialPrompt,
     });
+  }
+  if (pending.type === "create_google_sheet") {
+    return { execute: true, ack: frictionlessPendingAck(pending) };
   }
   return { execute: true, ack: frictionlessPendingAck(pending) };
 }

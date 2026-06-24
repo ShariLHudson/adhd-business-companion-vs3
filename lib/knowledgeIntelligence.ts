@@ -4,13 +4,14 @@
  */
 
 import { isRegistryArtifactExecution } from "./artifactRegistry";
+import { isAppHowToQuestion } from "./appFeatureKnowledge";
 
 const USER_FOCUSED_UNDERSTAND_RE =
   /\b(?:why do i|what patterns|patterns have you noticed|how have i changed|how have i grown|why am i stuck|what have you noticed|what do you notice about me|how do i usually|what'?s my pattern|help me understand (?:my|why i|how i)|my biggest strength|what am i good at)\b/i;
 
 /** Triggers for educational / definitional questions about concepts. */
 export const KNOWLEDGE_QUESTION_RE =
-  /\b(?:what is|what are|what does|what do|how does|how do|explain|tell me about|define|difference between|compared to|compare|walk me through|teach me (?:what|about|how)|learn (?:what|about|how))\b/i;
+  /\b(?:what is|what are|what does|what do|how does|how do|how is|how are|when is|when are|when should|why is|why are|explain|tell me about|define|examples of|difference between|compared to|compare|walk me through|teach me (?:what|about|how)|learn (?:what|about|how))\b/i;
 
 const LAYERS_SKIPPED_ON_LEARN = [
   "relationshipIntelligencePriority",
@@ -28,6 +29,7 @@ const ESTIMATED_TOKENS_PER_LAYER = 400;
 export function isKnowledgeQuestion(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (isAppHowToQuestion(t)) return false;
   if (isRegistryArtifactExecution(t)) return false;
   if (USER_FOCUSED_UNDERSTAND_RE.test(t)) return false;
   if (/\bhelp me decide\b/i.test(t)) return false;
@@ -55,16 +57,16 @@ export function extractKnowledgeTopic(text: string): string | null {
   return null;
 }
 
+import { learningPathMenuHintForChat } from "./learningPathMenu";
+
 export function knowledgeIntelligenceHintForChat(userText: string): string {
   const topic = extractKnowledgeTopic(userText);
   return [
-    "KNOWLEDGE INTELLIGENCE™ (P0.10 — answer first, fast path):",
+    "KNOWLEDGE INTELLIGENCE™ (P0.10 — answer first, learning paths):",
     topic ? `Concept: ${topic}.` : "User asks about a concept — NOT about themselves.",
-    "Answer immediately in plain language (definition + optional short numbered example).",
+    learningPathMenuHintForChat(topic),
     "FORBIDDEN openers: I've noticed…, It sounds like…, You seem to…, You're looking to…, This suggests…, This pattern indicates…",
     "No relationship observations, no ADHD pattern analysis, no user-history reflection.",
-    "Do NOT use the teaching-mode numbered menu (1–4 paths) unless they asked to learn step-by-step.",
-    "Optional closing: one line offering a simple example using ADHD Business Ecosystem™ if relevant.",
   ].join("\n");
 }
 

@@ -18,6 +18,13 @@ import {
   resolveFrictionlessContinuation,
   type FrictionlessActionCategory,
 } from "./frictionlessActionLayer";
+import {
+  auditRelationshipIntelligenceScope,
+  isSelfUnderstandingIntent,
+  RELATIONSHIP_INTELLIGENCE_OUT_OF_SCOPE,
+  shouldSuppressRelationshipIntelligenceForUserText,
+} from "./relationshipIntelligenceBoundaries";
+import { buildRelationshipIntelligencePriorityBlock } from "./relationshipIntelligencePrompt";
 import type { AppSection } from "./companionUi";
 
 export type AuditCategory =
@@ -78,6 +85,12 @@ export type CompanionBehaviorAuditCase = {
   maxQuestionsInTurn?: number;
   /** Create artifacts must not route to Projects */
   forbidProjectsRoute?: boolean;
+  /** Pre-seed Google Sheet yes-continuation pending */
+  setupGoogleSheetPending?: boolean;
+  /** Pre-seed strategy offer yes-continuation pending */
+  setupStrategyOfferPending?: boolean;
+  /** Pre-seed generic playbook workspace pending */
+  setupPlaybookPending?: boolean;
   notes?: string;
 };
 
@@ -145,7 +158,8 @@ const FEATURE_ALIASES: Record<string, string[]> = {
   "content-generator": ["create", "content-generator", "content builder"],
   "decision-compass": ["decision compass", "decision-compass"],
   "plan-my-day": ["plan my day", "plan-my-day"],
-  "brain-dump": ["clear my mind", "brain-dump", "mind map"],
+  "brain-dump": ["clear my mind", "brain-dump"],
+  "visual-focus": ["visual thinking", "visual-focus", "mind map", "decision tree"],
   "client-avatars": ["client avatar", "audience profile", "client-avatars"],
   energy: ["adapt my day", "energy"],
   "focus-audio": ["focus audio", "focus-audio"],
@@ -169,6 +183,17 @@ function featureMatches(actual: string | null, expected: string | null): boolean
   return false;
 }
 
+function isVisualThinkingFrictionless(
+  frictionless: ReturnType<typeof resolveFrictionlessAction>,
+): boolean {
+  return (
+    Boolean(frictionless.immediateVisualOpen) ||
+    frictionless.pendingAction?.type === "visual_thinking_menu" ||
+    frictionless.pendingAction?.type === "visual_recommendation" ||
+    frictionless.workspaceOffer?.section === "visual-focus"
+  );
+}
+
 function frictionlessOverridesRouting(
   category: FrictionlessActionCategory,
 ): boolean {
@@ -176,7 +201,8 @@ function frictionlessOverridesRouting(
     category === "emotional_regulation" ||
     category === "focus_support" ||
     category === "decision_support" ||
-    category === "tool_open"
+    category === "tool_open" ||
+    category === "google_sheet"
   );
 }
 
@@ -216,14 +242,17 @@ function deriveActualIntent(input: {
   learnFastPath: boolean;
   isContinuation: boolean;
   hasFeatureNav: boolean;
+  visualThinkingMenu: boolean;
 }): AuditIntent {
   if (input.isContinuation) return "continuation";
   if (input.hasFeatureNav) return "navigate";
+  if (input.visualThinkingMenu) return "plan";
   if (frictionlessOverridesRouting(input.frictionlessCategory)) {
     if (input.frictionlessCategory === "emotional_regulation") return "calm";
     if (input.frictionlessCategory === "focus_support") return "focus";
     if (input.frictionlessCategory === "decision_support") return "decide";
     if (input.frictionlessCategory === "tool_open") return "navigate";
+    if (input.frictionlessCategory === "google_sheet") return "create";
   }
   if (input.learnFastPath || input.routingCategory === "learn") return "learn";
   return mapRoutingCategoryToIntent(input.routingCategory);
@@ -281,11 +310,13 @@ function userFacingResponseText(
 }
 
 function buildSuppressionSnapshot(input: {
+  userText: string;
   routing: ReturnType<typeof resolveIntentRouting>;
   frictionless: ReturnType<typeof resolveFrictionlessAction>;
 }): AuditSuppressionSnapshot {
   return {
     relationship:
+      shouldSuppressRelationshipIntelligenceForUserText(input.userText) ||
       input.routing.suppressRelationshipIntelligence ||
       input.routing.suppressRelationshipLead ||
       input.frictionless.suppressRelationship,
@@ -374,6 +405,65 @@ export function evaluateCompanionBehaviorCase(
     }
   }
 
+  if (testCase.category === "yes_continuation" && testCase.setupGoogleSheetPending) {
+    const pending = {
+      type: "create_google_sheet" as const,
+      target: "google-workspace" as const,
+      context: "content_calendar",
+      sheetType: "content_calendar" as const,
+      sheetTitle: "Content Calendar — Pinterest",
+      sheetCsv: "Date,Platform\n,Pinterest",
+      sheetColumns: ["Date", "Platform"],
+      artifactType: "Content Calendar",
+      offeredAtTurn: 1,
+      offerSummary: "Create Google Sheet",
+    };
+    const cont = resolveFrictionlessContinuation(userText, pending, 2);
+    if (!cont?.execute) {
+      reasons.push("yes continuation did not execute pending action");
+    } else {
+      isContinuation = true;
+      continuationTarget = pending.target;
+    }
+  }
+
+  if (testCase.category === "yes_continuation" && testCase.setupStrategyOfferPending) {
+    const pending = {
+      type: "strategy_offer" as const,
+      target: "playbook" as const,
+      context: "ugly-first-draft",
+      strategyId: "ugly-first-draft",
+      strategyTitle: "Start Ugly",
+      initialPrompt: "I keep putting off my sales calls.",
+      offeredAtTurn: 2,
+      offerSummary: "Use Start Ugly",
+    };
+    const cont = resolveFrictionlessContinuation(userText, pending, 3);
+    if (!cont?.execute) {
+      reasons.push("yes continuation did not execute pending action");
+    } else {
+      isContinuation = true;
+      continuationTarget = pending.target;
+    }
+  }
+
+  if (testCase.category === "yes_continuation" && testCase.setupPlaybookPending) {
+    const pending = {
+      type: "open_workspace" as const,
+      target: "playbook" as const,
+      context: "strategies",
+      offeredAtTurn: 1,
+      offerSummary: "Open Strategies",
+    };
+    const cont = resolveFrictionlessContinuation(userText, pending, 2);
+    if (!cont?.execute) {
+      reasons.push("yes continuation did not execute pending action");
+    } else {
+      isContinuation = true;
+      continuationTarget = pending.target;
+    }
+  }
+
   const routing = resolveIntentRouting({ userText });
   const frictionless = resolveFrictionlessAction({
     userText,
@@ -393,7 +483,11 @@ export function evaluateCompanionBehaviorCase(
     });
   }
 
-  const actualSuppression = buildSuppressionSnapshot({ routing, frictionless });
+  const actualSuppression = buildSuppressionSnapshot({
+    userText,
+    routing,
+    frictionless,
+  });
   const userFacing = userFacingResponseText(frictionless);
   const guidance = buildGuidancePreview({ userText, routing, frictionless });
 
@@ -403,6 +497,9 @@ export function evaluateCompanionBehaviorCase(
     learnFastPath: routing.learnFastPath,
     isContinuation,
     hasFeatureNav: Boolean(featureNav),
+    visualThinkingMenu:
+      frictionless.pendingAction?.type === "visual_thinking_menu" ||
+      frictionless.pendingAction?.type === "visual_recommendation",
   });
 
   const actualRoute = deriveActualRoute({
@@ -411,20 +508,32 @@ export function evaluateCompanionBehaviorCase(
     isContinuation,
   });
 
-  const actualFeature = resolveFeatureLabel({
+  const rawFeature = resolveFeatureLabel({
     section:
-      frictionless.workspaceOffer?.section ??
-      routing.workspaceOffer?.section ??
-      (featureNav?.target?.kind === "workspace"
-        ? featureNav.target.section
-        : null),
-    featureLabel: routing.featureLabel,
-    pendingTarget: continuationTarget,
+      frictionless.category === "google_sheet"
+        ? "google-workspace"
+        : isVisualThinkingFrictionless(frictionless)
+          ? "visual-focus"
+          : frictionless.workspaceOffer?.section ??
+            routing.workspaceOffer?.section ??
+            (featureNav?.target?.kind === "workspace"
+              ? featureNav.target.section
+              : null),
+    featureLabel:
+      frictionless.category === "google_sheet" ||
+      isVisualThinkingFrictionless(frictionless)
+        ? null
+        : routing.featureLabel,
+    pendingTarget:
+      continuationTarget ??
+      (frictionless.category === "google_sheet" ? "google-workspace" : null),
     navLabel:
       featureNav?.target?.kind === "workspace"
         ? featureNav.target.label
         : featureNav?.target?.label ?? null,
   });
+  const actualFeature =
+    rawFeature === "visual-focus" ? "Visual Thinking" : rawFeature;
 
   if (!matchesOne(actualIntent, testCase.expectedIntent)) {
     reasons.push(
@@ -464,7 +573,7 @@ export function evaluateCompanionBehaviorCase(
   }
 
   const maxQuestions = testCase.maxQuestionsInTurn ?? 3;
-  if (userFacing) {
+  if (userFacing && !isVisualThinkingFrictionless(frictionless)) {
     const questionCount = countQuestionsInGuidance(userFacing);
     if (questionCount > maxQuestions) {
       reasons.push(
@@ -486,6 +595,26 @@ export function evaluateCompanionBehaviorCase(
     actualSuppression.relationship
   ) {
     reasons.push("relationship intelligence was suppressed on a reflection turn");
+  }
+
+  const scopeViolation = auditRelationshipIntelligenceScope({
+    userText,
+    relationshipSuppressed: actualSuppression.relationship,
+  });
+  if (scopeViolation === RELATIONSHIP_INTELLIGENCE_OUT_OF_SCOPE) {
+    reasons.push(
+      `${RELATIONSHIP_INTELLIGENCE_OUT_OF_SCOPE}: relationship layer active on non-self-understanding turn`,
+    );
+  }
+
+  if (
+    !actualSuppression.relationship &&
+    !isSelfUnderstandingIntent(userText) &&
+    buildRelationshipIntelligencePriorityBlock(userText)
+  ) {
+    reasons.push(
+      `${RELATIONSHIP_INTELLIGENCE_OUT_OF_SCOPE}: relationship priority block would render`,
+    );
   }
 
   if (
@@ -1008,6 +1137,236 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     expectedSuppressionFlags: { relationship: false },
   },
 
+  // —— P0.17 Relationship boundaries (forbidden) ——
+  {
+    id: "p017-book-adhd",
+    category: "create",
+    userInput: "I want to write a book about ADHD and my experiences.",
+    expectedIntent: ["build", "execute", "conversation"],
+    expectedRoute: ["conversation", "direct_action", "feature_offer"],
+    expectedSuppressionFlags: { relationship: true, reflectionFirst: true },
+    forbiddenOpeners: ["I've noticed"],
+    notes: "Book project — action first, no relationship lead",
+  },
+  {
+    id: "p017-marketing-plan-how",
+    category: "create",
+    userInput: "How do I create a marketing plan?",
+    expectedIntent: ["build", "execute", "learn", "navigate"],
+    expectedRoute: ["feature_offer", "conversation", "direct_action"],
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["I've noticed"],
+  },
+  {
+    id: "p017-mind-map",
+    category: "learn",
+    userInput: "What is a mind map?",
+    expectedIntent: "learn",
+    expectedRoute: "conversation",
+    expectedSuppressionFlags: {
+      relationship: true,
+      learnFastPath: true,
+      wisdom: true,
+      transformation: true,
+      observation: true,
+    },
+    forbiddenOpeners: ["I've noticed"],
+  },
+  {
+    id: "p017-write-email",
+    category: "create",
+    userInput: "I need to write an email.",
+    expectedIntent: ["execute", "build"],
+    expectedRoute: ["direct_action", "feature_offer"],
+    expectedFeature: "Create",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["I've noticed"],
+  },
+  {
+    id: "p017-sales-funnel-what",
+    category: "learn",
+    userInput: "What is a sales funnel?",
+    expectedIntent: "learn",
+    expectedRoute: "conversation",
+    expectedSuppressionFlags: { relationship: true, learnFastPath: true },
+    forbiddenOpeners: ["I've noticed"],
+  },
+  {
+    id: "p017-why-procrastinate",
+    category: "relationship",
+    userInput: "Why do I procrastinate?",
+    expectedIntent: "understand",
+    expectedRoute: "conversation",
+    expectedSuppressionFlags: { relationship: false },
+  },
+
+  // —— P0.17.2 Visual structure routing ——
+  {
+    id: "p0172-decision-tree",
+    category: "create",
+    userInput: "create a decision tree",
+    expectedIntent: ["build", "execute"],
+    expectedRoute: "direct_action",
+    expectedFeature: "Visual Thinking",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["I've noticed", "open Create"],
+  },
+  {
+    id: "p0172-build-decision-tree",
+    category: "create",
+    userInput: "build a decision tree",
+    expectedIntent: ["build", "execute"],
+    expectedRoute: "direct_action",
+    expectedFeature: "Visual Thinking",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["open Create"],
+  },
+  {
+    id: "p0172-mind-map",
+    category: "create",
+    userInput: "create a mind map",
+    expectedIntent: ["build", "execute"],
+    expectedRoute: "direct_action",
+    expectedFeature: "Visual Thinking",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["open Create"],
+  },
+  {
+    id: "p0172-help-mind-map",
+    category: "create",
+    userInput: "help me make a mind map",
+    expectedIntent: ["build", "execute", "create"],
+    expectedRoute: "direct_action",
+    expectedFeature: "Visual Thinking",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["open Create"],
+  },
+  {
+    id: "p0172-visual-map",
+    category: "create",
+    userInput: "visual map",
+    expectedIntent: ["build", "execute", "conversation"],
+    expectedRoute: "direct_action",
+    expectedFeature: "Visual Thinking",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["open Create"],
+  },
+  {
+    id: "p0172-concept-map",
+    category: "create",
+    userInput: "concept map",
+    expectedIntent: ["build", "execute", "conversation"],
+    expectedRoute: "direct_action",
+    expectedFeature: "Visual Thinking",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["open Create"],
+  },
+  {
+    id: "p0172-project-map",
+    category: "create",
+    userInput: "project map",
+    expectedIntent: ["build", "execute", "conversation"],
+    expectedRoute: "direct_action",
+    expectedFeature: "Visual Thinking",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["open Create"],
+  },
+
+  {
+    id: "p020-flowchart",
+    category: "create",
+    userInput: "create a flowchart",
+    expectedIntent: ["build", "execute"],
+    expectedRoute: "direct_action",
+    expectedFeature: "Visual Thinking",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["open Create"],
+  },
+  {
+    id: "p020-course-launch-visual",
+    category: "create",
+    userInput: "I want to launch a course",
+    expectedIntent: ["plan", "build", "execute"],
+    expectedRoute: "direct_action",
+    expectedFeature: "Visual Thinking",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["open Create"],
+  },
+  {
+    id: "p020-hierarchy",
+    category: "create",
+    userInput: "build a hierarchy map",
+    expectedIntent: ["build", "execute"],
+    expectedRoute: "direct_action",
+    expectedFeature: "Visual Thinking",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["open Create"],
+  },
+
+  // —— P0.20.2 Visual Thinking overreach — must NOT route to Visual Thinking ——
+  {
+    id: "p0202-sales-avoidance",
+    category: "strategy",
+    userInput: "I keep putting off my sales calls",
+    expectedIntent: ["strategy", "focus"],
+    expectedRoute: "strategy",
+    expectedFeature: "Strategy Intelligence",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["Visual Thinking", "Mind Map", "Project Map"],
+  },
+  {
+    id: "p0202-procrastination",
+    category: "focus",
+    userInput: "I keep procrastinating",
+    expectedIntent: ["focus", "strategy"],
+    expectedRoute: "focus",
+    expectedFeature: "Focus",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["Visual Thinking", "Mind Map"],
+  },
+  {
+    id: "p0202-overwhelm",
+    category: "organize",
+    userInput: "I'm overwhelmed",
+    expectedIntent: ["organize", "calm"],
+    expectedRoute: "organize",
+    expectedFeature: "Organize",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["Visual Thinking", "Mind Map"],
+  },
+  {
+    id: "p0202-motivation",
+    category: "emotional",
+    userInput: "I need motivation",
+    expectedIntent: ["emotional", "focus"],
+    expectedRoute: "emotional",
+    expectedFeature: "Emotional Regulation",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["Visual Thinking"],
+  },
+
+  // —— P0.20.1 Learn vs Visual ——
+  {
+    id: "p0201-learn-flowchart",
+    category: "learn",
+    userInput: "What is a flowchart and how is it used?",
+    expectedIntent: ["learn"],
+    expectedRoute: "learn",
+    expectedFeature: "Learn",
+    expectedSuppressionFlags: { relationship: true, learnFastPath: true },
+    forbiddenOpeners: ["Visual Thinking", "Opening"],
+  },
+  {
+    id: "p0201-planned-flowchart",
+    category: "create",
+    userInput: "Create a flowchart",
+    expectedIntent: ["build", "execute"],
+    expectedRoute: "direct_action",
+    expectedFeature: "Visual Thinking",
+    expectedSuppressionFlags: { relationship: true },
+    forbiddenOpeners: ["Opening Visual Thinking"],
+  },
+
   // —— 9. Feature Navigation ——
   {
     id: "nav-how-create-sop",
@@ -1104,6 +1463,64 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     expectedRoute: "continuation",
     expectedFeature: "content-generator",
     expectedSuppressionFlags: { relationship: true },
+  },
+  {
+    id: "yes-google-sheet",
+    category: "yes_continuation",
+    setupGoogleSheetPending: true,
+    userInput: "yes",
+    expectedIntent: "continuation",
+    expectedRoute: "continuation",
+    expectedFeature: "google-workspace",
+    expectedSuppressionFlags: { relationship: true },
+  },
+  {
+    id: "yes-strategy-offer",
+    category: "yes_continuation",
+    setupStrategyOfferPending: true,
+    userInput: "yes",
+    expectedIntent: "continuation",
+    expectedRoute: "continuation",
+    expectedFeature: "playbook",
+    expectedSuppressionFlags: { relationship: true },
+  },
+  {
+    id: "yes-playbook-generic",
+    category: "yes_continuation",
+    setupPlaybookPending: true,
+    userInput: "yes",
+    expectedIntent: "continuation",
+    expectedRoute: "continuation",
+    expectedFeature: "playbook",
+    expectedSuppressionFlags: { relationship: true },
+  },
+  {
+    id: "create-content-calendar-sheet",
+    category: "create",
+    userInput: "Help me create a content calendar",
+    expectedIntent: "create",
+    expectedRoute: "google_sheet",
+    expectedFeature: "google-workspace",
+    expectedSuppressionFlags: { relationship: true },
+  },
+  {
+    id: "create-lead-tracker-sheet",
+    category: "create",
+    userInput: "I need a lead tracker",
+    expectedIntent: "create",
+    expectedRoute: "google_sheet",
+    expectedFeature: "google-workspace",
+    expectedSuppressionFlags: { relationship: true },
+  },
+  {
+    id: "create-email-not-sheet",
+    category: "create",
+    userInput: "I need to write an email",
+    expectedIntent: ["create", "execute"],
+    expectedRoute: ["feature_offer", "direct_action", "execute_inline"],
+    expectedFeature: "content-generator",
+    expectedSuppressionFlags: { relationship: true },
+    notes: "Email stays in Create — not Google Sheets",
   },
 ];
 
