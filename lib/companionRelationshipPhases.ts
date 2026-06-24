@@ -8,6 +8,8 @@ import { isPhase2DiscoveryActive, getPhase2DiscoveryState } from "./phase2Progre
 import { isPhase3AdaptiveRelationshipActive } from "./phase3AdaptiveRelationship";
 import { isPhase4BusinessOperatingPartnerActive } from "./phase4BusinessOperatingPartner";
 import { isPhase5CompanionIntelligenceEcosystemActive } from "./phase5CompanionIntelligenceEcosystem";
+import { isPhase6CompanionIntelligenceNetworkActive } from "./phase6CompanionIntelligenceNetwork";
+import { isPhase7BusinessIntelligenceEcosystemActive } from "./businessIntelligenceEcosystem";
 
 export type RelationshipPhaseId =
   | "phase_1_initial_trust"
@@ -77,17 +79,17 @@ export const RELATIONSHIP_PHASES: RelationshipPhaseMeta[] = [
     id: "phase_6_companion_intelligence_network",
     number: 6,
     name: "Companion Intelligence Network",
-    tagline: "Networked companion intelligence.",
-    milestone: "Intelligence scales beyond one user.",
-    status: "future",
+    tagline: "Connected intelligence across the entire ecosystem.",
+    milestone: "Everything I need seems connected.",
+    status: "active",
   },
   {
     id: "phase_7_business_intelligence_ecosystem",
     number: 7,
     name: "Business Intelligence Ecosystem",
-    tagline: "Deep business intelligence layer.",
-    milestone: "Business intelligence compounds.",
-    status: "future",
+    tagline: "Understand the business as a living system.",
+    milestone: "This companion understands my business.",
+    status: "active",
   },
   {
     id: "phase_8_autonomous_preparation",
@@ -118,6 +120,12 @@ export const RELATIONSHIP_PHASES: RelationshipPhaseMeta[] = [
 export function getCurrentRelationshipPhase(): RelationshipPhaseMeta {
   if (!isPhase1OnboardingComplete()) {
     return RELATIONSHIP_PHASES[0]!;
+  }
+  if (isPhase7BusinessIntelligenceEcosystemActive()) {
+    return RELATIONSHIP_PHASES[6]!;
+  }
+  if (isPhase6CompanionIntelligenceNetworkActive()) {
+    return RELATIONSHIP_PHASES[5]!;
   }
   if (isPhase5CompanionIntelligenceEcosystemActive()) {
     return RELATIONSHIP_PHASES[4]!;

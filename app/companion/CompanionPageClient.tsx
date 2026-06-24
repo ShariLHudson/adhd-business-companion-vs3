@@ -626,6 +626,20 @@ import {
   phase5CompanionIntelligenceEcosystemHintForChat,
   recordOpportunityOfferShown,
 } from "@/lib/phase5CompanionIntelligenceEcosystem";
+import {
+  maybeExistingAssetReuseOffer,
+  maybeRelatedResourceDiscoveryOffer,
+  observePhase6NetworkTurn,
+  phase6CompanionIntelligenceNetworkHintForChat,
+  recordNetworkDiscoveryOfferShown,
+  recordNetworkReuseOfferShown,
+} from "@/lib/phase6CompanionIntelligenceNetwork";
+import {
+  maybeBusinessIntelligenceInsight,
+  observePhase7BusinessTurn,
+  phase7BusinessIntelligenceHintForChat,
+  recordBusinessIntelligenceInsightShown,
+} from "@/lib/businessIntelligenceEcosystem";
 import { relationshipPhaseSummaryForChat } from "@/lib/companionRelationshipPhases";
 import {
   createConversationWorkflow,
@@ -8355,6 +8369,9 @@ export default function CompanionPageClient() {
     let phase3AnticipatorySupport: string | null = null;
     let phase4ProactiveSupport: string | null = null;
     let phase5OpportunityOffer: string | null = null;
+    let phase6ReuseOffer: string | null = null;
+    let phase6DiscoveryOffer: string | null = null;
+    let phase7BusinessInsight: string | null = null;
     if (isPhase1OnboardingComplete()) {
       observeFromConversationTurn({
         userText: trimmed,
@@ -8366,6 +8383,8 @@ export default function CompanionPageClient() {
         resourceUsed: resourcePreferenceFromAppSection(workspacePanel) ?? undefined,
       });
       observePhase5EcosystemTurn({ userText: trimmed });
+      observePhase6NetworkTurn({ userText: trimmed });
+      observePhase7BusinessTurn({ userText: trimmed });
       phase2TrustMoment = maybeTrustBuildingMoment();
       if (phase2TrustMoment) recordTrustBuildingMomentShown();
       phase3AwarenessMoment = maybeCompanionAwarenessMoment();
@@ -8376,6 +8395,15 @@ export default function CompanionPageClient() {
       if (phase4ProactiveSupport) recordProactiveBusinessOfferShown();
       phase5OpportunityOffer = maybePredictiveOpportunityOffer();
       if (phase5OpportunityOffer) recordOpportunityOfferShown();
+      phase6ReuseOffer = maybeExistingAssetReuseOffer({ userText: trimmed });
+      if (phase6ReuseOffer) recordNetworkReuseOfferShown();
+      phase6DiscoveryOffer = maybeRelatedResourceDiscoveryOffer({ userText: trimmed });
+      if (phase6DiscoveryOffer) recordNetworkDiscoveryOfferShown();
+      phase7BusinessInsight = maybeBusinessIntelligenceInsight({
+        userText: trimmed,
+        messages: toChatTurns(nextMessages),
+      });
+      if (phase7BusinessInsight) recordBusinessIntelligenceInsightShown();
     }
 
     let compassSessionForApi = decisionCompassSession;
@@ -10126,6 +10154,16 @@ export default function CompanionPageClient() {
                 phase5CompanionIntelligenceEcosystemHintForChat({
                   opportunityOffer: phase5OpportunityOffer,
                   userText: trimmed,
+                }),
+                phase6CompanionIntelligenceNetworkHintForChat({
+                  reuseOffer: phase6ReuseOffer,
+                  discoveryOffer: phase6DiscoveryOffer,
+                  userText: trimmed,
+                }),
+                phase7BusinessIntelligenceHintForChat({
+                  insight: phase7BusinessInsight,
+                  userText: trimmed,
+                  messages: toChatTurns(nextMessages),
                 }),
                 sprint5.trustHint,
                 sprint5.confidenceHint,

@@ -44,6 +44,14 @@ import {
   getPhase5EcosystemState,
   isPhase5CompanionIntelligenceEcosystemActive,
 } from "@/lib/phase5CompanionIntelligenceEcosystem";
+import {
+  formatConnectedEcosystemForPanel,
+  isPhase6CompanionIntelligenceNetworkActive,
+} from "@/lib/phase6CompanionIntelligenceNetwork";
+import {
+  formatBusinessIntelligenceForPanel,
+  isPhase7BusinessIntelligenceEcosystemActive,
+} from "@/lib/businessIntelligenceEcosystem";
 
 function ManualSection({
   title,
@@ -112,12 +120,16 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
     window.addEventListener("companion-phase3-relationship-updated", fn);
     window.addEventListener("companion-phase4-partner-updated", fn);
     window.addEventListener("companion-phase5-ecosystem-updated", fn);
+    window.addEventListener("companion-phase6-network-updated", fn);
+    window.addEventListener("companion-phase7-business-intelligence-updated", fn);
     return () => {
       window.removeEventListener("companion-discovery-updated", fn);
       window.removeEventListener("companion-phase2-discovery-updated", fn);
       window.removeEventListener("companion-phase3-relationship-updated", fn);
       window.removeEventListener("companion-phase4-partner-updated", fn);
       window.removeEventListener("companion-phase5-ecosystem-updated", fn);
+      window.removeEventListener("companion-phase6-network-updated", fn);
+      window.removeEventListener("companion-phase7-business-intelligence-updated", fn);
     };
   }, []);
 
@@ -138,6 +150,8 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
   const phase3Active = isPhase3AdaptiveRelationshipActive();
   const phase4Active = isPhase4BusinessOperatingPartnerActive();
   const phase5Active = isPhase5CompanionIntelligenceEcosystemActive();
+  const phase6Active = isPhase6CompanionIntelligenceNetworkActive();
+  const phase7Active = isPhase7BusinessIntelligenceEcosystemActive();
   const phase5State = phase5Active ? getPhase5EcosystemState() : null;
   const businessStage = phase5State?.businessStage ?? phase1Profile.businessStage;
 
@@ -282,6 +296,24 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
             </div>
           </ManualSection>
         </>
+      ) : null}
+
+      {phase6Active ? (
+        <ManualSection title="Companion Intelligence Network™">
+          <p className="text-sm text-[#6b635a]">
+            The connected ecosystem — so you don&apos;t have to remember where things live.
+          </p>
+          <PanelMarkdown text={formatConnectedEcosystemForPanel()} />
+        </ManualSection>
+      ) : null}
+
+      {phase7Active ? (
+        <ManualSection title="Business Intelligence Ecosystem™">
+          <p className="text-sm text-[#6b635a]">
+            How your business grows, struggles, and where focus matters most — in plain language.
+          </p>
+          <PanelMarkdown text={formatBusinessIntelligenceForPanel()} />
+        </ManualSection>
       ) : null}
 
       <div className="mt-6 flex flex-col gap-4">

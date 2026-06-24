@@ -7,10 +7,15 @@ import {
 import { resetPhase3RelationshipForTests } from "./phase3AdaptiveRelationship";
 import { resetPhase4PartnerForTests } from "./phase4BusinessOperatingPartner";
 import { resetPhase5EcosystemForTests } from "./phase5CompanionIntelligenceEcosystem";
+import { resetPhase6NetworkForTests } from "./phase6CompanionIntelligenceNetwork";
+import { resetPhase7BusinessIntelligenceForTests } from "./businessIntelligenceEcosystem";
 import {
   getCurrentRelationshipPhase,
   RELATIONSHIP_PHASES,
 } from "./companionRelationshipPhases";
+import * as companionStore from "./companionStore";
+import * as savedWorkStore from "./savedWorkStore";
+import * as userStrategies from "./userStrategies";
 
 describe("companionRelationshipPhases", () => {
   beforeEach(() => {
@@ -27,6 +32,8 @@ describe("companionRelationshipPhases", () => {
     resetPhase3RelationshipForTests();
     resetPhase4PartnerForTests();
     resetPhase5EcosystemForTests();
+    resetPhase6NetworkForTests();
+    resetPhase7BusinessIntelligenceForTests();
   });
 
   it("registers all ten relationship phases", () => {
@@ -40,6 +47,15 @@ describe("companionRelationshipPhases", () => {
   });
 
   it("advances to phase 5 when ecosystem criteria are met", () => {
+    vi.spyOn(companionStore, "getProjects").mockReturnValue([]);
+    vi.spyOn(savedWorkStore, "getSavedWork").mockReturnValue([]);
+    vi.spyOn(userStrategies, "getUserStrategies").mockReturnValue([]);
+    vi.spyOn(companionStore, "getTemplates").mockReturnValue([]);
+    vi.spyOn(companionStore, "getSnippets").mockReturnValue([]);
+    vi.spyOn(companionStore, "getBrainDumps").mockReturnValue([]);
+    vi.spyOn(companionStore, "getBusinessProfile").mockReturnValue(null);
+    vi.spyOn(companionStore, "getPrimaryAvatar").mockReturnValue(undefined);
+
     applyPhase1OnboardingTurn({
       messages: [
         { role: "user", content: "Help me build my business and life" },
@@ -82,5 +98,174 @@ describe("companionRelationshipPhases", () => {
     });
 
     expect(getCurrentRelationshipPhase().number).toBe(5);
+  });
+
+  it("advances to phase 6 when connected assets exist", () => {
+    applyPhase1OnboardingTurn({
+      messages: [
+        { role: "user", content: "Help me build my business and life" },
+        { role: "assistant", content: "Tell me about your business?" },
+        { role: "user", content: "Coach for entrepreneurs" },
+        { role: "assistant", content: "What's in your way?" },
+        { role: "user", content: "Overwhelm" },
+        { role: "assistant", content: "What would progress look like?" },
+        { role: "user", content: "More confidence" },
+        { role: "assistant", content: "Did I get that right?" },
+        { role: "user", content: "Yes" },
+      ],
+      userText: "Yes",
+      lastAssistantText: "Did I get that right?",
+    });
+
+    const started = new Date("2025-01-01T10:00:00.000Z").toISOString();
+    patchPhase2DiscoveryState({
+      sessionCount: 25,
+      firstSessionAt: started,
+      lastSessionAt: started,
+      business: { type: "Coach" },
+      goals: [{ text: "Grow visibility", recordedAt: started }],
+      learningStyle: {
+        primary: "visual",
+        confidence: 0.7,
+        signals: { visual: 6 },
+      },
+      adhdPatterns: [{ id: "visibility_resistance", count: 3, lastSeen: started }],
+      resources: [
+        {
+          id: "decision_compass",
+          label: "Decision Compass",
+          helpfulScore: 75,
+          ignoredCount: 0,
+        },
+      ],
+      challenges: [{ label: "Visibility", count: 3, lastSeen: started }],
+    });
+
+    vi.spyOn(companionStore, "getProjects").mockReturnValue([
+      {
+        id: "p1",
+        name: "Workshop",
+        goal: "Launch",
+        goals: [],
+        horizon: "now",
+        status: "in-progress",
+        nextAction: "Plan",
+        color: "#1e4f4f",
+        createdAt: started,
+        updatedAt: started,
+      },
+      {
+        id: "p2",
+        name: "Content plan",
+        goal: "Visibility",
+        goals: [],
+        horizon: "now",
+        status: "in-progress",
+        nextAction: "Draft",
+        color: "#9a6fb0",
+        createdAt: started,
+        updatedAt: started,
+      },
+    ]);
+    vi.spyOn(savedWorkStore, "getSavedWork").mockReturnValue([
+      {
+        id: "sw1",
+        title: "Survey",
+        artifactType: "Form",
+        body: "Questions",
+        status: "saved",
+        savedLocation: "My Work",
+        typeFolder: "Documents",
+        preview: "",
+        tags: [],
+        sourceWorkspace: "create",
+        createdAt: started,
+        updatedAt: started,
+      },
+    ]);
+    vi.spyOn(userStrategies, "getUserStrategies").mockReturnValue([]);
+    vi.spyOn(companionStore, "getTemplates").mockReturnValue([]);
+    vi.spyOn(companionStore, "getSnippets").mockReturnValue([]);
+    vi.spyOn(companionStore, "getBrainDumps").mockReturnValue([]);
+    vi.spyOn(companionStore, "getBusinessProfile").mockReturnValue(null);
+    vi.spyOn(companionStore, "getPrimaryAvatar").mockReturnValue(undefined);
+
+    expect(getCurrentRelationshipPhase().number).toBe(6);
+  });
+
+  it("advances to phase 7 when business intelligence criteria are met", () => {
+    applyPhase1OnboardingTurn({
+      messages: [
+        { role: "user", content: "Help me build my business and life" },
+        { role: "assistant", content: "Tell me about your business?" },
+        { role: "user", content: "Coach for entrepreneurs" },
+        { role: "assistant", content: "What's in your way?" },
+        { role: "user", content: "Overwhelm" },
+        { role: "assistant", content: "What would progress look like?" },
+        { role: "user", content: "More confidence" },
+        { role: "assistant", content: "Did I get that right?" },
+        { role: "user", content: "Yes" },
+      ],
+      userText: "Yes",
+      lastAssistantText: "Did I get that right?",
+    });
+
+    const started = new Date("2025-01-01T10:00:00.000Z").toISOString();
+    patchPhase2DiscoveryState({
+      sessionCount: 25,
+      firstSessionAt: started,
+      lastSessionAt: started,
+      business: { type: "Coach" },
+      goals: [{ text: "Grow revenue", recordedAt: started }],
+      learningStyle: { primary: "visual", confidence: 0.7, signals: { visual: 6 } },
+      adhdPatterns: [{ id: "visibility_resistance", count: 3, lastSeen: started }],
+    });
+
+    vi.spyOn(companionStore, "getProjects").mockReturnValue([
+      {
+        id: "p1",
+        name: "Workshop",
+        goal: "Launch offer",
+        goals: [],
+        horizon: "now",
+        status: "in-progress",
+        nextAction: "Plan",
+        color: "#1e4f4f",
+        createdAt: started,
+        updatedAt: started,
+      },
+    ]);
+    vi.spyOn(savedWorkStore, "getSavedWork").mockReturnValue([
+      {
+        id: "sw1",
+        title: "Survey",
+        artifactType: "Form",
+        body: "Questions",
+        status: "saved",
+        savedLocation: "My Work",
+        typeFolder: "Documents",
+        preview: "",
+        tags: [],
+        sourceWorkspace: "create",
+        createdAt: started,
+        updatedAt: started,
+      },
+    ]);
+    vi.spyOn(userStrategies, "getUserStrategies").mockReturnValue([]);
+    vi.spyOn(companionStore, "getTemplates").mockReturnValue([]);
+    vi.spyOn(companionStore, "getSnippets").mockReturnValue([]);
+    vi.spyOn(companionStore, "getBrainDumps").mockReturnValue([]);
+    vi.spyOn(companionStore, "getBusinessProfile").mockReturnValue({
+      role: "Coach",
+      sells: "Workshop program",
+      goals: ["Grow"],
+      idealClient: "Entrepreneurs",
+      traits: [],
+      tone: "Warm",
+      updatedAt: started,
+    });
+    vi.spyOn(companionStore, "getPrimaryAvatar").mockReturnValue(undefined);
+
+    expect(getCurrentRelationshipPhase().number).toBe(7);
   });
 });
