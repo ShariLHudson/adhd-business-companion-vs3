@@ -27,6 +27,12 @@ import {
   loadWorkspaceSession,
   loadWorkspaceSessionMeta,
 } from "./workspaceSessionStore";
+import { listActiveVisualFocusMaps } from "./visualFocus/store";
+import {
+  myWorkCategoryLabelForMode,
+  visualFocusContinuityLocation,
+} from "./visualFocus/myWorkIntegration";
+import { studioCardTitleForMode } from "./visualFocus/studioCards";
 
 export const CONTINUITY_STORAGE_KEYS = {
   createSession: "companion-create-session-v1",
@@ -39,6 +45,7 @@ export const CONTINUITY_STORAGE_KEYS = {
   decisionCompass: "companion-decision-compass-session-v1",
   strategyApply: "companion-strategy-apply-v1",
   projectContinue: "companion-project-continue-v1",
+  visualFocusMaps: "companion-visual-focus-maps-v1",
 } as const;
 
 export type ContinuityItemType =
@@ -49,7 +56,8 @@ export type ContinuityItemType =
   | "workspace-sop"
   | "saved-work"
   | "decision-compass"
-  | "strategy-apply";
+  | "strategy-apply"
+  | "visual-focus-map";
 
 export type ContinuityResumeAction =
   | "restore-create"
@@ -58,6 +66,7 @@ export type ContinuityResumeAction =
   | "open-saved-work"
   | "restore-decision-compass"
   | "restore-strategy-apply"
+  | "restore-visual-focus"
   | "home-resume";
 
 export type ContinuityManifestItem = {
@@ -71,6 +80,7 @@ export type ContinuityManifestItem = {
   nextStep?: string;
   projectId?: string;
   avatarId?: string;
+  visualFocusMapId?: string;
 };
 
 export type ContinuityManifest = {
@@ -89,6 +99,7 @@ export const HOME_RESUME_CONTINUITY_TYPES: ReadonlySet<ContinuityItemType> =
     "client-avatar",
     "decision-compass",
     "strategy-apply",
+    "visual-focus-map",
   ]);
 
 function sortByTouched(items: ContinuityManifestItem[]): ContinuityManifestItem[] {
@@ -356,6 +367,23 @@ function savedWorkItems(): ContinuityManifestItem[] {
   }));
 }
 
+function visualFocusMapItems(): ContinuityManifestItem[] {
+  return listActiveVisualFocusMaps().map((map) => ({
+    id: `visual-focus:${map.id}`,
+    title: map.title,
+    type: "visual-focus-map" as const,
+    lastTouchedAt: map.updatedAt,
+    location: visualFocusContinuityLocation(map.mode),
+    storageKey: CONTINUITY_STORAGE_KEYS.visualFocusMaps,
+    resumeAction: "restore-visual-focus" as const,
+    nextStep:
+      map.workflowStage === "generated"
+        ? `Review your ${studioCardTitleForMode(map.mode)} insights`
+        : `Build your ${studioCardTitleForMode(map.mode)}`,
+    visualFocusMapId: map.id,
+  }));
+}
+
 /** Aggregate all resumable work from local storage. */
 export function buildContinuityManifest(): ContinuityManifest {
   const items: ContinuityManifestItem[] = [];
@@ -384,6 +412,7 @@ export function buildContinuityManifest(): ContinuityManifest {
   items.push(...projectItems());
   items.push(...avatarItems());
   items.push(...savedWorkItems());
+  items.push(...visualFocusMapItems());
 
   const sorted = sortByTouched(items);
   return {

@@ -42,6 +42,8 @@ export type AppSection =
 export type SidebarNavId =
   | "chat"
   | "focus"
+  | "visual-thinking"
+  | "other"
   | "create"
   | "tools"
   | "progress"
@@ -85,7 +87,7 @@ export const BRAND = {
   tagline: "Your Coach & Companion",
 } as const;
 
-// Six sidebar doors — companion-first daily path; libraries live inside hubs.
+// Six sidebar doors — Companion First: chat, regulation, visual thinking, growth, other, learning.
 export const SIDEBAR_NAV: {
   id: SidebarNavId;
   label: string;
@@ -93,11 +95,11 @@ export const SIDEBAR_NAV: {
   mode?: CoachingMode;
 }[] = [
   { id: "chat", label: "Chat", emoji: "💬", mode: "today" },
-  { id: "focus", label: "Focus", emoji: "🎯", mode: "focus" },
-  { id: "create", label: "Create", emoji: "✨" },
-  { id: "growth", label: "Growth", emoji: "🌱" },
-  { id: "my-work", label: "My Work", emoji: "🏠" },
-  { id: "how-do-i", label: "How Do I", emoji: "❓" },
+  { id: "focus", label: "Focus My Brain", emoji: "🚧", mode: "focus" },
+  { id: "visual-thinking", label: "Visual Thinking", emoji: "💡" },
+  { id: "growth", label: "Growth", emoji: "📈" },
+  { id: "other", label: "Other", emoji: "➕" },
+  { id: "how-do-i", label: "How Do I...?", emoji: "❓" },
 ];
 
 /** @deprecated More menu removed — My Work and How Do I are primary sidebar items. */
@@ -112,8 +114,10 @@ export const MORE_NAV: {
 // switching the chat into a coaching mode.
 export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
   focus: "focus",
-  create: "content-generator",
+  "visual-thinking": "visual-focus",
   growth: "growth",
+  other: "my-work",
+  create: "content-generator",
   "my-work": "my-work",
   projects: "projects",
   templates: "templates-library",
@@ -121,6 +125,67 @@ export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
   playbook: "playbook",
   "how-do-i": "how-do-i",
 };
+
+/** Map legacy or sub-area nav ids to a primary sidebar door. */
+export function normalizeSidebarNav(nav: SidebarNavId): SidebarNavId {
+  if (nav === "create" || nav === "my-work") return "other";
+  if (
+    nav === "projects" ||
+    nav === "templates" ||
+    nav === "snippets" ||
+    nav === "saved-work" ||
+    nav === "playbook"
+  ) {
+    return "other";
+  }
+  if (
+    nav === "wins-this-week" ||
+    nav === "evidence-bank" ||
+    nav === "confidence-vault" ||
+    nav === "my-journey"
+  ) {
+    return "growth";
+  }
+  return nav;
+}
+
+/** Primary sidebar nav for an open workspace section. */
+export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
+  switch (section) {
+    case "my-work":
+    case "content-generator":
+    case "projects":
+    case "templates-library":
+    case "snippets":
+    case "saved-work":
+    case "playbook":
+      return "other";
+    case "visual-focus":
+      return "visual-thinking";
+    case "focus":
+    case "focus-timer":
+    case "breathe":
+    case "focus-audio":
+    case "activities":
+    case "guided-exercises":
+    case "spin-wheel":
+    case "games":
+      return "focus";
+    case "growth":
+    case "wins-this-week":
+    case "evidence-bank":
+    case "confidence-vault":
+    case "my-journey":
+      return "growth";
+    case "how-do-i":
+      return "how-do-i";
+    case "home":
+    case "today":
+      return "chat";
+    default:
+      return null;
+  }
+}
 
 export const SIDEBAR_TOOLS: {
   id: SidebarToolId;

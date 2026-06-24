@@ -1,12 +1,23 @@
 /** Visual Focus — cognitive workspace (not a task display mode). */
 
+export type VisualFocusSaveDestinationId =
+  | "visual-thinking"
+  | "projects"
+  | "strategies"
+  | "templates"
+  | "documents"
+  | "decision-compass"
+  | "sops"
+  | "snippets";
+
 export type VisualFocusMode =
   | "mind-map"
   | "decision-tree"
   | "project-map"
   | "strategy-map"
   | "relationship-map"
-  | "visual-kanban";
+  | "visual-kanban"
+  | "business-canvas";
 
 export type VisualFocusNode = {
   id: string;
@@ -29,18 +40,127 @@ export type VisualKanbanCard = {
   linkedTo?: string[];
 };
 
+import type { BusinessCanvasData } from "./businessCanvas/types";
+import {
+  DEFAULT_BUSINESS_CANVAS_WORKFLOW,
+  normalizeBusinessCanvasWorkflow,
+} from "./businessCanvas/workflowTypes";
+
+export type VisualFocusPurposeAnchor = {
+  question: string;
+  userAnswer: string;
+  mode: VisualFocusMode;
+  capturedAt: string;
+};
+
+export type VisualFocusWorkflowStage = "build" | "generated";
+
+export type VisualFocusSaveStatus = "unsaved" | "saving" | "saved";
+
+/** Lifecycle — active work vs long-term Saved™ vs future states. */
+export type VisualFocusLifecycleStatus =
+  | "active"
+  | "archived"
+  | "completed"
+  | "deleted"
+  | "draft"
+  | "shared";
+
+/** Timestamped map snapshot for Save Version™ / Restore Version™. */
+export type VisualFocusMapSnapshot = Pick<
+  VisualFocusMap,
+  | "title"
+  | "mode"
+  | "root"
+  | "purposeAnchor"
+  | "businessCanvas"
+  | "kanban"
+  | "workflowStage"
+  | "generatedAt"
+  | "visualLayout"
+  | "analysis"
+  | "summary"
+  | "businessCanvasWorkflow"
+  | "businessCanvasChange"
+  | "businessCanvasImpactAnalysis"
+>;
+
+export type VisualFocusMapVersion = {
+  id: string;
+  label: string;
+  savedAt: string;
+  snapshot: VisualFocusMapSnapshot;
+};
+
+
+export type VisualFocusVisualNode = {
+  id: string;
+  label: string;
+  x: number;
+  y: number;
+  color?: string;
+  level?: number;
+};
+
+export type VisualFocusVisualEdge = {
+  fromId: string;
+  toId: string;
+  label?: string;
+};
+
+export type VisualFocusVisualLayout = {
+  nodes: VisualFocusVisualNode[];
+  edges: VisualFocusVisualEdge[];
+  layoutKind:
+    | "radial"
+    | "vertical-flow"
+    | "decision-branch"
+    | "kanban-columns"
+    | "business-canvas-grid";
+};
+
+export type VisualFocusAnalysis = {
+  summary: string;
+  keyRelationships: string[];
+  patterns: string[];
+  risks: string[];
+  opportunities: string[];
+  recommendations: string[];
+  nextSteps: string[];
+  boardObservations?: string[];
+  /** Business Canvas™ what-if ripple notes when exploring change. */
+  whatIfNotes?: string[];
+  generatedAt: string;
+};
+
 export type VisualFocusMap = {
   id: string;
   title: string;
   mode: VisualFocusMode;
   root: VisualFocusNode;
+  purposeAnchor?: VisualFocusPurposeAnchor;
+  businessCanvas?: BusinessCanvasData;
   kanban?: {
     columns: VisualKanbanColumn[];
     cards: Record<string, VisualKanbanCard>;
   };
+  workflowStage?: VisualFocusWorkflowStage;
+  generatedAt?: string;
+  visualLayout?: VisualFocusVisualLayout;
+  analysis?: VisualFocusAnalysis;
+  summary?: string;
+  saveStatus?: VisualFocusSaveStatus;
+  lastSavedAt?: string;
+  pinned?: boolean;
+  intentionallySaved?: boolean;
+  saveDestination?: VisualFocusSaveDestinationId;
+  lifecycleStatus?: VisualFocusLifecycleStatus;
+  archivedAt?: string;
+  versions?: VisualFocusMapVersion[];
+  currentVersionId?: string;
   updatedAt: string;
   createdAt: string;
-};
+} & import("./businessCanvas/workflowTypes").BusinessCanvasMapExtensions;
 
 export const VISUAL_FOCUS_MODE_META: {
   id: VisualFocusMode;
@@ -83,5 +203,11 @@ export const VISUAL_FOCUS_MODE_META: {
     label: "Visual Kanban",
     emoji: "🎨",
     desc: "Clusters, colors, and connections — beyond task columns.",
+  },
+  {
+    id: "business-canvas",
+    label: "Business Canvas",
+    emoji: "📋",
+    desc: "Nine guided sections — teach while you map your business model.",
   },
 ];

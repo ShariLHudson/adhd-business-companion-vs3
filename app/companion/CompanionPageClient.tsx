@@ -533,6 +533,7 @@ import {
   detectEcosystemProblemIntent,
   ecosystemIntentToWorkspaceOffer,
 } from "@/lib/companionEcosystemIntent";
+import { queueVisualFocusOpen, peekVisualFocusPendingOpen, requestVisualFocusStudio } from "@/lib/visualFocus";
 import {
   adhdNativeHintForChat,
   analyzeAdhdNativeTurn,
@@ -959,6 +960,8 @@ import { usePomodoroTimer } from "@/lib/usePomodoroTimer";
 import {
   MODE_FEEDBACK,
   SECTION_NAV,
+  sidebarNavForSection,
+  normalizeSidebarNav,
   type AppSection,
   type SidebarNavId,
   type SidebarToolId,
@@ -1315,7 +1318,7 @@ export default function CompanionPageClient() {
   const stayInCreateSplitScreen = useCallback(() => {
     applyChatLayoutMode("split");
     setActiveSection("home");
-    setActiveNav("create");
+    setActiveNav("other");
   }, [applyChatLayoutMode]);
   const isInCreateWorkspacePhase = useCallback(() => {
     return isCreateWorkspaceV2Phase(
@@ -2052,7 +2055,7 @@ export default function CompanionPageClient() {
       autoGenerate: false,
     }));
     setBuilderKickoffActive(false);
-    setActiveNav("create");
+    setActiveNav("other");
   }
 
   function clearParallelCoachingOffers() {
@@ -2808,7 +2811,7 @@ export default function CompanionPageClient() {
           : saved.workspaceDetail,
       );
       setActiveSection("home");
-      setActiveNav("create");
+      setActiveNav("other");
       applyWorkspaceFocus(null);
       setWorkspaceSession(null);
 
@@ -2970,7 +2973,7 @@ export default function CompanionPageClient() {
   useEffect(() => {
     if (!workspacePanel || activeSection === "home") return;
     setActiveSection("home");
-    if (workspacePanel === "content-generator") setActiveNav("create");
+    if (workspacePanel === "content-generator") setActiveNav("other");
   }, [workspacePanel, activeSection]);
 
   useEffect(() => {
@@ -3156,7 +3159,20 @@ export default function CompanionPageClient() {
           );
         }
         break;
+      case "visual-focus": {
+        const mapId = item.id.replace(/^visual-focus:/, "");
+        openVisualFocusMapCore(mapId, true);
+        appendRecoveryMessage(
+          resumeReceiptForContinuityType("visual-focus-map", item.title),
+        );
+        break;
+      }
     }
+  }
+
+  function openVisualFocusMapCore(mapId: string, preferGenerated = true) {
+    queueVisualFocusOpen(mapId, preferGenerated);
+    openWorkspaceBesideChatCore("visual-focus", workspaceOpenAck("visual-focus"));
   }
 
   function openDecisionCompass(prefill?: DecisionCompassPrefill | null) {
@@ -3291,7 +3307,7 @@ export default function CompanionPageClient() {
   function openGenerator(seed: GenSeed) {
     if (workspacePanel === "content-generator") {
       setActiveSection("home");
-      setActiveNav("create");
+      setActiveNav("other");
       if (seed) setGenSeed(seed);
       return;
     }
@@ -3438,7 +3454,7 @@ export default function CompanionPageClient() {
         { merge: true, instruction: input.brief ?? lastUserTextRef.current },
       );
       setActiveSection("home");
-      setActiveNav("create");
+      setActiveNav("other");
       focusWorkspaceLayout();
       revealWorkspace();
       return;
@@ -3453,7 +3469,7 @@ export default function CompanionPageClient() {
     ) {
       dbgWorkspace("openCreationWorkspace skipped — already open");
       setActiveSection("home");
-      setActiveNav("create");
+      setActiveNav("other");
       return;
     }
 
@@ -3473,7 +3489,7 @@ export default function CompanionPageClient() {
     if (section === "content-generator") {
       setGenSeed((prev) => (genSeedEqual(prev, nextSeed) ? prev : nextSeed));
       patchWorkspacePanel("content-generator");
-      setActiveNav("create");
+      setActiveNav("other");
     } else if (section === "projects") {
       setProjectContinueId(ctx.linkedProjectId ?? null);
       patchWorkspacePanel("projects");
@@ -3885,7 +3901,7 @@ export default function CompanionPageClient() {
       setActiveNav("playbook");
       setCoachingMode("playbook");
     } else {
-      setActiveNav("create");
+      setActiveNav("other");
     }
     setActiveSection("home");
     if (
@@ -4690,18 +4706,6 @@ export default function CompanionPageClient() {
       return;
     }
 
-    if (activeSection === "home" && workspacePanel) {
-      if (
-        activeNavRef.current === "my-work" &&
-        workspacePanel !== "my-work"
-      ) {
-        returnToMyWorkHub();
-        return;
-      }
-      closeWorkspacePanel();
-      return;
-    }
-
     const navRestore = navHistoryRef.current.pop();
     if (navRestore) {
       if (panelBackStackRef.current.length > 0) {
@@ -4712,6 +4716,19 @@ export default function CompanionPageClient() {
         setWorkspacePanelBackLabel(nextLabel);
       }
       navRestore();
+      return;
+    }
+
+    if (activeSection === "home" && workspacePanel) {
+      if (
+        (activeNavRef.current === "other" ||
+          activeNavRef.current === "my-work") &&
+        workspacePanel !== "my-work"
+      ) {
+        returnToMyWorkHub();
+        return;
+      }
+      closeWorkspacePanel();
       return;
     }
 
@@ -4972,52 +4989,22 @@ export default function CompanionPageClient() {
   }
 
   function isMyWorkFlow(): boolean {
-    return activeNavRef.current === "my-work";
+    return (
+      activeNavRef.current === "other" || activeNavRef.current === "my-work"
+    );
   }
 
   function returnToMyWorkHub() {
     goingBackRef.current = true;
-    openSectionBesideChatCore("my-work", "my-work");
+    openSectionBesideChatCore("my-work", "other");
   }
 
   function workspacePanelBack() {
-    if (isMyWorkFlow()) {
-      returnToMyWorkHub();
-      return;
-    }
-    closeWorkspacePanel();
+    goBack();
   }
 
   function navForWorkspaceSection(section: AppSection): SidebarNavId | null {
-    switch (section) {
-      case "content-generator":
-        return "create";
-      case "projects":
-        return "projects";
-      case "my-work":
-        return "my-work";
-      case "templates-library":
-        return "templates";
-      case "snippets":
-        return "snippets";
-      case "saved-work":
-        return "saved-work";
-      case "playbook":
-        return "playbook";
-      case "client-avatars":
-        return "client-avatars";
-      case "how-do-i":
-        return "how-do-i";
-      case "growth":
-        return "growth";
-      case "wins-this-week":
-      case "evidence-bank":
-      case "confidence-vault":
-      case "my-journey":
-        return "growth";
-      default:
-        return null;
-    }
+    return sidebarNavForSection(section);
   }
 
   /** Menu / in-panel navigation — replace right workspace, keep chat on the left. */
@@ -5032,7 +5019,7 @@ export default function CompanionPageClient() {
     if (section === "content-generator") {
       if (workspacePanel === "content-generator") {
         setActiveSection("home");
-        setActiveNav("create");
+        setActiveNav("other");
         focusWorkspaceLayout();
         revealWorkspace();
         return;
@@ -5079,6 +5066,9 @@ export default function CompanionPageClient() {
     }
 
     if (workspacePanel === section) {
+      if (section === "visual-focus" && !peekVisualFocusPendingOpen()) {
+        requestVisualFocusStudio();
+      }
       setActiveSection("home");
       if (nav) setActiveNav(nav);
       focusWorkspaceLayout();
@@ -5110,6 +5100,9 @@ export default function CompanionPageClient() {
 
     pushNavigationRestore();
     patchWorkspacePanel(section);
+    if (section === "visual-focus" && !peekVisualFocusPendingOpen()) {
+      requestVisualFocusStudio();
+    }
     if (section === "projects" && !projectsResumeIdRef.current) {
       setProjectsResumeId(null);
     }
@@ -5140,7 +5133,7 @@ export default function CompanionPageClient() {
   }
 
   function openCreateDirect() {
-    openSectionBesideChatCore("content-generator", "create");
+    openSectionBesideChatCore("content-generator", "other");
   }
 
   /** Menu navigation — open the workspace directly without forcing chat. */
@@ -5454,7 +5447,7 @@ export default function CompanionPageClient() {
         );
       }
       applyChatLayoutMode("split");
-      setActiveNav("create");
+      setActiveNav("other");
       revealWorkspace();
       clearParallelCoachingOffers();
       startCreateBuilderChat();
@@ -5595,7 +5588,7 @@ export default function CompanionPageClient() {
       commitCreateWorkflowRecord(record);
       patchWorkspacePanel("content-generator");
       applyChatLayoutMode("split");
-      setActiveNav("create");
+      setActiveNav("other");
       setActiveSection("home");
       revealWorkspace();
       setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
@@ -5823,7 +5816,9 @@ export default function CompanionPageClient() {
   }
 
   function handleNavSelectCore(nav: SidebarNavId, mode?: CoachingMode) {
-    if (nav === "chat") {
+    const normalizedNav = normalizeSidebarNav(nav);
+
+    if (normalizedNav === "chat") {
       setActiveNav("chat");
       setActiveSection("home");
       setWorkspaceFirstSplit(false);
@@ -5838,25 +5833,25 @@ export default function CompanionPageClient() {
       return;
     }
 
-    const section = SECTION_NAV[nav] ?? "home";
+    const section = SECTION_NAV[nav] ?? SECTION_NAV[normalizedNav] ?? "home";
     if (mode) {
       setCoachingMode(mode);
       if (section === "home") appendSystemMessage(MODE_FEEDBACK[mode]);
     }
 
     if (section === "home") {
-      setActiveNav(nav);
+      setActiveNav(normalizedNav);
       setActiveSection("home");
       inputRef.current?.focus();
       return;
     }
 
     if (shouldOpenBesideChat(section)) {
-      openSectionBesideChatCore(section, nav);
+      openSectionBesideChatCore(section, normalizedNav);
       return;
     }
 
-    openNavSectionDirectCore(section, nav);
+    openNavSectionDirectCore(section, normalizedNav);
   }
 
   function openFocusAudioCore(categoryId?: string | null) {
@@ -6760,7 +6755,7 @@ export default function CompanionPageClient() {
           ) {
             setWorkspaceOffer(null);
             setActiveSection("home");
-            setActiveNav("create");
+            setActiveNav("other");
           } else if (
             workspacePanel === "content-generator" &&
             workspaceOffer.section !== "content-generator"
@@ -6909,7 +6904,7 @@ export default function CompanionPageClient() {
     }
     if (workspacePanel === "content-generator") {
       setActiveSection("home");
-      setActiveNav("create");
+      setActiveNav("other");
       focusWorkspaceLayout();
       revealWorkspace();
       setExportTrigger(action);
@@ -6976,7 +6971,7 @@ export default function CompanionPageClient() {
     if (section === "content-generator") {
       if (workspacePanel === "content-generator") {
         setActiveSection("home");
-        setActiveNav("create");
+        setActiveNav("other");
         focusWorkspaceLayout();
         revealWorkspace();
       } else if (
@@ -7018,6 +7013,7 @@ export default function CompanionPageClient() {
       return;
     }
 
+    pushNavigationRestore();
     patchWorkspacePanel(section);
     setWorkspaceDetail(emptyWorkspaceDetail());
     setActiveSection("home");
@@ -7076,7 +7072,7 @@ export default function CompanionPageClient() {
         launchActionBridge(action.bridge);
         break;
       case "make-bridge": {
-        setActiveNav("create");
+        setActiveNav("other");
         const artifact = resolveChatHandoffArtifact(toChatTurns(messages), {
           hintType: action.bridge.type,
           userText: lastUserTextRef.current,
@@ -8662,7 +8658,7 @@ export default function CompanionPageClient() {
         revealWorkspace();
         focusWorkspaceLayout();
         setActiveSection("home");
-        setActiveNav("create");
+        setActiveNav("other");
         return;
       }
       if (
@@ -8689,7 +8685,7 @@ export default function CompanionPageClient() {
         revealWorkspace();
         focusWorkspaceLayout();
         setActiveSection("home");
-        setActiveNav("create");
+        setActiveNav("other");
         return;
       }
       tryOpenCreateForCurrentArtifact(trimmed, {
@@ -8778,7 +8774,7 @@ export default function CompanionPageClient() {
         revealWorkspace();
         focusWorkspaceLayout();
         setActiveSection("home");
-        setActiveNav("create");
+        setActiveNav("other");
         return;
       }
       tryOpenCreateForCurrentArtifact(trimmed, {
@@ -8873,7 +8869,7 @@ export default function CompanionPageClient() {
       if (workspacePanel === "content-generator") {
         setActiveSection("home");
         activeSectionRef.current = "home";
-        setActiveNav("create");
+        setActiveNav("other");
         revealWorkspace();
         appendVerifiedWorkspaceMessage(
           "content-generator",
@@ -9073,7 +9069,7 @@ export default function CompanionPageClient() {
         if (workspacePanel === "content-generator") {
           setActiveSection("home");
           activeSectionRef.current = "home";
-          setActiveNav("create");
+          setActiveNav("other");
           revealWorkspace();
           appendVerifiedWorkspaceMessage(
             "content-generator",
@@ -10384,7 +10380,7 @@ export default function CompanionPageClient() {
       noteWorkspaceOpened("content-generator", "workspace_offer");
       if (workspacePanel === "content-generator") {
         setActiveSection("home");
-        setActiveNav("create");
+        setActiveNav("other");
         return;
       }
       if (
@@ -10990,7 +10986,7 @@ export default function CompanionPageClient() {
             onOpenExternal={() => window.open(googleWorkspace.url, "_blank")}
             onBackToCreate={() => {
               patchWorkspacePanel("content-generator");
-              setActiveNav("create");
+              setActiveNav("other");
             }}
             onCopy={() => {
               void navigator.clipboard?.writeText(googleWorkspace.content);
@@ -11069,8 +11065,15 @@ export default function CompanionPageClient() {
       case "visual-focus":
         return (
           <VisualFocusWorkspacePanel
-            onBack={closeWorkspacePanel}
+            onBack={goBack}
+            onClose={closeWorkspacePanel}
             registerBack={registerBack}
+            onWorkWithShari={() => {
+              setInput(
+                "I'm in Visual Focus™ and I'm not sure which visual thinking tool fits. Here's what I'm trying to figure out: ",
+              );
+              inputRef.current?.focus();
+            }}
           />
         );
       case "wins-this-week":
@@ -11139,9 +11142,8 @@ export default function CompanionPageClient() {
             backLabel={workspacePanelBackLabel}
             registerBack={registerBack}
             onOpenSection={(section, nav) =>
-              openSectionBesideChatCore(section, nav)
+              openSectionBesideChatCore(section, nav ?? "other")
             }
-            onResume={resumeHomeItem}
             onOpenProject={(projectId) => {
               setProjectContinueId(projectId);
               setProjectsResumeId(projectId);
@@ -11152,7 +11154,7 @@ export default function CompanionPageClient() {
                 view: "detail",
                 workspacePanelOpen: false,
               });
-              openSectionBesideChatCore("projects", "projects");
+              openSectionBesideChatCore("projects", "other");
             }}
             onOpenSavedWork={(savedWorkId) => {
               const item = getSavedWorkById(savedWorkId);
@@ -11166,28 +11168,11 @@ export default function CompanionPageClient() {
                 );
                 return;
               }
-              openSectionBesideChatCore("saved-work", "saved-work");
+              openSectionBesideChatCore("saved-work", "other");
             }}
-            onOpenDecision={() => openDecisionCompass()}
-            onOpenInCreate={(input) => {
-              const item = input.templateId
-                ? getSavedWorkById(input.templateId)
-                : undefined;
-              if (item) {
-                openSavedWorkInCreate(
-                  item,
-                  buildSavedArtifactRecoveryMessage(
-                    recordFromSavedWork(item),
-                    true,
-                  ),
-                );
-                return;
-              }
-              openCreationWorkspaceCore("content-generator", {
-                ...input,
-                source: input.source ?? "generated",
-              });
-            }}
+            onOpenVisualFocusMap={(mapId) =>
+              openVisualFocusMapCore(mapId, true)
+            }
           />
         );
       case "client-avatars":
@@ -11584,7 +11569,7 @@ export default function CompanionPageClient() {
     ) {
       setActiveSection("home");
       activeSectionRef.current = "home";
-      setActiveNav("create");
+      setActiveNav("other");
       focusWorkspaceLayout();
       revealWorkspace();
       appendVerifiedWorkspaceMessage("content-generator", action.openAck);
@@ -11921,7 +11906,7 @@ export default function CompanionPageClient() {
         detail: title.slice(0, 48),
         onOpen: () => {
           setActiveSection("home");
-          setActiveNav("create");
+          setActiveNav("other");
           revealWorkspace();
         },
         onClose: closeWorkspacePanel,
@@ -12609,7 +12594,7 @@ export default function CompanionPageClient() {
                 onChatLayoutModeChange={applyChatLayoutMode}
                 viewSizePreset={effectiveViewSize}
                 onViewSizePresetChange={applyViewSizePreset}
-                onClose={closeWorkspacePanel}
+                onClose={goBack}
                 revealKey={workspaceRevealSeq}
                 chatFocusKey={chatFocusSeq}
                 workspaceFirst={workspaceFirstSplit}

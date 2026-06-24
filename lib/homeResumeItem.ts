@@ -18,12 +18,15 @@ export type HomeResumeItemKind =
   | "decision-compass"
   | "quick-two-option"
   | "strategy"
-  | "workspace";
+  | "workspace"
+  | "visual-focus";
 
 export type HomeResumeItem = {
   id: string;
   kind: HomeResumeItemKind;
   title: string;
+  typeLabel: string;
+  lastAction: string;
   nextStep: string;
   ts: string;
   projectId?: string;
@@ -44,12 +47,16 @@ function continuityToHomeResume(item: ContinuityManifestItem): HomeResumeItem {
             ? "decision-compass"
             : item.type === "strategy-apply"
               ? "strategy"
-              : "project";
+              : item.type === "visual-focus-map"
+                ? "visual-focus"
+                : "project";
 
   return {
     id: item.id,
     kind,
     title: item.title,
+    typeLabel: item.location.split(">")[0]?.trim() || resumeTypeLabel(item.type),
+    lastAction: item.nextStep ?? "Continue where you left off",
     nextStep: item.nextStep ?? "Continue where you left off",
     ts: item.lastTouchedAt,
     projectId: item.projectId,
@@ -61,6 +68,25 @@ function continuityToHomeResume(item: ContinuityManifestItem): HomeResumeItem {
         ? item.id.replace(/^strategy-apply:/, "")
         : undefined,
   };
+}
+
+function resumeTypeLabel(type: ContinuityManifestItem["type"]): string {
+  switch (type) {
+    case "visual-focus-map":
+      return "Visual Thinking™";
+    case "decision-compass":
+      return "Decision Compass™";
+    case "strategy-apply":
+      return "Strategies™";
+    case "project":
+      return "Projects™";
+    case "workspace-sop":
+      return "SOPs™";
+    case "client-avatar":
+      return "Audience Profile";
+    default:
+      return "Documents™";
+  }
 }
 
 /** Latest eligible genuine work — never navigation-only opens or chat snippets. */
@@ -86,6 +112,8 @@ export function homeResumeItemFromActivityId(
       id: "activity:decision-compass",
       kind: "decision-compass",
       title: activity.title,
+      typeLabel: "Decision Compass™",
+      lastAction: "Pick up your Decision Compass beside chat",
       nextStep: "Pick up your Decision Compass beside chat",
       ts: updatedAt,
       activityId: "decision-compass",
@@ -96,6 +124,8 @@ export function homeResumeItemFromActivityId(
       id: "activity:two-option",
       kind: "quick-two-option",
       title: activity.title,
+      typeLabel: "Decision Compass™",
+      lastAction: "Continue your quick two-option choice",
       nextStep: "Continue your quick two-option choice",
       ts: updatedAt,
       activityId: "two-option",

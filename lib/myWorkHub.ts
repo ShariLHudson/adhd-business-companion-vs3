@@ -28,6 +28,11 @@ import {
   type UnifiedProjectFile,
 } from "./projectFiles";
 import { continuityToHomeResume } from "./myWorkHubResume";
+import { listVisualFocusMaps, listSavedVisualFocusMaps, listArchivedVisualFocusMaps } from "./visualFocus/store";
+import {
+  myWorkCategoryLabelForMode,
+  visualFocusContinuityLocation,
+} from "./visualFocus/myWorkIntegration";
 
 export type MyWorkHubItemKind =
   | "saved-work"
@@ -38,7 +43,8 @@ export type MyWorkHubItemKind =
   | "client-avatar"
   | "brain-dump"
   | "file"
-  | "workspace-sop";
+  | "workspace-sop"
+  | "visual-thinking";
 
 export type MyWorkHubStatus =
   | "draft"
@@ -60,7 +66,9 @@ export type MyWorkHubOpenTarget =
       projectId?: string;
       avatarId?: string;
       strategyId?: string;
-    };
+    }
+  | { kind: "visual-focus"; mapId: string; preferGenerated?: boolean }
+  | { kind: "visual-thinking-browse" };
 
 export type MyWorkHubItem = {
   id: string;
@@ -275,6 +283,7 @@ function continuityToHubItem(item: ContinuityManifestItem): MyWorkHubItem {
     "saved-work": "saved-work",
     "decision-compass": "decision",
     "strategy-apply": "strategy",
+    "visual-focus-map": "visual-thinking",
   };
 
   const type = item.type;
@@ -288,6 +297,12 @@ function continuityToHubItem(item: ContinuityManifestItem): MyWorkHubItem {
     openTarget = {
       kind: "saved-work",
       savedWorkId: item.id.replace(/^saved-work:/, ""),
+    };
+  } else if (type === "visual-focus-map" && item.visualFocusMapId) {
+    openTarget = {
+      kind: "visual-focus",
+      mapId: item.visualFocusMapId,
+      preferGenerated: true,
     };
   } else {
     openTarget = {
@@ -513,6 +528,39 @@ export function dedupeHubItems(items: MyWorkHubItem[]): MyWorkHubItem[] {
   return [...byTitle.values()];
 }
 
+function buildVisualThinkingItems(): MyWorkHubItem[] {
+  return listSavedVisualFocusMaps().map((map) => ({
+    id: `visual-focus:${map.id}`,
+    kind: "visual-thinking" as const,
+    title: map.title,
+    typeLabel: myWorkCategoryLabelForMode(map.mode),
+    status:
+      map.lifecycleStatus === "archived" || map.lifecycleStatus === "completed"
+        ? ("complete" as const)
+        : map.workflowStage === "generated"
+          ? ("saved" as const)
+          : ("in-progress" as const),
+    date: map.updatedAt,
+    relativeDate: relativeDateLabel(map.updatedAt),
+    lastActivity: visualFocusContinuityLocation(map.mode),
+    nextStep:
+      map.summary ??
+      map.purposeAnchor?.userAnswer ??
+      "Continue your visual map",
+    openTarget: {
+      kind: "visual-focus" as const,
+      mapId: map.id,
+      preferGenerated: map.workflowStage === "generated",
+    },
+    searchText: normalizeSearch(
+      map.title,
+      map.purposeAnchor?.userAnswer,
+      myWorkCategoryLabelForMode(map.mode),
+      map.summary,
+    ),
+  }));
+}
+
 function collectAllRecentItems(
   manifest: ReturnType<typeof buildContinuityManifest>,
   saved: SavedWorkItem[],
@@ -568,10 +616,32 @@ function collectAllRecentItems(
   return [
     ...savedItems,
     ...continuityItems,
+    ...buildVisualThinkingItems(),
     ...strategies,
     ...avatars,
     ...projects,
   ];
+}
+
+export function countVisualThinkingMaps(): number {
+  return listSavedVisualFocusMaps().length;
+}
+
+export function buildVisualThinkingByCategory(): {
+  label: string;
+  items: MyWorkHubItem[];
+}[] {
+  const items = buildVisualThinkingItems();
+  const byMode = new Map<string, MyWorkHubItem[]>();
+  for (const item of items) {
+    const list = byMode.get(item.typeLabel) ?? [];
+    list.push(item);
+    byMode.set(item.typeLabel, list);
+  }
+  return [...byMode.entries()].map(([label, groupItems]) => ({
+    label,
+    items: groupItems.sort((a, b) => b.date.localeCompare(a.date)),
+  }));
 }
 
 export function buildMyWorkHub(): MyWorkHubSnapshot {
@@ -621,6 +691,7 @@ const SEARCH_GROUP_ORDER = [
   "Recently Active",
   "Projects",
   "Created Content",
+  "Visual Thinking",
   "Saved Work",
   "Strategies",
   "Templates",
@@ -644,6 +715,7 @@ function searchGroupLabel(item: MyWorkHubItem, inContinue: boolean): string {
   if (item.typeLabel === "Snippet") return "Snippets";
   if (item.typeLabel === "Archived") return "Archive";
   if (item.kind === "saved-work") return "Created Content";
+  if (item.kind === "visual-thinking") return "Visual Thinking";
   return "Saved Work";
 }
 
@@ -727,6 +799,28 @@ function archiveSearchItems(): MyWorkHubItem[] {
       searchText: normalizeSearch(t.title, t.body, "archived template"),
     });
   }
+  for (const map of listArchivedVisualFocusMaps()) {
+    items.push({
+      id: `archive-visual-focus:${map.id}`,
+      kind: "visual-thinking",
+      title: map.title,
+      typeLabel: "Archived",
+      status: "complete",
+      date: map.archivedAt ?? map.updatedAt,
+      relativeDate: relativeDateLabel(map.archivedAt ?? map.updatedAt),
+      openTarget: {
+        kind: "visual-focus",
+        mapId: map.id,
+        preferGenerated: map.workflowStage === "generated",
+      },
+      searchText: normalizeSearch(
+        map.title,
+        map.purposeAnchor?.userAnswer,
+        myWorkCategoryLabelForMode(map.mode),
+        "archived visual thinking",
+      ),
+    });
+  }
   return items;
 }
 
@@ -792,6 +886,7 @@ export function searchMyWorkHub(
     ...templateSearchItems(),
     ...snippetSearchItems(),
     ...archiveSearchItems(),
+    ...buildVisualThinkingItems(),
   ];
 
   const hits = dedupeHubItems(pool).filter((i) => i.searchText.includes(q));

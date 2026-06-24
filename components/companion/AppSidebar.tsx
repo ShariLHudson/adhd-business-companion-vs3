@@ -1,16 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   ASSETS,
   BRAND,
   MORE_NAV,
   SECTION_NAV,
   SIDEBAR_NAV,
+  normalizeSidebarNav,
   type AppSection,
   type SidebarNavId,
 } from "@/lib/companionUi";
-import { findLatestHomeResumeItem } from "@/lib/homeResumeItem";
 import { companionNavHref } from "@/lib/companionNavUrl";
 import type { CoachingMode } from "@/lib/companionPrompt";
 
@@ -20,26 +20,19 @@ type AppSidebarProps = {
   onNavSelect: (nav: SidebarNavId, mode?: CoachingMode) => void;
 };
 
-// Six sidebar doors — Chat, Focus, Create, Growth, My Work, How Do I.
+// Six sidebar doors — Chat, Focus My Brain, Visual Thinking, Growth, Other, How Do I.
 export function AppSidebar({
   activeNav,
   activeSection,
   onNavSelect,
 }: AppSidebarProps) {
-  // Is one of the backstage sections currently open? Keep "More" expanded if so.
+  const normalizedActiveNav = normalizeSidebarNav(activeNav);
   const moreActive = MORE_NAV.some(
     (item) =>
-      SECTION_NAV[item.id] === activeSection || activeNav === item.id,
+      SECTION_NAV[item.id] === activeSection || normalizedActiveNav === item.id,
   );
   const [moreOpen, setMoreOpen] = useState(false);
   const showMore = moreOpen || moreActive;
-
-  // Continue indicator — a small dot on Chat when unfinished work exists, so
-  // users elsewhere in the app know there's something to come back to.
-  const [hasContinue, setHasContinue] = useState(false);
-  useEffect(() => {
-    setHasContinue(Boolean(findLatestHomeResumeItem()));
-  }, [activeSection]);
 
   function renderItem(item: {
     id: SidebarNavId;
@@ -50,9 +43,8 @@ export function AppSidebar({
     const sectionFor = SECTION_NAV[item.id];
     const active = sectionFor
       ? activeSection === sectionFor ||
-        (activeSection === "home" && activeNav === item.id)
-      : activeNav === item.id && activeSection === "home";
-    const showDot = item.id === "chat" && hasContinue && !active;
+        (activeSection === "home" && normalizedActiveNav === item.id)
+      : normalizedActiveNav === item.id && activeSection === "home";
     const href = companionNavHref(item.id, item.mode);
     return (
       <a
@@ -65,9 +57,7 @@ export function AppSidebar({
           onNavSelect(item.id, item.mode);
         }}
         title={item.label}
-        aria-label={
-          showDot ? `${item.label} — you have something to continue` : item.label
-        }
+        aria-label={item.label}
         aria-current={active ? "page" : undefined}
         className={`flex w-full items-center justify-start gap-2 rounded-lg px-2 py-2.5 text-left leading-tight transition-colors md:px-3 ${
           active
@@ -80,17 +70,9 @@ export function AppSidebar({
           className="relative flex w-6 shrink-0 justify-center"
         >
           {item.emoji}
-          {showDot && (
-            <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-[#e0795a] ring-2 ring-[#6e6a66]" />
-          )}
         </span>
         <span className="hidden text-left text-base font-medium md:inline">
           {item.label}
-          {showDot && (
-            <span aria-hidden="true" className="ml-1.5 text-[#e0795a]">
-              ●
-            </span>
-          )}
         </span>
       </a>
     );
