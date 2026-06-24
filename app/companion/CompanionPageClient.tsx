@@ -12076,11 +12076,11 @@ export default function CompanionPageClient() {
           />
           {!homeCalm ? <ActiveWorkspaceBar items={activeWorkspaceItems} /> : null}
 
-          {(activeSection !== "home" || workspacePanel || overlay) && (
+          {(activeSection !== "home" || overlay) && !workspacePanel ? (
             <div className="shrink-0 px-4 pt-3 sm:px-6">
               <BackButton onClick={goBack} />
             </div>
-          )}
+          ) : null}
 
           {activeSection === "home" && (
             <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
