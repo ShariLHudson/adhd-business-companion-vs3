@@ -9,6 +9,7 @@ import { formatCompanionIntelligenceForPrompt } from "./intelligence-layer/compa
 import { topTraitsFromMap } from "./intelligence-layer/profileEvolution";
 import type { OutcomeThread } from "./companionOutcomeThread";
 import type { MultiTurnPatternAnalysis } from "./adhdMultiTurnPatterns";
+import { buildCompanionPlanObservations } from "./planMyDay/planBehaviorLearning";
 import { getRecentConfidenceWins } from "./companionConfidenceEngine";
 
 export type LearningStyleId =
@@ -265,6 +266,12 @@ export function buildPredictiveHints(input: {
     hints.push(
       `${best.label} has been working well for you — consider it when similar friction appears.`,
     );
+  }
+
+  for (const observation of buildCompanionPlanObservations(
+    input.now?.getTime(),
+  )) {
+    hints.push(observation);
   }
 
   return hints.slice(0, 2);

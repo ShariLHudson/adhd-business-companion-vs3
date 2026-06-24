@@ -24,13 +24,9 @@ describe("companionCapabilityRegistry", () => {
     expect(COMPANION_CAPABILITY_REGISTRY.length).toBeGreaterThanOrEqual(24);
   });
 
-  it("registry-driven routing matches legacy ecosystem intent behavior", () => {
-    expect(detectEcosystemProblemIntent("I have too much on my mind right now")?.section).toBe(
-      "brain-dump",
-    );
-    expect(detectEcosystemProblemIntent("I can't decide which offer to launch")?.section).toBe(
-      "decision-compass",
-    );
+  it("registry-driven routing defers vague phrases before workspace offers (P-1a)", () => {
+    expect(detectEcosystemProblemIntent("I have too much on my mind right now")).toBeNull();
+    expect(detectEcosystemProblemIntent("I can't decide which offer to launch")).toBeNull();
     expect(detectEcosystemProblemIntent("I need content ideas for LinkedIn")?.section).toBe(
       "content-generator",
     );
@@ -82,10 +78,10 @@ describe("companionCapabilityRegistry", () => {
     }
   });
 
-  it("capability routing hint includes registry metadata", () => {
+  it("capability routing hint defers keyword-first offers (P-1a)", () => {
     const hint = companionEcosystemRoutingHintForChat("my head is full of stuff");
-    expect(hint).toMatch(/CAPABILITY REGISTRY/);
-    expect(hint).toMatch(/Clear My Mind/i);
+    expect(hint).toMatch(/UNDERSTAND BEFORE SUGGESTING/);
+    expect(hint).not.toMatch(/CAPABILITY REGISTRY/);
   });
 
   it("records intervention without throwing", () => {

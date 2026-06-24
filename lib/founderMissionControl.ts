@@ -22,6 +22,10 @@ import {
   type FounderPriorityItem,
 } from "./founderCopilot";
 import {
+  buildPlanCompletionAnalytics,
+  type PlanCompletionAnalytics,
+} from "./planMyDay/planTaskCompletion";
+import {
   buildStrategyFounderAnalytics,
   type StrategyFounderAnalytics,
 } from "./strategyIntelligence";
@@ -136,6 +140,7 @@ export type FounderMissionControl = {
   situationAtlas: SituationAtlasAnalytics;
   situationReviewQueue: FounderReviewQueue;
   strategyIntelligence: StrategyFounderAnalytics;
+  planCompletion: PlanCompletionAnalytics;
 };
 
 const DAY_MS = 86_400_000;
@@ -448,6 +453,7 @@ export function buildFounderMissionControl(): FounderMissionControl {
     situationAtlas: buildSituationAtlasAnalytics(),
     situationReviewQueue: getFounderReviewQueue(),
     strategyIntelligence: buildStrategyFounderAnalytics(),
+    planCompletion: buildPlanCompletionAnalytics(),
   };
 }
 
