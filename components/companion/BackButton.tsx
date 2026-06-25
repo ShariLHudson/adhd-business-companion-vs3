@@ -1,39 +1,35 @@
 "use client";
 
+import { AppBackButton } from "@/components/companion/AppBackButton";
+import { NAV_HOME, normalizeBackDestination } from "@/lib/navigationBack";
+
 type BackButtonProps = {
   onClick: () => void;
+  /** Destination name or legacy full label. Defaults to Home. */
   label?: string;
   className?: string;
   size?: "default" | "compact";
 };
 
-const base =
-  "flex items-center gap-1.5 font-bold text-[#1e4f4f] transition-colors hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]";
-
-const sizes = {
-  default:
-    "rounded-xl border border-[#1e4f4f]/25 bg-white/80 px-4 py-2.5 text-lg",
-  compact: "rounded-lg border border-[#1e4f4f]/20 bg-white/70 px-3 py-1.5 text-sm",
-};
-
-/** Consistent one-click back control across panels and workspaces. */
+/**
+ * @deprecated Prefer AppBackButton with an explicit destination.
+ * Wraps AppBackButton for legacy call sites.
+ */
 export function BackButton({
   onClick,
-  label = "Back",
+  label = NAV_HOME,
   className = "",
   size = "default",
 }: BackButtonProps) {
+  const destination =
+    label === "Back" ? NAV_HOME : normalizeBackDestination(label);
+
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      aria-label={label}
-      className={`${base} ${sizes[size]} ${className}`.trim()}
-    >
-      <span className={size === "default" ? "text-2xl leading-none" : "text-xl leading-none"}>
-        ‹
-      </span>
-      {label}
-    </button>
+    <AppBackButton
+      destination={destination}
+      onBack={onClick}
+      className={className}
+      size={size}
+    />
   );
 }

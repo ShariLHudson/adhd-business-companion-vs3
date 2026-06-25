@@ -14,6 +14,7 @@ import {
 import { MomentumGameRunner } from "./games/MomentumGameRunner";
 import { rand } from "./games/gameUtils";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { AppBackButton } from "@/components/companion/AppBackButton";
 
 type Phase = "menu" | "category" | "play" | "done";
 
@@ -175,13 +176,11 @@ export function GamesPanel({
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
         <WorkspaceGuide section="focus" />
-        <button
-          type="button"
-          onClick={() => setPhase("menu")}
-          className="mb-3 self-start text-sm font-semibold text-[#6b635a] hover:text-[#1e4f4f]"
-        >
-          ← Back
-        </button>
+        <AppBackButton
+          destination="Games"
+          onBack={() => setPhase("menu")}
+          size="compact"
+        />
         <p className="text-2xl font-semibold text-[#1f1c19]">
           {cat.emoji} {cat.title}
         </p>

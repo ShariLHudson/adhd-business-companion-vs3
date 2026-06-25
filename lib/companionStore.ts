@@ -14,6 +14,7 @@ import {
   languagePrefsPatch,
   pushLanguagePrefsToUser,
 } from "./companionUserLanguage";
+import { safeLocalStorageSet } from "./companionStorageRecovery";
 import { createCatalogTypeLabels } from "./createCatalog";
 import { sortByDropdownLabel, sortDropdownLabels } from "./dropdownSort";
 import {
@@ -329,10 +330,8 @@ function newBrainDumpId(): string {
 
 function writeBrainDumps(next: BrainDumpEntry[]): BrainDumpEntry[] {
   if (typeof window === "undefined") return next;
-  try {
-    localStorage.setItem(BRAIN_DUMP_LIST_KEY, JSON.stringify(next));
-  } catch {
-    /* noop */
+  if (!safeLocalStorageSet(BRAIN_DUMP_LIST_KEY, JSON.stringify(next))) {
+    return getBrainDumps();
   }
   return next;
 }

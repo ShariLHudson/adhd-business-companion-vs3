@@ -3,7 +3,7 @@
  */
 
 import type { EmotionalState } from "@/lib/companionEmotions";
-import type { CompanionPhotoContext } from "@/lib/companionPhotoLibrary";
+import type { CompanionPhotoContext, CompanionPresenceWorkspace } from "@/lib/companionPhotoLibrary";
 import type { AppSection } from "@/lib/companionUi";
 import type { CompanionHomeState } from "@/lib/arrivalIntelligence/homeState";
 import type { RecognitionMoment } from "@/lib/recognition/types";
@@ -50,6 +50,10 @@ export type CompanionPresenceInput = {
   memberSince?: string | null;
   /** Clear My Mind™ journey phase — overrides workspace mapping when set. */
   clearMyMindPhase?: ClearMyMindPresencePhase | null;
+  /** Rotate photo on each entry to Clear My Mind™ or My Thoughts™. */
+  presenceWorkspace?: CompanionPresenceWorkspace | null;
+  /** Increment when the user enters/re-enters a presence workspace. */
+  workspaceEntryKey?: number;
 };
 
 export type CompanionPresenceResult = {

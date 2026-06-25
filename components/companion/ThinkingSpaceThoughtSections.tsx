@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import type { BrainDumpEntry } from "@/lib/companionStore";
-import type { ThoughtCollection } from "@/lib/thinkingSpace";
 import {
   groupThoughtsByStatusBucket,
   groupThoughtsByTimeBucket,
@@ -16,27 +15,20 @@ export type ThoughtSectionBucketMode = "time" | "status" | "none";
 
 type Props = {
   thoughts: BrainDumpEntry[];
-  collections: ThoughtCollection[];
   onOpenThought: (entry: BrainDumpEntry) => void;
   bucketMode?: ThoughtSectionBucketMode;
 };
 
 function ThoughtRow({
   entry,
-  collections,
   onOpenThought,
 }: {
   entry: BrainDumpEntry;
-  collections: ThoughtCollection[];
   onOpenThought: (entry: BrainDumpEntry) => void;
 }) {
   return (
     <li>
-      <ThoughtCompanionBox
-        entry={entry}
-        collections={collections}
-        onOpen={onOpenThought}
-      />
+      <ThoughtCompanionBox entry={entry} onOpen={onOpenThought} />
     </li>
   );
 }
@@ -45,7 +37,6 @@ type BucketId = TimeBucketId | StatusBucketId;
 
 export function ThinkingSpaceThoughtSections({
   thoughts,
-  collections,
   onOpenThought,
   bucketMode = thoughts.length >= PROGRESSIVE_DISCLOSURE_THRESHOLD
     ? "time"
@@ -58,7 +49,6 @@ export function ThinkingSpaceThoughtSections({
           <ThoughtRow
             key={entry.id}
             entry={entry}
-            collections={collections}
             onOpenThought={onOpenThought}
           />
         ))}
@@ -73,7 +63,6 @@ export function ThinkingSpaceThoughtSections({
         sections={sections}
         testId="thought-status-sections"
         defaultOpen="needs-attention"
-        collections={collections}
         onOpenThought={onOpenThought}
       />
     );
@@ -85,7 +74,6 @@ export function ThinkingSpaceThoughtSections({
       sections={sections}
       testId="thought-time-sections"
       defaultOpen="today"
-      collections={collections}
       onOpenThought={onOpenThought}
     />
   );
@@ -95,13 +83,11 @@ function BucketedList({
   sections,
   testId,
   defaultOpen,
-  collections,
   onOpenThought,
 }: {
   sections: Array<{ id: BucketId; label: string; thoughts: BrainDumpEntry[] }>;
   testId: string;
   defaultOpen: BucketId;
-  collections: ThoughtCollection[];
   onOpenThought: (entry: BrainDumpEntry) => void;
 }) {
   const [openBuckets, setOpenBuckets] = useState<Set<BucketId>>(
@@ -142,7 +128,6 @@ function BucketedList({
                   <ThoughtRow
                     key={entry.id}
                     entry={entry}
-                    collections={collections}
                     onOpenThought={onOpenThought}
                   />
                 ))}

@@ -1,17 +1,18 @@
 "use client";
 
-/** Always-visible exit — users should never wonder how to leave. */
-export function LibraryCloseButton({ onClose }: { onClose: () => void }) {
+import { AppBackButton } from "@/components/companion/AppBackButton";
+import { NAV_CHAT } from "@/lib/navigationBack";
+
+/** Journey-aware back — replaces legacy Close control in library panels. */
+export function LibraryCloseButton({
+  onClose,
+  destination = NAV_CHAT,
+}: {
+  onClose: () => void;
+  destination?: string;
+}) {
   return (
-    <button
-      type="button"
-      onClick={onClose}
-      className="flex shrink-0 items-center gap-1.5 rounded-lg border border-[#d4cdc3] bg-white px-3 py-2 text-sm font-semibold text-[#6b635a] shadow-sm hover:border-[#1e4f4f]/30 hover:bg-[#faf7f2] hover:text-[#1f1c19]"
-      aria-label="Close"
-    >
-      <span aria-hidden="true">✕</span>
-      Close
-    </button>
+    <AppBackButton destination={destination} onBack={onClose} size="compact" />
   );
 }
 
@@ -19,10 +20,12 @@ export function LibraryPanelHeader({
   title,
   description,
   onClose,
+  backDestination = NAV_CHAT,
 }: {
   title: string;
   description: string;
   onClose: () => void;
+  backDestination?: string;
 }) {
   return (
     <header className="flex items-start justify-between gap-3 border-b border-[#e7dfd4] pb-4">
@@ -32,7 +35,7 @@ export function LibraryPanelHeader({
           {description}
         </p>
       </div>
-      <LibraryCloseButton onClose={onClose} />
+      <LibraryCloseButton onClose={onClose} destination={backDestination} />
     </header>
   );
 }

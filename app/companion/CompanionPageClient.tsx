@@ -4,6 +4,7 @@ import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "rea
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { BackButton } from "@/components/companion/BackButton";
+import { NAV_HOME } from "@/lib/navigationBack";
 import { AppSidebar } from "@/components/companion/AppSidebar";
 import { CompanionSidebarPortal } from "@/components/companion/CompanionSidebarPortal";
 import { CompanionUrlNavigation } from "@/components/companion/CompanionUrlNavigation";
@@ -14040,7 +14041,10 @@ export default function CompanionPageClient() {
 
           {(activeSection !== "home" || overlay) && !workspacePanel ? (
             <div className="shrink-0 px-4 pt-3 sm:px-6">
-              <BackButton onClick={goBack} />
+              <BackButton
+                onClick={goBack}
+                label={workspacePanelBackLabel ?? NAV_HOME}
+              />
             </div>
           ) : null}
 

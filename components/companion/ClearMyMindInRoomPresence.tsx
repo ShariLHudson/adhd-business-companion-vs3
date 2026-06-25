@@ -21,6 +21,7 @@ type Props = {
   holdAck?: string | null;
   unfoldStep?: ClearMyMindUnfoldStep;
   totalThoughtCount?: number;
+  workspaceEntryKey?: number;
 };
 
 /**
@@ -33,6 +34,7 @@ export function ClearMyMindInRoomPresence({
   holdAck = null,
   unfoldStep = "idle",
   totalThoughtCount = 0,
+  workspaceEntryKey = 0,
 }: Props) {
   const graph = useMemo(
     () => buildBrainDumpClusterGraph(entries),
@@ -48,6 +50,7 @@ export function ClearMyMindInRoomPresence({
     holdAck,
     showingPatterns,
     unfoldStep,
+    workspaceEntryKey,
   });
 
   const acknowledgment = shariReceiveAcknowledgment(entries);
@@ -101,7 +104,9 @@ export function ClearMyMindInRoomPresence({
             className="clear-my-mind-in-room-voice"
           />
         </div>
-        <ShariPortrait presence={presence} size="in-room" alt="Shari" />
+        <div className="flex flex-col items-center">
+          <ShariPortrait presence={presence} size="in-room" alt="Shari" />
+        </div>
       </div>
     </div>
   );

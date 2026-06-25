@@ -15,6 +15,7 @@ export function useClearMyMindCompanionPresence(input: {
   holdAck: string | null;
   showingPatterns: boolean;
   unfoldStep?: ClearMyMindUnfoldStep;
+  workspaceEntryKey?: number;
 }) {
   const phase = useMemo(
     () =>
@@ -40,6 +41,8 @@ export function useClearMyMindCompanionPresence(input: {
   return useCompanionPresence({
     workspacePanel: "brain-dump",
     workspaceActiveBeside: true,
+    presenceWorkspace: "clear-my-mind",
+    workspaceEntryKey: input.workspaceEntryKey,
     clearMyMindPhase: phase,
     isThinking,
     emotion: "emotional",

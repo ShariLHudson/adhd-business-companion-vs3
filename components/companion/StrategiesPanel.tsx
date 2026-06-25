@@ -61,6 +61,7 @@ import {
   pickStrategyReflection,
 } from "@/lib/strategyReflections";
 import { MENU_LIST_LABEL, MENU_TEXT } from "@/lib/menuNavStyles";
+import { AppBackButton } from "@/components/companion/AppBackButton";
 
 type View =
   | { v: "home" }
@@ -1103,13 +1104,7 @@ function StrategyBuiltinDetail({
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
-      <button
-        type="button"
-        onClick={onBack}
-        className="self-start text-sm font-semibold text-[#1e4f4f]"
-      >
-        ‹ Back to {backLabel}
-      </button>
+      <AppBackButton destination={backLabel} onBack={onBack} />
 
       <p className="mt-2 text-2xl font-semibold text-[#1f1c19]">{s.title}</p>
 

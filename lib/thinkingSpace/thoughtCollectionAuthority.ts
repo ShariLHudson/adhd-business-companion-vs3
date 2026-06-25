@@ -209,6 +209,7 @@ export function moveThoughtToCollection(
       collectionIds: undefined,
       suggestedCollection: undefined,
       suggestedCollectionConfidence: undefined,
+      updatedAt: new Date().toISOString(),
     });
   } else {
     updateBrainDump(thoughtId, {
@@ -218,10 +219,60 @@ export function moveThoughtToCollection(
       collectionIds: undefined,
       suggestedCollection: undefined,
       suggestedCollectionConfidence: undefined,
+      updatedAt: new Date().toISOString(),
     });
   }
 
   return getBrainDumps().find((e) => e.id === thoughtId) ?? null;
+}
+
+export type SaveThoughtCollectionResult =
+  | { ok: true; entry: BrainDumpEntry }
+  | { ok: false; reason: "unchanged" | "missing-name" | "not-found" | "persist-failed" };
+
+/**
+ * Authoritative collection save — resolves picker value, persists collectionId, verifies.
+ */
+export function saveThoughtCollectionSelection(
+  entry: BrainDumpEntry,
+  pickerValue: string,
+  newCollectionLabel = "",
+): SaveThoughtCollectionResult {
+  const latest =
+    getBrainDumps().find((e) => e.id === entry.id) ?? entry;
+  const normalized = migrateThoughtCollectionFields(latest);
+
+  if (!isCollectionSelectionDirty(normalized, pickerValue, newCollectionLabel)) {
+    return { ok: true, entry: normalized };
+  }
+
+  const targetId = resolveCollectionIdFromPicker(
+    pickerValue,
+    newCollectionLabel,
+  );
+  if (targetId === undefined) {
+    return { ok: false, reason: "missing-name" };
+  }
+
+  const updated = moveThoughtToCollection(normalized.id, targetId);
+  if (!updated) {
+    return { ok: false, reason: "not-found" };
+  }
+
+  const persisted = getBrainDumps().find((e) => e.id === normalized.id);
+  if (!persisted) {
+    return { ok: false, reason: "persist-failed" };
+  }
+
+  const persistedId = getActiveCollectionId(persisted);
+  const targetMatches =
+    (targetId === null && persistedId === undefined) ||
+    (targetId !== null && persistedId === targetId);
+  if (!targetMatches) {
+    return { ok: false, reason: "persist-failed" };
+  }
+
+  return { ok: true, entry: persisted };
 }
 
 export function acceptSuggestedCollectionForThought(
@@ -305,6 +356,7 @@ export function listCollectionPickerOptions(): CollectionPickerOption[] {
 /**
  * Resolve a picker value to a persisted collection id.
  * Returns null for uncategorized; undefined when create-new has no label yet.
+ * Only call on Save — may create collections.
  */
 export function resolveCollectionIdFromPicker(
   pickerValue: string,
@@ -326,6 +378,49 @@ export function resolveCollectionIdFromPicker(
     return ensureCollectionByLabel(label).id;
   }
   return pickerValue;
+}
+
+/**
+ * Comparable key for draft vs saved — pure, no writes.
+ * Stored ids compare by id; catalog/create compare by normalized label.
+ */
+export function collectionSelectionKey(
+  pickerValue: string,
+  newCollectionLabel = "",
+): string | null {
+  if (!pickerValue) return null;
+  if (pickerValue === UNCATEGORIZED_COLLECTION_ID) {
+    return UNCATEGORIZED_COLLECTION_ID;
+  }
+  if (pickerValue === CREATE_COLLECTION_OPTION_ID) {
+    const label = newCollectionLabel.trim();
+    if (!label) return null;
+    return `label:${normalizeCollectionLabel(label)}`;
+  }
+  if (pickerValue.startsWith(CATALOG_COLLECTION_PREFIX)) {
+    const label = pickerValue.slice(CATALOG_COLLECTION_PREFIX.length);
+    const stored = getThoughtCollections().find(
+      (c) =>
+        normalizeCollectionLabel(c.label) === normalizeCollectionLabel(label),
+    );
+    return stored?.id ?? `label:${normalizeCollectionLabel(label)}`;
+  }
+  return pickerValue;
+}
+
+export function savedCollectionSelectionKey(entry: BrainDumpEntry): string {
+  return getActiveCollectionId(entry) ?? UNCATEGORIZED_COLLECTION_ID;
+}
+
+/** True when picker draft differs from the thought's saved collection. */
+export function isCollectionSelectionDirty(
+  entry: BrainDumpEntry,
+  pickerValue: string,
+  newCollectionLabel = "",
+): boolean {
+  const draftKey = collectionSelectionKey(pickerValue, newCollectionLabel);
+  if (!draftKey) return false;
+  return draftKey !== savedCollectionSelectionKey(entry);
 }
 
 /** All destinations for Move To — every stored collection + uncategorized. */

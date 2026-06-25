@@ -1,20 +1,25 @@
 PROFILE PHOTO ROTATION
 ======================
 
-Drop your photos of Shari into THIS folder, named like this:
+Approved Shari photos live in:
 
-    shari-1.jpg
-    shari-2.jpg
-    shari-3.jpg
-    ...up to shari-8.jpg
+    public/shari.jpg                    (default — always included when present)
+    public/images/shari/shari-images/   (gallery — all .jpg .jpeg .png .webp)
 
-The home-screen photo automatically rotates through every one that exists
-(every ~9 seconds, with a soft fade). The original /public/shari.jpg is always
-included, so it rotates alongside whatever you add here.
+Name gallery files descriptively, e.g.:
+
+    shari-warm-headshot.png
+    shari-thinking.png
+    shari-celebrating-fireworks.png
+
+The app scans that folder automatically — no manual manifest needed.
+Clear My Mind™ and My Thoughts™ rotate on each entry; home rotates gently over time.
+
+Legacy numbered slots (optional):
+
+    public/images/shari/shari-1.jpg … shari-8.jpg
 
 Tips:
-- Square-ish images look best (they're shown in a circle).
-- JPG format, names exactly as above (lowercase, with the dash).
-- Add as few or as many as you like (1 through 8). Missing numbers are skipped.
-
-To allow more than 8, ask to extend the list in components/companion/IdentityBar.tsx.
+- Square-ish images look best (shown in a circle).
+- JPG or PNG; use lowercase filenames with hyphens.
+- After adding files, hard refresh once to clear the photo probe cache.

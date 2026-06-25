@@ -23,6 +23,7 @@ import {
   type PlanLifeDomain,
 } from "@/lib/planMyDay/types";
 import { PLAN_CATEGORY_OPTIONS } from "@/lib/planMyDay/planItemColors";
+import { AppBackButton } from "@/components/companion/AppBackButton";
 
 export type PlanItemDetailMode =
   | "form"
@@ -265,13 +266,12 @@ export function PlanDayItemDetail({
             </li>
           ))}
         </ul>
-        <button
-          type="button"
-          onClick={() => setDetailMode("form")}
-          className="mt-4 text-sm font-semibold text-[#6b635a] hover:text-[#1f1c19]"
-        >
-          ← Back
-        </button>
+        <AppBackButton
+          destination="Manage item"
+          onBack={() => setDetailMode("form")}
+          size="compact"
+          className="mt-4"
+        />
       </div>
     );
   }
@@ -349,13 +349,12 @@ export function PlanDayItemDetail({
         >
           Move to {formatPlanDueDate(deferDate)}
         </button>
-        <button
-          type="button"
-          onClick={() => setDetailMode("form")}
-          className="mt-4 text-sm font-semibold text-[#6b635a] hover:text-[#1f1c19]"
-        >
-          ← Back
-        </button>
+        <AppBackButton
+          destination="Manage item"
+          onBack={() => setDetailMode("form")}
+          size="compact"
+          className="mt-4"
+        />
       </div>
     );
   }

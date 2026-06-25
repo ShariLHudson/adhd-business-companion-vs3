@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import type { BrainDumpEntry } from "@/lib/companionStore";
 import {
-  getThoughtCollections,
   getThoughtsForCollection,
   renameThoughtCollection,
   searchThinkingSpaceThoughts,
@@ -107,7 +106,6 @@ export function ThinkingSpaceCollectionView({
     ? filtered
     : filtered.slice(0, visibleCount);
 
-  const collections = useMemo(() => getThoughtCollections(), [thoughts]);
   const label = resolveCollectionLabel(collectionId);
   const headerPalette = useMemo(
     () => resolveCollectionPalette(collectionId),
@@ -241,7 +239,6 @@ export function ThinkingSpaceCollectionView({
         ) : (
           <ThinkingSpaceThoughtSections
             thoughts={visible}
-            collections={collections}
             onOpenThought={onOpenThought}
             bucketMode={bucketMode}
           />

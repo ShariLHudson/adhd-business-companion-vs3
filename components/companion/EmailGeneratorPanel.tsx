@@ -15,6 +15,7 @@ import { ScoreActions } from "@/components/companion/ScoreActions";
 import { ExportActions } from "@/components/companion/ExportActions";
 import type { AppSection } from "@/lib/companionUi";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
+import { AppBackButton } from "@/components/companion/AppBackButton";
 
 type Pkg = {
   subjects: string[];
@@ -280,14 +281,12 @@ export function EmailGeneratorPanel({
             ))}
           </div>
 
-          <div className="mt-5 flex items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="rounded-xl border-2 border-[#1e4f4f] bg-white px-5 py-3 text-base font-semibold text-[#1e4f4f]"
-            >
-              ← Back
-            </button>
+          <div className="mt-5 flex flex-wrap items-center gap-2">
+            <AppBackButton
+              destination="What are you writing?"
+              onBack={() => setStep(1)}
+              size="compact"
+            />
             <button
               type="button"
               onClick={() => generate()}
@@ -307,13 +306,12 @@ export function EmailGeneratorPanel({
 
       {/* STEP 3 — OUTPUT: edit details shortcut back to context. */}
       {step === 3 && (
-        <button
-          type="button"
-          onClick={() => setStep(2)}
-          className="mt-5 self-start text-sm font-semibold text-[#1e4f4f] hover:underline"
-        >
-          ← Edit details
-        </button>
+        <AppBackButton
+          destination="Email context"
+          onBack={() => setStep(2)}
+          className="mt-5"
+          size="compact"
+        />
       )}
 
       {/* Package */}

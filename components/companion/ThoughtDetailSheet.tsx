@@ -1,31 +1,35 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getProjects, deleteBrainDump, type BrainDumpEntry } from "@/lib/companionStore";
+import {
+  getBrainDumps,
+  getProjects,
+  deleteBrainDump,
+  type BrainDumpEntry,
+} from "@/lib/companionStore";
 import {
   acceptSuggestedCollection,
   archiveThought,
   connectThoughtToPerson,
   connectThoughtToProject,
   editThoughtText,
-  getThoughtCollections,
   markThoughtHandled,
   mergeThoughts,
-  moveThoughtToCollection,
   pinThought,
   restoreThought,
   setThoughtReminder,
 } from "@/lib/thinkingSpace";
-import { detectThoughtSplitProposal } from "@/lib/clearMyMindThoughtSplitter";
-import { separateThoughtWithUndo } from "@/lib/thinkingSpace/thoughtSeparate";
-import { ThoughtSeparateOffer } from "@/components/companion/ThoughtSeparateOffer";
 import {
   collectionPickerValueForThought,
   CREATE_COLLECTION_OPTION_ID,
   getActiveCollectionId,
+  isCollectionSelectionDirty,
   listCollectionPickerOptions,
-  resolveCollectionIdFromPicker,
+  saveThoughtCollectionSelection,
 } from "@/lib/thinkingSpace/thoughtCollectionAuthority";
+import { detectThoughtSplitProposal } from "@/lib/clearMyMindThoughtSplitter";
+import { separateThoughtWithUndo } from "@/lib/thinkingSpace/thoughtSeparate";
+import { ThoughtSeparateOffer } from "@/components/companion/ThoughtSeparateOffer";
 import {
   THOUGHT_ACTION_ARCHIVE,
   THOUGHT_ACTION_DELETE,
@@ -46,6 +50,7 @@ import {
   THOUGHT_SAVED,
 } from "@/lib/thinkingSpace/copy";
 import { thoughtDisplayEmoji } from "@/lib/thinkingSpace/thoughtEmoji";
+import { UNCATEGORIZED_COLLECTION_ID } from "@/lib/thinkingSpace/collectionSummaries";
 
 const btnClass =
   "rounded-xl border border-[#e7dfd4] bg-white px-3 py-2 text-sm font-semibold text-[#3d3630] hover:bg-[#faf7f2] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/35";
@@ -90,9 +95,20 @@ export function ThoughtDetailSheet({
   const [projectId, setProjectId] = useState(entry.projectId ?? "");
   const [reminderDate, setReminderDate] = useState(savedReminderDate(entry));
 
+  const entrySyncKey = [
+    entry.id,
+    entry.collectionId ?? "",
+    entry.text,
+    entry.pinned ? "1" : "0",
+    entry.done ? "1" : "0",
+    entry.reminderAt ?? "",
+    entry.projectId ?? "",
+    entry.connectedPerson ?? "",
+  ].join("|");
+
   const collectionOptions = useMemo(
     () => listCollectionPickerOptions(),
-    [entry],
+    [entrySyncKey],
   );
   const projects = useMemo(() => getProjects(), []);
   const emoji = thoughtDisplayEmoji(entry.text);
@@ -113,18 +129,14 @@ export function ThoughtDetailSheet({
     setProjectId(entry.projectId ?? "");
     setReminderDate(savedReminderDate(entry));
     setEditing(false);
-  }, [entry]);
+  }, [entrySyncKey]);
 
-  const savedCollectionId = getActiveCollectionId(entry) ?? null;
-  const draftResolvedCollectionId = resolveCollectionIdFromPicker(
+  const collectionDirty = isCollectionSelectionDirty(
+    entry,
     draftCollectionId,
     newCollection,
   );
-
-  const textDirty = editing && editText.trim() !== entry.text.trim();
-  const collectionDirty =
-    draftResolvedCollectionId !== undefined &&
-    draftResolvedCollectionId !== savedCollectionId;
+  const textDirty = editText.trim() !== entry.text.trim();
   const pinDirty = draftPinned !== !!entry.pinned;
   const doneDirty = draftDone !== !!entry.done;
   const reminderDirty = reminderDate !== savedReminderDate(entry);
@@ -151,58 +163,92 @@ export function ThoughtDetailSheet({
   }
 
   function handleSave() {
-    if (!canSave) return;
+    const liveEntry = getBrainDumps().find((e) => e.id === entry.id) ?? entry;
+
+    const collectionDirtyNow = isCollectionSelectionDirty(
+      liveEntry,
+      draftCollectionId,
+      newCollection,
+    );
+    const textDirtyNow = editText.trim() !== liveEntry.text.trim();
+    const pinDirtyNow = draftPinned !== !!liveEntry.pinned;
+    const doneDirtyNow = draftDone !== !!liveEntry.done;
+    const reminderDirtyNow = reminderDate !== savedReminderDate(liveEntry);
+    const projectDirtyNow = projectId !== (liveEntry.projectId ?? "");
+    const personDirtyNow = person !== (liveEntry.connectedPerson ?? "");
+
+    const isDirtyNow =
+      textDirtyNow ||
+      collectionDirtyNow ||
+      pinDirtyNow ||
+      doneDirtyNow ||
+      reminderDirtyNow ||
+      projectDirtyNow ||
+      personDirtyNow;
+
+    const canSaveNow =
+      isDirtyNow &&
+      (draftCollectionId !== CREATE_COLLECTION_OPTION_ID ||
+        newCollection.trim().length > 0);
+
+    if (!canSaveNow) return;
 
     let changed = false;
     let closeAfterSave = false;
 
-    if (textDirty) {
-      const updated = editThoughtText(entry.id, editText);
+    if (textDirtyNow) {
+      const updated = editThoughtText(liveEntry.id, editText);
       if (updated) {
         changed = true;
         setEditing(false);
       }
     }
 
-    if (collectionDirty && draftResolvedCollectionId !== undefined) {
-      moveThoughtToCollection(entry.id, draftResolvedCollectionId);
+    if (collectionDirtyNow) {
+      const result = saveThoughtCollectionSelection(
+        liveEntry,
+        draftCollectionId,
+        newCollection,
+      );
+      if (!result.ok) {
+        if (result.reason === "missing-name") {
+          flash("Name your new collection before saving.");
+        } else if (result.reason === "persist-failed") {
+          flash("Could not save that collection change. Try again.");
+        }
+        return;
+      }
       changed = true;
       setNewCollection("");
-      if (draftCollectionId === CREATE_COLLECTION_OPTION_ID) {
-        const created = getThoughtCollections().find(
-          (c) =>
-            c.label.toLowerCase() === newCollection.trim().toLowerCase(),
-        );
-        if (created) setDraftCollectionId(created.id);
-      }
+      setDraftCollectionId(collectionPickerValueForThought(result.entry));
     }
 
-    if (pinDirty) {
-      pinThought(entry.id, draftPinned);
+    if (pinDirtyNow) {
+      pinThought(liveEntry.id, draftPinned);
       changed = true;
     }
 
-    if (doneDirty && draftDone) {
-      markThoughtHandled(entry.id);
+    if (doneDirtyNow && draftDone) {
+      markThoughtHandled(liveEntry.id);
       changed = true;
       closeAfterSave = true;
     }
 
-    if (reminderDirty) {
+    if (reminderDirtyNow) {
       setThoughtReminder(
-        entry.id,
+        liveEntry.id,
         reminderDate ? new Date(reminderDate).toISOString() : null,
       );
       changed = true;
     }
 
-    if (projectDirty) {
-      connectThoughtToProject(entry.id, projectId || null);
+    if (projectDirtyNow) {
+      connectThoughtToProject(liveEntry.id, projectId || null);
       changed = true;
     }
 
-    if (personDirty) {
-      connectThoughtToPerson(entry.id, person || null);
+    if (personDirtyNow) {
+      connectThoughtToPerson(liveEntry.id, person || null);
       changed = true;
     }
 

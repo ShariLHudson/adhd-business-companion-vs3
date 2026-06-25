@@ -2,7 +2,6 @@
 
 import { useCallback, useMemo, useState } from "react";
 import type { BrainDumpEntry } from "@/lib/companionStore";
-import { updateBrainDump } from "@/lib/companionStore";
 import {
   buildBrainDumpClusterGraph,
   clusterOffersThoughtPreview,
@@ -19,6 +18,7 @@ import {
   reliefClusterTap,
   type ReliefClusterExpansionState,
 } from "@/lib/reliefClusterExpansion";
+import { setThoughtCategory } from "@/lib/thinkingSpace/thoughtOperations";
 import {
   applyThoughtAction,
   thoughtActionOpensSection,
@@ -101,7 +101,7 @@ export function ClearMyMindReliefClusters({
 
   const handleCategoryChange = useCallback(
     (entryId: string, category: string) => {
-      updateBrainDump(entryId, { category });
+      setThoughtCategory(entryId, category);
       onEntriesChange?.();
     },
     [onEntriesChange],

@@ -3,9 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { getBrainDumps, type BrainDumpEntry } from "@/lib/companionStore";
 import {
+  NAV_CLEAR_MY_MIND,
+  NAV_MY_THOUGHTS,
+} from "@/lib/navigationBack";
+import { usePanelNavigationHistory } from "@/lib/usePanelNavigationHistory";
+import {
   buildCollectionSummaries,
   searchThinkingSpaceThoughts,
-  type CollectionSummary,
 } from "@/lib/thinkingSpace";
 import {
   clearThoughtSeparationUndo,
@@ -14,9 +18,10 @@ import {
   type ThoughtSeparateUndo,
 } from "@/lib/thinkingSpace/thoughtSeparate";
 import {
+  thoughtBelongsToCollectionId,
+} from "@/lib/thinkingSpace/thoughtCollectionAuthority";
+import {
   MY_THOUGHTS_ARCHIVED,
-  MY_THOUGHTS_BACK,
-  MY_THOUGHTS_BACK_COLLECTIONS,
   MY_THOUGHTS_COLLECTIONS_HEADING,
   MY_THOUGHTS_EMPTY,
   MY_THOUGHTS_EXPLORE_PROMPT,
@@ -25,6 +30,7 @@ import {
   MY_THOUGHTS_TITLE,
 } from "@/lib/thinkingSpace/copy";
 import { useThinkingSpace } from "@/lib/thinkingSpace/useThinkingSpace";
+import { AppBackButton } from "@/components/companion/AppBackButton";
 import { ThinkingSpaceCollectionCard } from "@/components/companion/ThinkingSpaceCollectionCard";
 import { ThinkingSpaceCollectionView } from "@/components/companion/ThinkingSpaceCollectionView";
 import { ThinkingSpaceCreateCollection } from "@/components/companion/ThinkingSpaceCreateCollection";
@@ -36,21 +42,43 @@ import { ThoughtSeparateUndoBar } from "@/components/companion/ThoughtSeparateUn
 
 type View = "garden" | "collection" | "search" | "archived";
 
-type Props = {
-  onBack: () => void;
+type MyThoughtsNavState = {
+  view: View;
+  openCollectionId: string | null;
+  searchQuery: string;
 };
 
-export function MyThinkingSpacePanel({ onBack }: Props) {
-  const { allThoughts, archived, collections, refresh } = useThinkingSpace();
-  const [view, setView] = useState<View>("garden");
-  const [openCollectionId, setOpenCollectionId] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState("");
+const INITIAL_NAV: MyThoughtsNavState = {
+  view: "garden",
+  openCollectionId: null,
+  searchQuery: "",
+};
+
+type Props = {
+  /** Where the user came from before My Thoughts™ (journey-aware). */
+  backDestination?: string;
+  onBack: () => void;
+  presenceEntryKey?: number;
+};
+
+export function MyThinkingSpacePanel({
+  backDestination = NAV_CLEAR_MY_MIND,
+  onBack,
+  presenceEntryKey = 0,
+}: Props) {
+  const { allThoughts, archived, refresh } = useThinkingSpace();
+  const nav = usePanelNavigationHistory<MyThoughtsNavState>(INITIAL_NAV);
+  const { view, openCollectionId, searchQuery } = nav.snapshot;
   const [selectedThought, setSelectedThought] = useState<BrainDumpEntry | null>(
     null,
   );
   const [separateUndo, setSeparateUndo] = useState<ThoughtSeparateUndo | null>(
     () => getPendingThoughtSeparationUndo(),
   );
+
+  function patchNav(partial: Partial<MyThoughtsNavState>) {
+    nav.setSnapshot({ ...nav.snapshot, ...partial });
+  }
 
   useEffect(() => {
     const syncUndo = () =>
@@ -70,20 +98,34 @@ export function MyThinkingSpacePanel({ onBack }: Props) {
     return searchThinkingSpaceThoughts(searchQuery, allThoughts);
   }, [searchQuery, allThoughts]);
 
+  const backDestinationLabel =
+    nav.activeBackDestination ?? backDestination;
+
+  function handleBack() {
+    if (selectedThought) {
+      setSelectedThought(null);
+      return;
+    }
+    clearThoughtSeparationUndo();
+    setSeparateUndo(null);
+    if (nav.pop()) return;
+    onBack();
+  }
+
   function openCollection(id: string) {
     clearThoughtSeparationUndo();
     setSeparateUndo(null);
-    setOpenCollectionId(id);
-    setView("collection");
-    setSearchQuery("");
+    nav.push({ ...nav.snapshot }, NAV_MY_THOUGHTS);
+    patchNav({
+      view: "collection",
+      openCollectionId: id,
+      searchQuery: "",
+    });
   }
 
-  function backToGarden() {
-    clearThoughtSeparationUndo();
-    setSeparateUndo(null);
-    setView("garden");
-    setOpenCollectionId(null);
-    setSearchQuery("");
+  function openArchived() {
+    nav.push({ ...nav.snapshot }, NAV_MY_THOUGHTS);
+    patchNav({ view: "archived" });
   }
 
   function handleSearchChange(value: string) {
@@ -91,12 +133,25 @@ export function MyThinkingSpacePanel({ onBack }: Props) {
       clearThoughtSeparationUndo();
       setSeparateUndo(null);
     }
-    setSearchQuery(value);
+
+    if (value.trim() && !searchQuery.trim() && view === "garden") {
+      nav.push({ ...nav.snapshot }, NAV_MY_THOUGHTS);
+      patchNav({
+        view: "search",
+        openCollectionId: null,
+        searchQuery: value,
+      });
+      return;
+    }
+
+    patchNav({ searchQuery: value });
+
     if (value.trim()) {
-      setView("search");
-      setOpenCollectionId(null);
+      patchNav({ view: "search", openCollectionId: null });
     } else if (view === "search") {
-      setView("garden");
+      if (!nav.pop()) {
+        patchNav({ view: "garden", openCollectionId: null });
+      }
     }
   }
 
@@ -104,10 +159,14 @@ export function MyThinkingSpacePanel({ onBack }: Props) {
     <div
       className="my-thinking-space companion-fade-in"
       data-testid="my-thoughts"
-      data-my-thoughts-version="4"
+      data-my-thoughts-version="5"
       data-thinking-view={view}
+      data-nav-depth={nav.depth}
     >
-      <ThinkingSpacePresence thoughtCount={allThoughts.length} />
+      <ThinkingSpacePresence
+        thoughtCount={allThoughts.length}
+        workspaceEntryKey={presenceEntryKey}
+      />
 
       {separateUndo ? (
         <div className="mb-4 max-w-xl">
@@ -129,23 +188,12 @@ export function MyThinkingSpacePanel({ onBack }: Props) {
       ) : null}
 
       <header className="mb-4 max-w-2xl pr-16 sm:pr-20">
-        {view === "garden" ? (
-          <button
-            type="button"
-            onClick={onBack}
-            className="mb-3 text-sm font-semibold text-[#1e4f4f] hover:underline"
-          >
-            ← {MY_THOUGHTS_BACK}
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={backToGarden}
-            className="mb-3 text-sm font-semibold text-[#1e4f4f] hover:underline"
-          >
-            ← {MY_THOUGHTS_BACK_COLLECTIONS}
-          </button>
-        )}
+        {!selectedThought ? (
+          <AppBackButton
+            destination={backDestinationLabel}
+            onBack={handleBack}
+          />
+        ) : null}
         <p className="text-2xl font-semibold text-[#1f1c19]">
           {MY_THOUGHTS_TITLE}
         </p>
@@ -194,12 +242,10 @@ export function MyThinkingSpacePanel({ onBack }: Props) {
           </div>
 
           <ThinkingSpaceCreateCollection
-              existingLabels={
-                new Set(
-                  summaries.map((s) => s.label.toLowerCase()),
-                )
-              }
-              onCreated={refresh}
+            existingLabels={
+              new Set(summaries.map((s) => s.label.toLowerCase()))
+            }
+            onCreated={refresh}
           />
         </div>
       ) : null}
@@ -226,7 +272,6 @@ export function MyThinkingSpacePanel({ onBack }: Props) {
                 <li key={entry.id}>
                   <ThoughtCompanionBox
                     entry={entry}
-                    collections={collections}
                     onOpen={setSelectedThought}
                   />
                 </li>
@@ -246,7 +291,7 @@ export function MyThinkingSpacePanel({ onBack }: Props) {
         <div className="mt-10">
           <button
             type="button"
-            onClick={() => setView("archived")}
+            onClick={openArchived}
             className="text-sm font-semibold text-[#6b635a] hover:text-[#1e4f4f]"
           >
             {MY_THOUGHTS_ARCHIVED} ({archived.length})
@@ -270,6 +315,7 @@ export function MyThinkingSpacePanel({ onBack }: Props) {
       {selectedThought ? (
         <ThoughtCompanionModal onClose={() => setSelectedThought(null)}>
           <ThoughtDetailSheet
+            key={selectedThought.id}
             entry={selectedThought}
             allThoughts={[...allThoughts, ...archived]}
             variant="modal"
@@ -278,10 +324,20 @@ export function MyThinkingSpacePanel({ onBack }: Props) {
               clearThoughtSeparationUndo();
               setSeparateUndo(null);
               refresh();
-              const latest = getBrainDumps().find(
-                (t) => t.id === selectedThought.id,
-              );
-              setSelectedThought(latest ?? null);
+              setSelectedThought((prev) => {
+                if (!prev) return null;
+                const latest =
+                  getBrainDumps().find((t) => t.id === prev.id) ?? null;
+                if (!latest) return null;
+                if (
+                  view === "collection" &&
+                  openCollectionId &&
+                  !thoughtBelongsToCollectionId(latest, openCollectionId)
+                ) {
+                  return null;
+                }
+                return latest;
+              });
             }}
             onSeparated={() => {
               refresh();

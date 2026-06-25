@@ -9,6 +9,12 @@
  */
 
 import { ASSETS } from "./companionUi";
+import {
+  SHARI_OPTIONAL_PHOTOS,
+  sortShariPhotoUrls,
+} from "./shariPhotoManifest";
+
+export { SHARI_OPTIONAL_PHOTOS } from "./shariPhotoManifest";
 
 export type CompanionPhotoContext =
   | "welcome"
@@ -38,16 +44,23 @@ const CONTEXT_ROTATION: CompanionPhotoContext[] = [
 const RECENT_KEY = "companion-shari-recent-photos-v1";
 const SESSION_KEY = "companion-shari-session-photo-v1";
 const SESSION_DAY_KEY = "companion-shari-session-day-v1";
-const PROBE_CACHE_KEY = "companion-shari-photos-v2";
+const PROBE_CACHE_KEY = "companion-shari-photos-v4";
+const WORKSPACE_LAST_KEY = "companion-presence-workspace-last-v2";
+const GLOBAL_LAST_KEY = "companion-presence-global-last-v1";
 const MAX_RECENT = 4;
 
-/** Optional drops in public/images/shari/ — enable rotation when files are added. */
-export const SHARI_OPTIONAL_PHOTOS = Array.from(
-  { length: 8 },
-  (_, index) => `/images/shari/shari-${index + 1}.jpg`,
-);
+/** Workspaces that rotate Shari's photo on each entry. */
+export type CompanionPresenceWorkspace = "clear-my-mind" | "my-thoughts";
 
-/** Approved library — extend SHARI_OPTIONAL_PHOTOS as assets ship. */
+const WORKSPACE_PHOTO_CONTEXT: Record<
+  CompanionPresenceWorkspace,
+  CompanionPhotoContext
+> = {
+  "clear-my-mind": "reflection",
+  "my-thoughts": "planning",
+};
+
+/** Optional drops in public/images/shari/ — enable rotation when files are added. */
 export const APPROVED_COMPANION_PHOTOS: CompanionPhotoEntry[] = [
   {
     src: ASSETS.profile,
@@ -166,22 +179,32 @@ function probeImage(src: string): Promise<boolean> {
   });
 }
 
-/** Probe which approved photos actually exist on disk. */
-export async function probeAvailableCompanionPhotos(): Promise<string[]> {
+/** Probe which approved photos actually exist on disk (client fallback). */
+export async function probeAvailableCompanionPhotos(
+  options?: { forceRefresh?: boolean },
+): Promise<string[]> {
   if (typeof window === "undefined") {
     return [ASSETS.profile];
   }
 
-  try {
-    const cached = sessionStorage.getItem(PROBE_CACHE_KEY);
-    if (cached) {
-      const parsed = JSON.parse(cached) as string[];
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed;
+  if (!options?.forceRefresh) {
+    try {
+      const cached = sessionStorage.getItem(PROBE_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached) as string[];
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
       }
+    } catch {
+      /* ignore corrupt cache */
     }
-  } catch {
-    /* ignore corrupt cache */
+  } else {
+    try {
+      sessionStorage.removeItem(PROBE_CACHE_KEY);
+    } catch {
+      /* ignore */
+    }
   }
 
   const candidates = APPROVED_COMPANION_PHOTOS.map((p) => p.src);
@@ -198,6 +221,70 @@ export async function probeAvailableCompanionPhotos(): Promise<string[]> {
   }
 
   return library;
+}
+
+/**
+ * Resolve available photos — prefers server manifest API, then client probe.
+ * Always re-validates when only one image was cached.
+ */
+export async function resolveAvailableCompanionPhotos(options?: {
+  forceRefresh?: boolean;
+}): Promise<string[]> {
+  if (typeof window === "undefined") {
+    return [ASSETS.profile];
+  }
+
+  const force = options?.forceRefresh ?? false;
+
+  if (!force) {
+    try {
+      const cached = sessionStorage.getItem(PROBE_CACHE_KEY);
+      if (cached) {
+        const parsed = JSON.parse(cached) as string[];
+        if (Array.isArray(parsed) && parsed.length > 1) {
+          return parsed;
+        }
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
+  try {
+    const res = await fetch("/api/companion-shari-images", { cache: "no-store" });
+    if (res.ok) {
+      const data = (await res.json()) as { images?: string[] };
+      if (Array.isArray(data.images) && data.images.length > 0) {
+        try {
+          sessionStorage.setItem(PROBE_CACHE_KEY, JSON.stringify(data.images));
+        } catch {
+          /* quota */
+        }
+        return data.images;
+      }
+    }
+  } catch {
+    /* offline / dev without server */
+  }
+
+  return probeAvailableCompanionPhotos({ forceRefresh: force });
+}
+
+export function companionPhotoFilename(src: string): string {
+  const segment = src.split("/").filter(Boolean).pop();
+  return segment ?? src;
+}
+
+function sortedPhotoPool(available: string[]): string[] {
+  return sortShariPhotoUrls(available);
+}
+
+function pickNextInRotation(pool: string[], previous: string | null): string {
+  if (pool.length === 0) return ASSETS.profile;
+  if (pool.length === 1) return pool[0]!;
+  if (!previous || !pool.includes(previous)) return pool[0]!;
+  const index = pool.indexOf(previous);
+  return pool[(index + 1) % pool.length]!;
 }
 
 function hashSeed(seed: string): number {
@@ -281,4 +368,128 @@ export function pickNextCompanionPhoto(
     return pickCompanionPhoto(context, { available, forceNew: true });
   }
   return pickFromPool(pool, context, recent);
+}
+
+function readGlobalLastPhoto(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return sessionStorage.getItem(GLOBAL_LAST_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function writeGlobalLastPhoto(src: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.setItem(GLOBAL_LAST_KEY, src);
+  } catch {
+    /* quota */
+  }
+}
+
+function readWorkspaceLastPhoto(
+  workspace: CompanionPresenceWorkspace,
+): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(WORKSPACE_LAST_KEY);
+    if (!raw) return null;
+    const map = JSON.parse(raw) as Record<string, string>;
+    return map[workspace] ?? null;
+  } catch {
+    return null;
+  }
+}
+
+function writeWorkspaceLastPhoto(
+  workspace: CompanionPresenceWorkspace,
+  src: string,
+): void {
+  if (typeof window === "undefined") return;
+  try {
+    const raw = sessionStorage.getItem(WORKSPACE_LAST_KEY);
+    const map = raw ? (JSON.parse(raw) as Record<string, string>) : {};
+    map[workspace] = src;
+    sessionStorage.setItem(WORKSPACE_LAST_KEY, JSON.stringify(map));
+  } catch {
+    /* quota */
+  }
+}
+
+export type WorkspaceEntryPhotoResult = {
+  src: string;
+  reason: string;
+  previousImage: string | null;
+  fallbackOnly: boolean;
+  photoContext: CompanionPhotoContext;
+};
+
+/**
+ * Pick a photo when the user enters Clear My Mind™ or My Thoughts™.
+ * Deterministic rotation — next image in sorted list, never same twice in a row.
+ */
+export function pickWorkspaceEntryPhoto(
+  workspace: CompanionPresenceWorkspace,
+  available: string[],
+): WorkspaceEntryPhotoResult {
+  const photoContext = WORKSPACE_PHOTO_CONTEXT[workspace];
+  const workspacePrevious = readWorkspaceLastPhoto(workspace);
+  const previousImage = readGlobalLastPhoto() ?? workspacePrevious;
+  const pool = sortedPhotoPool(
+    available.length > 0 ? available : [ASSETS.profile],
+  );
+
+  if (pool.length <= 1) {
+    const src = pool[0]!;
+    writeWorkspaceLastPhoto(workspace, src);
+    writeGlobalLastPhoto(src);
+    return {
+      src,
+      reason: "only-one-image-available",
+      previousImage,
+      fallbackOnly: true,
+      photoContext,
+    };
+  }
+
+  const picked = pickNextInRotation(pool, previousImage);
+  writeWorkspaceLastPhoto(workspace, picked);
+  writeGlobalLastPhoto(picked);
+
+  return {
+    src: picked,
+    reason: previousImage
+      ? `workspace-entry-rotate:${previousImage}→${picked}`
+      : "workspace-first-entry",
+    previousImage,
+    fallbackOnly: false,
+    photoContext,
+  };
+}
+
+/** Temporary QA logging — remove after Companion Presence rotation is verified. */
+export function logCompanionPresenceDebug(
+  workspace: CompanionPresenceWorkspace,
+  detectedImages: string[],
+  result: WorkspaceEntryPhotoResult,
+): void {
+  if (process.env.NODE_ENV === "production") return;
+  console.info("[CompanionPresence Debug]", {
+    workspace,
+    detectedImages,
+    previousImage: result.previousImage,
+    selectedImage: result.src,
+    fallbackUsed: result.fallbackOnly,
+    reason: result.reason,
+  });
+}
+
+/** @deprecated Use logCompanionPresenceDebug */
+export function logCompanionPresenceDev(
+  workspace: CompanionPresenceWorkspace,
+  availableImages: string[],
+  result: WorkspaceEntryPhotoResult,
+): void {
+  logCompanionPresenceDebug(workspace, availableImages, result);
 }

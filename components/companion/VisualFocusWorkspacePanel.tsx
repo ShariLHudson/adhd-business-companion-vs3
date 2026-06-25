@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { LibraryCloseButton } from "@/components/companion/LibraryOrientationChrome";
+import { AppBackButton } from "@/components/companion/AppBackButton";
+import { NAV_FOCUS_MY_BRAIN } from "@/lib/navigationBack";
 import { VisualFocusStudioHub } from "@/components/companion/VisualFocusStudioHub";
 import { VisualFocusPurposeAnchor } from "@/components/companion/VisualFocusPurposeAnchor";
 import { VisualFocusMapHeader } from "@/components/companion/visualFocus/VisualFocusMapHeader";
@@ -588,23 +590,13 @@ export function VisualFocusWorkspacePanel({
         <div className="flex min-h-0 flex-1 flex-col">
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#e7dfd4] pb-4">
             <div className="flex flex-wrap items-center gap-3">
-              <button
-                type="button"
-                onClick={backToStudio}
-                className="inline-flex items-center gap-1 rounded-full border border-[#e7d9c8] bg-[#faf7f2] px-3 py-1.5 text-sm font-semibold text-[#2f261f] hover:bg-[#f3ebe0]"
-                data-testid="visual-focus-back-to-studio"
-              >
-                <span aria-hidden="true">←</span>
-                Back to Studio
-              </button>
-              <button
-                type="button"
-                onClick={backToStudio}
-                className="inline-flex items-center gap-1 rounded-full border border-[#e7dfd4] bg-white px-3 py-1.5 text-sm font-semibold text-[#6b635a] hover:bg-[#faf7f2]"
-                data-testid="visual-focus-close-map"
-              >
-                Close map
-              </button>
+              <AppBackButton
+                destination="Studio"
+                onBack={backToStudio}
+                size="compact"
+                className="mb-0"
+                ariaLabel="Back to Studio"
+              />
               {modeBadge ? (
                 <span
                   className="rounded-full bg-[#1e4f4f]/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#1e4f4f]"
@@ -694,7 +686,12 @@ export function VisualFocusWorkspacePanel({
                 }}
                 onDelete={() => setDeleteDialogOpen(true)}
               />
-              {onClose ? <LibraryCloseButton onClose={onClose} /> : null}
+              {onClose ? (
+                <LibraryCloseButton
+                  onClose={onClose}
+                  destination={NAV_FOCUS_MY_BRAIN}
+                />
+              ) : null}
             </div>
           </div>
 

@@ -3,6 +3,7 @@
 import { FormEvent, useEffect, useState } from "react";
 
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import { GoogleSignInIcon } from "@/components/companion/GoogleSignInIcon";
 import { useCompanionLanguage } from "@/components/companion/CompanionLanguageProvider";
 import {
   recordAuthLoginFailure,
@@ -371,9 +372,9 @@ export function CompanionSignInForm({
           type="button"
           disabled={googleBusy || !configured}
           onClick={() => void onGoogleSignIn()}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#d4cdc3] bg-white px-4 py-3 text-base font-semibold text-[#1f1c19] shadow-sm transition-colors hover:bg-[#faf7f2] disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#d4cdc3] bg-white px-4 py-3 text-base font-semibold text-[#1f1c19] shadow-sm transition-colors hover:bg-[#faf7f2] disabled:opacity-60"
         >
-          <span aria-hidden="true">G</span>
+          <GoogleSignInIcon className="h-5 w-5 shrink-0" />
           {googleBusy ? "One moment…" : "Continue with Google"}
         </button>
       ) : null}

@@ -20,12 +20,17 @@ import {
   splitThoughtIntoParts,
 } from "./thoughtOperations";
 import {
+  CATALOG_COLLECTION_PREFIX,
   collectionPickerValueForThought,
+  collectionSelectionKey,
   getActiveCollectionId,
+  isCollectionSelectionDirty,
   listCollectionPickerOptions,
   moveThoughtToCollection,
   resolveCollectionIdFromPicker,
+  saveThoughtCollectionSelection,
 } from "./thoughtCollectionAuthority";
+import { getThoughtCollections } from "./collections";
 import { UNCATEGORIZED_COLLECTION_ID } from "./collectionSummaries";
 
 describe("thinkingSpace", () => {
@@ -123,6 +128,63 @@ describe("thinkingSpace", () => {
     const updated = getBrainDumps()[0]!;
     expect(getActiveCollectionId(updated)).toBe(healthId);
     expect(collectionPickerValueForThought(updated)).toBe(healthId);
+  });
+
+  it("detects collection draft changes without creating collections on render", () => {
+    addBrainDump("call about peptides");
+    const thought = getBrainDumps()[0]!;
+    const business = createThoughtCollection({ label: "Business" });
+    moveThoughtToCollection(thought.id, business.id);
+
+    const beforeCount = getThoughtCollections().length;
+    const healthPicker = `${CATALOG_COLLECTION_PREFIX}Health`;
+
+    expect(isCollectionSelectionDirty(thought, healthPicker)).toBe(true);
+    expect(getThoughtCollections().length).toBe(beforeCount);
+
+    const healthId = resolveCollectionIdFromPicker(healthPicker)!;
+    moveThoughtToCollection(thought.id, healthId);
+
+    expect(getActiveCollectionId(getBrainDumps()[0]!)).toBe(healthId);
+    expect(isCollectionSelectionDirty(getBrainDumps()[0]!, healthPicker)).toBe(
+      false,
+    );
+    expect(collectionSelectionKey(healthPicker)).toBe(healthId);
+  });
+
+  it("persists global collection moves via Companion Box save", () => {
+    addBrainDump("call about peptides");
+    const thought = getBrainDumps()[0]!;
+    expect(getActiveCollectionId(thought)).toBeUndefined();
+
+    const business = createThoughtCollection({ label: "Business" });
+    const healthPicker = `${CATALOG_COLLECTION_PREFIX}Health`;
+    const websitePicker = `${CATALOG_COLLECTION_PREFIX}Website / Tech`;
+
+    const moves: Array<{
+      picker: string;
+      expectId: string | undefined;
+    }> = [
+      { picker: business.id, expectId: business.id },
+      { picker: healthPicker, expectId: resolveCollectionIdFromPicker(healthPicker)! },
+      { picker: business.id, expectId: business.id },
+      { picker: websitePicker, expectId: resolveCollectionIdFromPicker(websitePicker)! },
+      { picker: UNCATEGORIZED_COLLECTION_ID, expectId: undefined },
+    ];
+
+    for (const move of moves) {
+      const current = getBrainDumps().find((t) => t.id === thought.id)!;
+      const result = saveThoughtCollectionSelection(current, move.picker);
+      expect(result.ok).toBe(true);
+      if (!result.ok) continue;
+      expect(getActiveCollectionId(result.entry)).toBe(move.expectId);
+
+      const persisted = getBrainDumps().find((t) => t.id === thought.id)!;
+      expect(getActiveCollectionId(persisted)).toBe(move.expectId);
+      expect(collectionPickerValueForThought(persisted)).toBe(
+        move.expectId ?? UNCATEGORIZED_COLLECTION_ID,
+      );
+    }
   });
 
   it("searches by project name and reminder", async () => {

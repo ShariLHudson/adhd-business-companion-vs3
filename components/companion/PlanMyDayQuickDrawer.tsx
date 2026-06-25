@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { BackButton } from "@/components/companion/BackButton";
+import { AppBackButton } from "@/components/companion/AppBackButton";
+import { NAV_PLAN_MY_DAY } from "@/lib/navigationBack";
 import { ModalSheet } from "@/components/companion/ModalSheet";
 import { PlanDayAddForm } from "@/components/companion/PlanDayAddForm";
 import { PlanDayItemDetail } from "@/components/companion/PlanDayItemDetail";
@@ -62,9 +63,9 @@ export function PlanMyDayQuickDrawer({ open, onClose, onOpenFull }: Props) {
 
         {openItem ? (
           <>
-            <BackButton
-              onClick={() => setOpenItemId(null)}
-              label="Back"
+            <AppBackButton
+              destination={NAV_PLAN_MY_DAY}
+              onBack={() => setOpenItemId(null)}
               size="compact"
             />
             <PlanDayItemDetail

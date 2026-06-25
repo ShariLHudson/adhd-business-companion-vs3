@@ -2,6 +2,12 @@
  * My Thoughts™ — organization workshop (formerly My Thinking Space™).
  */
 
+import {
+  formatAppBackLabel,
+  NAV_CLEAR_MY_MIND,
+  NAV_MY_THOUGHTS,
+} from "@/lib/navigationBack";
+
 export const MY_THOUGHTS_TITLE = "My Thoughts";
 
 export const MY_THOUGHTS_TAGLINE = "What would you like to explore?";
@@ -10,9 +16,11 @@ export const MY_THOUGHTS_EXPLORE_PROMPT = "What would you like to explore?";
 
 export const MY_THOUGHTS_COLLECTIONS_HEADING = "Your collections";
 
-export const MY_THOUGHTS_BACK = "Back to Clear My Mind";
+/** @deprecated Use NAV_CLEAR_MY_MIND with AppBackButton */
+export const MY_THOUGHTS_BACK = formatAppBackLabel(NAV_CLEAR_MY_MIND);
 
-export const MY_THOUGHTS_BACK_COLLECTIONS = "All collections";
+/** @deprecated Use NAV_MY_THOUGHTS with AppBackButton */
+export const MY_THOUGHTS_BACK_COLLECTIONS = formatAppBackLabel(NAV_MY_THOUGHTS);
 
 export const MY_THOUGHTS_SEARCH_PLACEHOLDER =
   "Search thoughts, collections, people, projects…";

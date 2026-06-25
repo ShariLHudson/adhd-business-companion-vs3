@@ -3,8 +3,9 @@
  */
 
 import { getProjects, type BrainDumpEntry } from "@/lib/companionStore";
-import { getThoughtCollections } from "./collections";
-import { resolveCollectionVisual } from "./collectionColors";
+import { getThoughtCollectionById, getThoughtCollections } from "./collections";
+import { paletteForColorId, resolveCollectionVisual } from "./collectionColors";
+import { UNCATEGORIZED_COLLECTION_ID } from "./collectionSummaries";
 import { getActiveCollectionId } from "./thoughtCollectionAuthority";
 
 const TITLE_MAX = 72;
@@ -79,19 +80,33 @@ export type CollectionChipVisual = {
   palette: ReturnType<typeof resolveCollectionVisual>["palette"];
 };
 
+/** Single primary collection chip — collectionId only; never legacy categories. */
+export function primaryCollectionChipForThought(
+  entry: BrainDumpEntry,
+): CollectionChipVisual | null {
+  const id = getActiveCollectionId(entry);
+  if (!id) {
+    const palette = paletteForColorId("still-finding");
+    return {
+      id: UNCATEGORIZED_COLLECTION_ID,
+      label: "Still finding a home",
+      palette,
+    };
+  }
+  const col = getThoughtCollectionById(id);
+  if (!col) return null;
+  const visual = resolveCollectionVisual(col, getThoughtCollections());
+  return {
+    id,
+    label: col.label,
+    palette: visual.palette,
+  };
+}
+
+/** @deprecated Use primaryCollectionChipForThought */
 export function collectionChipsForThought(
   entry: BrainDumpEntry,
 ): CollectionChipVisual[] {
-  const id = getActiveCollectionId(entry);
-  if (!id) return [];
-  const col = getThoughtCollections().find((c) => c.id === id);
-  if (!col) return [];
-  const visual = resolveCollectionVisual(col, getThoughtCollections());
-  return [
-    {
-      id,
-      label: col.label,
-      palette: visual.palette,
-    },
-  ];
+  const chip = primaryCollectionChipForThought(entry);
+  return chip ? [chip] : [];
 }

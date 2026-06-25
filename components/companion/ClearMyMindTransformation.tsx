@@ -100,7 +100,6 @@ export function ClearMyMindTransformation({
                 <li key={entry.id}>
                   <ThoughtCompanionBox
                     entry={entry}
-                    collections={collections}
                     selected={selectedThought?.id === entry.id}
                     onOpen={setSelectedThought}
                   />
@@ -230,16 +229,17 @@ export function ClearMyMindTransformation({
       {selectedThought ? (
         <ThoughtCompanionModal onClose={() => setSelectedThought(null)}>
           <ThoughtDetailSheet
+            key={selectedThought.id}
             entry={selectedThought}
             allThoughts={thoughts}
             variant="modal"
             onClose={() => setSelectedThought(null)}
             onChanged={() => {
               refresh();
-              const latest = getBrainDumps().find(
-                (t) => t.id === selectedThought.id,
-              );
-              setSelectedThought(latest ?? null);
+              setSelectedThought((prev) => {
+                if (!prev) return null;
+                return getBrainDumps().find((t) => t.id === prev.id) ?? null;
+              });
             }}
             onDeleted={() => setSelectedThought(null)}
           />

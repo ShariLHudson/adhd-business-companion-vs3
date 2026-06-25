@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo } from "react";
-import { BackButton } from "@/components/companion/BackButton";
+import { AppBackButton } from "@/components/companion/AppBackButton";
+import { NAV_FOCUS_MY_BRAIN } from "@/lib/navigationBack";
 import { ContinueThinkingCard } from "@/components/companion/ContinueThinkingCard";
 import { VisualFocusStudioCardView } from "@/components/companion/VisualFocusStudioCard";
-import { LibraryCloseButton } from "@/components/companion/LibraryOrientationChrome";
 import {
   VISUAL_FOCUS_STUDIO_CARDS,
   VISUAL_FOCUS_STUDIO_HERO,
@@ -21,6 +21,7 @@ export function VisualFocusStudioHub({
   onDeleteMap,
   onWorkWithShari,
   onBack,
+  backDestination = NAV_FOCUS_MY_BRAIN,
   onClose,
 }: {
   maps: VisualFocusMap[];
@@ -30,6 +31,7 @@ export function VisualFocusStudioHub({
   onDeleteMap?: (id: string) => void;
   onWorkWithShari?: () => void;
   onBack?: () => void;
+  backDestination?: string;
   onClose?: () => void;
 }) {
   const continueThinking = useMemo(
@@ -56,10 +58,13 @@ export function VisualFocusStudioHub({
           </p>
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
-          {onBack ? (
-            <BackButton onClick={onBack} size="compact" label="Back" />
+          {onBack || onClose ? (
+            <AppBackButton
+              destination={backDestination}
+              onBack={onBack ?? onClose!}
+              size="compact"
+            />
           ) : null}
-          {onClose ? <LibraryCloseButton onClose={onClose} /> : null}
         </div>
       </div>
 

@@ -19,6 +19,8 @@ import {
 } from "@/lib/savedWorkStore";
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
+import { AppBackButton } from "@/components/companion/AppBackButton";
+import { NAV_CHAT } from "@/lib/navigationBack";
 import { MENU_DROPDOWN_ITEM, MENU_TEXT } from "@/lib/menuNavStyles";
 
 type SavedWorkAction = "rename" | "duplicate" | "archive" | "unarchive" | "delete";
@@ -127,10 +129,12 @@ function SavedWorkItemMenu({
 
 export function SavedWorkLibrary({
   onBack,
+  backDestination = NAV_CHAT,
   onOpenInCreate,
   embedded = false,
 }: {
   onBack?: () => void;
+  backDestination?: string;
   onOpenInCreate?: (input: CreationWorkspaceInput) => void;
   /** When true, renders inside My Work Hub without standalone chrome. */
   embedded?: boolean;
@@ -297,13 +301,11 @@ export function SavedWorkLibrary({
             </p>
           </div>
           {onBack ? (
-            <button
-              type="button"
-              onClick={onBack}
-              className="shrink-0 text-sm font-semibold text-[#1e4f4f] hover:underline"
-            >
-              ← Back
-            </button>
+            <AppBackButton
+              destination={backDestination}
+              onBack={onBack}
+              size="compact"
+            />
           ) : null}
         </div>
       ) : null}
@@ -327,13 +329,11 @@ export function SavedWorkLibrary({
       {viewing ? (
         <div className="mt-6 flex min-h-0 flex-1 flex-col rounded-2xl border border-[#e7dfd4] bg-white p-4">
           <div className="flex items-start justify-between gap-2">
-            <button
-              type="button"
-              onClick={() => setViewId(null)}
-              className="text-sm font-semibold text-[#1e4f4f] hover:underline"
-            >
-              ← All saved work
-            </button>
+            <AppBackButton
+              destination="Saved Work"
+              onBack={() => setViewId(null)}
+              size="compact"
+            />
             <SavedWorkItemMenu item={viewing} onAction={handleItemAction} />
           </div>
           <p className="mt-2 text-xs font-bold uppercase tracking-wide text-[#6b635a]">

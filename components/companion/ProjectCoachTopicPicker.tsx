@@ -10,6 +10,7 @@ import {
   type ProjectCoachNeed,
   type ProjectCoachSelection,
 } from "@/lib/projectCoachChoices";
+import { AppBackButton } from "@/components/companion/AppBackButton";
 
 const btnClass =
   "rounded-xl border border-[#1e4f4f]/25 bg-white px-3 py-2 text-sm font-semibold text-[#1e4f4f] transition-colors hover:border-[#1e4f4f] hover:bg-white text-left";
@@ -62,13 +63,12 @@ export function ProjectCoachTopicPicker({
             </li>
           ))}
         </ul>
-        <button
-          type="button"
-          onClick={backToNeeds}
-          className="mt-2 text-xs font-semibold text-[#9a8f82] hover:text-[#6b635a]"
-        >
-          ← Back
-        </button>
+        <AppBackButton
+          destination="What you need"
+          onBack={backToNeeds}
+          size="compact"
+          className="mt-2"
+        />
       </div>
     );
   }

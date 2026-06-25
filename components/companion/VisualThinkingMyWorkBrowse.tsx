@@ -2,13 +2,16 @@
 
 import type { MyWorkHubItem } from "@/lib/myWorkHub";
 import { buildVisualThinkingByCategory } from "@/lib/myWorkHub";
+import { AppBackButton } from "@/components/companion/AppBackButton";
 
 export function VisualThinkingMyWorkBrowse({
   onOpenMap,
   onBack,
+  backDestination = "Saved™",
 }: {
   onOpenMap: (mapId: string, preferGenerated: boolean) => void;
   onBack?: () => void;
+  backDestination?: string;
 }) {
   const categories = buildVisualThinkingByCategory();
 
@@ -22,13 +25,11 @@ export function VisualThinkingMyWorkBrowse({
           </p>
         </div>
         {onBack ? (
-          <button
-            type="button"
-            onClick={onBack}
-            className="rounded-full border border-[#e7d9c8] bg-[#faf7f2] px-3 py-1.5 text-sm font-semibold text-[#2f261f]"
-          >
-            ← Back
-          </button>
+          <AppBackButton
+            destination={backDestination}
+            onBack={onBack}
+            size="compact"
+          />
         ) : null}
       </div>
 

@@ -8,12 +8,18 @@ import { ClearMyMindPresenceBubble } from "@/components/companion/ClearMyMindPre
 
 type Props = {
   thoughtCount: number;
+  workspaceEntryKey?: number;
 };
 
-export function ThinkingSpacePresence({ thoughtCount }: Props) {
+export function ThinkingSpacePresence({
+  thoughtCount,
+  workspaceEntryKey = 0,
+}: Props) {
   const presence = useCompanionPresence({
     workspacePanel: "brain-dump",
     workspaceActiveBeside: true,
+    presenceWorkspace: "my-thoughts",
+    workspaceEntryKey,
     clearMyMindPhase: "supporting",
     isThinking: false,
     emotion: "emotional",
@@ -40,7 +46,9 @@ export function ThinkingSpacePresence({ thoughtCount }: Props) {
             className="clear-my-mind-in-room-voice"
           />
         </div>
-        <ShariPortrait presence={presence} size="in-room" alt="Shari" />
+        <div className="flex flex-col items-center">
+          <ShariPortrait presence={presence} size="in-room" alt="Shari" />
+        </div>
       </div>
     </div>
   );

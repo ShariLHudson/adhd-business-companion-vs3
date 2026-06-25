@@ -10,6 +10,7 @@ import {
   CLEAR_MY_MIND_HEADER,
   CLEAR_MY_MIND_PERMISSION,
 } from "@/lib/clearMyMindCopy";
+import { NAV_CLEAR_MY_MIND } from "@/lib/navigationBack";
 import type { AppSection } from "@/lib/companionUi";
 import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
@@ -40,6 +41,11 @@ export function BrainDumpPanel({
   const [holdAck, setHoldAck] = useState<string | null>(null);
   const [totalThoughtCount, setTotalThoughtCount] = useState(0);
   const [panelView, setPanelView] = useState<PanelView>("capture");
+  const [presenceEntryKey, setPresenceEntryKey] = useState(0);
+
+  useEffect(() => {
+    setPresenceEntryKey((key) => key + 1);
+  }, [panelView]);
 
   useEffect(() => {
     clearBrainDumpDraft();
@@ -70,7 +76,11 @@ export function BrainDumpPanel({
           className={`${workspacePanelShellClass({ width: "full", inSplit: false })} min-w-0 overflow-y-auto`}
         >
           <div className="clear-my-mind-room">
-            <MyThinkingSpacePanel onBack={() => setPanelView("capture")} />
+            <MyThinkingSpacePanel
+              backDestination={NAV_CLEAR_MY_MIND}
+              onBack={() => setPanelView("capture")}
+              presenceEntryKey={presenceEntryKey}
+            />
           </div>
         </div>
       </div>
@@ -112,6 +122,7 @@ export function BrainDumpPanel({
             holdAck={holdAck}
             unfoldStep="idle"
             totalThoughtCount={totalThoughtCount}
+            workspaceEntryKey={presenceEntryKey}
           />
 
           <div className="clear-my-mind-room-work">

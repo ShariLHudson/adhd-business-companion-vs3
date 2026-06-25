@@ -20,6 +20,7 @@ import {
   type WorkspaceViewSizePreset,
 } from "@/lib/workspaceViewSize";
 import { BackButton } from "@/components/companion/BackButton";
+import { NAV_CHAT } from "@/lib/navigationBack";
 import { WorkspaceViewSizeControl } from "@/components/companion/WorkspaceViewSizeControl";
 
 // Workspace Mode shell — Chat + working area together. Presentational only, so
@@ -43,6 +44,7 @@ export function WorkspaceLayout({
   chatLayoutMode = "workspace-focus",
   onChatLayoutModeChange,
   onClose,
+  backDestination = NAV_CHAT,
   revealKey = 0,
   workspaceFirst = false,
   hideAssistToggle = false,
@@ -61,6 +63,8 @@ export function WorkspaceLayout({
   chatLayoutMode?: ChatLayoutMode;
   onChatLayoutModeChange?: (mode: ChatLayoutMode) => void;
   onClose?: () => void;
+  /** Previous page name for the standard ← Back control. */
+  backDestination?: string;
   /** Increment to scroll/focus workspace into view after open. */
   revealKey?: number;
   /** Workspace on the left, companion chat on the right (user-initiated assist). */
@@ -221,7 +225,11 @@ export function WorkspaceLayout({
           >
             <div className="flex min-w-0 items-center gap-2">
               {onClose ? (
-                <BackButton onClick={onClose} size="compact" label="Back" />
+                <BackButton
+                  onClick={onClose}
+                  size="compact"
+                  label={backDestination}
+                />
               ) : null}
               <span className="truncate text-sm font-semibold text-[#2d2926]">
                 {workspaceTitle}

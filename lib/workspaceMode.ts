@@ -66,7 +66,7 @@ export function supportsWorkspace(section: AppSection): boolean {
 }
 
 export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
-  projects: "Projects",
+  projects: "Projects™",
   "my-work": "Other",
   "content-generator": "Documents",
   "google-workspace": "Google Workspace",
@@ -74,7 +74,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "saved-work": "Created Content",
   playbook: "Strategies",
   "how-do-i": "How Do I",
-  "brain-dump": "Clear My Mind",
+  "brain-dump": "Clear My Mind™",
   "time-block": "Momentum Appointments",
   "email-generator": "Email",
   snippets: "Snippets",
@@ -82,7 +82,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "client-avatars": "Audience Profile",
   "decision-compass": "Decision Compass",
   today: "Today",
-  "plan-my-day": "Plan My Day",
+  "plan-my-day": "Plan My Day™",
   "visual-focus": "Visual Thinking",
   "wins-this-week": "Wins This Week",
   "evidence-bank": "Evidence Bank",
@@ -93,7 +93,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "focus-timer": "Focus",
   settings: "Settings",
   profile: "Profile",
-  focus: "Focus My Brain",
+  focus: "Focus My Brain™",
   progress: "Progress",
   activities: "Activities",
 };
@@ -102,7 +102,7 @@ const EXTRA_AREA_TITLES: Partial<Record<AppSection, string>> = {
   home: "Chat",
   settings: "Settings",
   profile: "Profile",
-  focus: "Focus My Brain",
+  focus: "Focus My Brain™",
   progress: "Progress",
   energy: "Energy",
   activities: "Activities",
