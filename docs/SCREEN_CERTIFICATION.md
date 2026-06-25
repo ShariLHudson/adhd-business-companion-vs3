@@ -33,6 +33,25 @@ Companion Brain Intelligence™ modules activate **only after:**
 
 ---
 
+## Release branch
+
+Screen certification work runs on a dedicated branch so history stays clean:
+
+**Branch:** `release/v1-screen-certification`
+
+**Expected commit arc:**
+
+1. Governance milestone (`docs: establish governance framework…`) — on `main`
+2. `certify: Plan My Day™ complete`
+3. `certify: Visual Thinking™ complete`
+4. `certify: Projects™ complete`
+5. … (one commit per certified screen, in [certification order](#recommended-certification-order))
+6. `release: Version 1.0 screen certification complete`
+
+Merge to `main` when all 15 screens pass all 10 gates and the impress question.
+
+---
+
 ## The final question
 
 Before marking any screen COMPLETE, answer honestly:
