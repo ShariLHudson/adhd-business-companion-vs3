@@ -1,19 +1,16 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { PRESENCE_LINES, type EmotionalState } from "@/lib/companionEmotions";
-import { ASSETS, BRAND } from "@/lib/companionUi";
-import { getShariImageState } from "@/lib/shariImageState";
-import { recognitionToShariPresence } from "@/lib/recognition/shariPresenceBridge";
+import { BRAND } from "@/lib/companionUi";
+import type { AppSection } from "@/lib/companionUi";
 import type { RecognitionMoment } from "@/lib/recognition/types";
+import type { RecoveryLevel } from "@/lib/recovery-intelligence/types";
 import { useVisualMode } from "@/lib/useVisualMode";
-import {
-  getMemberSinceIso,
-  isAppAnniversaryToday,
-} from "@/lib/shariMemberSince";
+import { getMemberSinceIso } from "@/lib/shariMemberSince";
+import { useCompanionPresence } from "@/lib/useCompanionPresence";
+import { ShariPortrait } from "@/components/companion/ShariPortrait";
 
-// A soft "mood ring" color around Shari's photo, reflecting the read on how the
-// person seems.
 const RING: Record<EmotionalState, string> = {
   focused: "#2e8b57",
   building: "#1e4f4f",
@@ -25,32 +22,26 @@ const RING: Record<EmotionalState, string> = {
 
 type IdentityBarProps = {
   emotion: EmotionalState;
-  /** Calm home landing — greeting + question only; no coaching copy. */
   calmHome?: boolean;
   photoError: boolean;
   logoError: boolean;
   onPhotoError: () => void;
   onLogoError: () => void;
-  /** Slim header once chat is underway — conversation owns the screen. */
   compact?: boolean;
   resumeLine?: string | null;
   onResumeClick?: () => void;
   userBirthday?: { month: number; day: number } | null;
   recognitionMoment?: RecognitionMoment | null;
-  /** Gentle recovery day / lighter-day support is active. */
-  recoveryMode?: boolean;
-  /** Focus timer or focus workspace is active. */
+  recoveryLevel?: RecoveryLevel | null;
   focusMode?: boolean;
-  /** User win / recognition moment — proud Shari. */
   recognitionWin?: boolean;
-  /** Optional gentle load-awareness line for the opening welcome. */
   welcomeLine?: string | null;
-  /** Dismiss the welcome line for today (cognitive load offer). */
   onDismissWelcome?: () => void;
-  /** Primary question on calm home — replaces status line. */
   primaryQuestion?: string | null;
-  /** Returning user — show welcome back instead of cold greeting question. */
   welcomeBack?: boolean;
+  workspacePanel?: AppSection | null;
+  workspaceActiveBeside?: boolean;
+  isThinking?: boolean;
 };
 
 export function IdentityBar({
@@ -63,13 +54,16 @@ export function IdentityBar({
   calmHome = false,
   userBirthday = null,
   recognitionMoment = null,
-  recoveryMode = false,
+  recoveryLevel = null,
   focusMode = false,
   recognitionWin = false,
   welcomeLine = null,
   onDismissWelcome,
   primaryQuestion = null,
   welcomeBack = false,
+  workspacePanel = null,
+  workspaceActiveBeside = false,
+  isThinking = false,
 }: IdentityBarProps) {
   const effectiveWelcome = calmHome ? null : welcomeLine;
   const effectivePrimary =
@@ -96,78 +90,70 @@ export function IdentityBar({
         : RING[emotion] ?? "#d4a574";
 
   const [memberSince, setMemberSince] = useState<string | null>(null);
-  const [imageSrc, setImageSrc] = useState<string>(ASSETS.profile);
 
   useEffect(() => {
     setMemberSince(getMemberSinceIso());
   }, []);
 
-  const presence = useMemo(() => {
-    const now = new Date();
-    const milestoneCelebration = isAppAnniversaryToday(memberSince, now)
-      ? ("app_anniversary" as const)
-      : null;
-    const base = recognitionToShariPresence(
-      calmHome ? null : recognitionMoment,
-      {
-        now,
-        emotion,
-        userBirthday,
-        milestoneCelebration,
-        recoveryMode: calmHome ? false : recoveryMode,
-        focusMode: calmHome ? false : focusMode,
-        recognitionWin: calmHome ? false : recognitionWin,
-      },
-    );
-    return getShariImageState(base);
-  }, [
+  const presence = useCompanionPresence({
+    compact,
     calmHome,
     emotion,
-    memberSince,
     userBirthday,
-    recognitionMoment,
-    recoveryMode,
-    focusMode,
-    recognitionWin,
-  ]);
+    recognitionMoment: calmHome ? null : recognitionMoment,
+    recoveryLevel: calmHome ? null : recoveryLevel,
+    focusMode: calmHome ? false : focusMode,
+    recognitionWin: calmHome ? false : recognitionWin,
+    memberSince,
+    workspacePanel,
+    workspaceActiveBeside,
+    isThinking,
+  });
 
-  useEffect(() => {
-    if (compact) {
-      setImageSrc(ASSETS.profile);
-      return;
-    }
-    setImageSrc(presence.src);
-  }, [compact, presence.src]);
-
-  const avatar = (size: "lg" | "sm") => {
-    const dim = size === "lg" ? "h-24 w-24 text-2xl" : "h-10 w-10 text-sm";
-    const imgDim = size === "lg" ? 96 : 40;
-    return photoError ? (
+  if (photoError) {
+    const dim = compact ? "h-10 w-10 text-sm" : "h-24 w-24 text-2xl";
+    const fallback = (
       <div
         className={`flex ${dim} items-center justify-center rounded-full bg-gradient-to-br from-[#e8dfd4] to-[#d4c8b8] font-semibold text-[#5c534a]`}
       >
         S
       </div>
-    ) : (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
-        key={compact ? "compact" : `${presence.state}-${imageSrc}`}
-        src={imageSrc}
-        alt="Shari"
-        width={imgDim}
-        height={imgDim}
-        data-shari-state={compact ? "default" : presence.state}
-        onError={() => {
-          if (imageSrc !== ASSETS.profile) {
-            setImageSrc(ASSETS.profile);
-            return;
-          }
-          onPhotoError();
-        }}
-        className={`rounded-full object-cover ${compact ? "" : "companion-fade-in transition-opacity duration-700"} ${dim}`}
-      />
     );
-  };
+
+    if (compact) {
+      return (
+        <header className="identity-bar identity-bar-compact shrink-0 px-4 py-2.5 sm:px-6">
+          <div className="mx-auto flex max-w-xl items-center justify-center gap-3">
+            <div
+              className="presence-glow shrink-0 rounded-full p-0.5"
+              style={{ boxShadow: `0 0 0 2px ${ring}55, 0 0 12px ${ring}28` }}
+            >
+              {fallback}
+            </div>
+            <p className="text-base italic leading-snug text-[#6b635a]">{status}</p>
+          </div>
+        </header>
+      );
+    }
+
+    return (
+      <header className="identity-bar shrink-0 px-4 py-6 text-center sm:py-8">
+        <div className="mx-auto flex max-w-md flex-col items-center">
+          <div
+            className="presence-glow rounded-full p-1"
+            style={{ boxShadow: `0 0 0 4px ${ring}55, 0 0 24px ${ring}33` }}
+          >
+            {fallback}
+          </div>
+          <p className="mt-4 text-2xl font-semibold text-[#1f1c19]">
+            Hi, I&apos;m Shari
+          </p>
+          <p className="mt-0.5 text-base text-[#1e4f4f]">{BRAND.tagline}</p>
+          <p className="mt-2 text-lg italic text-[#6b635a]">{status}</p>
+        </div>
+      </header>
+    );
+  }
 
   if (compact) {
     return (
@@ -177,9 +163,18 @@ export function IdentityBar({
             className="presence-glow shrink-0 rounded-full p-0.5 transition-shadow duration-700"
             style={{ boxShadow: `0 0 0 2px ${ring}55, 0 0 12px ${ring}28` }}
           >
-            {avatar("sm")}
+            <ShariPortrait
+              presence={presence}
+              size="compact"
+              ringColor={ring}
+              onError={onPhotoError}
+            />
           </div>
-          <p className="text-base italic leading-snug text-[#6b635a]">{status}</p>
+          <p className="text-base italic leading-snug text-[#6b635a]">
+            {isThinking && presence.thinkingMessage
+              ? presence.thinkingMessage
+              : status}
+          </p>
         </div>
       </header>
     );
@@ -188,12 +183,12 @@ export function IdentityBar({
   return (
     <header className="identity-bar shrink-0 px-4 py-6 text-center sm:py-8">
       <div className="mx-auto flex max-w-md flex-col items-center">
-        <div
-          className="presence-glow rounded-full p-1 transition-shadow duration-700"
-          style={{ boxShadow: `0 0 0 4px ${ring}55, 0 0 24px ${ring}33` }}
-        >
-          {avatar("lg")}
-        </div>
+        <ShariPortrait
+          presence={presence}
+          size="standard"
+          ringColor={ring}
+          onError={onPhotoError}
+        />
 
         <p className="mt-4 text-2xl font-semibold text-[#1f1c19]">
           Hi, I&apos;m Shari
@@ -216,7 +211,9 @@ export function IdentityBar({
                   : "italic text-[#6b635a]"
               }`}
             >
-              {status}
+              {isThinking && presence.thinkingMessage
+                ? presence.thinkingMessage
+                : status}
             </p>
             {effectiveWelcome && onDismissWelcome ? (
               <button

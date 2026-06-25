@@ -62,7 +62,7 @@ export const APPROVED_COMPANION_PHOTOS: CompanionPhotoEntry[] = [
       "celebration",
     ],
   },
-  ...SHARI_OPTIONAL_PHOTOS.map((src, index) => ({
+  ...SHARI_OPTIONAL_PHOTOS.map((src, index): CompanionPhotoEntry => ({
     src,
     contexts: [
       CONTEXT_ROTATION[index % CONTEXT_ROTATION.length],
