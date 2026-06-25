@@ -561,6 +561,51 @@
   padding-top: 0.25rem;
 }
 
+/* ── Clear My Mind™ cognitive relief ── */
+.clear-my-mind-capture::placeholder {
+  color: #8a8178;
+  font-style: italic;
+}
+
+.clear-my-mind-companion {
+  animation: companionFadeIn 0.45s ease-out forwards;
+}
+
+.clear-my-mind-hold-btn {
+  background: #1e4f4f;
+  box-shadow: 0 4px 16px rgba(30, 79, 79, 0.28);
+  min-height: 3rem;
+  transition:
+    background 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.1s ease;
+}
+
+.clear-my-mind-hold-btn:hover:not(:disabled) {
+  background: #163c3c;
+  box-shadow: 0 6px 20px rgba(30, 79, 79, 0.34);
+}
+
+.clear-my-mind-hold-btn:active:not(:disabled) {
+  transform: scale(0.98);
+}
+
+.clear-my-mind-hold-btn:disabled {
+  background: #b8c9c7;
+  box-shadow: none;
+  opacity: 1;
+}
+
+.clear-my-mind-voice-row {
+  align-items: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clear-my-mind-companion {
+    animation: none;
+  }
+}
+
 .companion-background-calm .companion-bg-scene {
   opacity: 0.78;
 }

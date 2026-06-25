@@ -24,6 +24,9 @@ type VoiceAnswerFieldProps = {
   inputClassName?: string;
   /** Accessibility label for the mic — not shown visually. */
   micTitle?: string;
+  onFocus?: () => void;
+  onVoiceUsed?: () => void;
+  voiceProminent?: boolean;
   /** @deprecated Layout is always compact (icon beside field). */
   compact?: boolean;
 };
@@ -41,6 +44,9 @@ export function VoiceAnswerField({
   className = "",
   inputClassName,
   micTitle = "Voice input",
+  onFocus,
+  onVoiceUsed,
+  voiceProminent = false,
 }: VoiceAnswerFieldProps) {
   const fieldCls =
     inputClassName ??
@@ -50,12 +56,23 @@ export function VoiceAnswerField({
 
   return (
     <div className={className}>
-      <div className="flex items-start gap-2">
+      <div
+        className={`flex items-start gap-3 ${voiceProminent ? "clear-my-mind-voice-row" : "gap-2"}`}
+      >
+        <MicButton
+          prominent={voiceProminent}
+          onText={(t) => {
+            onVoiceUsed?.();
+            onChange(appendVoiceText(value, t));
+          }}
+          title={micTitle}
+        />
         {multiline ? (
           <textarea
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onFocus={onFocus}
             placeholder={placeholder}
             autoFocus={autoFocus}
             className={fieldCls}
@@ -66,15 +83,12 @@ export function VoiceAnswerField({
             type="text"
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onFocus={onFocus}
             placeholder={placeholder}
             autoFocus={autoFocus}
             className={fieldCls}
           />
         )}
-        <MicButton
-          onText={(t) => onChange(appendVoiceText(value, t))}
-          title={micTitle}
-        />
       </div>
     </div>
   );

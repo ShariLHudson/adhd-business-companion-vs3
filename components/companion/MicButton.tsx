@@ -29,10 +29,13 @@ export function MicButton({
   title = "Voice input",
   className,
   lang,
+  prominent = false,
 }: {
   onText: (text: string) => void;
   title?: string;
   className?: string;
+  /** Larger mic for voice-first surfaces (e.g. Clear My Mind). */
+  prominent?: boolean;
   lang?: string;
 }) {
   const recRef = useRef<Recognition | null>(null);
@@ -132,10 +135,14 @@ export function MicButton({
       title={title}
       aria-label={title}
       aria-pressed={listening}
-      className={`inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border text-lg transition-colors ${
+      className={`inline-flex shrink-0 items-center justify-center rounded-full border text-lg transition-colors ${
+        prominent ? "h-12 w-12 text-xl" : "h-10 w-10"
+      } ${
         listening
-          ? "animate-pulse border-[#1e4f4f] bg-[#1e4f4f] text-white"
-          : "border-[#c9bfb0] bg-white text-[#1e4f4f] hover:border-[#1e4f4f]"
+          ? "animate-pulse border-[#1e4f4f] bg-[#1e4f4f] text-white shadow-[0_4px_14px_rgba(30,79,79,0.35)]"
+          : prominent
+            ? "border-[#1e4f4f]/40 bg-[#f0f8f8] text-[#1e4f4f] shadow-[0_2px_10px_rgba(30,79,79,0.15)] hover:border-[#1e4f4f] hover:bg-[#e6f4f4]"
+            : "border-[#c9bfb0] bg-white text-[#1e4f4f] hover:border-[#1e4f4f]"
       } ${className ?? ""}`}
     >
       <span aria-hidden="true">🎤</span>

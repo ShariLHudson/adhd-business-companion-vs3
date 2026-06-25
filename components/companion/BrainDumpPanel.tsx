@@ -3,16 +3,24 @@
 import { useCallback, useEffect, useState } from "react";
 import { clearBrainDumpDraft, type BrainDumpEntry } from "@/lib/companionStore";
 import { ClearMyMindSession } from "@/components/companion/ClearMyMindSession";
+import { ClearMyMindCompanionPanel } from "@/components/companion/ClearMyMindCompanionPanel";
 import { BrainDumpVisualPanel } from "@/components/visual-thinking/BrainDumpVisualPanel";
 import { newCaptureSessionId } from "@/lib/clearMyMindCapture";
 import {
-  CLEAR_MY_MIND_CAPTURE_EXAMPLE,
-  CLEAR_MY_MIND_CAPTURE_GUIDANCE,
   CLEAR_MY_MIND_HEADER,
+  CLEAR_MY_MIND_PERMISSION,
 } from "@/lib/clearMyMindCopy";
+import type { ClearMyMindChoiceId } from "@/lib/clearMyMindCompanionVoice";
+import {
+  clearMyMindShowsCompanionPanel,
+  clearMyMindShowsExportTools,
+  clearMyMindShowsVisualAnalysis,
+  initialClearMyMindStage,
+  stageOnAcknowledgmentContinue,
+  type ClearMyMindStage,
+} from "@/lib/clearMyMindStages";
 import type { AppSection } from "@/lib/companionUi";
 import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
-import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
 export function BrainDumpPanel({
@@ -20,7 +28,6 @@ export function BrainDumpPanel({
   onSuggestOpen,
   onContextChange,
   contextBanner,
-  /** Full-width layout when opened standalone from top navigation. */
   standalone = false,
 }: {
   onOpen?: (section: AppSection) => void;
@@ -30,40 +37,71 @@ export function BrainDumpPanel({
   standalone?: boolean;
 }) {
   const [captureSessionId] = useState(newCaptureSessionId);
-  const [landscapeActive, setLandscapeActive] = useState(false);
+  const [stage, setStage] = useState<ClearMyMindStage>(initialClearMyMindStage);
   const [sessionVisualEntries, setSessionVisualEntries] = useState<
     BrainDumpEntry[]
   >([]);
+  const [selectedChoice, setSelectedChoice] = useState<ClearMyMindChoiceId | null>(
+    null,
+  );
 
   useEffect(() => {
     clearBrainDumpDraft();
   }, []);
 
   useEffect(() => {
+    const stageLabel =
+      stage === "permission" || stage === "release"
+        ? "release"
+        : stage === "received"
+          ? "received"
+          : stage === "understanding"
+            ? "understanding"
+            : "choice";
     onContextChange?.({
-      view: landscapeActive ? "relief" : "capture",
-      stage: landscapeActive ? "mental landscape" : "capture session",
+      view: stage === "permission" || stage === "release" ? "capture" : "relief",
+      stage: stageLabel,
     });
-  }, [landscapeActive, onContextChange]);
+  }, [stage, onContextChange]);
 
   const suggestOpen = onSuggestOpen ?? onOpen;
-  const handleLandscapeActiveChange = useCallback((active: boolean) => {
-    setLandscapeActive(active);
+  const showCompanion = clearMyMindShowsCompanionPanel(stage);
+  const showVisual = clearMyMindShowsVisualAnalysis(stage);
+  const showExport = clearMyMindShowsExportTools(stage);
+  const twoColumn = showCompanion;
+
+  const handleStageChange = useCallback((next: ClearMyMindStage) => {
+    setStage(next);
   }, []);
 
-  const fullWidth = standalone || landscapeActive;
+  const handleContinueToUnderstanding = useCallback(() => {
+    setStage(stageOnAcknowledgmentContinue(stage));
+    window.setTimeout(() => {
+      setStage("choice");
+    }, 1200);
+  }, [stage]);
+
+  const handleChoice = useCallback((choiceId: ClearMyMindChoiceId) => {
+    setSelectedChoice(choiceId);
+    if (choiceId === "focus") {
+      suggestOpen?.("focus-timer");
+    }
+  }, [suggestOpen]);
+
+  const inCapture = stage === "permission" || stage === "release";
 
   return (
     <div
       className={`companion-fade-in flex h-full min-h-0 flex-col ${
-        landscapeActive
-          ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(320px,48%)]"
-          : "lg:flex-row"
+        twoColumn
+          ? "lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,42%)]"
+          : ""
       }`}
+      data-cmind-stage={stage}
     >
       <div
-        className={`${workspacePanelShellClass({ width: "full", inSplit: !fullWidth })} min-w-0 overflow-y-auto ${
-          landscapeActive ? "lg:min-h-0" : "flex-1"
+        className={`${workspacePanelShellClass({ width: "full", inSplit: twoColumn })} min-w-0 overflow-y-auto ${
+          twoColumn ? "lg:min-h-0" : "flex-1"
         }`}
       >
         {contextBanner ? (
@@ -71,39 +109,53 @@ export function BrainDumpPanel({
             {contextBanner}
           </div>
         ) : null}
-        {!landscapeActive ? (
-          <>
-            <WorkspaceAreaWorksGuide areaId="brain-dump" />
+
+        {inCapture ? (
+          <header className="mb-5 max-w-xl">
             <p className="text-2xl font-semibold text-[#1f1c19]">Clear My Mind</p>
             <p className="mt-2 text-base leading-relaxed text-[#6b635a]">
               {CLEAR_MY_MIND_HEADER}
             </p>
-            <p className="mt-2 text-sm leading-relaxed text-[#6b635a]">
-              {CLEAR_MY_MIND_CAPTURE_GUIDANCE}
+            <p className="mt-3 text-sm leading-relaxed text-[#6b635a]">
+              {CLEAR_MY_MIND_PERMISSION}
             </p>
-            <p className="mt-1 text-sm italic text-[#9a8f82]">
-              e.g. {CLEAR_MY_MIND_CAPTURE_EXAMPLE}
-            </p>
-          </>
+          </header>
         ) : (
-          <p className="text-xl font-semibold text-[#1f1c19]">Clear My Mind</p>
+          <p className="mb-3 text-xl font-semibold text-[#1f1c19]">Clear My Mind</p>
         )}
 
-        <div className={landscapeActive ? "mt-3" : "mt-5"}>
-          <ClearMyMindSession
-            key={captureSessionId}
-            sessionId={captureSessionId}
-            onOpen={suggestOpen}
-            onSessionEntriesChange={setSessionVisualEntries}
-            onLandscapeActiveChange={handleLandscapeActiveChange}
-          />
-        </div>
+        <ClearMyMindSession
+          key={captureSessionId}
+          sessionId={captureSessionId}
+          stage={stage}
+          onOpen={suggestOpen}
+          onSessionEntriesChange={setSessionVisualEntries}
+          onStageChange={handleStageChange}
+          onChoice={handleChoice}
+          selectedChoice={selectedChoice}
+        />
       </div>
-      <BrainDumpVisualPanel
-        entries={sessionVisualEntries}
-        hideClusterCenter={landscapeActive}
-        expanded={landscapeActive}
-      />
+
+      {showCompanion ? (
+        <ClearMyMindCompanionPanel
+          stage={stage}
+          entries={sessionVisualEntries}
+          onContinueToUnderstanding={handleContinueToUnderstanding}
+          onChoice={handleChoice}
+          onOpen={suggestOpen}
+          selectedChoice={selectedChoice}
+        />
+      ) : null}
+
+      {showVisual && showExport ? (
+        <BrainDumpVisualPanel
+          entries={sessionVisualEntries}
+          hideClusterCenter
+          expanded={standalone}
+          initialVisible={false}
+          allowHide
+        />
+      ) : null}
     </div>
   );
 }
