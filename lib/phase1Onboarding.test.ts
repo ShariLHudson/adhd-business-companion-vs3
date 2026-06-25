@@ -29,7 +29,7 @@ describe("phase1Onboarding", () => {
 
   it("includes the companion opening message", () => {
     expect(PHASE1_OPENING_MESSAGE).toMatch(/I'm Shari/i);
-    expect(PHASE1_OPENING_MESSAGE).toMatch(/day been like so far/i);
+    expect(PHASE1_OPENING_MESSAGE).toMatch(/on your mind today/i);
   });
 
   it("moves to business discovery after the win-definition answer", () => {

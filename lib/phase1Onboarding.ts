@@ -65,14 +65,14 @@ export type Phase1OnboardingEvaluation = {
 
 const STORAGE_KEY = "companion-phase1-onboarding-v1";
 
-/** Warm welcome — one line; flows into the first question on the home card. */
-export const FIRST_CONVERSATION_WELCOME = "Hi — I'm Shari.";
+/** Warm welcome — flows into the home invite question. */
+export const FIRST_CONVERSATION_WELCOME = "Hi, I'm Shari.";
 
-/**
- * Grounded in the present moment — easy to answer in a word or a paragraph.
- * Friend language, not coaching or productivity framing.
- */
-export const FIRST_CONVERSATION_QUESTION = "What's your day been like so far?";
+/** Shared home invite — first visit and quiet presence. */
+export const FIRST_CONVERSATION_QUESTION = "What's on your mind today?";
+
+/** Quiet presence opening — established relationship, no pressure. */
+export const QUIET_PRESENCE_OPENING = "I'm still here whenever you are.";
 
 /** Soft cue in the input — presence, not a second question. */
 export const FIRST_CONVERSATION_INPUT_CUE = "I'm listening…";

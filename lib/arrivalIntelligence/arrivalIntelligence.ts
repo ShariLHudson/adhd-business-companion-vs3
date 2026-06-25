@@ -21,6 +21,7 @@ import {
   FIRST_CONVERSATION_QUESTION,
   FIRST_CONVERSATION_INPUT_CUE,
   FIRST_CONVERSATION_WELCOME,
+  QUIET_PRESENCE_OPENING,
 } from "@/lib/phase1Onboarding";
 import {
   homeChromeForState,
@@ -198,46 +199,18 @@ function buildReturningActiveInvite(input: {
   }
 }
 
-function buildQuietPresenceOpening(input: {
+function buildQuietPresenceOpening(_input: {
   visitorKind: ArrivalVisitorKind;
   timeOfDay: ReturnType<typeof timeOfDayBucket>;
 }): string {
-  const name = firstName();
-
-  if (input.visitorKind === "onboarding_return") {
-    return "I'm still here whenever you are.";
-  }
-
-  if (input.visitorKind === "long_absence") {
-    return name
-      ? `${name}, I'm here whenever you're ready.`
-      : "I'm here whenever you're ready.";
-  }
-
-  if (input.timeOfDay === "evening" || input.timeOfDay === "night") {
-    return name ? `${name}, I'm still here.` : "I'm still here.";
-  }
-
-  return name ? `${name}, I'm here.` : "I'm here.";
+  return QUIET_PRESENCE_OPENING;
 }
 
-function buildQuietPresenceInvite(input: {
+function buildQuietPresenceInvite(_input: {
   visitorKind: ArrivalVisitorKind;
   timeOfDay: ReturnType<typeof timeOfDayBucket>;
 }): string | null {
-  if (input.visitorKind === "onboarding_return") {
-    return FIRST_CONVERSATION_QUESTION;
-  }
-
-  switch (input.timeOfDay) {
-    case "morning":
-      return "What's on your mind this morning?";
-    case "evening":
-    case "night":
-      return "Want to talk about anything?";
-    default:
-      return "What's going on for you today?";
-  }
+  return FIRST_CONVERSATION_QUESTION;
 }
 
 function buildOpeningAndInvite(input: {
