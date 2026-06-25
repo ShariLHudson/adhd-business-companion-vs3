@@ -5,23 +5,50 @@ import { shariImmediateHoldResponse } from "./clearMyMindCompanionVoice";
 const { inferEmotionalTone, extractPeople, extractBusinessTerms, wordCount } =
   __clearMyMindIntelligenceTest;
 
+const SHORT_LINES = [
+  "I've got it.",
+  "Thank you for sharing that.",
+  "I'm glad you told me.",
+];
+
+const HEAVY_LINES = [
+  "That sounds like a lot to be carrying.",
+  "I'm really glad you shared that with me.",
+  "We don't have to solve everything right now.",
+  "I've got it.",
+];
+
 describe("shariImmediateHoldResponse", () => {
   it("responds briefly for a short single thought", () => {
-    expect(shariImmediateHoldResponse(["call mom"])).toBe("I've got this.");
+    const line = shariImmediateHoldResponse(["call mom"]);
+    expect(SHORT_LINES).toContain(line);
+    expect(line).not.toMatch(/call mom/i);
   });
 
-  it("acknowledges weight for a longer single thought", () => {
+  it("acknowledges weight for emotional or long thoughts", () => {
     const long =
       "I keep putting off the newsletter and feeling guilty about my client waiting and the whole launch timeline slipping again";
-    expect(shariImmediateHoldResponse([long])).toBe(
-      "That's a lot to carry. I've got it.",
-    );
+    const line = shariImmediateHoldResponse([long]);
+    expect(HEAVY_LINES).toContain(line);
+    expect(line).not.toMatch(/newsletter|client|launch/i);
   });
 
-  it("holds multiple pieces safely", () => {
-    expect(
-      shariImmediateHoldResponse(["email Sarah", "fix the landing page"]),
-    ).toBe("I've got all of this — every piece is held safely.");
+  it("holds multiple pieces without inventory language", () => {
+    const line = shariImmediateHoldResponse([
+      "email Sarah",
+      "fix the landing page",
+    ]);
+    expect(line).not.toMatch(/two|2|separate|thoughts/i);
+    expect(line.length).toBeLessThan(80);
+  });
+
+  it("respects short-response relief hints", () => {
+    const line = shariImmediateHoldResponse({
+      parts: ["a medium length thought about tomorrow"],
+      submissionIndex: 2,
+      hints: { prefersShortResponses: true, prefersVoice: false, prefersTyping: false, oftenContinuesSharing: true },
+    });
+    expect(SHORT_LINES).toContain(line);
   });
 });
 

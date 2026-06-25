@@ -48,13 +48,9 @@ export function stageOnUnderstandingReady(
 }
 
 export function clearMyMindShowsCompanionPanel(
-  stage: ClearMyMindStage,
+  _stage: ClearMyMindStage,
 ): boolean {
-  return (
-    stage === "received" ||
-    stage === "understanding" ||
-    stage === "choice"
-  );
+  return true;
 }
 
 export function clearMyMindShowsVisualAnalysis(

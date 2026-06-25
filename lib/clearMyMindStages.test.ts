@@ -21,8 +21,9 @@ describe("clearMyMindStages", () => {
     expect(stageOnCaptureBegin("permission")).toBe("release");
   });
 
-  it("hides companion panel until received", () => {
-    expect(clearMyMindShowsCompanionPanel("release")).toBe(false);
+  it("keeps companion panel visible throughout the journey", () => {
+    expect(clearMyMindShowsCompanionPanel("permission")).toBe(true);
+    expect(clearMyMindShowsCompanionPanel("release")).toBe(true);
     expect(clearMyMindShowsCompanionPanel("received")).toBe(true);
   });
 
@@ -42,7 +43,7 @@ describe("clearMyMindCompanionVoice", () => {
     const ack = shariReceiveAcknowledgment([
       { id: "1", text: "overwhelmed", createdAt: "", sorted: false },
     ] as never);
-    expect(ack).toMatch(/hear you/i);
+    expect(ack).toMatch(/glad|carry|got it/i);
     expect(ack).not.toMatch(/analysis/i);
   });
 

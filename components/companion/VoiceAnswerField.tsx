@@ -1,5 +1,6 @@
 "use client";
 
+import type { RefObject } from "react";
 import { MicButton } from "@/components/companion/MicButton";
 
 /** Append spoken text — never auto-submit; user can edit or speak again. */
@@ -27,6 +28,7 @@ type VoiceAnswerFieldProps = {
   onFocus?: () => void;
   onVoiceUsed?: () => void;
   voiceProminent?: boolean;
+  inputRef?: RefObject<HTMLTextAreaElement | HTMLInputElement | null>;
   /** @deprecated Layout is always compact (icon beside field). */
   compact?: boolean;
 };
@@ -47,6 +49,7 @@ export function VoiceAnswerField({
   onFocus,
   onVoiceUsed,
   voiceProminent = false,
+  inputRef,
 }: VoiceAnswerFieldProps) {
   const fieldCls =
     inputClassName ??
@@ -69,6 +72,7 @@ export function VoiceAnswerField({
         />
         {multiline ? (
           <textarea
+            ref={inputRef as RefObject<HTMLTextAreaElement>}
             id={id}
             value={value}
             onChange={(e) => onChange(e.target.value)}
@@ -79,6 +83,7 @@ export function VoiceAnswerField({
           />
         ) : (
           <input
+            ref={inputRef as RefObject<HTMLInputElement>}
             id={id}
             type="text"
             value={value}
