@@ -13,8 +13,11 @@ import {
   MENU_SECTION_HEADING,
   MENU_TRIGGER_BTN,
 } from "@/lib/menuNavStyles";
+import type { HomeNavVisibility } from "@/lib/arrivalIntelligence";
 
 type TopBarProps = {
+  calmHome?: boolean;
+  navVisibility?: HomeNavVisibility;
   showPlanMyDay?: boolean;
   onOpenPlanMyDay?: () => void;
   onOpenAdaptMyDay?: () => void;
@@ -176,6 +179,8 @@ function NewConversationDropdown({
 }
 
 export function TopBar({
+  calmHome = false,
+  navVisibility = "calm",
   showPlanMyDay = false,
   onOpenPlanMyDay,
   onOpenAdaptMyDay,
@@ -219,7 +224,11 @@ export function TopBar({
   }, [accountMenuOpen]);
 
   return (
-    <div className="companion-top-bar sticky top-0 z-50 flex shrink-0 items-center justify-end gap-2 px-4 py-2.5 backdrop-blur-sm sm:px-6">
+    <div
+      className={`companion-top-bar sticky top-0 z-50 flex shrink-0 items-center justify-end gap-2 px-4 py-2.5 backdrop-blur-sm sm:px-6 ${calmHome ? "companion-top-bar-calm" : ""} companion-nav-${navVisibility}`}
+      data-home-calm={calmHome ? "" : undefined}
+      data-nav-visibility={navVisibility}
+    >
       {onOpenClearMyMind ? (
         <HeaderActionButton
           emoji="🧠"

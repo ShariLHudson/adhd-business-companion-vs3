@@ -31,7 +31,7 @@ import { GamesPanel } from "@/components/companion/GamesPanel";
 import { FocusAudioPanel } from "@/components/companion/FocusAudioPanel";
 import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
-import { SimpleHomeWelcome } from "@/components/companion/SimpleHomeWelcome";
+import { CompanionHomeCard } from "@/components/companion/CompanionHomeCard";
 import { StressReliefOptionsCard } from "@/components/companion/StressReliefOptionsCard";
 import { TodayPanel } from "@/components/companion/TodayPanel";
 const PlanMyDayPanel = dynamic(
@@ -70,6 +70,17 @@ import { ConfidenceVaultPanel } from "@/components/companion/ConfidenceVaultPane
 import { MyJourneyPanel } from "@/components/companion/MyJourneyPanel";
 import type { HomeResumeItem } from "@/lib/homeResumeItem";
 import { findLatestHomeResumeItem } from "@/lib/homeResumeItem";
+import type { CompanionContinueOption } from "@/lib/companionLedContinue";
+import {
+  evaluateArrivalIntelligence,
+  homeStateDataAttr,
+  recordArrivalFirstAction,
+  recordFirstRelationshipSignals,
+  type ArrivalIntelligence,
+} from "@/lib/arrivalIntelligence";
+import { consumePostLoginContinue } from "@/lib/postLoginContinue";
+import { incrementHomeVisitCount } from "@/lib/homeWelcome";
+import { getDayDesignerSession } from "@/lib/day-designer/dayStore";
 import { activityReturnLabel as resolveActivityReturnLabel } from "@/lib/activityReturnLabel";
 import {
   BEGIN_NEW_DAY_GREETING,
@@ -592,7 +603,6 @@ import {
   evaluatePhase1Onboarding,
   isPhase1OnboardingActive,
   isPhase1OnboardingComplete,
-  PHASE1_INPUT_PLACEHOLDER,
   phase1OnboardingHintForChat,
   phase1RelationshipProfileForChat,
   shouldBlockWorkspaceOpenForPhase1,
@@ -1654,6 +1664,9 @@ export default function CompanionPageClient() {
   // True once we've restored any saved conversation from localStorage.
   // Gates the autosave effect so we never overwrite a saved chat with [].
   const [hydrated, setHydrated] = useState(false);
+  const [homeArrival, setHomeArrival] = useState<ArrivalIntelligence | null>(
+    null,
+  );
   const [hasChatted, setHasChatted] = useState(false);
   const [recognitionMoment, setRecognitionMoment] =
     useState<RecognitionMoment | null>(null);
@@ -1738,6 +1751,7 @@ export default function CompanionPageClient() {
   const remindedRef = useRef<Set<string>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const postLoginContinueHandledRef = useRef(false);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const baseInputRef = useRef("");
   const voiceUsedRef = useRef(false);
@@ -1761,6 +1775,25 @@ export default function CompanionPageClient() {
     isIdle &&
     !splitCreateChat &&
     !workspaceActiveBeside;
+
+  useEffect(() => {
+    if (!homeCalm) {
+      setHomeArrival(null);
+      return;
+    }
+    incrementHomeVisitCount();
+    const intel = evaluateArrivalIntelligence({ record: true });
+    setHomeArrival(intel);
+    if (intel.chrome.autoFocusInput) {
+      window.setTimeout(() => {
+        inputRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "nearest",
+        });
+        inputRef.current?.focus();
+      }, 300);
+    }
+  }, [homeCalm]);
 
   useEffect(() => {
     if (!homeCalm) return;
@@ -3548,6 +3581,62 @@ export default function CompanionPageClient() {
       }
     }
   }
+
+  function focusChatInput() {
+    inputRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "nearest",
+    });
+    window.setTimeout(() => inputRef.current?.focus(), 300);
+  }
+
+  function handleCompanionContinueOption(option: CompanionContinueOption) {
+    recordArrivalFirstAction(`continue:${option.kind}`);
+    switch (option.kind) {
+      case "conversation":
+        if (option.conversationCue) {
+          setMessages([{ role: "assistant", content: option.conversationCue }]);
+        }
+        focusChatInput();
+        return;
+      case "plan-my-day": {
+        const session = getDayDesignerSession();
+        if (
+          session &&
+          session.step !== "complete" &&
+          session.step !== "idle"
+        ) {
+          const q = questionForStep(session.step);
+          setDayDesignerSession(session);
+          setDayDesignerQuestion(q);
+          setMessages([
+            {
+              role: "assistant",
+              content: `${companionIntroForDayDesigner()} ${q}`,
+            },
+          ]);
+        } else {
+          openSectionBesideChatCore("plan-my-day", undefined, {
+            userInitiated: true,
+          });
+        }
+        focusChatInput();
+        return;
+      }
+      default:
+        if (option.homeResumeItem) {
+          resumeHomeItem(option.homeResumeItem);
+        }
+    }
+  }
+
+  useEffect(() => {
+    if (!hydrated || postLoginContinueHandledRef.current) return;
+    const intent = consumePostLoginContinue();
+    if (!intent) return;
+    postLoginContinueHandledRef.current = true;
+    handleCompanionContinueOption(intent.option);
+  }, [hydrated]);
 
   function openVisualFocusMapCore(mapId: string, preferGenerated = true) {
     queueVisualFocusOpen(mapId, preferGenerated);
@@ -7802,6 +7891,18 @@ export default function CompanionPageClient() {
   ) {
     const trimmed = (overrideText ?? input).trim();
     if (!trimmed || isLoading) return;
+
+    if (homeCalm) {
+      recordArrivalFirstAction(
+        voiceUsedRef.current ? "voice_message" : "chat_message",
+      );
+      if (homeArrival?.homeState === "FIRST_VISIT") {
+        recordFirstRelationshipSignals({
+          userText: trimmed,
+          usedVoice: voiceUsedRef.current,
+        });
+      }
+    }
 
     chatTurnRef.current += 1;
     const latencyProfiler = new CompanionLatencyProfiler(
@@ -13891,10 +13992,23 @@ export default function CompanionPageClient() {
       <Suspense fallback={null}>
         <CompanionSignInFromQuery onOpen={openSignIn} />
       </Suspense>
-      <CompanionBackground page={scenePage} seed={sceneSeed} />
+      <CompanionBackground
+        page={scenePage}
+        seed={sceneSeed}
+        calmHome={homeArrival?.chrome.softenBackground ?? homeCalm}
+      />
 
-      <div className="relative z-10 flex h-full min-h-0 w-full overflow-hidden pl-14 md:pl-44">
-        <CompanionSidebarPortal>
+      <div
+        className={`relative z-10 flex h-full min-h-0 w-full overflow-hidden pl-14 md:pl-44 ${homeCalm ? "companion-home-calm" : ""}`}
+        data-home-calm={homeCalm ? "" : undefined}
+        data-home-state={
+          homeArrival ? homeStateDataAttr(homeArrival.homeState) : undefined
+        }
+      >
+        <CompanionSidebarPortal
+          calmHome={homeCalm}
+          navVisibility={homeArrival?.chrome.navVisibility ?? "calm"}
+        >
           <AppSidebar
             activeNav={activeNav}
             activeSection={activeSection}
@@ -13904,6 +14018,8 @@ export default function CompanionPageClient() {
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <TopBar
+            calmHome={homeCalm}
+            navVisibility={homeArrival?.chrome.navVisibility ?? "calm"}
             onOpenClearMyMind={openClearMyMindStandaloneCore}
             onOpenAdaptMyDay={openAdaptMyDayCore}
             onRequestNewConversation={handleStartCleanConversation}
@@ -13981,7 +14097,13 @@ export default function CompanionPageClient() {
                 )}
               </div>
             ) : (
-            <main className="flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+            <main
+              className={`flex h-full min-h-0 flex-1 flex-col overflow-hidden ${
+                homeArrival?.chrome.layout === "centered"
+                  ? "companion-home-presence"
+                  : ""
+              }`}
+            >
               {splitCreateChat ? (
                 <header className="shrink-0 border-b border-[#e7dfd4] bg-[#faf7f2]/98 px-4 py-2.5 text-center sm:px-6">
                   <p className="text-xs font-bold uppercase tracking-wide text-[#9a8f82]">
@@ -13995,8 +14117,9 @@ export default function CompanionPageClient() {
                   ) : null}
                 </header>
               ) : homeCalm ? (
-                <SimpleHomeWelcome
-                  onOpenToday={() => openSectionBesideChat("today")}
+                <CompanionHomeCard
+                  arrival={homeArrival}
+                  onContinue={handleCompanionContinueOption}
                 />
               ) : (
               <IdentityBar
@@ -14043,7 +14166,13 @@ export default function CompanionPageClient() {
                 />
               ) : null}
 
-              <div className="flex-1 overflow-y-auto px-4 sm:px-6">
+              <div
+                className={`overflow-y-auto px-4 sm:px-6 ${
+                  homeArrival?.chrome.layout === "centered"
+                    ? "companion-home-chat-gap shrink-0"
+                    : "flex-1"
+                }`}
+              >
                 {!homeCalm && !suppressInterventionCards ? (
                   <FromYesterdayFocusCard
                     onOpenMomentum={() => setActiveSection("progress")}
@@ -14372,8 +14501,20 @@ export default function CompanionPageClient() {
                 </p>
               )}
 
-              <footer className="input-footer sticky bottom-0 shrink-0 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6">
-                <div className="mx-auto w-full max-w-xl">
+              <footer
+                className={`input-footer shrink-0 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6 ${
+                  homeArrival?.chrome.layout === "centered"
+                    ? "companion-home-input-footer"
+                    : "sticky bottom-0"
+                }`}
+              >
+                <div
+                  className={`mx-auto w-full ${
+                    homeArrival?.chrome.layout === "centered"
+                      ? "max-w-sm"
+                      : "max-w-xl"
+                  }`}
+                >
                   {pendingAction && !suppressInterventionCards && !isLoading && !homeCalm ? (
                     pendingAction.kind === "artifact-export" ? (
                       <ArtifactActionBar
@@ -14419,12 +14560,9 @@ export default function CompanionPageClient() {
                     onKeyDown={handleKeyDown}
                     onToggleListening={toggleListening}
                     onSend={() => void handleSend()}
+                    conversationMode={homeArrival?.chrome.conversationInput ?? false}
                     placeholder={
-                      homeCalm
-                        ? isPhase1OnboardingActive()
-                          ? PHASE1_INPUT_PLACEHOLDER
-                          : "What would help most right now?"
-                        : undefined
+                      homeCalm ? homeArrival?.chatPlaceholder : undefined
                     }
                   />
                   {!homeCalm && (

@@ -16,6 +16,10 @@
  */
 
 import type { EmotionalState } from "@/lib/companionEmotions";
+import {
+  pickCompanionPhoto,
+  shariImageStateToPhotoContext,
+} from "@/lib/companionPhotoLibrary";
 import { ASSETS } from "@/lib/companionUi";
 
 export type ShariImageState =
@@ -92,7 +96,13 @@ export const SHARI_IMAGE_ASSETS: Record<ShariImageState, string> = {
 };
 
 export function resolveShariImageSrc(state: ShariImageState): string {
-  return SHARI_IMAGE_ASSETS[state] ?? DEFAULT_SRC;
+  const dedicated = SHARI_IMAGE_ASSETS[state];
+  if (dedicated && dedicated !== DEFAULT_SRC) {
+    return dedicated;
+  }
+  return pickCompanionPhoto(shariImageStateToPhotoContext(state), {
+    preferSessionContinuity: true,
+  });
 }
 
 function isUserBirthdayToday(

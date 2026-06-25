@@ -13,6 +13,8 @@ type ChatInputBarProps = {
   onToggleListening: () => void;
   onSend: () => void;
   placeholder?: string;
+  /** Softer styling when the input continues a companion-led conversation. */
+  conversationMode?: boolean;
 };
 
 export function ChatInputBar({
@@ -26,9 +28,12 @@ export function ChatInputBar({
   onToggleListening,
   onSend,
   placeholder = INPUT_PLACEHOLDER,
+  conversationMode = false,
 }: ChatInputBarProps) {
   return (
-    <div className="input-glass flex items-end gap-2 rounded-[2rem] p-2 sm:gap-3 sm:p-2.5">
+    <div
+      className={`input-glass flex items-end gap-2 rounded-[2rem] p-2 sm:gap-3 sm:p-2.5 ${conversationMode ? "input-glass-conversation" : ""}`}
+    >
       <button
         type="button"
         onClick={onToggleListening}
@@ -64,14 +69,18 @@ export function ChatInputBar({
         placeholder={placeholder}
         rows={1}
         disabled={isLoading}
-        className="max-h-32 min-h-12 flex-1 resize-none border-0 bg-transparent px-2 py-3 text-lg leading-relaxed text-[#1f1c19] placeholder:text-[#6b635a] focus:outline-none disabled:opacity-50"
+        className={`max-h-32 min-h-12 flex-1 resize-none border-0 bg-transparent px-2 py-3 text-lg leading-relaxed text-[#1f1c19] focus:outline-none disabled:opacity-50 ${
+          conversationMode
+            ? "placeholder:text-[#8a8178] placeholder:italic"
+            : "placeholder:text-[#6b635a]"
+        }`}
       />
 
       <button
         type="button"
         onClick={onSend}
         disabled={!input.trim() || isLoading}
-        className="send-soft flex h-12 shrink-0 items-center justify-center rounded-full px-6 text-base font-medium text-white transition-all disabled:cursor-not-allowed disabled:bg-[#9aaba8] disabled:shadow-none"
+        className={`send-soft flex h-12 shrink-0 items-center justify-center rounded-full px-6 text-base font-medium text-white transition-all disabled:cursor-not-allowed disabled:bg-[#9aaba8] disabled:shadow-none ${conversationMode ? "send-soft-conversation" : ""}`}
       >
         Send
       </button>

@@ -65,18 +65,23 @@ export type Phase1OnboardingEvaluation = {
 
 const STORAGE_KEY = "companion-phase1-onboarding-v1";
 
-export const PHASE1_OPENING_MESSAGE = `Hi, I'm Shari.
+/** Warm welcome — one line; flows into the first question on the home card. */
+export const FIRST_CONVERSATION_WELCOME = "Hi — I'm Shari.";
 
-My job is to help you make progress in your business without adding more overwhelm.
+/**
+ * Grounded in the present moment — easy to answer in a word or a paragraph.
+ * Friend language, not coaching or productivity framing.
+ */
+export const FIRST_CONVERSATION_QUESTION = "What's your day been like so far?";
 
-You don't need to learn the app first.
+/** Soft cue in the input — presence, not a second question. */
+export const FIRST_CONVERSATION_INPUT_CUE = "I'm listening…";
 
-Let's start with you.
+/** @deprecated Use FIRST_CONVERSATION_WELCOME + FIRST_CONVERSATION_QUESTION on home. */
+export const PHASE1_OPENING_MESSAGE = `${FIRST_CONVERSATION_WELCOME}\n\n${FIRST_CONVERSATION_QUESTION}`;
 
-What would make this app a win for you?`;
-
-export const PHASE1_INPUT_PLACEHOLDER =
-  "What would make this app a win for you?";
+/** Empty — the question lives on the home card; cursor is already waiting. */
+export const PHASE1_INPUT_PLACEHOLDER = "";
 
 const MAX_ONBOARDING_QUESTIONS = 4;
 

@@ -43,6 +43,8 @@ type CompanionAuthContextValue = {
   ) => Promise<{ error: string | null; needsConfirmation?: boolean }>;
   signOut: () => Promise<void>;
   resendSignUpConfirmation: (email: string) => Promise<{ error: string | null }>;
+  resetPassword: (email: string) => Promise<{ error: string | null }>;
+  signInWithGoogle: () => Promise<{ error: string | null }>;
 };
 
 const CompanionAuthContext = createContext<CompanionAuthContextValue | null>(
@@ -149,6 +151,50 @@ async function resendSignUpConfirmationDirect(
     return { error: null };
   } catch (e) {
     const message = e instanceof Error ? e.message : "Could not resend email.";
+    return { error: sanitizeSupabaseAuthError(message) };
+  }
+}
+
+async function resetPasswordDirect(
+  email: string,
+): Promise<{ error: string | null }> {
+  const trimmed = email.trim();
+  if (!trimmed) {
+    return { error: "Enter your email and we'll send a reset link." };
+  }
+  const supabase = getCompanionSupabase();
+  if (!supabase) {
+    return { error: "Could not connect to Supabase in your browser." };
+  }
+  try {
+    const { error } = await supabase.auth.resetPasswordForEmail(trimmed, {
+      redirectTo: `${getAppSiteUrl()}/companion/login`,
+    });
+    if (error) return { error: sanitizeSupabaseAuthError(error.message) };
+    return { error: null };
+  } catch (e) {
+    const message =
+      e instanceof Error ? e.message : "Could not send reset email.";
+    return { error: sanitizeSupabaseAuthError(message) };
+  }
+}
+
+async function signInWithGoogleDirect(): Promise<{ error: string | null }> {
+  const supabase = getCompanionSupabase();
+  if (!supabase) {
+    return { error: "Could not connect to Supabase in your browser." };
+  }
+  try {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${getAppSiteUrl()}/companion/login`,
+      },
+    });
+    if (error) return { error: sanitizeSupabaseAuthError(error.message) };
+    return { error: null };
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Google sign-in failed.";
     return { error: sanitizeSupabaseAuthError(message) };
   }
 }
@@ -287,6 +333,8 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
         await supabase.auth.signOut();
       },
       resendSignUpConfirmation: resendSignUpConfirmationDirect,
+      resetPassword: resetPasswordDirect,
+      signInWithGoogle: signInWithGoogleDirect,
     }),
     [configured, loading, user, session],
   );

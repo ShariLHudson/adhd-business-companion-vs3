@@ -35,6 +35,13 @@ export type HomeResumeItem = {
   strategyId?: string;
 };
 
+/** Map a continuity manifest row to a home resume item. */
+export function homeResumeFromContinuityItem(
+  item: ContinuityManifestItem,
+): HomeResumeItem {
+  return continuityToHomeResume(item);
+}
+
 function continuityToHomeResume(item: ContinuityManifestItem): HomeResumeItem {
   const kind: HomeResumeItemKind =
     item.type === "create-draft" || item.type === "create-saved-for-later"

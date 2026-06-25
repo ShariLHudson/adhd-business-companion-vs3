@@ -15,7 +15,6 @@ import { companionNavHref } from "@/lib/companionNavUrl";
 import {
   MENU_NAV_LINK,
   MENU_NAV_LINK_LABEL,
-  MENU_SECTION_HEADING,
   MENU_TEXT_HOVER,
 } from "@/lib/menuNavStyles";
 import type { CoachingMode } from "@/lib/companionPrompt";
@@ -128,34 +127,44 @@ export function AppSidebar({
         ) : null}
       </nav>
 
-      {/* Google quick links — open your apps from anywhere. */}
+      {/* Google quick links — optional external tools, separate from main nav. */}
       <div className="border-t border-black/10 p-2">
-        <p className={`hidden px-2 pb-1 pt-0.5 md:block ${MENU_SECTION_HEADING}`}>
-          Open in Google
-        </p>
-        {[
-          { l: "📅", t: "Calendar", u: "https://calendar.google.com" },
-          { l: "📝", t: "Docs", u: "https://docs.google.com" },
-          { l: "📊", t: "Sheets", u: "https://sheets.google.com" },
-          { l: "📁", t: "Drive", u: "https://drive.google.com" },
-        ].map((g) => (
-          <a
-            key={g.t}
-            href={g.u}
-            target="_blank"
-            rel="noopener noreferrer"
-            title={`Open Google ${g.t}`}
-            aria-label={`Open Google ${g.t}`}
-            className={`${MENU_NAV_LINK} py-2 ${MENU_TEXT_HOVER}`}
+        <div className="rounded-lg bg-black/[0.03] px-1 py-1.5">
+          <p
+            className={`hidden px-2 pb-1 pt-0.5 md:block text-[10px] font-semibold uppercase tracking-wider text-black/45`}
           >
-            <span aria-hidden="true" className="flex w-6 shrink-0 justify-center">
-              {g.l}
-            </span>
-            <span className="hidden text-base font-medium text-black md:inline">
-              {g.t}
-            </span>
-          </a>
-        ))}
+            Google Workspace
+          </p>
+          {[
+            {
+              l: "📅",
+              t: "Google Calendar",
+              u: "https://calendar.google.com",
+            },
+            { l: "📝", t: "Google Docs", u: "https://docs.google.com" },
+            { l: "📁", t: "Google Drive", u: "https://drive.google.com" },
+          ].map((g) => (
+            <a
+              key={g.t}
+              href={g.u}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={g.t}
+              aria-label={g.t}
+              className={`${MENU_NAV_LINK} py-2 text-black/70 ${MENU_TEXT_HOVER}`}
+            >
+              <span
+                aria-hidden="true"
+                className="flex w-6 shrink-0 justify-center opacity-80"
+              >
+                {g.l}
+              </span>
+              <span className="hidden text-sm font-medium text-black/70 md:inline">
+                {g.t}
+              </span>
+            </a>
+          ))}
+        </div>
       </div>
     </aside>
   );
