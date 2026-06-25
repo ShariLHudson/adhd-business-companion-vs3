@@ -14132,7 +14132,11 @@ export default function CompanionPageClient() {
                 onLogoError={() => setLogoError(true)}
                 userBirthday={getRecognitionStore().birthday}
                 recognitionMoment={homeCalm ? null : recognitionMoment}
-                recoveryMode={false}
+                recoveryLevel={
+                  homeCalm
+                    ? null
+                    : recovery?.recoveryLevel ?? null
+                }
                 focusMode={
                   homeCalm
                     ? false
@@ -14150,6 +14154,9 @@ export default function CompanionPageClient() {
                             recognitionMoment.type === "conversation_milestone"),
                       )
                 }
+                workspacePanel={workspacePanel}
+                workspaceActiveBeside={workspaceActiveBeside}
+                isThinking={isLoading && !homeCalm}
                 welcomeLine={null}
                 onDismissWelcome={undefined}
                 primaryQuestion={null}

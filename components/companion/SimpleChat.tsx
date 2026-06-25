@@ -181,14 +181,11 @@ export function SimpleChat({
         {isLoading && (
           <li className="flex flex-col items-start gap-1.5">
             <span
-              className="flex gap-1.5 rounded-2xl bg-white/85 px-4 py-3 shadow-sm backdrop-blur-sm"
+              className="rounded-2xl bg-white/85 px-4 py-3 text-sm italic text-[#6b635a] shadow-sm backdrop-blur-sm"
               aria-label="Shari is thinking"
             >
-              <span className="h-2 w-2 rounded-full bg-[#6b635a]/40" />
-              <span className="h-2 w-2 rounded-full bg-[#6b635a]/25" />
-              <span className="h-2 w-2 rounded-full bg-[#6b635a]/15" />
+              Give me a moment…
             </span>
-            <span className="pl-1 text-sm text-[#6b635a]">Thinking…</span>
           </li>
         )}
       </ul>

@@ -71,6 +71,52 @@
   box-shadow: 0 4px 28px rgba(212, 165, 116, 0.22);
 }
 
+/* Companion Presence™ — subtle thinking, never spinner-like */
+@keyframes companionPresenceBreathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.012);
+  }
+}
+
+@keyframes companionPresenceSoftGlow {
+  0%,
+  100% {
+    box-shadow: 0 4px 28px rgba(30, 79, 79, 0.14);
+  }
+  50% {
+    box-shadow: 0 6px 32px rgba(30, 79, 79, 0.22);
+  }
+}
+
+.companion-presence-thinking {
+  animation: companionPresenceBreathe 4.5s ease-in-out infinite;
+}
+
+.companion-presence-glow-thinking {
+  animation: companionPresenceSoftGlow 4.5s ease-in-out infinite;
+}
+
+.companion-presence-listening {
+  animation: companionPresenceBreathe 5s ease-in-out infinite;
+}
+
+.companion-presence-glow-listening {
+  animation: companionPresenceSoftGlow 5s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .companion-presence-thinking,
+  .companion-presence-glow-thinking,
+  .companion-presence-listening,
+  .companion-presence-glow-listening {
+    animation: none;
+  }
+}
+
 /* ── glass input ── */
 .input-glass {
   background: rgba(255, 252, 248, 0.88);
@@ -567,10 +613,6 @@
   font-style: italic;
 }
 
-.clear-my-mind-companion {
-  animation: companionFadeIn 0.45s ease-out forwards;
-}
-
 .clear-my-mind-hold-btn {
   background: #1e4f4f;
   box-shadow: 0 4px 16px rgba(30, 79, 79, 0.28);
@@ -596,14 +638,177 @@
   opacity: 1;
 }
 
+.clear-my-mind-hold-btn.is-confirming {
+  background: #2a6565;
+  box-shadow: 0 2px 14px rgba(30, 79, 79, 0.22);
+  transition:
+    background 0.35s ease,
+    box-shadow 0.35s ease;
+}
+
+.clear-my-mind-hold-btn.is-confirming:disabled {
+  background: #2a6565;
+  opacity: 1;
+}
+
 .clear-my-mind-voice-row {
   align-items: center;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .clear-my-mind-companion {
-    animation: none;
+/* Shari Lives in the Room™ — integrated presence, not a sidebar */
+.clear-my-mind-room {
+  position: relative;
+  max-width: 42rem;
+}
+
+.clear-my-mind-in-room {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 1;
+  pointer-events: none;
+  max-width: min(100%, 13.5rem);
+}
+
+.clear-my-mind-in-room-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+.clear-my-mind-in-room-voice-wrap {
+  min-width: 0;
+  flex: 1;
+  padding-top: 0.125rem;
+  text-align: right;
+}
+
+.clear-my-mind-in-room-voice {
+  margin: 0;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  color: #6b635a;
+  font-style: italic;
+}
+
+.clear-my-mind-room-work {
+  position: relative;
+  z-index: 0;
+}
+
+.clear-my-mind-transformation {
+  padding-bottom: 1.5rem;
+}
+
+.cmind-section-title {
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: #1f1c19;
+}
+
+.cmind-unfold-section {
+  animation-duration: 0.65s;
+}
+
+.cmind-held-thought {
+  animation: cmind-thought-settle 0.5s ease-out both;
+}
+
+.cmind-pattern-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.cmind-pattern-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border-radius: 1rem;
+  border-width: 2px;
+  padding: 0.875rem 1rem;
+  animation-duration: 0.55s;
+}
+
+@keyframes cmind-thought-settle {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
   }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.thought-companion-box {
+  cursor: pointer;
+}
+
+.thinking-space-layout {
+  display: grid;
+  gap: 1.25rem;
+}
+
+@media (min-width: 768px) {
+  .thinking-space-layout {
+    grid-template-columns: 1fr min(18rem, 38%);
+    align-items: start;
+  }
+
+  .thinking-space-map {
+    position: sticky;
+    top: 0.5rem;
+  }
+}
+
+.thinking-map-collection {
+  min-width: 0;
+}
+
+.thought-companion-modal-overlay {
+  background: rgba(45, 41, 38, 0.28);
+  backdrop-filter: blur(6px);
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.thought-companion-modal-inner {
+  animation: cmind-thought-settle 0.35s ease-out both;
+}
+
+.thinking-space-collection-card {
+  cursor: pointer;
+}
+
+.thinking-map-node {
+  cursor: pointer;
+}
+
+.my-thinking-space {
+  padding-bottom: 2rem;
+}
+
+.my-thoughts-search-sticky {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding-top: 0.25rem;
+  padding-bottom: 0.5rem;
+  background: linear-gradient(
+    180deg,
+    rgba(252, 246, 236, 0.98) 0%,
+    rgba(252, 246, 236, 0.92) 70%,
+    transparent 100%
+  );
+}
+
+.thought-card-badge {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .companion-background-calm .companion-bg-scene {

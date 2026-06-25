@@ -127,10 +127,13 @@ export function clearBrainDumpDraft() {
 
 // ---- Saved brain dumps ----------------------------------------------------
 
+import type { EcosystemObjectKind } from "@/lib/intelligence/intelligenceReadyTypes";
+
 export type BrainDumpEntry = {
   id: string;
   text: string;
   createdAt: string;
+  updatedAt?: string;
   // AI-assigned, filled in shortly after capture.
   topic?: string;
   category?: string;
@@ -145,6 +148,31 @@ export type BrainDumpEntry = {
   routedAction?: string;
   sorted?: boolean;
   done?: boolean;
+  /** My Thinking Space™ — living thought object fields */
+  archived?: boolean;
+  archivedAt?: string;
+  pinned?: boolean;
+  /** Authoritative active collection — single source of truth for organization */
+  collectionId?: string;
+  /** @deprecated Migrated to collectionId — do not write */
+  collectionIds?: string[];
+  /** AI suggestion only — never organization until user accepts */
+  suggestedCollection?: string;
+  suggestedCollectionConfidence?: number;
+  previousCollectionId?: string;
+  collectionHistory?: string[];
+  reminderAt?: string;
+  /** Living Intelligence Graph™ — meaningful links only (future) */
+  connectedPerson?: string;
+  /** Optional display title — defaults to first line of text */
+  title?: string;
+  /** Intelligence-Ready™ — same object evolved from another (no duplicate) */
+  originatedFromId?: string;
+  originatedFromKind?: EcosystemObjectKind;
+  /** Future LIG connections */
+  connectionIds?: string[];
+  /** Per-engine enrichments — never bulk-expose in UI (see INTELLIGENCE_REGISTRY.md) */
+  intelligenceMeta?: Record<string, unknown>;
 };
 
 // Lightweight XP, awarded for completing items (Spin the Wheel etc.).

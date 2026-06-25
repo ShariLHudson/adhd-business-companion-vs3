@@ -8,9 +8,7 @@ import {
   remindersReadyToFire,
 } from "./reminderIntelligence";
 import {
-  completeReminder,
   getActiveReminders,
-  markReminderFired,
   updateReminder,
   type Reminder,
 } from "./reminderStore";
@@ -32,30 +30,46 @@ export function collectDueReminderAlerts(now = Date.now()): ReminderAlert[] {
 }
 
 export function afterReminderFired(reminder: Reminder, now = Date.now()): void {
-  markReminderFired(reminder.id);
+  try {
+    const firedAt = new Date().toISOString();
 
-  if (reminder.reminderType === "one_time") {
-    completeReminder(reminder.id);
-    return;
-  }
-
-  if (reminder.reminderType === "recurring" && reminder.recurrenceRule) {
-    const next = nextRecurrenceFire(
-      reminder.recurrenceRule,
-      reminder.scheduledAt ? new Date(reminder.scheduledAt) : new Date(now),
-    );
-    if (next) {
+    if (reminder.reminderType === "one_time") {
       updateReminder(reminder.id, {
-        scheduledAt: next,
-        lastFiredAt: undefined,
+        status: "completed",
+        lastFiredAt: firedAt,
       });
-    } else {
-      completeReminder(reminder.id);
+      return;
     }
-    return;
-  }
 
-  if (reminder.reminderType === "event_offset") {
-    completeReminder(reminder.id);
+    if (reminder.reminderType === "recurring" && reminder.recurrenceRule) {
+      const next = nextRecurrenceFire(
+        reminder.recurrenceRule,
+        reminder.scheduledAt ? new Date(reminder.scheduledAt) : new Date(now),
+      );
+      if (next) {
+        updateReminder(reminder.id, {
+          scheduledAt: next,
+          lastFiredAt: undefined,
+        });
+      } else {
+        updateReminder(reminder.id, {
+          status: "completed",
+          lastFiredAt: firedAt,
+        });
+      }
+      return;
+    }
+
+    if (reminder.reminderType === "event_offset") {
+      updateReminder(reminder.id, {
+        status: "completed",
+        lastFiredAt: firedAt,
+      });
+    }
+  } catch (err) {
+    console.warn(
+      "[companion] Reminder follow-up skipped — storage may be full.",
+      err,
+    );
   }
 }
