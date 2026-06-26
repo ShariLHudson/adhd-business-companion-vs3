@@ -287,8 +287,8 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   },
   {
     id: "adjust-my-day",
-    name: "Adapt My Day",
-    navigation: "Top navigation **🌤️ Adapt My Day**",
+    name: "Today's Reality",
+    navigation: "Top navigation **🌤️ Today's Reality**",
     howTo:
       "Share today's energy, motivation, and vibe so support and Plan My Day fit your real capacity.",
     match: [
@@ -317,11 +317,11 @@ export const APP_FEATURES: AppFeatureEntry[] = [
 
 /** Compact reference always included in the system prompt. */
 export const APP_FEATURE_KNOWLEDGE_COMPACT = `APP FEATURE KNOWLEDGE (authoritative — use for how-to/navigation; never deny these):
-• Companion-first top bar: Clear My Mind (🧠), Plan My Day (📅), Adapt My Day (🌤️) — companion workspaces; Chat Workspace (💬) manages conversation context (New Chat / New Day's Chat)
+• Companion-first top bar: Clear My Mind (🧠), Plan My Day (📅), Today's Reality (🌤️) — companion workspaces; Chat Workspace (💬) manages conversation context (New Chat / New Day's Chat)
 • Focus hub: Sidebar Focus → feelings-first tools (Focus Session, Guided Exercises, etc.)
 • Clear My Mind: Top bar 🧠 or Focus → Start Here → Clear My Mind
 • Plan My Day: Top bar 📅 — daily decision workspace (not long-term task manager)
-• Adapt My Day: Top bar 🌤️ — today's energy and reality check-in
+• Today's Reality: Top bar 🌤️ — today's energy and reality check-in
 • Chat Workspace: Top bar 💬 → New Chat (fresh conversation) or New Day's Chat (fresh daily start + Plan My Day reset)
 • Focus Session: Focus → Start Here → Focus Session
 • Breathe & Reset: Focus → Focus Tools → Breathe & Reset

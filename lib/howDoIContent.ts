@@ -32,7 +32,7 @@ export const HOW_DO_I_OPEN_LABELS: Partial<Record<AppSection, string>> = {
   focus: "Open Focus",
   "templates-library": "Open Templates",
   "brain-dump": "Open Clear My Mind",
-  energy: "Open Adapt My Day",
+  energy: "Open Today's Reality",
   "business-profile": "Open Business Profile",
   settings: "Open Settings",
 };
@@ -212,14 +212,14 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
       "A realistic day plan matched to your energy — not an idealized to-do list.",
     whenToUse: "Morning, after a pivot, or when the day already feels overloaded.",
     steps: [
-      "Open Adapt My Day (🌤️ top bar) or Plan My Day (📅) when you know your energy.",
+      "Open Today's Reality (🌤️ top bar) or Plan My Day (📅) when you know your energy.",
       "Answer one question at a time about energy and priorities.",
       "Review the plan Shari suggests.",
       "Move or trim blocks in Calendar if needed.",
     ],
     keywords: ["plan", "day", "schedule", "morning", "agenda", "today"],
     openSection: "energy",
-    openLabel: "Open Adapt My Day",
+    openLabel: "Open Today's Reality",
     askPrompt: "Help me plan my day — one question at a time.",
   },
   {
@@ -359,7 +359,7 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
     title: "How To: Chat Workspace",
     question: "How do I start a new chat or new day?",
     whatItIs:
-      "Chat Workspace manages your current conversation context — separate from Clear My Mind™, Plan My Day™, and Adapt My Day™.",
+      "Chat Workspace manages your current conversation context — separate from Clear My Mind™, Plan My Day™, and Today's Reality™.",
     whenToUse:
       "When you want a fresh conversation or a fresh daily start without losing projects, memory, or goals.",
     steps: [

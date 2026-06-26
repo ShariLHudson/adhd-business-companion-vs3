@@ -25,16 +25,16 @@ type SavedCategoryId =
 const SAVED_CATEGORIES: {
   id: SavedCategoryId;
   label: string;
-  emoji: string;
+  objectId: string;
 }[] = [
-  { id: "visual-thinking", label: "Visual Thinking", emoji: "💡" },
-  { id: "projects", label: "Projects", emoji: "📁" },
-  { id: "strategies", label: "Strategies", emoji: "🎯" },
-  { id: "templates", label: "Templates", emoji: "📋" },
-  { id: "documents", label: "Documents", emoji: "📄" },
-  { id: "decision-compass", label: "Decision Compass", emoji: "🧭" },
-  { id: "snippets", label: "Snippets", emoji: "✂️" },
-  { id: "sops", label: "SOPs", emoji: "📝" },
+  { id: "visual-thinking", label: "Visual Thinking", objectId: "visual-thinking" },
+  { id: "projects", label: "Projects", objectId: "projects" },
+  { id: "strategies", label: "Strategies", objectId: "strategies" },
+  { id: "templates", label: "Templates", objectId: "templates" },
+  { id: "documents", label: "Documents", objectId: "templates" },
+  { id: "decision-compass", label: "Decision Compass", objectId: "decision-compass" },
+  { id: "snippets", label: "Snippets", objectId: "toolbelt-snippets" },
+  { id: "sops", label: "SOPs", objectId: "content-types" },
 ];
 
 export function SavedBrowsePanel({
@@ -242,7 +242,7 @@ export function SavedBrowsePanel({
                 <EcosystemCollapsibleSection
                   key={cat.id}
                   title={cat.label}
-                  emoji={cat.emoji}
+                  objectId={cat.objectId}
                   description={`Saved ${cat.label.toLowerCase()}.`}
                   open={openCategories.has(cat.id)}
                   onToggle={() => toggleCategory(cat.id)}

@@ -10,6 +10,9 @@ import {
   MAX_ACTIVE_COMPANIONS,
   toggleActiveCompanion,
 } from "@/lib/activeCompanions";
+import { useCompanionPhotoCatalog } from "@/lib/companionPhotoProvider";
+import { companionPhotoSrcWithVersion } from "@/lib/companionPhotoCatalog";
+import { ASSETS } from "@/lib/companionUi";
 
 function AvatarPortrait({
   emoji,
@@ -22,11 +25,16 @@ function AvatarPortrait({
   size?: number;
   className?: string;
 }) {
-  if (image) {
+  const { catalog } = useCompanionPhotoCatalog();
+  const resolvedImage =
+    image === ASSETS.profile
+      ? companionPhotoSrcWithVersion(catalog.primarySrc, catalog.version)
+      : image;
+  if (resolvedImage) {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
-        src={image}
+        src={resolvedImage}
         alt=""
         className={`shrink-0 rounded-full object-cover ${className}`}
         style={{ width: size, height: size }}

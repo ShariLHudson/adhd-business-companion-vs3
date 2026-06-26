@@ -124,7 +124,7 @@ export function AdjustMyDayPanel({
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
         <WorkspaceGuide section="energy" />
-        <p className="text-2xl font-semibold text-[#1f1c19]">Adapt My Day</p>
+        <p className="text-2xl font-semibold text-[#1f1c19]">Today&apos;s Reality™</p>
         <p className="mt-1 text-sm text-[#6b635a]">
           Current Reality Intelligence™ — who showed up today? Shari uses your
           latest update when shaping support.
@@ -179,7 +179,7 @@ export function AdjustMyDayPanel({
           onClick={startEdit}
           className="mt-6 w-full rounded-xl bg-[#1e4f4f] px-8 py-3.5 text-lg font-semibold text-white shadow-md hover:bg-[#163a3a]"
         >
-          Update My Day
+          Update Today&apos;s Reality
         </button>
 
         {onDone ? (
@@ -198,7 +198,7 @@ export function AdjustMyDayPanel({
   return (
     <div className={shellClass}>
       {!embedded ? <WorkspaceGuide section="energy" /> : null}
-      <p className="text-2xl font-semibold text-[#1f1c19]">Adapt My Day</p>
+      <p className="text-2xl font-semibold text-[#1f1c19]">Today&apos;s Reality™</p>
       <p className="mt-1 text-base leading-relaxed text-[#6b635a]">
         Current Reality Intelligence™ — who showed up today?
       </p>
@@ -311,7 +311,7 @@ export function AdjustMyDayPanel({
         disabled={!canSave}
         className="mt-6 w-full rounded-xl bg-[#1e4f4f] px-8 py-3.5 text-lg font-semibold text-white shadow-md hover:bg-[#163a3a] disabled:cursor-not-allowed disabled:opacity-40"
       >
-        Update My Day
+        Update Today&apos;s Reality
       </button>
 
       {snapshot ? (

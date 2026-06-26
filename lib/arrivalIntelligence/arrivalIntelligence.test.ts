@@ -32,9 +32,12 @@ describe("arrivalIntelligence", () => {
     expect(intel.visitorKind).toBe("first_onboarding");
     expect(intel.chrome.navVisibility).toBe("muted");
     expect(intel.chrome.autoFocusInput).toBe(true);
-    expect(intel.welcomeLine).toMatch(/I'm Shari/i);
+    expect(intel.welcomeLine).toMatch(/welcome|here for you/i);
     expect(intel.inviteQuestion).toMatch(/on your mind today/i);
-    expect(intel.openingMessage).toBe("");
+    expect(intel.openingMessage).toMatch(/welcome|here for you/i);
+    expect(intel.welcomePresence?.greetingCategory).toBe("day_one");
+    expect(intel.livingRoom?.layer1.id).toBeTruthy();
+    expect(intel.livingRoom?.layer4.greeting).toBe(intel.welcomePresence?.greeting);
     expect(intel.chatPlaceholder).toMatch(/listening/i);
     expect(intel.contextualButtonLabel).toBeNull();
     expect(intel.showContinueList).toBe(false);
@@ -47,8 +50,10 @@ describe("arrivalIntelligence", () => {
     expect(intel.homeState).toBe("QUIET_PRESENCE");
     expect(intel.visitorKind).toBe("onboarding_return");
     expect(intel.chrome.navVisibility).toBe("calm");
-    expect(intel.openingMessage).toMatch(/still here whenever you are/i);
-    expect(intel.inviteQuestion).toMatch(/on your mind today/i);
+    expect(intel.openingMessage.length).toBeGreaterThan(0);
+    expect(intel.inviteQuestion).toMatch(
+      /on your mind|arriving|important|begin|reset|story|help/i,
+    );
     expect(intel.contextualButtonLabel).toBeNull();
     expect(intel.isFirstMeeting).toBe(false);
   });
@@ -75,8 +80,10 @@ describe("arrivalIntelligence", () => {
     const intel = evaluateArrivalIntelligence({ record: true });
     expect(intel.homeState).toBe("QUIET_PRESENCE");
     expect(intel.visitorKind).toBe("returning");
-    expect(intel.openingMessage).toMatch(/still here whenever you are/i);
-    expect(intel.inviteQuestion).toMatch(/on your mind today/i);
+    expect(intel.openingMessage.length).toBeGreaterThan(0);
+    expect(intel.inviteQuestion).toMatch(
+      /on your mind|arriving|important|begin|reset|story|help/i,
+    );
     expect(intel.openingMessage).not.toMatch(/learn the app/i);
     expect(intel.isFirstMeeting).toBe(false);
   });

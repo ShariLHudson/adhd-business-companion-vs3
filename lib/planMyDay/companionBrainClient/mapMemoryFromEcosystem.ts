@@ -1,5 +1,5 @@
 /**
- * Map ecosystem memory (Adapt My Day, plan items, captures) → Companion Brain™ input.
+ * Map ecosystem memory (Today's Reality™, plan items, captures) → Companion Brain™ input.
  * Experience layer only — brain never imports companionStore or planMyDay internals.
  */
 
@@ -14,6 +14,7 @@ import {
   type MotivationLevel,
 } from "@/lib/companionBrain";
 import type { PlanDayItem } from "@/lib/planMyDay/types";
+import { resolvePlanItemLegacyDomain } from "@/lib/planMyDay/lifeAreaBridge";
 
 export type EcosystemMemoryInput = {
   dayKey: string;
@@ -76,9 +77,10 @@ function priorityToFit(priority?: PlanDayItem["priority"]): number {
 
 function planItemToCandidate(item: PlanDayItem): CompanionCandidate {
   const themes: string[] = [];
-  if (item.category === "health") themes.push("health");
-  if (item.category === "relationships") themes.push("courtesy");
-  if (item.category === "business") themes.push("unlock");
+  const domain = resolvePlanItemLegacyDomain(item);
+  if (domain === "health") themes.push("health");
+  if (domain === "relationships") themes.push("courtesy");
+  if (domain === "business") themes.push("unlock");
   if (item.column === "doing") themes.push("active");
   return {
     id: item.id,

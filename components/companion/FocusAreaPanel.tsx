@@ -11,41 +11,8 @@ import {
 } from "@/lib/focusHub";
 import { initialSectionOpen } from "@/lib/expandableUi";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
-
-function FeelingButton({
-  emoji,
-  label,
-  tagline,
-  onClick,
-}: {
-  emoji: string;
-  label: string;
-  tagline?: string;
-  onClick: () => void;
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/70 px-3.5 py-3 text-left transition-colors hover:border-[#1e4f4f]/40 hover:bg-white"
-    >
-      <span
-        aria-hidden="true"
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f5f1ea] text-lg"
-      >
-        {emoji}
-      </span>
-      <span className="min-w-0">
-        <span className="block text-base font-semibold text-[#1f1c19]">{label}</span>
-        {tagline ? (
-          <span className="mt-0.5 block text-sm leading-snug text-[#6b635a]">
-            {tagline}
-          </span>
-        ) : null}
-      </span>
-    </button>
-  );
-}
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import { CompanionNavCard } from "@/components/companion/CompanionNavCard";
 
 function ToolButton({
   item,
@@ -191,8 +158,9 @@ export function FocusAreaPanel({
         >
           ‹ Focus
         </button>
-        <p className="text-2xl font-semibold text-[#1f1c19]">
-          {category.emoji} {category.label}
+        <p className="flex items-center gap-2 text-2xl font-semibold text-[#1f1c19]">
+          <CompanionObjectVisual objectId={category.objectId} size="md" variant="mini-scene" />
+          {category.label}
         </p>
         <p className="mt-1 text-sm text-[#6b635a]">{category.tagline}</p>
 
@@ -234,11 +202,12 @@ export function FocusAreaPanel({
       <ul className="mt-5 flex flex-col gap-2">
         {FOCUS_FEELING_ENTRIES.map((feeling) => (
           <li key={feeling.id}>
-            <FeelingButton
-              emoji={feeling.emoji}
-              label={feeling.label}
+            <CompanionNavCard
+              objectId={feeling.objectId}
+              title={feeling.label}
               tagline={feeling.immediate ? feeling.tagline : undefined}
               onClick={() => handleFeelingSelect(feeling.id)}
+              visualVariant="mini-scene"
             />
           </li>
         ))}

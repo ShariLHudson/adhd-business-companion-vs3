@@ -44,6 +44,7 @@ const CONTEXT_ROTATION: CompanionPhotoContext[] = [
 const RECENT_KEY = "companion-shari-recent-photos-v1";
 const SESSION_KEY = "companion-shari-session-photo-v1";
 const SESSION_DAY_KEY = "companion-shari-session-day-v1";
+const DAY_PRESENCE_KEY = "companion-presence-day-v1";
 const PROBE_CACHE_KEY = "companion-shari-photos-v4";
 const WORKSPACE_LAST_KEY = "companion-presence-workspace-last-v2";
 const GLOBAL_LAST_KEY = "companion-presence-global-last-v1";
@@ -161,6 +162,46 @@ function writeSessionPhoto(src: string) {
   try {
     sessionStorage.setItem(SESSION_DAY_KEY, todayKey());
     sessionStorage.setItem(SESSION_KEY, src);
+  } catch {
+    /* quota */
+  }
+}
+
+type DayPresenceStore = Record<string, string>;
+
+function dayPresenceStorageKey(presenceKey: string): string {
+  return `${todayKey()}:${presenceKey}`;
+}
+
+function readDayPresence(presenceKey: string): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(DAY_PRESENCE_KEY);
+    if (!raw) return null;
+    const map = JSON.parse(raw) as DayPresenceStore;
+    const today = todayKey();
+    const key = dayPresenceStorageKey(presenceKey);
+    const src = map[key];
+    if (!src) return null;
+    if (!key.startsWith(`${today}:`)) return null;
+    return src;
+  } catch {
+    return null;
+  }
+}
+
+function writeDayPresence(presenceKey: string, src: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    const raw = localStorage.getItem(DAY_PRESENCE_KEY);
+    const map = raw ? (JSON.parse(raw) as DayPresenceStore) : {};
+    const today = todayKey();
+    const pruned: DayPresenceStore = {};
+    for (const [k, v] of Object.entries(map)) {
+      if (k.startsWith(`${today}:`)) pruned[k] = v;
+    }
+    pruned[dayPresenceStorageKey(presenceKey)] = src;
+    localStorage.setItem(DAY_PRESENCE_KEY, JSON.stringify(pruned));
   } catch {
     /* quota */
   }
@@ -323,6 +364,8 @@ export type PickCompanionPhotoOptions = {
   preferSessionContinuity?: boolean;
   /** Force a new pick (e.g. rotation timer on home). */
   forceNew?: boolean;
+  /** Stable surface + context key — one portrait per day per surface. */
+  presenceKey?: string;
 };
 
 /**
@@ -338,13 +381,17 @@ export function pickCompanionPhoto(
     available.includes(src),
   );
   const effectivePool = pool.length > 0 ? pool : [ASSETS.profile];
+  const presenceKey = options.presenceKey ?? context;
 
-  if (
-    options.preferSessionContinuity &&
-    !options.forceNew
-  ) {
+  if (options.preferSessionContinuity && !options.forceNew) {
+    const dayPhoto = readDayPresence(presenceKey);
+    if (dayPhoto && effectivePool.includes(dayPhoto)) {
+      return dayPhoto;
+    }
+
     const sessionPhoto = readSessionPhoto();
     if (sessionPhoto && effectivePool.includes(sessionPhoto)) {
+      writeDayPresence(presenceKey, sessionPhoto);
       return sessionPhoto;
     }
   }
@@ -353,6 +400,7 @@ export function pickCompanionPhoto(
   const picked = pickFromPool(effectivePool, context, recent);
   recordPhotoUse(picked);
   writeSessionPhoto(picked);
+  writeDayPresence(presenceKey, picked);
   return picked;
 }
 
@@ -361,13 +409,22 @@ export function pickNextCompanionPhoto(
   current: string,
   context: CompanionPhotoContext,
   available: string[],
+  presenceKey?: string,
 ): string {
   const recent = [current, ...readRecent()];
   const pool = available.filter((src) => src !== current);
   if (pool.length === 0) {
-    return pickCompanionPhoto(context, { available, forceNew: true });
+    return pickCompanionPhoto(context, {
+      available,
+      forceNew: true,
+      presenceKey,
+    });
   }
-  return pickFromPool(pool, context, recent);
+  const picked = pickFromPool(pool, context, recent);
+  recordPhotoUse(picked);
+  writeSessionPhoto(picked);
+  if (presenceKey) writeDayPresence(presenceKey, picked);
+  return picked;
 }
 
 function readGlobalLastPhoto(): string | null {

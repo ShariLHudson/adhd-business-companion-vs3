@@ -8,12 +8,17 @@
 | Rank | Document | Governs |
 |------|----------|---------|
 | 1 | `docs-companion-intelligence/21_Companion_Constitution.md` | Product behavior, consent, one voice, forbidden actions |
-| 2 | **This document** | Relationship phase architecture, progression, activation, separation of systems |
-| 3 | `docs/relationship-phases/Relationship-Phase-Roadmap.md` | Phase summaries and registry |
-| 4 | `docs/relationship-phases/Phase-*.md` | Per-phase specifications |
-| 5 | `lib/companionRelationshipPhases.ts` | Machine registry (must conform to 2–4) |
+| 2 | `docs/EXPERIENCE_OF_SHARI.md` · `docs/THE_HONEST_SHARI.md` | Shari's presence and believable humanity |
+| 3 | `docs/COMPANION_TRUST_ARCHITECTURE.md` | Emotional trust earned over time |
+| 4 | `docs/COMPANION_DECISION_INTELLIGENCE.md` | Judgment — Decision Ladder™, what Shari does next |
+| 5 | **This document** | Relationship phase architecture, progression, activation |
+| 6 | `docs/relationship-phases/Relationship-Phase-Roadmap.md` | Phase summaries and registry |
+| 7 | `docs/relationship-phases/Phase-*.md` | Per-phase specifications |
+| 8 | `lib/companionRelationshipPhases.ts` | Machine registry (must conform to 5–7) |
 
 When product behavior conflicts with phase architecture, **the Companion Constitution wins**.  
+When trust/emotional behavior conflicts with a module, **`COMPANION_TRUST_ARCHITECTURE.md` wins** over phase registry convenience.  
+When turn/action behavior conflicts with judgment philosophy, **`COMPANION_DECISION_INTELLIGENCE.md` wins** over resource routing convenience.  
 When phase architecture conflicts with a single module implementation, **this document wins**.
 
 **Registry:** `lib/companionRelationshipPhases.ts`  

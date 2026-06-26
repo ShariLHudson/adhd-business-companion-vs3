@@ -35,7 +35,7 @@ export const STRATEGY_STRUGGLES: StrategyStruggle[] = [
     id: "too-many-tasks",
     label: "Too many tasks",
     section: "energy",
-    openLabel: "Open Adapt My Day",
+    openLabel: "Open Today's Reality",
     hint: "Shrink today to what actually fits your energy and time.",
   },
   {

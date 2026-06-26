@@ -45,18 +45,16 @@ export function isPromptOrOfferContent(text: string): boolean {
 
 export function hasConvertibleStructure(content: string): boolean {
   const t = content.trim();
+  if (!t) return false;
+  const commaParts = t
+    .split(/[,;]/)
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0);
+  if (commaParts.length >= 3) return true;
   if (t.length < 24) return false;
   if (extractFlowStepsFromContent(t).length >= 2) return true;
   if (/^(?:[-*•]|\d+[\.\)])\s/m.test(t)) return true;
   if ((t.match(/[.!?]+/g)?.length ?? 0) >= 2) return true;
-  if (
-    t
-      .split(/[,;]/)
-      .map((part) => part.trim())
-      .filter((part) => part.length > 2).length >= 3
-  ) {
-    return true;
-  }
   return false;
 }
 

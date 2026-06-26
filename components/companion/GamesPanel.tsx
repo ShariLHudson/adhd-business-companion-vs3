@@ -13,8 +13,10 @@ import {
 } from "@/lib/momentumGames";
 import { MomentumGameRunner } from "./games/MomentumGameRunner";
 import { rand } from "./games/gameUtils";
-import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
+import { CompanionObjectLabel, CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import { CompanionNavCard } from "@/components/companion/CompanionNavCard";
 import { AppBackButton } from "@/components/companion/AppBackButton";
+import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
 type Phase = "menu" | "category" | "play" | "done";
 
@@ -28,37 +30,24 @@ function GameMeta({ game }: { game: MomentumGameDef }) {
 }
 
 function CategoryCard({
-  emoji,
+  objectId,
   title,
   tagline,
   onClick,
 }: {
-  emoji: string;
+  objectId: string;
   title: string;
   tagline: string;
   onClick: () => void;
 }) {
   return (
-    <button
-      type="button"
+    <CompanionNavCard
+      objectId={objectId}
+      title={title}
+      tagline={tagline}
       onClick={onClick}
-      className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/85 px-3.5 py-3.5 text-left shadow-sm transition-colors hover:border-[#1e4f4f]/35 hover:bg-white"
-    >
-      <span
-        aria-hidden="true"
-        className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f5f1ea] text-xl"
-      >
-        {emoji}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-base font-semibold text-[#1f1c19]">
-          {title}
-        </span>
-        <span className="mt-0.5 block text-sm leading-snug text-[#6b635a]">
-          {tagline}
-        </span>
-      </span>
-    </button>
+      visualVariant="mini-scene"
+    />
   );
 }
 
@@ -181,8 +170,9 @@ export function GamesPanel({
           onBack={() => setPhase("menu")}
           size="compact"
         />
-        <p className="text-2xl font-semibold text-[#1f1c19]">
-          {cat.emoji} {cat.title}
+        <p className="flex items-center gap-2 text-2xl font-semibold text-[#1f1c19]">
+          <CompanionObjectVisual objectId={cat.objectId} size="md" variant="mini-scene" />
+          {cat.title}
         </p>
         <p className="mt-1 text-base text-[#6b635a]">{cat.tagline}</p>
         <ul className="mt-5 flex flex-col gap-2">
@@ -193,12 +183,12 @@ export function GamesPanel({
                 onClick={() => startGame(g)}
                 className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/85 px-3.5 py-3 text-left shadow-sm transition-colors hover:border-[#1e4f4f]/35 hover:bg-white"
               >
-                <span
-                  aria-hidden="true"
-                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f5f1ea] text-lg"
-                >
-                  {g.emoji}
-                </span>
+                <CompanionObjectVisual
+                  objectId={g.objectId}
+                  size="sm"
+                  variant="icon"
+                  className="shrink-0"
+                />
                 <span className="min-w-0 flex-1">
                   <span className="block text-base font-semibold text-[#1f1c19]">
                     {g.label}
@@ -230,7 +220,13 @@ export function GamesPanel({
             Shari Recommends
           </p>
           <p className="mt-2 text-base font-semibold text-[#1f1c19]">
-            {recommendation.game.emoji} {recommendation.game.label}
+            <CompanionObjectVisual
+              objectId={recommendation.game.objectId}
+              size="sm"
+              variant="icon"
+              className="mr-2 align-middle"
+            />
+            {recommendation.game.label}
           </p>
           <p className="mt-1 text-sm leading-snug text-[#6b635a]">
             {recommendation.reason}
@@ -249,7 +245,7 @@ export function GamesPanel({
         {MOMENTUM_NEED_CATEGORIES.map((cat) => (
           <li key={cat.id}>
             <CategoryCard
-              emoji={cat.emoji}
+              objectId={cat.objectId}
               title={cat.title}
               tagline={cat.tagline}
               onClick={() => openCategory(cat.id)}
@@ -263,7 +259,7 @@ export function GamesPanel({
         onClick={() => startGame(pickSurprise())}
         className="mt-6 rounded-2xl border-2 border-[#1e4f4f]/30 bg-white px-6 py-3 text-base font-bold text-[#1e4f4f]"
       >
-        Surprise me 🎲
+        <CompanionObjectLabel objectId="games" label="Surprise me" size="xs" />
       </button>
     </div>
   );

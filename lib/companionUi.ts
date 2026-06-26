@@ -78,7 +78,7 @@ export type SidebarToolId =
 
 export const ASSETS = {
   background: "/images/companion-bg.jpg",
-  logo: "/logo.png",
+  logo: "/images/shari/shari-images/ssc-logo-no-background.jpg",
   profile: "/shari.jpg",
 } as const;
 
@@ -91,22 +91,22 @@ export const BRAND = {
 export const SIDEBAR_NAV: {
   id: SidebarNavId;
   label: string;
-  emoji: string;
+  objectId: string;
   mode?: CoachingMode;
 }[] = [
-  { id: "chat", label: "Chat", emoji: "💬", mode: "today" },
-  { id: "focus", label: "Focus My Brain", emoji: "🚧", mode: "focus" },
-  { id: "visual-thinking", label: "Visual Thinking", emoji: "💡" },
-  { id: "growth", label: "Growth", emoji: "📈" },
-  { id: "other", label: "Other", emoji: "➕" },
-  { id: "how-do-i", label: "How Do I...?", emoji: "❓" },
+  { id: "chat", label: "Chat", objectId: "messages", mode: "today" },
+  { id: "focus", label: "Focus My Brain", objectId: "focus-my-brain", mode: "focus" },
+  { id: "visual-thinking", label: "Visual Thinking", objectId: "visual-thinking" },
+  { id: "growth", label: "Growth", objectId: "growth" },
+  { id: "other", label: "Other", objectId: "other-tools" },
+  { id: "how-do-i", label: "How Do I...?", objectId: "help" },
 ];
 
 /** @deprecated More menu removed — My Work and How Do I are primary sidebar items. */
 export const MORE_NAV: {
   id: SidebarNavId;
   label: string;
-  emoji: string;
+  objectId: string;
   mode?: CoachingMode;
 }[] = [];
 
@@ -190,13 +190,13 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
 export const SIDEBAR_TOOLS: {
   id: SidebarToolId;
   label: string;
-  emoji: string;
+  objectId: string;
 }[] = [
-  { id: "brain-dump", label: "Clear My Mind", emoji: "🧠" },
-  { id: "focus-timer", label: "Pomodoro", emoji: "⏱" },
-  { id: "reset-day", label: "New Chat", emoji: "💬" },
-  { id: "breathe", label: "Breathe", emoji: "🌬" },
-  { id: "voice", label: "Voice", emoji: "🎤" },
+  { id: "brain-dump", label: "Clear My Mind", objectId: "clear-my-mind" },
+  { id: "focus-timer", label: "Pomodoro", objectId: "focus-timer" },
+  { id: "reset-day", label: "New Chat", objectId: "messages" },
+  { id: "breathe", label: "Breathe", objectId: "breathing" },
+  { id: "voice", label: "Voice", objectId: "voice" },
 ];
 
 // Nested sidebar menu structure. A leaf dispatches a tool action; a branch
@@ -205,7 +205,7 @@ export type MenuLeaf = {
   kind: "leaf";
   id: string;
   label: string;
-  emoji: string;
+  objectId: string;
   tool: SidebarToolId;
 };
 
@@ -213,7 +213,7 @@ export type MenuBranch = {
   kind: "branch";
   id: string;
   label: string;
-  emoji: string;
+  objectId: string;
   children: MenuNode[];
 };
 
@@ -230,34 +230,34 @@ export const FOCUS_MENU: MenuNode[] = [
     kind: "leaf",
     id: "whats-on-your-mind",
     label: "What's on your mind",
-    emoji: "🧠",
+    objectId: "clear-my-mind",
     tool: "brain-dump",
   },
   {
     kind: "branch",
     id: "focus-tools",
     label: "Focus Tools",
-    emoji: "🧰",
+    objectId: "focus-studio",
     children: [
       {
         kind: "leaf",
         id: "focus-audio",
         label: "Focus Audio",
-        emoji: "🎧",
+        objectId: "focus-audio",
         tool: "focus-audio",
       },
       {
         kind: "leaf",
         id: "breathe",
         label: "Breathe",
-        emoji: "🌬",
+        objectId: "breathing",
         tool: "breathe",
       },
       {
         kind: "leaf",
         id: "pomodoro",
         label: "Pomodoro timer",
-        emoji: "⏱",
+        objectId: "focus-timer",
         tool: "focus-timer",
       },
     ],

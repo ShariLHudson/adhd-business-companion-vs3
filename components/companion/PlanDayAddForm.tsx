@@ -2,10 +2,9 @@
 
 import { useState } from "react";
 import {
-  PLAN_CATEGORY_OPTIONS,
-  type PlanLifeDomain,
   type QuickPlanItemInput,
 } from "@/lib/planMyDay";
+import { PlanDayLifeAreaSelector } from "@/components/companion/PlanDayLifeAreaSelector";
 
 const FIELD =
   "rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
@@ -17,13 +16,13 @@ type Props = {
 
 export function PlanDayAddForm({ onAdd, compact = false }: Props) {
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState<PlanLifeDomain | "auto">("auto");
+  const [lifeAreaId, setLifeAreaId] = useState<string | null>(null);
   const [hasTime, setHasTime] = useState(false);
   const [startTime, setStartTime] = useState("09:00");
 
   function reset() {
     setTitle("");
-    setCategory("auto");
+    setLifeAreaId(null);
     setHasTime(false);
     setStartTime("09:00");
   }
@@ -33,7 +32,7 @@ export function PlanDayAddForm({ onAdd, compact = false }: Props) {
     if (!trimmed) return;
     onAdd({
       title: trimmed,
-      category,
+      lifeAreaId: lifeAreaId ?? "auto",
       startTime: hasTime ? startTime : undefined,
     });
     reset();
@@ -43,7 +42,10 @@ export function PlanDayAddForm({ onAdd, compact = false }: Props) {
     <div className="flex flex-col gap-3 rounded-xl border border-[#e7dfd4] bg-[#faf7f2]/60 p-4">
       <input
         value={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={(e) => {
+          setTitle(e.target.value);
+          if (!e.target.value.trim()) setLifeAreaId(null);
+        }}
         onKeyDown={(e) => {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
@@ -55,27 +57,16 @@ export function PlanDayAddForm({ onAdd, compact = false }: Props) {
         className={`${FIELD} w-full text-base py-2.5`}
       />
 
+      <PlanDayLifeAreaSelector
+        taskText={title}
+        value={lifeAreaId}
+        onChange={setLifeAreaId}
+        compact={compact}
+      />
+
       <div
         className={`flex flex-wrap gap-2 ${compact ? "flex-col sm:flex-row sm:items-center" : "items-center"}`}
       >
-        <label className="flex min-w-0 flex-1 items-center gap-2 text-base font-semibold text-[#6b635a]">
-          <span className="shrink-0">Category</span>
-          <select
-            value={category}
-            onChange={(e) =>
-              setCategory(e.target.value as PlanLifeDomain | "auto")
-            }
-            className={`${FIELD} min-w-0 flex-1`}
-            aria-label="Category"
-          >
-            {PLAN_CATEGORY_OPTIONS.map((opt) => (
-              <option key={opt.value} value={opt.value}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
         <label className="flex items-center gap-2 text-base font-semibold text-[#6b635a]">
           <input
             type="checkbox"

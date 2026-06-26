@@ -180,7 +180,7 @@ export function detectDoItNowOffer(assistantText: string): DoItNowOffer | null {
     return {
       kind: "work",
       label: "Do It Now",
-      emoji: work.emoji,
+      emoji: "→",
       actionSummary: work.title,
       sourceText: text,
     };

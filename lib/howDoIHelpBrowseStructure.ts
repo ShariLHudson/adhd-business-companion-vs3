@@ -22,7 +22,7 @@ export type HowDoIBrowseSubgroup = {
 export type HowDoIBrowseTopSection = {
   id: HowDoITopSectionId;
   label: string;
-  emoji: string;
+  objectId: string;
   description: string;
   /** Flat list for New? Start Here */
   articleIds?: readonly string[];
@@ -152,7 +152,7 @@ export function howDoIBrowseSections(): HowDoIBrowseTopSection[] {
     {
       id: "new-user",
       label: "New? Start Here",
-      emoji: "🚀",
+      objectId: "learning",
       description:
         "Orientation and onboarding — calm first steps, not a feature manual.",
       articleIds: [...NEW_USER_START_ARTICLE_IDS],
@@ -160,7 +160,7 @@ export function howDoIBrowseSections(): HowDoIBrowseTopSection[] {
     {
       id: "main-areas",
       label: "Main Areas",
-      emoji: "📚",
+      objectId: "learning",
       description: "The core ecosystem — grouped by how you use them.",
       subgroups: MAIN_AREA_SUBGROUPS.map((group) => ({
         ...group,
@@ -170,7 +170,7 @@ export function howDoIBrowseSections(): HowDoIBrowseTopSection[] {
     {
       id: "additional-help",
       label: "Additional Help Topics",
-      emoji: "🛠",
+      objectId: "help",
       description: "Account, companion behavior, productivity, and deeper topics.",
       subgroups: additionalSubgroups.map((group) => ({
         ...group,

@@ -54,6 +54,10 @@ import {
   workspaceTitle,
 } from "./workspaceMode";
 import { isCompanionFirstQuestion } from "./companionFirstWorkflow";
+import {
+  detectVisualTypeInText,
+  isVisualCreateIntent,
+} from "./visualTypeAvailability";
 
 const FEATURE_DISCOVERY_RE =
   /\b(?:is there a feature|does this app|can this app help)\b/i;
@@ -239,6 +243,7 @@ function detectIntentCategory(text: string): IntentCategory {
   if (VAGUE_HELP_RE.test(t)) return "clarify";
   if (FEATURE_DISCOVERY_RE.test(t)) {
     if (/\bdecision\b/i.test(t)) return "decide";
+    if (/\b(?:sop|standard operating|write an sop)\b/i.test(t)) return "conversation";
     return "conversation";
   }
   if (isCompanionFirstQuestion(t)) return "conversation";
@@ -249,6 +254,10 @@ function detectIntentCategory(text: string): IntentCategory {
   }
 
   if (isLearnIntent(t)) return "learn";
+
+  if (isVisualCreateIntent(t) && detectVisualTypeInText(t)) {
+    return /\bhelp me\b/i.test(t) ? "build" : "execute";
+  }
 
   if (isVisualStructureExecution(t)) {
     return /\bhelp me\b/i.test(t) ? "build" : "execute";
@@ -507,7 +516,7 @@ function detectFeatureOffer(
   if (isAdaptMyDayIntent(text) && category === "plan") {
     return {
       section: "energy",
-      buttonLabel: "Open Adapt My Day",
+      buttonLabel: "Open Today's Reality",
       line: adaptMyDayOfferLine(),
     };
   }
@@ -698,7 +707,7 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
   ) {
     offer = {
       section: "energy",
-      buttonLabel: "Open Adapt My Day",
+      buttonLabel: "Open Today's Reality",
       line: adaptMyDayOfferLine(),
     };
   }

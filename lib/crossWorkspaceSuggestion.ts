@@ -1,5 +1,5 @@
 import type { AppSection } from "./companionUi";
-import { WORKSPACE_EMOJI, WORKSPACE_TITLES, workspaceTitle } from "./workspaceMode";
+import { workspaceObjectId, workspaceTitle, WORKSPACE_TITLES } from "./workspaceMode";
 
 /** Sections the global beside-this rule applies to. */
 export const CROSS_WORKSPACE_SECTIONS: AppSection[] = [
@@ -30,8 +30,13 @@ export function crossWorkspaceSectionLabel(section: AppSection): string {
   return WORKSPACE_TITLES[section] ?? workspaceTitle(section);
 }
 
-export function crossWorkspaceSectionEmoji(section: AppSection): string {
-  return WORKSPACE_EMOJI[section] ?? "🛠";
+export function crossWorkspaceSectionObjectId(section: AppSection): string {
+  return workspaceObjectId(section);
+}
+
+/** @deprecated Use crossWorkspaceSectionObjectId */
+export function crossWorkspaceSectionEmoji(_section: AppSection): string {
+  return "";
 }
 
 /** Permission prompt shown before opening a suggested section. */
@@ -39,7 +44,7 @@ export function crossWorkspaceBesideLine(
   targetSection: AppSection,
   hint?: string,
 ): string {
-  const label = crossWorkspaceSectionLabel(targetSection);
+  const label = crossWorkspaceSectionLabel(targetSection).replace(/™/g, "");
   if (hint?.trim()) {
     return `${hint.trim()} Would you like to open ${label} beside this?`;
   }
@@ -47,7 +52,7 @@ export function crossWorkspaceBesideLine(
 }
 
 export function crossWorkspaceAcceptLabel(targetSection: AppSection): string {
-  return `Yes, open ${crossWorkspaceSectionLabel(targetSection)}`;
+  return `Yes, open ${crossWorkspaceSectionLabel(targetSection).replace(/™/g, "")}`;
 }
 
 /** Context banner for the opened tool when launched from another guide. */

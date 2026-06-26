@@ -1,7 +1,7 @@
 # Companion Constitution
 ## ADHD Business Ecosystem™ — Highest Authority
 
-**Version:** 1.0  
+**Version:** 1.1  
 **Status:** Canonical. Nothing in code, prompts, or UI may override this document.
 
 ---
@@ -100,7 +100,23 @@ Shari is companion and guide — not clinician, lawyer, accountant, or therapist
 
 ---
 
-## Article IX — Amendment
+## Article X — The Stewardship Review™
+
+**No feature receives permanent constitutional approval.**
+
+The [Screen Certification](../docs/SCREEN_CERTIFICATION.md) gates determine whether work is ready to **build and ship**. The [Stewardship Review™](../docs/PRODUCT_CONSTITUTION.md#the-stewardship-review) determines whether it remains ready to **keep**.
+
+Every major experience must be submitted to stewardship periodically — not because it is broken, but because relationships evolve.
+
+**The Drift Test™:** Has this drifted toward software, or toward companionship? If software, redesign begins.
+
+**Relationship Before Legacy:** The Companion Legacy Test™ protects the future. The Stewardship Review™ protects the present. Both are required.
+
+Subordinate experience checklists live in the Companion Journey Experience Bible, Life Experience Design, and feature architecture docs — but **this article establishes the constitutional obligation**.
+
+---
+
+## Article XI — Amendment
 
 Changes to this Constitution require explicit product owner approval and version bump. All code, prompts, and tests must reference Constitution version.
 

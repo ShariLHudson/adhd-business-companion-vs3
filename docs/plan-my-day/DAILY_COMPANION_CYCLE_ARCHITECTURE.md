@@ -387,6 +387,8 @@ Run: `npm test -- lib/planMyDay/dailyCompanionCycle/simulationFixtures.test.ts`
 
 ## Stewardship Review™ (every PR)
 
+**Canonical law:** [Product Constitution™ — The Stewardship Review™](../PRODUCT_CONSTITUTION.md#the-stewardship-review)
+
 - What cognitive load is carried?
 - What capability is strengthened?
 - Who does this help the user become?
@@ -394,6 +396,7 @@ Run: `npm test -- lib/planMyDay/dailyCompanionCycle/simulationFixtures.test.ts`
 - Does this make tomorrow's person stronger?
 - Wiser or busier companion?
 - Stronger relationship?
+- **Drift Test™:** Software or companionship?
 
 ---
 

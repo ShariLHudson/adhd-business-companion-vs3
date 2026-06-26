@@ -174,7 +174,7 @@ export function inferConversationWorkflowFromAssistant(
   if (/\b(?:adapt my day|adjust my day|today'?s reality|rebuild today)\b/i.test(t)) {
     return {
       kind: "open_adjust_my_day",
-      offerSummary: "Adapt My Day",
+      offerSummary: "Today's Reality",
       assistantQuestion: t,
     };
   }
@@ -304,7 +304,7 @@ export function continuationForWorkflow(
         action: "open_section",
         section: "energy",
         message:
-          "Opening **Adapt My Day** — let's tune today to how you're actually feeling.",
+          "Opening **Today's Reality** — let's tune today to how you're actually feeling.",
         nextWorkflow: null,
       };
     case "open_plan_my_day":

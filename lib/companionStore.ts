@@ -1816,6 +1816,17 @@ export function getDayState(): DayState | null {
   }
 }
 
+export const COMPANION_REALITY_UPDATED = "companion-reality-updated";
+
+function dispatchRealityUpdated(detail: {
+  source: string;
+  kind: string;
+  at: string;
+}): void {
+  if (typeof window === "undefined") return;
+  window.dispatchEvent(new CustomEvent(COMPANION_REALITY_UPDATED, { detail }));
+}
+
 export function saveDayState(
   input: Omit<DayState, "setAt" | "energy" | "overwhelm"> & {
     energy?: DayLevel;
@@ -1839,6 +1850,11 @@ export function saveDayState(
     } catch {
       /* noop */
     }
+    dispatchRealityUpdated({
+      source: "todays-reality",
+      kind: "day-state",
+      at: state.setAt,
+    });
   }
   return state;
 }

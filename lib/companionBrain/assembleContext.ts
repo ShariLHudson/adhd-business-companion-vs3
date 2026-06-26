@@ -81,5 +81,7 @@ export function assembleContext(
     captureLoad: memory.captureLoad,
     milestoneEvidence: memory.milestoneEvidence,
     focusAreas: memory.focusAreas,
+    yesterdaySummary: memory.yesterdaySummary,
+    calendarHighlights: memory.calendarHighlights,
   };
 }

@@ -16,13 +16,19 @@ export type CompanionHomeState =
 
 export type HomeNavVisibility = "muted" | "normal" | "calm";
 
+export type HomeChromeLayout = "welcome-scene" | "standard";
+
 export type HomeChromeConfig = {
   navVisibility: HomeNavVisibility;
-  layout: "centered" | "standard";
+  layout: HomeChromeLayout;
   conversationInput: boolean;
   autoFocusInput: boolean;
   softenBackground: boolean;
 };
+
+export function isWelcomeSceneLayout(layout: HomeChromeLayout): boolean {
+  return layout === "welcome-scene";
+}
 
 export function resolveCompanionHomeState(input: {
   visitorKind: ArrivalVisitorKind;
@@ -47,7 +53,7 @@ export function homeChromeForState(state: CompanionHomeState): HomeChromeConfig 
     case "FIRST_VISIT":
       return {
         navVisibility: "muted",
-        layout: "centered",
+        layout: "welcome-scene",
         conversationInput: true,
         autoFocusInput: true,
         softenBackground: true,
@@ -63,7 +69,7 @@ export function homeChromeForState(state: CompanionHomeState): HomeChromeConfig 
     case "QUIET_PRESENCE":
       return {
         navVisibility: "calm",
-        layout: "centered",
+        layout: "welcome-scene",
         conversationInput: true,
         autoFocusInput: false,
         softenBackground: true,

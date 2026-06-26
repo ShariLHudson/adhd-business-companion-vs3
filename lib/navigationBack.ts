@@ -12,7 +12,11 @@ export const NAV_HOME = "Home";
 export const NAV_CLEAR_MY_MIND = "Clear My Mind™";
 export const NAV_MY_THOUGHTS = "My Thoughts™";
 export const NAV_PLAN_MY_DAY = "Plan My Day™";
-export const NAV_ADAPT_MY_DAY = "Adapt My Day™";
+export const NAV_TODAYS_REALITY = "Today's Reality™";
+/** @deprecated Use NAV_TODAYS_REALITY */
+export const NAV_SHAPE_TODAY = NAV_TODAYS_REALITY;
+/** @deprecated Use NAV_TODAYS_REALITY */
+export const NAV_ADAPT_MY_DAY = NAV_TODAYS_REALITY;
 export const NAV_FOCUS_MY_BRAIN = "Focus My Brain™";
 export const NAV_PROJECTS = "Projects™";
 export const NAV_CHAT = "Chat";

@@ -148,6 +148,8 @@ export type AssembledContext = {
   captureLoad?: CompanionMemorySnapshot["captureLoad"];
   milestoneEvidence?: string[];
   focusAreas?: string[];
+  yesterdaySummary?: string;
+  calendarHighlights?: string[];
 };
 
 export type MomentumAction = {
@@ -194,10 +196,19 @@ export type OrientationResult = {
   journeyLine: string | null;
 };
 
+/** Morning Presence™ — seen before guided; not orientation or proposals */
+export type MorningPresenceResult = {
+  /** Soft lead-in, e.g. "Before we think about work..." */
+  lead: string | null;
+  /** Companion noticing — one line per beat */
+  lines: string[];
+};
+
 export type CompanionJudgmentResult = {
   dayMode: DayMode;
   cycleState: CycleState;
   orientation: OrientationResult;
+  morningPresence: MorningPresenceResult;
   momentum: MomentumAction;
   confidence: ConfidenceOpportunity;
   permission: PermissionDecision;

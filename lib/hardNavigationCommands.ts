@@ -48,7 +48,7 @@ const HARD_NAV_ROUTES: RouteDef[] = [
   {
     test: /^(?:open|go to|take me to)\s+adapt\s+my\s+day$/i,
     target: { kind: "adapt-my-day" },
-    reply: "Opening Adapt My Day.",
+    reply: "Opening Today's Reality.",
   },
   {
     test: /^(?:open|go to|take me to)\s+clear\s+my\s+mind$/i,

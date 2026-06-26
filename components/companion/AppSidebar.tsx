@@ -17,6 +17,7 @@ import {
   MENU_NAV_LINK_LABEL,
   MENU_TEXT_HOVER,
 } from "@/lib/menuNavStyles";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 import type { CoachingMode } from "@/lib/companionPrompt";
 
 type AppSidebarProps = {
@@ -42,7 +43,7 @@ export function AppSidebar({
   function renderItem(item: {
     id: SidebarNavId;
     label: string;
-    emoji: string;
+    objectId: string;
     mode?: CoachingMode;
   }) {
     const sectionFor = SECTION_NAV[item.id];
@@ -68,11 +69,8 @@ export function AppSidebar({
           active ? "companion-nav-active shadow-sm" : MENU_TEXT_HOVER
         }`}
       >
-        <span
-          aria-hidden="true"
-          className="relative flex w-6 shrink-0 justify-center"
-        >
-          {item.emoji}
+        <span className="companion-sidebar-object" aria-hidden="true">
+          <CompanionObjectVisual objectId={item.objectId} size="sm" variant="icon" />
         </span>
         <span className={MENU_NAV_LINK_LABEL}>{item.label}</span>
       </a>

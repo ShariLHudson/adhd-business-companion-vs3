@@ -9,7 +9,7 @@ import {
   resolveAppFeatureKnowledge,
 } from "./appFeatureKnowledge";
 import type { AppSection } from "./companionUi";
-import { workspaceTitle } from "./workspaceMode";
+import { workspaceObjectId, workspaceTitle } from "./workspaceMode";
 import { detectCompanionFirstTarget } from "./companionFirstWorkflow";
 
 export type AppFeatureNavTarget =
@@ -29,7 +29,7 @@ export type AppFeatureNavOffer = {
   target: AppFeatureNavTarget;
   reply: string;
   acceptLabel: string;
-  emoji: string;
+  objectId: string;
 };
 
 const SETTINGS_ROUTES: {
@@ -90,6 +90,49 @@ export function resolveAppFeatureNavTarget(
         kind: "settings",
         section: route.section,
         label: route.label,
+      };
+    }
+  }
+
+  if (/\b(?:is there a feature|does this app|can this app help)\b/i.test(t)) {
+    if (/\b(?:sop|standard operating)\b/i.test(t)) {
+      return {
+        kind: "workspace",
+        section: "content-generator",
+        label: "Create",
+        itemType: "SOP",
+      };
+    }
+    const companionFirst = detectCompanionFirstTarget(t);
+    if (companionFirst) {
+      return {
+        kind: "workspace",
+        section: companionFirst.section,
+        label: companionFirst.label,
+        itemType: companionFirst.itemType,
+      };
+    }
+    const features = matchAppFeatures(t);
+    const primary = features[0];
+    if (primary) {
+      if (primary.id === "clear-my-mind") {
+        return {
+          kind: "workspace",
+          section: "brain-dump",
+          label: primary.name,
+        };
+      }
+      if (primary.id === "create") {
+        return {
+          kind: "workspace",
+          section: "content-generator",
+          label: primary.name,
+        };
+      }
+      return {
+        kind: "workspace",
+        section: primary.id as AppSection,
+        label: primary.name,
       };
     }
   }
@@ -166,7 +209,7 @@ export function buildAppFeatureNavOffer(text: string): AppFeatureNavOffer | null
       target,
       reply: `${brief}\n\nI can take you directly to **${target.label}** if you'd like.`,
       acceptLabel: `Open ${target.label}`,
-      emoji: "⚙️",
+      objectId: "settings",
     };
   }
 
@@ -177,7 +220,7 @@ export function buildAppFeatureNavOffer(text: string): AppFeatureNavOffer | null
     target,
     reply: `${brief}\n\nWant me to open **${workspaceTitle(target.section)}** beside us?`,
     acceptLabel: `Open ${target.label}`,
-    emoji: "🛠",
+    objectId: workspaceObjectId(target.section),
   };
 }
 

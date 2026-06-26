@@ -124,6 +124,50 @@ describe("planMyDay quick access", () => {
     expect(dispatch.mock.calls.length).toBeLessThanOrEqual(1);
   });
 
+  it("addQuickPlanItem appends without replacing prior tasks", () => {
+    const today = todayStr();
+    lsStore[PLAN_STORE_KEY] = JSON.stringify({ date: today, items: [] });
+
+    const first = addQuickPlanItem("Call doctor");
+    expect(first).toHaveLength(1);
+    expect(first[0]?.title).toBe("Call doctor");
+
+    const second = addQuickPlanItem("Finish launch", first);
+    expect(second).toHaveLength(2);
+    expect(second.map((i) => i.title)).toEqual(["Call doctor", "Finish launch"]);
+
+    const third = addQuickPlanItem("Email client", second);
+    expect(third).toHaveLength(3);
+    expect(third.map((i) => i.title)).toEqual([
+      "Call doctor",
+      "Finish launch",
+      "Email client",
+    ]);
+  });
+
+  it("persists appended tasks to storage", () => {
+    const dispatch = vi.fn();
+    const storage = {
+      getItem: (k: string) => lsStore[k] ?? null,
+      setItem: (k: string, v: string) => {
+        lsStore[k] = v;
+      },
+      removeItem: (k: string) => {
+        delete lsStore[k];
+      },
+    };
+    globalThis.window = { dispatchEvent: dispatch } as Window;
+    globalThis.localStorage = storage as Storage;
+
+    const today = todayStr();
+    lsStore[PLAN_STORE_KEY] = JSON.stringify({ date: today, items: [] });
+
+    addQuickPlanItem("Call doctor");
+    addQuickPlanItem("Finish launch", readTodayPlanItems());
+
+    expect(readTodayPlanItems()).toHaveLength(2);
+  });
+
   it("counts only incomplete items", () => {
     const items = [
       { id: "a", title: "One", column: "ready" as const, done: false },

@@ -192,7 +192,9 @@ function questionSpecificGuidance(userText?: string): string | null {
         ? operatingLines.slice(0, 3)
         : relevant.slice(0, 3).map((o) => `- ${o.text}`);
     return [
+      "STARTING NEW VS FINISHING — prioritize completion + momentum patterns first.",
       "USER ASKED ABOUT STARTING VS FINISHING — lead with operating patterns (WHY momentum drops), not symptom labels:",
+      "- New ideas often get your strongest energy — finishing is where momentum tends to drop.",
       ...lines,
       "Prioritize completion + momentum patterns — NOT conversational clarity or visual mapping unless directly relevant.",
       'PASS example: "Looking at your patterns, this doesn\'t seem to be a starting problem — energy is usually strong during creation. The drop tends to happen when work becomes repetitive or administrative."',

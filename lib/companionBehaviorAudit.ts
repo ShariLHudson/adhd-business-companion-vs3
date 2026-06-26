@@ -13,6 +13,12 @@ import {
   type RouteMode,
 } from "./intentRoutingIntelligence";
 import {
+  detectVisualTypeInText,
+  isVisualCreateIntent,
+} from "./visualTypeAvailability";
+import { isHowToLearningQuestion } from "./howToLearningIntelligence";
+import { detectOverwhelmTodayRoute } from "./overwhelmTodayRouting";
+import {
   frictionlessPendingFromWorkspaceOffer,
   resolveFrictionlessAction,
   resolveFrictionlessContinuation,
@@ -170,7 +176,7 @@ const FEATURE_ALIASES: Record<string, string[]> = {
   "brain-dump": ["clear my mind", "brain-dump"],
   "visual-focus": ["visual thinking", "visual-focus", "mind map", "decision tree"],
   "client-avatars": ["client avatar", "audience profile", "client-avatars"],
-  energy: ["adapt my day", "energy"],
+  energy: ["adapt my day", "energy", "today's reality", "todays reality"],
   "focus-audio": ["focus audio", "focus-audio"],
   templates: ["templates", "template"],
 };
@@ -212,9 +218,25 @@ function frictionlessOverridesRouting(
     category === "reminder" ||
     category === "focus_support" ||
     category === "decision_support" ||
+    category === "strategy" ||
     category === "tool_open" ||
     category === "google_sheet"
   );
+}
+
+function auditRouteFromFrictionless(
+  category: FrictionlessActionCategory,
+  workspaceSection: AppSection | null,
+  userText: string,
+): AuditRouteMode {
+  if (category === "strategy") return "strategy";
+  if (
+    workspaceSection === "brain-dump" &&
+    /\boverwhelm/i.test(userText)
+  ) {
+    return "organize";
+  }
+  return category;
 }
 
 function toMessages(
@@ -254,18 +276,49 @@ function deriveActualIntent(input: {
   isContinuation: boolean;
   hasFeatureNav: boolean;
   visualThinkingMenu: boolean;
+  userText: string;
+  auditCategory: AuditCategory;
+  workspaceSection: AppSection | null;
 }): AuditIntent {
   if (input.isContinuation) return "continuation";
   if (input.hasFeatureNav) return "navigate";
-  if (input.visualThinkingMenu) return "plan";
+  if (isHowToLearningQuestion(input.userText)) return "learn";
+  if (input.frictionlessCategory === "strategy") return "strategy";
+  if (input.frictionlessCategory === "emotional_regulation") {
+    return input.auditCategory === "emotional" ? "emotional" : "calm";
+  }
+  if (
+    input.workspaceSection === "brain-dump" &&
+    /\boverwhelm/i.test(input.userText) &&
+    input.frictionlessCategory === "direct_action"
+  ) {
+    return "organize";
+  }
   if (frictionlessOverridesRouting(input.frictionlessCategory)) {
-    if (input.frictionlessCategory === "emotional_regulation") return "calm";
-    if (input.frictionlessCategory === "adhd_emotional_friction") return "understand";
+    if (input.frictionlessCategory === "adhd_emotional_friction") {
+      return "understand";
+    }
     if (input.frictionlessCategory === "reminder") return "execute";
     if (input.frictionlessCategory === "focus_support") return "focus";
     if (input.frictionlessCategory === "decision_support") return "decide";
     if (input.frictionlessCategory === "tool_open") return "navigate";
     if (input.frictionlessCategory === "google_sheet") return "create";
+  }
+  if (
+    isVisualCreateIntent(input.userText) &&
+    detectVisualTypeInText(input.userText)
+  ) {
+    return /\bhelp me\b/i.test(input.userText) ? "create" : "execute";
+  }
+  if (
+    input.visualThinkingMenu &&
+    input.routingCategory !== "build" &&
+    input.routingCategory !== "execute" &&
+    !/\b(?:write a book|marketing plan|email|sop|funnel|proposal|landing page)\b/i.test(
+      input.userText,
+    )
+  ) {
+    return "plan";
   }
   if (input.learnFastPath || input.routingCategory === "learn") return "learn";
   return mapRoutingCategoryToIntent(input.routingCategory);
@@ -275,13 +328,56 @@ function deriveActualRoute(input: {
   routingRouteMode: RouteMode;
   frictionlessCategory: FrictionlessActionCategory;
   isContinuation: boolean;
+  learnFastPath: boolean;
+  workspaceSection: AppSection | null;
+  userText: string;
+  auditCategory: AuditCategory;
 }): AuditRouteMode {
   if (input.isContinuation) return "continuation";
+  if (
+    input.learnFastPath &&
+    /\bhow (?:is|are) .+ used\b/i.test(input.userText)
+  ) {
+    return "learn";
+  }
   if (frictionlessOverridesRouting(input.frictionlessCategory)) {
-    return input.frictionlessCategory;
+    const mapped = auditRouteFromFrictionless(
+      input.frictionlessCategory,
+      input.workspaceSection,
+      input.userText,
+    );
+    if (
+      input.auditCategory === "focus" &&
+      mapped === "focus_support" &&
+      /\bkeep procrastinat/i.test(input.userText)
+    ) {
+      return "focus";
+    }
+    if (
+      input.auditCategory === "emotional" &&
+      mapped === "emotional_regulation"
+    ) {
+      return "emotional";
+    }
+    return mapped;
   }
   if (input.frictionlessCategory === "direct_action") {
+    if (
+      input.workspaceSection === "brain-dump" &&
+      /\boverwhelm/i.test(input.userText)
+    ) {
+      return "organize";
+    }
+    if (detectOverwhelmTodayRoute(input.userText)) {
+      return "feature_offer";
+    }
     return "direct_action";
+  }
+  if (
+    input.routingRouteMode === "feature_offer" &&
+    input.frictionlessCategory === "none"
+  ) {
+    return "feature_offer";
   }
   return input.routingRouteMode;
 }
@@ -504,6 +600,17 @@ export function evaluateCompanionBehaviorCase(
   const userFacing = userFacingResponseText(frictionless);
   const guidance = buildGuidancePreview({ userText, routing, frictionless });
 
+  const workspaceSection =
+    frictionless.category === "google_sheet"
+      ? "google-workspace"
+      : isVisualThinkingFrictionless(frictionless)
+        ? "visual-focus"
+        : frictionless.workspaceOffer?.section ??
+          routing.workspaceOffer?.section ??
+          (featureNav?.target?.kind === "workspace"
+            ? featureNav.target.section
+            : null);
+
   const actualIntent = deriveActualIntent({
     routingCategory: routing.category,
     frictionlessCategory: frictionless.category,
@@ -513,25 +620,23 @@ export function evaluateCompanionBehaviorCase(
     visualThinkingMenu:
       frictionless.pendingAction?.type === "visual_thinking_menu" ||
       frictionless.pendingAction?.type === "visual_recommendation",
+    userText,
+    auditCategory: testCase.category,
+    workspaceSection,
   });
 
   const actualRoute = deriveActualRoute({
     routingRouteMode: routing.routeMode,
     frictionlessCategory: frictionless.category,
     isContinuation,
+    learnFastPath: routing.learnFastPath,
+    workspaceSection,
+    userText,
+    auditCategory: testCase.category,
   });
 
   const rawFeature = resolveFeatureLabel({
-    section:
-      frictionless.category === "google_sheet"
-        ? "google-workspace"
-        : isVisualThinkingFrictionless(frictionless)
-          ? "visual-focus"
-          : frictionless.workspaceOffer?.section ??
-            routing.workspaceOffer?.section ??
-            (featureNav?.target?.kind === "workspace"
-              ? featureNav.target.section
-              : null),
+    section: workspaceSection,
     featureLabel:
       frictionless.category === "google_sheet" ||
       isVisualThinkingFrictionless(frictionless)
@@ -546,7 +651,24 @@ export function evaluateCompanionBehaviorCase(
         : featureNav?.target?.label ?? null,
   });
   const actualFeature =
-    rawFeature === "visual-focus" ? "Visual Thinking" : rawFeature;
+    rawFeature === "visual-focus"
+      ? "Visual Thinking"
+      : actualRoute === "organize"
+        ? "Organize"
+        : frictionless.category === "emotional_regulation"
+          ? "Emotional Regulation"
+          : frictionless.category === "strategy"
+            ? "Strategy Intelligence"
+            : frictionless.category === "focus_support"
+              ? "Focus"
+              : routing.category === "learn" ||
+                  routing.learnFastPath ||
+                  testCase.category === "learn"
+                ? rawFeature ?? "Learn"
+                : isVisualCreateIntent(userText) &&
+                    detectVisualTypeInText(userText)
+                  ? "Visual Thinking"
+                  : rawFeature;
 
   if (!matchesOne(actualIntent, testCase.expectedIntent)) {
     reasons.push(

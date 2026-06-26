@@ -3,6 +3,8 @@
  * Distinguish emotional-friction turns from task-first turns.
  */
 
+import { isSelfUnderstandingIntent } from "./relationshipIntelligenceBoundaries";
+
 export type AdhdEmotionalFrictionCategory =
   | "activation"
   | "overwhelm"
@@ -14,6 +16,9 @@ const EMOTIONAL_FRICTION_RE =
 
 const TASK_ORIENTED_OPENER_RE =
   /\b(?:i need to|i want to|i have to|i need help|help me)\s+(?:work on|finish(?:ing)?|complete(?:ing)?|writ(?:e|ing)|build(?:ing)?|draft(?:ing)?|focus on|make progress on|with)\b/i;
+
+const DECISION_CHOICE_RE =
+  /\b(?:stuck between|torn between|can'?t decide|which (?:option|one|offer|model)|compare (?:these|two) options)\b/i;
 
 const CRISIS_DISTRESS_RE =
   /\b(?:can'?t catch (?:my )?breath|breathless|panicking|panic attack|having a panic|need to calm down|calm me down|help me calm)\b/i;
@@ -73,6 +78,9 @@ export function isAdhdEmotionalFrictionTurn(text: string): boolean {
   if (!t) return false;
   if (CRISIS_DISTRESS_RE.test(t)) return false;
   if (isTaskFirstTurn(t)) return false;
+  if (DECISION_CHOICE_RE.test(t)) return false;
+  if (isSelfUnderstandingIntent(t)) return false;
+  if (/\bi'?m stuck\b/i.test(t) && DECISION_CHOICE_RE.test(t)) return false;
   return EMOTIONAL_FRICTION_RE.test(t);
 }
 

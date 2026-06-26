@@ -15,7 +15,7 @@ export const WORKSPACE_AREA_WORKFLOWS: Record<string, WorkspaceAreaWorkflow> = {
       "Defer or remove what does not belong today.",
       "Use Chat Workspace → New Day's Chat when starting a fresh day.",
     ],
-    tip: "Today's Reality shows as a compact summary here — use Adapt My Day in the top bar when your capacity shifts.",
+    tip: "Today's Reality shows as a compact summary here — use Today's Reality in the top bar when your capacity shifts.",
   },
   "visual-focus": {
     id: "visual-focus",

@@ -2,13 +2,15 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ASSETS } from "@/lib/companionUi";
+import { resolveCompanionPresenceLibraryImage } from "@/lib/companionPresenceLibrary";
 import {
   logCompanionPresenceDebug,
   pickCompanionPhoto,
   pickNextCompanionPhoto,
   pickWorkspaceEntryPhoto,
-  resolveAvailableCompanionPhotos,
 } from "@/lib/companionPhotoLibrary";
+import { useCompanionPhotoCatalog } from "@/lib/companionPhotoProvider";
+import { companionPhotoSrcWithVersion } from "@/lib/companionPhotoCatalog";
 import { SHARI_IMAGE_ASSETS } from "@/lib/shariImageState";
 import { SHARI_PHOTO_ROTATION_MS } from "@/lib/shariPhotoRotation";
 import {
@@ -20,15 +22,45 @@ import {
 function resolvePresenceSrc(
   presence: ReturnType<typeof evaluateCompanionPresence>,
   available: string[],
+  presenceKey: string,
+  input: CompanionPresenceInput,
 ): string {
+  const libraryImage = resolveCompanionPresenceLibraryImage(
+    input.presenceSurface,
+    input.presenceImageId,
+  );
+  if (libraryImage) {
+    return libraryImage;
+  }
+
   const dedicated = SHARI_IMAGE_ASSETS[presence.shariImageState];
   if (dedicated && dedicated !== ASSETS.profile) {
     return dedicated;
   }
   return pickCompanionPhoto(presence.photoContext, {
     available,
-    preferSessionContinuity: !presence.rotate,
+    preferSessionContinuity: true,
+    presenceKey,
   });
+}
+
+function buildPresenceKey(
+  input: CompanionPresenceInput,
+  presence: ReturnType<typeof evaluateCompanionPresence>,
+): string {
+  if (input.presenceSurface) {
+    return `${input.presenceSurface}:${presence.shariImageState}`;
+  }
+  if (input.presenceWorkspace) {
+    return `${input.presenceWorkspace}:${presence.shariImageState}`;
+  }
+  if (input.homeState) {
+    return `home:${input.homeState}:${presence.shariImageState}`;
+  }
+  if (input.workspacePanel) {
+    return `workspace:${input.workspacePanel}:${presence.shariImageState}`;
+  }
+  return `${presence.photoContext}:${presence.shariImageState}`;
 }
 
 /**
@@ -55,51 +87,49 @@ export function useCompanionPresence(
       input.recognitionWin,
       input.memberSince,
       input.clearMyMindPhase,
+      input.presenceSurface,
+      input.presenceImageId,
     ],
   );
 
-  const [available, setAvailable] = useState<string[]>([ASSETS.profile]);
-  const [src, setSrc] = useState<string>(ASSETS.profile);
+  const { catalog } = useCompanionPhotoCatalog();
+  const available = catalog.images;
+  const cacheVersion = catalog.version;
+
+  const librarySrc = useMemo(
+    () =>
+      resolveCompanionPresenceLibraryImage(
+        input.presenceSurface,
+        input.presenceImageId,
+      ),
+    [input.presenceSurface, input.presenceImageId],
+  );
+
+  const [src, setSrc] = useState<string>(librarySrc ?? catalog.primarySrc);
   const frozenSrc = useRef<string | null>(null);
   const workspaceEntry = input.presenceWorkspace ?? null;
   const workspaceEntryKey = input.workspaceEntryKey ?? 0;
 
+  const presenceKey = buildPresenceKey(input, presence);
+
   useEffect(() => {
     if (workspaceEntry) return;
-    let cancelled = false;
-    void resolveAvailableCompanionPhotos().then((found) => {
-      if (!cancelled) setAvailable(found);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [workspaceEntry]);
+    if (librarySrc) {
+      setSrc(librarySrc);
+      return;
+    }
+    setSrc(resolvePresenceSrc(presence, available, presenceKey, input));
+  }, [workspaceEntry, presence, available, catalog.revision, presenceKey, librarySrc, input.presenceSurface, input.presenceImageId]);
 
   /** Clear My Mind™ / My Thoughts™ — rotate on each workspace entry. */
   useEffect(() => {
     if (!workspaceEntry || workspaceEntryKey <= 0) return;
+    if (!available.length) return;
 
-    let cancelled = false;
-    void resolveAvailableCompanionPhotos({ forceRefresh: true }).then(
-      (found) => {
-        if (cancelled) return;
-        setAvailable(found);
-        const pick = pickWorkspaceEntryPhoto(workspaceEntry, found);
-        logCompanionPresenceDebug(workspaceEntry, found, pick);
-        setSrc(pick.src);
-      },
-    );
-
-    return () => {
-      cancelled = true;
-    };
-  }, [workspaceEntry, workspaceEntryKey]);
-
-  /** Standard presence for home and other surfaces. */
-  useEffect(() => {
-    if (workspaceEntry || available.length === 0) return;
-    setSrc(resolvePresenceSrc(presence, available));
-  }, [workspaceEntry, presence, available]);
+    const pick = pickWorkspaceEntryPhoto(workspaceEntry, available);
+    logCompanionPresenceDebug(workspaceEntry, available, pick);
+    setSrc(pick.src);
+  }, [workspaceEntry, workspaceEntryKey, available, catalog.revision]);
 
   useEffect(() => {
     if (input.isThinking) {
@@ -121,7 +151,12 @@ export function useCompanionPresence(
 
     const id = window.setInterval(() => {
       setSrc((current) =>
-        pickNextCompanionPhoto(current, presence.photoContext, available),
+        pickNextCompanionPhoto(
+          current,
+          presence.photoContext,
+          available,
+          presenceKey,
+        ),
       );
     }, SHARI_PHOTO_ROTATION_MS);
 
@@ -132,13 +167,16 @@ export function useCompanionPresence(
     presence.rotate,
     presence.photoContext,
     available,
+    presenceKey,
   ]);
 
   const resolvedSrc =
     input.isThinking && frozenSrc.current ? frozenSrc.current : src;
 
+  const versionedSrc = companionPhotoSrcWithVersion(resolvedSrc, cacheVersion);
+
   return {
     ...presence,
-    src: input.compact ? ASSETS.profile : resolvedSrc,
+    src: versionedSrc,
   };
 }

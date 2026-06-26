@@ -7,7 +7,14 @@ import type { CompanionPresenceResolved } from "@/lib/companionPresence";
 type ShariPortraitProps = {
   presence: Pick<CompanionPresenceResolved, "src" | "shariImageState" | "animationState" | "expression">;
   alt?: string;
-  size?: "intimate" | "standard" | "compact" | "sidebar" | "in-room";
+  size?:
+    | "intimate"
+    | "standard"
+    | "compact"
+    | "sidebar"
+    | "in-room"
+    | "presence"
+    | "companion";
   ringColor?: string;
   className?: string;
   onError?: () => void;
@@ -20,6 +27,10 @@ const SIZE_CLASS = {
   compact: "h-10 w-10",
   sidebar: "h-16 w-16 ring-2",
   "in-room": "h-11 w-11 sm:h-12 sm:w-12",
+  presence:
+    "h-14 w-14 sm:h-[3.75rem] sm:w-[3.75rem] ring-2",
+  companion:
+    "h-[8.25rem] w-[8.25rem] sm:h-[8.75rem] sm:w-[8.75rem] ring-2",
 } as const;
 
 /**
@@ -38,7 +49,8 @@ export function ShariPortrait({
   const listening = presence.animationState === "listening";
   const intimate = size === "intimate";
   const compact = size === "compact";
-  const inRoom = size === "in-room";
+  const companion = size === "companion";
+  const inRoom = size === "in-room" || size === "presence" || companion;
 
   useEffect(() => {
     setSrc(presence.src);
@@ -51,7 +63,11 @@ export function ShariPortrait({
       : "";
 
   const imgClass = inRoom
-    ? `companion-fade-in rounded-full object-cover shadow-[0_2px_12px_rgba(47,38,31,0.08)] ring-2 ring-white/80 transition-opacity duration-700 motion-reduce:transition-none ${SIZE_CLASS["in-room"]} ${motionClass}`
+    ? `companion-fade-in rounded-full object-cover transition-opacity duration-700 motion-reduce:transition-none ${SIZE_CLASS[companion ? "companion" : size === "presence" ? "presence" : "in-room"]} ${
+        companion
+          ? "ring-2 ring-white/75 shadow-none"
+          : "shadow-[0_2px_12px_rgba(47,38,31,0.08)] ring-2 ring-white/80"
+      } ${motionClass}`
     : compact
       ? `rounded-full object-cover ${SIZE_CLASS.compact}`
       : `companion-fade-in rounded-full object-cover shadow-md transition-opacity duration-700 motion-reduce:transition-none ${SIZE_CLASS[size]} ring-white/90 ${

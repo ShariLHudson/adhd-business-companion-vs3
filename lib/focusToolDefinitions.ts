@@ -90,7 +90,7 @@ export const FOCUS_CLARITY_TOOLS: Record<FocusClarityToolId, FocusClarityTool> =
   },
   "adjust-my-day": {
     id: "adjust-my-day",
-    title: "Adapt My Day",
+    title: "Today's Reality",
     tagline: "Rebuild today's plan.",
     problem: "My plan isn't working.",
     useWhen: [
@@ -139,7 +139,7 @@ export type HelpMeRightNowMenuItem = {
   id: HelpMeRightNowMenuId;
   title: string;
   purpose: string;
-  emoji: string;
+  objectId: string;
   kind: "section" | "activity";
   section?: AppSection;
   activityId?: string;
@@ -149,9 +149,9 @@ export type HelpMeRightNowMenuItem = {
 export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
   {
     id: "adjust-my-day",
-    title: "Adapt My Day",
+    title: "Today's Reality",
     purpose: "Rebuild today's plan",
-    emoji: "⚡",
+    objectId: "todays-reality",
     kind: "section",
     section: "plan-my-day",
   },
@@ -159,7 +159,7 @@ export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
     id: "brain-parking-lot",
     title: "Brain Parking Lot",
     purpose: "Save ideas while staying focused",
-    emoji: "📌",
+    objectId: "parking-lot",
     kind: "activity",
     activityId: "brain-parking-lot",
   },
@@ -167,7 +167,7 @@ export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
     id: "clear-my-mind",
     title: "Clear My Mind",
     purpose: "Reduce mental clutter",
-    emoji: "🧠",
+    objectId: "clear-my-mind",
     kind: "section",
     section: "brain-dump",
   },
@@ -175,7 +175,7 @@ export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
     id: "safe-for-today",
     title: "Safe For Today",
     purpose: "Release pressure",
-    emoji: "🛡",
+    objectId: "safe-for-today",
     kind: "activity",
     activityId: "safe-for-today",
   },
@@ -183,7 +183,7 @@ export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
     id: "focus-session",
     title: "Focus Session",
     purpose: "Stay engaged",
-    emoji: "🎯",
+    objectId: "focus-timer",
     kind: "section",
     section: "focus-timer",
   },
@@ -191,7 +191,7 @@ export const HELP_ME_RIGHT_NOW_MENU: HelpMeRightNowMenuItem[] = [
     id: "decision-compass",
     title: "ADHD Decision Compass",
     purpose: "Work through a decision with visual thinking beside chat",
-    emoji: "🧭",
+    objectId: "decision-compass",
     kind: "activity",
     activityId: "decision-compass",
   },

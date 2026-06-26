@@ -14,7 +14,7 @@ export type GameEnergy = "Low" | "Medium" | "Any" | "None";
 export type MomentumGameDef = {
   id: string;
   label: string;
-  emoji: string;
+  objectId: string;
   need: MomentumNeedId;
   /** One-sentence description shown on the game card. */
   description: string;
@@ -25,9 +25,11 @@ export type MomentumGameDef = {
   externalTool?: "spin-wheel";
 };
 
+import { MOMENTUM_NEED_OBJECT_ID } from "./workspaceObjectIds";
+
 export type MomentumNeedCategory = {
   id: MomentumNeedId;
-  emoji: string;
+  objectId: string;
   title: string;
   tagline: string;
   color: string;
@@ -36,35 +38,35 @@ export type MomentumNeedCategory = {
 export const MOMENTUM_NEED_CATEGORIES: MomentumNeedCategory[] = [
   {
     id: "focus-attention",
-    emoji: "🧠",
+    objectId: MOMENTUM_NEED_OBJECT_ID["focus-attention"],
     title: "Focus & Attention",
     tagline: "Help when your brain feels scattered or distracted.",
     color: "#3b82f6",
   },
   {
     id: "momentum-action",
-    emoji: "⚡",
+    objectId: MOMENTUM_NEED_OBJECT_ID["momentum-action"],
     title: "Momentum & Action",
     tagline: "Help when you know what to do but can't get started.",
     color: "#f59e0b",
   },
   {
     id: "creative-spark",
-    emoji: "💡",
+    objectId: MOMENTUM_NEED_OBJECT_ID["creative-spark"],
     title: "Creative Spark",
     tagline: "Help when you need ideas, inspiration, or fresh thinking.",
     color: "#a855f7",
   },
   {
     id: "mental-vacation",
-    emoji: "🌴",
+    objectId: MOMENTUM_NEED_OBJECT_ID["mental-vacation"],
     title: "Mental Vacation",
     tagline: "Help when you're overwhelmed and need a break.",
     color: "#22c55e",
   },
   {
     id: "just-for-fun",
-    emoji: "🎉",
+    objectId: MOMENTUM_NEED_OBJECT_ID["just-for-fun"],
     title: "Just For Fun",
     tagline: "No goals. No productivity. Just dopamine.",
     color: "#e0795a",
@@ -76,7 +78,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "focus-sprint",
     label: "Focus Sprint",
-    emoji: "⏱️",
+    objectId: "games",
     need: "focus-attention",
     description: "Mini timed tap challenge to sharpen attention.",
     helpsWith: "Focus",
@@ -86,7 +88,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "memory-match",
     label: "Memory Match",
-    emoji: "🃏",
+    objectId: "games",
     need: "focus-attention",
     description: "Flip and pair matching symbols.",
     helpsWith: "Focus",
@@ -96,7 +98,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "number-hunt",
     label: "Number Hunt",
-    emoji: "🔍",
+    objectId: "games",
     need: "focus-attention",
     description: "Find numbers 1 through 9 in order.",
     helpsWith: "Focus",
@@ -106,7 +108,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "pattern-match",
     label: "Pattern Match",
-    emoji: "🧩",
+    objectId: "games",
     need: "focus-attention",
     description: "Tap the tile that's different.",
     helpsWith: "Focus",
@@ -116,7 +118,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "quick-sort",
     label: "Quick Sort",
-    emoji: "📦",
+    objectId: "games",
     need: "focus-attention",
     description: "Sort items into the right buckets fast.",
     helpsWith: "Focus",
@@ -126,7 +128,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "sequence-builder",
     label: "Sequence Builder",
-    emoji: "🔢",
+    objectId: "games",
     need: "focus-attention",
     description: "Tap items in the right order.",
     helpsWith: "Focus",
@@ -136,7 +138,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "shape-match",
     label: "Shape Match",
-    emoji: "⬡",
+    objectId: "games",
     need: "focus-attention",
     description: "Match the target shape.",
     helpsWith: "Focus",
@@ -147,7 +149,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "first-step-finder",
     label: "First Step Finder",
-    emoji: "👣",
+    objectId: "games",
     need: "momentum-action",
     description: "Shrink one stuck task down to a tiny first move.",
     helpsWith: "Getting Started",
@@ -157,7 +159,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "random-action-generator",
     label: "Random Action Generator",
-    emoji: "🎲",
+    objectId: "games",
     need: "momentum-action",
     description: "Get one small action you can do right now.",
     helpsWith: "Getting Started",
@@ -167,7 +169,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "reaction-tap",
     label: "Reaction Tap",
-    emoji: "⚡",
+    objectId: "games",
     need: "momentum-action",
     description: "Tap the target color as fast as you can.",
     helpsWith: "Getting Started",
@@ -177,7 +179,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "spin-the-wheel",
     label: "Spin The Wheel",
-    emoji: "🎡",
+    objectId: "games",
     need: "momentum-action",
     description: "Let the wheel pick one thing when everything feels equal.",
     helpsWith: "Getting Started",
@@ -188,7 +190,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "this-or-that",
     label: "This Or That",
-    emoji: "🔀",
+    objectId: "games",
     need: "momentum-action",
     description: "Fast choices — no wrong answers, just movement.",
     helpsWith: "Getting Started",
@@ -198,7 +200,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "tiny-win-challenge",
     label: "Tiny Win Challenge",
-    emoji: "🏆",
+    objectId: "games",
     need: "momentum-action",
     description: "Stack three micro-wins to build momentum.",
     helpsWith: "Getting Started",
@@ -209,7 +211,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "category-blitz",
     label: "Category Blitz",
-    emoji: "🧠",
+    objectId: "games",
     need: "creative-spark",
     description: "Name items in a category before time runs out.",
     helpsWith: "Ideas",
@@ -219,7 +221,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "opposite-thinking",
     label: "Opposite Thinking",
-    emoji: "🔄",
+    objectId: "games",
     need: "creative-spark",
     description: "Flip a familiar idea and see what opens up.",
     helpsWith: "Ideas",
@@ -229,7 +231,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "random-idea-generator",
     label: "Random Idea Generator",
-    emoji: "✨",
+    objectId: "games",
     need: "creative-spark",
     description: "A surprise prompt to spark a fresh angle.",
     helpsWith: "Ideas",
@@ -239,7 +241,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "story-starter",
     label: "Story Starter",
-    emoji: "📖",
+    objectId: "games",
     need: "creative-spark",
     description: "Open with one line — let your brain fill in the rest.",
     helpsWith: "Ideas",
@@ -249,7 +251,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "what-if-challenge",
     label: "What If Challenge",
-    emoji: "🤔",
+    objectId: "games",
     need: "creative-spark",
     description: "Play with a what-if question to loosen rigid thinking.",
     helpsWith: "Ideas",
@@ -259,7 +261,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "word-search-mini",
     label: "Word Search Mini",
-    emoji: "📝",
+    objectId: "games",
     need: "creative-spark",
     description: "Find three short words in the grid.",
     helpsWith: "Ideas",
@@ -270,7 +272,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "color-quest",
     label: "Color Quest",
-    emoji: "🎨",
+    objectId: "games",
     need: "mental-vacation",
     description: "Follow the color rule — ignore the rest.",
     helpsWith: "Mental Reset",
@@ -280,7 +282,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "find-duplicate",
     label: "Find The Duplicate",
-    emoji: "👯",
+    objectId: "games",
     need: "mental-vacation",
     description: "Spot the two matching symbols.",
     helpsWith: "Mental Reset",
@@ -290,7 +292,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "hidden-objects",
     label: "Hidden Objects",
-    emoji: "🔎",
+    objectId: "games",
     need: "mental-vacation",
     description: "Hunt for hidden gems in a calm grid.",
     helpsWith: "Mental Reset",
@@ -300,7 +302,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "spot-difference",
     label: "Spot The Difference",
-    emoji: "👀",
+    objectId: "games",
     need: "mental-vacation",
     description: "Find the one tile that doesn't belong.",
     helpsWith: "Mental Reset",
@@ -310,7 +312,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "treasure-hunt",
     label: "Treasure Hunt",
-    emoji: "🗺️",
+    objectId: "games",
     need: "mental-vacation",
     description: "Find hidden gems in the grid.",
     helpsWith: "Mental Reset",
@@ -321,7 +323,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "finish-the-sentence",
     label: "Finish The Sentence",
-    emoji: "✍️",
+    objectId: "games",
     need: "just-for-fun",
     description: "Complete a silly or surprising sentence starter.",
     helpsWith: "Mood",
@@ -331,7 +333,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "random-trivia",
     label: "Random Trivia",
-    emoji: "🧩",
+    objectId: "games",
     need: "just-for-fun",
     description: "One fun fact — guess or just enjoy.",
     helpsWith: "Mood",
@@ -341,7 +343,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "this-or-that-fun",
     label: "This Or That (Fun Version)",
-    emoji: "😄",
+    objectId: "games",
     need: "just-for-fun",
     description: "Playful picks — zero stakes, pure dopamine.",
     helpsWith: "Mood",
@@ -351,7 +353,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "two-truths-lie",
     label: "Two Truths And A Lie",
-    emoji: "🎭",
+    objectId: "games",
     need: "just-for-fun",
     description: "Spot the odd one out in three quick statements.",
     helpsWith: "Mood",
@@ -361,7 +363,7 @@ export const MOMENTUM_GAMES: MomentumGameDef[] = [
   {
     id: "would-you-rather",
     label: "Would You Rather",
-    emoji: "🤷",
+    objectId: "games",
     need: "just-for-fun",
     description: "Pick between two fun scenarios — no wrong answer.",
     helpsWith: "Mood",

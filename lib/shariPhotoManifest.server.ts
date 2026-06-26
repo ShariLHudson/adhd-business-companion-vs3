@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import crypto from "node:crypto";
 import {
   isShariImageFilename,
   publicUrlFromPublicRelative,
@@ -47,4 +48,41 @@ export function detectShariImagesOnDisk(): string[] {
   }
 
   return sortShariPhotoUrls(found.length > 0 ? found : [ASSETS.profile]);
+}
+
+function fileVersionToken(filePath: string): string {
+  try {
+    const stat = fs.statSync(filePath);
+    return `${stat.mtimeMs}`;
+  } catch {
+    return "";
+  }
+}
+
+/** Cache-bust token derived from on-disk file mtimes. */
+export function detectShariPhotoManifestVersion(): string {
+  const publicRoot = path.join(process.cwd(), "public");
+  const parts: string[] = [];
+
+  const profilePath = path.join(publicRoot, "shari.jpg");
+  if (fs.existsSync(profilePath)) {
+    parts.push(`profile:${fileVersionToken(profilePath)}`);
+  }
+
+  const galleryDir = path.join(publicRoot, SHARI_GALLERY_SUBDIR);
+  if (fs.existsSync(galleryDir)) {
+    for (const entry of fs.readdirSync(galleryDir, { withFileTypes: true })) {
+      if (!entry.isFile() || !isShariImageFilename(entry.name)) continue;
+      parts.push(
+        `g:${entry.name}:${fileVersionToken(path.join(galleryDir, entry.name))}`,
+      );
+    }
+  }
+
+  if (!parts.length) return "0";
+  return crypto
+    .createHash("sha1")
+    .update(parts.sort().join("|"))
+    .digest("hex")
+    .slice(0, 12);
 }

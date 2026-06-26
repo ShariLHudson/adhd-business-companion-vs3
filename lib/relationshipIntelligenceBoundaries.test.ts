@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import { buildRelationshipIntelligencePriorityBlock } from "./relationshipIntelligencePrompt";
-import { buildRelationshipLeadParagraph } from "./relationshipResponseContract";
 import { resolveIntentRouting } from "./intentRoutingIntelligence";
 import { resolveFrictionlessAction } from "./frictionlessActionLayer";
 import {
@@ -43,11 +42,6 @@ describe("relationshipIntelligenceBoundaries (P0.17)", () => {
     const frictionless = resolveFrictionlessAction({ userText, currentTurn: 1 });
     expect(frictionless.suppressRelationship).toBe(true);
     expect(buildRelationshipIntelligencePriorityBlock(userText)).toBeNull();
-    expect(
-      buildRelationshipLeadParagraph(userText, new Date(), {
-        suppressForRouting: false,
-      }),
-    ).toBeNull();
   });
 
   it.each(allowedCases)("allows relationship for: %s", (userText) => {

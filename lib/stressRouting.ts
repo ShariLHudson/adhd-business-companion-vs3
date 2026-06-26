@@ -28,7 +28,7 @@ export type StressCauseId =
 
 export type StressReliefOption = {
   id: StressReliefOptionId;
-  emoji: string;
+  objectId: string;
   label: string;
 };
 
@@ -58,12 +58,14 @@ const EXPLICIT_FOCUS_AUDIO_RE =
 const STRESS_TOOL_ACCEPT_RE =
   /\b(?:let'?s|let us|i'?ll|i will|i want to|want to|try|do the|do a|go with|yes to|sounds good|let me try)\b/i;
 
+import { STRESS_RELIEF_OBJECT_ID } from "./workspaceObjectIds";
+
 export const STRESS_RELIEF_OPTIONS: StressReliefOption[] = [
-  { id: "breathe", emoji: "🌬️", label: "Breathing Exercise" },
-  { id: "calm-audio", emoji: "🎵", label: "Calm Audio" },
-  { id: "clear-mind", emoji: "🧠", label: "Clear My Mind" },
-  { id: "safe-for-today", emoji: "🛡️", label: "Safe For Today" },
-  { id: "talk-through", emoji: "💬", label: "Talk It Through" },
+  { id: "breathe", objectId: STRESS_RELIEF_OBJECT_ID.breathe, label: "Breathing Exercise" },
+  { id: "calm-audio", objectId: STRESS_RELIEF_OBJECT_ID["calm-audio"], label: "Calm Audio" },
+  { id: "clear-mind", objectId: STRESS_RELIEF_OBJECT_ID["clear-mind"], label: "Clear My Mind" },
+  { id: "safe-for-today", objectId: STRESS_RELIEF_OBJECT_ID["safe-for-today"], label: "Safe For Today" },
+  { id: "talk-through", objectId: STRESS_RELIEF_OBJECT_ID["talk-through"], label: "Talk It Through" },
 ];
 
 export const STRESS_CAUSE_OPTIONS: StressCauseOption[] = [
@@ -260,7 +262,7 @@ export function recommendForStressCause(cause: StressCauseId): {
       return { primary: option("breathe") };
     case "too-much-to-do":
       return {
-        primary: { id: "adjust-day", emoji: "⚡", label: "Adapt My Day" },
+        primary: { id: "adjust-day", objectId: "todays-reality", label: "Today's Reality" },
       };
     case "something-else":
     default:
@@ -313,7 +315,7 @@ export function stressToolOpenAck(id: StressReliefOptionId): string {
     case "safe-for-today":
       return "Opening **Safe For Today** — permission to postpone, not a guilt list.";
     case "adjust-day":
-      return "Opening **Adapt My Day** — let's rebuild today to fit your real energy.";
+      return "Opening **Today's Reality** — let's rebuild today to fit your real energy.";
     case "talk-through":
       return "I'm here — let's talk it through.";
   }

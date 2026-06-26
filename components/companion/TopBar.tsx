@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import { CompanionObjectLabel } from "@/components/companion/CompanionObjectVisual";
 import {
   countActivePlanItems,
   PLAN_MY_DAY_UPDATED,
@@ -44,13 +46,13 @@ function usePlanActiveCount(): number {
 }
 
 function HeaderActionButton({
-  emoji,
+  objectId,
   label,
   onClick,
   href,
   badge,
 }: {
-  emoji: string;
+  objectId: string;
   label: string;
   onClick: () => void;
   href?: string;
@@ -59,7 +61,7 @@ function HeaderActionButton({
   const className = BTN;
   const content = (
     <>
-      <span aria-hidden="true">{emoji}</span>
+      <CompanionObjectVisual objectId={objectId} size="xs" variant="icon" />
       <span className="hidden sm:inline">{label}</span>
       {badge != null && badge > 0 ? (
         <span className="rounded-full bg-[var(--cm-accent-tint,#e6f0f0)] px-2 py-0.5 text-xs font-bold text-[var(--cm-accent,#1e4f4f)]">
@@ -139,7 +141,7 @@ function NewConversationDropdown({
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
-        <span aria-hidden="true">💬</span>
+        <CompanionObjectVisual objectId="messages" size="xs" variant="icon" />
         <span className="hidden sm:inline">{TOP_BAR_NEW_CONVERSATION_LABEL}</span>
         <span style={{ fontSize: 9, opacity: 0.5, marginLeft: 1 }}>▾</span>
       </button>
@@ -157,7 +159,7 @@ function NewConversationDropdown({
               onNewConversation();
             }}
           >
-            <span>💬</span>
+            <CompanionObjectVisual objectId="messages" size="xs" variant="icon" />
             <span>New Conversation</span>
           </button>
           <button
@@ -169,7 +171,7 @@ function NewConversationDropdown({
               onNewDayConversation();
             }}
           >
-            <span>🌅</span>
+            <CompanionObjectVisual objectId="todays-reality" size="xs" variant="icon" />
             <span>New Day Conversation</span>
           </button>
         </div>
@@ -231,7 +233,7 @@ export function TopBar({
     >
       {onOpenClearMyMind ? (
         <HeaderActionButton
-          emoji="🧠"
+          objectId="clear-my-mind"
           label="Clear My Mind"
           onClick={() => runHeaderAction(onOpenClearMyMind)}
         />
@@ -239,7 +241,7 @@ export function TopBar({
 
       {showPlanMyDay && onOpenPlanMyDay ? (
         <HeaderActionButton
-          emoji="📅"
+          objectId="plan-my-day"
           label="Plan My Day"
           onClick={() => runHeaderAction(onOpenPlanMyDay)}
           badge={planActiveCount}
@@ -248,8 +250,8 @@ export function TopBar({
 
       {onOpenAdaptMyDay ? (
         <HeaderActionButton
-          emoji="🌤️"
-          label="Adapt My Day"
+          objectId="todays-reality"
+          label="Today's Reality"
           onClick={() => runHeaderAction(onOpenAdaptMyDay)}
         />
       ) : null}
@@ -286,7 +288,7 @@ export function TopBar({
               onClick={() => runHeaderAction(() => onOpenSettings(null))}
               className={MENU_BTN}
             >
-              ⚙️ Settings
+              <CompanionObjectLabel objectId="settings" label="Settings" size="xs" />
             </button>
             <button
               type="button"
@@ -294,7 +296,7 @@ export function TopBar({
               onClick={() => runHeaderAction(onOpenProfile)}
               className={MENU_BTN}
             >
-              👤 Profile
+              <CompanionObjectLabel objectId="profile" label="Profile" size="xs" />
             </button>
           </div>
         ) : null}

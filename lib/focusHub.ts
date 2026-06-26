@@ -38,7 +38,7 @@ export type FocusHubToolGroup = {
 
 export type FocusFeelingCategory = {
   id: FocusFeelingId;
-  emoji: string;
+  objectId: string;
   label: string;
   tagline: string;
   /** Opens chat immediately — no sub-panel. */
@@ -66,7 +66,7 @@ function tool(
 export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
   {
     id: "stuck",
-    emoji: "🚧",
+    objectId: "focus-my-brain",
     label: "I'm Stuck",
     tagline: "Paralysis, avoidance, and fear of starting.",
     recommended: tool(
@@ -104,7 +104,7 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
   },
   {
     id: "need-break",
-    emoji: "🌿",
+    objectId: "breathing",
     label: "I Need A Break",
     tagline: "Regulate, reset, and come back calmer.",
     recommended: tool(
@@ -198,7 +198,7 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
 /** Flat list of feeling entry points for the home screen. */
 export const FOCUS_FEELING_ENTRIES = FOCUS_FEELING_CATEGORIES.map((c) => ({
   id: c.id,
-  emoji: c.emoji,
+  objectId: c.objectId,
   label: c.label,
   tagline: c.tagline,
   immediate: c.immediate ?? false,

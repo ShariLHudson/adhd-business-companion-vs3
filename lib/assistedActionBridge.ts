@@ -20,7 +20,7 @@ export type AssistedAction = {
   /** Message when the workspace opens. */
   openAck: string;
   buttonLabel: string;
-  emoji: string;
+  objectId: string;
   tool?: SidebarToolId;
 };
 
@@ -68,7 +68,7 @@ function detectAssistedActionUncached(
       openAck:
         "Your **Proposal** is in **Create** beside us — tell me what section to work on next.",
       buttonLabel: "Continue Proposal",
-      emoji: "📄",
+      objectId: "templates",
     };
   }
 
@@ -89,7 +89,7 @@ function detectAssistedActionUncached(
       openAck:
         "Opening **Create** with **Email** — tell me who it's to and what you want to say, and we'll draft it together.",
       buttonLabel: "Help Me Draft It",
-      emoji: "✉️",
+      objectId: "email-generator",
     };
   }
 
@@ -109,7 +109,7 @@ function detectAssistedActionUncached(
       openAck:
         "Opening **Create** for your post — share the angle and we'll shape it together.",
       buttonLabel: "Help Me Write It",
-      emoji: "📱",
+      objectId: "create",
     };
   }
 
@@ -126,7 +126,7 @@ function detectAssistedActionUncached(
       openAck:
         "Opening **Create** for your plan — we'll build it one piece at a time.",
       buttonLabel: "Help Me Plan It",
-      emoji: "📋",
+      objectId: "templates",
     };
   }
 
@@ -147,7 +147,7 @@ function detectAssistedActionUncached(
       openAck:
         "Opening **Create** for call prep — we'll shape what you want to say before you dial.",
       buttonLabel: "Help Me Prep",
-      emoji: "📞",
+      objectId: "messages",
     };
   }
 
@@ -166,7 +166,7 @@ function detectAssistedActionUncached(
       openAck:
         "Opening **Clear My Mind** — dump what's weighing on you about the inbox, and we'll sort it together.",
       buttonLabel: "Open Clear My Mind",
-      emoji: "🧠",
+      objectId: "clear-my-mind",
       tool: "brain-dump",
     };
   }
@@ -184,7 +184,7 @@ function detectAssistedActionUncached(
       helpMessage: `Want help with that ${topic}? I can open **Projects** beside us and we'll work through it step by step.`,
       openAck: `Opening **Projects** — let's build your ${topic} together.`,
       buttonLabel: "Build Together",
-      emoji: "📁",
+      objectId: "projects",
     };
   }
 
@@ -199,7 +199,7 @@ function detectAssistedActionUncached(
         "Want help scheduling it? I can open **Time Block** and we'll place it on your day together.",
       openAck: "Opening **Time Block** — let's find a spot that actually works.",
       buttonLabel: "Open Time Block",
-      emoji: "📅",
+      objectId: "calendar",
       tool: "time-block",
     };
   }

@@ -1,0 +1,149 @@
+/** Plan My Day™ Sprint 3 — atmosphere and progressive reveal */
+
+.plan-day-atmosphere {
+  --plan-day-gap: 1rem;
+  --plan-day-copy-max: 42rem;
+}
+
+.plan-day-atmosphere--recovery,
+.plan-day-atmosphere--survival,
+.plan-day-atmosphere--celebration {
+  --plan-day-gap: 1.5rem;
+}
+
+.plan-day-atmosphere--hyperfocus {
+  --plan-day-gap: 2rem;
+}
+
+.plan-day-atmosphere--health,
+.plan-day-atmosphere--family {
+  --plan-day-gap: 1.25rem;
+}
+
+.plan-day-reveal {
+  animation: plan-day-reveal-in 0.55s ease-out both;
+}
+
+@keyframes plan-day-reveal-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.plan-day-journey-chapter-enter {
+  animation: plan-day-living-in 520ms ease-out both;
+}
+
+.plan-day-journey-header {
+  transition: opacity 280ms ease;
+}
+
+.plan-day-living-enter {
+  animation: plan-day-living-in 0.65s ease-out both;
+}
+
+.plan-day-living-enter--delayed {
+  animation-delay: 180ms;
+}
+
+.plan-day-add-form--delayed {
+  animation-delay: 400ms;
+}
+
+@keyframes plan-day-living-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.plan-day-arrival-pause {
+  animation: plan-day-breathe 2.5s ease-in-out infinite;
+}
+
+@keyframes plan-day-breathe {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.55;
+  }
+}
+
+/* Morning Presence™ — companion moment before planning */
+.plan-day-morning-presence {
+  padding: 0.25rem 0 0.35rem;
+}
+
+.plan-day-morning-presence__moment {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 26rem;
+  margin-inline: auto;
+  text-align: center;
+}
+
+.plan-day-morning-presence__portrait {
+  flex-shrink: 0;
+  margin-bottom: 1.15rem;
+}
+
+.plan-day-morning-presence__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.plan-day-morning-presence__line {
+  margin: 0;
+  line-height: 1.5;
+  text-wrap: pretty;
+  color: #1f1c19;
+}
+
+.plan-day-morning-presence__line--primary {
+  font-size: 1.3125rem;
+  font-weight: 600;
+  color: #2f261f;
+  letter-spacing: -0.01em;
+}
+
+.plan-day-morning-presence__line--secondary {
+  font-size: 1.0625rem;
+  font-weight: 400;
+  color: #4a4239;
+}
+
+.plan-day-morning-presence-enter {
+  animation: plan-day-morning-in 0.7s ease-out both;
+}
+
+@keyframes plan-day-morning-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (min-width: 1024px) {
+  .plan-day-morning-presence__line--primary {
+    font-size: 1.35rem;
+  }
+}

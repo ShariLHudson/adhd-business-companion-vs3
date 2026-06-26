@@ -1,12 +1,16 @@
 /**
  * Constitutional annotations for Companion Brain™ services.
  * For future developers — not user-facing.
+ *
+ * Entry: Screen Certification™ gates (see docs/SCREEN_CERTIFICATION.md).
+ * Ongoing: Stewardship Review™ (see docs/PRODUCT_CONSTITUTION.md#the-stewardship-review).
  */
 
 export type ConstitutionalPrinciple =
   | "Constitution-Three-Laws"
   | "Dual-Mandate"
   | "Stewardship-Oath"
+  | "Stewardship-Review"
   | "Decision-Filter"
   | "Cognitive-Audit"
   | "Relevance-Safeguard"
@@ -83,6 +87,28 @@ export const COMPANION_BRAIN_SERVICES: ServiceConstitution[] = [
     ],
   },
   {
+    service: "generateMorningPresence",
+    purpose:
+      "Help the user feel seen before planning — witnessing, not coaching.",
+    principles: [
+      "Human-Reality-Test",
+      "Relationship-Protection",
+      "Dual-Mandate",
+      "Stewardship-Oath",
+    ],
+  },
+  {
+    service: "classifyLifeArea",
+    purpose:
+      "Understand where work belongs in the user's life — reduce manual organization.",
+    principles: [
+      "Stewardship-Oath",
+      "Dual-Mandate",
+      "Human-Reality-Test",
+      "Relevance-Safeguard",
+    ],
+  },
+  {
     service: "runCognitiveAudit",
     purpose: "Gate output against the Constitution before any page renders it.",
     principles: [
@@ -128,5 +154,25 @@ export const COMPANION_BRAIN_SERVICES: ServiceConstitution[] = [
     service: "emitLearningSignals",
     purpose: "Feed the Living Intelligence Graph™ without user dashboards.",
     principles: ["Relevance-Safeguard", "Dual-Mandate"],
+  },
+  {
+    service: "reEvaluateLiveJudgment",
+    purpose:
+      "Re-run judgment when reality changes — morning plan is a starting point, never a commitment.",
+    principles: [
+      "Human-Reality-Test",
+      "Stewardship-Oath",
+      "Constitution-Three-Laws",
+    ],
+  },
+  {
+    service: "publishRealitySignal",
+    purpose:
+      "Today's Reality™ and future signals feed one brain — no manual synchronization.",
+    principles: [
+      "Relevance-Safeguard",
+      "Relationship-Protection",
+      "Dual-Mandate",
+    ],
   },
 ];

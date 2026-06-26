@@ -1,5 +1,6 @@
 "use client";
 
+import { CompanionObjectLabel } from "@/components/companion/CompanionObjectVisual";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   initialCollapsedSectionMap,
@@ -1184,7 +1185,11 @@ function StrategyBuiltinDetail({
                 disabled={!onOpen}
                 className="rounded-full border border-[#1e4f4f]/25 bg-white px-3 py-1.5 text-sm font-medium text-[#1e4f4f] hover:bg-[#1e4f4f]/[0.06] disabled:opacity-40"
               >
-                {tool.emoji} {tool.label}
+                <CompanionObjectLabel
+                  objectId={tool.objectId}
+                  label={tool.label}
+                  size="xs"
+                />
               </button>
             ))}
           </div>
@@ -1298,19 +1303,19 @@ function LessonHeading({
   );
 }
 
-const TOOL_LABELS: Partial<Record<AppSection, { label: string; emoji: string }>> = {
-  "brain-dump": { label: "Clear My Mind", emoji: "🧠" },
-  "focus-timer": { label: "Focus Session", emoji: "🎯" },
-  breathe: { label: "Breathe & Reset", emoji: "🌿" },
-  energy: { label: "How Are You Feeling Today?", emoji: "💬" },
-  projects: { label: "Projects", emoji: "📁" },
-  "spin-wheel": { label: "Spin the Wheel", emoji: "🎡" },
-  "time-block": { label: "Time Block", emoji: "📅" },
-  "content-generator": { label: "Create", emoji: "✨" },
-  "email-generator": { label: "Email Generator", emoji: "✉️" },
-  snippets: { label: "Snippets", emoji: "📋" },
-  "templates-library": { label: "Templates", emoji: "📄" },
-  home: { label: "Chat with Shari", emoji: "💬" },
+const TOOL_LABELS: Partial<Record<AppSection, { label: string; objectId: string }>> = {
+  "brain-dump": { label: "Clear My Mind", objectId: "clear-my-mind" },
+  "focus-timer": { label: "Focus Session", objectId: "focus-timer" },
+  breathe: { label: "Breathe & Reset", objectId: "breathing" },
+  energy: { label: "How Are You Feeling Today?", objectId: "todays-reality" },
+  projects: { label: "Projects", objectId: "projects" },
+  "spin-wheel": { label: "Spin the Wheel", objectId: "spin-wheel" },
+  "time-block": { label: "Time Block", objectId: "calendar" },
+  "content-generator": { label: "Create", objectId: "create" },
+  "email-generator": { label: "Email Generator", objectId: "email-generator" },
+  snippets: { label: "Snippets", objectId: "toolbelt-snippets" },
+  "templates-library": { label: "Templates", objectId: "templates" },
+  home: { label: "Chat with Shari", objectId: "messages" },
 };
 
 function relatedCompanionTools(s: Strategy, subcatId: string) {
@@ -1328,7 +1333,7 @@ function relatedCompanionTools(s: Strategy, subcatId: string) {
     if (seen.has(section)) continue;
     const meta = TOOL_LABELS[section];
     if (meta) {
-      merged.push({ section, label: meta.label, emoji: meta.emoji });
+      merged.push({ section, label: meta.label, objectId: meta.objectId });
       seen.add(section);
     }
   }

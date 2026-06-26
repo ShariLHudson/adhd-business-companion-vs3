@@ -158,5 +158,5 @@ export function threadAwareAcceptanceFallback(thread: OutcomeThread | null): str
   if (thread?.currentProblem) {
     return `Picking up **${thread.currentProblem.slice(0, 120)}** — what's the piece that feels most uncertain?`;
   }
-  return "Continuing where we left off — what's the one variable you want to tackle first?";
+  return "I'm still here — what's the next piece you want to look at?";
 }

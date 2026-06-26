@@ -63,13 +63,13 @@ export const ADHD_ENTREPRENEUR_KNOWLEDGE_BASE: PatternSpec[] = [
   {
     id: "perfectionism",
     label: "Perfectionism",
-    re: /\b(?:perfect|not good enough|not ready|one more tweak|has to be right)\b/i,
+    re: /\b(?:perfect|not good enough|not ready|one more tweak|has to be right|won'?t do it right|little improvements|keep (?:making |)tweaking|so many drafts)\b/i,
     filterNote: "Favor good-enough forward motion over polish.",
   },
   {
     id: "planning_addiction",
     label: "Planning addiction",
-    re: /\b(?:another plan|keep planning|outline first|need a system|checklist before)\b/i,
+    re: /\b(?:another plan|keep planning|outline first|need a system|checklist before|schedule so many|calendar but nothing)\b/i,
     filterNote: "Plans are not progress — find the smallest start.",
   },
   {
@@ -81,7 +81,7 @@ export const ADHD_ENTREPRENEUR_KNOWLEDGE_BASE: PatternSpec[] = [
   {
     id: "tool_hopping",
     label: "Tool hopping",
-    re: /\b(?:another tool|different app|switch tools|new platform|better software)\b/i,
+    re: /\b(?:another tool|different app|switch tools|new platform|better software|so many subscriptions|signed up for and never used)\b/i,
     filterNote: "Tools don't fix execution — simplify the workflow first.",
   },
   {
@@ -99,19 +99,19 @@ export const ADHD_ENTREPRENEUR_KNOWLEDGE_BASE: PatternSpec[] = [
   {
     id: "shiny_object",
     label: "Shiny object syndrome",
-    re: /\b(?:shiny object|new idea|saw someone|everyone is doing|trending)\b/i,
+    re: /\b(?:shiny object|new idea|saw someone|everyone is doing|trending|incredible opportunities|opportunities in front of me)\b/i,
     filterNote: "Novelty is not strategy — return to the committed path.",
   },
   {
     id: "time_blindness",
     label: "Time blindness",
-    re: /\b(?:where did the time|lost track of time|took longer than|ran out of time|time got away)\b/i,
+    re: /\b(?:where did the time|lost track of time|took longer than|ran out of time|time got away|felt so far away|now it'?s today)\b/i,
     filterNote: "Shrink time boxes — external timers and visible deadlines.",
   },
   {
     id: "overcommitting",
     label: "Overcommitting",
-    re: /\b(?:said yes to too|too many commitments|overcommitted|can't do it all)\b/i,
+    re: /\b(?:said yes to too|said yes to (?:a |three |another )|too many commitments|overcommitted|can'?t do it all|big new project|future me will)\b/i,
     filterNote: "Subtract before adding — protect capacity.",
   },
   {
@@ -135,25 +135,25 @@ export const ADHD_ENTREPRENEUR_KNOWLEDGE_BASE: PatternSpec[] = [
   {
     id: "avoidance",
     label: "Avoidance",
-    re: /\b(?:avoiding|putting off|can'?t make myself|procrastinat)\b/i,
+    re: /\b(?:avoiding|putting (?:it )?off|can'?t make myself|procrastinat|can'?t bring myself|never actually publish|soft launch|haven'?t (?:sent|replied|checked in|touched)|just disappeared|keep avoiding it|paralysed and do nothing)\b/i,
     filterNote: "Name the scary part — shrink exposure, not willpower.",
   },
   {
     id: "confidence_crash",
     label: "Confidence crash",
-    re: /\b(?:nobody will|not qualified|imposter|fraud|who am i to)\b/i,
+    re: /\b(?:nobody will|not qualified|imposter|fraud|who am i to|feel(?:ing)? ashamed|feel like a failure|terrified|critici[sz]e|i'?m scared|lost money)\b/i,
     filterNote: "Ground in evidence — one stabilizing step, no cheerleading.",
   },
   {
     id: "burnout_cycle",
     label: "Burnout cycle",
-    re: /\b(?:burned out|burnt out|running on empty|can'?t keep this pace)\b/i,
+    re: /\b(?:burned out|burnt out|running on empty|can'?t keep this pace|feel really disconnected|completely wiped|wiped out|can'?t do anything)\b/i,
     filterNote: "Recovery is strategic — make today smaller.",
   },
   {
     id: "hyperfocus_crash",
     label: "Hyperfocus crash",
-    re: /\b(?:hyperfocus|crashed after|all night|ignored everything else)\b/i,
+    re: /\b(?:hyperfocus|crashed after|all night|ignored everything else|14 hours a day|worked \d+ hours a day)\b/i,
     filterNote: "Protect recovery after sprints — don't stack big asks.",
   },
   {
@@ -165,19 +165,19 @@ export const ADHD_ENTREPRENEUR_KNOWLEDGE_BASE: PatternSpec[] = [
   {
     id: "decision_paralysis",
     label: "Decision paralysis",
-    re: /\b(?:can'?t decide|stuck between|too many options|decision paralysis)\b/i,
+    re: /\b(?:can'?t decide|stuck between|too many options|decision paralysis|going in circles|unfinished projects|don'?t know which)\b/i,
     filterNote: "Reduce options artificially — good enough beats perfect.",
   },
   {
     id: "inconsistent_execution",
     label: "Inconsistent execution",
-    re: /\b(?:start strong then stop|never follow through|inconsistent|fall off)\b/i,
+    re: /\b(?:start strong then stop|never follow through|inconsistent|fall off|follower count|not growing|giving up)\b/i,
     filterNote: "Repeatable beats ambitious — one rhythm at a time.",
   },
   {
     id: "financial_avoidance",
     label: "Financial avoidance",
-    re: /\b(?:haven'?t looked at (?:my )?(?:revenue|numbers)|avoiding (?:my )?books|scared to open)\b/i,
+    re: /\b(?:haven'?t looked at (?:my )?(?:revenue|numbers|bank)|avoiding (?:my )?books|scared to open|taxes are due|haven'?t sent the invoices)\b/i,
     filterNote: "One tiny numbers glance — not a financial overhaul.",
   },
   {
@@ -207,7 +207,7 @@ export const ADHD_ENTREPRENEUR_KNOWLEDGE_BASE: PatternSpec[] = [
   {
     id: "launch_perfectionism",
     label: "Launch perfectionism",
-    re: /\b(?:just one more (?:thing|tweak)|almost ready to launch|not ready to launch)\b/i,
+    re: /\b(?:just one more (?:thing|tweak)|almost ready to launch|not ready to launch|everything is ready to launch|can'?t bring myself to press go)\b/i,
     filterNote: "Define launch-ready — stop endless prep.",
   },
   {

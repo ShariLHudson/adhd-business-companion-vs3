@@ -6,63 +6,63 @@
 // capability we have without offering the door to it.
 
 import type { AppSection } from "./companionUi";
+import { workspaceObjectId } from "./workspaceObjectIds";
 
 export type AppReference = {
   section: AppSection;
   label: string;
-  emoji: string;
+  objectId: string;
 };
 
 type RefRule = AppReference & { re: RegExp };
 
-// Order matters only for de-duplication; each rule fires independently.
 const RULES: RefRule[] = [
   {
     section: "brain-dump",
     label: "Clear My Mind",
-    emoji: "🧠",
+    objectId: "clear-my-mind",
     re: /\bbrain ?dump|clear (your|my|the) (head|mind)|mental clutter|crowded (head|brain)|can't think straight|get it (all )?out of your head|empty your head|sort (my|your) thoughts|too many thoughts\b/i,
   },
   {
     section: "focus",
     label: "Brain Parking Lot",
-    emoji: "🅿️",
+    objectId: "parking-lot",
     re: /\bbrain parking lot|park (this|that|it) for later|save (this|that|it) for later|idea (?:just )?popped up|don't want to lose (?:it|this)|while (?:i'm |im )?working\b/i,
   },
   {
     section: "focus",
     label: "Safe For Today",
-    emoji: "🛡️",
+    objectId: "safe-for-today",
     re: /\bsafe for today|permission not to|not (?:solving|doing) (?:this|it) today|can't deal with (?:this|it) today|postpone (?:the )?guilt\b/i,
   },
   {
     section: "spin-wheel",
     label: "Spin the Wheel",
-    emoji: "🎡",
+    objectId: "spin-wheel",
     re: /\bspin the wheel|let (something|chance) (pick|choose|decide)|can'?t (decide|choose|pick) (which|what)\b/i,
   },
   {
     section: "focus-timer",
     label: "Focus Session",
-    emoji: "🎯",
+    objectId: "focus-timer",
     re: /\bfocus session|pomodoro|focused? block|25[\s-]?min|short (burst|sprint) of focus|set a timer\b/i,
   },
   {
     section: "time-block",
     label: "Momentum Appointments",
-    emoji: "📅",
+    objectId: "calendar",
     re: /\btime ?block|schedule (it|time|the)|put it on (your|the) calendar|block (out )?time\b/i,
   },
   {
     section: "breathe",
     label: "Breathe & Reset",
-    emoji: "🌿",
+    objectId: "breathing",
     re: /\bbreathe|breathing|slow breath|reset your (attention|nervous system)|ground (yourself|your body)\b/i,
   },
   {
     section: "projects",
     label: "Projects",
-    emoji: "📁",
+    objectId: "projects",
     re: /\bidea parking lot|keep a (running )?(list|note) of (ideas|projects)|one project at a time|break (it|this|the work) into (smaller )?(steps|phases|pieces)\b/i,
   },
 ];
@@ -77,7 +77,11 @@ export function appReferences(...texts: (string | undefined)[]): AppReference[] 
     if (seen.has(rule.section)) continue;
     if (rule.re.test(hay)) {
       seen.add(rule.section);
-      out.push({ section: rule.section, label: rule.label, emoji: rule.emoji });
+      out.push({
+        section: rule.section,
+        label: rule.label,
+        objectId: rule.objectId ?? workspaceObjectId(rule.section),
+      });
     }
   }
   return out;

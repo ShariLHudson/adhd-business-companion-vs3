@@ -23,7 +23,7 @@ export type ToolSuggestion = {
   /** Warm, conversational line — supportive, not feature-driven. */
   line: string;
   toolLabel: string;
-  toolEmoji: string;
+  toolObjectId: string;
   keepTalkingLabel: string;
   /** Opens a panel, or a guided chat prompt for get-unstuck. */
   action: { type: "tool"; tool: SidebarToolId } | { type: "chat-prompt"; prompt: string };
@@ -114,7 +114,7 @@ export function suggestSupportTool(
       line:
         "Energizing music can be a fast lift — **Focus Audio** has a **Motivation Boost** playlist for that.",
       toolLabel: "Open Focus Audio",
-      toolEmoji: "⚡",
+      toolObjectId: "focus-audio",
       keepTalkingLabel: "Keep Talking",
       action: { type: "tool", tool: "focus-audio" },
     };
@@ -126,7 +126,7 @@ export function suggestSupportTool(
       line:
         "It sounds like your brain is carrying a lot right now. Before we try to solve anything, would it help to clear your head?",
       toolLabel: "Clear My Mind",
-      toolEmoji: "🧠",
+      toolObjectId: "clear-my-mind",
       keepTalkingLabel: "Keep Talking",
       action: { type: "tool", tool: "brain-dump" },
     };
@@ -138,7 +138,7 @@ export function suggestSupportTool(
       line:
         "That sounds like a lot for your nervous system to hold. Would a short reset help before we go further?",
       toolLabel: "Breathe & Reset",
-      toolEmoji: "🌿",
+      toolObjectId: "breathing",
       keepTalkingLabel: "Keep Talking",
       action: { type: "tool", tool: "breathe" },
     };
@@ -150,7 +150,7 @@ export function suggestSupportTool(
       line:
         "Sometimes the hardest part is just beginning. Want to try a short focus session and see what shifts?",
       toolLabel: "Focus Session",
-      toolEmoji: "🎯",
+      toolObjectId: "focus-timer",
       keepTalkingLabel: "Keep Talking",
       action: { type: "tool", tool: "focus-timer" },
     };
@@ -162,7 +162,7 @@ export function suggestSupportTool(
       line:
         "When everything feels equally important, choosing can be the whole battle. Want to spin the wheel and let chance pick one?",
       toolLabel: "Spin The Wheel",
-      toolEmoji: "🎡",
+      toolObjectId: "spin-wheel",
       keepTalkingLabel: "Keep Talking",
       action: { type: "tool", tool: "spin-wheel" },
     };
@@ -174,7 +174,7 @@ export function suggestSupportTool(
       line:
         "We can keep talking — or I can help you find one tiny next step. What sounds better?",
       toolLabel: "Get Unstuck",
-      toolEmoji: "🚶",
+      toolObjectId: "focus-my-brain",
       keepTalkingLabel: "Keep Talking",
       action: {
         type: "chat-prompt",

@@ -3,7 +3,7 @@
 import { ToolSuggestionCard } from "@/components/companion/ToolSuggestionCard";
 import {
   crossWorkspaceAcceptLabel,
-  crossWorkspaceSectionEmoji,
+  crossWorkspaceSectionObjectId,
 } from "@/lib/crossWorkspaceSuggestion";
 import type { AppSection } from "@/lib/companionUi";
 
@@ -23,7 +23,7 @@ export function CrossWorkspaceSuggestionCard({
   return (
     <ToolSuggestionCard
       line={line}
-      toolEmoji={crossWorkspaceSectionEmoji(targetSection)}
+      toolObjectId={crossWorkspaceSectionObjectId(targetSection)}
       toolLabel={crossWorkspaceAcceptLabel(targetSection)}
       keepTalkingLabel="Not now"
       onAccept={onAccept}

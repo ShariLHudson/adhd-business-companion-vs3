@@ -18,7 +18,7 @@ export type DecisionCompassOffer = {
 const SESSION_DISMISS_KEY = "companion-decision-compass-offer-dismiss-v1";
 
 const DECISION_COMPASS_OFFER_RE =
-  /\b(?:i need to make a decision|i need help deciding|help me decide|help me choose|i don'?t know where to start with this decision|compare two options|i need help choosing|should i .+ or .+)\b/i;
+  /\b(?:i need to make a decision|i need help deciding|help me decide|help me choose|i don'?t know where to start with this decision|compare two options|i need help choosing|should i .+ or .+|stuck between|torn between)\b/i;
 
 const EXPLICIT_OPEN_RE =
   /\b(?:open|start|launch|show|take me to)\s+(?:the\s+)?(?:adhd\s+)?decision compass\b/i;

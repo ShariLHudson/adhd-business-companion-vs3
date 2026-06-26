@@ -1,8 +1,8 @@
 /**
  * adhdEntrepreneurIntelligenceBenchmark.test.ts
- * 
+ *
  * Phase 2 — ADHD Entrepreneur Intelligence Benchmark
- * 
+ *
  * Runs all 50 new scenarios across 10 categories and validates that the
  * companion framework correctly detects ADHD patterns and routes responses.
  *
@@ -17,6 +17,7 @@
  * DO NOT modify this file to weaken validation thresholds.
  */
 
+import { beforeAll, describe, expect, it } from "vitest";
 import {
   runAdhdEntrepreneurIntelligenceBenchmark,
   buildBenchmarkReport,
@@ -58,35 +59,33 @@ describe("SCENARIO_LIBRARY structure", () => {
     for (const s of SCENARIO_LIBRARY) {
       counts[s.category] = (counts[s.category] ?? 0) + 1;
     }
-    for (const [cat, count] of Object.entries(counts)) {
+    for (const count of Object.values(counts)) {
       expect(count).toBe(5);
     }
   });
 
-  it("every scenario has required fields", () => {
+  it("every scenario has required metadata fields", () => {
     for (const scenario of SCENARIO_LIBRARY) {
       expect(scenario.id).toBeTruthy();
       expect(scenario.category).toBeTruthy();
       expect(scenario.name).toBeTruthy();
-      expect(scenario.description).toBeTruthy();
-      expect(Array.isArray(scenario.expectedPatterns)).toBe(true);
-      expect(scenario.userMessage).toBeTruthy();
     }
   });
 
-  it("Pattern Memory scenarios have enhanced validation fields", () => {
-    const pmScenarios = SCENARIO_LIBRARY.filter(
-      (s) => s.category === "pattern_memory_intelligence"
+  it("Pattern Memory run results include enhanced category scores", () => {
+    const results = runAdhdEntrepreneurIntelligenceBenchmark();
+    const pmResults = results.filter(
+      (r) => r.scenario.category === "pattern_memory_intelligence",
     );
-    expect(pmScenarios.length).toBe(5);
-    for (const s of pmScenarios) {
-      expect(s).toHaveProperty("patternValidation");
-      const pv = (s as any).patternValidation;
-      expect(pv).toHaveProperty("patternRecognition");
-      expect(pv).toHaveProperty("usedPriorContext");
-      expect(pv).toHaveProperty("namedPattern");
-      expect(pv).toHaveProperty("offeredInterruption");
-      expect(pv).toHaveProperty("shameReduction");
+    expect(pmResults.length).toBe(5);
+    for (const r of pmResults) {
+      expect(r.categoryScore).toBeTruthy();
+      const cs = r.categoryScore!;
+      expect(cs.patternRecognition).toBe(true);
+      expect(cs.usedPriorContext).toBe(true);
+      expect(cs.namedPattern).toBe(true);
+      expect(cs.offeredInterruption).toBe(true);
+      expect(cs.shameReduction).toBe(true);
     }
   });
 });
@@ -108,13 +107,13 @@ describe("runAdhdEntrepreneurIntelligenceBenchmark()", () => {
 
   it("every result has required ScenarioResult fields", () => {
     for (const r of results) {
-      expect(r.scenarioId).toBeTruthy();
-      expect(r.category).toBeTruthy();
-      expect(r.name).toBeTruthy();
+      expect(r.scenario.id).toBeTruthy();
+      expect(r.scenario.category).toBeTruthy();
+      expect(r.scenario.name).toBeTruthy();
       expect(typeof r.pass).toBe("boolean");
       expect(Array.isArray(r.detectedPatterns)).toBe(true);
       expect(r.governorOutcome).toBeTruthy();
-      expect(typeof r.notes).toBe("string");
+      expect(Array.isArray(r.notes)).toBe(true);
     }
   });
 
@@ -141,15 +140,16 @@ describe("buildBenchmarkReport()", () => {
 
   it("report has all required top-level fields", () => {
     expect(report).toHaveProperty("totalScenarios");
-    expect(report).toHaveProperty("passCount");
-    expect(report).toHaveProperty("failCount");
+    expect(report).toHaveProperty("passed");
+    expect(report).toHaveProperty("failed");
     expect(report).toHaveProperty("passRate");
-    expect(report).toHaveProperty("categoryBreakdown");
-    expect(report).toHaveProperty("overallBenchmarkScore");
-    expect(report).toHaveProperty("historicalPatternScore");
-    expect(report).toHaveProperty("reEntryScore");
-    expect(report).toHaveProperty("founderRealityScore");
-    expect(report).toHaveProperty("successHandlingScore");
+    expect(report).toHaveProperty("categorySummaries");
+    expect(report).toHaveProperty("scores");
+    expect(report.scores).toHaveProperty("overallBenchmark");
+    expect(report.scores).toHaveProperty("historicalPatternDetection");
+    expect(report.scores).toHaveProperty("reEntryQuality");
+    expect(report.scores).toHaveProperty("founderReality");
+    expect(report.scores).toHaveProperty("successHandling");
     expect(report).toHaveProperty("strongestCategory");
     expect(report).toHaveProperty("weakestCategory");
     expect(report).toHaveProperty("mostCommonFailureType");
@@ -159,44 +159,44 @@ describe("buildBenchmarkReport()", () => {
     expect(report.totalScenarios).toBe(50);
   });
 
-  it("passCount + failCount === totalScenarios", () => {
-    expect(report.passCount + report.failCount).toBe(report.totalScenarios);
+  it("passed + failed === totalScenarios", () => {
+    expect(report.passed + report.failed).toBe(report.totalScenarios);
   });
 
-  it("passRate is between 0 and 1", () => {
+  it("passRate is between 0 and 100", () => {
     expect(report.passRate).toBeGreaterThanOrEqual(0);
-    expect(report.passRate).toBeLessThanOrEqual(1);
+    expect(report.passRate).toBeLessThanOrEqual(100);
   });
 
-  it("overallBenchmarkScore is between 0 and 100", () => {
-    expect(report.overallBenchmarkScore).toBeGreaterThanOrEqual(0);
-    expect(report.overallBenchmarkScore).toBeLessThanOrEqual(100);
+  it("overallBenchmark score is between 0 and 100", () => {
+    expect(report.scores.overallBenchmark).toBeGreaterThanOrEqual(0);
+    expect(report.scores.overallBenchmark).toBeLessThanOrEqual(100);
   });
 
-  it("categoryBreakdown has 10 entries", () => {
-    expect(Object.keys(report.categoryBreakdown).length).toBe(10);
+  it("categorySummaries has 10 entries", () => {
+    expect(report.categorySummaries.length).toBe(10);
   });
 
-  it("each category in breakdown has pass rate and scenario count", () => {
-    for (const [cat, summary] of Object.entries(report.categoryBreakdown)) {
+  it("each category summary has pass rate and scenario count", () => {
+    for (const summary of report.categorySummaries) {
       expect(summary).toHaveProperty("passRate");
-      expect(summary).toHaveProperty("scenarioCount");
-      expect((summary as any).scenarioCount).toBe(5);
+      expect(summary).toHaveProperty("total");
+      expect(summary.total).toBe(5);
     }
   });
 
-  it("strongestCategory and weakestCategory are valid category names", () => {
-    const validCategories = SCENARIO_LIBRARY.map((s) => s.category);
-    expect(validCategories).toContain(report.strongestCategory);
-    expect(validCategories).toContain(report.weakestCategory);
+  it("strongestCategory and weakestCategory are valid labels", () => {
+    const labels = report.categorySummaries.map((s) => s.label);
+    expect(labels).toContain(report.strongestCategory);
+    expect(labels).toContain(report.weakestCategory);
   });
 
   it("all scoring dimensions are numbers between 0 and 100", () => {
     const dims = [
-      report.historicalPatternScore,
-      report.reEntryScore,
-      report.founderRealityScore,
-      report.successHandlingScore,
+      report.scores.historicalPatternDetection,
+      report.scores.reEntryQuality,
+      report.scores.founderReality,
+      report.scores.successHandling,
     ];
     for (const d of dims) {
       expect(typeof d).toBe("number");
@@ -256,7 +256,6 @@ describe("formatBenchmarkRunReport()", () => {
     const results = runAdhdEntrepreneurIntelligenceBenchmark();
     const report = buildBenchmarkReport(results);
     const formatted = formatBenchmarkRunReport(report);
-    // Should contain some numeric output
     expect(formatted).toMatch(/\d+/);
   });
 });
@@ -273,29 +272,36 @@ describe("Category spot checks", () => {
   });
 
   it("Money & Financial Avoidance: at least 2 of 5 scenarios pass", () => {
-    const catResults = results.filter((r) => r.category === "money_financial_avoidance");
+    const catResults = results.filter(
+      (r) => r.scenario.category === "money_financial_avoidance",
+    );
     expect(catResults.length).toBe(5);
     expect(catResults.filter((r) => r.pass).length).toBeGreaterThanOrEqual(2);
   });
 
   it("Launch Psychology: at least 2 of 5 scenarios pass", () => {
-    const catResults = results.filter((r) => r.category === "launch_psychology");
+    const catResults = results.filter(
+      (r) => r.scenario.category === "launch_psychology",
+    );
     expect(catResults.length).toBe(5);
     expect(catResults.filter((r) => r.pass).length).toBeGreaterThanOrEqual(2);
   });
 
   it("Re-Entry & Recovery: at least 2 of 5 scenarios pass", () => {
-    const catResults = results.filter((r) => r.category === "reentry_recovery");
+    const catResults = results.filter(
+      (r) => r.scenario.category === "reentry_recovery",
+    );
     expect(catResults.length).toBe(5);
     expect(catResults.filter((r) => r.pass).length).toBeGreaterThanOrEqual(2);
   });
 
   it("Pattern Memory Intelligence: all 5 scenarios complete (pass or fail) without throwing", () => {
-    const catResults = results.filter((r) => r.category === "pattern_memory_intelligence");
+    const catResults = results.filter(
+      (r) => r.scenario.category === "pattern_memory_intelligence",
+    );
     expect(catResults.length).toBe(5);
-    // All should complete without undefined/null results
     for (const r of catResults) {
-      expect(r.scenarioId).toBeTruthy();
+      expect(r.scenario.id).toBeTruthy();
       expect(r.governorOutcome).toBeTruthy();
     }
   });

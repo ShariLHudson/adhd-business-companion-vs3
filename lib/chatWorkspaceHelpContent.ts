@@ -1,10 +1,10 @@
 /**
  * Chat Workspace navigation — instructional copy for help articles, tooltips, and guidance.
- * Top bar: Clear My Mind™, Plan My Day™, Adapt My Day™ (companion workspaces) + Chat Workspace ▼ (session context).
+ * Top bar: Clear My Mind™, Plan My Day™, Today's Reality™ (companion workspaces) + Chat Workspace ▼ (session context).
  */
 
 export const TOP_NAV_COMPANION_WORKSPACES =
-  "Clear My Mind™, Plan My Day™, and Adapt My Day™";
+  "Clear My Mind™, Plan My Day™, and Today's Reality™";
 
 export const CHAT_WORKSPACE_MENU_HINT =
   "Chat Workspace manages your current conversation context — not your projects or memory.";

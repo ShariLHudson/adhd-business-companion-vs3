@@ -10,6 +10,7 @@ import {
   buildAdhdEmotionalFrictionReply,
   isAdhdEmotionalFrictionTurn,
 } from "./adhdEmotionalFrictionIntelligence";
+import { isSelfUnderstandingIntent } from "./relationshipIntelligenceBoundaries";
 import type { ToolSuggestion } from "./companionToolSuggestions";
 import type { AppSection } from "./companionUi";
 import {
@@ -99,6 +100,7 @@ export type FrictionlessActionCategory =
   | "adhd_emotional_friction"
   | "focus_support"
   | "decision_support"
+  | "strategy"
   | "google_sheet"
   | "reminder"
   | "none";
@@ -343,7 +345,7 @@ export function frictionlessToToolSuggestion(
         : tool === "breathe"
           ? "Breathe & Reset"
           : "Open tool",
-    toolEmoji: tool === "focus-audio" ? "🎧" : "🌿",
+    toolObjectId: tool === "focus-audio" ? "focus-audio" : "breathing",
     keepTalkingLabel: "Keep Talking",
     action: { type: "tool", tool },
   };
@@ -386,7 +388,7 @@ function buildAudioPending(
       kind: "focus-session",
       line: localReply,
       toolLabel: "Open Focus Audio",
-      toolEmoji: "🎧",
+      toolObjectId: "focus-audio",
       keepTalkingLabel: "Keep Talking",
       action: { type: "tool", tool: "focus-audio" },
     },
@@ -496,7 +498,7 @@ function buildEmotionalRegulationDecision(
       kind: "breathe",
       line: "Would calming audio or a breathing reset help?",
       toolLabel: "Open Focus Audio",
-      toolEmoji: "🎧",
+      toolObjectId: "focus-audio",
       keepTalkingLabel: "Stay here with me",
       action: { type: "tool", tool: "focus-audio" },
     },
@@ -673,6 +675,33 @@ function buildMotivationSupportDecision(
   };
 }
 
+function buildSimpleOverwhelmOrganizeDecision(
+  userText: string,
+  currentTurn: number,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision {
+  const offer = {
+    section: "brain-dump" as const,
+    buttonLabel: "Open Clear My Mind",
+    line: "Clear My Mind may help unload what's crowding your head. Would you like to open it?",
+  };
+  return {
+    category: "direct_action",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "OVERWHELM (P0.20.3): Route to Clear My Mind — never Visual Thinking.",
+    localReply: offer.line,
+    pendingAction: frictionlessPendingFromWorkspaceOffer(offer, currentTurn, {
+      userText,
+    }),
+    toolSuggestion: null,
+    workspaceOffer: offer,
+    intentRouting: routing,
+  };
+}
+
 function buildOverwhelmFrictionlessDecision(
   userText: string,
   currentTurn: number,
@@ -705,11 +734,8 @@ function buildStrategyFrictionlessDecision(
   routing: IntentRoutingDecision,
 ): FrictionlessActionDecision | null {
   if (shouldSkipStrategyOfferForUserText(userText)) return null;
-  if (
-    !isStrategyProblem(userText) &&
-    !isRelationshipQuestion(userText) &&
-    !isActivationProblem(userText)
-  ) {
+  if (isSelfUnderstandingIntent(userText)) return null;
+  if (!isStrategyProblem(userText) && !isActivationProblem(userText)) {
     return null;
   }
   const rec = recommendStrategyFromUserText(userText);
@@ -720,7 +746,7 @@ function buildStrategyFrictionlessDecision(
     currentTurn,
   );
   return {
-    category: "direct_action",
+    category: "strategy",
     suppressRelationship: true,
     suppressRecap: true,
     suppressReflectionFirst: true,
@@ -952,6 +978,31 @@ export function resolveFrictionlessAction(
   const reminderDecision = buildReminderDecision(userText, currentTurn, input);
   if (reminderDecision) return reminderDecision;
 
+  if (isOverwhelmProblem(userText)) {
+    const overwhelm = buildOverwhelmFrictionlessDecision(
+      userText,
+      currentTurn,
+      routing,
+    );
+    if (overwhelm) return overwhelm;
+    return buildSimpleOverwhelmOrganizeDecision(userText, currentTurn, routing);
+  }
+
+  if (/\bkeep procrastinat/i.test(userText)) {
+    return buildFocusSupportDecision(currentTurn);
+  }
+
+  const strategyDecision = buildStrategyFrictionlessDecision(
+    userText,
+    currentTurn,
+    routing,
+  );
+  if (strategyDecision) return strategyDecision;
+
+  if (isMotivationProblem(userText) && !isSelfUnderstandingIntent(userText)) {
+    return buildEmotionalRegulationDecision(currentTurn);
+  }
+
   if (
     EMOTIONAL_REGULATION_RE.test(userText) &&
     !PRODUCTIVITY_FRAMING_RE.test(userText)
@@ -969,26 +1020,6 @@ export function resolveFrictionlessAction(
   if (FOCUS_SUPPORT_RE.test(userText) && !/\boverwhelm/i.test(userText)) {
     return buildFocusSupportDecision(currentTurn);
   }
-
-  if (isOverwhelmProblem(userText)) {
-    const overwhelm = buildOverwhelmFrictionlessDecision(
-      userText,
-      currentTurn,
-      routing,
-    );
-    if (overwhelm) return overwhelm;
-  }
-
-  if (isMotivationProblem(userText) && !isAdhdEmotionalFrictionTurn(userText)) {
-    return buildMotivationSupportDecision(currentTurn);
-  }
-
-  const strategyDecision = buildStrategyFrictionlessDecision(
-    userText,
-    currentTurn,
-    routing,
-  );
-  if (strategyDecision) return strategyDecision;
 
   if (routing.learnFastPath) {
     clearVisualRecommendationPending();

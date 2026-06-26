@@ -8,11 +8,9 @@ import { isActionAcceptance } from "./assistedActionBridge";
 import type { ToolSuggestion } from "./companionToolSuggestions";
 import type { AppSection } from "./companionUi";
 import type { DoItNowOffer } from "./doItNowActions";
-import {
-  WORKSPACE_EMOJI,
-  supportsWorkspace,
-  type WorkspaceOffer,
-} from "./workspaceMode";
+import type { WorkspaceOffer } from "./workspaceMode";
+import { supportsWorkspace } from "./workspaceMode";
+import { workspaceObjectId } from "./workspaceObjectIds";
 import {
   detectAudioRequest,
   isRhetoricalSoundUsage,
@@ -91,23 +89,32 @@ export function resolvePendingAction(
   return candidates.sort((a, b) => PRIORITY[b.kind] - PRIORITY[a.kind])[0]!;
 }
 
-export function pendingActionEmoji(action: PendingAction): string {
+export function pendingActionObjectId(action: PendingAction): string {
   switch (action.kind) {
     case "workspace":
-      return WORKSPACE_EMOJI[action.offer.section] ?? "🛠";
+      return workspaceObjectId(action.offer.section);
     case "artifact-export":
-      return "📄";
+      return "templates";
     case "assisted":
-      return action.action.emoji;
+      return action.action.objectId;
     case "do-it-now":
-      return action.offer.emoji;
+      return action.offer.kind === "focus" ? "focus-timer" : "create";
     case "tool":
-      return action.suggestion.toolEmoji;
+      return action.suggestion.toolObjectId;
     case "action-bridge":
-      return action.bridge.emoji;
+      return action.bridge.tool === "focus-timer"
+        ? "focus-timer"
+        : action.bridge.tool === "breathe"
+          ? "breathing"
+          : "create";
     case "make-bridge":
-      return "✨";
+      return "build-with-shari";
   }
+}
+
+/** @deprecated Use pendingActionObjectId — feature emoji removed. */
+export function pendingActionEmoji(_action: PendingAction): string {
+  return "";
 }
 
 export function pendingActionLabel(action: PendingAction): string {

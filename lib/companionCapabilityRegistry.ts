@@ -358,7 +358,7 @@ export const COMPANION_CAPABILITY_REGISTRY: CompanionCapabilityEntry[] = [
   }),
   workspaceEntry({
     id: "adapt_my_day",
-    name: "Adapt My Day",
+    name: "Today's Reality™",
     category: "productivity_ecosystem",
     status: "production",
     ownerModule: "lib/adaptMyDayChatRouting.ts",
@@ -377,7 +377,7 @@ export const COMPANION_CAPABILITY_REGISTRY: CompanionCapabilityEntry[] = [
       frictionTypes: ["energy", "overcommit"],
     },
     contextContract: { ...CONTEXT_WORKSPACE, energyLevel: true },
-    whyItHelps: "Adapt My Day retunes the plan to real energy — without guilt or a full replan.",
+    whyItHelps: "Today's Reality retunes the plan to real energy — without guilt or a full replan.",
     offerTemplate: (label) =>
       `Today isn't matching how you expected to feel. **${label}** helps update reality without starting over.\n\nOpen **${label}** beside us, or stay in chat?`,
     firstStepHint: "Name what changed about today's energy — one honest line.",

@@ -13,6 +13,7 @@ import {
   movePlanItemColumn,
   nextFocusOptions,
   snoozePlanItem,
+  snoozePlanItemUntil,
   tomorrowStr,
   updatePlanItem,
   type PlanDayItem,
@@ -20,9 +21,15 @@ import {
 } from "@/lib/planMyDay";
 import {
   PLAN_PRIORITY_OPTIONS,
-  type PlanLifeDomain,
 } from "@/lib/planMyDay/types";
-import { PLAN_CATEGORY_OPTIONS } from "@/lib/planMyDay/planItemColors";
+import { defaultWhyTodayPlaceholder } from "@/lib/planMyDay/companionBrainClient/whyToday";
+import { PlanDayLifeAreaSelector } from "@/components/companion/PlanDayLifeAreaSelector";
+import { confirmLifeAreaForTask } from "@/lib/planMyDay/lifeAreaBridge";
+import { migratePlanItemLifeArea } from "@/lib/planMyDay/lifeAreaBridge";
+import {
+  REMIND_PRESETS,
+  shariRemindAcknowledgment,
+} from "@/lib/planMyDay/companionBrainClient/planDayRemindMe";
 import { AppBackButton } from "@/components/companion/AppBackButton";
 
 export type PlanItemDetailMode =
@@ -56,13 +63,14 @@ function projectName(projectId?: string): string | null {
 }
 
 function useItemForm(item: PlanDayItem) {
+  const migrated = migratePlanItemLifeArea(item);
   const [title, setTitle] = useState(item.title);
   const [notes, setNotes] = useState(item.notes ?? "");
   const [duration, setDuration] = useState(
     item.durationMinutes?.toString() ?? "",
   );
-  const [category, setCategory] = useState<PlanLifeDomain | "">(
-    item.category ?? "",
+  const [lifeAreaId, setLifeAreaId] = useState<string | null>(
+    migrated.lifeAreaId ?? null,
   );
   const [priority, setPriority] = useState<PlanItemPriority>(
     item.priority ?? "medium",
@@ -72,10 +80,11 @@ function useItemForm(item: PlanDayItem) {
   const [startTime, setStartTime] = useState(item.startTime ?? "");
 
   useEffect(() => {
+    const next = migratePlanItemLifeArea(item);
     setTitle(item.title);
     setNotes(item.notes ?? "");
     setDuration(item.durationMinutes?.toString() ?? "");
-    setCategory(item.category ?? "");
+    setLifeAreaId(next.lifeAreaId ?? null);
     setPriority(item.priority ?? "medium");
     setProjectId(item.projectId ?? "");
     setDueDate(item.dueDate ?? "");
@@ -89,8 +98,8 @@ function useItemForm(item: PlanDayItem) {
     setNotes,
     duration,
     setDuration,
-    category,
-    setCategory,
+    lifeAreaId,
+    setLifeAreaId,
     priority,
     setPriority,
     projectId,
@@ -118,6 +127,8 @@ export function PlanDayItemDetail({
 }: Props) {
   const [mode, setMode] = useState<PlanItemDetailMode>(initialMode);
   const [savedFlash, setSavedFlash] = useState(false);
+  const [remindOpen, setRemindOpen] = useState(false);
+  const [remindAck, setRemindAck] = useState<string | null>(null);
   const [deferDate, setDeferDate] = useState(tomorrowStr());
   const form = useItemForm(item);
 
@@ -167,7 +178,8 @@ export function PlanDayItemDetail({
         ? durationMinutes
         : undefined,
       flexible: !durationMinutes,
-      category: (form.category || undefined) as PlanLifeDomain | undefined,
+      lifeAreaId: form.lifeAreaId ?? undefined,
+      category: undefined,
       priority: form.priority,
       projectId: form.projectId || undefined,
       dueDate: form.dueDate || undefined,
@@ -176,6 +188,9 @@ export function PlanDayItemDetail({
   }
 
   function handleSave() {
+    if (form.lifeAreaId && form.title.trim()) {
+      confirmLifeAreaForTask(form.title.trim(), form.lifeAreaId);
+    }
     apply(updatePlanItem(items, item.id, buildPatch()));
     setSavedFlash(true);
   }
@@ -217,7 +232,16 @@ export function PlanDayItemDetail({
   function handleSnooze(minutes: number) {
     const next = updatePlanItem(items, item.id, buildPatch());
     apply(snoozePlanItem(next, item.id, minutes));
-    onClose();
+    setRemindAck(shariRemindAcknowledgment(item.title));
+    window.setTimeout(() => onClose(), 1200);
+  }
+
+  function handleRemindUntil(until: string) {
+    const next = updatePlanItem(items, item.id, buildPatch());
+    apply(snoozePlanItemUntil(next, item.id, until));
+    setRemindOpen(false);
+    setRemindAck(shariRemindAcknowledgment(item.title));
+    window.setTimeout(() => onClose(), 1200);
   }
 
   function handleDefer(targetDate: string) {
@@ -421,25 +445,13 @@ export function PlanDayItemDetail({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className={LABEL}>
-            Category
-            <select
-              value={form.category}
-              onChange={(e) =>
-                form.setCategory(e.target.value as PlanLifeDomain | "")
-              }
-              className={FIELD}
-            >
-              <option value="">Auto-detect</option>
-              {PLAN_CATEGORY_OPTIONS.filter((o) => o.value !== "auto").map(
-                (opt) => (
-                  <option key={opt.value} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ),
-              )}
-            </select>
-          </label>
+          <div className="sm:col-span-2">
+            <PlanDayLifeAreaSelector
+              taskText={form.title}
+              value={form.lifeAreaId}
+              onChange={form.setLifeAreaId}
+            />
+          </div>
           <label className={LABEL}>
             Scheduled time
             <input
@@ -498,15 +510,24 @@ export function PlanDayItemDetail({
         ) : null}
 
         <label className={LABEL}>
-          Notes
+          Why this matters today
           <textarea
             value={form.notes}
             onChange={(e) => form.setNotes(e.target.value)}
             rows={3}
-            placeholder="Context, links, or reminders…"
+            placeholder={defaultWhyTodayPlaceholder()}
             className={FIELD}
           />
         </label>
+
+        {remindAck ? (
+          <p
+            className="rounded-xl border border-[#c5e0e0] bg-[#f0f8f8] px-3 py-2 text-sm leading-relaxed text-[#1e4f4f]"
+            role="status"
+          >
+            {remindAck}
+          </p>
+        ) : null}
 
         {savedFlash ? (
           <p
@@ -544,7 +565,7 @@ export function PlanDayItemDetail({
             </button>
           ) : null}
         </div>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div className="mt-2 flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={() => handleSnooze(30)}
@@ -559,6 +580,38 @@ export function PlanDayItemDetail({
           >
             Snooze 1h
           </button>
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setRemindOpen((o) => !o)}
+              className="rounded-xl border border-[#d4cdc3] px-3 py-1.5 text-xs font-semibold text-[#6b635a]"
+              aria-expanded={remindOpen}
+              data-testid="plan-item-remind-me"
+            >
+              Remind me…
+            </button>
+            {remindOpen ? (
+              <ul
+                className="absolute left-0 top-full z-10 mt-1 min-w-[11rem] rounded-xl border border-[#e7dfd4] bg-white py-1 shadow-lg"
+                role="menu"
+              >
+                {REMIND_PRESETS.map((preset) => (
+                  <li key={preset.id} role="none">
+                    <button
+                      type="button"
+                      role="menuitem"
+                      className="block w-full px-3 py-2 text-left text-sm text-[#4b463f] hover:bg-[#faf7f2]"
+                      onClick={() =>
+                        handleRemindUntil(preset.resolveUntil().toISOString())
+                      }
+                    >
+                      {preset.label}
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>
           <button
             type="button"
             onClick={() => setDetailMode("defer-day")}

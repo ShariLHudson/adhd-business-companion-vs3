@@ -1,7 +1,9 @@
 "use client";
 
+import { CompanionObjectLabel } from "@/components/companion/CompanionObjectVisual";
+
 type PendingActionBarProps = {
-  emoji: string;
+  objectId: string;
   label: string;
   line?: string;
   onOpen: () => void;
@@ -9,7 +11,7 @@ type PendingActionBarProps = {
 };
 
 export function PendingActionBar({
-  emoji,
+  objectId,
   label,
   line,
   onOpen,
@@ -28,9 +30,7 @@ export function PendingActionBar({
         <p className="mt-0.5 text-sm leading-snug text-[#6b635a]">{line}</p>
       ) : null}
       <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
-        <span className="text-sm font-semibold text-[#2d2926]">
-          {emoji} {label}
-        </span>
+        <CompanionObjectLabel objectId={objectId} label={label} size="xs" />
         <button
           type="button"
           onClick={onOpen}

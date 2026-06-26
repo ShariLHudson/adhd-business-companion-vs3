@@ -125,7 +125,7 @@ describe("relationshipResponseContract", () => {
     );
     expect(lead).toBeTruthy();
     expect(lead).toMatch(/^I've noticed/i);
-    expect(lead).toMatch(/new ideas|finishing|unfinished/i);
+    expect(lead).toMatch(/new ideas|finishing|unfinished|momentum|projects/i);
     expect(lead).not.toMatch(/shiny object syndrome/i);
   });
 

@@ -35,6 +35,21 @@ import {
   timeOfDayBucket,
 } from "./livingIntelligenceGraph";
 import { refreshNarrativeContextOnArrival, type NarrativeContext } from "./narrativeContext";
+import { getRecognitionStore } from "@/lib/recognition/recognitionStore";
+import {
+  evaluateWelcomePresenceIntelligence,
+  type WelcomePresenceIntelligence,
+} from "@/lib/welcomePresenceIntelligence";
+import {
+  composeLivingCompanionRoom,
+  evaluateCompanionEnvironmentIntelligence,
+  defaultRoomPermissionContext,
+  type LivingCompanionRoom,
+} from "@/lib/companionEnvironmentIntelligence";
+import {
+  resolveEffectiveHospitalityProfile,
+} from "@/lib/companionHospitalityProfile";
+import { resolveWelcomeAtmosphere } from "@/lib/welcomeLivingRoom";
 import type {
   ArrivalConversationalTone,
   ArrivalGreetingStrategy,
@@ -57,7 +72,7 @@ export type {
   HomeNavVisibility,
 } from "./homeState";
 
-export { homeChromeForState, homeStateDataAttr, resolveCompanionHomeState } from "./homeState";
+export { homeChromeForState, homeStateDataAttr, isWelcomeSceneLayout, resolveCompanionHomeState } from "./homeState";
 
 export type ArrivalIntelligence = {
   /** Three-state home — single source of truth for Home render. */
@@ -84,6 +99,11 @@ export type ArrivalIntelligence = {
   returnIntervalDays: number | null;
   isFirstMeeting: boolean;
   sessionVisitIndex: number;
+  timeOfDay: ReturnType<typeof timeOfDayBucket>;
+  /** Welcome Presence Intelligence™ — first conversation of the day. */
+  welcomePresence: WelcomePresenceIntelligence | null;
+  /** Living Companion Room™ — four-layer welcome environment. */
+  livingRoom: LivingCompanionRoom | null;
 };
 
 function daysFromHours(hours: number | null): number | null {
@@ -213,13 +233,111 @@ function buildQuietPresenceInvite(_input: {
   return FIRST_CONVERSATION_QUESTION;
 }
 
+function isBirthdayToday(
+  birthday: { month: number; day: number } | null | undefined,
+  now: Date,
+): boolean {
+  if (!birthday) return false;
+  return (
+    birthday.month === now.getMonth() + 1 && birthday.day === now.getDate()
+  );
+}
+
+function buildCompanionEnvironmentInput(input: {
+  timeOfDay: ReturnType<typeof timeOfDayBucket>;
+  sessionVisitIndex: number;
+  isFirstMeeting: boolean;
+  now: Date;
+}) {
+  const recognition = getRecognitionStore();
+  const atmosphere = resolveWelcomeAtmosphere({
+    timeOfDay: input.timeOfDay,
+    now: input.now,
+  });
+  const hospitality = resolveEffectiveHospitalityProfile({
+    source: "memory",
+    recognition,
+    todayContext: {
+      now: input.now,
+      recoveryGentle: false,
+      lowEnergy: false,
+    },
+  });
+  const { todayContext, profile: hospitalityProfile } = hospitality;
+  return {
+    now: input.now,
+    timeOfDay: input.timeOfDay,
+    season: atmosphere.season,
+    sessionVisitIndex: input.sessionVisitIndex,
+    isFirstMeeting: input.isFirstMeeting,
+    birthdayToday: todayContext.birthdayToday ?? false,
+    celebrationActive: false,
+    recoveryGentle: false,
+    lowEnergy: false,
+    vacationDaysAway: todayContext.vacationDaysAway ?? null,
+    projectRecentlyCompleted: todayContext.projectRecentlyCompleted ?? false,
+    businessFocus: false,
+    gentleDay: false,
+    hospitalityProfile,
+    permissions: defaultRoomPermissionContext({
+      birthdayToday: todayContext.birthdayToday,
+      vacationDaysAway: todayContext.vacationDaysAway,
+    }),
+  } as const;
+}
+
+function buildWelcomePresenceInput(input: {
+  homeState: CompanionHomeState;
+  timeOfDay: ReturnType<typeof timeOfDayBucket>;
+  sessionVisitIndex: number;
+  returnIntervalHours: number | null;
+  returnIntervalDays: number | null;
+  isFirstMeeting: boolean;
+  now: Date;
+}) {
+  const recognition = getRecognitionStore();
+  const birthdayToday = isBirthdayToday(recognition.birthday, input.now);
+  return {
+    homeState:
+      input.homeState === "FIRST_VISIT" ? "FIRST_VISIT" : "QUIET_PRESENCE",
+    timeOfDay: input.timeOfDay,
+    isWeekend: [0, 6].includes(input.now.getDay()),
+    sessionVisitIndex: input.sessionVisitIndex,
+    returnIntervalHours: input.returnIntervalHours,
+    returnIntervalDays: input.returnIntervalDays,
+    isFirstMeeting: input.isFirstMeeting,
+    firstName: firstName(),
+    birthdayToday: isBirthdayToday(recognition.birthday, input.now),
+    celebrationActive: false,
+    recoveryGentle: false,
+    lowEnergy: false,
+    vacationDaysAway: null,
+    now: input.now,
+  } as const;
+}
+
 function buildOpeningAndInvite(input: {
   homeState: CompanionHomeState;
   visitorKind: ArrivalVisitorKind;
   continue: CompanionContinueResolution;
   timeOfDay: ReturnType<typeof timeOfDayBucket>;
   returnDays: number | null;
+  welcomePresence: WelcomePresenceIntelligence | null;
 }): { openingMessage: string; welcomeLine: string | null; inviteQuestion: string | null } {
+  if (
+    (input.homeState === "FIRST_VISIT" || input.homeState === "QUIET_PRESENCE") &&
+    input.welcomePresence
+  ) {
+    return {
+      openingMessage: input.welcomePresence.greeting,
+      welcomeLine:
+        input.homeState === "FIRST_VISIT"
+          ? input.welcomePresence.greeting
+          : null,
+      inviteQuestion: input.welcomePresence.invite,
+    };
+  }
+
   if (input.homeState === "FIRST_VISIT") {
     return {
       openingMessage: "",
@@ -252,7 +370,15 @@ function buildChatPlaceholder(input: {
   visitorKind: ArrivalVisitorKind;
   continue: CompanionContinueResolution;
   timeOfDay: ReturnType<typeof timeOfDayBucket>;
+  welcomePresence: WelcomePresenceIntelligence | null;
 }): string {
+  if (
+    (input.homeState === "FIRST_VISIT" || input.homeState === "QUIET_PRESENCE") &&
+    input.welcomePresence
+  ) {
+    return input.welcomePresence.chatPlaceholder;
+  }
+
   if (input.homeState === "FIRST_VISIT" || input.homeState === "QUIET_PRESENCE") {
     return FIRST_CONVERSATION_INPUT_CUE;
   }
@@ -376,12 +502,45 @@ export function evaluateArrivalIntelligence(
   );
   const timeOfDay = timeOfDayBucket(now);
   const narrativeContext = refreshNarrativeContextOnArrival(now);
+  const isFirstMeeting = homeState === "FIRST_VISIT";
+  const welcomePresenceInput =
+    homeState === "FIRST_VISIT" || homeState === "QUIET_PRESENCE"
+      ? buildWelcomePresenceInput({
+          homeState,
+          timeOfDay,
+          sessionVisitIndex: visitIndex,
+          returnIntervalHours,
+          returnIntervalDays: effectiveReturnDays,
+          isFirstMeeting,
+          now,
+        })
+      : null;
+  const environmentInput =
+    welcomePresenceInput != null
+      ? buildCompanionEnvironmentInput({
+          timeOfDay,
+          sessionVisitIndex: visitIndex,
+          isFirstMeeting,
+          now,
+        })
+      : null;
+  const welcomePresence = welcomePresenceInput
+    ? evaluateWelcomePresenceIntelligence(welcomePresenceInput)
+    : null;
+  const livingRoom =
+    welcomePresence && environmentInput
+      ? composeLivingCompanionRoom({
+          environment: evaluateCompanionEnvironmentIntelligence(environmentInput),
+          conversation: welcomePresence,
+        })
+      : null;
   const copy = buildOpeningAndInvite({
     homeState,
     visitorKind,
     continue: continueRes,
     timeOfDay,
     returnDays: effectiveReturnDays,
+    welcomePresence,
   });
 
   const intelligence: ArrivalIntelligence = {
@@ -399,6 +558,7 @@ export function evaluateArrivalIntelligence(
       visitorKind,
       continue: continueRes,
       timeOfDay,
+      welcomePresence,
     }),
     conversationalTone: resolveTone(homeState, visitorKind, timeOfDay),
     continue: continueRes,
@@ -412,8 +572,11 @@ export function evaluateArrivalIntelligence(
       homeState === "RETURNING_ACTIVE" && continueRes.mode === "choose",
     returnIntervalHours,
     returnIntervalDays: effectiveReturnDays,
-    isFirstMeeting: homeState === "FIRST_VISIT",
+    isFirstMeeting,
     sessionVisitIndex: visitIndex,
+    timeOfDay,
+    welcomePresence,
+    livingRoom,
   };
 
   if (options.record === true && typeof window !== "undefined") {

@@ -169,6 +169,8 @@ They become complete because users can use them **confidently and naturally**.
 
 See [Screen Certification Sprint™](./SCREEN_CERTIFICATION.md) — all **10 gates** including [Constitution Compliance™](./SCREEN_CERTIFICATION.md#10-constitution-compliance).
 
+Shipped features remain subject to the [Stewardship Review™](./PRODUCT_CONSTITUTION.md#the-stewardship-review) — certification governs entry; stewardship governs what stays.
+
 ---
 
 ## Rule #12 — Version 1.0 Goal

@@ -44,6 +44,6 @@ describe("momentumGames", () => {
   });
 
   it("resolves games by id", () => {
-    expect(getMomentumGame("treasure-hunt")?.emoji).toBe("🗺️");
+    expect(getMomentumGame("treasure-hunt")?.objectId).toBe("games");
   });
 });

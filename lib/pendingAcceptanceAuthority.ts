@@ -187,7 +187,7 @@ export function acceptanceAckForWorkspace(
     case "brain-dump":
       return "Opening Clear My Mind.";
     case "energy":
-      return "Opening Adapt My Day.";
+      return "Opening Today's Reality.";
     case "focus-audio":
       return "Opening Focus Audio.";
     case "templates-library":

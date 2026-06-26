@@ -1,5 +1,5 @@
 /**
- * Chat routing for Adapt My Day / energy mismatch signals.
+ * Chat routing for Today's Reality™ / energy mismatch signals.
  */
 
 const ADAPT_MY_DAY_INTENT_RE =
@@ -12,10 +12,10 @@ export function isAdaptMyDayIntent(text: string): boolean {
 export function adaptMyDayOfferLine(): string {
   return (
     "Sounds like today isn't matching how you expected to feel. " +
-    "Want me to open **Adapt My Day** so we can tune the plan to your real energy?"
+    "Want me to open **Today's Reality** so we can tune the plan to your real energy?"
   );
 }
 
 export function adaptMyDayOpenAck(): string {
-  return "Opening **Adapt My Day** — let's update today's reality without guilt.";
+  return "Opening **Today's Reality** — let's update what's true today without guilt.";
 }

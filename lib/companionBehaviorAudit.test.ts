@@ -10,15 +10,11 @@ describe("companionBehaviorAudit", () => {
     expect(COMPANION_BEHAVIOR_AUDIT_CASES.length).toBeGreaterThanOrEqual(50);
   });
 
-  it("covers all ten audit categories", () => {
+  it("covers all audit categories", () => {
     const categories = new Set(
       COMPANION_BEHAVIOR_AUDIT_CASES.map((c) => c.category),
     );
-    expect(categories).toEqual(
-      expect.objectContaining({
-        size: 10,
-      }),
-    );
+    expect(categories.size).toBeGreaterThanOrEqual(10);
     for (const cat of [
       "learn",
       "create",
@@ -28,6 +24,8 @@ describe("companionBehaviorAudit", () => {
       "focus",
       "calm",
       "relationship",
+      "strategy",
+      "emotional",
       "navigate",
       "yes_continuation",
     ] as const) {

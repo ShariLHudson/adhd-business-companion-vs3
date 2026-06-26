@@ -1,4 +1,10 @@
 import type { PlanDayItem, PlanLifeDomain } from "./types";
+import { getLifeAreaById } from "@/lib/companionBrain/lifeAreas";
+import {
+  resolvePlanItemLegacyDomain,
+  resolvePlanItemLifeAreaId,
+  resolvePlanItemLifeAreaName,
+} from "./lifeAreaBridge";
 
 export const NEUTRAL_PLAN_ITEM_STYLE = {
   color: "#d4cdc3",
@@ -19,11 +25,12 @@ export const PLAN_DOMAIN_PALETTE: Record<
   relationships: { color: "#d4688a", tint: "#faeef2", label: "Relationships" },
 };
 
+/** @deprecated Use Life Area selector — kept for legacy references */
 export const PLAN_CATEGORY_OPTIONS: {
   value: PlanLifeDomain | "auto";
   label: string;
 }[] = [
-  { value: "auto", label: "Auto-detect" },
+  { value: "auto", label: "Let Shari decide" },
   ...(
     Object.entries(PLAN_DOMAIN_PALETTE) as [
       PlanLifeDomain,
@@ -40,6 +47,7 @@ const DOMAIN_KEYWORDS: Record<PlanLifeDomain, RegExp> = {
   relationships: /\b(family|friend|relationship|call|mom|dad|partner|network)\b/i,
 };
 
+/** @deprecated Prefer resolvePlanItemLegacyDomain */
 export function inferPlanLifeDomain(title: string): PlanLifeDomain {
   const t = title.trim();
   for (const domain of Object.keys(DOMAIN_KEYWORDS) as PlanLifeDomain[]) {
@@ -48,24 +56,39 @@ export function inferPlanLifeDomain(title: string): PlanLifeDomain {
   return "business";
 }
 
+function tintFromColor(hex: string): string {
+  return `${hex}22`;
+}
+
 export function planItemStyle(
-  item: Pick<PlanDayItem, "title" | "category">,
+  item: Pick<PlanDayItem, "title" | "category" | "lifeAreaId">,
   colorCoding = true,
 ) {
-  const domain = item.category ?? inferPlanLifeDomain(item.title);
+  const domain = resolvePlanItemLegacyDomain(item as PlanDayItem);
+  const lifeAreaId = resolvePlanItemLifeAreaId(item as PlanDayItem);
+  const lifeArea = getLifeAreaById(lifeAreaId);
+  const label = resolvePlanItemLifeAreaName(item as PlanDayItem);
+
   if (!colorCoding) {
     return {
       domain,
+      lifeAreaId,
       ...NEUTRAL_PLAN_ITEM_STYLE,
-      label: PLAN_DOMAIN_PALETTE[domain].label,
+      label,
     };
   }
-  const palette = PLAN_DOMAIN_PALETTE[domain];
+
+  const color = lifeArea?.color ?? PLAN_DOMAIN_PALETTE[domain].color;
+  const tint = lifeArea?.color ? tintFromColor(color) : PLAN_DOMAIN_PALETTE[domain].tint;
+
   return {
     domain,
-    ...palette,
-    border: palette.color,
-    rail: palette.color,
+    lifeAreaId,
+    color,
+    tint,
+    border: color,
+    rail: color,
+    label,
   };
 }
 

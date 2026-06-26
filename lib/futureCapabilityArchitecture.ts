@@ -572,7 +572,7 @@ export const FUTURE_CAPABILITIES: FutureCapability[] = [
   },
   {
     id: "adapt_my_day",
-    name: "Adapt My Day",
+    name: "Today's Reality™",
     category: "productivity_ecosystem",
     maturity: "production",
     canonicalModules: ["lib/adaptMyDayChatRouting.ts", "lib/companionEcosystemIntent.ts"],

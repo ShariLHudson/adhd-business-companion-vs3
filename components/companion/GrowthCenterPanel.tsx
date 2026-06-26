@@ -25,7 +25,7 @@ type GrowthReflectionCard = {
   routingLine: string;
   description: string;
   actionLabel: string;
-  emoji: string;
+  objectId: string;
 };
 
 /** Narrative order: Wins → Evidence → Highlights → Journey */
@@ -36,7 +36,7 @@ const GROWTH_REFLECTION_CARDS: GrowthReflectionCard[] = [
     routingLine: "Something went well — forward motion, done, or showed up.",
     description: "Recent successes, progress, and accomplishments.",
     actionLabel: "Open My Wins",
-    emoji: "🏆",
+    objectId: "wins",
   },
   {
     id: "evidence-bank",
@@ -44,7 +44,7 @@ const GROWTH_REFLECTION_CARDS: GrowthReflectionCard[] = [
     routingLine: "Proof it mattered — impact, results, problems solved.",
     description: "Proof, testimonials, impact, results, and feedback.",
     actionLabel: "Open Evidence Bank",
-    emoji: "📈",
+    objectId: "evidence-bank",
   },
   {
     id: "confidence-vault",
@@ -52,7 +52,7 @@ const GROWTH_REFLECTION_CARDS: GrowthReflectionCard[] = [
     routingLine: "Praise, recognition, credentials, accomplishments.",
     description: "Recognition, expertise, credentials, and achievements.",
     actionLabel: "Open My Highlights",
-    emoji: "✨",
+    objectId: "my-highlights",
   },
   {
     id: "my-journey",
@@ -60,7 +60,7 @@ const GROWTH_REFLECTION_CARDS: GrowthReflectionCard[] = [
     routingLine: "Milestones, lessons, story — who you are becoming.",
     description: "Lessons learned, milestones, and growth moments.",
     actionLabel: "Open My Journey",
-    emoji: "🌱",
+    objectId: "my-journey",
   },
 ];
 
@@ -187,13 +187,13 @@ export function GrowthCenterPanel({
               key={section.id}
               title={section.title}
               description={section.description}
-              emoji={section.emoji}
+              objectId={section.objectId}
               open={openSections.has(section.id)}
               onToggle={() => toggleSection(section.id)}
               testId={`growth-section-${section.id}`}
               accentClass={`border-[#e7dfd4] border-t-4 ${style.accentBorder}`}
               headerClassName={`${style.headerBg} hover:brightness-[0.99]`}
-              emojiClassName={`inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg ${style.iconRing}`}
+              objectClassName={`inline-flex h-10 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl ${style.iconRing}`}
             >
               <GrowthCardAction
                 routingLine={section.routingLine}

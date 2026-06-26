@@ -1,5 +1,8 @@
 /**
  * Companion Decision Intelligence™ — public API.
+ *
+ * Philosophical framework: docs/COMPANION_DECISION_INTELLIGENCE.md
+ * Needs + room judgment: lib/companionNeedsIntelligence/
  */
 
 export type * from "./types";

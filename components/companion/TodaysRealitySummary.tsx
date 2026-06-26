@@ -7,7 +7,7 @@ import {
   isDayStateFromToday,
 } from "@/lib/dayReality";
 
-/** Compact read-only snapshot — Adapt My Day lives in the top bar. */
+/** Compact read-only snapshot — Today's Reality™ lives in the top bar. */
 export function TodaysRealitySummary() {
   const [refreshKey, setRefreshKey] = useState(0);
 
@@ -29,7 +29,7 @@ export function TodaysRealitySummary() {
       >
         <span className="font-semibold text-[#4b463f]">Today&apos;s Reality:</span>{" "}
         No check-in yet — use{" "}
-        <span className="font-semibold text-[#1e4f4f]">Adapt My Day</span> in the
+        <span className="font-semibold text-[#1e4f4f]">Today&apos;s Reality</span> in the
         top bar when you&apos;re ready.
       </p>
     );

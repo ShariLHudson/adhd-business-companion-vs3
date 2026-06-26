@@ -1,5 +1,5 @@
 /**
- * Plan My Day™ — daily reality alignment with Adapt My Day™.
+ * Plan My Day™ — daily reality alignment with Today's Reality™.
  *
  * Detects when today's commitments may no longer match the user's stated
  * energy, capacity, or motivation — supportive prompts only.

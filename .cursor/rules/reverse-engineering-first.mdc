@@ -1,0 +1,33 @@
+---
+description: Reverse Engineering First™ — design complete systems before implementing Version 1
+alwaysApply: true
+---
+
+# Reverse Engineering First™
+
+Never ask "How do we build this page?" Ask "If this were the best ADHD companion in ten years, what would this entire system become?" Design that vision first. Build Version 1 on that architecture.
+
+## Before writing code, answer
+
+1. **Purpose** — emotional + practical problem; why users return
+2. **Five-year vision** — what exists after years of refinement (not today's limits)
+3. **Complete user journey** — before, during, after, tomorrow, next month, years later
+4. **Companion journey** — when Shari guides, listens, or stays silent
+5. **Intelligence journey** — what begins here, compounds, feeds Living Intelligence Graph™
+6. **Narrative journey** — chapters, themes, growth visible over time
+7. **Data architecture** — objects, relationships, future connections; implement V1 subset only. Register in `lib/intelligence/INTELLIGENCE_REGISTRY.md`. Use `IntelligenceReadyHooks` from `lib/intelligence/intelligenceReadyTypes.ts`.
+8. **Ecosystem connections** — room for Arrival, Presence, LIG, Narrative, Founder, PostCraft, CRM, Projects, etc.
+9. **Version planning** — V1 / V2 / V3; build V1 only
+
+## Non-negotiables
+
+- **Intelligence Paradox™** — backend may be complex; frontend stays calm. If users must manage intelligence, redesign.
+- **Companion Covenant™** — strengthen trust, not impress or demonstrate AI
+- **Agency Principle™** — increase user confidence and independence; Shari does not replace their wisdom
+- **Ethical Foundation™** — patterns are observations, never conclusions; user is authority
+
+## Workflow
+
+Reverse engineer → design architecture → design journeys → design data → **then** implement Version 1.
+
+Never skip directly to implementation unless the user explicitly overrides this rule.

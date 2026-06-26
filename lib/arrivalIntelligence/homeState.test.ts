@@ -40,4 +40,10 @@ describe("homeState", () => {
     expect(homeChromeForState("RETURNING_ACTIVE").navVisibility).toBe("normal");
     expect(homeChromeForState("QUIET_PRESENCE").navVisibility).toBe("calm");
   });
+
+  it("uses welcome-scene layout for relationship welcome states", () => {
+    expect(homeChromeForState("FIRST_VISIT").layout).toBe("welcome-scene");
+    expect(homeChromeForState("QUIET_PRESENCE").layout).toBe("welcome-scene");
+    expect(homeChromeForState("RETURNING_ACTIVE").layout).toBe("standard");
+  });
 });

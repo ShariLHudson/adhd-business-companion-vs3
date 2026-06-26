@@ -6,7 +6,7 @@ import {
 } from "@/lib/companionStore";
 import type { PlanDayItem, PlanItemColumn, PlanItemPriority } from "./types";
 import type { PlanLifeDomain } from "./types";
-import { inferPlanLifeDomain, PLAN_DOMAIN_PALETTE } from "./planItemColors";
+import { resolvePlanItemLifeAreaName, classifyTaskLifeArea } from "./lifeAreaBridge";
 import {
   completePlanItem,
   type CompletePlanItemResult,
@@ -22,7 +22,7 @@ export const PLAN_MY_DAY_UPDATED = "companion-plan-my-day-updated";
 let planUpdateNotifyQueued = false;
 
 function notifyPlanUpdated(): void {
-  if (typeof window === "undefined") return;
+  if (!hasBrowserStorage()) return;
   if (planUpdateNotifyQueued) return;
   planUpdateNotifyQueued = true;
   queueMicrotask(() => {
@@ -36,8 +36,15 @@ type StoredDay = {
   items: PlanDayItem[];
 };
 
+function hasBrowserStorage(): boolean {
+  return (
+    typeof globalThis.window !== "undefined" &&
+    typeof globalThis.localStorage !== "undefined"
+  );
+}
+
 function readStored(): StoredDay | null {
-  if (typeof window === "undefined") return null;
+  if (!hasBrowserStorage()) return null;
   try {
     const raw = localStorage.getItem(STORE_KEY);
     if (!raw) return null;
@@ -50,7 +57,7 @@ function readStored(): StoredDay | null {
 }
 
 function writeStored(data: StoredDay): void {
-  if (typeof window === "undefined") return;
+  if (!hasBrowserStorage()) return;
   try {
     const payload = JSON.stringify(data);
     const existing = localStorage.getItem(STORE_KEY);
@@ -72,6 +79,39 @@ function readDeferred(): Record<string, PlanDayItem[]> {
   } catch {
     return {};
   }
+}
+
+/** Ideas waiting in the parking lot — deferred to future days. */
+export function readParkingLotPlanItems(): PlanDayItem[] {
+  const deferred = readDeferred();
+  return Object.values(deferred).flat().filter((i) => !i.done);
+}
+
+/** Move a parked idea onto today's plan. */
+export function bringParkingLotItemToToday(itemId: string): PlanDayItem[] {
+  const deferred = readDeferred();
+  let found: PlanDayItem | null = null;
+  const nextDeferred: Record<string, PlanDayItem[]> = {};
+
+  for (const [date, list] of Object.entries(deferred)) {
+    const kept: PlanDayItem[] = [];
+    for (const item of list) {
+      if (item.id === itemId) {
+        found = {
+          ...item,
+          column: "ready",
+          done: false,
+        };
+      } else {
+        kept.push(item);
+      }
+    }
+    if (kept.length > 0) nextDeferred[date] = kept;
+  }
+
+  if (!found) return readTodayPlanItems();
+  writeDeferred(nextDeferred);
+  return saveTodayPlanItems([...readTodayPlanItems(), found]);
 }
 
 function writeDeferred(data: Record<string, PlanDayItem[]>): void {
@@ -476,6 +516,15 @@ export function snoozePlanItem(
   id: string,
   minutes = 30,
 ): PlanDayItem[] {
+  const until = new Date(Date.now() + minutes * 60_000).toISOString();
+  return snoozePlanItemUntil(items, id, until);
+}
+
+export function snoozePlanItemUntil(
+  items: PlanDayItem[],
+  id: string,
+  until: string,
+): PlanDayItem[] {
   const item = items.find((i) => i.id === id);
   if (item) {
     recordPlanBehaviorEvent({
@@ -484,7 +533,6 @@ export function snoozePlanItem(
       title: item.title,
     });
   }
-  const until = new Date(Date.now() + minutes * 60_000).toISOString();
   return updatePlanItem(items, id, { snoozedUntil: until });
 }
 
@@ -602,8 +650,7 @@ export function planItemMetaLabel(
   const dur = durationLabel(item);
   if (dur !== "—") parts.push(dur);
   if (colorCoding) {
-    const domain = item.category ?? inferPlanLifeDomain(item.title);
-    parts.push(PLAN_DOMAIN_PALETTE[domain].label);
+    parts.push(resolvePlanItemLifeAreaName(item));
   }
   const joined = parts.join(" · ");
   return joined || (colorCoding ? "Flexible" : "Anytime");
@@ -611,6 +658,9 @@ export function planItemMetaLabel(
 
 export type QuickPlanItemInput = {
   title: string;
+  /** Explicit Life Area — omit for companion detection */
+  lifeAreaId?: string | "auto";
+  /** @deprecated Prefer lifeAreaId */
   category?: PlanLifeDomain | "auto";
   startTime?: string;
   durationMinutes?: number;
@@ -622,22 +672,40 @@ export function countActivePlanItems(): number {
 
 export function addQuickPlanItem(
   input: string | QuickPlanItemInput,
+  existingItems?: PlanDayItem[],
 ): PlanDayItem[] {
   const parsed: QuickPlanItemInput =
     typeof input === "string" ? { title: input } : input;
   const trimmed = parsed.title.trim();
-  const items = loadTodayPlanItems();
+  const stored = readTodayPlanItems();
+  const items =
+    existingItems && existingItems.length >= stored.length
+      ? existingItems
+      : stored;
   if (!trimmed) return items;
 
   const hasTime = Boolean(parsed.startTime?.trim());
+  const explicitLifeAreaId =
+    parsed.lifeAreaId && parsed.lifeAreaId !== "auto"
+      ? parsed.lifeAreaId
+      : undefined;
   const explicitCategory =
     parsed.category && parsed.category !== "auto" ? parsed.category : undefined;
+
+  let resolvedLifeAreaId = explicitLifeAreaId;
+  if (!resolvedLifeAreaId && !explicitCategory) {
+    const classification = classifyTaskLifeArea(trimmed);
+    if (classification && !classification.needsConfirmation) {
+      resolvedLifeAreaId = classification.primaryLifeAreaId;
+    }
+  }
 
   const next: PlanDayItem = {
     id: uid(),
     title: trimmed,
     column: "ready",
     done: false,
+    lifeAreaId: resolvedLifeAreaId,
     category: explicitCategory,
     startTime: hasTime ? parsed.startTime!.trim() : undefined,
     flexible: !parsed.durationMinutes,

@@ -8,6 +8,7 @@ Approved Shari photos live in:
 
 Name gallery files descriptively, e.g.:
 
+    shari-i-am-here.png          (default Welcome Companion Presence™ image)
     shari-warm-headshot.png
     shari-thinking.png
     shari-celebrating-fireworks.png

@@ -1,0 +1,62 @@
+---
+description: Intelligence-Ready Architecture™ — every object enrichable for ten years of companion growth
+alwaysApply: true
+---
+
+# Intelligence-Ready Architecture™
+
+**Global rule — every future development session.**
+
+Visible features are temporary. The intelligence architecture is permanent.
+
+We are not building only for today's features. Every object must be designed so future intelligence systems can use it **without database redesign, migrations, or user re-entry**.
+
+## Mindset
+
+Do not ask: "How do we build this feature?"
+
+Ask: **"What permanent capability are we adding to the ecosystem?"**
+
+## Every object must be intelligence-ready
+
+Thoughts, projects, decisions, notes, conversations, clients, offers, content ideas, calendar items, reminders, goals, journal entries, documents, voice sessions — all are **living objects** future engines enrich over time.
+
+## Build hooks today (even if V1 ignores them)
+
+Leave room for relationships consumed by:
+
+Living Intelligence Graph™, Narrative Intelligence™, Arrival Intelligence™, Companion Presence™, Founder Intelligence™, Decision Intelligence™, Opportunity Intelligence™, Business Intelligence™, Growth Intelligence™, Recovery Intelligence™, Pattern Intelligence™, Relationship Intelligence™, Content Intelligence™, Learning Intelligence™, Automation Intelligence™, and engines not yet imagined.
+
+**Do not expose intelligence hooks in user UI** unless the feature explicitly needs them.
+
+Shared shape: `lib/intelligence/intelligenceReadyTypes.ts` → `IntelligenceReadyHooks`
+
+## Enrichable, not duplicated
+
+Ask: **"What might this become?"** — not only "What is this?"
+
+A thought may later become a task, project, decision, meeting, content campaign, client opportunity, SOP, course lesson, automation, milestone, or business — **same lineage**, `originatedFromId` / `originatedFromKind`, not a copy.
+
+## Sprint gate — answer before coding
+
+1. What is this object?
+2. What relationships might it eventually have?
+3. Which intelligence engines could benefit?
+4. What metadata should exist now even if unused?
+5. Will this support features we have not imagined?
+
+If any answer is no or unknown → **redesign before implementation**.
+
+## Intelligence Registry™
+
+When adding objects or engines, update:
+
+`lib/intelligence/INTELLIGENCE_REGISTRY.md`
+
+That registry is the architectural blueprint — objects × storage × engines × relationships.
+
+## Invisible evolution
+
+Users never "train AI." They use their companion. Behind the scenes: relationships grow, confidence improves, patterns emerge, narrative deepens.
+
+Keep the surface calm (Intelligence Paradox™). Strengthen the foundation every sprint.

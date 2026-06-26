@@ -109,7 +109,7 @@ const INTERVENTION_LABELS: Record<string, string> = {
   clear_my_mind: "Clear My Mind",
   decision_compass: "Decision Compass",
   plan_my_day: "Plan My Day",
-  adapt_my_day: "Adapt My Day",
+  adapt_my_day: "Today's Reality",
   create_workspace: "Create",
   content_tools: "Content Tools",
   templates: "Templates",

@@ -11,6 +11,7 @@ import {
   STRESS_RELIEF_OPTIONS,
   stressCauseRecommendationLine,
 } from "@/lib/stressRouting";
+import { CompanionObjectLabel } from "@/components/companion/CompanionObjectVisual";
 
 type Props = {
   offer: StressReliefOffer;
@@ -37,7 +38,11 @@ export function StressReliefOptionsCard({
             onClick={() => onSelectOption(offer.primary.id)}
             className="rounded-full bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-[#163a3a]"
           >
-            {offer.primary.emoji} {offer.primary.label}
+            <CompanionObjectLabel
+              objectId={offer.primary.objectId}
+              label={offer.primary.label}
+              size="xs"
+            />
           </button>
           {offer.secondary ? (
             <button
@@ -45,7 +50,11 @@ export function StressReliefOptionsCard({
               onClick={() => onSelectOption(offer.secondary!.id)}
               className="rounded-full border border-[#1e4f4f]/30 bg-white/80 px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] transition-colors hover:bg-white"
             >
-              {offer.secondary.emoji} {offer.secondary.label}
+              <CompanionObjectLabel
+                objectId={offer.secondary.objectId}
+                label={offer.secondary.label}
+                size="xs"
+              />
             </button>
           ) : null}
           {onDismiss ? (
@@ -75,7 +84,7 @@ export function StressReliefOptionsCard({
             onClick={() => onSelectOption(opt.id)}
             className="rounded-full border border-[#1e4f4f]/25 bg-white px-3.5 py-2 text-sm font-semibold text-[#1e4f4f] transition-colors hover:border-[#1e4f4f]/45 hover:bg-[#f5f1ea]"
           >
-            {opt.emoji} {opt.label}
+            <CompanionObjectLabel objectId={opt.objectId} label={opt.label} size="xs" />
           </button>
         ))}
       </div>

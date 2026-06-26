@@ -118,7 +118,7 @@ const LOCAL_PLAN_MY_DAY_HELP: Omit<
     "Decide where it belongs: Considering Today, Today's Focus, or In Progress.",
     "Work the board — move items as you begin and finish; tap ✓ to complete (items archive and leave the board).",
     "Defer or remove what does not belong today.",
-    "Check Today's Reality in the compact summary; update via Adapt My Day in the top bar when your capacity shifts.",
+    "Check Today's Reality in the compact summary; update via Today's Reality in the top bar when your capacity shifts.",
     "When starting a new day, use Chat Workspace → New Day's Chat to reset this workspace.",
   ],
   tips: [

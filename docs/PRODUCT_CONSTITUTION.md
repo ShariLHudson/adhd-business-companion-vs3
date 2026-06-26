@@ -140,6 +140,73 @@ Where appropriate, every workflow must support:
 
 ---
 
+# The Stewardship Review™
+
+**Constitutional addition — permanent governance for what remains in the ecosystem**
+
+The [Screen Certification](./SCREEN_CERTIFICATION.md) gates (including Gate 10 — Constitution Compliance™) determine whether a feature is **ready to build and ship**.
+
+**The Stewardship Review™** determines whether it is **ready to keep**.
+
+A feature that once aligned with the Constitution may drift over time — because of new integrations, changing priorities, technical shortcuts, commercial pressure, or simply because the ecosystem has grown around it.
+
+**No feature receives permanent approval. Everything remains under stewardship.**
+
+## Purpose
+
+Every major experience should be reviewed periodically — not because it is broken, but because **relationships evolve**.
+
+The question is never:
+
+> Does this feature still work?
+
+The question is:
+
+> Does this feature still strengthen the relationship the way we intended?
+
+## Stewardship Questions
+
+| Question |
+|----------|
+| Has this experience become more human or more mechanical? |
+| Has it reduced or increased cognitive load? |
+| Does it still help people live more fully? |
+| Has convenience quietly replaced wisdom? |
+| Has automation replaced agency? |
+| Does it still reflect the Companion's character? |
+| Would we proudly introduce this experience to someone on one of the hardest days of their life? |
+| If we were building this today from scratch, knowing everything we know now, would we build it the same way? |
+
+## The Drift Test™
+
+Every Stewardship Review ends with one question:
+
+> Has this feature drifted toward **software**… or toward **companionship**?
+
+If the answer is software, **redesign begins** — not because the feature failed technically, but because it no longer fulfills its constitutional promise.
+
+## Relationship Before Legacy
+
+| Review | Asks | Protects |
+|--------|------|----------|
+| **Companion Legacy Test™** | What remains in the person's life years from now? | The future |
+| **Stewardship Review™** | Is today's experience still worthy of creating that legacy? | The present |
+
+One protects the future. The other protects the present. **Both are necessary.**
+
+## How entry and stewardship work together
+
+| Mechanism | Governs | When |
+|-----------|---------|------|
+| **Screen Certification™** (10 gates) | Ready to build · ready to ship | Before activation and at certification |
+| **Stewardship Review™** | Ready to keep · still constitutional | Periodically after ship; before major extensions |
+
+The Constitution survives not because it was written once. It survives because **every generation of the product willingly submits itself to it again**.
+
+**Experience-specific checklists:** [Companion Journey Experience Bible](./COMPANION_JOURNEY_EXPERIENCE_BIBLE.md) · [Life Experience Design](./LIFE_EXPERIENCE_DESIGN.md) · [Daily Companion Cycle Architecture](./plan-my-day/DAILY_COMPANION_CYCLE_ARCHITECTURE.md)
+
+---
+
 # Conversation Governance™
 
 Every **guided conversation** (chat intake, builder kickoff, multi-step offers, etc.) must pass all seven scenarios below.
@@ -211,6 +278,7 @@ Before implementing **any** new feature, ask:
 1. **Does it violate the Product Constitution™?**
 2. **Does it make the experience simpler?**
 3. **Does it help the user make a better decision, reduce overwhelm, or move their business forward?**
+4. **If this ships, will it still pass the [Stewardship Review™](#the-stewardship-review) in six months?**
 
 If the answer to any of these is **no**, redesign the feature before implementation.
 
@@ -239,5 +307,6 @@ The Product Constitution™ is the permanent foundation that keeps every future 
 | Intelligence | Gate 9 + Gate 10 | §5 |
 | Navigation | Gate 2 + Gate 10 | §6 |
 | Workflow | Gate 1 + Gate 10 | §7 |
+| Stewardship (ongoing) | Stewardship Review™ | [The Stewardship Review™](#the-stewardship-review) |
 
 Screen certification details: [SCREEN_CERTIFICATION.md](./SCREEN_CERTIFICATION.md)

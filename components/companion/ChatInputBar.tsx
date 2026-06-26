@@ -13,6 +13,8 @@ type ChatInputBarProps = {
   onToggleListening: () => void;
   onSend: () => void;
   placeholder?: string;
+  onFocus?: () => void;
+  onBlur?: () => void;
   /** Softer styling when the input continues a companion-led conversation. */
   conversationMode?: boolean;
 };
@@ -28,11 +30,15 @@ export function ChatInputBar({
   onToggleListening,
   onSend,
   placeholder = INPUT_PLACEHOLDER,
+  onFocus,
+  onBlur,
   conversationMode = false,
 }: ChatInputBarProps) {
   return (
     <div
-      className={`input-glass flex items-end gap-2 rounded-[2rem] p-2 sm:gap-3 sm:p-2.5 ${conversationMode ? "input-glass-conversation" : ""}`}
+      className={`input-glass flex items-end gap-2 rounded-[2rem] p-2 sm:gap-3 sm:p-2.5 ${
+        conversationMode ? "input-glass-conversation" : ""
+      }`}
     >
       <button
         type="button"
@@ -66,6 +72,8 @@ export function ChatInputBar({
         value={input}
         onChange={(e) => onInputChange(e.target.value)}
         onKeyDown={onKeyDown}
+        onFocus={onFocus}
+        onBlur={onBlur}
         placeholder={placeholder}
         rows={1}
         disabled={isLoading}

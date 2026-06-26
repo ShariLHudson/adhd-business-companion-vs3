@@ -185,7 +185,7 @@ export function resolveActiveWorkflowContext(
   if (input.dayDesignerActive) {
     return {
       kind: "day_designer",
-      label: "Adapt My Day",
+      label: "Today's Reality",
       resumeQuestion: extractPendingQuestionFromAssistant(lastAssistant),
     };
   }

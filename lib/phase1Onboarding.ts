@@ -65,14 +65,14 @@ export type Phase1OnboardingEvaluation = {
 
 const STORAGE_KEY = "companion-phase1-onboarding-v1";
 
-/** Warm welcome — flows into the home invite question. */
-export const FIRST_CONVERSATION_WELCOME = "Hi, I'm Shari.";
+/** Warm welcome — same emotional home for every visit. */
+export const FIRST_CONVERSATION_WELCOME = "I'm here for you.";
 
 /** Shared home invite — first visit and quiet presence. */
 export const FIRST_CONVERSATION_QUESTION = "What's on your mind today?";
 
 /** Quiet presence opening — established relationship, no pressure. */
-export const QUIET_PRESENCE_OPENING = "I'm still here whenever you are.";
+export const QUIET_PRESENCE_OPENING = "I'm here for you.";
 
 /** Soft cue in the input — presence, not a second question. */
 export const FIRST_CONVERSATION_INPUT_CUE = "I'm listening…";

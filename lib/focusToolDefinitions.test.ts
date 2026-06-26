@@ -23,20 +23,20 @@ describe("focusToolDefinitions", () => {
 
   it("lists the Help Me Right Now relief menu in product order", () => {
     expect(HELP_ME_RIGHT_NOW_MENU.map((t) => t.title)).toEqual([
-      "Adapt My Day",
+      "Today's Reality",
       "Brain Parking Lot",
       "Clear My Mind",
       "Safe For Today",
       "Focus Session",
       "ADHD Decision Compass",
     ]);
-    expect(HELP_ME_RIGHT_NOW_MENU.map((t) => t.emoji)).toEqual([
-      "⚡",
-      "📌",
-      "🧠",
-      "🛡",
-      "🎯",
-      "🧭",
+    expect(HELP_ME_RIGHT_NOW_MENU.map((t) => t.objectId)).toEqual([
+      "todays-reality",
+      "parking-lot",
+      "clear-my-mind",
+      "safe-for-today",
+      "focus-timer",
+      "decision-compass",
     ]);
   });
 

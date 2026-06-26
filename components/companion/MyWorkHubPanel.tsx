@@ -339,7 +339,7 @@ export function MyWorkHubPanel({
             <EcosystemCollapsibleSection
               title="Create & Build"
               description="Projects, templates, strategies, snippets, SOPs, and documents."
-              emoji="🛠️"
+              objectId="other-tools"
               open={openSections.has("create")}
               onToggle={() => toggleSection("create")}
               testId="other-create-build"
@@ -360,7 +360,7 @@ export function MyWorkHubPanel({
             <EcosystemCollapsibleSection
               title="Retrieve"
               description="Saved work — browse by category when you need it later."
-              emoji="📂"
+              objectId="toolbelt-saved-work"
               open={openSections.has("retrieve")}
               onToggle={() => toggleSection("retrieve")}
               testId="other-retrieve"

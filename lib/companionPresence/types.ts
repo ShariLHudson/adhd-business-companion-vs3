@@ -31,6 +31,16 @@ export type CompanionAnimationState = "still" | "thinking" | "listening";
 
 export type CompanionSpeechBubbleState = "default" | "thinking" | "listening";
 
+export type CompanionPresenceSurface =
+  | "chat-welcome"
+  | "chat-returning"
+  | "morning-presence"
+  | "flexible-planning"
+  | "today-reality"
+  | "clear-my-mind"
+  | "sign-in"
+  | "default";
+
 export type CompanionPresenceInput = {
   now?: Date;
   compact?: boolean;
@@ -54,6 +64,12 @@ export type CompanionPresenceInput = {
   presenceWorkspace?: CompanionPresenceWorkspace | null;
   /** Increment when the user enters/re-enters a presence workspace. */
   workspaceEntryKey?: number;
+  /** Stable surface id — day-persistent portrait selection without flicker. */
+  presenceSurface?: CompanionPresenceSurface;
+  /** Approved library image id — overrides rotation when set. */
+  presenceImageId?: string | null;
+  /** Full welcome photograph instead of circular portrait. */
+  welcomePhotograph?: boolean;
 };
 
 export type CompanionPresenceResult = {

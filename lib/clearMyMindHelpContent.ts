@@ -29,5 +29,5 @@ export const CLEAR_MY_MIND_HELP: Omit<
     "Voice capture works the same as typing — review and tap Capture when ready.",
   ],
   relatedAreas:
-    "When you're ready to act on a thought, use Thought Actions to move it to Plan My Day or a Project. Adapt My Day in Plan My Day helps Shari understand today's reality.",
+    "When you're ready to act on a thought, use Thought Actions to move it to Plan My Day or a Project. Today's Reality in Plan My Day helps Shari understand what's true today.",
 };

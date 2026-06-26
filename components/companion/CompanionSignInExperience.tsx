@@ -5,9 +5,11 @@ import { useEffect, useMemo } from "react";
 
 import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm";
 import { CompanionBackground } from "@/components/companion/CompanionBackground";
+import { ShariPortrait } from "@/components/companion/ShariPortrait";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { hasSignedInOnThisDeviceBefore } from "@/lib/companionAuthIntelligence";
 import { ASSETS, BRAND } from "@/lib/companionUi";
+import { useCompanionPresence } from "@/lib/useCompanionPresence";
 import {
   buildPostLoginContinueResolution,
   storePostLoginContinueFromResolution,
@@ -18,6 +20,11 @@ export function CompanionSignInExperience() {
   const { loading, user, configured: authReady } = useCompanionAuth();
 
   const returning = useMemo(() => hasSignedInOnThisDeviceBefore(), []);
+  const presence = useCompanionPresence({
+    calmHome: true,
+    homeState: returning ? "RETURNING_ACTIVE" : "FIRST_VISIT",
+    presenceSurface: "sign-in",
+  });
 
   useEffect(() => {
     if (!loading && user) {
@@ -68,12 +75,7 @@ export function CompanionSignInExperience() {
               </div>
             </div>
 
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={ASSETS.profile}
-              alt="Shari"
-              className="mt-1 h-16 w-16 rounded-full object-cover ring-4 ring-white/90 shadow-md"
-            />
+            <ShariPortrait presence={presence} size="presence" alt="Shari" />
 
             <div className="space-y-1">
               <h1 className="text-2xl font-bold text-[#2f261f]">

@@ -42,6 +42,7 @@ export function useClearMyMindCompanionPresence(input: {
     workspacePanel: "brain-dump",
     workspaceActiveBeside: true,
     presenceWorkspace: "clear-my-mind",
+    presenceSurface: "clear-my-mind",
     workspaceEntryKey: input.workspaceEntryKey,
     clearMyMindPhase: phase,
     isThinking,

@@ -311,7 +311,7 @@ export function HowDoIPanel({
               key={section.id}
               id={`how-do-i-section-${section.id}`}
               title={section.label}
-              emoji={section.emoji}
+              objectId={section.objectId}
               description={section.description}
               open={sectionOpen}
               onToggle={() => toggleTopSection(section.id)}

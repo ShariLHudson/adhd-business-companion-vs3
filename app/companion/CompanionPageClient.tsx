@@ -33,6 +33,8 @@ import { FocusAudioPanel } from "@/components/companion/FocusAudioPanel";
 import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
 import { CompanionHomeCard } from "@/components/companion/CompanionHomeCard";
+import { CompanionWelcomeScene } from "@/components/companion/CompanionWelcomeScene";
+import { WelcomeLivingRoomInput } from "@/components/companion/WelcomeLivingRoomInput";
 import { StressReliefOptionsCard } from "@/components/companion/StressReliefOptionsCard";
 import { TodayPanel } from "@/components/companion/TodayPanel";
 const PlanMyDayPanel = dynamic(
@@ -923,7 +925,8 @@ import {
   detectDoingIntent,
   buildWorkspaceOfferChatReply,
   workspaceOfferHintForChat,
-  WORKSPACE_EMOJI,
+  WORKSPACE_OBJECT_ID,
+  workspaceObjectId,
   workspaceTitle,
   supportsWorkspace,
   type WorkspaceOffer,
@@ -939,7 +942,7 @@ import {
   shouldAutoOpenWorkspaceFromIntent,
 } from "@/lib/companionAutoLaunch";
 import {
-  pendingActionEmoji,
+  pendingActionObjectId,
   pendingActionLabel,
   pendingActionLine,
   resolvePendingAction,
@@ -1776,6 +1779,8 @@ export default function CompanionPageClient() {
     isIdle &&
     !splitCreateChat &&
     !workspaceActiveBeside;
+  const welcomeScene =
+    homeCalm && homeArrival?.chrome.layout === "welcome-scene";
 
   useEffect(() => {
     if (!homeCalm) {
@@ -5182,6 +5187,13 @@ export default function CompanionPageClient() {
     },
     [restoreNavigationSnapshot],
   );
+
+  function goBackToChat() {
+    closeWorkspacePanel({ mode: "hide", silent: true });
+    setActiveSection("home");
+    setActiveNav("chat");
+    setPlanMyDayOpenItemId(null);
+  }
 
   function goBack(options?: { skipInterceptor?: boolean }) {
     if (!options?.skipInterceptor && backInterceptorRef.current?.()) return;
@@ -11158,7 +11170,7 @@ export default function CompanionPageClient() {
       ]);
       const energyOffer: WorkspaceOffer = {
         section: "energy",
-        buttonLabel: "Open Adapt My Day",
+        buttonLabel: "Open Today's Reality",
         line: offerLine,
       };
       setWorkspaceOffer(energyOffer);
@@ -13007,6 +13019,7 @@ export default function CompanionPageClient() {
         return (
           <PlanMyDayPanel
             onBack={goBack}
+            onBackToChat={goBackToChat}
             onOpenSettings={() => openHowDoISettings("planning")}
             onStartFocus={() => {
               openSectionBesideChatCore("focus-timer");
@@ -13025,6 +13038,10 @@ export default function CompanionPageClient() {
               openSectionBesideChatCore("projects", "projects");
             }}
             onOpenAdaptMyDay={openAdaptMyDayCore}
+            onOpenProjects={() => openSectionBesideChatCore("projects", "projects")}
+            onOpenCalendar={() =>
+              openWorkspaceBesideChatCore("time-block", workspaceOpenAck("time-block"))
+            }
             initialOpenItemId={planMyDayOpenItemId}
           />
         );
@@ -14103,9 +14120,7 @@ export default function CompanionPageClient() {
             ) : (
             <main
               className={`flex h-full min-h-0 flex-1 flex-col overflow-hidden ${
-                homeArrival?.chrome.layout === "centered"
-                  ? "companion-home-presence"
-                  : ""
+                welcomeScene ? "companion-welcome-scene-main" : ""
               }`}
             >
               {splitCreateChat ? (
@@ -14120,6 +14135,29 @@ export default function CompanionPageClient() {
                     </p>
                   ) : null}
                 </header>
+              ) : welcomeScene ? (
+                <CompanionWelcomeScene
+                  greeting={homeArrival?.welcomePresence?.greeting}
+                  invite={homeArrival?.welcomePresence?.invite}
+                  livingRoom={homeArrival?.livingRoom}
+                  timeOfDay={homeArrival?.timeOfDay}
+                >
+                  <WelcomeLivingRoomInput
+                    input={input}
+                    isLoading={isLoading}
+                    isListening={isListening}
+                    speechSupported={speechSupported}
+                    inputRef={inputRef}
+                    onInputChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onToggleListening={toggleListening}
+                    onSend={() => void handleSend()}
+                    conversationMode={
+                      homeArrival?.chrome.conversationInput ?? false
+                    }
+                    listeningPlaceholder={homeArrival?.chatPlaceholder}
+                  />
+                </CompanionWelcomeScene>
               ) : homeCalm ? (
                 <CompanionHomeCard
                   arrival={homeArrival}
@@ -14177,12 +14215,9 @@ export default function CompanionPageClient() {
                 />
               ) : null}
 
+              {!welcomeScene ? (
               <div
-                className={`overflow-y-auto px-4 sm:px-6 ${
-                  homeArrival?.chrome.layout === "centered"
-                    ? "companion-home-chat-gap shrink-0"
-                    : "flex-1"
-                }`}
+                className="flex-1 overflow-y-auto px-4 sm:px-6"
               >
                 {!homeCalm && !suppressInterventionCards ? (
                   <FromYesterdayFocusCard
@@ -14405,7 +14440,7 @@ export default function CompanionPageClient() {
                         ) : appFeatureNavOffer ? (
                           <ToolSuggestionCard
                             line="Ready when you are."
-                            toolEmoji={appFeatureNavOffer.emoji}
+                            toolObjectId={appFeatureNavOffer.objectId}
                             toolLabel={appFeatureNavOffer.acceptLabel}
                             keepTalkingLabel="Not now"
                             onAccept={() =>
@@ -14416,15 +14451,12 @@ export default function CompanionPageClient() {
                         ) : workspaceOffer ? (
                           <ToolSuggestionCard
                             line={workspaceOffer.line}
-                            toolEmoji={
-                              WORKSPACE_EMOJI[workspaceOffer.section] ?? "🛠"
-                            }
+                            toolObjectId={workspaceObjectId(workspaceOffer.section)}
                             toolLabel={workspaceOffer.buttonLabel}
                             keepTalkingLabel="Stay Here"
-                            secondaryEmoji={
+                            secondaryObjectId={
                               workspaceOffer.secondary
-                                ? WORKSPACE_EMOJI[workspaceOffer.secondary.section] ??
-                                  "🛠"
+                                ? workspaceObjectId(workspaceOffer.secondary.section)
                                 : undefined
                             }
                             secondaryLabel={workspaceOffer.secondary?.buttonLabel}
@@ -14455,7 +14487,7 @@ export default function CompanionPageClient() {
                         ) : assistedActionOffer ? (
                           <ToolSuggestionCard
                             line={assistedActionOffer.offerLine}
-                            toolEmoji={assistedActionOffer.emoji}
+                            toolObjectId={assistedActionOffer.objectId}
                             toolLabel={assistedActionOffer.buttonLabel}
                             keepTalkingLabel="I'll do it alone"
                             onAccept={() =>
@@ -14475,7 +14507,7 @@ export default function CompanionPageClient() {
                         ) : toolSuggestion ? (
                           <ToolSuggestionCard
                             line={toolSuggestion.line}
-                            toolEmoji={toolSuggestion.toolEmoji}
+                            toolObjectId={toolSuggestion.toolObjectId}
                             toolLabel={toolSuggestion.toolLabel}
                             keepTalkingLabel={toolSuggestion.keepTalkingLabel}
                             onAccept={() => acceptToolSuggestion(toolSuggestion)}
@@ -14502,8 +14534,9 @@ export default function CompanionPageClient() {
                 />
                 <div ref={bottomRef} className="h-2" />
               </div>
+              ) : null}
 
-              {error && (
+              {error && !welcomeScene && (
                 <p
                   className="px-4 pb-2 text-center text-base text-[#a85c4a]"
                   role="alert"
@@ -14512,20 +14545,11 @@ export default function CompanionPageClient() {
                 </p>
               )}
 
+              {!welcomeScene ? (
               <footer
-                className={`input-footer shrink-0 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6 ${
-                  homeArrival?.chrome.layout === "centered"
-                    ? "companion-home-input-footer"
-                    : "sticky bottom-0"
-                }`}
+                className="input-footer sticky bottom-0 shrink-0 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6"
               >
-                <div
-                  className={`mx-auto w-full ${
-                    homeArrival?.chrome.layout === "centered"
-                      ? "max-w-sm"
-                      : "max-w-xl"
-                  }`}
-                >
+                <div className="mx-auto w-full max-w-xl">
                   {pendingAction && !suppressInterventionCards && !isLoading && !homeCalm ? (
                     pendingAction.kind === "artifact-export" ? (
                       <ArtifactActionBar
@@ -14540,7 +14564,7 @@ export default function CompanionPageClient() {
                       />
                     ) : (
                       <PendingActionBar
-                        emoji={pendingActionEmoji(pendingAction)}
+                        objectId={pendingActionObjectId(pendingAction)}
                         label={pendingActionLabel(pendingAction)}
                         line={pendingActionLine(pendingAction)}
                         onOpen={() => executePendingAction(pendingAction)}
@@ -14623,6 +14647,7 @@ export default function CompanionPageClient() {
                   )}
                 </div>
               </footer>
+              ) : null}
             </main>
             )}
                 workspace={workspacePanelNode}
@@ -14646,7 +14671,9 @@ export default function CompanionPageClient() {
                 onChatLayoutModeChange={applyChatLayoutMode}
                 viewSizePreset={effectiveViewSize}
                 onViewSizePresetChange={applyViewSizePreset}
-                onClose={goBack}
+                onClose={
+                  workspacePanel === "plan-my-day" ? undefined : goBack
+                }
                 revealKey={workspaceRevealSeq}
                 chatFocusKey={chatFocusSeq}
                 workspaceFirst={workspaceFirstSplit}

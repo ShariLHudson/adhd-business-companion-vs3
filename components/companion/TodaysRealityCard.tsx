@@ -41,9 +41,9 @@ export function TodaysRealityCard({
             type="button"
             onClick={onUpdate}
             className="mt-4 rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white hover:bg-[#163a3a]"
-            data-testid="adapt-my-day-entry"
+            data-testid="todays-reality-entry"
           >
-            Adapt My Day
+            Today&apos;s Reality
           </button>
         ) : null}
       </div>
@@ -90,9 +90,9 @@ export function TodaysRealityCard({
           type="button"
           onClick={onUpdate}
           className="mt-4 rounded-xl border border-[#1e4f4f]/30 bg-[#1e4f4f]/5 px-5 py-3 text-base font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
-          data-testid="adapt-my-day-entry"
+          data-testid="todays-reality-entry"
         >
-          Update My Day
+          Update Today&apos;s Reality
         </button>
       ) : null}
     </div>

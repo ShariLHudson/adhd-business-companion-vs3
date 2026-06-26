@@ -163,7 +163,7 @@ When conversation alone is weaker than an existing feature, NAME the feature, ex
 - Too much on mind / mental clutter → **Clear My Mind** (not "make a list" in chat)
 - Can't decide / stuck between options → **Decision Compass** (not pros-and-cons lecture)
 - Don't know what to focus on today → **Plan My Day** (not abstract prioritization talk)
-- Overwhelmed / day fell apart → **Adapt My Day** (not generic coping advice)
+- Overwhelmed / day fell apart → **Today's Reality** (not generic coping advice)
 - Need content ideas → **Create** (not generic idea dumps)
 - Stuck but no clear tool fit → coach in conversation (clarify, explore, challenge assumptions)
 Permission-first: "Would you like to stay in chat or move into [Feature]?" User decides. Never auto-navigate from chat text.
@@ -213,7 +213,7 @@ When the user asks how to use THIS app, where to find something, or how to chang
 If a feature isn't built yet, SAY SO plainly and give the closest working path — never tell the user to do something the app can't do. Keep answers short and concrete.
 
 # POINT TO WHAT'S ALREADY HERE (consistent everywhere)
-If you suggest a technique that already exists as a tool in this app, NAME the in-app tool and tell them how to get there — never describe a capability we have as if they must build it elsewhere. Mapping: mental clutter / crowded head / need to sort thoughts → **Clear My Mind** (organize, prioritize, next steps); idea pops up while working / save for later without losing focus → **Brain Parking Lot** (quick park, no sorting now); guilt / can't deal today / permission to postpone → **Safe For Today**; plan broke / energy crashed → **Adapt My Day**; can't decide where to start → **Spin the Wheel**; focused block / timer → **Focus Session**; scheduling → **Time Block**; grounding → **Breathe & Reset**; multi-step work → **Projects**. Example: mid-task idea → "Park that in **Brain Parking Lot** and stay on what you're doing" — NOT Clear My Mind unless their whole head is crowded.
+If you suggest a technique that already exists as a tool in this app, NAME the in-app tool and tell them how to get there — never describe a capability we have as if they must build it elsewhere. Mapping: mental clutter / crowded head / need to sort thoughts → **Clear My Mind** (organize, prioritize, next steps); idea pops up while working / save for later without losing focus → **Brain Parking Lot** (quick park, no sorting now); guilt / can't deal today / permission to postpone → **Safe For Today**; plan broke / energy crashed → **Today's Reality**; can't decide where to start → **Spin the Wheel**; focused block / timer → **Focus Session**; scheduling → **Time Block**; grounding → **Breathe & Reset**; multi-step work → **Projects**. Example: mid-task idea → "Park that in **Brain Parking Lot** and stay on what you're doing" — NOT Clear My Mind unless their whole head is crowded.
 
 # PROJECT GROUNDING (when discussing Projects)
 Only reference project fields that exist in the workspace AND are visible on screen right now (see PROJECT GROUNDING block in workspace context when Projects is open).
@@ -500,7 +500,7 @@ export function buildCompanionSystemPrompt(
 
   if (context.dayState) {
     blocks.push(
-      `USER'S DAY (from Adapt My Day — adapt to this): ${context.dayState}\nHigh overwhelm → lean toward Chat Workspace → New Chat or grounding and one tiny step. Low energy → keep it to one small step. Honor what they said they need most. Don't mention these settings unless they bring them up.`,
+      `USER'S DAY (from Today's Reality — adapt to this): ${context.dayState}\nHigh overwhelm → lean toward Chat Workspace → New Chat or grounding and one tiny step. Low energy → keep it to one small step. Honor what they said they need most. Don't mention these settings unless they bring them up.`,
     );
   }
 

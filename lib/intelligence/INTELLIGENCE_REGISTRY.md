@@ -148,6 +148,17 @@ FounderEvent ──refs──────► Project | Thought | Workspace
 | `lib/intelligence-layer/signalStore` | `intelligence-signal` |
 | `companion-living-graph-arrivals-v1` | LIG arrival slice |
 | `lib/ecosystem/events` | `founder-event` |
+| `life-area` | `companion-user-life-areas-v1`, `companion-life-area-learning-v1` |
+
+### Life Area Intelligence™ (`classifyLifeArea`)
+
+| Engine | Reads | Writes |
+|--------|-------|--------|
+| `classifyLifeArea` | task text, corrections, projects, contacts | — |
+| Learning layer | corrections store | `companion-life-area-learning-v1` |
+| Smart Life Areas | plan item titles | user life areas on accept |
+
+Docs: `docs/plan-my-day/LIFE_AREA_INTELLIGENCE.md`
 
 ---
 

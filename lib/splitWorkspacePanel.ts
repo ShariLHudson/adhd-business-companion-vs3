@@ -1,10 +1,5 @@
 import type { AppSection } from "./companionUi";
-import {
-  WORKSPACE_EMOJI,
-  supportsWorkspace,
-  workspaceAreaTitle,
-} from "./workspaceMode";
-
+import { workspaceObjectId, supportsWorkspace, workspaceAreaTitle } from "./workspaceMode";
 /** Areas users can open beside Chat — shown in empty-state suggestions. */
 export const SPLIT_BESIDE_SUGGESTIONS: readonly {
   section: AppSection;
@@ -20,10 +15,14 @@ export const SPLIT_BESIDE_SUGGESTIONS: readonly {
 
 export { workspaceAreaTitle };
 
-export function workspaceAreaEmoji(section: AppSection): string {
-  return WORKSPACE_EMOJI[section] ?? "🛠";
+export function workspaceAreaObjectId(section: AppSection): string {
+  return workspaceObjectId(section);
 }
 
+/** @deprecated Use workspaceAreaObjectId */
+export function workspaceAreaEmoji(_section: AppSection): string {
+  return "";
+}
 export function splitBesideAreaDescription(section: AppSection): string {
   const title = workspaceAreaTitle(section);
   if (supportsWorkspace(section)) {

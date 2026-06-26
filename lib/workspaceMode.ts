@@ -46,13 +46,12 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
   "confidence-vault",
   "plan-my-day",
   "visual-focus",
-  "focus",
-  "focus-timer",
 ];
 
 export const STANDALONE_SECTIONS: AppSection[] = [
   "brain-dump",
   "breathe",
+  "focus",
   "focus-audio",
   "activities",
   "guided-exercises",
@@ -104,7 +103,7 @@ const EXTRA_AREA_TITLES: Partial<Record<AppSection, string>> = {
   profile: "Profile",
   focus: "Focus My Brain™",
   progress: "Progress",
-  energy: "Energy",
+  energy: "Today's Reality™",
   activities: "Activities",
   "guided-exercises": "Guided Exercises",
   "spin-wheel": "Spin Wheel",
@@ -133,31 +132,12 @@ export function workspaceTitle(section: AppSection): string {
   return workspaceAreaTitle(section);
 }
 
-export const WORKSPACE_EMOJI: Partial<Record<AppSection, string>> = {
-  projects: "📁",
-  "my-work": "🏠",
-  "content-generator": "✨",
-  "google-workspace": "📝",
-  "templates-library": "📚",
-  "saved-work": "📂",
-  playbook: "📘",
-  "brain-dump": "🧠",
-  "time-block": "📅",
-  "email-generator": "✉️",
-  snippets: "📝",
-  "business-profile": "💼",
-  "client-avatars": "👤",
-  "decision-compass": "🧭",
-  today: "📅",
-  "plan-my-day": "📋",
-  "visual-focus": "🎨",
-  "wins-this-week": "🏆",
-  "evidence-bank": "📈",
-  growth: "🌱",
-  "confidence-vault": "🌟",
-  "my-journey": "🌿",
-  "focus-audio": "🎧",
-};
+import { WORKSPACE_OBJECT_ID, workspaceObjectId } from "./workspaceObjectIds";
+
+export { workspaceObjectId, WORKSPACE_OBJECT_ID };
+
+/** @deprecated Use workspaceObjectId() and CompanionObjectVisual — emoji removed from features. */
+export const WORKSPACE_EMOJI: Partial<Record<AppSection, string>> = {};
 
 export type WorkspaceOffer = {
   section: AppSection;

@@ -5,6 +5,7 @@
 
 import { applyRelationshipProtection } from "./applyRelationshipProtection";
 import { buildOrientation } from "./buildOrientation";
+import { generateMorningPresence } from "./generateMorningPresence";
 import { evaluatePermission } from "./evaluatePermission";
 import { generateMomentumAction } from "./generateMomentumAction";
 import { generateProposals } from "./generateProposals";
@@ -47,12 +48,14 @@ export function generateCompanionJudgment(
   const permission = evaluatePermission(ctx);
   const proposals = generateProposals(ctx, momentum);
   const orientation = buildOrientation(ctx, momentum, permission);
+  const morningPresence = generateMorningPresence(ctx);
   const predictions = registerPredictions(ctx, momentum.label);
 
   let judgment: CompanionJudgmentResult = {
     dayMode: ctx.dayMode,
     cycleState: ctx.cycleState,
     orientation,
+    morningPresence,
     momentum,
     confidence,
     permission,

@@ -6,6 +6,7 @@
  */
 
 import type { BrainDumpEntry } from "./companionStore";
+import { maybePublishCaptureReality } from "@/lib/companionJudgmentClient/realityFromCapture";
 
 const STORAGE_KEY = "companion-clear-my-mind-intelligence-v2";
 const MAX_SUBMISSIONS = 200;
@@ -180,6 +181,11 @@ export function recordClearMyMindSubmission(input: {
 
   graph.submissions = [record, ...graph.submissions].slice(0, MAX_SUBMISSIONS);
   write(graph);
+
+  const combinedText = raw || combined;
+  if (combinedText.trim()) {
+    maybePublishCaptureReality(combinedText, "clear-my-mind");
+  }
 }
 
 /** Session summary when the user finishes a release pass. */

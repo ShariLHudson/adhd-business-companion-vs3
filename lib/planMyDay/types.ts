@@ -22,7 +22,9 @@ export type PlanDayItem = {
   title: string;
   durationMinutes?: number;
   flexible?: boolean;
-  /** Life area — explicit pick or inferred from title when missing. */
+  /** Life area — explicit pick or companion-detected when missing. */
+  lifeAreaId?: string;
+  /** @deprecated Prefer lifeAreaId — kept for migration */
   category?: PlanLifeDomain;
   priority?: PlanItemPriority;
   /** 24h HH:MM for timeline view */

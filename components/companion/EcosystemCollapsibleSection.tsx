@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 const SECTION_BTN =
   "flex w-full items-center gap-2 px-4 py-3.5 text-left hover:bg-[#faf7f2]/80";
 
@@ -28,7 +28,7 @@ export function EcosystemCollapsibleSection({
   id,
   title,
   description,
-  emoji,
+  objectId,
   open,
   onToggle,
   count,
@@ -36,12 +36,12 @@ export function EcosystemCollapsibleSection({
   testId,
   accentClass = "border-[#e4ddd2]",
   headerClassName,
-  emojiClassName,
+  objectClassName,
 }: {
   id?: string;
   title: string;
   description?: string;
-  emoji?: string;
+  objectId?: string;
   open: boolean;
   onToggle: () => void;
   count?: number;
@@ -49,7 +49,7 @@ export function EcosystemCollapsibleSection({
   testId?: string;
   accentClass?: string;
   headerClassName?: string;
-  emojiClassName?: string;
+  objectClassName?: string;
 }) {
   return (
     <div
@@ -63,14 +63,14 @@ export function EcosystemCollapsibleSection({
         aria-expanded={open}
         className={`${SECTION_BTN} ${headerClassName ?? ""}`}
       >
-        {emoji ? (
-          emojiClassName ? (
-            <span className={emojiClassName} aria-hidden="true">
-              {emoji}
+        {objectId ? (
+          objectClassName ? (
+            <span className={objectClassName} aria-hidden="true">
+              <CompanionObjectVisual objectId={objectId} size="md" variant="mini-scene" />
             </span>
           ) : (
-            <span className="text-lg leading-none" aria-hidden="true">
-              {emoji}
+            <span className="shrink-0" aria-hidden="true">
+              <CompanionObjectVisual objectId={objectId} size="md" variant="mini-scene" />
             </span>
           )
         ) : (
@@ -94,7 +94,7 @@ export function EcosystemCollapsibleSection({
             {count}
           </span>
         ) : null}
-        {emoji ? (
+        {objectId ? (
           <span className="shrink-0 text-sm text-[#9a8f82]" aria-hidden="true">
             {open ? "▲" : "▼"}
           </span>

@@ -130,7 +130,7 @@ export function buildOverwhelmTodayOffers(
     return {
       primary: {
         section: "energy",
-        buttonLabel: "Open Adapt My Day",
+        buttonLabel: "Open Today's Reality",
         line: adaptLine,
         secondary: { section: "plan-my-day", buttonLabel: "Open Plan My Day" },
       },
@@ -147,11 +147,11 @@ export function buildOverwhelmTodayOffers(
       section: "plan-my-day",
       buttonLabel: "Open Plan My Day",
       line: planPrimaryLine(),
-      secondary: { section: "energy", buttonLabel: "Open Adapt My Day" },
+      secondary: { section: "energy", buttonLabel: "Open Today's Reality" },
     },
     secondary: {
       section: "energy",
-      buttonLabel: "Open Adapt My Day",
+      buttonLabel: "Open Today's Reality",
       line: adaptMyDayOfferLine(),
     },
   };
@@ -162,7 +162,7 @@ export function overwhelmTodayRoutingHint(route: OverwhelmTodayRoute): string {
     return "User needs to unload thoughts first. Do not reflect or summarize. Offer Clear My Mind / Plan My Day or one tiny next step.";
   }
   if (route === "adapt_primary") {
-    return "User needs to adjust today to reality. Do not reflect or summarize. Offer Adapt My Day / Plan My Day or one tiny next step.";
+    return "User needs to adjust today to reality. Do not reflect or summarize. Offer Today's Reality / Plan My Day or one tiny next step.";
   }
-  return "User is overwhelmed and asking where to start today. Do not reflect or summarize. Offer Plan My Day / Adapt My Day or give one tiny next step.";
+  return "User is overwhelmed and asking where to start today. Do not reflect or summarize. Offer Plan My Day / Today's Reality or give one tiny next step.";
 }
