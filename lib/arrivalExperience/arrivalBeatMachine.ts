@@ -1,4 +1,8 @@
 import type { ArrivalBeat, ArrivalExperienceConfig } from "./types";
+import {
+  beatShowsCommunicationAnchor,
+  resolveCommunicationAnchorMode,
+} from "@/lib/companionCommunicationAnchor";
 
 export type ArrivalBeatState = {
   beat: ArrivalBeat;
@@ -104,8 +108,10 @@ export function beatShowsInvite(beat: ArrivalBeat): boolean {
 }
 
 export function beatShowsInput(beat: ArrivalBeat): boolean {
-  return beat === "reality" || beat === "staying";
+  return beatShowsCommunicationAnchor(beat);
 }
+
+export { beatShowsCommunicationAnchor, resolveCommunicationAnchorMode };
 
 export function beatShowsSecondaryActions(beat: ArrivalBeat): boolean {
   return beat === "invite";

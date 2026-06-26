@@ -37,7 +37,7 @@ import type { WelcomeWeather } from "@/lib/companionEnvironmentIntelligence";
 import { useWelcomeLivingRoom } from "@/lib/welcomeLivingRoom/useWelcomeLivingRoom";
 import { LivingCompanionRoomLayers } from "@/components/companion/LivingCompanionRoomLayers";
 import { WelcomeRoomPrototypeDevPanel } from "@/components/companion/WelcomeRoomPrototypeDevPanel";
-import type { HospitalityResponse } from "@/lib/arrivalExperience";
+import type { CommunicationAnchorMode } from "@/lib/companionCommunicationAnchor";
 import type { ArrivalRecommendation } from "@/lib/arrivalExperience";
 
 type WelcomeLivingRoomContextValue = ReturnType<typeof useWelcomeLivingRoom>;
@@ -85,6 +85,7 @@ type Props = {
   showEcho?: boolean;
   showRecommendation?: boolean;
   showInput?: boolean;
+  communicationAnchorMode?: CommunicationAnchorMode;
   walking?: boolean;
   onAcceptRecommendation?: () => void;
   onDeclineRecommendation?: () => void;
@@ -113,6 +114,7 @@ export function CompanionWelcomeScene({
   showEcho = false,
   showRecommendation = false,
   showInput: showInputOverride,
+  communicationAnchorMode = "full",
   walking = false,
   onAcceptRecommendation,
   onDeclineRecommendation,
@@ -160,6 +162,7 @@ export function CompanionWelcomeScene({
   const showInput =
     showInputOverride ?? phaseShowsInput(living.phase);
   const arrivalMode = showGreetingOverride !== undefined;
+  const livingChange = resolvedRoom?.livingChangeSet;
 
   return (
     <WelcomeLivingRoomContext.Provider value={living}>
@@ -192,6 +195,14 @@ export function CompanionWelcomeScene({
           data-hospitality-mug={hospitality?.showMugSteam ? "" : undefined}
           data-hospitality-lamp={hospitality?.warmLamp ? "" : undefined}
           data-hospitality-curtains={hospitality?.closeCurtains ? "" : undefined}
+          data-kinsey={
+            livingChange?.kinsey && livingChange.kinsey !== "hidden"
+              ? livingChange.kinsey
+              : undefined
+          }
+          data-wildlife={livingChange?.wildlife ?? undefined}
+          data-hero-motion={livingChange?.heroMotion ?? undefined}
+          data-living-visit={livingChange?.visitKind ?? undefined}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -313,9 +324,11 @@ export function CompanionWelcomeScene({
           </div>
 
           <div
-            className={`companion-welcome-scene__input${
+            className={`companion-welcome-scene__input companion-communication-anchor companion-communication-anchor--living-room companion-communication-anchor--${communicationAnchorMode}${
               showInput ? " is-visible" : ""
-            }`}
+            }${walking ? " companion-communication-anchor--transition" : ""}`}
+            data-communication-variant="living-room"
+            data-communication-mode={communicationAnchorMode}
           >
             {children}
           </div>

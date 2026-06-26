@@ -1,6 +1,7 @@
 "use client";
 
 import { INPUT_PLACEHOLDER } from "@/lib/companionUi";
+import { COMMUNICATION_ANCHOR_TEST_IDS } from "@/lib/companionCommunicationAnchor";
 
 type ChatInputBarProps = {
   input: string;
@@ -42,6 +43,7 @@ export function ChatInputBar({
     >
       <button
         type="button"
+        data-testid={COMMUNICATION_ANCHOR_TEST_IDS.mic}
         onClick={onToggleListening}
         disabled={!speechSupported || isLoading}
         aria-label={isListening ? "Stop listening" : "Voice input"}
@@ -69,6 +71,7 @@ export function ChatInputBar({
 
       <textarea
         ref={inputRef}
+        data-testid={COMMUNICATION_ANCHOR_TEST_IDS.input}
         value={input}
         onChange={(e) => onInputChange(e.target.value)}
         onKeyDown={onKeyDown}
@@ -86,6 +89,7 @@ export function ChatInputBar({
 
       <button
         type="button"
+        data-testid={COMMUNICATION_ANCHOR_TEST_IDS.send}
         onClick={onSend}
         disabled={!input.trim() || isLoading}
         className={`send-soft flex h-12 shrink-0 items-center justify-center rounded-full px-6 text-base font-medium text-white transition-all disabled:cursor-not-allowed disabled:bg-[#9aaba8] disabled:shadow-none ${conversationMode ? "send-soft-conversation" : ""}`}

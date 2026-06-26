@@ -5,6 +5,7 @@ import {
   reduceArrivalBeat,
   resolveArrivalRecommendation,
   softCompleteReality,
+  beatShowsInput,
 } from "./index";
 
 describe("arrivalExperience", () => {
@@ -57,5 +58,22 @@ describe("arrivalExperience", () => {
   it("soft complete provides gentle echo", () => {
     const soft = softCompleteReality();
     expect(soft.echo).toMatch(/gentle/i);
+  });
+
+  it("keeps communication anchor reachable on every beat", () => {
+    const beats = [
+      "settle",
+      "greet",
+      "sit",
+      "reality",
+      "echo",
+      "respond",
+      "invite",
+      "walk",
+      "staying",
+    ] as const;
+    for (const beat of beats) {
+      expect(beatShowsInput(beat)).toBe(true);
+    }
   });
 });

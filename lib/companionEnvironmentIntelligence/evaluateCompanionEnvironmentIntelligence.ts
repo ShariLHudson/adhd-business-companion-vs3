@@ -9,6 +9,8 @@ import { resolveDailyDiscovery } from "./dailyDiscovery";
 import { resolveIowaWeather } from "./iowaAtmosphere";
 import { resolveMotionProfile, resolveRoomObjects } from "./resolveRoom";
 import { defaultRoomPermissionContext } from "./permissionToShow";
+import { resolveAndApplyLivingChanges } from "@/lib/livingLifeEngine";
+import { applyEnvironmentalTruth } from "@/lib/environmentalTruth";
 import type {
   CompanionEnvironmentInput,
   CompanionEnvironmentIntelligence,
@@ -60,7 +62,7 @@ export function evaluateCompanionEnvironmentIntelligence(
   const objects = resolveRoomObjects(resolvedInput, guestPreparation);
   const photograph = selectWelcomePhotograph(resolvedInput);
 
-  return {
+  const base: CompanionEnvironmentIntelligence = {
     photograph,
     objects,
     motion: resolveMotionProfile(resolvedInput, objects, guestPreparation),
@@ -75,6 +77,22 @@ export function evaluateCompanionEnvironmentIntelligence(
     },
     guestPreparation,
   };
+
+  const useLivingEngine =
+    input.useLivingChangeEngine !== false &&
+    (input.prototypeDiscovery ?? "auto") === "auto";
+
+  const withLiving =
+    useLivingEngine
+      ? resolveAndApplyLivingChanges({
+          environment: base,
+          companionInput: resolvedInput,
+        }).environment
+      : base;
+
+  return applyEnvironmentalTruth(withLiving, {
+    recoveryGentle: resolvedInput.recoveryGentle,
+  });
 }
 
 export function composeLivingCompanionRoom(input: {
@@ -89,6 +107,8 @@ export function composeLivingCompanionRoom(input: {
     dailyDiscovery: input.environment.dailyDiscovery,
     atmosphere: input.environment.atmosphere,
     guestPreparation: input.environment.guestPreparation,
+    livingChangeSet: input.environment.livingChangeSet ?? null,
+    environmentalTruth: input.environment.environmentalTruth ?? null,
   };
 }
 
@@ -134,6 +154,7 @@ export function recomposeLivingRoomWithPrototype(
     season,
     weather,
     prototypeDiscovery: discovery,
+    useLivingChangeEngine: false,
     sessionVisitIndex: 12,
     isFirstMeeting: false,
     birthdayToday: discovery === "birthday",

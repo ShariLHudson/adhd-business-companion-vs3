@@ -34,6 +34,10 @@ import {
   recordArrival,
   timeOfDayBucket,
 } from "./livingIntelligenceGraph";
+import {
+  minutesSinceLivingRoomDeparture,
+  resolveLivingTimeline,
+} from "@/lib/livingLifeEngine";
 import { refreshNarrativeContextOnArrival, type NarrativeContext } from "./narrativeContext";
 import { getRecognitionStore } from "@/lib/recognition/recognitionStore";
 import {
@@ -248,6 +252,8 @@ function buildCompanionEnvironmentInput(input: {
   sessionVisitIndex: number;
   isFirstMeeting: boolean;
   now: Date;
+  returnIntervalHours: number | null;
+  recordLivingHistory: boolean;
 }) {
   const recognition = getRecognitionStore();
   const atmosphere = resolveWelcomeAtmosphere({
@@ -264,6 +270,10 @@ function buildCompanionEnvironmentInput(input: {
     },
   });
   const { todayContext, profile: hospitalityProfile } = hospitality;
+  const timeline = resolveLivingTimeline({
+    now: input.now,
+    hoursSinceLastVisit: input.returnIntervalHours,
+  });
   return {
     now: input.now,
     timeOfDay: input.timeOfDay,
@@ -283,6 +293,12 @@ function buildCompanionEnvironmentInput(input: {
       birthdayToday: todayContext.birthdayToday,
       vacationDaysAway: todayContext.vacationDaysAway,
     }),
+    livingLifeContext: {
+      visitKind: timeline.visitKind,
+      hoursSinceLastVisit: input.returnIntervalHours,
+      minutesAwayFromLivingRoom: minutesSinceLivingRoomDeparture(input.now),
+      recordToHistory: input.recordLivingHistory,
+    },
   } as const;
 }
 
@@ -525,6 +541,8 @@ export function evaluateArrivalIntelligence(
           sessionVisitIndex: visitIndex,
           isFirstMeeting,
           now,
+          returnIntervalHours,
+          recordLivingHistory: options.record === true,
         })
       : null;
   const welcomePresence = welcomePresenceInput

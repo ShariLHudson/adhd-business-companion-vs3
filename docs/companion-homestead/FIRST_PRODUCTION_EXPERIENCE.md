@@ -680,6 +680,26 @@ Workspace receives carried context (dayState, echo, emotional tone) — no re-as
 
 ---
 
+# Companion Communication Anchor™
+
+**Non-negotiable:** Every primary screen must preserve a way for the guest to speak to Shari.
+
+| Rule | Implementation |
+|------|----------------|
+| Text input always reachable | `CompanionCommunicationAnchor` + `data-testid="companion-communication-input"` |
+| Mic always reachable | Never disabled during room transitions (tier may gate voice) |
+| Send always reachable | `data-testid="companion-communication-send"` |
+| Arrival pause | `quiet` mode — visible, no auto-focus, mic live |
+| Active conversation | `full` mode — reality, invite, staying |
+| Life layers | Living Change Engine must not block pointer events on anchor |
+| Decorative overlays | `pointer-events: none` on scene layers; anchor `z-index: 12` |
+
+Component: `components/companion/CompanionCommunicationAnchor.tsx`  
+Invariants: `lib/companionCommunicationAnchor/`  
+Audit: `lib/companionCommunicationAnchor/companionCommunicationAnchor.test.ts`
+
+---
+
 # Approval Gate
 
 Before production implementation:

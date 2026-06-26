@@ -126,6 +126,10 @@ export type CompanionEnvironmentIntelligence = {
   };
   /** What Shari prepared — host voice, not UI customization. */
   guestPreparation: GuestPreparation | null;
+  /** Living Change Engine™ output — room speaks before dialogue. */
+  livingChangeSet?: import("@/lib/livingLifeEngine").LivingChangeSet | null;
+  /** Environmental Truth™ — every detail traces to a believable cause. */
+  environmentalTruth?: import("@/lib/environmentalTruth").EnvironmentalTruth | null;
 };
 
 /** Four-layer Living Companion Room™ */
@@ -137,6 +141,8 @@ export type LivingCompanionRoom = {
   dailyDiscovery: DailyDiscovery | null;
   atmosphere: CompanionEnvironmentIntelligence["atmosphere"];
   guestPreparation: GuestPreparation | null;
+  livingChangeSet?: import("@/lib/livingLifeEngine").LivingChangeSet | null;
+  environmentalTruth?: import("@/lib/environmentalTruth").EnvironmentalTruth | null;
 };
 
 export type CompanionEnvironmentInput = {
@@ -159,4 +165,7 @@ export type CompanionEnvironmentInput = {
   hospitalityProfile?: CompanionHospitalityProfile;
   visitEnergy?: VisitEnergy;
   projectRecentlyCompleted?: boolean;
+  /** When false, skips Living Change Engine (prototype / tests). Default true. */
+  useLivingChangeEngine?: boolean;
+  livingLifeContext?: import("@/lib/livingLifeEngine").LivingLifeContext;
 };

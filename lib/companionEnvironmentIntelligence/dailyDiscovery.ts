@@ -47,18 +47,6 @@ export function resolveDailyDiscovery(
     return { kind: match.object, label: match.label };
   }
 
-  const dayOfYear = Math.floor(
-    (now.getTime() - new Date(now.getFullYear(), 0, 0).getTime()) / 86_400_000,
-  );
-  if (dayOfYear % 11 === 0) {
-    return { kind: "encouragement", label: "quiet encouragement" };
-  }
-  if (dayOfYear % 13 === 0) {
-    return { kind: "tea", label: "tea suggestion" };
-  }
-  if (dayOfYear % 17 === 0) {
-    return { kind: "book-feature", label: "book lovers moment" };
-  }
-
+  // Modulo rotation deprecated — Living Change Engine™ selects caused hospitality.
   return null;
 }

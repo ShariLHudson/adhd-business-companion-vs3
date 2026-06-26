@@ -21,4 +21,6 @@ export const SCENE_INTEGRITY_RULES: SceneIntegrityRule[] = [
   { id: "no-placeholder-shapes", when: "render", then: "Never show beige blocks or missing assets", correct: "Hide — text in copy panel only" },
   { id: "no-duplicate-greeting", when: "greeting = invite", then: "Rewrite invite", correct: "One greeting block only" },
   { id: "logo-on-mug", when: "image = shari-i-am-here-2", then: "Hide separate logo", correct: "Mug already carries brand" },
+  { id: "communication-anchor-always", when: "any primary screen", then: "Chat and mic must remain reachable", correct: "Companion Communication Anchor™ — never hidden behind menus, overlays, or life layers" },
+  { id: "environmental-truth", when: "any motion or atmosphere detail", then: "Every effect must trace to a believable cause", correct: "Environmental Truth™ — cause before animation; one coherent Iowa story" },
 ];

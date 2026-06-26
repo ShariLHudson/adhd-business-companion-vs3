@@ -13,7 +13,7 @@ import { BrainDumpPanel } from "@/components/companion/BrainDumpPanel";
 import { DecisionCompassWorkspace } from "@/components/companion/DecisionCompassWorkspace";
 import { BreathePanel } from "@/components/companion/BreathePanel";
 import { StrategiesPanel } from "@/components/companion/StrategiesPanel";
-import { ChatInputBar } from "@/components/companion/ChatInputBar";
+import { CompanionCommunicationAnchor } from "@/components/companion/CompanionCommunicationAnchor";
 import { CompanionBackground } from "@/components/companion/CompanionBackground";
 import {
   ActiveWorkspaceBar,
@@ -80,6 +80,7 @@ import {
   recordFirstRelationshipSignals,
   type ArrivalIntelligence,
 } from "@/lib/arrivalIntelligence";
+import { recordLivingRoomDeparture } from "@/lib/livingLifeEngine";
 import { consumePostLoginContinue } from "@/lib/postLoginContinue";
 import { incrementHomeVisitCount } from "@/lib/homeWelcome";
 import { getDayDesignerSession } from "@/lib/day-designer/dayStore";
@@ -13998,6 +13999,18 @@ export default function CompanionPageClient() {
 
   function handleArrivalWalkComplete(section: AppSection) {
     if (section === "home") return;
+    const living = homeArrival?.livingRoom;
+    if (living?.livingChangeSet) {
+      recordLivingRoomDeparture({
+        toSection: section,
+        snapshot: {
+          kinsey: living.livingChangeSet.kinsey,
+          wildlife: living.livingChangeSet.wildlife,
+          heroMotion: living.livingChangeSet.heroMotion,
+          objectKinds: living.layer2.map((object) => object.kind),
+        },
+      });
+    }
     openSectionBesideChatCore(section, undefined, { userInitiated: true });
   }
 
@@ -14596,7 +14609,9 @@ export default function CompanionPageClient() {
                       disabled={isLoading}
                     />
                   ) : null}
-                  <ChatInputBar
+                  <CompanionCommunicationAnchor
+                    variant={homeCalm ? "living-room" : "default"}
+                    mode="full"
                     input={input}
                     isLoading={isLoading}
                     isListening={isListening}

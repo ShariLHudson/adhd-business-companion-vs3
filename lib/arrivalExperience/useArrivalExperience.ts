@@ -6,6 +6,8 @@ import {
   beatShowsEcho,
   beatShowsGreeting,
   beatShowsInput,
+  beatShowsCommunicationAnchor,
+  resolveCommunicationAnchorMode,
   beatShowsInvite,
   beatShowsRealityQuestion,
   beatShowsSecondaryActions,
@@ -53,6 +55,7 @@ export type UseArrivalExperienceResult = {
   showEcho: boolean;
   showInvite: boolean;
   showInput: boolean;
+  communicationAnchorMode: ReturnType<typeof resolveCommunicationAnchorMode>;
   showSecondaryActions: boolean;
   walking: boolean;
   submitReality: (message: string) => void;
@@ -304,6 +307,7 @@ export function useArrivalExperience(
     showEcho: beatShowsEcho(state.beat) && Boolean(echo),
     showInvite: beatShowsInvite(state.beat) && Boolean(recommendation),
     showInput: beatShowsInput(state.beat),
+    communicationAnchorMode: resolveCommunicationAnchorMode(state.beat),
     showSecondaryActions: beatShowsSecondaryActions(state.beat),
     walking: state.beat === "walk",
     submitReality,

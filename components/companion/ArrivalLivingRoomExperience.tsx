@@ -5,12 +5,25 @@ import type { ArrivalIntelligence } from "@/lib/arrivalIntelligence";
 import {
   useArrivalExperience,
   type ArrivalRecommendation,
+  type HospitalityResponse,
 } from "@/lib/arrivalExperience";
 import type { AppSection } from "@/lib/companionUi";
 import { CompanionWelcomeScene } from "@/components/companion/CompanionWelcomeScene";
 import { WelcomeLivingRoomInput } from "@/components/companion/WelcomeLivingRoomInput";
 import { isDayStateFromToday } from "@/lib/dayReality";
 import { getDayState } from "@/lib/companionStore";
+
+function mergeLivingHospitality(
+  life: HospitalityResponse | undefined,
+  tone: HospitalityResponse,
+): HospitalityResponse {
+  return {
+    showBlanket: Boolean(life?.showBlanket || tone.showBlanket),
+    showMugSteam: tone.showMugSteam && (life?.showMugSteam ?? true),
+    warmLamp: Boolean(life?.warmLamp || tone.warmLamp),
+    closeCurtains: Boolean(life?.closeCurtains || tone.closeCurtains),
+  };
+}
 
 type Props = {
   arrival: ArrivalIntelligence;
@@ -103,18 +116,25 @@ export function ArrivalLivingRoomExperience({
     Boolean(cached) &&
     !isDayStateFromToday(cached);
 
+  const lifeHospitality = arrival.livingRoom?.livingChangeSet?.hospitality;
+  const hospitality = mergeLivingHospitality(
+    lifeHospitality,
+    experience.hospitality,
+  );
+
   return (
     <CompanionWelcomeScene
       greeting={experience.greeting}
       invite={experience.realityQuestion}
       echoLine={experience.echo}
       recommendation={experience.recommendation}
-      hospitality={experience.hospitality}
+      hospitality={hospitality}
       showGreeting={experience.showGreeting}
       showInvite={experience.showRealityQuestion}
       showEcho={experience.showEcho}
       showRecommendation={experience.showInvite}
       showInput={experience.showInput}
+      communicationAnchorMode={experience.communicationAnchorMode}
       walking={experience.walking}
       onAcceptRecommendation={experience.acceptRecommendation}
       onDeclineRecommendation={handleDecline}
@@ -135,6 +155,7 @@ export function ArrivalLivingRoomExperience({
         onToggleListening={onToggleListening}
         onSend={handleSend}
         conversationMode
+        mode={experience.communicationAnchorMode}
         listeningPlaceholder={
           experience.showRealityQuestion
             ? "A few words is enough."

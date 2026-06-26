@@ -405,6 +405,38 @@ Not every return needs copy. When needed:
 10. **One constant** — guest always recognizes Shari's home  
 11. **Test with ten-year walkthrough** — timeline simulation required before ship  
 12. **Living Details are optional** — catalog supplies candidates; engine selects ≤2  
+13. **Communication Anchor is sacred** — life, weather, hospitality, and motion layers must never remove chat or mic access (`Companion Communication Anchor™`)
+14. **Environmental Truth is mandatory** — every visible detail must have a believable cause; motion is an effect, never decoration (`Environmental Truth™`)
+
+## Environmental Truth™ (implementation)
+
+Nothing moves because animation is available. Every effect traces to a cause:
+
+| Cause | Effect |
+|-------|--------|
+| Window open | Curtains stir |
+| Summer breeze | Candle flicker, curtains |
+| Fresh coffee / tea | Steam |
+| Morning sun | Warm daylight |
+| Wind outside | Foliage / branches sway |
+| Rain outside | Rain motion, lamp warmth — no harsh sun |
+| Winter Iowa | Snow when warranted; quiet wildlife |
+| Summer Iowa | Lush foliage, open-window breeze |
+
+Module: `lib/environmentalTruth/` — runs after Living Change Engine, before render (`applyEnvironmentalTruth` in `evaluateCompanionEnvironmentIntelligence`).
+
+Narrative grammar is internal (`because` lines): *"Of course the curtains are moving — the window is open."* Never shown as UI chrome.
+
+## Companion Communication Anchor™ (implementation)
+
+Living Change Engine™ and arrival choreography **must not**:
+
+- hide chat behind menus or overlays  
+- remove mic during room transitions  
+- let decorative layers block input (`pointer-events: none` on life layers; anchor stays `pointer-events: auto`)  
+- auto-focus during arrival pause beats (`quiet` mode only)
+
+Every room shell renders `CompanionCommunicationAnchor`. Arrival uses `quiet` mode during settle/greet/sit/walk and `full` mode during reality/invite/staying.
 
 ## Module map (future implementation)
 

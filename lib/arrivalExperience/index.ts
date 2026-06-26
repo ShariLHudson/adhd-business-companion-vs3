@@ -11,6 +11,8 @@ export {
   beatShowsEcho,
   beatShowsGreeting,
   beatShowsInput,
+  beatShowsCommunicationAnchor,
+  resolveCommunicationAnchorMode,
   beatShowsInvite,
   beatShowsRealityQuestion,
   beatShowsSecondaryActions,
