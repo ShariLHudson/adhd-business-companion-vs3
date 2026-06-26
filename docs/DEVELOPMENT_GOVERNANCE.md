@@ -12,7 +12,8 @@ This is **not** a coding standard. It is a **product-thinking standard**.
 
 **Governing law:** [Product Constitution™](./PRODUCT_CONSTITUTION.md) — what must comply  
 **Execution process:** [Screen Certification](./SCREEN_CERTIFICATION.md) — how screens become complete  
-**Living tracker:** [UX Punch List](./UX_PUNCH_LIST.md) — polish + Future Opportunities per screen
+**Living tracker:** [UX Punch List](./UX_PUNCH_LIST.md) — polish + Future Opportunities per screen  
+**Sprint Zero:** [Life Experience Sprint™](./companion-homestead/LIFE_EXPERIENCE_SPRINT.md) — live inside the Homestead before building more
 
 ---
 

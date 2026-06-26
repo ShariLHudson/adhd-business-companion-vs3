@@ -19,6 +19,7 @@
 | 4d | [FIRST_PRODUCTION_EXPERIENCE.md](./FIRST_PRODUCTION_EXPERIENCE.md) | First-minute arrival journey |
 | 4e | [LIVING_LIFE_ENGINE.md](./LIVING_LIFE_ENGINE.md) | Living place — natural change over time |
 | 4f | [LIVING_DETAILS_CATALOG.md](./LIVING_DETAILS_CATALOG.md) | 520+ natural variation candidates |
+| 4g | [LIFE_EXPERIENCE_SPRINT.md](./LIFE_EXPERIENCE_SPRINT.md) | **Sprint Zero** — live before building |
 | 5 | `docs/COMPANION_JOURNEY_EXPERIENCE_BIBLE.md` | Emotional experience layer |
 | 6 | `lib/companionNeedsIntelligence/` | Need → room intelligence |
 | — | [`../MASTER_DESIGN_REVIEW.md`](../MASTER_DESIGN_REVIEW.md) | Stress test before building — what breaks, what to cut |
