@@ -504,9 +504,12 @@ export function evaluateArrivalIntelligence(
   const narrativeContext = refreshNarrativeContextOnArrival(now);
   const isFirstMeeting = homeState === "FIRST_VISIT";
   const welcomePresenceInput =
-    homeState === "FIRST_VISIT" || homeState === "QUIET_PRESENCE"
+    homeState === "FIRST_VISIT" ||
+    homeState === "QUIET_PRESENCE" ||
+    homeState === "RETURNING_ACTIVE"
       ? buildWelcomePresenceInput({
-          homeState,
+          homeState:
+            homeState === "RETURNING_ACTIVE" ? "QUIET_PRESENCE" : homeState,
           timeOfDay,
           sessionVisitIndex: visitIndex,
           returnIntervalHours,

@@ -37,6 +37,8 @@ import type { WelcomeWeather } from "@/lib/companionEnvironmentIntelligence";
 import { useWelcomeLivingRoom } from "@/lib/welcomeLivingRoom/useWelcomeLivingRoom";
 import { LivingCompanionRoomLayers } from "@/components/companion/LivingCompanionRoomLayers";
 import { WelcomeRoomPrototypeDevPanel } from "@/components/companion/WelcomeRoomPrototypeDevPanel";
+import type { HospitalityResponse } from "@/lib/arrivalExperience";
+import type { ArrivalRecommendation } from "@/lib/arrivalExperience";
 
 type WelcomeLivingRoomContextValue = ReturnType<typeof useWelcomeLivingRoom>;
 
@@ -74,7 +76,21 @@ function normalizeWelcomeAtmosphere(
 type Props = {
   ariaLabel?: string;
   greeting?: string;
-  invite?: string;
+  invite?: string | null;
+  echoLine?: string | null;
+  recommendation?: ArrivalRecommendation | null;
+  hospitality?: HospitalityResponse | null;
+  showGreeting?: boolean;
+  showInvite?: boolean;
+  showEcho?: boolean;
+  showRecommendation?: boolean;
+  showInput?: boolean;
+  walking?: boolean;
+  onAcceptRecommendation?: () => void;
+  onDeclineRecommendation?: () => void;
+  onStayHere?: () => void;
+  onSameAsYesterday?: () => void;
+  showSameAsYesterday?: boolean;
   livingRoom?: LivingCompanionRoom | null;
   companionImageId?: string;
   timeOfDay?: WelcomeTimeOfDay;
@@ -89,6 +105,20 @@ export function CompanionWelcomeScene({
   ariaLabel = `${WELCOME_PRESENCE_GREETING} ${WELCOME_PRESENCE_INVITE}`,
   greeting = WELCOME_PRESENCE_GREETING,
   invite = WELCOME_PRESENCE_INVITE,
+  echoLine = null,
+  recommendation = null,
+  hospitality = null,
+  showGreeting: showGreetingOverride,
+  showInvite: showInviteOverride,
+  showEcho = false,
+  showRecommendation = false,
+  showInput: showInputOverride,
+  walking = false,
+  onAcceptRecommendation,
+  onDeclineRecommendation,
+  onStayHere,
+  onSameAsYesterday,
+  showSameAsYesterday = false,
   livingRoom,
   companionImageId,
   timeOfDay = timeOfDayBucket(),
@@ -123,9 +153,13 @@ export function CompanionWelcomeScene({
     resolveCompanionPresenceLibraryImage("chat-welcome", photographId) ??
     companionPresenceWelcomeImageUrl();
 
-  const showGreeting = phaseShowsGreeting(living.phase);
-  const showInvite = phaseShowsInvite(living.phase);
-  const showInput = phaseShowsInput(living.phase);
+  const showGreeting =
+    showGreetingOverride ?? phaseShowsGreeting(living.phase);
+  const showInvite =
+    showInviteOverride ?? (invite ? phaseShowsInvite(living.phase) : false);
+  const showInput =
+    showInputOverride ?? phaseShowsInput(living.phase);
+  const arrivalMode = showGreetingOverride !== undefined;
 
   return (
     <WelcomeLivingRoomContext.Provider value={living}>
@@ -145,13 +179,19 @@ export function CompanionWelcomeScene({
         <div
           className={`companion-welcome-scene__hero companion-welcome-scene__hero--${living.phase}${
             living.candlePulse ? " companion-welcome-scene__hero--candle-pulse" : ""
-          }${living.phase === "alive" ? " companion-welcome-scene__hero--ambient" : ""}`}
+          }${living.phase === "alive" || arrivalMode ? " companion-welcome-scene__hero--ambient" : ""}${
+            walking ? " companion-welcome-scene__hero--walking" : ""
+          }`}
           data-living-phase={living.phase}
           data-time-of-day={atmosphere.timeOfDay}
           data-season={atmosphere.season}
           data-weather={atmosphere.weather}
           data-room-accent={roomAccent ?? undefined}
           data-room-reason={resolvedRoom?.layer1.reason}
+          data-hospitality-blanket={hospitality?.showBlanket ? "" : undefined}
+          data-hospitality-mug={hospitality?.showMugSteam ? "" : undefined}
+          data-hospitality-lamp={hospitality?.warmLamp ? "" : undefined}
+          data-hospitality-curtains={hospitality?.closeCurtains ? "" : undefined}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -176,6 +216,19 @@ export function CompanionWelcomeScene({
             </div>
           )}
 
+          {hospitality?.showBlanket ? (
+            <div
+              className="companion-welcome-scene__object companion-welcome-scene__object--blanket companion-welcome-scene__hospitality-blanket"
+              aria-hidden="true"
+            />
+          ) : null}
+          {hospitality?.showMugSteam ? (
+            <div
+              className="companion-welcome-scene__steam companion-welcome-scene__hospitality-steam"
+              aria-hidden="true"
+            />
+          ) : null}
+
           <div className="companion-welcome-scene__veil" aria-hidden="true" />
 
           <div className="companion-welcome-scene__overlay">
@@ -197,6 +250,55 @@ export function CompanionWelcomeScene({
                 >
                   {invite}
                 </p>
+                <p
+                  className={`companion-welcome-scene__echo${
+                    showEcho && echoLine ? " is-visible" : ""
+                  }`}
+                  aria-live="polite"
+                >
+                  {echoLine}
+                </p>
+                {showRecommendation && recommendation ? (
+                  <div
+                    className={`companion-welcome-scene__arrival-door is-visible`}
+                  >
+                    <p className="companion-welcome-scene__recommendation">
+                      {recommendation.line}
+                    </p>
+                    <div className="companion-welcome-scene__arrival-actions">
+                      <button
+                        type="button"
+                        className="companion-welcome-scene__arrival-primary"
+                        onClick={onAcceptRecommendation}
+                      >
+                        {recommendation.buttonLabel}
+                      </button>
+                      <button
+                        type="button"
+                        className="companion-welcome-scene__arrival-quiet"
+                        onClick={onDeclineRecommendation}
+                      >
+                        Not today
+                      </button>
+                      <button
+                        type="button"
+                        className="companion-welcome-scene__arrival-quiet"
+                        onClick={onStayHere}
+                      >
+                        Stay here
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
+                {showSameAsYesterday ? (
+                  <button
+                    type="button"
+                    className="companion-welcome-scene__arrival-same"
+                    onClick={onSameAsYesterday}
+                  >
+                    Same as yesterday
+                  </button>
+                ) : null}
                 {resolvedRoom?.guestPreparation?.line ? (
                   <p
                     className={`companion-welcome-scene__prepared${

@@ -47,8 +47,10 @@ Same handwriting in materials, light, card behavior, and navigation chrome. Diff
 | 2 | Visual Design Bible™ | House DNA |
 | 3 | Room Look Books™ | Room soul |
 | 4 | **Screen Composition Guide™** (this document) | How rooms become screens |
-| 5 | Companion Layout System™ + Scene Integrity Engine™ | Implementation contracts |
-| 6 | Production UI | Pixels |
+| 5 | [`FIRST_PRODUCTION_EXPERIENCE.md`](./FIRST_PRODUCTION_EXPERIENCE.md) | First 30–60s arrival journey |
+| 6 | [`LIVING_LIFE_ENGINE.md`](./LIVING_LIFE_ENGINE.md) | Living place — natural change over time |
+| 7 | Companion Layout System™ + Scene Integrity Engine™ | Implementation contracts |
+| 8 | Production UI | Pixels |
 
 No page ships until it passes this guide **and** its room look book.
 

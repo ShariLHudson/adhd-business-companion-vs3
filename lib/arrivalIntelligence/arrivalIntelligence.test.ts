@@ -30,8 +30,8 @@ describe("arrivalIntelligence", () => {
     const intel = evaluateArrivalIntelligence({ record: true });
     expect(intel.homeState).toBe("FIRST_VISIT");
     expect(intel.visitorKind).toBe("first_onboarding");
-    expect(intel.chrome.navVisibility).toBe("muted");
-    expect(intel.chrome.autoFocusInput).toBe(true);
+    expect(intel.chrome.navVisibility).toBe("hidden");
+    expect(intel.chrome.autoFocusInput).toBe(false);
     expect(intel.welcomeLine).toMatch(/welcome|here for you/i);
     expect(intel.inviteQuestion).toMatch(/on your mind today/i);
     expect(intel.openingMessage).toMatch(/welcome|here for you/i);
@@ -117,8 +117,9 @@ describe("arrivalIntelligence", () => {
 
     const intel = evaluateArrivalIntelligence({ record: true });
     expect(intel.homeState).toBe("RETURNING_ACTIVE");
-    expect(intel.chrome.navVisibility).toBe("normal");
-    expect(intel.chrome.layout).toBe("standard");
+    expect(intel.chrome.navVisibility).toBe("muted");
+    expect(intel.chrome.layout).toBe("welcome-scene");
+    expect(intel.livingRoom?.layer1.id).toBeTruthy();
     expect(intel.openingMessage).toMatch(/newsletter launch/i);
     expect(intel.inviteQuestion).toMatch(/pick up where we left off/i);
     expect(intel.contextualButtonLabel).toBe("Continue");
@@ -132,8 +133,9 @@ describe("arrivalIntelligence", () => {
 
 describe("homeState", () => {
   it("maps chrome config per state", () => {
-    expect(homeChromeForState("FIRST_VISIT").navVisibility).toBe("muted");
-    expect(homeChromeForState("RETURNING_ACTIVE").navVisibility).toBe("normal");
+    expect(homeChromeForState("FIRST_VISIT").navVisibility).toBe("hidden");
+    expect(homeChromeForState("RETURNING_ACTIVE").navVisibility).toBe("muted");
+    expect(homeChromeForState("RETURNING_ACTIVE").layout).toBe("welcome-scene");
     expect(homeChromeForState("QUIET_PRESENCE").conversationInput).toBe(true);
   });
 

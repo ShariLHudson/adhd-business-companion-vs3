@@ -14,6 +14,11 @@
 | 2 | [MASTER_PLAN.md](./MASTER_PLAN.md) | Condensed site reference & room placement detail (companion to blueprint) |
 | 3 | [VISUAL_DESIGN_BIBLE.md](./VISUAL_DESIGN_BIBLE.md) | Materials, palette, Companion Object Style™, navigation cards |
 | 4 | [LOOK_BOOK.md](./LOOK_BOOK.md) | Per-room environmental art specs |
+| 4b | [`docs/room-lookbooks/`](../room-lookbooks/) | Phase 1 implementation-ready room packets |
+| 4c | [SCREEN_COMPOSITION_GUIDE.md](./SCREEN_COMPOSITION_GUIDE.md) | How rooms become screens |
+| 4d | [FIRST_PRODUCTION_EXPERIENCE.md](./FIRST_PRODUCTION_EXPERIENCE.md) | First-minute arrival journey |
+| 4e | [LIVING_LIFE_ENGINE.md](./LIVING_LIFE_ENGINE.md) | Living place — natural change over time |
+| 4f | [LIVING_DETAILS_CATALOG.md](./LIVING_DETAILS_CATALOG.md) | 520+ natural variation candidates |
 | 5 | `docs/COMPANION_JOURNEY_EXPERIENCE_BIBLE.md` | Emotional experience layer |
 | 6 | `lib/companionNeedsIntelligence/` | Need → room intelligence |
 | — | [`../MASTER_DESIGN_REVIEW.md`](../MASTER_DESIGN_REVIEW.md) | Stress test before building — what breaks, what to cut |

@@ -33,8 +33,7 @@ import { FocusAudioPanel } from "@/components/companion/FocusAudioPanel";
 import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
 import { CompanionHomeCard } from "@/components/companion/CompanionHomeCard";
-import { CompanionWelcomeScene } from "@/components/companion/CompanionWelcomeScene";
-import { WelcomeLivingRoomInput } from "@/components/companion/WelcomeLivingRoomInput";
+import { ArrivalLivingRoomExperience } from "@/components/companion/ArrivalLivingRoomExperience";
 import { StressReliefOptionsCard } from "@/components/companion/StressReliefOptionsCard";
 import { TodayPanel } from "@/components/companion/TodayPanel";
 const PlanMyDayPanel = dynamic(
@@ -1671,6 +1670,7 @@ export default function CompanionPageClient() {
   const [homeArrival, setHomeArrival] = useState<ArrivalIntelligence | null>(
     null,
   );
+  const [arrivalNavImmersion, setArrivalNavImmersion] = useState(false);
   const [hasChatted, setHasChatted] = useState(false);
   const [recognitionMoment, setRecognitionMoment] =
     useState<RecognitionMoment | null>(null);
@@ -1785,6 +1785,7 @@ export default function CompanionPageClient() {
   useEffect(() => {
     if (!homeCalm) {
       setHomeArrival(null);
+      setArrivalNavImmersion(false);
       return;
     }
     incrementHomeVisitCount();
@@ -13990,6 +13991,16 @@ export default function CompanionPageClient() {
     revealWorkspace,
   ]);
 
+  const arrivalNavVisibility =
+    arrivalNavImmersion && welcomeScene
+      ? "hidden"
+      : (homeArrival?.chrome.navVisibility ?? "calm");
+
+  function handleArrivalWalkComplete(section: AppSection) {
+    if (section === "home") return;
+    openSectionBesideChatCore(section, undefined, { userInitiated: true });
+  }
+
   return (
     <div
       className={`relative flex h-dvh max-h-dvh overflow-hidden text-lg ${
@@ -14017,15 +14028,22 @@ export default function CompanionPageClient() {
       />
 
       <div
-        className={`relative z-10 flex h-full min-h-0 w-full overflow-hidden pl-14 md:pl-44 ${homeCalm ? "companion-home-calm" : ""}`}
+        className={`relative z-10 flex h-full min-h-0 w-full overflow-hidden ${
+          arrivalNavImmersion && welcomeScene
+            ? "pl-0 companion-arrival-immersion"
+            : "pl-14 md:pl-44"
+        } ${homeCalm ? "companion-home-calm" : ""}`}
         data-home-calm={homeCalm ? "" : undefined}
+        data-arrival-immersion={
+          arrivalNavImmersion && welcomeScene ? "" : undefined
+        }
         data-home-state={
           homeArrival ? homeStateDataAttr(homeArrival.homeState) : undefined
         }
       >
         <CompanionSidebarPortal
           calmHome={homeCalm}
-          navVisibility={homeArrival?.chrome.navVisibility ?? "calm"}
+          navVisibility={arrivalNavVisibility}
         >
           <AppSidebar
             activeNav={activeNav}
@@ -14037,7 +14055,7 @@ export default function CompanionPageClient() {
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
           <TopBar
             calmHome={homeCalm}
-            navVisibility={homeArrival?.chrome.navVisibility ?? "calm"}
+            navVisibility={arrivalNavVisibility}
             onOpenClearMyMind={openClearMyMindStandaloneCore}
             onOpenAdaptMyDay={openAdaptMyDayCore}
             onRequestNewConversation={handleStartCleanConversation}
@@ -14135,29 +14153,22 @@ export default function CompanionPageClient() {
                     </p>
                   ) : null}
                 </header>
-              ) : welcomeScene ? (
-                <CompanionWelcomeScene
-                  greeting={homeArrival?.welcomePresence?.greeting}
-                  invite={homeArrival?.welcomePresence?.invite}
-                  livingRoom={homeArrival?.livingRoom}
-                  timeOfDay={homeArrival?.timeOfDay}
-                >
-                  <WelcomeLivingRoomInput
-                    input={input}
-                    isLoading={isLoading}
-                    isListening={isListening}
-                    speechSupported={speechSupported}
-                    inputRef={inputRef}
-                    onInputChange={handleInputChange}
-                    onKeyDown={handleKeyDown}
-                    onToggleListening={toggleListening}
-                    onSend={() => void handleSend()}
-                    conversationMode={
-                      homeArrival?.chrome.conversationInput ?? false
-                    }
-                    listeningPlaceholder={homeArrival?.chatPlaceholder}
-                  />
-                </CompanionWelcomeScene>
+              ) : welcomeScene && homeArrival ? (
+                <ArrivalLivingRoomExperience
+                  arrival={homeArrival}
+                  input={input}
+                  isLoading={isLoading}
+                  isListening={isListening}
+                  speechSupported={speechSupported}
+                  inputRef={inputRef}
+                  onInputChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  onToggleListening={toggleListening}
+                  onImmersionNav={setArrivalNavImmersion}
+                  onWalkComplete={handleArrivalWalkComplete}
+                  onStayAndChat={() => undefined}
+                  onSend={() => void handleSend()}
+                />
               ) : homeCalm ? (
                 <CompanionHomeCard
                   arrival={homeArrival}

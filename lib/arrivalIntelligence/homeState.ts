@@ -14,7 +14,7 @@ export type CompanionHomeState =
   | "RETURNING_ACTIVE"
   | "QUIET_PRESENCE";
 
-export type HomeNavVisibility = "muted" | "normal" | "calm";
+export type HomeNavVisibility = "muted" | "normal" | "calm" | "hidden";
 
 export type HomeChromeLayout = "welcome-scene" | "standard";
 
@@ -52,19 +52,19 @@ export function homeChromeForState(state: CompanionHomeState): HomeChromeConfig 
   switch (state) {
     case "FIRST_VISIT":
       return {
-        navVisibility: "muted",
+        navVisibility: "hidden",
         layout: "welcome-scene",
         conversationInput: true,
-        autoFocusInput: true,
+        autoFocusInput: false,
         softenBackground: true,
       };
     case "RETURNING_ACTIVE":
       return {
-        navVisibility: "normal",
-        layout: "standard",
+        navVisibility: "muted",
+        layout: "welcome-scene",
         conversationInput: false,
         autoFocusInput: false,
-        softenBackground: false,
+        softenBackground: true,
       };
     case "QUIET_PRESENCE":
       return {
