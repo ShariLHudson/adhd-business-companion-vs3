@@ -1,12 +1,12 @@
 {
   "summary": {
-    "scannedAt": "2026-06-25T23:03:33.063Z",
-    "fileCount": 176,
-    "uniqueEmojiCount": 211,
+    "scannedAt": "2026-06-26T01:21:34.900Z",
+    "fileCount": 158,
+    "uniqueEmojiCount": 205,
     "topEmojis": [
       [
         "️",
-        106
+        102
       ],
       [
         "✓",
@@ -14,58 +14,50 @@
       ],
       [
         "🧠",
-        56
+        47
       ],
       [
         "🎯",
-        45
+        39
       ],
       [
         "💬",
-        40
+        36
       ],
       [
         "📋",
-        33
-      ],
-      [
-        "📅",
-        28
+        29
       ],
       [
         "✨",
-        28
+        26
       ],
       [
         "🌱",
-        25
-      ],
-      [
-        "📁",
-        24
+        26
       ],
       [
         "✅",
         24
       ],
       [
-        "📝",
-        20
+        "📅",
+        23
       ],
       [
-        "🌿",
-        20
+        "📝",
+        19
+      ],
+      [
+        "📁",
+        19
       ],
       [
         "👤",
         17
       ],
       [
-        "💡",
-        16
-      ],
-      [
-        "⚡",
+        "🌿",
         16
       ],
       [
@@ -73,11 +65,11 @@
         15
       ],
       [
-        "📈",
+        "💡",
         15
       ],
       [
-        "🧭",
+        "📈",
         15
       ],
       [
@@ -85,31 +77,27 @@
         14
       ],
       [
-        "💼",
+        "📊",
         14
       ],
       [
-        "📊",
-        13
-      ],
-      [
-        "📄",
-        13
+        "🧭",
+        14
       ],
       [
         "⚠",
         13
       ],
       [
-        "📚",
+        "📖",
         12
       ],
       [
-        "🛠",
+        "💼",
         12
       ],
       [
-        "🎡",
+        "⚡",
         12
       ],
       [
@@ -121,27 +109,23 @@
         11
       ],
       [
-        "📖",
+        "📚",
+        10
+      ],
+      [
+        "📄",
+        10
+      ],
+      [
+        "🎡",
         10
       ],
       [
         "✍",
-        10
-      ],
-      [
-        "📂",
-        10
-      ],
-      [
-        "🧩",
         9
       ],
       [
         "🤝",
-        9
-      ],
-      [
-        "⚙",
         9
       ],
       [
@@ -153,7 +137,11 @@
         8
       ],
       [
-        "✉",
+        "📂",
+        8
+      ],
+      [
+        "🔥",
         8
       ],
       [
@@ -163,6 +151,18 @@
       [
         "🎨",
         8
+      ],
+      [
+        "⚙",
+        8
+      ],
+      [
+        "🌟",
+        7
+      ],
+      [
+        "🧩",
+        7
       ]
     ],
     "filesByHitCount": [
@@ -171,12 +171,12 @@
         "hitLines": 105
       },
       {
-        "file": "lib/createCatalogData.ts",
-        "hitLines": 40
+        "file": "lib/companionUniverse/libraries/objectLibrary.ts",
+        "hitLines": 78
       },
       {
-        "file": "lib/momentumGames.ts",
-        "hitLines": 37
+        "file": "lib/createCatalogData.ts",
+        "hitLines": 40
       },
       {
         "file": "components/companion/IdealClientBuilder.tsx",
@@ -187,12 +187,12 @@
         "hitLines": 33
       },
       {
-        "file": "lib/companionDashboard.ts",
-        "hitLines": 30
+        "file": "lib/companionObjects/companionObjectRegistry.ts",
+        "hitLines": 31
       },
       {
-        "file": "lib/workspaceMode.ts",
-        "hitLines": 23
+        "file": "lib/companionDashboard.ts",
+        "hitLines": 30
       },
       {
         "file": "lib/strategySystem.ts",
@@ -205,10 +205,6 @@
       {
         "file": "lib/ecosystem/automation/automationRouter.ts",
         "hitLines": 19
-      },
-      {
-        "file": "lib/companionUniverse/companionLayoutSystem.ts",
-        "hitLines": 17
       },
       {
         "file": "components/companion/SettingsPanel.tsx",
@@ -231,23 +227,11 @@
         "hitLines": 15
       },
       {
-        "file": "components/companion/StrategiesPanel.tsx",
-        "hitLines": 14
-      },
-      {
-        "file": "lib/companionUi.ts",
-        "hitLines": 14
-      },
-      {
-        "file": "components/companion/EmailGeneratorPanel.tsx",
-        "hitLines": 13
-      },
-      {
         "file": "lib/howDoIEcosystemGuide.ts",
         "hitLines": 13
       },
       {
-        "file": "app/companion/CompanionPageClient.tsx",
+        "file": "components/companion/EmailGeneratorPanel.tsx",
         "hitLines": 12
       },
       {
@@ -269,10 +253,6 @@
       {
         "file": "lib/companionRouting.ts",
         "hitLines": 10
-      },
-      {
-        "file": "components/companion/SavedBrowsePanel.tsx",
-        "hitLines": 9
       },
       {
         "file": "lib/appFeatureKnowledge.ts",
@@ -300,18 +280,6 @@
       },
       {
         "file": "components/companion/ProfilePanel.tsx",
-        "hitLines": 8
-      },
-      {
-        "file": "components/companion/TopBar.tsx",
-        "hitLines": 8
-      },
-      {
-        "file": "lib/appReferences.ts",
-        "hitLines": 8
-      },
-      {
-        "file": "lib/assistedActionBridge.ts",
         "hitLines": 8
       },
       {
@@ -379,28 +347,12 @@
         "hitLines": 6
       },
       {
-        "file": "lib/companionToolSuggestions.ts",
-        "hitLines": 6
-      },
-      {
-        "file": "lib/focusToolDefinitions.ts",
-        "hitLines": 6
-      },
-      {
-        "file": "lib/stressRouting.ts",
-        "hitLines": 6
-      },
-      {
         "file": "lib/visualFocus/intelligence/enrichInsights.ts",
         "hitLines": 6
       },
       {
         "file": "lib/visualThinkingColors.ts",
         "hitLines": 6
-      },
-      {
-        "file": "components/companion/GrowthCenterPanel.tsx",
-        "hitLines": 5
       },
       {
         "file": "components/companion/hospitality/CompanionDirectorsStudio.tsx",
@@ -435,12 +387,20 @@
         "hitLines": 5
       },
       {
+        "file": "lib/momentumGames.ts",
+        "hitLines": 5
+      },
+      {
         "file": "lib/personalAwareness.ts",
         "hitLines": 5
       },
       {
         "file": "lib/workspaceAwareness.ts",
         "hitLines": 5
+      },
+      {
+        "file": "app/companion/CompanionPageClient.tsx",
+        "hitLines": 4
       },
       {
         "file": "components/companion/ArtifactReadyPanel.tsx",
@@ -456,10 +416,6 @@
       },
       {
         "file": "components/companion/OperationalDashboard.tsx",
-        "hitLines": 4
-      },
-      {
-        "file": "components/companion/ProjectsPanel.tsx",
         "hitLines": 4
       },
       {
@@ -499,19 +455,11 @@
         "hitLines": 3
       },
       {
-        "file": "components/companion/GamesPanel.tsx",
-        "hitLines": 3
-      },
-      {
         "file": "components/companion/GrowthReportsPanel.tsx",
         "hitLines": 3
       },
       {
         "file": "components/companion/MyJourneyPanel.tsx",
-        "hitLines": 3
-      },
-      {
-        "file": "components/companion/MyWorkHubPanel.tsx",
         "hitLines": 3
       },
       {
@@ -551,15 +499,7 @@
         "hitLines": 3
       },
       {
-        "file": "lib/frictionlessActionLayer.ts",
-        "hitLines": 3
-      },
-      {
         "file": "lib/howDoIContent.ts",
-        "hitLines": 3
-      },
-      {
-        "file": "lib/howDoIHelpBrowseStructure.ts",
         "hitLines": 3
       },
       {
@@ -568,10 +508,6 @@
       },
       {
         "file": "lib/onboardingExperienceContent.ts",
-        "hitLines": 3
-      },
-      {
-        "file": "lib/pendingAction.ts",
         "hitLines": 3
       },
       {
@@ -611,6 +547,10 @@
         "hitLines": 2
       },
       {
+        "file": "components/companion/StrategiesPanel.tsx",
+        "hitLines": 2
+      },
+      {
         "file": "components/companion/TemplatesLibrary.tsx",
         "hitLines": 2
       },
@@ -619,15 +559,7 @@
         "hitLines": 2
       },
       {
-        "file": "lib/appFeatureNavigation.ts",
-        "hitLines": 2
-      },
-      {
         "file": "lib/doItNowActions.ts",
-        "hitLines": 2
-      },
-      {
-        "file": "lib/focusHub.ts",
         "hitLines": 2
       },
       {
@@ -648,10 +580,6 @@
       },
       {
         "file": "components/companion/ActiveCompanionsPicker.tsx",
-        "hitLines": 1
-      },
-      {
-        "file": "components/companion/ActiveWorkspaceBar.tsx",
         "hitLines": 1
       },
       {
@@ -715,6 +643,10 @@
         "hitLines": 1
       },
       {
+        "file": "components/companion/GrowthCenterPanel.tsx",
+        "hitLines": 1
+      },
+      {
         "file": "components/companion/HomeResumeLink.tsx",
         "hitLines": 1
       },
@@ -728,6 +660,10 @@
       },
       {
         "file": "components/companion/MicButton.tsx",
+        "hitLines": 1
+      },
+      {
+        "file": "components/companion/MyWorkHubPanel.tsx",
         "hitLines": 1
       },
       {
@@ -747,11 +683,11 @@
         "hitLines": 1
       },
       {
-        "file": "components/companion/SaveDestinationDialog.tsx",
+        "file": "components/companion/SavedBrowsePanel.tsx",
         "hitLines": 1
       },
       {
-        "file": "components/companion/SavedWorkLibrary.tsx",
+        "file": "components/companion/SaveDestinationDialog.tsx",
         "hitLines": 1
       },
       {
@@ -827,10 +763,6 @@
         "hitLines": 1
       },
       {
-        "file": "lib/crossWorkspaceSuggestion.ts",
-        "hitLines": 1
-      },
-      {
         "file": "lib/ecosystem/actions/actionSelectors.ts",
         "hitLines": 1
       },
@@ -855,10 +787,6 @@
         "hitLines": 1
       },
       {
-        "file": "lib/splitWorkspacePanel.ts",
-        "hitLines": 1
-      },
-      {
         "file": "lib/thinkingSpace/collections.ts",
         "hitLines": 1
       },
@@ -875,70 +803,14 @@
   "files": {
     "app/companion/CompanionPageClient.tsx": [
       {
-        "line": 13890,
-        "emojis": [
-          "📝"
-        ],
-        "snippet": "emoji: \"📝\","
-      },
-      {
-        "line": 13905,
-        "emojis": [
-          "📋"
-        ],
-        "snippet": "emoji: \"📋\","
-      },
-      {
-        "line": 13924,
-        "emojis": [
-          "📅"
-        ],
-        "snippet": "emoji: \"📅\","
-      },
-      {
-        "line": 13938,
-        "emojis": [
-          "📚"
-        ],
-        "snippet": "emoji: \"📚\","
-      },
-      {
-        "line": 13953,
-        "emojis": [
-          "🧩"
-        ],
-        "snippet": "emoji: \"🧩\","
-      },
-      {
-        "line": 13968,
-        "emojis": [
-          "📘"
-        ],
-        "snippet": "emoji: \"📘\","
-      },
-      {
-        "line": 14454,
-        "emojis": [
-          "🛠"
-        ],
-        "snippet": "WORKSPACE_EMOJI[workspaceOffer.section] ?? \"🛠\""
-      },
-      {
-        "line": 14461,
-        "emojis": [
-          "🛠"
-        ],
-        "snippet": "\"🛠\""
-      },
-      {
-        "line": 14617,
+        "line": 14615,
         "emojis": [
           "🔒"
         ],
         "snippet": "🔒 Voice — upgrade to talk back & forth"
       },
       {
-        "line": 14636,
+        "line": 14634,
         "emojis": [
           "🔊",
           "🔈"
@@ -946,7 +818,7 @@
         "snippet": "{voiceOutput ? \"🔊 Voice on\" : \"🔈 Voice off\"} ·{\" \"}"
       },
       {
-        "line": 14693,
+        "line": 14691,
         "emojis": [
           "📋",
           "💬"
@@ -954,7 +826,7 @@
         "snippet": "leftPaneEmoji={guideBesideSession ? \"📋\" : \"💬\"}"
       },
       {
-        "line": 15136,
+        "line": 15134,
         "emojis": [
           "✕"
         ],
@@ -996,32 +868,23 @@
         "snippet": "{checked ? \"☑\" : \"☐\"}"
       }
     ],
-    "components/companion/ActiveWorkspaceBar.tsx": [
-      {
-        "line": 86,
-        "emojis": [
-          "🎯"
-        ],
-        "snippet": "emoji: \"🎯\","
-      }
-    ],
     "components/companion/AppSidebar.tsx": [
       {
-        "line": 140,
+        "line": 138,
         "emojis": [
           "📅"
         ],
         "snippet": "l: \"📅\","
       },
       {
-        "line": 144,
+        "line": 142,
         "emojis": [
           "📝"
         ],
         "snippet": "{ l: \"📝\", t: \"Google Docs\", u: \"https://docs.google.com\" },"
       },
       {
-        "line": 145,
+        "line": 143,
         "emojis": [
           "📁"
         ],
@@ -1353,92 +1216,84 @@
     ],
     "components/companion/EmailGeneratorPanel.tsx": [
       {
-        "line": 159,
+        "line": 161,
         "emojis": [
           "✓"
         ],
         "snippet": "note(\"Saved to Templates ✓\");"
       },
       {
-        "line": 174,
+        "line": 176,
         "emojis": [
           "✓"
         ],
         "snippet": "note(\"Sequence saved to Templates ✓\");"
       },
       {
-        "line": 192,
+        "line": 194,
         "emojis": [
           "✓"
         ],
         "snippet": "note(\"Copied ✓\");"
       },
       {
-        "line": 200,
+        "line": 202,
         "emojis": [
           "✓"
         ],
         "snippet": "note(\"Saved as snippet ✓\");"
       },
       {
-        "line": 209,
-        "emojis": [
-          "✉",
-          "️"
-        ],
-        "snippet": "<p className=\"text-2xl font-semibold text-[#1f1c19]\">✉️ Email generator</p>"
-      },
-      {
-        "line": 296,
+        "line": 301,
         "emojis": [
           "✨"
         ],
         "snippet": "{loading ? \"Writing…\" : \"✨ Generate email\"}"
       },
       {
-        "line": 490,
+        "line": 495,
         "emojis": [
           "🧵"
         ],
         "snippet": "{seqLoading ? \"Building…\" : \"🧵 Turn into a 3-email sequence\"}"
       },
       {
-        "line": 513,
+        "line": 518,
         "emojis": [
           "💾"
         ],
         "snippet": "💾 Save sequence to Templates"
       },
       {
-        "line": 546,
+        "line": 551,
         "emojis": [
           "✨"
         ],
         "snippet": "✨ Build With Shari"
       },
       {
-        "line": 554,
+        "line": 559,
         "emojis": [
           "💾"
         ],
         "snippet": "💾 Save as Template"
       },
       {
-        "line": 561,
+        "line": 566,
         "emojis": [
           "📁"
         ],
         "snippet": "📁 Add to Project"
       },
       {
-        "line": 575,
+        "line": 580,
         "emojis": [
           "📋"
         ],
         "snippet": "📋 Copy"
       },
       {
-        "line": 583,
+        "line": 588,
         "emojis": [
           "🔄"
         ],
@@ -1516,7 +1371,7 @@
     ],
     "components/companion/FocusAudioPanel.tsx": [
       {
-        "line": 169,
+        "line": 179,
         "emojis": [
           "✕"
         ],
@@ -1670,30 +1525,6 @@
         "snippet": "[\"Comedy 😂\", \"Drama 🎭\"],"
       }
     ],
-    "components/companion/GamesPanel.tsx": [
-      {
-        "line": 24,
-        "emojis": [
-          "🎯",
-          "😊"
-        ],
-        "snippet": "🎯 Helps with: {game.helpsWith} · ⏱ {game.time} · 😊 Energy:{\" \"}"
-      },
-      {
-        "line": 148,
-        "emojis": [
-          "🎉"
-        ],
-        "snippet": "<p className=\"text-3xl\">🎉</p>"
-      },
-      {
-        "line": 266,
-        "emojis": [
-          "🎲"
-        ],
-        "snippet": "Surprise me 🎲"
-      }
-    ],
     "components/companion/GettingToKnowYouPanel.tsx": [
       {
         "line": 277,
@@ -1716,34 +1547,6 @@
       }
     ],
     "components/companion/GrowthCenterPanel.tsx": [
-      {
-        "line": 39,
-        "emojis": [
-          "🏆"
-        ],
-        "snippet": "emoji: \"🏆\","
-      },
-      {
-        "line": 47,
-        "emojis": [
-          "📈"
-        ],
-        "snippet": "emoji: \"📈\","
-      },
-      {
-        "line": 55,
-        "emojis": [
-          "✨"
-        ],
-        "snippet": "emoji: \"✨\","
-      },
-      {
-        "line": 63,
-        "emojis": [
-          "🌱"
-        ],
-        "snippet": "emoji: \"🌱\","
-      },
       {
         "line": 141,
         "emojis": [
@@ -1777,28 +1580,28 @@
     ],
     "components/companion/GrowthSectionHeader.tsx": [
       {
-        "line": 96,
+        "line": 103,
         "emojis": [
           "🖨"
         ],
         "snippet": "🖨 Print"
       },
       {
-        "line": 104,
+        "line": 111,
         "emojis": [
           "📄"
         ],
         "snippet": "📄 Export PDF"
       },
       {
-        "line": 135,
+        "line": 142,
         "emojis": [
           "📎"
         ],
         "snippet": "📎 Attach File"
       },
       {
-        "line": 142,
+        "line": 149,
         "emojis": [
           "🖼"
         ],
@@ -1816,35 +1619,35 @@
     ],
     "components/companion/hospitality/CompanionDirectorsStudio.tsx": [
       {
-        "line": 353,
+        "line": 355,
         "emojis": [
           "🎬"
         ],
         "snippet": "🎬 Prepare the Home"
       },
       {
-        "line": 356,
+        "line": 358,
         "emojis": [
           "🎲"
         ],
         "snippet": "🎲 Surprise Me"
       },
       {
-        "line": 359,
+        "line": 361,
         "emojis": [
           "📸"
         ],
         "snippet": "📸 Save Scene"
       },
       {
-        "line": 365,
+        "line": 367,
         "emojis": [
           "📋"
         ],
         "snippet": "📋 Export"
       },
       {
-        "line": 405,
+        "line": 407,
         "emojis": [
           "✔",
           "✕"
@@ -1879,14 +1682,14 @@
     ],
     "components/companion/HowDoIPanel.tsx": [
       {
-        "line": 206,
+        "line": 208,
         "emojis": [
           "📖"
         ],
         "snippet": "<span aria-hidden=\"true\">📖 </span>"
       },
       {
-        "line": 221,
+        "line": 223,
         "emojis": [
           "🔍"
         ],
@@ -2216,21 +2019,6 @@
           "🔍"
         ],
         "snippet": "placeholder=\"🔍 Search\""
-      },
-      {
-        "line": 342,
-        "emojis": [
-          "🛠",
-          "️"
-        ],
-        "snippet": "emoji=\"🛠️\""
-      },
-      {
-        "line": 363,
-        "emojis": [
-          "📂"
-        ],
-        "snippet": "emoji=\"📂\""
       }
     ],
     "components/companion/OperationalDashboard.tsx": [
@@ -2460,36 +2248,6 @@
         "snippet": "✕"
       }
     ],
-    "components/companion/ProjectsPanel.tsx": [
-      {
-        "line": 708,
-        "emojis": [
-          "📁"
-        ],
-        "snippet": "emoji: \"📁\","
-      },
-      {
-        "line": 715,
-        "emojis": [
-          "📚"
-        ],
-        "snippet": "emoji: \"📚\","
-      },
-      {
-        "line": 722,
-        "emojis": [
-          "🎯"
-        ],
-        "snippet": "emoji: \"🎯\","
-      },
-      {
-        "line": 729,
-        "emojis": [
-          "🧠"
-        ],
-        "snippet": "emoji: \"🧠\","
-      }
-    ],
     "components/companion/RefineActions.tsx": [
       {
         "line": 12,
@@ -2538,63 +2296,6 @@
       }
     ],
     "components/companion/SavedBrowsePanel.tsx": [
-      {
-        "line": 30,
-        "emojis": [
-          "💡"
-        ],
-        "snippet": "{ id: \"visual-thinking\", label: \"Visual Thinking\", emoji: \"💡\" },"
-      },
-      {
-        "line": 31,
-        "emojis": [
-          "📁"
-        ],
-        "snippet": "{ id: \"projects\", label: \"Projects\", emoji: \"📁\" },"
-      },
-      {
-        "line": 32,
-        "emojis": [
-          "🎯"
-        ],
-        "snippet": "{ id: \"strategies\", label: \"Strategies\", emoji: \"🎯\" },"
-      },
-      {
-        "line": 33,
-        "emojis": [
-          "📋"
-        ],
-        "snippet": "{ id: \"templates\", label: \"Templates\", emoji: \"📋\" },"
-      },
-      {
-        "line": 34,
-        "emojis": [
-          "📄"
-        ],
-        "snippet": "{ id: \"documents\", label: \"Documents\", emoji: \"📄\" },"
-      },
-      {
-        "line": 35,
-        "emojis": [
-          "🧭"
-        ],
-        "snippet": "{ id: \"decision-compass\", label: \"Decision Compass\", emoji: \"🧭\" },"
-      },
-      {
-        "line": 36,
-        "emojis": [
-          "✂",
-          "️"
-        ],
-        "snippet": "{ id: \"snippets\", label: \"Snippets\", emoji: \"✂️\" },"
-      },
-      {
-        "line": 37,
-        "emojis": [
-          "📝"
-        ],
-        "snippet": "{ id: \"sops\", label: \"SOPs\", emoji: \"📝\" },"
-      },
       {
         "line": 139,
         "emojis": [
@@ -2647,15 +2348,6 @@
           "🖨"
         ],
         "snippet": "🖨 Print"
-      }
-    ],
-    "components/companion/SavedWorkLibrary.tsx": [
-      {
-        "line": 297,
-        "emojis": [
-          "📂"
-        ],
-        "snippet": "<p className=\"text-2xl font-semibold text-[#1f1c19]\">📂 Saved Work</p>"
       }
     ],
     "components/companion/ScoreActions.tsx": [
@@ -2937,103 +2629,18 @@
     ],
     "components/companion/StrategiesPanel.tsx": [
       {
-        "line": 828,
+        "line": 837,
         "emojis": [
           "✨"
         ],
         "snippet": "✨ Recommended for you"
       },
       {
-        "line": 868,
+        "line": 877,
         "emojis": [
           "📌"
         ],
         "snippet": "📌 Saved Strategies"
-      },
-      {
-        "line": 1302,
-        "emojis": [
-          "🧠"
-        ],
-        "snippet": "\"brain-dump\": { label: \"Clear My Mind\", emoji: \"🧠\" },"
-      },
-      {
-        "line": 1303,
-        "emojis": [
-          "🎯"
-        ],
-        "snippet": "\"focus-timer\": { label: \"Focus Session\", emoji: \"🎯\" },"
-      },
-      {
-        "line": 1304,
-        "emojis": [
-          "🌿"
-        ],
-        "snippet": "breathe: { label: \"Breathe & Reset\", emoji: \"🌿\" },"
-      },
-      {
-        "line": 1305,
-        "emojis": [
-          "💬"
-        ],
-        "snippet": "energy: { label: \"How Are You Feeling Today?\", emoji: \"💬\" },"
-      },
-      {
-        "line": 1306,
-        "emojis": [
-          "📁"
-        ],
-        "snippet": "projects: { label: \"Projects\", emoji: \"📁\" },"
-      },
-      {
-        "line": 1307,
-        "emojis": [
-          "🎡"
-        ],
-        "snippet": "\"spin-wheel\": { label: \"Spin the Wheel\", emoji: \"🎡\" },"
-      },
-      {
-        "line": 1308,
-        "emojis": [
-          "📅"
-        ],
-        "snippet": "\"time-block\": { label: \"Time Block\", emoji: \"📅\" },"
-      },
-      {
-        "line": 1309,
-        "emojis": [
-          "✨"
-        ],
-        "snippet": "\"content-generator\": { label: \"Create\", emoji: \"✨\" },"
-      },
-      {
-        "line": 1310,
-        "emojis": [
-          "✉",
-          "️"
-        ],
-        "snippet": "\"email-generator\": { label: \"Email Generator\", emoji: \"✉️\" },"
-      },
-      {
-        "line": 1311,
-        "emojis": [
-          "📋"
-        ],
-        "snippet": "snippets: { label: \"Snippets\", emoji: \"📋\" },"
-      },
-      {
-        "line": 1312,
-        "emojis": [
-          "📄"
-        ],
-        "snippet": "\"templates-library\": { label: \"Templates\", emoji: \"📄\" },"
-      },
-      {
-        "line": 1313,
-        "emojis": [
-          "💬"
-        ],
-        "snippet": "home: { label: \"Chat with Shari\", emoji: \"💬\" },"
       }
     ],
     "components/companion/TemplatesLibrary.tsx": [
@@ -3176,66 +2783,6 @@
           "⚡"
         ],
         "snippet": "⚡ Resume Your Flow"
-      }
-    ],
-    "components/companion/TopBar.tsx": [
-      {
-        "line": 142,
-        "emojis": [
-          "💬"
-        ],
-        "snippet": "<span aria-hidden=\"true\">💬</span>"
-      },
-      {
-        "line": 160,
-        "emojis": [
-          "💬"
-        ],
-        "snippet": "<span>💬</span>"
-      },
-      {
-        "line": 172,
-        "emojis": [
-          "🌅"
-        ],
-        "snippet": "<span>🌅</span>"
-      },
-      {
-        "line": 234,
-        "emojis": [
-          "🧠"
-        ],
-        "snippet": "emoji=\"🧠\""
-      },
-      {
-        "line": 242,
-        "emojis": [
-          "📅"
-        ],
-        "snippet": "emoji=\"📅\""
-      },
-      {
-        "line": 251,
-        "emojis": [
-          "🌤",
-          "️"
-        ],
-        "snippet": "emoji=\"🌤️\""
-      },
-      {
-        "line": 289,
-        "emojis": [
-          "⚙",
-          "️"
-        ],
-        "snippet": "⚙️ Settings"
-      },
-      {
-        "line": 297,
-        "emojis": [
-          "👤"
-        ],
-        "snippet": "👤 Profile"
       }
     ],
     "components/companion/VisualColorModePicker.tsx": [
@@ -3924,141 +3471,6 @@
         "snippet": "• Chat Workspace: Top bar 💬 → New Chat (fresh conversation) or New Day's Chat (fresh daily start + "
       }
     ],
-    "lib/appFeatureNavigation.ts": [
-      {
-        "line": 169,
-        "emojis": [
-          "⚙",
-          "️"
-        ],
-        "snippet": "emoji: \"⚙️\","
-      },
-      {
-        "line": 180,
-        "emojis": [
-          "🛠"
-        ],
-        "snippet": "emoji: \"🛠\","
-      }
-    ],
-    "lib/appReferences.ts": [
-      {
-        "line": 23,
-        "emojis": [
-          "🧠"
-        ],
-        "snippet": "emoji: \"🧠\","
-      },
-      {
-        "line": 29,
-        "emojis": [
-          "️"
-        ],
-        "snippet": "emoji: \"🅿️\","
-      },
-      {
-        "line": 35,
-        "emojis": [
-          "🛡",
-          "️"
-        ],
-        "snippet": "emoji: \"🛡️\","
-      },
-      {
-        "line": 41,
-        "emojis": [
-          "🎡"
-        ],
-        "snippet": "emoji: \"🎡\","
-      },
-      {
-        "line": 47,
-        "emojis": [
-          "🎯"
-        ],
-        "snippet": "emoji: \"🎯\","
-      },
-      {
-        "line": 53,
-        "emojis": [
-          "📅"
-        ],
-        "snippet": "emoji: \"📅\","
-      },
-      {
-        "line": 59,
-        "emojis": [
-          "🌿"
-        ],
-        "snippet": "emoji: \"🌿\","
-      },
-      {
-        "line": 65,
-        "emojis": [
-          "📁"
-        ],
-        "snippet": "emoji: \"📁\","
-      }
-    ],
-    "lib/assistedActionBridge.ts": [
-      {
-        "line": 71,
-        "emojis": [
-          "📄"
-        ],
-        "snippet": "emoji: \"📄\","
-      },
-      {
-        "line": 92,
-        "emojis": [
-          "✉",
-          "️"
-        ],
-        "snippet": "emoji: \"✉️\","
-      },
-      {
-        "line": 112,
-        "emojis": [
-          "📱"
-        ],
-        "snippet": "emoji: \"📱\","
-      },
-      {
-        "line": 129,
-        "emojis": [
-          "📋"
-        ],
-        "snippet": "emoji: \"📋\","
-      },
-      {
-        "line": 150,
-        "emojis": [
-          "📞"
-        ],
-        "snippet": "emoji: \"📞\","
-      },
-      {
-        "line": 169,
-        "emojis": [
-          "🧠"
-        ],
-        "snippet": "emoji: \"🧠\","
-      },
-      {
-        "line": 187,
-        "emojis": [
-          "📁"
-        ],
-        "snippet": "emoji: \"📁\","
-      },
-      {
-        "line": 202,
-        "emojis": [
-          "📅"
-        ],
-        "snippet": "emoji: \"📅\","
-      }
-    ],
     "lib/audioPlaylists.ts": [
       {
         "line": 16,
@@ -4579,6 +3991,229 @@
         "snippet": "emoji: \"🌧️\","
       }
     ],
+    "lib/companionObjects/companionObjectRegistry.ts": [
+      {
+        "line": 35,
+        "emojis": [
+          "🧠"
+        ],
+        "snippet": "replacesEmoji: \"🧠\","
+      },
+      {
+        "line": 45,
+        "emojis": [
+          "🙂"
+        ],
+        "snippet": "replacesEmoji: \"🙂\","
+      },
+      {
+        "line": 55,
+        "emojis": [
+          "📅"
+        ],
+        "snippet": "replacesEmoji: \"📅\","
+      },
+      {
+        "line": 65,
+        "emojis": [
+          "🧭"
+        ],
+        "snippet": "replacesEmoji: \"🧭\","
+      },
+      {
+        "line": 75,
+        "emojis": [
+          "🎧"
+        ],
+        "snippet": "replacesEmoji: \"🎧\","
+      },
+      {
+        "line": 85,
+        "emojis": [
+          "🌬",
+          "️"
+        ],
+        "snippet": "replacesEmoji: \"🌬️\","
+      },
+      {
+        "line": 95,
+        "emojis": [
+          "🎲"
+        ],
+        "snippet": "replacesEmoji: \"🎲\","
+      },
+      {
+        "line": 105,
+        "emojis": [
+          "🎨"
+        ],
+        "snippet": "replacesEmoji: \"🎨\","
+      },
+      {
+        "line": 115,
+        "emojis": [
+          "📈"
+        ],
+        "snippet": "replacesEmoji: \"📈\","
+      },
+      {
+        "line": 125,
+        "emojis": [
+          "📚"
+        ],
+        "snippet": "replacesEmoji: \"📚\","
+      },
+      {
+        "line": 135,
+        "emojis": [
+          "📖"
+        ],
+        "snippet": "replacesEmoji: \"📖\","
+      },
+      {
+        "line": 145,
+        "emojis": [
+          "📝"
+        ],
+        "snippet": "replacesEmoji: \"📝\","
+      },
+      {
+        "line": 155,
+        "emojis": [
+          "📊"
+        ],
+        "snippet": "replacesEmoji: \"📊\","
+      },
+      {
+        "line": 165,
+        "emojis": [
+          "🏆"
+        ],
+        "snippet": "replacesEmoji: \"🏆\","
+      },
+      {
+        "line": 175,
+        "emojis": [
+          "🌱"
+        ],
+        "snippet": "replacesEmoji: \"🌱\","
+      },
+      {
+        "line": 185,
+        "emojis": [
+          "🗓",
+          "️"
+        ],
+        "snippet": "replacesEmoji: \"🗓️\","
+      },
+      {
+        "line": 195,
+        "emojis": [
+          "📁"
+        ],
+        "snippet": "replacesEmoji: \"📁\","
+      },
+      {
+        "line": 205,
+        "emojis": [
+          "💬"
+        ],
+        "snippet": "replacesEmoji: \"💬\","
+      },
+      {
+        "line": 215,
+        "emojis": [
+          "⚙",
+          "️"
+        ],
+        "snippet": "replacesEmoji: \"⚙️\","
+      },
+      {
+        "line": 225,
+        "emojis": [
+          "🔍"
+        ],
+        "snippet": "replacesEmoji: \"🔍\","
+      },
+      {
+        "line": 235,
+        "emojis": [
+          "🔔"
+        ],
+        "snippet": "replacesEmoji: \"🔔\","
+      },
+      {
+        "line": 245,
+        "emojis": [
+          "❓"
+        ],
+        "snippet": "replacesEmoji: \"❓\","
+      },
+      {
+        "line": 256,
+        "emojis": [
+          "🎯"
+        ],
+        "snippet": "replacesEmoji: \"🎯\","
+      },
+      {
+        "line": 266,
+        "emojis": [
+          "🎡"
+        ],
+        "snippet": "replacesEmoji: \"🎡\","
+      },
+      {
+        "line": 276,
+        "emojis": [
+          "📋"
+        ],
+        "snippet": "replacesEmoji: \"📋\","
+      },
+      {
+        "line": 286,
+        "emojis": [
+          "📂"
+        ],
+        "snippet": "replacesEmoji: \"📂\","
+      },
+      {
+        "line": 296,
+        "emojis": [
+          "📚"
+        ],
+        "snippet": "replacesEmoji: \"📚\","
+      },
+      {
+        "line": 306,
+        "emojis": [
+          "🧩"
+        ],
+        "snippet": "replacesEmoji: \"🧩\","
+      },
+      {
+        "line": 316,
+        "emojis": [
+          "✉",
+          "️"
+        ],
+        "snippet": "replacesEmoji: \"✉️\","
+      },
+      {
+        "line": 326,
+        "emojis": [
+          "✨"
+        ],
+        "snippet": "replacesEmoji: \"✨\","
+      },
+      {
+        "line": 336,
+        "emojis": [
+          "🎉"
+        ],
+        "snippet": "replacesEmoji: \"🎉\","
+      }
+    ],
     "lib/companionPrompt.ts": [
       {
         "line": 265,
@@ -4796,271 +4431,562 @@
         "snippet": "\"avoids complexity\": \"🧩\","
       }
     ],
-    "lib/companionToolSuggestions.ts": [
+    "lib/companionUniverse/libraries/objectLibrary.ts": [
       {
-        "line": 117,
-        "emojis": [
-          "⚡"
-        ],
-        "snippet": "toolEmoji: \"⚡\","
-      },
-      {
-        "line": 129,
+        "line": 84,
         "emojis": [
           "🧠"
         ],
-        "snippet": "toolEmoji: \"🧠\","
+        "snippet": "currentEmoji: \"🧠\","
       },
       {
-        "line": 141,
+        "line": 91,
         "emojis": [
-          "🌿"
+          "🧠"
         ],
-        "snippet": "toolEmoji: \"🌿\","
+        "snippet": "notes: \"Primary brain-dump workspace. Replaces 🧠 across top bar, sidebar, strategies, stress routin"
       },
       {
-        "line": 153,
+        "line": 96,
         "emojis": [
-          "🎯"
+          "📅"
         ],
-        "snippet": "toolEmoji: \"🎯\","
+        "snippet": "currentEmoji: \"📅\","
+      },
+      {
+        "line": 108,
+        "emojis": [
+          "🙂"
+        ],
+        "snippet": "currentEmoji: \"🙂\","
+      },
+      {
+        "line": 115,
+        "emojis": [
+          "🌤",
+          "️"
+        ],
+        "snippet": "notes: \"Also represented as 🌤️ in top bar today — unify to one object.\","
+      },
+      {
+        "line": 120,
+        "emojis": [
+          "🧭"
+        ],
+        "snippet": "currentEmoji: \"🧭\","
+      },
+      {
+        "line": 131,
+        "emojis": [
+          "🎧"
+        ],
+        "snippet": "currentEmoji: \"🎧\","
+      },
+      {
+        "line": 142,
+        "emojis": [
+          "🌬",
+          "️"
+        ],
+        "snippet": "currentEmoji: \"🌬️\","
+      },
+      {
+        "line": 154,
+        "emojis": [
+          "🎲"
+        ],
+        "snippet": "currentEmoji: \"🎲\","
       },
       {
         "line": 165,
         "emojis": [
-          "🎡"
+          "🎨"
         ],
-        "snippet": "toolEmoji: \"🎡\","
+        "snippet": "currentEmoji: \"🎨\","
       },
       {
         "line": 177,
         "emojis": [
-          "🚶"
-        ],
-        "snippet": "toolEmoji: \"🚶\","
-      }
-    ],
-    "lib/companionUi.ts": [
-      {
-        "line": 97,
-        "emojis": [
-          "💬"
-        ],
-        "snippet": "{ id: \"chat\", label: \"Chat\", emoji: \"💬\", mode: \"today\" },"
-      },
-      {
-        "line": 98,
-        "emojis": [
-          "🚧"
-        ],
-        "snippet": "{ id: \"focus\", label: \"Focus My Brain\", emoji: \"🚧\", mode: \"focus\" },"
-      },
-      {
-        "line": 99,
-        "emojis": [
-          "💡"
-        ],
-        "snippet": "{ id: \"visual-thinking\", label: \"Visual Thinking\", emoji: \"💡\" },"
-      },
-      {
-        "line": 100,
-        "emojis": [
           "📈"
         ],
-        "snippet": "{ id: \"growth\", label: \"Growth\", emoji: \"📈\" },"
+        "snippet": "currentEmoji: \"📈\","
       },
       {
-        "line": 101,
+        "line": 188,
         "emojis": [
-          "➕"
+          "📚"
         ],
-        "snippet": "{ id: \"other\", label: \"Other\", emoji: \"➕\" },"
-      },
-      {
-        "line": 102,
-        "emojis": [
-          "❓"
-        ],
-        "snippet": "{ id: \"how-do-i\", label: \"How Do I...?\", emoji: \"❓\" },"
-      },
-      {
-        "line": 195,
-        "emojis": [
-          "🧠"
-        ],
-        "snippet": "{ id: \"brain-dump\", label: \"Clear My Mind\", emoji: \"🧠\" },"
-      },
-      {
-        "line": 197,
-        "emojis": [
-          "💬"
-        ],
-        "snippet": "{ id: \"reset-day\", label: \"New Chat\", emoji: \"💬\" },"
-      },
-      {
-        "line": 198,
-        "emojis": [
-          "🌬"
-        ],
-        "snippet": "{ id: \"breathe\", label: \"Breathe\", emoji: \"🌬\" },"
+        "snippet": "currentEmoji: \"📚\","
       },
       {
         "line": 199,
         "emojis": [
-          "🎤"
+          "📖"
         ],
-        "snippet": "{ id: \"voice\", label: \"Voice\", emoji: \"🎤\" },"
+        "snippet": "currentEmoji: \"📖\","
       },
       {
-        "line": 233,
-        "emojis": [
-          "🧠"
-        ],
-        "snippet": "emoji: \"🧠\","
-      },
-      {
-        "line": 240,
-        "emojis": [
-          "🧰"
-        ],
-        "snippet": "emoji: \"🧰\","
-      },
-      {
-        "line": 246,
-        "emojis": [
-          "🎧"
-        ],
-        "snippet": "emoji: \"🎧\","
-      },
-      {
-        "line": 253,
-        "emojis": [
-          "🌬"
-        ],
-        "snippet": "emoji: \"🌬\","
-      }
-    ],
-    "lib/companionUniverse/companionLayoutSystem.ts": [
-      {
-        "line": 295,
-        "emojis": [
-          "🏡"
-        ],
-        "snippet": "emoji: \"🏡\","
-      },
-      {
-        "line": 303,
-        "emojis": [
-          "🪟"
-        ],
-        "snippet": "emoji: \"🪟\","
-      },
-      {
-        "line": 312,
-        "emojis": [
-          "🍵"
-        ],
-        "snippet": "emoji: \"🍵\","
-      },
-      {
-        "line": 320,
+        "line": 210,
         "emojis": [
           "📝"
         ],
-        "snippet": "emoji: \"📝\","
+        "snippet": "currentEmoji: \"📝\","
       },
       {
-        "line": 329,
-        "emojis": [
-          "🎯"
-        ],
-        "snippet": "emoji: \"🎯\","
-      },
-      {
-        "line": 337,
-        "emojis": [
-          "🎨"
-        ],
-        "snippet": "emoji: \"🎨\","
-      },
-      {
-        "line": 345,
-        "emojis": [
-          "💼"
-        ],
-        "snippet": "emoji: \"💼\","
-      },
-      {
-        "line": 353,
-        "emojis": [
-          "📚"
-        ],
-        "snippet": "emoji: \"📚\","
-      },
-      {
-        "line": 390,
-        "emojis": [
-          "💬"
-        ],
-        "snippet": "emoji: \"💬\","
-      },
-      {
-        "line": 398,
-        "emojis": [
-          "🔍"
-        ],
-        "snippet": "emoji: \"🔍\","
-      },
-      {
-        "line": 406,
-        "emojis": [
-          "💭"
-        ],
-        "snippet": "emoji: \"💭\","
-      },
-      {
-        "line": 414,
+        "line": 216,
         "emojis": [
           "️"
         ],
-        "snippet": "emoji: \"🅿️\","
+        "snippet": "notes: \"Deferred ideas — also 🅿️ in toolbelt; unify both.\","
       },
       {
-        "line": 421,
+        "line": 227,
+        "emojis": [
+          "📈"
+        ],
+        "snippet": "notes: \"Also 📈 in growth cards — map both emoji usages here.\","
+      },
+      {
+        "line": 232,
+        "emojis": [
+          "🏆"
+        ],
+        "snippet": "currentEmoji: \"🏆\","
+      },
+      {
+        "line": 244,
+        "emojis": [
+          "🌱"
+        ],
+        "snippet": "currentEmoji: \"🌱\","
+      },
+      {
+        "line": 258,
+        "emojis": [
+          "🗓",
+          "️"
+        ],
+        "snippet": "currentEmoji: \"🗓️\","
+      },
+      {
+        "line": 268,
         "emojis": [
           "📁"
         ],
-        "snippet": "emoji: \"📁\","
+        "snippet": "currentEmoji: \"📁\","
       },
       {
-        "line": 430,
+        "line": 278,
         "emojis": [
-          "📋"
+          "💬"
         ],
-        "snippet": "emoji: \"📋\","
+        "snippet": "currentEmoji: \"💬\","
       },
       {
-        "line": 438,
+        "line": 288,
         "emojis": [
           "⚙",
           "️"
         ],
-        "snippet": "emoji: \"⚙️\","
+        "snippet": "currentEmoji: \"⚙️\","
       },
       {
-        "line": 446,
+        "line": 298,
+        "emojis": [
+          "🔍"
+        ],
+        "snippet": "currentEmoji: \"🔍\","
+      },
+      {
+        "line": 308,
+        "emojis": [
+          "🔔"
+        ],
+        "snippet": "currentEmoji: \"🔔\","
+      },
+      {
+        "line": 318,
+        "emojis": [
+          "❓"
+        ],
+        "snippet": "currentEmoji: \"❓\","
+      },
+      {
+        "line": 330,
+        "emojis": [
+          "🏡"
+        ],
+        "snippet": "currentEmoji: \"🏡\","
+      },
+      {
+        "line": 340,
+        "emojis": [
+          "🎯"
+        ],
+        "snippet": "currentEmoji: \"🎯\","
+      },
+      {
+        "line": 350,
+        "emojis": [
+          "🍵"
+        ],
+        "snippet": "currentEmoji: \"🍵\","
+      },
+      {
+        "line": 361,
+        "emojis": [
+          "🪟"
+        ],
+        "snippet": "currentEmoji: \"🪟\","
+      },
+      {
+        "line": 371,
+        "emojis": [
+          "📝"
+        ],
+        "snippet": "currentEmoji: \"📝\","
+      },
+      {
+        "line": 383,
+        "emojis": [
+          "💬"
+        ],
+        "snippet": "currentEmoji: \"💬\","
+      },
+      {
+        "line": 393,
+        "emojis": [
+          "💭"
+        ],
+        "snippet": "currentEmoji: \"💭\","
+      },
+      {
+        "line": 403,
+        "emojis": [
+          "📋"
+        ],
+        "snippet": "currentEmoji: \"📋\","
+      },
+      {
+        "line": 413,
         "emojis": [
           "💾"
         ],
-        "snippet": "emoji: \"💾\","
+        "snippet": "currentEmoji: \"💾\","
       },
       {
-        "line": 454,
+        "line": 423,
         "emojis": [
           "✂",
           "️"
         ],
-        "snippet": "emoji: \"✂️\","
+        "snippet": "currentEmoji: \"✂️\","
+      },
+      {
+        "line": 435,
+        "emojis": [
+          "💬"
+        ],
+        "snippet": "currentEmoji: \"💬\","
+      },
+      {
+        "line": 445,
+        "emojis": [
+          "💡"
+        ],
+        "snippet": "currentEmoji: \"💡\","
+      },
+      {
+        "line": 455,
+        "emojis": [
+          "🚧"
+        ],
+        "snippet": "currentEmoji: \"🚧\","
+      },
+      {
+        "line": 465,
+        "emojis": [
+          "➕"
+        ],
+        "snippet": "currentEmoji: \"➕\","
+      },
+      {
+        "line": 475,
+        "emojis": [
+          "👤"
+        ],
+        "snippet": "currentEmoji: \"👤\","
+      },
+      {
+        "line": 487,
+        "emojis": [
+          "✨"
+        ],
+        "snippet": "currentEmoji: \"✨\","
+      },
+      {
+        "line": 493,
+        "emojis": [
+          "🌟"
+        ],
+        "snippet": "notes: \"Confidence vault / highlights — also 🌟 in articles.\","
+      },
+      {
+        "line": 498,
+        "emojis": [
+          "🌿"
+        ],
+        "snippet": "currentEmoji: \"🌿\","
+      },
+      {
+        "line": 508,
+        "emojis": [
+          "📖"
+        ],
+        "snippet": "currentEmoji: \"📖\","
+      },
+      {
+        "line": 518,
+        "emojis": [
+          "🎯"
+        ],
+        "snippet": "currentEmoji: \"🎯\","
+      },
+      {
+        "line": 540,
+        "emojis": [
+          "🎵"
+        ],
+        "snippet": "currentEmoji: \"🎵\","
+      },
+      {
+        "line": 550,
+        "emojis": [
+          "🎡"
+        ],
+        "snippet": "currentEmoji: \"🎡\","
+      },
+      {
+        "line": 560,
+        "emojis": [
+          "🎤"
+        ],
+        "snippet": "currentEmoji: \"🎤\","
+      },
+      {
+        "line": 570,
+        "emojis": [
+          "🛡",
+          "️"
+        ],
+        "snippet": "currentEmoji: \"🛡️\","
+      },
+      {
+        "line": 582,
+        "emojis": [
+          "✉",
+          "️"
+        ],
+        "snippet": "currentEmoji: \"✉️\","
+      },
+      {
+        "line": 592,
+        "emojis": [
+          "📄"
+        ],
+        "snippet": "currentEmoji: \"📄\","
+      },
+      {
+        "line": 602,
+        "emojis": [
+          "✨"
+        ],
+        "snippet": "currentEmoji: \"✨\","
+      },
+      {
+        "line": 612,
+        "emojis": [
+          "📝"
+        ],
+        "snippet": "currentEmoji: \"📝\","
+      },
+      {
+        "line": 624,
+        "emojis": [
+          "🏠"
+        ],
+        "snippet": "currentEmoji: \"🏠\","
+      },
+      {
+        "line": 634,
+        "emojis": [
+          "📝"
+        ],
+        "snippet": "currentEmoji: \"📝\","
+      },
+      {
+        "line": 644,
+        "emojis": [
+          "📘"
+        ],
+        "snippet": "currentEmoji: \"📘\","
+      },
+      {
+        "line": 654,
+        "emojis": [
+          "👤"
+        ],
+        "snippet": "currentEmoji: \"👤\","
+      },
+      {
+        "line": 666,
+        "emojis": [
+          "🗺",
+          "️"
+        ],
+        "snippet": "currentEmoji: \"🗺️\","
+      },
+      {
+        "line": 676,
+        "emojis": [
+          "🎨"
+        ],
+        "snippet": "currentEmoji: \"🎨\","
+      },
+      {
+        "line": 688,
+        "emojis": [
+          "🧠"
+        ],
+        "snippet": "currentEmoji: \"🧠\","
+      },
+      {
+        "line": 698,
+        "emojis": [
+          "⚡"
+        ],
+        "snippet": "currentEmoji: \"⚡\","
+      },
+      {
+        "line": 708,
+        "emojis": [
+          "💡"
+        ],
+        "snippet": "currentEmoji: \"💡\","
+      },
+      {
+        "line": 718,
+        "emojis": [
+          "🌴"
+        ],
+        "snippet": "currentEmoji: \"🌴\","
+      },
+      {
+        "line": 728,
+        "emojis": [
+          "🎉"
+        ],
+        "snippet": "currentEmoji: \"🎉\","
+      },
+      {
+        "line": 740,
+        "emojis": [
+          "🎬"
+        ],
+        "snippet": "currentEmoji: \"🎬\","
+      },
+      {
+        "line": 750,
+        "emojis": [
+          "🎲"
+        ],
+        "snippet": "currentEmoji: \"🎲\","
+      },
+      {
+        "line": 760,
+        "emojis": [
+          "📸"
+        ],
+        "snippet": "currentEmoji: \"📸\","
+      },
+      {
+        "line": 772,
+        "emojis": [
+          "🌷"
+        ],
+        "snippet": "currentEmoji: \"🌷\","
+      },
+      {
+        "line": 784,
+        "emojis": [
+          "🍂"
+        ],
+        "snippet": "currentEmoji: \"🍂\","
+      },
+      {
+        "line": 796,
+        "emojis": [
+          "🫖"
+        ],
+        "snippet": "currentEmoji: \"🫖\","
+      },
+      {
+        "line": 807,
+        "emojis": [
+          "🎂"
+        ],
+        "snippet": "currentEmoji: \"🎂\","
+      },
+      {
+        "line": 817,
+        "emojis": [
+          "🚀"
+        ],
+        "snippet": "currentEmoji: \"🚀\","
+      },
+      {
+        "line": 827,
+        "emojis": [
+          "🌅"
+        ],
+        "snippet": "currentEmoji: \"🌅\","
+      },
+      {
+        "line": 839,
+        "emojis": [
+          "🌨",
+          "️"
+        ],
+        "snippet": "currentEmoji: \"🌨️\","
+      },
+      {
+        "line": 851,
+        "emojis": [
+          "🌧",
+          "️"
+        ],
+        "snippet": "currentEmoji: \"🌧️\","
+      },
+      {
+        "line": 865,
+        "emojis": [
+          "🌱"
+        ],
+        "snippet": "currentEmoji: \"🌱\","
+      },
+      {
+        "line": 875,
+        "emojis": [
+          "🌿"
+        ],
+        "snippet": "currentEmoji: \"🌿\","
+      },
+      {
+        "line": 885,
+        "emojis": [
+          "🔥"
+        ],
+        "snippet": "currentEmoji: \"🔥\","
       }
     ],
     "lib/companionValidationFramework.ts": [
@@ -5357,15 +5283,6 @@
           "🧠"
         ],
         "snippet": "emoji: \"🧠\","
-      }
-    ],
-    "lib/crossWorkspaceSuggestion.ts": [
-      {
-        "line": 34,
-        "emojis": [
-          "🛠"
-        ],
-        "snippet": "return WORKSPACE_EMOJI[section] ?? \"🛠\";"
       }
     ],
     "lib/decisionCanvasExport.ts": [
@@ -5814,22 +5731,6 @@
         "snippet": "win: \"🎉\","
       }
     ],
-    "lib/focusHub.ts": [
-      {
-        "line": 69,
-        "emojis": [
-          "🚧"
-        ],
-        "snippet": "emoji: \"🚧\","
-      },
-      {
-        "line": 107,
-        "emojis": [
-          "🌿"
-        ],
-        "snippet": "emoji: \"🌿\","
-      }
-    ],
     "lib/focusSession.ts": [
       {
         "line": 44,
@@ -5860,50 +5761,6 @@
         "snippet": "{ id: \"stuck\", label: \"Got stuck\", emoji: \"🧱\" },"
       }
     ],
-    "lib/focusToolDefinitions.ts": [
-      {
-        "line": 154,
-        "emojis": [
-          "⚡"
-        ],
-        "snippet": "emoji: \"⚡\","
-      },
-      {
-        "line": 162,
-        "emojis": [
-          "📌"
-        ],
-        "snippet": "emoji: \"📌\","
-      },
-      {
-        "line": 170,
-        "emojis": [
-          "🧠"
-        ],
-        "snippet": "emoji: \"🧠\","
-      },
-      {
-        "line": 178,
-        "emojis": [
-          "🛡"
-        ],
-        "snippet": "emoji: \"🛡\","
-      },
-      {
-        "line": 186,
-        "emojis": [
-          "🎯"
-        ],
-        "snippet": "emoji: \"🎯\","
-      },
-      {
-        "line": 194,
-        "emojis": [
-          "🧭"
-        ],
-        "snippet": "emoji: \"🧭\","
-      }
-    ],
     "lib/freshStartCopy.ts": [
       {
         "line": 34,
@@ -5925,30 +5782,6 @@
           "🔄"
         ],
         "snippet": "menuEmoji: \"🔄\","
-      }
-    ],
-    "lib/frictionlessActionLayer.ts": [
-      {
-        "line": 346,
-        "emojis": [
-          "🎧",
-          "🌿"
-        ],
-        "snippet": "toolEmoji: tool === \"focus-audio\" ? \"🎧\" : \"🌿\","
-      },
-      {
-        "line": 389,
-        "emojis": [
-          "🎧"
-        ],
-        "snippet": "toolEmoji: \"🎧\","
-      },
-      {
-        "line": 499,
-        "emojis": [
-          "🎧"
-        ],
-        "snippet": "toolEmoji: \"🎧\","
       }
     ],
     "lib/growthCenter.ts": [
@@ -6954,29 +6787,6 @@
         "snippet": "emoji: \"🖼️\","
       }
     ],
-    "lib/howDoIHelpBrowseStructure.ts": [
-      {
-        "line": 155,
-        "emojis": [
-          "🚀"
-        ],
-        "snippet": "emoji: \"🚀\","
-      },
-      {
-        "line": 163,
-        "emojis": [
-          "📚"
-        ],
-        "snippet": "emoji: \"📚\","
-      },
-      {
-        "line": 173,
-        "emojis": [
-          "🛠"
-        ],
-        "snippet": "emoji: \"🛠\","
-      }
-    ],
     "lib/howDoIHelpTypes.ts": [
       {
         "line": 54,
@@ -7165,265 +6975,39 @@
     ],
     "lib/momentumGames.ts": [
       {
-        "line": 39,
-        "emojis": [
-          "🧠"
-        ],
-        "snippet": "emoji: \"🧠\","
-      },
-      {
-        "line": 46,
-        "emojis": [
-          "⚡"
-        ],
-        "snippet": "emoji: \"⚡\","
-      },
-      {
-        "line": 53,
-        "emojis": [
-          "💡"
-        ],
-        "snippet": "emoji: \"💡\","
-      },
-      {
-        "line": 60,
-        "emojis": [
-          "🌴"
-        ],
-        "snippet": "emoji: \"🌴\","
-      },
-      {
-        "line": 67,
-        "emojis": [
-          "🎉"
-        ],
-        "snippet": "emoji: \"🎉\","
-      },
-      {
-        "line": 75,
+        "line": 77,
         "emojis": [
           "🧠"
         ],
         "snippet": "// 🧠 Focus & Attention"
       },
       {
-        "line": 79,
-        "emojis": [
-          "️"
-        ],
-        "snippet": "emoji: \"⏱️\","
-      },
-      {
-        "line": 99,
-        "emojis": [
-          "🔍"
-        ],
-        "snippet": "emoji: \"🔍\","
-      },
-      {
-        "line": 109,
-        "emojis": [
-          "🧩"
-        ],
-        "snippet": "emoji: \"🧩\","
-      },
-      {
-        "line": 119,
-        "emojis": [
-          "📦"
-        ],
-        "snippet": "emoji: \"📦\","
-      },
-      {
-        "line": 129,
-        "emojis": [
-          "🔢"
-        ],
-        "snippet": "emoji: \"🔢\","
-      },
-      {
-        "line": 146,
+        "line": 148,
         "emojis": [
           "⚡"
         ],
         "snippet": "// ⚡ Momentum & Action"
       },
       {
-        "line": 150,
-        "emojis": [
-          "👣"
-        ],
-        "snippet": "emoji: \"👣\","
-      },
-      {
-        "line": 160,
-        "emojis": [
-          "🎲"
-        ],
-        "snippet": "emoji: \"🎲\","
-      },
-      {
-        "line": 170,
-        "emojis": [
-          "⚡"
-        ],
-        "snippet": "emoji: \"⚡\","
-      },
-      {
-        "line": 180,
-        "emojis": [
-          "🎡"
-        ],
-        "snippet": "emoji: \"🎡\","
-      },
-      {
-        "line": 191,
-        "emojis": [
-          "🔀"
-        ],
-        "snippet": "emoji: \"🔀\","
-      },
-      {
-        "line": 201,
-        "emojis": [
-          "🏆"
-        ],
-        "snippet": "emoji: \"🏆\","
-      },
-      {
-        "line": 208,
+        "line": 210,
         "emojis": [
           "💡"
         ],
         "snippet": "// 💡 Creative Spark"
       },
       {
-        "line": 212,
-        "emojis": [
-          "🧠"
-        ],
-        "snippet": "emoji: \"🧠\","
-      },
-      {
-        "line": 222,
-        "emojis": [
-          "🔄"
-        ],
-        "snippet": "emoji: \"🔄\","
-      },
-      {
-        "line": 232,
-        "emojis": [
-          "✨"
-        ],
-        "snippet": "emoji: \"✨\","
-      },
-      {
-        "line": 242,
-        "emojis": [
-          "📖"
-        ],
-        "snippet": "emoji: \"📖\","
-      },
-      {
-        "line": 252,
-        "emojis": [
-          "🤔"
-        ],
-        "snippet": "emoji: \"🤔\","
-      },
-      {
-        "line": 262,
-        "emojis": [
-          "📝"
-        ],
-        "snippet": "emoji: \"📝\","
-      },
-      {
-        "line": 269,
+        "line": 271,
         "emojis": [
           "🌴"
         ],
         "snippet": "// 🌴 Mental Vacation"
       },
       {
-        "line": 273,
-        "emojis": [
-          "🎨"
-        ],
-        "snippet": "emoji: \"🎨\","
-      },
-      {
-        "line": 283,
-        "emojis": [
-          "👯"
-        ],
-        "snippet": "emoji: \"👯\","
-      },
-      {
-        "line": 293,
-        "emojis": [
-          "🔎"
-        ],
-        "snippet": "emoji: \"🔎\","
-      },
-      {
-        "line": 303,
-        "emojis": [
-          "👀"
-        ],
-        "snippet": "emoji: \"👀\","
-      },
-      {
-        "line": 313,
-        "emojis": [
-          "🗺",
-          "️"
-        ],
-        "snippet": "emoji: \"🗺️\","
-      },
-      {
-        "line": 320,
+        "line": 322,
         "emojis": [
           "🎉"
         ],
         "snippet": "// 🎉 Just For Fun"
-      },
-      {
-        "line": 324,
-        "emojis": [
-          "✍",
-          "️"
-        ],
-        "snippet": "emoji: \"✍️\","
-      },
-      {
-        "line": 334,
-        "emojis": [
-          "🧩"
-        ],
-        "snippet": "emoji: \"🧩\","
-      },
-      {
-        "line": 344,
-        "emojis": [
-          "😄"
-        ],
-        "snippet": "emoji: \"😄\","
-      },
-      {
-        "line": 354,
-        "emojis": [
-          "🎭"
-        ],
-        "snippet": "emoji: \"🎭\","
-      },
-      {
-        "line": 364,
-        "emojis": [
-          "🤷"
-        ],
-        "snippet": "emoji: \"🤷\","
       }
     ],
     "lib/onboardingExperienceContent.ts": [
@@ -7447,29 +7031,6 @@
           "🚀"
         ],
         "snippet": "emoji: \"🚀\","
-      }
-    ],
-    "lib/pendingAction.ts": [
-      {
-        "line": 97,
-        "emojis": [
-          "🛠"
-        ],
-        "snippet": "return WORKSPACE_EMOJI[action.offer.section] ?? \"🛠\";"
-      },
-      {
-        "line": 99,
-        "emojis": [
-          "📄"
-        ],
-        "snippet": "return \"📄\";"
-      },
-      {
-        "line": 109,
-        "emojis": [
-          "✨"
-        ],
-        "snippet": "return \"✨\";"
       }
     ],
     "lib/personalAwareness.ts": [
@@ -7654,15 +7215,6 @@
         "snippet": "links: { label: \"Links\", icon: \"🔗\" },"
       }
     ],
-    "lib/splitWorkspacePanel.ts": [
-      {
-        "line": 24,
-        "emojis": [
-          "🛠"
-        ],
-        "snippet": "return WORKSPACE_EMOJI[section] ?? \"🛠\";"
-      }
-    ],
     "lib/strategySystem.ts": [
       {
         "line": 27,
@@ -7822,52 +7374,6 @@
           "🧭"
         ],
         "snippet": "{ id: \"business-decisions\", group: \"business\", label: \"Decision Making\", emoji: \"🧭\", color: \"#2f4f7"
-      }
-    ],
-    "lib/stressRouting.ts": [
-      {
-        "line": 62,
-        "emojis": [
-          "🌬",
-          "️"
-        ],
-        "snippet": "{ id: \"breathe\", emoji: \"🌬️\", label: \"Breathing Exercise\" },"
-      },
-      {
-        "line": 63,
-        "emojis": [
-          "🎵"
-        ],
-        "snippet": "{ id: \"calm-audio\", emoji: \"🎵\", label: \"Calm Audio\" },"
-      },
-      {
-        "line": 64,
-        "emojis": [
-          "🧠"
-        ],
-        "snippet": "{ id: \"clear-mind\", emoji: \"🧠\", label: \"Clear My Mind\" },"
-      },
-      {
-        "line": 65,
-        "emojis": [
-          "🛡",
-          "️"
-        ],
-        "snippet": "{ id: \"safe-for-today\", emoji: \"🛡️\", label: \"Safe For Today\" },"
-      },
-      {
-        "line": 66,
-        "emojis": [
-          "💬"
-        ],
-        "snippet": "{ id: \"talk-through\", emoji: \"💬\", label: \"Talk It Through\" },"
-      },
-      {
-        "line": 263,
-        "emojis": [
-          "⚡"
-        ],
-        "snippet": "primary: { id: \"adjust-day\", emoji: \"⚡\", label: \"Today's Reality\" },"
       }
     ],
     "lib/suggestedGrowthMoments.ts": [
@@ -8653,170 +8159,6 @@
           "🌱"
         ],
         "snippet": "\"Part of 🌱 Growth alongside Wins, Evidence Bank, and My Journey.\","
-      }
-    ],
-    "lib/workspaceMode.ts": [
-      {
-        "line": 137,
-        "emojis": [
-          "📁"
-        ],
-        "snippet": "projects: \"📁\","
-      },
-      {
-        "line": 138,
-        "emojis": [
-          "🏠"
-        ],
-        "snippet": "\"my-work\": \"🏠\","
-      },
-      {
-        "line": 139,
-        "emojis": [
-          "✨"
-        ],
-        "snippet": "\"content-generator\": \"✨\","
-      },
-      {
-        "line": 140,
-        "emojis": [
-          "📝"
-        ],
-        "snippet": "\"google-workspace\": \"📝\","
-      },
-      {
-        "line": 141,
-        "emojis": [
-          "📚"
-        ],
-        "snippet": "\"templates-library\": \"📚\","
-      },
-      {
-        "line": 142,
-        "emojis": [
-          "📂"
-        ],
-        "snippet": "\"saved-work\": \"📂\","
-      },
-      {
-        "line": 143,
-        "emojis": [
-          "📘"
-        ],
-        "snippet": "playbook: \"📘\","
-      },
-      {
-        "line": 144,
-        "emojis": [
-          "🧠"
-        ],
-        "snippet": "\"brain-dump\": \"🧠\","
-      },
-      {
-        "line": 145,
-        "emojis": [
-          "📅"
-        ],
-        "snippet": "\"time-block\": \"📅\","
-      },
-      {
-        "line": 146,
-        "emojis": [
-          "✉",
-          "️"
-        ],
-        "snippet": "\"email-generator\": \"✉️\","
-      },
-      {
-        "line": 147,
-        "emojis": [
-          "📝"
-        ],
-        "snippet": "snippets: \"📝\","
-      },
-      {
-        "line": 148,
-        "emojis": [
-          "💼"
-        ],
-        "snippet": "\"business-profile\": \"💼\","
-      },
-      {
-        "line": 149,
-        "emojis": [
-          "👤"
-        ],
-        "snippet": "\"client-avatars\": \"👤\","
-      },
-      {
-        "line": 150,
-        "emojis": [
-          "🧭"
-        ],
-        "snippet": "\"decision-compass\": \"🧭\","
-      },
-      {
-        "line": 151,
-        "emojis": [
-          "📅"
-        ],
-        "snippet": "today: \"📅\","
-      },
-      {
-        "line": 152,
-        "emojis": [
-          "📋"
-        ],
-        "snippet": "\"plan-my-day\": \"📋\","
-      },
-      {
-        "line": 153,
-        "emojis": [
-          "🎨"
-        ],
-        "snippet": "\"visual-focus\": \"🎨\","
-      },
-      {
-        "line": 154,
-        "emojis": [
-          "🏆"
-        ],
-        "snippet": "\"wins-this-week\": \"🏆\","
-      },
-      {
-        "line": 155,
-        "emojis": [
-          "📈"
-        ],
-        "snippet": "\"evidence-bank\": \"📈\","
-      },
-      {
-        "line": 156,
-        "emojis": [
-          "🌱"
-        ],
-        "snippet": "growth: \"🌱\","
-      },
-      {
-        "line": 157,
-        "emojis": [
-          "🌟"
-        ],
-        "snippet": "\"confidence-vault\": \"🌟\","
-      },
-      {
-        "line": 158,
-        "emojis": [
-          "🌿"
-        ],
-        "snippet": "\"my-journey\": \"🌿\","
-      },
-      {
-        "line": 159,
-        "emojis": [
-          "🎧"
-        ],
-        "snippet": "\"focus-audio\": \"🎧\","
       }
     ],
     "lib/workspaceSopConversation.ts": [

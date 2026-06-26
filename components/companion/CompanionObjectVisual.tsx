@@ -1,6 +1,6 @@
 "use client";
 
-import { companionObjectById } from "@/lib/companionUniverse/libraries/objectLibrary";
+import { companionObjectById, companionObjectRoom } from "@/lib/companionObjects";
 
 export type CompanionObjectSize = "xs" | "sm" | "md" | "lg" | "card";
 
@@ -38,7 +38,7 @@ export function CompanionObjectVisual({
 }: CompanionObjectVisualProps) {
   const entry = companionObjectById(objectId);
   const motion =
-    animate ?? (entry?.motionCompatible === true && variant === "mini-scene");
+    animate ?? (variant === "mini-scene" && entry?.assetStatus === "placeholder");
 
   return (
     <span
@@ -52,9 +52,9 @@ export function CompanionObjectVisual({
         .filter(Boolean)
         .join(" ")}
       data-companion-object={objectId}
-      data-companion-room={entry?.room ?? "living-room"}
+      data-companion-room={companionObjectRoom(objectId)}
       role="img"
-      aria-label={label ?? entry?.signatureObject ?? objectId}
+      aria-label={label ?? entry?.objectName ?? entry?.label ?? objectId}
     />
   );
 }

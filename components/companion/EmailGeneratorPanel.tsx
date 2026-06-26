@@ -1,5 +1,7 @@
 "use client";
 
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+
 import { useState } from "react";
 import {
   createSnippet,
@@ -206,7 +208,10 @@ export function EmailGeneratorPanel({
 
   return (
     <div className="companion-fade-in mx-auto flex h-full max-w-2xl flex-col px-6 py-8">
-      <p className="text-2xl font-semibold text-[#1f1c19]">✉️ Email generator</p>
+      <p className="flex items-center gap-2 text-2xl font-semibold text-[#1f1c19]">
+        <CompanionObjectVisual objectId="email-generator" size="md" variant="icon" />
+        Email generator
+      </p>
       <p className="mt-1 text-base text-[#6b635a]">
         Pick what the email is for — I&apos;ll write a full package you can edit,
         save, and reuse.

@@ -8,6 +8,8 @@ import {
 import { compareDropdownLabels } from "@/lib/dropdownSort";
 import { CATEGORY_PICKER_EMPTY_LIST_HINT, NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { CategoryPickerSelect } from "@/components/companion/CategoryPickerSelect";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import { objectIdForEmoji } from "@/lib/companionObjects";
 
 export function CreateCatalogPicker({
   onSelect,
@@ -100,9 +102,11 @@ export function CreateCatalogPicker({
                       : "border-[#1e4f4f]/20 bg-white/85 hover:border-[#1e4f4f]/45 hover:bg-white"
                   } ${compact ? "py-2.5" : "py-3.5"}`}
                 >
-                  <span className={compact ? "text-xl" : "text-2xl"}>
-                    {item.emoji}
-                  </span>
+                  <CompanionObjectVisual
+                    objectId={objectIdForEmoji(item.emoji, "create")}
+                    size={compact ? "sm" : "md"}
+                    variant="icon"
+                  />
                   <span
                     className={`mt-1 block font-semibold text-[#1f1c19] ${
                       compact ? "text-sm" : "text-base"

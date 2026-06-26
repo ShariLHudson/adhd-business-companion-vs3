@@ -20,6 +20,7 @@ import {
 import type { CreationWorkspaceInput } from "@/lib/workspaceCreation";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { AppBackButton } from "@/components/companion/AppBackButton";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 import { NAV_CHAT } from "@/lib/navigationBack";
 import { MENU_DROPDOWN_ITEM, MENU_TEXT } from "@/lib/menuNavStyles";
 
@@ -294,7 +295,14 @@ export function SavedWorkLibrary({
       {!embedded ? (
         <div className="flex items-start justify-between gap-3">
           <div>
-            <p className="text-2xl font-semibold text-[#1f1c19]">📂 Saved Work</p>
+            <p className="flex items-center gap-2 text-2xl font-semibold text-[#1f1c19]">
+              <CompanionObjectVisual
+                objectId="toolbelt-saved-work"
+                size="md"
+                variant="icon"
+              />
+              Saved Work
+            </p>
             <p className="mt-1 text-base text-[#6b635a]">
               Your created documents — proposals, SOPs, plans, and more. Archive to
               hide from active views; recover anytime from Archived.

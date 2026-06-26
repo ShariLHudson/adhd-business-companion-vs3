@@ -3,6 +3,8 @@
 import type { HowDoIHelpArticle } from "@/lib/howDoIHelpTypes";
 import type { AppSection } from "@/lib/companionUi";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import { objectIdForEmoji } from "@/lib/companionObjects";
 
 const GOLD_LABEL = "text-xs font-bold uppercase tracking-wide text-[#b45309]";
 
@@ -48,9 +50,12 @@ export function HowDoIWorkflowCard({
           aria-expanded={open}
           className="flex w-full items-center gap-2 px-4 py-3.5 text-left hover:bg-[#faf7f2]/80"
         >
-          <span className="text-lg leading-none" aria-hidden="true">
-            {article.emoji}
-          </span>
+          <CompanionObjectVisual
+            objectId={objectIdForEmoji(article.emoji, "help")}
+            size="sm"
+            variant="icon"
+            className="shrink-0"
+          />
           <span className="min-w-0 flex-1 text-base font-semibold text-[#1f1c19]">
             {article.title}
           </span>

@@ -1,12 +1,13 @@
 "use client";
 
 import type { usePomodoroTimer } from "@/lib/usePomodoroTimer";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 
 type Timer = ReturnType<typeof usePomodoroTimer>;
 
 export type ActiveWorkspaceItem = {
   id: string;
-  emoji: string;
+  objectId: string;
   label: string;
   detail?: string;
   running?: boolean;
@@ -38,7 +39,12 @@ export function ActiveWorkspaceBar({ items }: { items: ActiveWorkspaceItem[] }) 
             className="flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5"
           >
             <span className="flex min-w-0 items-center gap-1.5">
-              <span aria-hidden="true">{item.emoji}</span>
+              <CompanionObjectVisual
+                objectId={item.objectId}
+                size="xs"
+                variant="icon"
+                className="shrink-0"
+              />
               <span className="truncate text-sm font-semibold">{item.label}</span>
               {item.detail ? (
                 <span className="truncate text-sm text-white/80">
@@ -83,7 +89,7 @@ export function focusTimerWorkspaceItem(
   const focusTitle = timer.sessionMeta?.focusItem ?? timer.label;
   return {
     id: "focus-timer",
-    emoji: "🎯",
+    objectId: "focus-my-brain",
     label: `Focus Session — ${time} left`,
     detail: focusTitle?.trim() ? focusTitle.trim().slice(0, 48) : undefined,
     running: timer.running,

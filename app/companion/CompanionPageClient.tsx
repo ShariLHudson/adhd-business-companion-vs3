@@ -13888,7 +13888,7 @@ export default function CompanionPageClient() {
         "Draft";
       items.push({
         id: "create",
-        emoji: "📝",
+        objectId: "create",
         label: hasDraft ? "Create Draft Open" : "Create Open",
         detail: title.slice(0, 48),
         onOpen: () => {
@@ -13903,7 +13903,7 @@ export default function CompanionPageClient() {
     if (workspacePanel === "projects") {
       items.push({
         id: "projects",
-        emoji: "📋",
+        objectId: "projects",
         label: "Project",
         detail: (
           workspaceSession?.projectTitle ||
@@ -13922,7 +13922,7 @@ export default function CompanionPageClient() {
     if (workspacePanel === "time-block") {
       items.push({
         id: "time-block",
-        emoji: "📅",
+        objectId: "calendar",
         label: "Momentum Appointments",
         detail: "Planning open",
         onOpen: () => {
@@ -13936,7 +13936,7 @@ export default function CompanionPageClient() {
     if (workspacePanel === "templates-library") {
       items.push({
         id: "templates",
-        emoji: "📚",
+        objectId: "templates",
         label: "Templates",
         detail: "Library open",
         onOpen: () => {
@@ -13951,7 +13951,7 @@ export default function CompanionPageClient() {
     if (workspacePanel === "snippets") {
       items.push({
         id: "snippets",
-        emoji: "🧩",
+        objectId: "toolbelt-snippets",
         label: "Snippets",
         detail: "Library open",
         onOpen: () => {
@@ -13966,7 +13966,7 @@ export default function CompanionPageClient() {
     if (workspacePanel === "playbook") {
       items.push({
         id: "playbook",
-        emoji: "📘",
+        objectId: "strategies",
         label: "Strategies",
         detail: "Browse open",
         onOpen: () => {

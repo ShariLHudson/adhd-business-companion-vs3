@@ -1,0 +1,15 @@
+export {
+  AUDIO_SAVED_CATEGORY_OBJECT_ID,
+  COMPANION_OBJECT_REGISTRY,
+  GROWTH_SECTION_OBJECT_ID,
+  PROJECT_SOURCE_OBJECT_ID,
+  STRATEGY_CATEGORY_OBJECT_ID,
+  STRATEGY_GROUP_OBJECT_ID,
+  companionObjectByEmoji,
+  companionObjectById,
+  companionObjectRoom,
+  objectIdForEmoji,
+  resolveCompanionObjectId,
+  type CompanionObject,
+  type CompanionObjectAssetStatus,
+} from "./companionObjectRegistry";

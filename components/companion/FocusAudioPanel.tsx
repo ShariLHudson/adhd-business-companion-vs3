@@ -17,6 +17,8 @@ import {
 import { audioBackgroundMood, suggestAudioForEmotion } from "@/lib/audioSuggestions";
 import { SceneBackground } from "./SceneBackground";
 import type { EmotionalState } from "@/lib/companionEmotions";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import { AUDIO_SAVED_CATEGORY_OBJECT_ID } from "@/lib/companionObjects";
 
 // Categories shown in the picker — "My Audio" and "Favorites" live in Saved
 // Links instead, so the dropdown stays focused on moods/sound types.
@@ -75,7 +77,10 @@ export function FocusAudioPanel({
         {/* All content sits on a readable card over the scene — consistent with
             Home / Focus / Continue, so text never floats on the image. */}
         <div className="rounded-2xl border border-[#1e4f4f]/15 bg-white/90 p-5 shadow-sm backdrop-blur-sm sm:p-6">
-        <p className="text-2xl font-semibold text-[#1f1c19]">Focus Audio</p>
+        <p className="flex items-center gap-2 text-2xl font-semibold text-[#1f1c19]">
+          <CompanionObjectVisual objectId="focus-audio" size="md" variant="icon" />
+          Focus Audio
+        </p>
         <p className="mt-1 text-lg font-medium text-[#1f1c19]">
           What does your brain need right now?
         </p>
@@ -143,8 +148,13 @@ export function FocusAudioPanel({
                 if (inCat.length === 0) return null;
                 return (
                   <div key={cat.id}>
-                    <p className="text-sm font-semibold text-[#1f1c19]">
-                      {cat.emoji} {cat.name}
+                    <p className="flex items-center gap-2 text-sm font-semibold text-[#1f1c19]">
+                      <CompanionObjectVisual
+                        objectId={AUDIO_SAVED_CATEGORY_OBJECT_ID[cat.id] ?? "focus-audio"}
+                        size="xs"
+                        variant="icon"
+                      />
+                      {cat.name}
                     </p>
                     <div className="mt-1 flex flex-col gap-1.5">
                       {inCat.map((l) => (
@@ -198,7 +208,7 @@ export function FocusAudioPanel({
             >
               {SAVED_AUDIO_CATEGORIES.map((cat) => (
                 <option key={cat.id} value={cat.id}>
-                  {cat.emoji} {cat.name}
+                  {cat.name}
                 </option>
               ))}
             </select>

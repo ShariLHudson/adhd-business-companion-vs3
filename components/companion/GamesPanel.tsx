@@ -23,8 +23,7 @@ type Phase = "menu" | "category" | "play" | "done";
 function GameMeta({ game }: { game: MomentumGameDef }) {
   return (
     <p className="mt-1.5 text-xs leading-snug text-[#6b635a]">
-      🎯 Helps with: {game.helpsWith} · ⏱ {game.time} · 😊 Energy:{" "}
-      {game.energy}
+      Helps with: {game.helpsWith} · Time: {game.time} · Energy: {game.energy}
     </p>
   );
 }
@@ -134,7 +133,12 @@ export function GamesPanel({
   if (phase === "done") {
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-md flex-col items-center px-6 py-16 text-center">
-        <p className="text-3xl">🎉</p>
+        <CompanionObjectVisual
+          objectId="celebration-reset"
+          size="lg"
+          variant="mini-scene"
+          animate
+        />
         <p className="mt-3 text-xl font-bold text-[#1f1c19]">Nice reset!</p>
         <p className="mt-1 text-base text-[#6b635a]">
           Playful break complete — ready when you are.

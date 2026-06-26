@@ -23,6 +23,8 @@ import {
   EcosystemCloseAllButton,
   EcosystemCollapsibleSection,
 } from "@/components/companion/EcosystemCollapsibleSection";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import { resolveCompanionObjectId } from "@/lib/companionObjects";
 import { HowDoISubgroupBlock } from "@/components/companion/HowDoIBrowseDropdown";
 
 export function HowDoIPanel({
@@ -276,12 +278,12 @@ export function HowDoIPanel({
                             onClick={() => openSearchResult(result)}
                             className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-[#faf7f2]"
                           >
-                            <span
-                              className="text-base leading-none"
-                              aria-hidden="true"
-                            >
-                              {result.emoji ?? "•"}
-                            </span>
+                            <CompanionObjectVisual
+                              objectId={resolveCompanionObjectId(result.emoji, "help")}
+                              size="sm"
+                              variant="icon"
+                              className="shrink-0"
+                            />
                             <span className="min-w-0 flex-1">
                               <span className="block text-sm font-semibold text-[#1f1c19]">
                                 {result.title}

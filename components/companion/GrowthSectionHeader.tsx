@@ -12,6 +12,8 @@ import {
 } from "@/lib/growthNavigation";
 
 import { readFileAsAttachment, type GrowthAttachment } from "@/lib/growthAttachments";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import { GROWTH_SECTION_OBJECT_ID } from "@/lib/companionObjects";
 
 const TOOL_BTN =
   "rounded-full border border-[#e7d9c8] bg-white px-3 py-1.5 text-xs font-semibold text-[#2f261f] hover:bg-[#faf7f2]";
@@ -71,8 +73,13 @@ export function GrowthSectionHeader({
       ) : null}
 
       <div>
-        <h2 className="text-3xl font-bold text-[#2f261f]">
-          {meta.emoji} {meta.title}
+        <h2 className="flex items-center gap-2 text-3xl font-bold text-[#2f261f]">
+          <CompanionObjectVisual
+            objectId={GROWTH_SECTION_OBJECT_ID[nav.current] ?? "growth"}
+            size="md"
+            variant="icon"
+          />
+          {meta.title}
         </h2>
         <p className="mt-1 text-[#6f6259]">{meta.subtitle}</p>
       </div>

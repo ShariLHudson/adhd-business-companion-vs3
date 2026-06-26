@@ -1,6 +1,10 @@
 "use client";
 
-import { CompanionObjectLabel } from "@/components/companion/CompanionObjectVisual";
+import { CompanionObjectLabel, CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import {
+  STRATEGY_CATEGORY_OBJECT_ID,
+  STRATEGY_GROUP_OBJECT_ID,
+} from "@/lib/companionObjects";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   initialCollapsedSectionMap,
@@ -720,7 +724,11 @@ export function StrategiesPanel({
           ‹ Strategies
         </button>
         <p className="mt-2 flex items-center gap-2 text-2xl font-semibold text-[#1f1c19]">
-          <span aria-hidden="true">{group.emoji}</span>
+          <CompanionObjectVisual
+            objectId={STRATEGY_GROUP_OBJECT_ID[view.group]}
+            size="md"
+            variant="icon"
+          />
           {group.label}
         </p>
         <p className="mt-1 text-base text-[#6b635a]">
@@ -738,7 +746,7 @@ export function StrategiesPanel({
           <option value="">Select an area…</option>
           {subcats.map((cat) => (
               <option key={cat.id} value={cat.id}>
-                {cat.emoji} {cat.label}
+                {cat.label}
               </option>
             ))}
         </select>

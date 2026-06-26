@@ -23,6 +23,8 @@ import { ProjectBreakdown } from "@/components/companion/ProjectBreakdown";
 import { CollapsibleSection } from "@/components/companion/CollapsibleSection";
 import { ProjectAssetsPanel } from "@/components/companion/ProjectAssetsPanel";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import { PROJECT_SOURCE_OBJECT_ID } from "@/lib/companionObjects";
 import { useVisualMode } from "@/lib/useVisualMode";
 import {
   groupTimeBlocksByDate,
@@ -705,28 +707,28 @@ export function ProjectsPanel({
       {
         id: "blank",
         label: "Blank Project",
-        emoji: "📁",
+        objectId: PROJECT_SOURCE_OBJECT_ID.blank,
         hint: "Name it and define the outcome",
         action: startBlankCreate,
       },
       {
         id: "template",
         label: "Template",
-        emoji: "📚",
+        objectId: PROJECT_SOURCE_OBJECT_ID.template,
         hint: "Start from a reusable pattern",
         action: () => onOpen?.("templates-library"),
       },
       {
         id: "strategy",
         label: "Strategy",
-        emoji: "🎯",
+        objectId: PROJECT_SOURCE_OBJECT_ID.strategy,
         hint: "Pull from your playbook",
         action: () => onOpen?.("playbook"),
       },
       {
         id: "brain-dump",
         label: "Clear My Mind",
-        emoji: "🧠",
+        objectId: PROJECT_SOURCE_OBJECT_ID["brain-dump"],
         hint: "Capture thoughts, then turn one into a project",
         action: () => onOpen?.("brain-dump"),
       },
@@ -752,7 +754,12 @@ export function ProjectsPanel({
               onClick={s.action}
               className="flex items-start gap-3 rounded-xl border border-[#d4cdc3] bg-white/90 px-4 py-3 text-left hover:border-[#1e4f4f]/40"
             >
-              <span className="text-2xl">{s.emoji}</span>
+              <CompanionObjectVisual
+                objectId={s.objectId}
+                size="md"
+                variant="icon"
+                className="shrink-0"
+              />
               <span>
                 <span className="block text-base font-semibold text-[#1f1c19]">
                   {s.label}
