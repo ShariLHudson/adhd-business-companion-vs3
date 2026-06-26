@@ -75,7 +75,7 @@ export function resolveEnvironmentalCauses(
     }
   }
 
-  if (season === "winter" || season === "holiday") {
+  if (season === "winter") {
     causes.add("winter-iowa");
   }
 

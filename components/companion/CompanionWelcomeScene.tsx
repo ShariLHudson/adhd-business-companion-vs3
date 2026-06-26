@@ -38,7 +38,7 @@ import { useWelcomeLivingRoom } from "@/lib/welcomeLivingRoom/useWelcomeLivingRo
 import { LivingCompanionRoomLayers } from "@/components/companion/LivingCompanionRoomLayers";
 import { WelcomeRoomPrototypeDevPanel } from "@/components/companion/WelcomeRoomPrototypeDevPanel";
 import type { CommunicationAnchorMode } from "@/lib/companionCommunicationAnchor";
-import type { ArrivalRecommendation } from "@/lib/arrivalExperience";
+import type { ArrivalRecommendation, HospitalityResponse } from "@/lib/arrivalExperience";
 
 type WelcomeLivingRoomContextValue = ReturnType<typeof useWelcomeLivingRoom>;
 
