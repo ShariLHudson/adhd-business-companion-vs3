@@ -65,6 +65,7 @@ export function enforceMotionIntegrity(
     objects: input.objects,
     motion: enabled,
     recoveryGentle: input.recoveryGentle,
+    homesteadPeriod: input.homesteadPeriod,
   });
   return resolved.motion;
 }

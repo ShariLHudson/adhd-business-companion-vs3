@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useMemo,
+  type CSSProperties,
   type ReactNode,
 } from "react";
 import { useSearchParams } from "next/navigation";
@@ -21,7 +22,6 @@ import {
   WELCOME_PRESENCE_GREETING,
   WELCOME_PRESENCE_INVITE,
 } from "@/lib/companionPresenceLibrary";
-import { ASSETS } from "@/lib/companionUi";
 import { timeOfDayBucket } from "@/lib/arrivalIntelligence/livingIntelligenceGraph";
 import { getRecognitionStore } from "@/lib/recognition/recognitionStore";
 import {
@@ -36,9 +36,16 @@ import {
 import type { WelcomeWeather } from "@/lib/companionEnvironmentIntelligence";
 import { useWelcomeLivingRoom } from "@/lib/welcomeLivingRoom/useWelcomeLivingRoom";
 import { LivingCompanionRoomLayers } from "@/components/companion/LivingCompanionRoomLayers";
+import { LivingChangeVisualDebug } from "@/components/companion/LivingChangeVisualDebug";
 import { WelcomeRoomPrototypeDevPanel } from "@/components/companion/WelcomeRoomPrototypeDevPanel";
+import {
+  effectiveWelcomePhotographId,
+  welcomeImageCapabilities,
+} from "@/lib/companionEnvironmentIntelligence/welcomeImageCapabilities";
 import type { CommunicationAnchorMode } from "@/lib/companionCommunicationAnchor";
 import type { ArrivalRecommendation, HospitalityResponse } from "@/lib/arrivalExperience";
+import { homesteadTimeCssVars } from "@/lib/homesteadTime";
+import { isMasterLivingRoomLocked } from "@/lib/livingRoomMaster";
 
 type WelcomeLivingRoomContextValue = ReturnType<typeof useWelcomeLivingRoom>;
 
@@ -151,8 +158,20 @@ export function CompanionWelcomeScene({
     resolvedRoom?.layer1.id ??
     companionImageId ??
     COMPANION_PRESENCE_WELCOME_IMAGE_ID;
+  const displayPhotographId = effectiveWelcomePhotographId(photographId);
+  const imageCaps = welcomeImageCapabilities(displayPhotographId);
+  const masterSceneLocked = isMasterLivingRoomLocked();
+  const artStyle = {
+    objectPosition: imageCaps.artObjectPosition,
+    objectFit: imageCaps.artObjectFit,
+  } as CSSProperties;
+  const artRoomLayout = imageCaps.artObjectFit === "contain";
+  const showHospitalitySteam =
+    hospitality?.showMugSteam && !imageCaps.suppressHospitalitySteam;
+  const showHospitalityCurtains =
+    hospitality?.closeCurtains && !imageCaps.suppressCurtains;
   const src =
-    resolveCompanionPresenceLibraryImage("chat-welcome", photographId) ??
+    resolveCompanionPresenceLibraryImage("chat-welcome", displayPhotographId) ??
     companionPresenceWelcomeImageUrl();
 
   const showGreeting =
@@ -163,6 +182,10 @@ export function CompanionWelcomeScene({
     showInputOverride ?? phaseShowsInput(living.phase);
   const arrivalMode = showGreetingOverride !== undefined;
   const livingChange = resolvedRoom?.livingChangeSet;
+  const homesteadTime = resolvedRoom?.homesteadTime ?? null;
+  const homesteadStyle = homesteadTime
+    ? (homesteadTimeCssVars(homesteadTime) as CSSProperties)
+    : undefined;
 
   return (
     <WelcomeLivingRoomContext.Provider value={living}>
@@ -172,11 +195,18 @@ export function CompanionWelcomeScene({
         data-testid="companion-welcome-scene"
       >
         {showWelcomeRoomPrototypePanel(studioParam, demoParam) ? (
-          <WelcomeRoomPrototypeDevPanel
-            overrides={overrides}
-            onChange={setOverrides}
-            onReset={resetOverrides}
-          />
+          <>
+            <WelcomeRoomPrototypeDevPanel
+              overrides={overrides}
+              onChange={setOverrides}
+              onReset={resetOverrides}
+            />
+            <LivingChangeVisualDebug
+              livingChange={livingChange}
+              motionEnabled={resolvedRoom?.layer3.enabled ?? []}
+              photographId={displayPhotographId}
+            />
+          </>
         ) : null}
 
         <div
@@ -185,16 +215,20 @@ export function CompanionWelcomeScene({
           }${living.phase === "alive" || arrivalMode ? " companion-welcome-scene__hero--ambient" : ""}${
             walking ? " companion-welcome-scene__hero--walking" : ""
           }`}
+          style={homesteadStyle}
           data-living-phase={living.phase}
           data-time-of-day={atmosphere.timeOfDay}
+          data-homestead-period={homesteadTime?.period}
+          data-homestead-pace={homesteadTime?.dayPace}
           data-season={atmosphere.season}
           data-weather={atmosphere.weather}
           data-room-accent={roomAccent ?? undefined}
           data-room-reason={resolvedRoom?.layer1.reason}
           data-hospitality-blanket={hospitality?.showBlanket ? "" : undefined}
-          data-hospitality-mug={hospitality?.showMugSteam ? "" : undefined}
+          data-hospitality-mug={showHospitalitySteam ? "" : undefined}
           data-hospitality-lamp={hospitality?.warmLamp ? "" : undefined}
-          data-hospitality-curtains={hospitality?.closeCurtains ? "" : undefined}
+          data-hospitality-curtains={showHospitalityCurtains ? "" : undefined}
+          data-master-scene={masterSceneLocked ? "" : undefined}
           data-kinsey={
             livingChange?.kinsey && livingChange.kinsey !== "hidden"
               ? livingChange.kinsey
@@ -208,32 +242,35 @@ export function CompanionWelcomeScene({
           <img
             src={src}
             alt=""
-            data-welcome-image={photographId}
-            className="companion-welcome-scene__art"
+            data-welcome-image={displayPhotographId}
+            className={`companion-welcome-scene__art${
+              artRoomLayout ? " companion-welcome-scene__art--room" : ""
+            }`}
+            style={artStyle}
             draggable={false}
           />
 
-          {resolvedRoom ? (
+          {resolvedRoom && !masterSceneLocked ? (
             <LivingCompanionRoomLayers
               objects={resolvedRoom.layer2}
               motion={resolvedRoom.layer3}
-              photographId={photographId}
+              photographId={displayPhotographId}
             />
-          ) : (
+          ) : !masterSceneLocked ? (
             <div className="companion-welcome-scene__life" aria-hidden="true">
               <div className="companion-welcome-scene__sunlight" />
               <div className="companion-welcome-scene__lamplight" />
               <div className="companion-welcome-scene__foliage" />
             </div>
-          )}
+          ) : null}
 
-          {hospitality?.showBlanket ? (
+          {!masterSceneLocked && hospitality?.showBlanket ? (
             <div
               className="companion-welcome-scene__object companion-welcome-scene__object--blanket companion-welcome-scene__hospitality-blanket"
               aria-hidden="true"
             />
           ) : null}
-          {hospitality?.showMugSteam ? (
+          {!masterSceneLocked && showHospitalitySteam ? (
             <div
               className="companion-welcome-scene__steam companion-welcome-scene__hospitality-steam"
               aria-hidden="true"
@@ -296,7 +333,7 @@ export function CompanionWelcomeScene({
                         className="companion-welcome-scene__arrival-quiet"
                         onClick={onStayHere}
                       >
-                        Stay here
+                        Let's sit a minute
                       </button>
                     </div>
                   </div>
@@ -307,7 +344,7 @@ export function CompanionWelcomeScene({
                     className="companion-welcome-scene__arrival-same"
                     onClick={onSameAsYesterday}
                   >
-                    Same as yesterday
+                    About the same
                   </button>
                 ) : null}
                 {resolvedRoom?.guestPreparation?.line ? (
@@ -333,15 +370,6 @@ export function CompanionWelcomeScene({
             {children}
           </div>
 
-          <span className="companion-welcome-scene__brand" aria-hidden="true">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={ASSETS.logo}
-              alt=""
-              className="companion-welcome-scene__brand-img"
-              draggable={false}
-            />
-          </span>
         </div>
       </section>
     </WelcomeLivingRoomContext.Provider>

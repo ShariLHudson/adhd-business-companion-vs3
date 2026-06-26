@@ -5,13 +5,11 @@ import type { BrainDumpEntry } from "@/lib/companionStore";
 import { buildBrainDumpClusterGraph } from "@/lib/brainDumpClusterModel";
 import type { ClearMyMindStage } from "@/lib/clearMyMindStages";
 import { shariReceiveAcknowledgment, shariReflectingLine } from "@/lib/clearMyMindCompanionVoice";
-import { clearMyMindHeldCountLine } from "@/lib/clearMyMindCopy";
 import {
   unfoldReached,
   type ClearMyMindUnfoldStep,
 } from "@/lib/clearMyMindUnfold";
 import { useClearMyMindCompanionPresence } from "@/lib/useClearMyMindCompanionPresence";
-import { ShariPortrait } from "@/components/companion/ShariPortrait";
 import { ClearMyMindPresenceBubble } from "@/components/companion/ClearMyMindPresenceBubble";
 
 type Props = {
@@ -20,12 +18,11 @@ type Props = {
   shareConfirming?: boolean;
   holdAck?: string | null;
   unfoldStep?: ClearMyMindUnfoldStep;
-  totalThoughtCount?: number;
   workspaceEntryKey?: number;
 };
 
 /**
- * Shari in the room — integrated presence, not a sidebar.
+ * Shari in the room — voice only after a share, never a portrait or idle floating line.
  */
 export function ClearMyMindInRoomPresence({
   stage,
@@ -33,7 +30,6 @@ export function ClearMyMindInRoomPresence({
   shareConfirming = false,
   holdAck = null,
   unfoldStep = "idle",
-  totalThoughtCount = 0,
   workspaceEntryKey = 0,
 }: Props) {
   const graph = useMemo(
@@ -58,7 +54,6 @@ export function ClearMyMindInRoomPresence({
 
   const bubbleMessage = useMemo(() => {
     if (shareConfirming) return presence.thinkingMessage;
-    // Post-Share companion response — always show in capture (unfold is idle in V1).
     if (inCapture && holdAck) return holdAck;
     if (unfoldStep === "reflecting") {
       return shariReflectingLine(entries.length);
@@ -68,13 +63,7 @@ export function ClearMyMindInRoomPresence({
     if (stage === "understanding" && !showingPatterns) {
       return presence.thinkingMessage;
     }
-    if (inCapture && !holdAck && unfoldStep === "idle") {
-      if (totalThoughtCount > 0 && !shareConfirming) {
-        return clearMyMindHeldCountLine(totalThoughtCount);
-      }
-      return presence.thinkingMessage;
-    }
-    return presence.thinkingMessage;
+    return null;
   }, [
     shareConfirming,
     presence.thinkingMessage,
@@ -85,8 +74,9 @@ export function ClearMyMindInRoomPresence({
     stage,
     acknowledgment,
     showingPatterns,
-    totalThoughtCount,
   ]);
+
+  if (!bubbleMessage) return null;
 
   return (
     <div
@@ -96,18 +86,11 @@ export function ClearMyMindInRoomPresence({
       data-cmind-stage={stage}
       data-companion-phase={presence.reason}
     >
-      <div className="clear-my-mind-in-room-inner">
-        <div className="clear-my-mind-in-room-voice-wrap">
-          <ClearMyMindPresenceBubble
-            presence={presence}
-            message={bubbleMessage}
-            className="clear-my-mind-in-room-voice"
-          />
-        </div>
-        <div className="flex flex-col items-center">
-          <ShariPortrait presence={presence} size="in-room" alt="Shari" />
-        </div>
-      </div>
+      <ClearMyMindPresenceBubble
+        presence={presence}
+        message={bubbleMessage}
+        className="clear-my-mind-in-room-voice"
+      />
     </div>
   );
 }

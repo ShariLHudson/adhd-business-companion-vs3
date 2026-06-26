@@ -6,20 +6,31 @@ import {
   resolveArrivalRecommendation,
   softCompleteReality,
   beatShowsInput,
+  sameAsYesterdayEcho,
 } from "./index";
 
 describe("arrivalExperience", () => {
-  it("flooded reality routes to window seat", () => {
+  it("flooded reality sits first — no room redirect without expressed need", () => {
     const result = processRealityMessage("I am completely overwhelmed", "open");
     expect(result.tone).toBe("flooded");
     expect(result.needsClarify).toBe(false);
+    expect(result.echo).toMatch(/that's a lot|don't have to fix/i);
     const rec = resolveArrivalRecommendation({
-      message: "overwhelmed",
+      message: "I am completely overwhelmed",
       tone: result.tone,
       dayState: result.dayState,
+      reconnectionTurns: 2,
+    });
+    expect(rec).toBeNull();
+  });
+
+  it("offers window seat when guest explicitly asks to clear their mind", () => {
+    const rec = resolveArrivalRecommendation({
+      message: "I'm overwhelmed and need to clear my mind",
+      tone: "flooded",
+      reconnectionTurns: 2,
     });
     expect(rec?.placeId).toBe("window-seat");
-    expect(rec?.section).toBe("brain-dump");
   });
 
   it("vague reply asks one clarify only", () => {
@@ -42,7 +53,7 @@ describe("arrivalExperience", () => {
 
     const clarified = processRealityMessage("more tired", "clarify");
     expect(clarified.needsClarify).toBe(false);
-    expect(clarified.echo).toMatch(/short tank|gently/i);
+    expect(clarified.echo).toMatch(/light|thank you/i);
   });
 
   it("skips reality when cached for returning guest", () => {
@@ -55,9 +66,38 @@ describe("arrivalExperience", () => {
     expect(state.skipReality).toBe(true);
   });
 
-  it("soft complete provides gentle echo", () => {
+  it("soft complete offers gentle presence", () => {
     const soft = softCompleteReality();
-    expect(soft.echo).toMatch(/gentle/i);
+    expect(soft.echo).toMatch(/no pressure|just be here/i);
+  });
+
+  it("does not recommend a room before reconnection turns complete", () => {
+    const rec = resolveArrivalRecommendation({
+      message: "ready to plan",
+      tone: "okay",
+      reconnectionTurns: 1,
+    });
+    expect(rec).toBeNull();
+  });
+
+  it("uses home voice for planning table after reconnection", () => {
+    const rec = resolveArrivalRecommendation({
+      message: "ready to plan",
+      tone: "okay",
+      reconnectionTurns: 2,
+    });
+    if (rec?.placeId === "planning-table") {
+      expect(rec.line).toMatch(/planning table|table's open/i);
+      expect(rec.line).not.toMatch(/together\?/i);
+      expect(rec.buttonLabel).toBe("Show me");
+    }
+  });
+
+  it("continuity echo sounds like Shari", () => {
+    const result = sameAsYesterdayEcho();
+    expect(result.echo).toMatch(/yesterday|similar feeling|about the same/i);
+    expect(result.echo).not.toMatch(/I've got you/i);
+    expect(result.echo).not.toMatch(/shape today/i);
   });
 
   it("keeps communication anchor reachable on every beat", () => {

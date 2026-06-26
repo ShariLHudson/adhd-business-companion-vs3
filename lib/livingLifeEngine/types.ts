@@ -6,6 +6,7 @@ import type {
   WelcomeWeather,
 } from "@/lib/companionEnvironmentIntelligence/types";
 import type { CompanionPlaceId } from "@/lib/companionUniverse/types";
+import type { HomesteadTimePeriod } from "@/lib/homesteadTime";
 import type { WelcomeSeason, WelcomeTimeOfDay } from "@/lib/welcomeLivingRoom";
 
 export type LivingChangePriority =
@@ -123,6 +124,9 @@ export type LivingChangeEngineInput = {
   objects: RoomObject[];
   motion: { enabled: CompanionMotionKind[] };
   livingLifeContext?: LivingLifeContext;
+  homesteadPeriod?: HomesteadTimePeriod;
+  /** Companion Relationship™ — rhythm adapts; Shari never changes */
+  companionRelationship?: import("@/lib/companionRelationship").CompanionRelationshipVerdict;
 };
 
 export type LivingTimelineContext = {

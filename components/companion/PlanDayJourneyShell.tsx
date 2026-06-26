@@ -1,10 +1,12 @@
 "use client";
 
+import { useMemo } from "react";
 import {
   PLAN_MY_DAY_TITLE,
   planDayChapterSubtitle,
   type PlanDayJourneyChapter,
 } from "@/lib/planMyDay/companionBrainClient/planDayJourney";
+import { evaluatePlanningTableRoom } from "@/lib/planningTableRoom";
 import { EcosystemNavigationBar } from "@/components/companion/EcosystemNavigationBar";
 import { PlanDayHelpIcon } from "@/components/companion/PlanDayHelpIcon";
 import { PlanDayShariPresence } from "@/components/companion/PlanDayShariPresence";
@@ -34,9 +36,17 @@ export function PlanDayJourneyShell({
   hideHelp = false,
 }: Props) {
   const subtitle = planDayChapterSubtitle(chapter);
+  const room = useMemo(
+    () => evaluatePlanningTableRoom({ chapter }),
+    [chapter],
+  );
 
   return (
-    <div className="plan-day-journey flex min-h-0 flex-1 flex-col" data-chapter={chapter}>
+    <div
+      className="plan-day-journey flex min-h-0 flex-1 flex-col"
+      data-chapter={chapter}
+      data-room-whisper={room.roomWhisper}
+    >
       <header
         className={`mx-auto w-full max-w-3xl plan-day-journey-header ${chapter === "gateway" ? "" : "plan-day-living-enter"}`}
       >

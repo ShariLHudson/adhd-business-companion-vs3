@@ -11,6 +11,13 @@
  */
 
 import type { EmotionalObstacle, EmotionalState } from "./companionEmotions";
+import type { AppSection } from "./companionUi";
+import {
+  resolveCompanionIntelligence,
+  resolveConversationIntelligence,
+  type CompanionOrchestration,
+  type ConversationIntelligenceVerdict,
+} from "./companionConstitution";
 import {
   buildCompanionIntelligence,
   intelligenceHintForChat,
@@ -93,6 +100,9 @@ export type UserStateSnapshot = {
 export type CompanionTurnIntelligence = {
   userState: UserStateSnapshot;
   intelligence: CompanionIntelligence;
+  /** Constitutional conductor — sole orchestration authority for active intelligences */
+  conversation: ConversationIntelligenceVerdict;
+  orchestration: CompanionOrchestration;
   intelligenceHint?: string;
   sprint5?: Sprint5IntelligenceBundle;
   actionBias?: ActionBiasAnalysis;
@@ -123,11 +133,28 @@ export function buildCompanionTurnIntelligence(input: {
   lastAssistantText: string;
   userState: UserStateSnapshot;
   workspaceOpen: boolean;
+  activeSection?: AppSection | null;
   checkBusinessAdvice?: boolean;
   hasEcosystemFeatureMatch?: boolean;
   boardDomain?: ReturnType<typeof resolveWorkspaceAdvisorRole>;
   outcomeThread?: OutcomeThread | null;
 }): CompanionTurnIntelligence {
+  const conversation = resolveConversationIntelligence({
+    activeSection: input.activeSection ?? undefined,
+    workspaceBesideChat: input.workspaceOpen,
+    messageCount: input.messages.length,
+    userText: input.userText,
+  });
+
+  const orchestration = resolveCompanionIntelligence({
+    conversation,
+    emotionalState: input.userState.emotionalState,
+    overwhelmed: input.userState.emotionalState === "overwhelmed",
+    userText: input.userText,
+    activeSection: input.activeSection ?? undefined,
+    workspaceId: undefined,
+  });
+
   const intelligence = buildCompanionIntelligence({
     messages: input.messages,
     text: input.userText,
@@ -235,6 +262,8 @@ export function buildCompanionTurnIntelligence(input: {
   return {
     userState: input.userState,
     intelligence,
+    conversation,
+    orchestration,
     intelligenceHint,
     sprint5,
     actionBias,

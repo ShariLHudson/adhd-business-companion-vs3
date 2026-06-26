@@ -121,6 +121,16 @@ describe("reminderIntelligence", () => {
     expect(outcome.reminders[0]?.offsets).toEqual([15]);
   });
 
+  it("preserves 15-minute advance offset for event reminders", () => {
+    expect(parseOffsets("Notify me 15 minutes before my sales call")).toEqual([15]);
+    const draft = parseReminderDraft(
+      "Notify me 15 minutes before my sales call",
+      NOW,
+    );
+    expect(draft?.reminderType).toBe("event_offset");
+    expect(draft?.offsets).toEqual([15]);
+  });
+
   it("parses multiple offsets for the same event", () => {
     const offsets = parseOffsets(
       "Remind me about my webinar 1 day before, 1 hour before, and 15 minutes before",

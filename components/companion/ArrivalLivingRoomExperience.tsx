@@ -81,6 +81,12 @@ export function ArrivalLivingRoomExperience({
 
     onInputChange("");
     onSend();
+    if (
+      !experience.showRealityQuestion &&
+      (experience.beat === "invite" || experience.beat === "staying" || experience.beat === "respond")
+    ) {
+      experience.continueConversation(trimmed);
+    }
   }, [
     experience,
     input,

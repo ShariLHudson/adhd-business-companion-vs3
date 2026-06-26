@@ -10,8 +10,8 @@ import {
 
 describe("companionPresenceLibrary", () => {
   it("defines the fixed welcome greeting", () => {
-    expect(WELCOME_PRESENCE_GREETING).toBe("I'm here for you.");
-    expect(WELCOME_PRESENCE_INVITE).toBe("What's on your mind today?");
+    expect(WELCOME_PRESENCE_GREETING).toBe("It's good to see you.");
+    expect(WELCOME_PRESENCE_INVITE).toBe("Come on in — I'm glad you stopped by.");
   });
 
   it("resolves shari-i-am-here-2 for chat welcome", () => {

@@ -293,10 +293,8 @@ export function ClearMyMindSession({
     shareConfirming || !input.trim() || pendingSplit !== null;
 
   return (
-    <div className="flex flex-col gap-4" data-cmind-mode="capture">
-      <p className="text-lg font-semibold leading-snug text-[#1f1c19]">
-        {prompt}
-      </p>
+    <div className="clear-my-mind-session flex flex-col gap-4" data-cmind-mode="capture">
+      <p className="clear-my-mind-session__prompt">{prompt}</p>
 
       <VoiceAnswerField
         value={input}
@@ -311,8 +309,8 @@ export function ClearMyMindSession({
         onFocus={beginRelease}
         onVoiceUsed={() => setUsedVoice(true)}
         voiceProminent
-        placeholder="Say it or type it — messy is welcome"
-        inputClassName="clear-my-mind-capture w-full flex-1 rounded-2xl border-2 border-[#d4cdc3] bg-white px-4 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f] min-h-[3.25rem]"
+        placeholder="What's on your mind?"
+        inputClassName="clear-my-mind-capture w-full flex-1 rounded-xl border border-[#d4cdc3]/80 bg-[rgba(255,252,247,0.72)] px-4 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]/55 min-h-[3.25rem] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]"
         micTitle="Speak what's on your mind"
       />
 

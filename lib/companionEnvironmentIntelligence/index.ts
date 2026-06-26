@@ -24,6 +24,12 @@ export type {
   BookCategory,
   FeaturedBook,
 } from "./bookLibrary";
+export {
+  COMPANION_PRESENCE_WELCOME_FALLBACK_IMAGE_ID,
+  effectiveWelcomePhotographId,
+  welcomeImageCapabilities,
+} from "./welcomeImageCapabilities";
+export type { WelcomeImageCapabilities } from "./welcomeImageCapabilities";
 export type { ImageContextEntry, ImageEmotionalTone } from "./imageContextRegistry";
 export type {
   CompanionEnvironmentInput,

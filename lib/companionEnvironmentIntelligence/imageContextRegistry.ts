@@ -21,6 +21,9 @@ export type ImageContextEntry = {
   avoidCases: string[];
   compositionNotes: string;
   cropNotes: string;
+  /** Hero cannot support overlays truthfully — use fallbackImageId instead. */
+  compositionInvalid?: boolean;
+  fallbackImageId?: string;
 };
 
 const WELCOME_CONTEXT: ImageContextEntry[] = [
@@ -33,7 +36,18 @@ const WELCOME_CONTEXT: ImageContextEntry[] = [
     useCases: ["first welcome", "quiet presence", "gentle day"],
     avoidCases: ["business focus", "celebration fireworks"],
     compositionNotes: "Landscape room scene — open right side for greeting and chat.",
-    cropNotes: "object-position ~18–22% center; keep Shari left, room right.",
+    cropNotes: "object-position ~14% center; keep Shari left, room right.",
+  },
+  {
+    id: "shari-i-am-here",
+    filePath: "shari-i-am-here.png",
+    timeOfDay: ["morning", "afternoon", "evening"],
+    seasons: ["spring", "summer", "autumn", "winter", "holiday"],
+    emotionalTone: ["warm", "gentle"],
+    useCases: ["living room welcome", "room scene", "quiet presence"],
+    avoidCases: ["coffee close-up", "desk-only crops"],
+    compositionNotes: "Full living room — Shari left, room and window visible.",
+    cropNotes: "object-fit contain, left anchor; room must read as space not portrait.",
   },
   {
     id: "shari-coffee-cup",

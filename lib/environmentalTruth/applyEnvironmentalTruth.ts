@@ -13,6 +13,8 @@ export function applyEnvironmentalTruth(
     objects: input?.objects ?? environment.objects,
     motion: input?.motion ?? environment.motion.enabled,
     recoveryGentle: input?.recoveryGentle,
+    homesteadPeriod:
+      input?.homesteadPeriod ?? environment.homesteadTime?.period,
   };
 
   const resolved = resolveEnvironmentalTruth(truthInput);

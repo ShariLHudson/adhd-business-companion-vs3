@@ -15,8 +15,17 @@ import { resolveKinseyChanges } from "./kinseyResolver";
 import { resolveWildlifeChanges } from "./wildlifeResolver";
 import { resolveGardenChanges } from "./gardenResolver";
 import { resolveRelationshipContinuityChanges } from "./relationshipContinuityResolver";
+import {
+  filterSilentConversationHints,
+  resolveEverydayLifeChanges,
+} from "@/lib/sharisEverydayLife";
+import {
+  filterValidMemoryTriggerHints,
+  resolveMemoryTriggerChanges,
+} from "@/lib/memoryTriggers";
 import { resolveLivingTimeline } from "./livingTimelineResolver";
 import { filterBySceneIntegrity } from "./sceneIntegrityGate";
+import { filterLivingChangesToBorder } from "@/lib/livingBorder";
 import { isOnCooldown } from "./livingChangeHistory";
 
 function priorityRank(priority: LivingChangeItem["priority"]): number {
@@ -110,6 +119,8 @@ function collectCandidates(input: LivingChangeEngineInput): LivingChangeItem[] {
     ...resolveGardenChanges(input),
     ...resolveWildlifeChanges(input),
     ...resolveKinseyChanges(input),
+    ...resolveEverydayLifeChanges(input),
+    ...resolveMemoryTriggerChanges(input),
   ];
 }
 
@@ -227,6 +238,7 @@ export function resolveLivingChangeSet(
   }
 
   candidates = filterBySceneIntegrity(candidates, engineInput);
+  candidates = filterLivingChangesToBorder(candidates);
   candidates = filterAntiRepetition(candidates, now);
 
   const shouldRestrain =
@@ -247,9 +259,13 @@ export function resolveLivingChangeSet(
     wildlife: resolveWildlifeFromChanges(changes),
     heroMotion: resolveHeroMotion(changes),
     hospitality: mergeHospitality(changes),
-    conversationHints: changes
-      .map((c) => c.conversationHint)
-      .filter((hint): hint is string => Boolean(hint)),
+    conversationHints: filterValidMemoryTriggerHints(
+      filterSilentConversationHints(
+        changes
+          .map((c) => c.conversationHint)
+          .filter((hint): hint is string => Boolean(hint)),
+      ),
+    ),
     appliedAt: now.toISOString(),
     restraintApplied: shouldRestrain && changes.length === 0,
   };

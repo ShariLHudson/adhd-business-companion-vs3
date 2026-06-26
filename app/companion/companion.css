@@ -636,6 +636,13 @@
   min-height: 0;
   overflow: hidden;
   pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    #e5dcd0 0%,
+    #efe8de 34%,
+    #f7f2ea 58%,
+    #faf6f0 100%
+  );
 }
 
 .companion-welcome-scene__art {
@@ -644,10 +651,37 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: 22% center;
+  object-position: 8% center;
   user-select: none;
   z-index: 0;
-  /* Shari stays still — life happens in overlays only */
+}
+
+.companion-welcome-scene__art--room {
+  inset: auto;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(58%, 44rem);
+  height: 100%;
+  object-fit: contain;
+  object-position: left center;
+}
+
+.companion-welcome-scene__book-stack-mask {
+  position: absolute;
+  left: 6.5%;
+  top: 36%;
+  width: 12%;
+  height: 14%;
+  border-radius: 4px;
+  background: linear-gradient(
+    180deg,
+    rgba(248, 240, 228, 0.55) 0%,
+    rgba(235, 220, 200, 0.72) 100%
+  );
+  backdrop-filter: blur(3px);
+  z-index: 1;
+  pointer-events: none;
 }
 
 .companion-welcome-scene__life {
@@ -674,12 +708,13 @@
 /* Layer 2 — book overlays (never baked into photography) */
 .companion-welcome-scene__book {
   position: absolute;
-  left: calc(8.5% + var(--book-index, 0) * 2.1%);
-  top: 38%;
-  width: 1.6%;
-  height: 11%;
+  left: calc(7.2% + var(--book-index, 0) * 1.85%);
+  top: 37.5%;
+  width: 1.45%;
+  height: 12%;
   transform: rotate(-2deg);
-  opacity: 0.88;
+  opacity: 0.94;
+  z-index: 2;
 }
 
 .companion-welcome-scene__book-spine {
@@ -688,21 +723,23 @@
   height: 100%;
   writing-mode: vertical-rl;
   text-orientation: mixed;
-  font-size: clamp(0.42rem, 0.55vw, 0.58rem);
+  font-size: clamp(0.38rem, 0.48vw, 0.52rem);
   font-weight: 600;
   letter-spacing: 0.02em;
   line-height: 1.1;
-  color: rgba(72, 58, 48, 0.82);
+  color: rgba(58, 44, 34, 0.9);
   text-align: center;
   overflow: hidden;
   text-overflow: ellipsis;
   background: linear-gradient(
     180deg,
-    rgba(210, 178, 148, 0.92) 0%,
-    rgba(168, 132, 102, 0.88) 100%
+    rgba(210, 178, 148, 0.96) 0%,
+    rgba(148, 112, 82, 0.92) 100%
   );
   border-radius: 1px;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.2),
+    0 1px 3px rgba(45, 38, 32, 0.12);
 }
 
 /* Layer 2 — table objects */
@@ -1328,14 +1365,14 @@
 
 .companion-welcome-scene__foliage {
   position: absolute;
-  width: 12%;
-  height: 32%;
+  width: 14%;
+  height: 34%;
   right: 0;
-  top: 10%;
-  opacity: 0.1;
+  top: 8%;
+  opacity: 0.22;
   background: radial-gradient(
     ellipse at 80% 50%,
-    rgba(120, 158, 108, 0.35) 0%,
+    rgba(120, 158, 108, 0.55) 0%,
     transparent 72%
   );
   transform: translate3d(0, 0, 0);
@@ -1367,15 +1404,15 @@
 .companion-welcome-scene__hero--candle .companion-welcome-scene__candle,
 .companion-welcome-scene__hero--candle-pulse .companion-welcome-scene__candle,
 .companion-welcome-scene__hero--ambient .companion-welcome-scene__candle {
-  opacity: 0.42;
+  opacity: 0.58;
 }
 
 .companion-welcome-scene__hero--candle-pulse .companion-welcome-scene__candle {
-  animation: welcome-candle-flicker 0.65s ease-in-out 1;
+  animation: welcome-candle-flicker 0.55s ease-in-out 2;
 }
 
 .companion-welcome-scene__hero--ambient .companion-welcome-scene__candle {
-  animation: welcome-candle-breathe 9s ease-in-out infinite;
+  animation: welcome-candle-breathe 4.5s ease-in-out infinite;
 }
 
 .companion-welcome-scene__accent--flowers {
@@ -1397,26 +1434,28 @@
 @keyframes welcome-candle-flicker {
   0%,
   100% {
-    opacity: 0.38;
+    opacity: 0.48;
     transform: scale(1);
   }
   35% {
-    opacity: 0.62;
-    transform: scale(1.06);
+    opacity: 0.78;
+    transform: scale(1.1);
   }
   62% {
-    opacity: 0.44;
-    transform: scale(0.98);
+    opacity: 0.52;
+    transform: scale(0.96);
   }
 }
 
 @keyframes welcome-candle-breathe {
   0%,
   100% {
-    opacity: 0.34;
+    opacity: 0.44;
+    transform: scale(1);
   }
   48% {
-    opacity: 0.46;
+    opacity: 0.72;
+    transform: scale(1.05);
   }
 }
 
@@ -1424,10 +1463,55 @@
   0%,
   100% {
     transform: translate3d(0, 0, 0);
+    opacity: 0.2;
   }
   50% {
-    transform: translate3d(-2px, 1px, 0);
+    transform: translate3d(-5px, 2px, 0);
+    opacity: 0.32;
   }
+}
+
+/* Homestead Time™ — continuous day rhythm (not theme switching) */
+.companion-welcome-scene__hero[data-homestead-period="golden-hour"]
+  .companion-welcome-scene__sunlight {
+  opacity: calc(0.55 + var(--homestead-sun-warmth, 0.75) * 0.45);
+  background: radial-gradient(
+    ellipse calc(68% + var(--homestead-shadow-length, 0.6) * 8%) 86% at
+      calc(78% + var(--homestead-shadow-length, 0.6) * 4%) 40%,
+    rgba(255, 186, 110, calc(0.34 + var(--homestead-sun-warmth, 0.75) * 0.3)) 0%,
+    rgba(255, 170, 90, 0.14) 46%,
+    transparent 74%
+  );
+}
+
+.companion-welcome-scene__hero[data-homestead-period="dawn"]
+  .companion-welcome-scene__sunlight {
+  background: radial-gradient(
+    ellipse 76% 92% at 74% 34%,
+    rgba(196, 220, 255, 0.36) 0%,
+    rgba(255, 220, 180, 0.12) 44%,
+    transparent 74%
+  );
+}
+
+.companion-welcome-scene__hero[data-homestead-period="midday"]
+  .companion-welcome-scene__sunlight {
+  opacity: calc(0.65 + var(--homestead-exterior-brightness, 0.85) * 0.35);
+}
+
+.companion-welcome-scene__hero[data-homestead-period="night"]
+  .companion-welcome-scene__lamplight,
+.companion-welcome-scene__hero[data-homestead-period="evening"]
+  .companion-welcome-scene__lamplight {
+  opacity: calc(0.55 + var(--homestead-interior-glow, 0.7) * 0.45);
+}
+
+.companion-welcome-scene__hero[data-homestead-period] .companion-welcome-scene__sunlight {
+  transition: opacity 2.4s ease, background 2.4s ease;
+}
+
+.companion-welcome-scene__hero[data-homestead-period] .companion-welcome-scene__lamplight {
+  transition: opacity 2.4s ease;
 }
 
 /* Time of day — atmosphere only */
@@ -1496,11 +1580,25 @@
 
 .companion-welcome-scene__hero[data-season="summer"]
   .companion-welcome-scene__foliage {
-  opacity: 0.18;
+  opacity: 0.32;
 }
 
 .companion-welcome-scene__hero--ambient .companion-welcome-scene__foliage {
-  animation: welcome-foliage-drift 14s ease-in-out infinite;
+  animation: welcome-foliage-drift 9s ease-in-out infinite;
+}
+
+.companion-welcome-scene__hero--ambient .companion-welcome-scene__sunlight {
+  animation: welcome-sunlight-breathe 8s ease-in-out infinite;
+}
+
+@keyframes welcome-sunlight-breathe {
+  0%,
+  100% {
+    opacity: 0.88;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .companion-welcome-scene__veil {
@@ -1530,15 +1628,15 @@
 
 .companion-welcome-scene__copy-panel {
   position: absolute;
-  top: clamp(6%, 10vh, 14%);
-  right: clamp(1.25rem, 3vw, 2.75rem);
-  width: min(44%, 30rem);
-  min-width: min(100%, 16rem);
-  padding: 1rem 1.15rem;
+  top: clamp(4%, 7vh, 11%);
+  right: clamp(1rem, 2.5vw, 2.25rem);
+  width: min(34%, 24rem);
+  min-width: min(100%, 14rem);
+  padding: 0.75rem 0.9rem;
   border-radius: 12px;
-  background: rgba(252, 248, 242, 0.72);
-  backdrop-filter: blur(6px);
-  box-shadow: 0 2px 24px rgba(45, 38, 32, 0.08);
+  background: rgba(252, 248, 242, 0.55);
+  backdrop-filter: blur(3px);
+  box-shadow: 0 2px 20px rgba(45, 38, 32, 0.06);
   pointer-events: none;
 }
 
@@ -1821,6 +1919,27 @@
   }
 }
 
+.companion-homestead-logo {
+  position: absolute;
+  left: clamp(0.5rem, 1.2vw, 0.9rem);
+  bottom: max(0.55rem, env(safe-area-inset-bottom));
+  z-index: 25;
+  width: clamp(4.25rem, 7vw, 6rem);
+  line-height: 0;
+  pointer-events: none;
+  opacity: 0.9;
+  background: transparent;
+  mix-blend-mode: darken;
+}
+
+.companion-homestead-logo__img {
+  width: 100%;
+  height: auto;
+  display: block;
+  user-select: none;
+  background: transparent;
+}
+
 .companion-welcome-scene__input .input-glass {
   background: rgba(255, 252, 248, 0.94);
   border-color: rgba(255, 255, 255, 0.78);
@@ -1855,14 +1974,14 @@
 }
 
 @media (min-width: 900px) {
-  .companion-welcome-scene__art {
-    object-position: 18% center;
+  .companion-welcome-scene__art--room {
+    width: min(54%, 40rem);
   }
 
   .companion-welcome-scene__copy-panel {
-    top: clamp(7%, 11vh, 15%);
-    right: clamp(1.5rem, 4vw, 3rem);
-    width: min(40%, 32rem);
+    top: clamp(5%, 9vh, 13%);
+    right: clamp(1.25rem, 3vw, 2.5rem);
+    width: min(32%, 22rem);
   }
 }
 
@@ -2022,38 +2141,226 @@
 /* Shari Lives in the Room™ — integrated presence, not a sidebar */
 .clear-my-mind-room {
   position: relative;
-  max-width: 42rem;
+  max-width: 32rem;
+  margin: 0 auto;
+  padding: 0 0.5rem 1rem;
+}
+
+.clear-my-mind-room--capture {
+  padding-top: 0.25rem;
+}
+
+.clear-my-mind-room-header {
+  margin-bottom: 0.5rem;
+  max-width: 28rem;
+}
+
+.clear-my-mind-room-header .text-2xl {
+  font-size: 1.5rem;
+}
+
+.clear-my-mind-atmosphere {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.clear-my-mind-fireplace-glow {
+  position: absolute;
+  left: 6%;
+  bottom: 14%;
+  width: 32%;
+  height: 48%;
+  background: radial-gradient(
+    ellipse at 50% 82%,
+    rgba(255, 168, 88, 0.52) 0%,
+    rgba(255, 120, 48, 0.22) 40%,
+    transparent 74%
+  );
+  animation: cmind-fireplace-glow 4.5s ease-in-out infinite;
+}
+
+.clear-my-mind-candle {
+  position: absolute;
+  width: 0.65rem;
+  height: 1.25rem;
+  border-radius: 2px 2px 4px 4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 248, 230, 0.95) 0%,
+    rgba(220, 190, 150, 0.85) 100%
+  );
+}
+
+.clear-my-mind-candle::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -1.1rem;
+  width: 0.55rem;
+  height: 1rem;
+  margin-left: -0.27rem;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.35) 0%,
+    transparent 70%
+  );
+  animation: cmind-smoke-rise 5s ease-in-out infinite;
+  opacity: 0.55;
+}
+
+.clear-my-mind-candle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -0.55rem;
+  width: 0.5rem;
+  height: 0.75rem;
+  margin-left: -0.25rem;
+  border-radius: 50% 50% 20% 20%;
+  background: radial-gradient(
+    circle at 50% 80%,
+    rgba(255, 230, 140, 0.98) 0%,
+    rgba(255, 140, 40, 0.72) 55%,
+    transparent 100%
+  );
+  animation: cmind-candle-flicker 2.2s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(255, 160, 60, 0.45);
+}
+
+.clear-my-mind-candle--left {
+  left: 14%;
+  bottom: 34%;
+}
+
+.clear-my-mind-candle--right {
+  left: 22%;
+  bottom: 30%;
+  animation-delay: 0.9s;
+}
+
+.clear-my-mind-candle--right::after {
+  animation-delay: 0.9s;
+}
+
+.clear-my-mind-ember {
+  position: absolute;
+  left: 12%;
+  bottom: 22%;
+  width: 1.25rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle,
+    rgba(255, 120, 40, 0.75) 0%,
+    transparent 72%
+  );
+  animation: cmind-ember-pulse 3.2s ease-in-out infinite;
+}
+
+@keyframes cmind-fireplace-glow {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes cmind-candle-flicker {
+  0%,
+  100% {
+    opacity: 0.72;
+    transform: translateX(-50%) scale(1);
+  }
+  40% {
+    opacity: 1;
+    transform: translateX(-50%) scale(1.22);
+  }
+  70% {
+    opacity: 0.82;
+    transform: translateX(-50%) scale(0.9);
+  }
+}
+
+@keyframes cmind-smoke-rise {
+  0%,
+  100% {
+    opacity: 0.2;
+    transform: translateY(0) scale(0.9);
+  }
+  50% {
+    opacity: 0.55;
+    transform: translateY(-6px) scale(1.05);
+  }
+}
+
+@keyframes cmind-ember-pulse {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 0.95;
+  }
+}
+
+.clear-my-mind-journal {
+  position: relative;
+  z-index: 1;
+  max-width: 26rem;
+  margin: 0 auto;
+  padding: 0.85rem 0.95rem 1rem;
+  border-radius: 0.9rem;
+  background: rgba(255, 250, 242, 0.48);
+  border: 1px solid rgba(212, 198, 178, 0.45);
+  box-shadow:
+    0 6px 22px rgba(45, 38, 32, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(2px);
+}
+
+.clear-my-mind-session {
+  gap: 0.65rem;
+}
+
+.clear-my-mind-session > .text-lg {
+  font-size: 1rem;
+  line-height: 1.4;
 }
 
 .clear-my-mind-in-room {
-  position: absolute;
-  top: 0;
-  right: 0;
+  position: relative;
   z-index: 1;
   pointer-events: none;
-  max-width: min(100%, 13.5rem);
+  max-width: 30rem;
+  margin: 0 auto 0.5rem;
+  text-align: center;
 }
 
 .clear-my-mind-in-room-inner {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  gap: 0.5rem;
+  display: block;
 }
 
 .clear-my-mind-in-room-voice-wrap {
   min-width: 0;
-  flex: 1;
-  padding-top: 0.125rem;
-  text-align: right;
+  padding-top: 0;
+  text-align: center;
 }
 
 .clear-my-mind-in-room-voice {
-  margin: 0;
-  font-size: 0.8125rem;
-  line-height: 1.45;
+  margin: 0 auto;
+  font-size: 0.875rem;
+  line-height: 1.5;
   color: #6b635a;
   font-style: italic;
+  max-width: 28rem;
 }
 
 .clear-my-mind-room-work {
@@ -2185,6 +2492,74 @@
 
 .companion-background-calm .companion-bg-vignette {
   opacity: 0.88;
+}
+
+.companion-background-clear-my-mind {
+  --scene-image-dominance: 0.55;
+  --scene-image-scale: 1;
+  --scene-image-position: center 42%;
+}
+
+.companion-background-clear-my-mind .companion-bg-scene {
+  opacity: var(--scene-image-dominance, 0.55);
+  transform: scale(var(--scene-image-scale, 1));
+  object-position: var(--scene-image-position, center 42%);
+  filter: blur(0);
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.companion-background-clear-my-mind .companion-bg-wash {
+  background: rgba(252, 246, 236, 0.18) !important;
+}
+
+.companion-background-clear-my-mind .companion-bg-vignette {
+  opacity: 0.22;
+}
+
+.living-change-visual-debug {
+  position: absolute;
+  left: 0.5rem;
+  bottom: 0.5rem;
+  z-index: 6;
+  max-width: min(22rem, 42vw);
+  padding: 0.45rem 0.55rem;
+  border-radius: 8px;
+  background: rgba(24, 20, 18, 0.82);
+  color: #f5efe6;
+  font-size: 0.65rem;
+  line-height: 1.35;
+  pointer-events: none;
+}
+
+.living-change-visual-debug__title {
+  margin: 0 0 0.25rem;
+  font-weight: 600;
+  font-size: 0.68rem;
+}
+
+.living-change-visual-debug__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.living-change-visual-debug__list li {
+  margin-bottom: 0.2rem;
+}
+
+.living-change-visual-debug__ok {
+  color: #9fd4a8;
+}
+
+.living-change-visual-debug__blocked {
+  color: #f0b4a8;
+}
+
+.living-change-visual-debug__reason {
+  display: block;
+  opacity: 0.85;
+  font-size: 0.62rem;
 }
 
 .input-glass-conversation {
@@ -2392,5 +2767,802 @@
     flex: 1 1 auto;
     width: 100%;
     max-width: 100%;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Companion Workspace Standard v1 — homestead workspaces
+   @see docs/companion-homestead/COMPANION_WORKSPACE_STANDARD.md
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.companion-workspace-page-outer {
+  position: relative;
+  min-height: 100%;
+  width: 100%;
+  max-width: none;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  border-radius: 0;
+}
+
+.companion-workspace-page {
+  position: relative;
+  min-height: min(100%, 100dvh);
+  width: 100%;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  padding-bottom: max(4.5rem, calc(4.5rem + env(safe-area-inset-bottom)));
+}
+
+.companion-protected-zone {
+  position: relative;
+  z-index: 8;
+  width: min(100%, 36rem);
+  margin: 0 auto;
+}
+
+.companion-workspace-banner {
+  margin-bottom: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(212, 205, 195, 0.45);
+  background: rgba(255, 252, 248, 0.55);
+  backdrop-filter: blur(8px);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  line-height: 1.55;
+  color: #2d2926;
+}
+
+.companion-workspace-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.companion-workspace-header__object {
+  flex-shrink: 0;
+}
+
+.companion-workspace-header__title {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #1f1c19;
+}
+
+.companion-workspace-header__subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #5a5248;
+}
+
+/* Frosted glass — sheet resting in the room */
+.companion-workspace-frosted {
+  border-radius: 1.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 252, 248, 0.52);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow:
+    0 10px 36px rgba(45, 38, 32, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset,
+    0 0 0 1px rgba(255, 230, 200, 0.12) inset;
+  padding: clamp(1rem, 2.5vw, 1.35rem);
+}
+
+.clear-my-mind-session__prompt {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 500;
+  line-height: 1.45;
+  color: #2f2924;
+}
+
+.companion-workspace-invite {
+  margin-top: 0.25rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(212, 205, 195, 0.35);
+}
+
+.companion-workspace-invite__prompt {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b635a;
+}
+
+.companion-workspace-invite__link {
+  margin-top: 0.5rem;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #1e4f4f;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.companion-workspace-invite__link:hover {
+  color: #163c3c;
+}
+
+.companion-workspace-voice-chip {
+  margin-bottom: 0.75rem;
+}
+
+.companion-workspace-voice-chip__bubble {
+  max-width: 20rem;
+}
+
+/* Living Border™ — environmental life outside the protected zone */
+.companion-living-border {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.companion-living-border__curtain {
+  position: absolute;
+  top: 8%;
+  width: 14%;
+  height: 62%;
+  border-radius: 2px;
+  background: linear-gradient(
+    180deg,
+    rgba(248, 242, 232, 0.55) 0%,
+    rgba(235, 220, 200, 0.35) 100%
+  );
+  opacity: 0.7;
+  animation: cws-curtain-sway 9s ease-in-out infinite;
+}
+
+.companion-living-border__curtain--left {
+  left: 2%;
+}
+
+.companion-living-border__curtain--right {
+  right: 2%;
+  animation-delay: -4s;
+}
+
+.companion-living-border__trees {
+  position: absolute;
+  right: 6%;
+  top: 18%;
+  width: 28%;
+  height: 42%;
+  background: radial-gradient(
+    ellipse at 40% 80%,
+    rgba(72, 110, 62, 0.28) 0%,
+    transparent 72%
+  );
+  animation: cws-leaves-rustle 12s ease-in-out infinite;
+}
+
+.companion-living-border__bird {
+  position: absolute;
+  right: 18%;
+  top: 24%;
+  width: 0.65rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: #8b3a34;
+  opacity: 0;
+  animation: cws-bird-cross 28s linear infinite;
+}
+
+.companion-living-border__steam {
+  position: absolute;
+  right: 10%;
+  bottom: 16%;
+  width: 1.5rem;
+  height: 2.5rem;
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    rgba(255, 255, 255, 0.35) 0%,
+    transparent 70%
+  );
+  animation: cws-steam-rise 5s ease-in-out infinite;
+}
+
+.companion-living-border__candle {
+  position: absolute;
+  left: 12%;
+  bottom: 22%;
+  width: 0.45rem;
+  height: 0.9rem;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #fff8e8, #dcc896);
+}
+
+.companion-living-border__candle::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: -0.45rem;
+  width: 0.4rem;
+  height: 0.55rem;
+  margin-left: -0.2rem;
+  border-radius: 50% 50% 20% 20%;
+  background: radial-gradient(circle at 50% 80%, #ffe68c, #ff8c28 55%, transparent);
+  animation: cws-candle-flicker 3.2s ease-in-out infinite;
+}
+
+.companion-living-border__lamp-glow {
+  position: absolute;
+  left: 8%;
+  bottom: 18%;
+  width: 22%;
+  height: 38%;
+  background: radial-gradient(
+    ellipse at 30% 70%,
+    rgba(255, 196, 120, 0.32) 0%,
+    transparent 70%
+  );
+}
+
+.companion-living-border__bookshelf {
+  position: absolute;
+  left: 4%;
+  top: 22%;
+  width: 16%;
+  height: 34%;
+  background: linear-gradient(
+    90deg,
+    rgba(92, 62, 42, 0.18) 0%,
+    rgba(92, 62, 42, 0.08) 100%
+  );
+  border-radius: 4px;
+}
+
+.companion-living-border__blanket {
+  position: absolute;
+  right: 8%;
+  bottom: 12%;
+  width: 14%;
+  height: 10%;
+  border-radius: 40% 40% 12% 12%;
+  background: rgba(196, 168, 138, 0.35);
+}
+
+@keyframes cws-curtain-sway {
+  0%,
+  100% {
+    transform: translateX(0) skewX(0deg);
+  }
+  50% {
+    transform: translateX(3px) skewX(1deg);
+  }
+}
+
+@keyframes cws-leaves-rustle {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.85;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
+}
+
+@keyframes cws-bird-cross {
+  0%,
+  92%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  4% {
+    opacity: 0.85;
+  }
+  18% {
+    opacity: 0.85;
+    transform: translate(-12vw, 2vh);
+  }
+  22% {
+    opacity: 0;
+  }
+}
+
+@keyframes cws-steam-rise {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.65;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes cws-candle-flicker {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.92;
+  }
+  40% {
+    transform: scale(1.06);
+    opacity: 1;
+  }
+  70% {
+    transform: scale(0.96);
+    opacity: 0.85;
+  }
+}
+
+@media (max-width: 720px) {
+  .companion-living-border__curtain,
+  .companion-living-border__bookshelf,
+  .companion-living-border__blanket {
+    opacity: 0.45;
+  }
+
+  .companion-protected-zone {
+    width: min(100%, 100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .companion-living-border__curtain,
+  .companion-living-border__trees,
+  .companion-living-border__bird,
+  .companion-living-border__steam,
+  .companion-living-border__candle::after {
+    animation: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Scene Render Contract™ — sole layout authority for workspace scenes
+   Pipeline: SceneState → SceneResolver → SceneLayoutEngine → SceneRenderer
+   Overrides Workspace Standard v1 when conflicting.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.companion-scene-root {
+  position: relative;
+  min-height: min(100%, 100dvh);
+  width: 100%;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  padding-bottom: max(
+    calc(var(--scene-logo-reserve, 4.75rem) + 0.5rem),
+    calc(var(--scene-logo-reserve, 4.75rem) + env(safe-area-inset-bottom))
+  );
+  overflow: hidden;
+}
+
+.companion-scene-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.companion-scene-bg__image,
+.companion-bg-scene.companion-scene-bg__image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: var(--scene-image-position, center 38%);
+  background-repeat: no-repeat;
+  transform: scale(var(--scene-image-scale, 1));
+  transform-origin: center center;
+  opacity: var(--scene-image-dominance, 0.48);
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.companion-scene-bg__wash {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.companion-scene-root.companion-living-frame {
+  /* Living Frame™ — room embraces the work; life stays at edges */
+}
+
+.companion-scene-root--signature-right {
+  --scene-image-position: var(--scene-image-position, 72% 42%);
+}
+
+.companion-scene-root--signature-left {
+  --scene-image-position: var(--scene-image-position, 28% center);
+}
+
+.companion-scene-root--signature-bottom {
+  --scene-image-position: var(--scene-image-position, 50% 65%);
+}
+
+.companion-scene-bg__mask {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse calc(var(--room-protected-zone-expand, 0.58) * 100%)
+      calc(var(--room-protected-zone-expand, 0.58) * 100%) at 50% 46%,
+    rgba(252, 246, 236, 0.92) 0%,
+    rgba(252, 246, 236, 0.55) 48%,
+    transparent 72%
+  );
+}
+
+@media (max-width: 720px) {
+  .companion-scene-root.companion-living-frame {
+    --room-protected-zone-expand: 0.88;
+    --scene-center-max-width: 100%;
+  }
+
+  .companion-scene-center {
+    width: min(100%, 100%);
+  }
+}
+
+.companion-scene-root--bg-homestead-room .companion-scene-bg__mask {
+  background: radial-gradient(
+    ellipse calc(var(--room-protected-zone-expand, 0.52) * 100%)
+      calc(var(--room-protected-zone-expand, 0.52) * 100%) at 50% 44%,
+    rgba(252, 246, 236, 0.78) 0%,
+    rgba(252, 246, 236, 0.35) 50%,
+    transparent 70%
+  );
+}
+
+.companion-scene-motion {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.companion-scene-motion .companion-living-border {
+  z-index: 4;
+}
+
+/* Living Border™ — subtle movement only; never compete with center work */
+.companion-living-border--subtle .companion-living-border__bird,
+.companion-living-border--subtle .companion-living-border__steam,
+.companion-living-border--subtle .companion-living-border__candle::after {
+  opacity: 0.85;
+}
+
+.companion-living-border[data-living-border-subtle="1"] {
+  opacity: 0.92;
+}
+
+.companion-scene-center {
+  position: relative;
+  z-index: 10;
+  width: min(100%, var(--scene-center-max-width, 36rem));
+  margin: 0 auto;
+  isolation: isolate;
+}
+
+.companion-scene-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.85rem;
+}
+
+.companion-scene-header__object {
+  flex-shrink: 0;
+}
+
+.companion-scene-header__title {
+  margin: 0;
+  font-size: 1.375rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: #1f1c19;
+}
+
+.companion-scene-header__subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: #5a5248;
+}
+
+.companion-scene-header__prompt {
+  margin: 0.45rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: #6b635a;
+}
+
+.companion-scene-panel {
+  border-radius: 1.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(
+    255,
+    252,
+    248,
+    var(--scene-panel-frosted-opacity, 0.52)
+  );
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow:
+    0 10px 36px rgba(45, 38, 32, 0.08),
+    0 1px 0 rgba(255, 255, 255, 0.65) inset,
+    0 0 0 1px rgba(255, 230, 200, 0.12) inset;
+  padding: clamp(1rem, 2.5vw, 1.35rem);
+}
+
+.companion-scene-root--fit-contain .companion-scene-bg__image {
+  background-size: contain;
+  background-position: center center;
+}
+
+@media (max-width: 720px) {
+  .companion-scene-center {
+    width: min(100%, 100%);
+  }
+}
+
+/* Planning Table™ — Kitchen Planning Nook; open window stays visible right */
+.companion-scene-root--planning-table {
+  --scene-image-position: var(--scene-image-position, 62% 44%);
+}
+
+.companion-scene-root--planning-table .companion-scene-bg__wash {
+  background: var(--planning-table-wash, rgba(252, 246, 236, 0.22));
+}
+
+.companion-scene-root--planning-morning .companion-scene-bg__wash {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 236, 198, 0.28) 0%,
+    rgba(252, 246, 236, 0.22) 55%,
+    rgba(248, 242, 232, 0.18) 100%
+  );
+}
+
+.companion-scene-root--planning-afternoon .companion-scene-bg__wash {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 252, 244, 0.26) 0%,
+    rgba(252, 246, 236, 0.2) 100%
+  );
+}
+
+.companion-scene-root--planning-evening .companion-scene-bg__wash {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 228, 188, 0.24) 0%,
+    rgba(252, 246, 236, 0.28) 100%
+  );
+}
+
+.companion-scene-root--planning-rain .companion-scene-bg__wash {
+  background: linear-gradient(
+    180deg,
+    rgba(220, 228, 236, 0.32) 0%,
+    rgba(252, 246, 236, 0.26) 100%
+  );
+}
+
+.companion-scene-root--planning-winter .companion-scene-bg__wash {
+  background: linear-gradient(
+    145deg,
+    rgba(236, 244, 252, 0.22) 0%,
+    rgba(255, 238, 210, 0.26) 100%
+  );
+}
+
+.companion-scene-root--focus-landscape .companion-scene-bg__wash {
+  background: var(--focus-landscape-wash, rgba(248, 252, 246, 0.18));
+}
+
+.companion-scene-root--focus-garden-path .companion-scene-bg__wash {
+  background: linear-gradient(
+    180deg,
+    rgba(232, 240, 228, 0.28) 0%,
+    rgba(248, 252, 246, 0.18) 100%
+  );
+}
+
+.companion-scene-root--focus-deep-forest .companion-scene-bg__wash {
+  background: linear-gradient(
+    180deg,
+    rgba(210, 220, 210, 0.34) 0%,
+    rgba(228, 236, 228, 0.26) 100%
+  );
+  filter: saturate(var(--focus-landscape-saturation, 0.72));
+}
+
+.companion-scene-root--focus-horizon-trail .companion-scene-bg__wash {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 248, 220, 0.2) 0%,
+    rgba(252, 250, 240, 0.12) 100%
+  );
+}
+
+.companion-scene-root--planning-table.companion-scene-root--signature-right
+  .companion-scene-bg__mask {
+  background: radial-gradient(
+    ellipse calc(var(--room-protected-zone-expand, 0.54) * 100%)
+      calc(var(--room-protected-zone-expand, 0.54) * 100%) at 42% 46%,
+    rgba(252, 246, 236, 0.88) 0%,
+    rgba(252, 246, 236, 0.42) 52%,
+    transparent 74%
+  );
+}
+
+/* Sunroom Over The Pond™ — pond stays visible below workspace */
+.companion-scene-root--sunroom-over-pond {
+  --scene-image-position: var(--scene-image-position, 50% 68%);
+}
+
+.companion-scene-root--sunroom-over-pond .companion-scene-bg__wash {
+  background: var(--sunroom-wash, rgba(248, 252, 246, 0.18));
+}
+
+.companion-scene-root--sunroom-morning .companion-scene-bg__wash {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 240, 0.22) 0%,
+    rgba(248, 252, 246, 0.16) 55%,
+    rgba(232, 244, 238, 0.2) 100%
+  );
+}
+
+.companion-scene-root--sunroom-afternoon .companion-scene-bg__wash {
+  background: linear-gradient(
+    165deg,
+    rgba(252, 255, 248, 0.2) 0%,
+    rgba(248, 252, 246, 0.14) 100%
+  );
+}
+
+.companion-scene-root--sunroom-evening .companion-scene-bg__wash {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 236, 200, 0.18) 0%,
+    rgba(248, 252, 246, 0.22) 100%
+  );
+}
+
+.companion-scene-root--sunroom-after-rain .companion-scene-bg__wash {
+  background: linear-gradient(
+    180deg,
+    rgba(220, 236, 228, 0.26) 0%,
+    rgba(248, 252, 246, 0.18) 100%
+  );
+}
+
+.companion-scene-root--sunroom-over-pond.companion-scene-root--signature-bottom
+  .companion-scene-bg__mask {
+  background: radial-gradient(
+    ellipse calc(var(--room-protected-zone-expand, 0.48) * 100%)
+      calc(var(--room-protected-zone-expand, 0.48) * 100%) at 50% 38%,
+    rgba(248, 252, 246, 0.82) 0%,
+    rgba(248, 252, 246, 0.34) 50%,
+    transparent 76%
+  );
+}
+
+.companion-living-border__pond-water {
+  position: absolute;
+  bottom: 8%;
+  left: 18%;
+  right: 18%;
+  height: 12%;
+  opacity: 0.35;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(120, 176, 168, 0.35) 25%,
+    rgba(120, 176, 168, 0.45) 50%,
+    rgba(120, 176, 168, 0.35) 75%,
+    transparent 100%
+  );
+  animation: companion-pond-flow 14s ease-in-out infinite;
+}
+
+.companion-living-border__goldfish {
+  position: absolute;
+  bottom: 10%;
+  left: 30%;
+  width: 1.25rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: rgba(218, 145, 62, 0.55);
+  animation: companion-goldfish-glide 22s ease-in-out infinite;
+}
+
+.companion-living-border__water-lilies {
+  position: absolute;
+  bottom: 11%;
+  right: 28%;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 999px;
+  background: radial-gradient(
+    circle at 40% 40%,
+    rgba(180, 220, 170, 0.7) 0%,
+    rgba(140, 190, 130, 0.35) 70%
+  );
+  animation: companion-lily-shift 18s ease-in-out infinite;
+}
+
+.companion-living-border__pergola-vines {
+  position: absolute;
+  top: 6%;
+  left: 12%;
+  right: 12%;
+  height: 14%;
+  opacity: 0.28;
+  background: linear-gradient(
+    180deg,
+    rgba(90, 130, 80, 0.25) 0%,
+    transparent 100%
+  );
+  animation: companion-pergola-shadow 24s ease-in-out infinite;
+}
+
+@keyframes companion-pond-flow {
+  0%,
+  100% {
+    transform: translateX(-2%) scaleX(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: translateX(2%) scaleX(1.02);
+    opacity: 0.42;
+  }
+}
+
+@keyframes companion-goldfish-glide {
+  0%,
+  100% {
+    transform: translateX(0);
+    opacity: 0.45;
+  }
+  50% {
+    transform: translateX(8rem);
+    opacity: 0.65;
+  }
+}
+
+@keyframes companion-lily-shift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-0.35rem, 0.15rem);
+  }
+}
+
+@keyframes companion-pergola-shadow {
+  0%,
+  100% {
+    opacity: 0.22;
+  }
+  50% {
+    opacity: 0.34;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .companion-living-border__pond-water,
+  .companion-living-border__goldfish,
+  .companion-living-border__water-lilies,
+  .companion-living-border__pergola-vines {
+    animation: none !important;
   }
 }

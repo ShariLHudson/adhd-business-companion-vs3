@@ -61,6 +61,26 @@ export function resolveEnvironmentalCauses(
     causes.add("evening-indoors");
   }
 
+  if (
+    input.homesteadPeriod === "golden-hour" ||
+    input.homesteadPeriod === "evening"
+  ) {
+    causes.add("evening-indoors");
+  }
+
+  if (input.homesteadPeriod === "night") {
+    causes.delete("butterflies-day");
+    causes.delete("window-open");
+    causes.delete("summer-breeze");
+  }
+
+  if (
+    input.homesteadPeriod === "dawn" ||
+    input.homesteadPeriod === "golden-hour"
+  ) {
+    causes.add("morning-sun");
+  }
+
   if (season === "summer" && input.weather === "clear") {
     causes.add("summer-iowa");
     if (isDaytime(input.timeOfDay)) {

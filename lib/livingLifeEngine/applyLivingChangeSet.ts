@@ -92,6 +92,9 @@ export function applyLivingChangeSet(
         changeSet.changes.find((c) => c.relationshipCue)?.relationshipCue ??
         null,
       conversationHints: changeSet.conversationHints,
+      memoryTriggerIds: changeSet.changes
+        .filter((change) => change.sourceModule === "memoryTriggers")
+        .map((change) => change.id.replace(/^memory-trigger-/, "")),
       now: input.now,
     });
     if (input.livingLifeContext.visitKind === "arrival") {

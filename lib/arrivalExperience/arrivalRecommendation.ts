@@ -1,92 +1,104 @@
+import type { DayState } from "@/lib/companionStore";
 import type { CompanionContinueResolution } from "@/lib/companionLedContinue";
 import { evaluateCompanionNeedsIntelligence } from "@/lib/companionNeedsIntelligence";
-import { placeById } from "@/lib/companionUniverse/libraries/placeLibrary";
-import type { DayState } from "@/lib/companionStore";
+import type { CompanionPlaceId } from "@/lib/companionUniverse/types";
+import { composeRoomInvitation } from "@/lib/shariVoiceBible/composeRoomInvitation";
+import type { GreetingIntelligenceInput } from "@/lib/greetingIntelligence/types";
+import {
+  applyRestraintToArrivalRecommendation,
+  userExpressedRoomNeed,
+} from "@/lib/wisdomOfRestraint";
+import { applyCharacterToArrivalRecommendation } from "@/lib/characterOfShari";
 import type { ArrivalRecommendation, RealityEmotionalTone } from "./types";
 import { sectionForPlace } from "./sectionForPlace";
 
-const WALKING_LINES: Partial<Record<string, string>> = {
-  "planning-table": "I'll walk with you.",
-  "window-seat": "This way — by the window.",
-  "creative-studio": "Let's head to the studio.",
-  "reading-nook": "This way — by the reading nook.",
-  "focus-studio": "Let's protect your focus.",
-  "living-room": "Stay here with me.",
+const DEFAULT_VOICE_CONTEXT: GreetingIntelligenceInput = {
+  homeState: "QUIET_PRESENCE",
+  timeOfDay: "afternoon",
+  sessionVisitIndex: 12,
+  returnIntervalHours: 16,
+  returnIntervalDays: 0.5,
+  isFirstMeeting: false,
 };
 
-function recommendationLine(
-  placeName: string,
-  tone: RealityEmotionalTone,
-): string {
-  if (tone === "flooded" || tone === "grief") {
-    return "Let's spend a few minutes at the Window Seat.";
-  }
-  if (tone === "spark" || tone === "celebration") {
-    return `The Creative Studio is open if you want to land that idea.`;
-  }
-  if (tone === "low" || tone === "heavy") {
-    return `Want to sit at the ${placeName} — gently?`;
-  }
-  return `Want to shape today at the ${placeName}?`;
-}
-
-function buttonLabel(tone: RealityEmotionalTone): string {
-  if (tone === "flooded" || tone === "grief" || tone === "heavy") {
-    return "Yes, gently";
-  }
-  return "Yes";
-}
-
-function continueToPlace(kind: string): ArrivalRecommendation | null {
-  switch (kind) {
-    case "plan-my-day":
-      return buildRecommendation("planning-table", "okay", true);
-    case "conversation":
-      return null;
-    default:
-      return null;
-  }
-}
-
 function buildRecommendation(
-  placeId: import("@/lib/companionUniverse/types").CompanionPlaceId,
+  placeId: CompanionPlaceId,
   tone: RealityEmotionalTone,
+  voiceContext: GreetingIntelligenceInput,
   fromContinue = false,
 ): ArrivalRecommendation {
-  const placeName = placeById(placeId).name.replace(/™/g, "");
   const section = sectionForPlace(placeId);
   const stayInLivingRoom = placeId === "living-room";
+  const copy = composeRoomInvitation({
+    placeId,
+    tone,
+    voiceContext,
+    fromContinue,
+  });
   return {
     placeId,
     section,
-    line: fromContinue
-      ? `Want to pick up where we left off at the ${placeName}?`
-      : recommendationLine(placeName, tone),
-    buttonLabel: buttonLabel(tone),
-    walkingLine: WALKING_LINES[placeId] ?? "I'll walk with you.",
+    line: copy.line,
+    buttonLabel: copy.buttonLabel,
+    walkingLine: copy.walkingLine,
     stayInLivingRoom,
   };
 }
 
+/** Relationship before recommendation — wait until reconnection turns are complete. */
+const MIN_RECONNECTION_TURNS = 2;
+
+/**
+ * Room invitations pass through Wisdom of Restraint™.
+ * No tone-based redirects — only when the guest expressed a need.
+ */
 export function resolveArrivalRecommendation(input: {
   message?: string;
   tone: RealityEmotionalTone;
   dayState?: DayState | null;
   continueResolution?: CompanionContinueResolution;
+  reconnectionTurns?: number;
+  readyForRecommendation?: boolean;
+  voiceContext?: GreetingIntelligenceInput;
 }): ArrivalRecommendation | null {
-  const { tone, message = "", continueResolution } = input;
+  const {
+    tone,
+    message = "",
+    continueResolution,
+    reconnectionTurns = 0,
+    readyForRecommendation = true,
+    voiceContext = DEFAULT_VOICE_CONTEXT,
+  } = input;
 
-  if (tone === "grief" || tone === "flooded") {
-    return buildRecommendation("window-seat", tone);
-  }
+  const restraintContext = {
+    tone,
+    userMessage: message,
+    reconnectionTurns,
+  };
+
+  if (!readyForRecommendation) return null;
+  if (reconnectionTurns < MIN_RECONNECTION_TURNS) return null;
 
   if (
     continueResolution &&
     continueResolution.mode === "single" &&
     continueResolution.option.kind === "plan-my-day"
   ) {
-    return continueToPlace(continueResolution.option.kind);
+    return applyCharacterToArrivalRecommendation(
+      applyRestraintToArrivalRecommendation(
+        buildRecommendation("planning-table", tone, voiceContext, true),
+        {
+          ...restraintContext,
+          userExpressedNeed: true,
+          fromContinueResolution: true,
+        },
+      ),
+      {},
+    );
   }
+
+  const expressedNeed = userExpressedRoomNeed(message);
+  if (!expressedNeed) return null;
 
   const needs = evaluateCompanionNeedsIntelligence({
     text: message,
@@ -95,9 +107,15 @@ export function resolveArrivalRecommendation(input: {
     cognitiveLoadLevel: tone === "low" ? "heavy" : "moderate",
   });
 
-  if (tone === "spark" || tone === "celebration") {
-    return buildRecommendation("creative-studio", tone);
+  if (needs.recommendedPlaceId === "living-room" || needs.confidence === "low") {
+    return null;
   }
 
-  return buildRecommendation(needs.recommendedPlaceId, tone);
+  return applyCharacterToArrivalRecommendation(
+    applyRestraintToArrivalRecommendation(
+      buildRecommendation(needs.recommendedPlaceId, tone, voiceContext),
+      { ...restraintContext, userExpressedNeed: true },
+    ),
+    {},
+  );
 }

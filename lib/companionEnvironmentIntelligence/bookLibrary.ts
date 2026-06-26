@@ -17,15 +17,16 @@ export type FeaturedBook = {
 
 /** Starter ADHD / business titles — rotate slowly, not every render. */
 export const FEATURED_BOOK_LIBRARY: FeaturedBook[] = [
-  { title: "Tiny Wins", category: "adhd" },
-  { title: "One Thing at a Time", category: "adhd" },
+  { title: "Nobody Gave Me the Manual™", category: "adhd" },
   { title: "Permission to Begin", category: "encouragement" },
+  { title: "Ideas Worth Keeping", category: "creativity" },
+  { title: "Big Magic", category: "creativity" },
+  { title: "Tiny Steps, Real Life", category: "ordinary" },
+  { title: "One Thing at a Time", category: "adhd" },
   { title: "Progress Over Perfect", category: "progress" },
-  { title: "The Next Small Step", category: "planning" },
   { title: "Gentle Momentum", category: "mindset" },
   { title: "Building a Business That Fits Your Brain", category: "business" },
   { title: "Finished Is Beautiful", category: "joy" },
-  { title: "Ideas Worth Keeping", category: "creativity" },
   { title: "Today Counts Too", category: "ordinary" },
 ];
 

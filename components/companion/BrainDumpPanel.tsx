@@ -1,29 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { clearBrainDumpDraft, type BrainDumpEntry } from "@/lib/companionStore";
+import { clearBrainDumpDraft } from "@/lib/companionStore";
 import { ClearMyMindSession } from "@/components/companion/ClearMyMindSession";
-import { ClearMyMindInRoomPresence } from "@/components/companion/ClearMyMindInRoomPresence";
+import { CompanionWorkspaceShell } from "@/components/companion/CompanionWorkspaceShell";
 import { MyThinkingSpacePanel } from "@/components/companion/MyThinkingSpacePanel";
 import { newCaptureSessionId } from "@/lib/clearMyMindCapture";
-import {
-  CLEAR_MY_MIND_HEADER,
-  CLEAR_MY_MIND_PERMISSION,
-} from "@/lib/clearMyMindCopy";
 import { NAV_CLEAR_MY_MIND } from "@/lib/navigationBack";
 import type { AppSection } from "@/lib/companionUi";
 import type { WorkspacePanelDetail } from "@/lib/workspaceAwareness";
-import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 
 type PanelView = "capture" | "my-thoughts";
 
 /**
- * Clear My Mind™ captures continuously.
- * My Thoughts™ organizes — separate view, always one tap away.
+ * Clear My Mind™ — Companion Workspace Standard v1.
+ * Journal table at the Window Seat; room stays visible around the workspace.
  */
 export function BrainDumpPanel({
-  onOpen,
-  onSuggestOpen,
+  onOpen: _onOpen,
+  onSuggestOpen: _onSuggestOpen,
   onContextChange,
   contextBanner,
 }: {
@@ -34,12 +29,6 @@ export function BrainDumpPanel({
   standalone?: boolean;
 }) {
   const [captureSessionId] = useState(newCaptureSessionId);
-  const [sessionVisualEntries, setSessionVisualEntries] = useState<
-    BrainDumpEntry[]
-  >([]);
-  const [shareConfirming, setShareConfirming] = useState(false);
-  const [holdAck, setHoldAck] = useState<string | null>(null);
-  const [totalThoughtCount, setTotalThoughtCount] = useState(0);
   const [panelView, setPanelView] = useState<PanelView>("capture");
   const [presenceEntryKey, setPresenceEntryKey] = useState(0);
 
@@ -58,13 +47,9 @@ export function BrainDumpPanel({
     });
   }, [panelView, onContextChange]);
 
-  const handlePresenceStateChange = useCallback(
-    (state: { shareConfirming: boolean; holdAck: string | null }) => {
-      setShareConfirming(state.shareConfirming);
-      setHoldAck(state.holdAck);
-    },
-    [],
-  );
+  const contextBannerNode = contextBanner ? (
+    <div className="companion-workspace-banner">{contextBanner}</div>
+  ) : null;
 
   if (panelView === "my-thoughts") {
     return (
@@ -72,17 +57,17 @@ export function BrainDumpPanel({
         className="companion-fade-in h-full min-h-0"
         data-cmind-view="my-thoughts"
       >
-        <div
-          className={`${workspacePanelShellClass({ width: "full", inSplit: false })} min-w-0 overflow-y-auto`}
+        <CompanionWorkspaceShell
+          roomId="clear-my-mind"
+          workspaceId="clear-my-mind-thoughts"
+          banner={contextBannerNode}
         >
-          <div className="clear-my-mind-room">
-            <MyThinkingSpacePanel
-              backDestination={NAV_CLEAR_MY_MIND}
-              onBack={() => setPanelView("capture")}
-              presenceEntryKey={presenceEntryKey}
-            />
-          </div>
-        </div>
+          <MyThinkingSpacePanel
+            backDestination={NAV_CLEAR_MY_MIND}
+            onBack={() => setPanelView("capture")}
+            presenceEntryKey={presenceEntryKey}
+          />
+        </CompanionWorkspaceShell>
       </div>
     );
   }
@@ -93,50 +78,13 @@ export function BrainDumpPanel({
       data-cmind-mode="capture"
       data-cmind-view="capture"
     >
-      <div
-        className={`${workspacePanelShellClass({ width: "full", inSplit: false })} min-w-0 overflow-y-auto`}
-      >
-        {contextBanner ? (
-          <div className="mb-4 rounded-2xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/5 px-4 py-3 text-sm leading-relaxed text-[#2d2926]">
-            {contextBanner}
-          </div>
-        ) : null}
-
-        <div className="clear-my-mind-room">
-          <header className="mb-2 max-w-xl pr-16 sm:pr-20">
-            <p className="text-2xl font-semibold text-[#1f1c19]">
-              Clear My Mind
-            </p>
-            <p className="mt-2 text-base leading-relaxed text-[#6b635a]">
-              {CLEAR_MY_MIND_HEADER}
-            </p>
-            <p className="mt-3 text-sm leading-relaxed text-[#6b635a]">
-              {CLEAR_MY_MIND_PERMISSION}
-            </p>
-          </header>
-
-          <ClearMyMindInRoomPresence
-            stage="release"
-            entries={sessionVisualEntries}
-            shareConfirming={shareConfirming}
-            holdAck={holdAck}
-            unfoldStep="idle"
-            totalThoughtCount={totalThoughtCount}
-            workspaceEntryKey={presenceEntryKey}
-          />
-
-          <div className="clear-my-mind-room-work">
-            <ClearMyMindSession
-              key={captureSessionId}
-              sessionId={captureSessionId}
-              onSessionEntriesChange={setSessionVisualEntries}
-              onPresenceStateChange={handlePresenceStateChange}
-              onOpenMyThoughts={() => setPanelView("my-thoughts")}
-              onTotalThoughtCountChange={setTotalThoughtCount}
-            />
-          </div>
-        </div>
-      </div>
+      <CompanionWorkspaceShell roomId="clear-my-mind" banner={contextBannerNode}>
+        <ClearMyMindSession
+          key={captureSessionId}
+          sessionId={captureSessionId}
+          onOpenMyThoughts={() => setPanelView("my-thoughts")}
+        />
+      </CompanionWorkspaceShell>
     </div>
   );
 }

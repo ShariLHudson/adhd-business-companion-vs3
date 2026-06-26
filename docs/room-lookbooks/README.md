@@ -9,10 +9,12 @@ These documents are **permanent design authority** for the first five daily-life
 1. [`COMPANION_HOMESTEAD_MANIFESTO.md`](../COMPANION_HOMESTEAD_MANIFESTO.md) — constitutional law
 2. [`docs/companion-homestead/VISUAL_DESIGN_BIBLE.md`](../companion-homestead/VISUAL_DESIGN_BIBLE.md) — house DNA
 3. [`docs/companion-homestead/LOOK_BOOK.md`](../companion-homestead/LOOK_BOOK.md) — full 20-room environmental spec
-4. **This folder** — implementation-ready room packets for Phase 1 build
-5. [`docs/companion-homestead/SCREEN_COMPOSITION_GUIDE.md`](../companion-homestead/SCREEN_COMPOSITION_GUIDE.md) — how rooms become screens
-6. [`docs/companion-homestead/FIRST_PRODUCTION_EXPERIENCE.md`](../companion-homestead/FIRST_PRODUCTION_EXPERIENCE.md) — first 30–60s arrival journey
-7. [`lib/companionObjects/companionObjectRegistry.ts`](../lib/companionObjects/companionObjectRegistry.ts) — object identity (no duplicate objects)
+4. [`docs/companion-homestead/EMOTIONAL_EXPERIENCE_BLUEPRINT.md`](../companion-homestead/EMOTIONAL_EXPERIENCE_BLUEPRINT.md) — how each room must change how someone feels
+5. **This folder** — implementation-ready room packets for Phase 1 build
+6. [`docs/companion-homestead/SCREEN_COMPOSITION_GUIDE.md`](../companion-homestead/SCREEN_COMPOSITION_GUIDE.md) — how rooms become screens
+7. [`docs/companion-homestead/FIRST_PRODUCTION_EXPERIENCE.md`](../companion-homestead/FIRST_PRODUCTION_EXPERIENCE.md) — first 30–60s arrival journey
+8. [`docs/companion-homestead/JOURNEY_BETWEEN_ROOMS.md`](../companion-homestead/JOURNEY_BETWEEN_ROOMS.md) — movement between rooms (design authority)
+9. [`lib/companionObjects/companionObjectRegistry.ts`](../lib/companionObjects/companionObjectRegistry.ts) — object identity (no duplicate objects)
 
 ## Phase 1 rooms
 

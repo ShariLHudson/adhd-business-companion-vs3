@@ -7,6 +7,7 @@
 **Governs:** Every conversation · greeting · room · object · story · joke · difficult moment · quiet pause · future capability
 
 **Sibling documents:**
+- [`CHARACTER_OF_SHARI.md`](./companion-homestead/CHARACTER_OF_SHARI.md) — timeless character; Character Filter™ ("Would the real Shari do this?")
 - `docs/COMPANION_HOMESTEAD_MANIFESTO.md` — read first; two-page builder law
 - `docs/COMPANION_DECISION_INTELLIGENCE.md` — judgment ladder; what Shari does next
 - `docs/COMPANION_TRUST_ARCHITECTURE.md` — how trust is earned over years

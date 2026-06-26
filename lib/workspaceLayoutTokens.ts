@@ -20,8 +20,12 @@ export const WORKSPACE_CARD_GAP_CLASS = "gap-3";
 export const WORKSPACE_SECTION_GAP_CLASS = "gap-6";
 export const WORKSPACE_HEADER_MIN_HEIGHT_CLASS = "min-h-14";
 export const WORKSPACE_SLIDE_PANEL_WIDTH_CLASS = "max-w-xl";
+/** Shared frosted surface — prefer CompanionWorkspaceShell for homestead workspaces */
 export const WORKSPACE_FULL_PAGE_SURFACE_CLASS =
   "companion-panel-surface mx-auto min-h-full w-full max-w-3xl rounded-3xl bg-white/80 shadow-sm backdrop-blur-sm";
+
+/** Clear My Mind™ and future homestead workspaces — room stays visible */
+export const COMPANION_HOMESTEAD_WORKSPACE_PAGE_CLASS = "companion-workspace-page-outer";
 
 /** CSS class roots for split-pane flex proportions (see companion.css). */
 export const SPLIT_LAYOUT_ROOT_CLASS = "companion-split-layout";

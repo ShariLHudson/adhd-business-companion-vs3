@@ -162,8 +162,12 @@ export function startAmbientHospitalityAudio(
 
   void ctx.resume();
 
+  let stopped = false;
+
   return {
     stop: () => {
+      if (stopped) return;
+      stopped = true;
       cleanups.forEach((fn) => fn());
       sources.forEach((s) => {
         try {
@@ -172,7 +176,9 @@ export function startAmbientHospitalityAudio(
           /* already stopped */
         }
       });
-      void ctx.close();
+      if (ctx.state !== "closed") {
+        void ctx.close();
+      }
     },
   };
 }

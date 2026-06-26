@@ -144,6 +144,7 @@ export function recordLivingChangeApplication(input: {
   hospitalityIds: string[];
   relationshipCue: string | null;
   conversationHints: string[];
+  memoryTriggerIds?: string[];
   now?: Date;
 }) {
   const now = input.now ?? new Date();
@@ -169,6 +170,9 @@ export function recordLivingChangeApplication(input: {
   }
   for (const hint of input.conversationHints) {
     pushRecord(history, "observation", hint, now);
+  }
+  for (const triggerId of input.memoryTriggerIds ?? []) {
+    pushRecord(history, "observation", `memory-trigger:${triggerId}`, now);
   }
 
   writeHistory(history);

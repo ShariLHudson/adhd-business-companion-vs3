@@ -1,4 +1,5 @@
 import type { AppSection } from "@/lib/companionUi";
+import { applySharisPresenceToEngine } from "@/lib/sharisPresence";
 import type { CompanionPlaceId } from "./types";
 import { placeById } from "./libraries/placeLibrary";
 import { placeForSection } from "./companionLayoutSystem";
@@ -204,8 +205,10 @@ export const EXPERIENCE_PRESENCE_MAP: readonly ExperiencePresenceRule[] = [
   {
     id: "focus-studio",
     label: "Focus Studio™",
-    level: 1,
-    rationale: "Attention protection — Shari invisible while you focus",
+    level: 2,
+    evidence: ["coffee mug", "open journal"],
+    rationale:
+      "Sunroom prepared for regulated attention — pond anchors focus; Shari nearby without supervising",
   },
   {
     id: "window-seat",
@@ -301,6 +304,7 @@ const PLACE_TO_EXPERIENCE: Partial<Record<CompanionPlaceId, CompanionExperienceI
     "creative-studio": "creative-studio",
     "workshop": "workshop",
     "focus-studio": "focus-studio",
+    "sunroom-over-pond": "focus-studio",
     "reading-nook": "reading-nook",
     garden: "garden",
     "garden-path": "garden",
@@ -325,6 +329,7 @@ const SECTION_TO_EXPERIENCE: Partial<Record<AppSection, CompanionExperienceId>> 
   "content-generator": "creative-studio",
   "my-work": "creative-studio",
   "business-profile": "business-office",
+  "decision-compass": "business-office",
   "how-do-i": "library",
   growth: "reading-nook",
   "my-journey": "reading-nook",
@@ -410,7 +415,7 @@ export function evaluateCompanionPresenceEngine(input: {
     ? placeById(input.placeId).name
     : rule.label;
 
-  return {
+  const base: ResolvedCompanionPresence = {
     level,
     levelName: meta.name,
     purpose: meta.purpose,
@@ -425,6 +430,16 @@ export function evaluateCompanionPresenceEngine(input: {
     hostQuestion: HOST_QUESTION,
     rationale: `${rule.rationale} (${placeName})`,
   };
+
+  return applySharisPresenceToEngine(base, {
+    experienceId: rule.id,
+    placeId: input.placeId,
+    section: input.section,
+    writingActive: modifiers.includes("writing-active"),
+    voiceConversation:
+      modifiers.includes("voice-conversation") ||
+      modifiers.includes("coaching-session"),
+  });
 }
 
 export function presenceLevelFromLegacy(

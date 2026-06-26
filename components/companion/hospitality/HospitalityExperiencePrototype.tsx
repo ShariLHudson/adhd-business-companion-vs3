@@ -136,12 +136,12 @@ export function HospitalityExperiencePrototype() {
   }, [profileSource, demoKey, hospitalityResolution.summary]);
 
   useEffect(() => {
-    audioRef.current?.stop();
-    audioRef.current = startAmbientHospitalityAudio(
-      scene.audio,
-      scene.audioEnabled,
-    );
-    return () => audioRef.current?.stop();
+    const handle = startAmbientHospitalityAudio(scene.audio, scene.audioEnabled);
+    audioRef.current = handle;
+    return () => {
+      handle.stop();
+      audioRef.current = null;
+    };
   }, [scene.audio, scene.audioEnabled]);
 
   const flashToast = useCallback((message: string) => {

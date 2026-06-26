@@ -1,11 +1,20 @@
 "use client";
 
 import { companionObjectById, companionObjectRoom } from "@/lib/companionObjects";
+import {
+  resolveSignatureVisualSpec,
+  signatureObjectById,
+  type SignatureObjectForm,
+} from "@/lib/signatureCompanionObjects";
 
-export type CompanionObjectSize = "xs" | "sm" | "md" | "lg" | "card";
+export type CompanionObjectSize = "xs" | "sm" | "md" | "lg" | "card" | "hero";
 
 export type CompanionObjectVisualProps = {
   objectId: string;
+  /** Signature Companion Object™ id — resolves form, size, and catalog link. */
+  signatureId?: string;
+  /** Level 1 navigation · Level 2 feature · Level 3 environmental (scene placement). */
+  form?: SignatureObjectForm;
   size?: CompanionObjectSize;
   /** Mini-scene card crop vs compact icon square. */
   variant?: "mini-scene" | "icon";
@@ -22,6 +31,7 @@ const SIZE_CLASS: Record<CompanionObjectSize, string> = {
   md: "companion-object-visual--md",
   lg: "companion-object-visual--lg",
   card: "companion-object-visual--card",
+  hero: "companion-object-visual--hero",
 };
 
 /**
@@ -30,31 +40,44 @@ const SIZE_CLASS: Record<CompanionObjectSize, string> = {
  */
 export function CompanionObjectVisual({
   objectId,
+  signatureId,
+  form,
   size = "sm",
   variant = "mini-scene",
   className,
   label,
   animate,
 }: CompanionObjectVisualProps) {
-  const entry = companionObjectById(objectId);
+  const signature = signatureId ? signatureObjectById(signatureId) : undefined;
+  const spec = signature ? resolveSignatureVisualSpec(signature, form ?? "navigation") : null;
+  const resolvedObjectId =
+    spec?.featureObjectId ?? spec?.catalogObjectId ?? objectId;
+  const resolvedSize = spec?.size ?? size;
+  const resolvedVariant = spec?.variant ?? variant;
+  const entry = companionObjectById(resolvedObjectId);
   const motion =
-    animate ?? (variant === "mini-scene" && entry?.assetStatus === "placeholder");
+    animate ??
+    spec?.animate ??
+    (resolvedVariant === "mini-scene" && entry?.assetStatus === "placeholder");
 
   return (
     <span
       className={[
         "companion-object-visual",
-        SIZE_CLASS[size],
-        variant === "icon" ? "companion-object-visual--icon" : "",
+        SIZE_CLASS[resolvedSize],
+        resolvedVariant === "icon" ? "companion-object-visual--icon" : "",
         motion ? "companion-object-visual--alive" : "",
         className ?? "",
       ]
         .filter(Boolean)
         .join(" ")}
-      data-companion-object={objectId}
-      data-companion-room={companionObjectRoom(objectId)}
+      data-companion-object={resolvedObjectId}
+      data-signature-object={signature?.id}
+      data-signature-form={spec?.form}
+      data-catalog-object={spec?.catalogObjectId ?? signature?.catalogObjectId}
+      data-companion-room={companionObjectRoom(resolvedObjectId)}
       role="img"
-      aria-label={label ?? entry?.objectName ?? entry?.label ?? objectId}
+      aria-label={label ?? signature?.name ?? entry?.objectName ?? entry?.label ?? resolvedObjectId}
     />
   );
 }

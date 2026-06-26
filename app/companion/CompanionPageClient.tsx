@@ -15,6 +15,7 @@ import { BreathePanel } from "@/components/companion/BreathePanel";
 import { StrategiesPanel } from "@/components/companion/StrategiesPanel";
 import { CompanionCommunicationAnchor } from "@/components/companion/CompanionCommunicationAnchor";
 import { CompanionBackground } from "@/components/companion/CompanionBackground";
+import { CompanionHomesteadLogo } from "@/components/companion/CompanionHomesteadLogo";
 import {
   ActiveWorkspaceBar,
   focusTimerWorkspaceItem,
@@ -190,7 +191,7 @@ import {
   DEFAULT_CHAT_LAYOUT_MODE,
   saveWorkspaceChatLayoutPreference,
 } from "@/lib/workspaceChatPreference";
-import { WORKSPACE_FULL_PAGE_SURFACE_CLASS } from "@/lib/workspaceLayoutTokens";
+import { WORKSPACE_FULL_PAGE_SURFACE_CLASS, COMPANION_HOMESTEAD_WORKSPACE_PAGE_CLASS } from "@/lib/workspaceLayoutTokens";
 import {
   loadWorkspaceViewSizePreference,
   resolveEffectiveViewSize,
@@ -1372,7 +1373,7 @@ import {
   type PredictiveSupportOffer,
 } from "@/lib/predictive-support";
 import { playChime, unlockChime } from "@/lib/chime";
-import { type ScenePage } from "@/lib/companionBackgrounds";
+import { buildCompanionPageRenderContext } from "@/lib/companionConstitution";
 type SpeechRecognitionInstance = {
   continuous: boolean;
   interimResults: boolean;
@@ -1448,39 +1449,6 @@ function chatActivityTitle(assistantMessage: string, userText: string): string {
     .find((s) => s.length >= 12);
   const title = fromReply || userText.trim();
   return title.length > 50 ? `${title.slice(0, 50)}…` : title;
-}
-
-// Choose which organic scene family fits what the person is talking about.
-// The actual image within a family is then chosen by time of day.
-function sceneForContext(
-  emotion: EmotionalState,
-  section: AppSection,
-): ScenePage {
-  // Tool sections have a natural scene regardless of mood.
-  if (
-    section === "focus-timer" ||
-    section === "focus-audio" ||
-    section === "breathe"
-  ) {
-    return "focus";
-  }
-  if (section === "playbook" || section === "projects") {
-    return "business";
-  }
-  // Otherwise follow the emotional topic.
-  switch (emotion) {
-    case "emotional":
-    case "overwhelmed":
-      return "recovery";
-    case "focused":
-      return "focus";
-    case "building":
-      return "business";
-    case "stuck":
-      return "recovery";
-    default:
-      return "today";
-  }
 }
 
 const FOUNDER_ID = "founder-001";
@@ -1846,29 +1814,31 @@ export default function CompanionPageClient() {
   const stateHint = getStateHint(displayEmotion);
   const shellClass = EMOTION_SHELL_CLASS[displayEmotion];
 
-  // Organic background. The engine layers in time of day; here we pick the
-  // scene family + seed per context:
-  //  • Chat/home — locked to the conversation (its first message) so the
-  //    backdrop stays put throughout and never shifts while the person types.
-  //  • Brain dump — follows what they're writing.
-  //  • Tool screens — their own calm scene.
   const firstUserMessage = messages.find((m) => m.role === "user")?.content;
-  let scenePage: ScenePage;
-  let sceneSeed: string;
-  if (activeSection === "brain-dump") {
-    // Calm and fixed — the backdrop should never shift while they type.
-    scenePage = "recovery";
-    sceneSeed = "brain-dump";
-  } else if (activeSection === "home") {
-    const convoEmotion = firstUserMessage
-      ? detectEmotionalState(firstUserMessage)
-      : "unclear";
-    scenePage = sceneForContext(convoEmotion, "home");
-    sceneSeed = firstUserMessage ?? "home";
-  } else {
-    scenePage = sceneForContext(displayEmotion, activeSection);
-    sceneSeed = activeSection;
-  }
+  const constitutionalRenderContext = useMemo(
+    () =>
+      buildCompanionPageRenderContext({
+        activeSection,
+        workspacePanel,
+        workspaceBesideChat:
+          chatLayoutMode === "split" && Boolean(workspacePanel),
+        displayEmotion,
+        firstUserMessage,
+        messageCount: messages.length,
+        arrivalActive: welcomeScene,
+      }),
+    [
+      activeSection,
+      workspacePanel,
+      chatLayoutMode,
+      displayEmotion,
+      firstUserMessage,
+      messages.length,
+      welcomeScene,
+    ],
+  );
+  const { scenePage, sceneSeed, clearMyMind } =
+    constitutionalRenderContext.globalBackground;
 
   // Hydrate prefs and memory — keep calm home empty; don't reopen past chats.
   useEffect(() => {
@@ -14021,6 +13991,8 @@ export default function CompanionPageClient() {
       }`}
       data-visual-mode={clientMounted ? visualMode : "off"}
       data-adaptive-context={clientMounted ? adaptiveVisualContext : "support"}
+      {...constitutionalRenderContext.environment.dataAttributes}
+      {...constitutionalRenderContext.presence.dataAttributes}
       suppressHydrationWarning
     >
       <CompanionUrlNavigation
@@ -14038,6 +14010,7 @@ export default function CompanionPageClient() {
         page={scenePage}
         seed={sceneSeed}
         calmHome={homeArrival?.chrome.softenBackground ?? homeCalm}
+        clearMyMind={clearMyMind}
       />
 
       <div
@@ -14066,6 +14039,9 @@ export default function CompanionPageClient() {
         </CompanionSidebarPortal>
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          <CompanionHomesteadLogo
+            hidden={overlay === "signin" || overlay === "settings"}
+          />
           <TopBar
             calmHome={homeCalm}
             navVisibility={arrivalNavVisibility}
@@ -14734,7 +14710,11 @@ export default function CompanionPageClient() {
               }}
             >
               <div
-                className={WORKSPACE_FULL_PAGE_SURFACE_CLASS}
+                className={
+                  activeSection === "brain-dump"
+                    ? COMPANION_HOMESTEAD_WORKSPACE_PAGE_CLASS
+                    : WORKSPACE_FULL_PAGE_SURFACE_CLASS
+                }
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}
               >

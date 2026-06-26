@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { COMPANION_PRESENCE_WELCOME_IMAGE_ID } from "@/lib/companionPresenceLibrary";
+import { COMPANION_PRESENCE_WELCOME_IMAGE_ID } from "@/lib/companionPresenceLibrary/sceneCatalog";
 import {
   evaluateCompanionEnvironmentIntelligence,
   resolveDailyDiscovery,
@@ -9,7 +9,7 @@ import {
 } from "@/lib/companionEnvironmentIntelligence";
 
 describe("CompanionEnvironmentIntelligence™", () => {
-  it("keeps first meeting on the canonical welcome hero", () => {
+  it("uses the canonical Living Room photograph on first page", () => {
     const intel = evaluateCompanionEnvironmentIntelligence({
       timeOfDay: "morning",
       season: "summer",
@@ -86,7 +86,7 @@ describe("CompanionEnvironmentIntelligence™", () => {
       visitEnergy: "steady",
     });
     expect(intel.guestPreparation?.drink).toBe("coffee");
-    expect(intel.guestPreparation?.line).toMatch(/Spark mug/i);
+    expect(intel.guestPreparation?.vesselLabel).toMatch(/Spark mug/i);
     expect(intel.objects.some((o) => o.kind === "coffee")).toBe(true);
   });
 
@@ -121,7 +121,7 @@ describe("CompanionEnvironmentIntelligence™", () => {
     expect(capped.some((o) => o.kind === "book")).toBe(true);
   });
 
-  it("chooses evening photography with reason from registry", () => {
+  it("keeps the master Living Room photograph until seasonal layers ship", () => {
     const photo = selectWelcomePhotograph({
       timeOfDay: "evening",
       season: "autumn",
@@ -129,7 +129,7 @@ describe("CompanionEnvironmentIntelligence™", () => {
       sessionVisitIndex: 20,
       isFirstMeeting: false,
     });
-    expect(photo.id).toBeTruthy();
+    expect(photo.id).toBe(COMPANION_PRESENCE_WELCOME_IMAGE_ID);
     expect(photo.reason.length).toBeGreaterThan(0);
     expect(IMAGE_CONTEXT_REGISTRY.length).toBeGreaterThan(20);
   });

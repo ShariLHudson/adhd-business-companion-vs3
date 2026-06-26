@@ -6,6 +6,7 @@ import {
   SCENE_OVERLAY,
   type ScenePage,
 } from "@/lib/companionBackgrounds";
+import { SCENE_BG_IMAGE_CLASS } from "@/lib/sceneRenderContract";
 
 type CompanionBackgroundProps = {
   // Which scene family to draw from — derived from what the user is talking
@@ -15,12 +16,15 @@ type CompanionBackgroundProps = {
   seed?: string;
   /** Quieter atmosphere for the calm home — Shari and conversation lead. */
   calmHome?: boolean;
+  /** Clear My Mind — warmer room visible, less wash. */
+  clearMyMind?: boolean;
 };
 
 export function CompanionBackground({
   page = "today",
   seed = "",
   calmHome = false,
+  clearMyMind = false,
 }: CompanionBackgroundProps) {
   // The current hour is only known on the client, so resolve the scene after
   // mount. Until then we show the warm gradient base (no layout shift, no
@@ -35,9 +39,10 @@ export function CompanionBackground({
 
   return (
     <div
-      className={`pointer-events-none absolute inset-0 overflow-hidden ${calmHome ? "companion-background-calm" : ""}`}
+      className={`pointer-events-none absolute inset-0 overflow-hidden ${calmHome ? "companion-background-calm" : ""}${clearMyMind ? " companion-background-clear-my-mind" : ""}`}
       aria-hidden="true"
       data-home-calm={calmHome ? "" : undefined}
+      data-clear-my-mind={clearMyMind ? "" : undefined}
     >
       {/* Warm gradient base — always present as a fallback. */}
       <div className="companion-bg-base absolute inset-0 bg-gradient-to-br from-[#f7f0e6] via-[#f2ebe2] to-[#ebe4da]" />
@@ -45,8 +50,11 @@ export function CompanionBackground({
       {/* Organic scene, cross-faded in once resolved. */}
       {scene && (
         <div
-          className="companion-bg-scene absolute inset-0 scale-[1.03] bg-cover bg-center transition-opacity duration-700"
-          style={{ backgroundImage: `url('${scene}')` }}
+          className={`${SCENE_BG_IMAGE_CLASS} companion-bg-scene companion-scene-fade absolute inset-0 transition-opacity duration-700`}
+          style={{
+            backgroundImage: `url('${scene}')`,
+            opacity: clearMyMind ? "var(--scene-image-dominance, 0.55)" : undefined,
+          }}
         />
       )}
 

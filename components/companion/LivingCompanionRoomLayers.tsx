@@ -2,7 +2,7 @@ import type {
   CompanionMotionProfile,
   RoomObject,
 } from "@/lib/companionEnvironmentIntelligence";
-import { COMPANION_PRESENCE_WELCOME_IMAGE_ID } from "@/lib/companionPresenceLibrary";
+import { welcomeImageCapabilities } from "@/lib/companionEnvironmentIntelligence/welcomeImageCapabilities";
 
 type Props = {
   objects: RoomObject[];
@@ -10,11 +10,7 @@ type Props = {
   photographId?: string;
 };
 
-/** Welcome hero already has books, candle, mug, and flowers in the photograph. */
-const BAKED_IN_WELCOME_MOTION = new Set<CompanionMotionProfile["enabled"][number]>([
-  "candle",
-  "steam",
-]);
+const BAKED_TABLE_KINDS = new Set(["coffee", "tea", "tea-set", "cider"]);
 
 function hasMotion(motion: CompanionMotionProfile, kind: string): boolean {
   return motion.enabled.includes(kind as CompanionMotionProfile["enabled"][number]);
@@ -32,48 +28,37 @@ function resolveLayers(input: {
   motion: CompanionMotionProfile;
   photographId?: string;
 }): { objects: RoomObject[]; motion: CompanionMotionProfile } {
-  if (input.photographId !== COMPANION_PRESENCE_WELCOME_IMAGE_ID) {
-    return { objects: input.objects, motion: input.motion };
-  }
+  const caps = welcomeImageCapabilities(input.photographId);
+
+  const environmentalObjects = input.objects.filter((object) => {
+    if (caps.mugBakedIn && BAKED_TABLE_KINDS.has(object.kind)) return false;
+    return true;
+  });
+
+  const enabled = input.motion.enabled.filter((kind) => {
+    if (caps.suppressCurtains && kind === "curtains") return false;
+    if (caps.suppressHospitalitySteam && kind === "steam") return false;
+    if (!caps.openWindow && kind === "foliage") return false;
+    return true;
+  });
 
   return {
-    objects: [],
-    motion: {
-      enabled: input.motion.enabled.filter(
-        (kind) => !BAKED_IN_WELCOME_MOTION.has(kind),
-      ),
-    },
+    objects: environmentalObjects,
+    motion: { enabled },
   };
 }
 
 /**
  * Layer 2 — environmental objects. Layer 3 — quiet motion.
- * Nothing announces itself; the room simply feels prepared.
  */
 export function LivingCompanionRoomLayers({ objects, motion, photographId }: Props) {
   const layers = resolveLayers({ objects, motion, photographId });
   const onTable = objectsByPlacement(layers.objects, "table");
   const onWindow = objectsByPlacement(layers.objects, "window");
   const onFloor = objectsByPlacement(layers.objects, "floor");
-  const books = layers.objects.filter(
-    (object) => object.kind === "book" && object.placement === "shelf",
-  );
 
   return (
     <div className="companion-welcome-scene__room" aria-hidden="true">
-      {books.map((book, index) => (
-        <div
-          key={`book-${index}`}
-          className="companion-welcome-scene__book"
-          style={{ ["--book-index" as string]: index }}
-          data-book-title={book.label}
-        >
-          <span className="companion-welcome-scene__book-spine">
-            {book.label}
-          </span>
-        </div>
-      ))}
-
       {onTable.map((object, index) => (
         <div
           key={`table-${object.kind}-${index}`}

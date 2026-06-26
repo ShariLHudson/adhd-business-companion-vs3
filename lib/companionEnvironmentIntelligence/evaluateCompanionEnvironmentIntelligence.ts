@@ -11,9 +11,16 @@ import { resolveMotionProfile, resolveRoomObjects } from "./resolveRoom";
 import { defaultRoomPermissionContext } from "./permissionToShow";
 import { resolveAndApplyLivingChanges } from "@/lib/livingLifeEngine";
 import { applyEnvironmentalTruth } from "@/lib/environmentalTruth";
+import { resolveHomesteadTime } from "@/lib/homesteadTime";
+import {
+  evaluateQuietMoments,
+  mergeQuietMotions,
+} from "@/lib/quietMoments";
 import type {
   CompanionEnvironmentInput,
   CompanionEnvironmentIntelligence,
+  CompanionMotionKind,
+  CompanionMotionProfile,
   LivingCompanionRoom,
   WelcomeRoomPrototypeOverrides,
 } from "./types";
@@ -34,6 +41,12 @@ function resolveGuestPreparationForInput(
   return resolveGuestPreparation({
     profile: input.hospitalityProfile ?? {},
     visitEnergy,
+    timeOfDay: input.timeOfDay,
+    sessionVisitIndex: input.sessionVisitIndex,
+    recoveryGentle: input.recoveryGentle,
+    lowEnergy: input.lowEnergy,
+    projectRecentlyCompleted: input.projectRecentlyCompleted,
+    isFirstMeeting: input.isFirstMeeting,
   });
 }
 
@@ -41,6 +54,7 @@ export function evaluateCompanionEnvironmentIntelligence(
   input: CompanionEnvironmentInput,
 ): CompanionEnvironmentIntelligence {
   const now = input.now ?? new Date();
+  const homesteadTime = input.homesteadTime ?? resolveHomesteadTime({ now });
   const weather =
     input.weather ??
     resolveIowaWeather({ season: input.season, now });
@@ -52,6 +66,9 @@ export function evaluateCompanionEnvironmentIntelligence(
     });
   const resolvedInput: CompanionEnvironmentInput = {
     ...input,
+    now,
+    timeOfDay: input.timeOfDay ?? homesteadTime.legacyTimeOfDay,
+    homesteadTime,
     weather,
     permissions,
   };
@@ -90,9 +107,37 @@ export function evaluateCompanionEnvironmentIntelligence(
         }).environment
       : base;
 
-  return applyEnvironmentalTruth(withLiving, {
+  const environment = applyEnvironmentalTruth(withLiving, {
     recoveryGentle: resolvedInput.recoveryGentle,
+    homesteadPeriod: homesteadTime.period,
   });
+
+  const quietMoments = input.quietMoments
+    ? evaluateQuietMoments({
+        ...input.quietMoments,
+        timeOfDay: resolvedInput.timeOfDay,
+        season: resolvedInput.season,
+        recoveryGentle: resolvedInput.recoveryGentle,
+        flooded: input.livingLifeContext?.flooded,
+      })
+    : null;
+
+  const motion: CompanionMotionProfile = quietMoments
+    ? {
+        enabled: mergeQuietMotions(
+          environment.motion.enabled,
+          quietMoments.allowedMotions,
+          quietMoments.phase,
+        ) as CompanionMotionKind[],
+      }
+    : environment.motion;
+
+  return {
+    ...environment,
+    motion,
+    homesteadTime,
+    quietMoments,
+  };
 }
 
 export function composeLivingCompanionRoom(input: {
@@ -109,6 +154,8 @@ export function composeLivingCompanionRoom(input: {
     guestPreparation: input.environment.guestPreparation,
     livingChangeSet: input.environment.livingChangeSet ?? null,
     environmentalTruth: input.environment.environmentalTruth ?? null,
+    homesteadTime: input.environment.homesteadTime ?? null,
+    quietMoments: input.environment.quietMoments ?? null,
   };
 }
 

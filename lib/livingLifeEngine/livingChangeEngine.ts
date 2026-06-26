@@ -1,5 +1,6 @@
 import type { CompanionEnvironmentInput } from "@/lib/companionEnvironmentIntelligence/types";
 import type { CompanionEnvironmentIntelligence } from "@/lib/companionEnvironmentIntelligence/types";
+import { evaluateCompanionRelationship } from "@/lib/companionRelationship";
 import { applyLivingChangeSet } from "./applyLivingChangeSet";
 import { resolveLivingChangeSet } from "./livingChangeResolver";
 import type { LivingChangeEngineInput, LivingChangeSet } from "./types";
@@ -23,6 +24,14 @@ export function buildLivingChangeEngineInput(input: {
     objects: input.environment.objects,
     motion: input.environment.motion,
     livingLifeContext: input.companionInput.livingLifeContext,
+    homesteadPeriod: input.companionInput.homesteadTime?.period,
+    companionRelationship:
+      input.companionInput.companionRelationship ??
+      evaluateCompanionRelationship({
+        sessionVisitIndex: input.companionInput.sessionVisitIndex,
+        userText: input.companionInput.arrivalUserText ?? null,
+        overwhelmed: input.companionInput.livingLifeContext?.flooded,
+      }),
   };
 }
 

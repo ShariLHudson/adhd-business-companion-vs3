@@ -11,7 +11,16 @@ Room design · page layouts · navigation · Companion Object Library™ · Visu
 **Sibling documents (applications of this blueprint):**
 - `../EXPERIENCE_OF_SHARI.md` — who Shari is; every room expresses her presence
 - `VISUAL_DESIGN_BIBLE.md` — materials, palette, object art style
+- `COMPANION_OBJECTS_DESIGN_SYSTEM.md` — Companion Objects™ master catalog & illustration system
+- `SIGNATURE_COMPANION_OBJECTS.md` — Signature Objects™ three-form visual identity law
 - `LOOK_BOOK.md` — per-room art direction
+- `JOURNEY_BETWEEN_ROOMS.md` — how guests move between rooms without feeling like page changes
+- `EMOTIONAL_EXPERIENCE_BLUEPRINT.md` — every room solves a human need before a task
+- `PRESENCE_INTELLIGENCE.md` — quiet preparation before arrival; prepared, not customized
+- `WISDOM_OF_RESTRAINT.md` — Restraint Filter™ above all intelligence; silence is hospitality
+- `CHARACTER_OF_SHARI.md` — who Shari is; Character Filter™ above all authenticity
+- `SHARIS_LIFE_MOMENTS.md` — first-person life sharing; never advice
+- `SHARIS_EVERYDAY_LIFE.md` — environmental storytelling; lived in, never staged
 - `../A_YEAR_IN_THE_COMPANION_HOMESTEAD.md` — seasons, traditions, ordinary life rhythms
 - `MASTER_PLAN.md` — condensed site reference (this blueprint supersedes)
 - `lib/companionNeedsIntelligence/` — need → room routing

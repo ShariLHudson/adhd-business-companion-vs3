@@ -1,36 +1,6 @@
 import { imageContextById } from "./imageContextRegistry";
-import {
-  COMPANION_PRESENCE_SCENE_CATALOG,
-  COMPANION_PRESENCE_WELCOME_IMAGE_ID,
-} from "@/lib/companionPresenceLibrary/sceneCatalog";
+import { COMPANION_PRESENCE_WELCOME_IMAGE_ID } from "@/lib/companionPresenceLibrary/sceneCatalog";
 import type { CompanionEnvironmentInput } from "./types";
-
-function dayKey(now: Date): string {
-  return now.toISOString().slice(0, 10);
-}
-
-function scoreFromRegistry(
-  id: string,
-  input: CompanionEnvironmentInput,
-): number {
-  const context = imageContextById(id);
-  if (!context) return 0;
-
-  let score = 0;
-  if (context.timeOfDay.includes(input.timeOfDay)) score += 30;
-  if (context.seasons.includes(input.season)) score += 25;
-  if (input.recoveryGentle && context.emotionalTone.includes("recovery")) {
-    score += 40;
-  }
-  if (input.lowEnergy && context.emotionalTone.includes("gentle")) score += 35;
-  if (input.businessFocus && context.emotionalTone.includes("business")) {
-    score += 35;
-  }
-  if (input.birthdayToday && context.emotionalTone.includes("celebratory")) {
-    score += 50;
-  }
-  return score;
-}
 
 function photographReason(
   id: string,
@@ -51,38 +21,17 @@ function photographReason(
     : "today felt like this room";
 }
 
+/**
+ * Master Living Room™ — one approved photograph until time/season layers ship.
+ * First page is always `shari-i-am-here-2`.
+ */
 export function selectWelcomePhotograph(input: CompanionEnvironmentInput): {
   id: string;
   reason: string;
 } {
-  const now = input.now ?? new Date();
-  const candidates = COMPANION_PRESENCE_SCENE_CATALOG.filter(
-    (entry) => entry.surfaces?.includes("chat-welcome") || entry.welcomeHero,
-  );
-  const pool = candidates.length > 0 ? candidates : COMPANION_PRESENCE_SCENE_CATALOG;
-
-  let best = pool[0]!;
-  let bestScore = -1;
-  for (const entry of pool) {
-    let score = scoreFromRegistry(entry.id, input);
-    if (entry.welcomeHero) score += 15;
-    if (entry.timeOfDay?.includes(input.timeOfDay)) score += 20;
-
-    const tieSeed = `${dayKey(now)}:${entry.id}`;
-    const tie = score * 1000 + (tieSeed.charCodeAt(0) % 100);
-    if (tie > bestScore) {
-      bestScore = tie;
-      best = entry;
-    }
-  }
-
-  if (input.isFirstMeeting) {
-    best =
-      pool.find((e) => e.id === COMPANION_PRESENCE_WELCOME_IMAGE_ID) ?? best;
-  }
-
+  const id = COMPANION_PRESENCE_WELCOME_IMAGE_ID;
   return {
-    id: best.id,
-    reason: photographReason(best.id, input),
+    id,
+    reason: photographReason(id, input),
   };
 }

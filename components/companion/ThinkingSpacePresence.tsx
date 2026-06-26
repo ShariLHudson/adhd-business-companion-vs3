@@ -3,7 +3,6 @@
 import { useMemo } from "react";
 import { useCompanionPresence } from "@/lib/useCompanionPresence";
 import { MY_THOUGHTS_PRESENCE_LINES } from "@/lib/thinkingSpace/copy";
-import { ShariPortrait } from "@/components/companion/ShariPortrait";
 import { ClearMyMindPresenceBubble } from "@/components/companion/ClearMyMindPresenceBubble";
 
 type Props = {
@@ -11,6 +10,7 @@ type Props = {
   workspaceEntryKey?: number;
 };
 
+/** Voice-only — no floating portrait inside the workspace (Companion Workspace Standard v1). */
 export function ThinkingSpacePresence({
   thoughtCount,
   workspaceEntryKey = 0,
@@ -34,22 +34,15 @@ export function ThinkingSpacePresence({
 
   return (
     <div
-      className="clear-my-mind-in-room"
+      className="companion-workspace-voice-chip"
       aria-label="Shari"
       data-testid="thinking-space-presence"
     >
-      <div className="clear-my-mind-in-room-inner">
-        <div className="clear-my-mind-in-room-voice-wrap">
-          <ClearMyMindPresenceBubble
-            presence={presence}
-            message={message}
-            className="clear-my-mind-in-room-voice"
-          />
-        </div>
-        <div className="flex flex-col items-center">
-          <ShariPortrait presence={presence} size="in-room" alt="Shari" />
-        </div>
-      </div>
+      <ClearMyMindPresenceBubble
+        presence={presence}
+        message={message}
+        className="companion-workspace-voice-chip__bubble"
+      />
     </div>
   );
 }

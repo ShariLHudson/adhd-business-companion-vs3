@@ -38,8 +38,11 @@ import {
   minutesSinceLivingRoomDeparture,
   resolveLivingTimeline,
 } from "@/lib/livingLifeEngine";
+import { resolveHomesteadTime, type HomesteadTime } from "@/lib/homesteadTime";
 import { refreshNarrativeContextOnArrival, type NarrativeContext } from "./narrativeContext";
 import { getRecognitionStore } from "@/lib/recognition/recognitionStore";
+import { getLastActivity } from "@/lib/companionStore";
+import { resolveEffectiveHospitalityProfile } from "@/lib/companionHospitalityProfile";
 import {
   evaluateWelcomePresenceIntelligence,
   type WelcomePresenceIntelligence,
@@ -50,9 +53,6 @@ import {
   defaultRoomPermissionContext,
   type LivingCompanionRoom,
 } from "@/lib/companionEnvironmentIntelligence";
-import {
-  resolveEffectiveHospitalityProfile,
-} from "@/lib/companionHospitalityProfile";
 import { resolveWelcomeAtmosphere } from "@/lib/welcomeLivingRoom";
 import type {
   ArrivalConversationalTone,
@@ -104,6 +104,7 @@ export type ArrivalIntelligence = {
   isFirstMeeting: boolean;
   sessionVisitIndex: number;
   timeOfDay: ReturnType<typeof timeOfDayBucket>;
+  homesteadTime: HomesteadTime;
   /** Welcome Presence Intelligence™ — first conversation of the day. */
   welcomePresence: WelcomePresenceIntelligence | null;
   /** Living Companion Room™ — four-layer welcome environment. */
@@ -199,7 +200,7 @@ function buildReturningActiveInvite(input: {
 }): string | null {
   if (input.continue.mode === "single") {
     if (input.continue.option.kind === "conversation") {
-      return "Want to pick up where we left off?";
+      return "Want to keep talking about that?";
     }
     return "Want to keep going?";
   }
@@ -214,12 +215,12 @@ function buildReturningActiveInvite(input: {
 
   switch (input.timeOfDay) {
     case "morning":
-      return "What feels most doable today?";
+      return "How's the morning feeling?";
     case "evening":
     case "night":
       return "How's today treating you?";
     default:
-      return "What's on your mind?";
+      return "What's on your heart?";
   }
 }
 
@@ -254,6 +255,7 @@ function buildCompanionEnvironmentInput(input: {
   now: Date;
   returnIntervalHours: number | null;
   recordLivingHistory: boolean;
+  homesteadTime: HomesteadTime;
 }) {
   const recognition = getRecognitionStore();
   const atmosphere = resolveWelcomeAtmosphere({
@@ -299,6 +301,7 @@ function buildCompanionEnvironmentInput(input: {
       minutesAwayFromLivingRoom: minutesSinceLivingRoomDeparture(input.now),
       recordToHistory: input.recordLivingHistory,
     },
+    homesteadTime: input.homesteadTime,
   } as const;
 }
 
@@ -313,21 +316,35 @@ function buildWelcomePresenceInput(input: {
 }) {
   const recognition = getRecognitionStore();
   const birthdayToday = isBirthdayToday(recognition.birthday, input.now);
+  const hospitality = resolveEffectiveHospitalityProfile({
+    source: "memory",
+    recognition,
+    todayContext: { now: input.now },
+  });
+  const lastActivity = getLastActivity();
+  const atmosphere = resolveWelcomeAtmosphere({
+    timeOfDay: input.timeOfDay,
+    now: input.now,
+  });
   return {
     homeState:
       input.homeState === "FIRST_VISIT" ? "FIRST_VISIT" : "QUIET_PRESENCE",
     timeOfDay: input.timeOfDay,
+    season: atmosphere.season,
     isWeekend: [0, 6].includes(input.now.getDay()),
     sessionVisitIndex: input.sessionVisitIndex,
     returnIntervalHours: input.returnIntervalHours,
     returnIntervalDays: input.returnIntervalDays,
     isFirstMeeting: input.isFirstMeeting,
     firstName: firstName(),
-    birthdayToday: isBirthdayToday(recognition.birthday, input.now),
+    birthdayToday,
     celebrationActive: false,
     recoveryGentle: false,
     lowEnergy: false,
-    vacationDaysAway: null,
+    vacationDaysAway: hospitality.todayContext.vacationDaysAway ?? null,
+    projectRecentlyCompleted:
+      hospitality.todayContext.projectRecentlyCompleted ?? false,
+    previousTopic: lastActivity?.title ?? null,
     now: input.now,
   } as const;
 }
@@ -516,7 +533,8 @@ export function evaluateArrivalIntelligence(
     visitorKind,
     continueRes.mode,
   );
-  const timeOfDay = timeOfDayBucket(now);
+  const homesteadTime = resolveHomesteadTime({ now, placeId: "living-room" });
+  const timeOfDay = homesteadTime.legacyTimeOfDay;
   const narrativeContext = refreshNarrativeContextOnArrival(now);
   const isFirstMeeting = homeState === "FIRST_VISIT";
   const welcomePresenceInput =
@@ -543,6 +561,7 @@ export function evaluateArrivalIntelligence(
           now,
           returnIntervalHours,
           recordLivingHistory: options.record === true,
+          homesteadTime,
         })
       : null;
   const welcomePresence = welcomePresenceInput
@@ -596,6 +615,7 @@ export function evaluateArrivalIntelligence(
     isFirstMeeting,
     sessionVisitIndex: visitIndex,
     timeOfDay,
+    homesteadTime,
     welcomePresence,
     livingRoom,
   };

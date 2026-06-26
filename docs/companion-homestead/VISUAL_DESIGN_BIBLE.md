@@ -11,7 +11,8 @@
 - `docs/companion-homestead/MASTER_PLAN.md` — condensed site & room placement reference
 - `docs/companion-homestead/LOOK_BOOK.md` — per-room environmental specs (must conform to **this** bible)
 - `docs/COMPANION_JOURNEY_EXPERIENCE_BIBLE.md` — emotional blueprint
-- `lib/companionUniverse/libraries/objectLibrary.ts` — Companion Object Library™ registry
+- `lib/companionUniverse/libraries/objectLibrary.ts` — Companion Object Library™ (feature mapping)
+- `lib/companionObjectsDesignSystem/` — Companion Objects™ Design System master catalog
 - `lib/companionUniverse/libraries/placeLibrary.ts` — room registry
 
 **This is not:** a UI component spec · a Figma file · a room-by-room look book · a logo brand guide

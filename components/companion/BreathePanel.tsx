@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { logMomentum } from "@/lib/companionStore";
-import { SceneBackground } from "./SceneBackground";
+import { SceneRenderer } from "@/components/companion/scene/SceneRenderer";
+import { createSceneState } from "@/lib/sceneRenderContract";
 
 type PhaseKind = "in" | "hold" | "out";
 type BreathPhase = { kind: PhaseKind; seconds: number };
@@ -216,21 +217,11 @@ export function BreathePanel({ onDone }: { onDone?: () => void }) {
     }`;
 
   return (
-    <div className="companion-fade-in relative h-full overflow-y-auto px-4 py-8 sm:px-6">
-      <SceneBackground page="progress" seed="breathe" />
-      <div className="relative mx-auto w-full max-w-xl">
-        {/* Large content area on a readable card over the scene — a sister
-            layout to Focus Audio (same width, spacing, immersive feel). */}
-        <div className="flex flex-col items-center rounded-2xl border border-[#1e4f4f]/15 bg-white/90 p-6 text-center shadow-sm backdrop-blur-sm sm:p-8">
-        {/* Primary */}
-        <p className="text-4xl font-bold text-[#1f1c19]">Breathe</p>
-        {/* Secondary */}
-        <p className="mt-2 text-lg leading-relaxed text-[#4b463f]">
-          Pick a pattern and length — energizing breaths stay under 1 minute to
-          keep it safe and light.
-        </p>
-
-        {/* Mode */}
+    <SceneRenderer
+      scene={createSceneState({ workspaceId: "breathe", seed: "breathe" })}
+      className="companion-fade-in h-full min-h-0 overflow-y-auto"
+    >
+      <div className="flex flex-col items-center text-center">
         <div className="mt-6 flex w-full gap-2">
           <button type="button" onClick={() => changeMode("calm")} className={modeBtn("calm", "")}>
             🟢 Calm
@@ -369,8 +360,7 @@ export function BreathePanel({ onDone }: { onDone?: () => void }) {
             </button>
           )}
         </div>
-        </div>
       </div>
-    </div>
+    </SceneRenderer>
   );
 }

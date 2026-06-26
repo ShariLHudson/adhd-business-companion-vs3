@@ -23,4 +23,5 @@ export const SCENE_INTEGRITY_RULES: SceneIntegrityRule[] = [
   { id: "logo-on-mug", when: "image = shari-i-am-here-2", then: "Hide separate logo", correct: "Mug already carries brand" },
   { id: "communication-anchor-always", when: "any primary screen", then: "Chat and mic must remain reachable", correct: "Companion Communication Anchor™ — never hidden behind menus, overlays, or life layers" },
   { id: "environmental-truth", when: "any motion or atmosphere detail", then: "Every effect must trace to a believable cause", correct: "Environmental Truth™ — cause before animation; one coherent Iowa story" },
+  { id: "homestead-time", when: "any room render", then: "House lives in the guest's actual day", correct: "Homestead Time™ — seven periods, continuous light, not theme switching" },
 ];

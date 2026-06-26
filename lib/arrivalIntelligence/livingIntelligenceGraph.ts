@@ -5,6 +5,10 @@
 
 import type { ArrivalGreetingStrategy, ArrivalVisitorKind } from "./arrivalTypes";
 import type { CompanionContinueResolution } from "@/lib/companionLedContinue";
+import {
+  legacyTimeOfDayFromPeriod,
+  resolveHomesteadTimePeriod,
+} from "@/lib/homesteadTime";
 
 const STORAGE_KEY = "companion-living-graph-arrivals-v1";
 const MAX_RECORDS = 48;
@@ -56,11 +60,7 @@ function writeGraph(graph: LivingIntelligenceGraph) {
 export function timeOfDayBucket(
   now = new Date(),
 ): ArrivalGraphRecord["timeOfDay"] {
-  const hour = now.getHours();
-  if (hour >= 5 && hour < 12) return "morning";
-  if (hour >= 12 && hour < 17) return "afternoon";
-  if (hour >= 17 && hour < 22) return "evening";
-  return "night";
+  return legacyTimeOfDayFromPeriod(resolveHomesteadTimePeriod(now));
 }
 
 export function hoursSinceLastArrival(now = new Date()): number | null {

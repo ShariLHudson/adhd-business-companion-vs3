@@ -15,9 +15,10 @@ import {
   type AudioLink,
 } from "@/lib/audioPlaylists";
 import { audioBackgroundMood, suggestAudioForEmotion } from "@/lib/audioSuggestions";
-import { SceneBackground } from "./SceneBackground";
 import type { EmotionalState } from "@/lib/companionEmotions";
 import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import { SceneRenderer } from "@/components/companion/scene/SceneRenderer";
+import { createSceneState } from "@/lib/sceneRenderContract";
 import { AUDIO_SAVED_CATEGORY_OBJECT_ID } from "@/lib/companionObjects";
 
 // Categories shown in the picker — "My Audio" and "Favorites" live in Saved
@@ -71,24 +72,14 @@ export function FocusAudioPanel({
   }
 
   return (
-    <div className="companion-fade-in relative h-full overflow-y-auto px-4 py-8 sm:px-6">
-      <SceneBackground page={mood} seed={category} />
-      <div className="relative mx-auto w-full max-w-xl">
-        {/* All content sits on a readable card over the scene — consistent with
-            Home / Focus / Continue, so text never floats on the image. */}
-        <div className="rounded-2xl border border-[#1e4f4f]/15 bg-white/90 p-5 shadow-sm backdrop-blur-sm sm:p-6">
-        <p className="flex items-center gap-2 text-2xl font-semibold text-[#1f1c19]">
-          <CompanionObjectVisual objectId="focus-audio" size="md" variant="icon" />
-          Focus Audio
-        </p>
-        <p className="mt-1 text-lg font-medium text-[#1f1c19]">
-          What does your brain need right now?
-        </p>
-        <p className="mt-1 text-base leading-relaxed text-[#6b635a]">
-          Pick a sound below and I&apos;ll cue it up. It opens in a new tab so
-          you can keep it playing alongside the Companion.
-        </p>
-
+    <SceneRenderer
+      scene={createSceneState({
+        workspaceId: "focus-audio",
+        scenePage: mood,
+        seed: category,
+      })}
+      className="companion-fade-in h-full min-h-0 overflow-y-auto"
+    >
         {/* Category dropdown */}
         <label className="mt-5 block text-sm font-bold uppercase tracking-wide text-[#6b635a]">
           Sound for your brain
@@ -261,8 +252,6 @@ export function FocusAudioPanel({
             </p>
           </div>
         )}
-        </div>
-
         <div className="mt-6">
           <button
             type="button"
@@ -272,7 +261,6 @@ export function FocusAudioPanel({
             Back
           </button>
         </div>
-      </div>
-    </div>
+    </SceneRenderer>
   );
 }

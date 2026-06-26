@@ -28,8 +28,8 @@ describe("phase1Onboarding", () => {
   });
 
   it("includes the companion opening message", () => {
-    expect(PHASE1_OPENING_MESSAGE).toMatch(/here for you/i);
-    expect(PHASE1_OPENING_MESSAGE).toMatch(/on your mind today/i);
+    expect(PHASE1_OPENING_MESSAGE).toMatch(/come on in/i);
+    expect(PHASE1_OPENING_MESSAGE).toMatch(/brought you by today/i);
   });
 
   it("moves to business discovery after the win-definition answer", () => {

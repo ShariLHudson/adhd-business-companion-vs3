@@ -59,6 +59,7 @@ import {
 import { PlanDayAddForm } from "@/components/companion/PlanDayAddForm";
 import { PlanDayKanbanView } from "@/components/companion/PlanDayKanbanView";
 import { PlanDayJourneyShell } from "@/components/companion/PlanDayJourneyShell";
+import { CompanionWorkspaceShell } from "@/components/companion/CompanionWorkspaceShell";
 import { PlanDayLivingBoard } from "@/components/companion/PlanDayLivingBoard";
 import { PlanDayOrientationSurface } from "@/components/companion/PlanDayOrientationSurface";
 import { PlanDayFlexiblePlanningMode } from "@/components/companion/PlanDayFlexiblePlanningMode";
@@ -656,14 +657,19 @@ export function PlanMyDayPanel({
   }
 
   return (
-    <div
-      className={`companion-fade-in companion-panel-surface flex h-full min-h-0 w-full flex-col overflow-y-auto px-6 py-8 ${atmosphereClass}`}
-      data-plan-view={view}
-      data-day-mode={companion.orientation.dayMode}
-      data-experience-phase={
-        showOrientation ? "orienting" : flexibleMode ? "flexible" : "living"
-      }
+    <CompanionWorkspaceShell
+      workspaceId="plan-my-day"
+      hideHeader
+      className={`companion-fade-in h-full min-h-0 ${atmosphereClass}`}
     >
+      <div
+        className="flex h-full min-h-0 w-full flex-col overflow-y-auto"
+        data-plan-view={view}
+        data-day-mode={companion.orientation.dayMode}
+        data-experience-phase={
+          showOrientation ? "orienting" : flexibleMode ? "flexible" : "living"
+        }
+      >
       <PlanDayJourneyShell
         chapter={chapter}
         onBack={handleNavBack}
@@ -839,6 +845,7 @@ export function PlanMyDayPanel({
           </>
         )}
       </PlanDayJourneyShell>
-    </div>
+      </div>
+    </CompanionWorkspaceShell>
   );
 }

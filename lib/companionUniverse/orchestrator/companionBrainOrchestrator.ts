@@ -240,7 +240,7 @@ export function orchestrateCompanionUniverse(
       constitution,
       livingRoom,
       greeting: welcomePresence.greeting,
-      invite: welcomePresence.invite,
+      invite: welcomePresence.invite ?? undefined,
       atmosphere: atmosphereLine,
       preparedItems: livingRoom.layer2.map(
         (object) => object.label ?? object.kind,

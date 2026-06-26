@@ -59,6 +59,11 @@ export const COMPANION_PRESENCE_SCENE_CATALOG: CompanionPresenceLibraryEntry[] =
     timeOfDay: ["morning", "afternoon", "evening"],
     welcomeHero: true,
   }),
+  scene("shari-i-am-here.png", "Living Room", ["welcome", "gentle", "morning", "afternoon"], {
+    surfaces: ["chat-welcome"],
+    timeOfDay: ["morning", "afternoon", "evening"],
+    welcomeHero: true,
+  }),
   scene("shari-coffee-cup.png", "Coffee Together", ["welcome", "morning", "gentle"], {
     surfaces: ["chat-welcome"],
     timeOfDay: ["morning", "afternoon"],

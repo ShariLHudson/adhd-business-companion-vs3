@@ -1,3 +1,4 @@
+import { resolvePlace } from "@/lib/companionConstitution";
 import type { AppSection } from "@/lib/companionUi";
 import type { CompanionPlaceId } from "./types";
 import { placeById } from "./libraries/placeLibrary";
@@ -176,6 +177,12 @@ export const ROOM_IMMERSION_BY_PLACE: Record<
     description: "Very restrained — concentration is sacred",
     workingLayerDominant: true,
   },
+  "sunroom-over-pond": {
+    level: "restrained-focus",
+    environmentSharePercent: 15,
+    description: "Sunroom over the pond — focus with soft daylight",
+    workingLayerDominant: true,
+  },
   "creative-studio": {
     level: "creative-studio",
     environmentSharePercent: 30,
@@ -325,9 +332,9 @@ export const HOUSE_MAP_NAV: readonly HouseMapNavItem[] = [
   },
   {
     id: "focus",
-    label: "Focus",
-    objectId: "focus-studio",
-    placeId: "focus-studio",
+    label: "Focus My Brain™",
+    objectId: "focus-my-brain",
+    placeId: "sunroom-over-pond",
     section: "focus",
     status: "partial",
   },
@@ -472,36 +479,9 @@ export function houseMapForPlace(
   return HOUSE_MAP_NAV.find((item) => item.placeId === placeId) ?? null;
 }
 
+/** @deprecated Decisions flow through Environment Intelligence™ — delegate only. */
 export function placeForSection(section: AppSection): CompanionPlaceId {
-  const match = HOUSE_MAP_NAV.find((item) => item.section === section);
-  if (match) return match.placeId;
-
-  switch (section) {
-    case "today":
-    case "home":
-      return "living-room";
-    case "brain-dump":
-      return "window-seat";
-    case "plan-my-day":
-      return "planning-table";
-    case "visual-focus":
-      return "focus-studio";
-    case "content-generator":
-    case "my-work":
-      return "creative-studio";
-    case "projects":
-    case "templates-library":
-    case "snippets":
-    case "saved-work":
-      return "workshop";
-    case "how-do-i":
-      return "library";
-    case "growth":
-    case "my-journey":
-      return "reading-nook";
-    default:
-      return "living-room";
-  }
+  return resolvePlace({ section });
 }
 
 export function resolveCompanionLayout(input: {

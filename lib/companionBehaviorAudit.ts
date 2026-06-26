@@ -36,6 +36,7 @@ import type { AppSection } from "./companionUi";
 export type AuditCategory =
   | "learn"
   | "create"
+  | "build"
   | "decide"
   | "plan"
   | "organize"
@@ -45,11 +46,13 @@ export type AuditCategory =
   | "emotional"
   | "relationship"
   | "navigate"
+  | "conversation"
   | "yes_continuation";
 
 export type AuditIntent =
   | "learn"
   | "create"
+  | "build"
   | "execute"
   | "decide"
   | "plan"
@@ -1556,6 +1559,95 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     expectedRoute: ["conversation", "direct_action", "feature_offer"],
     expectedFeature: "Create",
     expectedSuppressionFlags: { relationship: true },
+  },
+
+  // —— Meaning Before Matching™ — connections guard ——
+  {
+    id: "mbm-pinterest-website-link",
+    category: "learn",
+    userInput: "How do I connect my website link to a Pinterest post?",
+    expectedIntent: "learn",
+    expectedRoute: "conversation",
+    expectedFeature: "Learn",
+    expectedSuppressionFlags: { relationship: true, learnFastPath: true },
+    notes: "Teach Pinterest link — never Connections",
+  },
+  {
+    id: "mbm-linkedin-networking",
+    category: "learn",
+    userInput: "How do I connect with more people on LinkedIn?",
+    expectedIntent: "learn",
+    expectedRoute: "conversation",
+    expectedFeature: "Learn",
+    expectedSuppressionFlags: { relationship: true, learnFastPath: true },
+    notes: "LinkedIn strategy — not Google integrations",
+  },
+  {
+    id: "mbm-connect-ideas",
+    category: "learn",
+    userInput: "Can you help me connect these ideas?",
+    expectedIntent: ["learn", "conversation", "understand"],
+    expectedRoute: "conversation",
+    expectedSuppressionFlags: { relationship: true },
+    notes: "Reasoning / brainstorm — not Connections",
+  },
+  {
+    id: "mbm-connect-offer-audience",
+    category: "learn",
+    userInput: "How do I connect my offer to my audience?",
+    expectedIntent: "learn",
+    expectedRoute: "conversation",
+    expectedFeature: "Learn",
+    expectedSuppressionFlags: { relationship: true, learnFastPath: true },
+  },
+  {
+    id: "mbm-google-calendar-connect",
+    category: "navigate",
+    userInput: "Connect my Google Calendar",
+    expectedIntent: "navigate",
+    expectedRoute: ["conversation", "feature_offer"],
+    expectedFeature: "Connections",
+    expectedSuppressionFlags: {},
+    notes: "True integration — Settings → Connections",
+  },
+  {
+    id: "mbm-gmail-connect",
+    category: "navigate",
+    userInput: "Connect my Gmail",
+    expectedIntent: "navigate",
+    expectedRoute: "conversation",
+    expectedFeature: "Connections",
+    expectedSuppressionFlags: {},
+  },
+
+  // —— Honor Their Intent™ — arrival mode ——
+  {
+    id: "hti-sales-funnel-work",
+    category: "build",
+    userInput: "I need to build a sales funnel.",
+    expectedIntent: ["build", "execute", "conversation"],
+    expectedRoute: ["feature_offer", "conversation", "direct_action"],
+    expectedFeature: "Create",
+    expectedSuppressionFlags: { relationship: true },
+    notes: "Come to work — begin immediately, no emotional detour",
+  },
+  {
+    id: "hti-overwhelmed-helped",
+    category: "conversation",
+    userInput: "I'm overwhelmed.",
+    expectedIntent: ["organize", "conversation", "clarify"],
+    expectedRoute: ["conversation", "organize"],
+    expectedSuppressionFlags: {},
+    notes: "Come to be helped — listen first, stay in Living Room",
+  },
+  {
+    id: "hti-onboarding-momentum",
+    category: "build",
+    userInput: "Help me build my client onboarding process.",
+    expectedIntent: ["create", "build", "execute", "conversation"],
+    expectedRoute: ["conversation", "feature_offer", "direct_action"],
+    expectedSuppressionFlags: { relationship: true },
+    notes: "Honor momentum — Absolutely. Let's build it.",
   },
 
   // —— 10. Yes Continuation ——

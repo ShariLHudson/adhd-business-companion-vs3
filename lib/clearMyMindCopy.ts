@@ -6,8 +6,12 @@ import {
 } from "@/lib/thinkingSpace/copy";
 
 export const CLEAR_MY_MIND_HEADER =
-  "A calm place to unload when your mind feels too heavy.";
+  "What's on your mind?";
 
+export const CLEAR_MY_MIND_WORKSPACE_SUBTITLE =
+  "Let's get it out of your head.";
+
+/** @deprecated Use conversation layer — not embedded in workspace UI */
 export const CLEAR_MY_MIND_PERMISSION =
   "You don't have to carry all of this by yourself anymore. When you're ready, share it with me.";
 

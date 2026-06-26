@@ -57,8 +57,10 @@ describe("workspace view size + layout tokens", () => {
       const src = readFileSync(join(root, rel), "utf8");
       expect(
         src.includes("workspaceLayoutTokens") ||
-          src.includes("WorkspacePanelShell"),
-        `${rel} should use workspaceLayoutTokens or WorkspacePanelShell`,
+          src.includes("WorkspacePanelShell") ||
+          src.includes("SceneRenderer") ||
+          src.includes("CompanionWorkspaceShell"),
+        `${rel} should use workspaceLayoutTokens, WorkspacePanelShell, SceneRenderer, or CompanionWorkspaceShell`,
       ).toBe(true);
     }
   });

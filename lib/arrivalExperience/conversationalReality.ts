@@ -1,3 +1,10 @@
+import {
+  composeBibleClarify,
+  composeBibleEcho,
+  composeBibleReconnectionQuestion,
+  composeBibleSoftPresence,
+} from "@/lib/shariVoiceBible";
+import { filterQuestionThroughRestraint } from "@/lib/wisdomOfRestraint";
 import { saveDayState, type DayState } from "@/lib/companionStore";
 import type {
   ConversationalRealityResult,
@@ -77,52 +84,20 @@ function vibeFromTone(tone: RealityEmotionalTone): DayState["vibe"] {
   }
 }
 
-function buildEcho(text: string, tone: RealityEmotionalTone): string {
-  const trimmed = text.trim();
-  if (!trimmed) {
-    return "I'll keep today gentle until you tell me otherwise.";
-  }
-  switch (tone) {
-    case "flooded":
-      return "So — flooded. We simplify everything until breathing is easier.";
-    case "grief":
-      return "So — a heavy day. Nothing needs fixing right now.";
-    case "heavy":
-      return "So — it's a hard one. We go gently and protect what we can.";
-    case "low":
-      return "So — short tank today. We keep it honest and small.";
-    case "spark":
-      return "So — you've got spark. Let's not waste it on busywork.";
-    case "celebration":
-      return "So — good news is in the room. We'll honor that first.";
-    default:
-      if (/\bbehind\b/i.test(trimmed)) {
-        return "So — you're behind, not broken. One honest piece at a time.";
-      }
-      if (/\bbusy\b/i.test(trimmed)) {
-        return "So — full day ahead. We'll shape it to what's actually true.";
-      }
-      return "So — I've got the shape of today. We'll keep it manageable.";
-  }
-}
-
-function clarifyForVague(text: string): string {
-  if (/^busy/i.test(text)) {
-    return "Good busy, or the kind that eats you?";
-  }
-  if (/^bad/i.test(text)) {
-    return "More tired, or more heavy?";
-  }
-  return "More steady, or more stretched?";
-}
-
 export function openingRealityQuestion(input: {
   returnAfterLongAbsence?: boolean;
   lowEnergyHint?: boolean;
-}): string {
-  if (input.returnAfterLongAbsence) return "What's today actually like?";
-  if (input.lowEnergyHint) return "How much do you actually have in the tank?";
-  return "How's today?";
+  isFirstVisit?: boolean;
+}): string | null {
+  return composeBibleReconnectionQuestion({
+    homeState: input.isFirstVisit ? "FIRST_VISIT" : "QUIET_PRESENCE",
+    timeOfDay: "morning",
+    sessionVisitIndex: 1,
+    returnIntervalHours: input.returnAfterLongAbsence ? 24 * 42 : 20,
+    returnIntervalDays: input.returnAfterLongAbsence ? 42 : 1,
+    isFirstMeeting: Boolean(input.isFirstVisit),
+    lowEnergy: input.lowEnergyHint,
+  });
 }
 
 export function processRealityMessage(
@@ -146,7 +121,20 @@ export function processRealityMessage(
         note: rawNote,
       }),
       needsClarify: true,
-      clarifyQuestion: clarifyForVague(rawNote),
+      clarifyQuestion: filterQuestionThroughRestraint(
+        composeBibleClarify(
+          {
+            homeState: "QUIET_PRESENCE",
+            timeOfDay: "morning",
+            sessionVisitIndex: 1,
+            returnIntervalHours: null,
+            returnIntervalDays: null,
+            isFirstMeeting: false,
+          },
+          rawNote,
+        ),
+        { tone, isFirstMeeting: false },
+      ).content,
       rawNote,
     };
   }
@@ -160,7 +148,18 @@ export function processRealityMessage(
   });
 
   return {
-    echo: buildEcho(rawNote, tone),
+    echo: composeBibleEcho({
+      voiceContext: {
+        homeState: "QUIET_PRESENCE",
+        timeOfDay: "afternoon",
+        sessionVisitIndex: 12,
+        returnIntervalHours: 16,
+        returnIntervalDays: 0.5,
+        isFirstMeeting: false,
+      },
+      tone,
+      rawNote,
+    }),
     tone,
     dayState,
     needsClarify: false,
@@ -178,7 +177,14 @@ export function softCompleteReality(): ConversationalRealityResult {
     note: "gentle default",
   });
   return {
-    echo: "I'll keep today gentle until you tell me otherwise.",
+    echo: composeBibleSoftPresence({
+      homeState: "QUIET_PRESENCE",
+      timeOfDay: "evening",
+      sessionVisitIndex: 1,
+      returnIntervalHours: null,
+      returnIntervalDays: null,
+      isFirstMeeting: false,
+    }),
     tone: "okay",
     dayState,
     needsClarify: false,
@@ -193,10 +199,21 @@ export function sameAsYesterdayEcho(note?: string): ConversationalRealityResult 
     motivationLevel: "get-it-done",
     vibe: "doing-okay",
     needs: [],
-    note: note ?? "same as yesterday",
+    note: note ?? "about the same",
   });
   return {
-    echo: "Same as yesterday — I've got it.",
+    echo: composeBibleEcho({
+      voiceContext: {
+        homeState: "QUIET_PRESENCE",
+        timeOfDay: "morning",
+        sessionVisitIndex: 1,
+        returnIntervalHours: null,
+        returnIntervalDays: null,
+        isFirstMeeting: false,
+      },
+      tone: "okay",
+      continuity: true,
+    }),
     tone: "okay",
     dayState,
     needsClarify: false,

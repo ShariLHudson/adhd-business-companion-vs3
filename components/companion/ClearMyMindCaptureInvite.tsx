@@ -2,7 +2,6 @@
 
 import {
   CLEAR_MY_MIND_CONTINUE_PROMPT,
-  clearMyMindHeldCountLine,
 } from "@/lib/clearMyMindCopy";
 import { MY_THOUGHTS_OPEN } from "@/lib/thinkingSpace/copy";
 import { recordReliefSignal } from "@/lib/reliefIntelligence";
@@ -15,8 +14,8 @@ type Props = {
 };
 
 /**
- * Quiet invitation — never interrupts capture.
- * Clear My Mind™ captures; My Thoughts™ organizes.
+ * Quiet workspace affordance — no portrait, no "safely got" copy in the panel.
+ * Organization lives in My Thoughts™; emotional acknowledgment lives in conversation.
  */
 export function ClearMyMindCaptureInvite({
   totalThoughtCount,
@@ -28,20 +27,13 @@ export function ClearMyMindCaptureInvite({
     return null;
   }
 
-  const count = Math.max(totalThoughtCount, sessionShareCount);
-
   return (
     <div
-      className="companion-fade-in mt-2 rounded-2xl border border-[#e7dfd4]/80 bg-[#faf7f2]/60 px-4 py-4"
+      className="companion-workspace-invite companion-fade-in"
       data-testid="clear-my-mind-capture-invite"
     >
-      {count > 0 ? (
-        <p className="text-sm leading-relaxed text-[#5a5248]">
-          {clearMyMindHeldCountLine(count)}
-        </p>
-      ) : null}
       {sessionShareCount > 0 ? (
-        <p className="mt-2 text-sm font-medium text-[#6b635a]">
+        <p className="companion-workspace-invite__prompt">
           {CLEAR_MY_MIND_CONTINUE_PROMPT}
         </p>
       ) : null}
@@ -57,7 +49,7 @@ export function ClearMyMindCaptureInvite({
             }
             onOpenMyThoughts();
           }}
-          className="mt-3 rounded-xl border border-[#c5ddd8] bg-[#f0f8f8] px-4 py-2.5 text-sm font-semibold text-[#1e4f4f] transition-colors hover:bg-[#e6f4f4] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/35"
+          className="companion-workspace-invite__link"
           data-testid="open-my-thoughts"
         >
           {MY_THOUGHTS_OPEN}

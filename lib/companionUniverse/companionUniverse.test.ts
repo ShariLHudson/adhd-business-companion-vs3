@@ -13,8 +13,8 @@ describe("Companion Universe™", () => {
     );
   });
 
-  it("place library defines 20 homestead places", () => {
-    expect(COMPANION_PLACE_LIBRARY).toHaveLength(20);
+  it("place library defines homestead places", () => {
+    expect(COMPANION_PLACE_LIBRARY).toHaveLength(21);
     expect(placeById("living-room").emotionalPromise).toBe(
       "I've been expecting you.",
     );

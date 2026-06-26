@@ -41,6 +41,13 @@
   border-radius: 14px;
 }
 
+/* Level 3 — Environmental Object™ (in-room placement, 128px+) */
+.companion-object-visual--hero {
+  width: 8rem;
+  height: 6rem;
+  border-radius: 16px;
+}
+
 .companion-object-visual--icon {
   border-radius: 11px;
 }

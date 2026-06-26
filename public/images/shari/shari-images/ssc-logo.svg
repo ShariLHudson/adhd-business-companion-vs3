@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 130" fill="none" aria-hidden="true">
+  <defs>
+    <linearGradient id="ssc-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f0d48a" />
+      <stop offset="45%" stop-color="#c9a04a" />
+      <stop offset="100%" stop-color="#8a6a2a" />
+    </linearGradient>
+    <linearGradient id="ssc-teal" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6a9a98" />
+      <stop offset="100%" stop-color="#2a4a48" />
+    </linearGradient>
+    <linearGradient id="ssc-gold-text" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#e8c878" />
+      <stop offset="50%" stop-color="#c9a04a" />
+      <stop offset="100%" stop-color="#9a7a3a" />
+    </linearGradient>
+  </defs>
+  <g transform="translate(110 8)">
+    <path
+      d="M-18 42 C-28 18 -14 4 0 0 C10 4 18 16 14 32 C8 22 2 18 -6 26 C-10 32 -14 38 -18 42Z"
+      fill="url(#ssc-teal)"
+    />
+    <path
+      d="M0 0 C14 6 22 22 18 42 C12 30 6 24 0 28 C-4 24 -8 30 -10 38 C-6 22 0 8 0 0Z"
+      fill="url(#ssc-gold)"
+    />
+    <path
+      d="M18 42 C28 18 14 4 0 0 C10 8 16 20 14 34 C16 28 20 34 18 42Z"
+      fill="url(#ssc-gold)"
+    />
+  </g>
+  <text
+    x="110"
+    y="78"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="15"
+    font-weight="700"
+    letter-spacing="0.14em"
+    fill="url(#ssc-gold-text)"
+  >
+    SPARK
+  </text>
+  <text
+    x="110"
+    y="96"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="15"
+    font-weight="700"
+    letter-spacing="0.14em"
+    fill="url(#ssc-gold-text)"
+  >
+    STUDIO
+  </text>
+  <text
+    x="110"
+    y="112"
+    text-anchor="middle"
+    font-family="Georgia, 'Times New Roman', serif"
+    font-size="9"
+    font-weight="600"
+    letter-spacing="0.1em"
+    fill="url(#ssc-gold-text)"
+  >
+    COMPANIONS "
+  </text>
+</svg>

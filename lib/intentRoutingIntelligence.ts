@@ -35,6 +35,12 @@ import {
 import { isKnowledgeQuestion } from "./knowledgeIntelligence";
 import { shouldSuppressRelationshipIntelligenceForUserText } from "./relationshipIntelligenceBoundaries";
 import {
+  evaluateHonorTheirIntent,
+  honorTheirIntentHintForChat,
+  shouldSuppressReflectionForHonorIntent,
+  type HonorTheirIntentVerdict,
+} from "@/lib/honorTheirIntent";
+import {
   containsVisualStructurePhrase,
   isVisualStructureExecution,
   resolveDecisionStructureWorkspaceOffer,
@@ -133,6 +139,8 @@ export type IntentRoutingDecision = {
   navigationLine: string | null;
   stayHereLabel: string;
   featureLabel: string | null;
+  /** Honor Their Intent™ — constitutional arrival mode */
+  honorTheirIntent: HonorTheirIntentVerdict;
 };
 
 export type ArtifactKind = RegistryArtifactKind;
@@ -726,8 +734,16 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
       : null;
   const suppressConversationSummary = Boolean(overwhelmTodayRoute);
   const learnFastPath = category === "learn" && isLearnIntent(text);
+  const honorIntent = evaluateHonorTheirIntent({
+    userText: text,
+    overwhelmed,
+  });
+  const honorAllowsRelationship =
+    honorIntent.arrivalMode === "come_to_be_helped" &&
+    !honorIntent.emergentNeedDetected;
   const suppressRelationshipIntelligence =
-    shouldSuppressRelationshipIntelligenceForUserText(text);
+    shouldSuppressRelationshipIntelligenceForUserText(text) &&
+    !honorAllowsRelationship;
   const suppressDeepIntelligence =
     suppressRelationshipIntelligence || learnFastPath;
 
@@ -752,13 +768,13 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     suppressRelationshipIntelligence,
     suppressRelationshipLead: false,
     suppressReflectionFirst:
-      suppressRelationshipIntelligence ||
+      shouldSuppressReflectionForHonorIntent(honorIntent) ||
       learnFastPath ||
       Boolean(overwhelmTodayRoute) ||
-      category === "build" ||
-      category === "execute" ||
-      category === "organize" ||
-      routeMode === "feature_offer",
+      (category === "build" && honorIntent.arrivalMode !== "come_to_be_helped") ||
+      (category === "execute" && honorIntent.arrivalMode !== "come_to_be_helped") ||
+      (category === "organize" && honorIntent.arrivalMode !== "come_to_be_helped") ||
+      (routeMode === "feature_offer" && honorIntent.arrivalMode === "come_to_work"),
     suppressConversationSummary: suppressConversationSummary || learnFastPath,
     learnFastPath,
     suppressWisdomIntelligence: suppressDeepIntelligence,
@@ -782,6 +798,7 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
         : null),
     stayHereLabel: STAY_HERE_LABEL,
     featureLabel: offer ? featureLabelForSection(offer.section) : null,
+    honorTheirIntent: honorIntent,
   };
 
   decision.suppressRelationshipLead =
@@ -856,6 +873,7 @@ export function intentRoutingHintForChat(
     decision.continuity
       ? `If user accepts, open ${decision.continuity.section} with context: ${decision.continuity.initialPrompt.slice(0, 160)}`
       : null,
+    honorTheirIntentHintForChat(decision.honorTheirIntent),
   ].filter(Boolean);
 
   return lines.length > 1 ? lines.join("\n") : null;

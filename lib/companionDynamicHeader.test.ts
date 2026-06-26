@@ -107,4 +107,20 @@ describe("appFeatureNavigation", () => {
     expect(offer?.reply).toMatch(/take you directly/i);
     expect(offer?.acceptLabel).toMatch(/Celebration/i);
   });
+
+  it("does not route ambiguous connect to Connections", () => {
+    expect(
+      resolveAppFeatureNavTarget(
+        "How do I connect my website link to a Pinterest post?",
+      ),
+    ).toBeNull();
+  });
+
+  it("routes Google Calendar connect to Connections settings", () => {
+    const target = resolveAppFeatureNavTarget("Connect my Google Calendar");
+    expect(target?.kind).toBe("settings");
+    if (target?.kind === "settings") {
+      expect(target.section).toBe("connections");
+    }
+  });
 });

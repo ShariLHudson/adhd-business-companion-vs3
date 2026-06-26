@@ -4,11 +4,46 @@ import {
   resolveCompanionAcceptanceTurn,
   trackConversationOffer,
 } from "./companionIntelligenceRouter";
+import { resolveCompanionIntelligence } from "./companionConstitution";
 import { createPendingAcceptanceRecord } from "./pendingAcceptanceAuthority";
 import { resolvePendingAction } from "./pendingAction";
 import type { WorkspaceOffer } from "./workspaceMode";
 
 describe("companionIntelligenceRouter", () => {
+  it("delegates orchestration to Companion Intelligence conductor", () => {
+    const turn = buildCompanionTurnIntelligence({
+      messages: [{ role: "user", content: "I feel stuck on my launch" }],
+      userText: "I feel stuck on my launch",
+      lastAssistantText: "",
+      userState: {
+        emotionalState: "stuck",
+        obstacle: null,
+        somatic: false,
+      },
+      workspaceOpen: false,
+      activeSection: "home",
+    });
+
+    const expected = resolveCompanionIntelligence({
+      conversation: turn.conversation,
+      emotionalState: "stuck",
+      overwhelmed: false,
+      userText: "I feel stuck on my launch",
+      activeSection: "home",
+      workspaceId: undefined,
+    });
+
+    expect(turn.orchestration.activeIntelligences).toEqual(
+      expected.activeIntelligences,
+    );
+    expect(turn.orchestration.dataAttributes["data-companion-intelligence"]).toBe(
+      "1",
+    );
+    expect(turn.conversation.dataAttributes["data-conversation-intelligence"]).toBe(
+      "1",
+    );
+  });
+
   it("builds intelligence with business gate for revenue advice when profile is thin", () => {
     const turn = buildCompanionTurnIntelligence({
       messages: [

@@ -425,6 +425,10 @@ Nothing moves because animation is available. Every effect traces to a cause:
 
 Module: `lib/environmentalTruth/` — runs after Living Change Engine, before render (`applyEnvironmentalTruth` in `evaluateCompanionEnvironmentIntelligence`).
 
+## Homestead Time™ (implementation)
+
+The Homestead has **days**, not themes. `lib/homesteadTime/` resolves seven periods (dawn → night), continuous sun/shadow/glow interpolation, room profiles, and ADHD conversation rhythm. Every environment evaluation consumes `resolveHomesteadTime()` before render.
+
 Narrative grammar is internal (`because` lines): *"Of course the curtains are moving — the window is open."* Never shown as UI chrome.
 
 ## Companion Communication Anchor™ (implementation)

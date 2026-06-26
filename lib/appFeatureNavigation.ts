@@ -11,6 +11,11 @@ import {
 import type { AppSection } from "./companionUi";
 import { workspaceObjectId, workspaceTitle } from "./workspaceMode";
 import { detectCompanionFirstTarget } from "./companionFirstWorkflow";
+import {
+  meaningBeforeMatchingHintForChat,
+  shouldBlockSingleKeywordWorkspaceRoute,
+  shouldRouteToConnectionsSettings,
+} from "./meaningBeforeMatching";
 
 export type AppFeatureNavTarget =
   | {
@@ -70,19 +75,27 @@ const SETTINGS_ROUTES: {
     label: "Language & region",
     brief: "Language and region are in **Settings → Language & Region**.",
   },
-  {
-    re: /\b(?:google|connect|integration)\b/i,
-    section: "connections",
-    label: "Connections",
-    brief: "Connected apps are in **Settings → Connections**.",
-  },
 ];
+
+const CONNECTIONS_SETTINGS = {
+  section: "connections" as const,
+  label: "Connections",
+  brief: "Connected apps are in **Settings → Connections**.",
+};
 
 export function resolveAppFeatureNavTarget(
   text: string,
 ): AppFeatureNavTarget | null {
   const t = text.trim();
   if (!t) return null;
+
+  if (shouldRouteToConnectionsSettings(t)) {
+    return {
+      kind: "settings",
+      section: CONNECTIONS_SETTINGS.section,
+      label: CONNECTIONS_SETTINGS.label,
+    };
+  }
 
   for (const route of SETTINGS_ROUTES) {
     if (route.re.test(t)) {
@@ -138,6 +151,7 @@ export function resolveAppFeatureNavTarget(
   }
 
   if (!isAppHowToQuestion(t)) return null;
+  if (shouldBlockSingleKeywordWorkspaceRoute(t)) return null;
 
   const companionFirst = detectCompanionFirstTarget(t);
   if (companionFirst) {
@@ -184,6 +198,9 @@ export function resolveAppFeatureNavTarget(
 }
 
 function settingsBrief(text: string): string | null {
+  if (shouldRouteToConnectionsSettings(text)) {
+    return CONNECTIONS_SETTINGS.brief;
+  }
   for (const route of SETTINGS_ROUTES) {
     if (route.re.test(text)) return route.brief;
   }
@@ -231,6 +248,9 @@ export function userAcceptedFeatureNav(text: string): boolean {
 }
 
 export function appFeatureNavigationHintForChat(text: string): string | undefined {
+  const meaningHint = meaningBeforeMatchingHintForChat(text);
+  if (meaningHint) return meaningHint;
+
   const offer = buildAppFeatureNavOffer(text);
   if (!offer) return undefined;
   if (offer.target.kind === "settings") {

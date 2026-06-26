@@ -20,8 +20,8 @@ export {
 } from "@/lib/companionPresenceLibrary/sceneCatalog";
 
 /** Emotional home of the ecosystem — never rotated or randomized. */
-export const WELCOME_PRESENCE_GREETING = "I'm here for you.";
-export const WELCOME_PRESENCE_INVITE = "What's on your mind today?";
+export const WELCOME_PRESENCE_GREETING = "It's good to see you.";
+export const WELCOME_PRESENCE_INVITE = "Come on in — I'm glad you stopped by.";
 
 /** Approved Companion Presence™ images (expand via scene catalog). */
 export const COMPANION_PRESENCE_LIBRARY: CompanionPresenceLibraryEntry[] =

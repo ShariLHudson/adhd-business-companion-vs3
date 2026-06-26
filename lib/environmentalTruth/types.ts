@@ -4,6 +4,7 @@ import type {
   RoomObjectKind,
   WelcomeWeather,
 } from "@/lib/companionEnvironmentIntelligence/types";
+import type { HomesteadTimePeriod } from "@/lib/homesteadTime";
 import type { WelcomeSeason, WelcomeTimeOfDay } from "@/lib/welcomeLivingRoom";
 
 export type EnvironmentalCause =
@@ -45,6 +46,7 @@ export type EnvironmentalTruthInput = {
   objects: RoomObject[];
   motion: CompanionMotionKind[];
   recoveryGentle?: boolean;
+  homesteadPeriod?: HomesteadTimePeriod;
 };
 
 export const ENVIRONMENTAL_TRUTH_RULE =

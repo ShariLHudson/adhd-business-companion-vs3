@@ -130,6 +130,10 @@ export type CompanionEnvironmentIntelligence = {
   livingChangeSet?: import("@/lib/livingLifeEngine").LivingChangeSet | null;
   /** Environmental Truth™ — every detail traces to a believable cause. */
   environmentalTruth?: import("@/lib/environmentalTruth").EnvironmentalTruth | null;
+  /** Homestead Time™ — the house lives in the guest's day. */
+  homesteadTime?: import("@/lib/homesteadTime").HomesteadTime | null;
+  /** Quiet Moments™ — ambient life between conversations (when idle state known). */
+  quietMoments?: import("@/lib/quietMoments").QuietMomentsIntelligence | null;
 };
 
 /** Four-layer Living Companion Room™ */
@@ -143,6 +147,8 @@ export type LivingCompanionRoom = {
   guestPreparation: GuestPreparation | null;
   livingChangeSet?: import("@/lib/livingLifeEngine").LivingChangeSet | null;
   environmentalTruth?: import("@/lib/environmentalTruth").EnvironmentalTruth | null;
+  homesteadTime?: import("@/lib/homesteadTime").HomesteadTime | null;
+  quietMoments?: import("@/lib/quietMoments").QuietMomentsIntelligence | null;
 };
 
 export type CompanionEnvironmentInput = {
@@ -168,4 +174,11 @@ export type CompanionEnvironmentInput = {
   /** When false, skips Living Change Engine (prototype / tests). Default true. */
   useLivingChangeEngine?: boolean;
   livingLifeContext?: import("@/lib/livingLifeEngine").LivingLifeContext;
+  homesteadTime?: import("@/lib/homesteadTime").HomesteadTime;
+  /** When set, evaluates Quiet Moments™ and merges ambient motion. */
+  quietMoments?: import("@/lib/quietMoments").QuietMomentsInput;
+  /** Optional pre-resolved relationship verdict */
+  companionRelationship?: import("@/lib/companionRelationship").CompanionRelationshipVerdict;
+  /** Arrival message for Dynamic Visit Awareness™ */
+  arrivalUserText?: string | null;
 };

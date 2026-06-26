@@ -12,7 +12,6 @@ import {
   beatShowsRealityQuestion,
   beatShowsSecondaryActions,
   initialArrivalBeatState,
-  openingRealityQuestion,
   processRealityMessage,
   reduceArrivalBeat,
   resolveArrivalRecommendation,
@@ -59,6 +58,7 @@ export type UseArrivalExperienceResult = {
   showSecondaryActions: boolean;
   walking: boolean;
   submitReality: (message: string) => void;
+  continueConversation: (message: string) => void;
   acceptRecommendation: () => void;
   declineRecommendation: () => void;
   stayHere: () => void;
@@ -117,6 +117,7 @@ export function useArrivalExperience(
   const realityTurnRef = useRef(state.realityTurn);
   realityTurnRef.current = state.realityTurn;
   const lastMessageRef = useRef("");
+  const reconnectionTurnsRef = useRef(0);
 
   const greeting =
     arrival.welcomePresence?.greeting ??
@@ -127,10 +128,25 @@ export function useArrivalExperience(
   const realityQuestion =
     state.skipReality && state.beat !== "reality"
       ? null
-      : openingRealityQuestion({
-          returnAfterLongAbsence: (arrival.returnIntervalDays ?? 0) >= 42,
-          lowEnergyHint: arrival.homeState === "QUIET_PRESENCE",
-        });
+      : (arrival.welcomePresence?.invite ??
+        arrival.inviteQuestion ??
+        null);
+
+  const maybeOfferRecommendation = useCallback(
+    (message: string, nextTone: ConversationalRealityResult["tone"], dayState?: ReturnType<typeof getDayState>) => {
+      const turns = reconnectionTurnsRef.current;
+      const rec = resolveArrivalRecommendation({
+        message,
+        tone: nextTone,
+        dayState: dayState ?? getDayState(),
+        continueResolution: arrival.continue,
+        reconnectionTurns: turns,
+        readyForRecommendation: turns >= 2,
+      });
+      setRecommendation(rec);
+    },
+    [arrival.continue],
+  );
 
   useEffect(() => {
     if (arrival.homeState === "FIRST_VISIT") {
@@ -159,16 +175,12 @@ export function useArrivalExperience(
           dispatch({ type: "SKIP_TO_INVITE" });
           const cachedState = getDayState();
           if (cachedState) {
+            reconnectionTurnsRef.current = 1;
             setTone("okay");
-            setEcho("Same as yesterday — I've got it.");
+            const continuity = sameAsYesterdayEcho(cachedState.note);
+            setEcho(continuity.echo);
             setHospitality(resolveHospitalityResponse("okay"));
-            const rec = resolveArrivalRecommendation({
-              message: cachedState.note ?? "",
-              tone: "okay",
-              dayState: cachedState,
-              continueResolution: arrival.continue,
-            });
-            setRecommendation(rec);
+            setRecommendation(null);
           }
           window.setTimeout(
             () => dispatch({ type: "TICK_INVITE" }),
@@ -187,17 +199,12 @@ export function useArrivalExperience(
     if (state.beat !== "reality") return undefined;
     const timer = window.setTimeout(() => {
       const soft = softCompleteReality();
+      reconnectionTurnsRef.current = 1;
       setEcho(soft.echo);
       setTone(soft.tone);
       setHospitality(resolveHospitalityResponse(soft.tone));
       dispatch({ type: "REALITY_SUBMITTED", needsClarify: false });
-      const rec = resolveArrivalRecommendation({
-        message: "",
-        tone: soft.tone,
-        dayState: soft.dayState,
-        continueResolution: arrival.continue,
-      });
-      setRecommendation(rec);
+      setRecommendation(null);
     }, ARRIVAL_MS.realityTimeout);
     return () => window.clearTimeout(timer);
   }, [state.beat, arrival.continue]);
@@ -247,16 +254,21 @@ export function useArrivalExperience(
 
       setClarifyQuestion(null);
       setEcho(result.echo);
+      reconnectionTurnsRef.current = 1;
       dispatch({ type: "REALITY_CLARIFIED" });
-      const rec = resolveArrivalRecommendation({
-        message,
-        tone: result.tone,
-        dayState: result.dayState,
-        continueResolution: arrival.continue,
-      });
-      setRecommendation(rec);
+      setRecommendation(null);
     },
-    [arrival.continue],
+    [],
+  );
+
+  const continueConversation = useCallback(
+    (message: string) => {
+      if (!message.trim()) return;
+      reconnectionTurnsRef.current += 1;
+      lastMessageRef.current = message;
+      maybeOfferRecommendation(message, tone);
+    },
+    [maybeOfferRecommendation, tone],
   );
 
   const sameAsYesterday = useCallback(() => {
@@ -265,15 +277,10 @@ export function useArrivalExperience(
     setTone(result.tone);
     setEcho(result.echo);
     setHospitality(resolveHospitalityResponse(result.tone));
+    reconnectionTurnsRef.current = 1;
     dispatch({ type: "REALITY_CLARIFIED" });
-    const rec = resolveArrivalRecommendation({
-      message: cached?.note ?? "",
-      tone: result.tone,
-      dayState: result.dayState,
-      continueResolution: arrival.continue,
-    });
-    setRecommendation(rec);
-  }, [arrival.continue]);
+    setRecommendation(null);
+  }, []);
 
   const acceptRecommendation = useCallback(() => {
     dispatch({ type: "ACCEPT_DOOR" });
@@ -311,6 +318,7 @@ export function useArrivalExperience(
     showSecondaryActions: beatShowsSecondaryActions(state.beat),
     walking: state.beat === "walk",
     submitReality,
+    continueConversation,
     acceptRecommendation,
     declineRecommendation,
     stayHere,

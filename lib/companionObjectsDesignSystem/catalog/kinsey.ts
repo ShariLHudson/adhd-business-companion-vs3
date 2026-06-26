@@ -1,0 +1,26 @@
+import type { ObjectSeed } from "./builder";
+
+export const KINSEY_OBJECT_SEEDS: ObjectSeed[] = [
+  { id: "obj-kinsey-dog-bed", name: "Kinsey's dog bed", emotionalPurpose: "Companionship", collection: "kinsey", primaryRoom: "living-room", material: "cotton" },
+  { id: "obj-kinsey-favorite-toy", name: "Kinsey's favorite toy", emotionalPurpose: "Joy", collection: "kinsey", primaryRoom: "living-room", material: "cotton" },
+  { id: "obj-kinsey-leash", name: "Kinsey's leash", emotionalPurpose: "Adventures together", collection: "kinsey", primaryRoom: "front-porch", material: "leather" },
+  { id: "obj-kinsey-water-bowl", name: "Kinsey's water bowl", emotionalPurpose: "Cared for", collection: "kinsey", primaryRoom: "kitchen-table", material: "ceramic", animationCapability: true, animation: "water-ripple" },
+  { id: "obj-kinsey-tennis-ball", name: "Kinsey's tennis ball", emotionalPurpose: "Play", collection: "kinsey", primaryRoom: "back-deck", material: "cotton" },
+  { id: "obj-kinsey-treat-jar", name: "Kinsey's treat jar", emotionalPurpose: "Small rewards", collection: "kinsey", primaryRoom: "kitchen-table", material: "glass" },
+  { id: "obj-kinsey-blanket", name: "Kinsey's blanket", emotionalPurpose: "Cozy nap", collection: "kinsey", primaryRoom: "living-room", material: "wool" },
+  { id: "obj-kinsey-collar", name: "Kinsey's collar", emotionalPurpose: "Belonging", collection: "kinsey", primaryRoom: "front-porch", material: "leather" },
+  { id: "obj-kinsey-food-bowl", name: "Kinsey's food bowl", emotionalPurpose: "Fed and loved", collection: "kinsey", primaryRoom: "kitchen-table", material: "ceramic" },
+  { id: "obj-kinsey-chew-bone", name: "Kinsey's chew bone", emotionalPurpose: "Contentment", collection: "kinsey", primaryRoom: "living-room", material: "wood" },
+  { id: "obj-kinsey-paw-towel", name: "Paw towel by door", emotionalPurpose: "Welcome back inside", collection: "kinsey", primaryRoom: "front-porch", material: "linen" },
+  { id: "obj-kinsey-car-seat-cover", name: "Car seat cover", emotionalPurpose: "Ride along", collection: "kinsey", primaryRoom: "barn", material: "cotton" },
+  { id: "obj-kinsey-brush", name: "Dog brush", emotionalPurpose: "Grooming care", collection: "kinsey", primaryRoom: "living-room", material: "wood" },
+  { id: "obj-kinsey-frisbee", name: "Frisbee", emotionalPurpose: "Backyard joy", collection: "kinsey", primaryRoom: "garden", material: "cotton" },
+  { id: "obj-kinsey-window-perch", name: "Window watching spot", emotionalPurpose: "Guardian of the yard", collection: "kinsey", primaryRoom: "living-room", material: "cotton" },
+  { id: "obj-kinsey-shed-hair-brush", name: "Lint roller", emotionalPurpose: "Love leaves traces", collection: "kinsey", primaryRoom: "living-room", material: "paper" },
+  { id: "obj-kinsey-bandana", name: "Seasonal bandana", emotionalPurpose: "Dressed for the day", collection: "kinsey", primaryRoom: "living-room", material: "cotton", seasonalVariants: ["summer-bandana", "holiday-bandana"] },
+  { id: "obj-kinsey-stuffed-squirrel", name: "Stuffed squirrel toy", emotionalPurpose: "Instinct play", collection: "kinsey", primaryRoom: "living-room", material: "cotton" },
+  { id: "obj-kinsey-agility-tunnel", name: "Agility tunnel", emotionalPurpose: "Energy spent", collection: "kinsey", primaryRoom: "garden", material: "cotton" },
+  { id: "obj-kinsey-photo-frame", name: "Kinsey photo frame", emotionalPurpose: "Family member", collection: "kinsey", primaryRoom: "living-room", material: "wood" },
+  { id: "obj-kinsey-mud-mat", name: "Mud mat", emotionalPurpose: "Mess accepted", collection: "kinsey", primaryRoom: "front-porch", material: "cotton", seasonalVariants: ["spring-rain", "winter-snow"] },
+  { id: "obj-kinsey-sun-spot", name: "Sun spot cushion", emotionalPurpose: "Afternoon nap", collection: "kinsey", primaryRoom: "living-room", material: "cotton" },
+];

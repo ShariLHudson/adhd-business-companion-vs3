@@ -65,7 +65,10 @@ export function resolveHospitalityPreparationChanges(
     });
   }
 
-  if (input.timeOfDay === "morning" && !observance) {
+  if (
+    (input.timeOfDay === "morning" || input.homesteadPeriod === "morning" || input.homesteadPeriod === "dawn") &&
+    !observance
+  ) {
     changes.push({
       id: "hospitality-morning-coffee",
       bucket: "hospitality_preparation",
@@ -74,11 +77,16 @@ export function resolveHospitalityPreparationChanges(
       cause: "morning-ritual",
       objects: [{ kind: "coffee", placement: "table" }],
       hospitality: { showMugSteam: true },
-      conversationHint: "Coffee's ready if you want it.",
     });
   }
 
-  if (input.timeOfDay === "evening" || input.timeOfDay === "night") {
+  if (
+    input.timeOfDay === "evening" ||
+    input.timeOfDay === "night" ||
+    input.homesteadPeriod === "evening" ||
+    input.homesteadPeriod === "golden-hour" ||
+    input.homesteadPeriod === "night"
+  ) {
     changes.push({
       id: "hospitality-evening-lamp",
       bucket: "hospitality_preparation",
@@ -88,6 +96,23 @@ export function resolveHospitalityPreparationChanges(
       hospitality: { warmLamp: true },
       motion: { enable: ["lamplight"] },
     });
+    if (
+      input.homesteadPeriod === "evening" ||
+      input.homesteadPeriod === "golden-hour" ||
+      input.homesteadPeriod === "night" ||
+      input.timeOfDay === "evening" ||
+      input.timeOfDay === "night"
+    ) {
+      changes.push({
+        id: "hospitality-evening-tea",
+        bucket: "hospitality_preparation",
+        priority: "hospitality",
+        sourceModule: "hospitalityPreparationResolver",
+        cause: "evening-tea-ritual",
+        objects: [{ kind: "tea-set", placement: "table" }],
+        hospitality: { showMugSteam: true },
+      });
+    }
   }
 
   if (input.projectRecentlyCompleted) {

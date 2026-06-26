@@ -28,20 +28,28 @@ export type WelcomeRelationshipTier =
   | "six_months"
   | "years";
 
+import type { PresenceIntelligence } from "@/lib/presenceIntelligence";
+import type { RestraintEvaluation } from "@/lib/wisdomOfRestraint";
+import type { CharacterEvaluation } from "@/lib/characterOfShari";
+
 export type WelcomePresenceIntelligence = {
   greeting: string;
-  invite: string;
+  invite: string | null;
   openingSentence: string;
   mood: WelcomeMood;
   animationProfile: "living" | "still";
   greetingCategory: WelcomeGreetingCategory;
   chatPlaceholder: string;
+  presence: PresenceIntelligence;
+  restraint: RestraintEvaluation;
+  character: CharacterEvaluation;
 };
 
 export type WelcomePresenceInput = {
   now?: Date;
   homeState: "FIRST_VISIT" | "QUIET_PRESENCE";
   timeOfDay: "morning" | "afternoon" | "evening" | "night";
+  season?: "spring" | "summer" | "autumn" | "winter" | "holiday";
   isWeekend?: boolean;
   sessionVisitIndex: number;
   returnIntervalHours: number | null;
@@ -53,4 +61,9 @@ export type WelcomePresenceInput = {
   recoveryGentle?: boolean;
   lowEnergy?: boolean;
   vacationDaysAway?: number | null;
+  projectRecentlyCompleted?: boolean;
+  previousTopic?: string | null;
+  recentAccomplishment?: string | null;
+  emotionalNote?: string | null;
+  prefersConversation?: boolean;
 };

@@ -214,7 +214,9 @@ export function resolveHospitalityLayers(input: {
   const contextualLines = [
     guestPrep.line,
     ...conversationLinesFromProfile(profile),
-  ].filter((line, index, list) => list.indexOf(line) === index);
+  ]
+    .filter((line): line is string => Boolean(line))
+    .filter((line, index, list) => list.indexOf(line) === index);
 
   const layer3: Layer3Conversation = {
     layer: 3,
@@ -240,7 +242,9 @@ export function resolveHospitalityLayers(input: {
     woven: [
       guestPrep.line,
       ...weaveGuestHospitality(profile),
-    ].filter((line, index, list) => list.indexOf(line) === index),
+    ]
+      .filter((line): line is string => Boolean(line))
+      .filter((line, index, list) => list.indexOf(line) === index),
     foundationUnchanged: true,
   };
 
