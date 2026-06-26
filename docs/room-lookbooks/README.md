@@ -11,7 +11,8 @@ These documents are **permanent design authority** for the first five daily-life
 3. [`docs/companion-homestead/LOOK_BOOK.md`](../companion-homestead/LOOK_BOOK.md) — full 20-room environmental spec
 4. **This folder** — implementation-ready room packets for Phase 1 build
 5. [`docs/companion-homestead/SCREEN_COMPOSITION_GUIDE.md`](../companion-homestead/SCREEN_COMPOSITION_GUIDE.md) — how rooms become screens
-6. [`lib/companionObjects/companionObjectRegistry.ts`](../lib/companionObjects/companionObjectRegistry.ts) — object identity (no duplicate objects)
+6. [`docs/companion-homestead/FIRST_PRODUCTION_EXPERIENCE.md`](../companion-homestead/FIRST_PRODUCTION_EXPERIENCE.md) — first 30–60s arrival journey
+7. [`lib/companionObjects/companionObjectRegistry.ts`](../lib/companionObjects/companionObjectRegistry.ts) — object identity (no duplicate objects)
 
 ## Phase 1 rooms
 
