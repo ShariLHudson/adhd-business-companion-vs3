@@ -255,7 +255,7 @@ function resolveBackground(
         seed: "plan-my-day-morning",
         overlay: "rgba(255, 250, 242, 0.04)",
         objectPosition: "center center",
-        fit: "cover",
+        fit: "cover-safe-crop",
         dominanceCap: 1,
       };
     }
@@ -268,7 +268,7 @@ function resolveBackground(
         seed: "focus-my-brain",
         overlay: "rgba(255, 250, 242, 0.04)",
         objectPosition: "center center",
-        fit: "cover",
+        fit: "cover-safe-crop",
         dominanceCap: 1,
       };
     }

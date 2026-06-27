@@ -16,12 +16,13 @@ export function useWelcomeRoomAmbience({ active, ambienceAllowed }: Options) {
   const experience = useWelcomeAudioExperience({
     profileId: "welcome-room",
     active,
-    ambienceAllowed,
+    immersive: ambienceAllowed,
+    paused: !ambienceAllowed,
   });
 
   return {
-    enabled: experience.ambienceEnabled,
+    enabled: !experience.musicMuted,
     available: experience.ambienceAvailable,
-    toggle: experience.toggleAmbience,
+    toggle: experience.toggleMusic,
   };
 }

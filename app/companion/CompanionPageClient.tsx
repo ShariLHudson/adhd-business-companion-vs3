@@ -630,6 +630,7 @@ import { unlockBrowserAudioFromClick } from "@/lib/welcomeAudio/audioUnlock";
 import {
   observeFromConversationTurn,
   observeResourcePreference,
+  maybeTrustBuildingMoment,
   phase2ProgressiveDiscoveryHintForChat,
   recordTrustBuildingMomentShown,
   resourcePreferenceFromAppSection,
