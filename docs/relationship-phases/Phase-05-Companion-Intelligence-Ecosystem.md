@@ -9,7 +9,7 @@
 
 ## Phase Name
 
-Companion Intelligence Ecosystem™
+Companion Intelligence Ecosystem
 
 ---
 
@@ -29,7 +29,7 @@ The user should feel:
 - That wins and lessons accumulate into a personal story
 - Milestone: *"You help me become the person I want to become."*
 
-Panel sections when active: Personal Operating Manual, Wisdom Engine™, What We've Built Together (includes legacy intelligence).
+Panel sections when active: Personal Operating Manual, Wisdom Engine, What We've Built Together (includes legacy intelligence).
 
 ---
 

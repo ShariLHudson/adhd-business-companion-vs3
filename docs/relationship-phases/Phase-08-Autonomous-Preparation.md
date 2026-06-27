@@ -10,7 +10,7 @@
 
 ## Phase Name
 
-Autonomous Preparation™
+Autonomous Preparation
 
 ---
 

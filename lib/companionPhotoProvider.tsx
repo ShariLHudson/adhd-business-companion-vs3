@@ -32,7 +32,7 @@ const defaultCatalog: CompanionPhotoCatalogSnapshot = {
 const CompanionPhotoContext =
   createContext<CompanionPhotoContextValue | null>(null);
 
-/** One catalog for every workspace — Live Reality™ pattern for companion portraits. */
+/** One catalog for every workspace — Live Reality pattern for companion portraits. */
 export function CompanionPhotoProvider({ children }: { children: ReactNode }) {
   const [catalog, setCatalog] = useState<CompanionPhotoCatalogSnapshot>(defaultCatalog);
 

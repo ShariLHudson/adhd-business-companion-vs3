@@ -9,7 +9,7 @@
 
 ## Phase Name
 
-Legacy & Transformation Intelligence™
+Legacy & Transformation Intelligence
 
 ---
 
@@ -31,7 +31,7 @@ The user should feel:
 - Growth framed as identity and capability evolution, not task counts
 - Evidence-based reflection without flattery or exaggeration
 
-Panel: **Legacy & Transformation Intelligence™** in Getting To Know You when active.
+Panel: **Legacy & Transformation Intelligence** in Getting To Know You when active.
 
 ---
 

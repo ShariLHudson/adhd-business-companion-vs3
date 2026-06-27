@@ -1,7 +1,7 @@
 import type { VisualFocusAnalysis } from "../types";
 import type { BusinessCanvasImpactModelExtensions } from "./impactModel/types";
 
-/** Business Canvas™ — current business first, then change exploration. */
+/** Business Canvas — current business first, then change exploration. */
 export type BusinessCanvasWorkflowStage =
   | "buildCurrentCanvas"
   | "generatedCurrentCanvas"

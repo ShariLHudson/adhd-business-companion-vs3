@@ -1,10 +1,10 @@
-# Wisdom of Restraint™
-## Companion Homestead™ — Knowing When To Do Nothing Is Part Of Caring
+# Wisdom of Restraint
+## Companion Homestead — Knowing When To Do Nothing Is Part Of Caring
 
 **Version:** 1.0  
 **Status:** Canonical design authority — governs every outgoing interaction  
-**Authority:** Sits **above** Presence Intelligence™, Greeting Intelligence™, Needs Intelligence™, and all recommendation engines  
-**Sibling documents:** [`PRESENCE_INTELLIGENCE.md`](./PRESENCE_INTELLIGENCE.md) · [`EMOTIONAL_EXPERIENCE_BLUEPRINT.md`](./EMOTIONAL_EXPERIENCE_BLUEPRINT.md) · [`Shari Voice Bible™`](../../lib/shariVoiceBible/CONSTITUTION.md)  
+**Authority:** Sits **above** Presence Intelligence, Greeting Intelligence, Needs Intelligence, and all recommendation engines  
+**Sibling documents:** [`PRESENCE_INTELLIGENCE.md`](./PRESENCE_INTELLIGENCE.md) · [`EMOTIONAL_EXPERIENCE_BLUEPRINT.md`](./EMOTIONAL_EXPERIENCE_BLUEPRINT.md) · [`Shari Voice Bible`](../../lib/shariVoiceBible/CONSTITUTION.md)  
 **Implementation:** [`lib/wisdomOfRestraint/`](../../lib/wisdomOfRestraint/)
 
 **This is not:**
@@ -37,7 +37,7 @@ From this point forward, every intelligence system, every recommendation, every 
 
 ---
 
-## The Restraint Filter™
+## The Restraint Filter
 
 `evaluateRestraintFilter()` evaluates every outgoing interaction against eight checks:
 
@@ -173,7 +173,7 @@ The Companion behaves the same way.
 
 | Concern | Location |
 |---------|----------|
-| Restraint Filter™ | `lib/wisdomOfRestraint/evaluateRestraintFilter.ts` |
+| Restraint Filter | `lib/wisdomOfRestraint/evaluateRestraintFilter.ts` |
 | Expressed-need detection | `lib/wisdomOfRestraint/resolveUserExpressedNeed.ts` |
 | Welcome output gate | `evaluateWelcomePresenceIntelligence` → `evaluateWelcomeRestraint` |
 | Room recommendation gate | `resolveArrivalRecommendation` → `applyRestraintToArrivalRecommendation` |
@@ -185,8 +185,8 @@ The Companion behaves the same way.
 ```
 Guest context
   → Needs / Presence / Greeting intelligence (compose candidates)
-  → Wisdom of Restraint™ (timing, necessity)
-  → Character of Shari™ (authenticity)
+  → Wisdom of Restraint (timing, necessity)
+  → Character of Shari (authenticity)
   → Guest sees only what passed
 ```
 
@@ -205,7 +205,7 @@ They remember:
 - "I never felt overwhelmed."
 - "I always felt like someone was quietly looking out for me."
 
-That is the Wisdom of Restraint™.
+That is the Wisdom of Restraint.
 
 It is not about doing less. It is about caring enough to know when less is exactly what someone needs.
 

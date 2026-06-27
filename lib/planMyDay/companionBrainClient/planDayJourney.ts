@@ -1,5 +1,5 @@
 /**
- * Plan My Day™ journey chapters — one story, consistent title.
+ * Plan My Day journey chapters — one story, consistent title.
  */
 
 export type PlanDayJourneyChapter =
@@ -10,7 +10,7 @@ export type PlanDayJourneyChapter =
   | "working-together"
   | "todays-progress";
 
-export const PLAN_MY_DAY_TITLE = "Plan My Day™";
+export const PLAN_MY_DAY_TITLE = "Plan My Day";
 
 const CHAPTER_SUBTITLES: Record<PlanDayJourneyChapter, string> = {
   gateway: "Today's Plan",

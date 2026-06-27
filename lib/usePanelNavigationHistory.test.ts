@@ -11,11 +11,11 @@ describe("panelNavigationStack", () => {
       [],
       initial,
       { view: "collection", query: "" },
-      "My Thoughts™",
+      "My Thoughts",
     );
 
     expect(pushed.frames).toHaveLength(1);
-    expect(pushed.frames[0]?.backDestination).toBe("My Thoughts™");
+    expect(pushed.frames[0]?.backDestination).toBe("My Thoughts");
     expect(pushed.snapshot.view).toBe("collection");
 
     const popped = popPanelNavigationFrame(pushed.frames);

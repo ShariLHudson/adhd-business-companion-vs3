@@ -149,7 +149,7 @@ export type BrainDumpEntry = {
   routedAction?: string;
   sorted?: boolean;
   done?: boolean;
-  /** My Thinking Space™ — living thought object fields */
+  /** My Thinking Space — living thought object fields */
   archived?: boolean;
   archivedAt?: string;
   pinned?: boolean;
@@ -163,11 +163,11 @@ export type BrainDumpEntry = {
   previousCollectionId?: string;
   collectionHistory?: string[];
   reminderAt?: string;
-  /** Living Intelligence Graph™ — meaningful links only (future) */
+  /** Living Intelligence Graph — meaningful links only (future) */
   connectedPerson?: string;
   /** Optional display title — defaults to first line of text */
   title?: string;
-  /** Intelligence-Ready™ — same object evolved from another (no duplicate) */
+  /** Intelligence-Ready — same object evolved from another (no duplicate) */
   originatedFromId?: string;
   originatedFromKind?: EcosystemObjectKind;
   /** Future LIG connections */

@@ -202,7 +202,7 @@ export function CompanionDirectorsStudio({
     <aside className="directors-studio-v2" aria-label="Companion Director's Studio v2">
       <header className="directors-studio-v2__header">
         <div>
-          <strong>Director&apos;s Studio™</strong>
+          <strong>Director&apos;s Studio</strong>
           <span>Prepare experiences — not variables</span>
         </div>
         <label className="directors-studio-v2__toggle">
@@ -233,7 +233,7 @@ export function CompanionDirectorsStudio({
                 onClick={() => patch({ placeId })}
                 title={entry?.purpose}
               >
-                {entry?.name.replace("™", "") ?? labelize(placeId)}
+                {entry?.name.replace("", "") ?? labelize(placeId)}
               </button>
             );
           })}
@@ -252,7 +252,7 @@ export function CompanionDirectorsStudio({
               checked={brief.iowaReality}
               onChange={(event) => patch({ iowaReality: event.target.checked })}
             />
-            Iowa Reality™
+            Iowa Reality
           </label>
           <label className="directors-studio-v2__toggle">
             <input

@@ -9,11 +9,11 @@ import {
   resolveSceneCopy,
 } from "./index";
 
-describe("Scene Render Contract™", () => {
+describe("Scene Render Contract", () => {
   it("resolves copy from single source — not hardcoded in components", () => {
     const copy = resolveSceneCopy("clear-my-mind");
     expect(copy.title).toBe("Clear My Mind");
-    expect(copy.subtitle).toContain("head");
+    expect(copy.subtitle).toContain("together");
   });
 
   it("caps image dominance", () => {
@@ -33,15 +33,18 @@ describe("Scene Render Contract™", () => {
     expect(layout.centerZone.className).toBe("companion-scene-center");
     expect(layout.panel.className).toBe("companion-scene-panel");
     expect(layout.cssVars["--scene-image-scale"]).toBe("1");
-    expect(Number(layout.cssVars["--scene-image-dominance"])).toBeLessThanOrEqual(0.62);
+    expect(Number(layout.cssVars["--scene-image-dominance"])).toBeGreaterThan(0.8);
   });
 
-  it("homestead workspaces use edge-only motion", () => {
+  it("clear my mind conservatory fills the room without edge motion", () => {
     const resolved = resolveScene(
       createSceneState({ workspaceId: "clear-my-mind" }),
     );
-    expect(resolved.motion.placement).toBe("edge-only");
-    expect(resolved.motion.enabled).toBe(true);
+    expect(resolved.motion.placement).toBe("none");
+    expect(resolved.motion.enabled).toBe(false);
+    expect(resolved.background.mode).toBe("photo-scene");
+    expect(resolved.background.imageUrl).toContain("clear-my-mind-background");
+    expect(resolved.environment.placeId).toBe("greenhouse");
   });
 
   it("photo scenes disable living border motion", () => {
@@ -58,35 +61,39 @@ describe("Scene Render Contract™", () => {
     expect(copy.subtitle).toContain("Paralysis");
   });
 
-  it("plan-my-day resolves Planning Table™ homestead scene", () => {
+  it("plan-my-day resolves Planning Table homestead scene", () => {
     const resolved = resolveScene(
       createSceneState({ workspaceId: "plan-my-day" }),
     );
     const layout = layoutScene(resolved);
     expect(resolved.motion.placement).toBe("edge-only");
-    expect(resolved.background.mode).toBe("homestead-room");
+    expect(resolved.background.mode).toBe("photo-scene");
+    expect(resolved.background.imageUrl).toBeTruthy();
     expect(layout.dataAttributes["data-planning-table-room"]).toBe("1");
     expect(layout.rootClassName).toContain("companion-scene-root--planning-table");
     const copy = resolveSceneCopy("plan-my-day");
-    expect(copy.title).toBe("Plan My Day™");
+    expect(copy.title).toBe("Plan My Day");
     expect(copy.subtitle).toContain("figure today out");
   });
 
-  it("focus-hub resolves Focus Landscape™ meadow-lake center", () => {
+  it("focus-hub resolves Focus Landscape meadow-lake center", () => {
     const resolved = resolveScene(
       createSceneState({ workspaceId: "focus-hub" }),
     );
     const layout = layoutScene(resolved);
-    expect(resolved.motion.placement).toBe("edge-only");
-    expect(resolved.background.mode).toBe("homestead-room");
+    expect(resolved.motion.placement).toBe("none");
+    expect(resolved.background.mode).toBe("photo-scene");
+    expect(resolved.background.imageUrl).toContain("focus-my-brain-background");
+    expect(resolved.background.fit).toBe("cover");
+    expect(resolved.background.dominanceCap).toBe(1);
     expect(layout.dataAttributes["data-focus-landscape"]).toBe("1");
     expect(layout.dataAttributes["data-focus-landscape-space"]).toBe("meadow-lake");
     expect(layout.rootClassName).toContain("companion-scene-root--focus-landscape");
     const copy = resolveSceneCopy("focus-hub");
-    expect(copy.title).toBe("Focus My Brain™");
+    expect(copy.title).toBe("Focus My Brain");
   });
 
-  it("focus-category stuck resolves Garden Path™", () => {
+  it("focus-category stuck resolves Garden Path", () => {
     const resolved = resolveScene(
       createSceneState({
         workspaceId: "focus-category",
@@ -98,13 +105,13 @@ describe("Scene Render Contract™", () => {
     expect(layout.dataAttributes["data-homestead-place"]).toBe("garden-path");
   });
 
-  it("homestead scene with signature object exposes both ids", () => {
+  it("conservatory scene omits signature object in the center", () => {
     const resolved = resolveScene(
       createSceneState({ workspaceId: "clear-my-mind" }),
     );
-    expect(resolved.signatureId).toBeTruthy();
-    expect(resolved.objectId).toBeTruthy();
-    expect(hasRenderableSignatureObject(resolved)).toBe(true);
+    expect(resolved.signatureId).toBeUndefined();
+    expect(resolved.objectId).toBeUndefined();
+    expect(hasRenderableSignatureObject(resolved)).toBe(false);
   });
 
   it("photo scene without signature object omits object ids safely", () => {

@@ -9,7 +9,7 @@ import {
 import type { QuietMomentsInput, QuietMomentsIntelligence } from "./types";
 
 /**
- * Quiet Moments™ — evaluate ambient life while nothing is happening.
+ * Quiet Moments — evaluate ambient life while nothing is happening.
  * Life, not activity. Peace, not a paused app.
  */
 export function evaluateQuietMoments(

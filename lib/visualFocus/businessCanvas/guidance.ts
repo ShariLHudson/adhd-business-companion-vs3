@@ -6,7 +6,7 @@ export const BUSINESS_CANVAS_SECTION_GUIDANCE: Record<
 > = {
   "customer-segments": {
     id: "customer-segments",
-    title: "Customer Segments™",
+    title: "Customer Segments",
     prompt: "Who do you serve?",
     explanation:
       "The specific groups of people your business is built to help — not everyone, just the audiences that matter most.",
@@ -19,7 +19,7 @@ export const BUSINESS_CANVAS_SECTION_GUIDANCE: Record<
       "Authors",
       "Small business owners",
     ],
-    suggestionSource: "Populate from Audience Intelligence™.",
+    suggestionSource: "Populate from Audience Intelligence.",
     changeRipples: [
       "Your value proposition may need to shift",
       "Marketing channels may need to change",
@@ -29,7 +29,7 @@ export const BUSINESS_CANVAS_SECTION_GUIDANCE: Record<
   },
   "value-proposition": {
     id: "value-proposition",
-    title: "Value Proposition™",
+    title: "Value Proposition",
     prompt: "Why should people choose you?",
     explanation:
       "The core promise — what outcome or transformation you deliver that makes you worth choosing.",
@@ -51,7 +51,7 @@ export const BUSINESS_CANVAS_SECTION_GUIDANCE: Record<
   },
   channels: {
     id: "channels",
-    title: "Channels™",
+    title: "Channels",
     prompt: "How do people discover you?",
     explanation:
       "Where your audience finds you before they buy — marketing, content, referrals, and touchpoints.",
@@ -75,7 +75,7 @@ export const BUSINESS_CANVAS_SECTION_GUIDANCE: Record<
   },
   "customer-relationships": {
     id: "customer-relationships",
-    title: "Customer Relationships™",
+    title: "Customer Relationships",
     prompt: "How do you stay connected?",
     explanation:
       "How you nurture trust after someone discovers you — ongoing connection, support, and community.",
@@ -98,7 +98,7 @@ export const BUSINESS_CANVAS_SECTION_GUIDANCE: Record<
   },
   "revenue-streams": {
     id: "revenue-streams",
-    title: "Revenue Streams™",
+    title: "Revenue Streams",
     prompt: "How does money enter the business?",
     explanation:
       "Every way your business earns — products, services, subscriptions, and recurring income.",
@@ -122,7 +122,7 @@ export const BUSINESS_CANVAS_SECTION_GUIDANCE: Record<
   },
   "key-activities": {
     id: "key-activities",
-    title: "Key Activities™",
+    title: "Key Activities",
     prompt: "What must happen for the business to operate?",
     explanation:
       "The essential work that creates value — what you (and your team) must do regularly.",
@@ -144,7 +144,7 @@ export const BUSINESS_CANVAS_SECTION_GUIDANCE: Record<
   },
   "key-resources": {
     id: "key-resources",
-    title: "Key Resources™",
+    title: "Key Resources",
     prompt: "What assets support the business?",
     explanation:
       "What you need to deliver — skills, tools, content, audience, brand, and people.",
@@ -167,7 +167,7 @@ export const BUSINESS_CANVAS_SECTION_GUIDANCE: Record<
   },
   "key-partners": {
     id: "key-partners",
-    title: "Key Partners™",
+    title: "Key Partners",
     prompt: "Who helps make this work?",
     explanation:
       "People and organizations that extend your capacity — collaborators, vendors, and allies.",
@@ -190,7 +190,7 @@ export const BUSINESS_CANVAS_SECTION_GUIDANCE: Record<
   },
   "cost-structure": {
     id: "cost-structure",
-    title: "Cost Structure™",
+    title: "Cost Structure",
     prompt: "What costs support the business?",
     explanation:
       "What you spend to run and grow — tools, ads, help, education, and overhead.",

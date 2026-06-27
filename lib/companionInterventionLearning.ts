@@ -1,5 +1,5 @@
 /**
- * Intervention Learning Engine™ — learn what actually helps per user and ecosystem-wide.
+ * Intervention Learning Engine — learn what actually helps per user and ecosystem-wide.
  *
  * Tracks full intervention lifecycle and adaptive recommendation weighting.
  * Privacy: patterns only — never labels or shames users.

@@ -1,5 +1,5 @@
 /**
- * P0 Relationship Response Contract™
+ * P0 Relationship Response Contract
  * Mandatory 3-paragraph structure when observation confidence is forming or sufficient.
  */
 

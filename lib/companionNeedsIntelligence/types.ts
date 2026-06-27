@@ -105,7 +105,7 @@ export type CompanionNeedsIntelligence = {
   likelyPlaceIds: CompanionPlaceId[];
   restorationPromise: string;
   restorationOutcome: RestorationOutcome;
-  /** Reward Principle™ — why arriving should feel like relief. */
+  /** Reward Principle — why arriving should feel like relief. */
   rewardFraming: string;
   /** How Shari would prepare before they arrive. */
   preparationGuidance: string[];

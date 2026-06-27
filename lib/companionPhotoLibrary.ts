@@ -483,7 +483,7 @@ export type WorkspaceEntryPhotoResult = {
 };
 
 /**
- * Pick a photo when the user enters Clear My Mind™ or My Thoughts™.
+ * Pick a photo when the user enters Clear My Mind or My Thoughts.
  * Deterministic rotation — next image in sorted list, never same twice in a row.
  */
 export function pickWorkspaceEntryPhoto(

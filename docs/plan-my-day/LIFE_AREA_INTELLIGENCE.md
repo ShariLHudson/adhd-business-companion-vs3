@@ -1,13 +1,13 @@
-# Life Area Intelligence™
+# Life Area Intelligence
 
-Category Intelligence™ lives in **Companion Brain™** — not inside Plan My Day™ or any single workspace. Plan My Day is the first consumer; Clear My Mind™, My Thoughts™, and Founder Intelligence™ can reuse the same service.
+Category Intelligence lives in **Companion Brain** — not inside Plan My Day or any single workspace. Plan My Day is the first consumer; Clear My Mind, My Thoughts, and Founder Intelligence can reuse the same service.
 
 ## Architecture
 
 ```
 Task text + ecosystem context
         ↓
-Companion Brain™ — classifyLifeArea()
+Companion Brain — classifyLifeArea()
         ↓
 LifeAreaClassificationResult (confidence, signals, alternates)
         ↓
@@ -22,9 +22,9 @@ UI — PlanDayLifeAreaSelector (presentation only)
 
 | Level | Source | Storage |
 |-------|--------|---------|
-| **System Life Areas™** | Ship with product | `lib/companionBrain/lifeAreas/systemLifeAreas.ts` |
-| **User Life Areas™** | User-created | `localStorage` → `companion-user-life-areas-v1` (Supabase-ready shape) |
-| **Smart Life Areas™** | Companion Brain suggests from patterns | Created via `createUserLifeArea` after user accepts |
+| **System Life Areas** | Ship with product | `lib/companionBrain/lifeAreas/systemLifeAreas.ts` |
+| **User Life Areas** | User-created | `localStorage` → `companion-user-life-areas-v1` (Supabase-ready shape) |
+| **Smart Life Areas** | Companion Brain suggests from patterns | Created via `createUserLifeArea` after user accepts |
 
 ## Companion Brain service
 
@@ -67,9 +67,9 @@ Life Areas are designed as **connectors**, not labels. A Life Area workspace wil
 ## Constitutional alignment
 
 - **Carry what should be carried** — companion organizes so the user doesn't
-- **Companion Judgment™** — recommends Life Area; user confirms or reshapes
-- **Lifetime Capability Model™** — corrections teach judgment over time
-- **Human Reality Test™** — "Shari usually knows where things belong"
+- **Companion Judgment** — recommends Life Area; user confirms or reshapes
+- **Lifetime Capability Model** — corrections teach judgment over time
+- **Human Reality Test** — "Shari usually knows where things belong"
 
 ## Key files
 

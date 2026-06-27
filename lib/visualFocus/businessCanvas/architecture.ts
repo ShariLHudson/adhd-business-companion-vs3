@@ -1,22 +1,22 @@
 /**
- * Business Canvas™ architecture — user experience vs internal frameworks.
+ * Business Canvas architecture — user experience vs internal frameworks.
  *
- * Part of the Visual Thinking™ Companion Intelligence™ stack:
+ * Part of the Visual Thinking Companion Intelligence stack:
  * Intelligence → Framework → Visual Output → Insights → Learning → Future Intelligence
  *
- * RULE: Users interact with Business Canvas™ only.
- * Business Model Canvas™, Lean Canvas™, etc. are Companion Intelligence™
+ * RULE: Users interact with Business Canvas only.
+ * Business Model Canvas, Lean Canvas, etc. are Companion Intelligence
  * framework choices — selected after permission, never as the primary UI label.
  */
 
 import type { BusinessCanvasTypeId } from "./types";
 
 /** The only user-facing product name for the visual business thinking experience. */
-export const BUSINESS_CANVAS_USER_LABEL = "Business Canvas™";
+export const BUSINESS_CANVAS_USER_LABEL = "Business Canvas";
 
 export type CanvasFrameworkMeta = {
   id: BusinessCanvasTypeId;
-  /** Companion Intelligence™ only — do not surface in studio, My Work, or map headers. */
+  /** Companion Intelligence only — do not surface in studio, My Work, or map headers. */
   companionFrameworkLabel: string;
   description: string;
   available: boolean;
@@ -27,7 +27,7 @@ export type CanvasFrameworkMeta = {
 export const CANVAS_FRAMEWORK_REGISTRY: CanvasFrameworkMeta[] = [
   {
     id: "business-model",
-    companionFrameworkLabel: "Business Model Canvas™",
+    companionFrameworkLabel: "Business Model Canvas",
     description:
       "Nine-section view of audience, value, channels, revenue, activities, resources, partners, and costs.",
     available: true,
@@ -42,7 +42,7 @@ export const CANVAS_FRAMEWORK_REGISTRY: CanvasFrameworkMeta[] = [
   },
   {
     id: "lean",
-    companionFrameworkLabel: "Lean Canvas™",
+    companionFrameworkLabel: "Lean Canvas",
     description: "Startup validation — problem, solution, unfair advantage.",
     available: false,
     situationPatterns: [
@@ -52,7 +52,7 @@ export const CANVAS_FRAMEWORK_REGISTRY: CanvasFrameworkMeta[] = [
   },
   {
     id: "value-proposition",
-    companionFrameworkLabel: "Value Proposition Canvas™",
+    companionFrameworkLabel: "Value Proposition Canvas",
     description: "Customer problems and solution fit.",
     available: false,
     situationPatterns: [
@@ -63,7 +63,7 @@ export const CANVAS_FRAMEWORK_REGISTRY: CanvasFrameworkMeta[] = [
   },
   {
     id: "customer-journey",
-    companionFrameworkLabel: "Customer Journey Canvas™",
+    companionFrameworkLabel: "Customer Journey Canvas",
     description: "Experience from awareness to loyalty.",
     available: false,
     situationPatterns: [
@@ -75,7 +75,7 @@ export const CANVAS_FRAMEWORK_REGISTRY: CanvasFrameworkMeta[] = [
   },
   {
     id: "offer",
-    companionFrameworkLabel: "Offer Canvas™",
+    companionFrameworkLabel: "Offer Canvas",
     description: "Product and service design.",
     available: false,
     situationPatterns: [
@@ -86,7 +86,7 @@ export const CANVAS_FRAMEWORK_REGISTRY: CanvasFrameworkMeta[] = [
   },
   {
     id: "ecosystem",
-    companionFrameworkLabel: "Ecosystem Canvas™",
+    companionFrameworkLabel: "Ecosystem Canvas",
     description:
       "Relationships across business, audience, offers, content, and revenue.",
     available: false,
@@ -102,13 +102,13 @@ export function userFacingCanvasLabel(): string {
   return BUSINESS_CANVAS_USER_LABEL;
 }
 
-/** @internal Companion Intelligence™ — framework name for a canvas type id. */
+/** @internal Companion Intelligence — framework name for a canvas type id. */
 export function companionFrameworkLabelForType(
   id: BusinessCanvasTypeId,
 ): string {
   return (
     CANVAS_FRAMEWORK_REGISTRY.find((f) => f.id === id)?.companionFrameworkLabel ??
-    "Business Model Canvas™"
+    "Business Model Canvas"
   );
 }
 

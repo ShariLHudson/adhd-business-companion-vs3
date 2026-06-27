@@ -24,7 +24,7 @@ function confidenceBehavior(
   return "none";
 }
 
-describe("Companion Brain™ — Human Reality fixture regression", () => {
+describe("Companion Brain — Human Reality fixture regression", () => {
   for (const fixture of ALL_SIMULATION_FIXTURES) {
     describe(fixture.title, () => {
       it("resolves DayMode and CycleState", () => {
@@ -85,7 +85,7 @@ describe("Companion Brain™ — Human Reality fixture regression", () => {
   }
 });
 
-describe("Companion Brain™ — architectural inversion", () => {
+describe("Companion Brain — architectural inversion", () => {
   it("does not import planMyDay modules", async () => {
     const { readFileSync, readdirSync } = await import("node:fs");
     const { join } = await import("node:path");

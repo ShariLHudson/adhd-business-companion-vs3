@@ -41,7 +41,7 @@ export function resolveVisitEnergy(input: {
 
 /**
  * Layer 2 + 5 — what Shari prepares before arrival.
- * Presence Intelligence™ — silent preparation, never memory narration.
+ * Presence Intelligence — silent preparation, never memory narration.
  */
 export function resolveGuestPreparation(input: {
   profile: CompanionHospitalityProfile;

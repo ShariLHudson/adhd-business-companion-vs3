@@ -1,5 +1,5 @@
 /**
- * Phase 6 — Companion Intelligence Network™
+ * Phase 6 — Companion Intelligence Network
  * Connected ecosystem intelligence across conversations, workspaces, and assets.
  */
 
@@ -624,7 +624,7 @@ export function formatConnectedEcosystemForPanel(
   }
 
   const lines = [
-    "## Companion Intelligence Network™",
+    "## Companion Intelligence Network",
     "",
     "_Everything connected — you shouldn't have to remember where things live._",
     "",
@@ -668,15 +668,15 @@ export function phase6CompanionIntelligenceNetworkHintForChat(input?: {
   const context = input?.userText ? buildContextAwarenessSummary(input.userText) : [];
 
   const parts = [
-    "PHASE 6 COMPANION INTELLIGENCE NETWORK™ (connected ecosystem — one companion face):",
+    "PHASE 6 COMPANION INTELLIGENCE NETWORK (connected ecosystem — one companion face):",
     "Goal: user never thinks 'Where was that?' or 'Which tool should I use?' — the companion knows.",
-    "Bridge between Companion Intelligence™ and Companion Intelligence Ecosystem™.",
+    "Bridge between Companion Intelligence and Companion Intelligence Ecosystem.",
     "User sees ONE companion. Never expose internal layers, graph mechanics, or confidence scores.",
     "Never pushy. Permission first. Surface what exists — reuse, modify, or create new.",
     `Knowledge graph: ${graph.nodes.length} nodes, ${graph.edges.length} cross-links. Days together: ${days}. Sessions: ${p2.sessionCount}.`,
-    "Resource Awareness™: know what exists, where it lives, what worked, what was abandoned, what relates.",
-    "Relationship Memory Upgrade™: workshop ↔ survey ↔ audience ↔ offer ↔ launch ↔ content ↔ strategy.",
-    "Validation: Existing Asset Reuse™, Related Resource Discovery™, Connected Project Awareness™, Cross-Workspace Intelligence™.",
+    "Resource Awareness: know what exists, where it lives, what worked, what was abandoned, what relates.",
+    "Relationship Memory Upgrade: workshop ↔ survey ↔ audience ↔ offer ↔ launch ↔ content ↔ strategy.",
+    "Validation: Existing Asset Reuse, Related Resource Discovery, Connected Project Awareness, Cross-Workspace Intelligence.",
   ];
 
   if (context.length) {

@@ -1,9 +1,9 @@
-# Life Experience Design™
+# Life Experience Design
 ## Beyond Experience Design — Designing for the Other 23 Hours
 
 **Version:** 1.0  
 **Status:** Canonical — awaiting approval  
-**Authority:** Subordinate to Companion Constitution · Product Constitution™  
+**Authority:** Subordinate to Companion Constitution · Product Constitution  
 **Parent:** `COMPANION_JOURNEY_EXPERIENCE_BIBLE.md`  
 **Sibling documents:** `COMPANION_JOURNEY_EXPERIENCE_BIBLE.md` · `plan-my-day/MORNING_EXPERIENCE_DESIGN.md`
 
@@ -36,7 +36,7 @@ The application is **one doorway** into an ongoing relationship that accompanies
 | Experience ends at the gate | Experience ripples after close |
 | Guest returns for another day | Person lives differently between visits |
 
-**Keep the analogy for Companion Worlds™** — emotional lands, atmosphere, choreography, transitions.
+**Keep the analogy for Companion Worlds** — emotional lands, atmosphere, choreography, transitions.
 
 **Recognize the limit** — we are not optimizing for time-on-app. We are optimizing for life-off-app.
 
@@ -47,10 +47,10 @@ The application is **one doorway** into an ongoing relationship that accompanies
 | Layer | Governs | Question it answers |
 |-------|---------|---------------------|
 | **Constitution** | Character | Who is Shari? What must never happen? |
-| **Companion Brain™** | Thinking | What does the companion understand? |
-| **Daily Companion Cycle™** | Reasoning | How does judgment form? |
-| **Experience Bible™** | Feeling (in-app) | What should they experience while here? |
-| **Life Experience Design™** | Living (beyond-app) | What continues after they leave? |
+| **Companion Brain** | Thinking | What does the companion understand? |
+| **Daily Companion Cycle** | Reasoning | How does judgment form? |
+| **Experience Bible** | Feeling (in-app) | What should they experience while here? |
+| **Life Experience Design** | Living (beyond-app) | What continues after they leave? |
 
 ### The question shift
 
@@ -138,7 +138,7 @@ Not every gift is visible immediately.
 ## Gift discipline
 
 - **One gift per meaningful interaction** — not a care package of features
-- **Gifts compound** — Relief Intelligence™ learns what gifts land for this person
+- **Gifts compound** — Relief Intelligence learns what gifts land for this person
 - **Gifts never guilt** — no "you haven't opened the app" leverage
 - **Gifts travel** — designed to work without the screen
 
@@ -146,7 +146,7 @@ The companion should quietly influence decisions **long after the application cl
 
 ---
 
-# Part III — Life Moments™
+# Part III — Life Moments
 
 Design not only for product moments.
 
@@ -156,20 +156,20 @@ These are first-class design scenarios — not edge cases.
 
 ## Life moment catalog
 
-| Life Moment™ | Arrival state | Gift to leave | Likely doorway |
+| Life Moment | Arrival state | Gift to leave | Likely doorway |
 |--------------|---------------|---------------|----------------|
 | **Before an important conversation** | Anxious · rehearsing · catastrophizing | One true sentence to lead with | Chat · Clear My Mind |
 | **After receiving bad news** | Shocked · fragmented · urgent to fix | Permission to not act yet | Chat · Breathe |
-| **Before pressing Publish** | Doubt · visibility fear | Evidence + *"This sounds like you"* | PostCraft™ |
-| **After disappointing yourself** | Shame · scorekeeping | Anti-guilt reframe · space | Plan My Day™ (recovery) |
-| **Believing they're falling behind** | Comparison · panic | Perspective · one honest scope | Founder Intelligence™ |
-| **Achieving something meaningful** | Joy · disbelief | Recognition without next-phase pivot | Plan My Day™ (celebration) |
+| **Before pressing Publish** | Doubt · visibility fear | Evidence + *"This sounds like you"* | PostCraft |
+| **After disappointing yourself** | Shame · scorekeeping | Anti-guilt reframe · space | Plan My Day (recovery) |
+| **Believing they're falling behind** | Comparison · panic | Perspective · one honest scope | Founder Intelligence |
+| **Achieving something meaningful** | Joy · disbelief | Recognition without next-phase pivot | Plan My Day (celebration) |
 | **Needing to hear they're okay** | Alone · self-critical | Quiet witnessing | Chat · Clear My Mind |
-| **Before a client call** | Performance anxiety | One prep move · not a script | Plan My Day™ · Projects™ |
-| **Kids sick / family disruption** | Split attention · guilt | Family-first permission | Adapt My Day™ |
-| **3pm energy crash** | Self-blame · abandon ship | Retune without restart shame | Adapt My Day™ |
-| **Sunday night dread** | Week anxiety | One week breath · not full replan | Plan My Day™ · My Journey™ |
-| **First time raising prices** | Fear · imposter | Decision support · evidence | Decision Compass™ · Founder Intelligence™ |
+| **Before a client call** | Performance anxiety | One prep move · not a script | Plan My Day · Projects |
+| **Kids sick / family disruption** | Split attention · guilt | Family-first permission | Adapt My Day |
+| **3pm energy crash** | Self-blame · abandon ship | Retune without restart shame | Adapt My Day |
+| **Sunday night dread** | Week anxiety | One week breath · not full replan | Plan My Day · My Journey |
+| **First time raising prices** | Fear · imposter | Decision support · evidence | Decision Compass · Founder Intelligence |
 | **Quiet evening alone** | Rumination | Gentle closure · not productivity | Chat · no workspace push |
 
 ## Life moment design template
@@ -202,7 +202,7 @@ The companion measures success by the **quality of those ripples** — not sessi
 
 ## Ripple horizons
 
-| Horizon | Question | Example (Plan My Day™) |
+| Horizon | Question | Example (Plan My Day) |
 |---------|----------|------------------------|
 | **Today** | What decision is easier right now? | Client call prep without panic |
 | **Tomorrow** | What re-entry is gentler? | No backlog dump after celebration |
@@ -213,7 +213,7 @@ The companion measures success by the **quality of those ripples** — not sessi
 ## Ripple design rules
 
 1. **Ripples must be positive or neutral** — never shame-based motivation
-2. **Ripples compound** — Companion Brain™ learning improves ripple quality over time
+2. **Ripples compound** — Companion Brain learning improves ripple quality over time
 3. **Ripples are invisible** — user feels growth, not gamification
 4. **Bad ripples are design failures** — e.g. celebration → next-day productivity panic (forbidden by R5 cooldown)
 
@@ -229,7 +229,7 @@ The companion measures success by the **quality of those ripples** — not sessi
 
 ---
 
-# Part V — Emotional Afterglow™
+# Part V — Emotional Afterglow
 
 Every experience leaves an emotional afterglow.
 
@@ -252,13 +252,13 @@ Ask for every experience:
 
 | World | Target afterglow (1 hour) | Target afterglow (next morning) |
 |-------|---------------------------|----------------------------------|
-| **Clear My Mind™** | Lighter · less mental noise | No urge to re-capture same thoughts |
-| **My Thoughts™** | Trust · ideas are held | No anxiety about lost captures |
-| **Plan My Day™** | Grounded · not pressured | Oriented re-entry · ritual anticipation |
-| **Focus My Brain™** | Satisfied · completed something | No guilt about "lost" planning time |
-| **Projects™** | Moved · bigness reduced | Willingness to return to project |
-| **Founder Intelligence™** | Steadier · less reactive | One decision made from perspective |
-| **PostCraft™** | Courage · voice intact | Willingness to publish or return to draft |
+| **Clear My Mind** | Lighter · less mental noise | No urge to re-capture same thoughts |
+| **My Thoughts** | Trust · ideas are held | No anxiety about lost captures |
+| **Plan My Day** | Grounded · not pressured | Oriented re-entry · ritual anticipation |
+| **Focus My Brain** | Satisfied · completed something | No guilt about "lost" planning time |
+| **Projects** | Moved · bigness reduced | Willingness to return to project |
+| **Founder Intelligence** | Steadier · less reactive | One decision made from perspective |
+| **PostCraft** | Courage · voice intact | Willingness to publish or return to draft |
 | **Celebration** | Joy without harvest pressure | No backlog dread |
 | **Recovery** | Space · not scorecarded | Self-selected re-engagement OK |
 
@@ -310,7 +310,7 @@ Design experiences that naturally accompany the user into:
 
 ---
 
-# Part VII — The Lifetime Journey™
+# Part VII — The Lifetime Journey
 
 The ecosystem is designed around **chapters** — not sessions.
 
@@ -324,17 +324,17 @@ Shari accompanies each chapter differently while remaining recognizably the same
 | **First success** | Proof something works | Celebration without harvest |
 | **First failure** | Shame · doubt | Recovery · anti-guilt · space |
 | **Finding confidence** | Repeated small wins | Evidence accumulation · quieter hype |
-| **Growing a business** | Complexity · delegation | Founder Intelligence™ · pattern wisdom |
-| **Leading others** | Responsibility · visibility | Relationship Intelligence™ · communication support |
+| **Growing a business** | Complexity · delegation | Founder Intelligence · pattern wisdom |
+| **Leading others** | Responsibility · visibility | Relationship Intelligence · communication support |
 | **Helping others** | Identity beyond self | Legacy · teaching · wisdom export |
-| **Changing identity** | Who am I now? | My Journey™ · narrative continuity |
+| **Changing identity** | Who am I now? | My Journey · narrative continuity |
 
 ## Chapter design rules
 
 1. **Same voice, different depth** — Shari doesn't become a different product per chapter
 2. **Chapter-aware, not chapter-locked** — user may be in multiple chapters
 3. **Never rush chapters** — no "you should be at Founder Intelligence by now"
-4. **Memory serves chapters** — Reflection Intelligence™ feeds long-horizon wisdom
+4. **Memory serves chapters** — Reflection Intelligence feeds long-horizon wisdom
 5. **Return visits change meaning** — Year 1 Plan My Day ≠ Year 5 Plan My Day (ritual deepens)
 
 ## Session vs chapter
@@ -348,14 +348,14 @@ Shari accompanies each chapter differently while remaining recognizably the same
 
 ---
 
-# Part VIII — Life Experience Review™
+# Part VIII — Life Experience Review
 
 Every new experience must pass **both** reviews:
 
 | Review | Question |
 |--------|----------|
-| **Experience Review™** (in-app) | How do they feel at 5s / 30s / 5min? |
-| **Life Experience Review™** (beyond-app) | How does their **actual life** improve after they leave? |
+| **Experience Review** (in-app) | How do they feel at 5s / 30s / 5min? |
+| **Life Experience Review** (beyond-app) | How does their **actual life** improve after they leave? |
 
 ## Life Experience Review questions
 
@@ -382,25 +382,25 @@ Not the button. Not the layout. The **experience**.
 
 # Part IX — Life Experience by Companion World
 
-Extends Companion Worlds™ with portable gifts and ripples.
+Extends Companion Worlds with portable gifts and ripples.
 
 | World | In-app transformation | Portable gift | Primary ripple |
 |-------|----------------------|---------------|----------------|
-| **Clear My Mind™** | Overwhelmed → Lighter | *"It's out — I don't have to hold it."* | Better decisions · less rumination |
-| **My Thoughts™** | Afraid → Held | *"Nothing important is lost."* | Long-term idea stewardship |
-| **Plan My Day™** | Scattered → Grounded | One anchor + permission exclusions | Daily self-trust ritual |
-| **Adapt My Day™** | Pretending → Honest | *"Today is allowed to be different."* | Interoception · adaptive living |
-| **Focus My Brain™** | Distracted → Present | Finish capacity | Deep work identity |
-| **Projects™** | Too much → One step | Momentum on something real | Multi-week persistence |
-| **Founder Intelligence™** | Reacting → Perspective | One pattern seen | Strategic patience |
-| **PostCraft™** | Blank → Voice | Draft + courage | Visible leadership |
-| **Chat™** | Alone → Accompanied | One line that echoes | Emotional regulation in life |
+| **Clear My Mind** | Overwhelmed → Lighter | *"It's out — I don't have to hold it."* | Better decisions · less rumination |
+| **My Thoughts** | Afraid → Held | *"Nothing important is lost."* | Long-term idea stewardship |
+| **Plan My Day** | Scattered → Grounded | One anchor + permission exclusions | Daily self-trust ritual |
+| **Adapt My Day** | Pretending → Honest | *"Today is allowed to be different."* | Interoception · adaptive living |
+| **Focus My Brain** | Distracted → Present | Finish capacity | Deep work identity |
+| **Projects** | Too much → One step | Momentum on something real | Multi-week persistence |
+| **Founder Intelligence** | Reacting → Perspective | One pattern seen | Strategic patience |
+| **PostCraft** | Blank → Voice | Draft + courage | Visible leadership |
+| **Chat** | Alone → Accompanied | One line that echoes | Emotional regulation in life |
 
 ---
 
 # Part X — Notifications, Reminders, and the Anti-Pattern
 
-Life Experience Design™ is **not** solved by pinging the user.
+Life Experience Design is **not** solved by pinging the user.
 
 | Approach | Verdict |
 |----------|---------|
@@ -441,13 +441,13 @@ Every design decision should honor that truth.
 ```
 Constitution (character)
     ↓
-Companion Brain™ (thinking)
+Companion Brain (thinking)
     ↓
-Daily Companion Cycle™ (reasoning)
+Daily Companion Cycle (reasoning)
     ↓
-Experience Bible™ (feeling — while here)
+Experience Bible (feeling — while here)
     ↓
-Life Experience Design™ (living — after they leave)
+Life Experience Design (living — after they leave)
     ↓
 Screen / UI design (expression — only after both approved)
 ```
@@ -466,15 +466,15 @@ New experiences require:
 2. **Portable gift defined** (Life Experience Design)
 3. **Afterglow timeline defined** (Life Experience Design)
 4. **Ripple horizon named** (Life Experience Design)
-5. Experience Review™ passed
-6. **Life Experience Review™ passed**
-7. Stewardship Review™ passed
+5. Experience Review passed
+6. **Life Experience Review passed**
+7. Stewardship Review passed
 
 ---
 
-# Stewardship Review™ — Life Layer
+# Stewardship Review — Life Layer
 
-**Canonical law:** [Product Constitution™ — The Stewardship Review™](./PRODUCT_CONSTITUTION.md#the-stewardship-review)
+**Canonical law:** [Product Constitution — The Stewardship Review](./PRODUCT_CONSTITUTION.md#the-stewardship-review)
 
 | Question | |
 |----------|---|
@@ -484,8 +484,8 @@ New experiences require:
 | What ripple reaches next week? | |
 | Does this build self-trust or app dependency? | Must be self-trust |
 | Would they live slightly differently? | Ultimate pass |
-| **Drift Test™:** Software or companionship? | Must be companionship |
+| **Drift Test:** Software or companionship? | Must be companionship |
 
 ---
 
-*Life Experience Design™ · Life Moments™ · Emotional Afterglow™ · The Lifetime Journey™ · Life Experience Review™ · Design For The Other 23 Hours*
+*Life Experience Design · Life Moments · Emotional Afterglow · The Lifetime Journey · Life Experience Review · Design For The Other 23 Hours*

@@ -1,5 +1,5 @@
 /**
- * Natural-language emoji for Companion Boxes™ — not categories.
+ * Natural-language emoji for Companion Boxes — not categories.
  */
 
 const RULES: { pattern: RegExp; emoji: string }[] = [

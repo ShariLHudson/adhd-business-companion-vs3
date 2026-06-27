@@ -1,13 +1,13 @@
-# Companion Trust Architecture™
+# Companion Trust Architecture
 ## How the Companion Earns Trust Over Years
 
 **Version:** 1.0  
 **Status:** Canonical — awaiting approval  
-**Authority:** Subordinate to Product Constitution™ · Companion Constitution™ · [`EXPERIENCE_OF_SHARI.md`](./EXPERIENCE_OF_SHARI.md) · [`THE_HONEST_SHARI.md`](./THE_HONEST_SHARI.md)  
+**Authority:** Subordinate to Product Constitution · Companion Constitution · [`EXPERIENCE_OF_SHARI.md`](./EXPERIENCE_OF_SHARI.md) · [`THE_HONEST_SHARI.md`](./THE_HONEST_SHARI.md)  
 **Governs:** Memory · conversations · hospitality · recognition · suggestions · boundaries · long-term relationship · emotional safety · every future intelligence system
 
 **Sibling documents:**
-- [`COMPANION_DECISION_INTELLIGENCE.md`](./COMPANION_DECISION_INTELLIGENCE.md) — what Shari does next (Decision Ladder™)
+- [`COMPANION_DECISION_INTELLIGENCE.md`](./COMPANION_DECISION_INTELLIGENCE.md) — what Shari does next (Decision Ladder)
 - `docs/relationship-phases/RELATIONSHIP-PHASE-CONSTITUTION.md` — technical phase registry (this document is the **emotional** trust layer)
 - `docs/EXPERIENCE_OF_SHARI.md` — presence, voice, hospitality
 - `docs/THE_HONEST_SHARI.md` — believable humanity
@@ -89,7 +89,7 @@ Regardless of day one or year five:
 - **Consistency** — same home, same voice, same lack of judgment  
 - **One remembered detail** — drink, name, one goal they named — woven naturally, not announced  
 - **Effort noticed** — *"You showed up again"* — not streak language  
-- **Relief honored** — if they used Window Seat™, not pushed to optimize  
+- **Relief honored** — if they used Window Seat, not pushed to optimize  
 - **Explicit user choices respected** — if they picked Plan My Day once, not assumed forever  
 
 ### What earns confidence
@@ -176,7 +176,7 @@ Regardless of day one or year five:
 - **Protect executive function** — fewer decisions, not more features  
 - **Hold continuity** — projects, wins, hard seasons — without surveillance framing  
 - **Name truth kindly** — when they're bullying themselves  
-- **Stay honest** — Honest Shari™ never graduates to guru  
+- **Stay honest** — Honest Shari never graduates to guru  
 - **Repair fast** — when intelligence misfires  
 
 ### Still never changes
@@ -284,7 +284,7 @@ Hundreds of tiny interactions. **Categories** — vary the detail, repeat the sp
 39. No "we noticed you struggling"  
 40. Intelligence invisible — one voice out  
 
-## Honest humanity micro-moments (Honest Shari™)
+## Honest humanity micro-moments (Honest Shari)
 
 41. Reheated coffee acknowledged with smile  
 42. *"My planner failed me too"* — shared, not competitive  
@@ -405,7 +405,7 @@ What they should be able to say:
 
 > **A relationship where you are known without being owned — helped without being fixed — and welcomed without being graded.**
 
-That is the Companion Trust Architecture™.
+That is the Companion Trust Architecture.
 
 ---
 
@@ -414,13 +414,13 @@ That is the Companion Trust Architecture™.
 ## Document hierarchy
 
 ```
-Product & Companion Constitution™
+Product & Companion Constitution
     ↓
-Experience of Shari™ · Honest Shari™
+Experience of Shari · Honest Shari
     ↓
-Companion Trust Architecture™ (this document)
+Companion Trust Architecture (this document)
     ↓
-Relationship Phase Constitution™ (technical activation)
+Relationship Phase Constitution (technical activation)
     ↓
 Homestead Blueprint · Visual Bible · Experience Bible
     ↓
@@ -455,4 +455,4 @@ One small moment at a time — the same way a remarkable human relationship beco
 
 ---
 
-*Companion Trust Architecture™ v1.0 — Trust is not a feature. It is the compound interest of dignity.*
+*Companion Trust Architecture v1.0 — Trust is not a feature. It is the compound interest of dignity.*

@@ -18,7 +18,7 @@ export type PlanDayCompanionPresentation = {
 };
 
 /**
- * Plan My Day™ consumes Live Reality™ judgment — re-evaluates when reality changes.
+ * Plan My Day consumes Live Reality judgment — re-evaluates when reality changes.
  * UI never reasons.
  */
 export function usePlanDayCompanionCycle(): PlanDayCompanionPresentation {

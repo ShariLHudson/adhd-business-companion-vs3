@@ -2,10 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   CLEAR_MY_MIND_SECTION,
   isClearMyMindSection,
+  shouldOpenClearMyMindBesideChat,
   shouldOpenClearMyMindStandalone,
 } from "./clearMyMindRouting";
-import { shouldOpenBesideChat } from "./workspaceNav";
-import { supportsWorkspace } from "./workspaceMode";
 
 describe("clearMyMindRouting", () => {
   it("uses brain-dump as the canonical section", () => {
@@ -14,9 +13,13 @@ describe("clearMyMindRouting", () => {
     expect(isClearMyMindSection("focus")).toBe(false);
   });
 
-  it("always opens standalone, never beside chat", () => {
-    expect(shouldOpenClearMyMindStandalone("brain-dump")).toBe(true);
-    expect(shouldOpenBesideChat("brain-dump")).toBe(false);
-    expect(supportsWorkspace("brain-dump")).toBe(false);
+  it("always opens standalone — never beside chat", () => {
+    expect(shouldOpenClearMyMindStandalone("brain-dump", "chat_beside")).toBe(
+      true,
+    );
+    expect(shouldOpenClearMyMindStandalone("brain-dump", "nav_fullscreen")).toBe(
+      true,
+    );
+    expect(shouldOpenClearMyMindBesideChat("brain-dump")).toBe(false);
   });
 });

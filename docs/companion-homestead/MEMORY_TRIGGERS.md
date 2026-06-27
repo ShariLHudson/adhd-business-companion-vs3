@@ -1,4 +1,4 @@
-# Memory Triggers™
+# Memory Triggers
 ## Awakening Memories Through Everyday Senses
 
 **Version:** 1.0  
@@ -10,7 +10,7 @@
 
 ## Mission
 
-The Companion Homestead™ cannot produce smells. It does not need to.
+The Companion Homestead cannot produce smells. It does not need to.
 
 The human brain completes sensory experiences from tiny cues. Our goal is not to describe a room. **Our goal is to awaken a memory.**
 
@@ -166,7 +166,7 @@ That is the standard.
 
 The Homestead should not merely show beautiful rooms. It should awaken beautiful memories.
 
-Memory Triggers™ are another invisible thread that transforms the Companion from software into a place people genuinely feel connected to.
+Memory Triggers are another invisible thread that transforms the Companion from software into a place people genuinely feel connected to.
 
 ---
 

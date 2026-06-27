@@ -1,5 +1,5 @@
 /**
- * P0.23 — ADHD Emotional Friction Intelligence™
+ * P0.23 — ADHD Emotional Friction Intelligence
  * Distinguish emotional-friction turns from task-first turns.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Shari's Everyday Life™
+ * Shari's Everyday Life
  *
  * Environmental storytelling — the home feels lived in, never staged.
  * @see docs/companion-homestead/SHARIS_EVERYDAY_LIFE.md

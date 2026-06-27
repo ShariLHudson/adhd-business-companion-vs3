@@ -57,7 +57,7 @@ export type VisualFocusWorkflowStage = "build" | "generated";
 
 export type VisualFocusSaveStatus = "unsaved" | "saving" | "saved";
 
-/** Lifecycle — active work vs long-term Saved™ vs future states. */
+/** Lifecycle — active work vs long-term Saved vs future states. */
 export type VisualFocusLifecycleStatus =
   | "active"
   | "archived"
@@ -66,7 +66,7 @@ export type VisualFocusLifecycleStatus =
   | "draft"
   | "shared";
 
-/** Timestamped map snapshot for Save Version™ / Restore Version™. */
+/** Timestamped map snapshot for Save Version / Restore Version. */
 export type VisualFocusMapSnapshot = Pick<
   VisualFocusMap,
   | "title"
@@ -128,7 +128,7 @@ export type VisualFocusAnalysis = {
   recommendations: string[];
   nextSteps: string[];
   boardObservations?: string[];
-  /** Business Canvas™ what-if ripple notes when exploring change. */
+  /** Business Canvas what-if ripple notes when exploring change. */
   whatIfNotes?: string[];
   generatedAt: string;
 };

@@ -9,7 +9,7 @@ import {
   listMemoryTriggersBySense,
 } from "./index";
 
-describe("Memory Triggers™", () => {
+describe("Memory Triggers", () => {
   beforeEach(() => {
     clearLivingChangeHistoryForTests();
   });

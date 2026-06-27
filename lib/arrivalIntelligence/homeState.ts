@@ -1,5 +1,5 @@
 /**
- * Three-State Companion Home — Arrival Intelligence™ decides; UI renders.
+ * Three-State Companion Home — Arrival Intelligence decides; UI renders.
  *
  * FIRST_VISIT       — build trust, one question, lead the conversation
  * RETURNING_ACTIVE  — contextual continuation, relationship picks up

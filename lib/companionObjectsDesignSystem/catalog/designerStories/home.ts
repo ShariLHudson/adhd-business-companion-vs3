@@ -1,4 +1,4 @@
-/** Designer Stories™ — Home Collection. Never shown to guests. */
+/** Designer Stories — Home Collection. Never shown to guests. */
 export const HOME_DESIGNER_STORIES: Record<string, string> = {
   "obj-fireplace":
     "Fire lit on Sundays and hard winters — heat you feel, not a video loop.",

@@ -1,5 +1,5 @@
 /**
- * Companion Photo Catalog™ — one source of truth for Shari portrait URLs.
+ * Companion Photo Catalog — one source of truth for Shari portrait URLs.
  * Every workspace consumes this catalog; no independent probes or caches.
  */
 

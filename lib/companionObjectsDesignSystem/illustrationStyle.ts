@@ -1,8 +1,8 @@
 /**
- * Companion Objects™ — illustration style tokens (Warm Homestead Realism™).
+ * Companion Objects — illustration style tokens (Warm Homestead Realism).
  */
 
-export const ILLUSTRATION_STYLE_NAME = "Warm Homestead Realism™";
+export const ILLUSTRATION_STYLE_NAME = "Warm Homestead Realism";
 
 export const ILLUSTRATION_STYLE = {
   name: ILLUSTRATION_STYLE_NAME,
@@ -30,7 +30,7 @@ export const DEFAULT_OBJECT_PALETTE = [
 ] as const;
 
 export const DEFAULT_ILLUSTRATION_NOTES =
-  "Warm Homestead Realism™ — semi-realistic watercolor-woodcut hybrid; handcrafted warmth; slight imperfection in symmetry; one focal object; readable at 48px, beautiful at 256px.";
+  "Warm Homestead Realism — semi-realistic watercolor-woodcut hybrid; handcrafted warmth; slight imperfection in symmetry; one focal object; readable at 48px, beautiful at 256px.";
 
 export const ANIMATION_LANGUAGE = {
   principle: "Movement is life, not notification",

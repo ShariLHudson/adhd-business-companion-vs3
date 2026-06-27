@@ -1,9 +1,9 @@
-# Sunroom Over The Pond™
-## Focus My Brain™ — A Reconstructed Lived Environment
+# Sunroom Over The Pond
+## Focus My Brain — A Reconstructed Lived Environment
 
 **Version:** 1.0  
-**Status:** Constitutional — Focus My Brain™ workspace  
-**Code:** `lib/sunroomOverThePond/` · Scene Render Contract™ · Living Border™  
+**Status:** Constitutional — Focus My Brain workspace  
+**Code:** `lib/sunroomOverThePond/` · Scene Render Contract · Living Border  
 **Sibling:** [PLANNING_TABLE.md](./PLANNING_TABLE.md) · [SHARIS_PRESENCE.md](./SHARIS_PRESENCE.md) · [LIVING_BORDER.md](./LIVING_BORDER.md)
 
 ---
@@ -35,7 +35,7 @@ Water sound is always present: soft, continuous, never rhythmic like music, neve
 
 ---
 
-## Living Border™ Behavior
+## Living Border Behavior
 
 **Allowed:** water flow · goldfish gliding · lily drift · leaf sway · light on water · pergola shadows · brief birds · peripheral butterflies
 
@@ -52,15 +52,15 @@ The workspace must:
 - Never block the pond entirely
 - Never obscure water movement completely
 - Feel embedded inside the sunroom — not on top of the environment
-- Remain visually subordinate to the Living Border™
+- Remain visually subordinate to the Living Border
 
 Enforced: lighter frosted panel (`0.42`), pond-forward crop (`50% 68%`), signature zone `bottom`.
 
 ---
 
-## Shari's Presence™
+## Shari's Presence
 
-**State:** Nearby™
+**State:** Nearby
 
 Shari is not visually centered or supervising. Evidence only:
 
@@ -92,7 +92,7 @@ Not because they were told to calm down. Because the environment supports it.
 SceneState (focus-hub | focus-category)
   → SceneResolver (homestead-room, sig-pond-anchor)
   → evaluateSunroomOverThePond() (time profile, css vars, data attrs)
-  → SceneLayoutEngine (Living Frame™, pond-visible center mask)
+  → SceneLayoutEngine (Living Frame, pond-visible center mask)
   → SceneRenderer + LivingBorderFrame (pond-water, goldfish, lilies)
   → FocusAreaPanel
 ```
@@ -107,5 +107,5 @@ SceneState (focus-hub | focus-category)
 | `lib/sceneRenderContract/` | Homestead background for focus-hub / focus-category |
 | `lib/roomCompositionRule/roomCatalog.ts` | Pond anchor signature at bottom |
 | `lib/livingBorder/` | Pond water, goldfish, lilies, pergola vines |
-| `lib/sharisPresence/roomAssignments.ts` | Nearby™ |
+| `lib/sharisPresence/roomAssignments.ts` | Nearby |
 | `components/companion/FocusAreaPanel.tsx` | Scene-wrapped focus feelings hub |

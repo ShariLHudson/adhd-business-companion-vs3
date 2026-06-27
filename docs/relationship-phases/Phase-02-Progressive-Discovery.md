@@ -9,7 +9,7 @@
 
 ## Phase Name
 
-Progressive Discovery™
+Progressive Discovery
 
 ---
 

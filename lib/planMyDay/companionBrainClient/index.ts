@@ -1,5 +1,5 @@
 /**
- * Plan My Day™ client of Companion Brain™.
+ * Plan My Day client of Companion Brain.
  * Experience layer — translates brain output for daily planning.
  */
 
@@ -11,7 +11,7 @@ export type DailyCompanionCycleResult = ReasoningCycleResult & {
 };
 
 /**
- * Run the Daily Companion Cycle™ for Plan My Day™.
+ * Run the Daily Companion Cycle for Plan My Day.
  * Plan My Day supplies memory; the brain supplies judgment.
  */
 export function runPlanMyDayCompanionCycle(

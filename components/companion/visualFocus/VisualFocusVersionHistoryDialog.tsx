@@ -52,7 +52,7 @@ export function VisualFocusVersionHistoryDialog({
           />
           {versions.length === 0 ? (
             <p className="mt-3 text-sm text-[#6b635a]">
-              No saved versions yet. Use Save Version™ to capture a snapshot.
+              No saved versions yet. Use Save Version to capture a snapshot.
             </p>
           ) : (
             <ul className="mt-2 space-y-2">
@@ -82,7 +82,7 @@ export function VisualFocusVersionHistoryDialog({
             onClick={onSaveVersion}
             className="rounded-lg bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white hover:bg-[#163a3a]"
           >
-            Save Version™
+            Save Version
           </button>
         </div>
       </div>

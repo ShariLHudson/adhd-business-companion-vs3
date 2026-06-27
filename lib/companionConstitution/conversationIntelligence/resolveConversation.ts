@@ -23,7 +23,7 @@ function resolveMode(input: ConversationIntelligenceInput): ConversationMode {
 }
 
 /**
- * Conversation Intelligence™ — understands the conversational context.
+ * Conversation Intelligence — understands the conversational context.
  * Never renders UI. Never routes workspaces alone — informs Companion Intelligence.
  */
 export function resolveConversationIntelligence(

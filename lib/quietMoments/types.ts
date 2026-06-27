@@ -1,5 +1,5 @@
 /**
- * Quiet Moments™ — everything that happens between conversations.
+ * Quiet Moments — everything that happens between conversations.
  * @see docs/companion-homestead/QUIET_MOMENTS.md
  */
 

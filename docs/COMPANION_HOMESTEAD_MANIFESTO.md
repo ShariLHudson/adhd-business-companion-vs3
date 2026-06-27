@@ -1,20 +1,20 @@
-# Companion Homestead™ Manifesto
+# Companion Homestead Manifesto
 ## Read This Before You Build Anything
 
 **Version:** 1.0  
 **Status:** Permanent — constitutional law for all contributors  
-**Authority:** Subordinate only to Product Constitution™ · Companion Constitution™  
+**Authority:** Subordinate only to Product Constitution · Companion Constitution  
 **Stress test:** [`MASTER_DESIGN_REVIEW.md`](./MASTER_DESIGN_REVIEW.md)
 
 **Audience:** Developers · designers · writers · AI models · founders
 
-**Length:** Two pages. If you follow only this, you should build experiences unmistakably like the Companion Homestead™.
+**Length:** Two pages. If you follow only this, you should build experiences unmistakably like the Companion Homestead.
 
 ---
 
 ## What this is
 
-The Companion Homestead™ is **Shari's Iowa home** — a place ADHD entrepreneurs visit to think, rest, work, and return to themselves. It is a **trusted relationship** expressed through hospitality, not a productivity app in a farmhouse skin.
+The Companion Homestead is **Shari's Iowa home** — a place ADHD entrepreneurs visit to think, rest, work, and return to themselves. It is a **trusted relationship** expressed through hospitality, not a productivity app in a farmhouse skin.
 
 **Product:** The feeling of leaving **a little better** than you arrived.  
 **Not product:** Features, engagement, optimization, transformation theater.
@@ -67,7 +67,7 @@ Before any action, evaluate:
 - **A porch swing** before a dashboard — arrival is an exhale  
 - **~20 rooms in lore, ~5 in daily life** — depth over floor plan  
 - **Iowa honest** — mud, gray November, gold hour, snow fields — not resort cosplay  
-- **Lived-in, not staged** — Honest Home™: mug rings, paused crafts, empty planner days  
+- **Lived-in, not staged** — Honest Home: mug rings, paused crafts, empty planner days  
 - **Residents that live** — Kinsey, horse, cardinal, reef — never performing for clicks  
 - **Ordinary Tuesdays** over launch day — life, not software updates  
 
@@ -134,4 +134,4 @@ That sentence is not retention. It is **Kinsey in a sunbeam**, **the reef on a g
 
 ---
 
-*Companion Homestead™ Manifesto v1.0 — The law beneath the lore.*
+*Companion Homestead Manifesto v1.0 — The law beneath the lore.*

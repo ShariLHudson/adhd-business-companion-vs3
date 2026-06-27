@@ -1,4 +1,4 @@
-# Companion Homestead™ — Room Look Books
+# Companion Homestead — Room Look Books
 
 **Phase 1 — Design Before Implementation**
 
@@ -20,21 +20,21 @@ These documents are **permanent design authority** for the first five daily-life
 
 | Room | File | Primary registry objects |
 |------|------|--------------------------|
-| Living Room™ | [living-room.md](./living-room.md) | `messages`, `momentum-just-for-fun` |
-| Planning Table™ | [planning-table.md](./planning-table.md) | `plan-my-day`, `calendar` |
-| Window Seat™ | [window-seat.md](./window-seat.md) | `clear-my-mind` |
-| Reading Nook™ | [reading-nook.md](./reading-nook.md) | `reading`, `strategies` |
-| Creative Studio™ | [creative-studio.md](./creative-studio.md) | `create`, `email-generator`, `momentum-creative-spark` |
+| Living Room | [living-room.md](./living-room.md) | `messages`, `momentum-just-for-fun` |
+| Planning Table | [planning-table.md](./planning-table.md) | `plan-my-day`, `calendar` |
+| Window Seat | [window-seat.md](./window-seat.md) | `clear-my-mind` |
+| Reading Nook | [reading-nook.md](./reading-nook.md) | `reading`, `strategies` |
+| Creative Studio | [creative-studio.md](./creative-studio.md) | `create`, `email-generator`, `momentum-creative-spark` |
 
 ## Signature features (one hero per room)
 
 | Room | Hero |
 |------|------|
-| Living Room™ | The welcoming fireplace |
-| Planning Table™ | The handcrafted planning desk |
-| Window Seat™ | The Iowa view |
-| Reading Nook™ | The living saltwater reef aquarium |
-| Creative Studio™ | The active project table |
+| Living Room | The welcoming fireplace |
+| Planning Table | The handcrafted planning desk |
+| Window Seat | The Iowa view |
+| Reading Nook | The living saltwater reef aquarium |
+| Creative Studio | The active project table |
 
 ## What this is not
 
@@ -50,6 +50,6 @@ Before room UI implementation:
 - [ ] All five look books reviewed
 - [ ] Signature features confirmed (one hero each)
 - [ ] Companion Object Registry cross-check complete
-- [ ] UI Language™ agreed with Companion Layout System™
-- [ ] ADHD Rules™ validated against behavior audit constraints
-- [ ] [Screen Composition Guide™](../companion-homestead/SCREEN_COMPOSITION_GUIDE.md) approved
+- [ ] UI Language agreed with Companion Layout System
+- [ ] ADHD Rules validated against behavior audit constraints
+- [ ] [Screen Composition Guide](../companion-homestead/SCREEN_COMPOSITION_GUIDE.md) approved

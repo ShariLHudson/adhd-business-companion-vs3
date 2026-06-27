@@ -1,5 +1,5 @@
 /**
- * Phase 11 — Ecosystem Intelligence™
+ * Phase 11 — Ecosystem Intelligence
  * Understand the whole life system — not just business.
  */
 
@@ -544,7 +544,7 @@ export function formatEcosystemIntelligenceForPanel(
   snapshot = buildEcosystemIntelligenceSnapshot(),
 ): string {
   return [
-    "## Ecosystem Intelligence™",
+    "## Ecosystem Intelligence",
     "",
     "_Your whole life system — not silos._",
     "",
@@ -579,7 +579,7 @@ export function phase11EcosystemIntelligenceHintForChat(input?: {
     (input?.userText ? maybeEcosystemInsight({ userText: input.userText }) : null);
 
   const parts = [
-    "PHASE 11 ECOSYSTEM INTELLIGENCE™ (whole life system — not just business):",
+    "PHASE 11 ECOSYSTEM INTELLIGENCE (whole life system — not just business):",
     "Goal: answer WHY things happen across life domains — business, energy, relationships, learning, health, purpose.",
     "Never silos. Never hustle-shame advice. Adapt to capacity, season, and energy.",
     `Life season: ${snapshot.season}. ${snapshot.seasonNarrative}`,

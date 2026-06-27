@@ -1,5 +1,5 @@
 /**
- * Carry Forward™ greeting library — natural variations; never analytical.
+ * Carry Forward greeting library — natural variations; never analytical.
  */
 
 import type { CarryForwardGreetingEntry } from "./types";
@@ -15,7 +15,6 @@ const MORNING_UNIVERSAL: CarryForwardGreetingEntry[] = [
   g({ id: "cf-m-02", tone: "morning_universal", line: "Morning." }),
   g({ id: "cf-m-03", tone: "morning_universal", line: "I'm glad you're here." }),
   g({ id: "cf-m-04", tone: "morning_universal", line: "Good morning. Come in." }),
-  g({ id: "cf-m-05", tone: "morning_universal", line: "Morning — good to see you." }),
   g({ id: "cf-m-06", tone: "morning_universal", line: "Hi. Fresh day." }),
   g({ id: "cf-m-07", tone: "morning_universal", line: "Good morning. Take your time." }),
   g({ id: "cf-m-08", tone: "morning_universal", line: "Morning. I'm glad you came." }),
@@ -176,19 +175,9 @@ const NATURAL_MEMORY: CarryForwardGreetingEntry[] = [
     line: "It feels good to see you again.",
   }),
   g({
-    id: "cf-mem-02",
-    tone: "ended_quiet",
-    line: "I've been thinking about our conversation yesterday.",
-  }),
-  g({
     id: "cf-mem-03",
     tone: "ended_well",
     line: "We ended yesterday on a hopeful note.",
-  }),
-  g({
-    id: "cf-mem-04",
-    tone: "ended_unfinished",
-    line: "Yesterday felt full — today can breathe.",
   }),
 ];
 

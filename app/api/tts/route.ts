@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
+import {
+  ELEVENLABS_TTS_MODEL,
+  ELEVENLABS_VOICE_SETTINGS,
+  isShariVoiceConfigured,
+  resolveElevenLabsVoiceId,
+} from "@/lib/companionElevenLabsVoice";
 
 // Voice output — Shari speaks. Uses ElevenLabs TTS. Returns audio/mpeg.
-// Set ELEVENLABS_API_KEY (and optionally ELEVENLABS_VOICE_ID) in .env.local.
-const DEFAULT_VOICE = "21m00Tcm4TlvDq8ikWAM"; // a warm default voice
+// Set ELEVENLABS_API_KEY and ELEVENLABS_VOICE_ID (Shari clone) in .env.local.
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,12 +18,17 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
+    if (!isShariVoiceConfigured()) {
+      console.warn(
+        "[TTS] ELEVENLABS_VOICE_ID is not set — using generic fallback voice.",
+      );
+    }
     const body = await request.json();
     const text = ((body.text as string) ?? "").trim().slice(0, 2500);
     if (!text) {
       return NextResponse.json({ error: "Nothing to speak." }, { status: 400 });
     }
-    const voiceId = process.env.ELEVENLABS_VOICE_ID || DEFAULT_VOICE;
+    const voiceId = resolveElevenLabsVoiceId();
 
     const res = await fetch(
       `https://api.elevenlabs.io/v1/text-to-speech/${voiceId}`,
@@ -31,8 +41,8 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           text,
-          model_id: "eleven_turbo_v2_5",
-          voice_settings: { stability: 0.5, similarity_boost: 0.75 },
+          model_id: ELEVENLABS_TTS_MODEL,
+          voice_settings: ELEVENLABS_VOICE_SETTINGS,
         }),
       },
     );

@@ -1,5 +1,5 @@
 /**
- * P0.20 — Visual Recommendation Engine™
+ * P0.20 — Visual Recommendation Engine
  * Napkin-style visual structure recommendations inside Visual Thinking.
  */
 
@@ -464,7 +464,7 @@ export function shouldOfferVisualRecommendation(userText: string): boolean {
 
 export function visualRecommendationEngineHintForChat(): string {
   return [
-    "VISUAL RECOMMENDATION ENGINE™ (P0.20):",
+    "VISUAL RECOMMENDATION ENGINE (P0.20):",
     "Path A (user names a structure): open Visual Thinking immediately.",
     "Path B (user needs help choosing): recommend 2–3 structures with short reasons; wait for 1/2/3 or name.",
     "Reply style: I can visualize this a few ways. Recommended: 1. X — reason … Which one would help most?",

@@ -67,7 +67,7 @@ export type DirectorBrief = {
   time: DirectorTime;
   lifeEvent: DirectorLifeEvent;
   atmosphereTone: AtmosphereTone;
-  /** Iowa Reality™ — block impossible combinations. */
+  /** Iowa Reality — block impossible combinations. */
   iowaReality: boolean;
   /** Future experimentation — bypass Iowa rules when true. */
   fantasyMode: boolean;

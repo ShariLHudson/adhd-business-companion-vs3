@@ -1,5 +1,5 @@
 /**
- * Phase 3 — Adaptive Relationship Intelligence™
+ * Phase 3 — Adaptive Relationship Intelligence
  * From understanding to anticipation. Pattern-aware, trust-safe, never surveillance.
  */
 
@@ -435,7 +435,7 @@ export function formatMyOperatingManualForPanel(
     ? manual.bestResources
     : manual.supportStyles;
   const lines = [
-    "## My Operating Manual™",
+    "## My Operating Manual",
     "",
     "_The companion already knows you — this is your living guide._",
     "",
@@ -464,7 +464,7 @@ export function formatMyOperatingManualForPanel(
 export function formatUserOperatingManualForDisplay(
   manual = buildUserOperatingManual(),
 ): string {
-  const lines = ["## My Operating Manual™", "", "_Continuously evolving — not a form you filled out._"];
+  const lines = ["## My Operating Manual", "", "_Continuously evolving — not a form you filled out._"];
   if (manual.businessProfile.type || manual.businessProfile.primaryGoal) {
     lines.push("", "### Business Profile");
     if (manual.businessProfile.type) lines.push(`Business Type: ${manual.businessProfile.type}`);
@@ -511,7 +511,7 @@ export function phase3AdaptiveRelationshipHintForChat(input?: {
   const anticipatory = input?.anticipatorySupport ?? maybeAnticipatorySupport();
 
   const parts = [
-    "PHASE 3 ADAPTIVE RELATIONSHIP INTELLIGENCE™ (invisible — never surveillance):",
+    "PHASE 3 ADAPTIVE RELATIONSHIP INTELLIGENCE (invisible — never surveillance):",
     "Goal: anticipate needs before the user names them. Prevention over prediction.",
     "User should feel: aware, helpful, attentive — NOT watched, tracked, or analyzed.",
     "Trust language only: 'It seems like…', 'I'm noticing…', 'I may be wrong, but…'",

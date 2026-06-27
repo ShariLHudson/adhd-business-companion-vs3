@@ -359,13 +359,13 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
     title: "How To: Chat Workspace",
     question: "How do I start a new chat or new day?",
     whatItIs:
-      "Chat Workspace manages your current conversation context — separate from Clear My Mind™, Plan My Day™, and Today's Reality™.",
+      "Chat Workspace manages your current conversation context — separate from Clear My Mind, Plan My Day, and Today's Reality.",
     whenToUse:
       "When you want a fresh conversation or a fresh daily start without losing projects, memory, or goals.",
     steps: [
       "Open Chat Workspace (💬) in the top navigation.",
-      "Choose New Chat for a completely fresh conversation — memory, projects, goals, analytics, and Founder Intelligence™ stay.",
-      "Choose New Day's Chat when starting a new day — fresh daily conversation, Plan My Day™ reset, daily planning cleared; memory and projects stay.",
+      "Choose New Chat for a completely fresh conversation — memory, projects, goals, analytics, and Founder Intelligence stay.",
+      "Choose New Day's Chat when starting a new day — fresh daily conversation, Plan My Day reset, daily planning cleared; memory and projects stay.",
       "Confirm in the dialog — nothing important is deleted.",
     ],
     keywords: [

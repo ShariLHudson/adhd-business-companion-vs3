@@ -8,7 +8,7 @@ import {
   violatesCharacterVoice,
 } from "./index";
 
-describe("The Character of Shari™", () => {
+describe("The Character of Shari", () => {
   it("defines permanent core traits", () => {
     expect(SHARI_CORE_TRAITS).toContain("warm");
     expect(SHARI_CORE_TRAITS).toContain("emotionally_safe");

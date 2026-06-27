@@ -1,5 +1,5 @@
 /**
- * My Thinking Space™ queries — permanent home for all captured thoughts.
+ * My Thinking Space queries — permanent home for all captured thoughts.
  */
 
 import {
@@ -26,7 +26,7 @@ export function isActiveThinkingSpaceThought(entry: BrainDumpEntry): boolean {
   return isVisibleInMentalLandscape(entry) && !isArchivedThought(entry);
 }
 
-/** All thoughts in My Thinking Space™ (active, not completed). */
+/** All thoughts in My Thinking Space (active, not completed). */
 export function getThinkingSpaceThoughts(): ThinkingSpaceThought[] {
   return getBrainDumps()
     .filter(isActiveThinkingSpaceThought)

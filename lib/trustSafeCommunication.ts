@@ -1,5 +1,5 @@
 /**
- * Trust-Safe Improvement Communication™
+ * Trust-Safe Improvement Communication
  *
  * Internal transparency: track everything.
  * External transparency: communicate only what improves the user experience.
@@ -343,7 +343,7 @@ export function translateInternalToExternal(internalSummary: string): string {
   return IMPROVEMENT_BENEFIT_COPY[area];
 }
 
-// ─── Recovery Messaging Engine™ ───────────────────────────────────────────────
+// ─── Recovery Messaging Engine ───────────────────────────────────────────────
 
 export function buildRecoveryMessage(
   input: RecoveryMessageInput = {},

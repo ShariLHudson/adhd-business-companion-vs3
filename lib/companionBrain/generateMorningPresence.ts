@@ -1,5 +1,5 @@
 /**
- * Morning Presence™ — help the user feel seen before the day begins.
+ * Morning Presence — help the user feel seen before the day begins.
  * Not advice, coaching, or productivity — Shari noticing today's reality.
  * @see constitution.ts — generateMorningPresence
  */

@@ -1,5 +1,5 @@
 /**
- * Room Composition Rule™ — design around the conversation.
+ * Room Composition Rule — design around the conversation.
  * @see docs/companion-homestead/ROOM_COMPOSITION_RULE.md
  */
 
@@ -25,7 +25,7 @@ export type RoomCompositionEntry = {
   signatureFeature: SignatureFeatureSpec;
   /** Environmental details allowed per edge — life frames the work */
   edgeLife: Record<EdgeZone, readonly string[]>;
-  /** Never place behind the Protected Conversation Zone™ */
+  /** Never place behind the Protected Conversation Zone */
   centerForbidden: readonly string[];
   /** Good motion locations — never behind text */
   motionZones: readonly EdgeZone[];

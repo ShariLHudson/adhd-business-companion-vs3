@@ -1,5 +1,5 @@
 /**
- * Companion Intelligence™ — Visual Thinking™ pipeline types.
+ * Companion Intelligence — Visual Thinking pipeline types.
  *
  * Visual workspaces are intelligence surfaces, not standalone file tools.
  * Stack: Intelligence → Framework → Visual Output → Insights → Learning → Future Intelligence
@@ -46,7 +46,7 @@ export type VisualThinkingFrameworkMeta = {
   id: VisualThinkingFrameworkId;
   userLabel: string;
   /**
-   * When true, the framework imposes required sections (Business Canvas™ is the
+   * When true, the framework imposes required sections (Business Canvas is the
    * primary exception). Otherwise structure emerges from the user's situation.
    */
   predefinedStructure: boolean;
@@ -73,9 +73,9 @@ export type VisualThinkingSessionCapture = {
 
 /** Canonical rule — import in tests and architecture reviews. */
 export const VISUAL_THINKING_INTELLIGENCE_RULE = [
-  "Visual Thinking™ tools are intelligence surfaces, not standalone tools.",
+  "Visual Thinking tools are intelligence surfaces, not standalone tools.",
   "Start with understanding; clarify when needed.",
   "Build structure from the user's situation unless the framework requires predefined sections.",
   "Generate visual output, insights, and recommendations.",
-  "Capture learning signals and feed Founder Intelligence™ for future recommendations.",
+  "Capture learning signals and feed Founder Intelligence for future recommendations.",
 ] as const;

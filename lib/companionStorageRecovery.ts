@@ -63,3 +63,37 @@ export function safeLocalStorageSet(key: string, value: string): boolean {
     }
   }
 }
+
+export type QuotaSafeStorage = {
+  getItem: (key: string) => string | null;
+  setItem: (key: string, value: string) => void;
+  removeItem: (key: string) => void;
+};
+
+/**
+ * Supabase auth and other SDKs must never throw from setItem — an uncaught
+ * QuotaExceededError breaks the React tree and blocks workspace opens.
+ */
+export function createQuotaSafeStorage(): QuotaSafeStorage {
+  return {
+    getItem(key: string): string | null {
+      if (typeof window === "undefined") return null;
+      try {
+        return localStorage.getItem(key);
+      } catch {
+        return null;
+      }
+    },
+    setItem(key: string, value: string): void {
+      safeLocalStorageSet(key, value);
+    },
+    removeItem(key: string): void {
+      if (typeof window === "undefined") return;
+      try {
+        localStorage.removeItem(key);
+      } catch {
+        /* noop */
+      }
+    },
+  };
+}

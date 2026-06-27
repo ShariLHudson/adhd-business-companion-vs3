@@ -39,7 +39,7 @@ function resolveState(
 }
 
 /**
- * Shari's Presence™ — constitutional presence before any room renders.
+ * Shari's Presence — constitutional presence before any room renders.
  */
 export function evaluateSharisPresence(
   input: SharisPresenceInput = {},
@@ -77,12 +77,12 @@ export function evaluateSharisPresence(
 
 export function sharisPresenceHintForChat(verdict: SharisPresenceVerdict): string {
   return [
-    "SHARI'S PRESENCE™:",
+    "SHARI'S PRESENCE:",
     verdict.principle,
     `State: ${verdict.state} (${verdict.placeId}).`,
     verdict.hostLine,
     verdict.showShariImage
-      ? "Shari may appear visually — Host™."
+      ? "Shari may appear visually — Host."
       : "No Shari portrait — presence felt through room and anchor.",
     "Guest never feels watched. Always feels welcomed.",
   ].join("\n");

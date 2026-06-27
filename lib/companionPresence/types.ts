@@ -1,5 +1,5 @@
 /**
- * Companion Presence™ — real photography, context-aware, felt not animated.
+ * Companion Presence — real photography, context-aware, felt not animated.
  */
 
 import type { EmotionalState } from "@/lib/companionEmotions";
@@ -51,6 +51,8 @@ export type CompanionPresenceInput = {
   emotion?: EmotionalState;
   /** Shari is preparing a response — maintain eye contact, no image rotation. */
   isThinking?: boolean;
+  /** Visible Thinking override — intelligence-aware wait copy. */
+  thinkingMessage?: string | null;
   userBirthday?: { month: number; day: number } | null;
   recognitionMoment?: RecognitionMoment | null;
   recoveryLevel?: RecoveryLevel | null;
@@ -58,9 +60,9 @@ export type CompanionPresenceInput = {
   recognitionWin?: boolean;
   /** ISO date — app anniversary detection. */
   memberSince?: string | null;
-  /** Clear My Mind™ journey phase — overrides workspace mapping when set. */
+  /** Clear My Mind journey phase — overrides workspace mapping when set. */
   clearMyMindPhase?: ClearMyMindPresencePhase | null;
-  /** Rotate photo on each entry to Clear My Mind™ or My Thoughts™. */
+  /** Rotate photo on each entry to Clear My Mind or My Thoughts. */
   presenceWorkspace?: CompanionPresenceWorkspace | null;
   /** Increment when the user enters/re-enters a presence workspace. */
   workspaceEntryKey?: number;

@@ -4,9 +4,9 @@ import type { CompanionPlaceId } from "./types";
 import { placeById } from "./libraries/placeLibrary";
 
 /**
- * Companion Layout System™
+ * Companion Layout System
  *
- * The Companion Homestead™ is the environment — not the navigation.
+ * The Companion Homestead is the environment — not the navigation.
  *
  * Navigation stays stable. The main content area becomes the room.
  * Users always know where menus are, but emotionally they walk from
@@ -19,14 +19,14 @@ import { placeById } from "./libraries/placeLibrary";
  * 4. Relationship Layer — Shari's presence, greetings, stories, hospitality
  */
 export const COMPANION_LAYOUT_SYSTEM = {
-  title: "Companion Layout System™",
+  title: "Companion Layout System",
   subtitle: "The homestead is the environment — navigation is the architecture.",
   corePrinciple:
     "Navigation does not become the room. Navigation stays stable. The content area becomes the room.",
   environmentSupportsWork:
     "The environment should support the work, never compete with it.",
   homesteadIsNotNavigation:
-    "The Companion Homestead™ is the environment, not the navigation.",
+    "The Companion Homestead is the environment, not the navigation.",
 } as const;
 
 export type LayoutLayerId =
@@ -68,7 +68,7 @@ export const LAYOUT_LAYERS: readonly LayoutLayer[] = [
     name: "Environmental Layer",
     tagline: "Which room is active — prepared, not rebuilt",
     owns: [
-      "Active Companion Place™",
+      "Active Companion Place",
       "Lighting and time of day",
       "Weather and season",
       "Motion and ambient sound",
@@ -104,7 +104,7 @@ export const LAYOUT_LAYERS: readonly LayoutLayer[] = [
       "Shari's still photograph",
       "Greetings and invites",
       "Conversation cadence",
-      "Shari Stories™ and NGMTM sticky notes",
+      "Shari Stories and NGMTM sticky notes",
       "Hospitality moments and prepared lines",
     ],
     mustNeverOwn: [
@@ -134,7 +134,7 @@ export type RoomImmersionProfile = {
 
 /**
  * Not every room is full-screen.
- * Living Room™ is special — arrival immersion.
+ * Living Room is special — arrival immersion.
  * Work rooms support the task first.
  */
 export const ROOM_IMMERSION_BY_PLACE: Record<
@@ -150,7 +150,7 @@ export const ROOM_IMMERSION_BY_PLACE: Record<
   "window-seat": {
     level: "environmental-header",
     environmentSharePercent: 35,
-    description: "Window Seat™ header — Clear My Mind™ capture below",
+    description: "Window Seat header — Clear My Mind capture below",
     workingLayerDominant: true,
   },
   "kitchen-table": {
@@ -292,7 +292,7 @@ export type HouseMapNavItem = {
 };
 
 /**
- * Top Navigation = The House Map™
+ * Top Navigation = The House Map
  * Moving from room to room — not a generic software menu.
  */
 export const HOUSE_MAP_NAV: readonly HouseMapNavItem[] = [
@@ -332,7 +332,7 @@ export const HOUSE_MAP_NAV: readonly HouseMapNavItem[] = [
   },
   {
     id: "focus",
-    label: "Focus My Brain™",
+    label: "Focus My Brain",
     objectId: "focus-my-brain",
     placeId: "sunroom-over-pond",
     section: "focus",
@@ -387,7 +387,7 @@ export type ToolbeltItem = {
 };
 
 /**
- * Left Sidebar = The Companion Toolbelt™
+ * Left Sidebar = The Companion Toolbelt
  * Built-in cabinetry — quiet access to tools, never competing with the room.
  */
 export const COMPANION_TOOLBELT: readonly ToolbeltItem[] = [
@@ -479,7 +479,7 @@ export function houseMapForPlace(
   return HOUSE_MAP_NAV.find((item) => item.placeId === placeId) ?? null;
 }
 
-/** @deprecated Decisions flow through Environment Intelligence™ — delegate only. */
+/** @deprecated Decisions flow through Environment Intelligence — delegate only. */
 export function placeForSection(section: AppSection): CompanionPlaceId {
   return resolvePlace({ section });
 }

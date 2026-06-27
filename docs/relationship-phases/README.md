@@ -23,7 +23,7 @@ The codebase contains **two independent phase numbering systems**. They must not
 ### Why they must stay separate
 
 1. **Different audiences** — Relationship phases govern how Shari evolves with a user over months/years. Founder Ecosystem phases govern backend intelligence, dashboards, actions, and founder-only tooling.
-2. **Colliding numbers** — Founder Ecosystem Phase 10 = Stage-Aware Recommendations. Relationship Phase 10 = Legacy & Transformation Intelligence™. Same number, different meaning.
+2. **Colliding numbers** — Founder Ecosystem Phase 10 = Stage-Aware Recommendations. Relationship Phase 10 = Legacy & Transformation Intelligence. Same number, different meaning.
 3. **Different activation models** — Relationship phases use localStorage state + conversation signals. Founder Ecosystem phases use event streams, materialized views, and namespaced exports.
 4. **Documented fragmentation** — `docs-companion-intelligence/23_Adaptive_Companion_Architecture.md` describes three intelligence stacks (companion profile, vertical hub, founder ecosystem) that are intentionally modular today.
 
@@ -55,7 +55,7 @@ The codebase contains **two independent phase numbering systems**. They must not
 |----------|---------|
 | `lib/ecosystem/` | Phases 1–19 backend modules |
 | `lib/ecosystem/README.md` | Phase 1 event engine overview |
-| `lib/founderIntelligence.ts` | Founder Intelligence™ dashboard (companion-adjacent) |
+| `lib/founderIntelligence.ts` | Founder Intelligence dashboard (companion-adjacent) |
 | `components/founder/`, `components/companion/FounderCommandCenter.tsx` | Partial UI for FE phases 12+ |
 
 ---

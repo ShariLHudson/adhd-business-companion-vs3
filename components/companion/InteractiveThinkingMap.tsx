@@ -1,8 +1,8 @@
 "use client";
 
 /**
- * @deprecated V2 — Future Thinking Map™ (relationship visualization).
- * Not mounted in v1 My Thoughts™.
+ * @deprecated V2 — Future Thinking Map (relationship visualization).
+ * Not mounted in v1 My Thoughts.
  */
 
 import { useMemo } from "react";

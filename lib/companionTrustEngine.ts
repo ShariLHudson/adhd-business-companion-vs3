@@ -1,5 +1,5 @@
 /**
- * Sprint 5 — Trust Engine™
+ * Sprint 5 — Trust Engine
  * Measure and strengthen trust through consistency, memory, and follow-through.
  */
 
@@ -64,7 +64,7 @@ export function trustEngineHintForChat(input: {
 }): string {
   const snapshot = input.snapshot ?? buildTrustSnapshot();
   const parts: string[] = [
-    "TRUST ENGINE™ (Sprint 5 — invisible):",
+    "TRUST ENGINE (Sprint 5 — invisible):",
     "Strengthen trust: remember context, follow through, explain why, stay consistent.",
     "NEVER abandon a thread. NEVER reset after yes/sure/okay.",
   ];

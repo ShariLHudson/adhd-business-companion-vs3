@@ -1,6 +1,6 @@
 import type { EmotionalState } from "@/lib/companionEmotions";
 
-/** Output of Companion Intelligence™ orchestration — understanding only; never renders UI. */
+/** Output of Companion Intelligence orchestration — understanding only; never renders UI. */
 export type CompanionState = {
   emotionalState: EmotionalState;
   energy: "low" | "medium" | "high";

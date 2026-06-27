@@ -1,10 +1,10 @@
-# Quiet Moments™
+# Quiet Moments
 ## Designing Everything That Happens Between Conversations
 
 **Version:** 1.0  
 **Status:** Canonical — governs silence, idle time, and ambient life  
 **Code:** `lib/quietMoments/`  
-**Sibling:** [WISDOM_OF_RESTRAINT.md](./WISDOM_OF_RESTRAINT.md) · [Companion Communication Anchor™](../../lib/companionCommunicationAnchor/)
+**Sibling:** [WISDOM_OF_RESTRAINT.md](./WISDOM_OF_RESTRAINT.md) · [Companion Communication Anchor](../../lib/companionCommunicationAnchor/)
 
 ---
 
@@ -95,7 +95,7 @@ Forbidden forever:
 - "Where did you go?"
 - Countdowns · Session timeout guilt · "Why haven't you…"
 
-Enforced in `lib/quietMoments/forbiddenIdle.ts` and Wisdom of Restraint™.
+Enforced in `lib/quietMoments/forbiddenIdle.ts` and Wisdom of Restraint.
 
 ---
 
@@ -164,7 +164,7 @@ When they're ready, they begin talking.
 
 The Companion never rushed them. Never demanded attention. Simply shared the space.
 
-**That is Quiet Moments™.**
+**That is Quiet Moments.**
 
 ---
 
@@ -182,10 +182,10 @@ evaluateCompanionEnvironmentIntelligence({
 Stack:
 
 ```
-Quiet Moments™ → ambient motion + anchor mode + forbidden idle copy
-Living Motion Library™ → irregular natural movement
-Wisdom of Restraint™ → nothing spoken unless caring
-Communication Anchor™ → always reachable, never loud
+Quiet Moments → ambient motion + anchor mode + forbidden idle copy
+Living Motion Library → irregular natural movement
+Wisdom of Restraint → nothing spoken unless caring
+Communication Anchor → always reachable, never loud
 ```
 
 ---
@@ -194,10 +194,10 @@ Communication Anchor™ → always reachable, never loud
 
 ```
 Manifesto
-  → Quiet Moments™ (this document)
-    → Living Motion Library™
-    → Wisdom of Restraint™
-    → Companion Communication Anchor™
+  → Quiet Moments (this document)
+    → Living Motion Library
+    → Wisdom of Restraint
+    → Companion Communication Anchor
 ```
 
 Tests: `npx vitest run lib/quietMoments`

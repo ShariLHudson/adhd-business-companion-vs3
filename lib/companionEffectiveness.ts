@@ -1,5 +1,5 @@
 /**
- * Companion Effectiveness System™ — measure whether the companion helps users move forward.
+ * Companion Effectiveness System — measure whether the companion helps users move forward.
  *
  * Privacy: patterns for improvement only — never negative labels or shame.
  */

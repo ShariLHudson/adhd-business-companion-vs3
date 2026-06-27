@@ -1,4 +1,4 @@
-/** Designer Stories™ — Creative Collection. Never shown to guests. */
+/** Designer Stories — Creative Collection. Never shown to guests. */
 export const CREATIVE_DESIGNER_STORIES: Record<string, string> = {
   "obj-crochet-basket":
     "Not decoration — the project Shari picks up when her mind needs to settle. Yarn half-used, hook still in the work.",

@@ -7,7 +7,7 @@ import {
   isDayStateFromToday,
 } from "@/lib/dayReality";
 
-/** Compact read-only snapshot — Today's Reality™ lives in the top bar. */
+/** Compact read-only snapshot — Today's Reality lives in the top bar. */
 export function TodaysRealitySummary() {
   const [refreshKey, setRefreshKey] = useState(0);
 

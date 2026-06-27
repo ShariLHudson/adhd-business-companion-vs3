@@ -1,5 +1,5 @@
 /**
- * User Life Areas™ — custom areas that sync locally (Supabase-ready shape).
+ * User Life Areas — custom areas that sync locally (Supabase-ready shape).
  */
 
 import type { CreateUserLifeAreaInput, LifeArea } from "./types";

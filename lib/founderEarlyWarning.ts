@@ -1,5 +1,5 @@
 /**
- * Early Warning System™ — detect companion issues before users complain.
+ * Early Warning System — detect companion issues before users complain.
  */
 
 import { getBehaviorEvents } from "./closedLoopLearning";

@@ -23,7 +23,15 @@ export type CompanionPageGlobalBackground = {
   scenePage: ScenePage;
   sceneSeed: string;
   clearMyMind: boolean;
+  /** When true, constitutional SceneRenderer owns the photo — hide legacy page wallpaper. */
+  suppress: boolean;
 };
+
+const HOMESTEAD_SCENE_SECTIONS = new Set<AppSection>([
+  "brain-dump",
+  "plan-my-day",
+  "focus",
+]);
 
 export type CompanionPageRenderContext = CompanionRenderContext & {
   globalBackground: CompanionPageGlobalBackground;
@@ -77,13 +85,33 @@ export function sectionToSceneWorkspaceId(
 function resolveGlobalBackgroundIntent(
   input: CompanionPageRenderInput,
 ): CompanionPageGlobalBackground {
-  if (input.activeSection === "brain-dump") {
+  const homesteadPanel =
+    input.workspacePanel != null &&
+    HOMESTEAD_SCENE_SECTIONS.has(input.workspacePanel);
+  const homesteadSection = HOMESTEAD_SCENE_SECTIONS.has(input.activeSection);
+  const constitutionalScene = homesteadPanel || homesteadSection;
+
+  if (constitutionalScene) {
+    const isClearMyMind =
+      input.activeSection === "brain-dump" ||
+      input.workspacePanel === "brain-dump";
+    const scenePage: ScenePage = isClearMyMind
+      ? "recovery"
+      : input.activeSection === "plan-my-day" ||
+          input.workspacePanel === "plan-my-day"
+        ? "today"
+        : "focus";
+    const sceneSeed = isClearMyMind
+      ? "brain-dump"
+      : (input.workspacePanel ?? input.activeSection);
     return {
-      scenePage: "recovery",
-      sceneSeed: "brain-dump",
-      clearMyMind: true,
+      scenePage,
+      sceneSeed,
+      clearMyMind: isClearMyMind,
+      suppress: true,
     };
   }
+
   if (input.activeSection === "home") {
     const convoEmotion = input.firstUserMessage
       ? detectEmotionalState(input.firstUserMessage)
@@ -92,12 +120,14 @@ function resolveGlobalBackgroundIntent(
       scenePage: sceneForContext(convoEmotion, "home"),
       sceneSeed: input.firstUserMessage ?? "home",
       clearMyMind: false,
+      suppress: false,
     };
   }
   return {
     scenePage: sceneForContext(input.displayEmotion, input.activeSection),
     sceneSeed: input.activeSection,
     clearMyMind: false,
+    suppress: false,
   };
 }
 

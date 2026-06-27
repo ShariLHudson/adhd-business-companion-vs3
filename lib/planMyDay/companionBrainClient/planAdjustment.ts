@@ -1,5 +1,5 @@
 /**
- * Today's Plan™ adjustments — swap recommendations without changing Today's Reality™.
+ * Today's Plan adjustments — swap recommendations without changing Today's Reality.
  * Companion Brain client — uses judgment + board state, not page reasoning.
  */
 

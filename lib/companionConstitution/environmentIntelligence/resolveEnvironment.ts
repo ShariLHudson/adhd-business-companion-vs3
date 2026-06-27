@@ -1,4 +1,23 @@
 import { pickScene, SCENE_OVERLAY, type ScenePage } from "@/lib/companionBackgrounds";
+import {
+  CLEAR_MY_MIND_CONSERVATORY_BG,
+  CLEAR_MY_MIND_WORKSPACE_MAX_WIDTH,
+  CLEAR_MY_MIND_WORKSPACE_MIN_WIDTH,
+} from "@/lib/clearMyMind/conservatory";
+import {
+  FOCUS_MY_BRAIN_ROOM_BG,
+  FOCUS_MY_BRAIN_WORKSPACE_MAX_WIDTH,
+  FOCUS_MY_BRAIN_WORKSPACE_MIN_WIDTH,
+} from "@/lib/focusMyBrain/focusRoom";
+import {
+  PLAN_MY_DAY_MORNING_BG,
+  PLAN_MY_DAY_WORKSPACE_MAX_WIDTH,
+  PLAN_MY_DAY_WORKSPACE_MIN_WIDTH,
+} from "@/lib/planMyDay/morningRoom";
+import {
+  LIFE_EXPERIENCE_LETTER_MAX_WIDTH,
+  LIFE_EXPERIENCE_ROOM_BG,
+} from "@/lib/lifeExperienceRoom";
 import type { AppSection } from "@/lib/companionUi";
 import { focusLandscapeSpace } from "@/lib/focusLandscape/spaceCatalog";
 import { spaceForFocusWorkspace } from "@/lib/focusLandscape/toolRouting";
@@ -17,10 +36,20 @@ import type {
 const HOMESTEAD_WORKSPACES = new Set<SceneWorkspaceId>([
   "clear-my-mind",
   "clear-my-mind-thoughts",
+  "life-experience-room",
   "plan-my-day",
   "focus-hub",
   "focus-category",
 ]);
+
+const HOMESTEAD_SCENE_PAGES: Partial<Record<SceneWorkspaceId, ScenePage>> = {
+  "clear-my-mind": "recovery",
+  "clear-my-mind-thoughts": "recovery",
+  "life-experience-room": "recovery",
+  "plan-my-day": "today",
+  "focus-hub": "focus",
+  "focus-category": "focus",
+};
 
 const PHOTO_SCENE_WORKSPACES: Record<string, ScenePage> = {
   breathe: "progress",
@@ -30,14 +59,6 @@ const PHOTO_SCENE_WORKSPACES: Record<string, ScenePage> = {
 const SIGNATURE_BY_WORKSPACE: Partial<
   Record<SceneWorkspaceId, { signatureId: string; objectId: string }>
 > = {
-  "clear-my-mind": {
-    signatureId: "sig-reflection-journal",
-    objectId: "clear-my-mind",
-  },
-  "clear-my-mind-thoughts": {
-    signatureId: "sig-reflection-journal",
-    objectId: "clear-my-mind",
-  },
   "plan-my-day": {
     signatureId: "sig-planning-notebook",
     objectId: "plan-my-day",
@@ -54,6 +75,7 @@ const SIGNATURE_BY_WORKSPACE: Partial<
 
 const SECTION_TO_SCENE: Partial<Record<AppSection, SceneWorkspaceId>> = {
   "brain-dump": "clear-my-mind",
+  "life-experience": "life-experience-room",
   "plan-my-day": "plan-my-day",
   focus: "focus-hub",
   breathe: "breathe",
@@ -78,7 +100,9 @@ function resolvePlaceForSection(section: AppSection): CompanionPlaceId {
     case "today":
       return "living-room";
     case "brain-dump":
-      return "window-seat";
+      return "greenhouse";
+    case "life-experience":
+      return "reading-nook";
     case "plan-my-day":
       return "planning-table";
     case "focus":
@@ -153,8 +177,9 @@ function resolvePlaceId(input: EnvironmentInput): {
 
   if (workspaceId) {
     const base: Partial<Record<SceneWorkspaceId, CompanionPlaceId>> = {
-      "clear-my-mind": "window-seat",
-      "clear-my-mind-thoughts": "window-seat",
+      "clear-my-mind": "greenhouse",
+      "clear-my-mind-thoughts": "greenhouse",
+      "life-experience-room": "reading-nook",
       breathe: "reading-nook",
       "focus-audio": "reading-nook",
       default: "living-room",
@@ -193,17 +218,71 @@ function resolveBackground(
   const room = roomRegistryEntry(placeId);
 
   if (workspaceId && HOMESTEAD_WORKSPACES.has(workspaceId)) {
+    if (
+      workspaceId === "clear-my-mind" ||
+      workspaceId === "clear-my-mind-thoughts"
+    ) {
+      return {
+        mode: "photo-scene",
+        imageUrl: CLEAR_MY_MIND_CONSERVATORY_BG,
+        scenePage: "recovery",
+        seed: "garden-conservatory",
+        overlay: "rgba(255, 252, 245, 0.06)",
+        objectPosition: "center center",
+        fit: "cover-safe-crop",
+        dominanceCap: 0.94,
+      };
+    }
+
+    if (workspaceId === "life-experience-room") {
+      return {
+        mode: "photo-scene",
+        imageUrl: LIFE_EXPERIENCE_ROOM_BG,
+        scenePage: "recovery",
+        seed: "life-experience-library",
+        overlay: "rgba(255, 248, 235, 0.05)",
+        objectPosition: "center center",
+        fit: "cover-safe-crop",
+        dominanceCap: 0.96,
+      };
+    }
+
+    if (workspaceId === "plan-my-day") {
+      return {
+        mode: "photo-scene",
+        imageUrl: PLAN_MY_DAY_MORNING_BG,
+        scenePage: "today",
+        seed: "plan-my-day-morning",
+        overlay: "rgba(255, 250, 242, 0.04)",
+        objectPosition: "center center",
+        fit: "cover",
+        dominanceCap: 1,
+      };
+    }
+
+    if (workspaceId === "focus-hub" || workspaceId === "focus-category") {
+      return {
+        mode: "photo-scene",
+        imageUrl: FOCUS_MY_BRAIN_ROOM_BG,
+        scenePage: "focus",
+        seed: "focus-my-brain",
+        overlay: "rgba(255, 250, 242, 0.04)",
+        objectPosition: "center center",
+        fit: "cover",
+        dominanceCap: 1,
+      };
+    }
+
+    const scenePage =
+      input.scenePage ?? HOMESTEAD_SCENE_PAGES[workspaceId] ?? "today";
+    const imageUrl = pickScene(scenePage, seed);
     const objectPosition = room.cameraCrop;
-    const dominanceCap =
-      workspaceId === "focus-hub" || workspaceId === "focus-category"
-        ? 0.56
-        : 0.52;
-    const overlay =
-      workspaceId === "focus-hub" || workspaceId === "focus-category"
-        ? "rgba(248, 252, 246, 0.18)"
-        : "rgba(252, 246, 236, 0.22)";
+    const dominanceCap = 0.52;
+    const overlay = "rgba(252, 246, 236, 0.22)";
     return {
-      mode: "homestead-room",
+      mode: "photo-scene",
+      imageUrl,
+      scenePage,
       seed,
       overlay,
       objectPosition,
@@ -231,7 +310,7 @@ function resolveBackground(
 }
 
 /**
- * Environment Intelligence™ — sole authority for room, place, scene, background,
+ * Environment Intelligence — sole authority for room, place, scene, background,
  * motion profile, signature object, and camera crop.
  */
 export function resolveEnvironment(
@@ -290,11 +369,34 @@ export function resolveEnvironment(
       dominanceCap: background.dominanceCap,
     },
     workspaceSize:
-      background.mode === "homestead-room" ? "36rem" : "32rem",
+      workspaceId === "clear-my-mind" || workspaceId === "clear-my-mind-thoughts"
+        ? `clamp(${CLEAR_MY_MIND_WORKSPACE_MIN_WIDTH}, 92vw, ${CLEAR_MY_MIND_WORKSPACE_MAX_WIDTH})`
+        : workspaceId === "life-experience-room"
+          ? `clamp(26.25rem, 92vw, ${LIFE_EXPERIENCE_LETTER_MAX_WIDTH})`
+          : workspaceId === "focus-hub" || workspaceId === "focus-category"
+            ? `clamp(${FOCUS_MY_BRAIN_WORKSPACE_MIN_WIDTH}, 92vw, ${FOCUS_MY_BRAIN_WORKSPACE_MAX_WIDTH})`
+            : homestead
+              ? "36rem"
+              : "32rem",
     signatureObject: signature,
     motionProfile: {
-      enabled: homestead,
-      placement: homestead ? "edge-only" : "none",
+      enabled:
+        homestead &&
+        workspaceId !== "clear-my-mind" &&
+        workspaceId !== "clear-my-mind-thoughts" &&
+        workspaceId !== "life-experience-room" &&
+        workspaceId !== "focus-hub" &&
+        workspaceId !== "focus-category",
+      placement:
+        workspaceId === "clear-my-mind" ||
+        workspaceId === "clear-my-mind-thoughts" ||
+        workspaceId === "life-experience-room" ||
+        workspaceId === "focus-hub" ||
+        workspaceId === "focus-category"
+          ? "none"
+          : homestead
+            ? "edge-only"
+            : "none",
       livingBorderPlaceId: room.livingBorderProfile,
       borderInput: {
         placeId: room.livingBorderProfile,

@@ -3,7 +3,7 @@ import {
   COMPANION_PRESENCE_WELCOME_IMAGE_ID,
 } from "@/lib/companionPresenceLibrary/sceneCatalog";
 
-/** Master Living Room™ — canonical first-page photograph until a new asset is approved. */
+/** Master Living Room — canonical first-page photograph until a new asset is approved. */
 export const COMPANION_PRESENCE_WELCOME_FALLBACK_IMAGE_ID = COMPANION_PRESENCE_WELCOME_IMAGE_ID;
 
 export type WelcomeImageCapabilities = {

@@ -7,7 +7,7 @@ import { AppBackButton } from "@/components/companion/AppBackButton";
 export function VisualThinkingMyWorkBrowse({
   onOpenMap,
   onBack,
-  backDestination = "Saved™",
+  backDestination = "Saved",
 }: {
   onOpenMap: (mapId: string, preferGenerated: boolean) => void;
   onBack?: () => void;
@@ -19,9 +19,9 @@ export function VisualThinkingMyWorkBrowse({
     <div className="flex min-h-0 flex-1 flex-col" data-testid="visual-thinking-saved-browse">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 className="text-xl font-semibold text-[#1f1c19]">Visual Thinking™</h2>
+          <h2 className="text-xl font-semibold text-[#1f1c19]">Visual Thinking</h2>
           <p className="mt-1 text-sm text-[#6b635a]">
-            Intentionally saved and archived maps — pinned favorites appear at the top of Saved™.
+            Intentionally saved and archived maps — pinned favorites appear at the top of Saved.
           </p>
         </div>
         {onBack ? (

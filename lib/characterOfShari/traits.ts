@@ -1,5 +1,5 @@
 /**
- * The Character of Shari™ — permanent core traits.
+ * The Character of Shari — permanent core traits.
  * @see docs/companion-homestead/CHARACTER_OF_SHARI.md
  */
 

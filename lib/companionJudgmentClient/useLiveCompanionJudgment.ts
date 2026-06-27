@@ -10,7 +10,7 @@ import { ensureLiveJudgment } from "./liveEcosystem";
 import type { LiveJudgmentSnapshot } from "./types";
 
 /**
- * Subscribe to live Companion Brain™ judgment — all workspaces share one truth.
+ * Subscribe to live Companion Brain judgment — all workspaces share one truth.
  */
 export function useLiveCompanionJudgment(): LiveJudgmentSnapshot {
   const dayKey = todayStr();

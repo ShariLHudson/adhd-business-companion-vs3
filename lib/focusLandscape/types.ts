@@ -1,5 +1,5 @@
 /**
- * Focus My Brain™ — The Focus Landscape™
+ * Focus My Brain — The Focus Landscape
  * Six-space cognitive countryside inside one unified ecosystem.
  * @see docs/companion-homestead/FOCUS_LANDSCAPE.md
  */

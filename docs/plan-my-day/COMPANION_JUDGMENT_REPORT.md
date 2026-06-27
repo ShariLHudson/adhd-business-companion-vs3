@@ -1,5 +1,5 @@
-# Companion Judgment Report™
-## Plan My Day™ — Sprint 1.75 Validation Gate
+# Companion Judgment Report
+## Plan My Day — Sprint 1.75 Validation Gate
 
 **Status:** Architectural validation only — no production code  
 **Prerequisite:** Sprint 1 (Daily Reasoning) + Sprint 1.5 (Daily Companion Cycle) approved  
@@ -9,7 +9,7 @@
 
 ---
 
-# Part I — Ten Human Reality Simulations™
+# Part I — Ten Human Reality Simulations
 
 ---
 
@@ -17,7 +17,7 @@
 
 ### Morning Context
 
-**Companion Brain™ (entering day):**
+**Companion Brain (entering day):**
 - `predictionAccuracyEwma`: 0.72 (decent calibration)
 - `permissionJudgment`: moderate — marketing exclusions have been accurate 4/5 days
 - `momentumJudgment`: unlock weight 0.30, fit weight 0.28
@@ -64,7 +64,7 @@ Exclude: newsletter full draft, website section, three social posts, scheduling 
 **Phase 5 — Reality alignment**  
 Medium energy vs 5 proposed items → reduce to 3 confirmed candidates + 1 anchor. Load score within budget.
 
-**Phase 6 — Cognitive Audit™**  
+**Phase 6 — Cognitive Audit**  
 Pass. ≤3 primary choices. No goal modification. Evidence for anchor exists in CMM.
 
 **Phase 7 — Render contract**  
@@ -94,10 +94,10 @@ Orientation + 3 proposal cards + permission brief + single invitation.
 
 | Element | Content |
 |---------|---------|
-| **Momentum Action™** | Clarify payment-link liability (CMM: "check liability on payment link") |
-| **Confidence Action™** | Same — completable proof of follow-through |
-| **Permission Decisions™** | Exclude newsletter draft, website, extra outreach |
-| **Suggested Focus™** | (1) Liability check AM (2) Client call prep 1:30pm (3) Kids pickup — non-negotiable |
+| **Momentum Action** | Clarify payment-link liability (CMM: "check liability on payment link") |
+| **Confidence Action** | Same — completable proof of follow-through |
+| **Permission Decisions** | Exclude newsletter draft, website, extra outreach |
+| **Suggested Focus** | (1) Liability check AM (2) Client call prep 1:30pm (3) Kids pickup — non-negotiable |
 | **Left off** | Newsletter, website, social batch |
 | **Recovery moments** | None needed — neutral tone |
 | **Opportunities** | Free window 3:30–5pm if call ends on time — *not pre-filled* |
@@ -118,7 +118,7 @@ User confirms 2 of 3 proposals; declines social prep. Plan materializes.
 
 ---
 
-### Reflection Intelligence™ (end of day)
+### Reflection Intelligence (end of day)
 
 **Surprises:** Liability check took 45 min not 20 — uncovered need for accountant call (new CMM thought auto-captured by user, not companion).
 
@@ -185,10 +185,10 @@ User confirms 2 of 3 proposals; declines social prep. Plan materializes.
 
 | Element | Content |
 |---------|---------|
-| **Momentum Action™** | Launch page final review (90 min block suggested, not mandated) |
-| **Confidence Action™** | Personal note to one early supporter |
-| **Permission Decisions™** | 7 launch tasks excluded with explicit "launch week ≠ today" |
-| **Suggested Focus™** | Review → go-live checklist → stop |
+| **Momentum Action** | Launch page final review (90 min block suggested, not mandated) |
+| **Confidence Action** | Personal note to one early supporter |
+| **Permission Decisions** | 7 launch tasks excluded with explicit "launch week ≠ today" |
+| **Suggested Focus** | Review → go-live checklist → stop |
 | **Left off** | Email sequence, ads, social batch, affiliate setup |
 
 ---
@@ -205,7 +205,7 @@ User picks emails. Companion logs override; permission accuracy signal = `partia
 
 ---
 
-### Reflection Intelligence™
+### Reflection Intelligence
 
 **Surprises:** User completed page review + 2 emails — exceeded proposal but didn't crash.  
 **Learned:** High-energy days: user override rate ↑ — permission should stay firm in *orientation* but accept swap without friction.  
@@ -279,7 +279,7 @@ User picks emails. Companion logs override; permission accuracy signal = `partia
 
 ---
 
-### Reflection Intelligence™
+### Reflection Intelligence
 
 **Surprises:** User didn't open plan after survival confirmation — still valid day.  
 **Learned:** "I can't today" = **confidence signal** (honest boundary), not failure.  
@@ -347,7 +347,7 @@ User picks emails. Companion logs override; permission accuracy signal = `partia
 
 ---
 
-### Reflection Intelligence™
+### Reflection Intelligence
 
 **Learned:** Overwhelm days: **empty materialized plan** is valid outcome.  
 **Changed:** `priorityJudgment` — when `motivation=overwhelmed`, Phase 7 may emit `orientationOnly: true`.  
@@ -400,7 +400,7 @@ User closes modal. Continues work. **Agency preserved** — opening plan was use
 
 ---
 
-### Reflection Intelligence™ (end of day)
+### Reflection Intelligence (end of day)
 
 **Surprises:** 4-hour hyperfocus session; zero plan confirmations; high output.  
 **Learned:** Hyperfocus + completion = momentum success without morning anchor.  
@@ -469,7 +469,7 @@ User closes modal. Continues work. **Agency preserved** — opening plan was use
 
 ---
 
-### Reflection Intelligence™
+### Reflection Intelligence
 
 **Learned:** User self-selected same anchor as Tuesday — **internalized prioritization** (capability growth signal).  
 **Changed:** `confidenceJudgment` — recovery day + user-initiated anchor = strong positive signal.  
@@ -528,7 +528,7 @@ User confirms health plan only. No override.
 
 ---
 
-### Reflection Intelligence™
+### Reflection Intelligence
 
 **Learned:** Health exclusion accuracy = 1.0; strengthens permission on health signals.  
 **Changed:** `permissionJudgment.weights.healthOverride` +0.04.  
@@ -581,7 +581,7 @@ Confirmed. Board shows one item.
 
 ---
 
-### Reflection Intelligence™
+### Reflection Intelligence
 
 **Learned:** Family mode detection from CMM keywords reliable.  
 **Changed:** `relationshipJudgment` — family mode suppresses evening reflection "productivity" framing.  
@@ -649,7 +649,7 @@ User accepts sequence.
 
 ---
 
-### Reflection Intelligence™
+### Reflection Intelligence
 
 **Learned:** Creative days: user may add build — sequence matters (explore → build).  
 **Changed:** `timingJudgment` — creative scatter → enforce sequencing in confirmation, not prohibition.
@@ -717,7 +717,7 @@ No follow-up prompt. No evening "ready for tomorrow?" push.
 
 ---
 
-### Reflection Intelligence™
+### Reflection Intelligence
 
 **Learned:** Celebration days need **24h no-replan cooldown**.  
 **Changed:** `relationshipJudgment.celebrationCooldown` = true.  
@@ -735,7 +735,7 @@ No follow-up prompt. No evening "ready for tomorrow?" push.
 
 ---
 
-# Part II — Companion Judgment Report™
+# Part II — Companion Judgment Report
 
 ## Executive Summary
 
@@ -755,12 +755,12 @@ Ten simulations were run against the Sprint 1 + 1.5 architecture **without produ
 
 | Area | Evidence across simulations |
 |------|----------------------------|
-| **Permission Intelligence™** | Sim 1, 2, 4, 7, 8, 9 — exclusions reduce paralysis; users trust "left off" |
+| **Permission Intelligence** | Sim 1, 2, 4, 7, 8, 9 — exclusions reduce paralysis; users trust "left off" |
 | **Momentum vs urgency** | Sim 1, 2, 6 — anchor = unlock/chain reaction, not due-date panic |
 | **Agency preservation** | Sim 1, 2, 3, 4, 6, 9 — swap, decline, survival, self-select all honored |
 | **Reality alignment** | Sim 3, 7 — low energy/health shrinks scope without guilt |
 | **Reflection loop** | All 10 — bounded judgment patches; no goal overrides |
-| **Confidence Intelligence™** | Sim 3, 6, 10 — evidence-based, never generic hype |
+| **Confidence Intelligence** | Sim 3, 6, 10 — evidence-based, never generic hype |
 | **Relationship tone** | All — user feels understood, not managed |
 | **Anti-dependency** | Sim 6 — user self-selects anchor; positive signal |
 
@@ -904,13 +904,13 @@ Creative days (Sim 9): timeboxed ideation without `PlanDayItem` until user confi
 | Document | Status |
 |----------|--------|
 | Constitution (3 Laws) | **PASS** |
-| Stewardship Oath™ | **PASS** |
+| Stewardship Oath | **PASS** |
 | Dual Mandate | **PASS** |
-| Companion Judgment™ | **PASS** with R1–R5 |
-| Cognitive Audit™ | **PASS** |
-| Relevance Safeguard™ | **PASS** with R3 |
+| Companion Judgment | **PASS** with R1–R5 |
+| Cognitive Audit | **PASS** |
+| Relevance Safeguard | **PASS** with R3 |
 | Decision Filter | **PASS** |
-| Stewardship Review™ | **PASS** |
+| Stewardship Review | **PASS** |
 
 ---
 

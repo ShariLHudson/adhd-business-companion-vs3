@@ -1,5 +1,5 @@
 /**
- * Why today? — presentation of Companion Judgment™, not priority scores.
+ * Why today? — presentation of Companion Judgment, not priority scores.
  */
 
 import type { CompanionJudgmentResult } from "@/lib/companionBrain";

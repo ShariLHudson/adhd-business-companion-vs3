@@ -6,21 +6,21 @@ import {
   violatesSunroomCognitiveRule,
 } from "./index";
 
-describe("Sunroom Over The Pond™ — Focus My Brain™", () => {
+describe("Sunroom Over The Pond — Focus My Brain", () => {
   it("communicates emotional promise and room whispers", () => {
     const verdict = evaluateSunroomOverThePond();
     expect(verdict.emotionalPromise).toBe(SUNROOM_EMOTIONAL_PROMISE);
     expect(verdict.roomWhisper).toMatch(/water|nature|thought|pond/i);
-    expect(verdict.title).toBe("Focus My Brain™");
+    expect(verdict.title).toBe("Focus My Brain");
   });
 
-  it("assigns Nearby™ presence — pond is emotional center, not Shari", () => {
+  it("assigns Nearby presence — pond is emotional center, not Shari", () => {
     const verdict = evaluateSunroomOverThePond();
     expect(verdict.sharisPresenceState).toBe("nearby");
     expect(verdict.dataAttributes["data-sharis-presence"]).toBe("nearby");
   });
 
-  it("uses Pond Anchor™ as signature object", () => {
+  it("uses Pond Anchor as signature object", () => {
     expect(evaluateSunroomOverThePond().signatureObjectId).toBe(
       "sig-pond-anchor",
     );

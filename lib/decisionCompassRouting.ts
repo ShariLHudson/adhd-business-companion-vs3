@@ -97,7 +97,7 @@ export function extractDecisionCompassPrefill(text: string): DecisionCompassPref
 export function buildDecisionCompassOffer(text: string): DecisionCompassOffer {
   const explain = explainFirstOfferForSection(
     "decision-compass",
-    "Decision Compass™",
+    "Decision Compass",
   );
   return {
     prefill: extractDecisionCompassPrefill(text),

@@ -1,6 +1,6 @@
 import type { CompanionObjectCollectionMeta } from "./types";
 
-/** Companion Object Collections™ — permanent groupings for the master catalog. */
+/** Companion Object Collections — permanent groupings for the master catalog. */
 export const COMPANION_OBJECT_COLLECTION_META: readonly CompanionObjectCollectionMeta[] = [
   {
     id: "writing",

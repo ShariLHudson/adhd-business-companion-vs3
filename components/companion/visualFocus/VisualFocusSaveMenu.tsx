@@ -84,7 +84,7 @@ export function VisualFocusSaveMenu({
             className={MENU_DROPDOWN_ITEM}
             onClick={() => act(onSaveVersion)}
           >
-            Save Version™
+            Save Version
           </button>
           <button
             type="button"

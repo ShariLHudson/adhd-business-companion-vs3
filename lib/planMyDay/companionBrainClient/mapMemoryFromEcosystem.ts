@@ -1,5 +1,5 @@
 /**
- * Map ecosystem memory (Today's Reality™, plan items, captures) → Companion Brain™ input.
+ * Map ecosystem memory (Today's Reality, plan items, captures) → Companion Brain input.
  * Experience layer only — brain never imports companionStore or planMyDay internals.
  */
 

@@ -1,5 +1,5 @@
 /**
- * Thought Collections — many-to-many overlays for the Living Intelligence Graph™.
+ * Thought Collections — many-to-many overlays for the Living Intelligence Graph.
  */
 
 import { getBrainDumps, updateBrainDump } from "@/lib/companionStore";

@@ -7,6 +7,7 @@ import {
   type PlanDayJourneyChapter,
 } from "@/lib/planMyDay/companionBrainClient/planDayJourney";
 import { evaluatePlanningTableRoom } from "@/lib/planningTableRoom";
+import { PLAN_MY_DAY_MORNING_COPY } from "@/lib/planMyDay/morningRoom";
 import { EcosystemNavigationBar } from "@/components/companion/EcosystemNavigationBar";
 import { PlanDayHelpIcon } from "@/components/companion/PlanDayHelpIcon";
 import { PlanDayShariPresence } from "@/components/companion/PlanDayShariPresence";
@@ -21,10 +22,26 @@ type Props = {
   headerActions?: React.ReactNode;
   /** Gateway — no help icon competing with Shari */
   hideHelp?: boolean;
+  /** Morning Room — no portrait, no external title chrome */
+  morningRoom?: boolean;
 };
 
+function MorningRoomNav({ onBack }: { onBack: () => void }) {
+  return (
+    <button
+      type="button"
+      className="plan-day-morning-note__previous"
+      onClick={onBack}
+      data-testid="app-back-button"
+    >
+      <span aria-hidden="true">←</span>
+      <span>{PLAN_MY_DAY_MORNING_COPY.previousScreen}</span>
+    </button>
+  );
+}
+
 /**
- * One continuous Plan My Day™ journey — consistent title, shifting subtitle.
+ * One continuous Plan My Day journey — consistent title, shifting subtitle.
  */
 export function PlanDayJourneyShell({
   chapter,
@@ -34,12 +51,26 @@ export function PlanDayJourneyShell({
   children,
   headerActions,
   hideHelp = false,
+  morningRoom = false,
 }: Props) {
   const subtitle = planDayChapterSubtitle(chapter);
   const room = useMemo(
     () => evaluatePlanningTableRoom({ chapter }),
     [chapter],
   );
+
+  if (morningRoom) {
+    return (
+      <div
+        className="plan-day-morning-room-content"
+        data-chapter={chapter}
+        data-room-whisper={room.roomWhisper}
+      >
+        <MorningRoomNav onBack={onBack} />
+        {children}
+      </div>
+    );
+  }
 
   return (
     <div

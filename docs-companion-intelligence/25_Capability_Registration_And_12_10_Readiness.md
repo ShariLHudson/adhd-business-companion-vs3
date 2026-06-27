@@ -89,7 +89,7 @@ recordCapabilityIntervention({
 });
 ```
 
-Required for Adaptive User Intelligence™ and intervention effectiveness analytics.
+Required for Adaptive User Intelligence and intervention effectiveness analytics.
 
 ---
 

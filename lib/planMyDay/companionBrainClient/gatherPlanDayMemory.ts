@@ -1,5 +1,5 @@
 /**
- * Gather ecosystem memory for Plan My Day™ — adapter only, no reasoning.
+ * Gather ecosystem memory for Plan My Day — adapter only, no reasoning.
  */
 
 import { getBrainDumps, getDayState, todayStr } from "@/lib/companionStore";

@@ -1,4 +1,4 @@
-/** Designer Stories™ — Kinsey Collection. Never shown to guests. */
+/** Designer Stories — Kinsey Collection. Never shown to guests. */
 export const KINSEY_DESIGNER_STORIES: Record<string, string> = {
   "obj-kinsey-dog-bed":
     "Kinsey's bed by the couch — she chooses it when the house is calm and Shari is nearby.",

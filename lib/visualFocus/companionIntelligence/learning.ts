@@ -1,5 +1,5 @@
 /**
- * Visual Thinking™ learning — local event store + signal bus + Founder Intelligence™ feed.
+ * Visual Thinking learning — local event store + signal bus + Founder Intelligence feed.
  *
  * The analytics layer learns from interactions; the intelligence layer owns the experience.
  */
@@ -88,7 +88,7 @@ export function emitVisualThinkingSignal(capture: VisualThinkingSessionCapture):
 }
 
 /**
- * Founder Intelligence™ feed — local aggregation today; ecosystem event stream later.
+ * Founder Intelligence feed — local aggregation today; ecosystem event stream later.
  * Event shape is stable for future `visual_thinking.*` ecosystem events.
  */
 export function feedFounderIntelligenceFromVisualThinking(

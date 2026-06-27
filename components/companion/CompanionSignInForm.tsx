@@ -12,6 +12,7 @@ import {
   type AuthLoginMethod,
 } from "@/lib/companionAuthIntelligence";
 import { companionAuthConfigStatus, companionAuthMisconfigHint } from "@/lib/supabase/companionClient";
+import { COMPANION_LOGIN_FORGOT_PASSWORD_LABEL } from "@/lib/companionLoginPage";
 
 type Mode = "signin" | "signup";
 
@@ -111,6 +112,8 @@ export function CompanionSignInForm({
   initialMode = "signin",
   showClose = false,
   variant = "overlay",
+  returning = true,
+  onProcessingChange,
 }: {
   onSuccess?: (method?: AuthLoginMethod) => void;
   onClose?: () => void;
@@ -118,6 +121,10 @@ export function CompanionSignInForm({
   showClose?: boolean;
   /** page = full sign-in screen; overlay = settings sheet */
   variant?: "page" | "overlay";
+  /** false = first-time visitor — Create Account before Sign In */
+  returning?: boolean;
+  /** Login page — porch doorway glow while auth is in flight */
+  onProcessingChange?: (processing: boolean) => void;
 }) {
   const {
     configured,
@@ -144,6 +151,14 @@ export function CompanionSignInForm({
   const [authHint, setAuthHint] = useState<string | null>(null);
   const [showResend, setShowResend] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
+
+  const authProcessing = busy || googleBusy;
+
+  useEffect(() => {
+    if (variant !== "page" || !onProcessingChange) return;
+    onProcessingChange(authProcessing);
+    return () => onProcessingChange(false);
+  }, [authProcessing, onProcessingChange, variant]);
 
   if (loading) {
     return (
@@ -199,10 +214,9 @@ export function CompanionSignInForm({
 
   async function onForgotPassword() {
     if (!configured) {
-      setError(
-        companionAuthMisconfigHint() ??
-          "Sign-in is not live yet on this environment.",
-      );
+      if (!companionAuthMisconfigHint()) {
+        setError("Sign-in is not live yet on this environment.");
+      }
       return;
     }
     if (!email.trim()) {
@@ -231,10 +245,9 @@ export function CompanionSignInForm({
 
   async function onGoogleSignIn() {
     if (!configured) {
-      setError(
-        companionAuthMisconfigHint() ??
-          "Sign-in is not live yet on this environment.",
-      );
+      if (!companionAuthMisconfigHint()) {
+        setError("Sign-in is not live yet on this environment.");
+      }
       return;
     }
     setGoogleBusy(true);
@@ -252,13 +265,16 @@ export function CompanionSignInForm({
     }
   }
 
-  async function onSubmit(e: FormEvent) {
+  async function onSubmit(e: FormEvent, submitMode?: Mode) {
     e.preventDefault();
+    const effectiveMode = submitMode ?? mode;
     if (!configured) {
-      setError(
+      const hint =
         companionAuthMisconfigHint() ??
-          "Sign-in is not live yet — add your Supabase anon key in companion-app/.env.local, then restart npm run dev.",
-      );
+        "Sign-in is not live yet — add your Supabase anon key in companion-app/.env.local, then restart npm run dev.";
+      if (!companionAuthMisconfigHint()) {
+        setError(hint);
+      }
       return;
     }
     setBusy(true);
@@ -266,7 +282,8 @@ export function CompanionSignInForm({
     setNotice(null);
     setAuthHint(null);
     try {
-      if (mode === "signin") {
+      if (submitMode) setMode(submitMode);
+      if (effectiveMode === "signin") {
         const result = await signIn(email, password);
         if (result.error) {
           recordAuthLoginFailure();
@@ -307,6 +324,51 @@ export function CompanionSignInForm({
     variant === "page"
       ? null
       : "Welcome back — pick up where we left off.";
+
+  const pagePrimaryClass =
+    "w-full rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-60";
+  const pageSecondaryClass =
+    "w-full rounded-xl border border-[#d4cdc3]/80 bg-white/70 px-4 py-3 text-sm font-semibold text-[#1e4f4f] transition-colors hover:bg-white disabled:opacity-60";
+
+  const createAccountButton = (
+    <button
+      key="create"
+      type="button"
+      disabled={busy}
+      onClick={(e) => {
+        setMode("signup");
+        void onSubmit(e, "signup");
+      }}
+      className={variant === "page" && !returning ? pagePrimaryClass : pageSecondaryClass}
+    >
+      {busy && mode === "signup" ? "One moment…" : "Create Account"}
+    </button>
+  );
+
+  const signInButton = (
+    <button
+      key="signin"
+      type="button"
+      disabled={busy}
+      onClick={(e) => {
+        setMode("signin");
+        void onSubmit(e, "signin");
+      }}
+      className={variant === "page" && returning ? pagePrimaryClass : pageSecondaryClass}
+    >
+      {busy && mode === "signin" ? "Signing you in…" : t("auth.signIn")}
+    </button>
+  );
+
+  const pageActionButtons =
+    variant === "page"
+      ? returning
+        ? [signInButton, createAccountButton]
+        : [createAccountButton, signInButton]
+      : null;
+
+  const showNameField =
+    mode === "signup" || (variant === "page" && !returning);
 
   return (
     <div className="flex flex-col gap-4">
@@ -372,23 +434,15 @@ export function CompanionSignInForm({
           type="button"
           disabled={googleBusy || !configured}
           onClick={() => void onGoogleSignIn()}
-          className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#d4cdc3] bg-white px-4 py-3 text-base font-semibold text-[#1f1c19] shadow-sm transition-colors hover:bg-[#faf7f2] disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#d4cdc3]/70 bg-white/85 px-4 py-3 text-base font-semibold text-[#1f1c19] transition-colors hover:bg-white disabled:opacity-60"
         >
           <GoogleSignInIcon className="h-5 w-5 shrink-0" />
           {googleBusy ? "One moment…" : "Continue with Google"}
         </button>
       ) : null}
 
-      {mode === "signin" && variant === "page" ? (
-        <div className="flex items-center gap-3">
-          <div className="h-px flex-1 bg-[#e0d8cc]" />
-          <span className="text-xs font-medium text-[#9a8f82]">or</span>
-          <div className="h-px flex-1 bg-[#e0d8cc]" />
-        </div>
-      ) : null}
-
-      <form onSubmit={onSubmit} className="flex flex-col gap-3">
-        {mode === "signup" ? (
+      <form onSubmit={(e) => void onSubmit(e)} className="flex flex-col gap-3">
+        {showNameField ? (
           <label className="flex flex-col gap-1.5 text-sm">
             <span className="font-medium text-[#4b463f]">{t("auth.yourName")}</span>
             <input
@@ -450,48 +504,38 @@ export function CompanionSignInForm({
               disabled={resetBusy}
               className="text-sm font-medium text-[#1e4f4f] hover:underline disabled:opacity-50"
             >
-              {resetBusy ? "Sending…" : "Forgot password?"}
+              {resetBusy ? "Sending…" : COMPANION_LOGIN_FORGOT_PASSWORD_LABEL}
             </button>
           </div>
         ) : null}
 
         {forgotOpen && !notice?.includes("reset link") ? (
           <p className="text-sm text-[#6b635a]">
-            Enter your email above, then tap Forgot password? — we&apos;ll send a
-            gentle reset link.
+            Enter your email above, then tap Forgot password? — we&apos;ll
+            send a gentle reset link.
           </p>
         ) : null}
 
-        <button
-          type="submit"
-          disabled={busy}
-          className="mt-1 rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-60"
-        >
-          {busy
-            ? mode === "signin"
-              ? "Signing you in…"
-              : "One moment…"
-            : mode === "signin"
-              ? t("auth.signIn")
-              : t("auth.createAccount")}
-        </button>
+        {variant === "page" ? (
+          <div className="mt-1 flex flex-col gap-2">{pageActionButtons}</div>
+        ) : (
+          <button
+            type="submit"
+            disabled={busy}
+            className="mt-1 rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-60"
+          >
+            {busy
+              ? mode === "signin"
+                ? "Signing you in…"
+                : "One moment…"
+              : mode === "signin"
+                ? t("auth.signIn")
+                : t("auth.createAccount")}
+          </button>
+        )}
       </form>
 
-      {variant === "page" ? (
-        <button
-          type="button"
-          onClick={() => {
-            setError(null);
-            setNotice(null);
-            setAuthHint(null);
-            setShowResend(false);
-            setMode((m) => (m === "signin" ? "signup" : "signin"));
-          }}
-          className="w-full rounded-xl border border-[#d4cdc3] bg-[#faf7f2] px-4 py-3 text-sm font-semibold text-[#1e4f4f] transition-colors hover:bg-white"
-        >
-          {mode === "signin" ? "Create Account" : "Already have an account? Sign in"}
-        </button>
-      ) : (
+      {variant === "page" ? null : (
         <button
           type="button"
           onClick={() => {

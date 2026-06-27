@@ -28,7 +28,7 @@ function baseEngineInput(
   };
 }
 
-describe("Living Change Engine™", () => {
+describe("Living Change Engine", () => {
   beforeEach(() => {
     clearLivingChangeHistoryForTests();
   });

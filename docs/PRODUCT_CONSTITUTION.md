@@ -1,4 +1,4 @@
-# Product Constitution™
+# Product Constitution
 
 **P0.58 — Permanent governing document for the ADHD Business Ecosystem™**
 
@@ -6,13 +6,13 @@ This is **not** a feature. It is the foundation that every future screen, workfl
 
 **Purpose:** Prevent design drift as the ecosystem grows.
 
-**Authority:** Before activating Companion Brain™ Intelligence or implementing new features, every screen must pass certification through Gate 10. This document governs all compliance decisions.
+**Authority:** Before activating Companion Brain Intelligence or implementing new features, every screen must pass certification through Gate 10. This document governs all compliance decisions.
 
-**Related:** [Development Governance](./DEVELOPMENT_GOVERNANCE.md) · [Screen Certification](./SCREEN_CERTIFICATION.md) · [UX Punch List](./UX_PUNCH_LIST.md) · [Reminder Chat Intake](./REMINDER_CHAT_INTAKE.md)
+**Related:** [Relationship Constitution](./RELATIONSHIP_CONSTITUTION.md) · [Development Governance](./DEVELOPMENT_GOVERNANCE.md) · [Screen Certification](./SCREEN_CERTIFICATION.md) · [UX Punch List](./UX_PUNCH_LIST.md) · [Reminder Chat Intake](./REMINDER_CHAT_INTAKE.md)
 
 ---
 
-## 1. Companion Constitution™
+## 1. Companion Constitution
 
 The user is always in control. The companion exists to **guide—not control**—the conversation.
 
@@ -30,7 +30,7 @@ The user is always in control. The companion exists to **guide—not control**�
 
 ---
 
-## 2. UX Constitution™
+## 2. UX Constitution
 
 Every screen should reduce cognitive load.
 
@@ -49,7 +49,7 @@ Every screen should reduce cognitive load.
 
 ---
 
-## 3. ADHD Constitution™
+## 3. ADHD Constitution
 
 Every screen should support executive functioning.
 
@@ -65,7 +65,7 @@ The companion should help users **move forward**—not simply organize informati
 
 ---
 
-## 4. Emotional Safety Constitution™
+## 4. Emotional Safety Constitution
 
 The emotional experience is as important as functionality.
 
@@ -90,9 +90,9 @@ Confidence reminders must always come from **real user history**.
 
 ---
 
-## 5. Intelligence Constitution™
+## 5. Intelligence Constitution
 
-Every screen contributes to the Companion Brain™.
+Every screen contributes to the Companion Brain.
 
 | Rule | Requirement |
 |------|-------------|
@@ -107,7 +107,7 @@ Every screen contributes to the Companion Brain™.
 
 ---
 
-## 6. Navigation Constitution™
+## 6. Navigation Constitution
 
 Navigation should feel predictable everywhere.
 
@@ -125,7 +125,7 @@ The user should never wonder where they will end up.
 
 ---
 
-## 7. Workflow Constitution™
+## 7. Workflow Constitution
 
 Every workflow should feel complete.
 
@@ -140,13 +140,13 @@ Where appropriate, every workflow must support:
 
 ---
 
-# The Stewardship Review™
+# The Stewardship Review
 
 **Constitutional addition — permanent governance for what remains in the ecosystem**
 
-The [Screen Certification](./SCREEN_CERTIFICATION.md) gates (including Gate 10 — Constitution Compliance™) determine whether a feature is **ready to build and ship**.
+The [Screen Certification](./SCREEN_CERTIFICATION.md) gates (including Gate 10 — Constitution Compliance) determine whether a feature is **ready to build and ship**.
 
-**The Stewardship Review™** determines whether it is **ready to keep**.
+**The Stewardship Review** determines whether it is **ready to keep**.
 
 A feature that once aligned with the Constitution may drift over time — because of new integrations, changing priorities, technical shortcuts, commercial pressure, or simply because the ecosystem has grown around it.
 
@@ -177,7 +177,7 @@ The question is:
 | Would we proudly introduce this experience to someone on one of the hardest days of their life? |
 | If we were building this today from scratch, knowing everything we know now, would we build it the same way? |
 
-## The Drift Test™
+## The Drift Test
 
 Every Stewardship Review ends with one question:
 
@@ -189,8 +189,8 @@ If the answer is software, **redesign begins** — not because the feature faile
 
 | Review | Asks | Protects |
 |--------|------|----------|
-| **Companion Legacy Test™** | What remains in the person's life years from now? | The future |
-| **Stewardship Review™** | Is today's experience still worthy of creating that legacy? | The present |
+| **Companion Legacy Test** | What remains in the person's life years from now? | The future |
+| **Stewardship Review** | Is today's experience still worthy of creating that legacy? | The present |
 
 One protects the future. The other protects the present. **Both are necessary.**
 
@@ -198,8 +198,8 @@ One protects the future. The other protects the present. **Both are necessary.**
 
 | Mechanism | Governs | When |
 |-----------|---------|------|
-| **Screen Certification™** (10 gates) | Ready to build · ready to ship | Before activation and at certification |
-| **Stewardship Review™** | Ready to keep · still constitutional | Periodically after ship; before major extensions |
+| **Screen Certification** (10 gates) | Ready to build · ready to ship | Before activation and at certification |
+| **Stewardship Review** | Ready to keep · still constitutional | Periodically after ship; before major extensions |
 
 The Constitution survives not because it was written once. It survives because **every generation of the product willingly submits itself to it again**.
 
@@ -207,11 +207,11 @@ The Constitution survives not because it was written once. It survives because *
 
 ---
 
-# Conversation Governance™
+# Conversation Governance
 
 Every **guided conversation** (chat intake, builder kickoff, multi-step offers, etc.) must pass all seven scenarios below.
 
-Use this checklist when certifying Chat™, Reminder Center™ chat intake, Create discovery, Visual Thinking guidance, Outcome Goals coaching flows, and any new guided workflow.
+Use this checklist when certifying Chat, Reminder Center chat intake, Create discovery, Visual Thinking guidance, Outcome Goals coaching flows, and any new guided workflow.
 
 ## Scenario 1 — Happy Path
 
@@ -275,14 +275,14 @@ The companion understands conversational answers—not exact keywords.
 
 Before implementing **any** new feature, ask:
 
-1. **Does it violate the Product Constitution™?**
+1. **Does it violate the Product Constitution?**
 2. **Does it make the experience simpler?**
 3. **Does it help the user make a better decision, reduce overwhelm, or move their business forward?**
-4. **If this ships, will it still pass the [Stewardship Review™](#the-stewardship-review) in six months?**
+4. **If this ships, will it still pass the [Stewardship Review](#the-stewardship-review) in six months?**
 
 If the answer to any of these is **no**, redesign the feature before implementation.
 
-Full product-thinking standard: [Development Governance™](./DEVELOPMENT_GOVERNANCE.md) (12 rules + final principle).
+Full product-thinking standard: [Development Governance](./DEVELOPMENT_GOVERNANCE.md) (12 rules + final principle).
 
 ---
 
@@ -292,7 +292,7 @@ The ADHD Business Ecosystem™ should not feel like dozens of separate tools.
 
 It should feel like **one calm, intelligent companion** with a consistent personality, predictable behavior, and growing understanding of the user's business and journey.
 
-The Product Constitution™ is the permanent foundation that keeps every future feature aligned with that vision.
+The Product Constitution is the permanent foundation that keeps every future feature aligned with that vision.
 
 ---
 
@@ -307,6 +307,6 @@ The Product Constitution™ is the permanent foundation that keeps every future 
 | Intelligence | Gate 9 + Gate 10 | §5 |
 | Navigation | Gate 2 + Gate 10 | §6 |
 | Workflow | Gate 1 + Gate 10 | §7 |
-| Stewardship (ongoing) | Stewardship Review™ | [The Stewardship Review™](#the-stewardship-review) |
+| Stewardship (ongoing) | Stewardship Review | [The Stewardship Review](#the-stewardship-review) |
 
 Screen certification details: [SCREEN_CERTIFICATION.md](./SCREEN_CERTIFICATION.md)

@@ -153,7 +153,7 @@ function narrativeForMotion(
 }
 
 /**
- * Environmental Truth™ — every motion must trace to a cause.
+ * Environmental Truth — every motion must trace to a cause.
  */
 export function resolveEnvironmentalTruth(
   input: EnvironmentalTruthInput,

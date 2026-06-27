@@ -1,5 +1,5 @@
 /**
- * Cognitive Audit™ — constitutional gate before output.
+ * Cognitive Audit — constitutional gate before output.
  * @see constitution.ts — runCognitiveAudit
  */
 

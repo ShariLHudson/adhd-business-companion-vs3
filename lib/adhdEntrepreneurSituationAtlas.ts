@@ -1,5 +1,5 @@
 /**
- * ADHD Entrepreneur Situation Atlas™
+ * ADHD Entrepreneur Situation Atlas
  *
  * Situation intelligence — not questions, not keywords, not prompts.
  * Maps recurring human situations to actual needs, patterns, and interventions.
@@ -1133,7 +1133,7 @@ export function situationAtlasHintForChat(resolution: SituationResolution): stri
   const interventions = entry?.recommendedInterventions.slice(0, 3).join(", ") ?? "";
 
   return [
-    "SITUATION ATLAS™ (recognize situations, not keywords):",
+    "SITUATION ATLAS (recognize situations, not keywords):",
     `Human situation: ${resolution.situationName} (${resolution.category?.replace(/_/g, " ") ?? "general"}).`,
     `Respond to the situation — not only the exact words used.`,
     resolution.actualNeed
@@ -1171,7 +1171,7 @@ export function getAtlasValidationCoverage(): {
   };
 }
 
-// ─── Atlas Growth System™ ─────────────────────────────────────────────────────
+// ─── Atlas Growth System ─────────────────────────────────────────────────────
 
 function readJson<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;

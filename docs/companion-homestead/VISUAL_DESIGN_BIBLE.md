@@ -1,9 +1,9 @@
-# Companion Homestead™ Visual Design Bible
+# Companion Homestead Visual Design Bible
 ## The Visual Constitution — Before A Single Room Is Designed
 
 **Version:** 1.0  
 **Status:** Canonical — awaiting approval  
-**Authority:** Subordinate to Product Constitution™ · Companion Constitution™ · [`EXPERIENCE_OF_SHARI.md`](../EXPERIENCE_OF_SHARI.md)  
+**Authority:** Subordinate to Product Constitution · Companion Constitution · [`EXPERIENCE_OF_SHARI.md`](../EXPERIENCE_OF_SHARI.md)  
 **Governs:** Every room · object · navigation card · photograph · illustration · motion layer · animation
 
 **Sibling documents:**
@@ -11,8 +11,8 @@
 - `docs/companion-homestead/MASTER_PLAN.md` — condensed site & room placement reference
 - `docs/companion-homestead/LOOK_BOOK.md` — per-room environmental specs (must conform to **this** bible)
 - `docs/COMPANION_JOURNEY_EXPERIENCE_BIBLE.md` — emotional blueprint
-- `lib/companionUniverse/libraries/objectLibrary.ts` — Companion Object Library™ (feature mapping)
-- `lib/companionObjectsDesignSystem/` — Companion Objects™ Design System master catalog
+- `lib/companionUniverse/libraries/objectLibrary.ts` — Companion Object Library (feature mapping)
+- `lib/companionObjectsDesignSystem/` — Companion Objects Design System master catalog
 - `lib/companionUniverse/libraries/placeLibrary.ts` — room registry
 
 **This is not:** a UI component spec · a Figma file · a room-by-room look book · a logo brand guide
@@ -25,7 +25,7 @@ Think like **Disney Imagineering**, **Pixar environmental artists**, and an **in
 
 ## The One Recognition Test
 
-A guest moves from the Living Room™ to the Focus Studio™ to the Garden™ — completely different purposes, completely different moods.
+A guest moves from the Living Room to the Focus Studio to the Garden — completely different purposes, completely different moods.
 
 They must still immediately feel:
 
@@ -41,7 +41,7 @@ Different rooms. Same home. Same handwriting in the details.
 |-------|----------|---------------------|
 | 1 | **Master Property Blueprint** | What is the entire place? Where does everything belong? |
 | 2 | **Visual Design Bible** (this document) | What materials, light, and object style repeat everywhere? |
-| 3 | Companion Needs Intelligence™ | What does the guest need right now? |
+| 3 | Companion Needs Intelligence | What does the guest need right now? |
 | 4 | Look Book (per room) | How does each room express the blueprint + bible? |
 | 5 | Production art & scenes | Photographs, objects, motion, audio |
 
@@ -176,7 +176,7 @@ Shari's art is **personal, eclectic, and curated over years** — not a single s
 - **Framed photographs** — family, travel, the land; mismatched frames united by mat cream
 - **Children's art in real frames** — rotated, honored, not fridge-magnet only
 - **Pinned inspiration** — creative studio only; cork, not sterile mood boards
-- **Nobody Gave Me the Manual™** — sticky notes, index cards, handwritten truths on surfaces (environmental storytelling, not UI copy)
+- **Nobody Gave Me the Manual** — sticky notes, index cards, handwritten truths on surfaces (environmental storytelling, not UI copy)
 - **Never:** Stock "inspirational" office art, AI generic landscapes, empty walls in lived-in rooms
 
 ---
@@ -403,7 +403,7 @@ Guests recognize the home through **repeated evidence**, not repeated layouts.
 
 ---
 
-# Part IV — Companion Object Style™
+# Part IV — Companion Object Style
 
 Before creating icons, illustrations, or 3D assets — **one art style governs all**.
 
@@ -419,7 +419,7 @@ Before creating icons, illustrations, or 3D assets — **one art style governs a
 
 ### Canonical style name
 
-**Warm Homestead Realism™**
+**Warm Homestead Realism**
 
 > Natural materials rendered with soft depth, morning-window light, and premium craftsmanship. Never clip art. Never corporate icon sets. Never emoji substitutes at ship quality.
 
@@ -470,7 +470,7 @@ An object ships when:
 
 ---
 
-# Part V — Navigation Card Philosophy™
+# Part V — Navigation Card Philosophy
 
 The **card structure stays**. ADHD-friendly navigation stays. The **visual language evolves** from software buttons to **room invitations**.
 
@@ -501,7 +501,7 @@ Not: a feature tile. Not: a dashboard widget. Not: a call-to-action screaming fo
 ```
 
 - **Mini-scene:** `CompanionObjectVisual` at `card` size — glimpse into room atmosphere gradient + object silhouette
-- **Title:** Semibold, Ink Brown — room or tool name with ™ where canonical
+- **Title:** Semibold, Ink Brown — room or tool name with  where canonical
 - **Tagline:** Soft Umber, one line — emotional invitation, not feature description
 
 ## Hover & motion
@@ -530,7 +530,7 @@ Every navigation card's mini-scene uses **`data-companion-room`** atmosphere gra
 
 ---
 
-# Part VI — Environmental Storytelling™
+# Part VI — Environmental Storytelling
 
 The home reveals personality **over months** — not in one tutorial.
 
@@ -560,7 +560,7 @@ The home reveals personality **over months** — not in one tutorial.
 
 ---
 
-# Part VII — Emotional Design Rules™
+# Part VII — Emotional Design Rules
 
 Every visual decision must pass **all seven**:
 
@@ -583,12 +583,12 @@ Every visual decision must pass **all seven**:
 ## What this bible governs
 
 - [ ] Room photographs and scene presets  
-- [ ] Companion Object Library™ illustrations  
+- [ ] Companion Object Library illustrations  
 - [ ] Navigation cards and mini-scenes  
 - [ ] Motion and audio layers  
 - [ ] Seasonal and hospitality overlays  
 - [ ] Marketing and onboarding imagery  
-- [ ] Director's Studio™ scene validation  
+- [ ] Director's Studio scene validation  
 
 ## Approval workflow
 
@@ -602,7 +602,7 @@ Every visual decision must pass **all seven**:
 ## When to amend this bible
 
 - New material family introduced (e.g., tile change)  
-- Companion Object Style™ levels up (photo → 3D)  
+- Companion Object Style levels up (photo → 3D)  
 - **Never** amend for one room's one-off exception — rooms adapt to bible  
 
 ---
@@ -613,10 +613,10 @@ Every visual decision must pass **all seven**:
 
 1. Validate `LOOK_BOOK.md` room entries against this constitution — align or revise  
 2. Commission **reference photography mood board** — one sheet per lighting condition  
-3. Produce **first Companion Object** at Warm Homestead Realism™ ship quality (Spark mug)  
+3. Produce **first Companion Object** at Warm Homestead Realism ship quality (Spark mug)  
 4. Update `companion-object.css` placeholders to match palette tokens formally  
-5. Design **Living Room™** first production scene — arrival is the front door of the product  
-6. Roll room-by-room through Director's Studio™ with bible checklist  
+5. Design **Living Room** first production scene — arrival is the front door of the product  
+6. Roll room-by-room through Director's Studio with bible checklist  
 
 ---
 
@@ -631,11 +631,11 @@ Walls:         Homestead Cream #FAF7F2 · plaster depth
 Accent:        Barn Red #8B3A3A · Companion Teal UI only #1E4F4F
 Light:         2700K lamps · golden hour · Iowa sky honest
 Objects:       Books · mugs · journals · plants · handwritten notes
-Object style:  Warm Homestead Realism™ — semi-realistic, soft light, transparent
+Object style:  Warm Homestead Realism — semi-realistic, soft light, transparent
 Cards:         Paper invitations · mini-scene glimpse · 16px radius · calm hover
 Test:          "I'm still at Shari's."
 ```
 
 ---
 
-*Companion Homestead™ Visual Design Bible v1.0 — Design the house before we design the rooms.*
+*Companion Homestead Visual Design Bible v1.0 — Design the house before we design the rooms.*

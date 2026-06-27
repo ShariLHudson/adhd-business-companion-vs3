@@ -1,61 +1,33 @@
 "use client";
 
-import { ShariPortrait } from "@/components/companion/ShariPortrait";
 import type { MorningPresenceResult } from "@/lib/companionBrain";
-import { useCompanionPresence } from "@/lib/useCompanionPresence";
 
 type Props = {
   presence: MorningPresenceResult;
 };
 
-function morningLineClass(tone: "primary" | "secondary"): string {
-  return tone === "secondary"
-    ? "plan-day-morning-presence__line plan-day-morning-presence__line--secondary"
-    : "plan-day-morning-presence__line plan-day-morning-presence__line--primary";
-}
-
 /**
- * Morning Presence™ — unmistakably Shari noticing the day before any plan.
+ * Morning presence — text only; the room holds the warmth, not a portrait.
  */
 export function PlanDayMorningPresence({ presence }: Props) {
-  const photoPresence = useCompanionPresence({
-    workspacePanel: "plan-my-day",
-    calmHome: true,
-    presenceSurface: "morning-presence",
-  });
-
   const lines = [
-    ...(presence.lead
-      ? [{ text: presence.lead, tone: "secondary" as const }]
-      : []),
-    ...presence.lines.map((text) => ({
-      text,
-      tone: "primary" as const,
-    })),
-  ].filter((line) => line.text);
+    ...(presence.lead ? [presence.lead] : []),
+    ...presence.lines,
+  ].filter(Boolean);
 
-  const ariaLabel = [presence.lead, ...presence.lines]
-    .filter(Boolean)
-    .join(" ");
+  if (!lines.length) return null;
 
   return (
-    <article
-      className="plan-day-morning-presence plan-day-morning-presence-enter"
-      aria-label={ariaLabel}
-      data-testid="plan-day-morning-presence"
+    <div
+      className="plan-day-morning-presence plan-day-morning-presence--text-only"
+      data-testid="plan-day-morning-presence-legacy"
+      aria-hidden
     >
-      <div className="plan-day-morning-presence__moment">
-        <div className="plan-day-morning-presence__portrait">
-          <ShariPortrait presence={photoPresence} size="companion" alt="" />
-        </div>
-        <div className="plan-day-morning-presence__copy">
-          {lines.map((line, index) => (
-            <p key={`${line.text}-${index}`} className={morningLineClass(line.tone)}>
-              {line.text}
-            </p>
-          ))}
-        </div>
-      </div>
-    </article>
+      {lines.map((line) => (
+        <p key={line} className="plan-day-morning-presence__line">
+          {line}
+        </p>
+      ))}
+    </div>
   );
 }

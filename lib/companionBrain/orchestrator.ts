@@ -1,5 +1,5 @@
 /**
- * Companion Brain™ orchestrator — reasoning cycle entry point.
+ * Companion Brain orchestrator — reasoning cycle entry point.
  * Pages call this. The brain never calls pages.
  */
 
@@ -28,7 +28,7 @@ export function runReflectionCycle(input: ReflectionInput): ReflectionResult {
   return result;
 }
 
-/** Companion Brain™ — permanent reasoning center. */
+/** Companion Brain — permanent reasoning center. */
 export const CompanionBrain = {
   runReasoningCycle,
   runReflectionCycle,

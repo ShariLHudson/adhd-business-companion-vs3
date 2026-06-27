@@ -32,16 +32,19 @@ describe("arrivalIntelligence", () => {
     expect(intel.visitorKind).toBe("first_onboarding");
     expect(intel.chrome.navVisibility).toBe("hidden");
     expect(intel.chrome.autoFocusInput).toBe(false);
-    expect(intel.welcomeLine).toMatch(/make yourself at home|welcome|here for you/i);
-    expect(intel.inviteQuestion).toMatch(/brought you (?:by|in)|on your mind today/i);
-    expect(intel.openingMessage).toMatch(/make yourself at home|welcome|here for you/i);
+    expect(intel.welcomeLine).toMatch(/welcome/i);
+    expect(intel.greetingHeadline).toMatch(/welcome/i);
+    expect(intel.greetingBody).toMatch(/glad you're here/i);
+    expect(intel.inviteQuestion).toMatch(/brought you in/i);
+    expect(intel.openingMessage).toBe(intel.greetingHeadline);
     expect(intel.welcomePresence?.greetingCategory).toBe("day_one");
     expect(intel.livingRoom?.layer1.id).toBeTruthy();
-    expect(intel.livingRoom?.layer4.greeting).toBe(intel.welcomePresence?.greeting);
+    expect(intel.livingRoom?.layer4.greeting).toBe(intel.greetingHeadline);
     expect(intel.chatPlaceholder).toMatch(/listening/i);
     expect(intel.contextualButtonLabel).toBeNull();
     expect(intel.showContinueList).toBe(false);
     expect(intel.isFirstMeeting).toBe(true);
+    expect(intel.livingHome).toBeTruthy();
   });
 
   it("renders QUIET_PRESENCE when onboarding user returns without threads", () => {
@@ -52,7 +55,7 @@ describe("arrivalIntelligence", () => {
     expect(intel.chrome.navVisibility).toBe("calm");
     expect(intel.openingMessage.length).toBeGreaterThan(0);
     expect(intel.inviteQuestion).toMatch(
-      /on your mind|arriving|important|begin|reset|story|help|sleep/i,
+      /on your mind|brought you|keep talking|morning feeling|day been/i,
     );
     expect(intel.contextualButtonLabel).toBeNull();
     expect(intel.isFirstMeeting).toBe(false);
@@ -82,7 +85,7 @@ describe("arrivalIntelligence", () => {
     expect(intel.visitorKind).toBe("returning");
     expect(intel.openingMessage.length).toBeGreaterThan(0);
     expect(intel.inviteQuestion).toMatch(
-      /on your mind|arriving|important|begin|reset|story|help|sleep/i,
+      /on your mind|brought you|keep talking|morning feeling|day been/i,
     );
     expect(intel.openingMessage).not.toMatch(/learn the app/i);
     expect(intel.isFirstMeeting).toBe(false);
@@ -120,8 +123,9 @@ describe("arrivalIntelligence", () => {
     expect(intel.chrome.navVisibility).toBe("muted");
     expect(intel.chrome.layout).toBe("welcome-scene");
     expect(intel.livingRoom?.layer1.id).toBeTruthy();
-    expect(intel.openingMessage).toMatch(/newsletter launch/i);
-    expect(intel.inviteQuestion).toMatch(/pick up where we left off|keep talking/i);
+    expect(intel.openingMessage).not.toMatch(/newsletter launch/i);
+    expect(intel.greetingBody).toMatch(/newsletter launch/i);
+    expect(intel.inviteQuestion).toMatch(/keep talking/i);
     expect(intel.contextualButtonLabel).toBe("Continue");
   });
 

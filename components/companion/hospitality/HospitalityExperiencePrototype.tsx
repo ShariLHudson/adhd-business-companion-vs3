@@ -284,7 +284,7 @@ export function HospitalityExperiencePrototype() {
 
       {studioEnabled && !presentationMode ? (
         <p className="hospitality-experience__hint">
-          Director&apos;s Studio™ demo — add ?present=1 for Presentation Mode
+          Director&apos;s Studio demo — add ?present=1 for Presentation Mode
         </p>
       ) : null}
     </div>

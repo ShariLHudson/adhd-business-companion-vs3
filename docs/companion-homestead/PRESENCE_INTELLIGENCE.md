@@ -1,10 +1,10 @@
-# Presence Intelligence™
-## Companion Homestead™ — Prepared, Not Customized
+# Presence Intelligence
+## Companion Homestead — Prepared, Not Customized
 
 **Version:** 1.0  
 **Status:** Canonical design authority — governs preparation, posture, and every sign of care before words  
-**Authority:** Subordinate to Product Constitution™ · Companion Constitution™ · [`EXPERIENCE_OF_SHARI.md`](../EXPERIENCE_OF_SHARI.md) · [`COMPANION_HOMESTEAD_MANIFESTO.md`](../COMPANION_HOMESTEAD_MANIFESTO.md)  
-**Sibling documents:** [`EMOTIONAL_EXPERIENCE_BLUEPRINT.md`](./EMOTIONAL_EXPERIENCE_BLUEPRINT.md) · [`JOURNEY_BETWEEN_ROOMS.md`](./JOURNEY_BETWEEN_ROOMS.md) · [`WISDOM_OF_RESTRAINT.md`](./WISDOM_OF_RESTRAINT.md) · [`Shari Voice Bible™`](../../lib/shariVoiceBible/CONSTITUTION.md)  
+**Authority:** Subordinate to Product Constitution · Companion Constitution · [`EXPERIENCE_OF_SHARI.md`](../EXPERIENCE_OF_SHARI.md) · [`COMPANION_HOMESTEAD_MANIFESTO.md`](../COMPANION_HOMESTEAD_MANIFESTO.md)  
+**Sibling documents:** [`EMOTIONAL_EXPERIENCE_BLUEPRINT.md`](./EMOTIONAL_EXPERIENCE_BLUEPRINT.md) · [`JOURNEY_BETWEEN_ROOMS.md`](./JOURNEY_BETWEEN_ROOMS.md) · [`WISDOM_OF_RESTRAINT.md`](./WISDOM_OF_RESTRAINT.md) · [`Shari Voice Bible`](../../lib/shariVoiceBible/CONSTITUTION.md)  
 **Implementation:** [`lib/presenceIntelligence/`](../../lib/presenceIntelligence/)
 
 **This is not:**
@@ -30,7 +30,7 @@
 
 ## The mission
 
-Build **Presence Intelligence™** — not recommendation intelligence, not memory, not personalization.
+Build **Presence Intelligence** — not recommendation intelligence, not memory, not personalization.
 
 The user should never think: *"The app remembered me."*  
 They should think: *"Shari thought about me."*
@@ -203,4 +203,4 @@ No room ships Presence-facing copy or preparation narration without passing:
 - [ ] `guestPreparation.line` is null in normal UX
 - [ ] Prior-thread questions use `presence_wonder`, not topic citation
 - [ ] Design review checklist completed for the room
-- [ ] Shari Test™: would a friend do this without explaining?
+- [ ] Shari Test: would a friend do this without explaining?

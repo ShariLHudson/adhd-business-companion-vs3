@@ -90,6 +90,12 @@ import {
   companionDecisionIntelligenceHintForChat,
   type CompanionDecisionIntelligence,
 } from "./companionDecisionIntelligence";
+import {
+  createConversationCommitment,
+  resolveConversationCommitment,
+  type CommitmentResolution,
+  type PendingConversationCommitment,
+} from "./conversationCommitmentEngine";
 
 export type UserStateSnapshot = {
   emotionalState: EmotionalState;
@@ -122,6 +128,7 @@ export type CompanionTurnIntelligence = {
 };
 
 export type CompanionAcceptanceResolution =
+  | { kind: "commitment"; resolution: CommitmentResolution }
   | { kind: "workflow"; continuation: WorkflowContinuationResult }
   | { kind: "pending"; result: ResolvePendingAcceptanceResult }
   | { kind: "none" };
@@ -290,26 +297,36 @@ export function trackConversationOffer(input: {
   workspaceOffer?: WorkspaceOffer | null;
 }): {
   workflow: ConversationWorkflow | null;
+  commitment: PendingConversationCommitment | null;
 } {
+  const commitment =
+    createConversationCommitment(input.offerLine, input.offeredAtTurn) ??
+    (input.workspaceOffer?.line
+      ? createConversationCommitment(
+          input.workspaceOffer.line,
+          input.offeredAtTurn,
+        )
+      : null);
+
   const fromLine = createConversationWorkflow(
     input.offerLine,
     input.offeredAtTurn,
   );
-  if (fromLine) return { workflow: fromLine };
+  if (fromLine) return { workflow: fromLine, commitment };
 
   if (input.workspaceOffer) {
     const workflow = createConversationWorkflow(
       input.workspaceOffer.line,
       input.offeredAtTurn,
     );
-    return { workflow };
+    return { workflow, commitment };
   }
 
-  return { workflow: null };
+  return { workflow: null, commitment };
 }
 
 /**
- * Resolve yes / sure / let's do it — workflow first, then pending acceptance.
+ * Resolve yes / sure / let's do it — pending commitment first, then workflow, then pending acceptance.
  * Reduces generic "what would you like help with next?" when Shari asked a question.
  */
 export function resolveCompanionAcceptanceTurn(input: {
@@ -317,6 +334,9 @@ export function resolveCompanionAcceptanceTurn(input: {
   lastAssistantText: string;
   currentTurn: number;
   workflow: ConversationWorkflow | null;
+  commitment?: PendingConversationCommitment | null;
+  lastConsumedCommitmentId?: string | null;
+  hasRealArtifactDraft?: boolean;
   pendingInput: Omit<
     ResolvePendingAcceptanceInput,
     "userText" | "lastAssistantText" | "currentTurn"
@@ -324,7 +344,29 @@ export function resolveCompanionAcceptanceTurn(input: {
   outcomeThread?: OutcomeThread | null;
 }): CompanionAcceptanceResolution {
   const t = input.userText.trim();
-  if (!t || !isAcceptanceAttempt(t)) return { kind: "none" };
+  if (!t) return { kind: "none" };
+
+  const commitmentResolution = resolveConversationCommitment({
+    userText: t,
+    commitment: input.commitment ?? null,
+    lastConsumedId: input.lastConsumedCommitmentId,
+    currentTurn: input.currentTurn,
+    outcomeThread: input.outcomeThread,
+    hasRealArtifactDraft: input.hasRealArtifactDraft,
+  });
+
+  if (input.commitment) {
+    if (
+      commitmentResolution.outcome !== "not_commitment_reply" &&
+      commitmentResolution.outcome !== "expired"
+    ) {
+      return { kind: "commitment", resolution: commitmentResolution };
+    }
+  } else if (commitmentResolution.outcome === "duplicate") {
+    return { kind: "commitment", resolution: commitmentResolution };
+  }
+
+  if (!isAcceptanceAttempt(t)) return { kind: "none" };
 
   const fromState = input.workflow
     ? resolveConversationWorkflowAcceptance({

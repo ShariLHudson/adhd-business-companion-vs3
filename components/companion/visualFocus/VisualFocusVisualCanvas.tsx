@@ -54,7 +54,7 @@ export function VisualFocusVisualCanvas({
     return (
       <BusinessCanvasVisualGrid
         layout={layout}
-        centerTitle={centerTitle ?? "Business Canvas™"}
+        centerTitle={centerTitle ?? "Business Canvas"}
       />
     );
   }

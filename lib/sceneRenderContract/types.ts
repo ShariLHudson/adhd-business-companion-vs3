@@ -1,5 +1,5 @@
 /**
- * Scene Render Contract™ — every workspace is a scene, not a page.
+ * Scene Render Contract — every workspace is a scene, not a page.
  * Pipeline: SceneState → SceneResolver → SceneLayoutEngine → SceneRenderer → UI
  */
 
@@ -11,6 +11,7 @@ import type { PresenceState } from "@/lib/companionConstitution/presenceIntellig
 export const SCENE_WORKSPACE_IDS = [
   "clear-my-mind",
   "clear-my-mind-thoughts",
+  "life-experience-room",
   "plan-my-day",
   "focus-hub",
   "focus-category",

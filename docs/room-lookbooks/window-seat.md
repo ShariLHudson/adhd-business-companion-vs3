@@ -1,4 +1,4 @@
-# Window Seat™ — Room Look Book
+# Window Seat — Room Look Book
 
 **Place ID:** `window-seat`  
 **Status:** Design authority — Phase 1 (no UI implementation)  
@@ -8,9 +8,9 @@
 
 ## Purpose
 
-The Window Seat™ is architecture for **unloading** — where thoughts land before they are sorted, fixed, or turned into tasks.
+The Window Seat is architecture for **unloading** — where thoughts land before they are sorted, fixed, or turned into tasks.
 
-It exists for **Clear My Mind™**. Capture without commitment. Rain without verdict.
+It exists for **Clear My Mind**. Capture without commitment. Rain without verdict.
 
 **Emotional need served:** "I don't have to carry this alone — I can put it down."
 
@@ -20,13 +20,13 @@ Built-in alcove: deep cushion, wide glass, wool blanket reachable with one hand.
 
 ---
 
-## Emotional Promise™
+## Emotional Promise
 
 **When someone leaves this room…** they feel **lighter** — not fixed, not analyzed — carrying hard thoughts at a lower volume.
 
 ---
 
-## Signature Feature™
+## Signature Feature
 
 ### The Iowa view
 
@@ -92,7 +92,7 @@ No typing animations demanding performance. No pulsing capture buttons.
 
 ---
 
-## Companion Presence™
+## Companion Presence
 
 **Nearby — quiet listener.**
 
@@ -106,7 +106,7 @@ Silence is hospitality. She does not fix, pattern-diagnose, or turn capture into
 
 ---
 
-## Kinsey™
+## Kinsey
 
 **Sleeping — occasionally present.**
 
@@ -117,7 +117,7 @@ Kinsey may be curled on the floor pillow at the foot of the seat — breathing a
 
 ---
 
-## Companion Objects™
+## Companion Objects
 
 | Registry ID | Object name | Role in room |
 |-------------|-------------|--------------|
@@ -125,11 +125,11 @@ Kinsey may be curled on the floor pillow at the foot of the seat — breathing a
 
 **Environmental:** window blanket, side cubby books (unassigned), candle (often unlit), forgotten cup forgiven, garden stone.
 
-Strategies deck and reading glasses belong in Reading Nook™ — not primary here.
+Strategies deck and reading glasses belong in Reading Nook — not primary here.
 
 ---
 
-## UI Language™
+## UI Language
 
 | Element | Rule |
 |---------|------|
@@ -145,7 +145,7 @@ Conversation **minimal** — lower-third whisper chip. Clear My Mind is the expe
 
 ---
 
-## Never In This Room™
+## Never In This Room
 
 - Kanban boards, priority matrices on capture screen
 - AI "you seem stressed" pattern callouts on first keystroke
@@ -158,7 +158,7 @@ Conversation **minimal** — lower-third whisper chip. Clear My Mind is the expe
 
 ---
 
-## ADHD Rules™
+## ADHD Rules
 
 | Challenge | How the room helps |
 |-----------|-------------------|
@@ -171,7 +171,7 @@ Conversation **minimal** — lower-third whisper chip. Clear My Mind is the expe
 
 ---
 
-## Seasonal Notes™
+## Seasonal Notes
 
 - **Spring:** Buds on oak inches from glass; lighter blanket; rain frequent
 - **Summer:** Thunderstorms then green; blanket pushed aside; window may crack
@@ -182,6 +182,6 @@ View changes; alcove architecture does not.
 
 ---
 
-## Final Feeling™
+## Final Feeling
 
 **I put some of it down — and the world is still there, moving, without needing me to hold all of it.**

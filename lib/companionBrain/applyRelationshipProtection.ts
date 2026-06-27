@@ -1,5 +1,5 @@
 /**
- * Relationship Protection™ — anti-intrusion, anti-dependency.
+ * Relationship Protection — anti-intrusion, anti-dependency.
  * @see constitution.ts — applyRelationshipProtection
  */
 

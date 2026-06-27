@@ -1,8 +1,8 @@
 /**
- * Companion Intelligence™ Ecosystem — future-first architecture types.
+ * Companion Intelligence Ecosystem — future-first architecture types.
  *
  * Build simple user experiences. Build powerful architecture underneath.
- * Spec: Future-First Architecture Rule (Companion Intelligence™ Ecosystem).
+ * Spec: Future-First Architecture Rule (Companion Intelligence Ecosystem).
  */
 
 /** Three-layer value every major feature must define. */
@@ -16,8 +16,8 @@ export type ThreeLayerFeatureValue = {
 };
 
 /**
- * Companion Intelligence™ owns the experience — canonical pipeline for major features.
- * Visual Thinking™ maps to a subset via `visualThinkingPipelineStage`.
+ * Companion Intelligence owns the experience — canonical pipeline for major features.
+ * Visual Thinking maps to a subset via `visualThinkingPipelineStage`.
  */
 export type CompanionIntelligencePipelineStage =
   | "user_situation"
@@ -60,16 +60,16 @@ export type IntelligencePatternCategory =
 
 export const INTELLIGENCE_PATTERN_LABELS: Record<IntelligencePatternCategory, string> =
   {
-    founder_decision: "Founder Decision Patterns™",
-    founder_momentum: "Founder Momentum Patterns™",
-    overwhelm: "Overwhelm Patterns™",
-    business_growth: "Business Growth Patterns™",
-    planning: "Planning Patterns™",
-    content_creation: "Content Creation Patterns™",
-    execution: "Execution Patterns™",
-    energy: "Energy Patterns™",
-    confidence: "Confidence Patterns™",
-    opportunity: "Opportunity Patterns™",
+    founder_decision: "Founder Decision Patterns",
+    founder_momentum: "Founder Momentum Patterns",
+    overwhelm: "Overwhelm Patterns",
+    business_growth: "Business Growth Patterns",
+    planning: "Planning Patterns",
+    content_creation: "Content Creation Patterns",
+    execution: "Execution Patterns",
+    energy: "Energy Patterns",
+    confidence: "Confidence Patterns",
+    opportunity: "Opportunity Patterns",
   };
 
 export type EcosystemMajorSystemId =

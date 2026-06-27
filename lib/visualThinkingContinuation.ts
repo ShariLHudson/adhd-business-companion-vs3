@@ -1,5 +1,5 @@
 /**
- * P0.20 — Visual Thinking Studio™ continuation
+ * P0.20 — Visual Thinking Studio continuation
  * Path B menu offers and selection handling.
  */
 

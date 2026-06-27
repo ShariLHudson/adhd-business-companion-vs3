@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+import { FocusMyBrainRoomShell } from "@/components/companion/FocusMyBrainRoomShell";
 import {
   FOCUS_FEELING_ENTRIES,
   focusFeelingById,
@@ -10,11 +11,8 @@ import {
   type FocusHubToolGroup,
 } from "@/lib/focusHub";
 import { evaluateFocusLandscape, spaceForFocusTool } from "@/lib/focusLandscape";
+import { FOCUS_MY_BRAIN_ROOM_COPY } from "@/lib/focusMyBrain/focusRoom";
 import { initialSectionOpen } from "@/lib/expandableUi";
-import { SceneRenderer } from "@/components/companion/scene/SceneRenderer";
-import { createSceneState } from "@/lib/sceneRenderContract";
-import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
-import { CompanionNavCard } from "@/components/companion/CompanionNavCard";
 
 function ToolButton({
   item,
@@ -31,7 +29,7 @@ function ToolButton({
       onClick={() => onSelect(item.action)}
       data-testid={`focus-tool-${item.id}`}
       data-focus-landscape-target={spaceForFocusTool(item.id) ?? undefined}
-      className="flex w-full items-start gap-2 rounded-xl border border-[#e4ddd2] bg-[#faf7f2] px-3 py-2.5 text-left transition-colors hover:border-[#1e4f4f]/35 hover:bg-white"
+      className="focus-my-brain-tool-btn"
     >
       <span className="min-w-0 flex-1">
         <span className="block text-sm font-semibold text-[#1f1c19]">
@@ -122,10 +120,63 @@ function ToolGroupSection({
   );
 }
 
+function FocusPanelFrame({
+  standalone,
+  children,
+}: {
+  standalone: boolean;
+  children: ReactNode;
+}) {
+  if (standalone) {
+    return <FocusMyBrainRoomShell>{children}</FocusMyBrainRoomShell>;
+  }
+
+  return (
+    <div className="focus-my-brain-inline companion-fade-in h-full min-h-0">
+      {children}
+    </div>
+  );
+}
+
+function FocusMyBrainHub({
+  onSelectFeeling,
+}: {
+  onSelectFeeling: (id: FocusFeelingId) => void;
+}) {
+  return (
+    <div
+      className="focus-my-brain-hub"
+      data-testid="focus-area-panel"
+      data-focus-view="feelings"
+    >
+      <h1 className="focus-my-brain-hub__title">{FOCUS_MY_BRAIN_ROOM_COPY.title}</h1>
+      <p className="focus-my-brain-hub__tagline">{FOCUS_MY_BRAIN_ROOM_COPY.tagline}</p>
+      <ul className="focus-my-brain-hub__options">
+        {FOCUS_FEELING_ENTRIES.map((feeling) => (
+          <li key={feeling.id}>
+            <button
+              type="button"
+              className="focus-my-brain-option"
+              data-testid={`focus-feeling-${feeling.id}`}
+              onClick={() => onSelectFeeling(feeling.id)}
+            >
+              {feeling.label}
+            </button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
 export function FocusAreaPanel({
   onAction,
+  standalone = false,
 }: {
   onAction: (action: FocusHubAction) => void;
+  /** Full-screen Focus My Brain room — never beside chat. */
+  standalone?: boolean;
+  onBackToChat?: () => void;
 }) {
   const [selectedFeeling, setSelectedFeeling] = useState<FocusFeelingId | null>(
     null,
@@ -141,10 +192,6 @@ export function FocusAreaPanel({
     [category, selectedFeeling],
   );
 
-  function handleFeelingSelect(id: FocusFeelingId) {
-    setSelectedFeeling(id);
-  }
-
   function handleBack() {
     setSelectedFeeling(null);
   }
@@ -156,83 +203,58 @@ export function FocusAreaPanel({
     );
 
     return (
-      <SceneRenderer
-        scene={createSceneState({
-          workspaceId: "focus-category",
-          focusCategoryId: category.id,
-          seed: category.id,
-        })}
-        className="companion-fade-in h-full min-h-0"
-      >
+      <FocusPanelFrame standalone={standalone}>
         <div
           data-testid="focus-area-panel"
           data-focus-view="category"
           data-focus-category={category.id}
           data-room-whisper={landscape.landscapeWhisper}
           data-focus-landscape-space={landscape.spaceId}
+          className="focus-my-brain-category"
         >
-        <button
-          type="button"
-          onClick={handleBack}
-          className="mb-3 self-start text-sm font-semibold text-[#1e4f4f]"
-        >
-          ‹ Focus
-        </button>
-        <p className="flex items-center gap-2 text-lg font-medium text-[#1f1c19]">
-          <CompanionObjectVisual objectId={category.objectId} size="md" variant="mini-scene" />
-        </p>
+          <button
+            type="button"
+            onClick={handleBack}
+            className="focus-my-brain-back"
+          >
+            ‹ Focus My Brain
+          </button>
+          <h2 className="focus-my-brain-category__title">{category.label}</h2>
+          <p className="focus-my-brain-category__tagline">{category.tagline}</p>
 
-        {category.recommended && !recommendedInFirstGroup ? (
-          <div className="mt-5">
-            <ToolButton
-              item={category.recommended}
-              starred
-              onSelect={onAction}
-            />
+          {category.recommended && !recommendedInFirstGroup ? (
+            <div className="mt-4">
+              <ToolButton
+                item={category.recommended}
+                starred
+                onSelect={onAction}
+              />
+            </div>
+          ) : null}
+
+          <div className="mt-4 flex flex-col gap-3">
+            {category.groups.map((group) => (
+              <ToolGroupSection
+                key={group.id}
+                group={group}
+                recommendedId={category.recommended?.id}
+                onSelect={onAction}
+              />
+            ))}
           </div>
-        ) : null}
-
-        <div className="mt-5 flex flex-col gap-3">
-          {category.groups.map((group) => (
-            <ToolGroupSection
-              key={group.id}
-              group={group}
-              recommendedId={category.recommended?.id}
-              onSelect={onAction}
-            />
-          ))}
         </div>
-        </div>
-      </SceneRenderer>
+      </FocusPanelFrame>
     );
   }
 
   return (
-    <SceneRenderer
-      scene={createSceneState({ workspaceId: "focus-hub", seed: "focus-hub" })}
-      className="companion-fade-in h-full min-h-0"
-    >
+    <FocusPanelFrame standalone={standalone}>
       <div
-        data-testid="focus-area-panel"
-        data-focus-view="feelings"
         data-room-whisper={landscape.landscapeWhisper}
         data-focus-landscape-space={landscape.spaceId}
       >
-
-      <ul className="mt-2 flex flex-col gap-2">
-        {FOCUS_FEELING_ENTRIES.map((feeling) => (
-          <li key={feeling.id}>
-            <CompanionNavCard
-              objectId={feeling.objectId}
-              title={feeling.label}
-              tagline={feeling.immediate ? feeling.tagline : undefined}
-              onClick={() => handleFeelingSelect(feeling.id)}
-              visualVariant="mini-scene"
-            />
-          </li>
-        ))}
-      </ul>
+        <FocusMyBrainHub onSelectFeeling={setSelectedFeeling} />
       </div>
-    </SceneRenderer>
+    </FocusPanelFrame>
   );
 }

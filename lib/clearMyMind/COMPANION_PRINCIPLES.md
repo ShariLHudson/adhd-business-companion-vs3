@@ -1,8 +1,8 @@
-# Clear My Mind™ — Companion Intelligence Principles
+# Clear My Mind — Companion Intelligence Principles
 
 **Permanent design standard for the ADHD Business Ecosystem™.**
 
-Clear My Mind™ is the emotional heartbeat of the ecosystem. It must become more intelligent over time **without ever becoming more complicated**.
+Clear My Mind is the emotional heartbeat of the ecosystem. It must become more intelligent over time **without ever becoming more complicated**.
 
 Every enhancement is measured against one question:
 
@@ -18,7 +18,7 @@ Help people put down what has become too heavy to carry alone. Everything else i
 
 ---
 
-## The Intelligence Paradox™
+## The Intelligence Paradox
 
 Do not surface intelligence simply because we have it. The user experiences better companionship; they do not need to see the engine working.
 
@@ -26,7 +26,7 @@ If intelligence requires explanation, configuration, or frequent reminders — q
 
 ---
 
-## Companion Covenant™
+## Companion Covenant
 
 Never let intelligence overshadow the relationship.
 
@@ -34,7 +34,7 @@ The user should leave thinking *"She really gets me."* — not *"That AI noticed
 
 ---
 
-## Narrative Intelligence™
+## Narrative Intelligence
 
 Rare and meaningful only. Reserve for genuine turning points.
 
@@ -44,7 +44,7 @@ Never: *"You've mentioned this three times."*
 
 ---
 
-## Ethical Foundation™
+## Ethical Foundation
 
 Observations are invitations, never conclusions.
 
@@ -54,13 +54,13 @@ Avoid: *"You always..."* / *"This means..."* / *"I know..."*
 
 ---
 
-## Agency Principle™
+## Agency Principle
 
 Never rush to solve. Reflection before recommendation. Sometimes presence. Sometimes silence. Sometimes simply: *"I've got it."*
 
 ---
 
-## Relief Intelligence™
+## Relief Intelligence
 
 `lib/reliefIntelligence.ts` — invisible layer. Does **not** analyze thought content.
 
@@ -99,7 +99,7 @@ Intelligence grows beneath the surface. The interface stays calm.
 
 ## Cross-page continuity
 
-`getReliefContextForEcosystem()` — other workspaces may read relief hints quietly (Plan My Day™, Focus, Projects, etc.). User never repeats what they just shared.
+`getReliefContextForEcosystem()` — other workspaces may read relief hints quietly (Plan My Day, Focus, Projects, etc.). User never repeats what they just shared.
 
 ---
 

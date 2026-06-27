@@ -1,5 +1,5 @@
 /**
- * Specialized Intelligence Layer™ — constitutional registry.
+ * Specialized Intelligence Layer — constitutional registry.
  * Each entry owns exactly one category of questions.
  */
 
@@ -19,6 +19,9 @@ export const SPECIALIZED_INTELLIGENCE_IDS = [
   "memory-intelligence",
   "creative-intelligence",
   "research-intelligence",
+  "human-conversation-intelligence",
+  "living-home-intelligence",
+  "arrival-greeting-intelligence",
   "relationship-intelligence",
   "wellness-intelligence",
   "environment-intelligence",
@@ -48,7 +51,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
   [
     {
       id: "user-intelligence",
-      name: "User Intelligence™",
+      name: "User Intelligence",
       responsibility: "Learns who the user is — preferences, chronotype, relationship depth",
       module: "companionAdaptiveUserEngine",
       maturity: "production",
@@ -56,7 +59,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "emotional-intelligence",
-      name: "Emotional Intelligence™",
+      name: "Emotional Intelligence",
       responsibility: "Recognizes emotional state and adjusts interaction tone",
       module: "adhdEmotionalFrictionIntelligence",
       maturity: "production",
@@ -64,7 +67,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "energy-intelligence",
-      name: "Energy Intelligence™",
+      name: "Energy Intelligence",
       responsibility: "Tracks energy, motivation, cognitive load, and timing",
       module: "recovery-intelligence",
       maturity: "production",
@@ -72,7 +75,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "business-intelligence",
-      name: "Business Intelligence™",
+      name: "Business Intelligence",
       responsibility: "Understands offers, clients, launches, marketing, visibility, sales, priorities",
       module: "ecosystem-intelligence",
       maturity: "production",
@@ -80,7 +83,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "project-intelligence",
-      name: "Project Intelligence™",
+      name: "Project Intelligence",
       responsibility: "Tracks active work, dependencies, progress, unfinished work",
       module: "founderWorkspace/intelligence",
       maturity: "production",
@@ -88,7 +91,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "planning-intelligence",
-      name: "Planning Intelligence™",
+      name: "Planning Intelligence",
       responsibility: "Determines what deserves attention today",
       module: "planMyDay/companionBrainClient",
       maturity: "production",
@@ -96,7 +99,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "focus-intelligence",
-      name: "Focus Intelligence™",
+      name: "Focus Intelligence",
       responsibility: "Recognizes stuck states and recommends appropriate focus tools",
       module: "focusLandscape",
       maturity: "production",
@@ -104,7 +107,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "decision-intelligence",
-      name: "Decision Intelligence™",
+      name: "Decision Intelligence",
       responsibility: "Supports choices, trade-offs, prioritization, and clarity",
       module: "decision-intelligence",
       maturity: "production",
@@ -112,7 +115,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "content-intelligence",
-      name: "Content Intelligence™",
+      name: "Content Intelligence",
       responsibility: "Content themes, repurposing, publishing strategy",
       module: "ecosystem/contentIntelligenceEngine",
       maturity: "production",
@@ -120,7 +123,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "opportunity-intelligence",
-      name: "Opportunity Intelligence™",
+      name: "Opportunity Intelligence",
       responsibility: "Recognizes leverage opportunities without interrupting flow",
       module: "opportunity-intelligence",
       maturity: "production",
@@ -128,7 +131,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "pattern-intelligence",
-      name: "Pattern Intelligence™",
+      name: "Pattern Intelligence",
       responsibility: "Recurring habits, struggles, wins, avoidance patterns",
       module: "loop-intelligence",
       maturity: "foundation",
@@ -136,7 +139,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "evidence-intelligence",
-      name: "Evidence Intelligence™",
+      name: "Evidence Intelligence",
       responsibility: "Remembers accomplishments and positive evidence for encouragement",
       module: "recognition",
       maturity: "foundation",
@@ -144,7 +147,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "memory-intelligence",
-      name: "Memory Intelligence™",
+      name: "Memory Intelligence",
       responsibility: "Long-term context — retrieves only what is relevant now",
       module: "intelligence-layer",
       maturity: "production",
@@ -152,7 +155,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "creative-intelligence",
-      name: "Creative Intelligence™",
+      name: "Creative Intelligence",
       responsibility: "Brainstorming, writing, design, idea generation",
       module: "content-generator",
       maturity: "production",
@@ -160,23 +163,51 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "research-intelligence",
-      name: "Research Intelligence™",
-      responsibility: "Information, trends, examples, supporting knowledge",
-      module: "knowledgeIntelligence",
+      name: "Research Intelligence",
+      responsibility: "Current information, trends, examples, comparisons, and supporting knowledge — Companion owns research",
+      module: "researchIntelligence",
+      maturity: "production",
+      userVisible: false,
+    },
+    {
+      id: "human-conversation-intelligence",
+      name: "Human Conversation",
+      responsibility:
+        "Constitutional conversation voice — Twelve Tests, curiosity over interrogation, Shari-not-AI responses",
+      module: "humanConversation",
+      maturity: "production",
+      userVisible: false,
+    },
+    {
+      id: "living-home-intelligence",
+      name: "Living Home",
+      responsibility:
+        "One familiar homestead — time, season, weather, life events, and living motion across every room",
+      module: "livingHome",
+      maturity: "production",
+      userVisible: false,
+    },
+    {
+      id: "arrival-greeting-intelligence",
+      name: "Arrival Greeting Intelligence",
+      responsibility:
+        "Scene-consistent, complete-sentence welcomes from Living Home context — relationship first",
+      module: "arrivalGreetingIntelligence",
       maturity: "production",
       userVisible: false,
     },
     {
       id: "relationship-intelligence",
-      name: "Relationship Intelligence™",
-      responsibility: "People, contacts, networking, follow-up, communication",
-      module: "relationship-intelligence",
+      name: "Relationship Intelligence",
+      responsibility:
+        "People, contacts, networking, follow-up, communication — Name Intelligence and Morning Greeting Intelligence",
+      module: "relationshipIntelligence",
       maturity: "production",
       userVisible: false,
     },
     {
       id: "wellness-intelligence",
-      name: "Wellness Intelligence™",
+      name: "Wellness Intelligence",
       responsibility: "Healthy rhythms, breaks, movement, breathing, recovery",
       module: "reliefIntelligence",
       maturity: "production",
@@ -184,7 +215,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "environment-intelligence",
-      name: "Environment Intelligence™",
+      name: "Environment Intelligence",
       responsibility: "Room, scene, atmosphere, workspace — constitutional render authority",
       module: "companionConstitution/environmentIntelligence",
       maturity: "production",
@@ -192,7 +223,7 @@ export const SPECIALIZED_INTELLIGENCE_REGISTRY: readonly SpecializedIntelligence
     },
     {
       id: "presence-intelligence",
-      name: "Presence Intelligence™",
+      name: "Presence Intelligence",
       responsibility: "How Shari is experienced — Nearby, Beside You, Listening, Invisible",
       module: "companionConstitution/presenceIntelligence",
       maturity: "production",

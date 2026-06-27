@@ -1,5 +1,5 @@
 /**
- * Remind me… — Shari-voiced snooze options for Plan My Day™ items.
+ * Remind me… — Shari-voiced snooze options for Plan My Day items.
  */
 
 export type RemindPreset = {

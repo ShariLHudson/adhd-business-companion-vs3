@@ -9,12 +9,21 @@ export function isClearMyMindSection(
   return section === CLEAR_MY_MIND_SECTION;
 }
 
+export type ClearMyMindOpenSource = "nav_fullscreen" | "chat_beside";
+
 /**
- * Clear My Mind is a full-screen capture + Mental Landscape experience.
- * It must never open in the split beside-chat workspace rail.
+ * Clear My Mind always opens as its own full-screen room — never beside chat.
  */
 export function shouldOpenClearMyMindStandalone(
   section: AppSection | null | undefined,
+  _source: ClearMyMindOpenSource = "nav_fullscreen",
 ): boolean {
   return isClearMyMindSection(section);
+}
+
+/** @deprecated Constitutional rule — Clear My Mind never opens beside chat. */
+export function shouldOpenClearMyMindBesideChat(
+  _section: AppSection | null | undefined,
+): boolean {
+  return false;
 }

@@ -1,5 +1,5 @@
 /**
- * Director's Studio™ — demo-only, never on by default.
+ * Director's Studio — demo-only, never on by default.
  *
  * Open for presentations:
  *   /companion/hospitality-prototype?demo=1

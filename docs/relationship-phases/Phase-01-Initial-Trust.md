@@ -9,7 +9,7 @@
 
 ## Phase Name
 
-Initial Trust — First Conversation Experience™
+Initial Trust — First Conversation Experience
 
 ---
 

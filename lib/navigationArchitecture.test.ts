@@ -12,6 +12,7 @@ describe("navigation architecture", () => {
     expect(sidebarNavForSection("growth")).toBe("growth");
     expect(sidebarNavForSection("my-work")).toBe("other");
     expect(sidebarNavForSection("how-do-i")).toBe("how-do-i");
+    expect(sidebarNavForSection("welcome-room")).toBe("welcome-room");
   });
 
   it("keeps sidebar doors in companion-first order", () => {
@@ -22,6 +23,7 @@ describe("navigation architecture", () => {
       "growth",
       "other",
       "how-do-i",
+      "welcome-room",
     ]);
   });
 

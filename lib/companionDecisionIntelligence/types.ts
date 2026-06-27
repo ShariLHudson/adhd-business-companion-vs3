@@ -1,5 +1,5 @@
 /**
- * Companion Decision Intelligence™ — shared types.
+ * Companion Decision Intelligence — shared types.
  */
 
 import type { ChatTurn } from "../companionIntelligence";

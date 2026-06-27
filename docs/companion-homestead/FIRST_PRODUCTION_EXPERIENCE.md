@@ -1,4 +1,4 @@
-# Companion Homestead™
+# Companion Homestead
 ## First Production Experience
 
 **Version:** 1.0  
@@ -10,19 +10,19 @@
 
 **Subordinate to:**
 
-- Product Constitution™ · Companion Constitution™
+- Product Constitution · Companion Constitution
 - [`COMPANION_HOMESTEAD_MANIFESTO.md`](../COMPANION_HOMESTEAD_MANIFESTO.md)
-- Hospitality Principle™ · [`EXPERIENCE_OF_SHARI.md`](../EXPERIENCE_OF_SHARI.md)
+- Hospitality Principle · [`EXPERIENCE_OF_SHARI.md`](../EXPERIENCE_OF_SHARI.md)
 - [`COMPANION_DECISION_INTELLIGENCE.md`](../COMPANION_DECISION_INTELLIGENCE.md)
 - [`COMPANION_TRUST_ARCHITECTURE.md`](../COMPANION_TRUST_ARCHITECTURE.md)
 - [`SCREEN_COMPOSITION_GUIDE.md`](./SCREEN_COMPOSITION_GUIDE.md)
-- [`docs/room-lookbooks/`](../room-lookbooks/) — especially Living Room™
-- Companion Object Registry™ · Scene Integrity Engine™ · Companion Layout System™
+- [`docs/room-lookbooks/`](../room-lookbooks/) — especially Living Room
+- Companion Object Registry · Scene Integrity Engine · Companion Layout System
 
 **Bridges:**
 
 ```
-Room Look Books™ → Screen Composition Guide™ → First Production Experience™ → React
+Room Look Books → Screen Composition Guide → First Production Experience → React
 ```
 
 **Success test:**
@@ -35,13 +35,13 @@ Room Look Books™ → Screen Composition Guide™ → First Production Experien
 
 The homestead does not open to software. It opens to **a room that was already waiting**.
 
-The first production experience is a **single choreographed journey** with six beats — not six pages. The Living Room™ holds the entire arc. Only at the end does the environment **walk** the guest to their first workspace. One recommendation. One transition. One next thing.
+The first production experience is a **single choreographed journey** with six beats — not six pages. The Living Room holds the entire arc. Only at the end does the environment **walk** the guest to their first workspace. One recommendation. One transition. One next thing.
 
 | Beat | Name | Duration | User feels |
 |------|------|----------|------------|
 | 0 | **Settle** | 0–3s | *I'm somewhere real.* |
 | 1 | **Arrive** | 3–8s | *She's glad I came.* |
-| 2 | **Today's Reality™** | 8–38s | *She gets today — I wasn't interrogated.* |
+| 2 | **Today's Reality** | 8–38s | *She gets today — I wasn't interrogated.* |
 | 3 | **Room responds** | overlaps 2–4 | *The house noticed.* |
 | 4 | **One door** | 38–48s | *She has one idea — I can say yes or not today.* |
 | 5 | **Walk there** | 48–60s | *We moved through the house — not clicked a link.* |
@@ -59,9 +59,9 @@ APP OPEN
    │
    ▼
 ┌──────────────────────────────────────────────────────────────┐
-│  LIVING ROOM™ — full-arrival (95% environment)               │
+│  LIVING ROOM — full-arrival (95% environment)               │
 │                                                              │
-│  [Settle] ──► [Greet] ──► [Today's Reality™] ──► [Respond]  │
+│  [Settle] ──► [Greet] ──► [Today's Reality] ──► [Respond]  │
 │                              conversational                   │
 │                                    │                         │
 │                                    ▼                         │
@@ -72,12 +72,12 @@ APP OPEN
 └──────────────────────────────────────────────────────────────┘
    │
    ▼
-FIRST WORKSPACE (Planning Table™ · Window Seat™ · Creative Studio™ · etc.)
+FIRST WORKSPACE (Planning Table · Window Seat · Creative Studio · etc.)
 ```
 
 ## Visitor paths
 
-Three home states from Arrival Intelligence™ — same journey **shape**, different **depth**:
+Three home states from Arrival Intelligence — same journey **shape**, different **depth**:
 
 | State | When | Journey depth |
 |-------|------|---------------|
@@ -87,21 +87,21 @@ Three home states from Arrival Intelligence™ — same journey **shape**, diffe
 
 ## Emotional choreography alignment
 
-Maps to Journey Experience Bible™ beats:
+Maps to Journey Experience Bible beats:
 
 | Bible beat | Production beat |
 |------------|-----------------|
 | Arrival | Settle + Arrive |
 | Pause | First 1.5s — room only, no copy |
 | Greeting | Arrive |
-| Orientation | Today's Reality™ |
+| Orientation | Today's Reality |
 | Invitation | One door |
 | Transition | Walk there |
 | Support | Begins inside workspace — out of scope for this doc's end |
 
 ## Decision ladder alignment
 
-Today's Reality™ and room recommendation obey Decision Intelligence™ rungs:
+Today's Reality and room recommendation obey Decision Intelligence rungs:
 
 1. **Emotional safety** — greeting and reality never push productivity when flooded  
 2. **Cognitive capacity** — fewer questions when low; Window Seat bias when very low  
@@ -139,7 +139,7 @@ Today's Reality™ and room recommendation obey Decision Intelligence™ rungs:
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### Layer ownership (Screen Composition Guide™)
+### Layer ownership (Screen Composition Guide)
 
 | Layer | Arrival layout |
 |-------|----------------|
@@ -151,7 +151,7 @@ Today's Reality™ and room recommendation obey Decision Intelligence™ rungs:
 | Objects | Mug, blanket appear as **environmental** — not UI icons |
 | Interaction | Single input line; no toolbar in content canvas |
 
-### Safe composition zones (Living Room™)
+### Safe composition zones (Living Room)
 
 | Zone | Rect (conceptual) | Allowed |
 |------|-------------------|---------|
@@ -180,7 +180,7 @@ Today's Reality™ and room recommendation obey Decision Intelligence™ rungs:
 - **Copy:** One line greeting. No subtitle. No feature names.
 - **Input:** Hidden.
 
-### Beat 2 — Today's Reality™ (8–38s)
+### Beat 2 — Today's Reality (8–38s)
 
 - **Visible:** Conversational exchange in safe text zone — reads like chat bubbles from Shari, not a form.
 - **Visible:** Optional **Reality Echo** — one short line summarizing what was understood (not a data card).
@@ -280,7 +280,7 @@ Today's Reality™ and room recommendation obey Decision Intelligence™ rungs:
          WORKSPACE
 ```
 
-## Today's Reality™ — conversational protocol
+## Today's Reality — conversational protocol
 
 **Not a form.** A **three-turn maximum** dialogue embedded in the Living Room.
 
@@ -352,7 +352,7 @@ Today's Reality™ and room recommendation obey Decision Intelligence™ rungs:
 - Never feature names on first line.
 - Never streak, guilt, absence shame, clinical tone.
 - Never multiple questions in one message.
-- Trust Architecture™ — earned warmth scales with relationship.
+- Trust Architecture — earned warmth scales with relationship.
 
 ## Beat 1 — Greeting variants
 
@@ -407,7 +407,7 @@ Today's Reality™ and room recommendation obey Decision Intelligence™ rungs:
 | Ordinary daily return | **Optional** — voice in text sufficient |
 | Low energy / late night | **Hidden** — room carries safety |
 
-## Beat 2 — Today's Reality™ dialogue
+## Beat 2 — Today's Reality dialogue
 
 ### Opening questions (one only)
 
@@ -475,7 +475,7 @@ Today's Reality™ and room recommendation obey Decision Intelligence™ rungs:
 
 **Principle:** The user **notices**. Shari does not announce preparation.
 
-Scene Integrity Engine™ + hospitality objects — triggered by Today's Reality™ signals and time/weather — **never manual per route**.
+Scene Integrity Engine + hospitality objects — triggered by Today's Reality signals and time/weather — **never manual per route**.
 
 | Signal | Environmental response | Announcement |
 |--------|------------------------|--------------|
@@ -488,7 +488,7 @@ Scene Integrity Engine™ + hospitality objects — triggered by Today's Reality
 | Late night | Single lamp pool; fire low | None |
 | Six-week return | Extra throw visible; mug out | None |
 
-**Kinsey™ (optional):** Tail thump once on ordinary return — then asleep on rug. Never blocks safe text zone.
+**Kinsey (optional):** Tail thump once on ordinary return — then asleep on rug. Never blocks safe text zone.
 
 **Audio shifts:** Fire crackle up one notch in winter low-energy; rain audio if glass has rain — guest may not have sound on.
 
@@ -621,7 +621,7 @@ Extend existing `living.phase` enum:
 | `evaluateArrivalIntelligence` | Visitor kind, home state, chrome |
 | `CompanionWelcomeScene` | Layer stack, atmosphere |
 | `LivingCompanionRoomLayers` | Background + living + atmosphere |
-| `Scene Integrity Engine™` | Room response triggers |
+| `Scene Integrity Engine` | Room response triggers |
 | `companionObjectRegistry` | Object identity in workspace after walk |
 | `companionLayoutSystem` | Immersion profiles on arrival at destination |
 | `welcomePresenceIntelligence` / greeting libraries | Greeting selection — extend categories for difficult/exciting |
@@ -680,7 +680,7 @@ Workspace receives carried context (dayState, echo, emotional tone) — no re-as
 
 ---
 
-# Companion Communication Anchor™
+# Companion Communication Anchor
 
 **Non-negotiable:** Every primary screen must preserve a way for the guest to speak to Shari.
 
@@ -704,13 +704,13 @@ Audit: `lib/companionCommunicationAnchor/companionCommunicationAnchor.test.ts`
 
 Before production implementation:
 
-- [ ] First Production Experience™ approved
-- [ ] Today's Reality™ conversational protocol approved (replaces form-at-arrival)
-- [ ] One-door recommendation aligns with Decision Intelligence™
+- [ ] First Production Experience approved
+- [ ] Today's Reality conversational protocol approved (replaces form-at-arrival)
+- [ ] One-door recommendation aligns with Decision Intelligence
 - [ ] Room response table approved by look book + Scene Integrity
 - [ ] ADHD maximums signed off
 - [ ] Mobile + accessibility checklists signed off
-- [ ] Screen Composition Guide™ Living Room sheet still valid
+- [ ] Screen Composition Guide Living Room sheet still valid
 - [ ] Behavior audit cases drafted for arrival journey
 
 **After approval:** Implement on `FIRST_PRODUCTION_EXPERIENCE` flag before redesigning other rooms.

@@ -1,4 +1,4 @@
-/** Designer Stories™ — Business Collection. Never shown to guests. */
+/** Designer Stories — Business Collection. Never shown to guests. */
 export const BUSINESS_DESIGNER_STORIES: Record<string, string> = {
   "obj-planning-notebook":
     "Where launches get decomposed into Tuesdays — messy margins, real deadlines, not a template.",

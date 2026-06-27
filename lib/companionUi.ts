@@ -1,4 +1,5 @@
 import type { CoachingMode } from "./companionPrompt";
+import { COMPANION_LOGIN_BACKGROUND } from "./companionLoginPage";
 
 export type AppSection =
   | "home"
@@ -37,7 +38,9 @@ export type AppSection =
   | "evidence-bank"
   | "growth"
   | "confidence-vault"
-  | "my-journey";
+  | "my-journey"
+  | "welcome-room"
+  | "life-experience";
 
 export type SidebarNavId =
   | "chat"
@@ -60,7 +63,8 @@ export type SidebarNavId =
   | "evidence-bank"
   | "growth"
   | "confidence-vault"
-  | "my-journey";
+  | "my-journey"
+  | "welcome-room";
 
 export type SidebarToolId =
   | "voice"
@@ -78,7 +82,8 @@ export type SidebarToolId =
 
 export const ASSETS = {
   background: "/images/companion-bg.jpg",
-  logo: "/images/shari/shari-images/ssc-logo-no-background.jpg",
+  logo: "/images/shari/shari-images/ssc-logo.svg",
+  loginBackground: COMPANION_LOGIN_BACKGROUND,
   profile: "/shari.jpg",
 } as const;
 
@@ -87,7 +92,7 @@ export const BRAND = {
   tagline: "Your Coach & Companion",
 } as const;
 
-// Six sidebar doors — Companion First: chat, regulation, visual thinking, growth, other, learning.
+// Seven sidebar doors — ends with Welcome Room.
 export const SIDEBAR_NAV: {
   id: SidebarNavId;
   label: string;
@@ -100,9 +105,10 @@ export const SIDEBAR_NAV: {
   { id: "growth", label: "Growth", objectId: "growth" },
   { id: "other", label: "Other", objectId: "other-tools" },
   { id: "how-do-i", label: "How Do I...?", objectId: "help" },
+  { id: "welcome-room", label: "Welcome Room", objectId: "welcome-room" },
 ];
 
-/** @deprecated More menu removed — My Work and How Do I are primary sidebar items. */
+/** @deprecated More menu hidden — settings via profile / overlays only. */
 export const MORE_NAV: {
   id: SidebarNavId;
   label: string;
@@ -124,6 +130,7 @@ export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
   snippets: "snippets",
   playbook: "playbook",
   "how-do-i": "how-do-i",
+  "welcome-room": "welcome-room",
 };
 
 /** Map legacy or sub-area nav ids to a primary sidebar door. */
@@ -176,9 +183,12 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "evidence-bank":
     case "confidence-vault":
     case "my-journey":
+    case "life-experience":
       return "growth";
     case "how-do-i":
       return "how-do-i";
+    case "welcome-room":
+      return "welcome-room";
     case "home":
     case "today":
       return "chat";

@@ -1,5 +1,5 @@
 /**
- * Shari's Presence™ — the Companion does not need to be seen to be felt.
+ * Shari's Presence — the Companion does not need to be seen to be felt.
  * @see docs/companion-homestead/SHARIS_PRESENCE.md
  */
 
@@ -28,12 +28,12 @@ export type SharisPresenceVerdict = {
   state: ShariPresenceState;
   principle: typeof SHARIS_PRESENCE_PRINCIPLE;
   placeId: CompanionPlaceId;
-  /** Shari photograph in environment — Host™ only */
+  /** Shari photograph in environment — Host only */
   showShariImage: boolean;
-  /** Mug, journal, glasses — Nearby™ / Returning™ */
+  /** Mug, journal, glasses — Nearby / Returning */
   showEvidenceObjects: boolean;
   evidenceObjects: readonly string[];
-  /** Communication Anchor™ is primary — Beside You™ */
+  /** Communication Anchor is primary — Beside You */
   communicationAnchorPrimary: boolean;
   conversationPrimary: boolean;
   guestFeelsWatched: false;

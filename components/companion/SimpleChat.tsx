@@ -8,6 +8,10 @@ import {
   logRelationshipResponseTrace,
 } from "@/lib/relationshipResponseTrace";
 import { RelationshipResponseDevBadge, isRelationshipDebugUiEnabled } from "@/components/companion/RelationshipResponseDevBadge";
+import { VisibleThinkingBubble } from "@/components/companion/VisibleThinkingBubble";
+import type { EmotionalState } from "@/lib/companionEmotions";
+import type { AppSection } from "@/lib/companionUi";
+import { shouldShowChatVisibleThinking } from "@/lib/visibleThinking/chatThinkingUi";
 
 type Message = {
   role: "user" | "assistant" | "system";
@@ -20,6 +24,11 @@ type SimpleChatProps = {
   stateHint: string | null;
   showHint: boolean;
   isLoading: boolean;
+  /** Visible Thinking — natural wait copy while Shari works. */
+  thinkingMessage?: string | null;
+  thinkingEmotion?: EmotionalState;
+  workspacePanel?: AppSection | null;
+  workspaceActiveBeside?: boolean;
   // Home owns cold-open copy (starters / continue) — skip the default empty line.
   hideEmptyState?: boolean;
   // Kept for compatibility; assistant text is parsed directly below.
@@ -120,6 +129,10 @@ export function SimpleChat({
   stateHint,
   showHint,
   isLoading,
+  thinkingMessage = null,
+  thinkingEmotion = "unclear",
+  workspacePanel = null,
+  workspaceActiveBeside = false,
   hideEmptyState = false,
   afterLastAssistant,
 }: SimpleChatProps) {
@@ -178,16 +191,16 @@ export function SimpleChat({
           );
         })}
 
-        {isLoading && (
-          <li className="flex flex-col items-start gap-1.5">
-            <span
-              className="rounded-2xl bg-white/85 px-4 py-3 text-sm italic text-[#6b635a] shadow-sm backdrop-blur-sm"
-              aria-label="Shari is thinking"
-            >
-              Give me a moment…
-            </span>
+        {shouldShowChatVisibleThinking(isLoading, thinkingMessage) ? (
+          <li className="flex flex-col items-start">
+            <VisibleThinkingBubble
+              message={thinkingMessage!}
+              emotion={thinkingEmotion}
+              workspacePanel={workspacePanel}
+              workspaceActiveBeside={workspaceActiveBeside}
+            />
           </li>
-        )}
+        ) : null}
       </ul>
     </section>
   );

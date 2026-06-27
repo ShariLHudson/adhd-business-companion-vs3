@@ -1,5 +1,5 @@
 /**
- * Orientation™ — where you are before what you do.
+ * Orientation — where you are before what you do.
  * @see constitution.ts — buildOrientation
  */
 

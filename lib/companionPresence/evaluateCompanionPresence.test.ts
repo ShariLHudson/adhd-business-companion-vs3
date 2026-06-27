@@ -86,6 +86,7 @@ describe("homeStatePresenceMapping", () => {
 
 describe("companionThinkingMessage", () => {
   it("returns a quiet thinking line", () => {
-    expect(companionThinkingMessage(0)).toMatch(/thinking|moment|sit with/i);
+    expect(companionThinkingMessage(0)).toMatch(/second|moment|shared/i);
+    expect(companionThinkingMessage(0)).not.toMatch(/^Thinking/i);
   });
 });

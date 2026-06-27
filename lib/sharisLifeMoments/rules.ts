@@ -1,5 +1,5 @@
 /**
- * Shari's Life Moments™ — never advice, always invitation.
+ * Shari's Life Moments — never advice, always invitation.
  */
 
 export const LIFE_MOMENT_ADVICE_PATTERNS = [

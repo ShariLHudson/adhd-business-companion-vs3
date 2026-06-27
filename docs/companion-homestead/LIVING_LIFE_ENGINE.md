@@ -1,4 +1,4 @@
-# Companion Homestead™ Living Life Engine™
+# Companion Homestead Living Life Engine
 ## Design the Homestead as a Living Place, Not a Static App
 
 **Version:** 1.0  
@@ -7,14 +7,14 @@
 
 **Subordinate to:**
 
-- Product Constitution™ · Companion Constitution™
+- Product Constitution · Companion Constitution
 - [`COMPANION_HOMESTEAD_MANIFESTO.md`](../COMPANION_HOMESTEAD_MANIFESTO.md)
-- Hospitality Principle™ · [`EXPERIENCE_OF_SHARI.md`](../EXPERIENCE_OF_SHARI.md)
+- Hospitality Principle · [`EXPERIENCE_OF_SHARI.md`](../EXPERIENCE_OF_SHARI.md)
 - [`COMPANION_DECISION_INTELLIGENCE.md`](../COMPANION_DECISION_INTELLIGENCE.md)
 - [`SCREEN_COMPOSITION_GUIDE.md`](./SCREEN_COMPOSITION_GUIDE.md)
 - [`FIRST_PRODUCTION_EXPERIENCE.md`](./FIRST_PRODUCTION_EXPERIENCE.md)
-- Scene Integrity Engine™ · Scene Integrity Library™
-- Living Intelligence Graph™ · Live Reality Ecosystem™
+- Scene Integrity Engine · Scene Integrity Library
+- Living Intelligence Graph · Live Reality Ecosystem
 
 **Extends (does not replace):**
 
@@ -42,7 +42,7 @@ Difference as natural as walking into a real home — not a redesign, not an A/B
 
 ---
 
-# Part I — The Living Life Principle™
+# Part I — The Living Life Principle
 
 ## Core question (every entry, every return)
 
@@ -62,7 +62,7 @@ Difference as natural as walking into a real home — not a redesign, not an A/B
 | "New UI again." | "Oh — cookies. She must have been baking." |
 | "Why is everything different?" | "Rain today. Of course the lamp is on." |
 
-## The One Constant™
+## The One Constant
 
 While details gently evolve:
 
@@ -73,42 +73,42 @@ While details gently evolve:
 
 ---
 
-# Part II — Living Life Engine™ Architecture
+# Part II — Living Life Engine Architecture
 
 ## System position
 
 ```
                     ┌─────────────────────────────┐
-                    │     Companion Brain™        │
+                    │     Companion Brain        │
                     │  (judgment — when & why)    │
                     └──────────────┬──────────────┘
                                    │
-     Live Reality™ ────────────────┼────────────── Relationship Memory™
+     Live Reality ────────────────┼────────────── Relationship Memory
      DayState, chapters           │              tenure, tone earned
                                    ▼
                     ┌─────────────────────────────┐
-                    │   Living Life Engine™       │
+                    │   Living Life Engine       │
                     │   "What changed naturally?" │
                     └──────────────┬──────────────┘
                                    │
           ┌────────────────────────┼────────────────────────┐
           ▼                        ▼                        ▼
    Scene Integrity          Hospitality            Conversation
-   Engine™ (coherence)      Preparation™           Intelligence™
+   Engine (coherence)      Preparation           Intelligence
           │                        │                        │
           └────────────────────────┴────────────────────────┘
                                    ▼
                     ┌─────────────────────────────┐
-                    │   Resolved Living Scene™    │
+                    │   Resolved Living Scene    │
                     │   atmosphere · objects ·     │
                     │   motion · audio · presence  │
                     │   greeting posture · rhythm  │
                     └─────────────────────────────┘
 ```
 
-**Living Life Engine™ decides *what may change*.**  
-**Scene Integrity Engine™ decides *what may coexist*.**  
-**Companion Brain™ decides *what should change for this person now*.**
+**Living Life Engine decides *what may change*.**  
+**Scene Integrity Engine decides *what may coexist*.**  
+**Companion Brain decides *what should change for this person now*.**
 
 Never the reverse.
 
@@ -116,35 +116,35 @@ Never the reverse.
 
 | Layer | Engine module | Primary inputs | Outputs |
 |-------|---------------|----------------|---------|
-| **1 — Time** | `TemporalLifeResolver™` | Clock, calendar, season, weather API/Iowa model, birthday, holidays, tenure years | Time band, season band, weather band, observance flags |
-| **2 — Life** | `HomesteadLifeResolver™` | Layer 1 + room + garden state + livestock/pet state + object persistence | Object deltas, motion deltas, micro-layout shifts |
-| **3 — Relationship** | `RelationshipLifeResolver™` | Tenure, visit frequency, trust earned, conversation depth | Greeting register, question frequency, silence permission, Shari presence mode |
-| **4 — Life Continuity™** | `ContinuityLifeResolver™` | Chapters: launch week, recovery, vacation, grief, growth, quiet season | Chapter-scene bias (not labels), preparation objects, tone guardrails |
-| **5 — Daily Rhythm™** | `RhythmLifeResolver™` | Time + relationship + last visit + today's reality | Arrival choreography variant, who speaks first, silence beats |
-| **6 — Room Return™** | `ReturnLifeResolver™` | Previous room, duration, emotional residue, carried context | Living Room (or current room) continuity — no reset |
-| **7 — Seasons of Life™** | `LifeSeasonResolver™` | Inferred from Live Reality + projects + rhythm (never announced) | Creative/building/recovery/celebration/learning/quiet/transition bias |
+| **1 — Time** | `TemporalLifeResolver` | Clock, calendar, season, weather API/Iowa model, birthday, holidays, tenure years | Time band, season band, weather band, observance flags |
+| **2 — Life** | `HomesteadLifeResolver` | Layer 1 + room + garden state + livestock/pet state + object persistence | Object deltas, motion deltas, micro-layout shifts |
+| **3 — Relationship** | `RelationshipLifeResolver` | Tenure, visit frequency, trust earned, conversation depth | Greeting register, question frequency, silence permission, Shari presence mode |
+| **4 — Life Continuity** | `ContinuityLifeResolver` | Chapters: launch week, recovery, vacation, grief, growth, quiet season | Chapter-scene bias (not labels), preparation objects, tone guardrails |
+| **5 — Daily Rhythm** | `RhythmLifeResolver` | Time + relationship + last visit + today's reality | Arrival choreography variant, who speaks first, silence beats |
+| **6 — Room Return** | `ReturnLifeResolver` | Previous room, duration, emotional residue, carried context | Living Room (or current room) continuity — no reset |
+| **7 — Seasons of Life** | `LifeSeasonResolver` | Inferred from Live Reality + projects + rhythm (never announced) | Creative/building/recovery/celebration/learning/quiet/transition bias |
 
 ## Resolution pipeline (conceptual)
 
 ```
 1. Snapshot last scene state (per room + global homestead)
-2. Ingest Live Reality™ + Living Intelligence Graph™ delta since last visit
+2. Ingest Live Reality + Living Intelligence Graph delta since last visit
 3. Resolve Layers 1–7 (parallel, typed outputs)
-4. Merge candidates into Living Change Set™ (ranked, capped)
-5. Scene Integrity Engine™ — veto impossible / incoherent / cluttered
-6. Companion Brain™ — apply Decision Ladder (safety → capacity → intent)
-7. Hospitality Principle™ — preparation, not personalization
-8. Emit ResolvedLivingScene™ + ConversationPosture™
+4. Merge candidates into Living Change Set (ranked, capped)
+5. Scene Integrity Engine — veto impossible / incoherent / cluttered
+6. Companion Brain — apply Decision Ladder (safety → capacity → intent)
+7. Hospitality Principle — preparation, not personalization
+8. Emit ResolvedLivingScene + ConversationPosture
 9. Persist scene state + change log (for anti-repetition)
 ```
 
-## Living Change Set™ (caps)
+## Living Change Set (caps)
 
 | Dimension | Per visit max | Notes |
 |-----------|---------------|-------|
 | **New foreground objects** | 2 | Restraint — look book cap five total |
 | **Removed/changed objects** | 2 | Chair moved, tea → coffee |
-| **Motion changes** | 1 hero + 1 subtle | Screen Composition Guide™ |
+| **Motion changes** | 1 hero + 1 subtle | Screen Composition Guide |
 | **Audio changes** | 1 bed shift | Duckable |
 | **Greeting mode change** | 1 | Question → observation → silence |
 | **Shari presence shift** | 1 | In room → nearby → voice only |
@@ -156,14 +156,14 @@ Never the reverse.
 
 | Store | Holds | Never holds |
 |-------|-------|-------------|
-| **Homestead Scene State™** | Last objects, motions, Shari posture per room | User shame scores |
-| **Living Change Log™** | What appeared last N visits (anti-repetition) | Surveillance narrative |
-| **Living Intelligence Graph™** | Arrival rhythm, intervals, time patterns | Engagement metrics |
-| **Life Chapter Memory™** | Active chapter signals (launch, recovery, etc.) | Diagnostic labels shown to user |
+| **Homestead Scene State** | Last objects, motions, Shari posture per room | User shame scores |
+| **Living Change Log** | What appeared last N visits (anti-repetition) | Surveillance narrative |
+| **Living Intelligence Graph** | Arrival rhythm, intervals, time patterns | Engagement metrics |
+| **Life Chapter Memory** | Active chapter signals (launch, recovery, etc.) | Diagnostic labels shown to user |
 
 ---
 
-# Part III — Daily Rhythm System™
+# Part III — Daily Rhythm System
 
 ## Principle
 
@@ -208,11 +208,11 @@ Rhythm variant = `f(time band, relationship tenure, life chapter, last rhythm, t
 | R11 | **Weekend late** | No planning bias — rest rhythm |
 | R12 | **Return from work** | Room return layer — continuity not re-arrival |
 
-Maps to `First Production Experience™` beats — rhythm selects **depth**, not new patterns.
+Maps to `First Production Experience` beats — rhythm selects **depth**, not new patterns.
 
 ---
 
-# Part IV — Relationship Evolution Model™
+# Part IV — Relationship Evolution Model
 
 ## Principle
 
@@ -245,9 +245,9 @@ People who know each other talk differently over time. Not scripts — **registe
 
 - Streak language · absence shame · "I noticed you haven't…"
 - Personality drift · new catchphrases without founder approval
-- Fake intimacy before trust earned (Trust Architecture™)
+- Fake intimacy before trust earned (Trust Architecture)
 
-## Conversation Intelligence™ (greeting grammar)
+## Conversation Intelligence (greeting grammar)
 
 | Move | Example | When |
 |------|---------|------|
@@ -264,7 +264,7 @@ People who know each other talk differently over time. Not scripts — **registe
 
 ---
 
-# Part V — Life Continuity Model™
+# Part V — Life Continuity Model
 
 ## Principle
 
@@ -291,13 +291,13 @@ Continuity is expressed through **preparation, tone, and object truth** — not 
 
 ## Chapter resolution
 
-Chapters come from **Live Reality™ + project signals + user language + calendar** — merged by Companion Brain™, not a dropdown.
+Chapters come from **Live Reality + project signals + user language + calendar** — merged by Companion Brain, not a dropdown.
 
 **Chapter exit:** fade preparation objects over 2–5 visits; never abrupt removal.
 
-## Life Continuity vs Memory™
+## Life Continuity vs Memory
 
-| Memory™ | Life Continuity™ |
+| Memory | Life Continuity |
 |---------|------------------|
 | Stores that something happened | Changes how the house feels **now** |
 | May inform Shari privately | Never exposes "we have a record that…" |
@@ -305,7 +305,7 @@ Chapters come from **Live Reality™ + project signals + user language + calenda
 
 ---
 
-# Part VI — Seasons of Life™ (non-calendar)
+# Part VI — Seasons of Life (non-calendar)
 
 Distinct from **season** (winter, spring). Life Seasons are **chapters of endeavor** — inferred.
 
@@ -323,7 +323,7 @@ Distinct from **season** (winter, spring). Life Seasons are **chapters of endeav
 
 ---
 
-# Part VII — Room Return System™ (Layer 6)
+# Part VII — Room Return System (Layer 6)
 
 ## Principle
 
@@ -353,7 +353,7 @@ Not every return needs copy. When needed:
 
 ---
 
-# Part VIII — Rules Preventing Repetition™
+# Part VIII — Rules Preventing Repetition
 
 | ID | Rule |
 |----|------|
@@ -368,11 +368,11 @@ Not every return needs copy. When needed:
 | RP09 | Conversation **echo** structure ("So — …") varied by tenure |
 | RP10 | If user declined a door yesterday, do not offer same door first today |
 
-**Living Change Log™** enforces cooldowns — not RNG.
+**Living Change Log** enforces cooldowns — not RNG.
 
 ---
 
-# Part IX — Rules Preventing Randomness™
+# Part IX — Rules Preventing Randomness
 
 | ID | Rule |
 |----|------|
@@ -391,12 +391,12 @@ Not every return needs copy. When needed:
 
 ---
 
-# Part X — Life Before Software™ Implementation Principles
+# Part X — Life Before Software Implementation Principles
 
 1. **Cause before pixel** — document why an object appears before designing it  
 2. **Integrity before beauty** — Scene Integrity vetoes first  
 3. **Brain before scene** — Decision Ladder before atmosphere  
-4. **Preparation before personalization** — Hospitality Principle™ always  
+4. **Preparation before personalization** — Hospitality Principle always  
 5. **State before animation** — persist what changed; motion follows truth  
 6. **Silence is output** — null Living Change Set is success  
 7. **Return ≠ arrive** — separate code paths  
@@ -405,10 +405,10 @@ Not every return needs copy. When needed:
 10. **One constant** — guest always recognizes Shari's home  
 11. **Test with ten-year walkthrough** — timeline simulation required before ship  
 12. **Living Details are optional** — catalog supplies candidates; engine selects ≤2  
-13. **Communication Anchor is sacred** — life, weather, hospitality, and motion layers must never remove chat or mic access (`Companion Communication Anchor™`)
-14. **Environmental Truth is mandatory** — every visible detail must have a believable cause; motion is an effect, never decoration (`Environmental Truth™`)
+13. **Communication Anchor is sacred** — life, weather, hospitality, and motion layers must never remove chat or mic access (`Companion Communication Anchor`)
+14. **Environmental Truth is mandatory** — every visible detail must have a believable cause; motion is an effect, never decoration (`Environmental Truth`)
 
-## Environmental Truth™ (implementation)
+## Environmental Truth (implementation)
 
 Nothing moves because animation is available. Every effect traces to a cause:
 
@@ -425,15 +425,15 @@ Nothing moves because animation is available. Every effect traces to a cause:
 
 Module: `lib/environmentalTruth/` — runs after Living Change Engine, before render (`applyEnvironmentalTruth` in `evaluateCompanionEnvironmentIntelligence`).
 
-## Homestead Time™ (implementation)
+## Homestead Time (implementation)
 
 The Homestead has **days**, not themes. `lib/homesteadTime/` resolves seven periods (dawn → night), continuous sun/shadow/glow interpolation, room profiles, and ADHD conversation rhythm. Every environment evaluation consumes `resolveHomesteadTime()` before render.
 
 Narrative grammar is internal (`because` lines): *"Of course the curtains are moving — the window is open."* Never shown as UI chrome.
 
-## Companion Communication Anchor™ (implementation)
+## Companion Communication Anchor (implementation)
 
-Living Change Engine™ and arrival choreography **must not**:
+Living Change Engine and arrival choreography **must not**:
 
 - hide chat behind menus or overlays  
 - remove mic during room transitions  
@@ -469,7 +469,7 @@ Every room shell renders `CompanionCommunicationAnchor`. Arrival uses `quiet` mo
 
 # Part XI — Integration With Existing Systems
 
-## Companion Brain™
+## Companion Brain
 
 | Brain role | Living Life Engine role |
 |------------|-------------------------|
@@ -480,7 +480,7 @@ Every room shell renders `CompanionCommunicationAnchor`. Arrival uses `quiet` mo
 
 **Contract:** Brain calls `resolveLivingLife(input)` → receives candidates → may zero them out.
 
-## Scene Integrity Engine™
+## Scene Integrity Engine
 
 | Integrity role | Living Life role |
 |----------------|------------------|
@@ -490,29 +490,29 @@ Every room shell renders `CompanionCommunicationAnchor`. Arrival uses `quiet` mo
 
 **Contract:** `resolveSceneIntegrity(livingScene + changes)` → `ResolvedLivingScene`.
 
-## Hospitality Principle™
+## Hospitality Principle
 
 The home belongs to Shari. The welcome belongs to the guest.
 
 Living Life Engine prepares **Shari's home for whoever arrived** — mug out because it's morning, not because user profile says coffee lover.
 
-## First Production Experience™
+## First Production Experience
 
 Arrival consumes **Rhythm + Relationship + Layer 1–2** only. Full engine depth unfolds over tenure — do not dump year-five silence on day one.
 
-## Screen Composition Guide™
+## Screen Composition Guide
 
 Living changes respect seven layers — max one hero motion; objects in object layer; no UI reskins for life events.
 
-## Living Intelligence Graph™
+## Living Intelligence Graph
 
 Extend graph with:
 
 - `lastRhythmId`, `lastGreetingHash`, `objectCooldowns`, `chapterBias`, `returnFromRoom`
 
-## Live Reality Ecosystem™
+## Live Reality Ecosystem
 
-Today's Reality™ feeds Life Season + Continuity — not duplicated questionnaires.
+Today's Reality feeds Life Season + Continuity — not duplicated questionnaires.
 
 ---
 
@@ -563,10 +563,10 @@ Today's Reality™ feeds Life Season + Continuity — not duplicated questionnai
 
 # Part XIII — Approval Gate
 
-- [ ] Living Life Principle™ approved  
+- [ ] Living Life Principle approved  
 - [ ] Seven-layer architecture approved  
 - [ ] Anti-randomness rules approved (incl. deprecate modulo discovery)  
-- [ ] Living Details Catalog™ reviewed  
+- [ ] Living Details Catalog reviewed  
 - [ ] Ten-year walkthrough resonates  
 - [ ] Scene Integrity integration signed off  
 - [ ] Brain contract (candidate → judgment → scene) signed off  

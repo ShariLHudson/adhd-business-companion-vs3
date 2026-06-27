@@ -11,8 +11,8 @@ type Props = {
 };
 
 /**
- * @deprecated V2 — Future Thinking Map™ (relationship graph, not navigation).
- * Removed from My Thoughts™ garden in v1; do not wire back until it shows
+ * @deprecated V2 — Future Thinking Map (relationship graph, not navigation).
+ * Removed from My Thoughts garden in v1; do not wire back until it shows
  * clusters and connections rather than duplicating collection cards.
  */
 export function ThinkingSpaceMapNav({

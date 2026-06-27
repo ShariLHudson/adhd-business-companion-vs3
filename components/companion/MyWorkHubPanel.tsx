@@ -144,42 +144,42 @@ export function MyWorkHubPanel({
     () => [
       {
         id: "projects",
-        title: "Projects™",
+        title: "Projects",
         description: "Larger work with multiple steps.",
         count: counts.projects,
         onOpen: () => onOpenSection("projects", "other"),
       },
       {
         id: "templates",
-        title: "Templates™",
+        title: "Templates",
         description: "Reusable frameworks and starting points.",
         count: counts.templates,
         onOpen: () => onOpenSection("templates-library", "other"),
       },
       {
         id: "strategies",
-        title: "Strategies™",
+        title: "Strategies",
         description: "Saved ADHD and business strategies.",
         count: counts.strategies,
         onOpen: () => onOpenSection("playbook", "other"),
       },
       {
         id: "snippets",
-        title: "Snippets™",
+        title: "Snippets",
         description: "Reusable phrases, hooks, CTAs, and content blocks.",
         count: counts.snippets,
         onOpen: () => onOpenSection("snippets", "other"),
       },
       {
         id: "sops",
-        title: "SOPs™",
+        title: "SOPs",
         description: "Standard operating procedures and repeatable workflows.",
         count: counts.sops,
         onOpen: () => onOpenSection("saved-work", "other"),
       },
       {
         id: "documents",
-        title: "Documents™",
+        title: "Documents",
         description: "Workshops, plans, emails, and created content.",
         count: counts.documents,
         onOpen: () => onOpenSection("content-generator", "other"),
@@ -283,7 +283,7 @@ export function MyWorkHubPanel({
 
         <div className="flex flex-wrap items-start justify-between gap-3">
           <div>
-            <h1 className="text-3xl font-bold text-stone-900">Other™</h1>
+            <h1 className="text-3xl font-bold text-stone-900">Other</h1>
             <p className="mt-1 text-stone-600">
               Create, build, manage, and retrieve — when you need more than chat.
             </p>
@@ -366,7 +366,7 @@ export function MyWorkHubPanel({
               testId="other-retrieve"
             >
               <BrowseRow
-                title="Saved™"
+                title="Saved"
                 count={counts.documents + counts.projects + counts.templates}
                 description="ADHD-friendly file explorer for everything you kept."
                 onOpen={() => setSavedBrowseOpen(true)}

@@ -1,5 +1,5 @@
 /**
- * Capture → Live Reality™ — producers never require Today's Reality™ repeat.
+ * Capture → Live Reality — producers never require Today's Reality repeat.
  */
 
 import { publishRealitySignal } from "./liveEcosystem";
@@ -15,7 +15,7 @@ const FAMILY_CAPTURE_RE =
   /\b(?:mom|dad|mother|father|family|kids?|child|spouse|partner)\b/i;
 
 /**
- * Whether capture text should trigger a Live Reality™ re-evaluation.
+ * Whether capture text should trigger a Live Reality re-evaluation.
  */
 export function captureAffectsLiveReality(text: string): boolean {
   return REALITY_CAPTURE_RE.test(text.trim());
@@ -42,7 +42,7 @@ function inferSourceKind(
 }
 
 /**
- * Publish reality from Clear My Mind™ or My Thoughts™ when capture changes today's truth.
+ * Publish reality from Clear My Mind or My Thoughts when capture changes today's truth.
  */
 export function maybePublishCaptureReality(
   text: string,

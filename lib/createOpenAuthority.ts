@@ -108,23 +108,23 @@ export function createReceiptMessage(
   const type = detail?.itemType?.trim();
   switch (kind) {
     case "draft_created":
-      return "I started a draft beside us.";
+      return "I started a draft — I'm still here while we shape it.";
     case "draft_updated":
       return "I updated your draft.";
     case "template_applied":
       return type
-        ? `I loaded that ${type} template into Create.`
-        : "I loaded that template into Create.";
+        ? `I loaded that ${type} template — we can work on it together.`
+        : "I loaded that template — we can work on it together.";
     case "saved_for_later":
       return "I saved this for later.";
     case "artifact_linked":
       return "I connected this to your draft.";
     case "create_opened":
       return type
-        ? `Create is open with your ${type} beside us.`
-        : "Create is open beside us.";
+        ? `Create is ready with your ${type} — I'm still here with you.`
+        : "Create is ready — I'm still here with you.";
     default:
-      return "Create is open beside us.";
+      return "Create is ready — I'm still here with you.";
   }
 }
 

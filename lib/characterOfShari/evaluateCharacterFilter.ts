@@ -31,7 +31,7 @@ function verdict(
 }
 
 /**
- * Character Filter™ — "Would the real Shari do this?"
+ * Character Filter — "Would the real Shari do this?"
  */
 export function evaluateCharacterFilter(
   content: string | null,

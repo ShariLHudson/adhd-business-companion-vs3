@@ -7,6 +7,11 @@ import type { AppSection } from "./companionUi";
 import type { SidebarToolId } from "./companionUi";
 import type { OutcomeThread } from "./companionOutcomeThread";
 import { workspaceTitle } from "./workspaceMode";
+import {
+  inferClearMyMindViewFromText,
+  workspaceOpenBesideSuccessCopy,
+  continuationReplyForAssistantQuestion,
+} from "./workspaceOpeningRule";
 import { assistantEndsWithQuestion } from "./conversationIntervention";
 import { isBareGenericAcceptance } from "./pendingAcceptanceAuthority";
 
@@ -14,6 +19,8 @@ export type ConversationWorkflowKind =
   | "project_list"
   | "project_sort"
   | "open_clear_my_mind"
+  | "open_my_thoughts"
+  | "choose_focus_task"
   | "open_decision_compass"
   | "open_breathe"
   | "open_adjust_my_day"
@@ -37,18 +44,21 @@ export type WorkflowContinuationResult =
       action: "reply";
       message: string;
       nextWorkflow?: ConversationWorkflow | null;
+      clearMyMindView?: "capture" | "my-thoughts";
     }
   | {
       action: "open_section";
       section: AppSection;
       message: string;
       nextWorkflow?: ConversationWorkflow | null;
+      clearMyMindView?: "capture" | "my-thoughts";
     }
   | {
       action: "open_tool";
       tool: SidebarToolId;
       message: string;
       nextWorkflow?: ConversationWorkflow | null;
+      clearMyMindView?: "capture" | "my-thoughts";
     };
 
 const CONSENT_OFFER_RE =
@@ -92,7 +102,7 @@ export function inferWorkspaceSectionFromConsent(text: string): AppSection | nul
 }
 
 const DECLINE_RE =
-  /^(?:no|nope|nah|not now|not yet|maybe later|skip|pass|don'?t|rather not)\.?$/i;
+  /^(?:no|nope|nah|not now|not yet|maybe later|no thanks|not really|skip|pass|don'?t|rather not)\.?$/i;
 
 /** Shari asked for consent — not just any question. */
 export function assistantOfferedConsent(text: string): boolean {
@@ -134,11 +144,31 @@ export function inferConversationWorkflowFromAssistant(
   if (
     /\b(?:clear my mind|brain dump|get (?:it |everything )?out of (?:your|my) head)\b/i.test(
       t,
-    )
+    ) &&
+    !/\bmy thoughts\b/i.test(t)
   ) {
     return {
       kind: "open_clear_my_mind",
       offerSummary: "Open Clear My Mind",
+      assistantQuestion: t,
+    };
+  }
+
+  if (/\bmy thoughts\b/i.test(t) && CONSENT_OFFER_RE.test(t)) {
+    return {
+      kind: "open_my_thoughts",
+      offerSummary: "Open My Thoughts",
+      assistantQuestion: t,
+    };
+  }
+
+  if (
+    /\b(?:choose|pick|select)\s+(?:one\s+)?(?:small\s+)?task\b/i.test(t) &&
+    CONSENT_OFFER_RE.test(t)
+  ) {
+    return {
+      kind: "choose_focus_task",
+      offerSummary: "Choose one focus task",
       assistantQuestion: t,
     };
   }
@@ -271,8 +301,24 @@ export function continuationForWorkflow(
       return {
         action: "open_section",
         section: "brain-dump",
+        message: workspaceOpenBesideSuccessCopy("brain-dump", { view: "capture" }),
+        nextWorkflow: null,
+      };
+    case "open_my_thoughts":
+      return {
+        action: "open_section",
+        section: "brain-dump",
+        message: workspaceOpenBesideSuccessCopy("brain-dump", {
+          view: "my-thoughts",
+        }),
+        nextWorkflow: null,
+        clearMyMindView: "my-thoughts",
+      };
+    case "choose_focus_task":
+      return {
+        action: "reply",
         message:
-          "I've opened **Clear My Mind**. Start by entering everything competing for your attention right now. Don't organize it yet — just get it out.",
+          "Okay. What's one thing that's been sitting in the back of your mind today?",
         nextWorkflow: null,
       };
     case "open_decision_compass":
@@ -311,8 +357,7 @@ export function continuationForWorkflow(
       return {
         action: "open_section",
         section: "plan-my-day",
-        message:
-          "I've opened **Plan My Day**. What's competing for your attention today — we'll shape it without rigid pressure.",
+        message: workspaceOpenBesideSuccessCopy("plan-my-day"),
         nextWorkflow: null,
       };
     case "open_focus_timer":
@@ -327,7 +372,9 @@ export function continuationForWorkflow(
       return {
         action: "open_section",
         section: workflow.targetSection ?? "how-do-i",
-        message: `Opening **${workflow.offerSummary}** beside us — we'll work through it together.`,
+        message: workspaceOpenBesideSuccessCopy(
+          workflow.targetSection ?? "how-do-i",
+        ),
         nextWorkflow: null,
       };
     case "guided_continue":
@@ -358,11 +405,16 @@ export function continuationForGuidedWorkflow(
     };
   }
   if (context?.currentProblem) {
-    return {
-      action: "reply",
-      message: `Picking up **${context.currentProblem.slice(0, 100)}** — tell me one thing you're most unsure about: customers, pricing, or timing?`,
-      nextWorkflow: workflow,
-    };
+    const fromQuestion = continuationReplyForAssistantQuestion(
+      workflow.assistantQuestion,
+    );
+    if (fromQuestion) {
+      return {
+        action: "reply",
+        message: fromQuestion,
+        nextWorkflow: null,
+      };
+    }
   }
   const q = workflow.assistantQuestion;
   if (/\bdecision compass\b/i.test(q)) {

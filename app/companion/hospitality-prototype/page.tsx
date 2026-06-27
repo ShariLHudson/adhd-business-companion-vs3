@@ -8,7 +8,7 @@ const ALLOWED =
   process.env.NODE_ENV === "development" ||
   process.env.NEXT_PUBLIC_HOSPITALITY_PROTOTYPE === "true";
 
-/** Companion Hospitality™ — emotional validation prototype. */
+/** Companion Hospitality — emotional validation prototype. */
 export default function HospitalityPrototypePage() {
   if (!ALLOWED) {
     return (

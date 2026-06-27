@@ -1,5 +1,5 @@
 /**
- * Frictionless Companion Action Layer™ (P0.9)
+ * Frictionless Companion Action Layer (P0.9)
  * Chat is the front door — act, ask one question, or open the right tool.
  * Runs before relationship reflection.
  */
@@ -80,6 +80,7 @@ import {
   type GoogleSheetIntakeSession,
   type GoogleSheetTypeId,
 } from "./googleSheetsIntelligence";
+import { welcomeRoomWorkspaceOffer } from "./welcomeRoom";
 import type { WorkspaceOffer } from "./workspaceMode";
 import type { TimeBlock } from "./companionStore";
 import {
@@ -875,6 +876,25 @@ export function resolveFrictionlessAction(
       suppressReflectionFirst: true,
       responseHint:
         "LEARN FAST PATH (P0.20.1): Answer the concept directly — no Visual Thinking open.",
+      intentRouting: routing,
+    };
+  }
+
+  const welcomeOffer = welcomeRoomWorkspaceOffer(userText);
+  if (welcomeOffer) {
+    return {
+      category: "direct_action",
+      suppressRelationship: false,
+      suppressRecap: false,
+      suppressReflectionFirst: false,
+      responseHint:
+        "WELCOME ROOM: Offer the Welcome Room invitation — never force navigation or read an About page.",
+      localReply: welcomeOffer.line,
+      pendingAction: frictionlessPendingFromWorkspaceOffer(welcomeOffer, currentTurn, {
+        userText,
+      }),
+      toolSuggestion: null,
+      workspaceOffer: welcomeOffer,
       intentRouting: routing,
     };
   }

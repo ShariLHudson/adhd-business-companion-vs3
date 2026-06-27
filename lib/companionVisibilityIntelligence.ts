@@ -1,5 +1,5 @@
 /**
- * Visibility & Marketing Confidence — ADHD Entrepreneur Behavioral Framework™.
+ * Visibility & Marketing Confidence — ADHD Entrepreneur Behavioral Framework.
  * Many "marketing problems" are visibility, confidence, and emotional safety problems.
  */
 

@@ -48,7 +48,7 @@ const FRONT_PORCH_RHYTHM: CompanionRelationshipRhythm = {
 export const COMPANION_RELATIONSHIP_STYLES_CATALOG: CompanionRelationshipStyleMeta[] = [
   {
     id: "quiet-companion",
-    label: "Quiet Companion™",
+    label: "Quiet Companion",
     emoji: "🌿",
     tagline: "I usually know what I want to work on.",
     description:
@@ -57,16 +57,16 @@ export const COMPANION_RELATIONSHIP_STYLES_CATALOG: CompanionRelationshipStyleMe
   },
   {
     id: "balanced-companion",
-    label: "Balanced Companion™",
+    label: "Balanced Companion",
     emoji: "☕",
     tagline: "I enjoy a little conversation, then let's get to work.",
     description:
-      "Warm greeting, occasional Memory Triggers™, fast transition when work is requested.",
+      "Warm greeting, occasional Memory Triggers, fast transition when work is requested.",
     rhythm: BALANCED_RHYTHM,
   },
   {
     id: "front-porch-companion",
-    label: "Front Porch Companion™",
+    label: "Front Porch Companion",
     emoji: "🏡",
     tagline: "I enjoy spending a little time together before we begin.",
     description:

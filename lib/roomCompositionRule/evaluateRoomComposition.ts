@@ -17,7 +17,7 @@ import { ROOM_COMPOSITION_PRINCIPLE } from "./types";
 export const LIVING_FRAME_CLASS = "companion-living-frame";
 
 /**
- * Room Composition Rule™ — compose every room around the conversation.
+ * Room Composition Rule — compose every room around the conversation.
  */
 export function evaluateRoomComposition(
   input: RoomCompositionInput = {},
@@ -27,8 +27,24 @@ export function evaluateRoomComposition(
   const room = roomCompositionForPlace(placeId);
   const mobile = input.mobile ?? false;
 
-  const centerMaxWidth = mobile ? "100%" : "36rem";
-  const mobileProtectedExpand = mobile ? "0.88" : "0.58";
+  const isConservatory =
+    input.workspaceId === "clear-my-mind" ||
+    input.workspaceId === "clear-my-mind-thoughts";
+
+  const centerMaxWidth = isConservatory
+    ? mobile
+      ? "min(100%, 31.25rem)"
+      : "clamp(26.25rem, 92vw, 31.25rem)"
+    : mobile
+      ? "100%"
+      : "36rem";
+  const mobileProtectedExpand = isConservatory
+    ? mobile
+      ? "0.72"
+      : "0.42"
+    : mobile
+      ? "0.88"
+      : "0.58";
 
   const cssVars: Record<string, string> = {
     "--scene-image-position": room.backgroundObjectPosition,
@@ -73,7 +89,7 @@ export function validateEnvironmentalPlacement(
   if (zone === "center" && isCenterForbidden(elementId)) {
     return {
       allowed: false,
-      reason: `${elementId} must not sit behind the Protected Conversation Zone™`,
+      reason: `${elementId} must not sit behind the Protected Conversation Zone`,
     };
   }
   if (!motionAllowedInZone(zone)) {
@@ -93,7 +109,7 @@ export function roomCompositionHintForChat(
   verdict: RoomCompositionVerdict,
 ): string {
   return [
-    "ROOM COMPOSITION RULE™ — design around the conversation:",
+    "ROOM COMPOSITION RULE — design around the conversation:",
     verdict.principle,
     `Place: ${verdict.placeId}. Signature: ${verdict.signatureFeature.label} (${verdict.signatureFeature.visibleZone} edge).`,
     "Never place hero features, Shari, or primary motion behind the center panel.",

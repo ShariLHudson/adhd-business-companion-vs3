@@ -4,6 +4,7 @@
  * Only explicit create/draft/build requests open Create.
  */
 
+import { isResearchIntelligenceRequest } from "./researchIntelligence";
 import { matchCatalogFromText } from "./createCatalog";
 import {
   hasClearEmotionalSignal,
@@ -34,9 +35,6 @@ export type CompanionIntentBucket =
   | "drafting"
   | "building_assets"
   | "neutral";
-
-const RESEARCH_RE =
-  /\b(?:what does research say|what do(?:es)? (?:the )?research(?:ers)? say|what (?:do|does) (?:the )?stud(?:y|ies) (?:say|show|suggest|find)|according to research|research (?:on|about|into|suggests?|shows?|says?|indicates?)|scientific (?:evidence|research)|evidence (?:on|about|for|that|suggests?))\b/i;
 
 const LEARNING_RE =
   /\b(?:how do(?:es)? .+ work|how (?:do|to) .+ work|what is (?:a|an) \w|what are \w|can you explain|could you explain|explain (?:how|what|why)|tell me (?:about|how)|teach me (?:about|how)|help me understand|walk me through)\b/i;
@@ -89,7 +87,7 @@ export function classifyCompanionIntentBucket(
   }
 
   if (isContentBrainstorming(t)) return "brainstorming";
-  if (RESEARCH_RE.test(t)) return "research";
+  if (isResearchIntelligenceRequest(t)) return "research";
   if (LEARNING_RE.test(t) && t.includes("?")) return "learning";
   if (LEARNING_RE.test(t) && !CREATE_SIGNAL_RE.test(t)) return "learning";
   if (ADVICE_RE.test(t)) return "advice";
@@ -134,7 +132,7 @@ export function informationIntentHintForChat(
 
   const job =
     bucket === "research"
-      ? "answer with research-informed context"
+      ? "own the research — synthesize current findings naturally; never push internet lookup onto the user"
       : bucket === "learning"
         ? "explain clearly in chat"
         : bucket === "advice"

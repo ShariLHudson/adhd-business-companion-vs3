@@ -1,5 +1,5 @@
 /**
- * Knowledge Intelligence™ (P0.10) — concept questions, not user reflection.
+ * Knowledge Intelligence (P0.10) — concept questions, not user reflection.
  * Answer first; skip relationship, observation, wisdom, and transformation layers.
  */
 
@@ -64,7 +64,7 @@ export function extractKnowledgeTopic(text: string): string | null {
 export function knowledgeIntelligenceHintForChat(userText: string): string {
   const topic = extractKnowledgeTopic(userText);
   return [
-    "KNOWLEDGE INTELLIGENCE™ (P0.10 — answer first, learning paths):",
+    "KNOWLEDGE INTELLIGENCE (P0.10 — answer first, learning paths):",
     topic ? `Concept: ${topic}.` : "User asks about a concept — NOT about themselves.",
     learningPathMenuHintForChat(topic),
     "FORBIDDEN openers: I've noticed…, It sounds like…, You seem to…, You're looking to…, This suggests…, This pattern indicates…",

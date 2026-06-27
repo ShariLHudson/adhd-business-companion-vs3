@@ -1,6 +1,6 @@
 /**
- * Business Canvas™ — Companion Intelligence™ entry (explain-first, permission-gated).
- * Users hear "Business Canvas™" only. Framework selection is internal.
+ * Business Canvas — Companion Intelligence entry (explain-first, permission-gated).
+ * Users hear "Business Canvas" only. Framework selection is internal.
  */
 
 import {
@@ -25,7 +25,7 @@ const BUSINESS_CANVAS_SITUATION_PATTERNS: RegExp[] = [
   /\bwhere\s+(?:is|are)\s+(?:the\s+)?(?:gap|leak|bottleneck)\b/i,
 ];
 
-/** True when chat suggests a Business Canvas™ opportunity (not auto-open). */
+/** True when chat suggests a Business Canvas opportunity (not auto-open). */
 export function isBusinessCanvasSituationSignal(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
@@ -34,21 +34,21 @@ export function isBusinessCanvasSituationSignal(text: string): boolean {
 
 export { explainFirstOfferForBusinessCanvas };
 
-/** Example companion line — Business Canvas™ only, no framework names. */
+/** Example companion line — Business Canvas only, no framework names. */
 export function formatBusinessCanvasCompanionOffer(text: string): string {
   return formatExplainFirstOfferMessage(explainFirstOfferForBusinessCanvas(text));
 }
 
 /**
- * Hint for companion-chat when a Business Canvas™ explain-first offer fits.
- * DO NOT name internal frameworks (Business Model Canvas™, Lean Canvas™, etc.).
+ * Hint for companion-chat when a Business Canvas explain-first offer fits.
+ * DO NOT name internal frameworks (Business Model Canvas, Lean Canvas, etc.).
  */
 export function companionBusinessCanvasEntryHintForChat(text: string): string | null {
   if (!isBusinessCanvasSituationSignal(text)) return null;
 
   return [
-    "BUSINESS CANVAS™ ENTRY (mandatory):",
-    `Offer ${BUSINESS_CANVAS_USER_LABEL} only — NOT framework names (no Business Model Canvas™, Lean Canvas™, etc. on this turn).`,
+    "BUSINESS CANVAS ENTRY (mandatory):",
+    `Offer ${BUSINESS_CANVAS_USER_LABEL} only — NOT framework names (no Business Model Canvas, Lean Canvas, etc. on this turn).`,
     "Explain what it is, why it helps, what they will receive, then ask permission.",
     `Example tone: "${formatBusinessCanvasCompanionOffer(text).split("\n").join(" ")}"`,
     "Wait for approval before opening any workspace.",

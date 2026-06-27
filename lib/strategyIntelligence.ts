@@ -1,5 +1,5 @@
 /**
- * Strategy Intelligence™ — discoverability, situation mapping, search, analytics.
+ * Strategy Intelligence — discoverability, situation mapping, search, analytics.
  *
  * Transforms strategies from a hidden library into a companion-supported
  * problem-solving system.
@@ -427,7 +427,7 @@ export function strategyIntelligenceHintForChat(userText: string): string | unde
   if (!rec || rec.confidence === "low") return undefined;
 
   return [
-    "STRATEGY INTELLIGENCE™ (situation-aware recommendations):",
+    "STRATEGY INTELLIGENCE (situation-aware recommendations):",
     `If appropriate, offer the matching strategy conversationally — do not lecture.`,
     `Suggested offer: ${rec.offerMessage}`,
     `Strategy id (internal): ${rec.strategyId}`,

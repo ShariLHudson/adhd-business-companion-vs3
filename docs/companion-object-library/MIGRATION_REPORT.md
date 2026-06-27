@@ -1,4 +1,4 @@
-# Companion Object Library™ — Migration Report
+# Companion Object Library — Migration Report
 
 **Phase:** 1 — Registry complete (no emoji replacement yet)  
 **Audit date:** 2026-06-25  
@@ -8,7 +8,7 @@
 
 ## Executive summary
 
-The Companion Homestead™ currently uses **Unicode emoji as feature iconography** across **176 production files** with **211 distinct emoji glyphs** (including variation selectors). This report inventories every usage class, maps features to Signature Objects™, and defines the phased migration to a single visual language.
+The Companion Homestead currently uses **Unicode emoji as feature iconography** across **176 production files** with **211 distinct emoji glyphs** (including variation selectors). This report inventories every usage class, maps features to Signature Objects, and defines the phased migration to a single visual language.
 
 **Phase 1 is complete:** a central registry exists with 22 primary features plus extended navigation, growth, hospitality, and momentum mappings. **All artwork status: Needs artwork.**
 
@@ -18,30 +18,30 @@ The Companion Homestead™ currently uses **Unicode emoji as feature iconography
 
 | Feature | Signature Object | Room | Status |
 |---------|------------------|------|--------|
-| Clear My Mind™ | Leather journal | Window Seat™ | Needs artwork |
-| Plan My Day™ | Open leather planner | Planning Table™ | Needs artwork |
-| Today's Reality™ | Morning mug and notebook | Kitchen Table™ | Needs artwork |
-| Decision Compass™ | Elegant brass compass | Outlook Point™ | Needs artwork |
-| Focus Studio™ | Premium headphones | Focus Studio™ | Needs artwork |
-| Breathing™ | Lit candle | Focus Studio™ | Needs artwork |
-| Games™ | Wooden puzzle | Living Room™ | Needs artwork |
-| Create™ | Sketchbook with paint brushes | Creative Studio™ | Needs artwork |
-| Business™ | Leather portfolio | Business Office™ | Needs artwork |
-| Learning™ | Stack of books | Library™ | Needs artwork |
-| Reading™ | Open hardcover book | Reading Nook™ | Needs artwork |
-| Parking Lot™ | Seed packet / idea box | Garden Path™ | Needs artwork |
-| Evidence Bank™ | Keepsake box | Library™ | Needs artwork |
-| Wins™ | Framed accomplishment | Fire Circle™ | Needs artwork |
-| Growth™ | Growing plant | Greenhouse™ | Needs artwork |
-| Calendar | Desktop calendar | Planning Table™ | Needs artwork |
-| Projects | Project binder | Barn™ | Needs artwork |
-| Messages | Handwritten note | Living Room™ | Needs artwork |
-| Settings | Vintage brass key | Front Porch™ | Needs artwork |
-| Search | Magnifying glass | Library™ | Needs artwork |
-| Notifications | Small desk bell | Kitchen Table™ | Needs artwork |
-| Help | Open guidebook | Library™ | Needs artwork |
+| Clear My Mind | Leather journal | Window Seat | Needs artwork |
+| Plan My Day | Open leather planner | Planning Table | Needs artwork |
+| Today's Reality | Morning mug and notebook | Kitchen Table | Needs artwork |
+| Decision Compass | Elegant brass compass | Outlook Point | Needs artwork |
+| Focus Studio | Premium headphones | Focus Studio | Needs artwork |
+| Breathing | Lit candle | Focus Studio | Needs artwork |
+| Games | Wooden puzzle | Living Room | Needs artwork |
+| Create | Sketchbook with paint brushes | Creative Studio | Needs artwork |
+| Business | Leather portfolio | Business Office | Needs artwork |
+| Learning | Stack of books | Library | Needs artwork |
+| Reading | Open hardcover book | Reading Nook | Needs artwork |
+| Parking Lot | Seed packet / idea box | Garden Path | Needs artwork |
+| Evidence Bank | Keepsake box | Library | Needs artwork |
+| Wins | Framed accomplishment | Fire Circle | Needs artwork |
+| Growth | Growing plant | Greenhouse | Needs artwork |
+| Calendar | Desktop calendar | Planning Table | Needs artwork |
+| Projects | Project binder | Barn | Needs artwork |
+| Messages | Handwritten note | Living Room | Needs artwork |
+| Settings | Vintage brass key | Front Porch | Needs artwork |
+| Search | Magnifying glass | Library | Needs artwork |
+| Notifications | Small desk bell | Kitchen Table | Needs artwork |
+| Help | Open guidebook | Library | Needs artwork |
 
-Full registry (80+ entries including House Map™, Toolbelt™, growth, games, hospitality): see `objectLibrary.ts`.
+Full registry (80+ entries including House Map, Toolbelt, growth, games, hospitality): see `objectLibrary.ts`.
 
 ---
 
@@ -69,8 +69,8 @@ Emoji used as the visual identity of a product feature. These must reference `CO
 | Area | Files | Top emojis | Registry coverage |
 |------|-------|------------|-------------------|
 | Top navigation | `TopBar.tsx`, `companionUi.ts` | 🧠 📅 🌤️ 💬 | `clear-my-mind`, `plan-my-day`, `todays-reality`, `messages` |
-| House Map™ | `companionLayoutSystem.ts` | 🏡 🪟 🍵 📝 🎯 🎨 💼 📚 | `nav-*` + primary features |
-| Toolbelt™ | `companionLayoutSystem.ts` | 💬 🔍 💭 🅿️ 📁 📋 💾 | `toolbelt-*` entries |
+| House Map | `companionLayoutSystem.ts` | 🏡 🪟 🍵 📝 🎯 🎨 💼 📚 | `nav-*` + primary features |
+| Toolbelt | `companionLayoutSystem.ts` | 💬 🔍 💭 🅿️ 📁 📋 💾 | `toolbelt-*` entries |
 | Sidebar | `companionUi.ts`, `AppSidebar.tsx` | 💬 🚧 💡 📈 ➕ ❓ | `messages`, `focus-my-brain`, `visual-thinking`, `business`, `other`, `help` |
 | Workspace modes | `workspaceMode.ts` | 23 mode emojis | Mapped via feature ids |
 | Growth hub | `GrowthCenterPanel.tsx`, `growthNavigation.ts` | 🏆 📈 ✨ 🌱 | `wins`, `evidence-bank`, `my-highlights`, `growth` |
@@ -215,7 +215,7 @@ Every registry entry supports:
 ### Phase 1 — Build library ✅
 
 - [x] Create `objectLibrary.ts` with full schema
-- [x] Register in `libraryCatalog.ts` as Companion Object Library™
+- [x] Register in `libraryCatalog.ts` as Companion Object Library
 - [x] Export from `companionUniverse/index.ts`
 - [x] Audit application (`emoji-audit.json`)
 - [x] Migration report (this document)
@@ -232,8 +232,8 @@ Every registry entry supports:
 
 ### Phase 3 — Update navigation cards
 
-- House Map™ cards use Signature Object renders
-- Toolbelt™ uses secondary-weight object thumbnails
+- House Map cards use Signature Object renders
+- Toolbelt uses secondary-weight object thumbnails
 - Sidebar six doors unified
 
 ### Phase 4 — Update room experiences

@@ -1,5 +1,5 @@
 /**
- * Clear My Mind™ — five-stage emotional flow.
+ * Clear My Mind — five-stage emotional flow.
  *
  * Permission → Release → Received → Understanding → Choice
  *

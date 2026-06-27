@@ -1,5 +1,5 @@
 /**
- * Founder Alerts™ — proactive surfacing of what needs founder attention.
+ * Founder Alerts — proactive surfacing of what needs founder attention.
  *
  * Philosophy: answer "what needs attention?" not "what happened?"
  * Batches non-critical items; escalates meaningful risks only.

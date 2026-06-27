@@ -45,20 +45,35 @@ import {
   assessRelationshipMemoryConfidence,
   type RelationshipMemoryConfidence,
 } from "./relationshipMemoryConfidence";
+import {
+  morningGreetingHintForChat,
+  nameIntelligenceHintForChat,
+  evaluateNameIntelligence,
+} from "./relationshipIntelligence";
 
 export type { RelationshipMemoryConfidence };
 export { assessRelationshipMemoryConfidence };
 
 const GENERIC_OPENING_BANS = [
+  "It sounds like",
+  "It seems like",
+  "It appears that",
   "This is a common challenge",
   "This is a common experience",
   "Many entrepreneurs",
   "Many people",
   "People with ADHD often",
+  "Many people with ADHD",
   "Research shows",
   "Studies suggest",
+  "Studies indicate",
   "It's common for",
   "A lot of founders",
+  "I understand how you feel",
+  "As an AI",
+  "Let's break this down",
+  "Based on what you said",
+  "I think you should",
 ];
 
 export function hasRelationshipMemoryForResponse(): boolean {
@@ -206,12 +221,20 @@ function questionSpecificGuidance(userText?: string): string | null {
 }
 
 export function relationshipResponseQualityGuardrails(): string {
+  const nameVerdict = evaluateNameIntelligence({
+    lineContext: "chat",
+    scenario: "ordinary",
+  });
   return [
     relationshipObservationResponseStructure(),
     "",
     "RESPONSE QUALITY GUARDRAILS (relationship memory active):",
     `FORBIDDEN FIRST-SENTENCE OPENERS: ${GENERIC_OPENING_BANS.join("; ")}`,
     "Sound like a companion who has spent months learning how they think — not someone who read a profile summary.",
+    "",
+    nameIntelligenceHintForChat(nameVerdict),
+    "",
+    morningGreetingHintForChat(),
   ].join("\n");
 }
 

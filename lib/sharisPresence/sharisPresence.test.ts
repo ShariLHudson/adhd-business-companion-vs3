@@ -6,15 +6,15 @@ import {
   shariImageAllowedForState,
 } from "./index";
 
-describe("Shari's Presence™", () => {
-  it("Living Room™ is Host™ — Shari may appear", () => {
+describe("Shari's Presence", () => {
+  it("Living Room is Host — Shari may appear", () => {
     const verdict = evaluateSharisPresence({ placeId: "living-room" });
     expect(verdict.state).toBe("host");
     expect(verdict.showShariImage).toBe(true);
     expect(verdict.conversationPrimary).toBe(true);
   });
 
-  it("Clear My Mind™ is Beside You™ — no portrait, anchor primary", () => {
+  it("Clear My Mind is Beside You — no portrait, anchor primary", () => {
     const verdict = evaluateSharisPresence({
       section: "brain-dump",
       workspaceId: "clear-my-mind",
@@ -25,20 +25,20 @@ describe("Shari's Presence™", () => {
     expect(verdict.guestFeelsWatched).toBe(false);
   });
 
-  it("Planning Table™ is Beside You™", () => {
+  it("Planning Table is Beside You", () => {
     expect(presenceStateForPlace("planning-table")).toBe("beside-you");
     expect(evaluateSharisPresence({ section: "plan-my-day" }).state).toBe(
       "beside-you",
     );
   });
 
-  it("Decision Compass maps to Beside You™", () => {
+  it("Decision Compass maps to Beside You", () => {
     expect(evaluateSharisPresence({ section: "decision-compass" }).state).toBe(
       "beside-you",
     );
   });
 
-  it("Creative Studio™ is Nearby™ with evidence, not Shari image", () => {
+  it("Creative Studio is Nearby with evidence, not Shari image", () => {
     const verdict = evaluateSharisPresence({ placeId: "creative-studio" });
     expect(verdict.state).toBe("nearby");
     expect(verdict.showShariImage).toBe(false);
@@ -46,7 +46,7 @@ describe("Shari's Presence™", () => {
     expect(verdict.evidenceObjects).toContain("coffee-mug");
   });
 
-  it("Reading Nook™ is Nearby™", () => {
+  it("Reading Nook is Nearby", () => {
     expect(evaluateSharisPresence({ placeId: "reading-nook" }).state).toBe(
       "nearby",
     );
@@ -61,7 +61,7 @@ describe("Shari's Presence™", () => {
     expect(verdict.showEvidenceObjects).toBe(false);
   });
 
-  it("only Host™ allows Shari photograph", () => {
+  it("only Host allows Shari photograph", () => {
     expect(shariImageAllowedForState("host")).toBe(true);
     expect(shariImageAllowedForState("beside-you")).toBe(false);
     expect(shariImageAllowedForState("nearby")).toBe(false);

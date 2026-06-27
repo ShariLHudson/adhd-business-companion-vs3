@@ -154,7 +154,7 @@ describe("EcosystemIntelligenceValidation", () => {
     vi.spyOn(companionStore, "getPrimaryAvatar").mockReturnValue(undefined);
   }
 
-  it("Capacity Awareness™ — recommendations adapt to capacity", () => {
+  it("Capacity Awareness — recommendations adapt to capacity", () => {
     seedEcosystemBase();
     expect(validateCapacityAwareness(new Date("2026-06-01T10:00:00.000Z"))).toBe(true);
     const adapted = adaptRecommendationToCapacity(
@@ -164,28 +164,28 @@ describe("EcosystemIntelligenceValidation", () => {
     expect(adapted.length).toBeGreaterThan(10);
   });
 
-  it("Energy Influence™ — energy affects business behavior narrative", () => {
+  it("Energy Influence — energy affects business behavior narrative", () => {
     seedEcosystemBase();
     expect(validateEnergyInfluence(new Date("2026-06-01T10:00:00.000Z"))).toBe(true);
     const snapshot = buildEcosystemIntelligenceSnapshot(new Date("2026-06-01T10:00:00.000Z"));
     expect(snapshot.energy.narrative).toMatch(/energy|capacity|window/i);
   });
 
-  it("Cross-Domain Insight™ — system recognizes connected patterns", () => {
+  it("Cross-Domain Insight — system recognizes connected patterns", () => {
     seedEcosystemBase();
     expect(validateCrossDomainInsight(new Date("2026-06-01T10:00:00.000Z"))).toBe(true);
     const snapshot = buildEcosystemIntelligenceSnapshot(new Date("2026-06-01T10:00:00.000Z"));
     expect(snapshot.interconnections.length).toBeGreaterThanOrEqual(2);
   });
 
-  it("Recovery Detection™ — companion recommends recovery when appropriate", () => {
+  it("Recovery Detection — companion recommends recovery when appropriate", () => {
     seedEcosystemBase();
     const recovery = identifyRecoveryRecommendation(new Date("2026-06-01T10:00:00.000Z"));
     expect(validateRecoveryDetection(new Date("2026-06-01T10:00:00.000Z"))).toBe(true);
     expect(recovery === null || /recovery|capacity/i.test(recovery)).toBe(true);
   });
 
-  it("Purpose Reconnection™ — reconnects users to meaningful goals", () => {
+  it("Purpose Reconnection — reconnects users to meaningful goals", () => {
     seedEcosystemBase();
     expect(validatePurposeReconnection(new Date("2026-06-01T10:00:00.000Z"))).toBe(true);
     const insight = maybeEcosystemInsight({
@@ -195,7 +195,7 @@ describe("EcosystemIntelligenceValidation", () => {
     expect(insight).toMatch(/purpose|why|reconnect|resonates/i);
   });
 
-  it("Whole-System Accuracy™ — insights require evidence levels", () => {
+  it("Whole-System Accuracy — insights require evidence levels", () => {
     seedEcosystemBase();
     expect(validateWholeSystemAccuracy(new Date("2026-06-01T10:00:00.000Z"))).toBe(true);
   });

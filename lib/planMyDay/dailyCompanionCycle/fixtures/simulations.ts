@@ -1,5 +1,5 @@
 /**
- * Ten Human Reality Test™ fixtures + Day After Launch (recommended).
+ * Ten Human Reality Test fixtures + Day After Launch (recommended).
  * @see docs/plan-my-day/COMPANION_JUDGMENT_REPORT.md
  */
 

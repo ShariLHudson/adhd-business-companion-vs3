@@ -1,22 +1,22 @@
-# Screen Certification Sprint™ Process
+# Screen Certification Sprint Process
 
 **P0.57+ — Production-ready, one screen at a time**
 
-**P0.58+ — Governed by the [Product Constitution™](./PRODUCT_CONSTITUTION.md)**
+**P0.58+ — Governed by the [Product Constitution](./PRODUCT_CONSTITUTION.md)**
 
 From this point forward, **stop working across multiple screens.** Complete one screen at a time until it is considered production-ready.
 
 A screen is **not** finished because the code compiles.
 
-A screen is **finished** because a first-time ADHD entrepreneur can use it confidently without confusion **and** the screen complies with the Product Constitution™.
+A screen is **finished** because a first-time ADHD entrepreneur can use it confidently without confusion **and** the screen complies with the Product Constitution.
 
 **Only after a screen is certified do we move to the next one.**
 
-Companion Brain Intelligence™ modules activate **only after:**
+Companion Brain Intelligence modules activate **only after:**
 
 1. Every screen in the certification order is marked **COMPLETE**, and  
-2. The [Product Constitution™](./PRODUCT_CONSTITUTION.md) is in force (P0.58), and  
-3. [Development Governance™](./DEVELOPMENT_GOVERNANCE.md) guides all new work (P0.58+).
+2. The [Product Constitution](./PRODUCT_CONSTITUTION.md) is in force (P0.58), and  
+3. [Development Governance](./DEVELOPMENT_GOVERNANCE.md) guides all new work (P0.58+).
 
 ---
 
@@ -42,9 +42,9 @@ Screen certification work runs on a dedicated branch so history stays clean:
 **Expected commit arc:**
 
 1. Governance milestone (`docs: establish governance framework…`) — on `main`
-2. `certify: Plan My Day™ complete`
-3. `certify: Visual Thinking™ complete`
-4. `certify: Projects™ complete`
+2. `certify: Plan My Day complete`
+3. `certify: Visual Thinking complete`
+4. `certify: Projects complete`
 5. … (one commit per certified screen, in [certification order](#recommended-certification-order))
 6. `release: Version 1.0 screen certification complete`
 
@@ -69,7 +69,7 @@ Every screen must pass **all** of the following before it is marked COMPLETE.
 
 ### 1. Workflow
 
-Complete every workflow from beginning to end. No dead ends. Aligns with **Workflow Constitution™** (see [§7](./PRODUCT_CONSTITUTION.md#7-workflow-constitution)).
+Complete every workflow from beginning to end. No dead ends. Aligns with **Workflow Constitution** (see [§7](./PRODUCT_CONSTITUTION.md#7-workflow-constitution)).
 
 | Workflow | Verify |
 |----------|--------|
@@ -88,7 +88,7 @@ Complete every workflow from beginning to end. No dead ends. Aligns with **Workf
 
 ### 2. Navigation
 
-Aligns with **Navigation Constitution™** ([§6](./PRODUCT_CONSTITUTION.md#6-navigation-constitution)).
+Aligns with **Navigation Constitution** ([§6](./PRODUCT_CONSTITUTION.md#6-navigation-constitution)).
 
 | Check | Verify |
 |-------|--------|
@@ -101,11 +101,11 @@ Aligns with **Navigation Constitution™** ([§6](./PRODUCT_CONSTITUTION.md#6-na
 
 ### 3. UX
 
-Aligns with **UX Constitution™** ([§2](./PRODUCT_CONSTITUTION.md#2-ux-constitution)). Ask: **Can this be simpler?**
+Aligns with **UX Constitution** ([§2](./PRODUCT_CONSTITUTION.md#2-ux-constitution)). Ask: **Can this be simpler?**
 
 ### 4. ADHD evaluation
 
-Aligns with **ADHD Constitution™** ([§3](./PRODUCT_CONSTITUTION.md#3-adhd-constitution)).
+Aligns with **ADHD Constitution** ([§3](./PRODUCT_CONSTITUTION.md#3-adhd-constitution)).
 
 | Question | Pass? |
 |----------|-------|
@@ -117,7 +117,7 @@ Aligns with **ADHD Constitution™** ([§3](./PRODUCT_CONSTITUTION.md#3-adhd-con
 
 ### 5. Companion alignment
 
-Aligns with **Companion Constitution™** ([§1](./PRODUCT_CONSTITUTION.md#1-companion-constitution)) and **Emotional Safety Constitution™** ([§4](./PRODUCT_CONSTITUTION.md#4-emotional-safety-constitution)). Calm, supportive, conversational, trustworthy — never like enterprise software.
+Aligns with **Companion Constitution** ([§1](./PRODUCT_CONSTITUTION.md#1-companion-constitution)) and **Emotional Safety Constitution** ([§4](./PRODUCT_CONSTITUTION.md#4-emotional-safety-constitution)). Calm, supportive, conversational, trustworthy — never like enterprise software.
 
 ### 6. Consistency
 
@@ -136,9 +136,9 @@ npx vitest run
 
 Plus a **live browser walkthrough** of every workflow on the screen. **No new failures.**
 
-### 9. Future Intelligence Readiness™
+### 9. Future Intelligence Readiness
 
-Aligns with **Intelligence Constitution™** ([§5](./PRODUCT_CONSTITUTION.md#5-intelligence-constitution)).
+Aligns with **Intelligence Constitution** ([§5](./PRODUCT_CONSTITUTION.md#5-intelligence-constitution)).
 
 | Question | Pass? |
 |----------|-------|
@@ -150,9 +150,9 @@ Aligns with **Intelligence Constitution™** ([§5](./PRODUCT_CONSTITUTION.md#5-
 | Useful for evidence-based encouragement? | |
 | Avoids duplicate information? | |
 
-### 10. Constitution Compliance™
+### 10. Constitution Compliance
 
-Explicit pass against all seven articles of the [Product Constitution™](./PRODUCT_CONSTITUTION.md):
+Explicit pass against all seven articles of the [Product Constitution](./PRODUCT_CONSTITUTION.md):
 
 | Article | Pass? |
 |---------|-------|
@@ -164,9 +164,9 @@ Explicit pass against all seven articles of the [Product Constitution™](./PROD
 | §6 Navigation Constitution | |
 | §7 Workflow Constitution | |
 
-**Guided conversations** on or through this screen must also pass [Conversation Governance™](./PRODUCT_CONSTITUTION.md#conversation-governance) (all 7 scenarios) where applicable.
+**Guided conversations** on or through this screen must also pass [Conversation Governance](./PRODUCT_CONSTITUTION.md#conversation-governance) (all 7 scenarios) where applicable.
 
-A screen is **not** production-ready unless it complies with the Product Constitution™.
+A screen is **not** production-ready unless it complies with the Product Constitution.
 
 ---
 
@@ -176,12 +176,12 @@ A screen is marked **COMPLETE** only when:
 
 - [x] Gates 1–8 pass (workflow through testing)
 - [x] Gate 9 — Future Intelligence Readiness reviewed
-- [x] Gate 10 — Constitution Compliance™ (all 7 articles + conversation scenarios if applicable)
+- [x] Gate 10 — Constitution Compliance (all 7 articles + conversation scenarios if applicable)
 - [x] **Final question:** impressed enough to come back tomorrow?
 
 ### Required deliverable: Future Opportunities note
 
-Capture a **Future Opportunities** note in [UX_PUNCH_LIST.md](./UX_PUNCH_LIST.md) under that screen (breadcrumbs for Companion Brain™, not build-now features).
+Capture a **Future Opportunities** note in [UX_PUNCH_LIST.md](./UX_PUNCH_LIST.md) under that screen (breadcrumbs for Companion Brain, not build-now features).
 
 ---
 
@@ -191,25 +191,25 @@ Capture a **Future Opportunities** note in [UX_PUNCH_LIST.md](./UX_PUNCH_LIST.md
 
 | # | Screen | Status | Certified |
 |---|--------|--------|-----------|
-| 1 | Plan My Day™ | Not started | — |
-| 2 | Visual Thinking™ | Not started | — |
-| 3 | Projects™ | Not started | — |
-| 4 | Create™ | Not started | — |
-| 5 | Focus™ | Not started | — |
-| 6 | Reminder Center™ | Not started | — |
-| 7 | Growth Vault™ (hub) | Not started | — |
-| 8 | My Wins™ | Not started | — |
-| 9 | Evidence Bank™ | Not started | — |
-| 10 | Portfolio™ | Not started | — |
-| 11 | My Journey™ | Not started | — |
-| 12 | Outcome Goals™ | Not started | — |
-| 13 | Settings™ | Not started | — |
-| 14 | Chat™ | Not started | — |
-| 15 | Today™ | Not started | — |
+| 1 | Plan My Day | Not started | — |
+| 2 | Visual Thinking | Not started | — |
+| 3 | Projects | Not started | — |
+| 4 | Create | Not started | — |
+| 5 | Focus | Not started | — |
+| 6 | Reminder Center | Not started | — |
+| 7 | Growth Vault (hub) | Not started | — |
+| 8 | My Wins | Not started | — |
+| 9 | Evidence Bank | Not started | — |
+| 10 | Portfolio | Not started | — |
+| 11 | My Journey | Not started | — |
+| 12 | Outcome Goals | Not started | — |
+| 13 | Settings | Not started | — |
+| 14 | Chat | Not started | — |
+| 15 | Today | Not started | — |
 
 Future Opportunities drafts: [UX_PUNCH_LIST.md](./UX_PUNCH_LIST.md)
 
-> **Note:** Today™ (`TodayPanel.tsx`) is currently unmounted.
+> **Note:** Today (`TodayPanel.tsx`) is currently unmounted.
 
 ---
 
@@ -261,4 +261,4 @@ Would a new user come back tomorrow if this were their only screen?
 
 ## Final goal
 
-One unified companion experience — governed by the Product Constitution™ and Development Governance™, certified screen by screen (all **10 gates**), with structured data ready for Companion Brain Intelligence™ only after every screen passes.
+One unified companion experience — governed by the Product Constitution and Development Governance, certified screen by screen (all **10 gates**), with structured data ready for Companion Brain Intelligence only after every screen passes.

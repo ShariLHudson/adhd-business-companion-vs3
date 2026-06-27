@@ -48,7 +48,7 @@ export function composeRoomInvitation(input: {
 }): { line: string; buttonLabel: string; walkingLine: string } {
   const ctx = resolveVoiceContext(input.voiceContext);
   const tag = emotionalTagFromTone(input.tone);
-  const placeName = placeById(input.placeId).name.replace(/™/g, "");
+  const placeName = placeById(input.placeId).name;
   const vars = { place: placeName, topic: "" };
 
   if (input.fromContinue) {

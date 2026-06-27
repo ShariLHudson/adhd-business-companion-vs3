@@ -1,10 +1,10 @@
 /**
- * Room Composition Rule™ — constitutional placement law.
+ * Room Composition Rule — constitutional placement law.
  */
 
 import type { CompositionZone, EdgeZone } from "./types";
 
-/** Never behind the Protected Conversation Zone™ */
+/** Never behind the Protected Conversation Zone */
 export const CENTER_FORBIDDEN_ELEMENTS = [
   "fireplace",
   "aquarium",

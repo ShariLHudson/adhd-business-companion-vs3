@@ -61,7 +61,7 @@ const RELATED_AREAS: Partial<Record<WorkspaceHelpAreaId, string>> = {
   "plan-my-day":
     "Pulls from Projects and Clear My Mind. Finished work lands in My Work; wins and proof build in Wins This Week and Evidence Bank.",
   "visual-focus":
-    "Studio hub with teaching cards — separate from Plan My Day (tasks) and Decision Compass™ (choosing which option is best). Decision Tree™ here explores what happens if you choose a path.",
+    "Studio hub with teaching cards — separate from Plan My Day (tasks) and Decision Compass (choosing which option is best). Decision Tree here explores what happens if you choose a path.",
   projects:
     "Links to Plan My Day, Create, Clear My Mind, and My Work. Chat can sit beside a project while you think.",
   "content-generator":
@@ -108,7 +108,7 @@ const LOCAL_PLAN_MY_DAY_HELP: Omit<
   WorkspaceHelpContent,
   "areaId" | "helpsToday" | "strengthens"
 > = {
-  areaName: "Plan My Day™",
+  areaName: "Plan My Day",
   whatItIs:
     "A daily decision workspace — not a task manager, project manager, or long-term planner. It answers one question: what is realistic for me today?",
   whenToUse:
@@ -144,7 +144,7 @@ const LOCAL_GROWTH_HELP: Record<
       "When you want the big picture of how you are growing — not just today's tasks.",
     workflow: [
       "Define Outcome Goals — where you are headed (not a task list).",
-      "Open Plan My Day™ when you are ready to choose what fits today.",
+      "Open Plan My Day when you are ready to choose what fits today.",
       "Open My Wins, Evidence Bank, My Highlights, or My Journey from the hub cards.",
       "Check Growth Inbox for moments the app noticed — save where they belong or dismiss.",
       "Tap Growth Reports for a printable reflection — not a live dashboard.",

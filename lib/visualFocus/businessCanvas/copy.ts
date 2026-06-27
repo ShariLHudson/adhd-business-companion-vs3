@@ -1,4 +1,4 @@
-/** User-facing Business Canvas™ copy — current business first, change second. */
+/** User-facing Business Canvas copy — current business first, change second. */
 
 export const BUSINESS_CANVAS_INTRO_HEADLINE =
   "Let's first map how your business works right now.";
@@ -24,4 +24,4 @@ export const BUSINESS_CANVAS_CHANGE_EXAMPLES = [
   "Change pricing structure",
 ] as const;
 
-export const BUSINESS_CANVAS_GENERATE_LABEL = "Generate Business Canvas™";
+export const BUSINESS_CANVAS_GENERATE_LABEL = "Generate Business Canvas";

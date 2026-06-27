@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   CONSTITUTIONAL_HIERARCHY,
   createCompanionState,
+  ELEVATE_LIFE_EXPERIENCE_RULE,
   resolveCompanionIntelligence,
   resolveCompanionRenderContext,
   resolveConversationIntelligence,
@@ -13,7 +14,12 @@ import {
   validateSpecializedIntelligenceRegistry,
 } from "./index";
 
-describe("Companion Constitution™", () => {
+describe("Companion Constitution", () => {
+  it("declares elevate the life experience constitutional rule", () => {
+    expect(ELEVATE_LIFE_EXPERIENCE_RULE).toMatch(/internal experience/i);
+    expect(ELEVATE_LIFE_EXPERIENCE_RULE).toMatch(/false positivity/i);
+  });
+
   it("declares full intelligence hierarchy", () => {
     expect(CONSTITUTIONAL_HIERARCHY[0]).toBe("conversation-intelligence");
     expect(CONSTITUTIONAL_HIERARCHY[1]).toBe("companion-intelligence");
@@ -63,7 +69,7 @@ describe("Companion Constitution™", () => {
   });
 
   it("resolveEnvironment is sole authority for clear my mind place", () => {
-    expect(resolvePlace({ workspaceId: "clear-my-mind" })).toBe("window-seat");
+    expect(resolvePlace({ workspaceId: "clear-my-mind" })).toBe("greenhouse");
   });
 
   it("placeForSection delegates through resolvePlace", () => {
@@ -100,9 +106,8 @@ describe("Companion Constitution™", () => {
   });
 
   it("room registry has one definition per place", () => {
-    const entry = roomRegistryEntry("window-seat");
-    expect(entry.name).toBe("Window Seat™");
-    expect(entry.emotionalPromise).toContain("carry");
+    const entry = roomRegistryEntry("greenhouse");
+    expect(entry.name).toContain("Greenhouse");
     expect(entry.supportedWorkspaces).toContain("clear-my-mind");
   });
 });

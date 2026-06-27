@@ -1,9 +1,9 @@
 ---
-description: Intelligence-Ready Architecture™ — every object enrichable for ten years of companion growth
+description: Intelligence-Ready Architecture — every object enrichable for ten years of companion growth
 alwaysApply: true
 ---
 
-# Intelligence-Ready Architecture™
+# Intelligence-Ready Architecture
 
 **Global rule — every future development session.**
 
@@ -25,7 +25,7 @@ Thoughts, projects, decisions, notes, conversations, clients, offers, content id
 
 Leave room for relationships consumed by:
 
-Living Intelligence Graph™, Narrative Intelligence™, Arrival Intelligence™, Companion Presence™, Founder Intelligence™, Decision Intelligence™, Opportunity Intelligence™, Business Intelligence™, Growth Intelligence™, Recovery Intelligence™, Pattern Intelligence™, Relationship Intelligence™, Content Intelligence™, Learning Intelligence™, Automation Intelligence™, and engines not yet imagined.
+Living Intelligence Graph, Narrative Intelligence, Arrival Intelligence, Companion Presence, Founder Intelligence, Decision Intelligence, Opportunity Intelligence, Business Intelligence, Growth Intelligence, Recovery Intelligence, Pattern Intelligence, Relationship Intelligence, Content Intelligence, Learning Intelligence, Automation Intelligence, and engines not yet imagined.
 
 **Do not expose intelligence hooks in user UI** unless the feature explicitly needs them.
 
@@ -47,7 +47,7 @@ A thought may later become a task, project, decision, meeting, content campaign,
 
 If any answer is no or unknown → **redesign before implementation**.
 
-## Intelligence Registry™
+## Intelligence Registry
 
 When adding objects or engines, update:
 
@@ -59,4 +59,4 @@ That registry is the architectural blueprint — objects × storage × engines �
 
 Users never "train AI." They use their companion. Behind the scenes: relationships grow, confidence improves, patterns emerge, narrative deepens.
 
-Keep the surface calm (Intelligence Paradox™). Strengthen the foundation every sprint.
+Keep the surface calm (Intelligence Paradox). Strengthen the foundation every sprint.

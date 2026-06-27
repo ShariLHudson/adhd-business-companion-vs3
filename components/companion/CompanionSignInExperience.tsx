@@ -1,15 +1,20 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm";
-import { CompanionBackground } from "@/components/companion/CompanionBackground";
-import { ShariPortrait } from "@/components/companion/ShariPortrait";
+import { CompanionLoginBackground } from "@/components/companion/CompanionLoginBackground";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { hasSignedInOnThisDeviceBefore } from "@/lib/companionAuthIntelligence";
-import { ASSETS, BRAND } from "@/lib/companionUi";
-import { useCompanionPresence } from "@/lib/useCompanionPresence";
+import {
+  COMPANION_LOGIN_LOGO,
+  COMPANION_LOGIN_OPENING_MESSAGE,
+  COMPANION_LOGIN_PRIVACY_LINE,
+  companionLoginHasHistory,
+  companionLoginHeadline,
+  companionLoginSubtext,
+} from "@/lib/companionLoginPage";
 import {
   buildPostLoginContinueResolution,
   storePostLoginContinueFromResolution,
@@ -20,11 +25,9 @@ export function CompanionSignInExperience() {
   const { loading, user, configured: authReady } = useCompanionAuth();
 
   const returning = useMemo(() => hasSignedInOnThisDeviceBefore(), []);
-  const presence = useCompanionPresence({
-    calmHome: true,
-    homeState: returning ? "RETURNING_ACTIVE" : "FIRST_VISIT",
-    presenceSurface: "sign-in",
-  });
+  const visitor = returning ? "returning" : "first";
+  const hasCompanionHistory = useMemo(() => companionLoginHasHistory(), []);
+  const [openingDoor, setOpeningDoor] = useState(false);
 
   useEffect(() => {
     if (!loading && user) {
@@ -43,48 +46,48 @@ export function CompanionSignInExperience() {
   if (loading) {
     return (
       <main className="relative flex min-h-dvh items-center justify-center overflow-hidden">
-        <CompanionBackground page="today" seed="sign-in" />
-        <p className="relative z-10 text-sm text-[#6b635a]">
-          Checking your session…
+        <CompanionLoginBackground />
+        <p
+          className="relative z-10 text-base text-[#f5efe6] drop-shadow-sm"
+          role="status"
+        >
+          {COMPANION_LOGIN_OPENING_MESSAGE}
         </p>
       </main>
     );
   }
 
   return (
-    <main className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-10">
-      <CompanionBackground page="today" seed="sign-in-welcome" />
+    <main
+      className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-8 sm:px-6 sm:py-10"
+      data-testid="companion-login-page"
+    >
+      <CompanionLoginBackground />
 
-      <div className="relative z-10 w-full max-w-md">
-        <div className="rounded-3xl border border-white/55 bg-white/78 px-6 py-8 shadow-[0_12px_40px_rgba(47,38,31,0.12)] backdrop-blur-md sm:px-8">
-          <div className="mb-6 flex flex-col items-center gap-3 text-center">
-            <div className="flex items-center gap-2.5">
+      <div className="relative z-10 w-full max-w-[22rem] sm:max-w-md">
+        <div className="rounded-2xl border border-white/45 bg-[#faf7f2]/72 px-5 py-6 backdrop-blur-md sm:rounded-3xl sm:px-7 sm:py-7">
+          <div className="mb-5 flex flex-col items-center gap-3 text-center">
+            <div className="flex flex-col items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={ASSETS.logo}
-                alt=""
-                className="h-9 w-9 rounded-lg object-contain"
+                src={COMPANION_LOGIN_LOGO}
+                alt="Spark Studio Companions"
+                className="h-[3.125rem] w-auto object-contain"
               />
-              <div className="text-left">
-                <p className="text-xs font-semibold uppercase tracking-wide text-[#6b635a]">
-                  Spark Studio Companions™
-                </p>
-                <p className="text-sm font-semibold text-[#2f261f]">
-                  ADHD Business Ecosystem™
-                </p>
-              </div>
+              <p className="text-sm font-semibold tracking-tight text-[#2f261f]">
+                Spark Studio Companions
+              </p>
+              <p className="text-xs font-medium text-[#6b635a]">
+                ADHD Business Ecosystem™
+              </p>
             </div>
 
-            <ShariPortrait presence={presence} size="presence" alt="Shari" />
-
-            <div className="space-y-1">
-              <h1 className="text-2xl font-bold text-[#2f261f]">
-                {returning ? "Welcome back." : "It's good to see you."}
+            <div className="space-y-1 pt-1">
+              <h1 className="text-2xl font-bold tracking-tight text-[#2f261f]">
+                {companionLoginHeadline(visitor)}
               </h1>
-              <p className="text-base text-[#6b635a]">
-                {returning
-                  ? "Ready to continue where we left off?"
-                  : "Let's pick up where you left off — whenever you're ready."}
+              <p className="text-base leading-relaxed text-[#6b635a]">
+                {companionLoginSubtext(visitor, hasCompanionHistory)}
               </p>
             </div>
           </div>
@@ -92,20 +95,32 @@ export function CompanionSignInExperience() {
           <CompanionSignInForm
             variant="page"
             initialMode="signin"
+            returning={returning}
             onSuccess={handleSuccess}
+            onProcessingChange={setOpeningDoor}
           />
 
+          {openingDoor ? (
+            <p
+              className="mt-4 text-center text-sm font-medium text-[#1e4f4f]"
+              role="status"
+              aria-live="polite"
+            >
+              {COMPANION_LOGIN_OPENING_MESSAGE}
+            </p>
+          ) : null}
+
+          <p className="mt-5 text-center text-xs leading-relaxed text-[#6b635a]">
+            {COMPANION_LOGIN_PRIVACY_LINE}
+          </p>
+
           {!authReady ? (
-            <p className="mt-6 text-center text-sm text-[#6b635a]">
+            <p className="mt-4 text-center text-sm text-[#6b635a]">
               Sign-in is still being set up here. Try again shortly, or reach out
               if this keeps showing.
             </p>
           ) : null}
         </div>
-
-        <p className="mt-4 text-center text-xs text-[#9a8f82]">
-          {BRAND.tagline}
-        </p>
       </div>
     </main>
   );

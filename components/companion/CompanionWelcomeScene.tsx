@@ -83,11 +83,14 @@ function normalizeWelcomeAtmosphere(
 type Props = {
   ariaLabel?: string;
   greeting?: string;
+  greetingBody?: string | null;
+  sparkLine?: string | null;
   invite?: string | null;
   echoLine?: string | null;
   recommendation?: ArrivalRecommendation | null;
   hospitality?: HospitalityResponse | null;
   showGreeting?: boolean;
+  showSpark?: boolean;
   showInvite?: boolean;
   showEcho?: boolean;
   showRecommendation?: boolean;
@@ -107,16 +110,19 @@ type Props = {
 
 /**
  * Living welcome room — environment breathes; Shari stays still.
- * Room state is chosen before render (Room Integrity Principle™).
+ * Room state is chosen before render (Room Integrity Principle).
  */
 export function CompanionWelcomeScene({
   ariaLabel = `${WELCOME_PRESENCE_GREETING} ${WELCOME_PRESENCE_INVITE}`,
   greeting = WELCOME_PRESENCE_GREETING,
+  greetingBody = null,
+  sparkLine = null,
   invite = WELCOME_PRESENCE_INVITE,
   echoLine = null,
   recommendation = null,
   hospitality = null,
   showGreeting: showGreetingOverride,
+  showSpark: showSparkOverride,
   showInvite: showInviteOverride,
   showEcho = false,
   showRecommendation = false,
@@ -176,6 +182,8 @@ export function CompanionWelcomeScene({
 
   const showGreeting =
     showGreetingOverride ?? phaseShowsGreeting(living.phase);
+  const showSpark =
+    showSparkOverride ?? showGreeting;
   const showInvite =
     showInviteOverride ?? (invite ? phaseShowsInvite(living.phase) : false);
   const showInput =
@@ -284,6 +292,15 @@ export function CompanionWelcomeScene({
 
             <div className="companion-welcome-scene__copy-panel">
               <div className="companion-welcome-scene__copy">
+                {sparkLine ? (
+                  <p
+                    className={`companion-welcome-scene__spark${
+                      showSpark ? " is-visible" : ""
+                    }`}
+                  >
+                    {sparkLine}
+                  </p>
+                ) : null}
                 <h1
                   className={`companion-welcome-scene__greeting${
                     showGreeting ? " is-visible" : ""
@@ -291,6 +308,15 @@ export function CompanionWelcomeScene({
                 >
                   {greeting}
                 </h1>
+                {greetingBody ? (
+                  <p
+                    className={`companion-welcome-scene__greeting-body${
+                      showGreeting ? " is-visible" : ""
+                    }`}
+                  >
+                    {greetingBody}
+                  </p>
+                ) : null}
                 <p
                   className={`companion-welcome-scene__invite${
                     showInvite ? " is-visible" : ""

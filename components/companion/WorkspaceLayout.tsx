@@ -54,6 +54,7 @@ export function WorkspaceLayout({
   viewSizePreset = "balanced",
   onViewSizePresetChange,
   chatFocusKey = 0,
+  onReturnToChat,
 }: {
   chat: ReactNode;
   workspace?: ReactNode | null;
@@ -80,6 +81,8 @@ export function WorkspaceLayout({
   onViewSizePresetChange?: (preset: WorkspaceViewSizePreset) => void;
   /** Increment to bring chat into view (e.g. Create → Need Ideas). */
   chatFocusKey?: number;
+  /** Closes workspace and opens main Chat — highest nav priority. */
+  onReturnToChat?: () => void;
 }) {
   const [mobileView, setMobileView] = useState<"chat" | "work">("chat");
   const workspacePaneRef = useRef<HTMLDivElement>(null);
@@ -163,6 +166,10 @@ export function WorkspaceLayout({
         <button
           type="button"
           onClick={() => {
+            if (onReturnToChat) {
+              onReturnToChat();
+              return;
+            }
             setMobileView("chat");
             onChatLayoutModeChange?.("split");
           }}
@@ -280,8 +287,8 @@ export function WorkspaceLayout({
               )}
             </div>
           </div>
-          {/* Solid canvas — content never sits over the blurred wallpaper. */}
-          <div className="workspace-panel-canvas min-h-0 flex-1 overflow-y-auto shadow-inner">
+          {/* Constitutional scene owns the canvas — no inset shadow slab. */}
+          <div className="workspace-panel-canvas min-h-0 flex-1 overflow-y-auto">
             {workspace}
           </div>
         </div>

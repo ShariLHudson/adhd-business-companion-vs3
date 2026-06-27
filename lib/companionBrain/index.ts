@@ -1,5 +1,5 @@
 /**
- * Companion Brain™ — public API.
+ * Companion Brain — public API.
  * Memory remembers. The Brain understands. Pages express.
  */
 

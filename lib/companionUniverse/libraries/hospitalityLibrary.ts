@@ -12,7 +12,7 @@ export type HospitalityItem = {
 };
 
 /**
- * Hospitality Library™ — everything Shari can prepare.
+ * Hospitality Library — everything Shari can prepare.
  * Tagged for season, mood, room, and context. Selection ranks by priority.
  */
 export const HOSPITALITY_LIBRARY: HospitalityItem[] = [

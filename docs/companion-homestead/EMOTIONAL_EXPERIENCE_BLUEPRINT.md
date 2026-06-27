@@ -1,10 +1,10 @@
-# Emotional Experience Blueprint™
-## Companion Homestead™ — Every Room Solves A Human Need First
+# Emotional Experience Blueprint
+## Companion Homestead — Every Room Solves A Human Need First
 
 **Version:** 1.0  
 **Status:** Canonical design authority — governs all rooms, copy, objects, sound, and recommendations  
-**Authority:** Subordinate to Product Constitution™ · Companion Constitution™ · [`EXPERIENCE_OF_SHARI.md`](../EXPERIENCE_OF_SHARI.md) · [`COMPANION_HOMESTEAD_MANIFESTO.md`](../COMPANION_HOMESTEAD_MANIFESTO.md)  
-**Sibling documents:** [`COMPANION_JOURNEY_EXPERIENCE_BIBLE.md`](../COMPANION_JOURNEY_EXPERIENCE_BIBLE.md) · [`JOURNEY_BETWEEN_ROOMS.md`](./JOURNEY_BETWEEN_ROOMS.md) · [`PRESENCE_INTELLIGENCE.md`](./PRESENCE_INTELLIGENCE.md) · [`MASTER_PROPERTY_BLUEPRINT.md`](./MASTER_PROPERTY_BLUEPRINT.md) · room look books in [`../room-lookbooks/`](../room-lookbooks/) · [`Shari Voice Bible™`](../../lib/shariVoiceBible/CONSTITUTION.md)
+**Authority:** Subordinate to Product Constitution · Companion Constitution · [`EXPERIENCE_OF_SHARI.md`](../EXPERIENCE_OF_SHARI.md) · [`COMPANION_HOMESTEAD_MANIFESTO.md`](../COMPANION_HOMESTEAD_MANIFESTO.md)  
+**Sibling documents:** [`COMPANION_JOURNEY_EXPERIENCE_BIBLE.md`](../COMPANION_JOURNEY_EXPERIENCE_BIBLE.md) · [`JOURNEY_BETWEEN_ROOMS.md`](./JOURNEY_BETWEEN_ROOMS.md) · [`PRESENCE_INTELLIGENCE.md`](./PRESENCE_INTELLIGENCE.md) · [`MASTER_PROPERTY_BLUEPRINT.md`](./MASTER_PROPERTY_BLUEPRINT.md) · room look books in [`../room-lookbooks/`](../room-lookbooks/) · [`Shari Voice Bible`](../../lib/shariVoiceBible/CONSTITUTION.md)
 
 **This is not:**
 - A feature map
@@ -27,7 +27,7 @@ If we cannot answer that, the room is **not finished**.
 
 # Part I — Core philosophy
 
-The Companion Homestead™ is **not** a productivity application.
+The Companion Homestead is **not** a productivity application.
 
 It is an **emotional environment** built for ADHD entrepreneurs.
 
@@ -41,7 +41,7 @@ Every room exists because it **changes how someone feels** — not because it pe
 
 ---
 
-# Part II — Emotional Transformation™
+# Part II — Emotional Transformation
 
 For **every room**, define four states. No room ships without this table completed and approved.
 
@@ -55,7 +55,7 @@ For **every room**, define four states. No room ships without this table complet
 ## Template (copy per room)
 
 ```markdown
-### [Room Name]™
+### [Room Name]
 
 **Purpose (one word):** [Belonging | Relief | Clarity | Restoration | Possibility | …]
 
@@ -78,7 +78,7 @@ For **every room**, define four states. No room ships without this table complet
 
 # Part III — Phase 1 rooms (canonical)
 
-## Living Room™
+## Living Room
 
 **Place ID:** `living-room`  
 **Purpose:** **Belonging**
@@ -102,7 +102,7 @@ For **every room**, define four states. No room ships without this table complet
 
 ---
 
-## Window Seat™ (Clear My Mind™)
+## Window Seat (Clear My Mind)
 
 **Place ID:** `window-seat`  
 **Purpose:** **Relief**
@@ -126,7 +126,7 @@ For **every room**, define four states. No room ships without this table complet
 
 ---
 
-## Planning Table™
+## Planning Table
 
 **Place ID:** `planning-table`  
 **Purpose:** **Clarity**
@@ -152,7 +152,7 @@ For **every room**, define four states. No room ships without this table complet
 
 ---
 
-## Reading Nook™
+## Reading Nook
 
 **Place ID:** `reading-nook`  
 **Purpose:** **Restoration**
@@ -176,7 +176,7 @@ For **every room**, define four states. No room ships without this table complet
 
 ---
 
-## Creative Studio™
+## Creative Studio
 
 **Place ID:** `creative-studio`  
 **Purpose:** **Possibility**
@@ -200,32 +200,32 @@ For **every room**, define four states. No room ships without this table complet
 
 ---
 
-# Part IV — ADHD First™
+# Part IV — ADHD First
 
 Every room should reduce **one or two** ADHD burdens exceptionally well — not all of them.
 
 | Burden | Primary rooms | Secondary rooms |
 |--------|---------------|-----------------|
-| Decision fatigue | Planning Table™ | Living Room™ |
-| Shame | Window Seat™ | Living Room™ |
-| Mental clutter | Window Seat™ | Planning Table™ |
-| Perfectionism | Creative Studio™ | Reading Nook™ |
-| Analysis paralysis | Planning Table™ | Reading Nook™ |
-| Fear of starting | Creative Studio™ | Living Room™ |
-| Task switching | Planning Table™ | — |
-| Emotional overwhelm | Window Seat™ | Living Room™ |
-| Working memory load | Window Seat™ | Planning Table™ |
-| Loneliness | Living Room™ | — |
-| Isolation | Living Room™ | Window Seat™ |
-| Masking | Living Room™ | Window Seat™ |
-| Time blindness | Planning Table™ | — |
-| Overstimulation | Reading Nook™ | Window Seat™ |
+| Decision fatigue | Planning Table | Living Room |
+| Shame | Window Seat | Living Room |
+| Mental clutter | Window Seat | Planning Table |
+| Perfectionism | Creative Studio | Reading Nook |
+| Analysis paralysis | Planning Table | Reading Nook |
+| Fear of starting | Creative Studio | Living Room |
+| Task switching | Planning Table | — |
+| Emotional overwhelm | Window Seat | Living Room |
+| Working memory load | Window Seat | Planning Table |
+| Loneliness | Living Room | — |
+| Isolation | Living Room | Window Seat |
+| Masking | Living Room | Window Seat |
+| Time blindness | Planning Table | — |
+| Overstimulation | Reading Nook | Window Seat |
 
 **Rule:** If a room claims more than two primary burdens, it is unfocused — split or redesign.
 
 ---
 
-# Part V — The Reward Principle™
+# Part V — The Reward Principle
 
 Every room should feel like a **reward** simply for entering.
 
@@ -241,7 +241,7 @@ The reward is **how the room feels the moment you cross the threshold** — befo
 
 ---
 
-# Part VI — The Shari Test™
+# Part VI — The Shari Test
 
 Before approving any room, ask:
 
@@ -261,11 +261,11 @@ Secondary checks:
 
 ---
 
-# Part VII — Experience Audit™ (Phase 1)
+# Part VII — Experience Audit (Phase 1)
 
 Required answers before room UI ships.
 
-## Living Room™
+## Living Room
 
 | Audit question | Answer |
 |----------------|--------|
@@ -276,7 +276,7 @@ Required answers before room UI ships.
 | What **memory** should the guest carry? | *"I'm home. She was glad I came."* |
 | What makes someone want to **come back tomorrow**? | The fireplace, the voice, the feeling of being expected — not a feature |
 
-## Window Seat™ (Clear My Mind™)
+## Window Seat (Clear My Mind)
 
 | Audit question | Answer |
 |----------------|--------|
@@ -287,7 +287,7 @@ Required answers before room UI ships.
 | Memory | *"I don't have to hold all of this."* |
 | Return | When life gets too loud — first place they think of |
 
-## Planning Table™
+## Planning Table
 
 | Audit question | Answer |
 |----------------|--------|
@@ -298,7 +298,7 @@ Required answers before room UI ships.
 | Memory | *"I know what matters now."* |
 | Return | Somehow makes the day manageable |
 
-## Reading Nook™
+## Reading Nook
 
 | Audit question | Answer |
 |----------------|--------|
@@ -309,7 +309,7 @@ Required answers before room UI ships.
 | Memory | *"I feel lighter."* |
 | Return | Always helps them slow down |
 
-## Creative Studio™
+## Creative Studio
 
 | Audit question | Answer |
 |----------------|--------|
@@ -333,13 +333,13 @@ No intelligence module may route a guest to a room **without** naming the emotio
 | Route because calendar is empty | Route because emotional state needs clarity / relief / restoration |
 | Feature match | **Departure state** of current room → **arrival need** of next room |
 
-Cross-reference: [`JOURNEY_BETWEEN_ROOMS.md`](./JOURNEY_BETWEEN_ROOMS.md) Part VII — Emotional Continuity™.
+Cross-reference: [`JOURNEY_BETWEEN_ROOMS.md`](./JOURNEY_BETWEEN_ROOMS.md) Part VII — Emotional Continuity.
 
 ---
 
 # Part IX — Final success test (six months)
 
-Imagine a user has spent **six months** inside the Companion Homestead™.
+Imagine a user has spent **six months** inside the Companion Homestead.
 
 They do **not** describe features.
 
@@ -351,7 +351,7 @@ They say things like:
 - *"The Reading Nook always helps me slow down."*
 - *"I don't know why… I just feel better after I spend a little time there."*
 
-**That** is the Companion Homestead™ we are building.
+**That** is the Companion Homestead we are building.
 
 ---
 
@@ -359,14 +359,14 @@ They say things like:
 
 Before any room UI is implementation-complete:
 
-- [ ] Four-state Emotional Transformation™ table approved  
+- [ ] Four-state Emotional Transformation table approved  
 - [ ] Purpose word + guest thought quote approved  
-- [ ] ADHD First™ — primary burdens named (max 2)  
-- [ ] Reward Principle™ — entry reward named  
-- [ ] Shari Test™ passed  
-- [ ] Experience Audit™ completed  
+- [ ] ADHD First — primary burdens named (max 2)  
+- [ ] Reward Principle — entry reward named  
+- [ ] Shari Test passed  
+- [ ] Experience Audit completed  
 - [ ] Look book aligned with departure state  
-- [ ] Voice Bible™ copy passes front-door test  
+- [ ] Voice Bible copy passes front-door test  
 - [ ] No feature-first marketing in room  
 
 ---
@@ -379,10 +379,10 @@ Emotional blueprint **precedes** look book polish **precedes** screen compositio
 |-------|-------------|
 | 1 | This document — room four-state table |
 | 2 | Room look book — environment serves departure state |
-| 3 | Journey Between Rooms™ — movement preserves emotion |
+| 3 | Journey Between Rooms — movement preserves emotion |
 | 4 | Screen composition — 80/20 room vs UI |
 | 5 | Implementation |
 
 ---
 
-*Companion Homestead™ · Emotional Experience Blueprint™ · Emotional Transformation™ · ADHD First™ · Reward Principle™ · Shari Test™ · Experience Audit™*
+*Companion Homestead · Emotional Experience Blueprint · Emotional Transformation · ADHD First · Reward Principle · Shari Test · Experience Audit*

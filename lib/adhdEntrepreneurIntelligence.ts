@@ -1,5 +1,5 @@
 /**
- * Sprint 4 — ADHD Entrepreneur Intelligence™ as the primary lens.
+ * Sprint 4 — ADHD Entrepreneur Intelligence as the primary lens.
  * Board of Directors is Layer 3 (advisory). This layer is Layer 1 (decision maker).
  */
 
@@ -388,7 +388,7 @@ export function adhdEntrepreneurPrimaryHintForChat(input: {
   adhdNative?: AdhdNativeAnalysis | null;
 }): string {
   const parts: string[] = [
-    "ADHD ENTREPRENEUR INTELLIGENCE™ (Layer 1 — PRIMARY — always first):",
+    "ADHD ENTREPRENEUR INTELLIGENCE (Layer 1 — PRIMARY — always first):",
     "You are an ADHD Entrepreneur Companion with access to a Board of Directors — NOT ADHD Companion + Board.",
     "Before ANY recommendation, strategy, workflow, or expert insight, ask: What would actually work for an ADHD entrepreneur?",
     "Never default to traditional business coach advice. Simplify, reduce, sequence, make actionable.",
@@ -428,7 +428,7 @@ export function buildFilteredBoardAdvisorHint(role: WorkspaceAdvisorRole): strin
   const translation = getExpertTranslationForDomain(role);
 
   return [
-    "BOARD OF DIRECTORS™ (Layer 3 — advisory only, invisible):",
+    "BOARD OF DIRECTORS (Layer 3 — advisory only, invisible):",
     `Draw on ${domainGuidance}`,
     translation,
     "CRITICAL: Filter every board insight through ADHD Entrepreneur Intelligence first. If traditional advice would overwhelm — rewrite it before speaking.",

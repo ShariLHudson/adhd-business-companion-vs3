@@ -1,5 +1,5 @@
 /**
- * P0.15 — Menu Continuation Intelligence™
+ * P0.15 — Menu Continuation Intelligence
  * Numbered teaching/knowledge menus must continue on 1–4 picks, not re-route as new turns.
  */
 
@@ -269,7 +269,7 @@ export function menuContinuationHintForChat(
     : teachingModeHintForChat(userText, lastAssistantText);
 
   return [
-    "MENU CONTINUATION INTELLIGENCE™ (P0.15 — mandatory):",
+    "MENU CONTINUATION INTELLIGENCE (P0.15 — mandatory):",
     `User is selecting menu option for **${topic}** — NOT a new topic.`,
     `Selected path: ${pathLabel}.`,
     "Continue the menu workflow only. Do NOT reinterpret this as a new conversation turn.",

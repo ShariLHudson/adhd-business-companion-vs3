@@ -1,5 +1,5 @@
 /**
- * Companion Intelligence Validation Framework™
+ * Companion Intelligence Validation Framework
  * Real-world ADHD entrepreneur scenarios + Companion Scorecard.
  */
 

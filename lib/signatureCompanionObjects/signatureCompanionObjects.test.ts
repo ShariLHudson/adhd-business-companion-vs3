@@ -17,7 +17,7 @@ import {
   workspaceHasSignatureObject,
 } from "./index";
 
-describe("Signature Companion Objects™", () => {
+describe("Signature Companion Objects", () => {
   it("defines signature objects for every room zone", () => {
     for (const room of SIGNATURE_ROOM_ZONES) {
       expect(signaturesForRoom(room).length).toBeGreaterThan(0);
@@ -53,10 +53,10 @@ describe("Signature Companion Objects™", () => {
 
   it("links primary workspaces to signature objects", () => {
     expect(signatureForFeatureObjectId("clear-my-mind")?.name).toBe(
-      "Reflection Journal™",
+      "Reflection Journal",
     );
     expect(signatureForFeatureObjectId("plan-my-day")?.name).toBe(
-      "Daily Planner™",
+      "Daily Planner",
     );
   });
 

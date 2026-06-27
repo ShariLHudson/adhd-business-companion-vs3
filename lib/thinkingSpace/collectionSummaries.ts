@@ -1,5 +1,5 @@
 /**
- * Collection summaries for My Thoughts™ — garden beds, not folders.
+ * Collection summaries for My Thoughts — garden beds, not folders.
  * Grouping uses collectionId only (thoughtCollectionAuthority).
  */
 

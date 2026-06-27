@@ -34,7 +34,7 @@ export const EVIDENCE_BY_STATE: Record<
 export const STATE_HOST_LINES: Record<ShariPresenceState, string> = {
   host: "Shari welcomes, listens, and shares the room.",
   "beside-you":
-    "Shari is fully available through the Communication Anchor™ — the guest has space to think.",
+    "Shari is fully available through the Communication Anchor — the guest has space to think.",
   nearby:
     "The room holds evidence of everyday life — accompanied without being observed.",
   returning: "She's nearby if you need her.",

@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { registerLiveEcosystemListeners } from "@/lib/companionJudgmentClient";
 
 /**
- * Boot Live Ecosystem™ listeners once per companion session.
+ * Boot Live Ecosystem listeners once per companion session.
  */
 export function LiveEcosystemInit() {
   useEffect(() => {

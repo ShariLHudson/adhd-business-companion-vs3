@@ -32,14 +32,14 @@ function modeFramework(mode: VisualFocusMode): VisualThinkingFrameworkMeta {
 export const FUTURE_VISUAL_THINKING_FRAMEWORKS: VisualThinkingFrameworkMeta[] = [
   {
     id: "living-canvas",
-    userLabel: "Living Canvas™",
+    userLabel: "Living Canvas",
     predefinedStructure: false,
     maturity: "future",
     canonicalModules: ["lib/visualFocus/companionIntelligence/"],
   },
   {
     id: "what-if-analysis",
-    userLabel: "What-If Analysis™",
+    userLabel: "What-If Analysis",
     predefinedStructure: false,
     maturity: "partial",
     canonicalModules: [
@@ -49,35 +49,35 @@ export const FUTURE_VISUAL_THINKING_FRAMEWORKS: VisualThinkingFrameworkMeta[] = 
   },
   {
     id: "business-simulation",
-    userLabel: "Business Simulations™",
+    userLabel: "Business Simulations",
     predefinedStructure: false,
     maturity: "future",
     canonicalModules: ["lib/visualFocus/companionIntelligence/"],
   },
   {
     id: "opportunity-mapping",
-    userLabel: "Opportunity Mapping™",
+    userLabel: "Opportunity Mapping",
     predefinedStructure: false,
     maturity: "future",
     canonicalModules: ["lib/opportunity-intelligence/"],
   },
   {
     id: "board-intelligence",
-    userLabel: "Board of Directors™ Intelligence™",
+    userLabel: "Board of Directors Intelligence",
     predefinedStructure: false,
     maturity: "partial",
     canonicalModules: ["lib/companionIntelligence.ts", "lib/ecosystem/board/"],
   },
   {
     id: "founder-intelligence",
-    userLabel: "Founder Intelligence™",
+    userLabel: "Founder Intelligence",
     predefinedStructure: false,
     maturity: "partial",
     canonicalModules: ["lib/founderIntelligence.ts", "lib/ecosystem/"],
   },
   {
     id: "predictive-business-guidance",
-    userLabel: "Predictive Business Guidance™",
+    userLabel: "Predictive Business Guidance",
     predefinedStructure: false,
     maturity: "future",
     canonicalModules: ["lib/predictive-support/"],

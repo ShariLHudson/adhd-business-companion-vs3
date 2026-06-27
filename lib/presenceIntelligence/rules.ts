@@ -1,5 +1,5 @@
 /**
- * Presence Intelligence™ — never sound like memory or monitoring.
+ * Presence Intelligence — never sound like memory or monitoring.
  */
 
 export const PRESENCE_BANNED_PATTERNS = [

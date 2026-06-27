@@ -1,5 +1,5 @@
 /**
- * Companion Brain™ — page-agnostic reasoning types.
+ * Companion Brain — page-agnostic reasoning types.
  * Memory remembers. The Brain understands. Pages express.
  */
 
@@ -196,7 +196,7 @@ export type OrientationResult = {
   journeyLine: string | null;
 };
 
-/** Morning Presence™ — seen before guided; not orientation or proposals */
+/** Morning Presence — seen before guided; not orientation or proposals */
 export type MorningPresenceResult = {
   /** Soft lead-in, e.g. "Before we think about work..." */
   lead: string | null;

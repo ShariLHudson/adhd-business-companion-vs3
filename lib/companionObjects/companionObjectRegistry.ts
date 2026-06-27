@@ -1,5 +1,5 @@
 /**
- * Companion Object Language™ — central registry for Signature Objects™.
+ * Companion Object Language — central registry for Signature Objects.
  * Production UI should reference this registry (not Unicode emoji) for feature identity.
  */
 
@@ -25,13 +25,13 @@ function obj(
   return { assetStatus: "placeholder", ...partial };
 }
 
-/** Companion Object Registry™ — single source of truth for warm homestead objects. */
+/** Companion Object Registry — single source of truth for warm homestead objects. */
 export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   // ── Primary workspaces (initial object map) ─────────────────────────────
   obj({
     id: "clear-my-mind",
-    label: "Clear My Mind™",
-    feature: "Clear My Mind™",
+    label: "Clear My Mind",
+    feature: "Clear My Mind",
     replacesEmoji: "🧠",
     room: "window-seat",
     objectName: "Leather journal",
@@ -40,8 +40,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "todays-reality",
-    label: "Today's Reality™",
-    feature: "Today's Reality™",
+    label: "Today's Reality",
+    feature: "Today's Reality",
     replacesEmoji: "🙂",
     room: "kitchen-table",
     objectName: "Morning mug and notebook",
@@ -50,8 +50,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "plan-my-day",
-    label: "Plan My Day™",
-    feature: "Plan My Day™",
+    label: "Plan My Day",
+    feature: "Plan My Day",
     replacesEmoji: "📅",
     room: "planning-table",
     objectName: "Open leather planner",
@@ -60,8 +60,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "decision-compass",
-    label: "Decision Compass™",
-    feature: "Decision Compass™",
+    label: "Decision Compass",
+    feature: "Decision Compass",
     replacesEmoji: "🧭",
     room: "outlook-point",
     objectName: "Brass compass",
@@ -70,8 +70,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "focus-audio",
-    label: "Focus Audio™",
-    feature: "Focus Audio™",
+    label: "Focus Audio",
+    feature: "Focus Audio",
     replacesEmoji: "🎧",
     room: "focus-studio",
     objectName: "Premium headphones",
@@ -80,8 +80,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "breathing",
-    label: "Breathing™",
-    feature: "Breathing™",
+    label: "Breathing",
+    feature: "Breathing",
     replacesEmoji: "🌬️",
     room: "focus-studio",
     objectName: "Lit candle",
@@ -90,8 +90,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "games",
-    label: "Games™",
-    feature: "Games™",
+    label: "Games",
+    feature: "Games",
     replacesEmoji: "🎲",
     room: "focus-studio",
     objectName: "Wooden puzzle",
@@ -100,8 +100,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "create",
-    label: "Create™",
-    feature: "Create™",
+    label: "Create",
+    feature: "Create",
     replacesEmoji: "🎨",
     room: "creative-studio",
     objectName: "Sketchbook with paint brushes",
@@ -110,8 +110,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "business",
-    label: "Business™",
-    feature: "Business™",
+    label: "Business",
+    feature: "Business",
     replacesEmoji: "📈",
     room: "business-office",
     objectName: "Leather portfolio",
@@ -120,8 +120,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "learning",
-    label: "Learning™",
-    feature: "Learning™",
+    label: "Learning",
+    feature: "Learning",
     replacesEmoji: "📚",
     room: "library",
     objectName: "Stack of books",
@@ -130,8 +130,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "reading",
-    label: "Reading Nook™",
-    feature: "Reading Nook™",
+    label: "Reading Nook",
+    feature: "Reading Nook",
     replacesEmoji: "📖",
     room: "reading-nook",
     objectName: "Open book with reading glasses",
@@ -139,9 +139,18 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
     emotionalPurpose: "Quiet focus for long-form thinking.",
   }),
   obj({
+    id: "life-experience",
+    label: "Life Experience Room",
+    feature: "Life Experience Room",
+    room: "reading-nook",
+    objectName: "Handwritten letter on side table",
+    description: "Stories, lessons, and quiet wisdom — one invitation at a time.",
+    emotionalPurpose: "You're not alone — sit together for a while.",
+  }),
+  obj({
     id: "parking-lot",
-    label: "Parking Lot™",
-    feature: "Parking Lot™",
+    label: "Parking Lot",
+    feature: "Parking Lot",
     replacesEmoji: "📝",
     room: "workshop",
     objectName: "Seed packet / idea box",
@@ -150,8 +159,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "evidence-bank",
-    label: "Evidence Bank™",
-    feature: "Evidence Bank™",
+    label: "Evidence Bank",
+    feature: "Evidence Bank",
     replacesEmoji: "📊",
     room: "business-office",
     objectName: "Keepsake box",
@@ -160,8 +169,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "wins",
-    label: "Wins™",
-    feature: "Wins™",
+    label: "Wins",
+    feature: "Wins",
     replacesEmoji: "🏆",
     room: "garden-path",
     objectName: "Framed accomplishment",
@@ -170,8 +179,8 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "growth",
-    label: "Growth™",
-    feature: "Growth™",
+    label: "Growth",
+    feature: "Growth",
     replacesEmoji: "🌱",
     room: "greenhouse",
     objectName: "Growing plant",
@@ -207,6 +216,16 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
     objectName: "Handwritten note",
     description: "Companion conversation home.",
     emotionalPurpose: "Feel like talking with someone at the table.",
+  }),
+  obj({
+    id: "welcome-room",
+    label: "Welcome Room",
+    feature: "Welcome Room",
+    replacesEmoji: "🏡",
+    room: "welcome-room",
+    objectName: "Comfortable armchair by the window",
+    description: "Meet Shari, understand the Companion, and feel at home.",
+    emotionalPurpose: "Build trust through warmth — never documentation.",
   }),
   obj({
     id: "settings",
@@ -282,7 +301,7 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   obj({
     id: "toolbelt-saved-work",
     label: "Saved Work",
-    feature: "Saved™",
+    feature: "Saved",
     replacesEmoji: "📂",
     room: "workshop",
     objectName: "Labeled archive box",

@@ -1,14 +1,14 @@
 /**
- * Companion Needs Intelligence™
+ * Companion Needs Intelligence
  *
  * The brain layer that asks — before any room is prepared:
  * "What does this ADHD entrepreneur need right now?"
  *
  * Flow position:
- * User → Current Context → Needs Intelligence™ → Room Selection →
+ * User → Current Context → Needs Intelligence → Room Selection →
  * Hospitality Preparation → Atmosphere → Presence → Conversation → Workspace
  *
- * Decision philosophy: docs/COMPANION_DECISION_INTELLIGENCE.md (Decision Ladder™)
+ * Decision philosophy: docs/COMPANION_DECISION_INTELLIGENCE.md (Decision Ladder)
  *
  * We optimize for executive function — not productivity.
  */
@@ -282,7 +282,7 @@ function assessExecutiveFunction(
 }
 
 /**
- * ADHD Design Filter™ — before a room renders, does the experience help?
+ * ADHD Design Filter — before a room renders, does the experience help?
  */
 export function evaluateAdhdDesignFilter(input: {
   needId: CompanionNeedId;
@@ -352,7 +352,7 @@ export function evaluateAdhdDesignFilter(input: {
       id: "improves-state",
       question: "Does it improve the user's state?",
       passed: Boolean(def.restorationOutcome),
-      note: `Restoration Promise™: ${def.restorationOutcome}`,
+      note: `Restoration Promise: ${def.restorationOutcome}`,
     },
   ];
 
@@ -407,7 +407,7 @@ function buildSummary(
 }
 
 /**
- * Companion Needs Intelligence™ — identify need before preparing any room.
+ * Companion Needs Intelligence — identify need before preparing any room.
  */
 export function evaluateCompanionNeedsIntelligence(
   input: CompanionNeedsInput = {},
@@ -504,11 +504,11 @@ export function companionNeedById(id: CompanionNeedId) {
 export const COMPANION_NEEDS_FLOW = [
   "User",
   "Current Context",
-  "Needs Intelligence™",
+  "Needs Intelligence",
   "Room Selection",
   "Hospitality Preparation",
-  "Atmosphere Engine™",
-  "Presence Engine™",
+  "Atmosphere Engine",
+  "Presence Engine",
   "Conversation",
   "Workspace",
 ] as const;

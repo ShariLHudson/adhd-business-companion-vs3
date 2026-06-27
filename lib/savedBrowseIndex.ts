@@ -1,5 +1,5 @@
 /**
- * Cross-category search index for Other™ → Saved™.
+ * Cross-category search index for Other → Saved.
  */
 
 import { getProjects, getSnippets, getTemplates } from "./companionStore";

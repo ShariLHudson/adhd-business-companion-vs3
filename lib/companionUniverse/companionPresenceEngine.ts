@@ -5,7 +5,7 @@ import { placeById } from "./libraries/placeLibrary";
 import { placeForSection } from "./companionLayoutSystem";
 
 /**
- * Companion Presence Engine™
+ * Companion Presence Engine
  *
  * Before rendering a room, Companion Brain asks:
  * "Would Shari naturally stay with this guest here, or would she
@@ -87,7 +87,7 @@ export type ResolvedCompanionPresence = {
   experienceLabel: string;
   /** Shari's photograph in the environment layer. */
   showShariImage: boolean;
-  /** Subtle posture or ambient motion (Focus Buddy™). */
+  /** Subtle posture or ambient motion (Focus Buddy). */
   allowAmbientPresenceMotion: boolean;
   /** Mug, note, blanket — she was here recently. */
   showEvidenceObjects: boolean;
@@ -115,11 +115,11 @@ type ExperiencePresenceRule = {
   rationale: string;
 };
 
-/** Companion Presence Map™ — experience-first, not control-first. */
+/** Companion Presence Map — experience-first, not control-first. */
 export const EXPERIENCE_PRESENCE_MAP: readonly ExperiencePresenceRule[] = [
   {
     id: "living-room",
-    label: "Living Room™",
+    label: "Living Room",
     level: 5,
     rationale: "Welcome and relationship — Shari is in the room",
   },
@@ -149,62 +149,62 @@ export const EXPERIENCE_PRESENCE_MAP: readonly ExperiencePresenceRule[] = [
   },
   {
     id: "plan-my-day",
-    label: "Plan My Day™",
+    label: "Plan My Day",
     level: 4,
     rationale: "Planning together at the table",
   },
   {
     id: "planning-table",
-    label: "Planning Table™",
+    label: "Planning Table",
     level: 4,
     rationale: "Shared planning surface",
   },
   {
     id: "focus-buddy",
-    label: "Focus Buddy™",
+    label: "Focus Buddy",
     level: 4,
     rationale: "Body doubling — present, quiet, working alongside",
   },
   {
     id: "creative-studio",
-    label: "Creative Studio™",
+    label: "Creative Studio",
     level: 4,
     rationale: "Creating together",
   },
   {
     id: "back-deck",
-    label: "Back Deck™",
+    label: "Back Deck",
     level: 4,
     rationale: "Evening conversation together",
   },
   {
     id: "kitchen-table",
-    label: "Kitchen Table™",
+    label: "Kitchen Table",
     level: 4,
     rationale: "Morning start together — tea and gentle planning",
   },
   {
     id: "business-office",
-    label: "Business Office™",
+    label: "Business Office",
     level: 3,
     levelWhenStrategy: 4,
     rationale: "Nearby for long work; closer when discussing strategy",
   },
   {
     id: "workshop",
-    label: "Workshop™",
+    label: "Workshop",
     level: 3,
     rationale: "Hands-on work — support without interruption",
   },
   {
     id: "library",
-    label: "Library™",
+    label: "Library",
     level: 3,
     rationale: "Quiet reference work — Shari ambient nearby",
   },
   {
     id: "focus-studio",
-    label: "Focus Studio™",
+    label: "Focus Studio",
     level: 2,
     evidence: ["coffee mug", "open journal"],
     rationale:
@@ -212,14 +212,14 @@ export const EXPERIENCE_PRESENCE_MAP: readonly ExperiencePresenceRule[] = [
   },
   {
     id: "window-seat",
-    label: "Window Seat™",
+    label: "Window Seat",
     level: 2,
     evidence: ["handwritten note", "tea", "blanket"],
     rationale: "Prepared for reflection — no Shari image",
   },
   {
     id: "clear-my-mind",
-    label: "Clear My Mind™",
+    label: "Clear My Mind",
     level: 2,
     levelWhenWriting: 1,
     evidence: ["handwritten note", "tea", "blanket"],
@@ -227,34 +227,34 @@ export const EXPERIENCE_PRESENCE_MAP: readonly ExperiencePresenceRule[] = [
   },
   {
     id: "reading-nook",
-    label: "Reading Nook™",
+    label: "Reading Nook",
     level: 2,
     evidence: ["open notebook", "reading glasses", "sweater on chair"],
     rationale: "Evidence she was here — not Shari herself",
   },
   {
     id: "garden",
-    label: "Garden™",
+    label: "Garden",
     level: 2,
     evidence: ["garden basket", "fresh flowers"],
     rationale: "Nature is the companion; quiet preparation remains",
   },
   {
     id: "greenhouse",
-    label: "Greenhouse™",
+    label: "Greenhouse",
     level: 2,
     evidence: ["watering can", "seedling tray"],
     rationale: "Growth space — recently tended",
   },
   {
     id: "focus-audio",
-    label: "Focus Audio™",
+    label: "Focus Audio",
     level: 1,
     rationale: "No Shari — environment supports concentration",
   },
   {
     id: "breathing",
-    label: "Breathing™",
+    label: "Breathing",
     level: 1,
     rationale: "Breathing animation only",
   },
@@ -266,7 +266,7 @@ export const EXPERIENCE_PRESENCE_MAP: readonly ExperiencePresenceRule[] = [
   },
   {
     id: "games",
-    label: "Games™",
+    label: "Games",
     level: 1,
     rationale: "Playful without another person watching",
   },

@@ -1,5 +1,5 @@
-# Shari's Everyday Life™
-## Companion Homestead™ — The Home Should Feel Lived In, Not Staged
+# Shari's Everyday Life
+## Companion Homestead — The Home Should Feel Lived In, Not Staged
 
 **Version:** 1.0  
 **Status:** Canonical design authority — environmental storytelling, not activity  
@@ -101,7 +101,7 @@ Canonical catalog: `lib/sharisEverydayLife/catalog.ts` (40+ moments; extends [`L
 | **Cooldown** | Same detail doesn't repeat for days |
 | **Restraint on hard days** | Flooded/grief/recovery — room softens, doesn't decorate |
 
-Wired through **Living Life Engine™** → `resolveEverydayLifeChanges()`
+Wired through **Living Life Engine** → `resolveEverydayLifeChanges()`
 
 ---
 
@@ -137,14 +137,14 @@ Answers sound like a real friend observed over time — birds, crafts, Kinsey, t
 ## Stack position
 
 ```
-Presence Intelligence™ (silent guest preparation)
-  → Living Life Engine™ (time, weather, Kinsey, wildlife)
-  → Shari's Everyday Life™ (one lived-in detail)
-  → Environmental Truth™ (coherence)
+Presence Intelligence (silent guest preparation)
+  → Living Life Engine (time, weather, Kinsey, wildlife)
+  → Shari's Everyday Life (one lived-in detail)
+  → Environmental Truth (coherence)
   → Guest discovers
 ```
 
-Sibling: **Shari's Life Moments™** (conversational sharing) vs **Everyday Life™** (environmental — no dialogue).
+Sibling: **Shari's Life Moments** (conversational sharing) vs **Everyday Life** (environmental — no dialogue).
 
 ---
 

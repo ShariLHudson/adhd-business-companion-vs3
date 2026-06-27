@@ -8,7 +8,7 @@ import {
   IMAGE_CONTEXT_REGISTRY,
 } from "@/lib/companionEnvironmentIntelligence";
 
-describe("CompanionEnvironmentIntelligence™", () => {
+describe("CompanionEnvironmentIntelligence", () => {
   it("uses the canonical Living Room photograph on first page", () => {
     const intel = evaluateCompanionEnvironmentIntelligence({
       timeOfDay: "morning",

@@ -55,7 +55,7 @@ const INITIAL_NAV: MyThoughtsNavState = {
 };
 
 type Props = {
-  /** Where the user came from before My Thoughts™ (journey-aware). */
+  /** Where the user came from before My Thoughts (journey-aware). */
   backDestination?: string;
   onBack: () => void;
   presenceEntryKey?: number;
@@ -351,5 +351,5 @@ export function MyThinkingSpacePanel({
   );
 }
 
-/** My Thoughts™ — organization workshop. */
+/** My Thoughts — organization workshop. */
 export { MyThinkingSpacePanel as MyThoughtsPanel };

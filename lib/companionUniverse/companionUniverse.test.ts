@@ -5,7 +5,7 @@ import { orchestrateCompanionUniverse } from "./orchestrator/companionBrainOrche
 import { DEFAULT_DIRECTOR_STATE } from "@/lib/companionHospitalityPrototype";
 import { constitutionPassed } from "./constitution";
 
-describe("Companion Universe™", () => {
+describe("Companion Universe", () => {
   it("catalog defines master libraries including companion object library", () => {
     expect(COMPANION_LIBRARY_CATALOG.length).toBeGreaterThanOrEqual(26);
     expect(COMPANION_LIBRARY_CATALOG.some((lib) => lib.id === "companion-object")).toBe(

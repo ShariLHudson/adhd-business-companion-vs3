@@ -7,6 +7,7 @@ import type { AssistedAction } from "./assistedActionBridge";
 import { isActionAcceptance } from "./assistedActionBridge";
 import type { ToolSuggestion } from "./companionToolSuggestions";
 import type { AppSection } from "./companionUi";
+import { buildWorkspaceOpenedTransition } from "./humanConversation/actionTransition";
 import type { DoItNowOffer } from "./doItNowActions";
 import type { WorkspaceOffer } from "./workspaceMode";
 import { supportsWorkspace } from "./workspaceMode";
@@ -335,25 +336,7 @@ export function detectOpenSectionRequest(text: string): AppSection | null {
 }
 
 export function workspaceOpenAck(section: AppSection): string {
-  const title =
-    section === "time-block"
-      ? "Momentum Appointments"
-      : section === "brain-dump"
-        ? "Clear My Mind"
-        : section === "content-generator"
-          ? "Create"
-          : section === "playbook"
-            ? "Strategies"
-            : section === "templates-library"
-              ? "Templates"
-              : section === "projects"
-                ? "Projects"
-                : section === "decision-compass"
-                  ? "Decision Compass"
-                  : section === "saved-work"
-                ? "Saved Work"
-                : "workspace";
-  return `Opening **${title}** beside us — chat stays right here.`;
+  return buildWorkspaceOpenedTransition(section);
 }
 
 export function isSplitWorkspaceSection(section: AppSection): boolean {

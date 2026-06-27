@@ -1,5 +1,5 @@
 /**
- * Maps app sections and tool ids to Companion Object Library™ entries.
+ * Maps app sections and tool ids to Companion Object Library entries.
  * Single lookup for navigation imagery — never use raw emoji for features.
  */
 
@@ -30,6 +30,8 @@ export const WORKSPACE_OBJECT_ID: Partial<Record<AppSection, string>> = {
   growth: "growth",
   "confidence-vault": "my-highlights",
   "my-journey": "my-journey",
+  "welcome-room": "welcome-room",
+  "life-experience": "life-experience",
   "focus-audio": "focus-audio",
   "focus-timer": "focus-timer",
   focus: "focus-my-brain",
@@ -93,6 +95,7 @@ export const SIDEBAR_NAV_OBJECT_ID: Record<
   "evidence-bank": "evidence-bank",
   "confidence-vault": "my-highlights",
   "my-journey": "my-journey",
+  "welcome-room": "welcome-room",
 };
 
 export const SIDEBAR_TOOL_OBJECT_ID: Record<

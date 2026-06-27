@@ -1,4 +1,4 @@
-# Carry Forward™
+# Carry Forward
 ## Every New Day Begins With Hope
 
 **Version:** 1.0  
@@ -78,9 +78,9 @@ Sound like someone who remembers naturally:
 
 ## Honor Today's Intent
 
-Carry Forward™ applies **only on the first visit of the day**.
+Carry Forward applies **only on the first visit of the day**.
 
-Once the guest says *"Help me build a marketing funnel"* — Carry Forward ends. [Honor Their Intent™](./HONOR_THEIR_INTENT.md) begins.
+Once the guest says *"Help me build a marketing funnel"* — Carry Forward ends. [Honor Their Intent](./HONOR_THEIR_INTENT.md) begins.
 
 ---
 

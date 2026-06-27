@@ -1,5 +1,5 @@
 /**
- * Shari's Life Moments™ — first-person experiences, never advice.
+ * Shari's Life Moments — first-person experiences, never advice.
  * @see docs/companion-homestead/SHARIS_LIFE_MOMENTS.md
  */
 

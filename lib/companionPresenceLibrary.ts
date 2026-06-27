@@ -1,5 +1,5 @@
 /**
- * Companion Presence Library™ — approved relationship images.
+ * Companion Presence Library — approved relationship images.
  *
  * Scenes live in sceneCatalog.ts — add files there only; no code changes elsewhere.
  */
@@ -23,7 +23,7 @@ export {
 export const WELCOME_PRESENCE_GREETING = "It's good to see you.";
 export const WELCOME_PRESENCE_INVITE = "Come on in — I'm glad you stopped by.";
 
-/** Approved Companion Presence™ images (expand via scene catalog). */
+/** Approved Companion Presence images (expand via scene catalog). */
 export const COMPANION_PRESENCE_LIBRARY: CompanionPresenceLibraryEntry[] =
   COMPANION_PRESENCE_SCENE_CATALOG;
 

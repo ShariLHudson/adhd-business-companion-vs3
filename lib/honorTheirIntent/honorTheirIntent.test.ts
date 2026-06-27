@@ -9,7 +9,7 @@ import {
   shouldSuppressReflectionForHonorIntent,
 } from "./index";
 
-describe("Honor Their Intent™", () => {
+describe("Honor Their Intent", () => {
   it("classifies come to work vs come to be helped", () => {
     expect(resolveGuestArrivalMode({ userText: "Help me write an SOP." })).toBe(
       "come_to_work",

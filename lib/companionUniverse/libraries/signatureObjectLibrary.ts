@@ -7,7 +7,7 @@ export type SignatureObject = {
   description: string;
 };
 
-/** Signature Object Library™ — one iconic anchor per place. */
+/** Signature Object Library — one iconic anchor per place. */
 export const SIGNATURE_OBJECT_LIBRARY: SignatureObject[] = [
   { id: "spark-mug", name: "Spark mug", placeId: "living-room", description: "The familiar mug — warmth waiting" },
   { id: "window-blanket", name: "Folded blanket", placeId: "window-seat", description: "Soft weight for heavy afternoons" },

@@ -31,7 +31,7 @@ const CATEGORY_ITEMS: Record<
 const CATEGORY_EMPTY: Partial<Record<IntelligenceCategoryId, string>> = {
   risks: "No major risks flagged yet.",
   board_observations:
-    "Coming soon — your canvas will feed Board of Directors™ review.",
+    "Coming soon — your canvas will feed Board of Directors review.",
   what_if:
     "Explore a business change below to see ripple effects and impact on your canvas.",
 };
@@ -137,7 +137,7 @@ export function VisualFocusIntelligencePanel({
   fullWidth = false,
 }: {
   analysis: VisualFocusAnalysis;
-  /** Future Living Canvas™ — highlight matching Business Canvas™ sections on hover. */
+  /** Future Living Canvas — highlight matching Business Canvas sections on hover. */
   onSectionHighlight?: (sectionId: BusinessCanvasSectionId | null) => void;
   fullWidth?: boolean;
 }) {
@@ -152,7 +152,7 @@ export function VisualFocusIntelligencePanel({
     >
       <div className="rounded-xl border border-[#1e4f4f]/20 bg-[#1e4f4f]/5 px-3 py-2">
         <p className="text-xs font-semibold text-[#1e4f4f]">
-          Companion Intelligence™ — scan by color and icon first, then read what
+          Companion Intelligence — scan by color and icon first, then read what
           needs your attention.
         </p>
       </div>

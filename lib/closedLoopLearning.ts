@@ -1,5 +1,5 @@
 /**
- * Closed Loop Learning™ — real behavior capture & intervention attribution.
+ * Closed Loop Learning — real behavior capture & intervention attribution.
  *
  * Recommendation → Action → Outcome → Learning → Better Recommendation
  * Privacy: patterns only — never labels or shame.

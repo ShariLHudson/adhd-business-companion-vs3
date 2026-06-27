@@ -22,7 +22,7 @@ export function BackButton({
   size = "default",
 }: BackButtonProps) {
   const destination =
-    label === "Back" ? NAV_HOME : normalizeBackDestination(label);
+    !label || label === "Back" ? NAV_HOME : normalizeBackDestination(label);
 
   return (
     <AppBackButton

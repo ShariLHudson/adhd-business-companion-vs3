@@ -1,5 +1,5 @@
 /**
- * Permission Intelligence™ — relief through intentional exclusion.
+ * Permission Intelligence — relief through intentional exclusion.
  * @see constitution.ts — evaluatePermission
  */
 

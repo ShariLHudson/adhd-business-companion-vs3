@@ -21,6 +21,7 @@ describe("companionPageRenderContext", () => {
       scenePage: "recovery",
       sceneSeed: "brain-dump",
       clearMyMind: true,
+      suppress: true,
     });
     expect(context.environment.dataAttributes["data-environment-intelligence"]).toBe(
       "1",
@@ -58,6 +59,23 @@ describe("companionPageRenderContext", () => {
     expect(sectionToSceneWorkspaceId("home", "plan-my-day")).toBe("plan-my-day");
     expect(sectionToSceneWorkspaceId("brain-dump")).toBe("clear-my-mind");
     expect(sectionToSceneWorkspaceId("settings")).toBeUndefined();
+  });
+
+  it("suppresses legacy wallpaper when Clear My Mind opens beside chat on home", () => {
+    const context = buildCompanionPageRenderContext({
+      activeSection: "home",
+      workspacePanel: "brain-dump",
+      workspaceBesideChat: true,
+      displayEmotion: "unclear",
+      messageCount: 2,
+    });
+
+    expect(context.globalBackground).toEqual({
+      scenePage: "recovery",
+      sceneSeed: "brain-dump",
+      clearMyMind: true,
+      suppress: true,
+    });
   });
 
   it("flags lower-layer place overrides in development", () => {

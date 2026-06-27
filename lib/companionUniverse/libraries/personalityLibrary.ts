@@ -5,7 +5,7 @@ export type PersonalityGuideline = {
   environmentExpression: string;
 };
 
-/** Shari Personality Library™ — governs every library selection. */
+/** Shari Personality Library — governs every library selection. */
 export const SHARI_PERSONALITY_LIBRARY: PersonalityGuideline[] = [
   { trait: "warm", environmentExpression: "Prepared drinks, soft light, unhurried greetings" },
   { trait: "creative", environmentExpression: "Sketchbooks, color, playful book titles" },

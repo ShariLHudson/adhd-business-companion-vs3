@@ -162,7 +162,7 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
   const sections = Object.keys(DISCOVERY_SECTION_LABELS) as DiscoverySectionId[];
   const relationshipPhase = getCurrentRelationshipPhase();
   const phaseNumber = relationshipPhase.number;
-  const panelTitle = phaseNumber >= 3 ? "My Operating Manual™" : "Getting To Know You™";
+  const panelTitle = phaseNumber >= 3 ? "My Operating Manual" : "Getting To Know You";
   const phase1Profile = getPhase1OnboardingState().profile;
   const phase2Active = isPhase2DiscoveryActive();
   const phase2State = phase2Active ? getPhase2DiscoveryState() : null;
@@ -282,7 +282,7 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
       ) : null}
 
       {phaseNumber === 2 && learnedProfile ? (
-        <ManualSection title="Progressive Discovery™">
+        <ManualSection title="Progressive Discovery">
           <PanelMarkdown
             text={formatPhase2DiscoveryForPanel(
               learnedProfile,
@@ -293,13 +293,13 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
       ) : null}
 
       {phase3Active ? (
-        <ManualSection title="My Operating Manual™">
+        <ManualSection title="My Operating Manual">
           <PanelMarkdown text={formatMyOperatingManualForPanel()} />
         </ManualSection>
       ) : null}
 
       {phase4Active ? (
-        <ManualSection title="Business Operating Manual™">
+        <ManualSection title="Business Operating Manual">
           <PanelMarkdown
             text={formatBusinessOperatingManualForPanel(undefined, businessStage)}
           />
@@ -308,11 +308,11 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
 
       {phase5Active ? (
         <>
-          <ManualSection title="Personal Operating Manual™">
+          <ManualSection title="Personal Operating Manual">
             <PanelMarkdown text={formatPersonalOperatingManualForDisplay()} />
           </ManualSection>
           {!phase9Active ? (
-            <ManualSection title="Wisdom Engine™">
+            <ManualSection title="Wisdom Engine">
               <p className="text-sm text-[#6b635a]">
                 Personal insights only — specific to you, not generic advice.
               </p>
@@ -329,7 +329,7 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
       ) : null}
 
       {phase6Active ? (
-        <ManualSection title="Companion Intelligence Network™">
+        <ManualSection title="Companion Intelligence Network">
           <p className="text-sm text-[#6b635a]">
             The connected ecosystem — so you don&apos;t have to remember where things live.
           </p>
@@ -338,7 +338,7 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
       ) : null}
 
       {phase7Active ? (
-        <ManualSection title="Business Intelligence Ecosystem™">
+        <ManualSection title="Business Intelligence Ecosystem">
           <p className="text-sm text-[#6b635a]">
             How your business grows, struggles, and where focus matters most — in plain language.
           </p>
@@ -365,7 +365,7 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
       ) : null}
 
       {phase10Active ? (
-        <ManualSection title="Legacy & Transformation Intelligence™">
+        <ManualSection title="Legacy & Transformation Intelligence">
           <p className="text-sm text-[#6b635a]">
             Who you were, who you&apos;re becoming — growth, legacy, and evidence of change.
           </p>
@@ -374,7 +374,7 @@ export function GettingToKnowYouPanel({ onBack }: { onBack?: () => void }) {
       ) : null}
 
       {phase11Active ? (
-        <ManualSection title="Ecosystem Intelligence™">
+        <ManualSection title="Ecosystem Intelligence">
           <p className="text-sm text-[#6b635a]">
             Your whole life system — capacity, energy, purpose, and how everything connects.
           </p>

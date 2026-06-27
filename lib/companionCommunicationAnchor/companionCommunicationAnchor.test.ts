@@ -23,7 +23,7 @@ const ARRIVAL_BEATS: ArrivalBeat[] = [
   "staying",
 ];
 
-describe("Companion Communication Anchor™", () => {
+describe("Companion Communication Anchor", () => {
   it("requires communication access on every arrival beat", () => {
     for (const beat of ARRIVAL_BEATS) {
       expect(beatShowsCommunicationAnchor(beat)).toBe(true);

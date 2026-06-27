@@ -338,7 +338,7 @@ export function BusinessCanvasInteractiveCanvas({
   data: BusinessCanvasData;
   onChange: (data: BusinessCanvasData) => void;
   centerTitle?: string;
-  /** Future Living Canvas™ — ripple highlight on related boxes. */
+  /** Future Living Canvas — ripple highlight on related boxes. */
   highlightedSections?: BusinessCanvasSectionId[];
   /** Future impact / what-if visual states per section. */
   impactStates?: CanvasImpactStateMap;

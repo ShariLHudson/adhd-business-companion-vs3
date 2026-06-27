@@ -3,7 +3,7 @@ import { clearCarryForwardStoreForTests } from "@/lib/carryForward/dayVisit";
 import { evaluateWelcomePresenceIntelligence } from "./evaluateWelcomePresenceIntelligence";
 import { clearVoiceUsageForTests, violatesShariVoice } from "@/lib/shariVoiceBible";
 
-describe("WelcomePresenceIntelligence™", () => {
+describe("WelcomePresenceIntelligence", () => {
   beforeEach(() => {
     clearVoiceUsageForTests();
     clearCarryForwardStoreForTests();

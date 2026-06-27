@@ -1,10 +1,10 @@
-# ADR-010: Create Relationship Phase 9 — Wisdom Intelligence™
+# ADR-010: Create Relationship Phase 9 — Wisdom Intelligence
 
 **Status:** Accepted (implemented 2026-06-24)
 
 ## Context
 
-Wisdom Intelligence was specified as Relationship Phase 9 but only partially existed inside `lib/phase5CompanionIntelligenceEcosystem.ts` (`wisdomInsights`, Wisdom Engine™ panel). There was no dedicated activation gate, observation loop, or chat integration. Wisdom could display under Phase 5 without evidence thresholds appropriate for long-horizon insight.
+Wisdom Intelligence was specified as Relationship Phase 9 but only partially existed inside `lib/phase5CompanionIntelligenceEcosystem.ts` (`wisdomInsights`, Wisdom Engine panel). There was no dedicated activation gate, observation loop, or chat integration. Wisdom could display under Phase 5 without evidence thresholds appropriate for long-horizon insight.
 
 ## Decision
 

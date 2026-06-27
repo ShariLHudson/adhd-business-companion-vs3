@@ -1,5 +1,5 @@
 /**
- * Plan My Day™ — re-exports Companion Brain™ types for backward compatibility.
+ * Plan My Day — re-exports Companion Brain types for backward compatibility.
  * New code should import from @/lib/companionBrain.
  */
 

@@ -80,19 +80,19 @@ function continuityToHomeResume(item: ContinuityManifestItem): HomeResumeItem {
 function resumeTypeLabel(type: ContinuityManifestItem["type"]): string {
   switch (type) {
     case "visual-focus-map":
-      return "Visual Thinking™";
+      return "Visual Thinking";
     case "decision-compass":
-      return "Decision Compass™";
+      return "Decision Compass";
     case "strategy-apply":
-      return "Strategies™";
+      return "Strategies";
     case "project":
-      return "Projects™";
+      return "Projects";
     case "workspace-sop":
-      return "SOPs™";
+      return "SOPs";
     case "client-avatar":
       return "Audience Profile";
     default:
-      return "Documents™";
+      return "Documents";
   }
 }
 
@@ -119,7 +119,7 @@ export function homeResumeItemFromActivityId(
       id: "activity:decision-compass",
       kind: "decision-compass",
       title: activity.title,
-      typeLabel: "Decision Compass™",
+      typeLabel: "Decision Compass",
       lastAction: "Pick up your Decision Compass beside chat",
       nextStep: "Pick up your Decision Compass beside chat",
       ts: updatedAt,
@@ -131,7 +131,7 @@ export function homeResumeItemFromActivityId(
       id: "activity:two-option",
       kind: "quick-two-option",
       title: activity.title,
-      typeLabel: "Decision Compass™",
+      typeLabel: "Decision Compass",
       lastAction: "Continue your quick two-option choice",
       nextStep: "Continue your quick two-option choice",
       ts: updatedAt,

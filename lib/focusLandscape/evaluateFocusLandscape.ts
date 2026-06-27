@@ -28,7 +28,7 @@ function stableWhisper(seed: string): string {
 }
 
 /**
- * Focus Landscape™ — resolve which cognitive space the guest occupies.
+ * Focus Landscape — resolve which cognitive space the guest occupies.
  */
 export function evaluateFocusLandscape(
   input: FocusLandscapeInput = {},
@@ -47,7 +47,7 @@ export function evaluateFocusLandscape(
     spaceId,
     space,
     placeId: space.placeId,
-    title: "Focus My Brain™",
+    title: "Focus My Brain",
     subtitle: subtitleForSpace(spaceId),
     landscapeWhisper: stableWhisper(`${dayKey}:${spaceId}:${input.toolId ?? "hub"}`),
     transition,
@@ -72,7 +72,7 @@ export function placeIdForFocusWorkspace(
 
 export function focusLandscapeHintForChat(verdict: FocusLandscapeVerdict): string {
   return [
-    "FOCUS LANDSCAPE™ — cognitive countryside:",
+    "FOCUS LANDSCAPE — cognitive countryside:",
     FOCUS_LANDSCAPE_PRINCIPLE,
     FOCUS_LANDSCAPE_INSIGHT,
     `Space: ${verdict.space.name} (${verdict.spaceId}).`,

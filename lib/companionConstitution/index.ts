@@ -4,6 +4,7 @@ export {
   CONSTITUTIONAL_RULE,
   ORCHESTRATION_RULE,
   SPECIALIZATION_RULE,
+  ELEVATE_LIFE_EXPERIENCE_RULE,
 } from "./types";
 export type { ConstitutionalLayerId } from "./types";
 

@@ -8,7 +8,7 @@ type Props = {
   message: string | null;
 };
 
-/** Shari presence for Plan My Day™ morning orientation. */
+/** Shari presence for Plan My Day morning orientation. */
 export function PlanDayShariPresence({ message }: Props) {
   const presence = useCompanionPresence({
     workspacePanel: "plan-my-day",

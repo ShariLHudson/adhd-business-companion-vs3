@@ -65,7 +65,7 @@ export type StewardshipMessageInput = {
 };
 
 /**
- * Acknowledge re-shaping after Live Reality™ changes — never guilt, never surprise.
+ * Acknowledge re-shaping after Live Reality changes — never guilt, never surprise.
  */
 export function formatBoardStewardshipMessage(
   input: StewardshipMessageInput,

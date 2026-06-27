@@ -1,5 +1,5 @@
 /**
- * Reflection Intelligence™ — interpret the day silently.
+ * Reflection Intelligence — interpret the day silently.
  * @see constitution.ts — performReflection
  */
 

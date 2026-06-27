@@ -4,7 +4,7 @@ import type { LivingBorderElementId, LivingBorderRoomCatalog } from "./types";
 export const LIVING_BORDER_ROOM_CATALOG: LivingBorderRoomCatalog[] = [
   {
     placeId: "living-room",
-    name: "Living Room™",
+    name: "Living Room",
     elements: [
       "window",
       "curtain-left",
@@ -22,7 +22,7 @@ export const LIVING_BORDER_ROOM_CATALOG: LivingBorderRoomCatalog[] = [
   },
   {
     placeId: "reading-nook",
-    name: "Reading Nook™",
+    name: "Reading Nook",
     elements: [
       "aquarium",
       "bookshelf",
@@ -35,7 +35,7 @@ export const LIVING_BORDER_ROOM_CATALOG: LivingBorderRoomCatalog[] = [
   },
   {
     placeId: "planning-table",
-    name: "Planning Table™",
+    name: "Planning Table",
     elements: [
       "bookshelf",
       "planner",
@@ -52,7 +52,7 @@ export const LIVING_BORDER_ROOM_CATALOG: LivingBorderRoomCatalog[] = [
   },
   {
     placeId: "creative-studio",
-    name: "Creative Studio™",
+    name: "Creative Studio",
     elements: [
       "craft-shelves",
       "window",
@@ -64,7 +64,7 @@ export const LIVING_BORDER_ROOM_CATALOG: LivingBorderRoomCatalog[] = [
   },
   {
     placeId: "window-seat",
-    name: "Window Seat™",
+    name: "Window Seat",
     elements: [
       "landscape",
       "trees",
@@ -84,7 +84,7 @@ export const LIVING_BORDER_ROOM_CATALOG: LivingBorderRoomCatalog[] = [
   },
   {
     placeId: "garden-path",
-    name: "Garden Path™",
+    name: "Garden Path",
     elements: [
       "landscape",
       "trees",
@@ -97,22 +97,22 @@ export const LIVING_BORDER_ROOM_CATALOG: LivingBorderRoomCatalog[] = [
   },
   {
     placeId: "greenhouse",
-    name: "Greenhouse™",
+    name: "Greenhouse",
     elements: ["rain", "trees", "flowers", "steam", "curtain-right"],
   },
   {
     placeId: "outlook-point",
-    name: "Outlook Point™",
+    name: "Outlook Point",
     elements: ["landscape", "trees", "bird", "flowers"],
   },
   {
     placeId: "garden",
-    name: "Garden™",
+    name: "Garden",
     elements: ["flowers", "trees", "bird", "landscape", "pond-water"],
   },
   {
     placeId: "sunroom-over-pond",
-    name: "Sunroom Over The Pond™",
+    name: "Sunroom Over The Pond",
     elements: [
       "pond-water",
       "goldfish",

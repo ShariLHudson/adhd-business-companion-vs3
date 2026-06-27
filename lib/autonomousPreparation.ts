@@ -1,5 +1,5 @@
 /**
- * Phase 8 — Autonomous Preparation™
+ * Phase 8 — Autonomous Preparation
  * Prepare before the user asks. Never execute, send, publish, or decide.
  */
 
@@ -570,7 +570,7 @@ export function formatPreparedWorkspaceForPanel(
   }
 
   const lines = [
-    "## Autonomous Preparation™",
+    "## Autonomous Preparation",
     "",
     "_Prepared before you ask — you decide what to use._",
     "",
@@ -617,7 +617,7 @@ export function phase8AutonomousPreparationHintForChat(input?: {
   const days = daysSinceRelationshipStart(now);
 
   const parts = [
-    "PHASE 8 AUTONOMOUS PREPARATION™ (prepare before they ask — never act without permission):",
+    "PHASE 8 AUTONOMOUS PREPARATION (prepare before they ask — never act without permission):",
     "Goal: user feels prepared, not surprised by autonomous action.",
     "NEVER: send, publish, contact, change records, or decide for the user.",
     "ALWAYS: prepare options, request permission, respect control.",

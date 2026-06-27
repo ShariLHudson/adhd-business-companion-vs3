@@ -1,5 +1,5 @@
 /**
- * Arrival Intelligence™ — orchestrates the Companion Home before render.
+ * Arrival Intelligence — orchestrates the Companion Home before render.
  *
  * Answers (without hard-coding forever):
  * 1. Who is arriving?
@@ -54,6 +54,16 @@ import {
   type LivingCompanionRoom,
 } from "@/lib/companionEnvironmentIntelligence";
 import { resolveWelcomeAtmosphere } from "@/lib/welcomeLivingRoom";
+import { isFirstVisitOfDay } from "@/lib/carryForward";
+import { composeArrivalGreeting } from "@/lib/arrivalGreetingIntelligence";
+import { evaluateLivingHome, type LivingHomeEvaluation } from "@/lib/livingHome";
+import { getMemberSinceIso } from "@/lib/shariMemberSince";
+import {
+  evaluateTodaysLittleSpark,
+  mergeSparkEnvironmentObjects,
+  resolveSparkSeason,
+  type TodaysLittleSparkResult,
+} from "@/lib/todaysLittleSpark";
 import type {
   ArrivalConversationalTone,
   ArrivalGreetingStrategy,
@@ -86,6 +96,10 @@ export type ArrivalIntelligence = {
   greetingStrategy: ArrivalGreetingStrategy;
   /** Primary companion line — presence or contextual opening. */
   openingMessage: string;
+  /** Arrival Greeting Intelligence — one complete sentence headline. */
+  greetingHeadline: string;
+  /** Scene-consistent supporting copy beneath the headline. */
+  greetingBody: string | null;
   /** FIRST_VISIT only — warm introduction before the question. */
   welcomeLine: string | null;
   /** Optional invite beneath the opening — question or gentle prompt. */
@@ -105,10 +119,14 @@ export type ArrivalIntelligence = {
   sessionVisitIndex: number;
   timeOfDay: ReturnType<typeof timeOfDayBucket>;
   homesteadTime: HomesteadTime;
-  /** Welcome Presence Intelligence™ — first conversation of the day. */
+  /** Living Home — shared homestead context for greetings and scenes. */
+  livingHome: LivingHomeEvaluation;
+  /** Welcome Presence Intelligence — first conversation of the day. */
   welcomePresence: WelcomePresenceIntelligence | null;
-  /** Living Companion Room™ — four-layer welcome environment. */
+  /** Living Companion Room — four-layer welcome environment. */
   livingRoom: LivingCompanionRoom | null;
+  /** Today's Little Spark — occasional daily delight at first arrival. */
+  littleSpark: TodaysLittleSparkResult | null;
 };
 
 function daysFromHours(hours: number | null): number | null {
@@ -535,6 +553,12 @@ export function evaluateArrivalIntelligence(
   );
   const homesteadTime = resolveHomesteadTime({ now, placeId: "living-room" });
   const timeOfDay = homesteadTime.legacyTimeOfDay;
+  const prefs = getPrefs();
+  const livingHome = evaluateLivingHome({
+    now,
+    region: prefs.region,
+    surface: "today",
+  });
   const narrativeContext = refreshNarrativeContextOnArrival(now);
   const isFirstMeeting = homeState === "FIRST_VISIT";
   const welcomePresenceInput =
@@ -567,31 +591,84 @@ export function evaluateArrivalIntelligence(
   const welcomePresence = welcomePresenceInput
     ? evaluateWelcomePresenceIntelligence(welcomePresenceInput)
     : null;
-  const livingRoom =
+  const recognition = getRecognitionStore();
+  const hospitalityForSpark = resolveEffectiveHospitalityProfile({
+    source: "memory",
+    recognition,
+    todayContext: { now },
+  });
+  const prefsForSpark = getPrefs();
+  const sparkSeason = resolveSparkSeason(prefsForSpark.region, now);
+  const sparkResult =
+    welcomePresence && welcomePresenceInput
+      ? evaluateTodaysLittleSpark({
+          now,
+          region: prefsForSpark.region,
+          season: sparkSeason,
+          timeOfDay,
+          isFirstVisitOfDay: isFirstVisitOfDay(now),
+          isFirstMeeting,
+          onboardingActive,
+          recoveryGentle: welcomePresenceInput.recoveryGentle,
+          lowEnergy: welcomePresenceInput.lowEnergy,
+          presencePreferSilence:
+            welcomePresence.presence.posture.preferSilence,
+          birthdayToday: welcomePresenceInput.birthdayToday,
+          celebrationActive: welcomePresenceInput.celebrationActive,
+          greetingCategory: welcomePresence.greetingCategory,
+          firstName: welcomePresenceInput.firstName,
+          memberSinceIso: getMemberSinceIso(),
+          conversationStarts: recognition.conversationStarts,
+          favoriteDrink: hospitalityForSpark.profile?.favoriteDrink ?? null,
+          record: options.record === true,
+        })
+      : { spark: null as TodaysLittleSparkResult | null };
+  let livingRoom =
     welcomePresence && environmentInput
       ? composeLivingCompanionRoom({
           environment: evaluateCompanionEnvironmentIntelligence(environmentInput),
           conversation: welcomePresence,
         })
       : null;
-  const copy = buildOpeningAndInvite({
+  if (livingRoom && sparkResult.spark) {
+    livingRoom = mergeSparkEnvironmentObjects(livingRoom, sparkResult.spark);
+  }
+
+  const arrivalGreeting = composeArrivalGreeting({
+    livingHome,
     homeState,
     visitorKind,
+    firstName: firstName(),
     continue: continueRes,
-    timeOfDay,
     returnDays: effectiveReturnDays,
-    welcomePresence,
+    isFirstMeeting,
+    isFirstVisitOfDay: isFirstVisitOfDay(now),
+    previousTopic: getLastActivity()?.title ?? null,
+    birthdayToday: welcomePresenceInput?.birthdayToday ?? false,
   });
+
+  if (livingRoom) {
+    livingRoom = {
+      ...livingRoom,
+      layer4: {
+        ...livingRoom.layer4,
+        greeting: arrivalGreeting.headline,
+      },
+    };
+  }
 
   const intelligence: ArrivalIntelligence = {
     homeState,
     chrome,
     visitorKind,
     greetingStrategy,
-    openingMessage: copy.openingMessage,
-    welcomeLine: copy.welcomeLine,
-    inviteQuestion: copy.inviteQuestion,
-    headline: buildHeadline(homeState),
+    openingMessage: arrivalGreeting.headline,
+    greetingHeadline: arrivalGreeting.headline,
+    greetingBody: arrivalGreeting.body,
+    welcomeLine:
+      homeState === "FIRST_VISIT" ? arrivalGreeting.headline : null,
+    inviteQuestion: arrivalGreeting.inviteQuestion,
+    headline: arrivalGreeting.headline,
     uiEmphasis: resolveUiEmphasis(homeState, continueRes),
     chatPlaceholder: buildChatPlaceholder({
       homeState,
@@ -616,8 +693,10 @@ export function evaluateArrivalIntelligence(
     sessionVisitIndex: visitIndex,
     timeOfDay,
     homesteadTime,
+    livingHome,
     welcomePresence,
     livingRoom,
+    littleSpark: sparkResult.spark,
   };
 
   if (options.record === true && typeof window !== "undefined") {

@@ -53,7 +53,7 @@ describe("visualFocus companionIntelligence", () => {
     ).toBe(true);
   });
 
-  it("only Business Canvas™ requires predefined structure among production modes", () => {
+  it("only Business Canvas requires predefined structure among production modes", () => {
     const production = VISUAL_THINKING_FRAMEWORK_REGISTRY.filter(
       (f) => f.maturity === "production",
     );

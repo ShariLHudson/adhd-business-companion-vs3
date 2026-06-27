@@ -7,7 +7,7 @@ type Props = {
   hidden?: boolean;
 };
 
-/** Spark Studio Companions™ — fixed lower-left on primary companion pages. */
+/** Spark Studio Companions — fixed lower-left on primary companion pages. */
 export function CompanionHomesteadLogo({ hidden = false }: Props) {
   if (hidden) return null;
 

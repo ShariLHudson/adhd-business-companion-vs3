@@ -136,8 +136,8 @@ export const EMOTIONAL_ECHOES: ShariVoiceLine[] = [
     "Good spark.",
   ], { emotionalTags: ["creative", "excited"] }),
   ...voiceLines("continuity", "echo", [
-    "Still carrying a similar feeling?",
-    "Yesterday still with you?",
-    "Want to start there?",
-  ], { tags: ["continuity"] }),
+    "Last time we talked, you were working on {topic}.",
+    "We can pick up on {topic} — or start somewhere new.",
+    "Yesterday you were focused on {topic}.",
+  ], { tags: ["continuity", "specific_memory"] }),
 ];

@@ -11,7 +11,7 @@ export type WorkspaceIntelligenceEntry = {
   id: string;
   name: string;
   role: WorkspaceIntelligenceRole;
-  /** What this workspace reads from Live Reality™ / Companion Brain™ */
+  /** What this workspace reads from Live Reality / Companion Brain */
   consumes: string[];
   /** What reality signals this workspace may publish */
   contributes: RealitySignalSource[];
@@ -20,12 +20,12 @@ export type WorkspaceIntelligenceEntry = {
 };
 
 /**
- * Canonical map — extend as workspaces wire into Live Reality™.
+ * Canonical map — extend as workspaces wire into Live Reality.
  */
 export const WORKSPACE_INTELLIGENCE_REGISTRY: WorkspaceIntelligenceEntry[] = [
   {
     id: "todays-reality",
-    name: "Today's Reality™",
+    name: "Today's Reality",
     role: "producer",
     consumes: ["live-judgment-framing"],
     contributes: ["todays-reality"],
@@ -34,7 +34,7 @@ export const WORKSPACE_INTELLIGENCE_REGISTRY: WorkspaceIntelligenceEntry[] = [
   },
   {
     id: "plan-my-day",
-    name: "Plan My Day™",
+    name: "Plan My Day",
     role: "both",
     consumes: ["live-judgment", "memory", "live-reality"],
     contributes: ["plan-my-day"],
@@ -43,7 +43,7 @@ export const WORKSPACE_INTELLIGENCE_REGISTRY: WorkspaceIntelligenceEntry[] = [
   },
   {
     id: "clear-my-mind",
-    name: "Clear My Mind™",
+    name: "Clear My Mind",
     role: "producer",
     consumes: ["live-judgment-tone"],
     contributes: ["clear-my-mind"],
@@ -52,7 +52,7 @@ export const WORKSPACE_INTELLIGENCE_REGISTRY: WorkspaceIntelligenceEntry[] = [
   },
   {
     id: "my-thoughts",
-    name: "My Thoughts™",
+    name: "My Thoughts",
     role: "producer",
     consumes: ["live-judgment"],
     contributes: ["my-thoughts"],
@@ -61,7 +61,7 @@ export const WORKSPACE_INTELLIGENCE_REGISTRY: WorkspaceIntelligenceEntry[] = [
   },
   {
     id: "focus",
-    name: "Focus My Brain™",
+    name: "Focus My Brain",
     role: "consumer",
     consumes: ["live-judgment", "capacity", "live-reality"],
     contributes: ["focus"],
@@ -70,7 +70,7 @@ export const WORKSPACE_INTELLIGENCE_REGISTRY: WorkspaceIntelligenceEntry[] = [
   },
   {
     id: "projects",
-    name: "Projects™",
+    name: "Projects",
     role: "consumer",
     consumes: ["live-judgment", "live-reality"],
     contributes: ["business"],
@@ -79,7 +79,7 @@ export const WORKSPACE_INTELLIGENCE_REGISTRY: WorkspaceIntelligenceEntry[] = [
   },
   {
     id: "founder-intelligence",
-    name: "Founder Intelligence™",
+    name: "Founder Intelligence",
     role: "wisdom",
     consumes: ["all-signals", "reflection", "adaptation-history"],
     contributes: [],
@@ -88,7 +88,7 @@ export const WORKSPACE_INTELLIGENCE_REGISTRY: WorkspaceIntelligenceEntry[] = [
   },
   {
     id: "business-intelligence",
-    name: "Business Intelligence™",
+    name: "Business Intelligence",
     role: "consumer",
     consumes: ["live-reality", "projects", "crm", "calendar", "revenue"],
     contributes: ["business"],
@@ -97,7 +97,7 @@ export const WORKSPACE_INTELLIGENCE_REGISTRY: WorkspaceIntelligenceEntry[] = [
   },
   {
     id: "postcraft",
-    name: "PostCraft™",
+    name: "PostCraft",
     role: "consumer",
     consumes: ["live-judgment", "creative-capacity"],
     contributes: [],
@@ -106,7 +106,7 @@ export const WORKSPACE_INTELLIGENCE_REGISTRY: WorkspaceIntelligenceEntry[] = [
   },
   {
     id: "decision-compass",
-    name: "Decision Compass™",
+    name: "Decision Compass",
     role: "consumer",
     consumes: ["live-judgment", "live-reality"],
     contributes: ["mood", "capacity"],
@@ -115,7 +115,7 @@ export const WORKSPACE_INTELLIGENCE_REGISTRY: WorkspaceIntelligenceEntry[] = [
   },
   {
     id: "relationship-intelligence",
-    name: "Relationship Intelligence™",
+    name: "Relationship Intelligence",
     role: "consumer",
     consumes: ["live-judgment", "emotional-signals", "live-reality"],
     contributes: ["family", "mood"],

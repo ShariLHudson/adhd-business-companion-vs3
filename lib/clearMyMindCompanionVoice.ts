@@ -1,8 +1,8 @@
 /**
- * Shari's voice for Clear My Mind™ — warm, grounded, never clinical.
+ * Shari's voice for Clear My Mind — warm, grounded, never clinical.
  *
- * Companion Covenant™: relationship before intelligence.
- * Agency Principle™: presence before recommendation.
+ * Companion Covenant: relationship before intelligence.
+ * Agency Principle: presence before recommendation.
  */
 
 import type { BrainDumpEntry } from "./companionStore";
@@ -107,6 +107,26 @@ export function shariImmediateHoldResponse(
 
 export function shariPermissionLine(): string {
   return "You don't have to organize anything first. Messy is welcome — half sentences, voice notes, whatever comes out.";
+}
+
+export function shariPostShareAcknowledgment(raw: string): string {
+  const seed = raw.slice(0, 48);
+  const lines = [
+    "That's a lot to carry.",
+    "I'm glad you didn't have to hold onto it by yourself.",
+    "Thank you for trusting me with that.",
+  ] as const;
+  return pickLine(lines, seed);
+}
+
+export function shariVisibleThinkingLine(seed: number): string {
+  const lines = [
+    "I'm looking for themes.",
+    "Some of these thoughts seem connected.",
+    "I'm noticing a few things that may be causing the most pressure.",
+    "I'm sorting these into manageable pieces.",
+  ] as const;
+  return lines[Math.abs(seed) % lines.length]!;
 }
 
 export function shariReleasePrompt(count: number): string {

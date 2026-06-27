@@ -1,5 +1,5 @@
 /**
- * Relationship Observation Engine™
+ * Relationship Observation Engine
  * Transforms stored memories into observed behaviors — not trait labels.
  */
 

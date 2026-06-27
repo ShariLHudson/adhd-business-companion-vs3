@@ -5,7 +5,7 @@ import {
   HOSPITALITY_PRINCIPLE,
 } from "./hospitalityPrinciple";
 
-describe("The Hospitality Principle™", () => {
+describe("The Hospitality Principle", () => {
   it("defines the host vs app distinction", () => {
     expect(HOSPITALITY_PRINCIPLE.guestShouldFeel).toBe("She remembered me.");
     expect(HOSPITALITY_PRINCIPLE.mustNeverFeel).toBe(

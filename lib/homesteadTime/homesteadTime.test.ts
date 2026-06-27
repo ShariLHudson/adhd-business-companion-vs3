@@ -7,7 +7,7 @@ import {
   resolveHomesteadTimePeriod,
 } from "@/lib/homesteadTime";
 
-describe("Homestead Time™", () => {
+describe("Homestead Time", () => {
   it("resolves seven daily periods from clock time", () => {
     expect(resolveHomesteadTimePeriod(new Date("2026-06-25T06:15:00"))).toBe(
       "dawn",

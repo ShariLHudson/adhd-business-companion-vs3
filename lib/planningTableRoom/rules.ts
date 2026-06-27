@@ -1,4 +1,4 @@
-/** ADHD Design Rules™ — Planning Table™ never adds pressure */
+/** ADHD Design Rules — Planning Table never adds pressure */
 
 export const PLANNING_TABLE_ADHD_FORBIDDEN = [
   "visual-clutter",

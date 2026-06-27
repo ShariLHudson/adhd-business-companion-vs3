@@ -1,4 +1,4 @@
-# Planning Table™ — Room Look Book
+# Planning Table — Room Look Book
 
 **Place ID:** `planning-table`  
 **Status:** Design authority — Phase 1 (no UI implementation)  
@@ -8,9 +8,9 @@
 
 ## Purpose
 
-The Planning Table™ is where **one day becomes manageable** — not where life is optimized, quarterly-planned, or guilt-scheduled.
+The Planning Table is where **one day becomes manageable** — not where life is optimized, quarterly-planned, or guilt-scheduled.
 
-It exists for **Plan My Day™** and honest time visibility. Structure without corporate conference room energy.
+It exists for **Plan My Day** and honest time visibility. Structure without corporate conference room energy.
 
 **Emotional need served:** "Today can be finite. I can choose three true things."
 
@@ -20,13 +20,13 @@ This is a sun-room corner or bright dining alcove in an Iowa farmhouse — round
 
 ---
 
-## Emotional Promise™
+## Emotional Promise
 
 **When someone leaves this room…** they feel **clearer** — holding a few true priorities instead of forty anxious ghosts, with permission to ignore the rest until tomorrow.
 
 ---
 
-## Signature Feature™
+## Signature Feature
 
 ### The handcrafted planning desk
 
@@ -92,7 +92,7 @@ No animated checklist confetti. No bouncing due dates.
 
 ---
 
-## Companion Presence™
+## Companion Presence
 
 **Nearby — not hovering.**
 
@@ -106,17 +106,17 @@ Warmth within arm's reach. Questions rare. Structure offered, never imposed.
 
 ---
 
-## Kinsey™
+## Kinsey
 
 **Not in this room.**
 
 Planning requires a surface free of paw prints and distraction. Kinsey may be heard elsewhere in the house — distant nail tick on oak — but **not on camera**.
 
-If the guest needs comfort animal energy, they return to the Living Room™ or Window Seat™ after planning.
+If the guest needs comfort animal energy, they return to the Living Room or Window Seat after planning.
 
 ---
 
-## Companion Objects™
+## Companion Objects
 
 | Registry ID | Object name | Role in room |
 |-------------|-------------|--------------|
@@ -125,11 +125,11 @@ If the guest needs comfort animal energy, they return to the Living Room™ or W
 
 **Environmental (non-registry):** pen cup, analog clock, credenza folders, two-window land view.
 
-Do not place Clear My Mind journal here as primary — capture belongs at the Window Seat™.
+Do not place Clear My Mind journal here as primary — capture belongs at the Window Seat.
 
 ---
 
-## UI Language™
+## UI Language
 
 | Element | Rule |
 |---------|------|
@@ -145,7 +145,7 @@ House Map and Toolbelt remain stable. Environment supports planning; it does not
 
 ---
 
-## Never In This Room™
+## Never In This Room
 
 - Quarterly OKR boards, 90-day strategic grids
 - Overdue red badges, streak language, shame copy
@@ -158,7 +158,7 @@ House Map and Toolbelt remain stable. Environment supports planning; it does not
 
 ---
 
-## ADHD Rules™
+## ADHD Rules
 
 | Challenge | How the room helps |
 |-----------|-------------------|
@@ -171,7 +171,7 @@ House Map and Toolbelt remain stable. Environment supports planning; it does not
 
 ---
 
-## Seasonal Notes™
+## Seasonal Notes
 
 - **Spring:** Mud on boots nearby (off-camera); bright hopeful light; planner may show lighter goals
 - **Summer:** Morning before heat; blinds cut glare; shorter visible day list
@@ -182,6 +182,6 @@ Planner may show holiday dots — not a seasonal UI reskin.
 
 ---
 
-## Final Feeling™
+## Final Feeling
 
 **Today is finite — and I know what actually matters before the noise returns.**

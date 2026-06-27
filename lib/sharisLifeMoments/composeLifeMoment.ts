@@ -11,7 +11,7 @@ import {
 } from "./resolveCategory";
 
 /**
- * Compose a Life Moment™ — Shari sharing her experience, not giving advice.
+ * Compose a Life Moment — Shari sharing her experience, not giving advice.
  */
 export function composeLifeMoment(input: {
   voiceContext: GreetingIntelligenceInput;

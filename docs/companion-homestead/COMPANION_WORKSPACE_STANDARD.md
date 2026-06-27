@@ -2,7 +2,7 @@
 ## Every Homestead Workspace Shares One Design Language
 
 **Version:** 1.0  
-**Status:** Canonical — Clear My Mind™ is the reference implementation  
+**Status:** Canonical — Clear My Mind is the reference implementation  
 **Code:** `lib/companionWorkspaceStandard/` · `components/companion/CompanionWorkspaceShell.tsx`
 
 ---
@@ -22,13 +22,13 @@
 Every workspace includes:
 
 - ✓ Companion logo (bottom left — `CompanionHomesteadLogo`)
-- ✓ Living Border™ (`LivingBorderFrame`)
-- ✓ Protected Conversation Zone™ (`companion-protected-zone`)
+- ✓ Living Border (`LivingBorderFrame`)
+- ✓ Protected Conversation Zone (`companion-protected-zone`)
 - ✓ Frosted glass workspace (`companion-workspace-frosted`)
-- ✓ Signature Companion Object™ in header (`CompanionObjectVisual` feature form)
+- ✓ Signature Companion Object in header (`CompanionObjectVisual` feature form)
 - ✓ Seasonal room + time-of-day lighting (via `CompanionBackground`)
-- ✓ Environmental Truth™
-- ✓ Communication Anchor™
+- ✓ Environmental Truth
+- ✓ Communication Anchor
 - ✓ No floating portraits inside the workspace panel
 - ✓ Calm transitions
 
@@ -46,7 +46,7 @@ Not an opaque software card on top of the photo.
 
 ---
 
-## Living Border™
+## Living Border
 
 Environmental motion stays **outside** the protected zone:
 
@@ -56,11 +56,11 @@ Environmental motion stays **outside** the protected zone:
 
 ---
 
-## Clear My Mind™ Reference
+## Clear My Mind Reference
 
 **Room:** Window Seat (`brain-dump` / `clear-my-mind`)
 
-**Signature object:** Reflection Journal™ (`sig-reflection-journal`)
+**Signature object:** Reflection Journal (`sig-reflection-journal`)
 
 **Composition:**
 - Left: bookshelf, lamp glow, candle (border)
@@ -79,7 +79,7 @@ Environmental motion stays **outside** the protected zone:
 
 ## Success Test
 
-Open Clear My Mind™. Write for 20 minutes.
+Open Clear My Mind. Write for 20 minutes.
 
 Occasionally notice curtains, sunlight, a bird, steam, candlelight — **none interrupting work**.
 

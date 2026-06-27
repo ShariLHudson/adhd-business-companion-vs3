@@ -17,7 +17,7 @@ export type FeaturedBook = {
 
 /** Starter ADHD / business titles — rotate slowly, not every render. */
 export const FEATURED_BOOK_LIBRARY: FeaturedBook[] = [
-  { title: "Nobody Gave Me the Manual™", category: "adhd" },
+  { title: "Nobody Gave Me the Manual", category: "adhd" },
   { title: "Permission to Begin", category: "encouragement" },
   { title: "Ideas Worth Keeping", category: "creativity" },
   { title: "Big Magic", category: "creativity" },

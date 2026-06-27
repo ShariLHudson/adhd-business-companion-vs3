@@ -1,7 +1,7 @@
 import type { ArrivalBeat } from "@/lib/arrivalExperience/types";
 
 /**
- * Companion Communication Anchor™ — non-negotiable homestead invariant.
+ * Companion Communication Anchor — non-negotiable homestead invariant.
  * Shari must always be reachable. Life may change; communication access may not.
  */
 export const COMMUNICATION_ANCHOR_RULES = {
@@ -49,10 +49,10 @@ export const PRIMARY_SCREEN_SHELLS = [
 export type PrimaryScreenShell = (typeof PRIMARY_SCREEN_SHELLS)[number];
 
 /**
- * Living Change Engine™ / arrival rule — life layers never remove speech access.
+ * Living Change Engine / arrival rule — life layers never remove speech access.
  */
 export const LIVING_CHANGE_COMMUNICATION_RULE =
-  "Living changes must never remove, hide, or block the Companion Communication Anchor™.";
+  "Living changes must never remove, hide, or block the Companion Communication Anchor.";
 
 /** Communication anchor is always present on every arrival beat. */
 export function beatShowsCommunicationAnchor(_beat: ArrivalBeat): boolean {

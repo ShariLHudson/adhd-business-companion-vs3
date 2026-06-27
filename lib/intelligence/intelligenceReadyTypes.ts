@@ -1,5 +1,5 @@
 /**
- * Intelligence-Ready Architecture™
+ * Intelligence-Ready Architecture
  * Shared hooks for every living object in the ADHD Business Ecosystem™.
  *
  * Users never see intelligenceMeta or bulk connection graphs in V1.
@@ -76,13 +76,13 @@ export type IntelligenceReadyHooks = {
   /** Same object evolved — no re-entry, no duplicate rows */
   originatedFromId?: string;
   originatedFromKind?: EcosystemObjectKind;
-  /** Living Intelligence Graph™ edge ids */
+  /** Living Intelligence Graph edge ids */
   connectionIds?: string[];
   /** Per-engine enrichments — write-only from intelligence layers */
   intelligenceMeta?: Partial<Record<IntelligenceEngineId, unknown>>;
 };
 
-/** Ask before every sprint — see AGENTS.md Intelligence-Ready Architecture™ */
+/** Ask before every sprint — see AGENTS.md Intelligence-Ready Architecture */
 export const INTELLIGENCE_READY_SPRINT_QUESTIONS = [
   "What is this object?",
   "What relationships might it eventually have?",

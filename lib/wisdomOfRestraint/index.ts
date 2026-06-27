@@ -1,5 +1,5 @@
 /**
- * Wisdom of Restraint™
+ * Wisdom of Restraint
  *
  * Knowing when to do nothing is part of caring.
  * @see docs/companion-homestead/WISDOM_OF_RESTRAINT.md

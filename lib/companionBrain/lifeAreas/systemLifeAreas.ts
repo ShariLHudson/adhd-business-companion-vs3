@@ -1,5 +1,5 @@
 /**
- * System Life Areas™ — permanent, ship with the product.
+ * System Life Areas — permanent, ship with the product.
  */
 
 import type { LifeArea } from "./types";

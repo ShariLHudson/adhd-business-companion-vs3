@@ -84,7 +84,7 @@ function suppressed(reason: string): MemoryTriggersVerdict {
 }
 
 /**
- * Select at most one Memory Trigger™ per eligible visit.
+ * Select at most one Memory Trigger per eligible visit.
  * Many visits return none — silence is hospitality.
  */
 export function evaluateMemoryTriggers(input: MemoryTriggersInput): MemoryTriggersVerdict {
@@ -139,7 +139,7 @@ function toLivingChangeItem(entry: MemoryTriggerEntry): LivingChangeItem {
 }
 
 /**
- * Wire Memory Triggers™ into the living change engine — one story line max.
+ * Wire Memory Triggers into the living change engine — one story line max.
  */
 export function resolveMemoryTriggerChanges(
   input: LivingChangeEngineInput,

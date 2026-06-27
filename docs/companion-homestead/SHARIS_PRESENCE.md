@@ -1,4 +1,4 @@
-# Shari's Presence™
+# Shari's Presence
 ## The Companion Does Not Need To Be Seen To Be Felt
 
 **Version:** 1.0  
@@ -25,24 +25,24 @@ Sometimes her presence is felt through details left behind.
 
 ## Presence States
 
-### Host™
+### Host
 Shari is present — welcomes, listens, talks, shares the room.  
-**Primary room:** Living Room™  
+**Primary room:** Living Room  
 **Visual:** Shari may appear
 
-### Beside You™
-Not visually present — fully available through the **Communication Anchor™**.  
+### Beside You
+Not visually present — fully available through the **Communication Anchor**.  
 The guest has space to think.  
-**Primary rooms:** Planning Table™ · Clear My Mind™ · Decision Compass™  
+**Primary rooms:** Planning Table · Clear My Mind · Decision Compass  
 **Visual:** No portrait — anchor is primary
 
-### Nearby™
+### Nearby
 Somewhere in the Homestead — the room holds evidence of everyday life.  
 **Examples:** coffee mug · open journal · reading glasses · crochet · flowers · Kinsey's toy  
 Accompanied **without** feeling observed.  
-**Primary rooms:** Creative Studio™ · Reading Nook™ · Kitchen Table™
+**Primary rooms:** Creative Studio · Reading Nook · Kitchen Table
 
-### Returning™
+### Returning
 The room suggests she just stepped away — open book, warm mug, chair pulled back.  
 > "She's nearby if I need her."
 
@@ -52,13 +52,13 @@ The room suggests she just stepped away — open book, warm mug, chair pulled ba
 
 | Room | State |
 |------|-------|
-| Living Room™ | Host™ |
-| Planning Table™ | Beside You™ |
-| Clear My Mind™ (Window Seat™) | Beside You™ |
-| Decision Compass™ | Beside You™ |
-| Reading Nook™ | Nearby™ |
-| Creative Studio™ | Nearby™ |
-| Kitchen Table™ | Nearby™ |
+| Living Room | Host |
+| Planning Table | Beside You |
+| Clear My Mind (Window Seat) | Beside You |
+| Decision Compass | Beside You |
+| Reading Nook | Nearby |
+| Creative Studio | Nearby |
+| Kitchen Table | Nearby |
 
 **Never** place Shari in a room simply because she *can* be there.  
 The guest should **never feel watched**. They should **always feel welcomed**.
@@ -72,7 +72,7 @@ The guest should **never feel watched**. They should **always feel welcomed**.
 | `evaluateSharisPresence()` | Constitutional verdict per place/section |
 | `applySharisPresenceToEngine()` | Overrides `showShariImage` on Presence Engine |
 | `ROOM_PRESENCE_ASSIGNMENTS` | Canonical state per place |
-| Living Border™ | Evidence objects at edges — not Shari portraits |
+| Living Border | Evidence objects at edges — not Shari portraits |
 
 ---
 

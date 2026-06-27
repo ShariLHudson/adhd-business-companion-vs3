@@ -7,17 +7,17 @@ import {
   userFacingCanvasLabel,
 } from "./architecture";
 
-describe("Business Canvas™ architecture rule", () => {
-  it("exposes Business Canvas™ as the only user-facing label", () => {
-    expect(userFacingCanvasLabel()).toBe("Business Canvas™");
-    expect(BUSINESS_CANVAS_USER_LABEL).toBe("Business Canvas™");
+describe("Business Canvas architecture rule", () => {
+  it("exposes Business Canvas as the only user-facing label", () => {
+    expect(userFacingCanvasLabel()).toBe("Business Canvas");
+    expect(BUSINESS_CANVAS_USER_LABEL).toBe("Business Canvas");
   });
 
-  it("keeps framework names internal to Companion Intelligence™", () => {
+  it("keeps framework names internal to Companion Intelligence", () => {
     expect(companionFrameworkLabelForType("business-model")).toBe(
-      "Business Model Canvas™",
+      "Business Model Canvas",
     );
-    expect(companionFrameworkLabelForType("lean")).toBe("Lean Canvas™");
+    expect(companionFrameworkLabelForType("lean")).toBe("Lean Canvas");
     for (const framework of CANVAS_FRAMEWORK_REGISTRY) {
       expect(framework.companionFrameworkLabel).not.toBe(BUSINESS_CANVAS_USER_LABEL);
     }

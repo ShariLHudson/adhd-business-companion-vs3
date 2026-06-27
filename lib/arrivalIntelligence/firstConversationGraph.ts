@@ -1,5 +1,5 @@
 /**
- * First conversation — relationship seeds for Living Intelligence Graph™.
+ * First conversation — relationship seeds for Living Intelligence Graph.
  * Inferred from the first reply only; never extra survey questions.
  */
 

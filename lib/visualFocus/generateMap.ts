@@ -62,7 +62,7 @@ function enrichBusinessCanvasMap(
 export function generateMapLabelForMode(mode: VisualFocusMap["mode"]): string {
   if (mode === "business-canvas") return BUSINESS_CANVAS_GENERATE_LABEL;
   const title = studioCardTitleForMode(mode);
-  return `Generate ${title}™`;
+  return `Generate ${title}`;
 }
 
 export function generateVisualFocusMap(map: VisualFocusMap): VisualFocusMap {

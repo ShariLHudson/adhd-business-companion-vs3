@@ -14,7 +14,7 @@ type Props = {
 };
 
 /**
- * Collection dashboard card — primary navigation for My Thoughts™.
+ * Collection dashboard card — primary navigation for My Thoughts.
  */
 export function ThinkingSpaceCollectionCard({ summary, onOpen }: Props) {
   const palette = summary.palette;

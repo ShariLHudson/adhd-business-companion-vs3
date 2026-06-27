@@ -1,4 +1,4 @@
-/** Business Canvas™ — canvas types inside Visual Thinking™. */
+/** Business Canvas — canvas types inside Visual Thinking. */
 
 export type BusinessCanvasTypeId =
   | "business-model"
@@ -36,7 +36,7 @@ export type BusinessCanvasSectionGuidance = {
   whyItMatters: string;
   examples: string[];
   suggestionSource: string;
-  /** Ripple effects — prepares for Living Canvas™ / What-If Analysis. */
+  /** Ripple effects — prepares for Living Canvas / What-If Analysis. */
   changeRipples: string[];
 };
 

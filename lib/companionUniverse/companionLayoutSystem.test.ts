@@ -12,7 +12,7 @@ import {
   resolveCompanionLayout,
 } from "./companionLayoutSystem";
 
-describe("Companion Layout System™", () => {
+describe("Companion Layout System", () => {
   it("defines four independent layers", () => {
     expect(LAYOUT_LAYERS).toHaveLength(4);
     expect(LAYOUT_LAYERS.map((layer) => layer.id)).toEqual([

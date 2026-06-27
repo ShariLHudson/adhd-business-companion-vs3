@@ -92,9 +92,11 @@ function GrowthCardAction({
 export function GrowthCenterPanel({
   refreshKey = 0,
   nav,
+  onOpenLifeExperienceRoom,
 }: {
   refreshKey?: string | number;
   nav: GrowthPanelNav;
+  onOpenLifeExperienceRoom?: () => void;
 }) {
   const [reportsOpen, setReportsOpen] = useState(false);
   const [openSections, setOpenSections] = useState<Set<GrowthSectionId>>(
@@ -133,6 +135,31 @@ export function GrowthCenterPanel({
 
       <WorkspaceAreaWorksGuide areaId="growth" />
 
+      {onOpenLifeExperienceRoom ? (
+        <div
+          className="mt-4 rounded-2xl border border-[#d4c4a8]/50 bg-gradient-to-br from-[#fffaf2] to-[#f5ebe0] p-4 shadow-sm"
+          data-testid="growth-life-experience-entry"
+        >
+          <p className="text-xs font-bold uppercase tracking-wide text-[#7a6348]">
+            Life Experience Room
+          </p>
+          <p className="mt-1 text-sm font-medium text-[#3d342c]">
+            Let&apos;s sit together for a while.
+          </p>
+          <p className="mt-1 text-sm text-[#6b635a]">
+            Stories and quiet wisdom — not articles. Pull a letter from the shelf
+            when something speaks to you today.
+          </p>
+          <button
+            type="button"
+            onClick={onOpenLifeExperienceRoom}
+            className="mt-3 rounded-xl border border-[#8b7355]/35 bg-white/70 px-4 py-2.5 text-sm font-semibold text-[#5c4a38] hover:bg-white"
+          >
+            Enter the room →
+          </button>
+        </div>
+      ) : null}
+
       <GrowthSaveSuggestionBanner
         onSaveToWins={(text) => {
           createSavedGrowthWin({
@@ -168,7 +195,7 @@ export function GrowthCenterPanel({
         data-testid="growth-outcome-goals"
       >
         <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
-          Outcome Goals™
+          Outcome Goals
         </p>
         <div className="mt-2">
           <OutcomeGoalsPanel hubMode />
@@ -210,7 +237,7 @@ export function GrowthCenterPanel({
         className="mt-4 rounded-2xl border border-[#e7dfd4] bg-white p-4"
         data-testid="growth-reports-entry"
       >
-        <p className="text-sm font-semibold text-[#1f1c19]">Growth Reports™</p>
+        <p className="text-sm font-semibold text-[#1f1c19]">Growth Reports</p>
         <p className="mt-1 text-sm text-[#6b635a]">
           Periodic reflection — a printable story of wins, evidence, highlights,
           and journey. Not a live dashboard.

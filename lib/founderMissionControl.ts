@@ -1,5 +1,5 @@
 /**
- * Founder Mission Control™ — single-screen executive summary for the ecosystem.
+ * Founder Mission Control — single-screen executive summary for the ecosystem.
  *
  * Answers in under 60 seconds:
  * What needs attention? What is getting worse? What should I fix first?

@@ -1,5 +1,5 @@
 /**
- * Clear My Mind™ post-Share unfold — gradual clarity, never instant results.
+ * Clear My Mind post-Share unfold — gradual clarity, never instant results.
  */
 
 export type ClearMyMindUnfoldStep =

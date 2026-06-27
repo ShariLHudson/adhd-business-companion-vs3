@@ -127,7 +127,7 @@ function detectExplicitSectionPrefix(text: string): BusinessCanvasSectionId | un
     const title = BUSINESS_CANVAS_SECTION_GUIDANCE[id].title;
     if (
       trimmed.startsWith(title) ||
-      trimmed.toLowerCase().startsWith(title.replace(/™/g, "").toLowerCase())
+      trimmed.toLowerCase().startsWith(title.toLowerCase())
     ) {
       return id;
     }

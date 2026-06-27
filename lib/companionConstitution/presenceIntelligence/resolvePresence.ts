@@ -25,7 +25,7 @@ function mapToConstitutionalState(
 }
 
 /**
- * Presence Intelligence™ — sole authority for companion visibility.
+ * Presence Intelligence — sole authority for companion visibility.
  * Rooms and renderers receive PresenceState; they never invent presence.
  */
 export function resolvePresence(input: PresenceInput = {}): PresenceState {

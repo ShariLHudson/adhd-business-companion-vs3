@@ -1,5 +1,5 @@
 /**
- * Thought Collection Authority™ — single source of truth for My Thoughts™.
+ * Thought Collection Authority — single source of truth for My Thoughts.
  *
  * Every UI surface reads active collection through this module.
  * `category` / `topic` are AI metadata only — never organization.

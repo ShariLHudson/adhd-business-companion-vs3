@@ -12,7 +12,7 @@ export type CompanionNeedDefinition = {
   rewardFraming: string;
 };
 
-/** Companion Needs Library™ — v1 primary needs and their Restoration Promise™. */
+/** Companion Needs Library — v1 primary needs and their Restoration Promise. */
 export const COMPANION_NEEDS_CATALOG: Record<
   CompanionNeedId,
   CompanionNeedDefinition

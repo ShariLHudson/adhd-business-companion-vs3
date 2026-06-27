@@ -1,5 +1,5 @@
 /**
- * Confidence Intelligence™ — self-trust through evidence.
+ * Confidence Intelligence — self-trust through evidence.
  * @see constitution.ts — selectConfidenceOpportunity
  */
 

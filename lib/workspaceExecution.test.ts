@@ -37,6 +37,9 @@ describe("workspaceExecution", () => {
         revealSeq: 2,
       }),
     ).toBe(workspaceOpenSuccessAck("time-block"));
+    expect(workspaceOpenSuccessAck("time-block")).not.toMatch(
+      /is open beside us/i,
+    );
   });
 
   it("strips false Google open claims when workspace is not verified", () => {

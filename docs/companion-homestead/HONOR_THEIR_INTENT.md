@@ -1,10 +1,10 @@
-# Honor Their Intent™
+# Honor Their Intent
 ## Meet People Where They Are
 
 **Version:** 1.0  
 **Status:** Constitutional — governs every conversation, room transition, and recommendation  
 **Code:** `lib/honorTheirIntent/`  
-**Sibling:** [COMPANION_RELATIONSHIP.md](./COMPANION_RELATIONSHIP.md) · [Meaning Before Matching™](../../lib/meaningBeforeMatching/) · [CHARACTER_OF_SHARI.md](./CHARACTER_OF_SHARI.md)
+**Sibling:** [COMPANION_RELATIONSHIP.md](./COMPANION_RELATIONSHIP.md) · [Meaning Before Matching](../../lib/meaningBeforeMatching/) · [CHARACTER_OF_SHARI.md](./CHARACTER_OF_SHARI.md)
 
 ---
 

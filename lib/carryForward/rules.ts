@@ -1,6 +1,8 @@
 /**
- * Carry Forward™ — constitutional bans; yesterday never judges today.
+ * Carry Forward — constitutional bans; yesterday never judges today.
  */
+
+import { violatesVagueCarryForward } from "@/lib/relationshipIntelligence/vagueCarryForward";
 
 export const CARRY_FORWARD_FORBIDDEN_PATTERNS = [
   /\bincomplete tasks?\b/i,
@@ -43,5 +45,7 @@ export function violatesCarryForwardLine(text: string): boolean {
 export function isValidCarryForwardLine(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
-  return !violatesCarryForwardLine(t);
+  if (violatesCarryForwardLine(t)) return false;
+  if (violatesVagueCarryForward(t)) return false;
+  return true;
 }

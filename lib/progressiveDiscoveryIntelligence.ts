@@ -1,5 +1,5 @@
 /**
- * Progressive Discovery Intelligence™ (P0.10.1)
+ * Progressive Discovery Intelligence (P0.10.1)
  * Gather minimum viable context — one question at a time — then offer the right framework.
  */
 
@@ -242,7 +242,7 @@ export function progressiveDiscoveryHintForChat(input: {
 }): string {
   const step = resolveProgressiveDiscoveryStep(input);
   const lines = [
-    "PROGRESSIVE DISCOVERY INTELLIGENCE™ (P0.10.1 — mandatory):",
+    "PROGRESSIVE DISCOVERY INTELLIGENCE (P0.10.1 — mandatory):",
     `Likely framework: ${step.framework.label} (${Math.round(step.confidence * 100)}% confidence).`,
     `Questions asked: ${step.questionsAsked} / ${step.maxQuestions} max before framework offer.`,
     "ADHD RULE: ONE question per turn. Wait for answer. Never numbered lists of 3–5 questions.",

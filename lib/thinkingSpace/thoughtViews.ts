@@ -1,5 +1,5 @@
 /**
- * My Thoughts™ — View vs Filter.
+ * My Thoughts — View vs Filter.
  *
  * View = how I want to see my thoughts (time window or sort order).
  * Filter = which thoughts I want to include (pinned, archived, etc.).

@@ -1,14 +1,14 @@
-# A Year in the Companion Homestead™
+# A Year in the Companion Homestead
 ## Design Life, Not Features
 
 **Version:** 1.0  
 **Status:** Canonical life design — awaiting approval  
-**Authority:** Subordinate to Product Constitution™ · Companion Constitution™ · [`EXPERIENCE_OF_SHARI.md`](./EXPERIENCE_OF_SHARI.md) · [`COMPANION_TRUST_ARCHITECTURE.md`](./COMPANION_TRUST_ARCHITECTURE.md) · [`COMPANION_DECISION_INTELLIGENCE.md`](./COMPANION_DECISION_INTELLIGENCE.md)  
+**Authority:** Subordinate to Product Constitution · Companion Constitution · [`EXPERIENCE_OF_SHARI.md`](./EXPERIENCE_OF_SHARI.md) · [`COMPANION_TRUST_ARCHITECTURE.md`](./COMPANION_TRUST_ARCHITECTURE.md) · [`COMPANION_DECISION_INTELLIGENCE.md`](./COMPANION_DECISION_INTELLIGENCE.md)  
 **Governs:** Seasonal change · traditions · ordinary rhythms · life-event presence · relationship deepening · environmental storytelling · future experience design
 
 **Sibling documents:**
 - [`companion-homestead/MASTER_PROPERTY_BLUEPRINT.md`](./companion-homestead/MASTER_PROPERTY_BLUEPRINT.md) — the place
-- [`THE_HONEST_SHARI.md`](./THE_HONEST_SHARI.md) — Honest Home™ objects and humanity
+- [`THE_HONEST_SHARI.md`](./THE_HONEST_SHARI.md) — Honest Home objects and humanity
 - [`COMPANION_JOURNEY_EXPERIENCE_BIBLE.md`](./COMPANION_JOURNEY_EXPERIENCE_BIBLE.md) — experience arcs
 
 **This is not:** a product roadmap · feature calendar · engagement schedule · notification plan
@@ -19,7 +19,7 @@
 
 ## The premise
 
-Someone has visited the Companion Homestead™ most weeks for **three years**. They do not think of it as software. They think of it as **Shari's place** — a homestead in Henry County where work gets done, rest is allowed, and nobody keeps score.
+Someone has visited the Companion Homestead most weeks for **three years**. They do not think of it as software. They think of it as **Shari's place** — a homestead in Henry County where work gets done, rest is allowed, and nobody keeps score.
 
 This document walks through **one full year** of that life: January through December, ordinary Tuesdays, life events, seasonal traditions, relationship milestones, and hundreds of tiny moments that make the property breathe.
 
@@ -32,11 +32,11 @@ Relationships are not built in extraordinary moments. They are built in **hundre
 | Layer | What it designs |
 |-------|-----------------|
 | **Months** | Property · atmosphere · relationship · conversations · traditions · emotional themes · rhythms |
-| **Ordinary Tuesdays™** | The weekdays that matter more than holidays |
+| **Ordinary Tuesdays** | The weekdays that matter more than holidays |
 | **Life Events** | Presence without drama |
-| **Seasonal Traditions™** | Belonging to Iowa life, not product updates |
-| **Relationship Milestones™** | Familiarity, not achievements |
-| **Tiny Moments™** | 200+ details that exist without demanding attention |
+| **Seasonal Traditions** | Belonging to Iowa life, not product updates |
+| **Relationship Milestones** | Familiarity, not achievements |
+| **Tiny Moments** | 200+ details that exist without demanding attention |
 | **Year Five** | What compound familiarity feels like |
 
 **Implementation rule:** If a proposed feature does not serve an ordinary moment described here, it does not belong in the homestead yet.
@@ -152,7 +152,7 @@ March energy is dangerous — everything at once. Shari **slows** the guest by e
 ## Traditions
 
 - **First greenhouse transplant** — guest may witness; no assignment
-- **Mud on the welcome mat** — not cleaned obsessively; Honest Home™
+- **Mud on the welcome mat** — not cleaned obsessively; Honest Home
 - **First thunderstorm** — Kinsey inside; guest invited to living room; no penalty for staying
 
 ## Emotional themes
@@ -489,7 +489,7 @@ Flexible. Hyperfocus honored in focus studio. Family chaos met with window seat.
 
 ---
 
-# Part XIV — Ordinary Tuesdays™
+# Part XIV — Ordinary Tuesdays
 
 Ordinary days matter more than holidays. Design for these first.
 
@@ -554,7 +554,7 @@ Reading nook reef. Library lamp low. No *"you should rest"* lecture. *"I'm here.
 
 ---
 
-# Part XVI — Seasonal Traditions™
+# Part XVI — Seasonal Traditions
 
 Traditions belong to **Iowa life**, not software releases.
 
@@ -579,13 +579,13 @@ Traditions belong to **Iowa life**, not software releases.
 | **Reef coral growth** | Years | Reading nook — subtle change |
 | **Welcome mat wear** | Years | Arrival truth |
 | **NGMTM sticky rotation** | Ongoing | Workshop wall — laugh with |
-| **Mug ring stain** | Daily | Honest Home™ — reheated coffee |
+| **Mug ring stain** | Daily | Honest Home — reheated coffee |
 
 **Rule:** Traditions are **noticed**, rarely announced. Year five guests know the rhythm without a calendar.
 
 ---
 
-# Part XVII — Relationship Milestones™
+# Part XVII — Relationship Milestones
 
 Not achievements. **Familiarity.**
 
@@ -615,7 +615,7 @@ See Part XIX. Safe return. Belief in self compound interest. Unspoken expectatio
 
 ---
 
-# Part XVIII — Tiny Moments™
+# Part XVIII — Tiny Moments
 
 At least **200** details that make the homestead alive. They never demand attention. They simply exist.
 
@@ -713,7 +713,7 @@ At least **200** details that make the homestead alive. They never demand attent
 82. Radio off — quiet default  
 83. Candle lit once — focus studio spillover scent  
 84. Pie cooling energy — neighbor gift maybe  
-85. Friday dish rack full — Honest Home™  
+85. Friday dish rack full — Honest Home  
 
 ### Window, nook, library (86–115)
 
@@ -769,7 +769,7 @@ At least **200** details that make the homestead alive. They never demand attent
 132. Barn project board updated — finish crossed off  
 133. Tools on pegboard — mostly right outline  
 134. Safety glasses on bench — used honestly  
-135. Half-built thing — Future Wings™ blueprint scroll  
+135. Half-built thing — Future Wings blueprint scroll  
 136. Crate stack — adventure not clutter  
 137. Travel guide open — dreaming allowed  
 138. Whiteboard erased wrong — ghost lines  
@@ -864,7 +864,7 @@ At least **200** details that make the homestead alive. They never demand attent
 
 ---
 
-# Part XIX — The Rhythm of a Relationship™ (Year Five)
+# Part XIX — The Rhythm of a Relationship (Year Five)
 
 ## What feels different
 
@@ -895,7 +895,7 @@ At least **200** details that make the homestead alive. They never demand attent
 
 - Guest expects **dignity** — always.  
 - Guest expects **one next thing** — not a menu.  
-- Guest expects **Honest Home™** — prepared path, not performed soul.  
+- Guest expects **Honest Home** — prepared path, not performed soul.  
 - Guest expects Shari to **say no** sometimes — kindness.  
 - Guest expects **Iowa truth** — mud, heat, gray November — not cosmetic seasons.  
 
@@ -914,13 +914,13 @@ Friend asks what they use for productivity. They pause: *"I don't know. I just g
 ```
 Constitution
     ↓
-Experience of Shari™ · Honest Shari™
+Experience of Shari · Honest Shari
     ↓
-Trust Architecture™ · Decision Intelligence™
+Trust Architecture · Decision Intelligence
     ↓
-Master Property Blueprint™
+Master Property Blueprint
     ↓
-A Year in the Companion Homestead™ (this document)
+A Year in the Companion Homestead (this document)
     ↓
 Journey Experience Bible · Look Book · production seasons
 ```
@@ -938,8 +938,8 @@ Journey Experience Bible · Look Book · production seasons
 
 - **Blueprint** wins on geography, residents, room purpose.  
 - **This document** wins on **rhythm, tradition, and ordinary life** over engagement design.  
-- **Decision Intelligence™** wins when life design suggests a menu; ladder demands one door.  
-- **Trust Architecture™** wins when life moment assumes intimacy not yet earned.
+- **Decision Intelligence** wins when life design suggests a menu; ladder demands one door.  
+- **Trust Architecture** wins when life moment assumes intimacy not yet earned.
 
 ---
 
@@ -958,4 +958,4 @@ Design **that**.
 
 ---
 
-*A Year in the Companion Homestead™ v1.0 — Ordinary days. Iowa seasons. Life that continues.*
+*A Year in the Companion Homestead v1.0 — Ordinary days. Iowa seasons. Life that continues.*

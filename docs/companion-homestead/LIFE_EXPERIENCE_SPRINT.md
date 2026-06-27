@@ -1,5 +1,5 @@
-# Companion Homestead™
-## Life Experience Sprint™ (Sprint Zero)
+# Companion Homestead
+## Life Experience Sprint (Sprint Zero)
 
 **Version:** 1.0  
 **Status:** Active development cycle — **no new features unless experience-proven**  
@@ -31,7 +31,7 @@ Every interaction should answer one question:
 
 ## Daily rhythm
 
-Open the Companion Homestead™ **at least five times each day** in different contexts.
+Open the Companion Homestead **at least five times each day** in different contexts.
 
 ### Time-of-day visits (required)
 
@@ -153,7 +153,7 @@ Success is someone quietly thinking:
 
 > **"I've missed this place."**
 
-When that happens, the Companion Homestead™ has stopped being software. It has become part of someone's life.
+When that happens, the Companion Homestead has stopped being software. It has become part of someone's life.
 
 ---
 

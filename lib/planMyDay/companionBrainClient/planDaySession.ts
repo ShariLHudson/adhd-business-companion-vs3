@@ -1,5 +1,5 @@
 /**
- * Plan My Day™ session — orientation vs living phase (presentation state only).
+ * Plan My Day session — orientation vs living phase (presentation state only).
  */
 
 const SESSION_KEY = "companion-plan-day-session-v1";

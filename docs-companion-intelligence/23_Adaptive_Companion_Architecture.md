@@ -1,4 +1,4 @@
-# Adaptive Companion Architecture™
+# Adaptive Companion Architecture
 ## ADHD Business Ecosystem™ — Future Architecture Sprint (2026–2029)
 
 **Version:** 1.0  
@@ -71,7 +71,7 @@ Eight trademark layers map to today's codebase. Status reflects **June 2026** im
 
 ```
                     ┌─────────────────────────────────────┐
-                    │   Continuous Learning Engine™ (L8)   │
+                    │   Continuous Learning Engine (L8)   │
                     │   (gates, evolution, signal bus)     │
                     └─────────────────┬───────────────────┘
                                       │ feeds
@@ -94,18 +94,18 @@ From `lib/companionIntelligenceRouter.ts` and `lib/companionPrompt.ts`:
 
 0. Trust Engine + Confidence Engine + Adaptive User Intelligence (Sprint 5)  
 0b. Action Bias / Anti-overanalysis (Sprint 7)  
-0c. Intuitive Awareness™ (surface intent vs actual need)  
+0c. Intuitive Awareness (surface intent vs actual need)  
 0d. Sales Intelligence / Visibility Intelligence (when context detected)  
-1. **ADHD Entrepreneur Intelligence™** — PRIMARY  
-2. Board of Directors™ — advisory only  
-3. Feature Intelligence™ — permission-based routing  
-4. Outcome Intelligence™ — goals, progress, follow-through  
+1. **ADHD Entrepreneur Intelligence** — PRIMARY  
+2. Board of Directors — advisory only  
+3. Feature Intelligence — permission-based routing  
+4. Outcome Intelligence — goals, progress, follow-through  
 
 **Board rule:** Expert advice is translated, not repeated. ADHD filter always wins.
 
 ---
 
-# Layer 1 — User Intelligence™
+# Layer 1 — User Intelligence
 
 **Learns:** preferences, learning styles, work rhythms, energy patterns, business habits, ADHD patterns.
 
@@ -137,9 +137,9 @@ New user dimensions via **registry entries** in `signalMapping.ts` + `types.ts` 
 
 ---
 
-# Layer 2 — Behavioral Intelligence™
+# Layer 2 — Behavioral Intelligence
 
-**Contains:** ADHD Entrepreneur Behavioral Framework™, validation scenarios, intuitive awareness, sales & visibility intelligence.
+**Contains:** ADHD Entrepreneur Behavioral Framework, validation scenarios, intuitive awareness, sales & visibility intelligence.
 
 ### Canonical modules
 
@@ -181,7 +181,7 @@ Scenario performance feeds Continuous Learning (Layer 8).
 
 ---
 
-# Layer 3 — Intervention Intelligence™
+# Layer 3 — Intervention Intelligence
 
 **Tracks:** what was recommended, accepted, ignored, worked, failed.
 
@@ -213,7 +213,7 @@ Intervention effectiveness **continuously improves** via Layer 8 feedback.
 
 ---
 
-# Layer 4 — Trust & Relationship Intelligence™
+# Layer 4 — Trust & Relationship Intelligence
 
 **Tracks:** trust indicators, confidence indicators, engagement, re-entry, follow-through.
 
@@ -241,7 +241,7 @@ Relationship model grows more accurate over time — single relationship store b
 
 ---
 
-# Layer 5 — Predictive Intelligence™
+# Layer 5 — Predictive Intelligence
 
 **Future-forward layer** — not "what happened?" but "what is likely next?"
 
@@ -266,7 +266,7 @@ Examples: burnout risk, overwhelm risk, launch avoidance, confidence crash, foll
 
 ---
 
-# Layer 6 — Ecosystem Intelligence™
+# Layer 6 — Ecosystem Intelligence
 
 **Understands:** features, tools, workspaces, future modules.
 
@@ -292,7 +292,7 @@ Examples: burnout risk, overwhelm risk, launch avoidance, confidence crash, foll
 
 ---
 
-# Layer 7 — Board Intelligence™
+# Layer 7 — Board Intelligence
 
 **Expertise sources** — advisors added, modified, or retired without affecting UX. **One Companion** always.
 
@@ -324,7 +324,7 @@ type AdvisorRegistryEntry = {
 
 ---
 
-# Layer 8 — Continuous Learning Engine™
+# Layer 8 — Continuous Learning Engine
 
 **Learns from:** user outcomes, scenario performance, intervention success, companion effectiveness.
 
@@ -365,7 +365,7 @@ Today three parallel stacks coexist:
 1. `CompanionGovernor` as single turn entry
 2. Data-driven scenario category registry (200–500+ target)
 3. Unified signal bus with staged learning rollout
-4. Shared advisor registry for Board Intelligence™
+4. Shared advisor registry for Board Intelligence
 5. Server-authoritative user profile sync
 6. Intervention outcome attribution → Continuous Learning loop
 

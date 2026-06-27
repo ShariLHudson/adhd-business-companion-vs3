@@ -1,5 +1,5 @@
 /**
- * Sprint 7 — Action Bias™, Momentum Protection™, Anti-Overanalysis System.
+ * Sprint 7 — Action Bias, Momentum Protection, Anti-Overanalysis System.
  * Companion Intelligence optimizes for forward movement, not analysis.
  */
 
@@ -216,7 +216,7 @@ export function shouldSuppressDiscoveryQuestions(
 /** Injected into companion-chat — progress over analysis. */
 export function actionBiasHintForChat(analysis: ActionBiasAnalysis): string {
   const parts: string[] = [
-    "ACTION BIAS™ & ANTI-OVERANALYSIS (Sprint 7 — mandatory):",
+    "ACTION BIAS & ANTI-OVERANALYSIS (Sprint 7 — mandatory):",
     "Purpose is PROGRESS — not analysis. Analysis must earn its keep.",
     "Before ANY question ask: Will this help us move forward? If no — do not ask.",
     "Investigate → Decide → Move. NEVER Investigate → Investigate → Investigate.",
@@ -229,13 +229,13 @@ export function actionBiasHintForChat(analysis: ActionBiasAnalysis): string {
 
   if (analysis.momentumActive) {
     parts.push(
-      "MOMENTUM PROTECTION™: Movement detected — protect flow. No long explanations, deep analysis, complex frameworks, extra planning, or unnecessary questions. Reduce friction; support execution.",
+      "MOMENTUM PROTECTION: Movement detected — protect flow. No long explanations, deep analysis, complex frameworks, extra planning, or unnecessary questions. Reduce friction; support execution.",
     );
   }
 
   if (analysis.hyperfocusActive) {
     parts.push(
-      "HYPERFOCUS PROTECTION™: User is building/creating — do NOT interrupt, redirect, overcoach, or force tool routing. Support what is working.",
+      "HYPERFOCUS PROTECTION: User is building/creating — do NOT interrupt, redirect, overcoach, or force tool routing. Support what is working.",
     );
   }
 
@@ -247,27 +247,27 @@ export function actionBiasHintForChat(analysis: ActionBiasAnalysis): string {
 
   if (analysis.reasonableConfidenceReached) {
     parts.push(
-      "REASONABLE CONFIDENCE THRESHOLD™ reached — stop digging. Move toward clarity, decision, action, or completion.",
+      "REASONABLE CONFIDENCE THRESHOLD reached — stop digging. Move toward clarity, decision, action, or completion.",
       "You likely know enough to help. Stop investigating. Start helping.",
     );
   }
 
   if (analysis.decisionAcceleration) {
     parts.push(
-      "DECISION ACCELERATION™: Enough information exists — help decide now.",
+      "DECISION ACCELERATION: Enough information exists — help decide now.",
       'You may say: "We have enough to move forward" or "At this point deciding is more valuable than more research."',
     );
   }
 
   if (analysis.investigationPhase === "over_investigating" || analysis.maxQuestionsReached) {
     parts.push(
-      "ADHD OVERANALYSIS PROTECTION™: Investigation is becoming avoidance.",
+      "ADHD OVERANALYSIS PROTECTION: Investigation is becoming avoidance.",
       "Do NOT ask another exploratory question. Offer ONE concrete next step or decision.",
-      "ONE USEFUL QUESTION RULE™ suspended — proceed to action.",
+      "ONE USEFUL QUESTION RULE suspended — proceed to action.",
     );
   } else if (analysis.recommendedEnd === "one_clarification") {
     parts.push(
-      "ONE USEFUL QUESTION RULE™: If you must ask, ask the single question that most improves ability to move forward — then proceed.",
+      "ONE USEFUL QUESTION RULE: If you must ask, ask the single question that most improves ability to move forward — then proceed.",
     );
   }
 
@@ -286,7 +286,7 @@ export function actionBiasHintForChat(analysis: ActionBiasAnalysis): string {
   }
 
   parts.push(
-    "CONFIDENCE THROUGH PROGRESS™: small wins and completion build confidence — not cheerleading.",
+    "CONFIDENCE THROUGH PROGRESS: small wins and completion build confidence — not cheerleading.",
   );
 
   return parts.join("\n");

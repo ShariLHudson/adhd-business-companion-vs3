@@ -199,7 +199,7 @@ type Props = {
 };
 
 /**
- * Living Board™ — Today's Focus · Ready When You Are · Being Held.
+ * Living Board — Today's Focus · Ready When You Are · Being Held.
  */
 export function PlanDayLivingBoard({
   partition,

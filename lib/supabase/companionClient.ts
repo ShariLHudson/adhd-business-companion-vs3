@@ -1,10 +1,13 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
+import { createQuotaSafeStorage } from "@/lib/companionStorageRecovery";
 import {
   resolveCompanionSupabaseEnv,
   type ResolvedCompanionSupabaseEnv,
 } from "@/lib/supabase/resolveCompanionSupabaseEnv";
 import { isBrowserSafeSupabaseKey } from "@/lib/supabase/supabaseKeyRoles";
+
+const companionAuthStorage = createQuotaSafeStorage();
 
 let browserClient: SupabaseClient | null = null;
 let runtimeConfig: { url: string; key: string } | null = null;
@@ -60,14 +63,14 @@ function resolved(): ResolvedCompanionSupabaseEnv {
 /** Load Supabase URL + anon key from server when NEXT_PUBLIC vars are not in the client bundle. */
 export async function bootstrapCompanionSupabaseConfig(): Promise<boolean> {
   if (companionAuthConfigured()) return true;
-  if (bootstrapPromise) return bootstrapPromise;
 
-  bootstrapPromise = (async () => {
+  const attempt = async (): Promise<boolean> => {
     try {
       const controller = new AbortController();
       const timeout = window.setTimeout(() => controller.abort(), 8_000);
       const res = await fetch("/api/companion-auth/config", {
         signal: controller.signal,
+        cache: "no-store",
       });
       window.clearTimeout(timeout);
       const data = (await res.json()) as {
@@ -84,7 +87,15 @@ export async function bootstrapCompanionSupabaseConfig(): Promise<boolean> {
       /* noop */
     }
     return false;
-  })();
+  };
+
+  if (!bootstrapPromise) {
+    bootstrapPromise = attempt().finally(() => {
+      if (!companionAuthConfigured()) {
+        bootstrapPromise = null;
+      }
+    });
+  }
 
   return bootstrapPromise;
 }
@@ -171,6 +182,7 @@ export function getCompanionSupabase(): SupabaseClient | null {
         autoRefreshToken: true,
         detectSessionInUrl: true,
         storageKey: "companion-supabase-auth",
+        storage: companionAuthStorage,
       },
     },
   );

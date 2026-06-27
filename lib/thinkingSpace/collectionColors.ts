@@ -1,5 +1,5 @@
 /**
- * My Thoughts™ collection color system — recognition without overwhelm.
+ * My Thoughts collection color system — recognition without overwhelm.
  * Each collection gets a distinct identity; custom collections take the next slot.
  */
 

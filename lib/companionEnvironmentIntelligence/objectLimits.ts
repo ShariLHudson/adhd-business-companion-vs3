@@ -29,7 +29,7 @@ const PRIORITY: Record<string, number> = {
 };
 
 /**
- * Constraint on Accumulation™ — hospitality, not clutter.
+ * Constraint on Accumulation — hospitality, not clutter.
  */
 export function applyObjectLimits(objects: RoomObject[]): RoomObject[] {
   if (objects.length <= MAX_FOREGROUND_OBJECTS) {

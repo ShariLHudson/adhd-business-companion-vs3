@@ -1,5 +1,5 @@
 /**
- * Companion Intelligence™ — master profile architecture.
+ * Companion Intelligence — master profile architecture.
  * Signals (raw observations) stay separate from intelligence conclusions.
  */
 

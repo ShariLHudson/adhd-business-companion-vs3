@@ -45,7 +45,7 @@ describe("companionIntelligenceEcosystem", () => {
   });
 
   it("defines intelligence analytics pattern categories", () => {
-    expect(INTELLIGENCE_PATTERN_LABELS.overwhelm).toBe("Overwhelm Patterns™");
+    expect(INTELLIGENCE_PATTERN_LABELS.overwhelm).toBe("Overwhelm Patterns");
     expect(INTELLIGENCE_PATTERN_LABELS.founder_decision).toMatch(
       /Founder Decision/i,
     );
@@ -62,24 +62,24 @@ describe("companionIntelligenceEcosystem", () => {
     }
   });
 
-  it("Business Canvas™ passes the final three-question test", () => {
+  it("Business Canvas passes the final three-question test", () => {
     const canvas = getEcosystemMajorSystem("business-canvas")!;
     expect(canvas.threeLayer.userValue).toMatch(/how their business works/i);
     expect(canvas.threeLayer.intelligenceCaptures).toContain("Audience patterns");
-    expect(canvas.threeLayer.futureEnables).toContain("Living Canvas™");
-    expect(canvas.threeLayer.futureEnables).toContain("What-If Analysis™");
+    expect(canvas.threeLayer.futureEnables).toContain("Living Canvas");
+    expect(canvas.threeLayer.futureEnables).toContain("What-If Analysis");
     expect(learningSignalsForSystem("business-canvas")).toContain(
       "Business model patterns",
     );
   });
 
-  it("Decision Tree™ captures decision learning signals", () => {
+  it("Decision Tree captures decision learning signals", () => {
     const tree = getEcosystemMajorSystem("decision-tree")!;
     expect(tree.learningSignals).toContain("Risk tolerance");
     expect(tree.learningSignals).toContain("Decision style");
   });
 
-  it("Plan My Day™ and Clear My Mind™ capture capacity and overwhelm signals", () => {
+  it("Plan My Day and Clear My Mind capture capacity and overwhelm signals", () => {
     expect(learningSignalsForSystem("plan-my-day")).toContain("Energy patterns");
     expect(learningSignalsForSystem("clear-my-mind")).toContain(
       "Overwhelm triggers",
@@ -90,7 +90,7 @@ describe("companionIntelligenceEcosystem", () => {
     const incomplete = evaluateFutureFirstFeature({
       userValue: "Helps today",
       intelligenceCaptures: [],
-      futureEnables: ["Living Canvas™"],
+      futureEnables: ["Living Canvas"],
     });
     expect(incomplete.aligned).toBe(false);
     expect(incomplete.blockers.some((b) => /intelligence value/i.test(b))).toBe(

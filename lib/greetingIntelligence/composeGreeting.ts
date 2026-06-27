@@ -1,5 +1,5 @@
 /**
- * @deprecated Use @/lib/shariVoiceBible — all greeting composition lives in the Voice Bible™.
+ * @deprecated Use @/lib/shariVoiceBible — all greeting composition lives in the Voice Bible.
  */
 export {
   composeBibleGreeting as composeGreeting,

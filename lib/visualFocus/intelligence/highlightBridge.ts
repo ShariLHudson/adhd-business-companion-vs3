@@ -1,6 +1,6 @@
 /**
- * Intelligence ↔ Canvas highlight bridge — future-ready for Living Canvas™,
- * What-If Analysis™, ripple effects, and Board of Directors™.
+ * Intelligence ↔ Canvas highlight bridge — future-ready for Living Canvas,
+ * What-If Analysis, ripple effects, and Board of Directors.
  */
 
 import type { BusinessCanvasSectionId } from "../businessCanvas/types";

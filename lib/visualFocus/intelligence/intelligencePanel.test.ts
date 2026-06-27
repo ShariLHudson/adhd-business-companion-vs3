@@ -17,7 +17,7 @@ describe("intelligence panel enrichment", () => {
 
   it("links insights to Business Canvas section colors", () => {
     const item = enrichInsightText(
-      "Revenue Streams™: Your revenue currently depends on only one primary source.",
+      "Revenue Streams: Your revenue currently depends on only one primary source.",
       "risks",
     );
     expect(item.sectionId).toBe("revenue-streams");
@@ -27,7 +27,7 @@ describe("intelligence panel enrichment", () => {
 
   it("assigns category-appropriate badges", () => {
     const item = enrichInsightText(
-      "Channels™: Pinterest and LinkedIn are reaching similar audiences.",
+      "Channels: Pinterest and LinkedIn are reaching similar audiences.",
       "opportunities",
     );
     expect(item.sectionId).toBe("channels");

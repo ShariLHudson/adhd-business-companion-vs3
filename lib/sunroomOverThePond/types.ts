@@ -1,5 +1,5 @@
 /**
- * Focus My Brain™ — The Sunroom Over The Pond™
+ * Focus My Brain — The Sunroom Over The Pond
  * @see docs/companion-homestead/SUNROOM_OVER_THE_POND.md
  */
 
@@ -8,7 +8,7 @@ import type { WelcomeWeather } from "@/lib/companionEnvironmentIntelligence";
 
 export const SUNROOM_PLACE_ID = "sunroom-over-pond" as const;
 
-export const SUNROOM_TITLE = "Focus My Brain™" as const;
+export const SUNROOM_TITLE = "Focus My Brain" as const;
 export const SUNROOM_SUBTITLE =
   "My mind slows down here without trying." as const;
 

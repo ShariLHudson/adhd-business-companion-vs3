@@ -1,6 +1,6 @@
 /**
- * Live Ecosystem™ — reality changes once, judgment updates once, every workspace adapts.
- * Today's Reality™ is an input. Companion Brain™ is the source of truth.
+ * Live Ecosystem — reality changes once, judgment updates once, every workspace adapts.
+ * Today's Reality is an input. Companion Brain is the source of truth.
  */
 
 import { CompanionBrain } from "@/lib/companionBrain";
@@ -28,7 +28,7 @@ export function publishRealitySignal(signal: RealitySignal): LiveAdaptationResul
 }
 
 /**
- * Re-run Companion Brain™ from current ecosystem memory.
+ * Re-run Companion Brain from current ecosystem memory.
  */
 export function reEvaluateLiveJudgment(
   signal: RealitySignal,

@@ -11,7 +11,7 @@ import {
   findCompanionObjectByName,
 } from "./index";
 
-describe("Companion Objects™ Design System", () => {
+describe("Companion Objects Design System", () => {
   it("defines 200–300 catalog objects", () => {
     expect(COMPANION_OBJECTS_MASTER_CATALOG.length).toBeGreaterThanOrEqual(
       COMPANION_OBJECTS_CATALOG_TARGET_MIN,
@@ -88,7 +88,7 @@ describe("Companion Objects™ Design System", () => {
   });
 
   it("uses Warm Homestead Realism illustration style", () => {
-    expect(ILLUSTRATION_STYLE_NAME).toBe("Warm Homestead Realism™");
+    expect(ILLUSTRATION_STYLE_NAME).toBe("Warm Homestead Realism");
   });
 
   it("summarizes catalog for art production planning", () => {

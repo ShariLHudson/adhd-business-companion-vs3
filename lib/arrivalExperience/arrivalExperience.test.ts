@@ -93,11 +93,12 @@ describe("arrivalExperience", () => {
     }
   });
 
-  it("continuity echo sounds like Shari", () => {
+  it("continuity echo references specific memory or fresh warmth — never vague", () => {
     const result = sameAsYesterdayEcho();
-    expect(result.echo).toMatch(/yesterday|similar feeling|about the same/i);
-    expect(result.echo).not.toMatch(/I've got you/i);
-    expect(result.echo).not.toMatch(/shape today/i);
+    expect(result.echo).not.toMatch(/similar feeling/i);
+    expect(result.echo).not.toMatch(/about the same/i);
+    expect(result.echo).not.toMatch(/feeling the same/i);
+    expect(result.echo.trim().length).toBeGreaterThan(0);
   });
 
   it("keeps communication anchor reachable on every beat", () => {

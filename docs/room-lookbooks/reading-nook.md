@@ -1,4 +1,4 @@
-# Reading Nook™ — Room Look Book
+# Reading Nook — Room Look Book
 
 **Place ID:** `reading-nook`  
 **Status:** Design authority — Phase 1 (no UI implementation)  
@@ -8,9 +8,9 @@
 
 ## Purpose
 
-The Reading Nook™ is a **small room on purpose** — intimate, evening-native, built for long-form thinking, saved wisdom, and strategies that do not feel clinical.
+The Reading Nook is a **small room on purpose** — intimate, evening-native, built for long-form thinking, saved wisdom, and strategies that do not feel clinical.
 
-It exists for **Reading Nook™**, **Strategies**, and quiet reference — learning that feels like a corner you chose, not a classroom you were assigned.
+It exists for **Reading Nook**, **Strategies**, and quiet reference — learning that feels like a corner you chose, not a classroom you were assigned.
 
 **Emotional need served:** "Nothing important gets lost — and I can think without being watched."
 
@@ -20,13 +20,13 @@ Hallway landing or transformed deep closet: armchair, floor-to-ceiling personal-
 
 ---
 
-## Emotional Promise™
+## Emotional Promise
 
 **When someone leaves this room…** they feel **more understood** — with one strategy or passage held, not flooded by everything they should have remembered.
 
 ---
 
-## Signature Feature™
+## Signature Feature
 
 ### The living saltwater reef aquarium
 
@@ -93,7 +93,7 @@ Reef motion is the **one** allowed living motion hero — still slower than UI a
 
 ---
 
-## Companion Presence™
+## Companion Presence
 
 **Occasionally present — Prepared level.**
 
@@ -101,23 +101,23 @@ Shari may have left the **strategy card deck** angled for discovery or a book fl
 
 She explains strategies in plain language when asked. She does not clinicalize. She does not stack cards.
 
-**Why not Host:** Intimacy requires lower volume than the Living Room™.
+**Why not Host:** Intimacy requires lower volume than the Living Room.
 
 **Why not Absent:** Empty nook would feel like a storage closet, not a refuge.
 
 ---
 
-## Kinsey™
+## Kinsey
 
 **Not in this room.**
 
 Saltwater and dog hair negotiate poorly. Kinsey stays beyond the hallway gate — may be heard softly elsewhere.
 
-If guest needs animal comfort, they move to Living Room™ or Window Seat™.
+If guest needs animal comfort, they move to Living Room or Window Seat.
 
 ---
 
-## Companion Objects™
+## Companion Objects
 
 | Registry ID | Object name | Role in room |
 |-------------|-------------|--------------|
@@ -126,11 +126,11 @@ If guest needs animal comfort, they move to Living Room™ or Window Seat™.
 
 **Environmental:** brass reading lamp, armchair, tea gone cold without judgment, bookshelf spines cracked.
 
-Help guidebook and template folio belong in **Library™** registry room — reference from nook, do not duplicate objects.
+Help guidebook and template folio belong in **Library** registry room — reference from nook, do not duplicate objects.
 
 ---
 
-## UI Language™
+## UI Language
 
 | Element | Rule |
 |---------|------|
@@ -146,7 +146,7 @@ Growth journey objects (`growth`, `my-journey` mapped to reading-nook in presenc
 
 ---
 
-## Never In This Room™
+## Never In This Room
 
 - Fluorescent clinic lighting
 - Diagnostic worksheets aesthetic
@@ -160,7 +160,7 @@ Growth journey objects (`growth`, `my-journey` mapped to reading-nook in presenc
 
 ---
 
-## ADHD Rules™
+## ADHD Rules
 
 | Challenge | How the room helps |
 |-----------|-------------------|
@@ -173,7 +173,7 @@ Growth journey objects (`growth`, `my-journey` mapped to reading-nook in presenc
 
 ---
 
-## Seasonal Notes™
+## Seasonal Notes
 
 - **Spring:** Reef maintenance visible — life renewing; window may show wet oak
 - **Summer:** Filter hum slightly louder (heat); evening late; crickets
@@ -184,6 +184,6 @@ Water temperature and coral health may shift — not a UI reskin.
 
 ---
 
-## Final Feeling™
+## Final Feeling
 
 **Something wise is within reach — and my nervous system unclenched enough to receive it.**

@@ -57,7 +57,7 @@ function SectionCard({
 }
 
 /**
- * Flexible Planning Mode™ — supported paths when the user isn't ready to commit.
+ * Flexible Planning Mode — supported paths when the user isn't ready to commit.
  */
 export function PlanDayFlexiblePlanningMode({
   context,

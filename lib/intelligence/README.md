@@ -1,6 +1,6 @@
 # Intelligence Layer (internal)
 
-**Intelligence-Ready Architecture™** — every object is built once and enriched for years.
+**Intelligence-Ready Architecture** — every object is built once and enriched for years.
 
 | Document | Purpose |
 |----------|---------|

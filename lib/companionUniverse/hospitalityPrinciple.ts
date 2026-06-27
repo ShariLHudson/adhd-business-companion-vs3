@@ -1,10 +1,10 @@
 import type { CompanionPlaceId } from "./types";
 
 /**
- * The Hospitality Principle™
+ * The Hospitality Principle
  * My Home. Prepared For You.
  *
- * The Companion Homestead™ is always Shari's home.
+ * The Companion Homestead is always Shari's home.
  * It is never rebuilt around the visitor.
  * What changes is how the home is prepared before someone arrives.
  *
@@ -12,7 +12,7 @@ import type { CompanionPlaceId } from "./types";
  * The home belongs to Shari. The welcome belongs to the guest.
  */
 export const HOSPITALITY_PRINCIPLE = {
-  title: "The Hospitality Principle™",
+  title: "The Hospitality Principle",
   subtitle: "My Home. Prepared For You.",
   guestShouldFeel: "She remembered me.",
   mustNeverFeel: "The app customized itself.",
@@ -130,7 +130,7 @@ export function describePreparation(preparedItems: string[]): HospitalityPrepara
 }
 
 /**
- * Evaluate whether a resolved scene honors The Hospitality Principle™.
+ * Evaluate whether a resolved scene honors The Hospitality Principle.
  * The home stays Shari's; only preparation and welcome change.
  */
 export function evaluateHospitalityPrinciple(

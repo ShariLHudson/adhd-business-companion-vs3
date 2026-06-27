@@ -1,9 +1,9 @@
-# Shari's Life Moments™
-## Companion Homestead™ — Invitation Into Her Life, Not Advice
+# Shari's Life Moments
+## Companion Homestead — Invitation Into Her Life, Not Advice
 
 **Version:** 1.0  
 **Status:** Canonical design authority — governs when and how Shari shares her own coping rhythms  
-**Authority:** Subordinate to Product Constitution™ · Companion Constitution™ · [`CHARACTER_OF_SHARI.md`](./CHARACTER_OF_SHARI.md) · [`THE_HONEST_SHARI.md`](../THE_HONEST_SHARI.md)  
+**Authority:** Subordinate to Product Constitution · Companion Constitution · [`CHARACTER_OF_SHARI.md`](./CHARACTER_OF_SHARI.md) · [`THE_HONEST_SHARI.md`](../THE_HONEST_SHARI.md)  
 **Implementation:** [`lib/sharisLifeMoments/`](../../lib/sharisLifeMoments/) · Voice Bible [`entries/lifeMoments.ts`](../../lib/shariVoiceBible/entries/lifeMoments.ts)
 
 **This is not:**
@@ -109,11 +109,11 @@ If it's instruction, it fails.
 
 | Canon | Role |
 |-------|------|
-| **Character of Shari™** | Is this authentically her? |
-| **Wisdom of Restraint™** | Is this the right moment to speak? |
-| **The Honest Shari™** | Imperfection, ADHD lived experience |
-| **Voice Bible™** | Exact approved lines |
-| **NGMTM / Shari Stories™** | Longer discovery stories — Life Moments are conversational |
+| **Character of Shari** | Is this authentically her? |
+| **Wisdom of Restraint** | Is this the right moment to speak? |
+| **The Honest Shari** | Imperfection, ADHD lived experience |
+| **Voice Bible** | Exact approved lines |
+| **NGMTM / Shari Stories** | Longer discovery stories — Life Moments are conversational |
 
 ---
 
@@ -127,7 +127,7 @@ Not:
 
 > *"The app told me to take a nap."*
 
-That is Shari's Life Moments™.
+That is Shari's Life Moments.
 
 ---
 
@@ -136,6 +136,6 @@ That is Shari's Life Moments™.
 - [ ] Every line is first-person Shari
 - [ ] No advice patterns (`you should`, `try taking`, `have you tried`)
 - [ ] Passes `violatesLifeMomentVoice()` and Voice Bible checks
-- [ ] Passes Character Filter™
+- [ ] Passes Character Filter
 - [ ] Offered with restraint — not every beat
 - [ ] Catalog matches this document

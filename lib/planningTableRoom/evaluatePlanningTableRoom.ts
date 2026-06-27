@@ -28,7 +28,7 @@ function stableWhisper(seed: string): string {
 }
 
 /**
- * Plan My Day™ — evaluate the Kitchen Planning Nook™ before render.
+ * Plan My Day — evaluate the Kitchen Planning Nook before render.
  */
 export function evaluatePlanningTableRoom(
   input: PlanningTableInput = {},
@@ -62,11 +62,11 @@ export function evaluatePlanningTableRoom(
 
 export function planningTableHintForChat(verdict: PlanningTableVerdict): string {
   return [
-    "PLANNING TABLE™ — Kitchen Planning Nook:",
+    "PLANNING TABLE — Kitchen Planning Nook:",
     verdict.emotionalPromise,
     verdict.roomWhisper,
     `Presence: ${verdict.sharisPresenceState} — prepared space, never watched.`,
-    `Time profile: ${verdict.timeProfile}. Signature: Planning Notebook™.`,
+    `Time profile: ${verdict.timeProfile}. Signature: Planning Notebook.`,
     "No dashboards, timers, or productivity pressure. Clarity before organization.",
   ].join("\n");
 }

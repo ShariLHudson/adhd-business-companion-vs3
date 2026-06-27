@@ -1,7 +1,6 @@
 import { resolvePlace } from "@/lib/companionConstitution";
 import type { CompanionPlaceId } from "@/lib/companionUniverse/types";
 import { livingBorderCatalogForPlace } from "./borderCatalog";
-import { showLivingBorderPlaceholders } from "./devMode";
 import { borderElement } from "./elementRegistry";
 import { centerAllowsBorderLife, capBorderAnimations } from "./rules";
 import type {
@@ -69,7 +68,7 @@ function resolveVisibility(
 }
 
 /**
- * Living Border™ — resolve which border elements are alive for this room.
+ * Living Border — resolve which border elements are alive for this room.
  */
 export function evaluateLivingBorder(
   input: LivingBorderInput = {},
@@ -124,13 +123,9 @@ export function evaluateLivingBorder(
 export function visibleBorderRenderClasses(
   verdict: LivingBorderVerdict,
 ): string[] {
-  const showPlaceholders = showLivingBorderPlaceholders();
   return [
     ...new Set(
-      verdict.activeElements
-        .filter((e) => e.visible)
-        .filter((e) => showPlaceholders || !borderElement(e.id).isPlaceholder)
-        .map((e) => e.cssClass),
+      verdict.activeElements.filter((e) => e.visible).map((e) => e.cssClass),
     ),
   ];
 }
@@ -148,7 +143,7 @@ export function passesLivingBorderRecognitionTest(
 
 export function livingBorderHintForChat(verdict: LivingBorderVerdict): string {
   return [
-    "LIVING BORDER™ — where the home comes alive:",
+    "LIVING BORDER — where the home comes alive:",
     verdict.principle,
     verdict.experiencePrinciple,
     `Room: ${verdict.placeId}. Border life visible: ${verdict.activeElements.filter((e) => e.visible).length}. Animated (subtle cap): ${verdict.animatedCount}.`,

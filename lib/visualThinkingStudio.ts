@@ -1,5 +1,5 @@
 /**
- * P0.20 — Visual Thinking Studio™
+ * P0.20 — Visual Thinking Studio
  * View library, recommendation engine, Path A/B routing, and content conversion.
  */
 
@@ -413,7 +413,7 @@ export function visualThinkingMenuAck(viewId: VisualThinkingViewId): string {
 
 export function visualThinkingStudioHintForChat(): string {
   return [
-    "VISUAL THINKING STUDIO™ (P0.20):",
+    "VISUAL THINKING STUDIO (P0.20):",
     "Visual structures always route to Visual Thinking — never Create, Documents, or Strategies.",
     "Path A (user unsure): recommend 2–3 structures + numbered menu; wait for selection.",
     "Path B (user names a structure): open Visual Thinking immediately — no extra questions.",

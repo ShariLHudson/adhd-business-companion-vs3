@@ -1,5 +1,5 @@
 /**
- * Meaning Before Matching™ — understand intent before routing.
+ * Meaning Before Matching — understand intent before routing.
  * A word is not an intent.
  */
 
@@ -25,7 +25,7 @@ export function meaningBeforeMatchingHintForChat(text: string): string | undefin
   const integration = evaluateIntegrationIntent(text);
   if (integration.clarification && !integration.isIntegration) {
     return [
-      "MEANING BEFORE MATCHING™ (mandatory):",
+      "MEANING BEFORE MATCHING (mandatory):",
       `Ambiguous routing — ask briefly: "${integration.clarification}"`,
       "Do NOT open Connections or Google integrations until intent is clear.",
       "Honor the door they walked through: teach how-to, create artifacts, or connect accounts — never hijack on one word.",

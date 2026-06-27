@@ -10,7 +10,7 @@ import type { CompanionPlaceId } from "@/lib/companionUniverse/types";
 import type { HomesteadTime } from "./types";
 
 /**
- * Homestead Time Engine™ — the house lives in the same day as the guest.
+ * Homestead Time Engine — the house lives in the same day as the guest.
  */
 export function resolveHomesteadTime(input?: {
   now?: Date;

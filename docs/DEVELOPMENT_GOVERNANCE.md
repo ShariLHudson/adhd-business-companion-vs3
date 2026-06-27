@@ -1,4 +1,4 @@
-# Development Governance™
+# Development Governance
 
 **ADHD Business Ecosystem™ — Product-thinking standard**
 
@@ -10,10 +10,10 @@ This document defines how future development decisions should be made so the pro
 
 This is **not** a coding standard. It is a **product-thinking standard**.
 
-**Governing law:** [Product Constitution™](./PRODUCT_CONSTITUTION.md) — what must comply  
+**Governing law:** [Product Constitution](./PRODUCT_CONSTITUTION.md) — what must comply  
 **Execution process:** [Screen Certification](./SCREEN_CERTIFICATION.md) — how screens become complete  
 **Living tracker:** [UX Punch List](./UX_PUNCH_LIST.md) — polish + Future Opportunities per screen  
-**Sprint Zero:** [Life Experience Sprint™](./companion-homestead/LIFE_EXPERIENCE_SPRINT.md) — live inside the Homestead before building more
+**Sprint Zero:** [Life Experience Sprint](./companion-homestead/LIFE_EXPERIENCE_SPRINT.md) — live inside the Homestead before building more
 
 ---
 
@@ -52,7 +52,7 @@ Whenever adding something new, ask: **Can this remove something else?**
 
 Every release should feel **lighter**—not heavier.
 
-Aligns with [UX Constitution™](./PRODUCT_CONSTITUTION.md#2-ux-constitution) and [Rule #5](#rule-5--one-source-of-truth) below.
+Aligns with [UX Constitution](./PRODUCT_CONSTITUTION.md#2-ux-constitution) and [Rule #5](#rule-5--one-source-of-truth) below.
 
 ---
 
@@ -69,7 +69,7 @@ Ask:
 
 If not, consider whether the interaction should be redesigned.
 
-Aligns with [Intelligence Constitution™](./PRODUCT_CONSTITUTION.md#5-intelligence-constitution) and [Future Intelligence Readiness](./SCREEN_CERTIFICATION.md#9-future-intelligence-readiness).
+Aligns with [Intelligence Constitution](./PRODUCT_CONSTITUTION.md#5-intelligence-constitution) and [Future Intelligence Readiness](./SCREEN_CERTIFICATION.md#9-future-intelligence-readiness).
 
 ---
 
@@ -98,7 +98,7 @@ Generate insights **only when:**
 
 **Silence is often better than unnecessary advice.**
 
-Aligns with [Emotional Safety Constitution™](./PRODUCT_CONSTITUTION.md#4-emotional-safety-constitution) — no fabricated encouragement.
+Aligns with [Emotional Safety Constitution](./PRODUCT_CONSTITUTION.md#4-emotional-safety-constitution) — no fabricated encouragement.
 
 ---
 
@@ -129,7 +129,7 @@ The user should understand:
 
 Transparency builds trust.
 
-Aligns with [Companion Constitution™](./PRODUCT_CONSTITUTION.md#1-companion-constitution) and Intelligence traceability.
+Aligns with [Companion Constitution](./PRODUCT_CONSTITUTION.md#1-companion-constitution) and Intelligence traceability.
 
 ---
 
@@ -168,9 +168,9 @@ Features do not become complete because the code works.
 
 They become complete because users can use them **confidently and naturally**.
 
-See [Screen Certification Sprint™](./SCREEN_CERTIFICATION.md) — all **10 gates** including [Constitution Compliance™](./SCREEN_CERTIFICATION.md#10-constitution-compliance).
+See [Screen Certification Sprint](./SCREEN_CERTIFICATION.md) — all **10 gates** including [Constitution Compliance](./SCREEN_CERTIFICATION.md#10-constitution-compliance).
 
-Shipped features remain subject to the [Stewardship Review™](./PRODUCT_CONSTITUTION.md#the-stewardship-review) — certification governs entry; stewardship governs what stays.
+Shipped features remain subject to the [Stewardship Review](./PRODUCT_CONSTITUTION.md#the-stewardship-review) — certification governs entry; stewardship governs what stays.
 
 ---
 
@@ -195,7 +195,7 @@ Whenever there is uncertainty, ask one question:
 - **Yes** → it belongs in the ADHD Business Ecosystem™
 - **No** → redesign it before building it
 
-This principle is also the [Future Development Rule](./PRODUCT_CONSTITUTION.md#future-development-rule) in the Product Constitution™.
+This principle is also the [Future Development Rule](./PRODUCT_CONSTITUTION.md#future-development-rule) in the Product Constitution.
 
 ---
 
@@ -203,16 +203,16 @@ This principle is also the [Future Development Rule](./PRODUCT_CONSTITUTION.md#f
 
 | Document | Role | When to use |
 |----------|------|-------------|
-| **Development Governance™** (this file) | Decision-making — *how to think* before building | Starting any task, feature pitch, or sprint |
-| **Product Constitution™** | Compliance — *what must be true* | Certifying screens, reviewing UX, guided conversations |
+| **Development Governance** (this file) | Decision-making — *how to think* before building | Starting any task, feature pitch, or sprint |
+| **Product Constitution** | Compliance — *what must be true* | Certifying screens, reviewing UX, guided conversations |
 | **Screen Certification** | Process — *how screens become complete* | Finishing a screen, before moving to the next |
 | **UX Punch List** | Tracker — *what's left + future breadcrumbs* | Daily polish, capturing Future Opportunities |
 
-**Companion Brain™ Intelligence** activates only after:
+**Companion Brain Intelligence** activates only after:
 
 1. Every screen in the certification order is marked **COMPLETE**, and  
-2. The [Product Constitution™](./PRODUCT_CONSTITUTION.md) is in force, and  
-3. [Development Governance™](./DEVELOPMENT_GOVERNANCE.md) guides all new work.
+2. The [Product Constitution](./PRODUCT_CONSTITUTION.md) is in force, and  
+3. [Development Governance](./DEVELOPMENT_GOVERNANCE.md) guides all new work.
 
 ---
 

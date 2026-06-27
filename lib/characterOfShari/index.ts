@@ -1,5 +1,5 @@
 /**
- * The Character of Shari™
+ * The Character of Shari
  *
  * Timeless qualities — not branding, not tone, character.
  * @see docs/companion-homestead/CHARACTER_OF_SHARI.md

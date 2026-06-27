@@ -3,7 +3,7 @@
 **Registry ID:** `phase_9_wisdom_intelligence`  
 **Dedicated module:** `lib/wisdomIntelligence.ts`  
 **Storage key:** `companion-phase9-wisdom-intelligence-v1`  
-**Partial legacy:** `lib/phase5CompanionIntelligenceEcosystem.ts` (Wisdom Engine™ — hidden when Phase 9 active)  
+**Partial legacy:** `lib/phase5CompanionIntelligenceEcosystem.ts` (Wisdom Engine — hidden when Phase 9 active)  
 **Registry status:** `active`  
 **Implementation status:** Dedicated module wired — chat, panel, resolver, tests
 
@@ -11,7 +11,7 @@
 
 ## Phase Name
 
-Wisdom Intelligence™
+Wisdom Intelligence
 
 ---
 
@@ -36,7 +36,7 @@ The user should feel:
 - The companion learns what repeatedly helps *them*
 - Wisdom accumulates quietly over months/years
 
-**Panel:** Getting To Know You shows **Personal Wisdom** via `formatWisdomIntelligenceForPanel()` when Phase 9 is active. Phase 5 Wisdom Engine™ is suppressed when Phase 9 is active.
+**Panel:** Getting To Know You shows **Personal Wisdom** via `formatWisdomIntelligenceForPanel()` when Phase 9 is active. Phase 5 Wisdom Engine is suppressed when Phase 9 is active.
 
 ---
 

@@ -1,4 +1,4 @@
-# Intelligence Registry™
+# Intelligence Registry
 
 **Internal only — never user-facing.**
 
@@ -22,7 +22,7 @@ Shared hook shape: `lib/intelligence/intelligenceReadyTypes.ts` → `Intelligenc
 ```ts
 id, createdAt, updatedAt?,
 originatedFromId, originatedFromKind?,
-connectionIds?,           // Living Intelligence Graph™
+connectionIds?,           // Living Intelligence Graph
 intelligenceMeta?         // per-engine enrichments — never bulk-expose in UI
 ```
 
@@ -47,7 +47,7 @@ If any answer is "unknown" — redesign before shipping.
 | Object | Kind | Primary storage | V1 user features | Future intelligence |
 |--------|------|-----------------|------------------|---------------------|
 | **Thought** | `thought` | `companionStore` → `BrainDumpEntry` | Clear My Mind capture, My Thoughts organize | Founder, Narrative, Opportunity, Content, Decision, Growth, Pattern, LIG |
-| **Collection** | `collection` | `companion-thought-collections-v1` → `ThoughtCollection` | My Thoughts garden, many-to-many | LIG, Narrative themes, Mind Landscape™ |
+| **Collection** | `collection` | `companion-thought-collections-v1` → `ThoughtCollection` | My Thoughts garden, many-to-many | LIG, Narrative themes, Mind Landscape |
 | **Capture session** | `capture-session` | `captureSessionId` on thoughts + `clearMyMindIntelligence` | Continuous capture batches | Pattern, Recovery, Narrative rhythm |
 | **Project** | `project` | `companionStore` → `Project` | Projects workspace, horizons | Business, Recovery, Pattern, Automation, Project |
 | **Project item** | `project-item` | `companionStore` → `ProjectItem` | Sections, tasks, subtasks | Project, Growth, Automation |
@@ -60,7 +60,7 @@ If any answer is "unknown" — redesign before shipping.
 | **Relationship** | `relationship` | `lib/relationship-intelligence/` | People context, touchpoints | Relationship, Audience, Opportunity, Narrative |
 | **Client avatar** | `client-avatar` | `companionStore` → `IdealClientAvatar` | AIRA, messaging | Audience, Offer, Content, Relationship |
 | **Business profile** | `business-profile` | `companion-business-profile-v1` | Onboarding context | Business, Founder, Content, Offer |
-| **Template** | `template` | `companionStore` → `TemplateItem` | Create, email, content | Content, PostCraft™, Automation |
+| **Template** | `template` | `companionStore` → `TemplateItem` | Create, email, content | Content, PostCraft, Automation |
 | **Snippet** | `snippet` | `companionStore` → `Snippet` | Reusable copy | Content, Automation |
 | **Content draft** | `content-draft` | PostCraft / ecosystem APIs | Drafts, publishing | Content, SEO, Social, GHL |
 | **Momentum event** | `momentum-event` | `companionStore` momentum | Movement XP (no streaks) | Growth, Recovery, Pattern |
@@ -85,29 +85,29 @@ If any answer is "unknown" — redesign before shipping.
 
 | Engine | Code home (primary) | Consumes objects | Writes to |
 |--------|---------------------|------------------|-----------|
-| **Living Intelligence Graph™** | `lib/arrivalIntelligence/livingIntelligenceGraph.ts`, thought `connectionIds` | Thought, Collection, Project, Relationship, Decision | `connectionIds`, `intelligenceMeta.living-intelligence-graph` |
-| **Narrative Intelligence™** | `lib/arrivalIntelligence/narrativeContext.ts` | Conversation, Thought, Project, Day state | `intelligenceMeta.narrative` |
-| **Arrival Intelligence™** | `lib/arrivalIntelligence/` | Day state, LIG arrivals, last activity | Greeting, home — not raw user data |
-| **Companion Presence™** | `lib/companionPresence/` | Conversation, emotional state, workspace | Presence copy only |
-| **Founder Intelligence™** | `lib/ecosystem/intelligence/`, founder workspace | Events, opportunities, decisions, projects | Founder dashboard, reports |
-| **Decision Intelligence™** | `lib/decision-intelligence/` | Decision, loops, cognitive load | `decisionStore`, support methods |
-| **Opportunity Intelligence™** | `lib/opportunity-intelligence/` | Opportunities, business profile, relationships | `opportunityStore` |
-| **Business Intelligence™** | `lib/ecosystem-intelligence/`, business profile | Profile, projects, content, revenue signals | Ecosystem snapshot |
-| **Growth Intelligence™** | `lib/momentum-intelligence/`, momentum events | Momentum, projects, thoughts handled | Momentum signals |
-| **Recovery Intelligence™** | `lib/recovery-intelligence/` | Day state, overwhelm, return patterns | Recovery insights |
-| **Pattern Intelligence™** | `lib/loop-intelligence/`, pattern awareness prefs | Loops, struggles, time-of-day | Loop store, signals |
-| **Relationship Intelligence™** | `lib/relationship-intelligence/` | Relationship, conversation, thoughts (person) | `relationshipStore` |
-| **Content Intelligence™** | PostCraft, templates, snippets | Template, draft, avatar | Content suggestions |
-| **Learning Intelligence™** | `lib/intelligence-layer/learningGates.ts` | Signals, trust, outcomes | Profile evolution |
-| **Automation Intelligence™** | GHL, ecosystem actions | Projects, content, calendar | External + events |
-| **Project Intelligence™** | `lib/founderWorkspace/intelligence/` | Project, items, time blocks | Project brain API |
-| **Calendar Intelligence™** | Google calendar routes, time blocks | Time block, reminder | Scheduling |
-| **Audience Intelligence™** | Avatars, business profile | Client avatar, profile | Messaging, offers |
-| **Offer Intelligence™** | Opportunity + business | Offer (planned), avatar | Opportunity engine |
-| **Environment Intelligence™** | `lib/environment-intelligence/` | Day state, workspace context | Environment scoring |
-| **Clear My Mind Intelligence™** | `lib/clearMyMindIntelligence.ts` | Capture sessions, thoughts | LIG ingest (silent) |
-| **Relief Intelligence™** | `lib/reliefIntelligence.ts` | Capture behavior signals (voice, rhythm, return) | Companion voice tone only — never UI |
-| **Ecosystem Intelligence™** | `lib/ecosystemIntelligence.ts` | Cross-domain snapshot | Whole-system insight |
+| **Living Intelligence Graph** | `lib/arrivalIntelligence/livingIntelligenceGraph.ts`, thought `connectionIds` | Thought, Collection, Project, Relationship, Decision | `connectionIds`, `intelligenceMeta.living-intelligence-graph` |
+| **Narrative Intelligence** | `lib/arrivalIntelligence/narrativeContext.ts` | Conversation, Thought, Project, Day state | `intelligenceMeta.narrative` |
+| **Arrival Intelligence** | `lib/arrivalIntelligence/` | Day state, LIG arrivals, last activity | Greeting, home — not raw user data |
+| **Companion Presence** | `lib/companionPresence/` | Conversation, emotional state, workspace | Presence copy only |
+| **Founder Intelligence** | `lib/ecosystem/intelligence/`, founder workspace | Events, opportunities, decisions, projects | Founder dashboard, reports |
+| **Decision Intelligence** | `lib/decision-intelligence/` | Decision, loops, cognitive load | `decisionStore`, support methods |
+| **Opportunity Intelligence** | `lib/opportunity-intelligence/` | Opportunities, business profile, relationships | `opportunityStore` |
+| **Business Intelligence** | `lib/ecosystem-intelligence/`, business profile | Profile, projects, content, revenue signals | Ecosystem snapshot |
+| **Growth Intelligence** | `lib/momentum-intelligence/`, momentum events | Momentum, projects, thoughts handled | Momentum signals |
+| **Recovery Intelligence** | `lib/recovery-intelligence/` | Day state, overwhelm, return patterns | Recovery insights |
+| **Pattern Intelligence** | `lib/loop-intelligence/`, pattern awareness prefs | Loops, struggles, time-of-day | Loop store, signals |
+| **Relationship Intelligence** | `lib/relationship-intelligence/` | Relationship, conversation, thoughts (person) | `relationshipStore` |
+| **Content Intelligence** | PostCraft, templates, snippets | Template, draft, avatar | Content suggestions |
+| **Learning Intelligence** | `lib/intelligence-layer/learningGates.ts` | Signals, trust, outcomes | Profile evolution |
+| **Automation Intelligence** | GHL, ecosystem actions | Projects, content, calendar | External + events |
+| **Project Intelligence** | `lib/founderWorkspace/intelligence/` | Project, items, time blocks | Project brain API |
+| **Calendar Intelligence** | Google calendar routes, time blocks | Time block, reminder | Scheduling |
+| **Audience Intelligence** | Avatars, business profile | Client avatar, profile | Messaging, offers |
+| **Offer Intelligence** | Opportunity + business | Offer (planned), avatar | Opportunity engine |
+| **Environment Intelligence** | `lib/environment-intelligence/` | Day state, workspace context | Environment scoring |
+| **Clear My Mind Intelligence** | `lib/clearMyMindIntelligence.ts` | Capture sessions, thoughts | LIG ingest (silent) |
+| **Relief Intelligence** | `lib/reliefIntelligence.ts` | Capture behavior signals (voice, rhythm, return) | Companion voice tone only — never UI |
+| **Ecosystem Intelligence** | `lib/ecosystemIntelligence.ts` | Cross-domain snapshot | Whole-system insight |
 | **Trust / signal bus** | `lib/intelligence-layer/` | Chat, features, emotions | `IntelligenceSignal` store |
 
 ---
@@ -150,7 +150,7 @@ FounderEvent ──refs──────► Project | Thought | Workspace
 | `lib/ecosystem/events` | `founder-event` |
 | `life-area` | `companion-user-life-areas-v1`, `companion-life-area-learning-v1` |
 
-### Life Area Intelligence™ (`classifyLifeArea`)
+### Life Area Intelligence (`classifyLifeArea`)
 
 | Engine | Reads | Writes |
 |--------|-------|--------|
@@ -181,8 +181,8 @@ Docs: `docs/plan-my-day/LIFE_AREA_INTELLIGENCE.md`
 - [ ] Declare which objects it reads (registry rows)
 - [ ] Declare write target: `intelligenceMeta.<engine>` and/or signal bus
 - [ ] Never require users to re-enter or reconnect existing data
-- [ ] Ship behind calm surface — Intelligence Paradox™
+- [ ] Ship behind calm surface — Intelligence Paradox
 
 ---
 
-*Last aligned with: My Thoughts™ visual architecture, Clear My Mind continuous capture, `BrainDumpEntry` LIG hooks.*
+*Last aligned with: My Thoughts visual architecture, Clear My Mind continuous capture, `BrainDumpEntry` LIG hooks.*

@@ -61,7 +61,7 @@ const VISUAL_FOCUS_OUTCOMES: Record<VisualFocusMode, string[]> = {
     "Business analysis",
     "Opportunities",
     "Risks",
-    "Board of Directors™ observations",
+    "Board of Directors observations",
     "Recommendations",
     "Ripple-effect analysis",
   ],
@@ -83,7 +83,7 @@ export function explainFirstOfferForBusinessCanvas(
 
 const SECTION_OFFERS: Partial<Record<AppSection, ExplainFirstOffer>> = {
   "brain-dump": {
-    whatItIs: "Clear My Mind™ is a calm place to unload thoughts without fixing everything at once.",
+    whatItIs: "Clear My Mind is a calm place to unload thoughts without fixing everything at once.",
     whyItHelps: "It reduces mental clutter so you can see what you are carrying.",
     outcomes: [
       "Captured thoughts",
@@ -91,11 +91,11 @@ const SECTION_OFFERS: Partial<Record<AppSection, ExplainFirstOffer>> = {
       "A calmer headspace",
       "Optional next view when you are ready",
     ],
-    permissionQuestion: "Would you like to open Clear My Mind™ beside us?",
+    permissionQuestion: "Would you like to open Clear My Mind beside us?",
   },
   "decision-compass": {
     whatItIs:
-      "Decision Compass™ helps compare options and determine which path appears strongest based on what matters most to you.",
+      "Decision Compass helps compare options and determine which path appears strongest based on what matters most to you.",
     whyItHelps: "It walks the decision step by step instead of piling pros and cons in chat.",
     outcomes: [
       "A recommendation",
@@ -107,7 +107,7 @@ const SECTION_OFFERS: Partial<Record<AppSection, ExplainFirstOffer>> = {
     permissionQuestion: "Would you like to explore that?",
   },
   "plan-my-day": {
-    whatItIs: "Plan My Day™ shapes today around what is realistic for your energy and priorities.",
+    whatItIs: "Plan My Day shapes today around what is realistic for your energy and priorities.",
     whyItHelps: "It turns a crowded to-do feeling into a doable plan for today.",
     outcomes: [
       "A realistic today plan",
@@ -115,10 +115,10 @@ const SECTION_OFFERS: Partial<Record<AppSection, ExplainFirstOffer>> = {
       "Energy-aware task view",
       "Suggested next step",
     ],
-    permissionQuestion: "Would you like to open Plan My Day™ beside us?",
+    permissionQuestion: "Would you like to open Plan My Day beside us?",
   },
   "visual-focus": {
-    whatItIs: "Visual Focus™ is a studio for thinking visually — maps, paths, and connections.",
+    whatItIs: "Visual Focus is a studio for thinking visually — maps, paths, and connections.",
     whyItHelps: "It helps you see structure instead of holding everything in your head.",
     outcomes: [
       "A visual map",

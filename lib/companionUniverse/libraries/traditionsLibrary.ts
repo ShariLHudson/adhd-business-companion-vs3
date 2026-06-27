@@ -1,7 +1,7 @@
 import type { WelcomeSeason } from "@/lib/welcomeLivingRoom";
 
 /**
- * Layer 4 — Traditions Library™
+ * Layer 4 — Traditions Library
  * These happen because it's Shari's home — not because of the guest.
  */
 export type HomeTradition = {

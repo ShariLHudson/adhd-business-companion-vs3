@@ -32,7 +32,7 @@ function verdict(
 }
 
 /**
- * Restraint Filter™ — every outgoing interaction passes through here.
+ * Restraint Filter — every outgoing interaction passes through here.
  * "Would a caring human actually say or do this right now?"
  */
 export function evaluateRestraintFilter(

@@ -1,5 +1,5 @@
 /**
- * P0.20.2 — Visual Thinking Overreach Fix™
+ * P0.20.2 — Visual Thinking Overreach Fix
  * Visual Thinking only when the user wants to SEE something — not ADHD friction.
  */
 
@@ -142,7 +142,7 @@ export function shouldOfferVisualThinkingRecommendation(text: string): boolean {
 
 export function visualThinkingOverreachHintForChat(): string {
   return [
-    "VISUAL THINKING OVERREACH FIX™ (P0.20.2):",
+    "VISUAL THINKING OVERREACH FIX (P0.20.2):",
     "Visual Thinking ONLY when the user wants to SEE something (mind map, flowchart, diagram, visualize this).",
     "NEVER offer Visual Thinking for procrastination, avoidance, overwhelm, sales resistance, anxiety, or activation difficulty.",
     "Those routes: Strategy Intelligence, Focus, Plan My Day, Organize, Emotional Regulation, Decision Compass, Learn.",

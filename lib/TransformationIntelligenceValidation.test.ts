@@ -170,32 +170,32 @@ describe("TransformationIntelligenceValidation", () => {
     vi.spyOn(companionStore, "getPrimaryAvatar").mockReturnValue(undefined);
   }
 
-  it("Visibility Growth™ — system recognizes long-term growth", () => {
+  it("Visibility Growth — system recognizes long-term growth", () => {
     seedTransformationBase();
     expect(validateVisibilityGrowth(new Date("2026-06-01T10:00:00.000Z"))).toBe(true);
   });
 
-  it("Confidence Evolution™ — system identifies confidence changes", () => {
+  it("Confidence Evolution — system identifies confidence changes", () => {
     seedTransformationBase();
     expect(validateConfidenceEvolution(new Date("2026-06-01T10:00:00.000Z"))).toBe(true);
   });
 
-  it("Business Maturity™ — system recognizes business progression", () => {
+  it("Business Maturity — system recognizes business progression", () => {
     seedTransformationBase();
     expect(validateBusinessMaturity(new Date("2026-06-01T10:00:00.000Z"))).toBe(true);
   });
 
-  it("Pattern Improvement™ — system identifies reduced friction patterns", () => {
+  it("Pattern Improvement — system identifies reduced friction patterns", () => {
     seedTransformationBase();
     expect(validatePatternImprovement(new Date("2026-06-01T10:00:00.000Z"))).toBe(true);
   });
 
-  it("Strength Emergence™ — system discovers strengths accurately", () => {
+  it("Strength Emergence — system discovers strengths accurately", () => {
     seedTransformationBase();
     expect(validateStrengthEmergence(new Date("2026-06-01T10:00:00.000Z"))).toBe(true);
   });
 
-  it("Legacy Accuracy™ — transformation claims require evidence", () => {
+  it("Legacy Accuracy — transformation claims require evidence", () => {
     seedTransformationBase();
     expect(validateLegacyAccuracy(new Date("2026-06-01T10:00:00.000Z"))).toBe(true);
   });

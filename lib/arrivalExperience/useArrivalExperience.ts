@@ -44,6 +44,7 @@ function prefersReducedMotion(): boolean {
 export type UseArrivalExperienceResult = {
   beat: ArrivalBeat;
   greeting: string;
+  greetingBody: string | null;
   realityQuestion: string | null;
   clarifyQuestion: string | null;
   echo: string | null;
@@ -120,10 +121,11 @@ export function useArrivalExperience(
   const reconnectionTurnsRef = useRef(0);
 
   const greeting =
-    arrival.welcomePresence?.greeting ??
-    arrival.welcomeLine ??
+    arrival.greetingHeadline ??
     arrival.openingMessage ??
-    "Come on in.";
+    "I'm glad you're here.";
+
+  const greetingBody = arrival.greetingBody ?? null;
 
   const realityQuestion =
     state.skipReality && state.beat !== "reality"
@@ -304,6 +306,7 @@ export function useArrivalExperience(
   return {
     beat: state.beat,
     greeting,
+    greetingBody,
     realityQuestion: inviteLine,
     clarifyQuestion,
     echo,

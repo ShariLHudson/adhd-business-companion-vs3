@@ -1,7 +1,7 @@
 import type { WelcomeSeason } from "@/lib/welcomeLivingRoom";
 
 /**
- * Companion Hospitality Profile™
+ * Companion Hospitality Profile
  *
  * Not a user profile. A hospitality profile.
  * Things Shari remembers because she's paying attention.

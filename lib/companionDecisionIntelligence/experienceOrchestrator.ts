@@ -1,5 +1,5 @@
 /**
- * Companion Experience Orchestrator™ — Discovery → Decision → Action → Completion.
+ * Companion Experience Orchestrator — Discovery → Decision → Action → Completion.
  */
 
 import type { AcceptedIntentResolution } from "./types";

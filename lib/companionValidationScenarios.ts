@@ -647,7 +647,7 @@ export const EXPANDED_SCENARIOS: ValidationScenario[] = [
 
 const S = SALES_SCORECARD_THRESHOLDS;
 
-/** Sales Conversations — ADHD Entrepreneur Behavioral Framework™ */
+/** Sales Conversations — ADHD Entrepreneur Behavioral Framework */
 export const SALES_SCENARIOS: ValidationScenario[] = [
   {
     id: "sales-discovery-call-avoidance",
@@ -889,7 +889,7 @@ export const SALES_SCENARIOS: ValidationScenario[] = [
 
 const V = VISIBILITY_SCORECARD_THRESHOLDS;
 
-/** Visibility & Marketing Confidence — ADHD Entrepreneur Behavioral Framework™ */
+/** Visibility & Marketing Confidence — ADHD Entrepreneur Behavioral Framework */
 export const VISIBILITY_SCENARIOS: ValidationScenario[] = [
   {
     id: "visibility-video-avoidance",
@@ -1160,7 +1160,7 @@ const B = MONEY_SCORECARD_THRESHOLDS;
 const D = DELEGATION_SCORECARD_THRESHOLDS;
 const L = LAUNCH_SCORECARD_THRESHOLDS;
 
-/** Money Intelligence™ — financial avoidance, pricing, revenue stress */
+/** Money Intelligence — financial avoidance, pricing, revenue stress */
 export const MONEY_SCENARIOS: ValidationScenario[] = [
   {
     id: "money-avoid-look-at-numbers",
@@ -1272,7 +1272,7 @@ export const MONEY_SCENARIOS: ValidationScenario[] = [
   },
 ];
 
-/** Delegation Intelligence™ */
+/** Delegation Intelligence */
 export const DELEGATION_SCENARIOS: ValidationScenario[] = [
   {
     id: "delegation-first-va-resistance",
@@ -1381,7 +1381,7 @@ export const DELEGATION_SCENARIOS: ValidationScenario[] = [
   },
 ];
 
-/** Launch Intelligence™ */
+/** Launch Intelligence */
 export const LAUNCH_SCENARIOS: ValidationScenario[] = [
   {
     id: "launch-delay-almost-ready",

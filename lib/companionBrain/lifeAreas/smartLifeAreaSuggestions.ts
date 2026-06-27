@@ -1,5 +1,5 @@
 /**
- * Smart Life Areas™ — companion notices patterns and offers to organize.
+ * Smart Life Areas — companion notices patterns and offers to organize.
  */
 
 import type { SmartLifeAreaSuggestion } from "./types";

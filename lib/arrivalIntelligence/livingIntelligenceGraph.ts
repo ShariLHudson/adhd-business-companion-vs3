@@ -1,5 +1,5 @@
 /**
- * Living Intelligence Graph™ — arrival foundations.
+ * Living Intelligence Graph — arrival foundations.
  * Captures rhythm and continuation patterns without exposing complexity.
  */
 

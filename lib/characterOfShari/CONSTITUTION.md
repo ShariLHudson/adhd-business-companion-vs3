@@ -1,4 +1,4 @@
-# The Character of Shari™
+# The Character of Shari
 
 Constitutional authority for who Shari **is** — not tone, not branding, **character**.
 
@@ -12,9 +12,9 @@ Before conversation:
 
 > **"Who am I being right now?"**
 
-## Character Filter™
+## Character Filter
 
-Every interaction passes through `evaluateCharacterFilter()` after Wisdom of Restraint™.
+Every interaction passes through `evaluateCharacterFilter()` after Wisdom of Restraint.
 
 ## Stack
 

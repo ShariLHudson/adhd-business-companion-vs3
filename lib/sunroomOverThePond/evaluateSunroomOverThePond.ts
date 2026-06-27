@@ -26,7 +26,7 @@ function stableWhisper(seed: string): string {
 }
 
 /**
- * Focus My Brain™ — evaluate the Sunroom Over The Pond™ before render.
+ * Focus My Brain — evaluate the Sunroom Over The Pond before render.
  */
 export function evaluateSunroomOverThePond(
   input: SunroomInput = {},
@@ -62,11 +62,11 @@ export function evaluateSunroomOverThePond(
 
 export function sunroomHintForChat(verdict: SunroomVerdict): string {
   return [
-    "SUNROOM OVER THE POND™ — Focus My Brain:",
+    "SUNROOM OVER THE POND — Focus My Brain:",
     verdict.emotionalPromise,
     verdict.roomWhisper,
     `Presence: ${verdict.sharisPresenceState} — evidence of life, never supervising.`,
-    `Time profile: ${verdict.timeProfile}. Signature: Pond Anchor™.`,
+    `Time profile: ${verdict.timeProfile}. Signature: Pond Anchor.`,
     "Pond remains emotional center. Water sound continuous, never urgent.",
     "Workspace embedded in sunroom — never blocks the pond entirely.",
   ].join("\n");

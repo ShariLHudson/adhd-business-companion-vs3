@@ -146,13 +146,13 @@ describe("BusinessIntelligenceValidation", () => {
     vi.spyOn(companionStore, "getPrimaryAvatar").mockReturnValue(undefined);
   }
 
-  it("Offer Clarity™ — identifies offer confusion", () => {
+  it("Offer Clarity — identifies offer confusion", () => {
     seedPhase7Base();
     const insight = identifyOfferConfusion(new Date("2026-05-01T10:00:00.000Z"));
     expect(insight).toMatch(/several offers|simplifying/i);
   });
 
-  it("Revenue Opportunity™ — surfaces revenue opportunity", () => {
+  it("Revenue Opportunity — surfaces revenue opportunity", () => {
     seedPhase7Base();
     const snapshot = buildBusinessIntelligenceSnapshot(new Date("2026-05-01T10:00:00.000Z"));
     expect(snapshot.revenue.drivers.length).toBeGreaterThan(0);
@@ -160,7 +160,7 @@ describe("BusinessIntelligenceValidation", () => {
     expect(insight === null || /revenue|opportunity/i.test(insight)).toBe(true);
   });
 
-  it("Content Reuse™ — discovers reusable content", () => {
+  it("Content Reuse — discovers reusable content", () => {
     seedPhase7Base();
     const insight = identifyContentReuse(
       new Date("2026-05-01T10:00:00.000Z"),
@@ -169,13 +169,13 @@ describe("BusinessIntelligenceValidation", () => {
     expect(insight).toMatch(/Workshop Content Draft|reuse|repurpos/i);
   });
 
-  it("Visibility Bottleneck™ — identifies visibility as constraint", () => {
+  it("Visibility Bottleneck — identifies visibility as constraint", () => {
     seedPhase7Base();
     const insight = identifyVisibilityBottleneck();
     expect(insight).toMatch(/visibility|friction|stalled/i);
   });
 
-  it("Sales Avoidance™ — recognizes avoidance and recommends action", () => {
+  it("Sales Avoidance — recognizes avoidance and recommends action", () => {
     seedPhase7Base();
     const insight = identifySalesAvoidanceSupport(
       "I keep putting off the sales call and never followed up",
@@ -184,7 +184,7 @@ describe("BusinessIntelligenceValidation", () => {
     expect(insight).toMatch(/call|follow|pressure/i);
   });
 
-  it("Business Stage Awareness™ — adjusts recommendations by maturity", () => {
+  it("Business Stage Awareness — adjusts recommendations by maturity", () => {
     seedPhase7Base();
     const rec = businessStageAwareRecommendation(new Date("2026-05-01T10:00:00.000Z"));
     expect(rec).toMatch(/stage|Focus now/i);

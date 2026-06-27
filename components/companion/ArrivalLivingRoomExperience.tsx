@@ -131,6 +131,8 @@ export function ArrivalLivingRoomExperience({
   return (
     <CompanionWelcomeScene
       greeting={experience.greeting}
+      greetingBody={experience.greetingBody}
+      sparkLine={arrival.littleSpark?.deliveryText ?? null}
       invite={experience.realityQuestion}
       echoLine={experience.echo}
       recommendation={experience.recommendation}

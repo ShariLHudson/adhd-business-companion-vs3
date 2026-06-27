@@ -20,7 +20,7 @@ export const COMMUNICATION_ANCHOR_AUDIT_CASES: CommunicationAnchorAuditCase[] =
   PRIMARY_SCREEN_SHELLS.map((shell) => ({
     id: `anchor-${shell}`,
     shell,
-    description: `${shell} must expose the Companion Communication Anchor™`,
+    description: `${shell} must expose the Companion Communication Anchor`,
     requiredTestIds: [
       COMMUNICATION_ANCHOR_TEST_IDS.anchor,
       COMMUNICATION_ANCHOR_TEST_IDS.mic,

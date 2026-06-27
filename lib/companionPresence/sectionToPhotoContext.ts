@@ -7,7 +7,7 @@ export type WorkspacePresenceMapping = {
   expression: CompanionPresenceExpression;
 };
 
-/** Workspace → emotional photograph preference (Companion Presence Library™). */
+/** Workspace → emotional photograph preference (Companion Presence Library). */
 const WORKSPACE_PRESENCE: Partial<Record<AppSection, WorkspacePresenceMapping>> =
   {
     home: { photoContext: "welcome", expression: "warm_welcome" },

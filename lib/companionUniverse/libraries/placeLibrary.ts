@@ -1,10 +1,10 @@
 import type { CompanionPlace, CompanionPlaceId } from "../types";
 
-/** Companion Place Library™ — every permanent place in the homestead. */
+/** Companion Place Library — every permanent place in the homestead. */
 export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   {
     id: "living-room",
-    name: "Living Room™",
+    name: "Living Room",
     purpose: "First welcome, daily return, quiet conversation",
     emotionalPromise: "I've been expecting you.",
     hospitalityStyle: "warm-host",
@@ -20,7 +20,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "window-seat",
-    name: "Window Seat™",
+    name: "Window Seat",
     purpose: "Reflection, heavy feelings, listening without fixing",
     emotionalPromise: "You don't have to carry this alone.",
     hospitalityStyle: "quiet-listener",
@@ -36,7 +36,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "kitchen-table",
-    name: "Kitchen Table™",
+    name: "Kitchen Table",
     purpose: "Morning start, tea, gentle planning",
     emotionalPromise: "We'll take today one bite at a time.",
     hospitalityStyle: "warm-host",
@@ -52,7 +52,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "planning-table",
-    name: "Planning Table™",
+    name: "Planning Table",
     purpose: "Morning clarity — decide what today needs, without pressure",
     emotionalPromise: "My day suddenly feels more manageable.",
     hospitalityStyle: "gentle-guide",
@@ -69,7 +69,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "business-office",
-    name: "Business Office™",
+    name: "Business Office",
     purpose: "Strategy, decisions, professional focus",
     emotionalPromise: "We'll find the next honest step.",
     hospitalityStyle: "gentle-guide",
@@ -85,7 +85,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "creative-studio",
-    name: "Creative Studio™",
+    name: "Creative Studio",
     purpose: "Ideas, making, playful exploration",
     emotionalPromise: "Your ideas deserve room to breathe.",
     hospitalityStyle: "creative-partner",
@@ -101,7 +101,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "workshop",
-    name: "Workshop™",
+    name: "Workshop",
     purpose: "Building, crafts, hands-on projects",
     emotionalPromise: "We'll figure out the next piece together.",
     hospitalityStyle: "creative-partner",
@@ -117,7 +117,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "focus-studio",
-    name: "Focus Studio™",
+    name: "Focus Studio",
     purpose: "Visual Focus Workspace, deep visual thinking",
     emotionalPromise: "I'll help protect your attention.",
     hospitalityStyle: "minimal-focus",
@@ -133,8 +133,8 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "sunroom-over-pond",
-    name: "Sunroom Over The Pond™",
-    purpose: "Focus My Brain™ — attention regulation and cognitive grounding",
+    name: "Sunroom Over The Pond",
+    purpose: "Focus My Brain — attention regulation and cognitive grounding",
     emotionalPromise: "My mind slows down here without trying.",
     hospitalityStyle: "thoughtful-companion",
     lightingProfile: "filtered sunroom light, water reflections",
@@ -150,7 +150,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "reading-nook",
-    name: "Reading Nook™",
+    name: "Reading Nook",
     purpose: "Books, reflection, saved ideas",
     emotionalPromise: "Nothing important gets lost.",
     hospitalityStyle: "quiet-listener",
@@ -166,7 +166,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "garden",
-    name: "Garden™",
+    name: "Garden",
     purpose: "Seasonal grounding, gentle perspective",
     emotionalPromise: "Notice what's blooming.",
     hospitalityStyle: "thoughtful-companion",
@@ -182,7 +182,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "garden-path",
-    name: "Garden Path™",
+    name: "Garden Path",
     purpose: "Walking thoughts, gentle movement",
     emotionalPromise: "We can take the long way today.",
     hospitalityStyle: "thoughtful-companion",
@@ -198,7 +198,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "greenhouse",
-    name: "Greenhouse™",
+    name: "Greenhouse",
     purpose: "Growth, nurturing long projects",
     emotionalPromise: "Some things grow slowly — that's allowed.",
     hospitalityStyle: "thoughtful-companion",
@@ -214,7 +214,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "back-deck",
-    name: "Back Deck™",
+    name: "Back Deck",
     purpose: "End of day, wind-down, reflection",
     emotionalPromise: "We can let today end gently.",
     hospitalityStyle: "reflective-friend",
@@ -230,7 +230,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "fire-circle",
-    name: "Fire Circle™",
+    name: "Fire Circle",
     purpose: "Celebration, storytelling, warmth",
     emotionalPromise: "Your wins deserve warmth.",
     hospitalityStyle: "celebratory",
@@ -246,7 +246,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "library",
-    name: "Library™",
+    name: "Library",
     purpose: "Deep reference, saved work, learning",
     emotionalPromise: "What you've learned stays here.",
     hospitalityStyle: "quiet-listener",
@@ -262,7 +262,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "front-porch",
-    name: "Front Porch™",
+    name: "Front Porch",
     purpose: "Arrival, transition between world and home",
     emotionalPromise: "You made it home.",
     hospitalityStyle: "warm-host",
@@ -278,7 +278,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "barn",
-    name: "Barn™",
+    name: "Barn",
     purpose: "Big projects, storage, long-horizon work",
     emotionalPromise: "Big work can live here without crowding today.",
     hospitalityStyle: "gentle-guide",
@@ -294,7 +294,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "outlook-point",
-    name: "Outlook Point™",
+    name: "Outlook Point",
     purpose: "Perspective, vision, long view",
     emotionalPromise: "From here you can see further.",
     hospitalityStyle: "reflective-friend",
@@ -310,7 +310,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "adventure-room",
-    name: "Adventure Room™",
+    name: "Adventure Room",
     purpose: "Vacation countdown, travel dreams, exploration",
     emotionalPromise: "Adventure is approaching — quietly prepared.",
     hospitalityStyle: "celebratory",
@@ -326,7 +326,7 @@ export const COMPANION_PLACE_LIBRARY: CompanionPlace[] = [
   },
   {
     id: "future-wings",
-    name: "Future Wings™",
+    name: "Future Wings",
     purpose: "Vision, launches, what comes next",
     emotionalPromise: "What you're building has room to grow.",
     hospitalityStyle: "celebratory",

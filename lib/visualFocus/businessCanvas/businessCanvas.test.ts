@@ -59,7 +59,7 @@ describe("businessCanvas guidance layer", () => {
     expect(g.changeRipples).toContain("Marketing priorities may shift");
   });
 
-  it("generate action uses Business Canvas™ not framework name", () => {
-    expect(generateMapLabelForMode("business-canvas")).toBe("Generate Business Canvas™");
+  it("generate action uses Business Canvas not framework name", () => {
+    expect(generateMapLabelForMode("business-canvas")).toBe("Generate Business Canvas");
   });
 });

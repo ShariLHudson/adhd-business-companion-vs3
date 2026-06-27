@@ -5,7 +5,7 @@ import {
   composeBibleSoftPresence,
 } from "@/lib/shariVoiceBible";
 import { filterQuestionThroughRestraint } from "@/lib/wisdomOfRestraint";
-import { saveDayState, type DayState } from "@/lib/companionStore";
+import { getLastActivity, saveDayState, type DayState } from "@/lib/companionStore";
 import type {
   ConversationalRealityResult,
   RealityEmotionalTone,
@@ -194,12 +194,14 @@ export function softCompleteReality(): ConversationalRealityResult {
 }
 
 export function sameAsYesterdayEcho(note?: string): ConversationalRealityResult {
+  const lastActivity = getLastActivity();
+  const previousTopic = lastActivity?.title ?? undefined;
   const dayState = saveDayState({
     energyLevel: "doing-okay",
     motivationLevel: "get-it-done",
     vibe: "doing-okay",
     needs: [],
-    note: note ?? "about the same",
+    note: note ?? "continuity",
   });
   return {
     echo: composeBibleEcho({
@@ -210,6 +212,7 @@ export function sameAsYesterdayEcho(note?: string): ConversationalRealityResult 
         returnIntervalHours: null,
         returnIntervalDays: null,
         isFirstMeeting: false,
+        previousTopic,
       },
       tone: "okay",
       continuity: true,

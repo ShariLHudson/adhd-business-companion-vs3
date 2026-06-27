@@ -1,5 +1,5 @@
 /**
- * The Living Border™ — the center belongs to the guest; borders belong to the Homestead.
+ * The Living Border — the center belongs to the guest; borders belong to the Homestead.
  * @see docs/companion-homestead/LIVING_BORDER.md
  */
 
@@ -98,7 +98,7 @@ export const LIVING_BORDER_PRINCIPLE =
   "The center belongs to the guest. The borders belong to the Homestead." as const;
 
 export const LIVING_BORDER_HEARTBEAT =
-  "The Living Border™ is the heartbeat of every room." as const;
+  "The Living Border is the heartbeat of every room." as const;
 
 export const LIVING_BORDER_EXPERIENCE_PRINCIPLE =
   "The center supports the guest. The borders support the experience." as const;

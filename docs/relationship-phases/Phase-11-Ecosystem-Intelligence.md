@@ -9,7 +9,7 @@
 
 ## Phase Name
 
-Ecosystem Intelligence™
+Ecosystem Intelligence
 
 ---
 
@@ -32,7 +32,7 @@ The user should feel:
 - Recommendations adapted to capacity — not hustle pressure when overloaded
 - Harmony over balance — *"build a business that fits your life"*
 
-Panel: **Ecosystem Intelligence™** in Getting To Know You when active.
+Panel: **Ecosystem Intelligence** in Getting To Know You when active.
 
 ---
 

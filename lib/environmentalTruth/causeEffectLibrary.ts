@@ -2,7 +2,7 @@ import type { CompanionMotionKind } from "@/lib/companionEnvironmentIntelligence
 import type { EnvironmentalCause } from "./types";
 
 /**
- * Cause → Effect library™
+ * Cause → Effect library
  * Motion is an effect. If the cause is not present, the effect does not render.
  */
 export const MOTION_CAUSE_MAP: Record<

@@ -1,5 +1,5 @@
 /**
- * Shari Voice Bible™ — absolute rules.
+ * Shari Voice Bible — absolute rules.
  * Every line in the ecosystem must pass these filters.
  */
 

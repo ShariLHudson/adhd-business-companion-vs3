@@ -3,6 +3,8 @@
  * Persists across turns so acceptance and routing never reset the thread.
  */
 
+import { continuationReplyForAssistantQuestion } from "./workspaceOpeningRule";
+
 import type { AppSection } from "./companionUi";
 import type { ConversationWorkflowKind } from "./conversationWorkflowContinuation";
 
@@ -147,16 +149,27 @@ export function outcomeThreadHintForChat(thread: OutcomeThread | null): string |
   return parts.join("\n");
 }
 
+export function consumePendingInvitation(): void {
+  patchOutcomeThread({
+    pendingQuestion: undefined,
+    pendingAction: undefined,
+    lastOfferSummary: undefined,
+  });
+}
+
 /** Non-resetting reply when acceptance cannot be resolved but a thread exists. */
 export function threadAwareAcceptanceFallback(thread: OutcomeThread | null): string {
+  if (thread?.pendingQuestion) {
+    const advanced = continuationReplyForAssistantQuestion(
+      thread.pendingQuestion,
+    );
+    if (advanced) return advanced;
+  }
   if (thread?.pendingAction) {
     return `Continuing **${thread.pendingAction}** — here's the next step on that.`;
   }
   if (thread?.pendingDecision) {
     return `Let's keep going on **${thread.pendingDecision}** — which path feels closest right now?`;
-  }
-  if (thread?.currentProblem) {
-    return `Picking up **${thread.currentProblem.slice(0, 120)}** — what's the piece that feels most uncertain?`;
   }
   return "I'm still here — what's the next piece you want to look at?";
 }

@@ -1,5 +1,5 @@
 /**
- * Context Assembly™ — unify memory into one reasoning snapshot.
+ * Context Assembly — unify memory into one reasoning snapshot.
  * @see constitution.ts — assembleContext
  */
 

@@ -15,7 +15,7 @@ import type {
 import { COMPANION_RELATIONSHIP_CONSTITUTIONAL_RULE } from "./types";
 
 /**
- * Companion Relationship™ — adjusts rhythm, never Shari.
+ * Companion Relationship — adjusts rhythm, never Shari.
  */
 export function evaluateCompanionRelationship(
   input: CompanionRelationshipInput = {},
@@ -60,7 +60,7 @@ export function shouldShowEnvironmentalStorytelling(
   }
 }
 
-/** Memory Triggers™ frequency gate per relationship rhythm */
+/** Memory Triggers frequency gate per relationship rhythm */
 export function isMemoryTriggerVisitEligible(
   rhythm: CompanionRelationshipVerdict["rhythm"],
   sessionVisitIndex: number,

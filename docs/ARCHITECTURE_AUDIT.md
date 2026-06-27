@@ -1,4 +1,4 @@
-# Companion Homestead™ Architecture Audit
+# Companion Homestead Architecture Audit
 ## Production Readiness Review — Before Commit & Push
 
 **Date:** 2026-06-25  
@@ -101,7 +101,7 @@
 | Companion Universe orchestration | Prototype route only (`/companion/hospitality-prototype`) |
 | 20 rooms, life rhythms | `placeLibrary` registered; main path uses living room + workspaces |
 | Hospitality Principle | Split across 4+ modules composing greetings independently |
-| Scene Integrity™ | Engine exists; type unions not aligned with scene presets |
+| Scene Integrity | Engine exists; type unions not aligned with scene presets |
 | Manifesto: depth in 5 rooms | Breadth in 30 library registrations |
 
 ## Unnecessary complexity

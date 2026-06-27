@@ -1,5 +1,5 @@
 /**
- * Thought card display — title, preview, and metadata for Companion Boxes™.
+ * Thought card display — title, preview, and metadata for Companion Boxes.
  */
 
 import { getProjects, type BrainDumpEntry } from "@/lib/companionStore";

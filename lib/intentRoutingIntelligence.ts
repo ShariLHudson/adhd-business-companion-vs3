@@ -1,5 +1,5 @@
 /**
- * Intent Routing Intelligence™ + Feature Navigation Intelligence™ (P0.7)
+ * Intent Routing Intelligence + Feature Navigation Intelligence (P0.7)
  * Understand before routing. Route before explaining. Help before reflecting.
  *
  * Always Available / Not Always Visible: routing intelligence and feature fit
@@ -139,7 +139,7 @@ export type IntentRoutingDecision = {
   navigationLine: string | null;
   stayHereLabel: string;
   featureLabel: string | null;
-  /** Honor Their Intent™ — constitutional arrival mode */
+  /** Honor Their Intent — constitutional arrival mode */
   honorTheirIntent: HonorTheirIntentVerdict;
 };
 
@@ -836,7 +836,7 @@ export function intentRoutingHintForChat(
       : null,
     decision.suppressRelationshipIntelligence && !decision.learnFastPath
       ? [
-          "RELATIONSHIP INTELLIGENCE BOUNDARIES™ (P0.17): This is NOT a self-understanding turn.",
+          "RELATIONSHIP INTELLIGENCE BOUNDARIES (P0.17): This is NOT a self-understanding turn.",
           "ACTION FIRST — answer directly; help them learn, create, plan, decide, or execute.",
           visualStructureRoutingHintForChat(),
           visualThinkingStudioHintForChat(),

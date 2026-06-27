@@ -1,5 +1,5 @@
 /**
- * Phase 10 — Legacy & Transformation Intelligence™
+ * Phase 10 — Legacy & Transformation Intelligence
  * Understand long-term change — not activity, not metrics, transformation.
  */
 
@@ -718,7 +718,7 @@ export function formatTransformationIntelligenceForPanel(
   snapshot = buildTransformationIntelligenceSnapshot(),
 ): string {
   return [
-    "## Legacy & Transformation Intelligence™",
+    "## Legacy & Transformation Intelligence",
     "",
     "_Who you were → who you're becoming — evidence, not flattery._",
     "",
@@ -767,7 +767,7 @@ export function phase10TransformationIntelligenceHintForChat(input?: {
     (input?.userText ? maybeTransformationReflection({ userText: input.userText }) : null);
 
   const parts = [
-    "PHASE 10 LEGACY & TRANSFORMATION INTELLIGENCE™ (understand what changed):",
+    "PHASE 10 LEGACY & TRANSFORMATION INTELLIGENCE (understand what changed):",
     "Goal: answer who they were, who they're becoming, what they built, overcame, and learned.",
     "Transformation not productivity. Evidence-based reflection — no flattery, no exaggeration.",
     `Origin challenge: ${snapshot.origin.primaryChallenge ?? "emerging"}`,

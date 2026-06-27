@@ -6,21 +6,21 @@ import {
   violatesPlanningTableAdhdRule,
 } from "./index";
 
-describe("Planning Table™ — Plan My Day™", () => {
+describe("Planning Table — Plan My Day", () => {
   it("communicates emotional promise and room whispers", () => {
     const verdict = evaluatePlanningTableRoom();
     expect(verdict.emotionalPromise).toBe(PLANNING_TABLE_EMOTIONAL_PROMISE);
     expect(verdict.roomWhisper).toMatch(/figure|time|pressure/i);
-    expect(verdict.title).toBe("Plan My Day™");
+    expect(verdict.title).toBe("Plan My Day");
   });
 
-  it("assigns Beside You™ presence — no Shari across the table", () => {
+  it("assigns Beside You presence — no Shari across the table", () => {
     const verdict = evaluatePlanningTableRoom();
     expect(verdict.sharisPresenceState).toBe("beside-you");
     expect(verdict.dataAttributes["data-sharis-presence"]).toBeUndefined();
   });
 
-  it("uses Planning Notebook™ as signature object", () => {
+  it("uses Planning Notebook as signature object", () => {
     expect(evaluatePlanningTableRoom().signatureObjectId).toBe(
       "sig-planning-notebook",
     );

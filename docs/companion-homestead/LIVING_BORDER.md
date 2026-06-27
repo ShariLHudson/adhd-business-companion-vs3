@@ -1,4 +1,4 @@
-# The Living Border™
+# The Living Border
 ## Where The Home Comes Alive
 
 **Version:** 1.1  
@@ -10,14 +10,14 @@
 
 ## Heartbeat
 
-> The Living Border™ is the **heartbeat of every room**.
+> The Living Border is the **heartbeat of every room**.
 
 The center of the screen belongs to the guest.  
 The borders belong to the Homestead.
 
 This is where life quietly unfolds while the guest thinks, creates, plans, writes, and talks.
 
-The Living Border™ should **never distract**.  
+The Living Border should **never distract**.  
 It should gently remind the guest that they are working inside a **real home** — not inside software.
 
 ---
@@ -33,7 +33,7 @@ While the guest is focused on their work, the Homestead continues living around 
 
 ## What Lives In The Border
 
-The Living Border™ is where **subtle movement** and quiet change happen:
+The Living Border is where **subtle movement** and quiet change happen:
 
 - Curtains sway beside the window  
 - Tree branches move outside  
@@ -72,11 +72,11 @@ Enforced: `LIVING_BORDER_RULES` · `filterLivingChangesToBorder()` · `capBorder
 
 | Room | Border life |
 |------|-------------|
-| Living Room™ | Window, curtains, trees, bird feeder, flowers, mug, bookshelf, lamp, Kinsey |
-| Window Seat™ | Landscape, wildlife, rain, snow, curtains, candle, steam |
-| Reading Nook™ | Aquarium, books, lamp, window, blanket |
-| Planning Table™ | Planner, calendar shelf, lamp, window, coffee |
-| Creative Studio™ | Craft shelves, fabric corner, plants, windows |
+| Living Room | Window, curtains, trees, bird feeder, flowers, mug, bookshelf, lamp, Kinsey |
+| Window Seat | Landscape, wildlife, rain, snow, curtains, candle, steam |
+| Reading Nook | Aquarium, books, lamp, window, blanket |
+| Planning Table | Planner, calendar shelf, lamp, window, coffee |
+| Creative Studio | Craft shelves, fabric corner, plants, windows |
 
 ---
 

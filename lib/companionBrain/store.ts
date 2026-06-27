@@ -1,5 +1,5 @@
 /**
- * Companion Brain™ persisted judgment state.
+ * Companion Brain persisted judgment state.
  */
 
 import type { CompanionBrainState, CooldownKind, JudgmentProfile } from "./types";

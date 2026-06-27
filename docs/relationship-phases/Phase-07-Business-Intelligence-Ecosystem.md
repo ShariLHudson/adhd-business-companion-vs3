@@ -9,7 +9,7 @@
 
 ## Phase Name
 
-Business Intelligence Ecosystem™
+Business Intelligence Ecosystem
 
 ---
 
@@ -29,7 +29,7 @@ The user should feel:
 - Insights are plain language, not dashboard metrics
 - Milestone: *"This companion understands my business."*
 
-Panel: **Business Intelligence Ecosystem™** in Getting To Know You.
+Panel: **Business Intelligence Ecosystem** in Getting To Know You.
 
 ---
 

@@ -14,6 +14,7 @@ const SUPABASE_ENV_KEYS = [
   "NEXT_PUBLIC_SUPABASE_ANON_KEY",
   "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
   "SUPABASE_ANON_KEY",
+  "SUPABASE_PUBLISHABLE_KEY",
 ] as const;
 
 export function isSupabaseProjectUrl(value: string): boolean {
@@ -74,6 +75,7 @@ export function resolveCompanionSupabaseEnv(): ResolvedCompanionSupabaseEnv {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ||
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
     process.env.SUPABASE_ANON_KEY?.trim() ||
+    process.env.SUPABASE_PUBLISHABLE_KEY?.trim() ||
     "";
 
   for (const v of candidates) {

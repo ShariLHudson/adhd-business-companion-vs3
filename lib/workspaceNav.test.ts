@@ -8,6 +8,7 @@ describe("workspaceNav", () => {
     expect(shouldOpenBesideChat("content-generator")).toBe(true);
     expect(shouldOpenBesideChat("playbook")).toBe(true);
     expect(shouldOpenBesideChat("brain-dump")).toBe(false);
+    expect(shouldOpenBesideChat("plan-my-day")).toBe(false);
   });
 
   it("keeps standalone tools off the split rail", () => {

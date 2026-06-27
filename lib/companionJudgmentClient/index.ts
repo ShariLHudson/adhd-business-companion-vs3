@@ -1,5 +1,5 @@
 /**
- * Companion Judgment Client™ — Live Reality™ experience layer.
+ * Companion Judgment Client — Live Reality experience layer.
  * One reality. One brain. Many experiences.
  */
 

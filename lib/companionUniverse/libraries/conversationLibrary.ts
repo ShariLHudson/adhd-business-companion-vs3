@@ -8,7 +8,7 @@ export type ConversationStyleEntry = {
   avoid: string;
 };
 
-/** Companion Conversation Library™ — how Shari speaks in each place. */
+/** Companion Conversation Library — how Shari speaks in each place. */
 export const COMPANION_CONVERSATION_LIBRARY: ConversationStyleEntry[] = [
   {
     placeId: "living-room",

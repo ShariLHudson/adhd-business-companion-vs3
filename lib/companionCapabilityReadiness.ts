@@ -1,5 +1,5 @@
 /**
- * Companion Capability Readiness™ — 12/10 scoring per capability.
+ * Companion Capability Readiness — 12/10 scoring per capability.
  */
 
 import {

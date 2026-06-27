@@ -1,4 +1,4 @@
-# Live Reality™ Architecture (Part 15)
+# Live Reality Architecture (Part 15)
 ## Dynamic Day Adaptation — Canonical Source of Truth
 
 **Status:** Foundation implemented  
@@ -10,30 +10,30 @@
 
 The morning plan is a **starting point**. Never a commitment.
 
-Life changes. Energy changes. The Companion Brain™ continuously reasons from **current reality**.
+Life changes. Energy changes. The Companion Brain continuously reasons from **current reality**.
 
 ---
 
 ## Architectural Rule
 
 ```
-Reality signals → Companion Brain™ → Live judgment → All workspaces
+Reality signals → Companion Brain → Live judgment → All workspaces
 ```
 
 | Layer | Location | Role |
 |-------|----------|------|
-| Reality inputs | Shape Today™, plan items, focus, captures, … | User updates reality once |
+| Reality inputs | Shape Today, plan items, focus, captures, … | User updates reality once |
 | Brain | `lib/companionBrain/` | Single source of judgment |
 | Live client | `lib/companionJudgmentClient/` | Re-evaluate, store, broadcast |
-| Experiences | Plan My Day™, Projects™, Focus™, … | Consume judgment; never reason |
+| Experiences | Plan My Day, Projects, Focus, … | Consume judgment; never reason |
 
-**Shape Today™ is not a separate feature.** It is an input into the Companion Brain™.
+**Shape Today is not a separate feature.** It is an input into the Companion Brain.
 
 ---
 
-## Live Ecosystem™ Flow
+## Live Ecosystem Flow
 
-1. User updates reality (e.g. Shape Today™ save → `saveDayState`)
+1. User updates reality (e.g. Shape Today save → `saveDayState`)
 2. `COMPANION_REALITY_UPDATED` event fires
 3. `reEvaluateLiveJudgment()` gathers ecosystem memory and runs reasoning cycle
 4. `COMPANION_JUDGMENT_UPDATED` broadcasts new judgment
@@ -85,11 +85,11 @@ The companion may **never** silently change:
 
 ---
 
-## Learning (Founder Intelligence™)
+## Learning (Founder Intelligence)
 
 `emitLiveAdaptationSignals()` records that **life changed** — not that plans failed.
 
-Signals feed the Living Intelligence Graph™ for:
+Signals feed the Living Intelligence Graph for:
 - Energy → planning patterns
 - Recovery patterns
 - Executive functioning habits
@@ -112,13 +112,13 @@ Wisdom, not surveillance.
 | `components/companion/LiveEcosystemInit.tsx` | Boot listeners in companion layout |
 | `lib/companionJudgmentClient/workspaceIntelligence.ts` | Consume/contribute registry |
 | `lib/companionStore.ts` | `COMPANION_REALITY_UPDATED` on day-state save |
-| `lib/companionJudgmentClient/realityFromCapture.ts` | Clear My Mind™ → Live Reality™ |
+| `lib/companionJudgmentClient/realityFromCapture.ts` | Clear My Mind → Live Reality |
 
 See `LIVE_REALITY_ECOSYSTEM.md` for how every workspace participates.
 
 ---
 
-## Human Reality™ Test
+## Human Reality Test
 
 After 8:00 AM the ecosystem must still feel alive.
 

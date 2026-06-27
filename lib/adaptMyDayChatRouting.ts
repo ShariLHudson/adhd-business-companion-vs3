@@ -1,5 +1,5 @@
 /**
- * Chat routing for Today's Reality™ / energy mismatch signals.
+ * Chat routing for Today's Reality / energy mismatch signals.
  */
 
 const ADAPT_MY_DAY_INTENT_RE =

@@ -20,14 +20,14 @@ export const WORKSPACE_AREA_WORKFLOWS: Record<string, WorkspaceAreaWorkflow> = {
   "visual-focus": {
     id: "visual-focus",
     steps: [
-      "Open Visual Focus™ — the studio asks how you want to think today.",
+      "Open Visual Focus — the studio asks how you want to think today.",
       "Pick a teaching card (Mind Map, Decision Tree, Strategy Map, and more).",
       "Create your map — it opens with a meaningful example, not a blank canvas.",
       "Edit branches or kanban cards as your thinking unfolds.",
       "Use Back to Studio to pick a different thinking style.",
       "Chat stays open for coaching while you organize visually.",
     ],
-    tip: "Decision Compass™ helps you choose which option is best. Decision Tree™ in Visual Focus helps you explore what happens if you choose a path.",
+    tip: "Decision Compass helps you choose which option is best. Decision Tree in Visual Focus helps you explore what happens if you choose a path.",
   },
   "brain-dump": {
     id: "brain-dump",

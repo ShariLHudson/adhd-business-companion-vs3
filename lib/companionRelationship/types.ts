@@ -1,5 +1,5 @@
 /**
- * Companion Relationship™ — rhythm adapts; Shari never changes.
+ * Companion Relationship — rhythm adapts; Shari never changes.
  * @see docs/companion-homestead/COMPANION_RELATIONSHIP.md
  */
 
@@ -32,7 +32,7 @@ export type CompanionRelationshipRhythm = {
   greetingLength: GreetingLength;
   askReconnectionQuestion: boolean;
   environmentalStorytelling: StorytellingDensity;
-  /** Higher = less frequent Memory Triggers™ */
+  /** Higher = less frequent Memory Triggers */
   memoryTriggerVisitModulo: number;
   /** Higher = less frequent Everyday Life moments */
   everydayLifeVisitModulo: number;

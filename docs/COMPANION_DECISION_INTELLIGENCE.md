@@ -1,9 +1,9 @@
-# Companion Decision Intelligence™
+# Companion Decision Intelligence
 ## How Shari Decides What Happens Next
 
 **Version:** 1.0  
 **Status:** Canonical — awaiting approval  
-**Authority:** Subordinate to Product Constitution™ · Companion Constitution™ · [`COMPANION_TRUST_ARCHITECTURE.md`](./COMPANION_TRUST_ARCHITECTURE.md) · [`EXPERIENCE_OF_SHARI.md`](./EXPERIENCE_OF_SHARI.md)  
+**Authority:** Subordinate to Product Constitution · Companion Constitution · [`COMPANION_TRUST_ARCHITECTURE.md`](./COMPANION_TRUST_ARCHITECTURE.md) · [`EXPERIENCE_OF_SHARI.md`](./EXPERIENCE_OF_SHARI.md)  
 **Governs:** Every Companion Brain judgment · conversation · room choice · suggestion · silence · hospitality · future intelligence modules
 
 **Implementation sibling:** `lib/companionDecisionIntelligence/` — turn evaluation (must conform to **this** philosophy)
@@ -75,7 +75,7 @@ The Brain quietly considers (never announces):
 
 ---
 
-# Part III — The Decision Ladder™
+# Part III — The Decision Ladder
 
 Evaluate **in order**. Do not skip rungs.
 
@@ -155,14 +155,14 @@ Room is **part of the intervention** — not wallpaper.
 
 | Need signal | Room bias | Atmosphere shift |
 |-------------|-----------|------------------|
-| Relief | Window Seat™ | Rain optional · blanket · fewer objects |
-| Clarity | Planning Table™ | One surface · planner open to today |
-| Focus | Focus Studio™ | Minimal · candle · Shari invisible |
-| Creativity | Creative Studio™ | Color · permission · sketchbook |
-| Strategy | Business Office™ | One strategy wall question |
-| Restoration | Garden™ · Porch™ | Body · slow · no metrics |
-| Celebration | Fire Circle™ · Back Deck™ | Warmth · don't rush leave |
-| Learning | Library™ · Reading Nook™ | Quiet · book pulled |
+| Relief | Window Seat | Rain optional · blanket · fewer objects |
+| Clarity | Planning Table | One surface · planner open to today |
+| Focus | Focus Studio | Minimal · candle · Shari invisible |
+| Creativity | Creative Studio | Color · permission · sketchbook |
+| Strategy | Business Office | One strategy wall question |
+| Restoration | Garden · Porch | Body · slow · no metrics |
+| Celebration | Fire Circle · Back Deck | Warmth · don't rush leave |
+| Learning | Library · Reading Nook | Quiet · book pulled |
 
 **Environmental decisions:**
 - Quieter? (recovery)  
@@ -170,7 +170,7 @@ Room is **part of the intervention** — not wallpaper.
 - Simpler? (flooded)  
 - **Fade Shari back?** (focus, writing, grief)  
 
-Orchestration: Needs Intelligence™ → room → hospitality → presence → conversation.
+Orchestration: Needs Intelligence → room → hospitality → presence → conversation.
 
 ---
 
@@ -185,7 +185,7 @@ Choose **one primary** from:
 | **Suggestion** | Invited or one gentle offer after relief |
 | **Tool** | User ready · trust earned · one tool |
 | **Room** | Transition as medicine |
-| **Story** | NGMTM™ · shame low · self-first humor |
+| **Story** | NGMTM · shame low · self-first humor |
 | **Humor** | After safety · Honest Shari |
 | **Silence** | Grief · vent · hyperfocus start |
 | **Celebration** | Win named · don't minimize |
@@ -244,18 +244,18 @@ The same words ≠ the same response. **Judgment matters.**
 
 ---
 
-# Part VII — Room Selection Intelligence™
+# Part VII — Room Selection Intelligence
 
 Choose rooms for **need** — not because they asked for a feature label.
 
 | They say | Need | Room (may be) | Why |
 |----------|------|---------------|-----|
-| *"My brain won't stop."* | Relief | **Window Seat™** | Gentlest place — not because Clear My Mind™ lives there |
-| *"Fifteen things to do."* | Clarity | **Planning Table™** | One day · one surface |
-| *"Lost all motivation."* | Restoration | **Front Porch™** swing | Not planner — rest first |
-| *"I know what to do, can't start."* | Focus | **Focus Studio™** | Protected attention |
+| *"My brain won't stop."* | Relief | **Window Seat** | Gentlest place — not because Clear My Mind lives there |
+| *"Fifteen things to do."* | Clarity | **Planning Table** | One day · one surface |
+| *"Lost all motivation."* | Restoration | **Front Porch** swing | Not planner — rest first |
+| *"I know what to do, can't start."* | Focus | **Focus Studio** | Protected attention |
 | *"Pricing is eating me."* | Strategy (+ shame?) | **Office** or **Window** | Shame → window first |
-| *"I want to write."* | Creativity | **Creative Studio™** | Permission to play |
+| *"I want to write."* | Creativity | **Creative Studio** | Permission to play |
 
 **Implementation:** `evaluateCompanionNeedsIntelligence()` informs room; **Decision Intelligence** chooses whether to **move** them there, **stay** in conversation, or **offer** the door.
 
@@ -280,7 +280,7 @@ A trusted companion doesn't always agree. **No builds trust when kind.**
 
 ---
 
-# Part IX — The One Next Right Thing™
+# Part IX — The One Next Right Thing
 
 Resist option floods. Ask internally:
 
@@ -298,7 +298,7 @@ Then guide **there** — one confident invitation, not a menu.
 
 ---
 
-# Part X — Decision Principles™
+# Part X — Decision Principles
 
 Every decision must pass:
 
@@ -323,11 +323,11 @@ The codebase implements judgment — it does not replace it.
 ```
 User + context
     ↓
-Decision Ladder™ (this document) — judgment
+Decision Ladder (this document) — judgment
     ↓
-Companion Needs Intelligence™ — need + room candidate
+Companion Needs Intelligence — need + room candidate
     ↓
-Companion Trust Architecture™ — what may be said
+Companion Trust Architecture — what may be said
     ↓
 lib/companionDecisionIntelligence/ — complexity, situation, experience mode
     ↓
@@ -344,7 +344,7 @@ Homestead orchestration — atmosphere, presence, hospitality
 | `companionBrainOrchestrator` | 5–6 (environment, presence) |
 | `clearMyMindCompanionVoice` | 6 (witness, hold) |
 
-**Rule:** If implementation suggests an action that fails Decision Principles™, **implementation yields** — not philosophy.
+**Rule:** If implementation suggests an action that fails Decision Principles, **implementation yields** — not philosophy.
 
 ---
 
@@ -355,11 +355,11 @@ Homestead orchestration — atmosphere, presence, hospitality
 ```
 Constitution
     ↓
-Experience of Shari™ · Honest Shari™
+Experience of Shari · Honest Shari
     ↓
-Companion Trust Architecture™
+Companion Trust Architecture
     ↓
-Companion Decision Intelligence™ (this document)
+Companion Decision Intelligence (this document)
     ↓
 Needs Intelligence · technical decision modules · Brain orchestrator
     ↓
@@ -372,7 +372,7 @@ Production copy · UI · rooms
 2. Was a **higher rung** skipped?  
 3. **One next right thing** or a menu?  
 4. **Room** chosen for need or feature label?  
-5. Pass **Decision Principles™** (all seven)?  
+5. Pass **Decision Principles** (all seven)?  
 6. Would a **thoughtful host** do this — or a workflow?  
 
 ---
@@ -391,4 +391,4 @@ The goal is the right **moment**.
 
 ---
 
-*Companion Decision Intelligence™ v1.0 — Judgment before workflow. Restraint before response. One next right thing.*
+*Companion Decision Intelligence v1.0 — Judgment before workflow. Restraint before response. One next right thing.*

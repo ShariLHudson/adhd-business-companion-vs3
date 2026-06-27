@@ -32,7 +32,7 @@ function resolveResponseStyle(
 }
 
 /**
- * Honor Their Intent™ — constitutional evaluation per turn.
+ * Honor Their Intent — constitutional evaluation per turn.
  */
 export function evaluateHonorTheirIntent(
   input: HonorTheirIntentInput = {},
@@ -111,7 +111,7 @@ export function honorTheirIntentHintForChat(
   verdict: HonorTheirIntentVerdict,
 ): string | null {
   const lines: string[] = [
-    "HONOR THEIR INTENT™ (constitutional — meet them where they are):",
+    "HONOR THEIR INTENT (constitutional — meet them where they are):",
     `Arrival: ${verdict.arrivalMode}. Style: ${verdict.responseStyle}.`,
     verdict.constitutionalPrinciple,
   ];
@@ -155,7 +155,7 @@ export function honorTheirIntentHintForChat(
   }
 
   lines.push(
-    "INTENT BEFORE ROUTING: Understand purpose before matching keywords (Meaning Before Matching™).",
+    "INTENT BEFORE ROUTING: Understand purpose before matching keywords (Meaning Before Matching).",
     "The guest chooses the door — walk through it with them.",
   );
 

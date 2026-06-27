@@ -56,7 +56,7 @@ export type ChangeImpactEstimate = {
   affectedSections: SectionImpactEstimate[];
 };
 
-/** Visual readiness — future Living Canvas™ / ripple UX. */
+/** Visual readiness — future Living Canvas / ripple UX. */
 export type CanvasImpactVisualState =
   | "none"
   | "low"
@@ -71,7 +71,7 @@ export type CanvasImpactStateMap = Partial<
   Record<BusinessCanvasSectionId, CanvasImpactVisualState>
 >;
 
-/** Phase 6 — version history readiness for Business Canvas™ snapshots. */
+/** Phase 6 — version history readiness for Business Canvas snapshots. */
 export type BusinessCanvasVersionRecord = {
   versionId: string;
   canvasId: string;

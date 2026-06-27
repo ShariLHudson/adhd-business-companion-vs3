@@ -1,4 +1,4 @@
-/** Designer Stories™ — Reading Collection. Never shown to guests. */
+/** Designer Stories — Reading Collection. Never shown to guests. */
 export const READING_DESIGNER_STORIES: Record<string, string> = {
   "obj-book-stack":
     "Library stack with one book always sideways — reading queue as furniture.",

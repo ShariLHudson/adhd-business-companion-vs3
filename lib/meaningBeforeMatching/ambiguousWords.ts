@@ -1,5 +1,5 @@
 /**
- * Meaning Before Matching™ — problem words that need context, not single-keyword routing.
+ * Meaning Before Matching — problem words that need context, not single-keyword routing.
  */
 
 export const PROBLEM_WORDS = [

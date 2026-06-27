@@ -1,5 +1,5 @@
 /**
- * Phase 4 — Business Operating Partner™
+ * Phase 4 — Business Operating Partner
  * From anticipation to business partnership. Help run the business, not just conversations.
  */
 
@@ -480,7 +480,7 @@ export function formatBusinessOperatingManualForPanel(
     ? stage.charAt(0).toUpperCase() + stage.slice(1)
     : "Growth";
   return [
-    "## Business Operating Manual™",
+    "## Business Operating Manual",
     "",
     "### Business Stage",
     stageLabel,
@@ -507,7 +507,7 @@ export function formatBusinessOperatingManualForDisplay(
 ): string {
   const g = manual.howBusinessGrows;
   const lines = [
-    "## Business Operating Manual™",
+    "## Business Operating Manual",
     "",
     "_How this business grows — continuously evolving._",
     "",
@@ -567,7 +567,7 @@ export function phase4BusinessOperatingPartnerHintForChat(input?: {
   const proactive = input?.proactiveSupport ?? maybeProactiveBusinessSupport({ userText: input?.userText });
 
   const parts = [
-    "PHASE 4 BUSINESS OPERATING PARTNER™ (trusted partner — not software):",
+    "PHASE 4 BUSINESS OPERATING PARTNER (trusted partner — not software):",
     "Goal: help run the business — goals, projects, momentum, opportunities — not just chat.",
     "User should feel: 'I have a business partner' — NOT coach, chatbot, or productivity tool.",
     "Never pushy, nagging, controlling, or managing. Permission first. User remains in control.",

@@ -47,6 +47,6 @@ export function resolveDailyDiscovery(
     return { kind: match.object, label: match.label };
   }
 
-  // Modulo rotation deprecated — Living Change Engine™ selects caused hospitality.
+  // Modulo rotation deprecated — Living Change Engine selects caused hospitality.
   return null;
 }

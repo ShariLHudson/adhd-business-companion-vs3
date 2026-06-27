@@ -125,7 +125,7 @@ export type LivingChangeEngineInput = {
   motion: { enabled: CompanionMotionKind[] };
   livingLifeContext?: LivingLifeContext;
   homesteadPeriod?: HomesteadTimePeriod;
-  /** Companion Relationship™ — rhythm adapts; Shari never changes */
+  /** Companion Relationship — rhythm adapts; Shari never changes */
   companionRelationship?: import("@/lib/companionRelationship").CompanionRelationshipVerdict;
 };
 

@@ -270,12 +270,20 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
 
     void (async () => {
       try {
-        const ready =
-          companionAuthConfigured() ||
-          (await bootstrapCompanionSupabaseConfig());
+        let ready = companionAuthConfigured();
+        if (!ready) {
+          for (let attempt = 0; attempt < 3 && !ready; attempt += 1) {
+            ready = await bootstrapCompanionSupabaseConfig();
+            if (!ready && attempt < 2) {
+              await new Promise((resolve) =>
+                window.setTimeout(resolve, 600 * (attempt + 1)),
+              );
+            }
+          }
+        }
         if (!mounted) return;
-        setConfigured(ready);
-        if (!ready) return;
+        setConfigured(companionAuthConfigured());
+        if (!companionAuthConfigured()) return;
 
         const supabase = getCompanionSupabase();
         if (!supabase) return;

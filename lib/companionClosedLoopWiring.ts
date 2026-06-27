@@ -1,5 +1,5 @@
 /**
- * Client wiring helpers for Closed Loop Learning™ — thin API for CompanionPageClient.
+ * Client wiring helpers for Closed Loop Learning — thin API for CompanionPageClient.
  */
 
 import type { EmotionalState } from "./companionEmotions";

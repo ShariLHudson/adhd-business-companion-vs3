@@ -71,12 +71,12 @@ export function VisualFocusStudioHub({
       {continueThinking.length > 0 ? (
         <section className="mt-6" data-testid="continue-thinking">
           <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
-            Continue Thinking™
+            Continue Thinking
           </p>
           <p className="mt-1 text-sm text-[#6b635a]">
             Resume momentum — not storage. Up to three active maps. Use{" "}
             <span className="font-semibold text-[#1f1c19]">Remove</span> to free a
-            slot (map stays in Saved™) or <span className="font-semibold text-[#9b2c2c]">Delete</span>{" "}
+            slot (map stays in Saved) or <span className="font-semibold text-[#9b2c2c]">Delete</span>{" "}
             to remove it permanently.
           </p>
           <div className="mt-3 flex flex-col gap-3 sm:flex-row">

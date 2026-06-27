@@ -1,5 +1,5 @@
 /**
- * Companion Universe™ — shared types across all homestead libraries.
+ * Companion Universe — shared types across all homestead libraries.
  */
 
 export type CompanionPlaceId =
@@ -178,9 +178,9 @@ export type UniverseOrchestrationInput = {
   useProductionPath?: boolean;
   /** Optional hospitality profile — what Shari remembers, not who the guest is. */
   hospitalityProfile?: import("./libraries/hospitalityProfileLibrary").CompanionHospitalityProfile;
-  /** Activity modifiers for Companion Presence Engine™. */
+  /** Activity modifiers for Companion Presence Engine. */
   presenceModifiers?: import("./companionPresenceEngine").PresenceActivityModifier[];
-  /** Current context for Companion Needs Intelligence™ — earliest orchestration step. */
+  /** Current context for Companion Needs Intelligence — earliest orchestration step. */
   needsContext?: import("@/lib/companionNeedsIntelligence").CompanionNeedsInput;
   userSeed?: string;
 };
@@ -200,8 +200,8 @@ export type UniverseOrchestrationResult = {
   greeting?: string;
   invite?: string;
   atmosphere?: string;
-  /** Companion Presence Engine™ — should Shari stay or step back? */
+  /** Companion Presence Engine — should Shari stay or step back? */
   presence: import("./companionPresenceEngine").ResolvedCompanionPresence;
-  /** Companion Needs Intelligence™ — what they need before the room is prepared. */
+  /** Companion Needs Intelligence — what they need before the room is prepared. */
   needs: import("@/lib/companionNeedsIntelligence").CompanionNeedsIntelligence | null;
 };

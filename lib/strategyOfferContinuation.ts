@@ -1,5 +1,5 @@
 /**
- * P0.18 — Strategy Offer Continuation™
+ * P0.18 — Strategy Offer Continuation
  * Register ADHD strategy offers so "yes" opens Strategies + apply-coach.
  */
 

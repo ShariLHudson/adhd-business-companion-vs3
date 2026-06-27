@@ -1,4 +1,4 @@
-/** Designer Stories™ — Coffee & Comfort Collection. Never shown to guests. */
+/** Designer Stories — Coffee & Comfort Collection. Never shown to guests. */
 export const COFFEE_DESIGNER_STORIES: Record<string, string> = {
   "obj-shari-signature-mug":
     "Shari's favorite mug — the one she reaches for every morning. Chip on the handle she won't retire.",

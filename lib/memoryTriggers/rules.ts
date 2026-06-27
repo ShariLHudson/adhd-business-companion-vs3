@@ -1,5 +1,5 @@
 /**
- * Memory Triggers™ — story-first rules; never announce the room.
+ * Memory Triggers — story-first rules; never announce the room.
  */
 
 export const MEMORY_TRIGGER_ANNOUNCEMENT_BANS = [

@@ -1,5 +1,5 @@
 /**
- * Memory Triggers™ — awakening memories through everyday senses.
+ * Memory Triggers — awakening memories through everyday senses.
  * @see docs/companion-homestead/MEMORY_TRIGGERS.md
  */
 
@@ -54,7 +54,7 @@ export type MemoryTriggersInput = {
   grief?: boolean;
   /** Visits with meaningful relationship — unlock established triggers */
   establishedRelationship?: boolean;
-  /** Companion Relationship™ rhythm — adjusts frequency, not personality */
+  /** Companion Relationship rhythm — adjusts frequency, not personality */
   companionRelationship?: CompanionRelationshipVerdict | null;
 };
 

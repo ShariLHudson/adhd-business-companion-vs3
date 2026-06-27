@@ -1,5 +1,5 @@
 /**
- * Companion Capability Registry™ — canonical registration for every ecosystem capability.
+ * Companion Capability Registry — canonical registration for every ecosystem capability.
  *
  * Registry-driven routing replaces ad-hoc feature conditionals where possible.
  * Spec: docs-companion-intelligence/25_Capability_Registration_And_12_10_Readiness.md
@@ -358,7 +358,7 @@ export const COMPANION_CAPABILITY_REGISTRY: CompanionCapabilityEntry[] = [
   }),
   workspaceEntry({
     id: "adapt_my_day",
-    name: "Today's Reality™",
+    name: "Today's Reality",
     category: "productivity_ecosystem",
     status: "production",
     ownerModule: "lib/adaptMyDayChatRouting.ts",

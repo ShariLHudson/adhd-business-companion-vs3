@@ -37,7 +37,7 @@ function resolveCategory(input: GreetingIntelligenceInput): string {
 }
 
 /**
- * Greeting Intelligence™ — selects from Shari Voice Bible™.
+ * Greeting Intelligence — selects from Shari Voice Bible.
  */
 export function evaluateGreetingIntelligence(
   input: GreetingIntelligenceInput,

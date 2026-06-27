@@ -1,10 +1,10 @@
-# Journey Between Rooms™
-## Companion Homestead™ — How Movement Feels
+# Journey Between Rooms
+## Companion Homestead — How Movement Feels
 
 **Version:** 1.0  
 **Status:** Canonical design authority — **design only; no implementation in this sprint**  
-**Authority:** Subordinate to Product Constitution™ · Companion Constitution™ · [`MASTER_PROPERTY_BLUEPRINT.md`](./MASTER_PROPERTY_BLUEPRINT.md) · [`Shari Voice Bible™`](../../lib/shariVoiceBible/CONSTITUTION.md)  
-**Sibling documents:** [`COMPANION_JOURNEY_EXPERIENCE_BIBLE.md`](../COMPANION_JOURNEY_EXPERIENCE_BIBLE.md) (Part V — Art of Transitions™) · [`FIRST_PRODUCTION_EXPERIENCE.md`](./FIRST_PRODUCTION_EXPERIENCE.md) · [`SCREEN_COMPOSITION_GUIDE.md`](./SCREEN_COMPOSITION_GUIDE.md) · room look books in [`../room-lookbooks/`](../room-lookbooks/)
+**Authority:** Subordinate to Product Constitution · Companion Constitution · [`MASTER_PROPERTY_BLUEPRINT.md`](./MASTER_PROPERTY_BLUEPRINT.md) · [`Shari Voice Bible`](../../lib/shariVoiceBible/CONSTITUTION.md)  
+**Sibling documents:** [`COMPANION_JOURNEY_EXPERIENCE_BIBLE.md`](../COMPANION_JOURNEY_EXPERIENCE_BIBLE.md) (Part V — Art of Transitions) · [`FIRST_PRODUCTION_EXPERIENCE.md`](./FIRST_PRODUCTION_EXPERIENCE.md) · [`SCREEN_COMPOSITION_GUIDE.md`](./SCREEN_COMPOSITION_GUIDE.md) · room look books in [`../room-lookbooks/`](../room-lookbooks/)
 
 **This is not:**
 - A page-transition spec
@@ -38,7 +38,7 @@ We have designed the rooms.
 
 The next step is to design how people **naturally move between them**.
 
-The Companion Homestead™ is not a collection of pages. It is **one home**.
+The Companion Homestead is not a collection of pages. It is **one home**.
 
 The guest should never feel like they left one page and opened another. They should feel like they **walked through the house**.
 
@@ -60,17 +60,17 @@ The **emotional state travels with the guest**. The house remembers. The convers
 The guest **goes somewhere**.
 
 ```
-Living Room™
+Living Room
     ↓  (east hall, morning light)
-Planning Table™
+Planning Table
     ↓  (back through living room, softer pace)
-Window Seat™
+Window Seat
     ↓  (southwest bump-out, quieter)
-Reading Nook™
+Reading Nook
     ↓  (glass wing, golden hour)
-Creative Studio™
+Creative Studio
     ↓  (home again)
-Living Room™
+Living Room
 ```
 
 Everything is **connected** — physically on the blueprint, emotionally in memory, conversationally in chat.
@@ -107,12 +107,12 @@ Movement must respect [`MASTER_PROPERTY_BLUEPRINT.md`](./MASTER_PROPERTY_BLUEPRI
 
 | From | To | Physical path | ~Steps felt | Light shift |
 |------|-----|---------------|-------------|-------------|
-| Living Room™ | Planning Table™ | East hall past kitchen smell | 8–12 | Morning clear → planner sun |
-| Planning Table™ | Window Seat™ | Back through living room, southwest | 10–14 | Bright → soft side light |
-| Window Seat™ | Reading Nook™ | Quiet wing, same floor | 6–8 | Rain-muted → reef glow |
-| Reading Nook™ | Creative Studio™ | Southeast glass wing | 10–12 | Calm → golden color |
-| Creative Studio™ | Living Room™ | Return through hall | 10–14 | Creative warmth → hearth |
-| Any room | Living Room™ | Shortest honest path home | varies | Whatever room was → hearth |
+| Living Room | Planning Table | East hall past kitchen smell | 8–12 | Morning clear → planner sun |
+| Planning Table | Window Seat | Back through living room, southwest | 10–14 | Bright → soft side light |
+| Window Seat | Reading Nook | Quiet wing, same floor | 6–8 | Rain-muted → reef glow |
+| Reading Nook | Creative Studio | Southeast glass wing | 10–12 | Calm → golden color |
+| Creative Studio | Living Room | Return through hall | 10–14 | Creative warmth → hearth |
+| Any room | Living Room | Shortest honest path home | varies | Whatever room was → hearth |
 
 **Rule:** Never imply the guest teleported. If the path passes the living room, the guest may **glimpse** it — fireplace glow, window light — even if they do not stop.
 
@@ -136,7 +136,7 @@ flowchart LR
 
 ---
 
-# Part IV — Every Room Has A Threshold™
+# Part IV — Every Room Has A Threshold
 
 A threshold is a **doorway moment** — intentional, human, never a feature label.
 
@@ -146,26 +146,26 @@ A threshold is a **doorway moment** — intentional, human, never a feature labe
 |---------|---------|
 | **Threshold line** | One short sentence Shari says at the door — invitation, not instruction |
 | **Doorway beat** | 0.5–1.0s pause — guest chooses to cross |
-| **Crossing** | Transitional Moment™ begins |
+| **Crossing** | Transitional Moment begins |
 | **Arrival line** | Optional — only if room needs orientation; often silence |
 
 ## Threshold copy principles
 
 - No feature names (*Plan My Day*, *Brain Dump*, section IDs)
 - No productivity commands (*shape your day*, *optimize*)
-- No "Let's…" coaching openers — Voice Bible™ rules apply
+- No "Let's…" coaching openers — Voice Bible rules apply
 - Maximum **12 words** for walking line; **one sentence** at threshold
-- All threshold lines live in **Shari Voice Bible™** (`kind: invitation` or future `kind: threshold`) — never ad-hoc in components
+- All threshold lines live in **Shari Voice Bible** (`kind: invitation` or future `kind: threshold`) — never ad-hoc in components
 
 ## Phase 1 threshold library (design authority)
 
 | Room | Threshold feeling | Example threshold lines (approved direction) |
 |------|-------------------|---------------------------------------------|
-| **Living Room™** | Exhale; you are home | *"You don't have to figure everything out here."* · *"Come in."* · *"Home."* |
-| **Planning Table™** | Spread it out; one day | *"We can spread everything out."* · *"Table's clear."* · *"One day at a time."* |
-| **Window Seat™** | Quieter; unload | *"Come sit by the window for a minute."* · *"Quieter over here."* · *"Window's open."* |
-| **Reading Nook™** | Absorb; gentle focus | *"I think you'll like it in here."* · *"Nook's calm today."* · *"Good light for reading."* |
-| **Creative Studio™** | Permission; play | *"I've been saving something to show you."* · *"Studio's bright."* · *"Room for ideas."* |
+| **Living Room** | Exhale; you are home | *"You don't have to figure everything out here."* · *"Come in."* · *"Home."* |
+| **Planning Table** | Spread it out; one day | *"We can spread everything out."* · *"Table's clear."* · *"One day at a time."* |
+| **Window Seat** | Quieter; unload | *"Come sit by the window for a minute."* · *"Quieter over here."* · *"Window's open."* |
+| **Reading Nook** | Absorb; gentle focus | *"I think you'll like it in here."* · *"Nook's calm today."* · *"Good light for reading."* |
+| **Creative Studio** | Permission; play | *"I've been saving something to show you."* · *"Studio's bright."* · *"Room for ideas."* |
 
 **Arriving home** (any room → Living Room):
 
@@ -173,11 +173,11 @@ A threshold is a **doorway moment** — intentional, human, never a feature labe
 |---------|---------|
 | Return without failure | *"Back home."* · *"Here again."* · *"Living room."* |
 
-Threshold lines are **offers**. Guest can decline and stay. Consent always — per Journey Experience Bible™ Part V.
+Threshold lines are **offers**. Guest can decline and stay. Consent always — per Journey Experience Bible Part V.
 
 ---
 
-# Part V — Transitional Moments™
+# Part V — Transitional Moments
 
 Movement takes **approximately 1–2 seconds**. Never abrupt. Never flashy. Never game-like.
 
@@ -203,7 +203,7 @@ The guest should simply **feel like they moved**.
 | **Room reveal** | Destination photograph eases in from direction of travel (east walk = content from right) | Maintains orientation |
 | **Ambient bleed** | Previous room audio fades 400ms after new room audio rises | Continuity |
 
-## Forbidden (ADHD Design Rules™ — motion)
+## Forbidden (ADHD Design Rules — motion)
 
 - Flash
 - Spin
@@ -233,7 +233,7 @@ When `prefers-reduced-motion: reduce`:
 
 ---
 
-# Part VI — Rooms Continue Living™
+# Part VI — Rooms Continue Living
 
 When the guest leaves a room, **nothing freezes**.
 
@@ -245,11 +245,11 @@ The UI may not show every change on every return — but the system must **never
 
 | Room | While guest is away | On return — guest may notice |
 |------|---------------------|------------------------------|
-| **Living Room™** | Steam from mug fades; sun angle shifts; Kinsey moves (window → rug → hall) | Warmer or cooler light; mug at different level; blanket folded differently |
-| **Planning Table™** | Planner may open to today; pen cap off; coffee cup migrates | Page turned; one sticky note added or removed |
-| **Window Seat™** | Rain continues or clears; blanket draped | Different weather on glass; candle shorter |
-| **Reading Nook™** | Fish in reef tank move; bookmark advanced if guest was reading | Different fish configuration; lamp already on if evening |
-| **Creative Studio™** | Project left mid-process; pencil moved | Same project, new scribble; window light more golden |
+| **Living Room** | Steam from mug fades; sun angle shifts; Kinsey moves (window → rug → hall) | Warmer or cooler light; mug at different level; blanket folded differently |
+| **Planning Table** | Planner may open to today; pen cap off; coffee cup migrates | Page turned; one sticky note added or removed |
+| **Window Seat** | Rain continues or clears; blanket draped | Different weather on glass; candle shorter |
+| **Reading Nook** | Fish in reef tank move; bookmark advanced if guest was reading | Different fish configuration; lamp already on if evening |
+| **Creative Studio** | Project left mid-process; pencil moved | Same project, new scribble; window light more golden |
 
 ## Rules
 
@@ -261,7 +261,7 @@ The UI may not show every change on every return — but the system must **never
 
 ---
 
-# Part VII — Emotional Continuity™
+# Part VII — Emotional Continuity
 
 The guest's **emotional state travels with them**.
 
@@ -292,7 +292,7 @@ Rooms should not start over. They should **continue the conversation**.
 
 ---
 
-# Part VIII — The House Remembers™
+# Part VIII — The House Remembers
 
 During movement, the guest should sense **one property** — not isolated JPEGs.
 
@@ -319,7 +319,7 @@ The guest always knows:
 
 ---
 
-# Part IX — ADHD Design Rules™ (movement)
+# Part IX — ADHD Design Rules (movement)
 
 Transitions exist to **reduce anxiety**, not perform.
 
@@ -391,7 +391,7 @@ If guest declines Shari's room offer:
 
 ---
 
-# Part XII — Walkthrough Day™ (experience rehearsal)
+# Part XII — Walkthrough Day (experience rehearsal)
 
 **No coding.** Walk this day before any implementation sprint.
 
@@ -399,13 +399,13 @@ Imagine opening the Homestead at **7:00 AM** and living through it.
 
 | Time | Location | Experience check |
 |------|----------|----------------|
-| **7:00** | Living Room™ | Coffee morning; one greeting; no feature menu. Feels like arrival. |
-| **7:15** | Walk → Planning Table™ | Threshold + 1.5s walk; planner already open; chat continues from living room topic. |
-| **7:45** | Walk → Creative Studio™ | Energy from planning carries; studio feels bright, not unrelated. |
-| **8:30** | Walk → Living Room™ | Home again; mug moved; sun shifted; no re-greeting. |
-| **12:00** | Walk → Window Seat™ (Clear My Mind) | Quieter; overwhelmed thread honored; no productivity push. |
-| **12:25** | Walk → Reading Nook™ | Slower pace; fish moving; grief/relief still in Shari's tone. |
-| **1:00** | Walk → Living Room™ | Afternoon light; Kinsey different place; conversation one thread. |
+| **7:00** | Living Room | Coffee morning; one greeting; no feature menu. Feels like arrival. |
+| **7:15** | Walk → Planning Table | Threshold + 1.5s walk; planner already open; chat continues from living room topic. |
+| **7:45** | Walk → Creative Studio | Energy from planning carries; studio feels bright, not unrelated. |
+| **8:30** | Walk → Living Room | Home again; mug moved; sun shifted; no re-greeting. |
+| **12:00** | Walk → Window Seat (Clear My Mind) | Quieter; overwhelmed thread honored; no productivity push. |
+| **12:25** | Walk → Reading Nook | Slower pace; fish moving; grief/relief still in Shari's tone. |
+| **1:00** | Walk → Living Room | Afternoon light; Kinsey different place; conversation one thread. |
 | **6:30 PM** | Return (same day) | Evening lamp on; **no** *"Welcome back!"* — *"Evening."* or *"Hi."* only. |
 | **7:00** | End | Memory test: *"I spent the day at Shari's house."* |
 
@@ -436,7 +436,7 @@ If any box fails — **fix the design**, not the code.
 
 ## What this document authorizes (future sprint)
 
-1. `JourneyBetweenRooms™` state — departure room, in-transit, arrival room  
+1. `JourneyBetweenRooms` state — departure room, in-transit, arrival room  
 2. Threshold offer UI — consent before cross  
 3. Transit layer — 1–2s crossfade + directional reveal per matrix  
 4. `RoomContinuityStore` — per-room living deltas  
@@ -454,11 +454,11 @@ If any box fails — **fix the design**, not the code.
 
 # Part XIV — Approval gate
 
-Before implementation of Journey Between Rooms™:
+Before implementation of Journey Between Rooms:
 
 - [ ] This document reviewed  
-- [ ] Walkthrough Day™ completed on paper or prototype — all pass criteria met  
-- [ ] Threshold lines added to Shari Voice Bible™  
+- [ ] Walkthrough Day completed on paper or prototype — all pass criteria met  
+- [ ] Threshold lines added to Shari Voice Bible  
 - [ ] Movement matrix signed off for Phase 1 five rooms  
 - [ ] Reduced-motion path defined  
 - [ ] Chat-never-stops behavior signed off  
@@ -479,4 +479,4 @@ Then — and only then — build it.
 
 ---
 
-*Companion Homestead™ · Journey Between Rooms™ · Every Room Has A Threshold™ · Transitional Moments™ · Rooms Continue Living™ · Emotional Continuity™ · The House Remembers™ · Walkthrough Day™*
+*Companion Homestead · Journey Between Rooms · Every Room Has A Threshold · Transitional Moments · Rooms Continue Living · Emotional Continuity · The House Remembers · Walkthrough Day*

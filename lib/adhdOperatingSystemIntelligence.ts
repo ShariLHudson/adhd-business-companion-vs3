@@ -1,5 +1,5 @@
 /**
- * ADHD Operating System Intelligence™ (P0.8.1)
+ * ADHD Operating System Intelligence (P0.8.1)
  * Identifies how the user's ADHD brain creates momentum, loses momentum,
  * makes decisions, and finishes work — not surface symptom labels.
  */

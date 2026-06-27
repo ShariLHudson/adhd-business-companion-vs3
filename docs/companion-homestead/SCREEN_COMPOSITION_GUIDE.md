@@ -1,4 +1,4 @@
-# Companion Homestead™ Screen Composition Guide
+# Companion Homestead Screen Composition Guide
 ## How Every Room Becomes a Screen
 
 **Version:** 1.0  
@@ -8,7 +8,7 @@
 **Bridges:**
 
 ```
-Room Look Books™  →  Screen Composition Guide™  →  Production UI
+Room Look Books  →  Screen Composition Guide  →  Production UI
 ```
 
 **Prerequisites (approved):**
@@ -27,7 +27,7 @@ Room Look Books™  →  Screen Composition Guide™  →  Production UI
 
 ## The One Recognition Test
 
-A guest moves from the Living Room™ to the Window Seat™ to the Creative Studio™.
+A guest moves from the Living Room to the Window Seat to the Creative Studio.
 
 They must immediately feel:
 
@@ -44,12 +44,12 @@ Same handwriting in materials, light, card behavior, and navigation chrome. Diff
 | Order | Document | Role |
 |-------|----------|------|
 | 1 | Manifesto + Constitutions | Why |
-| 2 | Visual Design Bible™ | House DNA |
-| 3 | Room Look Books™ | Room soul |
-| 4 | **Screen Composition Guide™** (this document) | How rooms become screens |
+| 2 | Visual Design Bible | House DNA |
+| 3 | Room Look Books | Room soul |
+| 4 | **Screen Composition Guide** (this document) | How rooms become screens |
 | 5 | [`FIRST_PRODUCTION_EXPERIENCE.md`](./FIRST_PRODUCTION_EXPERIENCE.md) | First 30–60s arrival journey |
 | 6 | [`LIVING_LIFE_ENGINE.md`](./LIVING_LIFE_ENGINE.md) | Living place — natural change over time |
-| 7 | Companion Layout System™ + Scene Integrity Engine™ | Implementation contracts |
+| 7 | Companion Layout System + Scene Integrity Engine | Implementation contracts |
 | 8 | Production UI | Pixels |
 
 No page ships until it passes this guide **and** its room look book.
@@ -58,12 +58,12 @@ No page ships until it passes this guide **and** its room look book.
 
 # Part I — Universal Screen Anatomy
 
-Every Companion Homestead™ screen is a **stack of seven layers**, bottom to top. Layers are conceptual — not necessarily separate DOM nodes — but every implementation must account for all seven.
+Every Companion Homestead screen is a **stack of seven layers**, bottom to top. Layers are conceptual — not necessarily separate DOM nodes — but every implementation must account for all seven.
 
 ```
 ┌─────────────────────────────────────────────────────────┐
 │  7. Interaction Layer    chat · input · voice · scroll  │
-│  6. Object Layer         Companion Objects™             │
+│  6. Object Layer         Companion Objects             │
 │  5. UI Layer             cards · buttons · workspace     │
 │  4. Companion Layer     Shari presence                  │
 │  3. Atmosphere Layer     light · weather · season · audio│
@@ -86,9 +86,9 @@ Every Companion Homestead™ screen is a **stack of seven layers**, bottom to to
 
 | Decision | Rule |
 |----------|------|
-| **How much is visible?** | Governed by **Room Immersion Profile** — environment share percent per place (see Part III). Living Room™ may approach full viewport; work rooms reserve 65–90% for working layer. |
-| **Focal point** | The room's **Signature Feature™** from its look book — fireplace, Iowa view, reef, planning desk, active project table. Photography composed so the hero sits in the **upper or upper-center band** unless the look book specifies otherwise. |
-| **Negative space for UI** | **Safe composition zones** — declarative regions where copy, cards, and chat may float without covering the hero. Negative space is **designed**, not leftover. Scene Integrity Engine™ assigns zones per image ID. |
+| **How much is visible?** | Governed by **Room Immersion Profile** — environment share percent per place (see Part III). Living Room may approach full viewport; work rooms reserve 65–90% for working layer. |
+| **Focal point** | The room's **Signature Feature** from its look book — fireplace, Iowa view, reef, planning desk, active project table. Photography composed so the hero sits in the **upper or upper-center band** unless the look book specifies otherwise. |
+| **Negative space for UI** | **Safe composition zones** — declarative regions where copy, cards, and chat may float without covering the hero. Negative space is **designed**, not leftover. Scene Integrity Engine assigns zones per image ID. |
 | **Avoiding clutter** | Foreground object cap (max five ranked objects). No decorative props that compete with signature feature. No beige placeholder blocks — hide asset until ready. |
 
 **Object position:** `object-position` equivalent concept — anchor focal point per scene (e.g., fireplace center-left, view center-right). Never center-crop the hero under a opaque card.
@@ -112,7 +112,7 @@ Every Companion Homestead™ screen is a **stack of seven layers**, bottom to to
 | **One hero motion** | Maximum one motion element may carry emotional weight (fire flicker, reef current, rain on glass). Everything else **subtle or static**. |
 | **Amplitude** | Slow cycles — seconds to minutes, not milliseconds. No bounce, no pulse, no attention-grabbing loops. |
 | **Reduced motion** | Respect `prefers-reduced-motion` — hero motion off or replaced with still frame. |
-| **Integrity** | No butterflies in winter. No harsh sun in rain. No snow indoors. Scene Integrity Library™ enforces combinations. |
+| **Integrity** | No butterflies in winter. No harsh sun in rain. No snow indoors. Scene Integrity Library enforces combinations. |
 
 **Never:** Particle systems, confetti, parallax carnival, animated emoji, multiple competing loops.
 
@@ -122,7 +122,7 @@ Every Companion Homestead™ screen is a **stack of seven layers**, bottom to to
 
 **What it is:** Lighting, time of day, weather, season, window behavior, ambient audio.
 
-**Source of truth:** **Scene Integrity Engine™** only — never hand-picked per screen in production code.
+**Source of truth:** **Scene Integrity Engine** only — never hand-picked per screen in production code.
 
 | Input | Output |
 |-------|--------|
@@ -153,17 +153,17 @@ Every Companion Homestead™ screen is a **stack of seven layers**, bottom to to
 **Pose vocabulary:**
 
 - **Standing** — rare; arrival, celebration threshold
-- **Sitting** — Living Room™, Creative Studio™ partner work
-- **Not in frame** — Window Seat™, deep focus rooms — voice only in Interaction Layer
+- **Sitting** — Living Room, Creative Studio partner work
+- **Not in frame** — Window Seat, deep focus rooms — voice only in Interaction Layer
 
 **Gaze:**
 
 - Toward user — welcome, partnership
-- Toward window/view — Window Seat™ listener mode; not required elsewhere
+- Toward window/view — Window Seat listener mode; not required elsewhere
 
 **Never:** Animated AI Shari · lip-sync avatar · portrait covering signature feature · multiple Shari instances · guilt face on absence
 
-**Kinsey™:** Only when look book allows — never on object layer as icon; physical dog in scene or absent.
+**Kinsey:** Only when look book allows — never on object layer as icon; physical dog in scene or absent.
 
 ---
 
@@ -173,7 +173,7 @@ Every Companion Homestead™ screen is a **stack of seven layers**, bottom to to
 
 The room remains part of the experience. Cards are **paper on the table**, not walls erected in front of the fireplace.
 
-### Universal UI Language™
+### Universal UI Language
 
 | Property | Specification |
 |----------|---------------|
@@ -201,7 +201,7 @@ Work rooms: UI workspace occupies **center-lower viewport** — cream surface mi
 
 ## 6. Object Layer
 
-**What it is:** **Companion Objects™** from registry — recognition, not decoration.
+**What it is:** **Companion Objects** from registry — recognition, not decoration.
 
 | Display mode | When |
 |--------------|------|
@@ -243,7 +243,7 @@ Work rooms: UI workspace occupies **center-lower viewport** — cream surface mi
 
 # Part II — Cross-Room Systems
 
-## Eye Path™
+## Eye Path
 
 Intended visual journey per screen — **one path**, no fighting for attention.
 
@@ -266,22 +266,22 @@ Environment edge (breathing room)
 **Rules:**
 
 - Eyes hit **hero first** — then **one** primary task
-- Chat does not compete with hero on cold open unless Living Room™ arrival
+- Chat does not compete with hero on cold open unless Living Room arrival
 - No sidebar + center grid + bottom banner all shouting
 
 ### Phase 1 Eye Paths (approved rooms)
 
-| Room | Eye Path™ |
+| Room | Eye Path |
 |------|-----------|
-| **Living Room™** | Fireplace → Shari greeting → invite line → single continue action → chat entry → fireplace ember (return to calm) |
-| **Planning Table™** | Handcrafted desk / planner → today's date context → three priorities max → plan items → nearby Shari chip → window edge |
-| **Window Seat™** | Iowa view / rain → capture field → thought cards (minimal) → whisper chat → view again |
-| **Reading Nook™** | Reef glow → reading lamp → open content / strategy card → shelf edge → optional chat |
-| **Creative Studio™** | Active project table → draft surface → one artifact focus → partner Shari chip → golden window edge |
+| **Living Room** | Fireplace → Shari greeting → invite line → single continue action → chat entry → fireplace ember (return to calm) |
+| **Planning Table** | Handcrafted desk / planner → today's date context → three priorities max → plan items → nearby Shari chip → window edge |
+| **Window Seat** | Iowa view / rain → capture field → thought cards (minimal) → whisper chat → view again |
+| **Reading Nook** | Reef glow → reading lamp → open content / strategy card → shelf edge → optional chat |
+| **Creative Studio** | Active project table → draft surface → one artifact focus → partner Shari chip → golden window edge |
 
 ---
 
-## Room Density™
+## Room Density
 
 UI density must match emotional promise. Classification drives max cards, motion, and decisions.
 
@@ -295,26 +295,26 @@ UI density must match emotional promise. Classification drives max cards, motion
 
 ### Phase 1 room assignments
 
-| Room | Room Density™ | Immersion profile | Environment share |
+| Room | Room Density | Immersion profile | Environment share |
 |------|---------------|-------------------|-------------------|
-| Living Room™ | **Very Calm** | `full-arrival` | ~95% |
-| Window Seat™ | **Calm** | `environmental-header` | ~35% |
-| Planning Table™ | **Balanced** | `warm-workspace` | ~25% |
-| Reading Nook™ | **Calm** | `warm-workspace` | ~25% |
-| Creative Studio™ | **Creative** | `creative-studio` | ~30% |
+| Living Room | **Very Calm** | `full-arrival` | ~95% |
+| Window Seat | **Calm** | `environmental-header` | ~35% |
+| Planning Table | **Balanced** | `warm-workspace` | ~25% |
+| Reading Nook | **Calm** | `warm-workspace` | ~25% |
+| Creative Studio | **Creative** | `creative-studio` | ~30% |
 
 Density caps are **hard** — overflow goes behind progressive disclosure, not tighter grids.
 
 ---
 
-## ADHD Rules™ (Screen-Level)
+## ADHD Rules (Screen-Level)
 
 Global constraints on every homestead screen:
 
 | Dimension | Maximum |
 |-----------|---------|
 | **Visible primary decisions** | 3 (1 on Very Calm) |
-| **Simultaneous cards** | Per Room Density™ table |
+| **Simultaneous cards** | Per Room Density table |
 | **Hero motion elements** | 1 |
 | **Competing accent colors** | 2 (room tint + one action accent) |
 | **Animated UI elements** | 0 on load; 1 on user action if needed |
@@ -323,11 +323,11 @@ Global constraints on every homestead screen:
 
 **Executive function:** One next thing visible. **Working memory:** State on screen, not in hidden tabs. **Overwhelm:** Progressive disclosure. **Decision fatigue:** Defaults chosen; "not today" always available. **Attention:** Hero anchors gaze. **Emotional regulation:** Warm surfaces before red urgency.
 
-Aligns with Companion Behavior Audit™ — no feature mall, no premature routing.
+Aligns with Companion Behavior Audit — no feature mall, no premature routing.
 
 ---
 
-## Never Do™ (Composition)
+## Never Do (Composition)
 
 | Violation | Why |
 |-----------|-----|
@@ -340,7 +340,7 @@ Aligns with Companion Behavior Audit™ — no feature mall, no premature routin
 | Glass over entire photograph | Legibility without destroying warmth — use scrim + cream workspace |
 | Multiple heroes (fire + reef + Shari + banner) | Cognitive overload |
 | Streak badges, guilt copy, red overdue | Trust violation |
-| Emoji feature identity | Object Language™ breach |
+| Emoji feature identity | Object Language breach |
 
 ---
 
@@ -350,7 +350,7 @@ Each sheet summarizes how the seven layers apply. Full emotional detail remains 
 
 ---
 
-## Living Room™ (`living-room`)
+## Living Room (`living-room`)
 
 | Layer | Specification |
 |-------|---------------|
@@ -362,12 +362,12 @@ Each sheet summarizes how the seven layers apply. Full emotional detail remains 
 | **Objects** | `messages` when chat emphasized; dice cup only if play invited |
 | **Interaction** | Chat primary after greeting; no workspace dominant |
 
-**Eye Path™:** Fireplace → greeting → invite → chat → fireplace  
+**Eye Path:** Fireplace → greeting → invite → chat → fireplace  
 **Density:** Very Calm
 
 ---
 
-## Planning Table™ (`planning-table`)
+## Planning Table (`planning-table`)
 
 | Layer | Specification |
 |-------|---------------|
@@ -379,12 +379,12 @@ Each sheet summarizes how the seven layers apply. Full emotional detail remains 
 | **Objects** | `plan-my-day`, `calendar` — icon + label on nav; planner object on hero |
 | **Interaction** | Tap to edit; drag optional; calm scroll |
 
-**Eye Path™:** Desk → date → priorities → items → Shari chip  
+**Eye Path:** Desk → date → priorities → items → Shari chip  
 **Density:** Balanced
 
 ---
 
-## Window Seat™ (`window-seat`)
+## Window Seat (`window-seat`)
 
 | Layer | Specification |
 |-------|---------------|
@@ -396,12 +396,12 @@ Each sheet summarizes how the seven layers apply. Full emotional detail remains 
 | **Objects** | `clear-my-mind` journal icon on capture affordance |
 | **Interaction** | Type-first; minimal buttons |
 
-**Eye Path™:** View → capture → cards → whisper chat → view  
+**Eye Path:** View → capture → cards → whisper chat → view  
 **Density:** Calm
 
 ---
 
-## Reading Nook™ (`reading-nook`)
+## Reading Nook (`reading-nook`)
 
 | Layer | Specification |
 |-------|---------------|
@@ -413,12 +413,12 @@ Each sheet summarizes how the seven layers apply. Full emotional detail remains 
 | **Objects** | `reading`, `strategies` — card deck metaphor |
 | **Interaction** | Slow browse; open one card |
 
-**Eye Path™:** Reef → lamp → content card → shelf → chat optional  
+**Eye Path:** Reef → lamp → content card → shelf → chat optional  
 **Density:** Calm
 
 ---
 
-## Creative Studio™ (`creative-studio`)
+## Creative Studio (`creative-studio`)
 
 | Layer | Specification |
 |-------|---------------|
@@ -430,7 +430,7 @@ Each sheet summarizes how the seven layers apply. Full emotional detail remains 
 | **Objects** | `create`, `email-generator`, `momentum-creative-spark` per context |
 | **Interaction** | Continue draft; save clear; no publish guilt |
 
-**Eye Path™:** Project table → draft → artifact → Shari partner → window edge  
+**Eye Path:** Project table → draft → artifact → Shari partner → window edge  
 **Density:** Creative
 
 ---
@@ -441,20 +441,20 @@ When production UI begins, these code-adjacent systems **must** consume this gui
 
 | System | Role |
 |--------|------|
-| **Companion Layout System™** | `ROOM_IMMERSION_BY_PLACE`, layer ownership |
-| **Scene Integrity Engine™** | Atmosphere + living layer combinations |
-| **Scene Integrity Library™** | Declarative never-rules |
-| **Safe Composition Registry™** | Background focal point + UI safe zones per image |
-| **Companion Object Registry™** | Object layer identities |
-| **Room Look Books™** | Companion presence + signature feature authority |
+| **Companion Layout System** | `ROOM_IMMERSION_BY_PLACE`, layer ownership |
+| **Scene Integrity Engine** | Atmosphere + living layer combinations |
+| **Scene Integrity Library** | Declarative never-rules |
+| **Safe Composition Registry** | Background focal point + UI safe zones per image |
+| **Companion Object Registry** | Object layer identities |
+| **Room Look Books** | Companion presence + signature feature authority |
 
 **Production sequence:**
 
-1. Approve this Screen Composition Guide™
+1. Approve this Screen Composition Guide
 2. Redesign existing pages using seven-layer stack + density caps
 3. Implement room photography with safe zones
-4. Wire atmosphere through Scene Integrity Engine™ only
-5. Validate against One Recognition Test + Behavior Audit™
+4. Wire atmosphere through Scene Integrity Engine only
+5. Validate against One Recognition Test + Behavior Audit
 
 ---
 
@@ -462,10 +462,10 @@ When production UI begins, these code-adjacent systems **must** consume this gui
 
 Before any production room UI ships:
 
-- [ ] Screen Composition Guide™ approved
+- [ ] Screen Composition Guide approved
 - [ ] All five Phase 1 room composition sheets validated against look books
-- [ ] Eye Path™ walkthrough signed off (design review)
-- [ ] Room Density™ caps encoded in layout system
+- [ ] Eye Path walkthrough signed off (design review)
+- [ ] Room Density caps encoded in layout system
 - [ ] Scene Integrity rules cover Phase 1 weather/season matrix
 - [ ] Object layer uses registry only — no emoji
 - [ ] ADHD maximums verified in design critique

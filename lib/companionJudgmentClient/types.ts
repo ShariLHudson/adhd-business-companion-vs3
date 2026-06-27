@@ -1,5 +1,5 @@
 /**
- * Live Reality™ — shared types for ecosystem-wide judgment.
+ * Live Reality — shared types for ecosystem-wide judgment.
  * One reality. One brain. Many experiences.
  */
 

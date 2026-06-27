@@ -16,6 +16,7 @@ import {
   MENU_TRIGGER_BTN,
 } from "@/lib/menuNavStyles";
 import type { HomeNavVisibility } from "@/lib/arrivalIntelligence";
+import { ASSETS } from "@/lib/companionUi";
 
 type TopBarProps = {
   calmHome?: boolean;
@@ -24,6 +25,9 @@ type TopBarProps = {
   onOpenPlanMyDay?: () => void;
   onOpenAdaptMyDay?: () => void;
   onOpenClearMyMind?: () => void;
+  onOpenWelcomeRoom?: () => void;
+  onOpenMyStory?: () => void;
+  onOpenWhatsNew?: () => void;
   onOpenSettings: (section?: SettingsSection | null) => void;
   onOpenProfile: () => void;
   onRequestNewConversation: () => void;
@@ -187,6 +191,9 @@ export function TopBar({
   onOpenPlanMyDay,
   onOpenAdaptMyDay,
   onOpenClearMyMind,
+  onOpenWelcomeRoom,
+  onOpenMyStory,
+  onOpenWhatsNew,
   onOpenSettings,
   onOpenProfile,
   onRequestNewConversation,
@@ -228,6 +235,7 @@ export function TopBar({
   return (
     <div
       className={`companion-top-bar sticky top-0 z-50 flex shrink-0 items-center justify-end gap-2 px-4 py-2.5 backdrop-blur-sm sm:px-6 ${calmHome ? "companion-top-bar-calm" : ""} companion-nav-${navVisibility}`}
+      data-companion-topbar=""
       data-home-calm={calmHome ? "" : undefined}
       data-nav-visibility={navVisibility}
     >
@@ -267,21 +275,56 @@ export function TopBar({
           onClick={() => setAccountMenuOpen((open) => !open)}
           aria-expanded={accountMenuOpen}
           aria-haspopup="menu"
-          aria-label="Account"
-          title="Account"
-          className="relative z-50 flex h-11 w-11 items-center justify-center rounded-full border border-[#c9bdb0] bg-white text-[26px] leading-none text-black shadow-sm transition-colors hover:bg-[#fff8ef] hover:text-black"
+          aria-label="Shari's menu"
+          title="Shari"
+          className="relative z-50 flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-[#c9bdb0] bg-white shadow-sm transition-colors hover:border-[#1e4f4f]/40 hover:bg-[#fff8ef]"
         >
-          ⋯
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={ASSETS.profile}
+            alt=""
+            className="h-full w-full object-cover"
+          />
         </button>
         {accountMenuOpen ? (
           <div
             className="absolute right-0 z-[60] mt-1 w-56 overflow-hidden rounded-xl border border-[#d8cfc2] bg-white shadow-lg"
             role="menu"
-            aria-label="Account"
+            aria-label="Shari"
           >
             <p className={`border-b border-[#e7dfd4] px-4 py-2 ${MENU_SECTION_HEADING}`}>
-              Account
+              Shari
             </p>
+            {onOpenWelcomeRoom ? (
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => runHeaderAction(onOpenWelcomeRoom)}
+                className={MENU_BTN}
+              >
+                <CompanionObjectLabel objectId="welcome-room" label="Welcome Room" size="xs" />
+              </button>
+            ) : null}
+            {onOpenMyStory ? (
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => runHeaderAction(onOpenMyStory)}
+                className={MENU_BTN}
+              >
+                <CompanionObjectLabel objectId="life-experience" label="My Story" size="xs" />
+              </button>
+            ) : null}
+            {onOpenWhatsNew ? (
+              <button
+                type="button"
+                role="menuitem"
+                onClick={() => runHeaderAction(onOpenWhatsNew)}
+                className={MENU_BTN}
+              >
+                <CompanionObjectLabel objectId="help" label="What's New" size="xs" />
+              </button>
+            ) : null}
             <button
               type="button"
               role="menuitem"
@@ -294,7 +337,7 @@ export function TopBar({
               type="button"
               role="menuitem"
               onClick={() => runHeaderAction(onOpenProfile)}
-              className={MENU_BTN}
+              className={`${MENU_BTN} border-t border-[#e7dfd4]`}
             >
               <CompanionObjectLabel objectId="profile" label="Profile" size="xs" />
             </button>

@@ -1,4 +1,4 @@
-/** Plan My Day™ Sprint 3 — atmosphere and progressive reveal */
+/** Plan My Day Sprint 3 — atmosphere and progressive reveal */
 
 .plan-day-atmosphere {
   --plan-day-gap: 1rem;
@@ -80,7 +80,7 @@
   }
 }
 
-/* Morning Presence™ — companion moment before planning */
+/* Morning Presence — companion moment before planning */
 .plan-day-morning-presence {
   padding: 0.25rem 0 0.35rem;
 }

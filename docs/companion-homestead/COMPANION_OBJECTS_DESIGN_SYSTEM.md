@@ -1,4 +1,4 @@
-# Companion Objects™ Design System
+# Companion Objects Design System
 ## The Visual Language Of Shari's Home
 
 **Version:** 1.0  
@@ -11,7 +11,7 @@
 
 ## Mission
 
-The Companion Homestead™ no longer uses emojis as its primary visual language. It uses **Companion Objects™** — beautifully illustrated household objects that live naturally throughout the home.
+The Companion Homestead no longer uses emojis as its primary visual language. It uses **Companion Objects** — beautifully illustrated household objects that live naturally throughout the home.
 
 These are not icons. They are emotional symbols that belong inside Shari's Iowa home.
 
@@ -63,7 +63,7 @@ Pottery Barn · Magnolia · Hallmark · Cozy farmhouse · Watercolor illustratio
 
 ---
 
-## Illustration Style — Warm Homestead Realism™
+## Illustration Style — Warm Homestead Realism
 
 Canonical style name shared with `VISUAL_DESIGN_BIBLE.md` Part IV.
 
@@ -157,7 +157,7 @@ Full mapping: `COMPANION_OBJECTS_MASTER_CATALOG` in code — each entry has `emo
 
 ---
 
-## Designer Stories™
+## Designer Stories
 
 **Not one the user reads. One the designers know.**
 
@@ -196,7 +196,7 @@ const story = designerStoryForObjectId("obj-shari-signature-mug");
 
 ---
 
-## Companion Object Collections™
+## Companion Object Collections
 
 | Collection | Tagline | Primary rooms |
 |------------|---------|---------------|
@@ -291,7 +291,7 @@ An object ships when:
 
 ```
 Manifesto
-  → Visual Design Bible (materials + Warm Homestead Realism™)
+  → Visual Design Bible (materials + Warm Homestead Realism)
     → Companion Objects Design System (this document)
       → Room Look Books (which objects appear where)
         → Production art assets

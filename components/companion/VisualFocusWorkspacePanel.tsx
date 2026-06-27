@@ -558,7 +558,7 @@ export function VisualFocusWorkspacePanel({
           />
           <ConfirmDialog
             open={Boolean(hubDeleteMap)}
-            title="Delete Map™"
+            title="Delete Map"
             message={
               hubDeleteMap
                 ? `Delete "${hubDeleteMap.title}" permanently? This cannot be undone.`
@@ -732,7 +732,7 @@ export function VisualFocusWorkspacePanel({
 
           <ConfirmDialog
             open={deleteDialogOpen && Boolean(active)}
-            title="Delete Map™"
+            title="Delete Map"
             message="This action cannot be undone. The map will be permanently removed from your workspace."
             confirmLabel="Delete"
             cancelLabel="Cancel"

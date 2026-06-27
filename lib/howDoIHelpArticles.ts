@@ -275,7 +275,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     tips: [
       "New Chat when the thread feels done but today's plan still fits.",
       "New Day's Chat when you are starting a new day and want a clean daily workspace.",
-      "Neither option deletes your projects, memory, or Founder Intelligence™ learning.",
+      "Neither option deletes your projects, memory, or Founder Intelligence learning.",
     ],
     keywords: [
       "chat workspace",
@@ -386,7 +386,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
   {
     id: "plan-my-day",
     categoryId: "planning",
-    title: "Plan My Day™",
+    title: "Plan My Day",
     emoji: "📅",
     featured: true,
     whatItIs:
@@ -413,7 +413,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
   {
     id: "visual-focus",
     categoryId: "planning",
-    title: "Visual Thinking™",
+    title: "Visual Thinking",
     emoji: "💡",
     featured: true,
     whatItIs:
@@ -421,11 +421,11 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whenToUse:
       "When linear lists fail and you need to see relationships, paths, or patterns — not when you need today's task list.",
     workflow: [
-      "Open Visual Thinking™ from the sidebar.",
+      "Open Visual Thinking from the sidebar.",
       "Pick a card that matches what you're figuring out — each shows what it is, when to use it, and what you'll receive.",
       "Build your map, then Generate for visuals, insights, recommendations, and next steps.",
-      "Continue Thinking™ resumes active work (up to 3 maps). Save intentionally when something is worth keeping.",
-      "Pinned favorites live in Other™ → Saved™ — not on the studio dashboard.",
+      "Continue Thinking resumes active work (up to 3 maps). Save intentionally when something is worth keeping.",
+      "Pinned favorites live in Other → Saved — not on the studio dashboard.",
       "Use Work With Shari when you're not sure which thinking style fits.",
     ],
     tips: visualThinkingToolHelpTips(),
@@ -442,7 +442,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "continue thinking",
     ],
     openSection: "visual-focus",
-    openLabel: "Open Visual Thinking™",
+    openLabel: "Open Visual Thinking",
   },
   {
     id: "momentum-appointments",
@@ -507,7 +507,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "Considering Today → Today's Focus → In Progress — complete to archive. No permanent Done column.",
     whenToUse: "When you want to see today's decision flow without turning the board into storage.",
     workflow: [
-      "Open Plan My Day™ and switch to Kanban view.",
+      "Open Plan My Day and switch to Kanban view.",
       "Considering Today — ideas still on your radar.",
       "Today's Focus — what matters most today.",
       "In Progress — what you are actively doing.",

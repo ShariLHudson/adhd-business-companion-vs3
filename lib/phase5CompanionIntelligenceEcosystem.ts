@@ -1,5 +1,5 @@
 /**
- * Phase 5 — Companion Intelligence Ecosystem™
+ * Phase 5 — Companion Intelligence Ecosystem
  * From business partner to personal operating system — lifelong adaptive relationship.
  */
 
@@ -547,7 +547,7 @@ export function formatPersonalOperatingManualForDisplay(
   manual = buildPersonalOperatingManual(),
 ): string {
   return [
-    "## Personal Operating Manual™",
+    "## Personal Operating Manual",
     "",
     "_One of the most valuable assets in the ecosystem — continuously refined._",
     "",
@@ -572,10 +572,10 @@ export function formatWisdomEngineForDisplay(
   insights = readState().wisdomInsights,
 ): string {
   if (!insights.length) {
-    return "## Wisdom Engine™\n\nPersonal wisdom is still forming from your patterns and wins.";
+    return "## Wisdom Engine\n\nPersonal wisdom is still forming from your patterns and wins.";
   }
   return [
-    "## Wisdom Engine™",
+    "## Wisdom Engine",
     "",
     "_Personal wisdom — specific to you, not generic advice._",
     "",
@@ -587,7 +587,7 @@ export function formatLegacyIntelligenceForDisplay(
   legacy = buildLegacyIntelligence(),
 ): string {
   return [
-    "## Legacy Intelligence™",
+    "## Legacy Intelligence",
     "",
     `**Time together:** ${legacy.relationshipDays} days`,
     `**Sessions:** ${legacy.sessionsTogether}`,
@@ -615,12 +615,12 @@ export const KNOWLEDGE_ECOSYSTEM_MODULES = [
 ] as const;
 
 export const COMPANION_NETWORK_LAYERS = [
-  "Board of Directors™",
-  "Knowledge Intelligence™",
-  "Founder Intelligence™",
-  "Business Intelligence™",
-  "Content Intelligence™",
-  "Resource Intelligence™",
+  "Board of Directors",
+  "Knowledge Intelligence",
+  "Founder Intelligence",
+  "Business Intelligence",
+  "Content Intelligence",
+  "Resource Intelligence",
 ] as const;
 
 export function phase5CompanionIntelligenceEcosystemHintForChat(input?: {
@@ -636,7 +636,7 @@ export function phase5CompanionIntelligenceEcosystemHintForChat(input?: {
   const opportunity = input?.opportunityOffer ?? maybePredictiveOpportunityOffer();
 
   const parts = [
-    "PHASE 5 COMPANION INTELLIGENCE ECOSYSTEM™ (lifelong relationship — not productivity software):",
+    "PHASE 5 COMPANION INTELLIGENCE ECOSYSTEM (lifelong relationship — not productivity software):",
     "Goal: transformation — think better, decide better, learn faster, follow through, build confidence, reduce overwhelm.",
     "User should feel: 'This understands me better than any productivity system' — a trusted companion for years.",
     "One companion experience only — never expose internal layers (Board, Founder Intel, etc.).",

@@ -9,7 +9,7 @@
 
 ## Phase Name
 
-Companion Intelligence Network™
+Companion Intelligence Network
 
 ---
 
@@ -29,7 +29,7 @@ The user should feel:
 - *"Everything I need seems connected"*
 - Reduced cognitive load finding prior work
 
-Panel: **Companion Intelligence Network™** — connected ecosystem map in Getting To Know You.
+Panel: **Companion Intelligence Network** — connected ecosystem map in Getting To Know You.
 
 ---
 
@@ -103,4 +103,4 @@ Offer cooldown: `OFFER_COOLDOWN_MS` (5 days in code).
 Reserved for future specification:
 
 - Unified graph with `lib/ecosystem/memory/` founder relationship graph (architecture doc notes fragmentation)
-- Visual map projection via Visual Thinking™ stack
+- Visual map projection via Visual Thinking stack

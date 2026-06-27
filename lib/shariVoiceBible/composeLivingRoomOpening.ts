@@ -82,7 +82,7 @@ function resolveGreetingCategory(ctx: ShariVoiceContext): ShariVoiceContext["vis
 }
 
 /**
- * Living Room opening from the Voice Bible™.
+ * Living Room opening from the Voice Bible.
  * Greeting + optional question. Silence is valid hospitality.
  */
 export function composeLivingRoomOpening(
@@ -220,11 +220,23 @@ export function composeBibleEcho(input: {
 
   const ctx = resolveVoiceContext(input.voiceContext);
   if (input.continuity) {
-    const line = selectVoiceLine("echo", ctx, {
-      category: "continuity",
-      salt: "continuity",
+    if (ctx.previousTopic?.trim()) {
+      const topic = shortTopicLabel(ctx.previousTopic);
+      const line = selectVoiceLine("echo", ctx, {
+        category: "continuity",
+        tag: "specific_memory",
+        salt: `continuity-${topic.slice(0, 12)}`,
+      });
+      if (line) {
+        return interpolateVoiceTemplate(line.text, { topic });
+      }
+      return `Last time we talked, you were working on ${topic}.`;
+    }
+    const quiet = selectVoiceLine("echo", ctx, {
+      category: "quiet",
+      salt: "continuity-fresh",
     });
-    return line?.text ?? "Still carrying a similar feeling?";
+    return quiet?.text ?? "I'm glad you're here.";
   }
 
   const tag = emotionalTagFromTone(input.tone);

@@ -6,11 +6,15 @@ import {
 } from "./cooldownStore";
 import {
   assertShariVoice,
-  personalizeWithName,
   sanitizeShariVoice,
   trimToOpeningLength,
   violatesShariVoice,
 } from "./rules";
+import {
+  applyNameNaturally,
+  evaluateNameIntelligence,
+  type NameLineContext,
+} from "@/lib/relationshipIntelligence";
 import type {
   ShariVoiceContext,
   ShariVoiceKind,
@@ -174,12 +178,47 @@ export function selectVoiceLine(
   );
   if (!picked) return null;
 
-  const text = assertShariVoice(
-    trimToOpeningLength(
-      personalizeWithName(sanitizeShariVoice(picked.text), ctx.firstName),
-    ),
-    picked.id,
+  const lineContext: NameLineContext =
+    kind === "greeting" || kind === "invitation"
+      ? "greeting"
+      : kind === "echo"
+        ? "echo"
+        : kind === "question"
+          ? "invite"
+          : "chat";
+
+  const isFirstGreetingOfDay =
+    ctx.timeOfDay === "morning" &&
+    (ctx.returnIntervalDays == null || ctx.returnIntervalDays < 1);
+
+  const nameDecision = evaluateNameIntelligence({
+    firstName: ctx.firstName,
+    lineContext,
+    isFirstGreetingOfDay: kind === "greeting" && isFirstGreetingOfDay,
+    returnIntervalDays: ctx.returnIntervalDays,
+    celebrationActive:
+      ctx.birthdayToday || ctx.emotionalTag === "celebrating",
+    projectRecentlyCompleted: ctx.projectRecentlyCompleted,
+    recoveryGentle: ctx.recoveryGentle,
+    scenario: ctx.birthdayToday
+      ? "celebration"
+      : kind === "greeting" && isFirstGreetingOfDay
+        ? "first_greeting_of_day"
+        : ctx.emotionalTag === "celebrating"
+          ? "celebration"
+          : ctx.returnIntervalDays != null && ctx.returnIntervalDays >= 3
+            ? "reconnect_after_absence"
+            : "ordinary",
+  });
+
+  const rawText = sanitizeShariVoice(picked.text);
+  const namedText = applyNameNaturally(
+    rawText,
+    ctx.firstName,
+    nameDecision.useName,
   );
+
+  const text = assertShariVoice(trimToOpeningLength(namedText), picked.id);
 
   if (options?.record !== false) {
     recordVoiceUsage({

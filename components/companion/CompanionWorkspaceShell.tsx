@@ -26,7 +26,7 @@ const ROOM_TO_WORKSPACE: Record<string, SceneWorkspaceId> = {
 };
 
 /**
- * Companion Workspace Standard v1 — delegates to Scene Render Contract™.
+ * Companion Workspace Standard v1 — delegates to Scene Render Contract.
  * SceneLayoutEngine overrides any conflicting v1 layout rules.
  */
 export function CompanionWorkspaceShell({

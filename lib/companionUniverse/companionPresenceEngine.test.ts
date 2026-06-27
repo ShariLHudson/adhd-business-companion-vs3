@@ -8,7 +8,7 @@ import {
   PRESENCE_LEVEL_META,
 } from "./companionPresenceEngine";
 
-describe("Companion Presence Engine™", () => {
+describe("Companion Presence Engine", () => {
   it("defines five presence levels", () => {
     expect(PRESENCE_LEVEL_META[5].name).toBe("Fully Present");
     expect(PRESENCE_LEVEL_META[1].name).toBe("Invisible");

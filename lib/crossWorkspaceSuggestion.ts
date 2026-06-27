@@ -44,7 +44,7 @@ export function crossWorkspaceBesideLine(
   targetSection: AppSection,
   hint?: string,
 ): string {
-  const label = crossWorkspaceSectionLabel(targetSection).replace(/™/g, "");
+  const label = crossWorkspaceSectionLabel(targetSection);
   if (hint?.trim()) {
     return `${hint.trim()} Would you like to open ${label} beside this?`;
   }
@@ -52,7 +52,7 @@ export function crossWorkspaceBesideLine(
 }
 
 export function crossWorkspaceAcceptLabel(targetSection: AppSection): string {
-  return `Yes, open ${crossWorkspaceSectionLabel(targetSection).replace(/™/g, "")}`;
+  return `Yes, open ${crossWorkspaceSectionLabel(targetSection)}`;
 }
 
 /** Context banner for the opened tool when launched from another guide. */

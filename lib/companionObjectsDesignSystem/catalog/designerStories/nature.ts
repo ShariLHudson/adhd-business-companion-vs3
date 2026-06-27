@@ -1,4 +1,4 @@
-/** Designer Stories™ — Nature Collection. Never shown to guests. */
+/** Designer Stories — Nature Collection. Never shown to guests. */
 export const NATURE_DESIGNER_STORIES: Record<string, string> = {
   "obj-hummingbird":
     "Shari genuinely loves watching hummingbirds — this one visits the feeder she refills more often than the garden chores list suggests.",

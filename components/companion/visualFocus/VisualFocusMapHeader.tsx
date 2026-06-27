@@ -21,7 +21,7 @@ function saveStatusLabel(status: VisualFocusMap["saveStatus"]): string {
 }
 
 export function VisualFocusMapHeader({ map }: { map: VisualFocusMap }) {
-  const typeLabel = `${studioCardTitleForMode(map.mode)}™`;
+  const typeLabel = `${studioCardTitleForMode(map.mode)}`;
   const purpose = map.purposeAnchor?.userAnswer?.trim();
 
   return (

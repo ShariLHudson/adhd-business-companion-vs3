@@ -12,8 +12,8 @@ const DEFAULT_PERMISSIONS: RoomPermissionContext = {
 };
 
 /**
- * Permission to Show™ — earned intimacy only.
- * Part of The Hospitality Principle™: Shari prepares what she knows —
+ * Permission to Show — earned intimacy only.
+ * Part of The Hospitality Principle: Shari prepares what she knows —
  * never rebuilds the home around the visitor.
  * If unsure, do not show it.
  */

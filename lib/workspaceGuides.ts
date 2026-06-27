@@ -59,7 +59,7 @@ export const WORKSPACE_GUIDES: Record<string, WorkspaceGuideContent> = {
   energy: {
     id: "energy",
     title: "Today's Reality",
-    what: "Current Reality Intelligence™ — share how you're showing up today so support fits your real energy.",
+    what: "Current Reality Intelligence — share how you're showing up today so support fits your real energy.",
     why: "Rigid plans break; knowing today's reality keeps momentum without guilt.",
     how: "Open Today's Reality from the top navigation (🌤️); update energy, motivation, and how you feel anytime life shifts.",
     example: "Poor sleep morning → Today's Reality → lighter plan in Plan My Day.",

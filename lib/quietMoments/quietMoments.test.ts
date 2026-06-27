@@ -8,7 +8,7 @@ import {
   resolveQuietMomentsPhase,
 } from "./index";
 
-describe("Quiet Moments™", () => {
+describe("Quiet Moments", () => {
   it("progresses through phases as idle time increases", () => {
     expect(resolveQuietMomentsPhase({ idleMs: 0 })).toBe("settling");
     expect(resolveQuietMomentsPhase({ idleMs: 30_000 })).toBe("quiet");

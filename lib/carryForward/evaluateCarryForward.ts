@@ -37,7 +37,7 @@ function suppressed(reason: string, tone: CarryForwardVerdict["yesterdayTone"]):
 }
 
 /**
- * Carry Forward™ — decide what is emotionally healthy to bring into today.
+ * Carry Forward — decide what is emotionally healthy to bring into today.
  */
 export function evaluateCarryForward(input: CarryForwardInput = {}): CarryForwardVerdict {
   const now = input.now ?? new Date();
@@ -139,10 +139,10 @@ export function formatCarryForwardGreeting(verdict: CarryForwardVerdict): string
 export function carryForwardHintForChat(verdict: CarryForwardVerdict): string | null {
   if (!verdict.active) return null;
   return [
-    "CARRY FORWARD™ (first visit of the day — encouragement only):",
+    "CARRY FORWARD (first visit of the day — encouragement only):",
     verdict.constitutionalPrinciple,
     `Yesterday tone (internal): ${verdict.yesterdayTone}.`,
     "Never reference missed tasks, streaks, scores, or productivity statistics.",
-    "Once the guest speaks with clear work intent, Honor Their Intent™ takes over.",
+    "Once the guest speaks with clear work intent, Honor Their Intent takes over.",
   ].join("\n");
 }

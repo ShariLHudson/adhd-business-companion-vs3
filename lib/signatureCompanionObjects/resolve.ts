@@ -1,5 +1,5 @@
 /**
- * Signature Companion Objects™ — form resolution and registry API.
+ * Signature Companion Objects — form resolution and registry API.
  */
 
 import type { CompanionObjectSize } from "@/components/companion/CompanionObjectVisual";
@@ -115,8 +115,8 @@ export function workspaceHasSignatureObject(workspaceId: string): boolean {
 export function assertWorkspaceSignatureObject(workspaceId: string): void {
   if (!workspaceHasSignatureObject(workspaceId)) {
     throw new Error(
-      `Signature Companion Objects™: workspace "${workspaceId}" has no Signature Object. ` +
-        `Every feature must answer: What is its Signature Companion Object™?`,
+      `Signature Companion Objects: workspace "${workspaceId}" has no Signature Object. ` +
+        `Every feature must answer: What is its Signature Companion Object?`,
     );
   }
 }

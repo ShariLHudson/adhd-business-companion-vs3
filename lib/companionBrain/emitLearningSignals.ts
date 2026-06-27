@@ -1,5 +1,5 @@
 /**
- * Learning Signals™ — internal graph feed, not dashboards.
+ * Learning Signals — internal graph feed, not dashboards.
  * @see constitution.ts — emitLearningSignals
  */
 

@@ -1,5 +1,5 @@
 /**
- * Accurate help copy for Clear My Mind™ — used by the in-panel dropdown
+ * Accurate help copy for Clear My Mind — used by the in-panel dropdown
  * and kept in sync with the live capture → landscape → action flow.
  */
 

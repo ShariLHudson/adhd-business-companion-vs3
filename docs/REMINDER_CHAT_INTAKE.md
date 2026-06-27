@@ -1,6 +1,6 @@
 # Reminder Chat Intake — Golden Path (P0.57)
 
-Governed by [Product Constitution™](./PRODUCT_CONSTITUTION.md) — [Conversation Governance™](./PRODUCT_CONSTITUTION.md#conversation-governance) scenarios 1–7 apply to this flow.
+Governed by [Product Constitution](./PRODUCT_CONSTITUTION.md) — [Conversation Governance](./PRODUCT_CONSTITUTION.md#conversation-governance) scenarios 1–7 apply to this flow.
 
 Chat reminder creation follows a **locked conversation** until save succeeds or the user abandons intake (Scenario 5: cancel must clear session).
 

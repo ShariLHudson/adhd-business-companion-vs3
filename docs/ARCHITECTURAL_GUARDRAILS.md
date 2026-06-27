@@ -10,7 +10,7 @@ When a feature request conflicts with this document, **these guardrails win**.
 
 ## 1. Product identity
 
-The ADHD Business Ecosystem™ is a **Companion Intelligence™ platform**.
+The ADHD Business Ecosystem™ is a **Companion Intelligence platform**.
 
 It helps users:
 - Make better decisions
@@ -32,18 +32,18 @@ It is **not**:
 
 | Workspace | Purpose | Must not become |
 |-----------|---------|-----------------|
-| **Clear My Mind™** | Capture competing attention | A sorted backlog |
+| **Clear My Mind** | Capture competing attention | A sorted backlog |
 | **Projects** | Multi-step work over time | Today's task list |
 | **Goals** | Define measurable outcomes | A task dump or KPI dashboard |
-| **Plan My Day™** | Choose what fits **today's** reality | Long-term storage, Done column graveyard |
-| **Adapt My Day™** | Current capacity & energy | One-time check-in only |
-| **Founder Intelligence™** | Learn patterns; supportive insights | Judgment, scorekeeping, shame |
+| **Plan My Day** | Choose what fits **today's** reality | Long-term storage, Done column graveyard |
+| **Adapt My Day** | Current capacity & energy | One-time check-in only |
+| **Founder Intelligence** | Learn patterns; supportive insights | Judgment, scorekeeping, shame |
 
 Each workspace has **one job**. Do not merge storage, columns, or mental models across them.
 
 ---
 
-## 3. Plan My Day™ rules
+## 3. Plan My Day rules
 
 - Answers: *"What is realistic for me today?"*
 - **Starts fresh daily** (Chat Workspace → New Day's Chat — not archive managers).
@@ -77,7 +77,7 @@ Goals are **not**:
 
 ---
 
-## 5. Companion Intelligence™ rules
+## 5. Companion Intelligence rules
 
 Learn from behavior (complete, postpone, defer, avoid, succeed) — surface **supportive, non-judgmental** observations.
 
@@ -87,9 +87,9 @@ Bad: Productivity scores, red/yellow KPIs, shame language, nagging every turn.
 
 Prefer **chat hints** and light context over new dashboards.
 
-### Visual Thinking™ intelligence surfaces
+### Visual Thinking intelligence surfaces
 
-Visual Thinking™ tools are **not standalone file tools**. They are **intelligence surfaces** owned by Companion Intelligence™.
+Visual Thinking tools are **not standalone file tools**. They are **intelligence surfaces** owned by Companion Intelligence.
 
 Every map, canvas, framework, and future visual workspace must:
 
@@ -100,28 +100,28 @@ Every map, canvas, framework, and future visual workspace must:
 5. Generate insights  
 6. Generate recommendations  
 7. Capture learning signals  
-8. Feed Founder Intelligence™  
+8. Feed Founder Intelligence  
 9. Improve future recommendations  
 
 **Layer ownership**
 
 | Layer | Role |
 |-------|------|
-| Companion Intelligence™ | Owns the experience — purpose, clarification, framework choice |
-| Thinking framework | Structures the user's situation (Mind Map™, Business Canvas™, etc.) |
+| Companion Intelligence | Owns the experience — purpose, clarification, framework choice |
+| Thinking framework | Structures the user's situation (Mind Map, Business Canvas, etc.) |
 | Visual output | Map layer — renders thinking, not the product itself |
 | Insights & recommendations | Intelligence panel — the insight is the product |
-| Learning & analytics | `lib/visualFocus/companionIntelligence/` → signal bus → Founder Intelligence™ |
+| Learning & analytics | `lib/visualFocus/companionIntelligence/` → signal bus → Founder Intelligence |
 
-**Predefined structure exception:** Business Canvas™ requires nine sections. Other frameworks should emerge from the user's situation unless the framework itself requires fixed sections.
+**Predefined structure exception:** Business Canvas requires nine sections. Other frameworks should emerge from the user's situation unless the framework itself requires fixed sections.
 
-**Future surfaces** (register in `VISUAL_THINKING_FRAMEWORK_REGISTRY`, implement without pipeline rewrite): Living Canvas™, What-If Analysis™, Business Simulations™, Opportunity Mapping™, Board of Directors™ Intelligence™, Predictive Business Guidance™.
+**Future surfaces** (register in `VISUAL_THINKING_FRAMEWORK_REGISTRY`, implement without pipeline rewrite): Living Canvas, What-If Analysis, Business Simulations, Opportunity Mapping, Board of Directors Intelligence, Predictive Business Guidance.
 
 Canonical implementation: `lib/visualFocus/companionIntelligence/`.
 
 ---
 
-## 6. Future-first architecture (Companion Intelligence™ Ecosystem)
+## 6. Future-first architecture (Companion Intelligence Ecosystem)
 
 **Core principle:** Build simple user experiences. Build powerful architecture underneath.
 
@@ -131,13 +131,13 @@ Users experience simplicity, clarity, guidance, and momentum. The system maintai
 
 Every major feature must answer:
 
-| Layer | Question | Example (Business Canvas™) |
+| Layer | Question | Example (Business Canvas) |
 |-------|----------|----------------------------|
 | **User value** | What problem does this solve today? | Helps users understand how their business works |
 | **Intelligence value** | What can the ecosystem learn? | Audience, revenue, offer, marketing, relationship patterns |
-| **Future value** | What future systems become possible? | Living Canvas™, What-If Analysis™, Ripple Effects™, BoD Analysis™ |
+| **Future value** | What future systems become possible? | Living Canvas, What-If Analysis, Ripple Effects, BoD Analysis |
 
-### Companion Intelligence™ pipeline
+### Companion Intelligence pipeline
 
 ```
 User Situation → Understanding → Clarification → Pattern Recognition
@@ -149,17 +149,17 @@ The intelligence layer owns the experience. Tools visualize thinking; intelligen
 
 ### Intelligence analytics (not just usage)
 
-Track pattern categories: Founder Decision™, Momentum™, Overwhelm™, Business Growth™, Planning™, Content Creation™, Execution™, Energy™, Confidence™, Opportunity™.
+Track pattern categories: Founder Decision, Momentum, Overwhelm, Business Growth, Planning, Content Creation, Execution, Energy, Confidence, Opportunity.
 
 ### Learning signals
 
 Every major system must produce learning signals (see `ECOSYSTEM_MAJOR_SYSTEMS` in `lib/companionIntelligenceEcosystem/systems.ts`).
 
-### Founder Intelligence™ & Board of Directors™
+### Founder Intelligence & Board of Directors
 
-Founder Intelligence™ learns how the user thinks, plans, decides, grows, and what creates friction vs momentum.
+Founder Intelligence learns how the user thinks, plans, decides, grows, and what creates friction vs momentum.
 
-Future Board of Directors™ systems draw from user data, patterns, decisions, Business Canvas data, Visual Thinking data, projects, and goals.
+Future Board of Directors systems draw from user data, patterns, decisions, Business Canvas data, Visual Thinking data, projects, and goals.
 
 ### Building rule
 
@@ -191,7 +191,7 @@ From the Constitution — enforce in UI:
 
 Do **not** implement without explicit product-owner approval:
 
-- Permanent Done / Archive / Clear Completed columns in Plan My Day™
+- Permanent Done / Archive / Clear Completed columns in Plan My Day
 - Blending Projects into Plan My Day as default storage
 - User-facing financial management (ledger, invoices, bank sync)
 - CRM pipelines, deal stages, contact scoring
@@ -201,9 +201,9 @@ Do **not** implement without explicit product-owner approval:
 
 ---
 
-## 9. Adapt My Day™ integration
+## 9. Adapt My Day integration
 
-Adapt My Day™ stays linked to Plan My Day™.
+Adapt My Day stays linked to Plan My Day.
 
 Prompt for reality mismatch only when **meaningful** (workload, capacity, heavy commitments) — not after every add.
 

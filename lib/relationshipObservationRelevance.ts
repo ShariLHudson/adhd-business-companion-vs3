@@ -1,5 +1,5 @@
 /**
- * Observation Relevance Intelligence™ (P0.6)
+ * Observation Relevance Intelligence (P0.6)
  * Ranks observations by intent, workspace, and diversity — not raw score alone.
  */
 

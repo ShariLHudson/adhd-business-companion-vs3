@@ -1,6 +1,6 @@
 /**
- * Gather ecosystem memory for Live Reality™ — all workspaces share one snapshot.
- * Adapters only; reasoning stays in Companion Brain™.
+ * Gather ecosystem memory for Live Reality — all workspaces share one snapshot.
+ * Adapters only; reasoning stays in Companion Brain.
  */
 
 import { gatherPlanDayMemory } from "@/lib/planMyDay/companionBrainClient/gatherPlanDayMemory";

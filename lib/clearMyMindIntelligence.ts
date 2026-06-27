@@ -1,5 +1,5 @@
 /**
- * Clear My Mind™ → Living Intelligence Graph™ (silent enrichment).
+ * Clear My Mind → Living Intelligence Graph (silent enrichment).
  *
  * Records structured submission data on every brain dump hold.
  * Never surfaced in the UI — foundation for future ecosystem intelligence.

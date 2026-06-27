@@ -1,5 +1,5 @@
 /**
- * SceneLayoutEngine™ — renders constitutional environment + presence.
+ * SceneLayoutEngine — renders constitutional environment + presence.
  * Does not decide room, place, background, or Shari presence.
  */
 

@@ -8,7 +8,7 @@ import {
   companionObjectsByCategory,
 } from "./objectLibrary";
 
-describe("Companion Object Library™", () => {
+describe("Companion Object Library", () => {
   it("defines all twelve object categories", () => {
     expect(COMPANION_OBJECT_CATEGORIES).toHaveLength(12);
     for (const category of COMPANION_OBJECT_CATEGORIES) {

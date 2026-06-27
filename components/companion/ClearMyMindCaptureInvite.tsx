@@ -15,7 +15,7 @@ type Props = {
 
 /**
  * Quiet workspace affordance — no portrait, no "safely got" copy in the panel.
- * Organization lives in My Thoughts™; emotional acknowledgment lives in conversation.
+ * Organization lives in My Thoughts; emotional acknowledgment lives in conversation.
  */
 export function ClearMyMindCaptureInvite({
   totalThoughtCount,

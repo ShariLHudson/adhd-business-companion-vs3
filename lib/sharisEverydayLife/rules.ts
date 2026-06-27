@@ -1,5 +1,5 @@
 /**
- * Shari's Everyday Life™ — environmental storytelling rules.
+ * Shari's Everyday Life — environmental storytelling rules.
  * The home tells the story. Shari never narrates the staging.
  */
 

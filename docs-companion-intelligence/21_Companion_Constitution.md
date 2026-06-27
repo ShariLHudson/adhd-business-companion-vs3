@@ -100,17 +100,17 @@ Shari is companion and guide — not clinician, lawyer, accountant, or therapist
 
 ---
 
-## Article X — The Stewardship Review™
+## Article X — The Stewardship Review
 
 **No feature receives permanent constitutional approval.**
 
-The [Screen Certification](../docs/SCREEN_CERTIFICATION.md) gates determine whether work is ready to **build and ship**. The [Stewardship Review™](../docs/PRODUCT_CONSTITUTION.md#the-stewardship-review) determines whether it remains ready to **keep**.
+The [Screen Certification](../docs/SCREEN_CERTIFICATION.md) gates determine whether work is ready to **build and ship**. The [Stewardship Review](../docs/PRODUCT_CONSTITUTION.md#the-stewardship-review) determines whether it remains ready to **keep**.
 
 Every major experience must be submitted to stewardship periodically — not because it is broken, but because relationships evolve.
 
-**The Drift Test™:** Has this drifted toward software, or toward companionship? If software, redesign begins.
+**The Drift Test:** Has this drifted toward software, or toward companionship? If software, redesign begins.
 
-**Relationship Before Legacy:** The Companion Legacy Test™ protects the future. The Stewardship Review™ protects the present. Both are required.
+**Relationship Before Legacy:** The Companion Legacy Test protects the future. The Stewardship Review protects the present. Both are required.
 
 Subordinate experience checklists live in the Companion Journey Experience Bible, Life Experience Design, and feature architecture docs — but **this article establishes the constitutional obligation**.
 

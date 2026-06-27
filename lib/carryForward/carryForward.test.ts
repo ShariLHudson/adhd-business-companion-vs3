@@ -8,14 +8,15 @@ import {
   isValidCarryForwardLine,
   violatesCarryForwardLine,
 } from "./index";
+import { violatesVagueCarryForward } from "@/lib/relationshipIntelligence";
 
-describe("Carry Forward™", () => {
+describe("Carry Forward", () => {
   beforeEach(() => {
     clearCarryForwardStoreForTests();
   });
 
   it("catalog has varied greetings for each yesterday tone", () => {
-    expect(CARRY_FORWARD_CATALOG.length).toBeGreaterThanOrEqual(40);
+    expect(CARRY_FORWARD_CATALOG.length).toBeGreaterThanOrEqual(36);
     const tones = new Set(CARRY_FORWARD_CATALOG.map((e) => e.tone));
     expect(tones.has("ended_well")).toBe(true);
     expect(tones.has("ended_overwhelmed")).toBe(true);
@@ -31,9 +32,9 @@ describe("Carry Forward™", () => {
     }
   });
 
-  it("forbids task guilt and analytical memory", () => {
-    expect(violatesCarryForwardLine("You still have three incomplete tasks.")).toBe(true);
-    expect(violatesCarryForwardLine("I noticed you usually skip mornings.")).toBe(true);
+  it("forbids vague emotional carry-forward", () => {
+    expect(violatesVagueCarryForward("Still carrying a similar feeling?")).toBe(true);
+    expect(isValidCarryForwardLine("Still carrying a similar feeling?")).toBe(false);
     expect(isValidCarryForwardLine("Good morning. I'm glad you're here.")).toBe(true);
   });
 
@@ -98,7 +99,10 @@ describe("Carry Forward™", () => {
       isFirstVisitOfDay: true,
       yesterdayTone: "ended_overwhelmed",
       sessionVisitIndex: 5,
+      now: new Date("2026-06-25T08:00:00"),
     });
-    expect(verdict.greeting).toMatch(/glad you came back|glad you're here/i);
+    expect(verdict.greeting).toBeTruthy();
+    expect(verdict.yesterdayTone).toBe("ended_overwhelmed");
+    expect(isValidCarryForwardLine(verdict.greeting!)).toBe(true);
   });
 });

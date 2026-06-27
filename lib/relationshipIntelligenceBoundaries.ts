@@ -1,5 +1,5 @@
 /**
- * P0.17 — Relationship Intelligence Boundaries™
+ * P0.17 — Relationship Intelligence Boundaries
  * Relationship memory is for self-understanding only — not learning, creating,
  * planning, execution, strategy, or business building.
  */
@@ -37,7 +37,7 @@ export function relationshipIntelligenceBoundaryHintForChat(
 ): string | null {
   if (!shouldSuppressRelationshipIntelligenceForUserText(userText)) return null;
   return [
-    "RELATIONSHIP INTELLIGENCE BOUNDARIES™ (P0.17 — hard enforcement):",
+    "RELATIONSHIP INTELLIGENCE BOUNDARIES (P0.17 — hard enforcement):",
     "This turn is NOT self-understanding. Answer the request directly.",
     "FORBIDDEN: I've noticed…, It sounds like…, You seem to…, relationship observations, ADHD pattern analysis, personality commentary, user-history reflection.",
     "No relationship lead. No observation engine. No wisdom/transformation framing.",

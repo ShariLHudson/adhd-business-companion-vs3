@@ -22,7 +22,7 @@ function photographReason(
 }
 
 /**
- * Master Living Room™ — one approved photograph until time/season layers ship.
+ * Master Living Room — one approved photograph until time/season layers ship.
  * First page is always `shari-i-am-here-2`.
  */
 export function selectWelcomePhotograph(input: CompanionEnvironmentInput): {

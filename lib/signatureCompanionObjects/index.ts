@@ -1,5 +1,5 @@
 /**
- * Signature Companion Objects™ — permanent visual language of the Homestead.
+ * Signature Companion Objects — permanent visual language of the Homestead.
  * @see docs/companion-homestead/SIGNATURE_COMPANION_OBJECTS.md
  */
 

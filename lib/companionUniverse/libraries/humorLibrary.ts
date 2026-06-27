@@ -7,5 +7,5 @@ export type HumorMoment = {
   places: CompanionPlaceId[];
 };
 
-/** Companion Humor Library™ — tiny moments, never interruptions. */
+/** Companion Humor Library — tiny moments, never interruptions. */
 export const COMPANION_HUMOR_LIBRARY: HumorMoment[] = [];

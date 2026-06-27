@@ -1,7 +1,7 @@
 /**
- * Master Living Room™ — composition lock.
+ * Master Living Room — composition lock.
  *
- * No Living Change™, Environmental Truth™, seasons, wildlife, or overlay
+ * No Living Change, Environmental Truth, seasons, wildlife, or overlay
  * objects render until this master scene is approved.
  */
 

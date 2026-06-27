@@ -9,5 +9,5 @@ export type ArtworkPiece = {
   places: CompanionPlaceId[];
 };
 
-/** Artwork Library™ — meaningful wall rotation, not random. */
+/** Artwork Library — meaningful wall rotation, not random. */
 export const ARTWORK_LIBRARY: ArtworkPiece[] = [];

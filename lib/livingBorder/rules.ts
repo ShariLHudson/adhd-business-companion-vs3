@@ -1,5 +1,5 @@
 /**
- * Living Border™ — constitutional rules.
+ * Living Border — constitutional rules.
  */
 
 import type { EdgeZone } from "@/lib/roomCompositionRule";

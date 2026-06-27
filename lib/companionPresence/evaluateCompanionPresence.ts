@@ -1,5 +1,5 @@
 /**
- * Companion Presence™ — context-aware photograph and presence state.
+ * Companion Presence — context-aware photograph and presence state.
  *
  * Pure evaluator: photo src resolution happens in useCompanionPresence.
  */
@@ -94,7 +94,8 @@ export function evaluateCompanionPresence(
     ? "thinking"
     : "default";
   const thinkingMessage = input.isThinking
-    ? companionThinkingMessage(now.getMinutes())
+    ? (input.thinkingMessage ??
+      companionThinkingMessage(now.getMinutes()))
     : null;
 
   if (input.calmHome && input.homeState) {

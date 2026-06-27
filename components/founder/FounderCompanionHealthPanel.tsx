@@ -27,7 +27,7 @@ export function FounderCompanionHealthPanel() {
   return (
     <section className="rounded-xl border border-[#1e4f4f]/25 bg-gradient-to-br from-[#1e4f4f]/5 to-white p-4 shadow-sm">
       <h2 className="text-[11px] font-bold uppercase tracking-wide text-[#1e4f4f]">
-        Companion Health Dashboard™
+        Companion Health Dashboard
       </h2>
       <p className="mt-0.5 text-xs text-[#6b635a]">
         Ecosystem health, early warnings, and founder copilot priorities.

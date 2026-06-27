@@ -27,7 +27,7 @@ const LEGACY_ROOM_TO_PLACE: Record<string, CompanionPlaceId> = {
 };
 
 /**
- * Living Border™ — life at the edges; center stays calm for the guest.
+ * Living Border — life at the edges; center stays calm for the guest.
  */
 export function LivingBorderFrame({
   placeId,

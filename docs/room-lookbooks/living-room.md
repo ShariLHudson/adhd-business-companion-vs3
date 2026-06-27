@@ -1,4 +1,4 @@
-# Living Room™ — Room Look Book
+# Living Room — Room Look Book
 
 **Place ID:** `living-room`  
 **Status:** Design authority — Phase 1 (no UI implementation)  
@@ -8,7 +8,7 @@
 
 ## Purpose
 
-The Living Room™ is the **heart of the homestead** — where guests arrive, exhale, and remember they are not alone in the work.
+The Living Room is the **heart of the homestead** — where guests arrive, exhale, and remember they are not alone in the work.
 
 It exists to hold **relationship before tools**. Chat lives here. Arrival lives here. The first conversation happens here before any workspace opens.
 
@@ -20,13 +20,13 @@ This is not a dashboard. It is Shari's Iowa farmhouse living room — generous w
 
 ---
 
-## Emotional Promise™
+## Emotional Promise
 
 **When someone leaves this room…** they feel **steadier** — less alone with whatever they carried in, grounded enough to face the next hour without being pushed into a tool.
 
 ---
 
-## Signature Feature™
+## Signature Feature
 
 ### The welcoming fireplace
 
@@ -96,11 +96,11 @@ No parallax carnival. No particle storms. No UI that pulses for attention.
 
 ---
 
-## Companion Presence™
+## Companion Presence
 
 **Present — Host level.**
 
-The Living Room™ is where Shari **may lead with warmth** because being welcomed is the work. She sets the mug down when she hears the screen door. Her voice can arrive before the guest finds theirs — but still **one invitation, one next thing**.
+The Living Room is where Shari **may lead with warmth** because being welcomed is the work. She sets the mug down when she hears the screen door. Her voice can arrive before the guest finds theirs — but still **one invitation, one next thing**.
 
 She is not a tour guide. She is not a feature narrator. She is someone who was already here and is glad you came.
 
@@ -108,7 +108,7 @@ She is not a tour guide. She is not a feature narrator. She is someone who was a
 
 ---
 
-## Kinsey™
+## Kinsey
 
 **Greeting — occasionally present.**
 
@@ -122,7 +122,7 @@ Never guilt the guest for Kinsey's absence. Never use Kinsey to manufacture char
 
 ---
 
-## Companion Objects™
+## Companion Objects
 
 Objects registered in [`lib/companionObjects/companionObjectRegistry.ts`](../../lib/companionObjects/companionObjectRegistry.ts) that naturally belong here:
 
@@ -137,7 +137,7 @@ Do not place workspace tools here as primary objects — Create, Plan My Day, an
 
 ---
 
-## UI Language™
+## UI Language
 
 Software disappears into the room. The guest should feel they sat down on the sofa, not opened an app.
 
@@ -155,7 +155,7 @@ Software disappears into the room. The guest should feel they sat down on the so
 
 ---
 
-## Never In This Room™
+## Never In This Room
 
 - Feature mall grids ("six doors to six tools")
 - Streak counters, guilt copy, absence shame
@@ -169,7 +169,7 @@ Software disappears into the room. The guest should feel they sat down on the so
 
 ---
 
-## ADHD Rules™
+## ADHD Rules
 
 | Challenge | How the room helps |
 |-----------|-------------------|
@@ -182,7 +182,7 @@ Software disappears into the room. The guest should feel they sat down on the so
 
 ---
 
-## Seasonal Notes™
+## Seasonal Notes
 
 Life changes; architecture does not.
 
@@ -195,6 +195,6 @@ No seasonal "events" or redesign skins — only light, objects, and temperature 
 
 ---
 
-## Final Feeling™
+## Final Feeling
 
 **I was expected here — and I can face the next hour without pretending I'm fine.**

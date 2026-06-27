@@ -1,4 +1,4 @@
-# ADR-009: Wire Relationship Phase 8 — Autonomous Preparation™
+# ADR-009: Wire Relationship Phase 8 — Autonomous Preparation
 
 **Status:** Accepted (implemented 2026-06-24)
 

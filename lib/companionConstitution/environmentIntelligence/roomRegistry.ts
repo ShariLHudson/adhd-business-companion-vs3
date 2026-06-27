@@ -22,7 +22,8 @@ export type RoomRegistryEntry = {
 const WORKSPACES_BY_PLACE: Partial<Record<CompanionPlaceId, readonly string[]>> =
   {
     "living-room": ["home", "today", "default"],
-    "window-seat": [
+    "window-seat": [],
+    "greenhouse": [
       "clear-my-mind",
       "clear-my-mind-thoughts",
       "brain-dump",
@@ -101,8 +102,8 @@ export function placeForWorkspaceFromRegistry(
   workspaceId?: string,
 ): CompanionPlaceId {
   const map: Partial<Record<SceneWorkspaceId, CompanionPlaceId>> = {
-    "clear-my-mind": "window-seat",
-    "clear-my-mind-thoughts": "window-seat",
+    "clear-my-mind": "greenhouse",
+    "clear-my-mind-thoughts": "greenhouse",
     "plan-my-day": "planning-table",
     "focus-hub": "sunroom-over-pond",
     "focus-category": "sunroom-over-pond",

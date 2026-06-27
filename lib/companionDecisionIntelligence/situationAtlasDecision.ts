@@ -1,5 +1,5 @@
 /**
- * Situation Atlas Decision™ — surface vs actual situation for business decisions.
+ * Situation Atlas Decision — surface vs actual situation for business decisions.
  */
 
 import type { ChatTurn } from "../companionIntelligence";

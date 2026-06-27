@@ -1,5 +1,5 @@
 /**
- * Adaptive Companion Architecture™ — layer registry and health evaluation.
+ * Adaptive Companion Architecture — layer registry and health evaluation.
  *
  * Systems over features: this module is the canonical map of intelligence layers,
  * their owners, observability hooks, and the future-feature validation gate.
@@ -108,7 +108,7 @@ function countScenariosByCategory(): Record<string, number> {
 export const ADAPTIVE_COMPANION_LAYERS: ArchitectureLayer[] = [
   {
     id: "user_intelligence",
-    name: "User Intelligence™",
+    name: "User Intelligence",
     learnsOrContains: [
       "preferences",
       "learning styles",
@@ -136,9 +136,9 @@ export const ADAPTIVE_COMPANION_LAYERS: ArchitectureLayer[] = [
   },
   {
     id: "behavioral_intelligence",
-    name: "Behavioral Intelligence™",
+    name: "Behavioral Intelligence",
     learnsOrContains: [
-      "ADHD Entrepreneur Behavioral Framework™",
+      "ADHD Entrepreneur Behavioral Framework",
       "surface intent vs actual need",
       "validation scenarios",
       "sales & visibility intelligence",
@@ -168,7 +168,7 @@ export const ADAPTIVE_COMPANION_LAYERS: ArchitectureLayer[] = [
   },
   {
     id: "intervention_intelligence",
-    name: "Intervention Intelligence™",
+    name: "Intervention Intelligence",
     learnsOrContains: [
       "recommended interventions",
       "acceptance / ignore signals",
@@ -195,7 +195,7 @@ export const ADAPTIVE_COMPANION_LAYERS: ArchitectureLayer[] = [
   },
   {
     id: "trust_relationship_intelligence",
-    name: "Trust & Relationship Intelligence™",
+    name: "Trust & Relationship Intelligence",
     learnsOrContains: [
       "trust indicators",
       "confidence wins",
@@ -225,7 +225,7 @@ export const ADAPTIVE_COMPANION_LAYERS: ArchitectureLayer[] = [
   },
   {
     id: "predictive_intelligence",
-    name: "Predictive Intelligence™",
+    name: "Predictive Intelligence",
     learnsOrContains: [
       "burnout risk",
       "overwhelm risk",
@@ -252,7 +252,7 @@ export const ADAPTIVE_COMPANION_LAYERS: ArchitectureLayer[] = [
   },
   {
     id: "ecosystem_intelligence",
-    name: "Ecosystem Intelligence™",
+    name: "Ecosystem Intelligence",
     learnsOrContains: [
       "features",
       "tools",
@@ -279,7 +279,7 @@ export const ADAPTIVE_COMPANION_LAYERS: ArchitectureLayer[] = [
   },
   {
     id: "board_intelligence",
-    name: "Board Intelligence™",
+    name: "Board Intelligence",
     learnsOrContains: [
       "workspace advisor roles (marketing, operations, planning, mindset)",
       "founder board advisors (7 roles)",
@@ -305,7 +305,7 @@ export const ADAPTIVE_COMPANION_LAYERS: ArchitectureLayer[] = [
   },
   {
     id: "continuous_learning",
-    name: "Continuous Learning Engine™",
+    name: "Continuous Learning Engine",
     learnsOrContains: [
       "user outcomes",
       "scenario performance",
@@ -358,7 +358,7 @@ export function evaluateArchitectureHealth(): ArchitectureHealthSnapshot {
       "CompanionGovernor as single turn entry",
       "Data-driven scenario category registry (200–500+ target)",
       "Unified signal bus with learning gates enabled in staged rollout",
-      "Shared advisor registry for Board Intelligence™",
+      "Shared advisor registry for Board Intelligence",
       "Server-authoritative user profile sync",
       "Intervention outcome attribution → Continuous Learning loop",
     ],
@@ -376,7 +376,7 @@ export function formatArchitectureHealthText(snapshot?: ArchitectureHealthSnapsh
     .map(([cat, n]) => `  ${cat}: ${n}`);
 
   return [
-    "Adaptive Companion Architecture™ — Health Snapshot",
+    "Adaptive Companion Architecture — Health Snapshot",
     `Evaluated: ${s.evaluatedAt}`,
     `Behavioral scenarios: ${s.behavioralScenarioCount} (target 200–500+)`,
     "Categories:",

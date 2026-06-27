@@ -1,5 +1,5 @@
 /**
- * Honor Their Intent™ — momentum protection and forbidden detours.
+ * Honor Their Intent — momentum protection and forbidden detours.
  */
 
 /** Never interrupt purposeful momentum with these patterns */

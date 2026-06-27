@@ -93,7 +93,7 @@ function finalizeOrchestration(input: {
 }
 
 /**
- * Companion Brain Orchestrator™
+ * Companion Brain Orchestrator
  *
  * Five layers:
  * 1 Foundation (never changes) → 2 Hospitality → 3 Conversation →

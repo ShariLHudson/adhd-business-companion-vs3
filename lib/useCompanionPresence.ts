@@ -89,6 +89,7 @@ export function useCompanionPresence(
       input.clearMyMindPhase,
       input.presenceSurface,
       input.presenceImageId,
+      input.thinkingMessage,
     ],
   );
 
@@ -121,7 +122,7 @@ export function useCompanionPresence(
     setSrc(resolvePresenceSrc(presence, available, presenceKey, input));
   }, [workspaceEntry, presence, available, catalog.revision, presenceKey, librarySrc, input.presenceSurface, input.presenceImageId]);
 
-  /** Clear My Mind™ / My Thoughts™ — rotate on each workspace entry. */
+  /** Clear My Mind / My Thoughts — rotate on each workspace entry. */
   useEffect(() => {
     if (!workspaceEntry || workspaceEntryKey <= 0) return;
     if (!available.length) return;

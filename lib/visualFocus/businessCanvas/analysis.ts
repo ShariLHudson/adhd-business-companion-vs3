@@ -33,7 +33,7 @@ export function buildBusinessCanvasAnalysis(
   const risks: string[] = [];
   if (channels.length > 0 && revenue.length === 0) {
     risks.push(
-      "Revenue Streams™: Visibility channels exist without a clear revenue stream — validate how discovery converts to income.",
+      "Revenue Streams: Visibility channels exist without a clear revenue stream — validate how discovery converts to income.",
     );
   }
   if (filled < 5) {
@@ -43,24 +43,24 @@ export function buildBusinessCanvasAnalysis(
   }
   if (costs.length === 0) {
     risks.push(
-      "Cost Structure™: No costs listed yet — profitability stays invisible until this section is filled.",
+      "Cost Structure: No costs listed yet — profitability stays invisible until this section is filled.",
     );
   }
   if (revenue.length === 1) {
     risks.push(
-      "Revenue Streams™: Your revenue currently depends on only one primary source.",
+      "Revenue Streams: Your revenue currently depends on only one primary source.",
     );
   }
 
   const opportunities: string[] = [];
   if (channels.length >= 2 && segments.length >= 1) {
     opportunities.push(
-      `Channels™: ${channels.join(", ")} may reach the same audience (${segments[0]}) — a unified content system could connect them.`,
+      `Channels: ${channels.join(", ")} may reach the same audience (${segments[0]}) — a unified content system could connect them.`,
     );
   }
   if (segments.length >= 1 && segments[0]!.length < 40) {
     opportunities.push(
-      "Customer Segments™: Audience definition appears narrow and may limit growth opportunities.",
+      "Customer Segments: Audience definition appears narrow and may limit growth opportunities.",
     );
   }
   if (value.length > 0 && revenue.length === 0) {
@@ -81,7 +81,7 @@ export function buildBusinessCanvasAnalysis(
     );
   } else {
     recommendations.push(
-      "Fill the highest-impact sections next: Customer Segments™, Value Proposition™, and Revenue Streams™.",
+      "Fill the highest-impact sections next: Customer Segments, Value Proposition, and Revenue Streams.",
     );
   }
 
@@ -93,8 +93,8 @@ export function buildBusinessCanvasAnalysis(
   ];
 
   const summary = purpose
-    ? `Business Canvas™ for "${title}" (${purpose}) — ${filled} of 9 sections mapped.`
-    : `Business Canvas™ for "${title}" — ${filled} of 9 sections mapped.`;
+    ? `Business Canvas for "${title}" (${purpose}) — ${filled} of 9 sections mapped.`
+    : `Business Canvas for "${title}" — ${filled} of 9 sections mapped.`;
 
   const nextSteps: string[] = [];
   for (const id of BUSINESS_CANVAS_SECTION_ORDER) {
@@ -104,7 +104,7 @@ export function buildBusinessCanvasAnalysis(
     }
   }
   if (nextSteps.length === 0) {
-    nextSteps.push("Save this canvas in My Work™ and revisit after your next strategy session.");
+    nextSteps.push("Save this canvas in My Work and revisit after your next strategy session.");
   }
 
   return {

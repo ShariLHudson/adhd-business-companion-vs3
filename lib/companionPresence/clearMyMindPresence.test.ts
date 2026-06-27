@@ -96,6 +96,6 @@ describe("evaluateClearMyMindPresence", () => {
   it("uses thinking expression after share", () => {
     const result = evaluateClearMyMindPresence("thinking");
     expect(result.animationState).toBe("thinking");
-    expect(result.thinkingMessage).toMatch(/moment|thinking|sit with/i);
+    expect(result.thinkingMessage).toMatch(/themes|connected|pressure|manageable/i);
   });
 });

@@ -15,7 +15,7 @@ type Props = ComponentProps<typeof ChatInputBar> & {
 };
 
 /**
- * Companion Communication Anchor™ — every primary screen renders this.
+ * Companion Communication Anchor — every primary screen renders this.
  * Style may change by room; access must never disappear.
  */
 export function CompanionCommunicationAnchor({

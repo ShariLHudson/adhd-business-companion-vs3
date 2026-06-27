@@ -1,5 +1,5 @@
 /**
- * Intuitive Awareness™ — sense what is happening beneath the surface.
+ * Intuitive Awareness — sense what is happening beneath the surface.
  * Surface Intent vs Actual Need. Not memory, not routing — subtext sensing.
  */
 
@@ -571,7 +571,7 @@ export function intuitiveAwarenessHintForChat(
   if (analysis.confidence === "low" && !analysis.gapDetected) return undefined;
 
   const parts: string[] = [
-    "INTUITIVE AWARENESS™ (mandatory — sense beneath the surface):",
+    "INTUITIVE AWARENESS (mandatory — sense beneath the surface):",
     "What the user says is often NOT the real thing. Sense resistance, hesitation, drift, discouragement, momentum, and avoidance without needing explicit statements.",
     "SURFACE INTENT vs ACTUAL NEED: respond to the actual need, not only the literal request.",
   ];

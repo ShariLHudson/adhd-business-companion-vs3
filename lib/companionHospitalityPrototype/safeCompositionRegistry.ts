@@ -1,5 +1,5 @@
 /**
- * Safe Composition Engine™ — placement metadata per approved photograph.
+ * Safe Composition Engine — placement metadata per approved photograph.
  * Text, chat input, and logo follow image-specific safe zones, not global CSS.
  */
 

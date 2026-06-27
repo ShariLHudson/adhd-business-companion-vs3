@@ -11,7 +11,7 @@ export type CompanionObjectSize = "xs" | "sm" | "md" | "lg" | "card" | "hero";
 
 export type CompanionObjectVisualProps = {
   objectId: string;
-  /** Signature Companion Object™ id — resolves form, size, and catalog link. */
+  /** Signature Companion Object id — resolves form, size, and catalog link. */
   signatureId?: string;
   /** Level 1 navigation · Level 2 feature · Level 3 environmental (scene placement). */
   form?: SignatureObjectForm;
@@ -35,7 +35,7 @@ const SIZE_CLASS: Record<CompanionObjectSize, string> = {
 };
 
 /**
- * Renders a Signature Object™ mini-scene or icon placeholder.
+ * Renders a Signature Object mini-scene or icon placeholder.
  * CSS homestead scenes until PNG/SVG art lands in the Object Library.
  */
 export function CompanionObjectVisual({

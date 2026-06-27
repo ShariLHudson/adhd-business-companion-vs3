@@ -94,7 +94,7 @@ function analysisMeta(analysis?: VisualFocusAnalysis): Record<string, number> {
 }
 
 /**
- * End-of-cycle hook: capture learning signals and feed Founder Intelligence™.
+ * End-of-cycle hook: capture learning signals and feed Founder Intelligence.
  * Called after visual output + insights are materialized on the map.
  */
 export function completeVisualThinkingIntelligenceCycle(map: VisualFocusMap): void {

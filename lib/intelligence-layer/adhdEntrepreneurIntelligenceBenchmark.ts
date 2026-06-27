@@ -1,7 +1,7 @@
 /**
  * ADHD Entrepreneur Intelligence Benchmark — Phase 2
  *
- * Companion Intelligence™ Validation Suite — Phase 2 Expansion
+ * Companion Intelligence Validation Suite — Phase 2 Expansion
  * ─────────────────────────────────────────────────────────────
  *
  * Complements the existing 24-scenario Phase 1 foundation with 50 new

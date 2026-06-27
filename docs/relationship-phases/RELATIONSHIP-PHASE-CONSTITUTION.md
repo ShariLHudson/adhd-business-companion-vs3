@@ -1,5 +1,5 @@
-# Relationship Phase Constitution™
-## The Constitution of Companion Intelligence™ — Relationship Architecture
+# Relationship Phase Constitution
+## The Constitution of Companion Intelligence — Relationship Architecture
 
 **Version:** 1.0  
 **Status:** Canonical for all Relationship Phase work  
@@ -10,7 +10,7 @@
 | 1 | `docs-companion-intelligence/21_Companion_Constitution.md` | Product behavior, consent, one voice, forbidden actions |
 | 2 | `docs/EXPERIENCE_OF_SHARI.md` · `docs/THE_HONEST_SHARI.md` | Shari's presence and believable humanity |
 | 3 | `docs/COMPANION_TRUST_ARCHITECTURE.md` | Emotional trust earned over time |
-| 4 | `docs/COMPANION_DECISION_INTELLIGENCE.md` | Judgment — Decision Ladder™, what Shari does next |
+| 4 | `docs/COMPANION_DECISION_INTELLIGENCE.md` | Judgment — Decision Ladder, what Shari does next |
 | 5 | **This document** | Relationship phase architecture, progression, activation |
 | 6 | `docs/relationship-phases/Relationship-Phase-Roadmap.md` | Phase summaries and registry |
 | 7 | `docs/relationship-phases/Phase-*.md` | Per-phase specifications |
@@ -253,7 +253,7 @@ Future development **MUST NOT:**
 
 | Rule | Rationale |
 |------|-----------|
-| Create competing companion voices | One Shari — Board of Directors™ advice is translated, not repeated |
+| Create competing companion voices | One Shari — Board of Directors advice is translated, not repeated |
 | Create separate assistant personalities | Wisdom Companion, ADHD Business, etc. are **audience/content** modifiers — not separate companions in one session |
 | Expose internal phases to users | No "You're in Phase 7" — milestones are felt, not labeled |
 | Expose intelligence scores | No productivity scores, trait percentages, or confidence KPIs in UX |
@@ -294,8 +294,8 @@ The same phase number means different things:
 
 | Number | Relationship Phase | Founder Ecosystem Phase |
 |--------|-------------------|------------------------|
-| 10 | Legacy & Transformation Intelligence™ | Stage-Aware Recommendation Engine |
-| 11 | Ecosystem Intelligence™ (whole life) | Action & Workspace Integration |
+| 10 | Legacy & Transformation Intelligence | Stage-Aware Recommendation Engine |
+| 11 | Ecosystem Intelligence (whole life) | Action & Workspace Integration |
 | 12 | *Does not exist* | Founder Command Center |
 | 13 | *Does not exist* | Adaptive Founder Companion |
 
@@ -305,7 +305,7 @@ Developers referencing "Phase 10" without a namespace have shipped features to t
 
 **In code comments:**
 ```typescript
-// Relationship Phase 10 — Legacy & Transformation Intelligence™
+// Relationship Phase 10 — Legacy & Transformation Intelligence
 // Founder Ecosystem Phase 10 — Stage-Aware Recommendations
 ```
 
@@ -441,17 +441,17 @@ Priority debt before Phase 12 consideration:
 
 ### ADR-004: Phase 10 — active
 
-- **Decision:** `lib/transformationIntelligence.ts` implements Legacy & Transformation Intelligence™
+- **Decision:** `lib/transformationIntelligence.ts` implements Legacy & Transformation Intelligence
 - **Status:** Accepted and wired
 - **Integration:** Chat hints, panel, resolver, validation tests
 - **Note:** Resolver requires Phase 7, not Phase 9 — intentional in code; narrative order differs
 
 ### ADR-005: Phase 11 — active
 
-- **Decision:** `lib/ecosystemIntelligence.ts` implements whole-life Ecosystem Intelligence™
+- **Decision:** `lib/ecosystemIntelligence.ts` implements whole-life Ecosystem Intelligence
 - **Status:** Accepted and wired
 - **Integration:** Chat hints, panel, resolver (highest phase), validation tests
-- **Note:** Name collides with Adaptive Architecture "Layer 6 — Ecosystem Intelligence™" — different scope (relationship vs platform layer)
+- **Note:** Name collides with Adaptive Architecture "Layer 6 — Ecosystem Intelligence" — different scope (relationship vs platform layer)
 
 ### ADR-006: Founder Ecosystem remains separate
 

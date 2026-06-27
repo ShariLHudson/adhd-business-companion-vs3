@@ -38,7 +38,7 @@ export function detectEmergentNeed(userText?: string | null): boolean {
   return EMERGENT_NEED_RE.test(text);
 }
 
-/** Bridge to Companion Relationship™ visit intent */
+/** Bridge to Companion Relationship visit intent */
 export function mapArrivalModeToVisitIntent(
   mode: GuestArrivalMode,
 ): "work_now" | "linger" | "neutral" {

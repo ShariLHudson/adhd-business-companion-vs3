@@ -8,7 +8,7 @@ export type DelightMoment = {
   presentation: "object-moved" | "note-appeared" | "creature" | "bloom";
 };
 
-/** Delight Library™ — things users simply notice. Never achievements. */
+/** Delight Library — things users simply notice. Never achievements. */
 export const DELIGHT_LIBRARY: DelightMoment[] = [
   { id: "squirrel-acorn", label: "A squirrel stole an acorn outside", places: ["garden", "garden-path"], frequency: "rare", presentation: "creature" },
   { id: "sticky-note-moved", label: "A sticky note shifted on the board", places: ["creative-studio", "workshop"], frequency: "rare", presentation: "note-appeared" },

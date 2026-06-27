@@ -1,6 +1,6 @@
 /**
- * Visual Thinking™ lifecycle learning — anonymous metadata on map actions.
- * Map deletion removes user-facing data; learning events persist for Founder Intelligence™.
+ * Visual Thinking lifecycle learning — anonymous metadata on map actions.
+ * Map deletion removes user-facing data; learning events persist for Founder Intelligence.
  */
 
 import { emitCompanionSignal } from "@/lib/intelligence-layer/signalBus";

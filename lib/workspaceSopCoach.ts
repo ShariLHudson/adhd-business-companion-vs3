@@ -395,5 +395,5 @@ export function buildSopAcceptMessage(session: WorkspaceSession): string {
     session.energyScope === "low"
       ? " With low energy, we'll only do a couple of fields today."
       : "";
-  return `${focusPrefix(step.fieldId)}I can see **${wf.title}** open beside us.${scopeNote} ${step.coachQuestion}`;
+  return `${focusPrefix(step.fieldId)}There we go — **${wf.title}** is ready when you are.${scopeNote} ${step.coachQuestion}`;
 }

@@ -1,5 +1,5 @@
 /**
- * Phase 1 Onboarding — First Conversation Experience™
+ * Phase 1 Onboarding — First Conversation Experience
  *
  * Relationship-building through conversation — not a profile form.
  * Understand → deliver value → memory seed → begin helping.
@@ -8,6 +8,7 @@
 import type { ChatTurn } from "./companionIntelligence";
 import { saveBusinessProfile } from "./companionStore";
 import { recordDiscoveryAnswer, completeFirstVisit } from "./companionDiscovery";
+import { scheduleWelcomeRoomInvitation } from "./welcomeRoom";
 
 export type Phase1OnboardingPhase =
   | "opening"
@@ -345,7 +346,7 @@ export function buildTrustReflection(profile: Phase1RelationshipProfile): string
     parts.push(`wanting progress on ${profile.immediateGoal.toLowerCase()}`);
   }
   if (!parts.length) return null;
-  return `It sounds like you're ${parts.join(" and ")}.`;
+  return `You've mentioned ${parts.join(" and ")} — did I hear that right?`;
 }
 
 export function buildMemorySeedSummary(profile: Phase1RelationshipProfile): string {
@@ -506,6 +507,7 @@ export function applyPhase1OnboardingTurn(
 
   const cur = readState();
   const nextPhase = evaluation.complete ? "complete" : evaluation.phase;
+  const wasComplete = cur.complete;
 
   patchPhase1OnboardingState({
     phase: nextPhase,
@@ -517,6 +519,9 @@ export function applyPhase1OnboardingTurn(
 
   if (evaluation.complete) {
     persistRelationshipProfile(evaluation.profile);
+    if (!wasComplete) {
+      scheduleWelcomeRoomInvitation();
+    }
   }
 
   return evaluation;

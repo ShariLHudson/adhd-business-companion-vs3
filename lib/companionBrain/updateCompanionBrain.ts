@@ -1,5 +1,5 @@
 /**
- * Update Companion Brain™ — judgment only, never user goals.
+ * Update Companion Brain — judgment only, never user goals.
  * @see constitution.ts — updateCompanionBrain
  */
 

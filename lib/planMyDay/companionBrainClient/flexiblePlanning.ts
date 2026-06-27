@@ -1,5 +1,5 @@
 /**
- * Flexible Planning Mode™ — presentation and context (no reasoning).
+ * Flexible Planning Mode — presentation and context (no reasoning).
  */
 
 import type { CompanionJudgmentResult } from "@/lib/companionBrain";

@@ -1,5 +1,5 @@
 /**
- * My Thoughts™ — living thought & collection types.
+ * My Thoughts — living thought & collection types.
  * Collections are many-to-many overlays, not folders.
  * @see lib/intelligence/INTELLIGENCE_REGISTRY.md
  */
@@ -19,7 +19,7 @@ export type ThoughtCollection = {
   suggestedByAi?: boolean;
   /** Merged collection ids (for LIG lineage) */
   mergedFrom?: string[];
-  /** Companion Box™ identity */
+  /** Companion Box identity */
   icon?: string;
   /** Distinct color slot — see collectionColors.ts */
   colorId?: string;
@@ -53,7 +53,7 @@ export type ThoughtConnectionKind =
   | "content"
   | "event";
 
-/** Living Intelligence Graph™ — meaningful links only (future). */
+/** Living Intelligence Graph — meaningful links only (future). */
 export type ThoughtConnection = {
   id: string;
   fromThoughtId: string;
@@ -70,7 +70,7 @@ export type ThoughtGrowthStage =
   | "project"
   | "completed";
 
-/** Mind Landscape™ signals (future) — stored for LIG consumption. */
+/** Mind Landscape signals (future) — stored for LIG consumption. */
 export type ThoughtLandscapeSignals = {
   thoughtCount: number;
   recentCaptureCount: number;

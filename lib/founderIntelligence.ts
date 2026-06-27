@@ -1,5 +1,5 @@
 /**
- * Founder Intelligence™ — Companion Health Dashboard™
+ * Founder Intelligence — Companion Health Dashboard
  *
  * Aggregates companion learning signals into founder-actionable health views.
  * Founder-only — never user-facing.

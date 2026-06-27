@@ -14,13 +14,14 @@ import { isPlanItemActive } from "@/lib/planMyDay/planDayItems";
 import { FOCUS_CAP, READY_CAP } from "./curateLivingBoard";
 
 /** Gateway partnership copy — recommendation, not approval. */
-export const GATEWAY_CONFIRM_PROMPT = "Does this feel right for today?";
-export const GATEWAY_YES_FEELS_RIGHT = "✓ Yes — This feels right";
-export const GATEWAY_ADJUST_TOGETHER = "↺ Let's adjust it together";
-export const GATEWAY_NOT_RIGHT_NOW = "Not right now";
+export const GATEWAY_CONFIRM_PROMPT =
+  "Does this feel like the right direction for today?";
+export const GATEWAY_YES_FEELS_RIGHT = "Yes — This feels right";
+export const GATEWAY_ADJUST_TOGETHER = "Adapt My Day";
+export const GATEWAY_NOT_RIGHT_NOW = "Not Right Now";
 
 export type PlanDayOrientationPresentation = {
-  /** Morning Presence™ — Shari noticing before guidance */
+  /** Morning Presence — Shari noticing before guidance */
   morningPresence: MorningPresenceResult;
   /** Plain companion line — accessibility / legacy */
   shariMessage: string;
@@ -154,7 +155,7 @@ export function formatInvitation(judgment: CompanionJudgmentResult): string {
   return `I think there are ${n} things worth your attention today.`;
 }
 
-/** Stale judgments (e.g. HMR) may predate Morning Presence™ */
+/** Stale judgments (e.g. HMR) may predate Morning Presence */
 function resolveMorningPresence(
   judgment: CompanionJudgmentResult,
 ): MorningPresenceResult {
@@ -235,7 +236,7 @@ export type LivingBoardPartition = {
   momentumLabel: string | null;
 };
 
-/** Living Board™ grouping — presentation only. */
+/** Living Board grouping — presentation only. */
 export function partitionLivingBoard(
   items: PlanDayItem[],
   momentumLabel: string | null,

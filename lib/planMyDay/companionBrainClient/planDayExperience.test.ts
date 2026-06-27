@@ -34,10 +34,12 @@ describe("presentPlanDayOrientation", () => {
     expect(presentation.invitation).toMatch(/\battention\b/i);
     expect(presentation.proposalPreview.length).toBeGreaterThan(0);
     expect(presentation.proposalPreview.length).toBeLessThanOrEqual(3);
-    expect(presentation.confirmPrompt).toBe("Does this feel right for today?");
-    expect(presentation.primaryConfirmLabel).toBe("✓ Yes — This feels right");
-    expect(presentation.adjustTogetherLabel).toBe("↺ Let's adjust it together");
-    expect(presentation.deferLabel).toBe("Not right now");
+    expect(presentation.confirmPrompt).toBe(
+      "Does this feel like the right direction for today?",
+    );
+    expect(presentation.primaryConfirmLabel).toBe("Yes — This feels right");
+    expect(presentation.adjustTogetherLabel).toBe("Adapt My Day");
+    expect(presentation.deferLabel).toBe("Not Right Now");
     expect(presentation.willMaterialize).toBe(true);
   });
 

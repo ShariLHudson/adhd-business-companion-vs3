@@ -26,7 +26,7 @@ type AppSidebarProps = {
   onNavSelect: (nav: SidebarNavId, mode?: CoachingMode) => void;
 };
 
-// Six sidebar doors — Chat, Focus My Brain, Visual Thinking, Growth, Other, How Do I.
+// Seven sidebar doors — Chat through Welcome Room; Settings under ⋯ More.
 export function AppSidebar({
   activeNav,
   activeSection,

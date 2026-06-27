@@ -10,6 +10,7 @@ import { useVisualMode } from "@/lib/useVisualMode";
 import { getMemberSinceIso } from "@/lib/shariMemberSince";
 import { useCompanionPresence } from "@/lib/useCompanionPresence";
 import { ShariPortrait } from "@/components/companion/ShariPortrait";
+import { identityBarShowsThinkingCopy } from "@/lib/visibleThinking/chatThinkingUi";
 
 const RING: Record<EmotionalState, string> = {
   focused: "#2e8b57",
@@ -42,6 +43,8 @@ type IdentityBarProps = {
   workspacePanel?: AppSection | null;
   workspaceActiveBeside?: boolean;
   isThinking?: boolean;
+  /** Visible Thinking message — overrides presence default while loading. */
+  thinkingMessage?: string | null;
 };
 
 export function IdentityBar({
@@ -64,6 +67,7 @@ export function IdentityBar({
   workspacePanel = null,
   workspaceActiveBeside = false,
   isThinking = false,
+  thinkingMessage = null,
 }: IdentityBarProps) {
   const effectiveWelcome = calmHome ? null : welcomeLine;
   const effectivePrimary =
@@ -108,6 +112,7 @@ export function IdentityBar({
     workspacePanel,
     workspaceActiveBeside,
     isThinking,
+    thinkingMessage: thinkingMessage ?? undefined,
   });
 
   if (photoError) {
@@ -171,7 +176,7 @@ export function IdentityBar({
             />
           </div>
           <p className="text-base italic leading-snug text-[#6b635a]">
-            {isThinking && presence.thinkingMessage
+            {identityBarShowsThinkingCopy(isThinking, presence.thinkingMessage)
               ? presence.thinkingMessage
               : status}
           </p>
@@ -211,7 +216,7 @@ export function IdentityBar({
                   : "italic text-[#6b635a]"
               }`}
             >
-              {isThinking && presence.thinkingMessage
+              {identityBarShowsThinkingCopy(isThinking, presence.thinkingMessage)
                 ? presence.thinkingMessage
                 : status}
             </p>

@@ -1,5 +1,5 @@
 /**
- * Product Expansion Uncertainty™ — validation scenario helpers.
+ * Product Expansion Uncertainty — validation scenario helpers.
  */
 
 import type { ChatTurn } from "../companionIntelligence";

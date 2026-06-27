@@ -1,5 +1,5 @@
 /**
- * Decision Complexity Score™ — how much discovery a decision needs.
+ * Decision Complexity Score — how much discovery a decision needs.
  */
 
 import type { ChatTurn } from "../companionIntelligence";

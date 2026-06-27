@@ -8,13 +8,13 @@ Approved Shari photos live in:
 
 Name gallery files descriptively, e.g.:
 
-    shari-i-am-here.png          (default Welcome Companion Presence™ image)
+    shari-i-am-here.png          (default Welcome Companion Presence image)
     shari-warm-headshot.png
     shari-thinking.png
     shari-celebrating-fireworks.png
 
 The app scans that folder automatically — no manual manifest needed.
-Clear My Mind™ and My Thoughts™ rotate on each entry; home rotates gently over time.
+Clear My Mind and My Thoughts rotate on each entry; home rotates gently over time.
 
 Legacy numbered slots (optional):
 

@@ -1,5 +1,5 @@
 /**
- * Companion Decision Intelligence™ — unified turn evaluation.
+ * Companion Decision Intelligence — unified turn evaluation.
  */
 
 import {
@@ -76,7 +76,7 @@ export function companionDecisionIntelligenceHintForChat(
   context?: { userText: string; messages: ChatTurn[] },
 ): string {
   const parts: string[] = [
-    "COMPANION DECISION INTELLIGENCE™ (mandatory):",
+    "COMPANION DECISION INTELLIGENCE (mandatory):",
     "Sequence: Understand first → Think second → Choose experience third → Follow through fourth → Outcome fifth.",
     `Decision Complexity: ${intel.complexity.level} (max ${intel.complexity.targetDiscoveryQuestions} discovery questions; ${intel.complexity.discoveryQuestionsAsked} asked).`,
     `Surface question: ${intel.situation.surfaceQuestion.slice(0, 120)}`,

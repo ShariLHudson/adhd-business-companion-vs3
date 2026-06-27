@@ -28,6 +28,10 @@ describe("Companion intent routing — chat-only (information)", () => {
         bucket: "research",
       },
       {
+        text: "What are the latest Pinterest trends?",
+        bucket: "research",
+      },
+      {
         text: "How do sales funnels work?",
         bucket: "learning",
       },

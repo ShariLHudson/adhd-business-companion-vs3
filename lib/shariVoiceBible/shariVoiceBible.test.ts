@@ -29,7 +29,7 @@ const REQUIRED_CATEGORIES: ShariVoiceCategory[] = [
   "from_creative_studio",
 ];
 
-describe("Shari Voice Bible™", () => {
+describe("Shari Voice Bible", () => {
   it("contains hundreds of approved lines", () => {
     expect(SHARI_VOICE_BIBLE_ENTRY_COUNT).toBeGreaterThanOrEqual(300);
     expect(SHARI_VOICE_BIBLE_ENTRIES.length).toBe(SHARI_VOICE_BIBLE_ENTRY_COUNT);

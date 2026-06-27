@@ -1,5 +1,5 @@
 /**
- * P0.18 — Google Sheets Creation Intelligence™
+ * P0.18 — Google Sheets Creation Intelligence
  * Detect spreadsheet-worthy requests, collect minimum info, offer creation.
  */
 

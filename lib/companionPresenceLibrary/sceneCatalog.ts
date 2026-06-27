@@ -51,7 +51,7 @@ function scene(
 }
 
 /**
- * Approved Companion Presence™ library — add files here only; no code changes elsewhere.
+ * Approved Companion Presence library — add files here only; no code changes elsewhere.
  */
 export const COMPANION_PRESENCE_SCENE_CATALOG: CompanionPresenceLibraryEntry[] = [
   scene("shari-i-am-here-2.png", "I Am Here", ["welcome", "gentle", "morning", "afternoon"], {

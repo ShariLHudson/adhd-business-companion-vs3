@@ -128,7 +128,7 @@ export function resumeReceiptForContinuityType(
     case "visual-focus-map":
       return title
         ? `Welcome back. We reopened your **${title}** visual map.`
-        : "Welcome back. We reopened your visual map in **Visual Focus™**.";
+        : "Welcome back. We reopened your visual map in **Visual Focus**.";
     default:
       return "Welcome back. Picking up where you left off.";
   }

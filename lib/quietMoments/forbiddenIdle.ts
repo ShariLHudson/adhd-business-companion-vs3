@@ -1,5 +1,5 @@
 /**
- * Quiet Moments™ — copy and UI patterns forbidden during silence.
+ * Quiet Moments — copy and UI patterns forbidden during silence.
  */
 
 import type { ForbiddenIdleCopyVerdict } from "./types";
@@ -68,7 +68,7 @@ export function isForbiddenIdleCopy(text: string): ForbiddenIdleCopyVerdict {
 export function assertNotForbiddenIdleCopy(text: string): void {
   const verdict = isForbiddenIdleCopy(text);
   if (verdict.forbidden) {
-    throw new Error(`Quiet Moments™: ${verdict.reason}: "${text.slice(0, 60)}"`);
+    throw new Error(`Quiet Moments: ${verdict.reason}: "${text.slice(0, 60)}"`);
   }
 }
 

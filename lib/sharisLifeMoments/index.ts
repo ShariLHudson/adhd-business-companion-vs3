@@ -1,5 +1,5 @@
 /**
- * Shari's Life Moments™
+ * Shari's Life Moments
  *
  * First-person invitations into Shari's life — never advice.
  * @see docs/companion-homestead/SHARIS_LIFE_MOMENTS.md

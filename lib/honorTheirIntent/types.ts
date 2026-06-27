@@ -1,5 +1,5 @@
 /**
- * Honor Their Intent™ — meet people where they are.
+ * Honor Their Intent — meet people where they are.
  * @see docs/companion-homestead/HONOR_THEIR_INTENT.md
  */
 

@@ -13,7 +13,7 @@ import {
   COMPANION_RELATIONSHIP_STYLES_CATALOG,
 } from "./index";
 
-describe("Companion Relationship™", () => {
+describe("Companion Relationship", () => {
   beforeEach(() => {
     clearCompanionRelationshipStoreForTests();
   });

@@ -1,5 +1,5 @@
 /**
- * Meaning Before Matching™ — account/integration intent only.
+ * Meaning Before Matching — account/integration intent only.
  * "connect" alone is not Connections routing.
  */
 

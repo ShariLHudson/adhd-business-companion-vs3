@@ -1,5 +1,5 @@
 /**
- * Category Intelligence™ — classify where a task belongs in the user's life.
+ * Category Intelligence — classify where a task belongs in the user's life.
  * Pure reasoning service — no UI, no workspace imports.
  */
 

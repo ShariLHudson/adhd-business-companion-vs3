@@ -5,7 +5,7 @@ import {
 import type { VisitIntent } from "./types";
 
 /**
- * Dynamic Visit Awareness™ — delegates to Honor Their Intent™.
+ * Dynamic Visit Awareness — delegates to Honor Their Intent.
  */
 export function resolveVisitIntent(input: {
   userText?: string | null;

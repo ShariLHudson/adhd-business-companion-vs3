@@ -1,5 +1,5 @@
 /**
- * Wisdom of Restraint™ — patterns that break trust or add noise.
+ * Wisdom of Restraint — patterns that break trust or add noise.
  */
 
 export const RESTRAINT_PERFORMANCE_PATTERNS = [
@@ -30,7 +30,7 @@ export const RESTRAINT_WHY_ABSENCE_PATTERNS = [
   /\bwhy so long\b/i,
 ] as const;
 
-/** Quiet Moments™ — never punish stillness or surveil idle guests. */
+/** Quiet Moments — never punish stillness or surveil idle guests. */
 export const RESTRAINT_IDLE_SURVEILLANCE_PATTERNS = [
   /\bare you still there\b/i,
   /\bstill (?:here|with me|online)\b/i,

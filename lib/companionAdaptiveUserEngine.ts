@@ -1,5 +1,5 @@
 /**
- * Sprint 5 — Adaptive User Intelligence™
+ * Sprint 5 — Adaptive User Intelligence
  * Living model: work rhythms, learning style, intervention effectiveness, prediction.
  */
 
@@ -291,7 +291,7 @@ export function adaptiveUserIntelligenceSprint5HintForChat(input: {
   });
 
   const parts: string[] = [
-    "ADAPTIVE USER INTELLIGENCE™ (Sprint 5 — Layer 2 — invisible living model):",
+    "ADAPTIVE USER INTELLIGENCE (Sprint 5 — Layer 2 — invisible living model):",
     "Learn continuously — never announce scores or internal systems.",
     `Top learning style signal: ${topStyle.id.replace(/_/g, " ")} (internal only).`,
   ];

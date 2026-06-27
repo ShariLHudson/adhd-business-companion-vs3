@@ -6,9 +6,13 @@ import {
 } from "@/lib/navigationBack";
 
 export type AppBackButtonProps = {
-  /** Previous page name — e.g. "Clear My Mind™" (prefix added automatically). */
-  destination: string;
-  onBack: () => void;
+  /** Previous page name — e.g. "Clear My Mind" (prefix added automatically). */
+  destination?: string;
+  /** @deprecated Use `destination`. */
+  label?: string;
+  onBack?: () => void;
+  /** @deprecated Use `onBack`. */
+  onClick?: () => void;
   className?: string;
   size?: "default" | "compact";
   /** Override the computed aria-label. */
@@ -29,18 +33,21 @@ const sizes = {
  */
 export function AppBackButton({
   destination,
+  label: legacyLabel,
   onBack,
+  onClick,
   className = "",
   size = "default",
   ariaLabel,
 }: AppBackButtonProps) {
-  const dest = normalizeBackDestination(destination);
+  const dest = normalizeBackDestination(destination ?? legacyLabel);
   const label = formatAppBackLabel(dest);
+  const handleBack = onBack ?? onClick ?? (() => {});
 
   return (
     <button
       type="button"
-      onClick={onBack}
+      onClick={handleBack}
       className={`${base} ${sizes[size]} ${className}`.trim()}
       aria-label={ariaLabel ?? label}
       data-testid="app-back-button"

@@ -1,5 +1,5 @@
 /**
- * Future Capability Architecture™ — ecosystem capability registry and design gates.
+ * Future Capability Architecture — ecosystem capability registry and design gates.
  *
  * The current app is only the first visible layer. Capabilities register here;
  * new features must pass design gates before implementation.
@@ -572,7 +572,7 @@ export const FUTURE_CAPABILITIES: FutureCapability[] = [
   },
   {
     id: "adapt_my_day",
-    name: "Today's Reality™",
+    name: "Today's Reality",
     category: "productivity_ecosystem",
     maturity: "production",
     canonicalModules: ["lib/adaptMyDayChatRouting.ts", "lib/companionEcosystemIntent.ts"],

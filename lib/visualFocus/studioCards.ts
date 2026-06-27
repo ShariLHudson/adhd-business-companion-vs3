@@ -1,5 +1,5 @@
 /**
- * Visual Focus™ Studio — single source of truth for teaching cards.
+ * Visual Focus Studio — single source of truth for teaching cards.
  */
 
 import type { VisualFocusMode } from "./types";
@@ -35,7 +35,7 @@ export type VisualFocusStudioCard = {
 };
 
 export const VISUAL_FOCUS_STUDIO_HERO = {
-  title: "Visual Thinking™",
+  title: "Visual Thinking",
   tagline: "Think visually, not linearly.",
   microCopy:
     "Build a map, discover patterns, and receive insights, recommendations, and next steps.",
@@ -51,7 +51,7 @@ export const VISUAL_FOCUS_WORK_WITH_SHARI = {
 } as const;
 
 export const VISUAL_FOCUS_SHARI_PROMPT =
-  "I'm in Visual Thinking™ and I'm not sure which visual thinking tool fits. Here's what I'm trying to figure out: ";
+  "I'm in Visual Thinking and I'm not sure which visual thinking tool fits. Here's what I'm trying to figure out: ";
 
 const ACCENTS: Record<VisualFocusMode, VisualFocusStudioAccent> = {
   "mind-map": {
@@ -115,7 +115,7 @@ const ACCENTS: Record<VisualFocusMode, VisualFocusStudioAccent> = {
 export const VISUAL_FOCUS_STUDIO_CARDS: VisualFocusStudioCard[] = [
   {
     mode: "mind-map",
-    title: "Mind Map™",
+    title: "Mind Map",
     emoji: "🧠",
     whatItIs: "Branch ideas outward so you can see the whole picture at once.",
     whenToUse:
@@ -146,13 +146,13 @@ export const VISUAL_FOCUS_STUDIO_CARDS: VisualFocusStudioCard[] = [
       "├ Marketing",
       "└ Follow Up",
     ],
-    actionLabel: "Create Mind Map™",
+    actionLabel: "Create Mind Map",
     accent: ACCENTS["mind-map"],
     keywords: ["workshop", "course", "brainstorm", "content", "offer", "ideas"],
   },
   {
     mode: "decision-tree",
-    title: "Decision Tree™",
+    title: "Decision Tree",
     subtitle: "What happens if I choose this?",
     emoji: "🌳",
     whatItIs: "Explore possible paths before you commit to a choice.",
@@ -186,13 +186,13 @@ export const VISUAL_FOCUS_STUDIO_CARDS: VisualFocusStudioCard[] = [
     ],
     actionLabel: "Create Path Map",
     boundaryNote:
-      "Need a recommendation? Use Decision Compass™ — it helps answer which option is best. Decision Tree™ explores paths; Decision Compass™ helps you choose.",
+      "Need a recommendation? Use Decision Compass — it helps answer which option is best. Decision Tree explores paths; Decision Compass helps you choose.",
     accent: ACCENTS["decision-tree"],
     keywords: ["hire", "price", "launch", "decide", "whether", "paths", "outcomes"],
   },
   {
     mode: "strategy-map",
-    title: "Strategy Map™",
+    title: "Strategy Map",
     emoji: "🎯",
     whatItIs: "Connect goals, actions, and priorities into one visual path.",
     whenToUse:
@@ -223,15 +223,15 @@ export const VISUAL_FOCUS_STUDIO_CARDS: VisualFocusStudioCard[] = [
       "↓",
       "Generate Leads",
     ],
-    actionLabel: "Build Strategy Map™",
+    actionLabel: "Build Strategy Map",
     boundaryNote:
-      "Use Decision Compass™ when you need to choose between options. Use Strategy Map™ when you need to build a path toward a goal.",
+      "Use Decision Compass when you need to choose between options. Use Strategy Map when you need to build a path toward a goal.",
     accent: ACCENTS["strategy-map"],
     keywords: ["goal", "revenue", "grow", "strategy", "plan", "marketing"],
   },
   {
     mode: "relationship-map",
-    title: "Relationship Map™",
+    title: "Relationship Map",
     emoji: "🤝",
     whatItIs:
       "See how people, systems, ideas, or business areas influence one another.",
@@ -260,13 +260,13 @@ export const VISUAL_FOCUS_STUDIO_CARDS: VisualFocusStudioCard[] = [
       "↔ Marketing",
       "↔ Revenue",
     ],
-    actionLabel: "Create Relationship Map™",
+    actionLabel: "Create Relationship Map",
     accent: ACCENTS["relationship-map"],
     keywords: ["connect", "relationship", "system", "dependency", "audience", "offer"],
   },
   {
     mode: "project-map",
-    title: "Project Map™",
+    title: "Project Map",
     emoji: "📁",
     whatItIs: "Break a large initiative into visual stages you can actually start.",
     whenToUse:
@@ -295,15 +295,15 @@ export const VISUAL_FOCUS_STUDIO_CARDS: VisualFocusStudioCard[] = [
       "├ Emails",
       "└ Promotion",
     ],
-    actionLabel: "Create Project Map™",
+    actionLabel: "Create Project Map",
     boundaryNote:
-      "Project Map™ helps you think through project structure. Projects™ is where ongoing project work lives.",
+      "Project Map helps you think through project structure. Projects is where ongoing project work lives.",
     accent: ACCENTS["project-map"],
     keywords: ["project", "website", "funnel", "launch", "course"],
   },
   {
     mode: "visual-kanban",
-    title: "Visual Kanban™",
+    title: "Visual Kanban",
     emoji: "🧩",
     whatItIs: "Move ideas across columns to sort, group, and explore visually.",
     whenToUse:
@@ -334,15 +334,15 @@ export const VISUAL_FOCUS_STUDIO_CARDS: VisualFocusStudioCard[] = [
       "↓",
       "Ready to act",
     ],
-    actionLabel: "Open Visual Kanban™",
+    actionLabel: "Open Visual Kanban",
     boundaryNote:
-      "Visual Kanban™ is for ideas. Plan My Day™ is for today's tasks.",
+      "Visual Kanban is for ideas. Plan My Day is for today's tasks.",
     accent: ACCENTS["visual-kanban"],
     keywords: ["organize", "columns", "move", "sort", "group", "kanban"],
   },
   {
     mode: "business-canvas",
-    title: "Business Canvas™",
+    title: "Business Canvas",
     emoji: "🏢",
     whatItIs: "Map how your business works — nine guided sections, no jargon required.",
     whenToUse:
@@ -365,15 +365,15 @@ export const VISUAL_FOCUS_STUDIO_CARDS: VisualFocusStudioCard[] = [
     whyItHelps:
       "You do not need to know business frameworks. Each section teaches what it means, why it matters, and what belongs there.",
     exampleLines: [
-      "Customer Segments™",
-      "Value Proposition™",
-      "Channels™",
-      "Revenue Streams™",
+      "Customer Segments",
+      "Value Proposition",
+      "Channels",
+      "Revenue Streams",
       "…9 guided sections",
     ],
-    actionLabel: "Create Business Canvas™",
+    actionLabel: "Create Business Canvas",
     boundaryNote:
-      "Business Canvas™ teaches while you build. Generate Business Canvas™ when ready for the visual 9-box and insights.",
+      "Business Canvas teaches while you build. Generate Business Canvas when ready for the visual 9-box and insights.",
     accent: ACCENTS["business-canvas"],
     keywords: ["business", "model", "canvas", "revenue", "offer", "audience", "pivot"],
   },
@@ -397,7 +397,7 @@ export function visualThinkingToolHelpTips(): string[] {
   });
   return [
     ...toolTips,
-    "Decision Compass™ (separate from Visual Thinking™) — when you need help choosing the best option, not just exploring paths. Decision Tree™ shows what could happen; Decision Compass™ helps you decide.",
-    "Continue Thinking™ (studio dashboard) resumes up to 3 active maps — momentum, not storage. Saved™ in Other™ is for work you intentionally keep.",
+    "Decision Compass (separate from Visual Thinking) — when you need help choosing the best option, not just exploring paths. Decision Tree shows what could happen; Decision Compass helps you decide.",
+    "Continue Thinking (studio dashboard) resumes up to 3 active maps — momentum, not storage. Saved in Other is for work you intentionally keep.",
   ];
 }

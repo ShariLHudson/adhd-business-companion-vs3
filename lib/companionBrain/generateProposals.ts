@@ -1,5 +1,5 @@
 /**
- * Proposal Generation™ — prepare options, never auto-commit.
+ * Proposal Generation — prepare options, never auto-commit.
  * @see constitution.ts — generateProposals
  */
 

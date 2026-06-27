@@ -1,4 +1,4 @@
-# Companion Relationship™
+# Companion Relationship
 ## Every Person Deserves The Kind Of Companion That Helps Them Best
 
 **Version:** 1.0  
@@ -19,7 +19,7 @@ Instead, adjust:
 - Pace
 - Conversation length
 - Environmental storytelling
-- Memory Triggers™
+- Memory Triggers
 - Personal stories
 - Speed to work
 - Frequency of check-ins
@@ -30,19 +30,19 @@ Instead, adjust:
 
 ## Three Companion Relationships
 
-### 🌿 Quiet Companion™
+### 🌿 Quiet Companion
 
 > "I usually know what I want to work on."
 
 Best for people who prefer efficiency, short greetings, fast tool access, and little conversation before work.
 
-### ☕ Balanced Companion™ (Default)
+### ☕ Balanced Companion (Default)
 
 > "I enjoy a little conversation, then let's get to work."
 
-Warm greeting, occasional Memory Triggers™, occasional life stories, fast transition when work is requested.
+Warm greeting, occasional Memory Triggers, occasional life stories, fast transition when work is requested.
 
-### 🏡 Front Porch Companion™
+### 🏡 Front Porch Companion
 
 > "I enjoy spending a little time together before we begin."
 
@@ -52,7 +52,7 @@ Full rhythm definitions: `COMPANION_RELATIONSHIP_STYLES_CATALOG` in `lib/compani
 
 ---
 
-## Dynamic Visit Awareness™
+## Dynamic Visit Awareness
 
 Relationship preference is only one input. Every visit also honors **today's intent**.
 

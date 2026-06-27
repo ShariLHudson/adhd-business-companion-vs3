@@ -1,5 +1,5 @@
 /**
- * Visual Thinking™ lifecycle helpers — status, versions, snapshots.
+ * Visual Thinking lifecycle helpers — status, versions, snapshots.
  */
 
 import type {

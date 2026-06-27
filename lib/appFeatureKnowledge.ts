@@ -87,7 +87,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
     name: "Chat Workspace",
     navigation: "Top navigation **💬 Chat Workspace** ▼",
     howTo:
-      "**New Chat** — fresh conversation; memory, projects, goals, and learning stay. **New Day's Chat** — fresh daily start; resets Plan My Day™ and clears daily planning items; memory and projects stay.",
+      "**New Chat** — fresh conversation; memory, projects, goals, and learning stay. **New Day's Chat** — fresh daily start; resets Plan My Day and clears daily planning items; memory and projects stay.",
     match: [
       /\bchat workspace\b/i,
       /\bnew chat\b/i,

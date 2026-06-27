@@ -1561,7 +1561,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     expectedSuppressionFlags: { relationship: true },
   },
 
-  // —— Meaning Before Matching™ — connections guard ——
+  // —— Meaning Before Matching — connections guard ——
   {
     id: "mbm-pinterest-website-link",
     category: "learn",
@@ -1620,7 +1620,7 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     expectedSuppressionFlags: {},
   },
 
-  // —— Honor Their Intent™ — arrival mode ——
+  // —— Honor Their Intent — arrival mode ——
   {
     id: "hti-sales-funnel-work",
     category: "build",

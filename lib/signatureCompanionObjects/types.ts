@@ -1,5 +1,5 @@
 /**
- * Signature Companion Objects™ — three coordinated visual forms.
+ * Signature Companion Objects — three coordinated visual forms.
  * @see docs/companion-homestead/SIGNATURE_COMPANION_OBJECTS.md
  */
 
@@ -49,42 +49,42 @@ export type SignatureRoomMeta = {
 };
 
 export const SIGNATURE_ROOM_META: readonly SignatureRoomMeta[] = [
-  { id: "living-room", name: "Living Room™", placeId: "living-room" },
+  { id: "living-room", name: "Living Room", placeId: "living-room" },
   {
     id: "clear-my-mind",
-    name: "Clear My Mind™",
+    name: "Clear My Mind",
     placeId: "window-seat",
     workspaceId: "clear-my-mind",
   },
   {
     id: "planning-table",
-    name: "Planning Table™",
+    name: "Planning Table",
     placeId: "planning-table",
     workspaceId: "plan-my-day",
   },
   {
     id: "sunroom-over-pond",
-    name: "Sunroom Over The Pond™",
+    name: "Sunroom Over The Pond",
     placeId: "sunroom-over-pond",
     workspaceId: "focus-hub",
   },
-  { id: "reading-nook", name: "Reading Nook™", placeId: "reading-nook" },
-  { id: "creative-studio", name: "Creative Studio™", placeId: "creative-studio" },
+  { id: "reading-nook", name: "Reading Nook", placeId: "reading-nook" },
+  { id: "creative-studio", name: "Creative Studio", placeId: "creative-studio" },
   {
     id: "business",
-    name: "Business™",
+    name: "Business",
     placeId: "business-office",
     workspaceId: "business",
   },
-  { id: "kitchen", name: "Kitchen™", placeId: "kitchen-table" },
-  { id: "nature", name: "Nature™", placeId: "garden" },
-  { id: "kinsey", name: "Kinsey™", placeId: "living-room" },
+  { id: "kitchen", name: "Kitchen", placeId: "kitchen-table" },
+  { id: "nature", name: "Nature", placeId: "garden" },
+  { id: "kinsey", name: "Kinsey", placeId: "living-room" },
 ];
 
 export type SignatureCompanionObject = {
   /** Stable signature id — sig-planning-notebook */
   id: string;
-  /** Display name — Planning Notebook™ */
+  /** Display name — Planning Notebook */
   name: string;
   room: SignatureRoomZone;
   emotionalPurpose: string;

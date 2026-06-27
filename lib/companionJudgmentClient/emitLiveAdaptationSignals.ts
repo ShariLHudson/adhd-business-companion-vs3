@@ -1,5 +1,5 @@
 /**
- * Founder Intelligence™ feed — life changed, not plans failed.
+ * Founder Intelligence feed — life changed, not plans failed.
  */
 
 import type { LearningSignal, LearningSignalKind } from "@/lib/companionBrain";

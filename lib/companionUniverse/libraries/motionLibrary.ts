@@ -11,7 +11,7 @@ export type LivingMotionEntry = {
 };
 
 /**
- * Living Motion Library™ — every movement behaves like nature.
+ * Living Motion Library — every movement behaves like nature.
  * Nothing loops obviously; irregular timing lives in CSS.
  */
 export const LIVING_MOTION_LIBRARY: LivingMotionEntry[] = [

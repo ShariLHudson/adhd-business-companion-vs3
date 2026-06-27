@@ -2,7 +2,7 @@ import type { VisualThinkingPipelineStage } from "../visualFocus/companionIntell
 import type { CompanionIntelligencePipelineStage } from "./types";
 import { COMPANION_INTELLIGENCE_PIPELINE_ORDER } from "./types";
 
-/** Maps Visual Thinking™ stages onto the ecosystem intelligence pipeline. */
+/** Maps Visual Thinking stages onto the ecosystem intelligence pipeline. */
 export const VISUAL_THINKING_TO_ECOSYSTEM_STAGE: Record<
   VisualThinkingPipelineStage,
   CompanionIntelligencePipelineStage

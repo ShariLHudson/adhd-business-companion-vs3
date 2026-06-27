@@ -1,5 +1,5 @@
 /**
- * Companion Intelligence™ — permanent category themes for all visual map types.
+ * Companion Intelligence — permanent category themes for all visual map types.
  */
 
 export type IntelligenceCategoryId =
@@ -31,7 +31,7 @@ export const INTELLIGENCE_CATEGORY_THEMES: Record<
   summary: {
     id: "summary",
     icon: "📋",
-    title: "Business Summary™",
+    title: "Business Summary",
     subtitle: "Quick overview of how the business currently fits together.",
     headerBg: "#eff6ff",
     headerText: "#1d4ed8",
@@ -41,7 +41,7 @@ export const INTELLIGENCE_CATEGORY_THEMES: Record<
   key_relationships: {
     id: "key_relationships",
     icon: "🔗",
-    title: "Key Relationships™",
+    title: "Key Relationships",
     subtitle: "Important connections and dependencies discovered within the canvas.",
     headerBg: "#f5f3ff",
     headerText: "#6d28d9",
@@ -51,8 +51,8 @@ export const INTELLIGENCE_CATEGORY_THEMES: Record<
   patterns: {
     id: "patterns",
     icon: "📈",
-    title: "Patterns™",
-    subtitle: "Themes, trends, and repeated observations identified by Companion Intelligence™.",
+    title: "Patterns",
+    subtitle: "Themes, trends, and repeated observations identified by Companion Intelligence.",
     headerBg: "#f0fdfa",
     headerText: "#0f766e",
     border: "#5eead4",
@@ -61,7 +61,7 @@ export const INTELLIGENCE_CATEGORY_THEMES: Record<
   risks: {
     id: "risks",
     icon: "⚠️",
-    title: "Risks™",
+    title: "Risks",
     subtitle: "Potential weaknesses, dependencies, gaps, or business concerns.",
     headerBg: "#fef2f2",
     headerText: "#b91c1c",
@@ -71,7 +71,7 @@ export const INTELLIGENCE_CATEGORY_THEMES: Record<
   opportunities: {
     id: "opportunities",
     icon: "🚀",
-    title: "Opportunities™",
+    title: "Opportunities",
     subtitle: "Growth opportunities, leverage points, and potential improvements.",
     headerBg: "#f0fdf4",
     headerText: "#15803d",
@@ -81,7 +81,7 @@ export const INTELLIGENCE_CATEGORY_THEMES: Record<
   recommendations: {
     id: "recommendations",
     icon: "✅",
-    title: "Recommendations™",
+    title: "Recommendations",
     subtitle: "Suggested next actions and priorities.",
     headerBg: "#fffbeb",
     headerText: "#b45309",
@@ -91,7 +91,7 @@ export const INTELLIGENCE_CATEGORY_THEMES: Record<
   board_observations: {
     id: "board_observations",
     icon: "🧠",
-    title: "Board of Directors™ Observations",
+    title: "Board of Directors Observations",
     subtitle: "Strategic observations from the advisory layer.",
     headerBg: "#f0f4f4",
     headerText: "#1e4f4f",
@@ -101,7 +101,7 @@ export const INTELLIGENCE_CATEGORY_THEMES: Record<
   what_if: {
     id: "what_if",
     icon: "🌊",
-    title: "What-If Analysis™",
+    title: "What-If Analysis",
     subtitle: "Ripple effects and impact when exploring business changes.",
     headerBg: "#ecfeff",
     headerText: "#0e7490",
@@ -111,7 +111,7 @@ export const INTELLIGENCE_CATEGORY_THEMES: Record<
   next_steps: {
     id: "next_steps",
     icon: "👣",
-    title: "Suggested Next Steps™",
+    title: "Suggested Next Steps",
     subtitle: "Concrete moves to keep momentum after reviewing intelligence.",
     headerBg: "#fffbeb",
     headerText: "#a16207",

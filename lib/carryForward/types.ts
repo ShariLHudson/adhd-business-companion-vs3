@@ -1,5 +1,5 @@
 /**
- * Carry Forward™ — every new day begins with hope.
+ * Carry Forward — every new day begins with hope.
  * @see docs/companion-homestead/CARRY_FORWARD.md
  */
 
@@ -33,7 +33,7 @@ export type CarryForwardInput = {
   projectRecentlyCompleted?: boolean;
   recoveryGentle?: boolean;
   lowEnergy?: boolean;
-  /** Once the guest speaks, Carry Forward ends — Honor Their Intent™ */
+  /** Once the guest speaks, Carry Forward ends — Honor Their Intent */
   userText?: string | null;
   birthdayToday?: boolean;
   celebrationActive?: boolean;

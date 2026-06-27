@@ -1,5 +1,5 @@
 /**
- * Phase 9 — Wisdom Intelligence™
+ * Phase 9 — Wisdom Intelligence
  * Earned insight from repeated experience — practical, not generic.
  */
 
@@ -467,7 +467,7 @@ export function phase9WisdomIntelligenceHintForChat(input?: {
 
   const parts = phase9Active
     ? [
-        "PHASE 9 WISDOM INTELLIGENCE™ (earned insight — practical, human, never preachy):",
+        "PHASE 9 WISDOM INTELLIGENCE (earned insight — practical, human, never preachy):",
         "Sound like a friend who remembers what worked — not a coach lecturing.",
         "NEVER: mystical, clinical, 'you always/never', phase names, intelligence jargon.",
         "MAY: gentle pattern reflections with permission to correct.",

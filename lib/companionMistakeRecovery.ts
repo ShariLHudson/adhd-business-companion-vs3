@@ -1,5 +1,5 @@
 /**
- * Mistake Recovery Engine™ & Trust Repair™ — learn from errors, not just success.
+ * Mistake Recovery Engine & Trust Repair — learn from errors, not just success.
  *
  * Detects misunderstandings, repairs trust, and adapts future recommendations.
  * Privacy: patterns only — never blame or shame the user.
@@ -635,8 +635,8 @@ export function mistakeRecoveryHintForChat(): string | null {
     .join(", ");
 
   const parts = [
-    "MISTAKE RECOVERY™ (Sprint 10 — invisible):",
-    "Companion Humility Model™: high confidence ≠ certainty. Patterns ≠ facts. Hypotheses require validation.",
+    "MISTAKE RECOVERY (Sprint 10 — invisible):",
+    "Companion Humility Model: high confidence ≠ certainty. Patterns ≠ facts. Hypotheses require validation.",
     "When the user corrects you: acknowledge uncertainty, re-center on them, reinvestigate briefly. NEVER argue, defend, blame, or double down.",
     'Allowed: "I may have misunderstood." "Help me understand what\'s missing." "Let\'s correct course."',
   ];

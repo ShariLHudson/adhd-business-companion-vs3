@@ -1,6 +1,7 @@
 // Verify workspace opens before the assistant claims success.
 
 import type { AppSection } from "./companionUi";
+import { buildWorkspaceOpenedTransition } from "./humanConversation/actionTransition";
 import { workspaceTitle } from "./workspaceMode";
 
 export type WorkspaceOpenSnapshot = {
@@ -45,8 +46,7 @@ export function isWorkspaceBesideChat(snap: WorkspaceOpenSnapshot): boolean {
 }
 
 export function workspaceOpenSuccessAck(section: AppSection): string {
-  const title = workspaceTitle(section);
-  return `**${title}** is open beside us — chat stays right here.`;
+  return buildWorkspaceOpenedTransition(section);
 }
 
 export function workspaceOpenFailureAck(section: AppSection): string {

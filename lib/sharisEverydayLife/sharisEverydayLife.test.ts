@@ -21,7 +21,7 @@ function baseInput(
   };
 }
 
-describe("Shari's Everyday Life™", () => {
+describe("Shari's Everyday Life", () => {
   it("catalog has lived-in moments across zones", () => {
     expect(EVERYDAY_LIFE_CATALOG.length).toBeGreaterThanOrEqual(35);
     const zones = new Set(EVERYDAY_LIFE_CATALOG.map((m) => m.zone));

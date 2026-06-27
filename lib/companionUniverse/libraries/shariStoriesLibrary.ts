@@ -9,7 +9,7 @@ export type ShariStory = {
   rooms: CompanionPlaceId[];
 };
 
-/** Shari Stories™ + NGMTM — real stories as quiet discovery. */
+/** Shari Stories + NGMTM — real stories as quiet discovery. */
 export const SHARI_STORIES_LIBRARY: ShariStory[] = [];
 
 export const NGMTM_STORIES_LIBRARY: ShariStory[] = [];

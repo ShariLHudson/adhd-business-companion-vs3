@@ -1,4 +1,4 @@
-/** Designer Stories™ — Seasonal Collection. Never shown to guests. */
+/** Designer Stories — Seasonal Collection. Never shown to guests. */
 export const SEASONAL_DESIGNER_STORIES: Record<string, string> = {
   "obj-winter-mug-variant":
     "Thicker mug reserved for cold — same ritual, different weight in hand.",

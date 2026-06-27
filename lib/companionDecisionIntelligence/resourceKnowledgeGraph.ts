@@ -1,5 +1,5 @@
 /**
- * Resource Knowledge Graph™ — which ecosystem resource beats conversation alone.
+ * Resource Knowledge Graph — which ecosystem resource beats conversation alone.
  */
 
 import type { DecisionComplexityScore } from "./types";

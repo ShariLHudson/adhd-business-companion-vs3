@@ -1,9 +1,9 @@
-# Companion Journey™ Experience Bible
+# Companion Journey Experience Bible
 ## The Emotional Blueprint for Every Experience
 
 **Version:** 1.0  
 **Status:** Canonical — awaiting approval  
-**Authority:** Subordinate to Companion Constitution · Product Constitution™ · Architectural Guardrails  
+**Authority:** Subordinate to Companion Constitution · Product Constitution · Architectural Guardrails  
 **Sibling documents:** `PRODUCT_CONSTITUTION.md` · `EXPERIENCE_OF_SHARI.md` · `THE_HONEST_SHARI.md` · `COMPANION_TRUST_ARCHITECTURE.md` · `COMPANION_DECISION_INTELLIGENCE.md` · `A_YEAR_IN_THE_COMPANION_HOMESTEAD.md` · `LIFE_EXPERIENCE_DESIGN.md` · `plan-my-day/MORNING_EXPERIENCE_DESIGN.md` · `plan-my-day/DAILY_COMPANION_CYCLE_ARCHITECTURE.md`
 
 **This is not:**
@@ -21,21 +21,21 @@
 | Layer | Governs | Question it answers |
 |-------|---------|---------------------|
 | **Constitution** | Character — hard rules | What must never happen? |
-| **Experience of Shari™** | Presence, voice, relationship | Who does it feel like to spend time with her? |
-| **Honest Shari™** | Humanity, imperfection, believability | What makes her trustworthy — not impressive? |
-| **Companion Trust Architecture™** | Trust earned over time | What deepens at Day 1 vs Year 5? |
-| **Companion Decision Intelligence™** | Judgment before action | What should Shari do next? |
-| **A Year in the Companion Homestead™** | Ordinary life design | What does a year of living here feel like? |
-| **Companion Brain™** | Thinking | What does the companion understand? |
-| **Daily Companion Cycle™** | Reasoning | How does judgment form before the user sees it? |
-| **Experience Bible™** | Feeling (in-app) | What should this person experience while they are here? |
-| **Life Experience Design™** | Living (beyond-app) | What continues after they leave? |
+| **Experience of Shari** | Presence, voice, relationship | Who does it feel like to spend time with her? |
+| **Honest Shari** | Humanity, imperfection, believability | What makes her trustworthy — not impressive? |
+| **Companion Trust Architecture** | Trust earned over time | What deepens at Day 1 vs Year 5? |
+| **Companion Decision Intelligence** | Judgment before action | What should Shari do next? |
+| **A Year in the Companion Homestead** | Ordinary life design | What does a year of living here feel like? |
+| **Companion Brain** | Thinking | What does the companion understand? |
+| **Daily Companion Cycle** | Reasoning | How does judgment form before the user sees it? |
+| **Experience Bible** | Feeling (in-app) | What should this person experience while they are here? |
+| **Life Experience Design** | Living (beyond-app) | What continues after they leave? |
 
 The question is no longer *"What should this page do?"*
 
 The questions are:
-- *"What should this person experience while they are here?"* (Experience Bible™)
-- *"What continues after they leave?"* (Life Experience Design™)
+- *"What should this person experience while they are here?"* (Experience Bible)
+- *"What continues after they leave?"* (Life Experience Design)
 
 **Full beyond-app specification:** `LIFE_EXPERIENCE_DESIGN.md`
 
@@ -104,7 +104,7 @@ Every workspace, every flow, every transition must define:
 
 ---
 
-# Part III — Companion Worlds™
+# Part III — Companion Worlds
 
 Treat every workspace like Disney treats its lands.
 
@@ -118,7 +118,7 @@ Primary emotional destinations. These define the ecosystem identity.
 
 ---
 
-### Clear My Mind™
+### Clear My Mind
 
 **World:** Relief
 
@@ -146,7 +146,7 @@ Primary emotional destinations. These define the ecosystem identity.
 
 ---
 
-### My Thoughts™
+### My Thoughts
 
 **World:** Trust
 
@@ -174,7 +174,7 @@ Primary emotional destinations. These define the ecosystem identity.
 
 ---
 
-### Plan My Day™
+### Plan My Day
 
 **World:** Orientation
 
@@ -189,7 +189,7 @@ Primary emotional destinations. These define the ecosystem identity.
 | **Confidence Outcome** | *"I think I can do this."* — before *"What should I do first?"* |
 | **Cognitive Load Carried** | Exclusions · capacity fit · yesterday continuity · permission · one momentum anchor |
 | **Capability Strengthened** | Prioritization judgment · honest capacity assessment · confirming vs overcommitting |
-| **Relationship Strengthened** | Daily ritual · Relationship Continuity™ · survival/celebration honored |
+| **Relationship Strengthened** | Daily ritual · Relationship Continuity · survival/celebration honored |
 | **Future Self Supported** | Someone who begins days oriented, not reactive — for years |
 
 **Atmosphere:** Morning calm · conversational · low urgency · words before widgets
@@ -202,7 +202,7 @@ Primary emotional destinations. These define the ecosystem identity.
 
 ---
 
-### Adapt My Day™
+### Adapt My Day
 
 **World:** Honesty
 
@@ -226,7 +226,7 @@ Primary emotional destinations. These define the ecosystem identity.
 
 ---
 
-### Focus My Brain™
+### Focus My Brain
 
 **World:** Flow
 
@@ -252,7 +252,7 @@ Primary emotional destinations. These define the ecosystem identity.
 
 ---
 
-### Projects™
+### Projects
 
 **World:** Progress
 
@@ -276,7 +276,7 @@ Primary emotional destinations. These define the ecosystem identity.
 
 ---
 
-### Founder Intelligence™
+### Founder Intelligence
 
 **World:** Wisdom
 
@@ -302,7 +302,7 @@ Primary emotional destinations. These define the ecosystem identity.
 
 ---
 
-### PostCraft™
+### PostCraft
 
 **World:** Creative Confidence
 
@@ -326,7 +326,7 @@ Primary emotional destinations. These define the ecosystem identity.
 
 ---
 
-### Relationship Intelligence™
+### Relationship Intelligence
 
 **World:** Connection
 
@@ -348,7 +348,7 @@ Primary emotional destinations. These define the ecosystem identity.
 
 ---
 
-### Business Intelligence™
+### Business Intelligence
 
 **World:** Clarity (operational)
 
@@ -374,21 +374,21 @@ Tools and surfaces that serve core worlds. Same Shari. Narrower transformation.
 
 | World | Workspace | Transformation | Primary Outcome |
 |-------|-----------|----------------|-----------------|
-| **Clarity** | Decision Compass™ | Stuck between options → One path forward | *"I can choose without endless lists."* |
-| **Space** | Visual Focus™ | Tangled → Spatially seen | *"I can see how this fits together."* |
-| **Regulation** | Breathe™ | Activated → Regulated | *"I can come back to my body."* |
-| **Calm** | Focus Audio™ | Noisy mind → Auditory anchor | *"Something steady is here with me."* |
-| **Direction** | My Journey™ | Drifting → Purpose-anchored | *"Today connects to where I'm going."* |
-| **Capability** | Growth™ | Stuck skill → Practiced step | *"I'm getting better at this."* |
-| **Belief** | Evidence Bank / My Highlights™ | Self-doubt → Documented proof | *"I have evidence I'm capable."* |
-| **Recognition** | Wins This Week™ | Invisible effort → Seen progress | *"I did more than I thought."* |
-| **Protection** | Momentum Appointments™ | Calendar chaos → Defended time | *"My focus time is real."* |
-| **Creation** | Create / Documents™ | Idea → Artifact started | *"It's begun — not perfect, begun."* |
-| **Communication** | Email™ | Dread → Draft with voice | *"I can reach out without agonizing."* |
-| **Identity** | Business Profile™ | Scattered offer → Named identity | *"I know what I stand for."* |
-| **Empathy** | Audience Profile™ | Guessing → Known person | *"I'm talking to someone real."* |
-| **Reference** | Templates · Strategies · Snippets™ | Blank → Scaffolded start | *"I don't start from zero."* |
-| **Presence** | Chat (Home)™ | Alone with problem → Accompanied | *"Someone is here with me."* |
+| **Clarity** | Decision Compass | Stuck between options → One path forward | *"I can choose without endless lists."* |
+| **Space** | Visual Focus | Tangled → Spatially seen | *"I can see how this fits together."* |
+| **Regulation** | Breathe | Activated → Regulated | *"I can come back to my body."* |
+| **Calm** | Focus Audio | Noisy mind → Auditory anchor | *"Something steady is here with me."* |
+| **Direction** | My Journey | Drifting → Purpose-anchored | *"Today connects to where I'm going."* |
+| **Capability** | Growth | Stuck skill → Practiced step | *"I'm getting better at this."* |
+| **Belief** | Evidence Bank / My Highlights | Self-doubt → Documented proof | *"I have evidence I'm capable."* |
+| **Recognition** | Wins This Week | Invisible effort → Seen progress | *"I did more than I thought."* |
+| **Protection** | Momentum Appointments | Calendar chaos → Defended time | *"My focus time is real."* |
+| **Creation** | Create / Documents | Idea → Artifact started | *"It's begun — not perfect, begun."* |
+| **Communication** | Email | Dread → Draft with voice | *"I can reach out without agonizing."* |
+| **Identity** | Business Profile | Scattered offer → Named identity | *"I know what I stand for."* |
+| **Empathy** | Audience Profile | Guessing → Known person | *"I'm talking to someone real."* |
+| **Reference** | Templates · Strategies · Snippets | Blank → Scaffolded start | *"I don't start from zero."* |
+| **Presence** | Chat (Home) | Alone with problem → Accompanied | *"Someone is here with me."* |
 
 ---
 
@@ -398,15 +398,15 @@ These are experienced as **wisdom through simplicity**, not as products.
 
 | Intelligence | Felt as | Never felt as |
 |--------------|---------|---------------|
-| Companion Brain™ | Better judgments over time | Reasoning pipeline |
-| Relief Intelligence™ | Shari's tone fits me | Analytics dashboard |
-| Reflection Intelligence™ | Tomorrow feels more accurate | Nightly survey |
-| Learning Signals™ | Companion gets wiser | Score changes |
-| Wisdom Intelligence™ | Rare earned insight | Lecture |
+| Companion Brain | Better judgments over time | Reasoning pipeline |
+| Relief Intelligence | Shari's tone fits me | Analytics dashboard |
+| Reflection Intelligence | Tomorrow feels more accurate | Nightly survey |
+| Learning Signals | Companion gets wiser | Score changes |
+| Wisdom Intelligence | Rare earned insight | Lecture |
 
 ---
 
-# Part IV — Emotional Choreography™
+# Part IV — Emotional Choreography
 
 Every experience unfolds. It never dumps.
 
@@ -450,7 +450,7 @@ Arrival
 
 ---
 
-# Part V — The Art of Transitions™
+# Part V — The Art of Transitions
 
 Users should never feel like they are jumping between tools.
 
@@ -463,12 +463,12 @@ They should feel like **Shari is walking with them**.
 | **Inevitable, not navigational** | The next step feels like the obvious human next step |
 | **Carry emotional state** | Relief in Clear My Mind becomes context in Plan My Day — user doesn't repeat |
 | **Carry cognitive state** | Brain remembers · user doesn't reconstruct |
-| **Name the why, not the route** | *"Want to shape today around what you just shared?"* — not *"Open Plan My Day™"* |
+| **Name the why, not the route** | *"Want to shape today around what you just shared?"* — not *"Open Plan My Day"* |
 | **Consent always** | Transitions are offers · never auto-teleport |
 
 ## Canonical transition paths
 
-### Clear My Mind™ → My Thoughts™
+### Clear My Mind → My Thoughts
 
 | | |
 |---|---|
@@ -477,7 +477,7 @@ They should feel like **Shari is walking with them**.
 | **Carried** | Capture volume · relief context · no re-telling |
 | **Never** | *"Now let's organize what you wrote."* |
 
-### Clear My Mind™ → Plan My Day™
+### Clear My Mind → Plan My Day
 
 | | |
 |---|---|
@@ -486,7 +486,7 @@ They should feel like **Shari is walking with them**.
 | **Carried** | Relief signals · thought count awareness · exclusions |
 | **Never** | Dump captures into today's board |
 
-### Plan My Day™ → Focus My Brain™
+### Plan My Day → Focus My Brain
 
 | | |
 |---|---|
@@ -495,7 +495,7 @@ They should feel like **Shari is walking with them**.
 | **Carried** | Confirmed anchor · hyperfocus protection |
 | **Never** | Re-plan during focus entry |
 
-### Projects™ → Founder Intelligence™
+### Projects → Founder Intelligence
 
 | | |
 |---|---|
@@ -504,7 +504,7 @@ They should feel like **Shari is walking with them**.
 | **Carried** | Project history · completion themes |
 | **Never** | Shame for slow progress |
 
-### PostCraft™ → Publishing
+### PostCraft → Publishing
 
 | | |
 |---|---|
@@ -513,7 +513,7 @@ They should feel like **Shari is walking with them**.
 | **Carried** | Draft · voice evidence |
 | **Never** | Pressure to post immediately |
 
-### Overwhelm anywhere → Breathe™ or Clear My Mind™
+### Overwhelm anywhere → Breathe or Clear My Mind
 
 | | |
 |---|---|
@@ -531,7 +531,7 @@ They should feel like **Shari is walking with them**.
 
 ---
 
-# Part VI — Atmosphere™
+# Part VI — Atmosphere
 
 Every workspace has an atmosphere that supports its transformation.
 
@@ -551,20 +551,20 @@ Every workspace has an atmosphere that supports its transformation.
 
 | World | Temperature | Pace | Energy | Rhythm | Silence | Density | Lightness |
 |-------|-------------|------|--------|--------|---------|---------|-----------|
-| Clear My Mind™ | Warm | Still | Restorative | Sparse | Generous | Open | Gentle |
-| My Thoughts™ | Warm | Medium | Neutral | Conversational | Moderate | Medium | Garden |
-| Plan My Day™ | Cool-warm | Still→medium | Calm→activating | Conversational | Moderate | Low→medium | Honest |
-| Focus My Brain™ | Cool | Still | Neutral | Sparse | Generous | Focused | Serious |
-| Projects™ | Warm | Medium | Activating | Conversational | Moderate | Focused | Industrious |
-| Founder Intelligence™ | Cool | Slow | Reflective | Sparse | Generous | Low | Serious |
-| PostCraft™ | Warm | Medium | Activating | Conversational | Moderate | Medium | Playful |
-| Chat™ | Warm | Medium | Matches user | Responsive | When needed | Low | Human |
+| Clear My Mind | Warm | Still | Restorative | Sparse | Generous | Open | Gentle |
+| My Thoughts | Warm | Medium | Neutral | Conversational | Moderate | Medium | Garden |
+| Plan My Day | Cool-warm | Still→medium | Calm→activating | Conversational | Moderate | Low→medium | Honest |
+| Focus My Brain | Cool | Still | Neutral | Sparse | Generous | Focused | Serious |
+| Projects | Warm | Medium | Activating | Conversational | Moderate | Focused | Industrious |
+| Founder Intelligence | Cool | Slow | Reflective | Sparse | Generous | Low | Serious |
+| PostCraft | Warm | Medium | Activating | Conversational | Moderate | Medium | Playful |
+| Chat | Warm | Medium | Matches user | Responsive | When needed | Low | Human |
 
 **Rule:** Atmosphere serves transformation. If atmosphere competes with the emotional outcome, atmosphere yields.
 
 ---
 
-# Part VII — The Role of Silence™
+# Part VII — The Role of Silence
 
 Silence is part of the experience.
 
@@ -574,8 +574,8 @@ Shari should not speak because she can. She should speak because it helps.
 
 | Moment | Why silence works |
 |--------|-------------------|
-| After Clear My Mind™ capture | User needs to feel held, not processed |
-| During Focus My Brain™ | Attention is the product |
+| After Clear My Mind capture | User needs to feel held, not processed |
+| During Focus My Brain | Attention is the product |
 | After survival declaration | Honor without fixing |
 | After celebration | Let the win breathe |
 | When user is typing | Never interrupt mid-thought |
@@ -607,7 +607,7 @@ The user should feel: *She's here. She's not rushing me. I can take my time.*
 
 ---
 
-# Part VIII — Delight™
+# Part VIII — Delight
 
 Every workspace should contain moments that are never required.
 
@@ -629,18 +629,18 @@ Small human moments. Unexpected kindness. Unexpected noticing. Unexpected encour
 
 | World | Delight moment |
 |-------|----------------|
-| Clear My Mind™ | *"I've got it."* after a long dump |
-| My Thoughts™ | A forgotten thought resurfaced gently |
-| Plan My Day™ | *"I left four things off — not because they don't matter."* |
-| Focus My Brain™ | Quiet completion · no fanfare |
-| Projects™ | *"You were here last Tuesday too — want to pick up where you left off?"* |
-| Founder Intelligence™ | Two disparate signals connected into one insight |
-| PostCraft™ | User's own phrase reflected back in a stronger line |
+| Clear My Mind | *"I've got it."* after a long dump |
+| My Thoughts | A forgotten thought resurfaced gently |
+| Plan My Day | *"I left four things off — not because they don't matter."* |
+| Focus My Brain | Quiet completion · no fanfare |
+| Projects | *"You were here last Tuesday too — want to pick up where you left off?"* |
+| Founder Intelligence | Two disparate signals connected into one insight |
+| PostCraft | User's own phrase reflected back in a stronger line |
 | Celebration | *"Enjoy the afternoon — seriously."* |
 
 ---
 
-# Part IX — The Companion Presence™
+# Part IX — The Companion Presence
 
 Regardless of workspace, Shari is always the same person.
 
@@ -674,7 +674,7 @@ Shari's visual presence (photo rotation on entry to emotional worlds) signals **
 
 ---
 
-# Part X — The Experience Review™
+# Part X — The Experience Review
 
 Every new experience must pass this review before ship.
 
@@ -701,9 +701,9 @@ The experience is not finished.
 
 Redesign the **experience** — not just the interface.
 
-## Stewardship Review™ (companion to Experience Review)
+## Stewardship Review (companion to Experience Review)
 
-**Canonical law:** [Product Constitution™ — The Stewardship Review™](../PRODUCT_CONSTITUTION.md#the-stewardship-review)
+**Canonical law:** [Product Constitution — The Stewardship Review](../PRODUCT_CONSTITUTION.md#the-stewardship-review)
 
 | Question | |
 |----------|---|
@@ -712,7 +712,7 @@ Redesign the **experience** — not just the interface.
 | Who does this help the user become? | |
 | Wiser or busier companion? | Must be wiser |
 | Stronger relationship? | |
-| **Drift Test™:** Software or companionship? | Must be companionship |
+| **Drift Test:** Software or companionship? | Must be companionship |
 
 ---
 
@@ -722,24 +722,24 @@ Quick reference for designers, writers, and engineers.
 
 | User arrives feeling… | Likely world | First beat | Never first |
 |----------------------|--------------|------------|-------------|
-| Head is full | Clear My Mind™ | Presence | Organization |
-| Can't prioritize today | Plan My Day™ | Orientation | Task board |
-| Can't focus | Focus My Brain™ | One lane | Plan review |
-| Idea will disappear | My Thoughts™ | Trust | Sorting pressure |
-| Project too big | Projects™ | One step | Full roadmap |
-| Can't decide | Decision Compass™ | Name the decision | Pros/cons dump |
-| Need to see it | Visual Focus™ | How do you want to think? | Blank canvas panic |
-| Low energy vs plan | Adapt My Day™ | Honest naming | Full replan lecture |
-| Launch hangover | Plan My Day™ (recovery) | Space | Backlog |
-| Just won something | Plan My Day™ (celebration) | Recognition | Next phase |
+| Head is full | Clear My Mind | Presence | Organization |
+| Can't prioritize today | Plan My Day | Orientation | Task board |
+| Can't focus | Focus My Brain | One lane | Plan review |
+| Idea will disappear | My Thoughts | Trust | Sorting pressure |
+| Project too big | Projects | One step | Full roadmap |
+| Can't decide | Decision Compass | Name the decision | Pros/cons dump |
+| Need to see it | Visual Focus | How do you want to think? | Blank canvas panic |
+| Low energy vs plan | Adapt My Day | Honest naming | Full replan lecture |
+| Launch hangover | Plan My Day (recovery) | Space | Backlog |
+| Just won something | Plan My Day (celebration) | Recognition | Next phase |
 | In deep work | Focus / Plan (protected) | Minimal overlay | Proposals |
-| Blank page fear | PostCraft™ | Voice invitation | Template grid |
-| Lost in weeds | Founder Intelligence™ | Pattern | Metrics dashboard |
-| Neglecting someone | Relationship Intelligence™ | One person | CRM list |
+| Blank page fear | PostCraft | Voice invitation | Template grid |
+| Lost in weeds | Founder Intelligence | Pattern | Metrics dashboard |
+| Neglecting someone | Relationship Intelligence | One person | CRM list |
 
 ---
 
-# Part XI-B — Complexity Governance (Companion Experience Framework™)
+# Part XI-B — Complexity Governance (Companion Experience Framework)
 
 **Governing principle:**
 
@@ -747,7 +747,7 @@ Quick reference for designers, writers, and engineers.
 > The companion manages complexity.  
 > The user manages only today's decisions.
 
-This principle governs Plan My Day™, Projects™, Founder Intelligence™, Business Intelligence™, Clear My Mind™, future planning features, memory systems, task routing, and automation.
+This principle governs Plan My Day, Projects, Founder Intelligence, Business Intelligence, Clear My Mind, future planning features, memory systems, task routing, and automation.
 
 ---
 
@@ -761,7 +761,7 @@ This principle governs Plan My Day™, Projects™, Founder Intelligence™, Bus
 - When to speak and when to be silent
 - What delight is appropriate
 - Experience review gates before UI ship
-- Life Experience Review™ gates (see `LIFE_EXPERIENCE_DESIGN.md`)
+- Life Experience Review gates (see `LIFE_EXPERIENCE_DESIGN.md`)
 
 ## This Bible does not govern (sibling docs do)
 
@@ -779,13 +779,13 @@ This principle governs Plan My Day™, Projects™, Founder Intelligence™, Bus
 New screens and major flows require:
 
 1. **Transformation template** completed for the experience
-2. **Experience Review™** passed
-3. **Stewardship Review™** passed
+2. **Experience Review** passed
+3. **Stewardship Review** passed
 4. Alignment with this Bible
 
 ---
 
-# Part XV — Live Reality™ (Experience Principle)
+# Part XV — Live Reality (Experience Principle)
 
 The morning plan is a starting point — never a commitment.
 
@@ -800,9 +800,9 @@ See `LIVE_REALITY_ECOSYSTEM.md` (why) and `LIVE_REALITY_ARCHITECTURE.md` (how).
 # Final Reminder
 
 The Constitution defines our character.  
-The Companion Brain™ defines our thinking.  
-The Daily Companion Cycle™ defines our reasoning.  
-**The Experience Bible™ defines what it feels like to spend time with Shari.**
+The Companion Brain defines our thinking.  
+The Daily Companion Cycle defines our reasoning.  
+**The Experience Bible defines what it feels like to spend time with Shari.**
 
 Build experiences that leave people calmer, clearer, more capable, more confident, and less alone.
 
@@ -810,4 +810,4 @@ Everything else exists to support that.
 
 ---
 
-*Companion Journey™ · Experience Bible™ · Emotional Choreography™ · Companion Worlds™ · Atmosphere™ · The Art of Transitions™ · The Role of Silence™ · Delight™ · Experience Review™*
+*Companion Journey · Experience Bible · Emotional Choreography · Companion Worlds · Atmosphere · The Art of Transitions · The Role of Silence · Delight · Experience Review*

@@ -1,5 +1,5 @@
 /**
- * Companion Objects™ Design System — canonical types.
+ * Companion Objects Design System — canonical types.
  * @see docs/companion-homestead/COMPANION_OBJECTS_DESIGN_SYSTEM.md
  */
 
@@ -70,7 +70,7 @@ export type CompanionObjectCatalogEntry = {
   /** Optional link to feature registry in objectLibrary.ts */
   featureObjectId?: string;
   /**
-   * Designer Stories™ — why this object really lives here.
+   * Designer Stories — why this object really lives here.
    * For illustrators and environment artists only. Never shown to guests.
    * @see docs/companion-homestead/COMPANION_OBJECTS_DESIGN_SYSTEM.md#designer-stories
    */

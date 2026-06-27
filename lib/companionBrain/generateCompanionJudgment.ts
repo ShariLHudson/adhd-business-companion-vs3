@@ -1,5 +1,5 @@
 /**
- * Companion Judgment™ — compose all judgment services.
+ * Companion Judgment — compose all judgment services.
  * @see constitution.ts — generateCompanionJudgment
  */
 

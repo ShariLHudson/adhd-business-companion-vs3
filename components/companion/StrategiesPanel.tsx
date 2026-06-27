@@ -319,7 +319,7 @@ export function StrategiesPanel({
         <WorkspaceAreaWorksGuide areaId="playbook" />
         {dockedPlan}
         <p className="text-2xl font-semibold text-[#1f1c19]">
-          ADHD Entrepreneur Strategy Library™
+          ADHD Entrepreneur Strategy Library
         </p>
         <p className="mt-1 text-base text-[#6b635a]">
           Browse proven strategies for real problems — or build your own custom strategy with Shari.

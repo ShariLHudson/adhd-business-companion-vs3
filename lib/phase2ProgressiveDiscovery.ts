@@ -1,5 +1,5 @@
 /**
- * Phase 2 Onboarding — Progressive Discovery™
+ * Phase 2 Onboarding — Progressive Discovery
  *
  * Learn while helping. Observe, confirm, adapt — never interrogate.
  * Active after Phase 1 completes; invisible ongoing relationship building.
@@ -791,7 +791,7 @@ export function phase2ProgressiveDiscoveryHintForChat(input?: {
   const trustMoment = input?.trustMoment ?? maybeTrustBuildingMoment(state);
 
   const parts = [
-    "PHASE 2 PROGRESSIVE DISCOVERY™ (invisible — never feel like onboarding):",
+    "PHASE 2 PROGRESSIVE DISCOVERY (invisible — never feel like onboarding):",
     "Learn while helping. Observe, confirm, adapt. Never interrogate.",
     "FORBIDDEN: questionnaires, assessments, forms, 'what is your learning style?'",
     "Every question must help the user OR help you help them — otherwise don't ask.",

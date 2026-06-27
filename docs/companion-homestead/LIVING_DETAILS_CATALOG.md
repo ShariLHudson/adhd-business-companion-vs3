@@ -1,5 +1,5 @@
-# Living Details™ Catalog
-## Natural Variation Library for the Living Life Engine™
+# Living Details Catalog
+## Natural Variation Library for the Living Life Engine
 
 **Version:** 1.0  
 **Status:** Design authority — companion to [`LIVING_LIFE_ENGINE.md`](./LIVING_LIFE_ENGINE.md)  
@@ -326,7 +326,7 @@
 
 ---
 
-## F — Kinsey™ moments (30)
+## F — Kinsey moments (30)
 
 | ID | Detail | Typical cause | Rooms |
 |----|--------|---------------|-------|
@@ -678,7 +678,7 @@
 | C — Garden, plants, seasons | 60 |
 | D — Interior lived-in objects | 80 |
 | E — Kitchen, food, hospitality | 40 |
-| F — Kinsey™ | 30 |
+| F — Kinsey | 30 |
 | G — Reef and reading | 25 |
 | H — Barn, field, outdoor | 30 |
 | I — Motion and atmosphere | 30 |

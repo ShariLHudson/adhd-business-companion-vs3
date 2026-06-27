@@ -36,7 +36,7 @@ export function buildLivingChangeEngineInput(input: {
 }
 
 /**
- * Living Change Engine™ — produces a validated Living Change Set™.
+ * Living Change Engine — produces a validated Living Change Set.
  * Never renders UI; integrates with Scene Integrity before composition.
  */
 export function resolveAndApplyLivingChanges(input: {

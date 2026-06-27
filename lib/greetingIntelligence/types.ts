@@ -29,9 +29,9 @@ export type GreetingIntelligenceInput = {
   emotionalNote?: string | null;
   prefersConversation?: boolean;
   weather?: "clear" | "rain" | "snow" | "cloudy";
-  /** Presence Intelligence™ — room speaks; skip forced question. */
+  /** Presence Intelligence — room speaks; skip forced question. */
   presencePreferSilence?: boolean;
-  /** Companion Relationship™ — adjusts greeting rhythm */
+  /** Companion Relationship — adjusts greeting rhythm */
   companionRelationship?: import("@/lib/companionRelationship").CompanionRelationshipVerdict;
 };
 

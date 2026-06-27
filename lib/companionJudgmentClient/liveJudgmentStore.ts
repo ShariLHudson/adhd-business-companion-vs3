@@ -1,5 +1,5 @@
 /**
- * Live judgment store — single source of truth for current Companion Brain™ output.
+ * Live judgment store — single source of truth for current Companion Brain output.
  */
 
 import type { LiveJudgmentSnapshot } from "./types";

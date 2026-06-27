@@ -1,16 +1,16 @@
-# UX Punch List™
+# UX Punch List
 
 **P0.57 — UX Polish & Screen Certification**
 
-**P0.58 — Governed by the [Product Constitution™](./PRODUCT_CONSTITUTION.md)**
+**P0.58 — Governed by the [Product Constitution](./PRODUCT_CONSTITUTION.md)**
 
-**Development decisions:** [Development Governance™](./DEVELOPMENT_GOVERNANCE.md)
+**Development decisions:** [Development Governance](./DEVELOPMENT_GOVERNANCE.md)
 
 Living tracker for polish issues and **Future Opportunities** breadcrumbs per screen.
 
-**Process:** [Screen Certification Sprint™](./SCREEN_CERTIFICATION.md) — one screen at a time until production-ready.
+**Process:** [Screen Certification Sprint](./SCREEN_CERTIFICATION.md) — one screen at a time until production-ready.
 
-**Governing law:** [Product Constitution™](./PRODUCT_CONSTITUTION.md) — Gate 10 required for every certification.
+**Governing law:** [Product Constitution](./PRODUCT_CONSTITUTION.md) — Gate 10 required for every certification.
 
 **Certification order:** Daily execution first (Plan My Day → Visual Thinking → Projects → Create → Focus → Reminders), then Growth (Vault → Wins → Evidence → Portfolio → Journey → Goals), then Settings → Chat → Today.
 
@@ -21,21 +21,21 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 1. **One screen at a time.** Do not batch changes across the app.
 2. **Follow the [certification order](./SCREEN_CERTIFICATION.md#recommended-certification-order).** Do not skip ahead.
 3. **Don't leave a screen until COMPLETE** — all **10 gates** + the [final impress question](./SCREEN_CERTIFICATION.md#the-final-question).
-4. **Gate 10:** verify [Constitution Compliance™](./PRODUCT_CONSTITUTION.md) (all 7 articles + conversation scenarios if applicable).
+4. **Gate 10:** verify [Constitution Compliance](./PRODUCT_CONSTITUTION.md) (all 7 articles + conversation scenarios if applicable).
 5. Mark punch items `[x]` when done. Add new items as you notice them in live use.
 6. **On certification:** capture or update **Future Opportunities** for that screen.
 7. Update the **Screen Completion Log** and `SCREEN_CERTIFICATION.md` master log.
 8. Run `npm run audit:companion` and `npx vitest run` before marking COMPLETE.
 
-**Before any new feature:** [Development Governance™](./DEVELOPMENT_GOVERNANCE.md) (12 rules) + [Future Development Rule](./PRODUCT_CONSTITUTION.md#future-development-rule).
+**Before any new feature:** [Development Governance](./DEVELOPMENT_GOVERNANCE.md) (12 rules) + [Future Development Rule](./PRODUCT_CONSTITUTION.md#future-development-rule).
 
 **Last updated:** 2026-06-24
 
-**Current focus:** Plan My Day™ (#1)
+**Current focus:** Plan My Day (#1)
 
 ---
 
-## Plan My Day™
+## Plan My Day
 
 *Certification status: Not started*
 
@@ -69,17 +69,17 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## Visual Thinking™
+## Visual Thinking
 
 *Certification status: Not started (partial Phase 2 polish)*
 
 ### Punch list
 
 - [x] Default hub: only "What are you trying to do?" intent choices
-- [x] Continue Thinking™ + Browse Visual Tools collapsed by default
+- [x] Continue Thinking + Browse Visual Tools collapsed by default
 - [x] Category dropdowns (one open, alphabetized, compact cards)
-- [x] Removed Client Avatar™, Clear My Mind™, Calendar Planner™, Workflow Map™ from catalog
-- [x] Content Ecosystem™ = repurposing copy
+- [x] Removed Client Avatar, Clear My Mind, Calendar Planner, Workflow Map from catalog
+- [x] Content Ecosystem = repurposing copy
 - [ ] Soften "Show Other Options" full-grid handoff
 - [ ] Live verify: nothing open on first hub visit
 - [ ] Help describes guided assistant, not tool library
@@ -94,18 +94,18 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## Projects™
+## Projects
 
 *Certification status: Not started*
 
 ### Punch list
 
-- [x] Continue Working On™ (top 10 by `updatedAt`)
+- [x] Continue Working On (top 10 by `updatedAt`)
 - [x] New Project cards: Blank / Template / Strategy / Clear My Mind
 - [ ] A–Z sort works live
 - [ ] Continue Working On / All Projects expand-collapse obvious
 - [ ] Audit inactive-looking controls
-- [ ] Help: "Recent Projects" → "Continue Working On™"
+- [ ] Help: "Recent Projects" → "Continue Working On"
 - [ ] **Certification:** create, detail, sort, search, delete, time blocks
 
 ### Future Opportunities
@@ -117,7 +117,7 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## Create™
+## Create
 
 *Certification status: Not started*
 
@@ -138,7 +138,7 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## Focus™
+## Focus
 
 *Certification status: Not started*
 
@@ -160,7 +160,7 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## Reminder Center™
+## Reminder Center
 
 *Certification status: Not started (partial P0.51 polish)*
 
@@ -182,13 +182,13 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## Growth Vault™ (hub)
+## Growth Vault (hub)
 
 *Certification status: Not started (partial Phase 2 polish)*
 
 ### Punch list
 
-- [x] 2×2 colorful vault boxes + Quick Save™
+- [x] 2×2 colorful vault boxes + Quick Save
 - [x] Per-section How To Use (not on hub)
 - [ ] One vault section open at a time; Back returns to hub
 - [ ] Box status previews accurate after saves
@@ -203,7 +203,7 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## My Wins™
+## My Wins
 
 *Certification status: Not started (partial Phase 2 polish)*
 
@@ -224,7 +224,7 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## Evidence Bank™
+## Evidence Bank
 
 *Certification status: Not started*
 
@@ -245,7 +245,7 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## Portfolio™
+## Portfolio
 
 *Certification status: Not started*
 
@@ -265,7 +265,7 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## My Journey™
+## My Journey
 
 *Certification status: Not started (partial Phase 2 polish)*
 
@@ -284,7 +284,7 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## Outcome Goals™
+## Outcome Goals
 
 *Certification status: Not started*
 
@@ -304,7 +304,7 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## Settings™
+## Settings
 
 *Certification status: Not started*
 
@@ -324,7 +324,7 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## Chat™
+## Chat
 
 *Certification status: Not started*
 
@@ -344,7 +344,7 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 ---
 
-## Today™
+## Today
 
 *Certification status: Not started — panel may be unmounted*
 
@@ -383,25 +383,25 @@ Living tracker for polish issues and **Future Opportunities** breadcrumbs per sc
 
 Synced with [SCREEN_CERTIFICATION.md](./SCREEN_CERTIFICATION.md).
 
-**Only mark COMPLETE when:** all 10 gates pass (including [Constitution Compliance™](./PRODUCT_CONSTITUTION.md)) + impress question = yes + Future Opportunities captured.
+**Only mark COMPLETE when:** all 10 gates pass (including [Constitution Compliance](./PRODUCT_CONSTITUTION.md)) + impress question = yes + Future Opportunities captured.
 
 | # | Screen | Status | Certified |
 |---|--------|--------|-----------|
-| 1 | Plan My Day™ | Not started | — |
-| 2 | Visual Thinking™ | Not started | — |
-| 3 | Projects™ | Not started | — |
-| 4 | Create™ | Not started | — |
-| 5 | Focus™ | Not started | — |
-| 6 | Reminder Center™ | Not started | — |
-| 7 | Growth Vault™ | Not started | — |
-| 8 | My Wins™ | Not started | — |
-| 9 | Evidence Bank™ | Not started | — |
-| 10 | Portfolio™ | Not started | — |
-| 11 | My Journey™ | Not started | — |
-| 12 | Outcome Goals™ | Not started | — |
-| 13 | Settings™ | Not started | — |
-| 14 | Chat™ | Not started | — |
-| 15 | Today™ | Not started | — |
+| 1 | Plan My Day | Not started | — |
+| 2 | Visual Thinking | Not started | — |
+| 3 | Projects | Not started | — |
+| 4 | Create | Not started | — |
+| 5 | Focus | Not started | — |
+| 6 | Reminder Center | Not started | — |
+| 7 | Growth Vault | Not started | — |
+| 8 | My Wins | Not started | — |
+| 9 | Evidence Bank | Not started | — |
+| 10 | Portfolio | Not started | — |
+| 11 | My Journey | Not started | — |
+| 12 | Outcome Goals | Not started | — |
+| 13 | Settings | Not started | — |
+| 14 | Chat | Not started | — |
+| 15 | Today | Not started | — |
 
 **0 / 15 certified**
 

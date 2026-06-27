@@ -1,9 +1,10 @@
 /**
- * Accepted Intent Lock™ — continue accepted workflows; never reset on yes.
+ * Accepted Intent Lock — continue accepted workflows; never reset on yes.
  */
 
 import type { OutcomeThread } from "../companionOutcomeThread";
 import { isBareGenericAcceptance } from "../pendingAcceptanceAuthority";
+import { continuationReplyForAssistantQuestion } from "../workspaceOpeningRule";
 import type { AcceptedIntentResolution, EcosystemResourceId } from "./types";
 
 const FORBIDDEN_RESET_RE =
@@ -56,7 +57,9 @@ function nextStepForGuidedContinue(
     return `Let's keep going on **${thread.pendingDecision}**. Based on what you shared, the three paths are: keep your current offer, replace it, or run both. Which feels closest to what you want — even if you're not sure yet?`;
   }
   if (thread?.currentProblem) {
-    return `Picking up **${thread.currentProblem.slice(0, 100)}** — tell me one thing you're most unsure about: customers, pricing, or timing?`;
+    const fromQuestion = continuationReplyForAssistantQuestion(assistantText);
+    if (fromQuestion) return fromQuestion;
+    return "Great — let's keep going. What's the piece that feels most uncertain right now?";
   }
   if (/\b(?:expansion|product line|new offer|group program)\b/i.test(assistantText)) {
     return "Let's keep going — who buys your current offer today, and who would the new line serve?";
@@ -112,7 +115,7 @@ export function acceptedIntentLockHintForChat(
   resolution: AcceptedIntentResolution,
 ): string {
   return [
-    "ACCEPTED INTENT LOCK™ (mandatory):",
+    "ACCEPTED INTENT LOCK (mandatory):",
     "User accepted your offer. DO NOT reset the conversation.",
     "FORBIDDEN: 'What would you like help with?', 'How can I help?', 'What's next?' before the workflow completes.",
     `Accepted: ${resolution.acceptedResource ?? resolution.offerKind}.`,

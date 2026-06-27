@@ -1,5 +1,5 @@
 /**
- * Save destination choices — user picks where work lands under Other™ > Saved™.
+ * Save destination choices — user picks where work lands under Other > Saved.
  */
 
 import type { VisualFocusMode } from "./visualFocus/types";

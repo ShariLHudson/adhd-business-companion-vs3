@@ -4,7 +4,7 @@ import type { RoomCompositionEntry } from "./types";
 
 const LIVING_ROOM: RoomCompositionEntry = {
   placeId: "living-room",
-  name: "Living Room™",
+  name: "Living Room",
   signatureFeature: {
     id: "summer-window-right",
     label: "Large open summer window",
@@ -20,7 +20,7 @@ const LIVING_ROOM: RoomCompositionEntry = {
 
 const WINDOW_SEAT: RoomCompositionEntry = {
   placeId: "window-seat",
-  name: "Window Seat™",
+  name: "Window Seat",
   signatureFeature: {
     id: "iowa-landscape-right",
     label: "Wide Iowa landscape",
@@ -41,10 +41,10 @@ const WINDOW_SEAT: RoomCompositionEntry = {
 
 const PLANNING_TABLE: RoomCompositionEntry = {
   placeId: "planning-table",
-  name: "Planning Table™",
+  name: "Planning Table",
   signatureFeature: {
     id: "planning-notebook",
-    label: "Planning Notebook™ — open beside the window",
+    label: "Planning Notebook — open beside the window",
     visibleZone: "right",
     description: "Large open window and morning light stay visible; notebook rests at the table edge.",
   },
@@ -77,7 +77,7 @@ const PLANNING_TABLE: RoomCompositionEntry = {
 
 const SUNROOM_OVER_POND: RoomCompositionEntry = {
   placeId: "sunroom-over-pond",
-  name: "Sunroom Over The Pond™",
+  name: "Sunroom Over The Pond",
   signatureFeature: {
     id: "pond-anchor",
     label: "Pond with flowing water — emotional center below the workspace",
@@ -105,7 +105,7 @@ const SUNROOM_OVER_POND: RoomCompositionEntry = {
 
 const GARDEN_PATH: RoomCompositionEntry = {
   placeId: "garden-path",
-  name: "Garden Path™",
+  name: "Garden Path",
   signatureFeature: {
     id: "forward-stones",
     label: "Stepping stones through morning fog",
@@ -126,7 +126,7 @@ const GARDEN_PATH: RoomCompositionEntry = {
 
 const OUTLOOK_POINT: RoomCompositionEntry = {
   placeId: "outlook-point",
-  name: "Outlook Point™",
+  name: "Outlook Point",
   signatureFeature: {
     id: "horizon-line",
     label: "Open horizon and long trail",
@@ -147,28 +147,29 @@ const OUTLOOK_POINT: RoomCompositionEntry = {
 
 const GREENHOUSE: RoomCompositionEntry = {
   placeId: "greenhouse",
-  name: "Greenhouse™",
+  name: "Garden Conservatory",
   signatureFeature: {
-    id: "rain-shelter",
-    label: "Rain shelter with filtered forest light",
+    id: "conservatory-glass",
+    label: "Morning light through glass walls",
     visibleZone: "top",
-    description: "Enclosed calm acoustics — rain stays at edges, not behind text.",
+    description:
+      "Plants and butterflies stay at the edges — calm before a single word is written.",
   },
   edgeLife: {
-    left: ["trees", "flowers"],
-    right: ["rain", "trees", "curtain-right"],
-    top: ["rain", "filtered-sunlight"],
-    bottom: ["flowers", "steam"],
+    left: ["ferns", "butterfly", "leaves", "planters"],
+    right: ["glass", "garden", "bird", "butterfly", "morning-light"],
+    top: ["glass-roof", "filtered-sunlight", "branches"],
+    bottom: ["flowers", "leaves", "planters"],
   },
   centerForbidden: CENTER_FORBIDDEN_ELEMENTS,
   motionZones: ["left", "right", "top"],
-  backgroundObjectPosition: "42% 52%",
-  panelFrostedOpacity: 0.5,
+  backgroundObjectPosition: "50% 45%",
+  panelFrostedOpacity: 0.46,
 };
 
 const READING_NOOK: RoomCompositionEntry = {
   placeId: "reading-nook",
-  name: "Reading Nook™",
+  name: "Reading Nook",
   signatureFeature: {
     id: "saltwater-aquarium-left",
     label: "Saltwater aquarium on left wall",
@@ -184,7 +185,7 @@ const READING_NOOK: RoomCompositionEntry = {
 
 const CREATIVE_STUDIO: RoomCompositionEntry = {
   placeId: "creative-studio",
-  name: "Creative Studio™",
+  name: "Creative Studio",
   signatureFeature: {
     id: "craft-table-lower",
     label: "Craft table wrapping lower edge",

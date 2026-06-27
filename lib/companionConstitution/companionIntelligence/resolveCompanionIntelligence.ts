@@ -1,5 +1,6 @@
 import type { EmotionalObstacle, EmotionalState } from "@/lib/companionEmotions";
 import type { AppSection } from "@/lib/companionUi";
+import { isResearchIntelligenceRequest } from "@/lib/researchIntelligence";
 import type { ConversationIntelligenceVerdict } from "../conversationIntelligence/types";
 import { createCompanionState, type CompanionState } from "../companionState";
 import type { SpecializedIntelligenceId } from "../specializedIntelligence/registry";
@@ -114,6 +115,7 @@ function selectIntelligences(input: CompanionIntelligenceInput): {
     addIntelligences(active, "business-intelligence", "relationship-intelligence");
   }
   if (section === "how-do-i") active.add("research-intelligence");
+  if (isResearchIntelligenceRequest(text)) active.add("research-intelligence");
   if (section === "wins-this-week" || section === "evidence-bank") {
     active.add("evidence-intelligence");
   }
@@ -147,7 +149,7 @@ function inferNextExperience(
 }
 
 /**
- * Companion Intelligence™ — the conductor. Sole orchestration authority.
+ * Companion Intelligence — the conductor. Sole orchestration authority.
  * Decides which specialized intelligences participate and what matters now.
  * The user experiences one companion — never individual intelligences.
  */

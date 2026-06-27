@@ -20,7 +20,7 @@ export type PresenceStateId = (typeof PRESENCE_STATES)[number];
 
 export type PresenceState = {
   state: PresenceStateId;
-  /** Canonical Shari's Presence™ state used for render hints */
+  /** Canonical Shari's Presence state used for render hints */
   sharisState: ShariPresenceState;
   showShariImage: boolean;
   showEvidenceObjects: boolean;

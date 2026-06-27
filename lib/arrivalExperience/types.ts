@@ -3,7 +3,7 @@ import type { CompanionPlaceId } from "@/lib/companionUniverse/types";
 import type { AppSection } from "@/lib/companionUi";
 import type { DayState } from "@/lib/companionStore";
 
-/** First Production Experience™ — arrival beat sequence. */
+/** First Production Experience — arrival beat sequence. */
 export type ArrivalBeat =
   | "settle"
   | "greet"

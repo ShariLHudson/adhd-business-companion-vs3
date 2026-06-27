@@ -33,7 +33,7 @@ export const FOCUS_LANDSCAPE_SPACES: Record<
 > = {
   "garden-path": {
     id: "garden-path",
-    name: "Garden Path™",
+    name: "Garden Path",
     hubRole: "entry",
     emotionalStates: ["overwhelmed", "mentally-blocked", "unsure-where-to-start"],
     emotionalPurpose: "Turn confusion into one visible next action",
@@ -55,7 +55,7 @@ export const FOCUS_LANDSCAPE_SPACES: Record<
   },
   "meadow-lake": {
     id: "meadow-lake",
-    name: "Meadow / Lake™",
+    name: "Meadow / Lake",
     hubRole: "center",
     emotionalStates: ["overstimulated", "mentally-fatigued", "emotionally-full"],
     emotionalPurpose: "Reduce overload → restore baseline regulation",
@@ -68,7 +68,7 @@ export const FOCUS_LANDSCAPE_SPACES: Record<
   },
   "meadow-stretch": {
     id: "meadow-stretch",
-    name: "Forest Clearing™",
+    name: "Forest Clearing",
     hubRole: "subspace",
     parentSpaceId: "meadow-lake",
     emotionalStates: ["body-held-tension", "mental-fatigue"],
@@ -82,7 +82,7 @@ export const FOCUS_LANDSCAPE_SPACES: Record<
   },
   "forest-pavilion": {
     id: "forest-pavilion",
-    name: "Forest Pavilion™",
+    name: "Forest Pavilion",
     hubRole: "subspace",
     parentSpaceId: "meadow-lake",
     emotionalStates: ["overwhelmed-but-working", "need-sensory-isolation"],
@@ -101,7 +101,7 @@ export const FOCUS_LANDSCAPE_SPACES: Record<
   },
   "meadow-object-field": {
     id: "meadow-object-field",
-    name: "Meadow Object Field™",
+    name: "Meadow Object Field",
     hubRole: "subspace",
     parentSpaceId: "meadow-lake",
     emotionalStates: ["low-energy", "emotional-depletion"],
@@ -115,7 +115,7 @@ export const FOCUS_LANDSCAPE_SPACES: Record<
   },
   "horizon-trail": {
     id: "horizon-trail",
-    name: "Horizon Trail™",
+    name: "Horizon Trail",
     hubRole: "subspace",
     parentSpaceId: "meadow-lake",
     emotionalStates: ["stuck-energy", "restlessness"],
@@ -133,7 +133,7 @@ export const FOCUS_LANDSCAPE_SPACES: Record<
   },
   "deep-forest": {
     id: "deep-forest",
-    name: "Deep Forest™",
+    name: "Deep Forest",
     hubRole: "subspace",
     parentSpaceId: "meadow-lake",
     emotionalStates: ["overstimulated", "shutdown-mode", "emotional-overload"],

@@ -1,4 +1,4 @@
-# Companion Object Language™ — Pass 1 Report
+# Companion Object Language — Pass 1 Report
 
 **Branch:** `design/companion-object-language`  
 **Date:** 2026-06-26  

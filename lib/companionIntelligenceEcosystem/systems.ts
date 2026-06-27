@@ -1,19 +1,19 @@
 import type { EcosystemMajorSystem, EcosystemMajorSystemId } from "./types";
 
 const VISUAL_THINKING_FUTURE = [
-  "Living Canvas™",
-  "What-If Analysis™",
-  "Ripple Effects™",
-  "Business Simulations™",
-  "Board of Directors™ Analysis™",
-  "Opportunity Detection™",
+  "Living Canvas",
+  "What-If Analysis",
+  "Ripple Effects",
+  "Business Simulations",
+  "Board of Directors Analysis",
+  "Opportunity Detection",
 ];
 
 /** Major ecosystem systems — three-layer value + learning signals registry. */
 export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
   {
     id: "business-canvas",
-    userLabel: "Business Canvas™",
+    userLabel: "Business Canvas",
     threeLayer: {
       userValue: "Helps users understand how their business works.",
       intelligenceCaptures: [
@@ -41,7 +41,7 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
   },
   {
     id: "mind-map",
-    userLabel: "Mind Map™",
+    userLabel: "Mind Map",
     threeLayer: {
       userValue: "Helps users explore scattered ideas and see the whole picture.",
       intelligenceCaptures: [
@@ -50,7 +50,7 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
         "Creativity patterns",
         "Branch depth and focus areas",
       ],
-      futureEnables: ["Living Canvas™", "Opportunity Detection™"],
+      futureEnables: ["Living Canvas", "Opportunity Detection"],
     },
     learningSignals: [
       "Idea clusters",
@@ -62,7 +62,7 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
   },
   {
     id: "decision-tree",
-    userLabel: "Decision Tree™",
+    userLabel: "Decision Tree",
     threeLayer: {
       userValue: "Helps users explore possible paths before committing.",
       intelligenceCaptures: [
@@ -72,8 +72,8 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
         "Branch exploration depth",
       ],
       futureEnables: [
-        "Board of Directors™ Analysis™",
-        "Predictive Business Guidance™",
+        "Board of Directors Analysis",
+        "Predictive Business Guidance",
       ],
     },
     learningSignals: [
@@ -86,7 +86,7 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
   },
   {
     id: "decision-compass",
-    userLabel: "Decision Compass™",
+    userLabel: "Decision Compass",
     threeLayer: {
       userValue: "Helps users choose the best option when paths are unclear.",
       intelligenceCaptures: [
@@ -95,8 +95,8 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
         "Commitment timing",
       ],
       futureEnables: [
-        "Board of Directors™ Analysis™",
-        "Founder Decision Patterns™",
+        "Board of Directors Analysis",
+        "Founder Decision Patterns",
       ],
     },
     learningSignals: [
@@ -112,7 +112,7 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
   },
   {
     id: "plan-my-day",
-    userLabel: "Plan My Day™",
+    userLabel: "Plan My Day",
     threeLayer: {
       userValue: "Helps users choose what fits today's reality.",
       intelligenceCaptures: [
@@ -122,8 +122,8 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
         "Deferral and completion themes",
       ],
       futureEnables: [
-        "Founder Momentum Patterns™",
-        "Predictive Business Guidance™",
+        "Founder Momentum Patterns",
+        "Predictive Business Guidance",
       ],
     },
     learningSignals: [
@@ -137,7 +137,7 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
   },
   {
     id: "clear-my-mind",
-    userLabel: "Clear My Mind™",
+    userLabel: "Clear My Mind",
     threeLayer: {
       userValue: "Helps users release mental load without sorting first.",
       intelligenceCaptures: [
@@ -146,7 +146,7 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
         "Stress patterns",
         "Capture volume and themes",
       ],
-      futureEnables: ["Overwhelm Patterns™", "Founder Momentum Patterns™"],
+      futureEnables: ["Overwhelm Patterns", "Founder Momentum Patterns"],
     },
     learningSignals: [
       "Overwhelm triggers",
@@ -159,7 +159,7 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
   },
   {
     id: "visual-thinking",
-    userLabel: "Visual Thinking™",
+    userLabel: "Visual Thinking",
     threeLayer: {
       userValue:
         "Helps users think visually — explore, connect, decide, and strategize.",
@@ -187,7 +187,7 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
   },
   {
     id: "projects",
-    userLabel: "Projects™",
+    userLabel: "Projects",
     threeLayer: {
       userValue: "Helps users hold multi-step work over time.",
       intelligenceCaptures: [
@@ -195,7 +195,7 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
         "Stall and completion patterns",
         "Cross-project themes",
       ],
-      futureEnables: ["Execution Patterns™", "Board of Directors™ Analysis™"],
+      futureEnables: ["Execution Patterns", "Board of Directors Analysis"],
     },
     learningSignals: ["Project velocity", "Stall themes", "Completion patterns"],
     intelligencePatterns: ["execution", "founder_momentum", "planning"],
@@ -203,7 +203,7 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
   },
   {
     id: "goals",
-    userLabel: "Goals™",
+    userLabel: "Goals",
     threeLayer: {
       userValue: "Helps users define measurable outcomes and stay aligned.",
       intelligenceCaptures: [
@@ -212,8 +212,8 @@ export const ECOSYSTEM_MAJOR_SYSTEMS: EcosystemMajorSystem[] = [
         "Outcome vs activity drift",
       ],
       futureEnables: [
-        "Business Growth Patterns™",
-        "Board of Directors™ Analysis™",
+        "Business Growth Patterns",
+        "Board of Directors Analysis",
       ],
     },
     learningSignals: [

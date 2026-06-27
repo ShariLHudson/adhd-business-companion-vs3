@@ -1,12 +1,12 @@
 /**
- * Plan My Day™ — The Kitchen Planning Nook™ / Planning Table™
+ * Plan My Day — The Kitchen Planning Nook / Planning Table
  * @see docs/companion-homestead/PLANNING_TABLE.md
  */
 
 import type { WelcomeSeason, WelcomeTimeOfDay } from "@/lib/welcomeLivingRoom";
 import type { WelcomeWeather } from "@/lib/companionEnvironmentIntelligence";
 
-export const PLANNING_TABLE_TITLE = "Plan My Day™" as const;
+export const PLANNING_TABLE_TITLE = "Plan My Day" as const;
 export const PLANNING_TABLE_SUBTITLE =
   "We'll figure today out together." as const;
 

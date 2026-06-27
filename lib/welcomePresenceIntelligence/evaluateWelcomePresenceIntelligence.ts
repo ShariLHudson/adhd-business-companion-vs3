@@ -5,6 +5,10 @@ import {
   formatCarryForwardGreeting,
   isFirstVisitOfDay,
 } from "@/lib/carryForward";
+import {
+  evaluateMorningGreeting,
+  formatMorningGreeting,
+} from "@/lib/relationshipIntelligence";
 import { evaluateWelcomeRestraint } from "@/lib/wisdomOfRestraint";
 import { evaluateWelcomeCharacter } from "@/lib/characterOfShari";
 import type {
@@ -42,8 +46,8 @@ function mapCategory(category: string): WelcomeGreetingCategory {
 }
 
 /**
- * Welcome Presence Intelligence™ — hospitality before words.
- * Greetings from Voice Bible™; preparation from Presence Intelligence™.
+ * Welcome Presence Intelligence — hospitality before words.
+ * Greetings from Voice Bible; preparation from Presence Intelligence.
  */
 export function evaluateWelcomePresenceIntelligence(
   input: WelcomePresenceInput,
@@ -120,10 +124,35 @@ export function evaluateWelcomePresenceIntelligence(
 
   const baseGreeting =
     character.greeting.content ?? restraint.greeting.content ?? composed.greeting;
-  const greeting =
-    carryForward.active && formatCarryForwardGreeting(carryForward)
-      ? formatCarryForwardGreeting(carryForward)!
-      : baseGreeting;
+
+  const firstVisitToday = isFirstVisitOfDay(input.now);
+  const morningFirstGreeting =
+    input.timeOfDay === "morning" &&
+    firstVisitToday &&
+    !input.isFirstMeeting &&
+    !input.birthdayToday &&
+    !input.celebrationActive;
+
+  let greeting: string;
+  if (morningFirstGreeting) {
+    const morning = evaluateMorningGreeting({
+      now: input.now,
+      firstName: input.firstName,
+      sessionVisitIndex: input.sessionVisitIndex,
+      returnIntervalDays: input.returnIntervalDays,
+      previousTopic: input.previousTopic,
+      recentAccomplishment: input.recentAccomplishment,
+      projectRecentlyCompleted: input.projectRecentlyCompleted,
+      celebrationActive: input.celebrationActive,
+      recoveryGentle: input.recoveryGentle,
+      isFirstMeeting: input.isFirstMeeting,
+    });
+    greeting = formatMorningGreeting(morning);
+  } else if (carryForward.active && formatCarryForwardGreeting(carryForward)) {
+    greeting = formatCarryForwardGreeting(carryForward)!;
+  } else {
+    greeting = baseGreeting;
+  }
 
   return {
     greeting,

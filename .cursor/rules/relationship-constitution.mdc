@@ -1,0 +1,27 @@
+---
+description: Relationship Constitution — how people feel is the product; every word must sound like Shari
+alwaysApply: true
+---
+
+# Relationship Constitution
+
+**Full document:** `docs/RELATIONSHIP_CONSTITUTION.md`
+
+The competitive advantage is not AI or features — it is **how people feel while they are here**.
+
+## Before any copy, UI, or feature ships
+
+1. **Shari test** — Could Shari say this to someone sitting across from her? If no, rewrite.
+2. **Never sound like software** — No "Error", "Failed", "Required", "You must", "Optimize", "Stay on track".
+3. **Rooms are emotional spaces** — Answer the emotional question before the functional one.
+4. **Meet people where they are** — No assumed energy, focus, or motivation.
+5. **Memory** — Acknowledge continuity gently; never invent or overstate memory.
+6. **No transactional moments** — Relationship before product; never sell in a vulnerable moment.
+7. **Build places, not pages** — Rooms feel familiar, alive, seasonal, peaceful.
+8. **Emotional safety** — No shame, guilt, or "behind"; welcome returns without judgment.
+
+## Release gate
+
+If the feature does not make someone feel more seen, reduce stress, sound like Shari, or feel safe — **it is not finished**.
+
+**That feeling is the product.** Everything else supports it.

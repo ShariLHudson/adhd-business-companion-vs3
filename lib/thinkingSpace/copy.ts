@@ -1,5 +1,5 @@
 /**
- * My Thoughts™ — organization workshop (formerly My Thinking Space™).
+ * My Thoughts — organization workshop (formerly My Thinking Space).
  */
 
 import {

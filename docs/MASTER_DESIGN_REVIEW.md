@@ -1,4 +1,4 @@
-# Companion Homestead™ Master Design Review
+# Companion Homestead Master Design Review
 ## Challenge Everything Before We Build
 
 **Version:** 1.0  
@@ -22,7 +22,7 @@
 |--------------|-----|
 | **The 20-room metaphor as navigation** | Twenty places × seasonal variants × signature objects × Look Book art specs = a theme park nobody can orient in. ADHD users need **one clear landing**, not a floor plan exam. |
 | **24+ Companion Universe libraries** | `libraryCatalog.ts` lists place, scene, motion, sound, lighting, seasonal, discovery, delight, traditions, memory, hospitality-profile, and more — **before** one room ships as a photograph. Systems will fight; engineers will wire the easiest library, not the right judgment. |
-| **20+ intelligence engines** | Intelligence Registry™ plans Narrative, Pattern, Recovery, Founder, Opportunity, Growth, etc. Each engine wants signals, surfaces, and "enrichment." That is the opposite of **one voice, one next thing**. |
+| **20+ intelligence engines** | Intelligence Registry plans Narrative, Pattern, Recovery, Founder, Opportunity, Growth, etc. Each engine wants signals, surfaces, and "enrichment." That is the opposite of **one voice, one next thing**. |
 | **Memory at scale** | "Known not monitored" requires perfect recall discipline. One wrong *"Last January you…"* to the wrong person, one leaked pattern, one conflation — trust dies in public. |
 | **Art production** | Reef aquarium, Iowa seasons, Kinsey, horse, hummingbirds, fireflies, 1,700-line Look Book — **cannot** be authored per user per day. Quality drops → uncanny valley → "cheap Sims house." |
 | **Hospitality preparation** | "Tea for one, coffee for another" × 1M guests × daily visits = a personalization engine that **will** feel like CRM unless ruthlessly capped. |
@@ -30,7 +30,7 @@
 
 ## What becomes repetitive
 
-- **Daily Discovery™** + **Delight Library™** + **220 Tiny Moments™** — if implemented as rotation logic, users learn the pattern in week two. *"Oh, the cardinal again."*
+- **Daily Discovery** + **Delight Library** + **220 Tiny Moments** — if implemented as rotation logic, users learn the pattern in week two. *"Oh, the cardinal again."*
 - **Seasonal traditions** triggered as events — first hummingbird, first fire, first tomato — become **calendar notifications wearing a flannel shirt**.
 - **Greeting libraries** — even good copy fatigues when arrival is daily. Year-three magic dies when line three repeats.
 - **NGMTM sticky notes** — charming once; wallpaper at scale unless rare and earned.
@@ -39,13 +39,13 @@
 
 - **Motion library** (birds, chimes, reef) competing with **conversation first**.
 - **Atmospheric layers** (lighting + sound + scene + seasonal) on mobile — sensory richness becomes **load time + visual noise**.
-- **Honest Home™ clutter** — three notebooks, baskets, half-projects — beautiful in a still photograph; chaotic if every object renders live.
+- **Honest Home clutter** — three notebooks, baskets, half-projects — beautiful in a still photograph; chaotic if every object renders live.
 - **Business ecosystem surfaces** (Projects, Create, Founder, Decision Compass) bleeding into homestead arrival — **two products in one doorway**.
 
 ## What becomes difficult to maintain
 
 - **Three site documents** (Blueprint, Master Plan, Look Book) plus Year doc — same fact in four places will diverge.
-- **Scene Integrity Engine™** — every new object needs combinatorial rules (no snow on sunflowers). Maintenance grows exponentially with content.
+- **Scene Integrity Engine** — every new object needs combinatorial rules (no snow on sunflowers). Maintenance grows exponentially with content.
 - **Trust stage × relationship phase × needs × decision ladder** — four progression systems; no single source of truth for "what can Shari say today?"
 - **Per-room 12-section Look Book specs** before first shipped photograph — design debt accrues interest daily.
 
@@ -80,8 +80,8 @@
 
 | Cut or freeze | Why |
 |---------------|-----|
-| **Future Wings™ as navigable space** | Aspiration belongs in Blueprint Part XI — not in v1 navigation. Empty wings feel abandoned. |
-| **Adventure Room™ as daily room** | Overlaps Creative Studio + restoration. Keep for travel-dream **moments**, not a permanent door. |
+| **Future Wings as navigable space** | Aspiration belongs in Blueprint Part XI — not in v1 navigation. Empty wings feel abandoned. |
+| **Adventure Room as daily room** | Overlaps Creative Studio + restoration. Keep for travel-dream **moments**, not a permanent door. |
 | **Discovery / Delight as push systems** | Contradicts Decision Intelligence restraint. Delight must be **ambient or absent**, never scheduled. |
 | **220 Tiny Moments as a build checklist** | Keep as **art direction cap** (~3 visible per visit max). Not a backlog of 220 tickets. |
 | **Daily Companion Cycle 11-phase journey as UX expectation** | Design for **one phase per visit**, not a virtuous full day. |

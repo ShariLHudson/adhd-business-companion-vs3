@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { evaluateGreetingIntelligence } from "./evaluateGreetingIntelligence";
 import { clearVoiceUsageForTests, violatesShariVoice } from "@/lib/shariVoiceBible";
 
-describe("GreetingIntelligence™", () => {
+describe("GreetingIntelligence", () => {
   it("composes first visit from Voice Bible — not random lists", () => {
     clearVoiceUsageForTests();
     const intel = evaluateGreetingIntelligence({

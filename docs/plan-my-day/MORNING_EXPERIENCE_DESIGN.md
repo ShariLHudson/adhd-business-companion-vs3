@@ -1,12 +1,12 @@
-# Plan My Day™ — Morning Experience Design
+# Plan My Day — Morning Experience Design
 ## Designing the Daily Ritual Before the Interface
 
 **Version:** 1.0 (Experience Design Sprint)  
 **Status:** Awaiting approval — no UI, no implementation  
-**Prerequisite:** Companion Brain™ complete · Daily Companion Cycle™ complete · Human Reality Test™ passed  
+**Prerequisite:** Companion Brain complete · Daily Companion Cycle complete · Human Reality Test passed  
 **Subordinate to:** `DAILY_COMPANION_CYCLE_ARCHITECTURE.md` · `COMPANION_JUDGMENT_REPORT.md` · Companion Constitution
 
-**Gate:** Visible Plan My Day™ screen design begins only after this document is approved.
+**Gate:** Visible Plan My Day screen design begins only after this document is approved.
 
 ---
 
@@ -14,10 +14,10 @@
 
 This is **not** a UI spec. It contains no cards, columns, layouts, or components.
 
-It defines **what it feels like** to open Plan My Day™ on a weekday morning — the emotional journey, the ritual, the conversation, and the invisible contract between Companion Brain™ and human.
+It defines **what it feels like** to open Plan My Day on a weekday morning — the emotional journey, the ritual, the conversation, and the invisible contract between Companion Brain and human.
 
 > The interface is not the experience.  
-> The Companion Brain™ already thinks.  
+> The Companion Brain already thinks.  
 > The experience allows the user to feel understood.
 
 ---
@@ -58,7 +58,7 @@ Arrival → Orientation → Relief → Confidence → Momentum → Choice → Fl
 | Brain dump on entry | Exhausted before starting | Orientation before proposals |
 | Productivity pressure | Guilt, performance anxiety | Confidence before tasks |
 | Architecture exposure | Confused, distrustful | Wisdom through simplicity |
-| Fresh-start amnesia | Disconnected from companion | Relationship Continuity™ |
+| Fresh-start amnesia | Disconnected from companion | Relationship Continuity |
 | False urgency | Rushed, misaligned | Momentum ≠ urgency |
 
 ---
@@ -67,7 +67,7 @@ Arrival → Orientation → Relief → Confidence → Momentum → Choice → Fl
 
 ## The five-year weekday ritual
 
-Imagine Alex opening Plan My Day™ every weekday for five years. This ritual should emerge:
+Imagine Alex opening Plan My Day every weekday for five years. This ritual should emerge:
 
 ### What becomes familiar
 
@@ -139,9 +139,9 @@ Shari speaks as a **trusted companion who prepared quietly**, not as software re
 
 ## Conversation phases (user-visible)
 
-These map to Daily Companion Cycle™ phases 7+ but are experienced as **conversation**, not pipeline.
+These map to Daily Companion Cycle phases 7+ but are experienced as **conversation**, not pipeline.
 
-### Phase A — Greeting with continuity (Relationship Continuity™)
+### Phase A — Greeting with continuity (Relationship Continuity)
 
 **Purpose:** Today is not a fresh start.
 
@@ -154,7 +154,7 @@ These map to Daily Companion Cycle™ phases 7+ but are experienced as **convers
 - If yesterday was hard, acknowledge without scorekeeping.
 - If celebration cooldown active, do not pivot forward.
 
-### Phase B — Today's reality (Orientation™)
+### Phase B — Today's reality (Orientation)
 
 **Purpose:** Answer *where am I?*
 
@@ -218,7 +218,7 @@ Confidence is **embedded** in Phases A–E — never a motivational poster.
 
 **Never:** "You've got this!" · "Crush it!" · "Let's go!"
 
-### Phase G — Single invitation (Confirmation™)
+### Phase G — Single invitation (Confirmation)
 
 **Purpose:** Transfer agency.
 
@@ -247,7 +247,7 @@ Confidence is **embedded** in Phases A–E — never a motivational poster.
 ```
                     ┌─────────────────┐
                     │  User opens     │
-                    │  Plan My Day™   │
+                    │  Plan My Day   │
                     └────────┬────────┘
                              │
               ┌──────────────┴──────────────┐
@@ -283,13 +283,13 @@ Confidence is **embedded** in Phases A–E — never a motivational poster.
 
 ### What has already happened (invisible)
 
-Before the user reads a word, Companion Brain™ has:
+Before the user reads a word, Companion Brain has:
 
 - Assembled context from Adapt My Day, captures, yesterday, calendar, projects
 - Resolved DayMode and CycleState
 - Selected momentum and confidence opportunities
 - Curated permission exclusions
-- Run Cognitive Audit™
+- Run Cognitive Audit
 - Prepared orientation copy and proposals (not materialized)
 
 ### What the user experiences
@@ -420,7 +420,7 @@ For normal days, user may still be reading — **no timer pressure**.
 
 ### After five minutes — success criteria
 
-The user should be able to close Plan My Day™ thinking:
+The user should be able to close Plan My Day thinking:
 
 - "I feel calmer."
 - "I know where I am."
@@ -446,7 +446,7 @@ The companion does not require them to stay on the page.
 
 ---
 
-# Deliverable 5 — What the Companion Brain™ Reveals Immediately
+# Deliverable 5 — What the Companion Brain Reveals Immediately
 
 ## Revealed at entry (user-facing)
 
@@ -496,18 +496,18 @@ The companion does not require them to stay on the page.
 
 ## The invisible preparation
 
-When the user opens Plan My Day™, the following has **already completed** — silently:
+When the user opens Plan My Day, the following has **already completed** — silently:
 
 ```
-Context Assembly™
+Context Assembly
   → DayMode resolution
   → CycleState resolution
-  → Momentum Intelligence™
-  → Confidence Intelligence™
-  → Permission Intelligence™
-  → Proposal Generation™
-  → Cognitive Audit™
-  → Relationship Protection™
+  → Momentum Intelligence
+  → Confidence Intelligence
+  → Permission Intelligence
+  → Proposal Generation
+  → Cognitive Audit
+  → Relationship Protection
 ```
 
 The user experiences the **result** as wisdom. Not the pipeline.
@@ -596,7 +596,7 @@ Never invert. Never show Layer 3 without passing Layer 1.
 4. **Momentum before volume** — one anchor before many items.
 5. **Choice before flow** — user judges before board activates.
 
-## Relationship principles (Relationship Continuity™)
+## Relationship principles (Relationship Continuity)
 
 1. **Continue, don't reconstruct** — one thread from yesterday.
 2. **Never fresh-start software** — brain state persists.
@@ -624,7 +624,7 @@ Never invert. Never show Layer 3 without passing Layer 1.
 
 ---
 
-# Human Reality Test™ — Experience Validation
+# Human Reality Test — Experience Validation
 
 **Question for every scenario:** *Would I want to begin my morning this way?*
 
@@ -745,18 +745,18 @@ Never invert. Never show Layer 3 without passing Layer 1.
 
 ## Next step (only after approval)
 
-**Screen design sprint** — translate these principles into visible Plan My Day™ entry states (Orientation Surface, Confirmation Surface, Living Board relationship).
+**Screen design sprint** — translate these principles into visible Plan My Day entry states (Orientation Surface, Confirmation Surface, Living Board relationship).
 
 **Not before approval:**
 - React components
-- Wire Companion Brain™ to UI
+- Wire Companion Brain to UI
 - Replace `PlanMyDayPanel` entry behavior
 
 ---
 
-# Stewardship Review™
+# Stewardship Review
 
-**Canonical law:** [Product Constitution™ — The Stewardship Review™](../PRODUCT_CONSTITUTION.md#the-stewardship-review)
+**Canonical law:** [Product Constitution — The Stewardship Review](../PRODUCT_CONSTITUTION.md#the-stewardship-review)
 
 | Question | Answer |
 |----------|--------|
@@ -770,4 +770,4 @@ Never invert. Never show Layer 3 without passing Layer 1.
 
 ---
 
-*Plan My Day™ is the daily ritual. The board is where a confirmed plan lives. The brain is invisible. The user feels understood.*
+*Plan My Day is the daily ritual. The board is where a confirmed plan lives. The brain is invisible. The user feels understood.*

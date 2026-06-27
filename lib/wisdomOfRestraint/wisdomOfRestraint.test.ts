@@ -5,7 +5,7 @@ import {
   violatesRestraintVoice,
 } from "./index";
 
-describe("Wisdom of Restraint™", () => {
+describe("Wisdom of Restraint", () => {
   it("suppresses performance and surveillance voice", () => {
     const verdict = evaluateRestraintFilter("I've prepared seven suggestions for you.", {
       kind: "spoken_line",

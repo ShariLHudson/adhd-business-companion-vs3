@@ -1,12 +1,12 @@
 /**
- * Clear My Mind™ → Companion Presence™ journey mapping.
+ * Clear My Mind → Companion Presence journey mapping.
  *
  * Listening → Receiving → Thinking → Understanding → Supporting
  */
 
 import type { ClearMyMindStage } from "@/lib/clearMyMindStages";
 import type { ClearMyMindUnfoldStep } from "@/lib/clearMyMindUnfold";
-import { companionThinkingMessage } from "./thinkingCopy";
+import { shariVisibleThinkingLine } from "@/lib/clearMyMindCompanionVoice";
 import type {
   CompanionAnimationState,
   CompanionPresenceExpression,
@@ -74,7 +74,7 @@ function listeningLine(seed: number): string {
   return LISTENING_LINES[Math.abs(seed) % LISTENING_LINES.length];
 }
 
-/** Presence evaluation for Clear My Mind™ — consumes journey phase, not page logic. */
+/** Presence evaluation for Clear My Mind — consumes journey phase, not page logic. */
 export function evaluateClearMyMindPresence(
   phase: ClearMyMindPresencePhase,
   now = new Date(),
@@ -102,7 +102,7 @@ export function evaluateClearMyMindPresence(
         animationState: "thinking",
         speechBubbleState: "thinking",
         shariImageState: "support",
-        thinkingMessage: companionThinkingMessage(now.getMinutes()),
+        thinkingMessage: shariVisibleThinkingLine(now.getMinutes()),
         reason: "clear-my-mind:thinking",
       };
     case "receiving":
@@ -120,7 +120,7 @@ export function evaluateClearMyMindPresence(
         expression: "thoughtful",
         animationState: "thinking",
         speechBubbleState: "thinking",
-        thinkingMessage: "I'm thinking this through…",
+        thinkingMessage: "I want to be thoughtful here.",
         reason: "clear-my-mind:understanding",
       };
     case "supporting":

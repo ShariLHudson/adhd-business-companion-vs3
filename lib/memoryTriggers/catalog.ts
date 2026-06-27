@@ -1,5 +1,5 @@
 /**
- * Memory Triggers™ library — reusable Companion intelligence layer.
+ * Memory Triggers library — reusable Companion intelligence layer.
  * Story-first lines only; never room announcements.
  */
 

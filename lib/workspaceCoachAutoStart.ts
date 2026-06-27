@@ -39,6 +39,7 @@ export const WORKSPACE_COACH_SILENT_SECTIONS: ReadonlySet<AppSection> =
     "google-workspace",
     "saved-work",
     "how-do-i",
+    "welcome-room",
   ]);
 
 export function isWorkspaceCoachSilent(section: AppSection): boolean {

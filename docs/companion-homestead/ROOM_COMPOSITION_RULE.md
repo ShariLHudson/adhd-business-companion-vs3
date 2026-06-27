@@ -1,10 +1,10 @@
-# Room Composition Rule™
+# Room Composition Rule
 ## Design Around The Conversation
 
 **Version:** 1.0  
 **Status:** Constitutional — every room, every workspace  
 **Code:** `lib/roomCompositionRule/`  
-**Sibling:** [COMPANION_WORKSPACE_STANDARD.md](./COMPANION_WORKSPACE_STANDARD.md) · Scene Render Contract™ (`lib/sceneRenderContract/`)
+**Sibling:** [COMPANION_WORKSPACE_STANDARD.md](./COMPANION_WORKSPACE_STANDARD.md) · Scene Render Contract (`lib/sceneRenderContract/`)
 
 ---
 
@@ -17,20 +17,20 @@ The Homestead is not wallpaper. It is a **living frame** around the guest's work
 
 ---
 
-## Protected Conversation Zone™
+## Protected Conversation Zone
 
 The center is reserved for:
 
 - Conversation · Documents · Brainstorming · Planning · Email  
-- Clear My Mind™ · SOPs · Marketing · Any future workspace
+- Clear My Mind · SOPs · Marketing · Any future workspace
 
-**Never place here:** fireplace, aquarium, open window, Shari, hero artwork, primary Signature Objects™, seasonal heroes, motion behind text.
+**Never place here:** fireplace, aquarium, open window, Shari, hero artwork, primary Signature Objects, seasonal heroes, motion behind text.
 
 Enforced: `CENTER_FORBIDDEN_ELEMENTS` in `lib/roomCompositionRule/rules.ts`
 
 ---
 
-## Living Frame™
+## Living Frame
 
 Life happens at the **edges**. The guest is surrounded while remaining focused.
 
@@ -43,15 +43,15 @@ Life happens at the **edges**. The guest is surrounded while remaining focused.
 
 ---
 
-## Signature Features™ (must stay visible)
+## Signature Features (must stay visible)
 
 | Room | Signature | Zone |
 |------|-----------|------|
-| Living Room™ | Open summer window | Right |
-| Window Seat™ | Iowa landscape | Right |
-| Planning Table™ | Handcrafted desk | Bottom |
-| Reading Nook™ | Saltwater aquarium | Left |
-| Creative Studio™ | Craft table | Bottom |
+| Living Room | Open summer window | Right |
+| Window Seat | Iowa landscape | Right |
+| Planning Table | Handcrafted desk | Bottom |
+| Reading Nook | Saltwater aquarium | Left |
+| Creative Studio | Craft table | Bottom |
 
 Catalog: `ROOM_COMPOSITION_CATALOG` in `roomCatalog.ts`
 

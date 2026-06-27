@@ -7,7 +7,7 @@ import {
 } from "@/lib/environmentalTruth";
 import { evaluateCompanionEnvironmentIntelligence } from "@/lib/companionEnvironmentIntelligence";
 
-describe("Environmental Truth™", () => {
+describe("Environmental Truth", () => {
   it("requires fresh coffee before steam appears", () => {
     const without = resolveEnvironmentalTruth({
       timeOfDay: "morning",

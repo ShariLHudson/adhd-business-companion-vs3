@@ -7,12 +7,12 @@ import {
   validateShariPlacement,
 } from "./index";
 
-describe("Room Composition Rule™", () => {
-  it("maps Clear My Mind to Window Seat™", () => {
+describe("Room Composition Rule", () => {
+  it("maps Clear My Mind to Window Seat", () => {
     expect(placeForWorkspace("clear-my-mind")).toBe("window-seat");
   });
 
-  it("keeps signature feature on the right for Window Seat™", () => {
+  it("keeps signature feature on the right for Window Seat", () => {
     const verdict = evaluateRoomComposition({ workspaceId: "clear-my-mind" });
     expect(verdict.signatureFeature.visibleZone).toBe("right");
     expect(verdict.backgroundObjectPosition).toContain("72%");

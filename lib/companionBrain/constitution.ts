@@ -1,9 +1,9 @@
 /**
- * Constitutional annotations for Companion Brain™ services.
+ * Constitutional annotations for Companion Brain services.
  * For future developers — not user-facing.
  *
- * Entry: Screen Certification™ gates (see docs/SCREEN_CERTIFICATION.md).
- * Ongoing: Stewardship Review™ (see docs/PRODUCT_CONSTITUTION.md#the-stewardship-review).
+ * Entry: Screen Certification gates (see docs/SCREEN_CERTIFICATION.md).
+ * Ongoing: Stewardship Review (see docs/PRODUCT_CONSTITUTION.md#the-stewardship-review).
  */
 
 export type ConstitutionalPrinciple =
@@ -152,7 +152,7 @@ export const COMPANION_BRAIN_SERVICES: ServiceConstitution[] = [
   },
   {
     service: "emitLearningSignals",
-    purpose: "Feed the Living Intelligence Graph™ without user dashboards.",
+    purpose: "Feed the Living Intelligence Graph without user dashboards.",
     principles: ["Relevance-Safeguard", "Dual-Mandate"],
   },
   {
@@ -168,7 +168,7 @@ export const COMPANION_BRAIN_SERVICES: ServiceConstitution[] = [
   {
     service: "publishRealitySignal",
     purpose:
-      "Today's Reality™ and future signals feed one brain — no manual synchronization.",
+      "Today's Reality and future signals feed one brain — no manual synchronization.",
     principles: [
       "Relevance-Safeguard",
       "Relationship-Protection",

@@ -1,5 +1,5 @@
 /**
- * Founder Copilot™ — diagnose issues and generate actionable fixes.
+ * Founder Copilot — diagnose issues and generate actionable fixes.
  */
 
 import type { FounderWarning } from "./founderEarlyWarning";

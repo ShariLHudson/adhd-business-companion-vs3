@@ -72,12 +72,12 @@ describe("explain-first offers", () => {
     expect(msg).toMatch(/Would you like/i);
   });
 
-  it("business canvas offer uses Business Canvas™ not framework names", () => {
+  it("business canvas offer uses Business Canvas not framework names", () => {
     expect(isBusinessCanvasSituationSignal("why are sales so slow")).toBe(true);
     const msg = formatBusinessCanvasCompanionOffer(
       "I want to understand why sales are slow",
     );
-    expect(msg).toMatch(/Business Canvas™/i);
+    expect(msg).toMatch(/Business Canvas/i);
     expect(msg).not.toMatch(/Business Model Canvas/i);
     expect(msg).toMatch(/Would you like to try it/i);
   });
@@ -86,7 +86,7 @@ describe("explain-first offers", () => {
     const hint = companionEntryLayerHintForChat(
       "I want to understand why sales are slow",
     );
-    expect(hint).toMatch(/BUSINESS CANVAS™ ENTRY/i);
+    expect(hint).toMatch(/BUSINESS CANVAS ENTRY/i);
     expect(hint).toMatch(/NOT framework names/i);
   });
 });

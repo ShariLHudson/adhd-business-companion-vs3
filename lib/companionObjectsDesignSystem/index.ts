@@ -1,5 +1,5 @@
 /**
- * Companion Objects™ Design System — master catalog API.
+ * Companion Objects Design System — master catalog API.
  * @see docs/companion-homestead/COMPANION_OBJECTS_DESIGN_SYSTEM.md
  */
 

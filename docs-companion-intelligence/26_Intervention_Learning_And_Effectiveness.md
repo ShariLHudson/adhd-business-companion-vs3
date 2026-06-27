@@ -1,4 +1,4 @@
-# Intervention Learning Engine™ & Companion Effectiveness System™
+# Intervention Learning Engine & Companion Effectiveness System
 ## Sprint 8 — Continuously Improving Companion
 
 **Version:** 1.0  
@@ -45,13 +45,13 @@ When overwhelmed, ranking prefers historically effective interventions (e.g. Cle
 
 ---
 
-# Companion Effectiveness Score™
+# Companion Effectiveness Score
 
 `buildCompanionEffectivenessScore()` — dimensions:
 
 - Progress, Confidence, Momentum, Trust, Completion, Follow-through, Intervention success, Business movement
 
-### User Outcome Profile™
+### User Outcome Profile
 
 `recordUserOutcome()`, `getUserOutcomeProfile()` — tracks decisions, actions, completions, confidence, momentum, and business outcomes.
 

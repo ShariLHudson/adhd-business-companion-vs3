@@ -9,7 +9,7 @@
 
 ## Phase Name
 
-Business Operating Partner™
+Business Operating Partner
 
 ---
 

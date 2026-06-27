@@ -1,5 +1,5 @@
 /**
- * Delegation Intelligence™ — ADHD Entrepreneur Behavioral Framework™
+ * Delegation Intelligence — ADHD Entrepreneur Behavioral Framework
  */
 
 import type { ChatTurn } from "./companionIntelligence";

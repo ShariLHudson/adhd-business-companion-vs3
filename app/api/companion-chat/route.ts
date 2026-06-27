@@ -9,6 +9,7 @@ import {
   enforceRelationshipResponse,
   type RelationshipResponseEnforcementResult,
 } from "@/lib/relationshipResponseContract";
+import { enforceHumanConversation } from "@/lib/humanConversation";
 import type { RelationshipMemoryConfidence } from "@/lib/relationshipIntelligencePrompt";
 import {
   buildRelationshipResponseTraceSummary,
@@ -229,7 +230,19 @@ export async function POST(request: NextRequest) {
       };
     }
 
-    const message = enforcement.message;
+    const messageAfterRelationship = enforcement.message;
+
+    const humanEnforcement = enforceHumanConversation({
+      response: messageAfterRelationship,
+      userText: userProbe,
+      gentle:
+        emotionalState?.toLowerCase().includes("overwhelm") ||
+        emotionalState?.toLowerCase().includes("emotional"),
+      seed: userProbe.length,
+      memoryConfidence,
+    });
+
+    const message = humanEnforcement.message;
 
     logRelationshipResponseTrace({
       responseId: relationshipResponseId,
@@ -302,10 +315,23 @@ export async function POST(request: NextRequest) {
             _relationshipTurnDebug: {
               ...apiDebug,
               ...traceSummary,
+              humanConversationRewritten: humanEnforcement.rewritten,
+              humanConversationTwelveTestScore: humanEnforcement.twelveTests.score,
+              humanConversationTwelveTestPassed: humanEnforcement.twelveTests.passed,
+              humanConversationTwelveTestFailures: humanEnforcement.twelveTests.results
+                .filter((r) => !r.passed)
+                .map((r) => ({ id: r.id, reason: r.reason })),
             },
           }
         : process.env.NODE_ENV === "development"
-          ? { _relationshipTurnDebug: traceSummary }
+          ? {
+              _relationshipTurnDebug: {
+                ...traceSummary,
+                humanConversationRewritten: humanEnforcement.rewritten,
+                humanConversationTwelveTestScore: humanEnforcement.twelveTests.score,
+                humanConversationTwelveTestPassed: humanEnforcement.twelveTests.passed,
+              },
+            }
           : {}),
     });
   } catch (error) {

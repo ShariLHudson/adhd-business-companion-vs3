@@ -1,12 +1,12 @@
 # ADHD Business Ecosystem™
-# Live Reality™
+# Live Reality
 ## How This Connects to the Entire Ecosystem
 
-This document explains **why** Live Reality™ exists and how it relates to every current and future part of the ecosystem.
+This document explains **why** Live Reality exists and how it relates to every current and future part of the ecosystem.
 
-This is **not** a Plan My Day™ feature.  
-This is **not** a Shape Today™ feature.  
-This is a **Companion Brain™** capability.
+This is **not** a Plan My Day feature.  
+This is **not** a Shape Today feature.  
+This is a **Companion Brain** capability.
 
 The ecosystem has **one brain**. Everything else is simply a different way of interacting with it.
 
@@ -26,9 +26,9 @@ This is how a real companion behaves.
 
 ---
 
-## What Live Reality™ Actually Is
+## What Live Reality Actually Is
 
-Live Reality™ is the continuously changing understanding of the user's current situation.
+Live Reality is the continuously changing understanding of the user's current situation.
 
 Examples:
 
@@ -48,19 +48,19 @@ Examples:
 - Current commitments
 - Anything that changes today's reality
 
-The **Companion Brain™** continuously reasons from this. Nothing else should.
+The **Companion Brain** continuously reasons from this. Nothing else should.
 
 ---
 
-## Shape Today™ (formerly Adapt My Day™)
+## Shape Today (formerly Adapt My Day)
 
 **Purpose:** Collect today's reality.
 
-It does **not** build the plan. It informs the Companion Brain™.
+It does **not** build the plan. It informs the Companion Brain.
 
-Think of Shape Today™ as asking: *"What is true right now?"*
+Think of Shape Today as asking: *"What is true right now?"*
 
-The Companion Brain™ decides what that means.
+The Companion Brain decides what that means.
 
 | Consumes | Contributes |
 |----------|-------------|
@@ -68,9 +68,9 @@ The Companion Brain™ decides what that means.
 
 ---
 
-## Plan My Day™
+## Plan My Day
 
-**Consumes** Live Reality™
+**Consumes** Live Reality
 
 **Purpose:** Create today's best plan.
 
@@ -82,9 +82,9 @@ Whenever Live Reality changes, Plan My Day automatically changes — not because
 
 ---
 
-## Clear My Mind™
+## Clear My Mind
 
-**Produces** Live Reality™
+**Produces** Live Reality
 
 Example — user says:
 
@@ -93,7 +93,7 @@ Example — user says:
 - *"I can't focus."*
 - *"I have a migraine."*
 
-Those become Live Reality signals. The user never has to repeat them in Shape Today™. The companion already knows.
+Those become Live Reality signals. The user never has to repeat them in Shape Today. The companion already knows.
 
 | Consumes | Contributes |
 |----------|-------------|
@@ -101,9 +101,9 @@ Those become Live Reality signals. The user never has to repeat them in Shape To
 
 ---
 
-## My Thoughts™
+## My Thoughts
 
-**Produces** Live Reality™
+**Produces** Live Reality
 
 Ideas. Concerns. Business thoughts. Health concerns. Relationship concerns. Future plans.
 
@@ -115,9 +115,9 @@ The companion notices changes in thinking. These become context.
 
 ---
 
-## Focus My Brain™
+## Focus My Brain
 
-**Consumes** Live Reality™
+**Consumes** Live Reality
 
 Example: energy drops → focus session changes, music changes, timer suggestions change, break timing changes.
 
@@ -129,9 +129,9 @@ The user doesn't configure this. The companion adapts.
 
 ---
 
-## Projects™
+## Projects
 
-**Consumes** Live Reality™
+**Consumes** Live Reality
 
 Projects remain the same. Today's **recommendations** change.
 
@@ -146,7 +146,7 @@ The projects don't change. Today's judgment changes.
 
 ---
 
-## Founder Intelligence™
+## Founder Intelligence
 
 **Consumes everything. Produces wisdom.**
 
@@ -166,7 +166,7 @@ Founder Intelligence **never** changes today's plan. It helps the companion make
 
 ---
 
-## Business Intelligence™
+## Business Intelligence
 
 **Consumes:** Live Reality, Projects, CRM, Sales, Content, Marketing, Meetings, Calendar, Revenue, Offers
 
@@ -184,9 +184,9 @@ That is wisdom.
 
 ---
 
-## PostCraft™
+## PostCraft
 
-**Consumes** Live Reality™
+**Consumes** Live Reality
 
 - Low energy → suggest easier content
 - High creativity → suggest writing
@@ -200,9 +200,9 @@ The companion should know when **not** to create.
 
 ---
 
-## Decision Compass™
+## Decision Compass
 
-**Consumes** Live Reality™
+**Consumes** Live Reality
 
 The same decision can change depending on energy, stress, health, confidence, available time.
 
@@ -214,7 +214,7 @@ The companion reasons from today's reality. Not yesterday's.
 
 ---
 
-## Google Workspace™ (future)
+## Google Workspace (future)
 
 Calendar. Email. Docs. Tasks. Meetings.
 
@@ -230,9 +230,9 @@ If today's reality changes, **recommendations** change. Not commitments.
 
 ---
 
-## Memory™ vs Live Reality™
+## Memory vs Live Reality
 
-| Memory™ | Live Reality™ |
+| Memory | Live Reality |
 |---------|----------------|
 | *"This happened."* | *"This is true now."* |
 | Stores history | Moves with the day |
@@ -241,7 +241,7 @@ The Companion Brain uses both.
 
 ---
 
-## Living Intelligence Graph™
+## Living Intelligence Graph
 
 The graph connects everything. Live Reality becomes another signal — **not** another database.
 
@@ -249,7 +249,7 @@ Every intelligence layer can reference it.
 
 ---
 
-## Reflection Intelligence™
+## Reflection Intelligence
 
 Reflection asks:
 
@@ -261,7 +261,7 @@ This improves future judgment.
 
 ---
 
-## Prediction Intelligence™ (future)
+## Prediction Intelligence (future)
 
 The companion begins anticipating.
 
@@ -271,7 +271,7 @@ Not because of a rule. Because the companion learned.
 
 ---
 
-## Relationship Intelligence™
+## Relationship Intelligence
 
 Perhaps the most important consumer.
 
@@ -318,7 +318,7 @@ No workspace exists alone. Every workspace participates in the Companion Brain.
 
 ## Future Growth
 
-This architecture supports Founder Intelligence™, Business Intelligence™, PostCraft™, Google Workspace™, GHL, Knowledge Graph™, analytics, predictions, automation, voice, wearables, health integrations, research, and learning — **without redesign**.
+This architecture supports Founder Intelligence, Business Intelligence, PostCraft, Google Workspace, GHL, Knowledge Graph, analytics, predictions, automation, voice, wearables, health integrations, research, and learning — **without redesign**.
 
 The ecosystem grows. The Companion Brain remains one brain.
 

@@ -24,7 +24,7 @@ export const WORKSPACE_SLIDE_PANEL_WIDTH_CLASS = "max-w-xl";
 export const WORKSPACE_FULL_PAGE_SURFACE_CLASS =
   "companion-panel-surface mx-auto min-h-full w-full max-w-3xl rounded-3xl bg-white/80 shadow-sm backdrop-blur-sm";
 
-/** Clear My Mind™ and future homestead workspaces — room stays visible */
+/** Clear My Mind and future homestead workspaces — room stays visible */
 export const COMPANION_HOMESTEAD_WORKSPACE_PAGE_CLASS = "companion-workspace-page-outer";
 
 /** CSS class roots for split-pane flex proportions (see companion.css). */

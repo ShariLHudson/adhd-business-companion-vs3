@@ -1,5 +1,5 @@
 /**
- * ADHD Entrepreneur Behavioral Framework™ — Sales Conversations layer.
+ * ADHD Entrepreneur Behavioral Framework — Sales Conversations layer.
  * Translates expert sales knowledge into ADHD-executable actions.
  */
 

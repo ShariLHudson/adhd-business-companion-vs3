@@ -1,5 +1,5 @@
 /**
- * Presence Intelligence™
+ * Presence Intelligence
  *
  * Quiet preparation before arrival — not memory, not personalization.
  * @see docs/companion-homestead/PRESENCE_INTELLIGENCE.md

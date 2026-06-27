@@ -14,7 +14,11 @@
     "audit:companion:latency": "vitest run lib/companionLatencyProfiler.test.ts && npx tsx scripts/companion-latency-qa.ts",
     "audit:companion:check": "node scripts/companion-audit-guardrail.mjs check",
     "setup:hooks": "node scripts/install-companion-git-hooks.mjs",
-    "postinstall": "node scripts/install-companion-git-hooks.mjs"
+    "postinstall": "node scripts/install-companion-git-hooks.mjs",
+    "welcome-voice:setup": "node scripts/set-elevenlabs-env.mjs",
+    "welcome-voice:check": "node scripts/check-elevenlabs-env.mjs",
+    "welcome-voice:list": "node scripts/list-elevenlabs-voices.mjs",
+    "welcome-voice:cache": "node scripts/generate-welcome-voice-cache.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.1",
@@ -30,6 +34,7 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.2.7",
+    "jsdom": "^29.1.1",
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^3.2.4"

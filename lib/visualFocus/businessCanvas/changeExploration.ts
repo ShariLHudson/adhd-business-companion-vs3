@@ -222,7 +222,7 @@ export function buildBusinessCanvasImpactAnalysis(
     answerSummary.length >= 3
       ? "You provided enough detail for a directional what-if — validate with real customer feedback next."
       : "Add a few more specifics if you want sharper predictions before acting.",
-    "Board of Directors™ full review — coming soon.",
+    "Board of Directors full review — coming soon.",
   ];
 
   const extras = impactPanelExtras(change, answers, affected);

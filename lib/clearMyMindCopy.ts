@@ -1,17 +1,62 @@
-/** Shared relief-first copy for Clear My Mind™ surfaces. */
+/** Shared relief-first copy for Clear My Mind surfaces. */
 
 import {
   THOUGHT_SEPARATE_INTRO,
   THOUGHT_SEPARATE_PREVIEW,
 } from "@/lib/thinkingSpace/copy";
 
-export const CLEAR_MY_MIND_HEADER =
-  "What's on your mind?";
+export const CLEAR_MY_MIND_HEADER = "Clear My Mind";
 
 export const CLEAR_MY_MIND_WORKSPACE_SUBTITLE =
-  "Let's get it out of your head.";
+  "Let's get it out of your head together.";
 
-/** @deprecated Use conversation layer — not embedded in workspace UI */
+/** Reassurance welcome — inside the frosted workspace only. */
+export const CLEAR_MY_MIND_WELCOME_LINES = [
+  "Nothing has to be organized. Write one thought or one hundred. Messy is perfectly okay. I'll help you sort it afterward.",
+] as const;
+
+/** Quiet support while the user is still unloading. */
+export const CLEAR_MY_MIND_CAPTURE_SUPPORT_LINES = [
+  "Take your time.",
+  "There's no rush.",
+  "You don't have to make it make sense.",
+  "I'm following along.",
+] as const;
+
+export const CLEAR_MY_MIND_INPUT_PLACEHOLDER =
+  "What's taking up space in your head today?";
+
+/** Visible Thinking during sort — never loading language. */
+export const CLEAR_MY_MIND_VISIBLE_THINKING_LINES = [
+  "I'm looking for themes.",
+  "Some of these thoughts seem connected.",
+  "I'm noticing a few things that may be causing the most pressure.",
+  "I'm sorting these into manageable pieces.",
+] as const;
+
+/** After submission — acknowledgment before organizing. */
+export const CLEAR_MY_MIND_POST_SHARE_ACK_LINES = [
+  "That's a lot to carry.",
+  "I'm glad you didn't have to hold onto it by yourself.",
+] as const;
+
+/** Memory — only after permission. */
+export const CLEAR_MY_MIND_MEMORY_ASK =
+  "Some of these ideas may be helpful later. Would you like me to remember any of them?";
+
+export const CLEAR_MY_MIND_MEMORY_YES = "Yes, remember what helps";
+
+export const CLEAR_MY_MIND_MEMORY_NO = "Not right now";
+
+/** Max three gentle next steps. */
+export const CLEAR_MY_MIND_SUGGESTIONS = [
+  "Let's organize these.",
+  "Let's figure out what actually matters today.",
+  "Would it help to move some of these into your parking lot?",
+  "Which one feels heaviest right now?",
+] as const;
+
+/** @deprecated Use CLEAR_MY_MIND_WELCOME_LINES */
 export const CLEAR_MY_MIND_PERMISSION =
   "You don't have to carry all of this by yourself anymore. When you're ready, share it with me.";
 
@@ -44,7 +89,7 @@ export function clearMyMindHeldCountLine(count: number): string {
 export const CLEAR_MY_MIND_ACK_CONTINUE_LABEL =
   "See what I'm noticing";
 
-/** @deprecated Capture never ends — organization lives in My Thoughts™. */
+/** @deprecated Capture never ends — organization lives in My Thoughts. */
 export const CLEAR_MY_MIND_ADD_MORE_LABEL = "Add more thoughts";
 
 export const CLEAR_MY_MIND_SPLIT_HEADLINE = THOUGHT_SEPARATE_INTRO;
@@ -56,9 +101,9 @@ export const CLEAR_MY_MIND_SPLIT_CONFIRM = "Yes, separate them";
 export const CLEAR_MY_MIND_SPLIT_KEEP = "Keep as one thought";
 
 /** Primary capture action — clear for first-time users. */
-export const CLEAR_MY_MIND_CAPTURE_BUTTON = "Share";
+export const CLEAR_MY_MIND_CAPTURE_BUTTON = "Save";
 
-export const CLEAR_MY_MIND_CAPTURE_BUTTON_MORE = "Share more";
+export const CLEAR_MY_MIND_CAPTURE_BUTTON_MORE = "Save more";
 
 /** Brief button confirmation after Share — emotional, not functional. */
 export const CLEAR_MY_MIND_CAPTURE_BUTTON_CONFIRM = "I've got it.";

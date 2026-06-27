@@ -4,7 +4,7 @@ import type { LivingChangeEngineInput } from "./types";
 
 /**
  * Scene Integrity gate — vetoes impossible combinations before render.
- * Delegates motion coherence to Environmental Truth™ after change selection.
+ * Delegates motion coherence to Environmental Truth after change selection.
  */
 export function filterBySceneIntegrity(
   changes: import("./types").LivingChangeItem[],

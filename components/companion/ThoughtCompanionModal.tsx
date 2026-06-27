@@ -7,7 +7,7 @@ type Props = {
   onClose: () => void;
 };
 
-/** Centered Companion Box™ — no scrolling to find the editor. */
+/** Centered Companion Box — no scrolling to find the editor. */
 export function ThoughtCompanionModal({ children, onClose }: Props) {
   return (
     <div

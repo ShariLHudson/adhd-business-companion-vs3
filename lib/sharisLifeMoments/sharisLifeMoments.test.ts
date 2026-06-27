@@ -9,7 +9,7 @@ import {
 import { violatesShariVoice } from "@/lib/shariVoiceBible";
 import { clearVoiceUsageForTests } from "@/lib/shariVoiceBible/cooldownStore";
 
-describe("Shari's Life Moments™", () => {
+describe("Shari's Life Moments", () => {
   it("catalog is first-person and never advice", () => {
     expect(LIFE_MOMENT_CATALOG.length).toBeGreaterThanOrEqual(30);
     for (const entry of LIFE_MOMENT_CATALOG) {

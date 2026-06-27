@@ -1,5 +1,5 @@
 /**
- * Plan My Day behavior learning — supportive observations for Companion Intelligence™.
+ * Plan My Day behavior learning — supportive observations for Companion Intelligence.
  */
 
 export type PlanBehaviorKind = "completed" | "deferred" | "snoozed";

@@ -3,7 +3,7 @@ import type { ShariVoiceLine } from "@/lib/shariVoiceBible/types";
 import { LIFE_MOMENT_CATALOG, lifeMomentTag } from "@/lib/sharisLifeMoments/catalog";
 import { assertLifeMomentVoice } from "@/lib/sharisLifeMoments/rules";
 
-/** Voice Bible entries for Shari's Life Moments™ — observation kind, never advice. */
+/** Voice Bible entries for Shari's Life Moments — observation kind, never advice. */
 export const SHARIS_LIFE_MOMENT_LINES: ShariVoiceLine[] = LIFE_MOMENT_CATALOG.map(
   (entry) => {
     assertLifeMomentVoice(entry.text, entry.id);

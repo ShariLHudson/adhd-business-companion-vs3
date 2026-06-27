@@ -39,7 +39,7 @@ describe("conversationWorkflowContinuation", () => {
     expect(result?.action).toBe("reply");
   });
 
-  it("opens clear my mind after acceptance", () => {
+  it("opens clear my mind beside chat after acceptance", () => {
     const assistant = "Want me to open Clear My Mind beside us?";
     const workflow = createConversationWorkflow(assistant, 1);
     expect(workflow?.kind).toBe("open_clear_my_mind");
@@ -52,6 +52,61 @@ describe("conversationWorkflowContinuation", () => {
     expect(result?.action).toBe("open_section");
     if (result?.action === "open_section") {
       expect(result.section).toBe("brain-dump");
+      expect(result.message).toMatch(/beside us/i);
+    }
+  });
+
+  it("opens My Thoughts beside chat after yes to task invitation", () => {
+    const assistant =
+      "Would you like to choose one small task from My Thoughts?";
+    const workflow = createConversationWorkflow(assistant, 4);
+    expect(workflow?.kind).toBe("open_my_thoughts");
+    const result = resolveConversationWorkflowAcceptance({
+      userText: "yes",
+      lastAssistantText: assistant,
+      workflow: workflow!,
+      currentTurn: 5,
+    });
+    expect(result?.action).toBe("open_section");
+    if (result?.action === "open_section") {
+      expect(result.section).toBe("brain-dump");
+      expect(result.clearMyMindView).toBe("my-thoughts");
+      expect(result.message).toMatch(/My Thoughts/i);
+      expect(result.message).not.toMatch(/Picking up/i);
+    }
+  });
+
+  it("continues focus task invitation without echoing prior user message", () => {
+    const assistant = "Would you like to choose one small task to focus on right now?";
+    const workflow = createConversationWorkflow(assistant, 2);
+    expect(workflow?.kind).toBe("choose_focus_task");
+    const result = resolveConversationWorkflowAcceptance({
+      userText: "yes",
+      lastAssistantText: assistant,
+      workflow: workflow!,
+      currentTurn: 3,
+      outcomeThread: {
+        currentProblem: "Picking up its only 9:30 am",
+        updatedAt: new Date().toISOString(),
+      },
+    });
+    expect(result?.action).toBe("reply");
+    if (result?.action === "reply") {
+      expect(result.message).toMatch(/one thing/i);
+      expect(result.message).not.toMatch(/9:30/i);
+      expect(result.message).not.toMatch(/Picking up/i);
+    }
+  });
+
+  it("opens plan my day beside chat from invitation", () => {
+    const assistant = "Would you like to open Plan My Day beside us?";
+    const workflow = createConversationWorkflow(assistant, 1);
+    expect(workflow?.kind).toBe("open_plan_my_day");
+    const result = continuationForWorkflow(workflow!);
+    expect(result.action).toBe("open_section");
+    if (result.action === "open_section") {
+      expect(result.section).toBe("plan-my-day");
+      expect(result.message).toMatch(/Plan My Day/i);
     }
   });
 

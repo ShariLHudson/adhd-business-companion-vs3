@@ -1,4 +1,4 @@
-/** Designer Stories™ — Hospitality Collection. Never shown to guests. */
+/** Designer Stories — Hospitality Collection. Never shown to guests. */
 export const HOSPITALITY_DESIGNER_STORIES: Record<string, string> = {
   "obj-guest-slippers":
     "Slippers for guests who stay — feet warm without asking.",

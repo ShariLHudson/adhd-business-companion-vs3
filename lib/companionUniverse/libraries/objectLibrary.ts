@@ -1,11 +1,11 @@
 import type { CompanionPlaceId } from "../types";
 
 /**
- * Companion Object Library™ — central registry for Signature Objects™.
+ * Companion Object Library — central registry for Signature Objects.
  * Every feature, nav item, and room affordance should reference this library
  * instead of Unicode emoji. Phase 1: registry only — no UI replacement yet.
  *
- * Distinct from Signature Object Library™ (one anchor per place).
+ * Distinct from Signature Object Library (one anchor per place).
  */
 
 export const COMPANION_OBJECT_CATEGORIES = [
@@ -47,7 +47,7 @@ export type CompanionObjectEntry = {
 };
 
 const DEFAULT_STYLE =
-  "Warm Homestead Realism™ — semi-realistic illustrative, natural materials, soft morning-window light, soft depth, transparent assets, never clip art. See docs/companion-homestead/VISUAL_DESIGN_BIBLE.md.";
+  "Warm Homestead Realism — semi-realistic illustrative, natural materials, soft morning-window light, soft depth, transparent assets, never clip art. See docs/companion-homestead/VISUAL_DESIGN_BIBLE.md.";
 const DEFAULT_LIGHTING = "soft-morning-window";
 
 function entry(
@@ -75,12 +75,12 @@ function entry(
   };
 }
 
-/** Companion Object Library™ — single source of truth for feature iconography. */
+/** Companion Object Library — single source of truth for feature iconography. */
 export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   // ── Primary companion workspaces (user-specified mappings) ──────────────
   entry({
     id: "clear-my-mind",
-    feature: "Clear My Mind™",
+    feature: "Clear My Mind",
     currentEmoji: "🧠",
     signatureObject: "Leather journal",
     room: "window-seat",
@@ -92,7 +92,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "plan-my-day",
-    feature: "Plan My Day™",
+    feature: "Plan My Day",
     currentEmoji: "📅",
     signatureObject: "Open leather planner",
     room: "planning-table",
@@ -104,7 +104,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "todays-reality",
-    feature: "Today's Reality™",
+    feature: "Today's Reality",
     currentEmoji: "🙂",
     signatureObject: "Morning mug and notebook",
     room: "kitchen-table",
@@ -116,7 +116,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "decision-compass",
-    feature: "Decision Compass™",
+    feature: "Decision Compass",
     currentEmoji: "🧭",
     signatureObject: "Elegant brass compass",
     room: "outlook-point",
@@ -127,7 +127,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "focus-studio",
-    feature: "Focus Studio™",
+    feature: "Focus Studio",
     currentEmoji: "🎧",
     signatureObject: "Premium headphones",
     room: "focus-studio",
@@ -138,7 +138,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "breathing",
-    feature: "Breathing™",
+    feature: "Breathing",
     currentEmoji: "🌬️",
     signatureObject: "Lit candle",
     room: "focus-studio",
@@ -150,7 +150,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "games",
-    feature: "Games™",
+    feature: "Games",
     currentEmoji: "🎲",
     signatureObject: "Wooden puzzle",
     room: "living-room",
@@ -161,7 +161,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "create",
-    feature: "Create™",
+    feature: "Create",
     currentEmoji: "🎨",
     signatureObject: "Sketchbook with paint brushes",
     room: "creative-studio",
@@ -173,7 +173,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "business",
-    feature: "Business™",
+    feature: "Business",
     currentEmoji: "📈",
     signatureObject: "Leather portfolio",
     room: "business-office",
@@ -184,7 +184,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "learning",
-    feature: "Learning™",
+    feature: "Learning",
     currentEmoji: "📚",
     signatureObject: "Stack of books",
     room: "library",
@@ -195,7 +195,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "reading",
-    feature: "Reading™",
+    feature: "Reading",
     currentEmoji: "📖",
     signatureObject: "Open hardcover book",
     room: "reading-nook",
@@ -206,7 +206,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "parking-lot",
-    feature: "Parking Lot™",
+    feature: "Parking Lot",
     currentEmoji: "📝",
     signatureObject: "Seed packet / idea box",
     room: "garden-path",
@@ -217,7 +217,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "evidence-bank",
-    feature: "Evidence Bank™",
+    feature: "Evidence Bank",
     currentEmoji: "⭐",
     signatureObject: "Keepsake box",
     room: "library",
@@ -228,7 +228,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "wins",
-    feature: "Wins™",
+    feature: "Wins",
     currentEmoji: "🏆",
     signatureObject: "Framed accomplishment",
     room: "fire-circle",
@@ -240,7 +240,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
   }),
   entry({
     id: "growth",
-    feature: "Growth™",
+    feature: "Growth",
     currentEmoji: "🌱",
     signatureObject: "Growing plant",
     room: "greenhouse",
@@ -323,7 +323,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
     notes: "How Do I sidebar, help articles, onboarding guides.",
   }),
 
-  // ── House Map™ navigation (companionLayoutSystem) ───────────────────────
+  // ── House Map navigation (companionLayoutSystem) ───────────────────────
   entry({
     id: "nav-home",
     feature: "Home",
@@ -376,7 +376,7 @@ export const COMPANION_OBJECT_LIBRARY: readonly CompanionObjectEntry[] = [
     notes: "Interim House Map emoji — consolidate with open leather planner.",
   }),
 
-  // ── Toolbelt™ items ─────────────────────────────────────────────────────
+  // ── Toolbelt items ─────────────────────────────────────────────────────
   entry({
     id: "toolbelt-new-conversation",
     feature: "New Conversation",
@@ -952,8 +952,7 @@ export function companionObjectForFeature(featureName: string): CompanionObjectE
   const normalized = featureName.trim().toLowerCase();
   return COMPANION_OBJECT_LIBRARY.find(
     (object) =>
-      object.feature.toLowerCase() === normalized ||
-      object.feature.replace(/™/g, "").trim().toLowerCase() === normalized,
+      object.feature.toLowerCase() === normalized,
   );
 }
 

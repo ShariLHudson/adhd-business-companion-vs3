@@ -19,7 +19,7 @@ import {
 
 /** Generic affirmations that must not act without pending context. */
 export const GENERIC_ACCEPTANCE_RE =
-  /^(?:yes|yep|yeah|yup|ok(?:ay)?|sure|sounds good|works for me|perfect|i like it|that'?s good|that'?s fine|that works|looks good|correct|right|good|that one|use that|let'?s do it|please do|go ahead|proceed|count me in|let'?s go)\.?$/i;
+  /^(?:yes|yep|yeah|yup|ok(?:ay)?|sure|sounds good|that would help|works for me|perfect|i like it|that'?s good|that'?s fine|that works|looks good|correct|right|good|that one|use that|let'?s do it|please|please do|go ahead|proceed|count me in|let'?s go)\.?$/i;
 
 export type PendingAcceptanceKind =
   | "workspace"

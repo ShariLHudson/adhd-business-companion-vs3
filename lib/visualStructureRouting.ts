@@ -1,5 +1,5 @@
 /**
- * P0.17.2 / P0.20 — Visual Structure Routing™
+ * P0.17.2 / P0.20 — Visual Structure Routing
  * Mind maps, decision trees, and visual maps are thinking surfaces — not Create documents.
  */
 
@@ -195,7 +195,7 @@ export function resolveVisualStructureWorkspaceOffer(
 
 export function visualStructureRoutingHintForChat(): string {
   return [
-    "VISUAL STRUCTURE ROUTING™ (P0.17.2 / P0.20):",
+    "VISUAL STRUCTURE ROUTING (P0.17.2 / P0.20):",
     "Mind maps, flowcharts, decision trees, and visual maps are Visual Thinking — NOT Create documents.",
     "Path B: when the user names a structure, open Visual Thinking immediately.",
     "Path A: when unsure, recommend structures and offer a numbered menu.",

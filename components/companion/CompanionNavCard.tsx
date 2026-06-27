@@ -17,7 +17,7 @@ export type CompanionNavCardProps = {
 
 /**
  * Warm navigation invitation — card stays, emoji goes.
- * Tiny window into the Companion Homestead™.
+ * Tiny window into the Companion Homestead.
  */
 export function CompanionNavCard({
   objectId,

@@ -58,7 +58,7 @@ describe("decisionCompassRouting", () => {
 
   it("builds offer copy", () => {
     const offer = buildDecisionCompassOffer("help me decide");
-    expect(offer.companionLine).toMatch(/Decision Compass™/i);
+    expect(offer.companionLine).toMatch(/Decision Compass/i);
     expect(offer.prefill.decision).toBe("help me decide");
   });
 

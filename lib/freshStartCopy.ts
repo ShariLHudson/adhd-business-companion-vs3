@@ -61,12 +61,12 @@ export const BEGIN_NEW_DAY_COPY: FreshStartCopy = {
   willDo: [
     "Archive today's chat session",
     "Start a fresh daily conversation",
-    "Reset Plan My Day™ workspace",
+    "Reset Plan My Day workspace",
     "Clear completed daily planning items",
   ],
   willNot: [
     "Delete memory or learning",
-    "Delete Founder Intelligence™",
+    "Delete Founder Intelligence",
     "Delete projects or goals",
     "Delete your user history",
   ],

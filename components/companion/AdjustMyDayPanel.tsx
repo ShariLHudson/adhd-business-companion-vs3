@@ -124,9 +124,9 @@ export function AdjustMyDayPanel({
     return (
       <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
         <WorkspaceGuide section="energy" />
-        <p className="text-2xl font-semibold text-[#1f1c19]">Today&apos;s Reality™</p>
+        <p className="text-2xl font-semibold text-[#1f1c19]">Today&apos;s Reality</p>
         <p className="mt-1 text-sm text-[#6b635a]">
-          Current Reality Intelligence™ — who showed up today? Shari uses your
+          Current Reality Intelligence — who showed up today? Shari uses your
           latest update when shaping support.
           {updated ? ` Last updated ${updated}.` : ""}
         </p>
@@ -198,9 +198,9 @@ export function AdjustMyDayPanel({
   return (
     <div className={shellClass}>
       {!embedded ? <WorkspaceGuide section="energy" /> : null}
-      <p className="text-2xl font-semibold text-[#1f1c19]">Today&apos;s Reality™</p>
+      <p className="text-2xl font-semibold text-[#1f1c19]">Today&apos;s Reality</p>
       <p className="mt-1 text-base leading-relaxed text-[#6b635a]">
-        Current Reality Intelligence™ — who showed up today?
+        Current Reality Intelligence — who showed up today?
       </p>
       <p className="mt-2 text-base leading-relaxed text-[#9a8f82]">
         Your day can change. Update this anytime.

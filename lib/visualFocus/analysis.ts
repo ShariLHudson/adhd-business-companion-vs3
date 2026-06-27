@@ -91,7 +91,7 @@ export function buildMapAnalysis(map: VisualFocusMap): VisualFocusAnalysis {
   if (map.mode === "visual-kanban" && map.kanban) {
     const cardCount = Object.keys(map.kanban.cards).length;
     patterns.push(`${cardCount} ideas organized across ${map.kanban.columns.length} stages.`);
-    recommendations.push("Move the top 1–2 cards in Ready to act into Plan My Day™ or a project.");
+    recommendations.push("Move the top 1–2 cards in Ready to act into Plan My Day or a project.");
   }
 
   if (opportunities.length === 0 && labels.length >= 2) {
@@ -103,7 +103,7 @@ export function buildMapAnalysis(map: VisualFocusMap): VisualFocusAnalysis {
     recommendations.push("Review the visual map and note one connection that feels strongest or most fragile.");
   }
   if (nextSteps.length === 0) {
-    nextSteps.push("Save this map in My Work™ and revisit after your next working session.");
+    nextSteps.push("Save this map in My Work and revisit after your next working session.");
   }
 
   const summary = purpose

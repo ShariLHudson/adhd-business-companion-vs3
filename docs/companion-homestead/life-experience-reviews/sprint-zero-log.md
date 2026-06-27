@@ -1,6 +1,6 @@
 # Sprint Zero — Visit Log
 
-**Sprint:** Life Experience Sprint™  
+**Sprint:** Life Experience Sprint  
 **Started:**  
 **Target close:** (7 living days minimum)  
 **Guide:** [`../LIFE_EXPERIENCE_SPRINT.md`](../LIFE_EXPERIENCE_SPRINT.md)

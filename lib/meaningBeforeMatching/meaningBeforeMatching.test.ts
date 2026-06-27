@@ -17,7 +17,7 @@ function routeConnections(text: string): string | null {
   return target?.kind === "settings" ? target.section : null;
 }
 
-describe("Meaning Before Matching™ — connect must not hijack", () => {
+describe("Meaning Before Matching — connect must not hijack", () => {
   it("does not route Pinterest website link help to Connections", () => {
     const text = "How do I connect my website link to a Pinterest post?";
     expect(routeConnections(text)).not.toBe("connections");

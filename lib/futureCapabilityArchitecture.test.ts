@@ -69,7 +69,7 @@ describe("futureCapabilityArchitecture", () => {
     const aligned = validateFutureFirstCapability({
       userValue: "Helps users understand their business",
       intelligenceCaptures: ["Audience patterns"],
-      futureEnables: ["Living Canvas™"],
+      futureEnables: ["Living Canvas"],
       observable: true,
       learnable: true,
       personalizable: true,

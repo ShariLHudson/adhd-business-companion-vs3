@@ -12,7 +12,7 @@ describe("chatWorkspaceHelpContent", () => {
     expect(NEW_CHAT_INSTRUCTION.label).toBe("New Chat");
     expect(NEW_DAYS_CHAT_INSTRUCTION.label).toBe("New Day's Chat");
     expect(CHAT_WORKSPACE_NAV_MODEL).toContain("Chat Workspace");
-    expect(CHAT_WORKSPACE_NAV_MODEL).toContain("Clear My Mind™");
+    expect(CHAT_WORKSPACE_NAV_MODEL).toContain("Clear My Mind");
   });
 
   it("is reflected in How Do I chat-workspace article", () => {

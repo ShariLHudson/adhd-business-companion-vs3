@@ -1,5 +1,5 @@
 /**
- * Momentum Intelligence™ — chain reaction, not urgency.
+ * Momentum Intelligence — chain reaction, not urgency.
  * @see constitution.ts — generateMomentumAction
  */
 

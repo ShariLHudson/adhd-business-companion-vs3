@@ -171,7 +171,7 @@ describe("AutonomousPreparationValidation", () => {
     vi.spyOn(companionStore, "getPrimaryAvatar").mockReturnValue(undefined);
   }
 
-  it("Workshop Launch™ — preparation appears before launch planning", () => {
+  it("Workshop Launch — preparation appears before launch planning", () => {
     seedPhase8Base();
     const kit = validateWorkshopLaunchPreparation(
       "I want to launch my workshop",
@@ -182,7 +182,7 @@ describe("AutonomousPreparationValidation", () => {
     expect(kit!.permissionPrompt).toMatch(/Would you like to see them/i);
   });
 
-  it("Discovery Call™ — sales resources prepared automatically", () => {
+  it("Discovery Call — sales resources prepared automatically", () => {
     seedPhase8Base();
     const kit = validateDiscoveryCallPreparation(
       "I have a discovery call tomorrow",
@@ -194,7 +194,7 @@ describe("AutonomousPreparationValidation", () => {
     );
   });
 
-  it("Content Creation™ — content opportunities prepared", () => {
+  it("Content Creation — content opportunities prepared", () => {
     seedPhase8Base();
     const kit = validateContentCreationPreparation(
       "I need content ideas for my workshop",
@@ -204,7 +204,7 @@ describe("AutonomousPreparationValidation", () => {
     expect(kit!.items.length).toBeGreaterThan(0);
   });
 
-  it("Re-Entry™ — user returns after absence with calm brief", () => {
+  it("Re-Entry — user returns after absence with calm brief", () => {
     seedPhase8Base("2025-12-01T10:00:00.000Z");
     const kit = validateReEntryPreparation(new Date("2026-05-01T10:00:00.000Z"));
     expect(kit).toBeTruthy();
@@ -212,7 +212,7 @@ describe("AutonomousPreparationValidation", () => {
     expect(kit!.items.some((i) => /Welcome back/i.test(i.label))).toBe(true);
   });
 
-  it("Decision Support™ — relevant information assembled", () => {
+  it("Decision Support — relevant information assembled", () => {
     seedPhase8Base();
     const kit = validateDecisionSupportPreparation(
       "I need to decide between these offers",
@@ -222,7 +222,7 @@ describe("AutonomousPreparationValidation", () => {
     expect(kit!.title).toMatch(/Decision/i);
   });
 
-  it("Opportunity Detection™ — potential opportunity surfaced appropriately", () => {
+  it("Opportunity Detection — potential opportunity surfaced appropriately", () => {
     seedPhase8Base();
     const kit = validateOpportunityDetection(new Date("2026-05-01T10:00:00.000Z"));
     expect(kit === null || kit.permissionPrompt.match(/helpful|pressure|optional/i)).toBeTruthy();

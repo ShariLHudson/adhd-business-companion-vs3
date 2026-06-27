@@ -1,6 +1,6 @@
 import type { BusinessCanvasSectionId } from "./types";
 
-/** Permanent section colors — used by canvas, layout, and future Living Canvas™ / ripple UX. */
+/** Permanent section colors — used by canvas, layout, and future Living Canvas / ripple UX. */
 export type BusinessCanvasSectionTheme = {
   id: BusinessCanvasSectionId;
   gridArea: string;

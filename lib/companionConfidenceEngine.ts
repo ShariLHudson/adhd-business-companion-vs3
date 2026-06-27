@@ -1,5 +1,5 @@
 /**
- * Sprint 5 — Confidence Engine™
+ * Sprint 5 — Confidence Engine
  * Evidence-based confidence (not cheerleading). Tracks wins and surfaces proof.
  */
 
@@ -89,7 +89,7 @@ export function confidenceEvidenceLines(wins: ConfidenceWin[]): string[] {
 export function confidenceEngineHintForChat(wins = getRecentConfidenceWins()): string {
   if (!wins.length) {
     return [
-      "CONFIDENCE ENGINE™ (Sprint 5 — invisible):",
+      "CONFIDENCE ENGINE (Sprint 5 — invisible):",
       "Build evidence-based confidence — not motivation or cheerleading.",
       "When the user completes something, acknowledge the specific win.",
       "Never shame. Never compare to others. Balance reality with progress.",
@@ -98,7 +98,7 @@ export function confidenceEngineHintForChat(wins = getRecentConfidenceWins()): s
 
   const evidence = confidenceEvidenceLines(wins);
   return [
-    "CONFIDENCE ENGINE™ (Sprint 5 — invisible):",
+    "CONFIDENCE ENGINE (Sprint 5 — invisible):",
     "Surface evidence-based confidence — NOT hype.",
     ...evidence.map((e) => `Evidence you may reference naturally: "${e}"`),
     "Never shame, lecture, or compare. Balance unfinished work with real progress.",

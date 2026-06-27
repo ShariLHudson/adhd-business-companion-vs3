@@ -1,5 +1,5 @@
 /**
- * Money Intelligence™ — ADHD Entrepreneur Behavioral Framework™
+ * Money Intelligence — ADHD Entrepreneur Behavioral Framework
  */
 
 import type { ChatTurn } from "./companionIntelligence";

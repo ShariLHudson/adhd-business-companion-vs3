@@ -59,9 +59,11 @@ import {
 import { PlanDayAddForm } from "@/components/companion/PlanDayAddForm";
 import { PlanDayKanbanView } from "@/components/companion/PlanDayKanbanView";
 import { PlanDayJourneyShell } from "@/components/companion/PlanDayJourneyShell";
+import { PlanMyDayMorningRoomShell } from "@/components/companion/PlanMyDayMorningRoomShell";
 import { CompanionWorkspaceShell } from "@/components/companion/CompanionWorkspaceShell";
 import { PlanDayLivingBoard } from "@/components/companion/PlanDayLivingBoard";
 import { PlanDayOrientationSurface } from "@/components/companion/PlanDayOrientationSurface";
+import { PlanMyDayMorningConversation } from "@/components/companion/PlanMyDayMorningConversation";
 import { PlanDayFlexiblePlanningMode } from "@/components/companion/PlanDayFlexiblePlanningMode";
 import { PlanDaySuggestionsReminder } from "@/components/companion/PlanDaySuggestionsReminder";
 import {
@@ -216,6 +218,7 @@ export function PlanMyDayPanel({
   onOpenAdaptMyDay,
   registerBack,
   initialOpenItemId,
+  standalone = false,
 }: {
   onBack?: () => void;
   onBackToChat?: () => void;
@@ -227,6 +230,7 @@ export function PlanMyDayPanel({
   onOpenAdaptMyDay?: () => void;
   registerBack?: (fn: (() => boolean) | null) => void;
   initialOpenItemId?: string | null;
+  standalone?: boolean;
 }) {
   const companion = usePlanDayCompanionCycle();
   const initialSession = readPlanDaySession(companion.dayKey);
@@ -656,12 +660,26 @@ export function PlanMyDayPanel({
     );
   }
 
+  if (standalone) {
+    return (
+      <PlanMyDayMorningRoomShell>
+        {renderPanelBody()}
+      </PlanMyDayMorningRoomShell>
+    );
+  }
+
   return (
     <CompanionWorkspaceShell
       workspaceId="plan-my-day"
       hideHeader
       className={`companion-fade-in h-full min-h-0 ${atmosphereClass}`}
     >
+      {renderPanelBody()}
+    </CompanionWorkspaceShell>
+  );
+
+  function renderPanelBody() {
+    return (
       <div
         className="flex h-full min-h-0 w-full flex-col overflow-y-auto"
         data-plan-view={view}
@@ -670,12 +688,21 @@ export function PlanMyDayPanel({
           showOrientation ? "orienting" : flexibleMode ? "flexible" : "living"
         }
       >
+      {showOrientation && standalone ? (
+        <PlanMyDayMorningConversation
+          judgment={companion.cycle.judgment}
+          onPrevious={handleNavBack}
+          onConfirm={() => unlockLiving(true, "confirmed")}
+          onNotRightNow={enterFlexiblePlanning}
+        />
+      ) : (
       <PlanDayJourneyShell
         chapter={chapter}
         onBack={handleNavBack}
         onBackToChat={() => onBackToChat?.()}
-        shariWhisper={shariWhisper}
-        hideHelp={showOrientation || flexibleMode}
+        shariWhisper={standalone ? null : shariWhisper}
+        hideHelp={showOrientation || flexibleMode || standalone}
+        morningRoom={standalone}
         headerActions={
           !showOrientation && !flexibleMode && !openItem && !editingReality ? (
             <ViewDropdown active={view} onChange={handleViewChange} />
@@ -686,8 +713,8 @@ export function PlanMyDayPanel({
           <div className="flex flex-1 flex-col justify-center py-6 plan-day-journey-chapter-enter">
             <PlanDayOrientationSurface
               presentation={companion.orientation}
+              onPrevious={handleNavBack}
               onConfirm={() => unlockLiving(true, "confirmed")}
-              onDecline={enterFlexiblePlanning}
               onOpenAdaptMyDay={openTodaysReality}
             />
           </div>
@@ -758,9 +785,9 @@ export function PlanMyDayPanel({
                         setRealityPrompt(null);
                         openTodaysReality();
                       }}
-                      className="rounded-xl border border-[#1e4f4f]/30 bg-[#1e4f4f] px-3 py-2 text-sm font-semibold text-white hover:bg-[#163c3c]"
+                      className="plan-day-morning-note__btn plan-day-morning-note__btn--secondary"
                     >
-                      Update Today&apos;s Reality
+                      Adapt My Day
                     </button>
                   </div>
                 </div>
@@ -811,7 +838,7 @@ export function PlanMyDayPanel({
               {showAddForm ? (
                 <div className="plan-day-living-enter plan-day-add-form--delayed">
                   <p className="mb-3 text-base leading-relaxed text-[#6b635a]">
-                    Unlike Clear My Mind™, enter one task at a time so I can place
+                    Unlike Clear My Mind, enter one task at a time so I can place
                     each one where it belongs.
                   </p>
                   <PlanDayAddForm onAdd={handleAdd} />
@@ -845,7 +872,8 @@ export function PlanMyDayPanel({
           </>
         )}
       </PlanDayJourneyShell>
+      )}
       </div>
-    </CompanionWorkspaceShell>
-  );
+    );
+  }
 }

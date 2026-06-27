@@ -1,4 +1,4 @@
-# Creative Studio™ — Room Look Book
+# Creative Studio — Room Look Book
 
 **Place ID:** `creative-studio`  
 **Status:** Design authority — Phase 1 (no UI implementation)  
@@ -8,9 +8,9 @@
 
 ## Purpose
 
-The Creative Studio™ is where **making is allowed to be messy** — ideas visible, perfectionism forgiven, output invited but not policed.
+The Creative Studio is where **making is allowed to be messy** — ideas visible, perfectionism forgiven, output invited but not policed.
 
-It exists for **Create™**, email drafting, and creative spark play — content and artifacts born in warmth, not a sterile content factory.
+It exists for **Create**, email drafting, and creative spark play — content and artifacts born in warmth, not a sterile content factory.
 
 **Emotional need served:** "My ideas deserve room to breathe before they are judged."
 
@@ -20,13 +20,13 @@ Sun-drenched room or enclosed porch — pegboard, jars, long worktable, golden h
 
 ---
 
-## Emotional Promise™
+## Emotional Promise
 
 **When someone leaves this room…** they feel **more capable of making** — with something started or continued, not a lecture about consistency.
 
 ---
 
-## Signature Feature™
+## Signature Feature
 
 ### The active project table
 
@@ -74,7 +74,7 @@ Golden hour light turns the table amber — permission in photons.
 | **Rain** | On glass roof/walls — enclosed porch studio |
 | **Clock** | None dominant |
 
-No hype playlist autoplay. Focus audio lives in Focus Studio™.
+No hype playlist autoplay. Focus audio lives in Focus Studio.
 
 ---
 
@@ -92,7 +92,7 @@ No confetti on save. No "great job!" particle burst.
 
 ---
 
-## Companion Presence™
+## Companion Presence
 
 **Present — Partner level.**
 
@@ -106,7 +106,7 @@ Warmth + craft respect. She asks what good enough means here.
 
 ---
 
-## Kinsey™
+## Kinsey
 
 **Occasionally present — not on the table.**
 
@@ -119,7 +119,7 @@ Never use Kinsey to interrupt flow for charm.
 
 ---
 
-## Companion Objects™
+## Companion Objects
 
 | Registry ID | Object name | Role in room |
 |-------------|-------------|--------------|
@@ -129,11 +129,11 @@ Never use Kinsey to interrupt flow for charm.
 
 **Environmental:** pegboard tools, jars, taped references, barn-red stool, cream walls as gallery.
 
-Do not duplicate `learning` stack or `templates` folio as primary studio objects — those live in Library™; may be referenced from Create flows.
+Do not duplicate `learning` stack or `templates` folio as primary studio objects — those live in Library; may be referenced from Create flows.
 
 ---
 
-## UI Language™
+## UI Language
 
 | Element | Rule |
 |---------|------|
@@ -149,7 +149,7 @@ Create catalog uses object placeholders from registry — never emoji tiles.
 
 ---
 
-## Never In This Room™
+## Never In This Room
 
 - Blank white SaaS template prison
 - "You haven't published in X days" guilt
@@ -163,7 +163,7 @@ Create catalog uses object placeholders from registry — never emoji tiles.
 
 ---
 
-## ADHD Rules™
+## ADHD Rules
 
 | Challenge | How the room helps |
 |-----------|-------------------|
@@ -176,7 +176,7 @@ Create catalog uses object placeholders from registry — never emoji tiles.
 
 ---
 
-## Seasonal Notes™
+## Seasonal Notes
 
 - **Spring:** Mud on boots by door; windows openable; first garden green at edge
 - **Summer:** Butterflies; screen porch mode; late gold
@@ -187,6 +187,6 @@ Table always shows **someone was making** — season changes light, not the perm
 
 ---
 
-## Final Feeling™
+## Final Feeling
 
 **I touched the work — and it can stay imperfect without becoming a verdict about me.**

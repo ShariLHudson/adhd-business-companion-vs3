@@ -1,5 +1,5 @@
 /**
- * Plan My Day™ → Companion Brain™ adapter.
+ * Plan My Day → Companion Brain adapter.
  * The brain never imports this module.
  */
 

@@ -38,7 +38,7 @@ export function FounderCommandCenterPanel() {
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h2 className="text-[11px] font-bold uppercase tracking-wide text-[#1e4f4f]">
-            Founder Command Center™
+            Founder Command Center
           </h2>
           <p className="mt-0.5 text-xs text-[#6b635a]">
             Mission Control — what needs attention, why, and what to do next.
@@ -87,7 +87,7 @@ export function FounderCommandCenterPanel() {
           className="flex w-full items-center justify-between text-left"
         >
           <p className="text-[10px] font-semibold uppercase text-[#1e4f4f]">
-            Founder Daily Brief™
+            Founder Daily Brief
           </p>
           <span className="text-xs text-[#6b635a]">{briefExpanded ? "−" : "+"}</span>
         </button>
@@ -256,7 +256,7 @@ export function FounderCommandCenterPanel() {
 
       {/* Misfire Center */}
       <div className="mt-4 rounded-lg border border-[#ebe4d9] bg-white p-3">
-        <SectionTitle title="Companion Misfire Center™" />
+        <SectionTitle title="Companion Misfire Center" />
         <div className="mt-2 grid gap-2 sm:grid-cols-4 text-xs">
           <MisfireStat label="Corrections" value={missionControl.misfireCenter.userCorrections} />
           <MisfireStat label="Behavioral" value={missionControl.misfireCenter.behavioralSignals} />
@@ -285,7 +285,7 @@ export function FounderCommandCenterPanel() {
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <div className="rounded-lg border border-[#ebe4d9] bg-white p-3">
           <SectionTitle
-            title="Recently Improved™"
+            title="Recently Improved"
             subtitle="User-facing — benefits only, no bugs or internals"
           />
           <ul className="mt-2 list-disc space-y-1 pl-4 text-xs text-[#2d2926]">
@@ -295,7 +295,7 @@ export function FounderCommandCenterPanel() {
           </ul>
         </div>
         <div className="rounded-lg border border-[#ebe4d9] bg-white p-3">
-          <SectionTitle title="What's New™" subtitle="Translated for user trust" />
+          <SectionTitle title="What's New" subtitle="Translated for user trust" />
           <ul className="mt-2 space-y-2 text-xs text-[#2d2926]">
             {missionControl.whatsNew.items.slice(0, 3).map((item) => (
               <li key={item.area}>{item.benefit}</li>
@@ -314,7 +314,7 @@ export function FounderCommandCenterPanel() {
       ) : null}
 
       <p className="mt-3 text-[10px] text-[#6b635a]">
-        Situation Atlas™: {missionControl.situationAtlas.totalEntries} situations mapped
+        Situation Atlas: {missionControl.situationAtlas.totalEntries} situations mapped
         {missionControl.situationReviewQueue.pending.length > 0
           ? ` · ${missionControl.situationReviewQueue.pending.length} candidate(s) awaiting founder review`
           : ""}

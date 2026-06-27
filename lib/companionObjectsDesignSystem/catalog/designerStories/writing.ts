@@ -1,4 +1,4 @@
-/** Designer Stories™ — Writing Collection. Never shown to guests. */
+/** Designer Stories — Writing Collection. Never shown to guests. */
 export const WRITING_DESIGNER_STORIES: Record<string, string> = {
   "obj-leather-journal":
     "Not a prop journal — the one Shari keeps by her chair to capture ideas before they disappear. The spine is soft from use.",

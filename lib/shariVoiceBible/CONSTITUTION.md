@@ -1,4 +1,4 @@
-# Shari Voice Bible™
+# Shari Voice Bible
 
 Permanent communication foundation for the ADHD Business Ecosystem™.
 
@@ -65,16 +65,16 @@ Each entry in `SHARI_VOICE_BIBLE_ENTRIES` includes:
 
 | System | Module |
 |--------|--------|
-| Greeting Intelligence™ | `lib/greetingIntelligence` → Bible |
+| Greeting Intelligence | `lib/greetingIntelligence` → Bible |
 | Welcome Presence | `lib/welcomePresenceIntelligence` → Bible |
 | Arrival conversation | `lib/arrivalExperience` → Bible |
 | Room invitations | `composeRoomInvitation` |
-| Character Filter™ | `lib/characterOfShari` — after Restraint |
-| Wisdom of Restraint™ | `lib/wisdomOfRestraint` — before Character |
+| Character Filter | `lib/characterOfShari` — after Restraint |
+| Wisdom of Restraint | `lib/wisdomOfRestraint` — before Character |
 
 ## Authority chain
 
-Voice Bible™ → Presence Intelligence™ → Wisdom of Restraint™ → **Character of Shari™** → guest
+Voice Bible → Presence Intelligence → Wisdom of Restraint → **Character of Shari** → guest
 
 *See [`docs/companion-homestead/CHARACTER_OF_SHARI.md`](../../docs/companion-homestead/CHARACTER_OF_SHARI.md)*
 

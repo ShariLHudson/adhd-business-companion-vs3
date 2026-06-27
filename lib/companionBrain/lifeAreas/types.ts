@@ -1,5 +1,5 @@
 /**
- * Life Area Intelligence™ — shared types for ecosystem-wide reuse.
+ * Life Area Intelligence — shared types for ecosystem-wide reuse.
  */
 
 import type { PlanLifeDomain } from "@/lib/planMyDay/types";

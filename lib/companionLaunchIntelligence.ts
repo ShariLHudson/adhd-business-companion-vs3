@@ -1,5 +1,5 @@
 /**
- * Launch Intelligence™ — ADHD Entrepreneur Behavioral Framework™
+ * Launch Intelligence — ADHD Entrepreneur Behavioral Framework
  */
 
 import type { ChatTurn } from "./companionIntelligence";

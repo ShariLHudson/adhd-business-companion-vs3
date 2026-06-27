@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   clearOutcomeThread,
+  consumePendingInvitation,
   getOutcomeThread,
   outcomeThreadHintForChat,
   patchOutcomeThread,
@@ -51,6 +52,28 @@ describe("companionOutcomeThread", () => {
     );
     expect(msg).not.toMatch(/what would you like help with next/i);
     expect(msg).toMatch(/Decision Compass/i);
+  });
+
+  it("consumes pending invitation after resolution", () => {
+    registerPendingOffer({
+      offerSummary: "Choose one focus task",
+      pendingQuestion: "Would you like to choose one small task?",
+    });
+    consumePendingInvitation();
+    const thread = getOutcomeThread();
+    expect(thread?.pendingQuestion).toBeUndefined();
+    expect(thread?.pendingAction).toBeUndefined();
+  });
+
+  it("fallback advances yes/no question without echoing current problem", () => {
+    const msg = threadAwareAcceptanceFallback(
+      patchOutcomeThread({
+        pendingQuestion: "Would you like to choose one small task?",
+        currentProblem: "Picking up its only 9:30 am",
+      }),
+    );
+    expect(msg).toMatch(/one thing/i);
+    expect(msg).not.toMatch(/9:30/i);
   });
 
   it("detects topic change", () => {

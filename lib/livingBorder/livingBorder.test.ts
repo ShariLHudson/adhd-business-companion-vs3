@@ -8,8 +8,8 @@ import {
   visibleBorderRenderClasses,
 } from "./index";
 
-describe("Living Border™", () => {
-  it("Window Seat™ has landscape and wildlife at borders", () => {
+describe("Living Border", () => {
+  it("Window Seat has landscape and wildlife at borders", () => {
     const catalog = livingBorderCatalogForPlace("window-seat");
     expect(catalog.elements).toContain("landscape");
     expect(catalog.elements).toContain("bird");
@@ -65,6 +65,7 @@ describe("Living Border™", () => {
     const verdict = evaluateLivingBorder({ placeId: "window-seat" });
     const classes = visibleBorderRenderClasses(verdict);
     expect(classes.length).toBe(new Set(classes).size);
+    expect(classes.some((c) => c.includes("curtain"))).toBe(true);
   });
 
   it("filters center-targeting living changes", () => {

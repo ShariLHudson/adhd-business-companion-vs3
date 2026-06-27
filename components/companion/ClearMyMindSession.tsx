@@ -14,11 +14,15 @@ import {
 import {
   CLEAR_MY_MIND_CAPTURE_BUTTON,
   CLEAR_MY_MIND_CAPTURE_BUTTON_CONFIRM,
+  CLEAR_MY_MIND_CONTINUE_PROMPT,
   CLEAR_MY_MIND_SHARE_ACK_DELAY_MS,
   CLEAR_MY_MIND_SHARE_CONFIRM_MS,
   CLEAR_MY_MIND_SPLIT_KEEP,
 } from "@/lib/clearMyMindCopy";
-import { shariImmediateHoldResponse, shariReleasePrompt } from "@/lib/clearMyMindCompanionVoice";
+import {
+  shariImmediateHoldResponse,
+  shariPostShareAcknowledgment,
+} from "@/lib/clearMyMindCompanionVoice";
 import { recordClearMyMindSubmission } from "@/lib/clearMyMindIntelligence";
 import {
   getReliefCompanionHints,
@@ -27,6 +31,7 @@ import {
 import {
   initialClearMyMindStage,
   stageOnCaptureBegin,
+  stageOnReleaseComplete,
   type ClearMyMindStage,
 } from "@/lib/clearMyMindStages";
 import { isVisibleInMentalLandscape } from "@/lib/thoughtLifecycle";
@@ -36,7 +41,7 @@ import {
   setThoughtCollectionSuggestion,
   SUGGESTED_COLLECTION_AI_CONFIDENCE,
 } from "@/lib/thinkingSpace/thoughtCollectionAuthority";
-import { VoiceAnswerField } from "@/components/companion/VoiceAnswerField";
+import { ClearMyMindCaptureCard } from "@/components/companion/ClearMyMindCaptureCard";
 import { ClearMyMindCaptureInvite } from "@/components/companion/ClearMyMindCaptureInvite";
 import { ThoughtSeparateOffer } from "@/components/companion/ThoughtSeparateOffer";
 import {
@@ -50,13 +55,15 @@ type Props = {
   onPresenceStateChange?: (state: {
     shareConfirming: boolean;
     holdAck: string | null;
+    stage: ClearMyMindStage;
+    lastShareItemCount: number;
   }) => void;
   onOpenMyThoughts?: () => void;
   onTotalThoughtCountChange?: (count: number) => void;
 };
 
 /**
- * Clear My Mind™ — continuous capture only. Organization lives in My Thoughts™.
+ * Clear My Mind — unload first. Organization follows with permission.
  */
 export function ClearMyMindSession({
   sessionId: sessionIdProp,
@@ -65,9 +72,7 @@ export function ClearMyMindSession({
   onOpenMyThoughts,
   onTotalThoughtCountChange,
 }: Props) {
-  const [sessionId] = useState(
-    () => sessionIdProp ?? newCaptureSessionId(),
-  );
+  const [sessionId] = useState(() => sessionIdProp ?? newCaptureSessionId());
   const [stage, setStage] = useState<ClearMyMindStage>(initialClearMyMindStage);
   const [input, setInput] = useState("");
   const [entries, setEntries] = useState<BrainDumpEntry[]>([]);
@@ -79,6 +84,7 @@ export function ClearMyMindSession({
   const [usedTyping, setUsedTyping] = useState(false);
   const [holdAck, setHoldAck] = useState<string | null>(null);
   const [submissionCount, setSubmissionCount] = useState(0);
+  const [lastShareItemCount, setLastShareItemCount] = useState(0);
   const [shareConfirming, setShareConfirming] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
@@ -109,8 +115,13 @@ export function ClearMyMindSession({
   ]);
 
   useEffect(() => {
-    onPresenceStateChange?.({ shareConfirming, holdAck });
-  }, [shareConfirming, holdAck, onPresenceStateChange]);
+    onPresenceStateChange?.({
+      shareConfirming,
+      holdAck,
+      stage,
+      lastShareItemCount,
+    });
+  }, [shareConfirming, holdAck, stage, lastShareItemCount, onPresenceStateChange]);
 
   useEffect(() => {
     onSessionEntriesChange?.(sessionItems);
@@ -182,6 +193,8 @@ export function ClearMyMindSession({
     if (!parts.length) return;
 
     setShareConfirming(true);
+    setHoldAck(null);
+    setLastShareItemCount(parts.length);
 
     const all = addBrainDumps(parts, { captureSessionId: sessionId });
     const createdItems = all.slice(0, parts.length);
@@ -190,11 +203,10 @@ export function ClearMyMindSession({
     );
 
     setSplitNotice(null);
-
     setEntries(sessionSaved);
     setInput("");
     setPendingSplit(null);
-    setStage(stageOnCaptureBegin(stage));
+    setStage(stageOnReleaseComplete(stageOnCaptureBegin(stage)));
 
     const nextSubmission = submissionCount + 1;
     if (nextSubmission > 1) {
@@ -209,13 +221,18 @@ export function ClearMyMindSession({
       sessionId,
     });
 
-    const ack = shariImmediateHoldResponse({
-      parts,
-      submissionIndex: nextSubmission,
-      hints: getReliefCompanionHints(),
-    });
+    const ack =
+      parts.join(" ").length >= 80 || parts.length > 2
+        ? shariPostShareAcknowledgment(rawDump)
+        : shariImmediateHoldResponse({
+            parts,
+            submissionIndex: nextSubmission,
+            hints: getReliefCompanionHints(),
+          });
+
     window.setTimeout(() => {
       setHoldAck(ack);
+      setStage("understanding");
     }, CLEAR_MY_MIND_SHARE_ACK_DELAY_MS);
 
     window.setTimeout(() => {
@@ -287,18 +304,17 @@ export function ClearMyMindSession({
     setStage(stageOnCaptureBegin(stage));
   }
 
-  const prompt = shariReleasePrompt(submissionCount);
-
   const shareDisabled =
     shareConfirming || !input.trim() || pendingSplit !== null;
 
   return (
-    <div className="clear-my-mind-session flex flex-col gap-4" data-cmind-mode="capture">
-      <p className="clear-my-mind-session__prompt">{prompt}</p>
+    <div className="clear-my-mind-session flex flex-col gap-5" data-cmind-mode="capture">
+      {submissionCount > 0 && !shareConfirming ? (
+        <p className="clear-my-mind-session__continue">{CLEAR_MY_MIND_CONTINUE_PROMPT}</p>
+      ) : null}
 
-      <VoiceAnswerField
+      <ClearMyMindCaptureCard
         value={input}
-        inputRef={inputRef}
         onChange={(value) => {
           setInput(value);
           if (value.trim()) {
@@ -308,13 +324,11 @@ export function ClearMyMindSession({
         }}
         onFocus={beginRelease}
         onVoiceUsed={() => setUsedVoice(true)}
-        voiceProminent
-        placeholder="What's on your mind?"
-        inputClassName="clear-my-mind-capture w-full flex-1 rounded-xl border border-[#d4cdc3]/80 bg-[rgba(255,252,247,0.72)] px-4 py-3 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]/55 min-h-[3.25rem] shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]"
-        micTitle="Speak what's on your mind"
+        inputRef={inputRef}
+        shareConfirming={shareConfirming}
       />
 
-      <div className="flex flex-wrap gap-2">
+      <div className="clear-my-mind-save-row">
         <button
           type="button"
           disabled={shareDisabled}
@@ -322,7 +336,7 @@ export function ClearMyMindSession({
           aria-live="polite"
           data-testid="share-capture-button"
           data-share-confirming={shareConfirming ? "true" : "false"}
-          className={`clear-my-mind-hold-btn rounded-xl px-6 py-3 text-base font-semibold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed ${
+          className={`clear-my-mind-hold-btn rounded-2xl px-7 py-3 text-base font-semibold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed ${
             shareConfirming ? "is-confirming" : ""
           }`}
         >

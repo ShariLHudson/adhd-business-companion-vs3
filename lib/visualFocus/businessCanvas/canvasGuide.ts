@@ -4,11 +4,11 @@ import { BUSINESS_CANVAS_SECTION_ORDER } from "./types";
 export const BUSINESS_CANVAS_GLOBAL_GUIDES = [
   {
     id: "how-to-use",
-    title: "How To Use Business Canvas™",
+    title: "How To Use Business Canvas",
     body: [
       "Tap Open on any box to add sticky-note entries for that part of your business.",
       "Only one box expands at a time — stay focused on one area.",
-      "When enough boxes have entries, Generate Business Canvas™ for insights and next steps.",
+      "When enough boxes have entries, Generate Business Canvas for insights and next steps.",
       "Map your current business first. Explore changes after you generate.",
     ],
   },
@@ -27,7 +27,7 @@ export const BUSINESS_CANVAS_GLOBAL_GUIDES = [
       "After you generate your current canvas, you can explore a business change.",
       "The companion asks a few follow-up questions — not a long survey.",
       "Impact analysis shows which boxes may shift and why, using ripple-effect guidance.",
-      "Living Canvas™ and simulations will highlight related boxes visually in the future.",
+      "Living Canvas and simulations will highlight related boxes visually in the future.",
     ],
   },
   {
@@ -38,7 +38,7 @@ export const BUSINESS_CANVAS_GLOBAL_GUIDES = [
       "Business summary and key relationships",
       "Risks and opportunities",
       "Recommendations and suggested next steps",
-      "Board of Directors™ observations",
+      "Board of Directors observations",
       "What-If Analysis placeholder for change exploration",
     ],
   },

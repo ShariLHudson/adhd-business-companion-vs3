@@ -1,5 +1,5 @@
 /**
- * Relief Intelligence™ — invisible layer for Clear My Mind™.
+ * Relief Intelligence — invisible layer for Clear My Mind.
  *
  * Learns what helps this individual feel lighter. Never surfaced as analytics.
  * Informs companion tone only — not content analysis.

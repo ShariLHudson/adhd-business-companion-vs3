@@ -9,8 +9,8 @@ import {
   canTransition,
 } from "./index";
 
-describe("Focus Landscape™ — Focus My Brain™", () => {
-  it("maps I'm Stuck to Garden Path™", () => {
+describe("Focus Landscape — Focus My Brain", () => {
+  it("maps I'm Stuck to Garden Path", () => {
     const verdict = evaluateFocusLandscape({
       workspaceId: "focus-category",
       focusCategoryId: "stuck",
@@ -20,7 +20,7 @@ describe("Focus Landscape™ — Focus My Brain™", () => {
     expect(verdict.subtitle).toMatch(/next step/i);
   });
 
-  it("maps I Need a Break to Meadow / Lake™ center hub", () => {
+  it("maps I Need a Break to Meadow / Lake center hub", () => {
     const verdict = evaluateFocusLandscape({
       workspaceId: "focus-category",
       focusCategoryId: "need-break",

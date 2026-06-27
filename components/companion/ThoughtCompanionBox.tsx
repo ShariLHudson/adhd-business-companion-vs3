@@ -17,7 +17,7 @@ type Props = {
 };
 
 /**
- * Thought Companion Box™ — icon, thought text, one collection chip, status hints.
+ * Thought Companion Box — icon, thought text, one collection chip, status hints.
  * Advanced details live in the Companion Box detail sheet only.
  */
 export function ThoughtCompanionBox({

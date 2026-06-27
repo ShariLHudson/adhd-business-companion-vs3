@@ -1,5 +1,5 @@
 /**
- * Quiet Moments™ — designing everything between conversations.
+ * Quiet Moments — designing everything between conversations.
  * @see docs/companion-homestead/QUIET_MOMENTS.md
  */
 

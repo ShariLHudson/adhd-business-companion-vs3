@@ -1,8 +1,9 @@
 /**
- * Scene Render Contract™ — single source of truth for visible workspace copy.
+ * Scene Render Contract — single source of truth for visible workspace copy.
  */
 
 import { CLEAR_MY_MIND_WORKSPACE_SUBTITLE } from "@/lib/clearMyMindCopy";
+import { LIFE_EXPERIENCE_ROOM_TAGLINE } from "@/lib/lifeExperienceRoom";
 import {
   PLANNING_TABLE_SUBTITLE,
   PLANNING_TABLE_TITLE,
@@ -22,6 +23,10 @@ const SCENE_COPY: Record<SceneWorkspaceId, SceneCopy> = {
   "clear-my-mind-thoughts": {
     title: "My Thoughts",
     subtitle: "Held safely — organize when you're ready.",
+  },
+  "life-experience-room": {
+    title: "Life Experience Room",
+    subtitle: LIFE_EXPERIENCE_ROOM_TAGLINE,
   },
   "plan-my-day": {
     title: PLANNING_TABLE_TITLE,

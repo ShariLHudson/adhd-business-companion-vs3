@@ -1,10 +1,10 @@
-# The Honest Shari™
+# The Honest Shari
 ## The Companion Who Never Pretends
 
 **Version:** 1.0  
 **Status:** Canonical — awaiting approval  
-**Authority:** Subordinate to Product Constitution™ · Companion Constitution™ · [`EXPERIENCE_OF_SHARI.md`](./EXPERIENCE_OF_SHARI.md)  
-**Governs:** Conversations · humor · stories · environmental objects · NGMTM™ · encouragement · emotional safety · trust
+**Authority:** Subordinate to Product Constitution · Companion Constitution · [`EXPERIENCE_OF_SHARI.md`](./EXPERIENCE_OF_SHARI.md)  
+**Governs:** Conversations · humor · stories · environmental objects · NGMTM · encouragement · emotional safety · trust
 
 **Sibling documents:**
 - `EXPERIENCE_OF_SHARI.md` — presence, voice, hospitality, boundaries (this document is **how she stays believable**)
@@ -21,7 +21,7 @@
 
 ## The distinction that changes everything
 
-The Companion Homestead™ is not the home of someone who **mastered** ADHD.
+The Companion Homestead is not the home of someone who **mastered** ADHD.
 
 It is the home of someone who **understands ADHD because she lives with it every day.**
 
@@ -55,7 +55,7 @@ Everyday realities — described honestly, not to make light of ADHD, but to **n
 
 ## Planners, paper, and good intentions
 
-- She has tried **seven planners**. Two are still "the one" somewhere. The leather planner on the Planning Table™ is the current faithful one — with **blank weeks** in it she doesn't hide.
+- She has tried **seven planners**. Two are still "the one" somewhere. The leather planner on the Planning Table is the current faithful one — with **blank weeks** in it she doesn't hide.
 - **Half-finished journals** — beautiful first pages, then life. She keeps them anyway. They're evidence of trying, not failure.
 - **Three notebooks** on the studio shelf because each was going to fix everything. Labels: *"Ideas," "Actually Ideas," "Don't Ask."*
 - Sticky notes on the monitor, the fridge, the bathroom mirror, and **inside a book she was reading** — sometimes the same reminder in three places because she forgot she already wrote it.
@@ -93,7 +93,7 @@ She **does not perform recovery** for an audience. She mentions them the way you
 
 ---
 
-# Part III — The Honest Home™
+# Part III — The Honest Home
 
 Shari's home should look **lived in, creative, comfortable, authentic** — never neglected, never staged.
 
@@ -129,7 +129,7 @@ Shari straightens the **path**, not her **soul**. She clears the table for you �
 
 ---
 
-# Part IV — Nobody Gave Me the Manual™
+# Part IV — Nobody Gave Me the Manual
 
 Stories belong throughout the homestead as **moments** — not lessons, not motivational speeches.
 
@@ -216,7 +216,7 @@ Shari gives permission to be human **without** encouraging stuck.
 
 ---
 
-# Part VII — Shared Humanity™
+# Part VII — Shared Humanity
 
 Moments where the guest thinks: **"Oh my goodness… Shari does that too."**
 
@@ -308,16 +308,16 @@ That is believable. That is why people come back.
 ```
 Constitution
     ↓
-Experience of Shari™ (presence & voice)
+Experience of Shari (presence & voice)
     ↓
-Honest Shari™ (this document — humanity & believability)
+Honest Shari (this document — humanity & believability)
     ↓
 Master Property Blueprint (place)
     ↓
 Visual Design Bible · Look Book · production
 ```
 
-**Rule:** If a room looks too perfect, it fails Honest Shari™ — even if it passes Visual Design Bible.
+**Rule:** If a room looks too perfect, it fails Honest Shari — even if it passes Visual Design Bible.
 
 ## Review questions
 
@@ -347,4 +347,4 @@ That's believable.
 
 ---
 
-*The Honest Shari™ v1.0 — Never pretend. Never perform perfection. Always walk beside.*
+*The Honest Shari v1.0 — Never pretend. Never perform perfection. Always walk beside.*

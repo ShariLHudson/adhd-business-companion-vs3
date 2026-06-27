@@ -1,5 +1,5 @@
-# Daily Companion Cycle™ Architecture
-## Plan My Day™ — Canonical Source of Truth
+# Daily Companion Cycle Architecture
+## Plan My Day — Canonical Source of Truth
 
 **Version:** 2.0 (Sprint 2 readiness)  
 **Status:** Approved for implementation  
@@ -7,15 +7,15 @@
 
 **Related documents:**
 - [COMPANION_JUDGMENT_REPORT.md](./COMPANION_JUDGMENT_REPORT.md) — Sprint 1.75 validation (ten simulations + judgment report)
-- [../ARCHITECTURAL_GUARDRAILS.md](../ARCHITECTURAL_GUARDRAILS.md) — Plan My Day™ workspace rules (§3)
+- [../ARCHITECTURAL_GUARDRAILS.md](../ARCHITECTURAL_GUARDRAILS.md) — Plan My Day workspace rules (§3)
 
 **Implementation fixtures:** `lib/planMyDay/dailyCompanionCycle/fixtures/`
 
 ---
 
-## What Plan My Day™ Is
+## What Plan My Day Is
 
-Plan My Day™ is **not a planner**. It is the **Daily Companion Cycle™** — the visible daily reasoning surface of Companion Brain Intelligence™.
+Plan My Day is **not a planner**. It is the **Daily Companion Cycle** — the visible daily reasoning surface of Companion Brain Intelligence.
 
 | Is | Is not |
 |----|--------|
@@ -34,22 +34,22 @@ Plan My Day™ is **not a planner**. It is the **Daily Companion Cycle™** — 
 Every decision must satisfy:
 
 - Companion Constitution (Three Laws)
-- Product Constitution™ (seven articles + Conversation Governance)
+- Product Constitution (seven articles + Conversation Governance)
 - Cognitive Growth Principle (`lib/cognitiveGrowthPrinciple.ts`)
-- Architectural Guardrails §3 (Plan My Day™)
+- Architectural Guardrails §3 (Plan My Day)
 - Relationship Phase Constitution (one voice, permission-based offers)
 
 ### Mapping
 
 | Sprint language | Repo anchor |
 |-----------------|-------------|
-| Flawless Brain Intelligence™ | Companion Brain Intelligence™ |
-| Stewardship Oath™ | Companion carries load; user keeps agency |
+| Flawless Brain Intelligence | Companion Brain Intelligence |
+| Stewardship Oath | Companion carries load; user keeps agency |
 | Dual Mandate | Help today + strengthen thinking skills |
-| Cognitive Audit™ | Pre-render + post-reflection gates |
-| Relevance Safeguard™ | Suppress low-value / wrong-time signals |
+| Cognitive Audit | Pre-render + post-reflection gates |
+| Relevance Safeguard | Suppress low-value / wrong-time signals |
 | Decision Filter | ≤3 meaningful choices; one momentum anchor |
-| Stewardship Review™ | Evaluation checklist (below) |
+| Stewardship Review | Evaluation checklist (below) |
 
 ### Learning rule (absolute)
 
@@ -108,15 +108,15 @@ Sprint 2 computes **This Week** and **Today** links; Season/Vision read from Goa
 | 3b | Confidence selection | Silent | Self-trust action (may differ) |
 | 4 | Permission curation | Silent | What does NOT belong today |
 | 5 | Scope realism | Silent | Adapt My Day alignment |
-| 6 | Cognitive Audit™ | Silent | Constitutional gate |
+| 6 | Cognitive Audit | Silent | Constitutional gate |
 | 7 | Render contract | User-facing | Orientation + confirmation |
 
 ## Intelligence inputs (Tier A)
 
 | Source | Use |
 |--------|-----|
-| Adapt My Day™ | Capacity, energy, motivation, vibe |
-| Clear My Mind™ | Preparation cards, pull candidates |
+| Adapt My Day | Capacity, energy, motivation, vibe |
+| Clear My Mind | Preparation cards, pull candidates |
 | Yesterday's plan | Carry-forward, behavior themes |
 | Projects / Goals | Next actions, deadlines, journey |
 | `planBehaviorLearning` | Defer/complete themes |
@@ -127,12 +127,12 @@ Sprint 2 computes **This Week** and **Today** links; Season/Vision read from Goa
 
 Core artifact: `DailyReasoningResult` (`lib/planMyDay/dailyCompanionCycle/types.ts`)
 
-- OrientationBrief™
-- JourneyPlacement™
-- MomentumRecommendation™
-- ConfidenceRecommendation™
+- OrientationBrief
+- JourneyPlacement
+- MomentumRecommendation
+- ConfidenceRecommendation
 - PreparedProposal[] (not plan items until confirmed)
-- PermissionBrief™ (exclusions + reasons)
+- PermissionBrief (exclusions + reasons)
 - ConfirmationContract (confirm / adjust / decline / swap / reduce)
 - RegisteredPrediction[] (for Phase 8 review)
 
@@ -146,7 +146,7 @@ Core artifact: `DailyReasoningResult` (`lib/planMyDay/dailyCompanionCycle/types.
 
 ---
 
-# Part II — Sprint 1.5: Reflection Intelligence™
+# Part II — Sprint 1.5: Reflection Intelligence
 
 ## Phase 8 — Silent post-day reasoning
 
@@ -175,12 +175,12 @@ Core artifact: `DailyReasoningResult` (`lib/planMyDay/dailyCompanionCycle/types.
 
 Module: `wisdomIntelligence.ts` — long horizon only (≥60 days). Daily reflection **feeds** wisdom; does not replace it.
 
-## Daily Learning Loop™
+## Daily Learning Loop
 
 ```
-Yesterday → Reflection Intelligence™ → Updated Companion Brain™
-    → Today's Reasoning™ → Orientation™ → Partnership™
-    → Observation™ → Reflection™ → Tomorrow's Brain™
+Yesterday → Reflection Intelligence → Updated Companion Brain
+    → Today's Reasoning → Orientation → Partnership
+    → Observation → Reflection → Tomorrow's Brain
 ```
 
 ## Learning signals (internal, not dashboards)
@@ -195,9 +195,9 @@ Persisted judgment only (`companion-brain-state-v1`). Bounded patches: ±0.05 pe
 
 ---
 
-# Part III — Sprint 1.75: Companion Judgment Validation™
+# Part III — Sprint 1.75: Companion Judgment Validation
 
-Ten Human Reality Test™ simulations validated judgment across:
+Ten Human Reality Test simulations validated judgment across:
 
 1. Normal Tuesday  
 2. High Energy Launch Day  
@@ -318,7 +318,7 @@ After survival / recovery days:
 
 ---
 
-# Part V — Daily Companion Cycle™ (complete)
+# Part V — Daily Companion Cycle (complete)
 
 ```
 Observe → Understand → Prepare → Orient → Partner → Support
@@ -332,7 +332,7 @@ Observe → Understand → Prepare → Orient → Partner → Support
 | 0 | Orchestrator (invisible) | **New** |
 | 1 | Orientation Surface | **New** |
 | 2 | Confirmation Surface | **New** |
-| 3 | Living Board™ | `PlanMyDayPanel.tsx` |
+| 3 | Living Board | `PlanMyDayPanel.tsx` |
 
 Entry state machine: `reasoning` → `orienting` → `confirming` → `living` | `protected`
 
@@ -385,9 +385,9 @@ Run: `npm test -- lib/planMyDay/dailyCompanionCycle/simulationFixtures.test.ts`
 - [ ] Reasoning output explainable (prediction IDs + reasons)
 - [ ] Companion becomes wiser, not busier (proposal count does not increase run-over-run on same input)
 
-## Stewardship Review™ (every PR)
+## Stewardship Review (every PR)
 
-**Canonical law:** [Product Constitution™ — The Stewardship Review™](../PRODUCT_CONSTITUTION.md#the-stewardship-review)
+**Canonical law:** [Product Constitution — The Stewardship Review](../PRODUCT_CONSTITUTION.md#the-stewardship-review)
 
 - What cognitive load is carried?
 - What capability is strengthened?
@@ -396,7 +396,7 @@ Run: `npm test -- lib/planMyDay/dailyCompanionCycle/simulationFixtures.test.ts`
 - Does this make tomorrow's person stronger?
 - Wiser or busier companion?
 - Stronger relationship?
-- **Drift Test™:** Software or companionship?
+- **Drift Test:** Software or companionship?
 
 ---
 
@@ -442,12 +442,12 @@ Run: `npm test -- lib/planMyDay/dailyCompanionCycle/simulationFixtures.test.ts`
 
 | Item | Sprint |
 |------|--------|
-| Future Reflection™ stories ("you've become faster at deciding") | Post-V1 |
+| Future Reflection stories ("you've become faster at deciding") | Post-V1 |
 | Full Season/Vision orientation UI | Post-V1 |
 | Chat-first replanning loop | Post-V1 |
 | Pull From Clear My Mind chips in panel | UX punch list |
-| Wisdom Intelligence™ panel integration | Phase 9 cadence |
-| Founder dashboard aggregates | Founder Intelligence™ only |
+| Wisdom Intelligence panel integration | Phase 9 cadence |
+| Founder dashboard aggregates | Founder Intelligence only |
 | Midnight background reflection job | Optional enhancement |
 | Screen certification walkthrough | After UI complete |
 
@@ -479,4 +479,4 @@ lib/planMyDay/dailyCompanionCycle/
 
 ---
 
-*The Constitution is the foundation. The Daily Companion Cycle™ is its first living expression. Sprint 2 begins with the orchestrator — not the board.*
+*The Constitution is the foundation. The Daily Companion Cycle is its first living expression. Sprint 2 begins with the orchestrator — not the board.*

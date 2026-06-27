@@ -1,5 +1,5 @@
 /**
- * Phase 7 — Business Intelligence Ecosystem™
+ * Phase 7 — Business Intelligence Ecosystem
  * Understand the business as a living system — meaning, not metrics.
  */
 
@@ -801,7 +801,7 @@ export function formatBusinessIntelligenceForPanel(
 ): string {
   const b = snapshot.bottleneck;
   return [
-    "## Business Intelligence Ecosystem™",
+    "## Business Intelligence Ecosystem",
     "",
     "_Understanding your business — meaning, not metrics._",
     "",
@@ -852,7 +852,7 @@ export function phase7BusinessIntelligenceHintForChat(input?: {
       : null);
 
   const parts = [
-    "PHASE 7 BUSINESS INTELLIGENCE ECOSYSTEM™ (understand the business, not just the user):",
+    "PHASE 7 BUSINESS INTELLIGENCE ECOSYSTEM (understand the business, not just the user):",
     "Goal: answer what helps grow, what slows down, what deserves attention, what's missed, highest return on effort.",
     "Meaning not metrics. Insight not data dumps. Guidance not reports. Never a dashboard, CRM, or spreadsheet.",
     "One companion face — never expose internal layers or confidence scores.",

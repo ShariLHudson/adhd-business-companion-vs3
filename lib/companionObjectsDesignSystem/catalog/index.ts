@@ -10,7 +10,7 @@ import { READING_OBJECT_SEEDS } from "./reading";
 import { SEASONAL_OBJECT_SEEDS } from "./seasonal";
 import { WRITING_OBJECT_SEEDS } from "./writing";
 
-/** Companion Objects™ Master Catalog — permanent visual language registry. */
+/** Companion Objects Master Catalog — permanent visual language registry. */
 export const COMPANION_OBJECTS_MASTER_CATALOG = objectsFromSeeds([
   ...WRITING_OBJECT_SEEDS,
   ...COFFEE_COMFORT_OBJECT_SEEDS,

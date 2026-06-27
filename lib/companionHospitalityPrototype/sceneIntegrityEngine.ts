@@ -692,7 +692,7 @@ function resolveBooks(
 }
 
 /**
- * Scene Integrity Engine™
+ * Scene Integrity Engine
  * Controls are inputs; the resolved scene is one coherent Iowa day.
  */
 export function resolveSceneIntegrity(

@@ -49,7 +49,7 @@ function buildRecommendation(
 const MIN_RECONNECTION_TURNS = 2;
 
 /**
- * Room invitations pass through Wisdom of Restraint™.
+ * Room invitations pass through Wisdom of Restraint.
  * No tone-based redirects — only when the guest expressed a need.
  */
 export function resolveArrivalRecommendation(input: {

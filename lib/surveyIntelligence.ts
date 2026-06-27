@@ -1,5 +1,5 @@
 /**
- * Survey Intelligence™ — customer validation & feedback frameworks.
+ * Survey Intelligence — customer validation & feedback frameworks.
  *
  * Determines what feedback is needed, which template fits, and pre-populates
  * Create with proven questions — never a blank page.
@@ -405,7 +405,7 @@ export function formatSurveyDraftContent(
     ...questions.map((q, i) => `${i + 1}. ${q.text}`),
     "",
     "---",
-    "_Template from Survey Intelligence™ — edit questions to match your voice before sending._",
+    "_Template from Survey Intelligence — edit questions to match your voice before sending._",
   ];
   return lines.join("\n");
 }
@@ -571,7 +571,7 @@ export function surveyIntelligenceHintForChat(
   if (!result.needsSurvey || !result.template) return null;
 
   const parts = [
-    "SURVEY INTELLIGENCE™ (mandatory when evidence is missing):",
+    "SURVEY INTELLIGENCE (mandatory when evidence is missing):",
     `Missing information: ${result.missingInformation}.`,
     `Recommended template: ${result.template.name}.`,
     `Survey length: ${result.recommendedLength} (${LENGTH_COUNTS[result.recommendedLength]} questions).`,
@@ -602,7 +602,7 @@ export function surveyIntelligenceHintForChat(
   return parts.join("\n");
 }
 
-// ─── Founder Intelligence™ ───────────────────────────────────────────────────
+// ─── Founder Intelligence ───────────────────────────────────────────────────
 
 function readFounderRecord(): SurveyFounderRecord {
   if (typeof window === "undefined") {
