@@ -1,266 +1,314 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   addMyAudioLink,
-  deleteAudioLink,
   getAudioLinks,
-  linksForAudioCategory,
-  MASTER_AUDIO_CATEGORIES,
-  SAVED_AUDIO_CATEGORIES,
   myAudioLinks,
-  playAudioTrack,
-  FAVORITES_PLAYLIST_ID,
-  MY_AUDIO_PLAYLIST_ID,
+  rememberAudioSelection,
+  updateAudioLink,
   type AudioLink,
 } from "@/lib/audioPlaylists";
-import { audioBackgroundMood, suggestAudioForEmotion } from "@/lib/audioSuggestions";
 import type { EmotionalState } from "@/lib/companionEmotions";
-import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
-import { SceneRenderer } from "@/components/companion/scene/SceneRenderer";
-import { createSceneState } from "@/lib/sceneRenderContract";
-import { AUDIO_SAVED_CATEGORY_OBJECT_ID } from "@/lib/companionObjects";
+import { FocusAudioPlayerModal } from "@/components/companion/FocusAudioPlayerModal";
+import { PeacefulPlaceSession } from "@/components/companion/PeacefulPlaceSession";
+import { HangingDestinationMenu } from "@/components/companion/peacefulPlaces/HangingDestinationMenu";
+import { MyPlacesEstatePanel } from "@/components/companion/peacefulPlaces/MyPlacesEstatePanel";
+import { PathwayPhotoSign } from "@/components/companion/peacefulPlaces/PathwayPhotoSign";
+import { PathwayPhotoSignsLayer } from "@/components/companion/peacefulPlaces/PathwayPhotoSignsLayer";
+import { PeacefulPlacesLandingShell } from "@/components/companion/peacefulPlaces/PeacefulPlacesLandingShell";
+import { PeacefulPlacesSignpostPortal } from "@/components/companion/peacefulPlaces/PeacefulPlacesSignpostPortal";
+import {
+  enterPeacefulPlace,
+  peacefulPlaceDisplayName,
+  peacefulPlaceDestinationFromSoundscape,
+  ESTATE_LEFT_SIGNS,
+  ESTATE_RIGHT_SIGNS,
+  PATHWAY_SIGN_ANCHORS,
+  type PeacefulPlaceDestination,
+} from "@/lib/peacefulPlaces";
+import { readMyPlaceAudioFile } from "@/lib/peacefulPlaces/myPlaceAudioUpload";
+import type { EstateSignId } from "@/lib/peacefulPlaces/signpostLayout";
+import {
+  resolveSoundscapeScrollTarget,
+  soundscapeById,
+  soundscapePlaybackFrom,
+  soundscapesForMood,
+  type Soundscape,
+  type SoundscapePlayback,
+} from "@/lib/soundscapes";
 
-// Categories shown in the picker — "My Audio" and "Favorites" live in Saved
-// Links instead, so the dropdown stays focused on moods/sound types.
-const PICKER_CATEGORIES = MASTER_AUDIO_CATEGORIES.filter(
-  (c) => c.id !== MY_AUDIO_PLAYLIST_ID && c.id !== FAVORITES_PLAYLIST_ID,
-);
+const PATHWAY_SIGNS = [...ESTATE_LEFT_SIGNS, ...ESTATE_RIGHT_SIGNS] as const;
 
 export function FocusAudioPanel({
   onDone,
-  emotion = "unclear",
   initialCategory,
 }: {
   onDone?: () => void;
   emotion?: EmotionalState;
   initialCategory?: string;
 }) {
-  const suggestion = useMemo(() => suggestAudioForEmotion(emotion), [emotion]);
-
-  const [category, setCategory] = useState<string>(
-    initialCategory ?? suggestion.categoryId,
+  const scrollTarget = resolveSoundscapeScrollTarget(initialCategory);
+  const sceneRef = useRef<HTMLDivElement>(null);
+  const signpostsRef = useRef<HTMLDivElement>(null);
+  const [openSign, setOpenSign] = useState<EstateSignId | null>(() =>
+    scrollTarget !== "top" ? scrollTarget : null,
   );
   const [links, setLinks] = useState<AudioLink[]>([]);
-  const [howToOpen, setHowToOpen] = useState(false);
-
-  useEffect(() => {
-    if (initialCategory) setCategory(initialCategory);
-  }, [initialCategory]);
-
-  // Add-your-own form
+  const [player, setPlayer] = useState<SoundscapePlayback | null>(null);
+  const [activeDestination, setActiveDestination] =
+    useState<PeacefulPlaceDestination | null>(null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [myName, setMyName] = useState("");
   const [myUrl, setMyUrl] = useState("");
-  const [myCategory, setMyCategory] = useState("focus");
+  const [myFile, setMyFile] = useState<File | null>(null);
+  const [myFileName, setMyFileName] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [savingMyPlace, setSavingMyPlace] = useState(false);
 
   const refresh = useCallback(() => setLinks(getAudioLinks()), []);
   useEffect(() => {
     refresh();
   }, [refresh]);
 
-  const tracks = useMemo(
-    () => linksForAudioCategory(category, links),
-    [category, links],
-  );
+  useEffect(() => {
+    if (scrollTarget === "top") return;
+    setOpenSign(scrollTarget);
+  }, [scrollTarget]);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpenSign(null);
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, []);
+
+  useEffect(() => {
+    function onPointerDown(e: MouseEvent) {
+      const target = e.target as Node;
+      if (sceneRef.current?.contains(target) || signpostsRef.current?.contains(target)) {
+        return;
+      }
+      if (
+        target instanceof Element &&
+        target.closest(
+          "[data-peaceful-places-signpost-portal], .pathway-photo-sign__dropdown, .pathway-photo-sign__hit, .hanging-destination-menu__item, .my-places-estate-panel",
+        )
+      ) {
+        return;
+      }
+      setOpenSign(null);
+    }
+    document.addEventListener("mousedown", onPointerDown);
+    return () => document.removeEventListener("mousedown", onPointerDown);
+  }, []);
+
   const savedLinks = useMemo(() => myAudioLinks(links), [links]);
-  const mood = audioBackgroundMood(category);
 
-  const showingSuggestion = category === suggestion.categoryId;
-
-  function play(track: AudioLink) {
-    playAudioTrack(track, "focus-audio", category);
+  function resetMyPlacesForm() {
+    setEditingId(null);
+    setMyName("");
+    setMyUrl("");
+    setMyFile(null);
+    setMyFileName(null);
+    setUploadError(null);
+    setSavingMyPlace(false);
   }
 
-  return (
-    <SceneRenderer
-      scene={createSceneState({
-        workspaceId: "focus-audio",
-        scenePage: mood,
-        seed: category,
-      })}
-      className="companion-fade-in h-full min-h-0 overflow-y-auto"
-    >
-        {/* Category dropdown */}
-        <label className="mt-5 block text-sm font-bold uppercase tracking-wide text-[#6b635a]">
-          Sound for your brain
-        </label>
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="mt-2 w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-3 text-base font-medium text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-        >
-          {PICKER_CATEGORIES.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name}
-            </option>
-          ))}
-        </select>
-        {showingSuggestion && (
-          <p className="mt-2 text-sm text-[#1e4f4f]">
-            Suggested {suggestion.reason} — {suggestion.categoryName}.
-          </p>
-        )}
+  function toggleSign(signId: EstateSignId) {
+    if (openSign === signId) {
+      setOpenSign(null);
+      if (signId === "my-places") resetMyPlacesForm();
+      return;
+    }
+    setOpenSign(signId);
+    if (signId === "my-places") {
+      setUploadError(null);
+    } else {
+      resetMyPlacesForm();
+    }
+  }
 
-        {/* Tracks for the chosen category */}
-        <div className="mt-4 space-y-2">
-          {tracks.length === 0 ? (
-            <p className="text-base text-[#6b635a]">
-              Nothing here yet — add a link under Saved Links below.
-            </p>
-          ) : (
-            tracks.map((t) => (
-              <button
-                key={t.id}
-                type="button"
-                onClick={() => play(t)}
-                className="flex w-full items-center rounded-lg border border-[#1e4f4f]/25 bg-[#1e4f4f]/5 px-3 py-2.5 text-left text-base font-medium text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
-              >
-                ▶ {t.name}
-              </button>
-            ))
-          )}
-        </div>
+  function handleEnterPeacefulPlace(destination: PeacefulPlaceDestination) {
+    enterPeacefulPlace(destination);
+    setActiveDestination(destination);
+    setPlayer(null);
+    setOpenSign(null);
+  }
 
-        {/* Saved Links — a divider section inside the same card (no card-in-card) */}
-        <section className="mt-6 border-t border-[#e7dfd4] pt-5">
-          <p className="text-lg font-semibold text-[#1f1c19]">Saved Links</p>
-          <p className="mt-1 text-base text-[#6b635a]">
-            Your own playlists, recordings, or affirmations — saved here for next
-            time.
-          </p>
+  function enterSoundscape(soundscape: Soundscape) {
+    const destination = peacefulPlaceDestinationFromSoundscape(soundscape);
+    if (destination) {
+      handleEnterPeacefulPlace(destination);
+      return;
+    }
+    setActiveDestination(null);
+    setPlayer(soundscapePlaybackFrom(soundscape));
+    rememberAudioSelection("focus-audio", soundscape.mood, soundscape.id);
+    void import("@/lib/ecosystem/eventTrackingEngine").then(({ trackEcosystemEvent }) => {
+      trackEcosystemEvent({
+        eventType: "feature.focus_audio_started",
+        feature: "focus-audio",
+        metadata: {
+          categoryId: soundscape.mood,
+          trackId: soundscape.id,
+          playback: "in-app",
+          soundscape: true,
+          peacefulPlace: false,
+          peacefulPlacesDirectory: true,
+          estateSignpost: true,
+        },
+      });
+    });
+    setOpenSign(null);
+  }
 
-          {/* Grouped by "what does this help you do?" — never a flat list. */}
-          {savedLinks.length > 0 ? (
-            <div className="mt-3 flex flex-col gap-3">
-              {SAVED_AUDIO_CATEGORIES.map((cat) => {
-                const inCat = savedLinks.filter(
-                  (l) => (l.category ?? "other") === cat.id,
-                );
-                if (inCat.length === 0) return null;
-                return (
-                  <div key={cat.id}>
-                    <p className="flex items-center gap-2 text-sm font-semibold text-[#1f1c19]">
-                      <CompanionObjectVisual
-                        objectId={AUDIO_SAVED_CATEGORY_OBJECT_ID[cat.id] ?? "focus-audio"}
-                        size="xs"
-                        variant="icon"
-                      />
-                      {cat.name}
-                    </p>
-                    <div className="mt-1 flex flex-col gap-1.5">
-                      {inCat.map((l) => (
-                        <div key={l.id} className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => play(l)}
-                            className="flex-1 rounded-lg border border-[#1e4f4f]/25 bg-[#1e4f4f]/5 px-3 py-2 text-left text-base font-medium text-[#1e4f4f] hover:bg-[#1e4f4f]/10"
-                          >
-                            ▶ {l.name}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              deleteAudioLink(l.id);
-                              refresh();
-                            }}
-                            title="Remove"
-                            aria-label={`Remove ${l.name}`}
-                            className="shrink-0 rounded-md px-2 py-2 text-sm text-[#a85c4a] hover:bg-[#a85c4a]/10"
-                          >
-                            ✕
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <p className="mt-3 text-base text-[#6b635a]">
-              No saved links yet — add one below.
-            </p>
-          )}
+  function enterSaved(link: AudioLink) {
+    setActiveDestination(null);
+    setPlayer({
+      id: link.id,
+      label: link.name,
+      description: link.name,
+      environment: "Added by You",
+      playbackUrl: link.url,
+    });
+    rememberAudioSelection("focus-audio", link.category ?? "other", link.id);
+    setOpenSign(null);
+  }
 
-          <div className="mt-4 flex flex-col gap-2">
-            <input
-              value={myName}
-              onChange={(e) => setMyName(e.target.value)}
-              placeholder="Label — e.g. My focus playlist"
-              className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base outline-none focus:border-[#1e4f4f]"
-            />
-            <label className="text-sm font-semibold text-[#6b635a]">
-              What does this help you do?
-            </label>
-            <select
-              value={myCategory}
-              onChange={(e) => setMyCategory(e.target.value)}
-              className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-            >
-              {SAVED_AUDIO_CATEGORIES.map((cat) => (
-                <option key={cat.id} value={cat.id}>
-                  {cat.name}
-                </option>
-              ))}
-            </select>
-            <input
-              value={myUrl}
-              onChange={(e) => setMyUrl(e.target.value)}
-              placeholder="Paste link (YouTube, Spotify, etc.)"
-              className="rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base outline-none focus:border-[#1e4f4f]"
-            />
-            <button
-              type="button"
-              disabled={!myName.trim() || !myUrl.trim()}
-              onClick={() => {
-                addMyAudioLink(myName, myUrl, myCategory);
-                setMyName("");
-                setMyUrl("");
-                refresh();
-              }}
-              className="rounded-lg bg-[#1e4f4f] px-4 py-3 text-base font-semibold text-white enabled:hover:bg-[#163a3a] disabled:opacity-40"
-            >
-              Save link
-            </button>
-          </div>
-        </section>
+  async function saveCustomPlace() {
+    const name = myName.trim();
+    const urlInput = myUrl.trim();
+    if (!name || (!urlInput && !myFile)) return;
 
-        {/* How to add & play */}
+    setSavingMyPlace(true);
+    setUploadError(null);
+
+    try {
+      const url = myFile ? await readMyPlaceAudioFile(myFile) : urlInput;
+      if (editingId) {
+        updateAudioLink(editingId, { name, url, category: "other" });
+        setEditingId(null);
+      } else {
+        addMyAudioLink(name, url, "other");
+      }
+      resetMyPlacesForm();
+      refresh();
+    } catch (error) {
+      setUploadError(error instanceof Error ? error.message : "Could not save that audio.");
+      setSavingMyPlace(false);
+    }
+  }
+
+  function handleMyPlaceFileChange(file: File | null) {
+    setMyFile(file);
+    setMyFileName(file?.name ?? null);
+    setUploadError(null);
+    if (file && !myName.trim()) {
+      setMyName(file.name.replace(/\.[^.]+$/, "").replace(/[-_]+/g, " ").trim());
+    }
+  }
+
+  function renderDestinationMenu(moodId: EstateSignId) {
+    if (moodId === "my-places") return null;
+    const items = soundscapesForMood(moodId);
+    return (
+      <HangingDestinationMenu
+        items={items.map((soundscape) => ({
+          id: soundscape.id,
+          name: peacefulPlaceDisplayName(soundscape.destinationName),
+        }))}
+        onSelect={(id) => {
+          const soundscape = soundscapeById(id);
+          if (soundscape) enterSoundscape(soundscape);
+        }}
+      />
+    );
+  }
+
+  function renderSignMenu(signId: EstateSignId) {
+    if (signId === "my-places") {
+      return (
+        <MyPlacesEstatePanel
+          savedLinks={savedLinks}
+          myName={myName}
+          myUrl={myUrl}
+          myFileName={myFileName}
+          uploadError={uploadError}
+          saving={savingMyPlace}
+          editingId={editingId}
+          onNameChange={setMyName}
+          onUrlChange={setMyUrl}
+          onFileChange={handleMyPlaceFileChange}
+          onSave={() => void saveCustomPlace()}
+          onSelectSaved={enterSaved}
+        />
+      );
+    }
+    return renderDestinationMenu(signId);
+  }
+
+  const signpostLayer = (
+    <PeacefulPlacesSignpostPortal>
+      {openSign ? (
         <button
           type="button"
-          onClick={() => setHowToOpen((v) => !v)}
-          className="mt-5 text-sm font-semibold text-[#1e4f4f]"
-        >
-          {howToOpen ? "▾" : "▸"} How to add & play your own
-        </button>
-        {howToOpen && (
-          <div className="mt-2 rounded-lg bg-[#faf6f0]/80 p-4 text-base text-[#4b463f]">
-            <ol className="list-decimal space-y-1 pl-5">
-              <li>
-                Open YouTube, Spotify, or wherever you listen, and copy the link
-                to a track or playlist.
-              </li>
-              <li>Paste it under Saved Links with a name, then tap Save link.</li>
-              <li>
-                Tap any track or ▶ Play to start — it opens in a new tab and
-                keeps playing while you work here.
-              </li>
-            </ol>
-            <p className="mt-2 text-sm text-[#6b635a]">
-              Tip: any earbuds or headphones work — the sound type matters more
-              than the brand.
-            </p>
-          </div>
-        )}
-        <div className="mt-6">
-          <button
-            type="button"
-            onClick={() => onDone?.()}
-            className="rounded-xl border-2 border-[#1e4f4f] bg-white px-8 py-3 text-lg font-semibold text-[#1e4f4f]"
+          className="peaceful-places-pathway-scene__backdrop peaceful-places-pathway-scene__backdrop--open"
+          aria-label="Close open signs"
+          tabIndex={-1}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setOpenSign(null);
+          }}
+        />
+      ) : null}
+      <PathwayPhotoSignsLayer ref={signpostsRef}>
+        {PATHWAY_SIGNS.map((sign) => (
+          <PathwayPhotoSign
+            key={sign.id}
+            id={sign.id}
+            label={sign.label}
+            anchor={PATHWAY_SIGN_ANCHORS[sign.id]}
+            open={openSign === sign.id}
+            onToggle={() => toggleSign(sign.id)}
           >
-            Back
-          </button>
-        </div>
-    </SceneRenderer>
+            {renderSignMenu(sign.id)}
+          </PathwayPhotoSign>
+        ))}
+      </PathwayPhotoSignsLayer>
+    </PeacefulPlacesSignpostPortal>
+  );
+
+  return (
+    <>
+      {!activeDestination ? (
+        <PeacefulPlacesLandingShell bakedInTitle>
+          <div
+            className="peaceful-places-pathway-scene peaceful-places-pathway-scene--photo-signs"
+            data-sign-open={openSign ?? undefined}
+          >
+            {signpostLayer}
+            <div ref={sceneRef} className="peaceful-places-pathway-scene__chrome">
+              {onDone ? (
+                <div className="peaceful-places-pathway-scene__leave">
+                  <button type="button" onClick={() => onDone()} className="peaceful-places-pathway-scene__leave-btn">
+                    Leave the pathway
+                  </button>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </PeacefulPlacesLandingShell>
+      ) : null}
+
+      <FocusAudioPlayerModal playback={player} onClose={() => setPlayer(null)} />
+
+      {activeDestination ? (
+        <PeacefulPlaceSession
+          destination={activeDestination}
+          onLeave={() => setActiveDestination(null)}
+        />
+      ) : null}
+    </>
   );
 }

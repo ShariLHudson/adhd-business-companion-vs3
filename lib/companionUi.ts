@@ -40,31 +40,54 @@ export type AppSection =
   | "confidence-vault"
   | "my-journey"
   | "welcome-room"
-  | "life-experience";
+  | "life-experience"
+  | "the-gallery";
 
 export type SidebarNavId =
   | "chat"
+  | "clear-my-mind"
+  | "plan-my-day"
   | "focus"
+  | "todays-reality"
   | "visual-thinking"
-  | "other"
   | "create"
-  | "tools"
-  | "progress"
-  | "projects"
-  | "templates"
-  | "snippets"
-  | "saved-work"
-  | "my-work"
-  | "playbook"
-  | "client-avatars"
-  | "settings"
   | "how-do-i"
-  | "wins-this-week"
-  | "evidence-bank"
+  | "playbook"
   | "growth"
+  | "journal"
+  | "portfolio"
+  | "evidence-bank"
   | "confidence-vault"
-  | "my-journey"
-  | "welcome-room";
+  | "welcome-room"
+  | "fire-pit"
+  | "butterfly-conservatory"
+  | "rain-porch"
+  | "pool"
+  | "deck-balcony"
+  /** @deprecated Use create / other group items */
+  | "other"
+  /** @deprecated */
+  | "tools"
+  /** @deprecated */
+  | "progress"
+  /** @deprecated */
+  | "projects"
+  /** @deprecated */
+  | "templates"
+  /** @deprecated */
+  | "snippets"
+  /** @deprecated */
+  | "saved-work"
+  /** @deprecated */
+  | "my-work"
+  /** @deprecated */
+  | "client-avatars"
+  /** @deprecated */
+  | "settings"
+  /** @deprecated */
+  | "wins-this-week"
+  /** @deprecated */
+  | "my-journey";
 
 export type SidebarToolId =
   | "voice"
@@ -92,21 +115,13 @@ export const BRAND = {
   tagline: "Your Coach & Companion",
 } as const;
 
-// Seven sidebar doors — ends with Welcome Room.
+// Primary sidebar doors — see lib/companionPropertyNav.ts for grouped layout.
 export const SIDEBAR_NAV: {
   id: SidebarNavId;
   label: string;
   objectId: string;
   mode?: CoachingMode;
-}[] = [
-  { id: "chat", label: "Chat", objectId: "messages", mode: "today" },
-  { id: "focus", label: "Focus My Brain", objectId: "focus-my-brain", mode: "focus" },
-  { id: "visual-thinking", label: "Visual Thinking", objectId: "visual-thinking" },
-  { id: "growth", label: "Growth", objectId: "growth" },
-  { id: "other", label: "Other", objectId: "other-tools" },
-  { id: "how-do-i", label: "How Do I...?", objectId: "help" },
-  { id: "welcome-room", label: "Welcome Room", objectId: "welcome-room" },
-];
+}[] = [];
 
 /** @deprecated More menu hidden — settings via profile / overlays only. */
 export const MORE_NAV: {
@@ -119,18 +134,26 @@ export const MORE_NAV: {
 // Top-level nav items that open their own section (a panel) rather than
 // switching the chat into a coaching mode.
 export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
+  chat: "home",
+  "clear-my-mind": "brain-dump",
+  "plan-my-day": "plan-my-day",
   focus: "focus",
+  "todays-reality": "energy",
   "visual-thinking": "visual-focus",
-  growth: "growth",
-  other: "my-work",
   create: "content-generator",
+  "how-do-i": "how-do-i",
+  playbook: "playbook",
+  growth: "the-gallery",
+  "evidence-bank": "evidence-bank",
+  "confidence-vault": "confidence-vault",
+  "welcome-room": "welcome-room",
+  other: "my-work",
   "my-work": "my-work",
   projects: "projects",
   templates: "templates-library",
   snippets: "snippets",
-  playbook: "playbook",
-  "how-do-i": "how-do-i",
-  "welcome-room": "welcome-room",
+  "wins-this-week": "wins-this-week",
+  "my-journey": "my-journey",
 };
 
 /** Map legacy or sub-area nav ids to a primary sidebar door. */
@@ -140,16 +163,15 @@ export function normalizeSidebarNav(nav: SidebarNavId): SidebarNavId {
     nav === "projects" ||
     nav === "templates" ||
     nav === "snippets" ||
-    nav === "saved-work" ||
-    nav === "playbook"
+    nav === "saved-work"
   ) {
     return "other";
   }
   if (
     nav === "wins-this-week" ||
-    nav === "evidence-bank" ||
-    nav === "confidence-vault" ||
-    nav === "my-journey"
+    nav === "my-journey" ||
+    nav === "journal" ||
+    nav === "portfolio"
   ) {
     return "growth";
   }
@@ -160,15 +182,23 @@ export function normalizeSidebarNav(nav: SidebarNavId): SidebarNavId {
 export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
   switch (section) {
     case "my-work":
-    case "content-generator":
     case "projects":
     case "templates-library":
     case "snippets":
     case "saved-work":
-    case "playbook":
       return "other";
+    case "content-generator":
+      return "create";
+    case "playbook":
+      return "playbook";
     case "visual-focus":
       return "visual-thinking";
+    case "brain-dump":
+      return "clear-my-mind";
+    case "plan-my-day":
+      return "plan-my-day";
+    case "energy":
+      return "todays-reality";
     case "focus":
     case "focus-timer":
     case "breathe":
@@ -178,10 +208,13 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "spin-wheel":
     case "games":
       return "focus";
-    case "growth":
-    case "wins-this-week":
+    case "the-gallery":
+      return "growth";
     case "evidence-bank":
+      return "evidence-bank";
     case "confidence-vault":
+      return "confidence-vault";
+    case "wins-this-week":
     case "my-journey":
     case "life-experience":
       return "growth";
@@ -252,7 +285,7 @@ export const FOCUS_MENU: MenuNode[] = [
       {
         kind: "leaf",
         id: "focus-audio",
-        label: "Focus Audio",
+        label: "Peaceful Places",
         objectId: "focus-audio",
         tool: "focus-audio",
       },

@@ -3,7 +3,7 @@ import { detectAudioRequest, isRhetoricalSoundUsage } from "./audioSuggestions";
 import { detectStandaloneToolRequest } from "./standaloneToolRouting";
 import { detectAudioIntent } from "./workspaceMode";
 
-describe("detectAudioRequest — rhetorical sound (no Focus Audio)", () => {
+describe("detectAudioRequest — rhetorical sound (no Soundscapes)", () => {
   it.each([
     "I don't want it to sound like a tool",
     "I don't want it to sound like a tool, planner, or ecosystem",
@@ -20,9 +20,10 @@ describe("detectAudioRequest — rhetorical sound (no Focus Audio)", () => {
   });
 });
 
-describe("detectAudioRequest — allowed Focus Audio triggers", () => {
+describe("detectAudioRequest — allowed Soundscapes triggers", () => {
   it.each([
     "Open focus audio",
+    "Open soundscapes",
     "Play brown noise",
     "I need music to focus",
     "focus music please",
@@ -39,39 +40,39 @@ describe("detectAudioRequest — allowed Focus Audio triggers", () => {
   it("treats energize requests as audio even without the word music", () => {
     const req = detectAudioRequest("I need something to energize me");
     expect(req.isAudio).toBe(true);
-    expect(req.categoryId).toBe("motivation-boost");
+    expect(req.categoryId).toBe("energize");
   });
 
   it("routes explicit music requests", () => {
     expect(detectAudioRequest("I need music").isAudio).toBe(true);
   });
 
-  it("routes calm requests to calm-brain", () => {
+  it("routes calm requests to calming soundscapes", () => {
     expect(detectAudioRequest("something calm to listen to").categoryId).toBe(
-      "calm-brain",
+      "calming",
     );
   });
 
   it("routes calming audio without extra words", () => {
     const req = detectAudioRequest("calming audio");
     expect(req.isAudio).toBe(true);
-    expect(req.categoryId).toBe("calm-brain");
+    expect(req.categoryId).toBe("calming");
   });
 
-  it("does not route I need to calm down to Focus Audio", () => {
+  it("does not route I need to calm down to Soundscapes", () => {
     expect(detectAudioRequest("I need to calm down").isAudio).toBe(false);
     expect(detectAudioIntent("I need to calm down")).toBeNull();
   });
 
-  it("routes motivation requests to motivation-boost", () => {
+  it("routes motivation requests to energize soundscapes", () => {
     const req = detectAudioRequest("I need motivation");
     expect(req.isAudio).toBe(true);
-    expect(req.categoryId).toBe("motivation-boost");
+    expect(req.categoryId).toBe("energize");
   });
 
   it("routes motivational audio phrasing", () => {
     const req = detectAudioRequest("play something motivational");
     expect(req.isAudio).toBe(true);
-    expect(req.categoryId).toBe("motivation-boost");
+    expect(req.categoryId).toBe("energize");
   });
 });

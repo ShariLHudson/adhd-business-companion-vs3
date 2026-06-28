@@ -22,10 +22,13 @@ export const NAV_PROJECTS = "Projects";
 export const NAV_CHAT = "Chat";
 export const NAV_LIFE_EXPERIENCE = "Life Experience Room";
 
+export const NAV_THE_GALLERY = "The Gallery";
+
 /** Full-page rooms that render their own back-to-chat control. */
 export const SECTIONS_WITH_EMBEDDED_CHAT_BACK: readonly AppSection[] = [
   "brain-dump",
   "life-experience",
+  "the-gallery",
   "plan-my-day",
 ] as const;
 
@@ -41,6 +44,7 @@ const TRADEMARK_SECTION_TITLES: Partial<Record<AppSection, string>> = {
   focus: NAV_FOCUS_MY_BRAIN,
   projects: NAV_PROJECTS,
   "life-experience": NAV_LIFE_EXPERIENCE,
+  "the-gallery": NAV_THE_GALLERY,
 };
 
 /**

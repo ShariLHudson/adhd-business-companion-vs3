@@ -10,6 +10,13 @@ import { CompanionSidebarPortal } from "@/components/companion/CompanionSidebarP
 import { CompanionUrlNavigation } from "@/components/companion/CompanionUrlNavigation";
 import { AdjustMyDayPanel } from "@/components/companion/AdjustMyDayPanel";
 import { BrainDumpPanel } from "@/components/companion/BrainDumpPanel";
+import { propertyNavComingSoonMessage } from "@/lib/companionPropertyNav";
+import {
+  GALLERY_HOME_SECTION,
+  isLegacyGrowthHubSection,
+  sidebarNavForGrowthDestination,
+} from "@/lib/gallery";
+import { GalleryExperiencePanel } from "@/components/companion/GalleryExperiencePanel";
 import { LifeExperienceRoomPanel } from "@/components/companion/LifeExperienceRoomPanel";
 import { DecisionCompassWorkspace } from "@/components/companion/DecisionCompassWorkspace";
 import { BreathePanel } from "@/components/companion/BreathePanel";
@@ -31,6 +38,7 @@ import {
 import { CrossWorkspaceSuggestionCard } from "@/components/companion/CrossWorkspaceSuggestionCard";
 import { SpinWheelPanel } from "@/components/companion/SpinWheelPanel";
 import { GamesPanel } from "@/components/companion/GamesPanel";
+import { MomentumGamesRoomShell } from "@/components/companion/MomentumGamesRoomShell";
 import { FocusAudioPanel } from "@/components/companion/FocusAudioPanel";
 import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
 import { IdentityBar } from "@/components/companion/IdentityBar";
@@ -69,7 +77,7 @@ const VisualFocusWorkspacePanel = dynamic(
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { WinsThisWeekPanel } from "@/components/companion/WinsThisWeekPanel";
 import { EvidenceBankPanel } from "@/components/companion/EvidenceBankPanel";
-import { GrowthCenterPanel } from "@/components/companion/GrowthCenterPanel";
+import { GrowthHubGalleryRedirect } from "@/components/companion/GrowthHubGalleryRedirect";
 import { ConfidenceVaultPanel } from "@/components/companion/ConfidenceVaultPanel";
 import { MyJourneyPanel } from "@/components/companion/MyJourneyPanel";
 import type { HomeResumeItem } from "@/lib/homeResumeItem";
@@ -5601,7 +5609,17 @@ export default function CompanionPageClient() {
       current,
       onBack: goBack,
       backLabel: workspacePanelBackLabel,
-      onOpenSection: (section) => openSectionBesideChatCore(section, "growth"),
+      onOpenSection: (section) => {
+        if (section === "growth") {
+          openNavSectionDirectCore(GALLERY_HOME_SECTION, "growth");
+          return;
+        }
+        openSectionBesideChatCore(
+          section,
+          sidebarNavForGrowthDestination(section),
+          { userInitiated: true },
+        );
+      },
     };
   }
 
@@ -5784,6 +5802,10 @@ export default function CompanionPageClient() {
     }
     if (isPlanMyDaySection(section)) {
       openPlanMyDayCore();
+      return;
+    }
+    if (isLegacyGrowthHubSection(section)) {
+      openNavSectionDirectCore(GALLERY_HOME_SECTION, nav ?? "growth");
       return;
     }
     if (section === "content-generator") {
@@ -6616,6 +6638,46 @@ export default function CompanionPageClient() {
 
   function handleNavSelectCore(nav: SidebarNavId, mode?: CoachingMode) {
     const normalizedNav = normalizeSidebarNav(nav);
+
+    const comingSoon = propertyNavComingSoonMessage(nav);
+    if (comingSoon) {
+      setWorkspaceContextBanner(comingSoon);
+      return;
+    }
+
+    if (nav === "clear-my-mind") {
+      openClearMyMindCore();
+      return;
+    }
+
+    if (nav === "plan-my-day") {
+      openPlanMyDayCore();
+      return;
+    }
+
+    if (nav === "todays-reality") {
+      openAdaptMyDayCore();
+      return;
+    }
+
+    if (nav === "growth") {
+      openNavSectionDirectCore(GALLERY_HOME_SECTION, "growth");
+      return;
+    }
+
+    if (nav === "evidence-bank") {
+      openSectionBesideChatCore("evidence-bank", "evidence-bank", {
+        userInitiated: true,
+      });
+      return;
+    }
+
+    if (nav === "confidence-vault") {
+      openSectionBesideChatCore("confidence-vault", "confidence-vault", {
+        userInitiated: true,
+      });
+      return;
+    }
 
     if (normalizedNav === "chat") {
       navigateToChatCore();
@@ -13388,11 +13450,15 @@ export default function CompanionPageClient() {
             nav={buildGrowthPanelNav("wins-this-week")}
             onSaveToEvidenceBank={(whatHappened, sourceWinId) => {
               setEvidencePrefill({ whatHappened, sourceWinId });
-              openSectionBesideChatCore("evidence-bank", "growth");
+              openSectionBesideChatCore("evidence-bank", "evidence-bank", {
+                userInitiated: true,
+              });
             }}
             onSaveEvidence={(text, sourceId) => {
               setEvidencePrefill({ whatHappened: text, sourceWinId: sourceId });
-              openSectionBesideChatCore("evidence-bank", "growth");
+              openSectionBesideChatCore("evidence-bank", "evidence-bank", {
+                userInitiated: true,
+              });
             }}
             onSaveProof={(text) => {
               setConfidencePrefill({
@@ -13400,14 +13466,18 @@ export default function CompanionPageClient() {
                 description: text,
                 category: "Praise & Compliments",
               });
-              openSectionBesideChatCore("confidence-vault", "growth");
+              openSectionBesideChatCore("confidence-vault", "confidence-vault", {
+                userInitiated: true,
+              });
             }}
             onSaveJourney={(text) => {
               setJourneyPrefill({
                 title: text.slice(0, 80),
                 whatHappened: text,
               });
-              openSectionBesideChatCore("my-journey", "growth");
+              openSectionBesideChatCore("my-journey", "growth", {
+                userInitiated: true,
+              });
             }}
           />
         );
@@ -13422,10 +13492,8 @@ export default function CompanionPageClient() {
         return <FocusAreaPanel onAction={handleFocusHubAction} />;
       case "growth":
         return (
-          <GrowthCenterPanel
-            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
-            nav={buildGrowthPanelNav("growth")}
-            onOpenLifeExperienceRoom={openLifeExperienceRoomCore}
+          <GrowthHubGalleryRedirect
+            onOpen={() => openNavSectionDirectCore(GALLERY_HOME_SECTION, "growth")}
           />
         );
       case "confidence-vault":
@@ -14370,8 +14438,16 @@ export default function CompanionPageClient() {
             ? "pl-0 companion-arrival-immersion"
             : workspacePanel === "welcome-room"
               ? "pl-0"
+              : activeSection === "the-gallery"
+                ? "pl-0 companion-gallery-active"
               : activeSection === "plan-my-day"
                 ? "pl-0 companion-plan-my-day-active"
+              : activeSection === "brain-dump"
+                ? "pl-0 companion-clear-my-mind-active"
+              : activeSection === "focus-audio"
+                ? "pl-0 companion-peaceful-places-active"
+              : activeSection === "games"
+                ? "pl-0 companion-momentum-games-active"
               : activeSection === "focus" &&
                   (activitySession.phase === "browse" ||
                     !activitySession.activityId ||
@@ -14381,7 +14457,15 @@ export default function CompanionPageClient() {
         } ${homeCalm ? "companion-home-calm" : ""} ${
           workspacePanel === "welcome-room" ? "companion-welcome-room-active" : ""
         } ${
+          activeSection === "the-gallery" ? "companion-gallery-active" : ""
+        } ${
           activeSection === "plan-my-day" ? "companion-plan-my-day-active" : ""
+        } ${
+          activeSection === "brain-dump" ? "companion-clear-my-mind-active" : ""
+        } ${
+          activeSection === "focus-audio" ? "companion-peaceful-places-active" : ""
+        } ${
+          activeSection === "games" ? "companion-momentum-games-active" : ""
         } ${
           activeSection === "focus" &&
           (activitySession.phase === "browse" ||
@@ -14415,14 +14499,15 @@ export default function CompanionPageClient() {
               overlay === "signin" ||
               overlay === "settings" ||
               workspacePanel === "welcome-room" ||
-              activeSection === "plan-my-day"
+              activeSection === "plan-my-day" ||
+              activeSection === "focus-audio"
             }
           />
           <TopBar
             calmHome={homeCalm}
             navVisibility={arrivalNavVisibility}
             onOpenClearMyMind={openClearMyMindCore}
-            onOpenAdaptMyDay={openAdaptMyDayCore}
+            onOpenFocusMyBrain={() => openStandaloneFocusSectionCore("focus")}
             onRequestNewConversation={handleStartCleanConversation}
             onRequestNewDayConversation={handleStartNewDayConversation}
             onOpenWelcomeRoom={() => openWelcomeRoom()}
@@ -15103,7 +15188,10 @@ export default function CompanionPageClient() {
               className={
                 activeSection === "brain-dump" ||
                 activeSection === "life-experience" ||
+                activeSection === "the-gallery" ||
                 activeSection === "plan-my-day" ||
+                activeSection === "focus-audio" ||
+                activeSection === "games" ||
                 (activeSection === "focus" &&
                   (activitySession.phase === "browse" ||
                     !activitySession.activityId ||
@@ -15115,7 +15203,10 @@ export default function CompanionPageClient() {
               title={
                 activeSection === "brain-dump" ||
                 activeSection === "life-experience" ||
+                activeSection === "the-gallery" ||
                 activeSection === "plan-my-day" ||
+                activeSection === "focus-audio" ||
+                activeSection === "games" ||
                 (activeSection === "focus" &&
                   (activitySession.phase === "browse" ||
                     !activitySession.activityId ||
@@ -15126,7 +15217,10 @@ export default function CompanionPageClient() {
               onClick={
                 activeSection === "brain-dump" ||
                 activeSection === "life-experience" ||
+                activeSection === "the-gallery" ||
                 activeSection === "plan-my-day" ||
+                activeSection === "focus-audio" ||
+                activeSection === "games" ||
                 (activeSection === "focus" &&
                   (activitySession.phase === "browse" ||
                     !activitySession.activityId ||
@@ -15141,7 +15235,10 @@ export default function CompanionPageClient() {
                 className={
                   activeSection === "brain-dump" ||
                   activeSection === "life-experience" ||
+                  activeSection === "the-gallery" ||
                   activeSection === "plan-my-day" ||
+                  activeSection === "focus-audio" ||
+                  activeSection === "games" ||
                   (activeSection === "focus" &&
                     (activitySession.phase === "browse" ||
                       !activitySession.activityId ||
@@ -15182,6 +15279,15 @@ export default function CompanionPageClient() {
 
           {activeSection === "life-experience" && (
             <LifeExperienceRoomPanel onBackToChat={navigateToChatCore} />
+          )}
+
+          {activeSection === "the-gallery" && (
+            <GalleryExperiencePanel
+              onBackToChat={navigateToChatCore}
+              onOpenSection={(section, nav) =>
+                openSectionBesideChatCore(section, nav, { userInitiated: true })
+              }
+            />
           )}
 
           {activeSection === "plan-my-day" && (
@@ -15288,9 +15394,11 @@ export default function CompanionPageClient() {
           )}
 
           {activeSection === "games" && (
-            <GamesPanel
-              onOpenSpinWheel={() => openStandaloneFocusSectionCore("spin-wheel")}
-            />
+            <MomentumGamesRoomShell>
+              <GamesPanel
+                onOpenSpinWheel={() => openStandaloneFocusSectionCore("spin-wheel")}
+              />
+            </MomentumGamesRoomShell>
           )}
 
           {activeSection === "business-profile" && (

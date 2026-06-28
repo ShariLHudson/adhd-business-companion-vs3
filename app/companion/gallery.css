@@ -1,0 +1,902 @@
+
+/* ── The Gallery™ — conservatory hallway walk ───────────────────────── */
+
+.gallery {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow: hidden;
+  background: #1a1510;
+  opacity: 0;
+  transition: opacity var(--gallery-enter-ms, 1200ms) ease;
+}
+
+.gallery--entered {
+  opacity: 1;
+}
+
+.gallery__camera-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #ebe4d8;
+}
+
+.gallery__camera-rig {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: scale(1.65);
+  transform-origin: 50% 55%;
+  backface-visibility: hidden;
+}
+
+.gallery__hallway-plate {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 240%;
+  will-change: transform;
+  backface-visibility: hidden;
+  transform: translate3d(0, 0, 0);
+  transform-origin: left center;
+}
+
+.gallery__hallway {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 54% 50%;
+  pointer-events: none;
+  user-select: none;
+}
+
+.gallery__wall-memories {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity 280ms ease;
+}
+
+.gallery__wall-memories--fading {
+  opacity: 0;
+}
+
+.gallery__wall-memory {
+  position: absolute;
+  width: clamp(4.5rem, 9vw, 7.5rem);
+  transform: translate(-50%, 0) perspective(900px) rotateY(var(--memory-tilt, 0deg));
+  transform-origin: center bottom;
+  filter: drop-shadow(0 6px 14px rgba(24, 16, 8, 0.28));
+  opacity: 0.94;
+}
+
+.gallery__wall-memory--left {
+  --memory-tilt: 7deg;
+}
+
+.gallery__wall-memory--right {
+  --memory-tilt: -7deg;
+}
+
+.gallery__wall-memory-frame {
+  border: 3px solid #c9a84a;
+  border-radius: 2px;
+  background: linear-gradient(165deg, #f8f2e8 0%, #ebe2d2 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.45),
+    inset 0 -2px 6px rgba(120, 90, 40, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.18);
+  padding: 0.35rem;
+  min-height: 3.6rem;
+}
+
+.gallery__wall-memory-content {
+  padding: 0.2rem 0.15rem;
+  text-align: center;
+}
+
+.gallery__wall-memory-title {
+  margin: 0;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 0.52rem;
+  line-height: 1.25;
+  font-style: italic;
+  color: #4a3f32;
+}
+
+.gallery__wall-memory-body {
+  margin: 0.15rem 0 0;
+  font-size: 0.46rem;
+  line-height: 1.3;
+  color: #5c5044;
+}
+
+.gallery__wall-memory-subtitle {
+  margin: 0.2rem 0 0;
+  font-size: 0.42rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #8a7a66;
+}
+
+.gallery__wall-memory-plaque {
+  margin: 0.28rem 0 0;
+  text-align: center;
+  font-size: 0.44rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(74, 58, 32, 0.82);
+}
+
+.gallery__wall-memory-empty {
+  display: grid;
+  place-items: center;
+  min-height: 3.2rem;
+  border: 1px dashed rgba(120, 100, 70, 0.45);
+  background: rgba(255, 252, 245, 0.55);
+}
+
+.gallery__wall-memory-empty span {
+  font-size: 0.46rem;
+  font-style: italic;
+  color: #7a6a54;
+  text-align: center;
+  padding: 0.2rem;
+}
+
+.gallery__wall-memory-botanical {
+  min-height: 3.4rem;
+  border-radius: 1px;
+  background:
+    radial-gradient(circle at 30% 30%, rgba(180, 210, 160, 0.55), transparent 55%),
+    radial-gradient(circle at 70% 60%, rgba(140, 180, 120, 0.45), transparent 50%),
+    linear-gradient(180deg, #e8efe2 0%, #d4e2cc 100%);
+}
+
+.gallery__wall-memory-photo {
+  display: grid;
+  place-items: center;
+  min-height: 3.4rem;
+  background: linear-gradient(145deg, #efe6d8 0%, #ddd0bc 100%);
+}
+
+.gallery__wall-memory-photo-glyph {
+  font-size: 1rem;
+  color: rgba(90, 70, 40, 0.55);
+}
+
+.gallery__wall-memory-heading {
+  margin: 0 0 0.2rem;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #4a3a28;
+}
+
+.gallery__wall-memory-lesson .gallery__wall-memory-body {
+  font-style: italic;
+}
+
+.gallery__wall-memory-portfolio {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-height: 3.5rem;
+}
+
+.gallery__wall-memory-portfolio-mat {
+  flex: 1;
+  min-height: 2.4rem;
+  border-radius: 1px;
+  background: linear-gradient(145deg, #f5efe4 0%, #e8dcc8 48%, #d9c9ae 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+
+.gallery__wall-memory-portfolio-label {
+  margin: 0;
+  font-size: 0.44rem;
+  text-align: center;
+  color: #5c4e3c;
+}
+
+.gallery__wall-memory-impact-title {
+  margin: 0 0 0.2rem;
+  font-size: 0.48rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #4a3a28;
+}
+
+.gallery__wall-memory-impact .gallery__wall-memory-body {
+  font-style: italic;
+  font-size: 0.48rem;
+}
+
+.gallery__wall-memory-anniversary .gallery__wall-memory-body {
+  font-style: italic;
+}
+
+.gallery__wall-memory-flowers {
+  position: absolute;
+  left: -0.35rem;
+  bottom: -0.15rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 35% 35%, #f8b4c4, transparent 52%),
+    radial-gradient(circle at 65% 55%, #f4d89b, transparent 48%),
+    radial-gradient(circle at 50% 70%, #c8e6a8, transparent 50%);
+  filter: blur(0.2px);
+  opacity: 0.92;
+}
+
+.gallery__wall-memory--accent-quiet-rotate {
+  animation: gallery-memory-emerge 2.4s ease-out both;
+}
+
+@keyframes gallery-memory-emerge {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.94;
+  }
+}
+
+/* ── Demo Mode — journey scenes, not software chrome ── */
+
+.gallery__demo-panel {
+  position: absolute;
+  top: max(3.4rem, calc(env(safe-area-inset-top) + 2.6rem));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 7;
+  width: min(920px, calc(100vw - 1.5rem));
+  pointer-events: none;
+}
+
+.gallery__demo-kicker {
+  margin: 0;
+  text-align: center;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 248, 238, 0.72);
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
+.gallery__demo-mood {
+  margin: 0.25rem 0 0;
+  text-align: center;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: clamp(0.78rem, 1.8vw, 0.92rem);
+  font-style: italic;
+  color: rgba(255, 252, 245, 0.9);
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.4);
+}
+
+.gallery__demo-hint {
+  margin: 0.35rem 0 0.4rem;
+  text-align: center;
+  font-size: 0.68rem;
+  line-height: 1.45;
+  color: rgba(255, 248, 238, 0.82);
+}
+
+.gallery__demo-panel-actions {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 0.35rem;
+  pointer-events: auto;
+}
+
+.gallery__demo-help-btn {
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 9999px;
+  background: rgba(18, 14, 10, 0.38);
+  backdrop-filter: blur(8px);
+  padding: 0.22rem 0.7rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  color: rgba(255, 248, 238, 0.92);
+  cursor: pointer;
+}
+
+.gallery__demo-archive {
+  margin: 0.2rem 0 0.45rem;
+  text-align: center;
+  font-size: 0.58rem;
+  color: rgba(255, 248, 238, 0.58);
+}
+
+.gallery__demo-scene-rail {
+  display: flex;
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding-bottom: 0.15rem;
+  pointer-events: auto;
+  scrollbar-width: none;
+}
+
+.gallery__demo-scene-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.gallery__demo-scene-chip {
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 9999px;
+  background: rgba(18, 14, 10, 0.42);
+  backdrop-filter: blur(10px);
+  padding: 0.28rem 0.62rem 0.32rem;
+  cursor: pointer;
+  color: rgba(255, 248, 238, 0.88);
+  text-align: left;
+}
+
+.gallery__demo-scene-chip.is-active {
+  border-color: rgba(228, 198, 106, 0.65);
+  background: rgba(36, 28, 18, 0.62);
+}
+
+.gallery__demo-scene-chip-label {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+}
+
+.gallery__demo-scene-chip-period {
+  display: block;
+  margin-top: 0.05rem;
+  font-size: 0.52rem;
+  opacity: 0.72;
+}
+
+/* ── Demo guide card ── */
+
+.gallery__demo-guide {
+  position: absolute;
+  left: max(0.75rem, env(safe-area-inset-left));
+  bottom: max(5.5rem, calc(env(safe-area-inset-bottom) + 4.75rem));
+  z-index: 8;
+  width: min(18.5rem, calc(100vw - 1.5rem));
+  padding: 0.85rem 0.95rem 0.9rem;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  background: rgba(250, 247, 242, 0.88);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 10px 28px rgba(24, 16, 8, 0.22);
+  pointer-events: auto;
+}
+
+.gallery__demo-guide-kicker {
+  margin: 0;
+  font-size: 0.58rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a7a66;
+}
+
+.gallery__demo-guide-title {
+  margin: 0.35rem 0 0.55rem;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 1rem;
+  font-weight: 500;
+  color: #3d3228;
+}
+
+.gallery__demo-guide-steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.55rem;
+}
+
+.gallery__demo-guide-steps li {
+  display: grid;
+  gap: 0.12rem;
+}
+
+.gallery__demo-guide-step-title {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #4a3d30;
+}
+
+.gallery__demo-guide-step-body {
+  font-size: 0.68rem;
+  line-height: 1.45;
+  color: #5c5044;
+}
+
+.gallery__demo-guide-dismiss {
+  margin-top: 0.7rem;
+  width: 100%;
+  border: none;
+  border-radius: 9999px;
+  padding: 0.45rem 0.75rem;
+  background: #3d5a4c;
+  color: #f8f5ef;
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.gallery__light-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 248, 235, 0.08) 0%,
+    transparent 42%,
+    rgba(255, 255, 255, 0.02) 100%
+  );
+}
+
+/* Soft oak blend over baked center rug — uninterrupted aisle */
+.gallery__aisle-floor {
+  position: absolute;
+  left: 27%;
+  bottom: 9%;
+  width: 32%;
+  height: 20%;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 88% 72% at 50% 58%,
+    rgba(196, 178, 150, 0.94) 0%,
+    rgba(202, 186, 158, 0.62) 52%,
+    transparent 100%
+  );
+  filter: blur(1.5px);
+}
+
+.gallery__lamp-fixes {
+  display: none;
+}
+
+/* Fixed viewport veils — hide baked PNG chrome without visible patch cards */
+.gallery__chrome-veil {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.gallery__chrome-veil--top {
+  top: 0;
+  height: 10.5%;
+  background: linear-gradient(
+    180deg,
+    rgba(241, 235, 226, 0.98) 0%,
+    rgba(241, 235, 226, 0.72) 48%,
+    transparent 100%
+  );
+}
+
+.gallery__chrome-veil--bottom {
+  bottom: 0;
+  height: 11.5%;
+  background: linear-gradient(
+    0deg,
+    rgba(180, 164, 142, 1) 0%,
+    rgba(192, 178, 156, 0.92) 38%,
+    rgba(204, 191, 169, 0.5) 72%,
+    transparent 100%
+  );
+}
+
+.gallery__ui-veil {
+  position: absolute;
+  left: 0;
+  right: 0;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.gallery__ui-veil--top {
+  display: none;
+}
+
+.gallery--golden-hour .gallery__light-wash {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 220, 170, 0.12) 0%,
+    transparent 45%,
+    rgba(120, 80, 40, 0.04) 100%
+  );
+}
+
+.gallery--evening .gallery__light-wash,
+.gallery--night .gallery__light-wash {
+  background: linear-gradient(
+    180deg,
+    rgba(80, 70, 120, 0.1) 0%,
+    transparent 50%,
+    rgba(20, 18, 30, 0.08) 100%
+  );
+}
+
+/* Elegant inscription — single title, no duplicate baked chrome */
+.gallery__inscription {
+  position: absolute;
+  top: max(92px, calc(env(safe-area-inset-top) + 66px));
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 6;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  font-family: var(--font-serif, Georgia, "Times New Roman", serif);
+  font-size: clamp(1rem, 2.15vw, 1.22rem);
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  color: rgba(255, 252, 248, 0.97);
+  text-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.45),
+    0 2px 14px rgba(0, 0, 0, 0.55),
+    0 0 24px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.gallery__inscription--foyer {
+  position: relative;
+  top: auto;
+  left: auto;
+  transform: none;
+  color: rgba(255, 250, 240, 0.92);
+  font-size: clamp(0.85rem, 2vw, 1rem);
+}
+
+.gallery__header {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 7;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: 0.5rem;
+  padding: max(0.65rem, env(safe-area-inset-top)) 0.75rem 0.25rem;
+  pointer-events: none;
+}
+
+.gallery__header > * {
+  pointer-events: auto;
+}
+
+.gallery__header-spacer {
+  min-height: 1px;
+}
+
+.gallery__back {
+  border: none;
+  background: rgba(24, 18, 14, 0.32);
+  backdrop-filter: blur(8px);
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 9999px;
+  color: rgba(255, 248, 240, 0.82);
+  cursor: pointer;
+  font-size: 0.88rem;
+  opacity: 0.85;
+}
+
+.gallery__back:hover {
+  opacity: 1;
+}
+
+.gallery__ambient-controls {
+  display: flex;
+  align-items: stretch;
+  gap: 0.4rem;
+  padding: 0.28rem 0.38rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(18, 14, 10, 0.52);
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.22);
+  opacity: 0.92;
+}
+
+.gallery__ambient-controls:hover {
+  opacity: 1;
+}
+
+.gallery__ambient-chip {
+  flex: 1 1 0;
+  min-width: 4.25rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 3px;
+  background: rgba(28, 22, 16, 0.38);
+  color: rgba(255, 252, 245, 0.94);
+  cursor: pointer;
+  font-family: var(--font-serif, Georgia, serif);
+  font-size: 0.58rem;
+  font-weight: 500;
+  font-style: normal;
+  letter-spacing: 0.06em;
+  text-transform: none;
+  padding: 0.36rem 0.45rem;
+  line-height: 1.15;
+  text-align: center;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  opacity: 1;
+}
+
+.gallery__ambient-chip.is-on {
+  background: rgba(255, 248, 240, 0.16);
+  border-color: rgba(255, 248, 240, 0.32);
+  color: #fff;
+}
+
+.gallery__ambient-chip:hover {
+  background: rgba(24, 18, 14, 0.52);
+}
+
+/* ── Brass plaque rail — architectural, not software ── */
+
+.gallery__plaque-rail {
+  position: absolute;
+  left: 50%;
+  bottom: max(22px, calc(env(safe-area-inset-bottom) + 6px));
+  transform: translateX(-50%);
+  z-index: 6;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  align-items: end;
+  gap: clamp(0.55rem, 1.5vw, 0.95rem);
+  width: min(900px, calc(100vw - 1.75rem));
+  padding: 0;
+  pointer-events: none;
+}
+
+.gallery__plaque-rail .gallery__brass-plaque {
+  pointer-events: auto;
+}
+
+.gallery__brass-plaque {
+  --plaque-rotate: 0deg;
+  --plaque-y: 0px;
+  position: relative;
+  width: 100%;
+  height: 2.35rem;
+  min-height: 2.35rem;
+  border: none;
+  border-radius: 6px;
+  padding: 0.44rem 0.48rem 0.48rem;
+  cursor: pointer;
+  background:
+    linear-gradient(
+      118deg,
+      rgba(255, 236, 180, 0.22) 0%,
+      transparent 38%
+    ),
+    linear-gradient(
+      165deg,
+      #e2c56a 0%,
+      #c9a84a 22%,
+      #a88432 48%,
+      #d4b85c 68%,
+      #967528 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 220, 0.55),
+    inset 0 -2px 5px rgba(60, 45, 20, 0.38),
+    inset 2px 0 3px rgba(255, 248, 220, 0.12),
+    inset -1px 0 2px rgba(60, 45, 20, 0.15),
+    0 4px 14px rgba(0, 0, 0, 0.28),
+    0 1px 0 rgba(255, 248, 220, 0.08);
+  transform: translateY(var(--plaque-y)) rotate(var(--plaque-rotate));
+  transform-origin: center bottom;
+  transition:
+    box-shadow 0.22s ease,
+    filter 0.22s ease,
+    transform 0.12s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.gallery__brass-plaque::before {
+  content: "";
+  position: absolute;
+  inset: 1px;
+  border-radius: 4px;
+  border: 1px solid rgba(92, 70, 16, 0.45);
+  pointer-events: none;
+}
+
+.gallery__brass-plaque::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 5px;
+  background: repeating-linear-gradient(
+    -12deg,
+    transparent 0,
+    transparent 2px,
+    rgba(255, 255, 255, 0.03) 2px,
+    rgba(255, 255, 255, 0.03) 3px
+  );
+  opacity: 0.55;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+.gallery__brass-plaque-engrave {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  font-family: var(--font-serif, Georgia, "Times New Roman", serif);
+  font-size: clamp(0.44rem, 0.95vw, 0.52rem);
+  font-weight: 600;
+  letter-spacing: 0.085em;
+  text-transform: uppercase;
+  line-height: 1.15;
+  text-align: center;
+  color: #3d2e14;
+  text-shadow:
+    0 1px 0 rgba(255, 248, 220, 0.35),
+    0 -1px 1px rgba(0, 0, 0, 0.28);
+  white-space: normal;
+  word-break: break-word;
+}
+
+.gallery__brass-plaque:hover {
+  filter: brightness(1.04);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 248, 220, 0.62),
+    inset 0 -2px 4px rgba(60, 45, 20, 0.32),
+    0 5px 16px rgba(0, 0, 0, 0.3),
+    0 0 18px rgba(255, 220, 150, 0.12);
+}
+
+.gallery__brass-plaque:active {
+  transform: translateY(calc(var(--plaque-y) + 1px)) rotate(var(--plaque-rotate));
+  box-shadow:
+    inset 0 2px 5px rgba(60, 45, 20, 0.4),
+    inset 0 1px 0 rgba(255, 248, 220, 0.25),
+    0 2px 8px rgba(0, 0, 0, 0.22);
+}
+
+.gallery__brass-plaque--craft-1::after {
+  opacity: 0.48;
+}
+
+/* ── Foyer ── */
+
+.gallery--foyer .gallery__hallway {
+  filter: blur(2.5px) brightness(0.68);
+  transform: scale(1.06);
+}
+
+.gallery--foyer-leaving .gallery__foyer {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gallery--foyer-leaving .gallery__hallway {
+  filter: none;
+  transform: none;
+  transition: filter var(--gallery-foyer-ms, 1400ms) ease;
+}
+
+.gallery__foyer {
+  position: absolute;
+  inset: 0;
+  z-index: 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem 1.25rem;
+  transition: opacity var(--gallery-foyer-ms, 1400ms) ease;
+}
+
+.gallery__foyer-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 70% 65% at 50% 48%,
+    rgba(32, 24, 18, 0.12) 0%,
+    rgba(18, 14, 10, 0.55) 100%
+  );
+  pointer-events: none;
+}
+
+.gallery__foyer .gallery__brass-plaque {
+  z-index: 1;
+  padding: 0.5rem 1rem 0.55rem;
+}
+
+.gallery__foyer .gallery__brass-plaque-engrave {
+  font-size: clamp(0.52rem, 1.2vw, 0.62rem);
+}
+
+/* ── Notices ── */
+
+.gallery__notice {
+  position: absolute;
+  left: 50%;
+  bottom: calc(52px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  z-index: 6;
+  max-width: min(20rem, 86vw);
+  padding: 0.5rem 0.8rem;
+  border-radius: 4px;
+  background: rgba(24, 18, 14, 0.48);
+  backdrop-filter: blur(8px);
+  color: rgba(255, 248, 240, 0.9);
+  font-size: 0.74rem;
+  line-height: 1.4;
+  text-align: center;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+.gallery__notice--whisper {
+  font-style: italic;
+  font-family: var(--font-serif, Georgia, serif);
+  border: 1px solid rgba(255, 248, 220, 0.08);
+}
+
+@media (max-width: 720px) {
+  .gallery__plaque-rail {
+    gap: 0.35rem;
+    bottom: max(10px, env(safe-area-inset-bottom));
+  }
+
+  .gallery__brass-plaque {
+    height: 2.1rem;
+    min-height: 2.1rem;
+    padding: 0.38rem 0.4rem 0.42rem;
+  }
+
+  .gallery__brass-plaque-engrave {
+    font-size: 0.44rem;
+    letter-spacing: 0.08em;
+  }
+
+  .gallery__ambient-chip {
+    min-width: 3.6rem;
+    padding: 0.3rem 0.38rem;
+    font-size: 0.52rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery__camera-rig,
+  .gallery__hallway {
+    will-change: auto;
+  }
+
+  .gallery__brass-plaque {
+    transition: none;
+  }
+}
+
+.companion-gallery-active .companion-sidebar-portal,
+.companion-gallery-active [data-companion-topbar],
+.companion-gallery-active .companion-homestead-logo,
+.companion-gallery-active .companion-active-workspace-bar {
+  display: none !important;
+  visibility: hidden;
+  pointer-events: none;
+}

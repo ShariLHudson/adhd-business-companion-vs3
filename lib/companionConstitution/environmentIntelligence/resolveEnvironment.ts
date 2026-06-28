@@ -18,6 +18,11 @@ import {
   LIFE_EXPERIENCE_LETTER_MAX_WIDTH,
   LIFE_EXPERIENCE_ROOM_BG,
 } from "@/lib/lifeExperienceRoom";
+import {
+  PEACEFUL_PLACES_DIRECTORY_MAX_WIDTH,
+  PEACEFUL_PLACES_DIRECTORY_MIN_WIDTH,
+  PEACEFUL_PLACES_PATHWAY_BG,
+} from "@/lib/peacefulPlaces/pathway";
 import type { AppSection } from "@/lib/companionUi";
 import { focusLandscapeSpace } from "@/lib/focusLandscape/spaceCatalog";
 import { spaceForFocusWorkspace } from "@/lib/focusLandscape/toolRouting";
@@ -40,6 +45,7 @@ const HOMESTEAD_WORKSPACES = new Set<SceneWorkspaceId>([
   "plan-my-day",
   "focus-hub",
   "focus-category",
+  "focus-audio",
 ]);
 
 const HOMESTEAD_SCENE_PAGES: Partial<Record<SceneWorkspaceId, ScenePage>> = {
@@ -49,6 +55,7 @@ const HOMESTEAD_SCENE_PAGES: Partial<Record<SceneWorkspaceId, ScenePage>> = {
   "plan-my-day": "today",
   "focus-hub": "focus",
   "focus-category": "focus",
+  "focus-audio": "recovery",
 };
 
 const PHOTO_SCENE_WORKSPACES: Record<string, ScenePage> = {
@@ -230,7 +237,20 @@ function resolveBackground(
         overlay: "rgba(255, 252, 245, 0.06)",
         objectPosition: "center center",
         fit: "cover-safe-crop",
-        dominanceCap: 0.94,
+        dominanceCap: 1,
+      };
+    }
+
+    if (workspaceId === "focus-audio") {
+      return {
+        mode: "photo-scene",
+        imageUrl: PEACEFUL_PLACES_PATHWAY_BG,
+        scenePage: "recovery",
+        seed: "peaceful-places-pathway",
+        overlay: "rgba(255, 252, 245, 0.04)",
+        objectPosition: "center center",
+        fit: "cover-safe-crop",
+        dominanceCap: 1,
       };
     }
 
@@ -371,6 +391,8 @@ export function resolveEnvironment(
     workspaceSize:
       workspaceId === "clear-my-mind" || workspaceId === "clear-my-mind-thoughts"
         ? `clamp(${CLEAR_MY_MIND_WORKSPACE_MIN_WIDTH}, 92vw, ${CLEAR_MY_MIND_WORKSPACE_MAX_WIDTH})`
+        : workspaceId === "focus-audio"
+          ? `clamp(${PEACEFUL_PLACES_DIRECTORY_MIN_WIDTH}, 92vw, ${PEACEFUL_PLACES_DIRECTORY_MAX_WIDTH})`
         : workspaceId === "life-experience-room"
           ? `clamp(26.25rem, 92vw, ${LIFE_EXPERIENCE_LETTER_MAX_WIDTH})`
           : workspaceId === "focus-hub" || workspaceId === "focus-category"
@@ -386,13 +408,15 @@ export function resolveEnvironment(
         workspaceId !== "clear-my-mind-thoughts" &&
         workspaceId !== "life-experience-room" &&
         workspaceId !== "focus-hub" &&
-        workspaceId !== "focus-category",
+        workspaceId !== "focus-category" &&
+        workspaceId !== "focus-audio",
       placement:
         workspaceId === "clear-my-mind" ||
         workspaceId === "clear-my-mind-thoughts" ||
         workspaceId === "life-experience-room" ||
         workspaceId === "focus-hub" ||
-        workspaceId === "focus-category"
+        workspaceId === "focus-category" ||
+        workspaceId === "focus-audio"
           ? "none"
           : homestead
             ? "edge-only"

@@ -4,6 +4,7 @@ import { workspaceTitle } from "./workspaceMode";
 /** Workspace panels that belong to the Growth Center family. */
 export const GROWTH_PANEL_SECTIONS: AppSection[] = [
   "growth",
+  "the-gallery",
   "wins-this-week",
   "evidence-bank",
   "confidence-vault",
@@ -37,9 +38,9 @@ export const GROWTH_SECTION_META: Record<
   { title: string; emoji: string; subtitle: string }
 > = {
   growth: {
-    emoji: "📈",
-    title: "Growth",
-    subtitle: "Outcome goals, wins, evidence, highlights, journey, and growth reports.",
+    emoji: "🖼",
+    title: "The Gallery",
+    subtitle: "A walk through your journey — memories on the walls, quiet steps ahead.",
   },
   "wins-this-week": {
     emoji: "🏆",
@@ -47,15 +48,16 @@ export const GROWTH_SECTION_META: Record<
     subtitle: "Recent progress and accomplishments.",
   },
   "evidence-bank": {
-    emoji: "📈",
+    emoji: "🛡",
     title: "Evidence Bank",
-    subtitle: "Proof of impact, improvements, progress, and problems solved.",
+    subtitle:
+      "Proof, wins, testimonials, screenshots, progress moments, and confidence reminders — things you may forget you accomplished.",
   },
   "confidence-vault": {
     emoji: "✨",
-    title: "My Highlights",
+    title: "Highlights",
     subtitle:
-      "Save accomplishments, recognition, praise, expertise, credentials, and meaningful moments you want to remember.",
+      "Milestones, celebrations, firsts, breakthroughs, and meaningful moments worth remembering.",
   },
   "my-journey": {
     emoji: "🌿",
@@ -70,7 +72,7 @@ export const GROWTH_CROSS_LINKS: {
 }[] = [
   { id: "wins-this-week", label: "Open Wins" },
   { id: "evidence-bank", label: "Open Evidence" },
-  { id: "confidence-vault", label: "Open My Highlights" },
+  { id: "confidence-vault", label: "Open Highlights" },
   { id: "my-journey", label: "Open Journey" },
 ];
 

@@ -31,6 +31,7 @@ const HOMESTEAD_SCENE_SECTIONS = new Set<AppSection>([
   "brain-dump",
   "plan-my-day",
   "focus",
+  "focus-audio",
 ]);
 
 export type CompanionPageRenderContext = CompanionRenderContext & {
@@ -95,15 +96,22 @@ function resolveGlobalBackgroundIntent(
     const isClearMyMind =
       input.activeSection === "brain-dump" ||
       input.workspacePanel === "brain-dump";
+    const isPeacefulPlaces =
+      input.activeSection === "focus-audio" ||
+      input.workspacePanel === "focus-audio";
     const scenePage: ScenePage = isClearMyMind
       ? "recovery"
-      : input.activeSection === "plan-my-day" ||
-          input.workspacePanel === "plan-my-day"
-        ? "today"
-        : "focus";
+      : isPeacefulPlaces
+        ? "recovery"
+        : input.activeSection === "plan-my-day" ||
+            input.workspacePanel === "plan-my-day"
+          ? "today"
+          : "focus";
     const sceneSeed = isClearMyMind
       ? "brain-dump"
-      : (input.workspacePanel ?? input.activeSection);
+      : isPeacefulPlaces
+        ? "peaceful-places-directory"
+        : (input.workspacePanel ?? input.activeSection);
     return {
       scenePage,
       sceneSeed,

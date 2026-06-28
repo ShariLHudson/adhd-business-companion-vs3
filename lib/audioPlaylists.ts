@@ -50,6 +50,7 @@ export type AudioPickerContext =
 export const MASTER_AUDIO_CATEGORIES: { id: string; name: string }[] = [
   { id: "deep-work", name: "Deep Work" },
   { id: "morning-focus", name: "Morning Focus" },
+  { id: "energetic", name: "Energetic" },
   { id: "motivation-boost", name: "Motivation Boost" },
   { id: "calm-brain", name: "Calm My Brain" },
   { id: "sleep-sounds", name: "Sleep Sounds" },
@@ -59,7 +60,14 @@ export const MASTER_AUDIO_CATEGORIES: { id: string; name: string }[] = [
 
 export const AUDIO_CATEGORY_PRESETS = {
   /** Focus work sessions — sprint, plan, Work With Shari */
-  focus: ["deep-work", "morning-focus", "motivation-boost", MY_AUDIO_PLAYLIST_ID, FAVORITES_PLAYLIST_ID],
+  focus: [
+    "deep-work",
+    "morning-focus",
+    "energetic",
+    "motivation-boost",
+    MY_AUDIO_PLAYLIST_ID,
+    FAVORITES_PLAYLIST_ID,
+  ],
   /** Recovery / Reset My Brain */
   calm: ["calm-brain", "sleep-sounds", MY_AUDIO_PLAYLIST_ID, FAVORITES_PLAYLIST_ID],
   all: MASTER_AUDIO_CATEGORIES.map((c) => c.id),
@@ -68,6 +76,7 @@ export const AUDIO_CATEGORY_PRESETS = {
 const DEFAULT_PLAYLISTS: AudioPlaylist[] = [
   { id: "deep-work", name: "Deep Work" },
   { id: "morning-focus", name: "Morning Focus" },
+  { id: "energetic", name: "Energetic" },
   { id: "calm-brain", name: "Calm My Brain" },
   { id: "sleep-sounds", name: "Sleep Sounds" },
   { id: "motivation-boost", name: "Motivation Boost" },
@@ -79,7 +88,7 @@ const DEFAULT_LINKS: AudioLink[] = [
     id: "dw-brown",
     playlistId: "deep-work",
     name: "Brown Noise",
-    url: "https://www.youtube.com/results?search_query=brown+noise+adhd+focus",
+    url: "https://www.youtube.com/watch?v=nMfPqeZjc2c",
   },
   {
     id: "dw-focus",
@@ -115,7 +124,7 @@ const DEFAULT_LINKS: AudioLink[] = [
     id: "cb-ambient",
     playlistId: "calm-brain",
     name: "Soft Ambient Calm",
-    url: "https://www.youtube.com/results?search_query=soft+ambient+calm+music",
+    url: "https://www.youtube.com/watch?v=lTRiuFIWV54",
   },
   {
     id: "ss-rain",
@@ -129,6 +138,24 @@ const DEFAULT_LINKS: AudioLink[] = [
     name: "Motivation Mix",
     url: "https://www.youtube.com/watch?v=KQ6zr6kCPj8",
   },
+  {
+    id: "en-happy-pop",
+    playlistId: "energetic",
+    name: "Upbeat Happy Energy",
+    url: "https://www.youtube.com/watch?v=atdm_5zcrts",
+  },
+  {
+    id: "en-festival",
+    playlistId: "energetic",
+    name: "Festival Energy Mix",
+    url: "https://www.youtube.com/watch?v=eLB2xOnJn_8",
+  },
+  {
+    id: "en-edm-power",
+    playlistId: "energetic",
+    name: "High-Energy EDM",
+    url: "https://www.youtube.com/watch?v=l4jWSjUHaxY",
+  },
 ];
 
 type AudioPreferences = {
@@ -138,6 +165,56 @@ type AudioPreferences = {
 
 function uid() {
   return Math.random().toString(36).slice(2, 11);
+}
+
+/** Curated tracks that shipped with search URLs — patch to direct embeddable videos. */
+const CATALOG_EMBED_URL_BY_ID: Record<string, string> = {
+  "dw-brown": "https://www.youtube.com/watch?v=nMfPqeZjc2c",
+  "cb-ambient": "https://www.youtube.com/watch?v=lTRiuFIWV54",
+};
+
+function mergeCatalogPlaylists(stored: AudioPlaylist[]): AudioPlaylist[] {
+  const byId = new Map(stored.map((playlist) => [playlist.id, playlist]));
+  let changed = false;
+  for (const playlist of DEFAULT_PLAYLISTS) {
+    if (!byId.has(playlist.id)) {
+      byId.set(playlist.id, playlist);
+      changed = true;
+    }
+  }
+  const next = Array.from(byId.values());
+  if (changed) writeJson(PLAYLISTS_KEY, next);
+  return next;
+}
+
+function mergeCatalogLinks(stored: AudioLink[]): AudioLink[] {
+  const byId = new Map(stored.map((link) => [link.id, link]));
+  let changed = false;
+  for (const link of DEFAULT_LINKS) {
+    if (!byId.has(link.id)) {
+      byId.set(link.id, link);
+      changed = true;
+    }
+  }
+  if (!changed) return stored;
+  const next = Array.from(byId.values());
+  writeJson(LINKS_KEY, next);
+  return next;
+}
+
+function normalizeEmbeddableCatalogLinks(links: AudioLink[]): AudioLink[] {
+  let changed = false;
+  const next = links.map((link) => {
+    const preferred = CATALOG_EMBED_URL_BY_ID[link.id];
+    if (!preferred || link.url === preferred) return link;
+    if (/youtube\.com\/results|search_query/i.test(link.url)) {
+      changed = true;
+      return { ...link, url: preferred };
+    }
+    return link;
+  });
+  if (changed) writeJson(LINKS_KEY, next);
+  return next;
 }
 
 function readJson<T>(key: string, fallback: T): T {
@@ -209,7 +286,7 @@ export function getAudioPlaylists(): AudioPlaylist[] {
     }
     return DEFAULT_PLAYLISTS;
   }
-  return stored;
+  return mergeCatalogPlaylists(stored);
 }
 
 export function saveAudioPlaylists(playlists: AudioPlaylist[]) {
@@ -224,7 +301,7 @@ export function getAudioLinks(): AudioLink[] {
     writeJson(LINKS_KEY, links);
     return links;
   }
-  return stored;
+  return normalizeEmbeddableCatalogLinks(mergeCatalogLinks(stored));
 }
 
 export function saveAudioLinks(links: AudioLink[]) {
@@ -433,6 +510,32 @@ export function addAudioLink(
 
 export function deleteAudioLink(id: string) {
   saveAudioLinks(getAudioLinks().filter((l) => l.id !== id));
+}
+
+export function updateAudioLink(
+  id: string,
+  patch: { name: string; url: string; category: string },
+): AudioLink | null {
+  const links = getAudioLinks();
+  const index = links.findIndex((l) => l.id === id);
+  if (index < 0) return null;
+  const updated: AudioLink = {
+    ...links[index]!,
+    name: patch.name.trim(),
+    url: patch.url.trim(),
+    category: patch.category,
+  };
+  const next = [...links];
+  next[index] = updated;
+  saveAudioLinks(next);
+  return updated;
+}
+
+export function savedAudioCategoryName(categoryId?: string): string {
+  const id = categoryId ?? "other";
+  return (
+    SAVED_AUDIO_CATEGORIES.find((c) => c.id === id)?.name ?? "Other"
+  );
 }
 
 export function deleteAudioPlaylist(id: string) {
