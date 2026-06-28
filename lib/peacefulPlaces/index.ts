@@ -68,3 +68,9 @@ export {
   PEACEFUL_PLACES_TITLE,
 } from "./directory";
 export type { PeacefulPlacesCategoryId } from "./directory";
+export {
+  resolvePeacefulPlacesGardenAtmosphere,
+  type GardenLightMood,
+  type GardenSeasonAccent,
+  type PeacefulPlacesGardenAtmosphere,
+} from "./gardenAtmosphere";

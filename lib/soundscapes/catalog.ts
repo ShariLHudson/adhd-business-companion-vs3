@@ -22,7 +22,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "🌧️",
     title: "Summer Storm",
     environment: "Covered Back Deck",
-    destinationName: "Covered Deck™",
+    destinationName: "Covered Deck",
     experience: "Summer Storm",
     tagline: "Warm rain on the cedar roof while the world slows down.",
     description:
@@ -37,7 +37,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "🌿",
     title: "Morning Garden",
     environment: "Garden Terrace",
-    destinationName: "Garden Terrace™",
+    destinationName: "Garden Terrace",
     experience: "Morning Garden",
     tagline: "Gentle birdsong as the garden wakes around you.",
     description:
@@ -50,7 +50,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "🌊",
     title: "Ocean Waves",
     environment: "Cliffside Overlook",
-    destinationName: "Cliffside Overlook™",
+    destinationName: "Cliffside Overlook",
     experience: "Ocean Waves",
     tagline: "Steady waves below a wide horizon — nowhere you need to be.",
     description:
@@ -63,7 +63,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "🔥",
     title: "Fireside Retreat",
     environment: "Stone Fireplace Room",
-    destinationName: "Stone Hearth Room™",
+    destinationName: "Stone Hearth Room",
     experience: "Fireside Retreat",
     tagline: "Low fire crackle and quiet warmth holding you.",
     description:
@@ -76,7 +76,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "☕",
     title: "Coffee Shop",
     environment: "Cozy Café",
-    destinationName: "Cozy Café™",
+    destinationName: "Cozy Café",
     experience: "Coffee Shop",
     tagline: "Soft murmur and gentle rhythm while you think nearby.",
     description:
@@ -90,7 +90,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "📚",
     title: "Quiet Library",
     environment: "Estate Library",
-    destinationName: "Estate Library™",
+    destinationName: "Estate Library",
     experience: "Quiet Shelves",
     tagline: "Deep quiet built for thinking.",
     description:
@@ -103,7 +103,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "✈️",
     title: "Airplane Cabin",
     environment: "Window Seat",
-    destinationName: "Window Seat™",
+    destinationName: "Window Seat",
     experience: "Airplane Cabin",
     tagline: "Cabin hush miles above the world.",
     description:
@@ -116,7 +116,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "🌧️",
     title: "Brown Noise",
     environment: "Quiet Study",
-    destinationName: "Quiet Study™",
+    destinationName: "Quiet Study",
     experience: "Brown Noise",
     tagline: "Deep steady sound that softens everything else.",
     description:
@@ -129,7 +129,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "🎼",
     title: "Deep Focus Piano",
     environment: "Music Room",
-    destinationName: "Music Room™",
+    destinationName: "Music Room",
     experience: "Deep Focus Piano",
     tagline: "Gentle piano that keeps you company without asking.",
     description:
@@ -142,7 +142,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "🌙",
     title: "Gentle Rain",
     environment: "Bedroom Window",
-    destinationName: "Bedroom Window™",
+    destinationName: "Bedroom Window",
     experience: "Gentle Rain",
     tagline: "Soft rain on glass while the room stays still.",
     description:
@@ -155,7 +155,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "🔥",
     title: "Fireplace at Night",
     environment: "Evening Hearth",
-    destinationName: "Evening Hearth™",
+    destinationName: "Evening Hearth",
     experience: "Fireplace at Night",
     tagline: "Embers glowing low as the day lets go.",
     description:
@@ -168,7 +168,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "🌌",
     title: "Night Forest",
     environment: "Woodland Path",
-    destinationName: "Woodland Path™",
+    destinationName: "Woodland Path",
     experience: "Night Forest",
     tagline: "Crickets and owl hush under a wide night sky.",
     description:
@@ -181,7 +181,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "🌊",
     title: "Ocean at Night",
     environment: "Moonlit Shore",
-    destinationName: "Moonlit Shore™",
+    destinationName: "Moonlit Shore",
     experience: "Ocean at Night",
     tagline: "Slow waves in the dark, easy to drift with.",
     description:
@@ -194,7 +194,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "🎵",
     title: "Morning Momentum",
     environment: "Music Loft",
-    destinationName: "Music Loft™",
+    destinationName: "Music Loft",
     experience: "Morning Momentum",
     tagline: "Sunshine and upbeat music — energy without chaos.",
     description:
@@ -207,7 +207,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "🌅",
     title: "Sunrise Terrace",
     environment: "East Terrace",
-    destinationName: "East Terrace™",
+    destinationName: "East Terrace",
     experience: "Sunrise Terrace",
     tagline: "Golden light lifting you into the day.",
     description:
@@ -220,7 +220,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     emoji: "⚡",
     title: "Movement Studio",
     environment: "Bright Studio",
-    destinationName: "Bright Studio™",
+    destinationName: "Bright Studio",
     experience: "Movement Studio",
     tagline: "Clean open space and a beat to get unstuck.",
     description:

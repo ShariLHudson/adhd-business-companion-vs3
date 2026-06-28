@@ -43,10 +43,14 @@ const PATHWAY_SIGNS = [...ESTATE_LEFT_SIGNS, ...ESTATE_RIGHT_SIGNS] as const;
 export function FocusAudioPanel({
   onDone,
   initialCategory,
+  arrivalActive = false,
+  onArrivalComplete,
 }: {
   onDone?: () => void;
   emotion?: EmotionalState;
   initialCategory?: string;
+  arrivalActive?: boolean;
+  onArrivalComplete?: () => void;
 }) {
   const scrollTarget = resolveSoundscapeScrollTarget(initialCategory);
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -282,7 +286,11 @@ export function FocusAudioPanel({
   return (
     <>
       {!activeDestination ? (
-        <PeacefulPlacesLandingShell bakedInTitle>
+        <PeacefulPlacesLandingShell
+          bakedInTitle
+          arrivalActive={arrivalActive}
+          onArrivalComplete={onArrivalComplete}
+        >
           <div
             className="peaceful-places-pathway-scene peaceful-places-pathway-scene--photo-signs"
             data-sign-open={openSign ?? undefined}

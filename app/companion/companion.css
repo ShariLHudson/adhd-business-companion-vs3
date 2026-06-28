@@ -4309,6 +4309,306 @@
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  transition: filter 1.8s ease, opacity 1.2s ease;
+}
+
+.peaceful-places-landing__estate-light,
+.peaceful-places-landing__sun-rays,
+.peaceful-places-landing__season-accent,
+.peaceful-places-landing__lantern-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.peaceful-places-landing__estate-light {
+  z-index: 1;
+  mix-blend-mode: soft-light;
+  opacity: 0.72;
+  transition: opacity 1.6s ease, background 1.6s ease;
+}
+
+.peaceful-places-landing__sun-rays {
+  z-index: 2;
+  opacity: 0.42;
+  background:
+    linear-gradient(
+      118deg,
+      transparent 34%,
+      rgba(255, 244, 210, 0.16) 44%,
+      rgba(255, 248, 228, 0.28) 50%,
+      rgba(255, 244, 210, 0.12) 58%,
+      transparent 68%
+    ),
+    linear-gradient(
+      132deg,
+      transparent 48%,
+      rgba(255, 250, 235, 0.12) 54%,
+      rgba(255, 246, 220, 0.2) 58%,
+      transparent 64%
+    );
+  animation: peaceful-places-sun-rays 18s ease-in-out infinite;
+}
+
+.peaceful-places-landing__season-accent {
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+
+.peaceful-places-landing__lantern-glow {
+  z-index: 3;
+  width: clamp(4rem, 11vw, 7rem);
+  height: clamp(3rem, 8vh, 5rem);
+  top: auto;
+  bottom: clamp(18%, 24vh, 28%);
+  opacity: 0;
+  border-radius: 50%;
+  filter: blur(18px);
+  background: radial-gradient(
+    circle,
+    rgba(255, 214, 140, 0.55) 0%,
+    rgba(255, 196, 108, 0.22) 42%,
+    transparent 72%
+  );
+  transition: opacity 1.4s ease;
+}
+
+.peaceful-places-landing__lantern-glow--left {
+  left: clamp(8%, 12vw, 16%);
+}
+
+.peaceful-places-landing__lantern-glow--right {
+  right: clamp(8%, 12vw, 16%);
+}
+
+.peaceful-places-landing[data-lantern-glow="1"] .peaceful-places-landing__lantern-glow {
+  opacity: 0.78;
+  animation: peaceful-places-lantern-pulse 5.5s ease-in-out infinite;
+}
+
+.peaceful-places-landing[data-garden-light="sunrise"] .peaceful-places-landing__estate-light {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 214, 168, 0.34) 0%,
+    rgba(255, 236, 206, 0.18) 48%,
+    rgba(88, 108, 128, 0.08) 100%
+  );
+}
+
+.peaceful-places-landing[data-garden-light="bright-morning"] .peaceful-places-landing__estate-light {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 248, 228, 0.28) 0%,
+    rgba(236, 246, 228, 0.14) 55%,
+    rgba(72, 96, 84, 0.06) 100%
+  );
+}
+
+.peaceful-places-landing[data-garden-light="afternoon"] .peaceful-places-landing__estate-light {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 240, 0.22) 0%,
+    rgba(248, 244, 228, 0.12) 58%,
+    rgba(64, 82, 72, 0.05) 100%
+  );
+}
+
+.peaceful-places-landing[data-garden-light="golden-hour"] .peaceful-places-landing__estate-light {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 196, 128, 0.32) 0%,
+    rgba(255, 220, 168, 0.18) 52%,
+    rgba(58, 48, 42, 0.1) 100%
+  );
+}
+
+.peaceful-places-landing[data-garden-light="blue-hour"] .peaceful-places-landing__estate-light {
+  background: linear-gradient(
+    180deg,
+    rgba(148, 176, 214, 0.28) 0%,
+    rgba(92, 118, 156, 0.16) 54%,
+    rgba(28, 36, 48, 0.18) 100%
+  );
+}
+
+.peaceful-places-landing[data-garden-light="moonlight"] .peaceful-places-landing__estate-light {
+  background: linear-gradient(
+    180deg,
+    rgba(118, 138, 178, 0.22) 0%,
+    rgba(48, 58, 78, 0.24) 58%,
+    rgba(18, 24, 34, 0.28) 100%
+  );
+}
+
+.peaceful-places-landing[data-garden-season="rain"] .peaceful-places-landing__season-accent,
+.peaceful-places-landing[data-garden-season="clear"] .peaceful-places-landing__season-accent {
+  opacity: 0;
+}
+
+.peaceful-places-landing[data-garden-season="spring-blossoms"] .peaceful-places-landing__season-accent {
+  opacity: 0.42;
+  background:
+    radial-gradient(circle at 18% 24%, rgba(255, 214, 228, 0.22) 0 1px, transparent 2px),
+    radial-gradient(circle at 82% 28%, rgba(255, 228, 236, 0.18) 0 1px, transparent 2px),
+    radial-gradient(circle at 44% 18%, rgba(255, 236, 244, 0.16) 0 1px, transparent 2px);
+}
+
+.peaceful-places-landing[data-garden-season="autumn-leaves"] .peaceful-places-landing__season-accent {
+  opacity: 0.38;
+  background:
+    radial-gradient(circle at 22% 30%, rgba(214, 138, 68, 0.18) 0 2px, transparent 3px),
+    radial-gradient(circle at 76% 22%, rgba(196, 108, 48, 0.16) 0 2px, transparent 3px);
+}
+
+.peaceful-places-landing[data-garden-season="snow"] .peaceful-places-landing__season-accent {
+  opacity: 0.34;
+  background: linear-gradient(
+    180deg,
+    rgba(236, 244, 252, 0.16) 0%,
+    rgba(220, 232, 244, 0.1) 100%
+  );
+}
+
+.peaceful-places-landing__invitation {
+  position: absolute;
+  top: clamp(14%, 18vh, 20%);
+  left: 50%;
+  z-index: 3;
+  width: min(92vw, 34rem);
+  margin: 0;
+  padding: 0 1rem;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.12rem, 2.4vw, 1.42rem);
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: 0.01em;
+  color: #4a4034;
+  text-shadow:
+    0 1px 0 rgba(255, 252, 245, 0.92),
+    0 2px 16px rgba(255, 248, 236, 0.72);
+}
+
+.peaceful-places-landing[data-arrival="entering"] {
+  animation: peaceful-places-arrival-fade 2.8s ease-out forwards;
+}
+
+.peaceful-places-landing[data-arrival="entering"] .peaceful-places-landing__estate-image {
+  animation: peaceful-places-path-reveal 3.1s ease-out forwards;
+}
+
+.peaceful-places-landing[data-arrival="entering"] .peaceful-places-landing__invitation {
+  animation: peaceful-places-invitation-rise 2.6s ease-out 0.55s both;
+}
+
+.peaceful-places-landing[data-arrival="entering"] .pathway-photo-sign {
+  animation: peaceful-places-sign-sway 7s ease-in-out infinite;
+}
+
+@keyframes peaceful-places-sun-rays {
+  0%,
+  100% {
+    opacity: 0.34;
+    transform: translate3d(0, 0, 0);
+  }
+  50% {
+    opacity: 0.48;
+    transform: translate3d(0.4%, -0.25%, 0);
+  }
+}
+
+@keyframes peaceful-places-lantern-pulse {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.88;
+    transform: scale(1.06);
+  }
+}
+
+@keyframes peaceful-places-arrival-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes peaceful-places-path-reveal {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+    filter: blur(2px) brightness(0.88);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0) brightness(1);
+  }
+}
+
+@keyframes peaceful-places-invitation-rise {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0.65rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+@keyframes peaceful-places-sign-sway {
+  0%,
+  100% {
+    transform: translate(-50%, -50%) rotate(-0.35deg);
+  }
+  50% {
+    transform: translate(-50%, -50%) rotate(0.35deg);
+  }
+}
+
+
+.top-bar-centered-menu__caret {
+  margin-left: 1px;
+  font-size: 9px;
+  opacity: 0.5;
+}
+
+.top-bar-centered-menu__panel {
+  position: absolute;
+  top: calc(100% + 0.45rem);
+  z-index: 60;
+  overflow: hidden;
+  border-radius: 0.95rem;
+  border: 1px solid #d8cfc2;
+  background: #fff;
+  box-shadow: 0 14px 34px rgba(34, 30, 26, 0.14);
+  min-width: 13rem;
+}
+
+.top-bar-centered-menu__panel .menu-dropdown-row,
+.top-bar-centered-menu__panel button[role="menuitem"] {
+  width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .peaceful-places-landing__sun-rays,
+  .peaceful-places-landing[data-lantern-glow="1"] .peaceful-places-landing__lantern-glow,
+  .pathway-photo-sign,
+  .peaceful-places-landing[data-arrival="entering"],
+  .peaceful-places-landing[data-arrival="entering"] .peaceful-places-landing__estate-image,
+  .peaceful-places-landing[data-arrival="entering"] .peaceful-places-landing__invitation,
+  .peaceful-places-landing[data-arrival="entering"] .pathway-photo-sign {
+    animation: none !important;
+  }
 }
 
 .peaceful-places-landing__estate-wash {
@@ -4759,6 +5059,8 @@
   z-index: 1;
   pointer-events: auto;
   touch-action: manipulation;
+  transform-origin: top center;
+  animation: peaceful-places-sign-sway 9s ease-in-out infinite;
 }
 
 .pathway-photo-sign__hit {

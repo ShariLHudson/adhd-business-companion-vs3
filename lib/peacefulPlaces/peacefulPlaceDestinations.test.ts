@@ -19,7 +19,7 @@ describe("peaceful place destinations", () => {
     expect(destination).toMatchObject({
       id: "covered-deck-summer-storm",
       category: "slowDown",
-      placeName: "Covered Deck™",
+      placeName: "Covered Deck",
       experienceName: "Summer Storm",
       imageSrc: SUMMER_STORM_COVERED_DECK_BG,
       audioType: "direct",
@@ -32,7 +32,7 @@ describe("peaceful place destinations", () => {
 
   it("resolves the destination by id and soundscape id", () => {
     expect(peacefulPlaceDestinationById("covered-deck-summer-storm")?.placeName).toBe(
-      "Covered Deck™",
+      "Covered Deck",
     );
     expect(peacefulPlaceDestinationBySoundscapeId("summer-storm")?.id).toBe(
       "covered-deck-summer-storm",
@@ -75,7 +75,7 @@ describe("peaceful place destinations", () => {
     expect(destination).toMatchObject({
       id: "cozy-cafe-coffee-shop",
       category: "focus",
-      placeName: "Cozy Café™",
+      placeName: "Cozy Café",
       experienceName: "Coffee Shop",
       imageSrc: expect.stringContaining("cozy-cafeimage"),
       audioType: "direct",
@@ -88,7 +88,7 @@ describe("peaceful place destinations", () => {
 
   it("resolves cozy café destination by id and soundscape id", () => {
     expect(peacefulPlaceDestinationById("cozy-cafe-coffee-shop")?.placeName).toBe(
-      "Cozy Café™",
+      "Cozy Café",
     );
     expect(peacefulPlaceDestinationBySoundscapeId("coffee-shop")?.id).toBe(
       "cozy-cafe-coffee-shop",

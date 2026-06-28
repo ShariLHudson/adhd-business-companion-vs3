@@ -32,13 +32,13 @@ describe("soundscape catalog", () => {
     expect(summerStorm?.signature).toBe(true);
     expect(summerStorm?.peacefulPlaceId).toBe("summer-storm-covered-deck");
     expect(summerStorm?.playbackUrl).toContain("RAINMetl-Gentle_rain_on_a_tin-Elevenlabs.mp3");
-    expect(summerStorm?.destinationName).toBe("Covered Deck™");
+    expect(summerStorm?.destinationName).toBe("Covered Deck");
   });
 
   it("links coffee shop to the cozy café peaceful place image", () => {
     const coffeeShop = SOUNDSCAPES.find((s) => s.id === "coffee-shop");
     expect(coffeeShop?.peacefulPlaceId).toBe("cozy-cafe");
     expect(coffeeShop?.playbackUrl).toContain("AMBRest-Quiet_coffee_shop_am-Elevenlabs.mp3");
-    expect(coffeeShop?.destinationName).toBe("Cozy Café™");
+    expect(coffeeShop?.destinationName).toBe("Cozy Café");
   });
 });

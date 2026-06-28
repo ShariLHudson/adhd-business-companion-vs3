@@ -12,6 +12,12 @@ import { AdjustMyDayPanel } from "@/components/companion/AdjustMyDayPanel";
 import { BrainDumpPanel } from "@/components/companion/BrainDumpPanel";
 import { propertyNavComingSoonMessage } from "@/lib/companionPropertyNav";
 import {
+  coachingModeForConversationLens,
+  type ClearMyMindMenuItemId,
+  type NewConversationLens,
+  type PlanMyDayMenuItemId,
+} from "@/lib/topBarNavigation";
+import {
   GALLERY_HOME_SECTION,
   isLegacyGrowthHubSection,
   sidebarNavForGrowthDestination,
@@ -1775,6 +1781,8 @@ export default function CompanionPageClient() {
   const [focusAudioCategory, setFocusAudioCategory] = useState<string | null>(
     null,
   );
+  const [peacefulPlacesArrivalActive, setPeacefulPlacesArrivalActive] =
+    useState(false);
   // A time block whose start time has arrived (shows the trigger popup).
   const [triggeredBlock, setTriggeredBlock] = useState<TimeBlock | null>(null);
   // A time block starting in ~15 minutes (shows a gentle heads-up toast).
@@ -6717,15 +6725,67 @@ export default function CompanionPageClient() {
     openNavSectionDirectCore(section, normalizedNav);
   }
 
-  function openFocusAudioCore(categoryId?: string | null) {
+  function openPeacefulPlacesCore(options?: {
+    animate?: boolean;
+    categoryId?: string | null;
+  }) {
+    pushNavigationRestore();
     clearParallelCoachingOffers();
+    clearSplitBesideWorkspace();
     const fromIntent = detectAudioRequest(lastUserTextRef.current);
     setFocusAudioCategory(
-      categoryId ?? (fromIntent.isAudio ? fromIntent.categoryId : null),
+      options?.categoryId ??
+        (fromIntent.isAudio ? fromIntent.categoryId : null),
     );
-    noteWorkspaceOpened("focus-audio", "recommendation_or_nav");
-    setActiveSection("focus-audio");
-    setActiveNav("focus");
+    trackWorkspaceEcosystemEvent("focus-audio");
+    noteWorkspaceOpened("focus-audio", "standalone_room");
+    setPeacefulPlacesArrivalActive(Boolean(options?.animate));
+    openStandaloneFocusSectionCore("focus-audio");
+  }
+
+  function openFocusAudioCore(categoryId?: string | null) {
+    openPeacefulPlacesCore({ categoryId });
+  }
+
+  function handleTopBarClearMyMindItem(itemId: ClearMyMindMenuItemId) {
+    switch (itemId) {
+      case "recent-thoughts":
+        openClearMyMindCore({ initialView: "my-thoughts" });
+        return;
+      case "brain-dump":
+      case "voice-note":
+        openClearMyMindCore({ initialView: "capture" });
+        return;
+      case "journal": {
+        const comingSoon = propertyNavComingSoonMessage("journal");
+        if (comingSoon) setWorkspaceContextBanner(comingSoon);
+        return;
+      }
+      default:
+        openClearMyMindCore();
+    }
+  }
+
+  function handleTopBarPlanMyDayItem(itemId: PlanMyDayMenuItemId) {
+    switch (itemId) {
+      case "daily-planner":
+      case "priorities":
+        openPlanMyDayCore();
+        return;
+      case "calendar":
+        openStandaloneFocusSectionCore("time-block");
+        return;
+      case "energy-planning":
+        openAdaptMyDayCore();
+        return;
+      default:
+        openPlanMyDayCore();
+    }
+  }
+
+  function handleStartConversationWithLens(lens: NewConversationLens) {
+    handleStartCleanConversation();
+    setCoachingMode(coachingModeForConversationLens(lens));
   }
 
   function handleToolSelectCore(tool: SidebarToolId) {
@@ -14506,10 +14566,12 @@ export default function CompanionPageClient() {
           <TopBar
             calmHome={homeCalm}
             navVisibility={arrivalNavVisibility}
-            onOpenClearMyMind={openClearMyMindCore}
-            onOpenFocusMyBrain={() => openStandaloneFocusSectionCore("focus")}
-            onRequestNewConversation={handleStartCleanConversation}
-            onRequestNewDayConversation={handleStartNewDayConversation}
+            onOpenClearMyMindItem={handleTopBarClearMyMindItem}
+            onOpenPlanMyDayItem={handleTopBarPlanMyDayItem}
+            onOpenPeacefulPlaces={() =>
+              openPeacefulPlacesCore({ animate: activeSection === "home" })
+            }
+            onStartConversation={handleStartConversationWithLens}
             onOpenWelcomeRoom={() => openWelcomeRoom()}
             onOpenMyStory={() => openLifeExperienceRoomCore()}
             onOpenWhatsNew={() => openWhatsNewCore()}
@@ -14519,7 +14581,6 @@ export default function CompanionPageClient() {
             }}
             onOpenProfile={() => setOverlay("profile")}
             showPlanMyDay={activeSection !== "plan-my-day"}
-            onOpenPlanMyDay={() => openPlanMyDayCore()}
           />
           {!homeCalm && activeSection !== "plan-my-day" ? (
             <ActiveWorkspaceBar items={activeWorkspaceItems} />
@@ -15327,8 +15388,11 @@ export default function CompanionPageClient() {
             <FocusAudioPanel
               emotion={displayEmotion}
               initialCategory={focusAudioCategory ?? undefined}
+              arrivalActive={peacefulPlacesArrivalActive}
+              onArrivalComplete={() => setPeacefulPlacesArrivalActive(false)}
               onDone={() => {
                 setFocusAudioCategory(null);
+                setPeacefulPlacesArrivalActive(false);
                 setActiveSection("home");
               }}
             />

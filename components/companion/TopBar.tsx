@@ -2,16 +2,25 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
-import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
-import { CompanionObjectLabel } from "@/components/companion/CompanionObjectVisual";
+import { TopBarCenteredMenu } from "@/components/companion/TopBarCenteredMenu";
+import {
+  CompanionObjectLabel,
+  CompanionObjectVisual,
+} from "@/components/companion/CompanionObjectVisual";
 import {
   countActivePlanItems,
   PLAN_MY_DAY_UPDATED,
 } from "@/lib/planMyDay";
-import { TOP_BAR_NEW_CONVERSATION_LABEL } from "@/lib/freshStartCopy";
+import {
+  CLEAR_MY_MIND_MENU_ITEMS,
+  NEW_CONVERSATION_MENU_ITEMS,
+  PLAN_MY_DAY_MENU_ITEMS,
+  type ClearMyMindMenuItemId,
+  type NewConversationLens,
+  type PlanMyDayMenuItemId,
+} from "@/lib/topBarNavigation";
 import {
   MENU_DROPDOWN_ITEM_LG,
-  MENU_DROPDOWN_ROW,
   MENU_SECTION_HEADING,
   MENU_TRIGGER_BTN,
 } from "@/lib/menuNavStyles";
@@ -22,21 +31,16 @@ type TopBarProps = {
   calmHome?: boolean;
   navVisibility?: HomeNavVisibility;
   showPlanMyDay?: boolean;
-  onOpenPlanMyDay?: () => void;
-  onOpenAdaptMyDay?: () => void;
-  onOpenClearMyMind?: () => void;
+  onOpenClearMyMindItem?: (itemId: ClearMyMindMenuItemId) => void;
+  onOpenPlanMyDayItem?: (itemId: PlanMyDayMenuItemId) => void;
+  onOpenPeacefulPlaces?: () => void;
+  onStartConversation?: (lens: NewConversationLens) => void;
   onOpenWelcomeRoom?: () => void;
   onOpenMyStory?: () => void;
   onOpenWhatsNew?: () => void;
   onOpenSettings: (section?: SettingsSection | null) => void;
   onOpenProfile: () => void;
-  onRequestNewConversation: () => void;
-  onRequestNewDayConversation: () => void;
 };
-
-const BTN = MENU_TRIGGER_BTN;
-
-const MENU_BTN = MENU_DROPDOWN_ITEM_LG;
 
 function usePlanActiveCount(): number {
   const [count, setCount] = useState(0);
@@ -49,155 +53,19 @@ function usePlanActiveCount(): number {
   return count;
 }
 
-function HeaderActionButton({
-  objectId,
-  label,
-  onClick,
-  href,
-  badge,
-}: {
-  objectId: string;
-  label: string;
-  onClick: () => void;
-  href?: string;
-  badge?: number;
-}) {
-  const className = BTN;
-  const content = (
-    <>
-      <CompanionObjectVisual objectId={objectId} size="xs" variant="icon" />
-      <span className="hidden sm:inline">{label}</span>
-      {badge != null && badge > 0 ? (
-        <span className="rounded-full bg-[var(--cm-accent-tint,#e6f0f0)] px-2 py-0.5 text-xs font-bold text-[var(--cm-accent,#1e4f4f)]">
-          {badge}
-        </span>
-      ) : null}
-    </>
-  );
-
-  if (href) {
-    return (
-      <a
-        href={href}
-        onClick={(e) => {
-          e.preventDefault();
-          onClick();
-        }}
-        className={className}
-        title={label}
-        aria-label={badge ? `${label}, ${badge} active items` : label}
-      >
-        {content}
-      </a>
-    );
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={className}
-      title={label}
-      aria-label={badge ? `${label}, ${badge} active items` : label}
-    >
-      {content}
-    </button>
-  );
-}
-
-function NewConversationDropdown({
-  onNewConversation,
-  onNewDayConversation,
-}: {
-  onNewConversation: () => void;
-  onNewDayConversation: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const handleClick = (e: PointerEvent) => {
-      if (!ref.current?.contains(e.target as Node)) setOpen(false);
-    };
-    const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("pointerdown", handleClick);
-    document.addEventListener("keydown", handleKey);
-    return () => {
-      document.removeEventListener("pointerdown", handleClick);
-      document.removeEventListener("keydown", handleKey);
-    };
-  }, [open]);
-
-  const btnClass = MENU_TRIGGER_BTN;
-  const itemClass = MENU_DROPDOWN_ROW;
-
-  return (
-    <div ref={ref} className="relative z-50">
-      <button
-        type="button"
-        className={btnClass}
-        title={TOP_BAR_NEW_CONVERSATION_LABEL}
-        aria-label={TOP_BAR_NEW_CONVERSATION_LABEL}
-        aria-haspopup="menu"
-        aria-expanded={open}
-        onClick={() => setOpen((v) => !v)}
-      >
-        <CompanionObjectVisual objectId="messages" size="xs" variant="icon" />
-        <span className="hidden sm:inline">{TOP_BAR_NEW_CONVERSATION_LABEL}</span>
-        <span style={{ fontSize: 9, opacity: 0.5, marginLeft: 1 }}>▾</span>
-      </button>
-      {open && (
-        <div
-          role="menu"
-          className="absolute right-0 z-[60] mt-1 w-52 overflow-hidden rounded-xl border border-[#d8cfc2] bg-white shadow-lg"
-        >
-          <button
-            type="button"
-            role="menuitem"
-            className={itemClass}
-            onClick={() => {
-              setOpen(false);
-              onNewConversation();
-            }}
-          >
-            <CompanionObjectVisual objectId="messages" size="xs" variant="icon" />
-            <span>New Conversation</span>
-          </button>
-          <button
-            type="button"
-            role="menuitem"
-            className={`${itemClass} border-t border-[#f0e9e0]`}
-            onClick={() => {
-              setOpen(false);
-              onNewDayConversation();
-            }}
-          >
-            <CompanionObjectVisual objectId="todays-reality" size="xs" variant="icon" />
-            <span>New Day Conversation</span>
-          </button>
-        </div>
-      )}
-    </div>
-  );
-}
-
 export function TopBar({
   calmHome = false,
   navVisibility = "calm",
   showPlanMyDay = false,
-  onOpenPlanMyDay,
-  onOpenAdaptMyDay,
-  onOpenClearMyMind,
+  onOpenClearMyMindItem,
+  onOpenPlanMyDayItem,
+  onOpenPeacefulPlaces,
+  onStartConversation,
   onOpenWelcomeRoom,
   onOpenMyStory,
   onOpenWhatsNew,
   onOpenSettings,
   onOpenProfile,
-  onRequestNewConversation,
-  onRequestNewDayConversation,
 }: TopBarProps) {
   const planActiveCount = usePlanActiveCount();
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
@@ -239,35 +107,62 @@ export function TopBar({
       data-home-calm={calmHome ? "" : undefined}
       data-nav-visibility={navVisibility}
     >
-      {onOpenClearMyMind ? (
-        <HeaderActionButton
-          objectId="clear-my-mind"
+      {onOpenClearMyMindItem ? (
+        <TopBarCenteredMenu
+          menuId="clear-my-mind"
+          triggerObjectId="clear-my-mind"
           label="Clear My Mind"
-          onClick={() => runHeaderAction(onOpenClearMyMind)}
+          items={CLEAR_MY_MIND_MENU_ITEMS.map((item) => ({
+            id: item.id,
+            label: item.label,
+            objectId: item.objectId,
+            onSelect: () => runHeaderAction(() => onOpenClearMyMindItem(item.id)),
+          }))}
         />
       ) : null}
 
-      {showPlanMyDay && onOpenPlanMyDay ? (
-        <HeaderActionButton
-          objectId="plan-my-day"
+      {showPlanMyDay && onOpenPlanMyDayItem ? (
+        <TopBarCenteredMenu
+          menuId="plan-my-day"
+          triggerObjectId="plan-my-day"
           label="Plan My Day"
-          onClick={() => runHeaderAction(onOpenPlanMyDay)}
           badge={planActiveCount}
+          items={PLAN_MY_DAY_MENU_ITEMS.map((item) => ({
+            id: item.id,
+            label: item.label,
+            objectId: item.objectId,
+            onSelect: () => runHeaderAction(() => onOpenPlanMyDayItem(item.id)),
+          }))}
         />
       ) : null}
 
-      {onOpenAdaptMyDay ? (
-        <HeaderActionButton
-          objectId="todays-reality"
-          label="Today's Reality"
-          onClick={() => runHeaderAction(onOpenAdaptMyDay)}
-        />
+      {onOpenPeacefulPlaces ? (
+        <button
+          type="button"
+          className={MENU_TRIGGER_BTN}
+          title="Focus My Brain"
+          aria-label="Focus My Brain — Peaceful Places"
+          data-top-bar-menu="focus-my-brain"
+          onClick={() => runHeaderAction(onOpenPeacefulPlaces)}
+        >
+          <CompanionObjectVisual objectId="focus-my-brain" size="xs" variant="icon" />
+          <span className="hidden sm:inline">Focus My Brain</span>
+        </button>
       ) : null}
 
-      <NewConversationDropdown
-        onNewConversation={() => runHeaderAction(onRequestNewConversation)}
-        onNewDayConversation={() => runHeaderAction(onRequestNewDayConversation)}
-      />
+      {onStartConversation ? (
+        <TopBarCenteredMenu
+          menuId="new-conversation"
+          triggerObjectId="messages"
+          label="New Conversation"
+          items={NEW_CONVERSATION_MENU_ITEMS.map((item) => ({
+            id: item.id,
+            label: item.label,
+            objectId: item.objectId,
+            onSelect: () => runHeaderAction(() => onStartConversation(item.lens)),
+          }))}
+        />
+      ) : null}
 
       <div ref={accountMenuRef} className="relative z-50">
         <button
@@ -300,7 +195,7 @@ export function TopBar({
                 type="button"
                 role="menuitem"
                 onClick={() => runHeaderAction(onOpenWelcomeRoom)}
-                className={MENU_BTN}
+                className={MENU_DROPDOWN_ITEM_LG}
               >
                 <CompanionObjectLabel objectId="welcome-room" label="Welcome Room" size="xs" />
               </button>
@@ -310,7 +205,7 @@ export function TopBar({
                 type="button"
                 role="menuitem"
                 onClick={() => runHeaderAction(onOpenMyStory)}
-                className={MENU_BTN}
+                className={MENU_DROPDOWN_ITEM_LG}
               >
                 <CompanionObjectLabel objectId="life-experience" label="My Story" size="xs" />
               </button>
@@ -320,7 +215,7 @@ export function TopBar({
                 type="button"
                 role="menuitem"
                 onClick={() => runHeaderAction(onOpenWhatsNew)}
-                className={MENU_BTN}
+                className={MENU_DROPDOWN_ITEM_LG}
               >
                 <CompanionObjectLabel objectId="help" label="What's New" size="xs" />
               </button>
@@ -329,7 +224,7 @@ export function TopBar({
               type="button"
               role="menuitem"
               onClick={() => runHeaderAction(() => onOpenSettings(null))}
-              className={MENU_BTN}
+              className={MENU_DROPDOWN_ITEM_LG}
             >
               <CompanionObjectLabel objectId="settings" label="Settings" size="xs" />
             </button>
@@ -337,7 +232,7 @@ export function TopBar({
               type="button"
               role="menuitem"
               onClick={() => runHeaderAction(onOpenProfile)}
-              className={`${MENU_BTN} border-t border-[#e7dfd4]`}
+              className={`${MENU_DROPDOWN_ITEM_LG} border-t border-[#e7dfd4]`}
             >
               <CompanionObjectLabel objectId="profile" label="Profile" size="xs" />
             </button>
