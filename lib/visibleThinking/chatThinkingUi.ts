@@ -4,9 +4,17 @@
 
 export function shouldShowChatVisibleThinking(
   isLoading: boolean,
-  thinkingMessage: string | null | undefined,
+  _thinkingMessage?: string | null,
 ): boolean {
-  return Boolean(isLoading && thinkingMessage?.trim());
+  return isLoading;
+}
+
+/** Fallback copy until adaptive thinking lines appear. */
+export function chatVisibleThinkingCopy(
+  thinkingMessage: string | null | undefined,
+): string {
+  const trimmed = thinkingMessage?.trim();
+  return trimmed || "…";
 }
 
 /** Identity Bar shows portrait animation only — chat owns thinking copy. */

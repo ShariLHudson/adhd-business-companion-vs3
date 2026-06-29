@@ -12,13 +12,35 @@ import {
 const inputClass =
   "w-full rounded-xl border-2 border-[#d4cdc3] bg-white px-4 py-3 text-base text-[#1f1c19] placeholder:text-[#9a8f82] focus:border-[#1e4f4f] focus:outline-none focus:ring-2 focus:ring-[#1e4f4f]/15";
 
+const deskInputClass =
+  "w-full rounded-lg border border-[#c4a876]/45 bg-[rgba(255,252,245,0.55)] px-3 py-2 text-[0.88rem] text-[#2e2820] placeholder:text-[#9a8f82] focus:border-[#b89558]/65 focus:outline-none focus:ring-1 focus:ring-[#c4a876]/25";
+
+const floatingCardInputClass =
+  "w-full rounded-xl border-[1.5px] border-[rgba(90,78,58,0.38)] bg-white px-4 py-3 text-base text-[#1f1c19] placeholder:text-[#6b635a] focus:border-[#1e4f4f]/55 focus:outline-none focus:ring-2 focus:ring-[#1e4f4f]/18";
+
 type Props = {
   field: ActivityFieldDef;
   answers: ActivityAnswers;
   onChange: (answers: ActivityAnswers) => void;
+  presentation?: "default" | "desk" | "floating-card";
 };
 
-export function ActivityStepFields({ field, answers, onChange }: Props) {
+export function ActivityStepFields({
+  field,
+  answers,
+  onChange,
+  presentation = "default",
+}: Props) {
+  const desk = presentation === "desk";
+  const floatingCard = presentation === "floating-card";
+  const compact = desk || floatingCard;
+  const fieldInputClass = floatingCard
+    ? floatingCardInputClass
+    : desk
+      ? deskInputClass
+      : inputClass;
+  const fieldWrapClass = compact ? "mt-1.5" : "mt-4";
+
   function patch(key: string, value: unknown) {
     onChange({ ...answers, [key]: value });
   }
@@ -26,8 +48,8 @@ export function ActivityStepFields({ field, answers, onChange }: Props) {
   switch (field.type) {
     case "text":
       return (
-        <div className="mt-4">
-          {field.label ? (
+        <div className={fieldWrapClass}>
+          {!compact && field.label ? (
             <label className="mb-2 block text-sm font-semibold text-[#4b463f]">
               {field.label}
             </label>
@@ -38,47 +60,76 @@ export function ActivityStepFields({ field, answers, onChange }: Props) {
               onChange={(v) => patch(field.key, v)}
               placeholder={field.placeholder ?? "Your answer…"}
               className="mt-0"
-              inputClassName={`${inputClass} min-h-[100px] resize-y`}
+              inputClassName={`${fieldInputClass} ${desk ? "min-h-[3.25rem] resize-y" : "min-h-[100px] resize-y"}`}
             />
           ) : (
             <input
               type="text"
               value={getTextAnswer(answers, field.key)}
               onChange={(e) => patch(field.key, e.target.value)}
-              placeholder={field.placeholder ?? "Your answer…"}
-              className={inputClass}
+              placeholder={field.placeholder ?? "Type here…"}
+              className={fieldInputClass}
             />
           )}
         </div>
       );
 
     case "options": {
-      const rows = getStringArray(answers[field.key]);
+      const stored = getStringArray(answers[field.key]);
+      const rows =
+        stored.length > 0
+          ? stored
+          : Array.from({ length: field.startCount ?? 1 }, () => "");
       const labelAt = field.itemLabel ?? ((i: number) => `Option ${i + 1}`);
       return (
-        <div className="mt-4 space-y-3">
+        <div className={`${fieldWrapClass} space-y-2`}>
           {rows.map((row, i) => (
-            <div key={i}>
-              <label className="mb-1 block text-sm font-semibold text-[#4b463f]">
-                {labelAt(i)}
-              </label>
-              <input
-                type="text"
-                value={row}
-                onChange={(e) => {
-                  const next = [...rows];
-                  next[i] = e.target.value;
-                  patch(field.key, next);
-                }}
-                placeholder="Type here…"
-                className={inputClass}
-              />
+            <div key={i} className="flex gap-2">
+              <div className="min-w-0 flex-1">
+                {!compact ? (
+                  <label className="mb-1 block text-sm font-semibold text-[#4b463f]">
+                    {labelAt(i)}
+                  </label>
+                ) : null}
+                <input
+                  type="text"
+                  value={row}
+                  onChange={(e) => {
+                    const next = [...rows];
+                    next[i] = e.target.value;
+                    patch(field.key, next);
+                  }}
+                  placeholder="Type here…"
+                  className={fieldInputClass}
+                />
+              </div>
+              {rows.length > 1 ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const next = rows.filter((_, j) => j !== i);
+                    patch(field.key, next.length > 0 ? next : [""]);
+                  }}
+                  className={
+                    desk
+                      ? "mt-0 shrink-0 self-end rounded-lg border border-[#c9bfb0] bg-white px-2 py-2 text-xs font-semibold text-[#6b635a]"
+                      : "mt-0 shrink-0 self-end rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-xs font-semibold text-[#6b635a] hover:border-[#a85c4a]/40 hover:text-[#a85c4a]"
+                  }
+                  aria-label={`Remove ${labelAt(i)}`}
+                >
+                  Remove
+                </button>
+              ) : null}
             </div>
           ))}
           <button
             type="button"
             onClick={() => patch(field.key, [...rows, ""])}
-            className="rounded-xl border border-dashed border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/5"
+            className={
+              desk
+                ? "rounded-lg border border-dashed border-[#c4a876]/45 bg-transparent px-3 py-1.5 text-xs font-semibold text-[#8a7a62] hover:bg-[#c4a876]/8"
+                : "rounded-xl border border-dashed border-[#1e4f4f]/40 bg-white px-4 py-2 text-sm font-semibold text-[#1e4f4f] hover:bg-[#1e4f4f]/5"
+            }
           >
             {field.addLabel ?? "Add another"}
           </button>
@@ -180,7 +231,9 @@ export function ActivityStepFields({ field, answers, onChange }: Props) {
             <p className="text-sm font-semibold text-[#4b463f]">{field.label}</p>
           ) : null}
           {items.length === 0 ? (
-            <p className="text-sm text-[#6b635a]">Add options in an earlier step first.</p>
+            <p className="text-sm text-[#6b635a]">
+              Nothing listed yet — you can continue, or tap Back to add items.
+            </p>
           ) : (
             items.map((item) => {
               const active = selected === item;

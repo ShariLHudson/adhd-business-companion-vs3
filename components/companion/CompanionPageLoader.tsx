@@ -10,6 +10,9 @@ const LOADING = (
   </main>
 );
 
+/** Warm the home shell as soon as this module loads. */
+const companionPageImport = import("@/app/companion/CompanionPageClient");
+
 /**
  * Loads the companion shell only in the browser (useEffect import). This avoids
  * SSR/hydration of the 12k-line tree, which left buttons visible but inert.
@@ -20,7 +23,7 @@ export function CompanionPageLoader() {
 
   useEffect(() => {
     let cancelled = false;
-    void import("@/app/companion/CompanionPageClient")
+    void companionPageImport
       .then((mod) => {
         if (!cancelled) setPage(() => mod.default);
       })

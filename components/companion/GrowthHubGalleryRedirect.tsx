@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 
-/** Legacy `growth` workspace routes — send guests into The Gallery hallway. */
+/** Legacy `growth` workspace routes — open the Asset Library hub. */
 export function GrowthHubGalleryRedirect({ onOpen }: { onOpen: () => void }) {
   useEffect(() => {
     onOpen();

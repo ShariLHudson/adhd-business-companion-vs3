@@ -72,6 +72,9 @@ import {
 } from "@/lib/founderWorkspace/actionCenter";
 import { generateResearchNote } from "@/lib/founderWorkspace/actionCenter/researchGenerator";
 import { kindLabel, statusLabel } from "@/lib/founderWorkspace";
+import {
+  COMPANION_GALLERY_DEMO_HREF,
+} from "@/lib/gallery";
 
 type FounderNavSection = FounderWorkspaceSection | "issue" | "dev_experiment" | "dashboard";
 
@@ -843,6 +846,12 @@ export function FounderWorkspacePage() {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
+            <a
+              href={COMPANION_GALLERY_DEMO_HREF}
+              className="rounded-lg border border-[#1e4f4f]/35 bg-[#1e4f4f]/8 px-3 py-1.5 text-xs font-medium text-[#1e4f4f] hover:bg-[#1e4f4f]/14"
+            >
+              Gallery demo
+            </a>
             <a
               href="/companion"
               className="rounded-lg border border-[#d4cdc3] px-3 py-1.5 text-xs font-medium text-[#2d2926] hover:bg-white"

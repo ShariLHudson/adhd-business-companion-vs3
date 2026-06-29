@@ -129,7 +129,7 @@ const MULTIPLE: MessagePools = {
   extended: ["Still with you. I'm checking one more thing."],
 };
 
-export const VISIBLE_THINKING_REVEAL_MS = 500;
+export const VISIBLE_THINKING_REVEAL_MS = 300;
 
 export const VISIBLE_THINKING_TIER_MS: Record<VisibleThinkingTier, number> = {
   early: 2000,

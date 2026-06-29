@@ -30,7 +30,7 @@ export function curateGalleryExhibition(options: {
   demoSceneId: GalleryDemoSceneId;
   archive?: readonly GalleryWallMemory[];
   signals?: GalleryCuratorSignals;
-}): GalleryWallMemory[] {
+}): readonly GalleryWallMemory[] {
   if (options.demoMode) {
     return resolveGalleryDemoScene(options.demoSceneId).exhibits;
   }

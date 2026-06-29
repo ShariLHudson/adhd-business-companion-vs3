@@ -162,9 +162,10 @@ export function WorkspaceLayout({
       data-mobile-split-layout={mobileLayout}
     >
       {/* Mobile tab switch — chat is always one tap away; never side-by-side shrink */}
-      <div className="flex shrink-0 gap-1 border-b border-[#1e4f4f]/10 bg-white/70 p-1 md:hidden">
+      <div className="companion-split-mobile-tabs md:hidden">
         <button
           type="button"
+          data-icon-slot="chat-tab"
           onClick={() => {
             if (onReturnToChat) {
               onReturnToChat();
@@ -173,27 +174,28 @@ export function WorkspaceLayout({
             setMobileView("chat");
             onChatLayoutModeChange?.("split");
           }}
-          className={`flex-1 rounded-lg py-2 text-sm font-semibold ${
+          className={`companion-split-mobile-tab ${
             mobileView === "chat" && !chatHidden
-              ? "bg-[#1e4f4f] text-white"
-              : "text-[#1e4f4f]"
+              ? "companion-split-mobile-tab--active"
+              : ""
           }`}
         >
-          {leftPaneEmoji} {leftPaneTitle}
+          <span data-temp-icon="chat">{leftPaneEmoji}</span> {leftPaneTitle}
         </button>
         <button
           type="button"
+          data-icon-slot="workspace-tab"
           onClick={() => {
             setMobileView("work");
             onChatLayoutModeChange?.("workspace-focus");
           }}
-          className={`flex-1 rounded-lg py-2 text-sm font-semibold ${
+          className={`companion-split-mobile-tab ${
             mobileView === "work" || chatHidden
-              ? "bg-[#1e4f4f] text-white"
-              : "text-[#1e4f4f]"
+              ? "companion-split-mobile-tab--active"
+              : ""
           }`}
         >
-          🛠 {workspaceTitle}
+          <span data-temp-icon="workspace">🛠</span> {workspaceTitle}
         </button>
       </div>
 
@@ -204,7 +206,7 @@ export function WorkspaceLayout({
       >
         {/* Chat pane — unmount when workspace-focus so the hidden chat tree cannot freeze the UI */}
         <div
-          className={`${SPLIT_CHAT_PANE_CLASS} h-full min-h-0 flex-col overflow-hidden border-[#1e4f4f]/10 md:max-h-full md:border-r ${
+          className={`${SPLIT_CHAT_PANE_CLASS} companion-split-chat-pane h-full min-h-0 flex-col overflow-hidden md:max-h-full ${
             chatHidden
               ? "hidden"
               : mobileView === "chat"
@@ -212,6 +214,11 @@ export function WorkspaceLayout({
                 : "hidden md:flex"
           }`}
         >
+          <div className="companion-split-chat-header hidden md:flex">
+            <span className="companion-split-chat-header__title" data-icon-slot="chat-pane-title">
+              {leftPaneEmoji} {leftPaneTitle}
+            </span>
+          </div>
           {!chatHidden ? chat : null}
         </div>
 
@@ -228,7 +235,7 @@ export function WorkspaceLayout({
           }`}
         >
           <div
-            className={`flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[#1e4f4f]/10 bg-white/60 px-3 py-2 ${WORKSPACE_HEADER_MIN_HEIGHT_CLASS}`}
+            className={`companion-split-chat-header flex shrink-0 flex-wrap items-center justify-between gap-2 px-3 py-2 ${WORKSPACE_HEADER_MIN_HEIGHT_CLASS}`}
           >
             <div className="flex min-w-0 items-center gap-2">
               {onClose ? (

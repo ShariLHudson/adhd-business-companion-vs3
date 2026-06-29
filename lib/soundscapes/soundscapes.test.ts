@@ -41,4 +41,38 @@ describe("soundscape catalog", () => {
     expect(coffeeShop?.playbackUrl).toContain("AMBRest-Quiet_coffee_shop_am-Elevenlabs.mp3");
     expect(coffeeShop?.destinationName).toBe("Cozy Café");
   });
+
+  it("links music room to the owned music loft ambience", () => {
+    const musicRoom = SOUNDSCAPES.find((s) => s.id === "deep-focus-piano");
+    expect(musicRoom?.playbackUrl).toContain("music-loft-ambience.mp3");
+    expect(musicRoom?.destinationName).toBe("Music Room");
+  });
+
+  it("links nature escape to the garden restoration peaceful place", () => {
+    const natureEscape = SOUNDSCAPES.find((s) => s.id === "nature-escape");
+    expect(natureEscape?.peacefulPlaceId).toBe("nature-escape");
+    expect(natureEscape?.destinationName).toBe("Nature Escape");
+  });
+
+  it("links sunrise terrace to the east terrace peaceful place", () => {
+    const sunriseTerrace = SOUNDSCAPES.find((s) => s.id === "sunrise-terrace");
+    expect(sunriseTerrace?.peacefulPlaceId).toBe("east-terrace");
+    expect(sunriseTerrace?.playbackUrl).toContain("east-terrace-morning-whisper.mp3");
+    expect(sunriseTerrace?.experience).toBe("Morning Whisper in the Garden");
+    expect(sunriseTerrace?.destinationName).toBe("East Terrace");
+  });
+
+  it("links movement studio to the bright studio peaceful place", () => {
+    const movementStudio = SOUNDSCAPES.find((s) => s.id === "movement-studio");
+    expect(movementStudio?.peacefulPlaceId).toBe("bright-studio");
+    expect(movementStudio?.playbackUrl).toContain("bright-studio-ambience.mp3");
+    expect(movementStudio?.destinationName).toBe("Bright Studio");
+  });
+
+  it("links evening hearth to the owned Songer fireplace ambience", () => {
+    const eveningHearth = SOUNDSCAPES.find((s) => s.id === "fireplace-night");
+    expect(eveningHearth?.peacefulPlaceId).toBe("evening-hearth");
+    expect(eveningHearth?.playbackUrl).toContain("evening-hearth-ambience.mp3");
+    expect(eveningHearth?.destinationName).toBe("Evening Hearth");
+  });
 });

@@ -19,6 +19,7 @@ import {
   type ProjectStatus,
 } from "@/lib/companionStore";
 import { sortByDropdownLabel } from "@/lib/dropdownSort";
+import { seedProjectChunks } from "@/lib/projects/seedProjectChunks";
 import { ProjectBreakdown } from "@/components/companion/ProjectBreakdown";
 import { CollapsibleSection } from "@/components/companion/CollapsibleSection";
 import { ProjectAssetsPanel } from "@/components/companion/ProjectAssetsPanel";
@@ -153,6 +154,9 @@ export function ProjectsPanel({
   const [step, setStep] = useState(0);
   const [what, setWhat] = useState("");
   const [why, setWhy] = useState("");
+  const [chunks, setChunks] = useState(["", "", ""]);
+
+  const CREATE_STEP_COUNT = 3;
 
   // Project Brain
   const [generating, setGenerating] = useState(false);
@@ -378,6 +382,7 @@ export function ProjectsPanel({
   function startBlankCreate() {
     setWhat("");
     setWhy("");
+    setChunks(["", "", ""]);
     setStep(0);
     setView("create");
   }
@@ -448,6 +453,11 @@ export function ProjectsPanel({
     });
     setProjects(next);
     const created = next[0]!;
+    const seededFirst = seedProjectChunks(created.id, chunks);
+    if (seededFirst) {
+      patch(created.id, { nextAction: seededFirst });
+      setDetailSectionsOpen({ tasks: true });
+    }
     setDetailId(created.id);
     setView("detail");
     onProjectSaved?.(created.id, created.name);
@@ -777,61 +787,89 @@ export function ProjectsPanel({
 
   // ---- Guided create ------------------------------------------------------
   if (view === "create") {
-    const isLast = step === 1;
+    const isLast = step === CREATE_STEP_COUNT - 1;
+    const stepTitle =
+      step === 0
+        ? "What are you trying to build?"
+        : step === 1
+          ? "Why does this matter right now?"
+          : "What are the main pieces?";
+    const stepHint =
+      step === 2
+        ? "Big pieces, not micro-tasks — optional, and you can add more later in Tasks."
+        : null;
+
     return (
       <div className="companion-fade-in flex h-full flex-col">
         <WorkspaceSopProgress session={sopSession ?? null} />
         <div className={`${workspacePanelShellClass({ width: "narrow", inSplit: true })} flex-1 overflow-y-auto`}>
         <p className="text-sm font-medium text-[#9a8f82]">
-          New project · step {step + 1} of 2
+          New project · step {step + 1} of {CREATE_STEP_COUNT}
         </p>
         <p className="mt-2 text-2xl font-semibold leading-snug text-[#1f1c19]">
-          {step === 0
-            ? "What are you trying to build?"
-            : "Why does this matter right now?"}
+          {stepTitle}
         </p>
-        <VoiceAnswerField
-          id={
-            step === 0
-              ? "workspace-field-project-title"
-              : "workspace-field-project-goal"
-          }
-          value={step === 0 ? what : why}
-          onChange={(v) => {
-            if (step === 0) {
-              setWhat(v);
-              if (sopSession && onSopFieldChange) {
-                const sid =
-                  sopSession.workflowId === "workshop"
-                    ? "workshop-title"
-                    : "project-name";
-                onSopFieldChange(sid, v);
-              }
-            } else {
-              setWhy(v);
-              if (sopSession && onSopFieldChange) {
-                const sid =
-                  sopSession.workflowId === "workshop"
-                    ? "workshop-outcome"
-                    : "project-outcome";
-                onSopFieldChange(sid, v);
-              }
+        {stepHint ? (
+          <p className="mt-2 text-base text-[#6b635a]">{stepHint}</p>
+        ) : null}
+        {step < 2 ? (
+          <VoiceAnswerField
+            id={
+              step === 0
+                ? "workspace-field-project-title"
+                : "workspace-field-project-goal"
             }
-          }}
-          placeholder={
-            step === 0
-              ? "e.g. Grow my Instagram audience"
-              : "A sentence on why it matters"
-          }
-          className="mt-6 flex-1"
-          inputClassName="min-h-[140px] flex-1 resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
-          micTitle={
-            step === 0
-              ? "What are you trying to build?"
-              : "Why does this matter right now?"
-          }
-        />
-        {sopSession && onSopFieldChange && (
+            value={step === 0 ? what : why}
+            onChange={(v) => {
+              if (step === 0) {
+                setWhat(v);
+                if (sopSession && onSopFieldChange) {
+                  const sid =
+                    sopSession.workflowId === "workshop"
+                      ? "workshop-title"
+                      : "project-name";
+                  onSopFieldChange(sid, v);
+                }
+              } else {
+                setWhy(v);
+                if (sopSession && onSopFieldChange) {
+                  const sid =
+                    sopSession.workflowId === "workshop"
+                      ? "workshop-outcome"
+                      : "project-outcome";
+                  onSopFieldChange(sid, v);
+                }
+              }
+            }}
+            placeholder={
+              step === 0
+                ? "e.g. Grow my Instagram audience"
+                : "A sentence on why it matters"
+            }
+            className="mt-6 flex-1"
+            inputClassName="min-h-[140px] flex-1 resize-none rounded-2xl border border-[#c9bfb0] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+            micTitle={stepTitle}
+          />
+        ) : (
+          <div className="mt-6 flex flex-col gap-3">
+            {chunks.map((chunk, index) => (
+              <label key={index} className="block text-sm font-semibold text-[#6b635a]">
+                Piece {index + 1}
+                <input
+                  value={chunk}
+                  onChange={(e) => {
+                    const next = [...chunks];
+                    next[index] = e.target.value;
+                    setChunks(next);
+                  }}
+                  placeholder={index === 0 ? "e.g. Content plan" : "Optional"}
+                  className="mt-1 w-full rounded-xl border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]"
+                />
+              </label>
+            ))}
+          </div>
+        )}
+        {sopSession && onSopFieldChange && step < 2 ? (
           <WorkspaceSopField
             session={sopSession}
             focusField={focusField}
@@ -839,11 +877,13 @@ export function ProjectsPanel({
             values={sopSession.acceptedValues as Record<string, string>}
             onChange={onSopFieldChange}
           />
-        )}
+        ) : null}
         <div className="mt-6 flex justify-between gap-2">
           <button
             type="button"
-            onClick={() => (step === 0 ? setView("create-source") : setStep(0))}
+            onClick={() =>
+              step === 0 ? setView("create-source") : setStep(step - 1)
+            }
             className="rounded-xl border-2 border-[#1e4f4f] bg-white px-6 py-3 text-base font-semibold text-[#1e4f4f]"
           >
             {step === 0 ? "Cancel" : "Back"}
@@ -851,7 +891,7 @@ export function ProjectsPanel({
           <button
             type="button"
             disabled={step === 0 && !what.trim()}
-            onClick={() => (isLast ? finishCreate() : setStep(1))}
+            onClick={() => (isLast ? finishCreate() : setStep(step + 1))}
             className="rounded-xl bg-[#1e4f4f] px-6 py-3 text-base font-semibold text-white disabled:bg-[#9aaba8]"
           >
             {isLast ? "Create project" : "Next"}

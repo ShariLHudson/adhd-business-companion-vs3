@@ -112,8 +112,8 @@ export function suggestSupportTool(
     return {
       kind: "focus-session",
       line:
-        "Energizing music can be a fast lift — **Focus Audio** has a **Motivation Boost** playlist for that.",
-      toolLabel: "Open Focus Audio",
+        "A peaceful place might help — **Peaceful Places** has destinations to slow down, focus, recharge, or unwind.",
+      toolLabel: "Open Peaceful Places",
       toolObjectId: "focus-audio",
       keepTalkingLabel: "Keep Talking",
       action: { type: "tool", tool: "focus-audio" },

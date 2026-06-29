@@ -989,7 +989,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "progress",
       "pillars",
     ],
-    openSection: "growth",
+    openSection: "the-gallery",
     openLabel: "Open Growth Center",
   },
   {
@@ -1191,7 +1191,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "visual report",
       "export",
     ],
-    openSection: "growth",
+    openSection: "the-gallery",
     openLabel: "Open Growth Reports",
   },
   {
@@ -1251,7 +1251,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "Trends matter more than any single day — reviewing progress is a thinking skill.",
     ],
     keywords: ["growth", "track", "progress", "review", "growth reports", "cognitive growth"],
-    openSection: "growth",
+    openSection: "the-gallery",
     openLabel: "Open Growth Center",
   },
 
@@ -1585,7 +1585,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "Reflection trains your brain to notice progress — that is the cognitive growth loop.",
     ],
     keywords: ["cognitive growth", "reflection", "confidence", "growth mindset"],
-    openSection: "growth",
+    openSection: "the-gallery",
     openLabel: "Open Growth",
   },
   {
@@ -1621,7 +1621,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     ],
     tips: ["A photo of a thank-you email counts as evidence."],
     keywords: ["upload", "attach", "file", "image", "photo", "pdf"],
-    openSection: "growth",
+    openSection: "the-gallery",
     openLabel: "Open Growth",
   },
   {

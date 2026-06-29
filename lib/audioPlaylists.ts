@@ -4,6 +4,8 @@ export type AudioLink = {
   url: string;
   playlistId: string;
   category?: string; // for saved audio: what it helps you do (focus/calm/…)
+  /** Personal note — why this place helps (Peaceful Places / My Audio). */
+  note?: string;
 };
 
 // Simple, human "what does this help you do?" buckets for SAVED audio — kept
@@ -423,8 +425,9 @@ export function addMyAudioLink(
   name: string,
   url: string,
   category?: string,
+  note?: string,
 ): AudioLink {
-  return addAudioLink(name, url, MY_AUDIO_PLAYLIST_ID, category);
+  return addAudioLink(name, url, MY_AUDIO_PLAYLIST_ID, category, note);
 }
 
 /** @deprecated Use focus preset via masterAudioCategories */
@@ -495,6 +498,7 @@ export function addAudioLink(
   url: string,
   playlistId: string,
   category?: string,
+  note?: string,
 ): AudioLink {
   const links = getAudioLinks();
   const link: AudioLink = {
@@ -503,6 +507,7 @@ export function addAudioLink(
     url: url.trim(),
     playlistId,
     ...(category ? { category } : {}),
+    ...(note?.trim() ? { note: note.trim() } : {}),
   };
   saveAudioLinks([link, ...links]);
   return link;
@@ -514,7 +519,7 @@ export function deleteAudioLink(id: string) {
 
 export function updateAudioLink(
   id: string,
-  patch: { name: string; url: string; category: string },
+  patch: { name: string; url: string; category: string; note?: string },
 ): AudioLink | null {
   const links = getAudioLinks();
   const index = links.findIndex((l) => l.id === id);
@@ -524,6 +529,7 @@ export function updateAudioLink(
     name: patch.name.trim(),
     url: patch.url.trim(),
     category: patch.category,
+    note: patch.note?.trim() ? patch.note.trim() : undefined,
   };
   const next = [...links];
   next[index] = updated;

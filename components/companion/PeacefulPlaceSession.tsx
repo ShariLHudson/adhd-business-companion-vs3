@@ -2,7 +2,10 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
+import { HomesteadRoomSignatureMotion } from "@/components/companion/homesteadRoom/HomesteadRoomSignatureMotion";
 import { parseYoutubeVideoId } from "@/lib/focusAudio/youtubeEmbed";
+import { peacefulPlaceNatureMotion } from "@/lib/companionHomestead";
 import {
   peacefulPlaceById,
   resolvePeacefulPlacePlayback,
@@ -58,6 +61,16 @@ export function PeacefulPlaceSession({ destination, onLeave }: Props) {
   const soundOnLabel = place?.sessionSoundOnLabel ?? DEFAULT_SOUND_ON_LABEL;
   const soundOffLabel = place?.sessionSoundOffLabel ?? DEFAULT_SOUND_OFF_LABEL;
   const audioWaitingCopy = place?.audioWaitingCopy ?? DEFAULT_AUDIO_DELAY_MESSAGE;
+
+  const natureMotion = useMemo(
+    () =>
+      peacefulPlaceNatureMotion({
+        placeId: destination.placeId,
+        experienceName: destination.experienceName,
+        soundscapeId: place?.soundscapeId,
+      }),
+    [destination.experienceName, destination.placeId, place?.soundscapeId],
+  );
 
   const youtubeSrc =
     playback.kind === "youtube" && soundOn
@@ -120,18 +133,24 @@ export function PeacefulPlaceSession({ destination, onLeave }: Props) {
       aria-label={`${destination.placeName} — ${destination.experienceName}`}
       data-peaceful-place={destination.placeId}
       data-peaceful-place-destination={destination.id}
+      data-homestead-room="peaceful-places"
       data-signature={place?.signature ? "1" : undefined}
       data-sound-on={soundOn ? "1" : undefined}
     >
       <div className="peaceful-place-session__bg" aria-hidden="true">
-        <div
-          className="peaceful-place-session__bg-image companion-scene-fade"
-          style={{
-            backgroundImage: `url('${destination.imageSrc}')`,
-            backgroundPosition: place?.backgroundObjectPosition ?? "center center",
-          }}
+        <CinematicBackground
+          preset="peaceful-place-session"
+          mode="image"
+          imageUrl={destination.imageSrc}
+          position={place?.backgroundObjectPosition ?? undefined}
+          placement="absolute"
+          className="peaceful-place-session__cinematic"
         />
         <div className="peaceful-place-session__bg-wash" />
+        <HomesteadRoomSignatureMotion
+          roomId="peaceful-places"
+          natureMotion={natureMotion}
+        />
         {showStormOutside ? (
           <div className="peaceful-place-session__storm-outside" />
         ) : null}

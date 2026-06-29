@@ -1,0 +1,121 @@
+/* ── Cinematic background engine — minimal crop, soft bottom depth ── */
+
+.cinematic-background {
+  --video-scale: 1.05;
+  --video-position: center center;
+  --cinematic-fade-strength: 1;
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.cinematic-background--fixed {
+  position: fixed;
+}
+
+.cinematic-background__clip {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.cinematic-background__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--video-position);
+  transform: scale(var(--video-scale));
+  transform-origin: center center;
+}
+
+.cinematic-background__image {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: var(--video-position);
+  transform: scale(var(--video-scale));
+  transform-origin: center center;
+}
+
+.cinematic-background__poster-fallback {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-color: #2a2420;
+  background-size: cover;
+  background-position: var(--video-position);
+  background-repeat: no-repeat;
+  transform: scale(var(--video-scale));
+  transform-origin: center center;
+}
+
+.cinematic-background__media {
+  z-index: 1;
+}
+
+.cinematic-background__fade {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  /* Bottom 20–30% — warm app parchment, not a mask panel */
+  background: linear-gradient(
+    to top,
+    rgba(252, 246, 236, calc(0.94 * var(--cinematic-fade-strength))) 0%,
+    rgba(252, 246, 236, calc(0.62 * var(--cinematic-fade-strength))) 14%,
+    rgba(252, 246, 236, calc(0.22 * var(--cinematic-fade-strength))) 24%,
+    transparent 30%
+  );
+}
+
+.companion-glass-panel,
+.companion-workspace-frosted,
+.companion-floating-card {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  background: rgba(255, 252, 245, 0.58);
+  border: 1px solid rgba(255, 255, 255, 0.42);
+  border-radius: 1.15rem;
+  box-shadow: 0 16px 42px rgba(42, 58, 38, 0.1);
+}
+
+.cinematic-background--no-fade .cinematic-background__fade {
+  display: none;
+}
+
+/* Scene contract — image dominance + cinematic crop share one clip */
+.companion-scene-bg .cinematic-background--scene-image {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.companion-scene-bg .cinematic-background--scene-image .cinematic-background__image,
+.companion-scene-bg .cinematic-background--scene-image .companion-scene-bg__image {
+  opacity: var(--scene-image-dominance, 0.48);
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.companion-scene-bg .cinematic-background--scene-video {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.companion-scene-bg .cinematic-background--scene-video .cinematic-background__fade {
+  z-index: 3;
+}
+
+/* Homestead home + chat — same engine, calmer fade on reading */
+.homestead-scene-surface.cinematic-background--home .cinematic-background__fade {
+  --cinematic-fade-strength: 0.72;
+}
+
+.companion-homestead-chat-scene .cinematic-background__fade {
+  --cinematic-fade-strength: 0.55;
+}

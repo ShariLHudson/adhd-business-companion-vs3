@@ -45,6 +45,8 @@ import {
 import type { CommunicationAnchorMode } from "@/lib/companionCommunicationAnchor";
 import type { ArrivalRecommendation, HospitalityResponse } from "@/lib/arrivalExperience";
 import { homesteadTimeCssVars } from "@/lib/homesteadTime";
+import { livingHomeCssVars } from "@/lib/livingHome/render";
+import { welcomeSeasonToLivingHomeSeason } from "@/lib/livingHome/season";
 import { isMasterLivingRoomLocked } from "@/lib/livingRoomMaster";
 
 type WelcomeLivingRoomContextValue = ReturnType<typeof useWelcomeLivingRoom>;
@@ -153,7 +155,13 @@ export function CompanionWelcomeScene({
   const atmosphere = useMemo(
     () =>
       normalizeWelcomeAtmosphere(
-        resolvedRoom?.atmosphere ?? resolveWelcomeAtmosphere({ timeOfDay }),
+        resolvedRoom?.atmosphere
+          ? {
+              timeOfDay: resolvedRoom.atmosphere.timeOfDay ?? timeOfDay,
+              season: resolvedRoom.atmosphere.season,
+              weather: resolvedRoom.atmosphere.weather,
+            }
+          : resolveWelcomeAtmosphere({ timeOfDay }),
       ),
     [resolvedRoom?.atmosphere, timeOfDay],
   );
@@ -171,7 +179,8 @@ export function CompanionWelcomeScene({
     objectPosition: imageCaps.artObjectPosition,
     objectFit: imageCaps.artObjectFit,
   } as CSSProperties;
-  const artRoomLayout = imageCaps.artObjectFit === "contain";
+  const artRoomLayout =
+    !masterSceneLocked && imageCaps.artObjectFit === "contain";
   const showHospitalitySteam =
     hospitality?.showMugSteam && !imageCaps.suppressHospitalitySteam;
   const showHospitalityCurtains =
@@ -191,9 +200,19 @@ export function CompanionWelcomeScene({
   const arrivalMode = showGreetingOverride !== undefined;
   const livingChange = resolvedRoom?.livingChangeSet;
   const homesteadTime = resolvedRoom?.homesteadTime ?? null;
-  const homesteadStyle = homesteadTime
-    ? (homesteadTimeCssVars(homesteadTime) as CSSProperties)
-    : undefined;
+  const homesteadStyle = useMemo(() => {
+    if (!homesteadTime) return undefined;
+    return {
+      ...homesteadTimeCssVars(homesteadTime),
+      ...livingHomeCssVars(
+        homesteadTime,
+        welcomeSeasonToLivingHomeSeason(atmosphere.season),
+        1,
+        [],
+        false,
+      ),
+    } as CSSProperties;
+  }, [homesteadTime, atmosphere.season]);
 
   return (
     <WelcomeLivingRoomContext.Provider value={living}>
@@ -224,6 +243,8 @@ export function CompanionWelcomeScene({
             walking ? " companion-welcome-scene__hero--walking" : ""
           }`}
           style={homesteadStyle}
+          data-welcome-photograph={displayPhotographId}
+          data-homestead-scene=""
           data-living-phase={living.phase}
           data-time-of-day={atmosphere.timeOfDay}
           data-homestead-period={homesteadTime?.period}
@@ -264,13 +285,19 @@ export function CompanionWelcomeScene({
               motion={resolvedRoom.layer3}
               photographId={displayPhotographId}
             />
-          ) : !masterSceneLocked ? (
-            <div className="companion-welcome-scene__life" aria-hidden="true">
+          ) : (
+            <div
+              className="companion-welcome-scene__life companion-welcome-scene__life--homestead"
+              aria-hidden="true"
+            >
               <div className="companion-welcome-scene__sunlight" />
+              <div className="companion-welcome-scene__exterior-dusk" />
+              <div className="companion-welcome-scene__interior-lamp" />
               <div className="companion-welcome-scene__lamplight" />
+              <div className="companion-welcome-scene__porch-glow" />
               <div className="companion-welcome-scene__foliage" />
             </div>
-          ) : null}
+          )}
 
           {!masterSceneLocked && hospitality?.showBlanket ? (
             <div

@@ -1,0 +1,213 @@
+/* Signature Icon System — warm illustrated navigation language */
+
+.signature-icon {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  color: #2a3634;
+}
+
+.signature-icon__svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.companion-nav-active .signature-icon,
+.companion-object-visual--active .signature-icon {
+  color: #1e4f4f;
+}
+
+/* ── Subtle motion — luxury hotel, not arcade ── */
+
+.signature-icon--window-glow .signature-icon__window-glow {
+  animation: sig-icon-window-glow 3.6s ease-in-out infinite;
+}
+
+.signature-icon--sparkle-drift .signature-icon__sparkle--1 {
+  animation: sig-icon-sparkle 2.8s ease-in-out infinite;
+}
+
+.signature-icon--sparkle-drift .signature-icon__sparkle--2 {
+  animation: sig-icon-sparkle 3.2s ease-in-out 0.4s infinite;
+}
+
+.signature-icon--sparkle-drift .signature-icon__sparkle--3 {
+  animation: sig-icon-sparkle-drift 3.4s ease-in-out infinite;
+}
+
+.signature-icon--lantern-glow .signature-icon__lantern-glow,
+.signature-icon--lantern-glow .signature-icon__lantern-rays {
+  animation: sig-icon-lantern-glow 3s ease-in-out infinite;
+}
+
+.signature-icon--path-brighten .signature-icon__path-glow {
+  animation: sig-icon-path-brighten 4s ease-in-out infinite;
+}
+
+.signature-icon--block-tip .signature-icon__block-tip {
+  transform-origin: 11.5px 12.7px;
+  animation: sig-icon-block-tip 2.6s ease-in-out infinite;
+}
+
+.signature-icon--page-glow .signature-icon__page-glow {
+  animation: sig-icon-page-glow 3.4s ease-in-out infinite;
+}
+
+.signature-icon--page-glow .signature-icon__page-glow--r {
+  animation-delay: 0.5s;
+}
+
+.signature-icon--lamp-glow .signature-icon__lamp-glow,
+.signature-icon--lamp-glow .signature-icon__lamp-light {
+  animation: sig-icon-lamp-glow 3.2s ease-in-out infinite;
+}
+
+.signature-icon--sound-wave .signature-icon__wave--1,
+.signature-icon--sound-wave .signature-icon__wave--3 {
+  animation: sig-icon-wave 2.2s ease-in-out infinite;
+}
+
+.signature-icon--sound-wave .signature-icon__wave--2,
+.signature-icon--sound-wave .signature-icon__wave--4 {
+  animation: sig-icon-wave 2.2s ease-in-out 0.35s infinite;
+}
+
+.signature-icon--leaf-sway .signature-icon__leaf-sway {
+  transform-origin: 12px 11px;
+  animation: sig-icon-leaf-sway 3.8s ease-in-out infinite;
+}
+
+.signature-icon--compass-turn .signature-icon__compass-needle {
+  transform-origin: 12px 12px;
+  animation: sig-icon-compass-turn 6s ease-in-out infinite;
+}
+
+.signature-icon--compass-turn .signature-icon__compass-glow {
+  animation: sig-icon-lantern-glow 3.5s ease-in-out infinite;
+}
+
+@keyframes sig-icon-window-glow {
+  0%,
+  100% {
+    opacity: 0.22;
+  }
+  50% {
+    opacity: 0.48;
+  }
+}
+
+@keyframes sig-icon-sparkle {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes sig-icon-sparkle-drift {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: translate(0, 0);
+  }
+  50% {
+    opacity: 0.85;
+    transform: translate(0.4px, -0.5px);
+  }
+}
+
+@keyframes sig-icon-lantern-glow {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes sig-icon-path-brighten {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes sig-icon-block-tip {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(-7deg);
+  }
+}
+
+@keyframes sig-icon-page-glow {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes sig-icon-lamp-glow {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes sig-icon-wave {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scaleX(0.92);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes sig-icon-leaf-sway {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  50% {
+    transform: rotate(4deg);
+  }
+}
+
+@keyframes sig-icon-compass-turn {
+  0%,
+  100% {
+    transform: rotate(-8deg);
+  }
+  50% {
+    transform: rotate(8deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .signature-icon [class*="signature-icon__"] {
+    animation: none !important;
+  }
+}

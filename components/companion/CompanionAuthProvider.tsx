@@ -4,18 +4,24 @@ import {
   createContext,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
-  useRef,
   useState,
   type ReactNode,
 } from "react";
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 
 import { getAppSiteUrl } from "@/lib/appSite";
+import {
+  hasCompanionAuthStorageHint,
+  waitForCompanionAuthStorage,
+} from "@/lib/companionLoginTransition";
 import { languagePrefsFromUserMetadata } from "@/lib/companionUserLanguage";
 import { savePrefs } from "@/lib/companionStore";
 import {
+  authRequestAbortedMessage,
   emailNotConfirmedMessage,
+  isAuthRequestAborted,
   isEmailNotConfirmedError,
   parseAuthApiResponse,
   postCompanionAuthApi,
@@ -25,11 +31,15 @@ import {
   bootstrapCompanionSupabaseConfig,
   companionAuthConfigured,
   getCompanionSupabase,
+  hydrateCompanionAuthFromInlineConfig,
+  resetCompanionAuthBackoff,
 } from "@/lib/supabase/companionClient";
 
 type CompanionAuthContextValue = {
   configured: boolean;
   loading: boolean;
+  /** True after the first session restore attempt finishes. */
+  sessionChecked: boolean;
   user: User | null;
   session: Session | null;
   signIn: (
@@ -79,12 +89,13 @@ function syncUserToPrefs(user: User | null) {
 async function signInDirect(
   email: string,
   password: string,
-): Promise<{ error: string | null; hint?: string }> {
+): Promise<{ error: string | null; hint?: string; session?: Session | null }> {
   const supabase = getCompanionSupabase();
   if (!supabase) {
     return { error: "Could not connect to Supabase in your browser." };
   }
   try {
+    resetCompanionAuthBackoff();
     const res = await postCompanionAuthApi("/api/companion-auth/signin", {
       email,
       password,
@@ -114,15 +125,50 @@ async function signInDirect(
       return { error: "Sign-in failed — no session returned." };
     }
 
-    const { error } = await supabase.auth.setSession({
+    const { data: sessionData, error } = await supabase.auth.setSession({
       access_token: session.access_token,
       refresh_token: session.refresh_token,
     });
     if (error) {
+      if (isAuthRequestAborted(error)) {
+        const retry = await supabase.auth.setSession({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+        });
+        if (retry.error) {
+          return { error: authRequestAbortedMessage() };
+        }
+        if (!retry.data.session) {
+          return { error: "Sign-in failed — could not save your session." };
+        }
+        const persisted = await waitForCompanionAuthStorage(5_000);
+        if (!persisted) {
+          return {
+            error:
+              "Signed in, but this browser could not save your session. Free some storage or try another browser.",
+          };
+        }
+        resetCompanionAuthBackoff();
+        return { error: null, session: retry.data.session };
+      }
       return { error: sanitizeSupabaseAuthError(error.message) };
     }
-    return { error: null };
+    if (!sessionData.session) {
+      return { error: "Sign-in failed — could not save your session." };
+    }
+    const persisted = await waitForCompanionAuthStorage(5_000);
+    if (!persisted) {
+      return {
+        error:
+          "Signed in, but this browser could not save your session. Free some storage or try another browser.",
+      };
+    }
+    resetCompanionAuthBackoff();
+    return { error: null, session: sessionData.session };
   } catch (e) {
+    if (isAuthRequestAborted(e)) {
+      return { error: authRequestAbortedMessage() };
+    }
     const message = e instanceof Error ? e.message : "Sign-in failed.";
     return { error: sanitizeSupabaseAuthError(message) };
   }
@@ -203,7 +249,7 @@ async function signUpDirect(
   email: string,
   password: string,
   name?: string,
-): Promise<{ error: string | null; needsConfirmation?: boolean }> {
+): Promise<{ error: string | null; needsConfirmation?: boolean; session?: Session | null }> {
   const supabase = getCompanionSupabase();
   if (!supabase) {
     return { error: "Could not connect to Supabase in your browser." };
@@ -231,14 +277,25 @@ async function signUpDirect(
       | { access_token?: string; refresh_token?: string }
       | undefined;
     if (session?.access_token && session?.refresh_token) {
-      const { error } = await supabase.auth.setSession({
+      const { data: sessionData, error } = await supabase.auth.setSession({
         access_token: session.access_token,
         refresh_token: session.refresh_token,
       });
       if (error) {
         return { error: sanitizeSupabaseAuthError(error.message) };
       }
-      return { error: null, needsConfirmation: false };
+      const persisted = await waitForCompanionAuthStorage(5_000);
+      if (!persisted) {
+        return {
+          error:
+            "Account created, but this browser could not save your session. Free some storage or try another browser.",
+        };
+      }
+      return {
+        error: null,
+        needsConfirmation: false,
+        session: sessionData.session,
+      };
     }
 
     return { error: null, needsConfirmation: Boolean(data.needsConfirmation) };
@@ -249,73 +306,108 @@ async function signUpDirect(
 }
 
 export function CompanionAuthProvider({ children }: { children: ReactNode }) {
-  const [configured, setConfigured] = useState(companionAuthConfigured());
+  useLayoutEffect(() => {
+    hydrateCompanionAuthFromInlineConfig();
+  }, []);
+
+  const [configured, setConfigured] = useState(() => {
+    if (typeof window === "undefined") return false;
+    hydrateCompanionAuthFromInlineConfig();
+    return companionAuthConfigured();
+  });
   const [loading, setLoading] = useState(true);
+  const [sessionChecked, setSessionChecked] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const initRef = useRef(false);
+
+  function applyAuthSession(sess: Session | null) {
+    setSession(sess);
+    setUser(sess?.user ?? null);
+    if (sess?.user) {
+      syncUserToPrefs(sess.user);
+    }
+  }
 
   useEffect(() => {
-    if (initRef.current) return;
-    initRef.current = true;
-
     let mounted = true;
     let unsubscribe: (() => void) | undefined;
 
     const finishLoading = () => {
-      if (mounted) setLoading(false);
+      if (mounted) {
+        setLoading(false);
+        setSessionChecked(true);
+      }
     };
 
-    const loadingTimeout = window.setTimeout(finishLoading, 8_000);
+    const loadingTimeout = window.setTimeout(finishLoading, 10_000);
 
     void (async () => {
       try {
+        hydrateCompanionAuthFromInlineConfig();
         let ready = companionAuthConfigured();
         if (!ready) {
-          for (let attempt = 0; attempt < 3 && !ready; attempt += 1) {
+          for (let attempt = 0; attempt < 4 && !ready; attempt += 1) {
             ready = await bootstrapCompanionSupabaseConfig();
-            if (!ready && attempt < 2) {
+            if (!ready && attempt < 3) {
               await new Promise((resolve) =>
-                window.setTimeout(resolve, 600 * (attempt + 1)),
+                window.setTimeout(resolve, 200 * (attempt + 1)),
               );
             }
           }
         }
         if (!mounted) return;
-        setConfigured(companionAuthConfigured());
-        if (!companionAuthConfigured()) return;
+        const authReady = companionAuthConfigured();
+        setConfigured(authReady);
+        if (!authReady) return;
 
         const supabase = getCompanionSupabase();
         if (!supabase) return;
 
-        const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
+        const applySession = (sess: Session | null) => {
           if (!mounted) return;
           setSession(sess);
           setUser(sess?.user ?? null);
+          if (sess?.user) syncUserToPrefs(sess.user);
+        };
+
+        const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
+          if (!mounted) return;
+          if (event === "SIGNED_OUT") {
+            setSession(null);
+            setUser(null);
+            return;
+          }
+          applySession(sess);
           if (shouldSyncPrefs(event)) {
             syncUserToPrefs(sess?.user ?? null);
           }
-          finishLoading();
         });
         unsubscribe = () => sub.subscription.unsubscribe();
 
-        const { data, error } = await supabase.auth.getSession();
-        if (!mounted) return;
-
-        if (error) {
-          const status = (error as { status?: number }).status;
-          if (status === 429) {
-            await supabase.auth.signOut({ scope: "local" });
+        async function restoreSession(): Promise<Session | null> {
+          if (!supabase) return null;
+          const first = await supabase.auth.getSession();
+          if (first.data.session) return first.data.session;
+          if (first.error) {
+            const status = (first.error as { status?: number }).status;
+            if (status === 429) resetCompanionAuthBackoff();
           }
-          return;
+          for (let i = 0; i < 12; i += 1) {
+            await new Promise((resolve) => window.setTimeout(resolve, 100));
+            const retry = await supabase.auth.getSession();
+            if (retry.data.session) return retry.data.session;
+          }
+          if (hasCompanionAuthStorageHint()) {
+            const refreshed = await supabase.auth.refreshSession();
+            if (refreshed.data.session) return refreshed.data.session;
+          }
+          return null;
         }
 
-        setSession(data.session);
-        setUser(data.session?.user ?? null);
-        if (data.session?.user) {
-          syncUserToPrefs(data.session.user);
-        }
+        const restored = await restoreSession();
+        if (mounted) applySession(restored);
       } finally {
+        window.clearTimeout(loadingTimeout);
         finishLoading();
       }
     })();
@@ -331,10 +423,31 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
     () => ({
       configured,
       loading,
+      sessionChecked,
       user,
       session,
-      signIn: signInDirect,
-      signUp: signUpDirect,
+      signIn: async (email, password) => {
+        hydrateCompanionAuthFromInlineConfig();
+        if (!companionAuthConfigured()) {
+          await bootstrapCompanionSupabaseConfig();
+        }
+        if (companionAuthConfigured()) setConfigured(true);
+        const result = await signInDirect(email, password);
+        if (!result.error && result.session) {
+          applyAuthSession(result.session);
+        }
+        return { error: result.error, hint: result.hint };
+      },
+      signUp: async (email, password, name) => {
+        const result = await signUpDirect(email, password, name);
+        if (!result.error && result.session) {
+          applyAuthSession(result.session);
+        }
+        return {
+          error: result.error,
+          needsConfirmation: result.needsConfirmation,
+        };
+      },
       signOut: async () => {
         const supabase = getCompanionSupabase();
         if (!supabase) return;
@@ -344,7 +457,7 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
       resetPassword: resetPasswordDirect,
       signInWithGoogle: signInWithGoogleDirect,
     }),
-    [configured, loading, user, session],
+    [configured, loading, sessionChecked, user, session],
   );
 
   return (

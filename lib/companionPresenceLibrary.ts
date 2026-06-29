@@ -15,6 +15,7 @@ import {
 
 export {
   COMPANION_PRESENCE_WELCOME_IMAGE_ID,
+  COMPANION_PRESENCE_EVENING_WELCOME_IMAGE_ID,
   companionPresenceEntryById,
   type CompanionPresenceLibraryEntry,
 } from "@/lib/companionPresenceLibrary/sceneCatalog";

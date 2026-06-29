@@ -1,0 +1,909 @@
+/* ═══════════════════════════════════════════════════════════
+   HOMESTEAD SIGNPOST SIDEBAR
+   Handcrafted lamp post + hanging wooden signs
+═══════════════════════════════════════════════════════════ */
+
+/* ── Reset legacy brass plaque rules — utility links only ── */
+.companion-app-sidebar.homestead-signpost-sidebar a.homestead-signpost-sidebar__utility-link {
+  background: none !important;
+  border-radius: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+  transform: none;
+}
+
+/* === HOMESTEAD SIGNPOST — Victorian wrought-iron lamppost + hanging plaques === */
+.companion-app-sidebar.homestead-signpost-sidebar a.homestead-signpost__plaque,
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  min-height: 2.45rem !important;
+  margin: 0 !important;
+  padding: 0.5rem 0.85rem !important;
+  border: 1.25px solid rgba(220, 205, 175, 0.72) !important;
+  border-radius: 0 !important;
+  clip-path: polygon(
+    11px 0%,
+    calc(100% - 11px) 0%,
+    100% 50%,
+    calc(100% - 11px) 100%,
+    11px 100%,
+    0% 50%
+  ) !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: 0.88rem !important;
+  font-weight: 500 !important;
+  letter-spacing: 0.03em !important;
+  text-shadow: none !important;
+  background: linear-gradient(
+    175deg,
+    #2a2826 0%,
+    #22201e 22%,
+    #1a1816 52%,
+    #141210 82%,
+    #0e0c0a 100%
+  ) !important;
+  color: #e8dcc8 !important;
+  text-decoration: none !important;
+  position: relative !important;
+  box-shadow: rgba(0, 0, 0, 0.55) 0 3px 8px !important;
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease !important;
+}
+
+.companion-app-sidebar.homestead-signpost-sidebar a.homestead-signpost__plaque::before,
+.companion-app-sidebar.homestead-signpost-sidebar a.homestead-signpost__plaque::after,
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque::before,
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque::after {
+  display: none !important;
+}
+
+.companion-app-sidebar.homestead-signpost-sidebar a.homestead-signpost__plaque:hover,
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque--menu:hover {
+  background: linear-gradient(175deg, #343230 0%, #2a2826 50%, #1e1c1a 100%) !important;
+  border-color: rgba(232, 220, 195, 0.88) !important;
+  transform: translateY(-2px);
+  box-shadow: rgba(0, 0, 0, 0.65) 0 5px 12px !important;
+}
+
+.companion-app-sidebar.homestead-signpost-sidebar a.homestead-signpost__plaque--active,
+.companion-app-sidebar.homestead-signpost-sidebar a.homestead-signpost__plaque[aria-current="page"],
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque--active {
+  background: linear-gradient(175deg, #3a3632 0%, #2e2a28 42%, #242220 100%) !important;
+  border-color: rgba(240, 228, 200, 0.82) !important;
+  color: #f5efe4 !important;
+  box-shadow:
+    rgba(0, 0, 0, 0.55) 0 3px 8px,
+    0 0 14px rgba(255, 210, 140, 0.28) !important;
+  text-shadow: 0 0 8px rgba(255, 230, 190, 0.35) !important;
+}
+
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque-label {
+  display: block !important;
+  width: 100% !important;
+  font-size: 0.88rem !important;
+  font-weight: 500 !important;
+  font-variant: normal !important;
+  color: inherit !important;
+  letter-spacing: 0.05em !important;
+  white-space: nowrap !important;
+  text-align: center !important;
+}
+
+.companion-app-sidebar.homestead-signpost-sidebar a.homestead-signpost__plaque-link {
+  display: flex !important;
+  flex: 1 !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 2.45rem !important;
+  width: 100% !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  text-decoration: none !important;
+}
+
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque--menu .homestead-signpost__plaque-link {
+  padding: 0 1.55rem 0 0.85rem !important;
+}
+
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost {
+  flex: 1 1 0% !important;
+  min-height: 600px !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  align-items: start !important;
+  width: 100% !important;
+  padding: 0.25rem 0.15rem 0.5rem 0.35rem !important;
+  --homestead-post-width: clamp(2.65rem, 5.5vw, 3.35rem);
+  --homestead-signs-width: min(12.25rem, calc(100% - var(--homestead-post-width) * 0.5 - 0.35rem));
+  --homestead-arm-start: calc(0.35rem + var(--homestead-post-width) * 0.5);
+  --homestead-arm-width: calc(100% - var(--homestead-arm-start) - 0.15rem);
+}
+
+.companion-app-sidebar.homestead-signpost-sidebar {
+  background: #2c2420 !important;
+  border-right: 1px solid #1a1512 !important;
+  color: #e8ddd4 !important;
+  overflow-y: auto !important;
+  overflow-x: visible !important;
+  opacity: 1 !important;
+}
+
+.companion-sidebar-portal[data-nav-visibility="normal"] .companion-app-sidebar.homestead-signpost-sidebar {
+  opacity: 1 !important;
+}
+
+.companion-sidebar-portal:has(.homestead-signpost-sidebar) {
+  background: #2c2420;
+}
+
+.companion-app-sidebar.homestead-signpost-sidebar > div:first-child {
+  background: #2c2420 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+}
+
+/* ── Brand header ───────────────────────────────────────── */
+.homestead-signpost-sidebar__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.5rem 0.35rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  background: #2c2420;
+}
+
+.homestead-signpost-sidebar__logo {
+  width: 1.65rem;
+  height: 1.65rem;
+  flex-shrink: 0;
+  object-fit: contain;
+}
+
+.homestead-signpost-sidebar__brand-name {
+  display: none;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.25;
+  color: rgba(232, 221, 212, 0.82);
+  letter-spacing: 0.01em;
+}
+
+@media (min-width: 768px) {
+  .homestead-signpost-sidebar__brand-name {
+    display: block;
+  }
+}
+
+/* ── Scene layout: unified signpost ─────────────────────── */
+.homestead-signpost-sidebar__nav {
+  flex: 1;
+  padding: 0.35rem 0 0.5rem;
+  min-height: 0;
+  overflow: visible;
+  background: #2c2420;
+}
+
+.homestead-signpost {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  width: 100%;
+  flex: 1 1 0%;
+  min-height: clamp(22rem, 72vh, 36rem);
+  height: 100%;
+  overflow: visible;
+  padding: 0.25rem 0.15rem 0.5rem 0.35rem;
+  --homestead-post-width: clamp(2.65rem, 5.5vw, 3.35rem);
+  --homestead-signs-width: min(12.25rem, calc(100% - var(--homestead-post-width) * 0.5 - 0.35rem));
+  --homestead-arm-start: calc(0.35rem + var(--homestead-post-width) * 0.5);
+  --homestead-arm-width: calc(100% - var(--homestead-arm-start) - 0.15rem);
+}
+
+/* ── Victorian lamppost — SVG from lamp-post reference art ── */
+.homestead-signpost__post {
+  grid-column: 1;
+  grid-row: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  width: var(--homestead-post-width);
+  height: 66.67%;
+  min-height: clamp(15rem, 46vh, 24rem);
+  flex-shrink: 0;
+  z-index: 2;
+  align-self: start;
+  overflow: visible;
+}
+
+.homestead-signpost__pole-svg {
+  display: block;
+  width: clamp(4.1rem, 9.2vw, 5rem);
+  height: 100%;
+  min-height: clamp(15rem, 46vh, 24rem);
+  margin: 0 auto;
+  overflow: visible;
+  pointer-events: none;
+  filter: drop-shadow(2px 5px 10px rgba(0, 0, 0, 0.38));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .homestead-signpost__pole-svg animate {
+    display: none;
+  }
+}
+
+/* Horizontal hanger rod — meets the lantern bracket, spans the sign row */
+.homestead-signpost__arm {
+  position: absolute;
+  top: calc(0.35rem + clamp(15rem, 46vh, 24rem) * 125 / 820);
+  left: var(--homestead-arm-start);
+  width: var(--homestead-arm-width);
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #4a4642 0%, #1a1816 48%, #0a0908 100%);
+  box-shadow:
+    0 2px 5px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  z-index: 4;
+  pointer-events: none;
+}
+
+.homestead-signpost__arm::before,
+.homestead-signpost__arm::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #3a3632;
+  transform: translateY(-50%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+}
+
+.homestead-signpost__arm::before {
+  left: 0.15rem;
+}
+
+.homestead-signpost__arm::after {
+  right: 0.15rem;
+}
+
+.homestead-signpost__signs {
+  grid-column: 1 / -1;
+  grid-row: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.48rem;
+  width: var(--homestead-arm-width);
+  margin-left: var(--homestead-arm-start);
+  padding-top: calc(0.35rem + clamp(15rem, 46vh, 24rem) * 125 / 820 + 0.55rem);
+  padding-left: 0;
+  padding-right: 0.15rem;
+  overflow: visible;
+  z-index: 1;
+}
+
+.homestead-signpost__sign-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: var(--homestead-signs-width);
+  max-width: 100%;
+  transform-origin: top center;
+}
+
+.homestead-signpost__signs > .homestead-signpost__sign-wrap:first-child .homestead-signpost__chain {
+  height: 0.95rem;
+}
+
+.homestead-signpost__signs > .homestead-signpost__sign-wrap:first-child .homestead-signpost__chains {
+  margin-top: -0.12rem;
+}
+
+.homestead-signpost__chains {
+  display: flex;
+  justify-content: center;
+  gap: 0.62rem;
+  padding: 0 0.28rem;
+}
+
+.homestead-signpost__chain {
+  display: block;
+  width: 2px;
+  height: 0.72rem;
+  background: repeating-linear-gradient(180deg, #5a5650 0 2px, #1a1816 2px 4px);
+  border-radius: 1px;
+}
+
+.homestead-signpost__plaque {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.45rem;
+  margin: 0;
+  padding: 0.5rem 0.85rem;
+  border: 1.25px solid rgba(220, 205, 175, 0.72);
+  border-radius: 0;
+  clip-path: polygon(
+    11px 0%,
+    calc(100% - 11px) 0%,
+    100% 50%,
+    calc(100% - 11px) 100%,
+    11px 100%,
+    0% 50%
+  );
+  background: linear-gradient(
+    175deg,
+    #2a2826 0%,
+    #22201e 22%,
+    #1a1816 52%,
+    #141210 82%,
+    #0e0c0a 100%
+  );
+  box-shadow: rgba(0, 0, 0, 0.55) 0 2px 6px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  color: #e8dcc8;
+  text-shadow: none;
+  text-decoration: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  transition:
+    background 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.2s ease;
+}
+
+.homestead-signpost__plaque::before,
+.homestead-signpost__plaque::after {
+  display: none;
+}
+
+.homestead-signpost__plaque:hover {
+  background: linear-gradient(175deg, #343230 0%, #2a2826 50%, #1e1c1a 100%);
+  border-color: rgba(232, 220, 195, 0.88);
+  transform: translateY(-2px);
+  box-shadow: rgba(0, 0, 0, 0.65) 0 5px 12px;
+}
+
+.homestead-signpost__plaque--active {
+  background: linear-gradient(175deg, #3a3632 0%, #2e2a28 42%, #242220 100%);
+  border-color: rgba(240, 228, 200, 0.82);
+  color: #f5efe4;
+  box-shadow:
+    rgba(0, 0, 0, 0.55) 0 3px 8px,
+    0 0 14px rgba(255, 210, 140, 0.28);
+  text-shadow: 0 0 8px rgba(255, 230, 190, 0.35);
+}
+
+.homestead-signpost__plaque-label {
+  display: block;
+  width: 100%;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: inherit;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.homestead-signpost__plaque--menu {
+  position: relative;
+  justify-content: center;
+  padding: 0;
+  overflow: visible;
+  clip-path: polygon(
+    11px 0%,
+    calc(100% - 11px) 0%,
+    100% 50%,
+    calc(100% - 11px) 100%,
+    11px 100%,
+    0% 50%
+  );
+  background: linear-gradient(
+    175deg,
+    #2a2826 0%,
+    #22201e 22%,
+    #1a1816 52%,
+    #141210 82%,
+    #0e0c0a 100%
+  );
+  border: 1.25px solid rgba(220, 205, 175, 0.72);
+  box-shadow: rgba(0, 0, 0, 0.55) 0 2px 6px;
+}
+
+.homestead-signpost__plaque--menu .homestead-signpost__plaque-link {
+  clip-path: none;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  margin: 0;
+  width: 100%;
+  padding: 0 1.55rem 0 0.85rem;
+}
+
+.homestead-signpost__plaque--menu:hover {
+  background: linear-gradient(175deg, #343230 0%, #2a2826 50%, #1e1c1a 100%);
+  border-color: rgba(232, 220, 195, 0.88);
+}
+
+.homestead-signpost__plaque--menu.homestead-signpost__plaque--active {
+  background: linear-gradient(175deg, #3a3632 0%, #2e2a28 42%, #242220 100%);
+  border-color: rgba(240, 228, 200, 0.82);
+}
+
+.homestead-signpost__plaque-link {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.45rem;
+  padding: 0 0.28rem;
+  text-decoration: none;
+  color: inherit;
+  background: transparent;
+  border: none;
+}
+
+.homestead-signpost__plaque-toggle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  padding: 0;
+  margin: 0;
+  border: none;
+  border-left: 1px solid rgba(20, 12, 4, 0.28);
+  background: rgba(0, 0, 0, 0.08);
+  color: rgba(232, 212, 168, 0.85);
+  cursor: pointer;
+  z-index: 2;
+}
+
+.homestead-signpost__plaque-toggle:hover {
+  background: rgba(255, 210, 130, 0.08);
+}
+
+.homestead-signpost__plaque-toggle-mark {
+  font-size: 0.72rem;
+  line-height: 1;
+  font-weight: 600;
+}
+
+.homestead-signpost__submenu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.08rem;
+}
+
+.homestead-signpost__sign-wrap--sub .homestead-signpost__plaque {
+  min-height: 1.85rem;
+  padding: 0.34rem 0.55rem;
+  font-size: 0.72rem;
+  width: 100%;
+}
+
+.homestead-signpost__plaque--sub {
+  width: 100%;
+  text-align: center;
+}
+
+.homestead-signpost__plaque:focus-visible,
+.homestead-signpost__plaque-toggle:focus-visible,
+.homestead-signpost__plaque--sub:focus-visible {
+  outline: 2px solid rgba(255, 210, 120, 0.55);
+  outline-offset: 2px;
+}
+
+.homestead-signpost__sign-wrap--sway-1 {
+  animation: homestead-sign-sway-a 9.5s ease-in-out infinite;
+}
+
+.homestead-signpost__sign-wrap--sway-2 {
+  animation: homestead-sign-sway-b 10.8s ease-in-out infinite;
+  animation-delay: 0.7s;
+}
+
+.homestead-signpost__sign-wrap--sway-3 {
+  animation: homestead-sign-sway-c 8.2s ease-in-out infinite;
+  animation-delay: 1.4s;
+}
+
+.homestead-signpost__sign-wrap--sway-4 {
+  animation: homestead-sign-sway-a 11.4s ease-in-out infinite;
+  animation-delay: 2.1s;
+}
+
+.homestead-signpost__sign-wrap--sway-5 {
+  animation: homestead-sign-sway-b 9.8s ease-in-out infinite;
+  animation-delay: 0.3s;
+}
+
+/* ── Top bar sign board (shared pointed-end shape) ───────── */
+.top-bar-homestead-sign__board {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 6.5rem;
+  height: 2.3rem;
+  min-height: 2.3rem;
+  white-space: nowrap;
+  padding: 0.44rem 0.9rem;
+  position: relative;
+  background: linear-gradient(
+    175deg,
+    #d4b858 0%,
+    #c4a048 22%,
+    #b89038 50%,
+    #a88228 78%,
+    #9a7520 100%
+  );
+  border: 1.5px solid #8a6818;
+  border-radius: 0;
+  clip-path: polygon(
+    16px 0%,
+    calc(100% - 16px) 0%,
+    100% 50%,
+    calc(100% - 16px) 100%,
+    16px 100%,
+    0% 50%
+  );
+  box-shadow: rgba(0, 0, 0, 0.32) 0px 3px 8px;
+  transition:
+    transform 0.25s,
+    background 0.25s,
+    box-shadow 0.25s,
+    border-color 0.25s;
+}
+
+.top-bar-homestead-sign__label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant: small-caps;
+  color: #3d3028;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  transition:
+    color 0.2s ease,
+    text-shadow 0.25s ease;
+}
+
+.top-bar-homestead-sign:hover .top-bar-homestead-sign__board,
+.companion-top-bar button.top-bar-homestead-sign:hover .top-bar-homestead-sign__board {
+  transform: translateY(-2px);
+  border-color: #a07818;
+  box-shadow:
+    rgba(255, 255, 255, 0.35) 0px 1px 0px inset,
+    rgba(0, 0, 0, 0.2) 0px -1px 0px inset,
+    rgba(0, 0, 0, 0.38) 0px 6px 12px;
+}
+
+.top-bar-homestead-sign:hover .top-bar-homestead-sign__label,
+.companion-top-bar button.top-bar-homestead-sign:hover .top-bar-homestead-sign__label,
+.top-bar-homestead-sign:active .top-bar-homestead-sign__label,
+.companion-top-bar button.top-bar-homestead-sign:active .top-bar-homestead-sign__label {
+  color: #2e2412;
+  text-shadow:
+    0 0 6px rgba(255, 252, 238, 0.95),
+    0 0 14px rgba(255, 245, 215, 0.75),
+    0 0 22px rgba(255, 235, 190, 0.5);
+}
+
+.top-bar-homestead-sign--active .top-bar-homestead-sign__board,
+.companion-top-bar button.top-bar-homestead-sign--active .top-bar-homestead-sign__board,
+.companion-top-bar button.top-bar-homestead-sign[aria-current="page"] .top-bar-homestead-sign__board {
+  transform: translateY(-1px);
+  border-color: #7a5c10 !important;
+  box-shadow:
+    rgba(255, 255, 255, 0.35) 0px 1px 0px inset,
+    rgba(0, 0, 0, 0.2) 0px -1px 0px inset,
+    rgba(0, 0, 0, 0.38) 0px 6px 12px !important;
+}
+
+.top-bar-homestead-sign--active .top-bar-homestead-sign__label,
+.companion-top-bar button.top-bar-homestead-sign--active .top-bar-homestead-sign__label,
+.companion-top-bar button.top-bar-homestead-sign[aria-current="page"] .top-bar-homestead-sign__label {
+  color: #2a2010 !important;
+  font-weight: 700;
+  text-shadow:
+    0 0 8px rgba(255, 252, 240, 1),
+    0 0 16px rgba(255, 248, 220, 0.85),
+    0 0 26px rgba(255, 238, 195, 0.65) !important;
+}
+
+@keyframes homestead-sign-sway-a {
+  0%,
+  100% {
+    transform: rotate(-0.6deg);
+  }
+  50% {
+    transform: rotate(0.8deg);
+  }
+}
+
+@keyframes homestead-sign-sway-b {
+  0%,
+  100% {
+    transform: rotate(0.5deg);
+  }
+  50% {
+    transform: rotate(-0.9deg);
+  }
+}
+
+@keyframes homestead-sign-sway-c {
+  0%,
+  100% {
+    transform: rotate(-0.4deg);
+  }
+  50% {
+    transform: rotate(0.6deg);
+  }
+}
+
+/* ── Google utilities (unchanged position, quiet styling) ── */
+.homestead-signpost-sidebar__utilities {
+  flex-shrink: 0;
+  border-top-color: rgba(255, 255, 255, 0.08) !important;
+  background: #2c2420;
+}
+
+.homestead-signpost-sidebar__utilities-inner {
+  border-radius: 0.5rem;
+  padding: 0.25rem 0.15rem;
+  background: transparent;
+}
+
+.homestead-signpost-sidebar__utilities-heading {
+  display: none;
+  margin: 0 0 0.35rem;
+  padding: 0 0.5rem;
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(200, 170, 110, 0.55);
+}
+
+@media (min-width: 768px) {
+  .homestead-signpost-sidebar__utilities-heading {
+    display: block;
+  }
+}
+
+.homestead-signpost-sidebar__utility-link {
+  display: flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.3;
+  color: rgba(232, 221, 212, 0.78) !important;
+  text-decoration: none;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+@media (min-width: 768px) {
+  .homestead-signpost-sidebar__utility-link {
+    font-size: 0.82rem;
+    padding: 0.5rem 0.6rem;
+  }
+}
+
+.homestead-signpost-sidebar__utility-link:hover {
+  background: rgba(255, 255, 255, 0.06) !important;
+  color: #f3ead8 !important;
+  transform: none !important;
+}
+
+.homestead-signpost-sidebar__utility-link:focus-visible {
+  outline: 2px solid rgba(255, 210, 120, 0.45);
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  .homestead-signpost-sidebar__utility-link {
+    justify-content: center;
+    font-size: 0;
+    line-height: 0;
+    color: transparent !important;
+    position: relative;
+  }
+
+  .homestead-signpost-sidebar__utility-link::after {
+    content: "";
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: rgba(200, 170, 110, 0.45);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .homestead-signpost__sign-wrap--sway-1,
+  .homestead-signpost__sign-wrap--sway-2,
+  .homestead-signpost__sign-wrap--sway-3,
+  .homestead-signpost__sign-wrap--sway-4,
+  .homestead-signpost__sign-wrap--sway-5 {
+    animation: none !important;
+  }
+
+  .homestead-signpost__plaque:hover {
+    transform: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   TOP BAR — HANGING SIGN BUTTONS (text only)
+═══════════════════════════════════════════════════════════ */
+
+.companion-top-bar {
+  align-items: flex-start !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  gap: 0.5rem !important;
+  min-height: 3.25rem;
+}
+
+.companion-top-bar__signs {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  transform: translateX(-0.25in);
+}
+
+.companion-top-bar__signs .top-bar-centered-menu,
+.companion-top-bar__signs > button.top-bar-homestead-sign {
+  align-self: flex-start;
+  margin: 0;
+  padding: 0;
+  vertical-align: top;
+}
+
+/* Beat legacy brass plaque rules in companion.css */
+.companion-top-bar button.top-bar-homestead-sign:not([data-top-bar-menu="account"]) {
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  color: inherit !important;
+  text-shadow: none !important;
+}
+
+.companion-top-bar button.top-bar-homestead-sign:not([data-top-bar-menu="account"]):hover {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.companion-top-bar > div:has(button[data-top-bar-menu="account"]) {
+  align-self: center;
+  padding-top: 0.65rem;
+  padding-bottom: 0.65rem;
+}
+
+.companion-top-bar .top-bar-centered-menu {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: flex-start;
+  height: auto;
+  padding: 0;
+  margin: 0;
+  line-height: 0;
+}
+
+.companion-top-bar .top-bar-centered-menu > button.top-bar-homestead-sign {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  height: auto !important;
+  min-height: 0 !important;
+}
+
+.companion-top-bar button.top-bar-homestead-sign {
+  display: inline-flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  height: auto !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  border-radius: 0 !important;
+  cursor: pointer;
+  position: relative;
+  transform: none !important;
+  min-height: 0 !important;
+  gap: 0;
+}
+
+.companion-top-bar button.top-bar-homestead-sign:hover {
+  background: transparent !important;
+  border: none !important;
+  transform: none !important;
+}
+
+.top-bar-homestead-sign__hanger {
+  display: block;
+  flex-shrink: 0;
+  width: 0.2rem;
+  height: 0.65rem;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #5a5040 0%, #888070 40%, #4a4030 100%);
+  border-radius: 1px;
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.06);
+}
+
+.top-bar-homestead-sign__label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-variant: small-caps;
+  color: #3d3028;
+  white-space: nowrap;
+  letter-spacing: 0.06em;
+  transition:
+    color 0.2s ease,
+    text-shadow 0.25s ease;
+}
+
+.top-bar-homestead-sign__badge {
+  border-radius: 9999px;
+  background: rgba(61, 48, 40, 0.14);
+  padding: 0.1rem 0.45rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: #3d3028;
+  line-height: 1.2;
+}
+
+.top-bar-centered-menu__caret {
+  display: none;
+}
+
+.companion-top-bar button.top-bar-homestead-sign:focus-visible {
+  outline: 2px solid rgba(255, 210, 120, 0.55);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .companion-top-bar button.top-bar-homestead-sign:hover .top-bar-homestead-sign__board {
+    transform: none;
+  }
+}

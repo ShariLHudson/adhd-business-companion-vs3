@@ -8,6 +8,8 @@ type Props = {
   open: boolean;
   onToggle: () => void;
   armLength?: "short" | "medium" | "long";
+  /** Woodland pathway — one shared arm per column; hide per-sign arms. */
+  showArm?: boolean;
   children?: ReactNode;
 };
 
@@ -17,6 +19,7 @@ export function HangingEstateSign({
   open,
   onToggle,
   armLength = "medium",
+  showArm = true,
   children,
 }: Props) {
   function handleToggle(e: PointerEvent<HTMLButtonElement>) {
@@ -30,7 +33,7 @@ export function HangingEstateSign({
       data-sign-id={id}
       data-open={open ? "1" : undefined}
     >
-      <div className="hanging-estate-sign__iron-arm" aria-hidden="true" />
+      {showArm ? <div className="hanging-estate-sign__iron-arm" aria-hidden="true" /> : null}
       <div className="hanging-estate-sign__chains" aria-hidden="true">
         <span className="hanging-estate-sign__chain" />
         <span className="hanging-estate-sign__chain" />
@@ -44,7 +47,7 @@ export function HangingEstateSign({
         onClick={handleToggle}
         className="hanging-estate-sign__plaque"
       >
-        {label}
+        <span className="hanging-estate-sign__label">{label}</span>
       </button>
       {open && children ? (
         <div

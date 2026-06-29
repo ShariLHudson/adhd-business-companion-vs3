@@ -1,0 +1,1549 @@
+/* ═══════════════════════════════════════════════════════════
+   PEACEFUL PLACES — REFINED LANDING & MY PLACES WORKSPACE
+═══════════════════════════════════════════════════════════ */
+
+/* ── Hero — single title + subtitle, no duplicate layers ── */
+
+/* Hide baked photograph title (incl. ™) and subtitle — soft garden wash, not a panel */
+.peaceful-places-landing[data-baked-title="1"] .peaceful-places-landing__estate-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      ellipse 112% 44% at 50% 90%,
+      rgba(228, 238, 218, 0.34) 0%,
+      rgba(212, 226, 204, 0.18) 40%,
+      transparent 74%
+    ),
+    radial-gradient(
+      ellipse 86% 46% at 50% 14%,
+      rgba(252, 248, 238, 0.54) 0%,
+      rgba(248, 242, 230, 0.48) 28%,
+      rgba(244, 236, 222, 0.22) 48%,
+      transparent 62%
+    ),
+    linear-gradient(
+      180deg,
+      rgba(252, 248, 238, 0.5) 0%,
+      rgba(248, 242, 230, 0.28) 8%,
+      transparent 16%
+    );
+}
+
+/* Full photograph — walkway entrance, both lampposts, no crop */
+.peaceful-places-landing[data-baked-title="1"] .peaceful-places-landing__estate-image {
+  transform: none !important;
+  background-size: contain;
+  background-position: center bottom;
+  background-color: #1a2418;
+}
+
+/* No duplicate wash layers — title mist lives on the photograph overlay */
+.peaceful-places-landing[data-baked-title="1"] .peaceful-places-landing__estate-wash,
+.peaceful-places-landing[data-baked-title="1"] .peaceful-places-landing__estate-quiet {
+  display: none;
+}
+
+.peaceful-places-landing[data-baked-title="1"] .peaceful-places-landing__estate-light {
+  display: block;
+  opacity: 0.62;
+  z-index: 2;
+}
+
+.peaceful-places-landing[data-baked-title="1"] .peaceful-places-landing__sun-rays {
+  display: block;
+  opacity: 0.46;
+  z-index: 2;
+}
+
+.peaceful-places-landing__baked-title-mute {
+  display: none !important;
+}
+
+.peaceful-places-landing__header {
+  position: absolute;
+  top: clamp(18%, 20vh, 22%);
+  left: 50%;
+  z-index: 5;
+  width: min(92vw, 37.5rem);
+  margin: 0;
+  padding: 0 1rem;
+  transform: translateX(-50%);
+  text-align: center;
+  pointer-events: none;
+}
+
+.peaceful-places-landing__header::before {
+  display: none;
+}
+
+.peaceful-places-landing__title {
+  margin: 0;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", "Book Antiqua", serif;
+  font-size: clamp(2.35rem, 5.2vw, 4rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: #2f4639;
+  text-shadow: none;
+}
+
+.peaceful-places-landing__subtitle {
+  margin: clamp(1rem, 2.4vh, 1.35rem) auto 0;
+  max-width: 37.5rem;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(1.05rem, 1.75vw, 1.375rem);
+  font-weight: 450;
+  line-height: 1.5;
+  letter-spacing: 0.01em;
+  color: rgba(62, 54, 46, 0.94);
+  text-shadow:
+    0 1px 0 rgba(255, 252, 248, 0.88),
+    0 0 22px rgba(255, 250, 242, 0.72),
+    0 2px 10px rgba(42, 38, 32, 0.14);
+}
+
+.peaceful-places-landing[data-arrival="entering"] .peaceful-places-landing__header {
+  animation: peaceful-places-header-rise 2.6s ease-out 0.45s both;
+}
+
+@keyframes peaceful-places-header-rise {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* Hide legacy single-line invitation (duplicate subtitle) */
+.peaceful-places-landing__invitation {
+  display: none !important;
+}
+
+/* ── My Peaceful Places — frosted workspace ─────────────── */
+.my-peaceful-places-workspace {
+  position: fixed;
+  inset: 0;
+  z-index: 85;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(1rem, 4vw, 2rem);
+}
+
+.my-peaceful-places-workspace__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(24, 20, 16, 0.42);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+.my-peaceful-places-workspace__panel {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 34rem);
+  max-height: min(92vh, 44rem);
+  overflow: auto;
+  padding: clamp(1.35rem, 3.5vw, 1.85rem);
+  border-radius: 1.25rem;
+  border: 1px solid rgba(255, 248, 232, 0.42);
+  background:
+    linear-gradient(
+      165deg,
+      rgba(255, 252, 245, 0.82) 0%,
+      rgba(250, 242, 228, 0.76) 48%,
+      rgba(245, 234, 216, 0.72) 100%
+    );
+  box-shadow:
+    0 24px 60px rgba(28, 22, 14, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+}
+
+.my-peaceful-places-workspace__header {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+
+.my-peaceful-places-workspace__title {
+  margin: 0;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(1.55rem, 3.5vw, 1.95rem);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  color: #2e2820;
+}
+
+.my-peaceful-places-workspace__lead {
+  margin: 0.55rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #6a5f52;
+}
+
+.my-peaceful-places-workspace__collection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin-bottom: 1.15rem;
+}
+
+.my-peaceful-place-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(180, 150, 110, 0.28);
+  background:
+    linear-gradient(
+      165deg,
+      rgba(255, 252, 245, 0.72) 0%,
+      rgba(248, 238, 220, 0.58) 100%
+    );
+  box-shadow:
+    0 8px 22px rgba(36, 28, 18, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.my-peaceful-place-card:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 12px 28px rgba(36, 28, 18, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.62);
+}
+
+.my-peaceful-place-card__name {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: #342c22;
+}
+
+.my-peaceful-place-card__url {
+  margin: 0.2rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: #7a6e60;
+  word-break: break-word;
+}
+
+.my-peaceful-place-card__note {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  font-style: italic;
+  color: #5c5348;
+}
+
+.my-peaceful-place-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.my-peaceful-place-card__btn {
+  min-height: 2rem;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(140, 110, 70, 0.35);
+  border-radius: 9999px;
+  background: rgba(255, 248, 235, 0.72);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #4a3c28;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.my-peaceful-place-card__btn:hover {
+  background: rgba(255, 252, 245, 0.95);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(36, 28, 18, 0.1);
+}
+
+.my-peaceful-place-card__btn--quiet {
+  background: transparent;
+  border-color: rgba(140, 110, 70, 0.22);
+  color: #6a5f52;
+}
+
+.my-peaceful-places-workspace__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.my-peaceful-places-workspace__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.my-peaceful-places-workspace__label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #4a4034;
+}
+
+.my-peaceful-places-workspace__optional {
+  font-weight: 500;
+  color: #8a7d6e;
+}
+
+.my-peaceful-places-workspace__input,
+.my-peaceful-places-workspace__textarea {
+  width: 100%;
+  margin: 0;
+  padding: 0.62rem 0.72rem;
+  border: 1px solid rgba(160, 130, 90, 0.32);
+  border-radius: 0.65rem;
+  background: rgba(255, 252, 245, 0.88);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: #2c2820;
+  box-shadow: inset 0 1px 2px rgba(36, 28, 18, 0.04);
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.my-peaceful-places-workspace__textarea {
+  resize: vertical;
+  min-height: 4.5rem;
+  font-family: inherit;
+}
+
+.my-peaceful-places-workspace__input:focus,
+.my-peaceful-places-workspace__textarea:focus {
+  outline: none;
+  border-color: rgba(160, 120, 72, 0.55);
+  box-shadow:
+    0 0 0 3px rgba(200, 160, 100, 0.18),
+    inset 0 1px 2px rgba(36, 28, 18, 0.04);
+}
+
+.my-peaceful-places-workspace__error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #9a4a3a;
+}
+
+.my-peaceful-places-workspace__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem;
+  padding-top: 0.15rem;
+}
+
+.my-peaceful-places-workspace__save {
+  min-height: 2.5rem;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid rgba(140, 100, 55, 0.45);
+  border-radius: 9999px;
+  background: linear-gradient(
+    165deg,
+    #d8b878 0%,
+    #b89458 55%,
+    #9a7840 100%
+  );
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #3a2c14;
+  cursor: pointer;
+  box-shadow:
+    0 6px 16px rgba(36, 28, 18, 0.14),
+    inset 0 1px 0 rgba(255, 248, 230, 0.45);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.my-peaceful-places-workspace__save:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 8px 20px rgba(36, 28, 18, 0.18),
+    inset 0 1px 0 rgba(255, 248, 230, 0.5);
+}
+
+.my-peaceful-places-workspace__save:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.my-peaceful-places-workspace__cancel {
+  border: 0;
+  background: transparent;
+  font-size: 0.84rem;
+  color: #6a5f52;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+/* ── Web place frame ────────────────────────────────────── */
+.peaceful-place-web-frame {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  padding: clamp(0.75rem, 2vw, 1.25rem);
+}
+
+.peaceful-place-web-frame__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(18, 14, 10, 0.5);
+  cursor: pointer;
+}
+
+.peaceful-place-web-frame__shell {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 72rem);
+  height: min(100%, calc(100vh - 2rem));
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 248, 232, 0.35);
+  background: #2a2420;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+
+.peaceful-place-web-frame__bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(42, 36, 32, 0.96);
+  border-bottom: 1px solid rgba(255, 248, 232, 0.12);
+}
+
+.peaceful-place-web-frame__title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #f3ead8;
+}
+
+.peaceful-place-web-frame__leave {
+  flex-shrink: 0;
+  min-height: 2.25rem;
+  padding: 0.4rem 0.85rem;
+  border: 1px solid rgba(200, 170, 110, 0.35);
+  border-radius: 9999px;
+  background: rgba(255, 248, 235, 0.08);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #f3ead8;
+  cursor: pointer;
+}
+
+.peaceful-place-web-frame__iframe {
+  flex: 1;
+  width: 100%;
+  border: 0;
+  background: #1a1614;
+}
+
+/* No duplicate invitation / subtitle panel */
+.peaceful-places-landing__invitation,
+.peaceful-places-pathway-scene__header,
+.peaceful-places-pathway-scene__header--cover-baked {
+  display: none !important;
+}
+
+/* Destination menus — wooden hanging signs beside each category sign */
+.peaceful-places-signpost-portal .pathway-photo-sign[data-open="1"] {
+  z-index: 12;
+}
+
+.peaceful-places-signpost-portal .pathway-photo-sign__dropdown {
+  z-index: 55;
+  width: min(11.5rem, 46vw);
+  max-height: min(72vh, 26rem);
+  overflow: visible;
+}
+
+.peaceful-places-signpost-portal .pathway-photo-sign--align-left .pathway-photo-sign__dropdown {
+  left: calc(100% + 0.45rem);
+  right: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.peaceful-places-signpost-portal .pathway-photo-sign--align-right .pathway-photo-sign__dropdown {
+  right: calc(100% + 0.45rem);
+  left: auto;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.peaceful-places-signpost-portal .hanging-destination-menu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.peaceful-places-signpost-portal .hanging-destination-menu__item-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.peaceful-places-signpost-portal .hanging-destination-menu__chain {
+  display: block;
+  width: 0.14rem;
+  height: 0.55rem;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #5a5040 0%, #8a7a60 40%, #3a3020 100%);
+  border-radius: 1px;
+}
+
+.peaceful-places-signpost-portal .hanging-destination-menu__sign-board {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.35rem;
+  margin: 0;
+  padding: 0.48rem 0.85rem;
+  border: 1.5px solid #a08030;
+  border-radius: 0;
+  background: linear-gradient(
+    175deg,
+    #3a2e1a 0%,
+    #2e2412 18%,
+    #261e0e 50%,
+    #1e1808 82%,
+    #160e04 100%
+  );
+  clip-path: polygon(
+    14px 0%,
+    calc(100% - 14px) 0%,
+    100% 50%,
+    calc(100% - 14px) 100%,
+    14px 100%,
+    0% 50%
+  );
+  box-shadow: rgba(0, 0, 0, 0.55) 0px 3px 8px;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  text-align: center;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.peaceful-places-signpost-portal .hanging-destination-menu__sign-board:hover,
+.peaceful-places-signpost-portal .hanging-destination-menu__sign-board:focus-visible {
+  transform: translateY(-2px);
+  border-color: #c8a840;
+  box-shadow: rgba(0, 0, 0, 0.65) 0px 5px 12px;
+  outline: none;
+}
+
+.peaceful-places-signpost-portal .hanging-destination-menu__name {
+  display: block;
+  width: 100%;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.84rem;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  color: #e8cc80;
+  text-align: center;
+  text-shadow: none;
+}
+
+/* Sign layer matches contain-fit photograph */
+.peaceful-places-landing[data-baked-title="1"] .peaceful-places-landing__content .peaceful-places-pathway-scene__photo-plate-inner {
+  width: min(100vw, calc(100vh * var(--pathway-image-aspect, 1.7778)));
+  height: min(100vh, calc(100vw / var(--pathway-image-aspect, 1.7778)));
+  transform: none;
+  transform-origin: center bottom;
+  align-self: flex-end;
+}
+
+.peaceful-places-landing[data-baked-title="1"] .peaceful-places-landing__content .peaceful-places-pathway-scene__photo-plate {
+  align-items: flex-end;
+  justify-content: center;
+}
+
+/* Legacy pan offset — only when not using baked-title contain frame */
+.peaceful-places-landing:not([data-baked-title="1"])
+  .peaceful-places-landing__content
+  .peaceful-places-pathway-scene__photo-plate-inner {
+  transform: translateX(2.75%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .peaceful-places-landing[data-arrival="entering"] .peaceful-places-landing__header,
+  .my-peaceful-place-card:hover,
+  .my-peaceful-places-workspace__save:hover:not(:disabled) {
+    animation: none;
+    transform: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   WOODLAND PATHWAY — wrought-iron lampposts on stone columns
+═══════════════════════════════════════════════════════════ */
+
+.peaceful-places-landing[data-mask-baked-signs="1"] .peaceful-places-landing__baked-sign-mute-pillar--left {
+  left: 2%;
+  bottom: 0;
+  width: 16%;
+  height: 48%;
+  background:
+    linear-gradient(
+      100deg,
+      rgba(52, 48, 42, 0.72) 0%,
+      rgba(62, 58, 50, 0.55) 45%,
+      rgba(68, 64, 56, 0.22) 78%,
+      transparent 100%
+    );
+}
+
+.peaceful-places-landing[data-mask-baked-signs="1"] .peaceful-places-landing__baked-sign-mute-pillar--right {
+  right: 1.5%;
+  bottom: 0;
+  width: 15.5%;
+  height: 48%;
+  background:
+    linear-gradient(
+      260deg,
+      rgba(50, 46, 40, 0.7) 0%,
+      rgba(60, 56, 48, 0.52) 46%,
+      rgba(66, 62, 54, 0.2) 80%,
+      transparent 100%
+    );
+}
+
+.peaceful-places-landing[data-mask-baked-signs="1"] .peaceful-places-landing__baked-sign-foot-mute--left {
+  left: 7%;
+  bottom: 30%;
+  width: 6%;
+  height: 10%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(58, 54, 48, 0.92) 0%,
+    rgba(68, 64, 56, 0.55) 55%,
+    transparent 78%
+  );
+}
+
+.peaceful-places-landing[data-mask-baked-signs="1"] .peaceful-places-landing__baked-sign-foot-mute--right {
+  right: 6.5%;
+  bottom: 30%;
+  width: 6%;
+  height: 10%;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(56, 52, 46, 0.92) 0%,
+    rgba(66, 62, 54, 0.55) 55%,
+    transparent 78%
+  );
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] > .estate-lamppost--pathway {
+  --pathway-lamppost-height: clamp(19rem, 46vh, 27rem);
+  bottom: 0;
+  z-index: 4;
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] > .estate-lamppost--pathway.estate-lamppost--left {
+  left: 5.5%;
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] > .estate-lamppost--pathway.estate-lamppost--right {
+  right: 4.5%;
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .estate-lamppost__post {
+  z-index: 1;
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .estate-lamppost__signs {
+  z-index: 3;
+  width: min(100%, 10.75rem);
+  padding-top: 2.5rem;
+  padding-bottom: 0.2rem;
+  gap: 0;
+}
+
+/* One shared arm per column; signs chain vertically beneath it */
+.pathway-hanging-signs {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 10.5rem);
+}
+
+.pathway-hanging-signs--left {
+  align-items: flex-end;
+}
+
+.pathway-hanging-signs--right {
+  align-items: flex-start;
+}
+
+.pathway-hanging-signs__arm {
+  position: relative;
+  flex-shrink: 0;
+  height: 4px;
+  width: 3.85rem;
+  margin-bottom: 0.12rem;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #5a5650 0%, #2a2826 55%, #141210 100%);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.pathway-hanging-signs--left .pathway-hanging-signs__arm {
+  align-self: flex-end;
+  margin-right: 0.2rem;
+}
+
+.pathway-hanging-signs--right .pathway-hanging-signs__arm {
+  align-self: flex-start;
+  margin-left: 0.2rem;
+}
+
+.pathway-hanging-signs--left .pathway-hanging-signs__arm::after,
+.pathway-hanging-signs--right .pathway-hanging-signs__arm::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 0.32rem;
+  height: 0.32rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #4a4642 0%, #1a1816 100%);
+  box-shadow: 0 0 0 1px rgba(90, 86, 80, 0.55);
+  transform: translateY(-50%);
+}
+
+.pathway-hanging-signs--left .pathway-hanging-signs__arm::after {
+  right: -0.32rem;
+}
+
+.pathway-hanging-signs--right .pathway-hanging-signs__arm::after {
+  left: -0.32rem;
+}
+
+.pathway-hanging-signs__column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.24rem;
+  width: 100%;
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .hanging-estate-sign {
+  position: relative;
+  z-index: 7;
+  max-width: 10.25rem;
+  padding-top: 0;
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .estate-lamppost--left .hanging-estate-sign {
+  padding-right: 0.1rem;
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .estate-lamppost--right .hanging-estate-sign {
+  padding-left: 0.1rem;
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .hanging-estate-sign__chains {
+  margin-top: 0.2rem;
+  gap: 0.62rem;
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .hanging-estate-sign__chain {
+  height: 0.4rem;
+  background: repeating-linear-gradient(180deg, #3a3632 0 2px, #141210 2px 4px);
+}
+
+/* Reference plaques — dark charcoal rectangles, white serif lettering */
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .hanging-estate-sign__plaque {
+  clip-path: none;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, #4a4846 0%, #3a3836 44%, #2e2c2a 100%);
+  color: #f2f0ea;
+  font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+  font-size: clamp(0.76rem, 1.2vw, 0.84rem);
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  min-height: 2rem;
+  padding: 0.38rem 0.72rem;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .hanging-estate-sign__label {
+  color: inherit;
+  font-weight: 400;
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .hanging-estate-sign__plaque:hover,
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .hanging-estate-sign__plaque:focus-visible {
+  transform: translateY(-1px);
+  border-color: rgba(255, 255, 255, 0.32);
+  background: linear-gradient(180deg, #545250 0%, #42403e 48%, #363432 100%);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.48);
+  outline: none;
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .hanging-estate-sign[data-open="1"] .hanging-estate-sign__plaque {
+  border-color: rgba(255, 220, 160, 0.42);
+  background: linear-gradient(180deg, #565246 0%, #454038 48%, #3a342c 100%);
+  color: #fffaf0;
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.42),
+    0 0 14px rgba(255, 190, 100, 0.28),
+    inset 0 1px 0 rgba(255, 240, 200, 0.12);
+  text-shadow: 0 0 8px rgba(255, 210, 130, 0.35);
+}
+
+.peaceful-places-signpost-portal .hanging-destination-menu__sign-board {
+  clip-path: none;
+  border-radius: 2px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: linear-gradient(180deg, #4a4846 0%, #3a3836 44%, #2e2c2a 100%);
+  box-shadow:
+    0 2px 8px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.peaceful-places-signpost-portal .hanging-destination-menu__sign-board:hover,
+.peaceful-places-signpost-portal .hanging-destination-menu__sign-board:focus-visible {
+  border-color: rgba(255, 255, 255, 0.32);
+  background: linear-gradient(180deg, #545250 0%, #42403e 48%, #363432 100%);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.48);
+}
+
+.peaceful-places-signpost-portal .hanging-destination-menu__name {
+  color: #f2f0ea;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.35);
+}
+
+.peaceful-places-pathway-scene__pillar-occlusion {
+  position: absolute;
+  bottom: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.peaceful-places-pathway-scene__pillar-occlusion--left {
+  left: 0;
+  width: 15.5%;
+  height: 46%;
+  background: linear-gradient(
+    102deg,
+    rgba(58, 54, 48, 0.96) 0%,
+    rgba(70, 66, 58, 0.86) 38%,
+    rgba(78, 74, 64, 0.38) 68%,
+    transparent 100%
+  );
+}
+
+.peaceful-places-pathway-scene__pillar-occlusion--right {
+  right: 0;
+  width: 15%;
+  height: 46%;
+  background: linear-gradient(
+    258deg,
+    rgba(56, 52, 46, 0.96) 0%,
+    rgba(68, 64, 56, 0.84) 40%,
+    rgba(76, 72, 62, 0.36) 70%,
+    transparent 100%
+  );
+}
+
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__photo-plate {
+  align-items: flex-end;
+  justify-content: center;
+}
+
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__photo-plate-inner {
+  width: min(100vw, calc(100vh * var(--pathway-image-aspect, 1.5015)));
+  height: min(100vh, calc(100vw / var(--pathway-image-aspect, 1.5015)));
+  transform: none;
+  transform-origin: center bottom;
+  align-self: flex-end;
+}
+
+.peaceful-places-signpost-portal
+  .peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"]
+  > .estate-lamppost--pathway {
+  --pathway-lamppost-scale: 1;
+  transform: none;
+}
+
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] > .estate-lamppost--pathway {
+  pointer-events: auto;
+}
+
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .hanging-estate-sign__plaque {
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__signposts[data-pathway-signposts="woodland"] .hanging-estate-sign__dropdown {
+  pointer-events: auto;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   PATHWAY GARDEN FLAG STAKES — perspective curb markers
+═══════════════════════════════════════════════════════════ */
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="garden-stakes"] {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.pathway-garden-stake-anchor {
+  position: absolute;
+  pointer-events: auto;
+}
+
+/* Left curb — walking into the garden */
+.flag--focus {
+  bottom: 5.2%;
+  left: 12.5%;
+  transform: scale(1);
+  transform-origin: left bottom;
+  z-index: 56;
+}
+
+.flag--slow-down {
+  bottom: 14.2%;
+  left: calc(19% + 60px);
+  transform: scale(1);
+  transform-origin: left bottom;
+  z-index: 46;
+}
+
+/* Right curb — staggered row mirroring the left (closest → farthest) */
+.flag--recharge {
+  bottom: 5.2%;
+  right: 12.5%;
+  left: auto;
+  transform: scale(1);
+  transform-origin: right bottom;
+  z-index: 56;
+}
+
+.flag--unwind {
+  bottom: calc(23.5% - 113px);
+  right: calc(16% + 42px);
+  left: auto;
+  transform: scale(1);
+  transform-origin: right bottom;
+  z-index: 36;
+}
+
+.flag--my-places {
+  bottom: calc(14.2% + 60px);
+  right: calc(12.5% - 9px);
+  left: auto;
+  transform: scale(1);
+  transform-origin: right bottom;
+  z-index: 46;
+}
+
+.flag--my-places .pathway-garden-stake--right .pathway-garden-stake__mount {
+  padding-right: 0;
+  margin-right: 0.34rem;
+}
+
+/* ── Garden presence — hover lift, walk forward, lantern & flowers ── */
+
+.peaceful-places-landing[data-baked-title="1"] .peaceful-places-landing__cinematic,
+.peaceful-places-landing[data-baked-title="1"] .peaceful-places-landing__estate-image {
+  transition: transform 600ms cubic-bezier(0.33, 1, 0.45, 1), opacity 450ms ease;
+  transform-origin: center bottom;
+}
+
+.peaceful-places-landing[data-garden-walk="1"] .peaceful-places-landing__cinematic,
+.peaceful-places-landing[data-garden-walk="1"] .peaceful-places-landing__estate-image {
+  transform: scale(1.03) !important;
+}
+
+.peaceful-places-landing[data-garden-depart="1"] .peaceful-places-landing__cinematic,
+.peaceful-places-landing[data-garden-depart="1"] .peaceful-places-landing__estate-image {
+  opacity: 0.42;
+}
+
+.peaceful-places-landing[data-garden-depart="1"] .peaceful-places-landing__content {
+  opacity: 0;
+  transition: opacity 450ms ease;
+}
+
+.peaceful-places-landing[data-baked-title="1"][data-flag-hover-side="left"]
+  .peaceful-places-landing__lantern-glow--left,
+.peaceful-places-landing[data-baked-title="1"][data-flag-hover-side="right"]
+  .peaceful-places-landing__lantern-glow--right,
+.peaceful-places-landing[data-baked-title="1"][data-flag-hover="unwind"]
+  .peaceful-places-landing__lantern-glow--right {
+  display: block;
+  opacity: 0.95;
+  filter: blur(14px) brightness(1.18) saturate(1.08);
+  animation: peaceful-places-lantern-pulse 4.2s ease-in-out infinite;
+}
+
+.peaceful-places-landing[data-baked-title="1"][data-flag-hover="unwind"]
+  .peaceful-places-landing__lantern-glow--right {
+  animation: peaceful-places-lantern-flicker 2.8s ease-in-out infinite;
+}
+
+@keyframes peaceful-places-lantern-flicker {
+  0%,
+  100% {
+    opacity: 0.88;
+    filter: blur(14px) brightness(1.12) saturate(1.05);
+  }
+  40% {
+    opacity: 1;
+    filter: blur(12px) brightness(1.28) saturate(1.12);
+  }
+  68% {
+    opacity: 0.82;
+    filter: blur(15px) brightness(1.08) saturate(1.02);
+  }
+}
+
+.peaceful-places-landing[data-baked-title="1"][data-flag-hover="focus"] .peaceful-places-landing__season-accent {
+  display: block;
+  opacity: 0.38;
+  background:
+    radial-gradient(circle at 22% 76%, rgba(255, 196, 148, 0.2) 0%, transparent 8%),
+    radial-gradient(circle at 28% 74%, rgba(196, 148, 255, 0.16) 0%, transparent 7%),
+    radial-gradient(ellipse 20% 12% at 20% 80%, rgba(255, 220, 180, 0.18) 0%, transparent 72%);
+  animation: peaceful-places-garden-flowers-sway 6s ease-in-out infinite;
+}
+
+.peaceful-places-landing[data-baked-title="1"][data-flag-hover="calming"] .peaceful-places-landing__season-accent {
+  display: block;
+  opacity: 0.4;
+  background:
+    radial-gradient(ellipse 16% 8% at 24% 78%, rgba(168, 148, 96, 0.28) 0%, transparent 70%),
+    radial-gradient(ellipse 12% 6% at 30% 82%, rgba(148, 128, 88, 0.22) 0%, transparent 68%);
+  animation: peaceful-places-leaves-drift 7s ease-in-out infinite;
+}
+
+.peaceful-places-landing[data-baked-title="1"][data-flag-hover="my-places"] .peaceful-places-landing__season-accent {
+  display: block;
+  opacity: 0.48;
+  background:
+    radial-gradient(ellipse 28% 18% at 78% 72%, rgba(255, 228, 148, 0.32) 0%, transparent 72%),
+    radial-gradient(circle at 74% 76%, rgba(120, 196, 220, 0.16) 0%, transparent 9%);
+  animation: peaceful-places-garden-flowers-sway 5.8s ease-in-out infinite;
+}
+
+.peaceful-places-landing[data-baked-title="1"][data-flag-hover="unwind"] .peaceful-places-landing__season-accent {
+  display: block;
+  opacity: 0.28;
+  background: radial-gradient(ellipse 22% 14% at 76% 78%, rgba(148, 132, 196, 0.2) 0%, transparent 74%);
+}
+
+.peaceful-places-landing[data-baked-title="1"][data-flag-hover="energize"] .peaceful-places-landing__season-accent {
+  display: block;
+  opacity: 0.44;
+  background:
+    radial-gradient(ellipse 18% 12% at 80% 78%, rgba(255, 196, 210, 0.26) 0%, transparent 72%),
+    radial-gradient(ellipse 14% 10% at 84% 74%, rgba(196, 228, 168, 0.24) 0%, transparent 70%);
+  animation: peaceful-places-garden-flowers-sway 4.8s ease-in-out infinite;
+}
+
+@keyframes peaceful-places-leaves-drift {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(6px, -3px);
+  }
+}
+
+@keyframes peaceful-places-garden-flowers-sway {
+  0%,
+  100% {
+    transform: translateX(0) scale(1);
+  }
+  50% {
+    transform: translateX(2px) scale(1.01);
+  }
+}
+
+/* Garden banner cloth, iron, and wind — peaceful-places-garden-banners.css */
+
+.pathway-garden-stake {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: center bottom;
+  filter: drop-shadow(0 2px 5px rgba(18, 28, 16, 0.2));
+}
+
+.pathway-garden-stake__mount {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.pathway-garden-stake--left .pathway-garden-stake__mount {
+  align-items: flex-start;
+  padding-left: 0.06rem;
+}
+
+.pathway-garden-stake--right .pathway-garden-stake__mount {
+  align-items: flex-end;
+  padding-right: 0.06rem;
+}
+
+.pathway-garden-stake__planted {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: -0.06rem;
+  margin-bottom: -0.42rem;
+  z-index: 1;
+}
+
+.pathway-garden-stake--left .pathway-garden-stake__planted {
+  align-items: flex-start;
+  margin-left: 0.12rem;
+}
+
+.pathway-garden-stake--right .pathway-garden-stake__planted {
+  align-items: flex-end;
+  margin-right: 0.12rem;
+}
+
+.pathway-garden-stake__post {
+  position: relative;
+  z-index: 2;
+  width: 4px;
+  height: clamp(5.4rem, 10vh, 7.2rem);
+  margin-top: -0.06rem;
+  margin-bottom: -1.28rem;
+  border-radius: 1px;
+  background: linear-gradient(
+    90deg,
+    #050505 0%,
+    #2a2a2a 32%,
+    #4a4a4a 50%,
+    #222 68%,
+    #080808 100%
+  );
+  box-shadow:
+    1px 0 3px rgba(0, 0, 0, 0.38),
+    -1px 0 1px rgba(255, 255, 255, 0.08);
+}
+
+.pathway-garden-stake__post::after {
+  content: "";
+  position: absolute;
+  left: -3px;
+  right: -3px;
+  bottom: 0;
+  height: 58%;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(58, 52, 44, 0.28) 40%,
+    rgba(42, 38, 32, 0.85) 100%
+  );
+  pointer-events: none;
+}
+
+.pathway-garden-stake__earth {
+  position: relative;
+  z-index: 4;
+  width: clamp(1.95rem, 3.1vw, 2.55rem);
+  height: clamp(0.4rem, 0.78vh, 0.52rem);
+  margin-top: -0.68rem;
+  pointer-events: none;
+}
+
+.pathway-garden-stake__ground-shadow {
+  position: absolute;
+  left: -18%;
+  right: -18%;
+  bottom: -0.14rem;
+  height: 0.38rem;
+  background: radial-gradient(
+    ellipse 90% 100% at 50% 0%,
+    rgba(14, 22, 12, 0.48) 0%,
+    rgba(14, 22, 12, 0.18) 55%,
+    transparent 100%
+  );
+}
+
+.pathway-garden-stake__soil-mound {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse 92% 68% at 50% 42%,
+    #8a8070 0%,
+    #6e6458 30%,
+    #524a42 58%,
+    #3e3832 82%,
+    #322e2a 100%
+  );
+  box-shadow:
+    inset 0 1px 2px rgba(255, 255, 255, 0.12),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.35);
+}
+
+.pathway-garden-stake__grass-lip {
+  position: absolute;
+  left: -26%;
+  right: -26%;
+  top: -36%;
+  height: 56%;
+  opacity: 0.68;
+  background:
+    radial-gradient(ellipse 68% 50% at 20% 100%, rgba(78, 108, 52, 0.52) 0%, transparent 72%),
+    radial-gradient(ellipse 62% 48% at 80% 100%, rgba(68, 98, 46, 0.48) 0%, transparent 70%),
+    radial-gradient(ellipse 90% 72% at 50% 100%, rgba(82, 112, 56, 0.36) 0%, transparent 78%);
+  filter: blur(0.35px);
+}
+
+.pathway-garden-stake__menu {
+  pointer-events: auto;
+}
+
+.flag--my-places .pathway-garden-stake__menu {
+  transform: none;
+}
+
+.peaceful-places-pathway-scene__signposts[data-pathway-signposts="garden-stakes"] .hanging-destination-menu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__signposts[data-pathway-signposts="garden-stakes"] {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__signposts[data-pathway-signposts="garden-stakes"] .pathway-garden-stake-anchor {
+  pointer-events: auto;
+}
+
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__signposts[data-pathway-signposts="garden-stakes"] .pathway-garden-stake__flag,
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__signposts[data-pathway-signposts="garden-stakes"] .pathway-garden-stake__menu {
+  pointer-events: auto;
+  touch-action: manipulation;
+}
+
+/* Carved wooden plaque — fades in beneath the flag on hover */
+.pathway-garden-stake__plaque {
+  position: absolute;
+  left: 50%;
+  bottom: 0.1rem;
+  z-index: 8;
+  width: max-content;
+  max-width: 10rem;
+  margin: 0;
+  padding: 0.36rem 0.58rem 0.4rem;
+  transform: translateX(-50%) translateY(8px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.52s ease, transform 0.52s ease;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(0.56rem, 0.8vw, 0.66rem);
+  font-style: italic;
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  text-align: center;
+  color: #4a3f34;
+  background: linear-gradient(180deg, #d4bc9e 0%, #b89a7c 45%, #9a8068 100%);
+  border: 1px solid rgba(68, 54, 40, 0.32);
+  border-radius: 3px;
+  box-shadow:
+    0 2px 7px rgba(24, 20, 14, 0.2),
+    inset 0 1px 0 rgba(255, 248, 236, 0.38),
+    inset 0 -1px 0 rgba(72, 58, 44, 0.18);
+}
+
+.pathway-garden-stake[data-hovered="1"] .pathway-garden-stake__plaque {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.pathway-garden-stake[data-open="1"] .pathway-garden-stake__plaque {
+  opacity: 0;
+}
+
+/* Per-flag garden life — visible only on hover */
+.pathway-garden-stake__life {
+  position: absolute;
+  top: -0.35rem;
+  left: -1.1rem;
+  right: -1.1rem;
+  height: 3.2rem;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  z-index: 6;
+}
+
+.pathway-garden-stake[data-hovered="1"] .pathway-garden-stake__life {
+  opacity: 1;
+}
+
+.pathway-garden-stake__life-sprite {
+  position: absolute;
+  opacity: 0;
+}
+
+.pathway-garden-stake[data-hovered="1"] .pathway-garden-stake__life-sprite {
+  opacity: 1;
+}
+
+.pathway-garden-stake[data-sign-id="focus"][data-hovered="1"] .pathway-garden-stake__life-sprite--a {
+  top: 0.55rem;
+  left: 0.25rem;
+  width: 0.42rem;
+  height: 0.32rem;
+  border-radius: 40% 60% 50% 45%;
+  background: radial-gradient(circle at 35% 35%, #ffe8b0 0%, #e8a060 72%);
+  animation: garden-life-butterfly 4.8s ease-in-out infinite;
+}
+
+.pathway-garden-stake[data-sign-id="focus"][data-hovered="1"] .pathway-garden-stake__life-sprite--b {
+  top: 1.1rem;
+  left: 1.4rem;
+  width: 0.38rem;
+  height: 0.3rem;
+  border-radius: 45% 55% 48% 42%;
+  background: radial-gradient(circle at 35% 35%, #f0d8ff 0%, #c888e8 72%);
+  animation: garden-life-butterfly 5.6s ease-in-out infinite reverse;
+}
+
+.pathway-garden-stake[data-sign-id="calming"][data-hovered="1"] .pathway-garden-stake__life-sprite--a {
+  top: 0.7rem;
+  left: 0.6rem;
+  width: 0.55rem;
+  height: 0.28rem;
+  border-radius: 50% 10% 50% 10%;
+  background: linear-gradient(135deg, #a8c878 0%, #6a8848 100%);
+  animation: garden-life-leaf 6.2s ease-in-out infinite;
+}
+
+.pathway-garden-stake[data-sign-id="calming"][data-hovered="1"] .pathway-garden-stake__life-sprite--b {
+  top: 1.25rem;
+  left: 1.65rem;
+  width: 0.48rem;
+  height: 0.24rem;
+  border-radius: 50% 10% 50% 10%;
+  background: linear-gradient(135deg, #c8a868 0%, #8a7040 100%);
+  animation: garden-life-leaf 7.4s ease-in-out infinite reverse;
+}
+
+.pathway-garden-stake[data-sign-id="my-places"][data-hovered="1"] .pathway-garden-stake__life-sprite--a {
+  top: 0.85rem;
+  right: 0.35rem;
+  left: auto;
+  width: 0.72rem;
+  height: 0.18rem;
+  border-radius: 50%;
+  background: linear-gradient(90deg, transparent, rgba(255, 220, 140, 0.55), transparent);
+  animation: garden-life-sun-warm 5s ease-in-out infinite;
+}
+
+.pathway-garden-stake[data-sign-id="my-places"][data-hovered="1"] .pathway-garden-stake__life-sprite--b {
+  top: 1.15rem;
+  right: 0.9rem;
+  left: auto;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 48% 52% 50% 50%;
+  background: radial-gradient(circle at 40% 35%, #88d8f0 0%, #4898b8 70%);
+  animation: garden-life-dragonfly 4.2s ease-in-out infinite;
+}
+
+.pathway-garden-stake[data-sign-id="unwind"][data-hovered="1"] .pathway-garden-stake__life-sprite--a {
+  top: 0.5rem;
+  right: 0.5rem;
+  left: auto;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 220, 148, 0.9) 0%, transparent 72%);
+  animation: garden-life-lantern-spark 2.6s ease-in-out infinite;
+}
+
+.pathway-garden-stake[data-sign-id="energize"][data-hovered="1"] .pathway-garden-stake__life-sprite--a {
+  top: 0.75rem;
+  right: 0.45rem;
+  left: auto;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe878 0%, #e8b030 75%);
+  animation: garden-life-bee 3.8s ease-in-out infinite;
+}
+
+.pathway-garden-stake[data-sign-id="energize"][data-hovered="1"] .pathway-garden-stake__life-sprite--b {
+  top: 1.2rem;
+  right: 1.35rem;
+  left: auto;
+  width: 0.32rem;
+  height: 0.32rem;
+  border-radius: 50%;
+  background: radial-gradient(circle at 40% 35%, #f8b8d8 0%, #d878a8 72%);
+  animation: garden-life-flower-sway 5.2s ease-in-out infinite;
+}
+
+@keyframes garden-life-butterfly {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(-8deg);
+  }
+  50% {
+    transform: translate(8px, -5px) rotate(10deg);
+  }
+}
+
+@keyframes garden-life-leaf {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(12deg);
+  }
+  50% {
+    transform: translate(10px, 4px) rotate(-18deg);
+  }
+}
+
+@keyframes garden-life-sun-warm {
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scaleX(0.9);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scaleX(1.1);
+  }
+}
+
+@keyframes garden-life-dragonfly {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(-7px, -4px);
+  }
+}
+
+@keyframes garden-life-lantern-spark {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(0.9);
+  }
+  45% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+@keyframes garden-life-bee {
+  0%,
+  100% {
+    transform: translate(0, 0);
+  }
+  40% {
+    transform: translate(-9px, -3px);
+  }
+  70% {
+    transform: translate(-4px, 2px);
+  }
+}
+
+@keyframes garden-life-flower-sway {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pathway-garden-stake__banner,
+  .pathway-garden-stake__photo-frame {
+    animation: none !important;
+  }
+
+  .peaceful-places-landing[data-garden-walk="1"] .peaceful-places-landing__cinematic,
+  .peaceful-places-landing[data-garden-walk="1"] .peaceful-places-landing__estate-image {
+    transform: none;
+  }
+
+  .pathway-garden-stake-anchor[data-flag-hovered="1"] .pathway-garden-stake__banner {
+    transform: none;
+  }
+}

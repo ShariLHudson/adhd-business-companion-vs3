@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm";
 import { CompanionLoginBackground } from "@/components/companion/CompanionLoginBackground";
@@ -9,52 +9,109 @@ import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { hasSignedInOnThisDeviceBefore } from "@/lib/companionAuthIntelligence";
 import {
   COMPANION_LOGIN_LOGO,
-  COMPANION_LOGIN_OPENING_MESSAGE,
   COMPANION_LOGIN_PRIVACY_LINE,
   companionLoginHasHistory,
   companionLoginHeadline,
   companionLoginSubtext,
 } from "@/lib/companionLoginPage";
 import {
-  buildPostLoginContinueResolution,
-  storePostLoginContinueFromResolution,
-} from "@/lib/postLoginContinue";
+  COMPANION_LOGIN_LOADING_DELAY_MS,
+  markCompanionLoginArrival,
+  pickCompanionLoginSlowMessage,
+  waitForCompanionAuthStorage,
+} from "@/lib/companionLoginTransition";
+import {
+  dismissWelcomeRoomInvitation,
+  dismissWelcomeRoomLoginOffer,
+} from "@/lib/welcomeRoom";
+
+/** Shared chunk promise — login page warms the home shell before auth completes. */
+const companionPageImport = import("@/app/companion/CompanionPageClient");
 
 export function CompanionSignInExperience() {
   const router = useRouter();
-  const { loading, user, configured: authReady } = useCompanionAuth();
+  const { loading, user, session, sessionChecked, configured: authReady } =
+    useCompanionAuth();
 
-  const returning = useMemo(() => hasSignedInOnThisDeviceBefore(), []);
+  const [mounted, setMounted] = useState(false);
+  const [authInFlight, setAuthInFlight] = useState(false);
+  const [redirectError, setRedirectError] = useState<string | null>(null);
+  const [slowMessage, setSlowMessage] = useState<string | null>(null);
+  const [redirecting, setRedirecting] = useState(false);
+  const navigatingRef = useRef(false);
+  const authInFlightRef = useRef(false);
+  const slowMessageRef = useRef(pickCompanionLoginSlowMessage());
+
+  const returning = useMemo(
+    () => (mounted ? hasSignedInOnThisDeviceBefore() : false),
+    [mounted],
+  );
   const visitor = returning ? "returning" : "first";
-  const hasCompanionHistory = useMemo(() => companionLoginHasHistory(), []);
-  const [openingDoor, setOpeningDoor] = useState(false);
+  const hasCompanionHistory = useMemo(
+    () => (mounted ? companionLoginHasHistory() : false),
+    [mounted],
+  );
 
   useEffect(() => {
-    if (!loading && user) {
-      const resolution = buildPostLoginContinueResolution();
-      storePostLoginContinueFromResolution(resolution);
-      router.replace("/companion");
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    void companionPageImport;
+  }, []);
+
+  const goHomeAfterAuth = useCallback(async () => {
+    if (navigatingRef.current) return;
+    navigatingRef.current = true;
+    setRedirecting(true);
+    setRedirectError(null);
+    dismissWelcomeRoomInvitation();
+    dismissWelcomeRoomLoginOffer();
+    markCompanionLoginArrival();
+    const persisted = await waitForCompanionAuthStorage(5_000);
+    if (!persisted) {
+      navigatingRef.current = false;
+      setRedirecting(false);
+      authInFlightRef.current = false;
+      setAuthInFlight(false);
+      setRedirectError(
+        "Signed in, but this browser could not save your session. Free some storage, then try again.",
+      );
+      return;
     }
-  }, [loading, user, router]);
-
-  function handleSuccess() {
-    const resolution = buildPostLoginContinueResolution();
-    storePostLoginContinueFromResolution(resolution);
     router.replace("/companion");
-  }
+  }, [router]);
 
-  if (loading) {
-    return (
-      <main className="relative flex min-h-dvh items-center justify-center overflow-hidden">
-        <CompanionLoginBackground />
-        <p
-          className="relative z-10 text-base text-[#f5efe6] drop-shadow-sm"
-          role="status"
-        >
-          {COMPANION_LOGIN_OPENING_MESSAGE}
-        </p>
-      </main>
-    );
+  const shouldLeaveLogin =
+    sessionChecked &&
+    !loading &&
+    Boolean(user || session) &&
+    !authInFlight &&
+    !authInFlightRef.current;
+
+  useEffect(() => {
+    if (!shouldLeaveLogin) return;
+    void goHomeAfterAuth();
+  }, [shouldLeaveLogin, goHomeAfterAuth]);
+
+  const showSlowStatus =
+    (loading || authInFlight) &&
+    !shouldLeaveLogin &&
+    !redirecting;
+
+  useEffect(() => {
+    if (!showSlowStatus) {
+      setSlowMessage(null);
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      setSlowMessage(slowMessageRef.current);
+    }, COMPANION_LOGIN_LOADING_DELAY_MS);
+    return () => window.clearTimeout(timer);
+  }, [showSlowStatus]);
+
+  if (shouldLeaveLogin || redirecting) {
+    return null;
   }
 
   return (
@@ -96,17 +153,20 @@ export function CompanionSignInExperience() {
             variant="page"
             initialMode="signin"
             returning={returning}
-            onSuccess={handleSuccess}
-            onProcessingChange={setOpeningDoor}
+            onSuccess={() => void goHomeAfterAuth()}
+            onProcessingChange={(processing) => {
+              authInFlightRef.current = processing;
+              setAuthInFlight(processing);
+              if (processing) setRedirectError(null);
+            }}
           />
 
-          {openingDoor ? (
+          {redirectError ? (
             <p
-              className="mt-4 text-center text-sm font-medium text-[#1e4f4f]"
-              role="status"
-              aria-live="polite"
+              role="alert"
+              className="mt-4 rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]"
             >
-              {COMPANION_LOGIN_OPENING_MESSAGE}
+              {redirectError}
             </p>
           ) : null}
 
@@ -114,7 +174,7 @@ export function CompanionSignInExperience() {
             {COMPANION_LOGIN_PRIVACY_LINE}
           </p>
 
-          {!authReady ? (
+          {!loading && !authReady ? (
             <p className="mt-4 text-center text-sm text-[#6b635a]">
               Sign-in is still being set up here. Try again shortly, or reach out
               if this keeps showing.
@@ -122,6 +182,12 @@ export function CompanionSignInExperience() {
           ) : null}
         </div>
       </div>
+
+      {slowMessage ? (
+        <p className="companion-login-page__slow-status" role="status" aria-live="polite">
+          {slowMessage}
+        </p>
+      ) : null}
     </main>
   );
 }

@@ -4,6 +4,7 @@
  */
 
 import { isKnowledgeQuestion } from "./knowledgeIntelligence";
+import { isSimpleSocialGreeting } from "./chatFastPath/simpleSocial";
 import {
   isFrictionlessAffirmation,
   resolveFrictionlessAction,
@@ -264,6 +265,17 @@ export function resolveCompanionResponseRoute(
     };
   }
 
+  if (isSimpleSocialGreeting(t)) {
+    return {
+      routeClass: "instant",
+      routeReason: "simple_social_greeting",
+      budgetMs: ROUTE_BUDGET_MS.instant,
+      skipHeavyLayers: true,
+      useLocalReplyOnly: true,
+      skipLayers: instantSkipLayers(),
+    };
+  }
+
   if (
     isAppHowToQuestion(t) ||
     isCompanionFirstQuestion(t) ||
@@ -291,12 +303,12 @@ export function resolveCompanionResponseRoute(
   }
 
   return {
-    routeClass: "deep",
+    routeClass: "fast",
     routeReason: "default_conversation",
-    budgetMs: ROUTE_BUDGET_MS.deep,
-    skipHeavyLayers: false,
+    budgetMs: ROUTE_BUDGET_MS.fast,
+    skipHeavyLayers: true,
     useLocalReplyOnly: false,
-    skipLayers: deepSkipLayers(),
+    skipLayers: fastSkipLayers(),
   };
 }
 

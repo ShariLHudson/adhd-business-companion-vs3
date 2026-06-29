@@ -1,0 +1,46 @@
+---
+description: Workspace placement — floating frosted cards vs Companion Desk
+globs:
+  - app/companion/**
+  - components/companion/**
+  - lib/companionDesk/**
+  - lib/workspaceLayoutTokens.ts
+---
+
+# Workspace layout
+
+Two placements, one calm visual language (warm frosted glass, parchment/cream, soft shadows, handcrafted feel).
+
+## Floating frosted card — room workspace
+
+Use for **static image scenes** and reflective work:
+
+- Clear My Mind, Journal, Life Evidence, Today's Reality, Portfolio
+- Plan My Day, Growth hub panels, home chat
+- Forms, capture, planning, static scene rooms
+
+Implementation: `companion-workspace-frosted` / `workspaceFloatingCardShellClass()` in the scene. Authority: `lib/companionDesk/workspaceLayout.ts` → `usesFloatingWorkspaceCard()`.
+
+## Companion Desk — bottom interaction desk
+
+Use **only** for active Focus My Brain guided workflows on butterfly video:
+
+- First Step Finder, Prioritize My Options, Break It Into Smaller Pieces, Reset/Reenergize workflows
+- Step-by-step guided flows while an activity is running (`phase !== "browse"`)
+
+**Focus My Brain hub landing** uses in-room `FocusConservatoryDock` — not the global Companion Desk layer.
+
+Implementation: `CompanionDesk` / `CompanionDeskPortal`. Authority: `usesCompanionDesk()` in `lib/companionDesk/workspaceLayout.ts`.
+
+Frosted styling matches Clear My Mind (`rgba(255, 252, 245, 0.58)`, `blur(14px)`) — not Plan My Day opacity.
+
+## Do not
+
+- Force every workspace into the bottom dock
+- Put static-scene writing rooms on the desk
+- Show permanent empty desk chrome on floating-card sections
+
+## Before adding a workspace
+
+1. Static scene or video-guided?
+2. Call `resolveWorkspacePresentationMode()` — do not hard-code desk visibility in page components.

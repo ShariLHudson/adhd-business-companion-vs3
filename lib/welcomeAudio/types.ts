@@ -19,6 +19,8 @@ export type WelcomeVoiceTrack = {
   cachedBodySrcs: readonly string[];
   /** Single pre-rendered MP3 — skips greeting + part clips when present. */
   fullWelcomeSrc?: string;
+  /** 1 = normal; 0.93 ≈ slightly slower, calmer delivery. */
+  playbackRate?: number;
 };
 
 export type WelcomeImmersiveTimeline = {

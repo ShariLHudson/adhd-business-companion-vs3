@@ -10,14 +10,14 @@ import {
 } from "@/lib/companionActivities";
 import {
   canAdvanceActivityStep,
-  defaultAnswersForField,
-  fieldStorageKey,
-  prepareStepAnswers,
+  ensureActivityStepAnswers,
   stepField,
   stepInstruction,
   type ActivityAnswers,
+  type ActivityFieldDef,
 } from "@/lib/activityFields";
 import { ActivityStepFields } from "@/components/companion/ActivityStepFields";
+import { CompanionFloatingCard } from "@/components/companion/CompanionFloatingCard";
 import {
   crossWorkspaceBesideLine,
   crossWorkspaceContextMessage,
@@ -25,6 +25,7 @@ import {
 import { NO_CATEGORY } from "@/lib/categoryRevealUx";
 import { DecisionCompassPanel } from "@/components/companion/DecisionCompassPanel";
 import { CrossWorkspaceSuggestionCard } from "@/components/companion/CrossWorkspaceSuggestionCard";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 import type { DecisionCompassPrefill } from "@/lib/decisionCompass";
 import type { PersistedDecisionCompassSession } from "@/lib/decisionCompassSessionStore";
 import type { AppSection } from "@/lib/companionUi";
@@ -54,6 +55,24 @@ export const EMPTY_ACTIVITY_SESSION: ActivitySessionState = {
   answers: {},
 };
 
+/** Active session with step-0 field answers initialized (use for all launch paths). */
+export function buildActiveActivitySession(
+  activity: CompanionActivity,
+  overrides?: Partial<ActivitySessionState>,
+): ActivitySessionState {
+  const answers = ensureActivityStepAnswers(activity.steps, 0, {});
+  return {
+    activityId: activity.id,
+    stepIndex: 0,
+    phase: "active",
+    categoryId: activity.categoryId,
+    linkedBesideDismissed: false,
+    linkedBesideOpened: false,
+    answers,
+    ...overrides,
+  };
+}
+
 type OpenBesidePayload = {
   activity: CompanionActivity;
   session: ActivitySessionState;
@@ -80,6 +99,7 @@ export function CompanionActivitiesPanel({
   onClose,
   embedded = false,
   variant = "help-now",
+  sanctuary = false,
   session: controlledSession,
   onSessionChange,
   registerBack,
@@ -98,6 +118,8 @@ export function CompanionActivitiesPanel({
   embedded?: boolean;
   /** Relief tools vs structured guided exercises. */
   variant?: ActivityPanelVariant;
+  /** Frosted floating card over butterfly conservatory (Focus My Brain workflows). */
+  sanctuary?: boolean;
   session?: ActivitySessionState;
   onSessionChange?: (session: ActivitySessionState) => void;
   /** Global ← Back — inner screens first, then parent history. */
@@ -140,18 +162,7 @@ export function CompanionActivitiesPanel({
 
   function start(a: CompanionActivity) {
     onBeforeActivityStart?.();
-    const firstField = stepField(a.steps[0]);
-    patchSession({
-      activityId: a.id,
-      stepIndex: 0,
-      phase: "active",
-      categoryId: a.categoryId,
-      linkedBesideDismissed: false,
-      linkedBesideOpened: false,
-      answers: firstField
-        ? { [fieldStorageKey(firstField)]: defaultAnswersForField(firstField) }
-        : {},
-    });
+    patchSession(buildActiveActivitySession(a));
   }
 
   function launchGuidedExercise(activityId: string) {
@@ -168,17 +179,20 @@ export function CompanionActivitiesPanel({
     stepIndex: number,
     answers: ActivityAnswers,
   ): ActivityAnswers {
-    const field = stepField(activity.steps[stepIndex]);
-    if (!field) return answers;
-    let next = answers;
-    if (answers[fieldStorageKey(field)] === undefined && field.type !== "review-list") {
-      const initial = defaultAnswersForField(field);
-      if (initial !== undefined) {
-        next = { ...next, [fieldStorageKey(field)]: initial };
-      }
-    }
-    return prepareStepAnswers(field, next);
+    return ensureActivityStepAnswers(activity.steps, stepIndex, answers);
   }
+
+  useEffect(() => {
+    if (!activity || session.phase !== "active") return;
+    const ensured = ensureActivityStepAnswers(
+      activity.steps,
+      session.stepIndex,
+      session.answers,
+    );
+    if (ensured !== session.answers) {
+      patchSession({ answers: ensured });
+    }
+  }, [activity?.id, session.phase, session.stepIndex, session.activityId]);
 
   function goToStep(nextIndex: number) {
     if (!activity) return;
@@ -261,15 +275,48 @@ export function CompanionActivitiesPanel({
     patchSession({ linkedBesideOpened: true });
   }
 
-  const shellClass = embedded
-    ? "flex h-full min-h-0 w-full max-w-xl flex-col overflow-hidden px-4 py-5"
-    : "companion-fade-in flex h-full min-h-0 w-full max-w-xl flex-col px-6 py-8";
+  const shellClass = sanctuary
+    ? "focus-workflow-shell"
+    : embedded
+      ? "flex h-full min-h-0 w-full max-w-xl flex-col overflow-hidden px-4 py-5"
+      : "companion-fade-in flex h-full min-h-0 w-full max-w-xl flex-col px-6 py-8";
 
   const browseShellClass = embedded
     ? "flex h-full min-h-0 w-full max-w-xl flex-col overflow-hidden"
     : "companion-fade-in mx-auto flex h-full min-h-0 w-full max-w-xl flex-col px-6 py-8";
 
   if (session.phase === "stopped") {
+    if (sanctuary) {
+      return (
+        <CompanionFloatingCard
+          activityTitle={activity?.title ?? parentLabel}
+          onLeftNav={exitToParent}
+          leftNavLabel={`← ${parentLabel}`}
+          primaryAction={
+            activity
+              ? {
+                  label: `Resume ${activity.title} →`,
+                  onClick: () =>
+                    patchSession({ stepIndex: 0, phase: "active" }),
+                }
+              : {
+                  label: `Back to ${parentLabel} →`,
+                  onClick: exitToParent,
+                }
+          }
+        >
+          <div className="companion-floating-card__outcome">
+            <p className="companion-floating-card__outcome-title">
+              Paused when you needed to.
+            </p>
+            <p className="companion-floating-card__outcome-body">
+              These are here when you want them — not obligations.
+            </p>
+          </div>
+        </CompanionFloatingCard>
+      );
+    }
+
     return (
       <div
         className={`${shellClass} ${embedded ? "" : "items-center text-center py-16"}`}
@@ -305,6 +352,32 @@ export function CompanionActivitiesPanel({
 
   if (session.phase === "complete" && activity) {
     const cat = ACTIVITY_CATEGORIES.find((c) => c.id === activity.categoryId);
+    if (sanctuary) {
+      return (
+        <CompanionFloatingCard
+          activityTitle={activity.title}
+          categoryId={activity.categoryId}
+          categoryLabel={cat?.label}
+          onLeftNav={backToBrowse}
+          leftNavLabel={`← ${parentLabel}`}
+          primaryAction={{
+            label: "Choose another →",
+            onClick: backToBrowse,
+          }}
+        >
+          <div className="companion-floating-card__outcome">
+            <p className="companion-floating-card__outcome-title">
+              You showed up for yourself.
+            </p>
+            <p className="companion-floating-card__outcome-body">
+              {activity.title} — {cat?.label ?? "done"}. No scorecard. Just
+              support.
+            </p>
+          </div>
+        </CompanionFloatingCard>
+      );
+    }
+
     return (
       <div
         className={`${shellClass} ${embedded ? "" : "items-center text-center py-16"}`}
@@ -329,7 +402,33 @@ export function CompanionActivitiesPanel({
   }
 
   if (session.phase === "active" && activity) {
+    const cat = ACTIVITY_CATEGORIES.find((c) => c.id === activity.categoryId);
+
     if (activity.customUi === "decision-compass") {
+      if (sanctuary) {
+        return (
+          <CompanionFloatingCard
+            activityTitle={activity.title}
+            categoryId={activity.categoryId}
+            categoryLabel={cat?.label}
+            timeLabel={activity.timeLabel}
+            onLeftNav={exitToParent}
+            leftNavLabel={`← ${parentLabel}`}
+            onPause={stop}
+            onExit={exitToParent}
+            exitLabel="Exit exercise"
+          >
+            <DecisionCompassPanel
+              initialPrefill={decisionCompassPrefill}
+              restoredSession={decisionCompassSession}
+              onSessionChange={onDecisionCompassSessionChange}
+              onComplete={onDecisionCompassComplete}
+              onStop={stop}
+              onClose={finish}
+            />
+          </CompanionFloatingCard>
+        );
+      }
       return (
         <div className={shellClass}>
           <DecisionCompassPanel
@@ -344,7 +443,6 @@ export function CompanionActivitiesPanel({
       );
     }
 
-    const cat = ACTIVITY_CATEGORIES.find((c) => c.id === activity.categoryId);
     const steps = activity.steps;
     const currentStep = steps[session.stepIndex];
     const field = stepField(currentStep);
@@ -358,17 +456,81 @@ export function CompanionActivitiesPanel({
       session.linkedBesideOpened,
     );
 
+    if (sanctuary) {
+      const leftNavLabel =
+        session.stepIndex > 0 ? "← Back" : `← ${parentLabel}`;
+      const onLeftNav =
+        session.stepIndex > 0
+          ? () => goToStep(session.stepIndex - 1)
+          : exitToParent;
+
+      return (
+        <CompanionFloatingCard
+          categoryId={activity.categoryId}
+          categoryLabel={cat?.label}
+          activityTitle={activity.title}
+          timeLabel={activity.timeLabel}
+          stepIndex={session.stepIndex}
+          stepCount={steps.length}
+          instruction={instruction}
+          stepKey={session.stepIndex}
+          onLeftNav={onLeftNav}
+          leftNavLabel={leftNavLabel}
+          onPause={stop}
+          onExit={exitToParent}
+          pauseLabel="Pause"
+          exitLabel="Exit exercise"
+          linkedSuggestion={
+            showLinkedSuggestion && activity.linkedSection && onOpenBeside ? (
+              <CrossWorkspaceSuggestionCard
+                line={crossWorkspaceBesideLine(
+                  activity.linkedSection,
+                  activity.linkedSuggestionHint,
+                )}
+                targetSection={activity.linkedSection}
+                onAccept={() => acceptLinkedBeside(activity)}
+                onDismiss={() => patchSession({ linkedBesideDismissed: true })}
+              />
+            ) : undefined
+          }
+          fields={
+            field ? (
+              <ActivityStepFields
+                presentation="floating-card"
+                field={field}
+                answers={session.answers}
+                onChange={(answers) => patchSession({ answers })}
+              />
+            ) : undefined
+          }
+          primaryAction={{
+            label: !isLast
+              ? field
+                ? "Next step →"
+                : "Continue →"
+              : "Done →",
+            onClick: !isLast
+              ? () => goToStep(session.stepIndex + 1)
+              : finish,
+            disabled: !canAdvance,
+          }}
+        />
+      );
+    }
+
     return (
       <div className={shellClass}>
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0 text-left">
-            <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
-              {cat?.label}
-            </p>
-            <h2 className="text-xl font-semibold text-[#1f1c19]">
-              {activity.title}
-            </h2>
-            <p className="mt-1 text-sm text-[#6b635a]">{activity.timeLabel}</p>
+            <>
+              <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
+                {cat?.label}
+              </p>
+              <h2 className="text-xl font-semibold text-[#1f1c19]">
+                {activity.title}
+              </h2>
+              <p className="mt-1 text-sm text-[#6b635a]">{activity.timeLabel}</p>
+            </>
           </div>
           {!embedded && onClose ? (
             <button
@@ -494,12 +656,12 @@ export function CompanionActivitiesPanel({
                     onClick={() => launchGuidedExercise(item.activityId)}
                     className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/85 px-3.5 py-3 text-left shadow-sm transition-colors hover:border-[#1e4f4f]/35 hover:bg-white"
                   >
-                    <span
-                      aria-hidden="true"
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#f5f1ea] text-lg"
-                    >
-                      {item.emoji}
-                    </span>
+                    <CompanionObjectVisual
+                      objectId={item.objectId}
+                      size="sm"
+                      variant="icon"
+                      className="shrink-0"
+                    />
                     <span className="min-w-0 flex-1">
                       <span className="block text-base font-semibold text-[#1f1c19]">
                         {item.title}

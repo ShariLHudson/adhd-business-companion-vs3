@@ -1,168 +1,150 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState } from "react";
+import { FocusConservatoryDock } from "@/components/companion/FocusConservatoryDock";
 import { FocusMyBrainRoomShell } from "@/components/companion/FocusMyBrainRoomShell";
+import { FocusHubPlaqueStrip } from "@/components/companion/FocusHubPlaqueStrip";
 import {
   FOCUS_FEELING_ENTRIES,
   focusFeelingById,
+  focusHubDropdownTools,
   type FocusFeelingId,
   type FocusHubAction,
   type FocusHubTool,
-  type FocusHubToolGroup,
 } from "@/lib/focusHub";
-import { evaluateFocusLandscape, spaceForFocusTool } from "@/lib/focusLandscape";
-import { FOCUS_MY_BRAIN_ROOM_COPY } from "@/lib/focusMyBrain/focusRoom";
-import { initialSectionOpen } from "@/lib/expandableUi";
+import { evaluateFocusLandscape } from "@/lib/focusLandscape";
+import { FOCUS_MY_BRAIN_HUB_CARDS } from "@/lib/focusMyBrain/focusRoom";
+import {
+  focusHubCardArt,
+  focusToolCardArt,
+} from "@/lib/focusMyBrain/focusCardArt";
 
-function ToolButton({
+function FocusHubDropdownItem({
   item,
-  starred,
   onSelect,
 }: {
   item: FocusHubTool;
-  starred?: boolean;
   onSelect: (action: FocusHubAction) => void;
 }) {
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(item.action)}
-      data-testid={`focus-tool-${item.id}`}
-      data-focus-landscape-target={spaceForFocusTool(item.id) ?? undefined}
-      className="focus-my-brain-tool-btn"
-    >
-      <span className="min-w-0 flex-1">
-        <span className="block text-sm font-semibold text-[#1f1c19]">
-          {starred ? "⭐ " : null}
-          {item.label}
-          {starred ? (
-            <span className="ml-1.5 text-[10px] font-bold uppercase tracking-wide text-[#1e4f4f]">
-              Recommended
-            </span>
-          ) : null}
-        </span>
-        {item.description ? (
-          <span className="mt-0.5 block text-xs leading-snug text-[#6b635a]">
-            {item.description}
-          </span>
-        ) : null}
-      </span>
-    </button>
-  );
-}
-
-function ToolGroupSection({
-  group,
-  recommendedId,
-  onSelect,
-}: {
-  group: FocusHubToolGroup;
-  recommendedId?: string;
-  onSelect: (action: FocusHubAction) => void;
-}) {
-  const [open, setOpen] = useState(
-    group.collapsible ? initialSectionOpen() : true,
-  );
-
-  const toolList = (
-    <ul className="flex flex-col gap-1.5">
-      {group.tools.map((item) => (
-        <li key={item.id}>
-          <ToolButton
-            item={item}
-            starred={item.id === recommendedId}
-            onSelect={onSelect}
-          />
-        </li>
-      ))}
-    </ul>
-  );
-
-  if (!group.collapsible) {
-    return (
-      <section className="flex flex-col gap-2" data-testid={`focus-group-${group.id}`}>
-        <h3 className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-          {group.title}
-        </h3>
-        {toolList}
-      </section>
-    );
-  }
-
-  return (
-    <section
-      className="overflow-hidden rounded-2xl border border-[#e7dfd4] bg-white/90"
-      data-testid={`focus-group-${group.id}`}
-    >
+    <li>
       <button
         type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        aria-controls={`focus-group-panel-${group.id}`}
-        className="flex w-full items-center justify-between gap-3 px-3.5 py-3 text-left"
+        className="focus-hub-dropdown__item focus-hub-plaque"
+        data-testid={`focus-tool-${item.id}`}
+        onClick={() => onSelect(item.action)}
       >
-        <span className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
-          {group.title}
-        </span>
-        <span className="text-[#9a9289]" aria-hidden="true">
-          {open ? "▾" : "▸"}
+        <FocusHubPlaqueStrip imageUrl={focusToolCardArt(item.id)} compact />
+        <span className="focus-hub-plaque__content">
+          <span className="focus-hub-dropdown__item-title">{item.label}</span>
+          {item.description ? (
+            <span className="focus-hub-dropdown__item-desc">{item.description}</span>
+          ) : null}
         </span>
       </button>
-      {open ? (
-        <div
-          id={`focus-group-panel-${group.id}`}
-          className="border-t border-[#efe8de] px-3 pb-3 pt-2"
-        >
-          {toolList}
-        </div>
-      ) : null}
-    </section>
+    </li>
   );
 }
 
-function FocusPanelFrame({
-  standalone,
-  children,
+function FocusHubChoice({
+  feelingId,
+  expanded,
+  onToggle,
+  onSelectTool,
 }: {
-  standalone: boolean;
-  children: ReactNode;
+  feelingId: FocusFeelingId;
+  expanded: boolean;
+  onToggle: (id: FocusFeelingId) => void;
+  onSelectTool: (action: FocusHubAction) => void;
 }) {
-  if (standalone) {
-    return <FocusMyBrainRoomShell>{children}</FocusMyBrainRoomShell>;
-  }
+  const feeling = focusFeelingById(feelingId);
+  const cardCopy = FOCUS_MY_BRAIN_HUB_CARDS[feelingId];
+  if (!feeling) return null;
+
+  const tools = focusHubDropdownTools(feeling);
+  const rowClass = [
+    "focus-hub-choice",
+    expanded ? "focus-hub-choice--expanded" : "",
+  ]
+    .filter(Boolean)
+    .join(" ");
 
   return (
-    <div className="focus-my-brain-inline companion-fade-in h-full min-h-0">
-      {children}
-    </div>
+    <li className={rowClass} data-testid={`focus-feeling-row-${feelingId}`}>
+      <button
+        type="button"
+        className="focus-hub-choice__main focus-hub-plaque"
+        data-testid={`focus-feeling-${feelingId}`}
+        aria-expanded={expanded}
+        onClick={() => onToggle(feelingId)}
+      >
+        <FocusHubPlaqueStrip imageUrl={focusHubCardArt(feelingId)} />
+        <span className="focus-hub-plaque__content">
+          <span className="focus-hub-choice__heading">
+            <span className="focus-hub-choice__title">{cardCopy.title}</span>
+            <span className="focus-hub-choice__chevron" aria-hidden>
+              {expanded ? "▾" : "▸"}
+            </span>
+          </span>
+          <span className="focus-hub-choice__descriptions">
+            <span className="focus-hub-choice__description">{cardCopy.tagline}</span>
+          </span>
+        </span>
+      </button>
+      {expanded ? (
+        <ul
+          className="focus-hub-dropdown"
+          data-testid={`focus-dropdown-${feelingId}`}
+        >
+          {tools.map((item) => (
+            <FocusHubDropdownItem
+              key={item.id}
+              item={item}
+              onSelect={onSelectTool}
+            />
+          ))}
+        </ul>
+      ) : null}
+    </li>
   );
 }
 
 function FocusMyBrainHub({
-  onSelectFeeling,
+  expandedFeeling,
+  onToggleFeeling,
+  onSelectTool,
+  landing = false,
 }: {
-  onSelectFeeling: (id: FocusFeelingId) => void;
+  expandedFeeling: FocusFeelingId | null;
+  onToggleFeeling: (id: FocusFeelingId) => void;
+  onSelectTool: (action: FocusHubAction) => void;
+  landing?: boolean;
 }) {
+  if (landing) {
+    return (
+      <FocusConservatoryDock
+        expandedFeeling={expandedFeeling}
+        onToggleFeeling={onToggleFeeling}
+        onSelectTool={onSelectTool}
+      />
+    );
+  }
+
   return (
     <div
       className="focus-my-brain-hub"
       data-testid="focus-area-panel"
       data-focus-view="feelings"
     >
-      <h1 className="focus-my-brain-hub__title">{FOCUS_MY_BRAIN_ROOM_COPY.title}</h1>
-      <p className="focus-my-brain-hub__tagline">{FOCUS_MY_BRAIN_ROOM_COPY.tagline}</p>
-      <ul className="focus-my-brain-hub__options">
+      <ul className="focus-hub-choices">
         {FOCUS_FEELING_ENTRIES.map((feeling) => (
-          <li key={feeling.id}>
-            <button
-              type="button"
-              className="focus-my-brain-option"
-              data-testid={`focus-feeling-${feeling.id}`}
-              onClick={() => onSelectFeeling(feeling.id)}
-            >
-              {feeling.label}
-            </button>
-          </li>
+          <FocusHubChoice
+            key={feeling.id}
+            feelingId={feeling.id}
+            expanded={expandedFeeling === feeling.id}
+            onToggle={onToggleFeeling}
+            onSelectTool={onSelectTool}
+          />
         ))}
       </ul>
     </div>
@@ -174,87 +156,54 @@ export function FocusAreaPanel({
   standalone = false,
 }: {
   onAction: (action: FocusHubAction) => void;
-  /** Full-screen Focus My Brain room — never beside chat. */
   standalone?: boolean;
   onBackToChat?: () => void;
 }) {
-  const [selectedFeeling, setSelectedFeeling] = useState<FocusFeelingId | null>(
+  const [expandedFeeling, setExpandedFeeling] = useState<FocusFeelingId | null>(
     null,
   );
+  const [videoPlayKey, setVideoPlayKey] = useState(0);
 
-  const category = selectedFeeling ? focusFeelingById(selectedFeeling) : null;
   const landscape = useMemo(
-    () =>
-      evaluateFocusLandscape({
-        workspaceId: category ? "focus-category" : "focus-hub",
-        focusCategoryId: selectedFeeling ?? undefined,
-      }),
-    [category, selectedFeeling],
+    () => evaluateFocusLandscape({ workspaceId: "focus-hub" }),
+    [],
   );
 
-  function handleBack() {
-    setSelectedFeeling(null);
+  function handleToggleFeeling(id: FocusFeelingId) {
+    setExpandedFeeling((current) => (current === id ? null : id));
   }
 
-  if (category) {
-    const recommendedInFirstGroup = Boolean(
-      category.recommended &&
-        category.groups[0]?.tools.some((t) => t.id === category.recommended?.id),
-    );
+  function handleSelectTool(action: FocusHubAction) {
+    setVideoPlayKey((key) => key + 1);
+    onAction(action);
+  }
 
+  const hub = (
+    <div
+      data-room-whisper={landscape.landscapeWhisper}
+      data-focus-landscape-space={landscape.spaceId}
+      data-focus-view="hub"
+    >
+      <FocusMyBrainHub
+        expandedFeeling={expandedFeeling}
+        onToggleFeeling={handleToggleFeeling}
+        onSelectTool={handleSelectTool}
+        landing={standalone}
+      />
+    </div>
+  );
+
+  if (standalone) {
     return (
-      <FocusPanelFrame standalone={standalone}>
-        <div
-          data-testid="focus-area-panel"
-          data-focus-view="category"
-          data-focus-category={category.id}
-          data-room-whisper={landscape.landscapeWhisper}
-          data-focus-landscape-space={landscape.spaceId}
-          className="focus-my-brain-category"
-        >
-          <button
-            type="button"
-            onClick={handleBack}
-            className="focus-my-brain-back"
-          >
-            ‹ Focus My Brain
-          </button>
-          <h2 className="focus-my-brain-category__title">{category.label}</h2>
-          <p className="focus-my-brain-category__tagline">{category.tagline}</p>
-
-          {category.recommended && !recommendedInFirstGroup ? (
-            <div className="mt-4">
-              <ToolButton
-                item={category.recommended}
-                starred
-                onSelect={onAction}
-              />
-            </div>
-          ) : null}
-
-          <div className="mt-4 flex flex-col gap-3">
-            {category.groups.map((group) => (
-              <ToolGroupSection
-                key={group.id}
-                group={group}
-                recommendedId={category.recommended?.id}
-                onSelect={onAction}
-              />
-            ))}
-          </div>
-        </div>
-      </FocusPanelFrame>
+      <FocusMyBrainRoomShell hubOverlay videoPlayKey={videoPlayKey}>
+        {hub}
+      </FocusMyBrainRoomShell>
     );
   }
 
   return (
-    <FocusPanelFrame standalone={standalone}>
-      <div
-        data-room-whisper={landscape.landscapeWhisper}
-        data-focus-landscape-space={landscape.spaceId}
-      >
-        <FocusMyBrainHub onSelectFeeling={setSelectedFeeling} />
-      </div>
-    </FocusPanelFrame>
+    <div className="focus-my-brain-inline companion-fade-in h-full min-h-0">
+      {hub}
+    </div>
   );
 }

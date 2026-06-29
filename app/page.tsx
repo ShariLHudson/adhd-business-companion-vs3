@@ -1,5 +1,7 @@
 import { redirect } from "next/navigation";
 
+import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
+
 export default function Home() {
-  redirect("/companion/login");
+  redirect(isCompanionAuthBypassed() ? "/companion" : "/companion/login");
 }

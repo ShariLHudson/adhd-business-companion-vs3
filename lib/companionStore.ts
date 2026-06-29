@@ -2434,6 +2434,8 @@ export type Prefs = {
   hasChatted: boolean; // has the user ever sent a message (returning vs first-time)
   name: string;
   email: string;
+  /** User-uploaded portrait — data URL; never Shari/companion images. */
+  profileImage?: string;
   howToMemory: string;
   // Connections — where finished content gets sent / pasted.
   facebookUrl: string;
@@ -2459,6 +2461,7 @@ const DEFAULT_PREFS: Prefs = {
   hasChatted: false,
   name: "",
   email: "",
+  profileImage: "",
   howToMemory: "",
   facebookUrl: "",
   instagramUrl: "",

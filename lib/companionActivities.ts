@@ -318,6 +318,34 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
     ],
   },
   {
+    id: "break-into-pieces",
+    categoryId: "focus",
+    title: "Break It Into Smaller Pieces",
+    helpsWith:
+      "When the whole thing feels too big — shrink it until your hands know what to do.",
+    timeLabel: "3–5 min",
+    steps: [
+      s("What feels too big or tangled right now?", {
+        type: "text",
+        key: "big",
+        label: "What feels too big",
+        multiline: true,
+      }),
+      s("Name one piece that's small enough to touch today — not the whole project.", {
+        type: "text",
+        key: "piece",
+        label: "One touchable piece",
+      }),
+      s("Shrink it once more. What could you do in five minutes?", {
+        type: "text",
+        key: "fiveMin",
+        label: "Five-minute version",
+        optional: true,
+      }),
+      s("That's your entry point. You don't have to finish — just open the door."),
+    ],
+  },
+  {
     id: "momentum-restart",
     categoryId: "focus",
     title: "Momentum Restart",
@@ -477,45 +505,6 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
         type: "text",
         key: "action",
         label: "One micro-action",
-      }),
-    ],
-  },
-  {
-    id: "recharge-menu",
-    categoryId: "energize",
-    title: "Recharge Menu",
-    helpsWith: "Choosing a recharge action that fits how empty actually feels.",
-    timeLabel: "3–5 min",
-    steps: [
-      s("How does empty feel right now?", {
-        type: "choice",
-        key: "emptyType",
-        label: "Type of empty",
-        choices: [
-          "Physically tired",
-          "Mentally flat",
-          "Emotionally heavy",
-          "Scattered / buzzing",
-        ],
-      }),
-      s("Pick from the menu — one only.", {
-        type: "choice",
-        key: "recharge",
-        label: "Recharge choice",
-        choices: [
-          "5-min walk",
-          "Water + snack",
-          "Lie down 5 min",
-          "Music / Focus Audio",
-          "Text someone kind",
-        ],
-      }),
-      s("Do it for five minutes before deciding on work. Recharge is not procrastination."),
-      s("Quick re-check: did anything shift? One word.", {
-        type: "text",
-        key: "shift",
-        label: "What shifted?",
-        optional: true,
       }),
     ],
   },
@@ -747,11 +736,12 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
     helpsWith: "Rank what matters most without building a giant task list.",
     timeLabel: "5–8 min",
     steps: [
-      s("Name three things competing for attention — not full tasks, just what's pulling.", {
+      s("Name what's competing for attention — not full tasks, just what's pulling. Add more only if you want.", {
         type: "options",
         key: "items",
-        startCount: 3,
-        minFilled: 2,
+        startCount: 1,
+        minFilled: 0,
+        optional: true,
         itemLabel: (i) => `Item ${i + 1}`,
         addLabel: "Add another",
       }),
@@ -760,17 +750,13 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
         key: "top",
         fromKey: "items",
         label: "Most important today",
+        optional: true,
       }),
-      s("Which feels second — still worth naming, not fixing everything.", {
-        type: "pick-from",
-        key: "second",
-        fromKey: "items",
-        label: "Second priority",
-      }),
-      s("One sentence on why the top pick wins right now.", {
+      s("One sentence on why the top pick wins right now — skip if you're not sure yet.", {
         type: "text",
         key: "why",
         label: "Why this one first",
+        optional: true,
       }),
       s("Park the rest honestly. Sorted ≠ scheduled — you chose direction."),
     ],
@@ -860,7 +846,8 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
     id: "project-breakdown",
     categoryId: "overwhelm",
     title: "Project Breakdown",
-    helpsWith: "Turn one project into a few honest next moves.",
+    helpsWith:
+      "Project planning — break one project into chunks and next moves. Use from Projects, not Focus My Brain.",
     timeLabel: "6–10 min",
     steps: [
       s("Name the project — one line, no scope creep.", {
@@ -1034,12 +1021,12 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
     helpsWith: "Finding which life area is loudest — without dumping every task into a list.",
     timeLabel: "4–6 min",
     steps: [
-      s("Don't list every task. Scan internally — which life area is competing loudest?"),
-      s("Which categories are pulling? Name up to three.", {
+      s("Scan internally — which life areas are pulling? Name up to three, or skip if nothing's clear.", {
         type: "options",
         key: "areas",
-        startCount: 3,
-        minFilled: 1,
+        startCount: 1,
+        minFilled: 0,
+        optional: true,
         itemLabel: (i) => `Area ${i + 1}`,
         addLabel: "Add area",
       }),
@@ -1048,11 +1035,13 @@ export const COMPANION_ACTIVITIES: CompanionActivity[] = [
         key: "heaviest",
         fromKey: "areas",
         label: "Heaviest area",
+        optional: true,
       }),
-      s("One sentence about that weight.", {
+      s("One sentence about that weight — optional.", {
         type: "text",
         key: "sentence",
         label: "One sentence",
+        optional: true,
       }),
       s("One two-minute action in that area only. Not the whole category — one pebble."),
     ],

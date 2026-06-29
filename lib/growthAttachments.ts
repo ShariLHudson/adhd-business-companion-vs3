@@ -1,6 +1,10 @@
 /**
- * Shared attachments for Growth Center areas — links, files, images, PDFs, video URLs.
+ * Shared attachments for Growth — thin references into the Asset Library.
+ * Files live once in lib/assetLibrary; entries hold assetId refs.
  */
+
+import { getAssetById } from "@/lib/assetLibrary/assetLibraryStore";
+import { ingestFileToAssetLibrary, ingestLinkToAssetLibrary } from "@/lib/assetLibrary/ingest";
 
 export type GrowthAttachmentKind = "file" | "image" | "pdf" | "link" | "video";
 
@@ -8,8 +12,11 @@ export type GrowthAttachment = {
   id: string;
   kind: GrowthAttachmentKind;
   name: string;
+  /** Resolved URL — may be empty when assetId is set (resolved at read time). */
   url: string;
   mimeType?: string;
+  /** Asset Library record — single source of truth for file blobs. */
+  assetId?: string;
 };
 
 export const GROWTH_ATTACHMENT_MAX_BYTES = 2_000_000;
@@ -30,35 +37,48 @@ export function isVideoUrl(url: string): boolean {
   return /youtube\.com|youtu\.be|vimeo\.com|loom\.com/i.test(url);
 }
 
+/** Resolve url/name from Asset Library when assetId is present. */
+export function resolveGrowthAttachment(att: GrowthAttachment): GrowthAttachment {
+  if (!att.assetId) return att;
+  const asset = getAssetById(att.assetId);
+  if (!asset) return att;
+  return {
+    ...att,
+    url: asset.url,
+    name: att.name || asset.title || asset.filename,
+    mimeType: att.mimeType ?? asset.mimeType,
+    kind: kindFromMime(asset.mimeType, asset.filename),
+  };
+}
+
 export async function readFileAsAttachment(
   file: File,
 ): Promise<GrowthAttachment | null> {
-  if (file.size > GROWTH_ATTACHMENT_MAX_BYTES) {
-    return null;
-  }
-  const dataUrl = await new Promise<string>((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result ?? ""));
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
-  const mime = file.type || "application/octet-stream";
+  const ingested = await ingestFileToAssetLibrary(file);
+  if (!ingested) return null;
+  const asset = getAssetById(ingested.assetId);
+  if (!asset) return null;
+  const mime = asset.mimeType;
   return {
     id: newAttachmentId(),
-    kind: kindFromMime(mime, file.name),
-    name: file.name,
-    url: dataUrl,
+    assetId: asset.id,
+    kind: kindFromMime(mime, asset.filename),
+    name: asset.filename,
+    url: asset.url,
     mimeType: mime,
   };
 }
 
 export function linkAttachment(url: string, label?: string): GrowthAttachment {
+  const ingested = ingestLinkToAssetLibrary(url, label);
+  const asset = getAssetById(ingested.assetId);
   const trimmed = url.trim();
   return {
     id: newAttachmentId(),
+    assetId: ingested.assetId,
     kind: isVideoUrl(trimmed) ? "video" : "link",
-    name: label?.trim() || trimmed,
-    url: trimmed,
+    name: label?.trim() || asset?.filename || trimmed,
+    url: asset?.url ?? trimmed,
   };
 }
 
@@ -79,10 +99,11 @@ export function attachmentTypeLabel(kind: GrowthAttachmentKind): string {
 
 export function downloadGrowthAttachment(att: GrowthAttachment): void {
   if (typeof window === "undefined") return;
+  const resolved = resolveGrowthAttachment(att);
   const anchor = document.createElement("a");
-  anchor.href = att.url;
-  anchor.download = att.name || "attachment";
-  if (att.url.startsWith("http")) {
+  anchor.href = resolved.url;
+  anchor.download = resolved.name || "attachment";
+  if (resolved.url.startsWith("http")) {
     anchor.target = "_blank";
     anchor.rel = "noopener noreferrer";
   }
@@ -93,9 +114,10 @@ export function downloadGrowthAttachment(att: GrowthAttachment): void {
 
 export function openGrowthAttachment(att: GrowthAttachment): void {
   if (typeof window === "undefined") return;
-  if (att.url.startsWith("http")) {
-    window.open(att.url, "_blank", "noopener,noreferrer");
+  const resolved = resolveGrowthAttachment(att);
+  if (resolved.url.startsWith("http")) {
+    window.open(resolved.url, "_blank", "noopener,noreferrer");
     return;
   }
-  downloadGrowthAttachment(att);
+  downloadGrowthAttachment(resolved);
 }

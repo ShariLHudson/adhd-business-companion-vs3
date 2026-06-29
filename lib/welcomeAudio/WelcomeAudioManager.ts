@@ -2,7 +2,7 @@ import {
   createSpeechAudio,
   fetchCompanionSpeechBlob,
 } from "@/lib/companionTts";
-import { isAutoplayBlockedError, unlockBrowserAudio } from "./audioUnlock";
+import { isAutoplayBlockedError, isWelcomeAudioSessionUnlocked, unlockBrowserAudio } from "./audioUnlock";
 import { chunkSpeechText } from "./chunkSpeechText";
 import { fadeAudioVolumeAsync } from "./fadeVolume";
 import {
@@ -57,6 +57,17 @@ export class WelcomeAudioManager {
   constructor(profile: WelcomeAudioProfile) {
     this.profile = profile;
     this.ambienceTargetVolume = profile.ambience?.volume ?? 0.17;
+    if (isWelcomeAudioSessionUnlocked()) {
+      this.audioUnlocked = true;
+    }
+  }
+
+  /** Re-sync after listeners attach (e.g. sidebar click unlocked before mount). */
+  adoptSessionUnlock(): boolean {
+    if (this.audioUnlocked) return true;
+    if (!isWelcomeAudioSessionUnlocked()) return false;
+    this.setAudioUnlocked(true);
+    return true;
   }
 
   getVoiceState(): WelcomeVoiceTransportState {
@@ -329,7 +340,20 @@ export class WelcomeAudioManager {
   }
 
   private clipFromCached(src: string, audio: HTMLAudioElement): SpeechClip {
+    this.applyVoicePlaybackRateToAudio(audio);
     return { audio, revoke: () => {}, cached: true };
+  }
+
+  private voicePlaybackRate(): number {
+    const rate = this.profile.voice?.playbackRate ?? 1;
+    return rate > 0 ? rate : 1;
+  }
+
+  private applyVoicePlaybackRateToAudio(audio: HTMLAudioElement): void {
+    const rate = this.voicePlaybackRate();
+    if (rate === 1) return;
+    audio.playbackRate = rate;
+    audio.defaultPlaybackRate = rate;
   }
 
   private async loadVoiceChunks(): Promise<boolean> {
@@ -371,7 +395,9 @@ export class WelcomeAudioManager {
         for (const chunk of chunks) {
           const blob = await fetchCompanionSpeechBlob(chunk);
           if (!blob) continue;
-          clips.push({ ...createSpeechAudio(blob), cached: false });
+          const clip = { ...createSpeechAudio(blob), cached: false };
+          this.applyVoicePlaybackRateToAudio(clip.audio);
+          clips.push(clip);
         }
       }
     }

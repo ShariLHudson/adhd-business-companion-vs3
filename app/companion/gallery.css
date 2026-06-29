@@ -584,6 +584,15 @@
   min-height: 1px;
 }
 
+.gallery__header--hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.gallery--capture .gallery__camera-viewport {
+  filter: brightness(0.35);
+}
+
 .gallery__back {
   border: none;
   background: rgba(24, 18, 14, 0.32);
@@ -893,7 +902,6 @@
 }
 
 .companion-gallery-active .companion-sidebar-portal,
-.companion-gallery-active [data-companion-topbar],
 .companion-gallery-active .companion-homestead-logo,
 .companion-gallery-active .companion-active-workspace-bar {
   display: none !important;

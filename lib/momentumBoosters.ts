@@ -15,7 +15,7 @@ export type MomentumBoosterItem = {
   id: MomentumBoosterId;
   title: string;
   desc: string;
-  emoji: string;
+  objectId: string;
   tool: SidebarToolId;
 };
 
@@ -24,21 +24,21 @@ const BOOSTER_ROWS: MomentumBoosterItem[] = [
     id: "guided-exercises",
     title: "Guided Exercises",
     desc: "Structured thinking — decisions, values, goals, and breakdowns.",
-    emoji: "📋",
+    objectId: "breathing",
     tool: "guided-exercises",
   },
   {
     id: "momentum-games",
-    title: "Momentum Games",
-    desc: "Playful mini-games organized by what your brain needs right now.",
-    emoji: "🎮",
+    title: "Momentum Builders",
+    desc: "A curated menu of short resets — energy, focus, calm, and playful surprises.",
+    objectId: "games",
     tool: "games",
   },
   {
     id: "spin-the-wheel",
     title: "Spin The Wheel",
     desc: "Let the wheel choose when everything feels equally important.",
-    emoji: "🎡",
+    objectId: "spin-wheel",
     tool: "spin-wheel",
   },
 ];

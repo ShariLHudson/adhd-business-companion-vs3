@@ -32,7 +32,8 @@ describe("Scene Render Contract", () => {
     const layout = layoutScene(resolved);
     expect(layout.centerZone.className).toBe("companion-scene-center");
     expect(layout.panel.className).toBe("companion-scene-panel");
-    expect(layout.cssVars["--scene-image-scale"]).toBe("1");
+    expect(layout.cssVars["--scene-image-scale"]).toBe("1.06");
+    expect(layout.cssVars["--video-scale"]).toBe("1.06");
     expect(Number(layout.cssVars["--scene-image-dominance"])).toBeGreaterThan(0.8);
   });
 

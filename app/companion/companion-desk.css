@@ -1,0 +1,468 @@
+/* ── Companion Desk — Focus My Brain guided workflows (Clear My Mind frosted reference) ── */
+
+.companion-desk-layer {
+  --companion-desk-frost: rgba(255, 252, 245, 0.58);
+  --companion-desk-frost-strong: rgba(255, 252, 245, 0.68);
+  --companion-desk-frost-border: rgba(255, 255, 255, 0.42);
+  --companion-desk-height: clamp(18vh, 20vh, 22vh);
+  position: fixed;
+  bottom: 0;
+  left: 3.5rem;
+  right: -12px;
+  z-index: 48;
+  box-sizing: border-box;
+  height: var(--companion-desk-height);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.companion-desk-layer--full-bleed {
+  left: -12px;
+  right: -12px;
+}
+
+@media (min-width: 768px) {
+  .companion-desk-layer:not(.companion-desk-layer--full-bleed) {
+    left: 11rem;
+  }
+}
+
+.companion-desk-layer__bleed {
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: auto;
+  background: transparent;
+}
+
+/* Soft emergence — translucent, not an opaque beige block */
+.companion-desk-layer__bleed::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  height: 2.75rem;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(255, 252, 245, 0.06) 45%,
+    rgba(255, 252, 245, 0.22) 100%
+  );
+}
+
+.companion-desk-layer__slot {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+}
+
+.companion-desk {
+  position: relative;
+  z-index: 1;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+}
+
+.companion-desk__surface {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  min-height: 0;
+  max-height: none;
+  overflow: hidden;
+  border: none;
+  border-top: 1px solid var(--companion-desk-frost-border);
+  border-radius: 0;
+  background: var(--companion-desk-frost);
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  box-shadow:
+    0 -10px 36px rgba(42, 58, 38, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+  padding: 0.55rem clamp(0.75rem, 2vw, 1rem)
+    max(0.5rem, env(safe-area-inset-bottom));
+}
+
+.companion-desk--chrome .companion-desk__surface,
+.companion-desk--chrome.companion-desk--chat .companion-desk__surface {
+  min-height: 0;
+  max-height: none;
+}
+
+.companion-desk__progress {
+  position: absolute;
+  top: 0.45rem;
+  right: 0.65rem;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.12rem;
+  pointer-events: none;
+}
+
+.companion-desk__progress-dots {
+  display: flex;
+  align-items: center;
+  gap: 0.22rem;
+}
+
+.companion-desk__progress-dot {
+  width: 0.34rem;
+  height: 0.34rem;
+  border-radius: 999px;
+  border: 1px solid rgba(196, 168, 118, 0.55);
+  background: transparent;
+}
+
+.companion-desk__progress-dot--filled {
+  background: linear-gradient(165deg, #e8c878 0%, #c4a876 100%);
+  border-color: rgba(196, 168, 118, 0.85);
+}
+
+.companion-desk__progress-text {
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #9a8a72;
+}
+
+.companion-desk__progress-line-track {
+  display: block;
+  width: 4.5rem;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(196, 168, 118, 0.22);
+  overflow: hidden;
+}
+
+.companion-desk__progress-line {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #d4b06a 0%, #c4a876 100%);
+  transition: width 340ms ease;
+}
+
+.companion-desk__zones {
+  display: grid;
+  grid-template-columns: minmax(4.75rem, 7.5rem) minmax(0, 1fr) minmax(4.75rem, 7.5rem);
+  align-items: start;
+  gap: 0.45rem;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.companion-desk__zones--chat-only {
+  display: block;
+}
+
+.companion-desk__left,
+.companion-desk__right {
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  padding-top: 0.1rem;
+}
+
+.companion-desk__right {
+  align-items: flex-end;
+}
+
+.companion-desk__nav-link {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #b89558;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 180ms ease;
+}
+
+.companion-desk__nav-link:hover {
+  color: #8a7048;
+}
+
+.companion-desk__utility {
+  border: 1px solid rgba(196, 168, 118, 0.28);
+  border-radius: 0.45rem;
+  background: rgba(255, 252, 245, 0.35);
+  padding: 0.2rem 0.42rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #8a7d6e;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    color 180ms ease;
+}
+
+.companion-desk__utility:hover {
+  border-color: rgba(196, 168, 118, 0.45);
+  background: rgba(255, 252, 245, 0.62);
+  color: #5c5348;
+}
+
+.companion-desk__center {
+  min-width: 0;
+  flex: 1 1 auto;
+  max-height: none;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-right: 3.25rem;
+  text-align: center;
+}
+
+.companion-desk__center--chat {
+  max-height: none;
+  padding-right: 0;
+  text-align: left;
+}
+
+.companion-desk__workflow-title {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.86rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #2a3228;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.companion-desk__glyph {
+  font-style: normal;
+}
+
+.companion-desk__meta {
+  margin: 0.08rem 0 0;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #3d6b62;
+}
+
+.companion-desk__time {
+  margin: 0.06rem 0 0;
+  font-size: 0.64rem;
+  line-height: 1.25;
+  color: #7a7064;
+}
+
+.companion-desk__linked {
+  margin-top: 0.25rem;
+  text-align: left;
+}
+
+.companion-desk__conversation {
+  animation: companion-desk-step-in 340ms ease;
+}
+
+@keyframes companion-desk-step-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.companion-desk__step-label {
+  margin: 0.2rem 0 0;
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #9a8a72;
+}
+
+.companion-desk__question {
+  margin: 0.18rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.35;
+  color: #2e2820;
+}
+
+.companion-desk__fields {
+  margin-top: 0.28rem;
+  text-align: left;
+}
+
+.companion-desk__fields input,
+.companion-desk__fields textarea {
+  border-color: rgba(196, 168, 118, 0.4) !important;
+  background: rgba(255, 252, 245, 0.62) !important;
+}
+
+.companion-desk__fields input:focus,
+.companion-desk__fields textarea:focus {
+  border-color: rgba(184, 149, 88, 0.72) !important;
+}
+
+.companion-desk__fields .mt-4,
+.companion-desk__fields .mt-1\.5 {
+  margin-top: 0.28rem;
+}
+
+.companion-desk__fields .rounded-xl.border {
+  border-color: rgba(196, 168, 118, 0.28) !important;
+  background: rgba(255, 252, 245, 0.42) !important;
+  border-radius: 0.55rem !important;
+  padding: 0.45rem 0.55rem !important;
+}
+
+.companion-desk__fields label,
+.companion-desk__fields .text-sm.font-semibold.text-\[\#4b463f\] {
+  font-size: 0.68rem;
+  color: #8a7d6e;
+}
+
+.companion-desk__footer {
+  display: flex;
+  flex-shrink: 0;
+  justify-content: center;
+  padding-top: 0.1rem;
+}
+
+.companion-desk__btn-continue {
+  width: 13.75rem;
+  max-width: min(13.75rem, 92%);
+  border: 1px solid rgba(196, 168, 118, 0.42);
+  border-radius: 0.65rem;
+  background: linear-gradient(165deg, #edd08a 0%, #c4a876 52%, #b89558 100%);
+  padding: 0.42rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 650;
+  color: #2a2418;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(184, 149, 88, 0.28);
+  transition:
+    filter 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.companion-desk__btn-continue:hover:not(:disabled) {
+  filter: brightness(1.04);
+  box-shadow: 0 6px 18px rgba(184, 149, 88, 0.34);
+}
+
+.companion-desk__btn-continue:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.companion-desk__btn-continue:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+}
+
+.companion-desk__outcome {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: center;
+  animation: companion-desk-step-in 340ms ease;
+}
+
+.companion-desk__outcome-title {
+  margin: 0.15rem 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #2a3228;
+}
+
+.companion-desk__outcome-body {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: #6b635a;
+}
+
+/* Chat inside the permanent desk */
+.companion-desk__chat-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+}
+
+.companion-desk .companion-communication-anchor {
+  width: 100%;
+}
+
+.companion-desk .companion-communication-anchor .input-glass {
+  border-color: rgba(255, 255, 255, 0.42);
+  background: rgba(255, 252, 245, 0.45);
+}
+
+.companion-desk__chat-extras {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.15rem;
+}
+
+/* Reserve space above the fixed desk in video sanctuary rooms */
+.companion-has-companion-desk .focus-my-brain-room--interaction-dock,
+.companion-has-companion-desk .companion-focus-my-brain-active .clear-my-mind-standalone-frame {
+  padding-bottom: clamp(18vh, 20vh, 22vh);
+}
+
+@media (max-width: 640px) {
+  .companion-desk-layer:not(.companion-desk-layer--full-bleed) {
+    left: 3.5rem;
+  }
+
+  .companion-desk__zones {
+    grid-template-columns: minmax(3.5rem, 5rem) minmax(0, 1fr) minmax(3.5rem, 5rem);
+    gap: 0.3rem;
+  }
+
+  .companion-desk__center {
+    padding-right: 2.75rem;
+  }
+
+  .companion-desk__utility {
+    font-size: 0.58rem;
+    padding: 0.18rem 0.34rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .companion-desk__conversation,
+  .companion-desk__outcome,
+  .companion-desk__progress-line {
+    animation: none !important;
+    transition: none !important;
+  }
+}

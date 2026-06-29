@@ -56,12 +56,12 @@ function scene(
 export const COMPANION_PRESENCE_SCENE_CATALOG: CompanionPresenceLibraryEntry[] = [
   scene("shari-i-am-here-2.png", "I Am Here", ["welcome", "gentle", "morning", "afternoon"], {
     surfaces: ["chat-welcome"],
-    timeOfDay: ["morning", "afternoon", "evening"],
+    timeOfDay: ["morning", "afternoon"],
     welcomeHero: true,
   }),
   scene("shari-i-am-here.png", "Living Room", ["welcome", "gentle", "morning", "afternoon"], {
     surfaces: ["chat-welcome"],
-    timeOfDay: ["morning", "afternoon", "evening"],
+    timeOfDay: ["morning", "afternoon"],
     welcomeHero: true,
   }),
   scene("shari-coffee-cup.png", "Coffee Together", ["welcome", "morning", "gentle"], {
@@ -150,6 +150,9 @@ export const COMPANION_PRESENCE_SCENE_CATALOG: CompanionPresenceLibraryEntry[] =
 ];
 
 export const COMPANION_PRESENCE_WELCOME_IMAGE_ID = "shari-i-am-here-2";
+
+/** Approved evening hero — lamplight from the room, not the window. */
+export const COMPANION_PRESENCE_EVENING_WELCOME_IMAGE_ID = "shari-evening-winddown";
 
 export function companionPresenceEntryById(
   id: string,

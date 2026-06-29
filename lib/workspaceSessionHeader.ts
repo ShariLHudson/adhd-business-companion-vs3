@@ -51,6 +51,7 @@ const ACTIVITY_HEADERS: Record<string, string> = {
   "priority-sort": "What needs sorting first?",
   "values-check": "What values are we checking against?",
   "goal-clarifier": "What goal are we clarifying?",
+  "break-into-pieces": "What feels too big right now?",
   "project-breakdown": "What project are we breaking down?",
 };
 

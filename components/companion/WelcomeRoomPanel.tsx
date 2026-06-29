@@ -1,16 +1,26 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type PointerEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { WelcomeRoomTopBar } from "@/components/companion/WelcomeRoomTopBar";
 import { useWelcomeAudioExperience } from "@/lib/welcomeAudio";
-import { unlockBrowserAudioFromClick } from "@/lib/welcomeAudio/audioUnlock";
+import {
+  isWelcomeAudioSessionUnlocked,
+  unlockBrowserAudioFromClick,
+} from "@/lib/welcomeAudio/audioUnlock";
+import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
 import {
   recordWelcomeRoomVisit,
   resolveWelcomeRoomSeason,
   setWelcomeRoomWelcomeMode,
   WELCOME_ROOM_ASSET,
   WELCOME_ROOM_LETTER,
-  WELCOME_ROOM_VOICE_CONTROLS,
   useWelcomeRoomArrival,
 } from "@/lib/welcomeRoom";
 
@@ -21,7 +31,7 @@ type Props = {
 };
 
 /**
- * Welcome Room — full sunroom; letter only on request, narrow rail on the right.
+ * Welcome Room — full sunroom; Shari welcomes you in voice. Letter opens only via Read welcome.
  */
 export function WelcomeRoomPanel({
   onBackToChat,
@@ -30,16 +40,17 @@ export function WelcomeRoomPanel({
 }: Props) {
   const season = useMemo(() => resolveWelcomeRoomSeason(), []);
   const [readingFocus, setReadingFocus] = useState(false);
-  const [cinematicActive, setCinematicActive] = useState(false);
+  const [cinematicActive, setCinematicActive] = useState(true);
   const [cinematicPaused, setCinematicPaused] = useState(false);
   const letterScrollRef = useRef<HTMLDivElement>(null);
   const visitedRef = useRef(false);
+  const autoStartedRef = useRef(false);
   const continueFn = onContinue ?? onBackToChat;
 
   const arrival = useWelcomeRoomArrival({
     frozen: readingFocus,
-    cinematicActive: cinematicActive && !readingFocus,
-    cinematicPaused,
+    walkPaused: cinematicPaused,
+    skipIntro: true,
   });
 
   const {
@@ -62,7 +73,13 @@ export function WelcomeRoomPanel({
     paused: readingFocus || cinematicPaused,
   });
 
-  const needsAudioUnlock = !readingFocus && !audioUnlocked;
+  const experienceLive =
+    cinematicActive ||
+    audioUnlocked ||
+    isWelcomeAudioSessionUnlocked() ||
+    voiceState === "loading" ||
+    voiceState === "playing" ||
+    voiceState === "paused";
 
   const beginListenExperience = useCallback(() => {
     unlockBrowserAudioFromClick();
@@ -85,7 +102,10 @@ export function WelcomeRoomPanel({
     setReadingFocus(false);
     setWelcomeRoomWelcomeMode("immersive");
     setCinematicPaused(false);
-  }, []);
+    if (voiceState === "paused") {
+      setCinematicActive(true);
+    }
+  }, [voiceState]);
 
   const openListen = useCallback(() => {
     beginListenExperience();
@@ -113,30 +133,24 @@ export function WelcomeRoomPanel({
     setWelcomeRoomWelcomeMode("immersive");
     setCinematicActive(true);
     setCinematicPaused(false);
-    unlockBrowserAudioFromClick();
     await restartExperience();
   }, [arrival, restartExperience]);
 
-  const handleStepInside = useCallback(
-    (event: PointerEvent<HTMLButtonElement>) => {
-      event.stopPropagation();
-      beginListenExperience();
-    },
-    [beginListenExperience],
-  );
+  useLayoutEffect(() => {
+    if (autoStartedRef.current) return;
+    autoStartedRef.current = true;
+    beginListenExperience();
+  }, [beginListenExperience]);
+
+  useEffect(() => {
+    preloadRoomBackground(WELCOME_ROOM_ASSET);
+  }, []);
 
   useEffect(() => {
     if (visitedRef.current) return;
     visitedRef.current = true;
     recordWelcomeRoomVisit();
   }, []);
-
-  useEffect(() => {
-    if (readingFocus || audioUnlocked) return;
-    if (voiceState === "playing" || voiceState === "paused") {
-      setCinematicActive(true);
-    }
-  }, [audioUnlocked, readingFocus, voiceState]);
 
   useEffect(() => {
     registerBack?.(() => {
@@ -158,7 +172,7 @@ export function WelcomeRoomPanel({
 
   return (
     <div
-      className={`welcome-room welcome-room--masterpiece welcome-room--${arrival.phase} ${roomSettled ? "welcome-room--still-frame" : ""} ${readingFocus ? "welcome-room--reading" : "welcome-room--listening"} ${needsAudioUnlock ? "welcome-room--invite" : ""} ${season.atmosphereClass}`}
+      className={`welcome-room welcome-room--masterpiece welcome-room--${arrival.phase} ${roomSettled ? "welcome-room--still-frame" : ""} ${readingFocus ? "welcome-room--reading" : "welcome-room--listening"} ${season.atmosphereClass}`}
       data-testid="welcome-room-panel"
       data-arrival={arrival.phase}
       data-mode={readingFocus ? "read" : "listen"}
@@ -186,7 +200,7 @@ export function WelcomeRoomPanel({
           onToggleMusic={toggleMusic}
           onToggleVoice={toggleVoice}
           readingFocus={readingFocus}
-          audioUnlocked={audioUnlocked}
+          audioUnlocked={audioUnlocked || experienceLive}
         />
 
         <div
@@ -202,8 +216,8 @@ export function WelcomeRoomPanel({
                 <div
                   className="welcome-room__photo-plane"
                   style={{
-                    transform: `scale(${arrival.dolly.photoScale})`,
-                    transformOrigin: "50% 40%",
+                    transform: arrival.dolly.imageTransform,
+                    transformOrigin: arrival.dolly.transformOrigin,
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -211,11 +225,14 @@ export function WelcomeRoomPanel({
                     src={WELCOME_ROOM_ASSET}
                     alt=""
                     className="welcome-room__photo"
-                    style={{ objectPosition: arrival.dolly.objectPosition }}
+                    style={{
+                      objectPosition: arrival.dolly.objectPosition,
+                      objectFit: arrival.dolly.objectFit,
+                    }}
                   />
                   <div
                     className="welcome-room__ambient"
-                    data-visible=""
+                    data-visible={experienceLive ? "" : undefined}
                     aria-hidden="true"
                   >
                     <div className="welcome-room__sunlight" />
@@ -232,7 +249,6 @@ export function WelcomeRoomPanel({
                     <div className="welcome-room__butterfly" />
                     <div className="welcome-room__lamplight" />
                   </div>
-                  <div className="welcome-room__vignette" aria-hidden="true" />
                 </div>
               </div>
             </div>
@@ -258,38 +274,25 @@ export function WelcomeRoomPanel({
           <div
             className="welcome-room__letter-shell"
             aria-label="Welcome letter"
-            data-testid="welcome-room-letter-rail"
           >
             <div
               ref={letterScrollRef}
               className="welcome-room__letter-panel"
-              data-testid="welcome-room-letter"
             >
               <div className="welcome-room__letter-body">
                 {WELCOME_ROOM_LETTER.paragraphs.map((paragraph) => (
-                  <p key={paragraph.slice(0, 40)}>{paragraph}</p>
+                  <p
+                    key={paragraph.text.slice(0, 40)}
+                    className={
+                      paragraph.emphasis ? "welcome-room__letter-emphasis" : undefined
+                    }
+                  >
+                    {paragraph.text}
+                  </p>
                 ))}
               </div>
             </div>
           </div>
-        ) : null}
-
-        {needsAudioUnlock ? (
-          <button
-            type="button"
-            className="welcome-room__audio-unlock"
-            onClick={handleStepInside}
-            onPointerDown={handleStepInside}
-            data-testid="welcome-room-enter"
-            aria-label={WELCOME_ROOM_VOICE_CONTROLS.stepInside}
-          >
-            <span className="welcome-room__enter-label">
-              {WELCOME_ROOM_VOICE_CONTROLS.stepInside}
-            </span>
-            <span className="welcome-room__enter-hint">
-              {WELCOME_ROOM_VOICE_CONTROLS.stepInsideHint}
-            </span>
-          </button>
         ) : null}
       </div>
     </div>

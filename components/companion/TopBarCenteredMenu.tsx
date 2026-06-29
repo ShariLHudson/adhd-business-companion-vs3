@@ -2,7 +2,7 @@
 
 import { useEffect, useId, useRef, useState, type CSSProperties } from "react";
 import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
-import { MENU_DROPDOWN_ROW, MENU_TRIGGER_BTN } from "@/lib/menuNavStyles";
+import { MENU_DROPDOWN_ROW, TOP_BAR_SIGN_BTN } from "@/lib/menuNavStyles";
 
 export type CenteredMenuItem = {
   id: string;
@@ -18,6 +18,7 @@ type Props = {
   items: CenteredMenuItem[];
   badge?: number;
   showCaret?: boolean;
+  active?: boolean;
 };
 
 const VIEWPORT_INSET_PX = 32;
@@ -26,11 +27,11 @@ const PANEL_MAX_WIDTH_PX = 260;
 
 export function TopBarCenteredMenu({
   menuId,
-  triggerObjectId,
   label,
   items,
   badge,
   showCaret = true,
+  active = false,
 }: Props) {
   const [open, setOpen] = useState(false);
   const [panelStyle, setPanelStyle] = useState<CSSProperties>({});
@@ -38,6 +39,7 @@ export function TopBarCenteredMenu({
   const triggerRef = useRef<HTMLButtonElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const listId = useId();
+  const isActive = active;
 
   useEffect(() => {
     if (!open) return;
@@ -94,7 +96,7 @@ export function TopBarCenteredMenu({
       <button
         ref={triggerRef}
         type="button"
-        className={MENU_TRIGGER_BTN}
+        className={`${TOP_BAR_SIGN_BTN}${isActive ? " top-bar-homestead-sign--active" : ""}`}
         title={label}
         aria-label={badge ? `${label}, ${badge} active items` : label}
         aria-haspopup="menu"
@@ -103,18 +105,18 @@ export function TopBarCenteredMenu({
         data-top-bar-menu={menuId}
         onClick={() => setOpen((value) => !value)}
       >
-        <CompanionObjectVisual objectId={triggerObjectId} size="xs" variant="icon" />
-        <span className="hidden sm:inline">{label}</span>
-        {badge != null && badge > 0 ? (
-          <span className="rounded-full bg-[var(--cm-accent-tint,#e6f0f0)] px-2 py-0.5 text-xs font-bold text-[var(--cm-accent,#1e4f4f)]">
-            {badge}
-          </span>
-        ) : null}
-        {showCaret ? (
-          <span className="top-bar-centered-menu__caret" aria-hidden="true">
-            ▾
-          </span>
-        ) : null}
+        <span className="top-bar-homestead-sign__hanger" aria-hidden="true" />
+        <span className="top-bar-homestead-sign__board">
+          <span className="top-bar-homestead-sign__label">{label}</span>
+          {badge != null && badge > 0 ? (
+            <span className="top-bar-homestead-sign__badge">{badge}</span>
+          ) : null}
+          {showCaret ? (
+            <span className="top-bar-centered-menu__caret" aria-hidden="true">
+              ▾
+            </span>
+          ) : null}
+        </span>
       </button>
 
       {open ? (

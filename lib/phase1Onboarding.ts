@@ -8,7 +8,6 @@
 import type { ChatTurn } from "./companionIntelligence";
 import { saveBusinessProfile } from "./companionStore";
 import { recordDiscoveryAnswer, completeFirstVisit } from "./companionDiscovery";
-import { scheduleWelcomeRoomInvitation } from "./welcomeRoom";
 
 export type Phase1OnboardingPhase =
   | "opening"
@@ -507,7 +506,6 @@ export function applyPhase1OnboardingTurn(
 
   const cur = readState();
   const nextPhase = evaluation.complete ? "complete" : evaluation.phase;
-  const wasComplete = cur.complete;
 
   patchPhase1OnboardingState({
     phase: nextPhase,
@@ -519,9 +517,6 @@ export function applyPhase1OnboardingTurn(
 
   if (evaluation.complete) {
     persistRelationshipProfile(evaluation.profile);
-    if (!wasComplete) {
-      scheduleWelcomeRoomInvitation();
-    }
   }
 
   return evaluation;

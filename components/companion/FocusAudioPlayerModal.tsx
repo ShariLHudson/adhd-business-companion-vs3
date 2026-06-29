@@ -4,7 +4,6 @@ import { useEffect, useMemo, useState } from "react";
 import { openAudioLink } from "@/lib/audioPlaylists";
 import { resolveInAppAudioPlayback } from "@/lib/focusAudio/inAppAudioPlayback";
 import type { SoundscapePlayback } from "@/lib/soundscapes/types";
-import { soundscapeToAudioLink } from "@/lib/soundscapes";
 
 type Props = {
   playback: SoundscapePlayback | null;
@@ -16,12 +15,12 @@ export function FocusAudioPlayerModal({ playback, onClose }: Props) {
 
   const inApp = useMemo(() => {
     if (!playback) return null;
-    return resolveInAppAudioPlayback(soundscapeToAudioLink({
+    return resolveInAppAudioPlayback({
       id: playback.id,
       name: playback.label,
       url: playback.playbackUrl,
       playlistId: "soundscape",
-    }));
+    });
   }, [playback]);
 
   useEffect(() => {

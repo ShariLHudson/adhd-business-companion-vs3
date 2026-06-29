@@ -28,23 +28,19 @@ describe("Visible Thinking chat bubble", () => {
     });
   }
 
-  it("renders Shari portrait beside thinking copy", () => {
+  it("renders warm amber thinking pulse beside copy", () => {
     renderBubble("Connecting a few dots...");
     const bubble = container.querySelector('[data-testid="visible-thinking-bubble"]');
-    const portrait = container.querySelector("img");
+    const pulse = container.querySelector(".companion-chat-thinking__pulse");
     expect(bubble).toBeTruthy();
-    expect(portrait).toBeTruthy();
+    expect(pulse).toBeTruthy();
     expect(container.textContent).toContain("Connecting a few dots...");
   });
 
-  it("uses compact circular portrait without a white square placeholder", () => {
+  it("does not repeat avatar portraits on every thinking state", () => {
     renderBubble("I want to answer this well.");
     const portrait = container.querySelector("img");
-    expect(portrait?.className).toMatch(/rounded-full/);
-    expect(portrait?.className).toMatch(/h-10/);
-    expect(portrait?.className).not.toMatch(/bg-white/);
-    const whiteSquare = container.querySelector(".bg-white");
-    expect(whiteSquare).toBeNull();
+    expect(portrait).toBeNull();
   });
 
   it("never surfaces raw JSON or DOCTYPE errors in chat copy", () => {

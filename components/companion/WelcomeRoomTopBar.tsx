@@ -69,7 +69,7 @@ export function WelcomeRoomTopBar({
     progress.totalSeconds > 0
       ? formatAudioTime(progress.totalSeconds)
       : "—:——";
-  const inviteQuiet = !audioUnlocked && !readingFocus;
+  const inviteQuiet = false;
 
   return (
     <header
@@ -88,24 +88,14 @@ export function WelcomeRoomTopBar({
         </button>
 
         {readingFocus ? (
-          <>
-            <button
-              type="button"
-              className="welcome-room__top-btn"
-              onClick={onCloseRead}
-              data-testid="welcome-room-close-read"
-            >
-              {WELCOME_ROOM_VOICE_CONTROLS.closeRead}
-            </button>
-            <button
-              type="button"
-              className="welcome-room__top-btn welcome-room__top-btn--active"
-              onClick={onOpenListen}
-              data-testid="welcome-room-listen-instead"
-            >
-              {WELCOME_ROOM_VOICE_CONTROLS.listenInstead}
-            </button>
-          </>
+          <button
+            type="button"
+            className="welcome-room__top-btn welcome-room__top-btn--active"
+            onClick={onOpenListen}
+            data-testid="welcome-room-listen-instead"
+          >
+            {WELCOME_ROOM_VOICE_CONTROLS.listenInstead}
+          </button>
         ) : inviteQuiet ? null : (
           <>
             <div

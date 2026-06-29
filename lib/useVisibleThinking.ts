@@ -6,7 +6,7 @@ import {
   type VisibleThinkingContext,
 } from "./visibleThinking";
 
-const TICK_MS = 750;
+const TICK_MS = 300;
 
 /**
  * Visible Thinking — adaptive, intelligence-aware wait copy.

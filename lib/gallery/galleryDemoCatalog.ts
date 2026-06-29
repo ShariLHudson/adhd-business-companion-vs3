@@ -8,9 +8,14 @@ import type { GalleryDemoScene, GalleryDemoSceneId } from "./galleryDemoMode";
 import type { GalleryWallMemory } from "./galleryWallMemories";
 
 function ex(
-  memory: GalleryWallMemory,
+  memory: Omit<GalleryWallMemory, "createdAt" | "updatedAt" | "title"> &
+    Partial<Pick<GalleryWallMemory, "createdAt" | "updatedAt" | "title">>,
 ): GalleryWallMemory {
-  return memory;
+  return {
+    ...memory,
+    createdAt: memory.createdAt ?? "2026-01-01T00:00:00.000Z",
+    title: memory.title ?? "",
+  };
 }
 
 const SCENE_BEGINNING: GalleryWallMemory[] = [

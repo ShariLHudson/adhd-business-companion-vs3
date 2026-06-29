@@ -33,6 +33,14 @@ const BY_IMAGE: Record<string, Partial<WelcomeImageCapabilities>> = {
     artObjectPosition: "14% center",
     artObjectFit: "cover",
   },
+  "shari-evening-winddown": {
+    openWindow: false,
+    mugBakedIn: false,
+    suppressHospitalitySteam: true,
+    suppressCurtains: true,
+    artObjectPosition: "22% center",
+    artObjectFit: "cover",
+  },
 };
 
 export function welcomeImageCapabilities(

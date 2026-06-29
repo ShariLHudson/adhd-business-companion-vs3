@@ -41,3 +41,12 @@ export {
   filterQuestionThroughCharacter,
   filterSpokenThroughCharacter,
 } from "./applyCharacterFilter";
+
+export {
+  buildShariSceneImagePrompt,
+  SHARI_IDENTITY_ANCHOR_IMAGE,
+  SHARI_LOCKED_VISUAL_IDENTITY,
+  SHARI_VISUAL_CHANGE_ALLOWLIST,
+  SHARI_VISUAL_IDENTITY_CORE,
+  SHARI_VISUAL_NEGATIVE_PROMPT,
+} from "./visualIdentity";

@@ -1,0 +1,65 @@
+/* Login → home — short dissolve, no interruption */
+
+@keyframes companion-login-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.companion-login-page--exiting {
+  animation: companion-login-fade-out 400ms ease-out forwards;
+  pointer-events: none;
+}
+
+.companion-login-page__slow-status {
+  position: fixed;
+  inset-inline: 0;
+  bottom: clamp(1.5rem, 8vh, 3rem);
+  z-index: 20;
+  margin: 0;
+  text-align: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: rgba(245, 239, 230, 0.92);
+  text-shadow: 0 1px 12px rgba(24, 20, 16, 0.35);
+}
+
+@keyframes companion-login-arrival-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.companion-shell[data-login-arrival],
+[data-login-arrival] {
+  animation: companion-login-arrival-in 450ms ease-out forwards;
+}
+
+.companion-auth-slow-status {
+  position: fixed;
+  inset-inline: 0;
+  top: clamp(0.75rem, 3vh, 1.25rem);
+  z-index: 200;
+  margin: 0;
+  padding: 0 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: rgba(106, 95, 82, 0.88);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .companion-login-page--exiting,
+  .companion-shell[data-login-arrival],
+  [data-login-arrival] {
+    animation: none;
+  }
+}

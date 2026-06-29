@@ -3,15 +3,19 @@
  * Core question: "What changed because of what I did?"
  */
 
+import type { EcosystemObjectKind } from "./intelligence/intelligenceReadyTypes";
 import type { GrowthAttachment } from "./growthAttachments";
+import { linkGrowthAttachmentsToRecord } from "@/lib/assetLibrary/references";
 
 export const EVIDENCE_CATEGORIES = [
   "Business Growth",
   "Client Impact",
   "Personal Growth",
-  "Health & Wellbeing",
+  "Health",
   "Courage",
   "Problem Solving",
+  "Prevented Problem",
+  "Moved Forward",
 ] as const;
 
 export type EvidenceCategory = (typeof EVIDENCE_CATEGORIES)[number];
@@ -31,6 +35,8 @@ export type EvidenceEntry = {
   updatedAt: string;
   /** Momentum event or win moment id when saved from Wins This Week */
   sourceWinId?: string;
+  originatedFromId?: string;
+  originatedFromKind?: EcosystemObjectKind;
 };
 
 export type EvidenceDashboardStats = {
@@ -55,6 +61,14 @@ function newId(): string {
   return `ev-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
+function normalizeCategory(raw: string): EvidenceCategory {
+  if (raw === "Health & Wellbeing") return "Health";
+  if ((EVIDENCE_CATEGORIES as readonly string[]).includes(raw)) {
+    return raw as EvidenceCategory;
+  }
+  return "Business Growth";
+}
+
 function readAll(): EvidenceEntry[] {
   if (typeof window === "undefined") return [];
   try {
@@ -72,6 +86,7 @@ function readAll(): EvidenceEntry[] {
       )
       .map((e) => ({
         ...e,
+        category: normalizeCategory(e.category),
         attachments: Array.isArray(e.attachments) ? e.attachments : [],
       }));
   } catch {
@@ -127,6 +142,11 @@ export function createEvidenceEntry(
     updatedAt: now,
   };
   writeAll([entry, ...readAll()]);
+  linkGrowthAttachmentsToRecord(
+    entry.attachments,
+    "evidence-bank",
+    entry.id,
+  );
   return entry;
 }
 
@@ -199,6 +219,54 @@ export function downloadEvidenceEntry(entry: EvidenceEntry): void {
 export function printEvidenceEntry(entry: EvidenceEntry): void {
   if (typeof window === "undefined") return;
   const html = `<!DOCTYPE html><html><head><title>Evidence</title></head><body><pre style="font-family:system-ui,sans-serif;padding:24px;white-space:pre-wrap;">${formatEvidenceEntryForExport(entry).replace(/</g, "&lt;")}</pre></body></html>`;
+  const win = window.open("", "_blank");
+  if (!win) return;
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  win.print();
+}
+
+/** Pick random entries for Remind Me overlay. */
+export function pickRandomEvidenceEntries(
+  count: number,
+  pool?: EvidenceEntry[],
+): EvidenceEntry[] {
+  const source = pool ?? getEvidenceEntries();
+  if (source.length === 0) return [];
+  const shuffled = [...source].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, Math.min(count, shuffled.length));
+}
+
+export function formatAllEvidenceForExport(entries: EvidenceEntry[]): string {
+  if (entries.length === 0) return "Evidence Bank — no entries.";
+  return entries
+    .map((e, i) => {
+      const block = formatEvidenceEntryForExport(e);
+      return i === 0 ? block : `\n${"─".repeat(40)}\n\n${block}`;
+    })
+    .join("");
+}
+
+export function downloadAllEvidence(entries: EvidenceEntry[]): void {
+  if (typeof window === "undefined" || entries.length === 0) return;
+  const blob = new Blob([formatAllEvidenceForExport(entries)], {
+    type: "text/plain;charset=utf-8",
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = `evidence-bank-${new Date().toISOString().slice(0, 10)}.txt`;
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
+}
+
+export function printAllEvidence(entries: EvidenceEntry[]): void {
+  if (typeof window === "undefined" || entries.length === 0) return;
+  const body = formatAllEvidenceForExport(entries).replace(/</g, "&lt;");
+  const html = `<!DOCTYPE html><html><head><title>Evidence Bank</title></head><body><pre style="font-family:Georgia,serif;padding:32px;white-space:pre-wrap;color:#2f261f;">${body}</pre></body></html>`;
   const win = window.open("", "_blank");
   if (!win) return;
   win.document.write(html);

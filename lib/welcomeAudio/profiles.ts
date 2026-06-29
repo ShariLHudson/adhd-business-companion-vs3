@@ -15,6 +15,7 @@ import {
   WELCOME_ROOM_PLAY_VOICE_START_MS,
   WELCOME_ROOM_SILENCE_MS,
 } from "@/lib/welcomeRoom/arrival";
+import { WELCOME_ROOM_VOICE_PLAYBACK_RATE } from "@/lib/welcomeRoom/voice";
 import {
   WELCOME_ROOM_GREETING_AUDIO_SRC,
   WELCOME_ROOM_FULL_WELCOME_AUDIO_SRC,
@@ -48,6 +49,7 @@ export const WELCOME_ROOM_AUDIO_PROFILE: WelcomeAudioProfile = {
     bodyText: welcomeRoomWelcomeBodySpeechText(),
     cachedBodySrcs: WELCOME_ROOM_WELCOME_AUDIO_PARTS,
     fullWelcomeSrc: WELCOME_ROOM_FULL_WELCOME_AUDIO_SRC,
+    playbackRate: WELCOME_ROOM_VOICE_PLAYBACK_RATE,
   },
 };
 

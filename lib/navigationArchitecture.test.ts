@@ -8,13 +8,14 @@ describe("navigation architecture", () => {
     expect(sidebarNavForSection("plan-my-day")).toBe("plan-my-day");
     expect(sidebarNavForSection("home")).toBe("chat");
     expect(sidebarNavForSection("focus")).toBe("focus");
-    expect(sidebarNavForSection("visual-focus")).toBe("visual-thinking");
+    expect(sidebarNavForSection("visual-focus")).toBe("other");
     expect(sidebarNavForSection("the-gallery")).toBe("growth");
     expect(sidebarNavForSection("evidence-bank")).toBe("evidence-bank");
     expect(sidebarNavForSection("confidence-vault")).toBe("confidence-vault");
     expect(sidebarNavForSection("my-work")).toBe("other");
-    expect(sidebarNavForSection("how-do-i")).toBe("how-do-i");
-    expect(sidebarNavForSection("welcome-room")).toBe("welcome-room");
+    expect(sidebarNavForSection("how-do-i")).toBe("other");
+    expect(sidebarNavForSection("playbook")).toBe("other");
+    expect(sidebarNavForSection("welcome-room")).toBe("other");
   });
 
   it("offers save destinations for Keep For Later / Save flows", () => {

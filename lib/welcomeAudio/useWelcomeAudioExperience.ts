@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { prefersReducedMotion } from "@/lib/welcomeRoom/arrival";
 import {
   clearWelcomeRoomGestureUnlock,
@@ -13,6 +13,7 @@ import {
 import { isWelcomeAudioSessionUnlocked } from "./audioUnlock";
 import { WelcomeAudioManager } from "./WelcomeAudioManager";
 import { resolveWelcomeAudioProfile } from "./profiles";
+import { attachWelcomeRoomAudioManager } from "./welcomeRoomAudioSession";
 import type {
   WelcomePlaybackProgress,
   WelcomeVoiceTransportState,
@@ -49,10 +50,16 @@ export function useWelcomeAudioExperience({
   const [voiceClipCount, setVoiceClipCount] = useState(0);
   const [progress, setProgress] = useState<WelcomePlaybackProgress>(EMPTY_PROGRESS);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!profile) return;
-    const manager = new WelcomeAudioManager(profile);
-    manager.setMusicMuted(!getWelcomeRoomAmbienceEnabled());
+    const manager =
+      profile.id === "welcome-room"
+        ? attachWelcomeRoomAudioManager()
+        : new WelcomeAudioManager(profile);
+    if (!manager) return;
+    if (profile.id === "welcome-room") {
+      manager.setMusicMuted(!getWelcomeRoomAmbienceEnabled());
+    }
     managerRef.current = manager;
 
     const unsubVoice = manager.onVoiceStateChange((state) => {
@@ -63,6 +70,12 @@ export function useWelcomeAudioExperience({
     const unsubUnlock = manager.onAudioUnlockChange(setAudioUnlocked);
     const unsubProgress = manager.onProgressChange(setProgress);
 
+    setAudioUnlocked(manager.isAudioUnlocked());
+    setVoiceState(manager.getVoiceState());
+    setVoiceReady(manager.isVoiceReady());
+    setVoiceClipCount(manager.getVoiceClipCount());
+    setProgress(manager.getPlaybackProgress());
+
     void manager.probeAmbience().then(setAmbienceAvailable);
     void manager.preloadVoice();
 
@@ -70,7 +83,7 @@ export function useWelcomeAudioExperience({
       manager.beginImmersiveWelcome();
     }
 
-    const tryAutoEnter = () => {
+    const startExperience = () => {
       void manager.playExperience().then((unlocked) => {
         if (unlocked) {
           clearWelcomeRoomGestureUnlock();
@@ -79,21 +92,55 @@ export function useWelcomeAudioExperience({
       });
     };
 
+    manager.adoptSessionUnlock();
+    if (manager.isAudioUnlocked()) {
+      setAudioUnlocked(true);
+    }
+
     if (
       hasPendingWelcomeRoomGestureUnlock() ||
       isWelcomeAudioSessionUnlocked()
     ) {
-      tryAutoEnter();
+      startExperience();
     }
 
     return () => {
       unsubVoice();
       unsubUnlock();
       unsubProgress();
-      manager.destroy();
+      if (profile.id !== "welcome-room") {
+        manager.destroy();
+      }
       managerRef.current = null;
     };
   }, [profile]);
+
+  useEffect(() => {
+    if (!active || !immersive || paused) {
+      managerRef.current?.pauseExperience();
+      return;
+    }
+    const manager = managerRef.current;
+    if (!manager) return;
+    if (
+      !manager.isAudioUnlocked() &&
+      (hasPendingWelcomeRoomGestureUnlock() || isWelcomeAudioSessionUnlocked())
+    ) {
+      void manager.playExperience().then((unlocked) => {
+        if (unlocked) {
+          clearWelcomeRoomGestureUnlock();
+          setAudioUnlocked(true);
+        }
+      });
+      return;
+    }
+    if (!manager.isAudioUnlocked()) return;
+    if (manager.getVoiceState() === "idle" || manager.getVoiceState() === "ended") {
+      void manager.playExperience();
+      return;
+    }
+    manager.resumeExperience();
+  }, [active, immersive, paused]);
 
   useEffect(() => {
     managerRef.current?.setMusicMuted(musicMuted);
@@ -102,18 +149,6 @@ export function useWelcomeAudioExperience({
   useEffect(() => {
     managerRef.current?.setVoiceMuted(voiceMuted);
   }, [voiceMuted]);
-
-  useEffect(() => {
-    if (!active || !immersive) {
-      managerRef.current?.pauseExperience();
-      return;
-    }
-    if (paused) {
-      managerRef.current?.pauseExperience();
-      return;
-    }
-    managerRef.current?.resumeExperience();
-  }, [active, immersive, paused]);
 
   const playExperience = useCallback(async () => {
     const unlocked = (await managerRef.current?.playExperience()) ?? false;
@@ -132,6 +167,10 @@ export function useWelcomeAudioExperience({
 
   const restartExperience = useCallback(async () => {
     await managerRef.current?.restartExperience();
+  }, []);
+
+  const resumeExperience = useCallback(() => {
+    managerRef.current?.resumeExperience();
   }, []);
 
   const toggleMusic = useCallback(() => {
@@ -166,5 +205,6 @@ export function useWelcomeAudioExperience({
     pauseExperience,
     stopExperience,
     restartExperience,
+    resumeExperience,
   };
 }

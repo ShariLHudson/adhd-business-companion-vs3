@@ -32,6 +32,20 @@ export const SPLIT_LAYOUT_ROOT_CLASS = "companion-split-layout";
 export const SPLIT_CHAT_PANE_CLASS = "companion-split-chat-pane";
 export const SPLIT_WORKSPACE_PANE_CLASS = "companion-split-workspace-pane";
 
+/** Floating frosted card in a static scene room — matches Companion Desk warmth without bottom placement. */
+export function workspaceFloatingCardShellClass(options?: {
+  width?: WorkspacePanelWidth;
+  inSplit?: boolean;
+  compact?: boolean;
+  extra?: string;
+}): string {
+  const { extra = "", ...rest } = options ?? {};
+  return workspacePanelShellClass({
+    ...rest,
+    extra: ["companion-workspace-frosted", extra].filter(Boolean).join(" "),
+  });
+}
+
 export function workspacePanelShellClass(options?: {
   width?: WorkspacePanelWidth;
   /** @deprecated Split panes use the same width tokens; kept for call-site compatibility. */

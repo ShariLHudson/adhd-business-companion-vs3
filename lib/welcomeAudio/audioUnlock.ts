@@ -30,10 +30,9 @@ export function unlockBrowserAudioFromClick(): boolean {
       void playPromise
         .then(() => {
           audio.pause();
-          sessionUnlocked = true;
         })
         .catch(() => {
-          sessionUnlocked = false;
+          /* gesture may still have unlocked the document */
         });
     }
     sessionUnlocked = true;

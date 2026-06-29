@@ -46,10 +46,8 @@ const SCENE_COPY: Record<SceneWorkspaceId, SceneCopy> = {
       "Pick a pattern and length — energizing breaths stay under 1 minute to keep it safe and light.",
   },
   "focus-audio": {
-    title: "Focus Audio",
-    subtitle: "What does your brain need right now?",
-    prompt:
-      "Pick a sound below and I'll cue it up. It opens in a new tab so you can keep it playing alongside the Companion.",
+    title: "Peaceful Places",
+    subtitle: "Take a gentle pause. Choose the place that feels right.",
   },
   default: {
     title: "",

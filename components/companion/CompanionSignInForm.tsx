@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { GoogleSignInIcon } from "@/components/companion/GoogleSignInIcon";
@@ -11,8 +11,11 @@ import {
   recordAuthPasswordResetRequested,
   type AuthLoginMethod,
 } from "@/lib/companionAuthIntelligence";
-import { companionAuthConfigStatus, companionAuthMisconfigHint } from "@/lib/supabase/companionClient";
-import { COMPANION_LOGIN_FORGOT_PASSWORD_LABEL } from "@/lib/companionLoginPage";
+import { companionAuthConfigStatus, companionAuthMisconfigHint, bootstrapCompanionSupabaseConfig, companionAuthConfigured, hydrateCompanionAuthFromInlineConfig } from "@/lib/supabase/companionClient";
+import {
+  COMPANION_LOGIN_FORGOT_PASSWORD_LABEL,
+  COMPANION_LOGIN_OPENING_MESSAGE,
+} from "@/lib/companionLoginPage";
 
 type Mode = "signin" | "signup";
 
@@ -24,6 +27,9 @@ function envSetupHint(hostname: string): string {
 }
 
 function friendlyAuthError(message: string): string {
+  if (/abort|signal is aborted/i.test(message)) {
+    return "Sign-in was interrupted. Please try once more.";
+  }
   if (/invalid login credentials|invalid email or password/i.test(message)) {
     return "That email or password didn't match. Double-check for typos — it happens to everyone.";
   }
@@ -151,6 +157,7 @@ export function CompanionSignInForm({
   const [authHint, setAuthHint] = useState<string | null>(null);
   const [showResend, setShowResend] = useState(false);
   const [forgotOpen, setForgotOpen] = useState(false);
+  const authInFlightRef = useRef(false);
 
   const authProcessing = busy || googleBusy;
 
@@ -160,10 +167,14 @@ export function CompanionSignInForm({
     return () => onProcessingChange(false);
   }, [authProcessing, onProcessingChange, variant]);
 
-  if (loading) {
+  if (loading && variant !== "page") {
     return (
       <p className="text-sm text-[#6b635a]">Checking your session…</p>
     );
+  }
+
+  if (user && variant === "page") {
+    return null;
   }
 
   if (user) {
@@ -243,23 +254,43 @@ export function CompanionSignInForm({
     }
   }
 
+  async function ensureAuthReady(): Promise<boolean> {
+    hydrateCompanionAuthFromInlineConfig();
+    if (companionAuthConfigured()) return true;
+    const ready = await bootstrapCompanionSupabaseConfig();
+    return ready && companionAuthConfigured();
+  }
+
   async function onGoogleSignIn() {
-    if (!configured) {
-      if (!companionAuthMisconfigHint()) {
-        setError("Sign-in is not live yet on this environment.");
-      }
-      return;
-    }
+    if (authInFlightRef.current) return;
+    authInFlightRef.current = true;
+    onProcessingChange?.(true);
     setGoogleBusy(true);
     setError(null);
     try {
+      const ready = await ensureAuthReady();
+      if (!ready) {
+        if (!companionAuthMisconfigHint()) {
+          setError("Sign-in is not live yet on this environment.");
+        }
+        authInFlightRef.current = false;
+        onProcessingChange?.(false);
+        return;
+      }
       const result = await signInWithGoogle();
       if (result.error) {
         setError(friendlyAuthError(result.error));
+        authInFlightRef.current = false;
+        onProcessingChange?.(false);
         return;
       }
       recordAuthLoginSuccess("google");
+      onProcessingChange?.(false);
       onSuccess?.("google");
+    } catch {
+      setError("Google sign-in didn't work. Please try again.");
+      authInFlightRef.current = false;
+      onProcessingChange?.(false);
     } finally {
       setGoogleBusy(false);
     }
@@ -267,21 +298,26 @@ export function CompanionSignInForm({
 
   async function onSubmit(e: FormEvent, submitMode?: Mode) {
     e.preventDefault();
+    if (authInFlightRef.current) return;
     const effectiveMode = submitMode ?? mode;
-    if (!configured) {
-      const hint =
-        companionAuthMisconfigHint() ??
-        "Sign-in is not live yet — add your Supabase anon key in companion-app/.env.local, then restart npm run dev.";
-      if (!companionAuthMisconfigHint()) {
-        setError(hint);
-      }
-      return;
-    }
+    authInFlightRef.current = true;
+    onProcessingChange?.(true);
     setBusy(true);
     setError(null);
     setNotice(null);
     setAuthHint(null);
+    let succeeded = false;
     try {
+      const ready = await ensureAuthReady();
+      if (!ready) {
+        const hint =
+          companionAuthMisconfigHint() ??
+          "Sign-in is not live yet — add your Supabase anon key in companion-app/.env.local, then restart npm run dev.";
+        if (!companionAuthMisconfigHint()) {
+          setError(hint);
+        }
+        return;
+      }
       if (submitMode) setMode(submitMode);
       if (effectiveMode === "signin") {
         const result = await signIn(email, password);
@@ -293,6 +329,7 @@ export function CompanionSignInForm({
           return;
         }
         recordAuthLoginSuccess("email");
+        succeeded = true;
         onSuccess?.("email");
         return;
       }
@@ -311,37 +348,41 @@ export function CompanionSignInForm({
         return;
       }
       recordAuthLoginSuccess("email");
+      succeeded = true;
       onSuccess?.("email");
+    } catch {
+      setError("Sign-in didn't work. Please check your connection and try again.");
     } finally {
-      setBusy(false);
+      if (!succeeded) {
+        authInFlightRef.current = false;
+        onProcessingChange?.(false);
+        setBusy(false);
+      }
     }
   }
 
   const inputClass =
     "w-full rounded-lg border border-[#c9bfb0] bg-white px-3 py-2.5 text-base text-[#1f1c19] outline-none focus:border-[#1e4f4f]";
 
-  const signInSubtitle =
-    variant === "page"
-      ? null
-      : "Welcome back — pick up where we left off.";
-
   const pagePrimaryClass =
     "w-full rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-60";
   const pageSecondaryClass =
     "w-full rounded-xl border border-[#d4cdc3]/80 bg-white/70 px-4 py-3 text-sm font-semibold text-[#1e4f4f] transition-colors hover:bg-white disabled:opacity-60";
 
+  const openingLabel = COMPANION_LOGIN_OPENING_MESSAGE;
+
   const createAccountButton = (
     <button
       key="create"
       type="button"
-      disabled={busy}
+      disabled={authProcessing}
       onClick={(e) => {
         setMode("signup");
         void onSubmit(e, "signup");
       }}
       className={variant === "page" && !returning ? pagePrimaryClass : pageSecondaryClass}
     >
-      {busy && mode === "signup" ? "One moment…" : "Create Account"}
+      {authProcessing && mode === "signup" ? openingLabel : "Create Account"}
     </button>
   );
 
@@ -349,14 +390,14 @@ export function CompanionSignInForm({
     <button
       key="signin"
       type="button"
-      disabled={busy}
+      disabled={authProcessing}
       onClick={(e) => {
         setMode("signin");
         void onSubmit(e, "signin");
       }}
       className={variant === "page" && returning ? pagePrimaryClass : pageSecondaryClass}
     >
-      {busy && mode === "signin" ? "Signing you in…" : t("auth.signIn")}
+      {authProcessing && mode === "signin" ? openingLabel : t("auth.signIn")}
     </button>
   );
 
@@ -379,9 +420,6 @@ export function CompanionSignInForm({
           <h2 className="text-xl font-semibold text-[#1f1c19]">
             {mode === "signin" ? t("auth.signIn") : t("auth.signUp")}
           </h2>
-          {signInSubtitle ? (
-            <p className="mt-1 text-sm text-[#6b635a]">{signInSubtitle}</p>
-          ) : null}
         </div>
       ) : null}
 
@@ -432,12 +470,12 @@ export function CompanionSignInForm({
       {mode === "signin" && variant === "page" ? (
         <button
           type="button"
-          disabled={googleBusy || !configured}
+          disabled={authProcessing}
           onClick={() => void onGoogleSignIn()}
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#d4cdc3]/70 bg-white/85 px-4 py-3 text-base font-semibold text-[#1f1c19] transition-colors hover:bg-white disabled:opacity-60"
         >
           <GoogleSignInIcon className="h-5 w-5 shrink-0" />
-          {googleBusy ? "One moment…" : "Continue with Google"}
+          {googleBusy ? openingLabel : "Continue with Google"}
         </button>
       ) : null}
 
@@ -521,13 +559,11 @@ export function CompanionSignInForm({
         ) : (
           <button
             type="submit"
-            disabled={busy}
+            disabled={authProcessing}
             className="mt-1 rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-60"
           >
-            {busy
-              ? mode === "signin"
-                ? "Signing you in…"
-                : "One moment…"
+            {authProcessing
+              ? openingLabel
               : mode === "signin"
                 ? t("auth.signIn")
                 : t("auth.createAccount")}

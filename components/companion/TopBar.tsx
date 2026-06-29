@@ -3,71 +3,83 @@
 import { useEffect, useRef, useState } from "react";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import { TopBarCenteredMenu } from "@/components/companion/TopBarCenteredMenu";
-import {
-  CompanionObjectLabel,
-  CompanionObjectVisual,
-} from "@/components/companion/CompanionObjectVisual";
+import { TopBarNavButton } from "@/components/companion/TopBarNavButton";
+import { CompanionObjectLabel } from "@/components/companion/CompanionObjectVisual";
 import {
   countActivePlanItems,
   PLAN_MY_DAY_UPDATED,
 } from "@/lib/planMyDay";
 import {
-  CLEAR_MY_MIND_MENU_ITEMS,
   NEW_CONVERSATION_MENU_ITEMS,
-  PLAN_MY_DAY_MENU_ITEMS,
-  type ClearMyMindMenuItemId,
-  type NewConversationLens,
-  type PlanMyDayMenuItemId,
+  type NewConversationMenuItemId,
 } from "@/lib/topBarNavigation";
 import {
   MENU_DROPDOWN_ITEM_LG,
   MENU_SECTION_HEADING,
-  MENU_TRIGGER_BTN,
 } from "@/lib/menuNavStyles";
 import type { HomeNavVisibility } from "@/lib/arrivalIntelligence";
-import { ASSETS } from "@/lib/companionUi";
+import type { AppSection } from "@/lib/companionUi";
+import { getPrefs } from "@/lib/companionStore";
+import {
+  userProfileImageUrl,
+  userProfileInitials,
+} from "@/lib/userProfileDisplay";
 
 type TopBarProps = {
   calmHome?: boolean;
   navVisibility?: HomeNavVisibility;
-  showPlanMyDay?: boolean;
-  onOpenClearMyMindItem?: (itemId: ClearMyMindMenuItemId) => void;
-  onOpenPlanMyDayItem?: (itemId: PlanMyDayMenuItemId) => void;
-  onOpenPeacefulPlaces?: () => void;
-  onStartConversation?: (lens: NewConversationLens) => void;
-  onOpenWelcomeRoom?: () => void;
-  onOpenMyStory?: () => void;
-  onOpenWhatsNew?: () => void;
+  activeSection?: AppSection;
+  onOpenClearMyMind?: () => void;
+  onOpenPlanMyDay?: () => void;
+  onOpenTodaysReality?: () => void;
+  onNewConversationItem?: (itemId: NewConversationMenuItemId) => void;
   onOpenSettings: (section?: SettingsSection | null) => void;
   onOpenProfile: () => void;
 };
 
 function usePlanActiveCount(): number {
   const [count, setCount] = useState(0);
+
   useEffect(() => {
     const sync = () => setCount(countActivePlanItems());
     sync();
     window.addEventListener(PLAN_MY_DAY_UPDATED, sync);
     return () => window.removeEventListener(PLAN_MY_DAY_UPDATED, sync);
   }, []);
+
   return count;
+}
+
+function useUserProfileDisplay() {
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [initials, setInitials] = useState("?");
+
+  useEffect(() => {
+    const sync = () => {
+      setImageUrl(userProfileImageUrl());
+      setInitials(userProfileInitials());
+    };
+    sync();
+    window.addEventListener("companion-prefs-updated", sync);
+    return () => window.removeEventListener("companion-prefs-updated", sync);
+  }, []);
+
+  return { imageUrl, initials, name: getPrefs().name };
 }
 
 export function TopBar({
   calmHome = false,
-  navVisibility = "calm",
-  showPlanMyDay = false,
-  onOpenClearMyMindItem,
-  onOpenPlanMyDayItem,
-  onOpenPeacefulPlaces,
-  onStartConversation,
-  onOpenWelcomeRoom,
-  onOpenMyStory,
-  onOpenWhatsNew,
+  navVisibility: _navVisibility = "normal",
+  activeSection = "home",
+  onOpenClearMyMind,
+  onOpenPlanMyDay,
+  onOpenTodaysReality,
+  onNewConversationItem,
   onOpenSettings,
   onOpenProfile,
 }: TopBarProps) {
   const planActiveCount = usePlanActiveCount();
+  const { imageUrl, initials } = useUserProfileDisplay();
   const [accountMenuOpen, setAccountMenuOpen] = useState(false);
   const accountMenuRef = useRef<HTMLDivElement>(null);
 
@@ -82,6 +94,7 @@ export function TopBar({
 
   useEffect(() => {
     if (!accountMenuOpen) return;
+
     const onPointerDown = (event: PointerEvent) => {
       const accountRoot = accountMenuRef.current;
       if (accountRoot?.contains(event.target as Node)) {
@@ -102,67 +115,61 @@ export function TopBar({
 
   return (
     <div
-      className={`companion-top-bar sticky top-0 z-50 flex shrink-0 items-center justify-end gap-2 px-4 py-2.5 backdrop-blur-sm sm:px-6 ${calmHome ? "companion-top-bar-calm" : ""} companion-nav-${navVisibility}`}
+      className={`companion-top-bar sticky top-0 z-[200] flex shrink-0 items-start justify-end gap-2 px-4 pb-2 pt-0 backdrop-blur-sm sm:px-6 companion-nav-normal ${calmHome ? "companion-top-bar-calm" : ""}`}
       data-companion-topbar=""
       data-home-calm={calmHome ? "" : undefined}
-      data-nav-visibility={navVisibility}
+      data-nav-visibility="normal"
     >
-      {onOpenClearMyMindItem ? (
-        <TopBarCenteredMenu
+      <div className="companion-top-bar__signs">
+      {onOpenClearMyMind ? (
+        <TopBarNavButton
           menuId="clear-my-mind"
-          triggerObjectId="clear-my-mind"
+          objectId="clear-my-mind"
           label="Clear My Mind"
-          items={CLEAR_MY_MIND_MENU_ITEMS.map((item) => ({
-            id: item.id,
-            label: item.label,
-            objectId: item.objectId,
-            onSelect: () => runHeaderAction(() => onOpenClearMyMindItem(item.id)),
-          }))}
+          active={activeSection === "brain-dump"}
+          onClick={() => runHeaderAction(onOpenClearMyMind)}
         />
       ) : null}
 
-      {showPlanMyDay && onOpenPlanMyDayItem ? (
-        <TopBarCenteredMenu
+      {onOpenPlanMyDay ? (
+        <TopBarNavButton
           menuId="plan-my-day"
-          triggerObjectId="plan-my-day"
+          objectId="plan-my-day"
           label="Plan My Day"
           badge={planActiveCount}
-          items={PLAN_MY_DAY_MENU_ITEMS.map((item) => ({
-            id: item.id,
-            label: item.label,
-            objectId: item.objectId,
-            onSelect: () => runHeaderAction(() => onOpenPlanMyDayItem(item.id)),
-          }))}
+          active={activeSection === "plan-my-day"}
+          onClick={() => runHeaderAction(onOpenPlanMyDay)}
         />
       ) : null}
 
-      {onOpenPeacefulPlaces ? (
-        <button
-          type="button"
-          className={MENU_TRIGGER_BTN}
-          title="Focus My Brain"
-          aria-label="Focus My Brain — Peaceful Places"
-          data-top-bar-menu="focus-my-brain"
-          onClick={() => runHeaderAction(onOpenPeacefulPlaces)}
-        >
-          <CompanionObjectVisual objectId="focus-my-brain" size="xs" variant="icon" />
-          <span className="hidden sm:inline">Focus My Brain</span>
-        </button>
+      {onOpenTodaysReality ? (
+        <TopBarNavButton
+          menuId="todays-reality"
+          objectId="todays-reality"
+          label="Today's Reality"
+          active={activeSection === "energy"}
+          onClick={() => runHeaderAction(onOpenTodaysReality)}
+        />
       ) : null}
 
-      {onStartConversation ? (
+      {onNewConversationItem ? (
         <TopBarCenteredMenu
           menuId="new-conversation"
           triggerObjectId="messages"
           label="New Conversation"
+          showCaret={false}
           items={NEW_CONVERSATION_MENU_ITEMS.map((item) => ({
             id: item.id,
             label: item.label,
             objectId: item.objectId,
-            onSelect: () => runHeaderAction(() => onStartConversation(item.lens)),
+            onSelect: () =>
+              runHeaderAction(() =>
+                onNewConversationItem(item.id as NewConversationMenuItemId),
+              ),
           }))}
         />
       ) : null}
+      </div>
 
       <div ref={accountMenuRef} className="relative z-50">
         <button
@@ -170,56 +177,41 @@ export function TopBar({
           onClick={() => setAccountMenuOpen((open) => !open)}
           aria-expanded={accountMenuOpen}
           aria-haspopup="menu"
-          aria-label="Shari's menu"
-          title="Shari"
-          className="relative z-50 flex h-11 w-11 items-center justify-center overflow-hidden rounded-full border border-[#c9bdb0] bg-white shadow-sm transition-colors hover:border-[#1e4f4f]/40 hover:bg-[#fff8ef]"
+          aria-label="Account menu"
+          title="Account"
+          className="relative z-50 flex h-11 w-11 items-center justify-center rounded-full border border-[#6B5010] bg-[#3D3028] text-[#E8DDD4] shadow-sm transition-colors hover:border-[#6B5010] hover:bg-[#4A3A28]"
+          data-top-bar-menu="account"
         >
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={ASSETS.profile}
-            alt=""
-            className="h-full w-full object-cover"
-          />
+          <span className="text-xl leading-none" aria-hidden>
+            ⋯
+          </span>
         </button>
         {accountMenuOpen ? (
           <div
             className="absolute right-0 z-[60] mt-1 w-56 overflow-hidden rounded-xl border border-[#d8cfc2] bg-white shadow-lg"
             role="menu"
-            aria-label="Shari"
+            aria-label="Account"
           >
-            <p className={`border-b border-[#e7dfd4] px-4 py-2 ${MENU_SECTION_HEADING}`}>
-              Shari
-            </p>
-            {onOpenWelcomeRoom ? (
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => runHeaderAction(onOpenWelcomeRoom)}
-                className={MENU_DROPDOWN_ITEM_LG}
-              >
-                <CompanionObjectLabel objectId="welcome-room" label="Welcome Room" size="xs" />
-              </button>
-            ) : null}
-            {onOpenMyStory ? (
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => runHeaderAction(onOpenMyStory)}
-                className={MENU_DROPDOWN_ITEM_LG}
-              >
-                <CompanionObjectLabel objectId="life-experience" label="My Story" size="xs" />
-              </button>
-            ) : null}
-            {onOpenWhatsNew ? (
-              <button
-                type="button"
-                role="menuitem"
-                onClick={() => runHeaderAction(onOpenWhatsNew)}
-                className={MENU_DROPDOWN_ITEM_LG}
-              >
-                <CompanionObjectLabel objectId="help" label="What's New" size="xs" />
-              </button>
-            ) : null}
+            <div className="flex items-center gap-3 border-b border-[#e7dfd4] px-4 py-3">
+              {imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={imageUrl}
+                  alt=""
+                  className="h-9 w-9 shrink-0 rounded-full object-cover"
+                />
+              ) : (
+                <span
+                  className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#e8e2d8] text-sm font-semibold text-[#4b463f]"
+                  aria-hidden
+                >
+                  {initials}
+                </span>
+              )}
+              <p className={`${MENU_SECTION_HEADING} !normal-case !tracking-normal`}>
+                Account
+              </p>
+            </div>
             <button
               type="button"
               role="menuitem"

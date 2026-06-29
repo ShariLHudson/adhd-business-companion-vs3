@@ -33,16 +33,18 @@ import {
 import { startAmbientHospitalityAudio } from "@/lib/companionHospitalityPrototype/ambientAudio";
 import { GalleryWallFrames } from "@/components/companion/GalleryWallFrames";
 import { GalleryDemoGuide } from "@/components/companion/GalleryDemoGuide";
+import { GrowthUniversalCapture } from "@/components/companion/GrowthUniversalCapture";
+import { AssetLibraryPanel } from "@/components/companion/AssetLibraryPanel";
 
 type Props = {
   onBackToChat: () => void;
   onOpenSection: (section: AppSection, nav: SidebarNavId) => void;
 };
 
-type GalleryPhase = "foyer" | "hallway";
+type GalleryPhase = "capture" | "library" | "foyer" | "hallway";
 
 /**
- * The Gallery™ — foyer arrival, then a living walk through the estate spine.
+ * Asset Library hub — universal capture + browse; legacy hallway walk retained for V1.
  */
 export function GalleryExperiencePanel({ onBackToChat, onOpenSection }: Props) {
   const environment = useMemo(() => resolveGalleryEnvironment(), []);
@@ -67,7 +69,7 @@ export function GalleryExperiencePanel({ onBackToChat, onOpenSection }: Props) {
     [demoMode, demoSceneId],
   );
   const [entered, setEntered] = useState(false);
-  const [phase, setPhase] = useState<GalleryPhase>("foyer");
+  const [phase, setPhase] = useState<GalleryPhase>("capture");
   const [foyerLeaving, setFoyerLeaving] = useState(false);
   const [walkPaused, setWalkPaused] = useState(true);
   const [musicOn, setMusicOn] = useState(true);
@@ -204,14 +206,20 @@ export function GalleryExperiencePanel({ onBackToChat, onOpenSection }: Props) {
   );
 
   const inFoyer = phase === "foyer";
+  const inCapture = phase === "capture";
+  const inLibrary = phase === "library";
+
+  const enterFoyer = useCallback(() => {
+    setPhase("foyer");
+  }, []);
 
   return (
     <div
-      className={`gallery ${galleryEnvironmentClass(environment)} ${entered ? "gallery--entered" : ""} ${inFoyer ? "gallery--foyer" : "gallery--hallway"} ${foyerLeaving ? "gallery--foyer-leaving" : ""} ${demoMode ? "gallery--demo" : ""}`}
+      className={`gallery ${galleryEnvironmentClass(environment)} ${entered ? "gallery--entered" : ""} ${inCapture ? "gallery--capture" : inFoyer ? "gallery--foyer" : "gallery--hallway"} ${foyerLeaving ? "gallery--foyer-leaving" : ""} ${demoMode ? "gallery--demo" : ""}`}
       data-testid="gallery-experience-panel"
       role="dialog"
       aria-modal="true"
-      aria-label="The Gallery"
+      aria-label="Asset Library"
       style={
         {
           "--gallery-enter-ms": `${GALLERY_ENTER_FADE_MS}ms`,
@@ -241,6 +249,20 @@ export function GalleryExperiencePanel({ onBackToChat, onOpenSection }: Props) {
         <div className="gallery__chrome-veil gallery__chrome-veil--bottom" aria-hidden="true" />
       </div>
 
+      {inLibrary ? (
+        <AssetLibraryPanel onBack={() => setPhase("capture")} />
+      ) : null}
+
+      {inCapture ? (
+        <GrowthUniversalCapture
+          embedded
+          onBackToChat={onBackToChat}
+          onBrowseAssetLibrary={() => setPhase("library")}
+          onExploreGallery={enterFoyer}
+          onOpenSection={onOpenSection}
+        />
+      ) : null}
+
       {inFoyer ? (
         <div className="gallery__foyer">
           <div className="gallery__foyer-vignette" aria-hidden="true" />
@@ -257,7 +279,7 @@ export function GalleryExperiencePanel({ onBackToChat, onOpenSection }: Props) {
             </span>
           </button>
         </div>
-      ) : (
+      ) : !inCapture && !inLibrary ? (
         <>
           <p className="gallery__inscription">{GALLERY_INSCRIPTION}</p>
 
@@ -334,9 +356,9 @@ export function GalleryExperiencePanel({ onBackToChat, onOpenSection }: Props) {
             ))}
           </nav>
         </>
-      )}
+      ) : null}
 
-      <header className="gallery__header">
+      <header className={`gallery__header ${inCapture || inLibrary ? "gallery__header--hidden" : ""}`}>
         <button
           type="button"
           className="gallery__back"

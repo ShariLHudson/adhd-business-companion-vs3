@@ -257,7 +257,8 @@ export function dayStateSummary(state: DayState | null): string | undefined {
   const energy = formatDayEnergyDisplay(s);
   const motivation = formatDayMotivationDisplay(s);
   const help = formatDayHelpDisplay(s);
+  const helpPart = help !== "—" ? ` Would help most: ${help}.` : "";
   const note = formatDayNoteDisplay(s);
   const notePart = note !== "—" ? ` Context: ${note}.` : "";
-  return `Energy: ${energy}. Motivation: ${motivation}.${vibe} Would help most: ${help}.${notePart} (Latest Adjust My Day — use as active context; low fuel = smaller steps; low motivation = gentle starts.)`;
+  return `Energy: ${energy}. Motivation: ${motivation}.${vibe}${helpPart}${notePart} (Latest Adjust My Day — use as active context; low fuel = smaller steps; low motivation = gentle starts.)`;
 }

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 820" width="80" height="820" preserveAspectRatio="xMidYMin meet">
+  <defs>
+    <linearGradient id="lp-iron" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%"   stop-color="#080706"/>
+      <stop offset="15%"  stop-color="#1c1a17"/>
+      <stop offset="40%"  stop-color="#3a3530"/>
+      <stop offset="50%"  stop-color="#58524a"/>
+      <stop offset="60%"  stop-color="#3a3530"/>
+      <stop offset="85%"  stop-color="#1c1a17"/>
+      <stop offset="100%" stop-color="#080706"/>
+    </linearGradient>
+    <linearGradient id="lp-collar" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%"   stop-color="#0e0c0a"/>
+      <stop offset="28%"  stop-color="#484038"/>
+      <stop offset="50%"  stop-color="#6a5e52"/>
+      <stop offset="72%"  stop-color="#484038"/>
+      <stop offset="100%" stop-color="#0e0c0a"/>
+    </linearGradient>
+    <linearGradient id="lp-brass" x1="0%" x2="100%" y1="0%" y2="0%">
+      <stop offset="0%"   stop-color="#2a1e08"/>
+      <stop offset="38%"  stop-color="#7a6228"/>
+      <stop offset="52%"  stop-color="#9a7e38"/>
+      <stop offset="100%" stop-color="#2a1e08"/>
+    </linearGradient>
+    <radialGradient id="lp-glow" cx="50%" cy="52%" r="50%">
+      <stop offset="0%"   stop-color="#fffce0" stop-opacity="1"/>
+      <stop offset="22%"  stop-color="#ffe080" stop-opacity="0.97"/>
+      <stop offset="55%"  stop-color="#ff9820" stop-opacity="0.82"/>
+      <stop offset="85%"  stop-color="#c05010" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#7a2800" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="lp-bloom" cx="50%" cy="50%" r="50%">
+      <stop offset="0%"   stop-color="#ffd060" stop-opacity="0.7"/>
+      <stop offset="55%"  stop-color="#ff8820" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#ff5500" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="40" cy="68" rx="28" ry="26" fill="url(#lp-bloom)">
+    <animate attributeName="opacity" values="0.6;1;0.7;1;0.6" dur="3.5s" repeatCount="indefinite"/>
+  </ellipse>
+  <polygon points="40,8 14,40 66,40" fill="url(#lp-iron)"/>
+  <rect x="13" y="39" width="54" height="3.5" fill="url(#lp-collar)" rx="1"/>
+  <circle cx="40" cy="6" r="4.5" fill="url(#lp-brass)"/>
+  <rect x="38" y="6" width="4" height="10" fill="url(#lp-brass)" rx="1"/>
+  <rect x="12" y="42" width="6" height="56" fill="url(#lp-iron)" rx="1.5"/>
+  <rect x="62" y="42" width="6" height="56" fill="url(#lp-iron)" rx="1.5"/>
+  <rect x="18" y="42" width="44" height="56" fill="url(#lp-glow)">
+    <animate attributeName="opacity" values="0.9;1;0.85;1;0.92;0.88;1" dur="2.2s" repeatCount="indefinite"/>
+  </rect>
+  <rect x="38" y="42" width="4"  height="56" fill="#2e2820" opacity="0.8"/>
+  <rect x="12" y="68" width="56" height="4"  fill="url(#lp-iron)" rx="0.5"/>
+  <rect x="10" y="97" width="60" height="8"  fill="url(#lp-collar)" rx="2.5"/>
+  <rect x="13" y="104" width="54" height="4" fill="url(#lp-brass)" rx="1"/>
+  <rect x="38" y="113" width="32" height="10" fill="url(#lp-iron)" rx="3"/>
+  <path d="M68,112 C78,112 84,117 84,123 C84,129 79,133 74,132 C70,131 68,129 68,126"
+        stroke="#4a4038" stroke-width="5" fill="none" stroke-linecap="round"/>
+  <path d="M68,126 C70,126 72,128 70,131"
+        stroke="#3a3028" stroke-width="3" fill="none" stroke-linecap="round"/>
+  <path d="M38,113 C32,110 28,112 28,117 C28,122 32,124 36,122"
+        stroke="#4a4038" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <path d="M38,123 C44,132 55,130 64,122"
+        stroke="#36302a" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <circle cx="38" cy="123" r="4.5" fill="url(#lp-collar)"/>
+  <rect x="34" y="108" width="12" height="20" fill="url(#lp-iron)" rx="2"/>
+  <rect x="31" y="122" width="18" height="7"  fill="url(#lp-collar)" rx="2"/>
+  <path d="M32,128 L28,775 L52,775 L48,128 Z" fill="url(#lp-iron)"/>
+  <rect x="25" y="200" width="30" height="12" fill="url(#lp-collar)" rx="2.5"/>
+  <rect x="25" y="310" width="30" height="12" fill="url(#lp-collar)" rx="2.5"/>
+  <rect x="25" y="420" width="30" height="12" fill="url(#lp-collar)" rx="2.5"/>
+  <rect x="25" y="530" width="30" height="12" fill="url(#lp-collar)" rx="2.5"/>
+  <rect x="25" y="635" width="30" height="12" fill="url(#lp-collar)" rx="2.5"/>
+  <rect x="27" y="255" width="26" height="6" fill="url(#lp-collar)" rx="1.5" opacity="0.65"/>
+  <rect x="27" y="365" width="26" height="6" fill="url(#lp-collar)" rx="1.5" opacity="0.65"/>
+  <rect x="27" y="475" width="26" height="6" fill="url(#lp-collar)" rx="1.5" opacity="0.65"/>
+  <rect x="27" y="583" width="26" height="6" fill="url(#lp-collar)" rx="1.5" opacity="0.65"/>
+  <path d="M28,775 L20,800 L60,800 L52,775 Z" fill="url(#lp-iron)"/>
+  <rect x="18" y="798" width="44" height="9"  fill="url(#lp-collar)" rx="2.5"/>
+  <rect x="14" y="806" width="52" height="6"  fill="url(#lp-iron)"   rx="1.5"/>
+  <rect x="10" y="811" width="60" height="5"  fill="url(#lp-collar)" rx="1"/>
+</svg>

@@ -11,7 +11,7 @@ import {
 
 describe("companion login page", () => {
   it("uses shari-login background asset", () => {
-    expect(COMPANION_LOGIN_BACKGROUND).toMatch(/shari-login\.png\?v=/);
+    expect(COMPANION_LOGIN_BACKGROUND).toMatch(/shari-login-1\.png\?v=/);
   });
 
   it("uses official transparent brand logo", () => {
@@ -38,8 +38,8 @@ describe("companion login page", () => {
     expect(COMPANION_LOGIN_PRIVACY_LINE).toMatch(/privacy/i);
   });
 
-  it("includes opening door transition copy", () => {
-    expect(COMPANION_LOGIN_OPENING_MESSAGE).toMatch(/opening the door/i);
+  it("includes slow-loading transition copy options", () => {
+    expect(COMPANION_LOGIN_OPENING_MESSAGE).toMatch(/opening your space/i);
   });
 
   it("uses universal forgot password label", () => {

@@ -3,10 +3,10 @@
  */
 
 /** Bump when `shari-login.png` is replaced so browsers fetch the fresh file. */
-export const COMPANION_LOGIN_BACKGROUND_VERSION = "20260626b" as const;
+export const COMPANION_LOGIN_BACKGROUND_VERSION = "20260628c" as const;
 
 export const COMPANION_LOGIN_BACKGROUND =
-  `/images/shari/shari-images/shari-login.png?v=${COMPANION_LOGIN_BACKGROUND_VERSION}` as const;
+  `/images/shari/shari-images/shari-login-1.png?v=${COMPANION_LOGIN_BACKGROUND_VERSION}` as const;
 
 /** Official Spark Studio Companions logo — transparent background. */
 export const COMPANION_LOGIN_LOGO =
@@ -50,6 +50,6 @@ export const COMPANION_LOGIN_PRIVACY_LINE =
   "Your privacy is always protected." as const;
 
 export const COMPANION_LOGIN_OPENING_MESSAGE =
-  "Opening the door..." as const;
+  "Opening your space…" as const;
 
 export const COMPANION_LOGIN_FORGOT_PASSWORD_LABEL = "Forgot password?" as const;

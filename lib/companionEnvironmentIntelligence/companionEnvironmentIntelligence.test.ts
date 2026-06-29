@@ -121,7 +121,7 @@ describe("CompanionEnvironmentIntelligence", () => {
     expect(capped.some((o) => o.kind === "book")).toBe(true);
   });
 
-  it("keeps the master Living Room photograph until seasonal layers ship", () => {
+  it("keeps the living room chair photograph at evening with lamp lighting layers", () => {
     const photo = selectWelcomePhotograph({
       timeOfDay: "evening",
       season: "autumn",
@@ -130,8 +130,19 @@ describe("CompanionEnvironmentIntelligence", () => {
       isFirstMeeting: false,
     });
     expect(photo.id).toBe(COMPANION_PRESENCE_WELCOME_IMAGE_ID);
-    expect(photo.reason.length).toBeGreaterThan(0);
+    expect(photo.reason).toMatch(/evening|lamp|window/i);
     expect(IMAGE_CONTEXT_REGISTRY.length).toBeGreaterThan(20);
+  });
+
+  it("keeps the daytime master photograph for morning and afternoon", () => {
+    const photo = selectWelcomePhotograph({
+      timeOfDay: "morning",
+      season: "summer",
+      weather: "clear",
+      sessionVisitIndex: 3,
+      isFirstMeeting: false,
+    });
+    expect(photo.id).toBe(COMPANION_PRESENCE_WELCOME_IMAGE_ID);
   });
 
   it("is stable within the same day", () => {

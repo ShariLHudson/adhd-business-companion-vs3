@@ -9,6 +9,8 @@ export const GROWTH_PANEL_SECTIONS: AppSection[] = [
   "evidence-bank",
   "confidence-vault",
   "my-journey",
+  "growth-journal",
+  "growth-portfolio",
 ];
 
 export function isGrowthPanelSection(
@@ -31,38 +33,51 @@ export type GrowthSectionId =
   | "wins-this-week"
   | "evidence-bank"
   | "confidence-vault"
-  | "my-journey";
+  | "my-journey"
+  | "growth-journal"
+  | "growth-portfolio";
 
 export const GROWTH_SECTION_META: Record<
   GrowthSectionId,
-  { title: string; emoji: string; subtitle: string }
+  { title: string; objectId: string; subtitle: string }
 > = {
   growth: {
-    emoji: "🖼",
-    title: "The Gallery",
-    subtitle: "A walk through your journey — memories on the walls, quiet steps ahead.",
+    objectId: "growth",
+    title: "Growth",
+    subtitle:
+      "Capture what matters, reflect on progress, and build your story over time.",
   },
   "wins-this-week": {
-    emoji: "🏆",
+    objectId: "wins",
     title: "Wins",
     subtitle: "Recent progress and accomplishments.",
   },
   "evidence-bank": {
-    emoji: "🛡",
+    objectId: "evidence-bank",
     title: "Evidence Bank",
     subtitle:
       "Proof, wins, testimonials, screenshots, progress moments, and confidence reminders — things you may forget you accomplished.",
   },
   "confidence-vault": {
-    emoji: "✨",
+    objectId: "my-highlights",
     title: "Highlights",
     subtitle:
       "Milestones, celebrations, firsts, breakthroughs, and meaningful moments worth remembering.",
   },
   "my-journey": {
-    emoji: "🌿",
+    objectId: "growth",
     title: "My Journey",
     subtitle: "Life experiences, lessons, wisdom, milestones, and personal growth.",
+  },
+  "growth-journal": {
+    objectId: "journal",
+    title: "Journal",
+    subtitle: "Private reflection — calm, personal, no required prompts.",
+  },
+  "growth-portfolio": {
+    objectId: "create",
+    title: "Portfolio",
+    subtitle: "What you've created — projects, courses, campaigns, and creative work.",
   },
 };
 
@@ -74,6 +89,8 @@ export const GROWTH_CROSS_LINKS: {
   { id: "evidence-bank", label: "Open Evidence" },
   { id: "confidence-vault", label: "Open Highlights" },
   { id: "my-journey", label: "Open Journey" },
+  { id: "growth-journal", label: "Open Journal" },
+  { id: "growth-portfolio", label: "Open Portfolio" },
 ];
 
 export type GrowthPanelNav = {
@@ -126,5 +143,21 @@ export const GROWTH_DESTINATION_STYLES: Record<
     actionBorder: "border-emerald-300",
     actionFg: "text-emerald-900",
     actionHover: "hover:bg-emerald-50",
+  },
+  "growth-journal": {
+    accentBorder: "border-t-stone-500",
+    headerBg: "bg-gradient-to-br from-stone-50/90 to-white",
+    iconRing: "bg-stone-100 text-stone-800",
+    actionBorder: "border-stone-300",
+    actionFg: "text-stone-900",
+    actionHover: "hover:bg-stone-50",
+  },
+  "growth-portfolio": {
+    accentBorder: "border-t-orange-500",
+    headerBg: "bg-gradient-to-br from-orange-50/90 to-white",
+    iconRing: "bg-orange-100 text-orange-800",
+    actionBorder: "border-orange-300",
+    actionFg: "text-orange-900",
+    actionHover: "hover:bg-orange-50",
   },
 };

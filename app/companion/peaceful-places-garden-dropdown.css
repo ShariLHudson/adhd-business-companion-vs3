@@ -1,0 +1,176 @@
+/* ═══════════════════════════════════════════════════════════
+   PEACEFUL PLACES — portaled garden banner dropdowns
+═══════════════════════════════════════════════════════════ */
+
+.garden-banner-dropdown {
+  pointer-events: auto;
+  overflow: visible;
+}
+
+.garden-banner-dropdown .pathway-garden-stake__menu {
+  position: static;
+  top: auto;
+  right: auto;
+  left: auto;
+  min-width: 12rem;
+  max-width: min(14.5rem, 54vw);
+  pointer-events: auto;
+}
+
+/* Open stake rises above siblings while menu is portaled */
+.pathway-garden-stake-anchor[data-menu-open="1"] {
+  z-index: 9990 !important;
+}
+
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__photo-signs,
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__photo-plate,
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__photo-plate-inner,
+.peaceful-places-signpost-portal .peaceful-places-pathway-scene__signposts[data-pathway-signposts="garden-stakes"],
+.peaceful-places-signpost-portal .pathway-garden-stake-anchor,
+.pathway-garden-stake,
+.pathway-garden-stake__mount,
+.pathway-garden-stake__banner {
+  overflow: visible !important;
+}
+
+/* Cloth hanging tags — garden pathway menus */
+.garden-banner-dropdown .hanging-destination-menu--garden-cloth {
+  margin: 0;
+  padding: 0.15rem 0.1rem;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  border: none;
+  background: transparent;
+  box-shadow: none;
+  filter: drop-shadow(0 6px 16px rgba(14, 22, 16, 0.28));
+}
+
+.garden-banner-dropdown .hanging-destination-menu__item-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.garden-banner-dropdown .hanging-destination-menu__chain {
+  display: block;
+  width: 0.1rem;
+  height: 0.55rem;
+  margin: 0 auto;
+  background: linear-gradient(180deg, #5a5244 0%, #8a7a62 42%, #3a3228 100%);
+  border-radius: 1px;
+  opacity: 0.9;
+}
+
+.garden-banner-dropdown .hanging-destination-menu__sign-board {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 2.4rem;
+  margin: 0;
+  padding: 0.52rem 0.8rem;
+  border: 1px solid rgba(247, 242, 232, 0.38);
+  border-radius: 0 0 4px 4px;
+  background:
+    repeating-linear-gradient(
+      92deg,
+      transparent 0,
+      transparent 2px,
+      rgba(255, 248, 236, 0.03) 2px,
+      rgba(255, 248, 236, 0.03) 3px
+    ),
+    repeating-linear-gradient(
+      2deg,
+      transparent 0,
+      transparent 4px,
+      rgba(0, 0, 0, 0.04) 4px,
+      rgba(0, 0, 0, 0.04) 5px
+    ),
+    linear-gradient(168deg, #3e4a3f 0%, #32453a 52%, #2a3830 100%);
+  box-shadow:
+    0 0 0 1px rgba(247, 242, 232, 0.1),
+    0 5px 14px rgba(12, 20, 14, 0.36),
+    inset 0 1px 0 rgba(247, 242, 232, 0.1);
+  clip-path: polygon(
+    0% 0%,
+    100% 0%,
+    100% 89%,
+    91% 96%,
+    76% 92%,
+    50% 97%,
+    24% 93%,
+    9% 97%,
+    0% 91%
+  );
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: center;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    background 0.22s ease,
+    border-color 0.22s ease;
+}
+
+/* Stitched linen edge */
+.garden-banner-dropdown .hanging-destination-menu__sign-board::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  pointer-events: none;
+  border: 1px dashed rgba(247, 242, 232, 0.22);
+  border-radius: 1px;
+  opacity: 0.85;
+}
+
+.garden-banner-dropdown .hanging-destination-menu__sign-board:hover,
+.garden-banner-dropdown .hanging-destination-menu__sign-board:focus-visible {
+  transform: translateY(-2px);
+  border-color: rgba(247, 242, 232, 0.52);
+  background:
+    repeating-linear-gradient(
+      92deg,
+      transparent 0,
+      transparent 2px,
+      rgba(255, 248, 236, 0.04) 2px,
+      rgba(255, 248, 236, 0.04) 3px
+    ),
+    repeating-linear-gradient(
+      2deg,
+      transparent 0,
+      transparent 4px,
+      rgba(0, 0, 0, 0.03) 4px,
+      rgba(0, 0, 0, 0.03) 5px
+    ),
+    linear-gradient(168deg, #4a574b 0%, #3a4a40 50%, #32453a 100%);
+  box-shadow:
+    0 0 0 1px rgba(247, 242, 232, 0.14),
+    0 8px 18px rgba(12, 20, 14, 0.4),
+    0 0 22px rgba(212, 184, 128, 0.2),
+    inset 0 1px 0 rgba(255, 248, 228, 0.14);
+  outline: none;
+}
+
+.garden-banner-dropdown .hanging-destination-menu__name {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  padding: 0;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: 0.84rem;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: 0.02em;
+  color: #f7f2e8;
+  text-align: center;
+  text-wrap: balance;
+  text-shadow: 0 1px 2px rgba(8, 12, 8, 0.55);
+}

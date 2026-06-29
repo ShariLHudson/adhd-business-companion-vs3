@@ -86,6 +86,18 @@ export function sectionToSceneWorkspaceId(
 function resolveGlobalBackgroundIntent(
   input: CompanionPageRenderInput,
 ): CompanionPageGlobalBackground {
+  const growthRoom =
+    input.workspacePanel === "growth" || input.activeSection === "growth";
+
+  if (growthRoom) {
+    return {
+      scenePage: "progress",
+      sceneSeed: "growth",
+      clearMyMind: false,
+      suppress: true,
+    };
+  }
+
   const homesteadPanel =
     input.workspacePanel != null &&
     HOMESTEAD_SCENE_SECTIONS.has(input.workspacePanel);

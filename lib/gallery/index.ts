@@ -84,6 +84,7 @@ export {
 export type { GalleryDestinationAction } from "./destinations";
 export { GALLERY_DESTINATION_ACTIONS } from "./destinations";
 export {
+  ASSET_LIBRARY_HOME_SECTION,
   GALLERY_HOME_SECTION,
   isLegacyGrowthHubSection,
   resolveGrowthHubSection,

@@ -12,23 +12,42 @@ const companionAuthStorage = createQuotaSafeStorage();
 let browserClient: SupabaseClient | null = null;
 let runtimeConfig: { url: string; key: string } | null = null;
 let bootstrapPromise: Promise<boolean> | null = null;
+
+type CompanionInlineAuth = { url: string; key: string };
+
+declare global {
+  interface Window {
+    __COMPANION_SUPABASE__?: CompanionInlineAuth;
+  }
+}
+
+/** Apply server-inlined auth config before React hydrates. */
+export function hydrateCompanionAuthFromInlineConfig(): boolean {
+  if (typeof window === "undefined") return false;
+  const payload = window.__COMPANION_SUPABASE__;
+  if (!payload?.url || !payload?.key) return false;
+  if (!isBrowserSafeSupabaseKey(payload.key)) return false;
+  runtimeConfig = { url: payload.url.replace(/\/$/, ""), key: payload.key };
+  browserClient = null;
+  return true;
+}
+
+if (typeof window !== "undefined") {
+  hydrateCompanionAuthFromInlineConfig();
+}
 /** Pause auth network calls after Supabase returns 429 (rate limit). */
 let authBackoffUntil = 0;
+
+/** Clear rate-limit backoff — call before explicit sign-in. */
+export function resetCompanionAuthBackoff(): void {
+  authBackoffUntil = 0;
+}
 
 function companionAuthFetch(
   input: RequestInfo | URL,
   init?: RequestInit,
 ): Promise<Response> {
   const url = String(input);
-  if (Date.now() < authBackoffUntil && url.includes("/auth/v1/")) {
-    // Return empty 200 during backoff so Supabase does not retry in a tight loop.
-    return Promise.resolve(
-      new Response(JSON.stringify({}), {
-        status: 200,
-        headers: { "Content-Type": "application/json" },
-      }),
-    );
-  }
   return fetch(input, init).then((res) => {
     if (res.status === 429 && url.includes("/auth/v1/")) {
       authBackoffUntil = Date.now() + 60_000;
@@ -63,25 +82,31 @@ function resolved(): ResolvedCompanionSupabaseEnv {
 /** Load Supabase URL + anon key from server when NEXT_PUBLIC vars are not in the client bundle. */
 export async function bootstrapCompanionSupabaseConfig(): Promise<boolean> {
   if (companionAuthConfigured()) return true;
+  hydrateCompanionAuthFromInlineConfig();
+  if (companionAuthConfigured()) return true;
 
   const attempt = async (): Promise<boolean> => {
     try {
       const controller = new AbortController();
-      const timeout = window.setTimeout(() => controller.abort(), 8_000);
+      const timeout = window.setTimeout(() => controller.abort(), 20_000);
       const res = await fetch("/api/companion-auth/config", {
         signal: controller.signal,
         cache: "no-store",
       });
       window.clearTimeout(timeout);
+      if (!res.ok) return false;
       const data = (await res.json()) as {
         configured?: boolean;
         url?: string;
         anonKey?: string;
       };
       if (data.configured && data.url && data.anonKey) {
-        runtimeConfig = { url: data.url, key: data.anonKey };
+        runtimeConfig = {
+          url: data.url.replace(/\/$/, ""),
+          key: data.anonKey,
+        };
         browserClient = null;
-        return true;
+        return companionAuthConfigured();
       }
     } catch {
       /* noop */
@@ -90,7 +115,15 @@ export async function bootstrapCompanionSupabaseConfig(): Promise<boolean> {
   };
 
   if (!bootstrapPromise) {
-    bootstrapPromise = attempt().finally(() => {
+    bootstrapPromise = (async () => {
+      for (let i = 0; i < 3; i += 1) {
+        if (await attempt()) return true;
+        if (i < 2) {
+          await new Promise((resolve) => window.setTimeout(resolve, 200 * (i + 1)));
+        }
+      }
+      return false;
+    })().finally(() => {
       if (!companionAuthConfigured()) {
         bootstrapPromise = null;
       }
@@ -120,6 +153,7 @@ export function companionAnonKeyLooksValid(): boolean {
 }
 
 export function companionAuthConfigured(): boolean {
+  hydrateCompanionAuthFromInlineConfig();
   return Boolean(
     companionSupabaseUrlLooksValid() &&
       getCompanionSupabaseAnonKey() &&
@@ -170,6 +204,7 @@ export function companionSupabaseEnvLooksSwapped(): boolean {
 
 /** Browser Supabase client for companion user auth (anon key only). */
 export function getCompanionSupabase(): SupabaseClient | null {
+  hydrateCompanionAuthFromInlineConfig();
   if (!companionAuthConfigured()) return null;
   if (browserClient) return browserClient;
   browserClient = createClient(

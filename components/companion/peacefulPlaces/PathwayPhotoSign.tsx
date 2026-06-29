@@ -56,7 +56,7 @@ export function PathwayPhotoSign({
         <div
           id={`pathway-photo-menu-${id}`}
           role="region"
-          aria-labelledby={`pathway-photo-sign-${id}`}
+          aria-label={`${label} destinations`}
           className="pathway-photo-sign__dropdown"
           onPointerDown={(e) => e.stopPropagation()}
           onClick={(e) => e.stopPropagation()}

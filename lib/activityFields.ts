@@ -16,6 +16,7 @@ export type ActivityFieldDef =
       key: string;
       startCount?: number;
       minFilled?: number;
+      optional?: boolean;
       itemLabel?: (index: number) => string;
       addLabel?: string;
     }
@@ -48,6 +49,7 @@ export type ActivityFieldDef =
       key: string;
       label?: string;
       choices: string[];
+      optional?: boolean;
     }
   | {
       type: "bucket-assign";
@@ -101,7 +103,8 @@ export function canAdvanceActivityStep(
       if (field.optional) return true;
       return getTextAnswer(answers, field.key).trim().length > 0;
     case "options": {
-      const min = field.minFilled ?? 1;
+      if (field.optional) return true;
+      const min = field.minFilled ?? 0;
       return filledOptions(answers[field.key]).length >= min;
     }
     case "labeled-fields": {
@@ -113,7 +116,7 @@ export function canAdvanceActivityStep(
       return true;
     }
     case "review-list":
-      return filledOptions(answers[field.fromKey]).length > 0;
+      return true;
     case "eliminate-from": {
       const min = field.minRemaining ?? 1;
       const source = field.key;
@@ -123,10 +126,11 @@ export function canAdvanceActivityStep(
       if (field.optional) return true;
       return getTextAnswer(answers, field.key).trim().length > 0;
     case "choice":
+      if (field.optional) return true;
       return getTextAnswer(answers, field.key).trim().length > 0;
     case "bucket-assign": {
       const items = filledOptions(answers[field.fromKey]);
-      if (items.length === 0) return false;
+      if (items.length === 0) return true;
       const map = answers[field.key];
       if (!map || typeof map !== "object") return false;
       const assignments = map as Record<string, string>;
@@ -154,10 +158,27 @@ export function fieldStorageKey(field: ActivityFieldDef): string {
   return field.key;
 }
 
+export function ensureActivityStepAnswers(
+  steps: ActivityStep[],
+  stepIndex: number,
+  answers: ActivityAnswers,
+): ActivityAnswers {
+  const field = stepField(steps[stepIndex]);
+  if (!field) return answers;
+  let next = answers;
+  if (answers[fieldStorageKey(field)] === undefined && field.type !== "review-list") {
+    const initial = defaultAnswersForField(field);
+    if (initial !== undefined) {
+      next = { ...next, [fieldStorageKey(field)]: initial };
+    }
+  }
+  return prepareStepAnswers(field, next);
+}
+
 export function defaultAnswersForField(field: ActivityFieldDef): unknown {
   switch (field.type) {
     case "options": {
-      const count = field.startCount ?? 3;
+      const count = field.startCount ?? 1;
       return Array.from({ length: count }, () => "");
     }
     case "labeled-fields":

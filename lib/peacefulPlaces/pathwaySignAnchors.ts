@@ -10,39 +10,39 @@ export type PathwaySignAnchor = {
   dropdownAlign: "left" | "right";
 };
 
-/** Click targets aligned to the main baked-in signs on peaceful-places-pathway.png */
+/** Legacy photo-overlay anchors — woodland pathway uses CSS lamppost signposts. */
 export const PATHWAY_SIGN_ANCHORS: Record<EstateSignId, PathwaySignAnchor> = {
   calming: {
-    centerX: 17.2,
-    centerY: 39.8,
+    centerX: 12.4,
+    centerY: 28.8,
     width: 13.1,
     height: 7.1,
     dropdownAlign: "left",
   },
   focus: {
-    centerX: 17.2,
-    centerY: 49.2,
+    centerX: 12.4,
+    centerY: 38.2,
     width: 13.1,
     height: 7.1,
     dropdownAlign: "left",
   },
   energize: {
-    centerX: 82.8,
-    centerY: 35.8,
+    centerX: 87.6,
+    centerY: 27.2,
     width: 13.1,
     height: 6.75,
     dropdownAlign: "right",
   },
   unwind: {
-    centerX: 82.8,
-    centerY: 44.8,
+    centerX: 87.6,
+    centerY: 39.6,
     width: 13.1,
     height: 6.75,
     dropdownAlign: "right",
   },
   "my-places": {
-    centerX: 82.8,
-    centerY: 53.8,
+    centerX: 87.6,
+    centerY: 49.2,
     width: 13.1,
     height: 7.1,
     dropdownAlign: "right",

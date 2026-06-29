@@ -6,6 +6,8 @@ import {
   signatureObjectById,
   type SignatureObjectForm,
 } from "@/lib/signatureCompanionObjects";
+import { signatureIconForObject } from "@/lib/signatureIcons";
+import { SignatureIcon } from "@/components/companion/SignatureIcon";
 
 export type CompanionObjectSize = "xs" | "sm" | "md" | "lg" | "card" | "hero";
 
@@ -35,8 +37,7 @@ const SIZE_CLASS: Record<CompanionObjectSize, string> = {
 };
 
 /**
- * Renders a Signature Object mini-scene or icon placeholder.
- * CSS homestead scenes until PNG/SVG art lands in the Object Library.
+ * Renders a Signature Object — illustrated icon (navigation) or mini-scene (feature cards).
  */
 export function CompanionObjectVisual({
   objectId,
@@ -60,6 +61,24 @@ export function CompanionObjectVisual({
     spec?.animate ??
     (resolvedVariant === "mini-scene" && entry?.assetStatus === "placeholder");
 
+  const ariaLabel =
+    label ?? signature?.name ?? entry?.objectName ?? entry?.label ?? resolvedObjectId;
+
+  const signatureIconId =
+    resolvedVariant === "icon" ? signatureIconForObject(resolvedObjectId) : null;
+
+  if (signatureIconId) {
+    return (
+      <SignatureIcon
+        iconId={signatureIconId}
+        size={resolvedSize}
+        className={className}
+        label={ariaLabel}
+        animate={motion}
+      />
+    );
+  }
+
   return (
     <span
       className={[
@@ -77,7 +96,7 @@ export function CompanionObjectVisual({
       data-catalog-object={spec?.catalogObjectId ?? signature?.catalogObjectId}
       data-companion-room={companionObjectRoom(resolvedObjectId)}
       role="img"
-      aria-label={label ?? signature?.name ?? entry?.objectName ?? entry?.label ?? resolvedObjectId}
+      aria-label={ariaLabel}
     />
   );
 }

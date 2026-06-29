@@ -1,6 +1,7 @@
-/** Plan My Day Morning Room — full-screen planning sanctuary. */
-export const PLAN_MY_DAY_MORNING_BG =
-  "/backgrounds/plan-my-day-background.png" as const;
+import { STUDY_ROOM_BG } from "@/lib/companionHomestead";
+
+/** Plan My Day Morning Room — full-screen planning sanctuary (Study). */
+export const PLAN_MY_DAY_MORNING_BG = STUDY_ROOM_BG;
 
 export const PLAN_MY_DAY_WORKSPACE_MAX_WIDTH = "35rem" as const; /* 560px */
 export const PLAN_MY_DAY_WORKSPACE_MIN_WIDTH = "27.5rem" as const; /* 440px */

@@ -7,6 +7,7 @@ import {
   linkAttachment,
   openGrowthAttachment,
   readFileAsAttachment,
+  resolveGrowthAttachment,
   type GrowthAttachment,
 } from "@/lib/growthAttachments";
 
@@ -23,16 +24,17 @@ function AttachmentRow({
   onRemove?: () => void;
   compact?: boolean;
 }) {
+  const resolved = resolveGrowthAttachment(att);
   return (
     <li
       className={`flex gap-3 rounded-lg border border-[#efe8de] bg-[#faf7f2]/60 px-3 py-2 ${
         compact ? "text-xs" : "text-sm"
       } text-[#4b463f]`}
     >
-      {att.kind === "image" && att.url ? (
+      {resolved.kind === "image" && resolved.url ? (
         <img
-          src={att.url}
-          alt={att.name}
+          src={resolved.url}
+          alt={resolved.name}
           className="h-12 w-12 shrink-0 rounded-md border border-[#e7d9c8] object-cover"
         />
       ) : (
@@ -41,9 +43,10 @@ function AttachmentRow({
         </span>
       )}
       <div className="min-w-0 flex-1">
-        <p className="truncate font-medium text-[#2f261f]">{att.name}</p>
+        <p className="truncate font-medium text-[#2f261f]">{resolved.name}</p>
         <p className="text-[10px] font-semibold uppercase tracking-wide text-[#9a8f82]">
-          {attachmentTypeLabel(att.kind)}
+          {attachmentTypeLabel(resolved.kind)}
+          {att.assetId ? " · library" : ""}
         </p>
         <div className="mt-1 flex flex-wrap gap-2">
           <button
@@ -51,9 +54,9 @@ function AttachmentRow({
             onClick={() => openGrowthAttachment(att)}
             className="text-xs font-semibold text-[#b45309] hover:underline"
           >
-            {att.url.startsWith("http") ? "Open" : "Download"}
+            {resolved.url.startsWith("http") ? "Open" : "Download"}
           </button>
-          {att.kind === "image" ? (
+          {resolved.kind === "image" ? (
             <button
               type="button"
               onClick={() => downloadGrowthAttachment(att)}

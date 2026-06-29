@@ -7,8 +7,7 @@
  *   also catching post edges — sign stays STATIC on the base image until
  *   LOGIN_SCENE_PORCH_SIGN_ASSET is provided (transparent PNG of sign only).
  * - Bracket and post are never included in any motion mask.
- * - Doorway presence: see loginDoorwayPresence.ts — corrected full-scene art preferred;
- *   fallback uses a static edge-correction overlay until shari-login-v2.png lands.
+ * - Doorway presence: see loginDoorwayPresence.ts — clean plate art (no baked UI).
  */
 
 import { LOGIN_SCENE_ASSET } from "./loginDoorwayPresence";

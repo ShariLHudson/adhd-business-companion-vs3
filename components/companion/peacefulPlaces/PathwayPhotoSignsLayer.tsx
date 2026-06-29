@@ -1,7 +1,10 @@
 "use client";
 
 import { forwardRef, useEffect, useState, type CSSProperties, type ReactNode } from "react";
-import { PEACEFUL_PLACES_PATHWAY_BG } from "@/lib/peacefulPlaces/pathway";
+import {
+  PEACEFUL_PLACES_PATHWAY_ASPECT,
+  PEACEFUL_PLACES_PATHWAY_BG,
+} from "@/lib/peacefulPlaces/pathway";
 
 type Props = {
   children: ReactNode;
@@ -12,7 +15,7 @@ type Props = {
  */
 export const PathwayPhotoSignsLayer = forwardRef<HTMLDivElement, Props>(
   function PathwayPhotoSignsLayer({ children }, ref) {
-    const [aspect, setAspect] = useState<number | null>(null);
+    const [aspect, setAspect] = useState(PEACEFUL_PLACES_PATHWAY_ASPECT);
 
     useEffect(() => {
       const img = new Image();
@@ -25,19 +28,19 @@ export const PathwayPhotoSignsLayer = forwardRef<HTMLDivElement, Props>(
     }, []);
 
     const plateStyle = {
-      "--pathway-image-aspect": String(aspect ?? 1.5),
+      "--pathway-image-aspect": String(aspect),
     } as CSSProperties;
 
     return (
       <div
         ref={ref}
         className="peaceful-places-pathway-scene__photo-signs"
-        data-pathway-signs-ready={aspect ? "1" : undefined}
+        data-pathway-signs-ready="1"
         style={plateStyle}
       >
         <div className="peaceful-places-pathway-scene__photo-plate">
           <div className="peaceful-places-pathway-scene__photo-plate-inner">
-            {aspect ? children : null}
+            {children}
           </div>
         </div>
       </div>

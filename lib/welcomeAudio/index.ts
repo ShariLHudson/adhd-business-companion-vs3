@@ -14,6 +14,11 @@ export type {
 export { WelcomeAudioManager } from "./WelcomeAudioManager";
 export { useWelcomeAudioExperience } from "./useWelcomeAudioExperience";
 export {
+  attachWelcomeRoomAudioManager,
+  destroyWelcomeRoomAudioManager,
+  primeWelcomeRoomAudioFromGesture,
+} from "./welcomeRoomAudioSession";
+export {
   WELCOME_ROOM_GREETING_AUDIO_SRC,
   WELCOME_ROOM_FULL_WELCOME_AUDIO_SRC,
   WELCOME_ROOM_WELCOME_AUDIO_PARTS,

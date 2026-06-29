@@ -5,6 +5,7 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 import { COMPANION_LOGIN_BACKGROUND } from "@/lib/companionLoginPage";
+import { HomesteadSceneProvider } from "@/lib/homesteadScene";
 import { CompanionLoginBackground } from "./CompanionLoginBackground";
 
 describe("CompanionLoginBackground", () => {
@@ -21,7 +22,11 @@ describe("CompanionLoginBackground", () => {
     document.body.appendChild(container);
     root = createRoot(container);
     act(() => {
-      root.render(<CompanionLoginBackground />);
+      root.render(
+        <HomesteadSceneProvider>
+          <CompanionLoginBackground />
+        </HomesteadSceneProvider>,
+      );
     });
   }
 
@@ -39,20 +44,20 @@ describe("CompanionLoginBackground", () => {
     expect(container.querySelector(".companion-login-scene__soften")).toBeTruthy();
   });
 
-  it("does not render motion or adaptive layers", () => {
+  it("applies shared homestead scene layers and attributes", () => {
     render();
+    const el = scene();
+    expect(el?.getAttribute("data-homestead-scene")).toBe("");
+    expect(el?.getAttribute("data-homestead-period")).toBeTruthy();
+    expect(el?.getAttribute("data-time-of-day")).toBeTruthy();
+    expect(el?.getAttribute("data-season")).toBeTruthy();
+    expect(el?.getAttribute("data-weather")).toBeTruthy();
     expect(
-      container.querySelector(".companion-login-scene__motion-swing"),
-    ).toBeNull();
+      container.querySelector(".companion-welcome-scene__sunlight"),
+    ).toBeTruthy();
     expect(
-      container.querySelector(".companion-login-scene__lighting"),
-    ).toBeNull();
-    expect(
-      container.querySelector(".companion-login-scene__processing-glow"),
-    ).toBeNull();
-    expect(
-      container.querySelector(".companion-login-scene__atmosphere"),
-    ).toBeNull();
+      container.querySelector(".companion-welcome-scene__porch-glow"),
+    ).toBeTruthy();
   });
 
   it("keeps the scene behind the login card stacking context", () => {

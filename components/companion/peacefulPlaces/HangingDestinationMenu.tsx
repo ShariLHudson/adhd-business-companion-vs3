@@ -10,9 +10,10 @@ type MenuItem = {
 type Props = {
   items: MenuItem[];
   onSelect: (id: string) => void;
+  className?: string;
 };
 
-export function HangingDestinationMenu({ items, onSelect }: Props) {
+export function HangingDestinationMenu({ items, onSelect, className }: Props) {
   if (!items.length) return null;
 
   function handleSelect(id: string, e: MouseEvent<HTMLButtonElement>) {
@@ -21,12 +22,18 @@ export function HangingDestinationMenu({ items, onSelect }: Props) {
   }
 
   return (
-    <ul className="hanging-destination-menu" role="list">
+    <ul
+      className={["hanging-destination-menu", "hanging-destination-menu--garden-cloth", className]
+        .filter(Boolean)
+        .join(" ")}
+      role="list"
+    >
       {items.map((item) => (
-        <li key={item.id}>
+        <li key={item.id} className="hanging-destination-menu__item-wrap">
+          <span className="hanging-destination-menu__chain" aria-hidden="true" />
           <button
             type="button"
-            className="hanging-destination-menu__item"
+            className="hanging-destination-menu__sign-board"
             onMouseDown={(e) => e.stopPropagation()}
             onClick={(e) => handleSelect(item.id, e)}
           >

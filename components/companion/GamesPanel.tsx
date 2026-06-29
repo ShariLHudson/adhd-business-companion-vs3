@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { logMomentum } from "@/lib/companionStore";
 import { recommendMomentumGame } from "@/lib/momentumGameRecommend";
 import {
@@ -11,10 +11,15 @@ import {
   type MomentumGameDef,
   type MomentumNeedId,
 } from "@/lib/momentumGames";
+import {
+  composeMomentumGamesWelcome,
+  recordMomentumGamesCategory,
+  recordMomentumGamesVisit,
+} from "@/lib/momentumGames/momentumGamesUsage";
 import { MomentumGameRunner } from "./games/MomentumGameRunner";
 import { rand } from "./games/gameUtils";
-import { CompanionObjectLabel, CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
-import { CompanionNavCard } from "@/components/companion/CompanionNavCard";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
+import { MomentumGamesCategoryCard } from "@/components/companion/MomentumGamesCategoryCard";
 import { AppBackButton } from "@/components/companion/AppBackButton";
 import { WorkspaceGuide } from "@/components/companion/WorkspaceGuide";
 
@@ -28,40 +33,26 @@ function GameMeta({ game }: { game: MomentumGameDef }) {
   );
 }
 
-function CategoryCard({
-  objectId,
-  title,
-  tagline,
-  onClick,
-}: {
-  objectId: string;
-  title: string;
-  tagline: string;
-  onClick: () => void;
-}) {
-  return (
-    <CompanionNavCard
-      objectId={objectId}
-      title={title}
-      tagline={tagline}
-      onClick={onClick}
-      visualVariant="mini-scene"
-    />
-  );
-}
-
 export function GamesPanel({
   onOpenSpinWheel,
+  onReturnHome,
 }: {
   onOpenSpinWheel?: () => void;
+  onReturnHome?: () => void;
 }) {
   const [phase, setPhase] = useState<Phase>("menu");
   const [activeNeed, setActiveNeed] = useState<MomentumNeedId | null>(null);
   const [current, setCurrent] = useState<MomentumGameDef | null>(null);
+  const [personalWelcome, setPersonalWelcome] = useState<string | null>(null);
   const recentRef = useRef<string[]>([]);
   const lastNeedRef = useRef<MomentumNeedId | null>(null);
 
   const recommendation = recommendMomentumGame();
+
+  useEffect(() => {
+    recordMomentumGamesVisit();
+    setPersonalWelcome(composeMomentumGamesWelcome());
+  }, []);
 
   function pickSurprise(): MomentumGameDef {
     const recent = recentRef.current;
@@ -86,6 +77,7 @@ export function GamesPanel({
       onOpenSpinWheel?.();
       return;
     }
+    recordMomentumGamesCategory(game.need);
     setCurrent(game);
     setPhase("play");
   }
@@ -96,6 +88,7 @@ export function GamesPanel({
   }
 
   function openCategory(need: MomentumNeedId) {
+    recordMomentumGamesCategory(need);
     setActiveNeed(need);
     setPhase("category");
   }
@@ -103,7 +96,7 @@ export function GamesPanel({
   if (phase === "play" && current) {
     const cat = getMomentumNeedCategory(current.need);
     return (
-      <div className="companion-fade-in mx-auto flex h-full max-w-md flex-col px-6 py-8">
+      <div className="momentum-games-panel companion-fade-in mx-auto flex h-full max-w-md flex-col px-2 py-4 sm:px-4">
         <div className="flex w-full items-center justify-between">
           <span
             className="rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wide"
@@ -132,7 +125,7 @@ export function GamesPanel({
 
   if (phase === "done") {
     return (
-      <div className="companion-fade-in mx-auto flex h-full max-w-md flex-col items-center px-6 py-16 text-center">
+      <div className="momentum-games-panel companion-fade-in mx-auto flex h-full max-w-md flex-col items-center px-2 py-12 text-center sm:px-4">
         <CompanionObjectVisual
           objectId="celebration-reset"
           size="lg"
@@ -147,8 +140,11 @@ export function GamesPanel({
           <button
             type="button"
             onClick={() => startGame(pickSurprise())}
-            className="rounded-xl border-2 border-[#1e4f4f] bg-white px-5 py-2.5 text-base font-bold text-[#1e4f4f]"
+            className="momentum-games-surprise momentum-games-surprise--compact"
           >
+            <span className="momentum-games-surprise__sparkle" aria-hidden>
+              ✦
+            </span>
             Surprise me
           </button>
           <button
@@ -167,14 +163,15 @@ export function GamesPanel({
     const cat = getMomentumNeedCategory(activeNeed);
     const games = gamesForNeed(activeNeed);
     return (
-      <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
+      <div className="momentum-games-panel companion-fade-in mx-auto flex h-full max-w-xl flex-col px-2 py-4 sm:px-4">
         <WorkspaceGuide section="focus" />
         <AppBackButton
-          destination="Games"
+          destination="Momentum Games"
           onBack={() => setPhase("menu")}
           size="compact"
+          className="momentum-games-back"
         />
-        <p className="flex items-center gap-2 text-2xl font-semibold text-[#1f1c19]">
+        <p className="momentum-games-category-heading flex items-center gap-2">
           <CompanionObjectVisual objectId={cat.objectId} size="md" variant="mini-scene" />
           {cat.title}
         </p>
@@ -185,7 +182,7 @@ export function GamesPanel({
               <button
                 type="button"
                 onClick={() => startGame(g)}
-                className="flex w-full items-start gap-3 rounded-2xl border border-[#d4cdc3] bg-white/85 px-3.5 py-3 text-left shadow-sm transition-colors hover:border-[#1e4f4f]/35 hover:bg-white"
+                className="momentum-games-game-row"
               >
                 <CompanionObjectVisual
                   objectId={g.objectId}
@@ -211,18 +208,32 @@ export function GamesPanel({
   }
 
   return (
-    <div className="companion-fade-in mx-auto flex h-full max-w-xl flex-col px-6 py-8">
-      <WorkspaceGuide section="focus" />
-      <p className="text-2xl font-semibold text-[#1f1c19]">Momentum Games</p>
-      <p className="mt-1 text-base text-[#6b635a]">
-        Choose what your brain needs right now.
-      </p>
+    <div className="momentum-games-panel companion-fade-in mx-auto flex h-full max-w-xl flex-col px-2 py-4 sm:px-4">
+      {onReturnHome ? (
+        <AppBackButton
+          destination="the Living Room"
+          onBack={onReturnHome}
+          size="compact"
+          className="momentum-games-home-back"
+        />
+      ) : null}
+
+      <header className="momentum-games-header">
+        <h1 className="momentum-games-header__title">Momentum Games</h1>
+        <p className="momentum-games-header__intro">
+          Let&apos;s give your brain something fun to do.
+        </p>
+        <p className="momentum-games-header__sub">
+          Sometimes momentum starts with play.
+        </p>
+        {personalWelcome ? (
+          <p className="momentum-games-header__personal">{personalWelcome}</p>
+        ) : null}
+      </header>
 
       {recommendation && (
-        <div className="mt-5 rounded-2xl border border-[#1e4f4f]/25 bg-[#f0f5f5] px-4 py-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#1e4f4f]">
-            Shari Recommends
-          </p>
+        <div className="momentum-games-recommendation">
+          <p className="momentum-games-recommendation__label">Shari suggests</p>
           <p className="mt-2 text-base font-semibold text-[#1f1c19]">
             <CompanionObjectVisual
               objectId={recommendation.game.objectId}
@@ -245,11 +256,11 @@ export function GamesPanel({
         </div>
       )}
 
-      <ul className="mt-5 flex flex-col gap-2">
+      <ul className="momentum-games-categories">
         {MOMENTUM_NEED_CATEGORIES.map((cat) => (
           <li key={cat.id}>
-            <CategoryCard
-              objectId={cat.objectId}
+            <MomentumGamesCategoryCard
+              needId={cat.id}
               title={cat.title}
               tagline={cat.tagline}
               onClick={() => openCategory(cat.id)}
@@ -258,13 +269,25 @@ export function GamesPanel({
         ))}
       </ul>
 
-      <button
-        type="button"
-        onClick={() => startGame(pickSurprise())}
-        className="mt-6 rounded-2xl border-2 border-[#1e4f4f]/30 bg-white px-6 py-3 text-base font-bold text-[#1e4f4f]"
-      >
-        <CompanionObjectLabel objectId="games" label="Surprise me" size="xs" />
-      </button>
+      <div className="momentum-games-surprise-wrap">
+        <p className="momentum-games-surprise__helper">
+          Not sure what you need today?
+        </p>
+        <button
+          type="button"
+          onClick={() => startGame(pickSurprise())}
+          className="momentum-games-surprise"
+        >
+          <span className="momentum-games-surprise__sparkle" aria-hidden>
+            ✦
+          </span>
+          <span className="momentum-games-surprise__label">Surprise me</span>
+          <span className="momentum-games-surprise__hint">
+            Let me choose for you.
+          </span>
+          <span className="momentum-games-surprise__particles" aria-hidden />
+        </button>
+      </div>
     </div>
   );
 }

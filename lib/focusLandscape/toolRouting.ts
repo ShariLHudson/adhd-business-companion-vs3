@@ -7,15 +7,25 @@ export const FOCUS_TOOL_TO_SPACE: Record<string, FocusLandscapeSpaceId> = {
   "prioritize-options": "garden-path",
   "break-smaller": "garden-path",
   "breathe-reset": "meadow-lake",
+  "mind-slow-breathe": "meadow-lake",
   "stretch-break": "meadow-stretch",
   "calm-moment": "meadow-stretch",
+  "sixty-second-reset": "meadow-stretch",
   "calm-audio": "forest-pavilion",
   "focus-audio": "forest-pavilion",
+  "mind-slow-places": "forest-pavilion",
   "nature-audio": "forest-pavilion",
   "sleep-audio": "forest-pavilion",
   "brain-break-games": "meadow-object-field",
   "sensory-reset": "deep-forest",
   "walk-reminder": "horizon-trail",
+  "momentum-builders": "meadow-stretch",
+  "brain-dump": "deep-forest",
+  "overwhelm-prioritize": "garden-path",
+  "overwhelm-break-down": "garden-path",
+  "overwhelm-clear": "deep-forest",
+  "overwhelm-breathe": "meadow-lake",
+  "chat-guide": "garden-path",
 };
 
 export const FOCUS_FEELING_TO_SPACE: Record<FocusFeelingId, FocusLandscapeSpaceId> =
@@ -34,8 +44,8 @@ export function spaceForFocusTool(toolId?: string): FocusLandscapeSpaceId | null
 export function spaceForFocusFeeling(
   feelingId?: FocusFeelingId | string,
 ): FocusLandscapeSpaceId {
-  if (feelingId === "stuck" || feelingId === "need-break") {
-    return FOCUS_FEELING_TO_SPACE[feelingId];
+  if (feelingId && feelingId in FOCUS_FEELING_TO_SPACE) {
+    return FOCUS_FEELING_TO_SPACE[feelingId as FocusFeelingId];
   }
   return FOCUS_HUB_CENTER_SPACE;
 }

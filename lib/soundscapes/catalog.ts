@@ -1,9 +1,17 @@
 import type { Soundscape, SoundscapeMood, SoundscapeMoodId } from "./types";
-import { COFFEE_SHOP_AMBIENCE_MP3, TIN_ROOF_RAIN_AMBIENCE_MP3 } from "./audioAssets";
+import {
+  BEDROOM_WINDOW_AMBIENCE_MP3,
+  BRIGHT_STUDIO_AMBIENCE_MP3,
+  COFFEE_SHOP_AMBIENCE_MP3,
+  EAST_TERRACE_AMBIENCE_MP3,
+  EVENING_HEARTH_AMBIENCE_MP3,
+  MUSIC_LOFT_AMBIENCE_MP3,
+  TIN_ROOF_RAIN_AMBIENCE_MP3,
+} from "./audioAssets";
 
 /** @deprecated Use PEACEFUL_PLACES_SUBTITLE from lib/peacefulPlaces/directory */
 export const SOUNDSCAPE_INTRO =
-  "Choose the place that feels right today." as const;
+  "Take a gentle pause. Choose the place that feels right." as const;
 
 export const SOUNDSCAPE_SUBCOPY =
   "Each destination is a place on the Estate where you can spend a little time." as const;
@@ -134,7 +142,7 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Gentle piano that keeps you company without asking.",
     description:
       "Gentle piano lines that keep you company without asking for your attention.",
-    playbackUrl: "https://www.youtube.com/watch?v=5qap5aO4i9A",
+    playbackUrl: MUSIC_LOFT_AMBIENCE_MP3,
   },
   {
     id: "gentle-rain",
@@ -147,7 +155,8 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Soft rain on glass while the room stays still.",
     description:
       "Soft rain on the glass while the room stays warm and still.",
-    playbackUrl: TIN_ROOF_RAIN_AMBIENCE_MP3,
+    playbackUrl: BEDROOM_WINDOW_AMBIENCE_MP3,
+    peacefulPlaceId: "bedroom-window",
   },
   {
     id: "fireplace-night",
@@ -160,7 +169,8 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Embers glowing low as the day lets go.",
     description:
       "Embers glow low while the fire breathes slow and the day lets go.",
-    playbackUrl: "https://www.youtube.com/watch?v=LGn608ws4pk",
+    playbackUrl: EVENING_HEARTH_AMBIENCE_MP3,
+    peacefulPlaceId: "evening-hearth",
   },
   {
     id: "night-forest",
@@ -189,17 +199,18 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     playbackUrl: "https://www.youtube.com/watch?v=uMenfkw_60I",
   },
   {
-    id: "morning-momentum",
+    id: "nature-escape",
     mood: "energize",
-    emoji: "🎵",
-    title: "Morning Momentum",
-    environment: "Music Loft",
-    destinationName: "Music Loft",
-    experience: "Morning Momentum",
-    tagline: "Sunshine and upbeat music — energy without chaos.",
+    emoji: "🌿",
+    title: "Nature Escape",
+    environment: "Nature Escape",
+    destinationName: "Nature Escape",
+    experience: "Nature Escape",
+    tagline: "Creek, birds, and wildflowers — room to fill your cup again.",
     description:
-      "Bright modern music loft. Sunshine through large windows, a gentle breeze through open doors, upbeat instrumental music, plants, fresh coffee — energy without chaos.",
-    playbackUrl: "https://www.youtube.com/watch?v=atdm_5zcrts",
+      "A sunlit garden nook — flowing creek, birdsong, hammock shade, wildflowers, and a gentle breeze while guided recharge moments meet you where you are.",
+    playbackUrl: "https://www.youtube.com/watch?v=lTRiuFIWV54",
+    peacefulPlaceId: "nature-escape",
   },
   {
     id: "sunrise-terrace",
@@ -208,11 +219,12 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     title: "Sunrise Terrace",
     environment: "East Terrace",
     destinationName: "East Terrace",
-    experience: "Sunrise Terrace",
+    experience: "Morning Whisper in the Garden",
     tagline: "Golden light lifting you into the day.",
     description:
-      "Golden light across the estate terrace. Coffee beside you, gardens waking up, and bright upbeat music that lifts you into the day without rushing you.",
-    playbackUrl: "https://www.youtube.com/watch?v=eLB2xOnJn_8",
+      "Golden light across the estate terrace. Coffee beside you, gardens waking up, and a soft morning melody that lifts you into the day without rushing you.",
+    playbackUrl: EAST_TERRACE_AMBIENCE_MP3,
+    peacefulPlaceId: "east-terrace",
   },
   {
     id: "movement-studio",
@@ -225,7 +237,8 @@ export const SOUNDSCAPES: readonly Soundscape[] = [
     tagline: "Clean open space and a beat to get unstuck.",
     description:
       "Wide windows, clean open floor, and a steady driving beat — enough energy to get unstuck and start moving.",
-    playbackUrl: "https://www.youtube.com/watch?v=l4jWSjUHaxY",
+    playbackUrl: BRIGHT_STUDIO_AMBIENCE_MP3,
+    peacefulPlaceId: "bright-studio",
   },
 ] as const;
 

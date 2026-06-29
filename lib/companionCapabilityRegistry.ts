@@ -536,7 +536,7 @@ export const COMPANION_CAPABILITY_REGISTRY: CompanionCapabilityEntry[] = [
   }),
   workspaceEntry({
     id: "focus_audio",
-    name: "Focus Audio",
+    name: "Peaceful Places",
     category: "productivity_ecosystem",
     status: "partial",
     ownerModule: "lib/audioSuggestions.ts",

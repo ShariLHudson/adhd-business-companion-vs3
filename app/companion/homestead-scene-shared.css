@@ -1,0 +1,408 @@
+/* ── Homestead scene — shared lighting for login + chat (welcome rules unchanged) ── */
+
+.homestead-scene-surface:is(
+    .companion-login-scene,
+    .companion-homestead-chat-scene
+  ).homestead-scene--ambient {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.homestead-scene--ambient .companion-welcome-scene__life--homestead > * {
+  transition: opacity 2.4s ease, background 2.4s ease, filter 2.4s ease;
+}
+
+/* Ambient motion — sunlight breathe, foliage drift */
+.homestead-scene--ambient[data-homestead-period="dawn"]
+  .companion-welcome-scene__sunlight,
+.homestead-scene--ambient[data-homestead-period="morning"]
+  .companion-welcome-scene__sunlight,
+.homestead-scene--ambient[data-homestead-period="midday"]
+  .companion-welcome-scene__sunlight,
+.homestead-scene--ambient[data-homestead-period="afternoon"]
+  .companion-welcome-scene__sunlight {
+  animation: welcome-sunlight-breathe 8s ease-in-out infinite;
+}
+
+.homestead-scene--ambient .companion-welcome-scene__foliage {
+  animation: welcome-foliage-drift 9s ease-in-out infinite;
+}
+
+.homestead-scene--ambient .companion-welcome-scene__holiday-lights {
+  opacity: 0;
+}
+
+.homestead-scene--ambient[data-season="holiday"]
+  .companion-welcome-scene__holiday-lights,
+.homestead-scene--ambient[data-holiday]
+  .companion-welcome-scene__holiday-lights {
+  opacity: 0.65;
+  animation: welcome-holiday-twinkle 4s ease-in-out infinite;
+}
+
+.homestead-scene--ambient[data-hero-motion="rain"]
+  .companion-welcome-scene__rain,
+.homestead-scene--ambient[data-weather="rain"]
+  .companion-welcome-scene__rain {
+  opacity: 0.55;
+  animation: welcome-rain-fall 1.2s linear infinite;
+}
+
+.homestead-scene--ambient[data-hero-motion="snow"]
+  .companion-welcome-scene__snow,
+.homestead-scene--ambient[data-weather="snow"]
+  .companion-welcome-scene__snow {
+  opacity: 0.22;
+  animation: welcome-snow-drift 18s linear infinite;
+}
+
+/* Season + weather */
+.homestead-scene--ambient[data-season="spring"]
+  .companion-welcome-scene__foliage {
+  opacity: 0.2;
+  background: radial-gradient(
+    ellipse at 60% 40%,
+    rgba(100, 170, 90, 0.4) 0%,
+    transparent 70%
+  );
+}
+
+.homestead-scene--ambient[data-season="autumn"]
+  .companion-welcome-scene__foliage {
+  opacity: 0.22;
+  background: radial-gradient(
+    ellipse at 60% 40%,
+    rgba(200, 140, 60, 0.38) 0%,
+    transparent 70%
+  );
+}
+
+.homestead-scene--ambient[data-season="winter"]
+  .companion-welcome-scene__foliage {
+  opacity: 0.08;
+}
+
+.homestead-scene--ambient[data-season="summer"]
+  .companion-welcome-scene__foliage {
+  opacity: 0.32;
+}
+
+.homestead-scene--ambient[data-weather="cloudy"]
+  .companion-welcome-scene__sunlight {
+  opacity: 0.72;
+  filter: saturate(0.85);
+}
+
+/* Homestead time rhythm */
+.homestead-scene--ambient[data-homestead-period="golden-hour"]
+  .companion-welcome-scene__exterior-dusk {
+  opacity: 0.42;
+}
+
+.homestead-scene--ambient[data-homestead-period="evening"]
+  .companion-welcome-scene__exterior-dusk,
+.homestead-scene--ambient[data-homestead-period="night"]
+  .companion-welcome-scene__exterior-dusk,
+.homestead-scene--ambient[data-time-of-day="evening"]
+  .companion-welcome-scene__exterior-dusk,
+.homestead-scene--ambient[data-time-of-day="night"]
+  .companion-welcome-scene__exterior-dusk {
+  opacity: 1;
+}
+
+.homestead-scene--ambient[data-homestead-period="evening"]
+  .companion-welcome-scene__interior-lamp,
+.homestead-scene--ambient[data-homestead-period="night"]
+  .companion-welcome-scene__interior-lamp,
+.homestead-scene--ambient[data-time-of-day="evening"]
+  .companion-welcome-scene__interior-lamp,
+.homestead-scene--ambient[data-time-of-day="night"]
+  .companion-welcome-scene__interior-lamp {
+  opacity: 1;
+}
+
+.homestead-scene--ambient[data-homestead-period="evening"]
+  .companion-welcome-scene__lamplight,
+.homestead-scene--ambient[data-homestead-period="night"]
+  .companion-welcome-scene__lamplight,
+.homestead-scene--ambient[data-time-of-day="evening"]
+  .companion-welcome-scene__lamplight,
+.homestead-scene--ambient[data-time-of-day="night"]
+  .companion-welcome-scene__lamplight {
+  left: 9%;
+  top: 35%;
+  width: 24%;
+  height: 30%;
+  opacity: calc(0.62 + var(--homestead-interior-glow, 0.7) * 0.38);
+  background: radial-gradient(
+    circle,
+    rgba(255, 204, 138, 0.48) 0%,
+    rgba(255, 176, 102, 0.16) 46%,
+    transparent 74%
+  );
+}
+
+.homestead-scene--ambient[data-homestead-period="evening"]
+  .companion-welcome-scene__foliage,
+.homestead-scene--ambient[data-homestead-period="night"]
+  .companion-welcome-scene__foliage,
+.homestead-scene--ambient[data-time-of-day="evening"]
+  .companion-welcome-scene__foliage,
+.homestead-scene--ambient[data-time-of-day="night"]
+  .companion-welcome-scene__foliage {
+  opacity: 0;
+}
+
+.homestead-scene--ambient[data-homestead-period="evening"]
+  .companion-welcome-scene__porch-glow,
+.homestead-scene--ambient[data-homestead-period="night"]
+  .companion-welcome-scene__porch-glow,
+.homestead-scene--ambient[data-time-of-day="evening"]
+  .companion-welcome-scene__porch-glow,
+.homestead-scene--ambient[data-time-of-day="night"]
+  .companion-welcome-scene__porch-glow {
+  opacity: calc(0.28 + var(--lh-porch-light, 0.65) * 0.62);
+}
+
+.homestead-scene--ambient[data-homestead-period="golden-hour"]
+  .companion-welcome-scene__sunlight,
+.homestead-scene--ambient[data-time-of-day="evening"]
+  .companion-welcome-scene__sunlight {
+  opacity: 0;
+}
+
+.homestead-scene--ambient[data-homestead-period="evening"]
+  .companion-welcome-scene__sunlight,
+.homestead-scene--ambient[data-homestead-period="night"]
+  .companion-welcome-scene__sunlight,
+.homestead-scene--ambient[data-time-of-day="evening"]
+  .companion-welcome-scene__sunlight,
+.homestead-scene--ambient[data-time-of-day="night"]
+  .companion-welcome-scene__sunlight {
+  opacity: 0;
+  animation: none;
+}
+
+.homestead-scene--ambient[data-homestead-period="dawn"]
+  .companion-welcome-scene__sunlight,
+.homestead-scene--ambient[data-homestead-period="morning"]
+  .companion-welcome-scene__sunlight {
+  opacity: 1;
+}
+
+.homestead-scene--ambient[data-homestead-period="midday"]
+  .companion-welcome-scene__sunlight,
+.homestead-scene--ambient[data-homestead-period="afternoon"]
+  .companion-welcome-scene__sunlight {
+  opacity: 0.92;
+}
+
+.homestead-scene--ambient[data-homestead-period="golden-hour"]
+  .companion-welcome-scene__sunlight {
+  opacity: calc(0.55 + var(--homestead-sun-warmth, 0.75) * 0.45);
+  background: radial-gradient(
+    ellipse calc(68% + var(--homestead-shadow-length, 0.6) * 8%) 86% at
+      calc(78% + var(--homestead-shadow-length, 0.6) * 4%) 40%,
+    rgba(255, 186, 110, calc(0.34 + var(--homestead-sun-warmth, 0.75) * 0.3)) 0%,
+    rgba(255, 170, 90, 0.14) 46%,
+    transparent 74%
+  );
+}
+
+.homestead-scene--ambient[data-homestead-period="dawn"]
+  .companion-welcome-scene__sunlight {
+  background: radial-gradient(
+    ellipse 76% 92% at 74% 34%,
+    rgba(196, 220, 255, 0.36) 0%,
+    rgba(255, 220, 180, 0.12) 44%,
+    transparent 74%
+  );
+}
+
+.homestead-scene--ambient[data-homestead-period="midday"]
+  .companion-welcome-scene__sunlight {
+  opacity: calc(0.65 + var(--homestead-exterior-brightness, 0.85) * 0.35);
+}
+
+.homestead-scene--ambient[data-time-of-day="morning"]
+  .companion-welcome-scene__sunlight {
+  background: radial-gradient(
+    ellipse 74% 90% at 76% 36%,
+    rgba(255, 228, 178, 0.48) 0%,
+    rgba(255, 220, 160, 0.14) 45%,
+    transparent 74%
+  );
+}
+
+.homestead-scene--ambient[data-time-of-day="afternoon"]
+  .companion-welcome-scene__sunlight {
+  background: radial-gradient(
+    ellipse 70% 86% at 80% 40%,
+    rgba(255, 244, 220, 0.32) 0%,
+    rgba(255, 238, 210, 0.1) 44%,
+    transparent 72%
+  );
+}
+
+/* Login porch — warm doorway glow at night */
+.companion-login-scene.homestead-scene--ambient[data-homestead-period="evening"]
+  .companion-welcome-scene__porch-glow,
+.companion-login-scene.homestead-scene--ambient[data-time-of-day="evening"]
+  .companion-welcome-scene__porch-glow,
+.companion-login-scene.homestead-scene--ambient[data-homestead-period="night"]
+  .companion-welcome-scene__porch-glow,
+.companion-login-scene.homestead-scene--ambient[data-time-of-day="night"]
+  .companion-welcome-scene__porch-glow {
+  opacity: calc(0.55 + var(--lh-porch-light, 0.65) * 0.45);
+  height: 38%;
+  background: radial-gradient(
+    ellipse 52% 88% at 58% 100%,
+    rgba(255, 196, 120, 0.42) 0%,
+    rgba(255, 168, 88, 0.16) 48%,
+    transparent 72%
+  );
+}
+
+.companion-login-scene.homestead-scene--ambient[data-homestead-period="evening"]
+  .companion-welcome-scene__interior-lamp,
+.companion-login-scene.homestead-scene--ambient[data-time-of-day="evening"]
+  .companion-welcome-scene__interior-lamp,
+.companion-login-scene.homestead-scene--ambient[data-homestead-period="night"]
+  .companion-welcome-scene__interior-lamp,
+.companion-login-scene.homestead-scene--ambient[data-time-of-day="night"]
+  .companion-welcome-scene__interior-lamp {
+  background: radial-gradient(
+    ellipse 48% 62% at 52% 62%,
+    rgba(255, 198, 128, 0.5) 0%,
+    rgba(255, 176, 102, 0.18) 40%,
+    transparent 68%
+  );
+}
+
+.companion-login-scene.homestead-scene--ambient[data-homestead-period="evening"]
+  .companion-login-scene__base,
+.companion-login-scene.homestead-scene--ambient[data-homestead-period="night"]
+  .companion-login-scene__base,
+.companion-login-scene.homestead-scene--ambient[data-time-of-day="evening"]
+  .companion-login-scene__base,
+.companion-login-scene.homestead-scene--ambient[data-time-of-day="night"]
+  .companion-login-scene__base {
+  filter: brightness(0.82) saturate(0.9) contrast(1.03);
+  transition: filter 2.4s ease;
+}
+
+/* Chat — master living room photograph + time filters */
+.companion-homestead-chat-scene__art,
+.companion-homestead-chat-scene__cinematic .cinematic-background__image.companion-homestead-chat-scene__art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 1;
+  transition: filter 2.4s ease, opacity 2.4s ease;
+}
+
+.companion-homestead-chat-scene__cinematic {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+[data-home-mode="chat"] .companion-homestead-chat-scene__art,
+[data-home-mode="chat"]
+  .companion-homestead-chat-scene__cinematic
+  .cinematic-background__image.companion-homestead-chat-scene__art {
+  opacity: 0.92;
+}
+
+.companion-homestead-chat-scene.homestead-scene--ambient[data-homestead-period="golden-hour"]
+  .companion-homestead-chat-scene__art {
+  filter: brightness(0.9) saturate(0.94);
+}
+
+.companion-homestead-chat-scene.homestead-scene--ambient[data-homestead-period="evening"]
+  .companion-homestead-chat-scene__art,
+.companion-homestead-chat-scene.homestead-scene--ambient[data-time-of-day="evening"]
+  .companion-homestead-chat-scene__art {
+  filter: brightness(1) saturate(1.04) contrast(1.02);
+}
+
+.companion-homestead-chat-scene.homestead-scene--ambient[data-homestead-period="night"]
+  .companion-homestead-chat-scene__art,
+.companion-homestead-chat-scene.homestead-scene--ambient[data-time-of-day="night"]
+  .companion-homestead-chat-scene__art {
+  filter: brightness(0.97) saturate(1.02) contrast(1.03);
+}
+
+.companion-homestead-chat-scene.homestead-scene--ambient[data-welcome-photograph="shari-i-am-here-2"][data-homestead-period="evening"]
+  .companion-welcome-scene__exterior-dusk,
+.companion-homestead-chat-scene.homestead-scene--ambient[data-welcome-photograph="shari-i-am-here-2"][data-time-of-day="evening"]
+  .companion-welcome-scene__exterior-dusk,
+.companion-homestead-chat-scene.homestead-scene--ambient[data-welcome-photograph="shari-i-am-here-2"][data-homestead-period="night"]
+  .companion-welcome-scene__exterior-dusk,
+.companion-homestead-chat-scene.homestead-scene--ambient[data-welcome-photograph="shari-i-am-here-2"][data-time-of-day="night"]
+  .companion-welcome-scene__exterior-dusk {
+  opacity: 0;
+}
+
+.companion-homestead-chat-scene.homestead-scene--ambient[data-welcome-photograph="shari-i-am-here-2"][data-homestead-period="evening"]
+  .companion-welcome-scene__interior-lamp,
+.companion-homestead-chat-scene.homestead-scene--ambient[data-welcome-photograph="shari-i-am-here-2"][data-time-of-day="evening"]
+  .companion-welcome-scene__interior-lamp,
+.companion-homestead-chat-scene.homestead-scene--ambient[data-welcome-photograph="shari-i-am-here-2"][data-homestead-period="night"]
+  .companion-welcome-scene__interior-lamp,
+.companion-homestead-chat-scene.homestead-scene--ambient[data-welcome-photograph="shari-i-am-here-2"][data-time-of-day="night"]
+  .companion-welcome-scene__interior-lamp {
+  opacity: 0.82;
+  mix-blend-mode: screen;
+  -webkit-mask-image: linear-gradient(90deg, #000 0%, #000 54%, transparent 66%);
+  mask-image: linear-gradient(90deg, #000 0%, #000 54%, transparent 66%);
+  background: radial-gradient(
+    ellipse 54% 70% at 8% 42%,
+    rgba(255, 196, 128, 0.48) 0%,
+    rgba(255, 172, 98, 0.22) 36%,
+    transparent 68%
+  );
+}
+
+.companion-homestead-chat-scene__wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: transparent;
+  z-index: 2;
+}
+
+[data-home-mode="chat"] .companion-homestead-chat-scene__wash {
+  background: rgba(252, 246, 236, 0.12);
+}
+
+.companion-homestead-chat-scene__veil {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 3;
+  background: transparent;
+  opacity: 0;
+}
+
+[data-home-mode="chat"] .companion-homestead-chat-scene__veil {
+  background: transparent;
+  opacity: 0;
+}
+
+.companion-login-scene__soften {
+  z-index: 4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .homestead-scene--ambient .companion-welcome-scene__sunlight,
+  .homestead-scene--ambient .companion-welcome-scene__foliage,
+  .homestead-scene--ambient .companion-welcome-scene__rain,
+  .homestead-scene--ambient .companion-welcome-scene__snow,
+  .homestead-scene--ambient .companion-welcome-scene__holiday-lights {
+    animation: none !important;
+  }
+}

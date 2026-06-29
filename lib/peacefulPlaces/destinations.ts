@@ -18,6 +18,11 @@ const MOOD_TO_CATEGORY: Record<SoundscapeMoodId, PeacefulPlaceCategoryId> = {
 const DESTINATION_ID_BY_PLACE: Record<PeacefulPlaceId, string> = {
   "summer-storm-covered-deck": "covered-deck-summer-storm",
   "cozy-cafe": "cozy-cafe-coffee-shop",
+  "nature-escape": "nature-escape-recharge",
+  "east-terrace": "east-terrace-morning-whisper",
+  "bright-studio": "bright-studio-movement-studio",
+  "bedroom-window": "bedroom-window-gentle-rain",
+  "evening-hearth": "evening-hearth-fireplace-night",
 };
 
 function destinationIdForPlace(placeId: PeacefulPlaceId): string {

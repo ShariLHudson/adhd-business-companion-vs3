@@ -2,6 +2,7 @@
 
 import type { ArrivalIntelligence } from "@/lib/arrivalIntelligence";
 import type { CompanionContinueOption } from "@/lib/companionLedContinue";
+import { homeStateDataAttr } from "@/lib/arrivalIntelligence";
 import { ShariPortrait } from "@/components/companion/ShariPortrait";
 import { useCompanionPresence } from "@/lib/useCompanionPresence";
 
@@ -17,13 +18,35 @@ function homeLineClass(tone: "primary" | "secondary"): string {
 }
 
 function buildAccessibilityLabel(arrival: ArrivalIntelligence): string {
-  return [arrival.openingMessage, arrival.inviteQuestion]
+  return [
+    arrival.greetingHeadline,
+    arrival.openingMessage,
+    arrival.greetingBody,
+    arrival.inviteQuestion,
+  ]
     .filter(Boolean)
     .join(" ");
 }
 
-/** Returning Active — contextual opening with soft continuation. */
-function ReturningActiveHome({
+function openingLines(arrival: ArrivalIntelligence) {
+  const primary =
+    arrival.greetingHeadline ||
+    arrival.openingMessage ||
+    arrival.welcomeLine ||
+    "";
+  const lines: { text: string; tone: "primary" | "secondary" }[] = [];
+  if (primary) lines.push({ text: primary, tone: "primary" });
+  if (arrival.greetingBody) {
+    lines.push({ text: arrival.greetingBody, tone: "secondary" });
+  }
+  if (arrival.inviteQuestion) {
+    lines.push({ text: arrival.inviteQuestion, tone: "secondary" });
+  }
+  return lines;
+}
+
+/** Calm home opening — Shari's message when not in the full welcome-scene walkthrough. */
+function CalmHomeOpening({
   arrival,
   onContinue,
 }: {
@@ -33,20 +56,18 @@ function ReturningActiveHome({
   const presence = useCompanionPresence({
     calmHome: true,
     homeState: arrival.homeState,
-    presenceSurface: "chat-returning",
+    presenceSurface:
+      arrival.homeState === "RETURNING_ACTIVE"
+        ? "chat-returning"
+        : "chat-welcome",
   });
 
-  const lines = [
-    { text: arrival.openingMessage, tone: "primary" as const },
-    ...(arrival.inviteQuestion
-      ? [{ text: arrival.inviteQuestion, tone: "secondary" as const }]
-      : []),
-  ].filter((line) => line.text);
+  const lines = openingLines(arrival);
 
   return (
     <section
       className="companion-home-card companion-home-returning mx-auto flex w-full max-w-md flex-col items-center px-5 pt-4 sm:pt-6"
-      data-home-state="returning-active"
+      data-home-state={homeStateDataAttr(arrival.homeState)}
       aria-label={buildAccessibilityLabel(arrival)}
     >
       <div className="companion-home-returning__moment">
@@ -62,38 +83,40 @@ function ReturningActiveHome({
         </div>
       </div>
 
-      <div className="companion-home-continue-actions">
-        {arrival.continue.mode === "single" && arrival.contextualButtonLabel ? (
-          <button
-            type="button"
-            onClick={() => {
-              if (arrival.continue.mode === "single") {
-                onContinue(arrival.continue.option);
-              }
-            }}
-            className="w-full rounded-2xl border border-[#c5e0e0] bg-[#f0f8f8]/90 px-6 py-3 text-base font-semibold text-[#1e4f4f] transition-colors hover:bg-[#e6f4f4] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
-          >
-            {arrival.contextualButtonLabel}
-          </button>
-        ) : null}
+      {arrival.homeState === "RETURNING_ACTIVE" ? (
+        <div className="companion-home-continue-actions">
+          {arrival.continue.mode === "single" && arrival.contextualButtonLabel ? (
+            <button
+              type="button"
+              onClick={() => {
+                if (arrival.continue.mode === "single") {
+                  onContinue(arrival.continue.option);
+                }
+              }}
+              className="w-full rounded-2xl border border-[#c5e0e0] bg-[#f0f8f8]/90 px-6 py-3 text-base font-semibold text-[#1e4f4f] transition-colors hover:bg-[#e6f4f4] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
+            >
+              {arrival.contextualButtonLabel}
+            </button>
+          ) : null}
 
-        {arrival.showContinueList && arrival.continue.mode === "choose" ? (
-          <ul className="w-full space-y-2 text-left">
-            {arrival.continue.options.map((option) => (
-              <li key={option.id}>
-                <button
-                  type="button"
-                  onClick={() => onContinue(option)}
-                  className="flex w-full items-center gap-2 rounded-xl border border-[#d7e8e8] bg-[#f5fafa]/90 px-4 py-3 text-left text-base font-medium text-[#1e4f4f] transition-colors hover:bg-[#eaf4f4] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
-                >
-                  <span aria-hidden="true">•</span>
-                  {option.title}
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : null}
-      </div>
+          {arrival.showContinueList && arrival.continue.mode === "choose" ? (
+            <ul className="w-full space-y-2 text-left">
+              {arrival.continue.options.map((option) => (
+                <li key={option.id}>
+                  <button
+                    type="button"
+                    onClick={() => onContinue(option)}
+                    className="flex w-full items-center gap-2 rounded-xl border border-[#d7e8e8] bg-[#f5fafa]/90 px-4 py-3 text-left text-base font-medium text-[#1e4f4f] transition-colors hover:bg-[#eaf4f4] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#1e4f4f]"
+                  >
+                    <span aria-hidden="true">•</span>
+                    {option.title}
+                  </button>
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </div>
+      ) : null}
     </section>
   );
 }
@@ -110,9 +133,5 @@ export function CompanionHomeCard({ arrival, onContinue }: CompanionHomeCardProp
     );
   }
 
-  if (arrival.homeState === "RETURNING_ACTIVE") {
-    return <ReturningActiveHome arrival={arrival} onContinue={onContinue} />;
-  }
-
-  return null;
+  return <CalmHomeOpening arrival={arrival} onContinue={onContinue} />;
 }

@@ -1,0 +1,18 @@
+export {
+  COMPANION_HOMESTEAD_ROOMS,
+  GAME_ROOM_BG,
+  LIBRARY_ROOM_BG,
+  LIVING_ROOM_BG,
+  STUDY_ROOM_BG,
+  SUNROOM_BUTTERFLY_VIDEO,
+  SUNROOM_FALLBACK_IMAGE,
+  homesteadRoomById,
+  homesteadRoomForPlace,
+  homesteadRoomForSection,
+  peacefulPlaceNatureMotion,
+  type HomesteadBackgroundKind,
+  type HomesteadRoomEntry,
+  type HomesteadRoomId,
+  type HomesteadSignatureMotionId,
+  type PeacefulPlaceNatureMotion,
+} from "./homesteadRoomRegistry";

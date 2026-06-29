@@ -32,6 +32,7 @@ export const WORKSPACE_COACH_SILENT_SECTIONS: ReadonlySet<AppSection> =
     "focus-audio",
     "focus",
     "wins-this-week",
+    "evidence-bank",
     "time-block",
     "brain-dump",
     "spin-wheel",

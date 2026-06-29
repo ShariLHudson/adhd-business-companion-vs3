@@ -88,10 +88,7 @@ export function AdjustMyDayPanel({
     return helpNeed ? [helpNeed] : [];
   }
 
-  const canSave =
-    Boolean(energyLevel) &&
-    Boolean(motivationLevel) &&
-    (helpNeed === DAY_HELP_OTHER ? otherNeed.trim().length > 0 : Boolean(helpNeed));
+  const canSave = Boolean(energyLevel) && Boolean(motivationLevel);
 
   function saveDay() {
     if (!energyLevel || !motivationLevel) return;
@@ -155,14 +152,16 @@ export function AdjustMyDayPanel({
                 {formatDayMotivationDisplay(snapshot)}
               </p>
             </div>
-            <div>
-              <p className="text-sm font-semibold text-[#1f1c19]">
-                What would help right now?
-              </p>
-              <p className="mt-1 text-base text-[#3d3630]">
-                {formatDayHelpDisplay(snapshot)}
-              </p>
-            </div>
+            {snapshot.needs.length > 0 ? (
+              <div>
+                <p className="text-sm font-semibold text-[#1f1c19]">
+                  What would help right now?
+                </p>
+                <p className="mt-1 text-base text-[#3d3630]">
+                  {formatDayHelpDisplay(snapshot)}
+                </p>
+              </div>
+            ) : null}
             <div>
               <p className="text-sm font-semibold text-[#1f1c19]">
                 Anything else going on?
@@ -275,6 +274,9 @@ export function AdjustMyDayPanel({
 
       <p className="mt-6 text-lg font-semibold text-[#1f1c19]">
         What would help right now?
+        <span className="ml-1.5 text-base font-normal text-[#9a8f82]">
+          — only if you want to
+        </span>
       </p>
       <HelpNeedDropdown
         className="mt-2"

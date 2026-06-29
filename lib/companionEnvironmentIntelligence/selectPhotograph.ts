@@ -12,7 +12,7 @@ function photographReason(
   if (input.lowEnergy) return "low energy — honest and unhurried";
   if (input.businessFocus) return "business focus — desk energy when you need it";
   if (input.timeOfDay === "evening" || input.timeOfDay === "night") {
-    return "evening — lamp already on";
+    return "evening — the living room lamp is on, the window is quiet";
   }
   if (input.timeOfDay === "morning") return "morning — coffee and calm";
   const context = imageContextById(id);
@@ -22,8 +22,9 @@ function photographReason(
 }
 
 /**
- * Master Living Room — one approved photograph until time/season layers ship.
- * First page is always `shari-i-am-here-2`.
+ * Master Living Room — one approved photograph at every time of day.
+ * Evening and night use homestead lighting layers on the same chair scene;
+ * the window darkens and interior lamp warmth replaces daylight.
  */
 export function selectWelcomePhotograph(input: CompanionEnvironmentInput): {
   id: string;

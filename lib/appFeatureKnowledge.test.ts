@@ -9,7 +9,7 @@ import {
 } from "./appFeatureKnowledge";
 
 describe("appFeatureKnowledge — QA navigation", () => {
-  it("How do I find the games? → Focus → Momentum Boosters → Momentum Games", () => {
+  it("How do I find the games? → Focus → Momentum Boosters → Momentum Builders", () => {
     const text = "How do I find the games?";
     expect(isAppHowToQuestion(text)).toBe(true);
 
@@ -17,11 +17,11 @@ describe("appFeatureKnowledge — QA navigation", () => {
     expect(answer).not.toBeNull();
     expect(answer!.navigation).toMatch(/Focus/i);
     expect(answer!.navigation).toMatch(/Momentum Boosters/i);
-    expect(answer!.navigation).toMatch(/Momentum Games/i);
+    expect(answer!.navigation).toMatch(/Momentum Builders/i);
     expect(answer!.featureIds).toContain("momentum-games");
 
     const hint = appFeatureKnowledgeHintForChat(text)!;
-    expect(hint).toMatch(/Momentum Games/i);
+    expect(hint).toMatch(/Momentum Builders/i);
     expect(hint).toMatch(/Momentum Boosters/i);
     expect(hint).not.toMatch(/no games|don't have games|not built/i);
   });

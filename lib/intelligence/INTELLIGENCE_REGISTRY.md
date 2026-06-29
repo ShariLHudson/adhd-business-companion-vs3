@@ -75,7 +75,14 @@ If any answer is "unknown" — redesign before shipping.
 | **Calendar event** | `calendar-event` | Google Workspace bridge | Calendar, Relationship, Automation |
 | **Document** | `document` | Uploads, Google docs | Learning, Content, Business |
 | **Voice session** | `voice-session` | TTS / voice companion | Narrative, Learning, Relationship |
-| **Journal entry** | `journal-entry` | Distinct from capture thought | Narrative, Recovery, Founder |
+| **Journal entry** | `journal-entry` | `lib/growthJournalStore.ts` — Growth primary DB (private reflection) | Narrative, Recovery, Founder, Growth |
+| **Portfolio entry** | `project` | `lib/growthPortfolioStore.ts` — Growth primary DB (creative work) | Growth, Content, Narrative, LIG |
+| **Growth capture** | `capture-session` | `lib/growthCapture/` — universal inbox before filing | Growth, Arrival, Companion Presence |
+| **Evidence entry** | `document` | `lib/evidenceBankStore.ts` — proof archive | Growth, Business, Pattern, LIG |
+| **Asset** | `document` | `lib/assetLibrary/` — single store for uploads; referenced by Portfolio, Evidence, Journal, Capture, Wins, Journey, Reports | Growth, Content, Business, LIG |
+| **Gallery memory** | `gallery-memory` | `lib/gallery/` — experiential wall frames (curated from growth + asset library) | Narrative, Growth, Environmental Experience |
+| **Peaceful place** | `peaceful-place` | `lib/peacefulPlaces/` — immersive estate destinations (Covered Deck™, Cozy Café™, Nature Escape™, etc.) with workspace-safe zones, layered audio spec, image brief | Environment, Recovery, Narrative, Companion Presence |
+| **Garden banner menu item** | `garden-menu-destination` | `lib/peacefulPlaces/gardenBannerMenu.ts` — curated cloth-tag menus per path sign; future Arrival may warm-glow a recommended banner without forcing navigation | Arrival, Companion Presence, Recovery |
 | **Offer** | `offer` | Product / service definitions | Offer, Audience, Opportunity |
 | **Automation rule** | `automation` | GHL / workflow hooks | Automation, Business |
 
@@ -105,6 +112,11 @@ If any answer is "unknown" — redesign before shipping.
 | **Audience Intelligence** | Avatars, business profile | Client avatar, profile | Messaging, offers |
 | **Offer Intelligence** | Opportunity + business | Offer (planned), avatar | Opportunity engine |
 | **Environment Intelligence** | `lib/environment-intelligence/` | Day state, workspace context | Environment scoring |
+| **Environmental Experience Intelligence** | `lib/gallery/environmentExperience.ts` | Gallery visit, season, time, weather | Estate atmosphere, lighting, audio layers |
+| **Homestead Room Architecture** | `lib/companionHomestead/homesteadRoomRegistry.ts` | App section, place id, room shell | Permanent background + signature motion per room |
+| **Gallery Demo Mode** | `lib/gallery/galleryDemoMode.ts`, `galleryDemoCatalog.ts` | Scripted journey scenes (no user PII) | Demo exhibitions only |
+| **Gallery Curator Intelligence** | `lib/gallery/galleryCuratorIntelligence.ts` | Gallery memory archive, signals, rotation | Today's visible exhibition (12–20) |
+| **Reflection Intelligence** | `lib/gallery/galleryReflectionIntelligence.ts` | Journal entries (private) | Wall wisdom — meaning without copied text |
 | **Clear My Mind Intelligence** | `lib/clearMyMindIntelligence.ts` | Capture sessions, thoughts | LIG ingest (silent) |
 | **Relief Intelligence** | `lib/reliefIntelligence.ts` | Capture behavior signals (voice, rhythm, return) | Companion voice tone only — never UI |
 | **Ecosystem Intelligence** | `lib/ecosystemIntelligence.ts` | Cross-domain snapshot | Whole-system insight |
@@ -112,7 +124,22 @@ If any answer is "unknown" — redesign before shipping.
 
 ---
 
-## Relationship map (high level)
+## Homestead rooms (companion home)
+
+Canonical catalog: `lib/companionHomestead/homesteadRoomRegistry.ts` → `COMPANION_HOMESTEAD_ROOMS`
+
+| Room | Purpose | Background | Signature motion | Sections |
+|------|---------|------------|------------------|----------|
+| Living Room | Everyday conversation | Cozy room + window (homestead scene) | Time-of-day lighting | `home`, `today`, `welcome-room` |
+| Sunroom | Focus My Brain | Butterfly video + plants | Butterflies drifting | `focus` |
+| Game Room | Momentum Games | Game room plate | Playful ambient | `games`, `activities` |
+| Library | Learning | Warm bookshelves / reading nook | Dust motes, page-turn | `how-do-i` |
+| Study | Planning | Elegant office | Morning light on desk | `plan-my-day`, `time-block` |
+| Peaceful Places | Regulation | Chosen destination | Nature-specific (rain, waves, leaves, snow) | `focus-audio`, `breathe` |
+
+Living Room lighting: `lib/homesteadScene/`. Signature motion layers: `HomesteadRoomSignatureMotion` + `homestead-room-motion.css`.
+
+---
 
 ```
 Thought ──collection──► Collection
@@ -148,7 +175,7 @@ FounderEvent ──refs──────► Project | Thought | Workspace
 | `lib/intelligence-layer/signalStore` | `intelligence-signal` |
 | `companion-living-graph-arrivals-v1` | LIG arrival slice |
 | `lib/ecosystem/events` | `founder-event` |
-| `life-area` | `companion-user-life-areas-v1`, `companion-life-area-learning-v1` |
+| `lib/gallery/` (planned persistence) | `gallery-memory`, gallery visit state |
 
 ### Life Area Intelligence (`classifyLifeArea`)
 

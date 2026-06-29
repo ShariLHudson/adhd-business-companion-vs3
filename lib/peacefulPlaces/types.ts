@@ -1,7 +1,14 @@
 import type { IntelligenceReadyHooks } from "@/lib/intelligence/intelligenceReadyTypes";
 
 /** Estate destination — not a playlist. */
-export type PeacefulPlaceId = "summer-storm-covered-deck" | "cozy-cafe";
+export type PeacefulPlaceId =
+  | "summer-storm-covered-deck"
+  | "cozy-cafe"
+  | "nature-escape"
+  | "east-terrace"
+  | "bright-studio"
+  | "bedroom-window"
+  | "evening-hearth";
 
 export type PeacefulPlaceAudioLayerRole =
   | "primary"

@@ -109,4 +109,19 @@ describe("adjustMyDay", () => {
     expect(summary).toContain("📋 Make A Plan");
     expect(summary).toContain("Big meeting at 3.");
   });
+
+  it("omits help line from summary when user skipped help need", () => {
+    const state: DayState = {
+      energy: "medium",
+      overwhelm: "medium",
+      energyLevel: "doing-okay",
+      motivationLevel: "get-it-done",
+      needs: [],
+      setAt: new Date().toISOString(),
+    };
+    const summary = dayStateSummary(state);
+    expect(summary).not.toContain("Would help most");
+    expect(summary).toContain("Energy:");
+    expect(summary).toContain("Motivation:");
+  });
 });

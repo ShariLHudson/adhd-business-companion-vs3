@@ -56,7 +56,7 @@ export function homeChromeForState(state: CompanionHomeState): HomeChromeConfig 
         layout: "welcome-scene",
         conversationInput: true,
         autoFocusInput: false,
-        softenBackground: true,
+        softenBackground: false,
       };
     case "RETURNING_ACTIVE":
       return {
@@ -64,7 +64,7 @@ export function homeChromeForState(state: CompanionHomeState): HomeChromeConfig 
         layout: "welcome-scene",
         conversationInput: false,
         autoFocusInput: false,
-        softenBackground: true,
+        softenBackground: false,
       };
     case "QUIET_PRESENCE":
       return {
@@ -72,7 +72,7 @@ export function homeChromeForState(state: CompanionHomeState): HomeChromeConfig 
         layout: "welcome-scene",
         conversationInput: true,
         autoFocusInput: false,
-        softenBackground: true,
+        softenBackground: false,
       };
   }
 }

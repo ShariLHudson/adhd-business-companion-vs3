@@ -1,31 +1,29 @@
 import { describe, expect, it } from "vitest";
 import { COMPANION_PROPERTY_NAV } from "./companionPropertyNav";
+import {
+  HOMESTEAD_OTHER_DROPDOWN_ITEMS,
+  HOMESTEAD_SIGNPOST_DESTINATIONS,
+} from "./homesteadSignpost";
 import { MORE_NAV, SIDEBAR_NAV } from "./companionUi";
 
 describe("sidebar navigation", () => {
-  it("uses grouped property navigation instead of flat SIDEBAR_NAV", () => {
+  it("uses five homestead signpost destinations only in the sidebar", () => {
     expect(SIDEBAR_NAV).toEqual([]);
-    const groupLabels = COMPANION_PROPERTY_NAV.map((group) => group.label);
-    expect(groupLabels).toEqual([
-      "Core",
-      "Create + Think",
-      "Grow",
-      "Peaceful Places",
+    expect(HOMESTEAD_SIGNPOST_DESTINATIONS.map((item) => item.label)).toEqual([
+      "Home",
+      "Focus My Brain",
+      "Create",
+      "Growth",
+      "Other",
     ]);
-    const growIds = COMPANION_PROPERTY_NAV.find((g) => g.id === "grow")?.items.map(
-      (item) => item.id,
-    );
-    expect(growIds).toEqual([
-      "growth",
-      "journal",
-      "portfolio",
-      "evidence-bank",
-      "confidence-vault",
+    expect(HOMESTEAD_OTHER_DROPDOWN_ITEMS.map((item) => item.label)).toEqual([
+      "Welcome Room",
+      "How Do I?",
+      "Strategies",
+      "Visual Thinking",
     ]);
-    const peacefulIds = COMPANION_PROPERTY_NAV.find(
-      (g) => g.id === "peaceful",
-    )?.items.map((item) => item.id);
-    expect(peacefulIds?.[0]).toBe("welcome-room");
+    const allItems = COMPANION_PROPERTY_NAV.flatMap((group) => group.items);
+    expect(allItems).toHaveLength(5);
   });
 
   it("does not expose More menu or Settings in the sidebar", () => {
@@ -34,9 +32,9 @@ describe("sidebar navigation", () => {
       group.items.map((item) => item.id),
     );
     expect(allIds.some((id) => id === "settings")).toBe(false);
-    expect(allIds.some((id) => id === "welcome-room")).toBe(true);
-    expect(allIds.some((id) => id === "growth")).toBe(true);
-    expect(allIds.some((id) => id === "create")).toBe(true);
-    expect(allIds.some((id) => id === "playbook")).toBe(true);
+    expect(allIds).toEqual(["chat", "focus", "create", "growth", "other"]);
+    expect(allIds.some((id) => id === "clear-my-mind")).toBe(false);
+    expect(allIds.some((id) => id === "welcome-room")).toBe(false);
+    expect(allIds.some((id) => id === "how-do-i")).toBe(false);
   });
 });

@@ -30,7 +30,7 @@ const WELCOME_CONTEXT: ImageContextEntry[] = [
   {
     id: "shari-i-am-here-2",
     filePath: "shari-i-am-here-2.png",
-    timeOfDay: ["morning", "afternoon", "evening"],
+    timeOfDay: ["morning", "afternoon"],
     seasons: ["spring", "summer", "autumn", "winter", "holiday"],
     emotionalTone: ["warm", "gentle"],
     useCases: ["first welcome", "quiet presence", "gentle day"],
@@ -41,7 +41,7 @@ const WELCOME_CONTEXT: ImageContextEntry[] = [
   {
     id: "shari-i-am-here",
     filePath: "shari-i-am-here.png",
-    timeOfDay: ["morning", "afternoon", "evening"],
+    timeOfDay: ["morning", "afternoon"],
     seasons: ["spring", "summer", "autumn", "winter", "holiday"],
     emotionalTone: ["warm", "gentle"],
     useCases: ["living room welcome", "room scene", "quiet presence"],

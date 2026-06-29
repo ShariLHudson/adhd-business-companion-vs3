@@ -1,21 +1,46 @@
 "use client";
 
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import {
-  PEACEFUL_PLACES_PATHWAY_BG,
-  PEACEFUL_PLACES_SUBTITLE,
-} from "@/lib/peacefulPlaces";
+import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
 import { resolvePeacefulPlacesGardenAtmosphere } from "@/lib/peacefulPlaces/gardenAtmosphere";
+import { PEACEFUL_PLACES_PATHWAY_BG } from "@/lib/peacefulPlaces/pathway";
+import { PeacefulPlacesHeader } from "./PeacefulPlacesHeader";
+
+function usePeacefulPlacesPathwayPreload() {
+  useEffect(() => {
+    const existing = document.querySelector(
+      'link[data-peaceful-places-pathway-preload="1"]',
+    );
+    if (existing) return;
+
+    const link = document.createElement("link");
+    link.rel = "preload";
+    link.as = "image";
+    link.href = PEACEFUL_PLACES_PATHWAY_BG;
+    link.setAttribute("data-peaceful-places-pathway-preload", "1");
+    document.head.appendChild(link);
+
+    return () => {
+      link.remove();
+    };
+  }, []);
+}
 
 type Props = {
   children: ReactNode;
-  /** Title and signs are baked into the pathway photograph — lighten overlays only. */
+  /** Title and signs are baked into the pathway photograph — mute and overlay CSS title. */
   bakedInTitle?: boolean;
   /** Hide baked-in lamppost signs so interactive CSS signs can sit on top. */
   maskBakedSigns?: boolean;
   /** Play the garden-path arrival sequence when entering from home. */
   arrivalActive?: boolean;
   onArrivalComplete?: () => void;
+  /** Hovered garden flag — subtle lantern and flower response. */
+  flagHover?: string | null;
+  flagHoverSide?: "left" | "right" | null;
+  /** Walking toward a selected destination. */
+  pathWalking?: boolean;
+  pathDeparting?: boolean;
 };
 
 /**
@@ -27,7 +52,12 @@ export function PeacefulPlacesLandingShell({
   maskBakedSigns = false,
   arrivalActive = false,
   onArrivalComplete,
+  flagHover = null,
+  flagHoverSide = null,
+  pathWalking = false,
+  pathDeparting = false,
 }: Props) {
+  usePeacefulPlacesPathwayPreload();
   const atmosphere = useMemo(() => resolvePeacefulPlacesGardenAtmosphere(), []);
   const [arrivalPhase, setArrivalPhase] = useState(arrivalActive ? "entering" : "idle");
 
@@ -54,11 +84,19 @@ export function PeacefulPlacesLandingShell({
       data-garden-season={atmosphere.season}
       data-lantern-glow={atmosphere.lanternGlow ? "1" : undefined}
       data-arrival={arrivalPhase !== "idle" ? arrivalPhase : undefined}
+      data-flag-hover={flagHover ?? undefined}
+      data-flag-hover-side={flagHoverSide ?? undefined}
+      data-garden-walk={pathWalking ? "1" : undefined}
+      data-garden-depart={pathDeparting ? "1" : undefined}
     >
       <div className="peaceful-places-landing__estate" aria-hidden="true">
-        <div
-          className="peaceful-places-landing__estate-image"
-          style={{ backgroundImage: `url('${PEACEFUL_PLACES_PATHWAY_BG}')` }}
+        <CinematicBackground
+          preset="peaceful-places"
+          mode="image"
+          imageUrl={PEACEFUL_PLACES_PATHWAY_BG}
+          placement="fixed"
+          className="peaceful-places-landing__cinematic"
+          mediaClassName="peaceful-places-landing__estate-image"
         />
         <div className="peaceful-places-landing__estate-light" />
         <div className="peaceful-places-landing__sun-rays" />
@@ -82,9 +120,7 @@ export function PeacefulPlacesLandingShell({
         ) : null}
       </div>
 
-      {bakedInTitle ? (
-        <p className="peaceful-places-landing__invitation">{PEACEFUL_PLACES_SUBTITLE}</p>
-      ) : null}
+      {bakedInTitle ? <PeacefulPlacesHeader /> : null}
 
       <div className="peaceful-places-landing__content">{children}</div>
     </div>

@@ -40,7 +40,11 @@ const QA_CASES: Array<{
   opts?: { isYesContinuation?: boolean; hasPendingFrictionless?: boolean };
 }> = [
   {
-    label: "learn — sales funnel",
+    label: "greeting — hi",
+    userText: "hi",
+    expectedRoute: "instant",
+  },
+  {
     userText: "What is a sales funnel?",
     expectedRoute: "fast",
   },

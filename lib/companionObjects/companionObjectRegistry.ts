@@ -70,13 +70,13 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
   }),
   obj({
     id: "focus-audio",
-    label: "Focus Audio",
-    feature: "Focus Audio",
+    label: "Peaceful Places",
+    feature: "Peaceful Places",
     replacesEmoji: "🎧",
     room: "focus-studio",
-    objectName: "Premium headphones",
-    description: "Soundscapes and saved audio for focus and calm.",
-    emotionalPurpose: "Support regulation without leaving the homestead.",
+    objectName: "Estate directory",
+    description: "Estate destinations where you can spend a little time.",
+    emotionalPurpose: "Offer shelter and restoration without leaving the homestead.",
   }),
   obj({
     id: "breathing",
@@ -266,6 +266,42 @@ export const COMPANION_OBJECT_REGISTRY: readonly CompanionObject[] = [
     objectName: "Open guidebook",
     description: "How-to walkthroughs and feature guidance.",
     emotionalPurpose: "Explain before opening — never surprise-route.",
+  }),
+  obj({
+    id: "journal",
+    label: "Journal",
+    feature: "Journal",
+    room: "window-seat",
+    objectName: "Open journal with fountain pen",
+    description: "Reflective writing at a calm pace.",
+    emotionalPurpose: "Hold thoughts with care — no performance.",
+  }),
+  obj({
+    id: "voice",
+    label: "Voice Reflection",
+    feature: "Voice Note",
+    room: "living-room",
+    objectName: "Small table microphone",
+    description: "Speak thoughts when typing feels like too much.",
+    emotionalPurpose: "Let the voice land gently.",
+  }),
+  obj({
+    id: "community",
+    label: "Community",
+    feature: "Community",
+    room: "living-room",
+    objectName: "Circle of comfortable chairs",
+    description: "Belonging without social-media noise.",
+    emotionalPurpose: "Feel invited — not evaluated.",
+  }),
+  obj({
+    id: "support",
+    label: "Support",
+    feature: "Support",
+    room: "living-room",
+    objectName: "Clasped hands",
+    description: "Human support when things feel heavy.",
+    emotionalPurpose: "Offer warmth — not a ticket queue.",
   }),
   // ── Focus & momentum variants ───────────────────────────────────────────
   obj({
@@ -495,6 +531,8 @@ export const GROWTH_SECTION_OBJECT_ID: Record<string, string> = {
   "evidence-bank": "evidence-bank",
   "confidence-vault": "my-highlights",
   "my-journey": "growth",
+  "growth-journal": "journal",
+  "growth-portfolio": "create",
 };
 
 /** New project source picker */

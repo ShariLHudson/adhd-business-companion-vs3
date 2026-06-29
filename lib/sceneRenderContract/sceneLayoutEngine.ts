@@ -3,7 +3,12 @@
  * Does not decide room, place, background, or Shari presence.
  */
 
-import type { ResolvedScene, SceneLayout } from "./types";
+import {
+  cinematicFramingToCssVars,
+  resolveCinematicPreset,
+  type CinematicPresetId,
+} from "@/lib/cinematicBackground";
+import type { ResolvedScene, SceneLayout, SceneWorkspaceId } from "./types";
 import {
   evaluateRoomComposition,
   LIVING_FRAME_CLASS,
@@ -19,6 +24,18 @@ export const SCENE_MOTION_CLASS = "companion-scene-motion";
 export const SCENE_CENTER_CLASS = "companion-scene-center";
 export const SCENE_PANEL_CLASS = "companion-scene-panel";
 export const SCENE_HEADER_CLASS = "companion-scene-header";
+
+const CINEMATIC_PRESET_BY_WORKSPACE: Partial<
+  Record<SceneWorkspaceId, CinematicPresetId>
+> = {
+  "clear-my-mind": "clear-my-mind",
+  "clear-my-mind-thoughts": "clear-my-mind-thoughts",
+  "plan-my-day": "plan-my-day",
+  "life-experience-room": "life-evidence",
+  "focus-hub": "focus-my-brain",
+  "focus-category": "focus-my-brain",
+  default: "home",
+};
 
 const FROSTED_BY_MODE: Record<ResolvedScene["background"]["mode"], number> = {
   "homestead-room": 0.52,
@@ -54,11 +71,20 @@ export function layoutScene(resolved: ResolvedScene): SceneLayout {
   const frostedOpacity =
     composition.panelFrostedOpacity ?? FROSTED_BY_MODE[background.mode];
 
+  const cinematicBase = resolveCinematicPreset(
+    CINEMATIC_PRESET_BY_WORKSPACE[resolved.workspaceId] ?? "default",
+  );
+  const imagePosition =
+    composition.backgroundObjectPosition ??
+    background.objectPosition ??
+    cinematicBase.position;
+
   const cssVars: Record<string, string> = {
+    ...cinematicFramingToCssVars({
+      ...cinematicBase,
+      position: imagePosition,
+    }),
     "--scene-image-dominance": String(dominance),
-    "--scene-image-scale": "1",
-    "--scene-image-position":
-      composition.backgroundObjectPosition ?? background.objectPosition,
     "--scene-overlay": background.overlay,
     "--scene-panel-frosted-opacity": String(frostedOpacity),
     "--scene-center-max-width":

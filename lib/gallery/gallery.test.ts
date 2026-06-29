@@ -79,13 +79,13 @@ describe("Gallery destinations", () => {
     );
     expect(GALLERY_DESTINATION_ACTIONS.journal).toEqual({
       kind: "open-section",
-      section: "my-journey",
-      nav: "growth",
+      section: "growth-journal",
+      nav: "journal",
     });
     expect(GALLERY_DESTINATION_ACTIONS.portfolio).toEqual({
       kind: "open-section",
-      section: "saved-work",
-      nav: "other",
+      section: "growth-portfolio",
+      nav: "portfolio",
     });
     expect(GALLERY_DESTINATION_ACTIONS["evidence-bank"]).toEqual({
       kind: "open-section",
@@ -101,8 +101,9 @@ describe("Gallery destinations", () => {
 });
 
 describe("Growth hub routing bridge", () => {
-  it("replaces legacy growth hub with The Gallery", () => {
-    expect(resolveGrowthHubSection("growth")).toBe("the-gallery");
+  it("keeps the growth hub section distinct from Asset Library", () => {
+    expect(resolveGrowthHubSection("growth")).toBe("growth");
+    expect(resolveGrowthHubSection("the-gallery")).toBe("the-gallery");
     expect(resolveGrowthHubSection("evidence-bank")).toBe("evidence-bank");
   });
 

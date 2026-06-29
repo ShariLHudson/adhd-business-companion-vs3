@@ -29,7 +29,7 @@ export const GALLERY_BOTTOM_PLAQUES: readonly GalleryBrassPlaque[] = [
 ] as const;
 
 export const GALLERY_INSCRIPTION =
-  "A walk through your journey" as const;
+  "Store once · reference everywhere" as const;
 
 export const GALLERY_FOYER_ENTER_LABEL = "Enter the hallway" as const;
 

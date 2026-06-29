@@ -13,13 +13,13 @@ export const GALLERY_DESTINATION_ACTIONS: Record<
   "continue-walking": { kind: "resume-walk" },
   journal: {
     kind: "open-section",
-    section: "my-journey",
-    nav: "growth",
+    section: "growth-journal",
+    nav: "journal",
   },
   portfolio: {
     kind: "open-section",
-    section: "saved-work",
-    nav: "other",
+    section: "growth-portfolio",
+    nav: "portfolio",
   },
   "evidence-bank": {
     kind: "open-section",

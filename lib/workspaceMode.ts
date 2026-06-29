@@ -44,6 +44,8 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
   "evidence-bank",
   "growth",
   "confidence-vault",
+  "growth-journal",
+  "growth-portfolio",
   "visual-focus",
   "welcome-room",
 ];
@@ -51,6 +53,7 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
 export const STANDALONE_SECTIONS: AppSection[] = [
   "brain-dump",
   "life-experience",
+  "the-gallery",
   "plan-my-day",
   "breathe",
   "focus",
@@ -87,12 +90,15 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "visual-focus": "Visual Thinking",
   "wins-this-week": "Wins This Week",
   "evidence-bank": "Evidence Bank",
-  growth: "Growth",
-  "confidence-vault": "My Highlights",
+  growth: "Asset Library",
+  "confidence-vault": "Highlights",
   "my-journey": "My Journey",
+  "growth-journal": "Journal",
+  "growth-portfolio": "Portfolio",
   "welcome-room": "Welcome Room",
   "life-experience": "Life Experience Room",
-  "focus-audio": "Focus Audio",
+  "the-gallery": "Asset Library",
+  "focus-audio": "Peaceful Places",
   "focus-timer": "Focus",
   settings: "Settings",
   profile: "Profile",
@@ -111,7 +117,7 @@ const EXTRA_AREA_TITLES: Partial<Record<AppSection, string>> = {
   activities: "Activities",
   "guided-exercises": "Guided Exercises",
   "spin-wheel": "Spin Wheel",
-  games: "Games",
+  games: "Momentum Builders",
   "content-types": "Content Types",
   breathe: "Breathe",
 };
@@ -356,7 +362,7 @@ export function detectAudioIntent(text: string): WorkspaceOffer | null {
   if (!isAudio) return null;
   return {
     section: "focus-audio",
-    buttonLabel: "Open Focus Audio",
+    buttonLabel: "Open Peaceful Places",
     line: audioSuggestionLine(categoryId),
   };
 }

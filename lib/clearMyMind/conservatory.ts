@@ -1,5 +1,5 @@
 /** Garden Conservatory — Clear My Mind room background. */
-export const CLEAR_MY_MIND_CONSERVATORY_BG_VERSION = "20260628d" as const;
+export const CLEAR_MY_MIND_CONSERVATORY_BG_VERSION = "20260628e" as const;
 
 export const CLEAR_MY_MIND_CONSERVATORY_BG =
   `/backgrounds/clear-my-mind-background.png?v=${CLEAR_MY_MIND_CONSERVATORY_BG_VERSION}` as const;

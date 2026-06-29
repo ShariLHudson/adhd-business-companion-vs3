@@ -27,8 +27,21 @@ export type GalleryWallMemory = GalleryMemory & {
   accent?: "flowers" | "quiet-rotate";
 };
 
+const SEED_CREATED = "2026-01-01T00:00:00.000Z";
+
+function seedWallMemory(
+  memory: Omit<GalleryWallMemory, "createdAt" | "title"> &
+    Partial<Pick<GalleryWallMemory, "createdAt" | "title">>,
+): GalleryWallMemory {
+  return {
+    ...memory,
+    createdAt: memory.createdAt ?? SEED_CREATED,
+    title: memory.title ?? "",
+  };
+}
+
 const SEED_WALL_MEMORIES: readonly GalleryWallMemory[] = [
-  {
+  seedWallMemory({
     id: "gallery-welcome-quote",
     kind: "quote",
     walkPosition: 0.1,
@@ -37,8 +50,8 @@ const SEED_WALL_MEMORIES: readonly GalleryWallMemory[] = [
     variant: "quote",
     title: GALLERY_BEGINNING_WALL_COPY.welcomeQuote,
     plaque: "Welcome",
-  },
-  {
+  }),
+  seedWallMemory({
     id: "gallery-journey-botanical",
     kind: "personal-photo",
     walkPosition: 0.16,
@@ -46,8 +59,8 @@ const SEED_WALL_MEMORIES: readonly GalleryWallMemory[] = [
     wallTopPercent: 30,
     variant: "botanical",
     plaque: "The Journey Begins",
-  },
-  {
+  }),
+  seedWallMemory({
     id: "gallery-still-being-written",
     kind: "milestone",
     walkPosition: 0.28,
@@ -55,8 +68,8 @@ const SEED_WALL_MEMORIES: readonly GalleryWallMemory[] = [
     wallTopPercent: 29,
     variant: "empty",
     plaque: GALLERY_BEGINNING_WALL_COPY.emptyFramePlaque,
-  },
-  {
+  }),
+  seedWallMemory({
     id: "gallery-small-steps",
     kind: "quote",
     walkPosition: 0.36,
@@ -64,8 +77,8 @@ const SEED_WALL_MEMORIES: readonly GalleryWallMemory[] = [
     wallTopPercent: 32,
     variant: "quote",
     body: "Progress is built one small step at a time.",
-  },
-  {
+  }),
+  seedWallMemory({
     id: "gallery-first-win",
     kind: "achievement",
     walkPosition: 0.48,
@@ -75,8 +88,8 @@ const SEED_WALL_MEMORIES: readonly GalleryWallMemory[] = [
     title: "First win remembered",
     subtitle: "Evidence Bank",
     plaque: "Growing",
-  },
-  {
+  }),
+  seedWallMemory({
     id: "gallery-proof-frame",
     kind: "testimonial",
     walkPosition: 0.58,
@@ -86,8 +99,8 @@ const SEED_WALL_MEMORIES: readonly GalleryWallMemory[] = [
     title: "Proof on the wall",
     subtitle: "Highlights & Evidence",
     plaque: "Confidence",
-  },
-  {
+  }),
+  seedWallMemory({
     id: "gallery-published-work",
     kind: "published-work",
     walkPosition: 0.7,
@@ -96,8 +109,8 @@ const SEED_WALL_MEMORIES: readonly GalleryWallMemory[] = [
     variant: "milestone",
     title: "Published work",
     plaque: "Portfolio",
-  },
-  {
+  }),
+  seedWallMemory({
     id: "gallery-reflection-branch",
     kind: "journal-entry",
     walkPosition: 0.82,
@@ -106,8 +119,8 @@ const SEED_WALL_MEMORIES: readonly GalleryWallMemory[] = [
     variant: "quote",
     body: "Quiet reflection lives just ahead.",
     plaque: "Journal",
-  },
-] as const;
+  }),
+];
 
 /** Wall items sorted along the stroll — demo curator or seed memories. */
 export function resolveGalleryWallMemories(

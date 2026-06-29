@@ -39,7 +39,7 @@ export function HelpNeedDropdown({
 
   const display = value
     ? labelForHelpNeed(value)
-    : "Select what would help…";
+    : "Skip for now, or pick what would help…";
 
   return (
     <div ref={rootRef} className={`relative ${className}`}>
@@ -74,6 +74,21 @@ export function HelpNeedDropdown({
             aria-labelledby={id}
             className="max-h-56 overflow-y-auto py-1"
           >
+            {value ? (
+              <li role="option">
+                <button
+                  type="button"
+                  onClick={() => {
+                    onChange("");
+                    setOpen(false);
+                    setSearch("");
+                  }}
+                  className="w-full px-3 py-2.5 text-left text-sm font-medium text-[#9a8f82] transition-colors hover:bg-[#1e4f4f]/8"
+                >
+                  Skip for now
+                </button>
+              </li>
+            ) : null}
             {options.length === 0 ? (
               <li className="px-3 py-2 text-sm text-[#9a8f82]">No matches</li>
             ) : (

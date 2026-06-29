@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 52" preserveAspectRatio="xMidYMid meet">
+  <defs>
+    <linearGradient id="wood" x1="0%" x2="0%" y1="0%" y2="100%">
+      <stop offset="0%"   stop-color="#3a2e1a"/>
+      <stop offset="18%"  stop-color="#2e2412"/>
+      <stop offset="50%"  stop-color="#261e0e"/>
+      <stop offset="82%"  stop-color="#1e1808"/>
+      <stop offset="100%" stop-color="#160e04"/>
+    </linearGradient>
+    <linearGradient id="goldEdge" x1="0%" x2="0%" y1="0%" y2="100%">
+      <stop offset="0%"   stop-color="#a88840"/>
+      <stop offset="50%"  stop-color="#c8a850"/>
+      <stop offset="100%" stop-color="#886820"/>
+    </linearGradient>
+    <linearGradient id="woodActive" x1="0%" x2="0%" y1="0%" y2="100%">
+      <stop offset="0%"   stop-color="#7a5e28"/>
+      <stop offset="35%"  stop-color="#6a5020"/>
+      <stop offset="100%" stop-color="#4a3810"/>
+    </linearGradient>
+    <filter id="signShadow">
+      <feDropShadow dx="0" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.55"/>
+    </filter>
+  </defs>
+  <!-- Sign board shape with decorative notched ends (matching Peaceful Places style) -->
+  <!-- The path describes: rectangular body with pointed/notched ends -->
+  <path d="
+    M 28,2
+    L 192,2
+    C 206,2 218,10 218,26
+    C 218,42 206,50 192,50
+    L 28,50
+    C 14,50 2,42 2,26
+    C 2,10 14,2 28,2
+    Z
+  " fill="url(#wood)" stroke="url(#goldEdge)" stroke-width="1.5" filter="url(#signShadow)"/>
+  <!-- Top highlight line -->
+  <path d="M 30,4 L 190,4 C 202,4 215,11 215,26"
+        stroke="rgba(255,230,140,0.18)" stroke-width="1" fill="none"/>
+  <!-- Bottom shadow line -->
+  <path d="M 30,48 L 190,48 C 202,48 215,41 215,26"
+        stroke="rgba(0,0,0,0.4)" stroke-width="1" fill="none"/>
+  <!-- Gold inner border inset -->
+  <path d="
+    M 30,7
+    L 190,7
+    C 203,7 213,15 213,26
+    C 213,37 203,45 190,45
+    L 30,45
+    C 17,45 7,37 7,26
+    C 7,15 17,7 30,7
+    Z
+  " fill="none" stroke="rgba(200,168,80,0.35)" stroke-width="1"/>
+</svg>

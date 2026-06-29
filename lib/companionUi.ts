@@ -39,6 +39,8 @@ export type AppSection =
   | "growth"
   | "confidence-vault"
   | "my-journey"
+  | "growth-journal"
+  | "growth-portfolio"
   | "welcome-room"
   | "life-experience"
   | "the-gallery";
@@ -143,7 +145,9 @@ export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
   create: "content-generator",
   "how-do-i": "how-do-i",
   playbook: "playbook",
-  growth: "the-gallery",
+  growth: "growth",
+  journal: "growth-journal",
+  portfolio: "growth-portfolio",
   "evidence-bank": "evidence-bank",
   "confidence-vault": "confidence-vault",
   "welcome-room": "welcome-room",
@@ -159,6 +163,14 @@ export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
 /** Map legacy or sub-area nav ids to a primary sidebar door. */
 export function normalizeSidebarNav(nav: SidebarNavId): SidebarNavId {
   if (nav === "create" || nav === "my-work") return "other";
+  if (
+    nav === "how-do-i" ||
+    nav === "playbook" ||
+    nav === "visual-thinking" ||
+    nav === "welcome-room"
+  ) {
+    return "other";
+  }
   if (
     nav === "projects" ||
     nav === "templates" ||
@@ -190,9 +202,10 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "content-generator":
       return "create";
     case "playbook":
-      return "playbook";
+    case "how-do-i":
     case "visual-focus":
-      return "visual-thinking";
+    case "welcome-room":
+      return "other";
     case "brain-dump":
       return "clear-my-mind";
     case "plan-my-day":
@@ -216,12 +229,12 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
       return "confidence-vault";
     case "wins-this-week":
     case "my-journey":
+    case "growth-journal":
+      return "journal";
+    case "growth-portfolio":
+      return "portfolio";
     case "life-experience":
       return "growth";
-    case "how-do-i":
-      return "how-do-i";
-    case "welcome-room":
-      return "welcome-room";
     case "home":
     case "today":
       return "chat";

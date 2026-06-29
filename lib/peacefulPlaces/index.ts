@@ -17,6 +17,26 @@ export {
   COZY_CAFE_PEACEFUL_PLACES_BG_VERSION,
 } from "./cozyCafePeacefulPlace";
 export {
+  NATURE_ESCAPE,
+  NATURE_ESCAPE_IMAGE,
+  NATURE_ESCAPE_IMAGE_VERSION,
+} from "./natureEscapePeacefulPlace";
+export {
+  EAST_TERRACE,
+  EAST_TERRACE_IMAGE,
+  EAST_TERRACE_IMAGE_VERSION,
+} from "./eastTerracePeacefulPlace";
+export {
+  BRIGHT_STUDIO,
+  BRIGHT_STUDIO_IMAGE,
+  BRIGHT_STUDIO_IMAGE_VERSION,
+} from "./brightStudioPeacefulPlace";
+export {
+  BEDROOM_WINDOW,
+  BEDROOM_WINDOW_IMAGE,
+  BEDROOM_WINDOW_IMAGE_VERSION,
+} from "./bedroomWindowPeacefulPlace";
+export {
   PEACEFUL_PLACE_DESTINATIONS,
   peacefulPlaceDestinationById,
   peacefulPlaceDestinationBySoundscapeId,
@@ -43,8 +63,9 @@ export type { PathwaySignAnchor } from "./pathwaySignAnchors";
 export {
   ESTATE_LEFT_SIGNS,
   ESTATE_RIGHT_SIGNS,
+  PATHWAY_GARDEN_STAKES,
 } from "./signpostLayout";
-export type { EstateHangingSign, EstateSignId } from "./signpostLayout";
+export type { EstateHangingSign, EstateSignId, PathwayGardenStake } from "./signpostLayout";
 export {
   DEFAULT_DESTINATION_THUMBNAIL,
   MY_PLACE_THUMBNAIL,

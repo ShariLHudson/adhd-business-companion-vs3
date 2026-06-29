@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+import { pickChatPlaceholder } from "@/lib/chatCanvas/chatPlaceholders";
 import { INPUT_PLACEHOLDER } from "@/lib/companionUi";
 import { COMMUNICATION_ANCHOR_TEST_IDS } from "@/lib/companionCommunicationAnchor";
 
@@ -16,7 +18,6 @@ type ChatInputBarProps = {
   placeholder?: string;
   onFocus?: () => void;
   onBlur?: () => void;
-  /** Softer styling when the input continues a companion-led conversation. */
   conversationMode?: boolean;
 };
 
@@ -30,20 +31,27 @@ export function ChatInputBar({
   onKeyDown,
   onToggleListening,
   onSend,
-  placeholder = INPUT_PLACEHOLDER,
+  placeholder,
   onFocus,
   onBlur,
   conversationMode = false,
 }: ChatInputBarProps) {
+  const resolvedPlaceholder = useMemo(() => {
+    if (placeholder) return placeholder;
+    if (INPUT_PLACEHOLDER) return INPUT_PLACEHOLDER;
+    return pickChatPlaceholder();
+  }, [placeholder]);
+
   return (
     <div
-      className={`input-glass flex items-end gap-2 rounded-[2rem] p-2 sm:gap-3 sm:p-2.5 ${
+      className={`companion-chat-input input-glass flex items-end gap-2 rounded-[2rem] p-2 sm:gap-3 sm:p-2.5 ${
         conversationMode ? "input-glass-conversation" : ""
       }`}
     >
       <button
         type="button"
         data-testid={COMMUNICATION_ANCHOR_TEST_IDS.mic}
+        data-icon-slot="voice-input"
         onClick={onToggleListening}
         disabled={!speechSupported || isLoading}
         aria-label={isListening ? "Stop listening" : "Voice input"}
@@ -51,10 +59,10 @@ export function ChatInputBar({
         title={
           speechSupported ? "Voice input" : "Voice not supported in this browser"
         }
-        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
+        className={`companion-chat-input__icon-slot flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
           isListening
             ? "mic-active bg-[#1e4f4f] text-white shadow-lg"
-            : "bg-[#f5f0e8] text-[#1e4f4f] hover:bg-[#eef5f5]"
+            : "bg-[#f5f0e8] text-[#1e4f4f] hover:bg-[#efe8de]"
         }`}
       >
         <svg
@@ -63,6 +71,7 @@ export function ChatInputBar({
           fill="currentColor"
           className="h-6 w-6"
           aria-hidden="true"
+          data-temp-icon="microphone"
         >
           <path d="M12 14a3 3 0 0 0 3-3V5a3 3 0 1 0-6 0v6a3 3 0 0 0 3 3Z" />
           <path d="M19 11a1 1 0 1 0-2 0 5 5 0 0 1-10 0 1 1 0 1 0-2 0 7 7 0 0 0 6 6.92V21H9a1 1 0 1 0 0 2h6a1 1 0 1 0 0-2h-2v-3.08A7 7 0 0 0 19 11Z" />
@@ -77,19 +86,16 @@ export function ChatInputBar({
         onKeyDown={onKeyDown}
         onFocus={onFocus}
         onBlur={onBlur}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         rows={1}
         disabled={isLoading}
-        className={`max-h-32 min-h-12 flex-1 resize-none border-0 bg-transparent px-2 py-3 text-lg leading-relaxed text-[#1f1c19] focus:outline-none disabled:opacity-50 ${
-          conversationMode
-            ? "placeholder:text-[#8a8178] placeholder:italic"
-            : "placeholder:text-[#6b635a]"
-        }`}
+        className="max-h-32 min-h-12 flex-1 resize-none border-0 bg-transparent px-2 py-3 text-base leading-relaxed text-[#1f1c19] focus:outline-none disabled:opacity-50"
       />
 
       <button
         type="button"
         data-testid={COMMUNICATION_ANCHOR_TEST_IDS.send}
+        data-icon-slot="send"
         onClick={onSend}
         disabled={!input.trim() || isLoading}
         className={`send-soft flex h-12 shrink-0 items-center justify-center rounded-full px-6 text-base font-medium text-white transition-all disabled:cursor-not-allowed disabled:bg-[#9aaba8] disabled:shadow-none ${conversationMode ? "send-soft-conversation" : ""}`}

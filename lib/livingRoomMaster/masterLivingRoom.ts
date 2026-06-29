@@ -1,8 +1,6 @@
 /**
- * Master Living Room — composition lock.
- *
- * No Living Change, Environmental Truth, seasons, wildlife, or overlay
- * objects render until this master scene is approved.
+ * Master Living Room — one approved photograph until a new asset is approved.
+ * Time of day is expressed through homestead lighting on this scene, not photo swaps.
  */
 
 export const MASTER_LIVING_ROOM_IMAGE_ID = "shari-i-am-here-2";

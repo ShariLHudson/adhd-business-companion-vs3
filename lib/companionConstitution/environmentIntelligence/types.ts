@@ -25,6 +25,7 @@ export type EnvironmentBackgroundMode = "homestead-room" | "photo-scene" | "none
 export type EnvironmentBackgroundSpec = {
   mode: EnvironmentBackgroundMode;
   imageUrl?: string;
+  videoUrl?: string;
   scenePage?: ScenePage;
   seed: string;
   overlay: string;

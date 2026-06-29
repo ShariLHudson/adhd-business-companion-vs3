@@ -83,6 +83,7 @@ export async function POST(request: NextRequest) {
     const chiefHint = body.chiefHint as string | undefined;
     const ecosystemGuidance = body.ecosystemGuidance as string | undefined;
     const intelligenceContext = body.intelligenceContext as string | undefined;
+    const streamRequested = Boolean(body.stream);
 
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json(
@@ -161,17 +162,20 @@ export async function POST(request: NextRequest) {
       relationshipLeadParagraphLength: relationshipLeadParagraph?.length ?? 0,
     });
 
+    const openAiBody = {
+      model: "gpt-4o-mini",
+      messages: [{ role: "system", content: finalSystem }, ...messages],
+      temperature,
+      ...(streamRequested ? { stream: true } : {}),
+    };
+
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [{ role: "system", content: finalSystem }, ...messages],
-        temperature,
-      }),
+      body: JSON.stringify(openAiBody),
     });
 
     if (!response.ok) {
@@ -180,6 +184,91 @@ export async function POST(request: NextRequest) {
         { error: "Something went wrong. Please try again." },
         { status: 502 },
       );
+    }
+
+    if (streamRequested && response.body) {
+      const encoder = new TextEncoder();
+      const readable = new ReadableStream({
+        async start(controller) {
+          try {
+            const reader = response.body!.getReader();
+            const decoder = new TextDecoder();
+            let sseBuffer = "";
+            let fullText = "";
+
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              sseBuffer += decoder.decode(value, { stream: true });
+              const lines = sseBuffer.split("\n");
+              sseBuffer = lines.pop() ?? "";
+              for (const line of lines) {
+                if (!line.startsWith("data: ")) continue;
+                const data = line.slice(6).trim();
+                if (!data || data === "[DONE]") continue;
+                try {
+                  const json = JSON.parse(data) as {
+                    choices?: Array<{ delta?: { content?: string } }>;
+                  };
+                  const chunk = json.choices?.[0]?.delta?.content;
+                  if (chunk) {
+                    fullText += chunk;
+                    controller.enqueue(
+                      encoder.encode(`${JSON.stringify({ delta: chunk })}\n`),
+                    );
+                  }
+                } catch {
+                  /* skip malformed SSE chunk */
+                }
+              }
+            }
+
+            const humanEnforcement = enforceHumanConversation({
+              response: fullText,
+              userText: userProbe,
+              gentle:
+                emotionalState?.toLowerCase().includes("overwhelm") ||
+                emotionalState?.toLowerCase().includes("emotional"),
+              seed: userProbe.length,
+              memoryConfidence,
+            });
+            const message = humanEnforcement.message;
+            if (message !== fullText) {
+              fullText = message;
+            }
+
+            logRelationshipResponseTrace({
+              responseId: relationshipResponseId,
+              stage: "api-return",
+              firstParagraph: firstParagraphForTrace(fullText),
+              memoryConfidence,
+              relationshipLeadParagraphLength: relationshipLeadParagraph?.length ?? 0,
+              relationshipResponseRewritten: false,
+              enforcementRan: false,
+              skipReason: "stream_fast_path",
+            });
+
+            controller.enqueue(
+              encoder.encode(
+                `${JSON.stringify({ done: true, relationshipResponseId, message: fullText })}\n`,
+              ),
+            );
+            controller.close();
+          } catch (error) {
+            console.error("Companion chat stream error:", error);
+            controller.enqueue(
+              encoder.encode(
+                `${JSON.stringify({ error: "Something went wrong. Please try again." })}\n`,
+              ),
+            );
+            controller.close();
+          }
+        },
+      });
+
+      return new Response(readable, {
+        headers: { "Content-Type": "application/x-ndjson" },
+      });
     }
 
     const data = await response.json();

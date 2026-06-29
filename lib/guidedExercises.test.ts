@@ -14,7 +14,6 @@ describe("guidedExercises", () => {
       "Future Me",
       "Goal Clarifier",
       "Priority Sort",
-      "Project Breakdown",
       "Quick Two Option Choice",
       "Values Check",
     ]);
@@ -34,7 +33,7 @@ describe("momentumBoosters", () => {
   it("lists momentum boosters alphabetically", () => {
     expect(momentumBoosterMenu().map((b) => b.title)).toEqual([
       "Guided Exercises",
-      "Momentum Games",
+      "Momentum Builders",
       "Spin The Wheel",
     ]);
   });

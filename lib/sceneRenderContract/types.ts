@@ -58,6 +58,7 @@ export type SceneCopy = {
 export type SceneBackgroundSpec = {
   mode: SceneBackgroundMode;
   imageUrl?: string;
+  videoUrl?: string;
   scenePage?: ScenePage;
   seed: string;
   overlay: string;

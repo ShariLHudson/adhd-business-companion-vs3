@@ -11,6 +11,7 @@ import {
   welcomeRoomDollyFrame,
   welcomeRoomFadeOpacity,
   welcomeRoomShowReadOffer,
+  welcomeRoomWalkElapsedMs,
   type WelcomeRoomArrivalPhase,
   type WelcomeRoomDollyFrame,
 } from "./arrival";
@@ -28,10 +29,10 @@ export type WelcomeRoomArrivalState = {
 type Options = {
   /** Read mode — hold the current frame. */
   frozen?: boolean;
-  /** Play pressed — slow dolly begins. */
-  cinematicActive?: boolean;
-  /** Pause — hold dolly and audio together. */
-  cinematicPaused?: boolean;
+  /** Pause — hold dolly (audio pause uses the same flag). */
+  walkPaused?: boolean;
+  /** Skip the opening black hold — sunroom visible immediately. */
+  skipIntro?: boolean;
 };
 
 const REDUCED_MOTION_STATE: WelcomeRoomArrivalState = {
@@ -46,26 +47,23 @@ const REDUCED_MOTION_STATE: WelcomeRoomArrivalState = {
 
 function frameAt(
   roomMs: number,
-  cinematicMs: number,
-  cinematicActive: boolean,
+  frozen: boolean,
+  walkPaused: boolean,
+  walkHoldMs: number,
 ): WelcomeRoomArrivalState {
-  const dollyProgress = cinematicActive
-    ? welcomeRoomCinematicDollyProgress(cinematicMs)
-    : 0;
+  const rawWalkMs = welcomeRoomWalkElapsedMs(roomMs);
+  const walkMs =
+    frozen || walkPaused ? walkHoldMs : rawWalkMs;
+  const dollyProgress = welcomeRoomCinematicDollyProgress(walkMs);
 
   return {
-    phase: welcomeRoomArrivalPhase(
-      roomMs,
-      false,
-      cinematicActive ? cinematicMs : 0,
-    ),
+    phase: welcomeRoomArrivalPhase(roomMs, false, walkMs),
     fadeOpacity: welcomeRoomFadeOpacity(roomMs),
     darkOpacity: welcomeRoomDarkOpacity(roomMs),
     dolly: welcomeRoomDollyFrame(dollyProgress),
     elapsedMs: roomMs,
     showReadOffer: welcomeRoomShowReadOffer(roomMs, false),
-    walkComplete:
-      cinematicActive && cinematicMs >= WELCOME_ROOM_INTRO_DOLLY_MS,
+    walkComplete: walkMs >= WELCOME_ROOM_INTRO_DOLLY_MS,
   };
 }
 
@@ -73,28 +71,29 @@ export function useWelcomeRoomArrival(
   options: Options = {},
 ): WelcomeRoomArrivalState & { resetCinematic: () => void } {
   const frozen = options.frozen ?? false;
-  const cinematicActive = options.cinematicActive ?? false;
-  const cinematicPaused = options.cinematicPaused ?? false;
+  const walkPaused = options.walkPaused ?? false;
+  const skipIntro = options.skipIntro ?? false;
 
-  const [state, setState] = useState<WelcomeRoomArrivalState>(() =>
-    prefersReducedMotion() ? REDUCED_MOTION_STATE : frameAt(0, 0, false),
+  const [state, setState] = useState<WelcomeRoomArrivalState>(() => {
+    if (prefersReducedMotion()) return REDUCED_MOTION_STATE;
+    if (skipIntro) {
+      return frameAt(WELCOME_ROOM_READY_ELAPSED_MS, false, false, 0);
+    }
+    return frameAt(0, false, false, 0);
+  });
+  const roomOriginRef = useRef<number | null>(
+    skipIntro ? performance.now() - WELCOME_ROOM_READY_ELAPSED_MS : null,
   );
-  const roomOriginRef = useRef<number | null>(null);
   const roomElapsedRef = useRef(0);
-  const cinematicOriginRef = useRef<number | null>(null);
-  const cinematicElapsedRef = useRef(0);
+  const walkHoldRef = useRef(0);
   const [resetToken, setResetToken] = useState(0);
 
   const resetCinematic = useCallback(() => {
-    cinematicOriginRef.current = null;
-    cinematicElapsedRef.current = 0;
+    walkHoldRef.current = 0;
+    roomOriginRef.current = performance.now() - WELCOME_ROOM_READY_ELAPSED_MS;
+    roomElapsedRef.current = WELCOME_ROOM_READY_ELAPSED_MS;
     setResetToken((token) => token + 1);
-    setState((prev) => ({
-      ...prev,
-      phase: welcomeRoomArrivalPhase(prev.elapsedMs, false, 0),
-      dolly: welcomeRoomDollyFrame(0),
-      walkComplete: false,
-    }));
+    setState(frameAt(WELCOME_ROOM_READY_ELAPSED_MS, false, false, 0));
   }, []);
 
   useEffect(() => {
@@ -103,46 +102,36 @@ export function useWelcomeRoomArrival(
       return;
     }
 
-    if (frozen || cinematicPaused) {
+    if (frozen || walkPaused) {
       setState(
         frameAt(
           roomElapsedRef.current,
-          cinematicElapsedRef.current,
-          cinematicActive,
+          frozen,
+          walkPaused,
+          walkHoldRef.current,
         ),
       );
       return;
     }
 
     if (roomOriginRef.current === null) {
-      roomOriginRef.current = performance.now();
-    }
-
-    if (cinematicActive) {
-      if (cinematicOriginRef.current === null) {
-        cinematicOriginRef.current = performance.now();
-      }
-    } else {
-      cinematicOriginRef.current = null;
-      cinematicElapsedRef.current = 0;
+      roomOriginRef.current = skipIntro
+        ? performance.now() - WELCOME_ROOM_READY_ELAPSED_MS
+        : performance.now();
     }
 
     let frame = 0;
     const tick = (now: number) => {
       const roomMs = now - (roomOriginRef.current ?? now);
       roomElapsedRef.current = roomMs;
-      const cinematicMs =
-        cinematicActive && cinematicOriginRef.current !== null
-          ? now - cinematicOriginRef.current
-          : 0;
-      cinematicElapsedRef.current = cinematicMs;
-      setState(frameAt(roomMs, cinematicMs, cinematicActive));
+      walkHoldRef.current = welcomeRoomWalkElapsedMs(roomMs);
+      setState(frameAt(roomMs, false, false, walkHoldRef.current));
       frame = requestAnimationFrame(tick);
     };
 
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [frozen, cinematicActive, cinematicPaused, resetToken]);
+  }, [frozen, walkPaused, resetToken, skipIntro]);
 
   return { ...state, resetCinematic };
 }

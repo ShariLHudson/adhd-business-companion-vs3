@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import { BackButton } from "@/components/companion/BackButton";
@@ -12,10 +12,7 @@ import { AdjustMyDayPanel } from "@/components/companion/AdjustMyDayPanel";
 import { BrainDumpPanel } from "@/components/companion/BrainDumpPanel";
 import { propertyNavComingSoonMessage } from "@/lib/companionPropertyNav";
 import {
-  coachingModeForConversationLens,
-  type ClearMyMindMenuItemId,
-  type NewConversationLens,
-  type PlanMyDayMenuItemId,
+  type NewConversationMenuItemId,
 } from "@/lib/topBarNavigation";
 import {
   GALLERY_HOME_SECTION,
@@ -28,22 +25,27 @@ import { DecisionCompassWorkspace } from "@/components/companion/DecisionCompass
 import { BreathePanel } from "@/components/companion/BreathePanel";
 import { StrategiesPanel } from "@/components/companion/StrategiesPanel";
 import { CompanionCommunicationAnchor } from "@/components/companion/CompanionCommunicationAnchor";
+import { CompanionDeskChrome } from "@/components/companion/CompanionDeskChrome";
+import { CompanionDeskProvider } from "@/components/companion/CompanionDeskProvider";
+import { HomeChatInputFooter } from "@/components/companion/HomeChatInputFooter";
 import { CompanionBackground } from "@/components/companion/CompanionBackground";
-import { CompanionHomesteadLogo } from "@/components/companion/CompanionHomesteadLogo";
 import {
   ActiveWorkspaceBar,
   focusTimerWorkspaceItem,
   type ActiveWorkspaceItem,
 } from "@/components/companion/ActiveWorkspaceBar";
 import { FocusAreaPanel } from "@/components/companion/FocusAreaPanel";
+import { FocusMyBrainRoomShell } from "@/components/companion/FocusMyBrainRoomShell";
 import {
   CompanionActivitiesPanel,
   EMPTY_ACTIVITY_SESSION,
+  buildActiveActivitySession,
   type ActivitySessionState,
 } from "@/components/companion/CompanionActivitiesPanel";
+import { ensureActivityStepAnswers } from "@/lib/activityFields";
 import { CrossWorkspaceSuggestionCard } from "@/components/companion/CrossWorkspaceSuggestionCard";
 import { SpinWheelPanel } from "@/components/companion/SpinWheelPanel";
-import { GamesPanel } from "@/components/companion/GamesPanel";
+import { MomentumBuildersPanel } from "@/components/companion/MomentumBuildersPanel";
 import { MomentumGamesRoomShell } from "@/components/companion/MomentumGamesRoomShell";
 import { FocusAudioPanel } from "@/components/companion/FocusAudioPanel";
 import { FocusTimerPanel } from "@/components/companion/FocusTimerPanel";
@@ -83,7 +85,9 @@ const VisualFocusWorkspacePanel = dynamic(
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { WinsThisWeekPanel } from "@/components/companion/WinsThisWeekPanel";
 import { EvidenceBankPanel } from "@/components/companion/EvidenceBankPanel";
-import { GrowthHubGalleryRedirect } from "@/components/companion/GrowthHubGalleryRedirect";
+import { GrowthCenterPanel } from "@/components/companion/GrowthCenterPanel";
+import { GrowthJournalPanel } from "@/components/companion/GrowthJournalPanel";
+import { GrowthPortfolioPanel } from "@/components/companion/GrowthPortfolioPanel";
 import { ConfidenceVaultPanel } from "@/components/companion/ConfidenceVaultPanel";
 import { MyJourneyPanel } from "@/components/companion/MyJourneyPanel";
 import type { HomeResumeItem } from "@/lib/homeResumeItem";
@@ -97,8 +101,12 @@ import {
   type ArrivalIntelligence,
 } from "@/lib/arrivalIntelligence";
 import { recordLivingRoomDeparture } from "@/lib/livingLifeEngine";
-import { consumePostLoginContinue } from "@/lib/postLoginContinue";
 import { incrementHomeVisitCount } from "@/lib/homeWelcome";
+import {
+  clearCompanionPostLoginQuiet,
+  isCompanionPostLoginQuiet,
+} from "@/lib/companionLoginTransition";
+import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
 import { getDayDesignerSession } from "@/lib/day-designer/dayStore";
 import { activityReturnLabel as resolveActivityReturnLabel } from "@/lib/activityReturnLabel";
 import {
@@ -121,8 +129,6 @@ import { useClientMounted } from "@/lib/useClientMounted";
 import { resolveAdaptiveVisualContext } from "@/lib/adaptiveVisualContext";
 import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import { WelcomeRoomPanel } from "@/components/companion/WelcomeRoomPanel";
-import { WelcomeRoomInvitation } from "@/components/companion/WelcomeRoomInvitation";
-import { WelcomeRoomLoginOffer } from "@/components/companion/WelcomeRoomLoginOffer";
 import type { EcosystemSearchResult } from "@/lib/howDoIHelpLibrary";
 import type { ProfileSettingsSection } from "@/components/companion/ProfilePanel";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
@@ -416,6 +422,12 @@ import {
   type ToolSuggestion,
 } from "@/lib/companionToolSuggestions";
 import {
+  declineConversationOffer,
+  isConversationOfferDeclined,
+  toolSuggestionDeclineKey,
+  workspaceOfferDeclineKey,
+} from "@/lib/chatConversation/declinedOffers";
+import {
   buildStressCauseRecommendation,
   buildStressReliefOffer,
   detectStressCauseChoice,
@@ -634,13 +646,10 @@ import {
   shouldSuppressWorkspaceCoachForPhase1,
 } from "@/lib/phase1Onboarding";
 import {
-  dismissWelcomeRoomInvitation,
-  dismissWelcomeRoomLoginOffer,
-  shouldShowWelcomeRoomInvitation,
-  shouldShowWelcomeRoomLoginOffer,
-} from "@/lib/welcomeRoom";
+  destroyWelcomeRoomAudioManager,
+  primeWelcomeRoomAudioFromGesture,
+} from "@/lib/welcomeAudio/welcomeRoomAudioSession";
 import { markWelcomeRoomOpenedWithGesture } from "@/lib/welcomeRoom/welcomeRoomGesture";
-import { unlockBrowserAudioFromClick } from "@/lib/welcomeAudio/audioUnlock";
 import {
   observeFromConversationTurn,
   observeResourcePreference,
@@ -828,6 +837,14 @@ import {
   type CompanionSpeedProfile,
 } from "@/lib/companionLatencyProfiler";
 import {
+  isSimpleSocialGreeting,
+  simpleSocialGreetingReply,
+} from "@/lib/chatFastPath/simpleSocial";
+import {
+  consumeCompanionChatStream,
+  isCompanionChatStreamResponse,
+} from "@/lib/chatFastPath/companionChatStream";
+import {
   logCreatePendingAction,
   resolvedArtifactFromCreatePending,
 } from "@/lib/createPendingAction";
@@ -988,7 +1005,10 @@ import {
   standaloneToolAck,
 } from "@/lib/standaloneToolRouting";
 import { isClearMyMindSection } from "@/lib/clearMyMindRouting";
+import { CLEAR_MY_MIND_CONSERVATORY_BG } from "@/lib/clearMyMind/conservatory";
 import { isPlanMyDaySection } from "@/lib/planMyDayRouting";
+import { PLAN_MY_DAY_MORNING_BG } from "@/lib/planMyDay/morningRoom";
+import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
 import {
   type ClearMyMindPanelView,
   inferClearMyMindViewFromText,
@@ -1091,6 +1111,12 @@ import {
   isGuidedExerciseActivity,
   standaloneSectionForActivity,
 } from "@/lib/guidedExercises";
+import { isFocusSanctuaryFullBleed } from "@/lib/focusMyBrain/focusSanctuary";
+import {
+  companionDeskFullBleed as resolveCompanionDeskFullBleed,
+  usesCompanionDesk,
+} from "@/lib/companionDesk/workspaceLayout";
+import { resolveHomeMode } from "@/lib/homeMode";
 import { getShariAssistLabel } from "@/lib/shariAssistLabels";
 import { resolveProjectWorkspaceDetail } from "@/lib/projectWorkspaceDetail";
 import {
@@ -1700,6 +1726,11 @@ export default function CompanionPageClient() {
     null,
   );
   const [arrivalNavImmersion, setArrivalNavImmersion] = useState(false);
+  const [postLoginQuiet, setPostLoginQuiet] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return isCompanionPostLoginQuiet();
+  });
+
   const [hasChatted, setHasChatted] = useState(false);
   const [recognitionMoment, setRecognitionMoment] =
     useState<RecognitionMoment | null>(null);
@@ -1791,7 +1822,6 @@ export default function CompanionPageClient() {
   const remindedRef = useRef<Set<string>>(new Set());
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-  const postLoginContinueHandledRef = useRef(false);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const baseInputRef = useRef("");
   const voiceUsedRef = useRef(false);
@@ -1815,8 +1845,14 @@ export default function CompanionPageClient() {
     isIdle &&
     !splitCreateChat &&
     !workspaceActiveBeside;
+  const effectiveHomeArrival = useMemo(() => {
+    if (!homeCalm) return null;
+    return homeArrival ?? evaluateArrivalIntelligence({ record: false });
+  }, [homeCalm, homeArrival]);
+
   const welcomeScene =
-    homeCalm && homeArrival?.chrome.layout === "welcome-scene";
+    homeCalm &&
+    effectiveHomeArrival?.chrome.layout === "welcome-scene";
   const visibleThinkingMessage = useVisibleThinking(
     isLoading && !homeCalm,
     visibleThinkingContext,
@@ -1827,6 +1863,11 @@ export default function CompanionPageClient() {
       setHomeArrival(null);
       setArrivalNavImmersion(false);
       return;
+    }
+    if (isCompanionPostLoginQuiet()) {
+      setPostLoginQuiet(true);
+    } else {
+      setPostLoginQuiet(false);
     }
     incrementHomeVisitCount();
     const intel = evaluateArrivalIntelligence({ record: true });
@@ -2162,14 +2203,6 @@ export default function CompanionPageClient() {
   const [settingsSection, setSettingsSection] =
     useState<SettingsSection | null>(null);
   const [profileGettingToKnowYou, setProfileGettingToKnowYou] = useState(false);
-  const [welcomeRoomInvitationOpen, setWelcomeRoomInvitationOpen] = useState(
-    () =>
-      typeof window !== "undefined" && shouldShowWelcomeRoomInvitation(),
-  );
-  const [welcomeRoomLoginOfferOpen, setWelcomeRoomLoginOfferOpen] = useState(
-    () =>
-      typeof window !== "undefined" && shouldShowWelcomeRoomLoginOffer(),
-  );
   const visualMode = useVisualMode();
   const clientMounted = useClientMounted();
   const adaptiveVisualContext = useMemo(
@@ -2192,29 +2225,8 @@ export default function CompanionPageClient() {
   );
   const { configured: authConfigured, user } = useCompanionAuth();
 
-  useEffect(() => {
-    function syncWelcomeRoomDiscovery() {
-      if (shouldShowWelcomeRoomInvitation()) {
-        setWelcomeRoomInvitationOpen(true);
-        setWelcomeRoomLoginOfferOpen(false);
-        return;
-      }
-      setWelcomeRoomInvitationOpen(false);
-      if (shouldShowWelcomeRoomLoginOffer()) {
-        setWelcomeRoomLoginOfferOpen(true);
-      }
-    }
-    syncWelcomeRoomDiscovery();
-    window.addEventListener("companion-welcome-room-invitation", syncWelcomeRoomDiscovery);
-    return () => {
-      window.removeEventListener(
-        "companion-welcome-room-invitation",
-        syncWelcomeRoomDiscovery,
-      );
-    };
-  }, [user]);
-
   const openSignIn = useCallback(() => {
+    if (isCompanionAuthBypassed()) return;
     if (authConfigured) setOverlay("signin");
     else router.push("/companion/login");
   }, [authConfigured, router]);
@@ -2329,6 +2341,7 @@ export default function CompanionPageClient() {
   const [pendingAcceptanceRecord, setPendingAcceptanceRecord] =
     useState<PendingAcceptanceRecord | null>(null);
   const chatTurnRef = useRef(0);
+  const declinedConversationOffersRef = useRef<Set<string>>(new Set());
   const lastWorkspaceOfferLineRef = useRef<string | null>(null);
   const lastEmotionalStateRef = useRef<EmotionalState | null>(null);
   const [assistedActionOffer, setAssistedActionOffer] =
@@ -3708,14 +3721,6 @@ export default function CompanionPageClient() {
         }
     }
   }
-
-  useEffect(() => {
-    if (!hydrated || postLoginContinueHandledRef.current) return;
-    const intent = consumePostLoginContinue();
-    if (!intent) return;
-    postLoginContinueHandledRef.current = true;
-    handleCompanionContinueOption(intent.option);
-  }, [hydrated]);
 
   function openVisualFocusMapCore(mapId: string, preferGenerated = true) {
     queueVisualFocusOpen(mapId, preferGenerated);
@@ -5517,6 +5522,7 @@ export default function CompanionPageClient() {
     recognitionRef.current?.stop();
     setIsListening(false);
     clearConversation();
+    declinedConversationOffersRef.current = new Set();
     setMessages([]);
     workspaceChatScopeRef.current = null;
     setInput("");
@@ -5619,7 +5625,7 @@ export default function CompanionPageClient() {
       backLabel: workspacePanelBackLabel,
       onOpenSection: (section) => {
         if (section === "growth") {
-          openNavSectionDirectCore(GALLERY_HOME_SECTION, "growth");
+          openSectionBesideChatCore("growth", "growth", { userInitiated: true });
           return;
         }
         openSectionBesideChatCore(
@@ -5822,6 +5828,8 @@ export default function CompanionPageClient() {
     }
 
     const isWelcomeRoom = section === "welcome-room";
+    const isEvidenceBank = section === "evidence-bank";
+    const workspaceFocusPanel = isWelcomeRoom || isEvidenceBank;
 
     if (workspacePanel === section) {
       if (section === "visual-focus" && !peekVisualFocusPendingOpen()) {
@@ -5829,7 +5837,7 @@ export default function CompanionPageClient() {
       }
       setActiveSection("home");
       if (nav) setActiveNav(nav);
-      if (isWelcomeRoom) {
+      if (workspaceFocusPanel) {
         applyChatLayoutMode("workspace-focus");
       } else {
         ensureSplitBesideChatLayout();
@@ -5876,7 +5884,7 @@ export default function CompanionPageClient() {
     setCreationContext(null);
     applyWorkspaceFocus(null);
     setActiveSection("home");
-    if (isWelcomeRoom) {
+    if (workspaceFocusPanel) {
       applyChatLayoutMode("workspace-focus");
     } else {
       ensureSplitBesideChatLayout();
@@ -5899,12 +5907,8 @@ export default function CompanionPageClient() {
   }
 
   function openWelcomeRoom() {
-    setWelcomeRoomInvitationOpen(false);
-    setWelcomeRoomLoginOfferOpen(false);
-    dismissWelcomeRoomInvitation();
-    dismissWelcomeRoomLoginOffer();
     markWelcomeRoomOpenedWithGesture();
-    unlockBrowserAudioFromClick();
+    primeWelcomeRoomAudioFromGesture();
     applyChatLayoutMode("workspace-focus");
     openSectionBesideChatCore("welcome-room", "welcome-room", {
       userInitiated: true,
@@ -5912,6 +5916,7 @@ export default function CompanionPageClient() {
   }
 
   function leaveWelcomeRoom() {
+    destroyWelcomeRoomAudioManager();
     navigateToChatCore();
   }
 
@@ -6528,9 +6533,23 @@ export default function CompanionPageClient() {
     clearSplitBesideWorkspace();
     setDecisionCompassPrefill(null);
     setDecisionCompassSession(null);
-    setActivitySession(session);
-    const section = session.activityId
-      ? standaloneSectionForActivity(session.activityId)
+    const activityForSession = session.activityId
+      ? getActivityById(session.activityId)
+      : null;
+    const normalizedSession =
+      activityForSession && session.phase === "active"
+        ? {
+            ...session,
+            answers: ensureActivityStepAnswers(
+              activityForSession.steps,
+              session.stepIndex,
+              session.answers,
+            ),
+          }
+        : session;
+    setActivitySession(normalizedSession);
+    const section = normalizedSession.activityId
+      ? standaloneSectionForActivity(normalizedSession.activityId)
       : "focus";
     setActivityReturnLabel(
       resolveActivityReturnLabel(options?.strategyOpenView, section),
@@ -6560,6 +6579,7 @@ export default function CompanionPageClient() {
     initialView?: ClearMyMindPanelView;
     silent?: boolean;
   }) {
+    preloadRoomBackground(CLEAR_MY_MIND_CONSERVATORY_BG);
     const view = options?.initialView ?? "capture";
     setBrainDumpInitialView(view);
     setBrainDumpPanelKey((k) => k + 1);
@@ -6571,6 +6591,7 @@ export default function CompanionPageClient() {
 
   /** Plan My Day — Morning Room standalone; never beside chat. */
   function openPlanMyDayCore(options?: { itemId?: string | null }) {
+    preloadRoomBackground(PLAN_MY_DAY_MORNING_BG);
     setPlanMyDayOpenItemId(options?.itemId ?? null);
     trackWorkspaceEcosystemEvent("plan-my-day");
     noteWorkspaceOpened("plan-my-day", "standalone_room");
@@ -6669,11 +6690,26 @@ export default function CompanionPageClient() {
     }
 
     if (nav === "growth") {
-      openNavSectionDirectCore(GALLERY_HOME_SECTION, "growth");
+      openSectionBesideChatCore("growth", "growth", { userInitiated: true });
+      return;
+    }
+
+    if (nav === "journal") {
+      openSectionBesideChatCore("growth-journal", "journal", {
+        userInitiated: true,
+      });
+      return;
+    }
+
+    if (nav === "portfolio") {
+      openSectionBesideChatCore("growth-portfolio", "portfolio", {
+        userInitiated: true,
+      });
       return;
     }
 
     if (nav === "evidence-bank") {
+      applyChatLayoutMode("workspace-focus");
       openSectionBesideChatCore("evidence-bank", "evidence-bank", {
         userInitiated: true,
       });
@@ -6747,45 +6783,36 @@ export default function CompanionPageClient() {
     openPeacefulPlacesCore({ categoryId });
   }
 
-  function handleTopBarClearMyMindItem(itemId: ClearMyMindMenuItemId) {
-    switch (itemId) {
-      case "recent-thoughts":
-        openClearMyMindCore({ initialView: "my-thoughts" });
-        return;
-      case "brain-dump":
-      case "voice-note":
-        openClearMyMindCore({ initialView: "capture" });
-        return;
-      case "journal": {
-        const comingSoon = propertyNavComingSoonMessage("journal");
-        if (comingSoon) setWorkspaceContextBanner(comingSoon);
+  function handleMomentumBuilderLaunch(
+    launch: import("@/lib/momentumBuilders").MomentumBuilderLaunch,
+  ) {
+    if (launch.kind === "activity") {
+      const activity = getActivityById(launch.activityId);
+      if (!activity) return;
+      openActivityFullPageCore({
+        ...EMPTY_ACTIVITY_SESSION,
+        activityId: launch.activityId,
+        stepIndex: 0,
+        phase: "active",
+        categoryId: activity.categoryId,
+      });
+      return;
+    }
+    if (launch.kind === "section") {
+      if (launch.section === "focus-audio") {
+        openFocusAudioCore();
         return;
       }
-      default:
-        openClearMyMindCore();
+      openStandaloneFocusSectionCore(launch.section);
     }
   }
 
-  function handleTopBarPlanMyDayItem(itemId: PlanMyDayMenuItemId) {
-    switch (itemId) {
-      case "daily-planner":
-      case "priorities":
-        openPlanMyDayCore();
-        return;
-      case "calendar":
-        openStandaloneFocusSectionCore("time-block");
-        return;
-      case "energy-planning":
-        openAdaptMyDayCore();
-        return;
-      default:
-        openPlanMyDayCore();
+  function handleTopBarNewConversationItem(itemId: NewConversationMenuItemId) {
+    if (itemId === "new-day-conversation") {
+      requestBeginNewDay();
+      return;
     }
-  }
-
-  function handleStartConversationWithLens(lens: NewConversationLens) {
-    handleStartCleanConversation();
-    setCoachingMode(coachingModeForConversationLens(lens));
+    requestClearTodayContext();
   }
 
   function handleToolSelectCore(tool: SidebarToolId) {
@@ -7297,6 +7324,24 @@ export default function CompanionPageClient() {
     );
   }
 
+  function handlePeacefulPlacesGardenActivity(activityId: string) {
+    const activity = getActivityById(activityId);
+    if (!activity) return;
+    setFocusAudioCategory(null);
+    setPeacefulPlacesArrivalActive(false);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openActivityFullPageCore(buildActiveActivitySession(activity));
+  }
+
+  function handlePeacefulPlacesGardenSection(section: AppSection) {
+    setFocusAudioCategory(null);
+    setPeacefulPlacesArrivalActive(false);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore(section);
+  }
+
   function handleHowDoIEcosystemOpen(result: EcosystemSearchResult) {
     const action = result.action;
     switch (action.kind) {
@@ -7461,8 +7506,6 @@ export default function CompanionPageClient() {
 
   function applyWorkflowContinuation(
     result: WorkflowContinuationResult,
-    userMessage: Message,
-    fresh: boolean,
   ): boolean {
     const continuedKind =
       conversationWorkflow?.kind ??
@@ -7510,16 +7553,13 @@ export default function CompanionPageClient() {
       handleToolSelectCore(result.tool);
     }
 
-    if (fresh) clearConversation();
     setMessages((prev) => [
-      ...(fresh ? [] : prev),
-      userMessage,
+      ...prev,
       { role: "assistant", content: result.message },
     ]);
     setInput("");
     voiceUsedRef.current = false;
-    setIsLoading(false);
-    inputRef.current?.focus();
+    finishEarlyChatTurn();
     return true;
   }
 
@@ -7547,10 +7587,8 @@ export default function CompanionPageClient() {
   function tryContinueConversationWorkflow(
     trimmed: string,
     lastAssistantText: string,
-    fresh: boolean,
+    _fresh: boolean,
   ): boolean {
-    const userMessage: Message = { role: "user", content: trimmed };
-
     const surveyOfferType = inferSurveyTypeFromAssistantOffer(lastAssistantText);
     if (surveyOfferType && isAcceptanceAttempt(trimmed)) {
       const template = SURVEY_TEMPLATES[surveyOfferType];
@@ -7563,10 +7601,8 @@ export default function CompanionPageClient() {
       openCreateWithShari(
         buildSurveyCreationInput(template, "standard"),
       );
-      if (fresh) clearConversation();
       setMessages((prev) => [
-        ...(fresh ? [] : prev),
-        userMessage,
+        ...prev,
         {
           role: "assistant",
           content:
@@ -7576,8 +7612,7 @@ export default function CompanionPageClient() {
       ]);
       setInput("");
       voiceUsedRef.current = false;
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishEarlyChatTurn();
       return true;
     }
 
@@ -7622,69 +7657,53 @@ export default function CompanionPageClient() {
           consumePendingCommitment(commitmentResult.consumed);
           setConversationWorkflow(null);
           clearPendingAcceptanceAuthority();
-          if (fresh) clearConversation();
           setMessages((prev) => [
-            ...(fresh ? [] : prev),
-            userMessage,
+            ...prev,
             { role: "assistant", content: commitmentResult.message },
           ]);
           setInput("");
           voiceUsedRef.current = false;
-          setIsLoading(false);
-          inputRef.current?.focus();
+          finishEarlyChatTurn();
           return true;
         }
         case "duplicate": {
-          if (fresh) clearConversation();
           setMessages((prev) => [
-            ...(fresh ? [] : prev),
-            userMessage,
+            ...prev,
             { role: "assistant", content: DUPLICATE_COMMITMENT_MESSAGE },
           ]);
           setInput("");
           voiceUsedRef.current = false;
-          setIsLoading(false);
-          inputRef.current?.focus();
+          finishEarlyChatTurn();
           return true;
         }
         case "no_pending": {
-          if (fresh) clearConversation();
           setMessages((prev) => [
-            ...(fresh ? [] : prev),
-            userMessage,
+            ...prev,
             { role: "assistant", content: COMMITMENT_CLARIFY_MESSAGE },
           ]);
           setInput("");
           voiceUsedRef.current = false;
-          setIsLoading(false);
-          inputRef.current?.focus();
+          finishEarlyChatTurn();
           return true;
         }
         case "expired":
           break;
         case "affirm": {
           consumePendingCommitment(commitmentResult.consumed);
-          return applyWorkflowContinuation(
-            commitmentResult.continuation,
-            userMessage,
-            fresh,
-          );
+          return applyWorkflowContinuation(commitmentResult.continuation);
         }
         case "affirm_create": {
           consumePendingCommitment(commitmentResult.consumed);
           setConversationWorkflow(null);
           clearPendingAcceptanceAuthority();
           openSectionBesideChatCore("content-generator");
-          if (fresh) clearConversation();
           setMessages((prev) => [
-            ...(fresh ? [] : prev),
-            userMessage,
+            ...prev,
             { role: "assistant", content: commitmentResult.message },
           ]);
           setInput("");
           voiceUsedRef.current = false;
-          setIsLoading(false);
-          inputRef.current?.focus();
+          finishEarlyChatTurn();
           return true;
         }
         case "affirm_export": {
@@ -7692,23 +7711,20 @@ export default function CompanionPageClient() {
           if (hasRealArtifactDraft && exportOffer) {
             setArtifactExportOffer(exportOffer);
           }
-          if (fresh) clearConversation();
           setMessages((prev) => [
-            ...(fresh ? [] : prev),
-            userMessage,
+            ...prev,
             { role: "assistant", content: commitmentResult.message },
           ]);
           setInput("");
           voiceUsedRef.current = false;
-          setIsLoading(false);
-          inputRef.current?.focus();
+          finishEarlyChatTurn();
           return true;
         }
       }
     }
 
     if (resolution.kind === "workflow") {
-      return applyWorkflowContinuation(resolution.continuation, userMessage, fresh);
+      return applyWorkflowContinuation(resolution.continuation);
     }
 
     if (resolution.kind === "pending") {
@@ -7717,25 +7733,19 @@ export default function CompanionPageClient() {
         pending.outcome === "conversation" ||
         pending.outcome === "expired"
       ) {
-        if (fresh) clearConversation();
         setMessages((prev) => [
-          ...(fresh ? [] : prev),
-          userMessage,
+          ...prev,
           { role: "assistant", content: pending.message },
         ]);
         setInput("");
         voiceUsedRef.current = false;
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         return true;
       }
       if (dispatchResolvedAcceptance(pending, pendingNow)) {
-        if (fresh) clearConversation();
-        setMessages((prev) => [...(fresh ? [] : prev), userMessage]);
         setInput("");
         voiceUsedRef.current = false;
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         return true;
       }
     }
@@ -8321,6 +8331,12 @@ export default function CompanionPageClient() {
     setVisibleThinkingContext(null);
   }
 
+  function finishEarlyChatTurn() {
+    endVisibleThinking();
+    setIsLoading(false);
+    inputRef.current?.focus();
+  }
+
   async function handleSend(
     overrideText?: string,
     fresh = false,
@@ -8328,6 +8344,11 @@ export default function CompanionPageClient() {
   ) {
     const trimmed = (overrideText ?? input).trim();
     if (!trimmed || isLoading) return;
+
+    if (postLoginQuiet) {
+      clearCompanionPostLoginQuiet();
+      setPostLoginQuiet(false);
+    }
 
     if (homeCalm) {
       recordArrivalFirstAction(
@@ -8354,6 +8375,26 @@ export default function CompanionPageClient() {
       if (opts?.calledApi) latencyProfiler.calledApi = true;
       logCompanionLatency(latencyProfiler.report());
     };
+
+    if (isSimpleSocialGreeting(trimmed)) {
+      lastUserTextRef.current = trimmed;
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        { role: "assistant", content: simpleSocialGreetingReply(trimmed) },
+      ]);
+      setInput("");
+      voiceUsedRef.current = false;
+      if (!getPrefs().hasChatted) {
+        savePrefs({ hasChatted: true });
+        setHasChatted(true);
+      }
+      inputRef.current?.focus();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
 
     const activeReminderSession = loadReminderIntakeSession();
     if (
@@ -8382,8 +8423,7 @@ export default function CompanionPageClient() {
           ...prev,
           { role: "assistant", content: reminderTurn.reply },
         ]);
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
       }
@@ -8416,8 +8456,7 @@ export default function CompanionPageClient() {
           ...prev,
           { role: "assistant", content: intakeTurn.reply },
         ]);
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
       }
@@ -8468,8 +8507,7 @@ export default function CompanionPageClient() {
           ack: visualMenuSelectionAck(menuPick.viewId),
         });
         setMessages((prev) => [...prev, { role: "assistant", content: ack }]);
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
       }
@@ -8512,8 +8550,7 @@ export default function CompanionPageClient() {
           ...prev,
           { role: "assistant", content: ack },
         ]);
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
       }
@@ -8568,8 +8605,7 @@ export default function CompanionPageClient() {
           clearPendingAcceptanceAuthority();
           setToolSuggestion(null);
           setWorkspaceOffer(null);
-          setIsLoading(false);
-          inputRef.current?.focus();
+          finishEarlyChatTurn();
           finishLatencyTurn({ localReply: true });
           return;
         }
@@ -8582,8 +8618,7 @@ export default function CompanionPageClient() {
             ...prev,
             { role: "assistant", content: ack },
           ]);
-          setIsLoading(false);
-          inputRef.current?.focus();
+          finishEarlyChatTurn();
           finishLatencyTurn({ localReply: true });
           return;
         }
@@ -8600,8 +8635,7 @@ export default function CompanionPageClient() {
           clearPendingAcceptanceAuthority();
           setToolSuggestion(null);
           setWorkspaceOffer(null);
-          setIsLoading(false);
-          inputRef.current?.focus();
+          finishEarlyChatTurn();
           finishLatencyTurn({ localReply: true });
           return;
         }
@@ -8741,8 +8775,7 @@ export default function CompanionPageClient() {
         clearPendingAcceptanceAuthority();
         setToolSuggestion(null);
         setWorkspaceOffer(null);
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
       }
@@ -8814,8 +8847,7 @@ export default function CompanionPageClient() {
             break;
         }
       }
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishEarlyChatTurn();
       finishLatencyTurn({ localReply: true });
       return;
     }
@@ -8889,8 +8921,7 @@ export default function CompanionPageClient() {
         setInput("");
         setActiveSection("home");
         setActiveNav("chat");
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         return;
       }
     }
@@ -8901,8 +8932,7 @@ export default function CompanionPageClient() {
       setMessages(nextMsgs);
       setInput("");
       openCreateFromConversationHandoff(pendingConversationHandoff, nextMsgs);
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishEarlyChatTurn();
       return;
     }
 
@@ -8935,8 +8965,7 @@ export default function CompanionPageClient() {
       setToolSuggestion(null);
       setActionBridge(null);
       setBridge(null);
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishEarlyChatTurn();
       return;
     }
 
@@ -9205,10 +9234,32 @@ export default function CompanionPageClient() {
     const isNewConversation = !messages.some((m) => m.role === "user");
     if (isNewConversation) recordConversationStart();
     lastUserTextRef.current = trimmed;
+    const detected = detectEmotionalState(trimmed);
+    setEmotion(detected);
+    const userMessage: Message = { role: "user", content: trimmed };
+    if (fresh) clearConversation();
+    const nextMessages = fresh ? [userMessage] : [...messages, userMessage];
+    setMessages(nextMessages);
+    setInput("");
+    const usedVoiceThisTurn = voiceUsedRef.current;
+    voiceUsedRef.current = false;
+    setError(null);
+    beginVisibleThinking(trimmed, detected);
+    setIsLoading(true);
+    const finishLocalChatTurn = (assistantContent?: string) => {
+      if (assistantContent) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: assistantContent },
+        ]);
+      }
+      finishEarlyChatTurn();
+    };
     if (!getPrefs().hasChatted) {
       savePrefs({ hasChatted: true });
       setHasChatted(true);
     }
+    lastEmotionalStateRef.current = detected;
     if (
       typeof window !== "undefined" &&
       !window.sessionStorage.getItem("ecosystem-chat-started-v1")
@@ -9219,17 +9270,15 @@ export default function CompanionPageClient() {
       });
       window.sessionStorage.setItem("ecosystem-chat-started-v1", "1");
     }
-    const detectedEmotion = detectEmotionalState(trimmed);
-    lastEmotionalStateRef.current = detectedEmotion;
     const classifiedSignals = observeUserSignalsFromText({
       text: trimmed,
-      emotionalState: detectedEmotion,
+      emotionalState: detected,
       source: "chat",
     });
     void syncClassifiedSignalsToServer(classifiedSignals);
     ingestClassifiedUserSignals(classifiedSignals, {
       source: "chat",
-      emotionalState: detectedEmotion,
+      emotionalState: detected,
     });
     const lastAssistantBeforeSend =
       [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
@@ -9400,19 +9449,11 @@ export default function CompanionPageClient() {
         setChiefOffer(null);
         setPredictiveOffer(null);
       }
-      const userMessage: Message = { role: "user", content: trimmed };
-      if (fresh) clearConversation();
-      const base = fresh ? [] : messages;
       const assistantContent = result.plan
         ? "Here's a gentle plan for today — change anything you like."
         : (result.question ?? "Got it.");
-      setMessages([
-        ...base,
-        userMessage,
-        { role: "assistant", content: assistantContent },
-      ]);
-      setInput("");
-      voiceUsedRef.current = false;
+      finishLocalChatTurn(assistantContent);
+      finishLatencyTurn({ localReply: true });
       return;
     }
 
@@ -9422,19 +9463,8 @@ export default function CompanionPageClient() {
       setDayDesignerSession(session);
       setDayDesignerQuestion(firstQ);
       setDayPlanView(null);
-      const userMessage: Message = { role: "user", content: trimmed };
-      if (fresh) clearConversation();
-      const base = fresh ? [] : messages;
-      setMessages([
-        ...base,
-        userMessage,
-        {
-          role: "assistant",
-          content: `${companionIntroForDayDesigner()} ${firstQ}`,
-        },
-      ]);
-      setInput("");
-      voiceUsedRef.current = false;
+      finishLocalChatTurn(`${companionIntroForDayDesigner()} ${firstQ}`);
+      finishLatencyTurn({ localReply: true });
       return;
     }
 
@@ -9647,17 +9677,9 @@ export default function CompanionPageClient() {
     }
 
     if (physicalActionWaiting && isActionDone(trimmed)) {
-      const userMessage: Message = { role: "user", content: trimmed };
-      if (fresh) clearConversation();
-      const base = fresh ? [] : messages;
-      setMessages([
-        ...base,
-        userMessage,
-        { role: "assistant", content: physicalDoneFollowUp() },
-      ]);
-      setInput("");
       setPhysicalActionWaiting(false);
-      voiceUsedRef.current = false;
+      finishLocalChatTurn(physicalDoneFollowUp());
+      finishLatencyTurn({ localReply: true });
       return;
     }
 
@@ -9687,25 +9709,15 @@ export default function CompanionPageClient() {
             "Done is done. That's real progress, and it's logged. What's next, or do you want to ride that for a sec?",
           ];
       const ack = acks[Math.floor(Math.random() * acks.length)]!;
-      const userMessage: Message = { role: "user", content: trimmed };
-      if (fresh) clearConversation();
-      const base = fresh ? [] : messages;
-      setMessages([
-        ...base,
-        userMessage,
-        { role: "assistant", content: ack },
-      ]);
-      setInput("");
-      voiceUsedRef.current = false;
+      finishLocalChatTurn(ack);
       logMomentum("complete", `Win: ${winDetail}`);
       clearLastActivity();
       setLastAct(null);
+      finishLatencyTurn({ localReply: true });
       return;
     }
 
     const commitUserLine = () => {
-      const um: Message = { role: "user", content: trimmed };
-      setMessages(fresh ? [um] : [...messages, um]);
       setInput("");
       voiceUsedRef.current = false;
     };
@@ -9741,6 +9753,7 @@ export default function CompanionPageClient() {
         setPendingDocumentTypeChoice(null);
         commitUserLine();
         if (tryChatCreateHandoff(trimmed, lastAssistantForGov, turnMessages)) {
+          finishEarlyChatTurn();
           return;
         }
       }
@@ -9750,6 +9763,7 @@ export default function CompanionPageClient() {
         const topic = pendingDocumentTypeChoice.topic;
         setPendingDocumentTypeChoice(null);
         openCollaborativeDocument(picked, topic, trimmed);
+        finishEarlyChatTurn();
         return;
       }
     }
@@ -9761,6 +9775,7 @@ export default function CompanionPageClient() {
         ...prev,
         { role: "assistant", content: formatDocumentRecoveryReply(matches) },
       ]);
+      finishEarlyChatTurn();
       return;
     }
 
@@ -9794,12 +9809,14 @@ export default function CompanionPageClient() {
       ) {
         openFounderActionWorkspace(recovery.action);
       }
+      finishEarlyChatTurn();
       return;
     }
 
     if (isFounderActionAcceptance(trimmed) && founderActionBoard.currentAction) {
       commitUserLine();
       respondToFounderAction(founderActionBoard.currentAction, "open");
+      finishEarlyChatTurn();
       return;
     }
 
@@ -9844,12 +9861,14 @@ export default function CompanionPageClient() {
             content: documentTypeConfirmationMessage(topic),
           },
         ]);
+        finishEarlyChatTurn();
         return;
       }
       const kind = inferDocumentTypeFromRequest(trimmed);
       if (kind) {
         commitUserLine();
         openCollaborativeDocument(kind, extractDocumentTopic(trimmed), trimmed);
+        finishEarlyChatTurn();
         return;
       }
     }
@@ -9871,6 +9890,7 @@ export default function CompanionPageClient() {
       ) {
         commitUserLine();
         openAssetRoute(assetRoute);
+        finishEarlyChatTurn();
         return;
       }
 
@@ -9882,6 +9902,7 @@ export default function CompanionPageClient() {
       ) {
         commitUserLine();
         openCreateFromIntent(resolved, turnMessages);
+        finishEarlyChatTurn();
         return;
       }
 
@@ -9894,6 +9915,7 @@ export default function CompanionPageClient() {
       ) {
         commitUserLine();
         openCreateFromIntent(resolved, turnMessages);
+        finishEarlyChatTurn();
         return;
       }
     }
@@ -9901,8 +9923,6 @@ export default function CompanionPageClient() {
     setActiveSection("home");
     setActiveNav(workspacePanel === "content-generator" ? "create" : "chat");
 
-    const detected = detectEmotionalState(trimmed);
-    setEmotion(detected);
     latencyProfiler.mark("intentRouting");
     let turnIntentRouting = resolveIntentRouting({
       userText: trimmed,
@@ -9914,18 +9934,7 @@ export default function CompanionPageClient() {
     latencyProfiler.measure("intentRouting");
     const learnFastPath = turnIntentRouting.learnFastPath;
 
-    const inputType = voiceUsedRef.current ? "voice" : "text";
-    const userMessage: Message = { role: "user", content: trimmed };
-    // A fresh start (e.g. opening a Playbook path) begins a brand-new
-    // conversation rather than appending to the previous one.
-    if (fresh) clearConversation();
-    const nextMessages = fresh ? [userMessage] : [...messages, userMessage];
-
-    setMessages(nextMessages);
-    setInput("");
-    const usedVoiceThisTurn = voiceUsedRef.current;
-    voiceUsedRef.current = false;
-    setError(null);
+    const inputType = usedVoiceThisTurn ? "voice" : "text";
 
     const lastAssistantText =
       [...nextMessages].reverse().find((m) => m.role === "assistant")?.content ??
@@ -10060,17 +10069,9 @@ export default function CompanionPageClient() {
       const snap = decisionCompassOffer;
       setDecisionCompassOffer(null);
       clearAllPendingOffers();
-      const userMessage: Message = { role: "user", content: trimmed };
-      if (fresh) clearConversation();
-      setMessages((prev) => [
-        ...(fresh ? [] : prev),
-        userMessage,
-        { role: "assistant", content: decisionCompassOpenAck() },
-      ]);
-      setInput("");
       openDecisionCompass(snap.prefill);
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishLocalChatTurn(decisionCompassOpenAck());
+      finishLatencyTurn({ localReply: true });
       return;
     }
 
@@ -10081,25 +10082,15 @@ export default function CompanionPageClient() {
       });
       if (survey.template) {
         const template = survey.template;
-        const userMessage: Message = { role: "user", content: trimmed };
-        if (fresh) clearConversation();
         recordSurveyCreated(template.id, { influencedDecision: true });
         openCreateWithShari(
           buildSurveyCreationInput(template, survey.recommendedLength),
         );
-        setMessages((prev) => [
-          ...(fresh ? [] : prev),
-          userMessage,
-          {
-            role: "assistant",
-            content:
-              `I've opened **${template.name}** with proven questions already loaded — ` +
-              "not a blank page. Edit anything to match your voice.",
-          },
-        ]);
-        setInput("");
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishLocalChatTurn(
+          `I've opened **${template.name}** with proven questions already loaded — ` +
+            "not a blank page. Edit anything to match your voice.",
+        );
+        finishLatencyTurn({ localReply: true });
         return;
       }
     }
@@ -10109,22 +10100,11 @@ export default function CompanionPageClient() {
     }
 
     if (isExplicitBreatheRequest(trimmed) && !governorChatOnly) {
-      const userMessage: Message = { role: "user", content: trimmed };
-      if (fresh) clearConversation();
-      setMessages((prev) => [
-        ...(fresh ? [] : prev),
-        userMessage,
-        {
-          role: "assistant",
-          content: standaloneToolAck("breathe"),
-        },
-      ]);
-      setInput("");
       setStressReliefOffer(null);
       clearAllPendingOffers();
       handleToolSelectCore("breathe");
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishLocalChatTurn(standaloneToolAck("breathe"));
+      finishLatencyTurn({ localReply: true });
       return;
     }
 
@@ -10140,8 +10120,7 @@ export default function CompanionPageClient() {
             : createReceiptMessage("draft_updated"),
         })
       ) {
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         return;
       }
     }
@@ -10157,13 +10136,7 @@ export default function CompanionPageClient() {
         createConsent: pendingCreateOpen,
       });
       if (dispatchResolvedAcceptance(acceptance, null)) {
-        const userMessage: Message = { role: "user", content: trimmed };
-        if (fresh) clearConversation();
-        setMessages((prev) => [...(fresh ? [] : prev), userMessage]);
-        setInput("");
-        voiceUsedRef.current = false;
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         return;
       }
     }
@@ -10178,8 +10151,7 @@ export default function CompanionPageClient() {
         source: "governor",
         tool: "games",
       });
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishEarlyChatTurn();
       return;
     }
 
@@ -10202,8 +10174,7 @@ export default function CompanionPageClient() {
         section,
         lane: turnSurface.lane,
       });
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishEarlyChatTurn();
       return;
     }
 
@@ -10262,6 +10233,7 @@ export default function CompanionPageClient() {
       setToolSuggestion(null);
       setActionBridge(null);
       setBridge(null);
+      finishEarlyChatTurn();
       return;
     }
 
@@ -10302,32 +10274,20 @@ export default function CompanionPageClient() {
       acceptanceResolution.outcome === "expired"
     ) {
       if (isAcceptanceAttempt(trimmed)) {
-        const userMessage: Message = { role: "user", content: trimmed };
-        if (fresh) clearConversation();
         setMessages((prev) => [
-          ...(fresh ? [] : prev),
-          userMessage,
+          ...prev,
           {
             role: "assistant",
             content: acceptanceResolution.message,
           },
         ]);
-        setInput("");
-        voiceUsedRef.current = false;
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         return;
       }
     }
 
     if (dispatchResolvedAcceptance(acceptanceResolution, pendingNow)) {
-      const userMessage: Message = { role: "user", content: trimmed };
-      if (fresh) clearConversation();
-      setMessages((prev) => [...(fresh ? [] : prev), userMessage]);
-      setInput("");
-      voiceUsedRef.current = false;
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishEarlyChatTurn();
       return;
     }
 
@@ -10341,6 +10301,7 @@ export default function CompanionPageClient() {
       shouldAutoLaunchPendingAction(trimmed, lastAssistantText, pendingNow)
     ) {
       executePendingAction(pendingNow);
+      finishEarlyChatTurn();
       return;
     }
 
@@ -10354,6 +10315,7 @@ export default function CompanionPageClient() {
           ...prev,
           { role: "assistant", content: stressToolOpenAck("talk-through") },
         ]);
+        finishEarlyChatTurn();
         return;
       }
       acceptStressReliefOption(stressToolChoice);
@@ -10361,6 +10323,7 @@ export default function CompanionPageClient() {
         ...prev,
         { role: "assistant", content: stressToolOpenAck(stressToolChoice) },
       ]);
+      finishEarlyChatTurn();
       return;
     }
 
@@ -10373,6 +10336,7 @@ export default function CompanionPageClient() {
         ...prev,
         { role: "assistant", content: decisionCompassOpenAck() },
       ]);
+      finishEarlyChatTurn();
       return;
     }
 
@@ -10393,13 +10357,12 @@ export default function CompanionPageClient() {
           ),
         },
       ]);
+      finishEarlyChatTurn();
       return;
     }
 
     if (workspacePanel === "google-workspace" && googleWorkspaceRef.current) {
       const gw = googleWorkspaceRef.current;
-      beginVisibleThinking(trimmed, detected);
-      setIsLoading(true);
       try {
         const res = await fetch("/api/google/apply-edit", {
           method: "POST",
@@ -10446,9 +10409,7 @@ export default function CompanionPageClient() {
         ]);
         setError(null);
       } finally {
-        endVisibleThinking();
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
       }
       return;
     }
@@ -10468,11 +10429,13 @@ export default function CompanionPageClient() {
           session,
           buildProjectOpenMessage(pendingDuplicateProject),
         );
+        finishEarlyChatTurn();
         return;
       }
       if (/\bnew\b/i.test(trimmed) && workspaceOffer) {
         setPendingDuplicateProject(null);
         acceptWorkspaceOffer(workspaceOffer);
+        finishEarlyChatTurn();
         return;
       }
     }
@@ -10490,6 +10453,7 @@ export default function CompanionPageClient() {
           buildSessionFromProject(picked),
           buildProjectOpenMessage(picked),
         );
+        finishEarlyChatTurn();
         return;
       }
     }
@@ -10838,8 +10802,7 @@ export default function CompanionPageClient() {
           setToolSuggestion(null);
           setActionBridge(null);
           setBridge(null);
-          setIsLoading(false);
-          inputRef.current?.focus();
+          finishEarlyChatTurn();
           return;
         }
       }
@@ -10991,8 +10954,7 @@ export default function CompanionPageClient() {
         { role: "assistant", content: turnIntentRouting.clarifyPrompt! },
       ]);
       setInput("");
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishEarlyChatTurn();
       return;
     }
     if (frictionlessAction.localReply) {
@@ -11003,8 +10965,7 @@ export default function CompanionPageClient() {
       if (frictionlessAction.immediateVisualOpen) {
         completeVisualThinkingOpen(frictionlessAction.immediateVisualOpen);
         setInput("");
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
       }
@@ -11042,8 +11003,7 @@ export default function CompanionPageClient() {
       if (frictionlessAction.workspaceOffer) {
         setWorkspaceOffer(frictionlessAction.workspaceOffer);
       }
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishEarlyChatTurn();
       finishLatencyTurn({ localReply: true });
       return;
     }
@@ -11167,7 +11127,7 @@ export default function CompanionPageClient() {
           : shouldOfferStressRelief(trimmed, nextMessages)
             ? buildStressReliefOffer()
             : null;
-    const pendingWorkspaceOffer =
+    const pendingWorkspaceOfferRaw =
       shouldDeferWorkspaceRoutingForPhase1() ||
       !rawWorkspaceOffer ||
       shouldSuppressWorkspaceOffer(workspaceContext, rawWorkspaceOffer) ||
@@ -11175,11 +11135,22 @@ export default function CompanionPageClient() {
       pendingDecisionCompassOffer
         ? null
         : rawWorkspaceOffer;
+    let pendingWorkspaceOffer = pendingWorkspaceOfferRaw;
+    if (
+      pendingWorkspaceOffer &&
+      !isExplicitFocusAudioRequest(trimmed) &&
+      isConversationOfferDeclined(
+        declinedConversationOffersRef.current,
+        workspaceOfferDeclineKey(pendingWorkspaceOffer),
+      )
+    ) {
+      pendingWorkspaceOffer = null;
+    }
     const deferToolCards = shouldDeferToolCardOnFirstDistress(
       nextMessages,
       trimmed,
     );
-    const pendingToolOffer =
+    const pendingToolOfferRaw =
       shouldDeferWorkspaceRoutingForPhase1() ||
       willBridge ||
       skipToolOffer ||
@@ -11203,6 +11174,17 @@ export default function CompanionPageClient() {
             askingHow,
             messages: nextMessages,
           });
+    let pendingToolOffer = pendingToolOfferRaw;
+    if (
+      pendingToolOffer &&
+      !isExplicitFocusAudioRequest(trimmed) &&
+      isConversationOfferDeclined(
+        declinedConversationOffersRef.current,
+        toolSuggestionDeclineKey(pendingToolOffer),
+      )
+    ) {
+      pendingToolOffer = null;
+    }
 
     if (
       !shouldDeferWorkspaceRoutingForPhase1() &&
@@ -11329,8 +11311,7 @@ export default function CompanionPageClient() {
             { role: "assistant", content: stripped },
           ]);
           applyWorkspaceFocus(coachFocus ?? coachTurn.focusField ?? null);
-          setIsLoading(false);
-          inputRef.current?.focus();
+          finishEarlyChatTurn();
           return;
         }
       }
@@ -11483,7 +11464,7 @@ export default function CompanionPageClient() {
               },
             ]);
             setInput("");
-            setIsLoading(false);
+            finishEarlyChatTurn();
             setWorkspaceOffer(null);
             setToolSuggestion(null);
             setActionBridge(null);
@@ -11563,20 +11544,15 @@ export default function CompanionPageClient() {
           ecosystemMatch.section,
         )
       ) {
-        const userMessage: Message = { role: "user", content: trimmed };
         const wsOffer = ecosystemIntentToWorkspaceOffer(ecosystemMatch);
-        if (fresh) clearConversation();
         setMessages((prev) => [
-          ...(fresh ? [] : prev),
-          userMessage,
+          ...prev,
           { role: "assistant", content: wsOffer.line },
         ]);
         setWorkspaceOffer(wsOffer);
         publishConversationOffer(wsOffer.line, wsOffer);
         registerPendingAcceptance("workspace", ecosystemMatch.featureLabel);
-        setInput("");
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         return;
       }
     }
@@ -11590,12 +11566,9 @@ export default function CompanionPageClient() {
       !isExplicitBreatheRequest(trimmed) &&
       !turnIntentRouting.overwhelmTodayRoute
     ) {
-      const userMessage: Message = { role: "user", content: trimmed };
       const offerLine = adaptMyDayOfferLine();
-      if (fresh) clearConversation();
       setMessages((prev) => [
-        ...(fresh ? [] : prev),
-        userMessage,
+        ...prev,
         { role: "assistant", content: offerLine },
       ]);
       const energyOffer: WorkspaceOffer = {
@@ -11605,9 +11578,7 @@ export default function CompanionPageClient() {
       };
       setWorkspaceOffer(energyOffer);
       publishConversationOffer(offerLine, energyOffer);
-      setInput("");
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishEarlyChatTurn();
       return;
     }
 
@@ -11631,8 +11602,7 @@ export default function CompanionPageClient() {
         setToolSuggestion(null);
         setActionBridge(null);
         setBridge(null);
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         return;
       }
 
@@ -11658,8 +11628,7 @@ export default function CompanionPageClient() {
         setToolSuggestion(null);
         setActionBridge(null);
         setBridge(null);
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         return;
       }
     }
@@ -11676,23 +11645,15 @@ export default function CompanionPageClient() {
           primaryBusinessAdviceDomain(trimmed),
         );
         businessConfidencePendingTextRef.current = trimmed;
-        const userMessage: Message = { role: "user", content: trimmed };
-        if (fresh) clearConversation();
         setMessages((prev) => [
-          ...(fresh ? [] : prev),
-          userMessage,
+          ...prev,
           { role: "assistant", content: offer.message },
         ]);
         setBusinessConfidenceOffer(offer);
-        setInput("");
-        setIsLoading(false);
-        inputRef.current?.focus();
+        finishEarlyChatTurn();
         return;
       }
     }
-
-    beginVisibleThinking(trimmed, detected);
-    setIsLoading(true);
 
     try {
       latencyProfiler.mark("promptConstruction");
@@ -11925,10 +11886,12 @@ export default function CompanionPageClient() {
       latencyProfiler.measure("promptConstruction");
       latencyProfiler.mark("apiModel");
       latencyProfiler.calledApi = true;
+      const useChatStream = speedProfile.routeClass === "fast";
       const res = await fetch("/api/companion-chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          stream: useChatStream,
           messages: messagesForApi(
             nextMessages,
             workspaceChatScopeRef.current,
@@ -12273,30 +12236,61 @@ export default function CompanionPageClient() {
         }),
       });
 
-      const data = await readJsonResponse<Record<string, unknown>>(res, {
-        url: "/api/companion-chat",
-      });
-      latencyProfiler.measure("apiModel");
-      latencyProfiler.mark("responseEnforcement");
+      let rawAssistantMsg = "";
+      let relationshipResponseId = "unknown";
+      let apiTurnDebug: Record<string, unknown> | undefined;
+      let streamedChatResponse = false;
+
       if (!res.ok) {
+        const errorData = await readJsonResponse<Record<string, unknown>>(res, {
+          url: "/api/companion-chat",
+        });
         const apiError =
-          typeof data.error === "string" ? data.error : undefined;
+          typeof errorData.error === "string" ? errorData.error : undefined;
         throw new Error(apiError ?? friendlyFetchErrorMessage(null));
       }
 
-      const rawAssistantMsg =
-        typeof data.message === "string" ? data.message : "";
-      const apiTurnDebug = data._relationshipTurnDebug as
-        | Record<string, unknown>
-        | undefined;
-      const relationshipResponseId =
-        (typeof data.relationshipResponseId === "string"
-          ? data.relationshipResponseId
-          : undefined) ??
-        (typeof apiTurnDebug?.relationshipResponseId === "string"
-          ? apiTurnDebug.relationshipResponseId
-          : undefined) ??
-        "unknown";
+      if (useChatStream && isCompanionChatStreamResponse(res)) {
+        streamedChatResponse = true;
+        setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
+        let firstChunk = false;
+        const streamResult = await consumeCompanionChatStream(res, (text) => {
+          if (!firstChunk && text) {
+            firstChunk = true;
+            endVisibleThinking();
+          }
+          setMessages((prev) => {
+            const copy = [...prev];
+            const last = copy[copy.length - 1];
+            if (last?.role === "assistant") {
+              copy[copy.length - 1] = { ...last, content: text };
+            }
+            return copy;
+          });
+        });
+        rawAssistantMsg = streamResult.fullText;
+        relationshipResponseId = streamResult.relationshipResponseId ?? "unknown";
+      } else {
+        const data = await readJsonResponse<Record<string, unknown>>(res, {
+          url: "/api/companion-chat",
+        });
+        rawAssistantMsg =
+          typeof data.message === "string" ? data.message : "";
+        apiTurnDebug = data._relationshipTurnDebug as
+          | Record<string, unknown>
+          | undefined;
+        relationshipResponseId =
+          (typeof data.relationshipResponseId === "string"
+            ? data.relationshipResponseId
+            : undefined) ??
+          (typeof apiTurnDebug?.relationshipResponseId === "string"
+            ? apiTurnDebug.relationshipResponseId
+            : undefined) ??
+          "unknown";
+      }
+
+      latencyProfiler.measure("apiModel");
+      latencyProfiler.mark("responseEnforcement");
 
       const {
         field: focusField,
@@ -12418,10 +12412,25 @@ export default function CompanionPageClient() {
           }
         }
       }
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: assistantMsg, relationshipTrace: uiTrace },
-      ]);
+      setMessages((prev) => {
+        if (streamedChatResponse) {
+          const copy = [...prev];
+          const lastIdx = copy.length - 1;
+          const last = copy[lastIdx];
+          if (last?.role === "assistant") {
+            copy[lastIdx] = {
+              role: "assistant",
+              content: assistantMsg,
+              relationshipTrace: uiTrace,
+            };
+            return copy;
+          }
+        }
+        return [
+          ...prev,
+          { role: "assistant", content: assistantMsg, relationshipTrace: uiTrace },
+        ];
+      });
       if (
         shouldUseCreateBuilderChatTurns() &&
         workspacePanelRef.current === "content-generator" &&
@@ -12792,9 +12801,7 @@ export default function CompanionPageClient() {
         latencyProfiler.measure("uiRender");
         finishLatencyTurn({ calledApi: true });
       }
-      endVisibleThinking();
-      setIsLoading(false);
-      inputRef.current?.focus();
+      finishEarlyChatTurn();
     }
   }
 
@@ -13552,8 +13559,13 @@ export default function CompanionPageClient() {
         return <FocusAreaPanel onAction={handleFocusHubAction} />;
       case "growth":
         return (
-          <GrowthHubGalleryRedirect
-            onOpen={() => openNavSectionDirectCore(GALLERY_HOME_SECTION, "growth")}
+          <GrowthCenterPanel
+            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+            nav={buildGrowthPanelNav("growth")}
+            onOpenLifeExperienceRoom={openLifeExperienceRoomCore}
+            onOpenAssetLibrary={() =>
+              openNavSectionDirectCore(GALLERY_HOME_SECTION, "growth")
+            }
           />
         );
       case "confidence-vault":
@@ -13568,6 +13580,20 @@ export default function CompanionPageClient() {
           <MyJourneyPanel
             refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
             nav={buildGrowthPanelNav("my-journey")}
+          />
+        );
+      case "growth-journal":
+        return (
+          <GrowthJournalPanel
+            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+            nav={buildGrowthPanelNav("growth-journal")}
+          />
+        );
+      case "growth-portfolio":
+        return (
+          <GrowthPortfolioPanel
+            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+            nav={buildGrowthPanelNav("growth-portfolio")}
           />
         );
       case "my-work":
@@ -13814,6 +13840,8 @@ export default function CompanionPageClient() {
             emotion={displayEmotion}
             initialCategory={focusAudioCategory ?? undefined}
             onDone={closeWorkspacePanel}
+            onLaunchActivity={handlePeacefulPlacesGardenActivity}
+            onLaunchSection={handlePeacefulPlacesGardenSection}
           />
         );
       default:
@@ -14440,10 +14468,9 @@ export default function CompanionPageClient() {
     revealWorkspace,
   ]);
 
-  const arrivalNavVisibility =
-    arrivalNavImmersion && welcomeScene
-      ? "hidden"
-      : (homeArrival?.chrome.navVisibility ?? "calm");
+  const arrivalNavVisibility = welcomeScene
+    ? "normal"
+    : (effectiveHomeArrival?.chrome.navVisibility ?? "calm");
 
   function handleArrivalWalkComplete(section: AppSection) {
     if (section === "home") return;
@@ -14462,13 +14489,54 @@ export default function CompanionPageClient() {
     openSectionBesideChatCore(section, undefined, { userInitiated: true });
   }
 
+  const focusSanctuaryFullBleed = isFocusSanctuaryFullBleed(
+    activeSection,
+    activitySession,
+  );
+  const focusWorkflowSanctuary =
+    focusSanctuaryFullBleed &&
+    Boolean(activitySession.activityId) &&
+    activitySession.phase !== "browse";
+
+  const homeHasUserMessages = messages.some((m) => m.role === "user");
+  const homeMode = resolveHomeMode({
+    activeSection,
+    homeCalm,
+    hasUserMessages: homeHasUserMessages,
+  });
+
+  const workspaceLayoutCtx = {
+    activeSection,
+    overlay,
+    workspacePanel,
+    welcomeScene,
+    activitySession,
+  };
+
+  const companionDeskVisible = usesCompanionDesk(workspaceLayoutCtx);
+
+  const companionDeskFullBleed = resolveCompanionDeskFullBleed(workspaceLayoutCtx);
+
+  const showHomeFloatingChat =
+    activeSection === "home" && !welcomeScene && !companionDeskVisible;
+
   return (
+    <CompanionDeskProvider
+      fullBleed={companionDeskFullBleed}
+      visible={companionDeskVisible}
+      defaultContent={
+        companionDeskVisible ? <CompanionDeskChrome /> : null
+      }
+    >
     <div
       className={`relative flex h-dvh max-h-dvh overflow-hidden text-lg ${
+        companionDeskVisible ? "companion-has-companion-desk" : ""
+      } ${
         clientMounted ? shellClass : EMOTION_SHELL_CLASS.unclear
       }`}
       data-visual-mode={clientMounted ? visualMode : "off"}
       data-adaptive-context={clientMounted ? adaptiveVisualContext : "support"}
+      data-home-mode={homeMode ?? undefined}
       {...constitutionalRenderContext.environment.dataAttributes}
       {...constitutionalRenderContext.presence.dataAttributes}
       suppressHydrationWarning
@@ -14487,19 +14555,26 @@ export default function CompanionPageClient() {
       <CompanionBackground
         page={scenePage}
         seed={sceneSeed}
-        calmHome={homeArrival?.chrome.softenBackground ?? homeCalm}
+        calmHome={false}
         clearMyMind={clearMyMind}
-        suppress={suppressGlobalBackground || workspacePanel === "welcome-room"}
+        homesteadChat={homeMode === "chat" && !suppressGlobalBackground}
+        suppress={
+          suppressGlobalBackground ||
+          workspacePanel === "welcome-room" ||
+          homeMode === "welcome"
+        }
       />
 
       <div
         className={`relative z-10 flex h-full min-h-0 w-full overflow-hidden ${
-          arrivalNavImmersion && welcomeScene
-            ? "pl-0 companion-arrival-immersion"
+          welcomeScene
+            ? "pl-14 md:pl-44 companion-welcome-scene-active"
             : workspacePanel === "welcome-room"
               ? "pl-0"
               : activeSection === "the-gallery"
                 ? "pl-0 companion-gallery-active"
+              : workspacePanel === "growth"
+                ? "pl-0 companion-growth-active"
               : activeSection === "plan-my-day"
                 ? "pl-0 companion-plan-my-day-active"
               : activeSection === "brain-dump"
@@ -14508,14 +14583,13 @@ export default function CompanionPageClient() {
                 ? "pl-0 companion-peaceful-places-active"
               : activeSection === "games"
                 ? "pl-0 companion-momentum-games-active"
-              : activeSection === "focus" &&
-                  (activitySession.phase === "browse" ||
-                    !activitySession.activityId ||
-                    isGuidedExerciseActivity(activitySession.activityId))
+              : focusSanctuaryFullBleed
                 ? "pl-0 companion-focus-my-brain-active"
               : "pl-14 md:pl-44"
         } ${homeCalm ? "companion-home-calm" : ""} ${
           workspacePanel === "welcome-room" ? "companion-welcome-room-active" : ""
+        } ${
+          workspacePanel === "growth" ? "companion-growth-active" : ""
         } ${
           activeSection === "the-gallery" ? "companion-gallery-active" : ""
         } ${
@@ -14527,13 +14601,15 @@ export default function CompanionPageClient() {
         } ${
           activeSection === "games" ? "companion-momentum-games-active" : ""
         } ${
-          activeSection === "focus" &&
-          (activitySession.phase === "browse" ||
-            !activitySession.activityId ||
-            isGuidedExerciseActivity(activitySession.activityId))
-            ? "companion-focus-my-brain-active"
-            : ""
+          focusSanctuaryFullBleed ? "companion-focus-my-brain-active" : ""
+        } ${
+          focusWorkflowSanctuary ? "companion-focus-workflow-active" : ""
         }`}
+        data-everyday-chat={
+          activeSection === "home" && !welcomeScene && !homeCalm
+            ? ""
+            : undefined
+        }
         data-home-calm={homeCalm ? "" : undefined}
         data-arrival-immersion={
           arrivalNavImmersion && welcomeScene ? "" : undefined
@@ -14554,40 +14630,28 @@ export default function CompanionPageClient() {
         </CompanionSidebarPortal>
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-          <CompanionHomesteadLogo
-            hidden={
-              overlay === "signin" ||
-              overlay === "settings" ||
-              workspacePanel === "welcome-room" ||
-              activeSection === "plan-my-day" ||
-              activeSection === "focus-audio"
-            }
-          />
           <TopBar
             calmHome={homeCalm}
-            navVisibility={arrivalNavVisibility}
-            onOpenClearMyMindItem={handleTopBarClearMyMindItem}
-            onOpenPlanMyDayItem={handleTopBarPlanMyDayItem}
-            onOpenPeacefulPlaces={() =>
-              openPeacefulPlacesCore({ animate: activeSection === "home" })
-            }
-            onStartConversation={handleStartConversationWithLens}
-            onOpenWelcomeRoom={() => openWelcomeRoom()}
-            onOpenMyStory={() => openLifeExperienceRoomCore()}
-            onOpenWhatsNew={() => openWhatsNewCore()}
+            navVisibility="normal"
+            activeSection={activeSection}
+            onOpenClearMyMind={() => openClearMyMindCore()}
+            onOpenPlanMyDay={() => openPlanMyDayCore()}
+            onOpenTodaysReality={() => openAdaptMyDayCore()}
+            onNewConversationItem={handleTopBarNewConversationItem}
             onOpenSettings={(section) => {
               setSettingsSection(section ?? null);
               setOverlay("settings");
             }}
             onOpenProfile={() => setOverlay("profile")}
-            showPlanMyDay={activeSection !== "plan-my-day"}
           />
-          {!homeCalm && activeSection !== "plan-my-day" ? (
+          {!homeCalm && activeSection !== "plan-my-day" && !focusWorkflowSanctuary ? (
             <ActiveWorkspaceBar items={activeWorkspaceItems} />
           ) : null}
 
           {(activeSection !== "home" || overlay) &&
           !workspacePanel &&
+          activeSection !== "games" &&
+          !focusWorkflowSanctuary &&
           !sectionHasEmbeddedChatBack(activeSection) ? (
             <div className="shrink-0 px-4 pt-3 sm:px-6">
               <BackButton
@@ -14667,9 +14731,9 @@ export default function CompanionPageClient() {
                     </p>
                   ) : null}
                 </header>
-              ) : welcomeScene && homeArrival ? (
+              ) : welcomeScene && effectiveHomeArrival ? (
                 <ArrivalLivingRoomExperience
-                  arrival={homeArrival}
+                  arrival={effectiveHomeArrival}
                   input={input}
                   isLoading={isLoading}
                   isListening={isListening}
@@ -14683,12 +14747,12 @@ export default function CompanionPageClient() {
                   onStayAndChat={() => undefined}
                   onSend={() => void handleSend()}
                 />
-              ) : homeCalm ? (
+              ) : homeCalm && !welcomeScene ? (
                 <CompanionHomeCard
                   arrival={homeArrival}
                   onContinue={handleCompanionContinueOption}
                 />
-              ) : (
+              ) : activeSection === "home" && !welcomeScene ? null : (
               <IdentityBar
                 emotion={displayEmotion}
                 compact={!isIdle || splitCreateChat}
@@ -14743,24 +14807,11 @@ export default function CompanionPageClient() {
 
               {!welcomeScene ? (
               <div
-                className="flex-1 overflow-y-auto px-4 sm:px-6"
+                className="companion-homestead-chat__reading flex-1 overflow-y-auto px-4 sm:px-6"
               >
                 {!homeCalm && !suppressInterventionCards ? (
                   <FromYesterdayFocusCard
                     onOpenMomentum={() => setActiveSection("progress")}
-                  />
-                ) : null}
-                {welcomeRoomLoginOfferOpen &&
-                user &&
-                !welcomeRoomInvitationOpen &&
-                activeSection === "home" &&
-                !workspacePanel ? (
-                  <WelcomeRoomLoginOffer
-                    onVisit={() => openWelcomeRoom()}
-                    onDismiss={() => {
-                      dismissWelcomeRoomLoginOffer();
-                      setWelcomeRoomLoginOfferOpen(false);
-                    }}
                   />
                 ) : null}
                 {/* Home stays calm: greeting up top, open space here, the chat
@@ -15019,6 +15070,10 @@ export default function CompanionPageClient() {
                             }
                             onDismiss={() => {
                               if (workspaceOffer) {
+                                declineConversationOffer(
+                                  declinedConversationOffersRef.current,
+                                  workspaceOfferDeclineKey(workspaceOffer),
+                                );
                                 captureOfferDismissed(
                                   workspaceOffer,
                                   closedLoopCtx(),
@@ -15055,6 +15110,10 @@ export default function CompanionPageClient() {
                             keepTalkingLabel={toolSuggestion.keepTalkingLabel}
                             onAccept={() => acceptToolSuggestion(toolSuggestion)}
                             onDismiss={() => {
+                              declineConversationOffer(
+                                declinedConversationOffersRef.current,
+                                toolSuggestionDeclineKey(toolSuggestion),
+                              );
                               trackToolSuggestionDismissed(toolSuggestion.kind);
                               captureToolOfferDismissed(
                                 toolSuggestion.kind,
@@ -15089,48 +15148,14 @@ export default function CompanionPageClient() {
               )}
 
               {!welcomeScene ? (
-              <footer
-                className="input-footer sticky bottom-0 shrink-0 px-4 py-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6"
-              >
-                <div className="mx-auto w-full max-w-xl">
-                  {pendingAction && !suppressInterventionCards && !isLoading && !homeCalm ? (
-                    pendingAction.kind === "artifact-export" ? (
-                      <ArtifactActionBar
-                        artifactType={pendingAction.offer.artifactType}
-                        line={pendingAction.offer.line}
-                        actions={pendingAction.offer.actions}
-                        onAction={runArtifactExport}
-                        onDismiss={() => {
-                          clearAllPendingOffers();
-                          dismissOfferKeepTalking();
-                        }}
-                      />
-                    ) : (
-                      <PendingActionBar
-                        objectId={pendingActionObjectId(pendingAction)}
-                        label={pendingActionLabel(pendingAction)}
-                        line={pendingActionLine(pendingAction)}
-                        onOpen={() => executePendingAction(pendingAction)}
-                        onDismiss={() => {
-                          clearAllPendingOffers();
-                          dismissOfferKeepTalking();
-                        }}
-                      />
-                    )
-                  ) : null}
-                  {splitCreateBuilder &&
-                  createBuilderActionsForPhase(createBuilderSession)?.length ? (
-                    <CreateBuilderActionBar
-                      actions={
-                        createBuilderActionsForPhase(createBuilderSession)!
-                      }
-                      onAction={handleCreateBuilderAction}
-                      disabled={isLoading}
-                    />
-                  ) : null}
-                  <CompanionCommunicationAnchor
-                    variant={homeCalm ? "living-room" : "default"}
-                    mode="full"
+              <footer className="shrink-0">
+                {showHomeFloatingChat ? (
+                  <HomeChatInputFooter
+                    homeCalm={homeCalm}
+                    homeChatPlaceholder={homeArrival?.chatPlaceholder}
+                    conversationMode={
+                      homeArrival?.chrome.conversationInput ?? false
+                    }
                     input={input}
                     isLoading={isLoading}
                     isListening={isListening}
@@ -15140,57 +15165,27 @@ export default function CompanionPageClient() {
                     onKeyDown={handleKeyDown}
                     onToggleListening={toggleListening}
                     onSend={() => void handleSend()}
-                    conversationMode={homeArrival?.chrome.conversationInput ?? false}
-                    placeholder={
-                      homeCalm ? homeArrival?.chatPlaceholder : undefined
-                    }
+                    pendingAction={pendingAction}
+                    suppressInterventionCards={suppressInterventionCards}
+                    onRunArtifactExport={runArtifactExport}
+                    onClearPendingOffers={clearAllPendingOffers}
+                    onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                    onExecutePendingAction={executePendingAction}
+                    splitCreateBuilder={splitCreateBuilder}
+                    createBuilderSession={createBuilderSession}
+                    onCreateBuilderAction={handleCreateBuilderAction}
+                    voiceOutput={voiceOutput}
+                    voiceBlocked={voiceBlocked}
+                    onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                    onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                    ttsAudioRef={ttsAudioRef}
                   />
-                  {!homeCalm && (
-                  <div className="mt-2 flex flex-col items-center justify-center gap-1">
-                    <div className="flex items-center justify-center gap-3">
-                      {(() => {
-                        const vs = getVoiceStatus();
-                        // Essential plan has no voice — show a locked upgrade chip.
-                        if (!vs.hasVoice) {
-                          return (
-                            <span
-                              title="Voice is part of Voice Lite and Voice Pro"
-                              className="rounded-full bg-white/70 px-3 py-1 text-xs font-semibold text-[#9a8f82]"
-                            >
-                              🔒 Voice — upgrade to talk back & forth
-                            </span>
-                          );
-                        }
-                        return (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              if (voiceOutput) ttsAudioRef.current?.pause();
-                              setVoiceBlocked(false);
-                              setVoiceOutput((v) => !v);
-                            }}
-                            title="Shari reads her replies aloud"
-                            className={`rounded-full px-3 py-1 text-xs font-semibold transition-colors ${
-                              voiceOutput
-                                ? "bg-[#1e4f4f] text-white"
-                                : "bg-white/70 text-[#6b635a] hover:bg-white"
-                            }`}
-                          >
-                            {voiceOutput ? "🔊 Voice on" : "🔈 Voice off"} ·{" "}
-                            {Math.ceil(vs.leftMin)}m left
-                          </button>
-                        );
-                      })()}
-                    </div>
-                    {voiceBlocked && (
-                      <p className="text-xs font-semibold text-[#a85c4a]">
-                        You&apos;re out of voice minutes this month — upgrade for
-                        more.
-                      </p>
-                    )}
-                  </div>
-                  )}
-                </div>
+                ) : companionDeskVisible ? (
+                  <div
+                    className="companion-desk-scroll-spacer h-[clamp(18vh,20vh,22vh)]"
+                    aria-hidden
+                  />
+                ) : null}
               </footer>
               ) : null}
             </main>
@@ -15253,10 +15248,7 @@ export default function CompanionPageClient() {
                 activeSection === "plan-my-day" ||
                 activeSection === "focus-audio" ||
                 activeSection === "games" ||
-                (activeSection === "focus" &&
-                  (activitySession.phase === "browse" ||
-                    !activitySession.activityId ||
-                    isGuidedExerciseActivity(activitySession.activityId)))
+                focusSanctuaryFullBleed
                   ? "clear-my-mind-standalone-shell min-h-[100dvh] min-h-[100svh] flex-1 overflow-hidden"
                   : "min-h-0 flex-1 overflow-y-auto px-2 py-3 sm:px-4"
               }
@@ -15268,10 +15260,7 @@ export default function CompanionPageClient() {
                 activeSection === "plan-my-day" ||
                 activeSection === "focus-audio" ||
                 activeSection === "games" ||
-                (activeSection === "focus" &&
-                  (activitySession.phase === "browse" ||
-                    !activitySession.activityId ||
-                    isGuidedExerciseActivity(activitySession.activityId)))
+                focusSanctuaryFullBleed
                   ? undefined
                   : "Click outside the panel to go back"
               }
@@ -15282,10 +15271,7 @@ export default function CompanionPageClient() {
                 activeSection === "plan-my-day" ||
                 activeSection === "focus-audio" ||
                 activeSection === "games" ||
-                (activeSection === "focus" &&
-                  (activitySession.phase === "browse" ||
-                    !activitySession.activityId ||
-                    isGuidedExerciseActivity(activitySession.activityId)))
+                focusSanctuaryFullBleed
                   ? undefined
                   : (e) => {
                       if (e.target === e.currentTarget) goBack();
@@ -15300,10 +15286,7 @@ export default function CompanionPageClient() {
                   activeSection === "plan-my-day" ||
                   activeSection === "focus-audio" ||
                   activeSection === "games" ||
-                  (activeSection === "focus" &&
-                    (activitySession.phase === "browse" ||
-                      !activitySession.activityId ||
-                      isGuidedExerciseActivity(activitySession.activityId)))
+                  focusSanctuaryFullBleed
                     ? "clear-my-mind-standalone-frame h-full min-h-[100dvh] min-h-[100svh] w-full"
                     : WORKSPACE_FULL_PAGE_SURFACE_CLASS
                 }
@@ -15390,10 +15373,12 @@ export default function CompanionPageClient() {
               initialCategory={focusAudioCategory ?? undefined}
               arrivalActive={peacefulPlacesArrivalActive}
               onArrivalComplete={() => setPeacefulPlacesArrivalActive(false)}
+              onLaunchActivity={handlePeacefulPlacesGardenActivity}
+              onLaunchSection={handlePeacefulPlacesGardenSection}
               onDone={() => {
                 setFocusAudioCategory(null);
                 setPeacefulPlacesArrivalActive(false);
-                setActiveSection("home");
+                setActiveSection("focus");
               }}
             />
           )}
@@ -15402,22 +15387,25 @@ export default function CompanionPageClient() {
           activitySession.phase !== "browse" &&
           activitySession.activityId &&
           !isGuidedExerciseActivity(activitySession.activityId) ? (
-            <CompanionActivitiesPanel
-              variant="help-now"
-              session={activitySession}
-              onSessionChange={setActivitySession}
-              onOpenBeside={handleActivityOpenBeside}
-              onOpenDecisionCompass={() => openDecisionCompass()}
-              onClose={() => goBack()}
-              registerBack={registerBack}
-              onBeforeActivityStart={pushNavigationRestore}
-              returnToLabel={activityReturnLabel ?? undefined}
-              onExitActivity={handleExitActivity}
-              decisionCompassPrefill={decisionCompassPrefill}
-              decisionCompassSession={decisionCompassSession}
-              onDecisionCompassSessionChange={handleDecisionCompassSessionChange}
-              onDecisionCompassComplete={handleDecisionCompassComplete}
-            />
+            <FocusMyBrainRoomShell floatingWorkflow>
+              <CompanionActivitiesPanel
+                sanctuary
+                variant="help-now"
+                session={activitySession}
+                onSessionChange={setActivitySession}
+                onOpenBeside={handleActivityOpenBeside}
+                onOpenDecisionCompass={() => openDecisionCompass()}
+                onClose={() => goBack()}
+                registerBack={registerBack}
+                onBeforeActivityStart={pushNavigationRestore}
+                returnToLabel={activityReturnLabel ?? undefined}
+                onExitActivity={handleExitActivity}
+                decisionCompassPrefill={decisionCompassPrefill}
+                decisionCompassSession={decisionCompassSession}
+                onDecisionCompassSessionChange={handleDecisionCompassSessionChange}
+                onDecisionCompassComplete={handleDecisionCompassComplete}
+              />
+            </FocusMyBrainRoomShell>
           ) : activeSection === "focus" ? (
             <FocusAreaPanel standalone onAction={handleFocusHubAction} />
           ) : null}
@@ -15431,7 +15419,28 @@ export default function CompanionPageClient() {
             </WorkspaceShell>
           )}
 
-          {activeSection === "guided-exercises" && (
+          {activeSection === "guided-exercises" &&
+          (focusWorkflowSanctuary ? (
+            <FocusMyBrainRoomShell floatingWorkflow>
+              <CompanionActivitiesPanel
+                sanctuary
+                variant="guided"
+                session={activitySession}
+                onSessionChange={setActivitySession}
+                onOpenBeside={handleActivityOpenBeside}
+                onOpenDecisionCompass={() => openDecisionCompass()}
+                onClose={() => goBack()}
+                registerBack={registerBack}
+                onBeforeActivityStart={pushNavigationRestore}
+                returnToLabel={activityReturnLabel ?? undefined}
+                onExitActivity={handleExitActivity}
+                decisionCompassPrefill={decisionCompassPrefill}
+                decisionCompassSession={decisionCompassSession}
+                onDecisionCompassSessionChange={handleDecisionCompassSessionChange}
+                onDecisionCompassComplete={handleDecisionCompassComplete}
+              />
+            </FocusMyBrainRoomShell>
+          ) : (
             <CompanionActivitiesPanel
               variant="guided"
               session={activitySession}
@@ -15448,7 +15457,7 @@ export default function CompanionPageClient() {
               onDecisionCompassSessionChange={handleDecisionCompassSessionChange}
               onDecisionCompassComplete={handleDecisionCompassComplete}
             />
-          )}
+          ))}
 
           {activeSection === "spin-wheel" && (
             <SpinWheelPanel
@@ -15459,8 +15468,9 @@ export default function CompanionPageClient() {
 
           {activeSection === "games" && (
             <MomentumGamesRoomShell>
-              <GamesPanel
-                onOpenSpinWheel={() => openStandaloneFocusSectionCore("spin-wheel")}
+              <MomentumBuildersPanel
+                onLaunchExternal={handleMomentumBuilderLaunch}
+                onReturnHome={goBack}
               />
             </MomentumGamesRoomShell>
           )}
@@ -15802,15 +15812,6 @@ export default function CompanionPageClient() {
         </div>
       ) : null}
 
-      <WelcomeRoomInvitation
-        open={welcomeRoomInvitationOpen}
-        onVisit={() => openWelcomeRoom()}
-        onSkip={() => {
-          dismissWelcomeRoomInvitation();
-          setWelcomeRoomInvitationOpen(false);
-        }}
-      />
-
       {workspacePanel === "welcome-room" ? (
         <WelcomeRoomPanel
           onBackToChat={leaveWelcomeRoom}
@@ -15819,5 +15820,6 @@ export default function CompanionPageClient() {
         />
       ) : null}
     </div>
+    </CompanionDeskProvider>
   );
 }

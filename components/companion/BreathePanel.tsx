@@ -221,8 +221,9 @@ export function BreathePanel({ onDone }: { onDone?: () => void }) {
       scene={createSceneState({ workspaceId: "breathe", seed: "breathe" })}
       className="companion-fade-in h-full min-h-0 overflow-y-auto"
     >
-      <div className="flex flex-col items-center text-center">
-        <div className="mt-6 flex w-full gap-2">
+      <div className="breathe-panel-frost companion-glass-panel mx-auto mt-6 max-w-md px-4 py-5 sm:px-6">
+        <div className="flex flex-col items-center text-center">
+          <div className="flex w-full gap-2">
           <button type="button" onClick={() => changeMode("calm")} className={modeBtn("calm", "")}>
             🟢 Calm
           </button>
@@ -311,7 +312,7 @@ export function BreathePanel({ onDone }: { onDone?: () => void }) {
             }}
           >
             <div>
-              <p className="breathe-orb-label text-2xl font-bold">
+              <p className="breathe-orb-label text-lg font-bold">
                 {active
                   ? PHASE_LABEL[phase.kind]
                   : completed
@@ -319,7 +320,7 @@ export function BreathePanel({ onDone }: { onDone?: () => void }) {
                     : "Ready"}
               </p>
               {active && (
-                <p className="breathe-orb-count mt-1 font-mono text-5xl font-bold tabular-nums">
+                <p className="breathe-orb-count mt-1 font-mono text-3xl font-bold tabular-nums">
                   {secondsLeft}
                 </p>
               )}
@@ -359,6 +360,7 @@ export function BreathePanel({ onDone }: { onDone?: () => void }) {
               Done
             </button>
           )}
+        </div>
         </div>
       </div>
     </SceneRenderer>

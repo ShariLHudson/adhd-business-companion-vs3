@@ -1,19 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import type { GrowthPanelNav, GrowthSectionId } from "@/lib/growthNavigation";
-import { GROWTH_DESTINATION_STYLES } from "@/lib/growthNavigation";
+import {
+  GROWTH_DESTINATION_STYLES,
+  GROWTH_SECTION_META,
+  type GrowthPanelNav,
+  type GrowthSectionId,
+} from "@/lib/growthNavigation";
+import { GrowthRoomShell } from "@/components/companion/GrowthRoomShell";
 import { GrowthSectionHeader } from "@/components/companion/GrowthSectionHeader";
 import { GrowthReportsPanel } from "@/components/companion/GrowthReportsPanel";
 import { OutcomeGoalsPanel } from "@/components/companion/OutcomeGoalsPanel";
 import { GrowthHubInboxStrip } from "@/components/companion/GrowthHubInboxStrip";
 import { GrowthSaveSuggestionBanner } from "@/components/companion/GrowthSaveSuggestionBanner";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
+import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 import {
   EcosystemCloseAllButton,
   EcosystemCollapsibleSection,
 } from "@/components/companion/EcosystemCollapsibleSection";
-import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
 import { createSavedGrowthWin } from "@/lib/growthWinsStore";
 import { setEvidencePrefill } from "@/lib/evidenceBankStore";
 import { setJourneyPrefill } from "@/lib/myJourneyStore";
@@ -93,10 +98,12 @@ export function GrowthCenterPanel({
   refreshKey = 0,
   nav,
   onOpenLifeExperienceRoom,
+  onOpenAssetLibrary,
 }: {
   refreshKey?: string | number;
   nav: GrowthPanelNav;
   onOpenLifeExperienceRoom?: () => void;
+  onOpenAssetLibrary?: () => void;
 }) {
   const [reportsOpen, setReportsOpen] = useState(false);
   const [openSections, setOpenSections] = useState<Set<GrowthSectionId>>(
@@ -123,7 +130,8 @@ export function GrowthCenterPanel({
   }
 
   return (
-    <section className={workspacePanelShellClass({ width: "standard" })}>
+    <GrowthRoomShell>
+      <section className="companion-fade-in flex h-full min-h-0 w-full flex-col">
       <GrowthSectionHeader nav={nav} />
 
       <div className="mt-4 flex justify-end">
@@ -134,6 +142,49 @@ export function GrowthCenterPanel({
       </div>
 
       <WorkspaceAreaWorksGuide areaId="growth" />
+
+      <div
+        className="mt-4 grid gap-2 sm:grid-cols-2"
+        data-testid="growth-hub-destinations"
+      >
+        {onOpenAssetLibrary ? (
+          <button
+            type="button"
+            onClick={onOpenAssetLibrary}
+            className="rounded-2xl border border-[#c9a66b]/40 bg-gradient-to-br from-[#fffaf2] to-[#f5ebe0] px-4 py-3 text-left hover:bg-white"
+          >
+            <p className="text-sm font-semibold text-[#2f261f]">
+              Universal Capture & Asset Library
+            </p>
+            <p className="mt-1 text-xs text-[#6b635a]">
+              Save photos and files once — use them across Growth.
+            </p>
+          </button>
+        ) : null}
+        {(["growth-journal", "growth-portfolio"] as const).map((id) => {
+          const meta = GROWTH_SECTION_META[id];
+          const style = GROWTH_DESTINATION_STYLES[id];
+          return (
+            <button
+              key={id}
+              type="button"
+              onClick={() => openSection(id)}
+              className={`flex items-start gap-3 rounded-2xl border bg-white px-4 py-3 text-left ${style.actionBorder} ${style.actionHover}`}
+            >
+              <CompanionObjectVisual
+                objectId={meta.objectId}
+                size="sm"
+                variant="icon"
+                className="mt-0.5 shrink-0"
+              />
+              <span className="min-w-0">
+                <p className="text-sm font-semibold text-[#2f261f]">{meta.title}</p>
+                <p className="mt-1 text-xs text-[#6b635a]">{meta.subtitle}</p>
+              </span>
+            </button>
+          );
+        })}
+      </div>
 
       {onOpenLifeExperienceRoom ? (
         <div
@@ -252,6 +303,7 @@ export function GrowthCenterPanel({
       </div>
 
       <GrowthReportsPanel open={reportsOpen} onClose={() => setReportsOpen(false)} />
-    </section>
+      </section>
+    </GrowthRoomShell>
   );
 }

@@ -88,8 +88,8 @@ export function evaluateCompanionEnvironmentIntelligence(
       input.prototypeDiscovery ?? "auto",
     ),
     atmosphere: {
-      timeOfDay: input.timeOfDay,
-      season: input.season,
+      timeOfDay: resolvedInput.timeOfDay,
+      season: resolvedInput.season,
       weather,
     },
     guestPreparation,

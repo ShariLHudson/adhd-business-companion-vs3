@@ -3,7 +3,7 @@ import type { SoundscapeMoodId } from "@/lib/soundscapes/types";
 export const PEACEFUL_PLACES_TITLE = "Peaceful Places" as const;
 
 export const PEACEFUL_PLACES_SUBTITLE =
-  "Choose the place that feels right today." as const;
+  "Take a gentle pause. Choose the place that feels right." as const;
 
 export type PeacefulPlacesCategoryId = SoundscapeMoodId | "my-places";
 
@@ -45,5 +45,5 @@ export const MY_PLACES_CATEGORY = {
   id: "my-places" as const,
   emoji: "❤️",
   label: "My Places",
-  description: "Destinations you've added to the Estate.",
+  description: "Your personal collection of favorite peaceful places.",
 };

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   canAdvanceActivityStep,
+  ensureActivityStepAnswers,
   prepareStepAnswers,
 } from "./activityFields";
 import { getActivityById } from "./companionActivities";
@@ -16,6 +17,22 @@ describe("activityFields", () => {
     expect(
       canAdvanceActivityStep(field, { options: ["A", "B", ""] }),
     ).toBe(true);
+  });
+
+  it("priority sort list step is optional — can continue without entries", () => {
+    const activity = getActivityById("priority-sort");
+    expect(activity).toBeDefined();
+    const field = stepField(activity!.steps[0]);
+    expect(field?.type).toBe("options");
+    expect(canAdvanceActivityStep(field, { items: [""] })).toBe(true);
+    expect(canAdvanceActivityStep(field, {})).toBe(true);
+  });
+
+  it("initializes option rows for step 0 when answers are missing", () => {
+    const activity = getActivityById("priority-sort");
+    expect(activity).toBeDefined();
+    const prepared = ensureActivityStepAnswers(activity!.steps, 0, {});
+    expect(prepared.items).toEqual([""]);
   });
 
   it("copies options into finalists for elimination step (field type)", () => {

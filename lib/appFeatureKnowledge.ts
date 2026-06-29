@@ -138,12 +138,13 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   },
   {
     id: "focus-audio",
-    name: "Focus Audio",
-    navigation: "Sidebar **Focus** → **Focus Tools** → **Focus Audio**",
+    name: "Peaceful Places",
+    navigation: "Sidebar **Focus** → **Focus Tools** → **Peaceful Places**",
     howTo:
-      "Background sound categories (Focus, Calm, Energy, etc.); you can also add your own link.",
+      "Choose an environment — rain, hearth, library, café, or morning light. Tap Play and stay inside the estate.",
     match: [
       /\bfocus audio\b/i,
+      /\bsoundscapes?\b/i,
       /\bbackground (?:sound|music|audio)\b/i,
       /\blisten(?:ing)? (?:to )?music\b/i,
     ],
@@ -163,17 +164,18 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   },
   {
     id: "momentum-games",
-    name: "Momentum Games",
+    name: "Momentum Builders",
     navigation:
-      "Sidebar **Focus** → expand **Momentum Boosters** → **Momentum Games**",
+      "Sidebar **Focus** → expand **Momentum Boosters** → **Momentum Builders**",
     howTo:
-      "Playful mini-games organized by what your brain needs — focus, momentum, ideas, reset, or fun. Built into the app under Focus.",
+      "A curated menu of short resets — breathing, games, calming places, and tiny re-entry steps. Recommendations come from your Today's Reality check-in; browse by category when you know what you need.",
     match: [
-      /\bmomentum games?\b/i,
+      /\bmomentum (?:builders?|games?|boosters?)\b/i,
       /\bfind the games?\b/i,
       /\b(?:where|how).*\bgames?\b/i,
       /\bmini[- ]?games?\b/i,
       /\bplay (?:a )?game\b/i,
+      /\brecharge\b/i,
     ],
   },
   {
@@ -325,10 +327,10 @@ export const APP_FEATURE_KNOWLEDGE_COMPACT = `APP FEATURE KNOWLEDGE (authoritati
 • Chat Workspace: Top bar 💬 → New Chat (fresh conversation) or New Day's Chat (fresh daily start + Plan My Day reset)
 • Focus Session: Focus → Start Here → Focus Session
 • Breathe & Reset: Focus → Focus Tools → Breathe & Reset
-• Focus Audio: Focus → Focus Tools → Focus Audio
+• Peaceful Places: Focus → Focus Tools → Peaceful Places
 • Time Blocks: Focus → Focus Tools → Block Out Time
 • Guided Exercises: Focus → Momentum Boosters → Guided Exercises
-• Momentum Games: Focus → Momentum Boosters → Momentum Games (games ARE in the app)
+• Momentum Builders: Focus → Momentum Boosters → Momentum Builders (short resets ARE in the app)
 • Spin The Wheel: Focus → Momentum Boosters → Spin The Wheel
 • Snippets: More → Snippets (reusable text blocks)
 • Create: Sidebar Create

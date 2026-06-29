@@ -13,15 +13,14 @@ export type GuidedExerciseId =
   | "priority-sort"
   | "future-me-test"
   | "values-check"
-  | "goal-clarifier"
-  | "project-breakdown";
+  | "goal-clarifier";
 
 export type GuidedExerciseMenuItem = {
   id: GuidedExerciseId;
   activityId: string;
   title: string;
   purpose: string;
-  emoji: string;
+  objectId: string;
 };
 
 const GUIDED_EXERCISE_ROWS: GuidedExerciseMenuItem[] = [
@@ -30,49 +29,42 @@ const GUIDED_EXERCISE_ROWS: GuidedExerciseMenuItem[] = [
     activityId: "decision-compass",
     title: "ADHD Decision Compass",
     purpose: "Adaptive paths for action, strategy, and emotional decisions",
-    emoji: "🧭",
+    objectId: "decision-compass",
   },
   {
     id: "future-me-test",
     activityId: "future-me-test",
     title: "Future Me",
     purpose: "Imagine living with each choice six months from now",
-    emoji: "🔮",
+    objectId: "journal",
   },
   {
     id: "goal-clarifier",
     activityId: "goal-clarifier",
     title: "Goal Clarifier",
     purpose: "Name one goal and what done actually looks like",
-    emoji: "🎯",
+    objectId: "growth",
   },
   {
     id: "priority-sort",
     activityId: "priority-sort",
     title: "Priority Sort",
     purpose: "Rank what matters most without a giant task list",
-    emoji: "📊",
-  },
-  {
-    id: "project-breakdown",
-    activityId: "project-breakdown",
-    title: "Project Breakdown",
-    purpose: "Turn one project into a few honest next moves",
-    emoji: "🧩",
+    objectId: "plan-my-day",
   },
   {
     id: "two-option",
     activityId: "two-option",
     title: "Quick Two Option Choice",
     purpose: "A fast 4-step helper for simple choices",
-    emoji: "⚖️",
+    objectId: "decision-compass",
   },
   {
     id: "values-check",
     activityId: "values-check",
     title: "Values Check",
     purpose: "See which choice aligns with what you care about",
-    emoji: "💎",
+    objectId: "decision-compass",
   },
 ];
 
