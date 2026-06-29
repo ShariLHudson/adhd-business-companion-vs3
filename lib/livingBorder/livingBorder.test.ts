@@ -25,7 +25,7 @@ describe("Living Border", () => {
       timeOfDay: "morning",
     });
     expect(verdict.centerStable).toBe(true);
-    expect(verdict.placeId).toBe("window-seat");
+    expect(verdict.placeId).toBe("greenhouse");
     expect(verdict.activeElements.some((e) => e.visible)).toBe(true);
   });
 

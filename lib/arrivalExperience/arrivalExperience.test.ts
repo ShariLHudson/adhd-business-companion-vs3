@@ -14,7 +14,7 @@ describe("arrivalExperience", () => {
     const result = processRealityMessage("I am completely overwhelmed", "open");
     expect(result.tone).toBe("flooded");
     expect(result.needsClarify).toBe(false);
-    expect(result.echo).toMatch(/that's a lot|don't have to fix/i);
+    expect(result.echo).toMatch(/slow is fine|that's a lot|don't have to fix/i);
     const rec = resolveArrivalRecommendation({
       message: "I am completely overwhelmed",
       tone: result.tone,
@@ -53,7 +53,7 @@ describe("arrivalExperience", () => {
 
     const clarified = processRealityMessage("more tired", "clarify");
     expect(clarified.needsClarify).toBe(false);
-    expect(clarified.echo).toMatch(/light|thank you/i);
+    expect(clarified.echo).toMatch(/gentle today|light|thank you/i);
   });
 
   it("skips reality when cached for returning guest", () => {

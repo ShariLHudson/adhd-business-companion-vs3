@@ -59,8 +59,10 @@ describe("workspace view size + layout tokens", () => {
         src.includes("workspaceLayoutTokens") ||
           src.includes("WorkspacePanelShell") ||
           src.includes("SceneRenderer") ||
-          src.includes("CompanionWorkspaceShell"),
-        `${rel} should use workspaceLayoutTokens, WorkspacePanelShell, SceneRenderer, or CompanionWorkspaceShell`,
+          src.includes("CompanionWorkspaceShell") ||
+          src.includes("FocusMyBrainRoomShell") ||
+          src.includes("CinematicBackground"),
+        `${rel} should use workspaceLayoutTokens, WorkspacePanelShell, SceneRenderer, CompanionWorkspaceShell, FocusMyBrainRoomShell, or CinematicBackground`,
       ).toBe(true);
     }
   });

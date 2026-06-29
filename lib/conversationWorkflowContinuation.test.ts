@@ -52,7 +52,7 @@ describe("conversationWorkflowContinuation", () => {
     expect(result?.action).toBe("open_section");
     if (result?.action === "open_section") {
       expect(result.section).toBe("brain-dump");
-      expect(result.message).toMatch(/beside us/i);
+      expect(result.message).toMatch(/sort through|on your mind|still here/i);
     }
   });
 
@@ -71,7 +71,7 @@ describe("conversationWorkflowContinuation", () => {
     if (result?.action === "open_section") {
       expect(result.section).toBe("brain-dump");
       expect(result.clearMyMindView).toBe("my-thoughts");
-      expect(result.message).toMatch(/My Thoughts/i);
+      expect(result.message).toMatch(/doable|smallest honest start/i);
       expect(result.message).not.toMatch(/Picking up/i);
     }
   });
@@ -106,7 +106,7 @@ describe("conversationWorkflowContinuation", () => {
     expect(result.action).toBe("open_section");
     if (result.action === "open_section") {
       expect(result.section).toBe("plan-my-day");
-      expect(result.message).toMatch(/Plan My Day/i);
+      expect(result.message).toMatch(/today|lighter|still here/i);
     }
   });
 

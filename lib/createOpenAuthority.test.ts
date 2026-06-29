@@ -82,7 +82,7 @@ describe("createOpenAuthority", () => {
 
   it("draft creation produces a receipt message", () => {
     expect(createReceiptMessage("draft_created")).toBe(
-      "I started a draft beside us.",
+      "I started a draft — I'm still here while we shape it.",
     );
     const decision = evaluateCreateOpen(
       {

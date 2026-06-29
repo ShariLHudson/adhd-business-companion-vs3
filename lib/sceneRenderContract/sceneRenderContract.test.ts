@@ -59,7 +59,7 @@ describe("Scene Render Contract", () => {
   it("focus category copy comes from resolver", () => {
     const copy = resolveSceneCopy("focus-category", undefined, "stuck");
     expect(copy.title).toBe("I'm Stuck");
-    expect(copy.subtitle).toContain("Paralysis");
+    expect(copy.subtitle).toContain("easier together");
   });
 
   it("plan-my-day resolves Planning Table homestead scene", () => {

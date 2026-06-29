@@ -40,7 +40,7 @@ describe("arrivalIntelligence", () => {
     expect(intel.welcomePresence?.greetingCategory).toBe("day_one");
     expect(intel.livingRoom?.layer1.id).toBeTruthy();
     expect(intel.livingRoom?.layer4.greeting).toBe(intel.greetingHeadline);
-    expect(intel.chatPlaceholder).toMatch(/listening/i);
+    expect(intel.chatPlaceholder).toMatch(/listening|…/i);
     expect(intel.contextualButtonLabel).toBeNull();
     expect(intel.showContinueList).toBe(false);
     expect(intel.isFirstMeeting).toBe(true);

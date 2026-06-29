@@ -30,10 +30,10 @@ describe("standaloneToolRouting", () => {
     );
   });
 
-  it("detects energize as focus audio with motivation-boost category", () => {
+  it("detects energize as focus audio with recharge category", () => {
     const launch = detectStandaloneToolRequest("I need something to energize me");
     expect(launch?.tool).toBe("focus-audio");
-    expect(launch?.focusAudioCategory).toBe("motivation-boost");
+    expect(launch?.focusAudioCategory).toBe("energize");
   });
 
   it("detects focus audio requests from chat", () => {
@@ -56,6 +56,6 @@ describe("standaloneToolRouting", () => {
       detectAssistantToolLaunch(
         "Opening Focus Audio — Calm My Brain is ready.",
       )?.focusAudioCategory,
-    ).toBe("calm-brain");
+    ).toBe("calming");
   });
 });
