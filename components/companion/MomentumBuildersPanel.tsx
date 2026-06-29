@@ -116,7 +116,7 @@ export function MomentumBuildersPanel({ onLaunchExternal, onReturnHome }: Props)
         </h2>
         <p className="mt-1 text-sm text-[#6b635a]">{currentGame.description}</p>
         <div className="mt-4 min-h-0 flex-1">
-          <MomentumGameRunner gameId={currentGame.id} onComplete={finishGame} />
+          <MomentumGameRunner gameId={currentGame.id} onDone={finishGame} />
         </div>
       </div>
     );
