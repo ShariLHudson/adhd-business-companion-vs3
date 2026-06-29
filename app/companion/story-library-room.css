@@ -1,0 +1,42 @@
+/* ═══════════════════════════════════════════════════════════
+   MY STORY LIBRARY — bright cottage reading room
+═══════════════════════════════════════════════════════════ */
+
+.story-library-room {
+  position: relative;
+  min-height: 100dvh;
+  min-height: 100svh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.story-library-room__cinematic {
+  z-index: 0;
+}
+
+.companion-growth-active .story-library-room__cinematic.cinematic-background--fixed {
+  width: 100vw;
+  height: 100vh;
+  height: 100svh;
+  left: 50%;
+  right: auto;
+  margin-left: -50vw;
+}
+
+.story-library-room__cinematic .cinematic-background__image {
+  background-color: #f5f0e6;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+  transform: none !important;
+}
+
+.story-library-room__scroll {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  min-height: 100svh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}

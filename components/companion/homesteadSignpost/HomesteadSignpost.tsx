@@ -5,6 +5,7 @@ import { companionNavHref } from "@/lib/companionNavUrl";
 import type { CoachingMode } from "@/lib/companionPrompt";
 import type { HomesteadSignpostItem } from "@/lib/homesteadSignpost";
 import { SidebarVictorianLampPostSvg } from "@/components/companion/homesteadSignpost/SidebarVictorianLampPostSvg";
+import { SignpostArmRailingSvg } from "@/components/companion/homesteadSignpost/SignpostArmRailingSvg";
 
 type Props = {
   destinations: readonly HomesteadSignpostItem[];
@@ -20,6 +21,10 @@ function SignChains() {
       <span className="homestead-signpost__chain" />
     </div>
   );
+}
+
+function LanternGlow() {
+  return <span className="homestead-signpost__lantern-glow" aria-hidden="true" />;
 }
 
 function OtherSign({
@@ -39,7 +44,6 @@ function OtherSign({
   const rootRef = useRef<HTMLDivElement>(null);
   const listId = useId();
   const href = companionNavHref(item.id, item.mode);
-  const isLit = active || open;
 
   useEffect(() => {
     if (!open) return;
@@ -69,14 +73,12 @@ function OtherSign({
       ].join(" ")}
     >
       <SignChains />
+      <LanternGlow />
       <div
         className={[
           "homestead-signpost__plaque",
           "homestead-signpost__plaque--menu",
-          isLit ? "homestead-signpost__plaque--active" : "",
-        ]
-          .filter(Boolean)
-          .join(" ")}
+        ].join(" ")}
       >
         <a
           href={href}
@@ -115,8 +117,12 @@ function OtherSign({
           className="homestead-signpost__submenu"
         >
           {menuItems.map((entry) => (
-            <div key={entry.id} className="homestead-signpost__sign-wrap homestead-signpost__sign-wrap--sub">
+            <div
+              key={entry.id}
+              className="homestead-signpost__sign-wrap homestead-signpost__sign-wrap--sub"
+            >
               <SignChains />
+              <LanternGlow />
               <button
                 type="button"
                 role="menuitem"
@@ -157,6 +163,7 @@ function DestinationSign({
       ].join(" ")}
     >
       <SignChains />
+      <LanternGlow />
       <a
         href={href}
         data-nav-id={item.id}
@@ -191,7 +198,10 @@ export function HomesteadSignpost({
 }: Props) {
   return (
     <div className="homestead-signpost" aria-label="Navigation">
-      <div className="homestead-signpost__arm" aria-hidden="true" />
+      <div className="homestead-signpost__arm-wrap" aria-hidden="true">
+        <SignpostArmRailingSvg idPrefix="homestead-arm-railing" />
+        <div className="homestead-signpost__arm" />
+      </div>
       <div className="homestead-signpost__post" aria-hidden="true">
         <SidebarVictorianLampPostSvg idPrefix="homestead-sidebar-lamp" />
       </div>

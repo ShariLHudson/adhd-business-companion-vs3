@@ -330,6 +330,9 @@ export function CompanionSignInForm({
         }
         recordAuthLoginSuccess("email");
         succeeded = true;
+        authInFlightRef.current = false;
+        onProcessingChange?.(false);
+        setBusy(false);
         onSuccess?.("email");
         return;
       }
@@ -349,6 +352,9 @@ export function CompanionSignInForm({
       }
       recordAuthLoginSuccess("email");
       succeeded = true;
+      authInFlightRef.current = false;
+      onProcessingChange?.(false);
+      setBusy(false);
       onSuccess?.("email");
     } catch {
       setError("Sign-in didn't work. Please check your connection and try again.");

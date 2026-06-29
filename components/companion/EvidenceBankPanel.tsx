@@ -6,6 +6,8 @@ import { createPortal } from "react-dom";
 import "@/app/companion/evidence-bank-vault.css";
 
 import { GrowthPanelBackButton } from "@/components/companion/GrowthPanelBackButton";
+import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
+import { EvidenceVaultRoomShell } from "@/components/companion/EvidenceVaultRoomShell";
 import { GrowthAttachmentsField } from "@/components/companion/GrowthAttachmentsField";
 import {
   consumeEvidencePrefill,
@@ -109,7 +111,7 @@ function EvidenceVaultCard({
           />
         ) : entry.attachments.length > 0 ? (
           <span className="evidence-vault__thumb-placeholder" aria-hidden>
-            📎
+            File
           </span>
         ) : (
           <span />
@@ -445,8 +447,10 @@ export function EvidenceBankPanel({
   }
 
   return (
-    <section className="evidence-vault" data-companion-object="evidence-bank">
-      <div className="evidence-vault__inner">
+    <EvidenceVaultRoomShell>
+      <EstateWorkspace variant="vault">
+        <div className="evidence-vault" data-companion-object="evidence-bank">
+          <div className="evidence-vault__inner">
         <header className="evidence-vault__header">
           <GrowthPanelBackButton
             onBack={nav.onBack}
@@ -454,8 +458,9 @@ export function EvidenceBankPanel({
           />
           <div className="evidence-vault__header-row mt-4">
             <div>
-              <h1 className="evidence-vault__title">Evidence Bank</h1>
-              <p className="evidence-vault__subtitle">
+              <p className="estate-workspace__kicker">Evidence Vault</p>
+              <h1 className="estate-workspace__title">Evidence Vault</h1>
+              <p className="estate-workspace__lead">
                 Your proof that things are moving forward.
               </p>
             </div>
@@ -591,7 +596,9 @@ export function EvidenceBankPanel({
             </div>
           )}
         </div>
-      </div>
+          </div>
+        </div>
+      </EstateWorkspace>
 
       <EvidenceDeepDrawer
         open={drawerOpen}
@@ -612,6 +619,6 @@ export function EvidenceBankPanel({
           onClose={() => setRemindEntries(null)}
         />
       ) : null}
-    </section>
+    </EvidenceVaultRoomShell>
   );
 }

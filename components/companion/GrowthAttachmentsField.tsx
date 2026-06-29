@@ -38,8 +38,14 @@ function AttachmentRow({
           className="h-12 w-12 shrink-0 rounded-md border border-[#e7d9c8] object-cover"
         />
       ) : (
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-[#e7d9c8] bg-white text-lg">
-          {att.kind === "pdf" ? "📄" : att.kind === "video" ? "🎥" : att.kind === "link" ? "🔗" : "📎"}
+        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-[#e7d9c8] bg-white text-[10px] font-bold uppercase tracking-wide text-[#9a8f82]">
+          {att.kind === "pdf"
+            ? "PDF"
+            : att.kind === "video"
+              ? "Video"
+              : att.kind === "link"
+                ? "Link"
+                : "File"}
         </span>
       )}
       <div className="min-w-0 flex-1">

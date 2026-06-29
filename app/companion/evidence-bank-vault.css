@@ -1,5 +1,39 @@
 /* Evidence Bank — warm private proof vault */
 
+.evidence-vault-room {
+  position: relative;
+  min-height: 100dvh;
+  min-height: 100svh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.evidence-vault-room__cinematic {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.evidence-vault-room__cinematic .cinematic-background__image {
+  background-color: #1e1610;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+  transform: none !important;
+}
+
+.evidence-vault-room__scroll {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  min-height: 100svh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
 .evidence-vault {
   --ev-walnut-deep: #1e1610;
   --ev-walnut: #2a2118;
@@ -11,23 +45,13 @@
   --ev-gold-soft: #d4b87a;
   --ev-glow: rgba(201, 166, 107, 0.35);
 
-  min-height: 100%;
-  background:
-    radial-gradient(ellipse 120% 80% at 50% -10%, rgba(201, 166, 107, 0.08), transparent 55%),
-    linear-gradient(180deg, var(--ev-walnut-deep) 0%, var(--ev-walnut) 40%, #231a13 100%);
+  width: 100%;
   color: var(--ev-cream);
 }
 
 .evidence-vault__inner {
-  max-width: 42rem;
-  margin: 0 auto;
-  padding: 1.5rem 1.25rem 3rem;
-}
-
-@media (min-width: 640px) {
-  .evidence-vault__inner {
-    padding: 2rem 1.75rem 4rem;
-  }
+  margin: 0;
+  padding: 0;
 }
 
 .evidence-vault__header {

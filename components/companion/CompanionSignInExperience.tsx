@@ -1,10 +1,8 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm";
-import { CompanionLoginBackground } from "@/components/companion/CompanionLoginBackground";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { hasSignedInOnThisDeviceBefore } from "@/lib/companionAuthIntelligence";
 import {
@@ -14,33 +12,20 @@ import {
   companionLoginHeadline,
   companionLoginSubtext,
 } from "@/lib/companionLoginPage";
-import {
-  COMPANION_LOGIN_LOADING_DELAY_MS,
-  markCompanionLoginArrival,
-  pickCompanionLoginSlowMessage,
-  waitForCompanionAuthStorage,
-} from "@/lib/companionLoginTransition";
+import { navigateToCompanionHome } from "@/lib/companionLoginTransition";
 import {
   dismissWelcomeRoomInvitation,
   dismissWelcomeRoomLoginOffer,
 } from "@/lib/welcomeRoom";
 
-/** Shared chunk promise — login page warms the home shell before auth completes. */
-const companionPageImport = import("@/app/companion/CompanionPageClient");
-
 export function CompanionSignInExperience() {
-  const router = useRouter();
   const { loading, user, session, sessionChecked, configured: authReady } =
     useCompanionAuth();
 
   const [mounted, setMounted] = useState(false);
-  const [authInFlight, setAuthInFlight] = useState(false);
   const [redirectError, setRedirectError] = useState<string | null>(null);
-  const [slowMessage, setSlowMessage] = useState<string | null>(null);
   const [redirecting, setRedirecting] = useState(false);
   const navigatingRef = useRef(false);
-  const authInFlightRef = useRef(false);
-  const slowMessageRef = useRef(pickCompanionLoginSlowMessage());
 
   const returning = useMemo(
     () => (mounted ? hasSignedInOnThisDeviceBefore() : false),
@@ -56,73 +41,40 @@ export function CompanionSignInExperience() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    void companionPageImport;
-  }, []);
-
-  const goHomeAfterAuth = useCallback(async () => {
+  const goHomeAfterAuth = useCallback(() => {
     if (navigatingRef.current) return;
     navigatingRef.current = true;
     setRedirecting(true);
     setRedirectError(null);
     dismissWelcomeRoomInvitation();
     dismissWelcomeRoomLoginOffer();
-    markCompanionLoginArrival();
-    const persisted = await waitForCompanionAuthStorage(5_000);
-    if (!persisted) {
-      navigatingRef.current = false;
-      setRedirecting(false);
-      authInFlightRef.current = false;
-      setAuthInFlight(false);
-      setRedirectError(
-        "Signed in, but this browser could not save your session. Free some storage, then try again.",
-      );
-      return;
-    }
-    router.replace("/companion");
-  }, [router]);
-
-  const shouldLeaveLogin =
-    sessionChecked &&
-    !loading &&
-    Boolean(user || session) &&
-    !authInFlight &&
-    !authInFlightRef.current;
+    navigateToCompanionHome();
+  }, []);
 
   useEffect(() => {
-    if (!shouldLeaveLogin) return;
-    void goHomeAfterAuth();
-  }, [shouldLeaveLogin, goHomeAfterAuth]);
+    if (!sessionChecked || loading || redirecting) return;
+    if (!user && !session) return;
+    goHomeAfterAuth();
+  }, [sessionChecked, loading, user, session, redirecting, goHomeAfterAuth]);
 
-  const showSlowStatus =
-    (loading || authInFlight) &&
-    !shouldLeaveLogin &&
-    !redirecting;
-
-  useEffect(() => {
-    if (!showSlowStatus) {
-      setSlowMessage(null);
-      return;
-    }
-    const timer = window.setTimeout(() => {
-      setSlowMessage(slowMessageRef.current);
-    }, COMPANION_LOGIN_LOADING_DELAY_MS);
-    return () => window.clearTimeout(timer);
-  }, [showSlowStatus]);
-
-  if (shouldLeaveLogin || redirecting) {
-    return null;
+  if (redirecting) {
+    return (
+      <main
+        className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]"
+        data-testid="companion-login-opening"
+      >
+        Opening your space…
+      </main>
+    );
   }
 
   return (
     <main
-      className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-8 sm:px-6 sm:py-10"
+      className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] px-4 py-8 sm:px-6 sm:py-10"
       data-testid="companion-login-page"
     >
-      <CompanionLoginBackground />
-
-      <div className="relative z-10 w-full max-w-[22rem] sm:max-w-md">
-        <div className="rounded-2xl border border-white/45 bg-[#faf7f2]/72 px-5 py-6 backdrop-blur-md sm:rounded-3xl sm:px-7 sm:py-7">
+      <div className="w-full max-w-[22rem] sm:max-w-md">
+        <div className="rounded-2xl border border-[#e7dfd4] bg-[#faf7f2] px-5 py-6 shadow-sm sm:rounded-3xl sm:px-7 sm:py-7">
           <div className="mb-5 flex flex-col items-center gap-3 text-center">
             <div className="flex flex-col items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -153,12 +105,7 @@ export function CompanionSignInExperience() {
             variant="page"
             initialMode="signin"
             returning={returning}
-            onSuccess={() => void goHomeAfterAuth()}
-            onProcessingChange={(processing) => {
-              authInFlightRef.current = processing;
-              setAuthInFlight(processing);
-              if (processing) setRedirectError(null);
-            }}
+            onSuccess={goHomeAfterAuth}
           />
 
           {redirectError ? (
@@ -182,12 +129,6 @@ export function CompanionSignInExperience() {
           ) : null}
         </div>
       </div>
-
-      {slowMessage ? (
-        <p className="companion-login-page__slow-status" role="status" aria-live="polite">
-          {slowMessage}
-        </p>
-      ) : null}
     </main>
   );
 }

@@ -67,11 +67,23 @@
 }
 
 .companion-app-sidebar.homestead-signpost-sidebar a.homestead-signpost__plaque:hover,
-.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque--menu:hover {
-  background: linear-gradient(175deg, #343230 0%, #2a2826 50%, #1e1c1a 100%) !important;
-  border-color: rgba(232, 220, 195, 0.88) !important;
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque--menu:hover,
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__sign-wrap:hover > .homestead-signpost__plaque,
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque:focus-visible,
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque-link:focus-visible,
+.companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque-toggle:focus-visible {
+  background: linear-gradient(175deg, #403c38 0%, #322e2a 50%, #242018 100%) !important;
+  border-color: rgba(255, 228, 175, 0.95) !important;
+  color: #fff8e8 !important;
   transform: translateY(-2px);
-  box-shadow: rgba(0, 0, 0, 0.65) 0 5px 12px !important;
+  box-shadow:
+    rgba(0, 0, 0, 0.55) 0 4px 10px,
+    0 0 28px rgba(255, 200, 90, 0.55),
+    0 0 52px rgba(255, 170, 50, 0.32),
+    inset 0 1px 0 rgba(255, 245, 210, 0.28) !important;
+  text-shadow:
+    0 0 16px rgba(255, 220, 140, 0.75),
+    0 1px 2px rgba(20, 12, 4, 0.45) !important;
 }
 
 .companion-app-sidebar.homestead-signpost-sidebar a.homestead-signpost__plaque--active,
@@ -80,10 +92,8 @@
   background: linear-gradient(175deg, #3a3632 0%, #2e2a28 42%, #242220 100%) !important;
   border-color: rgba(240, 228, 200, 0.82) !important;
   color: #f5efe4 !important;
-  box-shadow:
-    rgba(0, 0, 0, 0.55) 0 3px 8px,
-    0 0 14px rgba(255, 210, 140, 0.28) !important;
-  text-shadow: 0 0 8px rgba(255, 230, 190, 0.35) !important;
+  box-shadow: rgba(0, 0, 0, 0.55) 0 3px 8px !important;
+  text-shadow: none !important;
 }
 
 .companion-app-sidebar.homestead-signpost-sidebar .homestead-signpost__plaque-label {
@@ -125,7 +135,7 @@
   align-items: start !important;
   width: 100% !important;
   padding: 0.25rem 0.15rem 0.5rem 0.35rem !important;
-  --homestead-post-width: clamp(2.65rem, 5.5vw, 3.35rem);
+  --homestead-post-width: clamp(2.85rem, 6vw, 3.55rem);
   --homestead-signs-width: min(12.25rem, calc(100% - var(--homestead-post-width) * 0.5 - 0.35rem));
   --homestead-arm-start: calc(0.35rem + var(--homestead-post-width) * 0.5);
   --homestead-arm-width: calc(100% - var(--homestead-arm-start) - 0.15rem);
@@ -205,7 +215,7 @@
   height: 100%;
   overflow: visible;
   padding: 0.25rem 0.15rem 0.5rem 0.35rem;
-  --homestead-post-width: clamp(2.65rem, 5.5vw, 3.35rem);
+  --homestead-post-width: clamp(2.85rem, 6vw, 3.55rem);
   --homestead-signs-width: min(12.25rem, calc(100% - var(--homestead-post-width) * 0.5 - 0.35rem));
   --homestead-arm-start: calc(0.35rem + var(--homestead-post-width) * 0.5);
   --homestead-arm-width: calc(100% - var(--homestead-arm-start) - 0.15rem);
@@ -230,8 +240,10 @@
 }
 
 .homestead-signpost__pole-svg {
+  position: relative;
+  z-index: 1;
   display: block;
-  width: clamp(4.1rem, 9.2vw, 5rem);
+  width: clamp(4.45rem, 9.8vw, 5.35rem);
   height: 100%;
   min-height: clamp(15rem, 46vh, 24rem);
   margin: 0 auto;
@@ -240,26 +252,121 @@
   filter: drop-shadow(2px 5px 10px rgba(0, 0, 0, 0.38));
 }
 
+.homestead-lamppost__lantern-head {
+  transform-box: fill-box;
+  transform-origin: 40px 58px;
+}
+
+/* Gas-lantern flicker inside the glass — always on */
+.homestead-lamppost__lantern-flame {
+  animation: homestead-lamppost-lantern-flame-flicker 1.65s linear infinite;
+}
+
+@keyframes homestead-lamppost-lantern-flame-flicker {
+  0%,
+  100% {
+    opacity: 0.94;
+  }
+
+  4% {
+    opacity: 1;
+  }
+
+  8% {
+    opacity: 0.8;
+  }
+
+  12% {
+    opacity: 0.96;
+  }
+
+  16% {
+    opacity: 0.74;
+  }
+
+  21% {
+    opacity: 0.92;
+  }
+
+  27% {
+    opacity: 0.84;
+  }
+
+  34% {
+    opacity: 0.68;
+  }
+
+  39% {
+    opacity: 0.98;
+  }
+
+  47% {
+    opacity: 0.82;
+  }
+
+  55% {
+    opacity: 0.94;
+  }
+
+  63% {
+    opacity: 0.72;
+  }
+
+  69% {
+    opacity: 1;
+  }
+
+  77% {
+    opacity: 0.78;
+  }
+
+  86% {
+    opacity: 0.9;
+  }
+
+  94% {
+    opacity: 0.84;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .homestead-signpost__pole-svg animate {
-    display: none;
+  .homestead-lamppost__lantern-flame {
+    animation: none;
+    opacity: 0.92;
   }
 }
 
 /* Horizontal hanger rod — meets the lantern bracket, spans the sign row */
-.homestead-signpost__arm {
+.homestead-signpost__arm-wrap {
   position: absolute;
   top: calc(0.35rem + clamp(15rem, 46vh, 24rem) * 125 / 820);
   left: var(--homestead-arm-start);
   width: var(--homestead-arm-width);
   height: 4px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.homestead-signpost__arm {
+  position: absolute;
+  inset: 0;
   border-radius: 2px;
   background: linear-gradient(180deg, #4a4642 0%, #1a1816 48%, #0a0908 100%);
   box-shadow:
     0 2px 5px rgba(0, 0, 0, 0.42),
     inset 0 1px 0 rgba(255, 255, 255, 0.08);
-  z-index: 4;
-  pointer-events: none;
+}
+
+.homestead-signpost__arm-railing {
+  position: absolute;
+  left: -0.12rem;
+  right: -0.12rem;
+  bottom: calc(100% - 1px);
+  width: calc(100% + 0.24rem);
+  height: 16px;
+  display: block;
+  overflow: visible;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
 }
 
 .homestead-signpost__arm::before,
@@ -310,6 +417,54 @@
   transform-origin: top center;
 }
 
+/* Menu signs — warm bloom behind plaques on hover only */
+.homestead-signpost__lantern-glow {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  z-index: 0;
+  width: 130%;
+  height: 165%;
+  transform: translate(-50%, -46%) scale(0.75);
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 238, 180, 1) 0%,
+      rgba(255, 214, 120, 0.78) 22%,
+      rgba(255, 188, 72, 0.48) 42%,
+      rgba(255, 160, 40, 0.22) 58%,
+      transparent 78%
+    );
+  filter: blur(10px);
+  box-shadow:
+    0 0 28px rgba(255, 200, 90, 0.55),
+    0 0 48px rgba(255, 170, 50, 0.35);
+  transition:
+    opacity 0.28s ease,
+    transform 0.32s ease,
+    filter 0.28s ease;
+}
+
+.homestead-signpost__sign-wrap--sub .homestead-signpost__lantern-glow {
+  width: 118%;
+  height: 145%;
+  filter: blur(8px);
+}
+
+.homestead-signpost__sign-wrap:not(.homestead-signpost__sign-wrap--menu):hover
+  > .homestead-signpost__lantern-glow,
+.homestead-signpost__sign-wrap--menu:hover:not(:has(.homestead-signpost__sign-wrap--sub:hover))
+  > .homestead-signpost__lantern-glow,
+.homestead-signpost__sign-wrap--sub:hover > .homestead-signpost__lantern-glow {
+  opacity: 1;
+  transform: translate(-50%, -46%) scale(1.08);
+  filter: blur(12px);
+  animation: homestead-signpost-lantern-flicker 2.4s linear infinite;
+}
+
 .homestead-signpost__signs > .homestead-signpost__sign-wrap:first-child .homestead-signpost__chain {
   height: 0.95rem;
 }
@@ -335,6 +490,7 @@
 
 .homestead-signpost__plaque {
   position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -384,20 +540,110 @@
 }
 
 .homestead-signpost__plaque:hover {
-  background: linear-gradient(175deg, #343230 0%, #2a2826 50%, #1e1c1a 100%);
-  border-color: rgba(232, 220, 195, 0.88);
+  background: linear-gradient(175deg, #403c38 0%, #322e2a 50%, #242018 100%);
+  border-color: rgba(255, 228, 175, 0.95);
+  color: #fff8e8;
   transform: translateY(-2px);
-  box-shadow: rgba(0, 0, 0, 0.65) 0 5px 12px;
+  box-shadow:
+    rgba(0, 0, 0, 0.55) 0 4px 10px,
+    0 0 28px rgba(255, 200, 90, 0.55),
+    0 0 52px rgba(255, 170, 50, 0.32),
+    inset 0 1px 0 rgba(255, 245, 210, 0.28);
+  text-shadow:
+    0 0 16px rgba(255, 220, 140, 0.75),
+    0 1px 2px rgba(20, 12, 4, 0.45);
 }
 
 .homestead-signpost__plaque--active {
   background: linear-gradient(175deg, #3a3632 0%, #2e2a28 42%, #242220 100%);
   border-color: rgba(240, 228, 200, 0.82);
   color: #f5efe4;
-  box-shadow:
-    rgba(0, 0, 0, 0.55) 0 3px 8px,
-    0 0 14px rgba(255, 210, 140, 0.28);
-  text-shadow: 0 0 8px rgba(255, 230, 190, 0.35);
+  box-shadow: rgba(0, 0, 0, 0.55) 0 3px 8px;
+  text-shadow: none;
+}
+
+@keyframes homestead-signpost-lantern-flicker {
+  0%,
+  100% {
+    opacity: 0.84;
+    filter: blur(11px);
+  }
+
+  5% {
+    opacity: 1;
+    filter: blur(13px);
+  }
+
+  9% {
+    opacity: 0.78;
+    filter: blur(10px);
+  }
+
+  14% {
+    opacity: 0.96;
+    filter: blur(14px);
+  }
+
+  18% {
+    opacity: 0.72;
+    filter: blur(9px);
+  }
+
+  24% {
+    opacity: 0.9;
+    filter: blur(12px);
+  }
+
+  32% {
+    opacity: 0.66;
+    filter: blur(10px);
+  }
+
+  38% {
+    opacity: 1;
+    filter: blur(14px);
+  }
+
+  46% {
+    opacity: 0.8;
+    filter: blur(11px);
+  }
+
+  54% {
+    opacity: 0.94;
+    filter: blur(13px);
+  }
+
+  62% {
+    opacity: 0.7;
+    filter: blur(9px);
+  }
+
+  70% {
+    opacity: 0.98;
+    filter: blur(14px);
+  }
+
+  78% {
+    opacity: 0.76;
+    filter: blur(10px);
+  }
+
+  86% {
+    opacity: 0.92;
+    filter: blur(12px);
+  }
+
+  93% {
+    opacity: 0.82;
+    filter: blur(11px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .homestead-signpost__sign-wrap:hover > .homestead-signpost__lantern-glow {
+    animation: none;
+  }
 }
 
 .homestead-signpost__plaque-label {
@@ -549,6 +795,45 @@
 }
 
 /* ── Top bar sign board (shared pointed-end shape) ───────── */
+.top-bar-homestead-sign__lantern-glow {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  z-index: 0;
+  width: 125%;
+  height: 160%;
+  transform: translate(-50%, -48%) scale(0.75);
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 50%;
+  background:
+    radial-gradient(
+      ellipse at center,
+      rgba(255, 238, 180, 1) 0%,
+      rgba(255, 214, 120, 0.78) 22%,
+      rgba(255, 188, 72, 0.48) 42%,
+      rgba(255, 160, 40, 0.22) 58%,
+      transparent 78%
+    );
+  filter: blur(10px);
+  box-shadow:
+    0 0 28px rgba(255, 200, 90, 0.55),
+    0 0 48px rgba(255, 170, 50, 0.35);
+  transition:
+    opacity 0.28s ease,
+    transform 0.32s ease,
+    filter 0.28s ease;
+}
+
+/* Top bar signs — bloom on hover only */
+.top-bar-homestead-sign:hover .top-bar-homestead-sign__lantern-glow,
+.companion-top-bar button.top-bar-homestead-sign:hover .top-bar-homestead-sign__lantern-glow {
+  opacity: 1;
+  transform: translate(-50%, -48%) scale(1.08);
+  filter: blur(12px);
+  animation: homestead-signpost-lantern-flicker 2.4s linear infinite;
+}
+
 .top-bar-homestead-sign__board {
   display: flex;
   align-items: center;
@@ -560,6 +845,7 @@
   white-space: nowrap;
   padding: 0.44rem 0.9rem;
   position: relative;
+  z-index: 1;
   background: linear-gradient(
     175deg,
     #d4b858 0%,
@@ -601,22 +887,26 @@
 .top-bar-homestead-sign:hover .top-bar-homestead-sign__board,
 .companion-top-bar button.top-bar-homestead-sign:hover .top-bar-homestead-sign__board {
   transform: translateY(-2px);
-  border-color: #a07818;
+  border-color: #c89818;
   box-shadow:
     rgba(255, 255, 255, 0.35) 0px 1px 0px inset,
     rgba(0, 0, 0, 0.2) 0px -1px 0px inset,
-    rgba(0, 0, 0, 0.38) 0px 6px 12px;
+    rgba(0, 0, 0, 0.38) 0px 6px 12px,
+    0 0 28px rgba(255, 200, 90, 0.55),
+    0 0 52px rgba(255, 170, 50, 0.32);
 }
 
 .top-bar-homestead-sign:hover .top-bar-homestead-sign__label,
 .companion-top-bar button.top-bar-homestead-sign:hover .top-bar-homestead-sign__label,
+.top-bar-homestead-sign:focus-visible .top-bar-homestead-sign__label,
+.companion-top-bar button.top-bar-homestead-sign:focus-visible .top-bar-homestead-sign__label,
 .top-bar-homestead-sign:active .top-bar-homestead-sign__label,
 .companion-top-bar button.top-bar-homestead-sign:active .top-bar-homestead-sign__label {
-  color: #2e2412;
+  color: #2a1a08;
   text-shadow:
-    0 0 6px rgba(255, 252, 238, 0.95),
-    0 0 14px rgba(255, 245, 215, 0.75),
-    0 0 22px rgba(255, 235, 190, 0.5);
+    0 0 10px rgba(255, 252, 238, 1),
+    0 0 18px rgba(255, 245, 215, 0.9),
+    0 0 28px rgba(255, 235, 190, 0.65);
 }
 
 .top-bar-homestead-sign--active .top-bar-homestead-sign__board,
@@ -635,10 +925,7 @@
 .companion-top-bar button.top-bar-homestead-sign[aria-current="page"] .top-bar-homestead-sign__label {
   color: #2a2010 !important;
   font-weight: 700;
-  text-shadow:
-    0 0 8px rgba(255, 252, 240, 1),
-    0 0 16px rgba(255, 248, 220, 0.85),
-    0 0 26px rgba(255, 238, 195, 0.65) !important;
+  text-shadow: none !important;
 }
 
 @keyframes homestead-sign-sway-a {
@@ -849,6 +1136,7 @@
   border-radius: 0 !important;
   cursor: pointer;
   position: relative;
+  overflow: visible !important;
   transform: none !important;
   min-height: 0 !important;
   gap: 0;
@@ -905,5 +1193,10 @@
 @media (prefers-reduced-motion: reduce) {
   .companion-top-bar button.top-bar-homestead-sign:hover .top-bar-homestead-sign__board {
     transform: none;
+  }
+
+  .top-bar-homestead-sign:hover .top-bar-homestead-sign__lantern-glow,
+  .companion-top-bar button.top-bar-homestead-sign:hover .top-bar-homestead-sign__lantern-glow {
+    animation: none;
   }
 }

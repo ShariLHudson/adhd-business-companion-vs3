@@ -85,7 +85,10 @@ const VisualFocusWorkspacePanel = dynamic(
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { WinsThisWeekPanel } from "@/components/companion/WinsThisWeekPanel";
 import { EvidenceBankPanel } from "@/components/companion/EvidenceBankPanel";
-import { GrowthCenterPanel } from "@/components/companion/GrowthCenterPanel";
+import { GrowthStoryLandingPanel } from "@/components/companion/GrowthStoryLandingPanel";
+import { GrowthStoryCapturePanel } from "@/components/companion/GrowthStoryCapturePanel";
+import { GrowthLibraryPanel } from "@/components/companion/GrowthLibraryPanel";
+import { GrowthReportsPage } from "@/components/companion/GrowthReportsPage";
 import { GrowthJournalPanel } from "@/components/companion/GrowthJournalPanel";
 import { GrowthPortfolioPanel } from "@/components/companion/GrowthPortfolioPanel";
 import { ConfidenceVaultPanel } from "@/components/companion/ConfidenceVaultPanel";
@@ -1008,6 +1011,11 @@ import { isClearMyMindSection } from "@/lib/clearMyMindRouting";
 import { CLEAR_MY_MIND_CONSERVATORY_BG } from "@/lib/clearMyMind/conservatory";
 import { isPlanMyDaySection } from "@/lib/planMyDayRouting";
 import { PLAN_MY_DAY_MORNING_BG } from "@/lib/planMyDay/morningRoom";
+import { GROWTH_ROOM_BG, JOURNAL_ROOM_BG, EVIDENCE_VAULT_ROOM_BG } from "@/lib/growth/growthRoom";
+import { CREATIVE_STUDIO_ROOM_BG } from "@/lib/creativeStudio/creativeStudioRoom";
+import { CELEBRATION_GARDEN_ROOM_BG } from "@/lib/celebrationGarden/celebrationGardenRoom";
+import { STORY_LIBRARY_ROOM_BG } from "@/lib/storyLibrary/storyLibraryRoom";
+import { CAPTURE_MOMENT_ROOM_BG } from "@/lib/captureMoment/captureMomentRoom";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
 import {
   type ClearMyMindPanelView,
@@ -1210,6 +1218,7 @@ import { setConfidencePrefill } from "@/lib/confidenceVaultStore";
 import { setJourneyPrefill } from "@/lib/myJourneyStore";
 import {
   growthPanelBackLabel,
+  growthRoomBackLabel,
   isGrowthPanelSection,
   type GrowthPanelNav,
   type GrowthSectionId,
@@ -1850,9 +1859,7 @@ export default function CompanionPageClient() {
     return homeArrival ?? evaluateArrivalIntelligence({ record: false });
   }, [homeCalm, homeArrival]);
 
-  const welcomeScene =
-    homeCalm &&
-    effectiveHomeArrival?.chrome.layout === "welcome-scene";
+  const welcomeScene = false;
   const visibleThinkingMessage = useVisibleThinking(
     isLoading && !homeCalm,
     visibleThinkingContext,
@@ -5625,14 +5632,18 @@ export default function CompanionPageClient() {
       backLabel: workspacePanelBackLabel,
       onOpenSection: (section) => {
         if (section === "growth") {
-          openSectionBesideChatCore("growth", "growth", { userInitiated: true });
+          openGrowthLandingCore();
           return;
         }
-        openSectionBesideChatCore(
-          section,
-          sidebarNavForGrowthDestination(section),
-          { userInitiated: true },
-        );
+        if (section === "growth-library") {
+          openGrowthLibraryCore();
+          return;
+        }
+        if (section === "growth-reports") {
+          openGrowthReportsCore();
+          return;
+        }
+        openGrowthDestinationCore(section);
       },
     };
   }
@@ -5810,6 +5821,33 @@ export default function CompanionPageClient() {
     options?: { userInitiated?: boolean },
   ) {
     if (shouldBlockWorkspaceOpenForPhase1(options)) return;
+    if (section === "growth") {
+      openGrowthLandingCore();
+      return;
+    }
+    if (section === "growth-library") {
+      openGrowthLibraryCore();
+      return;
+    }
+    if (section === "growth-capture") {
+      openGrowthCaptureCore();
+      return;
+    }
+    if (section === "growth-reports") {
+      openGrowthReportsCore();
+      return;
+    }
+    if (
+      section === "growth-journal" ||
+      section === "growth-portfolio" ||
+      section === "wins-this-week" ||
+      section === "evidence-bank" ||
+      section === "confidence-vault" ||
+      section === "my-journey"
+    ) {
+      openGrowthDestinationCore(section);
+      return;
+    }
     if (isClearMyMindSection(section)) {
       openClearMyMindCore();
       return;
@@ -6607,6 +6645,70 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore("life-experience");
   }
 
+  /** Growth — Your Story landing; pond bench, capture-first, never beside chat. */
+  function pushGrowthBackLabel() {
+    const from = activeSectionRef.current;
+    const label = growthRoomBackLabel(from);
+    if (!label) return;
+    panelBackStackRef.current.push(label);
+    setWorkspacePanelBackLabel(label);
+  }
+
+  function openGrowthLandingCore() {
+    preloadRoomBackground(GROWTH_ROOM_BG);
+    preloadRoomBackground(JOURNAL_ROOM_BG);
+    preloadRoomBackground(STORY_LIBRARY_ROOM_BG);
+    preloadRoomBackground(CAPTURE_MOMENT_ROOM_BG);
+    trackWorkspaceEcosystemEvent("growth");
+    noteWorkspaceOpened("growth", "standalone_room");
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore("growth");
+  }
+
+  function openGrowthLibraryCore() {
+    pushGrowthBackLabel();
+    preloadRoomBackground(STORY_LIBRARY_ROOM_BG);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore("growth-library");
+  }
+
+  function openGrowthCaptureCore() {
+    pushGrowthBackLabel();
+    preloadRoomBackground(CAPTURE_MOMENT_ROOM_BG);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore("growth-capture");
+  }
+
+  function openGrowthReportsCore() {
+    pushGrowthBackLabel();
+    preloadRoomBackground(CELEBRATION_GARDEN_ROOM_BG);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore("growth-reports");
+  }
+
+  function openGrowthDestinationCore(section: AppSection) {
+    pushGrowthBackLabel();
+    if (section === "growth-journal") {
+      preloadRoomBackground(JOURNAL_ROOM_BG);
+    }
+    if (section === "evidence-bank") {
+      preloadRoomBackground(EVIDENCE_VAULT_ROOM_BG);
+    }
+    if (section === "growth-portfolio") {
+      preloadRoomBackground(CREATIVE_STUDIO_ROOM_BG);
+    }
+    if (section === "wins-this-week") {
+      preloadRoomBackground(CELEBRATION_GARDEN_ROOM_BG);
+    }
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore(section);
+  }
+
   function openWhatsNewCore() {
     if (workspacePanelRef.current === "welcome-room") {
       patchWorkspacePanel(null);
@@ -6690,29 +6792,22 @@ export default function CompanionPageClient() {
     }
 
     if (nav === "growth") {
-      openSectionBesideChatCore("growth", "growth", { userInitiated: true });
+      openGrowthLandingCore();
       return;
     }
 
     if (nav === "journal") {
-      openSectionBesideChatCore("growth-journal", "journal", {
-        userInitiated: true,
-      });
+      openGrowthDestinationCore("growth-journal");
       return;
     }
 
     if (nav === "portfolio") {
-      openSectionBesideChatCore("growth-portfolio", "portfolio", {
-        userInitiated: true,
-      });
+      openGrowthDestinationCore("growth-portfolio");
       return;
     }
 
     if (nav === "evidence-bank") {
-      applyChatLayoutMode("workspace-focus");
-      openSectionBesideChatCore("evidence-bank", "evidence-bank", {
-        userInitiated: true,
-      });
+      openGrowthDestinationCore("evidence-bank");
       return;
     }
 
@@ -13558,16 +13653,7 @@ export default function CompanionPageClient() {
       case "focus":
         return <FocusAreaPanel onAction={handleFocusHubAction} />;
       case "growth":
-        return (
-          <GrowthCenterPanel
-            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
-            nav={buildGrowthPanelNav("growth")}
-            onOpenLifeExperienceRoom={openLifeExperienceRoomCore}
-            onOpenAssetLibrary={() =>
-              openNavSectionDirectCore(GALLERY_HOME_SECTION, "growth")
-            }
-          />
-        );
+        return null;
       case "confidence-vault":
         return (
           <ConfidenceVaultPanel
@@ -14573,7 +14659,7 @@ export default function CompanionPageClient() {
               ? "pl-0"
               : activeSection === "the-gallery"
                 ? "pl-0 companion-gallery-active"
-              : workspacePanel === "growth"
+              : isGrowthPanelSection(activeSection)
                 ? "pl-0 companion-growth-active"
               : activeSection === "plan-my-day"
                 ? "pl-0 companion-plan-my-day-active"
@@ -14589,7 +14675,7 @@ export default function CompanionPageClient() {
         } ${homeCalm ? "companion-home-calm" : ""} ${
           workspacePanel === "welcome-room" ? "companion-welcome-room-active" : ""
         } ${
-          workspacePanel === "growth" ? "companion-growth-active" : ""
+          isGrowthPanelSection(activeSection) ? "companion-growth-active" : ""
         } ${
           activeSection === "the-gallery" ? "companion-gallery-active" : ""
         } ${
@@ -14747,11 +14833,6 @@ export default function CompanionPageClient() {
                   onStayAndChat={() => undefined}
                   onSend={() => void handleSend()}
                 />
-              ) : homeCalm && !welcomeScene ? (
-                <CompanionHomeCard
-                  arrival={homeArrival}
-                  onContinue={handleCompanionContinueOption}
-                />
               ) : activeSection === "home" && !welcomeScene ? null : (
               <IdentityBar
                 emotion={displayEmotion}
@@ -14809,6 +14890,12 @@ export default function CompanionPageClient() {
               <div
                 className="companion-homestead-chat__reading flex-1 overflow-y-auto px-4 sm:px-6"
               >
+                {homeCalm && !welcomeScene ? (
+                  <CompanionHomeCard
+                    arrival={homeArrival}
+                    onContinue={handleCompanionContinueOption}
+                  />
+                ) : null}
                 {!homeCalm && !suppressInterventionCards ? (
                   <FromYesterdayFocusCard
                     onOpenMomentum={() => setActiveSection("progress")}
@@ -15245,6 +15332,7 @@ export default function CompanionPageClient() {
                 activeSection === "brain-dump" ||
                 activeSection === "life-experience" ||
                 activeSection === "the-gallery" ||
+                isGrowthPanelSection(activeSection) ||
                 activeSection === "plan-my-day" ||
                 activeSection === "focus-audio" ||
                 activeSection === "games" ||
@@ -15257,6 +15345,7 @@ export default function CompanionPageClient() {
                 activeSection === "brain-dump" ||
                 activeSection === "life-experience" ||
                 activeSection === "the-gallery" ||
+                isGrowthPanelSection(activeSection) ||
                 activeSection === "plan-my-day" ||
                 activeSection === "focus-audio" ||
                 activeSection === "games" ||
@@ -15268,6 +15357,7 @@ export default function CompanionPageClient() {
                 activeSection === "brain-dump" ||
                 activeSection === "life-experience" ||
                 activeSection === "the-gallery" ||
+                isGrowthPanelSection(activeSection) ||
                 activeSection === "plan-my-day" ||
                 activeSection === "focus-audio" ||
                 activeSection === "games" ||
@@ -15283,6 +15373,7 @@ export default function CompanionPageClient() {
                   activeSection === "brain-dump" ||
                   activeSection === "life-experience" ||
                   activeSection === "the-gallery" ||
+                  isGrowthPanelSection(activeSection) ||
                   activeSection === "plan-my-day" ||
                   activeSection === "focus-audio" ||
                   activeSection === "games" ||
@@ -15361,6 +15452,96 @@ export default function CompanionPageClient() {
               }
               initialOpenItemId={planMyDayOpenItemId}
             />
+          )}
+
+          {activeSection === "growth" && (
+            <GrowthStoryLandingPanel
+              onBack={goBack}
+              onOpenJournal={() => openGrowthDestinationCore("growth-journal")}
+              onOpenCapture={openGrowthCaptureCore}
+              onOpenLibrary={openGrowthLibraryCore}
+            />
+          )}
+
+          {activeSection === "growth-capture" && (
+            <GrowthStoryCapturePanel
+              onBack={goBack}
+              backLabel={workspacePanelBackLabel}
+              onOpenSection={(section) => {
+                if (section === "growth") {
+                  openGrowthLandingCore();
+                  return;
+                }
+                if (section === "growth-library") {
+                  openGrowthLibraryCore();
+                  return;
+                }
+                openGrowthDestinationCore(section);
+              }}
+              onOpenAssetLibrary={() => openGrowthDestinationCore("the-gallery")}
+            />
+          )}
+
+          {activeSection === "growth-library" && (
+            <GrowthLibraryPanel
+              onBack={goBack}
+              backLabel={workspacePanelBackLabel}
+              onOpenSection={(section) => openGrowthDestinationCore(section)}
+              onOpenTimeline={openGrowthReportsCore}
+            />
+          )}
+
+          {activeSection === "growth-reports" && (
+            <GrowthReportsPage
+              onBack={goBack}
+              backLabel={workspacePanelBackLabel}
+            />
+          )}
+
+          {activeSection === "growth-journal" && (
+            <GrowthJournalPanel nav={buildGrowthPanelNav("growth-journal")} />
+          )}
+
+          {activeSection === "growth-portfolio" && (
+            <GrowthPortfolioPanel nav={buildGrowthPanelNav("growth-portfolio")} />
+          )}
+
+          {activeSection === "wins-this-week" && (
+            <WinsThisWeekPanel
+              refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+              nav={buildGrowthPanelNav("wins-this-week")}
+              onSaveEvidence={(text) => {
+                setEvidencePrefill({ whatHappened: text });
+                openGrowthDestinationCore("evidence-bank");
+              }}
+              onSaveHighlights={(text) => {
+                setConfidencePrefill({
+                  title: text.slice(0, 80),
+                  description: text,
+                  category: "Accomplishments",
+                });
+                openGrowthDestinationCore("confidence-vault");
+              }}
+              onSaveJourney={(text) => {
+                setJourneyPrefill({
+                  title: text.slice(0, 80),
+                  whatHappened: text,
+                });
+                openGrowthDestinationCore("my-journey");
+              }}
+            />
+          )}
+
+          {activeSection === "evidence-bank" && (
+            <EvidenceBankPanel nav={buildGrowthPanelNav("evidence-bank")} />
+          )}
+
+          {activeSection === "confidence-vault" && (
+            <ConfidenceVaultPanel nav={buildGrowthPanelNav("confidence-vault")} />
+          )}
+
+          {activeSection === "my-journey" && (
+            <MyJourneyPanel nav={buildGrowthPanelNav("my-journey")} />
           )}
 
           {activeSection === "breathe" && (

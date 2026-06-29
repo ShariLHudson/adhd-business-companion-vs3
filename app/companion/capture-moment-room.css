@@ -1,0 +1,44 @@
+/* ═══════════════════════════════════════════════════════════
+   CAPTURE A MOMENT — pond bench full-bleed background
+═══════════════════════════════════════════════════════════ */
+
+.capture-moment-room {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  min-height: 100svh;
+  overflow: hidden;
+  background: transparent;
+}
+
+.capture-moment-room__cinematic {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.capture-moment-room__cinematic .cinematic-background__image {
+  background-color: transparent;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+  transform: none !important;
+}
+
+.capture-moment-room--reflecting .capture-moment-room__cinematic {
+  opacity: 0.78;
+  transition: opacity 450ms ease-in-out;
+}
+
+.capture-moment-room__scroll {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 100dvh;
+  min-height: 100svh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}

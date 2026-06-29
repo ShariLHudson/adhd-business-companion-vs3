@@ -1,0 +1,114 @@
+/* ═══════════════════════════════════════════════════════════
+   ESTATE WORKSPACE — shared Growth room panel framework
+═══════════════════════════════════════════════════════════ */
+
+.estate-workspace-stage {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100dvh;
+  min-height: 100svh;
+  box-sizing: border-box;
+  padding: clamp(1rem, 3vh, 1.5rem) clamp(1rem, 3vw, 1.25rem);
+}
+
+.estate-workspace {
+  width: min(900px, calc(100% - 2rem));
+  max-height: 85vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: clamp(2.25rem, 4vw, 3rem);
+  flex-shrink: 0;
+}
+
+.estate-workspace.companion-workspace-frosted,
+.estate-workspace--ivory.companion-workspace-frosted {
+  background: rgba(255, 252, 245, 0.56);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: clamp(1.5rem, 2.4vw, 1.75rem);
+  box-shadow:
+    0 24px 56px rgba(42, 58, 38, 0.1),
+    0 2px 0 rgba(255, 255, 255, 0.38) inset;
+}
+
+.estate-workspace--vault.companion-workspace-frosted {
+  background: rgba(30, 22, 16, 0.62);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(201, 166, 107, 0.2);
+  border-radius: clamp(1.5rem, 2.4vw, 1.75rem);
+  box-shadow: 0 22px 52px rgba(12, 8, 4, 0.28);
+  color: #f0e6d6;
+}
+
+.estate-workspace__kicker {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #9a8f82;
+}
+
+.estate-workspace--vault .estate-workspace__kicker {
+  color: #c9b9a4;
+}
+
+.estate-workspace__title {
+  margin: 0.45rem 0 0;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(1.65rem, 3.2vw, 2rem);
+  font-weight: 600;
+  line-height: 1.12;
+  color: #2f261f;
+}
+
+.estate-workspace--vault .estate-workspace__title {
+  color: #f0e6d6;
+}
+
+.estate-workspace__lead {
+  margin: 0.55rem 0 0;
+  font-size: clamp(0.92rem, 1.8vw, 1.02rem);
+  line-height: 1.55;
+  color: #6f6259;
+  font-style: italic;
+  max-width: 36rem;
+}
+
+.estate-workspace--vault .estate-workspace__lead {
+  color: #c9b9a4;
+  font-style: normal;
+}
+
+.estate-workspace__section {
+  margin-top: clamp(1.35rem, 3vh, 1.75rem);
+  padding-top: clamp(1.15rem, 2.6vh, 1.35rem);
+  border-top: 1px solid rgba(139, 115, 85, 0.12);
+}
+
+.estate-workspace--vault .estate-workspace__section {
+  border-top-color: rgba(201, 166, 107, 0.16);
+}
+
+.estate-workspace__section-title {
+  margin: 0 0 0.75rem;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: 1.02rem;
+  font-weight: 600;
+  color: #4a4038;
+}
+
+.estate-workspace--vault .estate-workspace__section-title {
+  color: #f0e6d6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estate-workspace-stage {
+    scroll-behavior: auto;
+  }
+}

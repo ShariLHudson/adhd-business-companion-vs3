@@ -27,6 +27,35 @@
   );
 }
 
+[data-home-mode="chat"] .companion-home-card.companion-home-returning {
+  position: absolute;
+  top: clamp(14%, 18vh, 22%);
+  left: 44%;
+  right: clamp(1.25rem, 3.5vw, 2.75rem);
+  width: auto;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+[data-home-mode="chat"] .companion-home-returning__moment {
+  width: 100%;
+  max-width: min(100%, 28rem);
+  margin: 0 auto;
+  padding-top: 0;
+}
+
+[data-home-mode="chat"] .companion-home-continue-actions {
+  width: 100%;
+  max-width: min(100%, 28rem);
+  margin-right: auto;
+  margin-left: auto;
+}
+
 .companion-homestead-chat__reading > * {
   position: relative;
   z-index: 1;

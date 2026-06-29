@@ -95,6 +95,23 @@ describe("companionPageRenderContext", () => {
     });
   });
 
+  it("suppresses legacy wallpaper when Growth Journal opens", () => {
+    const context = buildCompanionPageRenderContext({
+      activeSection: "growth-journal",
+      workspacePanel: null,
+      workspaceBesideChat: false,
+      displayEmotion: "unclear",
+      messageCount: 0,
+    });
+
+    expect(context.globalBackground).toEqual({
+      scenePage: "progress",
+      sceneSeed: "growth",
+      clearMyMind: false,
+      suppress: true,
+    });
+  });
+
   it("flags lower-layer place overrides in development", () => {
     const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
     const previousEnv = process.env.NODE_ENV;

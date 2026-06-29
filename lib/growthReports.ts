@@ -15,6 +15,7 @@ import {
   getAllReflectionEntries,
   type GrowthReflectionEntry,
 } from "./growthReflection";
+import { getJournalEntries, type JournalEntry } from "./growthJournalStore";
 import { getBusinessProfile, getPrefs } from "./companionStore";
 
 export type GrowthReportType =
@@ -40,6 +41,7 @@ export type GrowthReportIncludes = {
   testimonials: boolean;
   certifications: boolean;
   reflections: boolean;
+  journal: boolean;
 };
 
 export type GrowthReportDateRange = {
@@ -73,6 +75,7 @@ export type GrowthReportContent = {
   testimonials: ConfidenceEntry[];
   certifications: ConfidenceEntry[];
   reflections: GrowthReflectionEntry[];
+  journal: JournalEntry[];
   photos: GrowthReportPhoto[];
   files: GrowthReportFile[];
   generatedAt: string;
@@ -172,6 +175,7 @@ export function defaultIncludesForType(
         testimonials: false,
         certifications: false,
         reflections: false,
+        journal: false,
       };
     case "monthly":
       return {
@@ -184,6 +188,7 @@ export function defaultIncludesForType(
         testimonials: false,
         certifications: false,
         reflections: true,
+        journal: true,
       };
     case "quarterly":
       return {
@@ -196,6 +201,7 @@ export function defaultIncludesForType(
         testimonials: true,
         certifications: false,
         reflections: true,
+        journal: true,
       };
     case "annual":
       return {
@@ -208,6 +214,7 @@ export function defaultIncludesForType(
         testimonials: true,
         certifications: true,
         reflections: true,
+        journal: true,
       };
     default:
       return {
@@ -220,6 +227,7 @@ export function defaultIncludesForType(
         testimonials: true,
         certifications: true,
         reflections: true,
+        journal: true,
       };
   }
 }
@@ -327,6 +335,10 @@ export function buildGrowthReportContent(input: {
       )
     : [];
 
+  const journal = includes.journal
+    ? getJournalEntries().filter((e) => isInRange(e.createdAt, dateRange))
+    : [];
+
   const photos: GrowthReportPhoto[] = [];
   const files: GrowthReportFile[] = [];
 
@@ -352,6 +364,11 @@ export function buildGrowthReportContent(input: {
         sources.push({ label: "My Journey", attachments: j.attachments });
       }
     }
+    if (includes.journal) {
+      for (const j of journal) {
+        sources.push({ label: "Journal", attachments: j.attachments });
+      }
+    }
     for (const { label, attachments } of sources) {
       const collected = collectAttachments(attachments, label);
       if (includes.photos) photos.push(...collected.photos);
@@ -372,6 +389,7 @@ export function buildGrowthReportContent(input: {
     testimonials,
     certifications,
     reflections,
+    journal,
     photos,
     files,
     generatedAt: new Date().toISOString(),
@@ -470,6 +488,16 @@ function formatJourney(entry: JourneyEntry, detailed: boolean): string {
   return parts.join("");
 }
 
+function formatJournal(entry: JournalEntry, detailed: boolean): string {
+  const date = new Date(entry.createdAt).toLocaleDateString();
+  if (!detailed) {
+    const preview =
+      entry.body.length > 160 ? `${entry.body.slice(0, 160)}…` : entry.body;
+    return `<li><strong>${date}</strong> — ${escapeHtml(preview)}</li>`;
+  }
+  return `<article class="entry"><h3>Journal</h3><p class="meta">${date}</p><p>${escapeHtml(entry.body)}</p></article>`;
+}
+
 function formatReflection(entry: GrowthReflectionEntry, detailed: boolean): string {
   const week = new Date(`${entry.weekKey}T00:00:00`).toLocaleDateString();
   if (!detailed) {
@@ -520,6 +548,7 @@ export function formatGrowthReportHtml(content: GrowthReportContent): string {
     content.includes.evidence ? `${content.evidence.length} evidence` : null,
     content.includes.highlights ? `${content.highlights.length} highlights` : null,
     content.includes.journey ? `${content.journey.length} journey` : null,
+    content.includes.journal ? `${content.journal.length} journal` : null,
     content.includes.reflections ? `${content.reflections.length} reflections` : null,
   ].filter(Boolean);
 
@@ -582,6 +611,15 @@ export function formatGrowthReportHtml(content: GrowthReportContent): string {
       sectionHeading("My Journey", content.journey.length) +
         wrapList(
           content.journey.map((j) => formatJourney(j, detailed || narrative)).join(""),
+        ),
+    );
+  }
+
+  if (content.includes.journal && content.journal.length) {
+    sections.push(
+      sectionHeading("Journal", content.journal.length) +
+        wrapList(
+          content.journal.map((j) => formatJournal(j, detailed || narrative)).join(""),
         ),
     );
   }
@@ -778,6 +816,7 @@ export const GROWTH_REPORT_INCLUDE_OPTIONS: {
   { key: "evidence", label: "Evidence" },
   { key: "highlights", label: "My Highlights" },
   { key: "journey", label: "Journey" },
+  { key: "journal", label: "Journal" },
   { key: "photos", label: "Photos" },
   { key: "files", label: "Files" },
   { key: "testimonials", label: "Testimonials" },

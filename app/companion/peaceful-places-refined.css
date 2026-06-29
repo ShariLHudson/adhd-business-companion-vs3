@@ -59,6 +59,233 @@
   z-index: 2;
 }
 
+/* Garden life — birds and butterflies across the estate */
+.peaceful-places-landing__garden-life {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.peaceful-places-landing__bird {
+  position: absolute;
+  width: 0.7rem;
+  height: 0.22rem;
+  opacity: 0;
+}
+
+.peaceful-places-landing__bird::before,
+.peaceful-places-landing__bird::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 0.36rem;
+  height: 0.36rem;
+  border: 1.5px solid rgba(48, 42, 36, 0.38);
+  border-bottom: none;
+  border-radius: 100% 100% 0 0;
+}
+
+.peaceful-places-landing__bird::before {
+  left: 0;
+  transform: rotate(-24deg);
+  transform-origin: right bottom;
+  animation: peaceful-places-bird-wing-a 0.42s ease-in-out infinite;
+}
+
+.peaceful-places-landing__bird::after {
+  right: 0;
+  transform: rotate(24deg);
+  transform-origin: left bottom;
+  animation: peaceful-places-bird-wing-b 0.42s ease-in-out infinite;
+}
+
+.peaceful-places-landing__bird--a {
+  top: 16%;
+  left: 0;
+  animation: peaceful-places-bird-flight-a 34s linear infinite;
+}
+
+.peaceful-places-landing__bird--b {
+  top: 23%;
+  left: 0;
+  animation: peaceful-places-bird-flight-b 42s linear infinite;
+  animation-delay: -18s;
+}
+
+.peaceful-places-landing__butterfly {
+  position: absolute;
+  width: 0.44rem;
+  height: 0.44rem;
+  border-radius: 50% 50% 45% 55%;
+  opacity: 0;
+  box-shadow: 0 0 10px rgba(255, 220, 160, 0.28);
+}
+
+.peaceful-places-landing__butterfly--a {
+  top: 36%;
+  left: 14%;
+  background: rgba(255, 214, 148, 0.58);
+  animation: peaceful-places-butterfly-drift-a 19s ease-in-out infinite;
+  animation-delay: -5s;
+}
+
+.peaceful-places-landing__butterfly--b {
+  top: 48%;
+  left: 62%;
+  width: 0.38rem;
+  height: 0.38rem;
+  background: rgba(232, 208, 248, 0.52);
+  animation: peaceful-places-butterfly-drift-b 24s ease-in-out infinite;
+  animation-delay: -12s;
+}
+
+.peaceful-places-landing__butterfly--c {
+  top: 41%;
+  left: 38%;
+  width: 0.4rem;
+  height: 0.4rem;
+  background: rgba(255, 228, 168, 0.5);
+  animation: peaceful-places-butterfly-drift-c 21s ease-in-out infinite;
+  animation-delay: -8s;
+}
+
+@keyframes peaceful-places-bird-wing-a {
+  0%,
+  100% {
+    transform: rotate(-24deg);
+  }
+
+  50% {
+    transform: rotate(-38deg);
+  }
+}
+
+@keyframes peaceful-places-bird-wing-b {
+  0%,
+  100% {
+    transform: rotate(24deg);
+  }
+
+  50% {
+    transform: rotate(38deg);
+  }
+}
+
+@keyframes peaceful-places-bird-flight-a {
+  0% {
+    opacity: 0;
+    transform: translateX(-4vw) translateY(0);
+  }
+
+  6% {
+    opacity: 0.5;
+  }
+
+  48% {
+    opacity: 0.45;
+    transform: translateX(54vw) translateY(-1.4vh);
+  }
+
+  58% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(108vw) translateY(0.6vh);
+  }
+}
+
+@keyframes peaceful-places-bird-flight-b {
+  0% {
+    opacity: 0;
+    transform: translateX(-6vw) translateY(0.4vh);
+  }
+
+  8% {
+    opacity: 0.42;
+  }
+
+  52% {
+    opacity: 0.38;
+    transform: translateX(58vw) translateY(-0.8vh);
+  }
+
+  62% {
+    opacity: 0;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(112vw) translateY(1vh);
+  }
+}
+
+@keyframes peaceful-places-butterfly-drift-a {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(-6deg);
+  }
+
+  18% {
+    opacity: 0.42;
+  }
+
+  50% {
+    opacity: 0.5;
+    transform: translate(5vw, -2.2vh) rotate(10deg);
+  }
+
+  82% {
+    opacity: 0.28;
+  }
+}
+
+@keyframes peaceful-places-butterfly-drift-b {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(8deg);
+  }
+
+  20% {
+    opacity: 0.38;
+  }
+
+  55% {
+    opacity: 0.46;
+    transform: translate(-4.5vw, -1.8vh) rotate(-12deg);
+  }
+
+  84% {
+    opacity: 0.22;
+  }
+}
+
+@keyframes peaceful-places-butterfly-drift-c {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+
+  16% {
+    opacity: 0.4;
+  }
+
+  48% {
+    opacity: 0.48;
+    transform: translate(3.5vw, 1.6vh) rotate(6deg);
+  }
+
+  80% {
+    opacity: 0.26;
+  }
+}
+
 .peaceful-places-landing__baked-title-mute {
   display: none !important;
 }
@@ -533,6 +760,8 @@
 }
 
 .peaceful-places-signpost-portal .hanging-destination-menu__sign-board {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -575,6 +804,13 @@
   border-color: #c8a840;
   box-shadow: rgba(0, 0, 0, 0.65) 0px 5px 12px;
   outline: none;
+}
+
+.peaceful-places-signpost-portal .hanging-destination-menu__sign-board[data-lit="1"] {
+  transform: translateY(-1px);
+  border-color: rgba(220, 170, 90, 0.78);
+  background: linear-gradient(180deg, #5a5652 0%, #484440 44%, #3c3834 100%);
+  color: #f8edd4;
 }
 
 .peaceful-places-signpost-portal .hanging-destination-menu__name {
@@ -1536,6 +1772,14 @@
   .pathway-garden-stake__banner,
   .pathway-garden-stake__photo-frame {
     animation: none !important;
+  }
+
+  .peaceful-places-landing__bird,
+  .peaceful-places-landing__butterfly,
+  .peaceful-places-landing__bird::before,
+  .peaceful-places-landing__bird::after {
+    animation: none !important;
+    opacity: 0 !important;
   }
 
   .peaceful-places-landing[data-garden-walk="1"] .peaceful-places-landing__cinematic,

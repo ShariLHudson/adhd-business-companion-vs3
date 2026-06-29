@@ -10,10 +10,7 @@ import {
 } from "react";
 import { WelcomeRoomTopBar } from "@/components/companion/WelcomeRoomTopBar";
 import { useWelcomeAudioExperience } from "@/lib/welcomeAudio";
-import {
-  isWelcomeAudioSessionUnlocked,
-  unlockBrowserAudioFromClick,
-} from "@/lib/welcomeAudio/audioUnlock";
+import { unlockBrowserAudioFromClick } from "@/lib/welcomeAudio/audioUnlock";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
 import {
   recordWelcomeRoomVisit,
@@ -21,6 +18,7 @@ import {
   setWelcomeRoomWelcomeMode,
   WELCOME_ROOM_ASSET,
   WELCOME_ROOM_LETTER,
+  WELCOME_ROOM_VOICE_CONTROLS,
   useWelcomeRoomArrival,
 } from "@/lib/welcomeRoom";
 
@@ -42,6 +40,7 @@ export function WelcomeRoomPanel({
   const [readingFocus, setReadingFocus] = useState(false);
   const [cinematicActive, setCinematicActive] = useState(true);
   const [cinematicPaused, setCinematicPaused] = useState(false);
+  const [experienceStopped, setExperienceStopped] = useState(false);
   const letterScrollRef = useRef<HTMLDivElement>(null);
   const visitedRef = useRef(false);
   const autoStartedRef = useRef(false);
@@ -74,15 +73,22 @@ export function WelcomeRoomPanel({
   });
 
   const experienceLive =
-    cinematicActive ||
-    audioUnlocked ||
-    isWelcomeAudioSessionUnlocked() ||
-    voiceState === "loading" ||
-    voiceState === "playing" ||
-    voiceState === "paused";
+    !experienceStopped &&
+    (cinematicActive ||
+      voiceState === "loading" ||
+      voiceState === "playing" ||
+      voiceState === "paused");
+
+  const roomMediaActive =
+    !experienceStopped &&
+    (voiceState === "loading" ||
+      voiceState === "playing" ||
+      voiceState === "paused" ||
+      cinematicActive);
 
   const beginListenExperience = useCallback(() => {
     unlockBrowserAudioFromClick();
+    setExperienceStopped(false);
     setReadingFocus(false);
     setWelcomeRoomWelcomeMode("immersive");
     setCinematicActive(true);
@@ -121,6 +127,7 @@ export function WelcomeRoomPanel({
   }, [pauseExperience]);
 
   const handleStop = useCallback(async () => {
+    setExperienceStopped(true);
     setCinematicActive(false);
     setCinematicPaused(false);
     arrival.resetCinematic();
@@ -128,6 +135,7 @@ export function WelcomeRoomPanel({
   }, [arrival, stopExperience]);
 
   const handleRestart = useCallback(async () => {
+    setExperienceStopped(false);
     arrival.resetCinematic();
     setReadingFocus(false);
     setWelcomeRoomWelcomeMode("immersive");
@@ -200,8 +208,21 @@ export function WelcomeRoomPanel({
           onToggleMusic={toggleMusic}
           onToggleVoice={toggleVoice}
           readingFocus={readingFocus}
-          audioUnlocked={audioUnlocked || experienceLive}
+          audioUnlocked={audioUnlocked || roomMediaActive}
+          roomMediaActive={roomMediaActive}
         />
+
+        {roomMediaActive ? (
+          <button
+            type="button"
+            className="welcome-room__stop-floating"
+            onClick={() => void handleStop()}
+            data-testid="welcome-room-stop-floating"
+            aria-label={WELCOME_ROOM_VOICE_CONTROLS.stopRoom}
+          >
+            {WELCOME_ROOM_VOICE_CONTROLS.stop}
+          </button>
+        ) : null}
 
         <div
           className="welcome-room__viewport"

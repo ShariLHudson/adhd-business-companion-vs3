@@ -29,6 +29,7 @@ type Props = {
   onToggleVoice: () => void;
   readingFocus: boolean;
   audioUnlocked: boolean;
+  roomMediaActive: boolean;
 };
 
 function formatAudioTime(seconds: number): string {
@@ -61,6 +62,7 @@ export function WelcomeRoomTopBar({
   onToggleVoice,
   readingFocus,
   audioUnlocked,
+  roomMediaActive,
 }: Props) {
   const isPlaying = voiceState === "playing";
   const progressPercent = Math.round(progress.ratio * 100);
@@ -73,7 +75,7 @@ export function WelcomeRoomTopBar({
 
   return (
     <header
-      className={`welcome-room__top-bar ${inviteQuiet ? "welcome-room__top-bar--invite" : ""} ${readingFocus ? "welcome-room__top-bar--reading" : ""}`}
+      className={`welcome-room__top-bar ${inviteQuiet ? "welcome-room__top-bar--invite" : ""} ${readingFocus ? "welcome-room__top-bar--reading" : ""} ${roomMediaActive ? "welcome-room__top-bar--media-active" : ""}`}
       data-testid="welcome-room-top-bar"
       aria-label="Welcome Room controls"
     >
@@ -87,15 +89,37 @@ export function WelcomeRoomTopBar({
           {WELCOME_ROOM_VOICE_CONTROLS.goToChat}
         </button>
 
-        {readingFocus ? (
+        {roomMediaActive ? (
           <button
             type="button"
-            className="welcome-room__top-btn welcome-room__top-btn--active"
-            onClick={onOpenListen}
-            data-testid="welcome-room-listen-instead"
+            className="welcome-room__top-btn welcome-room__top-btn--stop"
+            onClick={onStop}
+            data-testid="welcome-room-stop"
+            aria-label={WELCOME_ROOM_VOICE_CONTROLS.stopRoom}
           >
-            {WELCOME_ROOM_VOICE_CONTROLS.listenInstead}
+            {WELCOME_ROOM_VOICE_CONTROLS.stop}
           </button>
+        ) : null}
+
+        {readingFocus ? (
+          <>
+            <button
+              type="button"
+              className="welcome-room__top-btn welcome-room__top-btn--active"
+              onClick={onOpenListen}
+              data-testid="welcome-room-listen-instead"
+            >
+              {WELCOME_ROOM_VOICE_CONTROLS.listenInstead}
+            </button>
+            <button
+              type="button"
+              className="welcome-room__top-btn welcome-room__top-btn--quiet"
+              onClick={onCloseRead}
+              data-testid="welcome-room-close-read"
+            >
+              {WELCOME_ROOM_VOICE_CONTROLS.closeRead}
+            </button>
+          </>
         ) : inviteQuiet ? null : (
           <>
             <div
@@ -106,7 +130,7 @@ export function WelcomeRoomTopBar({
             >
               <button
                 type="button"
-                className="welcome-room__top-icon-btn"
+                className="welcome-room__top-btn welcome-room__top-btn--transport"
                 onClick={isPlaying ? onPause : onPlay}
                 disabled={voiceState === "loading"}
                 aria-label={
@@ -116,25 +140,20 @@ export function WelcomeRoomTopBar({
                 }
                 data-testid="welcome-room-play-pause"
               >
-                {voiceState === "loading" ? "..." : isPlaying ? "⏸" : "▶"}
+                {voiceState === "loading"
+                  ? WELCOME_ROOM_VOICE_CONTROLS.loading
+                  : isPlaying
+                    ? WELCOME_ROOM_VOICE_CONTROLS.pause
+                    : WELCOME_ROOM_VOICE_CONTROLS.play}
               </button>
               <button
                 type="button"
-                className="welcome-room__top-icon-btn"
-                onClick={onStop}
-                aria-label={WELCOME_ROOM_VOICE_CONTROLS.stop}
-                data-testid="welcome-room-stop"
-              >
-                ⏹
-              </button>
-              <button
-                type="button"
-                className="welcome-room__top-icon-btn"
+                className="welcome-room__top-btn welcome-room__top-btn--transport"
                 onClick={onRestart}
                 aria-label={WELCOME_ROOM_VOICE_CONTROLS.restart}
                 data-testid="welcome-room-restart"
               >
-                ↺
+                {WELCOME_ROOM_VOICE_CONTROLS.restart}
               </button>
 
               {voiceState === "playing" || voiceState === "paused" ? (

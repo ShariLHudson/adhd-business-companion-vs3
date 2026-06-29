@@ -9,8 +9,7 @@ export function resolveHomeMode(input: {
   hasUserMessages: boolean;
 }): HomeMode | null {
   if (input.activeSection !== "home") return null;
-  if (input.hasUserMessages || !input.homeCalm) return "chat";
-  return "welcome";
+  return "chat";
 }
 
 export function homeModeDataAttr(mode: HomeMode | null): string | undefined {

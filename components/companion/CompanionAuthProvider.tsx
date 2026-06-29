@@ -14,6 +14,7 @@ import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import { getAppSiteUrl } from "@/lib/appSite";
 import {
   hasCompanionAuthStorageHint,
+  navigateToCompanionHome,
   waitForCompanionAuthStorage,
 } from "@/lib/companionLoginTransition";
 import { languagePrefsFromUserMetadata } from "@/lib/companionUserLanguage";
@@ -141,13 +142,6 @@ async function signInDirect(
         if (!retry.data.session) {
           return { error: "Sign-in failed — could not save your session." };
         }
-        const persisted = await waitForCompanionAuthStorage(5_000);
-        if (!persisted) {
-          return {
-            error:
-              "Signed in, but this browser could not save your session. Free some storage or try another browser.",
-          };
-        }
         resetCompanionAuthBackoff();
         return { error: null, session: retry.data.session };
       }
@@ -155,13 +149,6 @@ async function signInDirect(
     }
     if (!sessionData.session) {
       return { error: "Sign-in failed — could not save your session." };
-    }
-    const persisted = await waitForCompanionAuthStorage(5_000);
-    if (!persisted) {
-      return {
-        error:
-          "Signed in, but this browser could not save your session. Free some storage or try another browser.",
-      };
     }
     resetCompanionAuthBackoff();
     return { error: null, session: sessionData.session };
@@ -373,6 +360,25 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
         const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
           if (!mounted) return;
           if (event === "SIGNED_OUT") {
+            if (hasCompanionAuthStorageHint()) {
+              void (async () => {
+                const refreshed = await supabase.auth.refreshSession();
+                if (!mounted) return;
+                if (refreshed.data.session) {
+                  applySession(refreshed.data.session);
+                  return;
+                }
+                const retry = await supabase.auth.getSession();
+                if (!mounted) return;
+                if (retry.data.session) {
+                  applySession(retry.data.session);
+                  return;
+                }
+                setSession(null);
+                setUser(null);
+              })();
+              return;
+            }
             setSession(null);
             setUser(null);
             return;
@@ -419,6 +425,31 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    if (!configured || loading || user || session) return;
+    if (!sessionChecked || !hasCompanionAuthStorageHint()) return;
+
+    let cancelled = false;
+    const supabase = getCompanionSupabase();
+    if (!supabase) return;
+
+    void (async () => {
+      const first = await supabase.auth.getSession();
+      if (!cancelled && first.data.session) {
+        applyAuthSession(first.data.session);
+        return;
+      }
+      const refreshed = await supabase.auth.refreshSession();
+      if (!cancelled && refreshed.data.session) {
+        applyAuthSession(refreshed.data.session);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [configured, loading, sessionChecked, user, session]);
+
   const value = useMemo<CompanionAuthContextValue>(
     () => ({
       configured,
@@ -435,6 +466,15 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
         const result = await signInDirect(email, password);
         if (!result.error && result.session) {
           applyAuthSession(result.session);
+        } else if (!result.error) {
+          const supabase = getCompanionSupabase();
+          const restored = await supabase?.auth.getSession();
+          if (restored?.data.session) {
+            applyAuthSession(restored.data.session);
+          }
+        }
+        if (!result.error) {
+          navigateToCompanionHome();
         }
         return { error: result.error, hint: result.hint };
       },

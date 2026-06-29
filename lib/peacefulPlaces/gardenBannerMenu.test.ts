@@ -23,12 +23,11 @@ describe("gardenBannerMenu", () => {
     expect(menu[1]).toMatchObject({ kind: "section", section: "breathe" });
   });
 
-  it("places nature escape on recharge instead of music loft", () => {
+  it("places nature escape on recharge", () => {
     const menu = gardenBannerMenuFor("energize");
     expect(menu.map((item) => item.label)).toEqual([
       "Nature Escape",
       "Sunshine Break",
-      "Guided Recharge",
       "Energy Reset",
     ]);
     expect(menu[0]).toMatchObject({ kind: "soundscape", soundscapeId: "nature-escape" });
@@ -48,8 +47,8 @@ describe("gardenBannerMenu", () => {
     const menu = gardenBannerMenuFor("my-places");
     expect(menu.map((item) => item.label)).toEqual([
       "My Peaceful Places",
-      "Add a Place",
-      "Manage Places",
+      "Add a New Place",
+      "Manage My Places",
     ]);
   });
 });

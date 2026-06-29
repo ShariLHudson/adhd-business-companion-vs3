@@ -18,11 +18,13 @@ import "./homestead-room-motion.css";
 import "./peaceful-places-refined.css";
 import "./peaceful-places-garden-banners.css";
 import "./peaceful-places-garden-dropdown.css";
+import "./peaceful-places-garden-cards.css";
 import "./focus-my-brain-sanctuary.css";
 import "./companion-floating-card.css";
 import "./companion-desk.css";
 import "./companion-chat.css";
 import "./plan-day-experience.css";
+import "./growth-story-hub.css";
 
 export const dynamic = "force-dynamic";
 

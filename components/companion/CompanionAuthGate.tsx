@@ -1,11 +1,23 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
-import { hasCompanionAuthStorageHint } from "@/lib/companionLoginTransition";
+import {
+  clearCompanionPostLoginQuiet,
+  hasCompanionAuthStorageHint,
+  isCompanionPostLoginQuiet,
+} from "@/lib/companionLoginTransition";
+
+function AuthGateLoading({ message }: { message: string }) {
+  return (
+    <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]">
+      {message}
+    </main>
+  );
+}
 
 /** Unauthenticated visitors go to sign-in when Supabase auth is configured. */
 export function CompanionAuthGate({ children }: { children: ReactNode }) {
@@ -16,58 +28,49 @@ export function CompanionAuthGate({ children }: { children: ReactNode }) {
   const { configured, loading, sessionChecked, user, session } =
     useCompanionAuth();
   const redirectingRef = useRef(false);
-  const [restoreGrace, setRestoreGrace] = useState(false);
+
   const isAuthed = Boolean(user || session);
+  const loginHandoff =
+    typeof window !== "undefined" && isCompanionPostLoginQuiet();
+  const hasStoredSession =
+    typeof window !== "undefined" && hasCompanionAuthStorageHint();
+  const gateOpen =
+    isAuthed ||
+    loginHandoff ||
+    (sessionChecked && !loading && hasStoredSession);
 
   useEffect(() => {
     if (isAuthed) {
-      setRestoreGrace(false);
+      clearCompanionPostLoginQuiet();
       redirectingRef.current = false;
-      return;
     }
-    if (!configured || !sessionChecked || loading) {
-      return;
-    }
-    if (hasCompanionAuthStorageHint()) {
-      setRestoreGrace(true);
-      const timer = window.setTimeout(() => setRestoreGrace(false), 5_000);
-      return () => window.clearTimeout(timer);
-    }
-    setRestoreGrace(false);
-  }, [configured, sessionChecked, loading, isAuthed]);
+  }, [isAuthed]);
 
   useEffect(() => {
-    if (isAuthed) {
+    if (gateOpen) {
       redirectingRef.current = false;
       return;
     }
-    if (
-      !configured ||
-      !sessionChecked ||
-      loading ||
-      restoreGrace ||
-      redirectingRef.current
-    ) {
+    if (!configured || !sessionChecked || loading || redirectingRef.current) {
       return;
     }
     redirectingRef.current = true;
     router.replace("/companion/login");
-  }, [configured, sessionChecked, loading, isAuthed, restoreGrace, router]);
+  }, [configured, sessionChecked, loading, gateOpen, router]);
 
-  if (configured && (!sessionChecked || loading || restoreGrace)) {
-    return (
-      <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]">
-        Loading your space…
-      </main>
-    );
+  if (!configured) {
+    return <>{children}</>;
   }
 
-  if (configured && sessionChecked && !loading && !isAuthed && !restoreGrace) {
-    return (
-      <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]">
-        Redirecting to sign in…
-      </main>
-    );
+  if (!sessionChecked || loading) {
+    if (loginHandoff || hasStoredSession) {
+      return <>{children}</>;
+    }
+    return <AuthGateLoading message="Loading your space…" />;
+  }
+
+  if (!gateOpen) {
+    return <AuthGateLoading message="Redirecting to sign in…" />;
   }
 
   return <>{children}</>;

@@ -52,26 +52,26 @@ export function homeChromeForState(state: CompanionHomeState): HomeChromeConfig 
   switch (state) {
     case "FIRST_VISIT":
       return {
-        navVisibility: "hidden",
-        layout: "welcome-scene",
+        navVisibility: "normal",
+        layout: "standard",
         conversationInput: true,
-        autoFocusInput: false,
+        autoFocusInput: true,
         softenBackground: false,
       };
     case "RETURNING_ACTIVE":
       return {
-        navVisibility: "muted",
-        layout: "welcome-scene",
-        conversationInput: false,
-        autoFocusInput: false,
+        navVisibility: "normal",
+        layout: "standard",
+        conversationInput: true,
+        autoFocusInput: true,
         softenBackground: false,
       };
     case "QUIET_PRESENCE":
       return {
         navVisibility: "calm",
-        layout: "welcome-scene",
+        layout: "standard",
         conversationInput: true,
-        autoFocusInput: false,
+        autoFocusInput: true,
         softenBackground: false,
       };
   }

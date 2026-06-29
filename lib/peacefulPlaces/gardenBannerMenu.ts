@@ -82,12 +82,6 @@ export const GARDEN_BANNER_MENUS: Record<EstateSignId, readonly GardenBannerMenu
       soundscapeId: "sunrise-terrace",
     },
     {
-      id: "guided-recharge",
-      label: "Guided Recharge",
-      kind: "activity",
-      activityId: "energy-check",
-    },
-    {
       id: "energy-reset",
       label: "Energy Reset",
       kind: "soundscape",
@@ -129,13 +123,13 @@ export const GARDEN_BANNER_MENUS: Record<EstateSignId, readonly GardenBannerMenu
     },
     {
       id: "add",
-      label: "Add a Place",
+      label: "Add a New Place",
       kind: "my-places",
       myPlacesAction: "add",
     },
     {
       id: "manage",
-      label: "Manage Places",
+      label: "Manage My Places",
       kind: "my-places",
       myPlacesAction: "manage",
     },

@@ -37,6 +37,9 @@ export type AppSection =
   | "wins-this-week"
   | "evidence-bank"
   | "growth"
+  | "growth-capture"
+  | "growth-library"
+  | "growth-reports"
   | "confidence-vault"
   | "my-journey"
   | "growth-journal"
@@ -222,6 +225,10 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "games":
       return "focus";
     case "the-gallery":
+    case "growth":
+    case "growth-capture":
+    case "growth-library":
+    case "growth-reports":
       return "growth";
     case "evidence-bank":
       return "evidence-bank";

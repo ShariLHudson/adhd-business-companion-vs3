@@ -36,14 +36,14 @@ describe("homeState", () => {
   });
 
   it("assigns nav visibility by relationship stage", () => {
-    expect(homeChromeForState("FIRST_VISIT").navVisibility).toBe("hidden");
-    expect(homeChromeForState("RETURNING_ACTIVE").navVisibility).toBe("muted");
+    expect(homeChromeForState("FIRST_VISIT").navVisibility).toBe("normal");
+    expect(homeChromeForState("RETURNING_ACTIVE").navVisibility).toBe("normal");
     expect(homeChromeForState("QUIET_PRESENCE").navVisibility).toBe("calm");
   });
 
-  it("uses welcome-scene layout for all arrival states", () => {
-    expect(homeChromeForState("FIRST_VISIT").layout).toBe("welcome-scene");
-    expect(homeChromeForState("QUIET_PRESENCE").layout).toBe("welcome-scene");
-    expect(homeChromeForState("RETURNING_ACTIVE").layout).toBe("welcome-scene");
+  it("uses standard layout for all arrival states", () => {
+    expect(homeChromeForState("FIRST_VISIT").layout).toBe("standard");
+    expect(homeChromeForState("QUIET_PRESENCE").layout).toBe("standard");
+    expect(homeChromeForState("RETURNING_ACTIVE").layout).toBe("standard");
   });
 });

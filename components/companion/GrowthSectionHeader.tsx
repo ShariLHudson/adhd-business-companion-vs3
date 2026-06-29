@@ -12,8 +12,6 @@ import {
 } from "@/lib/growthNavigation";
 
 import { readFileAsAttachment, type GrowthAttachment } from "@/lib/growthAttachments";
-import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
-import { GROWTH_SECTION_OBJECT_ID } from "@/lib/companionObjects";
 
 const TOOL_BTN =
   "rounded-full border border-[#e7d9c8] bg-white px-3 py-1.5 text-xs font-semibold text-[#2f261f] hover:bg-[#faf7f2]";
@@ -73,12 +71,7 @@ export function GrowthSectionHeader({
       ) : null}
 
       <div>
-        <h2 className="flex items-center gap-2 text-3xl font-bold text-[#2f261f]">
-          <CompanionObjectVisual
-            objectId={GROWTH_SECTION_OBJECT_ID[nav.current] ?? "growth"}
-            size="md"
-            variant="icon"
-          />
+        <h2 className="text-3xl font-bold text-[#2f261f]">
           {meta.title}
         </h2>
         <p className="mt-1 text-[#6f6259]">{meta.subtitle}</p>
@@ -100,7 +93,7 @@ export function GrowthSectionHeader({
               onClick={() => onPrint?.() ?? window.print()}
               className={TOOL_BTN}
             >
-              🖨 Print
+              Print
             </button>
             <button
               type="button"
@@ -108,7 +101,7 @@ export function GrowthSectionHeader({
               title="PDF export coming soon"
               className="cursor-not-allowed rounded-full border border-dashed border-[#e7d9c8] px-3 py-1.5 text-xs text-[#b8afa4]"
             >
-              📄 Export PDF
+              Export PDF
             </button>
             {onQuickAttach ? (
               <>
@@ -139,14 +132,14 @@ export function GrowthSectionHeader({
                   onClick={() => fileRef.current?.click()}
                   className={TOOL_BTN}
                 >
-                  📎 Attach File
+                  Attach file
                 </button>
                 <button
                   type="button"
                   onClick={() => imageRef.current?.click()}
                   className={TOOL_BTN}
                 >
-                  🖼 Upload Image
+                  Upload image
                 </button>
               </>
             ) : null}

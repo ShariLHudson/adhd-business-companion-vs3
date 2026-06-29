@@ -13,7 +13,7 @@ import {
 import type { EmotionalState } from "@/lib/companionEmotions";
 import { FocusAudioPlayerModal } from "@/components/companion/FocusAudioPlayerModal";
 import { PeacefulPlaceSession } from "@/components/companion/PeacefulPlaceSession";
-import { HangingDestinationMenu } from "@/components/companion/peacefulPlaces/HangingDestinationMenu";
+import { GardenDestinationCardMenu } from "@/components/companion/peacefulPlaces/GardenDestinationCardMenu";
 import { MyPeacefulPlacesWorkspace } from "@/components/companion/peacefulPlaces/MyPeacefulPlacesWorkspace";
 import { PathwayEstateSignposts } from "@/components/companion/peacefulPlaces/PathwayEstateSignposts";
 import { PathwayPhotoSignsLayer } from "@/components/companion/peacefulPlaces/PathwayPhotoSignsLayer";
@@ -26,6 +26,8 @@ import {
   type PeacefulPlaceDestination,
 } from "@/lib/peacefulPlaces";
 import { gardenBannerMenuFor } from "@/lib/peacefulPlaces/gardenBannerMenu";
+import { gardenDestinationCardsForSign } from "@/lib/peacefulPlaces/gardenDestinationCards";
+import { stopGardenCardAmbience } from "@/lib/peacefulPlaces/gardenCardAmbience";
 import {
   crossfadeGardenFlagAmbience,
   stopGardenFlagAmbience,
@@ -108,6 +110,7 @@ export function FocusAudioPanel({
   useEffect(() => {
     return () => {
       void stopGardenFlagAmbience();
+      void stopGardenCardAmbience();
     };
   }, []);
 
@@ -225,6 +228,7 @@ export function FocusAudioPanel({
 
   function handleEnterPeacefulPlace(destination: PeacefulPlaceDestination) {
     void stopGardenFlagAmbience();
+    void stopGardenCardAmbience();
     enterPeacefulPlace(destination);
     setActiveDestination(destination);
     setPlayer(null);
@@ -259,6 +263,7 @@ export function FocusAudioPanel({
 
   function enterSoundscape(soundscape: Soundscape) {
     void stopGardenFlagAmbience();
+    void stopGardenCardAmbience();
     const destination = peacefulPlaceDestinationFromSoundscape(soundscape);
     if (destination) {
       handleEnterPeacefulPlace(destination);
@@ -354,12 +359,11 @@ export function FocusAudioPanel({
 
   function renderDestinationMenu(moodId: EstateSignId) {
     const menuItems = gardenBannerMenuFor(moodId);
+    const cards = gardenDestinationCardsForSign(moodId);
     return (
-      <HangingDestinationMenu
-        items={menuItems.map((item) => ({
-          id: item.id,
-          name: item.label,
-        }))}
+      <GardenDestinationCardMenu
+        cards={cards}
+        onMenuPointerLeave={handleMenuPointerLeave}
         onSelect={(id) => {
           const item = menuItems.find((entry) => entry.id === id);
           if (!item) return;

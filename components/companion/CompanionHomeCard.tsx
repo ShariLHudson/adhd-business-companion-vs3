@@ -3,8 +3,6 @@
 import type { ArrivalIntelligence } from "@/lib/arrivalIntelligence";
 import type { CompanionContinueOption } from "@/lib/companionLedContinue";
 import { homeStateDataAttr } from "@/lib/arrivalIntelligence";
-import { ShariPortrait } from "@/components/companion/ShariPortrait";
-import { useCompanionPresence } from "@/lib/useCompanionPresence";
 
 type CompanionHomeCardProps = {
   arrival: ArrivalIntelligence | null;
@@ -45,7 +43,7 @@ function openingLines(arrival: ArrivalIntelligence) {
   return lines;
 }
 
-/** Calm home opening — Shari's message when not in the full welcome-scene walkthrough. */
+/** Calm home opening — greeting in the open window area, no portrait circle. */
 function CalmHomeOpening({
   arrival,
   onContinue,
@@ -53,27 +51,15 @@ function CalmHomeOpening({
   arrival: ArrivalIntelligence;
   onContinue: (option: CompanionContinueOption) => void;
 }) {
-  const presence = useCompanionPresence({
-    calmHome: true,
-    homeState: arrival.homeState,
-    presenceSurface:
-      arrival.homeState === "RETURNING_ACTIVE"
-        ? "chat-returning"
-        : "chat-welcome",
-  });
-
   const lines = openingLines(arrival);
 
   return (
     <section
-      className="companion-home-card companion-home-returning mx-auto flex w-full max-w-md flex-col items-center px-5 pt-4 sm:pt-6"
+      className="companion-home-card companion-home-returning"
       data-home-state={homeStateDataAttr(arrival.homeState)}
       aria-label={buildAccessibilityLabel(arrival)}
     >
       <div className="companion-home-returning__moment">
-        <div className="companion-home-returning__portrait">
-          <ShariPortrait presence={presence} size="companion" alt="" />
-        </div>
         <div className="companion-home-returning__copy">
           {lines.map((line, index) => (
             <p key={`${line.text}-${index}`} className={homeLineClass(line.tone)}>
@@ -125,10 +111,12 @@ export function CompanionHomeCard({ arrival, onContinue }: CompanionHomeCardProp
   if (!arrival) {
     return (
       <section
-        className="companion-home-card mx-auto flex w-full max-w-sm flex-col items-center px-5 pt-4 sm:pt-6"
+        className="companion-home-card companion-home-returning"
         aria-label="Companion home"
       >
-        <div className="h-28 w-full animate-pulse rounded-2xl bg-white/40 motion-reduce:animate-none" />
+        <div className="companion-home-returning__moment">
+          <div className="h-16 w-3/5 animate-pulse rounded-xl bg-white/40 motion-reduce:animate-none" />
+        </div>
       </section>
     );
   }

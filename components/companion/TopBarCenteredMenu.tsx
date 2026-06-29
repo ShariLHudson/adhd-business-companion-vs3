@@ -106,6 +106,7 @@ export function TopBarCenteredMenu({
         onClick={() => setOpen((value) => !value)}
       >
         <span className="top-bar-homestead-sign__hanger" aria-hidden="true" />
+        <span className="top-bar-homestead-sign__lantern-glow" aria-hidden="true" />
         <span className="top-bar-homestead-sign__board">
           <span className="top-bar-homestead-sign__label">{label}</span>
           {badge != null && badge > 0 ? (

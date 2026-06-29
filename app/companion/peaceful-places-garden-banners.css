@@ -206,6 +206,18 @@
     linear-gradient(285deg, rgba(255, 244, 210, 0.22) 0%, transparent 22%),
     linear-gradient(0deg, transparent 72%, rgba(255, 252, 244, 0.12) 100%);
   opacity: 0.85;
+  animation: garden-fabric-light-shimmer 11s ease-in-out infinite;
+}
+
+@keyframes garden-fabric-light-shimmer {
+  0%,
+  100% {
+    opacity: 0.78;
+  }
+
+  48% {
+    opacity: 0.92;
+  }
 }
 
 .pathway-garden-stake__stitch {
@@ -383,9 +395,12 @@
   line-height: 1.12;
 }
 
-.flag--recharge .pathway-garden-stake__label {
-  transform: translateX(-2px);
-  letter-spacing: 0.03em;
+.flag--recharge .pathway-garden-stake__label,
+.pathway-garden-stake[data-sign-id="energize"] .pathway-garden-stake__label {
+  font-size: clamp(0.54rem, 0.8vw, 0.66rem);
+  font-weight: 700;
+  letter-spacing: 0.018em;
+  transform: none;
 }
 
 .flag--unwind .pathway-garden-stake__label {
@@ -511,32 +526,32 @@
 @keyframes garden-cloth-breeze-a {
   0%,
   100% {
-    transform: perspective(820px) rotateY(1.2deg) rotateX(0.4deg) skewY(0.25deg) scaleY(1);
+    transform: perspective(820px) rotateY(1.8deg) rotateX(0.6deg) skewY(0.45deg) translateX(0) scaleY(1);
   }
   28% {
-    transform: perspective(820px) rotateY(2.4deg) rotateX(1.1deg) skewY(0.65deg) scaleY(1.014);
+    transform: perspective(820px) rotateY(3.6deg) rotateX(1.6deg) skewY(1deg) translateX(1px) scaleY(1.02);
   }
   52% {
-    transform: perspective(820px) rotateY(-0.8deg) rotateX(0.7deg) skewY(-0.35deg) scaleY(1.008);
+    transform: perspective(820px) rotateY(-1.4deg) rotateX(1.1deg) skewY(-0.55deg) translateX(-1px) scaleY(1.012);
   }
   76% {
-    transform: perspective(820px) rotateY(1.8deg) rotateX(1.3deg) skewY(0.5deg) scaleY(1.016);
+    transform: perspective(820px) rotateY(2.8deg) rotateX(1.9deg) skewY(0.8deg) translateX(1.5px) scaleY(1.022);
   }
 }
 
 @keyframes garden-cloth-breeze-b {
   0%,
   100% {
-    transform: perspective(820px) rotateY(-1.2deg) rotateX(0.4deg) skewY(-0.25deg) scaleY(1);
+    transform: perspective(820px) rotateY(-1.8deg) rotateX(0.6deg) skewY(-0.45deg) translateX(0) scaleY(1);
   }
   28% {
-    transform: perspective(820px) rotateY(-2.6deg) rotateX(1deg) skewY(-0.7deg) scaleY(1.013);
+    transform: perspective(820px) rotateY(-3.8deg) rotateX(1.5deg) skewY(-1.05deg) translateX(-1px) scaleY(1.019);
   }
   52% {
-    transform: perspective(820px) rotateY(0.6deg) rotateX(0.8deg) skewY(0.3deg) scaleY(1.007);
+    transform: perspective(820px) rotateY(1deg) rotateX(1.2deg) skewY(0.5deg) translateX(1px) scaleY(1.011);
   }
   76% {
-    transform: perspective(820px) rotateY(-1.6deg) rotateX(1.2deg) skewY(-0.55deg) scaleY(1.015);
+    transform: perspective(820px) rotateY(-2.6deg) rotateX(1.8deg) skewY(-0.85deg) translateX(-1.5px) scaleY(1.021);
   }
 }
 
@@ -716,7 +731,8 @@
   .pathway-garden-stake__banner,
   .pathway-garden-stake__photo-frame,
   .pathway-garden-stake__hem-shadow,
-  .pathway-garden-stake__corner-curl {
+  .pathway-garden-stake__corner-curl,
+  .pathway-garden-stake__fabric-light {
     animation: none !important;
   }
 }

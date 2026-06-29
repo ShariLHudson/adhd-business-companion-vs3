@@ -2,6 +2,7 @@ import type { ScenePage } from "@/lib/companionBackgrounds";
 import { detectEmotionalState } from "@/lib/companionEmotions";
 import type { EmotionalState } from "@/lib/companionEmotions";
 import type { AppSection } from "@/lib/companionUi";
+import { isGrowthPanelSection } from "@/lib/growthNavigation";
 import type { SceneWorkspaceId } from "@/lib/sceneRenderContract";
 import {
   resolveCompanionRenderContext,
@@ -87,7 +88,8 @@ function resolveGlobalBackgroundIntent(
   input: CompanionPageRenderInput,
 ): CompanionPageGlobalBackground {
   const growthRoom =
-    input.workspacePanel === "growth" || input.activeSection === "growth";
+    isGrowthPanelSection(input.activeSection) ||
+    isGrowthPanelSection(input.workspacePanel ?? undefined);
 
   if (growthRoom) {
     return {

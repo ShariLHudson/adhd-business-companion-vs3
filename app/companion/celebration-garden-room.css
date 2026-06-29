@@ -1,0 +1,161 @@
+/* ═══════════════════════════════════════════════════════════
+   CELEBRATION GARDEN — wins & celebrations full-bleed background
+═══════════════════════════════════════════════════════════ */
+
+.celebration-garden-room {
+  position: relative;
+  min-height: 100dvh;
+  min-height: 100svh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.celebration-garden-room__cinematic {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.celebration-garden-room__cinematic .cinematic-background__image {
+  background-color: #e6ebe0;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+  transform: none !important;
+}
+
+.celebration-garden-room__scroll {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  min-height: 100svh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Celebration Garden panel content */
+.celebration-garden-panel__header {
+  margin-top: 0.35rem;
+}
+
+.celebration-garden-panel__week {
+  margin: 0 0 0.65rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #9a8f82;
+}
+
+.celebration-garden-panel__empty {
+  margin: 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #6f6259;
+  font-style: italic;
+}
+
+.celebration-garden-panel__stat-list,
+.celebration-garden-panel__win-list,
+.celebration-garden-panel__timeline-list,
+.celebration-garden-panel__timeline-stats {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.celebration-garden-panel__stat {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.55rem 0;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #4a4038;
+}
+
+.celebration-garden-panel__stat + .celebration-garden-panel__stat {
+  border-top: 1px solid rgba(139, 115, 85, 0.1);
+}
+
+.celebration-garden-panel__stat-icon {
+  flex-shrink: 0;
+}
+
+.celebration-garden-panel__win {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.85rem 0;
+}
+
+.celebration-garden-panel__win + .celebration-garden-panel__win {
+  border-top: 1px solid rgba(139, 115, 85, 0.1);
+}
+
+.celebration-garden-panel__win-copy {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  font-size: 0.94rem;
+  line-height: 1.52;
+  color: #2f261f;
+}
+
+.celebration-garden-panel__win-copy p {
+  margin: 0;
+}
+
+.celebration-garden-panel__win-icon {
+  flex-shrink: 0;
+}
+
+.celebration-garden-panel__win-action {
+  align-self: flex-start;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #5a6b58;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.celebration-garden-panel__win-note {
+  font-size: 0.78rem;
+  font-style: italic;
+  color: #9a8f82;
+}
+
+.celebration-garden-panel__timeline-item {
+  padding: 0.75rem 0;
+}
+
+.celebration-garden-panel__timeline-item + .celebration-garden-panel__timeline-item {
+  border-top: 1px solid rgba(139, 115, 85, 0.1);
+}
+
+.celebration-garden-panel__timeline-label {
+  margin: 0;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #2f261f;
+}
+
+.celebration-garden-panel__timeline-note,
+.celebration-garden-panel__timeline-stats {
+  margin: 0.35rem 0 0;
+  font-size: 0.84rem;
+  line-height: 1.48;
+  color: #6f6259;
+}
+
+.celebration-garden-panel__timeline-stats li + li {
+  margin-top: 0.25rem;
+}

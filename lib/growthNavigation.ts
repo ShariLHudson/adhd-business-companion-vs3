@@ -1,9 +1,13 @@
 import type { AppSection } from "./companionUi";
+import { NAV_HOME } from "./navigationBack";
 import { workspaceTitle } from "./workspaceMode";
 
 /** Workspace panels that belong to the Growth Center family. */
 export const GROWTH_PANEL_SECTIONS: AppSection[] = [
   "growth",
+  "growth-capture",
+  "growth-library",
+  "growth-reports",
   "the-gallery",
   "wins-this-week",
   "evidence-bank",
@@ -28,8 +32,23 @@ export function growthPanelBackLabel(
   return workspaceTitle(activeSection);
 }
 
+/** Back label when navigating between standalone Growth rooms. */
+export function growthRoomBackLabel(fromSection: AppSection): string | null {
+  if (fromSection === "home") return NAV_HOME;
+  if (fromSection === "growth") return GROWTH_SECTION_META.growth.title;
+  if (fromSection === "growth-library") return GROWTH_SECTION_META["growth-library"].title;
+  if (fromSection === "growth-capture") return "Capture a Moment";
+  if (fromSection === "growth-reports") return GROWTH_SECTION_META["growth-reports"].title;
+  if (fromSection in GROWTH_SECTION_META) {
+    return GROWTH_SECTION_META[fromSection as GrowthSectionId].title;
+  }
+  return null;
+}
+
 export type GrowthSectionId =
   | "growth"
+  | "growth-library"
+  | "growth-reports"
   | "wins-this-week"
   | "evidence-bank"
   | "confidence-vault"
@@ -43,20 +62,31 @@ export const GROWTH_SECTION_META: Record<
 > = {
   growth: {
     objectId: "growth",
-    title: "Growth",
+    title: "Your Story",
     subtitle:
-      "Capture what matters, reflect on progress, and build your story over time.",
+      "The moments you choose to keep become the story you tell yourself tomorrow.",
+  },
+  "growth-library": {
+    objectId: "growth",
+    title: "My Story Library",
+    subtitle: "Return to any place your story lives.",
+  },
+  "growth-reports": {
+    objectId: "growth",
+    title: "Create Your Storybook",
+    subtitle:
+      "Choose the chapters of your journey you'd like to include. Spark will craft them into a beautiful keepsake of your story.",
   },
   "wins-this-week": {
     objectId: "wins",
-    title: "Wins",
-    subtitle: "Recent progress and accomplishments.",
+    title: "Celebration Garden",
+    subtitle: "Wins, milestones, and moments worth remembering.",
   },
   "evidence-bank": {
     objectId: "evidence-bank",
-    title: "Evidence Bank",
+    title: "Evidence Vault",
     subtitle:
-      "Proof, wins, testimonials, screenshots, progress moments, and confidence reminders — things you may forget you accomplished.",
+      "Collect proof of your growth. When something goes well, save it here — and when self-doubt appears, we'll remind you how far you've come.",
   },
   "confidence-vault": {
     objectId: "my-highlights",
@@ -72,12 +102,12 @@ export const GROWTH_SECTION_META: Record<
   "growth-journal": {
     objectId: "journal",
     title: "Journal",
-    subtitle: "Private reflection — calm, personal, no required prompts.",
+    subtitle: "Private reflections and thoughts.",
   },
   "growth-portfolio": {
     objectId: "create",
-    title: "Portfolio",
-    subtitle: "What you've created — projects, courses, campaigns, and creative work.",
+    title: "Creative Studio",
+    subtitle: "Projects, courses, campaigns, and creative work.",
   },
 };
 
@@ -102,7 +132,7 @@ export type GrowthPanelNav = {
 
 /** Visual identity per Growth reflection destination — scan-friendly, not identical. */
 export const GROWTH_DESTINATION_STYLES: Record<
-  Exclude<GrowthSectionId, "growth">,
+  Exclude<GrowthSectionId, "growth" | "growth-library" | "growth-reports">,
   {
     accentBorder: string;
     headerBg: string;

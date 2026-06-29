@@ -1538,6 +1538,37 @@
   opacity: 0.88;
 }
 
+.welcome-room__top-bar--media-active {
+  opacity: 0.88;
+}
+
+.welcome-room__stop-floating {
+  position: absolute;
+  right: max(0.85rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  z-index: 24;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(18, 16, 14, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  padding: 0.55rem 1.1rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: rgba(248, 244, 238, 0.96);
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+  transition:
+    background 0.25s ease,
+    transform 0.25s ease;
+}
+
+.welcome-room__stop-floating:hover {
+  background: rgba(28, 24, 20, 0.78);
+  transform: translateY(-1px);
+}
+
 .welcome-room__top-bar-row {
   display: flex;
   flex-wrap: wrap;
@@ -1655,6 +1686,23 @@
   max-width: 11.5rem;
   white-space: normal;
   text-align: center;
+}
+
+.welcome-room__top-btn--stop {
+  border-color: rgba(255, 236, 220, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  font-weight: 600;
+}
+
+.welcome-room__top-btn--stop:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+.welcome-room__top-btn--transport {
+  padding: 0.38rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
 .welcome-room--invite .welcome-room__top-btn--continue {
@@ -3762,55 +3810,64 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 22rem;
+  max-width: min(42%, 28rem);
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: clamp(1.25rem, 7vh, 2.75rem);
   text-align: center;
-}
-
-.companion-home-returning__portrait {
-  flex-shrink: 0;
-  margin-bottom: 1.15rem;
 }
 
 .companion-home-returning__copy {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.65rem;
   width: 100%;
+  align-items: center;
 }
 
 .companion-home-returning__line {
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.45;
   text-wrap: pretty;
   color: #1f1c19;
+  text-align: center;
+  max-width: 100%;
 }
 
 .companion-home-returning__line--primary {
-  font-size: 1.3125rem;
+  font-size: clamp(1.75rem, 3.5vw, 2.65rem);
   font-weight: 600;
+  line-height: 1.18;
   color: #2f261f;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  text-shadow: 0 1px 20px rgba(255, 252, 248, 0.72);
 }
 
 .companion-home-returning__line--secondary {
-  font-size: 1.0625rem;
+  font-size: clamp(1.1rem, 2.1vw, 1.35rem);
   font-weight: 400;
+  line-height: 1.48;
   color: #4a4239;
+  text-shadow: 0 1px 16px rgba(255, 252, 248, 0.62);
 }
 
 .companion-home-card {
-  padding-top: 0.35rem;
-  max-width: 20rem;
+  padding-top: 0;
+  width: 100%;
+  max-width: none;
+  align-self: center;
 }
 
 .companion-home-continue-actions {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 0.5rem;
   width: 100%;
-  max-width: 20rem;
+  max-width: min(42%, 28rem);
   margin-top: 0.75rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ── Clear My Mind cognitive relief ── */
@@ -5648,6 +5705,84 @@
   line-height: 1.3;
   color: #f0e4cc;
   text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+/* Lantern glow behind hanging menu signs */
+.hanging-destination-menu__item-wrap {
+  position: relative;
+}
+
+.hanging-destination-menu__lantern-glow {
+  position: absolute;
+  left: 50%;
+  top: 58%;
+  z-index: 0;
+  width: 112%;
+  height: 130%;
+  transform: translate(-50%, -50%) scale(0.72);
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 220, 150, 0.78) 0%,
+    rgba(255, 196, 108, 0.42) 28%,
+    rgba(255, 168, 62, 0.16) 52%,
+    transparent 74%
+  );
+  filter: blur(7px);
+  transition:
+    opacity 0.32s ease,
+    transform 0.36s ease;
+}
+
+.hanging-destination-menu__sign-board {
+  position: relative;
+  z-index: 1;
+}
+
+.hanging-destination-menu__item-wrap:has(.hanging-destination-menu__sign-board:active)
+  .hanging-destination-menu__lantern-glow,
+.hanging-destination-menu__lantern-glow[data-lit="1"] {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  animation: hanging-menu-lantern-pulse 1.6s ease-in-out infinite;
+}
+
+.hanging-destination-menu__sign-board[data-lit="1"] {
+  border-color: rgba(255, 210, 130, 0.72) !important;
+  box-shadow:
+    0 0 0 1px rgba(255, 228, 180, 0.22),
+    0 6px 16px rgba(12, 10, 6, 0.42),
+    0 0 22px rgba(255, 190, 90, 0.38),
+    0 0 38px rgba(255, 160, 50, 0.16),
+    inset 0 1px 0 rgba(255, 240, 210, 0.2) !important;
+}
+
+.hanging-destination-menu__sign-board[data-lit="1"] .hanging-destination-menu__name {
+  color: #fff6e4;
+  text-shadow:
+    0 0 12px rgba(255, 210, 130, 0.55),
+    0 1px 2px rgba(8, 12, 8, 0.45);
+}
+
+@keyframes hanging-menu-lantern-pulse {
+  0%,
+  100% {
+    opacity: 0.9;
+    filter: blur(7px);
+  }
+
+  50% {
+    opacity: 1;
+    filter: blur(9px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hanging-destination-menu__lantern-glow[data-lit="1"] {
+    animation: none;
+  }
 }
 
 /* My Places estate panel */
@@ -8290,6 +8425,15 @@
 /* ── Growth sanctuary room ── */
 .companion-growth-active {
   background: transparent;
+}
+
+.companion-growth-active .clear-my-mind-standalone-frame:has(.journal-room),
+.companion-growth-active .clear-my-mind-standalone-frame:has(.capture-moment-room),
+.companion-growth-active .clear-my-mind-standalone-frame:has(.creative-studio-room),
+.companion-growth-active .clear-my-mind-standalone-frame:has(.evidence-vault-room),
+.companion-growth-active .clear-my-mind-standalone-frame:has(.celebration-garden-room) {
+  position: relative;
+  overflow: hidden;
 }
 
 .growth-room {

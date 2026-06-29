@@ -1,0 +1,1337 @@
+/* ═══════════════════════════════════════════════════════════
+   GROWTH — Your Story (garden bench beside the pond)
+═══════════════════════════════════════════════════════════ */
+
+:root {
+  --growth-cream: #faf6ee;
+  --growth-linen: #f3ebe0;
+  --growth-botanical: #2f4a3e;
+  --growth-walnut: #5c4a38;
+  --growth-gold: #b8956a;
+  --growth-ink: #3d342c;
+  --growth-muted: #7a6f63;
+}
+
+/* ── Pond atmosphere ── */
+.growth-room__life {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.growth-room__bench-glow {
+  position: absolute;
+  bottom: 14%;
+  left: 10%;
+  width: min(28vw, 14rem);
+  height: min(18vh, 8rem);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 236, 196, 0) 0%,
+    rgba(255, 236, 196, 0) 100%
+  );
+  opacity: 0;
+  transition: opacity 1.2s ease;
+}
+
+.growth-room--arrived .growth-room__bench-glow {
+  opacity: 1;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 236, 196, 0.42) 0%,
+    rgba(255, 220, 160, 0.12) 48%,
+    transparent 72%
+  );
+}
+
+.growth-room__life-shimmer {
+  position: absolute;
+  bottom: 6%;
+  left: 22%;
+  width: min(42vw, 22rem);
+  height: min(8vh, 3.5rem);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 252, 240, 0.28) 0%,
+    rgba(200, 228, 220, 0.12) 42%,
+    transparent 70%
+  );
+  opacity: 0;
+  animation: growth-life-shimmer 11s ease-in-out infinite;
+  animation-delay: 1.4s;
+}
+
+.growth-room--arrived .growth-room__life-shimmer {
+  opacity: 1;
+}
+
+.growth-room__life-butterfly,
+.growth-room__life-dragonfly,
+.growth-room__life-leaf,
+.growth-room__life-ripple {
+  position: absolute;
+  opacity: 0;
+  animation-timing-function: ease-in-out;
+}
+
+.growth-room__life-butterfly {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50% 50% 45% 55%;
+  background: rgba(255, 214, 148, 0.62);
+  box-shadow: 0 0 10px rgba(255, 220, 160, 0.35);
+  animation-iteration-count: infinite;
+}
+
+.growth-room__life-butterfly--a {
+  top: 56%;
+  left: 14%;
+  animation-name: growth-life-butterfly;
+  animation-duration: 42s;
+  animation-delay: -6s;
+}
+
+.growth-room__life-butterfly--b {
+  top: 68%;
+  left: 32%;
+  width: 0.42rem;
+  height: 0.42rem;
+  animation-name: growth-life-butterfly;
+  animation-duration: 48s;
+  animation-delay: -20s;
+}
+
+.growth-room__life-butterfly--bench {
+  bottom: 22%;
+  left: 18%;
+  opacity: 0;
+  animation: growth-life-bench-butterfly 8s ease-in-out 1;
+  animation-delay: 1.8s;
+}
+
+.growth-room--arrived .growth-room__life-butterfly--a,
+.growth-room--arrived .growth-room__life-butterfly--b {
+  opacity: 1;
+}
+
+.growth-room__life-dragonfly {
+  top: 62%;
+  left: 48%;
+  width: 0.72rem;
+  height: 0.16rem;
+  border-radius: 999px;
+  background: rgba(108, 148, 128, 0.45);
+  animation-name: growth-life-dragonfly;
+  animation-duration: 28s;
+  animation-iteration-count: infinite;
+  animation-delay: -11s;
+}
+
+.growth-room--arrived .growth-room__life-dragonfly {
+  opacity: 1;
+}
+
+.growth-room__life-leaf {
+  width: 0.48rem;
+  height: 0.26rem;
+  border-radius: 0 80% 0 80%;
+  background: rgba(88, 118, 72, 0.42);
+  animation-iteration-count: infinite;
+}
+
+.growth-room__life-leaf--a {
+  top: 66%;
+  left: 62%;
+  animation-name: growth-life-leaf;
+  animation-duration: 54s;
+  animation-delay: -24s;
+}
+
+.growth-room__life-leaf--b {
+  top: 58%;
+  left: 74%;
+  animation-name: growth-life-leaf;
+  animation-duration: 46s;
+  animation-delay: -8s;
+}
+
+.growth-room--arrived .growth-room__life-leaf--a,
+.growth-room--arrived .growth-room__life-leaf--b {
+  opacity: 1;
+}
+
+.growth-room__life-ripple {
+  bottom: 7%;
+  width: 3.2rem;
+  height: 1rem;
+  border-radius: 50%;
+  border: 1px solid rgba(140, 178, 168, 0.2);
+  animation-iteration-count: infinite;
+}
+
+.growth-room__life-ripple--a {
+  left: 30%;
+  animation-name: growth-life-ripple;
+  animation-duration: 10s;
+  animation-delay: -2s;
+}
+
+.growth-room__life-ripple--b {
+  left: 42%;
+  width: 2.4rem;
+  animation-name: growth-life-ripple;
+  animation-duration: 12s;
+  animation-delay: -5.5s;
+}
+
+.growth-room--arrived .growth-room__life-ripple--a,
+.growth-room--arrived .growth-room__life-ripple--b {
+  opacity: 1;
+}
+
+@keyframes growth-life-shimmer {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.55;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes growth-life-butterfly {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  14% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 0.68;
+    transform: translate(16vw, -7vh) rotate(10deg);
+  }
+
+  86% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes growth-life-bench-butterfly {
+  0% {
+    opacity: 0;
+    transform: translate(0, 8px) scale(0.85);
+  }
+
+  18% {
+    opacity: 0.72;
+    transform: translate(0, 0) scale(1);
+  }
+
+  42% {
+    opacity: 0.78;
+    transform: translate(6px, -2px) scale(1);
+  }
+
+  70% {
+    opacity: 0.45;
+    transform: translate(28px, -18px) scale(0.95);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(48px, -32px) scale(0.88);
+  }
+}
+
+@keyframes growth-life-dragonfly {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateX(0);
+  }
+
+  22% {
+    opacity: 0.45;
+  }
+
+  55% {
+    opacity: 0.58;
+    transform: translateX(10vw) translateY(-1.2vh);
+  }
+}
+
+@keyframes growth-life-leaf {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translate(0, 0) rotate(0deg);
+  }
+
+  28% {
+    opacity: 0.38;
+  }
+
+  62% {
+    opacity: 0.5;
+    transform: translate(-5vw, 3.5vh) rotate(24deg);
+  }
+}
+
+@keyframes growth-life-ripple {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+
+  42% {
+    opacity: 0.32;
+    transform: scale(1);
+  }
+
+  72% {
+    opacity: 0.12;
+    transform: scale(1.1);
+  }
+}
+
+/* ── Workspace glass — spacious, warm (non-landing growth pages) ── */
+.growth-room:not(.growth-room--landing) .growth-room__center {
+  padding:
+    clamp(2.5rem, 14vh, 4.5rem) clamp(1rem, 4vw, 1.75rem)
+    clamp(2rem, 6vh, 3rem);
+}
+
+/* Landing — compact foyer; panel sits higher, pond visible below */
+.growth-room--landing .growth-room__scroll,
+.growth-room--capture .growth-room__scroll {
+  min-height: 100dvh;
+  min-height: 100svh;
+}
+
+.growth-room--landing .growth-room__center,
+.growth-room--capture .growth-room__center {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+  min-height: 100dvh;
+  min-height: 100svh;
+  box-sizing: border-box;
+  padding:
+    clamp(0.35rem, 1.8vh, 0.85rem) clamp(1rem, 3vw, 1.5rem)
+    clamp(3rem, 12vh, 6rem);
+}
+
+@media (min-width: 900px) {
+  .growth-room--landing .growth-room__scroll {
+    overflow: hidden;
+  }
+
+  .growth-room--landing .growth-room__center {
+    padding-top: clamp(0.45rem, 2vh, 0.9rem);
+    padding-bottom: clamp(2.25rem, 9vh, 4.25rem);
+  }
+}
+
+@media (max-height: 720px) {
+  .growth-room--landing .growth-room__center,
+  .growth-room--capture .growth-room__center {
+    padding-top: clamp(0.25rem, 1vh, 0.5rem);
+    padding-bottom: clamp(2rem, 8vh, 3.5rem);
+  }
+}
+
+.growth-room__workspace {
+  width: min(100%, clamp(28rem, 94vw, 40rem));
+  background: rgba(250, 246, 238, 0.44);
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  border: 1px solid rgba(255, 252, 245, 0.35);
+  border-radius: 1.25rem;
+  box-shadow: 0 18px 48px rgba(48, 38, 28, 0.08);
+  padding: clamp(1.25rem, 3vw, 1.75rem) clamp(1.1rem, 3.2vw, 1.65rem)
+    clamp(1.5rem, 3.5vw, 2rem);
+}
+
+/* Landing — centered frosted card, pond visible around edges */
+.growth-room--landing .growth-room__workspace,
+.growth-room--capture .growth-room__workspace {
+  width: min(100%, clamp(33.75rem, 94vw, 56rem));
+  flex-shrink: 0;
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border: none;
+  box-shadow: none;
+  padding: 0;
+}
+
+.growth-story-landing {
+  width: 100%;
+}
+
+.growth-story-landing__card {
+  width: 100%;
+  padding: clamp(1rem, 2.4vw, 1.35rem) clamp(1.1rem, 2.8vw, 1.45rem)
+    clamp(1.1rem, 2.4vw, 1.35rem);
+}
+
+.growth-story-landing__card--entrance {
+  width: min(100%, 56rem);
+  max-width: 56rem;
+  margin-inline: auto;
+}
+
+@media (min-width: 900px) {
+  .growth-story-landing__card--entrance {
+    max-height: calc(100svh - clamp(3rem, 11vh, 5.5rem));
+  }
+}
+
+@media (max-width: 899px) {
+  .growth-story-landing__card--entrance {
+    max-height: calc(100svh - 1.25rem);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* Match Clear My Mind glass — light parchment foyer */
+.growth-story-landing__card.companion-workspace-frosted,
+.growth-story-capture-page__card.companion-workspace-frosted {
+  background: rgba(255, 252, 245, 0.88);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  border-radius: 1.1rem;
+  box-shadow: 0 14px 36px rgba(42, 58, 38, 0.1);
+}
+
+.growth-story-landing__soften {
+  transition: opacity 450ms ease-in-out;
+}
+
+.growth-story-landing--writing-focus .growth-story-landing__soften,
+.growth-story-landing--writing-focus .growth-story-capture__heading,
+.growth-story-landing--writing-focus .growth-story-capture__chips {
+  opacity: 0.46;
+}
+
+.growth-story-landing--writing-focus .growth-story-capture__notebook {
+  opacity: 1;
+}
+
+.growth-room--reflecting .growth-room__cinematic,
+.growth-room--reflecting .growth-room__life {
+  opacity: 0.78;
+  transition: opacity 450ms ease-in-out;
+}
+
+.growth-room__cinematic,
+.growth-room__life {
+  transition: opacity 450ms ease-in-out;
+}
+
+.growth-story-header--landing {
+  margin-top: clamp(0.45rem, 1.2vh, 0.65rem);
+}
+
+.growth-story-header--intention {
+  margin-bottom: 0.1rem;
+}
+
+.growth-story-header__intention {
+  margin: 0;
+  max-width: 36rem;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(1.35rem, 2.8vw, 1.65rem);
+  font-weight: 500;
+  line-height: 1.28;
+  letter-spacing: -0.015em;
+  color: #352e26;
+}
+
+.growth-story-header--landing .growth-story-header__title {
+  margin: 0;
+  font-size: clamp(1.65rem, 3.2vw, 2rem);
+  font-weight: 500;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  color: #352e26;
+}
+
+.growth-story-header--landing .growth-story-header__lead {
+  margin: clamp(0.55rem, 1.4vh, 0.75rem) 0 0;
+  max-width: 38rem;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(0.92rem, 1.8vw, 1rem);
+  line-height: 1.5;
+  font-weight: 400;
+  font-style: normal;
+  color: var(--growth-muted);
+}
+
+.growth-story-header--landing .growth-story-header__prompt {
+  margin: clamp(0.65rem, 1.6vh, 0.85rem) 0 0;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(1rem, 2vw, 1.1rem);
+  font-weight: 500;
+  line-height: 1.4;
+  color: var(--growth-walnut);
+}
+
+/* Three destination cards — 3-column foyer on desktop */
+.growth-estate-choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(0.65rem, 1.6vw, 0.85rem);
+  margin-top: clamp(0.85rem, 2vh, 1.15rem);
+  align-items: stretch;
+}
+
+@media (max-width: 899px) {
+  .growth-estate-choices {
+    grid-template-columns: 1fr;
+    gap: 0.65rem;
+  }
+}
+
+.growth-estate-choice {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  overflow: hidden;
+  border: 1px solid rgba(184, 149, 106, 0.22);
+  border-radius: 0.85rem;
+  padding: 0;
+  text-align: left;
+  cursor: pointer;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 245, 0.98) 0%,
+    rgba(250, 244, 232, 0.96) 100%
+  );
+  box-shadow: 0 6px 18px rgba(48, 38, 28, 0.08);
+  transition:
+    transform 0.35s ease,
+    box-shadow 0.35s ease,
+    border-color 0.35s ease;
+}
+
+.growth-estate-choice__photo {
+  position: relative;
+  display: block;
+  flex-shrink: 0;
+  width: 100%;
+  height: clamp(5rem, 12vh, 6.25rem);
+  overflow: hidden;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  border-bottom: 1px solid rgba(184, 149, 106, 0.14);
+  transition: filter 0.35s ease, transform 0.45s ease;
+}
+
+.growth-estate-choice--explore .growth-estate-choice__photo {
+  background-position: center 42%;
+}
+
+.growth-estate-choice__copy {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 0.22rem;
+  padding: 0.8rem 0.85rem 0.85rem;
+  color: var(--growth-ink);
+}
+
+.growth-estate-choice__label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--growth-gold);
+}
+
+.growth-estate-choice__headline {
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(0.95rem, 1.6vw, 1.02rem);
+  font-weight: 600;
+  line-height: 1.28;
+  color: var(--growth-ink);
+}
+
+.growth-estate-choice__description {
+  margin-top: 0.15rem;
+  font-size: 0.76rem;
+  line-height: 1.42;
+  color: var(--growth-muted);
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.growth-estate-choice__quote {
+  margin-top: 0.35rem;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  font-style: italic;
+  color: #8a7d70;
+}
+
+.growth-estate-choice__cta {
+  margin-top: auto;
+  padding-top: 0.55rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--growth-botanical);
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.growth-estate-choice:hover {
+  transform: translateY(-2px);
+  border-color: rgba(184, 149, 106, 0.38);
+  box-shadow: 0 10px 24px rgba(48, 38, 28, 0.11);
+}
+
+.growth-estate-choice:hover .growth-estate-choice__photo {
+  filter: brightness(1.04);
+  transform: scale(1.015);
+}
+
+.growth-estate-choice:hover .growth-estate-choice__cta {
+  transform: translateX(2px);
+  color: #243d32;
+}
+
+.growth-estate-choice:focus-visible {
+  outline: 2px solid rgba(47, 74, 62, 0.35);
+  outline-offset: 2px;
+}
+
+/* Capture room page */
+.growth-story-capture-page {
+  width: 100%;
+}
+
+.growth-story-capture-page__header {
+  margin-top: 0.35rem;
+}
+
+.growth-story-landing--writing-focus .growth-story-capture-page__header,
+.growth-story-landing--writing-focus .growth-story-capture__chips {
+  opacity: 0.46;
+}
+
+@media (max-height: 720px) {
+  .growth-story-landing__card--entrance {
+    padding-top: clamp(0.75rem, 2vw, 1rem);
+    padding-bottom: clamp(0.85rem, 2vw, 1.1rem);
+  }
+
+  .growth-estate-choice__photo {
+    height: clamp(4.75rem, 12vh, 5.5rem);
+  }
+
+  .growth-story-header--landing .growth-story-header__title {
+    font-size: clamp(1.45rem, 2.8vw, 1.75rem);
+  }
+
+  .growth-story-hero {
+    margin-top: clamp(1rem, 2.5vh, 1.35rem);
+  }
+
+  .growth-story-capture__textarea {
+    min-height: clamp(6.5rem, 20vh, 9rem);
+  }
+}
+
+.growth-story-landing__footer {
+  margin-top: clamp(1.5rem, 3.5vh, 2rem);
+  padding-top: clamp(1rem, 2.5vh, 1.35rem);
+  border-top: 1px solid rgba(184, 149, 106, 0.22);
+  text-align: center;
+}
+
+.growth-story-landing__browse {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: none;
+  background: transparent;
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: var(--growth-walnut);
+  text-decoration: none;
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+.growth-story-landing__browse-arrow {
+  font-size: 1rem;
+  line-height: 1;
+  color: var(--growth-botanical);
+  transition: transform 0.25s ease;
+}
+
+.growth-story-landing__browse:hover {
+  color: var(--growth-botanical);
+}
+
+.growth-story-landing__browse:hover .growth-story-landing__browse-arrow {
+  transform: translateX(3px);
+}
+
+.growth-story-library-page,
+.growth-story-reports-page {
+  width: 100%;
+}
+
+.growth-story-library-page__header {
+  margin-top: 0.35rem;
+  margin-bottom: 0.1rem;
+}
+
+.growth-line-icon {
+  display: block;
+  width: 1.35rem;
+  height: 1.35rem;
+  color: var(--growth-gold);
+  flex-shrink: 0;
+}
+
+.growth-story-page {
+  gap: 0;
+}
+
+/* ── Hero intro ── */
+.growth-story-header {
+  margin-bottom: 0.25rem;
+}
+
+.growth-story-header__title {
+  margin: 0;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(2rem, 4.4vw, 2.45rem);
+  font-weight: 500;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  color: #352e26;
+}
+
+.growth-story-header__intro {
+  margin-top: clamp(1.1rem, 2.8vh, 1.65rem);
+  max-width: 34rem;
+}
+
+.growth-story-header__intro p {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.75vw, 1.05rem);
+  line-height: 1.62;
+  color: var(--growth-muted);
+}
+
+.growth-story-header__intro p + p {
+  margin-top: 0.5rem;
+}
+
+/* ── Fading companion welcome ── */
+.growth-story-welcome {
+  margin: 0.5rem 0 0;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(1.02rem, 2vw, 1.14rem);
+  line-height: 1.55;
+  font-style: italic;
+  font-weight: 400;
+  color: var(--growth-walnut);
+  opacity: 0;
+  transform: translateY(4px);
+  animation: growth-welcome-in 0.65s ease forwards;
+}
+
+.growth-story-welcome--cross {
+  animation: growth-welcome-cross 0.48s ease forwards;
+}
+
+.growth-story-welcome--out {
+  animation: growth-welcome-out 0.55s ease forwards;
+}
+
+@keyframes growth-welcome-in {
+  to {
+    opacity: 0.86;
+    transform: translateY(0);
+  }
+}
+
+@keyframes growth-welcome-cross {
+  to {
+    opacity: 0;
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes growth-welcome-out {
+  from {
+    opacity: 0.86;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+/* ── Capture hero ── */
+.growth-story-hero {
+  margin-top: clamp(1rem, 2.5vh, 1.35rem);
+  margin-bottom: 0;
+}
+
+.growth-story-capture__heading {
+  margin: 0 0 clamp(0.75rem, 1.8vh, 1rem);
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(1.05rem, 2.2vw, 1.15rem);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--growth-ink);
+}
+
+.growth-story-capture__notebook {
+  border-radius: 1rem;
+  border: 1px solid rgba(139, 115, 85, 0.14);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 245, 0.96) 0%,
+    rgba(250, 244, 232, 0.92) 100%
+  );
+  box-shadow:
+    inset 0 2px 14px rgba(92, 72, 48, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75);
+  padding: 1.1rem 1.15rem 1rem;
+}
+
+.growth-story-capture__textarea {
+  display: block;
+  width: 100%;
+  min-height: clamp(8rem, 24vh, 11rem);
+  resize: vertical;
+  border: 0;
+  background: transparent;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 1.02rem;
+  line-height: 1.6;
+  color: var(--growth-ink);
+}
+
+.growth-story-capture__textarea::placeholder {
+  color: #a39688;
+  font-style: italic;
+}
+
+.growth-story-capture__textarea:focus {
+  outline: none;
+}
+
+.growth-story-capture__attachments {
+  margin: 0.65rem 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 0.8rem;
+  color: var(--growth-muted);
+}
+
+.growth-story-capture__file-note {
+  margin: 0.55rem 0 0;
+  font-size: 0.8rem;
+  color: #9a7048;
+}
+
+.growth-story-capture__chips {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem 0.65rem;
+  margin-top: 1.15rem;
+}
+
+.growth-story-capture__chip {
+  border: 1px solid rgba(47, 74, 62, 0.14);
+  border-radius: 0.28rem;
+  background: rgba(250, 246, 238, 0.82);
+  padding: 0.48rem 0.95rem;
+  font-size: 0.84rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--growth-botanical);
+  cursor: pointer;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.55) inset,
+    0 1px 2px rgba(62, 48, 32, 0.03);
+  transition:
+    background 0.35s ease,
+    border-color 0.35s ease,
+    transform 0.35s ease;
+}
+
+.growth-story-capture__chip:hover {
+  transform: translateY(-1px);
+  border-color: rgba(47, 74, 62, 0.22);
+  background: rgba(255, 252, 245, 0.95);
+}
+
+.growth-story-capture__keep-wrap {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.35rem;
+}
+
+.growth-story-capture__keep {
+  margin-top: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--growth-botanical);
+  padding: 0.62rem 1.35rem;
+  font-size: 0.92rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #fffdf8;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(47, 74, 62, 0.18);
+  transition:
+    transform 0.45s ease,
+    box-shadow 0.45s ease,
+    filter 0.45s ease;
+}
+
+.growth-story-capture__keep:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: brightness(1.06);
+  box-shadow: 0 6px 18px rgba(47, 74, 62, 0.22);
+}
+
+.growth-story-capture__keep:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.growth-story-capture__companion {
+  border-radius: 0.85rem;
+  border: 1px solid rgba(139, 115, 85, 0.12);
+  background: rgba(255, 252, 245, 0.88);
+  padding: 1.1rem 1.05rem 1rem;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.growth-story-capture__companion-headline {
+  margin: 0;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: 1.08rem;
+  font-weight: 600;
+  color: var(--growth-ink);
+}
+
+.growth-story-capture__companion-quote {
+  margin: 0.6rem 0 0;
+  font-size: 0.94rem;
+  line-height: 1.55;
+  font-style: italic;
+  color: #5c5349;
+}
+
+.growth-story-capture__companion-lead {
+  margin: 0.8rem 0 0.35rem;
+  font-size: 0.9rem;
+  color: #4a4239;
+}
+
+.growth-story-capture__recommendations {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.growth-story-capture__recommendations li {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  line-height: 1.48;
+  color: var(--growth-ink);
+}
+
+.growth-story-capture__rec-label {
+  font-weight: 600;
+}
+
+.growth-story-capture__rec-reason {
+  color: var(--growth-muted);
+}
+
+.growth-story-capture__companion-note {
+  margin: 0.7rem 0 0;
+  font-size: 0.84rem;
+  color: var(--growth-muted);
+}
+
+.growth-story-capture__save-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-top: 0.95rem;
+}
+
+.growth-story-capture__save-btn {
+  border: 1px solid rgba(92, 74, 56, 0.18);
+  border-radius: 999px;
+  background: var(--growth-cream);
+  padding: 0.48rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--growth-botanical);
+  cursor: pointer;
+  transition:
+    transform 0.45s ease,
+    background 0.45s ease;
+}
+
+.growth-story-capture__save-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: #fffdf8;
+}
+
+.growth-story-capture__save-btn:disabled {
+  opacity: 0.62;
+  cursor: default;
+}
+
+.growth-story-capture__later {
+  border: 0;
+  background: transparent;
+  padding: 0.48rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--growth-muted);
+  cursor: pointer;
+}
+
+/* ── Spark reminder (orchard capture) ── */
+.growth-celebration {
+  position: relative;
+  margin: clamp(1.25rem, 3vh, 1.65rem) 0 0;
+  padding-top: clamp(1rem, 2.4vh, 1.25rem);
+  overflow: hidden;
+  border-top: 1px solid rgba(184, 149, 106, 0.22);
+  border-radius: 0;
+  border-left: 0;
+  border-right: 0;
+  border-bottom: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.growth-celebration--enter {
+  animation: growth-celebration-slide-in 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes growth-celebration-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.growth-celebration__confetti {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    radial-gradient(circle at 18% 28%, rgba(255, 214, 120, 0.45) 0 2px, transparent 3px),
+    radial-gradient(circle at 72% 22%, rgba(255, 196, 148, 0.4) 0 2px, transparent 3px),
+    radial-gradient(circle at 48% 62%, rgba(196, 220, 180, 0.38) 0 2px, transparent 3px);
+}
+
+.growth-celebration--spark .growth-celebration__confetti {
+  animation: growth-celebration-spark 1s ease-out;
+}
+
+.growth-celebration__title {
+  margin: 0;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: clamp(0.95rem, 2vw, 1.05rem);
+  font-weight: 500;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  text-transform: none;
+  color: var(--growth-ink);
+}
+
+.growth-celebration__label {
+  margin: 0.65rem 0 0;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--growth-gold);
+}
+
+.growth-celebration__moment {
+  margin: 0.35rem 0 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #4a4239;
+}
+
+.growth-celebration__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.growth-celebration__win,
+.growth-celebration__evidence {
+  border-radius: 999px;
+  padding: 0.48rem 0.9rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    transform 0.45s ease,
+    box-shadow 0.45s ease,
+    filter 0.45s ease;
+}
+
+.growth-celebration__win {
+  border: 0;
+  background: var(--growth-botanical);
+  color: #fffdf8;
+  box-shadow: 0 3px 10px rgba(47, 74, 62, 0.15);
+}
+
+.growth-celebration__evidence {
+  border: 1px solid rgba(92, 74, 56, 0.16);
+  background: var(--growth-cream);
+  color: var(--growth-botanical);
+}
+
+.growth-celebration__win:hover,
+.growth-celebration__evidence:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.04);
+}
+
+.growth-celebration__later {
+  border: 0;
+  background: transparent;
+  padding: 0.48rem 0.7rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--growth-muted);
+  cursor: pointer;
+}
+
+/* ── Growth library rows ── */
+.growth-story-library {
+  display: flex;
+  flex-direction: column;
+}
+
+.growth-story-panel {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.growth-story-panel__rule {
+  display: block;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(139, 115, 85, 0.22) 10%,
+    rgba(139, 115, 85, 0.22) 90%,
+    transparent 100%
+  );
+}
+
+.growth-story-panel__body {
+  display: block;
+  padding: 0.8rem 0.1rem 0.85rem;
+  border-radius: 0.35rem;
+  transition:
+    transform 0.48s ease,
+    background 0.48s ease;
+}
+
+.growth-story-panel:hover .growth-story-panel__body,
+.growth-story-panel:focus-visible .growth-story-panel__body {
+  transform: translateY(-2px);
+  background: rgba(255, 252, 245, 0.38);
+  box-shadow: 0 4px 16px rgba(48, 38, 28, 0.05);
+}
+
+.growth-story-panel:focus-visible {
+  outline: none;
+}
+
+.growth-story-panel:focus-visible .growth-story-panel__body {
+  outline: 1px solid rgba(47, 74, 62, 0.22);
+  outline-offset: 3px;
+}
+
+.growth-story-panel__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 2rem;
+}
+
+.growth-story-panel__copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  min-width: 0;
+}
+
+.growth-story-panel__title {
+  display: block;
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: 1.12rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--growth-ink);
+}
+
+.growth-story-panel__description {
+  display: block;
+  margin-top: 0.35rem;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  white-space: pre-line;
+  color: var(--growth-muted);
+}
+
+.growth-story-reports {
+  margin-top: clamp(1.5rem, 3vh, 2rem);
+  padding-top: 1rem;
+}
+
+.growth-story-reports__link {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--growth-muted);
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-color: rgba(122, 111, 99, 0.45);
+  cursor: pointer;
+  transition: color 0.45s ease;
+}
+
+.growth-story-reports__link:hover {
+  color: var(--growth-walnut);
+}
+
+@keyframes growth-celebration-rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes growth-celebration-spark {
+  0% {
+    opacity: 0;
+    transform: scale(0.92);
+  }
+
+  35% {
+    opacity: 0.75;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(1.04);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .growth-room__life-butterfly,
+  .growth-room__life-dragonfly,
+  .growth-room__life-leaf,
+  .growth-room__life-ripple,
+  .growth-room__life-shimmer,
+  .growth-story-welcome,
+  .growth-celebration,
+  .growth-celebration__confetti {
+    animation: none !important;
+  }
+
+  .growth-story-capture__chip,
+  .growth-story-capture__keep,
+  .growth-story-panel__body,
+  .growth-celebration__win,
+  .growth-celebration__evidence,
+  .growth-estate-choice {
+    transition: none;
+  }
+
+  .growth-story-panel:hover .growth-story-panel__body,
+  .growth-story-panel:focus-visible .growth-story-panel__body,
+  .growth-story-capture__chip:hover,
+  .growth-story-capture__keep:hover:not(:disabled),
+  .growth-estate-choice:hover {
+    transform: none;
+  }
+
+  .growth-room--arrived .growth-room__bench-glow {
+    opacity: 0.6;
+  }
+}

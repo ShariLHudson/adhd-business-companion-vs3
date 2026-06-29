@@ -1,0 +1,157 @@
+/* ═══════════════════════════════════════════════════════════
+   GROWTH JOURNAL — White Gazebo writing room
+═══════════════════════════════════════════════════════════ */
+
+.journal-room {
+  position: relative;
+  width: 100%;
+  min-height: 100dvh;
+  min-height: 100svh;
+  overflow: hidden;
+  background: transparent;
+}
+
+.journal-room__cinematic {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.journal-room__cinematic .cinematic-background__image {
+  background-color: #ebe4d8;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+  transform: none !important;
+}
+
+.journal-room-panel .journal-room__header {
+  margin-top: 0.35rem;
+}
+
+.journal-room__compose {
+  margin-top: clamp(1.15rem, 2.6vh, 1.45rem);
+  border-radius: 1rem;
+  border: 1px solid rgba(139, 115, 85, 0.14);
+  background: rgba(255, 252, 245, 0.68);
+  padding: clamp(0.95rem, 2vw, 1.1rem) clamp(1rem, 2.2vw, 1.15rem)
+    clamp(0.9rem, 2vw, 1.05rem);
+}
+
+.journal-room__textarea {
+  display: block;
+  width: 100%;
+  min-height: clamp(5.5rem, 14vh, 7rem);
+  max-height: clamp(7rem, 22vh, 10rem);
+  resize: vertical;
+  border: 0;
+  background: transparent;
+  font-family: "Segoe UI", system-ui, sans-serif;
+  font-size: 0.98rem;
+  line-height: 1.58;
+  color: #2f261f;
+}
+
+.journal-room__textarea::placeholder {
+  color: #a39688;
+  font-style: italic;
+}
+
+.journal-room__textarea:focus {
+  outline: none;
+}
+
+.journal-room__compose-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+.journal-room__save {
+  border: 0;
+  border-radius: 999px;
+  background: #2f4a3e;
+  padding: 0.55rem 1.1rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #fffdf8;
+  cursor: pointer;
+  transition:
+    transform 0.35s ease,
+    filter 0.35s ease;
+}
+
+.journal-room__save:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.journal-room__save:disabled {
+  opacity: 0.42;
+  cursor: default;
+}
+
+.journal-room__saved-note {
+  font-size: 0.8rem;
+  font-style: italic;
+  color: #6f6259;
+}
+
+.journal-room__entries {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.journal-room__entry {
+  margin-top: 0.75rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(139, 115, 85, 0.16);
+  background: rgba(255, 252, 245, 0.78);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 0.85rem 0.95rem;
+}
+
+.journal-room__entry-date {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #9a8f82;
+}
+
+.journal-room__entry-body {
+  margin: 0.45rem 0 0;
+  white-space: pre-wrap;
+  font-size: 0.88rem;
+  line-height: 1.52;
+  color: #2f261f;
+}
+
+.journal-room__entry-attachments {
+  margin-top: 0.5rem;
+}
+
+.journal-room__entry-remove {
+  margin-top: 0.5rem;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9a6b6b;
+  cursor: pointer;
+}
+
+.journal-room__entry-remove:hover {
+  text-decoration: underline;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .journal-room__save:hover:not(:disabled) {
+    transform: none;
+  }
+}

@@ -23,6 +23,11 @@ export function roomBackgroundImageStyle(imageUrl: string): {
   return { backgroundImage: roomBackgroundImageCss(imageUrl) };
 }
 
+/** Inline card previews — PNG directly so room art always appears before WebP exists. */
+export function roomBackgroundDirectCss(imageUrl: string): string {
+  return `url('${imageUrl}')`;
+}
+
 /** Prefer WebP for preload when a paired file exists. */
 export function preferredBackgroundPreloadUrl(imageUrl: string): string {
   return PNG_EXT.test(imageUrl) ? webpBackgroundUrl(imageUrl) : imageUrl;

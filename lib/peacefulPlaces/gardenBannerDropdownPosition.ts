@@ -16,8 +16,8 @@ export function computeGardenBannerDropdownPosition(
   viewportWidth = typeof window !== "undefined" ? window.innerWidth : 1280,
   viewportHeight = typeof window !== "undefined" ? window.innerHeight : 800,
 ): { top: number; left: number } {
-  const menuWidth = menu.width > 0 ? menu.width : 176;
-  const menuHeight = menu.height > 0 ? menu.height : 220;
+  const menuWidth = menu.width > 0 ? menu.width : 280;
+  const menuHeight = menu.height > 0 ? menu.height : 420;
 
   let left =
     side === "left"

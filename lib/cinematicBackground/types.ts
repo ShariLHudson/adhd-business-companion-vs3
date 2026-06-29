@@ -17,6 +17,11 @@ export const CINEMATIC_PRESET_IDS = [
   "growth",
   "journal",
   "life-evidence",
+  "evidence-vault",
+  "creative-studio",
+  "celebration-garden",
+  "story-library",
+  "capture-moment",
   "momentum-games",
   "default",
 ] as const;

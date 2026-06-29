@@ -67,6 +67,31 @@ export const CINEMATIC_PRESETS: Record<CinematicPresetId, CinematicFraming> = {
     position: "center center",
     gradientStrength: 1,
   },
+  "evidence-vault": {
+    scale: 1,
+    position: "center center",
+    gradientStrength: 0,
+  },
+  "creative-studio": {
+    scale: 1,
+    position: "center center",
+    gradientStrength: 0,
+  },
+  "celebration-garden": {
+    scale: 1,
+    position: "center center",
+    gradientStrength: 0,
+  },
+  "story-library": {
+    scale: 1.05,
+    position: "center center",
+    gradientStrength: 0.85,
+  },
+  "capture-moment": {
+    scale: 1.05,
+    position: "center 45%",
+    gradientStrength: 0.85,
+  },
   "momentum-games": {
     scale: 1.05,
     position: "center 45%",

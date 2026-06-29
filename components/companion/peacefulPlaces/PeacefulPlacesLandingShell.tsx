@@ -103,6 +103,13 @@ export function PeacefulPlacesLandingShell({
         <div className="peaceful-places-landing__season-accent" />
         <div className="peaceful-places-landing__lantern-glow peaceful-places-landing__lantern-glow--left" />
         <div className="peaceful-places-landing__lantern-glow peaceful-places-landing__lantern-glow--right" />
+        <div className="peaceful-places-landing__garden-life" aria-hidden="true">
+          <span className="peaceful-places-landing__bird peaceful-places-landing__bird--a" />
+          <span className="peaceful-places-landing__bird peaceful-places-landing__bird--b" />
+          <span className="peaceful-places-landing__butterfly peaceful-places-landing__butterfly--a" />
+          <span className="peaceful-places-landing__butterfly peaceful-places-landing__butterfly--b" />
+          <span className="peaceful-places-landing__butterfly peaceful-places-landing__butterfly--c" />
+        </div>
         <div className="peaceful-places-landing__estate-wash" />
         <div className="peaceful-places-landing__estate-quiet" />
         {maskBakedSigns ? (

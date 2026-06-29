@@ -2,14 +2,14 @@ import { describe, expect, it } from "vitest";
 import { resolveHomeMode } from "./homeMode";
 
 describe("resolveHomeMode", () => {
-  it("returns welcome before the user chats on home", () => {
+  it("returns chat on home so the frosted welcome layer never blocks entry", () => {
     expect(
       resolveHomeMode({
         activeSection: "home",
         homeCalm: true,
         hasUserMessages: false,
       }),
-    ).toBe("welcome");
+    ).toBe("chat");
   });
 
   it("returns chat after the first user message", () => {

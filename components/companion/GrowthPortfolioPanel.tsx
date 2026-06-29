@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CreativeStudioRoomShell } from "@/components/companion/CreativeStudioRoomShell";
+import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { GrowthPanelBackButton } from "@/components/companion/GrowthPanelBackButton";
 import { GrowthAttachmentsField } from "@/components/companion/GrowthAttachmentsField";
 import {
@@ -10,6 +12,7 @@ import {
   type PortfolioEntry,
 } from "@/lib/growthPortfolioStore";
 import type { GrowthPanelNav } from "@/lib/growthNavigation";
+import "@/app/companion/creative-studio-room.css";
 
 function formatDate(iso: string): string {
   return new Date(iso).toLocaleDateString(undefined, {
@@ -35,44 +38,38 @@ export function GrowthPortfolioPanel({
   }, []);
 
   return (
-    <div className="min-h-full bg-gradient-to-b from-[#fff9f0] to-[#f5ebe0] px-4 py-6 sm:px-6">
-      <div className="mx-auto max-w-3xl">
-        <GrowthPanelBackButton onBack={nav.onBack} label={nav.backLabel} />
-        <header className="mt-4">
-          <p className="text-xs font-bold uppercase tracking-wide text-[#b45309]">
-            Creative studio
-          </p>
-          <h1 className="mt-1 text-2xl font-bold text-[#2f261f]">Portfolio</h1>
-          <p className="mt-1 text-sm text-[#6f6259]">
-            What you&apos;ve created — projects, courses, campaigns, and creative work.
+    <CreativeStudioRoomShell>
+      <EstateWorkspace>
+        <GrowthPanelBackButton onBack={nav.onBack} label={nav.backLabel ?? "My Story"} />
+
+        <header className="creative-studio-room__header">
+          <p className="estate-workspace__kicker">Creative Studio</p>
+          <h1 className="estate-workspace__title">Creative Portfolio</h1>
+          <p className="estate-workspace__lead">
+            A place for your ideas, projects, courses, businesses and creative work to grow.
           </p>
         </header>
 
         {entries.length === 0 ? (
-          <div className="mt-8 rounded-2xl border border-dashed border-[#e7d9c8] bg-white/70 px-5 py-8 text-center text-sm text-[#6f6259]">
+          <p className="creative-studio-room__empty">
             Your gallery is waiting. Capture something you made from Growth — file to Portfolio.
-          </div>
+          </p>
         ) : (
-          <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+          <ul className="creative-studio-room__grid">
             {entries.map((entry) => {
               const cover = entry.attachments.find((a) => a.kind === "image");
               return (
-                <li
-                  key={entry.id}
-                  className="overflow-hidden rounded-2xl border border-[#e7d9c8] bg-white shadow-sm"
-                >
+                <li key={entry.id} className="creative-studio-room__card">
                   {cover?.url ? (
                     <img
                       src={cover.url}
                       alt=""
-                      className="h-36 w-full object-cover"
+                      className="creative-studio-room__card-cover"
                     />
                   ) : (
-                    <div className="flex h-36 items-center justify-center bg-gradient-to-br from-amber-50 to-orange-50 text-3xl">
-                      ✦
-                    </div>
+                    <div className="creative-studio-room__card-placeholder" aria-hidden />
                   )}
-                  <div className="p-4">
+                  <div className="creative-studio-room__card-body">
                     <h2 className="font-bold text-[#2f261f]">{entry.title}</h2>
                     <time className="text-[10px] font-semibold uppercase tracking-wide text-[#9a8f82]">
                       {formatDate(entry.createdAt)}
@@ -103,7 +100,7 @@ export function GrowthPortfolioPanel({
             })}
           </ul>
         )}
-      </div>
-    </div>
+      </EstateWorkspace>
+    </CreativeStudioRoomShell>
   );
 }

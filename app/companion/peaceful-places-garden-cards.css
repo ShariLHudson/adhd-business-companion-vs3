@@ -1,0 +1,205 @@
+/* ═══════════════════════════════════════════════════════════
+   PEACEFUL PLACES — luxury destination invitation cards
+═══════════════════════════════════════════════════════════ */
+
+@keyframes garden-card-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.garden-banner-dropdown .garden-destination-cards {
+  margin: 0;
+  padding: 0.25rem 0.15rem;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  width: min(19.5rem, 78vw);
+  border: none;
+  background: transparent;
+  box-shadow: none;
+}
+
+.garden-banner-dropdown .garden-destination-cards__item {
+  display: block;
+  margin: 0;
+  padding: 0;
+  animation: garden-card-arrive 0.46s ease-out both;
+}
+
+.garden-banner-dropdown .garden-destination-cards__item:nth-child(2) {
+  animation-delay: 0.05s;
+}
+
+.garden-banner-dropdown .garden-destination-cards__item:nth-child(3) {
+  animation-delay: 0.1s;
+}
+
+.garden-banner-dropdown .garden-destination-cards__item:nth-child(4) {
+  animation-delay: 0.15s;
+}
+
+.garden-banner-dropdown .garden-destination-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0.85rem;
+  overflow: hidden;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  text-align: left;
+  background: #1a221c;
+  box-shadow:
+    0 8px 22px rgba(10, 16, 12, 0.3),
+    0 2px 6px rgba(10, 16, 12, 0.18),
+    0 1px 0 rgba(255, 248, 236, 0.05) inset;
+  transform: translateY(0);
+  transition:
+    transform 0.44s ease-in-out,
+    box-shadow 0.44s ease-in-out;
+}
+
+.garden-banner-dropdown .garden-destination-card__media {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 5 / 3;
+  overflow: hidden;
+}
+
+.garden-banner-dropdown .garden-destination-card__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  transform: scale(1);
+  transition: transform 0.48s ease-in-out;
+}
+
+.garden-banner-dropdown .garden-destination-card__shade {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    0deg,
+    rgba(10, 14, 10, 0.88) 0%,
+    rgba(10, 14, 10, 0.5) 34%,
+    rgba(10, 14, 10, 0.12) 62%,
+    rgba(10, 14, 10, 0.02) 100%
+  );
+  transition: opacity 0.44s ease-in-out;
+}
+
+.garden-banner-dropdown .garden-destination-card__copy {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.28rem;
+  padding: 0.72rem 0.82rem 0.78rem;
+}
+
+.garden-banner-dropdown .garden-destination-card__title {
+  font-family: Georgia, "Iowan Old Style", "Palatino Linotype", serif;
+  font-size: 0.98rem;
+  font-weight: 600;
+  line-height: 1.22;
+  letter-spacing: 0.012em;
+  color: rgba(255, 250, 242, 0.92);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.48);
+  transition:
+    color 0.44s ease-in-out,
+    text-shadow 0.44s ease-in-out;
+}
+
+.garden-banner-dropdown .garden-destination-card__description {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  font-size: 0.74rem;
+  font-weight: 400;
+  line-height: 1.42;
+  color: rgba(247, 242, 232, 0.8);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+  opacity: 0.92;
+  transition:
+    color 0.44s ease-in-out,
+    opacity 0.44s ease-in-out;
+}
+
+.garden-banner-dropdown .garden-destination-card:hover,
+.garden-banner-dropdown .garden-destination-card:focus-visible {
+  transform: translateY(-4px);
+  box-shadow:
+    0 16px 32px rgba(10, 16, 12, 0.38),
+    0 0 0 1px rgba(255, 248, 236, 0.12),
+    0 1px 0 rgba(255, 248, 236, 0.1) inset;
+  outline: none;
+}
+
+.garden-banner-dropdown .garden-destination-card:hover .garden-destination-card__image,
+.garden-banner-dropdown .garden-destination-card:focus-visible .garden-destination-card__image {
+  transform: scale(1.02);
+}
+
+.garden-banner-dropdown .garden-destination-card:hover .garden-destination-card__shade,
+.garden-banner-dropdown .garden-destination-card:focus-visible .garden-destination-card__shade {
+  opacity: 0.96;
+}
+
+.garden-banner-dropdown .garden-destination-card:hover .garden-destination-card__title,
+.garden-banner-dropdown .garden-destination-card:focus-visible .garden-destination-card__title {
+  color: #fffdf9;
+  text-shadow:
+    0 1px 6px rgba(0, 0, 0, 0.5),
+    0 0 18px rgba(255, 248, 236, 0.14);
+}
+
+.garden-banner-dropdown .garden-destination-card:hover .garden-destination-card__description,
+.garden-banner-dropdown .garden-destination-card:focus-visible .garden-destination-card__description {
+  color: rgba(255, 252, 246, 0.94);
+  opacity: 1;
+}
+
+.garden-banner-dropdown .pathway-garden-stake__menu {
+  min-width: min(19.5rem, 78vw);
+  max-width: min(20rem, 80vw);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .garden-banner-dropdown .garden-destination-cards__item {
+    animation: none;
+  }
+
+  .garden-banner-dropdown .garden-destination-card,
+  .garden-banner-dropdown .garden-destination-card__image,
+  .garden-banner-dropdown .garden-destination-card__shade,
+  .garden-banner-dropdown .garden-destination-card__title,
+  .garden-banner-dropdown .garden-destination-card__description {
+    transition: none;
+  }
+
+  .garden-banner-dropdown .garden-destination-card:hover,
+  .garden-banner-dropdown .garden-destination-card:focus-visible {
+    transform: none;
+  }
+
+  .garden-banner-dropdown .garden-destination-card:hover .garden-destination-card__image,
+  .garden-banner-dropdown .garden-destination-card:focus-visible .garden-destination-card__image {
+    transform: none;
+  }
+}

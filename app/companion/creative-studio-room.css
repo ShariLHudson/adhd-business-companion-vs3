@@ -1,0 +1,93 @@
+/* ═══════════════════════════════════════════════════════════
+   CREATIVE STUDIO — craft room full-bleed background
+═══════════════════════════════════════════════════════════ */
+
+.creative-studio-room {
+  position: relative;
+  min-height: 100dvh;
+  min-height: 100svh;
+  width: 100%;
+  overflow: hidden;
+}
+
+.creative-studio-room__cinematic {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.creative-studio-room__cinematic .cinematic-background__image {
+  background-color: #ebe4d8;
+  background-size: contain;
+  background-position: center center;
+  background-repeat: no-repeat;
+  transform: none !important;
+}
+
+.creative-studio-room__scroll {
+  position: relative;
+  z-index: 1;
+  min-height: 100dvh;
+  min-height: 100svh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.creative-studio-room__header {
+  margin-top: 0.35rem;
+}
+
+.creative-studio-room__empty {
+  margin-top: 1.5rem;
+  border-radius: 1rem;
+  border: 1px dashed rgba(201, 166, 107, 0.45);
+  background: rgba(255, 252, 245, 0.72);
+  padding: 2rem 1.25rem;
+  text-align: center;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  color: #6f6259;
+}
+
+.creative-studio-room__grid {
+  margin-top: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .creative-studio-room__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.creative-studio-room__card {
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid rgba(231, 217, 200, 0.85);
+  background: rgba(255, 252, 245, 0.88);
+  box-shadow: 0 8px 24px rgba(42, 38, 32, 0.08);
+}
+
+.creative-studio-room__card-cover {
+  height: 9rem;
+  width: 100%;
+  object-fit: cover;
+}
+
+.creative-studio-room__card-placeholder {
+  display: flex;
+  height: 9rem;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, #fff9f0 0%, #f5ebe0 100%);
+  font-size: 1.75rem;
+  color: #c9a66b;
+}
+
+.creative-studio-room__card-body {
+  padding: 1rem;
+}

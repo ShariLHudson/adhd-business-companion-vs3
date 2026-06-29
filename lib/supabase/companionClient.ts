@@ -13,6 +13,19 @@ let browserClient: SupabaseClient | null = null;
 let runtimeConfig: { url: string; key: string } | null = null;
 let bootstrapPromise: Promise<boolean> | null = null;
 
+function applyRuntimeConfig(url: string, key: string): boolean {
+  const normalizedUrl = url.replace(/\/$/, "");
+  if (
+    runtimeConfig?.url === normalizedUrl &&
+    runtimeConfig?.key === key
+  ) {
+    return false;
+  }
+  runtimeConfig = { url: normalizedUrl, key };
+  browserClient = null;
+  return true;
+}
+
 type CompanionInlineAuth = { url: string; key: string };
 
 declare global {
@@ -27,8 +40,7 @@ export function hydrateCompanionAuthFromInlineConfig(): boolean {
   const payload = window.__COMPANION_SUPABASE__;
   if (!payload?.url || !payload?.key) return false;
   if (!isBrowserSafeSupabaseKey(payload.key)) return false;
-  runtimeConfig = { url: payload.url.replace(/\/$/, ""), key: payload.key };
-  browserClient = null;
+  applyRuntimeConfig(payload.url, payload.key);
   return true;
 }
 
@@ -101,11 +113,7 @@ export async function bootstrapCompanionSupabaseConfig(): Promise<boolean> {
         anonKey?: string;
       };
       if (data.configured && data.url && data.anonKey) {
-        runtimeConfig = {
-          url: data.url.replace(/\/$/, ""),
-          key: data.anonKey,
-        };
-        browserClient = null;
+        applyRuntimeConfig(data.url, data.anonKey);
         return companionAuthConfigured();
       }
     } catch {
@@ -207,6 +215,7 @@ export function getCompanionSupabase(): SupabaseClient | null {
   hydrateCompanionAuthFromInlineConfig();
   if (!companionAuthConfigured()) return null;
   if (browserClient) return browserClient;
+
   browserClient = createClient(
     getCompanionSupabaseUrl(),
     getCompanionSupabaseAnonKey(),

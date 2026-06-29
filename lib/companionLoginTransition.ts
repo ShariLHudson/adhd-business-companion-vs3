@@ -1,5 +1,6 @@
 /** Gentle login → home handoff — no modals, no blocking overlays. */
 
+import { getCompanionSupabase } from "@/lib/supabase/companionClient";
 import { COMPANION_LOGIN_OPENING_MESSAGE } from "@/lib/companionLoginPage";
 
 /** Immediate route change after auth — home shell hydrates progressively. */
@@ -58,6 +59,7 @@ const AUTH_STORAGE_KEY = "companion-supabase-auth";
 
 function authStorageHasSession(raw: string): boolean {
   if (raw.includes("access_token")) return true;
+  if (raw.includes("refresh_token")) return true;
   try {
     const parsed = JSON.parse(raw) as Record<string, unknown>;
     if (typeof parsed.access_token === "string" && parsed.access_token.length > 0) {
@@ -68,10 +70,41 @@ function authStorageHasSession(raw: string): boolean {
       const token = (nested as { access_token?: string }).access_token;
       return Boolean(token && token.length > 0);
     }
+    const session = parsed.session;
+    if (session && typeof session === "object") {
+      const token = (session as { access_token?: string }).access_token;
+      return Boolean(token && token.length > 0);
+    }
   } catch {
     /* legacy string format */
   }
   return false;
+}
+
+/** True when Supabase already has a live session in memory or storage. */
+export async function companionSignInSessionReady(
+  timeoutMs = 3000,
+): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (hasCompanionAuthStorageHint()) return true;
+    const supabase = getCompanionSupabase();
+    if (supabase) {
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.access_token) return true;
+    }
+    await new Promise((resolve) => window.setTimeout(resolve, 50));
+  }
+  return false;
+}
+
+/** Hard navigation — reliable after sign-in (SPA replace can stall). */
+export function navigateToCompanionHome(): void {
+  if (typeof window === "undefined") return;
+  markCompanionLoginArrival();
+  window.location.replace("/companion");
 }
 
 /** Wait until Supabase has written the session to localStorage before navigating. */

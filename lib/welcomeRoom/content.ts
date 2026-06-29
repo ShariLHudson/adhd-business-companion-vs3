@@ -42,6 +42,7 @@ export const WELCOME_ROOM_VOICE_CONTROLS = {
   play: "Play",
   pause: "Pause",
   stop: "Stop",
+  stopRoom: "Stop audio & motion",
   restart: "Restart",
   readWelcome: "Read welcome",
   listenInstead: "Resume listening",
