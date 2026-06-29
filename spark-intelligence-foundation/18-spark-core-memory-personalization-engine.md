@@ -3,6 +3,7 @@
 **Remember the right things — not everything.**
 
 | Implementation | `lib/sparkCoreIntelligence/memoryEngine/` |
+| OS architecture | [003 – Business Brain™](./003-business-brain.md) |
 | Status | v1.0 scaffold — not wired to companion UI |
 
 ## Memory types

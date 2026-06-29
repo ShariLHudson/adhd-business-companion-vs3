@@ -15433,7 +15433,8 @@ export default function CompanionPageClient() {
               onBack={goBack}
               onOpenJournal={() => openGrowthDestinationCore("growth-journal")}
               onOpenCapture={openGrowthCaptureCore}
-              onOpenLibrary={openGrowthLibraryCore}
+              onOpenMilestones={() => openGrowthDestinationCore("wins-this-week")}
+              onOpenStorybook={openGrowthReportsCore}
             />
           )}
 

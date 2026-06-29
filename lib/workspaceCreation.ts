@@ -1,4 +1,5 @@
 // Creation workspace — chat beside any draft, template, snippet, or project.
+// Philosophy: docs/CREATE_PHILOSOPHY.md (T-004) — intent before output, Business Assets™, not prompt UI.
 
 import {
   normalizeArtifactType,

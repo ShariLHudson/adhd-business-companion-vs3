@@ -6,6 +6,7 @@
 |-------|-------|
 | **Authority** | Orchestrates every response **before any words are generated** |
 | **Governed by** | [Spark Constitution™](./00-spark-constitution.md) |
+| **Response architecture** | [006 – Spark Response Architecture™](./006-spark-response-architecture.md) — Stages 1–2, 6–7 |
 | **Implementation** | `lib/sparkCognitiveOrchestration/` |
 | **Delegates** | [Response Intelligence](./12-spark-response-intelligence-engine.md) · foundation modules |
 | **Status** | Draft v1.0 |

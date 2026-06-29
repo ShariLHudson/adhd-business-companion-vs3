@@ -6,6 +6,10 @@
 |-------|-------|
 | **Priority** | Context layer — consulted by Objective, Intelligence, Conversation, and Estate modules |
 | **Governed by** | [Spark Constitution™](./00-spark-constitution.md) · Trust Principles |
+| **OS architecture** | [003 – Business Brain™](./003-business-brain.md) — this engine implements Brain memory rules |
+| **Lifecycle** | [009 – Business Brain Lifecycle](./009-business-brain-lifecycle.md) — stages, versioning, retrieval |
+| **Knowledge model** | [004 – Spark Knowledge Model™](./004-spark-knowledge-model.md) — Business Knowledge™ category |
+| **Context strategy** | [007 – Context Strategy™ & MVC](./007-context-strategy.md) — scoped retrieval; Brain stores, Strategy selects |
 | **Separate from** | [Communication Intelligence](./04-communication-intelligence.md) — reference profile, do not duplicate |
 | **Founder scope** | [`founder/`](./founder/) — never mixed with member memory |
 | **Status** | Draft v1.0 |

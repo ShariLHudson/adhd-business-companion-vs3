@@ -9,6 +9,14 @@ This folder is the source of truth for how **Spark** thinks, responds, routes co
 | Document | Domain |
 |----------|--------|
 | [00-spark-constitution.md](./00-spark-constitution.md) | Non-negotiable principles and identity |
+| [002-business-asset-architecture.md](./002-business-asset-architecture.md) | **Business Asset System™** — central organizing structure of Spark OS |
+| [003-business-brain.md](./003-business-brain.md) | **Business Brain™** — long-term business memory layer (remembers, does not decide) |
+| [004-spark-knowledge-model.md](./004-spark-knowledge-model.md) | **Spark Knowledge Model™** — nine knowledge categories, confidence, ownership |
+| [005-guidance-engine.md](./005-guidance-engine.md) | **Guidance Engine™** — reasoning and recommendations; member owns decisions |
+| [006-spark-response-architecture.md](./006-spark-response-architecture.md) | **Spark Response Architecture™** — runtime pipeline; nervous system of Spark OS |
+| [007-context-strategy.md](./007-context-strategy.md) | **Context Strategy™ & MVC** — intelligent context selection; Stage 3 detail |
+| [008-interaction-contracts.md](./008-interaction-contracts.md) | **Interaction Contracts™** — system ownership, inputs/outputs, forbidden interactions |
+| [009-business-brain-lifecycle.md](./009-business-brain-lifecycle.md) | **Business Brain™ Lifecycle** — acquire, validate, version, retire knowledge |
 | [01-spark-objective-engine.md](./01-spark-objective-engine.md) | Outcome detection — first stage of every interaction |
 | [02-conversation-engine.md](./02-conversation-engine.md) | Conversation creation — dialogue, modes, momentum |
 | [03-intent-router.md](./03-intent-router.md) | Intent detection and workspace routing |
@@ -36,11 +44,11 @@ This folder is the source of truth for how **Spark** thinks, responds, routes co
 
 - **Status:** Draft scaffolding + Spark OS libs (`sparkTrustPerformance`, `sparkCognitiveOrchestration`, `sparkResponseIntelligence`, `sparkCoreIntelligence`).
 - **Not wired:** Companion UI and chat routes do not call Spark OS pipeline yet.
-- **Future:** Wire `runSparkResponseIntelligence()` into companion judgment / prompt pipeline.
+- **Future:** Wire `runSparkResponseIntelligence()` into companion judgment / prompt pipeline per [006 – Spark Response Architecture](./006-spark-response-architecture.md).
 
 ## Reading order
 
-1. Constitution → **Trust & Performance Engine** → Cognitive Orchestration → Response Intelligence → sub-engines
+1. Constitution → **Business Asset Architecture** → **Business Brain** → **Spark Knowledge Model** → **Guidance Engine** → **Spark Response Architecture** → Trust & Performance / Cognitive Orchestration / Response Intelligence (runtime detail)
 2. Performance & Routing → Objective Engine → Focus & Objective Lock → Conversation Engine
 2. Intelligence Engine (orchestration) → Communication Intelligence → Response Evaluation
 3. Intent Router → Estate Navigation
@@ -50,6 +58,14 @@ This folder is the source of truth for how **Spark** thinks, responds, routes co
 ## Related internal docs
 
 - `docs/RELATIONSHIP_CONSTITUTION.md`
+- `docs/UNIVERSAL_EXPERIENCE_STANDARDS.md` (T-003 — member-facing UX)
+- `docs/CREATE_PHILOSOPHY.md` (T-004 — Create™ entrepreneurial transformation)
+- `docs/EXPERIENCE_PATTERNS.md` (T-005 — twelve experience patterns)
+- `docs/TRUST_EXPERIENCE.md` (T-006 — trust as experience)
+- `docs/ENTREPRENEURIAL_RESILIENCE.md` (T-007 — difficult seasons)
+- `docs/DECISION_EXPERIENCE_FRAMEWORK.md` (T-008 — decision support)
+- `docs/COMPANION_RELATIONSHIP_FRAMEWORK.md` (T-009 — relationship evolution)
+- `docs/FOUNDER_JOURNEY_FRAMEWORK.md` (T-010 — entrepreneurial journey stages)
 - `lib/intelligence/INTELLIGENCE_REGISTRY.md`
 - `lib/characterOfShari/CONSTITUTION.md`
 - `AGENTS.md` (companion architecture)

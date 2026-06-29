@@ -1,0 +1,56 @@
+---
+description: Momentum Builder Framework (T-012) — practice not games; real business; no winning
+globs:
+  - lib/sparkMomentumBuilders/**
+  - lib/momentumBuilders/**
+  - components/**/*Momentum*
+alwaysApply: false
+---
+
+# Momentum Builder™ Framework (T-012)
+
+**Full document:** `docs/MOMENTUM_BUILDER_FRAMEWORK.md`
+
+Momentum Builders™ are **not games**. Short (2–10 min) guided **practice** that strengthens real capabilities and connects to real business.
+
+## Core question
+
+> How will this make the member a stronger entrepreneur?
+
+## Required spec fields
+
+Primary capability · optional secondary · journey stages · Business Asset connection · Spark Card / Guild / Gallery when relevant · reflection question · practical application · EF support strategy · estimated time.
+
+**Type:** `MomentumBuilderSpec` in `lib/sparkMomentumBuilders/types.ts`
+
+## Flow
+
+Arrival → Context → Challenge → Practice → Insight → Reflection → Business Application → Capability Growth → Connection
+
+## Never
+
+Childish · arcade-like · scores/leaderboards · winners · disconnected abstract exercises · manipulation.
+
+## Celebrate instead
+
+Insights · improved thinking · capability growth · business application. **Learning is the reward.**
+
+## Growth levels (not Easy/Hard)
+
+Explore™ · Practice™ · Apply™ · Master™
+
+## Integration chain
+
+```
+Momentum Builder™ → Spark Card™ → Business Asset™ → Gallery™ → Guidance™
+```
+
+## EF standards
+
+Immediate structure · low setup · pausable · no interruption penalty · ADHD-friendly.
+
+## V1 note
+
+`lib/momentumBuilders/` catalog is EF-reset subset today. New entrepreneurial Builders implement **this framework**.
+
+Also: T-011 Spark Cards · T-010 journey (Build stage emphasis) · T-005 Pattern 5 Practice · T-007 resilience.

@@ -5,7 +5,8 @@
 | Field | Value |
 |-------|-------|
 | **Authority** | Integrates and supersedes ad-hoc response logic; subordinate only to [Spark Constitution™](./00-spark-constitution.md) |
-- **Implementation** | `lib/sparkResponseIntelligence/` + `lib/sparkCognitiveOrchestration/` (scaffolds — not wired to companion UI) |
+| **Response architecture** | [006 – Spark Response Architecture™](./006-spark-response-architecture.md) — Stages 7–8 |
+| **Implementation** | `lib/sparkResponseIntelligence/` + `lib/sparkCognitiveOrchestration/` (scaffolds — not wired to companion UI) |
 | **Status** | Draft v1.0 |
 
 ---

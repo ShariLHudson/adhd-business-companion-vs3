@@ -1,4 +1,5 @@
 /** Recovery Intelligence — recovery is productive. */
+/** Experience rules: docs/ENTREPRENEURIAL_RESILIENCE.md (T-007) */
 
 import type { ActivationState } from "@/lib/activation/types";
 import type { CompanionResponseMode } from "@/lib/adaptive-companion/types";

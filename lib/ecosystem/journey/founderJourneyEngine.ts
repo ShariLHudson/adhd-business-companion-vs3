@@ -1,4 +1,5 @@
 // Founder Ecosystem — Phase 9 Founder Journey Engine.
+// Member experience stages: docs/FOUNDER_JOURNEY_FRAMEWORK.md (T-010 Dream→Legacy).
 // Detects where the founder is in their business journey (idea → scaling), what
 // they're focused on, and what matters most at that stage — so every other
 // layer can personalize. Derived from the event stream + optional business

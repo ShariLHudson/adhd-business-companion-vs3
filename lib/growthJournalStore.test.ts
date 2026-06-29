@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   createCaptureMomentEntry,
   createJournalEntry,
+  createYourStoryEntry,
   generateEntryTitle,
   getGrowthMemoryEntries,
 } from "./growthJournalStore";
@@ -48,5 +49,23 @@ describe("growthJournalStore capture moments", () => {
     const captureOnly = getGrowthMemoryEntries({ types: ["capture_moment"] });
     expect(journalOnly).toHaveLength(1);
     expect(captureOnly).toHaveLength(1);
+  });
+
+  it("saves your_story entries with sourcePage and type", () => {
+    const { entry, ok } = createYourStoryEntry({
+      content: "A lesson from this season of building.",
+      userId: "user-1",
+    });
+    expect(ok).toBe(true);
+    expect(entry?.type).toBe("story_reflection");
+    expect(entry?.sourcePage).toBe("your_story");
+    expect(entry?.isArchived).toBe(false);
+
+    const milestone = createYourStoryEntry({
+      content: "Launched the companion beta.",
+      type: "milestone",
+    });
+    expect(milestone.ok).toBe(true);
+    expect(milestone.entry?.type).toBe("milestone");
   });
 });

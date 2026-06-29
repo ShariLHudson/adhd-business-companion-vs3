@@ -1,59 +1,142 @@
 "use client";
 
-import { GrowthRoomShell } from "@/components/companion/GrowthRoomShell";
+import { useEffect, useState } from "react";
+import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { GrowthPanelBackButton } from "@/components/companion/GrowthPanelBackButton";
-import { GrowthStoryChoiceCard } from "@/components/companion/GrowthStoryChoiceCard";
-import {
-  GROWTH_ESTATE_CHOICES,
-  GROWTH_STORY_ENTRANCE_PROMPT,
-  type GrowthEstateChoiceId,
-} from "@/lib/growth/growthEstateChoices";
-import "@/app/companion/growth-story-hub.css";
+import { GrowthStoryRoomShell } from "@/components/companion/GrowthStoryRoomShell";
+import { GrowthWritingCompose } from "@/components/companion/GrowthWritingCompose";
+import { createYourStoryEntry } from "@/lib/growthJournalStore";
+import "@/app/companion/growth-journal.css";
+
+type StoryOption = {
+  id: string;
+  title: string;
+  description: string;
+  onSelect: () => void;
+};
 
 type Props = {
   onBack: () => void;
   onOpenJournal: () => void;
   onOpenCapture: () => void;
-  onOpenLibrary: () => void;
+  onOpenMilestones: () => void;
+  onOpenStorybook: () => void;
 };
 
-/** Your Story — three intentions: reflect, save, explore. */
+/** Your Story — universal Growth layout; same family as Journal and Capture. */
 export function GrowthStoryLandingPanel({
   onBack,
   onOpenJournal,
   onOpenCapture,
-  onOpenLibrary,
+  onOpenMilestones,
+  onOpenStorybook,
 }: Props) {
-  function openChoice(id: GrowthEstateChoiceId) {
-    if (id === "reflect") onOpenJournal();
-    else if (id === "capture") onOpenCapture();
-    else onOpenLibrary();
+  const [draft, setDraft] = useState("");
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [statusRole, setStatusRole] = useState<"status" | "alert">("status");
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (!statusMessage || statusRole === "alert") return;
+    const t = window.setTimeout(() => setStatusMessage(null), 4000);
+    return () => window.clearTimeout(t);
+  }, [statusMessage, statusRole]);
+
+  const options: StoryOption[] = [
+    {
+      id: "capture",
+      title: "Capture a Moment",
+      description: "Save something meaningful from today.",
+      onSelect: onOpenCapture,
+    },
+    {
+      id: "journal",
+      title: "Journal",
+      description: "Write what is on your mind.",
+      onSelect: onOpenJournal,
+    },
+    {
+      id: "milestones",
+      title: "Milestones",
+      description: "Remember important moments and turning points.",
+      onSelect: onOpenMilestones,
+    },
+    {
+      id: "storybook",
+      title: "Storybook",
+      description: "Turn your journey into a beautiful keepsake.",
+      onSelect: onOpenStorybook,
+    },
+  ];
+
+  function saveQuickNote() {
+    const text = draft.trim();
+    if (!text || saving) return;
+    setSaving(true);
+    setStatusMessage(null);
+    const { ok } = createYourStoryEntry({ content: text, type: "story_reflection" });
+    setSaving(false);
+    if (ok) {
+      setDraft("");
+      setStatusRole("status");
+      setStatusMessage("Saved to Your Story.");
+    } else {
+      setStatusRole("alert");
+      setStatusMessage("This was not saved yet. Please try again.");
+    }
   }
 
   return (
-    <GrowthRoomShell landing>
-      <div className="growth-story-landing growth-story-landing--entrance companion-fade-in">
-        <article className="growth-story-landing__card growth-story-landing__card--entrance companion-workspace-frosted">
-          <GrowthPanelBackButton onBack={onBack} />
+    <GrowthStoryRoomShell>
+      <EstateWorkspace className="journal-room-panel">
+        <GrowthPanelBackButton onBack={onBack} label="Growth" />
 
-          <header className="growth-story-header growth-story-header--landing growth-story-header--intention">
-            <h1 className="growth-story-header__intention">{GROWTH_STORY_ENTRANCE_PROMPT}</h1>
-          </header>
+        <header className="journal-room__header">
+          <p className="estate-workspace__kicker">Your Story Room</p>
+          <h1 className="estate-workspace__title">Your Story</h1>
+          <p className="estate-workspace__lead">
+            A quiet place to gather the moments, lessons, and memories that shape your
+            life.
+          </p>
+        </header>
 
-          <nav
-            className="growth-estate-choices"
-            aria-label={GROWTH_STORY_ENTRANCE_PROMPT}
-          >
-            {GROWTH_ESTATE_CHOICES.map((choice) => (
-              <GrowthStoryChoiceCard
-                key={choice.id}
-                choice={choice}
-                onSelect={() => openChoice(choice.id)}
-              />
-            ))}
-          </nav>
-        </article>
-      </div>
-    </GrowthRoomShell>
+        <div className="journal-room__intro">
+          <p className="journal-room__intro-lead">Your story lives here.</p>
+          <p className="journal-room__intro-support">
+            Capture meaningful moments, reflections, lessons, milestones, and pieces of
+            your journey so they are not forgotten.
+          </p>
+        </div>
+
+        <GrowthWritingCompose
+          id="your-story-quick-note"
+          label="Save a quick note to Your Story"
+          value={draft}
+          onChange={setDraft}
+          placeholder="A thought, reflection, or memory worth keeping…"
+          rows={4}
+          saveLabel="Save to Your Story"
+          onSave={saveQuickNote}
+          saveDisabled={!draft.trim() || saving}
+          statusMessage={statusMessage}
+          statusRole={statusRole}
+        />
+
+        <nav className="journal-room__options" aria-label="Your Story destinations">
+          {options.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              className="journal-room__option"
+              onClick={option.onSelect}
+              data-testid={`your-story-option-${option.id}`}
+            >
+              <span className="journal-room__option-title">{option.title}</span>
+              <span className="journal-room__option-desc">{option.description}</span>
+            </button>
+          ))}
+        </nav>
+      </EstateWorkspace>
+    </GrowthStoryRoomShell>
   );
 }

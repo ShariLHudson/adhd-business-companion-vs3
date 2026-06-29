@@ -85,8 +85,33 @@ If any answer is "unknown" — redesign before shipping.
 | **Garden banner menu item** | `garden-menu-destination` | `lib/peacefulPlaces/gardenBannerMenu.ts` — curated cloth-tag menus per path sign; future Arrival may warm-glow a recommended banner without forcing navigation | Arrival, Companion Presence, Recovery |
 | **Offer** | `offer` | Product / service definitions | Offer, Audience, Opportunity |
 | **Automation rule** | `automation` | GHL / workflow hooks | Automation, Business |
+| **Business Asset** | `business-asset` | [Spec 002](../spark-intelligence-foundation/002-business-asset-architecture.md) — living business objects (workshop, offer, course, SOP, etc.); components attach; not file-centric | Business, LIG, Content, Offer, Learning, Automation, Narrative |
+| **Spark Card** | `spark-card` (planned) | [T-011](../docs/SPARK_CARD_FRAMEWORK.md) — `lib/sparkCards/types.ts`; living wisdom, Brain-personalized; not gamified collectibles | Guidance, Learning, LIG, Gallery, Momentum, Experience |
+| **Momentum Builder** | `momentum-builder` (planned) | [T-012](../docs/MOMENTUM_BUILDER_FRAMEWORK.md) — `lib/sparkMomentumBuilders/types.ts`; practice not games; V1 catalog in `lib/momentumBuilders/` | Capability Graph, Guidance, Momentum, Gallery, Guild, Learning |
 
----
+## Spark OS foundational layers
+
+| Layer | Spec | Role | Implementation (when wired) |
+|-------|------|------|----------------------------|
+| **Business Asset System™** | [002](../spark-intelligence-foundation/002-business-asset-architecture.md) | What members build — living objects | `business-asset` kind + future asset store |
+| **Business Brain™** | [003](../spark-intelligence-foundation/003-business-brain.md) | Long-term business memory — remembers, does not decide | [009-lifecycle](../spark-intelligence-foundation/009-business-brain-lifecycle.md) · `lib/sparkBusinessBrain/` · `memoryEngine/` |
+| **Spark Knowledge Model™** | [004](../spark-intelligence-foundation/004-spark-knowledge-model.md) | Nine knowledge categories, confidence, ownership | `lib/sparkKnowledgeModel/types.ts` |
+| **Guidance Engine™** | [005](../spark-intelligence-foundation/005-guidance-engine.md) | Reasons and recommends; member owns decisions | `lib/sparkGuidanceEngine/types.ts` |
+| **Spark Response Architecture™** | [006](../spark-intelligence-foundation/006-spark-response-architecture.md) | Runtime pipeline — all interactions must flow through | `lib/sparkResponseArchitecture/types.ts` · `lib/sparkTrustPerformance/` |
+| **Context Strategy™ & MVC** | [007](../spark-intelligence-foundation/007-context-strategy.md) | Intelligent context selection; six tiers; budgets | `lib/sparkContextStrategy/types.ts` |
+| **Interaction Contracts™** | [008](../spark-intelligence-foundation/008-interaction-contracts.md) | One owner per responsibility; published contracts only | `lib/sparkInteractionContracts/types.ts` |
+
+**Brain invariant:** retrieve context before re-asking; never generate content, recommendations, or member-facing copy; lifecycle stages govern storage; MVC governs retrieval ([009](../spark-intelligence-foundation/009-business-brain-lifecycle.md)).
+
+**Knowledge invariant:** every record should declare `SparkKnowledgeCategory` + `SparkKnowledgeConfidence`; connect to Business Assets where applicable.
+
+**Guidance invariant:** offers possibilities, never commands; reads Brain/Assets/Knowledge; Companion composes language.
+
+**Response invariant:** no feature bypasses the 10-stage lifecycle; learning never blocks helping (Stage 10 async).
+
+**Context invariant:** MVC only — never load entire Brain/Graph/Gallery; stop when sufficient confidence; Phase 1 blocks, Phases 2–3 async.
+
+**Contract invariant:** systems never mutate peer internal state; only Companion speaks to the member; resolve ownership conflicts before shipping.
 
 ## Intelligence engine registry
 

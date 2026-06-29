@@ -1,0 +1,32 @@
+---
+description: Experience Patterns (T-005) — twelve reusable patterns; name primary pattern before building
+alwaysApply: true
+---
+
+# Experience Patterns™ (T-005)
+
+**Full document:** `docs/EXPERIENCE_PATTERNS.md`
+
+Spark creates **experiences from patterns**, not isolated features. Emotional rhythm should feel familiar across Create™, Gallery™, Estate™, Guilds™, etc.
+
+## Twelve patterns
+
+Discovery · Clarity · Creation · Decision · Practice · Reflection · Celebration · Recovery · Guidance · Connection · Legacy · Curiosity
+
+## Before any new member-facing experience ships
+
+1. **Name the primary pattern** (and secondary only if necessary — prefer simple).
+2. **Pattern flow** — Arrival → Orientation → Participation → Insight → Application → Reflection → Connection → Growth (subset ok; must feel complete).
+3. **Connection** — link to Business Asset, Gallery, Spark Card, Companion, or Guidance; nothing meaningful ends alone.
+4. **EF standards** — reduce memory/planning/decision load; increase clarity/confidence/capability.
+5. **T-003 + T-004 + T-005 + T-006 + Relationship Constitution** — premium estate feel; trust earned not assumed.
+
+## Spec template (required in design docs)
+
+Primary pattern · Capability strengthened · Business Asset connection · EF support · optional Gallery/Spark Card links.
+
+If the experience cannot be described with these patterns, redesign before implementation.
+
+## Implementation prompt
+
+Identify `SparkExperiencePatternId` in the spec header. Build for familiar emotional rhythm, not a new interaction language per feature.

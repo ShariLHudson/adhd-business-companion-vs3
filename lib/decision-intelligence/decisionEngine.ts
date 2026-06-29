@@ -1,5 +1,6 @@
 /**
  * Decision Intelligence — reduce decision fatigue without deciding for the user.
+ * Experience rules: docs/DECISION_EXPERIENCE_FRAMEWORK.md (T-008)
  */
 
 import { getDayState } from "@/lib/companionStore";

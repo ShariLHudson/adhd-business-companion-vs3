@@ -1,5 +1,11 @@
 import type { AppSection } from "@/lib/companionUi";
 
+/**
+ * V1 Momentum Builders catalog — EF-focused resets (energy, refocus, calm).
+ * Entrepreneurial practice Builders follow T-012: docs/MOMENTUM_BUILDER_FRAMEWORK.md
+ * Framework types: lib/sparkMomentumBuilders/types.ts
+ */
+
 export const MOMENTUM_BUILDER_CATEGORY_IDS = [
   "reset-energy",
   "wake-brain",

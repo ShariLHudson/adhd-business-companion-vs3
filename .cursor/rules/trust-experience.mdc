@@ -1,0 +1,47 @@
+---
+description: Trust Experience (T-006) — earn trust through honesty, transparency, dignity; six-point approval gate
+alwaysApply: true
+---
+
+# Trust Experience™ (T-006)
+
+**Full document:** `docs/TRUST_EXPERIENCE.md`
+
+Trust is an **experience**, not a policy. Spark earns trust one interaction at a time — never assumes it.
+
+## Trust Pyramid (earn in order)
+
+1. **Reliability** — fast, consistent
+2. **Accuracy** — correct, admits uncertainty
+3. **Understanding** — remembers business context
+4. **Partnership** — feels like a partner, not software
+5. **Transformation** — sought before important decisions
+
+## Trust behaviors (every interaction)
+
+**Honesty** — say when uncertain; never fabricate confidence.
+
+**Transparency** — explain why recommendations fit *this* business.
+
+**Humility** — possibilities, not "the best answer."
+
+**Respect** — no shame, guilt, pressure, or failure framing.
+
+## Before any member-facing feature ships (all must be yes)
+
+1. Increases trust?
+2. Explains reasoning when appropriate?
+3. Preserves dignity?
+4. Reduces cognitive effort?
+5. Strengthens long-term relationship?
+6. More likely to trust Spark tomorrow?
+
+Also apply: Relationship Constitution · T-003 · T-005.
+
+## Memory trust
+
+Reference past context gently ("Last month you mentioned…") — glad it remembered, not surprised or surveilled.
+
+## Engineering note
+
+T-006 is **how trust feels**. `sparkTrustPerformance/` is runtime quality gates — both required.

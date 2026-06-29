@@ -1,0 +1,41 @@
+---
+description: Founder Journey Framework (T-010) — eight stages; adapt quietly; journey loops
+globs:
+  - lib/ecosystem/journey/**
+  - lib/sparkFounderJourney/**
+  - components/companion/**/*Journey*
+alwaysApply: false
+---
+
+# Founder Journey Framework™ (T-010)
+
+**Full document:** `docs/FOUNDER_JOURNEY_FRAMEWORK.md`
+
+Meet members **where they are** — Dream → Clarify → Design → Build → Launch → Grow → Multiply → Legacy. Not linear; pivots are normal.
+
+## Journey Principle
+
+Understand **where today** and **what could help next**. Guide — never push. Never require manual stage selection.
+
+## Quiet adaptation (never announce stage)
+
+| Stage | Emphasis |
+|-------|----------|
+| Dream | Exploration, confidence, reduce fear |
+| Build | Execution, momentum, gentle accountability |
+| Grow | Strategy, optimization |
+| Legacy | Reflection, impact, mentorship |
+
+## Every experience spec should identify
+
+Journey stage(s) · capabilities emphasized · Business Assets · guidance adaptation · optional Gallery/Estate/Community links.
+
+## Success feeling
+
+"Spark understands where I am" · "Grows with me" — not rushed, not judged.
+
+Also: T-005 Patterns · T-009 Relationship · T-007 pivots · [005 Guidance](../spark-intelligence-foundation/005-guidance-engine.md).
+
+## Technical note
+
+Member stages (Dream–Legacy) are experience vocabulary. `lib/ecosystem/journey/` uses operator stages (idea–scaling) — map quietly; do not expose rigid labels in member UI.

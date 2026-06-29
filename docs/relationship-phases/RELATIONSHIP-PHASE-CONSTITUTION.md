@@ -12,6 +12,7 @@
 | 3 | `docs/COMPANION_TRUST_ARCHITECTURE.md` | Emotional trust earned over time |
 | 4 | `docs/COMPANION_DECISION_INTELLIGENCE.md` | Judgment — Decision Ladder, what Shari does next |
 | 5 | **This document** | Relationship phase architecture, progression, activation |
+| 5b | `docs/COMPANION_RELATIONSHIP_FRAMEWORK.md` (T-009) | Experience goals for relationship stages — phases must serve these |
 | 6 | `docs/relationship-phases/Relationship-Phase-Roadmap.md` | Phase summaries and registry |
 | 7 | `docs/relationship-phases/Phase-*.md` | Per-phase specifications |
 | 8 | `lib/companionRelationshipPhases.ts` | Machine registry (must conform to 5–7) |

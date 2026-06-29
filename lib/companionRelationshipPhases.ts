@@ -1,6 +1,7 @@
 /**
  * ADHD Business Ecosystem™ — Relationship phase registry.
  * Phases 1–11 — highest qualifying phase wins (11 → 10 → 9 → 8 → 7 → … → 1).
+ * Experience goals: docs/COMPANION_RELATIONSHIP_FRAMEWORK.md (T-009)
  */
 
 import { isPhase8AutonomousPreparationActive } from "./autonomousPreparation";

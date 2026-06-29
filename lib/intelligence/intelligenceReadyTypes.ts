@@ -34,7 +34,8 @@ export type EcosystemObjectKind =
   | "day-state"
   | "capture-session"
   | "founder-event"
-  | "intelligence-signal";
+  | "intelligence-signal"
+  | "business-asset";
 
 /** Engines that may enrich objects over time — registry keys. */
 export type IntelligenceEngineId =

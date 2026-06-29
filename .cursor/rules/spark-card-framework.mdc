@@ -1,0 +1,50 @@
+---
+description: Spark Card Framework (T-011) — living wisdom; five questions; personalization; application
+globs:
+  - lib/sparkCards/**
+  - components/**/*Card*
+  - components/**/*spark*card*
+alwaysApply: false
+---
+
+# Spark Card™ Framework (T-011)
+
+**Full document:** `docs/SPARK_CARD_FRAMEWORK.md`
+
+Spark Cards™ are **not collectible rewards**. They are living entrepreneurial wisdom. Success = member can **apply today**.
+
+## Five questions (every card)
+
+1. What is it?
+2. Why does it matter?
+3. How does it apply generally?
+4. How does it apply to **THIS** business? (Brain personalizes)
+5. What should I do next? (**never** end without implementation)
+
+## Required spec fields
+
+Capability domain · journey stage alignment · Business Asset / Momentum / Guild / Gallery links when relevant · Companion introduction strategy · personalization opportunities · practical implementation.
+
+**Type:** `SparkCardSpec` in `lib/sparkCards/types.ts`
+
+## Companion introduction
+
+Never "Here's another card." Use conversational bridges — Shari test.
+
+## Integration chain
+
+```
+Momentum Builder™ → Spark Card™ → Business Asset™ → Gallery™ → Guidance™
+```
+
+Surface cards in **asset-building context** when useful — not as gamification.
+
+## EF + design
+
+Skimmable · progressive disclosure · practical actions first · premium timeless aesthetic (no cartoon/game UI).
+
+## Living knowledge
+
+Cards evolve as member, business, Brain, and Guidance evolve. Same template, richer personalization over time.
+
+Also: T-012 Momentum Builders · T-010 journey adaptation · T-005 Pattern 10 Connection · T-009 Relationship · [004 Knowledge Model](../spark-intelligence-foundation/004-spark-knowledge-model.md).

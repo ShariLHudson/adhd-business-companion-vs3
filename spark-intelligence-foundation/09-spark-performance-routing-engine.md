@@ -6,7 +6,7 @@
 |-------|-------|
 | **Priority** | Ingress — classifies every request before full pipeline activation |
 | **Governed by** | [Spark Constitution™](./00-spark-constitution.md) |
-| **Coordinates with** | [Intent Router](./03-intent-router.md) · [Intelligence Engine](./05-intelligence-engine.md) |
+| **Coordinates with** | [Intent Router](./03-intent-router.md) · [Intelligence Engine](./05-intelligence-engine.md) · [006 – Spark Response Architecture](./006-spark-response-architecture.md) Stages 1–2 |
 | **Status** | Draft v1.0 |
 
 ---

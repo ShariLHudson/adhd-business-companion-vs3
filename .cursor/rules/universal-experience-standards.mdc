@@ -1,0 +1,29 @@
+---
+description: Universal Experience Standards (T-003) — premium estate UX, ADHD-friendly, low cognitive load
+alwaysApply: true
+---
+
+# Universal Experience Standards™ (T-003)
+
+**Full document:** `docs/UNIVERSAL_EXPERIENCE_STANDARDS.md`
+
+Member-facing Spark must feel calm, premium, intentional, connected, and emotionally safe — never cartoonish, arcade-like, dashboard-heavy, or generic AI app.
+
+## Before any member-facing UI or copy ships
+
+1. **One primary action** per screen — secondaries must not compete.
+2. **Max 3 choices** visible — hide more behind “More options” / “Show me more”.
+3. **Progressive disclosure** — do not show everything at once.
+4. **Connection** — link to at least one: Business Asset, Spark Card, Gallery, Momentum, Guild, Companion, Estate, or Guidance.
+5. **EF-friendly** — reduce remember / organize / sort / prioritize / restart / repeat-context burden.
+6. **Visual** — elegant, warm, spacious, estate-like; subtle motion only; no childish rewards or streak language.
+7. **Celebrate growth** — clarity, courage, decisions, returns; not activity metrics.
+8. **Relationship Constitution** — Shari test, no software voice, no guilt or pressure.
+
+## Release gate
+
+Run the nine-point checklist in `docs/UNIVERSAL_EXPERIENCE_STANDARDS.md`. If it would not feel appropriate five years from now, it is not finished.
+
+## Implementation prompt (use in design tasks)
+
+Build this as part of Spark’s premium entrepreneurial estate experience. Avoid cartoon, arcade, dashboard, or generic AI app styling. Use calm spacing, refined language, low cognitive load, and clear connection to member growth.

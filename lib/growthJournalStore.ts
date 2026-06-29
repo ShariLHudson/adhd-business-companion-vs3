@@ -12,7 +12,10 @@ export type GrowthEntryType =
   | "reflection"
   | "lesson"
   | "idea"
-  | "memory";
+  | "memory"
+  | "story_reflection"
+  | "milestone"
+  | "storybook_note";
 
 export type JournalEntry = {
   id: string;
@@ -41,6 +44,9 @@ export const GROWTH_ENTRY_TYPE_LABELS: Record<GrowthEntryType, string> = {
   lesson: "Lesson",
   idea: "Idea",
   memory: "Memory",
+  story_reflection: "Story Reflection",
+  milestone: "Milestone",
+  storybook_note: "Storybook Note",
 };
 
 function newId(prefix = "jr"): string {
@@ -169,6 +175,37 @@ export function createCaptureMomentEntry(input: {
     updatedAt: now,
     userId: input.userId,
     sourcePage: "capture_the_moment",
+    tags: [],
+    isArchived: false,
+    originatedFromKind: "journal-entry",
+  };
+
+  const ok = writeAll([entry, ...readAll()]);
+  return { entry: ok ? entry : undefined, ok };
+}
+
+export function createYourStoryEntry(input: {
+  content: string;
+  type?: Extract<
+    GrowthEntryType,
+    "story_reflection" | "milestone" | "storybook_note" | "reflection" | "lesson"
+  >;
+  userId?: string;
+}): { entry?: JournalEntry; ok: boolean } {
+  const content = input.content.trim();
+  if (!content) return { ok: false };
+
+  const now = new Date().toISOString();
+  const entry: JournalEntry = {
+    id: newId("ys"),
+    type: input.type ?? "story_reflection",
+    title: generateEntryTitle(content),
+    body: content,
+    attachments: [],
+    createdAt: now,
+    updatedAt: now,
+    userId: input.userId,
+    sourcePage: "your_story",
     tags: [],
     isArchived: false,
     originatedFromKind: "journal-entry",

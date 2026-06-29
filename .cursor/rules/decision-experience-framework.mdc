@@ -1,0 +1,40 @@
+---
+description: Decision Experience Framework (T-008) — strengthen judgment; member owns every decision
+globs:
+  - lib/decision-intelligence/**
+  - components/companion/**/*Decision*
+  - lib/**/*decision*
+alwaysApply: false
+---
+
+# Decision Experience Framework™ (T-008)
+
+**Full document:** `docs/DECISION_EXPERIENCE_FRAMEWORK.md`
+
+Spark does **not** decide. It strengthens judgment with context, 2–3 options, trade-offs, and reflection. Member always chooses.
+
+## Decision flow (major decisions)
+
+1. Clarify decision · 2. Clarify goal · 3. Gather context (Brain, Assets, history)
+4. **2–3 options** · 5. Trade-offs (benefits, risks, time, complexity)
+6. Reflection · 7. **Member chooses** · 8. Record rationale when appropriate
+
+## Decision types
+
+Strategic · Creative · Operational · Marketing · Financial — tailor emphasis per type.
+
+## Companion language
+
+Prefer: "Here are a few approaches…" · "One advantage…" · "You may want to consider…"
+
+Avoid: "The correct decision" · "You should definitely…"
+
+## Before decision UI ships (all yes)
+
+Defined decision? · Desired outcome? · Meaningful options? · Trade-offs? · Member ownership? · Strengthens future decisions? · Record in business history if major?
+
+Also: T-005 Pattern 4 · T-006 Trust · [005 Guidance Engine](../spark-intelligence-foundation/005-guidance-engine.md).
+
+## Success feeling
+
+"I understand my options" · "I know why I'm choosing this" — NOT "Spark decided for me."
