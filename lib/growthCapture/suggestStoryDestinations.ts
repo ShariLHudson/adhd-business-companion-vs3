@@ -1,9 +1,8 @@
-import type { GrowthSectionId } from "@/lib/growthNavigation";
-
-export type GrowthStoryDestinationId = Exclude<
-  GrowthSectionId,
-  "growth" | "confidence-vault" | "my-journey"
->;
+export type GrowthStoryDestinationId =
+  | "wins-this-week"
+  | "evidence-bank"
+  | "growth-journal"
+  | "growth-portfolio";
 
 export type GrowthStoryRecommendation = {
   id: GrowthStoryDestinationId;

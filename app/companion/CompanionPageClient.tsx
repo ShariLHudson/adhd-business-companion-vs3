@@ -5866,8 +5866,7 @@ export default function CompanionPageClient() {
     }
 
     const isWelcomeRoom = section === "welcome-room";
-    const isEvidenceBank = section === "evidence-bank";
-    const workspaceFocusPanel = isWelcomeRoom || isEvidenceBank;
+    const workspaceFocusPanel = isWelcomeRoom;
 
     if (workspacePanel === section) {
       if (section === "visual-focus" && !peekVisualFocusPendingOpen()) {
@@ -13616,31 +13615,6 @@ export default function CompanionPageClient() {
                 userInitiated: true,
               });
             }}
-            onSaveEvidence={(text, sourceId) => {
-              setEvidencePrefill({ whatHappened: text, sourceWinId: sourceId });
-              openSectionBesideChatCore("evidence-bank", "evidence-bank", {
-                userInitiated: true,
-              });
-            }}
-            onSaveProof={(text) => {
-              setConfidencePrefill({
-                title: text.slice(0, 80),
-                description: text,
-                category: "Praise & Compliments",
-              });
-              openSectionBesideChatCore("confidence-vault", "confidence-vault", {
-                userInitiated: true,
-              });
-            }}
-            onSaveJourney={(text) => {
-              setJourneyPrefill({
-                title: text.slice(0, 80),
-                whatHappened: text,
-              });
-              openSectionBesideChatCore("my-journey", "growth", {
-                userInitiated: true,
-              });
-            }}
           />
         );
       case "evidence-bank":
@@ -15510,24 +15484,9 @@ export default function CompanionPageClient() {
             <WinsThisWeekPanel
               refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
               nav={buildGrowthPanelNav("wins-this-week")}
-              onSaveEvidence={(text) => {
-                setEvidencePrefill({ whatHappened: text });
+              onSaveToEvidenceBank={(whatHappened, sourceWinId) => {
+                setEvidencePrefill({ whatHappened, sourceWinId });
                 openGrowthDestinationCore("evidence-bank");
-              }}
-              onSaveHighlights={(text) => {
-                setConfidencePrefill({
-                  title: text.slice(0, 80),
-                  description: text,
-                  category: "Accomplishments",
-                });
-                openGrowthDestinationCore("confidence-vault");
-              }}
-              onSaveJourney={(text) => {
-                setJourneyPrefill({
-                  title: text.slice(0, 80),
-                  whatHappened: text,
-                });
-                openGrowthDestinationCore("my-journey");
               }}
             />
           )}

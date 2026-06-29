@@ -30,9 +30,6 @@ export function WinsThisWeekPanel({
   refreshKey?: string | number;
   nav: GrowthPanelNav;
   onSaveToEvidenceBank?: (whatHappened: string, sourceWinId: string) => void;
-  onSaveEvidence?: (text: string, sourceId: string) => void;
-  onSaveProof?: (text: string) => void;
-  onSaveJourney?: (text: string) => void;
 }) {
   const [tick, setTick] = useState(0);
   const archivePeriod: GrowthArchivePeriod = "week";

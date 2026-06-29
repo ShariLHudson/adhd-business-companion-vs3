@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm";
+import { CompanionLoginBackground } from "@/components/companion/CompanionLoginBackground";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { hasSignedInOnThisDeviceBefore } from "@/lib/companionAuthIntelligence";
 import {
@@ -70,11 +71,13 @@ export function CompanionSignInExperience() {
 
   return (
     <main
-      className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] px-4 py-8 sm:px-6 sm:py-10"
+      className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-8 sm:px-6 sm:py-10"
       data-testid="companion-login-page"
     >
-      <div className="w-full max-w-[22rem] sm:max-w-md">
-        <div className="rounded-2xl border border-[#e7dfd4] bg-[#faf7f2] px-5 py-6 shadow-sm sm:rounded-3xl sm:px-7 sm:py-7">
+      <CompanionLoginBackground />
+
+      <div className="relative z-10 w-full max-w-[22rem] sm:max-w-md">
+        <div className="rounded-2xl border border-white/45 bg-[#faf7f2]/72 px-5 py-6 shadow-sm backdrop-blur-md sm:rounded-3xl sm:px-7 sm:py-7">
           <div className="mb-5 flex flex-col items-center gap-3 text-center">
             <div className="flex flex-col items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
