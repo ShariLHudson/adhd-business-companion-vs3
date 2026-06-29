@@ -52,6 +52,14 @@
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.25);
 }
 
+.growth-capture__card--with-mic {
+  position: relative;
+}
+
+.growth-capture__card--with-mic .growth-capture__textarea {
+  padding-right: 2.75rem;
+}
+
 .growth-capture__textarea {
   width: 100%;
   min-height: 8rem;

@@ -1,17 +1,31 @@
 /**
- * Growth Journal — private reflection. One primary home per entry.
+ * Growth memory / journal storage — journal, capture moments, and related types.
  */
 
 import type { EcosystemObjectKind } from "./intelligence/intelligenceReadyTypes";
 import type { GrowthAttachment } from "./growthAttachments";
 import { linkGrowthAttachmentsToRecord } from "@/lib/assetLibrary/references";
 
+export type GrowthEntryType =
+  | "journal"
+  | "capture_moment"
+  | "reflection"
+  | "lesson"
+  | "idea"
+  | "memory";
+
 export type JournalEntry = {
   id: string;
+  type: GrowthEntryType;
+  title?: string;
   body: string;
   attachments: GrowthAttachment[];
   createdAt: string;
   updatedAt: string;
+  userId?: string;
+  sourcePage?: string;
+  tags: string[];
+  isArchived: boolean;
   originatedFromId?: string;
   originatedFromKind?: EcosystemObjectKind;
 };
@@ -20,8 +34,38 @@ const STORAGE_KEY = "companion-growth-journal-v1";
 
 export const GROWTH_JOURNAL_UPDATED_EVENT = "companion-growth-journal-updated";
 
-function newId(): string {
-  return `jr-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+export const GROWTH_ENTRY_TYPE_LABELS: Record<GrowthEntryType, string> = {
+  journal: "Journal",
+  capture_moment: "Capture Moment",
+  reflection: "Reflection",
+  lesson: "Lesson",
+  idea: "Idea",
+  memory: "Memory",
+};
+
+function newId(prefix = "jr"): string {
+  return `${prefix}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+}
+
+function normalizeEntry(raw: unknown): JournalEntry | null {
+  if (!raw || typeof raw !== "object") return null;
+  const e = raw as Partial<JournalEntry>;
+  if (typeof e.id !== "string" || typeof e.body !== "string") return null;
+  return {
+    id: e.id,
+    type: e.type ?? "journal",
+    title: e.title,
+    body: e.body,
+    attachments: Array.isArray(e.attachments) ? e.attachments : [],
+    createdAt: e.createdAt ?? new Date().toISOString(),
+    updatedAt: e.updatedAt ?? e.createdAt ?? new Date().toISOString(),
+    userId: e.userId,
+    sourcePage: e.sourcePage,
+    tags: Array.isArray(e.tags) ? e.tags : [],
+    isArchived: e.isArchived ?? false,
+    originatedFromId: e.originatedFromId,
+    originatedFromKind: e.originatedFromKind,
+  };
 }
 
 function readAll(): JournalEntry[] {
@@ -31,23 +75,31 @@ function readAll(): JournalEntry[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(
-      (e): e is JournalEntry =>
-        e && typeof e.id === "string" && typeof e.body === "string",
-    );
+    return parsed
+      .map(normalizeEntry)
+      .filter((e): e is JournalEntry => e != null && !e.isArchived);
   } catch {
     return [];
   }
 }
 
-function writeAll(list: JournalEntry[]): void {
-  if (typeof window === "undefined") return;
+function writeAll(list: JournalEntry[]): boolean {
+  if (typeof window === "undefined") return false;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
     window.dispatchEvent(new Event(GROWTH_JOURNAL_UPDATED_EVENT));
+    return true;
   } catch {
-    /* quota */
+    return false;
   }
+}
+
+export function generateEntryTitle(content: string): string {
+  const firstLine = content.split(/\n/)[0]?.trim() ?? "";
+  const words = firstLine.split(/\s+/).filter(Boolean);
+  if (words.length === 0) return "Untitled moment";
+  if (words.length <= 8) return firstLine.slice(0, 80);
+  return `${words.slice(0, 8).join(" ")}…`;
 }
 
 export function getJournalEntries(): JournalEntry[] {
@@ -56,22 +108,74 @@ export function getJournalEntries(): JournalEntry[] {
   );
 }
 
-export type JournalEntryInput = Omit<JournalEntry, "id" | "createdAt" | "updatedAt">;
+export function getGrowthMemoryEntries(
+  filter?: { types?: GrowthEntryType[] },
+): JournalEntry[] {
+  const all = getJournalEntries();
+  if (!filter?.types?.length) return all;
+  return all.filter((e) => filter.types!.includes(e.type));
+}
 
-export function createJournalEntry(input: JournalEntryInput): JournalEntry {
+export type JournalEntryInput = Omit<
+  JournalEntry,
+  "id" | "createdAt" | "updatedAt" | "type" | "tags" | "isArchived"
+> & {
+  type?: GrowthEntryType;
+  tags?: string[];
+  isArchived?: boolean;
+};
+
+export function createJournalEntry(
+  input: JournalEntryInput,
+): { entry: JournalEntry; ok: boolean } {
   const now = new Date().toISOString();
   const entry: JournalEntry = {
     id: newId(),
+    type: input.type ?? "journal",
+    title: input.title,
     body: input.body.trim(),
     attachments: input.attachments ?? [],
     createdAt: now,
     updatedAt: now,
+    userId: input.userId,
+    sourcePage: input.sourcePage ?? "growth_journal",
+    tags: input.tags ?? [],
+    isArchived: input.isArchived ?? false,
     originatedFromId: input.originatedFromId,
     originatedFromKind: input.originatedFromKind,
   };
-  writeAll([entry, ...readAll()]);
-  linkGrowthAttachmentsToRecord(entry.attachments, "journal", entry.id);
-  return entry;
+  const ok = writeAll([entry, ...readAll()]);
+  if (ok && entry.attachments.length > 0) {
+    linkGrowthAttachmentsToRecord(entry.attachments, "journal", entry.id);
+  }
+  return { entry, ok };
+}
+
+export function createCaptureMomentEntry(input: {
+  content: string;
+  userId?: string;
+}): { entry?: JournalEntry; ok: boolean } {
+  const content = input.content.trim();
+  if (!content) return { ok: false };
+
+  const now = new Date().toISOString();
+  const entry: JournalEntry = {
+    id: newId("cm"),
+    type: "capture_moment",
+    title: generateEntryTitle(content),
+    body: content,
+    attachments: [],
+    createdAt: now,
+    updatedAt: now,
+    userId: input.userId,
+    sourcePage: "capture_the_moment",
+    tags: [],
+    isArchived: false,
+    originatedFromKind: "journal-entry",
+  };
+
+  const ok = writeAll([entry, ...readAll()]);
+  return { entry: ok ? entry : undefined, ok };
 }
 
 export function deleteJournalEntry(id: string): void {

@@ -13,6 +13,7 @@ import {
 } from "@/lib/growthCapture";
 import { summarizeGrowthDerived } from "@/lib/growthDerived";
 import { GrowthDestinationPlaques } from "@/components/companion/GrowthDestinationPlaques";
+import { GrowthMicButton } from "@/components/companion/GrowthMicButton";
 import "@/app/companion/growth-capture.css";
 
 type Props = {
@@ -134,7 +135,12 @@ export function GrowthUniversalCapture({
         </p>
 
         {!saved ? (
-          <div className="growth-capture__card">
+          <div className="growth-capture__card growth-capture__card--with-mic">
+            <GrowthMicButton
+              value={body}
+              onChange={setBody}
+              className="journal-room__mic"
+            />
             <textarea
               className="growth-capture__textarea"
               placeholder="A win, a reflection, something you made, proof it worked…"

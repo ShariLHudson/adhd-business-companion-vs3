@@ -15439,20 +15439,10 @@ export default function CompanionPageClient() {
 
           {activeSection === "growth-capture" && (
             <GrowthStoryCapturePanel
-              onBack={goBack}
-              backLabel={workspacePanelBackLabel}
-              onOpenSection={(section) => {
-                if (section === "growth") {
-                  openGrowthLandingCore();
-                  return;
-                }
-                if (section === "growth-library") {
-                  openGrowthLibraryCore();
-                  return;
-                }
-                openGrowthDestinationCore(section);
+              nav={{
+                onBack: goBack,
+                backLabel: workspacePanelBackLabel,
               }}
-              onOpenAssetLibrary={() => openGrowthDestinationCore("the-gallery")}
             />
           )}
 

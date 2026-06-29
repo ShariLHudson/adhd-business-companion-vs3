@@ -9,6 +9,7 @@ import { GrowthPanelBackButton } from "@/components/companion/GrowthPanelBackBut
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { EvidenceVaultRoomShell } from "@/components/companion/EvidenceVaultRoomShell";
 import { GrowthAttachmentsField } from "@/components/companion/GrowthAttachmentsField";
+import { GrowthTextareaWithMic } from "@/components/companion/GrowthTextareaWithMic";
 import {
   consumeEvidencePrefill,
   createEvidenceEntry,
@@ -183,14 +184,13 @@ function EvidenceDeepDrawer({
             <label className="evidence-vault__field-label" htmlFor="deep-what">
               What happened?
             </label>
-            <textarea
+            <GrowthTextareaWithMic
               id="deep-what"
               rows={3}
-              className="evidence-vault__field-input"
               value={draft.whatHappened}
-              onChange={(e) =>
-                onChange({ ...draft, whatHappened: e.target.value })
-              }
+              onChange={(v) => onChange({ ...draft, whatHappened: v })}
+              inputClassName="evidence-vault__field-input"
+              wrapperClassName="!mt-0"
             />
           </div>
 
@@ -217,14 +217,13 @@ function EvidenceDeepDrawer({
               <label className="evidence-vault__field-label" htmlFor={key}>
                 {label}
               </label>
-              <textarea
+              <GrowthTextareaWithMic
                 id={key}
                 rows={2}
-                className="evidence-vault__field-input"
                 value={draft[key]}
-                onChange={(e) =>
-                  onChange({ ...draft, [key]: e.target.value })
-                }
+                onChange={(v) => onChange({ ...draft, [key]: v })}
+                inputClassName="evidence-vault__field-input"
+                wrapperClassName="!mt-0"
               />
             </div>
           ))}
@@ -531,12 +530,12 @@ export function EvidenceBankPanel({
         </header>
 
         <div className="evidence-vault__capture">
-          <textarea
-            className="evidence-vault__textarea"
-            placeholder="What happened that you want to remember?"
+          <GrowthTextareaWithMic
             value={quickText}
-            onChange={(e) => setQuickText(e.target.value)}
-            aria-label="What happened?"
+            onChange={setQuickText}
+            placeholder="What happened that you want to remember?"
+            inputClassName="evidence-vault__textarea"
+            wrapperClassName="!mt-0 w-full"
           />
           <div className="evidence-vault__chips" role="group" aria-label="Category">
             {EVIDENCE_CATEGORIES.map((cat) => (

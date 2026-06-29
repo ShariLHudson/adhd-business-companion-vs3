@@ -11,8 +11,7 @@ import { createSavedGrowthWin } from "@/lib/growthWinsStore";
 import type { GrowthAttachment } from "@/lib/growthAttachments";
 import { GrowthAttachmentsField } from "@/components/companion/GrowthAttachmentsField";
 
-const INPUT_CLASS =
-  "mt-1 w-full rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5 text-sm text-[#2d2926] focus:border-[#c9a66b] focus:outline-none focus:ring-2 focus:ring-[#c9a66b]/25";
+import { GrowthTextareaWithMic } from "@/components/companion/GrowthTextareaWithMic";
 
 const ACTION_BTN =
   "rounded-full border border-[#e7d9c8] bg-[#faf7f2] px-2.5 py-1 text-[11px] font-semibold text-[#2f261f] hover:bg-[#f3ebe0]";
@@ -94,11 +93,11 @@ export function GrowthInbox({
               <div className="mt-2 flex items-start gap-2 text-sm text-[#2f261f]">
                 <span aria-hidden="true">{item.icon}</span>
                 {editing ? (
-                  <textarea
+                  <GrowthTextareaWithMic
                     rows={2}
                     value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                    className={INPUT_CLASS}
+                    onChange={setEditText}
+                    className="flex-1"
                   />
                 ) : (
                   <span>{item.whatHappened}</span>

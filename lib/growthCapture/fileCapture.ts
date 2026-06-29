@@ -49,11 +49,14 @@ export function fileCaptureToDestination(
   }
 
   if (destination === "journal") {
-    const entry = createJournalEntry({
+    const { entry, ok } = createJournalEntry({
       body: capture.body.trim() || "(See attachments)",
       attachments: [...capture.attachments],
       ...lineage,
     });
+    if (!ok || !entry) {
+      return { ok: false, destination, error: "Could not save to journal." };
+    }
     markCaptureFiled(captureId, "journal", entry.id);
     return { ok: true, recordId: entry.id, destination };
   }

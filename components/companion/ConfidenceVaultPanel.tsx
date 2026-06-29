@@ -22,6 +22,7 @@ import {
   GrowthAttachmentsField,
   GrowthAttachmentsList,
 } from "@/components/companion/GrowthAttachmentsField";
+import { GrowthTextareaWithMic } from "@/components/companion/GrowthTextareaWithMic";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import {
   GrowthArchiveBar,
@@ -282,12 +283,12 @@ export function ConfidenceVaultPanel({
         <p className="mt-1 text-xs text-[#6f6259]">
           Paste a compliment, testimonial, praise, or positive email — no long form.
         </p>
-        <textarea
+        <GrowthTextareaWithMic
           rows={3}
           value={quickText}
-          onChange={(e) => setQuickText(e.target.value)}
+          onChange={setQuickText}
           placeholder="Paste praise here…"
-          className={`${INPUT_CLASS} mt-2`}
+          wrapperClassName="!mt-2"
         />
         <button
           type="button"
@@ -370,12 +371,13 @@ export function ConfidenceVaultPanel({
             </div>
             <div>
               <label className={LABEL_CLASS} htmlFor="cv-desc">Description</label>
-              <textarea
+              <GrowthTextareaWithMic
                 id="cv-desc"
                 rows={4}
                 value={draft.description}
-                onChange={(e) => updateDraft("description", e.target.value)}
-                className={INPUT_CLASS}
+                onChange={(v) => updateDraft("description", v)}
+                inputClassName={INPUT_CLASS}
+                wrapperClassName="!mt-1"
               />
             </div>
             <div>

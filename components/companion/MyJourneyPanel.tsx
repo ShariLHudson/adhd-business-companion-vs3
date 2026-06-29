@@ -19,6 +19,7 @@ import {
   type JourneyFilter,
 } from "@/lib/myJourneyStore";
 import { GrowthAttachmentsField, GrowthAttachmentsList } from "@/components/companion/GrowthAttachmentsField";
+import { GrowthTextareaWithMic } from "@/components/companion/GrowthTextareaWithMic";
 import { WorkspaceAreaWorksGuide } from "@/components/companion/WorkspaceAreaWorksGuide";
 import { GrowthSectionHeader } from "@/components/companion/GrowthSectionHeader";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
@@ -310,7 +311,13 @@ export function MyJourneyPanel({
           ).map(([key, label]) => (
             <div key={key}>
               <label className={LABEL_CLASS}>{label}</label>
-              <textarea rows={2} value={draft[key]} onChange={(e) => updateDraft(key, e.target.value)} className={INPUT_CLASS} />
+              <GrowthTextareaWithMic
+                rows={2}
+                value={draft[key]}
+                onChange={(v) => updateDraft(key, v)}
+                inputClassName={INPUT_CLASS}
+                wrapperClassName="!mt-1"
+              />
             </div>
           ))}
           <GrowthAttachmentsField

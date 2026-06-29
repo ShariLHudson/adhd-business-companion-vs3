@@ -10,8 +10,7 @@ import {
 } from "@/lib/growthReflection";
 import { weekKeyForDate } from "@/lib/weeklyWins";
 
-const INPUT_CLASS =
-  "mt-2 w-full rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5 text-sm text-[#2d2926] placeholder:text-[#9a8f82] focus:border-[#c9a66b] focus:outline-none focus:ring-2 focus:ring-[#c9a66b]/25";
+import { GrowthTextareaWithMic } from "@/components/companion/GrowthTextareaWithMic";
 
 export function GrowthReflectionCard({ refreshKey = 0 }: { refreshKey?: string | number }) {
   const [answer, setAnswer] = useState("");
@@ -41,12 +40,11 @@ export function GrowthReflectionCard({ refreshKey = 0 }: { refreshKey?: string |
       <h3 className="text-sm font-bold text-[#2f261f]">Reflection</h3>
       <p className="mt-1 text-xs text-[#6f6259]">One small question this week.</p>
       <p className="mt-2 text-sm font-medium text-[#2f261f]">{question}</p>
-      <textarea
+      <GrowthTextareaWithMic
         rows={2}
         value={answer}
-        onChange={(e) => setAnswer(e.target.value)}
+        onChange={setAnswer}
         placeholder="A sentence or two is enough…"
-        className={INPUT_CLASS}
       />
       <div className="mt-2 flex flex-wrap gap-2">
         <button
