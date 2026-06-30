@@ -18,7 +18,7 @@ describe("welcome homestead lighting", () => {
 
     expect(evening.atmosphere.timeOfDay).toBe("evening");
     expect(evening.homesteadTime?.period).toBe("evening");
-    expect(evening.photograph.id).toBe("shari-i-am-here-2");
+    expect(evening.photograph.id).toBe("welcome-home-room-background");
   });
 
   it("resolves morning atmosphere for soft daylight copy", () => {

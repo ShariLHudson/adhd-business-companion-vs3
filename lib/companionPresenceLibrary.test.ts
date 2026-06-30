@@ -14,9 +14,9 @@ describe("companionPresenceLibrary", () => {
     expect(WELCOME_PRESENCE_INVITE).toBe("Come on in — I'm glad you stopped by.");
   });
 
-  it("resolves shari-i-am-here-2 for chat welcome", () => {
+  it("resolves welcome-home-room-background for chat welcome", () => {
     const url = resolveCompanionPresenceLibraryImage("chat-welcome");
-    expect(url).toContain("shari-i-am-here-2");
+    expect(url).toContain("welcome-home-room-background");
     expect(url).toBe(companionPresenceWelcomeImageUrl());
   });
 

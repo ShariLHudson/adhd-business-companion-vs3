@@ -54,6 +54,15 @@ function scene(
  * Approved Companion Presence library — add files here only; no code changes elsewhere.
  */
 export const COMPANION_PRESENCE_SCENE_CATALOG: CompanionPresenceLibraryEntry[] = [
+  {
+    id: "welcome-home-room-background",
+    label: "Welcome Home Room",
+    relativePath: "backgrounds/welcome-home-room-background.jpeg",
+    surfaces: ["chat-welcome"],
+    tags: ["welcome", "gentle", "morning", "afternoon", "evening"],
+    timeOfDay: ["morning", "afternoon", "evening", "night"],
+    welcomeHero: true,
+  },
   scene("shari-i-am-here-2.png", "I Am Here", ["welcome", "gentle", "morning", "afternoon"], {
     surfaces: ["chat-welcome"],
     timeOfDay: ["morning", "afternoon"],
@@ -149,7 +158,7 @@ export const COMPANION_PRESENCE_SCENE_CATALOG: CompanionPresenceLibraryEntry[] =
   }),
 ];
 
-export const COMPANION_PRESENCE_WELCOME_IMAGE_ID = "shari-i-am-here-2";
+export const COMPANION_PRESENCE_WELCOME_IMAGE_ID = "welcome-home-room-background";
 
 /** Approved evening hero — lamplight from the room, not the window. */
 export const COMPANION_PRESENCE_EVENING_WELCOME_IMAGE_ID = "shari-evening-winddown";

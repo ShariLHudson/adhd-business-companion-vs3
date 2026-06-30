@@ -1,6 +1,8 @@
 /** Permanent room — not settings, not marketing. */
-export const WELCOME_ROOM_ASSET =
+export const WELCOME_HOME_ROOM_BACKGROUND =
   "/backgrounds/welcome-home-room-background.jpeg" as const;
+
+export const WELCOME_ROOM_ASSET = WELCOME_HOME_ROOM_BACKGROUND;
 
 export type WelcomeRoomSectionId =
   | "welcome"
