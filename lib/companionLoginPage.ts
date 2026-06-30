@@ -2,11 +2,11 @@
  * Companion login page — copy and asset constants.
  */
 
-/** Bump when `shari-login.png` is replaced so browsers fetch the fresh file. */
-export const COMPANION_LOGIN_BACKGROUND_VERSION = "20260628c" as const;
+/** Bump when `login-welcome-background.png` is replaced so browsers fetch the fresh file. */
+export const COMPANION_LOGIN_BACKGROUND_VERSION = "20260629a" as const;
 
 export const COMPANION_LOGIN_BACKGROUND =
-  `/images/shari/shari-images/shari-login-1.png?v=${COMPANION_LOGIN_BACKGROUND_VERSION}` as const;
+  `/images/shari/shari-images/login-welcome-background.png?v=${COMPANION_LOGIN_BACKGROUND_VERSION}` as const;
 
 /** Official Spark Studio Companions logo — transparent background. */
 export const COMPANION_LOGIN_LOGO =

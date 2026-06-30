@@ -34,7 +34,7 @@ describe("CompanionLoginBackground", () => {
     return container.querySelector("[data-testid='companion-login-scene']");
   }
 
-  it("renders the static shari-login background", () => {
+  it("renders the static login welcome background", () => {
     render();
     expect(scene()).toBeTruthy();
     const img = container.querySelector(

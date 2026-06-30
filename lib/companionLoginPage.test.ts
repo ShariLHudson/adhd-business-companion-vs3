@@ -10,8 +10,8 @@ import {
 } from "./companionLoginPage";
 
 describe("companion login page", () => {
-  it("uses shari-login background asset", () => {
-    expect(COMPANION_LOGIN_BACKGROUND).toMatch(/shari-login-1\.png\?v=/);
+  it("uses login welcome background asset", () => {
+    expect(COMPANION_LOGIN_BACKGROUND).toMatch(/login-welcome-background\.png\?v=/);
   });
 
   it("uses official transparent brand logo", () => {
