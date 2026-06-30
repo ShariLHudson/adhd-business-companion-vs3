@@ -2,8 +2,10 @@
 
 | Field | Value |
 |-------|-------|
+| **Milestone** | **Spark v3.0** — [Conversation Frozen](./SPARK_V3_0_CONVERSATION_FROZEN.md) |
 | **Status** | **FROZEN** — architecture complete · **Observation Mode active** |
-| **Date** | June 28, 2026 |
+| **Date** | June 29, 2026 |
+| **Branch** | `v3.0-conversation-frozen` |
 | **Objective** | Observe · document · validate — not design |
 | **Principle** | [The Member Wins™](./THE_MEMBER_WINS.md) |
 
