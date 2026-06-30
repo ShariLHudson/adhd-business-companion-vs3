@@ -6,7 +6,7 @@ import {
 
 describe("loginDoorwayPresence", () => {
   it("uses the login photograph as the scene source", () => {
-    expect(LOGIN_SCENE_ASSET).toMatch(/login-welcome-background\.png\?v=/);
+    expect(LOGIN_SCENE_ASSET).toMatch(/\/backgrounds\/login-welcome-background\.PNG\?v=/);
   });
 
   it("keeps the door static with hands inside the house", () => {

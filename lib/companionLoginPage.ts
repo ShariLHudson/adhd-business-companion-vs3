@@ -3,10 +3,10 @@
  */
 
 /** Bump when `login-welcome-background.png` is replaced so browsers fetch the fresh file. */
-export const COMPANION_LOGIN_BACKGROUND_VERSION = "20260629a" as const;
+export const COMPANION_LOGIN_BACKGROUND_VERSION = "20260630a" as const;
 
 export const COMPANION_LOGIN_BACKGROUND =
-  `/images/shari/shari-images/login-welcome-background.png?v=${COMPANION_LOGIN_BACKGROUND_VERSION}` as const;
+  `/backgrounds/login-welcome-background.PNG?v=${COMPANION_LOGIN_BACKGROUND_VERSION}` as const;
 
 /** Official Spark Studio Companions logo — transparent background. */
 export const COMPANION_LOGIN_LOGO =

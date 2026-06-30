@@ -11,7 +11,7 @@ import {
 
 describe("companion login page", () => {
   it("uses login welcome background asset", () => {
-    expect(COMPANION_LOGIN_BACKGROUND).toMatch(/login-welcome-background\.png\?v=/);
+    expect(COMPANION_LOGIN_BACKGROUND).toMatch(/\/backgrounds\/login-welcome-background\.PNG\?v=/);
   });
 
   it("uses official transparent brand logo", () => {

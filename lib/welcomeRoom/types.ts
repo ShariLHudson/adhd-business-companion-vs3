@@ -1,6 +1,6 @@
 /** Permanent room — not settings, not marketing. */
 export const WELCOME_ROOM_ASSET =
-  "/images/shari/shari-images/welcome-home-room-background.png" as const;
+  "/backgrounds/welcome-home-room-background.jpeg" as const;
 
 export type WelcomeRoomSectionId =
   | "welcome"
