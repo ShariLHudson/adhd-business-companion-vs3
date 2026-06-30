@@ -10,13 +10,14 @@ describe("sidebar navigation", () => {
   it("uses five homestead signpost destinations only in the sidebar", () => {
     expect(SIDEBAR_NAV).toEqual([]);
     expect(HOMESTEAD_SIGNPOST_DESTINATIONS.map((item) => item.label)).toEqual([
-      "Home",
-      "Focus My Brain",
+      "Today",
+      "Focus",
+      "Grow",
       "Create",
-      "Growth",
       "Other",
     ]);
     expect(HOMESTEAD_OTHER_DROPDOWN_ITEMS.map((item) => item.label)).toEqual([
+      "Your Story",
       "Welcome Room",
       "How Do I?",
       "Strategies",
@@ -32,7 +33,7 @@ describe("sidebar navigation", () => {
       group.items.map((item) => item.id),
     );
     expect(allIds.some((id) => id === "settings")).toBe(false);
-    expect(allIds).toEqual(["chat", "focus", "create", "growth", "other"]);
+    expect(allIds).toEqual(["chat", "focus", "grow", "create", "other"]);
     expect(allIds.some((id) => id === "clear-my-mind")).toBe(false);
     expect(allIds.some((id) => id === "welcome-room")).toBe(false);
     expect(allIds.some((id) => id === "how-do-i")).toBe(false);

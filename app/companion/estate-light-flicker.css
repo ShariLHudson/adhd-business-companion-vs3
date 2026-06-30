@@ -1,0 +1,366 @@
+/**
+ * Estate light flicker — canonical lanterns, candles, and fireplace glow.
+ * Use .estate-light-glow--* or data-estate-light on any warm-light overlay.
+ *
+ * @see .cursor/rules/estate-light-flicker.mdc
+ */
+
+/* ── Utility overlays ── */
+.estate-light-glow {
+  position: absolute;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+.estate-light-glow--lantern,
+[data-estate-light="lantern"] {
+  border-radius: 50%;
+  filter: blur(14px);
+  background: radial-gradient(
+    circle,
+    rgba(255, 214, 140, 0.55) 0%,
+    rgba(255, 196, 108, 0.28) 42%,
+    transparent 72%
+  );
+  animation: estate-lantern-flicker 2.6s linear infinite;
+}
+
+.estate-light-glow--candle,
+[data-estate-light="candle"] {
+  border-radius: 50%;
+  filter: blur(10px);
+  background: radial-gradient(
+    circle,
+    rgba(255, 214, 140, 0.72) 0%,
+    rgba(255, 176, 96, 0.34) 38%,
+    transparent 72%
+  );
+  animation: estate-candle-flicker 2.4s ease-in-out infinite;
+}
+
+.estate-light-glow--fireplace,
+[data-estate-light="fireplace"] {
+  border-radius: 42% 42% 50% 50%;
+  filter: blur(14px);
+  background: radial-gradient(
+    ellipse at 50% 78%,
+    rgba(255, 168, 88, 0.48) 0%,
+    rgba(255, 112, 48, 0.2) 42%,
+    transparent 74%
+  );
+  animation: estate-fireplace-flicker 3.8s ease-in-out infinite;
+}
+
+.estate-light-glow--delay-1,
+[data-estate-light-delay="1"] {
+  animation-delay: 0.35s;
+}
+
+.estate-light-glow--delay-2,
+[data-estate-light-delay="2"] {
+  animation-delay: 0.55s;
+}
+
+.estate-light-glow--delay-3,
+[data-estate-light-delay="3"] {
+  animation-delay: 0.85s;
+}
+
+.estate-light-glow--delay-4,
+[data-estate-light-delay="4"] {
+  animation-delay: 1.15s;
+}
+
+/* ── Lantern ── */
+@keyframes estate-lantern-flicker {
+  0%,
+  100% {
+    opacity: 0.76;
+    filter: blur(14px) brightness(1.08) saturate(1.04);
+    transform: scale(1);
+  }
+
+  5% {
+    opacity: 0.98;
+    filter: blur(16px) brightness(1.24) saturate(1.1);
+    transform: scale(1.03);
+  }
+
+  9% {
+    opacity: 0.68;
+    filter: blur(12px) brightness(1.02) saturate(1);
+    transform: scale(0.98);
+  }
+
+  14% {
+    opacity: 0.92;
+    filter: blur(17px) brightness(1.2) saturate(1.08);
+    transform: scale(1.02);
+  }
+
+  18% {
+    opacity: 0.64;
+    filter: blur(11px) brightness(0.98) saturate(0.98);
+    transform: scale(0.97);
+  }
+
+  24% {
+    opacity: 0.86;
+    filter: blur(15px) brightness(1.14) saturate(1.06);
+    transform: scale(1.01);
+  }
+
+  32% {
+    opacity: 0.6;
+    filter: blur(12px) brightness(1) saturate(1);
+    transform: scale(0.96);
+  }
+
+  38% {
+    opacity: 0.96;
+    filter: blur(17px) brightness(1.22) saturate(1.1);
+    transform: scale(1.04);
+  }
+
+  46% {
+    opacity: 0.74;
+    filter: blur(13px) brightness(1.06) saturate(1.02);
+    transform: scale(0.99);
+  }
+
+  54% {
+    opacity: 0.9;
+    filter: blur(16px) brightness(1.18) saturate(1.08);
+    transform: scale(1.02);
+  }
+
+  62% {
+    opacity: 0.66;
+    filter: blur(11px) brightness(0.99) saturate(0.99);
+    transform: scale(0.97);
+  }
+
+  70% {
+    opacity: 0.94;
+    filter: blur(17px) brightness(1.2) saturate(1.08);
+    transform: scale(1.03);
+  }
+
+  78% {
+    opacity: 0.72;
+    filter: blur(13px) brightness(1.04) saturate(1.02);
+    transform: scale(0.98);
+  }
+
+  86% {
+    opacity: 0.88;
+    filter: blur(15px) brightness(1.12) saturate(1.06);
+    transform: scale(1.01);
+  }
+
+  93% {
+    opacity: 0.78;
+    filter: blur(14px) brightness(1.06) saturate(1.03);
+    transform: scale(1);
+  }
+}
+
+/* Lamppost / compact lantern — opacity only (preserve centering transform) */
+@keyframes estate-lamppost-lantern-flicker {
+  0%,
+  100% {
+    opacity: 0.76;
+    filter: brightness(1.04);
+  }
+
+  5% {
+    opacity: 1;
+    filter: brightness(1.22);
+  }
+
+  9% {
+    opacity: 0.68;
+    filter: brightness(0.96);
+  }
+
+  14% {
+    opacity: 0.92;
+    filter: brightness(1.18);
+  }
+
+  18% {
+    opacity: 0.64;
+    filter: brightness(0.94);
+  }
+
+  24% {
+    opacity: 0.86;
+    filter: brightness(1.12);
+  }
+
+  32% {
+    opacity: 0.6;
+    filter: brightness(0.98);
+  }
+
+  38% {
+    opacity: 0.96;
+    filter: brightness(1.2);
+  }
+
+  46% {
+    opacity: 0.74;
+    filter: brightness(1.06);
+  }
+
+  54% {
+    opacity: 0.9;
+    filter: brightness(1.16);
+  }
+
+  62% {
+    opacity: 0.66;
+    filter: brightness(0.97);
+  }
+
+  70% {
+    opacity: 0.94;
+    filter: brightness(1.18);
+  }
+
+  78% {
+    opacity: 0.72;
+    filter: brightness(1.02);
+  }
+
+  86% {
+    opacity: 0.88;
+    filter: brightness(1.1);
+  }
+
+  93% {
+    opacity: 0.8;
+    filter: brightness(1.05);
+  }
+}
+
+/* ── Candle ── */
+@keyframes estate-candle-flicker {
+  0%,
+  100% {
+    opacity: 0.58;
+    filter: blur(10px) brightness(1);
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  12% {
+    opacity: 0.88;
+    filter: blur(11px) brightness(1.18);
+    transform: translate(-50%, -50%) scale(1.14);
+  }
+
+  22% {
+    opacity: 0.48;
+    filter: blur(8px) brightness(0.92);
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+
+  34% {
+    opacity: 0.82;
+    filter: blur(12px) brightness(1.12);
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+
+  48% {
+    opacity: 0.52;
+    filter: blur(9px) brightness(0.94);
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+
+  61% {
+    opacity: 0.9;
+    filter: blur(12px) brightness(1.16);
+    transform: translate(-50%, -50%) scale(1.12);
+  }
+
+  74% {
+    opacity: 0.56;
+    filter: blur(9px) brightness(0.96);
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+
+  88% {
+    opacity: 0.78;
+    filter: blur(11px) brightness(1.08);
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+
+/* ── Fireplace — gentle (half-strength flicker) ── */
+@keyframes estate-fireplace-flicker {
+  0%,
+  100% {
+    opacity: 0.72;
+    filter: blur(14px) brightness(1);
+    transform: scale(1);
+  }
+
+  8% {
+    opacity: 0.83;
+    filter: blur(15px) brightness(1.07);
+    transform: scale(1.02);
+  }
+
+  16% {
+    opacity: 0.69;
+    filter: blur(13px) brightness(0.97);
+    transform: scale(0.985);
+  }
+
+  24% {
+    opacity: 0.8;
+    filter: blur(14px) brightness(1.04);
+    transform: scale(1.01);
+  }
+
+  33% {
+    opacity: 0.67;
+    filter: blur(12px) brightness(0.96);
+    transform: scale(0.98);
+  }
+
+  42% {
+    opacity: 0.82;
+    filter: blur(15px) brightness(1.06);
+    transform: scale(1.015);
+  }
+
+  55% {
+    opacity: 0.71;
+    filter: blur(13px) brightness(0.99);
+    transform: scale(0.99);
+  }
+
+  68% {
+    opacity: 0.81;
+    filter: blur(14px) brightness(1.05);
+    transform: scale(1.01);
+  }
+
+  82% {
+    opacity: 0.7;
+    filter: blur(13px) brightness(0.98);
+    transform: scale(0.985);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estate-light-glow--lantern,
+  .estate-light-glow--candle,
+  .estate-light-glow--fireplace,
+  [data-estate-light="lantern"],
+  [data-estate-light="candle"],
+  [data-estate-light="fireplace"] {
+    animation: none !important;
+  }
+}

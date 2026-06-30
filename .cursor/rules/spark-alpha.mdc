@@ -1,0 +1,39 @@
+---
+description: Spark Alpha™ — relationship prototype; smallest software, largest partnership; no features, no UI redesign
+alwaysApply: true
+---
+
+# Spark Alpha™ — Relationship Prototype
+
+**Full document:** `docs/SPARK_ALPHA_FRAMEWORK.md`
+
+**Route:** `/spark-alpha` · **Dev panel:** Ctrl+Shift+D
+
+## Mission
+
+Smallest Spark that answers: **Would Shari choose this over ChatGPT daily?**
+
+> Build the smallest amount of software necessary to create the largest possible feeling of partnership.
+
+## Do NOT
+
+- Build full ecosystem · new features · UI redesign
+- Dashboards · menus · sidebars · step workflows · multi-panel · modals
+- Auto-switch environments · expose invisible work to members
+- Act without permission (create · export · publish · send · final Brain writes)
+
+## DO
+
+- **Conversation is the interface** — Conservatory + frosted glass only
+- **Intent → Context** (`workspaceContextManager`) — not navigation
+- **Invisible layer** — log hidden work; dev panel verifies iceberg
+- **Frozen specs** 106–114, 118 + **Spec 119** eight QA gates on every test
+- **Member-visible only:** conversation · environment · folded map · suggestion bubbles
+
+## When failing
+
+Improve conversation · hidden work · feeling — **not** features.
+
+**Final test:** ChatGPT vs Spark — immediate yes?
+
+**Types:** `lib/sparkAlpha/`

@@ -333,6 +333,7 @@ This specification is successful when:
 - [007-context-strategy.md](./007-context-strategy.md) — MVC retrieval; Brain stores, Strategy selects
 - [009-business-brain-lifecycle.md](./009-business-brain-lifecycle.md) — lifecycle, versioning, retrieval rules
 - [08-memory-engine.md](./08-memory-engine.md) — Business Memory Engine (implementation)
+- **[Spec 117 — Business Brain Memory & Retrieval](../docs/SPARK_BUSINESS_BRAIN_MEMORY_RETRIEVAL_FRAMEWORK.md)** — knowledge architecture (connect, organize, retrieve, dedupe, pattern, forget)
 - [18-spark-core-memory-personalization-engine.md](./18-spark-core-memory-personalization-engine.md) — Core Intelligence runtime
 - [04-communication-intelligence.md](./04-communication-intelligence.md) — communication profile (referenced, not duplicated)
 - `lib/intelligence/INTELLIGENCE_REGISTRY.md` — object × engine registry

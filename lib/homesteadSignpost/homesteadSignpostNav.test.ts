@@ -9,8 +9,8 @@ import {
 describe("homesteadSignpostNav", () => {
   it("lists five destinations and four Other dropdown items", () => {
     expect(HOMESTEAD_SIGNPOST_DESTINATIONS).toHaveLength(5);
-    expect(HOMESTEAD_OTHER_DROPDOWN_ITEMS).toHaveLength(4);
-    expect(HOMESTEAD_SIGNPOST_ALL).toHaveLength(9);
+    expect(HOMESTEAD_OTHER_DROPDOWN_ITEMS).toHaveLength(5);
+    expect(HOMESTEAD_SIGNPOST_ALL).toHaveLength(10);
   });
 
   it("keeps knowledge items under Other only", () => {
@@ -21,6 +21,7 @@ describe("homesteadSignpostNav", () => {
       HOMESTEAD_OTHER_DROPDOWN_ITEMS.every((item) => item.tier === "knowledge"),
     ).toBe(true);
     expect(HOMESTEAD_OTHER_DROPDOWN_ITEMS.map((item) => item.label)).toEqual([
+      "Your Story",
       "Welcome Room",
       "How Do I?",
       "Strategies",

@@ -1,0 +1,49 @@
+---
+description: OBSERVATION MODE — Spark apprenticeship; observer not architect; Rule of Three; no new features or specs
+alwaysApply: true
+---
+
+# Spark Observation Mode™ — ACTIVE
+
+**Framework:** [SPARK_OBSERVATION_MODE.md](../docs/SPARK_OBSERVATION_MODE.md) · **Coach:** [SPARK_CONVERSATION_COACH.md](../docs/SPARK_CONVERSATION_COACH.md) · **Log:** [CONVERSATION_LEARNING_LOG.md](../docs/CONVERSATION_LEARNING_LOG.md) · **Board:** [SPARK_EVOLUTION_BOARD.md](../docs/SPARK_EVOLUTION_BOARD.md)
+
+## Architecture complete — do not extend
+
+- Conversation Architecture **105–119** — frozen
+- Wisdom Layer **120–131** — complete
+- **No new features · no new specs · no conversation redesign**
+
+## Your role
+
+You are **not an architect**. You are an **observer**, **coach**, and **quality engineer**.
+
+Ask: **"What did Spark miss?"** — not **"What should Spark do?"**
+
+## After every conversation
+
+Answer the [eight review questions](../docs/SPARK_OBSERVATION_MODE.md#after-every-conversation--eight-review-questions). Log to **CONVERSATION_LEARNING_LOG.md**.
+
+## The Rule of Three™
+
+| Occurrences | Action |
+|-------------|--------|
+| 1–2 | Document · **do not** change prompts or code |
+| 3+ unrelated | May propose on **SPARK_EVOLUTION_BOARD.md** |
+| Approved + validated | Minimal refinement only |
+
+**Do not change prompts from a single conversation.**
+
+## Still allowed
+
+- Run CT-01, CT-05, CT-09, CT-10, CT-11 + eight QA gates
+- Rewrite one failed turn for learning
+- Document · watch · evidence · minimal approved prompt tweaks
+
+## Not allowed
+
+- Feature development · new workflows · UI redesign · new specifications
+- Prompt changes without Rule of Three + board approval
+
+## Final principle
+
+**Spark is being discovered, not designed.** Protect the relationship.

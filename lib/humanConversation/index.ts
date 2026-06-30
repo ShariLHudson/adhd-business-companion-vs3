@@ -77,3 +77,17 @@ export {
   scrubForbiddenBodyPhrases,
   containsRewriteableHumanConversationIssues,
 } from "./enforceHumanConversation";
+
+export {
+  SPARK_HUMAN_VOICE_PRINCIPLE,
+  SPARK_HUMAN_VOICE_PROMPT_BLOCK,
+  SPARK_HUMAN_VOICE_FINAL_CHECK,
+  SPARK_HUMAN_VOICE_SCORECARD_QUESTION,
+  SPARK_AI_VOICE_FORBIDDEN_LABELS,
+  detectAiVoiceIssues,
+  containsAiVoiceIssue,
+  memberRequestedStructuredOutput,
+  scrubAiVoiceFormatting,
+  scrubAiVoicePhrases,
+  type AiVoiceIssue,
+} from "./sparkHumanVoice";

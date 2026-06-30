@@ -1,0 +1,46 @@
+---
+description: Hidden Work Engine / Iceberg (Spec 118) — async submerged work while member converses; never busy, never blocking
+alwaysApply: true
+---
+
+# Hidden Work Engine™ — The Iceberg (Spec 118)
+
+**Full document:** `docs/SPARK_HIDDEN_WORK_ENGINE_FRAMEWORK.md`
+
+**Philosophy:** [Spec 111 Iceberg](../docs/SPARK_HOSPITALITY_FRAMEWORK.md) · **Triggers:** [Spec 114 Flow Engine](../docs/SPARK_CONVERSATION_FLOW_ENGINE_FRAMEWORK.md) · **Brain work:** [Spec 117](../docs/SPARK_BUSINESS_BRAIN_MEMORY_RETRIEVAL_FRAMEWORK.md) · **QA:** [Spec 116 Gold Standards](../docs/SPARK_CONVERSATION_GOLD_STANDARDS_FRAMEWORK.md)
+
+## Iceberg
+
+~10% visible: Shari's response, one next step.
+
+~90% submerged: organize assets · research · connect projects · draft · remember · scan gaps.
+
+**Member never feels busy. Spark does.**
+
+## Core rules
+
+1. **Response ships first** — hidden work never blocks conversation
+2. **Default invisible** — no spinners, progress bars, "I'm organizing…"
+3. **Permission before surface** — drafts, wins, new assets (Spec 106 Rule 5)
+4. **Cancel silently** when member changes direction — no sunk-cost guilt
+5. **Fail silent** — retry internally; never alarm member
+
+## Work categories
+
+Memory: `brain_retrieve` · `brain_propose_write` · `brain_connect` · `win_capture`
+
+Assets: `asset_organize` · `project_connect` · `autosave` · `asset_create_prep`
+
+Creation: `research_prep` · `draft_prep` · `content_prep`
+
+Intelligence: `gap_analysis` · `opportunity_scan` · `pattern_observe` · `anticipate_next`
+
+## When wrong — diff gold standards
+
+Missing work? Surfaced too early? Blocked response? Violated permission?
+
+Compare `docs/conversation-gold-standards/` **Hidden work** section per turn.
+
+**Types:** `lib/sparkHiddenWorkEngine/types.ts`
+
+**Spec 106 wins on conflict.**

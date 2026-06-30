@@ -7,6 +7,7 @@ import { HomesteadSceneProvider } from "@/lib/homesteadScene";
 import { resolveCompanionSupabaseEnv } from "@/lib/supabase/resolveCompanionSupabaseEnv";
 import { isBrowserSafeSupabaseKey } from "@/lib/supabase/supabaseKeyRoles";
 import "./cinematic-background.css";
+import "./estate-light-flicker.css";
 import "./companion.css";
 import "./companion-login-transition.css";
 import "./gallery.css";

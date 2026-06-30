@@ -14,6 +14,7 @@ describe("Human Conversation", () => {
   it("embeds constitutional block in system prompt", () => {
     const prompt = buildCompanionSystemPrompt("today", "text");
     expect(prompt).toContain("HUMAN CONVERSATION");
+    expect(prompt).toContain("SPARK HUMAN VOICE");
     expect(prompt).toContain("CONTEXT BEFORE CONTENT");
     expect(prompt).toContain("SUNROOM TEST");
     expect(prompt).toContain("CURIOSITY INTELLIGENCE");
@@ -24,6 +25,16 @@ describe("Human Conversation", () => {
     expect(HUMAN_CONVERSATION_PROMPT_BLOCK).toMatch(/It sounds like/i);
     expect(HUMAN_CONVERSATION_PROMPT_BLOCK).toMatch(/Many people with ADHD/i);
     expect(HUMAN_CONVERSATION_PROMPT_BLOCK).toMatch(/STOP EXPLAINING ADHD/i);
+  });
+
+  it("enforces human voice scrub on AI phrases", () => {
+    const result = enforceHumanConversation({
+      response: "Great question! Let's dive in. **Here** is my thought.",
+      userText: "I'm stuck on taxes.",
+    });
+    expect(result.message).not.toMatch(/great question/i);
+    expect(result.message).not.toMatch(/let's dive in/i);
+    expect(result.message).not.toContain("**");
   });
 
   it("detects forbidden openers", () => {

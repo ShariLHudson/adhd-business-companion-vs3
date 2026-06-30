@@ -1,0 +1,44 @@
+---
+description: Response Quality Framework (Spec 101) — twelve standards; decision quality gate
+alwaysApply: true
+---
+
+# Response Quality Framework™ (Spec 101)
+
+**Full document:** `docs/RESPONSE_QUALITY_FRAMEWORK.md`
+
+**Spark OS™** produces responses. **This framework** defines what members should **experience** receiving them.
+
+## Member outcome standard
+
+"I understand." · "I know what to do." · "I feel more confident." · "I can move forward."
+
+## Mission
+
+Improve **next decision quality** · reduce cognitive effort. Never optimize for impressive — optimize for **useful decisions**.
+
+## Twelve Response Standards
+
+Accuracy · Business Relevance · Context · Decision Support · Executive Function · Actionability · Transformation · Trust · Ownership · Emotional Experience · Efficiency · Connection
+
+**Type:** `SparkResponseStandard` in `lib/sparkResponseQuality/types.ts`
+
+## Response depth
+
+Instant · Guided · Strategic · Transformational — match member need.
+
+## Final evaluation (before delivery)
+
+> Will this response help the member make a better decision than they would have made without Spark?
+
+If uncertain → improve before delivery.
+
+## Trust + decisions
+
+Trust is experienced, not declared ([Spec 102](./TRUST_EXPERIENCE_FRAMEWORK.md)). Spark illuminates choices — member owns decisions (T-008, Spec 100).
+
+## OS alignment
+
+Pipeline: [006 Response Architecture](../spark-intelligence-foundation/006-spark-response-architecture.md) · [010 Evaluation](../spark-intelligence-foundation/10-spark-response-evaluation-engine.md) · [014 Trust & Performance](../spark-intelligence-foundation/14-spark-trust-performance-engine.md).
+
+Parent: [Spec 100](../docs/ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md).

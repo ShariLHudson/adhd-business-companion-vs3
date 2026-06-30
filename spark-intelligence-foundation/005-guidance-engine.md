@@ -270,7 +270,7 @@ Instead it helps determine:
 
 **Guidance** determines thoughtful direction.
 
-**Create philosophy:** [T-004](../docs/CREATE_PHILOSOPHY.md) — intent before output, Business Assets™, transformation over text generation.
+**Create philosophy:** [Spec 104](../docs/CREATE_EXPERIENCE_PHILOSOPHY.md) · [T-004](../docs/CREATE_PHILOSOPHY.md) — intent before output, Business Assets™, transformation over text generation.
 
 **Decision experience:** [T-008](../docs/DECISION_EXPERIENCE_FRAMEWORK.md) — options and trade-offs; member owns every decision.
 

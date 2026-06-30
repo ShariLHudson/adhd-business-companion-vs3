@@ -3,6 +3,7 @@ import type {
   WelcomeRoomPrototypeDiscovery,
 } from "./types";
 
+/** V1 estate hospitality ambience — not T-016 entrepreneurial Daily Discoveries. @see docs/DAILY_DISCOVERIES_FRAMEWORK.md */
 type HolidayEntry = {
   month: number;
   day: number;

@@ -12,6 +12,10 @@ import {
 import { enforceHumanConversation } from "@/lib/humanConversation";
 import type { RelationshipMemoryConfidence } from "@/lib/relationshipIntelligencePrompt";
 import {
+  buildCoachingFallbackResponse,
+  isCoachingFallbackNeeded,
+} from "@/lib/sparkConversation/coachingFallback";
+import {
   buildRelationshipResponseTraceSummary,
   createRelationshipResponseId,
   firstParagraphForTrace,
@@ -33,21 +37,43 @@ const MODE_TEMPERATURE: Record<CoachingMode, number> = {
   progress: 0.75,
 };
 
+function resolveAssistantMessage(input: {
+  rawMessage: string;
+  userProbe: string;
+  finishReason?: string | null;
+}): { message: string; usedCoachingFallback: boolean } {
+  if (isCoachingFallbackNeeded(input.rawMessage, input.finishReason)) {
+    return {
+      message: buildCoachingFallbackResponse(input.userProbe),
+      usedCoachingFallback: true,
+    };
+  }
+  return { message: input.rawMessage, usedCoachingFallback: false };
+}
+
+function coachingFallbackJsonResponse(
+  userProbe: string,
+  relationshipResponseId: string,
+) {
+  return NextResponse.json({
+    message: buildCoachingFallbackResponse(userProbe),
+    relationshipResponseId,
+    usedCoachingFallback: true,
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
     const apiKey = resolveOpenAiApiKey();
-    if (!apiKey) {
-      return NextResponse.json(
-        {
-          error:
-            "OpenAI API key is not configured. Add OPENAI_API_KEY to companion-app/.env.local and restart the dev server.",
-        },
-        { status: 500 },
-      );
-    }
-
     const body = await request.json();
     const messages = body.messages as ChatMessage[];
+    const userProbe = messages[messages.length - 1]?.content ?? "";
+    const relationshipResponseId = createRelationshipResponseId();
+
+    if (!apiKey) {
+      console.error("Companion chat: OpenAI API key is not configured.");
+      return coachingFallbackJsonResponse(userProbe, relationshipResponseId);
+    }
     const inputType = (body.inputType as InputType) ?? "text";
     const coachingMode = (body.coachingMode as CoachingMode) ?? "today";
     const emotionalState = body.emotionalState as string | undefined;
@@ -83,6 +109,7 @@ export async function POST(request: NextRequest) {
     const chiefHint = body.chiefHint as string | undefined;
     const ecosystemGuidance = body.ecosystemGuidance as string | undefined;
     const intelligenceContext = body.intelligenceContext as string | undefined;
+    const hiddenIntentHint = body.hiddenIntentHint as string | undefined;
     const streamRequested = Boolean(body.stream);
 
     if (!Array.isArray(messages) || messages.length === 0) {
@@ -131,6 +158,8 @@ export async function POST(request: NextRequest) {
     const intelligenceBlock = intelligenceContext
       ? `\n\n${intelligenceContext}`
       : "";
+    const hiddenIntentBlock = hiddenIntentHint ? `\n\n${hiddenIntentHint}` : "";
+    const wisdomLoopBlock = hiddenIntentBlock;
 
     const priorityBlock = relationshipIntelligencePriority?.trim()
       ? `${relationshipIntelligencePriority.trim()}\n\n`
@@ -138,7 +167,7 @@ export async function POST(request: NextRequest) {
 
     const finalSystem = `${priorityBlock}${
       businessContext ? `${systemPrompt}\n\n${businessContext}` : systemPrompt
-    }${attune}${ecosystemBlock}${intelligenceBlock}${adaptiveBlock}${workspaceBlock}${offerBlock}`;
+    }${attune}${ecosystemBlock}${intelligenceBlock}${wisdomLoopBlock}${adaptiveBlock}${workspaceBlock}${offerBlock}`;
 
     if (process.env.NODE_ENV === "development" && relationshipIntelligencePriority) {
       console.debug("[relationship-intelligence-debug] API priority received", {
@@ -150,9 +179,6 @@ export async function POST(request: NextRequest) {
     const baseTemp = MODE_TEMPERATURE[coachingMode] ?? 0.75;
     const temperature =
       inputType === "voice" ? Math.min(baseTemp + 0.05, 0.9) : baseTemp;
-
-    const relationshipResponseId = createRelationshipResponseId();
-    const userProbe = messages[messages.length - 1]?.content ?? "";
 
     logRelationshipResponseTrace({
       responseId: relationshipResponseId,
@@ -180,10 +206,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       console.error("OpenAI error:", await response.text());
-      return NextResponse.json(
-        { error: "Something went wrong. Please try again." },
-        { status: 502 },
-      );
+      return coachingFallbackJsonResponse(userProbe, relationshipResponseId);
     }
 
     if (streamRequested && response.body) {
@@ -223,19 +246,22 @@ export async function POST(request: NextRequest) {
               }
             }
 
-            const humanEnforcement = enforceHumanConversation({
-              response: fullText,
-              userText: userProbe,
-              gentle:
-                emotionalState?.toLowerCase().includes("overwhelm") ||
-                emotionalState?.toLowerCase().includes("emotional"),
-              seed: userProbe.length,
-              memoryConfidence,
+            const resolved = resolveAssistantMessage({
+              rawMessage: fullText,
+              userProbe,
             });
-            const message = humanEnforcement.message;
-            if (message !== fullText) {
-              fullText = message;
-            }
+            const message = resolved.usedCoachingFallback
+              ? resolved.message
+              : enforceHumanConversation({
+                  response: fullText,
+                  userText: userProbe,
+                  gentle:
+                    emotionalState?.toLowerCase().includes("overwhelm") ||
+                    emotionalState?.toLowerCase().includes("emotional"),
+                  seed: userProbe.length,
+                  memoryConfidence,
+                }).message;
+            fullText = message;
 
             logRelationshipResponseTrace({
               responseId: relationshipResponseId,
@@ -256,9 +282,10 @@ export async function POST(request: NextRequest) {
             controller.close();
           } catch (error) {
             console.error("Companion chat stream error:", error);
+            const fallback = buildCoachingFallbackResponse(userProbe);
             controller.enqueue(
               encoder.encode(
-                `${JSON.stringify({ error: "Something went wrong. Please try again." })}\n`,
+                `${JSON.stringify({ done: true, relationshipResponseId, message: fallback, usedCoachingFallback: true })}\n`,
               ),
             );
             controller.close();
@@ -273,6 +300,20 @@ export async function POST(request: NextRequest) {
 
     const data = await response.json();
     const rawMessage = data.choices?.[0]?.message?.content ?? "";
+    const finishReason = data.choices?.[0]?.finish_reason as string | undefined;
+    const fallbackResolved = resolveAssistantMessage({
+      rawMessage,
+      userProbe,
+      finishReason,
+    });
+
+    if (fallbackResolved.usedCoachingFallback) {
+      return NextResponse.json({
+        message: fallbackResolved.message,
+        relationshipResponseId,
+        usedCoachingFallback: true,
+      });
+    }
 
     logRelationshipResponseTrace({
       responseId: relationshipResponseId,
@@ -425,9 +466,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Companion chat error:", error);
-    return NextResponse.json(
-      { error: "Something went wrong. Please try again." },
-      { status: 500 },
-    );
+    return coachingFallbackJsonResponse("", createRelationshipResponseId());
   }
 }

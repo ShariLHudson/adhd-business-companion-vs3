@@ -6,7 +6,7 @@
 |-------|-------|
 | **Priority** | **Absolute** — supersedes feature work when in conflict |
 | **Governed by** | [Spark Constitution™](./00-spark-constitution.md) |
-| **Trust experience** | [T-006 Trust Experience™](../docs/TRUST_EXPERIENCE.md) — how trust feels |
+| **Trust experience** | [Spec 102 — Trust Experience Framework™](../docs/TRUST_EXPERIENCE_FRAMEWORK.md) · [T-006](../docs/TRUST_EXPERIENCE.md) — how trust feels |
 | **Response architecture** | [006 – Spark Response Architecture™](./006-spark-response-architecture.md) — ingress wraps this engine |
 | **Implementation** | `lib/sparkTrustPerformance/` |
 | **Wraps** | [Cognitive Orchestration](./13-spark-cognitive-orchestration-engine.md) · [Performance & Routing](./09-spark-performance-routing-engine.md) · [Response Evaluation](./10-spark-response-evaluation-engine.md) |

@@ -31,6 +31,10 @@ Specify companion-led navigation across rooms, workspaces, panels, and the growt
 - Specify transition copy and ambient behavior between rooms.
 - Add navigation audit for dead routes and orphaned panels after refactors.
 
+## Related internal docs
+
+- [T-017 Estate Rooms Framework](../docs/ESTATE_ROOMS_FRAMEWORK.md)
+
 ## Status
 
 **Draft**

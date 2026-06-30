@@ -8,9 +8,11 @@
 | **Status** | Foundational |
 | **Owner** | Spark Product & Experience |
 | **Applies to** | All member-facing Spark systems |
-| **Related** | [Relationship Constitution](./RELATIONSHIP_CONSTITUTION.md) · [Create™ Philosophy (T-004)](./CREATE_PHILOSOPHY.md) · [Experience Patterns (T-005)](./EXPERIENCE_PATTERNS.md) · [Trust Experience (T-006)](./TRUST_EXPERIENCE.md) · [Spark OS Spec 005 — Guidance Engine](../spark-intelligence-foundation/005-guidance-engine.md) · [Spark OS Spec 007 — Context Strategy](../spark-intelligence-foundation/007-context-strategy.md) |
+| **Related** | [Spec 100 — Transformation Constitution](./ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md) · **[Spec 103 — Universal Experience Standards Framework](./UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md)** · [Relationship Constitution](./RELATIONSHIP_CONSTITUTION.md) · [Spec 102 — Trust Experience](./TRUST_EXPERIENCE_FRAMEWORK.md) · [T-006 Trust Experience](./TRUST_EXPERIENCE.md) · [Create™ Philosophy (T-004)](./CREATE_PHILOSOPHY.md) · [Experience Patterns (T-005)](./EXPERIENCE_PATTERNS.md) · [Spark OS Spec 005 — Guidance Engine](../spark-intelligence-foundation/005-guidance-engine.md) · [Spark OS Spec 007 — Context Strategy](../spark-intelligence-foundation/007-context-strategy.md) |
 
 ---
+
+> **Parent spec:** [Spec 103 — Universal Experience Standards Framework™](./UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md) is the core experience specification. This document (T-003) retains supplementary material — experience flow arc, primary action rule, max 3 choices, language rules, and nine-point release checklist.
 
 ## Purpose
 
@@ -248,6 +250,8 @@ For any future component or screen, include this standard in the design prompt:
 > Build this as part of Spark’s premium entrepreneurial estate experience. Avoid cartoon, arcade, dashboard, or generic AI app styling. Use calm spacing, refined language, low cognitive load, and clear connection to member growth.
 
 **Cursor rule:** `.cursor/rules/universal-experience-standards.mdc`
+
+**Framework types:** `lib/sparkUniversalExperience/types.ts` (Spec 103)
 
 ---
 

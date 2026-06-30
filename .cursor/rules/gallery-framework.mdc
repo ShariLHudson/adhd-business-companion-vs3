@@ -1,0 +1,61 @@
+---
+description: Gallery Framework (T-015) — preserve transformation not activity; significance over quantity
+globs:
+  - lib/gallery/**
+  - lib/sparkGallery/**
+  - components/**/*[Gg]allery*
+alwaysApply: false
+---
+
+# Gallery™ Framework (T-015)
+
+**Full document:** `docs/GALLERY_FRAMEWORK.md`
+
+Gallery™ is the **living story** of an entrepreneur becoming who they were meant to become. Not an activity log. Not a task list.
+
+## Core question
+
+> **"How have I changed?"** — not "What have I done?"
+
+## Seven categories
+
+Milestones · Breakthroughs · Reflections · Decisions · Business Assets · Discovery · Seasons
+
+**Type:** `GalleryCategory` in `lib/sparkGallery/types.ts`
+
+## Preserve vs exclude
+
+**Preserve:** breakthroughs, decisions, launches, pivots, recovery, lessons, meaningful Builder/Card moments, Estate memories.
+
+**Exclude:** every click, session, routine navigation, minor actions, "Completed Builder #27."
+
+## Gallery Preservation Gate (before any memory)
+
+1. Should this become part of Gallery?
+2. What category?
+3. Why does it matter?
+4. How will it help the member in the future?
+5. How could future Guidance use this memory?
+
+**Type:** `SparkGalleryPreservationGate` · `GALLERY_PRESERVATION_QUESTIONS`
+
+## Emotional standard
+
+Proud · encouraged · grounded · hopeful · capable. **Never** guilt · comparison · "should have done more."
+
+## Integration
+
+- **Estate** — celebrate anniversaries and breakthroughs in the environment
+- **Guidance** — reference past growth ("You solved something similar last year")
+- **Companion** — gentle memory bridges; Shari test
+- **Chain:** Momentum Builder → Spark Card → Business Asset → **Gallery** → Guidance (T-014)
+
+## EF
+
+External memory — reduce remembering, searching, losing ideas, repeating lessons.
+
+## Runtime V1
+
+`lib/gallery/` — hallway walk, curator intelligence, wall frames (`GalleryMemoryKind` maps to framework categories when curating).
+
+Also: T-014 Ecosystem Connection · T-011 Spark Cards · T-012 Momentum Builders · T-010 Founder Journey · Spec 100 Transformation · T-016 Daily Discoveries.

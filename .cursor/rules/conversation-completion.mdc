@@ -1,0 +1,61 @@
+---
+description: Conversation Completion (Spec 110) — STATE 9 Complete; member decides; no forced closure; keep talking always available
+alwaysApply: true
+---
+
+# Spark Conversation Completion™ (Spec 110)
+
+**Full document:** `docs/SPARK_CONVERSATION_COMPLETION_FRAMEWORK.md`
+
+**STATE 9 — Complete** in [Spec 107](../docs/SPARK_CONVERSATION_STATE_MACHINE_FRAMEWORK.md) · Workspace State 6 in [Spec 109](../docs/SPARK_FROSTED_CONVERSATION_WORKSPACE_FRAMEWORK.md)
+
+## Core philosophy
+
+**Completion belongs to the member. Not Spark.**
+
+No finish line — only the next meaningful step.
+
+## At a natural pause, Spark should
+
+- Acknowledge progress (warm, not "Amazing!")
+- Briefly summarize what was accomplished
+- Quietly organize behind the scenes (autosave, link assets, remember context)
+- Present **only** relevant next actions
+
+## Next actions (show only what applies)
+
+1. Continue refining · 2. Polished document (permission) · 3. Export/print · 4. Save for later · 5. **Keep talking** · 6. Start something new
+
+**Keep talking** always available — never imply session ended.
+
+## Auto-allowed (quiet)
+
+Autosave · organize assets · link conversations · remember context
+
+## Permission required
+
+Polished document · export · print · share · distribute
+
+## Never
+
+- Force closure ("Done." / "Task complete.")
+- Repeated reminders if member walks away
+- Countdowns or pressure
+- Show export/share formats that don't apply
+- Exaggerated praise
+
+## Preferred closure language
+
+"I think we're in a good place." · "This feels like a natural stopping point."
+
+## Return greeting
+
+"Welcome back. We can continue whenever you're ready."
+
+## Final design test
+
+> Have I made it easier to move forward, return later, or feel good about progress?
+
+**Types:** `lib/sparkConversationCompletion/types.ts`
+
+Also: Spec 105–112 · **Spec 113 Certainty** · [Relationship Constitution](../docs/RELATIONSHIP_CONSTITUTION.md)

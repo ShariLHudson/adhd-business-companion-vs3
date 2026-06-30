@@ -1,0 +1,74 @@
+---
+description: Estate Rooms Framework (T-017) — rooms improve thinking; one purpose per room
+globs:
+  - lib/companionHomestead/**
+  - lib/sparkEstateRooms/**
+  - lib/homesteadScene/**
+  - lib/gallery/environmentExperience.ts
+  - components/companion/**/*Room*
+  - components/companion/**/*Homestead*
+  - app/companion/**/*.css
+alwaysApply: false
+---
+
+# Estate Rooms™ Framework (T-017)
+
+**Full document:** `docs/ESTATE_ROOMS_FRAMEWORK.md`
+
+**Conversation integration:** [Spec 108 — Environment Integration](../docs/SPARK_ENVIRONMENT_INTEGRATION_FRAMEWORK.md)
+
+**Workspace surface:** [Spec 109 — Frosted Conversation Workspace](../docs/SPARK_FROSTED_CONVERSATION_WORKSPACE_FRAMEWORK.md)
+
+Rooms are **not** backgrounds or themes. The Estate™ is Spark's interface. Every room must improve thinking **before** work begins.
+
+## The Estate Principle™ (all three required)
+
+1. Why does this room exist?
+2. How does this environment improve the member's thinking?
+3. What transformation happens here?
+
+Unanswerable → room should not exist.
+
+**Type:** `ESTATE_PRINCIPLE_QUESTIONS` · `SparkEstateRoomSpec` in `lib/sparkEstateRooms/types.ts`
+
+## One room · one purpose · one emotion
+
+Clear My Mind (relief) · Focus (concentration) · Grow (possibility) · Create (creative confidence) · Gallery (pride) · Observatory (wonder) · Guild Hall (mastery) · Community (belonging)
+
+Never multi-purpose rooms. Never mix competing emotions.
+
+## Architectural identity
+
+Stone · wood · glass · books · plants · fire · water · natural light · timeless craft.
+
+**Never:** sci-fi · corporate office · cartoon.
+
+Living spaces feel **inhabited** — open books, coffee, notes, soft lantern light ([Estate Light Flicker](./estate-light-flicker.mdc)).
+
+## Environment responds
+
+**Time:** morning golden · afternoon productive · evening warm lamps · night quiet.
+
+**Season:** spring/summer/autumn/winter — decor evolves, identity stays.
+
+**Personalization:** notebook, assets on desk, gallery frames, open Spark Cards — room becomes *theirs*.
+
+## Orientation (no instructions required)
+
+Why am I here? · What happens here? · What should I do first?
+
+Reduce EF load — limit choices, hide complexity, support return and continuation.
+
+## Required spec fields (new rooms)
+
+Primary purpose · emotional goal · capability · environmental psychology · time/season · personalization · connected rooms · EF strategy · ambient sound · Business Asset link when relevant.
+
+## V1 runtime
+
+`lib/companionHomestead/homesteadRoomRegistry.ts` — backgrounds, signature motion, section mapping.
+
+Also: Spec 103 Universal Experience · T-014 Connection · T-010 Journey · [07 Estate Navigation](../spark-intelligence-foundation/07-estate-navigation.md).
+
+## Competitive advantage
+
+Members say *"I spent the morning in my Grow Room"* — not *"I used an app."*

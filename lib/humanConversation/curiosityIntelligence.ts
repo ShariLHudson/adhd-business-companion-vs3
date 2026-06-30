@@ -4,12 +4,10 @@ import type { SpecializedIntelligenceId } from "../companionConstitution/special
 export const CURIOSITY_OPENERS = [
   "Can I tell you what caught my attention?",
   "Help me understand something...",
-  "Something about the way you said that makes me curious...",
   "I wonder if...",
   "You know what's interesting?",
   "Can we be curious about something for a second?",
   "I have a feeling there might be more going on.",
-  "That reminds me of something — can I share it?",
   "I've been wondering...",
   "Hmm — before I jump in, can I ask you something?",
 ] as const;

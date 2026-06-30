@@ -1,0 +1,56 @@
+---
+description: Certainty Before Completion (Spec 113) — three certainties at every ending; conversation not toolbars; Spark Promise
+alwaysApply: true
+---
+
+# Certainty Before Completion™ (Spec 113)
+
+**Full document:** `docs/SPARK_CERTAINTY_BEFORE_COMPLETION_FRAMEWORK.md`
+
+**Not UI — conversation architecture.** Overrides Save/Export/Print/Share toolbar endings.
+
+Complements: [Spec 110 Completion](../docs/SPARK_CONVERSATION_COMPLETION_FRAMEWORK.md) · [Spec 112 Memory](../docs/SPARK_COMPANION_MEMORY_CONTEXT_FRAMEWORK.md) · [Spec 106 Guardrails](../docs/SPARK_CONVERSATION_GUARDRAILS_FRAMEWORK.md) · [Spec 108 Environment Integration](../docs/SPARK_ENVIRONMENT_INTEGRATION_FRAMEWORK.md)
+
+## Spark Promise
+
+**Nothing important gets lost, and you never have to remember where you put it.**
+
+## Three certainties (before any meaningful ending)
+
+1. **What happened?** — calm reassurance, not "Save successful"
+2. **Where is it?** — Business Brain™, project, Business Assets™
+3. **Can I find it later?** — reassure, never instruct
+
+If any answer is "no" → provide reassurance before moving on.
+
+## Never leave members wondering
+
+Did it save? · Where did it go? · What was it called? · How do I find it?
+
+## Conversation instead of menus
+
+Ask: *"What would you like to do next?"*
+
+Never end with Save · Export · Print · Share toolbar.
+
+Member says "Print it" → Spark opens print experience. **Conversation Drives Navigation™**
+
+## Quiet organization (background)
+
+Autosave · versions · project linking · Brain · Assets · search indexing
+
+## Retrieval = conversational
+
+"Show me my marketing plan." — meaning, not filenames.
+
+## When cannot save — explain honestly
+
+Never leave uncertainty.
+
+## Philosophy
+
+Spark remembers so member doesn't. Organization = Spark. Thinking = member.
+
+**Types:** `lib/sparkCertaintyBeforeCompletion/types.ts`
+
+Also: Spec 105–112 · [Relationship Constitution](../docs/RELATIONSHIP_CONSTITUTION.md)

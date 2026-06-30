@@ -9,7 +9,7 @@
 | **Version** | 1.0 |
 | **Status** | Engineering Specification |
 | **Owner** | Spark OS™ |
-| **Dependencies** | [001 – Spark Constitution™](./00-spark-constitution.md) · [003 – Business Brain™](./003-business-brain.md) · [004 – Spark Knowledge Model™](./004-spark-knowledge-model.md) · [005 – Guidance Engine™](./005-guidance-engine.md) · [09 – Performance & Routing](./09-spark-performance-routing-engine.md) · [13 – Cognitive Orchestration](./13-spark-cognitive-orchestration-engine.md) · [14 – Trust & Performance](./14-spark-trust-performance-engine.md) |
+| **Dependencies** | [001 – Spark Constitution™](./00-spark-constitution.md) · [003 – Business Brain™](./003-business-brain.md) · [004 – Spark Knowledge Model™](./004-spark-knowledge-model.md) · [005 – Guidance Engine™](./005-guidance-engine.md) · [09 – Performance & Routing](./09-spark-performance-routing-engine.md) · [13 – Cognitive Orchestration](./13-spark-cognitive-orchestration-engine.md) · [14 – Trust & Performance](./14-spark-trust-performance-engine.md) · [Spec 101 – Response Quality Framework](../docs/RESPONSE_QUALITY_FRAMEWORK.md) (experience standard) |
 | **Last Updated** | June 28, 2026 |
 
 ---

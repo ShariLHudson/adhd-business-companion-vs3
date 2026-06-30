@@ -4,6 +4,9 @@ import type { CompanionPlaceId } from "./types";
  * The Hospitality Principle
  * My Home. Prepared For You.
  *
+ * Product-wide emotional OS: Spec 111 — docs/SPARK_HOSPITALITY_FRAMEWORK.md
+ * This module: homestead arrival hospitality implementation.
+ *
  * The Companion Homestead is always Shari's home.
  * It is never rebuilt around the visitor.
  * What changes is how the home is prepared before someone arrives.

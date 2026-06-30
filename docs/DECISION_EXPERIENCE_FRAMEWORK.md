@@ -10,7 +10,7 @@
 | **Status** | Foundational |
 | **Owner** | Spark Product & Experience |
 | **Applies to** | All decision-support experiences in Spark |
-| **Related** | [T-005 Experience Patterns](./EXPERIENCE_PATTERNS.md) (Pattern 4 — Decision) · [T-006 Trust Experience](./TRUST_EXPERIENCE.md) · [005 – Guidance Engine](../spark-intelligence-foundation/005-guidance-engine.md) · [Decision Intelligence](../lib/decision-intelligence/) |
+| **Related** | [Spec 101 — Response Quality](./RESPONSE_QUALITY_FRAMEWORK.md) · [T-005 Experience Patterns](./EXPERIENCE_PATTERNS.md) (Pattern 4 — Decision) · [T-006 Trust Experience](./TRUST_EXPERIENCE.md) · [005 – Guidance Engine](../spark-intelligence-foundation/005-guidance-engine.md) · [Decision Intelligence](../lib/decision-intelligence/) |
 
 ---
 

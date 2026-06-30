@@ -1,0 +1,37 @@
+---
+description: Conversation Gold Standards (Spec 116) — compare every conversational output to complete reference conversations
+globs:
+  - docs/conversation-gold-standards/**
+  - lib/sparkConversationGoldStandards/**
+  - components/prototype/**
+  - lib/sparkCoreIntelligence/conversationEngine/**
+alwaysApply: false
+---
+
+# Conversation Gold Standards™ (Spec 116)
+
+**Full document:** `docs/SPARK_CONVERSATION_GOLD_STANDARDS_FRAMEWORK.md`
+
+**Library:** `docs/conversation-gold-standards/` · **Catalog:** `lib/sparkConversationGoldStandards/types.ts`
+
+**Flow rules:** [Spec 114](../docs/SPARK_CONVERSATION_FLOW_ENGINE_FRAMEWORK.md) · **Hidden work:** [Spec 118](../docs/SPARK_HIDDEN_WORK_ENGINE_FRAMEWORK.md) · **Break-it tests:** [Spec 119](../docs/SPARK_CONVERSATION_TESTS_FRAMEWORK.md) · **Freeze:** [Architecture Freeze](../docs/SPARK_CONVERSATION_ARCHITECTURE_FREEZE.md)
+
+## When output feels wrong
+
+1. Find nearest scenario in catalog (28 planned → 50 target)
+2. Diff turn-by-turn: Shari copy · reasoning · hidden work · permissions · completion
+3. Use compare checklist at end of each gold standard file
+
+## Complete (V1)
+
+01 marketing app · 02 overwhelmed · 03 have an idea · 06 help me think · 07 huge win · 08 brain break
+
+## Priority planned next
+
+04 don't know what to do · 05 should I create a course · 09–28 catalog
+
+## Every gold standard includes
+
+Shari responses · internal reasoning · hidden work · permissions · suggestions · completion · anti-patterns
+
+**Supersedes:** Spec 115 Examples framework (same intent, this is authoritative)

@@ -1,0 +1,97 @@
+/* Grow™ — entrepreneurial capability rooms */
+
+.grow-room-panel {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vh, 1.75rem) clamp(1rem, 4vw, 1.5rem) 2.5rem;
+}
+
+.grow-room__header {
+  margin-top: 0.35rem;
+}
+
+.grow-room__statement {
+  margin: 0;
+}
+
+.grow-room__lead {
+  margin-top: 0.45rem;
+}
+
+.grow-room__cards {
+  margin-top: clamp(1.25rem, 2.8vh, 1.55rem);
+}
+
+.grow-room__card {
+  gap: 0.35rem;
+}
+
+.grow-room__card-action {
+  margin-top: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: #2f4a3e;
+}
+
+.grow-room__back {
+  margin-bottom: 0.5rem;
+}
+
+.grow-room__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 1.35rem;
+  margin-top: 1.25rem;
+}
+
+.grow-room__section-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 650;
+  color: #2a2820;
+}
+
+.grow-room__section-tagline {
+  margin: 0.25rem 0 0.65rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #6f6259;
+}
+
+.grow-room__placeholder-list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.grow-room__placeholder-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  border: 1px solid rgba(139, 115, 85, 0.14);
+  border-radius: 0.75rem;
+  background: rgba(255, 252, 245, 0.68);
+  padding: 0.7rem 0.85rem;
+}
+
+.grow-room__placeholder-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2f261f;
+}
+
+.grow-room__placeholder-note {
+  font-size: 0.78rem;
+  color: #8a7d72;
+}
+
+.grow-room__coming-soon {
+  margin-top: 1.25rem;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: #6f6259;
+  max-width: 32rem;
+}

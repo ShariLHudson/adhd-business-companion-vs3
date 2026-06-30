@@ -12,6 +12,7 @@ import {
   type FocusHubAction,
   type FocusHubTool,
 } from "@/lib/focusHub";
+import { FOCUS_PRIMARY_TOOLS } from "@/lib/focusPrimaryTools";
 import { evaluateFocusLandscape } from "@/lib/focusLandscape";
 import { FOCUS_MY_BRAIN_HUB_CARDS } from "@/lib/focusMyBrain/focusRoom";
 import {
@@ -136,6 +137,24 @@ function FocusMyBrainHub({
       data-testid="focus-area-panel"
       data-focus-view="feelings"
     >
+      <section className="focus-primary-tools" aria-label="Focus tools">
+        <p className="focus-primary-tools__kicker">Help my brain</p>
+        <ul className="focus-primary-tools__list">
+          {FOCUS_PRIMARY_TOOLS.map((tool) => (
+            <li key={tool.id}>
+              <button
+                type="button"
+                className="focus-primary-tools__item"
+                data-testid={`focus-primary-${tool.id}`}
+                onClick={() => onSelectTool(tool.action)}
+              >
+                <span className="focus-primary-tools__label">{tool.label}</span>
+                <span className="focus-primary-tools__desc">{tool.description}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      </section>
       <ul className="focus-hub-choices">
         {FOCUS_FEELING_ENTRIES.map((feeling) => (
           <FocusHubChoice

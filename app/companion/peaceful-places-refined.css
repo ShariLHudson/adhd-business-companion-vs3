@@ -1270,32 +1270,27 @@
 .peaceful-places-landing[data-baked-title="1"][data-flag-hover-side="right"]
   .peaceful-places-landing__lantern-glow--right,
 .peaceful-places-landing[data-baked-title="1"][data-flag-hover="unwind"]
+  .peaceful-places-landing__lantern-glow--left,
+.peaceful-places-landing[data-baked-title="1"][data-flag-hover="unwind"]
   .peaceful-places-landing__lantern-glow--right {
   display: block;
   opacity: 0.95;
   filter: blur(14px) brightness(1.18) saturate(1.08);
-  animation: peaceful-places-lantern-pulse 4.2s ease-in-out infinite;
+  animation: peaceful-places-lantern-flicker 2.6s linear infinite;
 }
 
+.peaceful-places-landing[data-baked-title="1"][data-flag-hover-side="right"]
+  .peaceful-places-landing__lantern-glow--right,
 .peaceful-places-landing[data-baked-title="1"][data-flag-hover="unwind"]
   .peaceful-places-landing__lantern-glow--right {
-  animation: peaceful-places-lantern-flicker 2.8s ease-in-out infinite;
-}
-
-@keyframes peaceful-places-lantern-flicker {
-  0%,
-  100% {
-    opacity: 0.88;
-    filter: blur(14px) brightness(1.12) saturate(1.05);
-  }
-  40% {
-    opacity: 1;
-    filter: blur(12px) brightness(1.28) saturate(1.12);
-  }
-  68% {
-    opacity: 0.82;
-    filter: blur(15px) brightness(1.08) saturate(1.02);
-  }
+  background: radial-gradient(
+    circle,
+    rgba(255, 214, 140, 0.78) 0%,
+    rgba(255, 196, 108, 0.42) 42%,
+    transparent 72%
+  );
+  animation: peaceful-places-lantern-flicker-right 2.6s linear infinite;
+  animation-delay: 0.55s;
 }
 
 .peaceful-places-landing[data-baked-title="1"][data-flag-hover="focus"] .peaceful-places-landing__season-accent {

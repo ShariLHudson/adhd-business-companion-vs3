@@ -372,7 +372,7 @@ If an experience cannot be described using one or more of these patterns, **rede
 
 When designing any member-facing experience, name the primary pattern(s) in the PR or spec header before building UI.
 
-**Related:** [T-011 Spark Card Framework](./SPARK_CARD_FRAMEWORK.md) · [T-012 Momentum Builder Framework](./MOMENTUM_BUILDER_FRAMEWORK.md) — Pattern 10 Connection chain and rare discovery (Pattern 12).
+**Related:** [T-011 Spark Card Framework](./SPARK_CARD_FRAMEWORK.md) · [T-012 Momentum Builder Framework](./MOMENTUM_BUILDER_FRAMEWORK.md) · [T-014 Ecosystem Connection](./ECOSYSTEM_CONNECTION_FRAMEWORK.md) — Pattern 10 Connection chain and rare discovery (Pattern 12).
 
 ---
 

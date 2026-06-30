@@ -1,0 +1,50 @@
+---
+description: Entrepreneurial Transformation Constitution (Spec 100) — governing philosophy of member growth
+alwaysApply: true
+---
+
+# Entrepreneurial Transformation Constitution™ (Spec 100)
+
+**Full document:** `docs/ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md`
+
+**Spark OS™** governs how Spark understands. **This Constitution** governs how members grow. Every experience inherits from it.
+
+## Mission
+
+Help entrepreneurs become more capable, confident, and effective decision-makers — reducing cognitive effort. **Not** content factory. **Not** automation. **Building entrepreneurs.**
+
+## Hero Principle™
+
+Member is always the hero. Spark = guide, thinking partner, mentor, companion, teacher, encourager. Every success belongs to the member.
+
+## Eight governing principles
+
+Hero · Cognitive Load · Capability · Transformation · Connection · Decision · Ownership · Trust Experience
+
+## Transformation cycle
+
+Understanding → Thinking → Decision → Action → Reflection → Learning → Growth → Better Understanding. **No finish line.**
+
+## Ultimate measure of success
+
+**Quality of the member's next decision** — not time in app, streaks, asset count, or engagement.
+
+## Before any experience ships — answer all seven
+
+1. What capability does this strengthen?
+2. How will the member recognize growth?
+3. How does this improve the next decision?
+4. How does this influence the business?
+5. How does this connect to the ecosystem?
+6. Does this reduce cognitive load?
+7. Will the member leave more capable?
+
+If any answer is unclear → **not ready**.
+
+**Type:** `EntrepreneurialExperienceDesignQuestions` in `lib/sparkTransformationConstitution/types.ts`
+
+## Constitutional statement
+
+Spark is not building businesses. **Spark is building entrepreneurs.**
+
+Child specs: T-003–T-017 under [Spec 100](../docs/ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md). Response delivery: [Spec 101](../docs/RESPONSE_QUALITY_FRAMEWORK.md). Trust: [Spec 102](../docs/TRUST_EXPERIENCE_FRAMEWORK.md). Universal experience: [Spec 103](../docs/UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md). Create: [Spec 104](../docs/CREATE_EXPERIENCE_PHILOSOPHY.md). Conversation: [Spec 105–107](../docs/SPARK_CONVERSATION_ENGINE_FRAMEWORK.md). Environment integration: [Spec 108](../docs/SPARK_ENVIRONMENT_INTEGRATION_FRAMEWORK.md). Frosted workspace: [Spec 109](../docs/SPARK_FROSTED_CONVERSATION_WORKSPACE_FRAMEWORK.md). Completion: [Spec 110](../docs/SPARK_CONVERSATION_COMPLETION_FRAMEWORK.md). Hospitality: [Spec 111](../docs/SPARK_HOSPITALITY_FRAMEWORK.md). Memory: [Spec 112](../docs/SPARK_COMPANION_MEMORY_CONTEXT_FRAMEWORK.md). Certainty: [Spec 113](../docs/SPARK_CERTAINTY_BEFORE_COMPLETION_FRAMEWORK.md). Flow: [Spec 114](../docs/SPARK_CONVERSATION_FLOW_ENGINE_FRAMEWORK.md). Examples: [Spec 116 Gold Standards](../docs/SPARK_CONVERSATION_GOLD_STANDARDS_FRAMEWORK.md). Estate rooms: [T-017](../docs/ESTATE_ROOMS_FRAMEWORK.md). OS layer: Spark Intelligence Foundation 002–009.

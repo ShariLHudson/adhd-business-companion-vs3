@@ -57,6 +57,8 @@ export function PeacefulPlaceSession({ destination, onLeave }: Props) {
     (destination.experienceName.toLowerCase().includes("storm") ||
       destination.id.includes("summer-storm"));
 
+  const showHearthLight = destination.placeId === "evening-hearth";
+
   const leaveLabel = place?.sessionLeaveLabel ?? "Back to the path";
   const soundOnLabel = place?.sessionSoundOnLabel ?? DEFAULT_SOUND_ON_LABEL;
   const soundOffLabel = place?.sessionSoundOffLabel ?? DEFAULT_SOUND_OFF_LABEL;
@@ -153,6 +155,18 @@ export function PeacefulPlaceSession({ destination, onLeave }: Props) {
         />
         {showStormOutside ? (
           <div className="peaceful-place-session__storm-outside" />
+        ) : null}
+        {showHearthLight ? (
+          <div className="peaceful-place-session__hearth-light" aria-hidden="true">
+            <div className="peaceful-place-session__hearth-glow peaceful-place-session__hearth-glow--fire" />
+            <div className="peaceful-place-session__hearth-glow peaceful-place-session__hearth-glow--mantle-left" />
+            <div className="peaceful-place-session__hearth-glow peaceful-place-session__hearth-glow--mantle-right" />
+            <div className="peaceful-place-session__hearth-glow peaceful-place-session__hearth-glow--hearth-floor" />
+            <div className="peaceful-place-session__hearth-glow peaceful-place-session__hearth-glow--coffee-table" />
+            <div className="peaceful-place-session__hearth-glow peaceful-place-session__hearth-glow--side-chair" />
+            <div className="peaceful-place-session__hearth-glow peaceful-place-session__hearth-glow--shelf-a" />
+            <div className="peaceful-place-session__hearth-glow peaceful-place-session__hearth-glow--shelf-b" />
+          </div>
         ) : null}
       </div>
 

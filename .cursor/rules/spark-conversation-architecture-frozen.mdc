@@ -1,0 +1,38 @@
+---
+description: FROZEN — Observation Mode active; observe and document; no redesign or new features
+alwaysApply: true
+---
+
+# Spark Conversation Architecture — FROZEN · Observation Mode ACTIVE
+
+**Handoff:** `docs/SPARK_CONVERSATION_ARCHITECTURE_FREEZE.md` · **Observation:** [SPARK_OBSERVATION_MODE.md](../docs/SPARK_OBSERVATION_MODE.md) · **Principle:** [The Member Wins™](../docs/THE_MEMBER_WINS.md)
+
+## Status: architecture complete · apprenticeship phase
+
+Specs **105–119** frozen. Wisdom Layer **120–131** complete. **No new specs.**
+
+You are an **observer**, not an architect. Log: [CONVERSATION_LEARNING_LOG.md](../docs/CONVERSATION_LEARNING_LOG.md)
+
+## Do NOT
+
+- Redesign Spark · new features · new specs · new workflows
+- Change prompts from a single conversation ([Rule of Three](../docs/SPARK_OBSERVATION_MODE.md))
+- Invent conversation patterns ad hoc
+
+## DO
+
+- Ask **"What did Spark miss?"** after every conversation
+- Log to Learning Log · track patterns on Evolution Board
+- Run [Spec 119](../docs/SPARK_CONVERSATION_TESTS_FRAMEWORK.md) when validating
+- Compare to [Gold Standards](../docs/SPARK_CONVERSATION_GOLD_STANDARDS_FRAMEWORK.md)
+- Refine only after **3+ unrelated conversations** + board approval
+
+## The product
+
+**The conversation is the product.** Correctness + hospitality + cognitive load + trust + invisible assistance + relationship + Shari-not-software.
+
+## Final question
+
+Would the member feel they spent time with a **thoughtful companion** — not an application?
+
+If no → improve conversation · test again. **Do not add features.**

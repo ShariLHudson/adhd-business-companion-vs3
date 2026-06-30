@@ -1,29 +1,68 @@
 ---
-description: Universal Experience Standards (T-003) — premium estate UX, ADHD-friendly, low cognitive load
+description: Universal Experience Standards Framework (Spec 103) — one relationship; EF first; eight review gates
 alwaysApply: true
 ---
 
-# Universal Experience Standards™ (T-003)
+# Universal Experience Standards Framework™ (Spec 103)
 
-**Full document:** `docs/UNIVERSAL_EXPERIENCE_STANDARDS.md`
+**Full document:** `docs/UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md`
 
-Member-facing Spark must feel calm, premium, intentional, connected, and emotionally safe — never cartoonish, arcade-like, dashboard-heavy, or generic AI app.
+**Supplementary:** [T-003](../docs/UNIVERSAL_EXPERIENCE_STANDARDS.md) — flow arc, max 3 choices, language rules, nine-point checklist.
 
-## Before any member-facing UI or copy ships
+One coherent entrepreneurial ecosystem — not disconnected features. Members continue **one relationship**.
 
-1. **One primary action** per screen — secondaries must not compete.
-2. **Max 3 choices** visible — hide more behind “More options” / “Show me more”.
-3. **Progressive disclosure** — do not show everything at once.
-4. **Connection** — link to at least one: Business Asset, Spark Card, Gallery, Momentum, Guild, Companion, Estate, or Guidance.
-5. **EF-friendly** — reduce remember / organize / sort / prioritize / restart / repeat-context burden.
-6. **Visual** — elegant, warm, spacious, estate-like; subtle motion only; no childish rewards or streak language.
-7. **Celebrate growth** — clarity, courage, decisions, returns; not activity metrics.
-8. **Relationship Constitution** — Shari test, no software voice, no guilt or pressure.
+## The Spark Feeling™
 
-## Release gate
+Calm · Clarity · Confidence · Curiosity · Momentum · Belonging · Hope · Ownership
 
-Run the nine-point checklist in `docs/UNIVERSAL_EXPERIENCE_STANDARDS.md`. If it would not feel appropriate five years from now, it is not finished.
+**Type:** `SparkFeeling` in `lib/sparkUniversalExperience/types.ts`
 
-## Implementation prompt (use in design tasks)
+## Eight Universal Design Principles
 
-Build this as part of Spark’s premium entrepreneurial estate experience. Avoid cartoon, arcade, dashboard, or generic AI app styling. Use calm spacing, refined language, low cognitive load, and clear connection to member growth.
+One Relationship · Orientation Before Action · Calm Before Complexity · Executive Function First · Confidence Before Completion · Guidance Before Automation · Ownership Always · Connection Everywhere
+
+Spark carries complexity. Members carry creativity.
+
+## Cognitive load
+
+**Minimize:** decision fatigue, context switching, repetition, overload, navigation complexity, memory burden.
+
+**Maximize:** recognition over recall, visual clarity, progressive learning, orientation, obvious next actions.
+
+## Interaction gate (all four clear)
+
+What am I doing? · Why does it matter? · What happens next? · What should I do now?
+
+## Visual + emotional
+
+Estate: premium, warm, elegant, timeless — never gamified, busy, toy-like, overstimulating.
+
+**Warm light:** lanterns, candles, and fireplaces use gentle flicker — see [Estate Light Flicker](../.cursor/rules/estate-light-flicker.mdc) · `app/companion/estate-light-flicker.css`.
+
+Reduce overwhelm, shame, paralysis. Increase hope, clarity, courage, confidence, momentum, belonging.
+
+## T-003 operational rules
+
+- **One primary action** per screen
+- **Max 3 choices** — hide more behind progressive disclosure
+- **Celebrate transformation** — not streaks or usage metrics
+- **Relationship Constitution** — Shari test always
+
+## Experience Review Checklist (all must be yes)
+
+1. Reduces cognitive load?
+2. Strengthens capability?
+3. Improves decision quality?
+4. Preserves ownership?
+5. Strengthens trust?
+6. Connects to Spark?
+7. Supports transformation?
+8. Feels like Spark?
+
+**Type:** `SPARK_UNIVERSAL_EXPERIENCE_REVIEW_CHECKLIST`
+
+Parent: [Spec 100](../docs/ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md). Also: Spec 101–112 · **Spec 113 Certainty** · T-014 Connection · [T-017 Estate Rooms](../docs/ESTATE_ROOMS_FRAMEWORK.md).
+
+## Implementation prompt
+
+Build as Spark's premium entrepreneurial estate experience. Calm spacing, refined language, low cognitive load, clear connection to member growth — never cartoon, arcade, dashboard, or generic AI app styling.

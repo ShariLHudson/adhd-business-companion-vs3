@@ -10,7 +10,7 @@
 | **Status** | Foundational |
 | **Owner** | Spark Product & Experience |
 | **Applies to** | Momentum Builder™ Library, Capability Graph™, Business Assets™, Spark Cards™, Gallery™, Guilds™, Estate™, Community™ |
-| **Related** | [T-011 Spark Cards](./SPARK_CARD_FRAMEWORK.md) · [T-010 Founder Journey](./FOUNDER_JOURNEY_FRAMEWORK.md) · [T-005 Experience Patterns](./EXPERIENCE_PATTERNS.md) · [T-007 Entrepreneurial Resilience](./ENTREPRENEURIAL_RESILIENCE.md) · [002 – Business Assets](../spark-intelligence-foundation/002-business-asset-architecture.md) · [003 – Business Brain](../spark-intelligence-foundation/003-business-brain.md) |
+| **Related** | [T-014 Ecosystem Connection](./ECOSYSTEM_CONNECTION_FRAMEWORK.md) · [T-011 Spark Cards](./SPARK_CARD_FRAMEWORK.md) · [T-016 Daily Discoveries](./DAILY_DISCOVERIES_FRAMEWORK.md) · [T-010 Founder Journey](./FOUNDER_JOURNEY_FRAMEWORK.md) · [T-005 Experience Patterns](./EXPERIENCE_PATTERNS.md) · [T-007 Entrepreneurial Resilience](./ENTREPRENEURIAL_RESILIENCE.md) · [002 – Business Assets](../spark-intelligence-foundation/002-business-asset-architecture.md) · [003 – Business Brain](../spark-intelligence-foundation/003-business-brain.md) |
 
 ---
 
@@ -247,6 +247,8 @@ Gallery records:
 - Decision milestones
 
 **Not** scores. **Not** completion. **Transformation.**
+
+See [T-015 Gallery Framework](./GALLERY_FRAMEWORK.md).
 
 ---
 

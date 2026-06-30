@@ -1,0 +1,69 @@
+---
+description: Frosted Conversation Workspace (Spec 109) — universal frosted-glass surface; one panel; input always visible
+alwaysApply: true
+---
+
+# Spark Frosted Conversation Workspace™ (Spec 109)
+
+**Full document:** `docs/SPARK_FROSTED_CONVERSATION_WORKSPACE_FRAMEWORK.md`
+
+**Conversation stack:** Spec 105–108 · **Layout:** `.cursor/rules/workspace-layout.mdc`
+
+## Primary rule
+
+**The user should always know what to do next.**
+
+## Core idea
+
+One centered frosted-glass conversation panel. Room visible around edges. Not a dashboard. Not three columns.
+
+Implementation: `companion-workspace-frosted` · `workspaceFloatingCardShellClass()` in `lib/workspaceLayoutTokens.ts`
+
+## Typography minimums (desktop)
+
+| Element | px |
+|---------|-----|
+| Shari message | 30–36 |
+| User message | 26–30 |
+| Buttons / input | 24–30 |
+| Supporting | 22–24 |
+
+No pale gray on glass. No thin fonts.
+
+## Six workspace states
+
+1. **Conversation** — default; one exchange visible
+2. **Help Options** — stuck triggers; four numbered choices
+3. **Research** — in-panel; 3–5 findings; same frosted surface
+4. **Draft Ready** — permission before show
+5. **Review** — draft primary; chat fades; old chat not behind draft
+6. **Completion** — only true prepared items; permission to review/save
+
+**Types:** `SparkFrostedWorkspaceState` in `lib/sparkFrostedConversationWorkspace/types.ts`
+
+## Non-negotiables
+
+- One question at a time
+- Numbered choices when helpful
+- **Input always visible** — never hidden when choices shown
+- No scroll chasing — next message in view
+- Permission before save/export/publish/send/delete
+
+## Map
+
+Folded map bottom-right — pauses conversation, never destroys it.
+
+## Mobile
+
+One column · large text · input fixed bottom · mic always available · choices stacked
+
+## Before shipping conversational UI
+
+- [ ] Primary rule — next step obvious?
+- [ ] Typography meets minimums?
+- [ ] Input always visible?
+- [ ] Review state hides competing chat?
+- [ ] Same behavior in every room (Spec 108)?
+- [ ] Permission before destructive/export actions?
+
+Also: Spec 105–109 · **Spec 110 Completion** · **Spec 111 Hospitality** · [Relationship Constitution](../docs/RELATIONSHIP_CONSTITUTION.md) · [workspace-layout.mdc](./workspace-layout.mdc)

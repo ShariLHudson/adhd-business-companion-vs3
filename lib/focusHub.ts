@@ -300,15 +300,15 @@ export const FOCUS_FEELING_CATEGORIES: FocusFeelingCategory[] = [
 
           tool(
 
-            "momentum-builders",
+            "quick-recharge",
 
-            "Momentum Builders",
+            "Quick Recharge",
 
-            { kind: "section", section: "games", toolId: "momentum-builders" },
+            { kind: "section", section: "quick-recharge", toolId: "quick-recharge" },
 
-            "Short resets for energy, focus, and calm.",
+            "Simple resets for when your brain needs a break.",
 
-            "✨",
+            "🌿",
 
           ),
 

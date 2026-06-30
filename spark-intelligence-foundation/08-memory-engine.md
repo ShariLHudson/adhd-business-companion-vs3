@@ -5,7 +5,7 @@
 | Field | Value |
 |-------|-------|
 | **Priority** | Context layer — consulted by Objective, Intelligence, Conversation, and Estate modules |
-| **Governed by** | [Spark Constitution™](./00-spark-constitution.md) · Trust Principles |
+| **Governed by** | [Spark Constitution™](./00-spark-constitution.md) · Trust Principles · **[Spec 112 — Companion Memory & Context](../docs/SPARK_COMPANION_MEMORY_CONTEXT_FRAMEWORK.md)** (experience layer) · **[Spec 117 — Business Brain Memory & Retrieval](../docs/SPARK_BUSINESS_BRAIN_MEMORY_RETRIEVAL_FRAMEWORK.md)** (knowledge architecture) |
 | **OS architecture** | [003 – Business Brain™](./003-business-brain.md) — this engine implements Brain memory rules |
 | **Lifecycle** | [009 – Business Brain Lifecycle](./009-business-brain-lifecycle.md) — stages, versioning, retrieval |
 | **Knowledge model** | [004 – Spark Knowledge Model™](./004-spark-knowledge-model.md) — Business Knowledge™ category |

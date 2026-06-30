@@ -10,9 +10,11 @@
 | **Status** | Foundational |
 | **Owner** | Spark Product & Experience |
 | **Applies to** | All current and future Create™ specifications and features |
-| **Related** | [002 – Business Asset Architecture](../spark-intelligence-foundation/002-business-asset-architecture.md) · [005 – Guidance Engine](../spark-intelligence-foundation/005-guidance-engine.md) · [T-003 Universal Experience Standards](./UNIVERSAL_EXPERIENCE_STANDARDS.md) · [T-005 Experience Patterns](./EXPERIENCE_PATTERNS.md) · [T-006 Trust Experience](./TRUST_EXPERIENCE.md) · [T-008 Decision Experience](./DECISION_EXPERIENCE_FRAMEWORK.md) · [Relationship Constitution](./RELATIONSHIP_CONSTITUTION.md) |
+| **Related** | [Spec 100 — Transformation Constitution](./ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md) · **[Spec 104 — Create™ Experience Philosophy](./CREATE_EXPERIENCE_PHILOSOPHY.md)** · [002 – Business Asset Architecture](../spark-intelligence-foundation/002-business-asset-architecture.md) · [005 – Guidance Engine](../spark-intelligence-foundation/005-guidance-engine.md) · [Spec 103 — Universal Experience](./UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md) · [T-003 Universal Experience](./UNIVERSAL_EXPERIENCE_STANDARDS.md) · [T-005 Experience Patterns](./EXPERIENCE_PATTERNS.md) · [T-008 Decision Experience](./DECISION_EXPERIENCE_FRAMEWORK.md) · [Relationship Constitution](./RELATIONSHIP_CONSTITUTION.md) |
 
 ---
+
+> **Parent spec:** [Spec 104 — Create™ Experience Philosophy](./CREATE_EXPERIENCE_PHILOSOPHY.md) is the foundational experience specification. This document (T-004) retains supplementary material — intent before output, build before write, progressive creation, and implementation notes.
 
 ## Purpose
 
@@ -375,6 +377,8 @@ Content generation is a tool.
 **Entrepreneurial growth is the mission.**
 
 **Cursor rule:** `.cursor/rules/create-philosophy.mdc`
+
+**Framework types:** `lib/sparkCreateExperience/types.ts` (Spec 104)
 
 ---
 

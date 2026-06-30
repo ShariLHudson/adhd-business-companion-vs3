@@ -8,6 +8,7 @@ import type {
   EmotionalState,
   MultiTurnPlan,
 } from "./types";
+import { detectHiddenIntent } from "@/lib/sparkConversation/hiddenIntent";
 
 export type ClarificationDecision = {
   needed: boolean;
@@ -120,6 +121,15 @@ export function inferObjective(message: string, intent: ConversationIntent): {
       desiredOutcome: "Member feels lighter with one clear optional next step",
     };
   }
+
+  const hidden = detectHiddenIntent(trimmed);
+  if (hidden) {
+    return {
+      summary: hidden.literalRequest,
+      desiredOutcome: hidden.hiddenGoal,
+    };
+  }
+
   return {
     summary: trimmed.length > 120 ? `${trimmed.slice(0, 120)}…` : trimmed,
     desiredOutcome: `Move the member forward on: ${trimmed.slice(0, 80)}`,

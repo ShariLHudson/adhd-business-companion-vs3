@@ -1,0 +1,64 @@
+---
+description: Daily Discoveries Framework (T-016) — Learn Connect Apply; curiosity not consumption
+globs:
+  - lib/sparkDailyDiscoveries/**
+  - lib/growNavigation.ts
+  - components/**/*[Dd]iscover*
+  - components/**/*[Gg]row*
+alwaysApply: false
+---
+
+# Daily Discoveries™ Framework (T-016)
+
+**Full document:** `docs/DAILY_DISCOVERIES_FRAMEWORK.md`
+
+Daily Discoveries™ are **not** daily tips. Curated entrepreneurial insight — small, meaningful, immediately useful.
+
+## Core question
+
+> **"How will this make me think differently about my business today?"**
+
+## Discovery Principle™ (all three required)
+
+**Learn** — genuinely valuable · **Connect** — why it matters · **Apply** — immediate use
+
+Missing one → not a Spark Discovery.
+
+## Ten categories (rotate naturally)
+
+Entrepreneur Stories · This Day in Business · Mental Models · Marketing Psychology · AI & Technology · Innovation · Customer Understanding · Leadership · Research Spotlight · Hidden Connections
+
+**Type:** `DiscoveryCategory` in `lib/sparkDailyDiscoveries/types.ts`
+
+## Structure rhythm
+
+Remarkable Idea → Why It Matters → Business Connection → Personal Connection → Suggested Action → Related Experiences
+
+Discovery **never stands alone** (T-014).
+
+## Required spec fields
+
+Category · capability strengthened · Brain personalization · Asset/Card/Builder/Guild links when relevant · Gallery only when exceptional (T-015) · reflection question · practical application
+
+**Type:** `SparkDailyDiscoverySpec`
+
+## Companion
+
+Natural bridges — Observatory, business relevance, project similarity. **Never** "Here is today's tip." Shari test.
+
+## Integrations
+
+- **Observatory** — future becomes practical
+- **Spark Cards** — curiosity → depth
+- **Momentum Builders** — Discovery → practice when appropriate
+- **Gallery** — exceptional transformations only
+
+## EF
+
+2–5 minutes · easy to read · memorable · curiosity — not overload.
+
+## V1 note
+
+`lib/companionEnvironmentIntelligence/dailyDiscovery.ts` = estate **hospitality ambience** (holidays, tea). **Not** T-016 entrepreneurial Discoveries product.
+
+Also: T-014 Ecosystem Connection · T-011 Spark Cards · T-012 Momentum Builders · T-015 Gallery · Spec 100 Transformation.

@@ -58,14 +58,21 @@ This folder is the source of truth for how **Spark** thinks, responds, routes co
 ## Related internal docs
 
 - `docs/RELATIONSHIP_CONSTITUTION.md`
-- `docs/UNIVERSAL_EXPERIENCE_STANDARDS.md` (T-003 — member-facing UX)
-- `docs/CREATE_PHILOSOPHY.md` (T-004 — Create™ entrepreneurial transformation)
+- `docs/ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md` — **Spec 100** — governing philosophy of member growth (parent of T-003–T-017)
+- `docs/UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md` (Spec 103 — universal UX principles)
+- `docs/UNIVERSAL_EXPERIENCE_STANDARDS.md` (T-003 — flow arc, max 3 choices, supplementary)
+- `docs/CREATE_EXPERIENCE_PHILOSOPHY.md` (Spec 104 — Business Creation Studio)
+- `docs/CREATE_PHILOSOPHY.md` (T-004 — intent before output, supplementary)
 - `docs/EXPERIENCE_PATTERNS.md` (T-005 — twelve experience patterns)
-- `docs/TRUST_EXPERIENCE.md` (T-006 — trust as experience)
+- `docs/TRUST_EXPERIENCE_FRAMEWORK.md` (Spec 102 — trust as experience)
+- `docs/TRUST_EXPERIENCE.md` (T-006 — Trust Pyramid™, supplementary)
 - `docs/ENTREPRENEURIAL_RESILIENCE.md` (T-007 — difficult seasons)
 - `docs/DECISION_EXPERIENCE_FRAMEWORK.md` (T-008 — decision support)
 - `docs/COMPANION_RELATIONSHIP_FRAMEWORK.md` (T-009 — relationship evolution)
 - `docs/FOUNDER_JOURNEY_FRAMEWORK.md` (T-010 — entrepreneurial journey stages)
+- `docs/GALLERY_FRAMEWORK.md` (T-015 — transformation story, not activity log)
+- `docs/DAILY_DISCOVERIES_FRAMEWORK.md` (T-016 — Learn · Connect · Apply)
+- `docs/ESTATE_ROOMS_FRAMEWORK.md` (T-017 — environmental psychology, one purpose per room)
 - `lib/intelligence/INTELLIGENCE_REGISTRY.md`
 - `lib/characterOfShari/CONSTITUTION.md`
 - `AGENTS.md` (companion architecture)

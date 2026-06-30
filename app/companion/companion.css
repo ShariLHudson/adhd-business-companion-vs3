@@ -4147,6 +4147,213 @@
     );
 }
 
+/* Evening Hearth — fireplace and candle light flicker over the room image */
+.peaceful-place-session__hearth-light {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.peaceful-place-session__hearth-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    circle,
+    rgba(255, 214, 140, 0.72) 0%,
+    rgba(255, 176, 96, 0.34) 38%,
+    transparent 72%
+  );
+  filter: blur(10px);
+  animation: peaceful-place-hearth-candle-flicker 2.4s ease-in-out infinite;
+}
+
+.peaceful-place-session__hearth-glow--fire {
+  left: 16%;
+  bottom: 30%;
+  top: auto;
+  width: clamp(7rem, 17vw, 13rem);
+  height: clamp(8.5rem, 20vh, 14rem);
+  transform: none;
+  border-radius: 42% 42% 50% 50%;
+  background: radial-gradient(
+    ellipse at 50% 78%,
+    rgba(255, 168, 88, 0.48) 0%,
+    rgba(255, 112, 48, 0.2) 42%,
+    transparent 74%
+  );
+  filter: blur(14px);
+  animation: peaceful-place-hearth-fire-flicker 3.8s ease-in-out infinite;
+}
+
+.peaceful-place-session__hearth-glow--mantle-left {
+  left: 27%;
+  top: 49%;
+  width: clamp(1.6rem, 3.2vw, 2.4rem);
+  height: clamp(1.8rem, 3.6vw, 2.6rem);
+  animation-delay: 0.35s;
+}
+
+.peaceful-place-session__hearth-glow--mantle-right {
+  left: 37%;
+  top: 49%;
+  width: clamp(1.6rem, 3.2vw, 2.4rem);
+  height: clamp(1.8rem, 3.6vw, 2.6rem);
+  animation-delay: 0.85s;
+}
+
+.peaceful-place-session__hearth-glow--hearth-floor {
+  left: 31%;
+  top: 62%;
+  width: clamp(1.8rem, 3.6vw, 2.8rem);
+  height: clamp(2rem, 4vw, 3rem);
+  animation-delay: 1.15s;
+}
+
+.peaceful-place-session__hearth-glow--coffee-table {
+  left: 47%;
+  top: 60%;
+  width: clamp(2rem, 4vw, 3.2rem);
+  height: clamp(2.2rem, 4.4vw, 3.4rem);
+  animation-delay: 0.55s;
+}
+
+.peaceful-place-session__hearth-glow--side-chair {
+  left: 9%;
+  top: 56%;
+  width: clamp(1.2rem, 2.4vw, 1.8rem);
+  height: clamp(1.4rem, 2.8vw, 2rem);
+  animation-delay: 1.45s;
+}
+
+.peaceful-place-session__hearth-glow--shelf-a {
+  left: 50%;
+  top: 46%;
+  width: clamp(1rem, 2vw, 1.5rem);
+  height: clamp(1.1rem, 2.2vw, 1.6rem);
+  animation-delay: 0.2s;
+}
+
+.peaceful-place-session__hearth-glow--shelf-b {
+  left: 54%;
+  top: 50%;
+  width: clamp(0.9rem, 1.8vw, 1.4rem);
+  height: clamp(1rem, 2vw, 1.5rem);
+  animation-delay: 0.95s;
+}
+
+@keyframes peaceful-place-hearth-fire-flicker {
+  0%,
+  100% {
+    opacity: 0.72;
+    filter: blur(14px) brightness(1);
+    transform: scale(1);
+  }
+
+  8% {
+    opacity: 0.83;
+    filter: blur(15px) brightness(1.07);
+    transform: scale(1.02);
+  }
+
+  16% {
+    opacity: 0.69;
+    filter: blur(13px) brightness(0.97);
+    transform: scale(0.985);
+  }
+
+  24% {
+    opacity: 0.8;
+    filter: blur(14px) brightness(1.04);
+    transform: scale(1.01);
+  }
+
+  33% {
+    opacity: 0.67;
+    filter: blur(12px) brightness(0.96);
+    transform: scale(0.98);
+  }
+
+  42% {
+    opacity: 0.82;
+    filter: blur(15px) brightness(1.06);
+    transform: scale(1.015);
+  }
+
+  55% {
+    opacity: 0.71;
+    filter: blur(13px) brightness(0.99);
+    transform: scale(0.99);
+  }
+
+  68% {
+    opacity: 0.81;
+    filter: blur(14px) brightness(1.05);
+    transform: scale(1.01);
+  }
+
+  82% {
+    opacity: 0.7;
+    filter: blur(13px) brightness(0.98);
+    transform: scale(0.985);
+  }
+}
+
+@keyframes peaceful-place-hearth-candle-flicker {
+  0%,
+  100% {
+    opacity: 0.58;
+    filter: blur(10px) brightness(1);
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  12% {
+    opacity: 0.88;
+    filter: blur(11px) brightness(1.18);
+    transform: translate(-50%, -50%) scale(1.14);
+  }
+
+  22% {
+    opacity: 0.48;
+    filter: blur(8px) brightness(0.92);
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+
+  34% {
+    opacity: 0.82;
+    filter: blur(12px) brightness(1.12);
+    transform: translate(-50%, -50%) scale(1.08);
+  }
+
+  48% {
+    opacity: 0.52;
+    filter: blur(9px) brightness(0.94);
+    transform: translate(-50%, -50%) scale(0.92);
+  }
+
+  61% {
+    opacity: 0.9;
+    filter: blur(12px) brightness(1.16);
+    transform: translate(-50%, -50%) scale(1.12);
+  }
+
+  74% {
+    opacity: 0.56;
+    filter: blur(9px) brightness(0.96);
+    transform: translate(-50%, -50%) scale(0.94);
+  }
+
+  88% {
+    opacity: 0.78;
+    filter: blur(11px) brightness(1.08);
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+}
+
 .peaceful-place-session__corner-sign {
   position: fixed;
   right: clamp(0.75rem, 2.2vw, 1.25rem);
@@ -4460,8 +4667,46 @@
 }
 
 .peaceful-places-landing[data-lantern-glow="1"] .peaceful-places-landing__lantern-glow {
-  opacity: 0.78;
-  animation: peaceful-places-lantern-pulse 5.5s ease-in-out infinite;
+  opacity: 0.82;
+  animation: peaceful-places-lantern-flicker 2.6s linear infinite;
+}
+
+.peaceful-places-landing[data-lantern-glow="1"]
+  .peaceful-places-landing__lantern-glow--right {
+  background: radial-gradient(
+    circle,
+    rgba(255, 214, 140, 0.72) 0%,
+    rgba(255, 196, 108, 0.38) 42%,
+    transparent 72%
+  );
+  animation: peaceful-places-lantern-flicker-right 2.6s linear infinite;
+  animation-delay: 0.55s;
+}
+
+.peaceful-places-landing[data-lantern-glow="1"]
+  .peaceful-places-pathway-scene
+  .estate-lamppost__lantern-glow,
+.peaceful-places-landing[data-lantern-glow="1"]
+  .peaceful-places-signpost-portal
+  .estate-lamppost__lantern-glow {
+  animation: peaceful-places-lamppost-lantern-flicker 2.4s linear infinite;
+}
+
+.peaceful-places-landing[data-lantern-glow="1"]
+  .peaceful-places-pathway-scene
+  .estate-lamppost--right
+  .estate-lamppost__lantern-glow,
+.peaceful-places-landing[data-lantern-glow="1"]
+  .peaceful-places-signpost-portal
+  .estate-lamppost--right
+  .estate-lamppost__lantern-glow {
+  animation-delay: 0.45s;
+  filter: brightness(1.2);
+}
+
+.peaceful-places-landing[data-lantern-glow="1"]
+  .hanging-destination-menu__lantern-glow[data-lit="1"] {
+  animation: peaceful-places-lantern-flicker 2.2s linear infinite;
 }
 
 .peaceful-places-landing[data-garden-light="sunrise"] .peaceful-places-landing__estate-light {
@@ -4609,6 +4854,271 @@
   }
 }
 
+@keyframes peaceful-places-lantern-flicker {
+  0%,
+  100% {
+    opacity: 0.76;
+    filter: blur(16px) brightness(1.08) saturate(1.04);
+    transform: scale(1);
+  }
+
+  5% {
+    opacity: 0.98;
+    filter: blur(18px) brightness(1.24) saturate(1.1);
+    transform: scale(1.03);
+  }
+
+  9% {
+    opacity: 0.68;
+    filter: blur(14px) brightness(1.02) saturate(1);
+    transform: scale(0.98);
+  }
+
+  14% {
+    opacity: 0.92;
+    filter: blur(19px) brightness(1.2) saturate(1.08);
+    transform: scale(1.02);
+  }
+
+  18% {
+    opacity: 0.64;
+    filter: blur(13px) brightness(0.98) saturate(0.98);
+    transform: scale(0.97);
+  }
+
+  24% {
+    opacity: 0.86;
+    filter: blur(17px) brightness(1.14) saturate(1.06);
+    transform: scale(1.01);
+  }
+
+  32% {
+    opacity: 0.6;
+    filter: blur(14px) brightness(1) saturate(1);
+    transform: scale(0.96);
+  }
+
+  38% {
+    opacity: 0.96;
+    filter: blur(19px) brightness(1.22) saturate(1.1);
+    transform: scale(1.04);
+  }
+
+  46% {
+    opacity: 0.74;
+    filter: blur(15px) brightness(1.06) saturate(1.02);
+    transform: scale(0.99);
+  }
+
+  54% {
+    opacity: 0.9;
+    filter: blur(18px) brightness(1.18) saturate(1.08);
+    transform: scale(1.02);
+  }
+
+  62% {
+    opacity: 0.66;
+    filter: blur(13px) brightness(0.99) saturate(0.99);
+    transform: scale(0.97);
+  }
+
+  70% {
+    opacity: 0.94;
+    filter: blur(19px) brightness(1.2) saturate(1.08);
+    transform: scale(1.03);
+  }
+
+  78% {
+    opacity: 0.72;
+    filter: blur(15px) brightness(1.04) saturate(1.02);
+    transform: scale(0.98);
+  }
+
+  86% {
+    opacity: 0.88;
+    filter: blur(17px) brightness(1.12) saturate(1.06);
+    transform: scale(1.01);
+  }
+
+  93% {
+    opacity: 0.78;
+    filter: blur(16px) brightness(1.06) saturate(1.03);
+    transform: scale(1);
+  }
+}
+
+/* Right pathway lantern — brighter floor to match left in the photo */
+@keyframes peaceful-places-lantern-flicker-right {
+  0%,
+  100% {
+    opacity: 0.86;
+    filter: blur(16px) brightness(1.18) saturate(1.08);
+    transform: scale(1);
+  }
+
+  5% {
+    opacity: 1;
+    filter: blur(18px) brightness(1.34) saturate(1.14);
+    transform: scale(1.03);
+  }
+
+  9% {
+    opacity: 0.78;
+    filter: blur(14px) brightness(1.12) saturate(1.04);
+    transform: scale(0.98);
+  }
+
+  14% {
+    opacity: 0.96;
+    filter: blur(19px) brightness(1.3) saturate(1.12);
+    transform: scale(1.02);
+  }
+
+  18% {
+    opacity: 0.76;
+    filter: blur(13px) brightness(1.08) saturate(1.02);
+    transform: scale(0.97);
+  }
+
+  24% {
+    opacity: 0.92;
+    filter: blur(17px) brightness(1.24) saturate(1.1);
+    transform: scale(1.01);
+  }
+
+  32% {
+    opacity: 0.74;
+    filter: blur(14px) brightness(1.1) saturate(1.04);
+    transform: scale(0.96);
+  }
+
+  38% {
+    opacity: 1;
+    filter: blur(19px) brightness(1.32) saturate(1.14);
+    transform: scale(1.04);
+  }
+
+  46% {
+    opacity: 0.84;
+    filter: blur(15px) brightness(1.16) saturate(1.06);
+    transform: scale(0.99);
+  }
+
+  54% {
+    opacity: 0.96;
+    filter: blur(18px) brightness(1.28) saturate(1.12);
+    transform: scale(1.02);
+  }
+
+  62% {
+    opacity: 0.78;
+    filter: blur(13px) brightness(1.1) saturate(1.03);
+    transform: scale(0.97);
+  }
+
+  70% {
+    opacity: 0.98;
+    filter: blur(19px) brightness(1.3) saturate(1.12);
+    transform: scale(1.03);
+  }
+
+  78% {
+    opacity: 0.82;
+    filter: blur(15px) brightness(1.14) saturate(1.06);
+    transform: scale(0.98);
+  }
+
+  86% {
+    opacity: 0.94;
+    filter: blur(17px) brightness(1.22) saturate(1.1);
+    transform: scale(1.01);
+  }
+
+  93% {
+    opacity: 0.88;
+    filter: blur(16px) brightness(1.16) saturate(1.07);
+    transform: scale(1);
+  }
+}
+
+@keyframes peaceful-places-lamppost-lantern-flicker {
+  0%,
+  100% {
+    opacity: 0.76;
+    filter: blur(0) brightness(1.04);
+  }
+
+  5% {
+    opacity: 1;
+    filter: blur(0) brightness(1.22);
+  }
+
+  9% {
+    opacity: 0.68;
+    filter: blur(0) brightness(0.96);
+  }
+
+  14% {
+    opacity: 0.92;
+    filter: blur(0) brightness(1.18);
+  }
+
+  18% {
+    opacity: 0.64;
+    filter: blur(0) brightness(0.94);
+  }
+
+  24% {
+    opacity: 0.86;
+    filter: blur(0) brightness(1.12);
+  }
+
+  32% {
+    opacity: 0.6;
+    filter: blur(0) brightness(0.98);
+  }
+
+  38% {
+    opacity: 0.96;
+    filter: blur(0) brightness(1.2);
+  }
+
+  46% {
+    opacity: 0.74;
+    filter: blur(0) brightness(1.06);
+  }
+
+  54% {
+    opacity: 0.9;
+    filter: blur(0) brightness(1.16);
+  }
+
+  62% {
+    opacity: 0.66;
+    filter: blur(0) brightness(0.97);
+  }
+
+  70% {
+    opacity: 0.94;
+    filter: blur(0) brightness(1.18);
+  }
+
+  78% {
+    opacity: 0.72;
+    filter: blur(0) brightness(1.02);
+  }
+
+  86% {
+    opacity: 0.88;
+    filter: blur(0) brightness(1.1);
+  }
+
+  93% {
+    opacity: 0.8;
+    filter: blur(0) brightness(1.05);
+  }
+}
+
 @keyframes peaceful-places-arrival-fade {
   from {
     opacity: 0;
@@ -4679,6 +5189,9 @@
 @media (prefers-reduced-motion: reduce) {
   .peaceful-places-landing__sun-rays,
   .peaceful-places-landing[data-lantern-glow="1"] .peaceful-places-landing__lantern-glow,
+  .peaceful-places-landing[data-lantern-glow="1"] .estate-lamppost__lantern-glow,
+  .peaceful-places-landing[data-lantern-glow="1"] .hanging-destination-menu__lantern-glow[data-lit="1"],
+  .peaceful-place-session__hearth-glow,
   .pathway-photo-sign,
   .peaceful-places-landing[data-arrival="entering"],
   .peaceful-places-landing[data-arrival="entering"] .peaceful-places-landing__estate-image,
@@ -5746,7 +6259,7 @@
 .hanging-destination-menu__lantern-glow[data-lit="1"] {
   opacity: 1;
   transform: translate(-50%, -50%) scale(1);
-  animation: hanging-menu-lantern-pulse 1.6s ease-in-out infinite;
+  animation: estate-lantern-flicker 2.2s linear infinite;
 }
 
 .hanging-destination-menu__sign-board[data-lit="1"] {
@@ -8975,6 +9488,12 @@
   font-size: 0.95rem;
   line-height: 1.45;
   color: #6b635a;
+}
+
+.momentum-builders-panel__intro--sub {
+  margin-top: 0.5rem;
+  font-size: 0.88rem;
+  color: #8a7d72;
 }
 
 .momentum-builders-panel__section-title {

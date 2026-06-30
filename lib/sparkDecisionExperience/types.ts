@@ -26,7 +26,7 @@ export type SparkDecisionFlowStep = (typeof SPARK_DECISION_FLOW)[number];
 
 export type SparkDecisionConfidenceBand = "high" | "moderate" | "low";
 
-/** Typical option count — align with T-003 max 3 choices */
+/** Typical option count — align with Spec 103 / T-003 max 3 choices */
 export const SPARK_DECISION_OPTION_TARGET = { min: 2, max: 3 } as const;
 
 /** T-008 approval checklist */

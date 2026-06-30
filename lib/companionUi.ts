@@ -22,6 +22,14 @@ export type AppSection =
   | "guided-exercises"
   | "spin-wheel"
   | "games"
+  | "quick-recharge"
+  | "grow"
+  | "grow-momentum-builders"
+  | "grow-spark-cards"
+  | "grow-guilds"
+  | "grow-daily-discoveries"
+  | "grow-business-history"
+  | "grow-observatory"
   | "email-generator"
   | "snippets"
   | "content-types"
@@ -56,6 +64,7 @@ export type SidebarNavId =
   | "todays-reality"
   | "visual-thinking"
   | "create"
+  | "grow"
   | "how-do-i"
   | "playbook"
   | "growth"
@@ -146,6 +155,7 @@ export const SECTION_NAV: Partial<Record<SidebarNavId, AppSection>> = {
   "todays-reality": "energy",
   "visual-thinking": "visual-focus",
   create: "content-generator",
+  grow: "grow",
   "how-do-i": "how-do-i",
   playbook: "playbook",
   growth: "growth",
@@ -188,7 +198,10 @@ export function normalizeSidebarNav(nav: SidebarNavId): SidebarNavId {
     nav === "journal" ||
     nav === "portfolio"
   ) {
-    return "growth";
+    return "other";
+  }
+  if (nav === "growth") {
+    return "other";
   }
   return nav;
 }
@@ -223,13 +236,23 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "guided-exercises":
     case "spin-wheel":
     case "games":
+    case "quick-recharge":
       return "focus";
+    case "grow":
+    case "grow-momentum-builders":
+    case "grow-spark-cards":
+    case "grow-guilds":
+    case "grow-daily-discoveries":
+    case "grow-business-history":
+    case "grow-observatory":
+      return "grow";
     case "the-gallery":
+      return "other";
     case "growth":
     case "growth-capture":
     case "growth-library":
     case "growth-reports":
-      return "growth";
+      return "other";
     case "evidence-bank":
       return "evidence-bank";
     case "confidence-vault":
@@ -337,7 +360,7 @@ export const TOOL_SECTION: Partial<Record<SidebarToolId, AppSection>> = {
   activities: "activities",
   "guided-exercises": "guided-exercises",
   "spin-wheel": "spin-wheel",
-  games: "games",
+  games: "quick-recharge",
 };
 
 export const INPUT_PLACEHOLDER = "";

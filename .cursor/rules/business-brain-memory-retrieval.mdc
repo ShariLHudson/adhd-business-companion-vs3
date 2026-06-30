@@ -1,0 +1,78 @@
+---
+description: Business Brain Memory & Retrieval (Spec 117) — knowledge architecture; connect without folders; MVC recall; dedupe; patterns; selective forgetting
+alwaysApply: true
+---
+
+# Business Brain™ Memory & Retrieval (Spec 117)
+
+**Full document:** `docs/SPARK_BUSINESS_BRAIN_MEMORY_RETRIEVAL_FRAMEWORK.md`
+
+**Trust layer:** [Spec 112 Companion Memory](./SPARK_COMPANION_MEMORY_CONTEXT_FRAMEWORK.md) — wins on persist conflicts
+
+**OS:** [003 Business Brain](../spark-intelligence-foundation/003-business-brain.md) · [009 Lifecycle](../spark-intelligence-foundation/009-business-brain-lifecycle.md) · [007 MVC](../spark-intelligence-foundation/007-context-strategy.md)
+
+## Core principle
+
+Brain is a **living map** — not a database, not a folder tree.
+
+## Seven questions (this spec answers all)
+
+Remember · Connect · Organize without folders · Retrieve naturally · Avoid duplicates · Recognize patterns · Forget what doesn't matter
+
+## Remembering pipeline
+
+Signal → **Trust gate (112)** → Classify → Lifecycle → Connect → Permission → Active
+
+Never learn from single utterance alone unless member confirms. Writes async — never block conversation.
+
+## Connect ideas (not folders)
+
+1. **Lineage** — `originatedFromId` / `originatedFromKind`
+2. **LIG** — `connectionIds` (evolved_from, supports, supersedes, pattern_of…)
+3. **Asset anchors** — knowledge belongs to living Business Assets™
+
+## Organize without folders
+
+Member sees: Companion Boxes™ · Business Assets™ · Projects · Memory Center™
+
+Invisible: Living Intelligence Graph · category × freshness × lifecycle clustering
+
+## Retrieve naturally
+
+Brain stores; **Context Strategy selects MVC** — never load entire Brain.
+
+Rank: lifecycle × freshness × relevance × confidence.
+
+Check Brain **before re-asking**. Hospitality language from Spec 112.
+
+Observed/Candidate → never assert as fact. Active/Mature → recall naturally.
+
+## Avoid duplicates
+
+Entity resolution on canonical keys + asset anchors + lineage.
+
+Same fact → strengthen. Business evolution → **version** (preserve history). Competing → hold + confirm.
+
+Evolution = one lineage chain — not copies.
+
+## Patterns (ethical)
+
+Observations only — never identity labels, shame, or unprompted lectures.
+
+Separate pattern records; tentative confidence; surface only when relevant.
+
+## Forgetting
+
+Ignore session chatter · Decay unreinforced candidates · Archive completed · Historical superseded · Retire on delete
+
+Spec 112 lists what **never** becomes durable.
+
+**Wiser, not larger.**
+
+## Boundaries
+
+Brain: store · connect · retrieve · propose writes
+
+Brain never: member copy · recommendations · UI · bypass permission
+
+**Types:** `lib/sparkBusinessBrain/memoryRetrievalTypes.ts` · `lifecycleTypes.ts` · `memoryEngine/`

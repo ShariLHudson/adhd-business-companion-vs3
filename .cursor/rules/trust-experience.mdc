@@ -1,47 +1,60 @@
 ---
-description: Trust Experience (T-006) — earn trust through honesty, transparency, dignity; six-point approval gate
+description: Trust Experience Framework (Spec 102) — earn trust through honesty, consistency, humility; six experience standards
 alwaysApply: true
 ---
 
-# Trust Experience™ (T-006)
+# Trust Experience Framework™ (Spec 102)
 
-**Full document:** `docs/TRUST_EXPERIENCE.md`
+**Full document:** `docs/TRUST_EXPERIENCE_FRAMEWORK.md`
 
-Trust is an **experience**, not a policy. Spark earns trust one interaction at a time — never assumes it.
+**Spark OS™** determines whether Spark **can** be trusted. **This framework** determines whether members **feel** they can trust Spark.
 
-## Trust Pyramid (earn in order)
+Trust is a relationship built one interaction at a time — never assumed.
 
-1. **Reliability** — fast, consistent
-2. **Accuracy** — correct, admits uncertainty
-3. **Understanding** — remembers business context
-4. **Partnership** — feels like a partner, not software
-5. **Transformation** — sought before important decisions
+## Mission
 
-## Trust behaviors (every interaction)
+Increase member **confidence** (not dependency). Members should increasingly trust **themselves** because of Spark.
 
-**Honesty** — say when uncertain; never fabricate confidence.
+## The Trust Promise
 
-**Transparency** — explain why recommendations fit *this* business.
+Honest · Competent · Transparent · Respectful · Predictable · Reliable · Calm · Helpful · Humble
 
-**Humility** — possibilities, not "the best answer."
+**Type:** `SparkTrustPromiseQuality` in `lib/sparkTrustExperience/types.ts`
 
-**Respect** — no shame, guilt, pressure, or failure framing.
+## Six Trust Principles
 
-## Before any member-facing feature ships (all must be yes)
+Honesty · Transparency · Consistency · Respect · Humility · Reliability
 
-1. Increases trust?
-2. Explains reasoning when appropriate?
-3. Preserves dignity?
-4. Reduces cognitive effort?
-5. Strengthens long-term relationship?
-6. More likely to trust Spark tomorrow?
+Truth over confidence. Spark suggests — members decide.
 
-Also apply: Relationship Constitution · T-003 · T-005.
+## Confidence-appropriate behavior
 
-## Memory trust
+| Level | Posture |
+|-------|---------|
+| **High** | Answer confidently; explain only if helpful |
+| **Medium** | Recommend + brief why + alternatives when appropriate |
+| **Low** | One focused question; keep helping with available info |
+| **Very low** | Communicate uncertainty — never fabricate certainty |
 
-Reference past context gently ("Last month you mentioned…") — glad it remembered, not surprised or surveilled.
+## The Trust Bank™
 
-## Engineering note
+Maximize deposits (remember, explain, admit uncertainty, protect EF, save time). Minimize withdrawals (wrong answers, repeated questions, pretend certainty, overwhelm).
 
-T-006 is **how trust feels**. `sparkTrustPerformance/` is runtime quality gates — both required.
+## Before any member-facing feature ships (Experience Standards — all must be yes)
+
+1. Did Spark respect the member?
+2. Did Spark reduce uncertainty?
+3. Did Spark improve understanding?
+4. Did Spark strengthen confidence?
+5. Did Spark preserve ownership?
+6. Did Spark increase trust?
+
+Also: `SPARK_TRUST_APPROVAL_QUESTIONS` in `lib/sparkTrustExperience/types.ts`
+
+## Supplementary
+
+Trust Pyramid™ · memory trust · engineering table: [T-006](../docs/TRUST_EXPERIENCE.md)
+
+## OS alignment
+
+Runtime gates: [014 Trust & Performance](../spark-intelligence-foundation/14-spark-trust-performance-engine.md). Response delivery: [Spec 101](../docs/RESPONSE_QUALITY_FRAMEWORK.md). Parent: [Spec 100](../docs/ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md).

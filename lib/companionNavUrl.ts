@@ -1,7 +1,11 @@
 import type { CoachingMode } from "@/lib/companionPrompt";
-import type { SidebarNavId } from "@/lib/companionUi";
+import type { AppSection, SidebarNavId } from "@/lib/companionUi";
 
 export type CompanionOverlayParam = "profile" | "settings" | "signin";
+
+export function companionSectionHref(section: AppSection): string {
+  return `/companion?section=${section}`;
+}
 
 export function companionNavHref(
   nav: SidebarNavId,

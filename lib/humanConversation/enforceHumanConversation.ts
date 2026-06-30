@@ -8,6 +8,10 @@ import {
   evaluateHumanConversationTwelveTests,
   type TwelveTestEvaluation,
 } from "./twelveTests";
+import {
+  scrubAiVoiceFormatting,
+  scrubAiVoicePhrases,
+} from "./sparkHumanVoice";
 
 export type HumanConversationViolation = {
   reason: string;
@@ -119,6 +123,24 @@ export function enforceHumanConversation(input: {
   let message = input.response;
   let rewritten = false;
 
+  const bodyScrub = scrubForbiddenBodyPhrases(message);
+  if (bodyScrub.rewritten) {
+    message = bodyScrub.text;
+    rewritten = true;
+  }
+
+  const aiFormatScrub = scrubAiVoiceFormatting(message, input.userText);
+  if (aiFormatScrub.rewritten) {
+    message = aiFormatScrub.text;
+    rewritten = true;
+  }
+
+  const aiPhraseScrub = scrubAiVoicePhrases(message);
+  if (aiPhraseScrub.rewritten) {
+    message = aiPhraseScrub.text;
+    rewritten = true;
+  }
+
   const violation = detectHumanConversationViolation(message);
   if (violation) {
     const seed =
@@ -126,12 +148,6 @@ export function enforceHumanConversation(input: {
       (input.userText?.length ?? 0) + violation.originalOpener.length;
     const replacement = pickCuriosityOpener(seed, input.gentle);
     message = replaceLeadingSentence(message, replacement);
-    rewritten = true;
-  }
-
-  const bodyScrub = scrubForbiddenBodyPhrases(message);
-  if (bodyScrub.rewritten) {
-    message = bodyScrub.text;
     rewritten = true;
   }
 

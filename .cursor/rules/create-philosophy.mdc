@@ -1,6 +1,7 @@
 ---
-description: Create™ Philosophy (T-004) — entrepreneurial transformation, Business Assets, intent before output
+description: Create Experience Philosophy (Spec 104) — Business Creation Studio; thinking before generation
 globs:
+  - lib/sparkCreateExperience/**
   - lib/workspaceCreation.ts
   - lib/create*.ts
   - lib/create/**
@@ -8,27 +9,58 @@ globs:
   - components/companion/**/EmailGenerator*
   - components/companion/**/SavedWork*
   - app/companion/**/*create*
+alwaysApply: false
 ---
 
-# Create™ Philosophy (T-004)
+# Create™ Experience Philosophy (Spec 104)
 
-**Full document:** `docs/CREATE_PHILOSOPHY.md`
+**Full document:** `docs/CREATE_EXPERIENCE_PHILOSOPHY.md`
 
-Create™ is not an AI writing tool — it transforms ideas into **Business Assets™**. Goal: confidence and clarity, not generated text.
+**Supplementary:** [T-004](../docs/CREATE_PHILOSOPHY.md) — intent before output, build before write, progressive creation.
+
+Create™ is a **Business Creation Studio™** — not an AI writing tool. The entrepreneur is the product, not the output.
+
+## Mission
+
+*"This is where I build my business."* — never *"This is where AI writes things for me."*
+
+## Four outcomes (every creation)
+
+Build something valuable · Strengthen capability · Improve decision quality · Increase confidence
+
+**Type:** `CreatePurposeOutcome` in `lib/sparkCreateExperience/types.ts`
+
+## Core principles
+
+**Hero** — member creates; Spark partners · **Collaboration** — conversation not commands · **Thinking** — clarify before produce · **Momentum** — visible progress + next step · **Confidence** — capability through understanding, not automation alone · **Decision** — asset = evidence of better thinking · **Business Asset** — living, connected, never isolated docs · **Connected Creation** — strengthens whole ecosystem · **Executive Function** — Spark carries complexity
+
+## Guidance flow (never generate first)
+
+Understand → Guide → Collaborate → Create
+
+Creative director alongside — not software operation.
+
+## Cognitive load
+
+**Minimize:** decision fatigue, prompt anxiety, context switching, overload.
+
+**Maximize:** clarity, momentum, recognition, confidence, progress.
+
+## Never become
+
+Prompt library · form builder · template dump · content factory · generator dashboard · disconnected tools.
 
 ## Before any Create™ feature ships
 
-1. **Intent before output** — start with purpose ("What are we building?"), never "What template?"
-2. **Build before write** — clarify audience, outcome, structure, positioning, value first.
-3. **Business Assets™** — members create workshops, offers, campaigns — not files.
-4. **Strengthen existing work** — ask "Can we improve something you already built?" before duplicating.
-5. **Conversation over commands** — thinking partner, not prompt interface.
-6. **No blank page** — brainstorm, outline, prioritize; never "Start writing."
-7. **Progressive creation** — one section → reflection → improve → continue.
-8. **Capability before content** — member becomes a better creator.
-9. **Guidance** — options and trade-offs; member owns decisions ([005 Guidance Engine](../spark-intelligence-foundation/005-guidance-engine.md)).
-10. **T-003 + Relationship Constitution** — calm, premium, EF-friendly; celebrate growth not AI output.
+1. Intent before output (T-004) — purpose first, not templates
+2. Hero Principle — *"I built this"*
+3. Thinking before generation
+4. Business Asset™ — living object, ecosystem hooks
+5. Connected Creation (T-014)
+6. Spec 103 + Relationship Constitution — calm, EF-friendly, celebrate growth not AI text
 
 ## Implementation prompt
 
-Begin with entrepreneurial intent, not templates. Prioritize thinking → clarity → Business Assets → transformation. Content generation is a tool; entrepreneurial growth is the mission.
+Thinking → Clarity → Business Assets → Transformation. Content generation is a tool; entrepreneurial growth is the mission.
+
+Also: [002 Business Assets](../spark-intelligence-foundation/002-business-asset-architecture.md) · [005 Guidance](../spark-intelligence-foundation/005-guidance-engine.md) · T-008 Decision · Spec 100 Hero.

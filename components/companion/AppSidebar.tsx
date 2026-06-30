@@ -3,6 +3,7 @@
 import { ASSETS, BRAND, SECTION_NAV, normalizeSidebarNav, type AppSection, type SidebarNavId } from "@/lib/companionUi";
 import { ASSET_LIBRARY_HOME_SECTION } from "@/lib/gallery";
 import { isGrowthPanelSection } from "@/lib/growthNavigation";
+import { isGrowPanelSection } from "@/lib/growNavigation";
 import {
   HOMESTEAD_OTHER_DROPDOWN_ITEMS,
   HOMESTEAD_SIGNPOST_DESTINATIONS,
@@ -36,10 +37,16 @@ export function AppSidebar({
       return isHomesteadOtherNavActive(normalizedActiveNav, activeSection);
     }
 
+    if (item.id === "grow") {
+      return (
+        isGrowPanelSection(activeSection) ||
+        activeSection === ASSET_LIBRARY_HOME_SECTION
+      );
+    }
+
     if (item.id === "growth") {
       return (
         isGrowthPanelSection(activeSection) ||
-        activeSection === ASSET_LIBRARY_HOME_SECTION ||
         activeSection === "life-experience"
       );
     }

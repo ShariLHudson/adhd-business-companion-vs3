@@ -10,7 +10,7 @@
 | **Status** | Foundational |
 | **Owner** | Spark Product & Experience |
 | **Applies to** | Spark Card™ Library, Companion introductions, Create™, Momentum Builders™, Business Assets™, Gallery™, Guilds™, Daily Discoveries™ |
-| **Related** | [T-012 Momentum Builders](./MOMENTUM_BUILDER_FRAMEWORK.md) · [T-010 Founder Journey](./FOUNDER_JOURNEY_FRAMEWORK.md) · [T-005 Experience Patterns](./EXPERIENCE_PATTERNS.md) · [T-009 Companion Relationship](./COMPANION_RELATIONSHIP_FRAMEWORK.md) · [004 – Spark Knowledge Model](../spark-intelligence-foundation/004-spark-knowledge-model.md) · [003 – Business Brain](../spark-intelligence-foundation/003-business-brain.md) · [002 – Business Assets](../spark-intelligence-foundation/002-business-asset-architecture.md) |
+| **Related** | [T-014 Ecosystem Connection](./ECOSYSTEM_CONNECTION_FRAMEWORK.md) · [T-012 Momentum Builders](./MOMENTUM_BUILDER_FRAMEWORK.md) · [T-015 Gallery](./GALLERY_FRAMEWORK.md) · [T-016 Daily Discoveries](./DAILY_DISCOVERIES_FRAMEWORK.md) · [T-010 Founder Journey](./FOUNDER_JOURNEY_FRAMEWORK.md) · [T-005 Experience Patterns](./EXPERIENCE_PATTERNS.md) · [T-009 Companion Relationship](./COMPANION_RELATIONSHIP_FRAMEWORK.md) · [004 – Spark Knowledge Model](../spark-intelligence-foundation/004-spark-knowledge-model.md) · [003 – Business Brain](../spark-intelligence-foundation/003-business-brain.md) · [002 – Business Assets](../spark-intelligence-foundation/002-business-asset-architecture.md) |
 
 ---
 
@@ -266,6 +266,8 @@ Example: *"This principle changed how you price your services."*
 Gallery remembers **transformation**.
 
 Not reading.
+
+See [T-015 Gallery Framework](./GALLERY_FRAMEWORK.md).
 
 ---
 

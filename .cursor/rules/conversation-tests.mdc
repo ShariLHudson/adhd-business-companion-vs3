@@ -1,0 +1,39 @@
+---
+description: FROZEN architecture — Conversation Validation (Spec 119) — eight mandatory QA gates; break engine; never pass without scorecard
+alwaysApply: true
+---
+
+# Conversation Validation™ (Spec 119) — FROZEN
+
+**Architecture:** [FREEZE](../docs/SPARK_CONVERSATION_ARCHITECTURE_FREEZE.md) · **Framework:** [Spec 119](../docs/SPARK_CONVERSATION_TESTS_FRAMEWORK.md)
+
+**Scorecard:** `docs/conversation-tests/SCORECARD_TEMPLATE.md` · **Tests:** `ct-01.md` … `ct-11.md`
+
+## Phase: validate — not design
+
+Do NOT redesign Spark · UI · workflows · features. **Improve conversations. Test again.**
+
+## Mandate
+
+**Break the Conversation Engine.** Never declare "Passed."
+
+## Eight mandatory QA gates (every test)
+
+1. **Conversation Quality** — 10 categories, 1–10
+2. **Hospitality™** (111) — 5 pass/fail
+3. **Cognitive Load** — 🟢🟡🔴
+4. **Iceberg** (118) — submerged work + permission boundary
+5. **Relief Test™** — 🟢 increased · 🟡 no change · 🔴 decreased
+6. **Future Me Test™** — tomorrow easier?
+7. **Spark Question™** — software vs Shari? → turn · why · rewrite
+8. **Shari Over-the-Shoulder** — **mandatory** — warmth · pace · trust · ADHD friendliness
+
+## On failure
+
+Exact turn · why · rewrite that response only · nearest Gold Standard (116)
+
+## Final question
+
+Companion for 20 minutes — or operating an application?
+
+**Types:** `lib/sparkConversationTests/types.ts`

@@ -1,0 +1,42 @@
+---
+description: Estate light flicker — lanterns and candles always animate gently; respect reduced motion
+alwaysApply: true
+---
+
+# Estate Light Flicker™
+
+**Canonical CSS:** `app/companion/estate-light-flicker.css`
+
+Any visible **lantern**, **candle**, or **fireplace** in the Estate should feel alive — soft warm flicker, never strobe or arcade flash.
+
+## When you add warm light
+
+1. Place a **blurred radial-gradient overlay** aligned to the flame in the image (not a cartoon flame sprite).
+2. Apply one of:
+   - `className="estate-light-glow estate-light-glow--lantern"` (or `--candle` / `--fireplace`)
+   - `data-estate-light="lantern"` (or `candle` / `fireplace`) on the overlay element
+3. Stagger siblings with `estate-light-glow--delay-1` … `--delay-4` or `data-estate-light-delay="1"` … `"4"`.
+4. Set `aria-hidden="true"` and `pointer-events: none` on decorative overlays.
+
+## Animation map
+
+| Light | Keyframe | Notes |
+|-------|----------|-------|
+| Lantern (scene overlay) | `estate-lantern-flicker` | 2.6s linear |
+| Lamppost glass glow | `estate-lamppost-lantern-flicker` | opacity only — keeps `translateX(-50%)` |
+| Candle | `estate-candle-flicker` | 2.4s ease-in-out |
+| Fireplace | `estate-fireplace-flicker` | 3.8s — **gentle**; half-strength swing |
+
+## Never
+
+- Static glow on a lit lantern/candle in a photo scene
+- Harsh pulse (`scale` > 1.05) or fast strobe (< 1.5s on fireplaces)
+- Flicker when `prefers-reduced-motion: reduce` — animations must disable
+
+## Existing patterns (may alias to canonical keyframes)
+
+Peaceful Places · Evening Hearth · Homestead signpost · Clear My Mind fireplace · Focus plaques · hanging destination menus.
+
+When touching those files, prefer `estate-light-flicker.css` utilities over new one-off keyframes.
+
+Aligns with [Spec 103](../docs/UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md) visual standards — subtle motion, premium estate feel.

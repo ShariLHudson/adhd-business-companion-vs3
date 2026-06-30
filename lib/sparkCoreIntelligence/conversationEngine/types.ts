@@ -1,6 +1,12 @@
 /**
- * Spark Core Intelligence v1.0 — Conversation Engine types.
+ * Spark Core Intelligence v1.0 — Conversation Engine types (runtime).
+ * Experience interaction model: Spec 105 — docs/SPARK_CONVERSATION_ENGINE_FRAMEWORK.md
+ * Guardrails (override features): Spec 106 — docs/SPARK_CONVERSATION_GUARDRAILS_FRAMEWORK.md
+ * State machine (internal engine): Spec 107 — docs/SPARK_CONVERSATION_STATE_MACHINE_FRAMEWORK.md
+ * Completion (State 9): Spec 110 — docs/SPARK_CONVERSATION_COMPLETION_FRAMEWORK.md
+ * Flow reasoning: Spec 114 — docs/SPARK_CONVERSATION_FLOW_ENGINE_FRAMEWORK.md
  * @see spark-intelligence-foundation/15-spark-core-conversation-engine.md
+ * @see lib/sparkConversationEngine/types.ts
  */
 
 import type { EstateRoomId } from "@/lib/sparkResponseIntelligence/types";

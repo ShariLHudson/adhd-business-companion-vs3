@@ -1,0 +1,69 @@
+---
+description: Companion Memory & Context (Spec 112) — four memory types; permission before persist; Memory Center; trust over personalization
+alwaysApply: true
+---
+
+# Spark Companion Memory & Context™ (Spec 112)
+
+**Full document:** `docs/SPARK_COMPANION_MEMORY_CONTEXT_FRAMEWORK.md`
+
+**OS layer:** [008 Business Memory Engine](../spark-intelligence-foundation/08-memory-engine.md) · [007 Context Strategy](../spark-intelligence-foundation/007-context-strategy.md) · **[Spec 117 Business Brain Memory & Retrieval](../docs/SPARK_BUSINESS_BRAIN_MEMORY_RETRIEVAL_FRAMEWORK.md)** · **Tone:** [Spec 111 Hospitality](../docs/SPARK_HOSPITALITY_FRAMEWORK.md)
+
+## Vision
+
+Members think: *"I'm glad I didn't have to explain that again."*
+
+Never: *"How did Spark know that?"*
+
+**Trust > personalization.**
+
+## Four memory types
+
+1. **Business Memory™** — long-term facts
+2. **Project Memory™** — until complete/archived/deleted
+3. **Relationship Memory™** — communication style (not surveillance)
+4. **Session Memory™** — expires unless member saves
+
+## Philosophy question (before every persist)
+
+> Will remembering this genuinely make the member's life easier in the future?
+
+No → don't remember.
+
+## Never assume
+
+Temporary ("I'm overwhelmed today") ≠ permanent memory. Ask permission.
+
+Observation ≠ memory. Repeated patterns → still ask before suggesting.
+
+## Context priority
+
+Current conversation → current project → Business Assets → long-term memory
+
+## Permission required for permanent storage
+
+"I can remember that if you'd like." · "Should I remember this for future conversations?"
+
+## Never remember
+
+Moods, arguments, health/politics/religion/family (unless requested), embarrassing surprises
+
+## Memory Center™
+
+Sections: Business · Projects · Preferences · Accessibility · Conversation Style · Environment · Saved Decisions
+
+Member controls: edit · delete · add · turn off
+
+## Hospitality language
+
+"I thought this might save us a little time." not "I remembered this."
+
+"Last time we decided..." not "You always..."
+
+## Trust tests (internal, before remember)
+
+Reduce effort? · Expected? · Would surprise? · Forgetting frustrates? · Permission builds trust?
+
+**Types:** `lib/sparkCompanionMemory/types.ts`
+
+Also: Spec 102 · Spec 106 · Spec 111 · Spec 112 · **Spec 113 Certainty** · [Relationship Constitution](../docs/RELATIONSHIP_CONSTITUTION.md)

@@ -1,0 +1,26 @@
+---
+description: The Member Wins™ — every decision must make life easier for the member; precedes implementation convenience
+alwaysApply: true
+---
+
+# The Member Wins™
+
+**Full document:** `docs/THE_MEMBER_WINS.md`
+
+## The question (every design decision)
+
+> **Does this make life easier for the member?**
+
+No or unclear → redesign. Do not implement.
+
+## Precedence
+
+**Member ease wins** over implementation convenience · coding simplicity · traditional software design · dev velocity · technical elegance.
+
+## With frozen architecture
+
+Specs change only when [repeated testing](../docs/SPARK_CONVERSATION_ARCHITECTURE_FREEZE.md) proves measurably better member experience — not because change is easier to build.
+
+Future ideas → [Parking Lot](../docs/PARKING_LOT.md) until milestone complete.
+
+**Principle:** [The Member Wins™](../docs/THE_MEMBER_WINS.md)

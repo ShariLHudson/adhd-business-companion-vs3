@@ -25,16 +25,47 @@ type Phase = "menu" | "play" | "done";
 type Props = {
   onLaunchExternal: (launch: Exclude<MomentumBuilderLaunch, { kind: "game" }>) => void;
   onReturnHome?: () => void;
+  /** Quick Recharge™ — games only, no business-growth framing */
+  variant?: "default" | "quick-recharge";
+  panelTitle?: string;
+  panelIntro?: string;
+  backDestination?: string;
+  menuBackDestination?: string;
 };
 
-export function MomentumBuildersPanel({ onLaunchExternal, onReturnHome }: Props) {
+function isQuickRechargeItem(item: MomentumBuilderItem): boolean {
+  return item.launch.kind === "game" || item.launch.kind === "surprise-pick";
+}
+
+export function MomentumBuildersPanel({
+  onLaunchExternal,
+  onReturnHome,
+  variant = "default",
+  panelTitle,
+  panelIntro,
+  backDestination = "Momentum Builders",
+  menuBackDestination = "the Living Room",
+}: Props) {
+  const isQuickRecharge = variant === "quick-recharge";
+  const title = panelTitle ?? (isQuickRecharge ? "Quick Recharge" : "Momentum Builders");
+  const intro =
+    panelIntro ??
+    (isQuickRecharge
+      ? "Simple activities for when your brain needs a reset."
+      : "Short resets for energy, focus, and calm — browse what you need right now.");
   const [phase, setPhase] = useState<Phase>("menu");
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null);
   const [currentGameId, setCurrentGameId] = useState<string | null>(null);
   const [recsHidden, setRecsHidden] = useState(() => areMomentumRecommendationsHidden());
   const recentRef = useRef<string[]>([]);
 
-  const recommendations = useMemo(() => recommendMomentumBuilders(3), []);
+  const recommendations = useMemo(
+    () =>
+      recommendMomentumBuilders(3).filter(({ item }) =>
+        isQuickRecharge ? isQuickRechargeItem(item) : true,
+      ),
+    [isQuickRecharge],
+  );
   const currentGame = currentGameId ? getMomentumGameDef(currentGameId) : null;
 
   useEffect(() => {
@@ -94,7 +125,7 @@ export function MomentumBuildersPanel({ onLaunchExternal, onReturnHome }: Props)
   }
 
   function finishGame() {
-    logMomentum("reset", `Momentum builder: ${currentGame?.label ?? "game"}`);
+    logMomentum("reset", `${title}: ${currentGame?.label ?? "activity"}`);
     setPhase("done");
   }
 
@@ -103,7 +134,7 @@ export function MomentumBuildersPanel({ onLaunchExternal, onReturnHome }: Props)
       <div className="momentum-builders-panel companion-fade-in flex h-full flex-col px-1 py-2 sm:px-2">
         <div className="flex w-full items-center justify-between">
           <AppBackButton
-            destination="Momentum Builders"
+            destination={backDestination}
             onBack={() => {
               setPhase("menu");
               setCurrentGameId(null);
@@ -131,7 +162,9 @@ export function MomentumBuildersPanel({ onLaunchExternal, onReturnHome }: Props)
           variant="mini-scene"
           animate
         />
-        <p className="mt-3 text-xl font-semibold text-[#1f1c19]">Nice reset</p>
+        <p className="mt-3 text-xl font-semibold text-[#1f1c19]">
+          {isQuickRecharge ? "Nice pause" : "Nice reset"}
+        </p>
         <p className="mt-1 text-base text-[#6b635a]">
           However small — you showed up for yourself.
         </p>
@@ -159,7 +192,7 @@ export function MomentumBuildersPanel({ onLaunchExternal, onReturnHome }: Props)
     <div className="momentum-builders-panel companion-fade-in flex h-full flex-col gap-4">
       {onReturnHome ? (
         <AppBackButton
-          destination="the Living Room"
+          destination={menuBackDestination}
           onBack={onReturnHome}
           size="compact"
           className="momentum-builders-panel__home-back"
@@ -167,10 +200,14 @@ export function MomentumBuildersPanel({ onLaunchExternal, onReturnHome }: Props)
       ) : null}
 
       <header className="momentum-builders-panel__header">
-        <h1 className="momentum-builders-panel__title">Momentum Builders</h1>
-        <p className="momentum-builders-panel__intro">
-          Short resets for energy, focus, and calm — browse what you need right now.
-        </p>
+        <h1 className="momentum-builders-panel__title">{title}</h1>
+        <p className="momentum-builders-panel__intro">{intro}</p>
+        {isQuickRecharge ? (
+          <p className="momentum-builders-panel__intro momentum-builders-panel__intro--sub">
+            These light activities are here to help you pause, reset, and return with a
+            little more breathing room.
+          </p>
+        ) : null}
       </header>
 
       {recommendations.length > 0 && !recsHidden ? (
@@ -232,7 +269,10 @@ export function MomentumBuildersPanel({ onLaunchExternal, onReturnHome }: Props)
 
       <section className="momentum-builders-panel__categories" aria-label="Builder categories">
         {MOMENTUM_BUILDER_CATEGORIES.map((category) => {
-          const items = momentumBuildersForCategory(category.id);
+          const items = momentumBuildersForCategory(category.id).filter((item) =>
+            isQuickRecharge ? isQuickRechargeItem(item) : true,
+          );
+          if (items.length === 0) return null;
           const open = expandedCategory === category.id;
           return (
             <div

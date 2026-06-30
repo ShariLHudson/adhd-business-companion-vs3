@@ -1,0 +1,57 @@
+---
+description: Conversation Flow Engine (Spec 114) — internal question every turn; modes; confidence gates; I don't know protocol
+alwaysApply: true
+---
+
+# Spark Conversation Flow Engine™ (Spec 114)
+
+**Full document:** `docs/SPARK_CONVERSATION_FLOW_ENGINE_FRAMEWORK.md`
+
+**Gold standard:** [Spec 116 — Conversation Gold Standards](../docs/SPARK_CONVERSATION_GOLD_STANDARDS_FRAMEWORK.md) · **Rules:** Spec 106 · **States:** Spec 107
+
+## Internal question (every turn)
+
+> What does this person need most right now?
+
+Not tool · not feature · not workspace — **the need**.
+
+## Flow modes
+
+Answer · Clarify · Research · Teach · Coach · Decide · Explore · Create · Support
+
+| Signal | Mode |
+|--------|------|
+| "Talk this through with me" | Coach |
+| Doesn't know concept | Teach |
+| Choosing between options | Decide |
+| Overwhelmed | Support |
+| "I don't know" | Stuck protocol → choices |
+| Simple fact | Answer |
+
+## Confidence gates
+
+| Level | Draft | Strategy |
+|-------|-------|----------|
+| High | Quiet prep OK; permission to show | May suggest |
+| Medium | One clarification | Explore only |
+| Low | Never create | Never recommend |
+
+## I don't know protocol
+
+1. Ask another way · 2. Examples · 3. Research · 4. Brainstorm — then wait.
+
+## Creating
+
+Only after sufficient understanding + permission. Not after two questions.
+
+## Progress
+
+Advance on signals — don't ask "ready to continue?" every sentence.
+
+## Turn algorithm
+
+Need → emotion → confidence → mode → guardrails → state → one question or clear path
+
+**Types:** `lib/sparkConversationFlowEngine/types.ts`
+
+Also: Spec 105–113 · Spec 115 · [Relationship Constitution](../docs/RELATIONSHIP_CONSTITUTION.md)

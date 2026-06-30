@@ -236,7 +236,7 @@ Every major Spark system should strengthen Business Assets.
 | **Guidance Engine™** | Suggests meaningful improvements | [005-guidance-engine.md](./005-guidance-engine.md) |
 | **Experience Engine™** | Determines how much complexity to expose |
 | **Companion™** | Discusses assets naturally |
-| **Create™** | Builds and expands assets | [T-004 Create™ Philosophy](../docs/CREATE_PHILOSOPHY.md) |
+| **Create™** | Builds and expands assets | [Spec 104 Create™ Experience](../docs/CREATE_EXPERIENCE_PHILOSOPHY.md) · [T-004](../docs/CREATE_PHILOSOPHY.md) |
 | **Momentum Builders™** | Help members implement assets |
 | **Spark Cards™** | Teach concepts relevant to assets |
 | **Gallery™** | Records meaningful milestones |

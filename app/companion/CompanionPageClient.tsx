@@ -85,6 +85,9 @@ const VisualFocusWorkspacePanel = dynamic(
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { WinsThisWeekPanel } from "@/components/companion/WinsThisWeekPanel";
 import { EvidenceBankPanel } from "@/components/companion/EvidenceBankPanel";
+import { GrowLandingPanel } from "@/components/companion/GrowLandingPanel";
+import { GrowMomentumBuildersPanel } from "@/components/companion/GrowMomentumBuildersPanel";
+import { GrowPlaceholderPanel } from "@/components/companion/GrowPlaceholderPanel";
 import { GrowthStoryLandingPanel } from "@/components/companion/GrowthStoryLandingPanel";
 import { GrowthStoryCapturePanel } from "@/components/companion/GrowthStoryCapturePanel";
 import { GrowthLibraryPanel } from "@/components/companion/GrowthLibraryPanel";
@@ -1216,6 +1219,11 @@ import {
 import { setEvidencePrefill } from "@/lib/evidenceBankStore";
 import { setConfidencePrefill } from "@/lib/confidenceVaultStore";
 import { setJourneyPrefill } from "@/lib/myJourneyStore";
+import {
+  growRoomBackLabel,
+  isGrowPanelSection,
+  type GrowSectionId,
+} from "@/lib/growNavigation";
 import {
   growthPanelBackLabel,
   growthRoomBackLabel,
@@ -6603,12 +6611,13 @@ export default function CompanionPageClient() {
 
   /** Standalone focus tools (Clear My Mind, spin wheel, energy, etc.). */
   function openStandaloneFocusSectionCore(section: AppSection) {
+    const resolvedSection = section === "games" ? "quick-recharge" : section;
     pushNavigationRestore();
     clearParallelCoachingOffers();
     clearSplitBesideWorkspace();
-    setActiveSection(section);
-    activeSectionRef.current = section;
-    setActiveNav(navForWorkspaceSection(section) ?? "focus");
+    setActiveSection(resolvedSection);
+    activeSectionRef.current = resolvedSection;
+    setActiveNav(navForWorkspaceSection(resolvedSection) ?? "focus");
   }
 
   /** Clear My Mind — Garden Conservatory standalone room; never beside chat. */
@@ -6663,6 +6672,55 @@ export default function CompanionPageClient() {
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
     openStandaloneFocusSectionCore("growth");
+  }
+
+  function pushGrowBackLabel() {
+    const from = activeSectionRef.current;
+    const label = growRoomBackLabel(from);
+    if (!label) return;
+    panelBackStackRef.current.push(label);
+    setWorkspacePanelBackLabel(label);
+  }
+
+  function openGrowLandingCore() {
+    preloadRoomBackground(GROWTH_ROOM_BG);
+    trackWorkspaceEcosystemEvent("grow");
+    noteWorkspaceOpened("grow", "standalone_room");
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore("grow");
+  }
+
+  function openGrowSectionCore(section: GrowSectionId) {
+    if (section === "grow") {
+      openGrowLandingCore();
+      return;
+    }
+    pushGrowBackLabel();
+    preloadRoomBackground(GROWTH_ROOM_BG);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore(section);
+  }
+
+  function openSectionFromUrlCore(section: AppSection) {
+    if (isGrowPanelSection(section)) {
+      openGrowSectionCore(section as GrowSectionId);
+      return;
+    }
+    if (section === "quick-recharge" || section === "games") {
+      openStandaloneFocusSectionCore("quick-recharge");
+      return;
+    }
+    if (section === "growth") {
+      openGrowthLandingCore();
+      return;
+    }
+    if (isGrowthPanelSection(section)) {
+      openGrowthDestinationCore(section);
+      return;
+    }
+    openStandaloneFocusSectionCore(section);
   }
 
   function openGrowthLibraryCore() {
@@ -6792,6 +6850,11 @@ export default function CompanionPageClient() {
 
     if (nav === "growth") {
       openGrowthLandingCore();
+      return;
+    }
+
+    if (nav === "grow") {
+      openGrowLandingCore();
       return;
     }
 
@@ -6941,7 +7004,7 @@ export default function CompanionPageClient() {
         openStandaloneFocusSectionCore("spin-wheel");
         break;
       case "games":
-        openStandaloneFocusSectionCore("games");
+        openStandaloneFocusSectionCore("quick-recharge");
         break;
       case "reset-day":
         requestClearTodayContext();
@@ -14603,6 +14666,7 @@ export default function CompanionPageClient() {
     >
       <CompanionUrlNavigation
         onNav={handleNavSelect}
+        onOpenSection={openSectionFromUrlCore}
         onOverlay={(overlay) => setOverlay(overlay)}
         onSettingsSection={(section) => {
           setSettingsSection(section);
@@ -14641,13 +14705,15 @@ export default function CompanionPageClient() {
                 ? "pl-0 companion-clear-my-mind-active"
               : activeSection === "focus-audio"
                 ? "pl-0 companion-peaceful-places-active"
-              : activeSection === "games"
+              : activeSection === "games" || activeSection === "quick-recharge"
                 ? "pl-0 companion-momentum-games-active"
               : focusSanctuaryFullBleed
                 ? "pl-0 companion-focus-my-brain-active"
               : "pl-14 md:pl-44"
         } ${homeCalm ? "companion-home-calm" : ""} ${
           workspacePanel === "welcome-room" ? "companion-welcome-room-active" : ""
+        } ${
+          isGrowPanelSection(activeSection) ? "companion-grow-active" : ""
         } ${
           isGrowthPanelSection(activeSection) ? "companion-growth-active" : ""
         } ${
@@ -14659,7 +14725,9 @@ export default function CompanionPageClient() {
         } ${
           activeSection === "focus-audio" ? "companion-peaceful-places-active" : ""
         } ${
-          activeSection === "games" ? "companion-momentum-games-active" : ""
+          activeSection === "games" || activeSection === "quick-recharge"
+            ? "companion-momentum-games-active"
+            : ""
         } ${
           focusSanctuaryFullBleed ? "companion-focus-my-brain-active" : ""
         } ${
@@ -15307,9 +15375,11 @@ export default function CompanionPageClient() {
                 activeSection === "life-experience" ||
                 activeSection === "the-gallery" ||
                 isGrowthPanelSection(activeSection) ||
+                isGrowPanelSection(activeSection) ||
                 activeSection === "plan-my-day" ||
                 activeSection === "focus-audio" ||
                 activeSection === "games" ||
+                activeSection === "quick-recharge" ||
                 focusSanctuaryFullBleed
                   ? "clear-my-mind-standalone-shell min-h-[100dvh] min-h-[100svh] flex-1 overflow-hidden"
                   : "min-h-0 flex-1 overflow-y-auto px-2 py-3 sm:px-4"
@@ -15320,9 +15390,11 @@ export default function CompanionPageClient() {
                 activeSection === "life-experience" ||
                 activeSection === "the-gallery" ||
                 isGrowthPanelSection(activeSection) ||
+                isGrowPanelSection(activeSection) ||
                 activeSection === "plan-my-day" ||
                 activeSection === "focus-audio" ||
                 activeSection === "games" ||
+                activeSection === "quick-recharge" ||
                 focusSanctuaryFullBleed
                   ? undefined
                   : "Click outside the panel to go back"
@@ -15332,9 +15404,11 @@ export default function CompanionPageClient() {
                 activeSection === "life-experience" ||
                 activeSection === "the-gallery" ||
                 isGrowthPanelSection(activeSection) ||
+                isGrowPanelSection(activeSection) ||
                 activeSection === "plan-my-day" ||
                 activeSection === "focus-audio" ||
                 activeSection === "games" ||
+                activeSection === "quick-recharge" ||
                 focusSanctuaryFullBleed
                   ? undefined
                   : (e) => {
@@ -15348,9 +15422,11 @@ export default function CompanionPageClient() {
                   activeSection === "life-experience" ||
                   activeSection === "the-gallery" ||
                   isGrowthPanelSection(activeSection) ||
+                  isGrowPanelSection(activeSection) ||
                   activeSection === "plan-my-day" ||
                   activeSection === "focus-audio" ||
                   activeSection === "games" ||
+                  activeSection === "quick-recharge" ||
                   focusSanctuaryFullBleed
                     ? "clear-my-mind-standalone-frame h-full min-h-[100dvh] min-h-[100svh] w-full"
                     : WORKSPACE_FULL_PAGE_SURFACE_CLASS
@@ -15425,6 +15501,60 @@ export default function CompanionPageClient() {
                 openWorkspaceBesideChatCore("time-block", workspaceOpenAck("time-block"))
               }
               initialOpenItemId={planMyDayOpenItemId}
+            />
+          )}
+
+          {activeSection === "grow" && (
+            <GrowLandingPanel
+              onBack={goBack}
+              onOpenSection={(section) => openGrowSectionCore(section)}
+            />
+          )}
+
+          {activeSection === "grow-momentum-builders" && (
+            <GrowMomentumBuildersPanel
+              onBack={goBack}
+              backLabel={workspacePanelBackLabel}
+            />
+          )}
+
+          {activeSection === "grow-spark-cards" && (
+            <GrowPlaceholderPanel
+              section="grow-spark-cards"
+              onBack={goBack}
+              backLabel={workspacePanelBackLabel}
+            />
+          )}
+
+          {activeSection === "grow-guilds" && (
+            <GrowPlaceholderPanel
+              section="grow-guilds"
+              onBack={goBack}
+              backLabel={workspacePanelBackLabel}
+            />
+          )}
+
+          {activeSection === "grow-daily-discoveries" && (
+            <GrowPlaceholderPanel
+              section="grow-daily-discoveries"
+              onBack={goBack}
+              backLabel={workspacePanelBackLabel}
+            />
+          )}
+
+          {activeSection === "grow-business-history" && (
+            <GrowPlaceholderPanel
+              section="grow-business-history"
+              onBack={goBack}
+              backLabel={workspacePanelBackLabel}
+            />
+          )}
+
+          {activeSection === "grow-observatory" && (
+            <GrowPlaceholderPanel
+              section="grow-observatory"
+              onBack={goBack}
+              backLabel={workspacePanelBackLabel}
             />
           )}
 
@@ -15597,9 +15727,14 @@ export default function CompanionPageClient() {
             />
           )}
 
-          {activeSection === "games" && (
+          {(activeSection === "games" || activeSection === "quick-recharge") && (
             <MomentumGamesRoomShell>
               <MomentumBuildersPanel
+                variant="quick-recharge"
+                panelTitle="Quick Recharge"
+                panelIntro="Simple activities for when your brain needs a reset."
+                backDestination="Quick Recharge"
+                menuBackDestination="Focus"
                 onLaunchExternal={handleMomentumBuilderLaunch}
                 onReturnHome={goBack}
               />

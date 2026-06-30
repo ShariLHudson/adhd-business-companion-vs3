@@ -10,9 +10,11 @@
 | **Status** | Foundational |
 | **Owner** | Spark Product & Experience |
 | **Applies to** | All member-facing Spark interactions |
-| **Related** | [Relationship Constitution](./RELATIONSHIP_CONSTITUTION.md) · [Companion Relationship Framework (T-009)](./COMPANION_RELATIONSHIP_FRAMEWORK.md) · [T-003 Universal Experience Standards](./UNIVERSAL_EXPERIENCE_STANDARDS.md) · [T-005 Experience Patterns](./EXPERIENCE_PATTERNS.md) · [005 – Guidance Engine](../spark-intelligence-foundation/005-guidance-engine.md) · [014 – Trust & Performance Engine](../spark-intelligence-foundation/14-spark-trust-performance-engine.md) |
+| **Related** | [Spec 100 — Transformation Constitution](./ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md) · **[Spec 102 — Trust Experience Framework](./TRUST_EXPERIENCE_FRAMEWORK.md)** · [Spec 101 — Response Quality](./RESPONSE_QUALITY_FRAMEWORK.md) · [Companion Relationship Framework (T-009)](./COMPANION_RELATIONSHIP_FRAMEWORK.md) · [T-003 Universal Experience Standards](./UNIVERSAL_EXPERIENCE_STANDARDS.md) · [T-005 Experience Patterns](./EXPERIENCE_PATTERNS.md) · [005 – Guidance Engine](../spark-intelligence-foundation/005-guidance-engine.md) · [014 – Trust & Performance Engine](../spark-intelligence-foundation/14-spark-trust-performance-engine.md) |
 
 ---
+
+> **Parent spec:** [Spec 102 — Trust Experience Framework™](./TRUST_EXPERIENCE_FRAMEWORK.md) is the core experience specification. This document (T-006) retains supplementary material — Trust Pyramid™, memory trust, and engineering alignment.
 
 ## Purpose
 
@@ -322,7 +324,8 @@ If the answer to any is **no**, redesign before implementation.
 
 | Layer | Document | Role |
 |-------|----------|------|
-| **Trust Experience™** (T-006) | This document | How trust **feels** — copy, behavior, relationship |
+| **Trust Experience™** (T-006) | This document | Supplementary — Trust Pyramid™, memory trust, cursor notes |
+| **Trust Experience Framework™** (Spec 102) | [TRUST_EXPERIENCE_FRAMEWORK.md](./TRUST_EXPERIENCE_FRAMEWORK.md) | How trust **feels** — principles, behaviors, Trust Bank™ |
 | **Trust & Performance Engine** (Spec 014) | `14-spark-trust-performance-engine.md` | Runtime ingress/egress quality gates |
 
 Both are required. Neither replaces the other.

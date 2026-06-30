@@ -147,6 +147,62 @@ function PanelContent({ overrides, onChange, onReset }: Props) {
       >
         Open Director&apos;s Studio (demo) →
       </Link>
+      <Link
+        href="/prototype/spark-studio"
+        className="welcome-room-prototype__link"
+        prefetch
+      >
+        Open Spark Studio™ prototype →
+      </Link>
+      <Link
+        href="/workspace-prototype"
+        className="welcome-room-prototype__link"
+        prefetch
+      >
+        Open Spark Workspace™ prototype →
+      </Link>
+      <Link
+        href="/estate-map-prototype"
+        className="welcome-room-prototype__link"
+        prefetch
+      >
+        Open Folded Estate Map™ prototype →
+      </Link>
+      <Link
+        href="/prototype/conversation-workspace"
+        className="welcome-room-prototype__link"
+        prefetch
+      >
+        Open Conversation → Workspace V4 (chat 2) →
+      </Link>
+      <Link
+        href="/prototype/relationship"
+        className="welcome-room-prototype__link"
+        prefetch
+      >
+        Open Relationship prototype 4 (chat 1) →
+      </Link>
+      <Link
+        href="/prototype/universal-work"
+        className="welcome-room-prototype__link"
+        prefetch
+      >
+        Open Universal Work™ prototype 01 →
+      </Link>
+      <Link
+        href="/spark-alpha"
+        className="welcome-room-prototype__link"
+        prefetch
+      >
+        Open Spark Alpha™ (relationship prototype) →
+      </Link>
+      <Link
+        href="/prototype/conservatory-workspace"
+        className="welcome-room-prototype__link"
+        prefetch
+      >
+        Open Conservatory Workspace™ V3 →
+      </Link>
       <button type="button" className="welcome-room-prototype__reset" onClick={onReset}>
         Reset to intelligence
       </button>

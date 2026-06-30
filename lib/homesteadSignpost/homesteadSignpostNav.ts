@@ -1,6 +1,7 @@
 import type { CoachingMode } from "@/lib/companionPrompt";
 import type { AppSection, SidebarNavId } from "@/lib/companionUi";
 import { normalizeSidebarNav } from "@/lib/companionUi";
+import { isGrowthPanelSection } from "@/lib/growthNavigation";
 import { isMyWorkPanelSection } from "@/lib/myWorkNavigation";
 
 export type HomesteadSignTier = "destination" | "knowledge";
@@ -16,21 +17,27 @@ export type HomesteadSignpostItem = {
 
 /** Primary homestead destinations — hanging from the lamp post. */
 export const HOMESTEAD_SIGNPOST_DESTINATIONS: readonly HomesteadSignpostItem[] = [
-  { id: "chat", label: "Home", tier: "destination", objectId: "messages", mode: "today" },
+  { id: "chat", label: "Today", tier: "destination", objectId: "messages", mode: "today" },
   {
     id: "focus",
-    label: "Focus My Brain",
+    label: "Focus",
     tier: "destination",
     objectId: "focus-my-brain",
     mode: "focus",
   },
+  { id: "grow", label: "Grow", tier: "destination", objectId: "grow" },
   { id: "create", label: "Create", tier: "destination", objectId: "create" },
-  { id: "growth", label: "Growth", tier: "destination", objectId: "the-gallery" },
   { id: "other", label: "Other", tier: "destination", objectId: "my-work" },
 ];
 
 /** Knowledge resources — dropdown under the Other sign, not separate sidebar signs. */
 export const HOMESTEAD_OTHER_DROPDOWN_ITEMS: readonly HomesteadSignpostItem[] = [
+  {
+    id: "growth",
+    label: "Your Story",
+    tier: "knowledge",
+    objectId: "growth",
+  },
   {
     id: "welcome-room",
     label: "Welcome Room",
@@ -61,6 +68,7 @@ export function isHomesteadOtherNavActive(
 ): boolean {
   if (normalizeSidebarNav(nav) === "other") return true;
   if (isMyWorkPanelSection(section)) return true;
+  if (isGrowthPanelSection(section)) return true;
   if (
     section === "how-do-i" ||
     section === "playbook" ||

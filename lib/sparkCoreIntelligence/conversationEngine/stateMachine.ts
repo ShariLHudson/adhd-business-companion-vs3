@@ -1,5 +1,6 @@
 /**
  * Conversation state machine transitions.
+ * Behavioral engine: Spec 107 — docs/SPARK_CONVERSATION_STATE_MACHINE_FRAMEWORK.md
  */
 
 import type {

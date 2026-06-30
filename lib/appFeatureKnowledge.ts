@@ -164,12 +164,12 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   },
   {
     id: "momentum-games",
-    name: "Momentum Builders",
-    navigation:
-      "Sidebar **Focus** → expand **Momentum Boosters** → **Momentum Builders**",
+    name: "Quick Recharge",
+    navigation: "Sidebar **Focus** → **Quick Recharge**",
     howTo:
-      "A curated menu of short resets — breathing, games, calming places, and tiny re-entry steps. Recommendations come from your Today's Reality check-in; browse by category when you know what you need.",
+      "Light activities for when your brain needs a reset — simple games and playful pauses. For entrepreneurial practice, visit **Grow** → **Momentum Builders**.",
     match: [
+      /\bquick recharge\b/i,
       /\bmomentum (?:builders?|games?|boosters?)\b/i,
       /\bfind the games?\b/i,
       /\b(?:where|how).*\bgames?\b/i,

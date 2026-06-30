@@ -21,6 +21,7 @@ import {
 } from "./conversationHierarchy";
 import { HUMAN_CONVERSATION_TWELVE_TESTS } from "./twelveTests";
 import { CONTEXT_BEFORE_CONTENT_PROMPT, contextBeforeContentHintForChat } from "./contextBeforeContent";
+import { SPARK_HUMAN_VOICE_PROMPT_BLOCK } from "./sparkHumanVoice";
 
 export const HUMAN_CONVERSATION_PRINCIPLE =
   "Human Conversation — every response elevates the person's life experience, strengthens the relationship, and feels like someone who genuinely knows them." as const;
@@ -79,7 +80,9 @@ CONVERSATION LAYERS (flow naturally):
 - Support: walk beside them, not ahead
 - Action: only after the above — personally justified, never default ADHD tools in conversation
 
-REAL CONVERSATIONS DRIFT: "That reminds me..." / "You know..." / "Hmm..." / "Actually..." — humanity is allowed.
+REAL CONVERSATIONS DRIFT: "You know..." / "Hmm..." / "Actually..." — humanity is allowed. Do NOT lean on repetitive AI filler ("That reminds me of something", "Something about the way you said that makes me curious").
+
+${SPARK_HUMAN_VOICE_PROMPT_BLOCK}
 
 FORBIDDEN (predictable AI defaults — rewrite unless rare intentional use):
 ${HUMAN_CONVERSATION_FORBIDDEN_OPENER_LABELS.map((l) => `- ${l}`).join("\n")}

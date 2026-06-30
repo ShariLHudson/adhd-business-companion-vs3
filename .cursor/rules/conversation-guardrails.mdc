@@ -1,0 +1,57 @@
+---
+description: Spark Conversation Guardrails (Spec 106) — overrides all features; seventeen rules; understand before solving
+alwaysApply: true
+---
+
+# Spark Conversation Guardrails™ (Spec 106)
+
+**Full document:** `docs/SPARK_CONVERSATION_GUARDRAILS_FRAMEWORK.md`
+
+**Supremacy:** If a feature conflicts with these guardrails, **the guardrails win.**
+
+Parent interaction model: [Spec 105 — Conversation Engine](../docs/SPARK_CONVERSATION_ENGINE_FRAMEWORK.md)
+
+## Guiding principle
+
+**Understand before solving.** Never assume what the member wants to build.
+
+## Seventeen rules (summary)
+
+1. **Reflect** before responding
+2. **Never invent** context (app ≠ workshop unless member says so)
+3. **One** thoughtful question — then wait
+4. **Numbered choices** when helpful (`1`, `2`, …)
+5. **Never rush** to draft — permission first
+6. **Repair immediately** if wrong — never defend
+7. **One conversation** — not tool-hopping
+8. **Member decides** — suggest, never force
+9. **Quiet intelligence** — connect assets behind the scenes
+10. **Never interrupt** momentum — silence is often best
+11. **Environment optional** — never auto-move
+12. **Conversation continues** across environments
+13. **Ask before acting** (draft, research, journal, export, etc.)
+14. **Every response earns its place** — understand · help · forward
+15. **Emotional safety** — never wrong · slow · behind · judged
+16. **Progressive confidence** — stages end early; that's normal
+17. **Simplicity wins** — fifth grader to overwhelmed ADHD brain
+
+**Types:** `SparkConversationGuardrailId` · `SPARK_CONVERSATION_GUARDRAILS` in `lib/sparkConversationGuardrails/types.ts`
+
+## Final design test
+
+Before every response:
+
+> What is the single most helpful thing to do next?
+
+Not: what feature? Not: what workflow?
+
+## Before shipping any prompt, builder, or conversational UI
+
+- [ ] Reflected intent before solving?
+- [ ] No invented topic/context?
+- [ ] One question only?
+- [ ] Permission before draft/research/export/environment?
+- [ ] Repair path if misunderstood?
+- [ ] Passes emotional safety (Shari test)?
+
+Also: Spec 105 · Spec 101–103 · Spec 107–110 · **Spec 111 Hospitality** · [Relationship Constitution](../docs/RELATIONSHIP_CONSTITUTION.md)

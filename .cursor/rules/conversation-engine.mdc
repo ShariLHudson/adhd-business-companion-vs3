@@ -1,0 +1,64 @@
+---
+description: Spark Conversation Engine (Spec 105) — conversation is the primary interface; nine-stage flow; permission before creating
+alwaysApply: true
+---
+
+# Spark Conversation Engine™ (Spec 105)
+
+**Full document:** `docs/SPARK_CONVERSATION_ENGINE_FRAMEWORK.md`
+
+**Highest-priority interaction model.** Conversation first. Environment second. Workspace third. Tools last.
+
+## Core principle
+
+**If you can have a conversation, you can use Spark.**
+
+Members never need to know where a feature lives or which workspace to open.
+
+## Philosophy (every turn)
+
+Listen → Understand → Clarify → Help → Create → Ask Permission → Continue
+
+Never rush. Never assume. Never overwhelm.
+
+## Nine-stage flow
+
+1. **Welcome** — greeting + one question; no dashboard
+2. **Understand** — listen first; one clarifying question max
+3. **Confirm direction** — one sentence
+4. **Environment** — optional; never forced
+5. **Conversation** — one meaningful question at a time
+6. **Quiet work** — prepare behind the scenes; don't interrupt
+7. **Permission** — never create final work without consent
+8. **Review** — frosted workspace; draft primary; chat fades
+9. **Continue** — member chooses next step
+
+**Types:** `SparkConversationFlowStage` in `lib/sparkConversationEngine/types.ts`
+
+## Internal modes (invisible to members)
+
+Listening · Clarifying · Exploring · Creating · Review · Reflection · Celebration · Restoration
+
+Runtime: `lib/sparkCoreIntelligence/conversationEngine/`
+
+## Relationship Rule™
+
+Never: *"Open Clear My Mind™."* → *"Let's clear your mind together."*
+
+**Spark never sends members somewhere. Spark goes with them.**
+
+## Spark never / always
+
+**Never:** bombard · assume · create without permission · send to features · force environments
+
+**Always:** listen first · one question · stuck help · permission · member in control
+
+## Before shipping conversational UI
+
+- [ ] One question at a time?
+- [ ] Understood before helping?
+- [ ] Permission before drafts/saves?
+- [ ] No feature-navigation language?
+- [ ] Conversation visually primary over workspace?
+
+Also: Spec 100–115 · **Spec 116 Gold Standards** · T-009 · [Relationship Constitution](../docs/RELATIONSHIP_CONSTITUTION.md)

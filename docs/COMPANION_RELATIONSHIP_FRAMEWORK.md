@@ -10,7 +10,7 @@
 | **Status** | Foundational |
 | **Owner** | Spark Product & Experience |
 | **Applies to** | All Companion and member-facing interactions over time |
-| **Related** | [Relationship Constitution](./RELATIONSHIP_CONSTITUTION.md) · [Relationship Phase Constitution](./relationship-phases/RELATIONSHIP-PHASE-CONSTITUTION.md) · [T-006 Trust Experience](./TRUST_EXPERIENCE.md) · [T-007 Entrepreneurial Resilience](./ENTREPRENEURIAL_RESILIENCE.md) · [003 – Business Brain](../spark-intelligence-foundation/003-business-brain.md) |
+| **Related** | [Relationship Constitution](./RELATIONSHIP_CONSTITUTION.md) · [Relationship Phase Constitution](./relationship-phases/RELATIONSHIP-PHASE-CONSTITUTION.md) · **[Spec 105 — Spark Conversation Engine](./SPARK_CONVERSATION_ENGINE_FRAMEWORK.md)** · **[Spec 106 — Conversation Guardrails](./SPARK_CONVERSATION_GUARDRAILS_FRAMEWORK.md)** · **[Spec 107 — Conversation State Machine](./SPARK_CONVERSATION_STATE_MACHINE_FRAMEWORK.md)** · **[Spec 108 — Environment Integration](./SPARK_ENVIRONMENT_INTEGRATION_FRAMEWORK.md)** · **[Spec 109 — Frosted Conversation Workspace](./SPARK_FROSTED_CONVERSATION_WORKSPACE_FRAMEWORK.md)** · **[Spec 110 — Conversation Completion](./SPARK_CONVERSATION_COMPLETION_FRAMEWORK.md)** · [T-006 Trust Experience](./TRUST_EXPERIENCE.md) · [T-007 Entrepreneurial Resilience](./ENTREPRENEURIAL_RESILIENCE.md) · [003 – Business Brain](../spark-intelligence-foundation/003-business-brain.md) |
 
 ---
 

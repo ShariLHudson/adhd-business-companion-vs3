@@ -1,0 +1,55 @@
+---
+description: Environment Integration (Spec 108) — Estate supports conversation; invitations only; conversation travels
+alwaysApply: true
+---
+
+# Environment Integration™ (Spec 108)
+
+**Full document:** `docs/SPARK_ENVIRONMENT_INTEGRATION_FRAMEWORK.md`
+
+**Room design:** [T-017 Estate Rooms](../docs/ESTATE_ROOMS_FRAMEWORK.md) · **Conversation:** Spec 105–107 · **Guardrails win:** Spec 106
+
+## Core philosophy
+
+Conversation is primary. Environment is supportive. Member always in control.
+
+**Design principle:** Changing rooms, not changing software.
+
+## Fourteen rules (summary)
+
+1. **Begin where member is** — remember last place; no "where to work today?"
+2. **Conversation first** — never open with room/workspace choice
+3. **Suggest only when helpful** — planning, writing, reflection, fatigue, etc.
+4. **Invitations only** — Yes · Stay Here · Show Estate Map
+5. **Staying is valid** — Estate adapts to conversation
+6. **Estate optional** — one favorite forever is fine
+7. **Capability identical** — only atmosphere differs
+8. **Restoration places** — no workspace; reflection, journaling, quiet
+9. **Map always available** — folded map or "Show me the Estate"
+10. **Places not features** — "Library" not "planning module"
+11. **Observe without surveillance** — thoughtful patterns only
+12. **Conversation travels** — never restart or summarize on move
+13. **Never a distraction** — support thinking/creating, not exploration for its own sake
+14. **Natural discovery** — curiosity, not tutorials
+
+**Types:** `SparkEnvironmentIntegrationRuleId` in `lib/sparkEnvironmentIntegration/types.ts`
+
+## Final design test (before any suggestion)
+
+> Will changing the setting genuinely help this person think, feel, or work better right now?
+
+Uncertain → **stay where you are**.
+
+## Forbidden language
+
+Never: "Opening the Conservatory..." · "Choose a room" · "Navigate to..."
+
+## Before shipping environment suggestions or transitions
+
+- [ ] Conversation understood first (Spec 107: after Confirming)?
+- [ ] Invitation with three choices?
+- [ ] Conversation continuity preserved?
+- [ ] Passes Final Design Test?
+- [ ] Place language, not feature language?
+
+Also: T-017 · Spec 105–110 · **Spec 111 Hospitality** · [Relationship Constitution](../docs/RELATIONSHIP_CONSTITUTION.md)

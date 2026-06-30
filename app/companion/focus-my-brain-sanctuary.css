@@ -225,6 +225,7 @@
 
 .focus-destination-plaque__main:hover .focus-destination-plaque__lantern-glow {
   opacity: 1;
+  animation: estate-lantern-flicker 2.6s linear infinite;
 }
 
 .focus-destination-plaque--expanded .focus-destination-plaque__main {
@@ -299,6 +300,7 @@
   .focus-destination-plaque__banner,
   .focus-destination-plaque__lantern-glow {
     transition: none !important;
+    animation: none !important;
   }
 }
 
@@ -988,4 +990,61 @@
     transform: none;
     filter: none;
   }
+}
+
+.focus-primary-tools {
+  margin-bottom: 1.1rem;
+}
+
+.focus-primary-tools__kicker {
+  margin: 0 0 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b635a;
+}
+
+.focus-primary-tools__list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.focus-primary-tools__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.15rem;
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(139, 115, 85, 0.16);
+  border-radius: 0.75rem;
+  background: rgba(255, 252, 245, 0.72);
+  padding: 0.65rem 0.8rem;
+  cursor: pointer;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease,
+    background 0.25s ease;
+}
+
+.focus-primary-tools__item:hover {
+  transform: translateY(-1px);
+  border-color: rgba(47, 74, 62, 0.28);
+  background: rgba(255, 252, 245, 0.9);
+}
+
+.focus-primary-tools__label {
+  font-size: 0.9rem;
+  font-weight: 650;
+  color: #2a2820;
+}
+
+.focus-primary-tools__desc {
+  font-size: 0.8rem;
+  line-height: 1.45;
+  color: #6f6259;
 }

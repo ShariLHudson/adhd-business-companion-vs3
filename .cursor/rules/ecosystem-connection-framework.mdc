@@ -1,0 +1,42 @@
+---
+description: Ecosystem Connection Framework (T-014) — no dead ends; one gentle next step
+alwaysApply: true
+---
+
+# Ecosystem Connection Framework™ (T-014)
+
+**Full document:** `docs/ECOSYSTEM_CONNECTION_FRAMEWORK.md`
+
+Spark is **one living ecosystem** — not separate modules. Value = relationships between experiences.
+
+## Connection Principle™
+
+Every experience answers: **What should naturally happen next?** Never dead ends.
+
+## Living cycle
+
+Question → Guidance → Momentum Builder → Spark Card → Business Asset → Gallery → Reflection → Capability Growth → smarter Guidance
+
+## No dead ends
+
+**One** thoughtfully chosen next recommendation. Never five competing actions. Max 3 choices (T-003).
+
+## Gentle guidance
+
+Recommend — never interrupt. Thoughtful bridges, not promotional. Shari test.
+
+## Required spec fields
+
+Leads from · strengthens · natural next (one primary) · Business Asset link when relevant · capability · EF reduction.
+
+**Type:** `SparkEcosystemConnectionSpec` in `lib/sparkEcosystemConnection/types.ts`
+
+## EF
+
+Reduce decision fatigue, searching, remembering, context switching.
+
+## Personalization (quiet)
+
+Brain · Business Assets · journey stage · Capability Graph · Transformation Graph · priorities · recent conversation.
+
+Also: Spec 103 Universal Experience · T-017 Estate Rooms · [07 Estate Navigation](../spark-intelligence-foundation/07-estate-navigation.md).

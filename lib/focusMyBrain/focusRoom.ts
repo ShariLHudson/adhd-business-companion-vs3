@@ -26,8 +26,8 @@ export const FOCUS_MY_BRAIN_WORKSPACE_MAX_WIDTH = "42rem" as const;
 export const FOCUS_MY_BRAIN_WORKSPACE_MIN_WIDTH = "27.5rem" as const;
 
 export const FOCUS_MY_BRAIN_ROOM_COPY = {
-  title: "Focus My Brain",
-  tagline: "My mind slows down here.",
+  title: "Focus",
+  tagline: "Help my brain.",
 } as const;
 
 export const FOCUS_MY_BRAIN_HUB_CARDS = {

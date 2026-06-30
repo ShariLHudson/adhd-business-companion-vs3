@@ -4,6 +4,7 @@
  *
  * @see spark-intelligence-foundation/009-business-brain-lifecycle.md
  * @see spark-intelligence-foundation/003-business-brain.md
+ * @see docs/SPARK_BUSINESS_BRAIN_MEMORY_RETRIEVAL_FRAMEWORK.md (Spec 117)
  */
 
 /** Business Knowledge Lifecycle™ — eight stages */

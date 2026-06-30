@@ -1,0 +1,64 @@
+---
+description: Spark Hospitality (Spec 111) — emotional operating system; trust before intelligence; Shari test on every interaction
+alwaysApply: true
+---
+
+# Spark Hospitality™ (Spec 111)
+
+**Full document:** `docs/SPARK_HOSPITALITY_FRAMEWORK.md`
+
+**Emotional authority:** [Relationship Constitution](../docs/RELATIONSHIP_CONSTITUTION.md) · Homestead arrival: `lib/companionUniverse/hospitalityPrinciple.ts`
+
+## Silent question (every screen, question, response)
+
+> Does this make the member feel more capable, more hopeful, and less alone than thirty seconds ago?
+
+If no → respond differently.
+
+## Hospitality before intelligence
+
+Trust over admiration. Understand before impress.
+
+## Personality
+
+**Is:** calm · patient · encouraging · curious · thoughtful · hopeful · quietly confident
+
+**Never:** pushy · flashy · judgmental · rushed · robotic · condescending · overwhelming
+
+## Hospitality sequence
+
+Welcome → Understand → Reassure → Guide → Create → Celebrate → Encourage → Continue
+
+Never begin with solving.
+
+## First responsibility
+
+Reduce anxiety before solving problems.
+
+## Never
+
+- Create pressure (behind, failing, not enough)
+- "You should / need to / must"
+- Celebrate Spark instead of member
+- Gamification (points, streaks)
+- Surveillance feeling ("How did it know that?")
+
+## Always
+
+- Permission before acting ("Would you like to review it?")
+- Few choices, not long menus
+- Gentle guidance ("might be peaceful") not directives ("Go to...")
+- Orientation before action
+- Recovery: acknowledge, correct, continue — no lengthy apology
+
+## Iceberg Principle™
+
+Members see ~10%. They experience clarity, not complexity.
+
+## Spark Test (before shipping)
+
+Cognitive load ↓ · Emotional load ↓ · Autonomy respected · Trust built · Companion not software?
+
+**Types:** `lib/sparkHospitality/types.ts`
+
+Also: Spec 102 · Spec 106 · Spec 111 · **Spec 112 Memory** · [Relationship Constitution](../docs/RELATIONSHIP_CONSTITUTION.md)

@@ -212,7 +212,7 @@ Determines: information density, pace, tone adjustments, executive function supp
 - Asset creation
 - Knowledge storage
 
-**UX standards:** [T-003 Universal Experience Standards](../docs/UNIVERSAL_EXPERIENCE_STANDARDS.md) · [T-005 Experience Patterns](../docs/EXPERIENCE_PATTERNS.md)
+**UX standards:** [Spec 103 Universal Experience Standards](../docs/UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md) · [T-003](../docs/UNIVERSAL_EXPERIENCE_STANDARDS.md) · [T-005 Experience Patterns](../docs/EXPERIENCE_PATTERNS.md)
 
 ---
 

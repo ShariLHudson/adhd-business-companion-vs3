@@ -1,0 +1,57 @@
+---
+description: Spark Conversation State Machine (Spec 107) — internal behavioral engine; ten states; mandatory permission before review
+alwaysApply: true
+---
+
+# Spark Conversation State Machine™ (Spec 107)
+
+**Full document:** `docs/SPARK_CONVERSATION_STATE_MACHINE_FRAMEWORK.md`
+
+**Invisible to members.** Governs what Spark is doing before deciding what to do next.
+
+Parent specs: [Spec 105 — Conversation Engine](../docs/SPARK_CONVERSATION_ENGINE_FRAMEWORK.md) · [Spec 106 — Guardrails](../docs/SPARK_CONVERSATION_GUARDRAILS_FRAMEWORK.md) (wins on conflict)
+
+Runtime: `lib/sparkCoreIntelligence/conversationEngine/stateMachine.ts`
+
+## Ten states (internal only)
+
+1. **Listening** — understand; no advice yet
+2. **Understanding** — identify real objective
+3. **Clarifying** — one question only; numbered choices
+4. **Confirming** — one-sentence shared understanding
+5. **Exploring** — collaborative thinking; not creating yet
+6. **Creating** — quiet prep; nothing shown
+7. **Permission** — mandatory before review; never skip
+8. **Review** — draft primary; chat fades
+9. **Complete** — member decides next
+10. **Continue** — no dead ends
+
+**Types:** `SparkConversationStateMachineState` in `lib/sparkConversationStateMachine/types.ts`
+
+## Confidence rule
+
+| Level | Action |
+|-------|--------|
+| High | Proceed |
+| Medium | One clarification |
+| Low | Stay in Listening |
+
+## Forbidden
+
+Skip clarifying · jump to creating · assume deliverable · multi-question interviews · draft without permission · environment before confirming · overwhelm with options
+
+## Integration rules
+
+- **Environment:** never before Confirming; always optional — see **Spec 108**
+- **Workspace:** only when useful; never interrupts conversation
+- **Business Brain:** quiet support every state — member sees result, not mechanics
+
+## Before shipping conversational logic
+
+- [ ] Current state identified?
+- [ ] Transition valid (forward or documented backward)?
+- [ ] Confidence assessed?
+- [ ] Permission state before any Review?
+- [ ] Recovery path if misunderstood?
+
+Also: Spec 105 · Spec 106 · **Spec 108 Environment Integration** · **Spec 109 Frosted Workspace** · **Spec 110 Completion** · [T-017 Estate Rooms](../docs/ESTATE_ROOMS_FRAMEWORK.md) · [Relationship Constitution](../docs/RELATIONSHIP_CONSTITUTION.md)

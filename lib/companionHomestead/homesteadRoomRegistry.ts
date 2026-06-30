@@ -2,7 +2,7 @@ import type { AppSection } from "@/lib/companionUi";
 import type { CompanionPlaceId } from "@/lib/companionUniverse/types";
 import { homesteadLivingRoomImageUrl } from "@/lib/homesteadScene/homesteadLivingRoomImage";
 
-/** Canonical homestead rooms — one persistent home, six signature spaces. */
+/** Canonical homestead rooms — one persistent home, six signature spaces. T-017 @see docs/ESTATE_ROOMS_FRAMEWORK.md */
 export type HomesteadRoomId =
   | "living-room"
   | "sunroom"

@@ -1,7 +1,12 @@
 import type { IntelligenceReadyHooks } from "@/lib/intelligence/intelligenceReadyTypes";
 import type { AppSection } from "@/lib/companionUi";
 
-/** Wall memory kinds — rotate naturally; never clutter a wall. */
+/**
+ * V1 hallway wall frames — runtime implementation.
+ * Preservation philosophy and categories: T-015 @see docs/GALLERY_FRAMEWORK.md
+ * Framework types: lib/sparkGallery/types.ts
+ */
+/** Wall memory kinds — rotate naturally; never clutter a wall. Map to GalleryCategory (T-015) when curating. */
 export type GalleryMemoryKind =
   | "journal-entry"
   | "testimonial"
