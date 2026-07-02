@@ -8,6 +8,7 @@
 import { resolveCanonicalPlaceId } from "./canonicalEstateRegistry";
 import type { EstateArrivalAmbienceProfile } from "./estateArrivalExperienceTypes";
 import { resolveCanonicalPlaceAmbience } from "./estatePlaceMedia";
+import { enrichAmbienceProfileWithIntent } from "./estatePlaceAmbienceIntent";
 import {
   COFFEE_SHOP_AMBIENCE_MP3,
   EVENING_HEARTH_AMBIENCE_MP3,
@@ -107,7 +108,7 @@ export function resolveEstatePlaceAmbientProfile(
 ): EstateArrivalAmbienceProfile | null {
   const id = normalizePlaceKey(placeId);
   const layered = ESTATE_PLACE_AMBIENT_SOUND[id];
-  if (layered) return layered;
+  if (layered) return enrichAmbienceProfileWithIntent(id, layered);
   const media = resolveCanonicalPlaceAmbience(id);
   if (media) return media;
   return null;

@@ -1,0 +1,371 @@
+/* Spark Estate Guidebook™ — two-page spread */
+
+.eg-guide-spread {
+  --eg-teal: #1a4a47;
+  --eg-gold: #c9a66b;
+  --eg-cream: #faf6ee;
+  --eg-cream-warm: #f3ead8;
+  --eg-paper-edge: #e5d9c4;
+  --eg-charcoal: #3a3632;
+  --eg-charcoal-soft: #5c5650;
+  --eg-body: clamp(1.375rem, 2.15vw, 1.5rem);
+  --eg-body-leading: 1.68;
+  --eg-title: clamp(2rem, 4vw, 2.75rem);
+  --eg-wisdom: clamp(1.75rem, 3vw, 2.1rem);
+  --eg-label: clamp(1.125rem, 1.8vw, 1.25rem);
+  --eg-page-pad: clamp(1.5rem, 3.5vw, 2.5rem);
+  --eg-block-gap: clamp(1.35rem, 2.8vw, 1.85rem);
+  --eg-gutter: clamp(0.85rem, 2vw, 1.35rem);
+
+  display: grid;
+  grid-template-columns: 1fr var(--eg-gutter) 1fr;
+  max-width: 88rem;
+  margin: 0 auto;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow:
+    0 18px 48px rgba(20, 14, 8, 0.18),
+    0 0 0 1px rgba(201, 166, 107, 0.35);
+  color: var(--eg-charcoal);
+  font-family: Georgia, "Times New Roman", "Iowan Old Style", serif;
+}
+
+.eg-guide-page {
+  background:
+    radial-gradient(ellipse 90% 60% at 50% 0%, rgba(255, 252, 246, 0.7), transparent 58%),
+    linear-gradient(180deg, var(--eg-cream) 0%, var(--eg-cream-warm) 100%);
+  padding: var(--eg-page-pad);
+  min-height: min(72dvh, 44rem);
+  overflow-y: auto;
+}
+
+.eg-guide-page--left {
+  border-right: 1px solid rgba(201, 166, 107, 0.25);
+  box-shadow: inset -6px 0 16px rgba(28, 20, 12, 0.06);
+}
+
+.eg-guide-page--right {
+  border-left: 1px solid rgba(201, 166, 107, 0.25);
+  box-shadow: inset 6px 0 16px rgba(28, 20, 12, 0.06);
+}
+
+.eg-guide-gutter {
+  background: linear-gradient(
+    90deg,
+    rgba(28, 20, 12, 0.08) 0%,
+    rgba(217, 203, 181, 0.95) 45%,
+    rgba(28, 20, 12, 0.08) 100%
+  );
+}
+
+.eg-guide-plate {
+  margin: 0 0 var(--eg-block-gap);
+  border-radius: 0.35rem;
+  overflow: hidden;
+  border: 1px solid rgba(201, 166, 107, 0.45);
+  box-shadow: 0 8px 24px rgba(20, 14, 8, 0.12);
+}
+
+.eg-guide-plate__image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: min(28vh, 16rem);
+  object-fit: cover;
+}
+
+.eg-guide-plate__fallback {
+  display: grid;
+  place-items: center;
+  min-height: 10rem;
+  padding: 1.5rem;
+  background: linear-gradient(145deg, #e8dfd0, #d9cfc0);
+}
+
+.eg-guide-plate__fallback-label {
+  font-size: var(--eg-label);
+  color: var(--eg-teal);
+  text-align: center;
+}
+
+.eg-guide-page__title {
+  margin: 0 0 0.45rem;
+  font-size: var(--eg-title);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--eg-teal);
+}
+
+.eg-guide-page__tagline {
+  margin: 0 0 var(--eg-block-gap);
+  font-size: var(--eg-body);
+  line-height: var(--eg-body-leading);
+  color: var(--eg-charcoal-soft);
+  font-style: italic;
+}
+
+.eg-guide-page__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--eg-block-gap);
+}
+
+.eg-guide-page__body--editorial {
+  gap: clamp(1.75rem, 3.5vw, 2.35rem);
+}
+
+/* —— Editorial blocks (coffee-table book) —— */
+
+.eg-editorial {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.eg-editorial__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.eg-editorial__label {
+  margin: 0 0 0.65rem;
+  padding-top: 0.15rem;
+  border-top: 1px solid rgba(201, 166, 107, 0.45);
+  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--eg-charcoal-soft);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.eg-editorial__title {
+  margin: 0 0 0.85rem;
+  font-size: clamp(1.5rem, 2.6vw, 1.85rem);
+  font-weight: 600;
+  line-height: 1.28;
+  color: var(--eg-teal);
+}
+
+.eg-editorial__paragraph {
+  margin: 0;
+  font-size: var(--eg-body);
+  line-height: var(--eg-body-leading);
+  max-width: 36rem;
+}
+
+.eg-editorial__paragraph + .eg-editorial__paragraph {
+  margin-top: 0.85rem;
+}
+
+.eg-editorial__list,
+.eg-editorial__prompts {
+  margin: 0.75rem 0 0;
+  padding-left: 1.35rem;
+  font-size: var(--eg-body);
+  line-height: var(--eg-body-leading);
+}
+
+.eg-editorial__list li + li,
+.eg-editorial__prompts li + li {
+  margin-top: 0.55rem;
+}
+
+.eg-editorial__prompts {
+  list-style: decimal;
+}
+
+.eg-editorial__source {
+  margin: 0.75rem 0 0;
+  font-size: clamp(1rem, 1.6vw, 1.125rem);
+  font-style: italic;
+  color: var(--eg-charcoal-soft);
+}
+
+.eg-editorial--from-sharis-notebook .eg-editorial__paragraph {
+  font-style: italic;
+  color: #2f3d3c;
+}
+
+.eg-editorial--stewards-note .eg-editorial__paragraph,
+.eg-editorial--curators-note .eg-editorial__paragraph {
+  font-size: clamp(1.3rem, 2vw, 1.42rem);
+}
+
+.eg-editorial--found-among-archives .eg-editorial__paragraph {
+  color: #3a3632;
+}
+
+.eg-editorial--estate-tradition .eg-editorial__paragraph {
+  max-width: 34rem;
+}
+
+.eg-editorial__remember-line {
+  margin: 0.35rem 0 0;
+  font-size: clamp(1.55rem, 2.8vw, 1.95rem);
+  line-height: 1.45;
+  color: var(--eg-teal);
+  font-weight: 500;
+  max-width: 32rem;
+}
+
+.eg-editorial__saying {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.eg-editorial__saying-text {
+  margin: 0.25rem 0 0;
+  font-size: clamp(1.5rem, 2.5vw, 1.85rem);
+  line-height: 1.48;
+  color: var(--eg-teal);
+  font-weight: 500;
+}
+
+.eg-editorial__saying-by {
+  margin-top: 0.65rem;
+  font-size: var(--eg-label);
+  color: var(--eg-charcoal-soft);
+}
+
+.eg-guide-section-title {
+  margin: 0;
+  font-size: var(--eg-label);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--eg-teal);
+}
+
+.eg-guide-wisdom-title {
+  margin: 0;
+  font-size: var(--eg-wisdom);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--eg-teal);
+}
+
+.eg-guide-paragraph {
+  margin: 0;
+  font-size: var(--eg-body);
+  line-height: var(--eg-body-leading);
+  max-width: 38rem;
+}
+
+.eg-guide-list {
+  margin: 0;
+  padding-left: 1.35rem;
+  font-size: var(--eg-body);
+  line-height: var(--eg-body-leading);
+}
+
+.eg-guide-list li + li {
+  margin-top: 0.55rem;
+}
+
+.eg-guide-list--numbered {
+  list-style: decimal;
+}
+
+.eg-guide-quote {
+  margin: 0;
+  padding: 1rem 1.1rem 1rem 1.35rem;
+  border-left: 3px solid var(--eg-gold);
+  background: rgba(201, 166, 107, 0.1);
+  border-radius: 0 0.35rem 0.35rem 0;
+}
+
+.eg-guide-quote p {
+  margin: 0;
+  font-size: clamp(1.375rem, 2vw, 1.45rem);
+  line-height: 1.55;
+  color: var(--eg-teal);
+}
+
+.eg-guide-quote__by {
+  margin-top: 0.5rem;
+  font-size: var(--eg-label);
+  color: var(--eg-charcoal-soft);
+}
+
+.eg-guide-insight {
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid rgba(201, 166, 107, 0.28);
+}
+
+.eg-guide-invitation {
+  padding: 1.1rem 1.15rem;
+  border: 1px solid rgba(201, 166, 107, 0.5);
+  border-radius: 0.4rem;
+  background: rgba(255, 252, 245, 0.85);
+}
+
+.eg-guide-cover {
+  display: inline-flex;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.eg-guide-cover__image {
+  display: block;
+  width: clamp(10rem, 28vw, 16rem);
+  height: auto;
+  border-radius: 0.25rem 0.55rem 0.55rem 0.25rem;
+}
+
+@media (max-width: 1023px) {
+  .eg-guide-spread {
+    grid-template-columns: 1fr;
+    max-width: 42rem;
+  }
+
+  .eg-guide-gutter {
+    height: 0.65rem;
+    background: linear-gradient(
+      180deg,
+      rgba(28, 20, 12, 0.08) 0%,
+      rgba(217, 203, 181, 0.95) 50%,
+      rgba(28, 20, 12, 0.08) 100%
+    );
+  }
+
+  .eg-guide-page {
+    min-height: auto;
+    max-height: none;
+  }
+
+  .eg-guide-page--left {
+    border-right: 0;
+    box-shadow: none;
+  }
+
+  .eg-guide-page--right {
+    border-left: 0;
+    box-shadow: none;
+  }
+}
+
+@media print {
+  .eg-guide-spread {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .eg-guide-spread {
+    transition: none;
+  }
+}

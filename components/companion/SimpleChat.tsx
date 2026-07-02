@@ -2,6 +2,7 @@
 
 import { useEffect, type ReactNode } from "react";
 import { toPlainLanguageDisplay } from "@/lib/plainLanguageFormatting";
+import { sanitizeEstateFacingCopy } from "@/lib/companionContextRouting";
 import type { RelationshipResponseUiTrace } from "@/lib/relationshipResponseTrace";
 import {
   firstParagraphForTrace,
@@ -34,6 +35,7 @@ type SimpleChatProps = {
   hideEmptyState?: boolean;
   formatParagraphs?: (content: string) => string[];
   afterLastAssistant?: ReactNode;
+  awaitingUserConfirmation?: boolean;
 };
 
 type ThreadItem =
@@ -80,7 +82,9 @@ function renderInline(text: string): ReactNode[] {
 }
 
 function renderAssistant(content: string): ReactNode[] {
-  const normalized = toPlainLanguageDisplay(content);
+  const normalized = toPlainLanguageDisplay(
+    sanitizeEstateFacingCopy(content),
+  );
   const lines = normalized.split("\n").map((l) => l.trim());
   const blocks: ReactNode[] = [];
   let bullets: string[] = [];
@@ -183,6 +187,7 @@ export function SimpleChat({
   workspaceActiveBeside = false,
   hideEmptyState = false,
   afterLastAssistant,
+  awaitingUserConfirmation = false,
 }: SimpleChatProps) {
   const visible = messages.filter((m) => m.role !== "system");
   const thread = groupThread(visible);
@@ -249,7 +254,11 @@ export function SimpleChat({
           );
         })}
 
-        {shouldShowChatVisibleThinking(isLoading, thinkingMessage) ? (
+        {shouldShowChatVisibleThinking(
+          isLoading,
+          thinkingMessage,
+          awaitingUserConfirmation,
+        ) ? (
           <li className="companion-chat-thread__item companion-fade-in flex flex-col items-start">
             <VisibleThinkingBubble
               message={chatVisibleThinkingCopy(thinkingMessage)}

@@ -16,6 +16,7 @@ import {
   COMPANION_LOGIN_FORGOT_PASSWORD_LABEL,
   COMPANION_LOGIN_OPENING_MESSAGE,
 } from "@/lib/companionLoginPage";
+import { unlockBrowserAudioFromClick } from "@/lib/welcomeAudio/audioUnlock";
 
 type Mode = "signin" | "signup";
 
@@ -377,11 +378,17 @@ export function CompanionSignInForm({
 
   const openingLabel = COMPANION_LOGIN_OPENING_MESSAGE;
 
+  /** Browser autoplay unlock only — welcome audio starts after login on Welcome Home. */
+  const primeWelcomeAudio = () => {
+    unlockBrowserAudioFromClick();
+  };
+
   const createAccountButton = (
     <button
       key="create"
       type="button"
       disabled={authProcessing}
+      onPointerDown={primeWelcomeAudio}
       onClick={(e) => {
         setMode("signup");
         void onSubmit(e, "signup");
@@ -397,6 +404,7 @@ export function CompanionSignInForm({
       key="signin"
       type="button"
       disabled={authProcessing}
+      onPointerDown={primeWelcomeAudio}
       onClick={(e) => {
         setMode("signin");
         void onSubmit(e, "signin");
@@ -477,6 +485,7 @@ export function CompanionSignInForm({
         <button
           type="button"
           disabled={authProcessing}
+          onPointerDown={primeWelcomeAudio}
           onClick={() => void onGoogleSignIn()}
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#d4cdc3]/70 bg-white/85 px-4 py-3 text-base font-semibold text-[#1f1c19] transition-colors hover:bg-white disabled:opacity-60"
         >
@@ -566,6 +575,7 @@ export function CompanionSignInForm({
           <button
             type="submit"
             disabled={authProcessing}
+            onPointerDown={primeWelcomeAudio}
             className="mt-1 rounded-xl bg-[#1e4f4f] px-5 py-3 text-base font-semibold text-white hover:bg-[#163a3a] disabled:opacity-60"
           >
             {authProcessing

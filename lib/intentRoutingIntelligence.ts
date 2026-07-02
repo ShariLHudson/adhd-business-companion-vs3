@@ -2,14 +2,22 @@
  * Intent Routing Intelligence + Feature Navigation Intelligence (P0.7)
  * Understand before routing. Route before explaining. Help before reflecting.
  *
- * Always Available / Not Always Visible: routing intelligence and feature fit
- * run on every turn (API hints, continuity, suppress rules). Workspace cards
- * and clarification menus surface only on high-confidence, explicit requests.
+ * **Phase C — replace later:** Estate place moves must go through `goToPlace`.
+ * This layer must not override exact canonical place navigation.
+ *
+ * @see lib/estate/goToPlace.ts
  */
 
 import { isAdaptMyDayIntent, adaptMyDayOfferLine } from "./adaptMyDayChatRouting";
+import { messageNamesExactEstateRoom } from "./estate/estateRoomAliasRegistry";
 import { shouldDeferKeywordWorkspaceOffer } from "./companionEntry/entryLayerGate";
 import type { AppSection } from "./companionUi";
+import {
+  estateEntryIdForSection,
+  estateRoomDisplayName,
+} from "./estateMemory/estateSectionMap";
+import { buildEstateInvitation } from "./estateIntelligence/estateRouter";
+import { estateRegistryEntryById } from "./estateIntelligence/estateRegistry";
 import {
   detectEcosystemProblemIntent,
   ecosystemIntentToWorkspaceOffer,
@@ -225,7 +233,7 @@ function buildCreateArtifactOffer(
   const section = createSectionForArtifact(kind);
   return {
     section,
-    buttonLabel: section === "client-avatars" ? "Open Client Avatar" : "Open Create",
+    buttonLabel: section === "client-avatars" ? "Open Client Avatar" : "Step into Creative Studio™",
     line: buildRegistryArtifactOfferLine(kind, execCategory),
   };
 }
@@ -346,6 +354,7 @@ function resolveSupportStyle(
 ): RoutingSupportStyle {
   if (pref === "solutions") return "direct";
   if (pref === "understand") return "reflective";
+  if (pref === "listen") return "reflective";
   if (category === "build" || category === "execute") return "direct";
   if (category === "learn") return "direct";
   if (category === "understand") return "reflective";
@@ -356,7 +365,14 @@ function resolveSupportStyle(
 function supportStyleGuidance(
   style: RoutingSupportStyle,
   category: IntentCategory,
+  memberSupportPref?: string | null,
 ): string | null {
+  if (memberSupportPref === "listen") {
+    return "Member chose Listen support in Settings — reflect first; no advice unless they explicitly ask.";
+  }
+  if (memberSupportPref === "understand" || memberSupportPref === "sos") {
+    return "Member chose reflective support in Settings — validate before solutions; tone preference wins over action-first routing.";
+  }
   if (style === "direct" && (category === "build" || category === "execute")) {
     return "Prioritize action. Offer navigation or creation. Minimal reflection before helping.";
   }
@@ -386,22 +402,32 @@ function buildNavigationLine(
   userText: string,
   category: IntentCategory,
 ): string {
-  const label = featureLabelForSection(section);
+  const entryId = estateEntryIdForSection(section);
+  if (entryId) {
+    const entry = estateRegistryEntryById(entryId);
+    if (entry) return buildEstateInvitation(entry);
+  }
+
+  const room = entryId ? estateRoomDisplayName(entryId) : null;
 
   if (section === "brain-dump" || category === "organize") {
-    return `${label} may help with this. Would you like to open it?`;
+    return room
+      ? `Clear My Mind™ may help unload what's crowding your head. Would you like to step in together?`
+      : `We can sort what's in your head together. Would you like me to take us there?`;
   }
   if (section === "decision-compass" || category === "decide") {
-    return `This sounds like a ${label} conversation. Would you like to open ${label}?`;
+    return `The Decision Compass™ was designed for situations like this. Would you like me to guide you there?`;
   }
   if (section === "plan-my-day" || category === "plan") {
-    return `We can do this here, or I can open ${label}. Would you like to open ${label}?`;
+    return `We can plan this here, or step into Momentum Builder™ together. Would you like me to take us there?`;
   }
   if (section === "projects" && SOP_BUILD_RE.test(userText)) {
-    return `Let's build the SOP in Create. Would you like to open Create?`;
+    return `The Creative Studio™ is a good place to build your SOP together. Would you like me to take us there?`;
   }
   if (section === "projects") {
-    return `This may be easier in ${label}. Would you like to open it?`;
+    return room
+      ? `${room} may be the right place for this. Would you like me to take us there?`
+      : `Would you like me to take us to the right workspace for this?`;
   }
   if (section === "content-generator" || section === CREATE_ARTIFACT_SECTION) {
     if (containsVisualStructurePhrase(userText)) {
@@ -411,9 +437,11 @@ function buildNavigationLine(
       const kind = detectArtifactRequest(userText)!;
       return buildCreateArtifactOffer(kind, category).line;
     }
-    return `Let's work on this together. Create may be the best place to build it. Would you like to open Create?`;
+    return `The Creative Studio™ is the perfect place in the Estate for writing newsletters, emails, blog posts, presentations, workshops, and other content. Would you like me to take us there?`;
   }
-  return `Would you like to open ${label}?`;
+  return room
+    ? `Would you like me to take us to ${room}?`
+    : `Would you like me to take us there?`;
 }
 
 function buildClarificationPrompt(): string {
@@ -701,11 +729,13 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     );
   }
   if (overwhelmed && category === "organize" && !offer && !overwhelmTodayRoute) {
-    offer = {
-      section: "brain-dump",
-      buttonLabel: "Open Clear My Mind",
-      line: buildNavigationLine("brain-dump", text, "organize"),
-    };
+    if (!messageNamesExactEstateRoom(text)) {
+      offer = {
+        section: "brain-dump",
+        buttonLabel: "Open Clear My Mind",
+        line: buildNavigationLine("brain-dump", text, "organize"),
+      };
+    }
   }
   if (
     adaptMyDayRecommended &&
@@ -785,7 +815,11 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
       ? OVERWHELM_TODAY_STAY_HERE_GUIDANCE
       : null,
     supportStyle,
-    supportStyleGuidance: supportStyleGuidance(supportStyle, category),
+    supportStyleGuidance: supportStyleGuidance(
+      supportStyle,
+      category,
+      input.supportStyle,
+    ),
     adaptMyDayRecommended,
     continuity,
     navigationLine:
@@ -848,7 +882,7 @@ export function intentRoutingHintForChat(
           "EXECUTE OVERRIDE (P0.7.3): Direct action only — minimal clarification or Create redirect.",
           "SKIP relationship observations, observation engine, and reflection-first openers entirely.",
           "FORBIDDEN: I've noticed…, behavioral analysis, ADHD pattern explanations, user history recap.",
-          "ALLOWED: 'I can help with that.', 'Would you like to open Create?', 'What kind of email is it?'",
+          "ALLOWED: 'I can help with that.', 'Would you like me to take us to the Creative Studio™?', 'What kind of email is it?'",
         ].join("\n")
       : null,
     decision.suppressRelationshipLead && !decision.suppressRelationshipIntelligence

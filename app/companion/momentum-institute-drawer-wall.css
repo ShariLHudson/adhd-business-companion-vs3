@@ -1,0 +1,842 @@
+/* Momentum Institute™ — Entrepreneur Development Center drawer wall (Phase 1). */
+
+.momentum-institute-room {
+  position: relative;
+  min-height: 100dvh;
+  width: 100%;
+  overflow: hidden;
+  --mi-brass: #c4a574;
+  --mi-brass-bright: #e8d4a8;
+  --mi-wood: #3d2f24;
+  --mi-wood-deep: #241a14;
+  --mi-paper: #f6f0e4;
+  --mi-ink: #2a231c;
+  --mi-glow: rgba(255, 220, 160, 0.42);
+}
+
+.momentum-institute-room__cinematic {
+  z-index: 0;
+}
+
+.momentum-institute-room__cinematic .cinematic-background__image {
+  background-size: cover;
+  background-position: center center;
+}
+
+.momentum-institute-room__fullbleed {
+  z-index: 0;
+}
+
+.momentum-institute-room__vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 94% 90% at 48% 44%,
+    transparent 38%,
+    rgba(18, 14, 10, 0.28) 100%
+  );
+}
+
+.momentum-institute-room__presence {
+  position: fixed;
+  z-index: 2;
+}
+
+.momentum-institute-room__stage {
+  position: relative;
+  z-index: 3;
+  min-height: 100dvh;
+  width: 100%;
+}
+
+/* Frosted conversation — wall stays visible; drawer wall IS navigation */
+.momentum-institute-room__chat-panel {
+  z-index: 40;
+}
+
+/* ——— Arrival plaque — colleges + invitation (wall stays primary) ——— */
+.institute-arrival-plaque {
+  position: fixed;
+  left: clamp(1.25rem, 4vw, 3rem);
+  top: max(5rem, 12vh);
+  z-index: 12;
+  max-width: min(20rem, 34vw);
+  padding: 0.65rem 0.15rem;
+  pointer-events: none;
+  text-align: center;
+  color: rgba(255, 248, 235, 0.92);
+  text-shadow: 0 1px 4px rgba(12, 8, 6, 0.55);
+  animation: institute-arrival-fade-in 0.65s ease-out;
+}
+
+@keyframes institute-arrival-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.35rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.institute-arrival-plaque__rule {
+  height: 1px;
+  margin: 0.45rem auto;
+  max-width: 11rem;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(232, 212, 168, 0.55) 20%,
+    rgba(232, 212, 168, 0.75) 50%,
+    rgba(232, 212, 168, 0.55) 80%,
+    transparent 100%
+  );
+}
+
+.institute-arrival-plaque__title {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.6vw, 1.15rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 248, 235, 0.96);
+}
+
+.institute-arrival-plaque__colleges {
+  list-style: none;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  font-size: clamp(0.72rem, 1.05vw, 0.84rem);
+  line-height: 1.35;
+  letter-spacing: 0.02em;
+  color: rgba(255, 244, 228, 0.88);
+}
+
+.institute-arrival-plaque__invitation {
+  margin: 0.65rem 0 0;
+  font-size: clamp(0.78rem, 1.1vw, 0.9rem);
+  font-style: italic;
+  color: rgba(232, 212, 168, 0.95);
+}
+
+/* ——— Photo plate — hotspots align with cover-fitted background ——— */
+.institute-wall-photo-plate {
+  position: fixed;
+  inset: 0;
+  z-index: 8;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.institute-wall-photo-plate__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 100vw;
+  max-height: 100dvh;
+  aspect-ratio: var(--institute-wall-aspect, 1.6);
+  pointer-events: none;
+}
+
+@media (min-aspect-ratio: 16/10) {
+  .institute-wall-photo-plate__inner {
+    width: auto;
+    height: 100%;
+  }
+}
+
+@media (max-aspect-ratio: 16/10) {
+  .institute-wall-photo-plate__inner {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* ——— Drawer wall hotspots ——— */
+.institute-drawer-wall {
+  position: absolute;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.institute-drawer-wall__drawer {
+  position: absolute;
+  pointer-events: auto;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    transform 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.28s ease;
+  transform-origin: left center;
+}
+
+.institute-drawer-wall__drawer-face {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 0.12rem;
+  background: transparent;
+  box-shadow: none;
+  transition:
+    box-shadow 0.28s ease,
+    background 0.28s ease;
+}
+
+.institute-drawer-wall__hover-glow {
+  position: absolute;
+  inset: -4%;
+  border-radius: 0.2rem;
+  opacity: 0;
+  background: radial-gradient(
+    ellipse 80% 70% at 50% 55%,
+    var(--mi-glow) 0%,
+    transparent 72%
+  );
+  transition: opacity 0.28s ease;
+  pointer-events: none;
+}
+
+.institute-drawer-wall__catalog-label {
+  position: absolute;
+  top: 14%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(0.5rem, 0.75vw, 0.68rem);
+  letter-spacing: 0.08em;
+  color: rgba(232, 212, 168, 0);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  transition: color 0.22s ease;
+}
+
+.institute-drawer-wall__handle {
+  position: absolute;
+  left: 50%;
+  bottom: 22%;
+  transform: translateX(-50%);
+  width: 34%;
+  height: 0.38rem;
+  border-radius: 999px;
+  opacity: 0.35;
+  background: linear-gradient(
+    180deg,
+    var(--mi-brass-bright) 0%,
+    var(--mi-brass) 48%,
+    #8a6d42 100%
+  );
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  transition:
+    opacity 0.28s ease,
+    box-shadow 0.28s ease,
+    transform 0.28s ease;
+}
+
+.institute-drawer-wall__drawer-title {
+  display: block;
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1.1rem;
+  font-size: clamp(0.58rem, 0.8vw, 0.68rem);
+  line-height: 1.2;
+  text-align: center;
+  color: rgba(255, 248, 235, 0.88);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.65);
+  opacity: 0;
+  transform: translateY(2px);
+  transition:
+    opacity 0.22s ease,
+    transform 0.22s ease;
+  pointer-events: none;
+}
+
+.institute-drawer-wall__drawer--hover .institute-drawer-wall__hover-glow,
+.institute-drawer-wall__drawer:focus-visible .institute-drawer-wall__hover-glow,
+.institute-drawer-wall__drawer--open .institute-drawer-wall__hover-glow {
+  opacity: 1;
+}
+
+.institute-drawer-wall__drawer--hover .institute-drawer-wall__catalog-label,
+.institute-drawer-wall__drawer:focus-visible .institute-drawer-wall__catalog-label,
+.institute-drawer-wall__drawer--open .institute-drawer-wall__catalog-label {
+  color: rgba(232, 212, 168, 0.88);
+}
+
+.institute-drawer-wall__drawer--hover .institute-drawer-wall__handle,
+.institute-drawer-wall__drawer:focus-visible .institute-drawer-wall__handle,
+.institute-drawer-wall__drawer--open .institute-drawer-wall__handle {
+  opacity: 1;
+  box-shadow:
+    0 0 0.65rem rgba(232, 212, 168, 0.75),
+    0 1px 2px rgba(0, 0, 0, 0.35);
+  transform: translateX(-50%) scale(1.06);
+}
+
+.institute-drawer-wall__drawer--hover,
+.institute-drawer-wall__drawer:focus-visible {
+  transform: translateY(-2px);
+}
+
+.institute-drawer-wall__drawer--hover .institute-drawer-wall__drawer-title,
+.institute-drawer-wall__drawer:focus-visible .institute-drawer-wall__drawer-title,
+.institute-drawer-wall__drawer--open .institute-drawer-wall__drawer-title {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.institute-drawer-wall__drawer--open {
+  transform: translateX(0.35rem) translateY(-3px);
+  z-index: 24 !important;
+}
+
+.institute-drawer-wall__drawer--open .institute-drawer-wall__drawer-face {
+  background: rgba(36, 26, 20, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 236, 210, 0.15),
+    0 0 1.1rem rgba(255, 214, 150, 0.38);
+}
+
+/* ——— Drawer slide — index cards emerge from drawer ——— */
+.institute-drawer-slide {
+  position: absolute;
+  left: calc(100% + 0.45rem);
+  top: -0.15rem;
+  width: min(16.5rem, 28vw);
+  max-height: min(62vh, 32rem);
+  z-index: 30;
+  padding: 0.95rem 0.85rem 0.85rem;
+  border-radius: 0.3rem;
+  background: linear-gradient(
+    165deg,
+    rgba(246, 240, 228, 0.97) 0%,
+    rgba(228, 214, 192, 0.95) 100%
+  );
+  border: 1px solid rgba(196, 165, 116, 0.5);
+  box-shadow:
+    0.85rem 1.25rem 2.5rem rgba(24, 16, 10, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  animation: institute-drawer-slide-out 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+  overflow: auto;
+  pointer-events: auto;
+  cursor: default;
+}
+
+@keyframes institute-drawer-slide-out {
+  from {
+    opacity: 0;
+    transform: translateX(-1.5rem) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.institute-drawer-slide__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.institute-drawer-slide__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(72, 54, 40, 0.72);
+}
+
+.institute-drawer-slide__title {
+  margin: 0.12rem 0 0;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--mi-ink);
+}
+
+.institute-drawer-slide__close,
+.institute-knowledge-panel__close {
+  border: none;
+  background: rgba(72, 54, 40, 0.08);
+  color: var(--mi-ink);
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  font-size: 1.35rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.institute-drawer-slide__cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.institute-index-card {
+  width: 100%;
+  text-align: left;
+  border: 1px solid rgba(196, 165, 116, 0.35);
+  border-radius: 0.2rem;
+  background: var(--mi-paper);
+  padding: 0.6rem 0.7rem 0.6rem 1rem;
+  cursor: pointer;
+  position: relative;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.institute-index-card__tab {
+  position: absolute;
+  left: 0.32rem;
+  top: 0.4rem;
+  bottom: 0.4rem;
+  width: 0.26rem;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--mi-brass-bright), var(--mi-brass));
+}
+
+.institute-index-card__title {
+  display: block;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--mi-ink);
+}
+
+.institute-index-card__summary {
+  display: block;
+  margin-top: 0.18rem;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: rgba(42, 35, 28, 0.72);
+}
+
+.institute-index-card:hover,
+.institute-index-card:focus-visible {
+  transform: translateX(3px);
+  box-shadow: 0 0.35rem 0.85rem rgba(24, 16, 10, 0.12);
+}
+
+.institute-index-card--selected {
+  border-color: rgba(196, 165, 116, 0.72);
+  box-shadow: 0 0.35rem 0.85rem rgba(24, 16, 10, 0.14);
+  background: #fffaf0;
+}
+
+.institute-drawer-slide__cards--stack {
+  position: relative;
+  padding-top: 0.15rem;
+}
+
+.institute-drawer-slide__card-slot {
+  position: relative;
+}
+
+.institute-index-card--stacked {
+  animation: institute-card-rise 0.48s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: calc(var(--card-rise-index, 0) * 0.1s + 0.08s);
+  box-shadow:
+    0 0.25rem 0.65rem rgba(24, 16, 10, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+@keyframes institute-card-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.1rem) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.institute-index-card__meta {
+  display: flex;
+  gap: 0.55rem;
+  margin-top: 0.35rem;
+  font-size: 0.72rem;
+  color: rgba(72, 54, 40, 0.68);
+}
+
+.institute-index-card__detail {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-top: 0.22rem;
+  font-size: 0.72rem;
+  color: rgba(42, 35, 28, 0.78);
+}
+
+.institute-index-card__detail-label {
+  color: rgba(72, 54, 40, 0.62);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-size: 0.66rem;
+}
+
+.institute-index-card__status--in_progress {
+  color: #6b4a2a;
+  font-weight: 600;
+}
+
+.institute-index-card__status--completed {
+  color: #3d5c48;
+  font-weight: 600;
+}
+
+.institute-index-card__status--saved {
+  color: #5a4a32;
+  font-weight: 600;
+}
+
+.institute-drawer-slide__more {
+  margin-top: 0.55rem;
+  width: 100%;
+  border: 1px dashed rgba(196, 165, 116, 0.55);
+  background: rgba(255, 250, 240, 0.72);
+  color: var(--mi-wood);
+  border-radius: 999px;
+  padding: 0.42rem 0.65rem;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.institute-drawer-slide__more:hover {
+  background: rgba(255, 252, 245, 0.95);
+}
+
+/* ——— Frosted learning panel — in-room, wall stays visible ——— */
+.institute-knowledge-panel {
+  position: fixed;
+  left: clamp(18rem, 36vw, 28rem);
+  top: max(4.5rem, 11vh);
+  bottom: max(1.25rem, 3vh);
+  width: min(36rem, 34vw);
+  max-height: calc(100dvh - 6rem);
+  z-index: 35;
+  display: flex;
+  flex-direction: column;
+  pointer-events: none;
+  animation: institute-panel-enter 0.34s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes institute-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(0.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.institute-knowledge-panel__surface {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  pointer-events: auto;
+  padding: 1.25rem 1.25rem 1rem;
+  border-radius: 0.45rem;
+  background: linear-gradient(
+    160deg,
+    rgba(252, 248, 240, 0.78) 0%,
+    rgba(240, 230, 214, 0.74) 100%
+  );
+  backdrop-filter: blur(20px) saturate(1.08);
+  -webkit-backdrop-filter: blur(20px) saturate(1.08);
+  border: 1px solid rgba(196, 165, 116, 0.48);
+  box-shadow:
+    0 1.25rem 3rem rgba(18, 12, 8, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
+}
+
+.institute-knowledge-panel__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.institute-knowledge-panel__eyebrow {
+  margin: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(72, 54, 40, 0.7);
+}
+
+.institute-knowledge-panel__title {
+  margin: 0.2rem 0 0;
+  font-size: clamp(1.25rem, 2.2vw, 1.75rem);
+  color: var(--mi-ink);
+}
+
+.institute-knowledge-panel__facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  margin: 0.55rem 0 0;
+  font-size: 0.82rem;
+}
+
+.institute-knowledge-panel__facts dt {
+  margin: 0;
+  font-size: 0.68rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: rgba(72, 54, 40, 0.62);
+}
+
+.institute-knowledge-panel__facts dd {
+  margin: 0.12rem 0 0;
+  color: var(--mi-ink);
+}
+
+.institute-knowledge-panel__section {
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(196, 165, 116, 0.24);
+}
+
+.institute-knowledge-panel__section-title {
+  margin: 0 0 0.45rem;
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(72, 54, 40, 0.72);
+}
+
+.institute-knowledge-panel__prose {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.5;
+  color: rgba(42, 35, 28, 0.84);
+}
+
+.institute-knowledge-panel__prose--preline {
+  white-space: pre-line;
+}
+
+.institute-knowledge-panel__list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(42, 35, 28, 0.82);
+}
+
+.institute-knowledge-panel__related-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.institute-knowledge-panel__related-chip {
+  display: inline-block;
+  padding: 0.32rem 0.55rem;
+  border-radius: 0.25rem;
+  background: rgba(196, 165, 116, 0.14);
+  font-size: 0.82rem;
+  color: var(--mi-wood-deep);
+}
+
+.institute-knowledge-panel__completion {
+  margin-top: 1rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 0.35rem;
+  background: rgba(196, 165, 116, 0.12);
+}
+
+.institute-knowledge-panel__completion p {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgba(42, 35, 28, 0.84);
+}
+
+.institute-knowledge-panel__completion p:last-child {
+  margin-bottom: 0;
+}
+
+.institute-knowledge-panel__footer {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid rgba(196, 165, 116, 0.28);
+}
+
+.institute-knowledge-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.institute-knowledge-panel__action-btn {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  border-radius: 999px;
+  padding: 0.4rem 0.75rem;
+  font-size: 0.8rem;
+  cursor: pointer;
+  border: 1px solid rgba(196, 165, 116, 0.4);
+  background: rgba(255, 252, 245, 0.9);
+  color: var(--mi-wood-deep);
+}
+
+.institute-knowledge-panel__action-btn--available:hover {
+  background: #fffaf0;
+}
+
+.institute-knowledge-panel__action-btn--soon {
+  opacity: 0.72;
+  cursor: default;
+}
+
+.institute-knowledge-panel__action-note {
+  font-size: 0.68rem;
+  color: rgba(72, 54, 40, 0.58);
+}
+
+.institute-knowledge-panel__discuss {
+  margin-top: 0.85rem;
+}
+
+.institute-knowledge-panel__discuss-lead {
+  margin: 0 0 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--mi-wood);
+}
+
+.institute-knowledge-panel__discuss-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.institute-knowledge-panel__discuss-links button {
+  border: none;
+  background: transparent;
+  color: rgba(72, 54, 40, 0.88);
+  font-size: 0.8rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  padding: 0;
+}
+
+.institute-knowledge-panel__cabinet-prompt {
+  margin: 0.75rem 0 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: rgba(42, 35, 28, 0.78);
+}
+
+.institute-knowledge-panel__cabinet-saved {
+  margin: 0.45rem 0 0;
+  font-size: 0.82rem;
+  color: #3d5c48;
+}
+
+.institute-knowledge-panel__cabinet-error {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  color: #7a3b2b;
+}
+
+/* ——— Immersive room — no duplicate sidebar navigation ——— */
+.companion-momentum-institute-active {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  background: transparent !important;
+}
+
+.companion-momentum-institute-active .companion-sidebar-portal,
+.companion-momentum-institute-active .companion-app-sidebar,
+.companion-momentum-institute-active .homestead-signpost-sidebar,
+.companion-momentum-institute-active .companion-homestead-logo,
+.companion-momentum-institute-active [data-companion-topbar],
+.companion-momentum-institute-active .companion-active-workspace-bar,
+.companion-momentum-institute-active .companion-back-button,
+.companion-momentum-institute-active [data-workspace-debug],
+.companion-momentum-institute-active .relationship-response-dev-badge,
+.companion-momentum-institute-active .companion-split-mobile-tabs,
+.companion-momentum-institute-active .companion-split-chat-header,
+.companion-momentum-institute-active .identity-bar,
+.companion-momentum-institute-active .companion-desk-portal,
+.companion-momentum-institute-active [data-companion-desk],
+.companion-momentum-institute-active .companion-has-companion-desk > footer,
+.companion-momentum-institute-active .homestead-signpost-sidebar__brand,
+.companion-momentum-institute-active .homestead-signpost-sidebar__utilities {
+  display: none !important;
+}
+
+@media (max-width: 1100px) {
+  .institute-knowledge-panel {
+    left: max(1rem, 2vw);
+    right: max(1rem, 2vw);
+    width: auto;
+    top: max(3.5rem, 8vh);
+    bottom: auto;
+    max-height: min(42vh, 24rem);
+  }
+}
+
+@media (max-width: 900px) {
+  .institute-arrival-plaque {
+    left: 0.75rem;
+    top: max(3.5rem, 8vh);
+    max-width: min(16rem, 52vw);
+  }
+
+  .momentum-institute-room__chat-panel {
+    max-height: 44vh;
+  }
+
+  .institute-drawer-slide {
+    left: calc(100% + 0.25rem);
+    width: min(14rem, 52vw);
+    max-height: min(48vh, 22rem);
+  }
+
+  .institute-knowledge-panel {
+    left: 0.75rem;
+    right: 0.75rem;
+    top: max(3rem, 7vh);
+    max-height: min(38vh, 20rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .institute-arrival-plaque,
+  .institute-drawer-wall__drawer,
+  .institute-index-card,
+  .institute-drawer-slide,
+  .institute-knowledge-panel {
+    animation: none !important;
+    transition: none !important;
+  }
+}

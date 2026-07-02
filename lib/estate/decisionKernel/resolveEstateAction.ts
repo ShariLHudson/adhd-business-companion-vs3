@@ -75,6 +75,14 @@ export function resolveEstateAction(
     lastAssistantText: context.lastAssistantText ?? null,
   });
 
+  if (placeTurn.type === "reply") {
+    return {
+      action: "CHAT",
+      userText,
+      immediateReply: placeTurn.line,
+    };
+  }
+
   // 1. NAVIGATE — explicit place, menu pick, canonical name
   if (placeTurn.type === "navigate") {
     return {

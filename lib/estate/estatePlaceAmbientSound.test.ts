@@ -18,13 +18,16 @@ describe("estatePlaceAmbientSound", () => {
     const conservatory = resolveEstatePlaceAmbientProfile("conservatory");
 
     expect(nook?.src).toBe(EVENING_HEARTH_AMBIENCE_MP3);
-    expect(nook?.character).toMatch(/fireplace/i);
+    expect(nook?.character).toMatch(/fireplace|page turn/i);
+    expect(nook?.layers?.length).toBeGreaterThanOrEqual(2);
 
     expect(gazebo?.src).toBe(GAZEBO_JOURNAL_AMBIENCE_MP3);
-    expect(gazebo?.character).toMatch(/fountain/i);
+    expect(gazebo?.character).toMatch(/water|gazebo|journal/i);
+    expect(gazebo?.layers?.some((l) => l.label.includes("birds"))).toBe(true);
 
     expect(greenhouse?.src).toBe(GREENHOUSE_BIRDS_AMBIENCE_MP3);
-    expect(greenhouse?.character).toMatch(/birds/i);
+    expect(greenhouse?.character).toMatch(/glasshouse|greenhouse/i);
+    expect(greenhouse?.layers?.length).toBeGreaterThanOrEqual(3);
 
     expect(conservatory?.src).toBe(GREENHOUSE_BIRDS_AMBIENCE_MP3);
     expect(conservatory?.character).toMatch(/birdsong/i);

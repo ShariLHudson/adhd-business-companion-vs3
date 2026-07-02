@@ -188,11 +188,11 @@ export function buildRegistryArtifactOfferLine(
   if (kind === "funnel") {
     return [
       "I can help build that.",
-      "Would you like to open Create and map out the funnel there?",
+      "The Creative Studio™ is a good place to map out the funnel together. Would you like me to take us there?",
     ].join("\n\n");
   }
   if (category === "build") {
-    return `Let's build your ${label} in Create. Would you like to open Create?`;
+    return `The Creative Studio™ is the right place to build your ${label}. Would you like me to take us there?`;
   }
-  return `I can help with that. Would you like to open Create to draft your ${label}?`;
+  return `I'd love to help with that. The Creative Studio™ is perfect for drafting your ${label}. Would you like me to take us there?`;
 }

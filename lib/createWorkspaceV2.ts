@@ -39,6 +39,7 @@ export const CREATE_V2_BLUEPRINT_TYPES = [
   "Newsletter",
   "Lead Magnet",
   "Workshop",
+  "Offer",
   "Course Outline",
   "SOP",
   "Landing Page",
@@ -603,8 +604,8 @@ export function bootstrapWorkspaceV2Session(
     },
     opener:
       `Your **${display}** blueprint is open beside you.\n\n` +
-      `Type directly into each section — chat is here when you want ideas, examples, or a second opinion. ` +
-      `Nothing from chat goes into the workspace unless you paste it yourself.`,
+      `Sections start empty — we'll shape them one at a time. ` +
+      `Chat is here when you want ideas; only what you share fills each section.`,
   };
 }
 
@@ -630,5 +631,7 @@ export function formatCreateWorkspaceV2ChatHint(
     "- NEVER generate a full draft in chat — user clicks Build Draft in the workspace when ready.",
     "- When they ask for ideas: give 3–5 concrete options in chat only.",
     `- Artifact: ${type}. Workspace sections: ${sections.length} (${filled} with content or N/A).`,
+    "FACILITATED CREATION: Shari facilitates — member owns the business. One question at a time.",
+    'Never say finished/complete/final unless member asks to finalize. Say "what we have so far" or "working draft".',
   ].join("\n");
 }

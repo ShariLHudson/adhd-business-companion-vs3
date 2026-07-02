@@ -17,7 +17,7 @@ describe("Human Conversation", () => {
     expect(prompt).toContain("SPARK HUMAN VOICE");
     expect(prompt).toContain("CONTEXT BEFORE CONTENT");
     expect(prompt).toContain("SUNROOM TEST");
-    expect(prompt).toContain("CURIOSITY INTELLIGENCE");
+    expect(prompt).toContain("How can I");
     expect(prompt).toContain("I'm glad I asked");
   });
 
@@ -52,7 +52,7 @@ describe("Human Conversation", () => {
       detectForbiddenHumanConversationOpener(
         "You know what's interesting? You might be closer than you think.",
       ),
-    ).toBeNull();
+    ).toBeTruthy();
   });
 
   it("detects forbidden ADHD lecture phrases in body", () => {
@@ -63,7 +63,7 @@ describe("Human Conversation", () => {
     ).toBeTruthy();
   });
 
-  it("rewrites forbidden opener with curiosity language", () => {
+  it("strips forbidden opener instead of injecting curiosity scaffolding", () => {
     const result = enforceHumanConversation({
       response:
         "It sounds like you're feeling stuck. That tension between starting and finishing is real.\n\nWhat's one piece that feels heaviest?",
@@ -71,10 +71,21 @@ describe("Human Conversation", () => {
     });
     expect(result.rewritten).toBe(true);
     expect(result.message).not.toMatch(/^It sounds like/i);
-    expect(result.message).toMatch(
-      /caught my attention|understand|curious|wonder|interesting/i,
+    expect(result.message).not.toMatch(
+      /help me understand|caught my attention|been wondering|curious about something/i,
     );
+    expect(result.message).toMatch(/tension between starting/i);
     expect(result.twelveTests.score).toBeGreaterThan(0);
+  });
+
+  it("strips curiosity-template openers", () => {
+    const result = enforceHumanConversation({
+      response:
+        "Help me understand something... One effective way is to find a shared interest. What are the services you want to share?",
+      userText: "how can i connect with someone i don't know",
+    });
+    expect(result.message).not.toMatch(/^Help me understand/i);
+    expect(result.message).not.toMatch(/one effective way is/i);
   });
 
   it("leaves human openers unchanged", () => {
@@ -115,6 +126,6 @@ describe("Human Conversation", () => {
 
   it("uses gentle curiosity when requested", () => {
     const opener = pickCuriosityOpener(2, true);
-    expect(opener).toMatch(/here|breath|rush|thoughtful|noticed/i);
+    expect(opener).toMatch(/here|time|rush/i);
   });
 });

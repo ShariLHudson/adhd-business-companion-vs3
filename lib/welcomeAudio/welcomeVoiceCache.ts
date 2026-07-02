@@ -16,6 +16,10 @@ export const WELCOME_ROOM_WELCOME_AUDIO_PARTS = [
 export const WELCOME_ROOM_FULL_WELCOME_AUDIO_SRC =
   "/audio/welcome-room/welcome-letter-full.mp3" as const;
 
+/** Welcome Home founder narration — cleaned export when present, else welcome letter. */
+export const WELCOME_HOME_FOUNDER_AUDIO_SRC =
+  "/audio/WelcomeHome_Clean.mp3" as const;
+
 export type CachedSpeechClip = {
   audio: HTMLAudioElement;
   src: string;

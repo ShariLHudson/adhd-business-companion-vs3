@@ -1,0 +1,359 @@
+/* Welcome Home — full-screen estate; zero app chrome or perimeter framing. */
+
+html.companion-welcome-home-mode,
+body.companion-welcome-home-mode {
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  background: #0a0a0a !important;
+}
+
+body.companion-welcome-home-mode > .companion-sidebar-portal {
+  display: none !important;
+  visibility: hidden !important;
+  width: 0 !important;
+  overflow: hidden !important;
+  pointer-events: none !important;
+}
+
+.companion-welcome-home-root,
+.companion-welcome-home-root[data-visual-mode] {
+  background: #0a0a0a !important;
+  --cm-bg: #0a0a0a;
+  --cm-canvas: #0a0a0a;
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  overflow: hidden !important;
+}
+
+.companion-welcome-home-active {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  margin: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  left: 0 !important;
+}
+
+.companion-welcome-home-active > .relative.flex.min-h-0.flex-1 {
+  width: 100%;
+  max-width: none;
+  margin-left: 0 !important;
+  padding-left: 0 !important;
+}
+
+.welcome-home-page {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  width: 100vw;
+  height: 100dvh;
+  max-width: 100vw;
+  max-height: 100dvh;
+  overflow: hidden;
+  background: #0a0a0a;
+  margin: 0;
+  padding: 0;
+}
+
+.welcome-home-page--intro {
+  z-index: 99999;
+}
+
+.welcome-home-page__stage,
+.welcome-home-page__viewport {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.welcome-home-page__viewport {
+  z-index: 1;
+  overflow: hidden;
+}
+
+.welcome-home-page .welcome-room__dolly-rig,
+.welcome-home-page__photo-rig,
+.welcome-home-page__photo-rig.welcome-room__dolly-rig,
+.welcome-home-page__photo-rig .welcome-room__dolly-stage,
+.welcome-home-page__photo-rig .welcome-room__hero,
+.welcome-home-page__photo-rig .welcome-room__photo-plane {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #0a0a0a !important;
+}
+
+.welcome-home-page__photo {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  object-fit: cover;
+  object-position: 50% 40%;
+  filter: none;
+}
+
+/* ——— Unified conversation card — layout: companion-layout-layers.css ——— */
+.welcome-home-page__chat-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 0;
+  overflow: hidden;
+  pointer-events: auto;
+}
+
+[data-companion-chat-layer="true"].welcome-home-page__chat-panel {
+  opacity: 0;
+  animation: welcome-home-chat-in 0.85s ease forwards;
+  transform: translateX(-50%) translateY(0.45rem);
+}
+
+@keyframes welcome-home-chat-in {
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* frosted visuals: companion-chat-surface.css */
+
+.welcome-home-page__messages-scroll {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: min(44vh, 24rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: clamp(0.75rem, 1.5vw, 1rem);
+  padding-bottom: 0.4rem;
+}
+
+.welcome-home-page__chat-divider {
+  flex-shrink: 0;
+  height: 1px;
+  margin: 0 clamp(0.85rem, 1.4vw, 1.1rem);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(120, 108, 96, 0.22) 20%,
+    rgba(120, 108, 96, 0.22) 80%,
+    transparent 100%
+  );
+}
+
+.welcome-home-page__welcome-line {
+  margin: 0 0 0.65rem;
+  font-size: clamp(1.1rem, 1.8vw, 1.35rem);
+  font-weight: 600;
+  line-height: 1.4;
+  color: #2f2924;
+}
+
+.welcome-home-page__input-wrap {
+  flex-shrink: 0;
+  padding: clamp(0.55rem, 1.2vw, 0.8rem);
+  padding-top: 0.45rem;
+}
+
+.welcome-home-page__chat-panel .companion-home-input-footer {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0;
+  --companion-chat-box-max-width: 100%;
+}
+
+.welcome-home-page__chat-panel .companion-home-input-footer > * {
+  width: 100%;
+  max-width: none;
+}
+
+.welcome-home-page__chat-panel .companion-chat-input.input-glass,
+.welcome-home-page__chat-panel .companion-chat-input.input-glass-conversation {
+  background: rgba(255, 252, 248, 0.55);
+  border-color: rgba(255, 255, 255, 0.5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.welcome-home-page__chat-panel textarea {
+  font-size: clamp(1.05rem, 1.35vw, 1.15rem);
+  min-height: 3.1rem;
+}
+
+.welcome-home-page__chat-panel .companion-chat-voice-hint {
+  margin-top: 0.35rem;
+  background: transparent !important;
+  padding: 0;
+}
+
+/* Reveal homestead signposts when member chooses Show map on Welcome Home */
+.companion-welcome-home-active.companion-welcome-home-show-estate-nav
+  .companion-sidebar-portal,
+.companion-welcome-home-active.companion-welcome-home-show-estate-nav
+  .companion-app-sidebar,
+.companion-welcome-home-active.companion-welcome-home-show-estate-nav
+  .homestead-signpost-sidebar {
+  display: flex !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* Hide all companion chrome on Welcome Home (sidebar portals to body) */
+body.companion-welcome-home-mode .companion-sidebar-portal,
+.companion-welcome-home-active .companion-sidebar-portal,
+.companion-welcome-home-active .companion-app-sidebar,
+.companion-welcome-home-active .homestead-signpost-sidebar,
+.companion-welcome-home-active .companion-homestead-logo,
+.companion-welcome-home-active [data-companion-topbar],
+.companion-welcome-home-active .companion-active-workspace-bar,
+.companion-welcome-home-active .companion-back-button,
+.companion-welcome-home-active [data-workspace-debug],
+.companion-welcome-home-active .relationship-response-dev-badge,
+.companion-welcome-home-active .companion-split-mobile-tabs,
+.companion-welcome-home-active .companion-split-chat-header,
+.companion-welcome-home-active .identity-bar,
+.companion-welcome-home-active .companion-desk-portal,
+.companion-welcome-home-active [data-companion-desk],
+.companion-welcome-home-active .companion-has-companion-desk > footer,
+.companion-welcome-home-active .homestead-signpost-sidebar__brand,
+.companion-welcome-home-active .homestead-signpost-sidebar__utilities {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.companion-welcome-home-intro-active .companion-sidebar-portal,
+.companion-welcome-home-intro-active .companion-app-sidebar,
+.companion-welcome-home-intro-active [data-companion-topbar],
+.companion-welcome-home-intro-active .companion-active-workspace-bar,
+.companion-welcome-home-intro-active .companion-back-button,
+.companion-welcome-home-intro-active .companion-split-mobile-tabs,
+.companion-welcome-home-intro-active .companion-split-chat-header,
+.companion-welcome-home-intro-active .identity-bar,
+.companion-welcome-home-intro-active [data-workspace-debug],
+.companion-welcome-home-intro-active .relationship-response-dev-badge,
+.companion-welcome-home-intro-active .companion-homestead-logo {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+@media (max-width: 640px) {
+  [data-companion-chat-layer="true"].welcome-home-page__chat-panel {
+    max-height: min(56vh, 30rem);
+  }
+
+  .welcome-home-page__messages-scroll {
+    max-height: min(38vh, 20rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .welcome-home-page__chat-panel {
+    animation: none;
+    opacity: 1;
+  }
+
+  [data-companion-chat-layer="true"].welcome-home-page__chat-panel {
+    transform: translateX(-50%) !important;
+  }
+}
+
+/* First-visit intro controls */
+.welcome-home-page__intro-controls {
+  position: absolute;
+  z-index: 6;
+  top: max(1rem, env(safe-area-inset-top));
+  right: max(1rem, env(safe-area-inset-right));
+  pointer-events: auto;
+}
+
+.welcome-home-page__stop-btn {
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 999px;
+  padding: 0.45rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f8f4ec;
+  background: rgba(24, 20, 16, 0.42);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  cursor: pointer;
+}
+
+.welcome-home-page__stop-btn:hover {
+  background: rgba(24, 20, 16, 0.58);
+}
+
+.welcome-home-page__dev-panel {
+  position: absolute;
+  z-index: 7;
+  top: max(1rem, env(safe-area-inset-top));
+  left: max(1rem, env(safe-area-inset-left));
+  max-width: min(16rem, 42vw);
+  padding: 0.55rem 0.7rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(12, 10, 8, 0.72);
+  color: #f2ebe2;
+  font-size: 0.72rem;
+  line-height: 1.35;
+  pointer-events: none;
+}
+
+.welcome-home-page__dev-panel-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.welcome-home-page__dev-panel dl {
+  margin: 0;
+  display: grid;
+  gap: 0.2rem;
+}
+
+.welcome-home-page__dev-panel dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.welcome-home-page__dev-panel dt {
+  opacity: 0.72;
+}
+
+.welcome-home-page__dev-panel dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.welcome-home-page__dev-panel-hint {
+  margin: 0.4rem 0 0;
+  opacity: 0.65;
+  font-size: 0.65rem;
+}

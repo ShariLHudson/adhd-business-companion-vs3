@@ -2,7 +2,11 @@ import {
   createSpeechAudio,
   fetchCompanionSpeechBlob,
 } from "@/lib/companionTts";
-import { isAutoplayBlockedError, isWelcomeAudioSessionUnlocked, unlockBrowserAudio } from "./audioUnlock";
+import {
+  isBenignAudioPlayError,
+  isWelcomeAudioSessionUnlocked,
+  unlockBrowserAudio,
+} from "./audioUnlock";
 import { chunkSpeechText } from "./chunkSpeechText";
 import { fadeAudioVolumeAsync } from "./fadeVolume";
 import {
@@ -53,6 +57,7 @@ export class WelcomeAudioManager {
   private voiceStarted = false;
   private destroyed = false;
   private voiceLoadPromise: Promise<boolean> | null = null;
+  private playExperiencePromise: Promise<boolean> | null = null;
 
   constructor(profile: WelcomeAudioProfile) {
     this.profile = profile;
@@ -205,6 +210,7 @@ export class WelcomeAudioManager {
     const audio = this.ensureAmbienceElement();
     if (!audio) return false;
     if (audio.readyState >= HTMLMediaElement.HAVE_METADATA) return true;
+    if (this.ambiencePlaying) return true;
     return new Promise((resolve) => {
       let settled = false;
       const done = (ok: boolean) => {
@@ -222,7 +228,9 @@ export class WelcomeAudioManager {
       audio.addEventListener("loadedmetadata", onReady, { once: true });
       audio.addEventListener("loadeddata", onReady, { once: true });
       audio.addEventListener("error", onError, { once: true });
-      audio.load();
+      if (audio.networkState === HTMLMediaElement.NETWORK_EMPTY) {
+        audio.load();
+      }
     });
   }
 
@@ -270,7 +278,7 @@ export class WelcomeAudioManager {
       await audio.play();
     } catch (error) {
       this.ambiencePlaying = false;
-      if (isAutoplayBlockedError(error)) return false;
+      if (isBenignAudioPlayError(error)) return false;
       return false;
     }
     if (token !== this.ambienceFadeToken || this.destroyed) return false;
@@ -474,7 +482,7 @@ export class WelcomeAudioManager {
       await audio.play();
       this.setVoiceState("playing");
     } catch (error) {
-      if (isAutoplayBlockedError(error)) {
+      if (isBenignAudioPlayError(error)) {
         this.setVoiceState("idle");
         return;
       }
@@ -584,7 +592,9 @@ export class WelcomeAudioManager {
     if (!this.audioUnlocked) return;
     const audio = this.ambience;
     if (audio && this.ambiencePlaying && !this.musicMuted) {
-      void audio.play();
+      void audio.play().catch(() => {
+        /* benign race with pause/load */
+      });
     }
     if (!this.voiceMuted && this.voiceState === "paused") {
       this.resumeVoice();
@@ -609,6 +619,16 @@ export class WelcomeAudioManager {
 
   /** User gesture — unlock audio, start music, schedule voice. */
   async playExperience(): Promise<boolean> {
+    if (this.playExperiencePromise) {
+      return this.playExperiencePromise;
+    }
+    this.playExperiencePromise = this.runPlayExperience().finally(() => {
+      this.playExperiencePromise = null;
+    });
+    return this.playExperiencePromise;
+  }
+
+  private async runPlayExperience(): Promise<boolean> {
     if (this.destroyed) return false;
 
     if (this.voiceState === "paused") {
@@ -648,7 +668,11 @@ export class WelcomeAudioManager {
     const clip = this.voiceClips[this.voiceChunkIndex];
     if (!clip || this.voiceState !== "paused" || this.voiceMuted) return;
     void this.duckAmbienceForVoice().then(() => {
-      void clip.audio.play().catch(() => this.setVoiceState("error"));
+      void clip.audio.play().catch((error) => {
+        if (!isBenignAudioPlayError(error)) {
+          this.setVoiceState("error");
+        }
+      });
       this.setVoiceState("playing");
     });
   }

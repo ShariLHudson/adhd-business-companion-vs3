@@ -17,7 +17,7 @@ export function GrowRoomShell({ children }: Props) {
   }, []);
 
   return (
-    <div className="grow-room journal-room" data-testid="grow-room" data-homestead-room="grow">
+    <div className="grow-room" data-testid="grow-room" data-homestead-room="grow">
       <CinematicBackground
         preset="growth"
         mode="image"
@@ -26,11 +26,11 @@ export function GrowRoomShell({ children }: Props) {
         imageUrl={GROWTH_ROOM_BG}
         imageStyle={roomBackgroundImageStyle(GROWTH_ROOM_BG)}
         placement="absolute"
-        className="journal-room__cinematic"
+        className="grow-room__cinematic"
         showBottomFade={false}
         gradientStrength={0}
       />
-      <div className="journal-room__scroll">{children}</div>
+      <div className="grow-room__scroll">{children}</div>
     </div>
   );
 }

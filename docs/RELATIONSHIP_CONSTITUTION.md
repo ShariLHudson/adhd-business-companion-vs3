@@ -11,7 +11,9 @@ It is not productivity.
 
 Every design decision must protect that feeling.
 
-**Authority:** This document governs emotional tone, copy, room design, memory behavior, and release readiness. When convenience conflicts with relationship, **relationship wins**.  
+**Authority:** This document governs emotional tone, copy, room design, memory behavior, and release readiness. When convenience conflicts with relationship, **relationship wins**.
+
+**Companion DNA (conversation first):** [The Friend We All Deserve™](./THE_FRIEND_WE_ALL_DESERVE.md) — read **before** conversation logic and prompts. This Relationship Constitution and that document are siblings: one governs feeling across the product; one governs Spark as a friend.  
 **Related:** [Spec 112 — Companion Memory & Context](./SPARK_COMPANION_MEMORY_CONTEXT_FRAMEWORK.md) · [Spec 111 — Spark Hospitality](./SPARK_HOSPITALITY_FRAMEWORK.md) · [Spec 100 — Transformation Constitution](./ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md) · [Product Constitution](./PRODUCT_CONSTITUTION.md) · [Companion Relationship Framework (T-009)](./COMPANION_RELATIONSHIP_FRAMEWORK.md) · [Founder Journey Framework (T-010)](./FOUNDER_JOURNEY_FRAMEWORK.md) · [Create™ Philosophy (T-004)](./CREATE_PHILOSOPHY.md) · [Experience Patterns (T-005)](./EXPERIENCE_PATTERNS.md) · [Trust Experience (T-006)](./TRUST_EXPERIENCE.md) · [Entrepreneurial Resilience (T-007)](./ENTREPRENEURIAL_RESILIENCE.md) · [Decision Experience (T-008)](./DECISION_EXPERIENCE_FRAMEWORK.md) · [Universal Experience Standards (T-003)](./UNIVERSAL_EXPERIENCE_STANDARDS.md) · [Relationship Phase Constitution](./relationship-phases/RELATIONSHIP-PHASE-CONSTITUTION.md) · [Character of Shari](../lib/characterOfShari/CONSTITUTION.md) · [Clear My Mind Companion Principles](../lib/clearMyMind/COMPANION_PRINCIPLES.md)
 
 ---

@@ -40,7 +40,10 @@ export function parseFocusMinutesFromText(text: string): number | null {
     /^for\s+(\d{1,3})\s*min(?:ute)?s?\.?$/i,
     /^(\d{1,3})\s*[-–]?\s*min(?:ute)?s?\s+(?:focus|timer|session|block)/i,
     /(?:focus|work|timer|session)\s+(?:for\s+)?(\d{1,3})\s*min/i,
-    /^(?:do|try|start|run)\s+(\d{1,3})\s*min/i,
+    /^(?:do|try|start|run|set)\s+(?:a\s+)?(\d{1,3})\s*min/i,
+    /\bset\s+(?:a\s+)?(\d{1,3})\s*min(?:ute)?s?\s+timer/i,
+    /\b(\d{1,3})\s*min(?:ute)?s?\s+timer\b/i,
+    /\btimer\s+for\s+(\d{1,3})\s*min/i,
   ];
 
   for (const re of patterns) {

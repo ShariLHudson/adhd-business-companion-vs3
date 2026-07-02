@@ -1,0 +1,50 @@
+---
+description: Spark Estate Bible — official canon; architectural authority Ch 1-23
+globs:
+  - app/companion/**
+  - components/companion/**
+  - components/estate/**
+  - lib/estate/**
+  - lib/estateIntelligence/**
+  - lib/estateMenu/**
+  - public/backgrounds/**
+alwaysApply: true
+---
+
+# Spark Estate Bible™ — Official Canon (BINDING)
+
+**Authority manifest:** `docs/estate/ESTATE_ARCHITECTURAL_AUTHORITY.md`  
+**Full text:** `docs/estate/Spark Estate Bible.md`  
+**With:** Constitution · Living in Spark Estate — **not reference material**
+
+## Three foundations (Ch 3)
+
+**Beauty** · **Relationship** · **Discovery**
+
+## Three place types (Ch 7)
+
+| Type | Rule |
+|------|------|
+| **Living** | Conversation — no dedicated features |
+| **Destination** | Intentional experiences |
+| **Transitional** | Connects — believable movement |
+
+## Never / Always (Ch 8–9, 22)
+
+**Never:** dashboard · workflow · module · launch · loading · achievement pop-ups  
+**Shari never:** "Launching…" "Opening…" "Activating…"  
+**Always:** conversation first · beauty before information · home wins
+
+## Chapter 23 — Spark Estate Test (10 yeses)
+
+Home? · Relationship? · Less stress? · Beauty? · Curiosity? · Simplicity? · Real estate? · Memorable? · Seen/encouraged? · Alive if removed?
+
+**Most no → does not belong.**
+
+## Objects & books (Ch 10–17)
+
+Treasured possessions — Guidebook, Discovery Key, Cards, Accomplishments, Bell, Library volumes. Not UI.
+
+## Before code
+
+Read canon chapter for the place/object. Write `bible/rooms/` or `bible/objects/` page. Pass Ch 23.

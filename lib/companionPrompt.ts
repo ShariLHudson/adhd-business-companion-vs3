@@ -1,12 +1,13 @@
-import { APP_FEATURE_KNOWLEDGE_COMPACT } from "./appFeatureKnowledge";
 import { COGNITIVE_GROWTH_PROMPT_BLOCK } from "./cognitiveGrowthPrinciple";
 import { ELEVATE_LIFE_EXPERIENCE_PROMPT_BLOCK } from "./elevateLifeExperience";
+import { SHARI_COMPANION_ENGINE_PROMPT_BLOCK } from "./conversation/shariCompanionEngine";
 import { HUMAN_CONVERSATION_PROMPT_BLOCK } from "./humanConversation";
 import { TODAYS_LITTLE_SPARK_PROMPT_BLOCK } from "./todaysLittleSpark";
-import { focusToolDifferentiationHintForChat } from "./focusToolDefinitions";
+import { ESTATE_BEHAVIORAL_RULES_BLOCK } from "./estateIntelligence/estateRoomLifecycle";
 import { momentumAppointmentHintForChat } from "./momentumAppointment";
-import { decisionCompassHintForChat } from "./decisionCompass";
 import { plainLanguageFormattingHintForPrompt } from "./plainLanguageFormatting";
+import { buildMemberTonePreferenceBlocks } from "./companionTonePreferences";
+import type { AiTone, HelpMode, SupportStyle } from "./companionStore";
 
 // Spark Studio Companion — AI Routing Engine. This system prompt drives Shari:
 // silently detect intent, category, and emotional state, then route to the
@@ -87,6 +88,7 @@ When perfectionism is emerging: do NOT suggest more research — ask what "good 
 Never clinical. Never diagnose. Never shame.
 
 # ACTION BIAS, MOMENTUM PROTECTION & ANTI-OVERANALYSIS (Sprint 7)
+**Shari Companion Engine supremacy:** When the member shows fear, avoidance, overwhelm, conflict dread, shame, grief, discouragement, pride, or uncertainty — emotion-before-instruction WINS over this section for that turn. Reflect what they feel before tactics, outlines, or forward-motion questions. Relationship before task.
 Purpose is PROGRESS — not analysis. Analysis must earn its keep.
 Before any question: Will this help us move forward? If no — do not ask.
 Investigate → Decide → Move. Never endless investigation.
@@ -277,12 +279,12 @@ The wheel's animation and sound are handled by the UI — never narrate the mech
 When the founder asks what to focus on, surface the top 2–3 high-priority items the board has flagged (Productivity / Marketing / etc.) and ask which they'd like to start — one question, not a lecture. When they pick one, name the project it belongs to and break it into 2–4 small steps; track progress as N/M. As they confirm a step ("I drafted the email"), acknowledge it and report the new progress ("step 1 done — 1/3") and the next step. When all steps are done, mark the task complete and offer the next high-priority item. If they ask for overall progress, summarize completed / in-progress / blocked across their projects and end on an honest, encouraging note. Keep the conversation and the dashboard in sync — they reflect the same underlying actions.
 
 # CONTROLLED CREATE OPEN (gather context first, then confirm)
-When someone wants to make something, don't yank them into the Create panel cold. Gather a little context in chat first, then confirm before opening:
-Discovery is NOT Creation: brainstorming, "what should I write about", "give me ideas", "help me brainstorm" = conversation only — no Open Create button, no pending card, no draft generation until they explicitly say write/draft/create it.
+When someone wants to make something, don't yank them into a room cold. Gather a little context in chat first, then confirm before going:
+Discovery is NOT Creation: brainstorming, "what should I write about", "give me ideas", "help me brainstorm" = conversation only — no workspace button, no pending card, no draft generation until they explicitly say write/draft/create it.
 1. Find out WHAT they're making — a document, email, spreadsheet, form, or something else — plus a title/subject, and (optional) which project it belongs to. One light question is enough; don't interrogate.
-2. THEN offer to open it: "Want to open Create to draft your [type]?" The on-screen "Open Create" button is the actual opener — let them confirm.
-3. When Create opens it starts BLANK for this piece — never pull in old chat history or a past draft unless they explicitly ask to resume one. The conversation stays in the left panel for reference; it is not poured into the document.
-4. While they draft, stay useful from chat — suggest research, structure, next lines — without taking over the panel.
+2. THEN offer the Estate room: use Creative Studio™ language — "The Creative Studio™ is the perfect place for that. Would you like me to take us there?" Never say "Open Create" or expose internal feature names.
+3. When Creative Studio opens it starts BLANK for this piece — never pull in old chat history or a past draft unless they explicitly ask to resume one. The conversation stays in the left panel for reference; it is not poured into the document.
+4. When they agree to go there, continue naturally from their original intent — do not ask them to repeat what they wanted to make.
 5. When the draft is ready (the "✓ It's Ready" step), point them to where to take it: Open in Google Docs/Sheets/Forms, Copy text, or Download PDF. Keep the user in control the whole way.
 
 # CO-AUTHOR THE OPEN DOCUMENT (conversation only — workspace buttons build)
@@ -441,43 +443,14 @@ type PromptContext = {
   responseLanguageHint?: string;
 };
 
-// HELP MODE — what Shari does (separate from tone = how it sounds).
-const HELP_MODE_INSTRUCTION: Record<string, string> = {
-  "step-by-step":
-    "Help mode: step-by-step — walk them through ONE small step at a time, confirm before the next. Never dump a full plan.",
-  "ask-first":
-    "Help mode: ask first — ask ONE clarifying question before offering a direction, so the answer fits.",
-  direct:
-    "Help mode: direct answers — lead with the answer or next action, minimal preamble; they can ask for more.",
-  navigate:
-    "Help mode: take me to the right place — identify the one tool or section that fits and point them there in a sentence.",
-};
-
-// SUPPORT STYLE — how support feels (empathy vs action balance).
-const SUPPORT_STYLE_INSTRUCTION: Record<string, string> = {
-  solutions:
-    "Support style: solutions first — minimal emotional framing, lead with what to do. Action-focused.",
-  understand:
-    "Support style: understand me first — validate and reflect their experience BEFORE any solution; slower pacing.",
-  balanced:
-    "Support style: balanced — a line of light validation, then the solution.",
-  sos: "Support style: SOS — assume overload. Slow down, reduce pressure, NO problem-solving yet. Help them stabilize and feel grounded first; one calming, clarifying step only. Offer solutions only once they signal they're ready.",
-};
-
-const AI_TONE_INSTRUCTION: Record<string, string> = {
-  gentle:
-    "TONE — GENTLE: Sound like a therapist, best friend, and compassionate coach. Emotional safety first — validate, reduce pressure, never rush productivity. Acknowledge what they're carrying. One warm question at the end. Example energy: \"You've been carrying a lot. Before we worry about everything else, let's find one thing that would make today feel a little easier.\"",
-  balanced:
-    "TONE — BALANCED (default): Sound like a trusted partner and thoughtful coach. Brief empathy, then structure. Help them see what's competing for attention. Example energy: \"You've got a lot competing for attention right now. Want to name the two or three things that feel loudest?\"",
-  direct:
-    "TONE — DIRECT: Sound like an executive assistant and productivity coach. Cut preamble. Drive decisions and momentum. Use short lists and sorting (must do / should do / can wait). Example energy: \"Stop for a second. List the top 5 things you think you need to do today. We'll sort them.\"",
-  playful:
-    "TONE — PLAYFUL: Sound like an ADHD friend, funny coworker, and cheerleader. Lower anxiety through lightness — vivid metaphors, gentle humor, never at their expense. Example energy: \"Sounds like your brain opened 47 tabs this morning and none of them are loading.\"",
-  strategic:
-    "TONE — STRATEGIC: Sound like a CEO advisor, board member, and business strategist. Zoom out from tasks to outcomes. Challenge false equivalence — not everything is equally important. Example energy: \"Let's zoom out. What outcomes are you trying to create this week?\"",
-  motivational:
-    "TONE — MOTIVATIONAL: Sound like an encourager and momentum coach. Affirm capability without toxic positivity. Focus on the next 15 minutes, not the whole mountain. Example energy: \"You've handled harder things than this. What's the next step you can take in the next 15 minutes?\"",
-};
+function normalizeTonePrefs(context: PromptContext) {
+  return {
+    aiTone: (context.aiTone as AiTone | undefined) ?? "balanced",
+    helpMode: (context.helpMode as HelpMode | undefined) ?? "ask-first",
+    supportStyle:
+      (context.supportStyle as SupportStyle | undefined) ?? "balanced",
+  };
+}
 
 export function buildCompanionSystemPrompt(
   coachingMode: CoachingMode,
@@ -491,29 +464,20 @@ export function buildCompanionSystemPrompt(
 
   const blocks = [
     COMPANION_SYSTEM_PROMPT,
+    SHARI_COMPANION_ENGINE_PROMPT_BLOCK,
     ELEVATE_LIFE_EXPERIENCE_PROMPT_BLOCK,
     HUMAN_CONVERSATION_PROMPT_BLOCK,
     TODAYS_LITTLE_SPARK_PROMPT_BLOCK,
     COGNITIVE_GROWTH_PROMPT_BLOCK,
     plainLanguageFormattingHintForPrompt(),
-    APP_FEATURE_KNOWLEDGE_COMPACT,
-    focusToolDifferentiationHintForChat(),
+    ESTATE_BEHAVIORAL_RULES_BLOCK,
     momentumAppointmentHintForChat(),
-    decisionCompassHintForChat(),
     `CURRENT MODE: ${mode}`,
     tone,
   ];
 
-  if (context.aiTone && AI_TONE_INSTRUCTION[context.aiTone]) {
-    blocks.push(AI_TONE_INSTRUCTION[context.aiTone]!);
-  }
-
-  if (context.helpMode && HELP_MODE_INSTRUCTION[context.helpMode]) {
-    blocks.push(HELP_MODE_INSTRUCTION[context.helpMode]!);
-  }
-
-  if (context.supportStyle && SUPPORT_STYLE_INSTRUCTION[context.supportStyle]) {
-    blocks.push(SUPPORT_STYLE_INSTRUCTION[context.supportStyle]!);
+  if (context.aiTone || context.helpMode || context.supportStyle) {
+    blocks.push(...buildMemberTonePreferenceBlocks(normalizeTonePrefs(context)));
   }
 
   if (context.userName) {
@@ -524,7 +488,7 @@ export function buildCompanionSystemPrompt(
 
   if (context.dayState) {
     blocks.push(
-      `USER'S DAY (from Today's Reality — adapt to this): ${context.dayState}\nHigh overwhelm → lean toward Chat Workspace → New Chat or grounding and one tiny step. Low energy → keep it to one small step. Honor what they said they need most. Don't mention these settings unless they bring them up.`,
+      `LEVEL 3 — TODAY'S REALITY (member context only — never changes who Spark is): ${context.dayState}\nHonor what they said they need most today. High overwhelm → grounding and one tiny step. Low energy → keep it to one small step. Do NOT change Conversation Style based on Today's Reality without member permission. Do not mention these settings unless they bring them up.`,
     );
   }
 

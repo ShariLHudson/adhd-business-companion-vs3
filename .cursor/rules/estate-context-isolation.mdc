@@ -1,0 +1,53 @@
+---
+description: Estate Context Isolation — system/debug language never in member-facing chat
+alwaysApply: true
+---
+
+# Estate Context Isolation Rule™
+
+The Estate conversation layer must **NEVER** expose:
+
+- network errors ("Failed to fetch")
+- build system state (Next.js, webpack, dev server)
+- API debugging instructions
+- runtime diagnostics
+- npm / terminal instructions
+
+These belong **ONLY** to developer tooling contexts.
+
+## If an error occurs
+
+DO NOT surface technical details.
+
+Use Shari recovery voice:
+
+> Something got tangled for a second, but I'm still here.
+
+Then continue Estate behavior normally.
+
+## If system failure happens during navigation
+
+- DO NOT switch to debugging mode
+- DO NOT explain system internals
+- DO NOT suggest terminal commands
+- Just recover conversationally
+
+## Priority order
+
+1. **Estate conversation** (highest)
+2. Navigation system
+3. Intent bridge
+4. Fallback conversational recovery
+5. **ONLY THEN** system logging (silent, not user-facing)
+
+## Absolute rule
+
+**No system-level language may ever appear in user-facing Estate chat.**
+
+## Implementation
+
+- Route failures: `routeCompanionFailure()` in `lib/companionContextRouting/`
+- Last render gate: `sanitizeEstateFacingCopy()` (used by `SimpleChat`)
+- In-app boundary: `EstateErrorBoundary` in `CompanionPageLoader` — **not** `app/companion/error.tsx` (separate chunk can ChunkLoadError)
+- System log only: `logCompanionSystemFailure()` — dev console, never Shari
+- Never pass `err.message` into `role: "assistant"` messages

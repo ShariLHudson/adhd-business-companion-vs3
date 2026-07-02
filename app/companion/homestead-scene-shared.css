@@ -397,6 +397,17 @@
   z-index: 4;
 }
 
+/* Login — uniform photograph; no right-side warm wash from homestead layers */
+.companion-login-scene--full-exposure .companion-welcome-scene__life,
+.companion-login-scene--full-exposure .companion-login-scene__soften {
+  display: none;
+}
+
+.companion-login-scene--full-exposure.homestead-scene--ambient
+  .companion-login-scene__base {
+  filter: brightness(1.04) saturate(1.08) contrast(1.02);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .homestead-scene--ambient .companion-welcome-scene__sunlight,
   .homestead-scene--ambient .companion-welcome-scene__foliage,

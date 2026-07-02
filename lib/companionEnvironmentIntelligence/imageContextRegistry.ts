@@ -28,15 +28,16 @@ export type ImageContextEntry = {
 
 const WELCOME_CONTEXT: ImageContextEntry[] = [
   {
-    id: "welcome-home-room-background",
-    filePath: "backgrounds/welcome-home-room-background.jpeg",
+    id: "welcome-home-background",
+    filePath: "backgrounds/welcome-home-background.png",
     timeOfDay: ["morning", "afternoon", "evening", "night"],
     seasons: ["spring", "summer", "autumn", "winter", "holiday"],
     emotionalTone: ["warm", "gentle"],
-    useCases: ["first welcome", "quiet presence", "gentle day", "home opening"],
+    useCases: ["first welcome", "quiet presence", "gentle day", "home opening", "estate arrival"],
     avoidCases: ["business focus", "celebration fireworks"],
-    compositionNotes: "Landscape welcome home room — open right side for greeting and chat.",
-    cropNotes: "object-position ~14% center; keep Shari left, room right.",
+    compositionNotes:
+      "Spark Estate foyer — conservatory center, reception right; dolly toward the heart of the estate.",
+    cropNotes: "object-position ~50% 42%; keep conservatory and welcome signage readable.",
   },
   {
     id: "shari-i-am-here-2",

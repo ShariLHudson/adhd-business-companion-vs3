@@ -45,6 +45,7 @@ export const WORKSPACE_SECTIONS: AppSection[] = [
   "growth",
   "confidence-vault",
   "growth-journal",
+  "growth-greenhouse",
   "growth-portfolio",
   "visual-focus",
   "welcome-room",
@@ -63,6 +64,7 @@ export const STANDALONE_SECTIONS: AppSection[] = [
   "spin-wheel",
   "focus-timer",
   "energy",
+  "user-memory",
 ];
 
 export function supportsWorkspace(section: AppSection): boolean {
@@ -78,6 +80,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "saved-work": "Created Content",
   playbook: "Strategies",
   "how-do-i": "How Do I",
+  "momentum-institute": "Momentum Institute™",
   "brain-dump": "Clear My Mind",
   "time-block": "Momentum Appointments",
   "email-generator": "Email",
@@ -88,16 +91,18 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   today: "Today",
   "plan-my-day": "Plan My Day",
   "visual-focus": "Visual Thinking",
-  "wins-this-week": "Wins This Week",
-  "evidence-bank": "Evidence Bank",
+  "wins-this-week": "Celebration Garden",
+  "evidence-bank": "Evidence Vault",
   growth: "Your Story",
   "growth-capture": "Capture a Moment",
-  "growth-library": "My Story Library",
-  "growth-reports": "Create Your Storybook",
+  "growth-library": "Achievement Library",
+  "growth-reports": "Celebration Hall",
   "confidence-vault": "Highlights",
   "my-journey": "My Journey",
-  "growth-journal": "Journal",
-  "growth-portfolio": "Portfolio",
+  "growth-journal": "Journal Gazebo",
+  "growth-greenhouse": "Growth Greenhouse",
+  "growth-portfolio": "Achievement Library",
+  "user-memory": "Memory",
   "welcome-room": "Welcome Room",
   "life-experience": "Life Experience Room",
   "the-gallery": "Asset Library",
@@ -123,7 +128,8 @@ const EXTRA_AREA_TITLES: Partial<Record<AppSection, string>> = {
   games: "Quick Recharge",
   "quick-recharge": "Quick Recharge",
   grow: "Grow",
-  "grow-momentum-builders": "Momentum Builders",
+  "momentum-builder": "Momentum Builder™",
+  "grow-momentum-builders": "Momentum Builder™",
   "grow-spark-cards": "Spark Cards",
   "grow-guilds": "Guilds",
   "grow-daily-discoveries": "Daily Discoveries",
@@ -165,6 +171,10 @@ export type WorkspaceOffer = {
   buttonLabel: string;
   line: string;
   visualFocusMode?: import("./visualFocus/types").VisualFocusMode;
+  /** Momentum Institute™ — Estate Intelligence opens a specific drawer */
+  instituteDrawerId?: string;
+  /** Global Estate menu overlay — profile, settings, etc. */
+  estateMenuActionId?: import("@/lib/estateMenu/menuConfig").EstateMenuActionId;
   secondary?: {
     section: AppSection;
     buttonLabel: string;
@@ -334,7 +344,7 @@ function buildOfferLine(target: WorkspaceTarget, mixed: boolean): string {
       return "Want me to open the project so we can build it together, one section at a time?";
     }
     if (target.section === "content-generator") {
-      return "Want me to open Create so we can write it together?";
+      return "The Creative Studio™ is the perfect place for that. Would you like me to take us there?";
     }
     if (target.section === "templates-library") {
       return "I can open a template and we'll work through it together — want to?";

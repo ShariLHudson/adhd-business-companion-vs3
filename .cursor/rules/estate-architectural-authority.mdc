@@ -1,0 +1,46 @@
+---
+description: Spark Estate architectural authority — Constitution, Experience Guide, Bible are binding law
+globs:
+  - app/companion/**
+  - components/companion/**
+  - components/estate/**
+  - lib/estate/**
+  - lib/estateIntelligence/**
+  - lib/estateMenu/**
+  - lib/estateKnowledge/**
+  - lib/estateMemory/**
+  - public/backgrounds/**
+alwaysApply: true
+---
+
+# Spark Estate™ — Architectural Authority (BINDING)
+
+**Manifest:** `docs/estate/ESTATE_ARCHITECTURAL_AUTHORITY.md`
+
+These three documents **define Spark Estate**. They are **not** reference material.
+
+| Authority | Path |
+|-----------|------|
+| **Constitution** | `docs/estate/01 - Spark Estate Constitution.md` |
+| **Experience Guide** | `docs/estate/Living in Spark Estate.md` |
+| **Bible (canon)** | `docs/estate/Spark Estate Bible.md` |
+
+## Rule
+
+If legacy code, old docs, templates, or patterns conflict with the three authorities → **change implementation**, not the canon.
+
+## Before any Estate work
+
+1. Which authority governs this change?  
+2. Does it pass Bible Ch 23 (Spark Estate Test)?  
+3. Does it use Estate language (Ch 8–9) — never dashboard/module/launch?  
+
+## Invalid without explicit override
+
+Feature-first panels · dashboard arrival · software navigation copy · merging Library and Institute · instructional overlays · room labels on glass
+
+## Subordinate (align or retire)
+
+`ESTATE_ROOM_TEMPLATE.md` · `ESTATE_E2E_WIRING.md` · grow placeholders · split workspace on Living Places
+
+**Heart:** Spark Estate™ is not a place you use. It is a place where you are welcomed home.

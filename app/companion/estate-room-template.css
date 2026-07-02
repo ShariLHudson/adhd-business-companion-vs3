@@ -1,0 +1,77 @@
+/* Estate Room Template™ — hero plaque + Shari welcome (layers 1–2) */
+
+.estate-room-template-arrival {
+  margin: 0 0 1rem;
+  text-align: left;
+}
+
+.estate-room-template-arrival__hero {
+  margin-bottom: 0.85rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(212, 175, 110, 0.28);
+  background: linear-gradient(
+    145deg,
+    rgba(42, 32, 22, 0.42) 0%,
+    rgba(28, 22, 16, 0.52) 100%
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 236, 200, 0.08);
+}
+
+.estate-room-template-arrival__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: rgba(255, 244, 228, 0.96);
+  line-height: 1.3;
+}
+
+.estate-room-template-arrival__subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.92rem;
+  font-weight: 500;
+  font-style: italic;
+  color: rgba(255, 236, 200, 0.88);
+  line-height: 1.35;
+}
+
+.estate-room-template-arrival__purpose {
+  margin: 0.45rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 400;
+  color: rgba(255, 248, 235, 0.78);
+  line-height: 1.4;
+}
+
+.estate-room-template-arrival__welcome-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.estate-room-template-arrival__welcome {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: rgba(255, 248, 235, 0.92);
+}
+
+.estate-room-template-arrival__welcome--follow {
+  color: rgba(255, 248, 235, 0.88);
+}
+
+.estate-room-invitation--embedded .estate-room-template-arrival__hero {
+  padding: 0.55rem 0.75rem;
+}
+
+.estate-room-invitation--embedded .estate-room-template-arrival__title {
+  font-size: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estate-room-template-arrival__hero {
+    transition: none;
+  }
+}

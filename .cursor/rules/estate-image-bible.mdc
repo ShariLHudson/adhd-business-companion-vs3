@@ -1,0 +1,28 @@
+---
+description: Estate Image Bible™ — Spark flame logo on every mug, brass palette, luxury pens, journal branding, signage typography, plausibility rules for all Estate room imagery.
+globs:
+  - "**/public/backgrounds/**"
+  - "**/room-lookbooks/**"
+  - "**/docs/estate/**"
+  - "**/peaceful-places/**"
+  - "**/momentumInstitute/**"
+alwaysApply: false
+---
+
+# Estate Image Bible™
+
+**Full document:** `docs/estate/ESTATE_IMAGE_BIBLE.md`  
+**Prompt block:** `lib/estate/estateImageStandards.ts` → `ESTATE_IMAGE_BRAND_PROMPT`
+
+When generating or reviewing **any** Spark Estate™ photograph, room plate, or scene art:
+
+1. Append `ESTATE_IMAGE_BRAND_PROMPT` (or `buildEstateRoomImagePrompt(roomBrief)`).
+2. Every mug, teacup, travel mug, or cup shows the **official Spark flame logo** — never blank, never another emblem.
+3. Journals: Spark Estate leather branding. Pens: black-and-gold Montblanc-style only.
+4. Brass: warm antique `#c4a574` family — match Institute drawer hardware.
+5. Signage: estate serif plaques — not app UI fonts.
+6. No clip art, stock logos, placeholder icons.
+7. Decorative objects reinforce **room purpose** (see ESTATE_EXPERIENCE_MASTER_PLAN).
+8. **Never** a mug with two handles. One handle per vessel.
+
+QA every image against the checklist in the bible before registering in `estateRoomRegistry`.

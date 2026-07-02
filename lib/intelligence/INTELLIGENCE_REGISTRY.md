@@ -64,7 +64,7 @@ If any answer is "unknown" — redesign before shipping.
 | **Business profile** | `business-profile` | `companion-business-profile-v1` | Onboarding context | Business, Founder, Content, Offer |
 | **Template** | `template` | `companionStore` → `TemplateItem` | Create, email, content | Content, PostCraft, Automation |
 | **Snippet** | `snippet` | `companionStore` → `Snippet` | Reusable copy | Content, Automation |
-| **Content draft** | `content-draft` | PostCraft / ecosystem APIs | Drafts, publishing | Content, SEO, Social, GHL |
+| **Content draft** | `content-draft` | PostCraft / ecosystem APIs; `lib/artifactState/` universal artifact memory | Drafts, publishing, facilitated creation | Content, SEO, Social, GHL |
 | **Momentum event** | `momentum-event` | `companionStore` momentum | Movement XP (no streaks) | Growth, Recovery, Pattern |
 | **Reminder** | `reminder` | `reminderAt` on thought + scheduling | Thought reminders | Calendar, Automation, Recovery |
 | **Founder event** | `founder-event` | `lib/ecosystem/events` | Analytics, dashboard | Founder, Business, Ecosystem |
@@ -91,6 +91,16 @@ If any answer is "unknown" — redesign before shipping.
 | **Spark Card** | `spark-card` (planned) | [T-011](../docs/SPARK_CARD_FRAMEWORK.md) — `lib/sparkCards/types.ts`; living wisdom, Brain-personalized; not gamified collectibles | Guidance, Learning, LIG, Gallery, Momentum, Experience |
 | **Momentum Builder** | `momentum-builder` (planned) | [T-012](../docs/MOMENTUM_BUILDER_FRAMEWORK.md) — `lib/sparkMomentumBuilders/types.ts`; practice not games; V1 catalog in `lib/momentumBuilders/` | Capability Graph, Guidance, Momentum, Gallery, Guild, Learning |
 | **Daily Discovery** | `daily-discovery` (planned) | [T-016](../docs/DAILY_DISCOVERIES_FRAMEWORK.md) — `lib/sparkDailyDiscoveries/types.ts`; Learn · Connect · Apply; not daily tips | Guidance, Learning, Observatory, Spark Card, Momentum, Gallery |
+| **Knowledge Card** | `knowledge-card` | `lib/sparkMomentumInstitute/types.ts` — master knowledge object; one per concept; all experiences reference by id | Learning, Momentum Institute, LIG, Growth Profile, Evidence Vault |
+| **Institute learning experience** | `institute-learning-experience` | `lib/momentumInstitute/learningExperienceStore.ts` — member session state + lifecycle | Learning, Momentum Institute, Growth Profile, Coaching |
+| **Institute cabinet item** | `institute-cabinet-item` | `lib/momentumInstitute/cabinetStore.ts` — My Institute Cabinet™ references only | Learning, Narrative, Growth |
+| **Institute growth profile** | `institute-growth-profile` | `lib/momentumInstitute/growthProfileStore.ts` — auto-updated competencies, timeline | Learning, Founder, Growth, Capability Graph |
+| **Institute evidence opportunity** | `institute-evidence-opportunity` | `lib/momentumInstitute/evidenceBridge.ts` — permission-gated; bridges to `evidenceBankStore` | Growth, Evidence Vault, Learning |
+| **Momentum Institute™** | `momentum-institute` (center) | `lib/momentumInstitute/` — Entrepreneur Development Center; catalog-driven; not a room | Learning, Guidance, Momentum, Apprenticeship, Business Lab, Simulation |
+| **Spark Competency Framework™** | (taxonomy) | `lib/sparkCompetencyFramework/` — v1.0 four pillars, departments, drawers, competency levels (Exploring→Mentoring), Knowledge Perspectives™ | Momentum Institute, Growth Profile, Learning, Capability Graph |
+| **Spark Knowledge Architecture™** | (Phase 3) | `lib/momentumInstitute/knowledgeArchitecture/` — hierarchy index, relationships, learning paths, competency graph · [MOMENTUM_INSTITUTE_ARCHITECTURE.md](../docs/MOMENTUM_INSTITUTE_ARCHITECTURE.md) | Momentum Institute, Guidance, Growth Profile, LIG |
+| **Spark Curriculum Master Index™** | (Phase 4) | `lib/sparkCurriculumMasterIndex/` — 181+ topic roadmap, competency slugs, future experience map · [SPARK_CURRICULUM_MASTER_INDEX.md](../docs/SPARK_CURRICULUM_MASTER_INDEX.md) | Momentum Institute, Estate Intelligence, Growth Profile, CMS |
+| **Spark Business Brain™ (Knowledge OS)** | `business-brain-knowledge-os` | `lib/businessBrain/` — institutional knowledge OS, Knowledge Council™, catalog provider · [SPARK_BUSINESS_BRAIN.md](../docs/SPARK_BUSINESS_BRAIN.md) | Momentum Institute, Estate Intelligence, Make It Mine, Coaching, Growth Profile |
 
 ## Spark OS foundational layers
 
@@ -146,9 +156,15 @@ If any answer is "unknown" — redesign before shipping.
 | **Gallery Curator Intelligence** | `lib/gallery/galleryCuratorIntelligence.ts` | Gallery memory archive, signals, rotation | Today's visible exhibition (12–20) |
 | **Reflection Intelligence** | `lib/gallery/galleryReflectionIntelligence.ts` | Journal entries (private) | Wall wisdom — meaning without copied text |
 | **Clear My Mind Intelligence** | `lib/clearMyMindIntelligence.ts` | Capture sessions, thoughts | LIG ingest (silent) |
+| **Estate Intelligence™** | `lib/estateIntelligence/`, `lib/estateKnowledge/`, `lib/welcomeHome/estateConcierge.ts` | User text, emotion, intent, Registry entries, room knowledge docs | Chat hints, `WorkspaceOffer` routing — [docs/estate/KNOWLEDGE_BASE.md](../docs/estate/KNOWLEDGE_BASE.md) |
+| **Estate Directory™** | `lib/estate/directory/` | Canonical place records + shell + media maps | `goToPlace`, backgrounds, suggestions, connections — 42 unified locations |
+| **Conversation Drives Navigation™** | `lib/estate/conversationDrivesNavigation/` | Member environmental need phrases | Need → directory place offers; Spec 108 invitation flow |
 | **Relief Intelligence** | `lib/reliefIntelligence.ts` | Capture behavior signals (voice, rhythm, return) | Companion voice tone only — never UI |
 | **Ecosystem Intelligence** | `lib/ecosystemIntelligence.ts` | Cross-domain snapshot | Whole-system insight |
 | **Trust / signal bus** | `lib/intelligence-layer/` | Chat, features, emotions | `IntelligenceSignal` store |
+| **Momentum Institute Engine™** | `lib/momentumInstitute/` | Knowledge Card, Institute learning experience, cabinet, growth profile | Catalog, lifecycle, Growth Profile (auto), Evidence (permission), Cabinet, Journal refs, time slots, ecosystem links |
+| **Spark Business Brain™ (Knowledge OS)** | `lib/businessBrain/` | Curriculum topics, Knowledge Cards, competencies, Knowledge Council | Institute catalog seed, synthesis context, Estate Intelligence, coaching, AI recommendations |
+| **Spark Competency Framework™** | `lib/sparkCompetencyFramework/` | Pillar/dept/drawer taxonomy, perspectives, competency levels | Momentum Institute catalog scaffold, Growth Profile levels |
 
 ---
 

@@ -31,6 +31,7 @@ const NAV_IDS = new Set(
 
 const GROW_SECTION_IDS = new Set<AppSection>([
   "grow",
+  "momentum-builder",
   "grow-momentum-builders",
   "grow-spark-cards",
   "grow-guilds",
@@ -42,6 +43,7 @@ const GROW_SECTION_IDS = new Set<AppSection>([
   "growth-capture",
   "growth-library",
   "growth-reports",
+  "user-memory",
   "growth-journal",
   "growth-portfolio",
   "wins-this-week",

@@ -12,9 +12,9 @@ import {
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 
 import { getAppSiteUrl } from "@/lib/appSite";
+import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
 import {
   hasCompanionAuthStorageHint,
-  navigateToCompanionHome,
   waitForCompanionAuthStorage,
 } from "@/lib/companionLoginTransition";
 import { languagePrefsFromUserMetadata } from "@/lib/companionUserLanguage";
@@ -293,6 +293,8 @@ async function signUpDirect(
 }
 
 export function CompanionAuthProvider({ children }: { children: ReactNode }) {
+  const authBypassed = isCompanionAuthBypassed();
+
   useLayoutEffect(() => {
     hydrateCompanionAuthFromInlineConfig();
   }, []);
@@ -302,8 +304,8 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
     hydrateCompanionAuthFromInlineConfig();
     return companionAuthConfigured();
   });
-  const [loading, setLoading] = useState(true);
-  const [sessionChecked, setSessionChecked] = useState(false);
+  const [loading, setLoading] = useState(() => !authBypassed);
+  const [sessionChecked, setSessionChecked] = useState(() => authBypassed);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
 
@@ -316,6 +318,8 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
+    if (authBypassed) return;
+
     let mounted = true;
     let unsubscribe: (() => void) | undefined;
 
@@ -423,9 +427,10 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
       window.clearTimeout(loadingTimeout);
       unsubscribe?.();
     };
-  }, []);
+  }, [authBypassed]);
 
   useEffect(() => {
+    if (authBypassed) return;
     if (!configured || loading || user || session) return;
     if (!sessionChecked || !hasCompanionAuthStorageHint()) return;
 
@@ -448,7 +453,7 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
     return () => {
       cancelled = true;
     };
-  }, [configured, loading, sessionChecked, user, session]);
+  }, [authBypassed, configured, loading, sessionChecked, user, session]);
 
   const value = useMemo<CompanionAuthContextValue>(
     () => ({
@@ -472,9 +477,6 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
           if (restored?.data.session) {
             applyAuthSession(restored.data.session);
           }
-        }
-        if (!result.error) {
-          navigateToCompanionHome();
         }
         return { error: result.error, hint: result.hint };
       },

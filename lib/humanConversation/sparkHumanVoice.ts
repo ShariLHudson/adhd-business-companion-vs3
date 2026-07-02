@@ -28,8 +28,19 @@ export const SPARK_AI_VOICE_FORBIDDEN_PHRASES: readonly RegExp[] = [
   /\bas an ai\b/i,
   /\bas a language model\b/i,
   /\bi hope this helps\b/i,
+  /\blet'?s break (?:this |it )?down\b/i,
+  /\bthat sounds tough\b/i,
+  /\bwould you like assistance\b/i,
+  /\bhere'?s a simple outline\b/i,
+  /\bhow does that sound\??\b/i,
+  /\bwhat specifically feels challenging\b/i,
+  /\blet'?s focus on key points\b/i,
+  /\bshall i help you\b/i,
   /\bfeel free to\b/i,
   /\bdon'?t hesitate to\b/i,
+  /\bhelp me understand something\b/i,
+  /\bthis might help me suggest\b/i,
+  /\bone effective way is\b/i,
 ];
 
 export const SPARK_AI_VOICE_FORBIDDEN_LABELS = [
@@ -38,6 +49,12 @@ export const SPARK_AI_VOICE_FORBIDDEN_LABELS = [
   "Here's a breakdown",
   "Let's dive in",
   "Great question!",
+  "Let's break it down",
+  "That sounds tough",
+  "Would you like assistance",
+  "Here's a simple outline",
+  "How does that sound?",
+  "Shall I help you",
   "That reminds me of something",
   "Something about the way you said that makes me curious",
   "As an AI",
@@ -158,6 +175,9 @@ const PHRASE_REPLACEMENTS: readonly [RegExp, string][] = [
   [/\bi hope this helps[.!]?\s*/gi, ""],
   [/\bfeel free to ask\b/gi, "ask anytime"],
   [/\bdon'?t hesitate to\b/gi, "you can"],
+  [/\bhelp me understand something[.:]?\s*/gi, ""],
+  [/\bone effective way is\s*/gi, ""],
+  [/\bthis might help me suggest a better approach[.!]?\s*/gi, ""],
 ];
 
 export function scrubAiVoicePhrases(text: string): {

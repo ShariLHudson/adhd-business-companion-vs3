@@ -124,7 +124,7 @@ describe("estate runtime system reset", () => {
       expect(plan.command.roomId ?? plan.command.entryId).toBe("greenhouse");
     }
     const amb = resolveEstatePlaceAmbientProfile("greenhouse");
-    expect(amb?.character).toMatch(/birds/i);
+    expect(amb?.character).toMatch(/glasshouse|water trickle/i);
     expect(getEstateRuntimeState().activeSoundscape).toBeNull();
   });
 

@@ -11,7 +11,6 @@ import {
 import { resolveEstatePlaceAmbientProfile } from "@/lib/estate/estatePlaceAmbientSound";
 import { refreshEstateSoundscapeOverlayVolume } from "@/lib/estate/estateSoundscapeOverlay";
 import { fadeAudioVolumeAsync } from "@/lib/welcomeAudio/fadeVolume";
-import { prefersReducedMotion } from "@/lib/welcomeRoom/arrival";
 import {
   ESTATE_AMBIENCE_FALLBACK_MP3,
   GREENHOUSE_BIRDS_AMBIENCE_MP3,
@@ -61,6 +60,13 @@ function sameAmbienceSrc(a: string, b: string): boolean {
 function ambienceSrcCandidates(primarySrc: string): string[] {
   if (primarySrc === GREENHOUSE_BIRDS_AMBIENCE_MP3) {
     return [primarySrc, ORCHARD_BIRDS_AMBIENCE_MP3];
+  }
+  if (primarySrc === ORCHARD_BIRDS_AMBIENCE_MP3) {
+    return [
+      primarySrc,
+      GREENHOUSE_BIRDS_AMBIENCE_MP3,
+      ESTATE_AMBIENCE_FALLBACK_MP3,
+    ];
   }
   const list = [primarySrc, ESTATE_AMBIENCE_FALLBACK_MP3];
   return [...new Set(list)];
@@ -173,7 +179,7 @@ export async function startEstateRoomAmbience(
 ): Promise<void> {
   if (typeof window === "undefined") return;
   if (!options?.userInitiated) {
-    if (prefersReducedMotion()) return;
+    // Place ambience is hospitality — not gated by prefers-reduced-motion (visual motion only).
     if (!isEstateAmbienceEnabled()) return;
   }
 

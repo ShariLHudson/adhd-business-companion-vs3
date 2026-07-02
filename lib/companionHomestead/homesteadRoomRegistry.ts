@@ -104,8 +104,8 @@ export const COMPANION_HOMESTEAD_ROOMS: readonly HomesteadRoomEntry[] = [
     signatureMotion: "dust-motes-page-turn",
     signatureMotionDescription: "Dust motes, page-turn ambience",
     placeIds: ["library", "reading-nook"],
-    sections: ["how-do-i"],
-    status: "partial",
+    sections: ["how-do-i", "growth-library", "momentum-institute"],
+    status: "live",
   },
   {
     id: "study",

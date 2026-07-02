@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { evaluateEstatePlaceTurn, savePendingEstatePlaceMenu, clearPendingEstatePlaceMenu } from "./estatePlaceNavigation";
-import { ESTATE_PLACE_SUGGESTION_INTRO } from "./estatePlaceIdentityLock";
+import { ENVIRONMENT_OFFER_CLOSER } from "./conversationDrivesNavigation/formatEnvironmentOffer";
 import { resolveUserIntent } from "./resolveUserIntent";
 import { planUserIntentExecution } from "./executeUserIntent";
 import { evaluateEstateCommand } from "@/lib/estateIntelligence/estateCommandRouter";
@@ -23,10 +23,10 @@ describe("estate stabilization acceptance", () => {
     });
     expect(turn.type).toBe("offer");
     if (turn.type === "offer") {
-      expect(turn.line).toContain(ESTATE_PLACE_SUGGESTION_INTRO);
+      expect(turn.line).toContain("A few quieter places on the Estate");
       expect(turn.line).toMatch(/^1\./m);
-      expect(turn.line).toMatch(/Reading Nook|Greenhouse|Back Deck/i);
-      expect(turn.line).toMatch(/Say a number or name and I'll take you there\./);
+      expect(turn.line).toMatch(/Gardens|Library|Reading Nook/i);
+      expect(turn.line).toContain(ENVIRONMENT_OFFER_CLOSER);
       expect(turn.line).not.toMatch(/oak tree|meditation|pond corner/i);
     }
   });
@@ -113,7 +113,7 @@ describe("estate stabilization acceptance", () => {
     });
     expect(turn.type).toBe("offer");
     if (turn.type === "offer") {
-      expect(turn.line).toContain(ESTATE_PLACE_SUGGESTION_INTRO);
+      expect(turn.line).toMatch(/A few (?:quieter )?places on the Estate/);
       expect(turn.placeIds).toContain("reading-nook");
     }
   });

@@ -4,6 +4,41 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
+<!-- BEGIN:estate-architectural-authority -->
+# Spark Estate™ — Architectural Authority (BINDING)
+
+**These three documents define Spark Estate. They are not reference material.**
+
+| Document | Path |
+|----------|------|
+| Constitution | `docs/estate/01 - Spark Estate Constitution.md` |
+| Experience Guide | `docs/estate/Living in Spark Estate.md` |
+| Bible (canon) | `docs/estate/Spark Estate Bible.md` |
+
+**Manifest:** `docs/estate/ESTATE_ARCHITECTURAL_AUTHORITY.md`
+
+If legacy code or older docs conflict → **change implementation**, not the canon. Bible Ch 23 (Spark Estate Test) is a release gate. No dashboards, feature menus, or software language (Bible Ch 8–9).
+
+**Restoration:** `docs/estate/ARCHITECTURAL_RESTORATION.md` · **Cleanup:** `docs/ESTATE_CLEANUP_ROADMAP.md`
+<!-- END:estate-architectural-authority -->
+
+<!-- BEGIN:companion-dna -->
+# The Friend We All Deserve™ — Spark Companion DNA (BINDING)
+
+**Read this before conversation logic, prompts, and how Spark speaks.**
+
+| Document | Path |
+|----------|------|
+| **The Friend We All Deserve™** | `docs/THE_FRIEND_WE_ALL_DESERVE.md` |
+| Redirect (legacy names) | `docs/SPARK_COMPANION_CONSTITUTION.md` · `docs/THE_HEART_OF_SPARK.md` |
+
+**Estate governs places. Spark governs friendship.** Sibling to the Estate Constitution.
+
+**One Question Rule:** *Would this feel natural between lifelong friends on a porch?* If no → rewrite.
+
+Spark never judges, lectures, overwhelms, impresses, rushes to fix, or sounds like software. Sometimes presence is the whole response.
+<!-- END:companion-dna -->
+
 <!-- BEGIN:companion-architecture -->
 # One Companion — not separate workspaces
 

@@ -38,7 +38,7 @@ type Props = {
   onImmersionNav: (hidden: boolean) => void;
   onWalkComplete: (section: AppSection) => void;
   onStayAndChat: () => void;
-  onSend: () => void;
+  onSend: (overrideText?: string) => void;
 };
 
 export function ArrivalLivingRoomExperience({
@@ -80,7 +80,7 @@ export function ArrivalLivingRoomExperience({
     }
 
     onInputChange("");
-    onSend();
+    onSend(trimmed);
     if (
       !experience.showRealityQuestion &&
       (experience.beat === "invite" || experience.beat === "staying" || experience.beat === "respond")
@@ -96,14 +96,9 @@ export function ArrivalLivingRoomExperience({
 
   const handleKeyDownWrapped = useCallback(
     (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        handleSend();
-        return;
-      }
       onKeyDown(event);
     },
-    [handleSend, onKeyDown],
+    [onKeyDown],
   );
 
   const handleDecline = useCallback(() => {

@@ -27,7 +27,7 @@ describe("estateRoomBackgroundCandidates", () => {
   it("lists library fallbacks", () => {
     expect(estateRoomBackgroundCandidates("library")).toEqual([
       ESTATE_ROOM_BG.library,
-      "/backgrounds/main-library-background.webp",
+      "/backgrounds/estate-library-background.webp",
       ESTATE_ROOM_BG.libraryLegacy,
       "/backgrounds/stairway-reading-nook-background.webp",
     ]);
@@ -39,8 +39,8 @@ describe("estateRoomBackgroundCandidates", () => {
       "/backgrounds/evidence-vault-background.webp",
     ]);
     expect(estateRoomBackgroundCandidates("portfolio")).toEqual([
-      "/backgrounds/accomplishments-room-background.png",
-      "/backgrounds/accomplishments-room-background.webp",
+      "/backgrounds/accomplisments-room-background.png",
+      "/backgrounds/accomplisments-room-background.webp",
     ]);
   });
 
@@ -51,7 +51,7 @@ describe("estateRoomBackgroundCandidates", () => {
     );
     expect(candidates).toEqual([
       ESTATE_ROOM_BG.portfolio,
-      "/backgrounds/accomplishments-room-background.webp",
+      "/backgrounds/accomplisments-room-background.webp",
     ]);
   });
 });

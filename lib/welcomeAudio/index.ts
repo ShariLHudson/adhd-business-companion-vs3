@@ -14,6 +14,11 @@ export type {
 export { WelcomeAudioManager } from "./WelcomeAudioManager";
 export { useWelcomeAudioExperience } from "./useWelcomeAudioExperience";
 export {
+  attachWelcomeHomeAudioManager,
+  destroyWelcomeHomeAudioManager,
+  primeWelcomeHomeAudioFromGesture,
+} from "./welcomeHomeAudioSession";
+export {
   attachWelcomeRoomAudioManager,
   destroyWelcomeRoomAudioManager,
   primeWelcomeRoomAudioFromGesture,

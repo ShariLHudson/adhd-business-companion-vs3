@@ -71,7 +71,7 @@ export function CompanionSignInExperience() {
 
   return (
     <main
-      className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-8 sm:px-6 sm:py-10"
+      className="companion-login-page companion-login-page--welcome-bg relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-8 sm:px-6 sm:py-10"
       data-testid="companion-login-page"
     >
       <CompanionLoginBackground />

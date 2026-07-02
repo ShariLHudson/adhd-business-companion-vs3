@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  backgroundUrlVariants,
   preferredBackgroundPreloadUrl,
   roomBackgroundImageCss,
   webpBackgroundUrl,
@@ -25,5 +26,16 @@ describe("roomBackgroundAssets", () => {
     expect(preferredBackgroundPreloadUrl("/backgrounds/plan-my-day-background.png")).toBe(
       "/backgrounds/plan-my-day-background.webp",
     );
+  });
+
+  it("lists png and webp variants for estate room plates", () => {
+    expect(backgroundUrlVariants("/backgrounds/evidence-vault-background.png")).toEqual([
+      "/backgrounds/evidence-vault-background.png",
+      "/backgrounds/evidence-vault-background.webp",
+    ]);
+    expect(backgroundUrlVariants("/backgrounds/evidence-vault-background.webp")).toEqual([
+      "/backgrounds/evidence-vault-background.webp",
+      "/backgrounds/evidence-vault-background.png",
+    ]);
   });
 });

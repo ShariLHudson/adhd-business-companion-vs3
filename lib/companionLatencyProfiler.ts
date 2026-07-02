@@ -90,6 +90,16 @@ const DEEP_PATH_RE =
 const STRATEGY_DEEP_RE =
   /\b(?:business strategy|diagnose my business|whole business|operating system|why does this keep happening)\b/i;
 
+/** Real coaching questions — deserve wisdom + relationship layers, not fast-path strip. */
+const THOUGHTFUL_CONVERSATION_RE =
+  /\b(?:how can i|how do i|how should i|what should i|help me (?:think|figure|understand)|i need (?:some )?(?:advice|help|guidance)|connect with someone|reach out to|share my services|talk to someone|cold (?:email|outreach|message)|financial advice|pricing advice|budget(?:ing)? help)\b/i;
+
+export function isThoughtfulConversationRequest(userText: string): boolean {
+  const t = userText.trim();
+  if (!t) return false;
+  return THOUGHTFUL_CONVERSATION_RE.test(t);
+}
+
 function instantSkipLayers(): CompanionLayerSkipFlags {
   return {
     relationshipObservation: true,
@@ -219,6 +229,25 @@ export function resolveCompanionResponseRoute(
   }
 
   if (
+    isThoughtfulConversationRequest(t) ||
+    input.routing.category === "decide" ||
+    input.routing.category === "coach"
+  ) {
+    return {
+      routeClass: "fast",
+      routeReason: isThoughtfulConversationRequest(t)
+        ? "thoughtful_coaching_question"
+        : input.routing.category === "decide"
+          ? "decision_support"
+          : "coach_intent",
+      budgetMs: ROUTE_BUDGET_MS.fast,
+      skipHeavyLayers: true,
+      useLocalReplyOnly: false,
+      skipLayers: fastSkipLayers(),
+    };
+  }
+
+  if (
     input.routing.learnFastPath ||
     input.routing.category === "learn" ||
     isKnowledgeQuestion(t)
@@ -284,17 +313,6 @@ export function resolveCompanionResponseRoute(
     return {
       routeClass: "fast",
       routeReason: "feature_navigation",
-      budgetMs: ROUTE_BUDGET_MS.fast,
-      skipHeavyLayers: true,
-      useLocalReplyOnly: false,
-      skipLayers: fastSkipLayers(),
-    };
-  }
-
-  if (input.routing.category === "decide") {
-    return {
-      routeClass: "fast",
-      routeReason: "decision_support",
       budgetMs: ROUTE_BUDGET_MS.fast,
       skipHeavyLayers: true,
       useLocalReplyOnly: false,

@@ -5,6 +5,7 @@ import type { RefObject } from "react";
 import { CompanionCommunicationAnchor } from "@/components/companion/CompanionCommunicationAnchor";
 import { ArtifactActionBar } from "@/components/companion/ArtifactActionBar";
 import { CreateBuilderActionBar } from "@/components/companion/CreateBuilderActionBar";
+import { EstateWorkspaceOfferCard } from "@/components/companion/EstateWorkspaceOfferCard";
 import { PendingActionBar } from "@/components/companion/PendingActionBar";
 import type { ArtifactExportAction } from "@/lib/artifactType";
 import { getVoiceStatus } from "@/lib/companionStore";
@@ -32,13 +33,14 @@ type Props = {
   onInputChange: (value: string) => void;
   onKeyDown: (event: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onToggleListening: () => void;
-  onSend: () => void;
+  onSend: (overrideText?: string) => void;
   pendingAction: PendingAction | null;
   suppressInterventionCards: boolean;
   onRunArtifactExport: (action: ArtifactExportAction) => void;
   onClearPendingOffers: () => void;
   onDismissOfferKeepTalking: () => void;
   onExecutePendingAction: (action: PendingAction) => void;
+  onShowEstateMap?: () => void;
   splitCreateBuilder: boolean;
   createBuilderSession: CreateBuilderSession | null;
   onCreateBuilderAction: (action: CreateBuilderAction) => void;
@@ -47,6 +49,8 @@ type Props = {
   onToggleVoiceOutput: () => void;
   onVoiceBlockedReset: () => void;
   ttsAudioRef: RefObject<HTMLAudioElement | null>;
+  /** Welcome Home — no footer gradient slab; softer voice hint copy. */
+  welcomeHome?: boolean;
 };
 
 /** Home chat on static homestead — floating input footer, not Companion Desk. */
@@ -69,6 +73,7 @@ export function HomeChatInputFooter({
   onClearPendingOffers,
   onDismissOfferKeepTalking,
   onExecutePendingAction,
+  onShowEstateMap,
   splitCreateBuilder,
   createBuilderSession,
   onCreateBuilderAction,
@@ -77,10 +82,31 @@ export function HomeChatInputFooter({
   onToggleVoiceOutput,
   onVoiceBlockedReset,
   ttsAudioRef,
+  welcomeHome = false,
 }: Props) {
   return (
-    <footer className="companion-home-input-footer input-footer companion-fade-in shrink-0 px-4 pb-4 pt-2 sm:px-6">
-      {pendingAction && !suppressInterventionCards && !isLoading && !homeCalm ? (
+    <footer
+      className={`companion-home-input-footer input-footer companion-fade-in shrink-0 ${
+        welcomeHome ? "" : "px-4 pb-4 pt-2 sm:px-6"
+      }`}
+    >
+      {welcomeHome &&
+      pendingAction?.kind === "workspace" &&
+      !isLoading &&
+      !homeCalm ? (
+        <EstateWorkspaceOfferCard
+          offer={pendingAction.offer}
+          onAccept={() => onExecutePendingAction(pendingAction)}
+          onStayHere={() => {
+            onClearPendingOffers();
+            onDismissOfferKeepTalking();
+          }}
+          onShowMap={() => {
+            onClearPendingOffers();
+            onShowEstateMap?.();
+          }}
+        />
+      ) : pendingAction && !suppressInterventionCards && !isLoading && !homeCalm ? (
         pendingAction.kind === "artifact-export" ? (
           <ArtifactActionBar
             artifactType={pendingAction.offer.artifactType}
@@ -136,11 +162,15 @@ export function HomeChatInputFooter({
               if (!vs.hasVoice) {
                 return (
                   <span
-                    title="Voice Pro includes natural back-and-forth conversations"
-                    className="companion-chat-voice-hint rounded-full bg-white/70 px-3 py-1 text-xs"
+                    title="Enable voice conversations in Settings"
+                    className={`companion-chat-voice-hint text-xs ${
+                      welcomeHome
+                        ? "text-[#6b635a]"
+                        : "rounded-full bg-white/70 px-3 py-1"
+                    }`}
                   >
                     <span aria-hidden="true">✦ </span>
-                    Voice conversations available with Voice Pro
+                    Voice conversations available in Settings
                   </span>
                 );
               }

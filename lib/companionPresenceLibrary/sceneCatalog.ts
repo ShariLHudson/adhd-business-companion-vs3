@@ -15,7 +15,8 @@ export type CompanionPresenceSceneTag =
   | "creative"
   | "planning"
   | "winddown"
-  | "family";
+  | "family"
+  | "estate";
 
 export type CompanionPresenceTimeOfDay =
   | "morning"
@@ -55,11 +56,11 @@ function scene(
  */
 export const COMPANION_PRESENCE_SCENE_CATALOG: CompanionPresenceLibraryEntry[] = [
   {
-    id: "welcome-home-room-background",
-    label: "Welcome Home Room",
-    relativePath: "backgrounds/welcome-home-room-background.jpeg",
+    id: "welcome-home-background",
+    label: "Welcome Home — Spark Estate Foyer",
+    relativePath: "backgrounds/welcome-home-background.png",
     surfaces: ["chat-welcome"],
-    tags: ["welcome", "gentle", "morning", "afternoon", "evening"],
+    tags: ["welcome", "gentle", "morning", "afternoon", "evening", "estate"],
     timeOfDay: ["morning", "afternoon", "evening", "night"],
     welcomeHero: true,
   },
@@ -158,7 +159,7 @@ export const COMPANION_PRESENCE_SCENE_CATALOG: CompanionPresenceLibraryEntry[] =
   }),
 ];
 
-export const COMPANION_PRESENCE_WELCOME_IMAGE_ID = "welcome-home-room-background";
+export const COMPANION_PRESENCE_WELCOME_IMAGE_ID = "welcome-home-background";
 
 /** Approved evening hero — lamplight from the room, not the window. */
 export const COMPANION_PRESENCE_EVENING_WELCOME_IMAGE_ID = "shari-evening-winddown";

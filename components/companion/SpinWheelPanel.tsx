@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   addXp,
   getBrainDumps,
@@ -73,9 +73,13 @@ const btnSecondary =
 export function SpinWheelPanel({
   onOpen,
   onAsk,
+  autoSpinWhenReady = false,
+  onAutoSpinStarted,
 }: {
   onOpen?: (s: AppSection) => void;
   onAsk?: (prompt: string) => void;
+  autoSpinWhenReady?: boolean;
+  onAutoSpinStarted?: () => void;
 }) {
   const [pool, setPool] = useState<PoolItem[]>([]);
   const [result, setResult] = useState<PoolItem | null>(null);
@@ -84,6 +88,7 @@ export function SpinWheelPanel({
   const [resultPhase, setResultPhase] = useState<ResultPhase>("actions");
   const [celebrating, setCelebrating] = useState(false);
   const [showPicker, setShowPicker] = useState(false);
+  const autoSpinStartedRef = useRef(false);
 
   useEffect(() => {
     const bd = getBrainDumps().filter(isVisibleInMentalLandscape);
@@ -141,6 +146,17 @@ export function SpinWheelPanel({
       setSpinning(false);
     }, dur);
   }
+
+  useEffect(() => {
+    if (!autoSpinWhenReady) {
+      autoSpinStartedRef.current = false;
+      return;
+    }
+    if (autoSpinStartedRef.current || pool.length === 0) return;
+    autoSpinStartedRef.current = true;
+    spin();
+    onAutoSpinStarted?.();
+  }, [autoSpinWhenReady, pool.length, onAutoSpinStarted]);
 
   function pickFromList(item: PoolItem) {
     setResult(item);

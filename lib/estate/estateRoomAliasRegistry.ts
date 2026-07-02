@@ -124,11 +124,15 @@ export const ESTATE_ROOM_ALIAS_REGISTRY: readonly EstateRoomAliasEntry[] = [
     "stable",
     "the stable",
   ], "stables", "reflection"),
-  entry("gardens", "The Gardens™", [
+  entry("gardens", "Celebration Garden™", [
     "gardens",
     "the gardens",
+    "celebration garden",
+    "the celebration garden",
     "garden",
     "the garden",
+    "my wins",
+    "wins this week",
   ], "wins-this-week", "nature"),
   entry("greenhouse", "Greenhouse™", [
     "greenhouse",
@@ -147,11 +151,13 @@ export const ESTATE_ROOM_ALIAS_REGISTRY: readonly EstateRoomAliasEntry[] = [
     "the library",
     "story library",
   ], "growth-library", "learning"),
-  entry("journal", "Journal™", [
+  entry("journal", "Journal Gazebo™", [
     "journal",
     "growth journal",
     "the journal",
     "my journal",
+    "journal gazebo",
+    "the journal gazebo",
     "gazebo",
     "the gazebo",
     "gazebo journal",
@@ -235,6 +241,12 @@ export const ESTATE_ROOM_ALIAS_REGISTRY: readonly EstateRoomAliasEntry[] = [
     "momentum builder",
     "the momentum builder",
   ], "momentum-builder", "planning"),
+  entry("celebration-room", "Celebration Hall™", [
+    "celebration room",
+    "the celebration room",
+    "celebration hall",
+    "the celebration hall",
+  ], "growth-reports", "archive"),
 ] as const;
 
 const ALIAS_REGISTRY_BY_ROOM_ID = new Map(

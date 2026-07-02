@@ -32,6 +32,26 @@ The rooms are where the experiences happen.
 
 ---
 
+## The Conversation Front Door™
+
+**Governing architectural rule** — every room, tool, and future destination inherits this.
+
+> If a member can accomplish something by talking to Spark, they should never have to hunt through the Estate to find it.
+
+- **Conversation is the front door.** Members describe what they need; Spark helps.
+- **Rooms are destinations for depth.** Immersive environments when focus, atmosphere, or dedicated workspace genuinely helps — never required just to begin.
+- **The Estate enriches conversation.** It does not replace it.
+
+As the Estate grows to dozens of rooms and hundreds of capabilities, Spark stays simple because members never need a mental map to get started.
+
+**Design gate:** Would a first-time visitor need to know this room's name to succeed? If yes — the feature is not finished.
+
+**Routing:** [Estate Intelligence™](./ESTATE_INTELLIGENCE_FRAMEWORK.md) · **Language:** [Spec 108](./SPARK_ENVIRONMENT_INTEGRATION_FRAMEWORK.md) — invitations, not navigation commands.
+
+**Code:** `CONVERSATION_FRONT_DOOR_PRINCIPLE` · `CONVERSATION_FRONT_DOOR_GATE` in `lib/sparkEstateRooms/types.ts`
+
+---
+
 ## Core Philosophy
 
 People think differently depending on their environment.
@@ -241,7 +261,30 @@ Every room should immediately answer:
 
 No instructions should be required.
 
-The environment should communicate **purpose**.
+The environment should communicate **purpose** through atmosphere and action — not exposition.
+
+---
+
+## Do the thing — never explain the room
+
+**Estate-wide design standard (Spark Estate™).**
+
+No room opens by defining itself.
+
+| Wrong | Right |
+|-------|-------|
+| "A momentum builder is…" | "Let's figure out the easiest way to move forward today." |
+| "Would you like to learn about the Observatory?" | Begin observing — one thoughtful question |
+| "The Library is where you…" | Offer the book, topic, or insight the member needs |
+| "The Conservatory is…" | Start the conversation the room exists for |
+
+Members arrive to **move forward**, not to learn what a room is called.
+
+**Test:** If a first-time visitor learns a definition or framework name before they get help, the room has failed.
+
+Teaching belongs in the **Library**, **Business Mastery Minutes**, or when the member explicitly asks — never in the arrival moment.
+
+Aligns with [Spec 108 Environment Integration](./SPARK_ENVIRONMENT_INTEGRATION_FRAMEWORK.md) · [T-012 Momentum Builder Room](./MOMENTUM_BUILDER_ROOM_ARCHITECTURE.md).
 
 ---
 
@@ -259,6 +302,8 @@ Every room should:
 The room itself should reduce executive function demands.
 
 Aligns with [Spec 103](./UNIVERSAL_EXPERIENCE_STANDARDS_FRAMEWORK.md) Executive Function First.
+
+**Estate routing:** [Estate Intelligence™](./ESTATE_INTELLIGENCE_FRAMEWORK.md) — Spark leads with the Estate before generic AI answers.
 
 ---
 

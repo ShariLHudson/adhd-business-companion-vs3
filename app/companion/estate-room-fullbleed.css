@@ -1,0 +1,142 @@
+/* Full-bleed estate room plates — photographic scenes own the viewport */
+
+.estate-room-fullbleed-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  min-width: 100%;
+  min-height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+  object-position: center center;
+  z-index: 0;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* In-room home control — fixed upper-left on every estate room */
+.estate-immersive-home-link {
+  position: fixed;
+  top: max(0.85rem, env(safe-area-inset-top, 0px));
+  left: max(0.85rem, env(safe-area-inset-left, 0px));
+  z-index: 100001;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.72rem 0.42rem 0.58rem;
+  border: 1px solid rgba(255, 248, 235, 0.38);
+  border-radius: 999px;
+  background: rgba(18, 14, 10, 0.48);
+  color: rgba(255, 248, 235, 0.94);
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.2;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+  pointer-events: auto;
+}
+
+.estate-immersive-home-link:hover {
+  background: rgba(28, 22, 16, 0.62);
+}
+
+.estate-immersive-home-link:focus-visible {
+  outline: 2px solid rgba(255, 236, 200, 0.85);
+  outline-offset: 2px;
+}
+
+.estate-immersive-home-link__arrow {
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0.92;
+}
+
+.companion-stables-root,
+.companion-momentum-institute-root,
+.companion-momentum-builder-root,
+.companion-growth-profile-root {
+  background: transparent !important;
+}
+
+.companion-stables-active > .relative.flex.min-h-0,
+.companion-momentum-institute-active > .relative.flex.min-h-0 {
+  background: transparent;
+}
+
+.companion-stables-active .estate-room-main {
+  background: transparent !important;
+}
+
+.stables-room--direct-arrival .stables-experience-rail,
+.stables-room--direct-arrival .stables-arrival-plaque,
+.stables-room--direct-arrival .stables-room__presence {
+  display: none !important;
+}
+
+/* ——— Estate room chrome (frosted chat + sound toggle) ——— */
+/* Upper-right below profile menu — bottom-right reserved for Estate Guide */
+.estate-room-ambience-toggle {
+  position: fixed;
+  top: calc(max(0.85rem, env(safe-area-inset-top, 0px)) + 3.35rem);
+  right: max(0.85rem, env(safe-area-inset-right, 0px));
+  z-index: 100001;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.72rem 0.42rem 0.58rem;
+  border: 1px solid rgba(255, 248, 235, 0.38);
+  border-radius: 999px;
+  background: rgba(18, 14, 10, 0.48);
+  color: rgba(255, 248, 235, 0.94);
+  font-size: 0.88rem;
+  font-weight: 500;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+  pointer-events: auto;
+}
+
+.estate-room-ambience-toggle:hover {
+  background: rgba(28, 22, 16, 0.62);
+}
+
+.estate-room-ambience-toggle:focus-visible {
+  outline: 2px solid rgba(255, 236, 200, 0.85);
+  outline-offset: 2px;
+}
+
+.estate-room-ambience-toggle__icon {
+  font-size: 1rem;
+  line-height: 1;
+  opacity: 0.92;
+}
+
+.estate-chat-navigation-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.estate-chat-navigation-overlay__vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 94% 90% at 48% 44%,
+    transparent 38%,
+    rgba(18, 14, 10, 0.28) 100%
+  );
+}
+
+.estate-chat-navigation-overlay__chat-panel,
+.estate-chat-navigation-overlay .estate-room-frosted-chat {
+  pointer-events: auto;
+  z-index: 40;
+}

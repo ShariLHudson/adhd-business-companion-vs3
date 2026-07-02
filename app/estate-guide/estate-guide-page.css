@@ -1,0 +1,81 @@
+/* Estate Guide — page shell */
+
+.eg-guide-route {
+  min-height: 100dvh;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  background:
+    radial-gradient(ellipse 120% 80% at 50% 0%, rgba(255, 252, 246, 0.55), transparent 55%),
+    linear-gradient(165deg, #c9bfb0 0%, #b8ab9a 45%, #a89b8c 100%);
+}
+
+.eg-guide-route__inner {
+  max-width: 90rem;
+  margin: 0 auto;
+}
+
+.eg-guide-route__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgba(201, 166, 107, 0.35);
+  border-radius: 0.5rem;
+  background: rgba(250, 246, 238, 0.9);
+  font-family: system-ui, sans-serif;
+  font-size: 0.95rem;
+  color: #3a3632;
+}
+
+.eg-guide-route__nav a {
+  color: #1a4a47;
+}
+
+.eg-guide-route__brand {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.eg-guide-cover {
+  display: block;
+  width: 3.5rem;
+  height: auto;
+  border-radius: 0.15rem;
+  box-shadow:
+    0 2px 6px rgba(26, 36, 34, 0.18),
+    0 0 0 1px rgba(201, 166, 107, 0.25);
+  flex-shrink: 0;
+}
+
+.eg-guide-route__cover {
+  width: clamp(3.25rem, 8vw, 4.25rem);
+}
+
+.eg-guide-route__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #5c5650;
+}
+
+.eg-guide-route__title {
+  margin: 0.15rem 0 0;
+  font-family: Georgia, serif;
+  font-size: 1.1rem;
+  color: #1a4a47;
+}
+
+@media print {
+  .eg-guide-route__nav {
+    display: none;
+  }
+
+  .eg-guide-route {
+    padding: 0;
+    background: #fff;
+  }
+}

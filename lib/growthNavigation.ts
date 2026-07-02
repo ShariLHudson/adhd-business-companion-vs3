@@ -14,7 +14,9 @@ export const GROWTH_PANEL_SECTIONS: AppSection[] = [
   "confidence-vault",
   "my-journey",
   "growth-journal",
+  "growth-greenhouse",
   "growth-portfolio",
+  "user-memory",
 ];
 
 export function isGrowthPanelSection(
@@ -68,19 +70,19 @@ export const GROWTH_SECTION_META: Record<
   },
   "growth-library": {
     objectId: "growth",
-    title: "My Story Library",
-    subtitle: "Return to any place your story lives.",
+    title: "Achievement Library",
+    subtitle: "Your achievements on the shelf — browse what you've built.",
   },
   "growth-reports": {
     objectId: "growth",
-    title: "Create Your Storybook",
+    title: "Celebration Hall",
     subtitle:
-      "Choose the chapters of your journey you'd like to include. Spark will craft them into a beautiful keepsake of your story.",
+      "Honor what matters — milestones and celebrations gathered in one quiet hall.",
   },
   "wins-this-week": {
     objectId: "wins",
     title: "Celebration Garden",
-    subtitle: "Wins, milestones, and moments worth remembering.",
+    subtitle: "Celebrations, milestones, and moments worth remembering.",
   },
   "evidence-bank": {
     objectId: "evidence-bank",
@@ -101,13 +103,13 @@ export const GROWTH_SECTION_META: Record<
   },
   "growth-journal": {
     objectId: "journal",
-    title: "Journal",
-    subtitle: "Private reflections and thoughts.",
+    title: "Journal Gazebo",
+    subtitle: "Private reflections in a quiet outdoor nook.",
   },
   "growth-portfolio": {
     objectId: "create",
-    title: "Creative Studio",
-    subtitle: "Projects, courses, campaigns, and creative work.",
+    title: "Achievement Library",
+    subtitle: "Achievements and work worth keeping on the shelf.",
   },
 };
 
@@ -115,12 +117,12 @@ export const GROWTH_CROSS_LINKS: {
   id: GrowthSectionId;
   label: string;
 }[] = [
-  { id: "wins-this-week", label: "Open Wins" },
-  { id: "evidence-bank", label: "Open Evidence" },
+  { id: "wins-this-week", label: "Open Celebration Garden" },
+  { id: "evidence-bank", label: "Open Evidence Vault" },
   { id: "confidence-vault", label: "Open Highlights" },
   { id: "my-journey", label: "Open Journey" },
-  { id: "growth-journal", label: "Open Journal" },
-  { id: "growth-portfolio", label: "Open Portfolio" },
+  { id: "growth-journal", label: "Open Journal Gazebo" },
+  { id: "growth-portfolio", label: "Open Achievement Library" },
 ];
 
 export type GrowthPanelNav = {

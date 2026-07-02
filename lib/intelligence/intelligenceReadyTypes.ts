@@ -35,7 +35,14 @@ export type EcosystemObjectKind =
   | "capture-session"
   | "founder-event"
   | "intelligence-signal"
-  | "business-asset";
+  | "business-asset"
+  | "knowledge-card"
+  | "institute-learning-experience"
+  | "institute-cabinet-item"
+  | "institute-growth-profile"
+  | "institute-evidence-opportunity"
+  | "institute-coaching-conversation"
+  | "institute-make-it-mine";
 
 /** Engines that may enrich objects over time — registry keys. */
 export type IntelligenceEngineId =
@@ -61,6 +68,8 @@ export type IntelligenceEngineId =
   | "environment"
   | "momentum"
   | "loop"
+  | "momentum-institute"
+  | "business-brain-knowledge-os"
   | "clear-my-mind"
   | "ecosystem"
   | "trust"

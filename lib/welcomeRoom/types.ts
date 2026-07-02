@@ -1,8 +1,14 @@
-/** Permanent room — not settings, not marketing. */
-export const WELCOME_HOME_ROOM_BACKGROUND =
-  "/backgrounds/welcome-home-room-background.jpeg" as const;
+/** Bump when `welcome-home-background.png` is replaced so browsers fetch the fresh file. */
+export const WELCOME_HOME_BACKGROUND_VERSION = "20260630d" as const;
 
-export const WELCOME_ROOM_ASSET = WELCOME_HOME_ROOM_BACKGROUND;
+/** Permanent room — not settings, not marketing. */
+export const WELCOME_HOME_BACKGROUND =
+  `/backgrounds/welcome-home-background.png?v=${WELCOME_HOME_BACKGROUND_VERSION}` as const;
+
+/** @deprecated Use WELCOME_HOME_BACKGROUND */
+export const WELCOME_HOME_ROOM_BACKGROUND = WELCOME_HOME_BACKGROUND;
+
+export const WELCOME_ROOM_ASSET = WELCOME_HOME_BACKGROUND;
 
 export type WelcomeRoomSectionId =
   | "welcome"

@@ -8824,12 +8824,21 @@
   }
 }
 
-/* ── Login background (shari-login) — homestead lighting layers ── */
+/* ── Login background (login-welcome-background) — uniform photograph ── */
+
+.companion-login-page--welcome-bg {
+  background: transparent;
+}
 
 .companion-login-scene {
   position: absolute;
   inset: 0;
   overflow: hidden;
+}
+
+.companion-login-scene__photo {
+  position: absolute;
+  inset: 0;
 }
 
 .companion-login-scene__base {
@@ -8838,19 +8847,38 @@
   height: 100%;
   width: 100%;
   object-fit: cover;
-  object-position: 62% 42%;
+  object-position: center center;
 }
 
-@media (min-width: 640px) {
-  .companion-login-scene__base {
-    object-position: 55% 40%;
-  }
+.companion-login-scene--full-exposure .companion-login-scene__base {
+  object-fit: cover;
+  object-position: center center;
+  filter: brightness(1.05) saturate(1.1) contrast(1.03);
+  transform: scale(1.02);
+  transform-origin: center center;
 }
 
-@media (min-width: 768px) {
-  .companion-login-scene__base {
-    object-position: center;
-  }
+.companion-login-scene__base--right-balance {
+  filter: brightness(1.1) saturate(1.2) contrast(1.06);
+  transform: scale(1.02);
+  transform-origin: center center;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 34%,
+    rgba(0, 0, 0, 0.25) 44%,
+    rgba(0, 0, 0, 0.72) 54%,
+    #000 66%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    transparent 34%,
+    rgba(0, 0, 0, 0.25) 44%,
+    rgba(0, 0, 0, 0.72) 54%,
+    #000 66%
+  );
+  pointer-events: none;
 }
 
 .companion-login-scene__soften {
@@ -8944,6 +8972,7 @@
 .companion-growth-active .clear-my-mind-standalone-frame:has(.capture-moment-room),
 .companion-growth-active .clear-my-mind-standalone-frame:has(.creative-studio-room),
 .companion-growth-active .clear-my-mind-standalone-frame:has(.evidence-vault-room),
+.companion-growth-active .clear-my-mind-standalone-frame:has(.portfolio-room),
 .companion-growth-active .clear-my-mind-standalone-frame:has(.celebration-garden-room) {
   position: relative;
   overflow: hidden;

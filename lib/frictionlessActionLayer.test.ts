@@ -5,6 +5,7 @@ import {
   frictionlessHintForChat,
   isFrictionlessAffirmation,
   loadFrictionlessPending,
+  loadFrictionlessPendingForConfirmation,
   resolveFrictionlessAction,
   resolveFrictionlessContinuation,
   saveFrictionlessPending,
@@ -23,6 +24,16 @@ describe("frictionlessActionLayer", () => {
     });
     clearFrictionlessPending();
     vi.restoreAllMocks();
+  });
+
+  it("routes pleasure places music to focus audio confirmation offer", () => {
+    const decision = resolveFrictionlessAction({
+      userText: "Can you take me to the pleasure places music?",
+      currentTurn: 1,
+    });
+    expect(decision.localReply).toMatch(/Focus Audio/i);
+    expect(decision.localReply).toMatch(/Want me to open it\?/i);
+    expect(decision.pendingAction?.target).toBe("focus-audio");
   });
 
   it("routes I need to focus to focus_support with relationship suppressed", () => {
@@ -45,12 +56,23 @@ describe("frictionlessActionLayer", () => {
       userText: "I am anxious and can't catch my breath",
     });
     expect(decision.category).toBe("emotional_regulation");
-    expect(decision.suppressRelationship).toBe(true);
-    expect(decision.localReply).toMatch(/slow this down|breath/i);
+    expect(decision.suppressReflectionFirst).toBe(false);
     expect(decision.localReply).not.toMatch(/plan my day|productivity|business/i);
+    expect(decision.localReply).not.toMatch(/let's break/i);
     const hint = frictionlessHintForChat(decision);
-    expect(hint).toMatch(/EMOTIONAL REGULATION/i);
-    expect(hint).toMatch(/No productivity/i);
+    expect(hint).toMatch(/SHARI COMPANION ENGINE|emotion before instruction/i);
+  });
+
+  it("routes difficult client call to Shari emotional-first local reply", () => {
+    const decision = resolveFrictionlessAction({
+      userText:
+        "I need to make a call to a difficult client but I don't want to do it.",
+    });
+    expect(decision.category).toBe("emotional_regulation");
+    expect(decision.suppressReflectionFirst).toBe(false);
+    expect(decision.localReply).toMatch(/boundary conversation/i);
+    expect(decision.localReply).toMatch(/practice/i);
+    expect(decision.localReply).not.toMatch(/break (?:this |it )?down/i);
   });
 
   it("creates pending Focus Audio action for calming music requests", () => {
@@ -138,6 +160,40 @@ describe("frictionlessActionLayer", () => {
     expect(decision.category).toBe("decision_support");
     expect(decision.suppressRelationship).toBe(true);
     expect(decision.workspaceOffer?.section).toBe("decision-compass");
+  });
+
+  it("prefers awaiting confirmation pending over misaligned localStorage", () => {
+    saveFrictionlessPending({
+      type: "open_tool",
+      target: "brain-dump",
+      context: "Clear My Mind",
+      offeredAtTurn: 1,
+      offerSummary: "Clear My Mind",
+    });
+    const awaiting = {
+      type: "open_tool" as const,
+      target: "focus-audio" as const,
+      context: "background audio",
+      focusAudioCategory: "focus",
+      offeredAtTurn: 5,
+      offerSummary: "Focus Audio — background audio",
+    };
+    const assistant =
+      "I can open Focus Audio for background audio. Want me to open it?";
+    const loaded = loadFrictionlessPendingForConfirmation({
+      confirmationReply: true,
+      awaitingPending: awaiting,
+      lastAssistantText: assistant,
+      currentTurn: 6,
+    });
+    expect(loaded?.target).toBe("focus-audio");
+    const cont = resolveFrictionlessContinuation(
+      "yes",
+      loaded!,
+      6,
+      assistant,
+    );
+    expect(cont?.execute).toBe(true);
   });
 
   it("keeps learn fast path out of direct_action execute override", () => {

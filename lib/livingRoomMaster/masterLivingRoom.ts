@@ -3,7 +3,7 @@
  * Time of day is expressed through homestead lighting on this scene, not photo swaps.
  */
 
-export const MASTER_LIVING_ROOM_IMAGE_ID = "welcome-home-room-background";
+export const MASTER_LIVING_ROOM_IMAGE_ID = "welcome-home-background";
 
 /** When true, the welcome scene shows only the master photograph + linen UI. */
 export const MASTER_LIVING_ROOM_COMPOSITION_LOCKED = true;

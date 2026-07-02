@@ -176,16 +176,15 @@ const PHRASE_RULES: readonly PhraseRule[] = [
     reason: "overwhelm/peace → restorative places",
   },
 
-  // ── Play / swimming ──
+  // ── Play / swimming (pool planned — water alternatives only) ──
   {
     id: "play-swimming",
-    pattern: /\b(?:let(?:'s| us) go swimming|go swimming|want to swim|go for a swim|take a swim|swimming pool|the pool)\b/i,
+    pattern: /\b(?:let(?:'s| us) go swimming|go swimming|want to swim|go for a swim|take a swim)\b/i,
     needId: "play",
-    mode: "invite",
-    placeIds: ["game-room"],
-    primaryPlaceId: "game-room",
+    mode: "suggest",
+    placeIds: ["seat-at-pond", "peaceful-places"],
     confidence: "medium",
-    reason: "swim intent → game room (interim until swimming-pool place registers)",
+    reason: "swim intent → pool not live; nearby water/restorative places",
   },
 
   // ── Celebrate / course finished ──

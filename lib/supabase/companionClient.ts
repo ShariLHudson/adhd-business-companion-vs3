@@ -44,6 +44,20 @@ export function hydrateCompanionAuthFromInlineConfig(): boolean {
   return true;
 }
 
+/** Client bootstrap from server layout — replaces inline script tags. */
+export function seedCompanionSupabaseInlineConfig(
+  url: string,
+  key: string,
+): boolean {
+  if (typeof window === "undefined") return false;
+  if (!url || !key || !isBrowserSafeSupabaseKey(key)) return false;
+  if (!url.includes(".supabase.co")) return false;
+  const normalizedUrl = url.replace(/\/$/, "");
+  window.__COMPANION_SUPABASE__ = { url: normalizedUrl, key };
+  applyRuntimeConfig(normalizedUrl, key);
+  return true;
+}
+
 if (typeof window !== "undefined") {
   hydrateCompanionAuthFromInlineConfig();
 }

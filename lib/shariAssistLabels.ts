@@ -27,6 +27,7 @@ const SECTION_LABELS: Partial<Record<AppSection, string>> = {
   "templates-library": "Build With Shari",
   snippets: "Use With Shari",
   "how-do-i": "Learn With Shari",
+  "momentum-institute": "Explore With Shari",
   "spin-wheel": "Decide With Shari",
   "time-block": "Focus With Shari",
 };

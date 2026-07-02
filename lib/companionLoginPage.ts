@@ -3,7 +3,7 @@
  */
 
 /** Bump when `login-welcome-background.png` is replaced so browsers fetch the fresh file. */
-export const COMPANION_LOGIN_BACKGROUND_VERSION = "20260630a" as const;
+export const COMPANION_LOGIN_BACKGROUND_VERSION = "20260630b" as const;
 
 export const COMPANION_LOGIN_BACKGROUND =
   `/backgrounds/login-welcome-background.PNG?v=${COMPANION_LOGIN_BACKGROUND_VERSION}` as const;

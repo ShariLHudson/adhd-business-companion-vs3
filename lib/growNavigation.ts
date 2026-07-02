@@ -38,10 +38,9 @@ export const GROW_SECTION_META: Record<
       "Strengthen your thinking, sharpen your skills, and build real entrepreneurial capability through guided experiences designed for your business.",
   },
   "grow-momentum-builders": {
-    objectId: "momentum-builders",
-    title: "Momentum Builders",
-    lead:
-      "Practice the thinking, decisions, and skills that help you become a stronger entrepreneur.",
+    objectId: "momentum-builder-room",
+    title: "Momentum Builder™",
+    lead: "Find the easiest way to move forward today.",
   },
   "grow-spark-cards": {
     objectId: "spark-cards",

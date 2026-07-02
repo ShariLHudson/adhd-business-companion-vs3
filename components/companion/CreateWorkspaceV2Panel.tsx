@@ -25,6 +25,10 @@ import {
   workspaceV2HasBuildableContent,
   workspaceV2Sections,
 } from "@/lib/createWorkspaceV2";
+import {
+  FACILITATED_SECTION_STATUS_LABELS,
+  resolveFacilitatedSectionStatus,
+} from "@/lib/facilitatedCreation";
 
 const SECTION_FIELD_CLS =
   "min-h-[7rem] w-full flex-1 resize-y rounded-xl border border-[#d4cdc3] bg-white px-4 py-3 text-base leading-relaxed text-[#1f1c19] whitespace-pre-wrap outline-none focus:border-[#1e4f4f] focus:ring-2 focus:ring-[#1e4f4f]/10";
@@ -90,6 +94,7 @@ function SectionCard({
   onDragLeave,
   onDrop,
   onDragEnd,
+  sectionStatus,
 }: {
   section: ReturnType<typeof workspaceV2Sections>[number];
   index: number;
@@ -98,6 +103,7 @@ function SectionCard({
   isDragTarget: boolean;
   isHighlighted: boolean;
   highlightStamp: number;
+  sectionStatus: string;
   onContentChange: (content: string) => void;
   onNeedIdeas: () => void;
   onToggleSkipped: () => void;
@@ -197,6 +203,9 @@ function SectionCard({
               </button>
             )}
             <div className="flex flex-wrap items-center gap-1">
+              <span className="rounded-full border border-[#e7dfd4] bg-[#faf7f2] px-2 py-0.5 text-[0.65rem] font-semibold uppercase tracking-wide text-[#6b635a]">
+                {sectionStatus}
+              </span>
               <button
                 type="button"
                 data-no-drag
@@ -401,10 +410,10 @@ export function CreateWorkspaceV2Panel({
           )}
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-[#6b635a]">
-          Type or paste into each section — as much as you need. Chat can brainstorm
-          beside you; copy anything you like into these boxes. When you&apos;re ready,
+          Sections start empty — we shape them together. Chat can brainstorm beside you;
+          only what you add fills each box. When you&apos;re ready,
           <span className="font-semibold text-[#1f1c19]"> Build Draft</span> turns your
-          notes into a polished piece you can edit, print, or export anytime.
+          notes into a working draft you can keep shaping, print, or export.
         </p>
         <p className="mt-1 text-xs text-[#9a8f82]">
           {filledCount} of {sections.length} sections have content or are N/A · drag a
@@ -423,6 +432,11 @@ export function CreateWorkspaceV2Panel({
               isHighlighted={highlightSectionId === section.id}
               highlightStamp={
                 highlightSectionId === section.id ? highlightKey : 0
+              }
+              sectionStatus={
+                FACILITATED_SECTION_STATUS_LABELS[
+                  resolveFacilitatedSectionStatus(section, workflow)
+                ]
               }
               onContentChange={(content) =>
                 onWorkflowChange(

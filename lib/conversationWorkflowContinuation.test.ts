@@ -147,6 +147,19 @@ describe("conversationWorkflowContinuation", () => {
     }
   });
 
+  it("opens focus audio after yes to open offer", () => {
+    const assistant =
+      "I can open Focus Audio for background audio. Want me to open it?";
+    const workflow = createConversationWorkflow(assistant, 3);
+    expect(workflow?.kind).toBe("open_focus_audio");
+    const result = resolveWorkflowFromLastAssistant("yes", assistant, 4);
+    expect(result?.action).toBe("open_tool");
+    if (result?.action === "open_tool") {
+      expect(result.tool).toBe("focus-audio");
+      expect(result.message).toMatch(/Opening.*Focus Audio/i);
+    }
+  });
+
   it("does not treat unrelated yes as workflow acceptance", () => {
     const result = resolveWorkflowFromLastAssistant(
       "sure",

@@ -1,4 +1,5 @@
 import { CompanionAuthProvider } from "@/components/companion/CompanionAuthProvider";
+import { CompanionAuthInlineBootstrap } from "@/components/companion/CompanionAuthInlineBootstrap";
 import { CompanionLanguageProvider } from "@/components/companion/CompanionLanguageProvider";
 import { CompanionPhotoProvider } from "@/lib/companionPhotoProvider";
 import { LiveEcosystemInit } from "@/components/companion/LiveEcosystemInit";
@@ -26,15 +27,29 @@ import "./companion-desk.css";
 import "./companion-chat.css";
 import "./plan-day-experience.css";
 import "./growth-story-hub.css";
+import "./welcome-home-first-launch.css";
+import "./momentum-builder-room.css";
+import "./momentum-institute-drawer-wall.css";
+import "./stables-room.css";
+import "./estate-immersive.css";
+import "./estate-room-fullbleed.css";
+import "./estate-room-frosted-chat.css";
+import "./estate-audio-settings.css";
+import "./estate-room-invitation.css";
+import "./estate-room-template.css";
+import "./estate-presence.css";
+import "./global-estate-menu.css";
+import "./spark-estate-guide.css";
+import "./companion-chat-surface.css";
+import "./companion-layout-layers.css";
 
 export const dynamic = "force-dynamic";
 
-function companionAuthBootstrapScript(): string | null {
+function companionInlineAuthConfig(): { url: string; anonKey: string } | null {
   const { url, key } = resolveCompanionSupabaseEnv();
   if (!url || !key || !isBrowserSafeSupabaseKey(key)) return null;
   if (!url.includes(".supabase.co")) return null;
-  const payload = JSON.stringify({ url: url.replace(/\/$/, ""), key });
-  return `window.__COMPANION_SUPABASE__=${payload};`;
+  return { url: url.replace(/\/$/, ""), anonKey: key };
 }
 
 export default function CompanionLayout({
@@ -42,14 +57,14 @@ export default function CompanionLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const authBootstrap = companionAuthBootstrapScript();
+  const inlineAuth = companionInlineAuthConfig();
 
   return (
     <HomesteadSceneProvider>
-      {authBootstrap ? (
-        <script
-          id="companion-auth-bootstrap"
-          dangerouslySetInnerHTML={{ __html: authBootstrap }}
+      {inlineAuth ? (
+        <CompanionAuthInlineBootstrap
+          url={inlineAuth.url}
+          anonKey={inlineAuth.anonKey}
         />
       ) : null}
       <CompanionAuthProvider>

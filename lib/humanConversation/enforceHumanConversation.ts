@@ -3,7 +3,9 @@ import {
   containsForbiddenHumanConversationPhrase,
   extractLeadingSentence,
 } from "./forbiddenPatterns";
-import { pickCuriosityOpener } from "./curiosityIntelligence";
+import {
+  repairNumberedEstateRoomMenu,
+} from "../conversation/vagueOfferRepair";
 import {
   evaluateHumanConversationTwelveTests,
   type TwelveTestEvaluation,
@@ -46,34 +48,13 @@ const BODY_PHRASE_REPLACEMENTS: readonly [RegExp, string][] = [
   [/\byou just need to\b/gi, "there might be one gentler way in"],
   [/\bif you would\b/gi, "if you're open to it"],
   [/\bthe system detected\b/gi, "I've been noticing something"],
+  [/\bone effective way is\s*/gi, ""],
+  [/\bthis might help me suggest a better approach[.!]?\s*/gi, ""],
+  [/\bthis will help me provide the most relevant advice[.!]?\s*/gi, ""],
 ];
 
 const SHAME_SCRUB_RE =
   /\b(?:you should be able to|you just need to|if you would|why can't you|no excuses?|simply just)\b/gi;
-
-function replaceLeadingSentence(response: string, newLead: string): string {
-  const trimmed = response.trim();
-  const lead = newLead.trim();
-  if (!trimmed) return lead;
-
-  const paragraphs = trimmed.split(/\n\s*\n/);
-  if (paragraphs.length >= 2) {
-    const rest = paragraphs.slice(1).join("\n\n");
-    const tail = paragraphs[0]!.replace(/^[^.!?]+[.!?]+\s*/, "").trim();
-    if (tail) {
-      return `${lead} ${tail}\n\n${rest}`.trim();
-    }
-    return `${lead}\n\n${rest}`.trim();
-  }
-
-  const oldLead = extractLeadingSentence(trimmed);
-  if (oldLead && trimmed.startsWith(oldLead)) {
-    const remainder = trimmed.slice(oldLead.length).trim();
-    return remainder ? `${lead} ${remainder}`.trim() : lead;
-  }
-
-  return `${lead}\n\n${trimmed}`;
-}
 
 export function scrubForbiddenBodyPhrases(text: string): {
   text: string;
@@ -92,6 +73,30 @@ export function scrubForbiddenBodyPhrases(text: string): {
     out = out.replace(SHAME_SCRUB_RE, "there might be a gentler way in");
   }
   return { text: out, rewritten };
+}
+
+function stripForbiddenLeadingOpener(response: string): {
+  text: string;
+  stripped: boolean;
+} {
+  const trimmed = response.trim();
+  if (!trimmed) return { text: trimmed, stripped: false };
+
+  const opener = extractLeadingSentence(trimmed);
+  if (!opener || !detectForbiddenHumanConversationOpener(trimmed)) {
+    return { text: trimmed, stripped: false };
+  }
+
+  let remainder = trimmed;
+  if (trimmed.startsWith(opener)) {
+    remainder = trimmed.slice(opener.length).trim();
+  } else {
+    remainder = trimmed.replace(/^[^.!?]+[.!?]+\s*/, "").trim();
+  }
+
+  remainder = remainder.replace(/^\.{3}\s*/, "").trim();
+  if (!remainder) return { text: trimmed, stripped: false };
+  return { text: remainder, stripped: true };
 }
 
 export function detectHumanConversationViolation(
@@ -141,15 +146,28 @@ export function enforceHumanConversation(input: {
     rewritten = true;
   }
 
-  const violation = detectHumanConversationViolation(message);
-  if (violation) {
-    const seed =
-      input.seed ??
-      (input.userText?.length ?? 0) + violation.originalOpener.length;
-    const replacement = pickCuriosityOpener(seed, input.gentle);
-    message = replaceLeadingSentence(message, replacement);
+  for (let pass = 0; pass < 3; pass++) {
+    const violation = detectHumanConversationViolation(message);
+    if (!violation) break;
+    const stripped = stripForbiddenLeadingOpener(message);
+    if (!stripped.stripped) break;
+    message = stripped.text;
     rewritten = true;
   }
+
+  const bodyRescrub = scrubForbiddenBodyPhrases(message);
+  if (bodyRescrub.rewritten) {
+    message = bodyRescrub.text;
+    rewritten = true;
+  }
+
+  const menuRepair = repairNumberedEstateRoomMenu(message);
+  if (menuRepair !== message) {
+    message = menuRepair;
+    rewritten = true;
+  }
+
+  const violation = detectHumanConversationViolation(message);
 
   const twelveTests = evaluateHumanConversationTwelveTests({
     response: message,

@@ -26,11 +26,13 @@ describe("evaluateEstateTurn — phrase matrix (Phase 1)", () => {
     expect(turn.matchedRuleId).toBe("restore-somewhere-peaceful");
   });
 
-  it('"Let\'s go swimming" → play → invite → game-room (interim)', () => {
+  it('"Let\'s go swimming" → play → suggest water alternatives (pool not live)', () => {
     const turn = evaluateEstateTurn("Let's go swimming");
     expect(turn.needId).toBe("play");
-    expect(turn.mode).toBe("invite");
-    expect(turn.primaryPlaceId).toBe("game-room");
+    expect(turn.mode).toBe("suggest");
+    expect(turn.placeIds).toContain("seat-at-pond");
+    expect(turn.placeIds).toContain("peaceful-places");
+    expect(turn.placeIds).not.toContain("game-room");
     expect(turn.matchedRuleId).toBe("play-swimming");
   });
 
@@ -75,8 +77,9 @@ describe("PLACE_ID_ALIASES — additive resolution", () => {
     expect(resolvePlaceId("achievement-library")).toBe("library");
   });
 
-  it("resolves swimming-pool → game-room (interim)", () => {
-    expect(resolvePlaceId("swimming-pool")).toBe("game-room");
+  it("swimming-pool id is not aliased to game-room", () => {
+    expect(resolvePlaceId("swimming-pool")).toBe("swimming-pool");
+    expect(resolvePlaceId("pool")).toBe("pool");
   });
 
   it("preserves P0 celebration-garden → celebration-room", () => {

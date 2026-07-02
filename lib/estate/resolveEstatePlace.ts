@@ -29,11 +29,13 @@ import {
 import { toCanonicalEstatePlace } from "./directory";
 import { extractRoomPhraseFromNavigation } from "./estateRoomAliasRegistry";
 import { formatEstatePlaceSuggestionMenu } from "./estatePlaceIdentityLock";
+import { isCelebrationSoundsIntent } from "./estatePlaceNavigationIntents";
 
 export type EstatePlaceResolutionKind =
   | "exact-place"
   | "explicit-object"
   | "explicit-activity"
+  | "audio-settings"
   | "suggestion"
   | "none";
 
@@ -80,9 +82,15 @@ const EXPLICIT_OBJECT_RULES: {
     reason: "explicit object → Accomplishments Book™",
   },
   {
-    pattern: /\b(?:celebration\s+room|celebration\s+garden|open\s+(?:the\s+)?celebration)\b/i,
+    pattern:
+      /\b(?:celebration\s+(?:room|hall)|open\s+(?:the\s+)?celebration(?:\s+room|\s+hall)?)\b/i,
     placeId: "celebration-room",
-    reason: "explicit object → Celebration Room™",
+    reason: "explicit object → Celebration Hall™",
+  },
+  {
+    pattern: /\b(?:celebration\s+garden|the\s+celebration\s+garden)\b/i,
+    placeId: "gardens",
+    reason: "explicit object → Celebration Garden™ / wins collection",
   },
   {
     pattern: /\b(?:institute\s+cabinet|my\s+cabinet)\b/i,
@@ -104,9 +112,10 @@ const WINS_AND_PROOF_RULES: {
     reason: "impact/proof → Evidence Vault™",
   },
   {
-    pattern: /\b(?:my\s+wins|show\s+(?:me\s+)?my\s+wins|story\s+of\s+my\s+wins)\b/i,
-    placeId: "celebration-room",
-    reason: "wins → Celebration Room™",
+    pattern:
+      /\b(?:my\s+wins|show\s+(?:me\s+)?my\s+wins|story\s+of\s+my\s+wins|wins\s+this\s+week)\b/i,
+    placeId: "gardens",
+    reason: "wins → Celebration Garden™ / wins collection",
   },
 ];
 
@@ -405,6 +414,14 @@ export function resolveEstatePlace(userText: string): EstatePlaceResolution {
   const text = userText.trim();
   if (!text) {
     return { kind: "none", confidence: "low", reason: "empty text" };
+  }
+
+  if (isCelebrationSoundsIntent(text)) {
+    return {
+      kind: "audio-settings",
+      confidence: "high",
+      reason: "celebration sounds → audio settings, not an Estate room",
+    };
   }
 
   if (isPlaceSuggestionRequest(text)) {

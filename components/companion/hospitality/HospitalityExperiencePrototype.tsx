@@ -238,9 +238,8 @@ export function HospitalityExperiencePrototype() {
               speechSupported={chat.speechSupported}
               inputRef={chat.inputRef}
               onInputChange={chat.handleInputChange}
-              onKeyDown={chat.handleKeyDown}
               onToggleListening={chat.toggleListening}
-              onSend={() => void chat.handleSend()}
+              onSend={(text) => void chat.handleSend(text)}
             />
           </HospitalityLivingRoom>
         </div>

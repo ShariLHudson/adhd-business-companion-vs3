@@ -34,15 +34,17 @@ describe("estate navigation regression", () => {
     });
   }
 
-  it("unknown swimming pool is honest — no random place menu", () => {
+  it("unknown swimming pool offers warm alternatives — not game-room", () => {
     const turn = evaluateEstatePlaceTurn({
       userText: "take me to the swimming pool",
     });
-    expect(turn.type).toBe("unknown_place");
-    if (turn.type === "unknown_place") {
-      expect(turn.line).toMatch(/don't have/i);
-      expect(turn.line).toMatch(/swimming pool/i);
-      expect(turn.line).not.toMatch(/^1\./m);
+    expect(turn.type).toBe("offer");
+    if (turn.type === "offer") {
+      expect(turn.line).toMatch(/isn't on the Estate yet/i);
+      expect(turn.line).toMatch(/swimming pool|pool/i);
+      expect(turn.placeIds).toContain("seat-at-pond");
+      expect(turn.placeIds).toContain("peaceful-places");
+      expect(turn.placeIds).not.toContain("game-room");
     }
   });
 });

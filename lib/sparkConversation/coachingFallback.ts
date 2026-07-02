@@ -1,10 +1,21 @@
 /**
- * Coaching fallback — when the model/API cannot respond to high-stakes prompts.
- * Keeps the member in conversation with warmth, not error copy.
+ * Coaching fallback — when the model/API cannot respond.
+ * Shari stays present — never generic error or AI coaching openers.
+ *
+ * @see docs/estate/SHARI_COMPANION_ENGINE_REWRITE.md
  */
 
+import {
+  buildShariErrorRecoveryResponse,
+} from "@/lib/conversation/shariCompanionEngine";
+import {
+  formatEmotionalFirstOpening,
+  planEmotionalFirstResponse,
+  shouldUseEmotionalFirstSequence,
+} from "@/lib/conversation/emotionalFirstResponseSequence";
+
 export const COACHING_FALLBACK_LEAD =
-  "I'm still here. That felt important, so let's slow this down. We don't have to solve everything at once." as const;
+  "Something got tangled for a second, but I'm still here." as const;
 
 export type CoachingFallbackKind =
   | "quit_temptation"
@@ -45,8 +56,17 @@ function gentleQuestionForKind(kind: CoachingFallbackKind): string {
 }
 
 export function buildCoachingFallbackResponse(userText: string): string {
-  const kind = classifyCoachingFallbackKind(userText);
-  return `${COACHING_FALLBACK_LEAD}\n\n${gentleQuestionForKind(kind)}`;
+  const trimmed = userText.trim();
+  if (shouldUseEmotionalFirstSequence(trimmed)) {
+    const plan = planEmotionalFirstResponse({ text: trimmed });
+    const opening = formatEmotionalFirstOpening(plan);
+    if (opening) {
+      return `${buildShariErrorRecoveryResponse(gentleQuestionForKind(classifyCoachingFallbackKind(trimmed)))}\n\n${opening}`;
+    }
+  }
+  return buildShariErrorRecoveryResponse(
+    gentleQuestionForKind(classifyCoachingFallbackKind(trimmed)),
+  );
 }
 
 export function isCoachingFallbackNeeded(

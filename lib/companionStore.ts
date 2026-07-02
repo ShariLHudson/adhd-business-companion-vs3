@@ -2399,10 +2399,20 @@ export const PLAN_VOICE_MINUTES: Record<Plan, number> = {
 };
 
 // How Shari behaves (separate from tone = how it sounds).
-export type HelpMode = "step-by-step" | "ask-first" | "direct" | "navigate";
+export type HelpMode =
+  | "step-by-step"
+  | "ask-first"
+  | "direct"
+  | "navigate"
+  | "concise";
 
 // How support feels — empathy vs action balance, plus an overwhelm-safe SOS.
-export type SupportStyle = "solutions" | "understand" | "balanced" | "sos";
+export type SupportStyle =
+  | "solutions"
+  | "understand"
+  | "balanced"
+  | "sos"
+  | "listen";
 
 export type Prefs = {
   aiTone: AiTone;
@@ -2432,6 +2442,8 @@ export type Prefs = {
   advancedAiTools: boolean; // unlocks Multi-Avatar output mode (opt-in)
   onboarded: boolean; // has the user completed (or skipped) first-run onboarding
   hasChatted: boolean; // has the user ever sent a message (returning vs first-time)
+  /** Welcome Home cinematic + founder audio seen (local + profile). */
+  hasSeenWelcomeIntro?: boolean;
   name: string;
   email: string;
   /** User-uploaded portrait — data URL; never Shari/companion images. */
@@ -2459,6 +2471,7 @@ const DEFAULT_PREFS: Prefs = {
   advancedAiTools: false,
   onboarded: false,
   hasChatted: false,
+  hasSeenWelcomeIntro: false,
   name: "",
   email: "",
   profileImage: "",

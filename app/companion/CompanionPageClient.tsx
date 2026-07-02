@@ -1518,6 +1518,9 @@ import {
   type SidebarToolId,
 } from "@/lib/companionUi";
 import { type CoachingMode } from "@/lib/companionPrompt";
+import {
+  tonePreferenceOverridesRoutingGuidance,
+} from "@/lib/companionTonePreferences";
 import { formatAssistantParagraphs, toPlainLanguageDisplay } from "@/lib/plainLanguageFormatting";
 import {
   blockDateTime,
@@ -9760,8 +9763,11 @@ export default function CompanionPageClient() {
       }
     }
 
+    const isDirectEstateNavPhrase = isDirectEstateRoomRequest(trimmed);
+
     if (
       !taskLockBlocksEstateRouting &&
+      !isDirectEstateNavPhrase &&
       frictionlessPendingForYes &&
       (isFrictionlessAffirmation(trimmed) || isConfirmationAcceptance(trimmed)) &&
       !strategyOfferOnLastTurn
@@ -13554,6 +13560,9 @@ export default function CompanionPageClient() {
           intentHint:
             mergeGovernorHints(
               [
+                tonePreferenceOverridesRoutingGuidance(prefs)
+                  ? "Member tone preference in Settings overrides conflicting action-first routing hints this turn."
+                  : null,
                 estateMemoryHintForChat(),
                 activeTaskLockHintForChat(estateTaskLockTurn.state),
                 estateConversationTurn && !taskLockBlocksEstateRouting
@@ -14770,6 +14779,14 @@ export default function CompanionPageClient() {
     }
     captureOfferAccepted(command.workspaceOffer, closedLoopCtx());
     acceptWorkspaceOfferCore(command.workspaceOffer);
+    const arrivalAck = estateCommandAckLine(command);
+    if (activeChatTurnLifecycleRef.current) {
+      markAssistantReplied(activeChatTurnLifecycleRef.current);
+    }
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: arrivalAck },
+    ]);
     finishEarlyChatTurn();
   }
 
@@ -14779,7 +14796,8 @@ export default function CompanionPageClient() {
     const estateAck = estateTransitionAckForSection(offer.section, pendingIntent);
     captureOfferAccepted(offer, closedLoopCtx());
     clearOfferStateOnly();
-    if (offer.estateMenuActionId) {
+    const directVisitAtOffer = directEstateVisitRef.current;
+    if (offer.estateMenuActionId && !directVisitAtOffer) {
       const menuEntryId =
         pendingTransition?.destinationEntryId ??
         estateEntryIdForSection(offer.section) ??
@@ -16749,6 +16767,8 @@ export default function CompanionPageClient() {
     !welcomeScene &&
     !companionDeskVisible &&
     !welcomeHomePrimary &&
+    !showDirectEstateOverlay &&
+    !sparkEstateShellPlaceId &&
     !momentumBuilderPrimary &&
     !momentumInstitutePrimary &&
     !stablesPrimary;
@@ -16965,68 +16985,78 @@ export default function CompanionPageClient() {
           />
 
           {sparkEstateShellPlaceId ? (
-            <SparkEstateShell
-              placeId={sparkEstateShellPlaceId}
-              section={activeSection}
-              profileEstateMode={sparkEstateShellProfileMode}
-              welcomeMessage={profileEstateWelcomeMessage}
-              conversationScrollKey={estateChatScrollKey}
-              inputRef={inputRef}
-              activityEngaged={estateConservatoryEngaged}
-              conversationStarted={estateConversationStartedSinceVisit}
-              onInvitationSelect={handleEstateRoomInvitationSelect}
-              onConversationStart={handleEstateConversationStart}
-              thread={
-                <SimpleChat
-                  messages={messages}
-                  stateHint={stateHint}
-                  showHint={false}
-                  hideEmptyState
-                  isLoading={isLoading}
-                  thinkingMessage={visibleThinkingMessage}
-                  awaitingUserConfirmation={chatAwaitingConfirmation}
-                  thinkingEmotion={displayEmotion}
-                  workspacePanel={workspacePanel}
-                  workspaceActiveBeside={workspaceActiveBeside}
-                  formatParagraphs={formatAssistantParagraphs}
-                  afterLastAssistant={undefined}
-                />
+            <div
+              className={
+                showDirectEstateOverlay
+                  ? "pointer-events-auto absolute inset-0 z-20 flex min-h-0 min-w-0 flex-col"
+                  : "relative flex min-h-0 min-w-0 flex-1 flex-col"
               }
-              footer={
-                <HomeChatInputFooter
-                  homeCalm={false}
-                  homeChatPlaceholder="What's on your mind?"
-                  conversationMode
-                  input={input}
-                  isLoading={isLoading}
-                  isListening={isListening}
-                  speechSupported={speechSupported}
-                  inputRef={inputRef}
-                  onInputChange={handleInputChange}
-                  onKeyDown={handleKeyDown}
-                  onToggleListening={toggleListening}
-                  onSend={(text) => void handleSend(text)}
-                  pendingAction={pendingAction}
-                  suppressInterventionCards
-                  onRunArtifactExport={runArtifactExport}
-                  onClearPendingOffers={clearAllPendingOffers}
-                  onDismissOfferKeepTalking={dismissOfferKeepTalking}
-                  onExecutePendingAction={executePendingAction}
-                  onShowEstateMap={revealWelcomeHomeEstateMap}
-                  splitCreateBuilder={splitCreateBuilder}
-                  createBuilderSession={createBuilderSession}
-                  onCreateBuilderAction={handleCreateBuilderAction}
-                  voiceOutput={voiceOutput}
-                  voiceBlocked={voiceBlocked}
-                  onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
-                  onVoiceBlockedReset={() => setVoiceBlocked(false)}
-                  ttsAudioRef={ttsAudioRef}
-                />
-              }
-            />
+            >
+              <SparkEstateShell
+                placeId={sparkEstateShellPlaceId}
+                section={activeSection}
+                profileEstateMode={sparkEstateShellProfileMode}
+                welcomeMessage={profileEstateWelcomeMessage}
+                conversationScrollKey={estateChatScrollKey}
+                inputRef={inputRef}
+                activityEngaged={estateConservatoryEngaged}
+                conversationStarted={estateConversationStartedSinceVisit}
+                onInvitationSelect={handleEstateRoomInvitationSelect}
+                onConversationStart={handleEstateConversationStart}
+                thread={
+                  <SimpleChat
+                    messages={messages}
+                    stateHint={stateHint}
+                    showHint={false}
+                    hideEmptyState
+                    isLoading={isLoading}
+                    thinkingMessage={visibleThinkingMessage}
+                    awaitingUserConfirmation={chatAwaitingConfirmation}
+                    thinkingEmotion={displayEmotion}
+                    workspacePanel={workspacePanel}
+                    workspaceActiveBeside={workspaceActiveBeside}
+                    formatParagraphs={formatAssistantParagraphs}
+                    afterLastAssistant={undefined}
+                  />
+                }
+                footer={
+                  <HomeChatInputFooter
+                    homeCalm={false}
+                    homeChatPlaceholder="What's on your mind?"
+                    conversationMode
+                    input={input}
+                    isLoading={isLoading}
+                    isListening={isListening}
+                    speechSupported={speechSupported}
+                    inputRef={inputRef}
+                    onInputChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onToggleListening={toggleListening}
+                    onSend={(text) => void handleSend(text)}
+                    pendingAction={pendingAction}
+                    suppressInterventionCards
+                    onRunArtifactExport={runArtifactExport}
+                    onClearPendingOffers={clearAllPendingOffers}
+                    onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                    onExecutePendingAction={executePendingAction}
+                    onShowEstateMap={revealWelcomeHomeEstateMap}
+                    splitCreateBuilder={splitCreateBuilder}
+                    createBuilderSession={createBuilderSession}
+                    onCreateBuilderAction={handleCreateBuilderAction}
+                    voiceOutput={voiceOutput}
+                    voiceBlocked={voiceBlocked}
+                    onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                    onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                    ttsAudioRef={ttsAudioRef}
+                  />
+                }
+              />
+            </div>
           ) : null}
 
-          {activeSection === "home" && !profileEstateChromeActive && (
+          {activeSection === "home" &&
+            !profileEstateChromeActive &&
+            !sparkEstateShellPlaceId && (
             <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
               {!welcomeHomePrimary ? (
               <WorkspaceDebugBanner
@@ -18072,7 +18102,7 @@ export default function CompanionPageClient() {
             />
           )}
 
-          {activeSection === "growth-reports" && (
+          {activeSection === "growth-reports" && !showDirectEstateOverlay && (
             <EstateCollectionRoomPanel
               roomId="celebration-hall"
               onBack={goBack}

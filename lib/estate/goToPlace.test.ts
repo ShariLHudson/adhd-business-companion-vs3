@@ -136,9 +136,9 @@ describe("resolveEstatePlace — Phase C success tests", () => {
     expect(resolution.explicitActivityRequested).toBe(true);
   });
 
-  it("my wins → celebration room (P0)", () => {
+  it("my wins → Celebration Garden / wins collection", () => {
     const { resolution } = navigate("show me my wins");
-    expect(resolution.placeId).toBe("celebration-room");
+    expect(resolution.placeId).toBe("gardens");
   });
 
   it("proof of growth → evidence vault (P0)", () => {

@@ -36,18 +36,17 @@ const baseReq: CreateOpenRequest = {
 };
 
 describe("createOpenAuthority", () => {
-  it("Facebook post ideas does not silently open Create", () => {
+  it("Facebook post ideas stays in conversation — no workspace yet", () => {
     const text = "I need Facebook post ideas";
     expect(shouldSilentlyOpenCreate(text)).toBe(false);
     const decision = evaluateCreateOpen(
       { ...baseReq, userText: text },
       { ...baseCtx, userText: text },
     );
-    expect(decision.action).toBe("offer");
-    expect(buildCreateConsentOffer(text)).toMatch(/open Create/i);
+    expect(decision.action).toBe("blocked");
   });
 
-  it("newsletter help offers Create before opening", () => {
+  it("newsletter help stays in chat before workspace opens", () => {
     const text = "I need help writing a newsletter";
     const decision = evaluateCreateOpen(
       {
@@ -58,11 +57,7 @@ describe("createOpenAuthority", () => {
       },
       { ...baseCtx, userText: text },
     );
-    expect(decision.action).toBe("offer");
-    if (decision.action === "offer") {
-      expect(decision.message).toMatch(/draft|Create/i);
-      expect(decision.pending.section).toBe("content-generator");
-    }
+    expect(decision.action).toBe("blocked");
   });
 
   it('explicit "open create" bypasses consent', () => {
@@ -176,7 +171,7 @@ describe("createOpenAuthority", () => {
     }
   });
 
-  it("silent Create opens are eliminated in authority layer", () => {
+  it("brainstorming does not silently open Create or workspace", () => {
     const brainstorm = "I need Facebook post ideas";
     expect(shouldSilentlyOpenCreate(brainstorm)).toBe(false);
     expect(
@@ -184,7 +179,7 @@ describe("createOpenAuthority", () => {
         { ...baseReq, userText: brainstorm },
         { ...baseCtx, userText: brainstorm },
       ).action,
-    ).toBe("offer");
+    ).toBe("blocked");
   });
 
   it("audit inventory lists all entry points through requestCreateOpen", () => {

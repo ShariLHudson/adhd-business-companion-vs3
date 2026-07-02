@@ -2,6 +2,7 @@
 // and the background engine.
 
 import type { EmotionalState } from "./companionEmotions";
+import { messageNamesExactEstateRoom } from "./estate/estateRoomAliasRegistry";
 import {
   getRecommendedTrack,
   type AudioLink,
@@ -131,6 +132,10 @@ export function detectAudioRequest(text: string): {
   }
 
   const t = text.toLowerCase();
+
+  if (messageNamesExactEstateRoom(text) && !MUSIC_MEDIA_RE.test(t)) {
+    return { isAudio: false, categoryId: "focus" };
+  }
   const wantsEnergize = ENERGIZE_AUDIO_RE.test(t);
   const moodAudioIntent =
     wantsEnergize ||

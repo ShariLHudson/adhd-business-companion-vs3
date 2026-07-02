@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { WELCOME_ROOM_GREETING_SPEECH } from "@/lib/welcomeRoom/content";
-import { WELCOME_ROOM_AUDIO_PROFILE } from "./profiles";
+import { WELCOME_ROOM_AUDIO_PROFILE, WELCOME_HOME_AUDIO_PROFILE } from "./profiles";
 
 describe("welcomeAudio profiles", () => {
   it("registers immersive timeline and cached voice sources", () => {
@@ -18,6 +18,16 @@ describe("welcomeAudio profiles", () => {
     expect(WELCOME_ROOM_AUDIO_PROFILE.voice?.playbackRate).toBe(0.93);
     expect(WELCOME_ROOM_AUDIO_PROFILE.ambience?.volume).toBeLessThanOrEqual(
       0.2,
+    );
+  });
+
+  it("registers welcome-home profile with founder narration source", () => {
+    expect(WELCOME_HOME_AUDIO_PROFILE.id).toBe("welcome-home");
+    expect(WELCOME_HOME_AUDIO_PROFILE.voice?.fullWelcomeSrc).toBe(
+      "/audio/welcome-room/welcome-letter-full.mp3",
+    );
+    expect(WELCOME_HOME_AUDIO_PROFILE.ambience?.src).toBe(
+      WELCOME_ROOM_AUDIO_PROFILE.ambience?.src,
     );
   });
 });

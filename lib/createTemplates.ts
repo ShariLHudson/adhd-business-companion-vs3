@@ -146,6 +146,13 @@ const CLIENT_ONBOARDING_SECTIONS: CreateTemplateSection[] = [
   section("communication", "Communication"),
 ];
 
+const OFFER_SECTIONS: CreateTemplateSection[] = [
+  section("audience", "Audience"),
+  section("problem", "Problem"),
+  section("promise", "Promise"),
+  section("price", "Price"),
+];
+
 const GENERIC_SECTIONS: CreateTemplateSection[] = [
   section("intro", "Introduction"),
   section("main", "Main Content"),
@@ -250,6 +257,12 @@ const PRESET_TEMPLATES: CreateTemplatePreset[] = [
     name: "Default Course Outline Template",
     itemType: "Course Outline",
     sections: [...COURSE_OUTLINE_SECTIONS],
+  },
+  {
+    id: "offer-default",
+    name: "Default Offer Template",
+    itemType: "Offer",
+    sections: [...OFFER_SECTIONS],
   },
   {
     id: "client-onboarding-default",

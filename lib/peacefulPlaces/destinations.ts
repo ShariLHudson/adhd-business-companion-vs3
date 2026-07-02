@@ -23,6 +23,7 @@ const DESTINATION_ID_BY_PLACE: Record<PeacefulPlaceId, string> = {
   "bright-studio": "bright-studio-movement-studio",
   "bedroom-window": "bedroom-window-gentle-rain",
   "evening-hearth": "evening-hearth-fireplace-night",
+  "music-room": "music-room-deep-focus-piano",
 };
 
 function destinationIdForPlace(placeId: PeacefulPlaceId): string {

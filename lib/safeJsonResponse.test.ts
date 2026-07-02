@@ -47,7 +47,7 @@ describe("safeJsonResponse", () => {
     try {
       await readJsonResponse(res);
     } catch (err) {
-      expect(friendlyFetchErrorMessage(err)).toBe(CHAT_RECOVERY_MESSAGE);
+      expect(friendlyFetchErrorMessage(err)).toMatch(/still here/i);
     }
   });
 
@@ -57,11 +57,17 @@ describe("safeJsonResponse", () => {
         `Unexpected token '<', "<!DOCTYPE "... is not valid JSON`,
       ),
     ).toBe(true);
-    expect(friendlyFetchErrorMessage(new SyntaxError("Unexpected token '<'"))).toBe(
-      CHAT_RECOVERY_MESSAGE,
+    expect(friendlyFetchErrorMessage(new SyntaxError("Unexpected token '<'"))).toMatch(
+      /still here/i,
     );
     expect(friendlyFetchErrorMessage(new SafeJsonResponseError("diag"))).toBe(
       CHAT_RECOVERY_MESSAGE,
+    );
+    expect(friendlyFetchErrorMessage(new TypeError("Failed to fetch"))).toMatch(
+      /still here/i,
+    );
+    expect(friendlyFetchErrorMessage(new TypeError("Failed to fetch"))).not.toContain(
+      "fetch",
     );
   });
 

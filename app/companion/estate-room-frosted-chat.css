@@ -1,0 +1,124 @@
+/* Estate rooms — bottom-anchored frosted conversation (Spec 109) */
+
+.estate-room-main {
+  position: fixed;
+  inset: 0;
+  z-index: 15;
+  overflow: hidden;
+  background: transparent !important;
+  width: 100vw;
+  height: 100dvh;
+  max-height: 100dvh;
+}
+
+.stables-room,
+.momentum-institute-room,
+.momentum-builder-room {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100dvh;
+  max-height: 100dvh;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.stables-room__stage,
+.momentum-institute-room__stage,
+.momentum-builder-room__stage {
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.stables-room__stage > *,
+.momentum-institute-room__stage > *,
+.momentum-builder-room__stage > * {
+  pointer-events: auto;
+}
+
+/* Frosted chat — layout on [data-companion-chat-layer]; see companion-layout-layers.css */
+.estate-room-frosted-chat {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 1.1rem;
+  border: 1px solid rgba(255, 248, 235, 0.4);
+  background: rgba(246, 238, 224, 0.48);
+  backdrop-filter: blur(18px) saturate(1.04);
+  -webkit-backdrop-filter: blur(18px) saturate(1.04);
+  box-shadow:
+    0 1.25rem 3rem rgba(18, 12, 8, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+}
+
+[data-companion-chat-layer="true"].estate-room-frosted-chat {
+  max-height: min(78dvh, 44rem);
+}
+
+.estate-room-frosted-chat__messages {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scroll-behavior: smooth;
+  padding: clamp(0.75rem, 1.5vw, 1rem);
+  padding-bottom: 0.35rem;
+}
+
+.estate-room-frosted-chat__divider {
+  flex-shrink: 0;
+  height: 1px;
+  margin: 0 clamp(0.85rem, 1.4vw, 1.1rem);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(120, 108, 96, 0.22) 20%,
+    rgba(120, 108, 96, 0.22) 80%,
+    transparent 100%
+  );
+}
+
+.estate-room-frosted-chat__input-wrap {
+  flex-shrink: 0;
+  padding: clamp(0.55rem, 1.2vw, 0.8rem);
+  padding-top: 0.45rem;
+}
+
+.estate-room-frosted-chat .companion-home-input-footer {
+  position: relative;
+  width: 100%;
+  max-width: none;
+  background: transparent !important;
+  padding: 0 !important;
+  margin: 0;
+  --companion-chat-box-max-width: 100%;
+}
+
+.estate-room-frosted-chat textarea {
+  font-size: clamp(1.05rem, 1.35vw, 1.15rem);
+  min-height: 3.1rem;
+}
+
+.estate-room-frosted-chat .companion-chat-input.input-glass,
+.estate-room-frosted-chat .companion-chat-input.input-glass-conversation {
+  background: rgba(255, 252, 248, 0.55);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Alias legacy room panel classes to canonical frosted chat */
+.stables-room__chat-panel,
+.momentum-institute-room__chat-panel,
+.momentum-builder-room__chat-panel,
+.estate-chat-navigation-overlay__chat-panel {
+  /* layout from .estate-room-frosted-chat when both classes applied */
+}
+
+@media (max-width: 900px) {
+  [data-companion-chat-layer="true"].estate-room-frosted-chat {
+    max-height: min(72dvh, 100%);
+  }
+}

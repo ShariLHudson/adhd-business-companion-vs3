@@ -3,6 +3,7 @@ import { BRIGHT_STUDIO } from "./brightStudioPeacefulPlace";
 import { COZY_CAFE } from "./cozyCafePeacefulPlace";
 import { EAST_TERRACE } from "./eastTerracePeacefulPlace";
 import { EVENING_HEARTH } from "./eveningHearthPeacefulPlace";
+import { MUSIC_ROOM } from "./musicRoomPeacefulPlace";
 import { NATURE_ESCAPE } from "./natureEscapePeacefulPlace";
 import { SUMMER_STORM_COVERED_DECK } from "./summerStormCoveredDeck";
 import type { PeacefulPlace, PeacefulPlaceId } from "./types";

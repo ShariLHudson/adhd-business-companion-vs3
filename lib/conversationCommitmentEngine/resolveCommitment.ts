@@ -22,7 +22,7 @@ export const COMMITMENT_DECLINE_MESSAGES = [
 ] as const;
 
 export const COMMITMENT_CLARIFY_MESSAGE =
-  "Happy to — which of those would help most right now?";
+  "You're right — I wasn't clear. What's actually on your mind right now?";
 
 export const DUPLICATE_COMMITMENT_MESSAGE =
   "We already took that step — what's the next piece you'd like to look at?";

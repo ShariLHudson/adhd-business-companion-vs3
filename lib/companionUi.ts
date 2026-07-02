@@ -24,6 +24,9 @@ export type AppSection =
   | "games"
   | "quick-recharge"
   | "grow"
+  | "momentum-builder"
+  | "momentum-institute"
+  | "stables"
   | "grow-momentum-builders"
   | "grow-spark-cards"
   | "grow-guilds"
@@ -51,7 +54,9 @@ export type AppSection =
   | "confidence-vault"
   | "my-journey"
   | "growth-journal"
+  | "growth-greenhouse"
   | "growth-portfolio"
+  | "user-memory"
   | "welcome-room"
   | "life-experience"
   | "the-gallery";
@@ -239,6 +244,7 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "quick-recharge":
       return "focus";
     case "grow":
+    case "momentum-builder":
     case "grow-momentum-builders":
     case "grow-spark-cards":
     case "grow-guilds":
@@ -260,6 +266,7 @@ export function sidebarNavForSection(section: AppSection): SidebarNavId | null {
     case "wins-this-week":
     case "my-journey":
     case "growth-journal":
+    case "growth-greenhouse":
       return "journal";
     case "growth-portfolio":
       return "portfolio";

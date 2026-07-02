@@ -27,6 +27,7 @@ export type ConversationWorkflowKind =
   | "open_plan_my_day"
   | "open_workspace"
   | "open_focus_timer"
+  | "open_focus_audio"
   | "guided_continue";
 
 export type ConversationWorkflow = {
@@ -228,6 +229,19 @@ export function inferConversationWorkflowFromAssistant(
     };
   }
 
+  if (
+    /\b(?:focus audio|focus music|background (?:music|audio)|soundscapes?)\b/i.test(
+      t,
+    ) &&
+    CONSENT_OFFER_RE.test(t)
+  ) {
+    return {
+      kind: "open_focus_audio",
+      offerSummary: "Focus Audio",
+      assistantQuestion: t,
+    };
+  }
+
   const workspaceSection = inferWorkspaceSectionFromConsent(t);
   if (workspaceSection && CONSENT_OFFER_RE.test(t)) {
     return {
@@ -366,6 +380,13 @@ export function continuationForWorkflow(
         tool: "focus-timer",
         message:
           "Opening **Focus Timer** — pick a length that feels doable and we'll go from there.",
+        nextWorkflow: null,
+      };
+    case "open_focus_audio":
+      return {
+        action: "open_tool",
+        tool: "focus-audio",
+        message: "Opening **Focus Audio**.",
         nextWorkflow: null,
       };
     case "open_workspace":

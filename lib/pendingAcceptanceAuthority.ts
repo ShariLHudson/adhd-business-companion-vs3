@@ -7,6 +7,7 @@ import { isActionAcceptance } from "./assistedActionBridge";
 import type { OutcomeThread } from "./companionOutcomeThread";
 import { threadAwareAcceptanceFallback } from "./companionOutcomeThread";
 import type { AppSection } from "./companionUi";
+import { estateTransitionAckForSection } from "./estateMemory/estatePendingTransition";
 import type { PendingCreateOpenPayload } from "./createOpenAuthority";
 import {
   matchesPendingAcceptance,
@@ -145,7 +146,7 @@ export function acceptanceAckForKind(
 ): string {
   switch (kind) {
     case "create_consent":
-      return "Opening Create.";
+      return "Let's head into the Creative Studio™ together.";
     case "draft_switch":
       return "Continuing your draft.";
     case "workspace":
@@ -174,31 +175,12 @@ export function acceptanceAckForKind(
 
 export function acceptanceAckForWorkspace(
   section?: AppSection | null,
+  userIntent?: string,
 ): string {
-  switch (section) {
-    case "content-generator":
-      return "Opening Create.";
-    case "projects":
-      return "Switching to Projects.";
-    case "playbook":
-      return "Opening Strategies.";
-    case "time-block":
-      return "Opening Momentum Appointments.";
-    case "brain-dump":
-      return "Opening Clear My Mind.";
-    case "energy":
-      return "Opening Today's Reality.";
-    case "focus-audio":
-      return "Opening Focus Audio.";
-    case "templates-library":
-      return "Opening Templates.";
-    case "snippets":
-      return "Opening Snippets.";
-    case "client-avatars":
-      return "Opening Client Avatar.";
-    default:
-      return "Opening that workspace.";
+  if (section) {
+    return estateTransitionAckForSection(section, userIntent);
   }
+  return "Let's continue right where we left off.";
 }
 
 function hasActivePending(input: ResolvePendingAcceptanceInput): boolean {

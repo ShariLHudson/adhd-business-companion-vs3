@@ -5,7 +5,6 @@ import { act } from "react";
 import { createRoot, type Root } from "react-dom/client";
 import { afterEach, describe, expect, it } from "vitest";
 import { COMPANION_LOGIN_BACKGROUND } from "@/lib/companionLoginPage";
-import { HomesteadSceneProvider } from "@/lib/homesteadScene";
 import { CompanionLoginBackground } from "./CompanionLoginBackground";
 
 describe("CompanionLoginBackground", () => {
@@ -17,16 +16,12 @@ describe("CompanionLoginBackground", () => {
     container?.remove();
   });
 
-  function render() {
+  function render(fullExposure = true) {
     container = document.createElement("div");
     document.body.appendChild(container);
     root = createRoot(container);
     act(() => {
-      root.render(
-        <HomesteadSceneProvider>
-          <CompanionLoginBackground />
-        </HomesteadSceneProvider>,
-      );
+      root.render(<CompanionLoginBackground fullExposure={fullExposure} />);
     });
   }
 
@@ -34,30 +29,31 @@ describe("CompanionLoginBackground", () => {
     return container.querySelector("[data-testid='companion-login-scene']");
   }
 
-  it("renders the static login welcome background", () => {
+  it("renders login-welcome-background with uniform full exposure", () => {
     render();
     expect(scene()).toBeTruthy();
-    const img = container.querySelector(
+    expect(scene()?.getAttribute("data-login-background")).toBe(
+      "login-welcome-background",
+    );
+    expect(scene()?.classList.contains("companion-login-scene--full-exposure")).toBe(
+      true,
+    );
+    const images = container.querySelectorAll(
       ".companion-login-scene__base",
-    ) as HTMLImageElement | null;
-    expect(img?.getAttribute("src")).toBe(COMPANION_LOGIN_BACKGROUND);
-    expect(container.querySelector(".companion-login-scene__soften")).toBeTruthy();
-  });
-
-  it("applies shared homestead scene layers and attributes", () => {
-    render();
-    const el = scene();
-    expect(el?.getAttribute("data-homestead-scene")).toBe("");
-    expect(el?.getAttribute("data-homestead-period")).toBeTruthy();
-    expect(el?.getAttribute("data-time-of-day")).toBeTruthy();
-    expect(el?.getAttribute("data-season")).toBeTruthy();
-    expect(el?.getAttribute("data-weather")).toBeTruthy();
+    ) as NodeListOf<HTMLImageElement>;
+    expect(images.length).toBe(2);
+    for (const img of images) {
+      expect(img.getAttribute("src")).toBe(COMPANION_LOGIN_BACKGROUND);
+    }
+    expect(container.querySelector(".companion-login-scene__soften")).toBeFalsy();
     expect(
       container.querySelector(".companion-welcome-scene__sunlight"),
-    ).toBeTruthy();
-    expect(
-      container.querySelector(".companion-welcome-scene__porch-glow"),
-    ).toBeTruthy();
+    ).toBeFalsy();
+  });
+
+  it("renders nothing when fullExposure is off", () => {
+    render(false);
+    expect(scene()).toBeFalsy();
   });
 
   it("keeps the scene behind the login card stacking context", () => {

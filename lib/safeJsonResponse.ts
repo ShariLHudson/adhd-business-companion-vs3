@@ -1,7 +1,12 @@
 /**
  * Defensive JSON parsing for Companion API calls.
  * Never surface raw HTML/DOCTYPE/JSON parse errors in chat UI.
+ *
+ * Member-visible copy is routed through companionContextRouting — not this file.
  */
+
+import { logCompanionSystemFailure, sanitizeEstateFacingCopy } from "@/lib/companionContextRouting";
+import { buildShariErrorRecoveryResponse } from "@/lib/conversation/shariCompanionEngine";
 
 export const CHAT_RECOVERY_MESSAGE =
   "Something got tangled for a second. I'm still here — can we try that again?" as const;
@@ -32,22 +37,18 @@ export function isJsonContentType(contentType: string | null): boolean {
 }
 
 const TECHNICAL_ERROR_RE =
-  /unexpected token|doctype|<!doctype|is not valid json|syntaxerror|failed to execute 'json'/i;
+  /unexpected token|doctype|<!doctype|is not valid json|syntaxerror|failed to execute 'json'|failed to fetch|networkerror|load failed/i;
 
 export function isTechnicalFetchErrorMessage(message: string): boolean {
   return TECHNICAL_ERROR_RE.test(message);
 }
 
 export function friendlyFetchErrorMessage(err: unknown): string {
-  if (err instanceof SafeJsonResponseError) return err.userMessage;
-  if (err instanceof Error) {
-    if (isTechnicalFetchErrorMessage(err.message)) return CHAT_RECOVERY_MESSAGE;
-    if (err.message && !isTechnicalFetchErrorMessage(err.message)) {
-      const trimmed = err.message.trim();
-      if (trimmed.length > 0 && trimmed.length < 120) return trimmed;
-    }
+  logCompanionSystemFailure(err, { surface: "chat" });
+  if (err instanceof SafeJsonResponseError) {
+    return sanitizeEstateFacingCopy(err.userMessage);
   }
-  return CHAT_RECOVERY_MESSAGE;
+  return buildShariErrorRecoveryResponse();
 }
 
 export function logNonJsonResponseDiagnostic(

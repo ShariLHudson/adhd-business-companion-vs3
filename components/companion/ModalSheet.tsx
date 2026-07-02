@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
 
 // A light, ADHD-friendly modal sheet that slides in from the right. It never
 // feels like leaving the app: the background stays partly visible and dimmed.
@@ -11,13 +12,22 @@ export function ModalSheet({
   onClose,
   title,
   children,
+  /** Portal above Welcome Home / full-bleed estate layers (body + fixed). */
+  portaled = false,
 }: {
   open: boolean;
   onClose: () => void;
   title?: string;
   children: ReactNode;
+  portaled?: boolean;
 }) {
   const [entered, setEntered] = useState(open);
+  const [portalReady, setPortalReady] = useState(false);
+
+  useLayoutEffect(() => {
+    if (!portaled) return;
+    setPortalReady(true);
+  }, [portaled]);
 
   // Slide-in runs after paint; panel stays interactive immediately on open.
   useLayoutEffect(() => {
@@ -40,10 +50,14 @@ export function ModalSheet({
 
   if (!open) return null;
 
-  // Absolute (not fixed) so the sheet only covers the main pane — sidebar stays
-  // clickable. No pointer-events-none wrapper; panel is interactive as soon as open.
-  return (
-    <div className="pointer-events-none absolute inset-0 z-50 flex justify-end overflow-hidden">
+  // Default: absolute so the sheet only covers the main pane — sidebar stays
+  // clickable. Portaled: fixed on body above Welcome Home (z-index 99999 intro).
+  const shellClass = portaled
+    ? "modal-sheet-portal pointer-events-none fixed inset-0 z-[100010] flex justify-end overflow-hidden"
+    : "pointer-events-none absolute inset-0 z-50 flex justify-end overflow-hidden";
+
+  const sheet = (
+    <div className={shellClass} data-companion-modal-layer={portaled ? "true" : undefined}>
       {entered ? (
         <button
           type="button"
@@ -79,4 +93,10 @@ export function ModalSheet({
       </div>
     </div>
   );
+
+  if (portaled && portalReady) {
+    return createPortal(sheet, document.body);
+  }
+
+  return sheet;
 }

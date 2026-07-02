@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { getPrefs, savePrefs } from "@/lib/companionStore";
 import type { AppSection } from "@/lib/companionUi";
 import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
+import { requestWelcomeHomeReplay } from "@/lib/welcomeHome";
 import { GettingToKnowYouPanel } from "@/components/companion/GettingToKnowYouPanel";
 import { ActiveCompanionsPicker } from "@/components/companion/ActiveCompanionsPicker";
 import { workspacePanelShellClass } from "@/lib/workspaceLayoutTokens";
@@ -273,6 +274,23 @@ export function ProfilePanel({
             </a>
           );
         })}
+        <button
+          type="button"
+          onClick={() => requestWelcomeHomeReplay()}
+          className={linkBtn}
+        >
+          <span aria-hidden="true" className="text-xl">
+            🏡
+          </span>
+          <span>
+            <span className="block text-base font-semibold text-[#1f1c19]">
+              Welcome Home
+            </span>
+            <span className="block text-sm text-[#6b635a]">
+              Replay your cinematic arrival at the Estate.
+            </span>
+          </span>
+        </button>
       </div>
 
       <ActiveCompanionsPicker />

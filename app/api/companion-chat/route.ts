@@ -15,6 +15,7 @@ import {
   buildCoachingFallbackResponse,
   isCoachingFallbackNeeded,
 } from "@/lib/sparkConversation/coachingFallback";
+import { shariCompanionHintForChat } from "@/lib/conversation/shariCompanionEngine";
 import {
   buildRelationshipResponseTraceSummary,
   createRelationshipResponseId,
@@ -165,9 +166,11 @@ export async function POST(request: NextRequest) {
       ? `${relationshipIntelligencePriority.trim()}\n\n`
       : "";
 
+    const shariCompanionBlock = shariCompanionHintForChat({ userText: userProbe });
+
     const finalSystem = `${priorityBlock}${
       businessContext ? `${systemPrompt}\n\n${businessContext}` : systemPrompt
-    }${attune}${ecosystemBlock}${intelligenceBlock}${wisdomLoopBlock}${adaptiveBlock}${workspaceBlock}${offerBlock}`;
+    }${shariCompanionBlock ? `\n\n${shariCompanionBlock}` : ""}${attune}${ecosystemBlock}${intelligenceBlock}${wisdomLoopBlock}${adaptiveBlock}${workspaceBlock}${offerBlock}`;
 
     if (process.env.NODE_ENV === "development" && relationshipIntelligencePriority) {
       console.debug("[relationship-intelligence-debug] API priority received", {

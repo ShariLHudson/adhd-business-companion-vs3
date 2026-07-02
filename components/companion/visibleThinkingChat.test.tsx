@@ -28,13 +28,13 @@ describe("Visible Thinking chat bubble", () => {
     });
   }
 
-  it("renders warm amber thinking pulse beside copy", () => {
-    renderBubble("Connecting a few dots...");
+  it("renders calm thinking label beside pulse", () => {
+    renderBubble("Thinking…");
     const bubble = container.querySelector('[data-testid="visible-thinking-bubble"]');
     const pulse = container.querySelector(".companion-chat-thinking__pulse");
     expect(bubble).toBeTruthy();
     expect(pulse).toBeTruthy();
-    expect(container.textContent).toContain("Connecting a few dots...");
+    expect(container.textContent).toContain("Thinking…");
   });
 
   it("does not repeat avatar portraits on every thinking state", () => {

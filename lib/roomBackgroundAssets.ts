@@ -32,3 +32,16 @@ export function roomBackgroundDirectCss(imageUrl: string): string {
 export function preferredBackgroundPreloadUrl(imageUrl: string): string {
   return PNG_EXT.test(imageUrl) ? webpBackgroundUrl(imageUrl) : imageUrl;
 }
+
+/** Ordered PNG/WebP variants — try the canonical path first, then the paired format. */
+export function backgroundUrlVariants(imageUrl: string): readonly string[] {
+  const variants: string[] = [imageUrl];
+  if (PNG_EXT.test(imageUrl)) {
+    const webp = webpBackgroundUrl(imageUrl);
+    if (!variants.includes(webp)) variants.push(webp);
+  } else if (/\.webp(\?.*)?$/i.test(imageUrl)) {
+    const png = imageUrl.replace(/\.webp(\?.*)?$/i, ".png$1");
+    if (!variants.includes(png)) variants.push(png);
+  }
+  return variants;
+}

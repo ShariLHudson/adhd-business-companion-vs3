@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useLayoutEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import type { FreshStartCopy } from "@/lib/freshStartCopy";
 
 type FreshStartConfirmDialogProps = {
@@ -47,25 +49,49 @@ function CheckList({
 
 export function FreshStartConfirmDialog({
   open,
+  portaled = true,
   scoped = false,
   copy,
   onConfirm,
   onCancel,
 }: FreshStartConfirmDialogProps & {
-  /** Cover the main pane only — keeps the sidebar clickable. */
+  /** Portal to body above Welcome Home / estate shell layers. */
+  portaled?: boolean;
+  /** @deprecated Prefer portaled — cover main pane only. */
   scoped?: boolean;
 }) {
+  const [portalReady, setPortalReady] = useState(
+    () => portaled && typeof window !== "undefined",
+  );
+
+  useLayoutEffect(() => {
+    if (!portaled) return;
+    setPortalReady(true);
+  }, [portaled]);
+
+  useEffect(() => {
+    if (!open) return;
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onCancel();
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open, onCancel]);
+
   if (!open) return null;
 
-  return (
+  const shellClass = portaled
+    ? "fixed inset-0 z-[100010] flex items-center justify-center bg-black/40 p-4"
+    : scoped
+      ? "absolute inset-0 z-[70] flex items-center justify-center bg-black/40 p-4"
+      : "fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4";
+
+  const dialog = (
     <div
-      className={
-        scoped
-          ? "absolute inset-0 z-[70] flex items-center justify-center bg-black/40 p-4"
-          : "fixed inset-0 z-[100] flex items-center justify-center bg-black/40 p-4"
-      }
+      className={shellClass}
       role="presentation"
       onClick={onCancel}
+      data-testid="fresh-start-dialog"
     >
       <div
         role="dialog"
@@ -107,4 +133,10 @@ export function FreshStartConfirmDialog({
       </div>
     </div>
   );
+
+  if (portaled && portalReady) {
+    return createPortal(dialog, document.body);
+  }
+
+  return dialog;
 }

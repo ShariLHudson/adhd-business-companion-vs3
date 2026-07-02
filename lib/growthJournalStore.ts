@@ -37,6 +37,42 @@ const STORAGE_KEY = "companion-growth-journal-v1";
 
 export const GROWTH_JOURNAL_UPDATED_EVENT = "companion-growth-journal-updated";
 
+let growthJournalLocalStorageBlocked = false;
+let memoryJournalEntries: JournalEntry[] | null = null;
+
+function safeGrowthSetItem(payload: string): boolean {
+  if (typeof window === "undefined") return false;
+  if (!growthJournalLocalStorageBlocked) {
+    try {
+      localStorage.setItem(STORAGE_KEY, payload);
+      return true;
+    } catch {
+      growthJournalLocalStorageBlocked = true;
+    }
+  }
+  try {
+    sessionStorage.setItem(STORAGE_KEY, payload);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function safeGrowthGetItem(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const fromLocal = localStorage.getItem(STORAGE_KEY);
+    if (fromLocal) return fromLocal;
+  } catch {
+    growthJournalLocalStorageBlocked = true;
+  }
+  try {
+    return sessionStorage.getItem(STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
 export const GROWTH_ENTRY_TYPE_LABELS: Record<GrowthEntryType, string> = {
   journal: "Journal",
   capture_moment: "Capture Moment",
@@ -75,29 +111,32 @@ function normalizeEntry(raw: unknown): JournalEntry | null {
 }
 
 function readAll(): JournalEntry[] {
-  if (typeof window === "undefined") return [];
+  if (typeof window === "undefined") return memoryJournalEntries ?? [];
   try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
+    const raw = safeGrowthGetItem();
+    if (!raw) return memoryJournalEntries ?? [];
     const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed
+    if (!Array.isArray(parsed)) return memoryJournalEntries ?? [];
+    const entries = parsed
       .map(normalizeEntry)
       .filter((e): e is JournalEntry => e != null && !e.isArchived);
+    memoryJournalEntries = entries;
+    return entries;
   } catch {
-    return [];
+    return memoryJournalEntries ?? [];
   }
 }
 
 function writeAll(list: JournalEntry[]): boolean {
   if (typeof window === "undefined") return false;
+  memoryJournalEntries = list;
+  const ok = safeGrowthSetItem(JSON.stringify(list));
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
     window.dispatchEvent(new Event(GROWTH_JOURNAL_UPDATED_EVENT));
-    return true;
   } catch {
-    return false;
+    /* listeners optional */
   }
+  return ok;
 }
 
 export function generateEntryTitle(content: string): string {
@@ -217,6 +256,42 @@ export function createYourStoryEntry(input: {
 
 export function deleteJournalEntry(id: string): void {
   writeAll(readAll().filter((e) => e.id !== id));
+}
+
+export function updateJournalEntry(
+  id: string,
+  patch: Partial<Pick<JournalEntry, "title" | "body" | "tags" | "attachments">>,
+): boolean {
+  const all = readAll();
+  const index = all.findIndex((e) => e.id === id);
+  if (index < 0) return false;
+  const existing = all[index]!;
+  const next: JournalEntry = {
+    ...existing,
+    ...patch,
+    body: patch.body?.trim() ?? existing.body,
+    updatedAt: new Date().toISOString(),
+  };
+  const updated = [...all];
+  updated[index] = next;
+  const ok = writeAll(updated);
+  if (ok && patch.attachments?.length) {
+    linkGrowthAttachmentsToRecord(patch.attachments, "journal", id);
+  }
+  return ok;
+}
+
+export function toggleJournalFavorite(id: string): boolean {
+  const entry = getJournalEntryById(id);
+  if (!entry) return false;
+  const tags = new Set(entry.tags);
+  if (tags.has("favorite")) tags.delete("favorite");
+  else tags.add("favorite");
+  return updateJournalEntry(id, { tags: [...tags] });
+}
+
+export function isJournalFavorite(entry: JournalEntry): boolean {
+  return entry.tags.includes("favorite");
 }
 
 export function getJournalEntryById(id: string): JournalEntry | null {

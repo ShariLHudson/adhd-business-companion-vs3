@@ -1,0 +1,139 @@
+/* ═══════════════════════════════════════════════════════════
+   ESTATE IMMERSIVE — full-viewport rooms, no app chrome
+═══════════════════════════════════════════════════════════ */
+
+.companion-estate-immersive-root {
+  background: #0e1210 !important;
+}
+
+/* Direct room overlay — photograph owns every pixel; no letterbox frame */
+.companion-estate-immersive-root.companion-direct-estate-room-active,
+.companion-estate-immersive-root:has(.estate-chat-navigation-overlay) {
+  background: transparent !important;
+}
+
+.companion-direct-estate-room-active .companion-estate-immersive-active {
+  background: transparent !important;
+}
+
+.companion-estate-immersive-active {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  background: transparent !important;
+  overflow: hidden;
+}
+
+.companion-estate-immersive-root .companion-sidebar-portal,
+.companion-estate-immersive-root .companion-homestead-logo,
+.companion-estate-immersive-active .companion-sidebar-portal,
+.companion-estate-immersive-active .companion-homestead-logo,
+.companion-estate-immersive-active [data-companion-topbar],
+.companion-estate-immersive-active .companion-top-bar,
+.companion-estate-immersive-active .companion-active-workspace-bar,
+.companion-direct-estate-room-active .companion-sidebar-portal,
+.companion-direct-estate-room-active .companion-homestead-logo,
+.companion-direct-estate-room-active [data-companion-topbar],
+.companion-direct-estate-room-active .companion-top-bar,
+.companion-direct-estate-room-active .companion-active-workspace-bar,
+.companion-direct-estate-room-active .homestead-signpost-sidebar,
+.companion-estate-immersive-root .homestead-signpost-sidebar {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.companion-estate-immersive-active .clear-my-mind-standalone-shell,
+.companion-estate-immersive-active .clear-my-mind-standalone-frame {
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  background: transparent;
+  min-height: 100dvh;
+  min-height: 100svh;
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: none;
+}
+
+.companion-estate-immersive-active .peaceful-places-landing {
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+  max-width: none;
+}
+
+.companion-estate-immersive-active .peaceful-places-pathway-scene__return {
+  display: none !important;
+}
+
+.companion-estate-immersive-active .companion-background,
+.companion-estate-immersive-root .companion-background,
+.companion-estate-immersive-root > [data-background-suppressed] {
+  display: none !important;
+}
+
+/* Room scenes own the viewport — no warm gradient letterbox behind them */
+.companion-estate-immersive-active .companion-bg-base,
+.companion-estate-immersive-active .companion-bg-wash,
+.companion-estate-immersive-active .companion-bg-vignette {
+  display: none !important;
+}
+
+/* Estate immersive rooms — photographic scenes fill the viewport */
+.companion-estate-immersive-active [class*="__estate-image"],
+.companion-estate-immersive-active [class*="__scene-art"],
+.companion-estate-immersive-active [class*="__room-image"],
+.companion-estate-immersive-active .cinematic-background__image {
+  background-size: cover !important;
+  background-position: center center !important;
+}
+.estate-immersive-home-link {
+  position: fixed;
+  top: max(0.85rem, env(safe-area-inset-top, 0px));
+  left: max(0.85rem, env(safe-area-inset-left, 0px));
+  z-index: 100001;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.72rem 0.42rem 0.58rem;
+  border: none;
+  border-radius: 999px;
+  background: rgba(18, 22, 18, 0.42);
+  color: rgba(255, 252, 245, 0.94);
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease;
+}
+
+.estate-immersive-home-link:hover {
+  background: rgba(18, 22, 18, 0.58);
+  transform: translateY(-1px);
+}
+
+.estate-immersive-home-link:focus-visible {
+  outline: 2px solid rgba(255, 236, 200, 0.85);
+  outline-offset: 2px;
+}
+
+.estate-immersive-home-link__arrow {
+  opacity: 0.9;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estate-immersive-home-link {
+    transition: none;
+  }
+
+  .estate-immersive-home-link:hover {
+    transform: none;
+  }
+}

@@ -1,104 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
+import type { GrowthAttachment } from "@/lib/growthAttachments";
 import {
   attachmentTypeLabel,
-  downloadGrowthAttachment,
   linkAttachment,
   openGrowthAttachment,
   readFileAsAttachment,
   resolveGrowthAttachment,
-  type GrowthAttachment,
 } from "@/lib/growthAttachments";
 
-const LABEL_CLASS = "text-xs font-bold uppercase tracking-wide text-[#9a8f82]";
-const INPUT_CLASS =
-  "mt-1 w-full rounded-xl border border-[#e4ddd2] bg-white px-3 py-2.5 text-sm text-[#2d2926] placeholder:text-[#9a8f82] focus:border-[#c9a66b] focus:outline-none focus:ring-2 focus:ring-[#c9a66b]/25";
+type Props = {
+  attachments: GrowthAttachment[];
+  onChange: (attachments: GrowthAttachment[]) => void;
+  label?: string;
+  allowLink?: boolean;
+  className?: string;
+};
 
-function AttachmentRow({
-  att,
-  onRemove,
-  compact,
-}: {
-  att: GrowthAttachment;
-  onRemove?: () => void;
-  compact?: boolean;
-}) {
-  const resolved = resolveGrowthAttachment(att);
-  return (
-    <li
-      className={`flex gap-3 rounded-lg border border-[#efe8de] bg-[#faf7f2]/60 px-3 py-2 ${
-        compact ? "text-xs" : "text-sm"
-      } text-[#4b463f]`}
-    >
-      {resolved.kind === "image" && resolved.url ? (
-        <img
-          src={resolved.url}
-          alt={resolved.name}
-          className="h-12 w-12 shrink-0 rounded-md border border-[#e7d9c8] object-cover"
-        />
-      ) : (
-        <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md border border-[#e7d9c8] bg-white text-[10px] font-bold uppercase tracking-wide text-[#9a8f82]">
-          {att.kind === "pdf"
-            ? "PDF"
-            : att.kind === "video"
-              ? "Video"
-              : att.kind === "link"
-                ? "Link"
-                : "File"}
-        </span>
-      )}
-      <div className="min-w-0 flex-1">
-        <p className="truncate font-medium text-[#2f261f]">{resolved.name}</p>
-        <p className="text-[10px] font-semibold uppercase tracking-wide text-[#9a8f82]">
-          {attachmentTypeLabel(resolved.kind)}
-          {att.assetId ? " · library" : ""}
-        </p>
-        <div className="mt-1 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => openGrowthAttachment(att)}
-            className="text-xs font-semibold text-[#b45309] hover:underline"
-          >
-            {resolved.url.startsWith("http") ? "Open" : "Download"}
-          </button>
-          {resolved.kind === "image" ? (
-            <button
-              type="button"
-              onClick={() => downloadGrowthAttachment(att)}
-              className="text-xs font-semibold text-[#6f6259] hover:underline"
-            >
-              Download
-            </button>
-          ) : null}
-          {onRemove ? (
-            <button
-              type="button"
-              onClick={onRemove}
-              className="text-xs font-semibold text-[#9a6b6b] hover:text-[#7f4f4f]"
-            >
-              Remove
-            </button>
-          ) : null}
-        </div>
-      </div>
-    </li>
-  );
-}
-
+/** Photo/file attachments for Growth collection rooms — Asset Library refs. */
 export function GrowthAttachmentsField({
   attachments,
-  link,
-  onAttachmentsChange,
-  onLinkChange,
-}: {
-  attachments: GrowthAttachment[];
-  link?: string;
-  onAttachmentsChange: (next: GrowthAttachment[]) => void;
-  onLinkChange?: (next: string) => void;
-}) {
-  const [linkDraft, setLinkDraft] = useState(link ?? "");
+  onChange,
+  label = "Photos or files (optional)",
+  allowLink = true,
+  className = "",
+}: Props) {
+  const fileRef = useRef<HTMLInputElement>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [linkDraft, setLinkDraft] = useState("");
 
   async function handleFiles(files: FileList | null) {
     if (!files?.length) return;
@@ -107,115 +37,129 @@ export function GrowthAttachmentsField({
     for (const file of Array.from(files)) {
       const att = await readFileAsAttachment(file);
       if (!att) {
-        setFileError("File too large — max 2 MB per attachment.");
+        setFileError("That file is a little large — max 2 MB per attachment.");
         continue;
       }
       next.push(att);
     }
-    onAttachmentsChange(next);
+    onChange(next);
+    if (fileRef.current) fileRef.current.value = "";
   }
 
   function addLink() {
-    const trimmed = linkDraft.trim();
-    if (!trimmed) return;
-    onAttachmentsChange([...attachments, linkAttachment(trimmed)]);
-    setLinkDraft("");
-    onLinkChange?.("");
+    const url = linkDraft.trim();
+    if (!url) return;
+    try {
+      const att = linkAttachment(url);
+      onChange([...attachments, att]);
+      setLinkDraft("");
+      setFileError(null);
+    } catch {
+      setFileError("That link did not look quite right.");
+    }
+  }
+
+  function remove(id: string) {
+    onChange(attachments.filter((att) => att.id !== id));
   }
 
   return (
-    <div className="space-y-3">
-      <div>
-        <p className={LABEL_CLASS}>Attachments</p>
-        <p className="mt-0.5 text-xs text-[#9a8f82]">
-          Screenshots, certificates, PDFs, documents, links, or video URLs
-        </p>
-        <input
-          type="file"
-          multiple
-          accept="image/*,.pdf,.doc,.docx,.txt,.xls,.xlsx"
-          onChange={(e) => {
-            void handleFiles(e.target.files);
-            e.target.value = "";
-          }}
-          className="mt-2 block w-full text-xs text-[#6f6259] file:mr-3 file:rounded-full file:border-0 file:bg-[#faf7f2] file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-[#2f261f]"
-        />
-        {fileError ? (
-          <p className="mt-1 text-xs text-[#a85c4a]">{fileError}</p>
-        ) : null}
-      </div>
+    <div
+      className={["estate-collection-panel__attachments", className].join(" ")}
+    >
+      <span className="estate-collection-panel__capture-label">{label}</span>
 
-      <div className="flex flex-wrap gap-2">
+      {attachments.length > 0 ? (
+        <ul className="estate-collection-panel__attachment-list">
+          {attachments.map((att) => {
+            const resolved = resolveGrowthAttachment(att);
+            const isImage = resolved.kind === "image";
+            return (
+              <li key={att.id} className="estate-collection-panel__attachment">
+                {isImage && resolved.url ? (
+                  <button
+                    type="button"
+                    className="estate-collection-panel__attachment-thumb"
+                    onClick={() => openGrowthAttachment(resolved)}
+                    aria-label={`Open ${resolved.name}`}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={resolved.url} alt="" />
+                  </button>
+                ) : null}
+                <div className="estate-collection-panel__attachment-meta">
+                  <button
+                    type="button"
+                    className="estate-collection-panel__attachment-name"
+                    onClick={() => openGrowthAttachment(resolved)}
+                  >
+                    {resolved.name || attachmentTypeLabel(resolved.kind)}
+                  </button>
+                  <span className="estate-collection-panel__attachment-kind">
+                    {attachmentTypeLabel(resolved.kind)}
+                  </span>
+                </div>
+                <button
+                  type="button"
+                  className="estate-collection-panel__attachment-remove"
+                  onClick={() => remove(att.id)}
+                >
+                  Remove
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      ) : null}
+
+      {fileError ? (
+        <p className="estate-collection-panel__attachment-error" role="status">
+          {fileError}
+        </p>
+      ) : null}
+
+      <div className="estate-collection-panel__attachment-actions">
         <input
-          type="url"
-          value={linkDraft}
-          onChange={(e) => {
-            setLinkDraft(e.target.value);
-            onLinkChange?.(e.target.value);
-          }}
-          placeholder="Paste a link or video URL"
-          className={`${INPUT_CLASS} min-w-[12rem] flex-1`}
+          ref={fileRef}
+          type="file"
+          className="sr-only"
+          multiple
+          accept="image/*,.pdf,.doc,.docx,.txt"
+          onChange={(e) => void handleFiles(e.target.files)}
         />
         <button
           type="button"
-          onClick={addLink}
-          disabled={!linkDraft.trim()}
-          className="self-end rounded-full border border-[#e7d9c8] bg-[#faf7f2] px-3 py-2 text-xs font-semibold text-[#2f261f] hover:bg-[#f3ebe0] disabled:opacity-40"
+          className="estate-collection-panel__attach-btn"
+          onClick={() => fileRef.current?.click()}
         >
-          Add link
+          Add photo or file
         </button>
-      </div>
-
-      {attachments.length > 0 ? (
-        <ul className="space-y-2">
-          {attachments.map((att) => (
-            <AttachmentRow
-              key={att.id}
-              att={att}
-              onRemove={() =>
-                onAttachmentsChange(attachments.filter((a) => a.id !== att.id))
-              }
+        {allowLink ? (
+          <div className="estate-collection-panel__link-row">
+            <input
+              type="url"
+              className="estate-collection-panel__link-input"
+              placeholder="Or paste a link"
+              value={linkDraft}
+              onChange={(e) => setLinkDraft(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  addLink();
+                }
+              }}
             />
-          ))}
-        </ul>
-      ) : null}
+            <button
+              type="button"
+              className="estate-collection-panel__link-add"
+              disabled={!linkDraft.trim()}
+              onClick={addLink}
+            >
+              Add link
+            </button>
+          </div>
+        ) : null}
+      </div>
     </div>
-  );
-}
-
-export function GrowthAttachmentsList({
-  attachments,
-  link,
-  onAttachmentsChange,
-  compact,
-}: {
-  attachments: GrowthAttachment[];
-  link?: string;
-  onAttachmentsChange?: (next: GrowthAttachment[]) => void;
-  compact?: boolean;
-}) {
-  const items = [...attachments];
-  if (link?.trim() && !items.some((a) => a.url === link.trim())) {
-    items.push(linkAttachment(link.trim()));
-  }
-  if (items.length === 0) return null;
-  return (
-    <ul className={`mt-2 space-y-2 ${compact ? "" : ""}`}>
-      {items.map((att) => (
-        <AttachmentRow
-          key={att.id}
-          att={att}
-          compact={compact}
-          onRemove={
-            onAttachmentsChange
-              ? () =>
-                  onAttachmentsChange(
-                    attachments.filter((a) => a.id !== att.id),
-                  )
-              : undefined
-          }
-        />
-      ))}
-    </ul>
   );
 }

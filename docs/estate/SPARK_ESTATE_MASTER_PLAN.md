@@ -83,7 +83,7 @@ Everything else (`growth-journal`, `achievement-library`, `gazebo-journal-backgr
 | **`placeId`** | `kebab-case`, **immutable** | `journal` |
 | AppSection | `{placeId}` or legacy alias table | `growth-journal` → alias → `journal` |
 | Background | `public/backgrounds/{placeId}-background.png` | `journal-gazebo-background.png` (target) |
-| Ambience | `public/audio/{placeId}-{layer}.mp3` | `journal-gazebo-water.mp3` |
+| Ambience | `public/audio/{placeId}-{layer}.mp3` | `journal-gazebo-water.mp3` — see [Estate Ambient Sound System](./ESTATE_AMBIENT_SOUND_SYSTEM.md) |
 | Component folder | `components/{placeId}/` | `components/journal-gazebo/` |
 | Shell component | `{PascalCase}Room.tsx` | `JournalGazeboRoom.tsx` (future) |
 | Lib module | `lib/{camelCase}/` | `lib/journalGazebo/` |

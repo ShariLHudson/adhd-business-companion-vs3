@@ -27,6 +27,13 @@ import {
 } from "./resolveEstatePlace";
 import { evaluateConversationEnvironmentNeed, isConversationEnvironmentOffer } from "./conversationDrivesNavigation";
 import { extractRoomPhraseFromNavigation } from "./estateRoomAliasRegistry";
+import {
+  formatCelebrationSoundsReply,
+  formatSwimmingPoolOfferLine,
+  isCelebrationSoundsIntent,
+  isSwimmingPoolNavigationRequest,
+  SWIMMING_POOL_ALTERNATIVE_PLACE_IDS,
+} from "./estatePlaceNavigationIntents";
 import { parseOptionSelection } from "@/lib/workspaceSop";
 import {
   detectDirectCommand,
@@ -144,6 +151,7 @@ export type EstatePlaceTurnResult =
   | { type: "none" }
   | { type: "navigate"; command: EstateCommandDecision }
   | { type: "offer"; line: string; placeIds: string[] }
+  | { type: "reply"; line: string }
   | { type: "unknown_place"; line: string };
 
 const PENDING_MENU_KEY = "companion-pending-estate-place-menu-v1";
@@ -454,6 +462,18 @@ export function evaluateEstatePlaceTurn(input: {
   const text = input.userText.trim();
   if (!text) return { type: "none" };
 
+  if (isCelebrationSoundsIntent(text)) {
+    return { type: "reply", line: formatCelebrationSoundsReply() };
+  }
+
+  if (isSwimmingPoolNavigationRequest(text)) {
+    return {
+      type: "offer",
+      line: formatSwimmingPoolOfferLine(),
+      placeIds: [...SWIMMING_POOL_ALTERNATIVE_PLACE_IDS],
+    };
+  }
+
   if (isCaptureWriteTurn(text)) return { type: "none" };
 
   const lastAssistant = input.lastAssistantText ?? null;
@@ -481,6 +501,11 @@ export function evaluateEstatePlaceTurn(input: {
   }
 
   const resolution = resolveEstatePlace(text);
+
+  if (resolution.kind === "audio-settings") {
+    return { type: "reply", line: formatCelebrationSoundsReply() };
+  }
+
   if (shouldAutoNavigateFromResolution(text, resolution) && resolution.placeId) {
     clearPendingEstatePlaceMenu();
     const command = navigateCommandForPlace(

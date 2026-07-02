@@ -20,6 +20,23 @@ export const ESTATE_PRINCIPLE_QUESTIONS = [
   "What transformation happens here?",
 ] as const;
 
+/**
+ * The Conversation Front Door™ — governing rule for every Estate feature.
+ * Conversation is how members enter; rooms deepen the experience.
+ *
+ * @see docs/ESTATE_INTELLIGENCE_FRAMEWORK.md#the-conversation-front-door
+ * @see docs/ESTATE_ROOMS_FRAMEWORK.md#the-conversation-front-door
+ */
+export const CONVERSATION_FRONT_DOOR_PRINCIPLE =
+  "If a member can accomplish something by talking to Spark, they should never have to hunt through the Estate to find it." as const;
+
+/** Design gate — every new room, tool, or capability must pass all three. */
+export const CONVERSATION_FRONT_DOOR_GATE = [
+  "Can the member get meaningful help from conversation alone?",
+  "Is Estate navigation optional enrichment — not a prerequisite?",
+  "Would a first-time visitor need to know a room name to succeed?",
+] as const;
+
 /** Environmental Psychology™ — dimensions the room intentionally influences */
 export type EnvironmentalPsychologyDimension =
   | "attention"

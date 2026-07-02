@@ -1,0 +1,42 @@
+---
+description: Living in Spark Estate — architectural authority; feelings before features
+globs:
+  - app/companion/**
+  - components/companion/**
+  - components/estate/**
+  - lib/estate/**
+  - lib/estateIntelligence/**
+  - lib/estateMenu/**
+  - public/backgrounds/**
+alwaysApply: true
+---
+
+# Living in Spark Estate™ — Experience Guide (BINDING)
+
+**Authority manifest:** `docs/estate/ESTATE_ARCHITECTURAL_AUTHORITY.md`  
+**Full text:** `docs/estate/Living in Spark Estate.md`  
+**With:** Constitution · Spark Estate Bible — **not reference material**
+
+## Heart
+
+> Spark Estate™ is not a place you use. It is a place where you are welcomed home.
+
+## Build for feeling, not features
+
+- Places organized by **emotion** — members remember feelings longer than menus  
+- Some places **simply exist** — no function required  
+- Conversation is **home** — moves with the member; never resets on room change  
+- Shari **lives here** — never launches modules; walks beside  
+- **Silence is welcome** — "Then we won't."  
+- Objects have **stories** — Guidebook, Bell, Accomplishments Book — not UI chrome  
+- Celebrate **quietly** — flowers, notes, bell — never confetti or pop-ups  
+- Beauty **before** information — discovered, not presented  
+- Estate **matures** — does not level up  
+
+## Never in code or copy
+
+Menus as navigation · room tours · achievement pop-ups · "launch experience" · interrogation on move · software labels on glass
+
+## Before shipping
+
+Could this exist in a real country estate? Would someone want to **stay**?

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { CreativeStudioRoomShell } from "@/components/companion/CreativeStudioRoomShell";
+import { PortfolioRoomShell } from "@/components/companion/PortfolioRoomShell";
 import { EstateWorkspace } from "@/components/companion/EstateWorkspace";
 import { GrowthPanelBackButton } from "@/components/companion/GrowthPanelBackButton";
 import { GrowthAttachmentsField } from "@/components/companion/GrowthAttachmentsField";
@@ -12,6 +12,7 @@ import {
   type PortfolioEntry,
 } from "@/lib/growthPortfolioStore";
 import type { GrowthPanelNav } from "@/lib/growthNavigation";
+import "@/app/companion/grow-room.css";
 import "@/app/companion/creative-studio-room.css";
 
 function formatDate(iso: string): string {
@@ -38,20 +39,20 @@ export function GrowthPortfolioPanel({
   }, []);
 
   return (
-    <CreativeStudioRoomShell>
-      <EstateWorkspace>
+    <PortfolioRoomShell>
+      <EstateWorkspace className="grow-room-panel">
         <GrowthPanelBackButton onBack={nav.onBack} label={nav.backLabel ?? "My Story"} />
 
-        <header className="creative-studio-room__header">
-          <p className="estate-workspace__kicker">Creative Studio</p>
-          <h1 className="estate-workspace__title">Creative Portfolio</h1>
-          <p className="estate-workspace__lead">
+        <header className="grow-room__header">
+          <p className="estate-workspace__kicker">Your Estate</p>
+          <h1 className="estate-workspace__title">Portfolio™</h1>
+          <p className="grow-room__lead grow-room__intro-support">
             A place for your ideas, projects, courses, businesses and creative work to grow.
           </p>
         </header>
 
         {entries.length === 0 ? (
-          <p className="creative-studio-room__empty">
+          <p className="grow-room__placeholder-card">
             Your gallery is waiting. Capture something you made from Growth — file to Portfolio.
           </p>
         ) : (
@@ -101,6 +102,6 @@ export function GrowthPortfolioPanel({
           </ul>
         )}
       </EstateWorkspace>
-    </CreativeStudioRoomShell>
+    </PortfolioRoomShell>
   );
 }

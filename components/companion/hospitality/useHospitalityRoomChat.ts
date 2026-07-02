@@ -1,7 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { routeCompanionFailure } from "@/lib/companionContextRouting";
 import { getPrefs } from "@/lib/companionStore";
+import { tryCommitMicCaptureOnEnd } from "@/lib/voiceMicCommit";
 
 type ChatMessage = { role: "user" | "assistant"; content: string };
 
@@ -30,6 +32,11 @@ export function useHospitalityRoomChat() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const baseInputRef = useRef("");
+  const inputSnapshotRef = useRef("");
+  const micExplicitStopRef = useRef(false);
+  const handleSendRef = useRef<(overrideText?: string) => Promise<void>>(
+    async () => {},
+  );
 
   useEffect(() => {
     const win = window as typeof window & {
@@ -52,11 +59,28 @@ export function useHospitalityRoomChat() {
       }
       const prefix = baseInputRef.current;
       const separator = prefix && !prefix.endsWith(" ") ? " " : "";
-      setInput(prefix + separator + transcript);
+      const nextValue = prefix + separator + transcript;
+      inputSnapshotRef.current = nextValue;
+      setInput(nextValue);
     };
 
-    recognition.onend = () => setIsListening(false);
-    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => {
+      setIsListening(false);
+      tryCommitMicCaptureOnEnd({
+        explicitStopRequested: micExplicitStopRef.current,
+        inputSnapshot: inputSnapshotRef.current,
+        send: (text) => {
+          void handleSendRef.current(text);
+        },
+        onConsumedExplicitStop: () => {
+          micExplicitStopRef.current = false;
+        },
+      });
+    };
+    recognition.onerror = () => {
+      setIsListening(false);
+      micExplicitStopRef.current = false;
+    };
     recognitionRef.current = recognition;
     setSpeechSupported(true);
 
@@ -70,10 +94,12 @@ export function useHospitalityRoomChat() {
     const recognition = recognitionRef.current;
     if (!recognition) return;
     if (isListening) {
+      micExplicitStopRef.current = true;
       recognition.stop();
       return;
     }
     baseInputRef.current = input;
+    inputSnapshotRef.current = input;
     try {
       recognition.start();
       setIsListening(true);
@@ -89,13 +115,16 @@ export function useHospitalityRoomChat() {
   }, [input, isListening]);
 
   const handleInputChange = useCallback((value: string) => {
+    inputSnapshotRef.current = value;
     setInput(value);
   }, []);
 
-  const handleSend = useCallback(async () => {
-    const text = input.trim();
+  const handleSend = useCallback(async (overrideText?: string) => {
+    handleSendRef.current = handleSend;
+    const text = (overrideText ?? input).trim();
     if (!text || isLoading) return;
 
+    micExplicitStopRef.current = false;
     recognitionRef.current?.stop();
     setIsListening(false);
 
@@ -103,6 +132,7 @@ export function useHospitalityRoomChat() {
     const nextMessages = [...messages, userMsg];
     setMessages(nextMessages);
     setInput("");
+    inputSnapshotRef.current = "";
     setIsLoading(true);
 
     try {
@@ -122,37 +152,31 @@ export function useHospitalityRoomChat() {
       });
       const data = (await res.json()) as { message?: string; error?: string };
       if (!res.ok) {
-        throw new Error(data.error ?? "Request failed");
+        throw new Error(data.error ?? "companion-chat-unavailable");
       }
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: data.message ?? "I'm here — try asking again.",
+          content: data.message ?? "I'm here — what would help most?",
         },
       ]);
-    } catch {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "I'm having trouble connecting — try again in a moment.",
-        },
-      ]);
+    } catch (err) {
+      const routed = routeCompanionFailure(err, {
+        surface: "chat",
+        userText: text,
+      });
+      if (routed.channel === "estate") {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: routed.message },
+        ]);
+      }
     } finally {
       setIsLoading(false);
       inputRef.current?.focus();
     }
   }, [input, isLoading, messages]);
-
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-      if (event.key !== "Enter" || event.shiftKey) return;
-      event.preventDefault();
-      void handleSend();
-    },
-    [handleSend],
-  );
 
   return {
     input,
@@ -162,7 +186,6 @@ export function useHospitalityRoomChat() {
     speechSupported,
     inputRef,
     handleInputChange,
-    handleKeyDown,
     handleSend,
     toggleListening,
   };

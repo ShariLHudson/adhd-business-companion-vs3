@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { pickChatPlaceholder } from "@/lib/chatCanvas/chatPlaceholders";
 import { INPUT_PLACEHOLDER } from "@/lib/companionUi";
 import { COMMUNICATION_ANCHOR_TEST_IDS } from "@/lib/companionCommunicationAnchor";
+import { handleChatTextareaKeyDown } from "@/lib/chatInputKeyboard";
 
 type ChatInputBarProps = {
   input: string;
@@ -12,9 +13,9 @@ type ChatInputBarProps = {
   speechSupported: boolean;
   inputRef: React.RefObject<HTMLTextAreaElement | null>;
   onInputChange: (value: string) => void;
-  onKeyDown: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
+  onKeyDown?: (e: React.KeyboardEvent<HTMLTextAreaElement>) => void;
   onToggleListening: () => void;
-  onSend: () => void;
+  onSend: (overrideText?: string) => void;
   placeholder?: string;
   onFocus?: () => void;
   onBlur?: () => void;
@@ -83,7 +84,13 @@ export function ChatInputBar({
         data-testid={COMMUNICATION_ANCHOR_TEST_IDS.input}
         value={input}
         onChange={(e) => onInputChange(e.target.value)}
-        onKeyDown={onKeyDown}
+        onKeyDown={(e) => {
+          const liveText = e.currentTarget.value;
+          handleChatTextareaKeyDown(e, (text) => onSend(text), {
+            canSend: Boolean(liveText.trim()) && !isLoading,
+            onOtherKey: onKeyDown,
+          });
+        }}
         onFocus={onFocus}
         onBlur={onBlur}
         placeholder={resolvedPlaceholder}
@@ -96,7 +103,7 @@ export function ChatInputBar({
         type="button"
         data-testid={COMMUNICATION_ANCHOR_TEST_IDS.send}
         data-icon-slot="send"
-        onClick={onSend}
+        onClick={() => onSend()}
         disabled={!input.trim() || isLoading}
         className={`send-soft flex h-12 shrink-0 items-center justify-center rounded-full px-6 text-base font-medium text-white transition-all disabled:cursor-not-allowed disabled:bg-[#9aaba8] disabled:shadow-none ${conversationMode ? "send-soft-conversation" : ""}`}
       >

@@ -8,7 +8,8 @@ export type PeacefulPlaceId =
   | "east-terrace"
   | "bright-studio"
   | "bedroom-window"
-  | "evening-hearth";
+  | "evening-hearth"
+  | "music-room";
 
 export type PeacefulPlaceAudioLayerRole =
   | "primary"

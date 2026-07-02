@@ -1,30 +1,20 @@
 import type { SpecializedIntelligenceId } from "../companionConstitution/specializedIntelligence/registry";
 
-/** Curiosity Intelligence — connection before instruction. */
+/** Curiosity — only when genuinely needed; never a mandatory opener. */
 export const CURIOSITY_OPENERS = [
-  "Can I tell you what caught my attention?",
-  "Help me understand something...",
-  "I wonder if...",
-  "You know what's interesting?",
-  "Can we be curious about something for a second?",
-  "I have a feeling there might be more going on.",
-  "I've been wondering...",
-  "Hmm — before I jump in, can I ask you something?",
+  "Hmm —",
+  "Okay —",
+  "Yeah —",
+  "So —",
 ] as const;
 
 export const GENTLE_CURIOSITY_OPENERS = [
   "I'm here.",
-  "Take a breath with me for a second...",
-  "I don't want to rush this.",
-  "I want to be thoughtful here.",
-  "Can I tell you what I noticed?",
-  "Something about this feels important — can we sit with it a moment?",
+  "Take your time.",
+  "No rush.",
 ] as const;
 
 export const HUMAN_DRIFT_MARKERS = [
-  "That reminds me...",
-  "Can I tell you something I noticed?",
-  "I've been wondering...",
   "You know...",
   "Actually...",
   "Oh...",

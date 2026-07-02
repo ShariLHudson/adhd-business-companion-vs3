@@ -17,6 +17,7 @@ import {
 } from "@/lib/welcomeRoom/arrival";
 import { WELCOME_ROOM_VOICE_PLAYBACK_RATE } from "@/lib/welcomeRoom/voice";
 import {
+  WELCOME_HOME_FOUNDER_AUDIO_SRC,
   WELCOME_ROOM_GREETING_AUDIO_SRC,
   WELCOME_ROOM_FULL_WELCOME_AUDIO_SRC,
   WELCOME_ROOM_WELCOME_AUDIO_PARTS,
@@ -53,8 +54,29 @@ export const WELCOME_ROOM_AUDIO_PROFILE: WelcomeAudioProfile = {
   },
 };
 
+/** Welcome Home — founder welcome on first visit; same ambience as Welcome Room. */
+export const WELCOME_HOME_AUDIO_PROFILE: WelcomeAudioProfile = {
+  id: "welcome-home",
+  timeline: {
+    silenceMs: WELCOME_ROOM_SILENCE_MS,
+    musicStartMs: WELCOME_ROOM_PLAY_MUSIC_START_MS,
+    voiceStartMs: WELCOME_ROOM_PLAY_VOICE_START_MS,
+  },
+  ambience: WELCOME_ROOM_AUDIO_PROFILE.ambience,
+  voice: {
+    id: "welcome-home-founder-welcome",
+    greetingText: WELCOME_ROOM_GREETING_SPEECH,
+    greetingSrc: WELCOME_ROOM_GREETING_AUDIO_SRC,
+    bodyText: welcomeRoomWelcomeBodySpeechText(),
+    cachedBodySrcs: WELCOME_ROOM_WELCOME_AUDIO_PARTS,
+    fullWelcomeSrc: WELCOME_HOME_FOUNDER_AUDIO_SRC,
+    playbackRate: WELCOME_ROOM_VOICE_PLAYBACK_RATE,
+  },
+};
+
 const PROFILE_REGISTRY: Record<string, WelcomeAudioProfile> = {
   [WELCOME_ROOM_AUDIO_PROFILE.id]: WELCOME_ROOM_AUDIO_PROFILE,
+  [WELCOME_HOME_AUDIO_PROFILE.id]: WELCOME_HOME_AUDIO_PROFILE,
 };
 
 export function resolveWelcomeAudioProfile(

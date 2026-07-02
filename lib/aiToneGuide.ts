@@ -12,7 +12,7 @@ export type AiToneGuide = {
   example: string;
 };
 
-/** ADHD entrepreneur states → best tone (for coaching hints and future auto-suggest). */
+/** @deprecated For documentation only — do NOT auto-change Conversation Style from Today's Reality. */
 export const TONE_BY_FOUNDER_STATE: Readonly<
   Record<string, { tone: AiTone; label: string }>
 > = {
@@ -31,8 +31,9 @@ export const AI_TONE_GUIDES: AiToneGuide[] = [
     emoji: "❤️",
     desc: "Emotional safety, validation, reduced pressure.",
     purpose: "Emotional safety · validation · reduced pressure",
-    feelsLike: "Therapist · Best friend · Compassionate coach",
-    bestFor: "Overwhelm — when you need to feel safe before acting.",
+    feelsLike: "Best friend · Warm presence · Patient listener",
+    bestFor:
+      "When you generally want more softness and validation before action.",
     whatChanges:
       "Leads with warmth and validation; never rushes productivity; one soft question at a time.",
     example:
@@ -44,8 +45,8 @@ export const AI_TONE_GUIDES: AiToneGuide[] = [
     emoji: "⚖️",
     desc: "Default companion — trusted partner energy.",
     purpose: "Everyday coaching — empathy plus clarity",
-    feelsLike: "Trusted partner · Companion · Thoughtful coach",
-    bestFor: "Normal days — your everyday default.",
+    feelsLike: "Trusted partner · Companion · Thoughtful friend",
+    bestFor: "Your everyday default — empathy plus clarity.",
     whatChanges:
       "Brief empathy, then structure; helps you see what's competing for attention.",
     example:
@@ -57,8 +58,9 @@ export const AI_TONE_GUIDES: AiToneGuide[] = [
     emoji: "🎯",
     desc: "Action, momentum, decision-making.",
     purpose: "Action · momentum · decisions",
-    feelsLike: "Executive assistant · Productivity coach",
-    bestFor: "Procrastinating — when you need a push, not a pep talk.",
+    feelsLike: "Honest friend · Clear thinker · Kind truth-teller",
+    bestFor:
+      "When you generally want honest, kind directness and clear next moves.",
     whatChanges:
       "Cuts preamble; uses lists and sorting frames (must do / should do / can wait).",
     example:
@@ -70,8 +72,9 @@ export const AI_TONE_GUIDES: AiToneGuide[] = [
     emoji: "😄",
     desc: "Lower anxiety through lightness.",
     purpose: "Lower anxiety · lightness · ADHD-friendly humor",
-    feelsLike: "ADHD friend · Funny coworker · Cheerleader",
-    bestFor: "Stress — when everything feels heavy and you need air.",
+    feelsLike: "ADHD friend · Funny coworker · Light-hearted companion",
+    bestFor:
+      "When you generally want lightness and humor to lower anxiety.",
     whatChanges:
       "Light metaphors and humor — never at your expense; makes planning feel less grim.",
     example:
@@ -83,8 +86,9 @@ export const AI_TONE_GUIDES: AiToneGuide[] = [
     emoji: "🧠",
     desc: "Zoom out — outcomes over tasks.",
     purpose: "Business planning · prioritization · big picture",
-    feelsLike: "CEO advisor · Board member · Business strategist",
-    bestFor: "Planning business — when you need zoom-out, not more tasks.",
+    feelsLike: "Thoughtful friend · Big-picture thinker · Steady advisor",
+    bestFor:
+      "When you generally want zoom-out and outcome-focused thinking.",
     whatChanges:
       "Challenges false urgency; connects work to outcomes; questions what actually matters this week.",
     example:
@@ -96,8 +100,9 @@ export const AI_TONE_GUIDES: AiToneGuide[] = [
     emoji: "🔥",
     desc: "Encouragement and the next 15 minutes.",
     purpose: "Unstick · momentum · forward motion",
-    feelsLike: "Encourager · Momentum coach",
-    bestFor: "Stuck — when you know what to do but can't start.",
+    feelsLike: "Encouraging friend · Steady cheerleader · Believer in you",
+    bestFor:
+      "When you generally want encouragement focused on the next small step.",
     whatChanges:
       "Affirms capability without toxic positivity; focuses on one small next step in the next 15 minutes.",
     example:

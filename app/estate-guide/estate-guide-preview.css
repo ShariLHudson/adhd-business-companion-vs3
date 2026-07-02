@@ -1,0 +1,62 @@
+/* Standalone estate guide preview — /estate-guide/[id] */
+
+.eg-guide-preview {
+  min-height: 100dvh;
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  background:
+    radial-gradient(ellipse 120% 80% at 50% 0%, rgba(255, 252, 246, 0.5), transparent 55%),
+    linear-gradient(165deg, #c9bfb0 0%, #b8ab9a 45%, #a89b8c 100%);
+}
+
+.eg-guide-preview__toolbar {
+  max-width: 88rem;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 0.4rem;
+  border: 1px solid rgba(201, 166, 107, 0.45);
+  background: rgba(250, 246, 238, 0.92);
+  font-family: system-ui, sans-serif;
+}
+
+.eg-guide-preview__eyebrow {
+  margin: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #5c5650;
+}
+
+.eg-guide-preview__title {
+  margin: 0.2rem 0 0;
+  font-family: Georgia, serif;
+  font-size: clamp(1.125rem, 2vw, 1.35rem);
+  color: #1a4a47;
+}
+
+.eg-guide-preview__back {
+  padding: 0.45rem 0.85rem;
+  border: 1px solid rgba(201, 166, 107, 0.55);
+  border-radius: 0.4rem;
+  background: #fff;
+  font-size: 0.95rem;
+  color: #1a4a47;
+  text-decoration: none;
+}
+
+.eg-guide-preview__back:hover {
+  background: #faf6ee;
+}
+
+.eg-guide-preview__empty {
+  max-width: 36rem;
+  margin: 4rem auto;
+  padding: 2rem;
+  text-align: center;
+  font-family: Georgia, serif;
+  font-size: 1.25rem;
+  color: #3a3632;
+}

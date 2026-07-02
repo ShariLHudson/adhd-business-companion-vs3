@@ -1,0 +1,191 @@
+/* Global Estate Menu™ — profile & settings, upper-right on every page */
+
+.global-estate-menu-anchor {
+  pointer-events: auto;
+}
+
+/* Final authority — menu anchor + panel never use chat placement */
+[data-companion-menu-layer="true"][data-estate-menu-variant="floating"].global-estate-menu-anchor {
+  position: fixed !important;
+  top: max(0.85rem, env(safe-area-inset-top, 0px)) !important;
+  right: max(0.85rem, env(safe-area-inset-right, 0px)) !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  z-index: 100002;
+}
+
+.global-estate-menu__panel.global-estate-menu__panel--floating[data-companion-menu-panel="true"] {
+  position: fixed !important;
+  top: calc(max(0.85rem, env(safe-area-inset-top, 0px)) + 2.75rem + 0.45rem) !important;
+  right: max(0.85rem, env(safe-area-inset-right, 0px)) !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  width: min(20rem, calc(100vw - 1.5rem)) !important;
+  max-height: min(32rem, calc(100dvh - 5rem)) !important;
+}
+
+.global-estate-menu__trigger {
+  position: relative;
+  z-index: 50;
+  display: flex;
+  height: 2.75rem;
+  width: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid #6b5010;
+  background: #3d3028;
+  color: #e8ddd4;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.global-estate-menu__trigger--floating {
+  border-color: rgba(255, 252, 245, 0.22);
+  background: rgba(18, 22, 18, 0.48);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.global-estate-menu__trigger:hover {
+  border-color: #8a6a18;
+  background: #4a3a28;
+}
+
+.global-estate-menu__trigger--floating:hover {
+  background: rgba(18, 22, 18, 0.62);
+}
+
+.global-estate-menu__trigger:focus-visible {
+  outline: 2px solid rgba(255, 236, 200, 0.85);
+  outline-offset: 2px;
+}
+
+.global-estate-menu__avatar-image,
+.global-estate-menu__avatar-fallback {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.global-estate-menu__avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  background: #e8e2d8;
+  color: #4b463f;
+}
+
+.global-estate-menu__dots {
+  position: relative;
+  z-index: 1;
+  font-size: 1.15rem;
+  line-height: 1;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.45);
+}
+
+.global-estate-menu__panel {
+  overflow-y: auto;
+  overflow-x: hidden;
+  border-radius: 0.85rem;
+  border: 1px solid #d8cfc2;
+  background: #fff;
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.18);
+}
+
+.global-estate-menu__panel--floating {
+  /* open position: companion-layout-layers.css */
+}
+
+.global-estate-menu__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-bottom: 1px solid #e7dfd4;
+  padding: 0.85rem 1rem;
+}
+
+.global-estate-menu__header-avatar {
+  height: 2.25rem;
+  width: 2.25rem;
+  flex-shrink: 0;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.global-estate-menu__header-avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8e2d8;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #4b463f;
+}
+
+.global-estate-menu__header-name {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #1f1c19;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.global-estate-menu__header-sub {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #9a8f82;
+}
+
+.global-estate-menu__section {
+  padding: 0.35rem 0 0.25rem;
+}
+
+.global-estate-menu__section--bordered {
+  border-top: 1px solid #e7dfd4;
+}
+
+.global-estate-menu__section-label {
+  padding: 0.55rem 1rem 0.25rem;
+}
+
+.global-estate-menu__item {
+  display: flex !important;
+  align-items: center;
+  gap: 0.65rem;
+}
+
+.global-estate-menu__item-emoji {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.global-estate-menu__item-label {
+  min-width: 0;
+  text-align: left;
+}
+
+.global-estate-menu__item--logout {
+  border-top: 1px solid #e7dfd4;
+  color: #5c3d3d;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .global-estate-menu__trigger {
+    transition: none;
+  }
+}

@@ -58,6 +58,11 @@ const HELP_MODES: { id: HelpMode; label: string; desc: string }[] = sortByDropdo
   },
   { id: "direct", label: "Direct answers", desc: "Lead with the answer." },
   {
+    id: "concise",
+    label: "Concise replies",
+    desc: "Shorter sentences — still warm.",
+  },
+  {
     id: "navigate",
     label: "Take me to the right place",
     desc: "Point me to the tool that fits.",
@@ -80,6 +85,11 @@ const SUPPORT_STYLES: { id: SupportStyle; label: string; desc: string }[] = sort
     label: "SOS mode",
     desc: "When overwhelmed, help me stabilize before problem-solving.",
   },
+  {
+    id: "listen",
+    label: "Listen first",
+    desc: "Presence and reflection — advice only when I ask.",
+  },
   ],
   (s) => s.label,
 );
@@ -100,6 +110,8 @@ const PATTERNS: { id: PatternAwareness; label: string; desc: string }[] = [
 ];
 
 import { visualModeLabel } from "@/lib/visualColorModes";
+import { EstateAudioSettings } from "@/components/companion/estate/EstateAudioSettings";
+import { getEstateAudioSettings } from "@/lib/estate/estateAudioSettings";
 import { VisualColorModePicker } from "@/components/companion/VisualColorModePicker";
 import {
   getDefaultPlanningView,
@@ -116,6 +128,7 @@ type Section =
   | "language"
   | "notifications"
   | "appearance"
+  | "estate-audio"
   | "planning"
   | "celebrations"
   | "pattern"
@@ -305,7 +318,7 @@ export function SettingsPanel({
   const desktopOn = desktop && perm === "granted";
 
   const ROWS: { id: Section; label: string; value: string }[] = [
-    { id: "tone", label: "AI Tone", value: aiToneLabel(aiTone) },
+    { id: "tone", label: "Conversation Style", value: aiToneLabel(aiTone) },
     { id: "help", label: "Help Mode", value: HELP_MODES.find((h) => h.id === helpMode)?.label ?? "" },
     { id: "support", label: "Support Style", value: SUPPORT_STYLES.find((s) => s.id === supportStyle)?.label ?? "" },
     {
@@ -322,6 +335,15 @@ export function SettingsPanel({
     },
     { id: "notifications", label: "Notifications", value: alerts ? "On" : "Off" },
     { id: "appearance", label: "Appearance", value: visualModeLabel(visualMode) },
+    {
+      id: "estate-audio",
+      label: "Estate sound",
+      value: getEstateAudioSettings().silenced
+        ? "Silenced"
+        : getEstateAudioSettings().ambienceEnabled
+          ? "Ambience on"
+          : "Ambience off",
+    },
     {
       id: "planning",
       label: "Planning",
@@ -446,18 +468,15 @@ export function SettingsPanel({
   if (open === "tone") {
     return (
       <div className={wrap}>
-        {header("AI Tone")}
+        {header("Conversation Style")}
         <p className="mt-1 text-sm text-[#6b635a]">
-          How Shari sounds. Each tone maps to a different kind of day.
+          Choose how you&apos;d generally like me to communicate with you. This
+          is a long-term preference — it changes my delivery, not who I am.
         </p>
-        <div className="mt-3 grid gap-2 text-xs text-[#6b635a] sm:grid-cols-2">
-          <span>Overwhelmed → Gentle</span>
-          <span>Normal day → Balanced</span>
-          <span>Procrastinating → Direct</span>
-          <span>Stressed → Playful</span>
-          <span>Planning → Strategic</span>
-          <span>Stuck → Motivational</span>
-        </div>
+        <p className="mt-2 text-sm text-[#6b635a]">
+          If today is different, simply tell me — or update Today&apos;s Reality
+          — and I&apos;ll adapt to how you&apos;re doing today.
+        </p>
         <div className="mt-4 flex flex-col gap-3">
           {AI_TONE_GUIDES.map((tone) => {
             const active = aiTone === tone.id;
@@ -623,6 +642,14 @@ export function SettingsPanel({
             savePrefs({ visualMode: v });
           }}
         />
+      </div>
+    );
+  }
+  if (open === "estate-audio") {
+    return (
+      <div className={wrap}>
+        {header("Estate sound")}
+        <EstateAudioSettings className="mt-3" />
       </div>
     );
   }

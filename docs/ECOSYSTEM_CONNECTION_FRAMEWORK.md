@@ -90,7 +90,9 @@ It introduces members to every other experience — naturally recommends Momentu
 
 The Companion **never** feels like a menu. It feels like a **guide**.
 
-See [T-009 Companion Relationship](./COMPANION_RELATIONSHIP_FRAMEWORK.md).
+**The Conversation Front Door™** ([Estate Intelligence](./ESTATE_INTELLIGENCE_FRAMEWORK.md)): if a member can accomplish something by talking to Spark, they should never have to hunt through the Estate to find it. Rooms deepen the experience; conversation is how they enter.
+
+See [T-009 Companion Relationship](./COMPANION_RELATIONSHIP_FRAMEWORK.md) · [T-017 Estate Rooms](./ESTATE_ROOMS_FRAMEWORK.md).
 
 ---
 

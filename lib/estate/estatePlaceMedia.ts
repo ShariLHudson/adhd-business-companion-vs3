@@ -5,10 +5,13 @@
  * Spaces in filenames are URL-encoded at runtime.
  *
  * @see docs/estate/P0_CANON_ERRATA.md
+ * @see docs/estate/ESTATE_AMBIENT_SOUND_SYSTEM.md
  */
 
 import type { EstateArrivalAmbienceProfile } from "./estateArrivalExperienceTypes";
 import { resolveCanonicalPlaceId } from "./canonicalEstateRegistry";
+import { enrichAmbienceProfileWithIntent } from "./estatePlaceAmbienceIntent";
+import { APPLE_ORCHARD_AMBIENCE_MP3 } from "@/lib/soundscapes/audioAssets";
 
 /** Build a public URL for a backgrounds filename (handles spaces). */
 export function estateBackgroundPath(filename: string): string {
@@ -139,11 +142,9 @@ export const CANONICAL_PLACE_AMBIENCE: Readonly<
     character: "gazebo fountain, garden hush",
   },
   "apple-orchard": {
-    src: estateAudioPath(
-      "nils_vega-birds-singing-in-early-summer-359446.mp3",
-    ),
+    src: APPLE_ORCHARD_AMBIENCE_MP3,
     volume: 0.11,
-    character: "orchard birds, open air",
+    character: "orchard ambience, open air",
   },
   "reading-nook": {
     src: estateAudioPath("peaceful-places/evening-hearth-ambience.mp3"),
@@ -197,6 +198,11 @@ export const CANONICAL_PLACE_AMBIENCE: Readonly<
     volume: 0.12,
     character: "sunroom warmth, quiet welcome",
   },
+  "goals-projects": {
+    src: estateAudioPath("reflections-of-triumph-gallery.mp3"),
+    volume: 0.06,
+    character: "boardroom hush, room tone only",
+  },
 };
 
 export function resolveCanonicalPlaceBackground(
@@ -218,5 +224,7 @@ export function resolveCanonicalPlaceAmbience(
   placeId: string,
 ): EstateArrivalAmbienceProfile | undefined {
   const id = resolveCanonicalPlaceId(placeId);
-  return CANONICAL_PLACE_AMBIENCE[id];
+  const base = CANONICAL_PLACE_AMBIENCE[id];
+  if (!base) return undefined;
+  return enrichAmbienceProfileWithIntent(id, base);
 }

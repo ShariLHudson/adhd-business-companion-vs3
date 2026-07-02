@@ -1,49 +1,27 @@
 import { describe, expect, it } from "vitest";
 import {
-  identityBarShowsThinkingCopy,
+  CHAT_THINKING_LABEL,
   chatVisibleThinkingCopy,
   shouldShowChatVisibleThinking,
 } from "./chatThinkingUi";
 
-describe("Visible Thinking chat UI", () => {
-  it("shows thinking bubble while loading", () => {
-    expect(shouldShowChatVisibleThinking(true, "Connecting a few dots...")).toBe(
-      true,
-    );
-    expect(shouldShowChatVisibleThinking(false, "Connecting a few dots...")).toBe(
+describe("chatThinkingUi", () => {
+  it("always shows a single thinking label", () => {
+    expect(chatVisibleThinkingCopy(null)).toBe(CHAT_THINKING_LABEL);
+    expect(chatVisibleThinkingCopy("Still with you.")).toBe(CHAT_THINKING_LABEL);
+  });
+  it("hides visible thinking while awaiting a confirmation answer", () => {
+    expect(shouldShowChatVisibleThinking(true, "Still with you.", true)).toBe(
       false,
     );
-    expect(shouldShowChatVisibleThinking(true, null)).toBe(true);
-    expect(shouldShowChatVisibleThinking(true, "   ")).toBe(true);
   });
 
-  it("uses fallback copy until adaptive thinking lines appear", () => {
-    expect(chatVisibleThinkingCopy(null)).toBe("…");
-    expect(chatVisibleThinkingCopy("One moment...")).toBe("One moment...");
-  });
-
-  it("hides thinking bubble after the assistant response (loading ends)", () => {
-    expect(
-      shouldShowChatVisibleThinking(false, "I want to answer this well."),
-    ).toBe(false);
-  });
-
-  it("keeps Identity Bar from duplicating thinking copy", () => {
-    expect(
-      identityBarShowsThinkingCopy(true, "Connecting a few dots..."),
-    ).toBe(false);
-  });
-
-  it("leaves chat input conceptually usable after failure (not loading)", () => {
-    const inputDisabledWhileLoading = shouldShowChatVisibleThinking(
+  it("shows visible thinking only while loading when not awaiting confirmation", () => {
+    expect(shouldShowChatVisibleThinking(true, "Thinking…", false)).toBe(
       true,
-      "One moment...",
     );
-    const inputUsableAfterFailure = !shouldShowChatVisibleThinking(
+    expect(shouldShowChatVisibleThinking(false, "Thinking…", false)).toBe(
       false,
-      "One moment...",
     );
-    expect(inputDisabledWhileLoading).toBe(true);
-    expect(inputUsableAfterFailure).toBe(true);
   });
 });

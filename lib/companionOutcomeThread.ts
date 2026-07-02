@@ -4,6 +4,10 @@
  */
 
 import { continuationReplyForAssistantQuestion } from "./workspaceOpeningRule";
+import {
+  buildEstateArrivalContinuation,
+  loadEstatePendingTransition,
+} from "@/lib/estateMemory";
 
 import type { AppSection } from "./companionUi";
 import type { ConversationWorkflowKind } from "./conversationWorkflowContinuation";
@@ -157,8 +161,30 @@ export function consumePendingInvitation(): void {
   });
 }
 
+/** When user shares how they work — not a task continuation. */
+export function isEntrepreneurialPatternShare(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  return /\b(?:(?:great|good) at starting|don'?t finish(?:ing)?(?: very)? well|never finish|trouble finish(?:ing)?|starting (?:new )?things)\b/i.test(
+    t,
+  );
+}
+
+export function entrepreneurialPatternHintForChat(text: string): string | undefined {
+  if (!isEntrepreneurialPatternShare(text)) return undefined;
+  return [
+    "ENTREPRENEURIAL PATTERN (mandatory): Member shared how they work — not a request for funnel steps or artifact sections.",
+    "Acknowledge the pattern with warmth first. One thoughtful question about what finishing would look like or what gets in the way.",
+    "FORBIDDEN: sales funnel steps, target audience worksheets, or jumping back to an earlier create topic unless they ask.",
+  ].join("\n");
+}
+
 /** Non-resetting reply when acceptance cannot be resolved but a thread exists. */
 export function threadAwareAcceptanceFallback(thread: OutcomeThread | null): string {
+  const estatePending = typeof window !== "undefined" ? loadEstatePendingTransition() : null;
+  if (estatePending?.destinationSection === "content-generator") {
+    return buildEstateArrivalContinuation(estatePending);
+  }
   if (thread?.pendingQuestion) {
     const advanced = continuationReplyForAssistantQuestion(
       thread.pendingQuestion,

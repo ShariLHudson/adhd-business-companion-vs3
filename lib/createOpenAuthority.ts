@@ -19,6 +19,7 @@ import {
   userGrantedDraftPermission,
 } from "./draftPermissionGate";
 import { hasCreateIntent } from "./intentStabilizer";
+import { evaluateFacilitatedCreateOpen } from "./facilitatedCreation/workspaceGate";
 import type { AppSection } from "./companionUi";
 import type { CreationWorkspaceInput } from "./workspaceCreation";
 import type { ResolvedArtifact } from "./createInitialization";
@@ -59,6 +60,8 @@ export type CreateOpenRequest = {
   lastAssistantText?: string;
   consentGranted?: boolean;
   skipConsentCheck?: boolean;
+  /** Member confirmed opening split workspace for facilitated build */
+  workspaceConsentGranted?: boolean;
 };
 
 export type CreateOpenContext = {
@@ -203,6 +206,7 @@ export function createOpenBypassesConsent(
   ctx: CreateOpenContext,
 ): boolean {
   if (req.skipConsentCheck || req.consentGranted) return true;
+  if (req.workspaceConsentGranted) return true;
   if (req.userInitiated) return true;
   if (UI_INITIATED_SOURCES.has(req.source)) return true;
   const text = req.userText ?? ctx.userText;
@@ -269,6 +273,9 @@ export function evaluateCreateOpen(
     req.artifact?.itemType ||
     matchCatalogFromText(userText)?.type ||
     "";
+
+  const facilitated = evaluateFacilitatedCreateOpen(req, ctx);
+  if (facilitated) return facilitated;
 
   if (
     ctx.lockedType &&

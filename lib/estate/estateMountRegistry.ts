@@ -156,8 +156,7 @@ export const ESTATE_MOUNT_REGISTRY: readonly EstateMountSpec[] = [
     experienceTier: "collection",
     shellComponent: "EstateCollectionRoomEngine",
     navigable: true,
-    architectNotes:
-      "Interim target for swimming phrases until swimming-pool canonical place registers.",
+    architectNotes: "Quick recharge / play collection — not a swimming pool substitute.",
   },
 ] as const;
 

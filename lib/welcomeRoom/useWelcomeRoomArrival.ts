@@ -33,6 +33,8 @@ type Options = {
   walkPaused?: boolean;
   /** Skip the opening black hold — sunroom visible immediately. */
   skipIntro?: boolean;
+  /** Sync walk-in length to narration (ms). */
+  dollyDurationMs?: number;
 };
 
 const REDUCED_MOTION_STATE: WelcomeRoomArrivalState = {
@@ -50,11 +52,15 @@ function frameAt(
   frozen: boolean,
   walkPaused: boolean,
   walkHoldMs: number,
+  dollyDurationMs: number,
 ): WelcomeRoomArrivalState {
   const rawWalkMs = welcomeRoomWalkElapsedMs(roomMs);
   const walkMs =
     frozen || walkPaused ? walkHoldMs : rawWalkMs;
-  const dollyProgress = welcomeRoomCinematicDollyProgress(walkMs);
+  const dollyProgress =
+    dollyDurationMs > 0
+      ? Math.min(1, walkMs / dollyDurationMs)
+      : welcomeRoomCinematicDollyProgress(walkMs);
 
   return {
     phase: welcomeRoomArrivalPhase(roomMs, false, walkMs),
@@ -63,7 +69,7 @@ function frameAt(
     dolly: welcomeRoomDollyFrame(dollyProgress),
     elapsedMs: roomMs,
     showReadOffer: welcomeRoomShowReadOffer(roomMs, false),
-    walkComplete: walkMs >= WELCOME_ROOM_INTRO_DOLLY_MS,
+    walkComplete: walkMs >= dollyDurationMs,
   };
 }
 
@@ -73,13 +79,21 @@ export function useWelcomeRoomArrival(
   const frozen = options.frozen ?? false;
   const walkPaused = options.walkPaused ?? false;
   const skipIntro = options.skipIntro ?? false;
+  const dollyDurationMs =
+    options.dollyDurationMs ?? WELCOME_ROOM_INTRO_DOLLY_MS;
 
   const [state, setState] = useState<WelcomeRoomArrivalState>(() => {
     if (prefersReducedMotion()) return REDUCED_MOTION_STATE;
     if (skipIntro) {
-      return frameAt(WELCOME_ROOM_READY_ELAPSED_MS, false, false, 0);
+      return frameAt(
+        WELCOME_ROOM_READY_ELAPSED_MS,
+        false,
+        false,
+        0,
+        dollyDurationMs,
+      );
     }
-    return frameAt(0, false, false, 0);
+    return frameAt(0, false, false, 0, dollyDurationMs);
   });
   const roomOriginRef = useRef<number | null>(
     skipIntro ? performance.now() - WELCOME_ROOM_READY_ELAPSED_MS : null,
@@ -93,8 +107,8 @@ export function useWelcomeRoomArrival(
     roomOriginRef.current = performance.now() - WELCOME_ROOM_READY_ELAPSED_MS;
     roomElapsedRef.current = WELCOME_ROOM_READY_ELAPSED_MS;
     setResetToken((token) => token + 1);
-    setState(frameAt(WELCOME_ROOM_READY_ELAPSED_MS, false, false, 0));
-  }, []);
+    setState(frameAt(WELCOME_ROOM_READY_ELAPSED_MS, false, false, 0, dollyDurationMs));
+  }, [dollyDurationMs]);
 
   useEffect(() => {
     if (prefersReducedMotion()) {
@@ -109,6 +123,7 @@ export function useWelcomeRoomArrival(
           frozen,
           walkPaused,
           walkHoldRef.current,
+          dollyDurationMs,
         ),
       );
       return;
@@ -125,13 +140,15 @@ export function useWelcomeRoomArrival(
       const roomMs = now - (roomOriginRef.current ?? now);
       roomElapsedRef.current = roomMs;
       walkHoldRef.current = welcomeRoomWalkElapsedMs(roomMs);
-      setState(frameAt(roomMs, false, false, walkHoldRef.current));
+      setState(
+        frameAt(roomMs, false, false, walkHoldRef.current, dollyDurationMs),
+      );
       frame = requestAnimationFrame(tick);
     };
 
     frame = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(frame);
-  }, [frozen, walkPaused, resetToken, skipIntro]);
+  }, [frozen, walkPaused, resetToken, skipIntro, dollyDurationMs]);
 
   return { ...state, resetCinematic };
 }

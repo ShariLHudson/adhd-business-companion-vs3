@@ -29,6 +29,14 @@ export const HUMAN_CONVERSATION_FORBIDDEN_OPENERS: readonly RegExp[] = [
   /^the adhd brain\b/i,
   /^your adhd brain\b/i,
   /^you should\b/i,
+  /^help me understand something\b/i,
+  /^i'?ve been wondering\b/i,
+  /^can i tell you what caught my attention\b/i,
+  /^can we be curious about something\b/i,
+  /^you know what'?s interesting\b/i,
+  /^one effective way is\b/i,
+  /^can i ask what\b/i,
+  /^here are a few options\b/i,
 ];
 
 export const HUMAN_CONVERSATION_FORBIDDEN_PHRASES: readonly RegExp[] = [
@@ -54,6 +62,19 @@ export const HUMAN_CONVERSATION_FORBIDDEN_PHRASES: readonly RegExp[] = [
   /\bthe system detected\b/i,
   /\bmemory intelligence\b/i,
   /\bpattern intelligence\b/i,
+  /\bthis might help me suggest\b/i,
+  /\bone effective way is\b/i,
+  /\bbetter approach\b/i,
+  /\bthis will help me provide\b/i,
+  /\bwhich one feels right for you\b/i,
+  /\bhere are a few options\b/i,
+  /\bthat sounds tough\b/i,
+  /\bwould you like assistance\b/i,
+  /\bhere'?s a simple outline\b/i,
+  /\bhow does that sound\??\b/i,
+  /\bwhat specifically feels challenging\b/i,
+  /\blet'?s focus on key points\b/i,
+  /\bshall i help you\b/i,
 ];
 
 /** Mechanical system transitions — Action Transition forbids these. */

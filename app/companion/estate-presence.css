@@ -1,0 +1,445 @@
+/**
+ * Estate Presence™ — slow, subtle environmental life across the Estate.
+ * Never competes with conversation or reading.
+ */
+
+.estate-presence {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.estate-presence__layer,
+.estate-presence__dust,
+.estate-presence__stars,
+.estate-presence__light {
+  position: absolute;
+  pointer-events: none;
+}
+
+/* ——— Warm light (aliases estate-light-flicker) ——— */
+.estate-presence__light {
+  mix-blend-mode: screen;
+}
+
+/* ——— Steam (Coffee House™) ——— */
+.estate-presence__layer--steam {
+  border-radius: 40% 40% 50% 50%;
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.06) 45%,
+    transparent 72%
+  );
+  filter: blur(6px);
+  animation: estate-presence-steam-rise 7s ease-in-out infinite;
+}
+
+@keyframes estate-presence-steam-rise {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0) scaleX(1);
+  }
+  50% {
+    opacity: 0.65;
+    transform: translateY(-12%) scaleX(1.08);
+  }
+}
+
+/* ——— Leaves / plants ——— */
+.estate-presence__layer--leaves,
+.estate-presence__layer--wind-sway,
+.estate-presence__layer--curtain-sway {
+  background: linear-gradient(
+    100deg,
+    transparent 40%,
+    rgba(120, 160, 90, 0.06) 48%,
+    rgba(140, 180, 100, 0.1) 52%,
+    transparent 60%
+  );
+  animation: estate-presence-sway 16s ease-in-out infinite alternate;
+}
+
+.estate-presence__layer--curtain-sway {
+  background: linear-gradient(
+    95deg,
+    rgba(255, 248, 235, 0.04) 0%,
+    rgba(255, 248, 235, 0.09) 35%,
+    transparent 55%
+  );
+  animation-duration: 18s;
+}
+
+@keyframes estate-presence-sway {
+  from {
+    transform: translateX(-0.35%) skewX(-0.2deg);
+    opacity: 0.7;
+  }
+  to {
+    transform: translateX(0.4%) skewX(0.15deg);
+    opacity: 1;
+  }
+}
+
+/* ——— Water ripple (Conservatory™) ——— */
+.estate-presence__layer--water-ripple {
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse,
+    rgba(180, 210, 220, 0.12) 0%,
+    rgba(140, 180, 200, 0.06) 40%,
+    transparent 70%
+  );
+  animation: estate-presence-ripple 9s ease-in-out infinite;
+}
+
+@keyframes estate-presence-ripple {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.04);
+    opacity: 0.75;
+  }
+}
+
+/* ——— Dust motes ——— */
+.estate-presence__dust span {
+  position: absolute;
+  width: 0.18rem;
+  height: 0.18rem;
+  border-radius: 50%;
+  background: rgba(255, 244, 220, 0.65);
+  animation: estate-presence-dust 18s linear infinite;
+}
+
+.estate-presence__dust span:nth-child(1) {
+  top: 20%;
+  left: 30%;
+}
+.estate-presence__dust span:nth-child(2) {
+  top: 35%;
+  left: 50%;
+  animation-delay: 4s;
+}
+.estate-presence__dust span:nth-child(3) {
+  top: 45%;
+  left: 38%;
+  animation-delay: 8s;
+}
+.estate-presence__dust span:nth-child(4) {
+  top: 28%;
+  left: 62%;
+  animation-delay: 11s;
+}
+.estate-presence__dust span:nth-child(5) {
+  top: 40%;
+  left: 22%;
+  animation-delay: 14s;
+}
+
+@keyframes estate-presence-dust {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  15% {
+    opacity: 0.65;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(2rem, -3rem);
+  }
+}
+
+/* ——— Cloud drift (Observatory™) ——— */
+.estate-presence__layer--cloud-drift {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 30%,
+    rgba(255, 255, 255, 0.08) 50%,
+    rgba(255, 255, 255, 0.04) 70%,
+    transparent 100%
+  );
+  animation: estate-presence-clouds 48s linear infinite;
+}
+
+@keyframes estate-presence-clouds {
+  from {
+    transform: translateX(-8%);
+  }
+  to {
+    transform: translateX(8%);
+  }
+}
+
+/* ——— Stars ——— */
+.estate-presence__stars span {
+  position: absolute;
+  width: 0.15rem;
+  height: 0.15rem;
+  border-radius: 50%;
+  background: rgba(255, 252, 240, 0.75);
+  animation: estate-presence-star 6s ease-in-out infinite;
+}
+
+.estate-presence__stars span:nth-child(1) {
+  top: 12%;
+  left: 22%;
+}
+.estate-presence__stars span:nth-child(2) {
+  top: 18%;
+  left: 45%;
+  animation-delay: 1.2s;
+}
+.estate-presence__stars span:nth-child(3) {
+  top: 8%;
+  left: 68%;
+  animation-delay: 2.4s;
+}
+.estate-presence__stars span:nth-child(4) {
+  top: 25%;
+  left: 35%;
+  animation-delay: 0.8s;
+}
+.estate-presence__stars span:nth-child(5) {
+  top: 15%;
+  left: 78%;
+  animation-delay: 3s;
+}
+.estate-presence__stars span:nth-child(6) {
+  top: 22%;
+  left: 55%;
+  animation-delay: 1.8s;
+}
+.estate-presence__stars span:nth-child(7) {
+  top: 10%;
+  left: 12%;
+  animation-delay: 2.2s;
+}
+.estate-presence__stars span:nth-child(8) {
+  top: 20%;
+  left: 88%;
+  animation-delay: 4s;
+}
+
+@keyframes estate-presence-star {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* ——— Lamp glow ——— */
+.estate-presence__layer--lamp-glow {
+  border-radius: 50%;
+  filter: blur(18px);
+  background: radial-gradient(
+    circle,
+    rgba(255, 228, 170, 0.28) 0%,
+    rgba(255, 200, 120, 0.1) 50%,
+    transparent 72%
+  );
+  animation: estate-presence-lamp 5s ease-in-out infinite alternate;
+}
+
+@keyframes estate-presence-lamp {
+  from {
+    opacity: 0.55;
+  }
+  to {
+    opacity: 0.85;
+  }
+}
+
+/* ——— Page turn hint ——— */
+.estate-presence__layer--page-turn {
+  background: linear-gradient(
+    125deg,
+    transparent 55%,
+    rgba(255, 248, 235, 0.08) 58%,
+    rgba(255, 248, 235, 0.14) 62%,
+    transparent 68%
+  );
+  animation: estate-presence-page 22s ease-in-out infinite;
+}
+
+@keyframes estate-presence-page {
+  0%,
+  92%,
+  100% {
+    opacity: 0.3;
+    transform: perspective(400px) rotateY(0deg);
+  }
+  94% {
+    opacity: 0.7;
+    transform: perspective(400px) rotateY(-4deg);
+  }
+}
+
+/* ——— Drawer settle ——— */
+.estate-presence__layer--drawer-settle {
+  background: rgba(80, 55, 35, 0.06);
+  border-radius: 2px;
+  animation: estate-presence-drawer 28s ease-in-out infinite;
+}
+
+@keyframes estate-presence-drawer {
+  0%,
+  96%,
+  100% {
+    transform: translateY(0);
+  }
+  97% {
+    transform: translateY(1px);
+  }
+}
+
+/* ——— Horse calm (Stables™) ——— */
+.estate-presence__layer--horse-calm {
+  background: radial-gradient(
+    ellipse at 50% 60%,
+    rgba(60, 48, 38, 0.08) 0%,
+    transparent 65%
+  );
+  animation: estate-presence-horse 12s ease-in-out infinite alternate;
+}
+
+@keyframes estate-presence-horse {
+  from {
+    transform: translateX(-0.15%) translateY(0);
+  }
+  to {
+    transform: translateX(0.2%) translateY(-0.25%);
+  }
+}
+
+/* ——— Compass glow ——— */
+.estate-presence__layer--compass-glow {
+  border-radius: 50%;
+  border: 1px solid rgba(212, 180, 120, 0.15);
+  box-shadow: 0 0 24px rgba(212, 180, 120, 0.12);
+  animation: estate-presence-compass 8s ease-in-out infinite;
+}
+
+@keyframes estate-presence-compass {
+  0%,
+  100% {
+    transform: rotate(-1deg);
+    opacity: 0.6;
+  }
+  50% {
+    transform: rotate(1deg);
+    opacity: 0.9;
+  }
+}
+
+/* ——— Bird pass (rare, slow) ——— */
+.estate-presence__layer--bird-pass {
+  background: radial-gradient(
+    ellipse,
+    rgba(40, 35, 30, 0.12) 0%,
+    transparent 70%
+  );
+  filter: blur(1px);
+  animation: estate-presence-bird 45s ease-in-out infinite;
+}
+
+@keyframes estate-presence-bird {
+  0%,
+  85%,
+  100% {
+    opacity: 0;
+    transform: translateX(0) translateY(0);
+  }
+  88% {
+    opacity: 0.45;
+  }
+  95% {
+    opacity: 0.35;
+    transform: translateX(55vw) translateY(-8vh);
+  }
+}
+
+/* ——— Blossom drift ——— */
+.estate-presence__layer--blossom-drift {
+  background: radial-gradient(
+    circle at 30% 40%,
+    rgba(255, 200, 210, 0.12),
+    transparent 55%
+  );
+  animation: estate-presence-blossom 20s ease-in-out infinite alternate;
+}
+
+@keyframes estate-presence-blossom {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(2vh);
+  }
+}
+
+/* ——— Apple fall (very rare) ——— */
+.estate-presence__layer--apple-fall {
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    rgba(180, 60, 50, 0.35) 0%,
+    rgba(140, 40, 35, 0.2) 60%,
+    transparent 80%
+  );
+  animation: estate-presence-apple 90s ease-in infinite;
+}
+
+@keyframes estate-presence-apple {
+  0%,
+  97%,
+  100% {
+    opacity: 0;
+    transform: translateY(0);
+  }
+  98% {
+    opacity: 0.5;
+  }
+  99.5% {
+    opacity: 0.35;
+    transform: translateY(18vh);
+  }
+}
+
+/* ——— Stagger ——— */
+.estate-presence__layer--delay-1 {
+  animation-delay: 0.4s;
+}
+.estate-presence__layer--delay-2 {
+  animation-delay: 0.9s;
+}
+.estate-presence__layer--delay-3 {
+  animation-delay: 1.4s;
+}
+.estate-presence__layer--delay-4 {
+  animation-delay: 2.1s;
+}
+
+/* ——— Pause when tab hidden ——— */
+.estate-presence[data-paused="true"] *,
+.estate-presence[data-paused="true"]::before,
+.estate-presence[data-paused="true"]::after {
+  animation-play-state: paused !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .estate-presence {
+    display: none;
+  }
+}

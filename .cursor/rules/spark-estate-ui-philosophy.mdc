@@ -1,0 +1,62 @@
+---
+description: Spark Estate UI Philosophy — scene hero, floating chat, no dashboards or software chrome
+globs:
+  - app/companion/**
+  - components/companion/**
+  - components/estate/**
+  - lib/estate/**
+  - lib/estateIntelligence/**
+  - lib/estateMenu/**
+  - lib/workspaceLayoutTokens.ts
+alwaysApply: true
+---
+
+# Spark Estate UI Philosophy™
+
+**Authority:** `docs/estate/ESTATE_ARCHITECTURAL_AUTHORITY.md` — Constitution · Experience Guide · Bible (binding)  
+**Extended:** `docs/SPARK_ESTATE_UI_PHILOSOPHY.md` — Bible Ch 8 wins on conflict
+
+**Wins over:** feature-first panels, room headers, invitation grids, instructional overlays in older templates.
+
+## Photograph Test
+
+> Could this frame hang on a wall — and still feel like somewhere you would want to live?
+
+## Three layers only
+
+1. **Scene** — estate image/video, full bleed, always the hero (≥70% visual weight)
+2. **Float** — frosted conversation panel centered over scene ([Spec 109](../docs/SPARK_FROSTED_CONVERSATION_WORKSPACE_FRAMEWORK.md))
+3. **Object** — physical affordance in-scene (book, folio, drawer) — Destination Rooms only
+
+## Non-negotiables
+
+- Estate image is **always** the hero — never a background behind a dashboard
+- Chat **floats** over the scene — no split chat + tools columns
+- **Guidebook** = physical book (pages, cover, close) — never help-center sidebar
+- **No** dashboards · software panels · unnecessary buttons · room labels · instructional overlays
+
+## Forbidden
+
+Sidebars · top app bars · workspace placeholders as arrival · “Welcome to…” tours · room title chrome · emoji feature grids · KPI tiles · breadcrumbs · `No data found` empty tables · white canvas gutters
+
+## Allowed (sparingly)
+
+Full-bleed scene · frosted chat · mic/send · one primary action · folded map (corner) · object-layer UI in Destinations · diegetic text **in artwork only** · recessive ambience toggle
+
+## Button rule
+
+**Necessity Test:** Would this control exist if you were standing in the real room?
+
+## Before shipping Estate UI
+
+- [ ] Photograph Test passes?
+- [ ] Scene hero, chat floats, no labels/overlays?
+- [ ] Every button necessary?
+- [ ] Guidebook/objects feel physical?
+- [ ] Shari test — not software copy?
+
+**Any no → not shippable.**
+
+## Build test
+
+Would someone want to **stay** here — not just get something done? See `docs/estate/Living in Spark Estate.md`.

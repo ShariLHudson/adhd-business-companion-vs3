@@ -1,0 +1,65 @@
+.estate-audio-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 1rem;
+  background: rgba(28, 22, 18, 0.42);
+  border: 1px solid rgba(255, 236, 210, 0.14);
+  color: rgba(255, 248, 240, 0.92);
+  font-size: 1.05rem;
+  line-height: 1.45;
+  backdrop-filter: blur(12px);
+}
+
+.estate-audio-settings__intro {
+  margin: 0;
+  opacity: 0.88;
+}
+
+.estate-audio-settings__row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+  cursor: pointer;
+}
+
+.estate-audio-settings__row input[type="checkbox"] {
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: #c9a46c;
+}
+
+.estate-audio-settings__hint {
+  grid-column: 2;
+  font-size: 0.92rem;
+  opacity: 0.72;
+}
+
+.estate-audio-settings__row--volume {
+  grid-template-columns: 1fr;
+  gap: 0.5rem;
+  cursor: default;
+}
+
+.estate-audio-settings__row--volume input[type="range"] {
+  width: 100%;
+  accent-color: #c9a46c;
+}
+
+.estate-audio-settings__silence {
+  align-self: flex-start;
+  margin-top: 0.25rem;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 236, 210, 0.22);
+  background: rgba(0, 0, 0, 0.18);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.estate-audio-settings__silence:hover {
+  background: rgba(255, 236, 210, 0.08);
+}

@@ -25,10 +25,10 @@ export const PLAN_MY_DAY_MENU_ITEMS = [
 export type PlanMyDayMenuItemId = (typeof PLAN_MY_DAY_MENU_ITEMS)[number]["id"];
 
 export const NEW_CONVERSATION_MENU_ITEMS = [
-  { id: "new-chat", label: "New Chat", objectId: "messages" },
+  { id: "new-chat", label: "Start New Conversation", objectId: "messages" },
   {
     id: "new-day-conversation",
-    label: "New Day Conversation",
+    label: "Start New Day Conversation",
     objectId: "plan-my-day",
   },
 ] as const;

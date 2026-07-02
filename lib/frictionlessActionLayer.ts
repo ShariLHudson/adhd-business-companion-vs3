@@ -2,9 +2,23 @@
  * Frictionless Companion Action Layer (P0.9)
  * Chat is the front door — act, ask one question, or open the right tool.
  * Runs before relationship reflection.
+ *
+ * **Phase C — adapter:** Estate navigation branches should call `goToPlace` via
+ * `resolveEstatePlace` — not legacy section routing alone.
+ *
+ * @see lib/estate/resolveEstatePlace.ts
  */
 
 import { detectAudioRequest } from "./audioSuggestions";
+import { isConfirmationAcceptance } from "./conversationConfirmationGate";
+import {
+  formatEmotionalFirstOpening,
+  planEmotionalFirstResponse,
+} from "./conversation/emotionalFirstResponseSequence";
+import {
+  buildDifficultClientCallOpeningReply,
+  isDifficultClientCallRequest,
+} from "./conversation/shariCompanionEngine";
 import {
   adhdEmotionalFrictionHintForChat,
   buildAdhdEmotionalFrictionReply,
@@ -81,6 +95,7 @@ import {
   type GoogleSheetTypeId,
 } from "./googleSheetsIntelligence";
 import { welcomeRoomWorkspaceOffer } from "./welcomeRoom";
+import { messageNamesExactEstateRoom } from "./estate/estateRoomAliasRegistry";
 import type { WorkspaceOffer } from "./workspaceMode";
 import type { TimeBlock } from "./companionStore";
 import {
@@ -90,9 +105,11 @@ import {
 } from "./reminderIntelligence";
 import type { ReminderIntakeSession } from "./reminderStore";
 import {
-  buildVisualSourceAskReply,
-  validateVisualSourceContent,
-} from "./visualSourceContentValidation";
+  buildEstateArrivalContinuation,
+  isEstateTransitionOfferMessage,
+  loadEstatePendingTransition,
+  registerEstatePendingTransition,
+} from "./estateMemory/estatePendingTransition";
 
 export type FrictionlessActionCategory =
   | "direct_action"
@@ -182,7 +199,7 @@ const PRODUCTIVITY_FRAMING_RE =
   /\b(?:plan my day|marketing plan|launch|revenue|clients?|business|productivity|get more done|prioritize my day)\b/i;
 
 const AFFIRMATION_RE =
-  /^(?:yes|yep|yeah|yup|sure|ok(?:ay)?|please|do that|open it|do it|go ahead|let'?s do it|use it|let'?s use it|sounds good|that works|perfect|great)\.?$/i;
+  /^(?:yes|yep|yeah|yup|sure|ok(?:ay)?|please|do that|open it|do it|go ahead|let'?s do it|use it|let'?s use it|sounds good|that works|perfect|great|take me there)\.?$/i;
 
 export function isFrictionlessAffirmation(text: string): boolean {
   return AFFIRMATION_RE.test(text.trim());
@@ -210,6 +227,48 @@ export function loadFrictionlessPending(): FrictionlessPendingAction | null {
   }
 }
 
+/** Prefer awaiting confirmation ref over stale localStorage when member says yes/sure. */
+export function loadFrictionlessPendingForConfirmation(input: {
+  confirmationReply: boolean;
+  awaitingPending?: FrictionlessPendingAction | null;
+  lastAssistantText?: string;
+  currentTurn: number;
+}): FrictionlessPendingAction | null {
+  const assistant = input.lastAssistantText?.trim() ?? "";
+
+  if (input.confirmationReply && input.awaitingPending) {
+    const awaiting = input.awaitingPending;
+    if (!isFrictionlessPendingExpired(awaiting, input.currentTurn)) {
+      if (
+        !assistant ||
+        isFrictionlessPendingAlignedWithAssistant(
+          awaiting,
+          assistant,
+          input.currentTurn,
+        )
+      ) {
+        return awaiting;
+      }
+    }
+  }
+
+  const stored = loadFrictionlessPending();
+  if (!stored || isFrictionlessPendingExpired(stored, input.currentTurn)) {
+    return null;
+  }
+  if (
+    assistant &&
+    !isFrictionlessPendingAlignedWithAssistant(
+      stored,
+      assistant,
+      input.currentTurn,
+    )
+  ) {
+    return null;
+  }
+  return stored;
+}
+
 export function clearFrictionlessPending(): void {
   saveFrictionlessPending(null);
 }
@@ -231,10 +290,14 @@ export function frictionlessPendingAck(action: FrictionlessPendingAction): strin
     return "Opening **Breathe & Reset** — follow along on screen.";
   }
   if (action.target === "content-generator") {
-    return "Opening Create.";
+    const pending = loadEstatePendingTransition();
+    if (pending?.originalUserIntent) {
+      return buildEstateArrivalContinuation(pending);
+    }
+    return "Let's head into the Creative Studio™ together.";
   }
   if (action.target === "decision-compass") {
-    return "Opening Decision Compass.";
+    return "We're in the Decision Compass™ now — let's talk this through calmly.";
   }
   if (action.target === "visual-focus") {
     const title = action.viewTitle?.trim();
@@ -250,10 +313,10 @@ export function frictionlessPendingAck(action: FrictionlessPendingAction): strin
     return `Opening **${action.viewTitle}** in Visual Thinking.`;
   }
   if (action.target === "brain-dump") {
-    return "Opening **Clear My Mind**.";
+    return "We're in Clear My Mind™ together — what's crowding your head most right now?";
   }
   if (action.target === "plan-my-day") {
-    return "Opening **Plan My Day**.";
+    return "Let's shape today together in Momentum Builder™.";
   }
   if (action.type === "create_google_sheet") {
     return "Creating your Google Sheet.";
@@ -273,6 +336,14 @@ export function frictionlessPendingFromWorkspaceOffer(
   offeredAtTurn: number,
   opts?: { userText?: string; artifactKind?: RegistryArtifactKind | null },
 ): FrictionlessPendingAction {
+  if (opts?.userText?.trim()) {
+    registerEstatePendingTransition({
+      destinationSection: offer.section,
+      originalUserIntent: opts.userText.trim(),
+      offeredAtTurn,
+      invitationLine: offer.line,
+    });
+  }
   if (offer.section === "content-generator" && opts?.userText?.trim()) {
     return buildCreateFrictionlessPending({
       target: offer.section,
@@ -475,18 +546,42 @@ function buildFocusSupportDecision(
   };
 }
 
-function buildEmotionalRegulationDecision(
-  currentTurn: number,
+function buildDifficultClientCallDecision(
+  _userText: string,
+  _currentTurn: number,
+  routing: IntentRoutingDecision,
 ): FrictionlessActionDecision {
   return {
     category: "emotional_regulation",
-    suppressRelationship: true,
+    suppressRelationship: false,
     suppressRecap: true,
-    suppressReflectionFirst: true,
+    suppressReflectionFirst: false,
     responseHint:
-      "EMOTIONAL REGULATION (P0.9): Support first, tool second. No productivity framing. No relationship observations. No business coaching.",
-    localReply:
-      "Let's slow this down. Take one gentle breath with me — inhale softly, then exhale a little longer than you inhale.\n\nWould you like calming audio, a breathing reset, or to stay here with me?",
+      "SHARI COMPANION ENGINE — difficult client call. Emotional grounding FIRST — boundary conversation weight, not phone-task tactics or outlines.",
+    localReply: buildDifficultClientCallOpeningReply(),
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+  };
+}
+
+function buildEmotionalRegulationDecision(
+  userText: string,
+  currentTurn: number,
+): FrictionlessActionDecision {
+  const plan = planEmotionalFirstResponse({ text: userText });
+  const opening =
+    formatEmotionalFirstOpening(plan) ??
+    "A lot is landing at once — we can slow this down together.";
+  return {
+    category: "emotional_regulation",
+    suppressRelationship: false,
+    suppressRecap: true,
+    suppressReflectionFirst: false,
+    responseHint:
+      "SHARI COMPANION ENGINE — emotion before instruction. Reflect + normalize before tools. No productivity framing on the first beat.",
+    localReply: `${opening}\n\nWould you like calming audio, a breathing reset, or to stay here with me?`,
     pendingAction: {
       type: "open_tool",
       target: "focus-audio",
@@ -592,7 +687,7 @@ function buildCreateFrictionlessPending(input: {
     artifactType,
     initialPrompt: input.userText.trim(),
     offeredAtTurn: input.offeredAtTurn,
-    offerSummary: input.offerSummary ?? "Open Create",
+    offerSummary: input.offerSummary ?? "Creative Studio™",
   };
   logCreatePendingAction("saved pending action", {
     target: pending.target,
@@ -683,8 +778,8 @@ function buildSimpleOverwhelmOrganizeDecision(
 ): FrictionlessActionDecision {
   const offer = {
     section: "brain-dump" as const,
-    buttonLabel: "Open Clear My Mind",
-    line: "Clear My Mind may help unload what's crowding your head. Would you like to open it?",
+    buttonLabel: "Step into Clear My Mind™",
+    line: "That sounds worth capturing while it's fresh. Would you like to step into Clear My Mind™ together?",
   };
   return {
     category: "direct_action",
@@ -807,7 +902,7 @@ function buildDirectActionDecision(
     routing.navigationLine ??
     (routing.artifactKind
       ? buildRegistryArtifactOfferLine(routing.artifactKind, execCategory)
-      : "I can help build that. Would you like to open Create?");
+      : "The Creative Studio™ is the perfect place for that. Would you like me to take us there?");
   return {
     category: "direct_action",
     suppressRelationship: true,
@@ -823,7 +918,7 @@ function buildDirectActionDecision(
             userText,
             offeredAtTurn: currentTurn,
             artifactKind: routing.artifactKind,
-            offerSummary: routing.featureLabel ?? "Create",
+            offerSummary: routing.featureLabel ?? "Creative Studio™",
           })
         : routing.workspaceOffer
           ? {
@@ -831,7 +926,7 @@ function buildDirectActionDecision(
               target: routing.workspaceOffer.section,
               context: routing.artifactKind ?? "create",
               offeredAtTurn: currentTurn,
-              offerSummary: routing.featureLabel ?? "Create",
+              offerSummary: routing.featureLabel ?? "Creative Studio™",
             }
           : null,
     toolSuggestion: null,
@@ -860,12 +955,28 @@ export function resolveFrictionlessAction(
 
   if (!userText) return none;
 
+  const audioWithNavigation =
+    /\b(?:take me to|go to|bring me to|open|show me)\b/i.test(userText) &&
+    /\b(music|audio|playlist|soundscape|songs?|tunes|beats)\b/i.test(userText);
+  if (audioWithNavigation) {
+    const audioDecision = buildAudioPending(userText, currentTurn);
+    if (audioDecision) return audioDecision;
+  }
+
+  if (messageNamesExactEstateRoom(userText)) {
+    return none;
+  }
+
   const routing = resolveIntentRouting({
     userText,
     workspace: input.workspace,
     emotionalState: input.emotionalState,
     overwhelmed: input.overwhelmed,
   });
+
+  if (isDifficultClientCallRequest(userText)) {
+    return buildDifficultClientCallDecision(userText, currentTurn, routing);
+  }
 
   if (routing.learnFastPath || shouldSuppressVisualThinkingForLearn(userText)) {
     clearVisualRecommendationPending();
@@ -1020,14 +1131,14 @@ export function resolveFrictionlessAction(
   if (strategyDecision) return strategyDecision;
 
   if (isMotivationProblem(userText) && !isSelfUnderstandingIntent(userText)) {
-    return buildEmotionalRegulationDecision(currentTurn);
+    return buildEmotionalRegulationDecision(userText, currentTurn);
   }
 
   if (
     EMOTIONAL_REGULATION_RE.test(userText) &&
     !PRODUCTIVITY_FRAMING_RE.test(userText)
   ) {
-    return buildEmotionalRegulationDecision(currentTurn);
+    return buildEmotionalRegulationDecision(userText, currentTurn);
   }
 
   if (isAdhdEmotionalFrictionTurn(userText)) {
@@ -1153,9 +1264,13 @@ export function isFrictionlessPendingAlignedWithAssistant(
 
   if (pending.target === "content-generator") {
     return (
+      /\b(?:creative studio|take (?:us|you|me) there|step into|would you like me to)\b/i.test(
+        assistant,
+      ) ||
       /\b(?:open create|create workspace|draft (?:a|an|the)|would you like (?:me )?to (?:create|draft|open))\b/i.test(
         assistant,
       ) ||
+      isEstateTransitionOfferMessage(assistant) ||
       Boolean(
         pending.artifactType &&
           assistant.toLowerCase().includes(pending.artifactType.toLowerCase()),
@@ -1212,7 +1327,12 @@ export function resolveFrictionlessContinuation(
   currentTurn: number,
   lastAssistantText?: string,
 ): { execute: boolean; ack: string } | null {
-  if (!isFrictionlessAffirmation(userText)) return null;
+  if (
+    !isFrictionlessAffirmation(userText) &&
+    !isConfirmationAcceptance(userText)
+  ) {
+    return null;
+  }
   if (isFrictionlessPendingExpired(pending, currentTurn)) return null;
   if (
     lastAssistantText &&

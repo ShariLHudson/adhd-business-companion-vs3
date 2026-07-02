@@ -2,19 +2,22 @@
  * Visible Thinking chat UI rules — pure helpers for tests and SimpleChat.
  */
 
+/** Single calm label while the model responds — no rotating "still with you" copy. */
+export const CHAT_THINKING_LABEL = "Thinking…" as const;
+
 export function shouldShowChatVisibleThinking(
   isLoading: boolean,
   _thinkingMessage?: string | null,
+  awaitingUserConfirmation = false,
 ): boolean {
+  if (awaitingUserConfirmation) return false;
   return isLoading;
 }
 
-/** Fallback copy until adaptive thinking lines appear. */
 export function chatVisibleThinkingCopy(
-  thinkingMessage: string | null | undefined,
+  _thinkingMessage?: string | null,
 ): string {
-  const trimmed = thinkingMessage?.trim();
-  return trimmed || "…";
+  return CHAT_THINKING_LABEL;
 }
 
 /** Identity Bar shows portrait animation only — chat owns thinking copy. */

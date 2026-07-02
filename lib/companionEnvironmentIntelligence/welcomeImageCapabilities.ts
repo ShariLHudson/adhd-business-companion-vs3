@@ -25,12 +25,12 @@ const DEFAULT_CAPS: WelcomeImageCapabilities = {
 };
 
 const BY_IMAGE: Record<string, Partial<WelcomeImageCapabilities>> = {
-  "welcome-home-room-background": {
+  "welcome-home-background": {
     openWindow: false,
-    mugBakedIn: true,
+    mugBakedIn: false,
     suppressHospitalitySteam: true,
     suppressCurtains: true,
-    artObjectPosition: "14% center",
+    artObjectPosition: "50% 42%",
     artObjectFit: "cover",
   },
   "shari-i-am-here-2": {

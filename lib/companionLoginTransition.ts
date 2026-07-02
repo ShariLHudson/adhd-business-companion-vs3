@@ -100,11 +100,24 @@ export async function companionSignInSessionReady(
   return false;
 }
 
+let companionHomeNavigationPending = false;
+
 /** Hard navigation — reliable after sign-in (SPA replace can stall). */
 export function navigateToCompanionHome(): void {
   if (typeof window === "undefined") return;
+  if (companionHomeNavigationPending) return;
+  if (window.location.pathname.replace(/\/$/, "") === "/companion") {
+    markCompanionLoginArrival();
+    return;
+  }
+  companionHomeNavigationPending = true;
   markCompanionLoginArrival();
   window.location.replace("/companion");
+}
+
+/** @internal test helper */
+export function resetCompanionHomeNavigationForTests(): void {
+  companionHomeNavigationPending = false;
 }
 
 /** Wait until Supabase has written the session to localStorage before navigating. */

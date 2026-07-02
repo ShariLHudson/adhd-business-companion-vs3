@@ -3,6 +3,7 @@
  */
 
 import type { GrowthAttachment } from "./growthAttachments";
+import { linkGrowthAttachmentsToRecord } from "@/lib/assetLibrary/references";
 import type { GrowthMomentClassification } from "./suggestedGrowthMoments";
 import { isInWeek } from "./weeklyWins";
 
@@ -77,6 +78,9 @@ export function createSavedGrowthWin(
     createdAt: new Date().toISOString(),
   };
   writeAll([win, ...readAll()]);
+  if (win.attachments.length > 0) {
+    linkGrowthAttachmentsToRecord(win.attachments, "win", win.id);
+  }
   return win;
 }
 
@@ -90,6 +94,9 @@ export function updateSavedGrowthWin(
   const updated = { ...list[idx], ...patch };
   list[idx] = updated;
   writeAll(list);
+  if (patch.attachments?.length) {
+    linkGrowthAttachmentsToRecord(patch.attachments, "win", id);
+  }
   return updated;
 }
 

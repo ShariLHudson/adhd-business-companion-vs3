@@ -13,6 +13,7 @@ import {
 import { isWelcomeAudioSessionUnlocked } from "./audioUnlock";
 import { WelcomeAudioManager } from "./WelcomeAudioManager";
 import { resolveWelcomeAudioProfile } from "./profiles";
+import { attachWelcomeHomeAudioManager } from "./welcomeHomeAudioSession";
 import { attachWelcomeRoomAudioManager } from "./welcomeRoomAudioSession";
 import type {
   WelcomePlaybackProgress,
@@ -21,6 +22,8 @@ import type {
 
 type Options = {
   profileId: string;
+  /** When false, no manager attach / preload (returning members). */
+  enabled?: boolean;
   active: boolean;
   immersive?: boolean;
   paused?: boolean;
@@ -34,6 +37,7 @@ const EMPTY_PROGRESS: WelcomePlaybackProgress = {
 
 export function useWelcomeAudioExperience({
   profileId,
+  enabled = true,
   active,
   immersive = true,
   paused = false,
@@ -51,15 +55,20 @@ export function useWelcomeAudioExperience({
   const [progress, setProgress] = useState<WelcomePlaybackProgress>(EMPTY_PROGRESS);
 
   useLayoutEffect(() => {
-    if (!profile) return;
+    if (!enabled || !profile) return;
     const manager =
       profile.id === "welcome-room"
         ? attachWelcomeRoomAudioManager()
-        : new WelcomeAudioManager(profile);
-    if (!manager) return;
-    if (profile.id === "welcome-room") {
-      manager.setMusicMuted(!getWelcomeRoomAmbienceEnabled());
+        : profile.id === "welcome-home"
+          ? attachWelcomeHomeAudioManager()
+          : new WelcomeAudioManager(profile);
+    if (
+      profile.id === "welcome-room" ||
+      profile.id === "welcome-home"
+    ) {
+      manager?.setMusicMuted(!getWelcomeRoomAmbienceEnabled());
     }
+    if (!manager) return;
     managerRef.current = manager;
 
     const unsubVoice = manager.onVoiceStateChange((state) => {
@@ -97,25 +106,28 @@ export function useWelcomeAudioExperience({
       setAudioUnlocked(true);
     }
 
-    if (
-      hasPendingWelcomeRoomGestureUnlock() ||
-      isWelcomeAudioSessionUnlocked()
-    ) {
-      startExperience();
+    if (profile.id !== "welcome-home") {
+      if (
+        hasPendingWelcomeRoomGestureUnlock() ||
+        isWelcomeAudioSessionUnlocked()
+      ) {
+        startExperience();
+      }
     }
 
     return () => {
       unsubVoice();
       unsubUnlock();
       unsubProgress();
-      if (profile.id !== "welcome-room") {
+      if (profile.id !== "welcome-room" && profile.id !== "welcome-home") {
         manager.destroy();
       }
       managerRef.current = null;
     };
-  }, [profile]);
+  }, [enabled, profile]);
 
   useEffect(() => {
+    if (!enabled) return;
     if (!active || !immersive || paused) {
       managerRef.current?.pauseExperience();
       return;
@@ -135,12 +147,17 @@ export function useWelcomeAudioExperience({
       return;
     }
     if (!manager.isAudioUnlocked()) return;
-    if (manager.getVoiceState() === "idle" || manager.getVoiceState() === "ended") {
-      void manager.playExperience();
+    const state = manager.getVoiceState();
+    if (state === "playing" || state === "loading" || state === "paused") {
+      if (state === "paused") {
+        manager.resumeExperience();
+      }
       return;
     }
-    manager.resumeExperience();
-  }, [active, immersive, paused]);
+    if (state === "idle" || state === "ended") {
+      void manager.playExperience();
+    }
+  }, [enabled, active, immersive, paused]);
 
   useEffect(() => {
     managerRef.current?.setMusicMuted(musicMuted);

@@ -39,12 +39,6 @@ export const PLACE_ID_ALIASES: Readonly<Record<string, string>> = {
 
   // Registry / menu bridges
   "estate-registry-journal": "journal",
-
-  // Play — interim until `swimming-pool` canonical place registers
-  "swimming-pool": "game-room",
-  pool: "game-room",
-  swim: "game-room",
-  swimming: "game-room",
 };
 
 const MAX_ALIAS_HOPS = 8;
