@@ -1,7 +1,6 @@
 "use client";
 
 import { EstateCollectionRoomEngine } from "./EstateCollectionRoomEngine";
-import { JournalGazeboExperience } from "@/components/journal-gazebo/JournalGazeboExperience";
 import type { EstateCollectionRoomId } from "@/lib/estate/collectionFramework";
 
 type Nav = {
@@ -25,10 +24,6 @@ export function EstateCollectionRoomPanel({
 }: Props) {
   const back = nav?.onBack ?? onBack ?? (() => {});
   const label = nav?.backLabel ?? backLabel ?? "Companion";
-
-  if (roomId === "journal") {
-    return <JournalGazeboExperience onBack={back} backLabel={label} />;
-  }
 
   return (
     <EstateCollectionRoomEngine

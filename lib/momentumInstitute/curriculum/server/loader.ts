@@ -7,15 +7,15 @@ import "server-only";
 import fs from "node:fs";
 import path from "node:path";
 
-import { mergeCurriculumIntoCatalog } from "./compiler";
-import { parseKnowledgeCardMarkdown } from "./parseKnowledgeCard";
+import { mergeCurriculumIntoCatalog } from "../compiler";
+import { parseKnowledgeCardMarkdown } from "../parseKnowledgeCard";
 import {
   getCurriculumRegistry,
   registerCurriculumKnowledgeCard,
   setCurriculumRegistry,
-} from "./registry";
-import type { CurriculumRegistry } from "./types";
-import { CURRICULUM_ROOT_SEGMENT } from "./types";
+} from "../registry";
+import type { CurriculumRegistry } from "../types";
+import { CURRICULUM_ROOT_SEGMENT } from "../types";
 import type { MomentumInstituteCatalog } from "@/lib/sparkMomentumInstitute/types";
 
 export function resolveCurriculumRoot(): string {
