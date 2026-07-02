@@ -1,0 +1,60 @@
+/**
+ * Chat turn guarantee — every member message gets a reply; loading never sticks.
+ */
+
+import { buildCoachingFallbackResponse } from "@/lib/sparkConversation/coachingFallback";
+import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
+import { isHowToLearningQuestion } from "@/lib/howToLearningIntelligence";
+
+/** Hard ceiling — fallback if API/stream does not finish in time. */
+export const CHAT_COMPLETION_TIMEOUT_MS = 28_000;
+
+const INFORMATIONAL_CHAT_RE =
+  /\b(?:(?:what is|what's) the best way to (?:start|begin|write|create|build)|how do i (?:write|create|start|build|make|draft)|help me understand|help me (?:write|draft|create|build|plan)|how to (?:write|create|start|build|draft)|what is an? sop|how do i write a proposal|how should i (?:start|write|create))\b/i;
+
+const PLAN_DAY_INFORMATIONAL_RE =
+  /\bhelp me plan my day\b/i;
+
+/**
+ * Coaching / SOP / how-to questions — chat only; skip estate kernel and heavy routing.
+ */
+export function isInformationalChatTurn(text: string): boolean {
+  const t = text.trim();
+  if (!t) return false;
+  if (PLAN_DAY_INFORMATIONAL_RE.test(t)) return true;
+  if (INFORMATIONAL_CHAT_RE.test(t)) return true;
+  if (isHowToLearningQuestion(t)) return true;
+  if (isKnowledgeQuestion(t)) return true;
+  return false;
+}
+
+export function buildFailSafeChatReply(userText: string): string {
+  const trimmed = userText.trim();
+  if (!trimmed) {
+    return "I'm here — what would help most right now?";
+  }
+  return buildCoachingFallbackResponse(trimmed);
+}
+
+export async function fetchCompanionChatWithTimeout(
+  body: Record<string, unknown>,
+  timeoutMs = CHAT_COMPLETION_TIMEOUT_MS,
+): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch("/api/companion-chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") {
+      throw new Error("companion-chat-timeout");
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}

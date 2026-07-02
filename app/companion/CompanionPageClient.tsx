@@ -3,17 +3,24 @@
 import { Suspense, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import { BackButton } from "@/components/companion/BackButton";
-import { NAV_HOME, sectionHasEmbeddedChatBack } from "@/lib/navigationBack";
 import { AppSidebar } from "@/components/companion/AppSidebar";
 import { CompanionSidebarPortal } from "@/components/companion/CompanionSidebarPortal";
 import { CompanionUrlNavigation } from "@/components/companion/CompanionUrlNavigation";
 import { AdjustMyDayPanel } from "@/components/companion/AdjustMyDayPanel";
 import { BrainDumpPanel } from "@/components/companion/BrainDumpPanel";
 import { propertyNavComingSoonMessage } from "@/lib/companionPropertyNav";
-import {
-  type NewConversationMenuItemId,
-} from "@/lib/topBarNavigation";
+import { EstateArrivalHost } from "@/components/companion/estate/EstateArrivalHost";
+import { EstatePlaceAudioHost } from "@/components/companion/estate/EstatePlaceAudioHost";
+import { EstatePresence } from "@/components/companion/estate/EstatePresence";
+import { GlobalEstateMenu } from "@/components/companion/GlobalEstateMenu";
+import { SparkEstateGuideAnchor } from "@/components/companion/SparkEstateGuideAnchor";
+import { EstateGuideFlipbook } from "@/components/estate-guide";
+import { estateArrivalShariGreeting } from "@/lib/estate/estateArrivalExperience";
+import { estatePresenceRoomForSection } from "@/lib/estate/estatePresence";
+import { getEstateMemory } from "@/lib/estateMemory/estateMemoryStore";
+import { SparkEstateShell } from "@/components/companion/estate/SparkEstateShell";
+import { InstituteCabinetPanel } from "@/components/companion/InstituteCabinetPanel";
+import type { EstateMenuActionId } from "@/lib/estateMenu";
 import {
   GALLERY_HOME_SECTION,
   isLegacyGrowthHubSection,
@@ -29,6 +36,7 @@ import { CompanionDeskChrome } from "@/components/companion/CompanionDeskChrome"
 import { CompanionDeskProvider } from "@/components/companion/CompanionDeskProvider";
 import { HomeChatInputFooter } from "@/components/companion/HomeChatInputFooter";
 import { CompanionBackground } from "@/components/companion/CompanionBackground";
+import { EstateImmersiveHomeLink } from "@/components/companion/EstateImmersiveHomeLink";
 import {
   ActiveWorkspaceBar,
   focusTimerWorkspaceItem,
@@ -83,22 +91,28 @@ const VisualFocusWorkspacePanel = dynamic(
   },
 );
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
-import { WinsThisWeekPanel } from "@/components/companion/WinsThisWeekPanel";
-import { EvidenceBankPanel } from "@/components/companion/EvidenceBankPanel";
+import { EstateCollectionRoomPanel } from "@/components/estate-collection";
 import { GrowLandingPanel } from "@/components/companion/GrowLandingPanel";
-import { GrowMomentumBuildersPanel } from "@/components/companion/GrowMomentumBuildersPanel";
+import { MomentumBuilderRoomPanel } from "@/components/companion/MomentumBuilderRoomPanel";
+import { MomentumInstituteRoomPanel } from "@/components/companion/momentumInstitute/MomentumInstituteRoomPanel";
+import type { InstituteLearningChatTurn } from "@/components/companion/momentumInstitute/MomentumInstituteRoomPanel";
+import { StablesRoomPanel } from "@/components/companion/stables/StablesRoomPanel";
+import type { StablesLearningChatTurn } from "@/components/companion/stables/StablesRoomPanel";
 import { GrowPlaceholderPanel } from "@/components/companion/GrowPlaceholderPanel";
 import { GrowthStoryLandingPanel } from "@/components/companion/GrowthStoryLandingPanel";
 import { GrowthStoryCapturePanel } from "@/components/companion/GrowthStoryCapturePanel";
-import { GrowthLibraryPanel } from "@/components/companion/GrowthLibraryPanel";
-import { GrowthReportsPage } from "@/components/companion/GrowthReportsPage";
-import { GrowthJournalPanel } from "@/components/companion/GrowthJournalPanel";
-import { GrowthPortfolioPanel } from "@/components/companion/GrowthPortfolioPanel";
+import {
+  MemoryLibraryPage,
+  type MemoryLibraryTab,
+} from "@/components/companion/memory/MemoryLibraryPage";
 import { ConfidenceVaultPanel } from "@/components/companion/ConfidenceVaultPanel";
 import { MyJourneyPanel } from "@/components/companion/MyJourneyPanel";
 import type { HomeResumeItem } from "@/lib/homeResumeItem";
 import { findLatestHomeResumeItem } from "@/lib/homeResumeItem";
-import type { CompanionContinueOption } from "@/lib/companionLedContinue";
+import {
+  resolveCompanionContinue,
+  type CompanionContinueOption,
+} from "@/lib/companionLedContinue";
 import {
   evaluateArrivalIntelligence,
   homeStateDataAttr,
@@ -116,10 +130,11 @@ import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
 import { getDayDesignerSession } from "@/lib/day-designer/dayStore";
 import { activityReturnLabel as resolveActivityReturnLabel } from "@/lib/activityReturnLabel";
 import {
-  BEGIN_NEW_DAY_GREETING,
   type FreshStartKind,
   freshStartCopy,
+  NEW_CONVERSATION_GREETING,
 } from "@/lib/freshStartCopy";
+import { beginEstateJourneyNewDay } from "@/lib/estateJourneyEngine/session";
 import { clearDailySessionFlags } from "@/lib/freshStartSession";
 import { resetTodayPlanForNewDay, resetPlanDayView } from "@/lib/planMyDay/planDayItems";
 import {
@@ -135,8 +150,8 @@ import { useClientMounted } from "@/lib/useClientMounted";
 import { resolveAdaptiveVisualContext } from "@/lib/adaptiveVisualContext";
 import { HowDoIPanel } from "@/components/companion/HowDoIPanel";
 import { WelcomeRoomPanel } from "@/components/companion/WelcomeRoomPanel";
+import { WelcomeHomePage } from "@/components/companion/WelcomeHomeFirstLaunch";
 import type { EcosystemSearchResult } from "@/lib/howDoIHelpLibrary";
-import type { ProfileSettingsSection } from "@/components/companion/ProfilePanel";
 import type { SettingsSection } from "@/components/companion/SettingsPanel";
 import { RecognitionMomentCard } from "@/components/companion/RecognitionMomentCard";
 import { ActivationOfferCard } from "@/components/companion/ActivationOfferCard";
@@ -154,7 +169,6 @@ import { PredictiveSupportOfferCard } from "@/components/companion/PredictiveSup
 import { DayPlanCard } from "@/components/companion/DayPlanCard";
 import { DayDesignerPromptCard } from "@/components/companion/DayDesignerPromptCard";
 import { WhatsNewPanel } from "@/components/companion/WhatsNewPanel";
-import { ProfilePanel } from "@/components/companion/ProfilePanel";
 import { ModalSheet } from "@/components/companion/ModalSheet";
 import { CompanionSignInForm } from "@/components/companion/CompanionSignInForm";
 import { CompanionSignInFromQuery } from "@/components/companion/CompanionSignInFromQuery";
@@ -259,6 +273,28 @@ import {
   setWorkspaceV2ActiveSection,
   shouldUseCreateBuilderChatTurns,
 } from "@/lib/createWorkspaceV2";
+import {
+  ensureFacilitatedSessionFromText,
+  facilitationOpenerForWorkspace,
+  formatFacilitatedCreationChatHint,
+  getFacilitatedCreationSession,
+  markWorkspaceFacilitationActive,
+  processFacilitatedWorkspaceTurn,
+} from "@/lib/facilitatedCreation";
+import {
+  applyArtifactRevisionCommand,
+  buildArtifactReturnGreeting,
+  buildWhatWeHaveSoFarSummary,
+  formatArtifactStateChatHint,
+  getActiveArtifact,
+  isShowProgressRequest,
+  parseArtifactRevisionCommand,
+  pauseArtifactForRoom,
+  recordUserSectionAnswer,
+  setActiveArtifact,
+  shouldPauseArtifactForSection,
+  syncArtifactFromWorkflow,
+} from "@/lib/artifactState";
 import {
   isUnresolvedCreateType,
   userFacingCreateTypeLabel,
@@ -619,9 +655,12 @@ import {
   consumePendingInvitation,
   getOutcomeThread,
   outcomeThreadHintForChat,
+  isEntrepreneurialPatternShare,
+  entrepreneurialPatternHintForChat,
+  patchOutcomeThread,
+  registerProblemFromUser,
   registerFeatureOpened,
   registerPendingOffer,
-  registerProblemFromUser,
   registerWorkflowContinuation,
   topicChangeClearsThread,
 } from "@/lib/companionOutcomeThread";
@@ -652,10 +691,21 @@ import {
   shouldSuppressWorkspaceCoachForPhase1,
 } from "@/lib/phase1Onboarding";
 import {
+  destroyWelcomeHomeAudioManager,
   destroyWelcomeRoomAudioManager,
   primeWelcomeRoomAudioFromGesture,
-} from "@/lib/welcomeAudio/welcomeRoomAudioSession";
+} from "@/lib/welcomeAudio";
 import { markWelcomeRoomOpenedWithGesture } from "@/lib/welcomeRoom/welcomeRoomGesture";
+import {
+  WELCOME_HOME_REPLAY_EVENT,
+  clearWelcomeHomeReplayRequest,
+  hasSeenWelcomeIntro,
+  markWelcomeIntroSeen,
+  peekWelcomeHomeReplayRequested,
+  type WelcomeHomeFirstChoice,
+} from "@/lib/welcomeHome";
+import { evaluateWelcomeHomeExperience } from "@/lib/sparkExperienceEngine";
+import { resolveWelcomeHomeChatPrompt } from "@/lib/welcomeHome/chatPrompt";
 import {
   observeFromConversationTurn,
   observeResourcePreference,
@@ -749,7 +799,20 @@ import {
   researchIntelligenceHintForChat,
 } from "@/lib/researchIntelligence";
 import { elevateLifeExperienceHintForChat } from "@/lib/elevateLifeExperience";
-import { humanConversationHintForChat } from "@/lib/humanConversation";
+import {
+  humanConversationHintForChat,
+  enforceHumanConversation,
+} from "@/lib/humanConversation";
+import {
+  isVagueOfferConfusion,
+  repairNumberedEstateRoomMenu,
+  vagueOfferConfusionReply,
+} from "@/lib/conversation/vagueOfferRepair";
+import { tryCommitMicCaptureOnEnd } from "@/lib/voiceMicCommit";
+import {
+  enforceCanonicalPlaceIdentityInCopy,
+  repairInventedEstatePlaceList,
+} from "@/lib/estate/estatePlaceIdentityLock";
 import {
   clearFrictionlessPending,
   frictionlessHintForChat,
@@ -759,11 +822,21 @@ import {
   isFrictionlessPendingAlignedWithAssistant,
   isFrictionlessPendingExpired,
   loadFrictionlessPending,
+  loadFrictionlessPendingForConfirmation,
   resolveFrictionlessAction,
   resolveFrictionlessContinuation,
   saveFrictionlessPending,
   shouldSuppressRelationshipForFrictionless,
+  type FrictionlessActionDecision,
 } from "@/lib/frictionlessActionLayer";
+import {
+  createAwaitingConfirmationState,
+  isConfirmationAcceptance,
+  isConfirmationDecline,
+  isPureConfirmationDecline,
+  shouldStopAfterAssistantOffer,
+  type AwaitingUserConfirmationState,
+} from "@/lib/conversationConfirmationGate";
 import { shouldSuppressRelationshipIntelligenceForUserText } from "@/lib/relationshipIntelligenceBoundaries";
 import { resolveHardNavigationCommand } from "@/lib/hardNavigationCommands";
 import {
@@ -851,6 +924,21 @@ import {
   isCompanionChatStreamResponse,
 } from "@/lib/chatFastPath/companionChatStream";
 import {
+  buildFailSafeChatReply,
+  fetchCompanionChatWithTimeout,
+  isInformationalChatTurn,
+} from "@/lib/chatFastPath/chatTurnGuarantee";
+import {
+  createChatTurnState,
+  guaranteeChatTurnCompletion,
+  markAssistantReplied,
+  markChatTurnLoading,
+  markChatTurnStarted,
+  finalizeChatTurn,
+  needsFailSafeAssistantReply,
+  type ChatTurnState,
+} from "@/lib/chatFastPath/chatTurnLifecycle";
+import {
   logCreatePendingAction,
   resolvedArtifactFromCreatePending,
 } from "@/lib/createPendingAction";
@@ -883,10 +971,8 @@ import {
   buildVisibleThinkingContext,
   type VisibleThinkingContext,
 } from "@/lib/visibleThinking";
-import {
-  friendlyFetchErrorMessage,
-  readJsonResponse,
-} from "@/lib/safeJsonResponse";
+import { routeCompanionFailure } from "@/lib/companionContextRouting";
+import { readJsonResponse } from "@/lib/safeJsonResponse";
 import { useVisibleThinking } from "@/lib/useVisibleThinking";
 import { isExplicitBreatheRequest } from "@/lib/explicitBreatheRouting";
 import {
@@ -1012,9 +1098,40 @@ import {
 } from "@/lib/standaloneToolRouting";
 import { isClearMyMindSection } from "@/lib/clearMyMindRouting";
 import { CLEAR_MY_MIND_CONSERVATORY_BG } from "@/lib/clearMyMind/conservatory";
+import {
+  directEstateChatRoomId,
+  shouldShowDirectEstateOverlay,
+} from "@/lib/estate/estateChatNavigation";
+import {
+  isDedicatedEstateRoomPanelSection,
+  type DirectEstateVisit,
+} from "@/lib/estate/directEstateVisit";
+import {
+  isEstatePlaceChromeActive,
+  resolveEstateChromePolicy,
+  shouldSuppressEstateInvitationGrid,
+} from "@/lib/estate/estateChromePolicy";
+import { messageNamesExactEstateRoom } from "@/lib/estate/estateRoomAliasRegistry";
+import { resolveEstateRoomInConversationReply } from "@/lib/estate/estateRoomInConversation";
+import { resolveEstateRoomBackgroundImage } from "@/lib/estate/estateRoomBackground";
+import {
+  resolveExplicitCompanionAction,
+  type ExplicitCompanionAction,
+} from "@/lib/companion/explicitCompanionActions";
+import {
+  estatePresenceGreeting,
+  type EstateRoomInvitationItem,
+} from "@/lib/estate/estateRoomInvitation";
 import { isPlanMyDaySection } from "@/lib/planMyDayRouting";
 import { PLAN_MY_DAY_MORNING_BG } from "@/lib/planMyDay/morningRoom";
-import { GROWTH_ROOM_BG, JOURNAL_ROOM_BG, EVIDENCE_VAULT_ROOM_BG } from "@/lib/growth/growthRoom";
+import { GROWTH_ROOM_BG, JOURNAL_ROOM_BG, EVIDENCE_VAULT_ROOM_BG, PORTFOLIO_ROOM_BG, ESTATE_PROFILE_ROOM_BG } from "@/lib/growth/growthRoom";
+import {
+  isProfileEstateRoomId,
+  profileEstateRoomBackgroundImage,
+  profileEstateRoomForMenuAction,
+  profileEstateSectionForRoom,
+  type ProfileEstateRoomId,
+} from "@/lib/growth/profileEstateRooms";
 import { CREATIVE_STUDIO_ROOM_BG } from "@/lib/creativeStudio/creativeStudioRoom";
 import { CELEBRATION_GARDEN_ROOM_BG } from "@/lib/celebrationGarden/celebrationGardenRoom";
 import { STORY_LIBRARY_ROOM_BG } from "@/lib/storyLibrary/storyLibraryRoom";
@@ -1062,6 +1179,65 @@ import {
   staggerPrefillKeys,
 } from "@/lib/companionGuidanceSystem";
 import { teachingModeActive } from "@/lib/teachingMode";
+import {
+  evaluateEstateConversationTurn,
+  estateConversationHintForChat,
+  estateCommandAckLine,
+  executeEstateCommandMemoryHandoff,
+  isDirectEstateRoomRequest,
+  mergeWorkspaceOfferSecondary,
+  resolveEstateAwareWorkspaceOffer,
+  workspaceOfferReplyLine,
+  type EstateCommandDecision,
+} from "@/lib/estateIntelligence";
+import {
+  savePendingEstatePlaceMenu,
+  registerPendingEstatePlaceMenuFromAssistant,
+  clearPendingEstatePlaceMenu,
+} from "@/lib/estate/estatePlaceNavigation";
+import {
+  executeSoundscapeIntent,
+} from "@/lib/estate/executeUserIntent";
+import { executeCaptureWrite } from "@/lib/capture";
+import {
+  classifyCompanionIntent,
+  executeCompanionIntent,
+} from "@/lib/companionTurn";
+import { patchEstateRuntimeState } from "@/lib/estate/estateRuntimeState";
+import {
+  estateMemoryHintForChat,
+  estateRoomArrivalContinuationLine,
+  consumeEstateTransitionPreserveChat,
+  buildEstateArrivalContinuation,
+  clearEstatePendingTransition,
+  loadEstatePendingTransition,
+  estateTransitionAckForSection,
+  patchEstateMemory,
+  recordEstateConversationTurn,
+  recordEstateRoomTransition,
+  registerEstatePendingTransition,
+  estateEntryIdForSection,
+  registerEstateWorkspaceOfferFromAssistant,
+  recoverEstateWorkspaceOfferFromChat,
+  isEstateTransitionOfferMessage,
+} from "@/lib/estateMemory";
+import { resolveMomentumBuilderRoomState } from "@/lib/momentumBuilderRoom/roomExperience";
+import { recordMomentumPathMilestone } from "@/lib/momentumBuilderRoom/momentumPathHooks";
+import { MOMENTUM_BUILDER_ROOM_BG } from "@/lib/momentumBuilderRoom/roomRegistry";
+import {
+  isMomentumBuilderRoomSection,
+  momentumBuilderRoomHintForChat,
+} from "@/lib/momentumBuilderRoom/momentumBuilderPrompt";
+import {
+  MOMENTUM_INSTITUTE_ROOM_BG,
+  isMomentumInstituteSection,
+} from "@/lib/momentumInstitute/room/instituteRoomRegistry";
+import {
+  STABLES_ROOM_BG,
+  isStablesSection,
+  stablesRoomHintForChat,
+} from "@/lib/stables";
+import "@/lib/momentumInstitute/catalog/bootstrapPhase1Catalog";
 import {
   applyMenuContinuationRoutingOverrides,
   loadPendingMenuSelection,
@@ -1217,6 +1393,23 @@ import {
   type SavedWorkItem,
 } from "@/lib/savedWorkStore";
 import { setEvidencePrefill } from "@/lib/evidenceBankStore";
+import {
+  getEstateCollectionRoom,
+  setCollectionPrefill,
+  evaluateCollectionSaveOffer,
+  collectionOfferForRoom,
+  createCollectionPendingOffer,
+  recoverCollectionPendingFromAssistant,
+  resolveCollectionOfferReply,
+  loadCollectionPendingOffer,
+  saveCollectionPendingOffer,
+  clearCollectionPendingOffer,
+  markCollectionOfferCooldown,
+  isCollectionOfferCooldownActive,
+  isCollectionOfferMessage,
+  type EstateCollectionRoomId,
+  type EstateCollectionCaptureValues,
+} from "@/lib/estate/collectionFramework";
 import { setConfidencePrefill } from "@/lib/confidenceVaultStore";
 import { setJourneyPrefill } from "@/lib/myJourneyStore";
 import {
@@ -1231,6 +1424,7 @@ import {
   type GrowthPanelNav,
   type GrowthSectionId,
 } from "@/lib/growthNavigation";
+import { isEstateImmersiveRoom, isStandaloneEstateRoomSection } from "@/lib/estateImmersiveLayout";
 import {
   isMyWorkPanelSection,
   myWorkPanelBackLabel,
@@ -1291,6 +1485,17 @@ import {
   exposeShadowMetricsToWindow,
   reportShadowParityAfterChatTurn,
 } from "@/lib/intelligence-layer/shadowDiagnostics";
+import {
+  exposeEstateOrchestrationShadowToWindow,
+  observeEstateOrchestrationShadowTurn,
+} from "@/lib/estate/estateOrchestrationDev";
+import {
+  activeTaskLockHintForChat,
+  applyAssistantTaskLockTurn,
+  applyEstateTaskLockTurn,
+  frictionlessOffersEstateRoom,
+  sanitizeAssistantCopyDuringActiveTask,
+} from "@/lib/estate/estateTaskLockGate";
 import {
   buildActionDashboard,
   executeFounderAction,
@@ -1499,15 +1704,8 @@ type Message = {
   relationshipTrace?: import("@/lib/relationshipResponseTrace").RelationshipResponseUiTrace;
 };
 
-function presenceDelay() {
-  return new Promise((resolve) =>
-    setTimeout(resolve, 500 + Math.random() * 400),
-  );
-}
-
-function companionPresenceDelay(skip: boolean) {
-  if (skip) return Promise.resolve();
-  return presenceDelay();
+function companionPresenceDelay(_skip: boolean) {
+  return Promise.resolve();
 }
 
 function toApiMessages(messages: Message[]): Message[] {
@@ -1566,6 +1764,7 @@ export default function CompanionPageClient() {
 
   useEffect(() => {
     exposeShadowMetricsToWindow();
+    exposeEstateOrchestrationShadowToWindow();
     initCompanionSession();
   }, []);
 
@@ -1574,6 +1773,15 @@ export default function CompanionPageClient() {
   const activeNavRef = useRef<SidebarNavId>("chat");
   activeNavRef.current = activeNav;
   const [messages, setMessages] = useState<Message[]>([]);
+  const [directEstateVisit, setDirectEstateVisit] = useState<DirectEstateVisit | null>(
+    null,
+  );
+  const [spinWheelAutoSpin, setSpinWheelAutoSpin] = useState(false);
+  const directEstateVisitRef = useRef<DirectEstateVisit | null>(null);
+  const syncDirectEstateVisit = useCallback((visit: DirectEstateVisit | null) => {
+    directEstateVisitRef.current = visit;
+    setDirectEstateVisit(visit);
+  }, []);
   const [workspacePanel, setWorkspacePanelState] = useState<AppSection | null>(
     null,
   );
@@ -1747,6 +1955,8 @@ export default function CompanionPageClient() {
     if (typeof window === "undefined") return false;
     return isCompanionPostLoginQuiet();
   });
+  const [welcomeHomeReplay, setWelcomeHomeReplay] = useState(false);
+  const [welcomeHomeIntroActive, setWelcomeHomeIntroActive] = useState(false);
 
   const [hasChatted, setHasChatted] = useState(false);
   const [recognitionMoment, setRecognitionMoment] =
@@ -1831,6 +2041,8 @@ export default function CompanionPageClient() {
   );
   const [peacefulPlacesArrivalActive, setPeacefulPlacesArrivalActive] =
     useState(false);
+  const [memoryLibraryTab, setMemoryLibraryTab] =
+    useState<MemoryLibraryTab>("all");
   // A time block whose start time has arrived (shows the trigger popup).
   const [triggeredBlock, setTriggeredBlock] = useState<TimeBlock | null>(null);
   // A time block starting in ~15 minutes (shows a gentle heads-up toast).
@@ -1841,6 +2053,12 @@ export default function CompanionPageClient() {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
   const baseInputRef = useRef("");
+  const inputSnapshotRef = useRef("");
+  const micExplicitStopRef = useRef(false);
+  const handleSendRef = useRef<
+    (overrideText?: string, fresh?: boolean, skipToolOffer?: boolean) => Promise<void>
+  >(async () => {});
+  const activeChatTurnLifecycleRef = useRef<ChatTurnState | null>(null);
   const voiceUsedRef = useRef(false);
   const pomodoroTimer = usePomodoroTimer();
 
@@ -1856,16 +2074,115 @@ export default function CompanionPageClient() {
   const workspaceActiveBeside = Boolean(
     workspacePanel || companionStandaloneSection || guideBesideSession,
   );
+  const welcomeHomePrimary =
+    activeSection === "home" &&
+    !workspacePanel &&
+    !guideBesideSession &&
+    !splitCreateChat &&
+    !companionStandaloneSection &&
+    !(
+      directEstateVisit &&
+      directEstateVisit.section === "home"
+    );
+  const momentumBuilderPrimary =
+    isMomentumBuilderRoomSection(activeSection) &&
+    !workspacePanel &&
+    !guideBesideSession &&
+    !splitCreateChat &&
+    !companionStandaloneSection;
+  const momentumInstitutePrimary =
+    isMomentumInstituteSection(activeSection) &&
+    !workspacePanel &&
+    !guideBesideSession &&
+    !splitCreateChat &&
+    !companionStandaloneSection;
+  const stablesPrimary =
+    isStablesSection(activeSection) &&
+    !workspacePanel &&
+    !guideBesideSession &&
+    !splitCreateChat &&
+    !companionStandaloneSection;
+  const directEstateNavActive = Boolean(directEstateVisit);
+  const showDirectEstateOverlay = useMemo(
+    () => shouldShowDirectEstateOverlay(activeSection, directEstateVisit),
+    [activeSection, directEstateVisit],
+  );
+  const estateChatRoomId = useMemo(
+    () => directEstateChatRoomId(activeSection, directEstateVisit),
+    [activeSection, directEstateVisit],
+  );
+  const estateConversationStartedSinceVisit = useMemo(() => {
+    if (!directEstateVisit) return false;
+    const userCount = messages.filter((m) => m.role === "user").length;
+    return userCount > directEstateVisit.userMessageCountAtArrival;
+  }, [directEstateVisit, messages]);
+  const [instituteInitialDrawerId, setInstituteInitialDrawerId] = useState<
+    string | null
+  >(null);
+  const instituteLearningHintRef = useRef<string | null>(null);
+  const stablesLearningHintRef = useRef<string | null>(null);
+  const previousMomentumPathIdRef = useRef<string | null>(null);
+  const momentumBuilderRoomExperience = useMemo(() => {
+    if (!momentumBuilderPrimary) return null;
+    return resolveMomentumBuilderRoomState({
+      messages: messages.map((m) => ({
+        role: m.role,
+        content: m.content,
+      })),
+      previousPathId: previousMomentumPathIdRef.current,
+    });
+  }, [momentumBuilderPrimary, messages]);
+
+  useEffect(() => {
+    if (!momentumBuilderPrimary) {
+      previousMomentumPathIdRef.current = null;
+      return;
+    }
+    const path = momentumBuilderRoomExperience?.todaysPath;
+    if (!path?.id) return;
+
+    const prev = previousMomentumPathIdRef.current;
+    if (prev !== path.id) {
+      if (!prev) {
+        recordMomentumPathMilestone({
+          id: `path-${path.id}`,
+          milestoneKind: "meaningful_forward_motion",
+          label: path.headline,
+          recordedAt: new Date().toISOString(),
+          todaysPathId: path.id,
+        });
+      }
+      previousMomentumPathIdRef.current = path.id;
+    }
+  }, [momentumBuilderPrimary, momentumBuilderRoomExperience?.todaysPath]);
   const intelligenceIdle = isIdle && !workspaceActiveBeside;
   const homeCalm =
     activeSection === "home" &&
     isIdle &&
     !splitCreateChat &&
-    !workspaceActiveBeside;
+    !workspaceActiveBeside &&
+    !welcomeHomePrimary;
   const effectiveHomeArrival = useMemo(() => {
     if (!homeCalm) return null;
     return homeArrival ?? evaluateArrivalIntelligence({ record: false });
   }, [homeCalm, homeArrival]);
+
+  const welcomeHomeExperience = useMemo(
+    () =>
+      evaluateWelcomeHomeExperience({
+        hasSeenWelcomeIntro: hasSeenWelcomeIntro(),
+        replayRequested: welcomeHomeReplay,
+      }),
+    [welcomeHomeReplay, hydrated],
+  );
+
+  const welcomeHomeGreeting =
+    welcomeHomeExperience.greeting ??
+    (welcomeHomeExperience.visitorKind === "returning"
+      ? resolveWelcomeHomeChatPrompt(
+          homeArrival ?? evaluateArrivalIntelligence({ record: false }),
+        )
+      : null);
 
   const welcomeScene = false;
   const visibleThinkingMessage = useVisibleThinking(
@@ -1874,29 +2191,47 @@ export default function CompanionPageClient() {
   );
 
   useEffect(() => {
-    if (!homeCalm) {
+    if (!homeCalm && !welcomeHomePrimary) {
       setHomeArrival(null);
       setArrivalNavImmersion(false);
       return;
     }
-    if (isCompanionPostLoginQuiet()) {
-      setPostLoginQuiet(true);
-    } else {
-      setPostLoginQuiet(false);
+    if (welcomeHomePrimary) {
+      if (isCompanionPostLoginQuiet()) {
+        setPostLoginQuiet(true);
+      } else {
+        setPostLoginQuiet(false);
+      }
+      incrementHomeVisitCount();
+      setHomeArrival(evaluateArrivalIntelligence({ record: true }));
+      return;
     }
-    incrementHomeVisitCount();
-    const intel = evaluateArrivalIntelligence({ record: true });
-    setHomeArrival(intel);
-    if (intel.chrome.autoFocusInput) {
-      window.setTimeout(() => {
-        inputRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "nearest",
-        });
-        inputRef.current?.focus();
-      }, 300);
+  }, [homeCalm, welcomeHomePrimary]);
+
+  useEffect(() => {
+    if (!hydrated || !welcomeHomePrimary) {
+      setWelcomeHomeReplay(false);
+      return;
     }
-  }, [homeCalm]);
+    if (peekWelcomeHomeReplayRequested()) {
+      clearWelcomeHomeReplayRequest();
+      setWelcomeHomeReplay(true);
+      return;
+    }
+    setWelcomeHomeReplay(false);
+  }, [hydrated, welcomeHomePrimary]);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    const onReplay = () => {
+      if (welcomeHomePrimary) {
+        setWelcomeHomeReplay(true);
+      }
+    };
+    window.addEventListener(WELCOME_HOME_REPLAY_EVENT, onReplay);
+    return () =>
+      window.removeEventListener(WELCOME_HOME_REPLAY_EVENT, onReplay);
+  }, [hydrated, welcomeHomePrimary]);
 
   useEffect(() => {
     if (!homeCalm) return;
@@ -2204,20 +2539,55 @@ export default function CompanionPageClient() {
 
   // Settings / Profile / Sign-in open as modal sheets on top of the app (not pages).
   const [overlay, setOverlay] = useState<
-    null | "settings" | "profile" | "signin" | "whats-new"
+    | null
+    | "settings"
+    | "profile"
+    | "signin"
+    | "whats-new"
+    | "growth-profile"
+    | "institute-cabinet"
   >(null);
+  const [estateGuideFlipbookOpen, setEstateGuideFlipbookOpen] = useState(false);
+  const [growthProfileEmphasizeTimeline, setGrowthProfileEmphasizeTimeline] =
+    useState(false);
+  const growthProfilePrimary = overlay === "growth-profile";
+  const estateProfilePrimary = overlay === "profile";
+  const profileEstateRoomOverlayId = useMemo((): ProfileEstateRoomId | null => {
+    if (estateProfilePrimary) return "my-estate";
+    if (growthProfilePrimary) return "growth-profile";
+    if (showDirectEstateOverlay && isProfileEstateRoomId(estateChatRoomId)) {
+      return estateChatRoomId;
+    }
+    if (
+      directEstateVisit &&
+      isProfileEstateRoomId(directEstateVisit.roomId) &&
+      activeSection === profileEstateSectionForRoom(directEstateVisit.roomId)
+    ) {
+      return directEstateVisit.roomId;
+    }
+    return null;
+  }, [
+    estateProfilePrimary,
+    growthProfilePrimary,
+    showDirectEstateOverlay,
+    estateChatRoomId,
+    directEstateVisit,
+    activeSection,
+  ]);
+  const profileEstateChromeActive = Boolean(profileEstateRoomOverlayId);
   const [planMyDayDrawerOpen, setPlanMyDayDrawerOpen] = useState(false);
   const [planMyDayOpenItemId, setPlanMyDayOpenItemId] = useState<string | null>(
     null,
   );
   const [freshStartDialog, setFreshStartDialog] =
     useState<FreshStartKind | null>(null);
+  const [freshStartRevision, setFreshStartRevision] = useState(0);
+  const estateChatScrollKey = `${freshStartRevision}-${messages.length}-${isLoading ? 1 : 0}`;
   const [activityReturnLabel, setActivityReturnLabel] = useState<string | null>(
     null,
   );
   const [settingsSection, setSettingsSection] =
     useState<SettingsSection | null>(null);
-  const [profileGettingToKnowYou, setProfileGettingToKnowYou] = useState(false);
   const visualMode = useVisualMode();
   const clientMounted = useClientMounted();
   const adaptiveVisualContext = useMemo(
@@ -2238,7 +2608,7 @@ export default function CompanionPageClient() {
       pomodoroTimer.isActive,
     ],
   );
-  const { configured: authConfigured, user } = useCompanionAuth();
+  const { configured: authConfigured, user, signOut } = useCompanionAuth();
 
   const openSignIn = useCallback(() => {
     if (isCompanionAuthBypassed()) return;
@@ -2349,6 +2719,29 @@ export default function CompanionPageClient() {
   const [workspaceOffer, setWorkspaceOffer] = useState<WorkspaceOffer | null>(
     null,
   );
+  const [momentumBuilderArrivalActive, setMomentumBuilderArrivalActive] =
+    useState(false);
+  const [welcomeHomeEstateMapVisible, setWelcomeHomeEstateMapVisible] =
+    useState(false);
+
+  useEffect(() => {
+    if (!welcomeHomePrimary) {
+      setWelcomeHomeEstateMapVisible(false);
+    }
+  }, [welcomeHomePrimary]);
+
+  useEffect(() => {
+    if (!momentumBuilderPrimary) {
+      setMomentumBuilderArrivalActive(false);
+    }
+  }, [momentumBuilderPrimary]);
+
+  useEffect(() => {
+    if (activeSection !== "brain-dump") {
+      setEstateConservatoryEngaged(false);
+    }
+  }, [activeSection]);
+
   const [pendingCreateOpen, setPendingCreateOpen] =
     useState<PendingCreateOpenPayload | null>(null);
   const [pendingConversationHandoff, setPendingConversationHandoff] =
@@ -2356,6 +2749,10 @@ export default function CompanionPageClient() {
   const [pendingAcceptanceRecord, setPendingAcceptanceRecord] =
     useState<PendingAcceptanceRecord | null>(null);
   const chatTurnRef = useRef(0);
+  const awaitingUserConfirmationRef = useRef<AwaitingUserConfirmationState | null>(
+    null,
+  );
+  const [chatAwaitingConfirmation, setChatAwaitingConfirmation] = useState(false);
   const declinedConversationOffersRef = useRef<Set<string>>(new Set());
   const lastWorkspaceOfferLineRef = useRef<string | null>(null);
   const lastEmotionalStateRef = useRef<EmotionalState | null>(null);
@@ -2616,7 +3013,16 @@ export default function CompanionPageClient() {
       ? resume && type && wf
         ? bootstrapCreateWorkspaceV2FromWorkflow(type, wf)
         : type
-          ? bootstrapWorkspaceV2Session(type)
+          ? (() => {
+              markWorkspaceFacilitationActive(type);
+              const boot = bootstrapWorkspaceV2Session(type);
+              const paused = getActiveArtifact();
+              const greeting =
+                paused?.status === "paused" || paused?.status === "saved"
+                  ? `${buildArtifactReturnGreeting(paused)}\n\n${facilitationOpenerForWorkspace(type)}`
+                  : facilitationOpenerForWorkspace(type);
+              return { ...boot, opener: greeting };
+            })()
           : bootstrapCreateBuilderSession(type)
       : resume && wf
         ? bootstrapCreateBuilderFromWorkflow(type!, wf)
@@ -2889,6 +3295,29 @@ export default function CompanionPageClient() {
   }
 
   function beginWorkspaceChat(scope: WorkspaceChatScope, opener: string) {
+    if (consumeEstateTransitionPreserveChat()) {
+      workspaceChatScopeRef.current = scope;
+      const pending = loadEstatePendingTransition();
+      const arrival =
+        pending && pending.destinationSection === scope.section
+          ? buildEstateArrivalContinuation(pending)
+          : estateRoomArrivalContinuationLine(
+              scope.section.replace(/-/g, " "),
+            );
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: arrival,
+        },
+      ]);
+      clearEstatePendingTransition();
+      workspaceCoachSeededRef.current = null;
+      setProjectCoachSession(null);
+      setProjectCoachTopicPickerVisible(false);
+      createBuilderBootstrappedRef.current = false;
+      return;
+    }
     clearConversation();
     setMessages([{ role: "assistant", content: opener }]);
     workspaceChatScopeRef.current = scope;
@@ -3030,6 +3459,7 @@ export default function CompanionPageClient() {
   const [brainDumpInitialView, setBrainDumpInitialView] =
     useState<ClearMyMindPanelView>("capture");
   const [brainDumpPanelKey, setBrainDumpPanelKey] = useState(0);
+  const [estateConservatoryEngaged, setEstateConservatoryEngaged] = useState(false);
   const [founderActionTick, setFounderActionTick] = useState(0);
 
   const founderActionBoard = useMemo(() => {
@@ -3944,6 +4374,7 @@ export default function CompanionPageClient() {
     userInitiated?: boolean;
     userText?: string;
     consentGranted?: boolean;
+    workspaceConsentGranted?: boolean;
     skipConsentCheck?: boolean;
     skipWorkspaceChatReset?: boolean;
     conversationHandoff?: boolean;
@@ -4185,6 +4616,7 @@ export default function CompanionPageClient() {
       userText: meta?.userText ?? lastUserTextRef.current,
       lastAssistantText: buildCreateOpenContext().lastAssistantText,
       consentGranted: meta?.consentGranted,
+      workspaceConsentGranted: meta?.workspaceConsentGranted,
       skipConsentCheck: meta?.skipConsentCheck,
     };
     const decision = evaluateCreateOpen(req, buildCreateOpenContext());
@@ -4580,35 +5012,9 @@ export default function CompanionPageClient() {
     }
     const catalog = matchCatalogFromText(userText);
     if (!catalog?.type) return false;
-    const itemType = catalog.type;
-    const scaffold = collaborativeScaffoldForType(itemType);
-    const opened = requestCreateOpen(
-      "content-generator",
-      {
-        itemType,
-        title: `New ${itemType}`,
-        draftContent: scaffold,
-        brief: userText,
-        stage: "editing draft",
-        source: "generated",
-        artifactTypeLocked: shouldLockArtifactType(itemType),
-      },
-      {
-        seedOverride: {
-          type: itemType,
-          topic: `New ${itemType}`,
-          brief: userText,
-          draft: scaffold,
-          autoGenerate: false,
-        },
-      },
-      { source: "ensure_live_create", userText },
-    );
-    if (opened) {
-      const wf = liveCreateWorkflowState(itemType);
-      createPanelWorkflowRef.current = wf;
-    }
-    return opened;
+    // Facilitated creation — do not auto-open split workspace with scaffold.
+    ensureFacilitatedSessionFromText(userText);
+    return false;
   }
 
   function tryChatCreateHandoff(
@@ -5284,11 +5690,13 @@ export default function CompanionPageClient() {
   function navigateToChatCore() {
     backInterceptorRef.current = null;
     goingBackRef.current = false;
+    syncDirectEstateVisit(null);
+    clearEstatePendingTransition();
+    setEstateConservatoryEngaged(false);
 
     if (overlay) {
       setOverlay(null);
       setSettingsSection(null);
-      setProfileGettingToKnowYou(false);
     }
     if (planMyDayDrawerOpen) setPlanMyDayDrawerOpen(false);
 
@@ -5321,7 +5729,6 @@ export default function CompanionPageClient() {
     if (overlay) {
       setOverlay(null);
       setSettingsSection(null);
-      setProfileGettingToKnowYou(false);
       return;
     }
 
@@ -5486,12 +5893,31 @@ export default function CompanionPageClient() {
       }
       const prefix = baseInputRef.current;
       const separator = prefix && !prefix.endsWith(" ") ? " " : "";
+      const nextValue = prefix + separator + transcript;
       voiceUsedRef.current = true;
-      setInput(prefix + separator + transcript);
+      inputSnapshotRef.current = nextValue;
+      setInput(nextValue);
     };
 
-    recognition.onend = () => setIsListening(false);
-    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => {
+      setIsListening(false);
+      patchEstateRuntimeState({ micActive: false });
+      tryCommitMicCaptureOnEnd({
+        explicitStopRequested: micExplicitStopRef.current,
+        inputSnapshot: inputSnapshotRef.current,
+        send: (text) => {
+          voiceUsedRef.current = true;
+          void handleSendRef.current(text);
+        },
+        onConsumedExplicitStop: () => {
+          micExplicitStopRef.current = false;
+        },
+      });
+    };
+    recognition.onerror = () => {
+      setIsListening(false);
+      micExplicitStopRef.current = false;
+    };
     recognitionRef.current = recognition;
     setSpeechSupported(true);
 
@@ -5505,11 +5931,15 @@ export default function CompanionPageClient() {
     const recognition = recognitionRef.current;
     if (!recognition) return;
     if (isListening) {
+      micExplicitStopRef.current = true;
+      patchEstateRuntimeState({ micActive: false });
       recognition.stop();
       return;
     }
     recognition.lang = speechLocaleForLanguage(getPrefs().voiceLanguage);
     baseInputRef.current = input;
+    inputSnapshotRef.current = input;
+    patchEstateRuntimeState({ micActive: true, inputBuffer: input });
     try {
       recognition.start();
       setIsListening(true);
@@ -5525,6 +5955,8 @@ export default function CompanionPageClient() {
   }
 
   function handleInputChange(value: string) {
+    inputSnapshotRef.current = value;
+    patchEstateRuntimeState({ inputBuffer: value });
     setInput(value);
     voiceUsedRef.current = false;
   }
@@ -5533,8 +5965,9 @@ export default function CompanionPageClient() {
     setMessages((prev) => [...prev, { role: "system", content }]);
   }
 
-  function clearTodayContext() {
+  function clearTodayContext(options?: { preserveRoom?: boolean }) {
     recognitionRef.current?.stop();
+    micExplicitStopRef.current = false;
     setIsListening(false);
     clearConversation();
     declinedConversationOffersRef.current = new Set();
@@ -5568,8 +6001,10 @@ export default function CompanionPageClient() {
     setProjectsBootstrapCreate(false);
     voiceUsedRef.current = false;
     setIsLoading(false);
-    setActiveSection("home");
-    setActiveNav("chat");
+    if (!options?.preserveRoom) {
+      setActiveSection("home");
+      setActiveNav("chat");
+    }
     setGuideBesideSession(null);
     setActivitySession(EMPTY_ACTIVITY_SESSION);
     activitySessionRef.current = EMPTY_ACTIVITY_SESSION;
@@ -5605,15 +6040,40 @@ export default function CompanionPageClient() {
     resetTodayPlanForNewDay();
   }
 
+  function shouldPreserveRoomForFreshConversation(): boolean {
+    if (welcomeHomePrimary) return true;
+    const section = activeSectionRef.current;
+    return section !== "home" && isStandaloneEstateRoomSection(section);
+  }
+
   function confirmFreshStart() {
-    if (freshStartDialog === "begin-new-day") {
-      beginNewDay();
-    } else if (freshStartDialog === "reset-day") {
-      resetPlanDay();
-    } else if (freshStartDialog === "clear-context") {
-      clearTodayContext();
+    try {
+      const preserveRoom = shouldPreserveRoomForFreshConversation();
+      if (freshStartDialog === "begin-new-day") {
+        beginNewDay(preserveRoom);
+      } else if (freshStartDialog === "reset-day") {
+        resetPlanDay();
+      } else if (freshStartDialog === "clear-context") {
+        clearTodayContext({ preserveRoom });
+        setMessages([
+          {
+            role: "assistant",
+            content: NEW_CONVERSATION_GREETING,
+          },
+        ]);
+      }
+      setFreshStartRevision((revision) => revision + 1);
+      window.requestAnimationFrame(() => inputRef.current?.focus());
+    } catch (err) {
+      const routed = routeCompanionFailure(err, {
+        surface: "fresh-start",
+      });
+      if (routed.channel === "estate") {
+        setMessages([{ role: "assistant", content: routed.message }]);
+      }
+    } finally {
+      setFreshStartDialog(null);
     }
-    setFreshStartDialog(null);
   }
 
   function resetPlanDay() {
@@ -5621,14 +6081,15 @@ export default function CompanionPageClient() {
     setPlanMyDayOpenItemId(null);
   }
 
-  function beginNewDay() {
-    clearTodayContext();
+  function beginNewDay(preserveRoom = false) {
+    clearTodayContext({ preserveRoom });
     clearDailySessionFlags();
     resetTodayPlanForNewDay();
+    const { greeting } = beginEstateJourneyNewDay();
     setMessages([
       {
         role: "assistant",
-        content: BEGIN_NEW_DAY_GREETING,
+        content: greeting,
       },
     ]);
   }
@@ -5845,11 +6306,18 @@ export default function CompanionPageClient() {
       openGrowthReportsCore();
       return;
     }
+    if (section === "user-memory") {
+      openUserMemoryCore("all");
+      return;
+    }
     if (
       section === "growth-journal" ||
       section === "growth-portfolio" ||
       section === "wins-this-week" ||
       section === "evidence-bank" ||
+      section === "growth-greenhouse" ||
+      section === "growth-library" ||
+      section === "growth-reports" ||
       section === "confidence-vault" ||
       section === "my-journey"
     ) {
@@ -5963,6 +6431,32 @@ export default function CompanionPageClient() {
   function leaveWelcomeRoom() {
     destroyWelcomeRoomAudioManager();
     navigateToChatCore();
+  }
+
+  function finishWelcomeHomeIntro() {
+    if (!hasSeenWelcomeIntro()) {
+      markWelcomeIntroSeen();
+    }
+    setWelcomeHomeReplay(false);
+    setWelcomeHomeIntroActive(false);
+    destroyWelcomeHomeAudioManager();
+    destroyWelcomeRoomAudioManager();
+  }
+
+  function completeWelcomeHomeFirstLaunch(choice: WelcomeHomeFirstChoice | null) {
+    finishWelcomeHomeIntro();
+
+    if (choice === "tour") {
+      openWelcomeRoom();
+      return;
+    }
+    if (choice === "surprise") {
+      void handleSend("Introduce me to something wonderful.", true);
+      return;
+    }
+    if (choice === "know") {
+      window.setTimeout(() => inputRef.current?.focus(), 350);
+    }
   }
 
   function openCreateDirect() {
@@ -6612,6 +7106,13 @@ export default function CompanionPageClient() {
   /** Standalone focus tools (Clear My Mind, spin wheel, energy, etc.). */
   function openStandaloneFocusSectionCore(section: AppSection) {
     const resolvedSection = section === "games" ? "quick-recharge" : section;
+    recordEstateRoomTransition({
+      toSection: resolvedSection,
+      fromSection: activeSectionRef.current,
+      reason: "estate room navigation",
+      userText: lastUserTextRef.current || undefined,
+      preserveChat: true,
+    });
     pushNavigationRestore();
     clearParallelCoachingOffers();
     clearSplitBesideWorkspace();
@@ -6696,6 +7197,10 @@ export default function CompanionPageClient() {
       openGrowLandingCore();
       return;
     }
+    if (section === "grow-momentum-builders") {
+      openMomentumBuilderRoomCore();
+      return;
+    }
     pushGrowBackLabel();
     preloadRoomBackground(GROWTH_ROOM_BG);
     clearSplitBesideWorkspace();
@@ -6703,7 +7208,74 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore(section);
   }
 
+  function openMomentumBuilderRoomCore() {
+    pushGrowBackLabel();
+    preloadRoomBackground(MOMENTUM_BUILDER_ROOM_BG);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore("momentum-builder");
+  }
+
+  function pauseActiveArtifactIfLeavingCreate(targetSection: AppSection) {
+    if (!shouldPauseArtifactForSection(targetSection)) return;
+    const artifact = getActiveArtifact();
+    if (!artifact || artifact.status === "finalized") return;
+    if (workspacePanelRef.current !== "content-generator") return;
+    setActiveArtifact(
+      pauseArtifactForRoom(artifact, targetSection, "Cross-room learning break"),
+    );
+  }
+
+  function openMomentumInstituteRoomCore(drawerId?: string | null) {
+    pauseActiveArtifactIfLeavingCreate("momentum-institute");
+    setInstituteInitialDrawerId(drawerId ?? null);
+    pushGrowBackLabel();
+    preloadRoomBackground(MOMENTUM_INSTITUTE_ROOM_BG);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore("momentum-institute");
+  }
+
+  function openStablesRoomCore() {
+    pauseActiveArtifactIfLeavingCreate("stables");
+    pushGrowBackLabel();
+    preloadRoomBackground(STABLES_ROOM_BG);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore("stables");
+  }
+
+  const handleInstituteLearningChat = useCallback(
+    (turn: InstituteLearningChatTurn) => {
+      instituteLearningHintRef.current = turn.chatHint;
+      setInput(turn.memberText);
+      requestAnimationFrame(() => inputRef.current?.focus());
+    },
+    [],
+  );
+
+  const handleStablesLearningChat = useCallback(
+    (turn: StablesLearningChatTurn) => {
+      stablesLearningHintRef.current = turn.chatHint;
+      setInput(turn.memberText);
+      requestAnimationFrame(() => inputRef.current?.focus());
+    },
+    [],
+  );
+
   function openSectionFromUrlCore(section: AppSection) {
+    if (section === "grow-momentum-builders" || section === "momentum-builder") {
+      openMomentumBuilderRoomCore();
+      return;
+    }
+    if (section === "momentum-institute") {
+      openMomentumInstituteRoomCore();
+      return;
+    }
+    if (section === "stables") {
+      openStablesRoomCore();
+      return;
+    }
     if (isGrowPanelSection(section)) {
       openGrowSectionCore(section as GrowSectionId);
       return;
@@ -6747,23 +7319,56 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore("growth-reports");
   }
 
-  function openGrowthDestinationCore(section: AppSection) {
+  function openUserMemoryCore(tab: MemoryLibraryTab = "all") {
+    setMemoryLibraryTab(tab);
     pushGrowthBackLabel();
-    if (section === "growth-journal") {
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore("user-memory");
+  }
+
+  function openGrowthDestinationCore(section: AppSection) {
+    const resolved =
+      section === "growth-portfolio" ? ("growth-library" as AppSection) : section;
+    pushGrowthBackLabel();
+    if (resolved === "growth-journal") {
       preloadRoomBackground(JOURNAL_ROOM_BG);
     }
-    if (section === "evidence-bank") {
+    if (resolved === "evidence-bank") {
       preloadRoomBackground(EVIDENCE_VAULT_ROOM_BG);
     }
-    if (section === "growth-portfolio") {
-      preloadRoomBackground(CREATIVE_STUDIO_ROOM_BG);
+    if (resolved === "growth-library") {
+      preloadRoomBackground(STORY_LIBRARY_ROOM_BG);
     }
-    if (section === "wins-this-week") {
+    if (resolved === "wins-this-week") {
       preloadRoomBackground(CELEBRATION_GARDEN_ROOM_BG);
+    }
+    if (resolved === "growth-greenhouse") {
+      preloadRoomBackground(GROWTH_ROOM_BG);
+    }
+    if (resolved === "growth-reports") {
+      preloadRoomBackground(
+        getEstateCollectionRoom("celebration-hall").backgroundImage,
+      );
     }
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
-    openStandaloneFocusSectionCore(section);
+    openStandaloneFocusSectionCore(resolved);
+  }
+
+  function openCollectionRoomWithPrefillCore(
+    roomId: EstateCollectionRoomId,
+    prefill: EstateCollectionCaptureValues,
+    sourceText: string,
+  ) {
+    setCollectionPrefill({
+      roomId,
+      values: prefill,
+      sourceText,
+      savedAt: new Date().toISOString(),
+    });
+    const room = getEstateCollectionRoom(roomId);
+    openGrowthDestinationCore(room.section);
   }
 
   function openWhatsNewCore() {
@@ -6964,12 +7569,119 @@ export default function CompanionPageClient() {
     }
   }
 
-  function handleTopBarNewConversationItem(itemId: NewConversationMenuItemId) {
-    if (itemId === "new-day-conversation") {
-      requestBeginNewDay();
+  const handleEstateLogOut = useCallback(async () => {
+    setOverlay(null);
+    if (authConfigured) {
+      await signOut();
+    }
+    router.push("/companion/login");
+  }, [authConfigured, router, signOut]);
+
+  function openProfileEstateRoomFromMenu(
+    roomId: ProfileEstateRoomId,
+    options?: { emphasizeTimeline?: boolean },
+  ) {
+    if (roomId === "growth-profile") {
+      preloadRoomBackground(GROWTH_ROOM_BG);
+      setGrowthProfileEmphasizeTimeline(options?.emphasizeTimeline ?? false);
+      syncDirectEstateVisit(null);
+      setOverlay("growth-profile");
       return;
     }
-    requestClearTodayContext();
+
+    if (roomId === "my-estate") {
+      preloadRoomBackground(ESTATE_PROFILE_ROOM_BG);
+      setGrowthProfileEmphasizeTimeline(false);
+      syncDirectEstateVisit(null);
+      setOverlay("profile");
+      return;
+    }
+
+    if (roomId === "evidence-vault" || roomId === "portfolio") {
+      const section = profileEstateSectionForRoom(roomId);
+      const bg = profileEstateRoomBackgroundImage(roomId);
+      preloadRoomBackground(bg);
+      setGrowthProfileEmphasizeTimeline(false);
+      setOverlay(null);
+      syncDirectEstateVisit(null);
+      openGrowthDestinationCore(section);
+      return;
+    }
+
+    const section = profileEstateSectionForRoom(roomId);
+    const bg = profileEstateRoomBackgroundImage(roomId);
+    preloadRoomBackground(bg);
+    setGrowthProfileEmphasizeTimeline(false);
+    setOverlay(null);
+    syncDirectEstateVisit({
+      roomId,
+      section,
+      userIntent: `estate-menu:${roomId}`,
+      userMessageCountAtArrival: messages.filter((m) => m.role === "user").length,
+    });
+    openStandaloneFocusSectionCore(section);
+  }
+
+  function openSparkEstateGuideCore() {
+    setEstateGuideFlipbookOpen(true);
+  }
+
+  function handleEstateMenuAction(actionId: EstateMenuActionId) {
+    if (actionId === "memory-library") {
+      openUserMemoryCore("all");
+      return;
+    }
+    if (actionId === "journal") {
+      openUserMemoryCore("journal");
+      return;
+    }
+
+    const profileRoom = profileEstateRoomForMenuAction(actionId);
+    if (profileRoom) {
+      openProfileEstateRoomFromMenu(profileRoom, {
+        emphasizeTimeline: actionId === "progress-timeline",
+      });
+      return;
+    }
+
+    switch (actionId) {
+      case "institute-cabinet":
+        setOverlay("institute-cabinet");
+        return;
+      case "seeds-planted":
+        setOverlay(null);
+        openGrowSectionCore("grow-spark-cards");
+        return;
+      case "goals-projects":
+        setOverlay(null);
+        openWorkspaceFromSection("projects");
+        return;
+      case "start-new-conversation":
+        requestClearTodayContext();
+        return;
+      case "start-new-day-conversation":
+        requestBeginNewDay();
+        return;
+      case "settings":
+        setSettingsSection(null);
+        setOverlay("settings");
+        return;
+      case "notifications":
+        setSettingsSection("notifications");
+        setOverlay("settings");
+        return;
+      case "voice-settings":
+        setSettingsSection("plan");
+        setOverlay("settings");
+        return;
+      case "log-out":
+        void handleEstateLogOut();
+        return;
+      default: {
+        const _exhaustive: never = actionId;
+        return _exhaustive;
+      }
+    }
   }
 
   function handleToolSelectCore(tool: SidebarToolId) {
@@ -7015,6 +7727,46 @@ export default function CompanionPageClient() {
         inputRef.current?.focus();
         break;
     }
+  }
+
+  function executeExplicitCompanionAction(
+    action: ExplicitCompanionAction,
+    finishLatencyTurn: (opts?: {
+      localReply?: boolean;
+      calledApi?: boolean;
+    }) => void,
+  ) {
+    clearFrictionlessPending();
+    clearPendingAcceptanceAuthority();
+    setToolSuggestion(null);
+    setWorkspaceOffer(null);
+    setAwaitingUserConfirmation(null);
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: action.message },
+    ]);
+
+    switch (action.kind) {
+      case "open-breathe":
+        handleToolSelectCore("breathe");
+        break;
+      case "open-spin-wheel":
+        setSpinWheelAutoSpin(true);
+        handleToolSelectCore("spin-wheel");
+        break;
+      case "start-timer": {
+        savePreferredFocusMinutes(action.minutes);
+        logMomentum("start", `Focus session from chat — ${action.minutes} min`);
+        pomodoroTimer.startWith(action.minutes);
+        setActiveNav("focus");
+        setCoachingMode("focus");
+        openStandaloneFocusSectionCore("focus-timer");
+        break;
+      }
+    }
+
+    finishEarlyChatTurn();
+    finishLatencyTurn({ localReply: true });
   }
 
   function handleFocusHubAction(action: FocusHubAction) {
@@ -7707,7 +8459,15 @@ export default function CompanionPageClient() {
           break;
       }
     } else if (result.action === "open_tool") {
-      handleToolSelectCore(result.tool);
+      if (result.tool === "focus-audio") {
+        openFocusAudioCore(
+          detectAudioRequest(
+            conversationWorkflow?.assistantQuestion ?? result.message,
+          ).categoryId,
+        );
+      } else {
+        handleToolSelectCore(result.tool);
+      }
     }
 
     setMessages((prev) => [
@@ -7746,6 +8506,89 @@ export default function CompanionPageClient() {
     lastAssistantText: string,
     _fresh: boolean,
   ): boolean {
+    if (
+      isFrictionlessAffirmation(trimmed) ||
+      isConfirmationAcceptance(trimmed)
+    ) {
+      const frictionlessPending = loadFrictionlessPendingForConfirmation({
+        confirmationReply: true,
+        awaitingPending: awaitingUserConfirmationRef.current?.frictionlessPending,
+        lastAssistantText,
+        currentTurn: chatTurnRef.current,
+      });
+      if (frictionlessPending) {
+        const continuation = resolveFrictionlessContinuation(
+          trimmed,
+          frictionlessPending,
+          chatTurnRef.current,
+          lastAssistantText,
+        );
+        if (continuation?.execute) {
+          if (frictionlessPending.target === "focus-audio") {
+            openFocusAudioCore(
+              frictionlessPending.focusAudioCategory ??
+                detectAudioRequest(lastAssistantText).categoryId,
+            );
+          } else if (frictionlessPending.target === "breathe") {
+            handleToolSelectCore("breathe");
+          } else if (frictionlessPending.target === "brain-dump") {
+            handleToolSelectCore("brain-dump");
+          } else if (frictionlessPending.target === "decision-compass") {
+            openDecisionCompass();
+          } else if (frictionlessPending.target === "playbook") {
+            openSectionBesideChatCore("playbook", undefined, {
+              userInitiated: true,
+            });
+          } else if (
+            frictionlessPending.type === "open_workspace" &&
+            frictionlessPending.target !== "visual-focus"
+          ) {
+            const offer =
+              workspaceOffer ??
+              ({
+                section: frictionlessPending.target,
+                buttonLabel:
+                  frictionlessPending.offerSummary ??
+                  frictionlessPending.label ??
+                  "Continue",
+                line: frictionlessPending.context,
+              } satisfies WorkspaceOffer);
+            acceptWorkspaceOfferCore(offer);
+            if (frictionlessPending.target !== "content-generator") {
+              setMessages((prev) => [
+                ...prev,
+                { role: "assistant", content: continuation.ack },
+              ]);
+            }
+            clearFrictionlessPending();
+            clearPendingAcceptanceAuthority();
+            setToolSuggestion(null);
+            setWorkspaceOffer(null);
+            setAwaitingUserConfirmation(null);
+            setConversationWorkflow(null);
+            setInput("");
+            voiceUsedRef.current = false;
+            finishEarlyChatTurn();
+            return true;
+          }
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: continuation.ack },
+          ]);
+          clearFrictionlessPending();
+          clearPendingAcceptanceAuthority();
+          setToolSuggestion(null);
+          setWorkspaceOffer(null);
+          setAwaitingUserConfirmation(null);
+          setConversationWorkflow(null);
+          setInput("");
+          voiceUsedRef.current = false;
+          finishEarlyChatTurn();
+          return true;
+        }
+      }
+    }
+
     const surveyOfferType = inferSurveyTypeFromAssistantOffer(lastAssistantText);
     if (surveyOfferType && isAcceptanceAttempt(trimmed)) {
       const template = SURVEY_TEMPLATES[surveyOfferType];
@@ -7991,6 +8834,7 @@ export default function CompanionPageClient() {
             source: pending.source,
             artifact: pending.artifact,
             consentGranted: true,
+            workspaceConsentGranted: true,
             skipConsentCheck: true,
           });
         }
@@ -8035,7 +8879,7 @@ export default function CompanionPageClient() {
     }
   }
 
-  function clearAllPendingOffers() {
+  function clearOfferStateOnly() {
     setWorkspaceOffer(null);
     setAssistedActionOffer(null);
     setArtifactExportOffer(null);
@@ -8047,6 +8891,11 @@ export default function CompanionPageClient() {
     setBridge(null);
     setPendingCreateOpen(null);
     clearPendingAcceptanceAuthority();
+  }
+
+  function clearAllPendingOffers() {
+    clearOfferStateOnly();
+    clearEstatePendingTransition();
   }
 
   const lockedArtifactType = useMemo(
@@ -8488,10 +9337,138 @@ export default function CompanionPageClient() {
     setVisibleThinkingContext(null);
   }
 
+  function setAwaitingUserConfirmation(
+    state: AwaitingUserConfirmationState | null,
+  ) {
+    awaitingUserConfirmationRef.current = state;
+    setChatAwaitingConfirmation(Boolean(state?.active));
+  }
+
   function finishEarlyChatTurn() {
-    endVisibleThinking();
-    setIsLoading(false);
-    inputRef.current?.focus();
+    const turnState = activeChatTurnLifecycleRef.current;
+    const finalize = () => {
+      endVisibleThinking();
+      setIsLoading(false);
+      inputRef.current?.focus();
+    };
+    if (turnState) {
+      finalizeChatTurn(turnState, finalize);
+    } else {
+      finalize();
+    }
+  }
+
+  function presentFrictionlessLocalReply(
+    frictionlessAction: FrictionlessActionDecision,
+    finishLatencyTurn: (opts?: {
+      localReply?: boolean;
+      calledApi?: boolean;
+    }) => void,
+  ): boolean {
+    if (!frictionlessAction.localReply) return false;
+
+    if (activeChatTurnLifecycleRef.current) {
+      markAssistantReplied(activeChatTurnLifecycleRef.current);
+    }
+    setMessages((prev) => [
+      ...prev,
+      { role: "assistant", content: frictionlessAction.localReply! },
+    ]);
+
+    if (frictionlessAction.immediateVisualOpen) {
+      completeVisualThinkingOpen(frictionlessAction.immediateVisualOpen);
+      setInput("");
+      setAwaitingUserConfirmation(null);
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return true;
+    }
+
+    if (frictionlessAction.pendingAction) {
+      const pendingAction = frictionlessAction.pendingAction;
+      if (isVisualThinkingPendingAction(pendingAction)) {
+        saveVisualThinkingMenuPending(pendingAction);
+      } else {
+        saveFrictionlessPending(pendingAction);
+      }
+      if (
+        frictionlessAction.localReply &&
+        isEstateTransitionOfferMessage(frictionlessAction.localReply) &&
+        lastUserTextRef.current.trim()
+      ) {
+        registerEstateWorkspaceOfferFromAssistant({
+          assistantText: frictionlessAction.localReply,
+          priorUserText: lastUserTextRef.current,
+          offeredAtTurn: chatTurnRef.current,
+        });
+      }
+      registerPendingAcceptance(
+        frictionlessAction.workspaceOffer ? "workspace" : "tool",
+        pendingAction.offerSummary,
+      );
+      registerPendingOffer({
+        offerSummary: pendingAction.offerSummary,
+        section:
+          pendingAction.target === "focus-audio"
+            ? "focus-audio"
+            : typeof pendingAction.target === "string" &&
+                pendingAction.target !== "breathe" &&
+                pendingAction.target !== "focus-timer" &&
+                pendingAction.target !== "brain-dump" &&
+                pendingAction.target !== "google-workspace"
+              ? pendingAction.target
+              : undefined,
+      });
+      const workflow = createConversationWorkflow(
+        frictionlessAction.localReply!,
+        chatTurnRef.current,
+      );
+      if (workflow) setConversationWorkflow(workflow);
+      logCreateOfferRegistration({
+        pendingAction,
+        pendingMenuSelection: loadPendingMenuSelection(),
+        pendingAcceptance: {
+          kind: frictionlessAction.workspaceOffer ? "workspace" : "tool",
+          offerSummary: frictionlessAction.pendingAction.offerSummary,
+        },
+      });
+    }
+    if (frictionlessAction.googleSheetIntake) {
+      saveGoogleSheetIntakeSession(frictionlessAction.googleSheetIntake);
+    }
+    if (frictionlessAction.reminderIntake) {
+      saveReminderIntakeSession(frictionlessAction.reminderIntake);
+    } else if (frictionlessAction.category === "reminder") {
+      clearReminderIntakeSession();
+    }
+    if (frictionlessAction.toolSuggestion) {
+      setToolSuggestion(frictionlessAction.toolSuggestion);
+    }
+    if (frictionlessAction.workspaceOffer) {
+      setWorkspaceOffer(frictionlessAction.workspaceOffer);
+    }
+
+    if (shouldStopAfterAssistantOffer(frictionlessAction.localReply)) {
+      setAwaitingUserConfirmation(
+        createAwaitingConfirmationState({
+          assistantPrompt: frictionlessAction.localReply,
+          offeredAtTurn: chatTurnRef.current,
+          kind: frictionlessAction.workspaceOffer
+            ? "workspace"
+            : frictionlessAction.pendingAction
+              ? "tool"
+              : "general",
+          frictionlessPending: frictionlessAction.pendingAction,
+          workspaceOffer: frictionlessAction.workspaceOffer,
+        }),
+      );
+    } else {
+      setAwaitingUserConfirmation(null);
+    }
+
+    finishEarlyChatTurn();
+    finishLatencyTurn({ localReply: true });
+    return true;
   }
 
   async function handleSend(
@@ -8499,8 +9476,18 @@ export default function CompanionPageClient() {
     fresh = false,
     skipToolOffer = false,
   ) {
-    const trimmed = (overrideText ?? input).trim();
+    handleSendRef.current = handleSend;
+    const trimmed = (
+      overrideText ??
+      inputRef.current?.value ??
+      inputSnapshotRef.current ??
+      input
+    ).trim();
     if (!trimmed || isLoading) return;
+
+    micExplicitStopRef.current = false;
+    recognitionRef.current?.stop();
+    setIsListening(false);
 
     if (postLoginQuiet) {
       clearCompanionPostLoginQuiet();
@@ -8520,6 +9507,11 @@ export default function CompanionPageClient() {
     }
 
     chatTurnRef.current += 1;
+    const confirmationReply =
+      isConfirmationAcceptance(trimmed) || isConfirmationDecline(trimmed);
+    if (!confirmationReply) {
+      setAwaitingUserConfirmation(null);
+    }
     const latencyProfiler = new CompanionLatencyProfiler(
       chatTurnRef.current,
       trimmed,
@@ -8533,6 +9525,11 @@ export default function CompanionPageClient() {
       logCompanionLatency(latencyProfiler.report());
     };
 
+    const chatTurnState = createChatTurnState();
+    markChatTurnStarted(chatTurnState);
+    activeChatTurnLifecycleRef.current = chatTurnState;
+
+    try {
     if (isSimpleSocialGreeting(trimmed)) {
       lastUserTextRef.current = trimmed;
       const userMessage: Message = { role: "user", content: trimmed };
@@ -8619,24 +9616,74 @@ export default function CompanionPageClient() {
       }
     }
 
-    const frictionlessPendingRaw = loadFrictionlessPending();
-    if (
-      frictionlessPendingRaw &&
-      isFrictionlessPendingExpired(frictionlessPendingRaw, chatTurnRef.current)
-    ) {
-      clearFrictionlessPending();
-      clearVisualThinkingMenuPending();
-    }
-    const frictionlessPending =
-      frictionlessPendingRaw &&
-      !isFrictionlessPendingExpired(frictionlessPendingRaw, chatTurnRef.current)
-        ? frictionlessPendingRaw
-        : null;
     const lastAssistantForYesEarly =
       [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
     const priorUserForYesEarly = [...messages]
       .reverse()
       .find((m) => m.role === "user")?.content;
+
+    let estateTaskLockTurn: ReturnType<typeof applyEstateTaskLockTurn> | null =
+      null;
+    let taskLockBlocksEstateRouting = false;
+    const detectedForTaskLockEarly = detectEmotionalState(trimmed);
+    estateTaskLockTurn = applyEstateTaskLockTurn({
+      userText: trimmed,
+      lastAssistantText: lastAssistantForYesEarly,
+      priorUserText: priorUserForYesEarly,
+      conversationTurn: chatTurnRef.current,
+      informationalTurn: isInformationalChatTurn(trimmed),
+      overwhelmed: detectedForTaskLockEarly === "overwhelmed",
+      inDirectEstateVisit: Boolean(directEstateVisitRef.current),
+    });
+    taskLockBlocksEstateRouting =
+      estateTaskLockTurn.suppressEstateRoomRouting;
+
+    const frictionlessPending = loadFrictionlessPendingForConfirmation({
+      confirmationReply,
+      awaitingPending: awaitingUserConfirmationRef.current?.frictionlessPending,
+      lastAssistantText: lastAssistantForYesEarly,
+      currentTurn: chatTurnRef.current,
+    });
+
+    const estateOfferOnLastTurn =
+      confirmationReply && isEstateTransitionOfferMessage(lastAssistantForYesEarly);
+    const collectionOfferOnLastTurn =
+      confirmationReply && isCollectionOfferMessage(lastAssistantForYesEarly);
+    const recoveredCollectionPending =
+      !loadCollectionPendingOffer() && collectionOfferOnLastTurn
+        ? recoverCollectionPendingFromAssistant({
+            assistantText: lastAssistantForYesEarly,
+            sourceUserText: priorUserForYesEarly ?? trimmed,
+            offeredAtTurn: chatTurnRef.current,
+          })
+        : null;
+    if (recoveredCollectionPending) {
+      saveCollectionPendingOffer(recoveredCollectionPending);
+    }
+    const recoveredEstatePending =
+      !frictionlessPending &&
+      !taskLockBlocksEstateRouting &&
+      estateOfferOnLastTurn
+        ? recoverEstateWorkspaceOfferFromChat({
+            lastAssistantText: lastAssistantForYesEarly,
+            priorUserText: priorUserForYesEarly,
+            currentTurn: chatTurnRef.current,
+          })
+        : null;
+    if (recoveredEstatePending) {
+      saveFrictionlessPending(recoveredEstatePending);
+      registerPendingAcceptance(
+        "workspace",
+        recoveredEstatePending.offerSummary ?? "Estate room",
+      );
+      setWorkspaceOffer({
+        section: recoveredEstatePending.target as AppSection,
+        buttonLabel: recoveredEstatePending.offerSummary ?? "Continue",
+        line: lastAssistantForYesEarly,
+      });
+    }
+    const frictionlessPendingForYes =
+      frictionlessPending ?? recoveredEstatePending;
 
     const visualMenuPendingEarly =
       loadVisualThinkingMenuPending() ??
@@ -8714,30 +9761,33 @@ export default function CompanionPageClient() {
     }
 
     if (
-      frictionlessPending &&
-      isFrictionlessAffirmation(trimmed) &&
+      !taskLockBlocksEstateRouting &&
+      frictionlessPendingForYes &&
+      (isFrictionlessAffirmation(trimmed) || isConfirmationAcceptance(trimmed)) &&
       !strategyOfferOnLastTurn
     ) {
       const lastAssistantForYes = lastAssistantForYesEarly;
       if (
         !isFrictionlessPendingAlignedWithAssistant(
-          frictionlessPending,
+          frictionlessPendingForYes,
           lastAssistantForYes,
           chatTurnRef.current,
         )
       ) {
-        clearFrictionlessPending();
-        clearVisualThinkingMenuPending();
+        if (!recoveredEstatePending) {
+          clearFrictionlessPending();
+          clearVisualThinkingMenuPending();
+        }
       } else {
       const continuation = resolveFrictionlessContinuation(
         trimmed,
-        frictionlessPending,
+        frictionlessPendingForYes,
         chatTurnRef.current,
         lastAssistantForYes,
       );
       logYesContinuationResolution({
         userText: trimmed,
-        pendingAction: frictionlessPending,
+        pendingAction: frictionlessPendingForYes,
         frictionlessContinuation: continuation,
         menuContinuation: resolveMenuContinuation({
           userText: trimmed,
@@ -8750,9 +9800,9 @@ export default function CompanionPageClient() {
         setMessages((prev) => [...prev, userMessage]);
         setInput("");
         voiceUsedRef.current = false;
-        if (frictionlessPending.type === "create_google_sheet") {
+        if (frictionlessPendingForYes.type === "create_google_sheet") {
           const sheetMsg = await executeGoogleSheetCreateFromPending(
-            frictionlessPending,
+            frictionlessPendingForYes,
           );
           setMessages((prev) => [
             ...prev,
@@ -8766,9 +9816,9 @@ export default function CompanionPageClient() {
           finishLatencyTurn({ localReply: true });
           return;
         }
-        if (frictionlessPending.type === "strategy_offer") {
+        if (frictionlessPendingForYes.type === "strategy_offer") {
           const ack = completeStrategyOfferFromPending(
-            frictionlessPending,
+            frictionlessPendingForYes,
             continuation.ack,
           );
           setMessages((prev) => [
@@ -8779,7 +9829,7 @@ export default function CompanionPageClient() {
           finishLatencyTurn({ localReply: true });
           return;
         }
-        if (frictionlessPending.target === "playbook") {
+        if (frictionlessPendingForYes.target === "playbook") {
           lastUserTextRef.current = trimmed;
           setMessages((prev) => [
             ...prev,
@@ -8796,34 +9846,34 @@ export default function CompanionPageClient() {
           finishLatencyTurn({ localReply: true });
           return;
         }
-        if (frictionlessPending.target === "focus-audio") {
+        if (frictionlessPendingForYes.target === "focus-audio") {
           lastUserTextRef.current = trimmed;
           openFocusAudioCore(
-            frictionlessPending.focusAudioCategory ?? "calm-brain",
+            frictionlessPendingForYes.focusAudioCategory ?? "calm-brain",
           );
-        } else if (frictionlessPending.target === "breathe") {
+        } else if (frictionlessPendingForYes.target === "breathe") {
           lastUserTextRef.current = trimmed;
           handleToolSelectCore("breathe");
-        } else if (frictionlessPending.target === "brain-dump") {
+        } else if (frictionlessPendingForYes.target === "brain-dump") {
           lastUserTextRef.current = trimmed;
           handleToolSelectCore("brain-dump");
-        } else if (frictionlessPending.target === "decision-compass") {
+        } else if (frictionlessPendingForYes.target === "decision-compass") {
           lastUserTextRef.current = trimmed;
           setMessages((prev) => [
             ...prev,
             { role: "assistant", content: continuation.ack },
           ]);
           openDecisionCompass();
-        } else if (frictionlessPending.target === "visual-focus") {
+        } else if (frictionlessPendingForYes.target === "visual-focus") {
           const prompt =
-            frictionlessPending.initialPrompt?.trim() ?? trimmed;
+            frictionlessPendingForYes.initialPrompt?.trim() ?? trimmed;
           lastUserTextRef.current = prompt;
           const ack = completeVisualThinkingOpen({
             mode:
-              frictionlessPending.visualFocusMode ??
+              frictionlessPendingForYes.visualFocusMode ??
               "mind-map",
-            viewId: frictionlessPending.viewId,
-            viewTitle: frictionlessPending.viewTitle,
+            viewId: frictionlessPendingForYes.viewId,
+            viewTitle: frictionlessPendingForYes.viewTitle,
             purposeAnswer: prompt,
             ack: continuation.ack,
           });
@@ -8832,20 +9882,20 @@ export default function CompanionPageClient() {
             { role: "assistant", content: ack },
           ]);
         } else if (
-          frictionlessPending.type === "visual_thinking_menu" ||
-          frictionlessPending.type === "visual_recommendation"
+          frictionlessPendingForYes.type === "visual_thinking_menu" ||
+          frictionlessPendingForYes.type === "visual_recommendation"
         ) {
           const prompt =
-            frictionlessPending.initialPrompt?.trim() ?? trimmed;
+            frictionlessPendingForYes.initialPrompt?.trim() ?? trimmed;
           lastUserTextRef.current = prompt;
-          const viewId = frictionlessPending.viewId;
+          const viewId = frictionlessPendingForYes.viewId;
           const mode =
-            frictionlessPending.visualFocusMode ??
+            frictionlessPendingForYes.visualFocusMode ??
             (viewId ? undefined : "mind-map");
           const ack = completeVisualThinkingOpen({
             mode: mode ?? "mind-map",
             viewId,
-            viewTitle: frictionlessPending.viewTitle,
+            viewTitle: frictionlessPendingForYes.viewTitle,
             purposeAnswer: prompt,
             ack: continuation.ack,
           });
@@ -8853,19 +9903,19 @@ export default function CompanionPageClient() {
             ...prev,
             { role: "assistant", content: ack },
           ]);
-        } else if (frictionlessPending.target === "content-generator") {
-          const prompt = frictionlessPending.initialPrompt?.trim() ?? "";
+        } else if (frictionlessPendingForYes.target === "content-generator") {
+          const prompt = frictionlessPendingForYes.initialPrompt?.trim() ?? "";
           if (prompt) lastUserTextRef.current = prompt;
           const ack = continuation.ack;
           logCreatePendingAction("target workspace", {
-            target: frictionlessPending.target,
-            artifactType: frictionlessPending.artifactType,
+            target: frictionlessPendingForYes.target,
+            artifactType: frictionlessPendingForYes.artifactType,
             initialPrompt: prompt,
           });
           const artifact = resolvedArtifactFromCreatePending({
             type: "open_workspace",
-            target: frictionlessPending.target,
-            artifactType: frictionlessPending.artifactType,
+            target: frictionlessPendingForYes.target,
+            artifactType: frictionlessPendingForYes.artifactType,
             initialPrompt: prompt,
           });
           setMessages((prev) => [...prev, { role: "assistant", content: ack }]);
@@ -8907,7 +9957,7 @@ export default function CompanionPageClient() {
             openCreateWorkspace({
               source: "hard_nav",
               initialPrompt: prompt,
-              artifactType: frictionlessPending.artifactType,
+              artifactType: frictionlessPendingForYes.artifactType,
             });
           }
           applyChatLayoutMode("split");
@@ -8920,8 +9970,8 @@ export default function CompanionPageClient() {
         } else {
           lastUserTextRef.current = trimmed;
         }
-        if (frictionlessPending.target !== "content-generator") {
-          if (frictionlessPending.target !== "visual-focus") {
+        if (frictionlessPendingForYes.target !== "content-generator") {
+          if (frictionlessPendingForYes.target !== "visual-focus") {
             setMessages((prev) => [
               ...prev,
               { role: "assistant", content: continuation.ack },
@@ -8932,11 +9982,38 @@ export default function CompanionPageClient() {
         clearPendingAcceptanceAuthority();
         setToolSuggestion(null);
         setWorkspaceOffer(null);
+        setAwaitingUserConfirmation(null);
         finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
       }
       }
+    }
+
+    if (
+      isPureConfirmationDecline(trimmed) &&
+      awaitingUserConfirmationRef.current?.active
+    ) {
+      const userMessage: Message = { role: "user", content: trimmed };
+      setMessages((prev) => [
+        ...prev,
+        userMessage,
+        {
+          role: "assistant",
+          content: "No problem — we can stay right here. What would help most?",
+        },
+      ]);
+      setInput("");
+      voiceUsedRef.current = false;
+      clearFrictionlessPending();
+      clearVisualThinkingMenuPending();
+      clearPendingAcceptanceAuthority();
+      setToolSuggestion(null);
+      setWorkspaceOffer(null);
+      setAwaitingUserConfirmation(null);
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
     }
 
     const hardNav = resolveHardNavigationCommand(trimmed);
@@ -9014,7 +10091,8 @@ export default function CompanionPageClient() {
     } else if (
       trimmed.length >= 12 &&
       !isBareGenericAcceptance(trimmed) &&
-      !isAcceptanceAttempt(trimmed)
+      !isAcceptanceAttempt(trimmed) &&
+      !isEntrepreneurialPatternShare(trimmed)
     ) {
       registerProblemFromUser(trimmed);
     }
@@ -9277,6 +10355,63 @@ export default function CompanionPageClient() {
       !isWorkflowConceptQuestion(trimmed) &&
       !discoveryHelpBypass;
 
+    const facilitatedV2Active =
+      CREATE_WORKSPACE_V2 &&
+      chatLayoutMode === "split" &&
+      workspacePanel === "content-generator" &&
+      createBuilderSession?.workflow.workspaceFirst &&
+      !fresh &&
+      !isWorkflowConceptQuestion(trimmed);
+
+    if (facilitatedV2Active && createBuilderSession) {
+      const lastAssistantForFacilitation =
+        [...messages].reverse().find((m) => m.role === "assistant")?.content ??
+        "";
+      const facilitation = processFacilitatedWorkspaceTurn(
+        trimmed,
+        createBuilderSession.workflow,
+        lastAssistantForFacilitation,
+      );
+      if (facilitation.kind === "apply_section") {
+        const userMessage: Message = { role: "user", content: trimmed };
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        setIsLoading(false);
+
+        const nextWorkflow = facilitation.workflow;
+        const nextSession = {
+          ...createBuilderSession,
+          workflow: nextWorkflow,
+        };
+        setCreateBuilderSession(nextSession);
+        const record = mergeRecordFromWorkflow(
+          createWorkflowRecordRef.current ??
+            loadWorkflowRecord() ??
+            workflowRecordFromState(createBuilderSession.workflow, {
+              builderPhase: createBuilderSession.phase,
+              source: "chat",
+              itemType: createBuilderSession.typeLabel,
+            }),
+          nextWorkflow,
+          "chat",
+          createBuilderSession.phase,
+        );
+        commitCreateWorkflowRecord(record);
+
+        const reply = facilitation.nextPrompt
+          ? `Got it — I've added that to **${facilitation.sectionId}**.\n\n${facilitation.nextPrompt}`
+          : `Got it — I've added that to **${facilitation.sectionId}**. Here's what we have so far.`;
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: reply },
+        ]);
+        if (splitCreateChat && workspacePanel === "content-generator") {
+          stayInCreateSplitScreen();
+        }
+        return;
+      }
+    }
+
     if (builderChatActive && !fresh && builderSession) {
       const userMessage: Message = { role: "user", content: trimmed };
       setMessages((prev) => [...prev, userMessage]);
@@ -9391,6 +10526,18 @@ export default function CompanionPageClient() {
     const isNewConversation = !messages.some((m) => m.role === "user");
     if (isNewConversation) recordConversationStart();
     lastUserTextRef.current = trimmed;
+    if (isEntrepreneurialPatternShare(trimmed)) {
+      patchOutcomeThread({
+        currentProblem: trimmed.slice(0, 200),
+        pendingAction: undefined,
+        pendingQuestion: undefined,
+        lastOfferSummary: undefined,
+        activeFeature: undefined,
+      });
+      clearFrictionlessPending();
+      clearPendingAcceptanceAuthority();
+      setWorkspaceOffer(null);
+    }
     const detected = detectEmotionalState(trimmed);
     setEmotion(detected);
     const userMessage: Message = { role: "user", content: trimmed };
@@ -9398,13 +10545,214 @@ export default function CompanionPageClient() {
     const nextMessages = fresh ? [userMessage] : [...messages, userMessage];
     setMessages(nextMessages);
     setInput("");
+    inputSnapshotRef.current = "";
+    patchEstateRuntimeState({ inputBuffer: "" });
     const usedVoiceThisTurn = voiceUsedRef.current;
     voiceUsedRef.current = false;
     setError(null);
+
+    const lastAssistantBeforeSend =
+      [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
+
+    const collectionPendingNow = loadCollectionPendingOffer();
+    if (collectionPendingNow) {
+      const collectionReply = resolveCollectionOfferReply(
+        trimmed,
+        collectionPendingNow,
+      );
+      if (collectionReply.handled) {
+        if (collectionReply.kind === "open" && collectionReply.openRoomId) {
+          openCollectionRoomWithPrefillCore(
+            collectionReply.openRoomId,
+            collectionReply.prefill ?? collectionPendingNow.prefill,
+            collectionReply.sourceText ?? collectionPendingNow.sourceUserText,
+          );
+        }
+        if (collectionReply.nextPending) {
+          saveCollectionPendingOffer(collectionReply.nextPending);
+        } else if (collectionReply.kind !== "menu") {
+          clearCollectionPendingOffer();
+        }
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: collectionReply.ack },
+        ]);
+        if (
+          collectionReply.kind === "menu" ||
+          collectionReply.kind === "decline" ||
+          isCollectionOfferMessage(collectionReply.ack)
+        ) {
+          setAwaitingUserConfirmation(
+            createAwaitingConfirmationState({
+              assistantPrompt: collectionReply.ack,
+              offeredAtTurn: chatTurnRef.current,
+              kind: "general",
+            }),
+          );
+        } else {
+          setAwaitingUserConfirmation(null);
+        }
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    if (isVagueOfferConfusion(trimmed, lastAssistantBeforeSend)) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: vagueOfferConfusionReply() },
+      ]);
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
+    const explicitAction = resolveExplicitCompanionAction(
+      trimmed,
+      lastAssistantBeforeSend,
+    );
+    if (explicitAction) {
+      executeExplicitCompanionAction(explicitAction, finishLatencyTurn);
+      return;
+    }
+
+    const visitAtSend = directEstateVisitRef.current;
+    if (visitAtSend) {
+      const inRoomReply = resolveEstateRoomInConversationReply(
+        visitAtSend.roomId,
+        trimmed,
+      );
+      if (inRoomReply) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: inRoomReply },
+        ]);
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    const informationalChatTurn = isInformationalChatTurn(trimmed);
+
+    // estateTaskLockTurn applied before frictionless yes-handler (Phase 2C)
+    if (!estateTaskLockTurn) {
+      const priorUserMessagesForTaskLock = messages.filter(
+        (m) => m.role === "user",
+      );
+      const priorUserForTaskLock =
+        priorUserMessagesForTaskLock.length > 1
+          ? priorUserMessagesForTaskLock[
+              priorUserMessagesForTaskLock.length - 2
+            ]?.content
+          : undefined;
+      estateTaskLockTurn = applyEstateTaskLockTurn({
+        userText: trimmed,
+        lastAssistantText: lastAssistantBeforeSend,
+        priorUserText: priorUserForTaskLock,
+        conversationTurn: chatTurnRef.current,
+        informationalTurn: informationalChatTurn,
+        overwhelmed: detected === "overwhelmed",
+        inDirectEstateVisit: Boolean(visitAtSend),
+      });
+      taskLockBlocksEstateRouting =
+        estateTaskLockTurn.suppressEstateRoomRouting;
+    }
+
+    const classifiedIntent = classifyCompanionIntent({
+      userText: trimmed,
+      lastAssistantText: lastAssistantBeforeSend,
+      currentPlaceId: directEstateVisitRef.current?.roomId ?? null,
+      forceChat: informationalChatTurn || taskLockBlocksEstateRouting,
+    });
+
+    const kernelHandled = executeCompanionIntent(classifiedIntent, {
+      onCaptureWrite: (plan) => {
+        executeCaptureWrite({
+          kind: "write",
+          captureType: plan.captureType,
+          content: plan.content,
+          userText: plan.userText,
+        });
+      },
+      onNavigateMemory: ({ tab }) => {
+        openUserMemoryCore(tab);
+      },
+      onNavigatePlace: ({ command }) => {
+        if (
+          taskLockBlocksEstateRouting &&
+          !estateTaskLockTurn.allowsExplicitEstateNavigation
+        ) {
+          return;
+        }
+        runDirectEstateRoomNavigation(command, trimmed);
+      },
+      onSoundscape: (plan) => {
+        void executeSoundscapeIntent(plan);
+      },
+      onAssistantLine: (line) => {
+        markAssistantReplied(chatTurnState);
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: line },
+        ]);
+      },
+      onPlaceMenu: ({ line, placeIds }) => {
+        if (taskLockBlocksEstateRouting) return;
+        savePendingEstatePlaceMenu({
+          placeIds,
+          offeredAtTurn: chatTurnRef.current,
+        });
+        markAssistantReplied(chatTurnState);
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: line },
+        ]);
+      },
+      onCaptureMenu: ({ line }) => {
+        markAssistantReplied(chatTurnState);
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: line },
+        ]);
+      },
+      onClearPlaceMenu: () => clearPendingEstatePlaceMenu(),
+    });
+
+    if (process.env.NODE_ENV === "development") {
+      const priorUserMessages = messages.filter((m) => m.role === "user");
+      const priorUserForShadow =
+        priorUserMessages.length > 0
+          ? priorUserMessages[priorUserMessages.length - 1]?.content
+          : undefined;
+      observeEstateOrchestrationShadowTurn({
+        userText: trimmed,
+        lastAssistantText: lastAssistantBeforeSend,
+        priorUserText: priorUserForShadow,
+        conversationTurn: chatTurnRef.current,
+        currentPlaceId: directEstateVisitRef.current?.roomId ?? null,
+        workspacePanel: workspacePanel ?? null,
+        overwhelmed: detected === "overwhelmed",
+        informationalTurn: informationalChatTurn,
+        inDirectEstateVisit: Boolean(visitAtSend),
+      });
+    }
+
+    if (kernelHandled) {
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
+    // classifiedIntent.kind === "CHAT" — chat API path only.
+
+    markChatTurnLoading(chatTurnState);
     beginVisibleThinking(trimmed, detected);
     setIsLoading(true);
     const finishLocalChatTurn = (assistantContent?: string) => {
       if (assistantContent) {
+        markAssistantReplied(chatTurnState);
         setMessages((prev) => [
           ...prev,
           { role: "assistant", content: assistantContent },
@@ -9437,8 +10785,6 @@ export default function CompanionPageClient() {
       source: "chat",
       emotionalState: detected,
     });
-    const lastAssistantBeforeSend =
-      [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
     const mistakeRecord = processMistakeSignalsFromUserTurn({
       userText: trimmed,
       lastAssistantText: lastAssistantBeforeSend,
@@ -9850,24 +11196,25 @@ export default function CompanionPageClient() {
       );
     const isWin = winRe.test(trimmed) && !winNegated;
     if (isWin && !trimmed.includes("?")) {
-      setActiveSection("home");
-      setActiveNav("chat");
-      const prev = getLastActivity();
-      const winDetail = prev?.title ?? trimmed.slice(0, 60);
-      const acks = prev?.title
-        ? [
-            `Nice — "${prev.title}" is done. That's real progress, and it's logged.`,
-            `Love that. You closed the loop on "${prev.title}" — that counts.`,
-            `Done is done. "${prev.title}" is off your plate. What's next, or want to sit with the win for a sec?`,
-          ]
-        : [
-            "That's done — nice work getting it out of the way. That's the kind of step that actually moves your business forward.",
-            "Love that. You showed up and moved it — that counts more than it feels like right now.",
-            "Done is done. That's real progress, and it's logged. What's next, or do you want to ride that for a sec?",
-          ];
-      const ack = acks[Math.floor(Math.random() * acks.length)]!;
-      finishLocalChatTurn(ack);
-      logMomentum("complete", `Win: ${winDetail}`);
+      const collectionOffer = collectionOfferForRoom("celebration-garden", trimmed);
+      const pending = createCollectionPendingOffer({
+        roomId: collectionOffer.roomId,
+        sourceUserText: trimmed,
+        offerLine: collectionOffer.offerLine,
+        prefill: collectionOffer.prefill,
+        offeredAtTurn: chatTurnRef.current,
+      });
+      saveCollectionPendingOffer(pending);
+      markCollectionOfferCooldown(chatTurnRef.current);
+      finishLocalChatTurn(collectionOffer.offerLine);
+      setAwaitingUserConfirmation(
+        createAwaitingConfirmationState({
+          assistantPrompt: collectionOffer.offerLine,
+          offeredAtTurn: chatTurnRef.current,
+          kind: "general",
+        }),
+      );
+      logMomentum("complete", `Win: ${trimmed.slice(0, 60)}`);
       clearLastActivity();
       setLastAct(null);
       finishLatencyTurn({ localReply: true });
@@ -10111,18 +11458,129 @@ export default function CompanionPageClient() {
       turnIntentRouting = applyMenuContinuationRoutingOverrides(turnIntentRouting);
     }
 
-    latencyProfiler.mark("frictionlessAction");
-    const frictionlessAction = resolveFrictionlessAction({
+    const welcomeHomeConciergeContext =
+      !workspacePanel &&
+      !guideBesideSession &&
+      !splitCreateChat &&
+      !companionStandaloneSection;
+    const estateConversationTurn =
+      informationalChatTurn || taskLockBlocksEstateRouting
+      ? null
+      : evaluateEstateConversationTurn({
       userText: trimmed,
-      lastAssistantText,
-      currentTurn: chatTurnRef.current,
+      activeSection: activeSectionRef.current,
+      workspacePanel,
       emotionalState: detected,
       overwhelmed: detected === "overwhelmed",
+      intentCategory: turnIntentRouting.category,
+      welcomeHomePrimary,
+      hasConversationHistory: messages.some((m) => m.role === "user"),
+      frostedChatContext: welcomeHomeConciergeContext,
+    });
+    const estateIntelligenceEval = estateConversationTurn?.estate ?? null;
+    const estateWorkspaceOffer =
+      estateConversationTurn?.workspaceOffer ?? null;
+    const estateRoutingActive =
+      !taskLockBlocksEstateRouting &&
+      Boolean(estateConversationTurn?.estateRoutingActive);
+    const suppressGenericFeatureHintsForEstate = Boolean(
+      estateConversationTurn?.suppressGenericFeatureHints,
+    );
+
+    recordEstateConversationTurn({
+      userText: trimmed,
+      emotionalLabel: detected,
+      overwhelmed: detected === "overwhelmed",
+      intentLabel: turnIntentRouting.category ?? null,
+    });
+
+    latencyProfiler.mark("frictionlessAction");
+
+    if (
+      !distressed &&
+      !estateRoutingActive &&
+      !workspacePanel &&
+      !isCollectionOfferCooldownActive(chatTurnRef.current)
+    ) {
+      const collectionOffer = evaluateCollectionSaveOffer({
+        userText: trimmed,
+        currentTurn: chatTurnRef.current,
+        workspaceOpen: Boolean(workspacePanel),
+        overwhelmed: detected === "overwhelmed",
+        cooldownActive: isCollectionOfferCooldownActive(chatTurnRef.current),
+      });
+      if (collectionOffer) {
+        const pending = createCollectionPendingOffer({
+          roomId: collectionOffer.roomId,
+          sourceUserText: trimmed,
+          offerLine: collectionOffer.offerLine,
+          prefill: collectionOffer.prefill,
+          offeredAtTurn: chatTurnRef.current,
+          alternateRoomIds: collectionOffer.alternateRoomIds,
+        });
+        saveCollectionPendingOffer(pending);
+        markCollectionOfferCooldown(chatTurnRef.current);
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: collectionOffer.offerLine },
+        ]);
+        setAwaitingUserConfirmation(
+          createAwaitingConfirmationState({
+            assistantPrompt: collectionOffer.offerLine,
+            offeredAtTurn: chatTurnRef.current,
+            kind: "general",
+          }),
+        );
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    const frictionlessAction = resolveFrictionlessAction({
+      userText: trimmed,
+      currentTurn: chatTurnRef.current,
+      lastAssistantText,
       workspace: workspacePanel,
-      timeBlocks: getTimeBlocks(),
-      reminderDraft: loadReminderIntakeSession()?.draft ?? null,
+      emotionalState: detected,
+      overwhelmed: detected === "overwhelmed",
     });
     latencyProfiler.measure("frictionlessAction");
+
+    const frictionlessBlockedByTaskLock =
+      taskLockBlocksEstateRouting &&
+      frictionlessOffersEstateRoom(frictionlessAction.localReply);
+
+    if (
+      !frictionlessBlockedByTaskLock &&
+      presentFrictionlessLocalReply(frictionlessAction, finishLatencyTurn)
+    ) {
+      return;
+    }
+
+    if (
+      turnIntentRouting.surfaceClarificationUi &&
+      turnIntentRouting.routeMode === "clarify" &&
+      turnIntentRouting.clarifyPrompt &&
+      !workspacePanel
+    ) {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: turnIntentRouting.clarifyPrompt! },
+      ]);
+      setInput("");
+      setAwaitingUserConfirmation(
+        createAwaitingConfirmationState({
+          assistantPrompt: turnIntentRouting.clarifyPrompt!,
+          offeredAtTurn: chatTurnRef.current,
+          kind: "general",
+        }),
+      );
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
     const knowledgeTiming = measureKnowledgeDetection(trimmed);
     latencyProfiler.recordTiming("knowledgeDetection", knowledgeTiming.ms);
     const speedProfile: CompanionSpeedProfile = resolveCompanionResponseRoute({
@@ -10282,6 +11740,43 @@ export default function CompanionPageClient() {
       }
     }
 
+    const artifactForMemory =
+      createBuilderSession?.workflow
+        ? syncArtifactFromWorkflow(
+            createBuilderSession.workflow,
+            getFacilitatedCreationSession(),
+          )
+        : getActiveArtifact();
+
+    if (isShowProgressRequest(trimmed) && artifactForMemory) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: buildWhatWeHaveSoFarSummary(artifactForMemory),
+        },
+      ]);
+      finishEarlyChatTurn();
+      return;
+    }
+
+    const revisionCmd = parseArtifactRevisionCommand(trimmed, artifactForMemory);
+    if (revisionCmd.kind !== "none" && artifactForMemory) {
+      const revisionResult = applyArtifactRevisionCommand(
+        artifactForMemory,
+        revisionCmd,
+      );
+      if (revisionResult) {
+        setActiveArtifact(revisionResult.artifact);
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: revisionResult.reply },
+        ]);
+        finishEarlyChatTurn();
+        return;
+      }
+    }
+
     if (pendingCreateOpen && userAcceptedCreateConsent(trimmed, lastAssistantText)) {
       const acceptance = resolvePendingAcceptance({
         userText: trimmed,
@@ -10315,7 +11810,8 @@ export default function CompanionPageClient() {
     if (
       !shouldDeferWorkspaceRoutingForPhase1() &&
       turnSurface.outcome === "workspace_open" &&
-      turnSurface.targetSection
+      turnSurface.targetSection &&
+      !directEstateVisitRef.current
     ) {
       const section = turnSurface.targetSection;
       governorChatMessagesRef.current = nextMessages;
@@ -10424,6 +11920,7 @@ export default function CompanionPageClient() {
       record: pendingAcceptanceRecord,
       pendingAction: pendingNow,
       createConsent: pendingCreateOpen,
+      outcomeThread: getOutcomeThread(),
     });
 
     if (
@@ -10557,12 +12054,17 @@ export default function CompanionPageClient() {
           ]);
         }
       } catch (err) {
+        const routed = routeCompanionFailure(err, {
+          surface: "workspace-action",
+        });
+        const message =
+          routed.channel === "estate"
+            ? routed.message
+            : buildFailSafeChatReply(trimmed);
+        markAssistantReplied(chatTurnState);
         setMessages((prev) => [
           ...prev,
-          {
-            role: "assistant",
-            content: friendlyFetchErrorMessage(err),
-          },
+          { role: "assistant", content: message },
         ]);
         setError(null);
       } finally {
@@ -10636,6 +12138,7 @@ export default function CompanionPageClient() {
         ackMessage:
           "Opening **Create** with what we just built — use **Create Google Doc**, **Print**, or **Save** above the draft.",
       });
+      finishEarlyChatTurn();
       return;
     }
 
@@ -10649,6 +12152,7 @@ export default function CompanionPageClient() {
         focusWorkspaceLayout();
         setActiveSection("home");
         setActiveNav("other");
+        finishEarlyChatTurn();
         return;
       }
       if (
@@ -10657,12 +12161,14 @@ export default function CompanionPageClient() {
           ackMessage: buildGoogleDocRecoveryMessage(savedRecord),
         })
       ) {
+        finishEarlyChatTurn();
         return;
       }
       setMessages((prev) => [
         ...prev,
         { role: "assistant", content: buildGoogleDocRecoveryMessage(null) },
       ]);
+      finishEarlyChatTurn();
       return;
     }
 
@@ -10676,6 +12182,7 @@ export default function CompanionPageClient() {
         focusWorkspaceLayout();
         setActiveSection("home");
         setActiveNav("other");
+        finishEarlyChatTurn();
         return;
       }
       tryOpenCreateForCurrentArtifact(trimmed, {
@@ -10684,6 +12191,7 @@ export default function CompanionPageClient() {
         ackMessage:
           "Opening your draft in **Create** — creating the Google Doc now.",
       });
+      finishEarlyChatTurn();
       return;
     }
 
@@ -10693,6 +12201,7 @@ export default function CompanionPageClient() {
         exportTrigger: "print",
         ackMessage: "Opening print…",
       });
+      finishEarlyChatTurn();
       return;
     }
 
@@ -10702,6 +12211,7 @@ export default function CompanionPageClient() {
         exportTrigger: "save",
         ackMessage: "Saving your updated copy…",
       });
+      finishEarlyChatTurn();
       return;
     }
 
@@ -10715,6 +12225,7 @@ export default function CompanionPageClient() {
           ? `Opening your document — pick **${projectReq.projectName}** or another project to link it.`
           : "Opening your document — choose which project to add it to.",
       });
+      finishEarlyChatTurn();
       return;
     }
 
@@ -11100,70 +12611,6 @@ export default function CompanionPageClient() {
     // engine, which decides (and gates) whether audio is appropriate.
     const obstacle = detectObstacle(trimmed);
     const somatic = detectSomaticAvoidance(trimmed);
-    if (
-      turnIntentRouting.surfaceClarificationUi &&
-      turnIntentRouting.routeMode === "clarify" &&
-      turnIntentRouting.clarifyPrompt &&
-      !workspacePanel
-    ) {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: turnIntentRouting.clarifyPrompt! },
-      ]);
-      setInput("");
-      finishEarlyChatTurn();
-      return;
-    }
-    if (frictionlessAction.localReply) {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: frictionlessAction.localReply! },
-      ]);
-      if (frictionlessAction.immediateVisualOpen) {
-        completeVisualThinkingOpen(frictionlessAction.immediateVisualOpen);
-        setInput("");
-        finishEarlyChatTurn();
-        finishLatencyTurn({ localReply: true });
-        return;
-      }
-      if (frictionlessAction.pendingAction) {
-        const pendingAction = frictionlessAction.pendingAction;
-        if (isVisualThinkingPendingAction(pendingAction)) {
-          saveVisualThinkingMenuPending(pendingAction);
-        } else {
-          saveFrictionlessPending(pendingAction);
-        }
-        registerPendingAcceptance(
-          frictionlessAction.workspaceOffer ? "workspace" : "tool",
-          pendingAction.offerSummary,
-        );
-        logCreateOfferRegistration({
-          pendingAction,
-          pendingMenuSelection: loadPendingMenuSelection(),
-          pendingAcceptance: {
-            kind: frictionlessAction.workspaceOffer ? "workspace" : "tool",
-            offerSummary: frictionlessAction.pendingAction.offerSummary,
-          },
-        });
-      }
-      if (frictionlessAction.googleSheetIntake) {
-        saveGoogleSheetIntakeSession(frictionlessAction.googleSheetIntake);
-      }
-      if (frictionlessAction.reminderIntake) {
-        saveReminderIntakeSession(frictionlessAction.reminderIntake);
-      } else if (frictionlessAction.category === "reminder") {
-        clearReminderIntakeSession();
-      }
-      if (frictionlessAction.toolSuggestion) {
-        setToolSuggestion(frictionlessAction.toolSuggestion);
-      }
-      if (frictionlessAction.workspaceOffer) {
-        setWorkspaceOffer(frictionlessAction.workspaceOffer);
-      }
-      finishEarlyChatTurn();
-      finishLatencyTurn({ localReply: true });
-      return;
-    }
     const willBridge =
       !suppressCreatePending && bridgeFromResolved(resolved) !== null;
     const intelligence = buildCompanionIntelligence({
@@ -11254,21 +12701,31 @@ export default function CompanionPageClient() {
             lastAssistantText,
           })
         : null);
-    const rawWorkspaceOffer =
+    const workspaceRoutingBlocked =
       willBridge ||
       skipToolOffer ||
       intelligence.shouldDeferTools ||
       decisionIntelligence.shouldDeferSolutions ||
-      stayInConversation ||
       suppressCreatePending ||
-      turnSurface.suppressCards
-        ? null
-        : turnIntentRouting.surfaceOfferUi
-          ? turnIntentRouting.workspaceOffer ?? detectDoingIntent(trimmed)
-          : null;
+      turnSurface.suppressCards ||
+      taskLockBlocksEstateRouting;
+    const rawWorkspaceOffer = resolveEstateAwareWorkspaceOffer({
+      routingBlocked: workspaceRoutingBlocked,
+      estateTurn: taskLockBlocksEstateRouting ? null : estateConversationTurn,
+      turnIntentRouting,
+      doingIntentOffer:
+        turnIntentRouting.surfaceOfferUi && !estateRoutingActive
+          ? detectDoingIntent(trimmed)
+          : null,
+      stayInConversation:
+        stayInConversation && !estateRoutingActive && !estateWorkspaceOffer,
+    });
+    const resolvedWorkspaceOffer = rawWorkspaceOffer
+      ? mergeWorkspaceOfferSecondary(rawWorkspaceOffer, turnIntentRouting)
+      : null;
     const stressCause = detectStressCauseChoice(trimmed);
     const pendingDecisionCompassOffer: DecisionCompassOffer | null =
-      shouldDeferWorkspaceRoutingForPhase1()
+      shouldDeferWorkspaceRoutingForPhase1() || estateRoutingActive
         ? null
         : shouldOfferDecisionCompassForTurn({
             text: trimmed,
@@ -11277,7 +12734,9 @@ export default function CompanionPageClient() {
           ? buildDecisionCompassOffer(trimmed)
           : null;
     const pendingStressOffer: StressReliefOffer | null =
-      shouldDeferWorkspaceRoutingForPhase1() || pendingDecisionCompassOffer
+      shouldDeferWorkspaceRoutingForPhase1() ||
+      pendingDecisionCompassOffer ||
+      estateRoutingActive
         ? null
         : stressCause && !isExplicitStressToolRequest(trimmed)
           ? buildStressCauseRecommendation(stressCause)
@@ -11286,12 +12745,12 @@ export default function CompanionPageClient() {
             : null;
     const pendingWorkspaceOfferRaw =
       shouldDeferWorkspaceRoutingForPhase1() ||
-      !rawWorkspaceOffer ||
-      shouldSuppressWorkspaceOffer(workspaceContext, rawWorkspaceOffer) ||
+      !resolvedWorkspaceOffer ||
+      shouldSuppressWorkspaceOffer(workspaceContext, resolvedWorkspaceOffer) ||
       pendingStressOffer ||
       pendingDecisionCompassOffer
         ? null
-        : rawWorkspaceOffer;
+        : resolvedWorkspaceOffer;
     let pendingWorkspaceOffer = pendingWorkspaceOfferRaw;
     if (
       pendingWorkspaceOffer &&
@@ -11381,12 +12840,25 @@ export default function CompanionPageClient() {
         setToolSuggestion(null);
         setActionBridge(null);
         setBridge(null);
+        setAwaitingUserConfirmation(
+          createAwaitingConfirmationState({
+            assistantPrompt: buildDuplicateProjectMessage(similar[0]!),
+            offeredAtTurn: chatTurnRef.current,
+            kind: "workspace",
+            workspaceOffer: pendingWorkspaceOffer,
+          }),
+        );
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
         return;
       }
 
-      const offerReply =
+      const offerReply = workspaceOfferReplyLine(
+        pendingWorkspaceOffer,
+        estateConversationTurn,
         turnIntentRouting.navigationLine ??
-        buildWorkspaceOfferChatReply(pendingWorkspaceOffer, trimmed);
+          buildWorkspaceOfferChatReply(pendingWorkspaceOffer, trimmed),
+      );
       if (
         shouldAutoOpenWorkspaceFromIntent(trimmed, pendingWorkspaceOffer) &&
         !governorChatOnly
@@ -11413,6 +12885,16 @@ export default function CompanionPageClient() {
       setToolSuggestion(null);
       setActionBridge(null);
       setBridge(null);
+      setAwaitingUserConfirmation(
+        createAwaitingConfirmationState({
+          assistantPrompt: offerReply,
+          offeredAtTurn: chatTurnRef.current,
+          kind: "estate",
+          workspaceOffer: pendingWorkspaceOffer,
+        }),
+      );
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
       return;
     }
 
@@ -11930,6 +13412,9 @@ export default function CompanionPageClient() {
         const parts = [
           businessContextSummary(),
           activeCompanionsContextForAI(),
+          estateIntelligenceEval?.route
+            ? `Estate context: member need aligns with ${estateIntelligenceEval.route.primaryEntry.name}.`
+            : null,
           suppressSummary ? null : discoveryContextForChat(),
           suppressSummary ? null : phase1RelationshipProfileForChat(),
           suppressSummary ? null : relationshipMemoryContextForChat(),
@@ -12043,11 +13528,12 @@ export default function CompanionPageClient() {
       latencyProfiler.measure("promptConstruction");
       latencyProfiler.mark("apiModel");
       latencyProfiler.calledApi = true;
-      const useChatStream = speedProfile.routeClass === "fast";
-      const res = await fetch("/api/companion-chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      const instituteLearningHint = instituteLearningHintRef.current;
+      instituteLearningHintRef.current = null;
+      const stablesLearningHint = stablesLearningHintRef.current;
+      stablesLearningHintRef.current = null;
+      const useChatStream = speedProfile.routeClass !== "instant";
+      const res = await fetchCompanionChatWithTimeout({
           stream: useChatStream,
           messages: messagesForApi(
             nextMessages,
@@ -12068,6 +13554,28 @@ export default function CompanionPageClient() {
           intentHint:
             mergeGovernorHints(
               [
+                estateMemoryHintForChat(),
+                activeTaskLockHintForChat(estateTaskLockTurn.state),
+                estateConversationTurn && !taskLockBlocksEstateRouting
+                  ? estateConversationHintForChat(estateConversationTurn, {
+                      hasConversationHistory: messages.some(
+                        (m) => m.role === "user",
+                      ),
+                      overwhelmed: detected === "overwhelmed",
+                      emotionalState: EMOTION_LABELS[detected],
+                      userText: trimmed,
+                      inRoomHint: isMomentumBuilderRoomSection(activeSection)
+                        ? momentumBuilderRoomHintForChat({
+                            userText: trimmed,
+                            hasConversationStarted: messages.some(
+                              (m) => m.role === "user",
+                            ),
+                          })
+                        : isStablesSection(activeSection)
+                          ? stablesRoomHintForChat()
+                          : null,
+                    })
+                  : null,
                 intentRoutingHintForChat(turnIntentRouting),
                 menuContinuation.active
                   ? menuContinuationHintForChat(
@@ -12083,8 +13591,12 @@ export default function CompanionPageClient() {
                 googleSheetsHintForChat(loadGoogleSheetIntakeSession()),
                 frictionlessHintForChat(frictionlessAction),
                 relationshipGuardrailsHint,
-                appFeatureKnowledgeHintForChat(trimmed),
-                appFeatureNavigationHintForChat(trimmed),
+                suppressGenericFeatureHintsForEstate
+                  ? null
+                  : appFeatureKnowledgeHintForChat(trimmed),
+                suppressGenericFeatureHintsForEstate
+                  ? null
+                  : appFeatureNavigationHintForChat(trimmed),
                 arbitrationHintForChat(turnArbitration),
                 conversationModeHintForChat(
                   classifyConversationalMode(trimmed),
@@ -12109,19 +13621,26 @@ export default function CompanionPageClient() {
                 intentHintForChat(resolved),
                 (() => {
                   const audio = detectAudioRequest(trimmed);
-                  if (!audio.isAudio || shouldBlockStressAutoToolRouting(trimmed)) {
+                  if (
+                    !audio.isAudio ||
+                    shouldBlockStressAutoToolRouting(trimmed) ||
+                    suppressGenericFeatureHintsForEstate
+                  ) {
                     return null;
                   }
                   return (
-                    `AUDIO / ENERGIZE REQUEST: User wants listening support — mention **Focus Audio** ` +
-                    `(category: ${audio.categoryId}, e.g. Motivation Boost for energizing) as an option. ` +
-                    `Offer first; do NOT say you are opening it unless they explicitly asked or accepted the Pending offer.`
+                    `AUDIO / ENERGIZE REQUEST: User wants listening support — lead with Peaceful Places™ ` +
+                    `(category: ${audio.categoryId}). Offer invitation; Estate Registry is source of truth. ` +
+                    `Do NOT define soundscapes or give a generic lecture.`
                   );
                 })(),
-                shouldOfferStressRelief(trimmed, nextMessages)
+                shouldOfferStressRelief(trimmed, nextMessages) &&
+                !suppressGenericFeatureHintsForEstate
                   ? stressReliefHintForChat(trimmed)
                   : null,
-                stayInConversation ? conversationGatingHint(trimmed) : null,
+                stayInConversation && !suppressGenericFeatureHintsForEstate
+                  ? conversationGatingHint(trimmed)
+                  : null,
                 workspacePanel === "client-avatars"
                   ? null
                   : businessStrategyCoachHintForChat(
@@ -12148,6 +13667,9 @@ export default function CompanionPageClient() {
                 }),
                 workspaceOpeningHintForChat(getWorkspaceSnapshot()),
                 outcomeThreadHintForChat(getOutcomeThread()),
+                instituteLearningHint,
+                stablesLearningHint,
+                entrepreneurialPatternHintForChat(trimmed),
                 companionDecisionIntelligenceHintForChat(decisionIntelligence, {
                   userText: trimmed,
                   messages: toChatTurns(nextMessages),
@@ -12318,9 +13840,28 @@ export default function CompanionPageClient() {
             }),
             splitCreateChat && shouldBootstrapCreateBuilder()
               ? CREATE_WORKSPACE_V2
-                ? formatCreateWorkspaceV2ChatHint(createBuilderSession)
+                ? [
+                    formatCreateWorkspaceV2ChatHint(createBuilderSession),
+                    formatFacilitatedCreationChatHint(
+                      getFacilitatedCreationSession(),
+                      createBuilderSession?.workflow,
+                    ),
+                  ]
+                    .filter(Boolean)
+                    .join("\n\n")
                 : formatCreateBuilderChatHint(createBuilderSession)
-              : null,
+              : formatFacilitatedCreationChatHint(
+                  getFacilitatedCreationSession(),
+                  null,
+                ),
+            formatArtifactStateChatHint(
+              createBuilderSession?.workflow
+                ? syncArtifactFromWorkflow(
+                    createBuilderSession.workflow,
+                    getFacilitatedCreationSession(),
+                  )
+                : getActiveArtifact(),
+            ),
             workspacePanel === "decision-compass" && compassSessionForApi
               ? [
                   decisionCompassWorkspaceHint(
@@ -12349,7 +13890,9 @@ export default function CompanionPageClient() {
                 (learnFastPath
                   ? false
                   : teachingModeActive(trimmed, lastAssistantText, {
-                      activeWorkflowLocked: shouldSuppressTeachingMode(workflowLockInput),
+                      activeWorkflowLocked:
+                        shouldSuppressTeachingMode(workflowLockInput) ||
+                        isMomentumBuilderRoomSection(activeSection),
                     })),
               createWorkspaceV2: createWorkspaceV2Active,
             }),
@@ -12390,7 +13933,6 @@ export default function CompanionPageClient() {
           ecosystemGuidance: ecosystemSnapshot
             ? ecosystemGuidanceForChat(ecosystemSnapshot)
             : undefined,
-        }),
       });
 
       let rawAssistantMsg = "";
@@ -12404,7 +13946,7 @@ export default function CompanionPageClient() {
         });
         const apiError =
           typeof errorData.error === "string" ? errorData.error : undefined;
-        throw new Error(apiError ?? friendlyFetchErrorMessage(null));
+        throw new Error(apiError ?? "companion-chat-unavailable");
       }
 
       if (useChatStream && isCompanionChatStreamResponse(res)) {
@@ -12448,6 +13990,33 @@ export default function CompanionPageClient() {
 
       latencyProfiler.measure("apiModel");
       latencyProfiler.mark("responseEnforcement");
+
+      const humanEnforced = enforceHumanConversation({
+        response: rawAssistantMsg,
+        userText: trimmed,
+        gentle: detected === "overwhelmed" || detected === "emotional",
+        seed: trimmed.length,
+        memoryConfidence: relationshipTurnClientMeta.memoryConfidence,
+      });
+      rawAssistantMsg = humanEnforced.message;
+      applyAssistantTaskLockTurn({
+        assistantText: rawAssistantMsg,
+        priorUserText: trimmed,
+        conversationTurn: chatTurnRef.current,
+      });
+      if (!taskLockBlocksEstateRouting) {
+        rawAssistantMsg = repairNumberedEstateRoomMenu(rawAssistantMsg, trimmed);
+        rawAssistantMsg = repairInventedEstatePlaceList(rawAssistantMsg, trimmed);
+        registerPendingEstatePlaceMenuFromAssistant(
+          rawAssistantMsg,
+          chatTurnRef.current,
+        );
+        rawAssistantMsg = enforceCanonicalPlaceIdentityInCopy(rawAssistantMsg, {
+          userText: trimmed,
+        });
+      } else {
+        rawAssistantMsg = sanitizeAssistantCopyDuringActiveTask(rawAssistantMsg);
+      }
 
       const {
         field: focusField,
@@ -12566,9 +14135,43 @@ export default function CompanionPageClient() {
             clearAllPendingOffers();
             saveVisualThinkingMenuPending(visualPending);
             registerPendingAcceptance("workspace", visualPending.offerSummary);
+          } else {
+            const estatePending = registerEstateWorkspaceOfferFromAssistant({
+              assistantText: assistantMsg,
+              priorUserText: menuContinuation.active
+                ? (priorUserText ?? trimmed)
+                : trimmed,
+              offeredAtTurn: chatTurnRef.current,
+            });
+            if (estatePending) {
+              saveFrictionlessPending(estatePending);
+              registerPendingAcceptance(
+                "workspace",
+                estatePending.offerSummary ?? "Estate room",
+              );
+              setWorkspaceOffer({
+                section: estatePending.target as AppSection,
+                buttonLabel: estatePending.offerSummary ?? "Continue",
+                line: assistantMsg,
+              });
+              setAwaitingUserConfirmation(
+                createAwaitingConfirmationState({
+                  assistantPrompt: assistantMsg,
+                  offeredAtTurn: chatTurnRef.current,
+                  kind: "estate",
+                  frictionlessPending: estatePending,
+                  workspaceOffer: {
+                    section: estatePending.target as AppSection,
+                    buttonLabel: estatePending.offerSummary ?? "Continue",
+                    line: assistantMsg,
+                  },
+                }),
+              );
+            }
           }
         }
       }
+      markAssistantReplied(chatTurnState);
       setMessages((prev) => {
         if (streamedChatResponse) {
           const copy = [...prev];
@@ -12885,7 +14488,7 @@ export default function CompanionPageClient() {
         setToolSuggestion(null);
         setActionBridge(null);
         setDecisionOffer(null);
-      } else if (pendingStressOffer) {
+      } else if (pendingStressOffer && !estateWorkspaceOffer) {
         setStressReliefOffer(pendingStressOffer);
         setDecisionCompassOffer(null);
         setActivationOffer(null);
@@ -12948,9 +14551,18 @@ export default function CompanionPageClient() {
       }
       if (voiceOutput && rawAssistantMsg) void playTTS(rawAssistantMsg);
     } catch (err) {
+      const routed = routeCompanionFailure(err, {
+        surface: "chat",
+        userText: trimmed,
+      });
+      const message =
+        routed.channel === "estate"
+          ? routed.message
+          : buildFailSafeChatReply(trimmed);
+      markAssistantReplied(chatTurnState);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: friendlyFetchErrorMessage(err) },
+        { role: "assistant", content: message },
       ]);
       setError(null);
     } finally {
@@ -12960,15 +14572,55 @@ export default function CompanionPageClient() {
       }
       finishEarlyChatTurn();
     }
+    } catch (err) {
+      if (!chatTurnState.assistantReplied) {
+        const routed = routeCompanionFailure(err, {
+          surface: "chat",
+          userText: trimmed,
+        });
+        const message =
+          routed.channel === "estate"
+            ? routed.message
+            : buildFailSafeChatReply(trimmed);
+        markAssistantReplied(chatTurnState);
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: message },
+        ]);
+      }
+      setError(null);
+    } finally {
+      guaranteeChatTurnCompletion({
+        state: chatTurnState,
+        ensureVisibleReply: () => {
+          if (!needsFailSafeAssistantReply(chatTurnState)) return;
+          setMessages((prev) => {
+            const last = prev[prev.length - 1];
+            if (last?.role === "assistant") {
+              markAssistantReplied(chatTurnState);
+              return prev;
+            }
+            markAssistantReplied(chatTurnState);
+            return [
+              ...prev,
+              { role: "assistant", content: buildFailSafeChatReply(trimmed) },
+            ];
+          });
+        },
+        finish: () => {
+          finalizeChatTurn(chatTurnState, () => {
+            endVisibleThinking();
+            setIsLoading(false);
+            inputRef.current?.focus();
+          });
+        },
+      });
+      activeChatTurnLifecycleRef.current = null;
+    }
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key !== "Enter" || e.shiftKey) {
-      voiceUsedRef.current = false;
-      return;
-    }
-    e.preventDefault();
-    void handleSend();
+    voiceUsedRef.current = false;
   }
 
   function dismissOfferKeepTalking() {
@@ -12981,14 +14633,196 @@ export default function CompanionPageClient() {
     setMessages((prev) => [...prev, { role: "assistant", content: line }]);
   }
 
+  function revealWelcomeHomeEstateMap() {
+    setWelcomeHomeEstateMapVisible(true);
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content:
+          "The homestead signposts are on the left — wander as long as you like. I'm right here when you're ready.",
+      },
+    ]);
+  }
+
+  function handleEstateRoomInvitationSelect(item: EstateRoomInvitationItem) {
+    const action = item.action;
+    switch (action.kind) {
+      case "conversation":
+        handleEstateConversationStart(
+          directEstateVisitRef.current?.roomId ??
+            getEstateMemory().currentRoom?.entryId ??
+            "welcome-home",
+        );
+        return;
+      case "presence":
+        handleEstateConversationStart(
+          directEstateVisitRef.current?.roomId ??
+            getEstateMemory().currentRoom?.entryId ??
+            "welcome-home",
+        );
+        return;
+      case "estate-map":
+        revealWelcomeHomeEstateMap();
+        return;
+      case "companion-continue": {
+        const resolution = resolveCompanionContinue();
+        if (resolution.mode === "single") {
+          handleCompanionContinueOption(resolution.option);
+          return;
+        }
+        if (resolution.mode === "choose" && resolution.options[0]) {
+          handleCompanionContinueOption(resolution.options[0]);
+          return;
+        }
+        focusChatInput();
+        return;
+      }
+      case "plan-my-day":
+        openPlanMyDayCore();
+        return;
+      case "show-suggestions":
+        void handleSend(
+          "What would help me focus on today? Show me a few gentle suggestions.",
+          true,
+        );
+        return;
+      case "return-home":
+        navigateToChatCore();
+        return;
+      case "section":
+        syncDirectEstateVisit(null);
+        clearEstatePendingTransition();
+        openStandaloneFocusSectionCore(action.section);
+        return;
+      case "brain-dump-engage":
+        setEstateConservatoryEngaged(true);
+        return;
+      case "institute-browse":
+        openMomentumInstituteRoomCore();
+        return;
+      case "stables-experience":
+        openStablesRoomCore();
+        return;
+      default:
+        return;
+    }
+  }
+
+  function handleEstateConversationStart(roomId: string) {
+    const greeting = estatePresenceGreeting(roomId);
+    setMessages((prev) => {
+      if (
+        prev.some(
+          (message) =>
+            message.role === "assistant" && message.content === greeting,
+        )
+      ) {
+        return prev;
+      }
+      return [...prev, { role: "assistant", content: greeting }];
+    });
+  }
+
+  function runDirectEstateRoomNavigation(
+    command: EstateCommandDecision,
+    userText: string,
+  ) {
+    setStressReliefOffer(null);
+    clearOfferStateOnly();
+    setEstateConservatoryEngaged(false);
+    const roomId = command.roomId ?? command.entryId;
+    patchEstateRuntimeState({
+      currentPlaceId: roomId,
+      activeConversationMode: true,
+    });
+    const roomBg = resolveEstateRoomBackgroundImage(roomId);
+    if (roomBg) preloadRoomBackground(roomBg);
+    const visit: DirectEstateVisit = {
+      roomId,
+      section: command.section,
+      userIntent: userText,
+      userMessageCountAtArrival: messages.filter((m) => m.role === "user")
+        .length,
+    };
+    syncDirectEstateVisit(visit);
+    registerEstatePendingTransition({
+      destinationSection: command.section,
+      destinationEntryId: command.roomId ?? command.entryId,
+      originalUserIntent: userText,
+      offeredAtTurn: chatTurnRef.current,
+      followUpQuestion: false,
+    });
+    executeEstateCommandMemoryHandoff(command, {
+      userText,
+      fromSection: activeSectionRef.current,
+      playArrival: true,
+      playAmbience: true,
+    });
+    if (command.pendingJourneyEntryIds?.length) {
+      patchEstateMemory((mem) => ({
+        ...mem,
+        activeJourney: {
+          ...mem.activeJourney,
+          pendingEntryIds: command.pendingJourneyEntryIds!,
+        },
+      }));
+    }
+    captureOfferAccepted(command.workspaceOffer, closedLoopCtx());
+    acceptWorkspaceOfferCore(command.workspaceOffer);
+    finishEarlyChatTurn();
+  }
+
   function acceptWorkspaceOfferCore(offer: WorkspaceOffer) {
+    const pendingTransition = loadEstatePendingTransition();
+    const pendingIntent = pendingTransition?.originalUserIntent;
+    const estateAck = estateTransitionAckForSection(offer.section, pendingIntent);
     captureOfferAccepted(offer, closedLoopCtx());
-    clearAllPendingOffers();
+    clearOfferStateOnly();
+    if (offer.estateMenuActionId) {
+      const menuEntryId =
+        pendingTransition?.destinationEntryId ??
+        estateEntryIdForSection(offer.section) ??
+        offer.section;
+      recordEstateRoomTransition({
+        toSection: offer.section,
+        toEntryId: menuEntryId,
+        fromSection: activeSectionRef.current,
+        reason: "direct room command",
+        userText: pendingIntent || lastUserTextRef.current || undefined,
+        preserveChat: true,
+        expectedNextStep: estateAck.split("\n\n").pop(),
+        shariGreeting: estateArrivalShariGreeting(menuEntryId) ?? undefined,
+      });
+      handleEstateMenuAction(offer.estateMenuActionId);
+      return;
+    }
+    const arrivalEntryId =
+      pendingTransition?.destinationEntryId ??
+      estateEntryIdForSection(offer.section) ??
+      offer.section;
+    recordEstateRoomTransition({
+      toSection: offer.section,
+      toEntryId: arrivalEntryId,
+      fromSection: activeSectionRef.current,
+      reason: "workspace offer accepted",
+      userText: pendingIntent || lastUserTextRef.current || undefined,
+      preserveChat: true,
+      expectedNextStep: estateAck.split("\n\n").pop(),
+      shariGreeting: estateArrivalShariGreeting(arrivalEntryId) ?? undefined,
+      playArrival: !(
+        pendingIntent?.trim() && isDirectEstateRoomRequest(pendingIntent)
+      ),
+    });
     if (offer.section === "content-generator") {
       noteWorkspaceOpened("content-generator", "workspace_offer");
       if (workspacePanel === "content-generator") {
         setActiveSection("home");
         setActiveNav("other");
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: estateAck },
+        ]);
         return;
       }
       if (
@@ -12998,18 +14832,26 @@ export default function CompanionPageClient() {
         return;
       }
       if (tryOpenCreateForCurrentArtifact(lastUserTextRef.current)) {
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: estateAck },
+        ]);
         return;
       }
+      const intentText = pendingIntent ?? lastUserTextRef.current;
       openCreationWorkspaceCore(
         "content-generator",
         {
           itemType: "content",
           title: "New piece",
-          brief: lastUserTextRef.current,
+          brief: intentText,
           stage: "choosing content type",
           source: "generated",
         },
-        { seedOverride: { autoGenerate: false } },
+        {
+          ackMessage: estateAck,
+          seedOverride: { autoGenerate: false },
+        },
       );
       return;
     }
@@ -13018,14 +14860,152 @@ export default function CompanionPageClient() {
       return;
     }
     if (offer.section === "brain-dump") {
+      const directVisit = directEstateVisitRef.current;
+      if (directVisit?.roomId === "clear-my-mind") {
+        const conservatoryBg =
+          resolveEstateRoomBackgroundImage(directVisit.roomId) ??
+          CLEAR_MY_MIND_CONSERVATORY_BG;
+        preloadRoomBackground(conservatoryBg);
+        setBrainDumpInitialView("capture");
+        trackWorkspaceEcosystemEvent("brain-dump");
+        noteWorkspaceOpened("brain-dump", "standalone_room");
+        clearSplitBesideWorkspace();
+        openStandaloneFocusSectionCore("brain-dump");
+        return;
+      }
       openClearMyMindCore({
         initialView: inferClearMyMindViewFromText(offer.line),
       });
       return;
     }
+    if (offer.section === "momentum-builder") {
+      noteWorkspaceOpened("momentum-builder", "estate_offer");
+      setMomentumBuilderArrivalActive(true);
+      openMomentumBuilderRoomCore();
+      return;
+    }
+    if (offer.section === "momentum-institute") {
+      noteWorkspaceOpened("momentum-institute", "estate_offer");
+      openMomentumInstituteRoomCore(offer.instituteDrawerId);
+      return;
+    }
+    if (offer.section === "stables") {
+      noteWorkspaceOpened("stables", "estate_offer");
+      openStablesRoomCore();
+      return;
+    }
+    if (offer.section === "grow-observatory") {
+      noteWorkspaceOpened("grow-observatory", "estate_offer");
+      openStandaloneFocusSectionCore("grow-observatory");
+      return;
+    }
+    if (offer.section === "growth-library" || offer.section === "how-do-i") {
+      const directVisit = directEstateVisitRef.current;
+      if (directVisit?.roomId === "library") {
+        noteWorkspaceOpened("growth-library", "standalone_room");
+        clearSplitBesideWorkspace();
+        openStandaloneFocusSectionCore("growth-library");
+        return;
+      }
+      noteWorkspaceOpened("momentum-institute", "estate_offer");
+      openMomentumInstituteRoomCore(offer.instituteDrawerId);
+      return;
+    }
+    if (offer.section === "growth-journal") {
+      const directVisit = directEstateVisitRef.current;
+      if (directVisit?.roomId === "journal") {
+        noteWorkspaceOpened("growth-journal", "standalone_room");
+        clearSplitBesideWorkspace();
+        openStandaloneFocusSectionCore("growth-journal");
+        return;
+      }
+      noteWorkspaceOpened("growth-journal", "estate_offer");
+      openGrowthDestinationCore("growth-journal");
+      return;
+    }
+    if (offer.section === "growth-greenhouse") {
+      const directVisit = directEstateVisitRef.current;
+      if (directVisit?.roomId === "greenhouse") {
+        noteWorkspaceOpened("growth-greenhouse", "standalone_room");
+        clearSplitBesideWorkspace();
+        openStandaloneFocusSectionCore("growth-greenhouse");
+        return;
+      }
+      noteWorkspaceOpened("growth-greenhouse", "estate_offer");
+      openStandaloneFocusSectionCore("growth-greenhouse");
+      return;
+    }
+    if (offer.section === "evidence-bank") {
+      const directVisit = directEstateVisitRef.current;
+      if (directVisit?.roomId === "evidence-vault") {
+        noteWorkspaceOpened("evidence-bank", "standalone_room");
+        clearSplitBesideWorkspace();
+        openStandaloneFocusSectionCore("evidence-bank");
+        return;
+      }
+      noteWorkspaceOpened("evidence-bank", "estate_offer");
+      openGrowthDestinationCore("evidence-bank");
+      return;
+    }
+    if (offer.section === "growth-portfolio") {
+      const directVisit = directEstateVisitRef.current;
+      if (directVisit?.roomId === "portfolio") {
+        noteWorkspaceOpened("growth-portfolio", "standalone_room");
+        clearSplitBesideWorkspace();
+        openStandaloneFocusSectionCore("growth-portfolio");
+        return;
+      }
+      noteWorkspaceOpened("growth-portfolio", "estate_offer");
+      openGrowthDestinationCore("growth-portfolio");
+      return;
+    }
+    if (offer.section === "grow-spark-cards") {
+      const directVisit = directEstateVisitRef.current;
+      if (directVisit?.roomId === "seeds-planted") {
+        noteWorkspaceOpened("grow-spark-cards", "standalone_room");
+        clearSplitBesideWorkspace();
+        openStandaloneFocusSectionCore("grow-spark-cards");
+        return;
+      }
+    }
+    if (offer.section === "decision-compass") {
+      openDecisionCompass();
+      return;
+    }
     if (offer.section === "focus-audio") {
+      const directVisit = directEstateVisitRef.current;
+      if (directVisit?.roomId === "peaceful-places") {
+        const peacefulBg = resolveEstateRoomBackgroundImage("peaceful-places");
+        if (peacefulBg) preloadRoomBackground(peacefulBg);
+        setPeacefulPlacesArrivalActive(true);
+        setFocusAudioCategory(null);
+        clearSplitBesideWorkspace();
+        trackWorkspaceEcosystemEvent("focus-audio");
+        noteWorkspaceOpened("focus-audio", "standalone_room");
+        openStandaloneFocusSectionCore("focus-audio");
+        return;
+      }
+      if (directVisit && directVisit.roomId !== "peaceful-places") {
+        setPeacefulPlacesArrivalActive(false);
+        setFocusAudioCategory(null);
+        clearSplitBesideWorkspace();
+        trackWorkspaceEcosystemEvent("focus-audio");
+        noteWorkspaceOpened("focus-audio", "standalone_room");
+        openStandaloneFocusSectionCore("focus-audio");
+        return;
+      }
       openFocusAudioCore(detectAudioRequest(lastUserTextRef.current).categoryId);
       return;
+    }
+    if (offer.section === "games" || offer.section === "quick-recharge") {
+      const directVisit = directEstateVisitRef.current;
+      if (directVisit?.roomId === "game-room") {
+        clearSplitBesideWorkspace();
+        trackWorkspaceEcosystemEvent("games");
+        noteWorkspaceOpened("quick-recharge", "standalone_room");
+        openStandaloneFocusSectionCore("games");
+        return;
+      }
     }
     if (offer.section === "energy") {
       noteWorkspaceOpened("energy", "workspace_offer");
@@ -13035,7 +15015,22 @@ export default function CompanionPageClient() {
       return;
     }
     if (offer.section === "welcome-room") {
+      if (directEstateVisitRef.current?.roomId === "sunroom") {
+        syncDirectEstateVisit(null);
+      }
       openWelcomeRoom();
+      return;
+    }
+
+    const directVisit = directEstateVisitRef.current;
+    if (
+      directVisit &&
+      directVisit.section === offer.section &&
+      !isDedicatedEstateRoomPanelSection(offer.section)
+    ) {
+      noteWorkspaceOpened(offer.section, "standalone_room");
+      clearSplitBesideWorkspace();
+      openStandaloneFocusSectionCore(offer.section);
       return;
     }
 
@@ -13669,21 +15664,15 @@ export default function CompanionPageClient() {
         );
       case "wins-this-week":
         return (
-          <WinsThisWeekPanel
-            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+          <EstateCollectionRoomPanel
+            roomId="celebration-garden"
             nav={buildGrowthPanelNav("wins-this-week")}
-            onSaveToEvidenceBank={(whatHappened, sourceWinId) => {
-              setEvidencePrefill({ whatHappened, sourceWinId });
-              openSectionBesideChatCore("evidence-bank", "evidence-bank", {
-                userInitiated: true,
-              });
-            }}
           />
         );
       case "evidence-bank":
         return (
-          <EvidenceBankPanel
-            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+          <EstateCollectionRoomPanel
+            roomId="evidence-vault"
             nav={buildGrowthPanelNav("evidence-bank")}
           />
         );
@@ -13707,15 +15696,15 @@ export default function CompanionPageClient() {
         );
       case "growth-journal":
         return (
-          <GrowthJournalPanel
-            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+          <EstateCollectionRoomPanel
+            roomId="journal"
             nav={buildGrowthPanelNav("growth-journal")}
           />
         );
       case "growth-portfolio":
         return (
-          <GrowthPortfolioPanel
-            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
+          <EstateCollectionRoomPanel
+            roomId="achievement-library"
             nav={buildGrowthPanelNav("growth-portfolio")}
           />
         );
@@ -14347,6 +16336,7 @@ export default function CompanionPageClient() {
         /* mic may already be active */
       }
     } else if (!next && isListening) {
+      micExplicitStopRef.current = true;
       recognitionRef.current?.stop();
     }
   }
@@ -14621,6 +16611,120 @@ export default function CompanionPageClient() {
     Boolean(activitySession.activityId) &&
     activitySession.phase !== "browse";
 
+  const peacefulPlacesChromeActive =
+    activeSection === "focus-audio" &&
+    (!directEstateVisit || directEstateVisit.roomId === "peaceful-places");
+
+  const estateImmersiveActive = isEstateImmersiveRoom({
+    activeSection,
+    workspacePanel,
+    welcomeHomePrimary,
+    momentumBuilderPrimary,
+    overlay,
+    focusSanctuaryFullBleed,
+  });
+
+  const estatePresenceRoomId =
+    momentumInstitutePrimary
+      ? "momentum-institute"
+      : stablesPrimary
+        ? "stables"
+        : showDirectEstateOverlay && directEstateVisit?.roomId
+          ? directEstateVisit.roomId
+          : (() => {
+            const memRoom = getEstateMemory().currentRoom?.entryId;
+            if (memRoom && memRoom !== "welcome-home") return memRoom;
+            return estatePresenceRoomForSection(activeSection);
+          })();
+
+  const showGlobalEstatePresence = Boolean(
+    estatePresenceRoomId &&
+      estateImmersiveActive &&
+      !momentumInstitutePrimary &&
+      !stablesPrimary,
+  );
+
+  const estatePlaceChromeActive = isEstatePlaceChromeActive({
+    welcomeHomePrimary,
+    profileEstateChromeActive,
+    estateImmersiveActive,
+    showDirectEstateOverlay,
+    momentumInstitutePrimary,
+    stablesPrimary,
+    momentumBuilderPrimary,
+  });
+
+  const estateChromePolicy = resolveEstateChromePolicy({
+    placeId:
+      (showDirectEstateOverlay ? estateChatRoomId : null) ??
+      profileEstateRoomOverlayId ??
+      directEstateVisit?.roomId ??
+      null,
+    welcomeHomePrimary,
+    profileEstateChromeActive,
+    estateImmersiveActive,
+    showDirectEstateOverlay,
+    momentumInstitutePrimary,
+    stablesPrimary,
+    momentumBuilderPrimary,
+    overlay,
+  });
+
+  /** Keep profile trigger visible while overlays open — only hide during sign-in. */
+  const showGlobalEstateMenu =
+    estateChromePolicy.showSubtleEstateMenu && overlay !== "signin";
+  const showSparkEstateGuide =
+    estateChromePolicy.showGuidebook && overlay !== "signin";
+
+  const showCompanionBackControl = overlay !== "signin";
+
+  const sparkEstateShellPlaceId =
+    profileEstateRoomOverlayId ??
+    (showDirectEstateOverlay && !estateConservatoryEngaged
+      ? estateChatRoomId
+      : null);
+  const sparkEstateShellProfileMode = Boolean(profileEstateRoomOverlayId);
+
+  const handleCompanionBack = () => {
+    if (
+      estatePlaceChromeActive ||
+      welcomeHomePrimary ||
+      Boolean(sparkEstateShellPlaceId)
+    ) {
+      navigateToChatCore();
+      return;
+    }
+    goBack();
+  };
+
+  const portaledModalSheets =
+    welcomeHomePrimary ||
+    estateImmersiveActive ||
+    momentumBuilderPrimary ||
+    momentumInstitutePrimary ||
+    stablesPrimary ||
+    profileEstateChromeActive;
+
+  const profileEstateWelcomeMessage = useMemo(() => {
+    if (!profileEstateRoomOverlayId) return undefined;
+    if (shouldSuppressEstateInvitationGrid(profileEstateRoomOverlayId)) {
+      return undefined;
+    }
+    if (messages.length > 0 || isLoading) return undefined;
+    if (
+      profileEstateRoomOverlayId === "growth-profile" &&
+      growthProfileEmphasizeTimeline
+    ) {
+      return "We can walk through your progress together — what feels most worth remembering?";
+    }
+    return estateArrivalShariGreeting(profileEstateRoomOverlayId) ?? undefined;
+  }, [
+    profileEstateRoomOverlayId,
+    messages.length,
+    isLoading,
+    growthProfileEmphasizeTimeline,
+  ]);
+
   const homeHasUserMessages = messages.some((m) => m.role === "user");
   const homeMode = resolveHomeMode({
     activeSection,
@@ -14641,7 +16745,13 @@ export default function CompanionPageClient() {
   const companionDeskFullBleed = resolveCompanionDeskFullBleed(workspaceLayoutCtx);
 
   const showHomeFloatingChat =
-    activeSection === "home" && !welcomeScene && !companionDeskVisible;
+    activeSection === "home" &&
+    !welcomeScene &&
+    !companionDeskVisible &&
+    !welcomeHomePrimary &&
+    !momentumBuilderPrimary &&
+    !momentumInstitutePrimary &&
+    !stablesPrimary;
 
   return (
     <CompanionDeskProvider
@@ -14654,7 +16764,17 @@ export default function CompanionPageClient() {
     <div
       className={`relative flex h-dvh max-h-dvh overflow-hidden text-lg ${
         companionDeskVisible ? "companion-has-companion-desk" : ""
-      } ${
+      }${welcomeHomePrimary ? " companion-welcome-home-root" : ""}${
+        momentumBuilderPrimary ? " companion-momentum-builder-root" : ""
+      }${
+        momentumInstitutePrimary ? " companion-momentum-institute-root" : ""
+      }${
+        stablesPrimary ? " companion-stables-root" : ""
+      }${
+        profileEstateChromeActive ? " companion-growth-profile-root" : ""
+      }${
+        estatePlaceChromeActive ? " companion-estate-immersive-root" : ""
+      }${showDirectEstateOverlay ? " companion-direct-estate-room-active" : ""} ${
         clientMounted ? shellClass : EMOTION_SHELL_CLASS.unclear
       }`}
       data-visual-mode={clientMounted ? visualMode : "off"}
@@ -14673,6 +16793,20 @@ export default function CompanionPageClient() {
           setOverlay("settings");
         }}
       />
+      <EstateArrivalHost
+        onShariGreeting={(message) => {
+          setMessages((prev) => [...prev, { role: "assistant", content: message }]);
+        }}
+      />
+      <EstatePlaceAudioHost
+        placeId={
+          directEstateVisit?.roomId ??
+          (showGlobalEstatePresence ? estatePresenceRoomId : null)
+        }
+      />
+      {showGlobalEstatePresence && estatePresenceRoomId ? (
+        <EstatePresence roomId={estatePresenceRoomId} />
+      ) : null}
       <Suspense fallback={null}>
         <CompanionSignInFromQuery onOpen={openSignIn} />
       </Suspense>
@@ -14685,13 +16819,39 @@ export default function CompanionPageClient() {
         suppress={
           suppressGlobalBackground ||
           workspacePanel === "welcome-room" ||
-          homeMode === "welcome"
+          homeMode === "welcome" ||
+          welcomeHomePrimary ||
+          momentumBuilderPrimary ||
+          momentumInstitutePrimary ||
+          stablesPrimary ||
+          profileEstateChromeActive ||
+          estateImmersiveActive
         }
       />
 
       <div
         className={`relative z-10 flex h-full min-h-0 w-full overflow-hidden ${
-          welcomeScene
+          estatePlaceChromeActive
+            ? `companion-estate-immersive-active pl-0 pr-0${
+                profileEstateChromeActive ? " companion-growth-profile-active" : ""
+              }`
+            : welcomeHomePrimary
+            ? `companion-welcome-home-active pl-0 pr-0${
+                welcomeHomeIntroActive
+                  ? " companion-welcome-home-intro-active"
+                  : ""
+              }${
+                welcomeHomeEstateMapVisible
+                  ? " companion-welcome-home-show-estate-nav"
+                  : ""
+              }`
+            : momentumBuilderPrimary
+              ? "companion-momentum-builder-active pl-0 pr-0"
+            : momentumInstitutePrimary
+              ? "companion-momentum-institute-active pl-0 pr-0"
+            : stablesPrimary
+              ? "companion-stables-active pl-0 pr-0"
+            : welcomeScene
             ? "pl-14 md:pl-44 companion-welcome-scene-active"
             : workspacePanel === "welcome-room"
               ? "pl-0"
@@ -14704,13 +16864,15 @@ export default function CompanionPageClient() {
               : activeSection === "brain-dump"
                 ? "pl-0 companion-clear-my-mind-active"
               : activeSection === "focus-audio"
-                ? "pl-0 companion-peaceful-places-active"
+                ? peacefulPlacesChromeActive
+                  ? "pl-0 companion-peaceful-places-active"
+                  : "pl-0"
               : activeSection === "games" || activeSection === "quick-recharge"
                 ? "pl-0 companion-momentum-games-active"
               : focusSanctuaryFullBleed
                 ? "pl-0 companion-focus-my-brain-active"
               : "pl-14 md:pl-44"
-        } ${homeCalm ? "companion-home-calm" : ""} ${
+        } ${homeCalm && !welcomeHomePrimary ? "companion-home-calm" : ""} ${
           workspacePanel === "welcome-room" ? "companion-welcome-room-active" : ""
         } ${
           isGrowPanelSection(activeSection) ? "companion-grow-active" : ""
@@ -14723,18 +16885,23 @@ export default function CompanionPageClient() {
         } ${
           activeSection === "brain-dump" ? "companion-clear-my-mind-active" : ""
         } ${
-          activeSection === "focus-audio" ? "companion-peaceful-places-active" : ""
+          peacefulPlacesChromeActive ? "companion-peaceful-places-active" : ""
         } ${
           activeSection === "games" || activeSection === "quick-recharge"
             ? "companion-momentum-games-active"
             : ""
+        } ${
+          momentumBuilderPrimary ? "companion-momentum-builder-active" : ""
         } ${
           focusSanctuaryFullBleed ? "companion-focus-my-brain-active" : ""
         } ${
           focusWorkflowSanctuary ? "companion-focus-workflow-active" : ""
         }`}
         data-everyday-chat={
-          activeSection === "home" && !welcomeScene && !homeCalm
+          activeSection === "home" &&
+          !welcomeScene &&
+          !homeCalm &&
+          (welcomeHomePrimary ? !welcomeHomeExperience.showIntro : true)
             ? ""
             : undefined
         }
@@ -14746,6 +16913,7 @@ export default function CompanionPageClient() {
           homeArrival ? homeStateDataAttr(homeArrival.homeState) : undefined
         }
       >
+        {!estatePlaceChromeActive ? (
         <CompanionSidebarPortal
           calmHome={homeCalm}
           navVisibility={arrivalNavVisibility}
@@ -14756,8 +16924,11 @@ export default function CompanionPageClient() {
             onNavSelect={handleNavSelect}
           />
         </CompanionSidebarPortal>
+        ) : null}
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+          {!estatePlaceChromeActive ? (
+          <>
           <TopBar
             calmHome={homeCalm}
             navVisibility="normal"
@@ -14765,32 +16936,99 @@ export default function CompanionPageClient() {
             onOpenClearMyMind={() => openClearMyMindCore()}
             onOpenPlanMyDay={() => openPlanMyDayCore()}
             onOpenTodaysReality={() => openAdaptMyDayCore()}
-            onNewConversationItem={handleTopBarNewConversationItem}
-            onOpenSettings={(section) => {
-              setSettingsSection(section ?? null);
-              setOverlay("settings");
-            }}
-            onOpenProfile={() => setOverlay("profile")}
+            onEstateMenuAction={handleEstateMenuAction}
           />
           {!homeCalm && activeSection !== "plan-my-day" && !focusWorkflowSanctuary ? (
             <ActiveWorkspaceBar items={activeWorkspaceItems} />
           ) : null}
-
-          {(activeSection !== "home" || overlay) &&
-          !workspacePanel &&
-          activeSection !== "games" &&
-          !focusWorkflowSanctuary &&
-          !sectionHasEmbeddedChatBack(activeSection) ? (
-            <div className="shrink-0 px-4 pt-3 sm:px-6">
-              <BackButton
-                onClick={goBack}
-                label={workspacePanelBackLabel ?? NAV_HOME}
-              />
-            </div>
+          </>
           ) : null}
 
-          {activeSection === "home" && (
+          {showCompanionBackControl ? (
+            <EstateImmersiveHomeLink onClick={handleCompanionBack} />
+          ) : null}
+
+          {showGlobalEstateMenu ? (
+            <GlobalEstateMenu
+              variant="floating"
+              onAction={handleEstateMenuAction}
+            />
+          ) : null}
+
+          {showSparkEstateGuide ? (
+            <SparkEstateGuideAnchor onClick={openSparkEstateGuideCore} />
+          ) : null}
+
+          <EstateGuideFlipbook
+            open={estateGuideFlipbookOpen}
+            onClose={() => setEstateGuideFlipbookOpen(false)}
+          />
+
+          {sparkEstateShellPlaceId ? (
+            <SparkEstateShell
+              placeId={sparkEstateShellPlaceId}
+              section={activeSection}
+              profileEstateMode={sparkEstateShellProfileMode}
+              welcomeMessage={profileEstateWelcomeMessage}
+              conversationScrollKey={estateChatScrollKey}
+              inputRef={inputRef}
+              activityEngaged={estateConservatoryEngaged}
+              conversationStarted={estateConversationStartedSinceVisit}
+              onInvitationSelect={handleEstateRoomInvitationSelect}
+              onConversationStart={handleEstateConversationStart}
+              thread={
+                <SimpleChat
+                  messages={messages}
+                  stateHint={stateHint}
+                  showHint={false}
+                  hideEmptyState
+                  isLoading={isLoading}
+                  thinkingMessage={visibleThinkingMessage}
+                  awaitingUserConfirmation={chatAwaitingConfirmation}
+                  thinkingEmotion={displayEmotion}
+                  workspacePanel={workspacePanel}
+                  workspaceActiveBeside={workspaceActiveBeside}
+                  formatParagraphs={formatAssistantParagraphs}
+                  afterLastAssistant={undefined}
+                />
+              }
+              footer={
+                <HomeChatInputFooter
+                  homeCalm={false}
+                  homeChatPlaceholder="What's on your mind?"
+                  conversationMode
+                  input={input}
+                  isLoading={isLoading}
+                  isListening={isListening}
+                  speechSupported={speechSupported}
+                  inputRef={inputRef}
+                  onInputChange={handleInputChange}
+                  onKeyDown={handleKeyDown}
+                  onToggleListening={toggleListening}
+                  onSend={(text) => void handleSend(text)}
+                  pendingAction={pendingAction}
+                  suppressInterventionCards
+                  onRunArtifactExport={runArtifactExport}
+                  onClearPendingOffers={clearAllPendingOffers}
+                  onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                  onExecutePendingAction={executePendingAction}
+                  onShowEstateMap={revealWelcomeHomeEstateMap}
+                  splitCreateBuilder={splitCreateBuilder}
+                  createBuilderSession={createBuilderSession}
+                  onCreateBuilderAction={handleCreateBuilderAction}
+                  voiceOutput={voiceOutput}
+                  voiceBlocked={voiceBlocked}
+                  onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                  onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                  ttsAudioRef={ttsAudioRef}
+                />
+              }
+            />
+          ) : null}
+
+          {activeSection === "home" && !profileEstateChromeActive && (
             <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+              {!welcomeHomePrimary ? (
               <WorkspaceDebugBanner
                 workspacePanel={workspacePanel}
                 chatLayoutMode={chatLayoutMode}
@@ -14801,6 +17039,7 @@ export default function CompanionPageClient() {
                 )}
                 createMounted={workspacePanel === CREATE_PANEL_SECTION}
               />
+              ) : null}
               <WorkspaceLayout
                 chat={
             guideBesideSession &&
@@ -14841,6 +17080,250 @@ export default function CompanionPageClient() {
                   </div>
                 )}
               </div>
+            ) : welcomeHomePrimary ? (
+            <main className="relative flex h-full min-h-0 flex-1 flex-col overflow-hidden">
+              <WelcomeHomePage
+                experience={welcomeHomeExperience}
+                onIntroComplete={finishWelcomeHomeIntro}
+                onIntroActiveChange={setWelcomeHomeIntroActive}
+                welcomeMessage={welcomeHomeGreeting}
+                showWelcomeLine={
+                  messages.length === 0 && !isLoading && Boolean(welcomeHomeGreeting)
+                }
+                showConversation={messages.length > 0 || isLoading}
+                conversationScrollKey={`${messages.length}-${isLoading ? 1 : 0}`}
+                inputRef={inputRef}
+                registerBack={registerBack}
+                thread={
+                  <>
+                    <SimpleChat
+                      messages={messages}
+                      stateHint={stateHint}
+                      showHint={false}
+                      hideEmptyState
+                      isLoading={isLoading}
+                      thinkingMessage={visibleThinkingMessage}
+                awaitingUserConfirmation={chatAwaitingConfirmation}
+                      awaitingUserConfirmation={chatAwaitingConfirmation}
+                      thinkingEmotion={displayEmotion}
+                      workspacePanel={workspacePanel}
+                      workspaceActiveBeside={workspaceActiveBeside}
+                      formatParagraphs={formatAssistantParagraphs}
+                      afterLastAssistant={undefined}
+                    />
+                  </>
+                }
+                footer={
+                  <HomeChatInputFooter
+                    welcomeHome
+                    homeCalm={false}
+                    homeChatPlaceholder={homeArrival?.chatPlaceholder}
+                    conversationMode={
+                      homeArrival?.chrome.conversationInput ?? true
+                    }
+                    input={input}
+                    isLoading={isLoading}
+                    isListening={isListening}
+                    speechSupported={speechSupported}
+                    inputRef={inputRef}
+                    onInputChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onToggleListening={toggleListening}
+                    onSend={(text) => void handleSend(text)}
+                    pendingAction={pendingAction}
+                    suppressInterventionCards
+                    onRunArtifactExport={runArtifactExport}
+                    onClearPendingOffers={clearAllPendingOffers}
+                    onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                    onExecutePendingAction={executePendingAction}
+                    onShowEstateMap={revealWelcomeHomeEstateMap}
+                    splitCreateBuilder={splitCreateBuilder}
+                    createBuilderSession={createBuilderSession}
+                    onCreateBuilderAction={handleCreateBuilderAction}
+                    voiceOutput={voiceOutput}
+                    voiceBlocked={voiceBlocked}
+                    onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                    onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                    ttsAudioRef={ttsAudioRef}
+                  />
+                }
+              />
+            </main>
+            ) : momentumBuilderPrimary ? (
+            <main className="estate-room-main">
+              <MomentumBuilderRoomPanel
+                conversationScrollKey={estateChatScrollKey}
+                onInvitationSelect={handleEstateRoomInvitationSelect}
+                onConversationStart={handleEstateConversationStart}
+                todaysPath={momentumBuilderRoomExperience?.todaysPath ?? null}
+                celebrationKind={momentumBuilderRoomExperience?.celebration ?? null}
+                inputRef={inputRef}
+                thread={
+                  <>
+                    <SimpleChat
+                      messages={messages}
+                      stateHint={stateHint}
+                      showHint={false}
+                      hideEmptyState
+                      isLoading={isLoading}
+                      thinkingMessage={visibleThinkingMessage}
+                awaitingUserConfirmation={chatAwaitingConfirmation}
+                      awaitingUserConfirmation={chatAwaitingConfirmation}
+                      thinkingEmotion={displayEmotion}
+                      workspacePanel={workspacePanel}
+                      workspaceActiveBeside={workspaceActiveBeside}
+                      formatParagraphs={formatAssistantParagraphs}
+                      afterLastAssistant={undefined}
+                    />
+                  </>
+                }
+                footer={
+                  <HomeChatInputFooter
+                    homeCalm={false}
+                    homeChatPlaceholder="What's on your mind?"
+                    conversationMode
+                    input={input}
+                    isLoading={isLoading}
+                    isListening={isListening}
+                    speechSupported={speechSupported}
+                    inputRef={inputRef}
+                    onInputChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onToggleListening={toggleListening}
+                    onSend={(text) => void handleSend(text)}
+                    pendingAction={pendingAction}
+                    suppressInterventionCards
+                    onRunArtifactExport={runArtifactExport}
+                    onClearPendingOffers={clearAllPendingOffers}
+                    onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                    onExecutePendingAction={executePendingAction}
+                    splitCreateBuilder={splitCreateBuilder}
+                    createBuilderSession={createBuilderSession}
+                    onCreateBuilderAction={handleCreateBuilderAction}
+                    voiceOutput={voiceOutput}
+                    voiceBlocked={voiceBlocked}
+                    onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                    onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                    ttsAudioRef={ttsAudioRef}
+                  />
+                }
+              />
+            </main>
+            ) : momentumInstitutePrimary ? (
+            <main className="estate-room-main">
+              <MomentumInstituteRoomPanel
+                conversationScrollKey={estateChatScrollKey}
+                onInvitationSelect={handleEstateRoomInvitationSelect}
+                onConversationStart={handleEstateConversationStart}
+                initialOpenDrawerId={instituteInitialDrawerId}
+                onInstituteLearningChat={handleInstituteLearningChat}
+                inputRef={inputRef}
+                thread={
+                  <SimpleChat
+                    messages={messages}
+                    stateHint={stateHint}
+                    showHint={false}
+                    hideEmptyState
+                    isLoading={isLoading}
+                    thinkingMessage={visibleThinkingMessage}
+                    awaitingUserConfirmation={chatAwaitingConfirmation}
+                    thinkingEmotion={displayEmotion}
+                    workspacePanel={workspacePanel}
+                    workspaceActiveBeside={workspaceActiveBeside}
+                    formatParagraphs={formatAssistantParagraphs}
+                    afterLastAssistant={undefined}
+                  />
+                }
+                footer={
+                  <HomeChatInputFooter
+                    homeCalm={false}
+                    homeChatPlaceholder="What would you like to explore?"
+                    conversationMode
+                    input={input}
+                    isLoading={isLoading}
+                    isListening={isListening}
+                    speechSupported={speechSupported}
+                    inputRef={inputRef}
+                    onInputChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onToggleListening={toggleListening}
+                    onSend={(text) => void handleSend(text)}
+                    pendingAction={pendingAction}
+                    suppressInterventionCards
+                    onRunArtifactExport={runArtifactExport}
+                    onClearPendingOffers={clearAllPendingOffers}
+                    onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                    onExecutePendingAction={executePendingAction}
+                    splitCreateBuilder={splitCreateBuilder}
+                    createBuilderSession={createBuilderSession}
+                    onCreateBuilderAction={handleCreateBuilderAction}
+                    voiceOutput={voiceOutput}
+                    voiceBlocked={voiceBlocked}
+                    onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                    onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                    ttsAudioRef={ttsAudioRef}
+                  />
+                }
+              />
+            </main>
+            ) : stablesPrimary ? (
+            <main className="estate-room-main">
+              <StablesRoomPanel
+                conversationScrollKey={estateChatScrollKey}
+                onInvitationSelect={handleEstateRoomInvitationSelect}
+                onConversationStart={handleEstateConversationStart}
+                onBackHome={navigateToChatCore}
+                conversationStarted={estateConversationStartedSinceVisit}
+                onStablesLearningChat={handleStablesLearningChat}
+                inputRef={inputRef}
+                thread={
+                  <SimpleChat
+                    messages={messages}
+                    stateHint={stateHint}
+                    showHint={false}
+                    hideEmptyState
+                    isLoading={isLoading}
+                    thinkingMessage={visibleThinkingMessage}
+                    awaitingUserConfirmation={chatAwaitingConfirmation}
+                    thinkingEmotion={displayEmotion}
+                    workspacePanel={workspacePanel}
+                    workspaceActiveBeside={workspaceActiveBeside}
+                    formatParagraphs={formatAssistantParagraphs}
+                    afterLastAssistant={undefined}
+                  />
+                }
+                footer={
+                  <HomeChatInputFooter
+                    homeCalm={false}
+                    homeChatPlaceholder="What's on your heart today?"
+                    conversationMode
+                    input={input}
+                    isLoading={isLoading}
+                    isListening={isListening}
+                    speechSupported={speechSupported}
+                    inputRef={inputRef}
+                    onInputChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onToggleListening={toggleListening}
+                    onSend={(text) => void handleSend(text)}
+                    pendingAction={pendingAction}
+                    suppressInterventionCards
+                    onRunArtifactExport={runArtifactExport}
+                    onClearPendingOffers={clearAllPendingOffers}
+                    onDismissOfferKeepTalking={dismissOfferKeepTalking}
+                    onExecutePendingAction={executePendingAction}
+                    splitCreateBuilder={splitCreateBuilder}
+                    createBuilderSession={createBuilderSession}
+                    onCreateBuilderAction={handleCreateBuilderAction}
+                    voiceOutput={voiceOutput}
+                    voiceBlocked={voiceBlocked}
+                    onToggleVoiceOutput={() => setVoiceOutput((v) => !v)}
+                    onVoiceBlockedReset={() => setVoiceBlocked(false)}
+                    ttsAudioRef={ttsAudioRef}
+                  />
+                }
+              />
+            </main>
             ) : (
             <main
               className={`flex h-full min-h-0 flex-1 flex-col overflow-hidden ${
@@ -14873,7 +17356,7 @@ export default function CompanionPageClient() {
                   onImmersionNav={setArrivalNavImmersion}
                   onWalkComplete={handleArrivalWalkComplete}
                   onStayAndChat={() => undefined}
-                  onSend={() => void handleSend()}
+                  onSend={(text) => void handleSend(text)}
                 />
               ) : activeSection === "home" && !welcomeScene ? null : (
               <IdentityBar
@@ -14912,6 +17395,7 @@ export default function CompanionPageClient() {
                 workspaceActiveBeside={workspaceActiveBeside}
                 isThinking={isLoading && !homeCalm}
                 thinkingMessage={visibleThinkingMessage}
+                awaitingUserConfirmation={chatAwaitingConfirmation}
                 welcomeLine={null}
                 onDismissWelcome={undefined}
                 primaryQuestion={null}
@@ -14952,6 +17436,7 @@ export default function CompanionPageClient() {
                   hideEmptyState
                   isLoading={isLoading}
                   thinkingMessage={visibleThinkingMessage}
+                awaitingUserConfirmation={chatAwaitingConfirmation}
                   thinkingEmotion={displayEmotion}
                   workspacePanel={workspacePanel}
                   workspaceActiveBeside={workspaceActiveBeside}
@@ -15267,7 +17752,7 @@ export default function CompanionPageClient() {
               </div>
               ) : null}
 
-              {error && !welcomeScene && (
+              {error && !welcomeScene && !welcomeHomePrimary && (
                 <p
                   className="px-4 pb-2 text-center text-base text-[#a85c4a]"
                   role="alert"
@@ -15293,7 +17778,7 @@ export default function CompanionPageClient() {
                     onInputChange={handleInputChange}
                     onKeyDown={handleKeyDown}
                     onToggleListening={toggleListening}
-                    onSend={() => void handleSend()}
+                    onSend={(text) => void handleSend(text)}
                     pendingAction={pendingAction}
                     suppressInterventionCards={suppressInterventionCards}
                     onRunArtifactExport={runArtifactExport}
@@ -15368,7 +17853,7 @@ export default function CompanionPageClient() {
           {/* Every non-home panel sits on a frosted white surface so text stays
               readable over the photo background, while the image still frames
               it. */}
-          {activeSection !== "home" && (
+          {activeSection !== "home" && !momentumBuilderPrimary && !profileEstateChromeActive && (
             <div
               className={
                 activeSection === "brain-dump" ||
@@ -15450,7 +17935,8 @@ export default function CompanionPageClient() {
             </WorkspaceShell>
           )}
 
-          {activeSection === "brain-dump" && (
+          {activeSection === "brain-dump" &&
+            (!showDirectEstateOverlay || estateConservatoryEngaged) && (
             <BrainDumpPanel
               key={brainDumpPanelKey}
               standalone
@@ -15511,14 +17997,7 @@ export default function CompanionPageClient() {
             />
           )}
 
-          {activeSection === "grow-momentum-builders" && (
-            <GrowMomentumBuildersPanel
-              onBack={goBack}
-              backLabel={workspacePanelBackLabel}
-            />
-          )}
-
-          {activeSection === "grow-spark-cards" && (
+          {activeSection === "grow-spark-cards" && !showDirectEstateOverlay && (
             <GrowPlaceholderPanel
               section="grow-spark-cards"
               onBack={goBack}
@@ -15577,50 +18056,77 @@ export default function CompanionPageClient() {
             />
           )}
 
-          {activeSection === "growth-library" && (
-            <GrowthLibraryPanel
+          {activeSection === "growth-greenhouse" && !showDirectEstateOverlay && (
+            <EstateCollectionRoomPanel
+              roomId="greenhouse"
               onBack={goBack}
               backLabel={workspacePanelBackLabel}
-              onOpenSection={(section) => openGrowthDestinationCore(section)}
-              onOpenTimeline={openGrowthReportsCore}
+            />
+          )}
+
+          {activeSection === "growth-library" && !showDirectEstateOverlay && (
+            <EstateCollectionRoomPanel
+              roomId="achievement-library"
+              onBack={goBack}
+              backLabel={workspacePanelBackLabel}
             />
           )}
 
           {activeSection === "growth-reports" && (
-            <GrowthReportsPage
+            <EstateCollectionRoomPanel
+              roomId="celebration-hall"
               onBack={goBack}
               backLabel={workspacePanelBackLabel}
             />
           )}
 
-          {activeSection === "growth-journal" && (
-            <GrowthJournalPanel nav={buildGrowthPanelNav("growth-journal")} />
-          )}
-
-          {activeSection === "growth-portfolio" && (
-            <GrowthPortfolioPanel nav={buildGrowthPanelNav("growth-portfolio")} />
-          )}
-
-          {activeSection === "wins-this-week" && (
-            <WinsThisWeekPanel
-              refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
-              nav={buildGrowthPanelNav("wins-this-week")}
-              onSaveToEvidenceBank={(whatHappened, sourceWinId) => {
-                setEvidencePrefill({ whatHappened, sourceWinId });
-                openGrowthDestinationCore("evidence-bank");
-              }}
+          {activeSection === "user-memory" && !showDirectEstateOverlay && (
+            <MemoryLibraryPage
+              onBack={goBack}
+              backLabel={workspacePanelBackLabel}
+              initialTab={memoryLibraryTab}
             />
           )}
 
-          {activeSection === "evidence-bank" && (
-            <EvidenceBankPanel nav={buildGrowthPanelNav("evidence-bank")} />
+          {activeSection === "growth-journal" &&
+            !showDirectEstateOverlay &&
+            !profileEstateRoomOverlayId && (
+            <EstateCollectionRoomPanel
+              roomId="journal"
+              nav={buildGrowthPanelNav("growth-journal")}
+            />
           )}
 
-          {activeSection === "confidence-vault" && (
+          {activeSection === "growth-portfolio" &&
+            !showDirectEstateOverlay &&
+            !profileEstateRoomOverlayId && (
+            <EstateCollectionRoomPanel
+              roomId="achievement-library"
+              nav={buildGrowthPanelNav("growth-portfolio")}
+            />
+          )}
+
+          {activeSection === "wins-this-week" && !showDirectEstateOverlay && (
+            <EstateCollectionRoomPanel
+              roomId="celebration-garden"
+              nav={buildGrowthPanelNav("wins-this-week")}
+            />
+          )}
+
+          {activeSection === "evidence-bank" &&
+            !showDirectEstateOverlay &&
+            !profileEstateRoomOverlayId && (
+            <EstateCollectionRoomPanel
+              roomId="evidence-vault"
+              nav={buildGrowthPanelNav("evidence-bank")}
+            />
+          )}
+
+          {activeSection === "confidence-vault" && !showDirectEstateOverlay && (
             <ConfidenceVaultPanel nav={buildGrowthPanelNav("confidence-vault")} />
           )}
 
-          {activeSection === "my-journey" && (
+          {activeSection === "my-journey" && !showDirectEstateOverlay && (
             <MyJourneyPanel nav={buildGrowthPanelNav("my-journey")} />
           )}
 
@@ -15628,7 +18134,7 @@ export default function CompanionPageClient() {
             <BreathePanel onDone={() => setActiveSection("home")} />
           )}
 
-          {activeSection === "focus-audio" && (
+          {activeSection === "focus-audio" && !showDirectEstateOverlay && (
             <FocusAudioPanel
               emotion={displayEmotion}
               initialCategory={focusAudioCategory ?? undefined}
@@ -15639,7 +18145,7 @@ export default function CompanionPageClient() {
               onDone={() => {
                 setFocusAudioCategory(null);
                 setPeacefulPlacesArrivalActive(false);
-                setActiveSection("focus");
+                navigateToChatCore();
               }}
             />
           )}
@@ -15722,12 +18228,15 @@ export default function CompanionPageClient() {
 
           {activeSection === "spin-wheel" && (
             <SpinWheelPanel
+              autoSpinWhenReady={spinWheelAutoSpin}
+              onAutoSpinStarted={() => setSpinWheelAutoSpin(false)}
               onOpen={suggestCrossWorkspaceOpen}
               onAsk={handlePlaybookAsk}
             />
           )}
 
-          {(activeSection === "games" || activeSection === "quick-recharge") && (
+          {(activeSection === "games" || activeSection === "quick-recharge") &&
+            !showDirectEstateOverlay && (
             <MomentumGamesRoomShell>
               <MomentumBuildersPanel
                 variant="quick-recharge"
@@ -15801,7 +18310,7 @@ export default function CompanionPageClient() {
             </WorkspaceShell>
           )}
 
-          {activeSection === "projects" && (
+          {activeSection === "projects" && !showDirectEstateOverlay && (
             <WorkspaceShell
               assistLabel={getShariAssistLabel("projects")}
               onAskShari={() => openCompanionAssist("projects")}
@@ -15954,6 +18463,7 @@ export default function CompanionPageClient() {
           />
 
           <ModalSheet
+            portaled={portaledModalSheets}
             open={overlay === "signin"}
             onClose={() => setOverlay(null)}
             title="Account"
@@ -15968,6 +18478,7 @@ export default function CompanionPageClient() {
           </ModalSheet>
 
           <ModalSheet
+            portaled={portaledModalSheets}
             open={overlay === "settings"}
             onClose={() => {
               setOverlay(null);
@@ -15984,6 +18495,7 @@ export default function CompanionPageClient() {
           </ModalSheet>
 
           <ModalSheet
+            portaled={portaledModalSheets}
             open={overlay === "whats-new"}
             onClose={() => setOverlay(null)}
             title="What's New"
@@ -15992,27 +18504,12 @@ export default function CompanionPageClient() {
           </ModalSheet>
 
           <ModalSheet
-            open={overlay === "profile"}
-            onClose={() => {
-              setOverlay(null);
-              setProfileGettingToKnowYou(false);
-            }}
-            title="Profile"
+            portaled={portaledModalSheets}
+            open={overlay === "institute-cabinet"}
+            onClose={() => setOverlay(null)}
+            title="My Institute Cabinet™"
           >
-            <ProfilePanel
-              onSignIn={openSignIn}
-              openGettingToKnowYou={profileGettingToKnowYou}
-              onOpen={(s) => {
-                setOverlay(null);
-                setProfileGettingToKnowYou(false);
-                setActiveSection(s);
-              }}
-              onOpenSettings={(section) => {
-                setSettingsSection(section);
-                setOverlay("settings");
-                setProfileGettingToKnowYou(false);
-              }}
-            />
+            <InstituteCabinetPanel />
           </ModalSheet>
 
           {triggeredBlock ? (
@@ -16034,7 +18531,6 @@ export default function CompanionPageClient() {
           ) : null}
 
           <FreshStartConfirmDialog
-            scoped
             open={freshStartDialog !== null}
             copy={freshStartCopy(freshStartDialog ?? "clear-context")}
             onConfirm={confirmFreshStart}
