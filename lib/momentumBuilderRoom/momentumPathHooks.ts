@@ -27,12 +27,18 @@ export type MomentumPathMilestone = IntelligenceReadyHooks & {
 
 const MILESTONE_STORAGE_KEY = "spark-momentum-path-milestones-v1";
 
+export type MomentumPathMilestoneInput = Omit<
+  MomentumPathMilestone,
+  "kind" | "createdAt"
+>;
+
 /** V1 — local stub; V2 persists to narrative / LIG. */
 export function recordMomentumPathMilestone(
-  milestone: Omit<MomentumPathMilestone, "kind">,
+  milestone: MomentumPathMilestoneInput,
 ): MomentumPathMilestone {
   const record: MomentumPathMilestone = {
     kind: "momentum-path-milestone",
+    createdAt: milestone.recordedAt,
     ...milestone,
   };
 
