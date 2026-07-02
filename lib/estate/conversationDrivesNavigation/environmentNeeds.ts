@@ -5,7 +5,7 @@
  * Member-facing names always come from registry officialName — never invented.
  */
 
-import type { EnvironmentNeedDefinition } from "./types";
+import type { EnvironmentNeedDefinition, EnvironmentNeedId } from "./types";
 
 /**
  * Ordered lexicon — more specific needs before broader ones where patterns overlap.

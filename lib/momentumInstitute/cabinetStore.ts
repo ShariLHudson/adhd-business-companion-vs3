@@ -2,7 +2,7 @@
  * My Institute Cabinet™ — reference-only archive. Never duplicates lesson content.
  */
 
-import type { InstituteCabinetItem } from "../types";
+import type { InstituteCabinetItem } from "./types";
 import { getDrawerById, getKnowledgeCardById } from "./catalog/provider";
 
 const STORAGE_KEY = "companion-institute-cabinet-v1";

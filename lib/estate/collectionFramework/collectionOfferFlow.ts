@@ -40,9 +40,9 @@ const ROOM_CHOICE_RE =
 
 function roomIdFromUserText(text: string): EstateCollectionRoomId | null {
   const trimmed = text.trim().toLowerCase();
-  const numbered = parseOptionSelection(text);
-  if (numbered && numbered >= 1 && numbered <= ESTATE_COLLECTION_ROOM_IDS.length) {
-    return ESTATE_COLLECTION_ROOM_IDS[numbered - 1]!;
+  const numbered = parseOptionSelection(text, ESTATE_COLLECTION_ROOM_IDS.length);
+  if (numbered !== null && numbered >= 0 && numbered < ESTATE_COLLECTION_ROOM_IDS.length) {
+    return ESTATE_COLLECTION_ROOM_IDS[numbered]!;
   }
 
   for (const id of ESTATE_COLLECTION_ROOM_IDS) {

@@ -81,7 +81,7 @@ function detectLegacyWouldRoute(input: {
   const legacyMatcherTop = top
     ? {
         entryId: top.entry.id,
-        reason: top.reason,
+        reason: top.reasons.join("; ") || top.entry.id,
         confidence: top.confidence,
       }
     : null;
@@ -134,10 +134,7 @@ export function evaluateEstateOrchestrationShadow(
     conversationTurn: context.conversationTurn,
     userTextPreview: previewUserTextForShadowLog(context.userText),
     shadowDecision: orchestration.decision.kind,
-    shadowReason:
-      "reason" in orchestration.decision
-        ? String(orchestration.decision.reason)
-        : orchestration.decision.kind,
+    shadowReason: String(orchestration.decision.reason),
     legacyMatcherEntryId: legacyMatcherTop?.entryId ?? null,
     legacyMatcherReason: legacyMatcherTop?.reason ?? null,
     legacyWouldRoute,

@@ -231,7 +231,7 @@ export function resolveCompanionResponseRoute(
   if (
     isThoughtfulConversationRequest(t) ||
     input.routing.category === "decide" ||
-    input.routing.category === "coach"
+    input.routing.category === "conversation"
   ) {
     return {
       routeClass: "fast",

@@ -8,7 +8,7 @@ import type {
   MemberLearningCompletion,
   MemberLearningTimelineEntry,
   MemberSkillRecord,
-} from "../types";
+} from "./types";
 import type { LearningExperienceTypeId } from "@/lib/sparkMomentumInstitute/types";
 import { nextCompetencyLevel, normalizeCompetencyLevel } from "@/lib/sparkCompetencyFramework/types";
 import { getCompetencyById, getKnowledgeCardById } from "./catalog/provider";

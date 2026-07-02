@@ -2,7 +2,7 @@
  * Member learning experience persistence — runtime session state.
  */
 
-import type { MemberLearningExperience } from "../types";
+import type { MemberLearningExperience } from "./types";
 import type { InstituteLifecycleStageId } from "@/lib/sparkMomentumInstitute/types";
 import { resolveExperienceById } from "./experienceResolver";
 import {

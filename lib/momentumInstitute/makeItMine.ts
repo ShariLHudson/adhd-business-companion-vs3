@@ -3,7 +3,7 @@
  * Shari helps the member adapt the lesson to THEIR business.
  */
 
-import type { MakeItMineSession } from "../types";
+import type { MakeItMineSession } from "./types";
 import type { MakeItMineIntent } from "@/lib/sparkMomentumInstitute/types";
 import { loadInstituteCatalog } from "./catalog/provider";
 import { resolveExperienceById } from "./experienceResolver";

@@ -63,7 +63,12 @@ function inferEnergyBand(
   gathered: ReturnType<typeof gatherMomentumInput>,
   recent: MomentumSnapshot[],
 ): MomentumProfileSignals["preferredEnergyBand"] {
-  if (gathered.cognitiveLoadLevel === "high") return "low";
+  if (
+    gathered.cognitiveLoadLevel === "heavy" ||
+    gathered.cognitiveLoadLevel === "overloaded"
+  ) {
+    return "low";
+  }
   if (recent.some((s) => s.momentumLevel === "building")) return "medium";
   if (recent.some((s) => s.momentumLevel === "steady")) return "high";
   return "unknown";

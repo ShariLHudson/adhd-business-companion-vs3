@@ -85,7 +85,9 @@ export type IntentCategory =
   | "execute"
   | "learn"
   | "clarify"
-  | "conversation";
+  | "conversation"
+  | "reflect"
+  | "restore";
 
 export type RouteMode =
   | "conversation"

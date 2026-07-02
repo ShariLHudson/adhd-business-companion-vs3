@@ -78,6 +78,10 @@ import {
   shouldOfferVisualRecommendation,
   visualRecommendationPendingFromReply,
 } from "./visualRecommendationEngine";
+import {
+  buildVisualSourceAskReply,
+  validateVisualSourceContent,
+} from "./visualSourceContentValidation";
 import { shouldBlockVisualThinking } from "./visualThinkingOverreach";
 import {
   detectConversionTargetView,

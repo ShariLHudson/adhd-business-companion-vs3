@@ -3,11 +3,11 @@
  * Members grow even with only a few minutes.
  */
 
-import type {
-  LearningExperienceTypeId,
-  LearningTimeSlotId,
-} from "@/lib/sparkMomentumInstitute/types";
-import { LEARNING_TIME_SLOT_LABELS } from "@/lib/sparkCompetencyFramework/types";
+import type { LearningExperienceTypeId } from "@/lib/sparkMomentumInstitute/types";
+import {
+  LEARNING_TIME_SLOT_LABELS,
+  type LearningTimeSlotId,
+} from "@/lib/sparkCompetencyFramework/types";
 import { loadInstituteCatalog } from "./catalog/provider";
 import {
   resolveExperiencesForKnowledgeCard,

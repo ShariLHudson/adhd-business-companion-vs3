@@ -3,7 +3,7 @@
  * Requires real-world outcome + member permission.
  */
 
-import type { EvidenceOpportunity } from "../types";
+import type { EvidenceOpportunity } from "./types";
 import { createEvidenceEntry, type EvidenceEntry } from "@/lib/evidenceBankStore";
 import { recordEvidenceSavedInProfile } from "./growthProfileStore";
 import { getKnowledgeCardById } from "./catalog/provider";
@@ -115,6 +115,7 @@ export function saveEvidenceFromOpportunity(
       `Applied ${card?.title ?? "Institute learning"} in my business.`,
     originatedFromId: opportunity.learningExperienceId,
     originatedFromKind: "institute-learning-experience",
+    attachments: [],
   });
 
   const updated: EvidenceOpportunity = {

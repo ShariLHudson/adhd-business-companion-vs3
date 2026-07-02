@@ -5,17 +5,9 @@
  * @see docs/conversation-tests/ct-05.md
  */
 
-export type EmotionalBlockerDepth = "explore" | "honor_practical" | "off";
+import type { EmotionalBlockerCue } from "./types";
 
-export type EmotionalBlockerCue = {
-  depth: EmotionalBlockerDepth;
-  signal: string;
-  curiosityOpener: string;
-  guidance: string;
-  possibleBlockers: readonly string[];
-  adhdNormalizeLine: string;
-  adhdNormalizeWhenFit: string;
-};
+export type EmotionalBlockerDepth = "explore" | "honor_practical" | "off";
 
 /** Member is stuck starting — the question is why, not how. */
 const EMOTIONAL_BLOCKER_RE =

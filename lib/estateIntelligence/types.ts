@@ -22,7 +22,8 @@ export type EstateAssetCategory =
   | "audio"
   | "report"
   | "collection"
-  | "game";
+  | "game"
+  | "reflection";
 
 export type EstateJourneyRole =
   | "learn"
@@ -43,7 +44,9 @@ export type EstateUserNeed =
   | "learn"
   | "create"
   | "rest"
-  | "organize";
+  | "organize"
+  | "reflect"
+  | "restore";
 
 export type EstateRegistryEntry = {
   id: string;

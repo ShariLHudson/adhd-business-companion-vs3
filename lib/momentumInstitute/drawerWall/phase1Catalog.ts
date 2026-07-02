@@ -22,7 +22,7 @@ const VERSION = "1.0.0-phase1-drawers";
 type CategorySeed = {
   slug: string;
   title: string;
-  pillarId: "build_your_business" | "build_your_mind" | "build_your_legacy";
+  pillarId: "build_your_business" | "build_your_thinking" | "build_your_legacy";
   cards: string[];
 };
 
@@ -50,7 +50,7 @@ const FEATURED_DRAWERS: {
     slug: "confidence",
     title: "Confidence",
     categorySlug: "confidence",
-    pillarId: "build_your_mind",
+    pillarId: "build_your_thinking",
     cards: [
       "Imposter Syndrome",
       "Courage",
@@ -80,8 +80,8 @@ const CATEGORY_DRAWERS: CategorySeed[] = [
   { slug: "leadership", title: "Leadership", pillarId: "build_your_legacy", cards: ["Leading With Clarity"] },
   { slug: "speaking", title: "Speaking", pillarId: "build_your_legacy", cards: ["Speaking With Warmth"] },
   { slug: "ai", title: "AI", pillarId: "build_your_business", cards: ["AI as Thinking Partner"] },
-  { slug: "executive-function", title: "Executive Function", pillarId: "build_your_mind", cards: ["Working Memory Supports"] },
-  { slug: "decision-making", title: "Decision Making", pillarId: "build_your_mind", cards: ["Choosing Under Uncertainty"] },
+  { slug: "executive-function", title: "Executive Function", pillarId: "build_your_thinking", cards: ["Working Memory Supports"] },
+  { slug: "decision-making", title: "Decision Making", pillarId: "build_your_thinking", cards: ["Choosing Under Uncertainty"] },
   { slug: "systems", title: "Systems", pillarId: "build_your_business", cards: ["Repeatable Systems"] },
   { slug: "pricing", title: "Pricing", pillarId: "build_your_business", cards: ["Pricing Foundations"] },
   { slug: "offers", title: "Offers", pillarId: "build_your_business", cards: ["Offer Clarity"] },
@@ -90,15 +90,15 @@ const CATEGORY_DRAWERS: CategorySeed[] = [
   { slug: "customer-experience", title: "Customer Experience", pillarId: "build_your_business", cards: ["Experience Design"] },
   { slug: "hiring", title: "Hiring", pillarId: "build_your_business", cards: ["Hiring Thoughtfully"] },
   { slug: "automation", title: "Automation", pillarId: "build_your_business", cards: ["Automate the Repeatable"] },
-  { slug: "habits", title: "Habits", pillarId: "build_your_mind", cards: ["Sustainable Habits"] },
-  { slug: "learning", title: "Learning", pillarId: "build_your_mind", cards: ["Learning How to Learn"] },
-  { slug: "thinking-skills", title: "Thinking Skills", pillarId: "build_your_mind", cards: ["Sharper Thinking"] },
-  { slug: "creative-thinking", title: "Creative Thinking", pillarId: "build_your_mind", cards: ["Creative Leaps"] },
-  { slug: "strategic-thinking", title: "Strategic Thinking", pillarId: "build_your_mind", cards: ["Strategic Foresight"] },
-  { slug: "pattern-recognition", title: "Pattern Recognition", pillarId: "build_your_mind", cards: ["Seeing Patterns"] },
-  { slug: "problem-solving", title: "Problem Solving", pillarId: "build_your_mind", cards: ["Solve the Real Problem"] },
+  { slug: "habits", title: "Habits", pillarId: "build_your_thinking", cards: ["Sustainable Habits"] },
+  { slug: "learning", title: "Learning", pillarId: "build_your_thinking", cards: ["Learning How to Learn"] },
+  { slug: "thinking-skills", title: "Thinking Skills", pillarId: "build_your_thinking", cards: ["Sharper Thinking"] },
+  { slug: "creative-thinking", title: "Creative Thinking", pillarId: "build_your_thinking", cards: ["Creative Leaps"] },
+  { slug: "strategic-thinking", title: "Strategic Thinking", pillarId: "build_your_thinking", cards: ["Strategic Foresight"] },
+  { slug: "pattern-recognition", title: "Pattern Recognition", pillarId: "build_your_thinking", cards: ["Seeing Patterns"] },
+  { slug: "problem-solving", title: "Problem Solving", pillarId: "build_your_thinking", cards: ["Solve the Real Problem"] },
   { slug: "innovation", title: "Innovation", pillarId: "build_your_business", cards: ["Innovation Without Chaos"] },
-  { slug: "adhd-entrepreneurship", title: "ADHD Entrepreneurship", pillarId: "build_your_mind", cards: ["Entrepreneurial EF"] },
+  { slug: "adhd-entrepreneurship", title: "ADHD Entrepreneurship", pillarId: "build_your_thinking", cards: ["Entrepreneurial EF"] },
   { slug: "business-growth", title: "Business Growth", pillarId: "build_your_business", cards: ["Growth With Intention"] },
 ];
 

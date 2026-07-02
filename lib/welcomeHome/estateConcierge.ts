@@ -45,7 +45,8 @@ export function evaluateWelcomeHomeConcierge(
   const needs = evaluateCompanionNeedsIntelligence({
     text: input.userText,
     emotionalState: input.emotionalState as EmotionalState | undefined,
-    overwhelmed: input.overwhelmed,
+    cognitiveLoadLevel: input.overwhelmed ? "overloaded" : undefined,
+    recoveryGentle: input.overwhelmed ? true : undefined,
     userIntent: undefined,
   });
 

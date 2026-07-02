@@ -5,10 +5,8 @@
 
 import type { MomentumInstituteCatalog } from "@/lib/sparkMomentumInstitute/types";
 import { SPARK_COMPETENCY_FRAMEWORK_V1 } from "@/lib/sparkCompetencyFramework/competencyFrameworkV1";
-import {
-  buildCatalogIndex,
-  type InstituteCatalogIndex,
-} from "../knowledgeArchitecture/catalogIndex";
+import { buildCatalogIndex } from "../knowledgeArchitecture/catalogIndex";
+import type { InstituteCatalogIndex } from "../knowledgeArchitecture/types";
 
 export type InstituteCatalogProvider = {
   load(): MomentumInstituteCatalog;

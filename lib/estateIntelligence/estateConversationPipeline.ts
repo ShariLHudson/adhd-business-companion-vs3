@@ -28,6 +28,7 @@ import {
   ESTATE_ROOM_ENTRY_HINT,
   ESTATE_ROOM_EXIT_HINT,
 } from "./estateRoomLifecycle";
+import type { EstateIntelligenceEvaluation } from "./types";
 import { directEstateNavigationHintForChat } from "./estateCommandRouter";
 import { shariCompanionHintForChat } from "@/lib/conversation/shariCompanionEngine";
 

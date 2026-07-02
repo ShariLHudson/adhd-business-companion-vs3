@@ -67,7 +67,7 @@ function resolveOutgoingEdges(
         blockedByPrerequisiteIds: access.met ? undefined : access.missing,
       };
     })
-    .filter((r): r is ResolvedKnowledgeRelationship => r !== null);
+    .filter((r) => r !== null) as ResolvedKnowledgeRelationship[];
 }
 
 function resolvePrerequisiteEdges(
@@ -208,7 +208,7 @@ export function resolveLearningPath(
         blockedByPrerequisiteIds: access.met ? undefined : access.missing,
       };
     })
-    .filter((s): s is ResolvedLearningPathStep => s !== null);
+    .filter((s) => s !== null) as ResolvedLearningPathStep[];
 }
 
 export function listLearningPathsForCard(

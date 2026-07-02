@@ -79,8 +79,7 @@ export function applyEstateTaskLockTurn(
     orchestration.suppressRoomRouting && !allowsExplicitEstateNavigation;
 
   const decision = orchestration.decision;
-  const decisionReason =
-    "reason" in decision ? String(decision.reason) : decision.kind;
+  const decisionReason = String(decision.reason);
 
   return {
     state: orchestration.nextTaskLockState,

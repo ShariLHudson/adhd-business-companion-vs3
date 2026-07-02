@@ -70,8 +70,6 @@ export function resolveUserIntent(
   }
 
   switch (decision.action) {
-    case "AUDIO":
-      return { kind: "soundscape", userText, categoryId: decision.categoryId };
     case "NAVIGATE":
       if (decision.target.kind === "place") {
         return toLegacyNavigate(userText, {

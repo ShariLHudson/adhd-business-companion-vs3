@@ -47,6 +47,7 @@ export function createInstituteJournalEntry(
     originatedFromKind: input.learningExperienceId
       ? "institute-learning-experience"
       : "knowledge-card",
+    attachments: [],
   });
 
   if (input.cabinetItemId) {

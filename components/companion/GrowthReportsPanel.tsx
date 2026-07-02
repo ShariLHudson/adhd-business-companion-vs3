@@ -12,6 +12,7 @@ import {
   defaultStorybookStyle,
   includesFromChapters,
   resolveStorybookStyle,
+  storybookReportTypeToExport,
   STORYBOOK_CHAPTERS,
   STORYBOOK_FUTURE_TYPES,
   STORYBOOK_STYLES,
@@ -124,10 +125,13 @@ function StorybookBuilderBody({
 
   function buildContent() {
     const style = resolveStorybookStyle(selectedStyle);
+    const includes = includesFromChapters(selectedChapters);
     return buildGrowthReportContent({
-      reportType: style.reportType,
+      reportType: storybookReportTypeToExport(style.reportType),
       reportStyle: style.reportStyle,
-      includes: includesFromChapters(selectedChapters),
+      includes: Object.entries(includes)
+        .filter(([, enabled]) => enabled)
+        .map(([key]) => key),
     });
   }
 

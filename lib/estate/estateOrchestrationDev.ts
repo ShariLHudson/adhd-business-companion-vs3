@@ -103,10 +103,7 @@ export function observeEstateOrchestrationShadowTurn(
       turn: input.conversationTurn,
       preview: shadow.orchestration.decision.kind,
       legacy: shadow.legacyMatcherTop?.entryId ?? "place-suggest",
-      shadowReason:
-        "reason" in shadow.orchestration.decision
-          ? shadow.orchestration.decision.reason
-          : shadow.orchestration.decision.kind,
+      shadowReason: shadow.orchestration.decision.reason,
       suppressRoomRouting: shadow.orchestration.suppressRoomRouting,
       routingMismatch: shadow.routingMismatch,
       hijackRisk: shadow.hijackRisk,

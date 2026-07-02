@@ -6,8 +6,8 @@ import {
   CANONICAL_ESTATE_REGISTRY,
   resolveCanonicalPlaceId,
   type CanonicalEstatePlace,
-  type CanonicalSuggestionProfile,
 } from "../canonicalEstateRegistry";
+import type { CanonicalSuggestionProfile } from "../canonicalEstateRegistryTypes";
 import { getEstateRoomById } from "../estateRoomRegistry";
 import { resolveEstateLocationMedia } from "./media";
 import { resolveEstateLocationShell } from "./shell";

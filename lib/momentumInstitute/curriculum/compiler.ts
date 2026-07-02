@@ -55,6 +55,7 @@ export function curriculumCardToKnowledgeCardDefinition(
     ) as string[],
     publishedAt: m.status === "published" ? m.last_updated : undefined,
     version: m.version,
+    createdAt: m.last_updated,
   };
 }
 
@@ -81,6 +82,7 @@ export function curriculumCardToBusinessMasteryMinuteExperience(
     competencyIds: doc.metadata.competencies,
     lifecycleStages: ["discover", "learn", "reflect"],
     version: doc.metadata.version,
+    createdAt: doc.metadata.last_updated,
   };
 }
 

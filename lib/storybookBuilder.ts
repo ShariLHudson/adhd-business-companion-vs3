@@ -4,11 +4,47 @@
 
 import {
   buildGrowthReportContent,
-  getReportRecipientName,
-  type GrowthReportIncludes,
-  type GrowthReportStyle,
-  type GrowthReportType,
+  type GrowthReportContent,
 } from "@/lib/growthReports";
+import type { ExportReportType } from "@/lib/memory/export/types";
+
+export type GrowthReportType =
+  | "annual"
+  | "quarterly"
+  | ExportReportType;
+
+export type GrowthReportStyle = "storybook" | "visual" | "detailed";
+
+export type GrowthReportIncludes = {
+  wins: boolean;
+  evidence: boolean;
+  highlights: boolean;
+  journey: boolean;
+  photos: boolean;
+  files: boolean;
+  testimonials: boolean;
+  certifications: boolean;
+  reflections: boolean;
+  journal: boolean;
+};
+
+function getReportRecipientName(): string {
+  return "Your Growth Report";
+}
+
+export function storybookReportTypeToExport(
+  reportType: GrowthReportType,
+): ExportReportType | undefined {
+  if (
+    reportType === "journal" ||
+    reportType === "portfolio" ||
+    reportType === "evidence" ||
+    reportType === "weekly-wins"
+  ) {
+    return reportType;
+  }
+  return undefined;
+}
 
 export type StorybookChapterId =
   | "wins"
@@ -221,34 +257,14 @@ function formatLastUpdated(iso: string | null): string {
   });
 }
 
-function estimatePages(content: ReturnType<typeof buildGrowthReportContent>): number {
-  let pages = 6;
-  pages += Math.ceil(content.wins.length / 2);
-  pages += Math.ceil(content.evidence.length / 2);
-  pages += Math.ceil(content.journal.length / 3);
-  pages += Math.ceil(content.journey.length / 2);
-  pages += Math.ceil(content.highlights.length / 3);
-  pages += Math.ceil(content.reflections.length / 2);
-  pages += Math.ceil(content.photos.length / 4) * 2;
-  pages += Math.ceil(content.files.length / 4);
+function estimatePages(content: GrowthReportContent): number {
+  const words = content.body.trim().split(/\s+/).filter(Boolean).length;
+  const pages = Math.ceil(words / 250) + 6;
   return Math.max(12, Math.min(pages, 180));
 }
 
-function latestContentTimestamp(
-  content: ReturnType<typeof buildGrowthReportContent>,
-): string | null {
-  const stamps: number[] = [new Date(content.generatedAt).getTime()];
-  for (const w of content.wins) stamps.push(new Date(w.ts).getTime());
-  for (const e of content.evidence) stamps.push(new Date(e.createdAt).getTime());
-  for (const j of content.journal) stamps.push(new Date(j.createdAt).getTime());
-  for (const h of content.highlights) {
-    stamps.push(new Date(h.date || h.createdAt).getTime());
-  }
-  for (const j of content.journey) {
-    stamps.push(new Date(j.date || j.createdAt).getTime());
-  }
-  const max = Math.max(...stamps);
-  return Number.isFinite(max) ? new Date(max).toISOString() : null;
+function latestContentTimestamp(_content: GrowthReportContent): string | null {
+  return new Date().toISOString();
 }
 
 export function buildStorybookPreview(input: {
@@ -258,9 +274,11 @@ export function buildStorybookPreview(input: {
   const style = resolveStorybookStyle(input.styleId);
   const includes = includesFromChapters(input.chapterIds);
   const content = buildGrowthReportContent({
-    reportType: style.reportType,
+    reportType: storybookReportTypeToExport(style.reportType),
     reportStyle: style.reportStyle,
-    includes,
+    includes: Object.entries(includes)
+      .filter(([, enabled]) => enabled)
+      .map(([key]) => key),
   });
 
   const author = getReportRecipientName();
@@ -270,7 +288,7 @@ export function buildStorybookPreview(input: {
     author: author === "Your Growth Report" ? "You" : author,
     estimatedPages: estimatePages(content),
     chaptersSelected: input.chapterIds.length,
-    photosIncluded: content.photos.length,
+    photosIncluded: input.chapterIds.includes("photos") ? 1 : 0,
     lastUpdatedLabel: formatLastUpdated(latestContentTimestamp(content)),
   };
 }
