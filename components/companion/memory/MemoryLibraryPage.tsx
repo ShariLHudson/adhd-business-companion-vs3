@@ -102,7 +102,7 @@ export function MemoryLibraryPage({
   initialTab = "all",
 }: Props) {
   const [tab, setTab] = useState<MemoryLibraryTab>(initialTab);
-  const [range, setRange] = useState<MemoryDateRange["preset"]>("all");
+  const [range, setRange] = useState<"week" | "month" | "all">("all");
   const [search, setSearch] = useState("");
   const [tick, setTick] = useState(0);
   const [exportReport, setExportReport] = useState<ExportReportType>("weekly-wins");
@@ -207,7 +207,7 @@ export function MemoryLibraryPage({
               <select
                 value={range}
                 onChange={(e) =>
-                  setRange(e.target.value as MemoryDateRange["preset"])
+                  setRange(e.target.value as "week" | "month" | "all")
                 }
               >
                 <option value="week">Past week</option>
@@ -245,7 +245,7 @@ export function MemoryLibraryPage({
             <select
               value={range}
               onChange={(e) =>
-                setRange(e.target.value as MemoryDateRange["preset"])
+                setRange(e.target.value as "week" | "month" | "all")
               }
             >
               <option value="week">Past week</option>
@@ -289,7 +289,7 @@ export function MemoryLibraryPage({
               <select
                 value={range}
                 onChange={(e) =>
-                  setRange(e.target.value as MemoryDateRange["preset"])
+                  setRange(e.target.value as "week" | "month" | "all")
                 }
               >
                 <option value="all">All time</option>
