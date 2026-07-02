@@ -56,27 +56,33 @@ export function isProfileEstateRoomId(
   return roomId != null && PROFILE_ROOM_ID_SET.has(roomId);
 }
 
-const MENU_ACTION_TO_ROOM: Partial<
-  Record<EstateMenuActionId, ProfileEstateRoomId>
-> = {
+const MENU_ACTION_TO_ROOM = {
   "estate-profile": "my-estate",
   "growth-profile": "growth-profile",
   "progress-timeline": "growth-profile",
   "evidence-vault": "evidence-vault",
   portfolio: "portfolio",
-};
+} as const satisfies Partial<Record<EstateMenuActionId, ProfileEstateRoomId>>;
+
+export type ProfileEstateMenuActionId = keyof typeof MENU_ACTION_TO_ROOM;
+
+export function isProfileEstateMenuAction(
+  actionId: EstateMenuActionId,
+): actionId is ProfileEstateMenuActionId {
+  return actionId in MENU_ACTION_TO_ROOM;
+}
+
+export function profileEstateRoomForMenuAction(
+  actionId: ProfileEstateMenuActionId,
+): ProfileEstateRoomId {
+  return MENU_ACTION_TO_ROOM[actionId];
+}
 
 const SECTION_TO_ROOM: Partial<Record<AppSection, ProfileEstateRoomId>> = {
   "evidence-bank": "evidence-vault",
   "growth-journal": "journal",
   "growth-portfolio": "portfolio",
 };
-
-export function profileEstateRoomForMenuAction(
-  actionId: EstateMenuActionId,
-): ProfileEstateRoomId | null {
-  return MENU_ACTION_TO_ROOM[actionId] ?? null;
-}
 
 export function profileEstateRoomForSection(
   section: AppSection,

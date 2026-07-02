@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  isProfileEstateMenuAction,
   isProfileEstateRoomId,
   profileEstateRoomBackgroundImage,
   profileEstateRoomForMenuAction,
@@ -13,8 +14,8 @@ describe("profileEstateRooms", () => {
     expect(profileEstateRoomForMenuAction("growth-profile")).toBe("growth-profile");
     expect(profileEstateRoomForMenuAction("evidence-vault")).toBe("evidence-vault");
     expect(profileEstateRoomForMenuAction("portfolio")).toBe("portfolio");
-    expect(profileEstateRoomForMenuAction("journal")).toBeNull();
-    expect(profileEstateRoomForMenuAction("settings")).toBeNull();
+    expect(isProfileEstateMenuAction("journal")).toBe(false);
+    expect(isProfileEstateMenuAction("settings")).toBe(false);
   });
 
   it("maps profile rooms to growth sections", () => {

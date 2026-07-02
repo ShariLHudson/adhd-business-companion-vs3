@@ -15,15 +15,35 @@ import {
   setCurriculumRegistry,
 } from "../registry";
 import type { CurriculumRegistry } from "../types";
-import { CURRICULUM_ROOT_SEGMENT } from "../types";
 import type { MomentumInstituteCatalog } from "@/lib/sparkMomentumInstitute/types";
 
+/** Static subfolder under cwd — literal segments keep Turbopack tracing scoped. */
+const CURRICULUM_ROOT_PARTS = [
+  "docs",
+  "momentum-institute",
+  "curriculum",
+] as const;
+
+function joinCurriculumPath(...segments: string[]): string {
+  return path.join(
+    /* turbopackIgnore: true */ process.cwd(),
+    ...CURRICULUM_ROOT_PARTS,
+    ...segments,
+  );
+}
+
 export function resolveCurriculumRoot(): string {
-  return path.join(process.cwd(), CURRICULUM_ROOT_SEGMENT);
+  return joinCurriculumPath();
+}
+
+function isSafeCurriculumRelativePath(relativePath: string): boolean {
+  const normalized = relativePath.replace(/\\/g, "/");
+  if (!normalized || normalized.startsWith("/")) return false;
+  return !normalized.split("/").some((part) => part === ".." || part === "");
 }
 
 export function loadCurriculumRegistryManifest(): CurriculumRegistry | null {
-  const manifestPath = path.join(resolveCurriculumRoot(), "curriculum-registry.json");
+  const manifestPath = joinCurriculumPath("curriculum-registry.json");
   if (!fs.existsSync(manifestPath)) return null;
   try {
     const raw = fs.readFileSync(manifestPath, "utf8");
@@ -36,7 +56,8 @@ export function loadCurriculumRegistryManifest(): CurriculumRegistry | null {
 export function loadKnowledgeCardFromPath(
   relativePath: string,
 ): ReturnType<typeof parseKnowledgeCardMarkdown> | null {
-  const fullPath = path.join(resolveCurriculumRoot(), relativePath);
+  if (!isSafeCurriculumRelativePath(relativePath)) return null;
+  const fullPath = joinCurriculumPath(relativePath);
   if (!fs.existsSync(fullPath)) return null;
   try {
     const raw = fs.readFileSync(fullPath, "utf8");
@@ -47,9 +68,10 @@ export function loadKnowledgeCardFromPath(
 }
 
 export function scanKnowledgeCardFiles(): string[] {
-  const root = path.join(resolveCurriculumRoot(), "knowledge-cards");
+  const root = joinCurriculumPath("knowledge-cards");
   if (!fs.existsSync(root)) return [];
   const results: string[] = [];
+  const curriculumRoot = resolveCurriculumRoot();
 
   function walk(dir: string) {
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -60,9 +82,8 @@ export function scanKnowledgeCardFiles(): string[] {
       }
       if (!entry.name.endsWith(".md")) continue;
       if (entry.name.startsWith("_")) continue;
-      const relative = path
-        .relative(resolveCurriculumRoot(), full)
-        .replace(/\\/g, "/");
+      const relative = path.relative(curriculumRoot, full).replace(/\\/g, "/");
+      if (!isSafeCurriculumRelativePath(relative)) continue;
       results.push(relative);
     }
   }
