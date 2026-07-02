@@ -68,10 +68,11 @@ export function EstateCollectionRoomEngine({
 
   useEffect(() => {
     reload();
-    if (!adapter.updatedEventName) return;
+    const eventName = adapter.updatedEventName;
+    if (!eventName) return;
     const onUpdate = () => reload();
-    window.addEventListener(adapter.updatedEventName, onUpdate);
-    return () => window.removeEventListener(adapter.updatedEventName, onUpdate);
+    window.addEventListener(eventName, onUpdate);
+    return () => window.removeEventListener(eventName, onUpdate);
   }, [adapter, reload]);
 
   useEffect(() => {
@@ -279,11 +280,7 @@ export function EstateCollectionRoomEngine({
                         displayStyle={display.style}
                         card={display.card}
                         removeLabel={removeLabel}
-                        onEdit={
-                          adapter.getItemCapture || adapter.saveItem
-                            ? () => beginEdit(item.id)
-                            : undefined
-                        }
+                        onEdit={() => beginEdit(item.id)}
                         onToggleFavorite={
                           adapter.toggleFavorite
                             ? () => {
