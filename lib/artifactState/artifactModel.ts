@@ -2,6 +2,7 @@
  * Artifact state — create, update, resolve status.
  */
 
+import type { AppSection } from "@/lib/companionUi";
 import type { CreateWorkflowState } from "@/lib/createWorkflow";
 import { resolvedTypeLabel } from "@/lib/createWorkflow";
 import {
@@ -29,8 +30,9 @@ export function createEmptyArtifact(
   opts?: { workflowSessionId?: string | null },
 ): Artifact {
   const now = new Date().toISOString();
+  const id = newId("artifact");
   return {
-    id: newId("artifact"),
+    id,
     type,
     title: type,
     status: "exploring",
@@ -45,8 +47,10 @@ export function createEmptyArtifact(
     finalizedAt: null,
     workflowSessionId: opts?.workflowSessionId ?? null,
     intelligence: {
+      id,
+      createdAt: now,
       originatedFromKind: "conversation",
-      intelligenceMeta: { artifactType: type },
+      intelligenceMeta: { content: { artifactType: type } },
     },
   };
 }
@@ -131,8 +135,10 @@ export function artifactFromWorkflow(
     };
   });
 
+  const artifactId = opts?.existing?.id ?? newId("artifact");
+  const createdAt = opts?.existing?.createdAt ?? new Date().toISOString();
   const artifact: Artifact = {
-    id: opts?.existing?.id ?? newId("artifact"),
+    id: artifactId,
     type,
     title: workspaceV2DisplayTitle(workflow),
     status: resolveArtifactStatus({
@@ -148,13 +154,15 @@ export function artifactFromWorkflow(
     pausedFromSection: opts?.existing?.pausedFromSection ?? null,
     pauseReason: opts?.existing?.pauseReason ?? null,
     revisitSectionIds: opts?.existing?.revisitSectionIds ?? [],
-    createdAt: opts?.existing?.createdAt ?? new Date().toISOString(),
+    createdAt,
     updatedAt: new Date().toISOString(),
     finalizedAt: opts?.existing?.finalizedAt ?? null,
     workflowSessionId: workflow.sessionId ?? opts?.existing?.workflowSessionId ?? null,
     intelligence: opts?.existing?.intelligence ?? {
+      id: artifactId,
+      createdAt,
       originatedFromKind: "conversation",
-      intelligenceMeta: { artifactType: type },
+      intelligenceMeta: { content: { artifactType: type } },
     },
   };
 

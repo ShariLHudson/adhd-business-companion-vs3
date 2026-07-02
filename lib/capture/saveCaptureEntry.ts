@@ -87,6 +87,7 @@ function persistCapture(
         title: generateEntryTitle(body),
         sourcePage: "capture_system",
         type: "journal",
+        attachments: [],
       });
       if (!ok || !entry) return { ok: false };
       return { ok: true, recordId: entry.id };
