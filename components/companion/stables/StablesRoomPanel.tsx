@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode, type RefObject } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { EstateRoomVisitChrome } from "@/components/companion/estate/EstateRoomVisitChrome";
 import { StablesRoomShell } from "@/components/companion/stables/StablesRoomShell";
 import { StablesExperienceRail } from "@/components/companion/stables/StablesExperienceRail";
@@ -22,7 +22,6 @@ export type { StablesLearningChatTurn };
 type Props = {
   thread: ReactNode;
   footer: ReactNode;
-  inputRef?: RefObject<HTMLTextAreaElement | null>;
   onStablesLearningChat?: (turn: StablesLearningChatTurn) => void;
   conversationScrollKey?: string | number;
   onInvitationSelect: (item: EstateRoomInvitationItem) => void;
@@ -34,7 +33,6 @@ type Props = {
 export function StablesRoomPanel({
   thread,
   footer,
-  inputRef,
   onStablesLearningChat,
   conversationScrollKey,
   onInvitationSelect,
@@ -57,11 +55,13 @@ export function StablesRoomPanel({
   };
 
   const handleInvitation = (item: EstateRoomInvitationItem) => {
-    if (item.action.kind === "stables-experience") {
+    const action = item.action;
+    if (action.kind === "stables-experience") {
+      const { experienceId } = action;
       setRoomState((prev) =>
         reduceStablesRoomState(prev, {
           type: "select_experience",
-          experienceId: item.action.experienceId,
+          experienceId,
         }),
       );
       return;
@@ -104,7 +104,6 @@ export function StablesRoomPanel({
         roomId="stables"
         thread={thread}
         footer={footer}
-        inputRef={inputRef}
         activityEngaged={activityEngaged}
         conversationStarted={conversationStarted}
         panelClassName="stables-room__chat-panel"

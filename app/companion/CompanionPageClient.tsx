@@ -17183,7 +17183,6 @@ export default function CompanionPageClient() {
                 onConversationStart={handleEstateConversationStart}
                 todaysPath={momentumBuilderRoomExperience?.todaysPath ?? null}
                 celebrationKind={momentumBuilderRoomExperience?.celebration ?? null}
-                inputRef={inputRef}
                 thread={
                   <>
                     <SimpleChat
@@ -17242,7 +17241,6 @@ export default function CompanionPageClient() {
                 onConversationStart={handleEstateConversationStart}
                 initialOpenDrawerId={instituteInitialDrawerId}
                 onInstituteLearningChat={handleInstituteLearningChat}
-                inputRef={inputRef}
                 thread={
                   <SimpleChat
                     messages={messages}
@@ -17300,7 +17298,6 @@ export default function CompanionPageClient() {
                 onBackHome={navigateToChatCore}
                 conversationStarted={estateConversationStartedSinceVisit}
                 onStablesLearningChat={handleStablesLearningChat}
-                inputRef={inputRef}
                 thread={
                   <SimpleChat
                     messages={messages}

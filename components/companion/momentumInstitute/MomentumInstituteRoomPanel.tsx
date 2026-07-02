@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode, type RefObject } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { EstateRoomVisitChrome } from "@/components/companion/estate/EstateRoomVisitChrome";
 import { MomentumInstituteRoomShell } from "@/components/companion/momentumInstitute/MomentumInstituteRoomShell";
 import { InstituteDrawerWall } from "@/components/companion/momentumInstitute/InstituteDrawerWall";
@@ -32,7 +32,6 @@ export type InstituteLearningChatTurn = {
 type Props = {
   thread: ReactNode;
   footer: ReactNode;
-  inputRef?: RefObject<HTMLTextAreaElement | null>;
   /** Estate Intelligence™ — open a drawer on arrival (Phase 3) */
   initialOpenDrawerId?: string | null;
   onInstituteLearningChat?: (turn: InstituteLearningChatTurn) => void;
@@ -44,7 +43,6 @@ type Props = {
 export function MomentumInstituteRoomPanel({
   thread,
   footer,
-  inputRef,
   initialOpenDrawerId,
   onInstituteLearningChat,
   conversationScrollKey,
@@ -172,7 +170,6 @@ export function MomentumInstituteRoomPanel({
         roomId="momentum-institute"
         thread={thread}
         footer={footer}
-        inputRef={inputRef}
         activityEngaged={activityEngaged}
         panelClassName="momentum-institute-room__chat-panel"
         conversationScrollKey={conversationScrollKey}
