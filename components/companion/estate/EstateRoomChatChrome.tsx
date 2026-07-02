@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode, RefObject } from "react";
+import type { ReactNode } from "react";
 import { WelcomeHomeFrostedChatPanel } from "@/components/companion/WelcomeHomeFrostedChatPanel";
 import { EstateRoomAmbienceToggle } from "@/components/companion/estate/EstateRoomAmbienceToggle";
 
@@ -8,7 +8,6 @@ type Props = {
   roomId: string;
   thread: ReactNode;
   footer: ReactNode;
-  inputRef?: RefObject<HTMLTextAreaElement | null>;
   panelClassName?: string;
   /** Orientation line — e.g. after chat navigation */
   welcomeMessage?: string;
@@ -24,7 +23,6 @@ export function EstateRoomChatChrome({
   roomId,
   thread,
   footer,
-  inputRef,
   panelClassName,
   welcomeMessage,
   showWelcomeLine = false,
@@ -43,7 +41,6 @@ export function EstateRoomChatChrome({
         alwaysShowInput
         thread={thread}
         footer={footer}
-        inputRef={inputRef}
         panelClassName={panelClassName}
         conversationScrollKey={conversationScrollKey}
       />

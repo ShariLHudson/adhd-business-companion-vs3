@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode, RefObject } from "react";
+import type { ReactNode } from "react";
 import { EstateRoomAmbienceToggle } from "@/components/companion/estate/EstateRoomAmbienceToggle";
 import { EstateRoomInvitationPanel } from "@/components/companion/estate/EstateRoomInvitationPanel";
 import { EstateRoomTemplateArrival } from "@/components/companion/estate/EstateRoomTemplateArrival";
@@ -17,7 +17,6 @@ type Props = {
   roomId: string;
   thread: ReactNode;
   footer: ReactNode;
-  inputRef?: RefObject<HTMLTextAreaElement | null>;
   panelClassName?: string;
   conversationScrollKey?: string | number;
   onInvitationSelect: (item: EstateRoomInvitationItem) => void;
@@ -37,7 +36,6 @@ export function EstateRoomVisitChrome({
   roomId,
   thread,
   footer,
-  inputRef,
   panelClassName,
   conversationScrollKey,
   onInvitationSelect,
@@ -96,7 +94,6 @@ export function EstateRoomVisitChrome({
         }
         thread={thread}
         footer={footer}
-        inputRef={inputRef}
         panelClassName={panelClassName}
         conversationScrollKey={conversationScrollKey}
       />

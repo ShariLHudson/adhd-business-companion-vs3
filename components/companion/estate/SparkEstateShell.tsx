@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode, RefObject } from "react";
+import type { ReactNode } from "react";
 import { EstatePresence } from "@/components/companion/estate/EstatePresence";
 import { EstateRoomChatChrome } from "@/components/companion/estate/EstateRoomChatChrome";
 import { EstateRoomFullBleedBackground } from "@/components/companion/estate/EstateRoomFullBleedBackground";
@@ -21,7 +21,6 @@ export type SparkEstateShellProps = {
   section?: AppSection;
   thread: ReactNode;
   footer: ReactNode;
-  inputRef?: RefObject<HTMLTextAreaElement | null>;
   conversationScrollKey?: string | number;
   activityEngaged?: boolean;
   conversationStarted?: boolean;
@@ -65,7 +64,6 @@ export function SparkEstateShell({
   section = "home",
   thread,
   footer,
-  inputRef,
   conversationScrollKey,
   activityEngaged = false,
   conversationStarted = false,
@@ -78,7 +76,6 @@ export function SparkEstateShell({
 }: SparkEstateShellProps) {
   const shellState = resolveEstateShellState(placeId, {
     placeId,
-    section,
     profileEstateMode,
     explicitActivityRequested,
     userIntent,
@@ -122,7 +119,6 @@ export function SparkEstateShell({
           roomId={resolvedPlaceId}
           thread={thread}
           footer={footer}
-          inputRef={inputRef}
           welcomeMessage={welcomeMessage}
           showWelcomeLine={Boolean(welcomeMessage)}
           panelClassName={panelClassName}
@@ -134,7 +130,6 @@ export function SparkEstateShell({
           livingPlaceMode={livingPlaceMode}
           thread={thread}
           footer={footer}
-          inputRef={inputRef}
           activityEngaged={activityEngaged}
           conversationStarted={conversationStarted}
           onInvitationSelect={onInvitationSelect ?? (() => {})}
