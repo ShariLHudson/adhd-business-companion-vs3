@@ -1126,6 +1126,7 @@ import { isPlanMyDaySection } from "@/lib/planMyDayRouting";
 import { PLAN_MY_DAY_MORNING_BG } from "@/lib/planMyDay/morningRoom";
 import { GROWTH_ROOM_BG, JOURNAL_ROOM_BG, EVIDENCE_VAULT_ROOM_BG, PORTFOLIO_ROOM_BG, ESTATE_PROFILE_ROOM_BG } from "@/lib/growth/growthRoom";
 import {
+  isProfileEstateMenuAction,
   isProfileEstateRoomId,
   profileEstateRoomBackgroundImage,
   profileEstateRoomForMenuAction,
@@ -6319,8 +6320,6 @@ export default function CompanionPageClient() {
       section === "wins-this-week" ||
       section === "evidence-bank" ||
       section === "growth-greenhouse" ||
-      section === "growth-library" ||
-      section === "growth-reports" ||
       section === "confidence-vault" ||
       section === "my-journey"
     ) {
@@ -7639,9 +7638,8 @@ export default function CompanionPageClient() {
       return;
     }
 
-    const profileRoom = profileEstateRoomForMenuAction(actionId);
-    if (profileRoom) {
-      openProfileEstateRoomFromMenu(profileRoom, {
+    if (isProfileEstateMenuAction(actionId)) {
+      openProfileEstateRoomFromMenu(profileEstateRoomForMenuAction(actionId), {
         emphasizeTimeline: actionId === "progress-timeline",
       });
       return;
@@ -16998,7 +16996,6 @@ export default function CompanionPageClient() {
                 profileEstateMode={sparkEstateShellProfileMode}
                 welcomeMessage={profileEstateWelcomeMessage}
                 conversationScrollKey={estateChatScrollKey}
-                inputRef={inputRef}
                 activityEngaged={estateConservatoryEngaged}
                 conversationStarted={estateConversationStartedSinceVisit}
                 onInvitationSelect={handleEstateRoomInvitationSelect}
@@ -17133,7 +17130,6 @@ export default function CompanionPageClient() {
                       hideEmptyState
                       isLoading={isLoading}
                       thinkingMessage={visibleThinkingMessage}
-                awaitingUserConfirmation={chatAwaitingConfirmation}
                       awaitingUserConfirmation={chatAwaitingConfirmation}
                       thinkingEmotion={displayEmotion}
                       workspacePanel={workspacePanel}
@@ -17197,7 +17193,6 @@ export default function CompanionPageClient() {
                       hideEmptyState
                       isLoading={isLoading}
                       thinkingMessage={visibleThinkingMessage}
-                awaitingUserConfirmation={chatAwaitingConfirmation}
                       awaitingUserConfirmation={chatAwaitingConfirmation}
                       thinkingEmotion={displayEmotion}
                       workspacePanel={workspacePanel}
@@ -17425,7 +17420,6 @@ export default function CompanionPageClient() {
                 workspaceActiveBeside={workspaceActiveBeside}
                 isThinking={isLoading && !homeCalm}
                 thinkingMessage={visibleThinkingMessage}
-                awaitingUserConfirmation={chatAwaitingConfirmation}
                 welcomeLine={null}
                 onDismissWelcome={undefined}
                 primaryQuestion={null}
@@ -17466,7 +17460,7 @@ export default function CompanionPageClient() {
                   hideEmptyState
                   isLoading={isLoading}
                   thinkingMessage={visibleThinkingMessage}
-                awaitingUserConfirmation={chatAwaitingConfirmation}
+                  awaitingUserConfirmation={chatAwaitingConfirmation}
                   thinkingEmotion={displayEmotion}
                   workspacePanel={workspacePanel}
                   workspaceActiveBeside={workspaceActiveBeside}
