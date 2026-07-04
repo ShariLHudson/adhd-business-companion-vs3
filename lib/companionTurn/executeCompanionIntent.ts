@@ -6,6 +6,7 @@ import type { CaptureType } from "@/lib/capture/types";
 import type { EstateCommandDecision } from "@/lib/estateIntelligence/estateCommandRouter";
 import type { EstateActionExecutionPlan } from "@/lib/estate/decisionKernel";
 import type { MemoryLibraryTargetTab } from "@/lib/estate/decisionKernel/types";
+import type { EstateRoomAction } from "@/lib/estate/roomContext/types";
 import type { ClassifiedCompanionIntent } from "./types";
 import { companionIntentHandledByKernel } from "./classifyCompanionIntent";
 
@@ -22,6 +23,7 @@ export type CompanionIntentExecutor = {
   onNavigatePlace: (input: {
     userText: string;
     command: EstateCommandDecision;
+    navigationLine?: string;
   }) => void;
   onSoundscape: (input: {
     categoryId: string;
@@ -37,6 +39,12 @@ export type CompanionIntentExecutor = {
     userText: string;
     line: string;
     captureOptions: CaptureType[];
+  }) => void;
+  onRoomAction: (input: {
+    userText: string;
+    currentPlaceId: string;
+    roomAction: EstateRoomAction;
+    reply: string;
   }) => void;
   onClearPlaceMenu?: () => void;
 };
@@ -60,6 +68,7 @@ function executePlan(
       executor.onNavigatePlace({
         userText: plan.userText,
         command: plan.command,
+        navigationLine: plan.navigationLine,
       });
       return;
     case "soundscape":
@@ -84,6 +93,15 @@ function executePlan(
         userText: plan.userText,
         line: plan.line,
         captureOptions: plan.captureOptions,
+      });
+      return;
+    case "room-action":
+      executor.onClearPlaceMenu?.();
+      executor.onRoomAction({
+        userText: plan.userText,
+        currentPlaceId: plan.currentPlaceId,
+        roomAction: plan.roomAction,
+        reply: plan.reply,
       });
       return;
     case "noop":

@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 import {
   buildCoachingFallbackResponse,
   classifyCoachingFallbackKind,
-  COACHING_FALLBACK_LEAD,
   isCoachingFallbackNeeded,
 } from "./coachingFallback";
+import { BRIDGE_CONTINUATION_LINE } from "./bridgeResponderGuard";
 
 describe("coachingFallback", () => {
   it("classifies quit-temptation prompts", () => {
@@ -23,12 +23,12 @@ describe("coachingFallback", () => {
     ).toBe("prioritization_overload");
   });
 
-  it("builds fallback with lead copy and a gentle question", () => {
+  it("builds fallback with contextual question for prioritization overload", () => {
     const response = buildCoachingFallbackResponse(
       "I have fifteen things I could work on today and every one of them feels important.",
     );
-    expect(response).toContain(COACHING_FALLBACK_LEAD);
     expect(response).toMatch(/one of those today/i);
+    expect(response).not.toContain(BRIDGE_CONTINUATION_LINE);
   });
 
   it("detects empty or filtered model output", () => {

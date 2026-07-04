@@ -5,14 +5,22 @@
 
 import { recommendedSoundscapeForLegacyCategory } from "@/lib/soundscapes";
 import type { EstateCommandDecision } from "@/lib/estateIntelligence/estateCommandRouter";
+import type { ImpliedEstatePlaceMatch } from "../impliedEstatePlaceMatch";
 import type { CaptureType } from "@/lib/capture/types";
 import type { EstateActionResult, MemoryLibraryTargetTab } from "./types";
+import type { EstateRoomAction } from "../roomContext/types";
 
 export type EstateActionExecutionPlan =
   | { type: "noop" }
   | { type: "chat"; userText: string }
   | { type: "chat-local-reply"; userText: string; reply: string }
-  | { type: "navigate-place"; userText: string; command: EstateCommandDecision }
+  | {
+      type: "navigate-place";
+      userText: string;
+      command: EstateCommandDecision;
+      navigationLine?: string;
+      impliedPlaceMatch?: ImpliedEstatePlaceMatch;
+    }
   | { type: "navigate-memory"; userText: string; tab: MemoryLibraryTargetTab }
   | {
       type: "capture-write";
@@ -36,6 +44,13 @@ export type EstateActionExecutionPlan =
       userText: string;
       line: string;
       captureOptions: CaptureType[];
+    }
+  | {
+      type: "room-action";
+      userText: string;
+      currentPlaceId: string;
+      roomAction: EstateRoomAction;
+      reply: string;
     };
 
 export function planEstateActionExecution(
@@ -63,6 +78,8 @@ export function planEstateActionExecution(
         type: "navigate-place",
         userText: result.userText,
         command: result.target.command,
+        navigationLine: result.navigationLine,
+        impliedPlaceMatch: result.impliedPlaceMatch,
       };
     case "CAPTURE":
       return {
@@ -93,6 +110,14 @@ export function planEstateActionExecution(
         userText: result.userText,
         line: result.line,
         captureOptions: result.captureOptions,
+      };
+    case "ROOM_ACTION":
+      return {
+        type: "room-action",
+        userText: result.userText,
+        currentPlaceId: result.currentPlaceId,
+        roomAction: result.roomAction,
+        reply: result.immediateReply,
       };
     default: {
       const _exhaustive: never = result;

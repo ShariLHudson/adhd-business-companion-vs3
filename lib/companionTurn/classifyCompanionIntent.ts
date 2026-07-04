@@ -2,6 +2,7 @@
  * Step 1 — classify member input into exactly one routing kind.
  */
 
+import { shouldRouteThroughEstateKernel } from "@/lib/estate/estateKernelGate";
 import { isInformationalChatTurn } from "@/lib/chatFastPath/chatTurnGuarantee";
 import {
   planEstateActionExecution,
@@ -27,6 +28,7 @@ function kindFromPlan(plan: EstateActionExecutionPlan): CompanionIntentKind {
     case "chat-local-reply":
     case "place-menu":
     case "capture-menu":
+    case "room-action":
     case "noop":
       return "CHAT";
     default: {
@@ -52,7 +54,11 @@ export function classifyCompanionIntent(
     };
   }
 
-  if (input.forceChat || isInformationalChatTurn(userText)) {
+  const estateKernelRequired = shouldRouteThroughEstateKernel(userText);
+  const forceChat =
+    (input.forceChat || isInformationalChatTurn(userText)) && !estateKernelRequired;
+
+  if (forceChat) {
     return {
       kind: "CHAT",
       userText,

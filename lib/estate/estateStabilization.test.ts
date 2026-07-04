@@ -43,13 +43,24 @@ describe("estate stabilization acceptance", () => {
     }
   });
 
-  it("Test 4: explicit take me to → immediate navigation", () => {
+  it("Test 4: explicit take me to ambiguous place → numbered choices (no guess)", () => {
     const turn = evaluateEstatePlaceTurn({
       userText: "Take me to Reading Nook",
     });
+    expect(turn.type).toBe("offer");
+    if (turn.type === "offer") {
+      expect(turn.placeIds.length).toBeGreaterThanOrEqual(2);
+      expect(turn.line).toMatch(/reading nook|which one/i);
+    }
+  });
+
+  it("Test 4b: explicit take me to unambiguous place → immediate navigation", () => {
+    const turn = evaluateEstatePlaceTurn({
+      userText: "Take me to the Music Room",
+    });
     expect(turn.type).toBe("navigate");
     if (turn.type === "navigate") {
-      expect(turn.command.roomId ?? turn.command.entryId).toBe("reading-nook");
+      expect(turn.command.roomId ?? turn.command.entryId).toBe("music-room");
     }
   });
 
@@ -113,7 +124,7 @@ describe("estate stabilization acceptance", () => {
     });
     expect(turn.type).toBe("offer");
     if (turn.type === "offer") {
-      expect(turn.line).toMatch(/A few (?:quieter )?places on the Estate/);
+      expect(turn.line).toMatch(/A few (?:quieter )?places on the Estate|A few ideas:/i);
       expect(turn.placeIds).toContain("reading-nook");
     }
   });

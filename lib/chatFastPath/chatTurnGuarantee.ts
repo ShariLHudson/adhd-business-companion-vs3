@@ -2,9 +2,15 @@
  * Chat turn guarantee — every member message gets a reply; loading never sticks.
  */
 
-import { buildCoachingFallbackResponse } from "@/lib/sparkConversation/coachingFallback";
+import {
+  buildContextualChatFallback,
+  type RuntimeRecoveryInput,
+} from "@/lib/sparkConversation/coachingFallback";
+import { shouldRouteThroughEstateKernel } from "@/lib/estate/estateKernelGate";
 import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
 import { isHowToLearningQuestion } from "@/lib/howToLearningIntelligence";
+import { conversationRecentlyShowedRecovery } from "./recoveryDedup";
+import { sanitizeBridgeFromReply } from "@/lib/sparkConversation/bridgeResponderGuard";
 
 /** Hard ceiling — fallback if API/stream does not finish in time. */
 export const CHAT_COMPLETION_TIMEOUT_MS = 28_000;
@@ -21,6 +27,7 @@ const PLAN_DAY_INFORMATIONAL_RE =
 export function isInformationalChatTurn(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (shouldRouteThroughEstateKernel(t)) return false;
   if (PLAN_DAY_INFORMATIONAL_RE.test(t)) return true;
   if (INFORMATIONAL_CHAT_RE.test(t)) return true;
   if (isHowToLearningQuestion(t)) return true;
@@ -28,12 +35,24 @@ export function isInformationalChatTurn(text: string): boolean {
   return false;
 }
 
-export function buildFailSafeChatReply(userText: string): string {
+export function buildFailSafeChatReply(
+  userText: string,
+  memory?: Pick<RuntimeRecoveryInput, "lastAssistantText" | "priorUserText">,
+  messages?: ReadonlyArray<{ role: string; content: string }>,
+): string {
   const trimmed = userText.trim();
   if (!trimmed) {
     return "I'm here — what would help most right now?";
   }
-  return buildCoachingFallbackResponse(trimmed);
+  const input: RuntimeRecoveryInput = {
+    userText: trimmed,
+    lastAssistantText: memory?.lastAssistantText,
+    priorUserText: memory?.priorUserText,
+  };
+  if (messages && conversationRecentlyShowedRecovery(messages)) {
+    return sanitizeBridgeFromReply(buildContextualChatFallback(input), trimmed);
+  }
+  return sanitizeBridgeFromReply(buildContextualChatFallback(input), trimmed);
 }
 
 export async function fetchCompanionChatWithTimeout(

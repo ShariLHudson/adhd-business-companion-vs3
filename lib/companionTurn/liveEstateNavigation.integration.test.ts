@@ -49,6 +49,7 @@ describe("live estate navigation chain", () => {
         onAssistantLine: () => {},
         onPlaceMenu: () => {},
         onCaptureMenu: () => {},
+        onRoomAction: () => {},
       });
       expect(handled).toBe(true);
       expect(navigated).toBe(true);

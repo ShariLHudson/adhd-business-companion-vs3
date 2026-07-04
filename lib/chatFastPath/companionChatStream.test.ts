@@ -40,4 +40,18 @@ describe("companionChatStream", () => {
     expect(result.fullText).toBe("Hi there");
     expect(result.relationshipResponseId).toBe("rel-1");
   });
+
+  it("times out when stream stalls", async () => {
+    const stream = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        controller.enqueue(new TextEncoder().encode(JSON.stringify({ delta: "Hi" }) + "\n"));
+      },
+    });
+    const res = new Response(stream, {
+      headers: { "content-type": "application/x-ndjson" },
+    });
+    await expect(
+      consumeCompanionChatStream(res, () => undefined, { timeoutMs: 50 }),
+    ).rejects.toMatchObject({ message: expect.stringContaining("stream-timeout") });
+  });
 });

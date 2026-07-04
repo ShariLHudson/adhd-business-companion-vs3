@@ -13,6 +13,10 @@ import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
 import { shouldEnterUniversalCreation } from "@/lib/universalCreation";
 import { evaluateImpliedNeed } from "@/lib/intentAwareConversation/impliedNeed";
 import { loadImpliedNeedSession } from "@/lib/intentAwareConversation/impliedNeedSession";
+import {
+  isLikelyMenuSelectionInput,
+  loadPendingChoice,
+} from "@/lib/pendingChoice";
 import { isRelationshipConversation } from "@/lib/intentAwareConversation/routingGate";
 import {
   evaluateSparkDecisionEngine,
@@ -141,6 +145,18 @@ function classifyPrimaryConversationTurnLegacy(
 
   if (loadImpliedNeedSession()) {
     return buildDecision("IMPLIED_NEED", "high", "active implied need menu continuation");
+  }
+
+  const pendingChoice = loadPendingChoice();
+  if (
+    pendingChoice?.choices.length &&
+    isLikelyMenuSelectionInput(text, pendingChoice.choices.length)
+  ) {
+    return buildDecision(
+      "DIRECT_COMMAND",
+      "high",
+      "pending numbered menu selection — not a new conversation",
+    );
   }
 
   if (directCommand(text, input.lastAssistantText)) {

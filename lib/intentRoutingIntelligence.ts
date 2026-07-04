@@ -17,6 +17,20 @@ import {
   estateRoomDisplayName,
 } from "./estateMemory/estateSectionMap";
 import { buildEstateInvitation } from "./estateIntelligence/estateRouter";
+import {
+  estateClearMyMindInvite,
+  estateGenericTransitionInvite,
+  estateTransitionInviteForRoom,
+} from "./estate/estateTransitionInviteCopy";
+import {
+  detectRegistryArtifact,
+  isRegistryArtifactExecution,
+  type RegistryArtifactKind,
+} from "./artifactRegistry";
+import {
+  buildRegistryArtifactOfferLine,
+  CREATE_EXPERIENCE_ARRIVAL_PROMPT,
+} from "./createExperience/createExperienceRouting";
 import { estateRegistryEntryById } from "./estateIntelligence/estateRegistry";
 import {
   detectEcosystemProblemIntent,
@@ -34,12 +48,6 @@ import {
   secondaryFeatureMatchForRoute,
   type OverwhelmTodayRoute,
 } from "./overwhelmTodayRouting";
-import {
-  buildRegistryArtifactOfferLine,
-  detectRegistryArtifact,
-  isRegistryArtifactExecution,
-  type RegistryArtifactKind,
-} from "./artifactRegistry";
 import { isKnowledgeQuestion } from "./knowledgeIntelligence";
 import { shouldSuppressRelationshipIntelligenceForUserText } from "./relationshipIntelligenceBoundaries";
 import {
@@ -48,6 +56,10 @@ import {
   shouldSuppressReflectionForHonorIntent,
   type HonorTheirIntentVerdict,
 } from "@/lib/honorTheirIntent";
+import {
+  evaluateIntentAwareConversation,
+  intentAwareConversationHintForChat,
+} from "@/lib/intentAwareConversation";
 import {
   containsVisualStructurePhrase,
   isVisualStructureExecution,
@@ -151,6 +163,10 @@ export type IntentRoutingDecision = {
   featureLabel: string | null;
   /** Honor Their Intent — constitutional arrival mode */
   honorTheirIntent: HonorTheirIntentVerdict;
+  /** Intent-aware conversation depth and purpose */
+  intentAwareConversation: import("@/lib/intentAwareConversation").IntentAwareEvaluation;
+  /** Original member utterance for routing gate hints */
+  memberText: string;
 };
 
 export type ArtifactKind = RegistryArtifactKind;
@@ -235,7 +251,7 @@ function buildCreateArtifactOffer(
   const section = createSectionForArtifact(kind);
   return {
     section,
-    buttonLabel: section === "client-avatars" ? "Open Client Avatar" : "Step into Creative Studio™",
+    buttonLabel: section === "client-avatars" ? "Open Client Avatar" : "Open Create",
     line: buildRegistryArtifactOfferLine(kind, execCategory),
   };
 }
@@ -414,22 +430,22 @@ function buildNavigationLine(
 
   if (section === "brain-dump" || category === "organize") {
     return room
-      ? `Clear My Mind™ may help unload what's crowding your head. Would you like to step in together?`
-      : `We can sort what's in your head together. Would you like me to take us there?`;
+      ? estateClearMyMindInvite()
+      : `We can sort what's in your head together. ${estateGenericTransitionInvite()}`;
   }
   if (section === "decision-compass" || category === "decide") {
-    return `The Decision Compass™ was designed for situations like this. Would you like me to guide you there?`;
+    return `The Decision Compass was designed for situations like this. Want to head there together?`;
   }
   if (section === "plan-my-day" || category === "plan") {
-    return `We can plan this here, or step into Momentum Builder™ together. Would you like me to take us there?`;
+    return `We can plan this here, or step into Momentum Builder together. ${estateGenericTransitionInvite()}`;
   }
   if (section === "projects" && SOP_BUILD_RE.test(userText)) {
-    return `The Creative Studio™ is a good place to build your SOP together. Would you like me to take us there?`;
+    return buildRegistryArtifactOfferLine("sop", category === "build" ? "build" : "execute");
   }
   if (section === "projects") {
     return room
-      ? `${room} may be the right place for this. Would you like me to take us there?`
-      : `Would you like me to take us to the right workspace for this?`;
+      ? estateTransitionInviteForRoom(room)
+      : "Let's get that moving in Momentum.";
   }
   if (section === "content-generator" || section === CREATE_ARTIFACT_SECTION) {
     if (containsVisualStructurePhrase(userText)) {
@@ -439,11 +455,11 @@ function buildNavigationLine(
       const kind = detectArtifactRequest(userText)!;
       return buildCreateArtifactOffer(kind, category).line;
     }
-    return `The Creative Studio™ is the perfect place in the Estate for writing newsletters, emails, blog posts, presentations, workshops, and other content. Would you like me to take us there?`;
+    return CREATE_EXPERIENCE_ARRIVAL_PROMPT;
   }
   return room
-    ? `Would you like me to take us to ${room}?`
-    : `Would you like me to take us there?`;
+    ? estateTransitionInviteForRoom(room)
+    : estateGenericTransitionInvite();
 }
 
 function buildClarificationPrompt(): string {
@@ -770,12 +786,20 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     userText: text,
     overwhelmed,
   });
+  const intentAware = evaluateIntentAwareConversation({
+    userText: text,
+    currentTurn: 0,
+    overwhelmed,
+    emotionalState: input.emotionalState,
+    workspace: input.workspace,
+  });
   const honorAllowsRelationship =
     honorIntent.arrivalMode === "come_to_be_helped" &&
     !honorIntent.emergentNeedDetected;
   const suppressRelationshipIntelligence =
-    shouldSuppressRelationshipIntelligenceForUserText(text) &&
-    !honorAllowsRelationship;
+    (shouldSuppressRelationshipIntelligenceForUserText(text) &&
+      !honorAllowsRelationship) ||
+    intentAware.honorTaskFocus;
   const suppressDeepIntelligence =
     suppressRelationshipIntelligence || learnFastPath;
 
@@ -835,6 +859,8 @@ export function resolveIntentRouting(input: IntentRoutingInput): IntentRoutingDe
     stayHereLabel: STAY_HERE_LABEL,
     featureLabel: offer ? featureLabelForSection(offer.section) : null,
     honorTheirIntent: honorIntent,
+    intentAwareConversation: intentAware,
+    memberText: text,
   };
 
   decision.suppressRelationshipLead =
@@ -884,7 +910,7 @@ export function intentRoutingHintForChat(
           "EXECUTE OVERRIDE (P0.7.3): Direct action only — minimal clarification or Create redirect.",
           "SKIP relationship observations, observation engine, and reflection-first openers entirely.",
           "FORBIDDEN: I've noticed…, behavioral analysis, ADHD pattern explanations, user history recap.",
-          "ALLOWED: 'I can help with that.', 'Would you like me to take us to the Creative Studio™?', 'What kind of email is it?'",
+          "ALLOWED: 'Absolutely. Let's head to Create.', 'I've opened a new SOP. What process are we documenting?', 'What kind of email is it?'",
         ].join("\n")
       : null,
     decision.suppressRelationshipLead && !decision.suppressRelationshipIntelligence
@@ -910,6 +936,10 @@ export function intentRoutingHintForChat(
       ? `If user accepts, open ${decision.continuity.section} with context: ${decision.continuity.initialPrompt.slice(0, 160)}`
       : null,
     honorTheirIntentHintForChat(decision.honorTheirIntent),
+    intentAwareConversationHintForChat(
+      decision.intentAwareConversation,
+      decision.memberText,
+    ),
   ].filter(Boolean);
 
   return lines.length > 1 ? lines.join("\n") : null;

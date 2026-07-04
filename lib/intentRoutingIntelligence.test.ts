@@ -23,7 +23,7 @@ describe("intentRoutingIntelligence", () => {
     expect(decision.workspaceOffer?.buttonLabel).toBe("Open Create");
     expect(decision.surfaceOfferUi).toBe(true);
     expect(decision.navigationLine).toMatch(/Create/i);
-    expect(decision.navigationLine).toMatch(/Would you like to open/i);
+    expect(decision.navigationLine).toMatch(/Create is the right place/i);
     expect(decision.suppressRelationshipIntelligence).toBe(true);
     expect(decision.suppressRelationshipLead).toBe(true);
     expect(decision.continuity?.projectType).toBe("SOP");
@@ -263,7 +263,7 @@ describe("intentRoutingIntelligence", () => {
       expect(decision.category).toBe("execute");
       expect(decision.routeMode).toBe("feature_offer");
       expect(decision.surfaceOfferUi).toBe(true);
-      expect(decision.navigationLine).toMatch(/I can help with that/i);
+      expect(decision.navigationLine).toMatch(/On it — Create/i);
       expect(decision.navigationLine).toMatch(/Create/i);
     });
 

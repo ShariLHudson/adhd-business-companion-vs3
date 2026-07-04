@@ -36,19 +36,13 @@ describe("frictionlessActionLayer", () => {
     expect(decision.pendingAction?.target).toBe("focus-audio");
   });
 
-  it("routes I need to focus to focus_support with relationship suppressed", () => {
+  it("routes I need to focus to discovery before coaching or navigation", () => {
     const decision = resolveFrictionlessAction({ userText: "I need to focus" });
-    expect(decision.category).toBe("focus_support");
+    expect(decision.category).toBe("estate_discovery");
     expect(decision.suppressRelationship).toBe(true);
-    expect(decision.suppressReflectionFirst).toBe(true);
-    expect(decision.localReply).toMatch(/one focus thread/i);
-    expect(decision.localReply).not.toMatch(/I've noticed/i);
-    expect(shouldSuppressRelationshipForFrictionless(decision)).toBe(true);
-    expect(
-      buildRelationshipLeadParagraph("I need to focus", new Date(), {
-        suppressForRouting: true,
-      }),
-    ).toBeNull();
+    expect(decision.localReply).toMatch(/making it hardest to focus/i);
+    expect(decision.immediateEstateCoachingOpen).toBeUndefined();
+    expect(decision.immediateCreateOpen).toBeUndefined();
   });
 
   it("routes breathless anxiety to emotional_regulation without productivity framing", () => {
@@ -88,16 +82,15 @@ describe("frictionlessActionLayer", () => {
     expect(loadFrictionlessPending()?.target).toBe("focus-audio");
   });
 
-  it("executes yes after sales funnel offer with content-generator target", () => {
+  it("routes sales funnel through universal creation before Create", () => {
     const decision = resolveFrictionlessAction({
       userText: "I need to create a sales funnel",
       currentTurn: 5,
     });
-    saveFrictionlessPending(decision.pendingAction);
-    const cont = resolveFrictionlessContinuation("yes", loadFrictionlessPending()!, 6);
-    expect(cont?.execute).toBe(true);
-    expect(loadFrictionlessPending()?.target).toBe("content-generator");
-    expect(loadFrictionlessPending()?.artifactType).toBe("Sales Funnel");
+    expect(decision.category).toBe("universal_creation");
+    expect(decision.immediateCreateOpen).toBeUndefined();
+    expect(decision.localReply).toMatch(/understand what you're building|reason you're creating/i);
+    expect(decision.pendingAction).toBeNull();
   });
 
   it("executes yes after Focus Audio offer without treating as new conversation", () => {
@@ -136,30 +129,77 @@ describe("frictionlessActionLayer", () => {
     expect(cont).toBeNull();
   });
 
-  it("routes write an email to direct_action with relationship suppressed", () => {
+  it("routes write an email through universal creation before Create", () => {
     const decision = resolveFrictionlessAction({
       userText: "write an email",
       currentTurn: 2,
     });
-    expect(decision.category).toBe("direct_action");
+    expect(decision.category).toBe("universal_creation");
     expect(decision.suppressRelationship).toBe(true);
-    expect(decision.workspaceOffer?.section).toBe("content-generator");
-    expect(decision.pendingAction).toMatchObject({
-      target: "content-generator",
-      artifactType: "Email",
-      initialPrompt: "write an email",
-    });
-    expect(decision.localReply).toMatch(/Create|email/i);
+    expect(decision.immediateCreateOpen).toBeUndefined();
+    expect(decision.localReply).toMatch(/email|reason/i);
   });
 
-  it("routes help me decide to decision_support with compass offer", () => {
+  it("routes help me create an SOP through universal creation before Create", () => {
+    const decision = resolveFrictionlessAction({
+      userText: "help me create an SOP",
+      currentTurn: 3,
+    });
+    expect(decision.category).toBe("universal_creation");
+    expect(decision.localReply).toMatch(/understand what you're trying to build/i);
+    expect(decision.immediateCreateOpen).toBeUndefined();
+  });
+
+  it("routes new project creation to Create not Momentum", () => {
+    const decision = resolveFrictionlessAction({
+      userText: "create a new project",
+      currentTurn: 4,
+    });
+    expect(decision.immediateCreateProjectOpen?.experienceId).toBe("create");
+    expect(decision.immediateCreateProjectOpen?.estatePlaceId).toBe(
+      "creative-studio",
+    );
+    expect(decision.immediateMomentumOpen).toBeUndefined();
+    expect(decision.localReply).toMatch(/bring that project to life/i);
+  });
+
+  it("routes vague business intent to medium-confidence menu", () => {
+    const decision = resolveFrictionlessAction({
+      userText: "I need to work on my business",
+      currentTurn: 2,
+    });
+    expect(decision.localReply).toMatch(/Which feels right today/i);
+    expect(decision.estateNavigationDisambiguation?.choices).toHaveLength(3);
+    expect(decision.pendingAction).toBeNull();
+  });
+
+  it("routes lost member to low-confidence discovery", () => {
+    const decision = resolveFrictionlessAction({
+      userText: "I don't know where to start",
+      currentTurn: 1,
+    });
+    expect(decision.localReply).toMatch(/figure it out together/i);
+    expect(decision.localReply).toMatch(/making something new/i);
+  });
+
+  it("routes weekly planning to Momentum", () => {
+    const decision = resolveFrictionlessAction({
+      userText: "help me with weekly planning",
+      currentTurn: 4,
+    });
+    expect(decision.immediateMomentumOpen?.section).toBe("projects");
+    expect(decision.localReply).toMatch(/Momentum/i);
+  });
+
+  it("routes help me decide to coaching before compass navigation", () => {
     const decision = resolveFrictionlessAction({
       userText: "help me decide",
       currentTurn: 1,
     });
-    expect(decision.category).toBe("decision_support");
+    expect(decision.category).toBe("estate_coaching");
     expect(decision.suppressRelationship).toBe(true);
-    expect(decision.workspaceOffer?.section).toBe("decision-compass");
+    expect(decision.localReply).toMatch(/Which sounds better/i);
+    expect(decision.immediateEstateCoachingOpen).toBeUndefined();
   });
 
   it("prefers awaiting confirmation pending over misaligned localStorage", () => {
@@ -196,6 +236,36 @@ describe("frictionlessActionLayer", () => {
     expect(cont?.execute).toBe(true);
   });
 
+  it("routes mental fatigue through spark restoration intelligence", () => {
+    const decision = resolveFrictionlessAction({
+      userText: "I keep revising this and nothing is working",
+      currentTurn: 20,
+    });
+    expect(decision.category).toBe("estate_restoration");
+    expect(decision.localReply).not.toMatch(/take a break/i);
+    expect(decision.responseHint).toMatch(/SPARK RESTORATION INTELLIGENCE/i);
+    expect(decision.localReply).toMatch(/Clear My Mind|mind|different|tried/i);
+  });
+
+  it("routes what can Spark do through estate guide", () => {
+    const decision = resolveFrictionlessAction({
+      userText: "What can Spark do?",
+      currentTurn: 2,
+    });
+    expect(decision.category).toBe("estate_guide");
+    expect(decision.localReply).toMatch(/Create|Momentum/i);
+    expect(decision.responseHint).toMatch(/ESTATE GUIDE/i);
+  });
+
+  it("routes room story questions through estate guide", () => {
+    const decision = resolveFrictionlessAction({
+      userText: "Tell me about the Butterfly Conservatory",
+      currentTurn: 3,
+    });
+    expect(decision.category).toBe("estate_guide");
+    expect(decision.localReply).toMatch(/Conservatory/i);
+  });
+
   it("keeps learn fast path out of direct_action execute override", () => {
     const decision = resolveFrictionlessAction({
       userText: "What is a sales funnel?",
@@ -205,5 +275,29 @@ describe("frictionlessActionLayer", () => {
     expect(decision.suppressRelationship).toBe(true);
     expect(decision.intentRouting?.learnFastPath).toBe(true);
     expect(decision.localReply).toBeNull();
+  });
+
+  it("navigates after coaching choice following focus discovery", () => {
+    const discovery = resolveFrictionlessAction({
+      userText: "I need to focus",
+      currentTurn: 1,
+    });
+    const answered = resolveFrictionlessAction({
+      userText: "Too many thoughts",
+      lastAssistantText: discovery.localReply ?? "",
+      currentTurn: 2,
+    });
+    expect(answered.category).toBe("estate_discovery");
+    expect(answered.estateCoachingMenu).toBeDefined();
+
+    const menuReply = answered.localReply ?? "";
+    const picked = resolveFrictionlessAction({
+      userText: "1",
+      lastAssistantText: menuReply,
+      currentTurn: 3,
+    });
+    expect(picked.immediateEstateCoachingOpen?.estatePlaceId).toBe(
+      "clear-my-mind",
+    );
   });
 });

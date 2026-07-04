@@ -43,6 +43,11 @@ import type { EstateRegistryEntry } from "./types";
 import { estateSectionForEntryId } from "@/lib/estateMemory/estateSectionMap";
 import { shouldSuppressEstateIntentWhileVisiting } from "@/lib/estate/estateRoomInConversation";
 import { resolveEstatePlace, shouldNavigateFromResolution } from "@/lib/estate/resolveEstatePlace";
+import { getCanonicalEstatePlaceById } from "@/lib/estate/canonicalEstateRegistry";
+import {
+  isAnotherRoomRequest,
+  isEstateRoomListOrMapRequest,
+} from "@/lib/estate/estateMetaNavigationPhrases";
 import { isConversationOnlyTurn } from "@/lib/estate/estateConversationGuard";
 import { resolveSingleCanonicalPlaceMentionedInText } from "@/lib/estate/estatePlaceIdentityLock";
 
@@ -58,6 +63,7 @@ export type EstateCommandDecision = {
   roomId?: string;
   pendingJourneyEntryIds?: string[];
   clarifyQuestion?: string;
+  backgroundImageOverride?: string | null;
 };
 
 export type EstateCommandRouterInput = {
@@ -119,9 +125,18 @@ function extractBareDestinationPhrase(text: string): string | null {
   return null;
 }
 
+function extractLookLikeRoomPhrase(text: string): string | null {
+  const match = text.match(/\bwhat does (?:the\s+)?(.+?)\s+look like\b/i);
+  if (!match?.[1]?.trim()) return null;
+  return match[1].trim().replace(/[™®.!?]+$/g, "");
+}
+
 function extractDirectDestinationPhrase(text: string): string | null {
   const fromNavigation = extractRoomPhraseFromNavigation(text);
   if (fromNavigation) return fromNavigation;
+
+  const lookLike = extractLookLikeRoomPhrase(text);
+  if (lookLike) return lookLike;
 
   const wherePhrase = extractWhereRoomPhrase(text);
   if (wherePhrase) return wherePhrase;
@@ -252,20 +267,20 @@ function workspaceOfferFromEntry(
   const section = opts?.section ?? entry.primarySection;
   if (!section && !opts?.estateMenuActionId) return null;
   const labels: Partial<Record<string, string>> = {
-    "peaceful-places": "Step into Peaceful Places™",
-    "momentum-builder": "Step into Momentum Builder™",
-    "clear-my-mind": "Clear My Mind Together",
-    conservatory: "Step into The Conservatory™",
-    "decision-compass": "Open Decision Compass™",
-    observatory: "Explore the Observatory™",
-    library: "Visit the Library™",
-    "creative-studio": "Create in Creative Studio™",
-    "growth-journal": "Open Growth Journal™",
-    stables: "Step into The Stables™",
+    "peaceful-places": "Peaceful Places",
+    "momentum-builder": "Open Momentum",
+    "clear-my-mind": "Clear My Mind",
+    conservatory: "Conservatory",
+    "decision-compass": "Decision Compass",
+    observatory: "Observatory",
+    library: "Library",
+    "creative-studio": "Create",
+    "growth-journal": "Journal",
+    stables: "Stables",
   };
   return {
     section: section ?? "home",
-    buttonLabel: labels[entry.id] ?? `Step into ${entry.name}`,
+    buttonLabel: labels[entry.id] ?? `Open ${entry.name}`,
     line: invitation ?? buildEstateInvitation(entry),
     estateMenuActionId: opts?.estateMenuActionId,
   };
@@ -360,6 +375,14 @@ export function detectDirectCommand(
   userText: string,
   context?: { lastAssistantText?: string | null },
 ): EstateCommandDecision | null {
+  const trimmed = userText.trim();
+  if (
+    isAnotherRoomRequest(trimmed) ||
+    isEstateRoomListOrMapRequest(trimmed)
+  ) {
+    return null;
+  }
+
   const contextual = detectContextualGoThere(
     userText,
     context?.lastAssistantText,
@@ -549,8 +572,11 @@ function displayNameForCommand(
   entryId: string,
   roomId?: string,
 ): string {
-  const room = getEstateRoomById(roomId ?? entryId);
+  const id = roomId ?? entryId;
+  const room = getEstateRoomById(id);
   if (room) return room.trademark ?? room.name;
+  const canonical = getCanonicalEstatePlaceById(id);
+  if (canonical) return canonical.officialName;
   return estateRegistryEntryById(entryId)?.name ?? entryId;
 }
 

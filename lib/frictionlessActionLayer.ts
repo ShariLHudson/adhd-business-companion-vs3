@@ -62,6 +62,7 @@ import {
   resolveImmediateMomentumAction,
   isMomentumForwardIntent,
   isProjectCreationIntent,
+  buildRegistryArtifactOfferLine,
   type ImmediateCreateOpenPayload,
   type ImmediateCreateProjectOpenPayload,
   type ImmediateMomentumOpenPayload,
@@ -246,6 +247,16 @@ import {
   resolveEstateConcierge,
   conversationStateHint,
 } from "./estateCapabilityRegistry";
+import {
+  frictionlessDecisionFromCancelledPendingChoice,
+  frictionlessDecisionFromPendingChoice,
+  frictionlessDecisionFromUnrecognizedPendingChoice,
+} from "@/lib/pendingChoice/frictionlessBridge";
+import {
+  hasActivePendingChoice,
+  registerPendingChoiceFromConcierge,
+  resolvePendingChoiceTurn,
+} from "@/lib/pendingChoice";
 
 export type FrictionlessActionCategory =
   | "direct_action"
@@ -258,6 +269,7 @@ export type FrictionlessActionCategory =
   | "estate_discovery"
   | "estate_guide"
   | "estate_concierge"
+  | "pending_choice"
   | "estate_restoration"
   | "implied_need"
   | "universal_creation"
@@ -358,6 +370,7 @@ export type FrictionlessActionDecision = {
     navigationLine: string;
     userText: string;
   };
+  pendingChoiceExecution?: import("@/lib/pendingChoice/frictionlessBridge").PendingChoiceExecution;
   sparkRuntime?: SparkRuntimeAction | null;
 };
 
@@ -1037,7 +1050,10 @@ function resolveFrictionlessForPrimaryTurn(
         );
       }
       if (isAdhdEmotionalFrictionTurn(input.userText)) {
-        return buildAdhdEmotionalFrictionDecision(input.userText, routing);
+        return buildAdhdEmotionalFrictionDecision(
+          input.userText,
+          input.currentTurn ?? 0,
+        );
       }
       return null;
     }
@@ -1235,6 +1251,58 @@ function tryEstateRestorationFlow(
   };
 }
 
+function tryPendingChoiceFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  if (!hasActivePendingChoice()) return null;
+
+  const result = resolvePendingChoiceTurn(input.userText.trim());
+  if (result.kind === "resolved") {
+    return frictionlessDecisionFromPendingChoice(
+      input.userText.trim(),
+      result,
+      routing,
+    );
+  }
+  if (result.kind === "unrecognized") {
+    return frictionlessDecisionFromUnrecognizedPendingChoice(
+      input.userText.trim(),
+      result,
+      routing,
+    );
+  }
+  if (result.kind === "cancelled") {
+    return frictionlessDecisionFromCancelledPendingChoice(result, routing);
+  }
+  return null;
+}
+
+const MUSIC_CREATION_RE =
+  /\b(?:write|compose|create).{0,40}(?:piece of music|a song|song|lyrics|melody|chords?)\b|\b(?:piece of music|song lyrics|chord ideas)\b/i;
+
+function tryMusicCreationGuidance(
+  userText: string,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const trimmed = userText.trim();
+  if (!trimmed || !MUSIC_CREATION_RE.test(trimmed)) return null;
+  return {
+    category: "direct_action",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "CREATE (music): Offer lyrics, structure, chord ideas, or music-tool prompt — no playable audio promise.",
+    localReply:
+      "I can't compose playable music directly, but I can help you write lyrics, structure a song, sketch chord ideas, or prepare a prompt for a music tool. Which would help most?",
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+  };
+}
+
 function tryEstateConciergeFlow(
   input: FrictionlessActionInput,
   routing: IntentRoutingDecision,
@@ -1267,6 +1335,13 @@ function tryEstateConciergeFlow(
   if (!decision || decision.kind !== "recommend") return null;
 
   const localReply = decision.line.replace(/\*\*/g, "");
+  registerPendingChoiceFromConcierge({
+    goalSummary: decision.goalSummary,
+    options: decision.options,
+    menuText: localReply,
+    offeredAtTurn: input.currentTurn,
+    activeIntent: decision.goalSummary,
+  });
 
   return {
     category: "estate_concierge",
@@ -2209,6 +2284,16 @@ function resolveFrictionlessActionImpl(
     emotionalState: input.emotionalState,
     overwhelmed: input.overwhelmed,
   });
+
+  const pendingChoiceFlow = tryPendingChoiceFlow(input, routing);
+  if (pendingChoiceFlow) {
+    return finishFrictionlessDecision(pendingChoiceFlow, sparkRuntime);
+  }
+
+  const musicGuidance = tryMusicCreationGuidance(userText, routing);
+  if (musicGuidance) {
+    return finishFrictionlessDecision(musicGuidance, sparkRuntime);
+  }
 
   if (input.primaryTurn?.blockSecondaryResponders) {
     const owned = resolveFrictionlessForPrimaryTurn(input, routing);

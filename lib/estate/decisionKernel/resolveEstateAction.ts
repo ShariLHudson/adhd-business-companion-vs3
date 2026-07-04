@@ -10,6 +10,13 @@ import { classifyCaptureIntent } from "@/lib/capture/classifyCaptureIntent";
 import type { CaptureType } from "@/lib/capture/types";
 import { isReflectionRequest } from "@/lib/memory/reflection/createReflectionReport";
 import { evaluateEstatePlaceTurn } from "../estatePlaceNavigation";
+import { evaluateEstateRoomAction } from "../roomContext/evaluateEstateRoomAction";
+import { estateRoomsEquivalent } from "../roomContext/roomIds";
+import { evaluateLibraryConversationReply } from "../libraryConversationIntents";
+import {
+  evaluateInRoomConversationReply,
+  formatAlreadyHereReply,
+} from "../estateInRoomConversationIntents";
 import { isEstateSoundscapeNavigationRequest } from "../estateSoundscapeNavigation";
 import type {
   EstateActionResult,
@@ -69,9 +76,25 @@ export function resolveEstateAction(
     return { action: "CHAT", userText: "" };
   }
 
+  const currentPlaceId = context.currentPlaceId ?? null;
+
+  const inRoomAction = evaluateEstateRoomAction({
+    userText,
+    currentPlaceId,
+  });
+  if (inRoomAction) {
+    return {
+      action: "ROOM_ACTION",
+      userText,
+      currentPlaceId: inRoomAction.currentRoomId,
+      roomAction: inRoomAction.action,
+      immediateReply: inRoomAction.reply,
+    };
+  }
+
   const placeTurn = evaluateEstatePlaceTurn({
     userText,
-    currentPlaceId: context.currentPlaceId ?? null,
+    currentPlaceId,
     lastAssistantText: context.lastAssistantText ?? null,
   });
 
@@ -85,10 +108,39 @@ export function resolveEstateAction(
 
   // 1. NAVIGATE — explicit place, menu pick, canonical name
   if (placeTurn.type === "navigate") {
+    const destId =
+      placeTurn.command.roomId ?? placeTurn.command.entryId ?? null;
+    if (
+      destId &&
+      currentPlaceId &&
+      estateRoomsEquivalent(destId, currentPlaceId)
+    ) {
+      const sameRoomAction = evaluateEstateRoomAction({
+        userText,
+        currentPlaceId,
+      });
+      if (sameRoomAction) {
+        return {
+          action: "ROOM_ACTION",
+          userText,
+          currentPlaceId: sameRoomAction.currentRoomId,
+          roomAction: sameRoomAction.action,
+          immediateReply: sameRoomAction.reply,
+        };
+      }
+      return {
+        action: "CHAT",
+        userText,
+        immediateReply: formatAlreadyHereReply(currentPlaceId),
+      };
+    }
+
     return {
       action: "NAVIGATE",
       userText,
       target: { kind: "place", command: placeTurn.command },
+      navigationLine: placeTurn.navigationLine,
+      impliedPlaceMatch: placeTurn.impliedPlaceMatch,
     };
   }
 
@@ -143,6 +195,30 @@ export function resolveEstateAction(
       action: "CHAT",
       userText,
       immediateReply: placeTurn.line,
+    };
+  }
+
+  const libraryReply = evaluateLibraryConversationReply(
+    userText,
+    context.currentPlaceId ?? null,
+  );
+  if (libraryReply) {
+    return {
+      action: "CHAT",
+      userText,
+      immediateReply: libraryReply,
+    };
+  }
+
+  const inRoomReply = evaluateInRoomConversationReply(
+    userText,
+    context.currentPlaceId ?? null,
+  );
+  if (inRoomReply) {
+    return {
+      action: "CHAT",
+      userText,
+      immediateReply: inRoomReply,
     };
   }
 

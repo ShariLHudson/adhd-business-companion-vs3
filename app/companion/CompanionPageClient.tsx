@@ -16,7 +16,6 @@ import { GlobalEstateMenu } from "@/components/companion/GlobalEstateMenu";
 import { SparkEstateGuideAnchor } from "@/components/companion/SparkEstateGuideAnchor";
 import { EstateGuideFlipbook } from "@/components/estate-guide";
 import { estateArrivalShariGreeting } from "@/lib/estate/estateArrivalExperience";
-import { estatePresenceRoomForSection } from "@/lib/estate/estatePresence";
 import { getEstateMemory } from "@/lib/estateMemory/estateMemoryStore";
 import { SparkEstateShell } from "@/components/companion/estate/SparkEstateShell";
 import { InstituteCabinetPanel } from "@/components/companion/InstituteCabinetPanel";
@@ -93,6 +92,7 @@ const VisualFocusWorkspacePanel = dynamic(
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { EstateCollectionRoomPanel } from "@/components/estate-collection";
 import { GrowLandingPanel } from "@/components/companion/GrowLandingPanel";
+import { GrowthJournalPanel } from "@/components/companion/GrowthJournalPanel";
 import { MomentumBuilderRoomPanel } from "@/components/companion/MomentumBuilderRoomPanel";
 import { MomentumInstituteRoomPanel } from "@/components/companion/momentumInstitute/MomentumInstituteRoomPanel";
 import type { InstituteLearningChatTurn } from "@/components/companion/momentumInstitute/MomentumInstituteRoomPanel";
@@ -830,6 +830,17 @@ import {
   type FrictionlessActionDecision,
 } from "@/lib/frictionlessActionLayer";
 import {
+  hasActivePendingChoice,
+  loadPendingChoice,
+  resolvePendingChoiceTurn,
+} from "@/lib/pendingChoice";
+import type { PendingChoiceExecution } from "@/lib/pendingChoice/frictionlessBridge";
+import type { PendingChoiceAction } from "@/lib/pendingChoice/types";
+import {
+  logTurnOwner,
+  normalizeTurnMessage,
+} from "@/lib/conversation/turnOwner";
+import {
   createAwaitingConfirmationState,
   isConfirmationAcceptance,
   isConfirmationDecline,
@@ -928,6 +939,35 @@ import {
   fetchCompanionChatWithTimeout,
   isInformationalChatTurn,
 } from "@/lib/chatFastPath/chatTurnGuarantee";
+import { resolveChatFailureReply } from "@/lib/chatFastPath/resolveChatFailureReply";
+import { logConversationPipelineDiagnostic } from "@/lib/conversation/conversationPipelineDiagnostics";
+import {
+  logPipelineTurnFailure,
+  runReliableSyncLayer,
+} from "@/lib/conversation/conversationTurnPipeline";
+import {
+  classifyPrimaryConversationTurn,
+  primaryTurnAllowsKernel,
+  type PrimaryTurnDecision,
+} from "@/lib/conversation/primaryTurnClassifier";
+import {
+  logPrimaryTurnClassification,
+  recordPrimaryTurnFinalResponse,
+} from "@/lib/conversation/primaryTurnLog";
+import { shouldRouteThroughEstateKernel } from "@/lib/estate/estateKernelGate";
+import { resolveEstatePlaceIdFromUserText } from "@/lib/estate/estateRoomAliasRegistry";
+import { resolveCurrentEstateRoom } from "@/lib/estate/roomContext";
+import { setCurrentRoom } from "@/lib/estateCapabilityRegistry";
+import type { EstateRoomAction } from "@/lib/estate/roomContext/types";
+import {
+  requestJournalGazeboCommand,
+  type JournalGazeboCommandKind,
+} from "@/lib/journalGazebo/journalGazeboCommands";
+import { matchImpliedEstatePlace } from "@/lib/estate/impliedEstatePlaceMatch";
+import {
+  evaluateImpliedNeed,
+  impliedNeedDiagnosticLabel,
+} from "@/lib/intentAwareConversation/impliedNeed";
 import {
   createChatTurnState,
   guaranteeChatTurnCompletion,
@@ -1100,10 +1140,23 @@ import { isClearMyMindSection } from "@/lib/clearMyMindRouting";
 import { CLEAR_MY_MIND_CONSERVATORY_BG } from "@/lib/clearMyMind/conservatory";
 import {
   directEstateChatRoomId,
+  resolveEstatePlaceAudioHostPlaceId,
   shouldShowDirectEstateOverlay,
 } from "@/lib/estate/estateChatNavigation";
 import {
+  isStopEstateAmbienceRequest,
+  stopAllEstateEnvironmentalAudio,
+  stopEstateAmbienceReply,
+} from "@/lib/estate/estateEnvironmentalAudio";
+import { resolveEstatePresenceRoomId } from "@/lib/estate/estatePresence";
+import {
+  formatEstateRoomPickerLine,
+} from "@/lib/estate/estateMetaNavigation";
+import { formatLibraryGreatThinkersReply } from "@/lib/estate/libraryConversationIntents";
+import { useEstateChatInputFocus } from "@/lib/useEstateChatInputFocus";
+import {
   isDedicatedEstateRoomPanelSection,
+  shouldShowDirectEstateVisitOverlay,
   type DirectEstateVisit,
 } from "@/lib/estate/directEstateVisit";
 import {
@@ -1112,7 +1165,6 @@ import {
   shouldSuppressEstateInvitationGrid,
 } from "@/lib/estate/estateChromePolicy";
 import { messageNamesExactEstateRoom } from "@/lib/estate/estateRoomAliasRegistry";
-import { resolveEstateRoomInConversationReply } from "@/lib/estate/estateRoomInConversation";
 import { resolveEstateRoomBackgroundImage } from "@/lib/estate/estateRoomBackground";
 import {
   resolveExplicitCompanionAction,
@@ -1191,6 +1243,12 @@ import {
   workspaceOfferReplyLine,
   type EstateCommandDecision,
 } from "@/lib/estateIntelligence";
+import { estateNavigateCommandForPlace } from "@/lib/estateIntelligence/estateCommandRouter";
+import type {
+  ImmediateCreateOpenPayload,
+  ImmediateCreateProjectOpenPayload,
+  ImmediateMomentumOpenPayload,
+} from "@/lib/createExperience/createExperienceRouting";
 import {
   savePendingEstatePlaceMenu,
   registerPendingEstatePlaceMenuFromAssistant,
@@ -1220,6 +1278,7 @@ import {
   estateEntryIdForSection,
   registerEstateWorkspaceOfferFromAssistant,
   recoverEstateWorkspaceOfferFromChat,
+  buildWorkspaceOfferForEstateSection,
   isEstateTransitionOfferMessage,
 } from "@/lib/estateMemory";
 import { resolveMomentumBuilderRoomState } from "@/lib/momentumBuilderRoom/roomExperience";
@@ -2111,6 +2170,22 @@ export default function CompanionPageClient() {
     () => shouldShowDirectEstateOverlay(activeSection, directEstateVisit),
     [activeSection, directEstateVisit],
   );
+
+  useEffect(() => {
+    if (!directEstateVisit) return;
+    if (shouldShowDirectEstateVisitOverlay(directEstateVisit, activeSection)) {
+      return;
+    }
+    const pending = loadEstatePendingTransition();
+    if (
+      pending?.destinationSection === directEstateVisit.section &&
+      (!pending.destinationEntryId ||
+        pending.destinationEntryId === directEstateVisit.roomId)
+    ) {
+      return;
+    }
+    syncDirectEstateVisit(null);
+  }, [activeSection, directEstateVisit, syncDirectEstateVisit]);
   const estateChatRoomId = useMemo(
     () => directEstateChatRoomId(activeSection, directEstateVisit),
     [activeSection, directEstateVisit],
@@ -2587,6 +2662,34 @@ export default function CompanionPageClient() {
     useState<FreshStartKind | null>(null);
   const [freshStartRevision, setFreshStartRevision] = useState(0);
   const estateChatScrollKey = `${freshStartRevision}-${messages.length}-${isLoading ? 1 : 0}`;
+
+  const estateChatInputFocusEnabled =
+    hydrated &&
+    overlay !== "signin" &&
+    !freshStartDialog &&
+    !triggeredBlock &&
+    !welcomeHomeIntroActive;
+
+  const estateNavigationFocusKey = [
+    activeSection,
+    workspacePanel ?? "",
+    directEstateVisit?.roomId ?? "",
+    directEstateVisit?.section ?? "",
+  ].join("|");
+
+  const { requestChatInputFocus } = useEstateChatInputFocus({
+    inputRef,
+    enabled: estateChatInputFocusEnabled,
+    hydrated,
+    isLoading,
+    activeSection,
+    workspacePanel,
+    overlay,
+    freshStartDialog,
+    freshStartRevision,
+    estateNavigationKey: estateNavigationFocusKey,
+  });
+
   const [activityReturnLabel, setActivityReturnLabel] = useState<string | null>(
     null,
   );
@@ -2753,6 +2856,7 @@ export default function CompanionPageClient() {
   const [pendingAcceptanceRecord, setPendingAcceptanceRecord] =
     useState<PendingAcceptanceRecord | null>(null);
   const chatTurnRef = useRef(0);
+  const activePrimaryTurnRef = useRef<PrimaryTurnDecision | null>(null);
   const awaitingUserConfirmationRef = useRef<AwaitingUserConfirmationState | null>(
     null,
   );
@@ -3183,7 +3287,7 @@ export default function CompanionPageClient() {
           content: "Tell me what you'd like to change — type it below.",
         },
       ]);
-      inputRef.current?.focus();
+      requestChatInputFocus();
       return;
     }
     if (action.id === "create-draft") {
@@ -4098,7 +4202,7 @@ export default function CompanionPageClient() {
           });
         }
         appendRecoveryMessage(
-          "Welcome back — continue your **Quick Two Option Choice**.",
+          "We can pick up from wherever you are — continue your **Quick Two Option Choice**.",
         );
         break;
       }
@@ -4127,11 +4231,7 @@ export default function CompanionPageClient() {
   }
 
   function focusChatInput() {
-    inputRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "nearest",
-    });
-    window.setTimeout(() => inputRef.current?.focus(), 300);
+    requestChatInputFocus({ scrollIntoView: true, preventScroll: false });
   }
 
   function handleCompanionContinueOption(option: CompanionContinueOption) {
@@ -5695,6 +5795,7 @@ export default function CompanionPageClient() {
     backInterceptorRef.current = null;
     goingBackRef.current = false;
     syncDirectEstateVisit(null);
+    void stopAllEstateEnvironmentalAudio();
     clearEstatePendingTransition();
     setEstateConservatoryEngaged(false);
 
@@ -5719,7 +5820,7 @@ export default function CompanionPageClient() {
     setPlanMyDayOpenItemId(null);
 
     requestAnimationFrame(() => {
-      inputRef.current?.focus({ preventScroll: true });
+      requestChatInputFocus({ preventScroll: true });
     });
   }
 
@@ -5779,28 +5880,6 @@ export default function CompanionPageClient() {
     window.addEventListener("pointerdown", unlock, { once: true });
     return () => window.removeEventListener("pointerdown", unlock);
   }, []);
-
-  // Zero-friction capture: on the chat screen, typing any character focuses the
-  // input so the thought flows straight in — unless you're in a field/modal.
-  useEffect(() => {
-    function onKeyDown(e: KeyboardEvent) {
-      if (activeSection !== "home" || triggeredBlock) return;
-      if (e.metaKey || e.ctrlKey || e.altKey || e.key.length !== 1) return;
-      const el = document.activeElement as HTMLElement | null;
-      const tag = el?.tagName;
-      if (
-        tag === "INPUT" ||
-        tag === "TEXTAREA" ||
-        tag === "SELECT" ||
-        el?.isContentEditable
-      ) {
-        return;
-      }
-      inputRef.current?.focus();
-    }
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [activeSection, triggeredBlock]);
 
   // Time-block alerts: while the app is open, check each ~30s for (a) a block
   // starting in ~15 minutes (gentle heads-up) and (b) a block whose start time
@@ -6067,7 +6146,7 @@ export default function CompanionPageClient() {
         ]);
       }
       setFreshStartRevision((revision) => revision + 1);
-      window.requestAnimationFrame(() => inputRef.current?.focus());
+      window.requestAnimationFrame(() => requestChatInputFocus());
     } catch (err) {
       const routed = routeCompanionFailure(err, {
         surface: "fresh-start",
@@ -6457,7 +6536,7 @@ export default function CompanionPageClient() {
       return;
     }
     if (choice === "know") {
-      window.setTimeout(() => inputRef.current?.focus(), 350);
+      window.setTimeout(() => requestChatInputFocus(), 350);
     }
   }
 
@@ -6626,7 +6705,7 @@ export default function CompanionPageClient() {
       resolveWorkspaceOpener("client-avatars"),
     );
     applyWorkspaceFocus("avatar-name");
-    inputRef.current?.focus();
+    requestChatInputFocus();
   }
 
   function openCompanionAssist(
@@ -6735,7 +6814,7 @@ export default function CompanionPageClient() {
         window.setTimeout(() => seedWorkspaceCoachAutoStart(true), 150);
       }
     }
-    inputRef.current?.focus();
+    requestChatInputFocus();
   }
 
   function openCreateWithShari(input: CreationWorkspaceInput) {
@@ -6781,7 +6860,7 @@ export default function CompanionPageClient() {
       revealWorkspace();
       clearParallelCoachingOffers();
       startCreateBuilderChat();
-      inputRef.current?.focus();
+      requestChatInputFocus();
       return;
     }
 
@@ -6792,7 +6871,7 @@ export default function CompanionPageClient() {
       if (navId) setActiveNav(navId);
       revealWorkspace();
       appendWorkspaceCoachOpener(targetSection, true);
-      inputRef.current?.focus();
+      requestChatInputFocus();
       return;
     }
 
@@ -6810,7 +6889,7 @@ export default function CompanionPageClient() {
 
     revealWorkspace();
     appendWorkspaceCoachOpener(targetSection, true);
-    inputRef.current?.focus();
+    requestChatInputFocus();
   }
 
   function resolveCurrentGuideSection(): AppSection | null {
@@ -7251,7 +7330,7 @@ export default function CompanionPageClient() {
     (turn: InstituteLearningChatTurn) => {
       instituteLearningHintRef.current = turn.chatHint;
       setInput(turn.memberText);
-      requestAnimationFrame(() => inputRef.current?.focus());
+      requestAnimationFrame(() => requestChatInputFocus());
     },
     [],
   );
@@ -7260,7 +7339,7 @@ export default function CompanionPageClient() {
     (turn: StablesLearningChatTurn) => {
       stablesLearningHintRef.current = turn.chatHint;
       setInput(turn.memberText);
-      requestAnimationFrame(() => inputRef.current?.focus());
+      requestAnimationFrame(() => requestChatInputFocus());
     },
     [],
   );
@@ -7327,6 +7406,65 @@ export default function CompanionPageClient() {
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
     openStandaloneFocusSectionCore("user-memory");
+  }
+
+  function executeEstateRoomActionCore(input: {
+    userText: string;
+    roomAction: EstateRoomAction;
+    reply: string;
+  }) {
+    const { userText, roomAction, reply } = input;
+
+    switch (roomAction.kind) {
+      case "open_journal":
+      case "create_journal":
+      case "resume_journal":
+      case "open_writing_tools": {
+        const journalCommand: JournalGazeboCommandKind =
+          roomAction.kind === "open_journal"
+            ? "open_journal"
+            : roomAction.kind === "create_journal"
+              ? "create_journal"
+              : roomAction.kind === "resume_journal"
+                ? "resume_journal"
+                : "open_writing_tools";
+        openGrowthDestinationCore("growth-journal");
+        requestJournalGazeboCommand({ kind: journalCommand });
+        break;
+      }
+      case "launch_creation":
+        openCreationWorkspaceCore(
+          "content-generator",
+          {
+            itemType: roomAction.creationIntent === "sop" ? "SOP" : "Document",
+            title:
+              roomAction.creationIntent === "sop"
+                ? "Standard Operating Procedure"
+                : "New draft",
+            brief: userText,
+            source: "chat",
+          },
+          { ackMessage: reply },
+        );
+        return;
+      case "open_projects":
+        openStandaloneFocusSectionCore("projects");
+        break;
+      case "open_section":
+        if (roomAction.section) {
+          openGrowthDestinationCore(roomAction.section);
+        }
+        break;
+      case "begin_brainstorm":
+      case "remain_in_room":
+        break;
+      default: {
+        const _exhaustive: never = roomAction.kind;
+        return _exhaustive;
+      }
+    }
+
+    setMessages((prev) => [...prev, { role: "assistant", content: reply }]);
   }
 
   function openGrowthDestinationCore(section: AppSection) {
@@ -7513,7 +7651,7 @@ export default function CompanionPageClient() {
     if (section === "home") {
       setActiveNav(normalizedNav);
       setActiveSection("home");
-      inputRef.current?.focus();
+      requestChatInputFocus();
       return;
     }
 
@@ -7725,7 +7863,7 @@ export default function CompanionPageClient() {
       case "voice":
         toggleVoiceMode();
         setActiveSection("home");
-        inputRef.current?.focus();
+        requestChatInputFocus();
         break;
     }
   }
@@ -8147,7 +8285,7 @@ export default function CompanionPageClient() {
     const { session, opener } = bootstrapBusinessStrategySession(typeLabel);
     setBusinessStrategySession(session);
     setMessages((prev) => [...prev, { role: "assistant", content: opener }]);
-    inputRef.current?.focus();
+    requestChatInputFocus();
   }
 
   function showBusinessStrategyDraft(draft: {
@@ -8203,7 +8341,7 @@ export default function CompanionPageClient() {
     setStrategyApplySession(boot.session);
     saveStrategyApplySession(boot.session, { workspacePanelOpen: true });
     beginStrategyApplyVisibleChat(boot.opener, strategyId);
-    inputRef.current?.focus();
+    requestChatInputFocus();
   }
 
   function strategyIdFromOpenTarget(target: StrategyOpenTarget): string | null {
@@ -8349,7 +8487,7 @@ export default function CompanionPageClient() {
         onTalkBusinessWithShari={() => {
           applyChatLayoutMode("split");
           revealWorkspace();
-          inputRef.current?.focus();
+          requestChatInputFocus();
           if (businessStrategyDraft) {
             setMessages((prev) => [
               ...prev,
@@ -9318,6 +9456,206 @@ export default function CompanionPageClient() {
     return input.ack;
   }
 
+  function clearFrictionlessOfferState() {
+    clearVisualThinkingMenuPending();
+    clearFrictionlessPending();
+    clearPendingAcceptanceAuthority();
+    clearPendingEstatePlaceMenu();
+    setToolSuggestion(null);
+    setWorkspaceOffer(null);
+    setDecisionCompassOffer(null);
+    setActionBridge(null);
+    setBridge(null);
+    setAwaitingUserConfirmation(null);
+  }
+
+  function completeImmediateCreateOpen(payload: ImmediateCreateOpenPayload) {
+    clearFrictionlessOfferState();
+    const command = estateNavigateCommandForPlace(
+      payload.estatePlaceId,
+      payload.userText,
+    );
+    const alreadyAtPlace =
+      directEstateVisitRef.current?.roomId === payload.estatePlaceId;
+    if (command && !alreadyAtPlace) {
+      runDirectEstateRoomNavigation(command, payload.userText, undefined, {
+        skipAssistantMessage: true,
+      });
+    } else if (command) {
+      patchEstateRuntimeState({
+        currentPlaceId: payload.estatePlaceId,
+        activeConversationMode: true,
+      });
+    }
+    openCreateWithResolvedArtifact(payload.artifact, undefined, null, {
+      userInitiated: true,
+      skipConsentCheck: true,
+      skipWorkspaceChatReset: true,
+      source: "artifact",
+    });
+  }
+
+  function completeImmediateCreateProjectOpen(
+    payload: ImmediateCreateProjectOpenPayload,
+  ) {
+    clearFrictionlessOfferState();
+    const command = estateNavigateCommandForPlace(
+      payload.estatePlaceId,
+      payload.userText,
+    );
+    const alreadyAtPlace =
+      directEstateVisitRef.current?.roomId === payload.estatePlaceId;
+    if (command && !alreadyAtPlace) {
+      runDirectEstateRoomNavigation(command, payload.userText, undefined, {
+        skipAssistantMessage: true,
+      });
+    } else if (command) {
+      patchEstateRuntimeState({
+        currentPlaceId: payload.estatePlaceId,
+        activeConversationMode: true,
+      });
+    }
+    openSectionBesideChatCore("projects", "projects", { userInitiated: true });
+  }
+
+  function completeImmediateMomentumOpen(payload: ImmediateMomentumOpenPayload) {
+    clearFrictionlessOfferState();
+    const command = estateNavigateCommandForPlace(
+      payload.estatePlaceId,
+      payload.userText,
+    );
+    const alreadyAtPlace =
+      directEstateVisitRef.current?.roomId === payload.estatePlaceId;
+    if (command && !alreadyAtPlace) {
+      runDirectEstateRoomNavigation(command, payload.userText, undefined, {
+        skipAssistantMessage: true,
+      });
+    } else if (command) {
+      patchEstateRuntimeState({
+        currentPlaceId: payload.estatePlaceId,
+        activeConversationMode: true,
+      });
+    }
+    openSectionBesideChatCore("projects", "projects", { userInitiated: true });
+  }
+
+  function completeImmediateResearchOpen(
+    payload: import("@/lib/estateBrain/intelligenceTypes").ImmediateResearchOpenPayload,
+  ) {
+    clearFrictionlessOfferState();
+    const command = estateNavigateCommandForPlace(
+      payload.estatePlaceId,
+      payload.userText,
+    );
+    const alreadyAtPlace =
+      directEstateVisitRef.current?.roomId === payload.estatePlaceId;
+    if (command && !alreadyAtPlace) {
+      runDirectEstateRoomNavigation(command, payload.userText, undefined, {
+        skipAssistantMessage: true,
+      });
+    } else if (command) {
+      patchEstateRuntimeState({
+        currentPlaceId: payload.estatePlaceId,
+        activeConversationMode: true,
+      });
+    }
+    openSectionBesideChatCore(payload.section, undefined, {
+      userInitiated: true,
+    });
+  }
+
+  function completeImmediateEstateCoachingOpen(
+    payload: import("@/lib/estateBrain/estateCoachingTypes").ImmediateEstateCoachingOpenPayload,
+  ) {
+    clearFrictionlessOfferState();
+    const command = estateNavigateCommandForPlace(
+      payload.estatePlaceId,
+      payload.userText,
+    );
+    const alreadyAtPlace =
+      directEstateVisitRef.current?.roomId === payload.estatePlaceId;
+    if (command && !alreadyAtPlace) {
+      runDirectEstateRoomNavigation(command, payload.userText, undefined, {
+        skipAssistantMessage: true,
+      });
+    } else if (command) {
+      patchEstateRuntimeState({
+        currentPlaceId: payload.estatePlaceId,
+        activeConversationMode: true,
+      });
+    }
+    if (payload.openSection) {
+      openSectionBesideChatCore(payload.openSection, undefined, {
+        userInitiated: true,
+      });
+    }
+  }
+
+  function completePendingChoiceExecution(execution: PendingChoiceExecution) {
+    clearFrictionlessOfferState();
+    clearPendingEstatePlaceMenu();
+    const { action, userText } = execution;
+
+    const navigateIfNeeded = (placeId?: string) => {
+      if (!placeId) return;
+      const command = estateNavigateCommandForPlace(placeId, userText);
+      const alreadyAtPlace =
+        directEstateVisitRef.current?.roomId === placeId;
+      if (command && !alreadyAtPlace) {
+        runDirectEstateRoomNavigation(command, userText, undefined, {
+          skipAssistantMessage: true,
+        });
+      } else if (command) {
+        patchEstateRuntimeState({
+          currentPlaceId: placeId,
+          activeConversationMode: true,
+        });
+      }
+    };
+
+    const openSection = (section: AppSection, nav?: SidebarNavId) => {
+      openSectionBesideChatCore(section, nav, { userInitiated: true });
+    };
+
+    const runAction = (pendingAction: PendingChoiceAction) => {
+      switch (pendingAction.kind) {
+        case "navigate_place":
+          navigateIfNeeded(pendingAction.placeId);
+          break;
+        case "open_section":
+          navigateIfNeeded(pendingAction.placeId);
+          if (pendingAction.section === "focus-audio") {
+            openFocusAudioCore(pendingAction.focusAudioCategory ?? "calm-brain");
+          } else if (pendingAction.section) {
+            openSection(pendingAction.section);
+          }
+          break;
+        case "open_focus_audio":
+          navigateIfNeeded(pendingAction.placeId);
+          openFocusAudioCore(pendingAction.focusAudioCategory ?? "calm-brain");
+          break;
+        case "start_discovery":
+          navigateIfNeeded(pendingAction.placeId);
+          openSection(pendingAction.section ?? "content-generator", "create");
+          break;
+        case "open_journal":
+          navigateIfNeeded(pendingAction.placeId);
+          openSection("growth-journal", "growth");
+          break;
+        case "coaching_open":
+          navigateIfNeeded(pendingAction.placeId);
+          if (pendingAction.section) openSection(pendingAction.section);
+          break;
+        case "stay_in_chat":
+          break;
+        default:
+          break;
+      }
+    };
+
+    runAction(action);
+  }
+
   function beginVisibleThinking(
     userText: string,
     emotionalState: EmotionalState,
@@ -9345,12 +9683,16 @@ export default function CompanionPageClient() {
     setChatAwaitingConfirmation(Boolean(state?.active));
   }
 
+  function recordPrimaryTurnResponse(content: string) {
+    recordPrimaryTurnFinalResponse(chatTurnRef.current, content);
+  }
+
   function finishEarlyChatTurn() {
     const turnState = activeChatTurnLifecycleRef.current;
     const finalize = () => {
       endVisibleThinking();
       setIsLoading(false);
-      inputRef.current?.focus();
+      requestChatInputFocus();
     };
     if (turnState) {
       finalizeChatTurn(turnState, finalize);
@@ -9375,11 +9717,87 @@ export default function CompanionPageClient() {
       ...prev,
       { role: "assistant", content: frictionlessAction.localReply! },
     ]);
+    recordPrimaryTurnResponse(frictionlessAction.localReply!);
 
     if (frictionlessAction.immediateVisualOpen) {
       completeVisualThinkingOpen(frictionlessAction.immediateVisualOpen);
       setInput("");
       setAwaitingUserConfirmation(null);
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return true;
+    }
+
+    if (frictionlessAction.immediateCreateOpen) {
+      completeImmediateCreateOpen(frictionlessAction.immediateCreateOpen);
+      setInput("");
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return true;
+    }
+
+    if (frictionlessAction.immediateCreateProjectOpen) {
+      completeImmediateCreateProjectOpen(
+        frictionlessAction.immediateCreateProjectOpen,
+      );
+      setInput("");
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return true;
+    }
+
+    if (frictionlessAction.immediateMomentumOpen) {
+      completeImmediateMomentumOpen(frictionlessAction.immediateMomentumOpen);
+      setInput("");
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return true;
+    }
+
+    if (frictionlessAction.immediateResearchOpen) {
+      completeImmediateResearchOpen(frictionlessAction.immediateResearchOpen);
+      setInput("");
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return true;
+    }
+
+    if (frictionlessAction.immediateEstateCoachingOpen) {
+      completeImmediateEstateCoachingOpen(
+        frictionlessAction.immediateEstateCoachingOpen,
+      );
+      setInput("");
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return true;
+    }
+
+    if (frictionlessAction.pendingChoiceExecution) {
+      completePendingChoiceExecution(frictionlessAction.pendingChoiceExecution);
+      setInput("");
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return true;
+    }
+
+    if (frictionlessAction.immediateEstatePlaceNavigate) {
+      const payload = frictionlessAction.immediateEstatePlaceNavigate;
+      const command = estateNavigateCommandForPlace(
+        payload.placeId,
+        payload.userText,
+      );
+      if (command) {
+        runDirectEstateRoomNavigation(
+          command,
+          payload.userText,
+          payload.navigationLine,
+        );
+      }
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: frictionlessAction.localReply! },
+      ]);
+      setInput("");
       finishEarlyChatTurn();
       finishLatencyTurn({ localReply: true });
       return true;
@@ -9508,6 +9926,34 @@ export default function CompanionPageClient() {
     }
 
     chatTurnRef.current += 1;
+    const lastAssistantForPrimary =
+      [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
+    const primaryTurnDecision = runReliableSyncLayer(
+      "decision_engine",
+      () =>
+        classifyPrimaryConversationTurn({
+          userText: trimmed,
+          lastAssistantText: lastAssistantForPrimary,
+        }),
+      {
+        type: "RELATIONSHIP_CHAT",
+        confidence: "low",
+        owner: "chat",
+        reason: "classification recovered — stay in chat",
+        blockKernelNavigation: true,
+        blockBridgeResponder: true,
+        blockCollectionOffer: true,
+        blockSecondaryResponders: false,
+      } satisfies PrimaryTurnDecision,
+      {
+        turn: chatTurnRef.current,
+        userText: trimmed,
+        normalizedMessage: normalizeTurnMessage(trimmed),
+      },
+    );
+    activePrimaryTurnRef.current = primaryTurnDecision;
+    logPrimaryTurnClassification(chatTurnRef.current, trimmed, primaryTurnDecision);
+
     const confirmationReply =
       isConfirmationAcceptance(trimmed) || isConfirmationDecline(trimmed);
     if (!confirmationReply) {
@@ -9531,6 +9977,27 @@ export default function CompanionPageClient() {
     activeChatTurnLifecycleRef.current = chatTurnState;
 
     try {
+    if (isStopEstateAmbienceRequest(trimmed)) {
+      lastUserTextRef.current = trimmed;
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      await stopAllEstateEnvironmentalAudio();
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        { role: "assistant", content: stopEstateAmbienceReply() },
+      ]);
+      setInput("");
+      voiceUsedRef.current = false;
+      if (!getPrefs().hasChatted) {
+        savePrefs({ hasChatted: true });
+        setHasChatted(true);
+      }
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
     if (isSimpleSocialGreeting(trimmed)) {
       lastUserTextRef.current = trimmed;
       const userMessage: Message = { role: "user", content: trimmed };
@@ -9540,13 +10007,14 @@ export default function CompanionPageClient() {
         userMessage,
         { role: "assistant", content: simpleSocialGreetingReply(trimmed) },
       ]);
+      recordPrimaryTurnResponse(simpleSocialGreetingReply(trimmed));
       setInput("");
       voiceUsedRef.current = false;
       if (!getPrefs().hasChatted) {
         savePrefs({ hasChatted: true });
         setHasChatted(true);
       }
-      inputRef.current?.focus();
+      requestChatInputFocus();
       finishLatencyTurn({ localReply: true });
       return;
     }
@@ -9561,7 +10029,9 @@ export default function CompanionPageClient() {
         draft: activeReminderSession.draft,
         timeBlocks: getTimeBlocks(),
       });
-      if (reminderTurn.kind === "ask" || reminderTurn.kind === "confirm") {
+      if (reminderTurn.kind === "not_reminder") {
+        clearReminderIntakeSession();
+      } else if (reminderTurn.kind === "ask" || reminderTurn.kind === "confirm") {
         const userMessage: Message = { role: "user", content: trimmed };
         setMessages((prev) => [...prev, userMessage]);
         setInput("");
@@ -9611,6 +10081,94 @@ export default function CompanionPageClient() {
           ...prev,
           { role: "assistant", content: intakeTurn.reply },
         ]);
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    if (hasActivePendingChoice()) {
+      const pendingTurnStarted = Date.now();
+      const pendingResult = resolvePendingChoiceTurn(trimmed);
+      if (
+        pendingResult.kind === "resolved" ||
+        pendingResult.kind === "unrecognized" ||
+        pendingResult.kind === "cancelled"
+      ) {
+        const pendingState = loadPendingChoice();
+        logTurnOwner({
+          turn: chatTurnRef.current,
+          rawMessage: trimmed,
+          normalizedMessage: normalizeTurnMessage(trimmed),
+          owner: "pending_choice",
+          intent: primaryTurnDecision.type,
+          currentRoom:
+            resolveCurrentEstateRoom({
+              directVisitRoomId: directEstateVisitRef.current?.roomId ?? null,
+              activeSection: activeSectionRef.current,
+              memoryRoomId: getEstateMemory().currentRoom?.entryId ?? null,
+            }) ?? null,
+          pendingChoices: pendingResult.kind === "unrecognized",
+          pendingChoiceType: pendingState?.pendingChoiceType ?? null,
+          navigationTarget:
+            pendingResult.kind === "resolved"
+              ? (pendingResult.action.placeId ??
+                pendingResult.action.section ??
+                pendingResult.action.capabilityId ??
+                null)
+              : null,
+          elapsedMs: Date.now() - pendingTurnStarted,
+        });
+        logConversationPipelineDiagnostic({
+          turn: chatTurnRef.current,
+          userText: trimmed,
+          detectedIntent: primaryTurnDecision.type,
+          kernelHandled: false,
+          informationalChatBypass: false,
+          estateKernelForced: false,
+          taskLockBlocksEstate: false,
+          selectedHandler: "pending_choice",
+          turnOwner: "pending_choice",
+          normalizedMessage: normalizeTurnMessage(trimmed),
+          pendingChoices: pendingResult.kind === "unrecognized",
+          pendingChoiceType: pendingState?.pendingChoiceType ?? null,
+          navigationTarget:
+            pendingResult.kind === "resolved"
+              ? (pendingResult.action.placeId ?? null)
+              : null,
+          primaryType: primaryTurnDecision.type,
+          primaryOwner: primaryTurnDecision.owner,
+          primaryConfidence: primaryTurnDecision.confidence,
+        });
+        lastUserTextRef.current = trimmed;
+        const userMessage: Message = { role: "user", content: trimmed };
+        setMessages((prev) => [...prev, userMessage]);
+        setInput("");
+        voiceUsedRef.current = false;
+        if (!getPrefs().hasChatted) {
+          savePrefs({ hasChatted: true });
+          setHasChatted(true);
+        }
+        const reply =
+          pendingResult.kind === "resolved"
+            ? pendingResult.reply
+            : pendingResult.kind === "unrecognized"
+              ? pendingResult.reply
+              : (pendingResult.reply ??
+                "No problem — we can stay right here.");
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: reply },
+        ]);
+        recordPrimaryTurnResponse(reply);
+        if (pendingResult.kind === "resolved") {
+          completePendingChoiceExecution({
+            userText: trimmed,
+            action: pendingResult.action,
+            reply: pendingResult.reply,
+          });
+        }
+        setAwaitingUserConfirmation(null);
         finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
@@ -9971,10 +10529,28 @@ export default function CompanionPageClient() {
           logCreatePendingAction("active panel after open", {
             activePanel: workspacePanelRef.current ?? "content-generator",
           });
+        } else if (
+          frictionlessPendingForYes.type === "open_workspace" &&
+          frictionlessPendingForYes.target &&
+          (frictionlessPendingForYes.target as string) !== "content-generator"
+        ) {
+          const offer =
+            workspaceOffer ??
+            buildWorkspaceOfferForEstateSection(
+              frictionlessPendingForYes.target as AppSection,
+              lastAssistantForYesEarly,
+            );
+          acceptWorkspaceOfferCore(offer);
         } else {
           lastUserTextRef.current = trimmed;
         }
-        if (frictionlessPendingForYes.target !== "content-generator") {
+        const handledEstateWorkspaceYes =
+          frictionlessPendingForYes.type === "open_workspace" &&
+          frictionlessPendingForYes.target !== "content-generator";
+        if (
+          frictionlessPendingForYes.target !== "content-generator" &&
+          !handledEstateWorkspaceYes
+        ) {
           if (frictionlessPendingForYes.target !== "visual-focus") {
             setMessages((prev) => [
               ...prev,
@@ -10622,21 +11198,12 @@ export default function CompanionPageClient() {
     }
 
     const visitAtSend = directEstateVisitRef.current;
-    if (visitAtSend) {
-      const inRoomReply = resolveEstateRoomInConversationReply(
-        visitAtSend.roomId,
-        trimmed,
-      );
-      if (inRoomReply) {
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: inRoomReply },
-        ]);
-        finishEarlyChatTurn();
-        finishLatencyTurn({ localReply: true });
-        return;
-      }
-    }
+    const currentEstateRoomId = resolveCurrentEstateRoom({
+      directVisitRoomId: visitAtSend?.roomId ?? null,
+      activeSection: activeSectionRef.current,
+      memoryRoomId: getEstateMemory().currentRoom?.entryId ?? null,
+    });
+    setCurrentRoom(currentEstateRoomId);
 
     const informationalChatTurn = isInformationalChatTurn(trimmed);
 
@@ -10664,12 +11231,44 @@ export default function CompanionPageClient() {
         estateTaskLockTurn.suppressEstateRoomRouting;
     }
 
-    const classifiedIntent = classifyCompanionIntent({
-      userText: trimmed,
-      lastAssistantText: lastAssistantBeforeSend,
-      currentPlaceId: directEstateVisitRef.current?.roomId ?? null,
-      forceChat: informationalChatTurn || taskLockBlocksEstateRouting,
-    });
+    const estateKernelForced =
+      primaryTurnAllowsKernel(primaryTurnDecision) &&
+      shouldRouteThroughEstateKernel(trimmed, {
+        primaryTurn: primaryTurnDecision,
+      });
+
+    const classifiedIntent = runReliableSyncLayer(
+      "estate_kernel",
+      () =>
+        classifyCompanionIntent({
+          userText: trimmed,
+          lastAssistantText: lastAssistantBeforeSend,
+          currentPlaceId: currentEstateRoomId,
+          forceChat:
+            (informationalChatTurn || taskLockBlocksEstateRouting) &&
+            !estateKernelForced,
+        }),
+      {
+        kind: "CHAT",
+        userText: trimmed,
+        plan: { type: "chat", userText: trimmed },
+      },
+      {
+        turn: chatTurnRef.current,
+        userText: trimmed,
+        intent: primaryTurnDecision.type,
+        currentRoom: currentEstateRoomId ?? null,
+        turnOwner: primaryTurnDecision.owner,
+      },
+    );
+
+    const priorUserMessagesForDiagnostic = messages.filter((m) => m.role === "user");
+    const priorUserForDiagnostic =
+      priorUserMessagesForDiagnostic.length > 1
+        ? priorUserMessagesForDiagnostic[
+            priorUserMessagesForDiagnostic.length - 2
+          ]?.content
+        : undefined;
 
     const kernelHandled = executeCompanionIntent(classifiedIntent, {
       onCaptureWrite: (plan) => {
@@ -10683,36 +11282,45 @@ export default function CompanionPageClient() {
       onNavigateMemory: ({ tab }) => {
         openUserMemoryCore(tab);
       },
-      onNavigatePlace: ({ command }) => {
+      onNavigatePlace: ({ command, navigationLine }) => {
         if (
           taskLockBlocksEstateRouting &&
           !estateTaskLockTurn.allowsExplicitEstateNavigation
         ) {
           return;
         }
-        runDirectEstateRoomNavigation(command, trimmed);
+        runDirectEstateRoomNavigation(command, trimmed, navigationLine);
       },
       onSoundscape: (plan) => {
         void executeSoundscapeIntent(plan);
       },
       onAssistantLine: (line) => {
         markAssistantReplied(chatTurnState);
+        recordPrimaryTurnResponse(line);
         setMessages((prev) => [
           ...prev,
           { role: "assistant", content: line },
         ]);
       },
       onPlaceMenu: ({ line, placeIds }) => {
-        if (taskLockBlocksEstateRouting) return;
+        if (taskLockBlocksEstateRouting && !estateKernelForced) return;
         savePendingEstatePlaceMenu({
           placeIds,
           offeredAtTurn: chatTurnRef.current,
+          menuText: line,
         });
         markAssistantReplied(chatTurnState);
         setMessages((prev) => [
           ...prev,
           { role: "assistant", content: line },
         ]);
+        setAwaitingUserConfirmation(
+          createAwaitingConfirmationState({
+            assistantPrompt: line,
+            offeredAtTurn: chatTurnRef.current,
+            kind: "general",
+          }),
+        );
       },
       onCaptureMenu: ({ line }) => {
         markAssistantReplied(chatTurnState);
@@ -10721,7 +11329,42 @@ export default function CompanionPageClient() {
           { role: "assistant", content: line },
         ]);
       },
+      onRoomAction: ({ roomAction, reply, userText }) => {
+        markAssistantReplied(chatTurnState);
+        recordPrimaryTurnResponse(reply);
+        executeEstateRoomActionCore({ userText, roomAction, reply });
+      },
       onClearPlaceMenu: () => clearPendingEstatePlaceMenu(),
+    });
+
+    const resolvedCanonicalPlaceId = resolveEstatePlaceIdFromUserText(trimmed);
+    const impliedPlaceMatchResult = matchImpliedEstatePlace(trimmed);
+    const impliedPlaceMatch = impliedPlaceMatchResult
+      ? `${impliedPlaceMatchResult.matchKey}:${impliedPlaceMatchResult.placeId}`
+      : null;
+    const impliedNeedIntent = impliedNeedDiagnosticLabel(evaluateImpliedNeed(trimmed));
+    logConversationPipelineDiagnostic({
+      turn: chatTurnRef.current,
+      userText: trimmed,
+      detectedIntent: primaryTurnDecision.type,
+      kernelHandled,
+      informationalChatBypass:
+        informationalChatTurn && !estateKernelForced,
+      estateKernelForced,
+      taskLockBlocksEstate: taskLockBlocksEstateRouting,
+      selectedHandler: kernelHandled
+        ? `kernel:${classifiedIntent.plan.type}`
+        : primaryTurnDecision.owner,
+      workspacePanel: workspacePanel ?? null,
+      currentPlaceId: currentEstateRoomId,
+      resolvedCanonicalPlaceId,
+      impliedPlaceMatch,
+      impliedNeedIntent,
+      primaryType: primaryTurnDecision.type,
+      primaryOwner: primaryTurnDecision.owner,
+      primaryConfidence: primaryTurnDecision.confidence,
+      lastAssistantPreview: lastAssistantBeforeSend ?? null,
+      priorUserPreview: priorUserForDiagnostic ?? null,
     });
 
     if (process.env.NODE_ENV === "development") {
@@ -10735,7 +11378,7 @@ export default function CompanionPageClient() {
         lastAssistantText: lastAssistantBeforeSend,
         priorUserText: priorUserForShadow,
         conversationTurn: chatTurnRef.current,
-        currentPlaceId: directEstateVisitRef.current?.roomId ?? null,
+        currentPlaceId: currentEstateRoomId,
         workspacePanel: workspacePanel ?? null,
         overwhelmed: detected === "overwhelmed",
         informationalTurn: informationalChatTurn,
@@ -10744,6 +11387,24 @@ export default function CompanionPageClient() {
     }
 
     if (kernelHandled) {
+      const navTarget =
+        classifiedIntent.plan.type === "navigate-place"
+          ? classifiedIntent.plan.command.roomId ??
+            classifiedIntent.plan.command.entryId ??
+            null
+          : null;
+      logTurnOwner({
+        turn: chatTurnRef.current,
+        rawMessage: trimmed,
+        normalizedMessage: normalizeTurnMessage(trimmed),
+        owner:
+          classifiedIntent.plan.type === "room-action"
+            ? "in_room_action"
+            : "estate_kernel",
+        intent: classifiedIntent.kind,
+        currentRoom: currentEstateRoomId ?? null,
+        navigationTarget: navTarget,
+      });
       finishEarlyChatTurn();
       finishLatencyTurn({ localReply: true });
       return;
@@ -10757,6 +11418,7 @@ export default function CompanionPageClient() {
     const finishLocalChatTurn = (assistantContent?: string) => {
       if (assistantContent) {
         markAssistantReplied(chatTurnState);
+        recordPrimaryTurnResponse(assistantContent);
         setMessages((prev) => [
           ...prev,
           { role: "assistant", content: assistantContent },
@@ -11504,7 +12166,8 @@ export default function CompanionPageClient() {
       !distressed &&
       !estateRoutingActive &&
       !workspacePanel &&
-      !isCollectionOfferCooldownActive(chatTurnRef.current)
+      !isCollectionOfferCooldownActive(chatTurnRef.current) &&
+      !primaryTurnDecision.blockCollectionOffer
     ) {
       const collectionOffer = evaluateCollectionSaveOffer({
         userText: trimmed,
@@ -11528,6 +12191,7 @@ export default function CompanionPageClient() {
           ...prev,
           { role: "assistant", content: collectionOffer.offerLine },
         ]);
+        recordPrimaryTurnResponse(collectionOffer.offerLine);
         setAwaitingUserConfirmation(
           createAwaitingConfirmationState({
             assistantPrompt: collectionOffer.offerLine,
@@ -11541,14 +12205,39 @@ export default function CompanionPageClient() {
       }
     }
 
-    const frictionlessAction = resolveFrictionlessAction({
-      userText: trimmed,
-      currentTurn: chatTurnRef.current,
-      lastAssistantText,
-      workspace: workspacePanel,
-      emotionalState: detected,
-      overwhelmed: detected === "overwhelmed",
-    });
+    const frictionlessAction = runReliableSyncLayer(
+      "frictionless",
+      () =>
+        resolveFrictionlessAction({
+          userText: trimmed,
+          currentTurn: chatTurnRef.current,
+          lastAssistantText,
+          workspace: workspacePanel,
+          emotionalState: detected,
+          overwhelmed: detected === "overwhelmed",
+          primaryTurn: primaryTurnDecision,
+          pendingConciergeChoices: hasActivePendingChoice(),
+        }),
+      {
+        category: "none",
+        suppressRelationship: false,
+        suppressRecap: false,
+        suppressReflectionFirst: false,
+        responseHint: null,
+        localReply: null,
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: null,
+      } satisfies FrictionlessActionDecision,
+      {
+        turn: chatTurnRef.current,
+        userText: trimmed,
+        intent: primaryTurnDecision.type,
+        currentRoom: currentEstateRoomId ?? null,
+        turnOwner: primaryTurnDecision.owner,
+      },
+    );
     latencyProfiler.measure("frictionlessAction");
 
     const frictionlessBlockedByTaskLock =
@@ -12058,18 +12747,19 @@ export default function CompanionPageClient() {
           ]);
         }
       } catch (err) {
-        const routed = routeCompanionFailure(err, {
+        const message = resolveChatFailureReply({
+          err,
+          userText: trimmed,
+          messages,
           surface: "workspace-action",
         });
-        const message =
-          routed.channel === "estate"
-            ? routed.message
-            : buildFailSafeChatReply(trimmed);
-        markAssistantReplied(chatTurnState);
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: message },
-        ]);
+        if (message) {
+          markAssistantReplied(chatTurnState);
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: message },
+          ]);
+        }
         setError(null);
       } finally {
         finishEarlyChatTurn();
@@ -14179,6 +14869,7 @@ export default function CompanionPageClient() {
         }
       }
       markAssistantReplied(chatTurnState);
+      recordPrimaryTurnResponse(assistantMsg);
       setMessages((prev) => {
         if (streamedChatResponse) {
           const copy = [...prev];
@@ -14558,19 +15249,30 @@ export default function CompanionPageClient() {
       }
       if (voiceOutput && rawAssistantMsg) void playTTS(rawAssistantMsg);
     } catch (err) {
-      const routed = routeCompanionFailure(err, {
-        surface: "chat",
+      logPipelineTurnFailure({
+        turn: chatTurnRef.current,
         userText: trimmed,
+        normalizedMessage: normalizeTurnMessage(trimmed),
+        intent: primaryTurnDecision.type,
+        turnOwner: primaryTurnDecision.owner,
+        currentRoom: currentEstateRoomId ?? null,
+        failureReason:
+          err instanceof Error ? err.message : "companion-chat-error",
+        selectedHandler: "companion_api",
       });
-      const message =
-        routed.channel === "estate"
-          ? routed.message
-          : buildFailSafeChatReply(trimmed);
-      markAssistantReplied(chatTurnState);
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: message },
-      ]);
+      const message = resolveChatFailureReply({
+        err,
+        userText: trimmed,
+        messages: turnMessages,
+        surface: "chat",
+      });
+      if (message) {
+        markAssistantReplied(chatTurnState);
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: message },
+        ]);
+      }
       setError(null);
     } finally {
       if (latencyProfiler.calledApi) {
@@ -14580,20 +15282,36 @@ export default function CompanionPageClient() {
       finishEarlyChatTurn();
     }
     } catch (err) {
+      logPipelineTurnFailure({
+        turn: chatTurnRef.current,
+        userText: trimmed,
+        normalizedMessage: normalizeTurnMessage(trimmed),
+        intent: primaryTurnDecision.type,
+        turnOwner: primaryTurnDecision.owner,
+        currentRoom:
+          resolveCurrentEstateRoom({
+            directVisitRoomId: directEstateVisitRef.current?.roomId ?? null,
+            activeSection: activeSectionRef.current,
+            memoryRoomId: getEstateMemory().currentRoom?.entryId ?? null,
+          }) ?? null,
+        failureReason:
+          err instanceof Error ? err.message : "handle-send-error",
+        selectedHandler: "handle_send",
+      });
       if (!chatTurnState.assistantReplied) {
-        const routed = routeCompanionFailure(err, {
-          surface: "chat",
+        const message = resolveChatFailureReply({
+          err,
           userText: trimmed,
+          messages: [...messages, { role: "user" as const, content: trimmed }],
+          surface: "chat",
         });
-        const message =
-          routed.channel === "estate"
-            ? routed.message
-            : buildFailSafeChatReply(trimmed);
-        markAssistantReplied(chatTurnState);
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: message },
-        ]);
+        if (message) {
+          markAssistantReplied(chatTurnState);
+          setMessages((prev) => [
+            ...prev,
+            { role: "assistant", content: message },
+          ]);
+        }
       }
       setError(null);
     } finally {
@@ -14607,10 +15325,30 @@ export default function CompanionPageClient() {
               markAssistantReplied(chatTurnState);
               return prev;
             }
+            const lastAssistant = [...prev]
+              .reverse()
+              .find((m) => m.role === "assistant")?.content;
+            const userLines = prev
+              .filter((m) => m.role === "user")
+              .map((m) => m.content);
+            const priorUser =
+              userLines.length >= 2
+                ? userLines[userLines.length - 2]
+                : userLines[0];
             markAssistantReplied(chatTurnState);
             return [
               ...prev,
-              { role: "assistant", content: buildFailSafeChatReply(trimmed) },
+              {
+                role: "assistant",
+                content: buildFailSafeChatReply(
+                  trimmed,
+                  {
+                    lastAssistantText: lastAssistant,
+                    priorUserText: priorUser,
+                  },
+                  prev,
+                ),
+              },
             ];
           });
         },
@@ -14618,7 +15356,7 @@ export default function CompanionPageClient() {
           finalizeChatTurn(chatTurnState, () => {
             endVisibleThinking();
             setIsLoading(false);
-            inputRef.current?.focus();
+            requestChatInputFocus();
           });
         },
       });
@@ -14652,25 +15390,51 @@ export default function CompanionPageClient() {
     ]);
   }
 
+  function revealEstateRoomChoices(fromRoomId?: string | null) {
+    const line = formatEstateRoomPickerLine(fromRoomId);
+    setMessages((prev) => [...prev, { role: "assistant", content: line }]);
+    registerPendingEstatePlaceMenuFromAssistant(line, chatTurnRef.current);
+    requestAnimationFrame(() => {
+      requestChatInputFocus({ preventScroll: true });
+    });
+  }
+
   function handleEstateRoomInvitationSelect(item: EstateRoomInvitationItem) {
     const action = item.action;
+    const roomId =
+      directEstateVisitRef.current?.roomId ??
+      getEstateMemory().currentRoom?.entryId ??
+      "welcome-home";
     switch (action.kind) {
       case "conversation":
-        handleEstateConversationStart(
-          directEstateVisitRef.current?.roomId ??
-            getEstateMemory().currentRoom?.entryId ??
-            "welcome-home",
-        );
+        if (item.id === "great-thinkers") {
+          setMessages((prev) => [
+            ...prev,
+            {
+              role: "user",
+              content: "I'd like to learn from great thinkers.",
+            },
+            {
+              role: "assistant",
+              content: formatLibraryGreatThinkersReply(),
+            },
+          ]);
+          requestAnimationFrame(() => {
+            requestChatInputFocus({ preventScroll: true });
+          });
+          return;
+        }
+        handleEstateConversationStart(roomId);
         return;
       case "presence":
-        handleEstateConversationStart(
-          directEstateVisitRef.current?.roomId ??
-            getEstateMemory().currentRoom?.entryId ??
-            "welcome-home",
-        );
+        handleEstateConversationStart(roomId);
         return;
       case "estate-map":
-        revealWelcomeHomeEstateMap();
+        if (welcomeHomePrimary && roomId === "welcome-home") {
+          revealWelcomeHomeEstateMap();
+        } else {
+          revealEstateRoomChoices(roomId);
+        }
         return;
       case "companion-continue": {
         const resolution = resolveCompanionContinue();
@@ -14734,6 +15498,8 @@ export default function CompanionPageClient() {
   function runDirectEstateRoomNavigation(
     command: EstateCommandDecision,
     userText: string,
+    navigationLine?: string,
+    opts?: { skipAssistantMessage?: boolean },
   ) {
     setStressReliefOffer(null);
     clearOfferStateOnly();
@@ -14743,7 +15509,9 @@ export default function CompanionPageClient() {
       currentPlaceId: roomId,
       activeConversationMode: true,
     });
-    const roomBg = resolveEstateRoomBackgroundImage(roomId);
+    const roomBg =
+      command.backgroundImageOverride ??
+      resolveEstateRoomBackgroundImage(roomId);
     if (roomBg) preloadRoomBackground(roomBg);
     const visit: DirectEstateVisit = {
       roomId,
@@ -14751,8 +15519,9 @@ export default function CompanionPageClient() {
       userIntent: userText,
       userMessageCountAtArrival: messages.filter((m) => m.role === "user")
         .length,
+      backgroundImageOverride: command.backgroundImageOverride ?? null,
     };
-    syncDirectEstateVisit(visit);
+    directEstateVisitRef.current = visit;
     registerEstatePendingTransition({
       destinationSection: command.section,
       destinationEntryId: command.roomId ?? command.entryId,
@@ -14777,14 +15546,17 @@ export default function CompanionPageClient() {
     }
     captureOfferAccepted(command.workspaceOffer, closedLoopCtx());
     acceptWorkspaceOfferCore(command.workspaceOffer);
-    const arrivalAck = estateCommandAckLine(command);
-    if (activeChatTurnLifecycleRef.current) {
-      markAssistantReplied(activeChatTurnLifecycleRef.current);
+    syncDirectEstateVisit(visit);
+    const arrivalAck = navigationLine ?? estateCommandAckLine(command);
+    if (!opts?.skipAssistantMessage) {
+      if (activeChatTurnLifecycleRef.current) {
+        markAssistantReplied(activeChatTurnLifecycleRef.current);
+      }
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: arrivalAck },
+      ]);
     }
-    setMessages((prev) => [
-      ...prev,
-      { role: "assistant", content: arrivalAck },
-    ]);
     finishEarlyChatTurn();
   }
 
@@ -15674,7 +16446,7 @@ export default function CompanionPageClient() {
               setInput(
                 "I'm in Visual Focus and I'm not sure which visual thinking tool fits. Here's what I'm trying to figure out: ",
               );
-              inputRef.current?.focus();
+              requestChatInputFocus();
             }}
           />
         );
@@ -15712,8 +16484,8 @@ export default function CompanionPageClient() {
         );
       case "growth-journal":
         return (
-          <EstateCollectionRoomPanel
-            roomId="journal"
+          <GrowthJournalPanel
+            refreshKey={`${activeSection}-${workspacePanel ?? ""}-${lastAct?.ts ?? ""}`}
             nav={buildGrowthPanelNav("growth-journal")}
           />
         );
@@ -16640,18 +17412,14 @@ export default function CompanionPageClient() {
     focusSanctuaryFullBleed,
   });
 
-  const estatePresenceRoomId =
-    momentumInstitutePrimary
-      ? "momentum-institute"
-      : stablesPrimary
-        ? "stables"
-        : showDirectEstateOverlay && directEstateVisit?.roomId
-          ? directEstateVisit.roomId
-          : (() => {
-            const memRoom = getEstateMemory().currentRoom?.entryId;
-            if (memRoom && memRoom !== "welcome-home") return memRoom;
-            return estatePresenceRoomForSection(activeSection);
-          })();
+  const estatePresenceRoomId = resolveEstatePresenceRoomId({
+    activeSection,
+    momentumInstitutePrimary,
+    stablesPrimary,
+    directEstateVisit,
+    showDirectEstateOverlay,
+    memoryRoomId: getEstateMemory().currentRoom?.entryId,
+  });
 
   const showGlobalEstatePresence = Boolean(
     estatePresenceRoomId &&
@@ -16659,6 +17427,13 @@ export default function CompanionPageClient() {
       !momentumInstitutePrimary &&
       !stablesPrimary,
   );
+
+  const estatePlaceAudioHostPlaceId = resolveEstatePlaceAudioHostPlaceId({
+    directEstateVisit,
+    showDirectEstateOverlay,
+    estatePresenceRoomId,
+    showGlobalEstatePresence,
+  });
 
   const estatePlaceChromeActive = isEstatePlaceChromeActive({
     welcomeHomePrimary,
@@ -16816,12 +17591,7 @@ export default function CompanionPageClient() {
           setMessages((prev) => [...prev, { role: "assistant", content: message }]);
         }}
       />
-      <EstatePlaceAudioHost
-        placeId={
-          directEstateVisit?.roomId ??
-          (showGlobalEstatePresence ? estatePresenceRoomId : null)
-        }
-      />
+      <EstatePlaceAudioHost placeId={estatePlaceAudioHostPlaceId} />
       {showGlobalEstatePresence && estatePresenceRoomId ? (
         <EstatePresence roomId={estatePresenceRoomId} />
       ) : null}
@@ -16994,6 +17764,9 @@ export default function CompanionPageClient() {
                 placeId={sparkEstateShellPlaceId}
                 section={activeSection}
                 profileEstateMode={sparkEstateShellProfileMode}
+                backgroundImageOverride={
+                  directEstateVisit?.backgroundImageOverride ?? null
+                }
                 welcomeMessage={profileEstateWelcomeMessage}
                 conversationScrollKey={estateChatScrollKey}
                 activityEngaged={estateConservatoryEngaged}
@@ -17051,7 +17824,10 @@ export default function CompanionPageClient() {
             </div>
           ) : null}
 
-          {activeSection === "home" &&
+          {(activeSection === "home" ||
+            stablesPrimary ||
+            momentumInstitutePrimary ||
+            momentumBuilderPrimary) &&
             !profileEstateChromeActive &&
             !sparkEstateShellPlaceId && (
             <div className="relative flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
@@ -18112,8 +18888,7 @@ export default function CompanionPageClient() {
           {activeSection === "growth-journal" &&
             !showDirectEstateOverlay &&
             !profileEstateRoomOverlayId && (
-            <EstateCollectionRoomPanel
-              roomId="journal"
+            <GrowthJournalPanel
               nav={buildGrowthPanelNav("growth-journal")}
             />
           )}

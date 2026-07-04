@@ -1,5 +1,5 @@
 import { buildShariErrorRecoveryResponse } from "@/lib/conversation/shariCompanionEngine";
-import { buildCoachingFallbackResponse } from "@/lib/sparkConversation/coachingFallback";
+import { buildRuntimeRecoveryResponse } from "@/lib/sparkConversation/coachingFallback";
 import { isTechnicalFetchErrorMessage } from "@/lib/safeJsonResponse";
 import { sanitizeEstateFacingCopy } from "./estateContextIsolation";
 import type {
@@ -16,10 +16,13 @@ export function logCompanionSystemFailure(
   if (process.env.NODE_ENV === "production") return;
   const detail =
     err instanceof Error ? err.message : typeof err === "string" ? err : "unknown";
+  const stack = err instanceof Error ? err.stack : undefined;
   console.warn("[companion-system]", {
     surface: context.surface,
     detail,
+    stack,
     technical: isTechnicalFetchErrorMessage(detail),
+    userPreview: context.userText?.slice(0, 120) ?? null,
   });
 }
 
@@ -44,7 +47,7 @@ function estateMessageForSurface(
   }
   const trimmed = userText?.trim() ?? "";
   if (trimmed) {
-    return buildCoachingFallbackResponse(trimmed);
+    return buildRuntimeRecoveryResponse({ userText: trimmed });
   }
   return buildShariErrorRecoveryResponse();
 }

@@ -5,8 +5,10 @@
 
 import type { CaptureType } from "@/lib/capture/types";
 import type { EstateCommandDecision } from "@/lib/estateIntelligence/estateCommandRouter";
+import type { ImpliedEstatePlaceMatch } from "../impliedEstatePlaceMatch";
+import type { EstateRoomAction } from "../roomContext/types";
 
-export type EstateAction = "CHAT" | "NAVIGATE" | "CAPTURE" | "AUDIO" | "MENU";
+export type EstateAction = "CHAT" | "NAVIGATE" | "CAPTURE" | "AUDIO" | "MENU" | "ROOM_ACTION";
 
 export type MemoryLibraryTargetTab =
   | "all"
@@ -22,7 +24,7 @@ export type EstateNavigateTarget =
 
 export type EstateActionResult =
   | { action: "CHAT"; userText: string; immediateReply?: string }
-  | { action: "NAVIGATE"; userText: string; target: EstateNavigateTarget }
+  | { action: "NAVIGATE"; userText: string; target: EstateNavigateTarget; navigationLine?: string; impliedPlaceMatch?: ImpliedEstatePlaceMatch }
   | {
       action: "CAPTURE";
       userText: string;
@@ -43,6 +45,13 @@ export type EstateActionResult =
       menuKind: "capture";
       line: string;
       captureOptions: CaptureType[];
+    }
+  | {
+      action: "ROOM_ACTION";
+      userText: string;
+      currentPlaceId: string;
+      roomAction: EstateRoomAction;
+      immediateReply: string;
     };
 
 export type ResolveEstateActionContext = {

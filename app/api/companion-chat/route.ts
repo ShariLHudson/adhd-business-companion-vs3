@@ -15,6 +15,7 @@ import {
   buildCoachingFallbackResponse,
   isCoachingFallbackNeeded,
 } from "@/lib/sparkConversation/coachingFallback";
+import { sanitizeBridgeFromReply } from "@/lib/sparkConversation/bridgeResponderGuard";
 import { shariCompanionHintForChat } from "@/lib/conversation/shariCompanionEngine";
 import {
   buildRelationshipResponseTraceSummary,
@@ -38,14 +39,32 @@ const MODE_TEMPERATURE: Record<CoachingMode, number> = {
   progress: 0.75,
 };
 
+function memoryFromChatMessages(messages: ChatMessage[]): {
+  lastAssistantText?: string;
+  priorUserText?: string;
+} {
+  const userLines = messages.filter((m) => m.role === "user").map((m) => m.content);
+  const lastAssistantText = [...messages]
+    .reverse()
+    .find((m) => m.role === "assistant")?.content;
+  const priorUserText =
+    userLines.length >= 2 ? userLines[userLines.length - 2] : userLines[0];
+  return { lastAssistantText, priorUserText };
+}
+
 function resolveAssistantMessage(input: {
   rawMessage: string;
   userProbe: string;
   finishReason?: string | null;
+  messages?: ChatMessage[];
 }): { message: string; usedCoachingFallback: boolean } {
   if (isCoachingFallbackNeeded(input.rawMessage, input.finishReason)) {
+    const memory = input.messages
+      ? memoryFromChatMessages(input.messages)
+      : undefined;
+    const fallback = buildCoachingFallbackResponse(input.userProbe, memory);
     return {
-      message: buildCoachingFallbackResponse(input.userProbe),
+      message: sanitizeBridgeFromReply(fallback, input.userProbe),
       usedCoachingFallback: true,
     };
   }
@@ -55,9 +74,12 @@ function resolveAssistantMessage(input: {
 function coachingFallbackJsonResponse(
   userProbe: string,
   relationshipResponseId: string,
+  messages?: ChatMessage[],
 ) {
+  const memory = messages ? memoryFromChatMessages(messages) : undefined;
+  const fallback = buildCoachingFallbackResponse(userProbe, memory);
   return NextResponse.json({
-    message: buildCoachingFallbackResponse(userProbe),
+    message: sanitizeBridgeFromReply(fallback, userProbe),
     relationshipResponseId,
     usedCoachingFallback: true,
   });
@@ -73,7 +95,7 @@ export async function POST(request: NextRequest) {
 
     if (!apiKey) {
       console.error("Companion chat: OpenAI API key is not configured.");
-      return coachingFallbackJsonResponse(userProbe, relationshipResponseId);
+      return coachingFallbackJsonResponse(userProbe, relationshipResponseId, messages);
     }
     const inputType = (body.inputType as InputType) ?? "text";
     const coachingMode = (body.coachingMode as CoachingMode) ?? "today";
@@ -209,7 +231,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       console.error("OpenAI error:", await response.text());
-      return coachingFallbackJsonResponse(userProbe, relationshipResponseId);
+      return coachingFallbackJsonResponse(userProbe, relationshipResponseId, messages);
     }
 
     if (streamRequested && response.body) {
@@ -252,6 +274,7 @@ export async function POST(request: NextRequest) {
             const resolved = resolveAssistantMessage({
               rawMessage: fullText,
               userProbe,
+              messages,
             });
             const message = resolved.usedCoachingFallback
               ? resolved.message
@@ -308,6 +331,7 @@ export async function POST(request: NextRequest) {
       rawMessage,
       userProbe,
       finishReason,
+      messages,
     });
 
     if (fallbackResolved.usedCoachingFallback) {
@@ -469,6 +493,6 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Companion chat error:", error);
-    return coachingFallbackJsonResponse("", createRelationshipResponseId());
+    return coachingFallbackJsonResponse("", createRelationshipResponseId(), []);
   }
 }

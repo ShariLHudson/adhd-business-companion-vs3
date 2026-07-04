@@ -35,6 +35,11 @@ import {
   type EstateDestinationAmbiguousMatch,
 } from "./estateDestinationResolver";
 import {
+  clearPendingChoice,
+  registerPendingChoiceFromNavigation,
+  registerPendingChoiceFromPlaceIds,
+} from "@/lib/pendingChoice";
+import {
   decodeSceneViewPlaceToken,
   encodeSceneViewPlaceToken,
   extractSceneViewTokensFromNumberedMenu,
@@ -189,6 +194,8 @@ export const ESTATE_PLACE_MAX_CHOICES = 3;
 export type PendingEstatePlaceMenu = {
   placeIds: string[];
   offeredAtTurn?: number;
+  /** Original assistant menu text — preserved for pending-choice replay */
+  menuText?: string;
 };
 
 export type EstatePlaceTurnResult =
@@ -228,10 +235,19 @@ export function loadPendingEstatePlaceMenu(): PendingEstatePlaceMenu | null {
 }
 
 export function savePendingEstatePlaceMenu(menu: PendingEstatePlaceMenu): void {
-  if (typeof window === "undefined") {
-    memoryPendingMenu = menu;
-    return;
+  memoryPendingMenu = menu;
+  const placeIds = uniquePlaceIds(menu.placeIds);
+  if (placeIds.length >= 2) {
+    const menuText =
+      menu.menuText?.trim() ||
+      formatEstatePlaceSuggestionMenu(placeIds);
+    registerPendingChoiceFromPlaceIds({
+      placeIds,
+      menuText,
+      offeredAtTurn: menu.offeredAtTurn,
+    });
   }
+  if (typeof window === "undefined") return;
   try {
     window.sessionStorage.setItem(PENDING_MENU_KEY, JSON.stringify(menu));
   } catch {
@@ -242,6 +258,7 @@ export function savePendingEstatePlaceMenu(menu: PendingEstatePlaceMenu): void {
 export function clearPendingEstatePlaceMenu(): void {
   memoryPendingMenu = null;
   clearPendingNavigationChoices();
+  clearPendingChoice();
   if (typeof window === "undefined") return;
   try {
     window.sessionStorage.removeItem(PENDING_MENU_KEY);
@@ -259,11 +276,19 @@ function saveAmbiguousDestinationOffer(
     choices: resolution.choices,
     offeredAtTurn,
   });
+  const menuText = formatEstateDestinationChoiceMenu(resolution);
   savePendingEstatePlaceMenu({
     placeIds: pendingNavigationPlaceIds({
       queryPhrase: resolution.queryPhrase,
       choices: resolution.choices,
     }),
+    offeredAtTurn,
+    menuText,
+  });
+  registerPendingChoiceFromNavigation({
+    choices: resolution.choices,
+    menuText,
+    queryPhrase: resolution.queryPhrase,
     offeredAtTurn,
   });
 }
@@ -986,7 +1011,11 @@ export function registerPendingEstatePlaceMenuFromAssistant(
     extractSceneViewTokensFromNumberedMenu(assistantText),
   );
   if (sceneTokens.length >= 2) {
-    savePendingEstatePlaceMenu({ placeIds: sceneTokens, offeredAtTurn });
+    savePendingEstatePlaceMenu({
+      placeIds: sceneTokens,
+      offeredAtTurn,
+      menuText: assistantText,
+    });
     return true;
   }
 
@@ -994,6 +1023,10 @@ export function registerPendingEstatePlaceMenuFromAssistant(
     extractPlaceIdsFromNumberedAssistantMenu(assistantText),
   );
   if (placeIds.length < 2) return false;
-  savePendingEstatePlaceMenu({ placeIds, offeredAtTurn });
+  savePendingEstatePlaceMenu({
+    placeIds,
+    offeredAtTurn,
+    menuText: assistantText,
+  });
   return true;
 }

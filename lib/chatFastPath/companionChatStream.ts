@@ -1,18 +1,53 @@
 /** NDJSON stream from /api/companion-chat when stream: true. */
 
+import { CHAT_COMPLETION_TIMEOUT_MS } from "./chatTurnGuarantee";
+
 export type CompanionChatStreamEvent =
   | { delta: string }
   | { done: true; relationshipResponseId?: string; message?: string }
   | { error: string };
 
+export class CompanionChatStreamTimeoutError extends Error {
+  constructor(timeoutMs: number) {
+    super(`companion-chat-stream-timeout:${timeoutMs}`);
+    this.name = "CompanionChatStreamTimeoutError";
+  }
+}
+
+function readWithTimeout(
+  reader: ReadableStreamDefaultReader<Uint8Array>,
+  timeoutMs: number,
+): Promise<ReadableStreamReadResult<Uint8Array>> {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => {
+      void reader.cancel().catch(() => undefined);
+      reject(new CompanionChatStreamTimeoutError(timeoutMs));
+    }, timeoutMs);
+    reader
+      .read()
+      .then((result) => {
+        clearTimeout(timer);
+        resolve(result);
+      })
+      .catch((err) => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+}
+
 export async function consumeCompanionChatStream(
   response: Response,
   onText: (fullText: string) => void,
+  options?: { timeoutMs?: number },
 ): Promise<{ fullText: string; relationshipResponseId?: string }> {
   const reader = response.body?.getReader();
   if (!reader) {
     throw new Error("No response stream");
   }
+
+  const timeoutMs = options?.timeoutMs ?? CHAT_COMPLETION_TIMEOUT_MS;
+  const deadline = Date.now() + timeoutMs;
 
   const decoder = new TextDecoder();
   let buffer = "";
@@ -45,7 +80,12 @@ export async function consumeCompanionChatStream(
   };
 
   while (true) {
-    const { done, value } = await reader.read();
+    const remaining = deadline - Date.now();
+    if (remaining <= 0) {
+      void reader.cancel().catch(() => undefined);
+      throw new CompanionChatStreamTimeoutError(timeoutMs);
+    }
+    const { done, value } = await readWithTimeout(reader, remaining);
     if (done) break;
     buffer += decoder.decode(value, { stream: true });
     const lines = buffer.split("\n");
