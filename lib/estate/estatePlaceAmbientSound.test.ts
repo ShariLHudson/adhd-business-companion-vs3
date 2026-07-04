@@ -3,6 +3,8 @@ import {
   EVENING_HEARTH_AMBIENCE_MP3,
   GAZEBO_JOURNAL_AMBIENCE_MP3,
   GREENHOUSE_BIRDS_AMBIENCE_MP3,
+  COFFEE_HOUSE_AMBIENCE_MP3,
+  MUSIC_LOFT_AMBIENCE_MP3,
 } from "@/lib/soundscapes/audioAssets";
 import {
   ESTATE_AMBIENT_ACCEPTANCE_SEQUENCE,
@@ -35,6 +37,15 @@ describe("estatePlaceAmbientSound", () => {
 
     expect(nook?.src).not.toBe(gazebo?.src);
     expect(gazebo?.src).not.toBe(greenhouse?.src);
+  });
+
+  it("maps coffee-house and music-room to one canonical src each", () => {
+    const coffee = resolveEstatePlaceAmbientProfile("coffee-house");
+    const music = resolveEstatePlaceAmbientProfile("music-room");
+
+    expect(coffee?.src).toBe(COFFEE_HOUSE_AMBIENCE_MP3);
+    expect(music?.src).toBe(MUSIC_LOFT_AMBIENCE_MP3);
+    expect(coffee?.src).not.toBe(music?.src);
   });
 
   it("acceptance sequence: Reading Nook → Gazebo → Greenhouse uses three identities", () => {

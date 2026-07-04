@@ -18,7 +18,7 @@ import type {
 import {
   BEDROOM_WINDOW_AMBIENCE_MP3,
   BRIGHT_STUDIO_AMBIENCE_MP3,
-  COFFEE_SHOP_AMBIENCE_MP3,
+  COFFEE_HOUSE_AMBIENCE_MP3,
   EAST_TERRACE_AMBIENCE_MP3,
   EVENING_HEARTH_AMBIENCE_MP3,
   GAZEBO_JOURNAL_AMBIENCE_MP3,
@@ -108,7 +108,7 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     motto: "Great Conversations Change Businesses.",
     shariGreeting: "Pull up a chair — what's worth talking through?",
     ambience: {
-      src: COFFEE_SHOP_AMBIENCE_MP3,
+      src: COFFEE_HOUSE_AMBIENCE_MP3,
       volume: 0.15,
       character: "espresso, quiet conversations, cups",
     },

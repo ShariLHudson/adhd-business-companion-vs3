@@ -6,15 +6,17 @@
  */
 
 import { resolveCanonicalPlaceId } from "./canonicalEstateRegistry";
+import { resolveEstateArrivalExperience } from "./estateArrivalExperience";
 import type { EstateArrivalAmbienceProfile } from "./estateArrivalExperienceTypes";
 import { resolveCanonicalPlaceAmbience } from "./estatePlaceMedia";
 import { enrichAmbienceProfileWithIntent } from "./estatePlaceAmbienceIntent";
 import {
-  COFFEE_SHOP_AMBIENCE_MP3,
+  COFFEE_HOUSE_AMBIENCE_MP3,
   EVENING_HEARTH_AMBIENCE_MP3,
   GAZEBO_JOURNAL_AMBIENCE_MP3,
   GREENHOUSE_BIRDS_AMBIENCE_MP3,
   HALL_OF_REFLECTIONS_AMBIENCE_MP3,
+  MUSIC_LOFT_AMBIENCE_MP3,
   ORCHARD_BIRDS_AMBIENCE_MP3,
   TIN_ROOF_RAIN_AMBIENCE_MP3,
 } from "@/lib/soundscapes/audioAssets";
@@ -61,9 +63,14 @@ export const ESTATE_PLACE_AMBIENT_SOUND: Readonly<
     character: "rain on the roof, wind through trees, distant nature",
   },
   "coffee-house": {
-    src: COFFEE_SHOP_AMBIENCE_MP3,
+    src: COFFEE_HOUSE_AMBIENCE_MP3,
     volume: 0.13,
     character: "soft café chatter, cups, espresso machine hum",
+  },
+  "music-room": {
+    src: MUSIC_LOFT_AMBIENCE_MP3,
+    volume: 0.14,
+    character: "gentle piano, warm listening room hush",
   },
   conservatory: {
     src: GREENHOUSE_BIRDS_AMBIENCE_MP3,
@@ -111,6 +118,8 @@ export function resolveEstatePlaceAmbientProfile(
   if (layered) return enrichAmbienceProfileWithIntent(id, layered);
   const media = resolveCanonicalPlaceAmbience(id);
   if (media) return media;
+  const arrival = resolveEstateArrivalExperience(id)?.ambience;
+  if (arrival) return enrichAmbienceProfileWithIntent(id, arrival);
   return null;
 }
 

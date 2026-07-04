@@ -6,6 +6,7 @@ import { CinematicBackground } from "@/components/companion/scene/CinematicBackg
 import { HomesteadRoomSignatureMotion } from "@/components/companion/homesteadRoom/HomesteadRoomSignatureMotion";
 import { parseYoutubeVideoId } from "@/lib/focusAudio/youtubeEmbed";
 import { peacefulPlaceNatureMotion } from "@/lib/companionHomestead";
+import { stopAllEstateEnvironmentalAudio } from "@/lib/estate/estateEnvironmentalAudio";
 import {
   peacefulPlaceById,
   resolvePeacefulPlacePlayback,
@@ -83,6 +84,10 @@ export function PeacefulPlaceSession({ destination, onLeave }: Props) {
     audioStartedRef.current = false;
     setAudioDelayed(playback.kind === "unavailable");
   }, [destination.id, playback.kind]);
+
+  useEffect(() => {
+    void stopAllEstateEnvironmentalAudio();
+  }, [destination.id]);
 
   useEffect(() => {
     if (!soundOn) {

@@ -241,9 +241,14 @@ export async function transitionEstatePlaceAmbient(
     return;
   }
 
-  const profile =
-    resolveEstatePlaceAmbientProfile(placeId);
-  if (!profile) return;
+  const profile = resolveEstatePlaceAmbientProfile(placeId);
+  if (!profile) {
+    // Place has no Layer 1 loop — still silence the previous room (one sound at a time).
+    if (currentRoomId !== null && currentRoomId !== placeId) {
+      await stopEstateRoomAmbience();
+    }
+    return;
+  }
 
   await startEstateRoomAmbience(placeId, profile, options);
   void refreshEstateSoundscapeOverlayVolume();

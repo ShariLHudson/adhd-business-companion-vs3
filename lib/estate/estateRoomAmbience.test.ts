@@ -116,4 +116,48 @@ describe("estateRoomAmbience", () => {
     expect(activeEstateAmbienceRoomId()).toBeNull();
     expect(pause).toHaveBeenCalled();
   });
+
+  it("stops coffee-house when moving to a place with no Layer 1 profile", async () => {
+    const {
+      kickstartEstateRoomAmbience,
+      transitionEstatePlaceAmbient,
+      activeEstateAmbienceRoomId,
+    } = await loadAmbience();
+
+    kickstartEstateRoomAmbience("coffee-house", {
+      src: "/audio/java-seranade-coffee-house.mp3",
+      volume: 0.13,
+      character: "cafe",
+    });
+    await vi.waitFor(() => {
+      expect(activeEstateAmbienceRoomId()).toBe("coffee-house");
+    });
+
+    await transitionEstatePlaceAmbient("games");
+    expect(activeEstateAmbienceRoomId()).toBeNull();
+    expect(pause).toHaveBeenCalled();
+  });
+
+  it("crossfades coffee-house into music-room", async () => {
+    const {
+      kickstartEstateRoomAmbience,
+      transitionEstatePlaceAmbient,
+      activeEstateAmbienceRoomId,
+    } = await loadAmbience();
+
+    kickstartEstateRoomAmbience("coffee-house", {
+      src: "/audio/java-seranade-coffee-house.mp3",
+      volume: 0.13,
+      character: "cafe",
+    });
+    await vi.waitFor(() => {
+      expect(activeEstateAmbienceRoomId()).toBe("coffee-house");
+    });
+
+    await transitionEstatePlaceAmbient("music-room", { userInitiated: true });
+    expect(activeEstateAmbienceRoomId()).toBe("music-room");
+    expect(play).toHaveBeenCalled();
+    const lastPlayCall = play.mock.invocationCallOrder.at(-1);
+    expect(lastPlayCall).toBeDefined();
+  });
 });

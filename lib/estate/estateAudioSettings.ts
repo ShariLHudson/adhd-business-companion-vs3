@@ -4,6 +4,8 @@
  */
 
 const STORAGE_KEY = "spark:estate:audio-settings:v2";
+export const ESTATE_AUDIO_SETTINGS_STORAGE_KEY = STORAGE_KEY;
+const SETTINGS_CHANGE_EVENT = "spark:estate:audio-settings-change";
 
 export type EstateAudioSettings = {
   /** Layer 1 — place identity sound (default on). */
@@ -53,9 +55,23 @@ function write(settings: EstateAudioSettings): void {
   if (typeof localStorage === "undefined") return;
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent(SETTINGS_CHANGE_EVENT));
+    }
   } catch {
     /* ignore */
   }
+}
+
+/** Listen for Layer 1 / master audio preference changes (same tab + cross-tab). */
+export function subscribeEstateAudioSettings(listener: () => void): () => void {
+  if (typeof window === "undefined") return () => {};
+  const onChange = () => listener();
+  window.addEventListener(SETTINGS_CHANGE_EVENT, onChange);
+  window.addEventListener("storage", (event) => {
+    if (event.key === STORAGE_KEY) onChange();
+  });
+  return () => window.removeEventListener(SETTINGS_CHANGE_EVENT, onChange);
 }
 
 export function getEstateAudioSettings(): EstateAudioSettings {
