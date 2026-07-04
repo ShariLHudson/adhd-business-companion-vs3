@@ -20,12 +20,12 @@ const noneFrictionless: FrictionlessActionDecision = {
 };
 
 const defaultRouting: IntentRoutingDecision = {
-  category: "coach",
+  category: "conversation",
   learnFastPath: false,
   suppressRelationshipIntelligence: false,
   suppressReflectionFirst: false,
   suppressConversationSummary: false,
-};
+} as IntentRoutingDecision;
 
 describe("companionLatencyProfiler thoughtful routing", () => {
   it("detects coaching and advice questions", () => {
@@ -53,7 +53,7 @@ describe("companionLatencyProfiler thoughtful routing", () => {
   it("keeps default conversation on the fast path", () => {
     const route = resolveCompanionResponseRoute({
       userText: "things feel messy today",
-      routing: { ...defaultRouting, category: "coach" },
+      routing: { ...defaultRouting, category: "conversation" },
       frictionless: noneFrictionless,
     });
     expect(route.routeReason).toBe("coach_intent");

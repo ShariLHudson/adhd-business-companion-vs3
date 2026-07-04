@@ -174,9 +174,7 @@ export function mapDecisionToRuntimeAction(
 
   const frictionActive = evaluateFrictionFirst(input.userText).active;
   const allowFrictionFirst =
-    frictionActive &&
-    !suppressEmotionalCoaching &&
-    canonicalRole !== "BUILD";
+    frictionActive && !suppressEmotionalCoaching;
 
   const runtimeMode = resolveRuntimeMode({
     intent: decision.intent,

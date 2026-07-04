@@ -125,7 +125,7 @@ export function evaluateSparkRightHelp(input: {
         !hasCreateSignals(text) &&
         !hasThinkSignals(text)),
     encourage: DISCOURAGED_RE.test(text) || emotional.includes("discouragement"),
-    permission: PERMISSION_RE.test(text) || input.overwhelmed,
+    permission: PERMISSION_RE.test(text) || Boolean(input.overwhelmed),
     stay: STAY_ALONE_RE.test(text) || /\b(?:lonely|loneliness)\b/i.test(text),
   };
 

@@ -1,12 +1,12 @@
 import { evaluateSparkSelfClarity } from "./evaluateSelfClarity";
 import {
   SPARK_ESTATE_SELF_CLARITY_PROMPT_BLOCK,
-  SPARK_EVIDENCE_OPENINGS,
   SPARK_FALSE_POSITIVITY_FORBIDDEN,
   SPARK_IDENTITY_REFRAME_EXAMPLES,
 } from "./principles";
 import {
   SPARK_CURIOSITY_OVER_JUDGMENT,
+  SPARK_EVIDENCE_OPENINGS,
   SPARK_SELF_CLARITY_GUIDING_QUESTION,
   type SparkSelfClarityHintInput,
 } from "./types";

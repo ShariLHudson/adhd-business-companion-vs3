@@ -7,6 +7,7 @@
  */
 
 import type { AppSection } from "@/lib/companionUi";
+import { estateCreativeStudioInvite } from "@/lib/estate/estateTransitionInviteCopy";
 import type {
   EstateMatchResult,
   EstateRegistryEntry,
@@ -29,7 +30,7 @@ const INVITATION_TEMPLATES: Partial<Record<string, string>> = {
   "momentum-institute":
     "The Momentum Institute™ has just the drawer for that. Would you like to explore it together?",
   "creative-studio":
-    "I'd love to help with that. The Creative Studio™ is the perfect place in the Estate for writing newsletters, emails, blog posts, presentations, workshops, and other content. Would you like me to take us there?",
+    `I'd love to help with that. ${estateCreativeStudioInvite()}`,
   "growth-journal":
     "That sounds worth capturing while it's fresh. Would you like to step into your Journal™ together?",
   "coffee-house":

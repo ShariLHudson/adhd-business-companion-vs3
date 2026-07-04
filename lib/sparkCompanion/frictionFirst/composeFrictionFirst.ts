@@ -97,7 +97,6 @@ export function resolveFrictionBarrierChoice(
     if (matched.id === "something_else") {
       return {
         kind: "something_else",
-        barrier: matched,
         reply: "Tell me more — what's getting in the way?",
       };
     }
@@ -109,7 +108,6 @@ export function resolveFrictionBarrierChoice(
     if (barrier && allowed.includes("something_else")) {
       return {
         kind: "something_else",
-        barrier,
         reply: "Tell me more — what's getting in the way?",
       };
     }

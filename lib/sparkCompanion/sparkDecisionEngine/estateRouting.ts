@@ -102,14 +102,6 @@ export function suggestEstateRoute(input: {
     };
   }
 
-  if (input.intent === "SUPPORT" && input.friction === "capacity") {
-    return {
-      placeId: "peaceful-places",
-      reason: "restoration — Peaceful Places for focus or calm",
-      optional: true,
-    };
-  }
-
   return null;
 }
 

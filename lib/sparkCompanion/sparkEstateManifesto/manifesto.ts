@@ -5,6 +5,12 @@ import {
   type SparkFiveQuestion,
 } from "./types";
 
+export {
+  SPARK_MANIFESTO_FORBIDDEN_OPENING,
+  SPARK_MANIFESTO_OPENING,
+  SPARK_PROMISE,
+} from "./types";
+
 export const SPARK_BELIEVES = [
   "Every person already possesses strengths, wisdom, resilience, and potential.",
   "Stress, fear, overwhelm, grief, ADHD, burnout, and life can temporarily hide those qualities.",
