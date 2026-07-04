@@ -24,14 +24,118 @@ import {
   buildAdhdEmotionalFrictionReply,
   isAdhdEmotionalFrictionTurn,
 } from "./adhdEmotionalFrictionIntelligence";
+import {
+  buildAttentionWanderReply,
+  buildFrictionFirstOpeningReply,
+  clearFrictionFirstSession,
+  createFrictionFirstSession,
+  evaluateFrictionFirst,
+  frictionFirstHintForChat,
+  isAttentionWanderSignal,
+  isFrictionFirstMenuOffer,
+  isFrictionFirstSessionExpired,
+  isFrictionFirstTurn,
+  loadFrictionFirstSession,
+  resolveFrictionBarrierChoice,
+  saveFrictionFirstSession,
+} from "./sparkCompanion/frictionFirst";
+import {
+  buildCanonicalEmotionalLocalReply,
+  emotionalFirstActionSecondHintForChat,
+  evaluateEmotionalFirstActionSecond,
+} from "./sparkCompanion/emotionalFirstActionSecond";
+import {
+  evaluateSparkDecisionEngine,
+  mapDecisionToRuntimeAction,
+} from "./sparkCompanion";
+import type { SparkRuntimeAction } from "./sparkCompanion";
 import { isSelfUnderstandingIntent } from "./relationshipIntelligenceBoundaries";
 import type { ToolSuggestion } from "./companionToolSuggestions";
 import type { AppSection } from "./companionUi";
 import {
-  buildRegistryArtifactOfferLine,
   isRegistryArtifactExecution,
   type RegistryArtifactKind,
 } from "./artifactRegistry";
+import {
+  resolveImmediateCreateAction,
+  resolveImmediateCreateProjectAction,
+  resolveImmediateMomentumAction,
+  isMomentumForwardIntent,
+  isProjectCreationIntent,
+  type ImmediateCreateOpenPayload,
+  type ImmediateCreateProjectOpenPayload,
+  type ImmediateMomentumOpenPayload,
+} from "./createExperience/createExperienceRouting";
+import {
+  formatEstateIntelligenceHint,
+  resolveEstateIntelligenceImmediateAction,
+} from "./estateBrain/routeEstateIntelligence";
+import type { ImmediateResearchOpenPayload } from "./estateBrain/intelligenceTypes";
+import type { ImmediateEstateCoachingOpenPayload } from "./estateBrain/estateCoachingTypes";
+import {
+  buildCoachingOpenPayload,
+  cacheCoachingMenu,
+  estateCoachingHint,
+  formatEstateCoachingMenu,
+  isEstateCoachingMenuMessage,
+  loadCachedCoachingMenu,
+  parseEstateCoachingChoice,
+  resolveEstateCoachingContinuation,
+  resolveEstateCoachingMenu,
+  shouldCoachBeforeNavigate,
+} from "./estateBrain/estateCoaching";
+import type { EstateCoachingMenu } from "./estateBrain/estateCoachingTypes";
+import type { DiscoverySession } from "./estateBrain/discoveryTypes";
+import {
+  clearDiscoverySession,
+  discoveryHint,
+  formatDiscoveryQuestion,
+  loadDiscoverySession,
+  resolveDiscoveryTurn,
+  saveDiscoverySession,
+  shouldEnterDiscoveryMode,
+} from "./estateBrain/discoveryMode";
+import {
+  clearUniversalCreationSession,
+  formatUniversalCreationQuestion,
+  resolveUniversalCreationTurn,
+  saveUniversalCreationSession,
+  shouldEnterUniversalCreation,
+  universalCreationHint,
+} from "./universalCreation";
+import type { UniversalCreationSession } from "./universalCreation";
+import {
+  estateGuideHint,
+  formatEstateGuideReply,
+  isEstateGuideQuestion,
+  isEstateOrientationQuestion,
+  isEstateRoomStoryQuestion,
+  resolveEstateGuideTurn,
+  shariKnowledgeHintForChat,
+} from "./sparkKnowledge";
+import {
+  acceptRestorationStory,
+  buildRestorationOffer,
+  buildStoryPick,
+  evaluateRestorationOpportunity,
+  formatInlineStoryReply,
+  formatRestorationOfferReply,
+  isRestorationAcceptance,
+  isRestorationDecline,
+  isRestorationOfferMessage,
+  isRestorationReturnReady,
+  recordRestorationDeclined,
+  recordRestorationOffer,
+  resolveRestorationReturn,
+  loadRestorationStore,
+  setPendingReturn,
+} from "./estateRestoration";
+import {
+  buildEnergyRestorationOffer,
+  evaluateSparkRestoration,
+  formatEnergyRestorationReply,
+  formatInlineEnergyStory,
+} from "./sparkRestorationIntelligence";
 import {
   inferCreateItemTypeFromText,
   logCreatePendingAction,
@@ -86,6 +190,7 @@ import { shouldBlockVisualThinking } from "./visualThinkingOverreach";
 import {
   detectConversionTargetView,
   detectExplicitVisualView,
+  getVisualThinkingView,
   immediateVisualOpenAck,
   isVisualConversionRequest,
   shouldRouteBusinessStrategyToCreate,
@@ -114,13 +219,48 @@ import {
   loadEstatePendingTransition,
   registerEstatePendingTransition,
 } from "./estateMemory/estatePendingTransition";
+import {
+  formatEstateNavigationChoiceMenu,
+  resolveEstateNavigationDisambiguation,
+  resolveEstateNavigationDiscovery,
+} from "./estateExperiences/resolveEstateNavigation";
+import type { EstateNavigationDisambiguation } from "./estateExperiences/types";
+import { ESTATE_NAVIGATION_GOLDEN_RULE } from "./estateExperiences/navigationPhilosophy";
+import {
+  evaluateImpliedNeed,
+  formatImpliedNeedReply,
+  resolveImpliedNeedContinuation,
+} from "./intentAwareConversation/impliedNeed";
+import {
+  clearImpliedNeedSession,
+  loadImpliedNeedSession,
+  saveImpliedNeedSession,
+} from "./intentAwareConversation/impliedNeedSession";
+import { estateNavigateCommandForPlace } from "./estateIntelligence/estateCommandRouter";
+import {
+  primaryTurnAllowsFrictionlessCategory,
+  type PrimaryTurnDecision,
+} from "./conversation/primaryTurnClassifier";
+import {
+  estateConciergeResponseHint,
+  resolveEstateConcierge,
+  conversationStateHint,
+} from "./estateCapabilityRegistry";
 
 export type FrictionlessActionCategory =
   | "direct_action"
   | "tool_open"
   | "emotional_regulation"
   | "adhd_emotional_friction"
+  | "friction_first"
   | "focus_support"
+  | "estate_coaching"
+  | "estate_discovery"
+  | "estate_guide"
+  | "estate_concierge"
+  | "estate_restoration"
+  | "implied_need"
+  | "universal_creation"
   | "decision_support"
   | "strategy"
   | "google_sheet"
@@ -166,6 +306,16 @@ export type FrictionlessActionInput = {
   workspace?: AppSection | null;
   timeBlocks?: TimeBlock[];
   reminderDraft?: ReminderDraft | null;
+  primaryTurn?: import("@/lib/conversation/primaryTurnClassifier").PrimaryTurnDecision | null;
+  isReturning?: boolean;
+  trustEstablished?: boolean;
+  currentRoom?: string | null;
+  activeWorkflow?: string | null;
+  activeDocument?: string | null;
+  pendingNavigationChoices?: boolean;
+  pendingConciergeChoices?: boolean;
+  /** Pre-computed Decision Engine runtime — skips re-evaluation when set */
+  sparkRuntime?: SparkRuntimeAction | null;
 };
 
 export type FrictionlessActionDecision = {
@@ -188,6 +338,27 @@ export type FrictionlessActionDecision = {
     purposeAnswer?: string;
     ack: string;
   };
+  immediateCreateOpen?: ImmediateCreateOpenPayload;
+  immediateCreateProjectOpen?: ImmediateCreateProjectOpenPayload;
+  immediateMomentumOpen?: ImmediateMomentumOpenPayload;
+  immediateResearchOpen?: ImmediateResearchOpenPayload;
+  immediateEstateCoachingOpen?: ImmediateEstateCoachingOpenPayload;
+  estateNavigationDisambiguation?: EstateNavigationDisambiguation;
+  estateCoachingMenu?: EstateCoachingMenu;
+  estateDiscoverySession?: DiscoverySession;
+  universalCreationSession?: UniversalCreationSession;
+  immediateEstateGuideOpen?: {
+    spreadId: string;
+    spreadTitle: string;
+    mode: "flipbook" | "conversational";
+  };
+  impliedNeedEvaluation?: import("@/lib/intentAwareConversation/impliedNeed").ImpliedNeedEvaluation | null;
+  immediateEstatePlaceNavigate?: {
+    placeId: string;
+    navigationLine: string;
+    userText: string;
+  };
+  sparkRuntime?: SparkRuntimeAction | null;
 };
 
 const STORAGE_KEY = "companion-frictionless-pending-v1";
@@ -298,7 +469,7 @@ export function frictionlessPendingAck(action: FrictionlessPendingAction): strin
     if (pending?.originalUserIntent) {
       return buildEstateArrivalContinuation(pending);
     }
-    return "Let's head into the Creative Studio™ together.";
+    return "Let's head to Create.";
   }
   if (action.target === "decision-compass") {
     return "We're in the Decision Compass™ now — let's talk this through calmly.";
@@ -491,6 +662,171 @@ function buildAdhdEmotionalFrictionDecision(
   };
 }
 
+function buildFrictionFirstDecision(
+  userText: string,
+  currentTurn: number,
+): FrictionlessActionDecision {
+  const evaluation = evaluateFrictionFirst(userText);
+  const session = createFrictionFirstSession({
+    userText,
+    domain: evaluation.domain,
+    focusSituation: evaluation.focusSituation,
+    offeredAtTurn: currentTurn,
+  });
+  saveFrictionFirstSession(session);
+
+  return {
+    category: "friction_first",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: frictionFirstHintForChat({ userText, session }),
+    localReply: buildFrictionFirstOpeningReply({
+      userText,
+      domain: session.domain,
+      focusSituation: session.focusSituation,
+    }),
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: null,
+  };
+}
+
+function resolveSparkRuntime(input: FrictionlessActionInput): SparkRuntimeAction {
+  if (input.sparkRuntime) return input.sparkRuntime;
+  const userText = input.userText.trim();
+  const decision = evaluateSparkDecisionEngine({
+    userText,
+    overwhelmed: input.overwhelmed,
+    placeId: input.workspace ?? input.currentRoom ?? null,
+    trustEstablished: input.trustEstablished,
+  });
+  return mapDecisionToRuntimeAction({
+    userText,
+    overwhelmed: input.overwhelmed,
+    placeId: input.workspace ?? input.currentRoom ?? null,
+    currentRoom: input.currentRoom ?? input.workspace ?? null,
+    isReturning: input.isReturning,
+    trustEstablished: input.trustEstablished,
+    activeWorkflow: input.activeWorkflow,
+    activeDocument: input.activeDocument,
+    pendingNavigationChoices: input.pendingNavigationChoices,
+    pendingConciergeChoices: input.pendingConciergeChoices,
+    decision,
+  });
+}
+
+function attachSparkRuntime(
+  decision: FrictionlessActionDecision,
+  runtime: SparkRuntimeAction,
+): FrictionlessActionDecision {
+  const runtimeHint = runtime.operationalHint;
+  return {
+    ...decision,
+    sparkRuntime: runtime,
+    responseHint: decision.responseHint
+      ? `${decision.responseHint}\n${runtimeHint}`
+      : runtimeHint,
+  };
+}
+
+function tryEmotionalCanonFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+  runtime: SparkRuntimeAction,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  if (!userText) return null;
+  if (runtime.suppressEmotionalCoaching) return null;
+
+  const localReply = buildCanonicalEmotionalLocalReply(userText);
+  const decision = evaluateEmotionalFirstActionSecond({ userText });
+  if (!localReply || decision.depth !== "emotional_first") return null;
+
+  return attachSparkRuntime(
+    {
+      category: "emotional_regulation",
+      suppressRelationship: false,
+      suppressRecap: true,
+      suppressReflectionFirst: false,
+      responseHint: emotionalFirstActionSecondHintForChat({ userText }),
+      localReply,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    },
+    runtime,
+  );
+}
+
+function tryFrictionFirstFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+  runtime: SparkRuntimeAction,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  const currentTurn = input.currentTurn ?? 0;
+  if (!userText) return null;
+  if (runtime.suppressEmotionalCoaching && !runtime.allowFrictionFirst) return null;
+
+  if (isAttentionWanderSignal(userText)) {
+    clearFrictionFirstSession();
+    return attachSparkRuntime(
+      {
+        category: "friction_first",
+        suppressRelationship: false,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint:
+          "FRICTION FIRST — attention wandered. Continue gently, no guilt.",
+        localReply: buildAttentionWanderReply(),
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: routing,
+      },
+      runtime,
+    );
+  }
+
+  const session = loadFrictionFirstSession();
+  if (
+    session &&
+    !isFrictionFirstSessionExpired(session, currentTurn) &&
+    (isFrictionFirstMenuOffer(input.lastAssistantText ?? "") ||
+      input.lastAssistantText?.includes("feels closest"))
+  ) {
+    const resolved = resolveFrictionBarrierChoice({ userText, session });
+    if (resolved.kind !== "unrecognized" && resolved.reply) {
+      clearFrictionFirstSession();
+      return {
+        category: "friction_first",
+        suppressRelationship: true,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint: frictionFirstHintForChat({ userText, session }),
+        localReply: resolved.reply,
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: routing,
+      };
+    }
+  }
+
+  if (session && isFrictionFirstSessionExpired(session, currentTurn)) {
+    clearFrictionFirstSession();
+  }
+
+  if (!isFrictionFirstTurn(userText)) return null;
+
+  if (runtime.suppressEmotionalCoaching) return null;
+
+  return buildFrictionFirstDecision(userText, currentTurn);
+}
+
 function buildReminderDecision(
   userText: string,
   currentTurn: number,
@@ -529,6 +865,701 @@ function buildReminderDecision(
   }
 
   return base;
+}
+
+function tryImpliedNeedFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  const currentTurn = input.currentTurn ?? 0;
+  if (!userText) return null;
+
+  const session = loadImpliedNeedSession();
+  if (session) {
+    const continuation = resolveImpliedNeedContinuation(userText, session);
+    if (continuation) {
+      clearImpliedNeedSession();
+      if (continuation.kind === "unrecognized") {
+        return {
+          category: "implied_need",
+          suppressRelationship: false,
+          suppressRecap: true,
+          suppressReflectionFirst: true,
+          responseHint:
+            "IMPLIED_NEED: Member answered vaguely — ask which choice (1, 2, or 3). No auto-navigation.",
+          localReply: continuation.reply,
+          pendingAction: null,
+          toolSuggestion: null,
+          workspaceOffer: null,
+          intentRouting: routing,
+          impliedNeedEvaluation: null,
+        };
+      }
+      if (continuation.kind === "estate_place") {
+        const place = continuation.placeId;
+        const navLine = `${continuation.reply} I'll take you there.`;
+        const command = estateNavigateCommandForPlace(place, userText);
+        if (!command) {
+          return {
+            category: "implied_need",
+            suppressRelationship: false,
+            suppressRecap: true,
+            suppressReflectionFirst: true,
+            responseHint: "IMPLIED_NEED: Estate place chosen — navigate warmly.",
+            localReply: navLine,
+            pendingAction: null,
+            toolSuggestion: null,
+            workspaceOffer: null,
+            intentRouting: routing,
+            impliedNeedEvaluation: null,
+          };
+        }
+        return {
+          category: "implied_need",
+          suppressRelationship: false,
+          suppressRecap: true,
+          suppressReflectionFirst: true,
+          responseHint: "IMPLIED_NEED: Member chose Estate place — navigate only after choice.",
+          localReply: navLine,
+          pendingAction: null,
+          toolSuggestion: null,
+          workspaceOffer: null,
+          intentRouting: routing,
+          impliedNeedEvaluation: null,
+          immediateEstatePlaceNavigate: {
+            placeId: place,
+            navigationLine: navLine,
+            userText,
+          },
+        };
+      }
+      return {
+        category: "implied_need",
+        suppressRelationship: false,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint:
+          "IMPLIED_NEED: Member chose presence or real-world break — stay in conversation.",
+        localReply: continuation.reply,
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: routing,
+        impliedNeedEvaluation: null,
+      };
+    }
+  }
+
+  const evaluation = evaluateImpliedNeed(userText);
+  if (!evaluation) return null;
+
+  saveImpliedNeedSession({
+    matchKey: evaluation.matchKey,
+    primaryPlaceId: evaluation.primaryPlaceId,
+    choices: evaluation.choices,
+    offeredAtTurn: currentTurn,
+  });
+
+  return {
+    category: "implied_need",
+    suppressRelationship: false,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: evaluation.responseHint,
+    localReply: formatImpliedNeedReply(evaluation),
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+    impliedNeedEvaluation: evaluation,
+  };
+}
+
+function finalizeFrictionlessDecision(
+  decision: FrictionlessActionDecision,
+  primaryTurn?: PrimaryTurnDecision | null,
+): FrictionlessActionDecision {
+  if (!primaryTurn?.blockSecondaryResponders) return decision;
+  if (primaryTurnAllowsFrictionlessCategory(primaryTurn, decision.category)) {
+    return decision;
+  }
+  return {
+    category: "none",
+    suppressRelationship: decision.suppressRelationship,
+    suppressRecap: decision.suppressRecap,
+    suppressReflectionFirst: decision.suppressReflectionFirst,
+    responseHint: `PRIMARY_OWNERSHIP:${primaryTurn.type}`,
+    localReply: null,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: decision.intentRouting,
+  };
+}
+
+function resolveFrictionlessForPrimaryTurn(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const primary = input.primaryTurn;
+  if (!primary) return null;
+
+  switch (primary.type) {
+    case "RELATIONSHIP_CHAT":
+    case "DIRECT_COMMAND":
+    case "INFORMATION_OR_RESEARCH":
+      return null;
+    case "IMPLIED_NEED":
+      return tryImpliedNeedFlow(input, routing);
+    case "TASK_REQUEST": {
+      const universal = tryUniversalCreationFlow(input, routing);
+      if (universal) return universal;
+      const discovery = tryDiscoveryFlow(input, routing);
+      if (discovery) return discovery;
+      const coaching = tryEstateCoachingFlow(input, routing);
+      if (coaching) return coaching;
+      return null;
+    }
+    case "EMOTIONAL_SUPPORT": {
+      const restoration = tryEstateRestorationFlow(input, routing);
+      if (restoration) return restoration;
+      if (EMOTIONAL_REGULATION_RE.test(input.userText.trim())) {
+        return buildEmotionalRegulationDecision(
+          input.userText,
+          input.currentTurn ?? 0,
+        );
+      }
+      if (isFrictionFirstTurn(input.userText)) {
+        return buildFrictionFirstDecision(
+          input.userText,
+          input.currentTurn ?? 0,
+        );
+      }
+      if (isAdhdEmotionalFrictionTurn(input.userText)) {
+        return buildAdhdEmotionalFrictionDecision(input.userText, routing);
+      }
+      return null;
+    }
+    default: {
+      const _exhaustive: never = primary.type;
+      return _exhaustive;
+    }
+  }
+}
+
+function tryEstateRestorationFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  const currentTurn = input.currentTurn ?? 0;
+  if (!userText) return null;
+
+  if (
+    input.lastAssistantText &&
+    isRestorationOfferMessage(input.lastAssistantText)
+  ) {
+    if (isRestorationDecline(userText)) {
+      recordRestorationDeclined(currentTurn);
+      return {
+        category: "estate_restoration",
+        suppressRelationship: false,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint:
+          "RESTORATION DECLINED: Respect the choice — no guilt. Continue the work gently.",
+        localReply: "We'll stay right here. What would help most?",
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: routing,
+      };
+    }
+
+    if (isRestorationAcceptance(userText) || isRestorationReturnReady(userText)) {
+      const pending = loadRestorationStore().pendingReturn;
+      if (isRestorationReturnReady(userText) && pending) {
+        const returned = resolveRestorationReturn(pending.taskLabel);
+        return {
+          category: "estate_restoration",
+          suppressRelationship: false,
+          suppressRecap: true,
+          suppressReflectionFirst: true,
+          responseHint: returned.responseHint,
+          localReply: `${returned.welcomeBack}\n\n${returned.reconnectQuestion}`,
+          pendingAction: null,
+          toolSuggestion: null,
+          workspaceOffer: null,
+          intentRouting: routing,
+        };
+      }
+
+      const store = loadRestorationStore();
+      const spreadId =
+        store.lastOfferedSpreadId ??
+        store.pendingReturn?.spreadId ??
+        "butterfly-conservatory";
+      const storyTitle = buildStoryPick(spreadId, "acceptance")?.title ?? "the Estate Guide";
+      acceptRestorationStory(
+        spreadId,
+        store.pendingReturn?.taskLabel ?? null,
+        currentTurn,
+      );
+
+      if (/\b(?:open|read more|guide|pages)\b/i.test(userText)) {
+        return {
+          category: "estate_restoration",
+          suppressRelationship: false,
+          suppressRecap: true,
+          suppressReflectionFirst: true,
+          responseHint:
+            "RESTORATION: Open Estate Guide at matched spread — peaceful, never leaving work behind.",
+          localReply: `I'll open the Estate Guide to ${storyTitle}. Take your time — I'll be here when you're ready.`,
+          pendingAction: null,
+          toolSuggestion: null,
+          workspaceOffer: null,
+          intentRouting: routing,
+          immediateEstateGuideOpen: {
+            spreadId,
+            spreadTitle: storyTitle,
+            mode: "flipbook",
+          },
+        };
+      }
+
+      const offer = buildStoryPick(spreadId, "acceptance")
+        ? buildRestorationOffer({
+            shouldOffer: true,
+            trigger: "natural_pause",
+            confidence: "medium",
+            story: buildStoryPick(spreadId, "acceptance")!,
+            deliveryMode: "tell_inline",
+            returnContextLabel: store.pendingReturn?.taskLabel ?? null,
+          })
+        : null;
+      return {
+        category: "estate_restoration",
+        suppressRelationship: false,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint:
+          offer?.responseHint ??
+          "RESTORATION: Tell story conversationally — member may stay in chat.",
+        localReply: offer
+          ? formatInlineStoryReply(offer)
+          : "Let me share something from the Estate with you.",
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: routing,
+      };
+    }
+  }
+
+  const energyEval = evaluateSparkRestoration({
+    userText,
+    currentTurn,
+    emotionalState: input.emotionalState,
+    overwhelmed: input.overwhelmed,
+    workspace: input.workspace,
+    lastAssistantText: input.lastAssistantText,
+  });
+
+  if (energyEval) {
+    const spreadId =
+      energyEval.guideSpreadId ??
+      energyEval.primary.spreadId ??
+      energyEval.recommendations.find((r) => r.spreadId)?.spreadId ??
+      "butterfly-conservatory";
+    recordRestorationOffer(currentTurn, spreadId);
+    if (energyEval.returnContextLabel) {
+      setPendingReturn(
+        energyEval.returnContextLabel,
+        spreadId,
+        currentTurn,
+      );
+    }
+
+    const offer = buildEnergyRestorationOffer(energyEval);
+    const tellInline =
+      Boolean(energyEval.guideStorySnippet) &&
+      (energyEval.trigger === "natural_pause" ||
+        energyEval.trigger === "extended_work");
+    const localReply = tellInline
+      ? formatInlineEnergyStory(energyEval) ?? formatEnergyRestorationReply(offer)
+      : formatEnergyRestorationReply(offer);
+
+    return {
+      category: "estate_restoration",
+      suppressRelationship: false,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: offer.responseHint,
+      localReply,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    };
+  }
+
+  const evaluation = evaluateRestorationOpportunity({
+    userText,
+    currentTurn,
+    emotionalState: input.emotionalState,
+    overwhelmed: input.overwhelmed,
+    workspace: input.workspace,
+    lastAssistantText: input.lastAssistantText,
+  });
+  if (!evaluation) return null;
+
+  recordRestorationOffer(currentTurn, evaluation.story.spreadId);
+  const offer = buildRestorationOffer(evaluation);
+  const localReply =
+    evaluation.deliveryMode === "tell_inline"
+      ? formatInlineStoryReply(offer)
+      : formatRestorationOfferReply(offer);
+
+  return {
+    category: "estate_restoration",
+    suppressRelationship: false,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: offer.responseHint,
+    localReply,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+  };
+}
+
+function tryEstateConciergeFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  if (!userText) return null;
+  if (isEstateGuideQuestion(userText)) return null;
+  if (shouldEnterUniversalCreation(userText)) return null;
+  if (shouldEnterDiscoveryMode(userText)) return null;
+  if (isRegistryArtifactExecution(userText)) return null;
+  if (isProjectCreationIntent(userText)) return null;
+  if (routing.learnFastPath) return null;
+  if (loadDiscoverySession()) return null;
+  if (isMomentumForwardIntent(userText)) return null;
+  if (shouldCoachBeforeNavigate(userText)) return null;
+  if (detectAudioRequest(userText)) return null;
+  if (EMOTIONAL_REGULATION_RE.test(userText)) return null;
+  if (
+    /\b(?:don't know where to start|not sure what to do|where to start|figure it out)\b/i.test(
+      userText,
+    )
+  ) {
+    return null;
+  }
+
+  const decision = resolveEstateConcierge({
+    userText,
+    isDirectCommand: input.primaryTurn?.type === "DIRECT_COMMAND",
+  });
+  if (!decision || decision.kind !== "recommend") return null;
+
+  const localReply = decision.line.replace(/\*\*/g, "");
+
+  return {
+    category: "estate_concierge",
+    suppressRelationship: false,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: estateConciergeResponseHint(decision),
+    localReply,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+  };
+}
+
+function tryEstateGuideFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  if (!userText || !isEstateGuideQuestion(userText)) return null;
+  if (
+    routing.learnFastPath &&
+    !isEstateOrientationQuestion(userText) &&
+    !isEstateRoomStoryQuestion(userText)
+  ) {
+    return null;
+  }
+  if (isRegistryArtifactExecution(userText)) return null;
+  if (isProjectCreationIntent(userText)) return null;
+  if (shouldEnterDiscoveryMode(userText)) return null;
+
+  const turn = resolveEstateGuideTurn(userText);
+  const knowledgeHint = shariKnowledgeHintForChat({ userText });
+
+  return {
+    category: "estate_guide",
+    suppressRelationship: false,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: [estateGuideHint(), turn.responseHint, knowledgeHint]
+      .filter(Boolean)
+      .join("\n\n"),
+    localReply: formatEstateGuideReply(turn),
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+  };
+}
+
+function tryUniversalCreationFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  if (!userText) return null;
+
+  const turn = resolveUniversalCreationTurn(
+    userText,
+    input.currentTurn ?? 0,
+    input.lastAssistantText,
+  );
+  if (!turn) return null;
+
+  if (turn.kind === "question") {
+    saveUniversalCreationSession(turn.session);
+    return {
+      category: "universal_creation",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: universalCreationHint(turn.session, turn),
+      localReply: formatUniversalCreationQuestion(turn),
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+      universalCreationSession: turn.session,
+    };
+  }
+
+  if (turn.kind === "uncertainty") {
+    saveUniversalCreationSession(turn.session);
+    return {
+      category: "universal_creation",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: universalCreationHint(turn.session, turn),
+      localReply: turn.message,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+      universalCreationSession: turn.session,
+    };
+  }
+
+  clearUniversalCreationSession();
+  const combined = `${turn.session.originalUserText} ${Object.values(turn.session.answers).join(" ")}`;
+  const createOpen = resolveImmediateCreateAction(
+    combined,
+    routing.artifactKind,
+  );
+  if (!createOpen) return null;
+
+  return {
+    category: "universal_creation",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: universalCreationHint(turn.session, turn),
+    localReply: turn.message,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+    immediateCreateOpen: createOpen,
+    universalCreationSession: turn.session,
+  };
+}
+
+function tryDiscoveryFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  if (!userText) return null;
+
+  const turn = resolveDiscoveryTurn(
+    userText,
+    input.currentTurn ?? 0,
+    input.lastAssistantText,
+  );
+  if (!turn) return null;
+
+  if (turn.kind === "question") {
+    saveDiscoverySession(turn.session);
+    return {
+      category: "estate_discovery",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: discoveryHint(turn.session, turn),
+      localReply: formatDiscoveryQuestion(turn),
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+      estateDiscoverySession: turn.session,
+    };
+  }
+
+  clearDiscoverySession();
+
+  const base: FrictionlessActionDecision = {
+    category: "estate_discovery",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: discoveryHint(turn.session, turn),
+    localReply: turn.message,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+    estateDiscoverySession: turn.session,
+  };
+
+  switch (turn.action.kind) {
+    case "coaching_menu":
+      cacheCoachingMenu(turn.action.menu);
+      return { ...base, estateCoachingMenu: turn.action.menu };
+    case "create_open":
+      return { ...base, immediateCreateOpen: turn.action.payload };
+    case "research_open":
+      return { ...base, immediateResearchOpen: turn.action.payload };
+    case "navigate":
+      return { ...base, immediateEstateCoachingOpen: turn.action.payload };
+    default:
+      return base;
+  }
+}
+
+function buildEstateCoachingDecision(
+  menu: EstateCoachingMenu,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision {
+  cacheCoachingMenu(menu);
+  return {
+    category: "estate_coaching",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: estateCoachingHint(menu),
+    localReply: formatEstateCoachingMenu(menu),
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+    estateCoachingMenu: menu,
+  };
+}
+
+function tryEstateCoachingFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  if (!userText) return null;
+
+  const continuation = resolveEstateCoachingContinuation(
+    userText,
+    input.lastAssistantText,
+  );
+  if (continuation) {
+    return {
+      category: "estate_coaching",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "ESTATE COACHING: Member chose a prescription — navigate quietly after warm ack.",
+      localReply: continuation.followUpLine,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+      immediateEstateCoachingOpen: continuation,
+    };
+  }
+
+  const isMenuFollowUp =
+    Boolean(input.lastAssistantText) &&
+    isEstateCoachingMenuMessage(input.lastAssistantText ?? "");
+
+  if (isMenuFollowUp) {
+    const menu =
+      loadCachedCoachingMenu() ??
+      resolveEstateCoachingMenu(input.lastAssistantText ?? "");
+    if (!menu) return null;
+
+    const directChoice = parseEstateCoachingChoice(userText, menu);
+    if (directChoice && directChoice.id !== "something-else") {
+      const payload = buildCoachingOpenPayload(
+        userText,
+        menu.situation,
+        directChoice,
+        menu.goal,
+      );
+      if (payload) {
+        return {
+          category: "estate_coaching",
+          suppressRelationship: true,
+          suppressRecap: true,
+          suppressReflectionFirst: true,
+          responseHint: estateCoachingHint(menu),
+          localReply: payload.followUpLine,
+          pendingAction: null,
+          toolSuggestion: null,
+          workspaceOffer: null,
+          intentRouting: routing,
+          immediateEstateCoachingOpen: payload,
+        };
+      }
+    }
+
+    if (directChoice?.stayInConversation) {
+      return {
+        category: "estate_coaching",
+        suppressRelationship: true,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint: estateCoachingHint(menu),
+        localReply:
+          directChoice.id === "something-else"
+            ? "Tell me more — what would actually help right now?"
+            : "I'm right here with you. What are you trying to focus on?",
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: routing,
+      };
+    }
+
+    return null;
+  }
+
+  const menu = resolveEstateCoachingMenu(userText);
+  if (!menu || !shouldCoachBeforeNavigate(userText)) return null;
+
+  return buildEstateCoachingDecision(menu, routing);
 }
 
 function buildFocusSupportDecision(
@@ -691,7 +1722,7 @@ function buildCreateFrictionlessPending(input: {
     artifactType,
     initialPrompt: input.userText.trim(),
     offeredAtTurn: input.offeredAtTurn,
-    offerSummary: input.offerSummary ?? "Creative Studio™",
+    offerSummary: input.offerSummary ?? "Create",
   };
   logCreatePendingAction("saved pending action", {
     target: pending.target,
@@ -782,7 +1813,7 @@ function buildSimpleOverwhelmOrganizeDecision(
 ): FrictionlessActionDecision {
   const offer = {
     section: "brain-dump" as const,
-    buttonLabel: "Step into Clear My Mind™",
+    buttonLabel: "Clear My Mind",
     line: "That sounds worth capturing while it's fresh. Would you like to step into Clear My Mind™ together?",
   };
   return {
@@ -896,17 +1927,220 @@ function buildVisualRecommendationDecision(
   };
 }
 
+function tryImmediateEstateExperienceAction(
+  userText: string,
+  currentTurn: number,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  if (
+    shouldCoachBeforeNavigate(userText) ||
+    shouldEnterDiscoveryMode(userText) ||
+    shouldEnterUniversalCreation(userText)
+  ) {
+    return null;
+  }
+
+  const intel = resolveEstateIntelligenceImmediateAction(userText);
+
+  if (intel?.kind === "create-project") {
+    const project = resolveImmediateCreateProjectAction(userText);
+    if (project) {
+      return {
+        category: "direct_action",
+        suppressRelationship: true,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint:
+          "CREATE: New project — bring to life in Create; active work lives in Momentum.",
+        localReply: project.followUpLine,
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: routing,
+        immediateCreateProjectOpen: project,
+      };
+    }
+  }
+
+  if (intel?.kind === "conversation" && !routing.learnFastPath) {
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: formatEstateIntelligenceHint(intel.route),
+      localReply: intel.route.followUpLine ?? null,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    };
+  }
+
+  if (intel?.kind === "research" && intel.researchPayload) {
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: formatEstateIntelligenceHint(intel.route),
+      localReply: intel.researchPayload.followUpLine,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+      immediateResearchOpen: intel.researchPayload,
+    };
+  }
+
+  if (intel?.kind === "visual") {
+    const view = getVisualThinkingView("mind-map");
+    if (view) {
+      const ack = intel.route.followUpLine ?? immediateVisualOpenAck(view);
+      return {
+        category: "direct_action",
+        suppressRelationship: true,
+        suppressRecap: true,
+        suppressReflectionFirst: true,
+        responseHint: formatEstateIntelligenceHint(intel.route),
+        localReply: ack,
+        pendingAction: null,
+        toolSuggestion: null,
+        workspaceOffer: null,
+        intentRouting: routing,
+        immediateVisualOpen: {
+          mode: view.mode,
+          viewId: view.id,
+          viewTitle: view.title,
+          purposeAnswer: userText.trim(),
+          ack,
+        },
+      };
+    }
+  }
+
+  const createProject = resolveImmediateCreateProjectAction(userText);
+  if (createProject) {
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "CREATE: New project — bring to life in Create; active work lives in Momentum.",
+      localReply: createProject.followUpLine,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+      immediateCreateProjectOpen: createProject,
+    };
+  }
+
+  const momentumOpen = resolveImmediateMomentumAction(userText);
+  if (momentumOpen) {
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "MOMENTUM: Navigate to projects — creation belongs in Create, forward motion belongs here.",
+      localReply: momentumOpen.followUpLine,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+      immediateMomentumOpen: momentumOpen,
+    };
+  }
+
+  const artifact = detectArtifactRequest(userText);
+  if (artifact && isRegistryArtifactExecution(userText)) {
+    return buildDirectActionDecision(
+      {
+        ...routing,
+        suppressRelationshipIntelligence: true,
+      },
+      userText,
+      currentTurn,
+    );
+  }
+
+  return null;
+}
+
+function tryEstateNavigationPhilosophy(
+  userText: string,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const discovery = resolveEstateNavigationDiscovery(userText);
+  if (discovery) {
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: `ESTATE NAVIGATION (low confidence): ${ESTATE_NAVIGATION_GOLDEN_RULE}`,
+      localReply: `${discovery.intro}\n\n${discovery.question}`,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    };
+  }
+
+  const disambiguation = resolveEstateNavigationDisambiguation(userText);
+  if (disambiguation) {
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: `ESTATE NAVIGATION (medium confidence): ${ESTATE_NAVIGATION_GOLDEN_RULE}`,
+      localReply: formatEstateNavigationChoiceMenu(disambiguation),
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+      estateNavigationDisambiguation: disambiguation,
+    };
+  }
+
+  return null;
+}
+
 function buildDirectActionDecision(
   routing: IntentRoutingDecision,
   userText: string,
   currentTurn: number,
 ): FrictionlessActionDecision {
+  const immediateCreate =
+    !shouldEnterUniversalCreation(userText) &&
+    resolveImmediateCreateAction(userText, routing.artifactKind);
+  if (immediateCreate) {
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "CREATE EXPERIENCE: Navigate to Create, open the tool, continue — no permission ask.",
+      localReply: immediateCreate.followUpLine,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: routing.workspaceOffer,
+      intentRouting: routing,
+      immediateCreateOpen: immediateCreate,
+    };
+  }
+
   const execCategory = routing.category === "build" ? "build" : "execute";
   const localReply =
     routing.navigationLine ??
     (routing.artifactKind
       ? buildRegistryArtifactOfferLine(routing.artifactKind, execCategory)
-      : "The Creative Studio™ is the perfect place for that. Would you like me to take us there?");
+      : "Let's head to Create.");
   return {
     category: "direct_action",
     suppressRelationship: true,
@@ -922,7 +2156,7 @@ function buildDirectActionDecision(
             userText,
             offeredAtTurn: currentTurn,
             artifactKind: routing.artifactKind,
-            offerSummary: routing.featureLabel ?? "Creative Studio™",
+            offerSummary: routing.featureLabel ?? "Create",
           })
         : routing.workspaceOffer
           ? {
@@ -930,7 +2164,7 @@ function buildDirectActionDecision(
               target: routing.workspaceOffer.section,
               context: routing.artifactKind ?? "create",
               offeredAtTurn: currentTurn,
-              offerSummary: routing.featureLabel ?? "Creative Studio™",
+              offerSummary: routing.featureLabel ?? "Create",
             }
           : null,
     toolSuggestion: null,
@@ -939,7 +2173,15 @@ function buildDirectActionDecision(
   };
 }
 
-export function resolveFrictionlessAction(
+function finishFrictionlessDecision(
+  decision: FrictionlessActionDecision,
+  runtime: SparkRuntimeAction,
+): FrictionlessActionDecision {
+  if (decision.sparkRuntime) return decision;
+  return attachSparkRuntime(decision, runtime);
+}
+
+function resolveFrictionlessActionImpl(
   input: FrictionlessActionInput,
 ): FrictionlessActionDecision {
   const userText = input.userText.trim();
@@ -959,17 +2201,7 @@ export function resolveFrictionlessAction(
 
   if (!userText) return none;
 
-  const audioWithNavigation =
-    /\b(?:take me to|go to|bring me to|open|show me)\b/i.test(userText) &&
-    /\b(music|audio|playlist|soundscape|songs?|tunes|beats)\b/i.test(userText);
-  if (audioWithNavigation) {
-    const audioDecision = buildAudioPending(userText, currentTurn);
-    if (audioDecision) return audioDecision;
-  }
-
-  if (messageNamesExactEstateRoom(userText)) {
-    return none;
-  }
+  const sparkRuntime = resolveSparkRuntime(input);
 
   const routing = resolveIntentRouting({
     userText,
@@ -978,8 +2210,78 @@ export function resolveFrictionlessAction(
     overwhelmed: input.overwhelmed,
   });
 
+  if (input.primaryTurn?.blockSecondaryResponders) {
+    const owned = resolveFrictionlessForPrimaryTurn(input, routing);
+    return finishFrictionlessDecision(
+      finalizeFrictionlessDecision(
+        owned ?? { ...none, intentRouting: routing },
+        input.primaryTurn,
+      ),
+      sparkRuntime,
+    );
+  }
+
+  const audioWithNavigation =
+    /\b(?:take me to|go to|bring me to|open|show me)\b/i.test(userText) &&
+    /\b(music|audio|playlist|soundscape|songs?|tunes|beats)\b/i.test(userText);
+  if (audioWithNavigation) {
+    const audioDecision = buildAudioPending(userText, currentTurn);
+    if (audioDecision) return audioDecision;
+  }
+
+  if (
+    messageNamesExactEstateRoom(userText) &&
+    !isEstateGuideQuestion(userText) &&
+    !isRegistryArtifactExecution(userText) &&
+    !isMomentumForwardIntent(userText) &&
+    !isProjectCreationIntent(userText)
+  ) {
+    return none;
+  }
+
   if (isDifficultClientCallRequest(userText)) {
     return buildDifficultClientCallDecision(userText, currentTurn, routing);
+  }
+
+  const emotionalCanonFlow = tryEmotionalCanonFlow(input, routing, sparkRuntime);
+  if (emotionalCanonFlow) return emotionalCanonFlow;
+
+  const impliedNeedFlow = tryImpliedNeedFlow(input, routing);
+  if (impliedNeedFlow) {
+    return attachSparkRuntime(impliedNeedFlow, sparkRuntime);
+  }
+
+  const estateRestorationFlow = tryEstateRestorationFlow(input, routing);
+  if (estateRestorationFlow) return estateRestorationFlow;
+
+  const estateGuideFlow = tryEstateGuideFlow(input, routing);
+  if (estateGuideFlow) return estateGuideFlow;
+
+  const universalCreationFlow = tryUniversalCreationFlow(input, routing);
+  if (universalCreationFlow) return universalCreationFlow;
+
+  const discoveryFlow = tryDiscoveryFlow(input, routing);
+  if (discoveryFlow) return discoveryFlow;
+
+  const frictionFirstFlow = tryFrictionFirstFlow(input, routing, sparkRuntime);
+  if (frictionFirstFlow) return frictionFirstFlow;
+
+  const coachingFlow = tryEstateCoachingFlow(input, routing);
+  if (coachingFlow) return coachingFlow;
+
+  if (!sparkRuntime.suppressDiscoveryAutoRoute) {
+    const immediateExperience = tryImmediateEstateExperienceAction(
+      userText,
+      currentTurn,
+      routing,
+    );
+    if (immediateExperience) return immediateExperience;
+
+    const estateConciergeFlow = tryEstateConciergeFlow(input, routing);
+    if (estateConciergeFlow) return estateConciergeFlow;
+
+    const navigationPhilosophy = tryEstateNavigationPhilosophy(userText, routing);
+    if (navigationPhilosophy) return navigationPhilosophy;
   }
 
   if (routing.learnFastPath || shouldSuppressVisualThinkingForLearn(userText)) {
@@ -1098,18 +2400,6 @@ export function resolveFrictionlessAction(
     return buildGoogleSheetsIntakeDecision(sheetType, userText, currentTurn);
   }
 
-  const artifact = detectArtifactRequest(userText);
-  if (artifact && isRegistryArtifactExecution(userText)) {
-    return buildDirectActionDecision(
-      {
-        ...routing,
-        suppressRelationshipIntelligence: true,
-      },
-      userText,
-      currentTurn,
-    );
-  }
-
   const reminderDecision = buildReminderDecision(userText, currentTurn, input);
   if (reminderDecision) return reminderDecision;
 
@@ -1146,6 +2436,9 @@ export function resolveFrictionlessAction(
   }
 
   if (isAdhdEmotionalFrictionTurn(userText)) {
+    if (isFrictionFirstTurn(userText)) {
+      return buildFrictionFirstDecision(userText, currentTurn);
+    }
     return buildAdhdEmotionalFrictionDecision(userText, currentTurn);
   }
 
@@ -1153,6 +2446,11 @@ export function resolveFrictionlessAction(
   if (audio) return audio;
 
   if (FOCUS_SUPPORT_RE.test(userText) && !/\boverwhelm/i.test(userText)) {
+    if (isFrictionFirstTurn(userText)) {
+      return buildFrictionFirstDecision(userText, currentTurn);
+    }
+    const menu = resolveEstateCoachingMenu(userText);
+    if (menu) return buildEstateCoachingDecision(menu, routing);
     return buildFocusSupportDecision(currentTurn);
   }
 
@@ -1202,6 +2500,18 @@ export function resolveFrictionlessAction(
   };
 }
 
+export function resolveFrictionlessAction(
+  input: FrictionlessActionInput,
+): FrictionlessActionDecision {
+  const userText = input.userText.trim();
+  if (!userText) return resolveFrictionlessActionImpl(input);
+  const runtime = input.sparkRuntime ?? resolveSparkRuntime(input);
+  return finishFrictionlessDecision(
+    resolveFrictionlessActionImpl({ ...input, sparkRuntime: runtime }),
+    runtime,
+  );
+}
+
 export function shouldSuppressRelationshipForFrictionless(
   decision: FrictionlessActionDecision,
 ): boolean {
@@ -1225,9 +2535,32 @@ export function frictionlessHintForChat(
       "Acknowledge first. One question only. No task planning or tools until they answer.",
     );
   }
+  if (decision.category === "friction_first") {
+    lines.push(
+      "FRICTION FIRST: Diagnose barrier before tools or Estate navigation. One barrier → one next step.",
+      "Never: Try harder, discipline, Stay focused. Welcome back without guilt if attention wandered.",
+    );
+  }
   if (decision.category === "focus_support") {
     lines.push("Ask what needs attention OR offer Focus Mode / Focus Audio.");
   }
+  if (decision.category === "estate_coaching") {
+    lines.push(
+      "Coach before navigate. Human prescriptions only — never feature names or 'I'm taking you to…'.",
+    );
+  }
+  if (decision.category === "estate_discovery") {
+    lines.push(
+      "DISCOVERY MODE: One thoughtful question at a time. Never a form. Stop when confidence ≥ 90%.",
+    );
+  }
+  if (decision.category === "estate_concierge") {
+    lines.push(
+      "ESTATE CONCIERGE: Registry-informed recommendations only. Max 4 numbered choices. Never overwhelm.",
+    );
+  }
+  const continuity = conversationStateHint();
+  if (continuity) lines.push(continuity);
   if (decision.category === "google_sheet") {
     lines.push(
       "One question at a time for sheet intake. Offer Google Sheet creation when ready.",
@@ -1268,7 +2601,7 @@ export function isFrictionlessPendingAlignedWithAssistant(
 
   if (pending.target === "content-generator") {
     return (
-      /\b(?:creative studio|take (?:us|you|me) there|step into|would you like me to)\b/i.test(
+      /\b(?:\bcreate\b|take (?:us|you|me) there|step into|would you like me to)\b/i.test(
         assistant,
       ) ||
       /\b(?:open create|create workspace|draft (?:a|an|the)|would you like (?:me )?to (?:create|draft|open))\b/i.test(

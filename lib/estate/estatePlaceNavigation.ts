@@ -15,6 +15,36 @@ import {
   extractCanonicalPlaceIdsMentionedInText,
   textContainsCanonicalPlaceName,
 } from "./estatePlaceIdentityLock";
+import {
+  formatEstateWanderMenu,
+  formatVagueWanderClusterMenu,
+} from "./estateWanderNavigation";
+import {
+  matchAmbiguousDestinationCluster,
+  matchVaguePlaceCluster,
+} from "./estatePlaceClusters";
+import {
+  clearPendingNavigationChoices,
+  formatEstateDestinationChoiceMenu,
+  loadPendingNavigationChoices,
+  pendingNavigationPlaceIds,
+  resolveEstateDestination,
+  resolvePendingNavigationChoice,
+  savePendingNavigationChoices,
+  shouldClearPendingNavigationChoices,
+  type EstateDestinationAmbiguousMatch,
+} from "./estateDestinationResolver";
+import {
+  decodeSceneViewPlaceToken,
+  encodeSceneViewPlaceToken,
+  extractSceneViewTokensFromNumberedMenu,
+  formatSceneViewMenuLine,
+  listSceneViewsForPlace,
+  placeHasSceneViewChoice,
+  resolveSceneViewBackgroundUrl,
+  sceneViewIdFromUserText,
+  sceneViewTokensForPlace,
+} from "./estatePlaceSceneViews";
 import { isConversationOnlyTurn } from "./estateConversationGuard";
 import { isCaptureWriteTurn } from "@/lib/capture/classifyCaptureIntent";
 import { resolveDirectRoomFromRoomId } from "./estateDirectRoomResolve";
@@ -26,14 +56,27 @@ import {
   type EstatePlaceResolution,
 } from "./resolveEstatePlace";
 import { evaluateConversationEnvironmentNeed, isConversationEnvironmentOffer } from "./conversationDrivesNavigation";
-import { extractRoomPhraseFromNavigation } from "./estateRoomAliasRegistry";
+import { isEstateTransitionOfferMessage } from "@/lib/estateMemory/estatePendingTransition";
+import { extractRoomPhraseFromNavigation, resolveEstatePlaceIdFromUserText, messageNamesExactEstateRoom, findAmbiguousPlaceMatches } from "./estateRoomAliasRegistry";
+import type { ImpliedEstatePlaceMatch } from "./impliedEstatePlaceMatch";
 import {
   formatCelebrationSoundsReply,
   formatSwimmingPoolOfferLine,
   isCelebrationSoundsIntent,
-  isSwimmingPoolNavigationRequest,
+  isVagueSwimmingActivityRequest,
   SWIMMING_POOL_ALTERNATIVE_PLACE_IDS,
 } from "./estatePlaceNavigationIntents";
+import {
+  isDeckCorrectionTurn,
+} from "./estateInRoomConversationIntents";
+import {
+  evaluateMetaEstateNavigationTurn,
+  formatEstateRoomPickerLine,
+  hasHardEstateNavigationIntent,
+  isAnotherRoomRequest,
+  isEstateRoomListOrMapRequest,
+  pickExploratoryPlaceIds,
+} from "./estateMetaNavigation";
 import { parseOptionSelection } from "@/lib/workspaceSop";
 import {
   detectDirectCommand,
@@ -89,6 +132,7 @@ export function assistantOffersPlaceNavigation(
   ) {
     return true;
   }
+  if (isEstateTransitionOfferMessage(last)) return true;
   return false;
 }
 
@@ -149,8 +193,13 @@ export type PendingEstatePlaceMenu = {
 
 export type EstatePlaceTurnResult =
   | { type: "none" }
-  | { type: "navigate"; command: EstateCommandDecision }
-  | { type: "offer"; line: string; placeIds: string[] }
+  | {
+      type: "navigate";
+      command: EstateCommandDecision;
+      impliedPlaceMatch?: ImpliedEstatePlaceMatch;
+      navigationLine?: string;
+    }
+  | { type: "offer"; line: string; placeIds: string[]; impliedPlaceMatch?: ImpliedEstatePlaceMatch }
   | { type: "reply"; line: string }
   | { type: "unknown_place"; line: string };
 
@@ -192,12 +241,129 @@ export function savePendingEstatePlaceMenu(menu: PendingEstatePlaceMenu): void {
 
 export function clearPendingEstatePlaceMenu(): void {
   memoryPendingMenu = null;
+  clearPendingNavigationChoices();
   if (typeof window === "undefined") return;
   try {
     window.sessionStorage.removeItem(PENDING_MENU_KEY);
   } catch {
     /* ignore */
   }
+}
+
+function saveAmbiguousDestinationOffer(
+  resolution: EstateDestinationAmbiguousMatch,
+  offeredAtTurn?: number,
+): void {
+  savePendingNavigationChoices({
+    queryPhrase: resolution.queryPhrase,
+    choices: resolution.choices,
+    offeredAtTurn,
+  });
+  savePendingEstatePlaceMenu({
+    placeIds: pendingNavigationPlaceIds({
+      queryPhrase: resolution.queryPhrase,
+      choices: resolution.choices,
+    }),
+    offeredAtTurn,
+  });
+}
+
+function tryDestinationResolverTurn(
+  userText: string,
+  currentPlaceId?: string | null,
+): EstatePlaceTurnResult | null {
+  const trimmed = userText.trim();
+  if (!trimmed) return null;
+
+  const destinationPhrase =
+    extractRoomPhraseFromNavigation(trimmed) ?? trimmed;
+  const wordCount = destinationPhrase.split(/\s+/).filter(Boolean).length;
+  const isBareCandidate =
+    wordCount <= 4 && !isConversationOnlyTurn(trimmed);
+
+  if (
+    !hasHardEstateNavigationIntent(trimmed) &&
+    !isBareCandidate &&
+    !isPhysicalQuietPlaceRequest(trimmed)
+  ) {
+    return null;
+  }
+
+  const resolution = resolveEstateDestination({
+    userText: trimmed,
+    destinationPhrase,
+    currentPlaceId,
+  });
+
+  if (resolution.kind === "exact_match") {
+    if (
+      hasHardEstateNavigationIntent(trimmed) ||
+      messageNamesExactEstateRoom(trimmed) ||
+      wordCount <= 4
+    ) {
+      clearPendingEstatePlaceMenu();
+      const finalized = finalizePlaceNavigation(
+        resolution.destinationId,
+        trimmed,
+      );
+      if (finalized) return finalized;
+    }
+    return null;
+  }
+
+  if (resolution.kind === "ambiguous_match") {
+    saveAmbiguousDestinationOffer(resolution);
+    return {
+      type: "offer",
+      line: formatEstateDestinationChoiceMenu(resolution),
+      placeIds: pendingNavigationPlaceIds({
+        queryPhrase: resolution.queryPhrase,
+        choices: resolution.choices,
+      }),
+    };
+  }
+
+  return null;
+}
+
+function resolvePendingDestinationTurn(
+  userText: string,
+  lastAssistantText?: string | null,
+): EstatePlaceTurnResult | null {
+  const pendingNav = loadPendingNavigationChoices();
+  const pendingMenu = loadPendingEstatePlaceMenu();
+  const hasPending =
+    Boolean(pendingNav?.choices.length) || Boolean(pendingMenu?.placeIds.length);
+
+  if (!hasPending) return null;
+
+  if (shouldClearPendingNavigationChoices(userText, true)) {
+    clearPendingEstatePlaceMenu();
+    return { type: "none" };
+  }
+
+  if (pendingNav?.choices.length) {
+    const selected = resolvePendingNavigationChoice(userText, pendingNav);
+    if (selected) {
+      clearPendingEstatePlaceMenu();
+      const finalized = finalizePlaceNavigation(selected.destinationId, userText);
+      if (finalized) return finalized;
+    }
+  }
+
+  const menuPlaceIds = resolveActiveMenuPlaceIds(pendingMenu, lastAssistantText);
+  if (menuPlaceIds.length >= 2) {
+    const selected =
+      resolveConfirmedPlaceId(userText, lastAssistantText ?? "", menuPlaceIds) ??
+      placeIdFromUserSelection(userText, menuPlaceIds);
+    if (selected) {
+      clearPendingEstatePlaceMenu();
+      const finalized = finalizePlaceNavigation(selected, userText);
+      if (finalized) return finalized;
+    }
+  }
+
+  return null;
 }
 
 export function formatEstatePlaceChoicesLine(placeIds: readonly string[]): string {
@@ -209,7 +375,7 @@ function uniquePlaceIds(ids: readonly string[]): string[] {
   const out: string[] = [];
   for (const id of ids) {
     if (!id || seen.has(id)) continue;
-    if (!getCanonicalEstatePlaceById(id) && !resolveDirectRoomFromRoomId(id)) {
+    if (!getCanonicalEstatePlaceById(id) && !resolveDirectRoomFromRoomId(id) && !decodeSceneViewPlaceToken(id)) {
       continue;
     }
     seen.add(id);
@@ -228,6 +394,19 @@ function placeIdFromUserSelection(
 
   const normalized = normalize(userText);
   for (const placeId of placeIds) {
+    const sceneToken = decodeSceneViewPlaceToken(placeId);
+    if (sceneToken) {
+      const view = listSceneViewsForPlace(sceneToken.placeId).find(
+        (row) => row.viewId === sceneToken.viewId,
+      );
+      if (view) {
+        const label = normalize(view.label.replace(/™/g, ""));
+        if (normalized.includes(label) || normalized.includes(sceneToken.viewId)) {
+          return placeId;
+        }
+      }
+      continue;
+    }
     const place = getCanonicalEstatePlaceById(placeId);
     if (!place) continue;
     const labels = [place.officialName, ...place.aliases];
@@ -256,6 +435,116 @@ function navigateCommandForPlace(
   });
 }
 
+function sceneViewOfferIfNeeded(
+  placeId: string,
+  userText: string,
+): EstatePlaceTurnResult | null {
+  if (!placeHasSceneViewChoice(placeId)) return null;
+
+  const specified = sceneViewIdFromUserText(placeId, userText);
+  if (specified) {
+    const command = navigateCommandForPlace(placeId, userText);
+    if (!command) return null;
+    return {
+      type: "navigate",
+      command: {
+        ...command,
+        backgroundImageOverride:
+          resolveSceneViewBackgroundUrl(placeId, specified) ?? null,
+      },
+    };
+  }
+
+  return {
+    type: "offer",
+    line: formatSceneViewMenuLine(placeId),
+    placeIds: sceneViewTokensForPlace(placeId),
+  };
+}
+
+function finalizePlaceNavigation(
+  placeOrToken: string,
+  userText: string,
+  explicitActivityRequested?: boolean,
+): EstatePlaceTurnResult | null {
+  const decoded = decodeSceneViewPlaceToken(placeOrToken);
+  const placeId = decoded?.placeId ?? placeOrToken;
+
+  if (!decoded && placeHasSceneViewChoice(placeId)) {
+    return sceneViewOfferIfNeeded(placeId, userText);
+  }
+
+  if (decoded) {
+    const command = navigateCommandForPlace(
+      placeId,
+      userText,
+      explicitActivityRequested,
+    );
+    if (!command) return null;
+    return {
+      type: "navigate",
+      command: {
+        ...command,
+        backgroundImageOverride:
+          resolveSceneViewBackgroundUrl(decoded.placeId, decoded.viewId) ?? null,
+      },
+    };
+  }
+
+  const command = navigateCommandForPlace(
+    placeId,
+    userText,
+    explicitActivityRequested,
+  );
+  if (!command) return null;
+  return { type: "navigate", command };
+}
+
+function offerAmbiguousAliasMatches(
+  destinationPhrase: string,
+  excludePlaceId?: string | null,
+): { line: string; placeIds: string[] } | null {
+  const matches = findAmbiguousPlaceMatches(destinationPhrase).filter(
+    (id) => id !== excludePlaceId,
+  );
+  if (matches.length < 2) return null;
+  const placeIds = pinQuietSuggestionOrder(matches).slice(0, 3);
+  return {
+    line: formatEstatePlaceSuggestionMenu(placeIds, {
+      intro: "A few places that could fit — which one did you mean?",
+    }),
+    placeIds,
+  };
+}
+
+function tryNamedPlaceWhileMenuOpen(
+  userText: string,
+  pending: PendingEstatePlaceMenu | null,
+  lastAssistantText?: string | null,
+): EstatePlaceTurnResult | null {
+  const hasMenu =
+    (pending?.placeIds.length ?? 0) >= 2 ||
+    assistantContainsNumberedPlaceMenu(lastAssistantText ?? "");
+  if (!hasMenu) return null;
+
+  const trimmed = userText.trim();
+  if (!trimmed || /^\d+$/.test(trimmed)) return null;
+
+  const namedPlace = resolveEstatePlaceIdFromUserText(trimmed);
+  if (!namedPlace) return null;
+
+  if (
+    hasHardEstateNavigationIntent(trimmed) ||
+    messageNamesExactEstateRoom(trimmed) ||
+    trimmed.split(/\s+/).length <= 4
+  ) {
+    clearPendingEstatePlaceMenu();
+    return finalizePlaceNavigation(namedPlace, trimmed);
+  }
+
+  return null;
+}
+
 function isContextualPlaceNavigationRequest(userText: string): boolean {
   return isPlaceNavigationConfirmation(userText);
 }
@@ -279,22 +568,18 @@ function resolveContextualPlaceNavigation(
     : null;
 
   if (confirmedId) {
-    const command = navigateCommandForPlace(confirmedId, userText);
-    if (command) {
-      clearPendingEstatePlaceMenu();
-      return { type: "navigate", command };
-    }
+    clearPendingEstatePlaceMenu();
+    const finalized = finalizePlaceNavigation(confirmedId, userText);
+    if (finalized) return finalized;
   }
 
   const singleMention = resolveSingleCanonicalPlaceMentionedInText(
     lastAssistantText,
   );
   if (singleMention) {
-    const command = navigateCommandForPlace(singleMention, userText);
-    if (command) {
-      clearPendingEstatePlaceMenu();
-      return { type: "navigate", command };
-    }
+    clearPendingEstatePlaceMenu();
+    const finalized = finalizePlaceNavigation(singleMention, userText);
+    if (finalized) return finalized;
   }
 
   const direct = detectDirectCommand(userText, {
@@ -341,8 +626,20 @@ function resolveActiveMenuPlaceIds(
   pending: PendingEstatePlaceMenu | null,
   lastAssistantText?: string | null,
 ): string[] {
-  const fromAssistant = lastAssistantText?.trim()
-    ? uniquePlaceIds(extractPlaceIdsFromNumberedAssistantMenu(lastAssistantText))
+  const last = lastAssistantText?.trim() ?? "";
+  const sceneFromAssistant = last
+    ? uniquePlaceIds(extractSceneViewTokensFromNumberedMenu(last))
+    : [];
+  if (sceneFromAssistant.length >= 2) {
+    savePendingEstatePlaceMenu({
+      placeIds: sceneFromAssistant,
+      offeredAtTurn: pending?.offeredAtTurn,
+    });
+    return sceneFromAssistant;
+  }
+
+  const fromAssistant = last
+    ? uniquePlaceIds(extractPlaceIdsFromNumberedAssistantMenu(last))
     : [];
 
   if (fromAssistant.length >= 2) {
@@ -380,7 +677,7 @@ function isLikelyPlaceMenuContinuation(
   if (placeIds.length === 0) return false;
   if (parseOptionSelection(userText, placeIds.length) !== null) return true;
   if (placeIdFromUserSelection(userText, placeIds)) return true;
-  if (HARD_NAV_RE.test(userText)) return true;
+  if (hasHardEstateNavigationIntent(userText)) return true;
   if (isContextualPlaceNavigationRequest(userText)) return true;
   return false;
 }
@@ -397,7 +694,7 @@ function isEstatePlaceNavigationTurn(
   ) {
     return true;
   }
-  if (HARD_NAV_RE.test(text)) return true;
+  if (hasHardEstateNavigationIntent(text)) return true;
   if (isPlaceSuggestionRequest(text)) return true;
   if (isPhysicalQuietPlaceRequest(text)) return true;
 
@@ -412,7 +709,7 @@ function shouldAutoNavigateFromResolution(
   resolution: EstatePlaceResolution,
 ): resolution is EstatePlaceResolution & { placeId: string } {
   if (!shouldNavigateFromResolution(resolution)) return false;
-  if (HARD_NAV_RE.test(text)) return true;
+  if (hasHardEstateNavigationIntent(text)) return true;
   if (
     resolution.kind === "explicit-object" ||
     resolution.kind === "explicit-activity"
@@ -442,12 +739,36 @@ function shouldEvaluatePlaceTurn(
     ) {
       return true;
     }
-    if (hasPendingMenu) {
+    if (
+      hasPendingMenu &&
+      shouldClearPendingNavigationChoices(userText, true)
+    ) {
       clearPendingEstatePlaceMenu();
     }
   }
 
   return isEstatePlaceNavigationTurn(userText, lastAssistantText);
+}
+
+function evaluateImpliedPlaceTurn(
+  _userText: string,
+): EstatePlaceTurnResult | null {
+  // IMPLIED_NEED — frictionless conversation layer offers choices; no kernel auto-route.
+  return null;
+}
+
+function detectDeckArrivalCorrection(
+  userText: string,
+  currentPlaceId?: string | null,
+): EstatePlaceTurnResult | null {
+  if (!isDeckCorrectionTurn(userText, currentPlaceId)) return null;
+  const command = navigateCommandForPlace("back-deck", userText);
+  if (!command) return null;
+  return {
+    type: "navigate",
+    command,
+    navigationLine: "You're right — let me take you to the Back Deck.",
+  };
 }
 
 /**
@@ -466,7 +787,7 @@ export function evaluateEstatePlaceTurn(input: {
     return { type: "reply", line: formatCelebrationSoundsReply() };
   }
 
-  if (isSwimmingPoolNavigationRequest(text)) {
+  if (isVagueSwimmingActivityRequest(text)) {
     return {
       type: "offer",
       line: formatSwimmingPoolOfferLine(),
@@ -474,16 +795,86 @@ export function evaluateEstatePlaceTurn(input: {
     };
   }
 
+  const metaNav = evaluateMetaEstateNavigationTurn({
+    userText: text,
+    currentPlaceId: input.currentPlaceId,
+  });
+  if (metaNav?.type === "navigate" && metaNav.command) {
+    const placeId = metaNav.command.roomId ?? metaNav.command.entryId;
+    const finalized = finalizePlaceNavigation(placeId, text);
+    if (finalized) return finalized;
+    return { type: "navigate", command: metaNav.command };
+  }
+  if (metaNav?.type === "offer") {
+    return {
+      type: "offer",
+      line: metaNav.line,
+      placeIds: metaNav.placeIds,
+    };
+  }
+
+  const deckCorrection = detectDeckArrivalCorrection(
+    text,
+    input.currentPlaceId,
+  );
+  if (deckCorrection) return deckCorrection;
+
   if (isCaptureWriteTurn(text)) return { type: "none" };
 
   const lastAssistant = input.lastAssistantText ?? null;
+
+  const pendingDestination = resolvePendingDestinationTurn(text, lastAssistant);
+  if (pendingDestination) return pendingDestination;
+
   const cafeCorrection = detectCafePlaceCorrection(text, lastAssistant);
   if (cafeCorrection) return cafeCorrection;
 
   const contextualNav = resolveContextualPlaceNavigation(text, lastAssistant);
   if (contextualNav) return contextualNav;
 
+  const impliedTurn = evaluateImpliedPlaceTurn(text);
+  if (impliedTurn) return impliedTurn;
+
+  const vagueCluster =
+    matchVaguePlaceCluster(text, input.currentPlaceId) ??
+    formatVagueWanderClusterMenu(text, input.currentPlaceId);
+  if (vagueCluster) {
+    return {
+      type: "offer",
+      line: vagueCluster.line,
+      placeIds: vagueCluster.placeIds,
+    };
+  }
+
+  const barePhrase = text.trim();
+  if (barePhrase.split(/\s+/).length <= 4) {
+    const destinationResolverTurn = tryDestinationResolverTurn(
+      text,
+      input.currentPlaceId,
+    );
+    if (destinationResolverTurn) return destinationResolverTurn;
+
+    const ambiguousBare = matchAmbiguousDestinationCluster(
+      barePhrase,
+      input.currentPlaceId,
+    );
+    if (ambiguousBare) {
+      return {
+        type: "offer",
+        line: ambiguousBare.line,
+        placeIds: ambiguousBare.placeIds,
+      };
+    }
+  }
+
   const pending = loadPendingEstatePlaceMenu();
+  const namedWhileMenu = tryNamedPlaceWhileMenuOpen(
+    text,
+    pending,
+    lastAssistant,
+  );
+  if (namedWhileMenu) return namedWhileMenu;
+
   if (!shouldEvaluatePlaceTurn(text, Boolean(pending), lastAssistant)) {
     return { type: "none" };
   }
@@ -495,8 +886,8 @@ export function evaluateEstatePlaceTurn(input: {
       placeIdFromUserSelection(text, menuPlaceIds);
     if (selected) {
       clearPendingEstatePlaceMenu();
-      const command = navigateCommandForPlace(selected, text);
-      if (command) return { type: "navigate", command };
+      const finalized = finalizePlaceNavigation(selected, text);
+      if (finalized) return finalized;
     }
   }
 
@@ -506,19 +897,60 @@ export function evaluateEstatePlaceTurn(input: {
     return { type: "reply", line: formatCelebrationSoundsReply() };
   }
 
+  const resolverBeforeAutoNav = tryDestinationResolverTurn(
+    text,
+    input.currentPlaceId,
+  );
+  if (resolverBeforeAutoNav) return resolverBeforeAutoNav;
+
   if (shouldAutoNavigateFromResolution(text, resolution) && resolution.placeId) {
     clearPendingEstatePlaceMenu();
-    const command = navigateCommandForPlace(
+    const finalized = finalizePlaceNavigation(
       resolution.placeId,
       text,
       resolution.explicitActivityRequested,
     );
-    if (command) return { type: "navigate", command };
+    if (finalized) return finalized;
   }
 
-  if (HARD_NAV_RE.test(text) && !shouldAutoNavigateFromResolution(text, resolution)) {
+  if (
+    hasHardEstateNavigationIntent(text) &&
+    !shouldAutoNavigateFromResolution(text, resolution)
+  ) {
+    if (isAnotherRoomRequest(text) || isEstateRoomListOrMapRequest(text)) {
+      const wander = formatEstateWanderMenu(input.currentPlaceId);
+      return {
+        type: "offer",
+        line: wander.line,
+        placeIds: wander.placeIds,
+      };
+    }
     clearPendingEstatePlaceMenu();
     const phrase = extractRoomPhraseFromNavigation(text) ?? text;
+    const destinationResolverTurn = tryDestinationResolverTurn(
+      phrase,
+      input.currentPlaceId,
+    );
+    if (destinationResolverTurn) return destinationResolverTurn;
+
+    const ambiguousCluster =
+      matchAmbiguousDestinationCluster(phrase, input.currentPlaceId) ??
+      offerAmbiguousAliasMatches(phrase, input.currentPlaceId);
+    if (ambiguousCluster) {
+      return {
+        type: "offer",
+        line: ambiguousCluster.line,
+        placeIds: ambiguousCluster.placeIds,
+      };
+    }
+    if (isAnotherRoomRequest(phrase) || isEstateRoomListOrMapRequest(phrase)) {
+      const wander = formatEstateWanderMenu(input.currentPlaceId);
+      return {
+        type: "offer",
+        line: wander.line,
+        placeIds: wander.placeIds,
+      };
+    }
     return {
       type: "unknown_place",
       line: formatUnknownEstatePlaceReply(phrase),
@@ -550,6 +982,14 @@ export function registerPendingEstatePlaceMenuFromAssistant(
   assistantText: string,
   offeredAtTurn?: number,
 ): boolean {
+  const sceneTokens = uniquePlaceIds(
+    extractSceneViewTokensFromNumberedMenu(assistantText),
+  );
+  if (sceneTokens.length >= 2) {
+    savePendingEstatePlaceMenu({ placeIds: sceneTokens, offeredAtTurn });
+    return true;
+  }
+
   const placeIds = uniquePlaceIds(
     extractPlaceIdsFromNumberedAssistantMenu(assistantText),
   );

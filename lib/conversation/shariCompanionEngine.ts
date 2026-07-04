@@ -5,12 +5,9 @@
  * @see docs/EMOTIONAL_FIRST_RESPONSE_SEQUENCE.md
  */
 
-import {
-  emotionalFirstResponseHint,
-  formatEmotionalContinuation,
-  planEmotionalFirstResponse,
-  shouldUseEmotionalFirstSequence,
-} from "./emotionalFirstResponseSequence";
+
+import { buildSparkCompanionHint } from "@/lib/sparkCompanion/buildSparkCompanionHint";
+import type { SparkCompanionSessionContext } from "@/lib/sparkCompanion/types";
 
 export const SHARI_CORE_LAW = [
   "Never solve a human moment before reflecting it.",
@@ -55,19 +52,18 @@ export const SHARI_ERROR_RECOVERY_LINE =
 const DIFFICULT_CLIENT_CALL_RE =
   /\b(?:difficult|hard|dread(?:ed|ing)?|don'?t want to|avoid(?:ing)?).{0,40}(?:call|phone|client|customer)|(?:call|phone).{0,40}(?:difficult|hard|client|customer|don'?t want)\b/i;
 
-const CONFLICT_DREAD_RE =
-  /\b(?:conflict|confrontation|pushback|boundary conversation|hard conversation)\b/i;
-
-const TASK_HELP_AFTER_EMOTION_RE =
-  /\b(?:call|email|script|conversation with|talk to)\b/i;
-
-export type ShariCompanionHintInput = {
+export type ShariCompanionHintInput = SparkCompanionSessionContext & {
   userText: string;
   /** Quiet memory — e.g. member dislikes conflict */
   memberDislikesConflict?: boolean;
   hasSolutionReady?: boolean;
   /** Draft/script ready to offer after emotional grounding */
   taskHelpReady?: boolean;
+  overwhelmed?: boolean;
+  momentumActive?: boolean;
+  currentTurn?: number;
+  /** Estate place id — room life-skill hint when available */
+  placeId?: string | null;
 };
 
 export const SHARI_COMPANION_ENGINE_PROMPT_BLOCK = `# SHARI COMPANION ENGINE (supremacy — overrides generic AI coaching cadence)
@@ -134,7 +130,7 @@ export function buildShariErrorRecoveryResponse(
 ): string {
   const tail =
     continuation?.trim() ||
-    "We can pick up right where we left off — what felt most important?";
+    "Pick up wherever you left off — I'm still with you.";
   return `${SHARI_ERROR_RECOVERY_LINE} ${tail}`;
 }
 
@@ -149,60 +145,10 @@ export function buildDifficultClientCallOpeningReply(): string {
 
 /**
  * Per-turn hint for companion + estate chat stacks.
+ * Delegates to Spark Companion V4 — one orchestrated hint per turn.
  */
 export function shariCompanionHintForChat(
   input: ShariCompanionHintInput,
 ): string | null {
-  const text = input.userText.trim();
-  if (!text) return null;
-
-  const lines: string[] = [
-    "SHARI COMPANION ENGINE (mandatory this turn):",
-    ...SHARI_CORE_LAW.map((l) => `- ${l}`),
-  ];
-
-  const emotionalPlan = planEmotionalFirstResponse({
-    text,
-    hasSolutionReady: input.hasSolutionReady,
-  });
-
-  if (shouldUseEmotionalFirstSequence(text)) {
-    lines.push(emotionalFirstResponseHint(emotionalPlan));
-  }
-
-  if (input.memberDislikesConflict && CONFLICT_DREAD_RE.test(text)) {
-    lines.push(
-      'MEMORY (use once, gently): "I know conflict feels especially hard for you, so we\'ll make this calm, clear, and kind."',
-    );
-  }
-
-  if (isDifficultClientCallRequest(text)) {
-    lines.push(
-      "DIFFICULT CLIENT CALL — do NOT open with tactics or outlines.",
-      'Reflect the weight first — e.g. "This sounds like one of those conversations that feels heavier than the actual words you\'ll need to say."',
-      "Then: boundary framing, calm + clear script in the member's voice, offer softer and firmer versions if useful.",
-      'End with: "Do you want to practice it once with me? I can be the client, and you can just read it through."',
-      "Offer to stay with them before the call.",
-    );
-  } else if (
-    emotionalPlan.requiresEmotionalFirstSequence &&
-    TASK_HELP_AFTER_EMOTION_RE.test(text)
-  ) {
-    lines.push(
-      "TASK HELP (after emotional grounding only): reassurance, framing, natural script, practice offer, stay-with-me offer.",
-    );
-  }
-
-  if (input.hasSolutionReady || input.taskHelpReady) {
-    lines.push(
-      `After guidance, continue: "${formatEmotionalContinuation(emotionalPlan)}"`,
-      "Never end the interaction after delivering a solution.",
-    );
-  }
-
-  lines.push(
-    `FORBIDDEN this turn: ${SHARI_BANNED_PHRASE_LABELS.slice(0, 6).join(" · ")}`,
-  );
-
-  return lines.join("\n");
+  return buildSparkCompanionHint(input);
 }

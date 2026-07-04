@@ -5,6 +5,11 @@
 
 import { CONVERSATION_FRONT_DOOR_PRINCIPLE } from "@/lib/sparkEstateRooms/types";
 import { estateRoomKnowledgeHintForChat } from "@/lib/estateKnowledge";
+import { shariKnowledgeHintForChat } from "@/lib/sparkKnowledge";
+import {
+  evaluateIntentAwareConversation,
+  intentAwareConversationHintForChat,
+} from "@/lib/intentAwareConversation";
 import { shariCompanionHintForChat } from "@/lib/conversation/shariCompanionEngine";
 import type { EstateIntelligenceEvaluation } from "./types";
 
@@ -14,6 +19,15 @@ const HIGH_CONFIDENCE_HEADER =
 export type EstateIntelligenceHintOptions = {
   userText?: string | null;
   memberDislikesConflict?: boolean;
+  currentTurn?: number;
+  overwhelmed?: boolean;
+  workspace?: string | null;
+  isReturning?: boolean;
+  trustEstablished?: boolean;
+  activeWorkflow?: string | null;
+  activeDocument?: string | null;
+  pendingNavigationChoices?: boolean;
+  pendingConciergeChoices?: boolean;
 };
 
 export function estateIntelligenceHintForChat(
@@ -26,8 +40,35 @@ export function estateIntelligenceHintForChat(
     const shariHint = shariCompanionHintForChat({
       userText: options.userText,
       memberDislikesConflict: options.memberDislikesConflict,
+      overwhelmed: options.overwhelmed,
+      placeId: options.workspace,
+      currentRoom: options.workspace,
+      isReturning: options.isReturning,
+      trustEstablished: options.trustEstablished,
+      activeWorkflow: options.activeWorkflow,
+      activeDocument: options.activeDocument,
+      pendingNavigationChoices: options.pendingNavigationChoices,
+      pendingConciergeChoices: options.pendingConciergeChoices,
     });
     if (shariHint) parts.push(shariHint);
+
+    const intentAware = evaluateIntentAwareConversation({
+      userText: options.userText,
+      currentTurn: options.currentTurn,
+      overwhelmed: options.overwhelmed,
+      workspace: options.workspace,
+    });
+    const intentHint = intentAwareConversationHintForChat(
+      intentAware,
+      options.userText,
+    );
+    if (intentHint) parts.push(intentHint);
+
+    const knowledgeHint = shariKnowledgeHintForChat({
+      userText: options.userText,
+      matchedEntryId: evaluation?.bestMatch?.entry.id,
+    });
+    if (knowledgeHint) parts.push(knowledgeHint);
   }
 
   if (!evaluation?.route || !evaluation.bestMatch) {

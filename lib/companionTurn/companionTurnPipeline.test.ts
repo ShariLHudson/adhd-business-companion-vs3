@@ -20,12 +20,14 @@ describe("companion turn pipeline", () => {
     expect(companionIntentHandledByKernel(classified)).toBe(false);
   });
 
-  it("2. classify + execute — Reading Nook → NAVIGATE only", () => {
+  it("2. classify + execute — Reading Nook → place menu, then pick", () => {
     const classified = classifyCompanionIntent({
       userText: "Take me to Reading Nook",
     });
-    expect(classified.kind).toBe("NAVIGATE");
+    expect(classified.kind).toBe("CHAT");
+    expect(classified.plan.type).toBe("place-menu");
 
+    const onPlaceMenu = vi.fn();
     const onNavigatePlace = vi.fn();
     const handled = executeCompanionIntent(classified, {
       onCaptureWrite: vi.fn(),
@@ -33,12 +35,14 @@ describe("companion turn pipeline", () => {
       onNavigatePlace,
       onSoundscape: vi.fn(),
       onAssistantLine: vi.fn(),
-      onPlaceMenu: vi.fn(),
+      onPlaceMenu,
       onCaptureMenu: vi.fn(),
+      onRoomAction: vi.fn(),
     });
 
     expect(handled).toBe(true);
-    expect(onNavigatePlace).toHaveBeenCalledTimes(1);
+    expect(onPlaceMenu).toHaveBeenCalledTimes(1);
+    expect(onNavigatePlace).not.toHaveBeenCalled();
   });
 
   it("3. classify — save thought → CAPTURE", () => {
@@ -70,6 +74,7 @@ describe("companion turn pipeline", () => {
       onAssistantLine: vi.fn(),
       onPlaceMenu: vi.fn(),
       onCaptureMenu: vi.fn(),
+      onRoomAction: vi.fn(),
     })).toBe(false);
   });
 

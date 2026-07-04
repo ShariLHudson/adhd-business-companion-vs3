@@ -14,11 +14,7 @@ const PHRASE_MATRIX: {
 }[] = [
   {
     text: "take me to the swimming pool",
-    expect: {
-      type: "offer",
-      placeIds: ["seat-at-pond", "peaceful-places"],
-      lineIncludes: ["isn't on the Estate yet", "Seat at the Pond"],
-    },
+    expect: { type: "navigate", placeId: "summer-terrace" },
   },
   {
     text: "let's go swimming",
@@ -30,11 +26,7 @@ const PHRASE_MATRIX: {
   },
   {
     text: "take me to the pool",
-    expect: {
-      type: "offer",
-      placeIds: ["seat-at-pond", "peaceful-places"],
-      lineIncludes: ["isn't on the Estate yet"],
-    },
+    expect: { type: "navigate", placeId: "summer-terrace" },
   },
   {
     text: "take me to the celebration room",

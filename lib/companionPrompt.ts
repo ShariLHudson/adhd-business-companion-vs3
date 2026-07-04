@@ -1,6 +1,6 @@
 import { COGNITIVE_GROWTH_PROMPT_BLOCK } from "./cognitiveGrowthPrinciple";
 import { ELEVATE_LIFE_EXPERIENCE_PROMPT_BLOCK } from "./elevateLifeExperience";
-import { SHARI_COMPANION_ENGINE_PROMPT_BLOCK } from "./conversation/shariCompanionEngine";
+import { getSparkCompanionPromptBlock } from "./sparkCompanion/getSparkCompanionPromptBlock";
 import { HUMAN_CONVERSATION_PROMPT_BLOCK } from "./humanConversation";
 import { TODAYS_LITTLE_SPARK_PROMPT_BLOCK } from "./todaysLittleSpark";
 import { ESTATE_BEHAVIORAL_RULES_BLOCK } from "./estateIntelligence/estateRoomLifecycle";
@@ -282,8 +282,8 @@ When the founder asks what to focus on, surface the top 2–3 high-priority item
 When someone wants to make something, don't yank them into a room cold. Gather a little context in chat first, then confirm before going:
 Discovery is NOT Creation: brainstorming, "what should I write about", "give me ideas", "help me brainstorm" = conversation only — no workspace button, no pending card, no draft generation until they explicitly say write/draft/create it.
 1. Find out WHAT they're making — a document, email, spreadsheet, form, or something else — plus a title/subject, and (optional) which project it belongs to. One light question is enough; don't interrogate.
-2. THEN offer the Estate room: use Creative Studio™ language — "The Creative Studio™ is the perfect place for that. Would you like me to take us there?" Never say "Open Create" or expose internal feature names.
-3. When Creative Studio opens it starts BLANK for this piece — never pull in old chat history or a past draft unless they explicitly ask to resume one. The conversation stays in the left panel for reference; it is not poured into the document.
+2. THEN navigate to Create when intent is clear — e.g. "Absolutely. Let's head to Create." and open the right tool immediately. Do not ask "Would you like me to take us there?" for high-confidence create requests.
+3. When Create opens it starts BLANK for this piece — never pull in old chat history or a past draft unless they explicitly ask to resume one. The conversation stays in the left panel for reference; it is not poured into the document.
 4. When they agree to go there, continue naturally from their original intent — do not ask them to repeat what they wanted to make.
 5. When the draft is ready (the "✓ It's Ready" step), point them to where to take it: Open in Google Docs/Sheets/Forms, Copy text, or Download PDF. Keep the user in control the whole way.
 
@@ -464,7 +464,7 @@ export function buildCompanionSystemPrompt(
 
   const blocks = [
     COMPANION_SYSTEM_PROMPT,
-    SHARI_COMPANION_ENGINE_PROMPT_BLOCK,
+    getSparkCompanionPromptBlock(),
     ELEVATE_LIFE_EXPERIENCE_PROMPT_BLOCK,
     HUMAN_CONVERSATION_PROMPT_BLOCK,
     TODAYS_LITTLE_SPARK_PROMPT_BLOCK,

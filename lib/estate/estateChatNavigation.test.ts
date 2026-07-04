@@ -1,58 +1,56 @@
-import { describe, expect, it, beforeEach, afterEach } from "vitest";
-import {
-  shouldShowDirectEstateOverlay,
-  shouldShowDirectEstateVisitOverlay,
-} from "./estateChatNavigation";
+import { describe, expect, it } from "vitest";
+import { resolveEstatePlaceAudioHostPlaceId } from "./estateChatNavigation";
 import type { DirectEstateVisit } from "./directEstateVisit";
-import {
-  registerEstatePendingTransition,
-  clearEstatePendingTransition,
-} from "@/lib/estateMemory";
 
-describe("estateChatNavigation", () => {
-  const storage = new Map<string, string>();
+const coffeeVisit: DirectEstateVisit = {
+  roomId: "coffee-house",
+  section: "focus-audio",
+  userIntent: "take me to the coffee house",
+  userMessageCountAtArrival: 0,
+};
 
-  beforeEach(() => {
-    storage.clear();
-    Object.defineProperty(globalThis, "sessionStorage", {
-      value: {
-        getItem: (k: string) => storage.get(k) ?? null,
-        setItem: (k: string, v: string) => {
-          storage.set(k, v);
-        },
-        removeItem: (k: string) => {
-          storage.delete(k);
-        },
-      },
-      configurable: true,
-    });
-    clearEstatePendingTransition();
+describe("resolveEstatePlaceAudioHostPlaceId", () => {
+  it("plays coffee-house ambience only while the direct overlay is active", () => {
+    expect(
+      resolveEstatePlaceAudioHostPlaceId({
+        directEstateVisit: coffeeVisit,
+        showDirectEstateOverlay: true,
+        estatePresenceRoomId: "coffee-house",
+        showGlobalEstatePresence: true,
+      }),
+    ).toBe("coffee-house");
   });
 
-  afterEach(() => {
-    clearEstatePendingTransition();
+  it("stops coffee-house ambience when member left for home chat", () => {
+    expect(
+      resolveEstatePlaceAudioHostPlaceId({
+        directEstateVisit: coffeeVisit,
+        showDirectEstateOverlay: false,
+        estatePresenceRoomId: "coffee-house",
+        showGlobalEstatePresence: false,
+      }),
+    ).toBeNull();
   });
 
-  it("shows overlay for apple orchard on focus-audio with visit state", () => {
-    const visit: DirectEstateVisit = {
-      roomId: "apple-orchard",
-      section: "focus-audio",
-      userIntent: "go to the apple orchard",
-      userMessageCountAtArrival: 0,
-    };
-    expect(shouldShowDirectEstateVisitOverlay(visit, "focus-audio")).toBe(true);
-    expect(shouldShowDirectEstateOverlay("focus-audio", visit)).toBe(true);
-    expect(shouldShowDirectEstateOverlay("stables", visit)).toBe(false);
+  it("does not use stale direct visit when immersive presence is off", () => {
+    expect(
+      resolveEstatePlaceAudioHostPlaceId({
+        directEstateVisit: coffeeVisit,
+        showDirectEstateOverlay: false,
+        estatePresenceRoomId: null,
+        showGlobalEstatePresence: false,
+      }),
+    ).toBeNull();
   });
 
-  it("falls back to pending transition without visit state", () => {
-    registerEstatePendingTransition({
-      destinationSection: "focus-audio",
-      destinationEntryId: "apple-orchard",
-      originalUserIntent: "go to the apple orchard",
-      offeredAtTurn: 1,
-      followUpQuestion: false,
-    });
-    expect(shouldShowDirectEstateOverlay("focus-audio")).toBe(true);
+  it("uses section presence when overlay is off but immersive room is active", () => {
+    expect(
+      resolveEstatePlaceAudioHostPlaceId({
+        directEstateVisit: null,
+        showDirectEstateOverlay: false,
+        estatePresenceRoomId: "peaceful-places",
+        showGlobalEstatePresence: true,
+      }),
+    ).toBe("peaceful-places");
   });
 });

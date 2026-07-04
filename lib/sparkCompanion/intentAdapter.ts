@@ -1,0 +1,100 @@
+/**
+ * Intent adapter — Decision Engine is source of truth; primaryTurnClassifier adapts.
+ */
+
+import type {
+  PrimaryConversationType,
+  PrimaryTurnConfidence,
+  PrimaryTurnDecision,
+} from "@/lib/conversation/primaryTurnClassifier";
+import type {
+  SparkDecisionEngineDecision,
+  SparkPrimaryIntent,
+} from "./sparkDecisionEngine/types";
+
+export function mapSparkIntentToPrimaryType(
+  intent: SparkPrimaryIntent,
+): PrimaryConversationType {
+  switch (intent) {
+    case "CREATE":
+    case "THINK":
+      return "TASK_REQUEST";
+    case "SUPPORT":
+      return "EMOTIONAL_SUPPORT";
+    case "LEARN":
+    case "EXPLORE":
+      return "INFORMATION_OR_RESEARCH";
+    default:
+      return "RELATIONSHIP_CHAT";
+  }
+}
+
+const PRIMARY_OWNERS: Record<PrimaryConversationType, string> = {
+  RELATIONSHIP_CHAT: "chat",
+  DIRECT_COMMAND: "kernel",
+  IMPLIED_NEED: "frictionless:implied_need",
+  TASK_REQUEST: "frictionless:decision_engine",
+  EMOTIONAL_SUPPORT: "frictionless:decision_engine",
+  INFORMATION_OR_RESEARCH: "chat:decision_engine",
+};
+
+function buildAdaptedPrimaryDecision(
+  type: PrimaryConversationType,
+  confidence: PrimaryTurnConfidence,
+  reason: string,
+): PrimaryTurnDecision {
+  const blockKernel = type !== "DIRECT_COMMAND";
+  return {
+    type,
+    confidence,
+    owner: PRIMARY_OWNERS[type],
+    reason,
+    blockKernelNavigation: blockKernel,
+    blockBridgeResponder: true,
+    blockCollectionOffer: type !== "DIRECT_COMMAND",
+    blockSecondaryResponders: true,
+  };
+}
+
+/**
+ * Map a Decision Engine result to primary-turn taxonomy (adapter layer).
+ */
+export function primaryTurnFromDecisionEngine(
+  decision: SparkDecisionEngineDecision,
+  reasonPrefix = "decision engine",
+): PrimaryTurnDecision {
+  const type = mapSparkIntentToPrimaryType(decision.intent);
+  return buildAdaptedPrimaryDecision(
+    type,
+    decision.intentConfidence,
+    `${reasonPrefix}: ${decision.intent} (${decision.reason})`,
+  );
+}
+
+/**
+ * Reconcile legacy primary classification with Decision Engine when engine confidence is high.
+ * Preserves DIRECT_COMMAND, RELATIONSHIP_CHAT, and IMPLIED_NEED from legacy classifier.
+ */
+export function reconcilePrimaryTurnWithDecisionEngine(
+  legacy: PrimaryTurnDecision,
+  decision: SparkDecisionEngineDecision,
+): PrimaryTurnDecision {
+  if (
+    legacy.type === "DIRECT_COMMAND" ||
+    legacy.type === "RELATIONSHIP_CHAT" ||
+    legacy.type === "IMPLIED_NEED"
+  ) {
+    return legacy;
+  }
+
+  if (decision.intentConfidence !== "high") {
+    return legacy;
+  }
+
+  const adapted = primaryTurnFromDecisionEngine(decision, "decision engine override");
+  if (legacy.type === adapted.type) {
+    return legacy;
+  }
+
+  return adapted;
+}
