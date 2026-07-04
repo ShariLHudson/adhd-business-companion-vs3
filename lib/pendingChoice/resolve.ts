@@ -1,4 +1,5 @@
 import { getCanonicalEstatePlaceById } from "@/lib/estate/canonicalEstateRegistry";
+import { hasHardEstateNavigationIntent } from "@/lib/estate/estateMetaNavigationPhrases";
 import type { CapabilityRecommendationOption } from "@/lib/estateCapabilityRegistry/types";
 import type { EstateDestinationChoice } from "@/lib/estate/estateDestinationResolver";
 import {
@@ -152,6 +153,11 @@ export function resolvePendingChoiceTurn(
   if (CANCEL_RE.test(trimmed)) {
     clearPendingChoice();
     return { kind: "cancelled", reply: "No problem — we can stay right here." };
+  }
+
+  if (hasHardEstateNavigationIntent(trimmed)) {
+    clearPendingChoice();
+    return { kind: "topic_change" };
   }
 
   const selected = parsePendingChoiceSelection(trimmed, state.choices);

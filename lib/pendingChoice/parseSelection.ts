@@ -2,6 +2,20 @@ import { parseOptionSelection } from "@/lib/workspaceSop";
 import { capabilityById } from "@/lib/estateCapabilityRegistry/catalog";
 import type { PendingChoiceItem } from "./types";
 
+/** Shared place words — never match a menu item on one token alone. */
+const GENERIC_PLACE_TOKENS = new Set([
+  "room",
+  "house",
+  "garden",
+  "deck",
+  "nook",
+  "studio",
+  "library",
+  "hall",
+  "pond",
+  "gazebo",
+]);
+
 const ORDINAL_WORDS: Record<string, number> = {
   first: 0,
   "1st": 0,
@@ -89,9 +103,16 @@ function matchLabel(userText: string, choice: PendingChoiceItem): boolean {
     if (cue.length >= 3 && choiceSearchText(choice).includes(cue)) return true;
   }
 
-  const search = choiceSearchText(choice);
   const tokens = label.split(/\s+/).filter((w) => w.length >= 4);
-  if (tokens.length > 0 && tokens.every((w) => t.includes(w))) return true;
+  if (tokens.length > 0 && tokens.every((w) => t.includes(w))) {
+    if (
+      tokens.length === 1 &&
+      GENERIC_PLACE_TOKENS.has(tokens[0]!.toLowerCase())
+    ) {
+      return false;
+    }
+    return true;
+  }
 
   return false;
 }

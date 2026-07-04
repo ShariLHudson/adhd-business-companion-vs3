@@ -6,6 +6,7 @@ import {
   clearPendingChoice,
   loadPendingChoice,
   registerPendingChoiceFromConcierge,
+  registerPendingChoiceFromPlaceIds,
   resolvePendingChoiceTurn,
 } from "./index";
 
@@ -68,6 +69,17 @@ describe("pendingChoice manager", () => {
     const text = "I need help writing an SOP";
     expect(shouldEnterUniversalCreation(text)).toBe(true);
     const result = resolvePendingChoiceTurn(text);
+    expect(result.kind).toBe("topic_change");
+    expect(loadPendingChoice()).toBeNull();
+  });
+
+  it('does not hijack explicit navigation while coffee menu is pending', () => {
+    registerPendingChoiceFromPlaceIds({
+      placeIds: ["coffee-house", "tea-room", "dining-room"],
+      menuText:
+        "1. Coffee House\n2. Tea Room\n3. Dining Room\nJust tell me which one.",
+    });
+    const result = resolvePendingChoiceTurn("Take me to the Music Room");
     expect(result.kind).toBe("topic_change");
     expect(loadPendingChoice()).toBeNull();
   });

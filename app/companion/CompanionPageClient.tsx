@@ -824,6 +824,7 @@ import {
   loadFrictionlessPending,
   loadFrictionlessPendingForConfirmation,
   resolveFrictionlessAction,
+  resolveCreateFastPathAction,
   resolveFrictionlessContinuation,
   saveFrictionlessPending,
   shouldSuppressRelationshipForFrictionless,
@@ -941,6 +942,13 @@ import {
 } from "@/lib/chatFastPath/chatTurnGuarantee";
 import { resolveChatFailureReply } from "@/lib/chatFastPath/resolveChatFailureReply";
 import { logConversationPipelineDiagnostic } from "@/lib/conversation/conversationPipelineDiagnostics";
+import {
+  isSimpleCreateRequest,
+  isUniversalCreationMessage,
+  loadUniversalCreationSession,
+  detectUniversalDocumentType,
+  createFastPathRecoveryLine,
+} from "@/lib/universalCreation";
 import {
   logPipelineTurnFailure,
   runReliableSyncLayer,
@@ -10169,6 +10177,105 @@ export default function CompanionPageClient() {
           });
         }
         setAwaitingUserConfirmation(null);
+        finishEarlyChatTurn();
+        finishLatencyTurn({ localReply: true });
+        return;
+      }
+    }
+
+    const lastAssistantForCreateFastPath =
+      [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
+    const universalSessionActive = loadUniversalCreationSession();
+    const universalCreationContinuation =
+      Boolean(universalSessionActive) &&
+      isUniversalCreationMessage(lastAssistantForCreateFastPath);
+
+    if (isSimpleCreateRequest(trimmed) || universalCreationContinuation) {
+      const createRouting = resolveIntentRouting({
+        userText: trimmed,
+        workspace: workspacePanel,
+        emotionalState: detectEmotionalState(trimmed),
+        overwhelmed: detectEmotionalState(trimmed) === "overwhelmed",
+      });
+      const createDocType = detectUniversalDocumentType(trimmed);
+      const createFastPathAction = runReliableSyncLayer(
+        "create_fast_path",
+        () =>
+          resolveCreateFastPathAction(
+            {
+              userText: trimmed,
+              currentTurn: chatTurnRef.current,
+              lastAssistantText: lastAssistantForCreateFastPath,
+              workspace: workspacePanel,
+              primaryTurn: primaryTurnDecision,
+            },
+            createRouting,
+          ),
+        {
+          category: "universal_creation",
+          suppressRelationship: true,
+          suppressRecap: true,
+          suppressReflectionFirst: true,
+          responseHint: "CREATE_FAST_PATH_RECOVERY",
+          localReply: createFastPathRecoveryLine(trimmed),
+          pendingAction: null,
+          toolSuggestion: null,
+          workspaceOffer: null,
+          intentRouting: createRouting,
+        } satisfies FrictionlessActionDecision,
+        {
+          turn: chatTurnRef.current,
+          userText: trimmed,
+          intent: primaryTurnDecision.type,
+          turnOwner: "frictionless:universal_creation",
+        },
+      );
+
+      logConversationPipelineDiagnostic({
+        turn: chatTurnRef.current,
+        userText: trimmed,
+        detectedIntent: "CREATE",
+        kernelHandled: false,
+        informationalChatBypass: true,
+        estateKernelForced: false,
+        taskLockBlocksEstate: true,
+        selectedHandler: "CREATE_FAST_PATH",
+        turnOwner: "frictionless:universal_creation",
+        normalizedMessage: normalizeTurnMessage(trimmed),
+        primaryType: primaryTurnDecision.type,
+        primaryOwner: "frictionless:universal_creation",
+        primaryConfidence: primaryTurnDecision.confidence,
+        createFastPath: true,
+        createDocumentType: createDocType,
+      });
+
+      if (createFastPathAction.localReply) {
+        lastUserTextRef.current = trimmed;
+        const userMessage: Message = { role: "user", content: trimmed };
+        if (fresh) clearConversation();
+        setMessages((prev) => [
+          ...(fresh ? [] : prev),
+          userMessage,
+        ]);
+        setInput("");
+        voiceUsedRef.current = false;
+        if (!getPrefs().hasChatted) {
+          savePrefs({ hasChatted: true });
+          setHasChatted(true);
+        }
+        if (
+          presentFrictionlessLocalReply(createFastPathAction, finishLatencyTurn)
+        ) {
+          return;
+        }
+        setMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: createFastPathAction.localReply,
+          },
+        ]);
+        recordPrimaryTurnResponse(createFastPathAction.localReply);
         finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
