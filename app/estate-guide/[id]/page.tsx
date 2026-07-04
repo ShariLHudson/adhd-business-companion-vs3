@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { EstateGuideSpread } from "@/components/estate-guide";
+import { EstateGuideRoomPage } from "@/components/estate-guide";
 import {
   getEstateGuideSpread,
   listEstateGuideSpreadIds,
@@ -31,7 +31,10 @@ export default async function EstateGuideSpreadPage({ params }: Props) {
           Back to Companion
         </Link>
       </header>
-      <EstateGuideSpread spread={spread} />
+      <div className="eg-guide-preview__pages">
+        <EstateGuideRoomPage spread={spread} pageKind="photo" />
+        <EstateGuideRoomPage spread={spread} pageKind="text" />
+      </div>
     </main>
   );
 }

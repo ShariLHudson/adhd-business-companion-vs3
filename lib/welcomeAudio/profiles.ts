@@ -54,15 +54,14 @@ export const WELCOME_ROOM_AUDIO_PROFILE: WelcomeAudioProfile = {
   },
 };
 
-/** Welcome Home — founder welcome on first visit; same ambience as Welcome Room. */
+/** Welcome Home — post-login produced welcome track (no layered ambience). */
 export const WELCOME_HOME_AUDIO_PROFILE: WelcomeAudioProfile = {
   id: "welcome-home",
   timeline: {
-    silenceMs: WELCOME_ROOM_SILENCE_MS,
+    silenceMs: 0,
     musicStartMs: WELCOME_ROOM_PLAY_MUSIC_START_MS,
-    voiceStartMs: WELCOME_ROOM_PLAY_VOICE_START_MS,
+    voiceStartMs: 250,
   },
-  ambience: WELCOME_ROOM_AUDIO_PROFILE.ambience,
   voice: {
     id: "welcome-home-founder-welcome",
     greetingText: WELCOME_ROOM_GREETING_SPEECH,
@@ -70,7 +69,7 @@ export const WELCOME_HOME_AUDIO_PROFILE: WelcomeAudioProfile = {
     bodyText: welcomeRoomWelcomeBodySpeechText(),
     cachedBodySrcs: WELCOME_ROOM_WELCOME_AUDIO_PARTS,
     fullWelcomeSrc: WELCOME_HOME_FOUNDER_AUDIO_SRC,
-    playbackRate: WELCOME_ROOM_VOICE_PLAYBACK_RATE,
+    playbackRate: 1,
   },
 };
 

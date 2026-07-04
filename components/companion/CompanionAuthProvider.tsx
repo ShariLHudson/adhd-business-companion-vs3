@@ -34,7 +34,13 @@ import {
   getCompanionSupabase,
   hydrateCompanionAuthFromInlineConfig,
   resetCompanionAuthBackoff,
+  seedCompanionSupabaseInlineConfig,
 } from "@/lib/supabase/companionClient";
+
+type CompanionInlineSupabaseConfig = {
+  url: string;
+  anonKey: string;
+};
 
 type CompanionAuthContextValue = {
   configured: boolean;
@@ -292,12 +298,14 @@ async function signUpDirect(
   }
 }
 
-export function CompanionAuthProvider({ children }: { children: ReactNode }) {
+export function CompanionAuthProvider({
+  children,
+  inlineSupabase,
+}: {
+  children: ReactNode;
+  inlineSupabase?: CompanionInlineSupabaseConfig | null;
+}) {
   const authBypassed = isCompanionAuthBypassed();
-
-  useLayoutEffect(() => {
-    hydrateCompanionAuthFromInlineConfig();
-  }, []);
 
   const [configured, setConfigured] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -308,6 +316,19 @@ export function CompanionAuthProvider({ children }: { children: ReactNode }) {
   const [sessionChecked, setSessionChecked] = useState(() => authBypassed);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+
+  useLayoutEffect(() => {
+    if (inlineSupabase?.url && inlineSupabase.anonKey) {
+      seedCompanionSupabaseInlineConfig(
+        inlineSupabase.url,
+        inlineSupabase.anonKey,
+      );
+    }
+    hydrateCompanionAuthFromInlineConfig();
+    if (companionAuthConfigured()) {
+      setConfigured(true);
+    }
+  }, [inlineSupabase?.url, inlineSupabase?.anonKey]);
 
   function applyAuthSession(sess: Session | null) {
     setSession(sess);

@@ -29,6 +29,7 @@ export type SparkEstateShellProps = {
   profileEstateMode?: boolean;
   explicitActivityRequested?: boolean;
   userIntent?: string;
+  backgroundImageOverride?: string | null;
   onInvitationSelect?: (item: EstateRoomInvitationItem) => void;
   onConversationStart?: (roomId: string) => void;
 };
@@ -71,6 +72,7 @@ export function SparkEstateShell({
   profileEstateMode = false,
   explicitActivityRequested = false,
   userIntent,
+  backgroundImageOverride = null,
   onInvitationSelect,
   onConversationStart,
 }: SparkEstateShellProps) {
@@ -85,7 +87,7 @@ export function SparkEstateShell({
   const { imageUrl, backgroundRoomId } = resolveBackground(
     resolvedPlaceId,
     profileEstateMode,
-    shellState?.backgroundImage ?? null,
+    backgroundImageOverride ?? shellState?.backgroundImage ?? null,
   );
 
   const livingPlaceMode = shellState?.livingPlaceMode ?? profileEstateMode;

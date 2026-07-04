@@ -57,6 +57,12 @@ If any answer is "unknown" — redesign before shipping.
 | **Day state** | `day-state` | `companionStore` → `DayState` | Adjust My Day, energy | Recovery, Pattern, Arrival, Environment |
 | **Conversation** | `conversation` | `companionStore` messages + chat API | Companion chat | Narrative, Relationship, Learning, Founder, Trust |
 | **Conversation turn** | `conversation-turn` | `StoredMessage` | Thread history | All conversation-derived engines |
+| **Estate adaptive preference** | `estate-adaptive-preference` | `estate-adaptive-intelligence-v1` → `AdaptivePreferenceState` | Invisible — shapes discovery, coaching, prep, anticipation | Arrival, Environment, Guidance, Pattern, Companion Presence |
+| **Universal creation session** | `universal-creation-session` | `universal-creation-session-v1` → `UniversalCreationSession` | Create discovery + phase state before/during Create | Content, Guidance, Pattern, Business Brain, Adaptive |
+| **Spark knowledge index** | `spark-knowledge-entry` | Composed from source registries via `lib/sparkKnowledge/` | Estate Guide, conversation hints, recommendations | Guidance, Arrival, Environment, All engines |
+| **Estate restoration session** | `estate-restoration-session` | `estate-restoration-v1` → `RestorationSessionStore` | Read stories, favorites, return context | Recovery, Arrival, Pattern, Companion Presence |
+| **Spark restoration evaluation** | `spark-restoration-evaluation` | Ephemeral per turn; registry in `lib/sparkRestorationIntelligence/` | Energy classification + recommendations | Recovery, Arrival, Environment, Pattern, Companion Presence |
+| **Intent-aware conversation session** | `intent-aware-conversation-session` | `intent-aware-conversation-v1` → `IntentAwareSessionStore` | Conversation purpose + depth memory | Relationship, Guidance, Recovery, All conversation engines |
 | **Decision** | `decision` | `lib/decision-intelligence/` | Decision Compass, support methods | Decision, Founder, Business, Narrative |
 | **Opportunity** | `opportunity` | `lib/opportunity-intelligence/` | Opportunity surfacing (founder) | Opportunity, Business, Offer, Audience |
 | **Relationship** | `relationship` | `lib/relationship-intelligence/` | People context, touchpoints | Relationship, Audience, Opportunity, Narrative |

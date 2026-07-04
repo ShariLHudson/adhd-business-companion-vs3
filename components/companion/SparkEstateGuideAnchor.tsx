@@ -10,7 +10,7 @@ type Props = {
   className?: string;
 };
 
-/** Bottom-right guidebook anchor on companion screens. */
+/** Bottom-left guidebook anchor — always visible companion chrome. */
 export function SparkEstateGuideAnchor({ onClick, className }: Props) {
   return (
     <button

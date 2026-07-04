@@ -19,6 +19,14 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 If legacy code or older docs conflict → **change implementation**, not the canon. Bible Ch 23 (Spark Estate Test) is a release gate. No dashboards, feature menus, or software language (Bible Ch 8–9).
 
+**Navigation Golden Rule (BINDING):** The user should never need to know where a feature lives. Spark knows the Estate. The member shares what they want to accomplish. Spark guides them to the most appropriate space, offers alternatives when more than one fits, and naturally suggests the next best place when it adds value. Implementation: `lib/estateExperiences/navigationPhilosophy.ts` · routing: `lib/estateExperiences/resolveEstateNavigation.ts`. When adding capability, ask *what they are trying to accomplish* — not *which menu should this go under*.
+
+**Estate Registry (BINDING):** `docs/estate/ESTATE_REGISTRY.md` — every feature appears exactly once (Experience → Space → Tool). Legacy audit: `lib/estateExperiences/legacyWorkspaceMap.ts`. **Migration freeze:** do not add new member-facing features until every legacy workspace, menu, route, prompt, and launcher is mapped or removed per the registry.
+
+**Estate Brain (BINDING):** `docs/estate/ESTATE_BRAIN.md` — Spark's internal knowledge of every experience, space, capability, trigger, and relationship. Runtime: `lib/estateBrain/`. Chat, routing, menus, and suggestions read from here — not independent hard-coded rules.
+
+**Estate Intelligence Architecture (BINDING):** `docs/estate/ESTATE_INTELLIGENCE_ARCHITECTURE.md` — capability-first routing (Intent → Capability → Expert → Experience → Tool). **Intent-First Navigation:** `docs/estate/INTENT_FIRST_ESTATE_NAVIGATION.md` — goals not rooms; `intentCategories.ts`, `environmentRegistry.ts`, `routeIntentFirstNavigation.ts`. **Coaching Before Navigation:** `docs/estate/ESTATE_COACHING_ARCHITECTURE.md` — coach first, navigate last; `estateCoaching.ts`, `estateCoachingRegistry.ts`. **Discovery Mode:** `docs/estate/ESTATE_DISCOVERY_MODE.md` — understand goal/obstacle/outcome before routing; `discoveryMode.ts`. Registries: `capabilityRegistry.ts`, `expertRegistry.ts`, `routeEstateIntelligence.ts`.
+
 **Restoration:** `docs/estate/ARCHITECTURAL_RESTORATION.md` · **Cleanup:** `docs/ESTATE_CLEANUP_ROADMAP.md`
 <!-- END:estate-architectural-authority -->
 

@@ -9,6 +9,11 @@ import {
 import { shouldRouteThroughEstateKernel } from "@/lib/estate/estateKernelGate";
 import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
 import { isHowToLearningQuestion } from "@/lib/howToLearningIntelligence";
+import {
+  formatEstateGuideReply,
+  isEstateGuideQuestion,
+  resolveEstateGuideTurn,
+} from "@/lib/sparkKnowledge/estateGuide";
 import { conversationRecentlyShowedRecovery } from "./recoveryDedup";
 import { sanitizeBridgeFromReply } from "@/lib/sparkConversation/bridgeResponderGuard";
 
@@ -28,6 +33,7 @@ export function isInformationalChatTurn(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
   if (shouldRouteThroughEstateKernel(t)) return false;
+  if (isEstateGuideQuestion(t)) return true;
   if (PLAN_DAY_INFORMATIONAL_RE.test(t)) return true;
   if (INFORMATIONAL_CHAT_RE.test(t)) return true;
   if (isHowToLearningQuestion(t)) return true;
@@ -43,6 +49,9 @@ export function buildFailSafeChatReply(
   const trimmed = userText.trim();
   if (!trimmed) {
     return "I'm here — what would help most right now?";
+  }
+  if (isEstateGuideQuestion(trimmed)) {
+    return formatEstateGuideReply(resolveEstateGuideTurn(trimmed));
   }
   const input: RuntimeRecoveryInput = {
     userText: trimmed,

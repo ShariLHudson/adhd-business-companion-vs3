@@ -38,6 +38,9 @@ export type ConversationPipelineDiagnostic = {
   failureReason?: string | null;
   elapsedMs?: number;
   recovered?: boolean;
+  /** Simple CREATE bypassed estate routing */
+  createFastPath?: boolean;
+  createDocumentType?: string | null;
 };
 
 declare global {

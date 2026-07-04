@@ -47,7 +47,8 @@ describe("Estate Journey Engine™", () => {
     });
 
     const greeting = buildEstateJourneyReturnGreeting();
-    expect(greeting).toContain("Welcome back");
+    expect(greeting).toContain("I'm really glad you're here");
+    expect(greeting).not.toMatch(/welcome back/i);
     expect(greeting).toContain("Spring Workshop");
     expect(greeting).toContain("continue where we left off");
   });

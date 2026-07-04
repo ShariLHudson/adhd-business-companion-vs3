@@ -1,3 +1,4 @@
+import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
 import { CLEAR_MY_MIND_CONSERVATORY_BG } from "@/lib/clearMyMind/conservatory";
 import {
   BEDROOM_WINDOW_AMBIENCE_MP3,
@@ -30,11 +31,10 @@ export type GardenDestinationCard = {
 
 const MUSIC_ROOM_IMAGE =
   "/backgrounds/peaceful-places/music-room-peaceful-places.png" as const;
-const PLAN_MY_DAY_IMAGE = "/backgrounds/plan-my-day-background.webp" as const;
-const GALLERY_IMAGE = "/backgrounds/gallery-background.webp" as const;
+const PLAN_MY_DAY_IMAGE = ESTATE_ROOM_BG.studyHall;
+const GALLERY_IMAGE = ESTATE_ROOM_BG.galleryOfFirsts;
 const LIFE_EXPERIENCE_IMAGE = "/backgrounds/life-experience-room.webp" as const;
-const FOCUS_PLANNING_IMAGE =
-  "/backgrounds/focus-my-brain-games-background.webp" as const;
+const FOCUS_PLANNING_IMAGE = ESTATE_ROOM_BG.gameRoom;
 const WOODLAND_IMAGE = "/backgrounds/peaceful-places/woodland-pathway.png" as const;
 const MOONLIT_SHORE_IMAGE = "/backgrounds/evening/night-bg.png" as const;
 const GAZEBO_IMAGE = "/backgrounds/evening/living-room-at-twilight-bg.png" as const;

@@ -27,7 +27,7 @@ import type {
 } from "./types";
 
 const CELEBRATION_HALL_ROOM_BG = estateBackgroundPath(
-  "celebration-hall-background.png",
+  "room-celebration-hall-background.png",
 );
 
 const CARD_EDIT = "Continue writing";

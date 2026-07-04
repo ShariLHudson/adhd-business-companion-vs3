@@ -67,7 +67,7 @@ export default function CompanionLayout({
           anonKey={inlineAuth.anonKey}
         />
       ) : null}
-      <CompanionAuthProvider>
+      <CompanionAuthProvider inlineSupabase={inlineAuth}>
         <CompanionLanguageProvider>
           <CompanionPhotoProvider>
             <LiveEcosystemInit />

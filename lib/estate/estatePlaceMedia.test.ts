@@ -10,24 +10,24 @@ import {
 
 describe("estatePlaceMedia", () => {
   it("encodes spaces in background filenames", () => {
-    const url = estateBackgroundPath("arched-window reading-nook-background.png");
+    const url = estateBackgroundPath("reading-nook-window background.png");
     expect(url).toBe(
-      "/backgrounds/arched-window%20reading-nook-background.png",
+      "/backgrounds/reading-nook-window%20background.png",
     );
   });
 
   it("maps reading nook and library to distinct plates", () => {
     expect(resolveCanonicalPlaceBackground("reading-nook")).toContain(
-      "arched-window",
+      "reading-nook-window",
     );
     expect(resolveCanonicalPlaceBackground("library")).toContain(
-      "estate-library",
+      "room-library-estate",
     );
   });
 
-  it("maps celebration-room to celebration room plate", () => {
+  it("maps celebration-room to celebration hall plate", () => {
     expect(resolveCanonicalPlaceBackground("celebration-room")).toContain(
-      "celebration-room-background",
+      "room-celebration-hall",
     );
   });
 

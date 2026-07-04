@@ -28,6 +28,10 @@ import {
   evaluateConversationEnvironmentNeed,
   isConversationEnvironmentOffer,
 } from "./conversationDrivesNavigation";
+import {
+  isPositiveSentimentWithoutCelebration,
+  isRelationshipConversation,
+} from "@/lib/intentAwareConversation/routingGate";
 import type { CanonicalSuggestionProfile } from "./canonicalEstateRegistryTypes";
 
 /** Minimum confidence before a consumer may auto-route (never force below this). */
@@ -69,7 +73,7 @@ const CURIOUS_RE =
   /\b(?:curious|wonder(?:ing)?|explore|discover|learn more|what if)\b/i;
 
 const CELEBRATORY_RE =
-  /\b(?:celebrat(?:e|ion|ing)|mark this|honor this|something good happened|proud of)\b/i;
+  /\b(?:celebrat(?:e|ion|ing)(?:\s+(?:this|that|it|my|our|a))|want to celebrate|something to celebrate|accomplish(?:ment|ed)|milestone|worth celebrating)\b/i;
 
 const REFLECTIVE_RE =
   /\b(?:reflect(?:ion|ive)?|think(?:ing)? through|process this|sit with|ponder|journal)\b/i;
@@ -120,7 +124,7 @@ const DESCRIPTIVE_PHRASE_RULES: readonly {
   {
     pattern: /\b(?:art studio|maker space|creative space)\b/i,
     placeId: "creative-studio",
-    reason: "descriptive → Creative Studio™",
+    reason: "descriptive → Create",
     confidence: 0.8,
   },
   {
@@ -180,10 +184,22 @@ const DESCRIPTIVE_PHRASE_RULES: readonly {
     confidence: 0.78,
   },
   {
-    pattern: /\b(?:institute|classroom|study hall)\b/i,
+    pattern: /\b(?:institute|classroom)\b/i,
     placeId: "momentum-institute",
     reason: "descriptive → Momentum Institute™",
     confidence: 0.75,
+  },
+  {
+    pattern: /\b(?:study hall)\b/i,
+    placeId: "study-hall",
+    reason: "descriptive → Study Hall™",
+    confidence: 0.8,
+  },
+  {
+    pattern: /\b(?:momentum room)\b/i,
+    placeId: "momentum-room",
+    reason: "descriptive → Momentum Room™",
+    confidence: 0.8,
   },
   {
     pattern: /\b(?:stars|look up|night sky)\b/i,
@@ -409,6 +425,14 @@ export function resolveEstateIntent(
       primaryPlaceId: null,
       confidence: 0,
       reasoning: "empty utterance — no place inference",
+    });
+  }
+
+  if (isRelationshipConversation(text) || isPositiveSentimentWithoutCelebration(text)) {
+    return buildResult({
+      primaryPlaceId: null,
+      confidence: 0,
+      reasoning: "relationship conversation — stay in chat, no place inference",
     });
   }
 

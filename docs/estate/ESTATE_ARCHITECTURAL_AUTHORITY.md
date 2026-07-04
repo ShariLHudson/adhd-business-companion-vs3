@@ -58,6 +58,14 @@ Conversation specs (105–119) and Relationship Constitution remain binding for 
 
 **`lib/estate/goToPlace.ts`** is the approved navigation primitive. **`lib/estate/resolveEstatePlace.ts`** resolves natural language to canonical place ids. Legacy section routing and regex matchers are subordinate. See **[PHASE_C_GOTOPLACE_REPORT.md](./PHASE_C_GOTOPLACE_REPORT.md)**.
 
+## Estate Registry — Experience → Space → Tool (BINDING)
+
+**[ESTATE_REGISTRY.md](./ESTATE_REGISTRY.md)** is the master map: every member-facing capability appears **exactly once** (Experience → Estate Space → Tool). Machine-readable audit: `lib/estateExperiences/legacyWorkspaceMap.ts`. **Migration freeze:** no new member-facing features until every legacy workspace, menu, route, prompt, and launcher is mapped or removed.
+
+## Estate Brain — Spark's internal Estate knowledge (BINDING)
+
+**[ESTATE_BRAIN.md](./ESTATE_BRAIN.md)** · Runtime: `lib/estateBrain/` — purpose, capabilities, tools, triggers, relationships, greetings, and suggestions for every experience and space. Chat, routing, menus, and discovery **search the brain** instead of maintaining parallel rule lists.
+
 ## Unified shell (Phase D)
 
 **[PHASE_D_UNIFIED_ESTATE_SHELL.md](./PHASE_D_UNIFIED_ESTATE_SHELL.md)** defines the canonical **`SparkEstateShell`** — one scene, one conversation panel, scene-anchored objects. Current layout components are inventoried with survive / adapter / deprecate verdicts.

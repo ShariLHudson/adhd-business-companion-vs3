@@ -40,7 +40,7 @@ export const ENVIRONMENT_NEED_LEXICON: readonly EnvironmentNeedDefinition[] = [
       /\b(?:need|want|could use).{0,20}fresh\s+air\b/i,
       /\b(?:get|be)\s+outside\b/i,
       /\b(?:outside|outdoors|open\s+air)\b/i,
-      /\b(?:garden\s+walk|woodland|trail|on the deck|on the porch)\b/i,
+      /\b(?:garden\s+walk|woodland|trail)\b/i,
       /\b(?:breathe|air).{0,25}(?:outside|outdoors|garden)\b/i,
     ],
     placeIds: ["garden-path", "woodland-path", "back-deck"],

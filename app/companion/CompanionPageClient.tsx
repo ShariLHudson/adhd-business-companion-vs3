@@ -13,8 +13,7 @@ import { EstateArrivalHost } from "@/components/companion/estate/EstateArrivalHo
 import { EstatePlaceAudioHost } from "@/components/companion/estate/EstatePlaceAudioHost";
 import { EstatePresence } from "@/components/companion/estate/EstatePresence";
 import { GlobalEstateMenu } from "@/components/companion/GlobalEstateMenu";
-import { SparkEstateGuideAnchor } from "@/components/companion/SparkEstateGuideAnchor";
-import { EstateGuideFlipbook } from "@/components/estate-guide";
+import { SparkEstateGuideChrome } from "@/components/companion/SparkEstateGuideChrome";
 import { estateArrivalShariGreeting } from "@/lib/estate/estateArrivalExperience";
 import { getEstateMemory } from "@/lib/estateMemory/estateMemoryStore";
 import { SparkEstateShell } from "@/components/companion/estate/SparkEstateShell";
@@ -949,6 +948,11 @@ import {
   detectUniversalDocumentType,
   createFastPathRecoveryLine,
 } from "@/lib/universalCreation";
+import {
+  formatEstateGuideReply,
+  isEstateGuideQuestion,
+  resolveEstateGuideTurn,
+} from "@/lib/sparkKnowledge/estateGuide";
 import {
   logPipelineTurnFailure,
   runReliableSyncLayer,
@@ -10272,10 +10276,10 @@ export default function CompanionPageClient() {
           ...prev,
           {
             role: "assistant",
-            content: createFastPathAction.localReply,
+            content: createFastPathAction.localReply!,
           },
         ]);
-        recordPrimaryTurnResponse(createFastPathAction.localReply);
+        recordPrimaryTurnResponse(createFastPathAction.localReply!);
         finishEarlyChatTurn();
         finishLatencyTurn({ localReply: true });
         return;
@@ -11512,6 +11516,34 @@ export default function CompanionPageClient() {
         currentRoom: currentEstateRoomId ?? null,
         navigationTarget: navTarget,
       });
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
+    if (isEstateGuideQuestion(trimmed)) {
+      const guideReply = formatEstateGuideReply(resolveEstateGuideTurn(trimmed));
+      markAssistantReplied(chatTurnState);
+      recordPrimaryTurnResponse(guideReply);
+      logConversationPipelineDiagnostic({
+        turn: chatTurnRef.current,
+        userText: trimmed,
+        detectedIntent: "INFORMATION_OR_RESEARCH",
+        kernelHandled: false,
+        informationalChatBypass: true,
+        estateKernelForced: false,
+        taskLockBlocksEstate: false,
+        selectedHandler: "estate_guide",
+        turnOwner: "frictionless:estate_guide",
+        normalizedMessage: normalizeTurnMessage(trimmed),
+        primaryType: primaryTurnDecision.type,
+        primaryOwner: primaryTurnDecision.owner,
+        primaryConfidence: primaryTurnDecision.confidence,
+      });
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: guideReply },
+      ]);
       finishEarlyChatTurn();
       finishLatencyTurn({ localReply: true });
       return;
@@ -17571,8 +17603,8 @@ export default function CompanionPageClient() {
   /** Keep profile trigger visible while overlays open — only hide during sign-in. */
   const showGlobalEstateMenu =
     estateChromePolicy.showSubtleEstateMenu && overlay !== "signin";
-  const showSparkEstateGuide =
-    estateChromePolicy.showGuidebook && overlay !== "signin";
+  /** Guidebook stays in the lower-left on every screen except sign-in. */
+  const showSparkEstateGuide = overlay !== "signin";
 
   const showCompanionBackControl = overlay !== "signin";
 
@@ -17849,15 +17881,6 @@ export default function CompanionPageClient() {
               onAction={handleEstateMenuAction}
             />
           ) : null}
-
-          {showSparkEstateGuide ? (
-            <SparkEstateGuideAnchor onClick={openSparkEstateGuideCore} />
-          ) : null}
-
-          <EstateGuideFlipbook
-            open={estateGuideFlipbookOpen}
-            onClose={() => setEstateGuideFlipbookOpen(false)}
-          />
 
           {sparkEstateShellPlaceId ? (
             <div
@@ -19484,6 +19507,13 @@ export default function CompanionPageClient() {
           registerBack={registerBack}
         />
       ) : null}
+
+      <SparkEstateGuideChrome
+        visible={showSparkEstateGuide}
+        flipbookOpen={estateGuideFlipbookOpen}
+        onOpen={openSparkEstateGuideCore}
+        onClose={() => setEstateGuideFlipbookOpen(false)}
+      />
     </div>
     </CompanionDeskProvider>
   );

@@ -5,6 +5,7 @@ import { pickChatPlaceholder } from "@/lib/chatCanvas/chatPlaceholders";
 import { INPUT_PLACEHOLDER } from "@/lib/companionUi";
 import { COMMUNICATION_ANCHOR_TEST_IDS } from "@/lib/companionCommunicationAnchor";
 import { handleChatTextareaKeyDown } from "@/lib/chatInputKeyboard";
+import { ESTATE_CHAT_INPUT_ATTR } from "@/lib/estateChatInputFocus";
 
 type ChatInputBarProps = {
   input: string;
@@ -81,6 +82,7 @@ export function ChatInputBar({
 
       <textarea
         ref={inputRef}
+        data-estate-chat-input="true"
         data-testid={COMMUNICATION_ANCHOR_TEST_IDS.input}
         value={input}
         onChange={(e) => onInputChange(e.target.value)}

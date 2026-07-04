@@ -1,15 +1,25 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ESTATE_GUIDE_SPREADS,
-  type EstateGuideSpreadData,
-} from "@/data/estateGuideSpreads";
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type TouchEvent,
+} from "react";
+import { ESTATE_GUIDE_SPREADS } from "@/data/estateGuideSpreads";
 import {
   SPARK_ESTATE_GUIDE_COVER_ALT,
   SPARK_ESTATE_GUIDE_COVER_SRC,
 } from "@/lib/estate/sparkEstateGuide";
-import { EstateGuideSpread } from "./EstateGuideSpread";
+import {
+  estateGuideRoomSpreadLabel,
+  expandEstateGuideToRoomSpreads,
+  type EstateGuideRoomSpread,
+} from "@/lib/estate/estateGuidePages";
+import { EstateGuideRoomPage } from "./EstateGuideSpread";
 import "./estate-guide-flipbook.css";
 
 type Props = {
@@ -18,38 +28,82 @@ type Props = {
 };
 
 type FlipPhase = "cover" | "spread";
-type FlipAnim = "idle" | "next" | "prev";
+
+function BookPageStack({ side }: { side: "left" | "right" }) {
+  return (
+    <div
+      className={[
+        "eg-flipbook__page-stack",
+        side === "left" ? "eg-flipbook__page-stack--left" : "eg-flipbook__page-stack--right",
+      ].join(" ")}
+      aria-hidden="true"
+    >
+      {Array.from({ length: 5 }, (_, index) => (
+        <span
+          key={index}
+          className="eg-flipbook__page-sheet"
+          style={{ "--eg-sheet-offset": index } as CSSProperties}
+        />
+      ))}
+    </div>
+  );
+}
+
+function GuideRoomSpread({ roomSpread }: { roomSpread: EstateGuideRoomSpread }) {
+  return (
+    <>
+      <div className="eg-flipbook__page-slot eg-flipbook__page-slot--left">
+        <EstateGuideRoomPage
+          spread={roomSpread.spread}
+          pageKind={roomSpread.photoPage.kind}
+        />
+      </div>
+      <div className="eg-flipbook__gutter eg-guide-gutter" aria-hidden="true" />
+      <div className="eg-flipbook__page-slot eg-flipbook__page-slot--right">
+        <EstateGuideRoomPage
+          spread={roomSpread.spread}
+          pageKind={roomSpread.textPage.kind}
+        />
+      </div>
+    </>
+  );
+}
 
 export function EstateGuideFlipbook({ open, onClose }: Props) {
-  const spreads = ESTATE_GUIDE_SPREADS;
+  const roomSpreads = useMemo(
+    () => expandEstateGuideToRoomSpreads(ESTATE_GUIDE_SPREADS),
+    [],
+  );
   const [phase, setPhase] = useState<FlipPhase>("cover");
   const [spreadIndex, setSpreadIndex] = useState(0);
-  const [flipAnim, setFlipAnim] = useState<FlipAnim>("idle");
+  const [spreadFading, setSpreadFading] = useState(false);
   const dialogRef = useRef<HTMLDivElement>(null);
+  const spreadRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
+  const [fitScale, setFitScale] = useState(1);
 
-  const spread = spreads[spreadIndex] as EstateGuideSpreadData | undefined;
+  const roomSpread = roomSpreads[spreadIndex] as EstateGuideRoomSpread | undefined;
   const atStart = spreadIndex <= 0;
-  const atEnd = spreadIndex >= spreads.length - 1;
+  const atEnd = spreadIndex >= roomSpreads.length - 1;
 
   const resetBook = useCallback(() => {
     setPhase("cover");
     setSpreadIndex(0);
-    setFlipAnim("idle");
+    setSpreadFading(false);
   }, []);
 
-  const runFlip = useCallback(
-    (direction: "next" | "prev", nextIndex: number) => {
-      setFlipAnim((current) => {
-        if (current !== "idle") return current;
-        window.setTimeout(() => {
-          setSpreadIndex(nextIndex);
-          setFlipAnim("idle");
-        }, 420);
-        return direction;
-      });
+  const goToSpread = useCallback(
+    (nextIndex: number) => {
+      if (nextIndex === spreadIndex) return;
+      if (nextIndex < 0 || nextIndex >= roomSpreads.length) return;
+
+      setSpreadFading(true);
+      window.setTimeout(() => {
+        setSpreadIndex(nextIndex);
+        window.setTimeout(() => setSpreadFading(false), 40);
+      }, 180);
     },
-    [],
+    [roomSpreads.length, spreadIndex],
   );
 
   useEffect(() => {
@@ -71,17 +125,67 @@ export function EstateGuideFlipbook({ open, onClose }: Props) {
         onClose();
         return;
       }
-      if (phase !== "spread" || flipAnim !== "idle") return;
-      if (event.key === "ArrowRight" && spreadIndex < spreads.length - 1) {
-        runFlip("next", spreadIndex + 1);
+      if (phase !== "spread" || spreadFading) return;
+      if (event.key === "ArrowRight" && spreadIndex < roomSpreads.length - 1) {
+        goToSpread(spreadIndex + 1);
       }
       if (event.key === "ArrowLeft" && spreadIndex > 0) {
-        runFlip("prev", spreadIndex - 1);
+        goToSpread(spreadIndex - 1);
       }
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
-  }, [open, onClose, phase, flipAnim, spreadIndex, spreads.length, runFlip]);
+  }, [open, onClose, phase, spreadFading, spreadIndex, roomSpreads.length, goToSpread]);
+
+  useEffect(() => {
+    if (!open || phase !== "spread") {
+      setFitScale(1);
+      return;
+    }
+
+    const spreadEl = spreadRef.current;
+    if (!spreadEl) return;
+
+    const measureFit = () => {
+      const fitTargets = spreadEl.querySelectorAll<HTMLElement>(
+        ".eg-guide-room-page--photo .eg-guide-room-page__lower, .eg-guide-room-page--text .eg-guide-room-page__text-shell",
+      );
+      if (fitTargets.length === 0) {
+        setFitScale(1);
+        return;
+      }
+
+      let nextScale = 1;
+      for (const fitTarget of fitTargets) {
+        const previousTransform = fitTarget.style.transform;
+        fitTarget.style.transform = "none";
+        const available = fitTarget.clientHeight;
+        const needed = fitTarget.scrollHeight;
+        fitTarget.style.transform = previousTransform;
+
+        if (available > 0 && needed > available) {
+          nextScale = Math.min(nextScale, available / needed);
+        }
+      }
+
+      setFitScale(Math.max(0.58, Math.min(1, nextScale)));
+    };
+
+    measureFit();
+    const observer = new ResizeObserver(measureFit);
+    observer.observe(spreadEl);
+    for (const fitTarget of spreadEl.querySelectorAll<HTMLElement>(
+      ".eg-guide-room-page--photo .eg-guide-room-page__lower, .eg-guide-room-page--text .eg-guide-room-page__text-shell",
+    )) {
+      observer.observe(fitTarget);
+    }
+    window.addEventListener("resize", measureFit);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", measureFit);
+    };
+  }, [open, phase, spreadIndex, spreadFading]);
 
   const openToFirstSpread = useCallback(() => {
     setPhase("spread");
@@ -89,23 +193,23 @@ export function EstateGuideFlipbook({ open, onClose }: Props) {
   }, []);
 
   const goNext = useCallback(() => {
-    if (phase !== "spread" || atEnd || flipAnim !== "idle") return;
-    runFlip("next", spreadIndex + 1);
-  }, [phase, atEnd, flipAnim, runFlip, spreadIndex]);
+    if (phase !== "spread" || atEnd || spreadFading) return;
+    goToSpread(spreadIndex + 1);
+  }, [phase, atEnd, spreadFading, goToSpread, spreadIndex]);
 
   const goPrev = useCallback(() => {
-    if (phase !== "spread" || atStart || flipAnim !== "idle") return;
-    runFlip("prev", spreadIndex - 1);
-  }, [phase, atStart, flipAnim, runFlip, spreadIndex]);
+    if (phase !== "spread" || atStart || spreadFading) return;
+    goToSpread(spreadIndex - 1);
+  }, [phase, atStart, spreadFading, goToSpread, spreadIndex]);
 
-  const handleTouchStart = (event: React.TouchEvent) => {
+  const handleTouchStart = (event: TouchEvent) => {
     touchStartX.current = event.touches[0]?.clientX ?? null;
   };
 
-  const handleTouchEnd = (event: React.TouchEvent) => {
+  const handleTouchEnd = (event: TouchEvent) => {
     const start = touchStartX.current;
     touchStartX.current = null;
-    if (start == null || phase !== "spread") return;
+    if (start == null || phase !== "spread" || spreadFading) return;
     const end = event.changedTouches[0]?.clientX;
     if (end == null) return;
     const delta = end - start;
@@ -130,25 +234,16 @@ export function EstateGuideFlipbook({ open, onClose }: Props) {
         onClick={onClose}
       />
 
-      <div className="eg-flipbook__shell">
-        <header className="eg-flipbook__toolbar">
-          <p className="eg-flipbook__eyebrow">Spark Estate Guide™</p>
-          {phase === "spread" && spread ? (
-            <p className="eg-flipbook__meta">
-              {spread.title} · Spread {spreadIndex + 1} of {spreads.length}
-            </p>
-          ) : (
-            <p className="eg-flipbook__meta">Your companion to the Estate</p>
-          )}
-          <button
-            type="button"
-            className="eg-flipbook__close"
-            onClick={onClose}
-          >
-            Close
-          </button>
-        </header>
+      <button
+        type="button"
+        className="eg-flipbook__close"
+        onClick={onClose}
+        aria-label="Close guide"
+      >
+        <span aria-hidden="true">×</span>
+      </button>
 
+      <div className="eg-flipbook__shell">
         <div
           className="eg-flipbook__stage"
           onTouchStart={handleTouchStart}
@@ -172,59 +267,74 @@ export function EstateGuideFlipbook({ open, onClose }: Props) {
                 <span className="eg-flipbook__cover-hint">Open guide</span>
               </button>
             </div>
-          ) : spread ? (
-            <div
-              className={[
-                "eg-flipbook__spread-wrap",
-                flipAnim === "next" ? "eg-flipbook__spread-wrap--flip-next" : "",
-                flipAnim === "prev" ? "eg-flipbook__spread-wrap--flip-prev" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-            >
-              <EstateGuideSpread spread={spread} className="eg-flipbook__spread" />
+          ) : roomSpread ? (
+            <div className="eg-flipbook__book">
+              <div className="eg-flipbook__volume" aria-hidden="true">
+                <span className="eg-flipbook__board eg-flipbook__board--back" />
+                <BookPageStack side="left" />
+                <BookPageStack side="right" />
+              </div>
+
+              <div
+                ref={spreadRef}
+                className={[
+                  "eg-flipbook__spread-view",
+                  "eg-flipbook__spread-view--room-spread",
+                  spreadFading ? "eg-flipbook__spread-view--fading" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                aria-label={roomSpread.roomTitle}
+                style={
+                  {
+                    "--eg-fit-scale": fitScale,
+                    "--eg-remaining-spreads": Math.max(
+                      1,
+                      roomSpreads.length - spreadIndex - 1,
+                    ),
+                  } as CSSProperties
+                }
+              >
+                <GuideRoomSpread roomSpread={roomSpread} />
+              </div>
 
               <button
                 type="button"
-                className="eg-flipbook__page-turn eg-flipbook__page-turn--prev"
+                className="eg-flipbook__arrow eg-flipbook__arrow--prev"
                 onClick={goPrev}
-                disabled={atStart || flipAnim !== "idle"}
+                disabled={atStart || spreadFading}
                 aria-label="Previous spread"
-              />
+              >
+                <span className="eg-flipbook__arrow-glyph" aria-hidden="true">
+                  ‹
+                </span>
+              </button>
               <button
                 type="button"
-                className="eg-flipbook__page-turn eg-flipbook__page-turn--next"
+                className="eg-flipbook__arrow eg-flipbook__arrow--next"
                 onClick={goNext}
-                disabled={atEnd || flipAnim !== "idle"}
+                disabled={atEnd || spreadFading}
                 aria-label="Next spread"
-              />
+              >
+                <span className="eg-flipbook__arrow-glyph" aria-hidden="true">
+                  ›
+                </span>
+              </button>
+
+              <p className="eg-flipbook__spread-meta" aria-live="polite">
+                <span className="eg-flipbook__sr-only">
+                  {estateGuideRoomSpreadLabel(
+                    roomSpread,
+                    spreadIndex,
+                    roomSpreads.length,
+                  )}
+                  .{" "}
+                </span>
+                {roomSpread.roomTitle} · {spreadIndex + 1} of {roomSpreads.length}
+              </p>
             </div>
           ) : null}
         </div>
-
-        {phase === "spread" ? (
-          <footer className="eg-flipbook__footer">
-            <button
-              type="button"
-              className="eg-flipbook__nav-btn"
-              onClick={goPrev}
-              disabled={atStart || flipAnim !== "idle"}
-            >
-              Previous
-            </button>
-            <p className="eg-flipbook__footer-hint">
-              Tap the page edge or swipe to turn
-            </p>
-            <button
-              type="button"
-              className="eg-flipbook__nav-btn"
-              onClick={goNext}
-              disabled={atEnd || flipAnim !== "idle"}
-            >
-              Next
-            </button>
-          </footer>
-        ) : null}
       </div>
     </div>
   );

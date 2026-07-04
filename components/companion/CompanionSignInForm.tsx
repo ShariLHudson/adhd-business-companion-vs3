@@ -16,7 +16,7 @@ import {
   COMPANION_LOGIN_FORGOT_PASSWORD_LABEL,
   COMPANION_LOGIN_OPENING_MESSAGE,
 } from "@/lib/companionLoginPage";
-import { unlockBrowserAudioFromClick } from "@/lib/welcomeAudio/audioUnlock";
+import { primeWelcomeHomeAudioFromGesture } from "@/lib/welcomeAudio/welcomeHomeAudioSession";
 
 type Mode = "signin" | "signup";
 
@@ -44,14 +44,15 @@ function friendlyAuthError(message: string): string {
 }
 
 function ConfigBanner() {
-  const { configured: authReady, loading } = useCompanionAuth();
+  const { configured: authReady, loading, sessionChecked } =
+    useCompanionAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted || loading || authReady) return null;
+  if (!mounted || loading || !sessionChecked || authReady) return null;
 
   const {
     hasUrl,
@@ -378,9 +379,9 @@ export function CompanionSignInForm({
 
   const openingLabel = COMPANION_LOGIN_OPENING_MESSAGE;
 
-  /** Browser autoplay unlock only — welcome audio starts after login on Welcome Home. */
+  /** Unlock autoplay on click; Welcome Home plays the estate welcome track after login. */
   const primeWelcomeAudio = () => {
-    unlockBrowserAudioFromClick();
+    primeWelcomeHomeAudioFromGesture();
   };
 
   const createAccountButton = (

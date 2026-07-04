@@ -29,9 +29,9 @@ export function multiItemWorkspaceOfferLine(section: AppSection): string {
   };
   return (
     labels[section] ??
-    "This works best with a workspace beside us so we can see each item separately. Open workspace?"
+    "This works best with the tool beside us so we can see each item separately. Open it?"
   );
 }
 
-export const MULTI_ITEM_WORKSPACE_ACCEPT = "Open Workspace";
+export const MULTI_ITEM_WORKSPACE_ACCEPT = "Open Tool";
 export const MULTI_ITEM_WORKSPACE_DECLINE = "Not Now";

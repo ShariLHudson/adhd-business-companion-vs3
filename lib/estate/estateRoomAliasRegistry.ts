@@ -10,9 +10,15 @@
  */
 
 import type { AppSection } from "@/lib/companionUi";
+import { isMetaNavigationDestinationPhrase } from "./estateMetaNavigationPhrases";
+import { ESTATE_ROOM_ALIAS_CATALOG } from "./estateRoomAliasCatalog";
 import { ESTATE_ROOM_BG_BY_ROOM_ID } from "./estateRoomAssets";
 import { getEstateRoomById } from "./estateRoomRegistry";
+import { normalizeSpokenPlaceText } from "./estateSpokenPlaceNormalize";
 import type { EstateRoomType } from "./types";
+
+export type { EstateRoomAliasSpec } from "./estateRoomAliasCatalog";
+export { ESTATE_ROOM_ALIAS_CATALOG } from "./estateRoomAliasCatalog";
 
 export type EstateRoomAliasEntry = {
   /** Stable registry id */
@@ -46,6 +52,26 @@ export const ESTATE_ROOM_DIRECT_SECTION_OVERRIDES: Partial<
   "game-room": "quick-recharge",
   journal: "growth-journal",
   greenhouse: "growth-greenhouse",
+  "reading-nook": "home",
+  "study-hall": "momentum-institute",
+  "momentum-room": "momentum-institute",
+  "personal-deck": "home",
+  "estate-kitchen": "home",
+  "summer-terrace": "home",
+  "grand-terrace": "home",
+  "lakeside-verandah": "home",
+  "lakeside-hammock": "home",
+  "reflection-pond": "home",
+  "fireside-deck": "home",
+  "estate-gardens": "home",
+  "discovery-room": "home",
+  "art-studio": "content-generator",
+  "strategy-studio": "content-generator",
+  "round-table": "projects",
+  "dining-room": "home",
+  "stairway-reading-nook": "home",
+  "spark-estate": "home",
+  "gallery-of-firsts": "growth-portfolio",
 };
 
 function entry(
@@ -73,181 +99,17 @@ function entry(
 }
 
 /** Canonical exact-room registry — every navigable Estate place. */
-export const ESTATE_ROOM_ALIAS_REGISTRY: readonly EstateRoomAliasEntry[] = [
-  entry("welcome-home", "Welcome Home™", [
-    "welcome home",
-    "home",
-  ], "welcome-room", "welcome"),
-  entry("conservatory", "The Conservatory™", [
-    "conservatory",
-    "the conservatory",
-    "conservatory room",
-    "butterfly conservatory",
-    "the butterfly conservatory",
-  ], null, "reflection"),
-  entry("momentum-institute", "Momentum Institute™", [
-    "momentum institute",
-    "the momentum institute",
-    "institute",
-    "the institute",
-  ], "momentum-institute", "learning"),
-  entry("creative-studio", "Creative Studio™", [
-    "creative studio",
-    "the creative studio",
-    "studio",
-    "the studio",
-  ], "content-generator", "creation"),
-  entry("observatory", "Observatory™", [
-    "observatory",
-    "the observatory",
-  ], "grow-observatory", "research"),
-  entry("coffee-house", "Coffee House™", [
-    "coffee house",
-    "the coffee house",
-    "coffee shop",
-    "the coffee shop",
-    "cozy cafe",
-    "cafe",
-    "the cafe",
-    "café",
-    "the café",
-  ], "focus-audio", "restoration"),
-  entry("apple-orchard", "Apple Orchard™", [
-    "apple orchard",
-    "the apple orchard",
-    "orchard",
-    "the orchard",
-  ], "focus-audio", "nature"),
-  entry("stables", "The Stables™", [
-    "stables",
-    "the stables",
-    "stable",
-    "the stable",
-  ], "stables", "reflection"),
-  entry("gardens", "Celebration Garden™", [
-    "gardens",
-    "the gardens",
-    "celebration garden",
-    "the celebration garden",
-    "garden",
-    "the garden",
-    "my wins",
-    "wins this week",
-  ], "wins-this-week", "nature"),
-  entry("greenhouse", "Greenhouse™", [
-    "greenhouse",
-    "the greenhouse",
-  ], null, "nature"),
-  entry("music-room", "Music Room™", [
-    "music room",
-    "the music room",
-  ], "focus-audio", "restoration"),
-  entry("tea-room", "Tea Room™", [
-    "tea room",
-    "the tea room",
-  ], "focus-audio", "restoration"),
-  entry("library", "The Library™", [
-    "library",
-    "the library",
-    "story library",
-  ], "growth-library", "learning"),
-  entry("journal", "Journal Gazebo™", [
-    "journal",
-    "growth journal",
-    "the journal",
-    "my journal",
-    "journal gazebo",
-    "the journal gazebo",
-    "gazebo",
-    "the gazebo",
-    "gazebo journal",
-  ], "growth-journal", "reflection"),
-  entry("evidence-vault", "Evidence Vault™", [
-    "evidence vault",
-    "the evidence vault",
-    "evidence bank",
-  ], "evidence-bank", "archive"),
-  entry("my-estate", "My Estate™", [
-    "my estate",
-    "estate profile",
-  ], null, "profile"),
-  entry("institute-cabinet", "My Institute Cabinet™", [
-    "institute cabinet",
-    "my institute cabinet",
-    "my cabinet",
-  ], null, "archive"),
-  entry("portfolio", "Portfolio™", [
-    "portfolio",
-    "my portfolio",
-  ], "growth-portfolio", "archive"),
-  entry("seeds-planted", "Seeds Planted™", [
-    "seeds planted",
-    "planted seeds",
-    "spark cards",
-    "my spark cards",
-  ], "grow-spark-cards", "archive"),
-  entry("growth-profile", "Growth Profile™", [
-    "growth profile",
-    "my growth profile",
-  ], null, "profile"),
-  entry("goals-projects", "Goals & Projects™", [
-    "goals and projects",
-    "goals & projects",
-    "my projects",
-    "goals projects",
-  ], "projects", "planning"),
-  entry("decision-compass", "Decision Compass™", [
-    "decision compass",
-    "the decision compass",
-  ], "decision-compass", "planning"),
-  entry("peaceful-places", "Peaceful Places™", [
-    "peaceful places",
-    "peaceful place",
-    "pleasure places",
-    "pleasure place",
-  ], "home", "restoration"),
-  entry("estate-soundscapes", "Estate Soundscapes™", [
-    "estate soundscapes",
-    "soundscapes",
-    "soundscape",
-    "take me to soundscapes",
-    "focus music",
-    "focus sounds",
-    "calming sounds",
-    "relaxing music",
-    "play focus music",
-    "play something peaceful",
-    "i want music",
-    "play music",
-    "audio",
-  ], "focus-audio", "restoration"),
-  entry("clear-my-mind", "Clear My Mind™", [
-    "clear my mind",
-    "brain dump",
-    "clear my head",
-  ], "brain-dump", "reflection"),
-  entry("game-room", "Game Room™", [
-    "game room",
-    "the game room",
-    "exercise room",
-    "the exercise room",
-  ], "quick-recharge", "play"),
-  entry("sunroom", "Sunroom", [
-    "sunroom",
-    "the sunroom",
-    "shari's sunroom",
-  ], "welcome-room", "welcome"),
-  entry("momentum-builder", "Momentum Builder™", [
-    "momentum builder",
-    "the momentum builder",
-  ], "momentum-builder", "planning"),
-  entry("celebration-room", "Celebration Hall™", [
-    "celebration room",
-    "the celebration room",
-    "celebration hall",
-    "the celebration hall",
-  ], "growth-reports", "archive"),
-] as const;
+export const ESTATE_ROOM_ALIAS_REGISTRY: readonly EstateRoomAliasEntry[] =
+  ESTATE_ROOM_ALIAS_CATALOG.map((spec) =>
+    entry(
+      spec.roomId,
+      spec.officialName,
+      spec.aliases,
+      spec.route,
+      spec.roomType,
+      spec.invitationCatalogId,
+    ),
+  );
 
 const ALIAS_REGISTRY_BY_ROOM_ID = new Map(
   ESTATE_ROOM_ALIAS_REGISTRY.map((row) => [row.roomId, row]),
@@ -278,7 +140,8 @@ function phraseContainsBoundedAlias(text: string, aliasPhrase: string): boolean 
 
 /** Exact phrase → room id (full string or without leading "the "). */
 export function resolveEstateRoomAliasExact(phrase: string): string | null {
-  const normalized = normalizeAliasPhrase(phrase);
+  const spoken = normalizeSpokenPlaceText(phrase);
+  const normalized = normalizeAliasPhrase(spoken);
   if (!normalized) return null;
   if (EXACT_ALIAS_TO_ROOM.has(normalized)) {
     return EXACT_ALIAS_TO_ROOM.get(normalized)!;
@@ -294,9 +157,10 @@ export function resolveEstateRoomAliasExact(phrase: string): string | null {
 
 /** Bounded substring match — longest alias wins. */
 export function resolveEstateRoomAliasBounded(phrase: string): string | null {
-  const exact = resolveEstateRoomAliasExact(phrase);
+  const spoken = normalizeSpokenPlaceText(phrase);
+  const exact = resolveEstateRoomAliasExact(spoken);
   if (exact) return exact;
-  const normalized = normalizeAliasPhrase(phrase);
+  const normalized = normalizeAliasPhrase(spoken);
   if (!normalized) return null;
   for (const { phrase: aliasPhrase, roomId } of ALIASES_BY_LENGTH) {
     if (phraseContainsBoundedAlias(normalized, aliasPhrase)) {
@@ -304,6 +168,32 @@ export function resolveEstateRoomAliasBounded(phrase: string): string | null {
     }
   }
   return null;
+}
+
+/** All rooms matching the longest alias in text — for disambiguation menus. */
+export function findAmbiguousPlaceMatches(phrase: string): string[] {
+  const spoken = normalizeSpokenPlaceText(phrase);
+  const normalized = normalizeAliasPhrase(spoken);
+  if (!normalized) return [];
+
+  const exact = resolveEstateRoomAliasExact(normalized);
+  if (exact) return [exact];
+
+  let bestLen = 0;
+  const matches = new Set<string>();
+
+  for (const { phrase: aliasPhrase, roomId } of ALIASES_BY_LENGTH) {
+    if (!phraseContainsBoundedAlias(normalized, aliasPhrase)) continue;
+    const len = aliasPhrase.length;
+    if (len < bestLen) continue;
+    if (len > bestLen) {
+      matches.clear();
+      bestLen = len;
+    }
+    matches.add(roomId);
+  }
+
+  return [...matches];
 }
 
 export function getEstateRoomAliasEntry(
@@ -344,12 +234,68 @@ export function messageNamesExactEstateRoom(userText: string): boolean {
   return false;
 }
 
+const PLACE_LOOK_LIKE_RE =
+  /\bwhat does (?:the\s+)?(.+?)\s+look like\b/i;
+
+const VISIT_WISH_RE =
+  /\b(?:i(?:'d| would)?\s+like\s+to\s+visit|i want to visit|can we visit|let(?:'s| us) visit)\s+(?:the\s+)?(.+?)(?:[.!?]|$)/i;
+
+/** Extract destination phrase from navigation / look-like / visit patterns. */
+export function extractEstateDestinationPhrase(userText: string): string | null {
+  const trimmed = userText.trim();
+  if (!trimmed) return null;
+
+  const fromNav = extractRoomPhraseFromNavigation(trimmed);
+  if (fromNav) return fromNav;
+
+  const lookLike = trimmed.match(PLACE_LOOK_LIKE_RE);
+  if (lookLike?.[1]?.trim()) {
+    return lookLike[1].trim().replace(/[™®.!?]+$/g, "");
+  }
+
+  const visitWish = trimmed.match(VISIT_WISH_RE);
+  if (visitWish?.[1]?.trim()) {
+    return visitWish[1].trim().replace(/[™®.!?]+$/g, "");
+  }
+
+  return null;
+}
+
+/**
+ * Resolve member text → canonical place id (alias registry).
+ * Returns null when no named place is detected.
+ */
+export function resolveEstatePlaceIdFromUserText(userText: string): string | null {
+  const trimmed = normalizeSpokenPlaceText(userText.trim());
+  if (!trimmed) return null;
+
+  const destination = extractEstateDestinationPhrase(trimmed);
+  if (destination) {
+    const spokenDestination = normalizeSpokenPlaceText(destination);
+    return (
+      resolveEstateRoomAliasExact(spokenDestination) ??
+      resolveEstateRoomAliasBounded(spokenDestination)
+    );
+  }
+
+  const bare = normalizeAliasPhrase(trimmed);
+  if (bare.split(/\s+/).length <= 6) {
+    const exact = resolveEstateRoomAliasExact(bare);
+    if (exact) return exact;
+  }
+
+  return resolveEstateRoomAliasBounded(trimmed);
+}
+
 /** Pull destination from "take me to …" / "open …" — trim compound "and help me …". */
 export function extractRoomPhraseFromNavigation(text: string): string | null {
   const patterns = [
+    /\bwhat does (?:the\s+)?(.+?)\s+look like\b/i,
     /\b(?:take\s+)?me\s+to\s+(?:the\s+)?(.+?)(?:[.!?]|$)/i,
     /\b(?:go to|take me to|bring me to|head to|visit)\s+(?:the\s+)?(.+?)(?:[.!?]|$)/i,
     /\b(?:want|wanna|need)\s+to\s+go\s+to\s+(?:the\s+)?(.+?)(?:[.!?]|$)/i,
+    /\b(?:would like|'d like)\s+to\s+visit\s+(?:the\s+)?(.+?)(?:[.!?]|$)/i,
+    /\blet(?:'s| us) visit\s+(?:the\s+)?(.+?)(?:[.!?]|$)/i,
     /\b(?:would like|'d like)\s+to\s+go(?:\s+\w+){0,8}?\s+(?:to\s+(?:the\s+)?|in\s+(?:the\s+)?)(.+?)(?:[.!?]|$)/i,
     /\b(?:no|nope)[,.]?\s+(?:i\s+)?(?:want|need)\s+to\s+go\s+to\s+(?:the\s+)?(.+?)(?:[.!?]|$)/i,
     /\bdon'?t\s+want\s+to\s+stay\b[^.!?]*\b(?:want|need)\s+to\s+go\s+to\s+(?:the\s+)?(.+?)(?:[.!?]|$)/i,
@@ -362,7 +308,9 @@ export function extractRoomPhraseFromNavigation(text: string): string | null {
   for (const pattern of patterns) {
     const match = text.match(pattern);
     if (match?.[1]?.trim()) {
-      return trimCompoundDestinationPhrase(match[1].trim());
+      const phrase = trimCompoundDestinationPhrase(match[1].trim());
+      if (isMetaNavigationDestinationPhrase(phrase)) return null;
+      return phrase;
     }
   }
   return null;

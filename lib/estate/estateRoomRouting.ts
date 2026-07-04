@@ -337,7 +337,7 @@ export function estateRoomNavigationLine(roomId: string): string | null {
     case "momentum-institute":
       return "I'll take us to the Momentum Institute™.";
     case "creative-studio":
-      return "Let's step into the Creative Studio™.";
+      return "Let's head to Create.";
     case "peaceful-places":
       return "Peaceful Places™ might help — shall we go there?";
     case "clear-my-mind":

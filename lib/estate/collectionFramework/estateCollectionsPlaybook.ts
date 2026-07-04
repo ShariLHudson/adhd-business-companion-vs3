@@ -287,8 +287,9 @@ export const PLAYBOOK_ROOM_SIGNALS: readonly PlaybookRoomSignal[] = [
     id: "celebration-garden",
     weight: 1,
     patterns: [
-      /\b(?:went well|win|won|proud|celebrat|finished|completed|shipped|posted|knocked it out|got it done|small victory|good day|walked today|stayed calm|took a break|asked for help|sent the email|called a friend|meditated|got outside)\b/i,
-      /\b(?:finally did|pulled it off|nailed it|drank enough water|finished laundry|finished today's priority|small client win|great compliment|did something brave)\b/i,
+      /\b(?:went well|(?:big|huge|small|major) win|won|proud of (?:myself|what|how)|celebrat(?:e|ion|ing)|something to celebrate|want to celebrate)\b/i,
+      /\b(?:finished (?:my|the)|completed (?:my|the)|shipped|posted|knocked it out|got it done|small victory|finally did|pulled it off|nailed it)\b/i,
+      /\b(?:great compliment|small client win|did something brave)\b/i,
     ],
   },
   {

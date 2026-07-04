@@ -98,6 +98,7 @@ import {
 } from "./estateBrain/discoveryMode";
 import {
   clearUniversalCreationSession,
+  detectUniversalDocumentType,
   formatUniversalCreationQuestion,
   resolveUniversalCreationTurn,
   saveUniversalCreationSession,
@@ -105,6 +106,11 @@ import {
   universalCreationHint,
 } from "./universalCreation";
 import type { UniversalCreationSession } from "./universalCreation";
+import {
+  createFastPathRecoveryLine,
+  isSimpleCreateRequest,
+  logCreateFastPath,
+} from "./universalCreation/createFastPath";
 import {
   estateGuideHint,
   formatEstateGuideReply,
@@ -1019,13 +1025,27 @@ function resolveFrictionlessForPrimaryTurn(
   if (!primary) return null;
 
   switch (primary.type) {
-    case "RELATIONSHIP_CHAT":
     case "DIRECT_COMMAND":
-    case "INFORMATION_OR_RESEARCH":
       return null;
+    case "RELATIONSHIP_CHAT":
+    case "INFORMATION_OR_RESEARCH": {
+      const guide = tryEstateGuideFlow(input, routing);
+      if (guide) return guide;
+      return null;
+    }
     case "IMPLIED_NEED":
       return tryImpliedNeedFlow(input, routing);
     case "TASK_REQUEST": {
+      if (isSimpleCreateRequest(input.userText.trim())) {
+        logCreateFastPath({
+          turn: input.currentTurn,
+          userText: input.userText.trim(),
+          documentType: detectUniversalDocumentType(input.userText.trim()),
+        });
+        const universal = tryUniversalCreationFlow(input, routing);
+        if (universal) return universal;
+        return buildCreateFastPathRecoveryDecision(input, routing);
+      }
       const universal = tryUniversalCreationFlow(input, routing);
       if (universal) return universal;
       const discovery = tryDiscoveryFlow(input, routing);
@@ -1393,6 +1413,24 @@ function tryEstateGuideFlow(
   };
 }
 
+function buildCreateFastPathRecoveryDecision(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision {
+  return {
+    category: "universal_creation",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: "CREATE_FAST_PATH_RECOVERY",
+    localReply: createFastPathRecoveryLine(input.userText.trim()),
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+  };
+}
+
 function tryUniversalCreationFlow(
   input: FrictionlessActionInput,
   routing: IntentRoutingDecision,
@@ -1400,11 +1438,19 @@ function tryUniversalCreationFlow(
   const userText = input.userText.trim();
   if (!userText) return null;
 
-  const turn = resolveUniversalCreationTurn(
-    userText,
-    input.currentTurn ?? 0,
-    input.lastAssistantText,
-  );
+  let turn;
+  try {
+    turn = resolveUniversalCreationTurn(
+      userText,
+      input.currentTurn ?? 0,
+      input.lastAssistantText,
+    );
+  } catch {
+    if (isSimpleCreateRequest(userText)) {
+      return buildCreateFastPathRecoveryDecision(input, routing);
+    }
+    return null;
+  }
   if (!turn) return null;
 
   if (turn.kind === "question") {
@@ -2331,6 +2377,17 @@ function resolveFrictionlessActionImpl(
   const emotionalCanonFlow = tryEmotionalCanonFlow(input, routing, sparkRuntime);
   if (emotionalCanonFlow) return emotionalCanonFlow;
 
+  if (isSimpleCreateRequest(userText)) {
+    logCreateFastPath({
+      turn: currentTurn,
+      userText,
+      documentType: detectUniversalDocumentType(userText),
+    });
+    const createFastPath = tryUniversalCreationFlow(input, routing);
+    if (createFastPath) return createFastPath;
+    return buildCreateFastPathRecoveryDecision(input, routing);
+  }
+
   const impliedNeedFlow = tryImpliedNeedFlow(input, routing);
   if (impliedNeedFlow) {
     return attachSparkRuntime(impliedNeedFlow, sparkRuntime);
@@ -2583,6 +2640,24 @@ function resolveFrictionlessActionImpl(
     suppressRecap: none.suppressRecap || routing.suppressConversationSummary,
     intentRouting: routing,
   };
+}
+
+/**
+ * CREATE fast path — Universal Creation owns the turn; never fall through to estate routing.
+ */
+export function resolveCreateFastPathAction(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision {
+  const userText = input.userText.trim();
+  logCreateFastPath({
+    turn: input.currentTurn,
+    userText,
+    documentType: detectUniversalDocumentType(userText),
+  });
+  const universal = tryUniversalCreationFlow(input, routing);
+  if (universal?.localReply) return universal;
+  return buildCreateFastPathRecoveryDecision(input, routing);
 }
 
 export function resolveFrictionlessAction(

@@ -1,96 +1,143 @@
-/**
- * Estate room background plates — paths match public/backgrounds/ on disk.
- *
- * **Authority:** `estatePlaceMedia.ts` (member-renamed filenames) → canonical registry.
- *
- * @see lib/estate/estatePlaceMedia.ts
- * @see lib/estate/canonicalEstateRegistry.ts
- */
-
 import {
   CANONICAL_PLACE_BACKGROUNDS,
-  CANONICAL_PLACE_BACKGROUND_FALLBACKS,
   estateBackgroundPath,
-} from "./estatePlaceMedia";
-import { backgroundUrlVariants } from "@/lib/roomBackgroundAssets";
+  resolveCanonicalPlaceBackgroundCandidates,
+} from "@/lib/estate/estatePlaceMedia";
 
+/**
+ * Named estate room background plates — camelCase keys for registries and UI.
+ * Values align with `CANONICAL_PLACE_BACKGROUNDS` in estatePlaceMedia.
+ */
 export const ESTATE_ROOM_BG = {
-  welcomeHome: CANONICAL_PLACE_BACKGROUNDS["welcome-home"]!,
-  sunroom: CANONICAL_PLACE_BACKGROUNDS.sunroom!,
-  butterflyConservatory: CANONICAL_PLACE_BACKGROUNDS.conservatory!,
-  appleOrchard: CANONICAL_PLACE_BACKGROUNDS["apple-orchard"]!,
-  celebrationRoom: CANONICAL_PLACE_BACKGROUNDS["celebration-room"]!,
-  celebrationGarden: CANONICAL_PLACE_BACKGROUNDS.gardens!,
-  gallery: estateBackgroundPath("gallery-background.png"),
-  gameRoom: CANONICAL_PLACE_BACKGROUNDS["game-room"]!,
-  seatAtPond: CANONICAL_PLACE_BACKGROUNDS["seat-at-pond"]!,
-  gazeboJournal: CANONICAL_PLACE_BACKGROUNDS.journal!,
-  library: CANONICAL_PLACE_BACKGROUNDS.library!,
-  libraryLegacy: CANONICAL_PLACE_BACKGROUNDS["main-staircase"]!,
-  readingNook: CANONICAL_PLACE_BACKGROUNDS["reading-nook"]!,
-  clearMyMind: CANONICAL_PLACE_BACKGROUNDS["clear-my-mind"]!,
-  teaRoom: CANONICAL_PLACE_BACKGROUNDS["tea-room"]!,
-  stables: CANONICAL_PLACE_BACKGROUNDS.stables!,
-  momentumInstitute: CANONICAL_PLACE_BACKGROUNDS["momentum-institute"]!,
-  creativeStudio: CANONICAL_PLACE_BACKGROUNDS["creative-studio"]!,
-  evidenceVault: CANONICAL_PLACE_BACKGROUNDS["evidence-vault"]!,
-  coffeeHouse: CANONICAL_PLACE_BACKGROUNDS["coffee-house"]!,
-  musicRoom: CANONICAL_PLACE_BACKGROUNDS["music-room"]!,
-  greenhouse: CANONICAL_PLACE_BACKGROUNDS.greenhouse!,
-  portfolio: CANONICAL_PLACE_BACKGROUNDS.portfolio!,
-  sparkEstatePhoto: CANONICAL_PLACE_BACKGROUNDS["my-estate"]!,
-  peacefulPlacesRain: CANONICAL_PLACE_BACKGROUNDS["peaceful-places"]!,
-  artistStudio: estateBackgroundPath("artist-studio-background.png"),
+  welcomeHome: CANONICAL_PLACE_BACKGROUNDS["welcome-home"],
+  sunroom: CANONICAL_PLACE_BACKGROUNDS.sunroom,
+  butterflyConservatory: CANONICAL_PLACE_BACKGROUNDS.conservatory,
+  clearMyMind: CANONICAL_PLACE_BACKGROUNDS["clear-my-mind"],
+  coffeeHouse: CANONICAL_PLACE_BACKGROUNDS["coffee-house"],
+  teaRoom: CANONICAL_PLACE_BACKGROUNDS["tea-room"],
+  diningRoom: CANONICAL_PLACE_BACKGROUNDS["dining-room"],
+  estateKitchen: CANONICAL_PLACE_BACKGROUNDS["estate-kitchen"],
+  grandTerrace: CANONICAL_PLACE_BACKGROUNDS["grand-terrace"],
+  lakesideVerandah: CANONICAL_PLACE_BACKGROUNDS["lakeside-verandah"],
+  lakesideHammock: CANONICAL_PLACE_BACKGROUNDS["lakeside-hammock"],
+  discoveryRoom: CANONICAL_PLACE_BACKGROUNDS["discovery-room"],
+  estateGardens: CANONICAL_PLACE_BACKGROUNDS["estate-gardens"],
+  musicRoom: CANONICAL_PLACE_BACKGROUNDS["music-room"],
+  greenhouse: CANONICAL_PLACE_BACKGROUNDS.greenhouse,
+  celebrationGarden: CANONICAL_PLACE_BACKGROUNDS.gardens,
+  celebrationRoom: CANONICAL_PLACE_BACKGROUNDS["celebration-room"],
+  appleOrchard: CANONICAL_PLACE_BACKGROUNDS["apple-orchard"],
+  readingNook: CANONICAL_PLACE_BACKGROUNDS["reading-nook"],
+  library: CANONICAL_PLACE_BACKGROUNDS.library,
+  momentumInstitute: CANONICAL_PLACE_BACKGROUNDS["momentum-institute"],
+  creativeStudio: CANONICAL_PLACE_BACKGROUNDS["creative-studio"],
+  artStudio: CANONICAL_PLACE_BACKGROUNDS["art-studio"],
+  observatory: CANONICAL_PLACE_BACKGROUNDS.observatory,
+  studyHall: CANONICAL_PLACE_BACKGROUNDS["study-hall"],
+  stables: CANONICAL_PLACE_BACKGROUNDS.stables,
+  gameRoom: CANONICAL_PLACE_BACKGROUNDS["game-room"],
+  momentumBuilder: CANONICAL_PLACE_BACKGROUNDS["momentum-builder"],
+  strategyStudio: CANONICAL_PLACE_BACKGROUNDS["strategy-studio"],
+  momentumRoom: CANONICAL_PLACE_BACKGROUNDS["momentum-room"],
+  roundTable: CANONICAL_PLACE_BACKGROUNDS["round-table"],
+  summerTerrace: CANONICAL_PLACE_BACKGROUNDS["summer-terrace"],
+  decisionCompass: CANONICAL_PLACE_BACKGROUNDS["decision-compass"],
+  gazeboJournal: CANONICAL_PLACE_BACKGROUNDS.journal,
+  evidenceVault: CANONICAL_PLACE_BACKGROUNDS["evidence-vault"],
+  galleryOfFirsts: CANONICAL_PLACE_BACKGROUNDS["gallery-of-firsts"],
+  portfolio: CANONICAL_PLACE_BACKGROUNDS.portfolio,
+  goalsProjects: CANONICAL_PLACE_BACKGROUNDS["goals-projects"],
+  peacefulPlaces: CANONICAL_PLACE_BACKGROUNDS["peaceful-places"],
+  seatAtPond: CANONICAL_PLACE_BACKGROUNDS["seat-at-pond"],
+  reflectionPond: CANONICAL_PLACE_BACKGROUNDS["reflection-pond"],
+  gardenBench: CANONICAL_PLACE_BACKGROUNDS["garden-bench"],
+  backDeck: CANONICAL_PLACE_BACKGROUNDS["back-deck"],
+  firesideDeck: CANONICAL_PLACE_BACKGROUNDS["fireside-deck"],
+  personalDeck: CANONICAL_PLACE_BACKGROUNDS["personal-deck"],
+  porchSwing: CANONICAL_PLACE_BACKGROUNDS["porch-swing"],
+  windowSeat: CANONICAL_PLACE_BACKGROUNDS["window-seat"],
+  balcony: CANONICAL_PLACE_BACKGROUNDS.balcony,
+  woodlandPath: CANONICAL_PLACE_BACKGROUNDS["woodland-path"],
+  mainStaircase: CANONICAL_PLACE_BACKGROUNDS["main-staircase"],
+  stairwayReadingNook: CANONICAL_PLACE_BACKGROUNDS["stairway-reading-nook"],
+  sparkEstatePhoto: CANONICAL_PLACE_BACKGROUNDS["my-estate"],
+  sparkEstate: CANONICAL_PLACE_BACKGROUNDS["spark-estate"],
+  growthProfile: CANONICAL_PLACE_BACKGROUNDS["growth-profile"],
+  personalLibrary: estateBackgroundPath("room-library-personal-background.png"),
+  hallOfAchievements: estateBackgroundPath(
+    "hall-of-achievements-room-background.png",
+  ),
 } as const;
 
-/** Room id → background URL */
-export const ESTATE_ROOM_BG_BY_ROOM_ID: Record<string, string> = {
-  ...CANONICAL_PLACE_BACKGROUNDS,
-  "celebration-garden": CANONICAL_PLACE_BACKGROUNDS["celebration-room"]!,
-  "growth-journal": CANONICAL_PLACE_BACKGROUNDS.journal!,
-  "evidence-bank": CANONICAL_PLACE_BACKGROUNDS["evidence-vault"]!,
-  "the-gallery": ESTATE_ROOM_BG.gallery,
-  "growth-portfolio": CANONICAL_PLACE_BACKGROUNDS.portfolio!,
-  "grow-observatory": CANONICAL_PLACE_BACKGROUNDS.observatory!,
+/** Room id → background plate for alias registry and routing. */
+export const ESTATE_ROOM_BG_BY_ROOM_ID: Readonly<Record<string, string>> = {
+  "welcome-home": ESTATE_ROOM_BG.welcomeHome,
+  sunroom: ESTATE_ROOM_BG.sunroom,
+  conservatory: ESTATE_ROOM_BG.butterflyConservatory,
+  "clear-my-mind": ESTATE_ROOM_BG.clearMyMind,
+  "coffee-house": ESTATE_ROOM_BG.coffeeHouse,
+  "tea-room": ESTATE_ROOM_BG.teaRoom,
+  "dining-room": ESTATE_ROOM_BG.diningRoom,
+  "estate-kitchen": ESTATE_ROOM_BG.estateKitchen,
+  "grand-terrace": ESTATE_ROOM_BG.grandTerrace,
+  "lakeside-verandah": ESTATE_ROOM_BG.lakesideVerandah,
+  "lakeside-hammock": ESTATE_ROOM_BG.lakesideHammock,
+  "discovery-room": ESTATE_ROOM_BG.discoveryRoom,
+  "estate-gardens": ESTATE_ROOM_BG.estateGardens,
+  "music-room": ESTATE_ROOM_BG.musicRoom,
+  greenhouse: ESTATE_ROOM_BG.greenhouse,
+  gardens: ESTATE_ROOM_BG.celebrationGarden,
+  "celebration-garden": ESTATE_ROOM_BG.celebrationGarden,
+  "celebration-room": ESTATE_ROOM_BG.celebrationRoom,
+  "apple-orchard": ESTATE_ROOM_BG.appleOrchard,
+  "reading-nook": ESTATE_ROOM_BG.readingNook,
+  library: ESTATE_ROOM_BG.library,
+  "estate-library": ESTATE_ROOM_BG.library,
+  "personal-library": ESTATE_ROOM_BG.personalLibrary,
+  "momentum-institute": ESTATE_ROOM_BG.momentumInstitute,
+  "creative-studio": ESTATE_ROOM_BG.creativeStudio,
+  "art-studio": ESTATE_ROOM_BG.artStudio,
+  observatory: ESTATE_ROOM_BG.observatory,
+  "study-hall": ESTATE_ROOM_BG.studyHall,
+  stables: ESTATE_ROOM_BG.stables,
+  "game-room": ESTATE_ROOM_BG.gameRoom,
+  "momentum-builder": ESTATE_ROOM_BG.momentumBuilder,
+  "strategy-studio": ESTATE_ROOM_BG.strategyStudio,
+  "momentum-room": ESTATE_ROOM_BG.momentumRoom,
+  "round-table": ESTATE_ROOM_BG.roundTable,
+  "summer-terrace": ESTATE_ROOM_BG.summerTerrace,
+  "swimming-pool": ESTATE_ROOM_BG.summerTerrace,
+  "decision-compass": ESTATE_ROOM_BG.decisionCompass,
+  journal: ESTATE_ROOM_BG.gazeboJournal,
+  "evidence-vault": ESTATE_ROOM_BG.evidenceVault,
+  "gallery-of-firsts": ESTATE_ROOM_BG.galleryOfFirsts,
+  portfolio: ESTATE_ROOM_BG.portfolio,
+  "goals-projects": ESTATE_ROOM_BG.goalsProjects,
+  "peaceful-places": ESTATE_ROOM_BG.peacefulPlaces,
+  "seat-at-pond": ESTATE_ROOM_BG.seatAtPond,
+  "reflection-pond": ESTATE_ROOM_BG.reflectionPond,
+  "garden-bench": ESTATE_ROOM_BG.gardenBench,
+  "back-deck": ESTATE_ROOM_BG.backDeck,
+  "fireside-deck": ESTATE_ROOM_BG.firesideDeck,
+  "personal-deck": ESTATE_ROOM_BG.personalDeck,
+  "porch-swing": ESTATE_ROOM_BG.porchSwing,
+  "window-seat": ESTATE_ROOM_BG.windowSeat,
+  balcony: ESTATE_ROOM_BG.balcony,
+  "woodland-path": ESTATE_ROOM_BG.woodlandPath,
+  "main-staircase": ESTATE_ROOM_BG.mainStaircase,
+  "stairway-reading-nook": ESTATE_ROOM_BG.stairwayReadingNook,
+  "my-estate": ESTATE_ROOM_BG.sparkEstatePhoto,
+  "spark-estate": ESTATE_ROOM_BG.sparkEstate,
+  "growth-profile": ESTATE_ROOM_BG.growthProfile,
 };
 
-/** Legacy plates when primary fails onError. */
-export const ESTATE_ROOM_BG_FALLBACKS: Partial<
-  Record<keyof typeof ESTATE_ROOM_BG, readonly string[]>
-> = {
-  celebrationRoom: CANONICAL_PLACE_BACKGROUND_FALLBACKS["celebration-room"],
-  greenhouse: CANONICAL_PLACE_BACKGROUND_FALLBACKS.greenhouse,
-  butterflyConservatory: CANONICAL_PLACE_BACKGROUND_FALLBACKS.conservatory,
-  clearMyMind: CANONICAL_PLACE_BACKGROUND_FALLBACKS["clear-my-mind"],
-  library: CANONICAL_PLACE_BACKGROUND_FALLBACKS.library,
-  creativeStudio: CANONICAL_PLACE_BACKGROUND_FALLBACKS["creative-studio"],
-};
-
-const ROOM_BACKGROUND_FALLBACKS: Record<string, readonly string[]> = {
-  greenhouse: ESTATE_ROOM_BG_FALLBACKS.greenhouse ?? [],
-  "growth-profile": ESTATE_ROOM_BG_FALLBACKS.greenhouse ?? [],
-  conservatory: ESTATE_ROOM_BG_FALLBACKS.butterflyConservatory ?? [],
-  "clear-my-mind": ESTATE_ROOM_BG_FALLBACKS.clearMyMind ?? [],
-  library: ESTATE_ROOM_BG_FALLBACKS.library ?? [],
-  "celebration-room": ESTATE_ROOM_BG_FALLBACKS.celebrationRoom ?? [],
-  "celebration-garden": ESTATE_ROOM_BG_FALLBACKS.celebrationRoom ?? [],
-  "creative-studio": ESTATE_ROOM_BG_FALLBACKS.creativeStudio ?? [],
-};
-
-/** Primary plate plus ordered fallbacks for runtime img onError. */
+/** Ordered background URLs for a guidebook room plate — primary spread image first. */
 export function estateRoomBackgroundCandidates(
-  roomId: string,
-  primaryUrl?: string | null,
+  placeId: string,
+  primaryImageUrl: string | null,
 ): readonly string[] {
-  const primary =
-    primaryUrl ??
-    ESTATE_ROOM_BG_BY_ROOM_ID[roomId] ??
-    null;
-  if (!primary) return [];
-  const fallbacks = ROOM_BACKGROUND_FALLBACKS[roomId] ?? [];
-  const urls = [
-    ...backgroundUrlVariants(primary),
-    ...fallbacks.flatMap((url) => backgroundUrlVariants(url)),
-  ];
-  return [...new Set(urls)];
+  const canonical = resolveCanonicalPlaceBackgroundCandidates(placeId);
+  if (!primaryImageUrl) return canonical;
+  const deduped = canonical.filter((url) => url !== primaryImageUrl);
+  return [primaryImageUrl, ...deduped];
 }

@@ -11,19 +11,20 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, "..");
 
 const TARGETS = [
-  "public/backgrounds/clear-my-mind-background.png",
-  "public/backgrounds/plan-my-day-background.png",
+  "public/backgrounds/sunroom-background.png",
+  "public/backgrounds/study-hall-background.png",
   "public/backgrounds/life-experience-room.png",
-  "public/backgrounds/memory-story-room-background.png",
-  "public/backgrounds/capture-a-moment-background.png",
+  "public/backgrounds/room-library-estate-background.png",
+  "public/backgrounds/water-seat-at-pond-background.png",
   "public/backgrounds/gallery-background.png",
-  "public/backgrounds/growth-background.png",
-  "public/backgrounds/journal-background.png",
+  "public/backgrounds/gazebo-journal-background.png",
   "public/backgrounds/evidence-vault-background.png",
-  "public/backgrounds/creative-studio-background.png",
-  "public/backgrounds/celebration-garden-background.png",
-  "public/backgrounds/focus-my-brain-games-background.png",
+  "public/backgrounds/room-create-studio-background.png",
+  "public/backgrounds/space-celebration-garden-background.png",
   "public/backgrounds/audio-rain-background.png",
+  "public/backgrounds/greenhouse-background.png",
+  "public/backgrounds/room-coffee-house-background.png",
+  "public/backgrounds/music-room-background.png",
 ];
 
 const MAX_WIDTH = 1920;

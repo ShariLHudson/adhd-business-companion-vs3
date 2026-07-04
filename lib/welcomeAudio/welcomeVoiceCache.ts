@@ -3,6 +3,8 @@
  * Generate once: `node scripts/generate-welcome-voice-cache.mjs`
  */
 
+import { estateAudioPath } from "@/lib/estate/estatePlaceMedia";
+
 export const WELCOME_ROOM_GREETING_AUDIO_SRC =
   "/audio/welcome-room/welcome-greeting.mp3" as const;
 
@@ -16,9 +18,13 @@ export const WELCOME_ROOM_WELCOME_AUDIO_PARTS = [
 export const WELCOME_ROOM_FULL_WELCOME_AUDIO_SRC =
   "/audio/welcome-room/welcome-letter-full.mp3" as const;
 
-/** Welcome Home founder narration — cleaned export when present, else welcome letter. */
-export const WELCOME_HOME_FOUNDER_AUDIO_SRC =
-  "/audio/WelcomeHome_Clean.mp3" as const;
+/** Post-login Welcome Home narration (`public/audio/Welcome to the Spark Estates.m4a`). */
+export const WELCOME_HOME_WELCOME_AUDIO_FILENAME =
+  "Welcome to the Spark Estates.m4a" as const;
+
+export const WELCOME_HOME_FOUNDER_AUDIO_SRC = estateAudioPath(
+  WELCOME_HOME_WELCOME_AUDIO_FILENAME,
+);
 
 export type CachedSpeechClip = {
   audio: HTMLAudioElement;

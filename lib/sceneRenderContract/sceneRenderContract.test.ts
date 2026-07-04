@@ -44,7 +44,7 @@ describe("Scene Render Contract", () => {
     expect(resolved.motion.placement).toBe("none");
     expect(resolved.motion.enabled).toBe(false);
     expect(resolved.background.mode).toBe("photo-scene");
-    expect(resolved.background.imageUrl).toContain("clear-my-mind-background");
+    expect(resolved.background.imageUrl).toContain("greenhouse-background");
     expect(resolved.environment.placeId).toBe("greenhouse");
   });
 
@@ -84,7 +84,7 @@ describe("Scene Render Contract", () => {
     const layout = layoutScene(resolved);
     expect(resolved.motion.placement).toBe("none");
     expect(resolved.background.mode).toBe("photo-scene");
-    expect(resolved.background.imageUrl).toContain("focus-my-brain-background");
+    expect(resolved.background.imageUrl).toContain("sunroom-background");
     expect(resolved.background.fit).toBe("cover-safe-crop");
     expect(resolved.background.dominanceCap).toBe(1);
     expect(layout.dataAttributes["data-focus-landscape"]).toBe("1");

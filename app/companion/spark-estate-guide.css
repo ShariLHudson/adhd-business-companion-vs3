@@ -1,9 +1,9 @@
-/* Spark Estate Guide™ — bottom-right on every companion window */
+/* Spark Estate Guide™ — cover thumbnail in the lower-left corner */
 
 .spark-estate-guide-anchor {
   position: fixed;
   bottom: max(1rem, env(safe-area-inset-bottom, 0px));
-  right: max(0.85rem, env(safe-area-inset-right, 0px));
+  left: max(0.85rem, env(safe-area-inset-left, 0px));
   z-index: 100001;
   display: block;
   padding: 0;
@@ -35,7 +35,7 @@
   width: clamp(3.25rem, 11vw, 4.75rem);
   height: auto;
   border-radius: 0.2rem 0.45rem 0.45rem 0.2rem;
-  object-fit: cover;
+  object-fit: contain;
   pointer-events: none;
   user-select: none;
 }

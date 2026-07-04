@@ -56,7 +56,7 @@ describe("Estate Pending Transition™", () => {
       offeredAtTurn: 1,
     });
     const arrival = buildEstateArrivalContinuation(pending);
-    expect(arrival).toContain("Creative Studio™");
+    expect(arrival).toContain("Create");
     expect(arrival).toContain("newsletter");
     expect(arrival).toContain("Who are you writing it for?");
   });

@@ -10,6 +10,7 @@ import { detectDirectCommand } from "@/lib/estateIntelligence/estateCommandRoute
 import { shouldEnterDiscoveryMode } from "@/lib/estateBrain/discoveryMode";
 import { isResearchIntent } from "@/lib/estateBrain/researchRouting";
 import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
+import { isEstateGuideQuestion } from "@/lib/sparkKnowledge/estateGuide";
 import { shouldEnterUniversalCreation } from "@/lib/universalCreation";
 import { evaluateImpliedNeed } from "@/lib/intentAwareConversation/impliedNeed";
 import { loadImpliedNeedSession } from "@/lib/intentAwareConversation/impliedNeedSession";
@@ -167,6 +168,14 @@ function classifyPrimaryConversationTurnLegacy(
     return buildDecision("RELATIONSHIP_CHAT", "high", "relationship / small talk");
   }
 
+  if (isEstateGuideQuestion(text)) {
+    return buildDecision(
+      "INFORMATION_OR_RESEARCH",
+      "high",
+      "capability / estate guide — answer in conversation",
+    );
+  }
+
   if (informationOrResearch(text)) {
     return buildDecision(
       "INFORMATION_OR_RESEARCH",
@@ -176,7 +185,17 @@ function classifyPrimaryConversationTurnLegacy(
   }
 
   if (taskRequest(text)) {
-    return buildDecision("TASK_REQUEST", "high", "task or creation request — discovery first");
+    const base = buildDecision(
+      "TASK_REQUEST",
+      "high",
+      shouldEnterUniversalCreation(text)
+        ? "CREATE fast path — universal creation"
+        : "task or creation request — discovery first",
+    );
+    if (shouldEnterUniversalCreation(text)) {
+      return { ...base, owner: "frictionless:universal_creation" };
+    }
+    return base;
   }
 
   if (emotionalSupport(text)) {
@@ -212,10 +231,11 @@ export function primaryTurnAllowsFrictionlessCategory(
   category: string,
 ): boolean {
   switch (decision.type) {
-    case "RELATIONSHIP_CHAT":
     case "DIRECT_COMMAND":
-    case "INFORMATION_OR_RESEARCH":
       return category === "none";
+    case "RELATIONSHIP_CHAT":
+    case "INFORMATION_OR_RESEARCH":
+      return category === "none" || category === "estate_guide";
     case "IMPLIED_NEED":
       return category === "implied_need" || category === "none";
     case "TASK_REQUEST":

@@ -5,7 +5,7 @@
 | **Audience** | Spark internal — conversation, Estate Intelligence, coaching, hidden work |
 | **Not for** | Member-facing copy, marketing, or UI labels |
 | **Authority** | Canonical over improvised explanations when a room is matched |
-| **Parent** | [ESTATE_INTELLIGENCE_FRAMEWORK.md](../ESTATE_INTELLIGENCE_FRAMEWORK.md) |
+| **Parent** | [SHARI_KNOWLEDGE_INTELLIGENCE_FRAMEWORK.md](./SHARI_KNOWLEDGE_INTELLIGENCE_FRAMEWORK.md) |
 | **Phase 1** | [momentum-institute.md](./momentum-institute.md) — Build Room Intelligence™ |
 
 ---

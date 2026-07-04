@@ -38,6 +38,9 @@ function matchEnvironmentNeed(
   const trimmed = text.trim();
   if (!trimmed) return null;
 
+  // Named deck — go to Back Deck, not a generic open-air menu.
+  if (/\b(?:the\s+)?(?:back\s+)?deck\b/i.test(trimmed)) return null;
+
   // Named destination with navigation verb — not an environment need offer
   if (NAV_VERB_ONLY_RE.test(trimmed)) return null;
 

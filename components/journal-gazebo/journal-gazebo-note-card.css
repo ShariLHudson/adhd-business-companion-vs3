@@ -1,0 +1,291 @@
+/* ═══════════════════════════════════════════════════════════
+   4×6 top-fold welcome note — isolated from legacy card CSS
+═══════════════════════════════════════════════════════════ */
+
+.jg-topfold-card {
+  --jg-topfold-full-h: min(66vh, 40rem);
+  --jg-topfold-w: calc(var(--jg-topfold-full-h) * 4 / 6);
+  --jg-topfold-half-h: calc(var(--jg-topfold-full-h) * 0.5);
+
+  position: absolute;
+  left: 50%;
+  bottom: clamp(12%, 16vh, 20%);
+  z-index: 12;
+  width: var(--jg-topfold-w);
+  max-width: min(92vw, 22rem);
+  height: var(--jg-topfold-half-h);
+  transform: translateX(-50%);
+  perspective: 1400px;
+  pointer-events: none;
+  filter: drop-shadow(0 20px 44px rgba(10, 8, 6, 0.5));
+  transition:
+    height 1s cubic-bezier(0.22, 1, 0.36, 1),
+    filter 0.8s ease,
+    transform 0.8s ease;
+}
+
+.jg-topfold-card--clickable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.jg-topfold-card--clickable:hover {
+  transform: translateX(-50%) translateY(-3px);
+  filter: drop-shadow(0 26px 52px rgba(10, 8, 6, 0.55));
+}
+
+.jg-topfold-card--flap-open,
+.jg-topfold-card--show-interior {
+  height: var(--jg-topfold-full-h);
+}
+
+.jg-topfold-card__shadow {
+  position: absolute;
+  left: 8%;
+  right: 8%;
+  bottom: -12%;
+  height: 28%;
+  background: radial-gradient(ellipse, rgba(8, 6, 4, 0.5), transparent 72%);
+  pointer-events: none;
+}
+
+.jg-topfold-card__stage {
+  position: relative;
+  width: 100%;
+  height: var(--jg-topfold-full-h);
+  transform-style: preserve-3d;
+}
+
+.jg-topfold-card__inside,
+.jg-topfold-card__flap {
+  background: linear-gradient(165deg, #fdf9f0 0%, #f3e8d6 48%, #e8dbc4 100%);
+  border: 1px solid rgba(155, 125, 78, 0.38);
+  box-shadow: inset 0 1px 0 rgba(255, 252, 245, 0.92);
+}
+
+.jg-topfold-card__inside {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.jg-topfold-card__flap {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  height: 50%;
+  border-radius: 4px 4px 0 0;
+  transform-origin: bottom center;
+  transform: rotateX(0deg);
+  transition: transform 1.15s cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 3;
+  backface-visibility: hidden;
+}
+
+.jg-topfold-card__paper-texture {
+  position: absolute;
+  inset: 0;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}
+
+.jg-topfold-card__emboss {
+  position: absolute;
+  inset: 0.5rem;
+  border: 1px solid rgba(180, 145, 90, 0.32);
+  box-shadow: inset 0 0 0 1px rgba(255, 252, 245, 0.45);
+  pointer-events: none;
+}
+
+.jg-topfold-card__crease {
+  position: absolute;
+  top: 50%;
+  left: 6%;
+  right: 6%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(120, 95, 60, 0.38) 15%,
+    rgba(120, 95, 60, 0.38) 85%,
+    transparent
+  );
+  pointer-events: none;
+  z-index: 2;
+}
+
+.jg-topfold-card__flap-face {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.5rem;
+}
+
+.jg-topfold-card__address {
+  margin: 0;
+  font-family: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.15rem, 2.6vw, 1.45rem);
+  font-style: italic;
+  font-weight: 500;
+  color: #2a2318;
+  text-align: center;
+  line-height: 1.2;
+}
+
+.jg-spark-flame-img {
+  display: block;
+  object-fit: contain;
+  clip-path: none !important;
+  -webkit-clip-path: none !important;
+  filter: drop-shadow(0 2px 5px rgba(120, 90, 40, 0.4));
+}
+
+.jg-spark-flame-img--sm {
+  height: clamp(1.75rem, 3.8vh, 2.15rem);
+  width: auto;
+}
+
+.jg-spark-flame-img--md {
+  height: clamp(2.15rem, 4.6vh, 2.85rem);
+  width: auto;
+}
+
+.jg-spark-flame-img--lg {
+  height: clamp(2.65rem, 5.8vh, 3.45rem);
+  width: auto;
+}
+
+.jg-topfold-card--flap-lift .jg-topfold-card__flap {
+  transform: rotateX(-62deg);
+}
+
+.jg-topfold-card--flap-open .jg-topfold-card__flap,
+.jg-topfold-card--revealed .jg-topfold-card__flap,
+.jg-topfold-card--complete .jg-topfold-card__flap {
+  transform: rotateX(-178deg);
+}
+
+.jg-topfold-card__gazebo-art {
+  position: absolute;
+  right: 4%;
+  bottom: 6%;
+  width: 42%;
+  height: 32%;
+  background-size: cover;
+  background-position: center bottom;
+  border-radius: 2px;
+  opacity: 0.22;
+  pointer-events: none;
+  filter: grayscale(0.35) sepia(0.25);
+  mask-image: linear-gradient(180deg, transparent 0%, #000 28%, #000 100%);
+  -webkit-mask-image: linear-gradient(180deg, transparent 0%, #000 28%, #000 100%);
+}
+
+.jg-topfold-card__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  padding: clamp(0.65rem, 1.8vh, 1rem) clamp(0.75rem, 2vw, 1.1rem)
+    clamp(0.5rem, 1.2vh, 0.75rem);
+  box-sizing: border-box;
+}
+
+.jg-topfold-card__head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.15rem;
+  flex-shrink: 0;
+}
+
+.jg-topfold-card__title {
+  margin: 0.15rem 0 0;
+  font-family: "Playfair Display", "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(1.35rem, 3vh, 1.75rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #2a2318;
+}
+
+.jg-topfold-card__filigree {
+  width: clamp(3.5rem, 8vw, 5rem);
+  height: 0.45rem;
+  margin-top: 0.2rem;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(212, 184, 112, 0.7) 25%,
+    rgba(212, 184, 112, 0.9) 50%,
+    rgba(212, 184, 112, 0.7) 75%,
+    transparent
+  );
+}
+
+.jg-topfold-card__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(0.2rem, 0.8vh, 0.45rem);
+  min-height: 0;
+  overflow: hidden;
+  text-align: center;
+}
+
+.jg-topfold-card__body p {
+  margin: 0;
+  font-family: "Playfair Display", Georgia, serif;
+  font-size: clamp(0.78rem, 1.55vh, 1.02rem);
+  line-height: 1.38;
+  color: #2a2318;
+}
+
+.jg-topfold-card__closing {
+  margin-top: 0.25rem !important;
+  font-style: italic;
+}
+
+.jg-topfold-card__sign {
+  margin-top: 0.35rem !important;
+  font-family: "Pinyon Script", "Segoe Script", cursive;
+  font-size: clamp(0.95rem, 1.9vh, 1.2rem) !important;
+  color: #3a3024;
+}
+
+.jg-topfold-card__cta {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  padding-top: 0.25rem;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.jg-topfold-card--invite .jg-topfold-card__cta {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.jg-topfold-card:not(.jg-topfold-card--flap-open):not(.jg-topfold-card--show-interior)
+  .jg-topfold-card__inside {
+  visibility: hidden;
+}
+
+.jg-topfold-card:not(.jg-topfold-card--flap-open):not(.jg-topfold-card--show-interior) {
+  overflow: hidden;
+}
+
+.journal-estate--note-open .jg-topfold-card {
+  z-index: 14;
+}

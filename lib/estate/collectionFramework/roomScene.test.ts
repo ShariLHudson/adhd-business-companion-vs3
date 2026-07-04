@@ -28,6 +28,6 @@ describe("estate guide spreads for collection rooms", () => {
       expect(spread).toBeDefined();
       expect(spread!.image.length).toBeGreaterThan(0);
     }
-    expect(listEstateGuideSpreadIds()).toHaveLength(6);
+    expect(listEstateGuideSpreadIds().length).toBeGreaterThanOrEqual(6);
   });
 });

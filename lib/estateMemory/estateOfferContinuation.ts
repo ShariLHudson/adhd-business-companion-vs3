@@ -31,7 +31,7 @@ function inferSectionFromAssistantOffer(assistantText: string): AppSection | nul
   return null;
 }
 
-function workspaceOfferForEstateSection(
+export function buildWorkspaceOfferForEstateSection(
   section: AppSection,
   line: string,
 ): WorkspaceOffer {
@@ -41,7 +41,7 @@ function workspaceOfferForEstateSection(
     : section;
   return {
     section,
-    buttonLabel: `Step into ${name}`,
+    buttonLabel: `Open ${name}`,
     line,
   };
 }
@@ -52,7 +52,7 @@ export function buildEstateOfferFrictionlessPending(input: {
   assistantText: string;
   offeredAtTurn: number;
 }): FrictionlessPendingAction {
-  const offer = workspaceOfferForEstateSection(input.section, input.assistantText);
+  const offer = buildWorkspaceOfferForEstateSection(input.section, input.assistantText);
   return frictionlessPendingFromWorkspaceOffer(offer, input.offeredAtTurn, {
     userText: input.priorUserText,
     artifactKind: detectRegistryArtifact(input.priorUserText),

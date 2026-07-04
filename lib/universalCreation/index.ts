@@ -52,3 +52,11 @@ export {
   resolveUniversalCreationTurn,
   universalCreationHint,
 } from "./orchestrator";
+
+export {
+  isSimpleCreateRequest,
+  inferDocumentTypeFromCreateText,
+  logCreateFastPath,
+  createFastPathRecoveryLine,
+  SIMPLE_CREATE_VERB_RE,
+} from "./createFastPath";

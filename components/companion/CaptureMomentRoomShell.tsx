@@ -13,7 +13,7 @@ type Props = {
   reflecting?: boolean;
 };
 
-/** Full-screen Capture a Moment — capture-a-moment-background fills the viewport. */
+/** Full-screen Capture a Moment — pond bench background fills the viewport. */
 export function CaptureMomentRoomShell({ children, reflecting }: Props) {
   useEffect(() => {
     preloadRoomBackground(CAPTURE_MOMENT_ROOM_BG);

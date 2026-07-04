@@ -47,6 +47,36 @@ describe("reminderIntelligence", () => {
     expect(isReminderRequest("Remind me how to write an email")).toBe(false);
   });
 
+  it("does not treat list-making as a reminder when member says don't forget", () => {
+    expect(
+      isReminderRequest(
+        "i have a lot in my head and need to make a list of things i need to do so i don't forget",
+      ),
+    ).toBe(false);
+    const outcome = resolveReminderTurn({
+      userText:
+        "i have a lot in my head and need to make a list of things i need to do so i don't forget",
+      now: NOW,
+    });
+    expect(outcome.kind).toBe("not_reminder");
+  });
+
+  it("exits reminder intake when member wants to write the list now", () => {
+    const first = resolveReminderTurn({
+      userText: "Remind me to call the dentist",
+      now: NOW,
+    });
+    expect(first.kind).toBe("ask");
+    if (first.kind !== "ask") return;
+
+    const second = resolveReminderTurn({
+      userText: "i need to write the list right now",
+      draft: first.draft,
+      now: NOW,
+    });
+    expect(second.kind).toBe("not_reminder");
+  });
+
   it("creates a one-time reminder with confirmation", () => {
     const outcome = resolveReminderTurn({
       userText: "Remind me to drink water at 2 PM",

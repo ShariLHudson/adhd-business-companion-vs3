@@ -6,9 +6,30 @@
 
 import { formatEstatePlaceSuggestionMenu } from "./estatePlaceIdentityLock";
 
-/** Explicit swim / pool navigation — never route to game-room. */
-export const SWIMMING_POOL_NAV_RE =
-  /\b(?:(?:take\s+me|go|head|bring\s+me)\s+to\s+(?:the\s+)?(?:swimming\s+)?pool|swimming\s+pool|let(?:'s| us)\s+go\s+swimming|go\s+(?:for\s+a\s+)?swim(?:ming)?|want\s+to\s+swim|take\s+a\s+swim)\b/i;
+/** Explicit swim / pool navigation — route to Summer Terrace™ via alias registry. */
+export const EXPLICIT_POOL_NAV_RE =
+  /\b(?:(?:take\s+me|go|head|bring\s+me)\s+to\s+(?:the\s+)?(?:swimming\s+)?pool|(?:show\s+me|open|visit)\s+(?:the\s+)?(?:swimming\s+)?pool|swimming\s+pool)\b/i;
+
+/** Vague swim activity — offer water-adjacent alternatives when pool terrace isn't named. */
+export const VAGUE_SWIM_ACTIVITY_RE =
+  /\b(?:let(?:'s| us)\s+go\s+swimming|go\s+(?:for\s+a\s+)?swimming|take\s+a\s+swim)\b/i;
+
+export function isExplicitPoolNavigationRequest(text: string): boolean {
+  return EXPLICIT_POOL_NAV_RE.test(text.trim());
+}
+
+export function isVagueSwimmingActivityRequest(text: string): boolean {
+  return VAGUE_SWIM_ACTIVITY_RE.test(text.trim());
+}
+
+/** @deprecated Use isExplicitPoolNavigationRequest or isVagueSwimmingActivityRequest */
+export function isSwimmingPoolNavigationRequest(text: string): boolean {
+  const trimmed = text.trim();
+  return (
+    isExplicitPoolNavigationRequest(trimmed) ||
+    isVagueSwimmingActivityRequest(trimmed)
+  );
+}
 
 /** Celebration audio — not Celebration Room™ / Hall™ / Garden™ navigation. */
 export const CELEBRATION_SOUNDS_INTENT_RE =
@@ -18,10 +39,6 @@ export const SWIMMING_POOL_ALTERNATIVE_PLACE_IDS = [
   "seat-at-pond",
   "peaceful-places",
 ] as const;
-
-export function isSwimmingPoolNavigationRequest(text: string): boolean {
-  return SWIMMING_POOL_NAV_RE.test(text.trim());
-}
 
 export function isCelebrationSoundsIntent(text: string): boolean {
   const trimmed = text.trim();

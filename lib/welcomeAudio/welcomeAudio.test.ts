@@ -21,13 +21,13 @@ describe("welcomeAudio profiles", () => {
     );
   });
 
-  it("registers welcome-home profile with founder narration source", () => {
+  it("registers welcome-home profile with post-login welcome track", () => {
     expect(WELCOME_HOME_AUDIO_PROFILE.id).toBe("welcome-home");
     expect(WELCOME_HOME_AUDIO_PROFILE.voice?.fullWelcomeSrc).toBe(
-      "/audio/welcome-room/welcome-letter-full.mp3",
+      "/audio/Welcome%20to%20the%20Spark%20Estates.m4a",
     );
-    expect(WELCOME_HOME_AUDIO_PROFILE.ambience?.src).toBe(
-      WELCOME_ROOM_AUDIO_PROFILE.ambience?.src,
-    );
+    expect(WELCOME_HOME_AUDIO_PROFILE.voice?.playbackRate).toBe(1);
+    expect(WELCOME_HOME_AUDIO_PROFILE.ambience).toBeUndefined();
+    expect(WELCOME_HOME_AUDIO_PROFILE.timeline?.voiceStartMs).toBe(250);
   });
 });

@@ -79,7 +79,7 @@ const CURIOUS_RE =
   /\b(?:curious|wonder(?:ing)?|explore|discover|learn more|what if)\b/i;
 
 const CELEBRATORY_RE =
-  /\b(?:celebrat(?:e|ion|ing)|mark this|honor this|something good happened|proud of)\b/i;
+  /\b(?:celebrat(?:e|ion|ing)(?:\s+(?:this|that|it|my|our|a))|want to celebrate|something to celebrate|accomplish(?:ment|ed)|milestone|worth celebrating)\b/i;
 
 const REFLECTIVE_RE =
   /\b(?:reflect(?:ion|ive)?|think(?:ing)? through|process this|sit with|ponder|journal)\b/i;

@@ -10,7 +10,7 @@
 
 /** @deprecated Import PLACE_ID_ALIASES — subset retained for backward compatibility. */
 export const CANONICAL_PLACE_LEGACY_IDS: Readonly<Record<string, string>> = {
-  "celebration-garden": "celebration-room",
+  "celebration-garden": "gardens",
   "exercise-room": "game-room",
 };
 
@@ -39,6 +39,12 @@ export const PLACE_ID_ALIASES: Readonly<Record<string, string>> = {
 
   // Registry / menu bridges
   "estate-registry-journal": "journal",
+  kitchen: "estate-kitchen",
+  "board-room": "round-table",
+  "estate-library": "library",
+  "personal-library": "library",
+  pool: "summer-terrace",
+  "hall-of-accomplishments": "gallery-of-firsts",
 };
 
 const MAX_ALIAS_HOPS = 8;

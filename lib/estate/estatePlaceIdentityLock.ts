@@ -28,10 +28,10 @@ export const QUIET_PLACE_SUGGESTION_ORDER = [
 ] as const;
 
 export const ESTATE_PLACE_SUGGESTION_INTRO =
-  "A few places on the Estate that might help:";
+  "A few ideas:";
 
 export const ESTATE_PLACE_SUGGESTION_CLOSER =
-  "Say a number or name and I'll take you there.";
+  "Just tell me which one — or name another room if you're picturing somewhere else.";
 
 /** Stable member-facing order for quiet/restorative suggestion menus. */
 export function pinQuietSuggestionOrder(placeIds: readonly string[]): string[] {
@@ -335,6 +335,7 @@ export function formatCanonicalPlaceMappingLine(placeId: string): string {
 /** Mandatory numbered Estate place suggestion format (PATH B). */
 export function formatEstatePlaceSuggestionMenu(
   placeIds: readonly string[],
+  opts?: { intro?: string; closer?: string },
 ): string {
   const ordered = pinQuietSuggestionOrder(placeIds);
   const places = ordered
@@ -354,7 +355,10 @@ export function formatEstatePlaceSuggestionMenu(
     return `${index + 1}. ${place.officialName} — ${blurb}`;
   });
 
-  return `${ESTATE_PLACE_SUGGESTION_INTRO}\n${lines.join("\n")}\n${ESTATE_PLACE_SUGGESTION_CLOSER}`;
+  const intro = opts?.intro ?? ESTATE_PLACE_SUGGESTION_INTRO;
+  const closer = opts?.closer ?? ESTATE_PLACE_SUGGESTION_CLOSER;
+
+  return `${intro}\n${lines.join("\n")}\n${closer}`;
 }
 
 /** @deprecated Use formatEstatePlaceSuggestionMenu */

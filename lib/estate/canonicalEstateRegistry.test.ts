@@ -14,7 +14,7 @@ import {
 describe("canonicalEstateRegistry", () => {
   it("has expected version and place count from Phase A canon", () => {
     expect(CANONICAL_ESTATE_REGISTRY_VERSION).toBe("1.0");
-    expect(CANONICAL_ESTATE_REGISTRY.length).toBe(42);
+    expect(CANONICAL_ESTATE_REGISTRY.length).toBe(61);
   });
 
   it("passes integrity validation", () => {
@@ -46,8 +46,8 @@ describe("canonicalEstateRegistry", () => {
 
   it("categories match canon distribution", () => {
     const stats = canonicalRegistryStats();
-    expect(stats.byCategory["living-place"]).toBe(16);
-    expect(stats.byCategory.destination).toBe(14);
+    expect(stats.byCategory["living-place"]).toBe(28);
+    expect(stats.byCategory.destination).toBe(21);
     expect(stats.byCategory.collection).toBe(5);
     expect(stats.byCategory["transition-space"]).toBe(7);
   });
@@ -68,11 +68,9 @@ describe("canonicalEstateRegistry", () => {
     expect(getCanonicalEstatePlaceById("main-hallway")).toBeDefined();
   });
 
-  it("maps legacy celebration-garden id to celebration-room (P0)", () => {
-    expect(resolveCanonicalPlaceId("celebration-garden")).toBe("celebration-room");
-    expect(getCanonicalEstatePlaceById("celebration-garden")?.id).toBe(
-      "celebration-room",
-    );
+  it("maps legacy celebration-garden id to gardens (member-facing Celebration Garden)", () => {
+    expect(resolveCanonicalPlaceId("celebration-garden")).toBe("gardens");
+    expect(getCanonicalEstatePlaceById("celebration-garden")?.id).toBe("gardens");
   });
 
   it("keeps reading nook and library as distinct places", () => {

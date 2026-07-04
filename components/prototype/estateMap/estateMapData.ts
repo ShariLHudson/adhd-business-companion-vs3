@@ -1,6 +1,8 @@
 import type { EstateLocation } from "./types";
 
-export const CONSERVATORY_BG = "/backgrounds/clear-my-mind-background.png";
+import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
+
+export const CONSERVATORY_BG = ESTATE_ROOM_BG.greenhouse;
 
 export const ESTATE_LOCATIONS: EstateLocation[] = [
   { id: "welcome-house", name: "Welcome House", tagline: "Arrival & Belonging", region: "center", x: 50, y: 48 },

@@ -1,5 +1,7 @@
 "use client";
 
+import { useLayoutEffect } from "react";
+
 import { seedCompanionSupabaseInlineConfig } from "@/lib/supabase/companionClient";
 
 type Props = {
@@ -12,6 +14,9 @@ type Props = {
  * (Next.js rejects script children in React component trees).
  */
 export function CompanionAuthInlineBootstrap({ url, anonKey }: Props) {
-  seedCompanionSupabaseInlineConfig(url, anonKey);
+  useLayoutEffect(() => {
+    seedCompanionSupabaseInlineConfig(url, anonKey);
+  }, [url, anonKey]);
+
   return null;
 }

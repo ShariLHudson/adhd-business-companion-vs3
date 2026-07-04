@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { backgroundUrlVariants } from "@/lib/roomBackgroundAssets";
 import { estateRoomBackgroundCandidates } from "@/lib/estate/estateRoomAssets";
 import { resolveEstateRoomBackgroundImage } from "@/lib/estate/estateRoomBackground";
 
@@ -9,6 +10,7 @@ type Props = {
   /** Override registry URL when section-specific asset is already resolved */
   imageUrl?: string | null;
   className?: string;
+  onLoad?: () => void;
 };
 
 /**
@@ -18,11 +20,21 @@ export function EstateRoomFullBleedBackground({
   roomId,
   imageUrl,
   className,
+  onLoad,
 }: Props) {
-  const candidates = estateRoomBackgroundCandidates(
-    roomId,
-    imageUrl ?? resolveEstateRoomBackgroundImage(roomId),
-  );
+  const candidates = useMemo(() => {
+    const base = estateRoomBackgroundCandidates(
+      roomId,
+      imageUrl ?? resolveEstateRoomBackgroundImage(roomId),
+    );
+    const expanded: string[] = [];
+    for (const url of base) {
+      for (const variant of backgroundUrlVariants(url)) {
+        if (!expanded.includes(variant)) expanded.push(variant);
+      }
+    }
+    return expanded;
+  }, [roomId, imageUrl]);
   const [candidateIndex, setCandidateIndex] = useState(0);
 
   useEffect(() => {
@@ -36,7 +48,16 @@ export function EstateRoomFullBleedBackground({
   }, [candidates.length]);
 
   const src = candidates[candidateIndex];
-  if (!src) return null;
+  if (!src) {
+    return (
+      <div
+        className={["estate-room-fullbleed-bg estate-room-fullbleed-bg--fallback", className]
+          .filter(Boolean)
+          .join(" ")}
+        aria-hidden
+      />
+    );
+  }
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -47,6 +68,7 @@ export function EstateRoomFullBleedBackground({
       className={["estate-room-fullbleed-bg", className].filter(Boolean).join(" ")}
       decoding="async"
       fetchPriority="high"
+      onLoad={onLoad}
       onError={handleError}
     />
   );

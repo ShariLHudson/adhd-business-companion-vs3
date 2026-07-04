@@ -1,14 +1,19 @@
 "use client";
 
-import { EstateCollectionRoomPanel } from "@/components/estate-collection";
+import { JournalGazeboExperience } from "@/components/journal-gazebo/JournalGazeboExperience";
 import type { GrowthPanelNav } from "@/lib/growthNavigation";
 
-/** Journal (White Gazebo) — Spark Estate Collection Framework™ */
+/** Journal Gazebo™ — first-visit envelope, letter, and writing desk. */
 export function GrowthJournalPanel({
   nav,
 }: {
   refreshKey?: string;
   nav: GrowthPanelNav;
 }) {
-  return <EstateCollectionRoomPanel roomId="journal" nav={nav} />;
+  return (
+    <JournalGazeboExperience
+      onBack={nav.onBack}
+      backLabel={nav.backLabel ?? "Companion"}
+    />
+  );
 }

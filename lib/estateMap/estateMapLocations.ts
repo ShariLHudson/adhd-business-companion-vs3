@@ -1,3 +1,4 @@
+import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
 import type { EstateMapLocation } from "./types";
 
 /**
@@ -19,7 +20,7 @@ export const DEFAULT_ESTATE_MAP_LOCATIONS: EstateMapLocation[] = [
   {
     id: "conservatory",
     name: "Conservatory",
-    image: "/backgrounds/clear-my-mind-background.png",
+    image: ESTATE_ROOM_BG.greenhouse,
     mood: "Clarity & thinking",
     x: 28,
     y: 32,
@@ -29,7 +30,7 @@ export const DEFAULT_ESTATE_MAP_LOCATIONS: EstateMapLocation[] = [
   {
     id: "library",
     name: "Library",
-    image: "/backgrounds/memory-story-room-background.webp",
+    image: ESTATE_ROOM_BG.library,
     mood: "Wisdom & learning",
     x: 50,
     y: 22,
@@ -39,7 +40,7 @@ export const DEFAULT_ESTATE_MAP_LOCATIONS: EstateMapLocation[] = [
   {
     id: "coffee-house",
     name: "Coffee House",
-    image: "/backgrounds/cozy-cafe-peaceful-places.png",
+    image: ESTATE_ROOM_BG.coffeeHouse,
     mood: "Warm focus",
     x: 74,
     y: 30,
@@ -59,7 +60,7 @@ export const DEFAULT_ESTATE_MAP_LOCATIONS: EstateMapLocation[] = [
   {
     id: "orchard",
     name: "Apple Orchard",
-    image: "/backgrounds/celebration-garden-background.webp",
+    image: "/backgrounds/space-apple-orchard-background.webp",
     mood: "Fresh ideas & possibility",
     x: 78,
     y: 50,
@@ -89,7 +90,7 @@ export const DEFAULT_ESTATE_MAP_LOCATIONS: EstateMapLocation[] = [
   {
     id: "observatory",
     name: "Observatory",
-    image: "/backgrounds/plan-my-day-background.webp",
+    image: ESTATE_ROOM_BG.observatory,
     mood: "Future thinking",
     x: 82,
     y: 18,

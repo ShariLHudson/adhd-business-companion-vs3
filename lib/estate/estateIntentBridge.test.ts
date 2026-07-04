@@ -64,6 +64,17 @@ describe("Estate Intent Bridge™ (Phase H.1)", () => {
     expect(result.reasoning).toMatch(/celebrat/i);
   });
 
+  it("relationship conversation — good day wish — no place inference", () => {
+    const result = resolveEstateIntent({
+      text: "I hope you're having a good day.",
+    });
+    expect(result.primaryPlaceId).toBeNull();
+    expect(result.suggestedPlaceIds).toEqual([]);
+    expect(result.confidence).toBe(0);
+    expect(result.reasoning).toMatch(/relationship conversation/i);
+    expect(mayAutoRouteFromEstateIntent(result)).toBe(false);
+  });
+
   it('"I don\'t know where to go" never fails silently', () => {
     const result = resolveEstateIntent({
       text: "I don't know where to go",

@@ -18,7 +18,7 @@ describe("Estate Directory", () => {
     const canon = canonicalRegistryStats();
     const directory = estateDirectoryStats();
     expect(directory.total).toBe(canon.total);
-    expect(ESTATE_DIRECTORY.size).toBe(42);
+    expect(ESTATE_DIRECTORY.size).toBe(canon.total);
   });
 
   it("passes integrity validation", () => {
@@ -46,8 +46,8 @@ describe("Estate Directory", () => {
   it("lists navigable living places and destinations", () => {
     const living = getEstateDirectoryEntriesByCategory("living-place");
     const destinations = getEstateDirectoryEntriesByCategory("destination");
-    expect(living.length).toBe(16);
-    expect(destinations.length).toBe(14);
+    expect(living.length).toBe(28);
+    expect(destinations.length).toBe(21);
     expect(
       getNavigableEstateDirectoryEntries().every((entry) => entry.shell.navigable),
     ).toBe(true);

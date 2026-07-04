@@ -1,0 +1,204 @@
+/* ═══════════════════════════════════════════════════════════
+   Welcome letter scene — photo plate + estate green plaques
+═══════════════════════════════════════════════════════════ */
+
+.journal-gazebo--welcome-letter .journal-gazebo__background {
+  inset: auto;
+  top: 0;
+  left: 50%;
+  width: auto;
+  height: min(78vh, 100%);
+  max-height: 78vh;
+  max-width: min(96vw, 100%);
+  aspect-ratio: 16 / 10;
+  transform: translateX(-50%);
+  object-fit: contain;
+  object-position: center top;
+}
+
+.journal-gazebo--workshop-plate .journal-gazebo__background {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  transform: none;
+  object-fit: cover;
+  object-position: center center;
+}
+
+/* Sized to match background img rect via JS in WelcomeDesk */
+.jg-welcome-desk {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  width: auto;
+  height: min(78vh, 100%);
+  max-height: 78vh;
+  max-width: min(96vw, 100%);
+  aspect-ratio: 16 / 10;
+  transform: translateX(-50%);
+  z-index: 30;
+  pointer-events: none;
+}
+
+.jg-welcome-desk__actions {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Estate green plaque — warm gold frame for "Begin My Journal" */
+.jg-welcome-desk__plaque {
+  position: absolute;
+  bottom: 2.4%;
+  height: 12.8%;
+  margin: 0;
+  padding: 0.5em 0.65em 0.55em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2em;
+  text-align: center;
+  border: 1px solid rgba(201, 166, 107, 0.72);
+  border-radius: 2px;
+  background:
+    radial-gradient(circle at 28% 18%, rgba(255, 244, 210, 0.12), transparent 52%),
+    radial-gradient(circle at 76% 88%, rgba(0, 0, 0, 0.28), transparent 58%),
+    linear-gradient(168deg, rgba(42, 38, 30, 0.92) 0%, rgba(24, 22, 18, 0.96) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 184, 112, 0.22),
+    inset 0 -2px 10px rgba(0, 0, 0, 0.38),
+    0 6px 18px rgba(8, 6, 4, 0.36);
+  color: #c9a66b;
+  cursor: pointer;
+  pointer-events: auto;
+  z-index: 2;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.jg-welcome-desk__plaque--create::before,
+.jg-welcome-desk__plaque--create::after {
+  content: "";
+  display: block;
+  width: min(88%, 14rem);
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(201, 166, 107, 0.35) 12%,
+    rgba(212, 184, 112, 0.72) 50%,
+    rgba(201, 166, 107, 0.35) 88%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.jg-welcome-desk__plaque::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(212, 184, 112, 0.26);
+  border-radius: 2px;
+  box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.16);
+  pointer-events: none;
+}
+
+.jg-welcome-desk__plaque--create {
+  left: 2.8%;
+  right: 50.4%;
+}
+
+.jg-welcome-desk__plaque--open {
+  left: 50.4%;
+  right: 2.8%;
+}
+
+.jg-welcome-desk__actions--single .jg-welcome-desk__plaque--create {
+  left: 18%;
+  right: 18%;
+}
+
+.jg-welcome-desk__plaque:hover {
+  border-color: rgba(212, 184, 112, 0.82);
+  box-shadow:
+    inset 0 1px 0 rgba(212, 184, 112, 0.18),
+    inset 0 -2px 10px rgba(0, 0, 0, 0.38),
+    0 7px 20px rgba(8, 6, 4, 0.42);
+  transform: translateY(-1px);
+}
+
+.jg-welcome-desk__plaque:focus-visible {
+  outline: 2px solid rgba(212, 184, 112, 0.78);
+  outline-offset: 2px;
+}
+
+.jg-welcome-desk__plaque-title {
+  position: relative;
+  z-index: 1;
+  font-family: "Cormorant Garamond", Georgia, serif;
+  font-size: clamp(0.58rem, 1.2vw, 0.82rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  color: #d4b870;
+}
+
+.jg-welcome-desk__plaque-sub {
+  position: relative;
+  z-index: 1;
+  max-width: 94%;
+  font-family: "Lora", Georgia, serif;
+  font-size: clamp(0.48rem, 0.95vw, 0.64rem);
+  font-style: italic;
+  line-height: 1.35;
+  color: rgba(212, 184, 112, 0.88);
+}
+
+.jg-welcome-desk__plaque-sub::before {
+  content: "\201C";
+}
+
+.jg-welcome-desk__plaque-sub::after {
+  content: "\201D";
+}
+
+.jg-welcome-desk__quill {
+  position: absolute;
+  right: 7%;
+  bottom: 14%;
+  width: clamp(12px, 1.9vw, 20px);
+  height: auto;
+  color: rgba(201, 166, 107, 0.88);
+  pointer-events: none;
+  z-index: 1;
+}
+
+@media (max-width: 640px) {
+  .journal-gazebo--welcome-letter .journal-gazebo__background,
+  .jg-welcome-desk {
+    height: min(74vh, 100%);
+    max-height: 74vh;
+  }
+
+  .jg-welcome-desk__plaque {
+    bottom: 2%;
+    height: 11.5%;
+    padding: 0.35em 0.45em;
+  }
+
+  .jg-welcome-desk__actions--single .jg-welcome-desk__plaque--create {
+    left: 10%;
+    right: 10%;
+  }
+}
+
+.journal-gazebo--welcome-letter .jg-cinematic-env {
+  display: none;
+}

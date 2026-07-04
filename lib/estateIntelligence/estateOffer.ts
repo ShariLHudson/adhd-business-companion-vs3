@@ -8,16 +8,16 @@ import { estateRegistryEntryById } from "./estateRegistry";
 import { resolveInstituteDrawerForText } from "@/lib/momentumInstitute/drawerWall/estateDrawerBridge";
 
 const ESTATE_OFFER_LABELS: Partial<Record<string, string>> = {
-  "peaceful-places": "Step into Peaceful Places™",
-  "momentum-builder": "Step into Momentum Builder™",
-  "clear-my-mind": "Step into Clear My Mind™",
-  "decision-compass": "Step into Decision Compass™",
-  "observatory": "Explore the Observatory™",
-  "library": "Visit the Library™",
-  "momentum-institute": "Explore the Momentum Institute™",
-  "creative-studio": "Step into Creative Studio™",
-  "soundscapes-focus-audio": "Listen in Peaceful Places™",
-  "growth-journal": "Step into your Journal™",
+  "peaceful-places": "Peaceful Places",
+  "momentum-builder": "Open Momentum",
+  "clear-my-mind": "Clear My Mind",
+  "decision-compass": "Decision Compass",
+  "observatory": "Observatory",
+  "library": "Library",
+  "momentum-institute": "Study Hall",
+  "creative-studio": "Open Create",
+  "soundscapes-focus-audio": "Peaceful Places",
+  "growth-journal": "Journal",
 };
 
 /** Secondary estate destination when both apply (e.g. overwhelm + scattered thoughts). */
@@ -54,7 +54,7 @@ export function workspaceOfferFromEstateEvaluation(
 
   const entry = evaluation.route.primaryEntry;
   const buttonLabel =
-    ESTATE_OFFER_LABELS[entry.id] ?? `Step into ${entry.name}`;
+    ESTATE_OFFER_LABELS[entry.id] ?? `Open ${entry.name}`;
 
   const secondaryId = secondaryEstateEntryId(evaluation);
   const secondaryEntry = secondaryId
@@ -78,7 +78,7 @@ export function workspaceOfferFromEstateEvaluation(
             section: secondarySection,
             buttonLabel:
               ESTATE_OFFER_LABELS[secondaryEntry.id] ??
-              `Step into ${secondaryEntry.name}`,
+              `Open ${secondaryEntry.name}`,
           }
         : undefined,
   };

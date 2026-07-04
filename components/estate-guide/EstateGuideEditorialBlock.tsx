@@ -1,5 +1,12 @@
-import type { EstateGuideEditorialBlock } from "@/lib/estate/estateGuideEditorial";
-import { estateGuideBlockLabel } from "@/lib/estate/estateGuideEditorial";
+import type { ReactNode } from "react";
+import type {
+  EstateGuideCaretakersNotebookBlock,
+  EstateGuideCaretakersObservationBlock,
+  EstateGuideEditorialBlock,
+  EstateGuideJournalBlock,
+  EstateGuideParagraphBlock,
+} from "@/lib/estate/estateGuideEditorial";
+import { estateGuideBlockDisplayLabel } from "@/lib/estate/estateGuideEditorial";
 
 type Props = {
   block: EstateGuideEditorialBlock;
@@ -9,7 +16,7 @@ type Props = {
 function BlockLabel({ type }: { type: EstateGuideEditorialBlock["type"] }) {
   return (
     <p className="eg-editorial__label" aria-hidden="true">
-      {estateGuideBlockLabel(type)}
+      {estateGuideBlockDisplayLabel(type)}
     </p>
   );
 }
@@ -26,150 +33,202 @@ function Paragraphs({ lines }: { lines: string[] }) {
   );
 }
 
-/** One premium editorial block — luxury guidebook spread, not a web card. */
+function ParagraphBlock({
+  blockKey,
+  block,
+  children,
+}: {
+  blockKey: string;
+  block: EstateGuideParagraphBlock;
+  children?: ReactNode;
+}) {
+  return (
+    <section
+      className={["eg-editorial", `eg-editorial--${block.type}`].join(" ")}
+      aria-labelledby={`${blockKey}-heading`}
+    >
+      <BlockLabel type={block.type} />
+      <h2 id={`${blockKey}-heading`} className="eg-editorial__sr-only">
+        {estateGuideBlockDisplayLabel(block.type)}
+      </h2>
+      <Paragraphs lines={block.paragraphs} />
+      {block.bullets?.length ? (
+        <ul className="eg-editorial__bullets">
+          {block.bullets.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      ) : null}
+      {block.closingParagraphs?.length ? (
+        <Paragraphs lines={block.closingParagraphs} />
+      ) : null}
+      {block.moments?.length ? (
+        <div className="eg-editorial__moments">
+          {block.moments.map((moment) => (
+            <div key={moment.title} className="eg-editorial__moment">
+              <p className="eg-editorial__moment-title">{moment.title}</p>
+              {moment.paragraphs?.length ? (
+                moment.paragraphs.map((line) => (
+                  <p key={line} className="eg-editorial__moment-text">
+                    {line}
+                  </p>
+                ))
+              ) : moment.text ? (
+                <p className="eg-editorial__moment-text">{moment.text}</p>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : null}
+      {children}
+    </section>
+  );
+}
+
+function JournalBlock({ blockKey, block }: { blockKey: string; block: EstateGuideJournalBlock }) {
+  return (
+    <section
+      className="eg-editorial eg-editorial--estate-journals"
+      aria-labelledby={`${blockKey}-heading`}
+    >
+      <BlockLabel type={block.type} />
+      <h2 id={`${blockKey}-heading`} className="eg-editorial__sr-only">
+        {estateGuideBlockDisplayLabel(block.type)}
+      </h2>
+      {block.date ? <p className="eg-editorial__journal-date">{block.date}</p> : null}
+      <div className="eg-editorial__journal-body">
+        <Paragraphs lines={block.paragraphs} />
+      </div>
+      {block.attribution?.length ? (
+        <footer className="eg-editorial__journal-attribution">
+          {block.attribution.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </footer>
+      ) : null}
+    </section>
+  );
+}
+
+function CaretakersNotebookBlock({
+  blockKey,
+  block,
+}: {
+  blockKey: string;
+  block: EstateGuideCaretakersNotebookBlock;
+}) {
+  return (
+    <section
+      className="eg-editorial eg-editorial--caretakers-notebook"
+      aria-labelledby={`${blockKey}-heading`}
+    >
+      <BlockLabel type={block.type} />
+      <h2 id={`${blockKey}-heading`} className="eg-editorial__sr-only">
+        {estateGuideBlockDisplayLabel(block.type)}
+      </h2>
+      <div className="eg-editorial__journal-body">
+        <Paragraphs lines={block.paragraphs} />
+      </div>
+      {block.attribution?.length ? (
+        <footer className="eg-editorial__journal-attribution">
+          {block.attribution.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </footer>
+      ) : null}
+    </section>
+  );
+}
+
+function CaretakersObservationBlock({
+  blockKey,
+  block,
+}: {
+  blockKey: string;
+  block: EstateGuideCaretakersObservationBlock;
+}) {
+  return (
+    <section
+      className="eg-editorial eg-editorial--caretakers-observation"
+      aria-labelledby={`${blockKey}-heading`}
+    >
+      <BlockLabel type={block.type} />
+      <h2 id={`${blockKey}-heading`} className="eg-editorial__sr-only">
+        {estateGuideBlockDisplayLabel(block.type)}
+      </h2>
+      <div className="eg-editorial__journal-body">
+        <Paragraphs lines={block.paragraphs} />
+      </div>
+      {block.attribution?.length ? (
+        <footer className="eg-editorial__journal-attribution">
+          {block.attribution.map((line) => (
+            <p key={line}>{line}</p>
+          ))}
+        </footer>
+      ) : null}
+    </section>
+  );
+}
+
+/** One caretaker-written block — premium guidebook, not app UI. */
 export function EstateGuideEditorialBlock({ block, blockKey }: Props) {
   const modifier = `eg-editorial--${block.type}`;
 
-  switch (block.type) {
-    case "around-the-estate":
-      return (
-        <section
-          key={blockKey}
-          className={["eg-editorial", modifier].join(" ")}
-          aria-labelledby={`${blockKey}-heading`}
-        >
-          <BlockLabel type={block.type} />
-          {block.title ? (
-            <h2 id={`${blockKey}-heading`} className="eg-editorial__title">
-              {block.title}
-            </h2>
-          ) : (
-            <h2 id={`${blockKey}-heading`} className="eg-editorial__sr-only">
-              {estateGuideBlockLabel(block.type)}
-            </h2>
-          )}
-          <Paragraphs lines={block.paragraphs} />
-          {block.visitReasons?.length ? (
-            <ul className="eg-editorial__list">
-              {block.visitReasons.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          ) : null}
-        </section>
-      );
-
-    case "estate-tradition":
-      return (
-        <section
-          key={blockKey}
-          className={["eg-editorial", modifier].join(" ")}
-          aria-labelledby={`${blockKey}-heading`}
-        >
-          <BlockLabel type={block.type} />
-          {block.title ? (
-            <h2 id={`${blockKey}-heading`} className="eg-editorial__title">
-              {block.title}
-            </h2>
-          ) : null}
-          <Paragraphs lines={block.paragraphs} />
-        </section>
-      );
-
-    case "found-among-archives":
-      return (
-        <section
-          key={blockKey}
-          className={["eg-editorial", modifier].join(" ")}
-          aria-labelledby={`${blockKey}-heading`}
-        >
-          <BlockLabel type={block.type} />
-          {block.title ? (
-            <h2 id={`${blockKey}-heading`} className="eg-editorial__title">
-              {block.title}
-            </h2>
-          ) : null}
-          <Paragraphs lines={block.paragraphs} />
-          {block.source ? (
-            <p className="eg-editorial__source">{block.source}</p>
-          ) : null}
-        </section>
-      );
-
-    case "from-sharis-notebook":
-      return (
-        <section
-          key={blockKey}
-          className={["eg-editorial", modifier].join(" ")}
-          aria-labelledby={`${blockKey}-heading`}
-        >
-          <BlockLabel type={block.type} />
-          {block.title ? (
-            <h2 id={`${blockKey}-heading`} className="eg-editorial__title">
-              {block.title}
-            </h2>
-          ) : null}
-          {block.paragraphs?.length ? (
-            <Paragraphs lines={block.paragraphs} />
-          ) : null}
-          {block.prompts?.length ? (
-            <ol className="eg-editorial__prompts">
-              {block.prompts.map((prompt) => (
-                <li key={prompt}>{prompt}</li>
-              ))}
-            </ol>
-          ) : null}
-        </section>
-      );
-
-    case "stewards-note":
-    case "curators-note":
-      return (
-        <section
-          key={blockKey}
-          className={["eg-editorial", modifier].join(" ")}
-          aria-labelledby={`${blockKey}-heading`}
-        >
-          <BlockLabel type={block.type} />
-          <div id={`${blockKey}-heading`} className="eg-editorial__sr-only">
-            {estateGuideBlockLabel(block.type)}
-          </div>
-          <Paragraphs lines={block.paragraphs} />
-        </section>
-      );
-
-    case "leave-remembering-one-thing":
-      return (
-        <section
-          key={blockKey}
-          className={["eg-editorial", modifier].join(" ")}
-          aria-labelledby={`${blockKey}-heading`}
-        >
-          <BlockLabel type={block.type} />
-          <p id={`${blockKey}-heading`} className="eg-editorial__remember-line">
-            {block.line}
-          </p>
-        </section>
-      );
-
-    case "estate-saying":
-      return (
-        <blockquote
-          key={blockKey}
-          className={["eg-editorial", modifier, "eg-editorial__saying"].join(" ")}
-          cite={block.attribution}
-        >
-          <BlockLabel type={block.type} />
-          <p className="eg-editorial__saying-text">{block.quote}</p>
-          {block.attribution ? (
-            <footer className="eg-editorial__saying-by">
-              — {block.attribution}
-            </footer>
-          ) : null}
-        </blockquote>
-      );
-
-    default:
-      return null;
+  if (block.type === "estate-journals") {
+    return <JournalBlock blockKey={blockKey} block={block} />;
   }
+
+  if (block.type === "caretakers-observation") {
+    return <CaretakersObservationBlock blockKey={blockKey} block={block} />;
+  }
+
+  if (block.type === "caretakers-notebook") {
+    return <CaretakersNotebookBlock blockKey={blockKey} block={block} />;
+  }
+
+  if (block.type === "next-stop") {
+    return (
+      <section
+        className={["eg-editorial", modifier, "eg-editorial--nav"].join(" ")}
+        aria-labelledby={`${blockKey}-heading`}
+      >
+        <BlockLabel type={block.type} />
+        <p id={`${blockKey}-heading`} className="eg-editorial__next-stop">
+          {block.destination}
+        </p>
+      </section>
+    );
+  }
+
+  if (block.type === "enjoy-visiting-next") {
+    const visits: Array<{ place: string; note?: string }> =
+      block.visits ??
+      block.destinations?.map((place) => ({ place })) ??
+      [];
+
+    return (
+      <section
+        className={["eg-editorial", modifier, "eg-editorial--nav"].join(" ")}
+        aria-labelledby={`${blockKey}-heading`}
+      >
+        <BlockLabel type={block.type} />
+        <ul
+          id={`${blockKey}-heading`}
+          className="eg-editorial__visit-list"
+          aria-label="Places you may enjoy visiting next"
+        >
+          {visits.map((visit) => (
+            <li key={visit.place} className="eg-editorial__visit-item">
+              <span className="eg-editorial__visit-place">{visit.place}</span>
+              {visit.note ? (
+                <span className="eg-editorial__visit-note">{visit.note}</span>
+              ) : null}
+            </li>
+          ))}
+        </ul>
+      </section>
+    );
+  }
+
+  return <ParagraphBlock blockKey={blockKey} block={block} />;
 }

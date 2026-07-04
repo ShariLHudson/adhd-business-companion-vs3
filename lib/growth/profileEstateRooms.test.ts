@@ -52,7 +52,7 @@ describe("profileEstateRooms", () => {
     );
     expect(profileEstateRoomBackgroundImage("portfolio")).toBe(PORTFOLIO_ROOM_BG);
     expect(profileEstateRoomBackgroundImage("portfolio")).toBe(
-      "/backgrounds/accomplishments-room-background.png",
+      "/backgrounds/accomplisments-room-background.png",
     );
   });
 });

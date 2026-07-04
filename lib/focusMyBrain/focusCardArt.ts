@@ -1,4 +1,5 @@
 import type { FocusFeelingId } from "@/lib/focusHub";
+import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
 
 /** Panoramic banners for conservatory destination plaques. */
 export const FOCUS_HUB_CARD_ART: Record<FocusFeelingId, string> = {
@@ -14,21 +15,21 @@ export function focusHubCardArt(feelingId: FocusFeelingId): string {
 export const FOCUS_TOOL_CARD_ART: Record<string, string> = {
   "next-small-step": "/backgrounds/peaceful-places/peaceful-places-pathway.png",
   "break-smaller": "/backgrounds/peaceful-places/woodland-pathway.png",
-  "prioritize-options": "/backgrounds/plan-my-day-background.png",
+  "prioritize-options": ESTATE_ROOM_BG.studyHall,
   "focus-audio": "/backgrounds/peaceful-places/summer-storm-covered-deck.png",
-  "momentum-builders": "/backgrounds/focus-my-brain-games-background.png",
+  "momentum-builders": ESTATE_ROOM_BG.gameRoom,
   "breathe-reset": "/backgrounds/audio-rain-background.png",
   "sixty-second-reset": "/backgrounds/peaceful-places/cozy-cafeimage.png",
   "calm-moment": "/backgrounds/peaceful-places/cozy-cafeimage.png",
-  "brain-break-games": "/backgrounds/focus-my-brain-games-background.png",
-  "sensory-reset": "/backgrounds/clear-my-mind-background.png",
-  "brain-dump": "/backgrounds/clear-my-mind-background.png",
+  "brain-break-games": ESTATE_ROOM_BG.gameRoom,
+  "sensory-reset": ESTATE_ROOM_BG.sunroom,
+  "brain-dump": ESTATE_ROOM_BG.sunroom,
   "chat-guide": "/backgrounds/life-experience-room.png",
   "mind-slow-breathe": "/backgrounds/audio-rain-background.png",
   "mind-slow-places": "/backgrounds/peaceful-places/woodland-pathway.png",
-  "overwhelm-prioritize": "/backgrounds/plan-my-day-background.png",
+  "overwhelm-prioritize": ESTATE_ROOM_BG.studyHall,
   "overwhelm-break-down": "/backgrounds/peaceful-places/woodland-pathway.png",
-  "overwhelm-clear": "/backgrounds/clear-my-mind-background.png",
+  "overwhelm-clear": ESTATE_ROOM_BG.sunroom,
   "overwhelm-breathe": "/backgrounds/audio-rain-background.png",
 };
 

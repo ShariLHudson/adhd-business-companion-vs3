@@ -21,6 +21,7 @@ export const LAYER_TIMEOUT_MS = {
   concierge: 5_000,
   discovery: 5_000,
   universal_creation: 5_000,
+  create_fast_path: 5_000,
   navigation: 5_000,
   workflow_launch: 8_000,
   companion_chat: 28_000,

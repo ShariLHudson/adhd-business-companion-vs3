@@ -1,5 +1,251 @@
-/* Spark Estate Guidebook™ — two-page spread */
+/* Spark Estate Guidebook™ — one room page */
 
+/* Estate flame — teardrop, never star-shaped */
+.eg-estate-flame {
+  clip-path: polygon(
+    50% 0%,
+    58% 18%,
+    70% 24%,
+    62% 42%,
+    74% 66%,
+    50% 100%,
+    26% 66%,
+    38% 42%,
+    30% 24%,
+    42% 18%
+  );
+}
+
+.eg-guide-room-page {
+  --eg-teal: #1a4a47;
+  --eg-gold: #c9a66b;
+  --eg-cream: #faf6ee;
+  --eg-cream-warm: #f3ead8;
+  --eg-paper-edge: #e5d9c4;
+  --eg-charcoal: #3a3632;
+  --eg-charcoal-soft: #5c5650;
+  --eg-body: clamp(1.05rem, 1.85vw, 1.28rem);
+  --eg-body-leading: 1.62;
+  --eg-title: clamp(1.35rem, 2.8vw, 1.85rem);
+  --eg-label: clamp(0.82rem, 1.35vw, 0.95rem);
+  --eg-page-pad: clamp(1.1rem, 2.8vw, 1.65rem);
+  --eg-block-gap: clamp(1rem, 2.2vw, 1.45rem);
+  --eg-half: 50%;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 0;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--eg-cream) 0%, var(--eg-cream-warm) 100%);
+  color: var(--eg-charcoal);
+  font-family: Georgia, "Times New Roman", "Iowan Old Style", serif;
+}
+
+.eg-guide-room-page__hero {
+  flex: 0 0 var(--eg-half);
+  min-height: var(--eg-half);
+  max-height: var(--eg-half);
+  overflow: hidden;
+}
+
+.eg-guide-room-page__plate,
+.eg-guide-room-page__hero .eg-guide-plate {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: none;
+}
+
+.eg-guide-room-page__hero .eg-guide-plate__image {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.eg-guide-room-page__lower {
+  flex: 1 1 var(--eg-half);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  padding: var(--eg-page-pad);
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 90% 50% at 50% 0%, rgba(255, 252, 246, 0.75), transparent 62%),
+    linear-gradient(180deg, var(--eg-cream) 0%, var(--eg-cream-warm) 100%);
+}
+
+/* Page 1 — photograph + title tucked under image + opening sections */
+.eg-guide-room-page--photo {
+  min-height: 100%;
+  --eg-body: clamp(0.92rem, 1.55vw, 1.12rem);
+  --eg-block-gap: clamp(0.65rem, 1.5vw, 0.95rem);
+  --eg-title: clamp(1rem, 1.65vw, 1.28rem);
+}
+
+.eg-guide-room-page--photo .eg-guide-room-page__lower {
+  justify-content: flex-start;
+  padding-top: clamp(0.35rem, 0.9vw, 0.6rem);
+  text-align: left;
+}
+
+.eg-guide-room-page--photo .eg-guide-room-page__header {
+  text-align: center;
+}
+
+.eg-guide-room-page--photo .eg-guide-room-page__title {
+  margin: 0;
+  line-height: 1.18;
+}
+
+.eg-guide-room-page--photo .eg-guide-room-page__room-subtitle {
+  margin-top: 0.2rem;
+}
+
+.eg-guide-room-page--photo .eg-guide-room-page__epigraph {
+  margin-top: 0.45rem;
+  font-size: clamp(0.82rem, 1.35vw, 0.98rem);
+}
+
+.eg-guide-room-page--photo .eg-guide-room-page__header-rule {
+  margin: clamp(0.4rem, 1vw, 0.6rem) auto clamp(0.45rem, 1.1vw, 0.65rem);
+}
+
+.eg-guide-room-page__body--photo {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Legacy intro alias — retained for flipbook fit-scale hooks */
+.eg-guide-room-page__intro {
+  flex: 1 1 var(--eg-half);
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: var(--eg-page-pad);
+  text-align: center;
+  background:
+    radial-gradient(ellipse 90% 50% at 50% 0%, rgba(255, 252, 246, 0.75), transparent 62%),
+    linear-gradient(180deg, var(--eg-cream) 0%, var(--eg-cream-warm) 100%);
+}
+
+/* Page 2 — full page of caretaker copy, no photograph */
+.eg-guide-room-page--text {
+  min-height: 100%;
+  padding: 0;
+}
+
+.eg-guide-room-page__text-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  height: 100%;
+  padding: var(--eg-page-pad);
+  overflow: hidden;
+}
+
+.eg-guide-room-page__running-title {
+  flex: 0 0 auto;
+  margin: 0 0 0.55rem;
+  font-size: clamp(0.68rem, 1.1vw, 0.78rem);
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  text-align: center;
+  color: var(--eg-charcoal-soft);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.eg-guide-room-page--text .eg-guide-room-page__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.eg-guide-room-page__header {
+  flex: 0 0 auto;
+  text-align: center;
+}
+
+.eg-guide-room-page__title {
+  margin: 0;
+  font-size: var(--eg-title);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--eg-teal);
+}
+
+.eg-guide-room-page__guide-subtitle {
+  margin: 0.35rem 0 0;
+  font-size: clamp(0.82rem, 1.35vw, 0.95rem);
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--eg-charcoal-soft);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+.eg-guide-room-page__room-subtitle {
+  margin: 0.3rem 0 0;
+  font-size: clamp(0.88rem, 1.45vw, 1.02rem);
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--eg-charcoal-soft);
+}
+
+.eg-guide-room-page__opening-line {
+  margin: 0.25rem 0 0;
+  font-size: clamp(1rem, 1.65vw, 1.2rem);
+  font-weight: 500;
+  font-style: italic;
+  color: var(--eg-teal);
+}
+
+.eg-guide-room-page__epigraph {
+  margin: 0.65rem auto 0;
+  max-width: 26rem;
+  font-size: clamp(0.95rem, 1.55vw, 1.1rem);
+  line-height: 1.5;
+  font-style: italic;
+  color: var(--eg-charcoal-soft);
+}
+
+.eg-guide-room-page__header-rule {
+  flex: 0 0 auto;
+  width: min(5rem, 28%);
+  height: 1px;
+  margin: clamp(0.55rem, 1.4vw, 0.85rem) auto clamp(0.65rem, 1.6vw, 0.95rem);
+  border: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(201, 166, 107, 0.65) 20%,
+    rgba(201, 166, 107, 0.65) 80%,
+    transparent
+  );
+}
+
+.eg-guide-room-page__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--eg-block-gap);
+  overflow-y: auto;
+  padding-right: 0.15rem;
+}
+
+/* Legacy two-page spread — retained for print / external embeds */
 .eg-guide-spread {
   --eg-teal: #1a4a47;
   --eg-gold: #c9a66b;
@@ -47,6 +293,48 @@
 .eg-guide-page--right {
   border-left: 1px solid rgba(201, 166, 107, 0.25);
   box-shadow: inset 6px 0 16px rgba(28, 20, 12, 0.06);
+}
+
+.eg-guide-page--full-bleed {
+  padding: 0;
+  overflow: hidden;
+}
+
+.eg-guide-page--full-bleed .eg-guide-page__full-image,
+.eg-guide-page--full-bleed .eg-guide-plate {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.eg-guide-page--full-bleed .eg-guide-plate__image {
+  width: 100%;
+  height: 100%;
+  max-height: none;
+  min-height: 100%;
+  object-fit: cover;
+  object-position: center center;
+}
+
+.eg-guide-page--blank {
+  padding: 0;
+  min-height: 100%;
+  background:
+    radial-gradient(ellipse 85% 55% at 50% 12%, rgba(255, 252, 246, 0.65), transparent 62%),
+    linear-gradient(180deg, var(--eg-cream) 0%, var(--eg-cream-warm) 100%);
+  box-shadow: inset 0 0 28px rgba(28, 20, 12, 0.04);
+}
+
+.eg-guide-page--blank.eg-guide-page--left {
+  box-shadow: inset -5px 0 14px rgba(28, 20, 12, 0.05);
+}
+
+.eg-guide-page--blank.eg-guide-page--right {
+  box-shadow: inset 5px 0 14px rgba(28, 20, 12, 0.05);
 }
 
 .eg-guide-gutter {
@@ -136,34 +424,171 @@
 }
 
 .eg-editorial__label {
-  margin: 0 0 0.65rem;
-  padding-top: 0.15rem;
-  border-top: 1px solid rgba(201, 166, 107, 0.45);
-  font-size: clamp(0.95rem, 1.5vw, 1.05rem);
-  font-weight: 500;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--eg-charcoal-soft);
-  font-family: "Segoe UI", system-ui, sans-serif;
-}
-
-.eg-editorial__title {
-  margin: 0 0 0.85rem;
-  font-size: clamp(1.5rem, 2.6vw, 1.85rem);
+  margin: 0 0 0.55rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(201, 166, 107, 0.48);
+  font-size: clamp(0.72rem, 1.2vw, 0.82rem);
   font-weight: 600;
-  line-height: 1.28;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
   color: var(--eg-teal);
+  font-family: Georgia, "Times New Roman", "Iowan Old Style", serif;
 }
 
 .eg-editorial__paragraph {
   margin: 0;
   font-size: var(--eg-body);
   line-height: var(--eg-body-leading);
-  max-width: 36rem;
 }
 
 .eg-editorial__paragraph + .eg-editorial__paragraph {
-  margin-top: 0.85rem;
+  margin-top: 0.55rem;
+}
+
+.eg-editorial--from-shari .eg-editorial__paragraph {
+  font-style: italic;
+  color: #2f3d3c;
+}
+
+.eg-editorial--gardeners-philosophy .eg-editorial__paragraph:nth-child(n + 2):nth-child(-n + 4) {
+  font-style: italic;
+  padding-left: 0.5rem;
+  border-left: 2px solid rgba(201, 166, 107, 0.35);
+}
+
+.eg-editorial--caretakers-closing-note .eg-editorial__paragraph {
+  font-style: italic;
+  color: var(--eg-charcoal-soft);
+}
+
+.eg-editorial--before-you-leave .eg-editorial__paragraph:last-child,
+.eg-editorial--reflection .eg-editorial__paragraph:last-child {
+  color: var(--eg-teal);
+  font-weight: 500;
+}
+
+.eg-editorial__journal-date {
+  margin: 0 0 0.65rem;
+  font-size: clamp(0.88rem, 1.45vw, 1rem);
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: var(--eg-charcoal-soft);
+  font-family: Georgia, "Times New Roman", "Iowan Old Style", serif;
+}
+
+.eg-editorial__journal-body {
+  padding-left: 0.35rem;
+  border-left: 2px solid rgba(201, 166, 107, 0.35);
+}
+
+.eg-editorial__journal-attribution {
+  margin: 0.85rem 0 0;
+  padding-top: 0.5rem;
+}
+
+.eg-editorial__journal-attribution p {
+  margin: 0;
+  font-size: clamp(0.88rem, 1.4vw, 0.98rem);
+  line-height: 1.45;
+  font-style: italic;
+  color: var(--eg-charcoal-soft);
+}
+
+.eg-editorial__journal-attribution p + p {
+  margin-top: 0.15rem;
+}
+
+.eg-editorial--welcome-home .eg-editorial__paragraph:first-child {
+  font-size: clamp(1.12rem, 1.95vw, 1.35rem);
+  color: var(--eg-teal);
+  font-weight: 500;
+}
+
+.eg-editorial--estate-secret .eg-editorial__paragraph,
+.eg-editorial--walls-could-talk .eg-editorial__paragraph {
+  font-style: italic;
+}
+
+.eg-editorial__next-stop {
+  margin: 0.2rem 0 0;
+  font-size: clamp(1.05rem, 1.75vw, 1.22rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--eg-teal);
+}
+
+.eg-editorial__visit-list {
+  margin: 0.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.eg-editorial__visit-item {
+  margin: 0;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(201, 166, 107, 0.22);
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.eg-editorial__visit-place {
+  font-size: clamp(1.02rem, 1.7vw, 1.18rem);
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--eg-teal);
+}
+
+.eg-editorial__visit-note {
+  font-size: clamp(0.92rem, 1.45vw, 1.05rem);
+  line-height: 1.45;
+  font-weight: 400;
+  color: var(--eg-charcoal-soft);
+}
+
+.eg-editorial__bullets {
+  margin: 0.35rem 0 0;
+  padding-left: 1.25rem;
+  font-size: var(--eg-body);
+  line-height: var(--eg-body-leading);
+  list-style: disc;
+}
+
+.eg-editorial__bullets li + li {
+  margin-top: 0.2rem;
+}
+
+.eg-editorial__moments {
+  margin-top: 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.eg-editorial__moment-title {
+  margin: 0;
+  font-size: clamp(0.98rem, 1.55vw, 1.12rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--eg-teal);
+}
+
+.eg-editorial__moment-text {
+  margin: 0.15rem 0 0;
+  font-size: var(--eg-body);
+  line-height: var(--eg-body-leading);
+  color: var(--eg-charcoal);
+}
+
+.eg-editorial--legacy-tree .eg-editorial__paragraph:nth-last-child(2) {
+  text-align: center;
+  font-weight: 500;
+  color: var(--eg-teal);
+}
+
+.eg-editorial__visit-item:last-child {
+  border-bottom: 0;
 }
 
 .eg-editorial__list,
@@ -236,6 +661,50 @@
   margin-top: 0.65rem;
   font-size: var(--eg-label);
   color: var(--eg-charcoal-soft);
+}
+
+.eg-editorial__illustration-image {
+  display: block;
+  width: 100%;
+  max-width: 28rem;
+  height: auto;
+  margin-top: 0.35rem;
+  border-radius: 0.25rem;
+  border: 1px solid rgba(201, 166, 107, 0.35);
+}
+
+.eg-editorial__illustration--tiny .eg-editorial__illustration-image {
+  max-width: 9rem;
+  margin-inline: auto;
+}
+
+.eg-editorial__illustration-caption {
+  margin-top: 0.55rem;
+  font-size: clamp(1rem, 1.6vw, 1.125rem);
+  font-style: italic;
+  color: var(--eg-charcoal-soft);
+  text-align: center;
+}
+
+.eg-editorial--estate-secret .eg-editorial__paragraph {
+  font-style: italic;
+}
+
+.eg-editorial--collectors-corner .eg-editorial__paragraph {
+  color: #3a3632;
+}
+
+.eg-editorial--collectors-corner .eg-editorial__paragraph:first-of-type {
+  font-weight: 500;
+  color: var(--eg-teal);
+}
+
+.eg-editorial--little-estate-tradition .eg-editorial__paragraph {
+  color: #3a3632;
+}
+
+.eg-editorial--did-you-know .eg-editorial__paragraph {
+  color: #2f3d3c;
 }
 
 .eg-guide-section-title {

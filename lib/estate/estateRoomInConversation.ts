@@ -88,7 +88,7 @@ export function resolveEstateRoomInConversationReply(
   if (!topic) return null;
 
   if (topic === "journal" && roomId === "journal") {
-    return IN_ROOM_REPLIES.journal.journal ?? IN_ROOM_REPLIES.journal.default;
+    return null;
   }
 
   if (topic === "journal" && !roomOffersJournal(roomId) && roomId !== "journal") {

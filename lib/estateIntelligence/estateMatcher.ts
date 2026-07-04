@@ -91,25 +91,25 @@ const PRODUCT_RULES: {
     pattern: /\b(?:help )?(?:creating|create) (?:a )?workshop\b/i,
     entryId: "creative-studio",
     score: 22,
-    reason: "workshop creation → Creative Studio™",
+    reason: "workshop creation → Create",
   },
   {
     pattern: /\b(?:write|writing|draft).*\bnewsletter\b/i,
     entryId: "creative-studio",
     score: 26,
-    reason: "newsletter writing → Creative Studio™",
+    reason: "newsletter writing → Create",
   },
   {
     pattern: /\bnewsletter\b/i,
     entryId: "creative-studio",
     score: 18,
-    reason: "newsletter → Creative Studio™",
+    reason: "newsletter → Create",
   },
   {
     pattern: /\b(?:write|writing|draft).*\b(?:email|e-mail|blog|post|presentation)\b/i,
     entryId: "creative-studio",
     score: 22,
-    reason: "content writing → Creative Studio™",
+    reason: "content writing → Create",
   },
   {
     pattern: /\blearn(?:ing)? (?:about )?pricing\b/i,
@@ -176,7 +176,7 @@ const PRODUCT_RULES: {
     pattern: /\b(?:want|need) to (?:create|make) something\b/i,
     entryId: "creative-studio",
     score: 22,
-    reason: "create intent → Creative Studio™",
+    reason: "create intent → Create",
   },
   {
     pattern: /\b(?:want|need) to reflect\b/i,
@@ -194,7 +194,7 @@ const PRODUCT_RULES: {
     pattern: /\b(?:want|need) to (?:create|make) something\b/i,
     entryId: "creative-studio",
     score: 20,
-    reason: "create intent → Creative Studio™",
+    reason: "create intent → Create",
   },
   {
     pattern: /\b(?:want|need) to reflect\b/i,

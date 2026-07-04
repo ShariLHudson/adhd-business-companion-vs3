@@ -14,6 +14,8 @@ export type DirectEstateVisit = {
   userIntent: string;
   /** User messages already in thread when this visit began */
   userMessageCountAtArrival: number;
+  /** Member-chosen scene view background (observatory, pool terrace, etc.) */
+  backgroundImageOverride?: string | null;
 };
 
 /** Rooms with dedicated full-page panels (not the chat-navigation overlay). */
@@ -21,6 +23,7 @@ export const DEDICATED_ESTATE_ROOM_PANEL_SECTIONS: readonly AppSection[] = [
   "stables",
   "momentum-institute",
   "momentum-builder",
+  "growth-journal",
 ] as const;
 
 export function isDedicatedEstateRoomPanelSection(

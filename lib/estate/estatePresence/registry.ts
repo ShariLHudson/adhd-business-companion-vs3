@@ -184,3 +184,36 @@ export function estatePresenceRoomForSection(
   };
   return map[section] ?? null;
 }
+
+export type ResolveEstatePresenceRoomIdInput = {
+  activeSection: string;
+  momentumInstitutePrimary?: boolean;
+  stablesPrimary?: boolean;
+  directEstateVisit?: { roomId: string } | null;
+  showDirectEstateOverlay?: boolean;
+  /** `getEstateMemory().currentRoom?.entryId` — may lag behind navigation. */
+  memoryRoomId?: string | null;
+};
+
+/**
+ * Presence + ambience room id for the current screen.
+ * Section mapping wins over stale memory so Coffee House audio does not follow
+ * the member into Clear My Mind or other immersive sections.
+ */
+export function resolveEstatePresenceRoomId(
+  input: ResolveEstatePresenceRoomIdInput,
+): string | null {
+  if (input.momentumInstitutePrimary) return "momentum-institute";
+  if (input.stablesPrimary) return "stables";
+  if (input.showDirectEstateOverlay && input.directEstateVisit?.roomId) {
+    return input.directEstateVisit.roomId;
+  }
+
+  const sectionRoom = estatePresenceRoomForSection(input.activeSection);
+  if (sectionRoom) return sectionRoom;
+
+  const memRoom = input.memoryRoomId;
+  if (memRoom && memRoom !== "welcome-home") return memRoom;
+
+  return null;
+}

@@ -11,6 +11,13 @@ import {
   recordSignalsFromDiscoveryAnswer,
 } from "@/lib/estateBrain/adaptiveIntelligence";
 import {
+  inferDocumentTypeFromCreateText,
+  isSimpleCreateRequest,
+  logCreateFastPath,
+  SIMPLE_CREATE_VERB_RE,
+  createFastPathRecoveryLine,
+} from "./createFastPath";
+import {
   UNIVERSAL_DOCUMENT_PLUGINS,
   pluginById,
 } from "./documentRegistry";
@@ -39,7 +46,7 @@ const UNCERTAINTY_RE =
   /\b(?:i don'?t know|not sure|no idea|you decide|whatever works|haven'?t figured|unsure)\b/i;
 
 const CREATION_MARKER_RE =
-  /let me understand what you'?re trying|what would success look like|who is this for|main reason you'?re creating/i;
+  /let me understand what you'?re trying|what would success look like|who is this for|main reason you'?re creating|who is the workshop for|transformation do you want|how long will the workshop|a couple of quick questions first/i;
 
 export function detectUniversalDocumentType(
   userText: string,
@@ -51,6 +58,11 @@ export function detectUniversalDocumentType(
     if (plugin.detectPatterns.some((re) => re.test(t))) return plugin.id;
   }
   if (isRegistryArtifactExecution(t)) return "document";
+  if (SIMPLE_CREATE_VERB_RE.test(t)) {
+    return inferDocumentTypeFromCreateText(t) ?? "document";
+  }
+  const inferred = inferDocumentTypeFromCreateText(t);
+  if (inferred) return inferred;
   return null;
 }
 
@@ -58,8 +70,8 @@ export function shouldEnterUniversalCreation(userText: string): boolean {
   const t = userText.trim();
   if (!t || EXPLICIT_ROOM_NAV_RE.test(t)) return false;
   if (isProjectCreationIntent(t)) return false;
-  const docType = detectUniversalDocumentType(t);
-  if (!docType) return false;
+  if (!isSimpleCreateRequest(t) && !detectUniversalDocumentType(t)) return false;
+  const docType = detectUniversalDocumentType(t) ?? "document";
   const session = buildInitialSession(t, docType, 0);
   return !isUniversalDiscoveryComplete(session.confidence);
 }
@@ -364,7 +376,31 @@ export function resolveUniversalCreationTurn(
   }
   if (isProjectCreationIntent(t)) return null;
 
-  return startUniversalCreationTurn(t, currentTurn);
+  if (isSimpleCreateRequest(t)) {
+    logCreateFastPath({
+      turn: currentTurn,
+      userText: t,
+      documentType: detectUniversalDocumentType(t),
+    });
+  }
+
+  try {
+    return startUniversalCreationTurn(t, currentTurn);
+  } catch {
+    const docType = detectUniversalDocumentType(t);
+    const plugin = docType ? pluginById(docType) : null;
+    const session = docType
+      ? buildInitialSession(t, docType, currentTurn)
+      : null;
+    return {
+      kind: "question",
+      intro: createFastPathRecoveryLine(t),
+      question: plugin?.discoveryQuestions[0]?.prompt ?? "What should we build first?",
+      session:
+        session ??
+        buildInitialSession(t, docType ?? "document", currentTurn),
+    };
+  }
 }
 
 export function universalCreationHint(

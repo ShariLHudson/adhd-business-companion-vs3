@@ -38,6 +38,25 @@ export function isActiveDirectEstateNavigation(): boolean {
 
 export { shouldShowDirectEstateVisitOverlay };
 
+/**
+ * Layer 1 ambience follows the place on screen — not a stale direct-visit ref.
+ * Coffee House audio must stop when the overlay/section no longer matches.
+ */
+export function resolveEstatePlaceAudioHostPlaceId(input: {
+  directEstateVisit: DirectEstateVisit | null;
+  showDirectEstateOverlay: boolean;
+  estatePresenceRoomId: string | null;
+  showGlobalEstatePresence: boolean;
+}): string | null {
+  if (input.showDirectEstateOverlay && input.directEstateVisit?.roomId) {
+    return input.directEstateVisit.roomId;
+  }
+  if (input.showGlobalEstatePresence && input.estatePresenceRoomId) {
+    return input.estatePresenceRoomId;
+  }
+  return null;
+}
+
 /** Full-bleed room + frosted chat for any direct navigation except dedicated panels. */
 export function shouldShowDirectEstateOverlay(
   section: AppSection,

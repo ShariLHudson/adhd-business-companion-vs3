@@ -34,17 +34,14 @@ describe("estate navigation regression", () => {
     });
   }
 
-  it("unknown swimming pool offers warm alternatives — not game-room", () => {
+  it("explicit pool navigation routes to Summer Terrace™ — not game-room", () => {
     const turn = evaluateEstatePlaceTurn({
       userText: "take me to the swimming pool",
     });
-    expect(turn.type).toBe("offer");
-    if (turn.type === "offer") {
-      expect(turn.line).toMatch(/isn't on the Estate yet/i);
-      expect(turn.line).toMatch(/swimming pool|pool/i);
-      expect(turn.placeIds).toContain("seat-at-pond");
-      expect(turn.placeIds).toContain("peaceful-places");
-      expect(turn.placeIds).not.toContain("game-room");
+    expect(turn.type).toBe("navigate");
+    if (turn.type === "navigate") {
+      expect(turn.command.roomId ?? turn.command.entryId).toBe("summer-terrace");
+      expect(turn.command.roomId ?? turn.command.entryId).not.toBe("game-room");
     }
   });
 });

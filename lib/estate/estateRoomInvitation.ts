@@ -13,6 +13,7 @@ import {
 import { resolveDynamicEstateInvitations } from "./estateRoomInvitationDynamic";
 import { resolveEstateRoomWelcomeLine } from "./estateRoomTemplate/resolveEstateRoomTemplate";
 import type {
+  EstateRoomInvitationAction,
   EstateRoomInvitationItem,
   EstateRoomInvitationSet,
 } from "./estateRoomInvitationTypes";
@@ -23,6 +24,23 @@ export type {
   EstateRoomInvitationSet,
   EstateRoomInvitationTier,
 } from "./estateRoomInvitationTypes";
+
+/** Invitation choices that continue in the frosted chat — not room activity panels. */
+export function estateInvitationKeepsInConversation(
+  action: EstateRoomInvitationAction,
+): boolean {
+  switch (action.kind) {
+    case "conversation":
+    case "presence":
+    case "estate-map":
+    case "companion-continue":
+    case "plan-my-day":
+    case "show-suggestions":
+      return true;
+    default:
+      return false;
+  }
+}
 
 /** Gentle presence-first lines — never route or solve on arrival. */
 export const ESTATE_PRESENCE_GREETINGS = [

@@ -36,4 +36,25 @@ describe("estateRoomAliasRegistry", () => {
       "momentum-institute",
     );
   });
+
+  it("resolves member-facing rooms from the navigation list", () => {
+    const cases: [string, string][] = [
+      ["reading nook", "reading-nook"],
+      ["study hall", "study-hall"],
+      ["momentum room", "momentum-room"],
+      ["personal deck", "personal-deck"],
+      ["fireside deck", "fireside-deck"],
+      ["kitchen", "estate-kitchen"],
+      ["journal gazebo", "journal"],
+      ["reflection pond", "reflection-pond"],
+      ["pool", "summer-terrace"],
+      ["hall of accomplishments", "gallery-of-firsts"],
+    ];
+    for (const [phrase, roomId] of cases) {
+      expect(resolveEstateRoomAliasExact(phrase)).toBe(roomId);
+      expect(messageNamesExactEstateRoom(`Take me to the ${phrase}.`)).toBe(
+        true,
+      );
+    }
+  });
 });

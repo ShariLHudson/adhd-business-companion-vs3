@@ -90,10 +90,10 @@ export function registerEstatePendingTransition(input: {
 }
 
 const ESTATE_OFFER_ALIGN_RE =
-  /\b(?:take (?:us|you|me) (?:there|to)|step into|head there|go there|explore (?:them|it) together|visit the|shall we|creative studio|momentum institute|observatory|decision compass|peaceful places?|growth journal|momentum builder|clear my mind|journal gazebo|reading nook|greenhouse)\b/i;
+  /\b(?:take (?:us|you|me) (?:there|to)|go there together|head there together|step into|head there|go there|explore (?:them|it) together|visit the|shall we|creative studio|momentum institute|observatory|decision compass|peaceful places?|growth journal|momentum builder|clear my mind|journal gazebo|reading nook|greenhouse)\b/i;
 
 const ESTATE_NAVIGATION_INVITE_RE =
-  /\b(?:take (?:us|you|me) (?:there|to)|go to|visit the|head to|step into|open the|we could visit|would you like to go to|would you like me to take (?:us|you|me) to)\b/i;
+  /\b(?:take (?:us|you|me) (?:there|to)|go to|visit the|head to|step into|open the|we could visit|would you like to go to|would you like me to take (?:us|you|me) to|want to go there together|head there together)\b/i;
 
 const ESTATE_NAMED_PLACE_RE =
   /\b(?:journal gazebo|reading nook|greenhouse|observatory|creative studio|momentum institute|decision compass|peaceful places?|clear my mind|momentum builder|growth journal|library|conservatory|back deck|coffee house|music room|celebration room|seat at the pond|garden path)\b/i;

@@ -56,6 +56,12 @@ import {
 
 } from "./bridgeResponderGuard";
 
+import {
+  formatEstateGuideReply,
+  isEstateGuideQuestion,
+  resolveEstateGuideTurn,
+} from "@/lib/sparkKnowledge/estateGuide";
+
 
 
 export const COACHING_FALLBACK_LEAD =
@@ -179,6 +185,12 @@ export function resolveRecoveryContinuation(input: RuntimeRecoveryInput): string
   if (!userText) {
 
     return "Pick up wherever you left off — I'm still with you.";
+
+  }
+
+  if (isEstateGuideQuestion(userText)) {
+
+    return formatEstateGuideReply(resolveEstateGuideTurn(userText));
 
   }
 

@@ -4,7 +4,7 @@ export const MUSIC_ROOM_IMAGE_VERSION = "20260629a" as const;
 
 /** Canonical Music Room™ session + garden card art. */
 export const MUSIC_ROOM_IMAGE =
-  `/backgrounds/peaceful-places/music-room-peaceful-places.png?v=${MUSIC_ROOM_IMAGE_VERSION}` as const;
+  `/backgrounds/music-room-background.png?v=${MUSIC_ROOM_IMAGE_VERSION}` as const;
 
 export const MUSIC_ROOM: PeacefulPlace = {
   id: "music-room",

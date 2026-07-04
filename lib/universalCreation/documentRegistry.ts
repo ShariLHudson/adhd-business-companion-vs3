@@ -164,7 +164,7 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
     label: "Social Post",
     createItemType: "Social Post",
     detectPatterns: [
-      /\b(?:social post|social media post|(?:facebook|linkedin|instagram) post|caption)\b/i,
+      /\b(?:social post|social media post|(?:facebook|linkedin|instagram) post|linkedin post|caption)\b/i,
     ],
     intro: "Let's craft something worth stopping the scroll for.",
     enhancements: [
@@ -200,7 +200,9 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
     id: "business_plan",
     label: "Business Plan",
     createItemType: "Marketing Plan",
-    detectPatterns: [/\b(?:business plan|marketing plan)\b/i],
+    detectPatterns: [
+      /\b(?:business plan|marketing plan|social media campaign|social campaign)\b/i,
+    ],
     intro: "Let's shape a plan you can actually work from.",
     enhancements: [
       { id: "executive-summary", label: "Executive summary", description: "One-page overview" },
@@ -256,7 +258,9 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
     id: "guide",
     label: "Guide",
     createItemType: "Document",
-    detectPatterns: [/\b(?:how[- ]to guide|guide|playbook)\b/i],
+    detectPatterns: [
+      /\b(?:how[- ]to guide|guide|playbook|lead magnet|client avatar)\b/i,
+    ],
     intro: "Let's build a guide that makes the path clear.",
     enhancements: [
       { id: "quick-start", label: "Quick-start page", description: "One-page overview" },
@@ -371,11 +375,115 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
     uncertaintyPaths: ["recommend", "examples"],
   }),
   plugin({
+    id: "workshop",
+    label: "Workshop",
+    createItemType: "Document",
+    detectPatterns: [/\bworkshop\b/i],
+    intro:
+      "I'd love to help.\nLet's build it together.\n\nA couple of quick questions first.",
+    discoveryQuestions: [
+      {
+        id: "workshop-who",
+        slot: "who",
+        prompt: "Who is the workshop for?",
+        signalPatterns: [
+          /\b(?:for my|for a|client|customer|team|entrepreneurs|beginners|audience)\b/i,
+        ],
+      },
+      {
+        id: "workshop-transformation",
+        slot: "why",
+        prompt:
+          "What transformation do you want participants to experience?",
+        signalPatterns: [
+          /\b(?:so they|learn|walk away|transform|outcome|feel|able to)\b/i,
+        ],
+      },
+      {
+        id: "workshop-duration",
+        slot: "success",
+        prompt: "About how long will the workshop be?",
+        signalPatterns: [
+          /\b(?:\d+\s*(?:hour|minute|min|hr|day)|half day|full day|90.?min)\b/i,
+        ],
+      },
+    ],
+    enhancements: [
+      { id: "agenda", label: "Session agenda", description: "Timed flow for delivery" },
+      { id: "worksheets", label: "Participant worksheets", description: "Hands-on exercises" },
+      { id: "follow-up", label: "Follow-up email", description: "Post-workshop nurture message" },
+    ],
+    completionActions: [
+      { id: "google-docs", label: "Open in Google Docs" },
+      { id: "pdf", label: "Download PDF" },
+      { id: "save-template", label: "Save as Template" },
+    ],
+    uncertaintyPaths: ["recommend", "examples", "teach"],
+  }),
+  plugin({
+    id: "webinar",
+    label: "Webinar",
+    createItemType: "Document",
+    detectPatterns: [/\bwebinar\b/i],
+    intro:
+      "Let's build a webinar that holds attention and delivers real value.\n\nA couple of quick questions first.",
+    discoveryQuestions: [
+      {
+        id: "webinar-who",
+        slot: "who",
+        prompt: "Who is this webinar for?",
+        signalPatterns: [/\b(?:for my|for a|client|audience|list|prospects)\b/i],
+      },
+      {
+        id: "webinar-goal",
+        slot: "why",
+        prompt: "What's the main outcome you want attendees to leave with?",
+        signalPatterns: [/\b(?:so they|learn|sign up|buy|understand|walk away)\b/i],
+      },
+      {
+        id: "webinar-length",
+        slot: "success",
+        prompt: "About how long will the webinar run?",
+        signalPatterns: [
+          /\b(?:\d+\s*(?:hour|minute|min)|45.?min|60.?min|90.?min)\b/i,
+        ],
+      },
+    ],
+    enhancements: [
+      { id: "slides", label: "Slide outline", description: "Key beats for each section" },
+      { id: "registration", label: "Registration page copy", description: "Title and promise for sign-ups" },
+      { id: "replay-email", label: "Replay follow-up", description: "Email for no-shows and replay viewers" },
+    ],
+    completionActions: [
+      { id: "google-docs", label: "Open in Google Docs" },
+      { id: "pdf", label: "Download PDF" },
+      { id: "save-template", label: "Save as Template" },
+    ],
+    uncertaintyPaths: ["recommend", "examples", "research"],
+  }),
+  plugin({
+    id: "presentation",
+    label: "Presentation",
+    createItemType: "Document",
+    detectPatterns: [/\bpresentation\b/i],
+    intro: "Let's shape a presentation that lands clearly.\n\nA couple of quick questions first.",
+    enhancements: [
+      { id: "speaker-notes", label: "Speaker notes", description: "What to say on each slide" },
+      { id: "handout", label: "Audience handout", description: "One-page takeaway summary" },
+    ],
+    completionActions: [
+      { id: "google-docs", label: "Open in Google Docs" },
+      { id: "pdf", label: "Download PDF" },
+      { id: "save-template", label: "Save as Template" },
+    ],
+    uncertaintyPaths: ["recommend", "examples"],
+  }),
+  plugin({
     id: "document",
     label: "Document",
     createItemType: "Document",
     detectPatterns: [
-      /\b(?:help me (?:create|write|draft)|create a|write a|draft a|need a)\b/i,
+      /\b(?:help me (?:create|write|draft|build|compose|design|outline|plan|develop|generate|make)|(?:create|write|draft|build|compose|design|outline|plan|develop|generate|make)\s+(?:a|an|my|the|new|our)|need a)\b/i,
     ],
     intro: "I'd love to help you create this.\n\nLet me understand what you're building.",
     uncertaintyPaths: ["recommend", "examples", "teach"],

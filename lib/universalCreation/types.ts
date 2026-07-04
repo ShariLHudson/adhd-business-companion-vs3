@@ -33,6 +33,9 @@ export type UniversalDocumentType =
   | "white_paper"
   | "marketing_plan"
   | "workflow"
+  | "workshop"
+  | "webinar"
+  | "presentation"
   | "document";
 
 export type UniversalDiscoverySlot = "what" | "why" | "who" | "success";

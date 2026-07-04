@@ -8,13 +8,13 @@ import {
 describe("estateRoomBackground", () => {
   it("resolves stables plate from canonical registry", () => {
     expect(resolveEstateRoomBackgroundImage("stables")).toBe(
-      "/backgrounds/spark-estate-stables-background.webp",
+      "/backgrounds/spark-estate-stables-background.png",
     );
   });
 
-  it("resolves conservatory from butterfly-conservatory plate", () => {
+  it("resolves conservatory from greenhouse plate when butterfly webp is absent", () => {
     expect(resolveEstateRoomBackgroundImage("conservatory")).toBe(
-      "/backgrounds/butterfly-conservatory.webp",
+      "/backgrounds/greenhouse-background.png",
     );
   });
 
@@ -26,13 +26,13 @@ describe("estateRoomBackground", () => {
 
   it("resolves apple orchard plate", () => {
     expect(resolveEstateRoomBackgroundImage("apple-orchard")).toBe(
-      "/backgrounds/apple-orchard-background.png",
+      "/backgrounds/space-apple-orchard-background.webp",
     );
   });
 
   it("resolves gazebo journal plate", () => {
     expect(resolveEstateRoomBackgroundImage("journal")).toBe(
-      "/backgrounds/gazebo-libjournal-background.png",
+      "/backgrounds/gazebo-journal-background.png",
     );
   });
 
@@ -68,10 +68,22 @@ describe("estateRoomBackground", () => {
       "/backgrounds/evidence-vault-background.png",
     );
     expect(resolveEstateRoomBackgroundImage("portfolio")).toBe(
-      "/backgrounds/accomplishments-room-background.png",
+      "/backgrounds/accomplisments-room-background.png",
     );
     expect(resolveEstateRoomBackgroundForSection("growth-portfolio")).toBe(
-      "/backgrounds/accomplishments-room-background.png",
+      "/backgrounds/accomplisments-room-background.png",
+    );
+  });
+
+  it("resolves pool to swimming pool plate", () => {
+    expect(resolveEstateRoomBackgroundImage("summer-terrace")).toBe(
+      "/backgrounds/water-swimming-pool-private-background.png",
+    );
+  });
+
+  it("resolves celebration hall plate", () => {
+    expect(resolveEstateRoomBackgroundImage("celebration-room")).toBe(
+      "/backgrounds/room-celebration-hall-background.png",
     );
   });
 });

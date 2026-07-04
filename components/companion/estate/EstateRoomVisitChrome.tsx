@@ -7,8 +7,8 @@ import { EstateRoomTemplateArrival } from "@/components/companion/estate/EstateR
 import { useEstateRoomVisitPhase } from "@/components/companion/estate/useEstateRoomVisitPhase";
 import { WelcomeHomeFrostedChatPanel } from "@/components/companion/WelcomeHomeFrostedChatPanel";
 import {
+  estateInvitationKeepsInConversation,
   resolveEstateRoomInvitationSet,
-  resolveEstateRoomInvitations,
   type EstateRoomInvitationItem,
 } from "@/lib/estate/estateRoomInvitation";
 import { shouldSuppressEstateInvitationGrid } from "@/lib/estate/estateChromePolicy";
@@ -52,9 +52,13 @@ export function EstateRoomVisitChrome({
   const invitation = resolveEstateRoomInvitationSet(roomId);
 
   const handleInvitation = (item: EstateRoomInvitationItem) => {
-    if (item.action.kind === "conversation" || item.action.kind === "presence") {
+    if (estateInvitationKeepsInConversation(item.action)) {
       visit.openConversation();
-      onConversationStart?.(roomId);
+      if (item.action.kind === "conversation" || item.action.kind === "presence") {
+        onConversationStart?.(roomId);
+        return;
+      }
+      onInvitationSelect(item);
       return;
     }
     visit.openActivity();

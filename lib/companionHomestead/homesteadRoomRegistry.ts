@@ -1,5 +1,6 @@
 import type { AppSection } from "@/lib/companionUi";
 import type { CompanionPlaceId } from "@/lib/companionUniverse/types";
+import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
 import { homesteadLivingRoomImageUrl } from "@/lib/homesteadScene/homesteadLivingRoomImage";
 
 /** Canonical homestead rooms — one persistent home, six signature spaces. T-017 @see docs/ESTATE_ROOMS_FRAMEWORK.md */
@@ -45,17 +46,13 @@ export const LIVING_ROOM_BG = homesteadLivingRoomImageUrl();
 export const SUNROOM_BUTTERFLY_VIDEO =
   "/backgrounds/butterfly-conservatory.mp4" as const;
 
-export const SUNROOM_FALLBACK_IMAGE =
-  "/backgrounds/focus-my-brain-background.png" as const;
+export const SUNROOM_FALLBACK_IMAGE = ESTATE_ROOM_BG.sunroom;
 
-export const GAME_ROOM_BG =
-  "/backgrounds/focus-my-brain-games-background.png" as const;
+export const GAME_ROOM_BG = ESTATE_ROOM_BG.gameRoom;
 
-export const LIBRARY_ROOM_BG =
-  "/backgrounds/library-reading-nook-background.png" as const;
+export const LIBRARY_ROOM_BG = ESTATE_ROOM_BG.stairwayReadingNook;
 
-export const STUDY_ROOM_BG =
-  "/backgrounds/plan-my-day-background.png" as const;
+export const STUDY_ROOM_BG = ESTATE_ROOM_BG.studyHall;
 
 /** User-facing homestead room catalog — matches the companion home architecture. */
 export const COMPANION_HOMESTEAD_ROOMS: readonly HomesteadRoomEntry[] = [

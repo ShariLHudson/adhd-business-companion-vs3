@@ -1,5 +1,5 @@
 export const TEA_HOUSE_BACKGROUND =
-  "/backgrounds/peaceful-places/cozy-cafe-peaceful-places.png";
+  "/backgrounds/peaceful-places/cozy-cafeimage.png";
 
 export const COMPANION_PRIMARY =
   "Yesterday you clarified who this workshop is for.";

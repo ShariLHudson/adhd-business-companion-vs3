@@ -29,6 +29,13 @@ export type ReminderTurnOutcome =
 const REMINDER_REQUEST_RE =
   /\b(?:remind me|notify me|alert me|nudge me|check in with me|don'?t let me forget|don'?t forget)\b/i;
 
+/** List capture / brain dump — not a timed reminder even when "don't forget" appears. */
+const LIST_CAPTURE_EXCLUSION_RE =
+  /\b(?:make|write|create|need)\s+(?:a\s+)?(?:list|todo|to-?do)|\blist of\b|\bthings i need to do\b|\bbrain dump\b|\bget (?:it|this|everything) (?:out|down)\b/i;
+
+const LIST_WRITE_NOW_RE =
+  /\b(?:write|make|create)\s+(?:the\s+)?(?:list|todo|to-?do)\b|\blist\b.*\bright now\b|\bright now\b.*\blist\b/i;
+
 const RECURRENCE_RE =
   /\b(?:every\s+hour|every\s+day|every\s+week|every\s+(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)|weekdays?\s+(?:at\s+)?|every\s+friday|every\s+monday)\b/i;
 
@@ -63,6 +70,7 @@ const EVERY_FRIDAY_RE = /\bevery\s+friday(?:\s+(morning|afternoon|evening))?\b/i
 export function isReminderRequest(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (LIST_CAPTURE_EXCLUSION_RE.test(t)) return false;
   if (!REMINDER_REQUEST_RE.test(t)) return false;
   if (/\bremind me (?:how|what|why|when|where)\b/i.test(t)) return false;
   return true;
@@ -530,6 +538,10 @@ function continueReminderDraft(
   blocks: TimeBlock[],
   now: Date,
 ): ReminderTurnOutcome {
+  if (LIST_WRITE_NOW_RE.test(answer) || LIST_CAPTURE_EXCLUSION_RE.test(answer)) {
+    return { kind: "not_reminder" };
+  }
+
   if (draft.missing === "am_pm") {
     const isPm = /\bpm\b|p\.m\.?/i.test(answer);
     const isAm = /\bam\b|a\.m\.?/i.test(answer);

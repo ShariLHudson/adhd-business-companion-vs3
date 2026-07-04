@@ -30,7 +30,8 @@ export function roomBackgroundDirectCss(imageUrl: string): string {
 
 /** Prefer WebP for preload when a paired file exists. */
 export function preferredBackgroundPreloadUrl(imageUrl: string): string {
-  return PNG_EXT.test(imageUrl) ? webpBackgroundUrl(imageUrl) : imageUrl;
+  // Estate plates ship as PNG — preloading nonexistent .webp caused blank rooms.
+  return imageUrl;
 }
 
 /** Ordered PNG/WebP variants — try the canonical path first, then the paired format. */

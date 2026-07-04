@@ -6,6 +6,11 @@
  * @see docs/estate/ESTATE_COLLECTIONS_PLAYBOOK.md
  */
 
+import {
+  hasHighConfidenceCelebrationIntent,
+  isPositiveSentimentWithoutCelebration,
+  isRelationshipConversation,
+} from "@/lib/intentAwareConversation/routingGate";
 import { emptyCaptureValues } from "./captureUtils";
 import {
   formatMultiRoomCollectionOffer,
@@ -115,6 +120,8 @@ export function evaluateCollectionSaveOffer(input: {
   if (text.length < 28) return null;
   if (SKIP_RE.test(text)) return null;
   if (NAV_RE.test(text)) return null;
+  if (isRelationshipConversation(text)) return null;
+  if (isPositiveSentimentWithoutCelebration(text)) return null;
   if (/^\s*(how|what|why|when|where|can you|could you|should i)\b/i.test(text)) {
     return null;
   }
@@ -125,6 +132,13 @@ export function evaluateCollectionSaveOffer(input: {
   if (!ranked.length) return null;
   const top = ranked[0]!;
   if (top.score < 1) return null;
+
+  if (
+    top.id === "celebration-garden" &&
+    !hasHighConfidenceCelebrationIntent(text)
+  ) {
+    return null;
+  }
 
   const multi = resolveMultiRoomOffer(ranked);
   if (multi) {

@@ -17,6 +17,7 @@ import {
   resolveVisualStructureWorkspaceOffer,
 } from "./visualStructureRouting";
 import type { AppSection } from "./companionUi";
+import { estateCreativeStudioInvite } from "@/lib/estate/estateTransitionInviteCopy";
 import { multiItemWorkspaceOfferLine } from "./multiItemWorkspace";
 import {
   isExplicitCreationRequest,
@@ -74,7 +75,7 @@ export function supportsWorkspace(section: AppSection): boolean {
 export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   projects: "Projects",
   "my-work": "Other",
-  "content-generator": "Documents",
+  "content-generator": "Create",
   "google-workspace": "Google Workspace",
   "templates-library": "Templates",
   "saved-work": "Created Content",
@@ -128,8 +129,8 @@ const EXTRA_AREA_TITLES: Partial<Record<AppSection, string>> = {
   games: "Quick Recharge",
   "quick-recharge": "Quick Recharge",
   grow: "Grow",
-  "momentum-builder": "Momentum Builder™",
-  "grow-momentum-builders": "Momentum Builder™",
+  "momentum-builder": "Momentum",
+  "grow-momentum-builders": "Momentum",
   "grow-spark-cards": "Spark Cards",
   "grow-guilds": "Guilds",
   "grow-daily-discoveries": "Daily Discoveries",
@@ -238,7 +239,7 @@ function matchWorkspaceTarget(t: string): WorkspaceTarget | null {
   if (catalog?.type) {
     return {
       section: "content-generator",
-      buttonLabel: "Open Create & Keep Chatting",
+      buttonLabel: "Open Create",
       topic: catalog.type.toLowerCase(),
       topicLabel: catalog.type,
     };
@@ -272,7 +273,7 @@ function matchWorkspaceTarget(t: string): WorkspaceTarget | null {
       )?.[1] ?? "content";
     return {
       section: "content-generator",
-      buttonLabel: "Open Create & Keep Chatting",
+      buttonLabel: "Open Create",
       topic,
       topicLabel: topic,
     };
@@ -344,7 +345,7 @@ function buildOfferLine(target: WorkspaceTarget, mixed: boolean): string {
       return "Want me to open the project so we can build it together, one section at a time?";
     }
     if (target.section === "content-generator") {
-      return "The Creative Studio™ is the perfect place for that. Would you like me to take us there?";
+      return estateCreativeStudioInvite();
     }
     if (target.section === "templates-library") {
       return "I can open a template and we'll work through it together — want to?";

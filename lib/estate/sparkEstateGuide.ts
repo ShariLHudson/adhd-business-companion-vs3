@@ -1,9 +1,9 @@
-/** Spark Estate Guide™ — cover plate and routes. */
+/** Guidebook cover — physical book object in-scene (title cover art, not an interior page). */
 export const SPARK_ESTATE_GUIDE_COVER_SRC =
-  "/images/spark-estate-guide-cover.png" as const;
+  "/images/spark-estate-guide-cover.png";
 
-export const SPARK_ESTATE_GUIDE_COVER_ALT =
-  "Spark Estate Guide — open the guidebook" as const;
+export const SPARK_ESTATE_GUIDE_COVER_ALT = "Spark Estate Guide";
 
+/** Prototype entry — journal gazebo hosts the in-scene guidebook anchor. */
 export const SPARK_ESTATE_GUIDE_DEFAULT_ROUTE =
-  "/estate-guide/estate-library" as const;
+  "/companion/journal-gazebo-prototype" as const;

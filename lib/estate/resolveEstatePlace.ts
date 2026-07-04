@@ -97,6 +97,12 @@ const EXPLICIT_OBJECT_RULES: {
     placeId: "institute-cabinet",
     reason: "explicit object → Institute Cabinet™",
   },
+  {
+    pattern:
+      /\b(?:sit\s+(?:out\s+)?on\s+(?:the\s+)?deck|out\s+on\s+(?:the\s+)?deck|(?:the\s+)?back\s+deck|go\s+(?:out\s+)?on\s+(?:the\s+)?deck)\b/i,
+    placeId: "back-deck",
+    reason: "explicit place → Back Deck",
+  },
 ];
 
 /** Wins vs proof routing (P0 canon — see docs/estate/P0_CANON_ERRATA.md) */

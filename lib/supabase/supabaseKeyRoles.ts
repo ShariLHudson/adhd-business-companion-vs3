@@ -20,7 +20,10 @@ export function isBrowserSafeSupabaseKey(key: string): boolean {
   const v = key.trim();
   if (!v || v.startsWith("sb_secret_")) return false;
   if (v.startsWith("sb_publishable_")) {
-    return /^sb_publishable_[A-Za-z0-9_-]+_[A-Za-z0-9_-]+$/.test(v);
+    return (
+      v.length >= 32 &&
+      /^sb_publishable_[A-Za-z0-9_-]+$/.test(v)
+    );
   }
   if (v.startsWith("eyJ")) {
     const role = supabaseJwtRole(v);

@@ -88,7 +88,13 @@ export function isRegistryArtifactExecution(text: string): boolean {
   const t = text.trim();
   if (!t) return false;
   if (containsVisualStructurePhrase(t)) return false;
-  if (isCompanionFirstQuestion(t)) return false;
+  if (
+    isCompanionFirstQuestion(t) &&
+    !ARTIFACT_NEED_VERB_RE.test(t) &&
+    !hasArtifactExecuteVerb(t)
+  ) {
+    return false;
+  }
   if (FEATURE_DISCOVERY_RE.test(t)) return false;
   if (!detectRegistryArtifact(t)) return false;
   if (hasArtifactExecuteVerb(t)) return true;
@@ -177,22 +183,4 @@ export function registryArtifactKindToCreateItemType(
     default:
       return registryArtifactLabel(kind);
   }
-}
-
-/** User-facing Create offer for artifact execution (P0.9.1). */
-export function buildRegistryArtifactOfferLine(
-  kind: RegistryArtifactKind,
-  category: "build" | "execute",
-): string {
-  const label = registryArtifactLabel(kind);
-  if (kind === "funnel") {
-    return [
-      "I can help build that.",
-      "The Creative Studio™ is a good place to map out the funnel together. Would you like me to take us there?",
-    ].join("\n\n");
-  }
-  if (category === "build") {
-    return `The Creative Studio™ is the right place to build your ${label}. Would you like me to take us there?`;
-  }
-  return `I'd love to help with that. The Creative Studio™ is perfect for drafting your ${label}. Would you like me to take us there?`;
 }
