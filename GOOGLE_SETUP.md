@@ -3,7 +3,7 @@
 End users connect in **Settings → Connections → Connect Google**. This doc is for
 **you** (deploy / local dev) — never shown in the app UI.
 
-## Production: ecosystems.visualsparkstudios.com
+## Production: ecosystem.visualsparkstudios.com
 
 1. **Google Cloud Console** → your project → **APIs & Services → Library** →
    enable **Google Drive API** (required). Optionally enable **Google Docs API**
@@ -19,7 +19,7 @@ End users connect in **Settings → Connections → Connect Google**. This doc i
    URIs** (add both if you use local + prod):
 
    ```
-   https://ecosystems.visualsparkstudios.com/api/google/callback
+   https://ecosystem.visualsparkstudios.com/api/google/callback
    http://localhost:3000/api/google/callback
    ```
 
@@ -29,7 +29,7 @@ End users connect in **Settings → Connections → Connect Google**. This doc i
    |----------|-----------------|
    | `GOOGLE_CLIENT_ID` | From Google Console |
    | `GOOGLE_CLIENT_SECRET` | From Google Console |
-   | `GOOGLE_REDIRECT_URI` | `https://ecosystems.visualsparkstudios.com/api/google/callback` |
+   | `GOOGLE_REDIRECT_URI` | `https://ecosystem.visualsparkstudios.com/api/google/callback` |
 
 5. **Redeploy** Production (`main`) after saving env vars.
 

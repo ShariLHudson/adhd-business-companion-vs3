@@ -1,5 +1,9 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Production deploy
+
+**Read [`VERCEL.md`](./VERCEL.md) first.** Production: **adhd-business-companion-vs3** → `ShariLHudson/adhd-business-companion-vs3` branch **`main`** → https://ecosystem.visualsparkstudios.com
+
 ## Getting Started
 
 First, run the development server:
