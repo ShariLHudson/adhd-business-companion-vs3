@@ -15475,18 +15475,20 @@ export default function CompanionPageClient() {
                 ? userLines[userLines.length - 2]
                 : userLines[0];
             markAssistantReplied(chatTurnState);
+            const failSafeReply = buildFailSafeChatReply(
+              trimmed,
+              {
+                lastAssistantText: lastAssistant,
+                priorUserText: priorUser,
+              },
+              prev,
+            );
+            if (!failSafeReply) return prev;
             return [
               ...prev,
               {
-                role: "assistant",
-                content: buildFailSafeChatReply(
-                  trimmed,
-                  {
-                    lastAssistantText: lastAssistant,
-                    priorUserText: priorUser,
-                  },
-                  prev,
-                ),
+                role: "assistant" as const,
+                content: failSafeReply,
               },
             ];
           });
