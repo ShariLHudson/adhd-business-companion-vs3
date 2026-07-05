@@ -2,11 +2,10 @@
  * Companion login page — copy and asset constants.
  */
 
-/** Bump when `login-welcome-background.png` is replaced so browsers fetch the fresh file. */
-export const COMPANION_LOGIN_BACKGROUND_VERSION = "20260630b" as const;
+import { WELCOME_HOME_BACKGROUND } from "@/lib/welcomeRoom/types";
 
-export const COMPANION_LOGIN_BACKGROUND =
-  `/backgrounds/login-welcome-background.PNG?v=${COMPANION_LOGIN_BACKGROUND_VERSION}` as const;
+/** Login uses the same scene as the estate Welcome Home room. */
+export const COMPANION_LOGIN_BACKGROUND = WELCOME_HOME_BACKGROUND;
 
 /** Official Spark Studio Companions logo — transparent background. */
 export const COMPANION_LOGIN_LOGO =

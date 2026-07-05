@@ -5,8 +5,10 @@ import {
 } from "./loginDoorwayPresence";
 
 describe("loginDoorwayPresence", () => {
-  it("uses the login photograph as the scene source", () => {
-    expect(LOGIN_SCENE_ASSET).toMatch(/\/backgrounds\/login-welcome-background\.PNG\?v=/);
+  it("uses the Welcome Home room photograph as the scene source", () => {
+    expect(LOGIN_SCENE_ASSET).toMatch(
+      /\/backgrounds\/welcome-home-background\.png\?v=/,
+    );
   });
 
   it("keeps the door static with hands inside the house", () => {

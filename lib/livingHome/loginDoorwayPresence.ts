@@ -1,9 +1,5 @@
 /**
- * Login Doorway Presence — Shari stands inside an already-open door.
- *
- * The login scene is a single photograph (shari-login.png).
- * Pose, screen-door hardware, and interior lever must be correct in source art —
- * CSS cannot fix impossible hand perspective or missing handles.
+ * Login scene — estate Welcome Home room (same art as post-arrival living room).
  */
 
 import { COMPANION_LOGIN_BACKGROUND } from "@/lib/companionLoginPage";
@@ -17,7 +13,7 @@ export const LOGIN_DOORWAY_PRESENCE = {
   sceneAsset: LOGIN_SCENE_ASSET,
 } as const;
 
-/** Doorway zone — porch motion never animates this region. */
+/** Legacy doorway zone — porch overlays only; unused on Welcome Home login. */
 export const LOGIN_DOORWAY_ZONE = {
   left: 52,
   right: 100,
