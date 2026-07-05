@@ -8,6 +8,7 @@
  */
 
 import { CANONICAL_ESTATE_PLACES } from "./canonicalEstatePlaces";
+import { CANONICAL_ESTATE_SUBPLACES } from "./canonicalEstateSubplaces";
 import {
   resolvePlaceId,
 } from "./placeIdAliases";
@@ -18,6 +19,7 @@ import type {
   CanonicalEstatePlace,
   CanonicalEstatePlaceId,
   CanonicalEstateStatus,
+  EstateRouteType,
 } from "./canonicalEstateRegistryTypes";
 
 export type {
@@ -27,6 +29,7 @@ export type {
   CanonicalEstatePlace,
   CanonicalEstatePlaceId,
   CanonicalEstateStatus,
+  EstateRouteType,
 } from "./canonicalEstateRegistryTypes";
 
 export {
@@ -35,8 +38,10 @@ export {
 } from "./canonicalEstateRegistryTypes";
 
 /** All canonical Estate places — single runtime source of truth. */
-export const CANONICAL_ESTATE_REGISTRY: readonly CanonicalEstatePlace[] =
-  CANONICAL_ESTATE_PLACES;
+export const CANONICAL_ESTATE_REGISTRY: readonly CanonicalEstatePlace[] = [
+  ...CANONICAL_ESTATE_PLACES,
+  ...CANONICAL_ESTATE_SUBPLACES,
+];
 
 /**
  * Legacy place ids → canonical id (P0 errata).
@@ -233,7 +238,29 @@ export function validateCanonicalRegistryIntegrity(): string[] {
         errors.push(`${place.id}: unknown relatedPlace ${related}`);
       }
     }
+
+    if (place.parentPlaceId && !BY_ID.has(place.parentPlaceId)) {
+      errors.push(`${place.id}: unknown parentPlaceId ${place.parentPlaceId}`);
+    }
+
+    const routeType = inferRouteType(place);
+    if (
+      (routeType === "subspace" || routeType === "object") &&
+      !place.parentPlaceId
+    ) {
+      errors.push(`${place.id}: ${routeType} requires parentPlaceId`);
+    }
   }
 
   return errors;
+}
+
+/** Resolve route type — explicit on record, otherwise inferred from canon shape. */
+export function inferRouteType(place: CanonicalEstatePlace): EstateRouteType {
+  if (place.routeType) return place.routeType;
+  if (place.parentPlaceId) {
+    return place.category === "collection" ? "object" : "subspace";
+  }
+  if (place.arrivalBehavior === "presence-only") return "presence-only";
+  return "room";
 }

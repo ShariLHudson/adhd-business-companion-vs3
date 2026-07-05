@@ -16,6 +16,8 @@ export type DirectEstateVisit = {
   userMessageCountAtArrival: number;
   /** Member-chosen scene view background (observatory, pool terrace, etc.) */
   backgroundImageOverride?: string | null;
+  /** Subspace or object focus within roomId (registry-driven). */
+  subspaceId?: string | null;
 };
 
 /** Rooms with dedicated full-page panels (not the chat-navigation overlay). */

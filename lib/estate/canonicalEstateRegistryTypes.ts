@@ -58,6 +58,14 @@ export type CanonicalSuggestionProfile =
   | "uncertain"
   | "orient";
 
+/** How routing treats this place — room, subspace, object, experience, or presence-only. */
+export type EstateRouteType =
+  | "room"
+  | "subspace"
+  | "object"
+  | "experience"
+  | "presence-only";
+
 export type CanonicalEstatePlace = {
   /** Stable internal id — never member-visible */
   id: string;
@@ -78,6 +86,16 @@ export type CanonicalEstatePlace = {
   suggestionProfiles?: readonly CanonicalSuggestionProfile[];
   /** From canon Future Expansion Notes — internal only */
   expansionNotes?: string;
+  /** Routing classification — inferred from category when omitted. */
+  routeType?: EstateRouteType;
+  /** Parent room when this is a subspace, object, or nested experience. */
+  parentPlaceId?: string;
+  /** Member-facing purpose — why someone comes here. */
+  purpose?: string;
+  /** Named actions Spark may offer (open, show, sit, reflect…). */
+  availableActions?: readonly string[];
+  /** Scene view within parent (observatory day-inside, etc.). */
+  sceneViewId?: string;
 };
 
 export type CanonicalEstatePlaceId = CanonicalEstatePlace["id"];

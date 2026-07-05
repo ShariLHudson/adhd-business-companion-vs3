@@ -24,6 +24,7 @@ export type EstateGuideEditorialBlockType =
   | "discovery-key"
   | "room-possibility"
   | "estate-whisper"
+  | "estate-note"
   | "gardeners-table"
   | "living-classroom"
   | "why-this-room-exists"
@@ -83,6 +84,23 @@ export type EstateGuideEditorialBlockType =
   | "learning-philosophy"
   | "study-hall-could-speak"
   | "story-of-momentum-room"
+  | "story-of-possibility-studio"
+  | "what-youll-discover"
+  | "before-you-explore"
+  | "the-open-windows"
+  | "the-journal"
+  | "kinseys-corner"
+  | "the-great-window"
+  | "the-telescope"
+  | "the-hearth"
+  | "the-drawers"
+  | "still-becoming"
+  | "opening-the-chest"
+  | "before-you-close-lid"
+  | "hidden-estate-legend"
+  | "the-fireplace"
+  | "the-open-doors"
+  | "final-treehouse-tradition"
   | "cabinet-of-small-steps"
   | "drawer-tradition"
   | "mathematics-of-momentum"
@@ -162,6 +180,7 @@ export type EstateGuideParagraphBlock = BlockBase & {
     | "discovery-key"
     | "room-possibility"
     | "estate-whisper"
+    | "estate-note"
     | "gardeners-table"
     | "living-classroom"
     | "why-this-room-exists"
@@ -221,6 +240,23 @@ export type EstateGuideParagraphBlock = BlockBase & {
     | "learning-philosophy"
     | "study-hall-could-speak"
     | "story-of-momentum-room"
+  | "story-of-possibility-studio"
+  | "what-youll-discover"
+  | "before-you-explore"
+  | "the-open-windows"
+  | "the-journal"
+  | "kinseys-corner"
+  | "the-great-window"
+  | "the-telescope"
+  | "the-hearth"
+  | "the-drawers"
+  | "still-becoming"
+  | "opening-the-chest"
+  | "before-you-close-lid"
+  | "hidden-estate-legend"
+  | "the-fireplace"
+  | "the-open-doors"
+  | "final-treehouse-tradition"
     | "cabinet-of-small-steps"
     | "drawer-tradition"
     | "mathematics-of-momentum"
@@ -294,6 +330,13 @@ export type EstateGuideSpreadData = {
   openingLine?: string;
   epigraph?: string;
   blocks: EstateGuideEditorialBlock[];
+  /**
+   * Short corner line on every page of this spread — Whisper from the Estate™.
+   * One thoughtful line; optional on legacy spreads until migrated.
+   */
+  whisperFromEstate?: string;
+  /** Closing quote at the bottom of the text page — optional per spread. */
+  guideQuote?: string;
 };
 
 const BLOCK_LABELS: Record<EstateGuideEditorialBlockType, string> = {
@@ -314,7 +357,8 @@ const BLOCK_LABELS: Record<EstateGuideEditorialBlockType, string> = {
   "coffee-conversation": "Coffee, Conversation & Quiet Moments",
   "discovery-key": "The Discovery Key",
   "room-possibility": "A Room Designed for Possibility",
-  "estate-whisper": "An Estate Whisper",
+  "estate-whisper": "Whisper from the Estate",
+  "estate-note": "Estate Note",
   "gardeners-table": "The Gardener's Table",
   "living-classroom": "A Living Classroom",
   "why-this-room-exists": "Why This Room Exists",
@@ -374,6 +418,23 @@ const BLOCK_LABELS: Record<EstateGuideEditorialBlockType, string> = {
   "learning-philosophy": "The Estate's Learning Philosophy",
   "study-hall-could-speak": "If The Study Hall Could Speak",
   "story-of-momentum-room": "The Story of the Momentum Room",
+  "story-of-possibility-studio": "The Story of the Space",
+  "what-youll-discover": "What You'll Discover",
+  "before-you-explore": "Before You Explore...",
+  "the-open-windows": "The Open Windows",
+  "the-journal": "The Journal",
+  "kinseys-corner": "Kinsey's Corner",
+  "the-great-window": "The Great Window",
+  "the-telescope": "The Telescope",
+  "the-hearth": "The Hearth",
+  "the-drawers": "The Drawers",
+  "still-becoming": "The Drawer Called Still Becoming",
+  "opening-the-chest": "Opening the Chest",
+  "before-you-close-lid": "Before You Close the Lid...",
+  "hidden-estate-legend": "Hidden Estate Legend",
+  "the-fireplace": "The Fireplace",
+  "the-open-doors": "The Open Doors",
+  "final-treehouse-tradition": "A Final Treehouse Tradition",
   "cabinet-of-small-steps": "The Cabinet of Small Steps",
   "drawer-tradition": "The Drawer Tradition",
   "mathematics-of-momentum": "The Mathematics of Momentum",
@@ -449,6 +510,7 @@ export const ESTATE_GUIDE_EDITORIAL_BLOCK_TYPES = [
   "discovery-key",
   "room-possibility",
   "estate-whisper",
+  "estate-note",
   "gardeners-table",
   "living-classroom",
   "why-this-room-exists",
@@ -508,6 +570,23 @@ export const ESTATE_GUIDE_EDITORIAL_BLOCK_TYPES = [
   "learning-philosophy",
   "study-hall-could-speak",
   "story-of-momentum-room",
+  "story-of-possibility-studio",
+  "what-youll-discover",
+  "before-you-explore",
+  "the-open-windows",
+  "the-journal",
+  "kinseys-corner",
+  "the-great-window",
+  "the-telescope",
+  "the-hearth",
+  "the-drawers",
+  "still-becoming",
+  "opening-the-chest",
+  "before-you-close-lid",
+  "hidden-estate-legend",
+  "the-fireplace",
+  "the-open-doors",
+  "final-treehouse-tradition",
   "cabinet-of-small-steps",
   "drawer-tradition",
   "mathematics-of-momentum",

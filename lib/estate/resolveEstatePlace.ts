@@ -26,6 +26,12 @@ import {
   evaluateConversationEnvironmentNeed,
   isConversationEnvironmentOffer,
 } from "./conversationDrivesNavigation";
+import {
+  resolveEstateRoutingDecision,
+  routingDecisionToPlaceResolution,
+  isInformationalEstatePlaceQuestion,
+  type EstateRoutingContext,
+} from "./estateRoutingRegistry";
 import { toCanonicalEstatePlace } from "./directory";
 import { extractRoomPhraseFromNavigation } from "./estateRoomAliasRegistry";
 import { formatEstatePlaceSuggestionMenu } from "./estatePlaceIdentityLock";
@@ -416,7 +422,10 @@ function matchNavigationDestination(text: string): EstatePlaceResolution | null 
  * Resolve member text to a canonical place decision.
  * Use `goToPlace` when kind is exact-place, explicit-object, or explicit-activity.
  */
-export function resolveEstatePlace(userText: string): EstatePlaceResolution {
+export function resolveEstatePlace(
+  userText: string,
+  routingContext: EstateRoutingContext = {},
+): EstatePlaceResolution {
   const text = userText.trim();
   if (!text) {
     return { kind: "none", confidence: "low", reason: "empty text" };
@@ -428,6 +437,32 @@ export function resolveEstatePlace(userText: string): EstatePlaceResolution {
       confidence: "high",
       reason: "celebration sounds → audio settings, not an Estate room",
     };
+  }
+
+  const activity = matchExplicitActivity(text);
+  if (activity) return activity;
+
+  const registryRouting = resolveEstateRoutingDecision(text, routingContext);
+  if (isInformationalEstatePlaceQuestion(text)) {
+    return {
+      kind: "none",
+      confidence: "high",
+      reason: registryRouting.reason,
+    };
+  }
+  if (registryRouting.kind === "presence") {
+    return {
+      kind: "none",
+      confidence: "high",
+      reason: registryRouting.reason,
+    };
+  }
+  if (
+    registryRouting.kind === "navigate" ||
+    registryRouting.kind === "suggest"
+  ) {
+    const adapted = routingDecisionToPlaceResolution(registryRouting);
+    if (adapted.kind !== "none") return adapted;
   }
 
   if (isPlaceSuggestionRequest(text)) {
@@ -467,9 +502,7 @@ export function resolveEstatePlace(userText: string): EstatePlaceResolution {
     }
   }
 
-  // Priority 3: explicit activity (may overlap place id)
-  const activity = matchExplicitActivity(text);
-  if (activity) return activity;
+  // Priority 3: explicit activity handled above (before registry routing)
 
   // Priority 4: feelings → suggest only, never force
   const suggestion = matchFeelingSuggestion(text);

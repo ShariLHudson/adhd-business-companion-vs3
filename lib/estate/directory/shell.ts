@@ -79,6 +79,9 @@ export const ESTATE_DIRECTORY_PLACE_SECTION: Partial<
   "strategy-studio": "content-generator",
   "round-table": "projects",
   "gallery-of-firsts": "growth-portfolio",
+  "house-possibility-outside": "home",
+  "legacy-room-main": "home",
+  "reflection-tree-main": "home",
 };
 
 export const ESTATE_DIRECTORY_MENU_ACTION: Partial<

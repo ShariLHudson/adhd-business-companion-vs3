@@ -7,8 +7,12 @@ import { estateBackgroundPath } from "@/lib/estate/estatePlaceMedia";
 import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
 import type { EstateCollectionRoomId } from "@/lib/estate/collectionFramework/types";
 import type { EstateGuideSpreadData } from "@/lib/estate/estateGuideEditorial";
+import { POSSIBILITY_HOUSE_GUIDE_CHAPTERS } from "./estateGuideSpreads/possibilityHouseSection";
 
 export type { EstateGuideSpreadData } from "@/lib/estate/estateGuideEditorial";
+export {
+  POSSIBILITY_HOUSE_GUIDE_CHAPTERS as TREEHOUSE_GUIDE_SECTION_CHAPTERS,
+} from "./estateGuideSpreads/possibilityHouseSection";
 
 /** All guidebook pages — order is the suggested journey through the Estate. */
 export const ESTATE_GUIDE_SPREADS: readonly EstateGuideSpreadData[] = [
@@ -6422,6 +6426,8 @@ export const ESTATE_GUIDE_SPREADS: readonly EstateGuideSpreadData[] = [
       },
     ],
   },
+  // —— The Treehouse Possibility House — dedicated section at the back of the guidebook ——
+  ...POSSIBILITY_HOUSE_GUIDE_CHAPTERS,
 ];
 
 const spreadById = new Map(
@@ -6436,6 +6442,30 @@ export function getEstateGuideSpread(
   id: string,
 ): EstateGuideSpreadData | undefined {
   return spreadById.get(id);
+}
+
+/** Canonical place id → guide spread (when ids align or mapped). */
+const GUIDE_SPREAD_BY_PLACE_ID: Readonly<Record<string, string>> = {
+  "house-possibility-outside": "house-possibility-outside",
+  "house-possibility-studio": "house-possibility-studio",
+  "house-possibility-reflection-desk": "house-possibility-reflection-desk",
+  "house-possibility-observatory": "house-possibility-observatory",
+  "house-possibility-telescope-deck": "house-possibility-observatory",
+  "house-possibility-cabinet-of-chapters": "house-possibility-cabinet-of-chapters",
+  "house-possibility-curiosity-cabinet": "house-possibility-cabinet-of-chapters",
+  "legacy-room-cabinet-of-chapters": "house-possibility-cabinet-of-chapters",
+  "house-possibility-discovery-chest": "house-possibility-discovery-chest",
+  "house-possibility-legacy-room": "house-possibility-legacy-room",
+  "legacy-room-main": "house-possibility-legacy-room",
+  "house-possibility-staircase": "house-possibility-staircase",
+  "house-possibility-window-nook": "house-possibility-staircase",
+};
+
+export function getEstateGuideSpreadForPlaceId(
+  placeId: string,
+): EstateGuideSpreadData | undefined {
+  const spreadId = GUIDE_SPREAD_BY_PLACE_ID[placeId] ?? placeId;
+  return getEstateGuideSpread(spreadId);
 }
 
 /** Collection room id → guide page id */

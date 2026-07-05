@@ -5,6 +5,9 @@ import {
 } from "@/lib/estate/estateGuidePages";
 import { EstateGuideEditorialBlock } from "./EstateGuideEditorialBlock";
 import { EstateGuideSpreadPlate } from "./EstateGuideSpreadPlate";
+import { EstateGuideTreehouseJourney } from "./EstateGuideTreehouseJourney";
+import { EstateGuideWhisperFromEstate } from "./EstateGuideWhisperFromEstate";
+import { resolveTreehouseJourneyFooter } from "@/data/estateGuideSpreads/treehouseGuideJourney";
 import "./estate-guide-spread.css";
 
 type Props = {
@@ -47,6 +50,8 @@ function RoomHeader({ spread }: { spread: EstateGuideSpreadData }) {
 export function EstateGuideRoomPage({ spread, pageKind, className }: Props) {
   const blocks = resolveBlocksForEstateGuideRoomPage(spread, pageKind);
   const placeId = spread.imagePlaceId ?? spread.id;
+  const whisper = spread.whisperFromEstate?.trim();
+  const treehouseJourney = resolveTreehouseJourneyFooter(spread.id);
 
   if (pageKind === "photo") {
     return (
@@ -91,6 +96,10 @@ export function EstateGuideRoomPage({ spread, pageKind, className }: Props) {
             </>
           ) : null}
         </div>
+        {treehouseJourney ? (
+          <EstateGuideTreehouseJourney journey={treehouseJourney} />
+        ) : null}
+        {whisper ? <EstateGuideWhisperFromEstate line={whisper} /> : null}
       </article>
     );
   }
@@ -120,7 +129,16 @@ export function EstateGuideRoomPage({ spread, pageKind, className }: Props) {
             );
           })}
         </div>
+        {spread.guideQuote?.trim() ? (
+          <p className="eg-guide-room-page__guide-quote">
+            &ldquo;{spread.guideQuote.trim()}&rdquo;
+          </p>
+        ) : null}
       </div>
+      {treehouseJourney ? (
+        <EstateGuideTreehouseJourney journey={treehouseJourney} />
+      ) : null}
+      {whisper ? <EstateGuideWhisperFromEstate line={whisper} /> : null}
     </article>
   );
 }

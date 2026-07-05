@@ -32,6 +32,7 @@
   --eg-block-gap: clamp(1rem, 2.2vw, 1.45rem);
   --eg-half: 50%;
 
+  position: relative;
   display: flex;
   flex-direction: column;
   min-height: 100%;
@@ -836,5 +837,132 @@
 @media (prefers-reduced-motion: reduce) {
   .eg-guide-spread {
     transition: none;
+  }
+}
+
+/* Whisper from the Estate™ — recurring corner line on every spread page */
+.eg-guide-whisper {
+  position: absolute;
+  right: clamp(0.65rem, 1.8vw, 1.1rem);
+  bottom: clamp(0.65rem, 1.8vw, 1.1rem);
+  z-index: 2;
+  max-width: min(13.5rem, 42%);
+  padding: 0.55rem 0.7rem 0.6rem;
+  border-radius: 0.35rem;
+  background: rgba(250, 246, 238, 0.92);
+  border: 1px solid rgba(201, 166, 107, 0.45);
+  box-shadow: 0 4px 14px rgba(28, 20, 12, 0.08);
+  pointer-events: none;
+}
+
+.eg-guide-whisper__label {
+  margin: 0 0 0.35rem;
+  font-size: clamp(0.62rem, 1.05vw, 0.72rem);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--eg-teal, #1a4a47);
+  opacity: 0.88;
+}
+
+.eg-guide-whisper__line {
+  margin: 0;
+  font-size: clamp(0.72rem, 1.15vw, 0.82rem);
+  line-height: 1.45;
+  font-style: italic;
+  color: var(--eg-charcoal-soft, #5c5650);
+}
+
+.eg-guide-room-page--photo .eg-guide-whisper {
+  bottom: clamp(0.5rem, 1.2vw, 0.85rem);
+}
+
+@media (max-width: 640px) {
+  .eg-guide-whisper {
+    max-width: min(11rem, 48%);
+  }
+}
+
+.eg-guide-room-page__guide-quote {
+  margin: clamp(1.25rem, 2.5vw, 1.75rem) 0 0;
+  padding-top: clamp(0.85rem, 1.6vw, 1.1rem);
+  border-top: 1px solid rgba(201, 166, 107, 0.35);
+  font-size: clamp(0.88rem, 1.35vw, 1rem);
+  line-height: 1.5;
+  font-style: italic;
+  text-align: center;
+  color: var(--eg-charcoal-soft, #5c5650);
+}
+
+/* Your Journey Through the Treehouse™ — narrative footer on Possibility House spreads */
+.eg-guide-treehouse-journey {
+  position: absolute;
+  left: clamp(0.65rem, 1.8vw, 1.1rem);
+  right: clamp(0.65rem, 1.8vw, 1.1rem);
+  bottom: clamp(0.65rem, 1.8vw, 1.1rem);
+  z-index: 2;
+  max-width: min(18rem, 52%);
+  padding: 0.55rem 0.75rem 0.65rem;
+  border-radius: 0.35rem;
+  background: rgba(250, 246, 238, 0.94);
+  border: 1px solid rgba(201, 166, 107, 0.4);
+  box-shadow: 0 4px 14px rgba(28, 20, 12, 0.07);
+  pointer-events: none;
+}
+
+.eg-guide-room-page--text .eg-guide-treehouse-journey {
+  position: static;
+  max-width: none;
+  margin-top: clamp(1rem, 2vw, 1.35rem);
+}
+
+.eg-guide-treehouse-journey__title {
+  margin: 0 0 0.4rem;
+  font-size: clamp(0.62rem, 1.05vw, 0.72rem);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--eg-teal, #1a4a47);
+  opacity: 0.9;
+}
+
+.eg-guide-treehouse-journey__steps {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.eg-guide-treehouse-journey__step {
+  display: flex;
+  gap: 0.35rem;
+  align-items: flex-start;
+  margin: 0 0 0.28rem;
+  font-size: clamp(0.68rem, 1.1vw, 0.78rem);
+  line-height: 1.4;
+  color: var(--eg-charcoal-soft, #5c5650);
+}
+
+.eg-guide-treehouse-journey__step--next {
+  margin-top: 0.35rem;
+  font-style: italic;
+  color: var(--eg-charcoal, #3d3832);
+}
+
+.eg-guide-treehouse-journey__mark {
+  flex-shrink: 0;
+  opacity: 0.75;
+}
+
+.eg-guide-room-page--photo .eg-guide-whisper {
+  bottom: clamp(0.5rem, 1.2vw, 0.85rem);
+}
+
+.eg-guide-room-page--photo:has(.eg-guide-treehouse-journey) .eg-guide-whisper {
+  max-width: min(11rem, 38%);
+}
+
+@media (max-width: 640px) {
+  .eg-guide-treehouse-journey {
+    max-width: min(14rem, 55%);
   }
 }

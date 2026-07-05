@@ -97,6 +97,40 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "my-estate": estateBackgroundPath("spark-estate-photo-background.png"),
   "spark-estate": estateBackgroundPath("spark-estate-photo-background.png"),
   "growth-profile": estateBackgroundPath("greenhouse-background.png"),
+  "house-possibility-outside": estateBackgroundPath(
+    "treehouse-possibility-house-outside-background.png",
+  ),
+  "house-possibility-studio": estateBackgroundPath("treehouse-possibility-studio.png"),
+  "house-possibility-staircase": estateBackgroundPath(
+    "treehouse-possibility-staircase-window-reading-nook-background.png",
+  ),
+  "house-possibility-window-nook": estateBackgroundPath(
+    "treehouse-possibility-staircase-window-reading-nook-background.png",
+  ),
+  "house-possibility-reflection-desk": estateBackgroundPath(
+    "treehouse-possibility-reflection-desk-background.png",
+  ),
+  "house-possibility-observatory": estateBackgroundPath(
+    "treehouse-possibility-observatory-background.png",
+  ),
+  "house-possibility-telescope-deck": estateBackgroundPath(
+    "treehouse-possibility-observatory-background.png",
+  ),
+  "house-possibility-cabinet-of-chapters": estateBackgroundPath(
+    "treehouse-possibility-cabinet-of-chapters-background.png",
+  ),
+  "house-possibility-curiosity-cabinet": estateBackgroundPath(
+    "treehouse-possibility-cabinet-of-chapters-background.png",
+  ),
+  "house-possibility-discovery-chest": estateBackgroundPath(
+    "treehouse-possibility-discovery-chest-background.png",
+  ),
+  "house-possibility-legacy-room": estateBackgroundPath(
+    "treehouse-possibility-legacy-room-background.png",
+  ),
+  "legacy-room-main": estateBackgroundPath(
+    "treehouse-possibility-legacy-room-background.png",
+  ),
 };
 
 /** Ordered fallbacks when primary plate fails to load. */

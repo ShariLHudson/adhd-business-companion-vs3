@@ -21,6 +21,8 @@ import {
   type CanonicalEstateCategory,
   type CanonicalEstatePlace,
 } from "./canonicalEstateRegistry";
+import { resolveNavigationTarget } from "./estateRoutingRegistry";
+import { resolveSceneViewBackgroundUrl } from "./estatePlaceSceneViews";
 import type { DirectEstateVisit } from "./directEstateVisit";
 
 export type GoToPlaceInput = {
@@ -88,7 +90,9 @@ function arrivalUiFlags(
 
 /** Validate canonical place id and build navigation metadata without mutating chat. */
 export function goToPlace(input: GoToPlaceInput): GoToPlaceOutcome {
-  const entry = getEstateDirectoryEntry(input.placeId);
+  const navTarget = resolveNavigationTarget(input.placeId);
+  const shellPlaceId = navTarget?.navigatePlaceId ?? input.placeId;
+  const entry = getEstateDirectoryEntry(shellPlaceId);
   if (!entry) {
     return {
       ok: false,
@@ -107,22 +111,31 @@ export function goToPlace(input: GoToPlaceInput): GoToPlaceOutcome {
     };
   }
 
-  const place = toCanonicalEstatePlace(entry);
+  const focusPlace = navTarget?.focusPlace ?? toCanonicalEstatePlace(entry);
+  const place = focusPlace;
   const section = entry.shell.section ?? "home";
-  const arrivalUi = arrivalUiFlags(place);
-  const userIntent = input.userIntent?.trim() || `Visit ${entry.officialName}`;
+  const arrivalUi = arrivalUiFlags(toCanonicalEstatePlace(entry));
+  const userIntent = input.userIntent?.trim() || `Visit ${focusPlace.officialName}`;
+
+  const sceneViewId = navTarget?.sceneViewId;
+  const backgroundImageOverride =
+    sceneViewId && entry.id
+      ? resolveSceneViewBackgroundUrl(entry.id, sceneViewId)
+      : null;
+  const focusMedia = getEstateDirectoryEntry(focusPlace.id)?.media.backgroundUrl;
 
   return {
     ok: true,
-    placeId: entry.id,
+    placeId: focusPlace.id,
     place,
-    officialName: entry.officialName,
-    category: entry.category,
-    primaryFeeling: entry.primaryFeeling,
-    backgroundImage: entry.media.backgroundUrl,
-    arrivalBehavior: entry.arrivalBehavior,
-    relatedPlaces: entry.relatedPlaces,
-    status: entry.status,
+    officialName: focusPlace.officialName,
+    category: place.category,
+    primaryFeeling: place.primaryFeeling,
+    backgroundImage:
+      backgroundImageOverride ?? focusMedia ?? entry.media.backgroundUrl,
+    arrivalBehavior: place.arrivalBehavior,
+    relatedPlaces: place.relatedPlaces,
+    status: place.status,
     section,
     menuActionId: entry.shell.menuActionId,
     resetConversation: false,
@@ -135,6 +148,9 @@ export function goToPlace(input: GoToPlaceInput): GoToPlaceOutcome {
       section,
       userIntent,
       userMessageCountAtArrival: input.userMessageCountAtArrival ?? 0,
+      subspaceId: navTarget?.subspaceId ?? null,
+      backgroundImageOverride:
+        backgroundImageOverride ?? focusMedia ?? null,
     },
   };
 }

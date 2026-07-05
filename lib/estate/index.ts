@@ -23,6 +23,8 @@ export * from "./conversationDrivesNavigation";
 export * from "./canonicalPlaceSuggestions";
 export * from "./goToPlace";
 export * from "./resolveEstatePlace";
+export type { EstateRoutingContext } from "./estateRoutingRegistry";
+export * from "./estateRoutingRegistry";
 export * from "./estateIntentBridge";
 export * from "./estateExpansionEngine";
 export * from "./canonicalPlaceSectionAdapter";

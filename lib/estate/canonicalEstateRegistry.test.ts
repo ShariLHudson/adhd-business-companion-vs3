@@ -14,7 +14,7 @@ import {
 describe("canonicalEstateRegistry", () => {
   it("has expected version and place count from Phase A canon", () => {
     expect(CANONICAL_ESTATE_REGISTRY_VERSION).toBe("1.0");
-    expect(CANONICAL_ESTATE_REGISTRY.length).toBe(61);
+    expect(CANONICAL_ESTATE_REGISTRY.length).toBe(75);
   });
 
   it("passes integrity validation", () => {
@@ -46,9 +46,9 @@ describe("canonicalEstateRegistry", () => {
 
   it("categories match canon distribution", () => {
     const stats = canonicalRegistryStats();
-    expect(stats.byCategory["living-place"]).toBe(28);
-    expect(stats.byCategory.destination).toBe(21);
-    expect(stats.byCategory.collection).toBe(5);
+    expect(stats.byCategory["living-place"]).toBe(32);
+    expect(stats.byCategory.destination).toBe(28);
+    expect(stats.byCategory.collection).toBe(8);
     expect(stats.byCategory["transition-space"]).toBe(7);
   });
 

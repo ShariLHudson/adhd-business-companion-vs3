@@ -911,9 +911,12 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     permanentObjects: ["Telescope", "Horizon windows", "Curated stacks"],
     seasonalObjects: ["Clear winter skies", "Summer haze"],
     interactiveObjects: ["Research findings (3–5, conversational)"],
-    relatedPlaces: ["momentum-institute", "creative-studio", "decision-compass"],
+    relatedPlaces: ["momentum-institute", "creative-studio", "decision-compass", "observatory-telescope-window", "observatory-fireplace"],
     status: "needs-asset",
     suggestionProfiles: ["learn", "curious"],
+    routeType: "room",
+    purpose: "Look ahead — research, horizon, and what is emerging",
+    availableActions: ["research", "look out", "sit by the fire", "telescope"],
     expansionNotes: "Never dump information",
   },
   {

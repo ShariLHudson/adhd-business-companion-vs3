@@ -9,6 +9,7 @@ import {
   validateEstateGuideSpread,
 } from "@/lib/estate/estateGuideEditorial";
 import { expandEstateGuideToBookPages, expandEstateGuideToRoomSpreads } from "@/lib/estate/estateGuidePages";
+import { resolveTreehouseJourneyFooter } from "@/data/estateGuideSpreads/treehouseGuideJourney";
 
 describe("estateGuideSpreads", () => {
   it("includes summer terrace with waterfall and outdoor pavilion sections", () => {
@@ -292,6 +293,197 @@ describe("estateGuideSpreads", () => {
     expect(spread!.blocks.some((block) => block.type === "caretakers-observation")).toBe(
       true,
     );
+  });
+
+  it("includes possibility house opening chapter with section structure", () => {
+    const spread = getEstateGuideSpread("house-possibility-outside");
+    expect(spread).toBeDefined();
+    expect(spread!.title).toContain("Treehouse Possibility House");
+    expect(spread!.guideSubtitle).toContain("Every New Chapter Begins");
+    expect(spread!.whisperFromEstate).toMatch(/first step/i);
+    expect(spread!.guideQuote).toMatch(/remarkable journeys/i);
+    expect(spread!.blocks.some((block) => block.type === "story-of-possibility-studio")).toBe(
+      true,
+    );
+    expect(spread!.blocks.some((block) => block.type === "what-youll-discover")).toBe(true);
+    expect(spread!.blocks.some((block) => block.type === "before-you-explore")).toBe(true);
+    expect(spread!.blocks.some((block) => block.type === "from-shari")).toBe(true);
+    expect(validateEstateGuideSpread(spread!)).toEqual([]);
+  });
+
+  it("includes possibility studio spread with story, whisper, and guide quote", () => {
+    const spread = getEstateGuideSpread("house-possibility-studio");
+    expect(spread).toBeDefined();
+    expect(spread!.title).toContain("Possibility Studio");
+    expect(spread!.whisperFromEstate).toMatch(/single possibility/i);
+    expect(spread!.guideQuote).toMatch(/impossible idea/i);
+    expect(
+      spread!.blocks.some((block) => block.type === "story-of-possibility-studio"),
+    ).toBe(true);
+    expect(spread!.blocks.some((block) => block.type === "estate-secret")).toBe(true);
+    expect(validateEstateGuideSpread(spread!)).toEqual([]);
+  });
+
+  it("includes possibility staircase spread with story, whisper, and guide quote", () => {
+    const spread = getEstateGuideSpread("house-possibility-staircase");
+    expect(spread).toBeDefined();
+    expect(spread!.title).toContain("Staircase");
+    expect(spread!.guideSubtitle).toContain("Every Step Opens");
+    expect(spread!.whisperFromEstate).toMatch(/extraordinary courage/i);
+    expect(spread!.guideQuote).toMatch(/next step can see/i);
+    expect(spread!.blocks.some((block) => block.type === "before-you-continue")).toBe(
+      true,
+    );
+    expect(validateEstateGuideSpread(spread!)).toEqual([]);
+  });
+
+  it("includes possibility reflection desk spread with kinsey and journal sections", () => {
+    const spread = getEstateGuideSpread("house-possibility-reflection-desk");
+    expect(spread).toBeDefined();
+    expect(spread!.title).toContain("Reflection Desk");
+    expect(spread!.guideSubtitle).toContain("Thoughts Find Their Voice");
+    expect(spread!.whisperFromEstate).toMatch(/quiet you've been too busy/i);
+    expect(spread!.guideQuote).toMatch(/next chapter quietly begins/i);
+    expect(spread!.blocks.some((block) => block.type === "the-journal")).toBe(true);
+    expect(spread!.blocks.some((block) => block.type === "kinseys-corner")).toBe(true);
+    expect(spread!.blocks.some((block) => block.type === "before-you-leave")).toBe(true);
+    expect(validateEstateGuideSpread(spread!)).toEqual([]);
+  });
+
+  it("includes possibility observatory spread with window, telescope, and hearth", () => {
+    const spread = getEstateGuideSpread("house-possibility-observatory");
+    expect(spread).toBeDefined();
+    expect(spread!.title).toContain("Observatory");
+    expect(spread!.guideSubtitle).toContain("Perspective Changes Everything");
+    expect(spread!.whisperFromEstate).toMatch(/edge of what you can see/i);
+    expect(spread!.guideQuote).toMatch(/not the end of your story/i);
+    expect(spread!.blocks.some((block) => block.type === "the-great-window")).toBe(true);
+    expect(spread!.blocks.some((block) => block.type === "the-telescope")).toBe(true);
+    expect(spread!.blocks.some((block) => block.type === "the-hearth")).toBe(true);
+    expect(validateEstateGuideSpread(spread!)).toEqual([]);
+  });
+
+  it("includes cabinet of chapters as a long philosophy spread", () => {
+    const spread = getEstateGuideSpread("house-possibility-cabinet-of-chapters");
+    expect(spread).toBeDefined();
+    expect(spread!.title).toContain("Cabinet of Chapters");
+    expect(spread!.guideSubtitle).toContain("Story Worth Remembering");
+    expect(spread!.blocks.length).toBeGreaterThanOrEqual(8);
+    expect(spread!.whisperFromEstate).toMatch(/keep writing the next one/i);
+    expect(spread!.guideQuote).toMatch(/story worth telling/i);
+    expect(spread!.blocks.some((block) => block.type === "still-becoming")).toBe(true);
+    expect(spread!.blocks.some((block) => block.type === "the-drawers")).toBe(true);
+    expect(validateEstateGuideSpread(spread!)).toEqual([]);
+  });
+
+  it("includes discovery chest spread with legend and opening the chest", () => {
+    const spread = getEstateGuideSpread("house-possibility-discovery-chest");
+    expect(spread).toBeDefined();
+    expect(spread!.title).toBe("The Treehouse Discovery Chest");
+    expect(spread!.title).not.toContain("™");
+    expect(spread!.guideSubtitle).toContain("Curiosity Is Always Rewarded");
+    expect(spread!.whisperFromEstate).toMatch(/Stay curious/i);
+    expect(spread!.blocks.some((block) => block.type === "opening-the-chest")).toBe(true);
+    expect(spread!.blocks.some((block) => block.type === "hidden-estate-legend")).toBe(
+      true,
+    );
+    expect(spread!.blocks.some((block) => block.type === "before-you-close-lid")).toBe(
+      true,
+    );
+    expect(validateEstateGuideSpread(spread!)).toEqual([]);
+  });
+
+  it("treehouse guide titles omit trademark symbols", () => {
+    for (const id of [
+      "house-possibility-outside",
+      "house-possibility-studio",
+      "house-possibility-staircase",
+      "house-possibility-reflection-desk",
+      "house-possibility-observatory",
+      "house-possibility-cabinet-of-chapters",
+      "house-possibility-discovery-chest",
+      "house-possibility-legacy-room",
+    ]) {
+      const spread = getEstateGuideSpread(id);
+      expect(spread!.title).not.toContain("™");
+    }
+  });
+
+  it("includes legacy room as the treehouse journey conclusion", () => {
+    const spread = getEstateGuideSpread("house-possibility-legacy-room");
+    expect(spread).toBeDefined();
+    expect(spread!.title).toBe("The Treehouse Legacy Room");
+    expect(spread!.guideSubtitle).toContain("Legacy You'll Leave");
+    expect(spread!.blocks.length).toBeGreaterThanOrEqual(10);
+    expect(spread!.whisperFromEstate).toMatch(/already growing/i);
+    expect(spread!.blocks.some((block) => block.type === "the-fireplace")).toBe(true);
+    expect(spread!.blocks.some((block) => block.type === "the-open-doors")).toBe(true);
+    expect(spread!.blocks.some((block) => block.type === "final-treehouse-tradition")).toBe(
+      true,
+    );
+    expect(validateEstateGuideSpread(spread!)).toEqual([]);
+  });
+
+  it("legacy room journey footer has no next stop", () => {
+    const footer = resolveTreehouseJourneyFooter("house-possibility-legacy-room");
+    expect(footer!.completedSteps).toContain("Reflected in the Legacy Room");
+    expect(footer!.nextStop).toBeNull();
+  });
+
+  it("places treehouse section at the back of the guidebook", () => {
+    const ids = listEstateGuideSpreadIds();
+    const discoveryIndex = ids.indexOf("discovery-room");
+    const houseIndex = ids.indexOf("house-possibility-outside");
+    const legacyIndex = ids.indexOf("house-possibility-legacy-room");
+    const coffeeHouseIndex = ids.indexOf("coffee-house");
+    expect(discoveryIndex).toBeGreaterThanOrEqual(0);
+    expect(houseIndex).toBeGreaterThan(discoveryIndex);
+    expect(coffeeHouseIndex).toBeGreaterThan(discoveryIndex);
+    expect(houseIndex).toBeGreaterThan(coffeeHouseIndex);
+    expect(legacyIndex).toBe(ids.length - 1);
+  });
+
+  it("orders treehouse chapters as one continuous journey", () => {
+    const ids = listEstateGuideSpreadIds();
+    const houseIndex = ids.indexOf("house-possibility-outside");
+    const staircaseIndex = ids.indexOf("house-possibility-staircase");
+    const studioIndex = ids.indexOf("house-possibility-studio");
+    const reflectionIndex = ids.indexOf("house-possibility-reflection-desk");
+    const observatoryIndex = ids.indexOf("house-possibility-observatory");
+    const cabinetIndex = ids.indexOf("house-possibility-cabinet-of-chapters");
+    const chestIndex = ids.indexOf("house-possibility-discovery-chest");
+    const legacyIndex = ids.indexOf("house-possibility-legacy-room");
+    expect(staircaseIndex).toBeGreaterThan(houseIndex);
+    expect(studioIndex).toBeGreaterThan(staircaseIndex);
+    expect(reflectionIndex).toBeGreaterThan(studioIndex);
+    expect(observatoryIndex).toBeGreaterThan(reflectionIndex);
+    expect(cabinetIndex).toBeGreaterThan(observatoryIndex);
+    expect(chestIndex).toBeGreaterThan(cabinetIndex);
+    expect(legacyIndex).toBeGreaterThan(chestIndex);
+  });
+
+  it("builds treehouse journey footer for discovery chest with legacy room next", () => {
+    const footer = resolveTreehouseJourneyFooter("house-possibility-discovery-chest");
+    expect(footer).not.toBeNull();
+    expect(footer!.completedSteps).toContain("Discovered the Discovery Chest");
+    expect(footer!.nextStop).toBe("The Legacy Room");
+  });
+
+  it("builds treehouse journey footer for cabinet with discovery chest next", () => {
+    const footer = resolveTreehouseJourneyFooter("house-possibility-cabinet-of-chapters");
+    expect(footer).not.toBeNull();
+    expect(footer!.completedSteps).toContain("Opened the Cabinet of Chapters");
+    expect(footer!.nextStop).toBe("The Discovery Chest");
+  });
+
+  it("builds treehouse journey footer for observatory with cabinet next stop", () => {
+    const footer = resolveTreehouseJourneyFooter("house-possibility-observatory");
+    expect(footer).not.toBeNull();
+    expect(footer!.completedSteps).toContain(
+      "Gained Perspective in the Observatory",
+    );
+    expect(footer!.completedSteps).toContain("Paused at the Reflection Desk");
+    expect(footer!.nextStop).toBe("The Cabinet of Chapters");
   });
 
   it("lists all spread ids", () => {
