@@ -10,7 +10,10 @@
  */
 
 import { detectAudioRequest } from "./audioSuggestions";
-import { isConfirmationAcceptance } from "./conversationConfirmationGate";
+import {
+  isConfirmationAcceptance,
+  isPureConfirmationDecline,
+} from "./conversationConfirmationGate";
 import { shouldSuppressEnvironmentNeedDuringDistress } from "./conversation/emotionalDistressRouting";
 import {
   formatEmotionalFirstOpening,
@@ -102,6 +105,7 @@ import {
   detectUniversalDocumentType,
   formatUniversalCreationQuestion,
   formatUniversalCreationTurnReply,
+  loadUniversalCreationSession,
   resolveUniversalCreationTurn,
   saveUniversalCreationSession,
   shouldEnterUniversalCreation,
@@ -400,7 +404,7 @@ const PRODUCTIVITY_FRAMING_RE =
   /\b(?:plan my day|marketing plan|launch|revenue|clients?|business|productivity|get more done|prioritize my day)\b/i;
 
 const AFFIRMATION_RE =
-  /^(?:yes|yep|yeah|yup|sure|ok(?:ay)?|please|do that|open it|do it|go ahead|let'?s do it|use it|let'?s use it|sounds good|that works|perfect|great|take me there)\.?$/i;
+  /^(?:yes(?:\s+please)?|yep|yeah|yup|sure|ok(?:ay)?|please|do that|open it|do it|go ahead|let'?s do it|use it|let'?s use it|sounds good|that works|perfect|great|take me there|start|create it)\.?$/i;
 
 export function isFrictionlessAffirmation(text: string): boolean {
   return AFFIRMATION_RE.test(text.trim());
@@ -1493,7 +1497,11 @@ function tryUniversalCreationFlow(
       suppressReflectionFirst: true,
       responseHint: universalCreationHint(turn.session, turn),
       localReply: formatUniversalCreationQuestion(turn),
-      pendingAction: null,
+      pendingAction: universalCreationPendingAction(
+        turn.session,
+        input.currentTurn ?? 0,
+        routing.artifactKind,
+      ),
       toolSuggestion: null,
       workspaceOffer: null,
       intentRouting: routing,
@@ -1510,7 +1518,11 @@ function tryUniversalCreationFlow(
       suppressReflectionFirst: true,
       responseHint: universalCreationHint(turn.session, turn),
       localReply: turn.message,
-      pendingAction: null,
+      pendingAction: universalCreationPendingAction(
+        turn.session,
+        input.currentTurn ?? 0,
+        routing.artifactKind,
+      ),
       toolSuggestion: null,
       workspaceOffer: null,
       intentRouting: routing,
@@ -1527,7 +1539,11 @@ function tryUniversalCreationFlow(
       suppressReflectionFirst: true,
       responseHint: universalCreationHint(turn.session, turn),
       localReply: formatUniversalCreationTurnReply(turn),
-      pendingAction: null,
+      pendingAction: universalCreationPendingAction(
+        turn.session,
+        input.currentTurn ?? 0,
+        routing.artifactKind,
+      ),
       toolSuggestion: null,
       workspaceOffer: null,
       intentRouting: routing,
@@ -1544,7 +1560,11 @@ function tryUniversalCreationFlow(
       suppressReflectionFirst: true,
       responseHint: universalCreationHint(turn.session, turn),
       localReply: turn.message,
-      pendingAction: null,
+      pendingAction: universalCreationPendingAction(
+        turn.session,
+        input.currentTurn ?? 0,
+        routing.artifactKind,
+      ),
       toolSuggestion: null,
       workspaceOffer: null,
       intentRouting: routing,
@@ -1865,7 +1885,13 @@ function buildGoogleSheetsIntakeDecision(
 function buildDecisionSupportDecision(
   routing: IntentRoutingDecision,
   currentTurn: number,
+  userText?: string,
 ): FrictionlessActionDecision {
+  const workspaceOffer = routing.workspaceOffer ?? {
+    section: "decision-compass" as const,
+    buttonLabel: "Open Decision Compass",
+    line: "Want to open Decision Compass together?",
+  };
   return {
     category: "decision_support",
     suppressRelationship: true,
@@ -1873,20 +1899,290 @@ function buildDecisionSupportDecision(
     suppressReflectionFirst: true,
     responseHint:
       "DECISION SUPPORT (P0.9): Offer Decision Compass or one clarifying question. No relationship lead paragraph.",
-    localReply: null,
-    pendingAction: routing.workspaceOffer
-      ? {
-          type: "open_tool",
-          target: "decision-compass",
-          context: "decision support",
-          offeredAtTurn: currentTurn,
-          offerSummary: "Decision Compass",
-        }
-      : null,
+    localReply: workspaceOffer.line,
+    pendingAction: {
+      type: "open_tool",
+      target: "decision-compass",
+      context: "decision support",
+      initialPrompt: userText?.trim(),
+      offeredAtTurn: currentTurn,
+      offerSummary: "Decision Compass",
+    },
     toolSuggestion: null,
-    workspaceOffer: routing.workspaceOffer,
+    workspaceOffer,
     intentRouting: routing,
   };
+}
+
+function universalCreationPendingAction(
+  session: UniversalCreationSession,
+  currentTurn: number,
+  artifactKind?: RegistryArtifactKind | null,
+): FrictionlessPendingAction {
+  return buildCreateFrictionlessPending({
+    target: "content-generator",
+    userText: session.originalUserText,
+    offeredAtTurn: currentTurn,
+    artifactKind,
+    offerSummary: "Create",
+  });
+}
+
+function maybeClearStaleFrictionlessPending(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): void {
+  const userText = input.userText.trim();
+  if (!userText) return;
+  if (isFrictionlessAffirmation(userText) || isConfirmationAcceptance(userText)) {
+    return;
+  }
+  if (isPureConfirmationDecline(userText)) {
+    clearFrictionlessPending();
+    return;
+  }
+  const last = input.lastAssistantText?.trim() ?? "";
+  if (last && isCreateFlowAssistantContext(last)) return;
+  if (loadUniversalCreationSession()) return;
+  if (loadDiscoverySession()) return;
+  if (messageNamesExactEstateRoom(userText)) {
+    clearFrictionlessPending();
+    return;
+  }
+  const pending = loadFrictionlessPending();
+  if (!pending) return;
+  const currentTurn = input.currentTurn ?? 0;
+  if (isFrictionlessPendingExpired(pending, currentTurn)) {
+    clearFrictionlessPending();
+    return;
+  }
+  if (routing.learnFastPath) {
+    clearFrictionlessPending();
+  }
+}
+
+function buildPendingContinuationDecision(
+  pending: FrictionlessPendingAction,
+  cont: { execute: boolean; ack: string },
+  routing: IntentRoutingDecision,
+  input: FrictionlessActionInput,
+): FrictionlessActionDecision {
+  const userText = input.userText.trim();
+  const currentTurn = input.currentTurn ?? 0;
+  const base: FrictionlessActionDecision = {
+    category: "direct_action",
+    suppressRelationship: true,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "YES CONTINUATION: Execute the stored pending action — do not re-ask what to create or open the wrong workspace.",
+    localReply: cont.ack,
+    pendingAction: null,
+    toolSuggestion:
+      pending.target === "focus-audio" ||
+      pending.target === "breathe" ||
+      pending.target === "brain-dump"
+        ? frictionlessToToolSuggestion(pending)
+        : null,
+    workspaceOffer: null,
+    intentRouting: routing,
+  };
+
+  if (pending.target === "content-generator") {
+    const prompt = pending.initialPrompt?.trim() ?? "";
+    const storedSession = loadUniversalCreationSession();
+    if (storedSession) {
+      const turn = resolveUniversalCreationTurn(
+        userText,
+        currentTurn,
+        input.lastAssistantText,
+      );
+      if (turn) {
+        saveUniversalCreationSession(turn.session);
+        const localReply =
+          turn.kind === "question"
+            ? formatUniversalCreationQuestion(turn)
+            : turn.kind === "uncertainty" || turn.kind === "message"
+              ? turn.message
+              : formatUniversalCreationTurnReply(turn);
+        return {
+          ...base,
+          category: "universal_creation",
+          localReply,
+          responseHint: universalCreationHint(turn.session, turn),
+          universalCreationSession: turn.session,
+        };
+      }
+    }
+    if (prompt) {
+      const turn = resolveUniversalCreationTurn(
+        prompt,
+        currentTurn,
+        input.lastAssistantText,
+      );
+      if (turn?.kind === "question") {
+        saveUniversalCreationSession(turn.session);
+        return {
+          ...base,
+          category: "universal_creation",
+          localReply: formatUniversalCreationQuestion(turn),
+          responseHint: universalCreationHint(turn.session, turn),
+          universalCreationSession: turn.session,
+          workspaceOffer: {
+            section: "content-generator",
+            buttonLabel: pending.offerSummary ?? "Create",
+            line: cont.ack,
+          },
+        };
+      }
+      const createOpen = resolveImmediateCreateAction(
+        prompt,
+        pending.artifactType as RegistryArtifactKind | undefined,
+      );
+      if (createOpen) {
+        return {
+          ...base,
+          immediateCreateOpen: createOpen,
+          workspaceOffer: {
+            section: "content-generator",
+            buttonLabel: pending.offerSummary ?? "Create",
+            line: cont.ack,
+          },
+        };
+      }
+    }
+    return {
+      ...base,
+      workspaceOffer: {
+        section: "content-generator",
+        buttonLabel: pending.offerSummary ?? "Create",
+        line: cont.ack,
+      },
+    };
+  }
+
+  if (pending.target === "decision-compass") {
+    return {
+      ...base,
+      category: "decision_support",
+      workspaceOffer: routing.workspaceOffer ?? {
+        section: "decision-compass",
+        buttonLabel: "Open Decision Compass",
+        line: cont.ack,
+      },
+    };
+  }
+
+  if (pending.target === "brain-dump") {
+    return {
+      ...base,
+      workspaceOffer: {
+        section: "brain-dump",
+        buttonLabel: "Clear My Mind",
+        line: cont.ack,
+      },
+    };
+  }
+
+  if (pending.target === "visual-focus") {
+    return {
+      ...base,
+      workspaceOffer: {
+        section: "visual-focus",
+        buttonLabel: "Open Visual Thinking",
+        line: cont.ack,
+      },
+      immediateVisualOpen:
+        pending.viewId && pending.visualFocusMode
+          ? {
+              mode: pending.visualFocusMode,
+              viewId: pending.viewId,
+              viewTitle: pending.viewTitle ?? "Visual Thinking",
+              purposeAnswer: pending.initialPrompt,
+              ack: cont.ack,
+            }
+          : undefined,
+    };
+  }
+
+  if (
+    pending.type === "visual_thinking_menu" ||
+    pending.type === "visual_recommendation"
+  ) {
+    return {
+      ...base,
+      workspaceOffer: {
+        section: "visual-focus",
+        buttonLabel: "Open Visual Thinking",
+        line: cont.ack,
+      },
+    };
+  }
+
+  if (pending.target === "focus-audio" || pending.target === "breathe") {
+    return { ...base, category: "tool_open" };
+  }
+
+  if (pending.type === "create_google_sheet") {
+    return { ...base, category: "google_sheet" };
+  }
+
+  if (pending.type === "strategy_offer" || pending.target === "playbook") {
+    return {
+      ...base,
+      category: "strategy",
+      workspaceOffer: {
+        section: "playbook",
+        buttonLabel: pending.offerSummary ?? "Open Strategies",
+        line: cont.ack,
+      },
+    };
+  }
+
+  if (pending.type === "open_workspace" && pending.target !== "content-generator") {
+    return {
+      ...base,
+      workspaceOffer: {
+        section: pending.target as AppSection,
+        buttonLabel: pending.offerSummary ?? pending.label ?? "Continue",
+        line: cont.ack,
+      },
+    };
+  }
+
+  return base;
+}
+
+function tryFrictionlessYesContinuation(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  const currentTurn = input.currentTurn ?? 0;
+  if (!userText) return null;
+  if (!isFrictionlessAffirmation(userText) && !isConfirmationAcceptance(userText)) {
+    return null;
+  }
+  if (routing.learnFastPath) return null;
+  if (messageNamesExactEstateRoom(userText)) return null;
+
+  const pending = loadFrictionlessPendingForConfirmation({
+    confirmationReply: true,
+    awaitingPending: undefined,
+    lastAssistantText: input.lastAssistantText,
+    currentTurn,
+  });
+  if (!pending) return null;
+
+  const cont = resolveFrictionlessContinuation(
+    userText,
+    pending,
+    currentTurn,
+    input.lastAssistantText,
+  );
+  if (!cont?.execute) return null;
+
+  return buildPendingContinuationDecision(pending, cont, routing, input);
 }
 
 function buildCreateFrictionlessPending(input: {
@@ -2484,6 +2780,8 @@ function resolveFrictionlessActionImpl(
     overwhelmed: input.overwhelmed,
   });
 
+  maybeClearStaleFrictionlessPending(input, routing);
+
   const earlySupport = tryEarlyCompanionSupportFlow(input, routing);
   if (earlySupport) {
     return finishFrictionlessDecision(earlySupport, sparkRuntime);
@@ -2492,6 +2790,11 @@ function resolveFrictionlessActionImpl(
   const pendingChoiceFlow = tryPendingChoiceFlow(input, routing);
   if (pendingChoiceFlow) {
     return finishFrictionlessDecision(pendingChoiceFlow, sparkRuntime);
+  }
+
+  const yesContinuation = tryFrictionlessYesContinuation(input, routing);
+  if (yesContinuation) {
+    return finishFrictionlessDecision(yesContinuation, sparkRuntime);
   }
 
   const musicGuidance = tryMusicCreationGuidance(userText, routing);
@@ -2565,6 +2868,16 @@ function resolveFrictionlessActionImpl(
 
   const frictionFirstFlow = tryFrictionFirstFlow(input, routing, sparkRuntime);
   if (frictionFirstFlow) return frictionFirstFlow;
+
+  if (
+    isDecisionCompassOfferSignal(userText) ||
+    (/\bhelp me decide\b/i.test(userText) && routing.category === "decide")
+  ) {
+    return finishFrictionlessDecision(
+      buildDecisionSupportDecision(routing, currentTurn, userText),
+      sparkRuntime,
+    );
+  }
 
   const coachingFlow = tryEstateCoachingFlow(input, routing);
   if (coachingFlow) return coachingFlow;
@@ -2765,13 +3078,6 @@ function resolveFrictionlessActionImpl(
         "LEARN FAST PATH (P0.10): Answer the concept directly — no relationship layer.",
       intentRouting: routing,
     };
-  }
-
-  if (
-    isDecisionCompassOfferSignal(userText) ||
-    /\bhelp me decide\b/i.test(userText)
-  ) {
-    return buildDecisionSupportDecision(routing, currentTurn);
   }
 
   if (

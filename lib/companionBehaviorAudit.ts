@@ -20,10 +20,14 @@ import { isHowToLearningQuestion } from "./howToLearningIntelligence";
 import { detectOverwhelmTodayRoute } from "./overwhelmTodayRouting";
 import {
   frictionlessPendingFromWorkspaceOffer,
+  resetFrictionlessPendingForTests,
   resolveFrictionlessAction,
   resolveFrictionlessContinuation,
   type FrictionlessActionCategory,
 } from "./frictionlessActionLayer";
+import { clearDiscoverySession } from "./estateBrain/discoveryMode";
+import { clearUniversalCreationSession } from "./universalCreation";
+import { clearVisualRecommendationPending } from "./visualThinkingContinuation";
 import {
   auditRelationshipIntelligenceScope,
   isSelfUnderstandingIntent,
@@ -177,7 +181,9 @@ const FEATURE_ALIASES: Record<string, string[]> = {
   "decision-compass": ["decision compass", "decision-compass"],
   "plan-my-day": ["plan my day", "plan-my-day"],
   "brain-dump": ["clear my mind", "brain-dump"],
+  "Clear My Mind": ["clear my mind", "brain-dump"],
   "visual-focus": ["visual thinking", "visual-focus", "mind map", "decision tree"],
+  "Visual Thinking": ["visual thinking", "visual-focus", "mind map", "decision tree"],
   "client-avatars": ["client avatar", "audience profile", "client-avatars"],
   energy: ["adapt my day", "energy", "today's reality", "todays reality"],
   "focus-audio": ["focus audio", "focus-audio"],
@@ -484,9 +490,17 @@ function checkForbiddenOpeners(
   }
 }
 
+function resetCompanionAuditIsolation(): void {
+  resetFrictionlessPendingForTests();
+  clearUniversalCreationSession();
+  clearDiscoverySession();
+  clearVisualRecommendationPending();
+}
+
 export function evaluateCompanionBehaviorCase(
   testCase: CompanionBehaviorAuditCase,
 ): CompanionBehaviorAuditResult {
+  resetCompanionAuditIsolation();
   const reasons: string[] = [];
   let isContinuation = false;
   let continuationTarget: string | null = null;
@@ -1689,6 +1703,46 @@ export const COMPANION_BEHAVIOR_AUDIT_CASES: CompanionBehaviorAuditCase[] = [
     expectedIntent: "continuation",
     expectedRoute: "continuation",
     expectedFeature: "content-generator",
+    expectedSuppressionFlags: { relationship: true },
+  },
+  {
+    id: "yes-newsletter",
+    category: "yes_continuation",
+    setupUserInput: "I need to create a newsletter",
+    userInput: "yes",
+    expectedIntent: "continuation",
+    expectedRoute: "continuation",
+    expectedFeature: "content-generator",
+    expectedSuppressionFlags: { relationship: true },
+  },
+  {
+    id: "yes-visual-map",
+    category: "yes_continuation",
+    setupUserInput: "Turn this into something visual",
+    userInput: "yes",
+    expectedIntent: "continuation",
+    expectedRoute: "continuation",
+    expectedFeature: "Visual Thinking",
+    expectedSuppressionFlags: { relationship: true },
+  },
+  {
+    id: "yes-focus-help",
+    category: "yes_continuation",
+    setupUserInput: "I need focus music while I work",
+    userInput: "yes",
+    expectedIntent: "continuation",
+    expectedRoute: "continuation",
+    expectedFeature: "focus-audio",
+    expectedSuppressionFlags: { relationship: true },
+  },
+  {
+    id: "yes-clear-my-mind",
+    category: "yes_continuation",
+    setupUserInput: "I have too many ideas.",
+    userInput: "yes",
+    expectedIntent: "continuation",
+    expectedRoute: "continuation",
+    expectedFeature: "Clear My Mind",
     expectedSuppressionFlags: { relationship: true },
   },
   {

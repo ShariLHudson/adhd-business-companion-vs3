@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { evaluateCompanionBehaviorCase } from "./companionBehaviorAudit";
 import { clearDiscoverySession } from "./estateBrain/discoveryMode";
 import { clearUniversalCreationSession } from "./universalCreation/orchestrator";
 import { buildRelationshipLeadParagraph } from "./relationshipResponseContract";
@@ -96,7 +97,11 @@ describe("frictionlessActionLayer", () => {
     expect(decision.localReply).toMatch(
       /understand what you're building|reason you're creating|map a funnel|offer sits at the bottom/i,
     );
-    expect(decision.pendingAction).toBeNull();
+    expect(decision.pendingAction).toMatchObject({
+      target: "content-generator",
+      artifactType: "Sales Funnel",
+      initialPrompt: "I need to create a sales funnel",
+    });
   });
 
   it("executes yes after Focus Audio offer without treating as new conversation", () => {
@@ -197,14 +202,14 @@ describe("frictionlessActionLayer", () => {
     expect(decision.localReply).toMatch(/Momentum/i);
   });
 
-  it("routes help me decide to coaching before compass navigation", () => {
+  it("routes help me decide to Decision Compass before coaching menu", () => {
     const decision = resolveFrictionlessAction({
       userText: "help me decide",
       currentTurn: 1,
     });
-    expect(decision.category).toBe("estate_coaching");
+    expect(decision.category).toBe("decision_support");
     expect(decision.suppressRelationship).toBe(true);
-    expect(decision.localReply).toMatch(/Which sounds better/i);
+    expect(decision.pendingAction?.target).toBe("decision-compass");
     expect(decision.immediateEstateCoachingOpen).toBeUndefined();
   });
 
@@ -305,5 +310,125 @@ describe("frictionlessActionLayer", () => {
     expect(picked.immediateEstateCoachingOpen?.estatePlaceId).toBe(
       "clear-my-mind",
     );
+  });
+
+  it("yes-sales-funnel continues universal creation from stored pending", () => {
+    const setup = resolveFrictionlessAction({
+      userText: "I need to create a sales funnel",
+      currentTurn: 1,
+    });
+    saveFrictionlessPending(setup.pendingAction);
+    const yes = resolveFrictionlessAction({
+      userText: "yes",
+      currentTurn: 2,
+      lastAssistantText: setup.localReply ?? "",
+    });
+    expect(yes.category).toBe("universal_creation");
+    expect(yes.localReply).not.toMatch(/what would you like to create/i);
+  });
+
+  it("yes-decide resolves decision-compass pending", () => {
+    const setup = resolveFrictionlessAction({
+      userText: "Help me decide between two offers",
+      currentTurn: 1,
+    });
+    saveFrictionlessPending(setup.pendingAction);
+    const cont = resolveFrictionlessContinuation(
+      "yes please",
+      loadFrictionlessPending()!,
+      2,
+    );
+    expect(cont?.execute).toBe(true);
+    const yes = resolveFrictionlessAction({
+      userText: "yes please",
+      currentTurn: 2,
+      lastAssistantText: setup.localReply ?? "",
+    });
+    expect(yes.pendingAction).toBeNull();
+    expect(yes.workspaceOffer?.section ?? yes.category).toMatch(
+      /decision-compass|decision_support/,
+    );
+  });
+
+  it("yes-write-email continues Create pending without re-asking", () => {
+    const setup = resolveFrictionlessAction({
+      userText: "I need to write an email",
+      currentTurn: 1,
+    });
+    expect(setup.pendingAction?.target).toBe("content-generator");
+    saveFrictionlessPending(setup.pendingAction);
+    const yes = resolveFrictionlessAction({
+      userText: "let's do it",
+      currentTurn: 2,
+      lastAssistantText: setup.localReply ?? "",
+    });
+    expect(yes.localReply).not.toMatch(/what would you like to create/i);
+    expect(yes.category).toMatch(/universal_creation|direct_action/);
+  });
+
+  it("yes-newsletter stores and continues Create pending", () => {
+    const setup = resolveFrictionlessAction({
+      userText: "I need to create a newsletter",
+      currentTurn: 1,
+    });
+    expect(setup.pendingAction?.target).toBe("content-generator");
+    expect(setup.pendingAction?.initialPrompt).toMatch(/newsletter/i);
+    saveFrictionlessPending(setup.pendingAction);
+    const cont = resolveFrictionlessContinuation(
+      "go ahead",
+      loadFrictionlessPending()!,
+      2,
+    );
+    expect(cont?.execute).toBe(true);
+  });
+
+  it("yes-clear-my-mind resolves brain-dump pending", () => {
+    const setup = resolveFrictionlessAction({
+      userText: "I have too many ideas.",
+      currentTurn: 1,
+    });
+    expect(setup.pendingAction?.target).toBe("brain-dump");
+    const cont = resolveFrictionlessContinuation(
+      "yes",
+      setup.pendingAction!,
+      2,
+    );
+    expect(cont?.execute).toBe(true);
+  });
+
+  it("yes-focus-help resolves focus-audio pending", () => {
+    const setup = resolveFrictionlessAction({
+      userText: "I need focus music while I work",
+      currentTurn: 1,
+    });
+    expect(setup.pendingAction?.target).toBe("focus-audio");
+    saveFrictionlessPending(setup.pendingAction);
+    const yes = resolveFrictionlessAction({
+      userText: "start",
+      currentTurn: 2,
+      lastAssistantText: setup.localReply ?? "",
+    });
+    expect(yes.category).toBe("tool_open");
+    expect(yes.toolSuggestion?.action.type).toBe("tool");
+  });
+
+  it("recognizes extended affirmation phrases", () => {
+    expect(isFrictionlessAffirmation("yes please")).toBe(true);
+    expect(isFrictionlessAffirmation("create it")).toBe(true);
+    expect(isFrictionlessAffirmation("start")).toBe(true);
+  });
+
+  it("passes yes-visual-map companion audit case", () => {
+    const result = evaluateCompanionBehaviorCase({
+      id: "yes-visual-map",
+      category: "yes_continuation",
+      setupUserInput: "Turn this into something visual",
+      userInput: "yes",
+      expectedIntent: "continuation",
+      expectedRoute: "continuation",
+      expectedFeature: "Visual Thinking",
+      expectedSuppressionFlags: { relationship: true },
+    });
+    expect(result.failureReasons, result.failureReasons.join("; ")).toEqual([]);
   });
 });

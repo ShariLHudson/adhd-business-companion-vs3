@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { clearUniversalCreationSession } from "./universalCreation/orchestrator";
 import {
   inferCreateItemTypeFromText,
   resolvedArtifactFromCreatePending,
@@ -23,6 +24,7 @@ describe("createPendingAction (P0.10.2)", () => {
       clear: () => mem.clear(),
     });
     clearFrictionlessPending();
+    clearUniversalCreationSession();
   });
 
   it("infers Email from create-an-email prompt", () => {
@@ -66,7 +68,7 @@ describe("createPendingAction (P0.10.2)", () => {
       userText: "I need to write an email",
       currentTurn: 2,
     });
-    expect(decision.localReply).toMatch(/open Create to draft your email/i);
+    expect(decision.category).toBe("universal_creation");
     expect(decision.pendingAction).toMatchObject({
       type: "open_workspace",
       target: "content-generator",
@@ -88,7 +90,7 @@ describe("createPendingAction (P0.10.2)", () => {
       3,
     );
     expect(cont?.execute).toBe(true);
-    expect(cont?.ack).toBe("Opening Create.");
+    expect(cont?.ack).toMatch(/Create/i);
     const artifact = resolvedArtifactFromCreatePending(loadFrictionlessPending()!);
     expect(artifact?.itemType).toBe("Email");
     expect(artifact?.artifactTypeLocked).toBe(true);
