@@ -38,6 +38,8 @@ export type WelcomeHomeExperiencePlan = {
 export type ExperienceEngineInput = {
   hasSeenWelcomeIntro: boolean;
   replayRequested?: boolean;
+  /** Second or later login — intro plays once ever, not every sign-in. */
+  isRepeatLogin?: boolean;
   isReturningSameDay?: boolean;
   now?: Date;
 };
@@ -45,14 +47,19 @@ export type ExperienceEngineInput = {
 export function evaluateWelcomeHomeExperience(
   input: ExperienceEngineInput,
 ): WelcomeHomeExperiencePlan {
+  const repeatLogin = Boolean(input.isRepeatLogin);
+  const introAlreadySeen = input.hasSeenWelcomeIntro || repeatLogin;
+
   const visitorKind: ExperienceVisitorKind = input.replayRequested
     ? "replay"
-    : input.hasSeenWelcomeIntro
+    : introAlreadySeen
       ? "returning"
       : "first_visit";
 
   const showIntro =
     !isCompanionDevFastPath() &&
+    !introAlreadySeen &&
+    !repeatLogin &&
     (visitorKind === "first_visit" || visitorKind === "replay");
 
   const greeting =
