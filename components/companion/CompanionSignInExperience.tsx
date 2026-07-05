@@ -63,9 +63,22 @@ export function CompanionSignInExperience() {
 
   useEffect(() => {
     if (!sessionChecked || loading || redirecting) return;
-    if (!user && !session) return;
+    const token = session?.access_token;
+    if (!user?.id && !token) return;
     goHomeAfterAuth();
   }, [sessionChecked, loading, user, session, redirecting, goHomeAfterAuth]);
+
+  useEffect(() => {
+    if (!redirecting) return;
+    const timeout = window.setTimeout(() => {
+      navigatingRef.current = false;
+      setRedirecting(false);
+      setRedirectError(
+        "Taking longer than expected — try signing in again.",
+      );
+    }, 12_000);
+    return () => window.clearTimeout(timeout);
+  }, [redirecting]);
 
   if (redirecting) {
     return (

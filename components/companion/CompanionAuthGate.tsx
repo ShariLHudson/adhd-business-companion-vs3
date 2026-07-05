@@ -7,7 +7,6 @@ import { useCompanionAuth } from "@/components/companion/CompanionAuthProvider";
 import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
 import {
   clearCompanionPostLoginQuiet,
-  hasCompanionAuthStorageHint,
   isCompanionPostLoginQuiet,
 } from "@/lib/companionLoginTransition";
 
@@ -32,13 +31,7 @@ export function CompanionAuthGate({ children }: { children: ReactNode }) {
   const isAuthed = Boolean(user || session);
   const loginHandoff =
     typeof window !== "undefined" && isCompanionPostLoginQuiet();
-  const hasStoredSession =
-    typeof window !== "undefined" && hasCompanionAuthStorageHint();
-  /** Storage hint only bypasses the gate while session restore is still in flight. */
-  const gateOpen =
-    isAuthed ||
-    loginHandoff ||
-    ((!sessionChecked || loading) && hasStoredSession);
+  const gateOpen = isAuthed || loginHandoff;
 
   useEffect(() => {
     if (isAuthed) {
@@ -66,7 +59,7 @@ export function CompanionAuthGate({ children }: { children: ReactNode }) {
   }, [configChecked, configured, sessionChecked, loading, gateOpen, router]);
 
   if (!configChecked || !sessionChecked || loading) {
-    if (gateOpen && (loginHandoff || hasStoredSession)) {
+    if (loginHandoff) {
       return <>{children}</>;
     }
     return <AuthGateLoading message="Loading your space…" />;

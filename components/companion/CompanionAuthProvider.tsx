@@ -412,7 +412,7 @@ export function CompanionAuthProvider({
 
         if (loginOnlyAuth) {
           const { data } = await supabase.auth.getSession();
-          if (data.session) {
+          if (data.session?.access_token) {
             applySession(data.session);
           } else if (hasCompanionAuthStorageHint()) {
             clearCompanionAuthStorage();
