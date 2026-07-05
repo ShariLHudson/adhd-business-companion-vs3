@@ -233,15 +233,26 @@ export function companionAuthConfigStatus(): {
   };
 }
 
-/** Only shown when auto-resolve still cannot find a valid key. */
+/** Member-safe hint when auth env is missing — never surfaces dev tooling on production. */
 export function companionAuthMisconfigHint(): string | null {
   if (companionAuthConfigured()) return null;
   const r = resolved();
+  const isLocalDev =
+    typeof window !== "undefined"
+      ? /localhost|127\.0\.0\.1/.test(window.location.hostname)
+      : process.env.NODE_ENV === "development";
+
   if (!r.key) {
-    return "Add your Supabase anon/publishable key to companion-app/.env.local as NEXT_PUBLIC_SUPABASE_ANON_KEY (or SUPABASE_ANON_KEY), then restart npm run dev. Get it from Supabase → Settings → API Keys.";
+    if (isLocalDev) {
+      return "Add your Supabase anon/publishable key to companion-app/.env.local as NEXT_PUBLIC_SUPABASE_ANON_KEY (or SUPABASE_ANON_KEY), then restart npm run dev. Get it from Supabase → Settings → API Keys.";
+    }
+    return "Sign-in isn't connected on this site yet. If this keeps showing, reach out — we'll get you in.";
   }
   if (!companionAnonKeyLooksValid()) {
-    return "Supabase publishable key does not look valid. Copy it from Supabase → Settings → API Keys (copy icon).";
+    if (isLocalDev) {
+      return "Supabase publishable key does not look valid. Copy it from Supabase → Settings → API Keys (copy icon).";
+    }
+    return "Sign-in isn't quite ready yet. If this keeps showing, reach out and we'll sort it out.";
   }
   return null;
 }

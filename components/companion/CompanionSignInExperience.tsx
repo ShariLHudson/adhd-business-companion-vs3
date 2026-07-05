@@ -135,8 +135,8 @@ export function CompanionSignInExperience() {
 
           {configChecked && sessionChecked && !loading && !authReady ? (
             <p className="mt-4 text-center text-sm text-[#6b635a]">
-              Sign-in is still being set up here. Try again shortly, or reach out
-              if this keeps showing.
+              Sign-in isn&apos;t connected here yet. If this keeps showing, reach
+              out — we&apos;ll get you in.
             </p>
           ) : null}
         </div>

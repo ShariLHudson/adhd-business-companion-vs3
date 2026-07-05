@@ -62,6 +62,17 @@ export default function CompanionLayout({
 
   return (
     <HomesteadSceneProvider>
+      {inlineAuth ? (
+        <script
+          id="companion-auth-bootstrap"
+          dangerouslySetInnerHTML={{
+            __html: `window.__COMPANION_SUPABASE__=${JSON.stringify({
+              url: inlineAuth.url,
+              key: inlineAuth.anonKey,
+            })};`,
+          }}
+        />
+      ) : null}
       <CompanionAuthProvider inlineSupabase={inlineAuth}>
         <CompanionLanguageProvider>
           <CompanionPhotoProvider>

@@ -24,7 +24,11 @@ function envSetupHint(hostname: string): string {
   if (/localhost|127\.0\.0\.1/.test(hostname)) {
     return "companion-app/.env.local — then restart npm run dev";
   }
-  return "Vercel environment variables — then redeploy";
+  return "your deployment environment settings — then redeploy";
+}
+
+function isLocalCompanionHost(hostname: string): boolean {
+  return /localhost|127\.0\.0\.1/.test(hostname);
 }
 
 function friendlyAuthError(message: string): string {
@@ -65,7 +69,10 @@ function ConfigBanner() {
   const missing: string[] = [];
   if (!hasUrl) missing.push("NEXT_PUBLIC_SUPABASE_URL");
   if (!hasAnonKey) missing.push("NEXT_PUBLIC_SUPABASE_ANON_KEY");
-  const showMissingBanner = missing.length > 0 && !misconfigHint;
+  const showMissingBanner =
+    missing.length > 0 && !misconfigHint && typeof window !== "undefined"
+      ? isLocalCompanionHost(window.location.hostname)
+      : false;
 
   return (
     <div className="flex flex-col gap-2">
@@ -86,7 +93,11 @@ function ConfigBanner() {
           {misconfigHint}
         </p>
       ) : null}
-      {hasUrl && !urlLooksValid && !misconfigHint ? (
+      {hasUrl &&
+      !urlLooksValid &&
+      !misconfigHint &&
+      typeof window !== "undefined" &&
+      isLocalCompanionHost(window.location.hostname) ? (
         <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
           <code className="rounded bg-white/80 px-1">NEXT_PUBLIC_SUPABASE_URL</code>{" "}
           should be your Supabase project URL (e.g.{" "}
@@ -96,17 +107,17 @@ function ConfigBanner() {
           ), not an API key. Fix in {envSetupHint(window.location.hostname)}.
         </p>
       ) : null}
-      {hasAnonKey && !anonKeyLooksValid && !misconfigHint ? (
+      {hasAnonKey &&
+      !anonKeyLooksValid &&
+      !misconfigHint &&
+      typeof window !== "undefined" &&
+      isLocalCompanionHost(window.location.hostname) ? (
         <p className="rounded-lg border border-[#a85c4a]/30 bg-[#a85c4a]/8 px-3 py-2 text-sm text-[#a85c4a]">
           Your Supabase API key does not look right ({anonKeyLength} characters).
           Use the full <strong>Publishable</strong> key from Supabase → Settings →
           API Keys (copy button), or the <strong>Legacy anon</strong>{" "}
-          <code className="rounded bg-white/80 px-1">eyJ…</code> key. Paste into
-          Vercel as{" "}
-          <code className="rounded bg-white/80 px-1">
-            NEXT_PUBLIC_SUPABASE_ANON_KEY
-          </code>
-          , then restart or redeploy.
+          <code className="rounded bg-white/80 px-1">eyJ…</code> key in{" "}
+          {envSetupHint(window.location.hostname)}.
         </p>
       ) : null}
     </div>
