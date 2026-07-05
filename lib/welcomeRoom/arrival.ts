@@ -97,6 +97,28 @@ export function welcomeRoomFadeOpacity(elapsedMs: number): number {
   return Math.min(1, reveal / WELCOME_ROOM_REVEAL_MS);
 }
 
+/** When skipIntro is set, never rewind below the settled reveal — returning users stay visible. */
+export function welcomeRoomElapsedForFrame(
+  roomElapsedMs: number,
+  skipIntro: boolean,
+): number {
+  if (skipIntro && roomElapsedMs < WELCOME_ROOM_READY_ELAPSED_MS) {
+    return WELCOME_ROOM_READY_ELAPSED_MS;
+  }
+  return roomElapsedMs;
+}
+
+export function welcomeRoomRevealOpacitiesAt(
+  roomElapsedMs: number,
+  skipIntro: boolean,
+): { fadeOpacity: number; darkOpacity: number } {
+  const ms = welcomeRoomElapsedForFrame(roomElapsedMs, skipIntro);
+  return {
+    fadeOpacity: welcomeRoomFadeOpacity(ms),
+    darkOpacity: welcomeRoomDarkOpacity(ms),
+  };
+}
+
 /** Elapsed walk-in time after the room has fully revealed. */
 export function welcomeRoomWalkElapsedMs(roomElapsedMs: number): number {
   return Math.max(0, roomElapsedMs - WELCOME_ROOM_READY_ELAPSED_MS);

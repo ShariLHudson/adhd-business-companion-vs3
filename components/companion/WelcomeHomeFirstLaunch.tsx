@@ -135,7 +135,7 @@ export function WelcomeHomePage({
 
   const arrival = useWelcomeRoomArrival({
     skipIntro: true,
-    frozen: !firstVisitCinematic || phase !== "intro",
+    frozen: firstVisitCinematic && phase === "intro",
     dollyDurationMs: introPlaybackReady ? dollyDurationMs : undefined,
     walkPaused,
   });

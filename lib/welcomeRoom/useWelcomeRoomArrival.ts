@@ -9,6 +9,7 @@ import {
   welcomeRoomCinematicDollyProgress,
   welcomeRoomDarkOpacity,
   welcomeRoomDollyFrame,
+  welcomeRoomElapsedForFrame,
   welcomeRoomFadeOpacity,
   welcomeRoomShowReadOffer,
   welcomeRoomWalkElapsedMs,
@@ -98,7 +99,9 @@ export function useWelcomeRoomArrival(
   const roomOriginRef = useRef<number | null>(
     skipIntro ? performance.now() - WELCOME_ROOM_READY_ELAPSED_MS : null,
   );
-  const roomElapsedRef = useRef(0);
+  const roomElapsedRef = useRef(
+    skipIntro ? WELCOME_ROOM_READY_ELAPSED_MS : 0,
+  );
   const walkHoldRef = useRef(0);
   const [resetToken, setResetToken] = useState(0);
 
@@ -119,7 +122,7 @@ export function useWelcomeRoomArrival(
     if (frozen || walkPaused) {
       setState(
         frameAt(
-          roomElapsedRef.current,
+          welcomeRoomElapsedForFrame(roomElapsedRef.current, skipIntro),
           frozen,
           walkPaused,
           walkHoldRef.current,
