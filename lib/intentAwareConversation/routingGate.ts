@@ -19,6 +19,8 @@ export const RELATIONSHIP_CONVERSATION_PATTERNS: readonly RegExp[] = [
   /\b(?:i'?m glad we(?:'re| are) working together)\b/i,
   /\b(?:nice to (?:see|talk to|chat with) you)\b/i,
   /\b(?:good to (?:see|hear from) you)\b/i,
+  /^(?:not much|nothing much|same old|same here)(?:[\s!.,?-]+(?:how about you|how are you|and you|what about you|yourself))?[\s!.,?]*$/i,
+  /\b(?:how about you|what about you)\b/i,
 ];
 
 /** Explicit celebration — high confidence only */

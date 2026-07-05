@@ -15,7 +15,12 @@ const THANKS_RE = /^(?:thanks|thank you)[\s!.,?]*$/i;
 const HOW_ARE_YOU_RE =
   /\bhow(?:'re| are) you(?: doing| today| this morning| this afternoon)?\b/i;
 
+const HOW_ABOUT_YOU_RE = /\b(?:how about you|what about you|and you)\b/i;
+
 const NOT_MUCH_RE = /\bnot much\b/i;
+
+const CASUAL_CHECK_IN_RE =
+  /^(?:not much|nothing much|same old|same here|(?:pretty )?(?:good|fine|okay|ok|alright)|doing (?:good|well|okay|fine))(?:[\s!.,?-]+(?:how about you|how are you|and you|what about you|yourself))?[\s!.,?]*$/i;
 
 const WARM_RELATIONSHIP_REPLIES = [
   "That's really kind — thank you. I'm glad we're talking.",
@@ -31,14 +36,33 @@ function stablePick(seed: string, options: readonly string[]): string {
   return options[Math.abs(hash) % options.length]!;
 }
 
-/** Primary classifier assigned RELATIONSHIP_CHAT — complete locally, no downstream handlers. */
+/** Messages we can answer warmly without API — casual greetings and reciprocal check-ins. */
+export function isRelationshipLocalCandidate(userText: string): boolean {
+  const trimmed = userText.trim();
+  if (!trimmed || trimmed.length > 120) return false;
+  if (isSimpleSocialGreeting(trimmed)) return true;
+  if (HOPE_GOOD_DAY_RE.test(trimmed)) return true;
+  if (THANKS_RE.test(trimmed)) return true;
+  if (HOW_ARE_YOU_RE.test(trimmed)) return true;
+  if (HOW_ABOUT_YOU_RE.test(trimmed)) return true;
+  if (CASUAL_CHECK_IN_RE.test(trimmed)) return true;
+  if (isRelationshipConversation(trimmed)) return true;
+  return false;
+}
+
+/** Complete relationship small-talk locally — no API, no generic fallback. */
 export function shouldCompleteRelationshipChatLocally(
   decision: PrimaryTurnDecision,
   userText: string,
 ): boolean {
-  if (decision.type !== "RELATIONSHIP_CHAT") return false;
-  if (decision.confidence !== "high") return false;
-  return isRelationshipConversation(userText);
+  if (!isRelationshipLocalCandidate(userText)) return false;
+  if (
+    decision.confidence === "high" &&
+    decision.type !== "RELATIONSHIP_CHAT"
+  ) {
+    return false;
+  }
+  return true;
 }
 
 export function relationshipConversationLocalReply(userText: string): string {
@@ -52,11 +76,17 @@ export function relationshipConversationLocalReply(userText: string): string {
   if (THANKS_RE.test(trimmed)) {
     return "You're welcome. I'm glad to be here with you.";
   }
-  if (HOW_ARE_YOU_RE.test(trimmed)) {
+  if (HOW_ARE_YOU_RE.test(trimmed) || HOW_ABOUT_YOU_RE.test(trimmed)) {
     if (NOT_MUCH_RE.test(trimmed)) {
       return "Not much can be a nice kind of quiet. I'm good — thanks for asking. What's on your mind?";
     }
     return "I'm doing well — thank you for asking. How are you really doing today?";
+  }
+  if (CASUAL_CHECK_IN_RE.test(trimmed)) {
+    if (NOT_MUCH_RE.test(trimmed) || /^(?:nothing much|same old|same here)/i.test(trimmed)) {
+      return "Not much can be a nice kind of quiet. I'm good — thanks for asking. What's on your mind?";
+    }
+    return "I'm doing well — thank you for asking. What's going on for you today?";
   }
   if (NOT_MUCH_RE.test(trimmed)) {
     return "That's okay. Sometimes a quiet day is exactly what we need.";

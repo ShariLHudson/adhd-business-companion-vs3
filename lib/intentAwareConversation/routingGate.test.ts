@@ -25,6 +25,8 @@ describe("routingGate", () => {
     expect(isRelationshipConversation("Good morning")).toBe(true);
     expect(isRelationshipConversation("Thank you")).toBe(true);
     expect(isRelationshipConversation("You're doing a great job")).toBe(true);
+    expect(isRelationshipConversation("not much. how about you")).toBe(true);
+    expect(isRelationshipConversation("not much")).toBe(true);
   });
 
   it("does not treat positive sentiment as celebration", () => {

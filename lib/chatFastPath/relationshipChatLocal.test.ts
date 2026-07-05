@@ -26,6 +26,15 @@ describe("relationshipChatLocal", () => {
     expect(reply).not.toMatch(/tell me what you need/i);
   });
 
+  it("completes how-about-you check-in locally without high classifier confidence", () => {
+    const text = "not much. how about you";
+    const decision = classifyPrimaryConversationTurn({ userText: text });
+    expect(shouldCompleteRelationshipChatLocally(decision, text)).toBe(true);
+    const reply = relationshipConversationLocalReply(text);
+    expect(reply).toMatch(/good|thanks for asking|quiet/i);
+    expect(reply).not.toMatch(/tell me what you need/i);
+  });
+
   it("does not local-complete low-confidence relationship turns", () => {
     const decision = classifyPrimaryConversationTurn({
       userText: "maybe we could talk later",
