@@ -25,6 +25,7 @@ import {
   formatUncertaintyMenu,
   guidedCreationHint,
 } from "./phases";
+import { formatPostDraftReviewPrompt } from "./guidedCreationFlow";
 import type {
   UniversalCreationSession,
   UniversalCreationTurnResult,
@@ -347,6 +348,25 @@ export function advanceUniversalCreation(
     question: following.question.prompt,
     session: { ...updated, questionIndex: following.index },
   };
+}
+
+export function formatUniversalCreationTurnReply(
+  turn: UniversalCreationTurnResult,
+): string {
+  if (turn.kind === "question") {
+    return formatUniversalCreationQuestion(turn);
+  }
+  if (turn.kind === "draft") {
+    return `${turn.message}\n\n${turn.draftBody}${formatPostDraftReviewPrompt()}`;
+  }
+  if (
+    turn.kind === "ready" ||
+    turn.kind === "uncertainty" ||
+    turn.kind === "message"
+  ) {
+    return turn.message;
+  }
+  return "";
 }
 
 export function formatUniversalCreationQuestion(
