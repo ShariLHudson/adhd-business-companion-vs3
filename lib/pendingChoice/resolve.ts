@@ -20,6 +20,16 @@ import {
   isLikelyMenuSelectionInput,
   parsePendingChoiceSelection,
 } from "./parseSelection";
+import {
+  buildExpandedPlaceMenu,
+  buildMenuAffirmationReply,
+  buildMenuMetaReply,
+  isCreateWorkflowContinuation,
+  isPendingMenuAffirmation,
+  isPendingMenuExpansionRequest,
+  isPendingMenuMetaQuestion,
+} from "./listContinuation";
+import { loadUniversalCreationSession } from "@/lib/universalCreation";
 import { isEmotionalSupportThread } from "@/lib/conversation/emotionalDistressRouting";
 import type {
   PendingChoiceItem,
@@ -160,9 +170,53 @@ export function resolvePendingChoiceTurn(
     return { kind: "cancelled", reply: "No problem — we can stay right here." };
   }
 
+  if (isCreateWorkflowContinuation(trimmed) && loadUniversalCreationSession()) {
+    clearPendingChoice();
+    return { kind: "topic_change" };
+  }
+
   if (hasHardEstateNavigationIntent(trimmed)) {
     clearPendingChoice();
     return { kind: "topic_change" };
+  }
+
+  if (isPendingMenuMetaQuestion(trimmed)) {
+    return {
+      kind: "continued",
+      reply: buildMenuMetaReply(state),
+      menuText: state.menuText,
+    };
+  }
+
+  if (isPendingMenuExpansionRequest(trimmed)) {
+    const expanded = buildExpandedPlaceMenu(state);
+    if (expanded) {
+      if (expanded.placeIds.length >= 2 && expanded.menuText !== state.menuText) {
+        registerPendingChoiceFromPlaceIds({
+          placeIds: expanded.placeIds,
+          menuText: expanded.menuText,
+          offeredAtTurn: state.offeredAtTurn,
+        });
+        return {
+          kind: "expanded",
+          reply: expanded.reply,
+          menuText: expanded.menuText,
+        };
+      }
+      return {
+        kind: "continued",
+        reply: expanded.reply,
+        menuText: state.menuText,
+      };
+    }
+  }
+
+  if (isPendingMenuAffirmation(trimmed)) {
+    return {
+      kind: "continued",
+      reply: buildMenuAffirmationReply(state),
+      menuText: state.menuText,
+    };
   }
 
   const selected = parsePendingChoiceSelection(trimmed, state.choices);

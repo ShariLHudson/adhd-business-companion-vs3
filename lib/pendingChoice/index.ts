@@ -38,3 +38,10 @@ export {
   resolvePendingChoiceTurn,
   shouldClearPendingChoiceForTopicChange,
 } from "./resolve";
+
+export {
+  isCreateWorkflowContinuation,
+  isPendingMenuAffirmation,
+  isPendingMenuExpansionRequest,
+  isPendingMenuMetaQuestion,
+} from "./listContinuation";

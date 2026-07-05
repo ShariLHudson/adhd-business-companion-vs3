@@ -62,6 +62,8 @@ export type PendingChoiceResolveResult =
   | { kind: "cancelled"; reply?: string }
   | { kind: "topic_change" }
   | { kind: "unrecognized"; reply: string; menuText: string }
+  | { kind: "continued"; reply: string; menuText?: string }
+  | { kind: "expanded"; reply: string; menuText: string }
   | {
       kind: "resolved";
       choice: PendingChoiceItem;

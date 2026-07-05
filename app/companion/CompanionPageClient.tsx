@@ -834,7 +834,9 @@ import {
   type FrictionlessActionDecision,
 } from "@/lib/frictionlessActionLayer";
 import {
+  clearPendingChoice,
   hasActivePendingChoice,
+  isCreateWorkflowContinuation,
   loadPendingChoice,
   resolvePendingChoiceTurn,
 } from "@/lib/pendingChoice";
@@ -10292,13 +10294,22 @@ export default function CompanionPageClient() {
       }
     }
 
+    if (
+      loadUniversalCreationSession() &&
+      isCreateWorkflowContinuation(trimmed)
+    ) {
+      clearPendingChoice();
+    }
+
     if (hasActivePendingChoice()) {
       const pendingTurnStarted = Date.now();
       const pendingResult = resolvePendingChoiceTurn(trimmed);
       if (
         pendingResult.kind === "resolved" ||
         pendingResult.kind === "unrecognized" ||
-        pendingResult.kind === "cancelled"
+        pendingResult.kind === "cancelled" ||
+        pendingResult.kind === "continued" ||
+        pendingResult.kind === "expanded"
       ) {
         const pendingState = loadPendingChoice();
         logTurnOwner({
@@ -10359,6 +10370,9 @@ export default function CompanionPageClient() {
             ? pendingResult.reply
             : pendingResult.kind === "unrecognized"
               ? pendingResult.reply
+              : pendingResult.kind === "continued" ||
+                  pendingResult.kind === "expanded"
+                ? pendingResult.reply
               : (pendingResult.reply ??
                 "No problem — we can stay right here.");
         setMessages((prev) => [
