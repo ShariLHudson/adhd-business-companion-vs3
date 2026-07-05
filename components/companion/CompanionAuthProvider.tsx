@@ -4,6 +4,7 @@ import {
   createContext,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -324,7 +325,9 @@ export function CompanionAuthProvider({
 }) {
   const authBypassed = isCompanionAuthBypassed();
 
-  seedInlineSupabaseOnClient(inlineSupabase);
+  useLayoutEffect(() => {
+    seedInlineSupabaseOnClient(inlineSupabase);
+  }, [inlineSupabase?.url, inlineSupabase?.anonKey]);
 
   const [configured, setConfigured] = useState(false);
   const [configChecked, setConfigChecked] = useState(false);
@@ -438,7 +441,7 @@ export function CompanionAuthProvider({
             const status = (first.error as { status?: number }).status;
             if (status === 429) resetCompanionAuthBackoff();
           }
-          for (let i = 0; i < 12; i += 1) {
+          for (let i = 0; i < 4; i += 1) {
             await new Promise((resolve) => window.setTimeout(resolve, 100));
             const retry = await supabase.auth.getSession();
             if (retry.data.session) return retry.data.session;
