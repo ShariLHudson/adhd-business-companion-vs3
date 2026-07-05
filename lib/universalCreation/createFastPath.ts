@@ -4,6 +4,7 @@
 
 import { isProjectCreationIntent } from "@/lib/createExperience/createExperienceRouting";
 import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
+import { isVisualStructureExecution } from "@/lib/visualStructureRouting";
 import { pluginById } from "./documentRegistry";
 import type { UniversalDocumentType } from "./types";
 
@@ -61,6 +62,7 @@ export function isSimpleCreateRequest(userText: string): boolean {
   if (isKnowledgeQuestion(t)) return false;
   if (isProjectCreationIntent(t)) return false;
   if (isDevelopmentWorkFrustration(t)) return false;
+  if (isVisualStructureExecution(t)) return false;
   if (SIMPLE_CREATE_VERB_RE.test(t)) return true;
   return inferDocumentTypeFromCreateText(t) !== null;
 }

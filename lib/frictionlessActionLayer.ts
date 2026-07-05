@@ -1048,6 +1048,8 @@ function resolveFrictionlessForPrimaryTurn(
     case "IMPLIED_NEED":
       return tryImpliedNeedFlow(input, routing);
     case "TASK_REQUEST": {
+      const visual = tryVisualStructureEarlyFlow(input, routing);
+      if (visual) return visual;
       if (isSimpleCreateRequest(input.userText.trim())) {
         logCreateFastPath({
           turn: input.currentTurn,
@@ -2269,6 +2271,100 @@ function buildVisualStructureDecision(
   };
 }
 
+function tryVisualStructureEarlyFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  const currentTurn = input.currentTurn ?? 0;
+  if (!userText) return null;
+
+  if (routing.learnFastPath || shouldSuppressVisualThinkingForLearn(userText)) {
+    return null;
+  }
+
+  const plannedVisualReply = resolveUnavailableVisualTypeReply(userText, {
+    priorContent: input.lastAssistantText,
+  });
+  if (plannedVisualReply) {
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "PLANNED VISUAL TYPE (P0.20.4): Not built yet — draft outline in chat; optional Mind Map offer. Never Create.",
+      localReply: plannedVisualReply,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    };
+  }
+
+  const visualRoute = resolveVisualStructureRoute(userText);
+  const visualOffer = resolveVisualStructureWorkspaceOffer(userText);
+  if (
+    visualOffer?.section === "visual-focus" &&
+    !shouldBlockVisualThinking(userText)
+  ) {
+    if (isVisualConversionRequest(userText) && input.lastAssistantText?.trim()) {
+      const view = detectConversionTargetView(userText);
+      if (view) {
+        const sourceValidation = validateVisualSourceContent({
+          userText,
+          sourceContent: input.lastAssistantText,
+          currentTurn,
+        });
+        if (!sourceValidation.ok) {
+          return {
+            category: "direct_action",
+            suppressRelationship: true,
+            suppressRecap: true,
+            suppressReflectionFirst: true,
+            responseHint:
+              "VISUAL SOURCE VALIDATION (P0.20.5): Prior content failed validation — ask for source instead of converting.",
+            localReply: buildVisualSourceAskReply(userText, sourceValidation),
+            pendingAction: null,
+            toolSuggestion: null,
+            workspaceOffer: null,
+            intentRouting: routing,
+          };
+        }
+        return {
+          category: "direct_action",
+          suppressRelationship: true,
+          suppressRecap: true,
+          suppressReflectionFirst: true,
+          responseHint:
+            "VISUAL CONVERSION (P0.20): Reuse chat content; open Visual Thinking immediately.",
+          localReply: immediateVisualOpenAck(view),
+          pendingAction: null,
+          immediateVisualOpen: {
+            mode: view.mode,
+            viewId: view.id,
+            viewTitle: view.title,
+            purposeAnswer: input.lastAssistantText.trim(),
+            ack: immediateVisualOpenAck(view),
+          },
+          toolSuggestion: null,
+          workspaceOffer: visualOffer,
+          intentRouting: routing,
+        };
+      }
+    }
+    return buildVisualStructureDecision(
+      visualOffer,
+      userText,
+      currentTurn,
+      routing,
+      visualRoute,
+    );
+  }
+
+  return null;
+}
+
 function buildMotivationSupportDecision(
   currentTurn: number,
 ): FrictionlessActionDecision {
@@ -2298,8 +2394,11 @@ function buildSimpleOverwhelmOrganizeDecision(
     buttonLabel: "Clear My Mind",
     line: "That sounds worth capturing while it's fresh. Would you like to step into Clear My Mind together?",
   };
+  const plainOverwhelm =
+    /\b(?:i'?m\s+)?overwhelmed\b/i.test(userText.trim()) &&
+    !/\btoo many ideas\b/i.test(userText);
   return {
-    category: "none",
+    category: plainOverwhelm ? "direct_action" : "none",
     suppressRelationship: true,
     suppressRecap: true,
     suppressReflectionFirst: true,
@@ -2336,8 +2435,16 @@ function shouldDeferEarlyOverwhelmRoute(
   userText: string,
   lastAssistantText?: string,
 ): boolean {
-  if (resolveEstateNavigationDiscovery(userText)) return true;
   if (isFocusSupportFollowUp(userText, lastAssistantText)) return true;
+  if (resolveEstateNavigationDiscovery(userText)) {
+    if (
+      /\boverwhelm/i.test(userText) &&
+      detectOverwhelmTodayRoute(userText)
+    ) {
+      return false;
+    }
+    return true;
+  }
   return false;
 }
 
@@ -2348,6 +2455,13 @@ function tryEarlyCompanionSupportFlow(
   const userText = input.userText.trim();
   const currentTurn = input.currentTurn ?? 0;
   if (!userText) return null;
+
+  if (
+    isMotivationProblem(userText) &&
+    !/\b(?:music|audio|sound|playlist|listen)\b/i.test(userText)
+  ) {
+    return buildEmotionalRegulationDecision(userText, currentTurn);
+  }
 
   const audio = buildAudioPending(userText, currentTurn);
   if (audio) return audio;
@@ -2383,6 +2497,23 @@ function tryEarlyCompanionSupportFlow(
       workspaceOffer: null,
       intentRouting: routing,
     };
+  }
+
+  if (
+    isOverwhelmProblem(userText) &&
+    !detectOverwhelmTodayRoute(userText) &&
+    !shouldEnterDiscoveryMode(userText) &&
+    !isFocusSupportFollowUp(userText, input.lastAssistantText)
+  ) {
+    return buildSimpleOverwhelmOrganizeDecision(userText, currentTurn, routing);
+  }
+
+  if (
+    /\bkeep(?:s)?\s+procrastinat\w*\b/i.test(userText) &&
+    !/\b(?:sales|outreach|follow[- ]?up)\b/i.test(userText) &&
+    !/\bwhy do i\b/i.test(userText)
+  ) {
+    return buildFocusSupportDecision(currentTurn);
   }
 
   const strategyEarly = buildStrategyFrictionlessDecision(
@@ -2797,6 +2928,11 @@ function resolveFrictionlessActionImpl(
     return finishFrictionlessDecision(yesContinuation, sparkRuntime);
   }
 
+  const visualStructureFlow = tryVisualStructureEarlyFlow(input, routing);
+  if (visualStructureFlow) {
+    return finishFrictionlessDecision(visualStructureFlow, sparkRuntime);
+  }
+
   const musicGuidance = tryMusicCreationGuidance(userText, routing);
   if (musicGuidance) {
     return finishFrictionlessDecision(musicGuidance, sparkRuntime);
@@ -2929,84 +3065,8 @@ function resolveFrictionlessActionImpl(
     };
   }
 
-  const plannedVisualReply = resolveUnavailableVisualTypeReply(userText, {
-    priorContent: input.lastAssistantText,
-  });
-  if (plannedVisualReply) {
-    return {
-      category: "direct_action",
-      suppressRelationship: true,
-      suppressRecap: true,
-      suppressReflectionFirst: true,
-      responseHint:
-        "PLANNED VISUAL TYPE (P0.20.4): Not built yet — draft outline in chat; optional Mind Map offer. Never Create.",
-      localReply: plannedVisualReply,
-      pendingAction: null,
-      toolSuggestion: null,
-      workspaceOffer: null,
-      intentRouting: routing,
-    };
-  }
-
-  const visualRoute = resolveVisualStructureRoute(userText);
-  const visualOffer = resolveVisualStructureWorkspaceOffer(userText);
-  if (
-    visualOffer?.section === "visual-focus" &&
-    !shouldBlockVisualThinking(userText)
-  ) {
-    if (isVisualConversionRequest(userText) && input.lastAssistantText?.trim()) {
-      const view = detectConversionTargetView(userText);
-      if (view) {
-        const sourceValidation = validateVisualSourceContent({
-          userText,
-          sourceContent: input.lastAssistantText,
-          currentTurn,
-        });
-        if (!sourceValidation.ok) {
-          return {
-            category: "direct_action",
-            suppressRelationship: true,
-            suppressRecap: true,
-            suppressReflectionFirst: true,
-            responseHint:
-              "VISUAL SOURCE VALIDATION (P0.20.5): Prior content failed validation — ask for source instead of converting.",
-            localReply: buildVisualSourceAskReply(userText, sourceValidation),
-            pendingAction: null,
-            toolSuggestion: null,
-            workspaceOffer: null,
-            intentRouting: routing,
-          };
-        }
-        return {
-          category: "direct_action",
-          suppressRelationship: true,
-          suppressRecap: true,
-          suppressReflectionFirst: true,
-          responseHint:
-            "VISUAL CONVERSION (P0.20): Reuse chat content; open Visual Thinking immediately.",
-          localReply: immediateVisualOpenAck(view),
-          pendingAction: null,
-          immediateVisualOpen: {
-            mode: view.mode,
-            viewId: view.id,
-            viewTitle: view.title,
-            purposeAnswer: input.lastAssistantText.trim(),
-            ack: immediateVisualOpenAck(view),
-          },
-          toolSuggestion: null,
-          workspaceOffer: visualOffer,
-          intentRouting: routing,
-        };
-      }
-    }
-    return buildVisualStructureDecision(
-      visualOffer,
-      userText,
-      currentTurn,
-      routing,
-      visualRoute,
-    );
-  }
+  const visualStructureLate = tryVisualStructureEarlyFlow(input, routing);
+  if (visualStructureLate) return visualStructureLate;
 
   const sheetType = detectSheetIntent(userText);
   if (sheetType && !shouldExcludeSheetOffer(userText)) {

@@ -18,7 +18,7 @@ const FOCUS_RE =
   /\b(?:need to focus|help me focus|help me concentrate|can'?t concentrate|trouble concentrating|stay focused|hard to focus|lose focus|losing focus|can'?t stay on task|stay on task)\b/i;
 
 const OVERWHELM_RE =
-  /\b(?:i'?m\s+overwhelm(?:ed)?|feels?\s+overwhelm(?:ed)?|too much to do|don'?t know where to start|everything feels urgent|not sure where to start|too many things|can'?t prioritize|don'?t know where to begin)\b/i;
+  /\b(?:i'?m\s+overwhelm(?:ed)?|feels?\s+overwhelm(?:ed)?|too much to do|too much on my (?:brain|mind|head)|have too much on my (?:brain|mind|head)|don'?t know where to start|everything feels urgent|not sure where to start|too many things|can'?t prioritize|don'?t know where to begin)\b/i;
 
 const MOTIVATION_RE =
   /\b(?:need motivation|can'?t motivate|no motivation|not motivated)\b/i;
