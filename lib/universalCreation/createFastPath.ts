@@ -3,8 +3,10 @@
  */
 
 import { isProjectCreationIntent } from "@/lib/createExperience/createExperienceRouting";
+import { isGoogleSheetWorthyRequest } from "@/lib/googleSheetsIntelligence";
 import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
 import { isVisualStructureExecution } from "@/lib/visualStructureRouting";
+import { shouldOfferVisualThinkingRecommendation } from "@/lib/visualThinkingOverreach";
 import { pluginById } from "./documentRegistry";
 import type { UniversalDocumentType } from "./types";
 
@@ -63,8 +65,17 @@ export function isSimpleCreateRequest(userText: string): boolean {
   if (isProjectCreationIntent(t)) return false;
   if (isDevelopmentWorkFrustration(t)) return false;
   if (isVisualStructureExecution(t)) return false;
+  if (isGoogleSheetWorthyRequest(t)) return false;
   if (SIMPLE_CREATE_VERB_RE.test(t)) return true;
-  return inferDocumentTypeFromCreateText(t) !== null;
+  const inferred = inferDocumentTypeFromCreateText(t);
+  if (
+    inferred &&
+    shouldOfferVisualThinkingRecommendation(t) &&
+    !SIMPLE_CREATE_VERB_RE.test(t)
+  ) {
+    return false;
+  }
+  return inferred !== null;
 }
 
 export function createFastPathRecoveryLine(userText: string): string {

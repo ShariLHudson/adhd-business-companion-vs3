@@ -5,6 +5,8 @@
 import { isRegistryArtifactExecution } from "@/lib/artifactRegistry";
 import { resolveImmediateCreateAction } from "@/lib/createExperience/createExperienceRouting";
 import { isProjectCreationIntent } from "@/lib/createExperience/createExperienceRouting";
+import { isGoogleSheetWorthyRequest } from "@/lib/googleSheetsIntelligence";
+import { shouldOfferVisualThinkingRecommendation } from "@/lib/visualThinkingOverreach";
 import {
   adaptivePreparationExtras,
   prefillDiscoveryFromAdaptiveMemory,
@@ -71,6 +73,10 @@ export function shouldEnterUniversalCreation(userText: string): boolean {
   const t = userText.trim();
   if (!t || EXPLICIT_ROOM_NAV_RE.test(t)) return false;
   if (isProjectCreationIntent(t)) return false;
+  if (isGoogleSheetWorthyRequest(t)) return false;
+  if (shouldOfferVisualThinkingRecommendation(t) && !isSimpleCreateRequest(t)) {
+    return false;
+  }
   if (!isSimpleCreateRequest(t) && !detectUniversalDocumentType(t)) return false;
   const docType = detectUniversalDocumentType(t) ?? "document";
   const session = buildInitialSession(t, docType, 0);

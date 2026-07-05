@@ -2,7 +2,7 @@
  * CREATE fast path — detection and Universal Creation routing.
  */
 
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import { classifyPrimaryConversationTurn } from "@/lib/conversation/primaryTurnClassifier";
 import { resolveFrictionlessAction } from "@/lib/frictionlessActionLayer";
 import { evaluateSparkDecisionEngine } from "@/lib/sparkCompanion";
@@ -12,6 +12,7 @@ import {
   shouldEnterUniversalCreation,
   resolveUniversalCreationTurn,
   formatUniversalCreationQuestion,
+  clearUniversalCreationSession,
 } from "@/lib/universalCreation";
 import {
   isSimpleCreateRequest,
@@ -21,6 +22,8 @@ import {
 const CREATE_PHRASES = [
   "Help me write a workshop",
   "Create a marketing plan",
+  "Help me build a marketing plan",
+  "Help me create an SOP",
   "Write an SOP",
   "Create a newsletter",
   "Build a webinar",
@@ -31,6 +34,10 @@ const CREATE_PHRASES = [
 ] as const;
 
 describe("CREATE fast path", () => {
+  beforeEach(() => {
+    clearUniversalCreationSession();
+  });
+
   it.each(CREATE_PHRASES)("%s — detects simple create", (text) => {
     expect(isSimpleCreateRequest(text)).toBe(true);
     expect(detectUniversalDocumentType(text)).toBeTruthy();

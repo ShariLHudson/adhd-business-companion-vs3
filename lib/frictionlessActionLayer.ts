@@ -2480,7 +2480,6 @@ function tryEarlyCompanionSupportFlow(
 
   if (
     isSelfUnderstandingIntent(userText) &&
-    shouldBlockVisualThinking(userText) &&
     !isExplicitVisualThinkingRequest(userText) &&
     !isVisualConversionRequest(userText)
   ) {
@@ -2592,6 +2591,32 @@ function buildStrategyFrictionlessDecision(
   };
 }
 
+function tryVisualRecommendationFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  const currentTurn = input.currentTurn ?? 0;
+  if (
+    !shouldRouteBusinessStrategyToCreate(userText) &&
+    routing.category !== "learn" &&
+    !routing.learnFastPath &&
+    !shouldSuppressVisualRecommendation(userText) &&
+    shouldOfferVisualRecommendation(userText)
+  ) {
+    if (isRegistryArtifactExecution(userText) || isSimpleCreateRequest(userText)) {
+      return null;
+    }
+    return buildVisualRecommendationDecision(
+      userText,
+      currentTurn,
+      routing,
+      input.lastAssistantText,
+    );
+  }
+  return null;
+}
+
 function buildVisualRecommendationDecision(
   userText: string,
   currentTurn: number,
@@ -2633,6 +2658,7 @@ function tryImmediateEstateExperienceAction(
   currentTurn: number,
   routing: IntentRoutingDecision,
 ): FrictionlessActionDecision | null {
+  if (isSelfUnderstandingIntent(userText)) return null;
   if (
     shouldCoachBeforeNavigate(userText) ||
     shouldEnterDiscoveryMode(userText) ||
@@ -2974,6 +3000,11 @@ function resolveFrictionlessActionImpl(
   const emotionalCanonFlow = tryEmotionalCanonFlow(input, routing, sparkRuntime);
   if (emotionalCanonFlow) return emotionalCanonFlow;
 
+  const sheetTypeEarly = detectSheetIntent(userText);
+  if (sheetTypeEarly && !shouldExcludeSheetOffer(userText)) {
+    return buildGoogleSheetsIntakeDecision(sheetTypeEarly, userText, currentTurn);
+  }
+
   if (!routing.learnFastPath && isSimpleCreateRequest(userText)) {
     logCreateFastPath({
       turn: currentTurn,
@@ -2995,6 +3026,9 @@ function resolveFrictionlessActionImpl(
 
   const estateGuideFlow = tryEstateGuideFlow(input, routing);
   if (estateGuideFlow) return estateGuideFlow;
+
+  const visualRecommendationFlow = tryVisualRecommendationFlow(input, routing);
+  if (visualRecommendationFlow) return visualRecommendationFlow;
 
   const universalCreationFlow = tryUniversalCreationFlow(input, routing);
   if (universalCreationFlow) return universalCreationFlow;
@@ -3140,20 +3174,8 @@ function resolveFrictionlessActionImpl(
     };
   }
 
-  if (
-    !shouldRouteBusinessStrategyToCreate(userText) &&
-    routing.category !== "learn" &&
-    !routing.learnFastPath &&
-    !shouldSuppressVisualRecommendation(userText) &&
-    shouldOfferVisualRecommendation(userText)
-  ) {
-    return buildVisualRecommendationDecision(
-      userText,
-      currentTurn,
-      routing,
-      input.lastAssistantText,
-    );
-  }
+  const visualRecommendationLate = tryVisualRecommendationFlow(input, routing);
+  if (visualRecommendationLate) return visualRecommendationLate;
 
   return {
     ...none,
