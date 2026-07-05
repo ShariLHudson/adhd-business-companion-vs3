@@ -141,6 +141,10 @@ function runCompanionAuditTests() {
   });
 }
 
+function isCiEnvironment() {
+  return Boolean(process.env.VERCEL || process.env.CI);
+}
+
 function warnIfNeeded() {
   const { remind, reasons, changedPaths } = shouldRemind();
   if (!remind) return;
@@ -166,6 +170,16 @@ if (mode === "record") {
 }
 
 if (mode === "post-build" || mode === "dev") {
+  if (mode === "post-build" && isCiEnvironment()) {
+    console.log("Companion behavior audit (CI)…");
+    const result = runCompanionAuditTests();
+    if ((result.status ?? 1) !== 0) {
+      console.error("\n❌ Companion audit failed on CI.\n");
+      process.exit(result.status ?? 1);
+    }
+    console.log("✓ Companion behavior audit passed.");
+    process.exit(0);
+  }
   warnIfNeeded();
   process.exit(0);
 }
