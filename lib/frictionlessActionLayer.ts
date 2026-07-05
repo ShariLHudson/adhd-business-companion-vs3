@@ -11,6 +11,7 @@
 
 import { detectAudioRequest } from "./audioSuggestions";
 import { isConfirmationAcceptance } from "./conversationConfirmationGate";
+import { shouldSuppressEnvironmentNeedDuringDistress } from "./conversation/emotionalDistressRouting";
 import {
   formatEmotionalFirstOpening,
   planEmotionalFirstResponse,
@@ -100,6 +101,7 @@ import {
   clearUniversalCreationSession,
   detectUniversalDocumentType,
   formatUniversalCreationQuestion,
+  formatUniversalCreationTurnReply,
   resolveUniversalCreationTurn,
   saveUniversalCreationSession,
   shouldEnterUniversalCreation,
@@ -111,6 +113,7 @@ import {
   isSimpleCreateRequest,
   logCreateFastPath,
 } from "./universalCreation/createFastPath";
+import { isCreateFlowAssistantContext } from "./universalCreation/createFlowContext";
 import {
   estateGuideHint,
   formatEstateGuideReply,
@@ -177,6 +180,7 @@ import { clearVisualRecommendationPending } from "./visualThinkingContinuation";
 import { isVisualThinkingMenuOfferMessage } from "./visualThinkingContinuation";
 import {
   isActivationProblem,
+  isFocusProblem,
   isMotivationProblem,
   isOverwhelmProblem,
   isRelationshipQuestion,
@@ -193,7 +197,10 @@ import {
   buildVisualSourceAskReply,
   validateVisualSourceContent,
 } from "./visualSourceContentValidation";
-import { shouldBlockVisualThinking } from "./visualThinkingOverreach";
+import {
+  isExplicitVisualThinkingRequest,
+  shouldBlockVisualThinking,
+} from "./visualThinkingOverreach";
 import {
   detectConversionTargetView,
   detectExplicitVisualView,
@@ -387,7 +394,7 @@ const FOCUS_SUPPORT_RE =
   /\b(?:need to focus|help me focus|help me concentrate|can'?t concentrate|trouble concentrating|stay focused|hard to focus|lose focus|losing focus|can'?t stay on task|stay on task)\b/i;
 
 const EMOTIONAL_REGULATION_RE =
-  /\b(?:can'?t catch (?:my )?breath|breathless|panicking|panic attack|having a panic|need to calm down|calm me down|help me calm|feel(?:ing)? anxious|i am anxious|i'?m anxious)\b/i;
+  /\b(?:can'?t seem to relax|can'?t relax|catch(?:ing)? (?:my )?breath|can'?t catch (?:my )?breath|breathless|panicking|panic attack|having a panic|need to calm down|calm me down|help me calm|feel(?:ing)? anxious|i am anxious|i'?m anxious)\b/i;
 
 const PRODUCTIVITY_FRAMING_RE =
   /\b(?:plan my day|marketing plan|launch|revenue|clients?|business|productivity|get more done|prioritize my day)\b/i;
@@ -758,6 +765,7 @@ function tryEmotionalCanonFlow(
   const userText = input.userText.trim();
   if (!userText) return null;
   if (runtime.suppressEmotionalCoaching) return null;
+  if (isCreateFlowAssistantContext(input.lastAssistantText)) return null;
 
   const localReply = buildCanonicalEmotionalLocalReply(userText);
   const decision = evaluateEmotionalFirstActionSecond({ userText });
@@ -1329,7 +1337,15 @@ function tryEstateConciergeFlow(
 ): FrictionlessActionDecision | null {
   const userText = input.userText.trim();
   if (!userText) return null;
-  if (isEstateGuideQuestion(userText)) return null;
+  if (
+    shouldSuppressEnvironmentNeedDuringDistress(
+      userText,
+      input.lastAssistantText,
+    )
+  ) {
+    return null;
+  }
+  if (isEstateGuideQuestion(userText, input.lastAssistantText)) return null;
   if (shouldEnterUniversalCreation(userText)) return null;
   if (shouldEnterDiscoveryMode(userText)) return null;
   if (isRegistryArtifactExecution(userText)) return null;
@@ -1382,7 +1398,12 @@ function tryEstateGuideFlow(
   routing: IntentRoutingDecision,
 ): FrictionlessActionDecision | null {
   const userText = input.userText.trim();
-  if (!userText || !isEstateGuideQuestion(userText)) return null;
+  if (
+    !userText ||
+    !isEstateGuideQuestion(userText, input.lastAssistantText)
+  ) {
+    return null;
+  }
   if (
     routing.learnFastPath &&
     !isEstateOrientationQuestion(userText) &&
@@ -1437,6 +1458,16 @@ function tryUniversalCreationFlow(
 ): FrictionlessActionDecision | null {
   const userText = input.userText.trim();
   if (!userText) return null;
+  if (routing.learnFastPath) return null;
+  if (isProjectCreationIntent(userText)) return null;
+  if (isMomentumForwardIntent(userText)) return null;
+  if (shouldCoachBeforeNavigate(userText)) return null;
+  if (
+    resolveEstateNavigationDisambiguation(userText) ||
+    resolveEstateNavigationDiscovery(userText)
+  ) {
+    return null;
+  }
 
   let turn;
   try {
@@ -1471,6 +1502,40 @@ function tryUniversalCreationFlow(
   }
 
   if (turn.kind === "uncertainty") {
+    saveUniversalCreationSession(turn.session);
+    return {
+      category: "universal_creation",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: universalCreationHint(turn.session, turn),
+      localReply: turn.message,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+      universalCreationSession: turn.session,
+    };
+  }
+
+  if (turn.kind === "draft" || turn.kind === "ready") {
+    saveUniversalCreationSession(turn.session);
+    return {
+      category: "universal_creation",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: universalCreationHint(turn.session, turn),
+      localReply: formatUniversalCreationTurnReply(turn),
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+      universalCreationSession: turn.session,
+    };
+  }
+
+  if (turn.kind === "message") {
     saveUniversalCreationSession(turn.session);
     return {
       category: "universal_creation",
@@ -1694,7 +1759,7 @@ function buildFocusSupportDecision(
     responseHint:
       "FOCUS SUPPORT (P0.9): Help pick ONE focus thread. Offer Focus Mode or Focus Audio if helpful. No relationship observations. No recap.",
     localReply:
-      "Let's choose one focus thread. What needs your attention most right now?\n\nIf it helps, we can also use **Focus Mode** or **Focus Audio** — want either of those?",
+      "Let's choose one focus thread. What needs your attention most right now?",
     pendingAction: null,
     toolSuggestion: null,
     workspaceOffer: null,
@@ -1935,10 +2000,10 @@ function buildSimpleOverwhelmOrganizeDecision(
   const offer = {
     section: "brain-dump" as const,
     buttonLabel: "Clear My Mind",
-    line: "That sounds worth capturing while it's fresh. Would you like to step into Clear My Mind™ together?",
+    line: "That sounds worth capturing while it's fresh. Would you like to step into Clear My Mind together?",
   };
   return {
-    category: "direct_action",
+    category: "none",
     suppressRelationship: true,
     suppressRecap: true,
     suppressReflectionFirst: true,
@@ -1952,6 +2017,94 @@ function buildSimpleOverwhelmOrganizeDecision(
     workspaceOffer: offer,
     intentRouting: routing,
   };
+}
+
+function isFocusSupportFollowUp(
+  userText: string,
+  lastAssistantText?: string,
+): boolean {
+  if (!lastAssistantText?.trim()) return false;
+  if (
+    !/choose one focus thread|what needs your attention most/i.test(
+      lastAssistantText,
+    )
+  ) {
+    return false;
+  }
+  return /\b(?:too many thoughts|can't get started|keep getting interrupted|can't concentrate|distracted|no motivation|anxious|tired)\b/i.test(
+    userText,
+  );
+}
+
+function shouldDeferEarlyOverwhelmRoute(
+  userText: string,
+  lastAssistantText?: string,
+): boolean {
+  if (resolveEstateNavigationDiscovery(userText)) return true;
+  if (isFocusSupportFollowUp(userText, lastAssistantText)) return true;
+  return false;
+}
+
+function tryEarlyCompanionSupportFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const userText = input.userText.trim();
+  const currentTurn = input.currentTurn ?? 0;
+  if (!userText) return null;
+
+  const audio = buildAudioPending(userText, currentTurn);
+  if (audio) return audio;
+
+  if (
+    !shouldDeferEarlyOverwhelmRoute(userText, input.lastAssistantText) &&
+    detectOverwhelmTodayRoute(userText)
+  ) {
+    const overwhelm = buildOverwhelmFrictionlessDecision(
+      userText,
+      currentTurn,
+      routing,
+    );
+    if (overwhelm) return overwhelm;
+  }
+
+  if (
+    isSelfUnderstandingIntent(userText) &&
+    shouldBlockVisualThinking(userText) &&
+    !isExplicitVisualThinkingRequest(userText) &&
+    !isVisualConversionRequest(userText)
+  ) {
+    return {
+      category: "none",
+      suppressRelationship: false,
+      suppressRecap: false,
+      suppressReflectionFirst: false,
+      responseHint:
+        "RELATIONSHIP REFLECTION (P0.17): Self-understanding turn — warm conversation, one thoughtful question. No tools. No Visual Thinking.",
+      localReply: null,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    };
+  }
+
+  const strategyEarly = buildStrategyFrictionlessDecision(
+    userText,
+    currentTurn,
+    routing,
+  );
+  if (strategyEarly) return strategyEarly;
+
+  if (/\btoo many ideas\b/i.test(userText) && shouldBlockVisualThinking(userText)) {
+    return buildSimpleOverwhelmOrganizeDecision(userText, currentTurn, routing);
+  }
+
+  if (isFocusProblem(userText) && !isOverwhelmProblem(userText)) {
+    return buildFocusSupportDecision(currentTurn);
+  }
+
+  return null;
 }
 
 function buildOverwhelmFrictionlessDecision(
@@ -2331,6 +2484,11 @@ function resolveFrictionlessActionImpl(
     overwhelmed: input.overwhelmed,
   });
 
+  const earlySupport = tryEarlyCompanionSupportFlow(input, routing);
+  if (earlySupport) {
+    return finishFrictionlessDecision(earlySupport, sparkRuntime);
+  }
+
   const pendingChoiceFlow = tryPendingChoiceFlow(input, routing);
   if (pendingChoiceFlow) {
     return finishFrictionlessDecision(pendingChoiceFlow, sparkRuntime);
@@ -2377,7 +2535,7 @@ function resolveFrictionlessActionImpl(
   const emotionalCanonFlow = tryEmotionalCanonFlow(input, routing, sparkRuntime);
   if (emotionalCanonFlow) return emotionalCanonFlow;
 
-  if (isSimpleCreateRequest(userText)) {
+  if (!routing.learnFastPath && isSimpleCreateRequest(userText)) {
     logCreateFastPath({
       turn: currentTurn,
       userText,

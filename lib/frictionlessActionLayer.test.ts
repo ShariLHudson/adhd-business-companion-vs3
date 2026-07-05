@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { clearDiscoverySession } from "./estateBrain/discoveryMode";
+import { clearUniversalCreationSession } from "./universalCreation/orchestrator";
 import { buildRelationshipLeadParagraph } from "./relationshipResponseContract";
 import {
   clearFrictionlessPending,
@@ -23,6 +25,8 @@ describe("frictionlessActionLayer", () => {
       clear: () => mem.clear(),
     });
     clearFrictionlessPending();
+    clearUniversalCreationSession();
+    clearDiscoverySession();
     vi.restoreAllMocks();
   });
 
@@ -36,11 +40,11 @@ describe("frictionlessActionLayer", () => {
     expect(decision.pendingAction?.target).toBe("focus-audio");
   });
 
-  it("routes I need to focus to discovery before coaching or navigation", () => {
+  it("routes I need to focus to focus support before coaching or navigation", () => {
     const decision = resolveFrictionlessAction({ userText: "I need to focus" });
-    expect(decision.category).toBe("estate_discovery");
+    expect(decision.category).toBe("focus_support");
     expect(decision.suppressRelationship).toBe(true);
-    expect(decision.localReply).toMatch(/making it hardest to focus/i);
+    expect(decision.localReply).toMatch(/one focus thread/i);
     expect(decision.immediateEstateCoachingOpen).toBeUndefined();
     expect(decision.immediateCreateOpen).toBeUndefined();
   });
@@ -89,7 +93,9 @@ describe("frictionlessActionLayer", () => {
     });
     expect(decision.category).toBe("universal_creation");
     expect(decision.immediateCreateOpen).toBeUndefined();
-    expect(decision.localReply).toMatch(/understand what you're building|reason you're creating/i);
+    expect(decision.localReply).toMatch(
+      /understand what you're building|reason you're creating|map a funnel|offer sits at the bottom/i,
+    );
     expect(decision.pendingAction).toBeNull();
   });
 

@@ -401,6 +401,31 @@ export function startDiscoveryTurn(
   };
 }
 
+const FOCUS_SUPPORT_FOLLOW_UP_RE =
+  /choose one focus thread|what needs your attention most/i;
+
+function resolveFocusSupportDiscoveryFollowUp(
+  userText: string,
+  currentTurn: number,
+  lastAssistantText: string,
+): DiscoveryTurnResult | null {
+  if (!FOCUS_SUPPORT_FOLLOW_UP_RE.test(lastAssistantText)) return null;
+
+  const session = buildInitialSession("I need to focus", "focus", currentTurn);
+  const updated = applyAnswer(session, "focus-obstacle", userText);
+  if (!isDiscoveryComplete(updated.confidence)) return null;
+
+  const action = resolveReadyAction(updated);
+  if (!action) return null;
+
+  return {
+    kind: "ready",
+    session: updated,
+    message: readyMessage(updated, action),
+    action,
+  };
+}
+
 export function resolveDiscoveryTurn(
   userText: string,
   currentTurn: number,
@@ -411,6 +436,15 @@ export function resolveDiscoveryTurn(
     if (stored) {
       return advanceDiscoverySession(stored, userText);
     }
+  }
+
+  if (lastAssistantText) {
+    const focusFollowUp = resolveFocusSupportDiscoveryFollowUp(
+      userText,
+      currentTurn,
+      lastAssistantText,
+    );
+    if (focusFollowUp) return focusFollowUp;
   }
 
   if (!shouldEnterDiscoveryMode(userText)) return null;
