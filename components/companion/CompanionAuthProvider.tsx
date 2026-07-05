@@ -333,6 +333,7 @@ export function CompanionAuthProvider({
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const explicitSignOutRef = useRef(false);
+  const signOutRecoveryRef = useRef(false);
 
   function applyAuthSession(sess: Session | null) {
     setSession(sess);
@@ -393,21 +394,28 @@ export function CompanionAuthProvider({
               return;
             }
             if (hasCompanionAuthStorageHint()) {
+              if (signOutRecoveryRef.current) return;
+              signOutRecoveryRef.current = true;
               void (async () => {
-                const refreshed = await supabase.auth.refreshSession();
-                if (!mounted) return;
-                if (refreshed.data.session) {
-                  applySession(refreshed.data.session);
-                  return;
+                try {
+                  const refreshed = await supabase.auth.refreshSession();
+                  if (!mounted) return;
+                  if (refreshed.data.session) {
+                    applySession(refreshed.data.session);
+                    return;
+                  }
+                  const retry = await supabase.auth.getSession();
+                  if (!mounted) return;
+                  if (retry.data.session) {
+                    applySession(retry.data.session);
+                    return;
+                  }
+                  clearCompanionAuthStorage();
+                  setSession(null);
+                  setUser(null);
+                } finally {
+                  signOutRecoveryRef.current = false;
                 }
-                const retry = await supabase.auth.getSession();
-                if (!mounted) return;
-                if (retry.data.session) {
-                  applySession(retry.data.session);
-                  return;
-                }
-                setSession(null);
-                setUser(null);
               })();
               return;
             }
@@ -439,6 +447,9 @@ export function CompanionAuthProvider({
             const refreshed = await supabase.auth.refreshSession();
             if (refreshed.data.session) return refreshed.data.session;
           }
+          if (hasCompanionAuthStorageHint()) {
+            clearCompanionAuthStorage();
+          }
           return null;
         }
 
@@ -456,32 +467,6 @@ export function CompanionAuthProvider({
       unsubscribe?.();
     };
   }, [authBypassed, inlineSupabase?.url, inlineSupabase?.anonKey]);
-
-  useEffect(() => {
-    if (authBypassed) return;
-    if (!configured || loading || user || session) return;
-    if (!sessionChecked || !hasCompanionAuthStorageHint()) return;
-
-    let cancelled = false;
-    const supabase = getCompanionSupabase();
-    if (!supabase) return;
-
-    void (async () => {
-      const first = await supabase.auth.getSession();
-      if (!cancelled && first.data.session) {
-        applyAuthSession(first.data.session);
-        return;
-      }
-      const refreshed = await supabase.auth.refreshSession();
-      if (!cancelled && refreshed.data.session) {
-        applyAuthSession(refreshed.data.session);
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [authBypassed, configured, loading, sessionChecked, user, session]);
 
   const value = useMemo<CompanionAuthContextValue>(
     () => ({

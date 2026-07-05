@@ -34,10 +34,11 @@ export function CompanionAuthGate({ children }: { children: ReactNode }) {
     typeof window !== "undefined" && isCompanionPostLoginQuiet();
   const hasStoredSession =
     typeof window !== "undefined" && hasCompanionAuthStorageHint();
+  /** Storage hint only bypasses the gate while session restore is still in flight. */
   const gateOpen =
     isAuthed ||
     loginHandoff ||
-    (sessionChecked && !loading && hasStoredSession);
+    ((!sessionChecked || loading) && hasStoredSession);
 
   useEffect(() => {
     if (isAuthed) {
