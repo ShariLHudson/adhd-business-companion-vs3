@@ -11,6 +11,7 @@ import {
   estateBrainExperiences,
 } from "@/lib/estateBrain/knowledgeRegistry";
 import { searchEstateBrain } from "@/lib/estateBrain/search";
+import { isCreateFlowAssistantContext } from "@/lib/universalCreation/createFlowContext";
 import { THINKING_FRAMEWORKS } from "./thinkingFrameworkRegistry";
 import { UNIVERSAL_DOCUMENT_LABELS } from "./creationKnowledge";
 import type { EstateGuideTopic, EstateGuideTurnResult } from "./types";
@@ -18,9 +19,35 @@ import type { EstateGuideTopic, EstateGuideTurnResult } from "./types";
 const ESTATE_GUIDE_RE =
   /\b(?:what can spark do|what does spark do|what (?:rooms|places) (?:are|do you have)|what (?:kinds? of )?journals|what visual (?:models?|thinking)|what (?:can|could) help (?:me )?grow (?:my )?business|how can spark help.*adhd|what features? am i missing|tell me about (?:the )?|why was (?:the )?|history of (?:the )?|what(?:'s| is) special about)\b/i;
 
-/** Member exploring what Spark can do — especially ADHD / capability questions. */
+/** Member exploring what Spark can do — not bare "adhd" in informational questions. */
 const CAPABILITY_EXPLORATION_RE =
-  /\b(?:(?:i (?:have|'ve got|'ve) )?adhd\b|(?:what|how) (?:can|could|does) (?:spark|this(?:\s+system)?|the system|it) (?:help|do)\b|wondering what (?:this|spark|the system|it) (?:can|could) help|what(?:'s| is) spark (?:good|helpful|useful) (?:for|with)|what can i do (?:here|with spark))\b/i;
+  /\b(?:(?:what|how) (?:can|could|does) (?:spark|this(?:\s+system)?|the system|\bit\b) (?:help|do)\b|wondering what (?:this|spark|the system|\bit\b) (?:can|could) help|what(?:'s| is) spark (?:good|helpful|useful) (?:for|with)|what can i do (?:here|with spark))\b/i;
+
+const SPARK_ADHD_CAPABILITY_RE =
+  /\b(?:(?:what|how)\s+(?:can|could|does)\s+(?:spark|this(?:\s+system)?|the\s+system|\bit\b).*\badhd\b|\badhd\b.*(?:\bspark\b|help\s+(?:me|with)|\bhere\b|\bestate\b))\b/i;
+
+const SPARK_CAPABILITY_ASK_RE =
+  /\b(?:what (?:can|does)|how (?:can|does)|what(?:'s| is))(?: spark| this(?:\s+system)?|\bit\b)\b/i;
+
+const MEMBER_ADHD_SHARING_RE =
+  /\b(?:i (?:have|'ve got|'ve been diagnosed with|'ve) adhd\b|my adhd\b|adhd (?:brain|makes|is) (?:hard|tough|overwhelming))\b/i;
+
+const CREATE_DISCOVERY_ADHD_PITCH_RE =
+  /\b(?:explain(?:ing)? to|show(?:ing)?|help(?:ing)?)\b.*\b(?:potential users|customers|audience|users)\b.*\badhd\s+app\b/i;
+
+/** Educational ADHD questions — not Estate capability tours. */
+const INFORMATIONAL_ADHD_RE =
+  /\b(?:symptoms?|signs?|what is|what are|diagnos|characteristics|traits|causes?|treatment|medication|explain|define|tell me about|difference between)\b/i;
+
+export function isInformationalAdhdQuestion(text: string): boolean {
+  const t = text.trim();
+  if (!t || !/\badhd\b/i.test(t)) return false;
+  if (CREATE_DISCOVERY_ADHD_PITCH_RE.test(t)) return true;
+  if (SPARK_ADHD_CAPABILITY_RE.test(t) || MEMBER_ADHD_SHARING_RE.test(t)) {
+    return false;
+  }
+  return INFORMATIONAL_ADHD_RE.test(t);
+}
 
 const ORIENTATION_WHAT_IS_RE =
   /\bwhat(?:'s| is) (?:the )?(?:butterfly conservatory|conservatory|estate|spark estate)\b/i;
@@ -41,10 +68,24 @@ export function isEstateOrientationQuestion(text: string): boolean {
   return false;
 }
 
-export function isEstateGuideQuestion(text: string): boolean {
+export function isEstateGuideQuestion(
+  text: string,
+  lastAssistantText?: string | null,
+): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (CREATE_DISCOVERY_ADHD_PITCH_RE.test(t)) return false;
+  if (
+    lastAssistantText?.trim() &&
+    isCreateFlowAssistantContext(lastAssistantText) &&
+    !SPARK_CAPABILITY_ASK_RE.test(t)
+  ) {
+    return false;
+  }
+  if (isInformationalAdhdQuestion(t)) return false;
   if (CAPABILITY_EXPLORATION_RE.test(t)) return true;
+  if (SPARK_ADHD_CAPABILITY_RE.test(t)) return true;
+  if (MEMBER_ADHD_SHARING_RE.test(t)) return true;
   if (isEstateOrientationQuestion(t)) return true;
   if (isEstateRoomStoryQuestion(t)) return true;
   return false;
@@ -52,13 +93,14 @@ export function isEstateGuideQuestion(text: string): boolean {
 
 function detectGuideTopic(text: string): EstateGuideTopic {
   const t = text.toLowerCase();
+  if (CREATE_DISCOVERY_ADHD_PITCH_RE.test(t)) return "general";
   if (ROOM_STORY_RE.test(t) && matchCanonicalPlaceInText(t)) return "room_story";
   if (/what can spark|what does spark/.test(t)) return "capabilities";
   if (/what rooms|what places/.test(t)) return "rooms";
   if (/journal/.test(t)) return "journals";
   if (/visual model|visual thinking|mind map|whiteboard/.test(t)) return "visual_models";
   if (/grow.*business|business growth/.test(t)) return "business_growth";
-  if (/adhd/.test(t)) return "adhd";
+  if (/adhd/.test(t) && !CREATE_DISCOVERY_ADHD_PITCH_RE.test(t)) return "adhd";
   if (/missing|don't know about|haven't tried/.test(t)) return "features_missing";
   return "general";
 }
