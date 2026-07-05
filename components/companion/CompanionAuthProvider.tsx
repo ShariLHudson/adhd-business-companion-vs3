@@ -4,7 +4,6 @@ import {
   createContext,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -33,8 +32,7 @@ import {
   sanitizeSupabaseAuthError,
 } from "@/lib/supabase/authErrors";
 import {
-  bootstrapCompanionSupabaseConfig,
-  companionAuthConfigured,
+  ensureCompanionSupabaseConfigured,
   getCompanionSupabase,
   hydrateCompanionAuthFromInlineConfig,
   resetCompanionAuthBackoff,
@@ -48,6 +46,8 @@ type CompanionInlineSupabaseConfig = {
 
 type CompanionAuthContextValue = {
   configured: boolean;
+  /** True after the first Supabase config bootstrap attempt finishes. */
+  configChecked: boolean;
   loading: boolean;
   /** True after the first session restore attempt finishes. */
   sessionChecked: boolean;
@@ -95,6 +95,19 @@ function syncUserToPrefs(user: User | null) {
     ...(email ? { email } : {}),
     ...(languagePrefs ?? {}),
   });
+}
+
+function seedInlineSupabaseOnClient(
+  inlineSupabase?: CompanionInlineSupabaseConfig | null,
+): void {
+  if (typeof window === "undefined") return;
+  if (inlineSupabase?.url && inlineSupabase.anonKey) {
+    seedCompanionSupabaseInlineConfig(
+      inlineSupabase.url,
+      inlineSupabase.anonKey,
+    );
+  }
+  hydrateCompanionAuthFromInlineConfig();
 }
 
 async function signInDirect(
@@ -311,29 +324,15 @@ export function CompanionAuthProvider({
 }) {
   const authBypassed = isCompanionAuthBypassed();
 
-  const [configured, setConfigured] = useState(() => {
-    if (typeof window === "undefined") return false;
-    hydrateCompanionAuthFromInlineConfig();
-    return companionAuthConfigured();
-  });
+  seedInlineSupabaseOnClient(inlineSupabase);
+
+  const [configured, setConfigured] = useState(false);
+  const [configChecked, setConfigChecked] = useState(false);
   const [loading, setLoading] = useState(() => !authBypassed);
   const [sessionChecked, setSessionChecked] = useState(() => authBypassed);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const explicitSignOutRef = useRef(false);
-
-  useLayoutEffect(() => {
-    if (inlineSupabase?.url && inlineSupabase.anonKey) {
-      seedCompanionSupabaseInlineConfig(
-        inlineSupabase.url,
-        inlineSupabase.anonKey,
-      );
-    }
-    hydrateCompanionAuthFromInlineConfig();
-    if (companionAuthConfigured()) {
-      setConfigured(true);
-    }
-  }, [inlineSupabase?.url, inlineSupabase?.anonKey]);
 
   function applyAuthSession(sess: Session | null) {
     setSession(sess);
@@ -344,8 +343,6 @@ export function CompanionAuthProvider({
   }
 
   useEffect(() => {
-    if (authBypassed) return;
-
     let mounted = true;
     let unsubscribe: (() => void) | undefined;
 
@@ -360,25 +357,24 @@ export function CompanionAuthProvider({
 
     void (async () => {
       try {
-        hydrateCompanionAuthFromInlineConfig();
-        let ready = companionAuthConfigured();
-        if (!ready) {
-          for (let attempt = 0; attempt < 4 && !ready; attempt += 1) {
-            ready = await bootstrapCompanionSupabaseConfig();
-            if (!ready && attempt < 3) {
-              await new Promise((resolve) =>
-                window.setTimeout(resolve, 200 * (attempt + 1)),
-              );
-            }
-          }
-        }
+        const authReady = await ensureCompanionSupabaseConfigured(
+          inlineSupabase,
+        );
         if (!mounted) return;
-        const authReady = companionAuthConfigured();
+
         setConfigured(authReady);
-        if (!authReady) return;
+        setConfigChecked(true);
+
+        if (authBypassed || !authReady) {
+          finishLoading();
+          return;
+        }
 
         const supabase = getCompanionSupabase();
-        if (!supabase) return;
+        if (!supabase) {
+          finishLoading();
+          return;
+        }
 
         const applySession = (sess: Session | null) => {
           if (!mounted) return;
@@ -459,7 +455,7 @@ export function CompanionAuthProvider({
       window.clearTimeout(loadingTimeout);
       unsubscribe?.();
     };
-  }, [authBypassed]);
+  }, [authBypassed, inlineSupabase?.url, inlineSupabase?.anonKey]);
 
   useEffect(() => {
     if (authBypassed) return;
@@ -490,16 +486,17 @@ export function CompanionAuthProvider({
   const value = useMemo<CompanionAuthContextValue>(
     () => ({
       configured,
+      configChecked,
       loading,
       sessionChecked,
       user,
       session,
       signIn: async (email, password) => {
-        hydrateCompanionAuthFromInlineConfig();
-        if (!companionAuthConfigured()) {
-          await bootstrapCompanionSupabaseConfig();
+        const ready = await ensureCompanionSupabaseConfigured(inlineSupabase);
+        if (ready) {
+          setConfigured(true);
+          setConfigChecked(true);
         }
-        if (companionAuthConfigured()) setConfigured(true);
         const result = await signInDirect(email, password);
         clearCompanionSignedOut();
         if (!result.error && result.session) {
@@ -514,6 +511,11 @@ export function CompanionAuthProvider({
         return { error: result.error, hint: result.hint };
       },
       signUp: async (email, password, name) => {
+        const ready = await ensureCompanionSupabaseConfigured(inlineSupabase);
+        if (ready) {
+          setConfigured(true);
+          setConfigChecked(true);
+        }
         const result = await signUpDirect(email, password, name);
         if (!result.error && result.session) {
           applyAuthSession(result.session);
@@ -535,9 +537,16 @@ export function CompanionAuthProvider({
       },
       resendSignUpConfirmation: resendSignUpConfirmationDirect,
       resetPassword: resetPasswordDirect,
-      signInWithGoogle: signInWithGoogleDirect,
+      signInWithGoogle: async () => {
+        const ready = await ensureCompanionSupabaseConfigured(inlineSupabase);
+        if (ready) {
+          setConfigured(true);
+          setConfigChecked(true);
+        }
+        return signInWithGoogleDirect();
+      },
     }),
-    [configured, loading, sessionChecked, user, session],
+    [configured, configChecked, loading, sessionChecked, user, session, inlineSupabase?.url, inlineSupabase?.anonKey],
   );
 
   return (

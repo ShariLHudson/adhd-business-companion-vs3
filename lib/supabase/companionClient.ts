@@ -105,6 +105,18 @@ function resolved(): ResolvedCompanionSupabaseEnv {
   return resolveCompanionSupabaseEnv();
 }
 
+/** Sync + async bootstrap — call once on app load before showing misconfig UI. */
+export async function ensureCompanionSupabaseConfigured(
+  inline?: { url: string; anonKey: string } | null,
+): Promise<boolean> {
+  if (inline?.url && inline.anonKey) {
+    seedCompanionSupabaseInlineConfig(inline.url, inline.anonKey);
+  }
+  hydrateCompanionAuthFromInlineConfig();
+  if (companionAuthConfigured()) return true;
+  return bootstrapCompanionSupabaseConfig();
+}
+
 /** Load Supabase URL + anon key from server when NEXT_PUBLIC vars are not in the client bundle. */
 export async function bootstrapCompanionSupabaseConfig(): Promise<boolean> {
   if (companionAuthConfigured()) return true;

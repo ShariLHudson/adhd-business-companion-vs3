@@ -11,7 +11,7 @@ import {
   recordAuthPasswordResetRequested,
   type AuthLoginMethod,
 } from "@/lib/companionAuthIntelligence";
-import { companionAuthConfigStatus, companionAuthMisconfigHint, bootstrapCompanionSupabaseConfig, companionAuthConfigured, hydrateCompanionAuthFromInlineConfig } from "@/lib/supabase/companionClient";
+import { companionAuthConfigStatus, companionAuthMisconfigHint, ensureCompanionSupabaseConfigured, companionAuthConfigured, hydrateCompanionAuthFromInlineConfig } from "@/lib/supabase/companionClient";
 import {
   COMPANION_LOGIN_FORGOT_PASSWORD_LABEL,
   COMPANION_LOGIN_OPENING_MESSAGE,
@@ -44,15 +44,14 @@ function friendlyAuthError(message: string): string {
 }
 
 function ConfigBanner() {
-  const { configured: authReady, loading, sessionChecked } =
-    useCompanionAuth();
+  const { configured: authReady, configChecked } = useCompanionAuth();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  if (!mounted || loading || !sessionChecked || authReady) return null;
+  if (!mounted || !configChecked || authReady) return null;
 
   const {
     hasUrl,
@@ -259,8 +258,7 @@ export function CompanionSignInForm({
   async function ensureAuthReady(): Promise<boolean> {
     hydrateCompanionAuthFromInlineConfig();
     if (companionAuthConfigured()) return true;
-    const ready = await bootstrapCompanionSupabaseConfig();
-    return ready && companionAuthConfigured();
+    return ensureCompanionSupabaseConfigured();
   }
 
   async function onGoogleSignIn() {

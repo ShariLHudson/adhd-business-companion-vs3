@@ -1,5 +1,4 @@
 import { CompanionAuthProvider } from "@/components/companion/CompanionAuthProvider";
-import { CompanionAuthInlineBootstrap } from "@/components/companion/CompanionAuthInlineBootstrap";
 import { CompanionLanguageProvider } from "@/components/companion/CompanionLanguageProvider";
 import { CompanionPhotoProvider } from "@/lib/companionPhotoProvider";
 import { LiveEcosystemInit } from "@/components/companion/LiveEcosystemInit";
@@ -63,12 +62,6 @@ export default function CompanionLayout({
 
   return (
     <HomesteadSceneProvider>
-      {inlineAuth ? (
-        <CompanionAuthInlineBootstrap
-          url={inlineAuth.url}
-          anonKey={inlineAuth.anonKey}
-        />
-      ) : null}
       <CompanionAuthProvider inlineSupabase={inlineAuth}>
         <CompanionLanguageProvider>
           <CompanionPhotoProvider>

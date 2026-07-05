@@ -25,7 +25,7 @@ export function CompanionAuthGate({ children }: { children: ReactNode }) {
     return <>{children}</>;
   }
   const router = useRouter();
-  const { configured, loading, sessionChecked, user, session } =
+  const { configured, configChecked, loading, sessionChecked, user, session } =
     useCompanionAuth();
   const redirectingRef = useRef(false);
 
@@ -51,14 +51,20 @@ export function CompanionAuthGate({ children }: { children: ReactNode }) {
       redirectingRef.current = false;
       return;
     }
-    if (!configured || !sessionChecked || loading || redirectingRef.current) {
+    if (
+      !configChecked ||
+      !configured ||
+      !sessionChecked ||
+      loading ||
+      redirectingRef.current
+    ) {
       return;
     }
     redirectingRef.current = true;
     router.replace("/companion/login");
-  }, [configured, sessionChecked, loading, gateOpen, router]);
+  }, [configChecked, configured, sessionChecked, loading, gateOpen, router]);
 
-  if (!configured) {
+  if (!configChecked || !configured) {
     return <>{children}</>;
   }
 

@@ -20,7 +20,7 @@ import {
 } from "@/lib/welcomeRoom";
 
 export function CompanionSignInExperience() {
-  const { loading, user, session, sessionChecked, configured: authReady } =
+  const { loading, user, session, sessionChecked, configured: authReady, configChecked } =
     useCompanionAuth();
 
   const [mounted, setMounted] = useState(false);
@@ -124,7 +124,7 @@ export function CompanionSignInExperience() {
             {COMPANION_LOGIN_PRIVACY_LINE}
           </p>
 
-          {!loading && sessionChecked && !authReady ? (
+          {configChecked && sessionChecked && !loading && !authReady ? (
             <p className="mt-4 text-center text-sm text-[#6b635a]">
               Sign-in is still being set up here. Try again shortly, or reach out
               if this keeps showing.
