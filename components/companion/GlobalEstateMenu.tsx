@@ -22,6 +22,8 @@ export type GlobalEstateMenuProps = {
   onAction: (actionId: EstateMenuActionId) => void;
   /** topbar = inline in TopBar; floating = fixed upper-right for immersive rooms */
   variant?: "topbar" | "floating";
+  /** When true, render inline inside EstateTopRightChrome (no separate portal). */
+  embedded?: boolean;
   className?: string;
 };
 
@@ -45,6 +47,7 @@ function useUserProfileDisplay() {
 export function GlobalEstateMenu({
   onAction,
   variant = "topbar",
+  embedded = false,
   className = "",
 }: GlobalEstateMenuProps) {
   const { imageUrl, initials, name } = useUserProfileDisplay();
@@ -95,7 +98,9 @@ export function GlobalEstateMenu({
 
   const rootClass =
     variant === "floating"
-      ? `global-estate-menu-anchor ${className}`.trim()
+      ? `global-estate-menu-anchor${
+          embedded ? " global-estate-menu-anchor--embedded" : ""
+        } ${className}`.trim()
       : `relative z-50 ${className}`.trim();
 
   const displayName = name?.trim() || "Your Estate";
@@ -211,9 +216,13 @@ export function GlobalEstateMenu({
     </div>
   );
 
-  if (variant === "floating") {
+  if (variant === "floating" && !embedded) {
     if (!mounted) return null;
     return createPortal(menu, document.body);
+  }
+
+  if (variant === "floating" && embedded && !mounted) {
+    return null;
   }
 
   return menu;

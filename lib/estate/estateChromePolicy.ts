@@ -6,6 +6,7 @@
  * @see docs/estate/PHASE_E_REMOVE_APPLICATION_CHROME_REPORT.md
  */
 
+import type { AppSection } from "@/lib/companionUi";
 import { getCanonicalEstatePlaceById } from "./canonicalEstateRegistry";
 import { goToPlace, type GoToPlaceResult } from "./goToPlace";
 
@@ -28,6 +29,8 @@ export type EstateChromePolicy = {
 
 export type EstateChromeContext = {
   placeId?: string | null;
+  /** Primary chat home — hide app chrome even when a workspace panel is beside chat. */
+  activeSection?: AppSection;
   welcomeHomePrimary?: boolean;
   profileEstateChromeActive?: boolean;
   estateImmersiveActive?: boolean;
@@ -37,6 +40,11 @@ export type EstateChromeContext = {
   momentumBuilderPrimary?: boolean;
   overlay?: string | null;
 };
+
+/** Estate-first chat at `/companion` home — not legacy dashboard shell. */
+export function isEstateHomeChatSection(ctx: EstateChromeContext): boolean {
+  return ctx.activeSection === "home" && ctx.overlay !== "signin";
+}
 
 function policyFromGoToPlace(result: GoToPlaceResult): EstateChromePolicy {
   const livingPlaceMode = result.category === "living-place";
@@ -74,7 +82,8 @@ const APPLICATION_DEFAULT: EstateChromePolicy = {
 /** True when member is inside an Estate place (not generic app layout). */
 export function isEstatePlaceChromeActive(ctx: EstateChromeContext): boolean {
   return Boolean(
-    ctx.welcomeHomePrimary ||
+    isEstateHomeChatSection(ctx) ||
+      ctx.welcomeHomePrimary ||
       ctx.profileEstateChromeActive ||
       ctx.estateImmersiveActive ||
       ctx.showDirectEstateOverlay ||
@@ -105,6 +114,10 @@ export function resolveEstateChromePolicy(
     if (place?.category === "living-place") {
       return { ...ESTATE_PLACE_DEFAULT, livingPlaceMode: true };
     }
+  }
+
+  if (isEstateHomeChatSection(ctx)) {
+    return ESTATE_PLACE_DEFAULT;
   }
 
   if (isEstatePlaceChromeActive(ctx)) {

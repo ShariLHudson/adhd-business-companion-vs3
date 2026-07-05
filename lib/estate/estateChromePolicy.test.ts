@@ -1,50 +1,64 @@
 import { describe, expect, it } from "vitest";
-
 import {
+  isEstateHomeChatSection,
   isEstatePlaceChromeActive,
   resolveEstateChromePolicy,
-  shouldSuppressEstateInvitationGrid,
-  shouldSuppressEstateTitlePlaque,
 } from "./estateChromePolicy";
 
-describe("estateChromePolicy", () => {
-  it("living places suppress invitation grids and title plaques", () => {
-    expect(shouldSuppressEstateInvitationGrid("greenhouse")).toBe(true);
-    expect(shouldSuppressEstateInvitationGrid("coffee-house")).toBe(true);
-    expect(shouldSuppressEstateInvitationGrid("reading-nook")).toBe(true);
-    expect(shouldSuppressEstateTitlePlaque("conservatory")).toBe(true);
-    expect(shouldSuppressEstateTitlePlaque("apple-orchard")).toBe(true);
+describe("Estate chrome policy — returning /companion user regression", () => {
+  it("hides application chrome on home chat even when a workspace panel is open", () => {
+    expect(
+      isEstatePlaceChromeActive({
+        activeSection: "home",
+        welcomeHomePrimary: false,
+        estateImmersiveActive: false,
+        overlay: null,
+      }),
+    ).toBe(true);
   });
 
-  it("destinations with object-invitation may show grids", () => {
-    expect(shouldSuppressEstateInvitationGrid("library")).toBe(false);
-    expect(shouldSuppressEstateInvitationGrid("momentum-institute")).toBe(false);
+  it("hides application chrome for welcome-home primary", () => {
+    expect(
+      isEstatePlaceChromeActive({
+        activeSection: "home",
+        welcomeHomePrimary: true,
+        overlay: null,
+      }),
+    ).toBe(true);
   });
 
-  it("direct estate overlay hides application chrome", () => {
+  it("shows application chrome during sign-in overlay on home", () => {
+    expect(
+      isEstateHomeChatSection({
+        activeSection: "home",
+        overlay: "signin",
+      }),
+    ).toBe(false);
+
+    expect(
+      resolveEstateChromePolicy({
+        activeSection: "home",
+        overlay: "signin",
+      }).hideApplicationChrome,
+    ).toBe(false);
+  });
+
+  it("resolveEstateChromePolicy hides sidebar/topbar tabs on home chat", () => {
     const policy = resolveEstateChromePolicy({
-      showDirectEstateOverlay: true,
-      placeId: "greenhouse",
+      activeSection: "home",
+      overlay: null,
     });
     expect(policy.hideApplicationChrome).toBe(true);
-    expect(policy.hideEstateHomeLink).toBe(false);
-    expect(policy.livingPlaceMode).toBe(true);
-    expect(policy.hideInvitationGrid).toBe(true);
+    expect(policy.showSubtleEstateMenu).toBe(true);
+    expect(policy.showGuidebook).toBe(true);
   });
 
-  it("generic home keeps application chrome", () => {
-    const policy = resolveEstateChromePolicy({
-      estateImmersiveActive: false,
-      showDirectEstateOverlay: false,
-    });
-    expect(policy.hideApplicationChrome).toBe(false);
-  });
-
-  it("detects estate place chrome contexts", () => {
+  it("legacy application chrome remains available during sign-in only on home", () => {
     expect(
-      isEstatePlaceChromeActive({ showDirectEstateOverlay: true }),
-    ).toBe(true);
-    expect(isEstatePlaceChromeActive({ welcomeHomePrimary: true })).toBe(true);
-    expect(isEstatePlaceChromeActive({})).toBe(false);
+      resolveEstateChromePolicy({
+        activeSection: "home",
+        overlay: "signin",
+      }).hideApplicationChrome,
+    ).toBe(false);
   });
 });

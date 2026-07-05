@@ -1,0 +1,41 @@
+/* Single upper-right cluster — Room (when present) + profile initials */
+
+.estate-top-right-chrome {
+  position: fixed;
+  top: max(0.85rem, env(safe-area-inset-top, 0px));
+  right: max(0.85rem, env(safe-area-inset-right, 0px));
+  z-index: 100003;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  pointer-events: none;
+}
+
+.estate-top-right-chrome > * {
+  pointer-events: auto;
+}
+
+.estate-top-right-chrome .estate-room-experience-menu {
+  position: static;
+  top: auto;
+  right: auto;
+  z-index: auto;
+}
+
+.estate-top-right-chrome .estate-room-experience-menu--with-estate-menu {
+  right: auto;
+}
+
+.estate-top-right-chrome .global-estate-menu-anchor,
+.estate-top-right-chrome
+  [data-companion-menu-layer="true"][data-estate-menu-variant="floating"].global-estate-menu-anchor {
+  position: static !important;
+  top: auto !important;
+  right: auto !important;
+  left: auto !important;
+  bottom: auto !important;
+  transform: none !important;
+  z-index: auto;
+}

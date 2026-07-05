@@ -21,6 +21,8 @@ export type EstateRoomExperienceMenuProps = {
   visible?: boolean;
   /** When true, shift left so the estate menu trigger stays at the corner. */
   withEstateMenu?: boolean;
+  /** When true, render inline inside EstateTopRightChrome (no separate portal). */
+  embedded?: boolean;
   onJustBeHere: () => void;
 };
 
@@ -32,6 +34,7 @@ export function EstateRoomExperienceMenu({
   roomId,
   visible = true,
   withEstateMenu = false,
+  embedded = false,
   onJustBeHere,
 }: EstateRoomExperienceMenuProps) {
   const [mounted, setMounted] = useState(false);
@@ -93,12 +96,15 @@ export function EstateRoomExperienceMenu({
 
   if (!mounted || !visible) return null;
 
-  return createPortal(
+  const menu = (
     <div
       ref={rootRef}
       className={[
         "estate-room-experience-menu",
-        withEstateMenu ? "estate-room-experience-menu--with-estate-menu" : "",
+        !embedded && withEstateMenu
+          ? "estate-room-experience-menu--with-estate-menu"
+          : "",
+        embedded ? "estate-room-experience-menu--embedded" : "",
         soundEnabled ? "estate-room-experience-menu--sound-on" : "",
         open ? "estate-room-experience-menu--open" : "",
         fullscreen ? "estate-room-experience-menu--fullscreen" : "",
@@ -192,7 +198,10 @@ export function EstateRoomExperienceMenu({
           ) : null}
         </>
       )}
-    </div>,
-    document.body,
+    </div>
   );
+
+  if (embedded) return menu;
+
+  return createPortal(menu, document.body);
 }

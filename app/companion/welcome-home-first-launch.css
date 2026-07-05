@@ -260,6 +260,7 @@ body.companion-welcome-home-mode .companion-sidebar-portal,
   pointer-events: none !important;
 }
 
+.companion-welcome-home-intro-active .estate-top-right-chrome,
 .companion-welcome-home-intro-active .global-estate-menu-anchor,
 .companion-welcome-home-intro-active .estate-room-experience-menu,
 .companion-welcome-home-intro-active .spark-estate-guide-anchor {

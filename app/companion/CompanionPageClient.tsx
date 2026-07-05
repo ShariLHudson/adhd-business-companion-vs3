@@ -12,9 +12,8 @@ import { propertyNavComingSoonMessage } from "@/lib/companionPropertyNav";
 import { EstateArrivalHost } from "@/components/companion/estate/EstateArrivalHost";
 import { EstatePlaceAudioHost } from "@/components/companion/estate/EstatePlaceAudioHost";
 import { EstatePresence } from "@/components/companion/estate/EstatePresence";
-import { GlobalEstateMenu } from "@/components/companion/GlobalEstateMenu";
+import { EstateTopRightChrome } from "@/components/companion/estate/EstateTopRightChrome";
 import { SparkEstateGuideChrome } from "@/components/companion/SparkEstateGuideChrome";
-import { EstateRoomExperienceMenu } from "@/components/companion/estate/EstateRoomExperienceMenu";
 import { EnjoyEstateVisitorChrome } from "@/components/companion/estate/EnjoyEstateVisitorChrome";
 import { estateArrivalShariGreeting } from "@/lib/estate/estateArrivalExperience";
 import { getEstateMemory } from "@/lib/estateMemory/estateMemoryStore";
@@ -707,6 +706,7 @@ import {
   peekWelcomeHomeReplayRequested,
   type WelcomeHomeFirstChoice,
 } from "@/lib/welcomeHome";
+import { getCompanionAuthIntelligence } from "@/lib/companionAuthIntelligence";
 import { evaluateWelcomeHomeExperience } from "@/lib/sparkExperienceEngine";
 import { resolveWelcomeHomeChatPrompt } from "@/lib/welcomeHome/chatPrompt";
 import {
@@ -2284,13 +2284,24 @@ export default function CompanionPageClient() {
   }, [homeCalm, homeArrival]);
 
   const welcomeHomeExperience = useMemo(
-    () =>
-      evaluateWelcomeHomeExperience({
+    () => {
+      const authIntel = getCompanionAuthIntelligence();
+      const isRepeatLogin = authIntel.loginCount > 1;
+      return evaluateWelcomeHomeExperience({
         hasSeenWelcomeIntro: hasSeenWelcomeIntro(),
         replayRequested: welcomeHomeReplay,
-      }),
+        isRepeatLogin,
+      });
+    },
     [welcomeHomeReplay, hydrated],
   );
+
+  useEffect(() => {
+    if (!hydrated || !welcomeHomePrimary) return;
+    if (getCompanionAuthIntelligence().loginCount > 1 && !hasSeenWelcomeIntro()) {
+      markWelcomeIntroSeen();
+    }
+  }, [hydrated, welcomeHomePrimary]);
 
   const welcomeHomeGreeting =
     welcomeHomeExperience.greeting ??
@@ -2444,11 +2455,11 @@ export default function CompanionPageClient() {
           key: Date.now(),
           strategyId: strategySnap.strategyId,
         });
+        // Estate-first: restore strategy state but do not cold-open split workspace.
         if (strategySnap.workspacePanelOpen) {
-          patchWorkspacePanel("playbook");
-          setActiveNav("playbook");
-          applyChatLayoutMode("split");
-          revealWorkspace();
+          saveStrategyApplySession(toStrategyApplySession(strategySnap), {
+            workspacePanelOpen: false,
+          });
         }
       }
 
@@ -17786,6 +17797,7 @@ export default function CompanionPageClient() {
   });
 
   const estatePlaceChromeActive = isEstatePlaceChromeActive({
+    activeSection,
     welcomeHomePrimary,
     profileEstateChromeActive,
     estateImmersiveActive,
@@ -17793,6 +17805,7 @@ export default function CompanionPageClient() {
     momentumInstitutePrimary,
     stablesPrimary,
     momentumBuilderPrimary,
+    overlay,
   });
 
   const estateChromePolicy = resolveEstateChromePolicy({
@@ -17801,6 +17814,7 @@ export default function CompanionPageClient() {
       profileEstateRoomOverlayId ??
       directEstateVisit?.roomId ??
       null,
+    activeSection,
     welcomeHomePrimary,
     profileEstateChromeActive,
     estateImmersiveActive,
@@ -17819,7 +17833,9 @@ export default function CompanionPageClient() {
     overlay !== "signin" && !justBeHereSession;
 
   const showCompanionBackControl =
-    overlay !== "signin" && !justBeHereSession;
+    overlay !== "signin" &&
+    !justBeHereSession &&
+    !estatePlaceChromeActive;
 
   const sparkEstateShellPlaceId =
     profileEstateRoomOverlayId ??
@@ -18107,13 +18123,6 @@ export default function CompanionPageClient() {
 
           {showCompanionBackControl ? (
             <EstateImmersiveHomeLink onClick={handleCompanionBack} />
-          ) : null}
-
-          {showGlobalEstateMenu ? (
-            <GlobalEstateMenu
-              variant="floating"
-              onAction={handleEstateMenuAction}
-            />
           ) : null}
 
           {sparkEstateShellPlaceId ? (
@@ -19748,13 +19757,17 @@ export default function CompanionPageClient() {
         onOpen={openSparkEstateGuideCore}
         onClose={() => setEstateGuideFlipbookOpen(false)}
       />
-      {showEstateExperienceMenu && estateExperienceMenuRoomId ? (
-        <EstateRoomExperienceMenu
-          roomId={estateExperienceMenuRoomId}
-          withEstateMenu={showGlobalEstateMenu}
-          onJustBeHere={() => enterJustBeHere(estateExperienceMenuRoomId)}
-        />
-      ) : null}
+      <EstateTopRightChrome
+        showProfile={showGlobalEstateMenu}
+        showRoom={showEstateExperienceMenu}
+        roomId={estateExperienceMenuRoomId}
+        onEstateMenuAction={handleEstateMenuAction}
+        onJustBeHere={() => {
+          if (estateExperienceMenuRoomId) {
+            enterJustBeHere(estateExperienceMenuRoomId);
+          }
+        }}
+      />
       {justBeHereSession ? (
         <EnjoyEstateVisitorChrome
           soundEnabled={justBeHereSoundEnabled}
