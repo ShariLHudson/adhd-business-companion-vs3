@@ -23,6 +23,15 @@ function applyRuntimeConfig(url: string, key: string): boolean {
   }
   runtimeConfig = { url: normalizedUrl, key };
   browserClient = null;
+  if (typeof window !== "undefined") {
+    const existing = window.__COMPANION_SUPABASE_CLIENT__;
+    if (
+      existing &&
+      (existing.url !== normalizedUrl || existing.key !== key)
+    ) {
+      delete window.__COMPANION_SUPABASE_CLIENT__;
+    }
+  }
   return true;
 }
 
@@ -31,6 +40,11 @@ type CompanionInlineAuth = { url: string; key: string };
 declare global {
   interface Window {
     __COMPANION_SUPABASE__?: CompanionInlineAuth;
+    __COMPANION_SUPABASE_CLIENT__?: {
+      url: string;
+      key: string;
+      client: SupabaseClient;
+    };
   }
 }
 
@@ -240,21 +254,33 @@ export function companionSupabaseEnvLooksSwapped(): boolean {
 export function getCompanionSupabase(): SupabaseClient | null {
   hydrateCompanionAuthFromInlineConfig();
   if (!companionAuthConfigured()) return null;
+
+  const url = getCompanionSupabaseUrl();
+  const key = getCompanionSupabaseAnonKey();
+
+  if (typeof window !== "undefined") {
+    const global = window.__COMPANION_SUPABASE_CLIENT__;
+    if (global && global.url === url && global.key === key) {
+      browserClient = global.client;
+      return global.client;
+    }
+  }
+
   if (browserClient) return browserClient;
 
-  browserClient = createClient(
-    getCompanionSupabaseUrl(),
-    getCompanionSupabaseAnonKey(),
-    {
-      global: { fetch: companionAuthFetch },
-      auth: {
-        persistSession: true,
-        autoRefreshToken: true,
-        detectSessionInUrl: true,
-        storageKey: "companion-supabase-auth",
-        storage: companionAuthStorage,
-      },
+  const client = createClient(url, key, {
+    global: { fetch: companionAuthFetch },
+    auth: {
+      persistSession: true,
+      autoRefreshToken: true,
+      detectSessionInUrl: true,
+      storageKey: "companion-supabase-auth",
+      storage: companionAuthStorage,
     },
-  );
-  return browserClient;
+  });
+  browserClient = client;
+  if (typeof window !== "undefined") {
+    window.__COMPANION_SUPABASE_CLIENT__ = { url, key, client };
+  }
+  return client;
 }
