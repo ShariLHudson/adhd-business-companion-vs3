@@ -306,6 +306,25 @@ export function tonePreferenceOverridesRoutingGuidance(
   );
 }
 
+/** Label for in-conversation drafts — mirrors Settings Conversation Style. */
+export function memberCreationToneLabel(
+  prefs: MemberTonePreferenceInput,
+): string {
+  const byTone: Record<MemberTonePreferenceInput["aiTone"], string> = {
+    gentle: "Warm and gentle",
+    balanced: "Balanced and clear",
+    direct: "Direct and kind",
+    playful: "Warm and conversational",
+    strategic: "Clear and strategic",
+    motivational: "Encouraging and clear",
+  };
+  const base = byTone[prefs.aiTone] ?? byTone.balanced;
+  if (prefs.helpMode === "concise") {
+    return `${base} — concise`;
+  }
+  return base;
+}
+
 /** True when hint text includes constitutional identity guardrails for tests. */
 export function hintPreservesShariIdentity(hint: string): boolean {
   const lower = hint.toLowerCase();
