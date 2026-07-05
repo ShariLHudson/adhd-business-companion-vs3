@@ -168,12 +168,26 @@ async function signInDirect(
           return { error: "Sign-in failed — could not save your session." };
         }
         resetCompanionAuthBackoff();
+        const persisted = await waitForCompanionAuthStorage(5_000);
+        if (!persisted) {
+          return {
+            error:
+              "Signed in, but this browser could not save your session. Free some storage or try another browser.",
+          };
+        }
         return { error: null, session: retry.data.session };
       }
       return { error: sanitizeSupabaseAuthError(error.message) };
     }
     if (!sessionData.session) {
       return { error: "Sign-in failed — could not save your session." };
+    }
+    const persisted = await waitForCompanionAuthStorage(5_000);
+    if (!persisted) {
+      return {
+        error:
+          "Signed in, but this browser could not save your session. Free some storage or try another browser.",
+      };
     }
     resetCompanionAuthBackoff();
     return { error: null, session: sessionData.session };

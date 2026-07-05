@@ -13,7 +13,7 @@ import {
   companionLoginHeadline,
   companionLoginSubtext,
 } from "@/lib/companionLoginPage";
-import { navigateToCompanionHome } from "@/lib/companionLoginTransition";
+import { navigateToCompanionHome, waitForCompanionAuthStorage } from "@/lib/companionLoginTransition";
 import {
   dismissWelcomeRoomInvitation,
   dismissWelcomeRoomLoginOffer,
@@ -42,13 +42,22 @@ export function CompanionSignInExperience() {
     setMounted(true);
   }, []);
 
-  const goHomeAfterAuth = useCallback(() => {
+  const goHomeAfterAuth = useCallback(async () => {
     if (navigatingRef.current) return;
     navigatingRef.current = true;
     setRedirecting(true);
     setRedirectError(null);
     dismissWelcomeRoomInvitation();
     dismissWelcomeRoomLoginOffer();
+    const persisted = await waitForCompanionAuthStorage(5_000);
+    if (!persisted) {
+      navigatingRef.current = false;
+      setRedirecting(false);
+      setRedirectError(
+        "Almost there — your browser did not save the session. Try signing in once more.",
+      );
+      return;
+    }
     navigateToCompanionHome();
   }, []);
 
