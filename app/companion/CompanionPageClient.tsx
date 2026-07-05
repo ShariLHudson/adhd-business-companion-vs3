@@ -937,6 +937,10 @@ import {
   shouldCompleteRelationshipChatLocally,
 } from "@/lib/chatFastPath/relationshipChatLocal";
 import {
+  isVagueHelpRequest,
+  vagueHelpLocalReply,
+} from "@/lib/chatFastPath/vagueHelpLocal";
+import {
   consumeCompanionChatStream,
   isCompanionChatStreamResponse,
 } from "@/lib/chatFastPath/companionChatStream";
@@ -951,8 +955,8 @@ import {
   isSimpleCreateRequest,
   isUniversalCreationMessage,
   loadUniversalCreationSession,
+  clearUniversalCreationSession,
   detectUniversalDocumentType,
-  createFastPathRecoveryLine,
 } from "@/lib/universalCreation";
 import {
   formatEstateGuideReply,
@@ -10176,6 +10180,46 @@ export default function CompanionPageClient() {
       return;
     }
 
+    if (isVagueHelpRequest(trimmed)) {
+      clearUniversalCreationSession();
+      lastUserTextRef.current = trimmed;
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      const reply = vagueHelpLocalReply();
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        { role: "assistant", content: reply },
+      ]);
+      recordPrimaryTurnResponse(reply);
+      markAssistantReplied(chatTurnState);
+      logConversationPipelineDiagnostic({
+        turn: chatTurnRef.current,
+        userText: trimmed,
+        detectedIntent: "CLARIFY",
+        kernelHandled: false,
+        informationalChatBypass: true,
+        estateKernelForced: false,
+        taskLockBlocksEstate: false,
+        selectedHandler: "vague_help_local",
+        turnOwner: "chat",
+        normalizedMessage: normalizeTurnMessage(trimmed),
+        primaryType: primaryTurnDecision.type,
+        primaryOwner: primaryTurnDecision.owner,
+        primaryConfidence: primaryTurnDecision.confidence,
+      });
+      setInput("");
+      voiceUsedRef.current = false;
+      if (!getPrefs().hasChatted) {
+        savePrefs({ hasChatted: true });
+        setHasChatted(true);
+      }
+      requestChatInputFocus();
+      finishEarlyChatTurn();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
     const activeReminderSession = loadReminderIntakeSession();
     if (
       activeReminderSession?.phase === "collecting" &&
@@ -10337,7 +10381,8 @@ export default function CompanionPageClient() {
     const universalSessionActive = loadUniversalCreationSession();
     const universalCreationContinuation =
       Boolean(universalSessionActive) &&
-      isUniversalCreationMessage(lastAssistantForCreateFastPath);
+      isUniversalCreationMessage(lastAssistantForCreateFastPath) &&
+      !isVagueHelpRequest(trimmed);
 
     if (isSimpleCreateRequest(trimmed) || universalCreationContinuation) {
       const createRouting = resolveIntentRouting({
@@ -10361,12 +10406,12 @@ export default function CompanionPageClient() {
             createRouting,
           ),
         {
-          category: "universal_creation",
-          suppressRelationship: true,
-          suppressRecap: true,
-          suppressReflectionFirst: true,
-          responseHint: "CREATE_FAST_PATH_RECOVERY",
-          localReply: createFastPathRecoveryLine(trimmed),
+          category: "none",
+          suppressRelationship: false,
+          suppressRecap: false,
+          suppressReflectionFirst: false,
+          responseHint: null,
+          localReply: null,
           pendingAction: null,
           toolSuggestion: null,
           workspaceOffer: null,
@@ -10380,25 +10425,24 @@ export default function CompanionPageClient() {
         },
       );
 
-      logConversationPipelineDiagnostic({
-        turn: chatTurnRef.current,
-        userText: trimmed,
-        detectedIntent: "CREATE",
-        kernelHandled: false,
-        informationalChatBypass: true,
-        estateKernelForced: false,
-        taskLockBlocksEstate: true,
-        selectedHandler: "CREATE_FAST_PATH",
-        turnOwner: "frictionless:universal_creation",
-        normalizedMessage: normalizeTurnMessage(trimmed),
-        primaryType: primaryTurnDecision.type,
-        primaryOwner: "frictionless:universal_creation",
-        primaryConfidence: primaryTurnDecision.confidence,
-        createFastPath: true,
-        createDocumentType: createDocType,
-      });
-
-      if (createFastPathAction.localReply) {
+      if (createFastPathAction?.localReply) {
+        logConversationPipelineDiagnostic({
+          turn: chatTurnRef.current,
+          userText: trimmed,
+          detectedIntent: "CREATE",
+          kernelHandled: false,
+          informationalChatBypass: true,
+          estateKernelForced: false,
+          taskLockBlocksEstate: true,
+          selectedHandler: "CREATE_FAST_PATH",
+          turnOwner: "frictionless:universal_creation",
+          normalizedMessage: normalizeTurnMessage(trimmed),
+          primaryType: primaryTurnDecision.type,
+          primaryOwner: "frictionless:universal_creation",
+          primaryConfidence: primaryTurnDecision.confidence,
+          createFastPath: true,
+          createDocumentType: createDocType,
+        });
         lastUserTextRef.current = trimmed;
         const userMessage: Message = { role: "user", content: trimmed };
         if (fresh) clearConversation();

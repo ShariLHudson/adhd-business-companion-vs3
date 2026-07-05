@@ -84,8 +84,8 @@ describe("intentRoutingIntelligence", () => {
     expect(decision.category).toBe("clarify");
     expect(decision.routeMode).toBe("clarify");
     expect(decision.surfaceClarificationUi).toBe(true);
-    expect(decision.clarifyPrompt).toMatch(/Make a decision/i);
-    expect(decision.clarifyPrompt).toMatch(/Organize my thoughts/i);
+    expect(decision.clarifyPrompt).toMatch(/glad you said/i);
+    expect(decision.clarifyPrompt).toMatch(/decide|make|talk through/i);
   });
 
   it("keeps feature fit available for softer artifact phrasing with execute override", () => {

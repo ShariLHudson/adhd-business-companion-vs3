@@ -463,15 +463,7 @@ function buildNavigationLine(
 }
 
 function buildClarificationPrompt(): string {
-  return [
-    "What would help most right now?",
-    "",
-    "- Make a decision",
-    "- Create something",
-    "- Plan something",
-    "- Understand something",
-    "- Organize my thoughts",
-  ].join("\n");
+  return "I'm glad you said something. What's pulling at you most — something to decide, something to make, or something you need to talk through?";
 }
 
 function buildWorkspaceContinuity(

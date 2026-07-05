@@ -80,14 +80,20 @@ export function isSimpleCreateRequest(userText: string): boolean {
 
 export function createFastPathRecoveryLine(userText: string): string {
   const inferred = inferDocumentTypeFromCreateText(userText);
-  const label =
-    (inferred ? pluginById(inferred)?.label : null)?.toLowerCase() ??
-    "document";
-  return `I ran into a problem starting the ${label} builder, but we can absolutely build it together right here.`;
+  const label = (inferred ? pluginById(inferred)?.label : null)?.toLowerCase();
+  if (label && label !== "document") {
+    return `Let's keep shaping this ${label} right here together. What part should we start with?`;
+  }
+  return "Let's keep going right here together. What's the first piece you want to figure out?";
 }
 
 export function isCreateFastPathRecoveryMessage(text: string): boolean {
-  return /\bran into a problem starting the .* builder\b/i.test(text.trim());
+  const t = text.trim();
+  return (
+    /\blet'?s keep shaping this .+ right here together\b/i.test(t) ||
+    /\blet'?s keep going right here together\b/i.test(t) ||
+    /\bran into a problem starting the .* builder\b/i.test(t)
+  );
 }
 
 /** Member wants to continue after a create offer or recovery line. */

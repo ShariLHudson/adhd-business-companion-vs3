@@ -1057,8 +1057,10 @@ function resolveFrictionlessForPrimaryTurn(
           documentType: detectUniversalDocumentType(input.userText.trim()),
         });
         const universal = tryUniversalCreationFlow(input, routing);
-        if (universal) return universal;
-        return buildCreateFastPathRecoveryDecision(input, routing);
+        if (universal?.localReply) return universal;
+        if (isSimpleCreateRequest(input.userText.trim())) {
+          return buildCreateFastPathRecoveryDecision(input, routing);
+        }
       }
       const universal = tryUniversalCreationFlow(input, routing);
       if (universal) return universal;
@@ -3194,8 +3196,11 @@ function resolveFrictionlessActionImpl(
 export function resolveCreateFastPathAction(
   input: FrictionlessActionInput,
   routing: IntentRoutingDecision,
-): FrictionlessActionDecision {
+): FrictionlessActionDecision | null {
   const userText = input.userText.trim();
+  if (!isSimpleCreateRequest(userText) && !loadUniversalCreationSession()) {
+    return null;
+  }
   logCreateFastPath({
     turn: input.currentTurn,
     userText,
@@ -3203,6 +3208,10 @@ export function resolveCreateFastPathAction(
   });
   const universal = tryUniversalCreationFlow(input, routing);
   if (universal?.localReply) return universal;
+  if (!isSimpleCreateRequest(userText)) {
+    clearUniversalCreationSession();
+    return null;
+  }
   return buildCreateFastPathRecoveryDecision(input, routing);
 }
 
