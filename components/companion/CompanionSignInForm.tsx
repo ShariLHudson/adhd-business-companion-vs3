@@ -270,9 +270,10 @@ export function CompanionSignInForm({
     try {
       const ready = await ensureAuthReady();
       if (!ready) {
-        if (!companionAuthMisconfigHint()) {
-          setError("Sign-in is not live yet on this environment.");
-        }
+        setError(
+          companionAuthMisconfigHint() ??
+            "Sign-in is not live yet on this environment.",
+        );
         authInFlightRef.current = false;
         onProcessingChange?.(false);
         return;
@@ -310,12 +311,10 @@ export function CompanionSignInForm({
     try {
       const ready = await ensureAuthReady();
       if (!ready) {
-        const hint =
+        setError(
           companionAuthMisconfigHint() ??
-          "Sign-in is not live yet — add your Supabase anon key in companion-app/.env.local, then restart npm run dev.";
-        if (!companionAuthMisconfigHint()) {
-          setError(hint);
-        }
+            "Sign-in is not live yet — add your Supabase anon key in companion-app/.env.local, then restart npm run dev.",
+        );
         return;
       }
       if (submitMode) setMode(submitMode);
