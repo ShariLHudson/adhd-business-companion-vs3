@@ -65,18 +65,14 @@ export function CompanionAuthGate({ children }: { children: ReactNode }) {
     router.replace("/companion/login");
   }, [configChecked, configured, sessionChecked, loading, gateOpen, router]);
 
-  if (!configChecked || !configured) {
-    return <>{children}</>;
-  }
-
-  if (!sessionChecked || loading) {
-    if (loginHandoff || hasStoredSession) {
+  if (!configChecked || !sessionChecked || loading) {
+    if (gateOpen && (loginHandoff || hasStoredSession)) {
       return <>{children}</>;
     }
     return <AuthGateLoading message="Loading your space…" />;
   }
 
-  if (!gateOpen) {
+  if (!configured || !gateOpen) {
     return <AuthGateLoading message="Redirecting to sign in…" />;
   }
 
