@@ -42,7 +42,6 @@ export const PLACE_ID_ALIASES: Readonly<Record<string, string>> = {
   kitchen: "estate-kitchen",
   "board-room": "round-table",
   "estate-library": "library",
-  "personal-library": "library",
   pool: "summer-terrace",
   "hall-of-accomplishments": "gallery-of-firsts",
 };

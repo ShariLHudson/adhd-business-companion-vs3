@@ -1,0 +1,476 @@
+/* ═══════════════════════════════════════════════════════════
+   Enjoy the Estate™ — scene only; chat and chrome fade away
+═══════════════════════════════════════════════════════════ */
+
+.companion-root[data-just-be-here] {
+  cursor: default;
+}
+
+.companion-root[data-just-be-here--active][data-enjoy-estate-cursor-idle] {
+  cursor: none;
+}
+
+.companion-root[data-just-be-here--active][data-enjoy-estate-cursor-idle]:hover,
+.companion-root[data-just-be-here--active][data-enjoy-estate-cursor-idle]:focus-within {
+  cursor: default;
+}
+
+.companion-root[data-just-be-here] .enjoy-estate-entry,
+.companion-root[data-just-be-here] .companion-sidebar-portal,
+.companion-root[data-just-be-here] .companion-homestead-logo,
+.companion-root[data-just-be-here] [data-companion-topbar],
+.companion-root[data-just-be-here] .companion-top-bar,
+.companion-root[data-just-be-here] .companion-active-workspace-bar,
+.companion-root[data-just-be-here] .homestead-signpost-sidebar,
+.companion-root[data-just-be-here] .estate-immersive-home-link,
+.companion-root[data-just-be-here] .global-estate-menu,
+.companion-root[data-just-be-here] .spark-estate-guide-anchor,
+.companion-root[data-just-be-here] .estate-room-experience-menu,
+.companion-root[data-just-be-here] .estate-room-invitation,
+.companion-root[data-just-be-here] .estate-room-ambience-toggle,
+.companion-root[data-just-be-here] [data-estate-visit-chrome],
+.companion-root[data-just-be-here] .companion-thinking-indicator {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transition: opacity 1.8s ease, visibility 0s linear 1.8s;
+}
+
+.companion-root[data-just-be-here] [data-companion-chat-layer] {
+  transition:
+    opacity 1.9s ease,
+    transform 1.9s ease,
+    visibility 0s linear 1.9s;
+}
+
+.companion-root[data-just-be-here--active]:not([data-just-be-here-chat-visible="true"])
+  [data-companion-chat-layer],
+.companion-root[data-just-be-here--entering] [data-companion-chat-layer] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateY(12px) scale(0.992);
+}
+
+.companion-root[data-just-be-here--active][data-just-be-here-chat-visible="true"]
+  [data-companion-chat-layer] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: none;
+  transition: opacity 1.4s ease, transform 1.4s ease;
+}
+
+.companion-root[data-just-be-here--active] .estate-room-fullbleed-background__image,
+.companion-root[data-just-be-here--active] .spark-estate-shell__presence {
+  transition: transform 2s ease;
+}
+
+.companion-root[data-just-be-here--active] .estate-room-fullbleed-background__image {
+  transform: scale(1.02);
+}
+
+.companion-root[data-just-be-here--active] .estate-chat-navigation-overlay__vignette {
+  opacity: 0.35;
+  transition: opacity 2s ease;
+}
+
+/* Resume — chat returns without a jolt */
+.companion-root[data-just-be-here-resume] [data-companion-chat-layer] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transform: none;
+  transition: opacity 1.4s ease, transform 1.4s ease;
+}
+
+.just-be-here-controls {
+  position: fixed;
+  top: max(0.85rem, env(safe-area-inset-top, 0px));
+  right: max(0.85rem, env(safe-area-inset-right, 0px));
+  bottom: auto;
+  z-index: 100004;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4rem;
+  min-width: 10.75rem;
+  padding: 0.45rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 236, 200, 0.28);
+  background: rgba(22, 18, 14, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.32);
+  pointer-events: auto;
+  transition:
+    opacity 0.55s ease,
+    background 0.55s ease,
+    border-color 0.55s ease,
+    box-shadow 0.55s ease,
+    padding 0.55s ease;
+}
+
+.just-be-here-controls--visible {
+  opacity: 1;
+}
+
+.just-be-here-controls--faded {
+  opacity: 1;
+  min-width: auto;
+  padding: 0;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.just-be-here-controls__actions {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.4rem;
+}
+
+.just-be-here-controls--faded .just-be-here-controls__actions {
+  display: none;
+}
+
+.just-be-here-controls__hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid rgba(255, 236, 200, 0.32);
+  border-radius: 999px;
+  background: rgba(22, 18, 14, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(255, 248, 235, 0.88);
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.just-be-here-controls__hint--fullscreen {
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  max-width: 11.5rem;
+  text-align: center;
+  line-height: 1.35;
+}
+
+.just-be-here-controls__hint:hover {
+  background: rgba(32, 26, 20, 0.78);
+  border-color: rgba(255, 236, 200, 0.48);
+}
+
+.just-be-here-controls__hint:focus-visible {
+  outline: 2px solid rgba(255, 236, 200, 0.85);
+  outline-offset: 2px;
+}
+
+.just-be-here-controls__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2.55rem;
+  padding: 0.48rem 0.72rem;
+  border: 1px solid rgba(255, 248, 235, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.08);
+  color: rgba(255, 252, 245, 0.96);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.just-be-here-controls__btn:hover:not(:disabled) {
+  background: rgba(255, 252, 245, 0.14);
+  border-color: rgba(255, 248, 235, 0.32);
+  transform: translateY(-1px);
+}
+
+.just-be-here-controls__btn:focus-visible {
+  outline: 2px solid rgba(255, 236, 200, 0.85);
+  outline-offset: 2px;
+}
+
+.just-be-here-controls__btn--primary {
+  border-color: rgba(255, 236, 200, 0.42);
+  background: rgba(255, 252, 245, 0.12);
+}
+
+.just-be-here-controls__btn--active {
+  border-color: rgba(201, 164, 108, 0.62);
+}
+
+.just-be-here-controls__btn:disabled {
+  opacity: 0.38;
+  cursor: default;
+}
+
+.just-be-here-controls__icon {
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.just-be-here-controls__label {
+  line-height: 1.2;
+}
+
+/* ── Enjoy the Estate™ — entry pill + visitor flame ── */
+
+.enjoy-estate-entry {
+  position: fixed;
+  bottom: max(1rem, env(safe-area-inset-bottom, 0px));
+  left: max(1rem, env(safe-area-inset-left, 0px));
+  z-index: 100003;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.35rem;
+  padding: 0.38rem 0.85rem 0.38rem 0.65rem;
+  border: 1px solid rgba(255, 236, 200, 0.36);
+  border-radius: 999px;
+  background: rgba(22, 18, 14, 0.62);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: rgba(255, 252, 245, 0.96);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.28);
+  pointer-events: auto;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease,
+    background 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.enjoy-estate-entry:hover {
+  background: rgba(32, 26, 20, 0.78);
+  border-color: rgba(255, 236, 200, 0.52);
+  transform: translateY(-1px);
+}
+
+.enjoy-estate-entry:focus-visible {
+  outline: 2px solid rgba(255, 236, 200, 0.85);
+  outline-offset: 2px;
+}
+
+.enjoy-estate-entry__icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.enjoy-estate-entry__label {
+  white-space: nowrap;
+}
+
+.enjoy-estate-visitor {
+  position: fixed;
+  top: max(0.85rem, env(safe-area-inset-top, 0px));
+  right: max(0.85rem, env(safe-area-inset-right, 0px));
+  bottom: auto;
+  z-index: 100005;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+}
+
+.enjoy-estate-visitor__strip {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.35rem;
+  min-width: 11.5rem;
+  padding: 0.45rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 236, 200, 0.22);
+  background: rgba(22, 18, 14, 0.72);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.28);
+  pointer-events: auto;
+  opacity: 1;
+  transition: opacity 0.55s ease;
+}
+
+.enjoy-estate-visitor--flame-only .enjoy-estate-visitor__strip {
+  display: none;
+}
+
+.enjoy-estate-visitor__action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  min-height: 2.45rem;
+  padding: 0.45rem 0.72rem;
+  border: 1px solid rgba(255, 248, 235, 0.14);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.07);
+  color: rgba(255, 252, 245, 0.96);
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.25s ease, border-color 0.25s ease;
+}
+
+.enjoy-estate-visitor__action:hover {
+  background: rgba(255, 252, 245, 0.12);
+  border-color: rgba(255, 248, 235, 0.24);
+}
+
+.enjoy-estate-visitor__action--active {
+  border-color: rgba(201, 164, 108, 0.45);
+}
+
+.enjoy-estate-visitor__action-icon {
+  flex-shrink: 0;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.enjoy-estate-visitor__action-label {
+  line-height: 1.2;
+}
+
+.enjoy-estate-visitor__action--primary {
+  border-color: rgba(255, 236, 200, 0.32);
+  background: rgba(255, 252, 245, 0.1);
+}
+
+.enjoy-estate-visitor__hint {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.4rem 0.7rem;
+  border: 1px solid rgba(255, 236, 200, 0.28);
+  border-radius: 999px;
+  background: rgba(22, 18, 14, 0.62);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(255, 248, 235, 0.88);
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  max-width: 11.5rem;
+  text-align: center;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.enjoy-estate-visitor__hint:hover {
+  background: rgba(32, 26, 20, 0.78);
+  border-color: rgba(255, 236, 200, 0.42);
+}
+
+.enjoy-estate-visitor__hint:focus-visible {
+  outline: 2px solid rgba(255, 236, 200, 0.75);
+  outline-offset: 2px;
+}
+
+.enjoy-estate-flame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.45rem;
+  height: 2.45rem;
+  padding: 0.32rem;
+  border: 1px solid rgba(255, 236, 200, 0.22);
+  border-radius: 999px;
+  background: rgba(22, 18, 14, 0.42);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+  cursor: pointer;
+  pointer-events: auto;
+  opacity: 0.68;
+  transition: opacity 0.4s ease, background 0.4s ease;
+}
+
+.enjoy-estate-visitor__flame--inline {
+  width: 100%;
+  height: auto;
+  min-height: 2.45rem;
+  padding: 0.4rem 0.72rem;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  opacity: 1;
+}
+
+.enjoy-estate-flame:hover,
+.enjoy-estate-flame:focus-visible {
+  opacity: 0.88;
+  background: rgba(28, 23, 18, 0.58);
+}
+
+.enjoy-estate-flame:focus-visible {
+  outline: 1px solid rgba(255, 236, 200, 0.55);
+  outline-offset: 2px;
+}
+
+.enjoy-estate-flame__img {
+  width: 1.25rem;
+  height: 1.25rem;
+  object-fit: contain;
+  display: block;
+  opacity: 0.92;
+  flex-shrink: 0;
+}
+
+.enjoy-estate-flame__label {
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.2;
+  color: rgba(255, 252, 245, 0.96);
+}
+
+.enjoy-estate-visitor__flame--inline .enjoy-estate-flame__img {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .companion-root[data-just-be-here] [data-companion-chat-layer],
+  .companion-root[data-just-be-here] .companion-sidebar-portal,
+  .companion-root[data-just-be-here] .estate-immersive-home-link,
+  .companion-root[data-just-be-here--active] .estate-room-fullbleed-background__image,
+  .just-be-here-controls,
+  .enjoy-estate-entry,
+  .enjoy-estate-visitor,
+  .enjoy-estate-flame {
+    transition: none !important;
+    transform: none !important;
+  }
+}

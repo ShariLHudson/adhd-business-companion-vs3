@@ -39,7 +39,8 @@ export const ESTATE_PLACE_AMBIENT_SOUND: Readonly<
   "reading-nook": {
     src: EVENING_HEARTH_AMBIENCE_MP3,
     volume: 0.12,
-    character: "fireplace crackle, occasional page turn, soft house wind",
+    character:
+      "distant birds, gentle breeze, occasional page turn, soft teacup, wood settling",
   },
   "main-staircase": {
     src: EVENING_HEARTH_AMBIENCE_MP3,
@@ -55,7 +56,7 @@ export const ESTATE_PLACE_AMBIENT_SOUND: Readonly<
   greenhouse: {
     src: GREENHOUSE_BIRDS_AMBIENCE_MP3,
     volume: 0.07,
-    character: "birds, soft breeze, light water droplets",
+    character: "water trickling, leaves rustling, birds, soft insects",
   },
   "back-deck": {
     src: TIN_ROOF_RAIN_AMBIENCE_MP3,
@@ -70,7 +71,7 @@ export const ESTATE_PLACE_AMBIENT_SOUND: Readonly<
   "music-room": {
     src: MUSIC_LOFT_AMBIENCE_MP3,
     volume: 0.14,
-    character: "gentle piano, warm listening room hush",
+    character: "faint piano, vinyl crackle, breeze, distant birds",
   },
   conservatory: {
     src: GREENHOUSE_BIRDS_AMBIENCE_MP3,
@@ -97,6 +98,18 @@ export const ESTATE_PLACE_AMBIENT_SOUND: Readonly<
     src: ORCHARD_BIRDS_AMBIENCE_MP3,
     volume: 0.09,
     character: "irrigation water, birds, soft wind through plants",
+  },
+  /** Tree Swing™ — porch swing, creek, wind */
+  "porch-swing": {
+    src: ORCHARD_BIRDS_AMBIENCE_MP3,
+    volume: 0.1,
+    character: "wind, swing softly creaking, distant creek, birds",
+  },
+  /** Pool terrace — waterfall, breeze, distant water */
+  "summer-terrace": {
+    src: GAZEBO_JOURNAL_AMBIENCE_MP3,
+    volume: 0.11,
+    character: "waterfall hush, breeze, distant water movement",
   },
 };
 

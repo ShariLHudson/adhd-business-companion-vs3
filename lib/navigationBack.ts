@@ -6,7 +6,11 @@
 import type { AppSection } from "./companionUi";
 import { workspaceAreaTitle } from "./workspaceMode";
 
-export const NAV_HOME = "Home";
+/** Visible label for estate home back controls. */
+export const BACK_TO_ESTATE = "Back To Estate";
+
+/** Destination key when returning from a room to the Estate (chat home). */
+export const NAV_HOME = "Estate";
 
 /** Trademarked workspace names — consistent across the ecosystem. */
 export const NAV_CLEAR_MY_MIND = "Clear My Mind";
@@ -54,6 +58,20 @@ export function navigationDestinationForSection(section: AppSection): string {
   return TRADEMARK_SECTION_TITLES[section] ?? workspaceAreaTitle(section);
 }
 
+/** True when a back destination means the Spark Estate home. */
+export function isEstateHomeDestination(
+  destination: string | null | undefined,
+): boolean {
+  if (!destination) return false;
+  const normalized = normalizeBackDestination(destination).toLowerCase();
+  return (
+    normalized === "home" ||
+    normalized === "estate" ||
+    normalized === "return to estate" ||
+    normalized === "back to estate"
+  );
+}
+
 /**
  * Standard label: "Back to Clear My Mind"
  * Pass the destination only — not the full "Back to" prefix.
@@ -61,6 +79,7 @@ export function navigationDestinationForSection(section: AppSection): string {
 export function formatAppBackLabel(destination: string): string {
   const trimmed = destination.trim();
   if (!trimmed) return "Back";
+  if (isEstateHomeDestination(trimmed)) return BACK_TO_ESTATE;
   if (/^back to\b/i.test(trimmed)) return trimmed;
   return `Back to ${trimmed}`;
 }

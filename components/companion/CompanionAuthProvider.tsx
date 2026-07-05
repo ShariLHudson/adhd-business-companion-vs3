@@ -6,6 +6,7 @@ import {
   useEffect,
   useLayoutEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react";
@@ -14,7 +15,10 @@ import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import { getAppSiteUrl } from "@/lib/appSite";
 import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
 import {
+  clearCompanionAuthStorage,
+  clearCompanionSignedOut,
   hasCompanionAuthStorageHint,
+  markCompanionSignedOut,
   waitForCompanionAuthStorage,
 } from "@/lib/companionLoginTransition";
 import { languagePrefsFromUserMetadata } from "@/lib/companionUserLanguage";
@@ -316,6 +320,7 @@ export function CompanionAuthProvider({
   const [sessionChecked, setSessionChecked] = useState(() => authBypassed);
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
+  const explicitSignOutRef = useRef(false);
 
   useLayoutEffect(() => {
     if (inlineSupabase?.url && inlineSupabase.anonKey) {
@@ -385,6 +390,12 @@ export function CompanionAuthProvider({
         const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
           if (!mounted) return;
           if (event === "SIGNED_OUT") {
+            if (explicitSignOutRef.current) {
+              explicitSignOutRef.current = false;
+              setSession(null);
+              setUser(null);
+              return;
+            }
             if (hasCompanionAuthStorageHint()) {
               void (async () => {
                 const refreshed = await supabase.auth.refreshSession();
@@ -490,6 +501,7 @@ export function CompanionAuthProvider({
         }
         if (companionAuthConfigured()) setConfigured(true);
         const result = await signInDirect(email, password);
+        clearCompanionSignedOut();
         if (!result.error && result.session) {
           applyAuthSession(result.session);
         } else if (!result.error) {
@@ -512,6 +524,11 @@ export function CompanionAuthProvider({
         };
       },
       signOut: async () => {
+        explicitSignOutRef.current = true;
+        markCompanionSignedOut();
+        clearCompanionAuthStorage();
+        setSession(null);
+        setUser(null);
         const supabase = getCompanionSupabase();
         if (!supabase) return;
         await supabase.auth.signOut();

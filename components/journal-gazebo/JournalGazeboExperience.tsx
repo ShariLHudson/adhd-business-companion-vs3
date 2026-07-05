@@ -1132,7 +1132,6 @@ export function JournalGazeboExperience({
         <EstateImmersiveHomeLink
           onClick={onBack}
           className="journal-gazebo__home-link"
-          label="Return to Estate"
         />
       ) : null}
 

@@ -12,6 +12,11 @@ import {
   logConversationPipelineDiagnostic,
   type ConversationPipelineDiagnostic,
 } from "./conversationPipelineDiagnostics";
+import {
+  pipelineStageEnter,
+  pipelineStageExit,
+  updatePipelineTurnContext,
+} from "./conversationPipelineTrace";
 import { normalizeTurnMessage } from "./turnOwner";
 
 export const LAYER_TIMEOUT_MS = {
@@ -80,9 +85,21 @@ export function runReliableSyncLayer<T>(
 ): T {
   const started = Date.now();
   const timeoutMs = LAYER_TIMEOUT_MS[layer];
+  pipelineStageEnter(layer);
+  if (ctx.turnOwner || ctx.intent) {
+    updatePipelineTurnContext({
+      owner: ctx.turnOwner ?? undefined,
+      intent: ctx.intent ?? undefined,
+      currentRoom: ctx.currentRoom ?? undefined,
+    });
+  }
   try {
-    return withLayerTimeout(layer, fn, timeoutMs);
+    const result = withLayerTimeout(layer, fn, timeoutMs);
+    pipelineStageExit(layer);
+    return result;
   } catch (err) {
+    const reason = failureReasonFromError(err, layer);
+    pipelineStageExit(layer, reason);
     logPipelineLayerRecovery(layer, err, ctx, Date.now() - started);
     return fallback;
   }
@@ -99,9 +116,21 @@ export async function runReliableAsyncLayer<T>(
 ): Promise<T> {
   const started = Date.now();
   const timeoutMs = LAYER_TIMEOUT_MS[layer];
+  pipelineStageEnter(layer);
+  if (ctx.turnOwner || ctx.intent) {
+    updatePipelineTurnContext({
+      owner: ctx.turnOwner ?? undefined,
+      intent: ctx.intent ?? undefined,
+      currentRoom: ctx.currentRoom ?? undefined,
+    });
+  }
   try {
-    return await withAsyncLayerTimeout(layer, fn, timeoutMs);
+    const result = await withAsyncLayerTimeout(layer, fn, timeoutMs);
+    pipelineStageExit(layer);
+    return result;
   } catch (err) {
+    const reason = failureReasonFromError(err, layer);
+    pipelineStageExit(layer, reason);
     logPipelineLayerRecovery(layer, err, ctx, Date.now() - started);
     return fallback;
   }

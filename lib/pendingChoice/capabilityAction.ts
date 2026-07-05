@@ -1,3 +1,5 @@
+import { getCanonicalEstatePlaceById } from "@/lib/estate/canonicalEstateRegistry";
+import { isLiveEstatePlace } from "@/lib/estate/liveEstatePlace";
 import type { AppSection } from "@/lib/companionUi";
 import { capabilityById } from "@/lib/estateCapabilityRegistry/catalog";
 import type { CapabilityRecommendationOption } from "@/lib/estateCapabilityRegistry/types";
@@ -89,11 +91,17 @@ export function pendingChoicesFromConciergeOptions(
 
 export function ackForPendingChoiceAction(action: PendingChoiceAction): string {
   const entry = action.capabilityId ? capabilityById(action.capabilityId) : null;
-  const name = entry?.name ?? action.placeId?.replace(/-/g, " ") ?? "that";
+  const place =
+    action.placeId != null ? getCanonicalEstatePlaceById(action.placeId) : null;
+  const name =
+    entry?.name ?? place?.officialName.replace(/™/g, "") ?? action.placeId?.replace(/-/g, " ") ?? "that";
 
   switch (action.kind) {
     case "navigate_place":
     case "open_section":
+      if (action.placeId && !isLiveEstatePlace(action.placeId)) {
+        return "That spot isn't ready to walk into yet — we can stay here and keep talking, or I can take you to Peaceful Places if you want something quieter.";
+      }
       return `Let's go — ${name}.`;
     case "open_focus_audio":
       return "Quiet music — I'll take you there.";

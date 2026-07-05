@@ -1,6 +1,6 @@
 /** Production site — used when NEXT_PUBLIC_APP_URL is missing or mis-pasted. */
 export const COMPANION_APP_URL_DEFAULT =
-  "https://ecosystem.visualsparkstudios.com";
+  "https://ecosystems.visualsparkstudios.com";
 
 export function appUrlLooksValid(value: string): boolean {
   const v = value.trim();

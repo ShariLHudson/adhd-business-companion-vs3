@@ -4,7 +4,8 @@
   --spark-estate-guide-anchor-size: clamp(3.25rem, 11vw, 4.75rem);
 }
 
-.spark-estate-guide-anchor {  position: fixed;
+.spark-estate-guide-anchor {
+  position: fixed;
   bottom: max(1rem, env(safe-area-inset-bottom, 0px));
   right: max(0.85rem, env(safe-area-inset-right, 0px));
   z-index: 100001;

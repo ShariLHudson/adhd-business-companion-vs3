@@ -75,12 +75,12 @@ export const ENVIRONMENT_NEED_LEXICON: readonly EnvironmentNeedDefinition[] = [
     id: "relax",
     label: "relax / unwind",
     patterns: [
-      /\b(?:want to|need to|like to|i'?d like to)\s+relax\b/i,
-      /\b(?:just\s+)?relax(?:ation)?\b/i,
-      /\b(?:unwind|wind\s+down|take\s+it\s+easy|loosen\s+up)\b/i,
+      /\b(?:want to|need to|like to|i'?d like to|help me)\s+relax\b/i,
+      /\b(?:want to|need to|like to|help me)\s+unwind\b/i,
+      /\b(?:wind\s+down|take\s+it\s+easy|loosen\s+up)\b/i,
       /\b(?:hammock|pool|lazy).{0,25}(?:relax|rest)\b/i,
     ],
-    placeIds: ["coffee-house", "peaceful-places", "porch-swing"],
+    placeIds: ["coffee-house", "peaceful-places"],
     offerIntro: "A few easy places on the Estate to unwind:",
   },
   {

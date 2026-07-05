@@ -1,9 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { EstateRoomAmbienceToggle } from "@/components/companion/estate/EstateRoomAmbienceToggle";
-import { EstateRoomInvitationPanel } from "@/components/companion/estate/EstateRoomInvitationPanel";
-import { EstateRoomTemplateArrival } from "@/components/companion/estate/EstateRoomTemplateArrival";
+import { EstateRoomInvitationPanel } from "@/components/companion/estate/EstateRoomInvitationPanel";import { EstateRoomTemplateArrival } from "@/components/companion/estate/EstateRoomTemplateArrival";
 import { useEstateRoomVisitPhase } from "@/components/companion/estate/useEstateRoomVisitPhase";
 import { WelcomeHomeFrostedChatPanel } from "@/components/companion/WelcomeHomeFrostedChatPanel";
 import {
@@ -52,16 +50,19 @@ export function EstateRoomVisitChrome({
   const invitation = resolveEstateRoomInvitationSet(roomId);
 
   const handleInvitation = (item: EstateRoomInvitationItem) => {
+    if (item.action.kind === "presence") {
+      onInvitationSelect(item);
+      return;
+    }
     if (estateInvitationKeepsInConversation(item.action)) {
       visit.openConversation();
-      if (item.action.kind === "conversation" || item.action.kind === "presence") {
+      if (item.action.kind === "conversation") {
         onConversationStart?.(roomId);
         return;
       }
       onInvitationSelect(item);
       return;
-    }
-    visit.openActivity();
+    }    visit.openActivity();
     onInvitationSelect(item);
   };
 
@@ -74,9 +75,7 @@ export function EstateRoomVisitChrome({
 
   return (
     <>
-      <EstateRoomAmbienceToggle roomId={roomId} />
-      <WelcomeHomeFrostedChatPanel
-        estateRoom
+      <WelcomeHomeFrostedChatPanel        estateRoom
         alwaysShowInput
         showWelcomeLine={showInvitation}
         showConversation={

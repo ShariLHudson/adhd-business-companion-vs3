@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { appUrlLooksValid, getAppSiteUrl } from "@/lib/appSite";
+import { resolveOpenAiApiKey } from "@/lib/openai/resolveOpenAiApiKey";
 import { ghlApiConfigured } from "@/lib/ghl/client";
 import { companionAuthConfigStatus, companionAuthMisconfigHint, companionSupabaseEnvLooksSwapped, companionSupabaseUrlLooksValid, envValuePrefix, getCompanionSupabaseAnonKey, getCompanionSupabaseUrl } from "@/lib/supabase/companionClient";
 
@@ -50,5 +51,6 @@ export async function GET() {
     ghlApiConfigured: ghlApiConfigured(),
     locationIdConfigured: ghlLocationId.length > 0,
     nodeEnv: process.env.NODE_ENV ?? null,
+    hasOpenAiKey: Boolean(resolveOpenAiApiKey()),
   });
 }

@@ -31,6 +31,7 @@ export const ESTATE_DIRECTORY_PLACE_SECTION: Partial<
   journal: "growth-journal",
   greenhouse: "growth-greenhouse",
   library: "growth-library",
+  "personal-library": "growth-library",
   "creative-studio": "content-generator",
   observatory: "grow-observatory",
   "momentum-builder": "momentum-builder",

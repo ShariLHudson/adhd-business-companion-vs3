@@ -108,3 +108,20 @@ export function logTurnOwner(record: TurnOwnerRecord): void {
     message: record.normalizedMessage.slice(0, 80),
   });
 }
+
+/** Never proceed without an owner — default relationship chat. */
+export function assertTurnOwner(
+  owner: string | null | undefined,
+  reason = "unspecified",
+): TurnOwnerKind {
+  if (owner && owner.trim()) {
+    return owner.trim() as TurnOwnerKind;
+  }
+  if (typeof window !== "undefined") {
+    // eslint-disable-next-line no-console
+    console.warn("[turn-owner] missing owner — default relationship_chat", {
+      reason,
+    });
+  }
+  return "relationship_chat";
+}

@@ -70,46 +70,6 @@
   transform-origin: center bottom;
 }
 
-.momentum-builder-room__sticky-note {
-  position: absolute;
-  width: 3.25rem;
-  height: 3rem;
-  border-radius: 0.15rem;
-  background: linear-gradient(
-    145deg,
-    #f5e9a8 0%,
-    #e8d07a 100%
-  );
-  box-shadow:
-    0 0.35rem 0.75rem rgba(24, 16, 10, 0.18),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.06);
-  opacity: 0.82;
-}
-
-.momentum-builder-room__sticky-note--one {
-  right: max(6rem, 14vw);
-  top: 28vh;
-  transform: rotate(-6deg);
-  animation: momentum-builder-sticky-drift 9s ease-in-out infinite;
-}
-
-.momentum-builder-room__sticky-note--two {
-  right: max(4rem, 11vw);
-  top: 31vh;
-  transform: rotate(4deg);
-  animation: momentum-builder-sticky-drift 11s ease-in-out infinite reverse;
-}
-
-@keyframes momentum-builder-sticky-drift {
-  0%,
-  100% {
-    transform: rotate(-6deg) translateY(0);
-  }
-  50% {
-    transform: rotate(-4deg) translateY(-2px);
-  }
-}
-
 .momentum-builder-room__pen {
   position: absolute;
   right: max(5.5rem, 13vw);
@@ -410,17 +370,17 @@
   }
 }
 
-.momentum-builder-room--board-update .momentum-builder-room__sticky-note--one {
+.momentum-builder-room--board-update .momentum-builder-room__pen {
   animation: momentum-builder-board-nudge 0.9s ease;
 }
 
 @keyframes momentum-builder-board-nudge {
   0%,
   100% {
-    transform: rotate(-6deg) translateY(0);
+    transform: rotate(-18deg) translateY(0);
   }
   50% {
-    transform: rotate(-3deg) translateY(-4px);
+    transform: rotate(-14deg) translateY(-3px);
   }
 }
 
@@ -452,7 +412,6 @@
   }
 
   .momentum-builder-room__desk-surface,
-  .momentum-builder-room__sticky-note,
   .momentum-builder-room__pen {
     opacity: 0.45;
   }
@@ -472,11 +431,9 @@
 
 @media (prefers-reduced-motion: reduce) {
   .momentum-builder-room__morning-light,
-  .momentum-builder-room__sticky-note--one,
-  .momentum-builder-room__sticky-note--two,
   .momentum-builder-room--path-reveal .momentum-builder-room__planning-table,
   .momentum-builder-room--notebook-close .momentum-builder-room__notebook--open,
-  .momentum-builder-room--board-update .momentum-builder-room__sticky-note--one,
+  .momentum-builder-room--board-update .momentum-builder-room__pen,
   .momentum-builder-room--sunlight-warm .momentum-builder-room__morning-light {
     animation: none !important;
   }

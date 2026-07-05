@@ -150,6 +150,6 @@ describe("resolveEstatePlace — Phase C success tests", () => {
     const outcome = goToPlace({ placeId: "celebration-garden" });
     expect(outcome.ok).toBe(true);
     if (!outcome.ok) return;
-    expect(outcome.placeId).toBe("celebration-room");
+    expect(outcome.placeId).toBe("gardens");
   });
 });

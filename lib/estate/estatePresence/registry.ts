@@ -139,6 +139,41 @@ export const ESTATE_PRESENCE_REGISTRY: Record<string, EstatePresenceProfile> = {
       L("dust", { top: "28%", left: "38%", width: "30%", height: "38%" }),
     ],
   },
+  greenhouse: {
+    roomId: "greenhouse",
+    layers: [
+      L("leaves", { top: "0", left: "0", width: "100%", height: "50%" }),
+      L("wind-sway", { top: "0", left: "0", width: "100%", height: "100%" }),
+      L("water-ripple", { bottom: "12%", left: "25%", width: "50%", height: "18%", delay: 2 }),
+      L("bird-pass", { top: "16%", left: "65%", width: "16%", height: "8%", delay: 3 }),
+    ],
+  },
+  "porch-swing": {
+    roomId: "porch-swing",
+    layers: [
+      L("wind-sway", { top: "0", left: "0", width: "100%", height: "100%" }),
+      L("leaves", { top: "5%", left: "15%", width: "70%", height: "40%" }),
+      L("bird-pass", { top: "22%", left: "8%", width: "18%", height: "8%", delay: 2 }),
+      L("water-ripple", { bottom: "8%", left: "30%", width: "40%", height: "14%", delay: 1 }),
+    ],
+  },
+  "summer-terrace": {
+    roomId: "summer-terrace",
+    layers: [
+      L("water-ripple", { bottom: "15%", left: "20%", width: "60%", height: "22%" }),
+      L("wind-sway", { top: "0", left: "0", width: "100%", height: "100%" }),
+      L("leaves", { top: "10%", left: "50%", width: "35%", height: "28%", delay: 1 }),
+    ],
+  },
+  "reading-nook": {
+    roomId: "reading-nook",
+    layers: [
+      L("candle", { top: "64%", left: "18%", width: "3%", height: "4%", delay: 1 }),
+      L("page-turn", { top: "56%", left: "42%", width: "14%", height: "9%", delay: 3 }),
+      L("dust", { top: "24%", left: "34%", width: "32%", height: "42%" }),
+      L("bird-pass", { top: "18%", left: "72%", width: "14%", height: "7%", delay: 4 }),
+    ],
+  },
   "growth-journal": {
     roomId: "growth-journal",
     layers: [

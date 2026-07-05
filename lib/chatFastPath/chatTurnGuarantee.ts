@@ -14,7 +14,8 @@ import {
   isEstateGuideQuestion,
   resolveEstateGuideTurn,
 } from "@/lib/sparkKnowledge/estateGuide";
-import { conversationRecentlyShowedRecovery } from "./recoveryDedup";
+import { resolveInformationalKnowledgeLocalReply } from "@/lib/sparkKnowledge/informationalKnowledge";
+import { conversationRecentlyShowedRecovery, messagesAlreadyHasRecoveryReply } from "./recoveryDedup";
 import { sanitizeBridgeFromReply } from "@/lib/sparkConversation/bridgeResponderGuard";
 
 /** Hard ceiling — fallback if API/stream does not finish in time. */
@@ -45,14 +46,19 @@ export function buildFailSafeChatReply(
   userText: string,
   memory?: Pick<RuntimeRecoveryInput, "lastAssistantText" | "priorUserText">,
   messages?: ReadonlyArray<{ role: string; content: string }>,
-): string {
+): string | null {
   const trimmed = userText.trim();
+  if (messages && messagesAlreadyHasRecoveryReply(messages)) {
+    return null;
+  }
   if (!trimmed) {
     return "I'm here — what would help most right now?";
   }
   if (isEstateGuideQuestion(trimmed)) {
     return formatEstateGuideReply(resolveEstateGuideTurn(trimmed));
   }
+  const knowledgeReply = resolveInformationalKnowledgeLocalReply(trimmed);
+  if (knowledgeReply) return knowledgeReply;
   const input: RuntimeRecoveryInput = {
     userText: trimmed,
     lastAssistantText: memory?.lastAssistantText,

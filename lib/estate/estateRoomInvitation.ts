@@ -86,7 +86,7 @@ function universalClosers(roomId: string): EstateRoomInvitationItem[] {
     items.push({
       id: "universal-presence",
       emoji: "🌿",
-      label: copy.presence ?? "I'm Happy Just Being Here",
+      label: copy.presence ?? "Enjoy the Estate",
       action: { kind: "presence" },
       tier: "universal",
     });

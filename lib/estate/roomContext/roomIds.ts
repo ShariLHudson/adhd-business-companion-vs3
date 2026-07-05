@@ -2,6 +2,8 @@
  * Canonical estate room identity — aliases and equivalence groups.
  */
 
+import { getCanonicalEstatePlaceById } from "../canonicalEstateRegistry";
+import { resolvePlaceId } from "../placeIdAliases";
 import { resolveEstatePlaceIdFromUserText } from "../estateRoomAliasRegistry";
 
 const ROOM_EQUIVALENCE: Record<string, readonly string[]> = {
@@ -12,7 +14,8 @@ const ROOM_EQUIVALENCE: Record<string, readonly string[]> = {
     "study-hall",
   ],
   "creative-studio": ["creative-studio", "art-studio", "strategy-studio"],
-  library: ["library", "personal-library", "estate-library", "growth-library"],
+  library: ["library", "estate-library", "growth-library"],
+  "personal-library": ["personal-library"],
 };
 
 export function normalizeEstateRoomId(
@@ -20,6 +23,10 @@ export function normalizeEstateRoomId(
 ): string | null {
   if (!placeId?.trim()) return null;
   const trimmed = placeId.trim();
+  const viaAlias = resolvePlaceId(trimmed);
+  if (getCanonicalEstatePlaceById(viaAlias)) {
+    return viaAlias;
+  }
   return resolveEstatePlaceIdFromUserText(trimmed) ?? trimmed;
 }
 

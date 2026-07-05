@@ -14,6 +14,8 @@ import { EstatePlaceAudioHost } from "@/components/companion/estate/EstatePlaceA
 import { EstatePresence } from "@/components/companion/estate/EstatePresence";
 import { GlobalEstateMenu } from "@/components/companion/GlobalEstateMenu";
 import { SparkEstateGuideChrome } from "@/components/companion/SparkEstateGuideChrome";
+import { EstateRoomExperienceMenu } from "@/components/companion/estate/EstateRoomExperienceMenu";
+import { EnjoyEstateVisitorChrome } from "@/components/companion/estate/EnjoyEstateVisitorChrome";
 import { estateArrivalShariGreeting } from "@/lib/estate/estateArrivalExperience";
 import { getEstateMemory } from "@/lib/estateMemory/estateMemoryStore";
 import { SparkEstateShell } from "@/components/companion/estate/SparkEstateShell";
@@ -931,6 +933,10 @@ import {
   simpleSocialGreetingReply,
 } from "@/lib/chatFastPath/simpleSocial";
 import {
+  relationshipConversationLocalReply,
+  shouldCompleteRelationshipChatLocally,
+} from "@/lib/chatFastPath/relationshipChatLocal";
+import {
   consumeCompanionChatStream,
   isCompanionChatStreamResponse,
 } from "@/lib/chatFastPath/companionChatStream";
@@ -1160,6 +1166,17 @@ import {
   stopAllEstateEnvironmentalAudio,
   stopEstateAmbienceReply,
 } from "@/lib/estate/estateEnvironmentalAudio";
+import {
+  isEstateAmbienceEnabled,
+  setEstateAmbienceEnabled,
+} from "@/lib/estate/estateAmbiencePreference";
+import { resolveEstatePlaceAmbientProfile } from "@/lib/estate/estatePlaceAmbientSound";
+import { kickstartEstateRoomAmbience } from "@/lib/estate/estateRoomAmbience";
+import {
+  JUST_BE_HERE_ENTER_MS,
+  resolvePresenceModeRoomId,
+  type JustBeHereSession,
+} from "@/lib/estate/justBeHere";
 import { resolveEstatePresenceRoomId } from "@/lib/estate/estatePresence";
 import {
   formatEstateRoomPickerLine,
@@ -2639,6 +2656,16 @@ export default function CompanionPageClient() {
     | "institute-cabinet"
   >(null);
   const [estateGuideFlipbookOpen, setEstateGuideFlipbookOpen] = useState(false);
+  const [justBeHereSession, setJustBeHereSession] =
+    useState<JustBeHereSession | null>(null);
+  const [justBeHerePhase, setJustBeHerePhase] = useState<
+    "entering" | "active" | null
+  >(null);
+  const [justBeHereChatVisible, setJustBeHereChatVisible] = useState(false);
+  const [justBeHereSoundEnabled, setJustBeHereSoundEnabled] = useState(false);
+  const justBeHereEnterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const [growthProfileEmphasizeTimeline, setGrowthProfileEmphasizeTimeline] =
     useState(false);
   const growthProfilePrimary = overlay === "growth-profile";
@@ -5806,6 +5833,7 @@ export default function CompanionPageClient() {
   function navigateToChatCore() {
     backInterceptorRef.current = null;
     goingBackRef.current = false;
+    clearJustBeHereMode();
     syncDirectEstateVisit(null);
     void stopAllEstateEnvironmentalAudio();
     clearEstatePendingTransition();
@@ -7726,7 +7754,7 @@ export default function CompanionPageClient() {
     if (authConfigured) {
       await signOut();
     }
-    router.push("/companion/login");
+    router.push("/companion/login?signedOut=1");
   }, [authConfigured, router, signOut]);
 
   function openProfileEstateRoomFromMenu(
@@ -7776,6 +7804,84 @@ export default function CompanionPageClient() {
 
   function openSparkEstateGuideCore() {
     setEstateGuideFlipbookOpen(true);
+  }
+
+  function clearJustBeHereMode() {
+    if (justBeHereEnterTimerRef.current) {
+      clearTimeout(justBeHereEnterTimerRef.current);
+      justBeHereEnterTimerRef.current = null;
+    }
+    setJustBeHereSession(null);
+    setJustBeHerePhase(null);
+    setJustBeHereChatVisible(false);
+  }
+
+  function enterJustBeHere(roomId: string) {
+    if (justBeHereEnterTimerRef.current) {
+      clearTimeout(justBeHereEnterTimerRef.current);
+    }
+    setJustBeHereSession({ roomId, enteredAt: Date.now() });
+    setJustBeHerePhase("entering");
+    justBeHereEnterTimerRef.current = setTimeout(() => {
+      setJustBeHerePhase("active");
+      justBeHereEnterTimerRef.current = null;
+    }, JUST_BE_HERE_ENTER_MS);
+
+    const profile = resolveEstatePlaceAmbientProfile(roomId);
+    if (profile) {
+      setEstateAmbienceEnabled(true);
+      kickstartEstateRoomAmbience(roomId, profile);
+      setJustBeHereSoundEnabled(true);
+    } else {
+      setJustBeHereSoundEnabled(isEstateAmbienceEnabled());
+    }
+    setJustBeHereChatVisible(false);
+  }
+
+  function toggleJustBeHereChat() {
+    setJustBeHereChatVisible((visible) => !visible);
+  }
+
+  function toggleJustBeHereSound() {
+    const roomId = justBeHereSession?.roomId;
+    if (!roomId) return;
+    if (justBeHereSoundEnabled) {
+      setEstateAmbienceEnabled(false);
+      setJustBeHereSoundEnabled(false);
+      void stopAllEstateEnvironmentalAudio();
+      return;
+    }
+    const profile = resolveEstatePlaceAmbientProfile(roomId);
+    if (!profile) return;
+    setEstateAmbienceEnabled(true);
+    setJustBeHereSoundEnabled(true);
+    kickstartEstateRoomAmbience(roomId, profile);
+  }
+
+  function returnFromJustBeHere() {
+    if (typeof document !== "undefined" && document.fullscreenElement) {
+      void document.exitFullscreen().catch(() => {
+        /* member declined or browser blocked */
+      });
+    }
+
+    const fromSection = activeSectionRef.current;
+    clearJustBeHereMode();
+    syncDirectEstateVisit(null);
+    clearEstatePendingTransition();
+    setEstateConservatoryEngaged(false);
+    setCompanionStandaloneSection(null);
+
+    recordEstateRoomTransition({
+      toSection: "home",
+      toEntryId: "welcome-home",
+      fromSection,
+      reason: "just be here return",
+      preserveChat: true,
+    });
+    setCurrentRoom("welcome-home");
+    setWelcomeHomeEstateMapVisible(true);
+    navigateToChatCore();
   }
 
   function handleEstateMenuAction(actionId: EstateMenuActionId) {
@@ -10027,6 +10133,45 @@ export default function CompanionPageClient() {
         setHasChatted(true);
       }
       requestChatInputFocus();
+      finishLatencyTurn({ localReply: true });
+      return;
+    }
+
+    if (shouldCompleteRelationshipChatLocally(primaryTurnDecision, trimmed)) {
+      lastUserTextRef.current = trimmed;
+      const userMessage: Message = { role: "user", content: trimmed };
+      if (fresh) clearConversation();
+      const reply = relationshipConversationLocalReply(trimmed);
+      setMessages((prev) => [
+        ...(fresh ? [] : prev),
+        userMessage,
+        { role: "assistant", content: reply },
+      ]);
+      recordPrimaryTurnResponse(reply);
+      markAssistantReplied(chatTurnState);
+      logConversationPipelineDiagnostic({
+        turn: chatTurnRef.current,
+        userText: trimmed,
+        detectedIntent: "RELATIONSHIP_CHAT",
+        kernelHandled: false,
+        informationalChatBypass: true,
+        estateKernelForced: false,
+        taskLockBlocksEstate: false,
+        selectedHandler: "relationship_chat_local",
+        turnOwner: "chat",
+        normalizedMessage: normalizeTurnMessage(trimmed),
+        primaryType: primaryTurnDecision.type,
+        primaryOwner: primaryTurnDecision.owner,
+        primaryConfidence: primaryTurnDecision.confidence,
+      });
+      setInput("");
+      voiceUsedRef.current = false;
+      if (!getPrefs().hasChatted) {
+        savePrefs({ hasChatted: true });
+        setHasChatted(true);
+      }
+      requestChatInputFocus();
+      finishEarlyChatTurn();
       finishLatencyTurn({ localReply: true });
       return;
     }
@@ -15568,7 +15713,7 @@ export default function CompanionPageClient() {
         handleEstateConversationStart(roomId);
         return;
       case "presence":
-        handleEstateConversationStart(roomId);
+        enterJustBeHere(roomId);
         return;
       case "estate-map":
         if (welcomeHomePrimary && roomId === "welcome-home") {
@@ -17605,10 +17750,12 @@ export default function CompanionPageClient() {
   /** Keep profile trigger visible while overlays open — only hide during sign-in. */
   const showGlobalEstateMenu =
     estateChromePolicy.showSubtleEstateMenu && overlay !== "signin";
-  /** Guidebook stays in the lower-left on every screen except sign-in. */
-  const showSparkEstateGuide = overlay !== "signin";
+  /** Guidebook — lower-right; hidden during sign-in and Enjoy the Estate. */
+  const showSparkEstateGuide =
+    overlay !== "signin" && !justBeHereSession;
 
-  const showCompanionBackControl = overlay !== "signin";
+  const showCompanionBackControl =
+    overlay !== "signin" && !justBeHereSession;
 
   const sparkEstateShellPlaceId =
     profileEstateRoomOverlayId ??
@@ -17616,6 +17763,19 @@ export default function CompanionPageClient() {
       ? estateChatRoomId
       : null);
   const sparkEstateShellProfileMode = Boolean(profileEstateRoomOverlayId);
+
+  const estateExperienceMenuRoomId = resolvePresenceModeRoomId({
+    directRoomId:
+      sparkEstateShellPlaceId ??
+      (showDirectEstateOverlay ? estateChatRoomId : null),
+    memoryRoomId: getEstateMemory().currentRoom?.entryId ?? null,
+    presenceRoomId: estatePresenceRoomId,
+    fallbackRoomId: welcomeHomePrimary ? "welcome-home" : null,
+  });
+  const showEstateExperienceMenu =
+    overlay !== "signin" &&
+    !justBeHereSession &&
+    Boolean(estateExperienceMenuRoomId);
 
   const handleCompanionBack = () => {
     if (
@@ -17696,7 +17856,7 @@ export default function CompanionPageClient() {
       }
     >
     <div
-      className={`relative flex h-dvh max-h-dvh overflow-hidden text-lg ${
+      className={`companion-root relative flex h-dvh max-h-dvh overflow-hidden text-lg ${
         companionDeskVisible ? "companion-has-companion-desk" : ""
       }${welcomeHomePrimary ? " companion-welcome-home-root" : ""}${
         momentumBuilderPrimary ? " companion-momentum-builder-root" : ""
@@ -17714,6 +17874,14 @@ export default function CompanionPageClient() {
       data-visual-mode={clientMounted ? visualMode : "off"}
       data-adaptive-context={clientMounted ? adaptiveVisualContext : "support"}
       data-home-mode={homeMode ?? undefined}
+      data-just-be-here={justBeHereSession ? "" : undefined}
+      data-just-be-here--entering={
+        justBeHerePhase === "entering" ? "" : undefined
+      }
+      data-just-be-here--active={justBeHerePhase === "active" ? "" : undefined}
+      data-just-be-here-chat-visible={
+        justBeHereChatVisible ? "true" : undefined
+      }
       {...constitutionalRenderContext.environment.dataAttributes}
       {...constitutionalRenderContext.presence.dataAttributes}
       suppressHydrationWarning
@@ -19516,6 +19684,25 @@ export default function CompanionPageClient() {
         onOpen={openSparkEstateGuideCore}
         onClose={() => setEstateGuideFlipbookOpen(false)}
       />
+      {showEstateExperienceMenu && estateExperienceMenuRoomId ? (
+        <EstateRoomExperienceMenu
+          roomId={estateExperienceMenuRoomId}
+          withEstateMenu={showGlobalEstateMenu}
+          onJustBeHere={() => enterJustBeHere(estateExperienceMenuRoomId)}
+        />
+      ) : null}
+      {justBeHereSession ? (
+        <EnjoyEstateVisitorChrome
+          soundEnabled={justBeHereSoundEnabled}
+          soundAvailable={Boolean(
+            resolveEstatePlaceAmbientProfile(justBeHereSession.roomId),
+          )}
+          chatVisible={justBeHereChatVisible}
+          onReturnToEstate={returnFromJustBeHere}
+          onToggleChat={toggleJustBeHereChat}
+          onToggleSound={toggleJustBeHereSound}
+        />
+      ) : null}
     </div>
     </CompanionDeskProvider>
   );

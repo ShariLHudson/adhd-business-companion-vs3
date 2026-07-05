@@ -5,9 +5,11 @@
 import {
   getEstateDirectoryEntry,
 } from "../directory";
+import { isLiveEstatePlace } from "../liveEstatePlace";
 import { resolveCanonicalPlaceId } from "../canonicalEstateRegistry";
 import { formatEnvironmentPlaceOffer } from "./formatEnvironmentOffer";
 import { ENVIRONMENT_NEED_LEXICON } from "./environmentNeeds";
+import { shouldSuppressEnvironmentNeedDuringDistress } from "@/lib/conversation/emotionalDistressRouting";
 import type {
   ConversationEnvironmentEvaluation,
   EnvironmentNeedId,
@@ -22,6 +24,7 @@ function filterNavigablePlaceIds(ids: readonly string[]): string[] {
   const out: string[] = [];
   for (const raw of ids) {
     const id = resolveCanonicalPlaceId(raw);
+    if (!isLiveEstatePlace(id)) continue;
     const entry = getEstateDirectoryEntry(id);
     if (!entry?.shell.navigable) continue;
     if (seen.has(id)) continue;
@@ -58,6 +61,7 @@ function matchEnvironmentNeed(
  */
 export function evaluateConversationEnvironmentNeed(
   userText: string,
+  options?: { lastAssistantText?: string | null },
 ): ConversationEnvironmentEvaluation {
   const text = userText.trim();
   const empty: ConversationEnvironmentEvaluation = {
@@ -71,6 +75,18 @@ export function evaluateConversationEnvironmentNeed(
   };
 
   if (!text) return empty;
+
+  if (
+    shouldSuppressEnvironmentNeedDuringDistress(
+      text,
+      options?.lastAssistantText,
+    )
+  ) {
+    return {
+      ...empty,
+      reasoning: "emotional distress thread — stay in conversation before environment",
+    };
+  }
 
   const match = matchEnvironmentNeed(text);
   if (!match) return empty;

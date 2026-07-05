@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
+  BACK_TO_ESTATE,
   formatAppBackLabel,
+  isEstateHomeDestination,
   NAV_CLEAR_MY_MIND,
+  NAV_HOME,
   NAV_MY_THOUGHTS,
   navigationDestinationForSection,
   sectionHasEmbeddedChatBack,
@@ -13,7 +16,11 @@ describe("navigationBack", () => {
       "Back to Clear My Mind",
     );
     expect(formatAppBackLabel(NAV_MY_THOUGHTS)).toBe("Back to My Thoughts");
-    expect(formatAppBackLabel("Back to Home")).toBe("Back to Home");
+    expect(formatAppBackLabel(NAV_HOME)).toBe(BACK_TO_ESTATE);
+    expect(formatAppBackLabel("Home")).toBe(BACK_TO_ESTATE);
+    expect(formatAppBackLabel("Back to Home")).toBe(BACK_TO_ESTATE);
+    expect(formatAppBackLabel("Return to Estate")).toBe(BACK_TO_ESTATE);
+    expect(isEstateHomeDestination("Estate")).toBe(true);
   });
 
   it("flags immersive rooms with in-panel chat back", () => {

@@ -6,13 +6,10 @@ import {
   isEstateAmbienceLayerEnabled,
   subscribeEstateAudioSettings,
 } from "@/lib/estate/estateAudioSettings";
+import { stopAllEstateEnvironmentalAudio } from "@/lib/estate/estateEnvironmentalAudio";
 import {
   transitionEstatePlaceAmbient,
-  stopEstateRoomAmbience,
 } from "@/lib/estate/estateRoomAmbience";
-import {
-  stopEstateSoundscapeOverlay,
-} from "@/lib/estate/estateSoundscapeOverlay";
 
 type Props = {
   /** Current canonical place id — from direct visit or estate presence. */
@@ -54,8 +51,7 @@ export function EstatePlaceAudioHost({ placeId }: Props) {
     };
 
     if (!ambienceEnabled || settings.silenced || !id) {
-      void stopEstateRoomAmbience();
-      if (settings.silenced) void stopEstateSoundscapeOverlay();
+      void stopAllEstateEnvironmentalAudio();
       return;
     }
 

@@ -37,6 +37,7 @@ function isSoftRecoverableError(err: unknown): boolean {
   if (err instanceof Error) {
     if (err.name === "AbortError") return true;
     if (err.message === "companion-chat-timeout") return true;
+    if (err.message === "turn-watchdog-timeout") return true;
     if (err.message.startsWith("companion-chat-stream-timeout:")) return true;
     if (err.message.includes("-timeout:")) return true;
   }
@@ -58,13 +59,8 @@ export function resolveChatFailureReply(
   if (responseOwnershipBlocksBridge(lastAssistant?.content)) {
     return null;
   }
-
   if (conversationRecentlyShowedRecovery(input.messages)) {
-    const reply = buildContextualChatFallback({
-      userText: trimmed,
-      ...memory,
-    });
-    return sanitizeBridgeFromReply(reply, trimmed);
+    return null;
   }
 
   if (isSoftRecoverableError(input.err)) {

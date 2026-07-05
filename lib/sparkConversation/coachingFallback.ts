@@ -68,6 +68,21 @@ export const COACHING_FALLBACK_LEAD =
 
   "Something got tangled for a second, but I'm still here." as const;
 
+export const GENERIC_RECOVERY_BRIDGE =
+  "I'm here — tell me what you need and we'll take it from there." as const;
+
+export function isGenericRecoveryContinuation(text: string): boolean {
+  const t = text.trim();
+  if (!t) return true;
+  return (
+    t === GENERIC_RECOVERY_BRIDGE ||
+    t === "Pick up wherever you left off — I'm still with you." ||
+    t === "I'm here — what would help most right now?" ||
+    /\bname where you'd like to be\b/i.test(t) ||
+    /\btell me what you need and we'll take it from there\b/i.test(t)
+  );
+}
+
 
 
 export type CoachingFallbackKind =
@@ -286,7 +301,7 @@ export function resolveRecoveryContinuation(input: RuntimeRecoveryInput): string
 
     }
 
-    return "I'm here — tell me what you need and we'll take it from there.";
+    return GENERIC_RECOVERY_BRIDGE;
 
   }
 
@@ -312,9 +327,7 @@ export function buildRuntimeRecoveryResponse(input: RuntimeRecoveryInput): strin
 
   const userText = input.userText?.trim() ?? "";
 
-  const continuation = resolveRecoveryContinuation(input);
-
-  if (userText && shouldUseEmotionalFirstSequence(userText) && !BRIDGE_RESPONDER_DISABLED) {
+  if (userText && shouldUseEmotionalFirstSequence(userText)) {
 
     const plan = planEmotionalFirstResponse({ text: userText });
 
@@ -322,13 +335,22 @@ export function buildRuntimeRecoveryResponse(input: RuntimeRecoveryInput): strin
 
     if (opening) {
 
-      return `${buildShariErrorRecoveryResponse(continuation)}\n\n${opening}`;
+      return opening;
 
     }
 
   }
 
-  return buildShariErrorRecoveryResponse(continuation);
+  const continuation = resolveRecoveryContinuation(input);
+
+  if (
+    isGenericRecoveryContinuation(continuation) ||
+    isBridgeContinuationResponse(continuation)
+  ) {
+    return COACHING_FALLBACK_LEAD;
+  }
+
+  return `${COACHING_FALLBACK_LEAD} ${continuation}`;
 
 }
 

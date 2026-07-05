@@ -13,7 +13,7 @@ export type MemberEstatePlaceName = {
 /** Core member-facing places (expand as Estate grows). */
 export const MEMBER_ESTATE_PLACE_NAMES: readonly MemberEstatePlaceName[] = [
   { memberName: "Estate Library", placeId: "library" },
-  { memberName: "Personal Library", placeId: "library" },
+  { memberName: "Personal Library", placeId: "personal-library" },
   { memberName: "Coffee House", placeId: "coffee-house" },
   { memberName: "Kitchen", placeId: "estate-kitchen" },
   { memberName: "Music Room", placeId: "music-room" },

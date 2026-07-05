@@ -1,4 +1,5 @@
 import { getCanonicalEstatePlaceById } from "@/lib/estate/canonicalEstateRegistry";
+import { isLiveEstatePlace } from "@/lib/estate/liveEstatePlace";
 import { hasHardEstateNavigationIntent } from "@/lib/estate/estateMetaNavigationPhrases";
 import type { CapabilityRecommendationOption } from "@/lib/estateCapabilityRegistry/types";
 import type { EstateDestinationChoice } from "@/lib/estate/estateDestinationResolver";
@@ -19,6 +20,7 @@ import {
   isLikelyMenuSelectionInput,
   parsePendingChoiceSelection,
 } from "./parseSelection";
+import { isEmotionalSupportThread } from "@/lib/conversation/emotionalDistressRouting";
 import type {
   PendingChoiceItem,
   PendingChoiceResolveResult,
@@ -42,7 +44,9 @@ function formatMenuReplay(state: PendingChoiceState): string {
 }
 
 function placeChoicesFromIds(placeIds: readonly string[]): PendingChoiceItem[] {
-  return placeIds.map((placeId) => {
+  return placeIds
+    .filter((placeId) => isLiveEstatePlace(placeId))
+    .map((placeId) => {
     const place = getCanonicalEstatePlaceById(placeId);
     const label = place?.officialName.replace(/™/g, "") ?? placeId.replace(/-/g, " ");
     return {
@@ -135,6 +139,7 @@ export function shouldClearPendingChoiceForTopicChange(userText: string): boolea
   if (!trimmed) return false;
   if (CANCEL_RE.test(trimmed)) return true;
   if (TOPIC_CHANGE_RE.test(trimmed)) return true;
+  if (isEmotionalSupportThread(trimmed)) return true;
   if (trimmed.split(/\s+/).length >= 8 && !isLikelyMenuSelectionInput(trimmed, 4)) {
     return true;
   }

@@ -1,0 +1,29 @@
+# Estate Registry & Brain Migration Freeze™
+
+**Member map:** `docs/estate/ESTATE_REGISTRY.md`  
+**Spark knowledge:** `docs/estate/ESTATE_BRAIN.md` · `lib/estateBrain/`  
+**Legacy audit:** `lib/estateExperiences/legacyWorkspaceMap.ts`
+
+## Freeze (BINDING)
+
+**Stop adding new member-facing features** until every remaining legacy workspace, menu, route, prompt, and launcher has either been **removed** or **mapped** in the Estate Registry.
+
+## Before adding capability
+
+Ask: *What is the user trying to accomplish, and where in the Estate would that feel most natural?* — **not** *Which menu should this go under?*
+
+## Routing model
+
+Intent → Experience → Navigate to Space → Open Tool → Conversation
+
+## Registry rule
+
+Every feature appears **exactly once**. Duplicate = technical debt. Unmapped = design discussion.
+
+## Retire (member-facing)
+
+Workspace · Open Workspace · Switch Workspace · Module · Builder · Launch · Step into… · Dashboard menus
+
+## Use instead
+
+Experience names (Create, Momentum, Focus, …) · Open [Experience] · Let's head to… · Guidebook + conversation

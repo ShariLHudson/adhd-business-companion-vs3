@@ -97,7 +97,7 @@ const CASUAL_RE =
   /^(?:hi|hey|hello|good morning|good afternoon|thanks|thank you|yo)\b/i;
 
 export const SOMATIC_DISTRESS_RE =
-  /\b(feel sick|feeling sick|nauseous|nauseated|throw up|might cry|want to cry|crying|tearful|body won'?t)\b/i;
+  /\b(feel sick|feeling sick|nauseous|nauseated|throw up|might cry|want to cry|crying|tearful|body won'?t|catch(?:ing)? (?:my )?breath|can'?t catch (?:my )?breath|can'?t seem to relax|can'?t relax|breathless|can'?t breathe)\b/i;
 
 /** Clear emotional signals — not ordinary task uncertainty or problem frustration. */
 export function hasClearEmotionalSignal(text: string): boolean {

@@ -15,6 +15,12 @@
  * @see docs/SPARK_CONVERSATION_GUARDRAILS_FRAMEWORK.md (Rule 1 — Reflect)
  */
 
+import { isSimpleCreateRequest } from "@/lib/universalCreation/createFastPath";
+import {
+  detectUniversalDocumentType,
+  shouldEnterUniversalCreation,
+} from "@/lib/universalCreation/orchestrator";
+
 export type MemberEmotionalSignal =
   | "fear"
   | "avoidance"
@@ -294,8 +300,12 @@ export function detectMemberEmotionalSignals(text: string): MemberEmotionalSigna
   const trimmed = text.trim();
   if (!trimmed) return [];
 
+  const skipConflictDread =
+    /\b(?:email|e-mail|letter|write|draft|compose)\b/i.test(trimmed);
+
   const found: MemberEmotionalSignal[] = [];
   for (const rule of SIGNAL_RULES) {
+    if (rule.signal === "conflict_dread" && skipConflictDread) continue;
     if (rule.pattern.test(trimmed)) found.push(rule.signal);
   }
   return found;
@@ -304,6 +314,16 @@ export function detectMemberEmotionalSignals(text: string): MemberEmotionalSigna
 export function shouldUseEmotionalFirstSequence(text: string): boolean {
   const trimmed = text.trim();
   if (!trimmed) return false;
+  if (
+    shouldEnterUniversalCreation(trimmed) ||
+    isSimpleCreateRequest(trimmed) ||
+    detectUniversalDocumentType(trimmed)
+  ) {
+    return false;
+  }
+  if (/\b(?:write|draft|compose)\b/i.test(trimmed) && /\b(?:email|letter)\b/i.test(trimmed)) {
+    return false;
+  }
   if (FACTUAL_SKIP_RE.test(trimmed) && detectMemberEmotionalSignals(trimmed).length === 0) {
     return false;
   }

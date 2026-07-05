@@ -17,6 +17,15 @@ const ADHD_CAPABILITY =
   "i have adhd and am wondering what this system can help me do";
 
 describe("estate guide — ADHD capability exploration", () => {
+  it("does not treat adhd app pitch as estate guide during create discovery", () => {
+    const pitch =
+      "to explain to potential users how they can use and benefit from my new adhd app";
+    const last =
+      "What's the main reason you're creating this presentation?";
+    expect(isEstateGuideQuestion(pitch)).toBe(false);
+    expect(isEstateGuideQuestion(pitch, last)).toBe(false);
+  });
+
   it("detects the member question", () => {
     expect(isEstateGuideQuestion(ADHD_CAPABILITY)).toBe(true);
   });

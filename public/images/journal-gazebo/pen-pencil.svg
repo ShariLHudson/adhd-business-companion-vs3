@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 48" role="img" aria-label="Pencil">
+  <defs>
+    <linearGradient id="wood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d4a86a"/>
+      <stop offset="100%" stop-color="#8b6a40"/>
+    </linearGradient>
+    <linearGradient id="brass" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#8b6914"/>
+      <stop offset="50%" stop-color="#e8c878"/>
+      <stop offset="100%" stop-color="#8b6914"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="100" cy="44" rx="66" ry="3" fill="#000" opacity="0.2"/>
+  <rect x="48" y="12" width="96" height="22" rx="1" fill="url(#wood)"/>
+  <rect x="20" y="13" width="28" height="20" fill="url(#brass)"/>
+  <rect x="48" y="12" width="4" height="22" fill="#c9a050" opacity="0.5"/>
+  <path d="M144 12 L178 24 L144 34 Z" fill="#3a3228"/>
+  <path d="M144 15 L170 24 L144 31 Z" fill="#6a5a48"/>
+  <path d="M170 22 L178 24 L170 26 Z" fill="#2a2420"/>
+</svg>

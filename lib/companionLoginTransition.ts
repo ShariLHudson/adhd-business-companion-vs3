@@ -56,6 +56,45 @@ export function consumeCompanionLoginArrival(): boolean {
 }
 
 const AUTH_STORAGE_KEY = "companion-supabase-auth";
+const SIGNED_OUT_KEY = "companion-signed-out-v1";
+
+/** After explicit sign-out — login page may show even when dev auth is bypassed. */
+export function markCompanionSignedOut(): void {
+  if (typeof sessionStorage === "undefined") return;
+  try {
+    sessionStorage.setItem(SIGNED_OUT_KEY, "1");
+  } catch {
+    /* quota */
+  }
+}
+
+export function isCompanionSignedOut(): boolean {
+  if (typeof sessionStorage === "undefined") return false;
+  try {
+    return sessionStorage.getItem(SIGNED_OUT_KEY) === "1";
+  } catch {
+    return false;
+  }
+}
+
+export function clearCompanionSignedOut(): void {
+  if (typeof sessionStorage === "undefined") return;
+  try {
+    sessionStorage.removeItem(SIGNED_OUT_KEY);
+  } catch {
+    /* quota */
+  }
+}
+
+/** Remove persisted Supabase session from this browser. */
+export function clearCompanionAuthStorage(): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(AUTH_STORAGE_KEY);
+  } catch {
+    /* quota */
+  }
+}
 
 function authStorageHasSession(raw: string): boolean {
   if (raw.includes("access_token")) return true;

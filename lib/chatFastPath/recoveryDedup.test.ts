@@ -43,7 +43,26 @@ describe("conversation recovery", () => {
       userText: "I just want this app to work.",
       messages,
     });
-    expect(reply).not.toMatch(/something got tangled/i);
-    expect(reply).toMatch(/estate|behave|breaking/i);
+    expect(reply).toBeNull();
+  });
+
+  it("runtime recovery uses one line for generic failures", () => {
+    const reply = buildRuntimeRecoveryResponse({
+      userText: "hello",
+    });
+    expect(reply).toBe(
+      "Something got tangled for a second, but I'm still here.",
+    );
+    expect(reply).not.toContain("tell me what you need");
+  });
+
+  it("runtime recovery does not stack bridge navigation fallback", () => {
+    const reply = buildRuntimeRecoveryResponse({
+      userText: "Can we go to the library?",
+    });
+    expect(reply).toBe(
+      "Something got tangled for a second, but I'm still here.",
+    );
+    expect(reply).not.toMatch(/name where you'd like to be/i);
   });
 });

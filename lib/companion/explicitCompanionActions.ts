@@ -4,12 +4,17 @@
 
 import { isDirectEstateRoomRequest } from "@/lib/estateIntelligence/estateCommandRouter";
 import {
+  isEmotionalSupportMenuOffer,
+  resolveEmotionalSupportMenuChoice,
+} from "@/lib/conversation/emotionalDistressRouting";
+import {
   clampFocusMinutes,
   parseFocusMinutesFromText,
 } from "@/lib/focusDuration";
 
 export type ExplicitCompanionAction =
   | { kind: "open-breathe"; message: string }
+  | { kind: "open-focus-audio"; message: string; categoryId?: string }
   | { kind: "open-spin-wheel"; message: string }
   | { kind: "start-timer"; minutes: number; message: string };
 
@@ -74,6 +79,24 @@ export function resolveExplicitCompanionAction(
   const text = userText.trim();
   if (!text) return null;
   if (isDirectEstateRoomRequest(userText)) return null;
+
+  if (lastAssistantText && isEmotionalSupportMenuOffer(lastAssistantText)) {
+    const choice = resolveEmotionalSupportMenuChoice(userText, lastAssistantText);
+    if (choice === "breathe") {
+      return {
+        kind: "open-breathe",
+        message:
+          "Let's slow down together. I'll stay with you while we breathe.",
+      };
+    }
+    if (choice === "focus-audio") {
+      return {
+        kind: "open-focus-audio",
+        message: "I'll open something calming. Take what you need from it.",
+        categoryId: "calm-brain",
+      };
+    }
+  }
 
   if (BREATHE_EXPLICIT_RE.test(text) || STRESSED_BREATHE_RE.test(text)) {
     return {

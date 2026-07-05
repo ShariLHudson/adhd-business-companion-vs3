@@ -89,7 +89,7 @@ export function ChatInputBar({
         onKeyDown={(e) => {
           const liveText = e.currentTarget.value;
           handleChatTextareaKeyDown(e, (text) => onSend(text), {
-            canSend: Boolean(liveText.trim()) && !isLoading,
+            canSend: Boolean(liveText.trim()),
             onOtherKey: onKeyDown,
           });
         }}
@@ -97,16 +97,18 @@ export function ChatInputBar({
         onBlur={onBlur}
         placeholder={resolvedPlaceholder}
         rows={1}
-        disabled={isLoading}
-        className="max-h-32 min-h-12 flex-1 resize-none border-0 bg-transparent px-2 py-3 text-base leading-relaxed text-[#1f1c19] focus:outline-none disabled:opacity-50"
+        className="max-h-32 min-h-12 flex-1 resize-none border-0 bg-transparent px-2 py-3 text-base leading-relaxed text-[#1f1c19] focus:outline-none"
       />
 
       <button
         type="button"
         data-testid={COMMUNICATION_ANCHOR_TEST_IDS.send}
         data-icon-slot="send"
-        onClick={() => onSend()}
-        disabled={!input.trim() || isLoading}
+        onClick={() => {
+          const liveText = inputRef.current?.value ?? input;
+          onSend(liveText);
+        }}
+        disabled={!input.trim()}
         className={`send-soft flex h-12 shrink-0 items-center justify-center rounded-full px-6 text-base font-medium text-white transition-all disabled:cursor-not-allowed disabled:bg-[#9aaba8] disabled:shadow-none ${conversationMode ? "send-soft-conversation" : ""}`}
       >
         Send

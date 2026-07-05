@@ -2,8 +2,6 @@
 
 import type { ReactNode } from "react";
 import { WelcomeHomeFrostedChatPanel } from "@/components/companion/WelcomeHomeFrostedChatPanel";
-import { EstateRoomAmbienceToggle } from "@/components/companion/estate/EstateRoomAmbienceToggle";
-
 type Props = {
   roomId: string;
   thread: ReactNode;
@@ -31,9 +29,7 @@ export function EstateRoomChatChrome({
 }: Props) {
   return (
     <>
-      <EstateRoomAmbienceToggle roomId={roomId} />
-      <WelcomeHomeFrostedChatPanel
-        estateRoom
+      <WelcomeHomeFrostedChatPanel        estateRoom
         welcomeMessage={welcomeMessage}
         welcomeSlot={welcomeSlot}
         showWelcomeLine={showWelcomeLine}

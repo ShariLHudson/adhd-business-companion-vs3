@@ -8,8 +8,6 @@ export function MomentumBuilderStudioScene() {
     <div className="momentum-builder-room__studio" aria-hidden>
       <div className="momentum-builder-room__morning-light" />
       <div className="momentum-builder-room__desk-surface" />
-      <div className="momentum-builder-room__sticky-note momentum-builder-room__sticky-note--one" />
-      <div className="momentum-builder-room__sticky-note momentum-builder-room__sticky-note--two" />
       <div className="momentum-builder-room__pen" />
       <div className="momentum-builder-room__plant" />
     </div>

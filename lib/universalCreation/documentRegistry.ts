@@ -1,60 +1,37 @@
 /**
  * Document type plugins — same journey, different questions and enhancements.
+ *
+ * Discovery questions and intros come from documentCreationProfiles.ts.
  */
 
+import { getDocumentCreationProfile } from "./documentCreationProfiles";
 import type { UniversalDocumentPlugin } from "./types";
 
-const STANDARD_SLOTS = {
-  why: (topic: string) =>
-    `What's the main reason you're creating this ${topic}?`,
-  who: "Who is this for?",
-  success: "What would success look like when this is done?",
-} as const;
+type PluginInput = Omit<
+  UniversalDocumentPlugin,
+  "discoveryQuestions" | "intro" | "label"
+> & {
+  label?: string;
+  intro?: string;
+  discoveryQuestions?: UniversalDocumentPlugin["discoveryQuestions"];
+};
 
-function plugin(
-  partial: Omit<UniversalDocumentPlugin, "discoveryQuestions"> & {
-    discoveryQuestions?: UniversalDocumentPlugin["discoveryQuestions"];
-  },
-): UniversalDocumentPlugin {
-  const label = partial.label.toLowerCase();
+function plugin(partial: PluginInput): UniversalDocumentPlugin {
+  const profile = getDocumentCreationProfile(partial.id);
   return {
     ...partial,
-    discoveryQuestions: partial.discoveryQuestions ?? [
-      {
-        id: `${partial.id}-why`,
-        slot: "why",
-        prompt: STANDARD_SLOTS.why(label),
-        signalPatterns: [
-          /\b(?:because|so that|to help|goal|purpose|need to|want to)\b/i,
-        ],
-      },
-      {
-        id: `${partial.id}-who`,
-        slot: "who",
-        prompt: STANDARD_SLOTS.who,
-        signalPatterns: [
-          /\b(?:for my|for a|client|customer|team|va|audience|reader)\b/i,
-        ],
-      },
-      {
-        id: `${partial.id}-success`,
-        slot: "success",
-        prompt: STANDARD_SLOTS.success,
-        signalPatterns: [
-          /\b(?:so they|result|outcome|convert|reply|sign up|follow|complete)\b/i,
-        ],
-      },
-    ],
+    label: partial.label ?? profile.label,
+    intro: partial.intro ?? profile.intro,
+    discoveryQuestions:
+      partial.discoveryQuestions ?? profile.discoveryQuestions,
   };
 }
 
 export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   plugin({
     id: "email",
-    label: "Email",
     createItemType: "Email",
     detectPatterns: [/\b(?:an? )?email\b/i],
-    intro: "I'd be happy to help with this email.\n\nLet me understand what you're trying to accomplish.",
     enhancements: [
       { id: "subject-lines", label: "Subject line options", description: "A few subject lines to choose from" },
       { id: "preview-text", label: "Preview text", description: "Inbox preview that supports the subject" },
@@ -70,10 +47,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "newsletter",
-    label: "Newsletter",
     createItemType: "Newsletter",
     detectPatterns: [/\bnewsletter\b/i],
-    intro: "Let's create a newsletter that feels like you.\n\nA couple of quick questions first.",
     enhancements: [
       { id: "subject-lines", label: "Subject lines", description: "Options for the inbox" },
       { id: "preview-text", label: "Preview text", description: "Supports the subject line" },
@@ -89,41 +64,49 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
     uncertaintyPaths: ["recommend", "examples", "research"],
   }),
   plugin({
+    id: "sales_funnel",
+    createItemType: "Marketing Plan",
+    detectPatterns: [
+      /\b(?:sales funnel|marketing funnel|lead funnel|conversion funnel)\b/i,
+      /\bfunnel\b/i,
+    ],
+    enhancements: [
+      { id: "stage-map", label: "Stage map", description: "Visual flow from entry to offer" },
+      { id: "email-sequence", label: "Email sequence outline", description: "Nurture emails between stages" },
+      { id: "landing-copy", label: "Landing page copy", description: "Entry-point page draft" },
+    ],
+    completionActions: [
+      { id: "google-docs", label: "Open in Google Docs" },
+      { id: "pdf", label: "Download PDF" },
+      { id: "momentum", label: "Break into Momentum projects" },
+      { id: "save-template", label: "Save as Template" },
+    ],
+    uncertaintyPaths: ["teach", "recommend", "examples", "research"],
+  }),
+  plugin({
+    id: "website",
+    createItemType: "Document",
+    detectPatterns: [
+      /\b(?:website copy|web copy|homepage|home page|landing page|site copy)\b/i,
+      /\b(?:website|web site)\b/i,
+    ],
+    enhancements: [
+      { id: "page-outline", label: "Page outline", description: "All pages and sections" },
+      { id: "seo-headlines", label: "SEO headlines", description: "Search-friendly titles" },
+      { id: "cta-blocks", label: "CTA blocks", description: "Primary actions per page" },
+    ],
+    completionActions: [
+      { id: "google-docs", label: "Open in Google Docs" },
+      { id: "pdf", label: "Download PDF" },
+      { id: "save-template", label: "Save as Template" },
+    ],
+    uncertaintyPaths: ["recommend", "examples", "research"],
+  }),
+  plugin({
     id: "sop",
-    label: "SOP",
     createItemType: "SOP",
     detectPatterns: [
       /\b(?:an? )?sop\b|standard operating procedure\b/i,
-    ],
-    intro:
-      "I'd be happy to help.\n\nLet me understand what you're trying to build.",
-    discoveryQuestions: [
-      {
-        id: "sop-audience-type",
-        slot: "who",
-        prompt: "Is this SOP for your own business, or for a client?",
-        signalPatterns: [
-          /\b(?:my (?:own )?business|our (?:team|company)|for a client|client'?s)\b/i,
-        ],
-      },
-      {
-        id: "sop-starting-point",
-        slot: "why",
-        prompt:
-          "Are you starting from scratch, or do you already have a process written down somewhere?",
-        signalPatterns: [
-          /\b(?:from scratch|starting fresh|already have|written down|existing)\b/i,
-        ],
-      },
-      {
-        id: "sop-audience-size",
-        slot: "success",
-        prompt:
-          "Will one person use this, or will multiple people need to follow it?",
-        signalPatterns: [
-          /\b(?:just me|one person|solo|team|multiple|va|assistant|staff)\b/i,
-        ],
-      },
     ],
     enhancements: [
       { id: "checklist", label: "Printable checklist", description: "Quick-reference checklist from the SOP" },
@@ -141,10 +124,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "proposal",
-    label: "Proposal",
     createItemType: "Proposal",
     detectPatterns: [/\b(?:an? )?proposal\b/i],
-    intro: "Let's build a proposal that wins trust.\n\nFirst, help me understand the opportunity.",
     enhancements: [
       { id: "cover-letter", label: "Cover letter", description: "Warm opening before the details" },
       { id: "timeline", label: "Timeline", description: "Clear phases and milestones" },
@@ -161,12 +142,10 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "social_post",
-    label: "Social Post",
     createItemType: "Social Post",
     detectPatterns: [
       /\b(?:social post|social media post|(?:facebook|linkedin|instagram) post|linkedin post|caption)\b/i,
     ],
-    intro: "Let's craft something worth stopping the scroll for.",
     enhancements: [
       { id: "hook-variants", label: "Opening hook options", description: "Strong first lines" },
       { id: "hashtags", label: "Hashtag suggestions", description: "When they fit the platform" },
@@ -181,10 +160,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "checklist",
-    label: "Checklist",
     createItemType: "Checklist",
     detectPatterns: [/\b(?:an? )?checklist\b/i],
-    intro: "Let's make a checklist people will actually use.",
     enhancements: [
       { id: "printable", label: "Printable layout", description: "Clean format for printing" },
       { id: "sop-link", label: "Link to related SOP", description: "When this supports a process" },
@@ -198,12 +175,10 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "business_plan",
-    label: "Business Plan",
     createItemType: "Marketing Plan",
     detectPatterns: [
       /\b(?:business plan|marketing plan|social media campaign|social campaign)\b/i,
     ],
-    intro: "Let's shape a plan you can actually work from.",
     enhancements: [
       { id: "executive-summary", label: "Executive summary", description: "One-page overview" },
       { id: "financial-outline", label: "Financial outline", description: "High-level numbers section" },
@@ -218,10 +193,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "course",
-    label: "Course",
     createItemType: "Document",
     detectPatterns: [/\b(?:an? )?course\b|training program\b/i],
-    intro: "Let's design a course that helps people grow.",
     enhancements: [
       { id: "workbook", label: "Workbook", description: "Exercises and worksheets" },
       { id: "slides", label: "Slide outline", description: "Lesson presentation structure" },
@@ -238,10 +211,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "blog",
-    label: "Blog",
     createItemType: "Document",
     detectPatterns: [/\b(?:blog(?:\s+post)?|article)\b/i],
-    intro: "Let's write something your reader will be glad they found.",
     enhancements: [
       { id: "headlines", label: "Headline options", description: "Titles that earn the click" },
       { id: "seo-outline", label: "SEO outline", description: "Structure for search and skimming" },
@@ -256,12 +227,10 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "guide",
-    label: "Guide",
     createItemType: "Document",
     detectPatterns: [
       /\b(?:how[- ]to guide|guide|playbook|lead magnet|client avatar)\b/i,
     ],
-    intro: "Let's build a guide that makes the path clear.",
     enhancements: [
       { id: "quick-start", label: "Quick-start page", description: "One-page overview" },
       { id: "examples", label: "Worked examples", description: "Show what good looks like" },
@@ -275,10 +244,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "workbook",
-    label: "Workbook",
     createItemType: "Document",
     detectPatterns: [/\bworkbook\b/i],
-    intro: "Let's create a workbook people can work through step by step.",
     enhancements: [
       { id: "exercises", label: "Exercise pages", description: "Prompts and fill-in sections" },
       { id: "answer-key", label: "Facilitator notes", description: "For coaches and trainers" },
@@ -292,10 +259,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "training_manual",
-    label: "Training Manual",
     createItemType: "Document",
     detectPatterns: [/\b(?:training manual|training guide|onboarding guide)\b/i],
-    intro: "Let's build training materials that stick.",
     enhancements: [
       { id: "checklist", label: "Trainer checklist", description: "Session delivery guide" },
       { id: "quizzes", label: "Knowledge checks", description: "Short comprehension checks" },
@@ -309,10 +274,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "book_chapter",
-    label: "Book Chapter",
     createItemType: "Document",
     detectPatterns: [/\b(?:book chapter|chapter draft)\b/i],
-    intro: "Let's develop this chapter with a clear arc.",
     enhancements: [
       { id: "outline", label: "Chapter outline", description: "Section structure before drafting" },
       { id: "pull-quotes", label: "Pull quotes", description: "Memorable lines for promotion" },
@@ -326,10 +289,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "meeting_agenda",
-    label: "Meeting Agenda",
     createItemType: "Document",
     detectPatterns: [/\b(?:meeting agenda|agenda for)\b/i],
-    intro: "Let's plan a meeting that respects everyone's time.",
     enhancements: [
       { id: "pre-read", label: "Pre-read notes", description: "What to review beforehand" },
       { id: "follow-up", label: "Follow-up template", description: "Capture decisions after" },
@@ -343,10 +304,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "white_paper",
-    label: "White Paper",
     createItemType: "Document",
     detectPatterns: [/\bwhite paper\b/i],
-    intro: "Let's build a white paper that earns trust and clarity.",
     enhancements: [
       { id: "executive-summary", label: "Executive summary", description: "One-page overview" },
       { id: "research-citations", label: "Research section", description: "Evidence and sources" },
@@ -360,10 +319,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "workflow",
-    label: "Workflow",
     createItemType: "Workflow",
     detectPatterns: [/\b(?:an? )?workflow\b/i],
-    intro: "Let's map a workflow your team can follow.",
     enhancements: [
       { id: "flowchart", label: "Flowchart outline", description: "Visual process map" },
       { id: "checklist", label: "Checklist", description: "Step-by-step reference" },
@@ -376,38 +333,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "workshop",
-    label: "Workshop",
     createItemType: "Document",
     detectPatterns: [/\bworkshop\b/i],
-    intro:
-      "I'd love to help.\nLet's build it together.\n\nA couple of quick questions first.",
-    discoveryQuestions: [
-      {
-        id: "workshop-who",
-        slot: "who",
-        prompt: "Who is the workshop for?",
-        signalPatterns: [
-          /\b(?:for my|for a|client|customer|team|entrepreneurs|beginners|audience)\b/i,
-        ],
-      },
-      {
-        id: "workshop-transformation",
-        slot: "why",
-        prompt:
-          "What transformation do you want participants to experience?",
-        signalPatterns: [
-          /\b(?:so they|learn|walk away|transform|outcome|feel|able to)\b/i,
-        ],
-      },
-      {
-        id: "workshop-duration",
-        slot: "success",
-        prompt: "About how long will the workshop be?",
-        signalPatterns: [
-          /\b(?:\d+\s*(?:hour|minute|min|hr|day)|half day|full day|90.?min)\b/i,
-        ],
-      },
-    ],
     enhancements: [
       { id: "agenda", label: "Session agenda", description: "Timed flow for delivery" },
       { id: "worksheets", label: "Participant worksheets", description: "Hands-on exercises" },
@@ -422,33 +349,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "webinar",
-    label: "Webinar",
     createItemType: "Document",
     detectPatterns: [/\bwebinar\b/i],
-    intro:
-      "Let's build a webinar that holds attention and delivers real value.\n\nA couple of quick questions first.",
-    discoveryQuestions: [
-      {
-        id: "webinar-who",
-        slot: "who",
-        prompt: "Who is this webinar for?",
-        signalPatterns: [/\b(?:for my|for a|client|audience|list|prospects)\b/i],
-      },
-      {
-        id: "webinar-goal",
-        slot: "why",
-        prompt: "What's the main outcome you want attendees to leave with?",
-        signalPatterns: [/\b(?:so they|learn|sign up|buy|understand|walk away)\b/i],
-      },
-      {
-        id: "webinar-length",
-        slot: "success",
-        prompt: "About how long will the webinar run?",
-        signalPatterns: [
-          /\b(?:\d+\s*(?:hour|minute|min)|45.?min|60.?min|90.?min)\b/i,
-        ],
-      },
-    ],
     enhancements: [
       { id: "slides", label: "Slide outline", description: "Key beats for each section" },
       { id: "registration", label: "Registration page copy", description: "Title and promise for sign-ups" },
@@ -463,10 +365,8 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "presentation",
-    label: "Presentation",
     createItemType: "Document",
     detectPatterns: [/\bpresentation\b/i],
-    intro: "Let's shape a presentation that lands clearly.\n\nA couple of quick questions first.",
     enhancements: [
       { id: "speaker-notes", label: "Speaker notes", description: "What to say on each slide" },
       { id: "handout", label: "Audience handout", description: "One-page takeaway summary" },
@@ -480,12 +380,10 @@ export const UNIVERSAL_DOCUMENT_PLUGINS: readonly UniversalDocumentPlugin[] = [
   }),
   plugin({
     id: "document",
-    label: "Document",
     createItemType: "Document",
     detectPatterns: [
       /\b(?:help me (?:create|write|draft|build|compose|design|outline|plan|develop|generate|make)|(?:create|write|draft|build|compose|design|outline|plan|develop|generate|make)\s+(?:a|an|my|the|new|our)|need a)\b/i,
     ],
-    intro: "I'd love to help you create this.\n\nLet me understand what you're building.",
     uncertaintyPaths: ["recommend", "examples", "teach"],
     enhancements: [],
     completionActions: [

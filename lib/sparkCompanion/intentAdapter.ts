@@ -73,12 +73,32 @@ export function primaryTurnFromDecisionEngine(
 
 /**
  * Reconcile legacy primary classification with Decision Engine when engine confidence is high.
- * Preserves DIRECT_COMMAND, RELATIONSHIP_CHAT, and IMPLIED_NEED from legacy classifier.
+ * CREATE + high is terminal — always wins over legacy routers.
  */
 export function reconcilePrimaryTurnWithDecisionEngine(
   legacy: PrimaryTurnDecision,
   decision: SparkDecisionEngineDecision,
 ): PrimaryTurnDecision {
+  if (decision.intent === "CREATE" && decision.intentConfidence === "high") {
+    return {
+      type: "TASK_REQUEST",
+      confidence: "high",
+      owner: "frictionless:universal_creation",
+      reason: `decision engine CREATE (terminal): ${decision.reason}`,
+      blockKernelNavigation: true,
+      blockBridgeResponder: true,
+      blockCollectionOffer: true,
+      blockSecondaryResponders: true,
+    };
+  }
+
+  if (
+    legacy.owner === "frictionless:universal_creation" &&
+    legacy.type === "TASK_REQUEST"
+  ) {
+    return legacy;
+  }
+
   if (
     legacy.type === "DIRECT_COMMAND" ||
     legacy.type === "RELATIONSHIP_CHAT" ||

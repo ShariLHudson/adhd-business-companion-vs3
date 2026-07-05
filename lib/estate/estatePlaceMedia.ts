@@ -51,6 +51,7 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "apple-orchard": estateBackgroundPath("space-apple-orchard-background.webp"),
   "reading-nook": estateBackgroundPath("reading-nook-window background.png"),
   library: estateBackgroundPath("room-library-estate-background.png"),
+  "personal-library": estateBackgroundPath("room-library-personal-background.png"),
   "momentum-institute": estateBackgroundPath(
     "the-momentum-institute-background.png",
   ),

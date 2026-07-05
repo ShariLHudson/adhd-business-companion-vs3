@@ -50,7 +50,7 @@ export const SHARI_ERROR_RECOVERY_LINE =
   "Something got tangled for a second, but I'm still here." as const;
 
 const DIFFICULT_CLIENT_CALL_RE =
-  /\b(?:difficult|hard|dread(?:ed|ing)?|don'?t want to|avoid(?:ing)?).{0,40}(?:call|phone|client|customer)|(?:call|phone).{0,40}(?:difficult|hard|client|customer|don'?t want)\b/i;
+  /\b(?:difficult|hard|dread(?:ed|ing)?|don'?t want to|avoid(?:ing)?).{0,40}(?:call|phone)\b|\b(?:call|phone).{0,40}(?:difficult|hard|client|customer|don'?t want)\b/i;
 
 export type ShariCompanionHintInput = SparkCompanionSessionContext & {
   userText: string;
@@ -122,7 +122,12 @@ export function detectShariBannedPhrases(text: string): string[] {
 }
 
 export function isDifficultClientCallRequest(text: string): boolean {
-  return DIFFICULT_CLIENT_CALL_RE.test(text.trim());
+  const trimmed = text.trim();
+  if (!trimmed) return false;
+  if (/\b(?:email|e-mail|letter|message|write|draft|compose)\b/i.test(trimmed)) {
+    return false;
+  }
+  return DIFFICULT_CLIENT_CALL_RE.test(trimmed);
 }
 
 export function buildShariErrorRecoveryResponse(

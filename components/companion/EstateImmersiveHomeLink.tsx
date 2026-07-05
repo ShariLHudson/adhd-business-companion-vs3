@@ -1,11 +1,15 @@
 "use client";
 
-import { formatAppBackLabel, NAV_HOME } from "@/lib/navigationBack";
+import {
+  BACK_TO_ESTATE,
+  formatAppBackLabel,
+  isEstateHomeDestination,
+} from "@/lib/navigationBack";
 
 type Props = {
   onClick: () => void;
   className?: string;
-  /** Visible label — defaults to estate Home. */
+  /** Visible label — defaults to Back To Estate. */
   label?: string;
 };
 
@@ -15,20 +19,27 @@ type Props = {
 export function EstateImmersiveHomeLink({
   onClick,
   className = "",
-  label = NAV_HOME,
+  label = BACK_TO_ESTATE,
 }: Props) {
+  const visibleLabel = isEstateHomeDestination(label)
+    ? BACK_TO_ESTATE
+    : label;
+  const ariaLabel = isEstateHomeDestination(label)
+    ? BACK_TO_ESTATE
+    : formatAppBackLabel(label);
+
   return (
     <button
       type="button"
       onClick={onClick}
       className={`estate-immersive-home-link ${className}`.trim()}
       data-testid="estate-room-home-link"
-      aria-label={formatAppBackLabel(label)}
+      aria-label={ariaLabel}
     >
       <span className="estate-immersive-home-link__arrow" aria-hidden="true">
         ←
       </span>
-      <span className="estate-immersive-home-link__label">{label}</span>
+      <span className="estate-immersive-home-link__label">{visibleLabel}</span>
     </button>
   );
 }
