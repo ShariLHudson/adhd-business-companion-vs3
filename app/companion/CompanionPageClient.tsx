@@ -701,6 +701,8 @@ import {
   WELCOME_HOME_REPLAY_EVENT,
   clearWelcomeHomeReplayRequest,
   hasSeenWelcomeIntro,
+  isWelcomeHomeIntroAudioBlocked,
+  markChatAssistantAudioElement,
   markWelcomeIntroSeen,
   peekWelcomeHomeReplayRequested,
   type WelcomeHomeFirstChoice,
@@ -4401,6 +4403,7 @@ export default function CompanionPageClient() {
   }
   const ttsAudioRef = useRef<HTMLAudioElement | null>(null);
   async function playTTS(text: string) {
+    if (isWelcomeHomeIntroAudioBlocked()) return;
     // Voice is metered per plan. Out of minutes → don't spend the API call.
     const vs = getVoiceStatus();
     if (!vs.hasVoice || vs.leftMin <= 0) {
@@ -4418,6 +4421,7 @@ export default function CompanionPageClient() {
       if (!res.ok) return;
       const url = URL.createObjectURL(await res.blob());
       const audio = new Audio(url);
+      markChatAssistantAudioElement(audio);
       ttsAudioRef.current = audio;
       audio.onended = () => {
         addVoiceSeconds(audio.duration || 0);
@@ -15575,7 +15579,9 @@ export default function CompanionPageClient() {
       } else {
         registerCommitmentFromAssistant(assistantMsg);
       }
-      if (voiceOutput && rawAssistantMsg) void playTTS(rawAssistantMsg);
+      if (voiceOutput && rawAssistantMsg && !isWelcomeHomeIntroAudioBlocked()) {
+        void playTTS(rawAssistantMsg);
+      }
     } catch (err) {
       logPipelineTurnFailure({
         turn: chatTurnRef.current,

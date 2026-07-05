@@ -18,9 +18,16 @@ import {
   destroyWelcomeHomeAudioManager,
   useWelcomeAudioExperience,
 } from "@/lib/welcomeAudio";
-import { unlockBrowserAudioFromClick } from "@/lib/welcomeAudio/audioUnlock";
+import {
+  isWelcomeAudioSessionUnlocked,
+  unlockBrowserAudioFromClick,
+} from "@/lib/welcomeAudio/audioUnlock";
+import {
+  WELCOME_HOME_BEGIN_HINT,
+  WELCOME_HOME_BEGIN_LABEL,
+} from "@/lib/welcomeHome/content";
+import { setWelcomeHomeIntroAudioBlocked } from "@/lib/welcomeHome/introAudioGuard";
 import { markWelcomeRoomOpenedWithGesture } from "@/lib/welcomeRoom/welcomeRoomGesture";
-import { welcomeHomeBackgroundFrame } from "@/lib/welcomeHome/backgroundFrame";
 import {
   WELCOME_HOME_CHAT_REVEAL_DELAY_MS,
   WELCOME_HOME_FALLBACK_DOLLY_MS,
@@ -29,14 +36,14 @@ import {
 } from "@/lib/welcomeHome/introTiming";
 import type { WelcomeHomeExperiencePlan } from "@/lib/sparkExperienceEngine";
 import {
+  hasPendingWelcomeRoomGestureUnlock,
   prefersReducedMotion,
   WELCOME_ROOM_ASSET,
   useWelcomeRoomArrival,
-} from "@/lib/welcomeRoom";
-import {
   welcomeRoomCinematicDollyProgress,
+  welcomeRoomDollyFrame,
   welcomeRoomWalkElapsedMs,
-} from "@/lib/welcomeRoom/arrival";
+} from "@/lib/welcomeRoom";
 
 type Props = {
   experience: WelcomeHomeExperiencePlan;
@@ -88,6 +95,8 @@ export function WelcomeHomePage({
   const introActive = firstVisitCinematic && phase === "intro";
   const introPlaybackReady = introActive && screenReady;
   const chatVisible = phase === "chat";
+  const chromeHiddenDuringWelcome =
+    firstVisitCinematic && phase !== "chat";
 
   const {
     voiceState,
@@ -113,15 +122,18 @@ export function WelcomeHomePage({
   }, [introPlaybackReady, progress.totalSeconds]);
 
   const walkPaused =
-    introPlaybackReady &&
-    !skippedIntro &&
-    !voiceHasPlayed &&
-    voiceState !== "playing" &&
-    voiceState !== "loading" &&
-    voiceState !== "ended";
+    (introActive && !screenReady) ||
+    (introPlaybackReady && !audioUnlocked && !skippedIntro) ||
+    (introPlaybackReady &&
+      !skippedIntro &&
+      !voiceHasPlayed &&
+      voiceState !== "playing" &&
+      voiceState !== "loading" &&
+      voiceState !== "ended");
 
   const arrival = useWelcomeRoomArrival({
-    skipIntro: !firstVisitCinematic || phase !== "intro",
+    skipIntro: true,
+    frozen: !firstVisitCinematic || phase !== "intro",
     dollyDurationMs: introPlaybackReady ? dollyDurationMs : undefined,
     walkPaused,
   });
@@ -132,11 +144,10 @@ export function WelcomeHomePage({
       )
     : 1;
 
-  const backgroundFrame = welcomeHomeBackgroundFrame(cinematicProgress);
-  const imageScale = useMemo(() => {
-    const match = backgroundFrame.imageTransform.match(/scale\(([\d.]+)\)/);
-    return match ? Number(match[1]) : 1;
-  }, [backgroundFrame.imageTransform]);
+  const roomDolly = firstVisitCinematic
+    ? arrival.dolly
+    : welcomeRoomDollyFrame(1);
+  const imageScale = roomDolly.imageScale;
 
   useEffect(() => {
     if (!firstVisitCinematic) {
@@ -154,15 +165,22 @@ export function WelcomeHomePage({
 
   useEffect(() => {
     if (!introPlaybackReady || audioUnlocked) return;
-    markWelcomeRoomOpenedWithGesture();
-    unlockBrowserAudioFromClick();
-    void playExperience();
+    if (
+      isWelcomeAudioSessionUnlocked() ||
+      hasPendingWelcomeRoomGestureUnlock()
+    ) {
+      void playExperience();
+    }
   }, [introPlaybackReady, audioUnlocked, playExperience]);
 
   useEffect(() => {
-    onIntroActiveChange?.(introActive);
-    return () => onIntroActiveChange?.(false);
-  }, [introActive, onIntroActiveChange]);
+    onIntroActiveChange?.(chromeHiddenDuringWelcome);
+    setWelcomeHomeIntroAudioBlocked(chromeHiddenDuringWelcome);
+    return () => {
+      onIntroActiveChange?.(false);
+      setWelcomeHomeIntroAudioBlocked(false);
+    };
+  }, [chromeHiddenDuringWelcome, onIntroActiveChange]);
 
   useEffect(() => {
     if (voiceState === "playing") {
@@ -239,6 +257,13 @@ export function WelcomeHomePage({
     [introPlaybackReady, audioUnlocked, beginIntroAudio],
   );
 
+  const showBeginWelcome =
+    introPlaybackReady &&
+    !audioUnlocked &&
+    !skippedIntro &&
+    voiceState !== "playing" &&
+    voiceState !== "loading";
+
   useLayoutEffect(() => {
     if (!chatVisible || !inputRef) return;
     const delayMs = firstVisitCinematic ? 450 : 0;
@@ -271,6 +296,7 @@ export function WelcomeHomePage({
       <div className="welcome-home-page__stage">
         <div
           className="welcome-home-page__viewport"
+          style={{ opacity: arrival.fadeOpacity }}
           onPointerDown={handleIntroPointerDown}
         >
           <div className="welcome-room__dolly-rig welcome-home-page__photo-rig">
@@ -279,8 +305,8 @@ export function WelcomeHomePage({
                 <div
                   className="welcome-room__photo-plane"
                   style={{
-                    transform: backgroundFrame.imageTransform,
-                    transformOrigin: backgroundFrame.transformOrigin,
+                    transform: roomDolly.imageTransform,
+                    transformOrigin: roomDolly.transformOrigin,
                   }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -289,8 +315,8 @@ export function WelcomeHomePage({
                     alt=""
                     className="welcome-room__photo welcome-home-page__photo"
                     style={{
-                      objectPosition: backgroundFrame.objectPosition,
-                      objectFit: backgroundFrame.objectFit,
+                      objectPosition: roomDolly.objectPosition,
+                      objectFit: roomDolly.objectFit,
                     }}
                     onLoad={() => setHeroImageLoaded(true)}
                   />
@@ -299,6 +325,26 @@ export function WelcomeHomePage({
             </div>
           </div>
         </div>
+
+        {arrival.darkOpacity > 0 ? (
+          <div
+            className="welcome-room__dark-curtain"
+            style={{ opacity: arrival.darkOpacity }}
+            aria-hidden="true"
+          />
+        ) : null}
+
+        {showBeginWelcome ? (
+          <button
+            type="button"
+            className="welcome-room__audio-unlock welcome-home-page__begin-welcome"
+            onClick={beginIntroAudio}
+            data-testid="welcome-home-begin-welcome"
+          >
+            <span className="welcome-room__enter-label">{WELCOME_HOME_BEGIN_LABEL}</span>
+            <span className="welcome-room__enter-hint">{WELCOME_HOME_BEGIN_HINT}</span>
+          </button>
+        ) : null}
 
         {introActive ? (
           <div className="welcome-home-page__intro-controls">

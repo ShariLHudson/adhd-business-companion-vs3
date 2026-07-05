@@ -260,6 +260,18 @@ body.companion-welcome-home-mode .companion-sidebar-portal,
   pointer-events: none !important;
 }
 
+.companion-welcome-home-intro-active .global-estate-menu-anchor,
+.companion-welcome-home-intro-active .estate-room-experience-menu,
+.companion-welcome-home-intro-active .spark-estate-guide-anchor {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.welcome-home-page__begin-welcome {
+  z-index: 12;
+}
+
 @media (max-width: 640px) {
   [data-companion-chat-layer="true"].welcome-home-page__chat-panel {
     max-height: min(56vh, 30rem);

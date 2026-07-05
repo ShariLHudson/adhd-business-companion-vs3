@@ -17,9 +17,17 @@ export {
 export {
   WELCOME_HOME_INVITATIONS,
   WELCOME_HOME_SHARI_QUESTION,
+  WELCOME_HOME_BEGIN_LABEL,
+  WELCOME_HOME_BEGIN_HINT,
   type WelcomeHomeFirstChoice,
   type WelcomeHomeInvitation,
 } from "./content";
+export {
+  isWelcomeHomeIntroAudioBlocked,
+  markChatAssistantAudioElement,
+  pauseChatAssistantAudio,
+  setWelcomeHomeIntroAudioBlocked,
+} from "./introAudioGuard";
 export { resolveWelcomeHomeDailyGreeting } from "./dailyGreeting";
 export {
   WELCOME_HOME_CHAT_REVEAL_DELAY_MS,
