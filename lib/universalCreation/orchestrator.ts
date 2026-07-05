@@ -435,6 +435,18 @@ export function universalCreationHint(
       "If member is uncertain → teach, recommend, examples, or research."
     );
   }
+  if (turn.kind === "draft") {
+    return (
+      `UNIVERSAL CREATION — Draft (${plugin.label}): ` +
+      "Draft is in chat · ask permission before revisions · member owns approval."
+    );
+  }
+  if (turn.kind === "message") {
+    return (
+      `UNIVERSAL CREATION — Guided (${plugin.label}): ` +
+      "Continue conversationally · one step at a time."
+    );
+  }
   return (
     `UNIVERSAL CREATION — Ready (${plugin.label}): ` +
     `${turn.guidedCreationHint} Enhancements available: ${turn.enhancementOffers.join("; ")}`

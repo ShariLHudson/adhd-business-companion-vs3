@@ -2141,7 +2141,7 @@ function buildPendingContinuationDecision(
     };
   }
 
-  if (pending.type === "open_workspace" && pending.target !== "content-generator") {
+  if (pending.type === "open_workspace") {
     return {
       ...base,
       workspaceOffer: {

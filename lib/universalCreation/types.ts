@@ -36,6 +36,8 @@ export type UniversalDocumentType =
   | "workshop"
   | "webinar"
   | "presentation"
+  | "sales_funnel"
+  | "website"
   | "document";
 
 export type UniversalDiscoverySlot = "what" | "why" | "who" | "success";
@@ -90,6 +92,8 @@ export type UniversalCreationSession = {
   startedAtTurn: number;
   preparationReady: boolean;
   pendingEnhancements: string[];
+  /** Composed draft shown during review — persisted for revision turns. */
+  draftContent?: string;
 };
 
 export const UNIVERSAL_DISCOVERY_THRESHOLD = 90;
@@ -137,6 +141,17 @@ export type UniversalCreationTurnResult =
       preparationLine: string;
       guidedCreationHint: string;
       enhancementOffers: string[];
+    }
+  | {
+      kind: "draft";
+      message: string;
+      draftBody: string;
+      session: UniversalCreationSession;
+    }
+  | {
+      kind: "message";
+      message: string;
+      session: UniversalCreationSession;
     };
 
 export type UniversalReviewChoice =
