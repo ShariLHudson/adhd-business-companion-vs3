@@ -40,10 +40,12 @@ import {
   prefersReducedMotion,
   WELCOME_ROOM_ASSET,
   useWelcomeRoomArrival,
+} from "@/lib/welcomeRoom";
+import {
   welcomeRoomCinematicDollyProgress,
   welcomeRoomDollyFrame,
   welcomeRoomWalkElapsedMs,
-} from "@/lib/welcomeRoom";
+} from "@/lib/welcomeRoom/arrival";
 
 type Props = {
   experience: WelcomeHomeExperiencePlan;
