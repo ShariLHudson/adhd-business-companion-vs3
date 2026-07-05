@@ -11,6 +11,7 @@ import {
   type ReactNode,
 } from "react";
 import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
+import { usePathname } from "next/navigation";
 
 import { getAppSiteUrl } from "@/lib/appSite";
 import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
@@ -316,6 +317,12 @@ async function signUpDirect(
   }
 }
 
+function isCompanionLoginPath(pathname: string | null): boolean {
+  if (!pathname) return false;
+  const normalized = pathname.replace(/\/$/, "") || "/";
+  return normalized === "/companion/login";
+}
+
 export function CompanionAuthProvider({
   children,
   inlineSupabase,
@@ -324,6 +331,8 @@ export function CompanionAuthProvider({
   inlineSupabase?: CompanionInlineSupabaseConfig | null;
 }) {
   const authBypassed = isCompanionAuthBypassed();
+  const pathname = usePathname();
+  const loginOnlyAuth = isCompanionLoginPath(pathname);
 
   useLayoutEffect(() => {
     seedInlineSupabaseOnClient(inlineSupabase);
@@ -386,6 +395,16 @@ export function CompanionAuthProvider({
           setUser(sess?.user ?? null);
           if (sess?.user) syncUserToPrefs(sess.user);
         };
+
+        if (loginOnlyAuth) {
+          const { data } = await supabase.auth.getSession();
+          if (data.session) {
+            applySession(data.session);
+          } else if (hasCompanionAuthStorageHint()) {
+            clearCompanionAuthStorage();
+          }
+          return;
+        }
 
         const { data: sub } = supabase.auth.onAuthStateChange((event, sess) => {
           if (!mounted) return;
@@ -469,7 +488,7 @@ export function CompanionAuthProvider({
       window.clearTimeout(loadingTimeout);
       unsubscribe?.();
     };
-  }, [authBypassed, inlineSupabase?.url, inlineSupabase?.anonKey]);
+  }, [authBypassed, inlineSupabase?.url, inlineSupabase?.anonKey, loginOnlyAuth]);
 
   const value = useMemo<CompanionAuthContextValue>(
     () => ({
