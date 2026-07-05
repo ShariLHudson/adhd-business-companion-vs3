@@ -14,12 +14,18 @@ import {
   companionLoginSubtext,
 } from "@/lib/companionLoginPage";
 import { navigateToCompanionHome, waitForCompanionAuthStorage } from "@/lib/companionLoginTransition";
+import { getCompanionSupabase } from "@/lib/supabase/companionClient";
 import {
   dismissWelcomeRoomInvitation,
   dismissWelcomeRoomLoginOffer,
 } from "@/lib/welcomeRoom";
 
-export function CompanionSignInExperience() {
+export function CompanionSignInExperience({
+  forceSignIn = false,
+}: {
+  /** After explicit sign-out — stay on login; do not auto-enter home. */
+  forceSignIn?: boolean;
+}) {
   const { loading, user, session, sessionChecked, configured: authReady, configChecked } =
     useCompanionAuth();
 
@@ -62,11 +68,32 @@ export function CompanionSignInExperience() {
   }, []);
 
   useEffect(() => {
-    if (!sessionChecked || loading || redirecting) return;
+    if (forceSignIn || !sessionChecked || loading || redirecting) return;
     const token = session?.access_token;
     if (!user?.id && !token) return;
-    goHomeAfterAuth();
-  }, [sessionChecked, loading, user, session, redirecting, goHomeAfterAuth]);
+
+    let cancelled = false;
+    void (async () => {
+      const supabase = getCompanionSupabase();
+      if (!supabase) return;
+      const { data: userData, error } = await supabase.auth.getUser();
+      if (cancelled) return;
+      if (error || !userData.user) return;
+      goHomeAfterAuth();
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    forceSignIn,
+    sessionChecked,
+    loading,
+    user,
+    session,
+    redirecting,
+    goHomeAfterAuth,
+  ]);
 
   useEffect(() => {
     if (!redirecting) return;
@@ -83,10 +110,13 @@ export function CompanionSignInExperience() {
   if (redirecting) {
     return (
       <main
-        className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]"
+        className="companion-login-page companion-login-page--welcome-bg relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-8"
         data-testid="companion-login-opening"
       >
-        Opening your space…
+        <CompanionLoginBackground />
+        <p className="relative z-10 rounded-2xl border border-white/45 bg-[#faf7f2]/72 px-6 py-4 text-base text-[#6b635a] shadow-sm backdrop-blur-md">
+          Opening your space…
+        </p>
       </main>
     );
   }

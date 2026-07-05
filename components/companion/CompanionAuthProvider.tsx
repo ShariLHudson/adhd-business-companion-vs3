@@ -411,9 +411,37 @@ export function CompanionAuthProvider({
         };
 
         if (loginOnlyAuth) {
+          const signedOut =
+            typeof window !== "undefined" &&
+            new URLSearchParams(window.location.search).get("signedOut") ===
+              "1";
+
+          if (signedOut) {
+            clearCompanionAuthStorage();
+            try {
+              await supabase.auth.signOut({ scope: "local" });
+            } catch {
+              /* noop */
+            }
+            applySession(null);
+            return;
+          }
+
           const { data } = await supabase.auth.getSession();
           if (data.session?.access_token) {
-            applySession(data.session);
+            const { data: userData, error: userError } =
+              await supabase.auth.getUser();
+            if (!userError && userData.user) {
+              applySession(data.session);
+            } else {
+              clearCompanionAuthStorage();
+              try {
+                await supabase.auth.signOut({ scope: "local" });
+              } catch {
+                /* noop */
+              }
+              applySession(null);
+            }
           } else if (hasCompanionAuthStorageHint()) {
             clearCompanionAuthStorage();
           }

@@ -85,10 +85,28 @@ function coachingFallbackJsonResponse(
   });
 }
 
+async function parseCompanionChatBody(
+  request: NextRequest,
+): Promise<Record<string, unknown> | null> {
+  const raw = await request.text();
+  if (!raw.trim()) return null;
+  try {
+    return JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const apiKey = resolveOpenAiApiKey();
-    const body = await request.json();
+    const body = await parseCompanionChatBody(request);
+    if (!body) {
+      return NextResponse.json(
+        { error: "Invalid or empty request body." },
+        { status: 400 },
+      );
+    }
     const messages = body.messages as ChatMessage[];
     const userProbe = messages[messages.length - 1]?.content ?? "";
     const relationshipResponseId = createRelationshipResponseId();

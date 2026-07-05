@@ -16,5 +16,5 @@ export default async function CompanionLoginPage({
     redirect("/companion");
   }
 
-  return <CompanionSignInExperience />;
+  return <CompanionSignInExperience forceSignIn={signedOut} />;
 }
