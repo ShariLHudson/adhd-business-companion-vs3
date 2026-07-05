@@ -134,11 +134,16 @@ function recordSuccess() {
 }
 
 function runCompanionAuditTests() {
-  const npm = process.platform === "win32" ? "npm.cmd" : "npm";
-  return spawnSync(npm, ["run", "audit:companion"], {
-    cwd: ROOT,
-    stdio: "inherit",
-  });
+  const npx = process.platform === "win32" ? "npx.cmd" : "npx";
+  return spawnSync(
+    npx,
+    ["vitest", "run", "lib/companionBehaviorAudit.test.ts"],
+    {
+      cwd: ROOT,
+      stdio: "inherit",
+      shell: process.platform === "win32",
+    },
+  );
 }
 
 function isCiEnvironment() {
