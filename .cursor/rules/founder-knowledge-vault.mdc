@@ -7,6 +7,7 @@ globs:
   - lib/founderKnowledgeVault/**
   - lib/founderAiExtensions/**
   - lib/executiveIntegration/**
+  - lib/executiveResourcesCenter/**
   - lib/founderStudio/**
   - components/founderStudio/**
   - .cursor/rules/**
@@ -47,3 +48,16 @@ Preserve the higher-authority document. Recommend the **simpler** approach.
 ## AI Extensions Center
 
 `lib/founderAiExtensions/` · `/companion/founder/ai-extensions-center` — external links only in V1.
+
+## Executive Resources Center™
+
+**Route:** `/companion/founder/executive-resources-center`  
+**Spec:** `docs/founder/EXECUTIVE_RESOURCES_CENTER.md`  
+**Engine:** `lib/executiveResourcesCenter/`
+
+Before adding any important external tool, link, or dashboard:
+
+1. Run the **five admission questions** (all must be YES).
+2. Add to Resources Center — **not** scattered across other Founder rooms.
+3. Systems → `integrationData.ts` · AI tools → `aiExtensionsData.ts` · docs → Knowledge Vault.
+

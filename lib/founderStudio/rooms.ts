@@ -183,6 +183,15 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
     accent: "teal",
   },
   {
+    id: "executive-resources-center",
+    href: `${FOUNDER_STUDIO_BASE}/executive-resources-center`,
+    title: "Executive Resources Center™",
+    question: "Where are all important external resources?",
+    purpose:
+      "Single authoritative location — systems, AI tools, documents, dashboards, and executive links. Nothing important scattered elsewhere.",
+    accent: "gold",
+  },
+  {
     id: "executive-integration-center",
     href: `${FOUNDER_STUDIO_BASE}/executive-integration-center`,
     title: "Executive Integration Center™",

@@ -64,6 +64,7 @@ The most important for protecting architecture:
 | **Summary doc** | `docs/founder/FOUNDER_ARCHITECTURE_SUMMARY.md` |
 
 **Executive Headquarters:** `/companion/founder/executive-command-center`  
+**Executive Resources (single hub):** `/companion/founder/executive-resources-center`  
 **Mission Control (integrations):** `/companion/founder/executive-integration-center`  
 **AI tools (extensions only):** `/companion/founder/ai-extensions-center`
 

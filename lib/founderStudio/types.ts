@@ -39,7 +39,8 @@ export type FounderRoomId =
   | "executive-command-center"
   | "decision-vault"
   | "founder-knowledge-vault"
-  | "ai-extensions-center";
+  | "ai-extensions-center"
+  | "executive-resources-center";
 
 export type FounderRoomMeta = {
   id: FounderRoomId;

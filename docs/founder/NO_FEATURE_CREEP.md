@@ -44,6 +44,7 @@ Every proposal must answer honestly:
 | New dashboard | Improve Executive Command Center panel or deep-link to existing room |
 | New intelligence engine | Feed existing engine (Research, Discovery, Judgment) |
 | New room | Extend existing room's detail view or integration shortcut |
+| New external tool link | Add to **Executive Resources Center** after five-question gate — see [EXECUTIVE_RESOURCES_CENTER.md](./EXECUTIVE_RESOURCES_CENTER.md) |
 | New notification type | Fold into Discovery brief or Judgment pyramid tier |
 | New settings page | Conversational preference or Memory Center pattern |
 | Duplicate data store | Lineage + enrich existing object in registry |

@@ -144,6 +144,15 @@ const MASTER_PROMPTS: KnowledgeVaultItem[] = [
 
 const FOUNDER_PROMPTS: KnowledgeVaultItem[] = [
   item({
+    id: "kv-prompt-resources",
+    title: "Executive Resources Center",
+    categoryId: "founder-prompts",
+    purpose: "Five-question gate — single hub for external systems, AI tools, and links.",
+    lastUpdated: "2026-07-06",
+    status: "active",
+    documentPath: "docs/founder/EXECUTIVE_RESOURCES_CENTER.md",
+  }),
+  item({
     id: "kv-prompt-integration",
     title: "Executive Integration Center implementation",
     categoryId: "founder-prompts",

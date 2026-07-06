@@ -7256,3 +7256,91 @@
   border: 1px solid rgba(15, 111, 124, 0.15);
 }
 
+/* Executive Resources Center™ */
+
+.founder-resources {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+}
+
+.founder-resources__lead {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.55;
+  color: var(--founder-cream, #f5f0e6);
+}
+
+.founder-resources__section-title {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--founder-gold, #f5c16c);
+}
+
+.founder-resources__gate {
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(245, 193, 108, 0.3);
+  background: rgba(245, 193, 108, 0.06);
+}
+
+.founder-resources__questions {
+  margin: 0.75rem 0;
+  padding-left: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  font-size: 1.02rem;
+  line-height: 1.45;
+}
+
+.founder-resources__question {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.founder-resources__question-number {
+  font-weight: 600;
+  color: var(--founder-gold, #f5c16c);
+}
+
+.founder-resources__gate-outcome {
+  margin: 0;
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--founder-teal, #0f6f7c);
+}
+
+.founder-resources__nav-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.founder-resources__nav-link {
+  display: block;
+  padding: 0.85rem 1rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(15, 111, 124, 0.25);
+  background: rgba(12, 28, 36, 0.45);
+  color: var(--founder-aqua, #7ec8d4);
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.founder-resources__nav-link:hover {
+  border-color: rgba(15, 111, 124, 0.45);
+  background: rgba(15, 111, 124, 0.1);
+}
+
+.founder-resources__ai {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+

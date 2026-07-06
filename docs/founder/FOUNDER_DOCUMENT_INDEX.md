@@ -39,6 +39,7 @@
 
 | Document | Path | Purpose | When to use | Authority |
 |----------|------|---------|-------------|-----------|
+| Executive Resources Center | `docs/founder/EXECUTIVE_RESOURCES_CENTER.md` | Single hub for external tools and links | Before adding external resources | Operating Manual |
 | Executive Integration Center | `docs/founder/EXECUTIVE_INTEGRATION_CENTER.md` | Mission Control — external systems | Integration work | Operating Manual |
 | Executive Research Center | `docs/founder/EXECUTIVE_RESEARCH_CENTER.md` | Research department flow | Research features | Operating Manual |
 | Implementation Roadmap | `docs/founder/IMPLEMENTATION_ROADMAP.md` | Sample → real → polish phases | Post-freeze builds | Operating Manual |

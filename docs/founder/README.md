@@ -35,6 +35,7 @@
 | [EXECUTIVE_EXECUTION_SYSTEM.md](./EXECUTIVE_EXECUTION_SYSTEM.md) | Decision-to-execution lifecycle |
 | [LEARNING_ORGANIZATION_SYSTEM.md](./LEARNING_ORGANIZATION_SYSTEM.md) | Institutional wisdom and learning loops |
 | [EXECUTIVE_RESEARCH_CENTER.md](./EXECUTIVE_RESEARCH_CENTER.md) | Research department spec |
+| [EXECUTIVE_RESOURCES_CENTER.md](./EXECUTIVE_RESOURCES_CENTER.md) | Single hub for external systems, AI tools, and links |
 | [EXECUTIVE_INTEGRATION_CENTER.md](./EXECUTIVE_INTEGRATION_CENTER.md) | Integration Center — Sprint 1 Mission Control |
 | [FOUNDER_DOCUMENT_INDEX.md](./FOUNDER_DOCUMENT_INDEX.md) | Master index of important documents |
 | [FOUNDER_RECOVERY_GUIDE.md](./FOUNDER_RECOVERY_GUIDE.md) | Plain English recovery when direction is unclear |
