@@ -149,6 +149,7 @@ If any answer is "unknown" — redesign before shipping.
 | **Recovery Intelligence** | `lib/recovery-intelligence/` | Day state, overwhelm, return patterns | Recovery insights |
 | **Pattern Intelligence** | `lib/loop-intelligence/`, pattern awareness prefs | Loops, struggles, time-of-day | Loop store, signals |
 | **SPARK™ Intelligence Core** | `lib/spark/` | Signals, observations, patterns, knowledge graph, priorities | Sample repo (V1); consumed by Founder, Companion, PostCraft, Team Hub, FLAME, FIRE |
+| **Executive Questions™** | `lib/executiveQuestions/` | SPARK, FLAME, FIRE, missions, decisions, research (loosely coupled refs) | Composed answers (sample V1); bridge: `lib/founder/services/executiveQuestionsBridge.ts` |
 | **Relationship Intelligence** | `lib/relationship-intelligence/` | Relationship, conversation, thoughts (person) | `relationshipStore` |
 | **Content Intelligence** | PostCraft, templates, snippets | Template, draft, avatar | Content suggestions |
 | **Learning Intelligence** | `lib/intelligence-layer/learningGates.ts` | Signals, trust, outcomes | Profile evolution |
