@@ -4,6 +4,25 @@
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
 
+<!-- BEGIN:spark-intelligence-blueprint -->
+# SPARK™ Intelligence Blueprint™ — Executive Intelligence OS (BINDING)
+
+**Full document:** `docs/architecture/SPARK_INTELLIGENCE_BLUEPRINT.md`
+
+Spark is an Intelligence Operating System™ — not an application. **One Brain:** Founder, Companion, PostCraft, and Team Hub consume shared intelligence; never duplicate engines per screen.
+
+| Layer | Home | Owns |
+|-------|------|------|
+| **SPARK™** | `lib/spark/` | Observe, score, connect, prioritize, patterns, knowledge graph |
+| **FLAME™** | `lib/founder/flame/` | Founder learning & mentoring |
+| **FIRE™** | (future) | Executive briefings & reports |
+| **Experience** | product UI | Conversation, rooms, surfaces |
+
+Before any feature: reduce friction? reusable? right layer? no duplicate logic? five-year test? Conflict with blueprint → preserve blueprint, change implementation.
+
+**Rule:** `.cursor/rules/spark-intelligence-blueprint.mdc`
+<!-- END:spark-intelligence-blueprint -->
+
 <!-- BEGIN:estate-architectural-authority -->
 # Spark Estate™ — Architectural Authority (BINDING)
 

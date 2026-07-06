@@ -119,7 +119,7 @@ If any answer is "unknown" — redesign before shipping.
 | **Spark Response Architecture™** | [006](../spark-intelligence-foundation/006-spark-response-architecture.md) | Runtime pipeline — all interactions must flow through | `lib/sparkResponseArchitecture/types.ts` · `lib/sparkTrustPerformance/` |
 | **Context Strategy™ & MVC** | [007](../spark-intelligence-foundation/007-context-strategy.md) | Intelligent context selection; six tiers; budgets | `lib/sparkContextStrategy/types.ts` |
 | **Interaction Contracts™** | [008](../spark-intelligence-foundation/008-interaction-contracts.md) | One owner per responsibility; published contracts only | `lib/sparkInteractionContracts/types.ts` |
-| **SPARK™ Intelligence Core** | Phase 8 — ecosystem OS | Observes, scores, connects, prioritizes — no UI, no AI | `lib/spark/` — `Spark.observe()` · `score()` · `prioritize()` · `connect()` · `prepare()` · `summarize()` |
+| **SPARK™ Intelligence Core** | Phase 8 — ecosystem OS | Observes, scores, connects, prioritizes — no UI, no AI | `lib/spark/` — blueprint: `docs/architecture/SPARK_INTELLIGENCE_BLUEPRINT.md` |
 
 **Brain invariant:** retrieve context before re-asking; never generate content, recommendations, or member-facing copy; lifecycle stages govern storage; MVC governs retrieval ([009](../spark-intelligence-foundation/009-business-brain-lifecycle.md)).
 

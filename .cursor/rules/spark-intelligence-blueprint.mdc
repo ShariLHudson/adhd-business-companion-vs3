@@ -1,0 +1,44 @@
+---
+description: SPARK Intelligence Blueprint — master OS architecture for SPARK, FLAME, FIRE, and experience layers
+alwaysApply: true
+---
+
+# SPARK™ Intelligence Blueprint™ — Master Architecture (BINDING)
+
+**Full document:** `docs/architecture/SPARK_INTELLIGENCE_BLUEPRINT.md`
+
+Follow the **SPARK Intelligence Blueprint™**. If a requested implementation conflicts with the blueprint, **preserve the blueprint** and suggest the better architectural approach. Always build for the long-term ecosystem, not just today's feature.
+
+## One Brain
+
+Never duplicate intelligence. **Founder · Companion · PostCraft · Team Hub** consume the same core:
+
+| Layer | Code home | Owns |
+|-------|-----------|------|
+| **SPARK™** | `lib/spark/` | Observe, score, connect, prioritize, patterns, knowledge graph — **no UI, no chat, no reports** |
+| **FLAME™** | `lib/founder/flame/` | Founder learning & mentoring — **not** raw research or SPARK scoring |
+| **FIRE™** | (future) | Executive briefings & reports — **not** collection or founder modeling |
+| **Experience** | product UI | Conversation, rooms, surfaces — **not** duplicate engines |
+
+## Before every feature
+
+1. Reduce friction?
+2. Help the user think better?
+3. SPARK, FLAME, FIRE, or experience layer?
+4. Reusable by other products?
+5. Strengthen relationship?
+6. Preserve Estate philosophy?
+7. Avoid duplicate logic?
+8. Still right in five years?
+
+Any **no** → rethink before code.
+
+## Non-negotiables
+
+- **Relationship before technology** — trusted, warm, human; not AI theater
+- **Companion first** — conversations and intentions, not feature menus
+- **Executive simplicity** — complexity submerged; Spark carries it
+- **Intelligence Pipeline** — nothing bypasses Sources → Signals → Findings → Patterns → Recommendations → Reports → Archive
+- **Estate = cognitive interface** — not decoration
+
+Parent: [Spec 100](../docs/ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md) · Registry: `lib/intelligence/INTELLIGENCE_REGISTRY.md`
