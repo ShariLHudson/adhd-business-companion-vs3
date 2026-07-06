@@ -32,6 +32,8 @@ alwaysApply: false
 
 If one exists → **extend it**. Do **not** duplicate.
 
+**After V1 complete:** Read [FOUNDER_V1_IMPLEMENTATION_TRANSITION.md](../docs/founder/FOUNDER_V1_IMPLEMENTATION_TRANSITION.md) before every implementation sprint — we build, we do not redesign.
+
 ## When a new permanent document is created
 
 Automatically register it in:

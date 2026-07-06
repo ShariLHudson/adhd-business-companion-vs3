@@ -1,12 +1,13 @@
 # Founder Studio™ — Documentation Authority
 
-**Version 1.0 architecture is complete.** Future work is implementation, integration, and refinement — not redesign.
+**Version 1.0 architecture is complete.** We are now building Founder — implementation, integration, and refinement — not redesign.
 
 ## Start here
 
 | Document | Role |
 |----------|------|
 | **[FOUNDER_V1.md](./FOUNDER_V1.md)** | Executive summary — read first (~15 minutes) |
+| **[FOUNDER_V1_IMPLEMENTATION_TRANSITION.md](./FOUNDER_V1_IMPLEMENTATION_TRANSITION.md)** | **Build phase declaration — five priorities** |
 | **[ARCHITECTURE_FREEZE.md](./ARCHITECTURE_FREEZE.md)** | What is frozen and what may still evolve |
 | **[FOUNDER_ARCHITECTURE_SUMMARY.md](./FOUNDER_ARCHITECTURE_SUMMARY.md)** | Systems, flows, and relationship map |
 
@@ -41,6 +42,8 @@
 | [FOUNDER_RECOVERY_GUIDE.md](./FOUNDER_RECOVERY_GUIDE.md) | Plain English recovery when direction is unclear |
 | [FOUNDER_MARKETING_ORCHESTRATION.md](./FOUNDER_MARKETING_ORCHESTRATION.md) | PostCraft + GHL orchestration flow |
 | [FOUNDER_V1_COMPLETION_REPORT.md](./FOUNDER_V1_COMPLETION_REPORT.md) | V1 freeze completion record |
+| [FOUNDER_V1_IMPLEMENTATION_TRANSITION.md](./FOUNDER_V1_IMPLEMENTATION_TRANSITION.md) | Build phase — five priorities, permanent rules |
+| [SPARK_MASTER_LIBRARY.md](./SPARK_MASTER_LIBRARY.md) | Permanent knowledge index spec |
 
 ## Engineering authority
 

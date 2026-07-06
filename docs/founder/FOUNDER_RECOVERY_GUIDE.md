@@ -11,6 +11,7 @@ You do not need to rebuild everything. Most answers already live in one of a few
 1. Open **Founder Studio** → **Founder Knowledge Vault™** (`/companion/founder/founder-knowledge-vault`)  
 2. Open **Founder Document Index** (`docs/founder/FOUNDER_DOCUMENT_INDEX.md`)  
 3. Read **Founder V1** (`docs/founder/FOUNDER_V1.md`) for the executive summary  
+4. If you are starting a build sprint, read **V1 Implementation Transition** (`docs/founder/FOUNDER_V1_IMPLEMENTATION_TRANSITION.md`)
 
 That is usually enough to remember what matters.
 

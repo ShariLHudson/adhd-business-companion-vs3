@@ -1,14 +1,27 @@
 # Founder Studio™ — Implementation Roadmap
 
-**What happens after architecture freeze**
+**What happens after Version 1.0 architecture complete**
 
 | | |
 |---|---|
-| **Status** | Active |
+| **Status** | Active — build phase |
 | **Architecture** | Complete — [ARCHITECTURE_FREEZE.md](./ARCHITECTURE_FREEZE.md) |
+| **Transition** | [FOUNDER_V1_IMPLEMENTATION_TRANSITION.md](./FOUNDER_V1_IMPLEMENTATION_TRANSITION.md) |
 | **Milestones** | [GITHUB_ROADMAP.md](./GITHUB_ROADMAP.md) |
 
-This roadmap replaces continuous redesign with **phased implementation**. Each phase deepens existing systems.
+This roadmap replaces continuous redesign with **phased implementation**. Each phase deepens existing systems — it does not expand architecture.
+
+---
+
+## Five priorities (binding)
+
+| # | Priority | Objective |
+|---|----------|-----------|
+| **1** | Real implementation | Replace sample repos, placeholder data, mock intelligence |
+| **2** | Real integrations | PostCraft, GHL, GitHub, Cursor, Vercel, Railway, Supabase, Google, NotebookLM, AI Studio, social |
+| **3** | Executive experience | Calm, elegant, premium — typography, spacing, accessibility, friction reduction |
+| **4** | Companion intelligence | Better recommendations and learning in existing engines — no new layers |
+| **5** | Automation | Prepare, recommend, monitor, review, learn — Shari always in control |
 
 ---
 

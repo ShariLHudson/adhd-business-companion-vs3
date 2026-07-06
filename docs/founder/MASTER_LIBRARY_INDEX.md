@@ -32,6 +32,7 @@
 | Founder Master Blueprint™ | SPARK Intelligence Blueprint | Blueprints | Blueprint | `docs/founder/FOUNDER_MASTER_BLUEPRINT.md` | Yes | Founder Studio, Spark Intelligence | Shari | 2026-07-06 |
 | Founder V1 | Executive architecture orientation | Blueprints | Blueprint | `docs/founder/FOUNDER_V1.md` | Yes | Founder Studio | Shari | 2026-07-06 |
 | Architecture Freeze | Frozen vs. allowed evolution | Blueprints | Blueprint | `docs/founder/ARCHITECTURE_FREEZE.md` | No | Founder Studio, Development | Shari | 2026-07-06 |
+| Founder V1 Implementation Transition | Build phase — five priorities | Blueprints | Blueprint | `docs/founder/FOUNDER_V1_IMPLEMENTATION_TRANSITION.md` | Yes | Founder Studio | Shari | 2026-07-06 |
 | No Feature Creep | Eight-question feature gate | Founder | Blueprint | `docs/founder/NO_FEATURE_CREEP.md` | No | Founder Studio | Shari | 2026-07-06 |
 
 ---

@@ -74,6 +74,18 @@ const BLUEPRINTS: MasterLibraryItem[] = [
     lastUpdated: "2026-07-06",
   }),
   entry({
+    id: "ml-v1-transition",
+    name: "Founder V1 Implementation Transition",
+    purpose: "Build phase — we are now building Founder, not designing it.",
+    categoryId: "blueprints",
+    authority: "blueprint",
+    location: "docs/founder/FOUNDER_V1_IMPLEMENTATION_TRANSITION.md",
+    inNotebookLmLibrary: true,
+    relatedSystems: ["Founder Studio"],
+    owner: "Shari",
+    lastUpdated: "2026-07-06",
+  }),
+  entry({
     id: "ml-arch-freeze",
     name: "Architecture Freeze",
     purpose: "Frozen vs. allowed evolution after V1.",

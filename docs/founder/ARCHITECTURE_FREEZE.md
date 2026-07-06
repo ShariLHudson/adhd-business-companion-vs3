@@ -4,7 +4,8 @@
 
 | | |
 |---|---|
-| **Status** | **FROZEN** — architecture complete |
+| **Status** | **FROZEN** — architecture complete · **implementation transition active** |
+| **Transition** | [FOUNDER_V1_IMPLEMENTATION_TRANSITION.md](./FOUNDER_V1_IMPLEMENTATION_TRANSITION.md) |
 | **Supersedes** | Open-ended Founder architecture sprints |
 | **Does not freeze** | Implementation, integrations, UX polish, real data, learning |
 | **Entry point** | [FOUNDER_V1.md](./FOUNDER_V1.md) |
@@ -15,7 +16,11 @@
 
 **Founder Studio Version 1.0 architecture is complete.**
 
+We are no longer designing Founder. We are now building Founder.
+
 The executive intelligence stack, room model, composition layers, and documentation authority are defined. Future development **implements and refines** this vision — it does not redesign it.
+
+Binding transition: [FOUNDER_V1_IMPLEMENTATION_TRANSITION.md](./FOUNDER_V1_IMPLEMENTATION_TRANSITION.md)
 
 This freeze mirrors the discipline applied to Spark Conversation Architecture (Specs 105–131): **discover and refine from evidence**, do not architect from impulse.
 
@@ -38,16 +43,19 @@ This freeze mirrors the discipline applied to Spark Conversation Architecture (S
 
 ## What may still evolve (explicitly allowed)
 
+Future work follows **five priorities** — see [FOUNDER_V1_IMPLEMENTATION_TRANSITION.md](./FOUNDER_V1_IMPLEMENTATION_TRANSITION.md):
+
 | Priority | Work type |
 |----------|-----------|
-| **1** | **Implementation** — real data replacing sample repositories |
-| **2** | **User experience** — typography, motion, accessibility, estate integration, executive polish |
-| **3** | **Integrations** — Cursor, Companion, PostCraft, GHL, Google, GitHub, Analytics |
-| **4** | **Real intelligence** — live signals into *existing* engines |
-| **5** | **Automation** — preparation, monitoring, implementation assistance, review workflows |
-| **6** | **Learning** — pattern recognition, recommendation improvement, institutional wisdom |
-| **7** | **Performance** — speed, reliability, calm load times |
-| **8** | **Refinement** — copy, scoring weights, sample quality, edge cases |
+| **1** | **Real implementation** — sample repositories → live data |
+| **2** | **Real integrations** — PostCraft, GHL, GitHub, Cursor, Google, AI Studio, social |
+| **3** | **Executive experience** — typography, spacing, motion, accessibility, calm polish |
+| **4** | **Companion intelligence** — better recommendations and learning in *existing* engines |
+| **5** | **Automation** — prepare, recommend, monitor, review — always permission-gated |
+
+Also allowed: **performance**, **refinement**, **copy**, **scoring weights**, **edge cases**.
+
+**Not allowed:** new intelligence layers, duplicate dashboards, architecture expansion without override.
 
 ---
 

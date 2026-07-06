@@ -168,18 +168,20 @@ Those are **implementation phases** — see [IMPLEMENTATION_ROADMAP.md](./IMPLEM
 
 ## Future direction
 
-After V1 freeze, work prioritizes:
+**Version 1.0 architecture is frozen.** We are now building Founder.
 
-1. **Implementation** — replace sample data with real company state  
-2. **Integrations** — Cursor, Companion, PostCraft, GHL, Analytics, Google  
-3. **Real intelligence** — live signals feeding existing engines (not new engines)  
-4. **Experience refinement** — typography, motion, accessibility, estate cohesion  
-5. **Automation** — preparation, monitoring, review workflows (permission-gated)  
-6. **Learning** — pattern recognition, recommendation improvement, institutional wisdom  
-7. **Performance & polish** — fast, calm, reliable every morning  
+| Priority | Work |
+|----------|------|
+| **1** | Real implementation — replace sample data with real company state |
+| **2** | Real integrations — PostCraft, GHL, GitHub, Cursor, Google, AI Studio, social |
+| **3** | Executive experience — calm, elegant, premium polish |
+| **4** | Companion intelligence — teach Founder over time; no new intelligence layers |
+| **5** | Automation — prepare, recommend, monitor, review — permission-gated |
 
-Prioritization: [EXECUTIVE_VALUE_SCORE.md](./EXECUTIVE_VALUE_SCORE.md).  
-Milestones: [GITHUB_ROADMAP.md](./GITHUB_ROADMAP.md).
+Binding transition: [FOUNDER_V1_IMPLEMENTATION_TRANSITION.md](./FOUNDER_V1_IMPLEMENTATION_TRANSITION.md)  
+Phases: [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md)  
+Prioritization: [EXECUTIVE_VALUE_SCORE.md](./EXECUTIVE_VALUE_SCORE.md)  
+Milestones: [GITHUB_ROADMAP.md](./GITHUB_ROADMAP.md)
 
 ---
 
@@ -191,6 +193,7 @@ Milestones: [GITHUB_ROADMAP.md](./GITHUB_ROADMAP.md).
 | Feature gate | [NO_FEATURE_CREEP.md](./NO_FEATURE_CREEP.md) |
 | Systems & flows diagram | [FOUNDER_ARCHITECTURE_SUMMARY.md](./FOUNDER_ARCHITECTURE_SUMMARY.md) |
 | V1 completion record | [FOUNDER_V1_COMPLETION_REPORT.md](./FOUNDER_V1_COMPLETION_REPORT.md) |
+| **V1 implementation transition** | **[FOUNDER_V1_IMPLEMENTATION_TRANSITION.md](./FOUNDER_V1_IMPLEMENTATION_TRANSITION.md)** |
 | All docs index | [README.md](./README.md) |
 
 ---

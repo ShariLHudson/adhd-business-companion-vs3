@@ -134,11 +134,14 @@ The architecture should remain stable for years while intelligence, integrations
 
 > Make the existing vision extraordinary. Do not expand it.
 
+**Implementation transition (July 2026):** [FOUNDER_V1_IMPLEMENTATION_TRANSITION.md](./FOUNDER_V1_IMPLEMENTATION_TRANSITION.md) — we are now building Founder, not designing it.
+
 ---
 
 ## Next actions (suggested)
 
-1. Create GitHub milestones M1–M7 from [GITHUB_ROADMAP.md](./GITHUB_ROADMAP.md)  
-2. Tag backlog issues with Executive Value Score  
-3. Begin IMPLEMENTATION_ROADMAP Phase 1 — missions repository  
-4. Schedule M3 UX pass on Executive Command Center only  
+1. Read [FOUNDER_V1_IMPLEMENTATION_TRANSITION.md](./FOUNDER_V1_IMPLEMENTATION_TRANSITION.md) before every sprint  
+2. Create GitHub milestones M1–M7 from [GITHUB_ROADMAP.md](./GITHUB_ROADMAP.md)  
+3. Tag backlog issues with Executive Value Score  
+4. Begin IMPLEMENTATION_ROADMAP Phase 1 — missions repository  
+5. Schedule UX pass on Executive Command Center — Priority 3

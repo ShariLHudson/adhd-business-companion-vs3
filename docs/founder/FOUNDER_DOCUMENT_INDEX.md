@@ -30,6 +30,7 @@
 | Founder Master Blueprint™ | `docs/founder/FOUNDER_MASTER_BLUEPRINT.md` | SPARK Intelligence Blueprint — executive philosophy | Strategic decisions | Blueprint |
 | Founder V1 | `docs/founder/FOUNDER_V1.md` | 15-minute architecture orientation | Onboarding, handoffs | Blueprint |
 | Architecture Freeze | `docs/founder/ARCHITECTURE_FREEZE.md` | Frozen vs. allowed evolution | Before new engines/rooms | Blueprint |
+| Founder V1 Implementation Transition | `docs/founder/FOUNDER_V1_IMPLEMENTATION_TRANSITION.md` | Build phase — five priorities | Every implementation sprint | Blueprint |
 | Founder Architecture Summary | `docs/founder/FOUNDER_ARCHITECTURE_SUMMARY.md` | Systems and relationship map | Engineering orientation | Blueprint |
 | No Feature Creep | `docs/founder/NO_FEATURE_CREEP.md` | Eight-question feature gate | Every proposed feature | Blueprint |
 
@@ -47,7 +48,7 @@
 | Master Prompt Library | `docs/founder/MASTER_PROMPT_LIBRARY.md` | Organized prompts by area | Prompt lookup | Prompt |
 | Executive Integration Center | `docs/founder/EXECUTIVE_INTEGRATION_CENTER.md` | Mission Control — external systems | Integration work | Operating Manual |
 | Executive Research Center | `docs/founder/EXECUTIVE_RESEARCH_CENTER.md` | Research department flow | Research features | Operating Manual |
-| Implementation Roadmap | `docs/founder/IMPLEMENTATION_ROADMAP.md` | Sample → real → polish phases | Post-freeze builds | Operating Manual |
+| Implementation Roadmap | `docs/founder/IMPLEMENTATION_ROADMAP.md` | Five-priority build phases | Post-V1 sprints | Operating Manual |
 | Intelligence Registry | `lib/intelligence/INTELLIGENCE_REGISTRY.md` | Objects × engines × relationships | New objects/engines | Operating Manual |
 | Executive Execution System | `docs/founder/EXECUTIVE_EXECUTION_SYSTEM.md` | Decision-to-execution lifecycle | Execution flows | Operating Manual |
 
