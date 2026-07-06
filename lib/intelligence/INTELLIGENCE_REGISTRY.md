@@ -157,6 +157,7 @@ If any answer is "unknown" — redesign before shipping.
 | **Companion Intelligence Graph™** | `lib/intelligenceGraph/` | All ecosystem objects — missions, research, content, decisions, campaigns, lessons | Connected institutional memory (sample V1); bridge: `lib/founder/services/intelligenceGraphBridge.ts` |
 | **Institutional Memory™** | `lib/institutionalMemory/` | Decisions, lessons, experiments, product evolution, campaigns, founder reflections — linked via Intelligence Graph | Organizational wisdom layer (sample V1); bridge: `lib/founder/services/institutionalMemoryBridge.ts` |
 | **Executive Decision Lifecycle™** | `lib/executiveDecision/` | Missions, products, workshops, marketing, automation — composes Institutional Memory, Intelligence Graph, Executive Brief | Twelve-step decision OS (sample V1); bridge: `lib/founder/services/executiveDecisionBridge.ts` |
+| **Executive Orchestrator™** | `lib/orchestrator/` | Executive decisions, missions, launches, workshops, campaigns — composes Decision Lifecycle, Institutional Memory, Intelligence Graph | Decision-to-execution orchestration (sample V1); bridge: `lib/founder/services/executiveOrchestratorBridge.ts` |
 | **Relationship Intelligence** | `lib/relationship-intelligence/` | Relationship, conversation, thoughts (person) | `relationshipStore` |
 | **Content Intelligence** | PostCraft, templates, snippets | Template, draft, avatar | Content suggestions |
 | **Learning Intelligence** | `lib/intelligence-layer/learningGates.ts` | Signals, trust, outcomes | Profile evolution |
