@@ -155,6 +155,7 @@ If any answer is "unknown" — redesign before shipping.
 | **Overnight Executive Cycle™** | `lib/overnight/` | SPARK, Executive Questions, opportunities, missions, research, companion, PostCraft, GHL, analytics | Seven-phase orchestration (sample V1); bridge: `lib/founder/services/overnightExecutiveCycleBridge.ts` |
 | **Executive Brief Experience™** | `lib/founder/executiveBrief/` | Overnight, opportunities, missions, research, decisions, advisory | Plain-English presentation (sample V1); bridge: `lib/founder/services/executiveBriefBridge.ts` |
 | **Companion Intelligence Graph™** | `lib/intelligenceGraph/` | All ecosystem objects — missions, research, content, decisions, campaigns, lessons | Connected institutional memory (sample V1); bridge: `lib/founder/services/intelligenceGraphBridge.ts` |
+| **Institutional Memory™** | `lib/institutionalMemory/` | Decisions, lessons, experiments, product evolution, campaigns, founder reflections — linked via Intelligence Graph | Organizational wisdom layer (sample V1); bridge: `lib/founder/services/institutionalMemoryBridge.ts` |
 | **Relationship Intelligence** | `lib/relationship-intelligence/` | Relationship, conversation, thoughts (person) | `relationshipStore` |
 | **Content Intelligence** | PostCraft, templates, snippets | Template, draft, avatar | Content suggestions |
 | **Learning Intelligence** | `lib/intelligence-layer/learningGates.ts` | Signals, trust, outcomes | Profile evolution |
