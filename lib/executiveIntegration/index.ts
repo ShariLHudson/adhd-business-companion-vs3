@@ -29,6 +29,20 @@ export type {
 } from "./integrationConnection";
 
 export {
+  GHL_DEPARTMENT,
+  MARKETING_FEEDBACK_STEP,
+  MARKETING_ORCHESTRATION_FLOW,
+  MARKETING_ORCHESTRATION_HEADLINE,
+  MARKETING_ORCHESTRATION_STEPS,
+  MARKETING_ORCHESTRATION_SUMMARY,
+  POSTCRAFT_DEPARTMENT,
+} from "./marketingOrchestration";
+export type {
+  MarketingDepartmentRole,
+  MarketingOrchestrationStep,
+} from "./marketingOrchestration";
+
+export {
   INTEGRATION_CENTER_PRINCIPLE,
   ONE_OFFICE_MESSAGE,
   INTEGRATION_GROUPS,

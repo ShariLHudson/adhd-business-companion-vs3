@@ -191,6 +191,22 @@ Founder is **above** tools — not inside them.
 
 ---
 
+## Marketing orchestration flow
+
+Canonical diagram: [FOUNDER_MARKETING_ORCHESTRATION.md](./FOUNDER_MARKETING_ORCHESTRATION.md)
+
+```
+Founder Studio™ → recommendations → prepares everything
+  ├─ PostCraft™ (content, campaigns, assets)
+  └─ GoHighLevel (workflows, email, funnels, CRM, memberships, automations)
+        ▼
+Founder receives status and analytics back
+```
+
+Runtime: `lib/executiveIntegration/marketingOrchestration.ts` · UI: Executive Integration Center flow panel.
+
+---
+
 ## Future implementation priorities
 
 See [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md). Summary:

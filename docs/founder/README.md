@@ -35,6 +35,7 @@
 | [EXECUTIVE_EXECUTION_SYSTEM.md](./EXECUTIVE_EXECUTION_SYSTEM.md) | Decision-to-execution lifecycle |
 | [LEARNING_ORGANIZATION_SYSTEM.md](./LEARNING_ORGANIZATION_SYSTEM.md) | Institutional wisdom and learning loops |
 | [EXECUTIVE_RESEARCH_CENTER.md](./EXECUTIVE_RESEARCH_CENTER.md) | Research department spec |
+| [FOUNDER_MARKETING_ORCHESTRATION.md](./FOUNDER_MARKETING_ORCHESTRATION.md) | PostCraft + GHL orchestration flow |
 | [FOUNDER_V1_COMPLETION_REPORT.md](./FOUNDER_V1_COMPLETION_REPORT.md) | V1 freeze completion record |
 
 ## Engineering authority

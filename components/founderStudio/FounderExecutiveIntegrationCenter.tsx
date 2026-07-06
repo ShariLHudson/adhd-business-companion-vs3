@@ -4,12 +4,14 @@ import { useCallback, useMemo, useState } from "react";
 
 import { composeIntegrationCenterView, composeIntegrationSearch } from "@/lib/executiveIntegration";
 import { getIntegrationCenterBootstrap } from "@/lib/founder/integrationCenter";
+import { MARKETING_ORCHESTRATION_HEADLINE } from "@/lib/executiveIntegration";
 import { FOUNDER_STUDIO_BASE } from "@/lib/founderStudio/founderConfig";
 import type { IntegrationSearchView } from "@/lib/executiveIntegration/types";
 
 import { RoomHeader } from "./executive/RoomHeader";
 import { IntegrationGroupPanel } from "./integrationCenter/IntegrationGroupPanel";
 import { IntegrationSearchPanel } from "./integrationCenter/IntegrationSearchPanel";
+import { MarketingOrchestrationFlow } from "./integrationCenter/MarketingOrchestrationFlow";
 import { MarketingIntegrationsPanel } from "./integrationCenter/MarketingIntegrationsPanel";
 import { useMarketingIntegrationStatus } from "./integrationCenter/useMarketingIntegrationStatus";
 
@@ -40,7 +42,7 @@ export function FounderExecutiveIntegrationCenter() {
         eyebrow="Executive Integration Center™"
         title="Mission Control for Visual Spark Studios"
         question="What do I need from my connected systems today?"
-        purpose="One calm executive headquarters — Founder orchestrates. PostCraft creates. GHL delivers. Cursor builds. You run the company."
+        purpose={`One calm executive headquarters — ${MARKETING_ORCHESTRATION_HEADLINE}. You run the company.`}
       />
 
       <section className="founder-integration__hero" aria-labelledby="integration-hero">
@@ -53,6 +55,8 @@ export function FounderExecutiveIntegrationCenter() {
           {bootstrap.groupCount} departments
         </p>
       </section>
+
+      <MarketingOrchestrationFlow />
 
       <MarketingIntegrationsPanel
         integrations={marketingIntegrations}

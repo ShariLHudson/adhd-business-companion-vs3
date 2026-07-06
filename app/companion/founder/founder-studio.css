@@ -6340,6 +6340,92 @@
   gap: 0.75rem;
 }
 
+.founder-integration__flow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.founder-integration__flow-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1rem 1.25rem;
+  border-radius: 0.75rem;
+  background: rgba(12, 28, 36, 0.45);
+  border: 1px solid rgba(15, 111, 124, 0.2);
+}
+
+.founder-integration__flow-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.founder-integration__flow-node {
+  display: inline-block;
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  background: rgba(15, 111, 124, 0.15);
+  border: 1px solid rgba(15, 111, 124, 0.35);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--founder-cream, #f5f0e6);
+  text-align: center;
+}
+
+.founder-integration__flow-node--feedback {
+  background: rgba(245, 193, 108, 0.12);
+  border-color: rgba(245, 193, 108, 0.4);
+  color: var(--founder-gold, #f5c16c);
+}
+
+.founder-integration__flow-arrow {
+  font-size: 0.75rem;
+  color: var(--founder-aqua, #7ec8d4);
+  line-height: 1;
+}
+
+.founder-integration__flow-branches {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 1rem;
+  width: 100%;
+  margin: 0.5rem 0;
+  padding-top: 0.5rem;
+  border-top: 1px dashed rgba(15, 111, 124, 0.25);
+}
+
+.founder-integration__flow-branch {
+  padding: 0.85rem 1rem;
+  border-radius: 0.65rem;
+  background: rgba(8, 20, 26, 0.55);
+  border: 1px solid rgba(15, 111, 124, 0.22);
+}
+
+.founder-integration__flow-branch-title {
+  margin: 0 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--founder-teal, #0f6f7c);
+}
+
+.founder-integration__flow-branch-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.founder-integration__flow-step--feedback {
+  margin-top: 0.35rem;
+  padding-top: 0.5rem;
+  border-top: 1px dashed rgba(245, 193, 108, 0.25);
+}
+
 .founder-integration__card-grid--featured {
   grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
 }
