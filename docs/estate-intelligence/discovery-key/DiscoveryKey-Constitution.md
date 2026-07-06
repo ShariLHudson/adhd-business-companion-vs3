@@ -186,6 +186,8 @@ If a feature is not live, do not show it in normal Discovery Key rotation.
 
 **Registry authority:** [Estate Intelligence System](../README.md) — `estate-rooms.json`, `estate-features.json`, `estate-tools.json`, and related registries. Only items marked **Live** may be recommended.
 
+**Behavior spec:** [DiscoveryKey-Behavior.md](./DiscoveryKey-Behavior.md) — placement, interaction, and completion rules (documentation before UI).
+
 ---
 
 ## Visual Principle

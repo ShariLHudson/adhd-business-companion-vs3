@@ -43,6 +43,7 @@ This folder is Spark Estate's **brain** — the master documentation that descri
     room-placement-library.json    ← In-scene placement metadata (when populated)
     discovery-key/
         DiscoveryKey-Constitution.md ← Discovery Key experience law
+        DiscoveryKey-Behavior.md     ← Interaction and placement behavior (no UI yet)
 ```
 
 Future documents can be added without changing this architecture.
@@ -143,5 +144,6 @@ This system is the long-term knowledge foundation for Spark Estate.
 |----------|------|
 | [ESTATE_INTELLIGENCE_ARCHITECTURE.md](../estate/ESTATE_INTELLIGENCE_ARCHITECTURE.md) | Routing, judgment, registry authority |
 | [Discovery Key Constitution](./discovery-key/DiscoveryKey-Constitution.md) | Gentle discovery — not a reward system |
+| [Discovery Key Behavior](./discovery-key/DiscoveryKey-Behavior.md) | Placement, interaction, and completion behavior |
 | [Spark Estate Bible](../estate/Spark%20Estate%20Bible.md) | Place and object canon |
 | [ESTATE_ARCHITECTURAL_AUTHORITY.md](../estate/ESTATE_ARCHITECTURAL_AUTHORITY.md) | Constitution · Experience Guide · Bible |

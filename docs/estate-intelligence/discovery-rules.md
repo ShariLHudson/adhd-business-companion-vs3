@@ -6,6 +6,7 @@
 |---|---|
 | **Status** | Foundational — rules active; library not populated |
 | **Constitution** | [Discovery Key Constitution](./discovery-key/DiscoveryKey-Constitution.md) |
+| **Behavior** | [Discovery Key Behavior](./discovery-key/DiscoveryKey-Behavior.md) |
 | **Library** | [discovery-library.json](./discovery-library.json) |
 
 ---
