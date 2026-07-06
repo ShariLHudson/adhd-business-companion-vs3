@@ -6583,3 +6583,243 @@
   text-transform: uppercase;
   color: var(--founder-purple, #b8a0d8);
 }
+
+/* Executive Command Center™ — Executive Headquarters */
+.founder-hq {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.founder-hq__section-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.2rem, 2.4vw, 1.45rem);
+  font-weight: 600;
+  color: var(--founder-gold);
+}
+
+.founder-hq__lead,
+.founder-hq__prose {
+  margin: 0 0 0.75rem;
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+
+.founder-hq__meta {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  color: var(--founder-muted);
+  font-style: italic;
+}
+
+.founder-hq__overnight {
+  margin: 0 0 0.5rem;
+  font-size: 1.05rem;
+  color: var(--founder-teal, #0f6f7c);
+  font-style: italic;
+}
+
+.founder-hq__status {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.75rem 1rem;
+  padding: 1rem 1.1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(245, 193, 108, 0.35);
+  background: rgba(245, 193, 108, 0.08);
+}
+
+.founder-hq__status-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.founder-hq__status-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--founder-muted);
+}
+
+.founder-hq__status-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.founder-hq__primary-card {
+  padding: 1.15rem 1.2rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(245, 193, 108, 0.4);
+  background: rgba(245, 193, 108, 0.1);
+}
+
+.founder-hq__primary-mission {
+  margin: 0 0 0.35rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--founder-gold);
+}
+
+.founder-hq__primary-headline {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.25rem, 2.6vw, 1.65rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.founder-hq__today-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.founder-hq__progress {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--founder-gold);
+}
+
+.founder-hq__next-action {
+  margin: 0;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgba(245, 193, 108, 0.25);
+  font-size: 1.02rem;
+}
+
+.founder-hq__question-list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.founder-hq__question-row {
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(15, 111, 124, 0.2);
+  background: rgba(15, 111, 124, 0.06);
+}
+
+.founder-hq__question-label {
+  margin: 0 0 0.35rem;
+  font-weight: 600;
+  color: var(--founder-teal, #0f6f7c);
+}
+
+.founder-hq__question-answer {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.founder-hq__panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+}
+
+.founder-hq__panel-card {
+  border-radius: 0.85rem;
+  border: 1px solid rgba(200, 146, 46, 0.28);
+  background: rgba(200, 146, 46, 0.06);
+  overflow: hidden;
+}
+
+.founder-hq__panel-card--expanded {
+  grid-column: 1 / -1;
+  border-color: rgba(245, 193, 108, 0.45);
+}
+
+.founder-hq__panel-trigger {
+  width: 100%;
+  padding: 1rem 1.1rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.founder-hq__panel-eyebrow {
+  margin: 0 0 0.25rem;
+  font-size: 0.82rem;
+  color: var(--founder-muted);
+}
+
+.founder-hq__panel-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+}
+
+.founder-hq__panel-teaser {
+  margin: 0 0 0.5rem;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.founder-hq__panel-count {
+  font-size: 0.82rem;
+  color: var(--founder-bronze, #c8922e);
+}
+
+.founder-hq__panel-items {
+  margin: 0;
+  padding: 0 1.1rem 1rem;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.founder-hq__panel-item {
+  padding: 0.65rem 0;
+  border-top: 1px solid rgba(200, 146, 46, 0.15);
+}
+
+.founder-hq__panel-link {
+  display: inline-block;
+  margin-top: 0.35rem;
+  font-size: 0.92rem;
+  color: var(--founder-teal, #0f6f7c);
+  text-decoration: none;
+}
+
+.founder-hq__panel-link:hover {
+  text-decoration: underline;
+}
+
+.founder-hq__assistant-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.founder-hq__assistant-item {
+  padding: 0.9rem 1rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(184, 160, 216, 0.25);
+  background: rgba(184, 160, 216, 0.06);
+}
+
+.founder-hq__assistant-title {
+  margin: 0 0 0.35rem;
+  font-weight: 600;
+}
+
+.founder-hq__draft-badge {
+  display: inline-block;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--founder-purple, #b8a0d8);
+}
+

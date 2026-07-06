@@ -3,6 +3,15 @@ import { FOUNDER_STUDIO_BASE } from "./founderConfig";
 
 export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
+    id: "executive-command-center",
+    href: `${FOUNDER_STUDIO_BASE}/executive-command-center`,
+    title: "Executive Command Center™",
+    question: "What matters today?",
+    purpose:
+      "The Executive Headquarters — one mission, one recommendation, one next action. Everything else expands only when you ask.",
+    accent: "gold",
+  },
+  {
     id: "morning",
     href: `${FOUNDER_STUDIO_BASE}/morning`,
     title: "Morning Briefing",
