@@ -72,5 +72,5 @@ export function resolvedArtifactFromSessionContext(
 export function itemTypeFromUniversalCreation(
   uc: UniversalCreationSession,
 ): string {
-  return pluginById(uc.documentType).createItemType;
+  return pluginById(uc.documentType)?.createItemType ?? "Document";
 }

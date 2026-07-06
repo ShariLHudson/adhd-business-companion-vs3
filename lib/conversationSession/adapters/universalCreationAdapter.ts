@@ -38,6 +38,7 @@ function answeredQuestionsFromUniversalCreation(
   uc: UniversalCreationSession,
 ): AnsweredQuestion[] {
   const plugin = pluginById(uc.documentType);
+  if (!plugin) return [];
   const now = new Date().toISOString();
   const out: AnsweredQuestion[] = [];
 
@@ -83,6 +84,7 @@ export function syncUniversalCreationToSession(
 
   const base = getOrCreateConversationSession();
   const plugin = pluginById(uc.documentType);
+  if (!plugin) return null;
   const incomingAnswers = answeredQuestionsFromUniversalCreation(uc);
   const mergedAnswers = mergeAnsweredQuestions(base.answeredQuestions, incomingAnswers);
   const readiness = studioReadinessFromSession(uc);

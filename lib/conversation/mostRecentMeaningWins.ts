@@ -272,5 +272,5 @@ export function recentAssistantOfferOverridesPendingMenu(input: {
   const currentTurn = input.currentTurn ?? 0;
   const menuTurn = input.menuOfferedAtTurn ?? 0;
   if (menuTurn && currentTurn - menuTurn > 0) return true;
-  return topic !== "unknown";
+  return true;
 }
