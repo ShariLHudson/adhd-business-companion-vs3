@@ -43,6 +43,15 @@ export type {
 } from "./marketingOrchestration";
 
 export {
+  composeEcosystemSystemsStatus,
+  ECOSYSTEM_SYSTEMS_STATUS_HEADLINE,
+} from "./ecosystemSystemsStatus";
+export type {
+  EcosystemSystemStatusKind,
+  EcosystemSystemStatusRow,
+} from "./ecosystemSystemsStatus";
+
+export {
   INTEGRATION_CENTER_PRINCIPLE,
   ONE_OFFICE_MESSAGE,
   INTEGRATION_GROUPS,

@@ -3,12 +3,13 @@
 import { useCallback, useMemo, useState } from "react";
 
 import { composeIntegrationCenterView, composeIntegrationSearch } from "@/lib/executiveIntegration";
-import { getIntegrationCenterBootstrap } from "@/lib/founder/integrationCenter";
 import { MARKETING_ORCHESTRATION_HEADLINE } from "@/lib/executiveIntegration";
+import { getIntegrationCenterBootstrap } from "@/lib/founder/integrationCenter";
 import { FOUNDER_STUDIO_BASE } from "@/lib/founderStudio/founderConfig";
 import type { IntegrationSearchView } from "@/lib/executiveIntegration/types";
 
 import { RoomHeader } from "./executive/RoomHeader";
+import { EcosystemSystemsStatusTable } from "./integrationCenter/EcosystemSystemsStatusTable";
 import { IntegrationGroupPanel } from "./integrationCenter/IntegrationGroupPanel";
 import { IntegrationSearchPanel } from "./integrationCenter/IntegrationSearchPanel";
 import { MarketingOrchestrationFlow } from "./integrationCenter/MarketingOrchestrationFlow";
@@ -55,6 +56,8 @@ export function FounderExecutiveIntegrationCenter() {
           {bootstrap.groupCount} departments
         </p>
       </section>
+
+      <EcosystemSystemsStatusTable />
 
       <MarketingOrchestrationFlow />
 
