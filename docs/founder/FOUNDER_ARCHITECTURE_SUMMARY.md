@@ -33,7 +33,9 @@ Composes: Judgment, Discovery, Research, Opportunity, Simulation, Memory, Builde
 | 7 | Executive Relationship Intelligence™ | `lib/executiveRelationshipIntelligence/` |
 | 8 | Executive Discovery Engine™ | `lib/executiveDiscoveryEngine/` |
 | 9 | Executive Integration Center™ | `lib/executiveIntegration/` · [spec](./EXECUTIVE_INTEGRATION_CENTER.md) |
-| 10 | Executive Judgment Engine™ | `lib/executiveJudgmentEngine/` |
+| 10 | Founder Knowledge Vault™ | `lib/founderKnowledgeVault/` · [index](./FOUNDER_DOCUMENT_INDEX.md) |
+| 11 | AI Extensions Center™ | `lib/founderAiExtensions/` |
+| 12 | Executive Judgment Engine™ | `lib/executiveJudgmentEngine/` |
 
 ### Coordination & voice
 
@@ -59,7 +61,7 @@ All under `lib/founder/services/*Bridge.ts` — UI and Command Center consume br
 
 ## Major experiences (rooms)
 
-Canonical list: `lib/founderStudio/rooms.ts` (24 rooms).
+Canonical list: `lib/founderStudio/rooms.ts` (26 rooms).
 
 **Six Command Center panels** map to domains:
 
@@ -69,7 +71,7 @@ Canonical list: `lib/founderStudio/rooms.ts` (24 rooms).
 | **DISCOVER** | Research, Opportunity Discovery, Discovery Engine, Relationship Intelligence |
 | **DECIDE** | Simulation, Judgment, Strategy, Decision Vault |
 | **BUILD** | Builder, Spark Command, Creation Studio |
-| **RUN** | Integration Center, Automation, Team Hub |
+| **RUN** | Integration Center, Automation, Team Hub, Knowledge Vault, AI Extensions |
 | **LEARN** | Memory Theater, Intelligence Graph, Reflection |
 
 ---

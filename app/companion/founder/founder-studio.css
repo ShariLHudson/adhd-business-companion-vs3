@@ -7024,3 +7024,235 @@
   color: var(--founder-purple, #b8a0d8);
 }
 
+/* Founder Knowledge Vault™ + AI Extensions Center™ */
+
+.founder-vault,
+.founder-ai-ext {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  max-width: 56rem;
+  margin: 0 auto;
+  padding: 0 1rem 2rem;
+}
+
+.founder-vault__lead,
+.founder-ai-ext__lead {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.55;
+  color: var(--founder-cream, #f5f0e6);
+}
+
+.founder-vault__stats {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--founder-aqua, #7ec8d4);
+}
+
+.founder-vault__sections {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.founder-vault__section {
+  border-radius: 0.75rem;
+  border: 1px solid rgba(184, 160, 216, 0.25);
+  background: rgba(12, 28, 36, 0.45);
+  padding: 0.5rem 1rem 1rem;
+}
+
+.founder-vault__section-summary {
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.65rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.founder-vault__section-summary::-webkit-details-marker {
+  display: none;
+}
+
+.founder-vault__section-count {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--founder-muted);
+}
+
+.founder-vault__section-purpose {
+  margin: 0 0 0.85rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--founder-muted);
+}
+
+.founder-vault__grid,
+.founder-ai-ext__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+  gap: 1rem;
+}
+
+.founder-vault__card,
+.founder-ai-ext__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 1rem 1.1rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgba(15, 111, 124, 0.22);
+  background: rgba(8, 20, 26, 0.55);
+}
+
+.founder-ai-ext__card--future {
+  border-style: dashed;
+  opacity: 0.85;
+}
+
+.founder-vault__card-header,
+.founder-ai-ext__card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.founder-vault__card-title,
+.founder-ai-ext__card-name {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.founder-vault__status {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 0.2rem 0.45rem;
+  border-radius: 0.35rem;
+  white-space: nowrap;
+}
+
+.founder-vault__status--active {
+  background: rgba(15, 111, 124, 0.2);
+  color: var(--founder-teal, #0f6f7c);
+}
+
+.founder-vault__status--reference {
+  background: rgba(126, 200, 212, 0.15);
+  color: var(--founder-aqua, #7ec8d4);
+}
+
+.founder-vault__status--archive {
+  background: rgba(200, 146, 46, 0.15);
+  color: var(--founder-bronze, #c8922e);
+}
+
+.founder-vault__card-purpose,
+.founder-ai-ext__purpose {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.45;
+}
+
+.founder-vault__meta {
+  margin: 0;
+  display: grid;
+  gap: 0.45rem;
+  font-size: 0.88rem;
+}
+
+.founder-vault__meta dt {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--founder-muted);
+}
+
+.founder-vault__meta dd {
+  margin: 0;
+}
+
+.founder-vault__path {
+  font-family: ui-monospace, monospace;
+  font-size: 0.82rem;
+  word-break: break-all;
+}
+
+.founder-vault__notes,
+.founder-ai-ext__notes {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--founder-muted);
+}
+
+.founder-vault__actions,
+.founder-ai-ext__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: auto;
+  padding-top: 0.5rem;
+}
+
+.founder-vault__action,
+.founder-ai-ext__action {
+  padding: 0.45rem 0.85rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(15, 111, 124, 0.35);
+  background: rgba(15, 111, 124, 0.1);
+  color: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  text-align: center;
+}
+
+.founder-vault__action--primary,
+.founder-ai-ext__action--primary {
+  background: rgba(15, 111, 124, 0.22);
+  border-color: rgba(15, 111, 124, 0.5);
+}
+
+.founder-ai-ext__field,
+.founder-ai-ext__placeholder-line {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.founder-ai-ext__field-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--founder-muted);
+}
+
+.founder-ai-ext__field-value {
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.founder-ai-ext__badge {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--founder-bronze, #c8922e);
+}
+
+.founder-ai-ext__placeholders {
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  background: rgba(15, 111, 124, 0.06);
+  border: 1px solid rgba(15, 111, 124, 0.15);
+}
+

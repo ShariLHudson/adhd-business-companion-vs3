@@ -36,6 +36,8 @@
 | [LEARNING_ORGANIZATION_SYSTEM.md](./LEARNING_ORGANIZATION_SYSTEM.md) | Institutional wisdom and learning loops |
 | [EXECUTIVE_RESEARCH_CENTER.md](./EXECUTIVE_RESEARCH_CENTER.md) | Research department spec |
 | [EXECUTIVE_INTEGRATION_CENTER.md](./EXECUTIVE_INTEGRATION_CENTER.md) | Integration Center — Sprint 1 Mission Control |
+| [FOUNDER_DOCUMENT_INDEX.md](./FOUNDER_DOCUMENT_INDEX.md) | Master index of important documents |
+| [FOUNDER_RECOVERY_GUIDE.md](./FOUNDER_RECOVERY_GUIDE.md) | Plain English recovery when direction is unclear |
 | [FOUNDER_MARKETING_ORCHESTRATION.md](./FOUNDER_MARKETING_ORCHESTRATION.md) | PostCraft + GHL orchestration flow |
 | [FOUNDER_V1_COMPLETION_REPORT.md](./FOUNDER_V1_COMPLETION_REPORT.md) | V1 freeze completion record |
 

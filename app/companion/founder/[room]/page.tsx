@@ -10,6 +10,8 @@ import { FounderExecutiveIntelligenceGraph } from "@/components/founderStudio/Fo
 import { FounderExecutiveRelationshipIntelligence } from "@/components/founderStudio/FounderExecutiveRelationshipIntelligence";
 import { FounderExecutiveDiscoveryEngine } from "@/components/founderStudio/FounderExecutiveDiscoveryEngine";
 import { FounderExecutiveIntegrationCenter } from "@/components/founderStudio/FounderExecutiveIntegrationCenter";
+import { FounderAiExtensionsCenter } from "@/components/founderStudio/FounderAiExtensionsCenter";
+import { FounderKnowledgeVault } from "@/components/founderStudio/FounderKnowledgeVault";
 import { FounderExecutiveCommandCenter } from "@/components/founderStudio/FounderExecutiveCommandCenter";
 import { FounderExecutiveJudgmentEngine } from "@/components/founderStudio/FounderExecutiveJudgmentEngine";
 import { FounderOpportunityDiscovery } from "@/components/founderStudio/FounderOpportunityDiscovery";
@@ -46,6 +48,8 @@ export function generateStaticParams() {
     { room: "executive-relationship-intelligence" },
     { room: "executive-discovery-engine" },
     { room: "executive-integration-center" },
+    { room: "founder-knowledge-vault" },
+    { room: "ai-extensions-center" },
     { room: "executive-judgment-engine" },
     { room: "executive-command-center" },
     { room: "decision-vault" },
@@ -109,6 +113,14 @@ export default async function FounderRoomRoute({ params }: FounderRoomRouteProps
 
   if (roomId === "executive-integration-center") {
     return <FounderExecutiveIntegrationCenter />;
+  }
+
+  if (roomId === "founder-knowledge-vault") {
+    return <FounderKnowledgeVault />;
+  }
+
+  if (roomId === "ai-extensions-center") {
+    return <FounderAiExtensionsCenter />;
   }
 
   if (roomId === "executive-judgment-engine") {

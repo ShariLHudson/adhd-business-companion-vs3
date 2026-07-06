@@ -192,6 +192,24 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
     accent: "bronze",
   },
   {
+    id: "founder-knowledge-vault",
+    href: `${FOUNDER_STUDIO_BASE}/founder-knowledge-vault`,
+    title: "Founder Knowledge Vault™",
+    question: "Where does our source of truth live?",
+    purpose:
+      "Executive archive — constitutions, blueprints, prompts, Cursor rules, and recovery documents.",
+    accent: "purple",
+  },
+  {
+    id: "ai-extensions-center",
+    href: `${FOUNDER_STUDIO_BASE}/ai-extensions-center`,
+    title: "AI Extensions Center™",
+    question: "Which specialist AI tool helps today?",
+    purpose:
+      "ChatGPT, Claude, Gemini, Cursor, and image tools — extensions only; Founder remains headquarters.",
+    accent: "aqua",
+  },
+  {
     id: "executive-judgment-engine",
     href: `${FOUNDER_STUDIO_BASE}/executive-judgment-engine`,
     title: "Executive Judgment Engine™",

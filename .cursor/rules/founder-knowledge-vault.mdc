@@ -1,0 +1,49 @@
+---
+description: Founder Knowledge Vault — protect architecture documents; check index before duplicating
+globs:
+  - docs/founder/**
+  - docs/founder-ghl-prompts.md
+  - lib/founder/**
+  - lib/founderKnowledgeVault/**
+  - lib/founderAiExtensions/**
+  - lib/executiveIntegration/**
+  - lib/founderStudio/**
+  - components/founderStudio/**
+  - .cursor/rules/**
+alwaysApply: false
+---
+
+# Founder Knowledge Vault™
+
+**Vault UI:** `/companion/founder/founder-knowledge-vault`  
+**Document index:** `docs/founder/FOUNDER_DOCUMENT_INDEX.md`  
+**Recovery:** `docs/founder/FOUNDER_RECOVERY_GUIDE.md`  
+**Engine:** `lib/founderKnowledgeVault/`
+
+## Before creating new Founder architecture
+
+1. Check the **Founder Knowledge Vault** and **Founder Document Index**.
+2. Do **not** duplicate constitutions, blueprints, prompts, or master documents.
+3. If a new important prompt or constitution is created → add to vault sample data and `FOUNDER_DOCUMENT_INDEX.md`.
+
+## Conflict resolution (higher authority wins)
+
+| Priority | Document |
+|----------|----------|
+| 1 | `docs/founder/FOUNDER_EXPERIENCE_CONSTITUTION.md` |
+| 2 | `docs/founder/FOUNDER_MASTER_BLUEPRINT.md` (SPARK Intelligence Blueprint) |
+| 3 | `docs/founder/NO_FEATURE_CREEP.md` · `docs/founder/ARCHITECTURE_FREEZE.md` |
+| 4 | Room specs · operating manuals |
+
+Preserve the higher-authority document. Recommend the **simpler** approach.
+
+## Sprint constraints (Implementation Sprint)
+
+- Do **not** redesign Founder Studio.
+- Do **not** remove existing Founder routes or documents.
+- Do **not** connect paid AI APIs in vault/extensions without explicit approval.
+- AI Extensions are **extensions** — Founder remains Executive Headquarters.
+
+## AI Extensions Center
+
+`lib/founderAiExtensions/` · `/companion/founder/ai-extensions-center` — external links only in V1.
