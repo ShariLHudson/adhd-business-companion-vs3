@@ -120,6 +120,15 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
     accent: "aqua",
   },
   {
+    id: "executive-builder",
+    href: `${FOUNDER_STUDIO_BASE}/executive-builder`,
+    title: "Executive Builder™",
+    question: "Where do I start?",
+    purpose:
+      "Complete implementation blueprints — phases, work packets, three options, draft outputs. Never a blank page.",
+    accent: "bronze",
+  },
+  {
     id: "decision-vault",
     href: `${FOUNDER_STUDIO_BASE}/decision-vault`,
     title: "Decision Vault™",
