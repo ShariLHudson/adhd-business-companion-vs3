@@ -1,0 +1,15 @@
+export {
+  SAMPLE_OPPORTUNITIES,
+  SAMPLE_OPPORTUNITY_EVIDENCE,
+  SAMPLE_OPPORTUNITY_RECOMMENDATIONS,
+  SAMPLE_OPPORTUNITY_RELATIONSHIPS,
+  SAMPLE_OPPORTUNITY_RISKS,
+  SAMPLE_OPPORTUNITY_SIGNALS,
+  getSampleEvidenceForOpportunity,
+  getSampleOpportunity,
+  getSampleRecommendationsForOpportunity,
+  getSampleRelationshipsForOpportunity,
+  getSampleRisksForOpportunity,
+  getSampleSignalsForOpportunity,
+  listSampleOpportunities,
+} from "./opportunitiesData";
