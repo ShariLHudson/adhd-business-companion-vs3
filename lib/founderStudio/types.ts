@@ -30,6 +30,7 @@ export type FounderRoomId =
   | "opportunity-discovery"
   | "executive-builder"
   | "executive-simulation"
+  | "executive-memory-theater"
   | "decision-vault";
 
 export type FounderRoomMeta = {

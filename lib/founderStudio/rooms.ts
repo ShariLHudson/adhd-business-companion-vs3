@@ -138,6 +138,15 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
     accent: "teal",
   },
   {
+    id: "executive-memory-theater",
+    href: `${FOUNDER_STUDIO_BASE}/executive-memory-theater`,
+    title: "Executive Memory Theater™",
+    question: "What happened — and what did we learn?",
+    purpose:
+      "The living history of Visual Spark Studios — replay decisions, launches, and journeys as executive wisdom.",
+    accent: "purple",
+  },
+  {
     id: "decision-vault",
     href: `${FOUNDER_STUDIO_BASE}/decision-vault`,
     title: "Decision Vault™",
