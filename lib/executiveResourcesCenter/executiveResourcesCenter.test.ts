@@ -23,6 +23,8 @@ describe("Executive Resources Center™", () => {
     expect(view.headline).toContain("Executive Resources Center");
     expect(view.integrationCenterHref).toContain("executive-integration-center");
     expect(view.knowledgeVaultHref).toContain("founder-knowledge-vault");
-    expect(view.aiExtensions.tools.length).toBeGreaterThan(0);
+    expect(view.masterLibraryHref).toContain("spark-master-library");
+    expect(view.departments.length).toBe(8);
+    expect(view.executiveSearch.scopes.length).toBeGreaterThan(10);
   });
 });

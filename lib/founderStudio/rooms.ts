@@ -210,6 +210,15 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
     accent: "purple",
   },
   {
+    id: "spark-master-library",
+    href: `${FOUNDER_STUDIO_BASE}/spark-master-library`,
+    title: "Spark Master Library™",
+    question: "Where does everything important belong?",
+    purpose:
+      "Permanent index of all Spark knowledge — unlimited growth, one calm catalog.",
+    accent: "purple",
+  },
+  {
     id: "ai-extensions-center",
     href: `${FOUNDER_STUDIO_BASE}/ai-extensions-center`,
     title: "AI Extensions Center™",

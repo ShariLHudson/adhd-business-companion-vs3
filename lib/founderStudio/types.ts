@@ -39,6 +39,7 @@ export type FounderRoomId =
   | "executive-command-center"
   | "decision-vault"
   | "founder-knowledge-vault"
+  | "spark-master-library"
   | "ai-extensions-center"
   | "executive-resources-center";
 

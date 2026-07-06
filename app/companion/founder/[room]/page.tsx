@@ -13,6 +13,7 @@ import { FounderExecutiveResourcesCenter } from "@/components/founderStudio/Foun
 import { FounderExecutiveIntegrationCenter } from "@/components/founderStudio/FounderExecutiveIntegrationCenter";
 import { FounderAiExtensionsCenter } from "@/components/founderStudio/FounderAiExtensionsCenter";
 import { FounderKnowledgeVault } from "@/components/founderStudio/FounderKnowledgeVault";
+import { FounderSparkMasterLibrary } from "@/components/founderStudio/FounderSparkMasterLibrary";
 import { FounderExecutiveCommandCenter } from "@/components/founderStudio/FounderExecutiveCommandCenter";
 import { FounderExecutiveJudgmentEngine } from "@/components/founderStudio/FounderExecutiveJudgmentEngine";
 import { FounderOpportunityDiscovery } from "@/components/founderStudio/FounderOpportunityDiscovery";
@@ -51,6 +52,7 @@ export function generateStaticParams() {
     { room: "executive-resources-center" },
     { room: "executive-integration-center" },
     { room: "founder-knowledge-vault" },
+    { room: "spark-master-library" },
     { room: "ai-extensions-center" },
     { room: "executive-judgment-engine" },
     { room: "executive-command-center" },
@@ -123,6 +125,10 @@ export default async function FounderRoomRoute({ params }: FounderRoomRouteProps
 
   if (roomId === "founder-knowledge-vault") {
     return <FounderKnowledgeVault />;
+  }
+
+  if (roomId === "spark-master-library") {
+    return <FounderSparkMasterLibrary />;
   }
 
   if (roomId === "ai-extensions-center") {

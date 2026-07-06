@@ -11,6 +11,9 @@ export function composeKnowledgeVaultView(): KnowledgeVaultView {
     generatedAt: new Date().toISOString(),
     headline: KNOWLEDGE_VAULT_HEADLINE,
     summary: KNOWLEDGE_VAULT_SUMMARY,
-    sections: KNOWLEDGE_VAULT_SECTIONS,
+    sections: KNOWLEDGE_VAULT_SECTIONS.map((section) => ({
+      ...section,
+      items: [...section.items],
+    })),
   };
 }

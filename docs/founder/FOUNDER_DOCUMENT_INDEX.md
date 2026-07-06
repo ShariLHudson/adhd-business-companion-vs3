@@ -39,7 +39,12 @@
 
 | Document | Path | Purpose | When to use | Authority |
 |----------|------|---------|-------------|-----------|
-| Executive Resources Center | `docs/founder/EXECUTIVE_RESOURCES_CENTER.md` | Single hub for external tools and links | Before adding external resources | Operating Manual |
+| Executive Resources Center | `docs/founder/EXECUTIVE_RESOURCES_CENTER.md` | Single hub for external tools and departments | Before adding external resources | Operating Manual |
+| Spark Master Library | `docs/founder/SPARK_MASTER_LIBRARY.md` | Permanent knowledge index | Finding any important document | Operating Manual |
+| Google Drive Structure | `docs/founder/GOOGLE_DRIVE_STRUCTURE.md` | Master storage folders | File organization | Operating Manual |
+| AI Knowledge / NotebookLM | `docs/founder/AI_KNOWLEDGE_NOTEBOOKLM.md` | Vault → Drive → NotebookLM | Large document research | Operating Manual |
+| Master Library Index | `docs/founder/MASTER_LIBRARY_INDEX.md` | Master catalog of all knowledge | Document registration | Reference |
+| Master Prompt Library | `docs/founder/MASTER_PROMPT_LIBRARY.md` | Organized prompts by area | Prompt lookup | Prompt |
 | Executive Integration Center | `docs/founder/EXECUTIVE_INTEGRATION_CENTER.md` | Mission Control — external systems | Integration work | Operating Manual |
 | Executive Research Center | `docs/founder/EXECUTIVE_RESEARCH_CENTER.md` | Research department flow | Research features | Operating Manual |
 | Implementation Roadmap | `docs/founder/IMPLEMENTATION_ROADMAP.md` | Sample → real → polish phases | Post-freeze builds | Operating Manual |
@@ -86,6 +91,7 @@ Located in `.cursor/rules/`. Key rules:
 | Rule | Path | Purpose |
 |------|------|---------|
 | Founder Knowledge Vault | `.cursor/rules/founder-knowledge-vault.mdc` | Protect documents — no duplication |
+| Master Library | `.cursor/rules/master-library.mdc` | Check Master Library before duplicating docs |
 | The Friend We All Deserve | `.cursor/rules/the-friend-we-all-deserve.mdc` | Companion voice |
 | Estate Architectural Authority | `.cursor/rules/estate-architectural-authority.mdc` | Estate canon |
 | Conversation Architecture Frozen | `.cursor/rules/spark-conversation-architecture-frozen.mdc` | No conversation redesign |
@@ -112,5 +118,6 @@ When implementation conflicts with documents, **higher authority wins:**
 When a new important constitution, blueprint, or master prompt is created:
 
 1. Add it to **Founder Knowledge Vault** sample data (`lib/founderKnowledgeVault/sample/vaultData.ts`)  
-2. Add a row to **this index**  
-3. Do not duplicate existing authority documents
+2. Register in **Spark Master Library** (`lib/sparkMasterLibrary/sample/libraryData.ts`)  
+3. Add rows to **this index**, **MASTER_LIBRARY_INDEX.md**, and **MASTER_PROMPT_LIBRARY.md** (if prompt)  
+4. Do not duplicate existing authority documents

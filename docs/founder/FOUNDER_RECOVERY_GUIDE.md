@@ -65,6 +65,8 @@ The most important for protecting architecture:
 
 **Executive Headquarters:** `/companion/founder/executive-command-center`  
 **Executive Resources (single hub):** `/companion/founder/executive-resources-center`  
+**Knowledge Vault (executive archive):** `/companion/founder/founder-knowledge-vault`  
+**Spark Master Library (permanent index):** `/companion/founder/spark-master-library`  
 **Mission Control (integrations):** `/companion/founder/executive-integration-center`  
 **AI tools (extensions only):** `/companion/founder/ai-extensions-center`
 

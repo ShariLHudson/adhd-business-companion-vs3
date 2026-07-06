@@ -6,6 +6,7 @@ import { getKnowledgeVaultBootstrap } from "@/lib/founder/knowledgeVaultCenter";
 import { FOUNDER_STUDIO_BASE } from "@/lib/founderStudio/founderConfig";
 
 import { RoomHeader } from "./executive/RoomHeader";
+import { DocumentLayersPanel } from "./knowledgeVault/DocumentLayersPanel";
 import { KnowledgeVaultSectionPanel } from "./knowledgeVault/KnowledgeVaultSectionPanel";
 
 export function FounderKnowledgeVault() {
@@ -19,7 +20,7 @@ export function FounderKnowledgeVault() {
         eyebrow="Founder Knowledge Vault™"
         title="Executive Archive"
         question="Where does our source of truth live?"
-        purpose="Constitutions, blueprints, prompts, Cursor rules, and recovery documents — organized for calm retrieval, not file hunting."
+        purpose="Constitutions, blueprints, prompts, Cursor rules, and recovery documents — curated for calm retrieval, not file hunting."
       />
 
       <section className="founder-vault__hero" aria-labelledby="vault-hero">
@@ -32,12 +33,14 @@ export function FounderKnowledgeVault() {
         </p>
       </section>
 
+      <DocumentLayersPanel />
+
       <div className="founder-vault__sections">
         {vault.sections.map((section, index) => (
           <KnowledgeVaultSectionPanel
             key={section.id}
             section={section}
-            defaultOpen={index < 2}
+            defaultOpen={index < 3}
           />
         ))}
       </div>

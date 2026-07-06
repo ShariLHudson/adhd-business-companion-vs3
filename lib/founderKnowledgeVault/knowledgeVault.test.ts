@@ -7,14 +7,15 @@ import {
 } from "./index";
 
 describe("Founder Knowledge Vault™", () => {
-  it("composeKnowledgeVaultView includes all archive sections", () => {
+  it("composeKnowledgeVaultView includes expanded archive sections", () => {
     const view = composeKnowledgeVaultView();
-    expect(view.sections).toHaveLength(15);
+    expect(view.sections.length).toBeGreaterThanOrEqual(18);
     expect(view.sections.map((s) => s.label)).toContain("Constitutions");
-    expect(view.sections.map((s) => s.label)).toContain("Recovery / Handoff Docs");
+    expect(view.sections.map((s) => s.label)).toContain("Operating Manuals");
+    expect(view.sections.map((s) => s.label)).toContain("Recovery Guides");
   });
 
-  it("vault items include required metadata", () => {
+  it("vault items include authority and related systems", () => {
     const item = ALL_KNOWLEDGE_VAULT_ITEMS.find((i) => i.id === "kv-founder-constitution");
     expect(item).toMatchObject({
       title: "Founder Experience Constitution™",
@@ -22,7 +23,9 @@ describe("Founder Knowledge Vault™", () => {
       lastUpdated: expect.any(String),
       status: "active",
       documentPath: "docs/founder/FOUNDER_EXPERIENCE_CONSTITUTION.md",
+      authorityLevel: "constitution",
     });
+    expect(item?.relatedSystems.length).toBeGreaterThan(0);
   });
 
   it("sections contain at least one item each", () => {

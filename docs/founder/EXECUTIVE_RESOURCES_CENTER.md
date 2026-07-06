@@ -4,26 +4,48 @@
 
 | | |
 |---|---|
-| **Status** | Binding — implementation sprint |
+| **Status** | Implementation Sprint 2 — department-organized V1 |
 | **Route** | `/companion/founder/executive-resources-center` |
 | **Engine** | `lib/executiveResourcesCenter/` |
-| **Related** | [Executive Integration Center](./EXECUTIVE_INTEGRATION_CENTER.md) · [Founder Knowledge Vault](./FOUNDER_DOCUMENT_INDEX.md) · [AI Extensions](../lib/founderAiExtensions/) |
+| **Related** | [Executive Integration Center](./EXECUTIVE_INTEGRATION_CENTER.md) · [Founder Knowledge Vault](./FOUNDER_DOCUMENT_INDEX.md) · [Spark Master Library](./SPARK_MASTER_LIBRARY.md) |
 
 > Do **not** scatter important external resources throughout Founder.  
 > The Executive Resources Center remains the single authoritative location for external systems, AI tools, calendars, resources, documents, dashboards, and executive links.
 
 ---
 
-## What lives here
+## The One Office Principle™
 
-| Category | Surface |
-|----------|---------|
-| **Connected systems** | Ecosystem systems status table |
-| **Mission Control (full)** | Link to Executive Integration Center |
-| **AI extensions** | ChatGPT, Claude, Gemini, Cursor, image tools |
-| **Documents & prompts** | Link to Founder Knowledge Vault |
+Founder Studio™ is the Executive Headquarters.
 
-Founder Studio remains the **Executive Headquarters**. Resources are extensions and departments — not separate headquarters.
+Every external application becomes a specialized department. Founder decides. Founder prepares. Founder recommends. Founder teaches. External systems execute specialized work.
+
+---
+
+## Departments (V1)
+
+| Department | Contents |
+|------------|----------|
+| **Executive** | Founder Studio™ |
+| **Development** | Cursor, GitHub, Vercel, Railway, Supabase |
+| **AI Studio** | ChatGPT, VSS Command Center GPT, Claude, Gemini, Perplexity, NotebookLM, ElevenLabs, Suno |
+| **Google Workspace** | Gmail, Calendar, Drive, Docs, Sheets, Meet |
+| **Marketing** | PostCraft™, LinkedIn, Facebook, Instagram |
+| **Operations** | GoHighLevel™ — CRM, funnels, membership, automations, analytics |
+| **Booking Calendars** | Framework Building, Curious Connections, Client Sessions, Sales, Networking, Strategic Growth |
+| **Business Toolkit™** | Canva, Domains, Brand Assets (planned) |
+
+Runtime: `lib/executiveResourcesCenter/sample/resourcesData.ts`
+
+---
+
+## Permanent knowledge links
+
+| Surface | Route |
+|---------|-------|
+| Executive Integration Center | `/companion/founder/executive-integration-center` |
+| Founder Knowledge Vault | `/companion/founder/founder-knowledge-vault` |
+| Spark Master Library | `/companion/founder/spark-master-library` |
 
 ---
 

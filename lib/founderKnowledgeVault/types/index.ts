@@ -1,10 +1,28 @@
 /** Founder Knowledge Vault™ — executive archive for master documents and prompts. */
 
+export type DocumentAuthorityLevel =
+  | "constitution"
+  | "blueprint"
+  | "operating-manual"
+  | "prompt"
+  | "reference"
+  | "archive";
+
 export type KnowledgeVaultCategoryId =
   | "constitutions"
   | "blueprints"
-  | "cursor-rules"
+  | "operating-manuals"
   | "master-prompts"
+  | "cursor-rules"
+  | "recovery-guides"
+  | "architecture"
+  | "research"
+  | "estate"
+  | "images"
+  | "audio"
+  | "launches"
+  | "business-systems"
+  | "archive"
   | "founder-prompts"
   | "companion-prompts"
   | "postcraft-prompts"
@@ -14,8 +32,7 @@ export type KnowledgeVaultCategoryId =
   | "launch-prompts"
   | "research-prompts"
   | "recovery-handoff"
-  | "how-to-rebuild"
-  | "archive";
+  | "how-to-rebuild";
 
 export type KnowledgeVaultItemStatus = "active" | "reference" | "archive" | "draft";
 
@@ -24,9 +41,13 @@ export type KnowledgeVaultItem = {
   title: string;
   categoryId: KnowledgeVaultCategoryId;
   purpose: string;
+  authorityLevel: DocumentAuthorityLevel;
+  relatedSystems: readonly string[];
   lastUpdated: string;
   status: KnowledgeVaultItemStatus;
   documentPath: string;
+  googleDrivePath?: string;
+  inNotebookLmLibrary?: boolean;
   promptExcerpt?: string;
   notes?: string;
 };

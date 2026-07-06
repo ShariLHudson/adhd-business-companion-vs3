@@ -2,6 +2,11 @@ export type {
   ExecutiveResourceAdmissionQuestion,
   ExecutiveResourceAdmissionQuestionId,
   ExecutiveResourcesCenterView,
+  ExecutiveResourceItem,
+  ResourceDepartment,
+  ResourceDepartmentId,
+  ExecutiveSearchScope,
+  ExecutiveSearchArchitectureView,
 } from "./types";
 
 export {

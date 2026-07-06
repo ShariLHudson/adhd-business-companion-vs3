@@ -1,0 +1,60 @@
+---
+description: Master Library — check before duplicating constitutions, blueprints, prompts, or operating manuals
+globs:
+  - docs/founder/**
+  - docs/founder-ghl-prompts.md
+  - docs/estate/**
+  - docs/estate-intelligence/**
+  - lib/founderKnowledgeVault/**
+  - lib/sparkMasterLibrary/**
+  - lib/executiveResourcesCenter/**
+  - .cursor/rules/**
+alwaysApply: false
+---
+
+# Spark Master Library™
+
+**UI:** `/companion/founder/spark-master-library`  
+**Index:** `docs/founder/MASTER_LIBRARY_INDEX.md`  
+**Prompts:** `docs/founder/MASTER_PROMPT_LIBRARY.md`  
+**Engine:** `lib/sparkMasterLibrary/`
+
+## Before creating any new
+
+- Constitution
+- Blueprint
+- Prompt
+- Operating Manual
+- Recovery Guide
+- Architecture Document
+
+**Check the Master Library.**
+
+If one exists → **extend it**. Do **not** duplicate.
+
+## When a new permanent document is created
+
+Automatically register it in:
+
+1. **Founder Knowledge Vault** — `lib/founderKnowledgeVault/sample/vaultData.ts`
+2. **Spark Master Library** — `lib/sparkMasterLibrary/sample/libraryData.ts`
+3. **MASTER_LIBRARY_INDEX.md**
+4. **MASTER_PROMPT_LIBRARY.md** (if applicable)
+
+## Three-layer architecture
+
+| Layer | Role |
+|-------|------|
+| Founder Knowledge Vault | Curated executive view |
+| Google Drive | Master file storage — see `docs/founder/GOOGLE_DRIVE_STRUCTURE.md` |
+| NotebookLM | Research across large collections — see `docs/founder/AI_KNOWLEDGE_NOTEBOOKLM.md` |
+
+## Conflict resolution
+
+Founder Experience Constitution™ wins. Then SPARK Intelligence Blueprint. Then Architecture Freeze.
+
+## Sprint constraints
+
+- Do **not** redesign Founder Studio
+- Do **not** add new intelligence systems
+- Do **not** remove existing Founder routes

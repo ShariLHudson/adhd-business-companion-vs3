@@ -11,6 +11,15 @@ const STATUS_LABEL: Record<KnowledgeVaultItem["status"], string> = {
   draft: "Draft",
 };
 
+const AUTHORITY_LABEL: Record<KnowledgeVaultItem["authorityLevel"], string> = {
+  constitution: "Constitution",
+  blueprint: "Blueprint",
+  "operating-manual": "Operating Manual",
+  prompt: "Prompt",
+  reference: "Reference",
+  archive: "Archive",
+};
+
 type KnowledgeVaultItemCardProps = {
   item: KnowledgeVaultItem;
 };
@@ -31,12 +40,32 @@ export function KnowledgeVaultItemCard({ item }: KnowledgeVaultItemCardProps) {
 
       <dl className="founder-vault__meta">
         <div>
+          <dt>Authority</dt>
+          <dd>{AUTHORITY_LABEL[item.authorityLevel]}</dd>
+        </div>
+        <div>
           <dt>Last updated</dt>
           <dd>{item.lastUpdated}</dd>
         </div>
         <div>
           <dt>Path</dt>
           <dd className="founder-vault__path">{item.documentPath}</dd>
+        </div>
+        {item.relatedSystems.length > 0 ? (
+          <div>
+            <dt>Related systems</dt>
+            <dd>{item.relatedSystems.join(" · ")}</dd>
+          </div>
+        ) : null}
+        {item.googleDrivePath ? (
+          <div>
+            <dt>Google Drive</dt>
+            <dd className="founder-vault__path">{item.googleDrivePath}</dd>
+          </div>
+        ) : null}
+        <div>
+          <dt>NotebookLM</dt>
+          <dd>{item.inNotebookLmLibrary ? "In library" : "Not indexed"}</dd>
         </div>
       </dl>
 

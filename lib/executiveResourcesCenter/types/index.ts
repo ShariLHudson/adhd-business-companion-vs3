@@ -1,5 +1,17 @@
 /** Executive Resources Center™ — single authoritative location for external resources. */
 
+import type { ResourceDepartment } from "./resources";
+import type { ExecutiveSearchArchitectureView } from "./executiveSearch";
+
+export type { ResourceDepartment, ResourceDepartmentId, ExecutiveResourceItem } from "./resources";
+export type { ExecutiveSearchScope, ExecutiveSearchScopeId, ExecutiveSearchArchitectureView } from "./executiveSearch";
+export {
+  EXECUTIVE_SEARCH_HEADLINE,
+  EXECUTIVE_SEARCH_SCOPES,
+  EXECUTIVE_SEARCH_SUMMARY,
+  composeExecutiveSearchArchitecture,
+} from "./executiveSearch";
+
 export type ExecutiveResourceAdmissionQuestionId =
   | "weekly-use"
   | "saves-time"
@@ -45,6 +57,9 @@ export type ExecutiveResourcesCenterView = {
   admissionQuestions: readonly ExecutiveResourceAdmissionQuestion[];
   integrationCenterHref: string;
   knowledgeVaultHref: string;
+  masterLibraryHref: string;
+  departments: readonly ResourceDepartment[];
+  executiveSearch: ExecutiveSearchArchitectureView;
 };
 
 export function evaluateExecutiveResourceAdmission(
