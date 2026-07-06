@@ -32,7 +32,7 @@ Composes: Judgment, Discovery, Research, Opportunity, Simulation, Memory, Builde
 | 6 | Executive Intelligence Graph™ | `lib/executiveIntelligenceGraph/` |
 | 7 | Executive Relationship Intelligence™ | `lib/executiveRelationshipIntelligence/` |
 | 8 | Executive Discovery Engine™ | `lib/executiveDiscoveryEngine/` |
-| 9 | Executive Integration Center™ | `lib/executiveIntegration/` |
+| 9 | Executive Integration Center™ | `lib/executiveIntegration/` · [spec](./EXECUTIVE_INTEGRATION_CENTER.md) |
 | 10 | Executive Judgment Engine™ | `lib/executiveJudgmentEngine/` |
 
 ### Coordination & voice

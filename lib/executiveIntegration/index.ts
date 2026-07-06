@@ -17,8 +17,10 @@ export type {
 export {
   GHL_CAPABILITIES,
   INTEGRATION_OPEN_ROUTES,
+  INTEGRATION_STATUS_LABELS,
   POSTCRAFT_CAPABILITIES,
   integrationConnectionLabel,
+  integrationStatusDisplayLabel,
   parseMarketingIntegrationStatus,
   resolveIntegrationActionHref,
   resolveIntegrationConnectionLabel,

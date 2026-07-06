@@ -12,13 +12,24 @@ describe("Executive Integration Center™", () => {
     expect(INTEGRATION_CENTER_PRINCIPLE).toContain("orchestrates");
   });
 
-  it("composeIntegrationCenterView includes all integration groups", () => {
+  it("composeIntegrationCenterView includes all integration groups in sprint order", () => {
     const view = composeIntegrationCenterView();
-    expect(view.groups.length).toBeGreaterThan(7);
+    expect(view.groups.map((group) => group.label)).toEqual([
+      "Communication",
+      "Development",
+      "Marketing",
+      "Operations",
+      "Business",
+      "AI Tools",
+      "Social Media",
+      "Productivity",
+      "Research",
+    ]);
     const names = view.groups.flatMap((g) => g.integrations.map((i) => i.name));
     expect(names).toContain("PostCraft™");
     expect(names).toContain("Google Mail");
     expect(names).toContain("GitHub");
+    expect(names).toContain("ChatGPT Command Center");
   });
 
   it("integrations expose status and quick actions", () => {

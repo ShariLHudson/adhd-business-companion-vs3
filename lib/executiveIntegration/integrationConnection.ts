@@ -35,6 +35,27 @@ export function integrationConnectionLabel(
   return status === "connected" ? "connected" : "not-connected";
 }
 
+export const INTEGRATION_STATUS_LABELS: Record<IntegrationStatus, string> = {
+  connected: "Connected",
+  "needs-configuration": "Needs Configuration",
+  offline: "Offline",
+  future: "Future",
+  unavailable: "Unavailable",
+};
+
+export function integrationStatusDisplayLabel(
+  integration: ExecutiveIntegration,
+  live?: MarketingIntegrationLiveStatus,
+): string {
+  if (integration.id === "postcraft" && live) {
+    return live.postcraft === "connected" ? "Connected" : "Needs Configuration";
+  }
+  if (integration.id === "gohighlevel" && live) {
+    return live.gohighlevel === "connected" ? "Connected" : "Needs Configuration";
+  }
+  return INTEGRATION_STATUS_LABELS[integration.status];
+}
+
 export function parseMarketingIntegrationStatus(
   payload: EcosystemDashboardStatusPayload | null | undefined,
 ): MarketingIntegrationLiveStatus {

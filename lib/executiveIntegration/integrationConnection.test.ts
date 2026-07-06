@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   GHL_CAPABILITIES,
   POSTCRAFT_CAPABILITIES,
+  integrationStatusDisplayLabel,
   parseMarketingIntegrationStatus,
   resolveIntegrationActionHref,
   resolveIntegrationConnectionLabel,
@@ -61,5 +62,24 @@ describe("Integration connection — PostCraft & GoHighLevel", () => {
     expect(postcraft?.quickActions.map((a) => a.label)).toContain("Open PostCraft");
     expect(ghl?.quickActions.map((a) => a.label)).toContain("Prepare email workflow");
     expect(resolveIntegrationConnectionLabel(postcraft!)).toBe("not-connected");
+  });
+
+  it("integrationStatusDisplayLabel uses sprint status vocabulary", () => {
+    const view = composeIntegrationCenterView();
+    const postcraft = view.groups
+      .flatMap((g) => g.integrations)
+      .find((i) => i.id === "postcraft")!;
+    const pinterest = view.groups
+      .flatMap((g) => g.integrations)
+      .find((i) => i.id === "pinterest")!;
+
+    expect(integrationStatusDisplayLabel(postcraft)).toBe("Needs Configuration");
+    expect(
+      integrationStatusDisplayLabel(postcraft, {
+        postcraft: "connected",
+        gohighlevel: "not-connected",
+      }),
+    ).toBe("Connected");
+    expect(integrationStatusDisplayLabel(pinterest)).toBe("Future");
   });
 });

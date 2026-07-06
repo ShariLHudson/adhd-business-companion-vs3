@@ -363,10 +363,10 @@ export const INTEGRATION_GROUPS: IntegrationGroup[] = [
   { id: "communication", label: "Communication", purpose: "Mail, calendar, documents — what the company said and scheduled.", integrations: COMMUNICATION },
   { id: "development", label: "Development", purpose: "Founder Studio, GitHub, Cursor — what we are building.", integrations: DEVELOPMENT },
   { id: "marketing", label: "Marketing", purpose: "PostCraft creates · GoHighLevel delivers.", integrations: MARKETING },
-  { id: "social-media", label: "Social Media", purpose: "LinkedIn, Instagram, Facebook — where the world meets Spark.", integrations: SOCIAL },
-  { id: "ai", label: "AI Tools", purpose: "Command Center GPT and future assistants.", integrations: AI },
   { id: "operations", label: "Operations", purpose: "Team Hub and execution lanes.", integrations: OPERATIONS },
   { id: "business", label: "Business", purpose: "Companion and member-facing products.", integrations: BUSINESS },
+  { id: "ai", label: "AI Tools", purpose: "Command Center GPT and future assistants.", integrations: AI },
+  { id: "social-media", label: "Social Media", purpose: "LinkedIn, Instagram, Facebook — where the world meets Spark.", integrations: SOCIAL },
   { id: "productivity", label: "Productivity", purpose: "Workspace tools that support the office.", integrations: PRODUCTIVITY },
   { id: "research", label: "Research", purpose: "Executive Research and intelligence inputs.", integrations: RESEARCH },
 ];

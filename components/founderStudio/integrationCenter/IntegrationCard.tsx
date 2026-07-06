@@ -2,22 +2,15 @@
 
 import type { ExecutiveIntegration } from "@/lib/executiveIntegration/types";
 import {
+  integrationStatusDisplayLabel,
   resolveIntegrationActionHref,
   resolveIntegrationConnectionLabel,
   type MarketingIntegrationLiveStatus,
 } from "@/lib/executiveIntegration";
 
-const CONNECTION_LABEL = {
-  connected: "Connected",
-  "not-connected": "Not connected",
-} as const;
-
-const LEGACY_STATUS_LABEL = {
-  connected: "Connected",
-  "needs-configuration": "Not connected",
-  offline: "Not connected",
-  future: "Future",
-  unavailable: "Unavailable",
+const CONNECTION_CLASS = {
+  connected: "connected",
+  "not-connected": "needs-configuration",
 } as const;
 
 type IntegrationCardProps = {
@@ -32,11 +25,11 @@ export function IntegrationCard({ integration, liveStatus }: IntegrationCardProp
     ? resolveIntegrationConnectionLabel(integration, liveStatus)
     : null;
 
-  const statusLabel = connection
-    ? CONNECTION_LABEL[connection]
-    : LEGACY_STATUS_LABEL[integration.status];
+  const statusLabel = integrationStatusDisplayLabel(integration, liveStatus);
 
-  const statusClass = connection ?? integration.status;
+  const statusClass = connection
+    ? CONNECTION_CLASS[connection]
+    : integration.status;
 
   return (
     <article className={`founder-integration__card founder-integration__card--${statusClass}`}>
