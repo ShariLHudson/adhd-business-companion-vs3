@@ -1,0 +1,440 @@
+import type {
+  CollectedSignal,
+  OvernightCycleHistoryRecord,
+  OvernightCycleRun,
+  PreparedOffice,
+} from "../types";
+
+const TS = "2026-07-06T06:00:00.000Z";
+const CYCLE_DATE = "2026-07-06";
+
+export const SAMPLE_COLLECTED_SIGNALS: CollectedSignal[] = [
+  {
+    id: "sig-research-adhd-restart",
+    source: "research",
+    title: "ADHD restart rituals in productivity apps",
+    summary: "Members prefer shame-free return over streak recovery.",
+    refId: "res-adhd-restart-2026",
+    missionIds: ["listening-rooms"],
+    collectedAt: TS,
+  },
+  {
+    id: "sig-companion-voice",
+    source: "companion",
+    title: "Voice companion usage uptick",
+    summary: "Members asking for hands-free capture during overwhelm.",
+    refId: "companion-voice-theme",
+    missionIds: ["companion"],
+    collectedAt: TS,
+  },
+  {
+    id: "sig-founder-mission-progress",
+    source: "mission",
+    title: "Listening Rooms milestone advanced",
+    summary: "Estate scene polish entered QA checklist.",
+    refId: "listening-rooms",
+    missionIds: ["listening-rooms"],
+    collectedAt: TS,
+  },
+  {
+    id: "sig-decision-restart-invest",
+    source: "decision-vault",
+    title: "Decision waiting: invest in restart experience",
+    summary: "Board consensus needs founder confirmation.",
+    refId: "dec-invest-restart",
+    missionIds: ["listening-rooms"],
+    collectedAt: TS,
+  },
+  {
+    id: "sig-postcraft-pinterest",
+    source: "postcraft",
+    title: "Pinterest ADHD planning interest",
+    summary: "Pin saves rising on calm planning visuals.",
+    refId: "postcraft-pinterest-trend",
+    missionIds: ["postcraft", "marketing-launch"],
+    collectedAt: TS,
+  },
+  {
+    id: "sig-ghl-nurture",
+    source: "gohighlevel",
+    title: "Gentle Restart nurture draft ready",
+    summary: "Automation sequence awaits content approval.",
+    refId: "gentle-restart",
+    missionIds: ["marketing-launch"],
+    collectedAt: TS,
+  },
+  {
+    id: "sig-analytics-retention",
+    source: "analytics",
+    title: "Return-after-absence cohort improved",
+    summary: "Early signal after companion copy refinement.",
+    refId: "analytics-retention-q2",
+    missionIds: ["listening-rooms", "companion"],
+    collectedAt: TS,
+  },
+  {
+    id: "sig-customer-fatigue",
+    source: "customer-feedback",
+    title: "Decision fatigue workshop demand",
+    summary: "Repeated member requests for workshop on choosing.",
+    refId: "member-workshop-voice",
+    missionIds: ["workshop-series"],
+    collectedAt: TS,
+  },
+  {
+    id: "sig-ai-news-voice",
+    source: "ai-news",
+    title: "Voice AI latency improvements",
+    summary: "On-device speech models faster for mobile.",
+    refId: "ai-voice-latency",
+    missionIds: ["companion"],
+    collectedAt: TS,
+  },
+  {
+    id: "sig-tech-estate-perf",
+    source: "technology",
+    title: "Full-bleed scene mobile performance",
+    summary: "Multiple estate backgrounds need lazy load review.",
+    refId: "tech-estate-mobile",
+    missionIds: ["listening-rooms", "estate"],
+    collectedAt: TS,
+  },
+  {
+    id: "sig-competitor-calm",
+    source: "competitors",
+    title: "Competitor launches calm planner",
+    summary: "Category noise increasing; differentiation via estate.",
+    refId: "comp-calm-planner",
+    missionIds: ["listening-rooms"],
+    collectedAt: TS,
+  },
+  {
+    id: "sig-founder-daily",
+    source: "founder",
+    title: "Founder daily workflow usage",
+    summary: "Mission composer used consistently; office prep valued.",
+    refId: "founder-daily-workflow",
+    missionIds: ["founder-studio"],
+    collectedAt: TS,
+  },
+];
+
+export const SAMPLE_PREPARED_OFFICE: PreparedOffice = {
+  date: CYCLE_DATE,
+  morning: {
+    date: CYCLE_DATE,
+    whileYouWereAway: [
+      "124 research items reviewed.",
+      "18 recurring ADHD struggles identified.",
+      "4 opportunities deserve attention.",
+      "2 decisions are waiting.",
+      "Listening Rooms remains your highest-impact mission.",
+      "Three workshop ideas emerged.",
+      "Voice AI improved.",
+      "Pinterest interest in ADHD planning increased.",
+      "One automation opportunity could save several hours each week.",
+    ],
+    stats: {
+      researchItemsReviewed: 124,
+      recurringStrugglesIdentified: 18,
+      opportunitiesDeserveAttention: 4,
+      decisionsWaiting: 2,
+      workshopIdeasEmerging: 3,
+    },
+  },
+  brief: {
+    id: "brief-2026-07-06",
+    date: CYCLE_DATE,
+    greeting: "Good morning, Shari.",
+    narrative: [
+      "While you were away, the ecosystem reviewed research, companion themes, and mission movement.",
+      "Nothing urgent needs panic — a few items deserve your calm attention today.",
+    ],
+    highlights: [
+      "Listening Rooms remains the highest-impact mission.",
+      "Two decisions are waiting in the vault.",
+      "Voice companion themes strengthened overnight.",
+    ],
+    missionFocus: "Continue Listening Rooms — estate scene QA is the next honest step.",
+    recommendedMissionId: "listening-rooms",
+    recommendedFirstAction: "Review the Listening Rooms estate scene against the Photograph Test.",
+    calmClose: "Your office is ready. One mission. One first action.",
+  },
+  missionFocus: {
+    missionId: "listening-rooms",
+    title: "Listening Rooms",
+    status: "active",
+    headline: "Highest-impact mission — calm restart for returning members.",
+    progressNote: "Scene polish entered QA; nurture waits on visual proof.",
+    isRecommended: true,
+  },
+  todaysQuestions: [
+    {
+      id: "product-build-next",
+      question: "What should we build next for members?",
+      category: "product",
+      priority: 92,
+      missionId: "listening-rooms",
+    },
+    {
+      id: "founder-attention-today",
+      question: "Where should founder attention go today?",
+      category: "founder",
+      priority: 88,
+    },
+    {
+      id: "founder-decision-waiting",
+      question: "Which decision is waiting for you?",
+      category: "founder",
+      priority: 85,
+    },
+  ],
+  opportunities: [
+    {
+      id: "opp-listening-rooms-expansion",
+      title: "Listening Rooms expansion",
+      headline: "Own the ADHD restart category with estate re-entry.",
+      missionIds: ["listening-rooms"],
+      compositeScore: 91,
+    },
+    {
+      id: "opp-decision-fatigue-workshop",
+      title: "Decision Fatigue Workshop",
+      headline: "Recurring member demand for choosing support.",
+      missionIds: ["workshop-series"],
+      compositeScore: 84,
+    },
+    {
+      id: "opp-ghl-automation",
+      title: "GHL nurture automation",
+      headline: "Logistics automation without touching companion voice.",
+      missionIds: ["marketing-launch"],
+      compositeScore: 78,
+    },
+    {
+      id: "opp-voice-capture",
+      title: "Voice capture during overwhelm",
+      headline: "Hands-free capture aligns with accessibility and EF.",
+      missionIds: ["companion"],
+      compositeScore: 76,
+    },
+  ],
+  risks: [
+    {
+      id: "risk-competitor-noise",
+      title: "Category noise from calm planners",
+      headline: "Differentiate through estate beauty, not features.",
+      severity: "medium",
+      missionIds: ["listening-rooms"],
+    },
+    {
+      id: "risk-mobile-perf",
+      title: "Mobile estate scene performance",
+      headline: "Multiple full-bleed scenes need lazy load discipline.",
+      severity: "medium",
+      missionIds: ["listening-rooms", "estate"],
+    },
+  ],
+  research: [
+    {
+      id: "res-adhd-restart",
+      title: "ADHD restart rituals",
+      headline: "Shame-free return beats streak recovery — worth reading.",
+      itemsReviewed: 124,
+      worthReading: true,
+    },
+    {
+      id: "res-pinterest-planning",
+      title: "Pinterest ADHD planning trend",
+      headline: "Calm planning visuals gaining saves — defer campaign until scene ready.",
+      itemsReviewed: 18,
+      worthReading: true,
+    },
+  ],
+  marketing: [
+    {
+      id: "mkt-gentle-restart",
+      title: "Gentle Restart campaign",
+      headline: "Hold launch until Listening Rooms scene passes Photograph Test.",
+      channel: "GHL",
+    },
+    {
+      id: "mkt-pinterest-defer",
+      title: "Pinterest strategy",
+      headline: "Interest rising — explicitly defer to Q4 review.",
+      channel: "Pinterest",
+    },
+  ],
+  products: [
+    {
+      id: "prod-listening-rooms",
+      title: "Listening Rooms",
+      headline: "Flagship member moment for 2026.",
+      missionIds: ["listening-rooms"],
+    },
+    {
+      id: "prod-voice-companion",
+      title: "Voice companion capture",
+      headline: "Improve hands-free capture path on mobile.",
+      missionIds: ["companion"],
+    },
+  ],
+  automations: [
+    {
+      id: "auto-ghl-nurture",
+      title: "GHL nurture sequence",
+      headline: "Automate logistics; never automate belonging.",
+      hoursSavedEstimate: "3–5 hours weekly",
+    },
+  ],
+  recommendations: [
+    {
+      id: "rec-continue-listening-rooms",
+      kind: "product",
+      title: "Continue Listening Rooms",
+      summary: "Highest mission alignment and member impact.",
+      missionIds: ["listening-rooms"],
+      reasoningId: "reason-lr-priority",
+      suggestedAction: "QA estate scene today.",
+      dimensions: {
+        priority: 95,
+        urgency: 72,
+        confidence: 88,
+        strategicValue: 94,
+        customerValue: 92,
+        founderValue: 90,
+        revenuePotential: 78,
+        missionAlignment: 98,
+      },
+      compositeScore: 91,
+    },
+    {
+      id: "rec-workshop-ideas",
+      kind: "workshop",
+      title: "Three workshop ideas emerged",
+      summary: "Decision fatigue theme strongest from member voice.",
+      missionIds: ["workshop-series"],
+      reasoningId: "reason-workshop-demand",
+      dimensions: {
+        priority: 82,
+        urgency: 58,
+        confidence: 80,
+        strategicValue: 75,
+        customerValue: 88,
+        founderValue: 70,
+        revenuePotential: 72,
+        missionAlignment: 80,
+      },
+      compositeScore: 78,
+    },
+    {
+      id: "rec-ghl-automation",
+      kind: "automation",
+      title: "GHL nurture when content ready",
+      summary: "Save hours weekly without harming relationship.",
+      missionIds: ["marketing-launch"],
+      reasoningId: "reason-ghl-auto",
+      suggestedAction: "Approve draft when scene screenshots exist.",
+      dimensions: {
+        priority: 70,
+        urgency: 45,
+        confidence: 74,
+        strategicValue: 68,
+        customerValue: 60,
+        founderValue: 85,
+        revenuePotential: 65,
+        missionAlignment: 72,
+      },
+      compositeScore: 71,
+    },
+    {
+      id: "rec-dec-invest-restart",
+      kind: "executive-decision",
+      title: "Invest in restart experience",
+      summary: "Decision vault item needs founder confirmation.",
+      missionIds: ["listening-rooms"],
+      reasoningId: "reason-dec-restart",
+      dimensions: {
+        priority: 88,
+        urgency: 80,
+        confidence: 86,
+        strategicValue: 90,
+        customerValue: 88,
+        founderValue: 92,
+        revenuePotential: 70,
+        missionAlignment: 95,
+      },
+      compositeScore: 86,
+    },
+  ],
+  recommendedMission: {
+    missionId: "listening-rooms",
+    title: "Listening Rooms",
+    status: "active",
+    headline: "Continue here — highest impact today.",
+    progressNote: "One scene QA away from nurture alignment.",
+    isRecommended: true,
+  },
+  recommendedFirstAction:
+    "Review the Listening Rooms estate scene against the Photograph Test.",
+};
+
+export const SAMPLE_OVERNIGHT_CYCLE_RUN: OvernightCycleRun = {
+  id: "cycle-2026-07-06",
+  date: CYCLE_DATE,
+  startedAt: "2026-07-06T05:00:00.000Z",
+  completedAt: TS,
+  phases: [
+    "collect",
+    "normalize",
+    "observe",
+    "reason",
+    "recommend",
+    "prioritize",
+    "prepare",
+  ],
+  preparedOffice: SAMPLE_PREPARED_OFFICE,
+};
+
+export const SAMPLE_OVERNIGHT_HISTORY: OvernightCycleHistoryRecord[] = [
+  {
+    id: "hist-2026-07-06",
+    date: CYCLE_DATE,
+    signalsProcessed: 124,
+    researchProcessed: 124,
+    questionsPrepared: 3,
+    recommendations: 4,
+    missionUpdates: 1,
+    opportunitiesDiscovered: 4,
+    risksDiscovered: 2,
+    briefGenerated: true,
+    cycleId: "cycle-2026-07-06",
+  },
+  {
+    id: "hist-2026-07-05",
+    date: "2026-07-05",
+    signalsProcessed: 98,
+    researchProcessed: 98,
+    questionsPrepared: 3,
+    recommendations: 3,
+    missionUpdates: 1,
+    opportunitiesDiscovered: 3,
+    risksDiscovered: 1,
+    briefGenerated: true,
+    cycleId: "cycle-2026-07-05",
+  },
+];
+
+export function getSamplePreparedOffice(date?: string): PreparedOffice {
+  if (!date || date === CYCLE_DATE) return SAMPLE_PREPARED_OFFICE;
+  return { ...SAMPLE_PREPARED_OFFICE, date };
+}
+
+export function getSampleCycleRun(id?: string): OvernightCycleRun | undefined {
+  if (!id || id === SAMPLE_OVERNIGHT_CYCLE_RUN.id) return SAMPLE_OVERNIGHT_CYCLE_RUN;
+  return undefined;
+}
+
+export function listSampleCycleHistory(): OvernightCycleHistoryRecord[] {
+  return [...SAMPLE_OVERNIGHT_HISTORY];
+}
