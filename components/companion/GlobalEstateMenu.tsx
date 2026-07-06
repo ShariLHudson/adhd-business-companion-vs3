@@ -3,9 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
-  ESTATE_MENU_SECTION_IDS,
-  ESTATE_MENU_SECTION_LABELS,
-  estateMenuItemsForSection,
+  ESTATE_MENU_DROPDOWN_ITEMS,
   type EstateMenuActionId,
 } from "@/lib/estateMenu";
 import { getPrefs } from "@/lib/companionStore";
@@ -13,10 +11,6 @@ import {
   userProfileImageUrl,
   userProfileInitials,
 } from "@/lib/userProfileDisplay";
-import {
-  MENU_DROPDOWN_ITEM_LG,
-  MENU_SECTION_HEADING,
-} from "@/lib/menuNavStyles";
 
 export type GlobalEstateMenuProps = {
   onAction: (actionId: EstateMenuActionId) => void;
@@ -103,7 +97,7 @@ export function GlobalEstateMenu({
         } ${className}`.trim()
       : `relative z-50 ${className}`.trim();
 
-  const displayName = name?.trim() || "Your Estate";
+  const displayName = name?.trim() || "Member";
 
   const menu = (
     <div
@@ -120,10 +114,11 @@ export function GlobalEstateMenu({
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-haspopup="menu"
-        aria-label="Profile and settings"
-        title="Profile and settings"
+        aria-label="Account"
+        title="Account"
         className={triggerClass}
         data-estate-menu-trigger=""
+        data-top-bar-menu="account"
       >
         {imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -146,7 +141,7 @@ export function GlobalEstateMenu({
         <div
           className={panelClass}
           role="menu"
-          aria-label="Estate menu"
+          aria-label="Account"
           data-companion-menu-panel="true"
           data-estate-menu-panel=""
         >
@@ -166,51 +161,28 @@ export function GlobalEstateMenu({
                 {initials}
               </span>
             )}
-            <div className="min-w-0">
-              <p className="global-estate-menu__header-name">{displayName}</p>
-              <p className="global-estate-menu__header-sub">Estate Menu</p>
-            </div>
+            <p className="global-estate-menu__header-name">{displayName}</p>
           </div>
 
-          {ESTATE_MENU_SECTION_IDS.map((sectionId, sectionIndex) => {
-            const items = estateMenuItemsForSection(sectionId);
-            return (
-              <div
-                key={sectionId}
-                className={
-                  sectionIndex > 0
-                    ? "global-estate-menu__section global-estate-menu__section--bordered"
-                    : "global-estate-menu__section"
-                }
+          <div className="global-estate-menu__list">
+            {ESTATE_MENU_DROPDOWN_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                role="menuitem"
+                onClick={() => run(item.id)}
+                className={`global-estate-menu__item${
+                  item.id === "log-out" ? " global-estate-menu__item--logout" : ""
+                }`}
+                data-estate-menu-item={item.id}
               >
-                <p className={`${MENU_SECTION_HEADING} global-estate-menu__section-label`}>
-                  {ESTATE_MENU_SECTION_LABELS[sectionId]}
-                </p>
-                {items.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    role="menuitem"
-                    title={item.hint}
-                    onClick={() => run(item.id)}
-                    className={`${MENU_DROPDOWN_ITEM_LG} global-estate-menu__item${
-                      item.id === "log-out"
-                        ? " global-estate-menu__item--logout"
-                        : ""
-                    }`}
-                    data-estate-menu-item={item.id}
-                  >
-                    <span className="global-estate-menu__item-emoji" aria-hidden>
-                      {item.emoji}
-                    </span>
-                    <span className="global-estate-menu__item-label">
-                      {item.label}
-                    </span>
-                  </button>
-                ))}
-              </div>
-            );
-          })}
+                <span className="global-estate-menu__item-emoji" aria-hidden>
+                  {item.emoji}
+                </span>
+                <span className="global-estate-menu__item-label">{item.label}</span>
+              </button>
+            ))}
+          </div>
         </div>
       ) : null}
     </div>

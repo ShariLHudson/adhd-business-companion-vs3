@@ -1,0 +1,876 @@
+/**
+ * Ocean Conservatory™ — living aquarium overlay (tank only).
+ * GPU transforms · seamless loops · reduced-motion safe.
+ */
+
+.ocean-conservatory-aquarium-life {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Tank clip shared by photo drift + animated overlay */
+.ocean-conservatory-aquarium-life__tank,
+.ocean-conservatory-aquarium-life__tank-photo-drift {
+  clip-path: polygon(
+    40% 11%,
+    48% 8.5%,
+    100% 7%,
+    100% 91%,
+    53% 89%,
+    43% 79%,
+    38% 54%,
+    40% 28%
+  );
+}
+
+/* Photographed fish — gentle underwater drift via background-position */
+.ocean-conservatory-aquarium-life__tank-photo-drift {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  will-change: background-position;
+  animation: ocean-aquarium-tank-photo-drift 16s ease-in-out infinite;
+}
+
+@keyframes ocean-aquarium-tank-photo-drift {
+  0%,
+  100% {
+    background-position: 50% 50%;
+  }
+  30% {
+    background-position: 50.22% 49.92%;
+  }
+  62% {
+    background-position: 49.88% 50.1%;
+  }
+}
+
+/* Room candles + lanterns — estate-light-flicker.css */
+.ocean-conservatory-aquarium-life__room-lights {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.ocean-conservatory-aquarium-life__room-light {
+  transform: translate(-50%, -50%);
+}
+
+/* ~38% of canonical estate flicker (50% reduced, then another 25%) */
+.ocean-conservatory-aquarium-life__room-light.estate-light-glow--candle {
+  animation: ocean-conservatory-candle-flicker 2.4s ease-in-out infinite;
+}
+
+.ocean-conservatory-aquarium-life__room-light.estate-light-glow--lantern {
+  animation: ocean-conservatory-lantern-flicker 2.6s linear infinite;
+}
+
+.ocean-conservatory-aquarium-life__room-light--steady {
+  animation: none !important;
+  opacity: 0.62;
+  filter: blur(10px) brightness(1.02);
+  transform: translate(-50%, -50%) scale(1);
+}
+
+@keyframes ocean-conservatory-candle-flicker {
+  0%,
+  100% {
+    opacity: 0.58;
+    filter: blur(10px) brightness(1);
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  12% {
+    opacity: 0.69;
+    filter: blur(10.5px) brightness(1.07);
+    transform: translate(-50%, -50%) scale(1.05);
+  }
+
+  22% {
+    opacity: 0.54;
+    filter: blur(9px) brightness(0.97);
+    transform: translate(-50%, -50%) scale(0.96);
+  }
+
+  34% {
+    opacity: 0.67;
+    filter: blur(11px) brightness(1.05);
+    transform: translate(-50%, -50%) scale(1.03);
+  }
+
+  48% {
+    opacity: 0.56;
+    filter: blur(9.5px) brightness(0.98);
+    transform: translate(-50%, -50%) scale(0.97);
+  }
+
+  61% {
+    opacity: 0.7;
+    filter: blur(11px) brightness(1.06);
+    transform: translate(-50%, -50%) scale(1.04);
+  }
+
+  74% {
+    opacity: 0.57;
+    filter: blur(9.5px) brightness(0.99);
+    transform: translate(-50%, -50%) scale(0.98);
+  }
+
+  88% {
+    opacity: 0.66;
+    filter: blur(10.5px) brightness(1.03);
+    transform: translate(-50%, -50%) scale(1.02);
+  }
+}
+
+@keyframes ocean-conservatory-lantern-flicker {
+  0%,
+  100% {
+    opacity: 0.76;
+    filter: blur(14px) brightness(1.08) saturate(1.04);
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  14% {
+    opacity: 0.82;
+    filter: blur(15px) brightness(1.12) saturate(1.05);
+    transform: translate(-50%, -50%) scale(1.01);
+  }
+
+  28% {
+    opacity: 0.72;
+    filter: blur(13.5px) brightness(1.04) saturate(1.02);
+    transform: translate(-50%, -50%) scale(0.99);
+  }
+
+  42% {
+    opacity: 0.84;
+    filter: blur(15px) brightness(1.13) saturate(1.05);
+    transform: translate(-50%, -50%) scale(1.01);
+  }
+
+  56% {
+    opacity: 0.73;
+    filter: blur(13.5px) brightness(1.05) saturate(1.02);
+    transform: translate(-50%, -50%) scale(0.99);
+  }
+
+  70% {
+    opacity: 0.83;
+    filter: blur(15px) brightness(1.12) saturate(1.05);
+    transform: translate(-50%, -50%) scale(1.01);
+  }
+
+  84% {
+    opacity: 0.75;
+    filter: blur(14px) brightness(1.06) saturate(1.03);
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.ocean-conservatory-aquarium-life__tank {
+  position: absolute;
+  inset: 0;
+  contain: layout style paint;
+  transform: translateZ(0);
+  z-index: 1;
+}
+
+/* ── Light shimmer (water refraction) ── */
+.ocean-conservatory-aquarium-life__caustics {
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  mix-blend-mode: soft-light;
+  background:
+    radial-gradient(
+      ellipse 42% 28% at 68% 18%,
+      rgba(255, 255, 255, 0.45) 0%,
+      transparent 68%
+    ),
+    radial-gradient(
+      ellipse 36% 24% at 82% 22%,
+      rgba(200, 235, 255, 0.28) 0%,
+      transparent 72%
+    ),
+    radial-gradient(
+      ellipse 50% 35% at 56% 14%,
+      rgba(255, 255, 255, 0.18) 0%,
+      transparent 70%
+    );
+  animation: ocean-aquarium-caustics 31s ease-in-out infinite;
+}
+
+.ocean-conservatory-aquarium-life__rays {
+  position: absolute;
+  inset: 0;
+  opacity: 0.14;
+  background: linear-gradient(
+    168deg,
+    rgba(255, 255, 255, 0.35) 0%,
+    transparent 28%,
+    transparent 72%,
+    rgba(180, 220, 255, 0.08) 100%
+  );
+  animation: ocean-aquarium-rays 47s ease-in-out infinite;
+}
+
+@keyframes ocean-aquarium-caustics {
+  0%,
+  100% {
+    opacity: 0.18;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  33% {
+    opacity: 0.26;
+    transform: translate3d(0.4%, -0.3%, 0) scale(1.02);
+  }
+  66% {
+    opacity: 0.2;
+    transform: translate3d(-0.3%, 0.2%, 0) scale(0.99);
+  }
+}
+
+@keyframes ocean-aquarium-rays {
+  0%,
+  100% {
+    opacity: 0.12;
+  }
+  50% {
+    opacity: 0.18;
+  }
+}
+
+/* ── Kelp sway (soft fields over photo kelp — no solid strips) ── */
+.ocean-conservatory-aquarium-life__plant-sway {
+  position: absolute;
+  transform-origin: center bottom;
+  will-change: transform;
+  animation: ocean-aquarium-plant-sway ease-in-out infinite;
+}
+
+.ocean-conservatory-aquarium-life__plant-sway__field {
+  width: 100%;
+  height: 100%;
+  border-radius: 42% 58% 38% 62% / 48% 52% 55% 45%;
+  background: radial-gradient(
+    ellipse 58% 88% at 50% 88%,
+    rgba(72, 168, 98, 0.16) 0%,
+    rgba(52, 138, 82, 0.07) 38%,
+    transparent 72%
+  );
+  filter: blur(7px);
+  mix-blend-mode: soft-light;
+}
+
+@keyframes ocean-aquarium-plant-sway {
+  0%,
+  100% {
+    transform: rotate(-1.8deg) skewX(-0.6deg);
+  }
+  35% {
+    transform: rotate(2.4deg) skewX(0.9deg);
+  }
+  68% {
+    transform: rotate(-1.2deg) skewX(0.4deg);
+  }
+}
+
+/* ── Coral polyp sway (soft shimmer on reef clusters) ── */
+.ocean-conservatory-aquarium-life__coral-sway {
+  position: absolute;
+  transform-origin: center bottom;
+  will-change: transform;
+  animation: ocean-aquarium-coral-sway ease-in-out infinite;
+}
+
+.ocean-conservatory-aquarium-life__coral-sway__field {
+  width: 100%;
+  height: 100%;
+  border-radius: 48% 52% 44% 56% / 52% 48% 54% 46%;
+  filter: blur(6px);
+  mix-blend-mode: soft-light;
+}
+
+.ocean-conservatory-aquarium-life__coral-sway--pink .ocean-conservatory-aquarium-life__coral-sway__field {
+  background: radial-gradient(
+    ellipse 70% 65% at 50% 62%,
+    rgba(240, 140, 170, 0.2) 0%,
+    rgba(200, 100, 140, 0.09) 48%,
+    transparent 74%
+  );
+}
+
+.ocean-conservatory-aquarium-life__coral-sway--purple .ocean-conservatory-aquarium-life__coral-sway__field {
+  background: radial-gradient(
+    ellipse 68% 62% at 48% 60%,
+    rgba(180, 110, 210, 0.19) 0%,
+    rgba(130, 80, 170, 0.08) 46%,
+    transparent 72%
+  );
+}
+
+.ocean-conservatory-aquarium-life__coral-sway--orange .ocean-conservatory-aquarium-life__coral-sway__field {
+  background: radial-gradient(
+    ellipse 72% 64% at 52% 58%,
+    rgba(240, 150, 90, 0.18) 0%,
+    rgba(200, 110, 60, 0.08) 44%,
+    transparent 70%
+  );
+}
+
+@keyframes ocean-aquarium-coral-sway {
+  0%,
+  100% {
+    transform: rotate(-1.2deg) scale(1);
+  }
+  40% {
+    transform: rotate(1.4deg) scale(1.04);
+  }
+  72% {
+    transform: rotate(-0.6deg) scale(1.02);
+  }
+}
+
+/* ── Particles ── */
+.ocean-conservatory-aquarium-life__particle {
+  position: absolute;
+  width: 2px;
+  height: 2px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  opacity: 0;
+  animation: ocean-aquarium-particle-drift linear infinite;
+}
+
+@keyframes ocean-aquarium-particle-drift {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+  }
+  12% {
+    opacity: 0.45;
+  }
+  88% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(1.2rem, -2.4rem, 0);
+  }
+}
+
+/* ── Bubbles ── */
+.ocean-conservatory-aquarium-life__bubble {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 32% 28%,
+    rgba(255, 255, 255, 0.75) 0%,
+    rgba(200, 235, 255, 0.25) 55%,
+    transparent 100%
+  );
+  opacity: 0;
+  animation: ocean-aquarium-bubble-rise ease-in infinite;
+}
+
+@keyframes ocean-aquarium-bubble-rise {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) scale(0.7);
+  }
+  8% {
+    opacity: 0.55;
+  }
+  85% {
+    opacity: 0.35;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(0.4rem, -38vh, 0) scale(1.05);
+  }
+}
+
+
+/* ── Fish (SVG silhouettes — body, tail, fins) ── */
+.ocean-conservatory-aquarium-life__fish {
+  position: absolute;
+  top: 0;
+  left: 0;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation-timing-function: cubic-bezier(0.42, 0, 0.38, 1);
+  animation-iteration-count: infinite;
+}
+
+.ocean-conservatory-aquarium-life__fish-body {
+  display: block;
+  transform-origin: center center;
+  animation: ocean-aquarium-fish-body-rock 2.8s ease-in-out infinite;
+}
+
+.ocean-conservatory-aquarium-life__fish-body--depth-near {
+  opacity: 0.82;
+  filter: blur(0.05px) drop-shadow(0 1px 2px rgba(0, 40, 80, 0.18));
+}
+
+.ocean-conservatory-aquarium-life__fish-body--depth-mid {
+  opacity: 0.58;
+  filter: blur(0.35px) drop-shadow(0 1px 1px rgba(0, 40, 80, 0.12));
+}
+
+.ocean-conservatory-aquarium-life__fish-body--depth-far {
+  opacity: 0.38;
+  filter: blur(0.75px);
+}
+
+.ocean-conservatory-aquarium-life__fish-svg--depth-far {
+  transform: scale(0.88);
+  transform-origin: center center;
+}
+
+.ocean-conservatory-aquarium-life__fish-svg {
+  display: block;
+  height: auto;
+  overflow: visible;
+}
+
+.ocean-conservatory-aquarium-life__fish-svg--xs {
+  width: 0.95rem;
+}
+
+.ocean-conservatory-aquarium-life__fish-svg--sm {
+  width: 1.35rem;
+}
+
+.ocean-conservatory-aquarium-life__fish-svg--md {
+  width: 1.85rem;
+}
+
+.ocean-conservatory-aquarium-life__fish-svg--lg {
+  width: 2.55rem;
+}
+
+.ocean-conservatory-aquarium-life__fish-tail {
+  transform-origin: 72% 50%;
+  transform-box: fill-box;
+  animation: ocean-aquarium-fish-tail-flutter 0.55s ease-in-out infinite;
+}
+
+.ocean-conservatory-aquarium-life__fish-svg--shape-minnow .ocean-conservatory-aquarium-life__fish-tail {
+  transform-origin: 78% 50%;
+  animation-duration: 0.42s;
+}
+
+.ocean-conservatory-aquarium-life__fish-svg--shape-moorish .ocean-conservatory-aquarium-life__fish-tail {
+  transform-origin: 76% 50%;
+  animation-duration: 0.62s;
+}
+
+.ocean-conservatory-aquarium-life__fish-fin {
+  transform-origin: center center;
+  transform-box: fill-box;
+  animation: ocean-aquarium-fish-fin-pulse 1.6s ease-in-out infinite;
+}
+
+.ocean-conservatory-aquarium-life__fish-fin--dorsal {
+  animation-duration: 2.4s;
+}
+
+@keyframes ocean-aquarium-fish-body-rock {
+  0%,
+  100% {
+    transform: rotate(-1.5deg) translateY(0);
+  }
+  35% {
+    transform: rotate(1.2deg) translateY(-0.5px);
+  }
+  68% {
+    transform: rotate(-0.8deg) translateY(0.4px);
+  }
+}
+
+@keyframes ocean-aquarium-fish-tail-flutter {
+  0%,
+  100% {
+    transform: rotate(-6deg) scaleX(1);
+  }
+  50% {
+    transform: rotate(7deg) scaleX(0.94);
+  }
+}
+
+@keyframes ocean-aquarium-fish-fin-pulse {
+  0%,
+  100% {
+    transform: rotate(0deg);
+    opacity: 0.45;
+  }
+  50% {
+    transform: rotate(4deg);
+    opacity: 0.62;
+  }
+}
+
+/* Independent swim paths — tank-relative translate3d (vw/vh) */
+@keyframes ocean-aquarium-swim-1 {
+  0% {
+    opacity: 0;
+    transform: translate3d(52vw, 34vh, 0) scaleX(1);
+  }
+  6% {
+    opacity: 0.58;
+  }
+  48% {
+    transform: translate3d(72vw, 28vh, 0) scaleX(1) rotate(2deg);
+  }
+  52% {
+    opacity: 0.12;
+    transform: translate3d(74vw, 28vh, 0) scaleX(1) rotate(1deg);
+  }
+  56% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(88vw, 36vh, 0) scaleX(-1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-2 {
+  0% {
+    opacity: 0;
+    transform: translate3d(86vw, 42vh, 0) scaleX(-1);
+  }
+  8% {
+    opacity: 0.54;
+  }
+  45% {
+    transform: translate3d(58vw, 38vh, 0) scaleX(-1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(44vw, 44vh, 0) scaleX(1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-3 {
+  0%,
+  18% {
+    opacity: 0;
+    transform: translate3d(64vw, 52vh, 0) scaleX(1);
+  }
+  24% {
+    opacity: 0.42;
+  }
+  38% {
+    transform: translate3d(64vw, 52vh, 0) scaleX(1);
+  }
+  62% {
+    transform: translate3d(78vw, 48vh, 0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(92vw, 50vh, 0) scaleX(1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-4 {
+  0% {
+    opacity: 0;
+    transform: translate3d(48vw, 26vh, 0) scaleX(1);
+  }
+  10% {
+    opacity: 0.56;
+  }
+  55% {
+    transform: translate3d(68vw, 32vh, 0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(82vw, 24vh, 0) scaleX(-1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-5 {
+  0% {
+    opacity: 0;
+    transform: translate3d(90vw, 58vh, 0) scaleX(-1);
+  }
+  12% {
+    opacity: 0.44;
+  }
+  70% {
+    transform: translate3d(46vw, 48vh, 0) scaleX(-1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(42vw, 46vh, 0) scaleX(1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-6 {
+  0% {
+    opacity: 0;
+    transform: translate3d(56vw, 40vh, 0) scaleX(1);
+  }
+  15% {
+    opacity: 0.62;
+  }
+  40% {
+    transform: translate3d(62vw, 36vh, 0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(76vw, 42vh, 0) scaleX(1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-7 {
+  0% {
+    opacity: 0;
+    transform: translate3d(74vw, 22vh, 0) scaleX(-1);
+  }
+  8% {
+    opacity: 0.52;
+  }
+  35% {
+    transform: translate3d(54vw, 30vh, 0) scaleX(-1);
+  }
+  65% {
+    opacity: 0.12;
+    transform: translate3d(50vw, 30vh, 0) scaleX(-1);
+  }
+  72% {
+    opacity: 0;
+  }
+  100% {
+    transform: translate3d(44vw, 34vh, 0) scaleX(1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-8 {
+  0% {
+    opacity: 0;
+    transform: translate3d(60vw, 46vh, 0) scaleX(1);
+  }
+  10% {
+    opacity: 0.58;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(84vw, 40vh, 0) scaleX(-1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-9 {
+  0% {
+    opacity: 0;
+    transform: translate3d(80vw, 30vh, 0) scaleX(-1);
+  }
+  12% {
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate3d(62vw, 44vh, 0) scaleX(-1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(48vw, 50vh, 0) scaleX(1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-10 {
+  0% {
+    opacity: 0;
+    transform: translate3d(50vw, 54vh, 0) scaleX(1);
+  }
+  14% {
+    opacity: 0.66;
+  }
+  58% {
+    transform: translate3d(70vw, 46vh, 0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(86vw, 52vh, 0) scaleX(-1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-11 {
+  0% {
+    opacity: 0;
+    transform: translate3d(66vw, 36vh, 0) scaleX(1);
+  }
+  20% {
+    opacity: 0.52;
+    transform: translate3d(66vw, 36vh, 0) scaleX(1);
+  }
+  75% {
+    transform: translate3d(78vw, 34vh, 0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(88vw, 38vh, 0) scaleX(1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-12 {
+  0% {
+    opacity: 0;
+    transform: translate3d(88vw, 26vh, 0) scaleX(-1);
+  }
+  10% {
+    opacity: 0.64;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(52vw, 32vh, 0) scaleX(-1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-13 {
+  0% {
+    opacity: 0;
+    transform: translate3d(44vw, 48vh, 0) scaleX(1);
+  }
+  15% {
+    opacity: 0.42;
+  }
+  80% {
+    transform: translate3d(82vw, 44vh, 0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(94vw, 46vh, 0) scaleX(-1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-14 {
+  0% {
+    opacity: 0;
+    transform: translate3d(72vw, 56vh, 0) scaleX(-1);
+  }
+  12% {
+    opacity: 0.44;
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(54vw, 58vh, 0) scaleX(-1);
+  }
+}
+
+@keyframes ocean-aquarium-swim-15 {
+  0% {
+    opacity: 0;
+    transform: translate3d(58vw, 24vh, 0) scaleX(1);
+  }
+  8% {
+    opacity: 0.54;
+  }
+  42% {
+    transform: translate3d(66vw, 28vh, 0) scaleX(1);
+  }
+  46% {
+    opacity: 0.1;
+  }
+  52% {
+    opacity: 0.52;
+    transform: translate3d(70vw, 30vh, 0) scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(84vw, 26vh, 0) scaleX(-1);
+  }
+}
+
+.ocean-conservatory-aquarium-life__fish--swim-1 {
+  animation-name: ocean-aquarium-swim-1;
+}
+.ocean-conservatory-aquarium-life__fish--swim-2 {
+  animation-name: ocean-aquarium-swim-2;
+}
+.ocean-conservatory-aquarium-life__fish--swim-3 {
+  animation-name: ocean-aquarium-swim-3;
+}
+.ocean-conservatory-aquarium-life__fish--swim-4 {
+  animation-name: ocean-aquarium-swim-4;
+}
+.ocean-conservatory-aquarium-life__fish--swim-5 {
+  animation-name: ocean-aquarium-swim-5;
+}
+.ocean-conservatory-aquarium-life__fish--swim-6 {
+  animation-name: ocean-aquarium-swim-6;
+}
+.ocean-conservatory-aquarium-life__fish--swim-7 {
+  animation-name: ocean-aquarium-swim-7;
+}
+.ocean-conservatory-aquarium-life__fish--swim-8 {
+  animation-name: ocean-aquarium-swim-8;
+}
+.ocean-conservatory-aquarium-life__fish--swim-9 {
+  animation-name: ocean-aquarium-swim-9;
+}
+.ocean-conservatory-aquarium-life__fish--swim-10 {
+  animation-name: ocean-aquarium-swim-10;
+}
+.ocean-conservatory-aquarium-life__fish--swim-11 {
+  animation-name: ocean-aquarium-swim-11;
+}
+.ocean-conservatory-aquarium-life__fish--swim-12 {
+  animation-name: ocean-aquarium-swim-12;
+}
+.ocean-conservatory-aquarium-life__fish--swim-13 {
+  animation-name: ocean-aquarium-swim-13;
+}
+.ocean-conservatory-aquarium-life__fish--swim-14 {
+  animation-name: ocean-aquarium-swim-14;
+}
+.ocean-conservatory-aquarium-life__fish--swim-15 {
+  animation-name: ocean-aquarium-swim-15;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ocean-conservatory-aquarium-life__tank-photo-drift,
+  .ocean-conservatory-aquarium-life__plant-sway,
+  .ocean-conservatory-aquarium-life__coral-sway,
+  .ocean-conservatory-aquarium-life__fish,
+  .ocean-conservatory-aquarium-life__fish-body,
+  .ocean-conservatory-aquarium-life__fish-tail,
+  .ocean-conservatory-aquarium-life__fish-fin,
+  .ocean-conservatory-aquarium-life__bubble,
+  .ocean-conservatory-aquarium-life__particle,
+  .ocean-conservatory-aquarium-life__caustics,
+  .ocean-conservatory-aquarium-life__rays,
+  .ocean-conservatory-aquarium-life__room-light {
+    animation: none !important;
+  }
+
+  .ocean-conservatory-aquarium-life__caustics {
+    opacity: 0.16;
+  }
+}
+
+@media (max-width: 720px) {
+  .ocean-conservatory-aquarium-life__tank,
+  .ocean-conservatory-aquarium-life__tank-photo-drift {
+    clip-path: polygon(
+      34% 12%,
+      46% 9%,
+      100% 8%,
+      100% 92%,
+      48% 90%,
+      38% 80%,
+      32% 52%,
+      36% 26%
+    );
+  }
+}

@@ -17,6 +17,7 @@ import {
   GREENHOUSE_BIRDS_AMBIENCE_MP3,
   HALL_OF_REFLECTIONS_AMBIENCE_MP3,
   MUSIC_LOFT_AMBIENCE_MP3,
+  OCEAN_CONSERVATORY_AMBIENCE_MP3,
   ORCHARD_BIRDS_AMBIENCE_MP3,
   TIN_ROOF_RAIN_AMBIENCE_MP3,
 } from "@/lib/soundscapes/audioAssets";
@@ -74,9 +75,9 @@ export const ESTATE_PLACE_AMBIENT_SOUND: Readonly<
     character: "faint piano, vinyl crackle, breeze, distant birds",
   },
   conservatory: {
-    src: GREENHOUSE_BIRDS_AMBIENCE_MP3,
-    volume: 0.065,
-    character: "soft birdsong, glass hush, light flutter movement",
+    src: OCEAN_CONSERVATORY_AMBIENCE_MP3,
+    volume: 0.11,
+    character: "indoor aquarium, gentle water hush, living tank",
   },
   "clear-my-mind": {
     src: GREENHOUSE_BIRDS_AMBIENCE_MP3,
@@ -104,6 +105,12 @@ export const ESTATE_PLACE_AMBIENT_SOUND: Readonly<
     src: ORCHARD_BIRDS_AMBIENCE_MP3,
     volume: 0.1,
     character: "wind, swing softly creaking, distant creek, birds",
+  },
+  /** The Swing Beneath the Oak™ — oak shade, creek, gentle sway */
+  "the-swing-beneath-the-oak": {
+    src: ORCHARD_BIRDS_AMBIENCE_MP3,
+    volume: 0.1,
+    character: "wind in oak leaves, swing softly creaking, quiet water, birds",
   },
   /** Pool terrace — waterfall, breeze, distant water */
   "summer-terrace": {

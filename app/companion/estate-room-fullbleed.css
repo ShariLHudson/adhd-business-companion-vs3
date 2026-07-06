@@ -1,5 +1,17 @@
 /* Full-bleed estate room plates — photographic scenes own the viewport */
 
+.estate-room-fullbleed-stack {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.estate-room-fullbleed-stack .estate-room-fullbleed-bg {
+  position: absolute;
+  inset: 0;
+}
+
 .estate-room-fullbleed-bg {
   position: fixed;
   inset: 0;
@@ -93,7 +105,7 @@
 }
 
 /* ——— Estate room chrome (frosted chat + sound toggle) ——— */
-/* Upper-right below profile menu — bottom-right reserved for Estate Guide */
+/* Upper-right below profile menu — Estate Guide sits bottom left */
 .estate-room-ambience-toggle {
   position: fixed;
   top: calc(max(0.85rem, env(safe-area-inset-top, 0px)) + 3.35rem);

@@ -1,13 +1,10 @@
 export type {
   EstateMenuActionId,
-  EstateMenuSectionId,
-  EstateMenuItem,
+  EstateMenuDropdownItem,
 } from "./menuConfig";
 
 export {
   ESTATE_MENU_ACTION_IDS,
-  ESTATE_MENU_SECTION_IDS,
-  ESTATE_MENU_ITEMS,
-  ESTATE_MENU_SECTION_LABELS,
-  estateMenuItemsForSection,
+  ESTATE_MENU_DROPDOWN_ITEMS,
+  estateMenuDropdownItems,
 } from "./menuConfig";

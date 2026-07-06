@@ -14,6 +14,7 @@ import { fadeAudioVolumeAsync } from "@/lib/welcomeAudio/fadeVolume";
 import {
   ESTATE_AMBIENCE_FALLBACK_MP3,
   GREENHOUSE_BIRDS_AMBIENCE_MP3,
+  OCEAN_CONSERVATORY_AMBIENCE_MP3,
   ORCHARD_BIRDS_AMBIENCE_MP3,
 } from "@/lib/soundscapes/audioAssets";
 import type { EstateArrivalAmbienceProfile } from "./estateArrivalExperience";
@@ -58,6 +59,9 @@ function sameAmbienceSrc(a: string, b: string): boolean {
 }
 
 function ambienceSrcCandidates(primarySrc: string): string[] {
+  if (primarySrc === OCEAN_CONSERVATORY_AMBIENCE_MP3) {
+    return [primarySrc];
+  }
   if (primarySrc === GREENHOUSE_BIRDS_AMBIENCE_MP3) {
     return [primarySrc, ORCHARD_BIRDS_AMBIENCE_MP3];
   }

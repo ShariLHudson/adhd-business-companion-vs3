@@ -2,6 +2,7 @@
 
 import { useEffect, type CSSProperties, type ReactNode } from "react";
 import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
+import { OceanConservatoryAquariumLife } from "@/components/companion/estate/OceanConservatoryAquariumLife";
 import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 import { LivingBorderFrame } from "@/components/companion/LivingBorderFrame";
 import {
@@ -16,6 +17,10 @@ import type { CinematicPresetId } from "@/lib/cinematicBackground";
 import { hasRenderableSignatureObject } from "@/lib/sceneRenderContract/signatureObject";
 import { roomBackgroundImageStyle } from "@/lib/roomBackgroundAssets";
 import { preloadRoomBackground } from "@/lib/roomBackgroundPreload";
+import {
+  isOceanConservatoryBackground,
+  isOceanConservatoryRoom,
+} from "@/lib/oceanConservatory/isOceanConservatoryRoom";
 
 type Props = {
   scene: SceneState;
@@ -67,6 +72,11 @@ export function SceneRenderer({
       ? roomBackgroundImageStyle(background.imageUrl)
       : undefined;
 
+  const showOceanAquariumLife =
+    background.mode === "photo-scene" &&
+    (isOceanConservatoryRoom(resolved.environment.placeId) ||
+      isOceanConservatoryBackground(background.imageUrl));
+
   return (
     <div
       className={`${layout.rootClassName} ${className}`.trim()}
@@ -105,6 +115,11 @@ export function SceneRenderer({
             style={{ background: background.overlay }}
           />
           <div className={SCENE_BG_MASK_CLASS} />
+          {showOceanAquariumLife ? (
+            <OceanConservatoryAquariumLife
+              backgroundImageUrl={background.imageUrl}
+            />
+          ) : null}
         </div>
       ) : null}
 

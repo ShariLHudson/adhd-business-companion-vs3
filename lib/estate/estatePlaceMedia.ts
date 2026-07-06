@@ -15,6 +15,7 @@ import {
   APPLE_ORCHARD_AMBIENCE_MP3,
   COFFEE_HOUSE_AMBIENCE_MP3,
   MUSIC_LOFT_AMBIENCE_MP3,
+  OCEAN_CONSERVATORY_AMBIENCE_MP3,
 } from "@/lib/soundscapes/audioAssets";
 
 /** Build a public URL for a backgrounds filename (handles spaces). */
@@ -88,6 +89,7 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "fireside-deck": estateBackgroundPath("fireside-deck-background.PNG"),
   "personal-deck": estateBackgroundPath("private-balcony-sunset-background.PNG"),
   "porch-swing": estateBackgroundPath("fireside-deck-background.PNG"),
+  "the-swing-beneath-the-oak": estateBackgroundPath("tree-swing-background.png"),
   "window-seat": estateBackgroundPath("reading-nook-under-stairway-background.png"),
   balcony: estateBackgroundPath("private-balcony-sunset-background.PNG"),
   "woodland-path": estateBackgroundPath("peaceful-places/woodland-pathway.png"),
@@ -295,9 +297,9 @@ export const CANONICAL_PLACE_AMBIENCE: Readonly<
     character: "rain on the roof, wind through trees",
   },
   conservatory: {
-    src: estateAudioPath("greenhouse-birds-ambience.mp3"),
-    volume: 0.065,
-    character: "soft birdsong, glass hush, conservatory calm",
+    src: OCEAN_CONSERVATORY_AMBIENCE_MP3,
+    volume: 0.11,
+    character: "indoor aquarium, gentle water hush, living tank",
   },
   stables: {
     src: estateAudioPath("reflections-of-triumph-gallery.mp3"),

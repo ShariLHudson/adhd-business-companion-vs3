@@ -53,6 +53,10 @@ export const APPLE_ORCHARD_AMBIENCE_MP3 = ORCHARD_BIRDS_AMBIENCE_MP3;
 export const GREENHOUSE_BIRDS_AMBIENCE_MP3 =
   "/audio/greenhouse-birds-ambience.mp3" as const;
 
+/** Ocean Conservatory™ — indoor aquarium hush (Freesound Community). */
+export const OCEAN_CONSERVATORY_AMBIENCE_MP3 =
+  "/audio/freesound_community-indoor-fish-tank-without-bubble-strips-ambiance-33541.mp3" as const;
+
 /** Celebration Room™ / garden — reflections of triumph. */
 export const CELEBRATION_ROOM_AMBIENCE_MP3 =
   "/audio/reflections-of-triumph-celebration-garden.mp3" as const;

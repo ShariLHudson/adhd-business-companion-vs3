@@ -32,6 +32,7 @@ import "./momentum-institute-drawer-wall.css";
 import "./stables-room.css";
 import "./estate-immersive.css";
 import "./estate-room-fullbleed.css";
+import "./ocean-conservatory-aquarium.css";
 import "./estate-room-frosted-chat.css";
 import "./estate-audio-settings.css";
 import "./estate-room-invitation.css";

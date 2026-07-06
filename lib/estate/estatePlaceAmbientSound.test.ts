@@ -5,6 +5,7 @@ import {
   GREENHOUSE_BIRDS_AMBIENCE_MP3,
   COFFEE_HOUSE_AMBIENCE_MP3,
   MUSIC_LOFT_AMBIENCE_MP3,
+  OCEAN_CONSERVATORY_AMBIENCE_MP3,
 } from "@/lib/soundscapes/audioAssets";
 import {
   ESTATE_AMBIENT_ACCEPTANCE_SEQUENCE,
@@ -31,9 +32,9 @@ describe("estatePlaceAmbientSound", () => {
     expect(greenhouse?.character).toMatch(/glasshouse|greenhouse/i);
     expect(greenhouse?.layers?.length).toBeGreaterThanOrEqual(3);
 
-    expect(conservatory?.src).toBe(GREENHOUSE_BIRDS_AMBIENCE_MP3);
-    expect(conservatory?.character).toMatch(/birdsong/i);
-    expect(conservatory?.volume).toBeLessThan(greenhouse?.volume ?? 1);
+    expect(conservatory?.src).toBe(OCEAN_CONSERVATORY_AMBIENCE_MP3);
+    expect(conservatory?.character).toMatch(/aquarium/i);
+    expect(conservatory?.volume).toBeGreaterThan(greenhouse?.volume ?? 0);
 
     expect(nook?.src).not.toBe(gazebo?.src);
     expect(gazebo?.src).not.toBe(greenhouse?.src);

@@ -1,9 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { OceanConservatoryAquariumLife } from "@/components/companion/estate/OceanConservatoryAquariumLife";
 import { backgroundUrlVariants } from "@/lib/roomBackgroundAssets";
 import { estateRoomBackgroundCandidates } from "@/lib/estate/estateRoomAssets";
 import { resolveEstateRoomBackgroundImage } from "@/lib/estate/estateRoomBackground";
+import {
+  isOceanConservatoryBackground,
+  isOceanConservatoryRoom,
+} from "@/lib/oceanConservatory/isOceanConservatoryRoom";
 
 type Props = {
   roomId: string;
@@ -48,6 +53,9 @@ export function EstateRoomFullBleedBackground({
   }, [candidates.length]);
 
   const src = candidates[candidateIndex];
+  const showAquariumLife =
+    isOceanConservatoryRoom(roomId) || isOceanConservatoryBackground(src);
+
   if (!src) {
     return (
       <div
@@ -60,16 +68,20 @@ export function EstateRoomFullBleedBackground({
   }
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={src}
-      alt=""
-      aria-hidden
-      className={["estate-room-fullbleed-bg", className].filter(Boolean).join(" ")}
-      decoding="async"
-      fetchPriority="high"
-      onLoad={onLoad}
-      onError={handleError}
-    />
+    <div className="estate-room-fullbleed-stack" aria-hidden>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src}
+        alt=""
+        className={["estate-room-fullbleed-bg", className].filter(Boolean).join(" ")}
+        decoding="async"
+        fetchPriority="high"
+        onLoad={onLoad}
+        onError={handleError}
+      />
+      {showAquariumLife ? (
+        <OceanConservatoryAquariumLife backgroundImageUrl={src} />
+      ) : null}
+    </div>
   );
 }

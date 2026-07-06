@@ -25,6 +25,7 @@ import {
   GREENHOUSE_BIRDS_AMBIENCE_MP3,
   HALL_OF_REFLECTIONS_AMBIENCE_MP3,
   MUSIC_LOFT_AMBIENCE_MP3,
+  OCEAN_CONSERVATORY_AMBIENCE_MP3,
 } from "@/lib/soundscapes/audioAssets";
 
 export type {
@@ -86,9 +87,9 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
       "We can simply enjoy the space, or if you'd like, I can help you with one of these.",
     invitationAfterArrival: true,
     ambience: {
-      src: EAST_TERRACE_AMBIENCE_MP3,
-      volume: 0.13,
-      character: "birds, water, wind through glass",
+      src: OCEAN_CONSERVATORY_AMBIENCE_MP3,
+      volume: 0.11,
+      character: "indoor aquarium, gentle water hush, living tank",
     },
   },
   "clear-my-mind": {

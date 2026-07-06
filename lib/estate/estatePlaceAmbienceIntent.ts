@@ -86,6 +86,16 @@ export const ESTATE_PLACE_AMBIENCE_INTENT: Readonly<
       },
     ],
   },
+  conservatory: {
+    placeId: "conservatory",
+    displayName: "Ocean Conservatory",
+    emotionalPurpose: "Still aquarium calm, underwater sanctuary",
+    layers: [
+      { id: "tank", label: "indoor aquarium", prominence: "subtle" },
+      { id: "water", label: "gentle water movement", prominence: "subtle" },
+    ],
+    hospitalityNote: "Fish tank ambience only — no birdsong or music overlay.",
+  },
   "reading-nook": {
     placeId: "reading-nook",
     displayName: "Reading Nook",

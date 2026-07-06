@@ -1,27 +1,34 @@
 import { describe, expect, it } from "vitest";
 import {
   ESTATE_MENU_ACTION_IDS,
-  ESTATE_MENU_ITEMS,
-  ESTATE_MENU_SECTION_IDS,
+  ESTATE_MENU_DROPDOWN_ITEMS,
 } from "./menuConfig";
 
 describe("Global Estate Menu™", () => {
-  it("lists all required menu actions", () => {
-    expect(ESTATE_MENU_ACTION_IDS).toHaveLength(16);
-    expect(ESTATE_MENU_ITEMS).toHaveLength(16);
-    expect(ESTATE_MENU_SECTION_IDS).toEqual([
-      "personal",
-      "conversation",
+  it("keeps routing action ids for programmatic navigation", () => {
+    expect(ESTATE_MENU_ACTION_IDS).toContain("memory-library");
+    expect(ESTATE_MENU_ACTION_IDS).toContain("journal");
+    expect(ESTATE_MENU_ACTION_IDS).toContain("notifications");
+    expect(ESTATE_MENU_ACTION_IDS).toContain("my-profile");
+  });
+
+  it("shows only five calm dropdown choices", () => {
+    expect(ESTATE_MENU_DROPDOWN_ITEMS).toHaveLength(5);
+    const ids = ESTATE_MENU_DROPDOWN_ITEMS.map((item) => item.id);
+    expect(ids).toEqual([
+      "start-new-day-conversation",
+      "start-new-conversation",
       "settings",
+      "my-profile",
+      "log-out",
     ]);
   });
 
-  it("includes conversation and logout controls", () => {
-    const ids = ESTATE_MENU_ITEMS.map((item) => item.id);
-    expect(ids).toContain("start-new-conversation");
-    expect(ids).toContain("start-new-day-conversation");
-    expect(ids).toContain("log-out");
-    expect(ids).toContain("estate-profile");
-    expect(ids).toContain("journal");
+  it("uses estate-friendly labels", () => {
+    const labels = ESTATE_MENU_DROPDOWN_ITEMS.map((item) => item.label);
+    expect(labels).toContain("Start a New Day");
+    expect(labels).toContain("Start a New Conversation");
+    expect(labels).toContain("My Profile");
+    expect(labels).toContain("Log Out");
   });
 });
