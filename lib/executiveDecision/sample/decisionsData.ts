@@ -1,0 +1,628 @@
+import type {
+  ApprovalStage,
+  DecisionComparison,
+  DecisionConfidence,
+  DecisionOption,
+  DecisionPlan,
+  DecisionRecommendation,
+  DecisionRelationship,
+  ExecutiveDecision,
+  ExecutiveReview,
+  ImplementationPlan,
+  MonitoringPlan,
+  RiskAssessment,
+} from "../types";
+
+const TS = "2026-07-06T12:00:00.000Z";
+
+function conf(score: number, rationale: string): DecisionConfidence {
+  return {
+    level: score >= 85 ? "high" : score >= 70 ? "medium" : score >= 55 ? "low" : "exploratory",
+    score,
+    rationale,
+  };
+}
+
+function criteria(partial: Partial<DecisionOption["criteria"]> & Pick<DecisionOption["criteria"], "benefits" | "risks">): DecisionOption["criteria"] {
+  return {
+    difficulty: 50,
+    cost: "Moderate",
+    time: "4–6 weeks",
+    strategicValue: 70,
+    revenuePotential: 60,
+    customerImpact: 75,
+    missionAlignment: 80,
+    founderEnergyRequired: 50,
+    implementationComplexity: 55,
+    ...partial,
+  };
+}
+
+function option(partial: Omit<DecisionOption, "criteria" | "confidence"> & {
+  criteria: DecisionOption["criteria"];
+  confidence?: DecisionConfidence;
+}): DecisionOption {
+  return {
+    confidence: conf(75, "Sample scenario estimate."),
+    ...partial,
+  };
+}
+
+const DEFAULT_APPROVAL: ApprovalStage[] = [
+  {
+    id: "ap-draft",
+    label: "Draft review",
+    status: "pending",
+    requiresExplicitApproval: false,
+    blockedActions: [],
+    allowedActions: ["recommend", "compare", "prepare", "organize", "draft", "research", "simulate", "prioritize"],
+    notes: "Preparation only — no execution.",
+  },
+  {
+    id: "ap-founder",
+    label: "Founder approval",
+    status: "pending",
+    requiresExplicitApproval: true,
+    blockedActions: [
+      "publish",
+      "launch",
+      "spend_money",
+      "delete",
+      "change_production_data",
+      "modify_customer_information",
+      "send_communications",
+      "execute_automations",
+    ],
+    allowedActions: ["review", "approve", "decline", "defer"],
+    notes: "Founder always makes the final business decision.",
+  },
+];
+
+function baseDecision(
+  partial: Omit<ExecutiveDecision, "approvalStages" | "risks" | "fallbacks" | "lessons" | "relationships" | "graphNodeIds" | "createdAt" | "updatedAt"> &
+    Partial<Pick<ExecutiveDecision, "approvalStages" | "risks" | "fallbacks" | "lessons" | "relationships" | "graphNodeIds">>,
+): ExecutiveDecision {
+  return {
+    approvalStages: DEFAULT_APPROVAL,
+    risks: [],
+    fallbacks: [],
+    lessons: [],
+    relationships: [],
+    graphNodeIds: [],
+    createdAt: TS,
+    updatedAt: TS,
+    ...partial,
+  };
+}
+
+export const SAMPLE_EXECUTIVE_DECISIONS: ExecutiveDecision[] = [
+  baseDecision({
+    id: "ed-voice-companion",
+    title: "Voice Companion for Listening Rooms",
+    question: "Should we build Voice Companion for Listening Rooms?",
+    category: "product",
+    missionId: "listening-rooms",
+    productId: "companion",
+    opportunity: "Members returning after absence may prefer speaking over typing when energy is low.",
+    whyItMatters: "Restart friction drops when the first interaction feels human and calm — not like software.",
+    currentStep: "recommend",
+    completedSteps: ["discover", "understand", "generate_options", "compare"],
+    priority: "high",
+    confidence: conf(82, "Strong member voice; implementation cost is the main constraint."),
+    options: [
+      option({
+        id: "opt-voice-full",
+        label: "Option A — Full voice layer in Conservatory",
+        summary: "Mic-first return flow with estate scene and conversation continuity.",
+        pros: ["Lowest friction on return", "Differentiates from ChatGPT", "Aligns with Companion DNA"],
+        cons: ["Higher build cost", "Accessibility testing required", "Latency sensitivity"],
+        estimatedEffort: "High",
+        estimatedImpact: "High trust on restart",
+        estimatedRevenue: "Indirect — retention lift",
+        estimatedCustomerValue: "Members feel welcomed before typing",
+        estimatedImplementationTime: "8–10 weeks",
+        riskLevel: "medium",
+        founderEffort: "Medium — voice QA with Shari",
+        confidence: conf(80, "Member need clear; build scope is large."),
+        criteria: criteria({
+          benefits: "Shame-free voice return in estate scene",
+          risks: "Scope creep into full voice product",
+          difficulty: 78,
+          cost: "High",
+          time: "8–10 weeks",
+          strategicValue: 88,
+          revenuePotential: 65,
+          customerImpact: 92,
+          missionAlignment: 95,
+          founderEnergyRequired: 60,
+          implementationComplexity: 82,
+        }),
+      }),
+      option({
+        id: "opt-voice-limited",
+        label: "Option B — Limited voice on return only",
+        summary: "Voice available first session after absence; typing default thereafter.",
+        pros: ["Smaller scope", "Tests demand", "Preserves calm default"],
+        cons: ["May feel inconsistent", "Edge cases on session detection"],
+        estimatedEffort: "Medium",
+        estimatedImpact: "Medium-high",
+        estimatedRevenue: "Testable before full build",
+        estimatedCustomerValue: "Welcome without permanent voice dependency",
+        estimatedImplementationTime: "4–5 weeks",
+        riskLevel: "low",
+        founderEffort: "Low-medium",
+        confidence: conf(86, "Best balance of learning and restraint."),
+        criteria: criteria({
+          benefits: "Validates voice need without full commitment",
+          risks: "Underwhelms if members want voice everywhere",
+          difficulty: 55,
+          cost: "Medium",
+          time: "4–5 weeks",
+          strategicValue: 80,
+          revenuePotential: 55,
+          customerImpact: 85,
+          missionAlignment: 90,
+          founderEnergyRequired: 40,
+          implementationComplexity: 58,
+        }),
+      }),
+      option({
+        id: "opt-voice-wait",
+        label: "Option C — Wait until Listening Rooms scene ships",
+        summary: "Defer voice until estate restart experience is proven in production.",
+        pros: ["No distraction from core mission", "Scene hero first", "Clearer success metrics"],
+        cons: ["Miss early voice signal", "Competitors may move faster"],
+        estimatedEffort: "Low",
+        estimatedImpact: "Deferred",
+        estimatedRevenue: "None near-term",
+        estimatedCustomerValue: "Stable scene-first experience",
+        estimatedImplementationTime: "0 now; revisit Q4",
+        riskLevel: "low",
+        founderEffort: "Low",
+        confidence: conf(78, "Conservative but mission-aligned."),
+        criteria: criteria({
+          benefits: "Protects Listening Rooms launch focus",
+          risks: "Opportunity cost if voice is the unlock",
+          difficulty: 20,
+          cost: "Low",
+          time: "Defer",
+          strategicValue: 70,
+          revenuePotential: 30,
+          customerImpact: 60,
+          missionAlignment: 88,
+          founderEnergyRequired: 20,
+          implementationComplexity: 15,
+        }),
+      }),
+    ],
+    comparison: {
+      decisionId: "ed-voice-companion",
+      options: [],
+      comparedAt: TS,
+      summary: "Option B balances learning and scope. Option A wins impact but risks mission delay. Option C is safest sequencing.",
+    },
+    recommendation: {
+      decisionId: "ed-voice-companion",
+      recommendedOptionId: "opt-voice-limited",
+      headline: "Start with limited voice on return — not full voice everywhere.",
+      why: "It tests the emotional hypothesis without betting the Listening Rooms timeline. Members get welcome-by-voice when they need it most; we learn before scaling build.",
+      whatHappensIfNothing: "Restart stays typing-only. Some exhausted members may bounce before they feel seen.",
+      whatToPrepare: [
+        "Cursor plan for return-session voice gate",
+        "Companion conversation copy for first voice return",
+        "Accessibility checklist draft",
+        "Decision Vault entry when approved",
+      ],
+      visualSparkStudiosPerspective:
+        "I would ship the scene first, then add voice only on the shame-heavy return moment — one calm mic, not a voice product launch.",
+      plainEnglishSummary: [
+        "What happened? Members want to be welcomed without typing when they are depleted.",
+        "Why care? Restart is the door to everything else in Spark.",
+        "Options: full voice, limited voice on return, or wait.",
+        "Recommend: limited voice on return first.",
+        "If nothing: typing-only restart remains; some members may leave early.",
+        "Prepare: implementation draft, copy, and approval — nothing publishes yet.",
+      ],
+      confidence: conf(86, "Aligns mission focus with member voice."),
+      recommendedAt: TS,
+    },
+    graphNodeIds: ["node-listening-rooms", "node-mission-lr"],
+  }),
+
+  baseDecision({
+    id: "ed-launch-workshop",
+    title: "Decision Fatigue Workshop Launch",
+    question: "Should we launch a Decision Fatigue workshop now?",
+    category: "workshop",
+    missionId: "listening-rooms",
+    opportunity: "Workshop research shows members stall when asked to choose before feeling safe.",
+    whyItMatters: "Workshops convert research into trust — and feed Listening Rooms messaging.",
+    currentStep: "plan",
+    completedSteps: ["discover", "understand", "generate_options", "compare", "recommend"],
+    priority: "medium",
+    confidence: conf(79, "Customer voice supports workshop; calendar capacity is the constraint."),
+    options: [
+      option({
+        id: "opt-workshop-now",
+        label: "Launch pilot workshop in 3 weeks",
+        summary: "Small cohort, estate-themed facilitation, shame-free framing.",
+        pros: ["Fast learning", "Content for Gentle Restart campaign", "Member stories"],
+        cons: ["Founder energy", "Ops prep"],
+        estimatedEffort: "Medium",
+        estimatedImpact: "High learning",
+        estimatedRevenue: "Workshop ticket + nurture",
+        estimatedCustomerValue: "Live relief from decision fatigue",
+        estimatedImplementationTime: "3 weeks",
+        riskLevel: "medium",
+        founderEffort: "High — Shari facilitates",
+        criteria: criteria({ benefits: "Live proof for mission", risks: "Burnout if stacked", founderEnergyRequired: 85 }),
+      }),
+      option({
+        id: "opt-workshop-q3",
+        label: "Schedule for Q3 after Listening Rooms beta",
+        summary: "Workshop follows proven restart scene.",
+        pros: ["Better proof", "Less split focus"],
+        cons: ["Slower learning"],
+        estimatedEffort: "Low now",
+        estimatedImpact: "Medium",
+        estimatedRevenue: "Delayed",
+        estimatedCustomerValue: "Workshop tied to live product",
+        estimatedImplementationTime: "Q3",
+        riskLevel: "low",
+        founderEffort: "Low now",
+        criteria: criteria({ benefits: "Sequenced with product", risks: "Miss nurture window", time: "Q3" }),
+      }),
+    ],
+    recommendation: {
+      decisionId: "ed-launch-workshop",
+      recommendedOptionId: "opt-workshop-q3",
+      headline: "Schedule the workshop after Listening Rooms beta — not before.",
+      why: "The workshop lands harder when members can walk into the room you are describing.",
+      whatHappensIfNothing: "Research stays abstract; campaign lacks live stories.",
+      whatToPrepare: ["Workshop outline draft", "PostCraft nurture sequence draft", "Mission milestone update"],
+      visualSparkStudiosPerspective: "I would not add a live event until the estate scene exists — otherwise we are selling a promise.",
+      plainEnglishSummary: ["Recommend Q3 sequencing.", "Prepare outline and drafts only."],
+      confidence: conf(81, "Protects founder energy and mission focus."),
+      recommendedAt: TS,
+    },
+    plan: {
+      decisionId: "ed-launch-workshop",
+      missionUpdates: ["Add workshop milestone post-beta"],
+      roadmapUpdates: ["Q3 workshop slot — Decision Fatigue"],
+      developmentPhases: [],
+      researchTasks: ["Collect 5 member quotes on decision fatigue"],
+      contentIdeas: ["Workshop landing page draft", "Gentle Restart email tie-in"],
+      marketingIdeas: ["Nurture segment: research-interested members"],
+      automationOpportunities: ["GHL waitlist tag — no send until approved"],
+      teamWork: ["Ops: calendar hold Q3"],
+      status: "draft",
+    },
+    graphNodeIds: ["node-workshop-fatigue", "node-finding-decision-fatigue"],
+  }),
+
+  baseDecision({
+    id: "ed-automate-onboarding",
+    title: "Automate Gentle Restart Onboarding",
+    question: "Should we automate onboarding for Gentle Restart?",
+    category: "automation",
+    missionId: "listening-rooms",
+    opportunity: "GHL Gentle Restart campaign can nurture returns — if automations respect Spec 106 permission.",
+    whyItMatters: "Automation should reduce Shari's manual follow-up without feeling surveillance-like.",
+    currentStep: "approval",
+    completedSteps: ["discover", "understand", "generate_options", "compare", "recommend", "plan", "prepare"],
+    priority: "high",
+    confidence: conf(84, "Ops alignment strong; approval required before any send."),
+    options: [
+      option({
+        id: "opt-auto-full",
+        label: "Full automation sequence",
+        summary: "Multi-step nurture with estate imagery and single primary CTA.",
+        pros: ["Hands-off nurture", "Consistent messaging"],
+        cons: ["Feels automated if wrong tone", "Harder to unwind"],
+        estimatedEffort: "Medium",
+        estimatedImpact: "High ops relief",
+        estimatedRevenue: "Conversion lift potential",
+        estimatedCustomerValue: "Timely gentle nudge",
+        estimatedImplementationTime: "2 weeks",
+        riskLevel: "medium",
+        founderEffort: "Medium — copy review",
+        criteria: criteria({ benefits: "Scale nurture", risks: "Tone failure", implementationComplexity: 65 }),
+      }),
+      option({
+        id: "opt-auto-pilot",
+        label: "Pilot automation — 20 members, manual approval per step",
+        summary: "Draft automations execute only after Founder approves each step.",
+        pros: ["Safe learning", "Preserves control", "Tone QA"],
+        cons: ["Not fully hands-off yet"],
+        estimatedEffort: "Low-medium",
+        estimatedImpact: "Medium",
+        estimatedRevenue: "Testable",
+        estimatedCustomerValue: "Still personal",
+        estimatedImplementationTime: "1 week setup",
+        riskLevel: "low",
+        founderEffort: "Low per step",
+        criteria: criteria({ benefits: "Control + learning", risks: "Slower scale", founderEnergyRequired: 30 }),
+      }),
+    ],
+    recommendation: {
+      decisionId: "ed-automate-onboarding",
+      recommendedOptionId: "opt-auto-pilot",
+      headline: "Pilot automations with approval gates — never send without you.",
+      why: "Matches Executive Control Principle. We automate preparation and monitoring, not authority.",
+      whatHappensIfNothing: "Manual follow-up continues; restart cohort may leak.",
+      whatToPrepare: ["GHL workflow draft", "PostCraft email drafts", "Approval checklist"],
+      visualSparkStudiosPerspective: "Automate the prep and reminders — you still press go.",
+      plainEnglishSummary: ["Recommend pilot with approval gates.", "No emails send until you approve."],
+      confidence: conf(88, "Permanent Founder principle."),
+      recommendedAt: TS,
+    },
+    implementation: {
+      decisionId: "ed-automate-onboarding",
+      phases: [
+        {
+          id: "ph-1",
+          name: "Draft",
+          summary: "Prepare GHL + PostCraft drafts",
+          tasks: [
+            { id: "t-1", title: "GHL workflow draft", owner: "ops", status: "draft", module: "ghl", notes: "No live trigger" },
+            { id: "t-2", title: "Email copy draft", owner: "postcraft", status: "draft", module: "postcraft", notes: "Awaiting approval" },
+          ],
+        },
+      ],
+      status: "awaiting_approval",
+    },
+    approvalStages: [
+      { ...DEFAULT_APPROVAL[0], status: "approved" },
+      { ...DEFAULT_APPROVAL[1], status: "pending", notes: "Required before any send." },
+    ],
+    graphNodeIds: ["node-campaign-gentle-restart", "node-ghl-gentle-restart"],
+  }),
+
+  baseDecision({
+    id: "ed-hire-support",
+    title: "Hire Part-Time Operations Support",
+    question: "Should we hire part-time operations support this quarter?",
+    category: "hiring",
+    missionId: "founder-studio",
+    opportunity: "Executive cycle surfaces ops load during campaign pilots and workshop prep.",
+    whyItMatters: "Founder energy should go to decisions and member experience — not repetitive ops.",
+    currentStep: "compare",
+    completedSteps: ["discover", "understand", "generate_options"],
+    priority: "medium",
+    confidence: conf(72, "Need is real; timing depends on revenue signal."),
+    options: [
+      option({
+        id: "opt-hire-now",
+        label: "Hire 10 hrs/week ops contractor",
+        summary: "Campaign setup, analytics pulls, workshop logistics.",
+        pros: ["Frees Shari", "Faster pilots"],
+        cons: ["Cash outlay", "Onboarding time"],
+        estimatedEffort: "Medium",
+        estimatedImpact: "High founder relief",
+        estimatedRevenue: "Enables faster experiments",
+        estimatedCustomerValue: "Indirect — better delivery",
+        estimatedImplementationTime: "2–3 weeks to onboard",
+        riskLevel: "medium",
+        founderEffort: "Medium — hiring + SOPs",
+        criteria: criteria({ benefits: "Founder time returned", risks: "Onboarding cost", cost: "Moderate monthly", founderEnergyRequired: 55 }),
+      }),
+      option({
+        id: "opt-hire-defer",
+        label: "Defer until Gentle Restart pilot results",
+        summary: "Revisit hire after automation pilot metrics.",
+        pros: ["Cash preserved", "Clearer ROI"],
+        cons: ["Founder load continues"],
+        estimatedEffort: "Low",
+        estimatedImpact: "Deferred relief",
+        estimatedRevenue: "N/A",
+        estimatedCustomerValue: "N/A",
+        estimatedImplementationTime: "Revisit in 6 weeks",
+        riskLevel: "low",
+        founderEffort: "Low",
+        criteria: criteria({ benefits: "Cash discipline", risks: "Burnout", founderEnergyRequired: 75 }),
+      }),
+    ],
+    graphNodeIds: ["node-mission-lr"],
+  }),
+
+  baseDecision({
+    id: "ed-lr-estate-scene",
+    title: "Ship Full-Bleed Estate Scene First",
+    question: "Should we build the full-bleed estate scene feature before other Listening Rooms enhancements?",
+    category: "product",
+    missionId: "listening-rooms",
+    productId: "listening-rooms",
+    opportunity: "Photograph Test and Estate UI Philosophy require scene as hero.",
+    whyItMatters: "Without the scene, everything else feels like software on a dashboard.",
+    currentStep: "monitor",
+    completedSteps: [
+      "discover",
+      "understand",
+      "generate_options",
+      "compare",
+      "recommend",
+      "plan",
+      "prepare",
+      "approval",
+      "implement",
+    ],
+    priority: "critical",
+    confidence: conf(91, "Canon-aligned; already in progress."),
+    options: [
+      option({
+        id: "opt-scene-first",
+        label: "Scene first — defer feature menu",
+        summary: "Full-bleed estate image, frosted chat, no dashboard chrome.",
+        pros: ["Passes Photograph Test", "Mission credibility"],
+        cons: ["Other features wait"],
+        estimatedEffort: "High",
+        estimatedImpact: "Transformational",
+        estimatedRevenue: "Enables restart campaign",
+        estimatedCustomerValue: "Belonging on return",
+        estimatedImplementationTime: "In progress",
+        riskLevel: "low",
+        founderEffort: "Medium — art direction",
+        criteria: criteria({ benefits: "Estate hero experience", risks: "Delayed side features", strategicValue: 95, missionAlignment: 98, customerImpact: 94 }),
+      }),
+    ],
+    recommendation: {
+      decisionId: "ed-lr-estate-scene",
+      recommendedOptionId: "opt-scene-first",
+      headline: "Yes — scene first. Everything else waits.",
+      why: "This is the emotional proof of Listening Rooms. Without it, workshops and campaigns sell an idea, not a place.",
+      whatHappensIfNothing: "Mission reads as another ADHD app with rooms.",
+      whatToPrepare: [],
+      visualSparkStudiosPerspective: "I would not launch anything until the frame could hang on a wall.",
+      plainEnglishSummary: ["Scene is non-negotiable hero."],
+      confidence: conf(94, "Estate canon."),
+      recommendedAt: "2026-01-10T00:00:00.000Z",
+    },
+    monitoring: {
+      decisionId: "ed-lr-estate-scene",
+      checkpoints: [
+        { id: "cp-qa", label: "Estate scene QA", status: "on_track", notes: "Frosted panel centered" },
+        { id: "cp-mobile", label: "Mobile typography pass", status: "upcoming", notes: "Spec 109 minimums" },
+      ],
+      metrics: [
+        { id: "m-progress", label: "Mission progress", target: "70%", current: "64%", source: "Mission Workspace" },
+        { id: "m-restart", label: "Restart session completion", target: "TBD post-launch", source: "Analytics" },
+      ],
+      watchFor: ["Split workspace regressions", "Software chrome creeping back"],
+      recommendationTriggers: ["QA fails Photograph Test", "Conversation continuity breaks on room change"],
+    },
+    graphNodeIds: ["node-listening-rooms", "node-decision-invest-restart"],
+    institutionalMemoryId: "mem-decision-invest-restart",
+  }),
+
+  baseDecision({
+    id: "ed-launch-now-or-wait",
+    title: "Launch Gentle Restart Campaign Now or Wait",
+    question: "Should we launch the Gentle Restart campaign now or wait for prototype proof?",
+    category: "launch",
+    missionId: "listening-rooms",
+    opportunity: "Nurture cohort is warm; prototype analytics are early but positive.",
+    whyItMatters: "Launch too early damages trust; wait too long loses momentum.",
+    currentStep: "remember",
+    completedSteps: [
+      "discover",
+      "understand",
+      "generate_options",
+      "compare",
+      "recommend",
+      "plan",
+      "prepare",
+      "approval",
+      "implement",
+      "monitor",
+      "review",
+    ],
+    priority: "high",
+    confidence: conf(87, "Decision recorded; lessons captured."),
+    options: [
+      option({
+        id: "opt-launch-now",
+        label: "Launch now",
+        summary: "Ship campaign with current prototype proof.",
+        pros: ["Momentum", "Revenue signal"],
+        cons: ["Trust risk if scene incomplete"],
+        estimatedEffort: "Low",
+        estimatedImpact: "High short-term",
+        estimatedRevenue: "Near-term",
+        estimatedCustomerValue: "Mixed if product not ready",
+        estimatedImplementationTime: "1 week",
+        riskLevel: "high",
+        founderEffort: "Medium",
+        criteria: criteria({ benefits: "Fast momentum", risks: "Trust damage", revenuePotential: 75 }),
+      }),
+      option({
+        id: "opt-launch-wait",
+        label: "Wait for prototype proof",
+        summary: "Campaign starts when restart session metrics stabilize.",
+        pros: ["Trust preserved", "Aligned proof"],
+        cons: ["Slower revenue"],
+        estimatedEffort: "Low",
+        estimatedImpact: "High long-term",
+        estimatedRevenue: "Delayed but healthier",
+        estimatedCustomerValue: "Promise matches experience",
+        estimatedImplementationTime: "2–3 weeks delay",
+        riskLevel: "low",
+        founderEffort: "Low",
+        criteria: criteria({ benefits: "Promise matches experience", risks: "Slower revenue", strategicValue: 90, customerImpact: 92 }),
+      }),
+    ],
+    recommendation: {
+      decisionId: "ed-launch-now-or-wait",
+      recommendedOptionId: "opt-launch-wait",
+      headline: "Wait until prototype proof — then launch.",
+      why: "Member trust beats calendar urgency. Campaign drafts are ready; send waits on scene QA.",
+      whatHappensIfNothing: "Warm cohort cools; manual outreach continues.",
+      whatToPrepare: ["Hold GHL workflow", "Monitor prototype metrics weekly"],
+      visualSparkStudiosPerspective: "I would never invite someone home before the lights work.",
+      plainEnglishSummary: ["Waited for proof.", "Campaign prepared but not sent."],
+      confidence: conf(89, "Validated in review."),
+      recommendedAt: "2026-02-01T00:00:00.000Z",
+    },
+    outcome: {
+      decisionId: "ed-launch-now-or-wait",
+      succeeded: true,
+      summary: "Waiting preserved trust; early retention signal improved before send.",
+      surprises: ["Members cared more about welcome copy than feature list"],
+      wouldDoAgain: true,
+      changesNextTime: ["Define proof metrics before draft prep"],
+      recordedAt: TS,
+    },
+    review: {
+      decisionId: "ed-launch-now-or-wait",
+      worked: true,
+      surprised: ["Welcome-first copy mattered more than features"],
+      wouldDoAgain: true,
+      changeNextTime: ["Set proof thresholds in Step 4, not Step 9"],
+      narrative: [
+        "Did it work? Yes — trust held and metrics improved.",
+        "What surprised us? Copy tone beat feature breadth.",
+        "Would we do it again? Yes.",
+        "Next time: lock proof criteria earlier.",
+      ],
+      reviewedAt: TS,
+    },
+    lessons: [
+      { id: "les-1", decisionId: "ed-launch-now-or-wait", lesson: "Never launch nurture before the experience matches the promise.", repeat: true },
+    ],
+    institutionalMemoryId: "mem-gentle-restart-campaign",
+    graphNodeIds: ["node-campaign-gentle-restart", "node-ghl-gentle-restart"],
+  }),
+];
+
+// Fill comparison option refs
+for (const d of SAMPLE_EXECUTIVE_DECISIONS) {
+  if (d.comparison) d.comparison.options = d.options;
+}
+
+export const SAMPLE_DECISION_RELATIONSHIPS: DecisionRelationship[] = [
+  { id: "dr-1", fromDecisionId: "ed-launch-now-or-wait", toDecisionId: "ed-lr-estate-scene", kind: "depends_on", reason: "Campaign waits on scene proof." },
+  { id: "dr-2", fromDecisionId: "ed-voice-companion", toDecisionId: "ed-lr-estate-scene", kind: "depends_on", reason: "Voice return requires scene." },
+  { id: "dr-3", fromDecisionId: "ed-automate-onboarding", toDecisionId: "ed-launch-now-or-wait", kind: "informed_by", reason: "Automation pilot informs send timing." },
+  { id: "dr-4", fromDecisionId: "ed-launch-workshop", toDecisionId: "ed-lr-estate-scene", kind: "depends_on", reason: "Workshop sequenced after beta." },
+];
+
+const BY_ID = new Map(SAMPLE_EXECUTIVE_DECISIONS.map((d) => [d.id, d]));
+
+export function getSampleDecision(id: string): ExecutiveDecision | undefined {
+  return BY_ID.get(id);
+}
+
+export function listSampleDecisions(): ExecutiveDecision[] {
+  return [...SAMPLE_EXECUTIVE_DECISIONS];
+}
+
+export function listSampleDecisionRelationships(): DecisionRelationship[] {
+  return [...SAMPLE_DECISION_RELATIONSHIPS];
+}
+
+export function decisionsForMission(missionId: string): ExecutiveDecision[] {
+  return SAMPLE_EXECUTIVE_DECISIONS.filter((d) => d.missionId === missionId);
+}
+
+export function decisionsByCategory(category: ExecutiveDecision["category"]): ExecutiveDecision[] {
+  return SAMPLE_EXECUTIVE_DECISIONS.filter((d) => d.category === category);
+}
