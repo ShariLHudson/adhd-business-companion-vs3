@@ -4,9 +4,11 @@
 | | |
 |---|---|
 | **Version** | 1.0 |
-| **Status** | Foundational |
+| **Status** | Foundational · Architecture Constitution |
 | **Owner** | Shari Hudson |
 | **Company** | Visual Spark Studios™ |
+
+> **Cursor instruction:** Follow the SPARK Intelligence Blueprint™. If a requested implementation conflicts with this document, preserve the blueprint and suggest the better architectural approach. Build for the long-term ecosystem, not just today's feature.
 
 ---
 
@@ -16,11 +18,7 @@ Spark is not an application.
 
 Spark is an **Intelligence Operating System™** that helps people think better, make better decisions, reduce friction, and build extraordinary businesses.
 
-**Users experience:**
-
-- One trusted companion.
-
-Behind the scenes Spark coordinates multiple intelligence systems working together seamlessly.
+**Users experience one trusted companion.** Behind the scenes, Spark coordinates multiple intelligence systems working together seamlessly.
 
 - The user never manages AI.
 - The user manages ideas.
@@ -29,41 +27,11 @@ Behind the scenes Spark coordinates multiple intelligence systems working togeth
 
 ## Guiding Principles
 
-Every future decision must satisfy these principles.
-
-### 1. Relationship Before Technology
-
-Users build a relationship with Spark.
-
-Not with AI. Not with agents.
-
-Spark should feel like: **trusted · warm · intelligent · calm · encouraging · executive · human**
-
-### 2. Companion First
-
-Never build around features.
-
-Build around conversations. Build around intentions. Build around thinking.
-
-### 3. One Brain
-
-There is only **ONE** intelligence.
-
-Never duplicate intelligence.
-
-**Founder · Companion · PostCraft · Team Hub** — all consume the same intelligence.
-
-### 4. Reduce Friction
-
-Every feature must answer: *How does this reduce friction?*
-
-If it doesn't — don't build it.
-
-### 5. Executive Simplicity
-
-Power should exist beneath the surface.
-
-Complexity belongs to Spark. Simplicity belongs to the user.
+1. **Relationship before technology** — trusted, warm, intelligent, calm, encouraging, executive, human
+2. **Companion first** — conversations, intentions, and thinking — not feature menus
+3. **One brain** — Founder, Companion, PostCraft, and Team Hub consume the same intelligence; never duplicate logic per screen
+4. **Reduce friction** — if a feature does not reduce friction, do not build it
+5. **Executive simplicity** — complexity belongs to Spark; simplicity belongs to the user
 
 ---
 
@@ -86,244 +54,149 @@ Complexity belongs to Spark. Simplicity belongs to the user.
  Report Engine™
 ────────────────────────────────────
       Experiences
- Founder
- Companion
+ Founder Studio
+ Spark Companion
  PostCraft
  Team Hub
+ GoHighLevel
  Future Products
 ```
 
 ---
 
-## SPARK™
+## Ecosystem Systems
 
-### Purpose
+### 1. SPARK™ — Strategic Pattern Analysis & Recommendation Kernel™
 
-SPARK observes. Connects. Scores. Prioritizes. Finds patterns. Organizes knowledge.
+**Purpose:** Central intelligence core for the full ecosystem.
 
-SPARK **never** chats. SPARK **never** generates reports. SPARK **prepares** intelligence.
+SPARK observes, connects, scores, prioritizes, finds patterns, and organizes knowledge. SPARK prepares intelligence for FLAME™, FIRE™, and every product layer.
 
-**Implementation (V1):** `lib/spark/` — public API: `observe()` · `score()` · `prioritize()` · `connect()` · `prepare()` · `summarize()`
+**Responsibilities:** Pattern detection · signal collection · relationship mapping · opportunity scoring · risk scoring · priority ranking · knowledge graph · recommendation preparation
 
-### Responsibilities
+**SPARK never:** generates UI · knows about Founder or Companion as products · generates conversations · owns reports · owns workflows
 
-- Pattern detection
-- Signal collection
-- Relationship mapping
-- Opportunity scoring
-- Risk scoring
-- Priority ranking
-- Knowledge graph
-- Recommendation preparation
-
-### SPARK Never
-
-- Generates UI
-- Knows about Founder
-- Knows about Companion
-- Generates conversations
-- Owns reports
-- Owns workflows
+**Implementation (V1):** `lib/spark/` — `observe()` · `score()` · `prioritize()` · `connect()` · `prepare()` · `summarize()`
 
 ---
 
-## FLAME™
+### 2. FLAME™ — Founder Learning & Adaptive Mentoring Engine™
 
-**Founder Learning & Adaptive Mentoring Engine™**
+**Purpose:** Learns Shari — not the business, **the person**. Adapts, mentors, reflects, challenges, and supports executive decision-making.
 
-### Purpose
+**Learns:** Preferences · thinking style · decision style · product vision · communication style · working rhythm · energy patterns · strengths · blind spots · goals · values · lessons · wins · mistakes
 
-FLAME learns the founder.
+**Provides:** Executive mentoring · questions · reflection · perspective · encouragement · challenges · long-term thinking · adaptive guidance
 
-Not the business. **The person.**
-
-### Learns
-
-Preferences · Thinking style · Decision style · Product vision · Communication style · Working rhythm · Energy patterns · Strengths · Blind spots · Goals · Values · Lessons · Wins · Mistakes
-
-### FLAME Provides
-
-Executive mentoring · Questions · Reflection · Perspective · Encouragement · Challenges · Long-term thinking · Adaptive guidance
-
-### FLAME Never
-
-- Collects raw research
-- Owns analytics
-- Creates reports
-- Duplicates SPARK
+**FLAME never:** collects raw research · owns analytics · creates reports · duplicates SPARK
 
 **Implementation (V1):** `lib/founder/flame/`
 
 ---
 
-## FIRE™
+### 3. FIRE™ — Founder Intelligence Report Engine™
 
-**Founder Intelligence Report Engine™**
+**Purpose:** Transforms intelligence into executive briefings, reports, forecasts, PDFs, archives, and action plans.
 
-### Purpose
+**Produces:** Morning Brief · Executive Brief · Weekly · Monthly · Quarterly reviews · Launch · Market · Product · Trend · Opportunity · Competitive reports
 
-Transform intelligence into executive briefings.
-
-### FIRE Produces
-
-Morning Brief · Executive Brief · Weekly Review · Monthly Review · Quarterly Review · Launch Reports · Market Reports · Product Reports · Trend Forecasts · Opportunity Reports · Competitive Reports
-
-### FIRE Never
-
-- Collects information — **SPARK does**
-- Learns the founder — **FLAME does**
+**FIRE never:** collects information (SPARK does) · learns the founder (FLAME does)
 
 ---
 
-## Founder Studio™
+### 4. Founder Studio™
 
-### Purpose
+**Purpose:** Private executive headquarters for Shari. Where executive decisions happen.
 
-Executive Headquarters. Where executive decisions happen.
+**Contains:** Office · Executive Workspaces · Executive Concierge · Strategy Center · Decision Vault · Intelligence · Memory · Reports
 
-### Contains
-
-Office · Executive Workspaces · Executive Concierge · Strategy Center · Decision Vault · Intelligence · Memory · Reports
-
-### Founder consumes
-
-SPARK · FLAME · FIRE
+**Consumes:** SPARK · FLAME · FIRE
 
 ---
 
-## Companion™
+### 5. Spark Companion™
 
-### Purpose
+**Purpose:** Member-facing ADHD business companion.
 
-Help ADHD entrepreneurs.
+**Focuses on:** Thinking · planning · creating · reflection · emotions · projects · business · focus · growth
 
-### Companion focuses on
-
-Thinking · Planning · Creating · Reflection · Emotions · Projects · Business · Focus · Growth
-
-### Companion feeds
-
-SPARK
+**Feeds:** SPARK (signals, patterns, member context — never duplicate intelligence engines in Companion UI)
 
 ---
 
-## PostCraft™
+### 6. PostCraft™
 
-### Purpose
+**Purpose:** Content and campaign creation system.
 
-Transform ideas into content.
+**Consumes:** Research · ideas · recommendations · campaigns · analytics (from SPARK)
 
-### Consumes
-
-Research · Ideas · Recommendations · Campaigns · Analytics
-
-### Feeds (back into SPARK)
-
-Performance · Engagement · Conversions · Content Trends
+**Feeds back into SPARK:** Performance · engagement · conversions · content trends
 
 ---
 
-## Team Hub™
+### 7. Team Hub™
 
-### Purpose
+**Purpose:** Execution layer for Izna, Cursor, approvals, projects, assets, and future team members.
 
-Execute.
+**Receives:** Projects · approvals · campaigns · tasks · assets
 
-### Receives
-
-Projects · Approvals · Campaigns · Tasks · Assets
-
-### Feeds (back into SPARK)
-
-Status · Completion · Progress
+**Feeds back into SPARK:** Status · completion · progress
 
 ---
 
-## GoHighLevel
+### 8. GoHighLevel
 
-### Purpose
+**Purpose:** CRM · funnels · email · SMS · workflows · memberships · lead nurture · campaign automation
 
-Marketing automation · CRM · Funnels · Email · SMS · Membership · Appointments
-
-### Feeds (back into SPARK)
-
-Conversions · Revenue · Funnels · Campaigns · Engagement
+**Feeds back into SPARK:** Conversions · revenue · funnels · campaigns · engagement
 
 ---
 
-## Intelligence Pipeline™
+### 9. Intelligence Pipeline™
 
-### Purpose
+**Purpose:** All intelligence enters here first. Nothing bypasses the pipeline.
 
-Everything enters here first.
+**Sources include:** Signals · findings · research · analytics · customer insights · product updates · social performance · user behavior · external intelligence
 
 ```
-Sources
-  ↓
-Signals
-  ↓
-Findings
-  ↓
-Patterns
-  ↓
-Recommendations
-  ↓
-Reports
-  ↓
-Archive
+Sources → Signals → Findings → Patterns → Recommendations → Reports → Archive
 ```
-
-**Nothing bypasses the pipeline.**
 
 **Implementation (Founder UI):** `lib/founder/intelligence/`
 
 ---
 
-## Executive Concierge™
+### 10. Executive Concierge™
 
-### Purpose
-
-Prepare the office. Guide attention. Reduce decision fatigue. Never overwhelm.
+**Purpose:** Prepares Shari's office — agenda, workspace suggestions, thinking-space suggestions, and reminders. Guides attention and reduces decision fatigue without overwhelm.
 
 **Implementation (V1):** `lib/founder/concierge/`
 
 ---
 
-## Workspace Orchestrator™
+### 11. Workspace Orchestrator™
 
-### Purpose
-
-Create the ideal workspace.
-
-Not navigation. Workspaces assemble dynamically using existing rooms and services.
+**Purpose:** Turns intentions into prepared executive workspaces. Not navigation — workspaces assemble dynamically from existing rooms and services.
 
 **Implementation:** `lib/founder/workspace/`
 
 ---
 
-## Executive Strategy Center™
+### 12. Executive Strategy Center™
 
-### Purpose
+**Purpose:** Think. Not execute.
 
-Think. Not execute.
-
-### Supports
-
-Visual Thinking · Board of Directors · Expert Perspectives · Decision Canvas · Whiteboard · Estate Thinking Spaces
+**Supports:** Visual thinking · board of directors · expert perspectives · whiteboard · decision canvas · estate thinking spaces
 
 **Implementation (V1):** `lib/founder/strategyCenter/`
 
 ---
 
-## Decision Vault™
+### 13. Decision Vault™
 
-### Purpose
+**Purpose:** Remember **why**, not just **what**.
 
-Remember **WHY**. Not just **WHAT**.
-
-### Stores
-
-Decisions · Evidence · Alternatives · Lessons · Outcomes · History · Relationships
+**Stores:** Decisions · reasoning · evidence · alternatives · lessons · outcomes · roadmap changes · company history · relationships
 
 **Implementation (V1):** `lib/founder/memory/`
 
@@ -331,9 +204,7 @@ Decisions · Evidence · Alternatives · Lessons · Outcomes · History · Relat
 
 ## Estate Philosophy
 
-The Estate is **NOT** decoration. It is the **cognitive interface**.
-
-Each space supports a different way of thinking.
+The Estate is **not** decoration. It is the **cognitive interface**.
 
 | Space | Thinking mode |
 |-------|----------------|
@@ -346,106 +217,98 @@ Each space supports a different way of thinking.
 | Listening Rooms | Focus |
 | Treasure Chest | Ideas for another day |
 
-**Canon:** `docs/estate/ESTATE_ARCHITECTURAL_AUTHORITY.md` · Constitution · Living in Spark Estate · Spark Estate Bible
+**Canon:** `docs/estate/ESTATE_ARCHITECTURAL_AUTHORITY.md`
 
 ---
 
 ## Intelligence Flow
 
 ```
-Research
-  ↓
-Companion
-  ↓
-Founder
-  ↓
-PostCraft
-  ↓
-Team Hub
-  ↓
-GoHighLevel
-  ↓
-Analytics
-  ↓
-Intelligence Pipeline™
-  ↓
-SPARK™
-  ↓
-FLAME™
-  ↓
-FIRE™
-  ↓
-Executive Concierge™
-  ↓
-Founder Experience
+Research → Companion → Founder → PostCraft → Team Hub → GoHighLevel → Analytics
+  → Intelligence Pipeline™ → SPARK™ → FLAME™ → FIRE™ → Executive Concierge™ → Founder Experience
 ```
 
 ---
 
 ## Design Constitution
 
-Every interface should communicate:
+Founder Studio and executive surfaces should feel:
 
-**Executive confidence · Warmth · Sophistication · Calm · Clarity · Beauty · Spaciousness · Intelligence**
+**Professional · executive · modern · warm · premium · bright · beautiful · calm · made specifically for Shari**
 
-### Never
+### Avoid
 
-Cartoonish · Playful · Cluttered · Generic SaaS · Enterprise gray · Notification overload · Emoji-driven
+- Cartoon graphics
+- Emojis in core UI
+- Playful stickers
+- Generic SaaS dashboards
+- Clutter
+- Notification overload
+- Childish visuals
+- Enterprise gray monotony
 
-### Instead
+### Prefer
 
-Architectural · Premium · Timeless · Elegant · Bright · Inspiring · Human-centered
+- Architectural design
+- Refined typography
+- Glass panels used sparingly
+- Gold accents
+- Teal and aqua Spark colors
+- Spacious layouts
+- Executive portfolios
+- Premium line icons
+- Beautiful photography
 
-**Related:** Spec 103 Universal Experience · Relationship Constitution · Spark Estate UI Philosophy
+**Related:** Spec 103 · Relationship Constitution · Spark Estate UI Philosophy · `app/companion/founder/founder-studio.css`
 
 ---
 
 ## Development Constitution
 
-Every new feature must answer these questions **before** it is built:
+Every future feature must answer **before** it is built:
 
-1. Does it reduce friction?
-2. Does it help the user think better?
-3. Does it belong in **SPARK**, **FLAME**, **FIRE**, or the **experience layer**?
-4. Can it be reused by other products?
-5. Does it strengthen the relationship with the user?
-6. Does it preserve the Estate philosophy?
-7. Does it avoid duplicate logic?
-8. Will it still make sense five years from now?
+1. Does this **reduce friction**?
+2. Does this help Shari **think, decide, create, automate, or delegate**?
+3. Does it belong in **SPARK**, **FLAME**, **FIRE**, **Founder**, **Companion**, **PostCraft**, **Team Hub**, or **GHL**?
+4. Can it be **reused across the ecosystem**?
+5. Does it preserve **one shared intelligence layer**?
+6. Does it **avoid duplicate logic**?
+7. Does it support the **long-term operating system vision**?
 
-**If the answer to any of these is "no," rethink the design before writing code.**
+**If any answer is no — rethink the design before writing code.**
 
-### Layer placement guide
+### Layer placement
 
 | Layer | Owns | Does not own |
 |-------|------|----------------|
-| **SPARK** | Observe, score, connect, prioritize, patterns, knowledge graph | UI, chat, reports, product-specific routing |
-| **FLAME** | Founder learning, mentoring voice, reflection | Raw research, analytics, SPARK scoring |
-| **FIRE** | Executive briefings and reports | Collection, founder modeling |
-| **Experience** | UI, rooms, conversation, member/founder surfaces | Duplicate intelligence engines |
+| **SPARK** | Observe, score, connect, prioritize, patterns, knowledge graph | UI, chat, reports, product routing |
+| **FLAME** | Founder learning, mentoring, reflection | Raw research, analytics, SPARK scoring |
+| **FIRE** | Briefings, reports, PDFs, archives, action plans | Collection, founder modeling |
+| **Experience** | UI, rooms, conversation, Founder/Companion surfaces | Duplicate intelligence engines |
+| **GHL** | CRM, automation, funnels, nurture | Internal scoring or pattern engines |
 
 ---
 
 ## Long-Term Vision
 
-The goal is not to build the smartest AI.
-
-The goal is to build the **most trusted executive companion** for founders and ADHD entrepreneurs.
+The goal is not the smartest AI. The goal is the **most trusted executive companion** for founders and ADHD entrepreneurs.
 
 When someone opens Spark, they should feel:
 
 > *"This system understands me, understands my business, remembers what matters, quietly prepares my day, helps me think clearly, and makes running my company feel possible—even on my hardest days."*
 
-That is the standard every feature, every screen, every service, and every line of code should support.
+That is the standard every feature, screen, service, and line of code must support.
 
 ---
 
-## Related documents
+## Related Documents
 
 | Document | Path |
 |----------|------|
+| Architecture index | `docs/architecture/README.md` |
 | Intelligence Registry | `lib/intelligence/INTELLIGENCE_REGISTRY.md` |
 | SPARK implementation | `lib/spark/` |
+| Cursor rule | `.cursor/rules/spark-intelligence-blueprint.mdc` |
 | Entrepreneurial Transformation Constitution | `docs/ENTREPRENEURIAL_TRANSFORMATION_CONSTITUTION.md` |
 | The Friend We All Deserve™ | `docs/THE_FRIEND_WE_ALL_DESERVE.md` |
 | Estate Architectural Authority | `docs/estate/ESTATE_ARCHITECTURAL_AUTHORITY.md` |

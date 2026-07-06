@@ -2,6 +2,8 @@
 
 **Foundational principle:** **THE RELATIONSHIP OWNS THE WORK.**
 
+**Product operating system (binding):** [architecture/SPARK_INTELLIGENCE_BLUEPRINT.md](./architecture/SPARK_INTELLIGENCE_BLUEPRINT.md) — SPARK™, FLAME™, FIRE™, Founder Studio™, Companion™, PostCraft™, Team Hub™, GoHighLevel, and the Intelligence Pipeline™. All ecosystem features must align with this blueprint before implementation.
+
 This index lists **binding architecture documents** for conversation, creation, and the Estate. Implementation specs (105–119), Wisdom Layer (120–131), and Estate canon are authoritative in their own domains — this index covers the **orchestration stack** added in 2026-07.
 
 ---
@@ -65,6 +67,7 @@ Full spec: [CREATION_GUIDANCE_INTELLIGENCE.md](./CREATION_GUIDANCE_INTELLIGENCE.
 
 | Document | Role |
 |----------|------|
+| [architecture/SPARK_INTELLIGENCE_BLUEPRINT.md](./architecture/SPARK_INTELLIGENCE_BLUEPRINT.md) | **Ecosystem OS** — SPARK · FLAME · FIRE · products · pipeline · design & development constitution |
 | [ADAPTIVE_CREATION_INTELLIGENCE.md](./ADAPTIVE_CREATION_INTELLIGENCE.md) | Research Create · knowledge-gap detection (sub-step of Creation Guidance) |
 | [estate/ESTATE_INTELLIGENCE_ARCHITECTURE.md](./estate/ESTATE_INTELLIGENCE_ARCHITECTURE.md) | Estate place + capability judgment |
 | [estate/UNIVERSAL_CREATION_FRAMEWORK.md](./estate/UNIVERSAL_CREATION_FRAMEWORK.md) | Universal Creation **adapter** (internal — not member-facing) |
