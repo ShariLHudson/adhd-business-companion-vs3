@@ -9,6 +9,7 @@
 | **Parent** | [Founder Master Blueprint™](./FOUNDER_MASTER_BLUEPRINT.md) — strategy and architecture |
 | **This document governs** | How Founder *feels* · what appears on screen · what never appears |
 | **Phase rule** | No new intelligence · no new architecture · no new rooms — **experience only** |
+| **V1.0** | Architecture frozen — [ARCHITECTURE_FREEZE.md](./ARCHITECTURE_FREEZE.md) · Future work: experience refinement per [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) Phase 4 |
 
 > **Before designing or building any Founder screen, read this document.**
 

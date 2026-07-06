@@ -9,6 +9,7 @@
 | **Supersedes** | Feature-first thinking · dashboard thinking · “just add a module” thinking |
 | **Does not replace** | Spark Estate Constitution · Relationship Constitution · Intelligence Registry (engineering) |
 | **When in conflict** | This document wins on *why* and *experience*; canon wins on *Estate places*; registry wins on *data shapes* |
+| **V1.0** | Architecture frozen — [FOUNDER_V1.md](./FOUNDER_V1.md) · [ARCHITECTURE_FREEZE.md](./ARCHITECTURE_FREEZE.md) |
 
 > **Read this before building anything in Founder.**
 

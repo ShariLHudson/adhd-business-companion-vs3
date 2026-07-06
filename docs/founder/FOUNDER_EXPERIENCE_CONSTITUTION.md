@@ -9,6 +9,7 @@
 | **Supersedes** | Implementation convenience · feature requests · trends · “how other apps do it” |
 | **When in conflict** | **This Constitution wins.** Change the implementation — not these principles. |
 | **Siblings** | [Founder Master Blueprint™](./FOUNDER_MASTER_BLUEPRINT.md) · [Founder Experience Manifesto™](./FOUNDER_EXPERIENCE_MANIFESTO.md) · [Executive Execution System™](./EXECUTIVE_EXECUTION_SYSTEM.md) · [Learning Organization System™](./LEARNING_ORGANIZATION_SYSTEM.md) |
+| **V1.0** | Architecture frozen — [FOUNDER_V1.md](./FOUNDER_V1.md) · [ARCHITECTURE_FREEZE.md](./ARCHITECTURE_FREEZE.md) · [FOUNDER_DESIGN_PRINCIPLES.md](./FOUNDER_DESIGN_PRINCIPLES.md) |
 
 > **If any implementation conflicts with this Constitution, the Constitution wins.**
 

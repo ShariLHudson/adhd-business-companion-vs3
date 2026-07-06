@@ -8,6 +8,7 @@
 | **Route** | `/companion/founder/executive-research` |
 | **Authority** | [Founder Experience Constitution™](./FOUNDER_EXPERIENCE_CONSTITUTION.md) · [Executive Execution System™](./EXECUTIVE_EXECUTION_SYSTEM.md) |
 | **Engine** | `lib/research/` · Bridge: `lib/founder/services/researchBridge.ts` |
+| **V1.0** | Sprint 1 architecture complete — live data per [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) Phase 1–3 |
 
 > **Not Google. Not ChatGPT. A research department that understands Visual Spark Studios.**
 

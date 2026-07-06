@@ -9,6 +9,7 @@
 | **Parents** | [Founder Master Blueprint™](./FOUNDER_MASTER_BLUEPRINT.md) · [Founder Experience Manifesto™](./FOUNDER_EXPERIENCE_MANIFESTO.md) |
 | **Activates** | Executive Operating System™ · Executive Orchestrator™ · Decision Lifecycle™ · Institutional Memory™ |
 | **Phase rule** | Complete executive workflow — not isolated features |
+| **V1.0** | Architecture frozen — implementation per [IMPLEMENTATION_ROADMAP.md](./IMPLEMENTATION_ROADMAP.md) · [FOUNDER_ARCHITECTURE_SUMMARY.md](./FOUNDER_ARCHITECTURE_SUMMARY.md) |
 
 > **Founder does not simply recommend work. Founder prepares, coordinates, monitors, and improves every initiative until it is complete.**
 
