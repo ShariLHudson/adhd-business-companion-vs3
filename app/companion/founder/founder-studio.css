@@ -6381,3 +6381,205 @@
   font-size: 0.9rem;
   cursor: pointer;
 }
+
+/* Executive Judgment Engine™ */
+.founder-judgment {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.founder-judgment__section-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.2rem, 2.4vw, 1.45rem);
+  font-weight: 600;
+  color: var(--founder-purple, #b8a0d8);
+}
+
+.founder-judgment__lead,
+.founder-judgment__prose {
+  margin: 0 0 0.75rem;
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+
+.founder-judgment__muted {
+  color: var(--founder-muted);
+  font-style: italic;
+}
+
+.founder-judgment__meta {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  color: var(--founder-muted);
+  font-style: italic;
+}
+
+.founder-judgment__title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.35rem, 2.8vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.founder-judgment__primary-preview {
+  padding: 1rem 1.1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(184, 160, 216, 0.35);
+  background: rgba(184, 160, 216, 0.08);
+  margin-bottom: 1rem;
+}
+
+.founder-judgment__preview-headline {
+  margin: 0 0 0.5rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.founder-judgment__score-badge {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--founder-gold);
+}
+
+.founder-judgment__primary-button {
+  padding: 0.8rem 1.35rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(184, 160, 216, 0.45);
+  background: rgba(184, 160, 216, 0.12);
+  color: var(--founder-text);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.founder-judgment__back {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--founder-aqua);
+  cursor: pointer;
+  font-size: 0.98rem;
+}
+
+.founder-judgment__card-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.85rem;
+}
+
+.founder-judgment__card {
+  width: 100%;
+  text-align: left;
+  padding: 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(184, 160, 216, 0.22);
+  background: rgba(12, 28, 36, 0.45);
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  cursor: pointer;
+  color: inherit;
+}
+
+.founder-judgment__card-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--founder-gold);
+}
+
+.founder-judgment__card-headline {
+  font-size: 1.08rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.founder-judgment__card-why {
+  font-size: 0.95rem;
+  color: var(--founder-muted);
+  line-height: 1.4;
+}
+
+.founder-judgment__card-meta {
+  font-size: 0.8rem;
+  color: rgba(244, 247, 248, 0.72);
+}
+
+.founder-judgment__why-not {
+  padding: 1rem 1.1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(184, 160, 216, 0.2);
+  background: rgba(12, 28, 36, 0.35);
+  margin-bottom: 1rem;
+}
+
+.founder-judgment__kind {
+  font-size: 0.85rem;
+  color: var(--founder-aqua);
+  font-style: italic;
+}
+
+.founder-judgment__discipline {
+  padding: 1rem 1.1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(245, 193, 108, 0.35);
+  background: rgba(245, 193, 108, 0.06);
+  margin-bottom: 1rem;
+}
+
+.founder-judgment__subhead {
+  margin: 0.75rem 0 0.35rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--founder-aqua);
+}
+
+.founder-judgment__metrics,
+.founder-judgment__bullets,
+.founder-judgment__score-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.founder-judgment__metrics {
+  list-style: none;
+  padding-left: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.founder-judgment__prep-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.founder-judgment__prep-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(184, 160, 216, 0.12);
+}
+
+.founder-judgment__prep-label {
+  font-weight: 600;
+}
+
+.founder-judgment__prep-desc {
+  grid-column: 1 / -1;
+  font-size: 0.95rem;
+  color: var(--founder-muted);
+}
+
+.founder-judgment__prep-status {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--founder-purple, #b8a0d8);
+}

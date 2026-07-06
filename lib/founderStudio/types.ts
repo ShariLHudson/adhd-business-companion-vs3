@@ -35,6 +35,7 @@ export type FounderRoomId =
   | "executive-relationship-intelligence"
   | "executive-discovery-engine"
   | "executive-integration-center"
+  | "executive-judgment-engine"
   | "decision-vault";
 
 export type FounderRoomMeta = {

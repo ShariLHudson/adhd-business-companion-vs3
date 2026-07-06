@@ -183,6 +183,15 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
     accent: "bronze",
   },
   {
+    id: "executive-judgment-engine",
+    href: `${FOUNDER_STUDIO_BASE}/executive-judgment-engine`,
+    title: "Executive Judgment Engine™",
+    question: "What would I recommend today?",
+    purpose:
+      "The executive brain — everything competes, judgment decides what deserves attention. Wisdom before Founder speaks.",
+    accent: "purple",
+  },
+  {
     id: "decision-vault",
     href: `${FOUNDER_STUDIO_BASE}/decision-vault`,
     title: "Decision Vault™",
