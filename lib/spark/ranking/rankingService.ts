@@ -8,6 +8,10 @@ export class RankingService {
       return bScore - aScore;
     });
   }
+
+  rankByConfidence<T extends { confidence: { score: number } }>(items: T[]): T[] {
+    return [...items].sort((a, b) => b.confidence.score - a.confidence.score);
+  }
 }
 
 export const rankingService = new RankingService();

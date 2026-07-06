@@ -8,7 +8,7 @@ const SEVERITY_ORDER: Record<SparkRisk["severity"], number> = {
   low: 1,
 };
 
-export class RiskService {
+export class SparkRiskService {
   constructor(private readonly repo: SparkSampleRepository = sparkSampleRepository) {}
 
   listRisks(): SparkRisk[] {
@@ -18,4 +18,7 @@ export class RiskService {
   }
 }
 
-export const riskService = new RiskService();
+export const sparkRiskService = new SparkRiskService();
+
+/** @deprecated Use sparkRiskService */
+export const riskService = sparkRiskService;

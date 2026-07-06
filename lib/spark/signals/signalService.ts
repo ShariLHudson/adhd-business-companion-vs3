@@ -2,7 +2,7 @@ import type { SparkSignal } from "../types";
 import type { SparkSampleRepository } from "../repositories";
 import { sparkSampleRepository } from "../repositories";
 
-export class SignalService {
+export class SparkSignalService {
   constructor(private readonly repo: SparkSampleRepository = sparkSampleRepository) {}
 
   listSignals(): SparkSignal[] {
@@ -18,4 +18,7 @@ export class SignalService {
   }
 }
 
-export const signalService = new SignalService();
+export const sparkSignalService = new SparkSignalService();
+
+/** @deprecated Use sparkSignalService */
+export const signalService = sparkSignalService;

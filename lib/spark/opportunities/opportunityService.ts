@@ -3,12 +3,15 @@ import type { SparkSampleRepository } from "../repositories";
 import { sparkSampleRepository } from "../repositories";
 import { rankingService } from "../ranking/rankingService";
 
-export class OpportunityService {
+export class SparkOpportunityService {
   constructor(private readonly repo: SparkSampleRepository = sparkSampleRepository) {}
 
   listOpportunities(): SparkOpportunity[] {
-    return rankingService.rankByComposite(this.repo.opportunities());
+    return rankingService.rankByConfidence(this.repo.opportunities());
   }
 }
 
-export const opportunityService = new OpportunityService();
+export const sparkOpportunityService = new SparkOpportunityService();
+
+/** @deprecated Use sparkOpportunityService */
+export const opportunityService = sparkOpportunityService;

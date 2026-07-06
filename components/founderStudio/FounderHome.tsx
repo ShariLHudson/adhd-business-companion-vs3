@@ -1,29 +1,30 @@
 import { getFireExecutivePortfolio } from "@/lib/founder/briefs/firePortfolio";
-import { prepareOffice } from "@/lib/founder/concierge/services";
+import { composeFounderDailyWorkflow } from "@/lib/founder/dailyWorkflow";
 
 import { ConciergeAgenda } from "./concierge/ConciergeAgenda";
-import { ConciergeCard } from "./concierge/ConciergeCard";
 import { ConciergeReminders } from "./concierge/ConciergeReminders";
 import { ConciergeThinkingSpace } from "./concierge/ConciergeThinkingSpace";
 import { ConciergeWorkspaceSuggestion } from "./concierge/ConciergeWorkspaceSuggestion";
 import { FlameMentorPresence } from "./flame/FlameMentorPresence";
+import { MissionWorkspaceShell } from "./missions/MissionWorkspaceShell";
 import { FireExecutivePortfolioView } from "./fire/FireExecutivePortfolioView";
 import { FounderWorkspaceCards } from "./FounderWorkspaceCards";
 
 export function FounderHome() {
-  const office = prepareOffice();
+  const workflow = composeFounderDailyWorkflow();
+  const { office } = workflow;
   const portfolio = getFireExecutivePortfolio();
 
   return (
     <div className="founder-home">
       <header className="founder-home__hero">
         <p className="founder-home__eyebrow">Executive Office</p>
-        <h1 className="founder-home__greeting">{office.greeting}</h1>
+        <h1 className="founder-home__greeting">{workflow.greeting}</h1>
       </header>
 
-      <FlameMentorPresence />
+      <MissionWorkspaceShell />
 
-      <ConciergeCard message={office.primaryMessage} />
+      <FlameMentorPresence />
 
       <div className="founder-concierge-office__row">
         <ConciergeWorkspaceSuggestion suggestion={office.workspaceSuggestion} />
@@ -42,5 +43,5 @@ export function FounderHome() {
 
 /** Drawer sections for shell — loaded through ConciergeService. */
 export function getFounderConciergeDrawerSections() {
-  return prepareOffice().drawer;
+  return composeFounderDailyWorkflow().office.drawer;
 }

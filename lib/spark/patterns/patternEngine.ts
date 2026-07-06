@@ -2,7 +2,7 @@ import type { SparkConnection, SparkPattern, SparkSignal, SparkTheme } from "../
 import type { SparkSampleRepository } from "../repositories";
 import { sparkSampleRepository } from "../repositories";
 
-export class PatternEngine {
+export class SparkPatternService {
   constructor(private readonly repo: SparkSampleRepository = sparkSampleRepository) {}
 
   findPatterns(): SparkPattern[] {
@@ -22,15 +22,9 @@ export class PatternEngine {
   }
 
   detectRelationships(pattern: SparkPattern): SparkConnection[] {
-    return pattern.signalIds.map((signalId, index) => ({
-      id: `rel-${pattern.id}-${index}`,
-      fromKind: "signal" as const,
-      fromId: signalId,
-      toKind: "pattern" as const,
-      toId: pattern.id,
-      relationship: "supports" as const,
-      notedAt: pattern.detectedAt,
-    }));
+    return this.repo
+      .connections()
+      .filter((c) => c.toId === pattern.id || pattern.signalIds.includes(c.fromId));
   }
 
   identifyThemes(): SparkTheme[] {
@@ -39,10 +33,11 @@ export class PatternEngine {
 
   rankImportance(patterns?: SparkPattern[]): SparkPattern[] {
     const list = patterns ?? this.repo.patterns();
-    return [...list].sort(
-      (a, b) => b.confidence.score - a.confidence.score,
-    );
+    return [...list].sort((a, b) => b.confidence.score - a.confidence.score);
   }
 }
 
-export const patternEngine = new PatternEngine();
+export const sparkPatternService = new SparkPatternService();
+
+/** @deprecated Use sparkPatternService */
+export const patternEngine = sparkPatternService;

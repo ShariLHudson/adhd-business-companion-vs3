@@ -2,7 +2,7 @@ import type { SparkMemoryReference } from "../types";
 import type { SparkSampleRepository } from "../repositories";
 import { sparkSampleRepository } from "../repositories";
 
-export class MemoryReferenceService {
+export class SparkMemoryReferenceService {
   constructor(private readonly repo: SparkSampleRepository = sparkSampleRepository) {}
 
   listReferences(): SparkMemoryReference[] {
@@ -16,4 +16,7 @@ export class MemoryReferenceService {
   }
 }
 
-export const memoryReferenceService = new MemoryReferenceService();
+export const sparkMemoryReferenceService = new SparkMemoryReferenceService();
+
+/** @deprecated Use sparkMemoryReferenceService */
+export const memoryReferenceService = sparkMemoryReferenceService;

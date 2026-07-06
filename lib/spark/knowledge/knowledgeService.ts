@@ -1,8 +1,8 @@
-import type { SparkKnowledgeGraph } from "../types";
+import type { SparkKnowledgeGraph, SparkKnowledgeItem } from "../types";
 import type { SparkSampleRepository } from "../repositories";
 import { sparkSampleRepository } from "../repositories";
 
-export class KnowledgeGraph {
+export class SparkKnowledgeGraphStore {
   constructor(private readonly repo: SparkSampleRepository = sparkSampleRepository) {}
 
   getGraph(): SparkKnowledgeGraph {
@@ -29,21 +29,27 @@ export class KnowledgeGraph {
   }
 }
 
-export const knowledgeGraph = new KnowledgeGraph();
+export const sparkKnowledgeGraphStore = new SparkKnowledgeGraphStore();
 
-export class KnowledgeService {
+export class SparkKnowledgeService {
   constructor(
     private readonly repo: SparkSampleRepository = sparkSampleRepository,
-    private readonly graph: KnowledgeGraph = knowledgeGraph,
+    private readonly graphStore: SparkKnowledgeGraphStore = sparkKnowledgeGraphStore,
   ) {}
 
-  listKnowledge() {
+  getKnowledgeItems(): SparkKnowledgeItem[] {
     return this.repo.knowledge();
   }
 
   getGraph(): SparkKnowledgeGraph {
-    return this.graph.getGraph();
+    return this.graphStore.getGraph();
   }
 }
 
-export const knowledgeService = new KnowledgeService();
+export const sparkKnowledgeService = new SparkKnowledgeService();
+
+/** @deprecated Use sparkKnowledgeGraphStore */
+export const knowledgeGraph = sparkKnowledgeGraphStore;
+
+/** @deprecated Use sparkKnowledgeService */
+export const knowledgeService = sparkKnowledgeService;

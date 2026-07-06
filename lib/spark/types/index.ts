@@ -1,20 +1,18 @@
-/** SPARK™ Intelligence Core — shared ecosystem types (no UI). */
+/** SPARK™ Intelligence Core — shared ecosystem types (no UI, no Founder dependency). */
 
 export type SparkEntityKind =
   | "signal"
   | "observation"
+  | "finding"
   | "pattern"
+  | "theme"
   | "relationship"
   | "priority"
   | "recommendation"
-  | "insight"
-  | "trend"
   | "opportunity"
   | "risk"
   | "action"
   | "question"
-  | "finding"
-  | "theme"
   | "knowledge"
   | "memory";
 
@@ -22,15 +20,32 @@ export type SparkConfidenceLevel = "very-low" | "low" | "medium" | "high" | "ver
 
 export type SparkConfidence = {
   level: SparkConfidenceLevel;
+  /** Normalized 0–100 */
   score: number;
 };
 
-export type SparkSource = {
-  id: string;
-  name: string;
-  category: string;
-  productScope: "ecosystem" | "founder" | "companion" | "postcraft" | "team-hub";
-};
+export type SparkSourceCategory =
+  | "companion"
+  | "founder"
+  | "postcraft"
+  | "teamhub"
+  | "ghl"
+  | "research"
+  | "analytics"
+  | "social"
+  | "competitor"
+  | "product"
+  | "user-feedback"
+  | "development"
+  | "content"
+  | "manual-note";
+
+export type SparkProductScope =
+  | "ecosystem"
+  | "founder"
+  | "companion"
+  | "postcraft"
+  | "teamhub";
 
 export type SparkCategory =
   | "product"
@@ -41,7 +56,22 @@ export type SparkCategory =
   | "learning"
   | "innovation"
   | "relationship"
+  | "executive"
+  | "content"
   | "general";
+
+export type SparkEntityStatus = "active" | "candidate" | "archived" | "superseded";
+
+export type SparkSource = {
+  id: string;
+  sourceCategory: SparkSourceCategory;
+  title: string;
+  summary: string;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
+};
 
 export type SparkSignal = {
   id: string;
@@ -49,16 +79,44 @@ export type SparkSignal = {
   title: string;
   summary: string;
   category: SparkCategory;
-  observedAt: string;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
   confidence: SparkConfidence;
+  evidenceIds?: string[];
+  relationshipIds?: string[];
 };
 
 export type SparkObservation = {
   id: string;
   signalId: string;
+  title: string;
   summary: string;
-  recordedAt: string;
+  category: SparkCategory;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
   confidence: SparkConfidence;
+  evidenceIds?: string[];
+  relationshipIds?: string[];
+};
+
+export type SparkFinding = {
+  id: string;
+  signalId?: string;
+  sourceId?: string;
+  title: string;
+  summary: string;
+  category: SparkCategory;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
+  confidence: SparkConfidence;
+  evidenceIds?: string[];
+  relationshipIds?: string[];
 };
 
 export type SparkPattern = {
@@ -67,16 +125,40 @@ export type SparkPattern = {
   summary: string;
   themeId?: string;
   signalIds: string[];
+  findingIds?: string[];
+  category: SparkCategory;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
   confidence: SparkConfidence;
-  detectedAt: string;
+  evidenceIds?: string[];
+  relationshipIds?: string[];
+};
+
+export type SparkTheme = {
+  id: string;
+  title: string;
+  summary: string;
+  patternIds: string[];
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
 };
 
 export type SparkRelationshipKind =
   | "supports"
-  | "evolved-from"
-  | "enables"
-  | "informs"
-  | "resulted-in";
+  | "contradicts"
+  | "influences"
+  | "duplicates"
+  | "extends"
+  | "belongs_to"
+  | "generated"
+  | "derived_from"
+  | "requires"
+  | "blocks"
+  | "related_to";
 
 export type SparkConnection = {
   id: string;
@@ -85,7 +167,8 @@ export type SparkConnection = {
   toKind: SparkEntityKind;
   toId: string;
   relationship: SparkRelationshipKind;
-  notedAt: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type SparkRelationship = {
@@ -93,22 +176,27 @@ export type SparkRelationship = {
   label: string;
   chain: SparkConnection[];
   summary: string;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
 };
 
 export type SparkScoreDimension =
-  | "strategic-value"
-  | "customer-impact"
-  | "revenue-potential"
-  | "founder-importance"
-  | "product-importance"
-  | "innovation"
+  | "strategicValue"
+  | "customerImpact"
+  | "revenuePotential"
+  | "founderImportance"
+  | "productImportance"
+  | "innovationValue"
   | "urgency"
   | "confidence"
-  | "learning-value"
-  | "implementation-effort";
+  | "learningValue"
+  | "implementationEffort";
 
 export type SparkScore = {
   dimension: SparkScoreDimension;
+  /** Normalized 0–100 */
   value: number;
   weight: number;
   rationale?: string;
@@ -116,19 +204,30 @@ export type SparkScore = {
 
 export type SparkEvidence = {
   id: string;
-  label: string;
   sourceId?: string;
+  title: string;
+  summary: string;
   excerpt: string;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type SparkPriority = {
   id: string;
   title: string;
   summary: string;
+  category: SparkCategory;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
   scores: SparkScore[];
+  /** Normalized 0–100 */
   compositeScore: number;
   confidence: SparkConfidence;
   evidenceIds: string[];
+  relationshipIds?: string[];
 };
 
 export type SparkRecommendation = {
@@ -136,34 +235,30 @@ export type SparkRecommendation = {
   title: string;
   summary: string;
   priorityId?: string;
-  preparedFor: "founder" | "companion" | "postcraft" | "team-hub" | "ecosystem";
+  preparedFor: SparkProductScope;
+  category: SparkCategory;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
   confidence: SparkConfidence;
   evidenceIds: string[];
-};
-
-export type SparkInsight = {
-  id: string;
-  title: string;
-  summary: string;
-  themeId?: string;
-  confidence: SparkConfidence;
-  discoveredAt: string;
-};
-
-export type SparkTrend = {
-  id: string;
-  title: string;
-  direction: "rising" | "stable" | "emerging" | "declining";
-  summary: string;
-  confidence: SparkConfidence;
+  relationshipIds?: string[];
 };
 
 export type SparkOpportunity = {
   id: string;
   title: string;
   summary: string;
+  category: SparkCategory;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
   scores: SparkScore[];
   confidence: SparkConfidence;
+  evidenceIds?: string[];
+  relationshipIds?: string[];
 };
 
 export type SparkRisk = {
@@ -171,7 +266,14 @@ export type SparkRisk = {
   title: string;
   summary: string;
   severity: "low" | "medium" | "high";
+  category: SparkCategory;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
   confidence: SparkConfidence;
+  evidenceIds?: string[];
+  relationshipIds?: string[];
 };
 
 export type SparkAction = {
@@ -179,46 +281,51 @@ export type SparkAction = {
   title: string;
   summary: string;
   urgency: SparkScore;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
 };
 
 export type SparkQuestion = {
   id: string;
+  title: string;
+  summary: string;
   question: string;
   context: string;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
   confidence: SparkConfidence;
 };
 
-export type SparkFinding = {
-  id: string;
-  title: string;
-  summary: string;
-  category: SparkCategory;
-  signalId?: string;
-  confidence: SparkConfidence;
-};
-
-export type SparkTheme = {
-  id: string;
-  title: string;
-  summary: string;
-  patternIds: string[];
-};
-
-export type SparkKnowledge = {
+export type SparkKnowledgeItem = {
   id: string;
   title: string;
   summary: string;
   category: SparkCategory;
   sourceId?: string;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
+  status: SparkEntityStatus;
   memoryRefIds: string[];
+  relationshipIds?: string[];
 };
+
+/** @deprecated Use SparkKnowledgeItem */
+export type SparkKnowledge = SparkKnowledgeItem;
 
 export type SparkMemoryReference = {
   id: string;
   kind: SparkEntityKind;
   entityId: string;
-  label: string;
-  productScope: SparkSource["productScope"];
+  title: string;
+  summary: string;
+  productScope: SparkProductScope;
+  tags?: string[];
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type SparkGraphNode = {
@@ -239,28 +346,38 @@ export type SparkKnowledgeGraph = {
   edges: SparkGraphEdge[];
 };
 
+export type SparkPrepareContext = {
+  product: SparkProductScope;
+  limit?: number;
+};
+
+export type SparkOverview = {
+  headline: string;
+  sourceCount: number;
+  signalCount: number;
+  observationCount: number;
+  findingCount: number;
+  patternCount: number;
+  priorityCount: number;
+  recommendationCount: number;
+  topPatternTitle?: string;
+  topPriorityTitle?: string;
+  preparedAt: string;
+};
+
 export type SparkIntelligenceBundle = {
+  sources: SparkSource[];
   signals: SparkSignal[];
   observations: SparkObservation[];
+  findings: SparkFinding[];
   patterns: SparkPattern[];
   themes: SparkTheme[];
   priorities: SparkPriority[];
   recommendations: SparkRecommendation[];
   opportunities: SparkOpportunity[];
   risks: SparkRisk[];
-  knowledge: SparkKnowledge[];
+  knowledge: SparkKnowledgeItem[];
   graph: SparkKnowledgeGraph;
 };
 
-export type SparkPrepareContext = {
-  product: SparkSource["productScope"];
-  limit?: number;
-};
-
-export type SparkSummary = {
-  headline: string;
-  observationCount: number;
-  patternCount: number;
-  topPriorityTitle?: string;
-  preparedAt: string;
-};
+export type SparkSummary = SparkOverview;

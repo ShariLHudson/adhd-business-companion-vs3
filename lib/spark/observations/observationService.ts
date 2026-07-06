@@ -2,7 +2,7 @@ import type { SparkObservation } from "../types";
 import type { SparkSampleRepository } from "../repositories";
 import { sparkSampleRepository } from "../repositories";
 
-export class ObservationService {
+export class SparkObservationService {
   constructor(private readonly repo: SparkSampleRepository = sparkSampleRepository) {}
 
   listObservations(): SparkObservation[] {
@@ -14,4 +14,7 @@ export class ObservationService {
   }
 }
 
-export const observationService = new ObservationService();
+export const sparkObservationService = new SparkObservationService();
+
+/** @deprecated Use sparkObservationService */
+export const observationService = sparkObservationService;

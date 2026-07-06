@@ -3,7 +3,7 @@ import type { SparkSampleRepository } from "../repositories";
 import { sparkSampleRepository } from "../repositories";
 import { rankingService } from "../ranking/rankingService";
 
-export class PriorityService {
+export class SparkPriorityService {
   constructor(private readonly repo: SparkSampleRepository = sparkSampleRepository) {}
 
   listPriorities(): SparkPriority[] {
@@ -19,4 +19,7 @@ export class PriorityService {
   }
 }
 
-export const priorityService = new PriorityService();
+export const sparkPriorityService = new SparkPriorityService();
+
+/** @deprecated Use sparkPriorityService */
+export const priorityService = sparkPriorityService;

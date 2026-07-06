@@ -1,96 +1,134 @@
 import type {
   SparkConnection,
   SparkIntelligenceBundle,
+  SparkOverview,
+  SparkPattern,
   SparkPrepareContext,
-  SparkSummary,
 } from "../types";
-import { observationService } from "../observations/observationService";
-import { patternEngine } from "../patterns/patternEngine";
-import { priorityService } from "../priorities/priorityService";
-import { recommendationPreparationService } from "../recommendations/recommendationPreparationService";
-import { knowledgeGraph } from "../knowledge/knowledgeService";
-import { relationshipService } from "../relationships/relationshipEngine";
-import { scoringEngine, type SparkScoringInput } from "../scoring/scoringEngine";
-import { signalService } from "../signals/signalService";
-import { opportunityService } from "../opportunities/opportunityService";
-import { riskService } from "../risks/riskService";
-import { knowledgeService } from "../knowledge/knowledgeService";
+import { sparkObservationService } from "../observations/observationService";
+import { sparkPatternService } from "../patterns/patternEngine";
+import { sparkPriorityService } from "../priorities/priorityService";
+import { sparkRecommendationService } from "../recommendations/recommendationPreparationService";
+import { sparkKnowledgeGraphStore } from "../knowledge/knowledgeService";
+import { sparkRelationshipService } from "../relationships/relationshipEngine";
+import { sparkScoringService, type SparkScoringInput } from "../scoring/scoringEngine";
+import { sparkSignalService } from "../signals/signalService";
+import { sparkOpportunityService } from "../opportunities/opportunityService";
+import { sparkRiskService } from "../risks/riskService";
+import { sparkKnowledgeService } from "../knowledge/knowledgeService";
+import { sparkFindingService } from "../findings/findingService";
+import { sparkSampleRepository } from "../repositories";
 
 export type SparkObserveResult = {
-  signals: ReturnType<typeof signalService.listSignals>;
-  observations: ReturnType<typeof observationService.listObservations>;
-  patterns: ReturnType<typeof patternEngine.findPatterns>;
-  themes: ReturnType<typeof patternEngine.identifyThemes>;
+  sources: ReturnType<typeof sparkSampleRepository.sources>;
+  signals: ReturnType<typeof sparkSignalService.listSignals>;
+  observations: ReturnType<typeof sparkObservationService.listObservations>;
+  findings: ReturnType<typeof sparkFindingService.listFindings>;
+  patterns: ReturnType<typeof sparkPatternService.findPatterns>;
+  themes: ReturnType<typeof sparkPatternService.identifyThemes>;
 };
 
 export type SparkConnectResult = {
-  lineage: ReturnType<typeof relationshipService.buildLineageRelationship>;
-  graph: ReturnType<typeof knowledgeGraph.getGraph>;
+  lineage: ReturnType<typeof sparkRelationshipService.buildLineageRelationship>;
+  graph: ReturnType<typeof sparkKnowledgeGraphStore.getGraph>;
+  connections: ReturnType<typeof sparkRelationshipService.listConnections>;
 };
 
 export type SparkPrepareResult = {
-  recommendations: ReturnType<typeof recommendationPreparationService.prepare>;
-  priorities: ReturnType<typeof priorityService.topPriorities>;
-  opportunities: ReturnType<typeof opportunityService.listOpportunities>;
-  risks: ReturnType<typeof riskService.listRisks>;
+  recommendations: ReturnType<typeof sparkRecommendationService.prepare>;
+  priorities: ReturnType<typeof sparkPriorityService.topPriorities>;
+  opportunities: ReturnType<typeof sparkOpportunityService.listOpportunities>;
+  risks: ReturnType<typeof sparkRiskService.listRisks>;
 };
 
 /**
- * SPARK™ public API — ecosystem intelligence OS.
- * No UI. No product-specific logic. Consumed by Companion, Founder, PostCraft, Team Hub, FLAME, FIRE.
+ * SPARK™ public API — Strategic Pattern Analysis & Recommendation Kernel™
+ * No UI. No AI. No product-specific logic.
  */
 export const Spark = {
   observe(): SparkObserveResult {
     return {
-      signals: signalService.listSignals(),
-      observations: observationService.listObservations(),
-      patterns: patternEngine.findPatterns(),
-      themes: patternEngine.identifyThemes(),
+      sources: sparkSampleRepository.sources(),
+      signals: sparkSignalService.listSignals(),
+      observations: sparkObservationService.listObservations(),
+      findings: sparkFindingService.listFindings(),
+      patterns: sparkPatternService.findPatterns(),
+      themes: sparkPatternService.identifyThemes(),
     };
   },
 
   score(input: SparkScoringInput) {
-    return scoringEngine.score(input);
+    return sparkScoringService.score(input);
   },
 
   prioritize(limit = 5) {
-    return priorityService.topPriorities(limit);
+    return sparkPriorityService.topPriorities(limit);
   },
 
   connect(nodeId?: string): SparkConnectResult {
     return {
-      lineage: relationshipService.buildLineageRelationship(),
-      graph: nodeId ? knowledgeGraph.neighbors(nodeId) : knowledgeGraph.getGraph(),
+      lineage: sparkRelationshipService.buildLineageRelationship(),
+      graph: nodeId
+        ? sparkKnowledgeGraphStore.neighbors(nodeId)
+        : sparkKnowledgeGraphStore.getGraph(),
+      connections: sparkRelationshipService.listConnections(),
     };
   },
 
-  connectEntities(connection: Omit<SparkConnection, "id" | "notedAt">): SparkConnection {
-    return {
-      ...connection,
-      id: `conn-${Date.now()}`,
-      notedAt: new Date().toISOString(),
-    };
+  connectEntities(
+    connection: Omit<SparkConnection, "id" | "createdAt" | "updatedAt">,
+  ): SparkConnection {
+    const now = new Date().toISOString();
+    return { ...connection, id: `conn-${Date.now()}`, createdAt: now, updatedAt: now };
   },
 
   prepare(context: SparkPrepareContext = { product: "ecosystem" }): SparkPrepareResult {
     return {
-      recommendations: recommendationPreparationService.prepare(context),
-      priorities: priorityService.topPriorities(context.limit ?? 5),
-      opportunities: opportunityService.listOpportunities(),
-      risks: riskService.listRisks(),
+      recommendations: sparkRecommendationService.prepare(context),
+      priorities: sparkPriorityService.topPriorities(context.limit ?? 5),
+      opportunities: sparkOpportunityService.listOpportunities(),
+      risks: sparkRiskService.listRisks(),
     };
   },
 
-  summarize(): SparkSummary {
+  prepareRecommendations(context: SparkPrepareContext = { product: "ecosystem" }) {
+    return sparkRecommendationService.prepare(context);
+  },
+
+  findPatterns(): SparkPattern[] {
+    return sparkPatternService.findPatterns();
+  },
+
+  getKnowledgeItems() {
+    return sparkKnowledgeService.getKnowledgeItems();
+  },
+
+  getSparkOverview(context: SparkPrepareContext = { product: "ecosystem" }): SparkOverview {
     const observed = this.observe();
-    const top = priorityService.topPriorities(1)[0];
+    const patterns = sparkPatternService.rankImportance();
+    const priorities = sparkPriorityService.topPriorities(1);
+    const recommendations = sparkRecommendationService.prepare({
+      ...context,
+      limit: context.limit ?? 10,
+    });
     return {
-      headline: "SPARK intelligence snapshot",
+      headline: "SPARK™ ecosystem intelligence overview",
+      sourceCount: observed.sources.length,
+      signalCount: observed.signals.length,
       observationCount: observed.observations.length,
+      findingCount: observed.findings.length,
       patternCount: observed.patterns.length,
-      topPriorityTitle: top?.title,
+      priorityCount: sparkPriorityService.listPriorities().length,
+      recommendationCount: recommendations.length,
+      topPatternTitle: patterns[0]?.title,
+      topPriorityTitle: priorities[0]?.title,
       preparedAt: new Date().toISOString(),
     };
+  },
+
+  /** @deprecated Use getSparkOverview */
+  summarize(): SparkOverview {
+    return this.getSparkOverview();
   },
 
   bundle(): SparkIntelligenceBundle {
@@ -98,15 +136,17 @@ export const Spark = {
     const prepared = this.prepare();
     const connected = this.connect();
     return {
+      sources: observed.sources,
       signals: observed.signals,
       observations: observed.observations,
+      findings: observed.findings,
       patterns: observed.patterns,
       themes: observed.themes,
       priorities: prepared.priorities,
       recommendations: prepared.recommendations,
       opportunities: prepared.opportunities,
       risks: prepared.risks,
-      knowledge: knowledgeService.listKnowledge(),
+      knowledge: sparkKnowledgeService.getKnowledgeItems(),
       graph: connected.graph,
     };
   },

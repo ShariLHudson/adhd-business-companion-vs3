@@ -1,6 +1,6 @@
 import type { SparkScoreDimension } from "../types";
 
-/** Configurable scoring dimensions — weights sum to 1.0 by default. */
+/** Configurable scoring dimensions — weights sum to 1.0 by default. Values are 0–100. */
 export const SPARK_SCORE_DIMENSIONS: readonly {
   dimension: SparkScoreDimension;
   label: string;
@@ -8,38 +8,38 @@ export const SPARK_SCORE_DIMENSIONS: readonly {
   description: string;
 }[] = [
   {
-    dimension: "strategic-value",
+    dimension: "strategicValue",
     label: "Strategic Value",
     defaultWeight: 0.14,
     description: "Long-term ecosystem positioning",
   },
   {
-    dimension: "customer-impact",
+    dimension: "customerImpact",
     label: "Customer Impact",
     defaultWeight: 0.14,
     description: "Member outcome and relationship quality",
   },
   {
-    dimension: "revenue-potential",
+    dimension: "revenuePotential",
     label: "Revenue Potential",
     defaultWeight: 0.1,
     description: "Monetization and growth upside",
   },
   {
-    dimension: "founder-importance",
+    dimension: "founderImportance",
     label: "Founder Importance",
     defaultWeight: 0.1,
     description: "Executive leverage for Shari",
   },
   {
-    dimension: "product-importance",
+    dimension: "productImportance",
     label: "Product Importance",
     defaultWeight: 0.12,
     description: "Core product integrity",
   },
   {
-    dimension: "innovation",
-    label: "Innovation",
+    dimension: "innovationValue",
+    label: "Innovation Value",
     defaultWeight: 0.08,
     description: "Novel capability or differentiation",
   },
@@ -56,13 +56,13 @@ export const SPARK_SCORE_DIMENSIONS: readonly {
     description: "Evidence strength",
   },
   {
-    dimension: "learning-value",
+    dimension: "learningValue",
     label: "Learning Value",
     defaultWeight: 0.08,
     description: "Institutional knowledge gained",
   },
   {
-    dimension: "implementation-effort",
+    dimension: "implementationEffort",
     label: "Implementation Effort",
     defaultWeight: 0.06,
     description: "Cost to execute (lower effort scores higher when inverted)",
