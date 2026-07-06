@@ -9,11 +9,7 @@ import {
 } from "react";
 
 import { CompanionAuthGate } from "@/components/companion/CompanionAuthGate";
-import {
-  ESTATE_WORKSPACE_LOAD_RECOVERY,
-  logCompanionSystemFailure,
-  routeCompanionFailure,
-} from "@/lib/companionContextRouting";
+import { ESTATE_WORKSPACE_LOAD_RECOVERY } from "@/lib/companionContextRouting/workspaceLoadRecovery";
 
 const LOADING = (
   <main className="flex min-h-dvh items-center justify-center bg-[#f5f0e8] text-[#6b635a]">
@@ -23,6 +19,22 @@ const LOADING = (
 
 /** Warm the home shell as soon as this module loads. */
 const companionPageImport = import("@/app/companion/CompanionPageClient");
+
+function logWorkspaceLoadFailure(error: Error): void {
+  void import("@/lib/companionContextRouting/routeCompanionFailure").then(
+    ({ logCompanionSystemFailure }) => {
+      logCompanionSystemFailure(error, { surface: "workspace-load" });
+    },
+  );
+}
+
+function routeWorkspaceLoadFailure(err: unknown): void {
+  void import("@/lib/companionContextRouting/routeCompanionFailure").then(
+    ({ routeCompanionFailure }) => {
+      routeCompanionFailure(err, { surface: "workspace-load" });
+    },
+  );
+}
 
 type EstateErrorBoundaryState = { hasError: boolean };
 
@@ -41,7 +53,7 @@ class EstateErrorBoundary extends Component<
   }
 
   componentDidCatch(error: Error) {
-    logCompanionSystemFailure(error, { surface: "workspace-load" });
+    logWorkspaceLoadFailure(error);
   }
 
   private handleReset = () => {
@@ -85,7 +97,7 @@ export function CompanionPageLoader() {
       })
       .catch((err: unknown) => {
         if (!cancelled) {
-          routeCompanionFailure(err, { surface: "workspace-load" });
+          routeWorkspaceLoadFailure(err);
           setLoadFailed(true);
         }
       });

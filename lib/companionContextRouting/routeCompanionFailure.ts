@@ -87,9 +87,4 @@ export function routeCompanionFailure(
   };
 }
 
-/** Estate copy for workspace shell load — never raw fetch/build text. */
-export const ESTATE_WORKSPACE_LOAD_RECOVERY = sanitizeEstateFacingCopy(
-  buildShariErrorRecoveryResponse(
-    "Give this one more moment, then we can continue.",
-  ),
-);
+export { ESTATE_WORKSPACE_LOAD_RECOVERY } from "./workspaceLoadRecovery";
