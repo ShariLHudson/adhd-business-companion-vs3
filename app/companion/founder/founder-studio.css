@@ -5387,3 +5387,265 @@
 .founder-memory-theater__board-item {
   margin-bottom: 0.85rem;
 }
+
+/* Executive Intelligence Graph™ */
+.founder-graph {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.founder-graph__section-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.2rem, 2.4vw, 1.45rem);
+  font-weight: 600;
+  color: var(--founder-gold);
+}
+
+.founder-graph__lead,
+.founder-graph__prose {
+  margin: 0 0 0.75rem;
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+
+.founder-graph__muted {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--founder-muted);
+}
+
+.founder-graph__entry-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.founder-graph__entry-input {
+  flex: 1 1 16rem;
+  min-width: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(48, 182, 213, 0.35);
+  background: rgba(12, 18, 22, 0.85);
+  color: var(--founder-text);
+  font-size: 1.05rem;
+}
+
+.founder-graph__run-button {
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(48, 182, 213, 0.5);
+  background: rgba(48, 182, 213, 0.18);
+  color: var(--founder-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.founder-graph__suggestions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.founder-graph__suggestion-chip {
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(48, 182, 213, 0.22);
+  background: rgba(20, 28, 32, 0.72);
+  color: var(--founder-muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.founder-graph__ecosystem-grid {
+  margin: 0 0 1rem;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+  gap: 0.65rem;
+}
+
+.founder-graph__eco-card {
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(48, 182, 213, 0.2);
+  background: rgba(20, 28, 32, 0.65);
+}
+
+.founder-graph__eco-card--strong {
+  border-color: rgba(48, 182, 213, 0.45);
+}
+
+.founder-graph__eco-card--growing {
+  border-color: rgba(245, 193, 108, 0.35);
+}
+
+.founder-graph__eco-card--needs-attention {
+  border-color: rgba(251, 146, 60, 0.4);
+}
+
+.founder-graph__eco-label {
+  display: block;
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-bottom: 0.25rem;
+}
+
+.founder-graph__eco-count {
+  font-size: 0.8rem;
+  color: var(--founder-aqua);
+}
+
+.founder-graph__eco-summary {
+  margin: 0.35rem 0 0;
+  font-size: 0.92rem;
+  color: var(--founder-muted);
+  line-height: 1.4;
+}
+
+.founder-graph__featured-link {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--founder-aqua);
+  cursor: pointer;
+  font-size: 0.95rem;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.founder-graph__back {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--founder-aqua);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.founder-graph__meta {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--founder-aqua);
+}
+
+.founder-graph__title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.35rem, 2.8vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.founder-graph__idk,
+.founder-graph__discovery {
+  padding: 1rem 1.1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(245, 193, 108, 0.3);
+  background: rgba(245, 193, 108, 0.05);
+  margin-bottom: 1rem;
+}
+
+.founder-graph__insight-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.founder-graph__insight-card {
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(48, 182, 213, 0.12);
+}
+
+.founder-graph__insight-kind {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--founder-aqua);
+  margin-bottom: 0.25rem;
+}
+
+.founder-graph__node-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  gap: 0.75rem;
+}
+
+.founder-graph__node-card {
+  width: 100%;
+  text-align: left;
+  padding: 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(48, 182, 213, 0.22);
+  background: rgba(20, 28, 32, 0.72);
+  color: var(--founder-text);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: border-color 0.2s ease;
+}
+
+.founder-graph__node-card:hover {
+  border-color: rgba(48, 182, 213, 0.45);
+}
+
+.founder-graph__node-kind {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--founder-aqua);
+}
+
+.founder-graph__node-title {
+  font-size: 1.08rem;
+  font-weight: 600;
+}
+
+.founder-graph__node-summary {
+  font-size: 0.92rem;
+  color: var(--founder-muted);
+  line-height: 1.4;
+}
+
+.founder-graph__node-meta {
+  font-size: 0.8rem;
+  color: rgba(244, 247, 248, 0.7);
+}
+
+.founder-graph__subhead {
+  margin: 0.75rem 0 0.35rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--founder-aqua);
+}
+
+.founder-graph__bullets,
+.founder-graph__rels,
+.founder-graph__pathway,
+.founder-graph__board {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.founder-graph__board-item {
+  margin-bottom: 0.85rem;
+}

@@ -147,6 +147,15 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
     accent: "purple",
   },
   {
+    id: "executive-intelligence-graph",
+    href: `${FOUNDER_STUDIO_BASE}/executive-intelligence-graph`,
+    title: "Executive Intelligence Graph™",
+    question: "How is everything connected?",
+    purpose:
+      "The living brain — relationships, not folders. Every product, decision, and idea linked into intelligence.",
+    accent: "aqua",
+  },
+  {
     id: "decision-vault",
     href: `${FOUNDER_STUDIO_BASE}/decision-vault`,
     title: "Decision Vault™",

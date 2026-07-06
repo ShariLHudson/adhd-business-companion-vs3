@@ -31,6 +31,7 @@ export type FounderRoomId =
   | "executive-builder"
   | "executive-simulation"
   | "executive-memory-theater"
+  | "executive-intelligence-graph"
   | "decision-vault";
 
 export type FounderRoomMeta = {
