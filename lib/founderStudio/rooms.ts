@@ -92,6 +92,24 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
       "Signals, timeline, and inbox — the pipeline every future engine feeds.",
     accent: "teal",
   },
+  {
+    id: "executive-strategy",
+    href: `${FOUNDER_STUDIO_BASE}/executive-strategy`,
+    title: "Executive Strategy Center™",
+    question: "What deserves your clearest thinking?",
+    purpose:
+      "Visual thinking for decisions, roadmaps, and leadership — not execution.",
+    accent: "gold",
+  },
+  {
+    id: "decision-vault",
+    href: `${FOUNDER_STUDIO_BASE}/decision-vault`,
+    title: "Decision Vault™",
+    question: "What did we decide — and why?",
+    purpose:
+      "Institutional memory — decisions, lessons, milestones, and the company story.",
+    accent: "bronze",
+  },
 ];
 
 export function getFounderRoom(id: string): FounderRoomMeta | undefined {

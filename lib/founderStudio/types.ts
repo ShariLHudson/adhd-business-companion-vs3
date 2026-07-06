@@ -24,7 +24,9 @@ export type FounderRoomId =
   | "creation-studio"
   | "automation-studio"
   | "team-hub"
-  | "executive-intelligence";
+  | "executive-intelligence"
+  | "executive-strategy"
+  | "decision-vault";
 
 export type FounderRoomMeta = {
   id: FounderRoomId;
