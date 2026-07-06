@@ -8,6 +8,7 @@ import { ESTATE_ROOM_BG } from "@/lib/estate/estateRoomAssets";
 import type { EstateCollectionRoomId } from "@/lib/estate/collectionFramework/types";
 import type { EstateGuideSpreadData } from "@/lib/estate/estateGuideEditorial";
 import { POSSIBILITY_HOUSE_GUIDE_CHAPTERS } from "./estateGuideSpreads/possibilityHouseSection";
+import { OCEAN_CONSERVATORY_GUIDE_SPREAD } from "./estateGuideSpreads/oceanConservatory";
 
 export type { EstateGuideSpreadData } from "@/lib/estate/estateGuideEditorial";
 export {
@@ -780,99 +781,6 @@ export const ESTATE_GUIDE_SPREADS: readonly EstateGuideSpreadData[] = [
           "It simply welcomes you home.",
           "And perhaps...",
           "That is the most important purpose of any home.",
-        ],
-      },
-    ],
-  },
-  {
-    id: "butterfly-conservatory",
-    title: "The Butterfly Conservatory",
-    epigraph:
-      "Some transformations are so quiet they are almost invisible.",
-    image: ESTATE_ROOM_BG.butterflyConservatory,
-    imagePlaceId: "conservatory",
-    blocks: [
-      {
-        type: "estate-journals",
-        date: "June 3, 1919",
-        paragraphs: [
-          "Miss Eleanor visited the Conservatory again today.",
-          "She has come every Tuesday for nearly six weeks.",
-          "She never brings a book.",
-          "Never sketches.",
-          "Never speaks.",
-          "Instead, she chooses the same wicker chair near the eastern windows and quietly watches the butterflies.",
-          "This afternoon one landed gently on the sleeve of her dress.",
-          "It remained there for nearly twenty minutes.",
-          "She never moved.",
-          "When it finally lifted into the air she whispered,",
-          "\"I think I'm finally ready.\"",
-          "She smiled all the way back toward the Estate.",
-          "I've long suspected the butterflies know something the rest of us don't.",
-        ],
-        attribution: ["— Samuel Hawthorne", "Head Gardener"],
-      },
-      {
-        type: "estate-history",
-        paragraphs: [
-          "The Conservatory was completed in 1918 after Lady Ashford returned from visiting the great botanical gardens of Europe.",
-          "She believed every Estate should have one place dedicated entirely to transformation.",
-          "Rather than filling it with rare plants alone, she insisted butterflies become its true caretakers.",
-          "Her reasoning was beautifully simple:",
-          "\"Nothing teaches hope quite like watching something become entirely new.\"",
-          "To this day, every flowering plant inside the Conservatory was selected not for its appearance, but because it nourishes life.",
-        ],
-      },
-      {
-        type: "estate-traditions",
-        paragraphs: [
-          "Members rarely rush through the Conservatory.",
-          "Most choose a single bench and simply sit.",
-          "Some stay five minutes.",
-          "Others remain nearly an hour.",
-          "Estate tradition says the butterfly that lands nearest you has arrived exactly when you needed it.",
-          "Whether that's true...",
-          "No one seems interested in proving otherwise.",
-        ],
-      },
-      {
-        type: "visitors-miss",
-        paragraphs: ["Look carefully..."],
-        bullets: [
-          "The oldest butterfly illustration hangs quietly above the eastern doorway.",
-          "Tiny brass butterflies are hidden throughout the stonework.",
-          "Morning light creates entirely different colors than afternoon sunlight.",
-          "During spring, one particular vine flowers for only two weeks each year.",
-        ],
-      },
-      {
-        type: "did-you-know",
-        paragraphs: [],
-        bullets: [
-          "Butterflies taste with their feet.",
-          "Some butterflies remember favorite flowers.",
-          "The Conservatory changes with every season.",
-          "No two visits are ever exactly alike.",
-          "The oldest flowering vine in the Conservatory is over 80 years old.",
-        ],
-      },
-      {
-        type: "from-shari",
-        paragraphs: [
-          "I've always loved butterflies.",
-          "Not simply because they're beautiful...",
-          "But because they remind us that transformation usually happens where no one is watching.",
-          "If you're walking through a season of change...",
-          "Stay a little longer.",
-          "Sometimes hope arrives on quiet wings.",
-        ],
-      },
-      {
-        type: "before-you-leave",
-        paragraphs: [
-          "As you walk back toward the Estate...",
-          "Ask yourself:",
-          "What part of my life is quietly becoming something new?",
         ],
       },
     ],
@@ -6426,6 +6334,7 @@ export const ESTATE_GUIDE_SPREADS: readonly EstateGuideSpreadData[] = [
       },
     ],
   },
+  OCEAN_CONSERVATORY_GUIDE_SPREAD,
   // —— The Treehouse Possibility House — dedicated section at the back of the guidebook ——
   ...POSSIBILITY_HOUSE_GUIDE_CHAPTERS,
 ];
@@ -6434,6 +6343,11 @@ const spreadById = new Map(
   ESTATE_GUIDE_SPREADS.map((spread) => [spread.id, spread]),
 );
 
+/** Legacy spread ids → current guide page. */
+const ESTATE_GUIDE_SPREAD_ALIASES: Readonly<Record<string, string>> = {
+  "butterfly-conservatory": "ocean-conservatory",
+};
+
 export function listEstateGuideSpreadIds(): string[] {
   return ESTATE_GUIDE_SPREADS.map((spread) => spread.id);
 }
@@ -6441,11 +6355,13 @@ export function listEstateGuideSpreadIds(): string[] {
 export function getEstateGuideSpread(
   id: string,
 ): EstateGuideSpreadData | undefined {
-  return spreadById.get(id);
+  const resolved = ESTATE_GUIDE_SPREAD_ALIASES[id] ?? id;
+  return spreadById.get(resolved);
 }
 
 /** Canonical place id → guide spread (when ids align or mapped). */
 const GUIDE_SPREAD_BY_PLACE_ID: Readonly<Record<string, string>> = {
+  conservatory: "ocean-conservatory",
   "house-possibility-outside": "house-possibility-outside",
   "house-possibility-studio": "house-possibility-studio",
   "house-possibility-reflection-desk": "house-possibility-reflection-desk",

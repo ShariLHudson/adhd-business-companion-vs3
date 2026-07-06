@@ -146,12 +146,14 @@ describe("estateGuideSpreads", () => {
     );
   });
 
-  it("includes butterfly conservatory with journal template blocks", () => {
+  it("resolves butterfly-conservatory alias to Ocean Conservatory spread", () => {
     const spread = getEstateGuideSpread("butterfly-conservatory");
     expect(spread).toBeDefined();
-    expect(spread!.title).toContain("Butterfly Conservatory");
-    expect(spread!.blocks[0]?.type).toBe("estate-journals");
-    expect(spread!.blocks.some((block) => block.type === "before-you-leave")).toBe(
+    expect(spread!.title).toMatch(/Ocean Conservatory/i);
+    expect(spread!.blocks.some((block) => block.type === "estate-secret")).toBe(
+      true,
+    );
+    expect(spread!.blocks.some((block) => block.type === "why-this-room-exists")).toBe(
       true,
     );
   });
@@ -436,11 +438,31 @@ describe("estateGuideSpreads", () => {
     const houseIndex = ids.indexOf("house-possibility-outside");
     const legacyIndex = ids.indexOf("house-possibility-legacy-room");
     const coffeeHouseIndex = ids.indexOf("coffee-house");
+    const oceanIndex = ids.indexOf("ocean-conservatory");
     expect(discoveryIndex).toBeGreaterThanOrEqual(0);
     expect(houseIndex).toBeGreaterThan(discoveryIndex);
     expect(coffeeHouseIndex).toBeGreaterThan(discoveryIndex);
-    expect(houseIndex).toBeGreaterThan(coffeeHouseIndex);
+    expect(oceanIndex).toBeGreaterThan(coffeeHouseIndex);
+    expect(houseIndex).toBe(oceanIndex + 1);
     expect(legacyIndex).toBe(ids.length - 1);
+  });
+
+  it("includes Ocean Conservatory guide spread before Treehouse section", () => {
+    const spread = getEstateGuideSpread("ocean-conservatory");
+    expect(spread).toBeDefined();
+    expect(spread!.title).toMatch(/Ocean Conservatory/i);
+    expect(spread!.epigraph).toMatch(/rhythm of the sea/i);
+    expect(spread!.blocks.some((block) => block.type === "why-this-room-exists")).toBe(
+      true,
+    );
+    expect(spread!.blocks.some((block) => block.type === "estate-secret")).toBe(true);
+    expect(
+      spread!.blocks.some(
+        (block) =>
+          block.type === "reflection" &&
+          block.attribution?.some((line) => /spark/i.test(line)),
+      ),
+    ).toBe(true);
   });
 
   it("orders treehouse chapters as one continuous journey", () => {
