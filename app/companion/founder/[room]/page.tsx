@@ -7,6 +7,7 @@ import { FounderExecutiveBuilder } from "@/components/founderStudio/FounderExecu
 import { FounderExecutiveSimulation } from "@/components/founderStudio/FounderExecutiveSimulation";
 import { FounderExecutiveMemoryTheater } from "@/components/founderStudio/FounderExecutiveMemoryTheater";
 import { FounderExecutiveIntelligenceGraph } from "@/components/founderStudio/FounderExecutiveIntelligenceGraph";
+import { FounderExecutiveRelationshipIntelligence } from "@/components/founderStudio/FounderExecutiveRelationshipIntelligence";
 import { FounderOpportunityDiscovery } from "@/components/founderStudio/FounderOpportunityDiscovery";
 import { FounderExecutiveResearch } from "@/components/founderStudio/FounderExecutiveResearch";
 import { FounderExecutiveStrategy } from "@/components/founderStudio/FounderExecutiveStrategy";
@@ -38,6 +39,7 @@ export function generateStaticParams() {
     { room: "executive-simulation" },
     { room: "executive-memory-theater" },
     { room: "executive-intelligence-graph" },
+    { room: "executive-relationship-intelligence" },
     { room: "decision-vault" },
   ];
 }
@@ -87,6 +89,10 @@ export default async function FounderRoomRoute({ params }: FounderRoomRouteProps
 
   if (roomId === "executive-intelligence-graph") {
     return <FounderExecutiveIntelligenceGraph />;
+  }
+
+  if (roomId === "executive-relationship-intelligence") {
+    return <FounderExecutiveRelationshipIntelligence />;
   }
 
   if (roomId === "decision-vault") {

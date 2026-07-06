@@ -156,6 +156,15 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
     accent: "aqua",
   },
   {
+    id: "executive-relationship-intelligence",
+    href: `${FOUNDER_STUDIO_BASE}/executive-relationship-intelligence`,
+    title: "Executive Relationship Intelligence™",
+    question: "What might we be missing?",
+    purpose:
+      "The discovery engine — hidden patterns, butterfly chains, and Founder Alerts that create new executive knowledge.",
+    accent: "gold",
+  },
+  {
     id: "decision-vault",
     href: `${FOUNDER_STUDIO_BASE}/decision-vault`,
     title: "Decision Vault™",
