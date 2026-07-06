@@ -288,6 +288,15 @@ export const SAMPLE_INSIGHTS: readonly FounderInsight[] = [
 
 export const SAMPLE_RECOMMENDATIONS: readonly FounderRecommendation[] = [
   {
+    id: "rec-exec-today",
+    title: "Continue improving Listening Rooms",
+    summary:
+      "Member curiosity is high — polish atmosphere and conversation continuity.",
+    tone: "opportunity",
+    category: "build",
+    score: { confidence: 0.93, impact: 1 },
+  },
+  {
     id: "rec-1",
     title: "Wire getTodayBrief() everywhere",
     summary: "Home dashboard reads from brief service — no hardcoded arrays.",

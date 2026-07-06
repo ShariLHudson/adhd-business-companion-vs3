@@ -2,7 +2,6 @@ import { getTeamHubSections } from "@/lib/founder/teamhub";
 import { FOUNDER_STUDIO_BASE } from "@/lib/founderStudio/founderConfig";
 
 import { ExecutivePanel, RoomHeader } from "./executive";
-import { FounderRoomNav } from "./FounderRoomNav";
 
 export function FounderTeamHub() {
   const sections = getTeamHubSections();
@@ -11,6 +10,7 @@ export function FounderTeamHub() {
     <div className="founder-team-hub">
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
+        backLabel="← Back to the Office"
         eyebrow="Team Hub™ · Execution layer"
         title="Team Hub™"
         question="What needs to be executed, assigned, reviewed, or approved?"
@@ -42,8 +42,6 @@ export function FounderTeamHub() {
           </ExecutivePanel>
         ))}
       </div>
-
-      <FounderRoomNav activeRoomId="team-hub" />
     </div>
   );
 }

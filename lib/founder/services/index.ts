@@ -1,5 +1,20 @@
 export { getTodayBrief, getBriefByDate } from "../briefs";
 export {
+  getExecutiveArchive,
+  getFireExecutivePortfolio,
+  listExecutiveArchives,
+} from "../briefs/firePortfolio";
+export {
+  getExecutiveTimeline,
+  getIncomingSignals,
+  getIntelligenceInbox,
+  getIntelligenceRoomOverview,
+  getPipelineStatus,
+  getRecentFindings,
+  getSourceSummary,
+  traceSamplePipeline,
+} from "../intelligence/services";
+export {
   listFounderMemory,
   getFounderMemory,
   searchFounderMemory,
@@ -43,3 +58,8 @@ export {
 export { getReports, getReport, searchReports } from "../research";
 export { getAnalyticsSummary } from "../analytics";
 export { getRoomCards } from "./roomContentService";
+export {
+  getExecutiveRecommendation,
+  getWorkspace,
+  listWorkspaces,
+} from "../workspace";

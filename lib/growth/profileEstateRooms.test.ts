@@ -11,6 +11,7 @@ import { GROWTH_ROOM_BG, ESTATE_PROFILE_ROOM_BG, EVIDENCE_VAULT_ROOM_BG, PORTFOL
 describe("profileEstateRooms", () => {
   it("maps menu actions to profile estate rooms", () => {
     expect(profileEstateRoomForMenuAction("estate-profile")).toBe("my-estate");
+    expect(profileEstateRoomForMenuAction("my-profile")).toBe("my-estate");
     expect(profileEstateRoomForMenuAction("growth-profile")).toBe("growth-profile");
     expect(profileEstateRoomForMenuAction("evidence-vault")).toBe("evidence-vault");
     expect(profileEstateRoomForMenuAction("portfolio")).toBe("portfolio");

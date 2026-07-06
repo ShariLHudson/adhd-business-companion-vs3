@@ -1225,6 +1225,7 @@ import {
   profileEstateRoomBackgroundImage,
   profileEstateRoomForMenuAction,
   profileEstateSectionForRoom,
+  type EstateMenuShellActionId,
   type ProfileEstateRoomId,
 } from "@/lib/growth/profileEstateRooms";
 import { CREATIVE_STUDIO_ROOM_BG } from "@/lib/creativeStudio/creativeStudioRoom";
@@ -7927,7 +7928,9 @@ export default function CompanionPageClient() {
       return;
     }
 
-    switch (actionId) {
+    const shellActionId = actionId as EstateMenuShellActionId;
+
+    switch (shellActionId) {
       case "institute-cabinet":
         setOverlay("institute-cabinet");
         return;
@@ -7961,7 +7964,7 @@ export default function CompanionPageClient() {
         void handleEstateLogOut();
         return;
       default: {
-        const _exhaustive: never = actionId;
+        const _exhaustive: never = shellActionId;
         return _exhaustive;
       }
     }

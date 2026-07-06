@@ -1,6 +1,7 @@
 export * from "./types";
 export * from "./services";
 export * from "./briefs";
+export * from "./briefs/firePortfolio";
 export * from "./memory";
 export * from "./insights";
 export * from "./recommendations";
@@ -9,3 +10,5 @@ export * from "./automation";
 export * from "./teamhub";
 export * from "./research";
 export * from "./analytics";
+export * from "./workspace";
+export * from "./intelligence";

@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 
+import { FounderExecutiveArchives } from "@/components/founderStudio/FounderExecutiveArchives";
+import { FounderExecutiveIntelligence } from "@/components/founderStudio/FounderExecutiveIntelligence";
 import { FounderRoomPageView } from "@/components/founderStudio/FounderRoomPage";
 import { FounderTeamHub } from "@/components/founderStudio/FounderTeamHub";
 import { getFounderRoom, isFounderRoomId } from "@/lib/founderStudio/rooms";
@@ -20,6 +22,7 @@ export function generateStaticParams() {
     { room: "creation-studio" },
     { room: "automation-studio" },
     { room: "team-hub" },
+    { room: "executive-intelligence" },
   ];
 }
 
@@ -32,6 +35,14 @@ export default async function FounderRoomRoute({ params }: FounderRoomRouteProps
 
   if (roomId === "team-hub") {
     return <FounderTeamHub />;
+  }
+
+  if (roomId === "knowledge-library") {
+    return <FounderExecutiveArchives />;
+  }
+
+  if (roomId === "executive-intelligence") {
+    return <FounderExecutiveIntelligence />;
   }
 
   const room = getFounderRoom(roomId);

@@ -4,6 +4,8 @@ import type { ReactNode } from "react";
 
 import { FOUNDER_OFFICE_BACKGROUND } from "@/lib/founderStudio/founderConfig";
 
+import { FounderSideNav } from "./FounderSideNav";
+
 type FounderShellProps = {
   children: ReactNode;
   /** Keep center/right clear for overlays when true (default). */
@@ -21,7 +23,10 @@ export function FounderShell({ children, cleanRight = true }: FounderShellProps)
       }
     >
       <div className="founder-shell__scrim" aria-hidden="true" />
-      <div className="founder-shell__content">{children}</div>
+      <div className="founder-shell__frame">
+        <FounderSideNav />
+        <div className="founder-shell__content">{children}</div>
+      </div>
     </div>
   );
 }

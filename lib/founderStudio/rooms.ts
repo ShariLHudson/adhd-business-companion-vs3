@@ -45,9 +45,9 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
   {
     id: "knowledge-library",
     href: `${FOUNDER_STUDIO_BASE}/knowledge-library`,
-    title: "Knowledge Library",
-    question: "Where is the full research?",
-    purpose: "FIRE reports, PDFs, articles, forecasts, and decision history.",
+    title: "Executive Archives",
+    question: "What did we already decide?",
+    purpose: "Previous FIRE briefs — issue history, focus, and executive summaries.",
     accent: "purple",
   },
   {
@@ -82,6 +82,15 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
       "What needs to be executed, assigned, reviewed, or approved?",
     purpose: "Founder thinks. Team Hub executes.",
     accent: "gold",
+  },
+  {
+    id: "executive-intelligence",
+    href: `${FOUNDER_STUDIO_BASE}/executive-intelligence`,
+    title: "Executive Intelligence",
+    question: "What is entering the ecosystem?",
+    purpose:
+      "Signals, timeline, and inbox — the pipeline every future engine feeds.",
+    accent: "teal",
   },
 ];
 

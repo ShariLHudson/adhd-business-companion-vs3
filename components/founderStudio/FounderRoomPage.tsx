@@ -3,7 +3,6 @@ import { FOUNDER_STUDIO_BASE } from "@/lib/founderStudio/founderConfig";
 import type { FounderRoomMeta } from "@/lib/founderStudio/types";
 
 import { ExecutiveCard, ExecutivePanel, RoomHeader } from "./executive";
-import { FounderRoomNav } from "./FounderRoomNav";
 
 type FounderRoomPageProps = {
   room: FounderRoomMeta;
@@ -16,6 +15,7 @@ export function FounderRoomPageView({ room }: FounderRoomPageProps) {
     <div className="founder-room-page">
       <RoomHeader
         backHref={FOUNDER_STUDIO_BASE}
+        backLabel="← Back to the Office"
         title={room.title}
         question={room.question}
         purpose={room.purpose}
@@ -38,8 +38,6 @@ export function FounderRoomPageView({ room }: FounderRoomPageProps) {
           mentoring memory, and FIRE™ briefings when you are ready.
         </p>
       </ExecutivePanel>
-
-      <FounderRoomNav activeRoomId={room.id} />
     </div>
   );
 }

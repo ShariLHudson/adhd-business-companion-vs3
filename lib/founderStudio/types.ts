@@ -23,7 +23,8 @@ export type FounderRoomId =
   | "reflection"
   | "creation-studio"
   | "automation-studio"
-  | "team-hub";
+  | "team-hub"
+  | "executive-intelligence";
 
 export type FounderRoomMeta = {
   id: FounderRoomId;

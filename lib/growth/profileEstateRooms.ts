@@ -56,20 +56,50 @@ export function isProfileEstateRoomId(
   return roomId != null && PROFILE_ROOM_ID_SET.has(roomId);
 }
 
-const MENU_ACTION_TO_ROOM = {
+export const PROFILE_ESTATE_MENU_ACTION_IDS = [
+  "estate-profile",
+  "my-profile",
+  "growth-profile",
+  "progress-timeline",
+  "evidence-vault",
+  "portfolio",
+] as const satisfies readonly EstateMenuActionId[];
+
+export type ProfileEstateMenuActionId =
+  (typeof PROFILE_ESTATE_MENU_ACTION_IDS)[number];
+
+/** Estate menu actions handled in the shell switch (after memory + profile routes). */
+export type EstateMenuShellActionId = Exclude<
+  EstateMenuActionId,
+  ProfileEstateMenuActionId | "memory-library" | "journal"
+>;
+
+const MENU_ACTION_TO_ROOM: Record<
+  ProfileEstateMenuActionId,
+  ProfileEstateRoomId
+> = {
   "estate-profile": "my-estate",
+  "my-profile": "my-estate",
   "growth-profile": "growth-profile",
   "progress-timeline": "growth-profile",
   "evidence-vault": "evidence-vault",
   portfolio: "portfolio",
-} as const satisfies Partial<Record<EstateMenuActionId, ProfileEstateRoomId>>;
-
-export type ProfileEstateMenuActionId = keyof typeof MENU_ACTION_TO_ROOM;
+};
 
 export function isProfileEstateMenuAction(
   actionId: EstateMenuActionId,
 ): actionId is ProfileEstateMenuActionId {
-  return actionId in MENU_ACTION_TO_ROOM;
+  switch (actionId) {
+    case "estate-profile":
+    case "my-profile":
+    case "growth-profile":
+    case "progress-timeline":
+    case "evidence-vault":
+    case "portfolio":
+      return true;
+    default:
+      return false;
+  }
 }
 
 export function profileEstateRoomForMenuAction(
