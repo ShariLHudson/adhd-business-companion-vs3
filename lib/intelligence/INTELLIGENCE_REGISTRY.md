@@ -151,6 +151,9 @@ If any answer is "unknown" — redesign before shipping.
 | **SPARK™ Intelligence Core** | `lib/spark/` | Signals, observations, patterns, knowledge graph, priorities | Sample repo (V1); consumed by Founder, Companion, PostCraft, Team Hub, FLAME, FIRE |
 | **Executive Questions™** | `lib/executiveQuestions/` | SPARK, FLAME, FIRE, missions, decisions, research (loosely coupled refs) | Composed answers (sample V1); bridge: `lib/founder/services/executiveQuestionsBridge.ts` |
 | **Opportunity Discovery Engine™** | `lib/opportunities/` | Multi-signal evidence, missions, research, customer feedback, analytics | Ranked discoveries (sample V1); feeds SPARK, FLAME, FIRE, Executive Brief |
+| **Founder Advisory Council™** | `lib/advisory/` | Missions, research, decisions, executive questions, opportunities, roadmap, products, content, workshops, campaigns | Multi-perspective board reasoning (sample V1); bridge: `lib/founder/services/advisoryCouncilBridge.ts` |
+| **Overnight Executive Cycle™** | `lib/overnight/` | SPARK, Executive Questions, opportunities, missions, research, companion, PostCraft, GHL, analytics | Seven-phase orchestration (sample V1); bridge: `lib/founder/services/overnightExecutiveCycleBridge.ts` |
+| **Executive Brief Experience™** | `lib/founder/executiveBrief/` | Overnight, opportunities, missions, research, decisions, advisory | Plain-English presentation (sample V1); bridge: `lib/founder/services/executiveBriefBridge.ts` |
 | **Relationship Intelligence** | `lib/relationship-intelligence/` | Relationship, conversation, thoughts (person) | `relationshipStore` |
 | **Content Intelligence** | PostCraft, templates, snippets | Template, draft, avatar | Content suggestions |
 | **Learning Intelligence** | `lib/intelligence-layer/learningGates.ts` | Signals, trust, outcomes | Profile evolution |
