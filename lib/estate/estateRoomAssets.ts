@@ -12,6 +12,7 @@ export const ESTATE_ROOM_BG = {
   welcomeHome: CANONICAL_PLACE_BACKGROUNDS["welcome-home"],
   sunroom: CANONICAL_PLACE_BACKGROUNDS.sunroom,
   butterflyConservatory: CANONICAL_PLACE_BACKGROUNDS.conservatory,
+  oceanConservatory: CANONICAL_PLACE_BACKGROUNDS.conservatory,
   clearMyMind: CANONICAL_PLACE_BACKGROUNDS["clear-my-mind"],
   coffeeHouse: CANONICAL_PLACE_BACKGROUNDS["coffee-house"],
   teaRoom: CANONICAL_PLACE_BACKGROUNDS["tea-room"],
