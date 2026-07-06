@@ -4450,3 +4450,215 @@
   color: var(--founder-gold);
   align-self: start;
 }
+
+/* Opportunity Discovery Center™ */
+.founder-opportunity {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.founder-opportunity__section-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.2rem, 2.4vw, 1.45rem);
+  font-weight: 600;
+  color: var(--founder-gold);
+}
+
+.founder-opportunity__muted {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  line-height: 1.45;
+  color: var(--founder-muted);
+}
+
+.founder-opportunity__overview {
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+.founder-opportunity__card-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.founder-opportunity__card-button {
+  width: 100%;
+  text-align: left;
+  padding: 1rem 1.1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(48, 182, 213, 0.22);
+  background: rgba(20, 28, 32, 0.72);
+  color: var(--founder-text);
+  cursor: pointer;
+}
+
+.founder-opportunity__card--featured .founder-opportunity__card-button {
+  border-color: rgba(245, 193, 108, 0.45);
+  background: rgba(245, 193, 108, 0.08);
+}
+
+.founder-opportunity__card-type {
+  display: block;
+  font-size: 0.75rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--founder-aqua);
+  margin-bottom: 0.35rem;
+}
+
+.founder-opportunity__card-name {
+  display: block;
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin-bottom: 0.45rem;
+}
+
+.founder-opportunity__card-summary {
+  margin: 0 0 0.65rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--founder-muted);
+}
+
+.founder-opportunity__card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  font-size: 0.88rem;
+  color: rgba(244, 247, 248, 0.78);
+}
+
+.founder-opportunity__rec {
+  display: inline-block;
+  padding: 0.12rem 0.5rem;
+  border-radius: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.founder-opportunity__rec--build { background: rgba(48, 182, 213, 0.28); color: #9ee8f7; }
+.founder-opportunity__rec--prototype { background: rgba(245, 193, 108, 0.22); color: var(--founder-gold); }
+.founder-opportunity__rec--research-further { background: rgba(200, 146, 46, 0.2); color: #f0d4a0; }
+.founder-opportunity__rec--watch { background: rgba(120, 120, 120, 0.25); color: #ccc; }
+.founder-opportunity__rec--ignore { background: rgba(80, 80, 80, 0.3); color: #aaa; }
+.founder-opportunity__rec--delay { background: rgba(15, 111, 124, 0.25); color: #8fd4dc; }
+.founder-opportunity__rec--partner { background: rgba(48, 182, 213, 0.18); color: #b8ecf7; }
+.founder-opportunity__rec--automate { background: rgba(245, 193, 108, 0.15); color: #f5d9a0; }
+
+.founder-opportunity__back {
+  margin-bottom: 0.75rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--founder-aqua);
+  font-size: 1rem;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.founder-opportunity__detail-name {
+  margin: 0;
+  font-size: clamp(1.35rem, 3vw, 1.75rem);
+  line-height: 1.25;
+}
+
+.founder-opportunity__detail-meta {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  color: var(--founder-muted);
+}
+
+.founder-opportunity__recommendation-block {
+  padding: 1rem 1.1rem;
+  margin-bottom: 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(245, 193, 108, 0.35);
+  background: rgba(245, 193, 108, 0.08);
+}
+
+.founder-opportunity__rec-label {
+  margin: 0 0 0.35rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--founder-gold);
+}
+
+.founder-opportunity__rec-value {
+  margin: 0;
+  font-size: 1.08rem;
+  line-height: 1.5;
+}
+
+.founder-opportunity__prose {
+  margin: 0 0 0.65rem;
+  font-size: 1.05rem;
+  line-height: 1.55;
+}
+
+.founder-opportunity__subhead {
+  margin: 0.75rem 0 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--founder-gold);
+}
+
+.founder-opportunity__bullets,
+.founder-opportunity__metrics-grid {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 1.02rem;
+  line-height: 1.5;
+}
+
+.founder-opportunity__metrics-grid {
+  list-style: none;
+  padding-left: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(10rem, 1fr));
+  gap: 0.5rem;
+}
+
+.founder-opportunity__prep-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+.founder-opportunity__prep-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(48, 182, 213, 0.12);
+}
+
+.founder-opportunity__prep-label {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.founder-opportunity__prep-desc {
+  grid-column: 1 / -1;
+  font-size: 0.95rem;
+  color: var(--founder-muted);
+}
+
+.founder-opportunity__prep-status {
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--founder-gold);
+  align-self: start;
+}

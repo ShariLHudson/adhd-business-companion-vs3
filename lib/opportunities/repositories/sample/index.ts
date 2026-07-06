@@ -1,24 +1,14 @@
-import type { OpportunityId } from "../../types";
 import {
-  getSampleEvidenceForOpportunity,
+  OPPORTUNITY_DISCOVERY_PRINCIPLE,
+  SAMPLE_OPPORTUNITIES,
   getSampleOpportunity,
-  getSampleRecommendationsForOpportunity,
-  getSampleRelationshipsForOpportunity,
-  getSampleRisksForOpportunity,
-  getSampleSignalsForOpportunity,
-  listSampleOpportunities,
-  SAMPLE_OPPORTUNITY_RELATIONSHIPS,
-} from "../../sample";
+} from "../../sample/opportunityData";
+import type { BusinessOpportunity } from "../../types";
 
 export const opportunitySampleRepository = {
-  list: () => listSampleOpportunities(),
-  get: (id: OpportunityId) => getSampleOpportunity(id),
-  listRelationships: () => [...SAMPLE_OPPORTUNITY_RELATIONSHIPS],
-  signalsFor: (id: OpportunityId) => getSampleSignalsForOpportunity(id),
-  evidenceFor: (id: OpportunityId) => getSampleEvidenceForOpportunity(id),
-  recommendationsFor: (id: OpportunityId) => getSampleRecommendationsForOpportunity(id),
-  risksFor: (id: OpportunityId) => getSampleRisksForOpportunity(id),
-  relationshipsFor: (id: OpportunityId) => getSampleRelationshipsForOpportunity(id),
+  principle: () => OPPORTUNITY_DISCOVERY_PRINCIPLE,
+  all: () => SAMPLE_OPPORTUNITIES,
+  get: (id: string) => getSampleOpportunity(id),
+  byBucket: (bucket: BusinessOpportunity["bucket"]) =>
+    SAMPLE_OPPORTUNITIES.filter((o) => o.bucket === bucket).sort((a, b) => b.rankScore - a.rankScore),
 };
-
-export type OpportunitySampleRepository = typeof opportunitySampleRepository;

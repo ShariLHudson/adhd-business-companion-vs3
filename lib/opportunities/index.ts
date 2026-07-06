@@ -1,50 +1,37 @@
-export type * from "./types";
+export type {
+  OpportunityTypeId,
+  OpportunityRecommendation,
+  OpportunityConfidence,
+  OpportunityImpactLevel,
+  OpportunityEffortLevel,
+  OpportunitySourceKind,
+  OpportunityBoardPerspectiveId,
+  SparkEcosystemTarget,
+  OpportunityEvidence,
+  OpportunityWhyNow,
+  OpportunitySoWhat,
+  OpportunityOutsideTheBox,
+  OpportunityValueMetrics,
+  OpportunityBoardPerspective,
+  OpportunityPrepKind,
+  OpportunityPrepOffer,
+  BusinessOpportunity,
+  OpportunityDiscoveryOverview,
+  OpportunityType,
+} from "./types";
 
 export {
+  OPPORTUNITY_DISCOVERY_PRINCIPLE,
+  SAMPLE_OPPORTUNITIES,
+  OPPORTUNITY_TYPES,
+  getSampleOpportunity,
+} from "./sample/opportunityData";
+
+export { opportunitySampleRepository } from "./repositories/sample";
+
+export {
+  composeOpportunityDiscoveryOverview,
+  getOpportunityById,
   OpportunityDiscoveryService,
   opportunityDiscoveryService,
-  discoverOpportunities,
-  listOpportunities,
-  getOpportunity,
-  rankOpportunitiesPublic as rankOpportunities,
-  listQuickWins,
-  listStrategicBets,
-  listMissionOpportunities,
 } from "./services/opportunityDiscoveryService";
-
-export {
-  discover,
-  findEmerging,
-  findHidden,
-  findRecurring,
-  findIgnored,
-  group,
-  prepareExecutiveSummary,
-} from "./discovery/opportunityDiscovery";
-
-export {
-  scoreOpportunity,
-  rankByMission,
-} from "./ranking/opportunityRanking";
-
-export {
-  buildOpportunityScore,
-  compareOpportunityScores,
-  isQuickWin,
-  isStrategicBet,
-  isHighImpact,
-  needsResearch,
-} from "./scoring/opportunityScoring";
-
-export {
-  OPPORTUNITY_CATEGORY_LABELS,
-  EXECUTIVE_FILTER_LABELS,
-  labelForCategory,
-  labelForExecutiveFilter,
-} from "./categories/opportunityCategories";
-
-export {
-  listOpportunityRelationships,
-  relationshipsForOpportunity,
-  describeOpportunityRelationship,
-} from "./relationships/opportunityRelationships";

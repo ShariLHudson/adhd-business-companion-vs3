@@ -1,102 +1,68 @@
-import type {
-  DiscoveredOpportunity,
-  OpportunityDiscoveryFilter,
-  OpportunityExecutiveSummary,
-  OpportunityGroup,
-  OpportunityId,
-} from "../types";
-import {
-  discover,
-  findEmerging,
-  findHidden,
-  findIgnored,
-  findRecurring,
-  group,
-  prepareExecutiveSummary,
-} from "../discovery/opportunityDiscovery";
-import { rankByMission, rankOpportunities, scoreOpportunity } from "../ranking/opportunityRanking";
-import { isQuickWin, isStrategicBet } from "../scoring/opportunityScoring";
+import { applyRuleOfThree } from "@/lib/calmIntelligence";
+
 import { opportunitySampleRepository } from "../repositories/sample";
-import { listOpportunityRelationships } from "../relationships/opportunityRelationships";
+import type { BusinessOpportunity, OpportunityDiscoveryOverview } from "../types";
+
+function sortByRank(items: BusinessOpportunity[]): BusinessOpportunity[] {
+  return [...items].sort((a, b) => b.rankScore - a.rankScore);
+}
+
+/** Compose the opening surface — Rule of One + Rule of Three. */
+export function composeOpportunityDiscoveryOverview(): OpportunityDiscoveryOverview {
+  const all = opportunitySampleRepository.all();
+  const todaysBiggest =
+    opportunitySampleRepository.byBucket("todays-biggest")[0] ??
+    sortByRank(all)[0]!;
+
+  const emerging = applyRuleOfThree(
+    sortByRank(opportunitySampleRepository.byBucket("emerging")),
+  ).items;
+
+  const quickWins = applyRuleOfThree(
+    sortByRank(opportunitySampleRepository.byBucket("quick-win")),
+  ).items;
+
+  const longTerm = applyRuleOfThree(
+    sortByRank(opportunitySampleRepository.byBucket("long-term")),
+  ).items;
+
+  const competitiveThreats = applyRuleOfThree(
+    sortByRank(opportunitySampleRepository.byBucket("competitive-threat")),
+  ).items;
+
+  const watching = applyRuleOfThree(
+    sortByRank(opportunitySampleRepository.byBucket("watching")),
+  ).items;
+
+  return {
+    product: "founder",
+    generatedAt: new Date().toISOString(),
+    todaysBiggest,
+    emerging,
+    quickWins,
+    longTerm,
+    competitiveThreats,
+    watching,
+    principle: opportunitySampleRepository.principle(),
+  };
+}
+
+export function getOpportunityById(id: string): BusinessOpportunity | undefined {
+  return opportunitySampleRepository.get(id);
+}
 
 export class OpportunityDiscoveryService {
-  discover(filter?: OpportunityDiscoveryFilter): DiscoveredOpportunity[] {
-    return rankOpportunities(discover(filter));
+  overview() {
+    return composeOpportunityDiscoveryOverview();
   }
 
-  rank(opportunities: DiscoveredOpportunity[]): DiscoveredOpportunity[] {
-    return rankOpportunities(opportunities);
+  get(id: string) {
+    return getOpportunityById(id);
   }
 
-  score(id: OpportunityId) {
-    return scoreOpportunity(id);
-  }
-
-  group(opportunities: DiscoveredOpportunity[], by?: "category" | "executive-filter"): OpportunityGroup[] {
-    return group(opportunities, by);
-  }
-
-  findEmerging(): DiscoveredOpportunity[] {
-    return findEmerging();
-  }
-
-  findHidden(): DiscoveredOpportunity[] {
-    return findHidden();
-  }
-
-  findRecurring(): DiscoveredOpportunity[] {
-    return findRecurring();
-  }
-
-  findIgnored(): DiscoveredOpportunity[] {
-    return findIgnored();
-  }
-
-  prepareExecutiveSummary(opportunities?: DiscoveredOpportunity[]): OpportunityExecutiveSummary {
-    return prepareExecutiveSummary(opportunities ?? this.discover());
-  }
-
-  listOpportunities(filter?: OpportunityDiscoveryFilter): DiscoveredOpportunity[] {
-    return this.discover(filter);
-  }
-
-  getOpportunity(id: OpportunityId): DiscoveredOpportunity | null {
-    const base = opportunitySampleRepository.get(id);
-    if (!base) return null;
-    return this.discover().find((o) => o.id === id) ?? null;
-  }
-
-  listOpportunityRelationships() {
-    return listOpportunityRelationships();
+  sampleRepository() {
+    return opportunitySampleRepository;
   }
 }
 
 export const opportunityDiscoveryService = new OpportunityDiscoveryService();
-
-export function discoverOpportunities(filter?: OpportunityDiscoveryFilter) {
-  return opportunityDiscoveryService.discover(filter);
-}
-
-export function listOpportunities(filter?: OpportunityDiscoveryFilter) {
-  return opportunityDiscoveryService.listOpportunities(filter);
-}
-
-export function getOpportunity(id: OpportunityId) {
-  return opportunityDiscoveryService.getOpportunity(id);
-}
-
-export function rankOpportunitiesPublic(opportunities: DiscoveredOpportunity[]) {
-  return opportunityDiscoveryService.rank(opportunities);
-}
-
-export function listQuickWins(): DiscoveredOpportunity[] {
-  return opportunityDiscoveryService.discover().filter((o) => isQuickWin(o.score));
-}
-
-export function listStrategicBets(): DiscoveredOpportunity[] {
-  return opportunityDiscoveryService.discover().filter((o) => isStrategicBet(o.score));
-}
-
-export function listMissionOpportunities(missionId: string): DiscoveredOpportunity[] {
-  return rankByMission(opportunityDiscoveryService.discover({ missionId }), missionId);
-}

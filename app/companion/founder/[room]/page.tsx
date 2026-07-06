@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { FounderDecisionVault } from "@/components/founderStudio/FounderDecisionVault";
 import { FounderExecutiveArchives } from "@/components/founderStudio/FounderExecutiveArchives";
 import { FounderExecutiveIntelligence } from "@/components/founderStudio/FounderExecutiveIntelligence";
+import { FounderOpportunityDiscovery } from "@/components/founderStudio/FounderOpportunityDiscovery";
 import { FounderExecutiveResearch } from "@/components/founderStudio/FounderExecutiveResearch";
 import { FounderExecutiveStrategy } from "@/components/founderStudio/FounderExecutiveStrategy";
 import { FounderRoomPageView } from "@/components/founderStudio/FounderRoomPage";
@@ -28,6 +29,7 @@ export function generateStaticParams() {
     { room: "executive-intelligence" },
     { room: "executive-strategy" },
     { room: "executive-research" },
+    { room: "opportunity-discovery" },
     { room: "decision-vault" },
   ];
 }
@@ -57,6 +59,10 @@ export default async function FounderRoomRoute({ params }: FounderRoomRouteProps
 
   if (roomId === "executive-research") {
     return <FounderExecutiveResearch />;
+  }
+
+  if (roomId === "opportunity-discovery") {
+    return <FounderOpportunityDiscovery />;
   }
 
   if (roomId === "decision-vault") {

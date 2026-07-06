@@ -111,6 +111,15 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
     accent: "purple",
   },
   {
+    id: "opportunity-discovery",
+    href: `${FOUNDER_STUDIO_BASE}/opportunity-discovery`,
+    title: "Opportunity Discovery Center™",
+    question: "If this were my company, what would I build next?",
+    purpose:
+      "Evidence-backed opportunities — today's biggest bet, quick wins, threats, and what to watch.",
+    accent: "aqua",
+  },
+  {
     id: "decision-vault",
     href: `${FOUNDER_STUDIO_BASE}/decision-vault`,
     title: "Decision Vault™",

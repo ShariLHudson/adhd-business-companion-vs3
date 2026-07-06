@@ -1,223 +1,203 @@
-/** Opportunity Discovery Engine™ — reusable discovery types (no UI). */
+/** Opportunity Discovery Center™ — business opportunity types. */
 
-export type OpportunityId = string;
-
-export type OpportunityCategory =
-  | "product"
-  | "revenue"
-  | "marketing"
-  | "workshop"
-  | "course"
-  | "feature"
+export type OpportunityTypeId =
+  | "new-product"
+  | "feature-improvement"
   | "automation"
-  | "ai"
+  | "customer-experience"
+  | "revenue"
+  | "membership"
+  | "course"
+  | "workshop"
+  | "marketing"
+  | "research"
   | "technology"
-  | "customer"
+  | "ai"
+  | "operations"
   | "community"
-  | "partnership"
-  | "brand"
-  | "operational";
+  | "education"
+  | "strategic-partnership"
+  | "future-vision";
 
-export type OpportunityStatus =
-  | "emerging"
-  | "active"
+export type OpportunityRecommendation =
+  | "build"
+  | "prototype"
+  | "research-further"
   | "watch"
-  | "ignored"
-  | "archived";
+  | "ignore"
+  | "delay"
+  | "partner"
+  | "automate";
 
-export type OpportunityExecutiveFilter =
-  | "high-impact"
-  | "quick-win"
-  | "long-term-bet"
-  | "needs-research"
-  | "watch"
-  | "ignore";
+export type OpportunityConfidence = "high" | "medium" | "low" | "exploratory";
+
+export type OpportunityImpactLevel = "high" | "medium" | "low";
+
+export type OpportunityEffortLevel = "low" | "medium" | "high";
 
 export type OpportunitySourceKind =
-  | "spark"
   | "research"
-  | "mission"
-  | "customer-feedback"
+  | "customer-questions"
+  | "member-struggles"
+  | "analytics"
+  | "search-trends"
+  | "pinterest"
+  | "ai-developments"
+  | "competitor-gaps"
+  | "executive-board"
+  | "institutional-memory"
+  | "mission-progress"
+  | "executive-questions";
+
+export type OpportunityBoardPerspectiveId =
+  | "ceo"
+  | "customer"
+  | "marketing"
+  | "finance"
+  | "operations"
+  | "innovation"
+  | "technology"
+  | "adhd";
+
+export type SparkEcosystemTarget =
+  | "founder"
   | "companion"
   | "postcraft"
-  | "analytics"
-  | "decision-vault"
-  | "competitor"
-  | "technology"
-  | "flame"
-  | "fire"
-  | "ghl"
-  | "team-hub";
-
-export type OpportunityRelationshipKind =
-  | "supports"
-  | "extends"
-  | "feeds"
-  | "launches-through"
-  | "depends-on"
-  | "creates-revenue-for"
-  | "informs"
-  | "mitigates";
-
-export type OpportunityConfidenceLevel = "high" | "medium" | "low" | "exploratory";
-
-export type OpportunityScoreDimensions = {
-  /** 0–100 */
-  strategicValue: number;
-  /** 0–100 */
-  revenuePotential: number;
-  /** 0–100 */
-  founderAlignment: number;
-  /** 0–100 */
-  customerNeed: number;
-  /** 0–100 */
-  innovation: number;
-  /** 0–100 — higher = harder */
-  difficulty: number;
-  /** 0–100 */
-  urgency: number;
-  /** 0–100 */
-  confidence: number;
-  /** 0–100 */
-  missionAlignment: number;
-  /** 0–100 */
-  marketingValue: number;
-};
-
-export type OpportunityScore = OpportunityScoreDimensions & {
-  /** Weighted composite 0–100 */
-  composite: number;
-};
-
-export type OpportunitySource = {
-  id: string;
-  kind: OpportunitySourceKind;
-  label: string;
-  summary?: string;
-};
-
-export type OpportunitySignal = {
-  id: string;
-  opportunityId: OpportunityId;
-  title: string;
-  summary: string;
-  source: OpportunitySource;
-  observedAt: string;
-  strength: number;
-};
+  | "listening-rooms"
+  | "team-hub"
+  | "customer-experience"
+  | "revenue"
+  | "founder-experience"
+  | "courses"
+  | "workshops"
+  | "memberships"
+  | "operations";
 
 export type OpportunityEvidence = {
   id: string;
-  opportunityId: OpportunityId;
+  kind: OpportunitySourceKind;
   title: string;
   summary: string;
-  source: OpportunitySource;
-  weight?: number;
 };
 
-export type OpportunityImpact = {
-  summary: string;
-  effort: "low" | "medium" | "high";
-  effortLabel: string;
-  beneficiary: string;
-};
-
-export type OpportunityMission = {
-  missionId: string;
-  name: string;
-  role: "primary" | "secondary" | "downstream";
-  summary: string;
-};
-
-export type OpportunityRisk = {
-  id: string;
-  title: string;
-  summary: string;
-  severity: "low" | "medium" | "high";
-};
-
-export type OpportunityRecommendation = {
-  id: string;
-  label: string;
-  summary: string;
-  href?: string;
-};
-
-export type OpportunityConfidence = {
-  level: OpportunityConfidenceLevel;
-  /** 0–100 */
-  score: number;
-  rationale: string;
-};
-
-export type OpportunityRelationship = {
-  id: string;
-  fromOpportunityId: OpportunityId;
-  toOpportunityId: OpportunityId;
-  relationship: OpportunityRelationshipKind;
-  summary: string;
-};
-
-export type OpportunityExecutiveReasoning = {
-  whyItMatters: string;
+export type OpportunityWhyNow = {
   whyNow: string;
-  whoBenefits: string;
-  missionBenefit: string;
-  nextStep: string;
-  potentialImpact: string;
-  potentialEffort: string;
+  whyNotSixMonthsAgo: string;
+  whatChanged: string;
+  evidenceSummary: string;
 };
 
-export type Opportunity = {
-  id: OpportunityId;
-  title: string;
-  summary: string;
-  category: OpportunityCategory;
-  status: OpportunityStatus;
-  score: OpportunityScore;
+export type OpportunitySoWhat = {
+  whySparkShouldCare: string;
+  whyMembersShouldCare: string;
+  ecosystemImpact: { target: SparkEcosystemTarget; summary: string }[];
+};
+
+export type OpportunityOutsideTheBox = {
+  unexpectedApplications: string[];
+  industriesDoingBetter: string[];
+  ideasToBorrow: string[];
+  futurePossibilities: string[];
+  secondOrderEffects: string[];
+  potentialRisks: string[];
+  questionsWorthExploring: string[];
+};
+
+export type OpportunityValueMetrics = {
+  revenueOpportunity: OpportunityImpactLevel;
+  memberImpact: OpportunityImpactLevel;
+  founderTimeSavedHours: number;
+  implementationDifficulty: OpportunityEffortLevel;
+  strategicValue: OpportunityImpactLevel;
+  competitiveAdvantage: OpportunityImpactLevel;
+  automationPotential: OpportunityImpactLevel;
   confidence: OpportunityConfidence;
-  impact: OpportunityImpact;
-  reasoning: OpportunityExecutiveReasoning;
-  missionIds: string[];
-  missions: OpportunityMission[];
-  signalIds: string[];
-  evidenceIds: string[];
-  recommendationIds: string[];
-  riskIds: string[];
-  tags: string[];
-  discoveredAt: string;
-  updatedAt: string;
 };
 
-export type DiscoveredOpportunity = Opportunity & {
-  signals: OpportunitySignal[];
-  evidence: OpportunityEvidence[];
-  recommendations: OpportunityRecommendation[];
-  risks: OpportunityRisk[];
-};
-
-export type OpportunityGroup = {
-  id: string;
+export type OpportunityBoardPerspective = {
+  id: OpportunityBoardPerspectiveId;
   label: string;
-  filter: OpportunityExecutiveFilter | OpportunityCategory;
-  opportunities: DiscoveredOpportunity[];
+  summary: string;
+  stance: string;
 };
 
-export type OpportunityExecutiveSummary = {
-  headline: string;
-  narrative: string;
-  topOpportunities: DiscoveredOpportunity[];
-  emergingCount: number;
-  hiddenCount: number;
-  quickWinCount: number;
-  strategicBetCount: number;
+export type OpportunityPrepKind =
+  | "mission"
+  | "cursor-prompt"
+  | "development-roadmap"
+  | "workshop"
+  | "course"
+  | "marketing-plan"
+  | "postcraft-campaign"
+  | "ghl-workflow"
+  | "executive-brief"
+  | "decision-comparison";
+
+export type OpportunityPrepOffer = {
+  id: string;
+  kind: OpportunityPrepKind;
+  label: string;
+  description: string;
+  status: "draft";
+};
+
+export type BusinessOpportunity = {
+  id: string;
+  name: string;
+  typeId: OpportunityTypeId;
+  typeLabel: string;
+  executiveSummary: string;
+  whyExists: string;
+  evidence: OpportunityEvidence[];
+  confidence: OpportunityConfidence;
+  confidenceRationale: string;
+  potentialImpact: OpportunityImpactLevel;
+  estimatedEffort: OpportunityEffortLevel;
+  estimatedTimeWeeks: number;
+  estimatedRevenue: string;
+  estimatedMemberImpact: OpportunityImpactLevel;
+  strategicImportance: OpportunityImpactLevel;
+  automationPotential: OpportunityImpactLevel;
+  relatedMissions: string[];
+  relatedProducts: string[];
+  relatedResearch: string[];
+  relatedExecutiveQuestions: string[];
+  relatedCustomerProblems: string[];
+  whyNow: OpportunityWhyNow;
+  soWhat: OpportunitySoWhat;
+  sources: OpportunitySourceKind[];
+  recommendation: OpportunityRecommendation;
+  recommendationRationale: string;
+  ifIgnored: string;
+  boardPerspectives?: OpportunityBoardPerspective[];
+  boardRecommendation?: string;
+  outsideTheBox: OpportunityOutsideTheBox;
+  valueMetrics: OpportunityValueMetrics;
+  prepOffers: OpportunityPrepOffer[];
+  /** Display bucket */
+  bucket:
+    | "todays-biggest"
+    | "emerging"
+    | "quick-win"
+    | "long-term"
+    | "competitive-threat"
+    | "watching";
+  rankScore: number;
+};
+
+export type OpportunityDiscoveryOverview = {
+  product: "founder";
   generatedAt: string;
+  todaysBiggest: BusinessOpportunity;
+  emerging: BusinessOpportunity[];
+  quickWins: BusinessOpportunity[];
+  longTerm: BusinessOpportunity[];
+  competitiveThreats: BusinessOpportunity[];
+  watching: BusinessOpportunity[];
+  principle: string;
 };
 
-export type OpportunityDiscoveryFilter = {
-  category?: OpportunityCategory;
-  missionId?: string;
-  status?: OpportunityStatus;
-  executiveFilter?: OpportunityExecutiveFilter;
-  minComposite?: number;
+export type OpportunityType = {
+  id: OpportunityTypeId;
+  label: string;
 };
