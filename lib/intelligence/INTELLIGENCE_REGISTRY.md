@@ -159,6 +159,7 @@ If any answer is "unknown" — redesign before shipping.
 | **Executive Decision Lifecycle™** | `lib/executiveDecision/` | Missions, products, workshops, marketing, automation — composes Institutional Memory, Intelligence Graph, Executive Brief | Twelve-step decision OS (sample V1); bridge: `lib/founder/services/executiveDecisionBridge.ts` |
 | **Executive Orchestrator™** | `lib/orchestrator/` | Executive decisions, missions, launches, workshops, campaigns — composes Decision Lifecycle, Institutional Memory, Intelligence Graph | Decision-to-execution orchestration (sample V1); bridge: `lib/founder/services/executiveOrchestratorBridge.ts` |
 | **Executive Command Center™** | `lib/founder/commandCenter/` | Composes Brief, Missions, Questions, Decisions, Memory, Opportunities, Orchestrator, SPARK, FLAME, FIRE, Concierge, Overnight | One executive surface — attention model + desk (sample V1); no UI |
+| **Executive Digital Twin™** | `lib/founderProfile/` | Observations, patterns, preferences, friction, strengths — complements FLAME mentoring voice | Founder Profile Intelligence — observational learning, no personality labels (sample V1); bridge: `lib/founder/services/founderProfileBridge.ts` |
 | **Relationship Intelligence** | `lib/relationship-intelligence/` | Relationship, conversation, thoughts (person) | `relationshipStore` |
 | **Content Intelligence** | PostCraft, templates, snippets | Template, draft, avatar | Content suggestions |
 | **Learning Intelligence** | `lib/intelligence-layer/learningGates.ts` | Signals, trust, outcomes | Profile evolution |
