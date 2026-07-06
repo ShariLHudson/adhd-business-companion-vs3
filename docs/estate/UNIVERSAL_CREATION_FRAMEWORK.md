@@ -1,7 +1,11 @@
 # Universal Creation Framework™
 
-**Status:** BINDING · **Runtime:** `lib/universalCreation/`  
+**Status:** BINDING (implementation adapter — subordinate to [Creation Guidance Intelligence](../CREATION_GUIDANCE_INTELLIGENCE.md))  
+**Runtime:** `lib/universalCreation/`  
 **Philosophy:** One exceptional creation experience — document types are plugins, not separate builders.
+
+**Member-facing creation:** Creating Together ([ESTATE_CREATION_EXPERIENCE.md](../ESTATE_CREATION_EXPERIENCE.md)).  
+**Guidance authority:** [CREATION_GUIDANCE_INTELLIGENCE.md](../CREATION_GUIDANCE_INTELLIGENCE.md) owns lifecycle steps; Universal Creation persists plugin slots and phases as an **adapter**.
 
 ## Vision
 
@@ -41,14 +45,20 @@ Each plugin defines:
 - Completion actions
 - Uncertainty paths (teach · recommend · research · examples)
 
-## Uncertainty rule
+## Uncertainty rule → Research Create
 
-If the member doesn't know an answer, Spark never leaves them stuck:
+If the member doesn't know an answer — especially **steps, process, or expertise** — Spark **never repeats the question** and **never leaves them stuck**.
 
-- Recommend a direction
-- Teach how it usually works
-- Show examples
-- Research best practices
+**Immediate mode switch:** Research Create ([ADAPTIVE_CREATION_INTELLIGENCE.md](../ADAPTIVE_CREATION_INTELLIGENCE.md))
+
+During Research Create, Spark may:
+
+- Recommend a direction  
+- Teach how it usually works  
+- Show examples  
+- Research best practices **with** the member  
+
+Studio opens only after enough understanding exists to draft — not at create intent.
 
 ## Adaptive Intelligence
 
@@ -67,16 +77,26 @@ See [ESTATE_ADAPTIVE_INTELLIGENCE.md](./ESTATE_ADAPTIVE_INTELLIGENCE.md).
 ```
 User Request
     ↓
-Universal Creation (Phase 1–2 for all create intents)
+Conversation Mode (Create)
     ↓
-Create Studio (Phase 3+ continues in conversation)
+Conversation Session
+    ↓
+Creation Guidance Intelligence  ← orient → capture → structure → draft → review → complete
+    ↓
+Universal Creation (adapter — plugins · persistence · UC phases)
+    ↓
+Studio Readiness → Create Studio (when populated)
 ```
 
 Estate Discovery Mode handles **non-create** intents (focus, business growth, research).  
-Create intents route through **Universal Creation** first.
+Create intents route through **Creation Guidance** first; Universal Creation **mirrors** session state — it does not own intake or step logic.
 
 ## Related
 
+- [CREATION_GUIDANCE_INTELLIGENCE.md](../CREATION_GUIDANCE_INTELLIGENCE.md) — **binding** lifecycle authority
+- [STUDIO_READINESS_INTELLIGENCE.md](../STUDIO_READINESS_INTELLIGENCE.md)
+- [CONVERSATION_SESSION_ARCHITECTURE.md](../CONVERSATION_SESSION_ARCHITECTURE.md)
+- [docs/README.md](../README.md) — architecture index
 - [ESTATE_DISCOVERY_MODE.md](./ESTATE_DISCOVERY_MODE.md)
 - [ESTATE_ADAPTIVE_INTELLIGENCE.md](./ESTATE_ADAPTIVE_INTELLIGENCE.md)
 - [INTENT_FIRST_ESTATE_NAVIGATION.md](./INTENT_FIRST_ESTATE_NAVIGATION.md)

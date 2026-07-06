@@ -2,13 +2,14 @@
 
 ## Architectural authority (binding)
 
-**These three documents define Spark Estate. They supersede all prior design assumptions.**
+**These four documents define Spark Estate. They supersede all prior design assumptions.**
 
 | Authority | Document |
 |-----------|----------|
 | **Principles** | [01 — Spark Estate Constitution](./01%20-%20Spark%20Estate%20Constitution.md) |
 | **Experience** | [Living in Spark Estate](./Living%20in%20Spark%20Estate.md) |
 | **Canon** | [Spark Estate Bible](./Spark%20Estate%20Bible.md) |
+| **Operational canon** | [Master World Bible](./SPARK_ESTATE_MASTER_WORLD_BIBLE.md) — timeline, lore, laws, guide standards, Spark knowledge |
 
 **Manifest:** [ESTATE_ARCHITECTURAL_AUTHORITY.md](./ESTATE_ARCHITECTURAL_AUTHORITY.md)
 
@@ -43,6 +44,16 @@ Implementation must align. Legacy code and older docs are subordinate. If confli
 ### Companion DNA — The Friend We All Deserve™
 
 **[THE_FRIEND_WE_ALL_DESERVE.md](../THE_FRIEND_WE_ALL_DESERVE.md)** — **read first before conversation logic and prompts.** Sibling to the Estate Constitution: Estate governs places; Spark governs friendship.
+
+### Conversation & creation architecture (binding)
+
+**[docs/README.md](../README.md)** — master index for the intelligence stack.
+
+| Layer | Document |
+|-------|----------|
+| Conversation Intelligence | [SPARK_CONVERSATION_INTELLIGENCE_ARCHITECTURE.md](../SPARK_CONVERSATION_INTELLIGENCE_ARCHITECTURE.md) |
+| Creation Guidance | [CREATION_GUIDANCE_INTELLIGENCE.md](../CREATION_GUIDANCE_INTELLIGENCE.md) |
+| Creating Together | [ESTATE_CREATION_EXPERIENCE.md](../ESTATE_CREATION_EXPERIENCE.md) |
 
 ### Phase D — Unified Estate Shell
 
