@@ -6322,6 +6322,60 @@
   white-space: nowrap;
 }
 
+.founder-integration__status--connected {
+  color: var(--founder-teal, #0f6f7c);
+}
+
+.founder-integration__status--not-connected {
+  color: var(--founder-gold);
+}
+
+.founder-integration__card--not-connected {
+  border-color: rgba(245, 193, 108, 0.35);
+}
+
+.founder-integration__marketing {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.founder-integration__card-grid--featured {
+  grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+}
+
+.founder-integration__card--featured {
+  border-width: 1px;
+  background: rgba(12, 28, 36, 0.55);
+}
+
+.founder-integration__capabilities {
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.55rem;
+  background: rgba(15, 111, 124, 0.08);
+  border: 1px solid rgba(15, 111, 124, 0.18);
+}
+
+.founder-integration__capabilities-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--founder-teal, #0f6f7c);
+  font-weight: 600;
+}
+
+.founder-integration__capabilities-list {
+  margin: 0;
+  padding-left: 1.1rem;
+  font-size: 0.95rem;
+  line-height: 1.45;
+}
+
+.founder-integration__capabilities-list li {
+  margin-bottom: 0.2rem;
+}
+
 .founder-integration__highlights {
   margin: 0;
   padding: 0;

@@ -18,6 +18,13 @@ export type IntegrationStatus =
   | "future"
   | "unavailable";
 
+export type IntegrationCapability = {
+  id: string;
+  label: string;
+};
+
+export type IntegrationConnectionLabel = "connected" | "not-connected";
+
 export type IntegrationQuickActionKind =
   | "open"
   | "resume"
@@ -50,6 +57,8 @@ export type ExecutiveIntegration = {
   lastActivityAt?: string;
   lastActivitySummary?: string;
   highlights: IntegrationHighlight[];
+  /** Plain-English capabilities — what this integration will do for Shari */
+  capabilities: IntegrationCapability[];
   quickActions: IntegrationQuickAction[];
   openUrl?: string;
   orchestrationNote: string;

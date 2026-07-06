@@ -1,6 +1,8 @@
 export type {
   IntegrationGroupId,
   IntegrationStatus,
+  IntegrationConnectionLabel,
+  IntegrationCapability,
   IntegrationQuickActionKind,
   IntegrationQuickAction,
   IntegrationHighlight,
@@ -11,6 +13,20 @@ export type {
   ExecutiveIntegrationCenterView,
   IntegrationSearchView,
 } from "./types";
+
+export {
+  GHL_CAPABILITIES,
+  INTEGRATION_OPEN_ROUTES,
+  POSTCRAFT_CAPABILITIES,
+  integrationConnectionLabel,
+  parseMarketingIntegrationStatus,
+  resolveIntegrationActionHref,
+  resolveIntegrationConnectionLabel,
+} from "./integrationConnection";
+export type {
+  EcosystemDashboardStatusPayload,
+  MarketingIntegrationLiveStatus,
+} from "./integrationConnection";
 
 export {
   INTEGRATION_CENTER_PRINCIPLE,

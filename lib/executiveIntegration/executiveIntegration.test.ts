@@ -26,8 +26,9 @@ describe("Executive Integration Center™", () => {
     const postcraft = view.groups
       .flatMap((g) => g.integrations)
       .find((i) => i.id === "postcraft");
-    expect(postcraft?.status).toBe("connected");
-    expect(postcraft?.quickActions.length).toBeGreaterThan(0);
+    expect(postcraft?.status).toBe("needs-configuration");
+    expect(postcraft?.capabilities.length).toBe(3);
+    expect(postcraft?.quickActions.length).toBe(3);
     expect(postcraft?.highlights.length).toBeGreaterThan(0);
   });
 

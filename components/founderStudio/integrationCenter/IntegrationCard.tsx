@@ -1,29 +1,65 @@
 "use client";
 
-import type { ExecutiveIntegration, IntegrationStatus } from "@/lib/executiveIntegration/types";
+import type { ExecutiveIntegration } from "@/lib/executiveIntegration/types";
+import {
+  resolveIntegrationActionHref,
+  resolveIntegrationConnectionLabel,
+  type MarketingIntegrationLiveStatus,
+} from "@/lib/executiveIntegration";
 
-const STATUS_LABEL: Record<IntegrationStatus, string> = {
+const CONNECTION_LABEL = {
   connected: "Connected",
-  "needs-configuration": "Needs Configuration",
-  offline: "Offline",
+  "not-connected": "Not connected",
+} as const;
+
+const LEGACY_STATUS_LABEL = {
+  connected: "Connected",
+  "needs-configuration": "Not connected",
+  offline: "Not connected",
   future: "Future",
   unavailable: "Unavailable",
-};
+} as const;
 
 type IntegrationCardProps = {
   integration: ExecutiveIntegration;
+  liveStatus?: MarketingIntegrationLiveStatus;
 };
 
-export function IntegrationCard({ integration }: IntegrationCardProps) {
+export function IntegrationCard({ integration, liveStatus }: IntegrationCardProps) {
+  const isMarketing =
+    integration.id === "postcraft" || integration.id === "gohighlevel";
+  const connection = isMarketing
+    ? resolveIntegrationConnectionLabel(integration, liveStatus)
+    : null;
+
+  const statusLabel = connection
+    ? CONNECTION_LABEL[connection]
+    : LEGACY_STATUS_LABEL[integration.status];
+
+  const statusClass = connection ?? integration.status;
+
   return (
-    <article className={`founder-integration__card founder-integration__card--${integration.status}`}>
+    <article className={`founder-integration__card founder-integration__card--${statusClass}`}>
       <header className="founder-integration__card-header">
         <div>
           <h4 className="founder-integration__card-name">{integration.name}</h4>
           <p className="founder-integration__card-tagline">{integration.tagline}</p>
         </div>
-        <span className="founder-integration__status">{STATUS_LABEL[integration.status]}</span>
+        <span className={`founder-integration__status founder-integration__status--${statusClass}`}>
+          {statusLabel}
+        </span>
       </header>
+
+      {integration.capabilities.length > 0 ? (
+        <div className="founder-integration__capabilities">
+          <p className="founder-integration__capabilities-title">What it will do</p>
+          <ul className="founder-integration__capabilities-list">
+            {integration.capabilities.map((cap) => (
+              <li key={cap.id}>{cap.label}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
 
       <ul className="founder-integration__highlights">
         {integration.highlights.map((h) => (
@@ -54,8 +90,11 @@ export function IntegrationCard({ integration }: IntegrationCardProps) {
               type="button"
               className="founder-integration__action-button"
               onClick={() => {
-                if (integration.openUrl && action.kind === "open") {
-                  window.open(integration.openUrl, "_blank", "noopener,noreferrer");
+                const href =
+                  resolveIntegrationActionHref(integration.id, action.id) ??
+                  (action.kind === "open" ? integration.openUrl : undefined);
+                if (href) {
+                  window.open(href, "_blank", "noopener,noreferrer");
                 }
               }}
             >

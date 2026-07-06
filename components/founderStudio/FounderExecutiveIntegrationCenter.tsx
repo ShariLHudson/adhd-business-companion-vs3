@@ -10,12 +10,23 @@ import type { IntegrationSearchView } from "@/lib/executiveIntegration/types";
 import { RoomHeader } from "./executive/RoomHeader";
 import { IntegrationGroupPanel } from "./integrationCenter/IntegrationGroupPanel";
 import { IntegrationSearchPanel } from "./integrationCenter/IntegrationSearchPanel";
+import { MarketingIntegrationsPanel } from "./integrationCenter/MarketingIntegrationsPanel";
+import { useMarketingIntegrationStatus } from "./integrationCenter/useMarketingIntegrationStatus";
 
 export function FounderExecutiveIntegrationCenter() {
   const bootstrap = useMemo(() => getIntegrationCenterBootstrap(), []);
   const center = useMemo(() => composeIntegrationCenterView(), []);
+  const liveStatus = useMarketingIntegrationStatus();
   const [query, setQuery] = useState("");
   const [searchView, setSearchView] = useState<IntegrationSearchView | null>(null);
+
+  const marketingIntegrations = useMemo(
+    () =>
+      center.groups
+        .filter((g) => g.id === "marketing")
+        .flatMap((g) => g.integrations),
+    [center.groups],
+  );
 
   const runSearch = useCallback(() => {
     setSearchView(composeIntegrationSearch(query));
@@ -43,6 +54,11 @@ export function FounderExecutiveIntegrationCenter() {
         </p>
       </section>
 
+      <MarketingIntegrationsPanel
+        integrations={marketingIntegrations}
+        liveStatus={liveStatus}
+      />
+
       <IntegrationSearchPanel
         query={query}
         onQueryChange={setQuery}
@@ -56,6 +72,10 @@ export function FounderExecutiveIntegrationCenter() {
             key={group.id}
             group={group}
             defaultOpen={index < 3}
+            liveStatus={liveStatus}
+            excludeIntegrationIds={
+              group.id === "marketing" ? ["postcraft", "gohighlevel"] : []
+            }
           />
         ))}
       </div>

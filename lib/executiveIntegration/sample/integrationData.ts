@@ -3,6 +3,7 @@ import type {
   IntegrationGroup,
   IntegrationSearchResult,
 } from "../types";
+import { GHL_CAPABILITIES, POSTCRAFT_CAPABILITIES } from "../integrationConnection";
 
 export const INTEGRATION_CENTER_PRINCIPLE =
   "Founder orchestrates. Other applications are connected departments — not separate worlds.";
@@ -11,9 +12,14 @@ export const ONE_OFFICE_MESSAGE =
   "What you need today — organized around running your company, not opening applications.";
 
 function integration(
-  partial: ExecutiveIntegration,
+  partial: Omit<ExecutiveIntegration, "capabilities"> & {
+    capabilities?: ExecutiveIntegration["capabilities"];
+  },
 ): ExecutiveIntegration {
-  return partial;
+  return {
+    ...partial,
+    capabilities: partial.capabilities ?? [],
+  };
 }
 
 const COMMUNICATION: ExecutiveIntegration[] = [
@@ -145,19 +151,20 @@ const MARKETING: ExecutiveIntegration[] = [
     name: "PostCraft™",
     groupId: "marketing",
     tagline: "Founder decides · PostCraft creates",
-    status: "connected",
-    lastActivityAt: "2026-07-06T10:20:00Z",
-    lastActivitySummary: "Gentle Restart campaign awaiting estate visual",
+    status: "needs-configuration",
+    lastActivitySummary: "Connect ecosystem signals to send content and import analytics",
+    capabilities: [...POSTCRAFT_CAPABILITIES],
     highlights: [
-      { id: "pc-queue", label: "Content queue", value: "3 drafts" },
-      { id: "pc-campaigns", label: "Campaign queue", value: "1 restart campaign" },
-      { id: "pc-waiting", label: "Drafts waiting", value: "Quote injection from research" },
+      { id: "pc-queue", label: "Content queue", value: "Awaiting connection" },
+      { id: "pc-campaigns", label: "Campaign queue", value: "Draft when connected" },
     ],
     quickActions: [
-      { id: "pc-create", kind: "prepare", label: "Create campaign" },
       { id: "pc-open", kind: "open", label: "Open PostCraft" },
+      { id: "pc-send", kind: "prepare", label: "Send content to PostCraft" },
+      { id: "pc-analytics", kind: "review", label: "Import PostCraft analytics" },
     ],
-    orchestrationNote: "PostCraft creates — Founder coordinates messaging with research.",
+    openUrl: "/ecosystem/dashboard",
+    orchestrationNote: "PostCraft creates — Founder coordinates messaging with research. Nothing publishes without you.",
   }),
   integration({
     id: "gohighlevel",
@@ -165,17 +172,19 @@ const MARKETING: ExecutiveIntegration[] = [
     groupId: "marketing",
     tagline: "Founder decides · GHL delivers",
     status: "needs-configuration",
-    lastConnectedAt: "2026-07-01T14:00:00Z",
-    lastActivitySummary: "Membership workflow draft — needs final connection",
+    lastActivitySummary: "Connect GHL API and location to prepare funnels and import results",
+    capabilities: [...GHL_CAPABILITIES],
     highlights: [
-      { id: "ghl-crm", label: "CRM", value: "Restart segment ready" },
-      { id: "ghl-funnels", label: "Funnels", value: "Workshop funnel draft" },
-      { id: "ghl-auto", label: "Automations", value: "2 waiting approval" },
+      { id: "ghl-crm", label: "CRM", value: "Connect to activate" },
+      { id: "ghl-funnels", label: "Funnels", value: "Prepare after connection" },
     ],
     quickActions: [
-      { id: "ghl-review", kind: "review", label: "Review workflows" },
-      { id: "ghl-open", kind: "open", label: "Open GoHighLevel" },
+      { id: "ghl-open", kind: "open", label: "Open GHL" },
+      { id: "ghl-funnel", kind: "prepare", label: "Prepare funnel" },
+      { id: "ghl-email", kind: "prepare", label: "Prepare email workflow" },
+      { id: "ghl-results", kind: "review", label: "Import campaign results" },
     ],
+    openUrl: "/ghl/dashboard",
     orchestrationNote: "Nothing launches from GHL until Founder approves.",
   }),
 ];
