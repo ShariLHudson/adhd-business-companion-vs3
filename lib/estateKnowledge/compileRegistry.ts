@@ -121,7 +121,7 @@ function buildGuidebookRef(placeId: string): EstateKnowledgeGuidebookRef | null 
     title: spread.title,
     epigraph: spread.epigraph,
     openingLine: spread.openingLine,
-    tagline: spread.tagline,
+    tagline: spread.guideSubtitle,
   };
 }
 
