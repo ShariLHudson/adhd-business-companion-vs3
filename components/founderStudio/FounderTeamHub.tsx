@@ -1,32 +1,25 @@
-import Link from "next/link";
-
+import { getTeamHubSections } from "@/lib/founder/teamhub";
 import { FOUNDER_STUDIO_BASE } from "@/lib/founderStudio/founderConfig";
-import { TEAM_HUB_SECTIONS } from "@/lib/founderStudio/sampleData";
 
-import { FounderPanel } from "./FounderPanel";
+import { ExecutivePanel, RoomHeader } from "./executive";
 import { FounderRoomNav } from "./FounderRoomNav";
 
 export function FounderTeamHub() {
+  const sections = getTeamHubSections();
+
   return (
     <div className="founder-team-hub">
-      <header className="founder-room-page__hero">
-        <Link href={FOUNDER_STUDIO_BASE} className="founder-room-page__back">
-          ← Back to Founder Studio
-        </Link>
-        <p className="founder-room-page__eyebrow">Team Hub™ · Execution layer</p>
-        <h1>Team Hub™</h1>
-        <p className="founder-room-page__question">
-          What needs to be executed, assigned, reviewed, or approved?
-        </p>
-        <p className="founder-room-page__purpose">
-          Founder thinks. Team Hub executes. Izna&apos;s lane stays here — not in
-          private strategy intelligence.
-        </p>
-      </header>
+      <RoomHeader
+        backHref={FOUNDER_STUDIO_BASE}
+        eyebrow="Team Hub™ · Execution layer"
+        title="Team Hub™"
+        question="What needs to be executed, assigned, reviewed, or approved?"
+        purpose="Founder thinks. Team Hub executes. Izna's lane stays here — not in private strategy intelligence."
+      />
 
       <div className="founder-team-hub__grid">
-        {TEAM_HUB_SECTIONS.map((section) => (
-          <FounderPanel
+        {sections.map((section) => (
+          <ExecutivePanel
             key={section.id}
             title={section.title}
             collapsible
@@ -46,7 +39,7 @@ export function FounderTeamHub() {
                 </li>
               ))}
             </ul>
-          </FounderPanel>
+          </ExecutivePanel>
         ))}
       </div>
 

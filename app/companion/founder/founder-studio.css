@@ -729,4 +729,91 @@
   .founder-room-nav__card:hover {
     transform: none;
   }
+
+  .founder-loading-skeleton__line {
+    animation: none;
+  }
+}
+
+/* Executive design system additions */
+.founder-metric-tile {
+  padding: 1rem;
+  border-radius: 1rem;
+  background: rgba(15, 111, 124, 0.22);
+  border: 1px solid rgba(48, 182, 213, 0.18);
+}
+
+.founder-metric-tile__label {
+  margin: 0 0 0.35rem;
+  font-size: 0.9rem;
+  color: var(--founder-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.founder-metric-tile__value {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.founder-metric-tile__trend {
+  color: var(--founder-aqua);
+}
+
+.founder-metric-tile__note {
+  margin: 0.35rem 0 0;
+  font-size: 0.95rem;
+  color: var(--founder-muted);
+}
+
+.founder-empty-state {
+  padding: 1.5rem;
+  text-align: center;
+  color: var(--founder-muted);
+}
+
+.founder-empty-state__title {
+  margin: 0 0 0.35rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--founder-text);
+}
+
+.founder-empty-state__message {
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.45;
+}
+
+.founder-loading-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  padding: 0.5rem 0;
+}
+
+.founder-loading-skeleton__line {
+  height: 1rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(
+    90deg,
+    rgba(48, 182, 213, 0.15) 0%,
+    rgba(48, 182, 213, 0.35) 50%,
+    rgba(48, 182, 213, 0.15) 100%
+  );
+  background-size: 200% 100%;
+  animation: founder-skeleton-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes founder-skeleton-pulse {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
 }
