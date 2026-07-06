@@ -12,7 +12,7 @@ import { captureObservation, applyLearn, resetRuntimeObservations } from "../his
 import { listPatterns } from "../patterns/patternEngine";
 import { listFrictionPatterns } from "../patterns/frictionPatterns";
 import { listStrengths } from "../patterns/strengthPatterns";
-import { buildRecommendations, topRecommendation } from "../recommendations/recommendationEngine";
+import { buildRecommendations, topRecommendation as selectTopRecommendation } from "../recommendations/recommendationEngine";
 import { composeAdaptationView } from "../adaptation/adaptationEngine";
 import { founderProfileSampleRepository } from "../repositories/sample";
 
@@ -48,7 +48,7 @@ export class FounderProfileService {
 
   topRecommendation(context: FounderProfileRecommendContext = {}) {
     void context;
-    return topRecommendation();
+    return selectTopRecommendation();
   }
 
   sampleRepository() {
