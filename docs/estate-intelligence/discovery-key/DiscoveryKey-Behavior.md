@@ -7,6 +7,7 @@
 | **Status** | Foundational — behavior spec; no UI implementation yet |
 | **Constitution** | [DiscoveryKey-Constitution.md](./DiscoveryKey-Constitution.md) |
 | **Data** | [discovery-rules.md](../discovery-rules.md) · [discovery-library.json](../discovery-library.json) · [room-placement-library.json](../room-placement-library.json) |
+| **Visual** | [DiscoveryKey-Visual-Reference.md](./DiscoveryKey-Visual-Reference.md) — `/images/discovery-key.png` |
 | **Parent** | [Estate Intelligence System](../README.md) |
 
 ---

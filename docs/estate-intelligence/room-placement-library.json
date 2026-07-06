@@ -3,7 +3,15 @@
   "version": "1.0.0",
   "description": "In-scene placement metadata for Discovery Key and diegetic UI — where keys, objects, and affordances appear in room images.",
   "statusValues": ["Live", "Draft", "Future", "Hidden", "Retired"],
-  "itemSchema": {
+  "canonicalAssets": {
+    "discoveryKey": {
+      "officialName": "Discovery Key™",
+      "path": "/images/discovery-key.png",
+      "repositoryPath": "public/images/discovery-key.png",
+      "visualReference": "docs/estate-intelligence/discovery-key/DiscoveryKey-Visual-Reference.md",
+      "reuseRule": "Single asset estate-wide — no alternate key designs"
+    }
+  },
     "id": "string",
     "roomId": "string",
     "officialName": "string",
