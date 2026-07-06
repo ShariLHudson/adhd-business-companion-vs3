@@ -7,7 +7,7 @@ import {
   composeOpportunityDiscoveryOverview,
   getOpportunityById,
   opportunityDiscoveryService,
-} from "@/lib/opportunities";
+} from "@/lib/opportunities/services/opportunityDiscoveryService";
 import { getOpportunityCenterBootstrap } from "@/lib/founder/opportunityCenter";
 
 export function prepareFounderOpportunityCenter(missionId: MissionId = DEFAULT_ACTIVE_MISSION_ID) {
@@ -21,9 +21,8 @@ export function prepareFounderOpportunityCenter(missionId: MissionId = DEFAULT_A
 
 export function prepareFounderOpportunityOverview(missionId: MissionId = DEFAULT_ACTIVE_MISSION_ID) {
   return {
-    product: "founder" as const,
-    missionId,
     ...composeOpportunityDiscoveryOverview(),
+    missionId,
   };
 }
 

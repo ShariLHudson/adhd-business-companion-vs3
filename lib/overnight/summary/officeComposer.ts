@@ -12,7 +12,7 @@ import type {
   ResearchSummary,
   RiskSummary,
 } from "../types";
-import { discoverOpportunities } from "@/lib/opportunities";
+import { opportunitySampleRepository } from "@/lib/opportunities/repositories/sample";
 import { executiveQuestionService } from "@/lib/executiveQuestions";
 import { getActiveMission, missionService } from "@/lib/founder/missions";
 import type { MissionId } from "@/lib/founder/missions";
@@ -66,14 +66,15 @@ export function composeQuestionSummaries(): QuestionSummary[] {
 }
 
 export function composeOpportunitySummaries(): OpportunitySummary[] {
-  return discoverOpportunities({ missionId: "listening-rooms" })
+  return [...opportunitySampleRepository.all()]
+    .sort((a, b) => b.rankScore - a.rankScore)
     .slice(0, 4)
     .map((o) => ({
       id: o.id,
-      title: o.title,
-      headline: o.summary,
-      missionIds: o.missionIds,
-      compositeScore: o.score.composite,
+      title: o.name,
+      headline: o.executiveSummary,
+      missionIds: o.relatedMissions,
+      compositeScore: o.rankScore,
     }));
 }
 

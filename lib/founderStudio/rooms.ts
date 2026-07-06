@@ -165,6 +165,24 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
     accent: "gold",
   },
   {
+    id: "executive-discovery-engine",
+    href: `${FOUNDER_STUDIO_BASE}/executive-discovery-engine`,
+    title: "Executive Discovery Engine™",
+    question: "What did Founder find while you were away?",
+    purpose:
+      "Your executive discovery department — daily briefs, weekly patterns, and calm recommendations before you ask.",
+    accent: "teal",
+  },
+  {
+    id: "executive-integration-center",
+    href: `${FOUNDER_STUDIO_BASE}/executive-integration-center`,
+    title: "Executive Integration Center™",
+    question: "What do I need from my connected systems today?",
+    purpose:
+      "Mission Control — Founder orchestrates PostCraft, GHL, GitHub, Google, Cursor, and every department of Visual Spark Studios.",
+    accent: "bronze",
+  },
+  {
     id: "decision-vault",
     href: `${FOUNDER_STUDIO_BASE}/decision-vault`,
     title: "Decision Vault™",

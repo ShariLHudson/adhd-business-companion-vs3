@@ -6,7 +6,7 @@ import {
   SUGGESTED_RESEARCH_QUERIES,
   getSampleReport,
 } from "../../sample/researchData";
-import type { ExecutiveResearchReport, ResearchCategoryId } from "../types";
+import type { ExecutiveResearchReport, ResearchCategoryId } from "../../types";
 
 const SO_WHAT_MINIMUM = 70;
 

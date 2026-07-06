@@ -1,10 +1,13 @@
-import { applyRuleOfThree } from "@/lib/calmIntelligence";
-
 import { opportunitySampleRepository } from "../repositories/sample";
 import type { BusinessOpportunity, OpportunityDiscoveryOverview } from "../types";
 
 function sortByRank(items: BusinessOpportunity[]): BusinessOpportunity[] {
   return [...items].sort((a, b) => b.rankScore - a.rankScore);
+}
+
+/** Rule of Three — local to avoid calmIntelligence ↔ overnight import cycle. */
+function topThree(items: BusinessOpportunity[]): BusinessOpportunity[] {
+  return items.slice(0, 3);
 }
 
 /** Compose the opening surface — Rule of One + Rule of Three. */
@@ -14,25 +17,25 @@ export function composeOpportunityDiscoveryOverview(): OpportunityDiscoveryOverv
     opportunitySampleRepository.byBucket("todays-biggest")[0] ??
     sortByRank(all)[0]!;
 
-  const emerging = applyRuleOfThree(
+  const emerging = topThree(
     sortByRank(opportunitySampleRepository.byBucket("emerging")),
-  ).items;
+  );
 
-  const quickWins = applyRuleOfThree(
+  const quickWins = topThree(
     sortByRank(opportunitySampleRepository.byBucket("quick-win")),
-  ).items;
+  );
 
-  const longTerm = applyRuleOfThree(
+  const longTerm = topThree(
     sortByRank(opportunitySampleRepository.byBucket("long-term")),
-  ).items;
+  );
 
-  const competitiveThreats = applyRuleOfThree(
+  const competitiveThreats = topThree(
     sortByRank(opportunitySampleRepository.byBucket("competitive-threat")),
-  ).items;
+  );
 
-  const watching = applyRuleOfThree(
+  const watching = topThree(
     sortByRank(opportunitySampleRepository.byBucket("watching")),
-  ).items;
+  );
 
   return {
     product: "founder",

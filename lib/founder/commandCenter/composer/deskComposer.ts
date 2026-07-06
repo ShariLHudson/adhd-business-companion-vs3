@@ -3,7 +3,7 @@ import { missionService } from "@/lib/founder/missions";
 import type { MissionId } from "@/lib/founder/missions/types";
 import { getExecutiveBrief } from "@/lib/founder/executiveBrief";
 import { executiveDecisionService } from "@/lib/executiveDecision";
-import { opportunityDiscoveryService } from "@/lib/opportunities";
+import { opportunitySampleRepository } from "@/lib/opportunities/repositories/sample";
 import { executiveOrchestratorService } from "@/lib/orchestrator";
 import type { ExecutiveDesk } from "../types";
 
@@ -19,10 +19,14 @@ export function composeExecutiveDesk(missionId: MissionId = DEFAULT_ACTIVE_MISSI
   const topDecision = decisions.find((d) => d.id === "ed-voice-companion") ?? decisions[0];
   const rec = topDecision ? executiveDecisionService.recommendOption(topDecision.id) : null;
 
-  const opportunities = opportunityDiscoveryService
-    .discover({ missionId })
+  const opportunities = [...opportunitySampleRepository.all()]
+    .sort((a, b) => b.rankScore - a.rankScore)
     .slice(0, 3)
-    .map((o) => ({ id: o.id, title: o.title, summary: o.reasoning?.whyItMatters ?? o.summary }));
+    .map((o) => ({
+      id: o.id,
+      title: o.name,
+      summary: o.recommendationRationale || o.executiveSummary,
+    }));
 
   const waitingOn = executiveOrchestratorService
     .list()

@@ -1,7 +1,7 @@
 import type { ExecutiveLeverage } from "../types";
 import type { MissionId } from "@/lib/founder/missions/types";
 import { executiveOrchestratorService } from "@/lib/orchestrator";
-import { opportunityDiscoveryService } from "@/lib/opportunities";
+import { opportunitySampleRepository } from "@/lib/opportunities/repositories/sample";
 
 export function composeLeverageItems(missionId: MissionId): ExecutiveLeverage[] {
   const items: ExecutiveLeverage[] = [];
@@ -23,19 +23,21 @@ export function composeLeverageItems(missionId: MissionId): ExecutiveLeverage[] 
     });
   }
 
-  const opps = opportunityDiscoveryService.discover({ missionId }).slice(0, 2);
+  const opps = [...opportunitySampleRepository.all()]
+    .sort((a, b) => b.rankScore - a.rankScore)
+    .slice(0, 2);
   for (const opp of opps) {
     items.push({
       itemId: opp.id,
-      title: opp.title,
+      title: opp.name,
       timeSavedHours: 2,
       decisionsSaved: 0,
       researchAvoided: false,
       automationPotential: 40,
-      revenueImpact: opp.impact?.summary ?? "TBD",
-      customerImpact: opp.reasoning?.whoBenefits ?? "Members",
+      revenueImpact: opp.estimatedRevenue,
+      customerImpact: opp.soWhat.whyMembersShouldCare,
       founderEffort: "low",
-      summary: opp.reasoning?.whyItMatters ?? opp.summary,
+      summary: opp.recommendationRationale || opp.executiveSummary,
     });
   }
 

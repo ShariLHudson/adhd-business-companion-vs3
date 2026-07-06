@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 
-import { getOpportunityById } from "@/lib/opportunities";
+import { getOpportunityById } from "@/lib/opportunities/services/opportunityDiscoveryService";
 import { getOpportunityCenterBootstrap } from "@/lib/founder/opportunityCenter";
 import { FOUNDER_STUDIO_BASE } from "@/lib/founderStudio/founderConfig";
 

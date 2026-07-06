@@ -4,7 +4,7 @@ import { DEFAULT_ACTIVE_MISSION_ID } from "@/lib/founder/missions";
 import { composeExecutiveDesk } from "@/lib/founder/commandCenter";
 import { improvementService } from "@/lib/improvement";
 import { founderProfileService } from "@/lib/founderProfile";
-import { opportunityDiscoveryService } from "@/lib/opportunities";
+import { opportunitySampleRepository } from "@/lib/opportunities/repositories/sample";
 import { ONE_RECOMMENDATION_PRINCIPLE } from "../sample";
 
 function candidate(
@@ -69,13 +69,15 @@ export function collectCompetingRecommendations(missionId: MissionId): RoutedRec
     );
   }
 
-  for (const opp of opportunityDiscoveryService.discover({ missionId }).slice(0, 5)) {
+  for (const opp of [...opportunitySampleRepository.all()]
+    .sort((a, b) => b.rankScore - a.rankScore)
+    .slice(0, 5)) {
     if (!items.some((i) => i.id === `rec-opp-${opp.id}`)) {
       items.push(
         candidate(
           `rec-opp-${opp.id}`,
-          opp.title,
-          opp.reasoning?.whyItMatters ?? opp.summary,
+          opp.name,
+          opp.recommendationRationale || opp.executiveSummary,
           "opportunity_discovery",
           65,
         ),

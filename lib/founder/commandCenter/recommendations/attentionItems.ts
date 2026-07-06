@@ -3,7 +3,7 @@ import { classifyAttention } from "../attention/attentionModel";
 import { DEFAULT_ACTIVE_MISSION_ID } from "@/lib/founder/missions";
 import type { MissionId } from "@/lib/founder/missions/types";
 import { executiveDecisionService } from "@/lib/executiveDecision";
-import { opportunityDiscoveryService } from "@/lib/opportunities";
+import { opportunitySampleRepository } from "@/lib/opportunities/repositories/sample";
 import { executiveOrchestratorService } from "@/lib/orchestrator";
 import { getFounderExecutiveQuestionsBundle } from "@/lib/founder/services/executiveQuestionsBridge";
 
@@ -39,12 +39,14 @@ export function buildAttentionItems(missionId: MissionId = DEFAULT_ACTIVE_MISSIO
     );
   }
 
-  for (const opp of opportunityDiscoveryService.discover({ missionId }).slice(0, 3)) {
+  for (const opp of [...opportunitySampleRepository.all()]
+    .sort((a, b) => b.rankScore - a.rankScore)
+    .slice(0, 3)) {
     items.push(
       classifyAttention({
         id: `att-opp-${opp.id}`,
-        title: opp.title,
-        summary: opp.summary,
+        title: opp.name,
+        summary: opp.executiveSummary,
         level: "watch",
         source: "opportunity_discovery",
         missionId,

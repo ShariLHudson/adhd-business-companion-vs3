@@ -71,7 +71,8 @@ export type SparkEcosystemTarget =
   | "courses"
   | "workshops"
   | "memberships"
-  | "operations";
+  | "operations"
+  | "marketing";
 
 export type OpportunityEvidence = {
   id: string;
@@ -201,3 +202,27 @@ export type OpportunityType = {
   id: OpportunityTypeId;
   label: string;
 };
+
+export type OpportunityCategory =
+  | "product"
+  | "revenue"
+  | "marketing"
+  | "workshop"
+  | "course"
+  | "feature"
+  | "automation"
+  | "ai"
+  | "technology"
+  | "customer"
+  | "community"
+  | "partnership"
+  | "brand"
+  | "operational";
+
+export type OpportunityExecutiveFilter =
+  | "high-impact"
+  | "quick-win"
+  | "long-term-bet"
+  | "needs-research"
+  | "watch"
+  | "ignore";
