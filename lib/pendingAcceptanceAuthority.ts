@@ -4,6 +4,9 @@
  */
 
 import { isActionAcceptance } from "./assistedActionBridge";
+import {
+  affirmationAlignsWithRecentMeaning,
+} from "./conversation/mostRecentMeaningWins";
 import type { OutcomeThread } from "./companionOutcomeThread";
 import { threadAwareAcceptanceFallback } from "./companionOutcomeThread";
 import type { AppSection } from "./companionUi";
@@ -240,19 +243,31 @@ export function resolvePendingAcceptance(
   }
 
   if (!hasActivePending(input)) {
-    if (
-      input.pendingAction &&
-      (shouldAutoLaunchPendingAction(
+  if (
+    input.pendingAction &&
+    (shouldAutoLaunchPendingAction(
+      t,
+      input.lastAssistantText,
+      input.pendingAction,
+    ) ||
+      matchesExperienceFollowUp(
         t,
         input.lastAssistantText,
         input.pendingAction,
-      ) ||
-        matchesExperienceFollowUp(
-          t,
-          input.lastAssistantText,
-          input.pendingAction,
-        ))
+      ))
+  ) {
+    if (
+      !affirmationAlignsWithRecentMeaning({
+        userText: t,
+        lastAssistantText: input.lastAssistantText,
+        pendingAction: input.pendingAction,
+        pendingOfferSummary: input.record?.offerSummary ?? input.pendingAction.kind,
+        pendingOfferedAtTurn: input.record?.offeredAtTurn,
+        currentTurn: input.currentTurn,
+      })
     ) {
+      return { outcome: "not_acceptance" };
+    }
       const section =
         input.pendingAction.kind === "workspace"
           ? input.pendingAction.offer.section
@@ -320,6 +335,22 @@ export function resolvePendingAcceptance(
     );
 
     if (specific || genericAllowed || (bareGeneric && autoLaunch)) {
+      if (
+        bareGeneric &&
+        !affirmationAlignsWithRecentMeaning({
+          userText: t,
+          lastAssistantText: input.lastAssistantText,
+          pendingAction: input.pendingAction,
+          pendingOfferSummary: record.offerSummary,
+          pendingOfferedAtTurn: record.offeredAtTurn,
+          currentTurn: input.currentTurn,
+        })
+      ) {
+        return {
+          outcome: "conversation",
+          message: ambiguousAcceptanceReply(input.outcomeThread),
+        };
+      }
       const section =
         input.pendingAction.kind === "workspace"
           ? input.pendingAction.offer.section
@@ -338,6 +369,8 @@ export function resolvePendingAcceptance(
     message: ambiguousAcceptanceReply(input.outcomeThread),
   };
 }
+
+export { MOST_RECENT_MEANING_WINS_HINT } from "./conversation/mostRecentMeaningWins";
 
 export function topicChangeInvalidatesOffer(
   userText: string,

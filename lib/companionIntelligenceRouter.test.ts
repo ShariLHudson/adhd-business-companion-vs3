@@ -8,6 +8,7 @@ import { resolveCompanionIntelligence } from "./companionConstitution";
 import { createPendingAcceptanceRecord } from "./pendingAcceptanceAuthority";
 import { resolvePendingAction } from "./pendingAction";
 import type { WorkspaceOffer } from "./workspaceMode";
+import type { PendingAction } from "./pendingAction";
 
 describe("companionIntelligenceRouter", () => {
   it("delegates orchestration to Companion Intelligence conductor", () => {
@@ -103,6 +104,41 @@ describe("companionIntelligenceRouter", () => {
     if (result.kind === "workflow") {
       expect(result.continuation.action).toBe("reply");
       expect(result.continuation.message).toMatch(/projects you're considering/i);
+    }
+  });
+
+  it("yes after clear my mind offer wins over stale create pending", () => {
+    const clearMyMindOffer =
+      "Would you like to clear your mind together for a few minutes?";
+    const staleCreate: PendingAction = {
+      kind: "workspace",
+      offer: {
+        section: "content-generator",
+        buttonLabel: "Create",
+        line: "Want to build your sales funnel?",
+      },
+    };
+    const record = createPendingAcceptanceRecord(
+      "workspace",
+      "Create sales funnel",
+      2,
+      null,
+    );
+    const result = resolveCompanionAcceptanceTurn({
+      userText: "yes",
+      lastAssistantText: clearMyMindOffer,
+      currentTurn: 5,
+      workflow: null,
+      pendingInput: {
+        workspacePanel: null,
+        record,
+        pendingAction: staleCreate,
+        createConsent: null,
+      },
+    });
+    expect(result.kind).toBe("workflow");
+    if (result.kind === "workflow" && result.continuation.action === "open_section") {
+      expect(result.continuation.section).toBe("brain-dump");
     }
   });
 

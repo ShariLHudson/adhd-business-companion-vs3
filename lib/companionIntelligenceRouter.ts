@@ -50,6 +50,10 @@ import {
   type ResolvePendingAcceptanceInput,
   type ResolvePendingAcceptanceResult,
 } from "./pendingAcceptanceAuthority";
+import {
+  affirmationAlignsWithRecentMeaning,
+  inferMeaningTopicFromAssistant,
+} from "./conversation/mostRecentMeaningWins";
 import type { PendingAction } from "./pendingAction";
 import type { OutcomeThread } from "./companionOutcomeThread";
 import {
@@ -346,6 +350,17 @@ export function resolveCompanionAcceptanceTurn(input: {
   const t = input.userText.trim();
   if (!t) return { kind: "none" };
 
+  const lastAssistant = input.lastAssistantText.trim();
+  const workflowFromLast =
+    lastAssistant && isAcceptanceAttempt(t)
+      ? resolveWorkflowFromLastAssistant(
+          t,
+          input.lastAssistantText,
+          input.currentTurn,
+          input.outcomeThread,
+        )
+      : null;
+
   const commitmentResolution = resolveConversationCommitment({
     userText: t,
     commitment: input.commitment ?? null,
@@ -355,11 +370,40 @@ export function resolveCompanionAcceptanceTurn(input: {
     hasRealArtifactDraft: input.hasRealArtifactDraft,
   });
 
+  const commitmentMatchesRecentOffer =
+    !input.commitment ||
+    !lastAssistant ||
+    input.commitment.promptText.trim() === lastAssistant ||
+    lastAssistant.includes(input.commitment.promptText.trim().slice(0, 48)) ||
+    input.commitment.offeredAtTurn >= input.currentTurn - 1;
+
+  if (input.commitment && workflowFromLast && isAcceptanceAttempt(t)) {
+    const assistantTopic = inferMeaningTopicFromAssistant(lastAssistant);
+    const commitmentTopic = inferMeaningTopicFromAssistant(
+      input.commitment.promptText,
+    );
+    if (
+      assistantTopic !== "unknown" &&
+      commitmentTopic !== "unknown" &&
+      assistantTopic !== commitmentTopic &&
+      !commitmentMatchesRecentOffer
+    ) {
+      return { kind: "workflow", continuation: workflowFromLast };
+    }
+  }
+
   if (input.commitment) {
     if (
       commitmentResolution.outcome !== "not_commitment_reply" &&
       commitmentResolution.outcome !== "expired"
     ) {
+      if (
+        isAcceptanceAttempt(t) &&
+        !commitmentMatchesRecentOffer &&
+        workflowFromLast
+      ) {
+        return { kind: "workflow", continuation: workflowFromLast };
+      }
       return { kind: "commitment", resolution: commitmentResolution };
     }
   } else if (commitmentResolution.outcome === "duplicate") {
@@ -378,14 +422,7 @@ export function resolveCompanionAcceptanceTurn(input: {
       })
     : null;
 
-  const workflowHit =
-    fromState ??
-    resolveWorkflowFromLastAssistant(
-      t,
-      input.lastAssistantText,
-      input.currentTurn,
-      input.outcomeThread,
-    );
+  const workflowHit = fromState ?? workflowFromLast;
 
   if (workflowHit) {
     return { kind: "workflow", continuation: workflowHit };
@@ -399,7 +436,30 @@ export function resolveCompanionAcceptanceTurn(input: {
     ...input.pendingInput,
   });
 
-  if (pending.outcome === "accept" || pending.outcome === "expired") {
+  if (pending.outcome === "accept") {
+    if (
+      input.pendingInput.pendingAction &&
+      !affirmationAlignsWithRecentMeaning({
+        userText: t,
+        lastAssistantText: input.lastAssistantText,
+        pendingAction: input.pendingInput.pendingAction,
+        pendingOfferSummary: input.pendingInput.record?.offerSummary,
+        pendingOfferedAtTurn: input.pendingInput.record?.offeredAtTurn,
+        currentTurn: input.currentTurn,
+      })
+    ) {
+      if (workflowFromLast) {
+        return { kind: "workflow", continuation: workflowFromLast };
+      }
+      return { kind: "none" };
+    }
+    return { kind: "pending", result: pending };
+  }
+
+  if (pending.outcome === "expired") {
+    if (workflowFromLast) {
+      return { kind: "workflow", continuation: workflowFromLast };
+    }
     return { kind: "pending", result: pending };
   }
 

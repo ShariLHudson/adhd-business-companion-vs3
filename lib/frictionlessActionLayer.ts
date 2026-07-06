@@ -16,6 +16,14 @@ import {
 } from "./conversationConfirmationGate";
 import { shouldSuppressEnvironmentNeedDuringDistress } from "./conversation/emotionalDistressRouting";
 import {
+  inferMeaningTopicFromAssistant,
+  inferMeaningTopicFromFrictionlessPending,
+} from "./conversation/mostRecentMeaningWins";
+import {
+  isConversationPriorityEngineEnabled,
+  resolveConversationPriority,
+} from "./conversationIntelligence/orchestrator";
+import {
   formatEmotionalFirstOpening,
   planEmotionalFirstResponse,
 } from "./conversation/emotionalFirstResponseSequence";
@@ -105,6 +113,7 @@ import {
   detectUniversalDocumentType,
   formatUniversalCreationQuestion,
   formatUniversalCreationTurnReply,
+  isUniversalCreationMessage,
   loadUniversalCreationSession,
   resolveUniversalCreationTurn,
   saveUniversalCreationSession,
@@ -1293,7 +1302,10 @@ function tryPendingChoiceFlow(
 ): FrictionlessActionDecision | null {
   if (!hasActivePendingChoice()) return null;
 
-  const result = resolvePendingChoiceTurn(input.userText.trim());
+  const result = resolvePendingChoiceTurn(input.userText.trim(), {
+    lastAssistantText: input.lastAssistantText,
+    currentTurn: input.currentTurn,
+  });
   if (result.kind === "resolved") {
     return frictionlessDecisionFromPendingChoice(
       input.userText.trim(),
@@ -1938,6 +1950,18 @@ function maybeClearStaleFrictionlessPending(
 ): void {
   const userText = input.userText.trim();
   if (!userText) return;
+  if (isConversationPriorityEngineEnabled()) {
+    const priority = resolveConversationPriority({
+      userText,
+      lastAssistantText: input.lastAssistantText ?? "",
+      currentTurn: input.currentTurn ?? 0,
+      hasUniversalCreationSession: Boolean(loadUniversalCreationSession()),
+      frictionlessPending: loadFrictionlessPending(),
+    });
+    if (priority.stalePendingsToClear.includes("frictionless")) {
+      clearFrictionlessPending();
+    }
+  }
   if (isFrictionlessAffirmation(userText) || isConfirmationAcceptance(userText)) {
     return;
   }
@@ -2169,6 +2193,28 @@ function tryFrictionlessYesContinuation(
   }
   if (routing.learnFastPath) return null;
   if (messageNamesExactEstateRoom(userText)) return null;
+
+  if (isConversationPriorityEngineEnabled()) {
+    const priority = resolveConversationPriority({
+      userText,
+      lastAssistantText: input.lastAssistantText ?? "",
+      currentTurn,
+      hasUniversalCreationSession: Boolean(loadUniversalCreationSession()),
+      frictionlessPending: loadFrictionlessPending(),
+    });
+    if (priority.deferFrictionlessYes) return null;
+  }
+
+  const ucSession = loadUniversalCreationSession();
+  const lastAssistant = input.lastAssistantText?.trim() ?? "";
+  if (
+    ucSession &&
+    lastAssistant &&
+    (isUniversalCreationMessage(lastAssistant) ||
+      inferMeaningTopicFromAssistant(lastAssistant) === "create")
+  ) {
+    return null;
+  }
 
   const pending = loadFrictionlessPendingForConfirmation({
     confirmationReply: true,
@@ -3287,6 +3333,12 @@ export function frictionlessHintForChat(
   return lines.join("\n");
 }
 
+const RESTORATION_OFFER_IN_ASSISTANT_RE =
+  /\b(?:clear my mind|clear your mind|brain dump|breathe|decision compass|plan my day|focus audio|focus music|my thoughts)\b/i;
+
+const CREATE_TOPIC_IN_ASSISTANT_RE =
+  /\b(?:create|draft|write|build|newsletter|email|sop|proposal|funnel|workshop|sales funnel)\b/i;
+
 export function isFrictionlessPendingAlignedWithAssistant(
   pending: FrictionlessPendingAction,
   lastAssistantText: string,
@@ -3315,6 +3367,17 @@ export function isFrictionlessPendingAlignedWithAssistant(
   }
 
   if (pending.target === "content-generator") {
+    if (
+      RESTORATION_OFFER_IN_ASSISTANT_RE.test(assistant) &&
+      !CREATE_TOPIC_IN_ASSISTANT_RE.test(assistant)
+    ) {
+      return false;
+    }
+    const assistantTopic = inferMeaningTopicFromAssistant(assistant);
+    const pendingTopic = inferMeaningTopicFromFrictionlessPending(pending);
+    if (assistantTopic === "create" && pendingTopic === "create") {
+      return true;
+    }
     return (
       /\b(?:\bcreate\b|take (?:us|you|me) there|step into|would you like me to)\b/i.test(
         assistant,

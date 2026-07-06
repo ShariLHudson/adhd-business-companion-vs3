@@ -31,6 +31,9 @@ import {
 } from "./listContinuation";
 import { loadUniversalCreationSession } from "@/lib/universalCreation";
 import { isEmotionalSupportThread } from "@/lib/conversation/emotionalDistressRouting";
+import {
+  recentAssistantOfferOverridesPendingMenu,
+} from "@/lib/conversation/mostRecentMeaningWins";
 import type {
   PendingChoiceItem,
   PendingChoiceResolveResult,
@@ -158,6 +161,10 @@ export function shouldClearPendingChoiceForTopicChange(userText: string): boolea
 
 export function resolvePendingChoiceTurn(
   userText: string,
+  context?: {
+    lastAssistantText?: string;
+    currentTurn?: number;
+  },
 ): PendingChoiceResolveResult {
   const state = loadPendingChoice();
   if (!state?.choices.length) return { kind: "none" };
@@ -212,6 +219,18 @@ export function resolvePendingChoiceTurn(
   }
 
   if (isPendingMenuAffirmation(trimmed)) {
+    if (
+      context?.lastAssistantText &&
+      recentAssistantOfferOverridesPendingMenu({
+        userText: trimmed,
+        lastAssistantText: context.lastAssistantText,
+        menuOfferedAtTurn: state.offeredAtTurn,
+        currentTurn: context.currentTurn,
+      })
+    ) {
+      clearPendingChoice();
+      return { kind: "topic_change" };
+    }
     return {
       kind: "continued",
       reply: buildMenuAffirmationReply(state),

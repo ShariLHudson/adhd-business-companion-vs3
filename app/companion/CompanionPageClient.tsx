@@ -840,6 +840,11 @@ import {
   loadPendingChoice,
   resolvePendingChoiceTurn,
 } from "@/lib/pendingChoice";
+import {
+  applyConversationPriorityClears,
+  isConversationPriorityEngineEnabled,
+  resolveTurnPriority,
+} from "@/lib/conversationIntelligence/orchestrator";
 import type { PendingChoiceExecution } from "@/lib/pendingChoice/frictionlessBridge";
 import type { PendingChoiceAction } from "@/lib/pendingChoice/types";
 import {
@@ -10305,16 +10310,37 @@ export default function CompanionPageClient() {
       }
     }
 
-    if (
+    const lastAssistantForPriority =
+      [...messages].reverse().find((m) => m.role === "assistant")?.content ??
+      "";
+
+    const conversationPriority = isConversationPriorityEngineEnabled()
+      ? resolveTurnPriority({
+          userText: trimmed,
+          lastAssistantText: lastAssistantForPriority,
+          currentTurn: chatTurnRef.current,
+        })
+      : null;
+
+    if (conversationPriority) {
+      applyConversationPriorityClears(conversationPriority);
+    } else if (
       loadUniversalCreationSession() &&
       isCreateWorkflowContinuation(trimmed)
     ) {
       clearPendingChoice();
     }
 
-    if (hasActivePendingChoice()) {
+    const shouldRunPendingChoice =
+      hasActivePendingChoice() &&
+      !(conversationPriority?.deferPendingChoice ?? false);
+
+    if (shouldRunPendingChoice) {
       const pendingTurnStarted = Date.now();
-      const pendingResult = resolvePendingChoiceTurn(trimmed);
+      const pendingResult = resolvePendingChoiceTurn(trimmed, {
+        lastAssistantText: lastAssistantForPriority,
+        currentTurn: chatTurnRef.current,
+      });
       if (
         pendingResult.kind === "resolved" ||
         pendingResult.kind === "unrecognized" ||
@@ -10405,12 +10431,16 @@ export default function CompanionPageClient() {
       }
     }
 
-    const lastAssistantForCreateFastPath =
-      [...messages].reverse().find((m) => m.role === "assistant")?.content ?? "";
+    const lastAssistantForCreateFastPath = lastAssistantForPriority;
     const universalSessionActive = loadUniversalCreationSession();
+    const createWorkflowContinuation =
+      Boolean(universalSessionActive) &&
+      isCreateWorkflowContinuation(trimmed);
     const universalCreationContinuation =
       Boolean(universalSessionActive) &&
-      isUniversalCreationMessage(lastAssistantForCreateFastPath) &&
+      (isUniversalCreationMessage(lastAssistantForCreateFastPath) ||
+        createWorkflowContinuation ||
+        conversationPriority?.winner === "continue_creation") &&
       !isVagueHelpRequest(trimmed);
 
     if (isSimpleCreateRequest(trimmed) || universalCreationContinuation) {
@@ -17828,7 +17858,7 @@ export default function CompanionPageClient() {
   /** Keep profile trigger visible while overlays open — only hide during sign-in. */
   const showGlobalEstateMenu =
     estateChromePolicy.showSubtleEstateMenu && overlay !== "signin";
-  /** Guidebook — lower-right; hidden during sign-in and Enjoy the Estate. */
+  /** Guidebook — bottom left; hidden during sign-in and Enjoy the Estate. */
   const showSparkEstateGuide =
     overlay !== "signin" && !justBeHereSession;
 
