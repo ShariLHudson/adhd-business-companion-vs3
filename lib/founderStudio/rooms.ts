@@ -129,6 +129,15 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
     accent: "bronze",
   },
   {
+    id: "executive-simulation",
+    href: `${FOUNDER_STUDIO_BASE}/executive-simulation`,
+    title: "Executive Simulation Studio™",
+    question: "If we choose this path… what is most likely to happen?",
+    purpose:
+      "Compare possible futures — tradeoffs, risks, and opportunity cost before you commit time, money, or energy.",
+    accent: "teal",
+  },
+  {
     id: "decision-vault",
     href: `${FOUNDER_STUDIO_BASE}/decision-vault`,
     title: "Decision Vault™",

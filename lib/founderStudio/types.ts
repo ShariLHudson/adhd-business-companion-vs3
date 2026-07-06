@@ -29,6 +29,7 @@ export type FounderRoomId =
   | "executive-research"
   | "opportunity-discovery"
   | "executive-builder"
+  | "executive-simulation"
   | "decision-vault";
 
 export type FounderRoomMeta = {

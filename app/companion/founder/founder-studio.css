@@ -4892,3 +4892,277 @@
   text-transform: uppercase;
   color: var(--founder-gold);
 }
+
+/* Executive Simulation Studio™ */
+.founder-simulation {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.founder-simulation__section-title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.2rem, 2.4vw, 1.45rem);
+  font-weight: 600;
+  color: var(--founder-gold);
+}
+
+.founder-simulation__lead,
+.founder-simulation__prose,
+.founder-simulation__recommendation {
+  margin: 0 0 0.75rem;
+  font-size: 1.02rem;
+  line-height: 1.55;
+}
+
+.founder-simulation__muted {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--founder-muted);
+}
+
+.founder-simulation__entry-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-bottom: 1rem;
+}
+
+.founder-simulation__entry-input {
+  flex: 1 1 16rem;
+  min-width: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(48, 182, 213, 0.28);
+  background: rgba(12, 18, 22, 0.85);
+  color: var(--founder-text);
+  font-size: 1.05rem;
+}
+
+.founder-simulation__run-button {
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.65rem;
+  border: 1px solid rgba(48, 182, 213, 0.45);
+  background: rgba(48, 182, 213, 0.15);
+  color: var(--founder-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.founder-simulation__suggestions {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.founder-simulation__suggestion-chip {
+  padding: 0.45rem 0.75rem;
+  border-radius: 999px;
+  border: 1px solid rgba(48, 182, 213, 0.22);
+  background: rgba(20, 28, 32, 0.72);
+  color: var(--founder-muted);
+  font-size: 0.92rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.founder-simulation__back {
+  align-self: flex-start;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--founder-aqua);
+  cursor: pointer;
+  font-size: 0.95rem;
+}
+
+.founder-simulation__header {
+  margin-bottom: 0.5rem;
+}
+
+.founder-simulation__meta {
+  margin: 0 0 0.35rem;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--founder-aqua);
+}
+
+.founder-simulation__title {
+  margin: 0 0 0.5rem;
+  font-size: clamp(1.35rem, 2.8vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.founder-simulation__if-i-were-you {
+  padding: 1rem 1.1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(245, 193, 108, 0.35);
+  background: rgba(245, 193, 108, 0.06);
+}
+
+.founder-simulation__card-grid {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.85rem;
+}
+
+.founder-simulation__card {
+  width: 100%;
+  text-align: left;
+  padding: 1rem;
+  border-radius: 0.85rem;
+  border: 1px solid rgba(48, 182, 213, 0.22);
+  background: rgba(20, 28, 32, 0.72);
+  color: var(--founder-text);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.founder-simulation__card--rec {
+  border-color: rgba(245, 193, 108, 0.45);
+  background: rgba(245, 193, 108, 0.08);
+}
+
+.founder-simulation__card-letter {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--founder-aqua);
+}
+
+.founder-simulation__card-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.founder-simulation__card-summary {
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--founder-muted);
+}
+
+.founder-simulation__card-metrics {
+  font-size: 0.82rem;
+  color: rgba(244, 247, 248, 0.75);
+}
+
+.founder-simulation__rec-badge {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  color: var(--founder-gold);
+}
+
+.founder-simulation__table-wrap {
+  overflow-x: auto;
+}
+
+.founder-simulation__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.founder-simulation__table th,
+.founder-simulation__table td {
+  padding: 0.55rem 0.65rem;
+  border-bottom: 1px solid rgba(48, 182, 213, 0.15);
+  text-align: left;
+  vertical-align: top;
+}
+
+.founder-simulation__table th {
+  color: var(--founder-gold);
+  font-weight: 600;
+}
+
+.founder-simulation__learning-note {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--founder-muted);
+}
+
+.founder-simulation__subhead {
+  margin: 0.75rem 0 0.35rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--founder-aqua);
+}
+
+.founder-simulation__bullets,
+.founder-simulation__metrics,
+.founder-simulation__effects,
+.founder-simulation__board,
+.founder-simulation__ecosystem,
+.founder-simulation__risks {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.founder-simulation__metrics {
+  list-style: none;
+  padding-left: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.founder-simulation__pros-cons,
+.founder-simulation__what-changes {
+  display: grid;
+  gap: 1rem;
+}
+
+@media (min-width: 48rem) {
+  .founder-simulation__pros-cons {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .founder-simulation__what-changes {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.founder-simulation__board-item {
+  margin-bottom: 0.85rem;
+}
+
+.founder-simulation__prep-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.founder-simulation__prep-item {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.25rem 0.75rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgba(48, 182, 213, 0.12);
+}
+
+.founder-simulation__prep-label {
+  font-weight: 600;
+}
+
+.founder-simulation__prep-desc {
+  grid-column: 1 / -1;
+  font-size: 0.95rem;
+  color: var(--founder-muted);
+}
+
+.founder-simulation__prep-status {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  color: var(--founder-gold);
+}
