@@ -1,0 +1,30 @@
+{
+  "registry": "estate-routes",
+  "version": "1.0.0",
+  "description": "Canonical routes and navigation destinations. Links rooms, features, and tools to resolvable paths.",
+  "statusValues": ["Live", "Draft", "Future", "Hidden", "Retired"],
+  "itemSchema": {
+    "id": "string",
+    "officialName": "string",
+    "category": "string",
+    "description": "string",
+    "purpose": "string",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "route": "string",
+    "image": "string | null",
+    "relatedRooms": "string[]",
+    "relatedFeatures": "string[]",
+    "relatedDiscoveries": "string[]",
+    "relatedSparkCards": "string[]",
+    "relatedMomentumActivities": "string[]",
+    "primaryMemberProblemSolved": "string | null",
+    "memberBenefits": "string[]",
+    "recommendedWhen": "string | null",
+    "navigationDestination": "string",
+    "buttonText": "string | null",
+    "keywords": "string[]",
+    "searchTags": "string[]",
+    "lastUpdated": "string"
+  },
+  "items": []
+}

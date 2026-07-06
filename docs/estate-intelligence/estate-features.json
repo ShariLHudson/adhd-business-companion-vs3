@@ -1,0 +1,30 @@
+{
+  "registry": "estate-features",
+  "version": "1.0.0",
+  "description": "Member-facing capabilities and experiences — not rooms themselves. Source of truth for feature recommendations.",
+  "statusValues": ["Live", "Draft", "Future", "Hidden", "Retired"],
+  "itemSchema": {
+    "id": "string",
+    "officialName": "string",
+    "category": "string",
+    "description": "string",
+    "purpose": "string",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "route": "string | null",
+    "image": "string | null",
+    "relatedRooms": "string[]",
+    "relatedFeatures": "string[]",
+    "relatedDiscoveries": "string[]",
+    "relatedSparkCards": "string[]",
+    "relatedMomentumActivities": "string[]",
+    "primaryMemberProblemSolved": "string | null",
+    "memberBenefits": "string[]",
+    "recommendedWhen": "string | null",
+    "navigationDestination": "string | null",
+    "buttonText": "string | null",
+    "keywords": "string[]",
+    "searchTags": "string[]",
+    "lastUpdated": "string"
+  },
+  "items": []
+}

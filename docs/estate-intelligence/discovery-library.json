@@ -1,0 +1,35 @@
+{
+  "registry": "discovery-library",
+  "version": "1.0.0",
+  "description": "Discovery Key notes and discovery entries. Each entry references Live items from other registries — never invents features.",
+  "statusValues": ["Live", "Draft", "Future", "Hidden", "Retired"],
+  "discoveryTypes": [
+    "estate-discovery",
+    "feature-discovery",
+    "estate-story",
+    "hidden-treasure",
+    "positive-personal-discovery",
+    "new-possibility"
+  ],
+  "itemSchema": {
+    "id": "string",
+    "officialName": "string",
+    "discoveryType": "estate-discovery | feature-discovery | estate-story | hidden-treasure | positive-personal-discovery | new-possibility",
+    "description": "string",
+    "purpose": "string",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "targetRegistry": "estate-rooms | estate-features | estate-tools | estate-settings | estate-routes",
+    "targetId": "string",
+    "route": "string | null",
+    "image": "string | null",
+    "relatedRooms": "string[]",
+    "relatedFeatures": "string[]",
+    "foodForThought": "string | null",
+    "primaryActionButtonText": "string | null",
+    "navigationDestination": "string | null",
+    "keywords": "string[]",
+    "searchTags": "string[]",
+    "lastUpdated": "string"
+  },
+  "items": []
+}

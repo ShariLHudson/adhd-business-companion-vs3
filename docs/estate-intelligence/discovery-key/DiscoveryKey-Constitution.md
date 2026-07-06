@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | **Status** | Foundational — documentation before UI or logic |
-| **Parent** | [Spark Estate Bible](../../estate/Spark%20Estate%20Bible.md) · Ch 14 — The Discovery Key |
+| **Parent** | [Estate Intelligence System](../README.md) · [Spark Estate Bible](../../estate/Spark%20Estate%20Bible.md) · Ch 14 — The Discovery Key |
 
 ---
 
@@ -183,6 +183,8 @@ The Discovery Key™ must **never** claim a feature exists unless it actually ex
 It must not invent features, exaggerate capabilities, or describe future functionality as if it already exists.
 
 If a feature is not live, do not show it in normal Discovery Key rotation.
+
+**Registry authority:** [Estate Intelligence System](../README.md) — `estate-rooms.json`, `estate-features.json`, `estate-tools.json`, and related registries. Only items marked **Live** may be recommended.
 
 ---
 

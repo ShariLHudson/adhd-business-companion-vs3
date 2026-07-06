@@ -1,0 +1,20 @@
+{
+  "registry": "room-placement-library",
+  "version": "1.0.0",
+  "description": "In-scene placement metadata for Discovery Key and diegetic UI — where keys, objects, and affordances appear in room images.",
+  "statusValues": ["Live", "Draft", "Future", "Hidden", "Retired"],
+  "itemSchema": {
+    "id": "string",
+    "roomId": "string",
+    "officialName": "string",
+    "placementType": "discovery-key | object | affordance",
+    "description": "string",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "sceneImage": "string | null",
+    "placementNotes": "string | null",
+    "relatedDiscoveryIds": "string[]",
+    "maxVisibleAtOnce": "number",
+    "lastUpdated": "string"
+  },
+  "items": []
+}
