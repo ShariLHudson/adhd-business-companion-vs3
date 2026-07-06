@@ -102,6 +102,15 @@ export const FOUNDER_ROOMS: readonly FounderRoomMeta[] = [
     accent: "gold",
   },
   {
+    id: "executive-research",
+    href: `${FOUNDER_STUDIO_BASE}/executive-research`,
+    title: "Executive Research Center™",
+    question: "What does Shari actually need to know?",
+    purpose:
+      "Your private research department — answer, evidence, Spark application, prepared action.",
+    accent: "purple",
+  },
+  {
     id: "decision-vault",
     href: `${FOUNDER_STUDIO_BASE}/decision-vault`,
     title: "Decision Vault™",
