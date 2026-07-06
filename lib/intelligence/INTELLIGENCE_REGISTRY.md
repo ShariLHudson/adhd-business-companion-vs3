@@ -239,6 +239,18 @@ Docs: `docs/plan-my-day/LIFE_AREA_INTELLIGENCE.md`
 
 ---
 
+### Conversation Session (`ConversationSession`)
+
+| Field | Storage | Role |
+|-------|---------|------|
+| Active relationship turn | `companion-conversation-session-v1` | **Owner** — intent, discovery answers, draft, artifact stack, room, readiness |
+| Universal Creation | `universal-creation-session-v1` | Adapter — dual-writes into Conversation Session (Pass 2) |
+| Outcome thread | `companion-outcome-thread-v1` | Adapter — pending question mirror (future merge) |
+
+Runtime: `lib/conversationSession/` · Flag: `NEXT_PUBLIC_CONVERSATION_SESSION_SPINE=0` disables dual-write.
+
+---
+
 ## Adding a new object (checklist)
 
 - [ ] Add row to **Object registry** above

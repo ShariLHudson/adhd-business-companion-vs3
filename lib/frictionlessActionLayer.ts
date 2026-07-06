@@ -109,6 +109,9 @@ import {
   shouldEnterDiscoveryMode,
 } from "./estateBrain/discoveryMode";
 import {
+  syncUniversalCreationHandoffToSession,
+} from "./conversationSession";
+import {
   clearUniversalCreationSession,
   detectUniversalDocumentType,
   formatUniversalCreationQuestion,
@@ -1588,11 +1591,13 @@ function tryUniversalCreationFlow(
     };
   }
 
-  clearUniversalCreationSession();
+  syncUniversalCreationHandoffToSession(turn.session);
+  saveUniversalCreationSession(turn.session);
   const combined = `${turn.session.originalUserText} ${Object.values(turn.session.answers).join(" ")}`;
   const createOpen = resolveImmediateCreateAction(
     combined,
     routing.artifactKind,
+    { universalCreationSession: turn.session },
   );
   if (!createOpen) return null;
 
@@ -2066,6 +2071,7 @@ function buildPendingContinuationDecision(
       const createOpen = resolveImmediateCreateAction(
         prompt,
         pending.artifactType as RegistryArtifactKind | undefined,
+        { universalCreationSession: loadUniversalCreationSession() },
       );
       if (createOpen) {
         return {

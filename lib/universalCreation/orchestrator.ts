@@ -39,8 +39,17 @@ import {
   computeUniversalDiscoveryConfidence,
   isUniversalDiscoveryComplete,
 } from "./types";
+import { isBareGenericAcceptance } from "../pendingAcceptanceAuthority";
+import { assistantOfferedConsent } from "../conversationWorkflowContinuation";
+import { inferMeaningTopicFromAssistant } from "../conversation/mostRecentMeaningWins";
+import {
+  isConversationSessionSpineEnabled,
+  syncUniversalCreationToSession,
+} from "@/lib/conversationSession";
 
 const STORAGE_KEY = "universal-creation-session-v1";
+
+let memoryUniversalCreationSession: UniversalCreationSession | null = null;
 
 const EXPLICIT_ROOM_NAV_RE =
   /\b(?:take me to|bring me to|go to|open|show me|step into)\b/i;
@@ -49,7 +58,7 @@ const UNCERTAINTY_RE =
   /\b(?:i don'?t know|not sure|no idea|you decide|whatever works|haven'?t figured|unsure)\b/i;
 
 const CREATION_MARKER_RE =
-  /let me understand what you'?re trying|what would success look like|who is this for|main reason you'?re creating|who is the workshop for|transformation do you want|how long will the workshop|a couple of quick questions first/i;
+  /let me understand what you'?re trying|what would success look like|who is this for|main reason you'?re creating|who is the workshop for|transformation do you want|how long will the workshop|a couple of quick questions first|one question at a time|(?:map|bottom of) (?:a |this )?funnel|offer sits at the bottom/i;
 
 export function detectUniversalDocumentType(
   userText: string,
@@ -90,15 +99,20 @@ export function isUniversalCreationMessage(text: string): boolean {
 export function saveUniversalCreationSession(
   session: UniversalCreationSession | null,
 ): void {
+  memoryUniversalCreationSession = session;
   if (typeof window === "undefined") return;
   if (!session) {
     localStorage.removeItem(STORAGE_KEY);
     return;
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+  if (isConversationSessionSpineEnabled()) {
+    syncUniversalCreationToSession(session);
+  }
 }
 
 export function loadUniversalCreationSession(): UniversalCreationSession | null {
+  if (memoryUniversalCreationSession) return memoryUniversalCreationSession;
   if (typeof window === "undefined") return null;
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
@@ -110,6 +124,7 @@ export function loadUniversalCreationSession(): UniversalCreationSession | null 
 }
 
 export function clearUniversalCreationSession(): void {
+  memoryUniversalCreationSession = null;
   saveUniversalCreationSession(null);
 }
 
@@ -392,9 +407,20 @@ export function resolveUniversalCreationTurn(
   const t = userText.trim();
   if (!t) return null;
 
+  const storedSession = loadUniversalCreationSession();
+  if (storedSession && isBareGenericAcceptance(t) && lastAssistantText?.trim()) {
+    const recentTopic = inferMeaningTopicFromAssistant(lastAssistantText);
+    if (
+      isUniversalCreationMessage(lastAssistantText) ||
+      assistantOfferedConsent(lastAssistantText) ||
+      recentTopic === "create"
+    ) {
+      return advanceUniversalCreation(storedSession, t);
+    }
+  }
+
   if (lastAssistantText && isUniversalCreationMessage(lastAssistantText)) {
-    const stored = loadUniversalCreationSession();
-    if (stored) return advanceUniversalCreation(stored, t);
+    if (storedSession) return advanceUniversalCreation(storedSession, t);
   }
 
   if (!shouldEnterUniversalCreation(t) && !detectUniversalDocumentType(t)) {

@@ -17,6 +17,13 @@ import {
   estateExperienceArrivalPrompt,
   estateExperienceDefaultSpace,
 } from "@/lib/estateExperiences/registry";
+import {
+  isConversationSessionSpineEnabled,
+  loadConversationSession,
+  sessionAwareFollowUpLine,
+  resolvedArtifactFromSessionContext,
+} from "@/lib/conversationSession";
+import type { UniversalCreationSession } from "@/lib/universalCreation/types";
 
 export const CREATE_EXPERIENCE_ARRIVAL_PROMPT =
   estateExperienceArrivalPrompt("create");
@@ -42,7 +49,22 @@ const PROJECT_CREATE_RE =
 const MOMENTUM_PLANNING_RE =
   /\b(?:marketing strategy|business plan(?:ning)?|weekly plan(?:ning)?|quarterly plan(?:ning)?|action plan|roadmap|milestone|goal tracking|move .* forward)\b/i;
 
-function followUpForItemType(itemType: string): string {
+export type ImmediateCreateContext = {
+  universalCreationSession?: UniversalCreationSession | null;
+};
+
+function followUpForItemType(
+  itemType: string,
+  context?: ImmediateCreateContext | null,
+): string {
+  if (isConversationSessionSpineEnabled()) {
+    const sessionAware = sessionAwareFollowUpLine(
+      itemType,
+      loadConversationSession(),
+    );
+    if (sessionAware) return sessionAware;
+  }
+
   const t = itemType.toLowerCase();
   if (t === "sop") {
     return "I've opened a new SOP. What process are we documenting today?";
@@ -165,6 +187,7 @@ export function isMomentumForwardIntent(userText: string): boolean {
 export function resolveImmediateCreateAction(
   userText: string,
   artifactKind?: RegistryArtifactKind | null,
+  context?: ImmediateCreateContext | null,
 ): ImmediateCreateOpenPayload | null {
   const text = userText.trim();
   if (!text) return null;
@@ -184,9 +207,20 @@ export function resolveImmediateCreateAction(
 
   if (!itemType) return null;
 
-  const artifact = resolvedArtifactForItemType(itemType, text);
+  const session = isConversationSessionSpineEnabled()
+    ? loadConversationSession()
+    : null;
+  const artifact =
+    isConversationSessionSpineEnabled()
+      ? resolvedArtifactFromSessionContext(
+          itemType,
+          text,
+          session,
+          context?.universalCreationSession,
+        )
+      : resolvedArtifactForItemType(itemType, text);
   const arrivalLine = arrivalLineForIntent(text);
-  const followUpLine = followUpForItemType(artifact.itemType);
+  const followUpLine = followUpForItemType(artifact.itemType, context);
 
   return {
     userText: text,
