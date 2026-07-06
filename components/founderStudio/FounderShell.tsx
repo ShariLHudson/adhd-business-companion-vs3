@@ -2,8 +2,10 @@
 
 import type { ReactNode } from "react";
 
+import { prepareOffice } from "@/lib/founder/concierge/services";
 import { FOUNDER_OFFICE_BACKGROUND } from "@/lib/founderStudio/founderConfig";
 
+import { ConciergeDrawer } from "./concierge/ConciergeDrawer";
 import { FounderSideNav } from "./FounderSideNav";
 
 type FounderShellProps = {
@@ -13,6 +15,8 @@ type FounderShellProps = {
 };
 
 export function FounderShell({ children, cleanRight = true }: FounderShellProps) {
+  const drawerSections = prepareOffice().drawer;
+
   return (
     <div
       className={`founder-shell${cleanRight ? " founder-shell--clean-right" : ""}`}
@@ -23,6 +27,7 @@ export function FounderShell({ children, cleanRight = true }: FounderShellProps)
       }
     >
       <div className="founder-shell__scrim" aria-hidden="true" />
+      <ConciergeDrawer sections={drawerSections} />
       <div className="founder-shell__frame">
         <FounderSideNav />
         <div className="founder-shell__content">{children}</div>

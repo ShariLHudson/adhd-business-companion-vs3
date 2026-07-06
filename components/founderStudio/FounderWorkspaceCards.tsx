@@ -13,7 +13,7 @@ export function FounderWorkspaceCards() {
         Executive Workspaces
       </h2>
       <p className="founder-workspaces__lead">
-        What are you trying to accomplish? Choose an intention — Founder assembles the workspace.
+        Your Concierge has a suggestion above — or choose any intention when you are ready.
       </p>
       <div className="founder-workspaces__grid">
         {workspaces.map((workspace) => (

@@ -119,6 +119,7 @@ If any answer is "unknown" — redesign before shipping.
 | **Spark Response Architecture™** | [006](../spark-intelligence-foundation/006-spark-response-architecture.md) | Runtime pipeline — all interactions must flow through | `lib/sparkResponseArchitecture/types.ts` · `lib/sparkTrustPerformance/` |
 | **Context Strategy™ & MVC** | [007](../spark-intelligence-foundation/007-context-strategy.md) | Intelligent context selection; six tiers; budgets | `lib/sparkContextStrategy/types.ts` |
 | **Interaction Contracts™** | [008](../spark-intelligence-foundation/008-interaction-contracts.md) | One owner per responsibility; published contracts only | `lib/sparkInteractionContracts/types.ts` |
+| **SPARK™ Intelligence Core** | Phase 8 — ecosystem OS | Observes, scores, connects, prioritizes — no UI, no AI | `lib/spark/` — `Spark.observe()` · `score()` · `prioritize()` · `connect()` · `prepare()` · `summarize()` |
 
 **Brain invariant:** retrieve context before re-asking; never generate content, recommendations, or member-facing copy; lifecycle stages govern storage; MVC governs retrieval ([009](../spark-intelligence-foundation/009-business-brain-lifecycle.md)).
 
@@ -147,6 +148,7 @@ If any answer is "unknown" — redesign before shipping.
 | **Growth Intelligence** | `lib/momentum-intelligence/`, momentum events | Momentum, projects, thoughts handled | Momentum signals |
 | **Recovery Intelligence** | `lib/recovery-intelligence/` | Day state, overwhelm, return patterns | Recovery insights |
 | **Pattern Intelligence** | `lib/loop-intelligence/`, pattern awareness prefs | Loops, struggles, time-of-day | Loop store, signals |
+| **SPARK™ Intelligence Core** | `lib/spark/` | Signals, observations, patterns, knowledge graph, priorities | Sample repo (V1); consumed by Founder, Companion, PostCraft, Team Hub, FLAME, FIRE |
 | **Relationship Intelligence** | `lib/relationship-intelligence/` | Relationship, conversation, thoughts (person) | `relationshipStore` |
 | **Content Intelligence** | PostCraft, templates, snippets | Template, draft, avatar | Content suggestions |
 | **Learning Intelligence** | `lib/intelligence-layer/learningGates.ts` | Signals, trust, outcomes | Profile evolution |

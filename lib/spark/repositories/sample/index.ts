@@ -1,0 +1,46 @@
+import {
+  SPARK_SAMPLE_ACTIONS,
+  SPARK_SAMPLE_EVIDENCE,
+  SPARK_SAMPLE_FINDINGS,
+  SPARK_SAMPLE_GRAPH_EDGES,
+  SPARK_SAMPLE_GRAPH_NODES,
+  SPARK_SAMPLE_INSIGHTS,
+  SPARK_SAMPLE_KNOWLEDGE,
+  SPARK_SAMPLE_MEMORY_REFS,
+  SPARK_SAMPLE_OBSERVATIONS,
+  SPARK_SAMPLE_OPPORTUNITIES,
+  SPARK_SAMPLE_PATTERNS,
+  SPARK_SAMPLE_PRIORITIES,
+  SPARK_SAMPLE_QUESTIONS,
+  SPARK_SAMPLE_RECOMMENDATIONS,
+  SPARK_SAMPLE_RISKS,
+  SPARK_SAMPLE_SIGNALS,
+  SPARK_SAMPLE_SOURCES,
+  SPARK_SAMPLE_THEMES,
+  SPARK_SAMPLE_TRENDS,
+} from "./data";
+
+/** In-memory sample repository — swap for durable storage without changing services. */
+export const sparkSampleRepository = {
+  sources: () => [...SPARK_SAMPLE_SOURCES],
+  signals: () => [...SPARK_SAMPLE_SIGNALS],
+  observations: () => [...SPARK_SAMPLE_OBSERVATIONS],
+  patterns: () => [...SPARK_SAMPLE_PATTERNS],
+  themes: () => [...SPARK_SAMPLE_THEMES],
+  evidence: () => [...SPARK_SAMPLE_EVIDENCE],
+  priorities: () => [...SPARK_SAMPLE_PRIORITIES],
+  recommendations: () => [...SPARK_SAMPLE_RECOMMENDATIONS],
+  opportunities: () => [...SPARK_SAMPLE_OPPORTUNITIES],
+  risks: () => [...SPARK_SAMPLE_RISKS],
+  findings: () => [...SPARK_SAMPLE_FINDINGS],
+  insights: () => [...SPARK_SAMPLE_INSIGHTS],
+  trends: () => [...SPARK_SAMPLE_TRENDS],
+  actions: () => [...SPARK_SAMPLE_ACTIONS],
+  questions: () => [...SPARK_SAMPLE_QUESTIONS],
+  knowledge: () => [...SPARK_SAMPLE_KNOWLEDGE],
+  memoryRefs: () => [...SPARK_SAMPLE_MEMORY_REFS],
+  graphNodes: () => [...SPARK_SAMPLE_GRAPH_NODES],
+  graphEdges: () => [...SPARK_SAMPLE_GRAPH_EDGES],
+};
+
+export type SparkSampleRepository = typeof sparkSampleRepository;
