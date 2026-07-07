@@ -1,0 +1,88 @@
+{
+  "registry": "progressive-discovery-curriculum",
+  "version": "1.0.0",
+  "description": "Progressive Discovery Curriculum™ — internal learning journey for Discovery Key™. Members never see lessons; the Estate unfolds naturally.",
+  "philosophy": {
+    "summary": "Small discoveries. Perfect timing. No overwhelm.",
+    "memberShouldFeel": "I keep discovering wonderful new things.",
+    "memberShouldNeverFeel": "I have to learn another feature.",
+    "unfolds": [
+      "the Estate",
+      "the tools",
+      "the experiences",
+      "the stories",
+      "the hidden details",
+      "their own preferences"
+    ]
+  },
+  "rules": {
+    "oneMeaningfulDiscoveryAtATime": true,
+    "curiosityLed": true,
+    "neverSurfaceProgress": true,
+    "neverSurfaceScores": true,
+    "maxDiscoveriesPerResponse": 1,
+    "collectionOrderMatters": true,
+    "prerequisitesEnforced": true,
+    "liveTargetsOnly": true,
+    "deferWhenPrerequisitesUnmet": true
+  },
+  "audienceProfiles": {
+    "newMember": {
+      "label": "New member",
+      "pace": "gentle",
+      "collectionOrder": [
+        "welcome-to-spark-estate",
+        "estate-rooms",
+        "features-and-tools"
+      ]
+    },
+    "returningMember": {
+      "label": "Returning member",
+      "pace": "steady",
+      "collectionOrder": [
+        "estate-rooms",
+        "features-and-tools",
+        "listening-experiences",
+        "settings-and-personalization"
+      ]
+    },
+    "establishedMember": {
+      "label": "Established member",
+      "pace": "curious",
+      "collectionOrder": [
+        "listening-experiences",
+        "estate-stories",
+        "hidden-treasures",
+        "spark-cards",
+        "personal-discoveries",
+        "tips-and-shortcuts",
+        "whats-new"
+      ]
+    }
+  },
+  "journeyStageToCollections": {
+    "welcome": ["welcome-to-spark-estate"],
+    "explore": ["welcome-to-spark-estate", "estate-rooms"],
+    "discover-features": ["estate-rooms", "features-and-tools"],
+    "personalize": ["features-and-tools", "settings-and-personalization"],
+    "deeper-discovery": [
+      "listening-experiences",
+      "estate-stories",
+      "hidden-treasures",
+      "spark-cards",
+      "personal-discoveries"
+    ]
+  },
+  "futureExpansion": {
+    "supportsNewRooms": true,
+    "supportsNewFeatures": true,
+    "supportsAudioExperiences": true,
+    "supportsSeasonalContent": true,
+    "supportsMemberMilestones": true,
+    "supportsPersonalizedDiscoveryPaths": true,
+    "supportsWhatsNewReleases": true,
+    "notes": "Add collection items and prerequisites without restructuring — register in discovery-collections.json and discovery-prerequisites.json."
+  },
+  "status": "Live",
+  "lastUpdated": "2026-07-06"
+}

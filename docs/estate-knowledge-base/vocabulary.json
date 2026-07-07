@@ -1,0 +1,64 @@
+{
+  "registry": "estate-knowledge-vocabulary",
+  "version": "1.0.0",
+  "description": "One official name per room, feature, tool, and button. Spark never randomly renames things.",
+  "rules": {
+    "oneOfficialNamePerEntity": true,
+    "aliasesRequireExplicitApproval": true,
+    "canonWinsOnConflict": "docs/estate/Spark Estate Bible.md",
+    "liveOnlyForRecommendation": true
+  },
+  "officialNames": {
+    "rooms": {
+      "greenhouse": "Greenhouse™",
+      "sunroom": "Sunroom",
+      "clear-my-mind": "Clear My Mind™",
+      "music-room": "Music Room",
+      "gardens": "The Gardens™",
+      "conservatory": "The Ocean Conservatory™",
+      "creative-studio": "Create",
+      "personal-library": "Personal Library",
+      "reflection-pond": "Reflection Pond™",
+      "observatory": "Observatory™"
+    },
+    "features": {
+      "clear-my-mind": "Clear My Mind™",
+      "create": "Create",
+      "plan-my-day": "Plan My Day",
+      "focus-audio": "Peaceful Places"
+    },
+    "tools": {
+      "guidebook": "Guidebook",
+      "folded-map": "Folded Map",
+      "discovery-key": "Discovery Key™"
+    },
+    "settings": {
+      "member-settings": "Settings",
+      "estate-ambience": "Estate Ambience"
+    },
+    "buttons": {
+      "take-me-there": "Take Me There",
+      "show-me-how": "Show Me How",
+      "show-estate-map": "Show Me the Estate",
+      "save-for-later": "Save for Later",
+      "open-settings": "Open Settings"
+    }
+  },
+  "approvedAliases": [
+    {
+      "entityType": "room",
+      "entityId": "conservatory",
+      "alias": "Conservatory",
+      "notes": "Spoken shorthand only — UI uses The Ocean Conservatory™"
+    }
+  ],
+  "forbiddenSubstitutions": [
+    { "insteadOf": "Greenhouse™", "doNotUse": ["Garden", "Plant Room", "Botanical Room"] },
+    { "insteadOf": "The Ocean Conservatory™", "doNotUse": ["Chat room", "Main chat", "Home screen"] },
+    { "insteadOf": "Clear My Mind™", "doNotUse": ["Brain dump room", "Vent room", "Thought catcher"] },
+    { "insteadOf": "Spark Cards™", "doNotUse": ["Cards feature", "Flash cards"] },
+    { "insteadOf": "Folded Map", "doNotUse": ["Estate map menu", "Navigation menu"] },
+    { "insteadOf": "Guidebook", "doNotUse": ["Help center", "Docs sidebar"] }
+  ],
+  "lastUpdated": "2026-07-06"
+}

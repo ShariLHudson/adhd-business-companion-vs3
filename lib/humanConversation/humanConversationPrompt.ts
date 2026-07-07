@@ -22,7 +22,7 @@ import {
 import { HUMAN_CONVERSATION_TWELVE_TESTS } from "./twelveTests";
 import { CONTEXT_BEFORE_CONTENT_PROMPT, contextBeforeContentHintForChat } from "./contextBeforeContent";
 import { SPARK_HUMAN_VOICE_PROMPT_BLOCK } from "./sparkHumanVoice";
-import { SHARI_COMPANION_ENGINE_PROMPT_BLOCK } from "../conversation/shariCompanionEngine";
+import { SHARI_COMPANION_ENGINE_PROMPT_BLOCK } from "../conversation/shariCompanionEnginePrompt";
 
 export const HUMAN_CONVERSATION_PRINCIPLE =
   "Human Conversation — every response elevates the person's life experience, strengthens the relationship, and feels like someone who genuinely knows them." as const;

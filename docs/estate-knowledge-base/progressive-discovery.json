@@ -1,0 +1,115 @@
+{
+  "registry": "progressive-discovery-journey",
+  "version": "2.0.0",
+  "description": "Progressive Discovery Journey™ — five gentle stages. No scores, no checklists. Help & Discovery + Discovery Key™.",
+  "rules": {
+    "maxItemsPerResponse": 3,
+    "neverOverwhelm": true,
+    "liveTargetsOnly": true,
+    "noProgressScores": true,
+    "minEngagementsToAdvance": 2
+  },
+  "recommendationProfiles": {
+    "newMember": [
+      "essential",
+      "core-locations",
+      "core-features",
+      "personalization",
+      "delight"
+    ],
+    "establishedMember": [
+      "hidden-treasure",
+      "new-possibility",
+      "seasonal-discovery",
+      "personal-discovery",
+      "estate-story"
+    ]
+  },
+  "discoveryPriorityByProfile": {
+    "essential": ["Essential"],
+    "core-locations": ["Essential", "Helpful"],
+    "core-features": ["Essential", "Helpful"],
+    "personalization": ["Helpful", "Personalized"],
+    "delight": ["Delight", "Helpful"],
+    "hidden-treasure": ["Delight"],
+    "new-possibility": ["Helpful", "Delight"],
+    "seasonal-discovery": ["Delight", "Personalized"],
+    "personal-discovery": ["Personalized"],
+    "estate-story": ["Helpful", "Delight"]
+  },
+  "stages": [
+    {
+      "stageId": "welcome",
+      "order": 1,
+      "label": "Welcome",
+      "purpose": "Help members understand they have entered Spark Estate.",
+      "intro": "A few gentle starting points — no rush to see everything.",
+      "priorityBands": ["essential"],
+      "itemIds": [
+        { "type": "discovery", "id": "DISC-001" },
+        { "type": "discovery", "id": "DISC-002" },
+        { "type": "discovery", "id": "DISC-003" },
+        { "type": "tool", "id": "folded-map" },
+        { "type": "tool", "id": "discovery-key" }
+      ],
+      "status": "Live"
+    },
+    {
+      "stageId": "explore",
+      "order": 2,
+      "label": "Explore",
+      "purpose": "Introduce major spaces on the Estate.",
+      "intro": "When you're ready to wander a little:",
+      "priorityBands": ["core-locations"],
+      "itemIds": [
+        { "type": "room", "id": "personal-library" },
+        { "type": "room", "id": "music-room" },
+        { "type": "room", "id": "conservatory" },
+        { "type": "room", "id": "reflection-pond" }
+      ],
+      "status": "Live"
+    },
+    {
+      "stageId": "discover-features",
+      "order": 3,
+      "label": "Discover features",
+      "purpose": "Introduce tools that support daily work.",
+      "intro": "A few things members often find helpful:",
+      "priorityBands": ["core-features"],
+      "itemIds": [
+        { "type": "feature", "id": "clear-my-mind" },
+        { "type": "feature", "id": "plan-my-day" },
+        { "type": "feature", "id": "focus-audio" }
+      ],
+      "status": "Live"
+    },
+    {
+      "stageId": "personalize",
+      "order": 4,
+      "label": "Personalize",
+      "purpose": "Help members make Spark their own.",
+      "intro": "When you want the Estate to feel more like yours:",
+      "priorityBands": ["personalization"],
+      "itemIds": [
+        { "type": "setting", "id": "member-settings" },
+        { "type": "setting", "id": "estate-ambience" },
+        { "type": "room", "id": "greenhouse" }
+      ],
+      "status": "Live"
+    },
+    {
+      "stageId": "deeper-discovery",
+      "order": 5,
+      "label": "Deeper discovery",
+      "purpose": "Long-term engagement — stories, objects, quiet treasures.",
+      "intro": "When you want to go a little further:",
+      "priorityBands": ["delight", "hidden-treasure", "estate-story"],
+      "itemIds": [
+        { "type": "discovery", "id": "DISC-011" },
+        { "type": "tool", "id": "guidebook" },
+        { "type": "room", "id": "reflection-pond" }
+      ],
+      "status": "Live"
+    }
+  ]
+}

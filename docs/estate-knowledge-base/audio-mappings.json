@@ -1,0 +1,128 @@
+{
+  "registry": "audio-mappings",
+  "version": "1.0.0",
+  "description": "Audio Experience Foundation™ — cross-links rooms, features, needs, and discoveries to audio experiences.",
+  "itemSchema": {
+    "id": "string",
+    "sourceType": "room | feature | tool | discovery | need-signal | experience-group",
+    "sourceId": "string",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "audioExperienceIds": "string[] — must exist in audio-experiences.json",
+    "presentationOrder": "string[] — optional member-facing order",
+    "lastUpdated": "string"
+  },
+  "legacyFeatureBridge": {
+    "description": "discovery-mappings.json relatedAudio uses feature ids — bridge to audioExperienceId",
+    "focus-audio": "peaceful-places-focus"
+  },
+  "mappings": [
+    {
+      "id": "audio-map-focus-audio-feature",
+      "sourceType": "feature",
+      "sourceId": "focus-audio",
+      "status": "Live",
+      "audioExperienceIds": ["peaceful-places-focus"],
+      "presentationOrder": ["peaceful-places-focus"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "audio-map-music-room",
+      "sourceType": "room",
+      "sourceId": "music-room",
+      "status": "Live",
+      "audioExperienceIds": ["music-room-piano", "peaceful-places-focus"],
+      "presentationOrder": ["music-room-piano", "peaceful-places-focus"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "audio-map-clear-my-mind-room",
+      "sourceType": "room",
+      "sourceId": "clear-my-mind",
+      "status": "Live",
+      "audioExperienceIds": ["clear-my-mind-soft-audio", "peaceful-places-focus"],
+      "presentationOrder": ["clear-my-mind-soft-audio"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "audio-map-conservatory",
+      "sourceType": "room",
+      "sourceId": "conservatory",
+      "status": "Live",
+      "audioExperienceIds": ["conservatory-gentle-audio", "peaceful-places-focus"],
+      "presentationOrder": ["conservatory-gentle-audio"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "audio-map-coffee-house",
+      "sourceType": "room",
+      "sourceId": "coffee-house",
+      "status": "Draft",
+      "audioExperienceIds": ["coffee-house-murmur"],
+      "presentationOrder": ["coffee-house-murmur"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "audio-map-peaceful-places",
+      "sourceType": "room",
+      "sourceId": "peaceful-places",
+      "status": "Draft",
+      "audioExperienceIds": ["peaceful-places-rain", "peaceful-places-focus"],
+      "presentationOrder": ["peaceful-places-rain"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "audio-map-estate-ambience-setting",
+      "sourceType": "tool",
+      "sourceId": "estate-ambience",
+      "status": "Live",
+      "audioExperienceIds": ["estate-ambience-toggle"],
+      "presentationOrder": ["estate-ambience-toggle"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "audio-map-music-and-sound-group",
+      "sourceType": "experience-group",
+      "sourceId": "music-and-sound",
+      "status": "Live",
+      "audioExperienceIds": ["music-room-piano", "peaceful-places-focus"],
+      "presentationOrder": ["music-room-piano", "peaceful-places-focus"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "audio-map-need-focus",
+      "sourceType": "need-signal",
+      "sourceId": "need-focus",
+      "status": "Live",
+      "audioExperienceIds": ["peaceful-places-focus", "music-room-piano"],
+      "presentationOrder": ["peaceful-places-focus"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "audio-map-need-quiet",
+      "sourceType": "need-signal",
+      "sourceId": "need-quiet",
+      "status": "Live",
+      "audioExperienceIds": ["peaceful-places-focus", "conservatory-gentle-audio"],
+      "presentationOrder": ["peaceful-places-focus"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "audio-map-need-rest",
+      "sourceType": "need-signal",
+      "sourceId": "need-rest",
+      "status": "Live",
+      "audioExperienceIds": ["peaceful-places-focus", "clear-my-mind-soft-audio"],
+      "presentationOrder": ["peaceful-places-focus"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "audio-map-disc-003",
+      "sourceType": "discovery",
+      "sourceId": "DISC-003",
+      "status": "Live",
+      "audioExperienceIds": ["clear-my-mind-soft-audio"],
+      "presentationOrder": ["clear-my-mind-soft-audio"],
+      "lastUpdated": "2026-07-06"
+    }
+  ]
+}

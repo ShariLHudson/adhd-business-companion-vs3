@@ -1,0 +1,238 @@
+{
+  "registry": "member-need-signals",
+  "version": "1.0.0",
+  "description": "Human-side signals — what the member is feeling or needing right now. Estate Recommendation Intelligence™ reads these; Spark never invents needs.",
+  "rules": {
+    "signalsAreObservations": true,
+    "neverDiagnose": true,
+    "stayHereAlwaysValid": true,
+    "maxRecommendationsPerSignal": 3
+  },
+  "toneValues": ["recovery", "clarity", "creation", "celebration", "connection", "rest", "focus", "exploration"],
+  "signals": [
+    {
+      "signalId": "mental-overload",
+      "label": "Mental overload",
+      "memberMaySay": [
+        "I'm overwhelmed",
+        "too much in my head",
+        "my mind is racing",
+        "I can't think straight",
+        "everything feels like too much"
+      ],
+      "keywords": [
+        "overwhelmed",
+        "overwhelm",
+        "too much",
+        "racing thoughts",
+        "mind is full",
+        "head is full",
+        "can't think"
+      ],
+      "emotionalTone": "recovery",
+      "status": "Live"
+    },
+    {
+      "signalId": "need-quiet",
+      "label": "Need quiet",
+      "memberMaySay": [
+        "I need somewhere quiet",
+        "I need silence",
+        "it's too noisy in my head",
+        "I want stillness"
+      ],
+      "keywords": [
+        "quiet",
+        "silence",
+        "stillness",
+        "somewhere quiet",
+        "need calm",
+        "too loud"
+      ],
+      "emotionalTone": "rest",
+      "status": "Live"
+    },
+    {
+      "signalId": "need-focus",
+      "label": "Need focus",
+      "memberMaySay": [
+        "I need to focus",
+        "I can't concentrate",
+        "help me concentrate",
+        "I keep losing focus"
+      ],
+      "keywords": [
+        "focus",
+        "concentrate",
+        "concentration",
+        "distracted",
+        "stay on task"
+      ],
+      "emotionalTone": "focus",
+      "status": "Live"
+    },
+    {
+      "signalId": "need-rest",
+      "label": "Need rest",
+      "memberMaySay": [
+        "I'm exhausted",
+        "I need a break",
+        "I'm so tired",
+        "I need to rest"
+      ],
+      "keywords": [
+        "exhausted",
+        "tired",
+        "need a break",
+        "need rest",
+        "burnt out",
+        "burned out"
+      ],
+      "emotionalTone": "rest",
+      "status": "Live"
+    },
+    {
+      "signalId": "need-clarity",
+      "label": "Need clarity",
+      "memberMaySay": [
+        "I don't know where to start",
+        "I'm stuck",
+        "everything feels fuzzy",
+        "I need clarity"
+      ],
+      "keywords": [
+        "stuck",
+        "clarity",
+        "fuzzy",
+        "don't know where to start",
+        "not sure what to do",
+        "unclear"
+      ],
+      "emotionalTone": "clarity",
+      "status": "Live"
+    },
+    {
+      "signalId": "fragile-idea",
+      "label": "Fragile idea emerging",
+      "memberMaySay": [
+        "I have an idea but it's not ready",
+        "something is growing",
+        "I don't want to rush this thought"
+      ],
+      "keywords": [
+        "fragile idea",
+        "seed of an idea",
+        "not ready to share",
+        "still forming",
+        "taking root"
+      ],
+      "emotionalTone": "exploration",
+      "status": "Live"
+    },
+    {
+      "signalId": "want-celebration",
+      "label": "Something to honor",
+      "memberMaySay": [
+        "I want to celebrate",
+        "something good happened",
+        "I want to mark this moment"
+      ],
+      "keywords": [
+        "celebrate",
+        "celebration",
+        "good news",
+        "proud of",
+        "something to celebrate"
+      ],
+      "emotionalTone": "celebration",
+      "status": "Live"
+    },
+    {
+      "signalId": "need-reflection",
+      "label": "Need reflection",
+      "memberMaySay": [
+        "I need to think",
+        "I need to process",
+        "I need to reflect"
+      ],
+      "keywords": [
+        "reflect",
+        "reflection",
+        "process this",
+        "think things through",
+        "sit with this"
+      ],
+      "emotionalTone": "clarity",
+      "status": "Live"
+    },
+    {
+      "signalId": "need-fresh-air",
+      "label": "Need fresh air",
+      "memberMaySay": [
+        "I need fresh air",
+        "I want to be outside",
+        "I need to get outside"
+      ],
+      "keywords": [
+        "fresh air",
+        "outside",
+        "outdoors",
+        "open air",
+        "step outside"
+      ],
+      "emotionalTone": "rest",
+      "status": "Live"
+    },
+    {
+      "signalId": "morning-overwhelm",
+      "label": "Morning overwhelm",
+      "memberMaySay": [
+        "I don't know what to do today",
+        "my morning is a mess",
+        "too many priorities"
+      ],
+      "keywords": [
+        "plan my day",
+        "priorities",
+        "morning overwhelm",
+        "what to do today",
+        "where to start today"
+      ],
+      "emotionalTone": "clarity",
+      "status": "Live"
+    },
+    {
+      "signalId": "need-inspiration",
+      "label": "Need inspiration",
+      "memberMaySay": [
+        "I need inspiration",
+        "I want inspiration",
+        "I feel stuck creatively"
+      ],
+      "keywords": [
+        "inspiration",
+        "inspired",
+        "creative spark",
+        "need ideas"
+      ],
+      "emotionalTone": "exploration",
+      "status": "Live"
+    },
+    {
+      "signalId": "want-to-learn",
+      "label": "Want to learn",
+      "memberMaySay": [
+        "I want to learn something",
+        "teach me something",
+        "I want to discover something new"
+      ],
+      "keywords": [
+        "want to learn",
+        "learn something",
+        "teach me"
+      ],
+      "emotionalTone": "exploration",
+      "status": "Live"
+    }
+  ]
+}

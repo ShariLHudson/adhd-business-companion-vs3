@@ -1,0 +1,251 @@
+{
+  "registry": "estate-recommendation-reasons",
+  "version": "1.0.0",
+  "description": "Why a Live destination might help right now — connects member-need-signals to estate locations with companion reasoning.",
+  "rules": {
+    "whyNowIsMemberFacing": true,
+    "liveLocationsOnly": true,
+    "neverForceNavigation": true,
+    "permissionBeforeMove": true
+  },
+  "reasons": [
+    {
+      "signalId": "mental-overload",
+      "locationId": "clear-my-mind",
+      "whyNow": "You can set thoughts down without finishing or filing anything — relief first, organization later.",
+      "priority": 1,
+      "status": "Live"
+    },
+    {
+      "signalId": "mental-overload",
+      "locationId": "conservatory",
+      "whyNow": "Still glass and soft light — a place to breathe when everything feels loud inside.",
+      "priority": 2,
+      "status": "Live"
+    },
+    {
+      "signalId": "mental-overload",
+      "locationId": "reflection-pond",
+      "whyNow": "Quiet water gives your mind somewhere to rest without asking you to solve anything.",
+      "priority": 3,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-quiet",
+      "locationId": "reflection-pond",
+      "whyNow": "Still water and nothing required of you — just room to exhale.",
+      "priority": 1,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-quiet",
+      "locationId": "personal-library",
+      "whyNow": "A cozy indoor hush — thinking at your own pace, door closed to the noise.",
+      "priority": 2,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-quiet",
+      "locationId": "conservatory",
+      "whyNow": "Sanctuary quiet — no performance, no hurry.",
+      "priority": 3,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-focus",
+      "locationId": "music-room",
+      "whyNow": "Warm light and gentle company — focus without feeling alone at your desk.",
+      "priority": 1,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-focus",
+      "locationId": "greenhouse",
+      "whyNow": "Patient glass walls — good for one thing at a time, without the world rushing you.",
+      "priority": 2,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-focus",
+      "locationId": "personal-library",
+      "whyNow": "A quiet table and your own rhythm — nothing competing for attention.",
+      "priority": 3,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-rest",
+      "locationId": "sunroom",
+      "whyNow": "Warm pond light and unhurried welcome — you don't have to be 'on' here.",
+      "priority": 1,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-rest",
+      "locationId": "conservatory",
+      "whyNow": "Soft underwater light — rest without guilt about not being productive.",
+      "priority": 2,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-rest",
+      "locationId": "reflection-pond",
+      "whyNow": "Still water — let the day loosen its grip for a few minutes.",
+      "priority": 3,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-clarity",
+      "locationId": "greenhouse",
+      "whyNow": "Ideas need warmth before they need answers — this room is built for that patience.",
+      "priority": 1,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-clarity",
+      "locationId": "personal-library",
+      "whyNow": "Spread things out without pressure — clarity often arrives when you stop forcing it.",
+      "priority": 2,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-clarity",
+      "locationId": "sunroom",
+      "whyNow": "Morning-light clarity — see what matters before the day piles on.",
+      "priority": 3,
+      "status": "Live"
+    },
+    {
+      "signalId": "fragile-idea",
+      "locationId": "greenhouse",
+      "whyNow": "Ideas still taking root deserve glass walls and time — not a deadline.",
+      "priority": 1,
+      "status": "Live"
+    },
+    {
+      "signalId": "fragile-idea",
+      "locationId": "house-possibility-outside",
+      "whyNow": "Among the trees — creative retreat when something is too tender for the main house.",
+      "priority": 2,
+      "status": "Live"
+    },
+    {
+      "signalId": "want-celebration",
+      "locationId": "estate-gardens",
+      "whyNow": "Paths and cultivated beauty — room to let a good moment land.",
+      "priority": 1,
+      "status": "Live"
+    },
+    {
+      "signalId": "want-celebration",
+      "locationId": "sunroom",
+      "whyNow": "Warm light and unhurried welcome — honor the moment without making a production of it.",
+      "priority": 2,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-reflection",
+      "locationId": "journal",
+      "whyNow": "The journal is open to a blank page — reflection without anyone grading it.",
+      "priority": 1,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-reflection",
+      "locationId": "reflection-pond",
+      "whyNow": "Still water for thoughts that aren't ready to be solved yet.",
+      "priority": 2,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-reflection",
+      "locationId": "personal-library",
+      "whyNow": "A thinking space that belongs to you — unhurried and private.",
+      "priority": 3,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-fresh-air",
+      "locationId": "estate-gardens",
+      "whyNow": "Paths outside and cultivated air — movement without a destination.",
+      "priority": 1,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-fresh-air",
+      "locationId": "greenhouse",
+      "whyNow": "Glass to the sky with your feet on the ground — outside feeling, gentle shelter.",
+      "priority": 2,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-fresh-air",
+      "locationId": "gardens",
+      "whyNow": "A celebratory garden walk — fresh air with something beautiful to notice.",
+      "priority": 3,
+      "status": "Live"
+    },
+    {
+      "signalId": "morning-overwhelm",
+      "locationId": "greenhouse",
+      "whyNow": "Before the day demands answers — one warm place to see what actually matters.",
+      "priority": 1,
+      "status": "Live"
+    },
+    {
+      "signalId": "morning-overwhelm",
+      "locationId": "sunroom",
+      "whyNow": "Morning light without a to-do list — orient gently before you choose.",
+      "priority": 2,
+      "status": "Live"
+    },
+    {
+      "signalId": "morning-overwhelm",
+      "locationId": "personal-library",
+      "whyNow": "Sort the day from a quiet table — priorities without pressure.",
+      "priority": 3,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-inspiration",
+      "locationId": "greenhouse",
+      "whyNow": "Ideas still taking root deserve warmth before the world asks anything of them.",
+      "priority": 1,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-inspiration",
+      "locationId": "house-possibility-outside",
+      "whyNow": "Among the trees — room for possibility without performance.",
+      "priority": 2,
+      "status": "Live"
+    },
+    {
+      "signalId": "need-inspiration",
+      "locationId": "music-room",
+      "whyNow": "Warm light and gentle company — sometimes inspiration arrives sideways.",
+      "priority": 3,
+      "status": "Live"
+    },
+    {
+      "signalId": "want-to-learn",
+      "locationId": "personal-library",
+      "whyNow": "Read and explore at your own pace — no test at the end.",
+      "priority": 1,
+      "status": "Live"
+    },
+    {
+      "signalId": "want-to-learn",
+      "locationId": "greenhouse",
+      "whyNow": "Patient growth — learn by noticing what is emerging, not forcing it.",
+      "priority": 2,
+      "status": "Live"
+    },
+    {
+      "signalId": "want-to-learn",
+      "locationId": "conservatory",
+      "whyNow": "Still sanctuary — room to wonder without rushing to answers.",
+      "priority": 3,
+      "status": "Live"
+    }
+  ]
+}

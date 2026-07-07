@@ -9,6 +9,12 @@ import {
   effectiveEstateLayerVolume,
   isEstateSoundscapeOverlayEnabled,
 } from "./estateAudioSettings";
+import {
+  clearActiveEnvironmentalAudioState,
+  isAudioPlaybackGuardEnabled,
+  prepareSingleTrackPlayback,
+} from "./audioPlaybackGuard";
+import { stopEstateRoomAmbience } from "./estateRoomAmbience";
 import { fadeAudioVolumeAsync } from "@/lib/welcomeAudio/fadeVolume";
 
 const OVERLAY_CROSSFADE_MS = 650;
@@ -35,6 +41,7 @@ export async function stopEstateSoundscapeOverlay(): Promise<void> {
   if (typeof window === "undefined") return;
   const token = ++overlayFadeToken;
   activeOverlayId = null;
+  clearActiveEnvironmentalAudioState();
   if (!overlayAudio) return;
   await fadeAudioVolumeAsync(overlayAudio, 0, OVERLAY_CROSSFADE_MS);
   if (token !== overlayFadeToken) return;
@@ -54,6 +61,11 @@ export async function startEstateSoundscapeOverlay(
   const playback: SoundscapePlayback = soundscapePlaybackFrom(soundscape);
   if (!/\.(mp3|wav|ogg|m4a|aac|flac|webm)(\?|$)/i.test(playback.playbackUrl)) {
     return;
+  }
+
+  if (isAudioPlaybackGuardEnabled()) {
+    await prepareSingleTrackPlayback(`overlay:${soundscapeId}`);
+    await stopEstateRoomAmbience();
   }
 
   const token = ++overlayFadeToken;

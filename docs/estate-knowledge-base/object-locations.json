@@ -1,0 +1,161 @@
+{
+  "registry": "object-locations",
+  "version": "1.0.0",
+  "description": "Where estate objects appear in scene — placement and location binding for Object Intelligence™.",
+  "rules": {
+    "locationIdMatchesEstateLocations": true,
+    "objectIdMatchesEstateObjects": true
+  },
+  "itemSchema": {
+    "locationId": "string — estate-locations.locationId",
+    "objectId": "string — estate-objects.objectId",
+    "placementLabel": "string — human label, e.g. Telescope Table",
+    "surfaceType": "string | null — from room-placement-library surfaceTypes",
+    "prominence": "primary | secondary | background",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "notes": "string | null",
+    "lastUpdated": "ISO date"
+  },
+  "placements": [
+    {
+      "locationId": "observatory",
+      "objectId": "observatory-telescope",
+      "placementLabel": "Telescope Table",
+      "surfaceType": "telescope-table",
+      "prominence": "primary",
+      "status": "Live",
+      "notes": "Beside telescope base — curiosity without clutter.",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "house-possibility-telescope-deck",
+      "objectId": "observatory-telescope",
+      "placementLabel": "Treehouse Telescope Deck",
+      "surfaceType": "railing",
+      "prominence": "primary",
+      "status": "Draft",
+      "notes": "Possibility House wing — same telescope lore, treehouse arrival.",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "house-possibility-observatory",
+      "objectId": "observatory-telescope",
+      "placementLabel": "Possibility Observatory",
+      "surfaceType": "telescope-table",
+      "prominence": "primary",
+      "status": "Draft",
+      "notes": null,
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "welcome-home",
+      "objectId": "kinsey",
+      "placementLabel": "Welcome Sofa",
+      "surfaceType": "chair",
+      "prominence": "secondary",
+      "status": "Live",
+      "notes": "Kinsey asleep on sofa — intentional, never crop.",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "greenhouse",
+      "objectId": "kinsey",
+      "placementLabel": "Greenhouse Bench",
+      "surfaceType": "bench",
+      "prominence": "secondary",
+      "status": "Live",
+      "notes": "Discovery Key never placed on sleeping Kinsey.",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "house-possibility-discovery-chest",
+      "objectId": "discovery-chest",
+      "placementLabel": "Discovery Chest",
+      "surfaceType": "floor",
+      "prominence": "primary",
+      "status": "Draft",
+      "notes": "Room is the object — full scene focal.",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "journal",
+      "objectId": "estate-journal",
+      "placementLabel": "Gazebo Journal Table",
+      "surfaceType": "table",
+      "prominence": "primary",
+      "status": "Live",
+      "notes": "Journal open to blank page on arrival.",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "house-possibility-reflection-desk",
+      "objectId": "estate-journal",
+      "placementLabel": "Reflection Desk",
+      "surfaceType": "desk",
+      "prominence": "primary",
+      "status": "Draft",
+      "notes": "Treehouse reflection desk journal.",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "personal-library",
+      "objectId": "guidebook",
+      "placementLabel": "Reading Table",
+      "surfaceType": "table",
+      "prominence": "secondary",
+      "status": "Live",
+      "notes": null,
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "music-room",
+      "objectId": "music-room-piano",
+      "placementLabel": "Piano",
+      "surfaceType": "floor",
+      "prominence": "primary",
+      "status": "Live",
+      "notes": null,
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "accomplishments-shelf",
+      "objectId": "accomplishments-book",
+      "placementLabel": "Accomplishments Shelf",
+      "surfaceType": "shelf",
+      "prominence": "primary",
+      "status": "Live",
+      "notes": null,
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "house-possibility-cabinet-of-chapters",
+      "objectId": "cabinet-of-chapters",
+      "placementLabel": "Cabinet of Chapters",
+      "surfaceType": "cabinet",
+      "prominence": "primary",
+      "status": "Draft",
+      "notes": null,
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "greenhouse",
+      "objectId": "discovery-key",
+      "placementLabel": "Potting Table",
+      "surfaceType": "potting-table",
+      "prominence": "secondary",
+      "status": "Live",
+      "notes": "Eligible Discovery Key surface — one key estate-wide.",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "locationId": "conservatory",
+      "objectId": "discovery-key",
+      "placementLabel": "Windowsill",
+      "surfaceType": "windowsill",
+      "prominence": "secondary",
+      "status": "Live",
+      "notes": null,
+      "lastUpdated": "2026-07-06"
+    }
+  ]
+}

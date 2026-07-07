@@ -1,0 +1,276 @@
+{
+  "registry": "estate-objects",
+  "version": "1.0.0",
+  "description": "Meaningful objects, visual elements, and recurring items across Spark Estate™. Estate Object Intelligence™ source of truth.",
+  "rules": {
+    "oneOfficialNamePerObject": true,
+    "aliasesInObjectAliasesJson": true,
+    "liveOnlyForInteractiveRecommendation": true,
+    "neverInventObjects": true
+  },
+  "objectTypeValues": [
+    "character",
+    "instrument",
+    "furniture",
+    "tool",
+    "collection",
+    "experience-anchor",
+    "navigational",
+    "decorative"
+  ],
+  "statusValues": ["Live", "Draft", "Future", "Hidden", "Retired"],
+  "itemSchema": {
+    "objectId": "string — stable id",
+    "officialName": "string",
+    "assetReferences": "string[] — background file names where object appears",
+    "objectType": "objectTypeValues",
+    "description": "string — what the member sees",
+    "purpose": "string — why it exists in the Estate",
+    "story": "string — member-safe lore (Guidebook-aligned)",
+    "appearsInLocations": "string[] — locationId from estate-locations",
+    "aliases": "string[] — inline quick reference; canonical aliases in object-aliases.json",
+    "relatedFeatures": "string[] — feature ids from features.json",
+    "relatedDiscoveries": "string[] — discovery ids",
+    "interactive": "boolean — member may use or open",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "lastUpdated": "ISO date"
+  },
+  "objects": [
+    {
+      "objectId": "observatory-telescope",
+      "officialName": "Observatory Telescope",
+      "assetReferences": [
+        "observatory-daytime-outside-background.png",
+        "treehouse-possibility-observatory-background.png",
+        "treehouse-possibility-telescope-deck-background.png"
+      ],
+      "objectType": "instrument",
+      "description": "A great telescope beside the horizon windows — brass, patient, and quietly inviting.",
+      "purpose": "Invite foresight and calm curiosity without rushing today's worries.",
+      "story": "Mr. Ashford adjusted the great telescope while observations were quietly recorded. It points beyond the Estate — rarely changing what is happening nearby, but helping guests see farther than today's concerns.",
+      "appearsInLocations": [
+        "observatory",
+        "house-possibility-observatory",
+        "house-possibility-telescope-deck"
+      ],
+      "aliases": ["telescope", "the telescope", "that telescope"],
+      "relatedFeatures": [],
+      "relatedDiscoveries": [],
+      "interactive": false,
+      "status": "Live",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "objectId": "kinsey",
+      "officialName": "Kinsey",
+      "assetReferences": [],
+      "objectType": "character",
+      "description": "A white Lhasa Poo who has unofficially appointed herself the Estate welcoming committee.",
+      "purpose": "Warmth, belonging, and the feeling that someone is always glad you arrived.",
+      "story": "Kinsey is part of the Estate — not a feature, not decoration. She frequently falls asleep on whichever sofa seems most comfortable, including by the greenhouse bench and the hearth. The Estate does not rush her.",
+      "appearsInLocations": [
+        "welcome-home",
+        "greenhouse",
+        "conservatory",
+        "personal-library",
+        "house-possibility-reflection-desk"
+      ],
+      "aliases": ["kinsey", "the dog", "that dog", "who is the dog"],
+      "relatedFeatures": [],
+      "relatedDiscoveries": [],
+      "interactive": false,
+      "status": "Live",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "objectId": "discovery-chest",
+      "officialName": "Discovery Chest™",
+      "assetReferences": ["treehouse-possibility-discovery-chest-background.png"],
+      "objectType": "collection",
+      "description": "A treasured chest in the Possibility House — filled with stories, curiosities, and quiet surprises.",
+      "purpose": "Hold discoveries worth returning to — not a loot box, a belonging place.",
+      "story": "The Treehouse Discovery Chest keeps what members find along the way. It is opened with permission, never pressure — curiosity rewarded, never gamified.",
+      "appearsInLocations": ["house-possibility-discovery-chest"],
+      "aliases": [
+        "discovery chest",
+        "the discovery chest",
+        "that chest",
+        "the chest"
+      ],
+      "relatedFeatures": [],
+      "relatedDiscoveries": [],
+      "interactive": true,
+      "status": "Draft",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "objectId": "estate-journal",
+      "officialName": "Estate Journal",
+      "assetReferences": [
+        "gazebo-journal-background.png",
+        "treehouse-possibility-reflection-desk-background.png"
+      ],
+      "objectType": "experience-anchor",
+      "description": "A journal left open to a blank page — an invitation to reflect without finishing.",
+      "purpose": "Quiet processing and written reflection at the member's pace.",
+      "story": "The journal is always opened to a blank page. It is meant to invite possibility — not to judge how much you write.",
+      "appearsInLocations": [
+        "journal",
+        "house-possibility-reflection-desk",
+        "discovery-room"
+      ],
+      "aliases": [
+        "the journal",
+        "that journal",
+        "estate journal",
+        "reflection journal"
+      ],
+      "relatedFeatures": [],
+      "relatedDiscoveries": [],
+      "interactive": true,
+      "status": "Live",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "objectId": "guidebook",
+      "officialName": "Guidebook",
+      "assetReferences": [],
+      "objectType": "tool",
+      "description": "A treasured book in the scene — pages of orientation, never a help-center sidebar.",
+      "purpose": "Gentle orientation without software chrome.",
+      "story": "The Guidebook is read at your own pace. It holds room stories and estate lore — a physical book you close when you are done.",
+      "appearsInLocations": ["personal-library", "conservatory", "welcome-home"],
+      "aliases": ["guidebook", "the guidebook", "estate guidebook"],
+      "relatedFeatures": [],
+      "relatedDiscoveries": [],
+      "interactive": true,
+      "status": "Live",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "objectId": "discovery-key",
+      "officialName": "Discovery Key™",
+      "assetReferences": ["/images/discovery-key.png"],
+      "objectType": "tool",
+      "description": "A brass key placed naturally in a room — one gentle discovery at a time.",
+      "purpose": "Invite curiosity without notification pressure.",
+      "story": "The Discovery Key represents curiosity. When it appears, it offers one note — never a pile of notifications.",
+      "appearsInLocations": [],
+      "aliases": ["discovery key", "the discovery key", "that key", "brass key"],
+      "relatedFeatures": [],
+      "relatedDiscoveries": [],
+      "interactive": true,
+      "status": "Live",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "objectId": "folded-map",
+      "officialName": "Folded Map",
+      "assetReferences": [],
+      "objectType": "navigational",
+      "description": "A folded map in the corner — pauses conversation, never destroys it.",
+      "purpose": "Optional estate orientation without forced navigation.",
+      "story": "The map waits until you ask. It shows the whole Estate when you are ready — never interrupts a thought mid-sentence.",
+      "appearsInLocations": [],
+      "aliases": ["folded map", "the map", "estate map", "that map"],
+      "relatedFeatures": [],
+      "relatedDiscoveries": [],
+      "interactive": true,
+      "status": "Live",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "objectId": "accomplishments-book",
+      "officialName": "Accomplishments Book™",
+      "assetReferences": ["space-celebration-garden-background.png"],
+      "objectType": "collection",
+      "description": "A book that quietly remembers wins — celebration without confetti.",
+      "purpose": "Honor progress the member chooses to keep.",
+      "story": "The Accomplishments Book remembers what you mark as worth keeping. It is not a scoreboard — it is a shelf of quiet pride.",
+      "appearsInLocations": ["accomplishments-shelf", "gardens", "garden-bench"],
+      "aliases": [
+        "accomplishments book",
+        "accomplishment book",
+        "my accomplishments"
+      ],
+      "relatedFeatures": [],
+      "relatedDiscoveries": [],
+      "interactive": true,
+      "status": "Live",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "objectId": "celebration-bell",
+      "officialName": "Celebration Bell",
+      "assetReferences": [],
+      "objectType": "decorative",
+      "description": "A bell rung quietly when something worth honoring happens.",
+      "purpose": "Mark moments without gamification or streaks.",
+      "story": "The bell rings softly — flowers, notes, and warmth. Never pop-ups. Never pressure to perform celebration.",
+      "appearsInLocations": ["celebration-room", "gardens"],
+      "aliases": ["celebration bell", "the bell", "estate bell"],
+      "relatedFeatures": [],
+      "relatedDiscoveries": [],
+      "interactive": false,
+      "status": "Draft",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "objectId": "music-room-piano",
+      "officialName": "Music Room Piano",
+      "assetReferences": ["music-room-background.png"],
+      "objectType": "instrument",
+      "description": "A piano in warm light — sheet music nearby, focus with gentle company.",
+      "purpose": "Creative calm and optional musical companionship.",
+      "story": "Friends have gathered here for generations — learning a first song, singing late into the evening. The Estate believes every life deserves a soundtrack.",
+      "appearsInLocations": ["music-room"],
+      "aliases": ["piano", "the piano", "that piano"],
+      "relatedFeatures": ["focus-audio"],
+      "relatedDiscoveries": ["DISC-004"],
+      "interactive": false,
+      "status": "Live",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "objectId": "cabinet-of-chapters",
+      "officialName": "Cabinet of Chapters™",
+      "assetReferences": [
+        "treehouse-possibility-cabinet-of-chapters-background.png"
+      ],
+      "objectType": "collection",
+      "description": "A curiosity cabinet of chapters — legacy and story kept in reach.",
+      "purpose": "Hold narrative threads across seasons of growth.",
+      "story": "Each chapter waits until you are ready. The cabinet does not hurry legacy — it keeps it safe.",
+      "appearsInLocations": [
+        "house-possibility-cabinet-of-chapters",
+        "legacy-room-main"
+      ],
+      "aliases": [
+        "cabinet of chapters",
+        "curiosity cabinet",
+        "the cabinet"
+      ],
+      "relatedFeatures": [],
+      "relatedDiscoveries": [],
+      "interactive": true,
+      "status": "Draft",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "objectId": "institute-cabinet",
+      "officialName": "Institute Cabinet™",
+      "assetReferences": [],
+      "objectType": "furniture",
+      "description": "A cabinet in the Momentum Institute — folios, tools, and earned capability.",
+      "purpose": "Store institute materials as treasured possessions, not folders.",
+      "story": "The Institute Cabinet holds what you build in learning — opened when you ask, never dumped on arrival.",
+      "appearsInLocations": ["institute-cabinet", "momentum-institute"],
+      "aliases": ["institute cabinet", "my cabinet", "the institute cabinet"],
+      "relatedFeatures": [],
+      "relatedDiscoveries": [],
+      "interactive": true,
+      "status": "Draft",
+      "lastUpdated": "2026-07-06"
+    }
+  ]
+}

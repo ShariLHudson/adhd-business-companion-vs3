@@ -1,0 +1,234 @@
+{
+  "registry": "estate-aliases",
+  "version": "1.0.0",
+  "description": "Natural language ways members refer to estate locations. Aliases resolve to locationId — never to invented names.",
+  "rules": {
+    "resolvesToLocationId": true,
+    "assetFileNamesUnchanged": true,
+    "approvedAliasesOnly": true
+  },
+  "itemSchema": {
+    "phrase": "string — lowercase matching phrase",
+    "locationId": "string — estate-locations.locationId",
+    "matchType": "nickname | experience | colloquial | approved",
+    "status": "Live | Draft | Hidden | Retired"
+  },
+  "aliases": [
+    {
+      "phrase": "take me to the treehouse",
+      "locationId": "house-possibility-outside",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the treehouse",
+      "locationId": "house-possibility-outside",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "treehouse",
+      "locationId": "house-possibility-outside",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "possibility house",
+      "locationId": "house-possibility-outside",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the possibility house",
+      "locationId": "house-possibility-outside",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "butterfly conservatory",
+      "locationId": "conservatory",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the butterfly conservatory",
+      "locationId": "conservatory",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "ocean conservatory",
+      "locationId": "conservatory",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the ocean conservatory",
+      "locationId": "conservatory",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "conservatory",
+      "locationId": "conservatory",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the conservatory",
+      "locationId": "conservatory",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "reflection pond",
+      "locationId": "reflection-pond",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the reflection pond",
+      "locationId": "reflection-pond",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "personal library",
+      "locationId": "personal-library",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "my library",
+      "locationId": "personal-library",
+      "matchType": "colloquial",
+      "status": "Live"
+    },
+    {
+      "phrase": "greenhouse",
+      "locationId": "greenhouse",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the greenhouse",
+      "locationId": "greenhouse",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "estate garden",
+      "locationId": "estate-gardens",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "estate gardens",
+      "locationId": "estate-gardens",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the gardens",
+      "locationId": "gardens",
+      "matchType": "colloquial",
+      "status": "Live"
+    },
+    {
+      "phrase": "i want to swim",
+      "locationId": "summer-terrace",
+      "matchType": "experience",
+      "status": "Live"
+    },
+    {
+      "phrase": "take me swimming",
+      "locationId": "summer-terrace",
+      "matchType": "experience",
+      "status": "Live"
+    },
+    {
+      "phrase": "take me to the pool",
+      "locationId": "summer-terrace",
+      "matchType": "experience",
+      "status": "Live"
+    },
+    {
+      "phrase": "the pool",
+      "locationId": "summer-terrace",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "observatory",
+      "locationId": "observatory",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the observatory",
+      "locationId": "observatory",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "take me to the observatory",
+      "locationId": "observatory",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "music room",
+      "locationId": "music-room",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the music room",
+      "locationId": "music-room",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "swimming pool",
+      "locationId": "summer-terrace",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "estate pool",
+      "locationId": "summer-terrace",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "summer terrace",
+      "locationId": "summer-terrace",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "seat at the pond",
+      "locationId": "seat-at-pond",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the pond",
+      "locationId": "seat-at-pond",
+      "matchType": "colloquial",
+      "status": "Live"
+    },
+    {
+      "phrase": "sunroom",
+      "locationId": "sunroom",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "clear my mind",
+      "locationId": "clear-my-mind",
+      "matchType": "approved",
+      "status": "Live"
+    }
+  ]
+}

@@ -59,6 +59,8 @@ export const ESTATE_ROUTING_EXCLUSIVE_PHRASES: Readonly<Record<string, string>> 
     "the estate gardens": "estate-gardens",
     "butterfly conservatory": "conservatory",
     "the butterfly conservatory": "conservatory",
+    "ocean conservatory": "conservatory",
+    "the ocean conservatory": "conservatory",
     "personal library": "personal-library",
     "the personal library": "personal-library",
     "estate library": "library",
@@ -157,6 +159,16 @@ export const ESTATE_ROUTING_AMBIGUITY_GROUPS: readonly EstateRoutingAmbiguityGro
       ],
       intro: "We have two observatories — the Treehouse and the main Estate. Which one?",
       placeIds: ["house-possibility-observatory", "observatory"],
+    },
+    {
+      id: "conservatory",
+      patterns: [
+        /^(?:the\s+)?conservatory$/i,
+        /\b(?:take me to|go to|show me|visit)\s+(?:the\s+)?conservatory\b/i,
+      ],
+      intro:
+        "I found a few conservatory spaces. Did you mean Ocean Conservatory or the Greenhouse?",
+      placeIds: ["conservatory", "greenhouse"],
     },
     {
       id: "pond",

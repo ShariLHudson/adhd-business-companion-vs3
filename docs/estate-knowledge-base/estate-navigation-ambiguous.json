@@ -1,0 +1,70 @@
+{
+  "registry": "estate-navigation-ambiguous",
+  "version": "1.0.0",
+  "description": "Terms that map to multiple Live destinations — Spark offers thoughtful options, never guesses.",
+  "rules": {
+    "neverChooseRandomly": true,
+    "maxMemberOptions": 4
+  },
+  "terms": [
+    {
+      "id": "garden",
+      "status": "Live",
+      "triggerPhrases": [
+        "take me to the garden",
+        "go to the garden",
+        "show me the garden",
+        "the garden",
+        "a garden"
+      ],
+      "excludeWhenContains": [
+        "estate garden",
+        "celebration garden",
+        "greenhouse",
+        "butterfly",
+        "ocean conservatory"
+      ],
+      "locationIds": [
+        "estate-gardens",
+        "greenhouse",
+        "conservatory"
+      ],
+      "presentationOrder": [
+        "estate-gardens",
+        "greenhouse",
+        "conservatory"
+      ],
+      "memberFacingIntro": "I found a few garden spaces you might enjoy:",
+      "clarificationQuestion": "I want to make sure I take you to the right place. Are you thinking about the outdoor garden, the greenhouse, or the butterfly conservatory?"
+    },
+    {
+      "id": "conservatory",
+      "status": "Live",
+      "triggerPhrases": [
+        "take me to the conservatory",
+        "go to the conservatory",
+        "show me the conservatory",
+        "visit the conservatory",
+        "the conservatory",
+        "a conservatory",
+        "conservatory"
+      ],
+      "excludeWhenContains": [
+        "ocean conservatory",
+        "the ocean conservatory",
+        "butterfly conservatory",
+        "the butterfly conservatory"
+      ],
+      "locationIds": [
+        "conservatory",
+        "greenhouse"
+      ],
+      "presentationOrder": [
+        "conservatory",
+        "greenhouse"
+      ],
+      "memberFacingIntro": "I found a few conservatory spaces.",
+      "clarificationQuestion": "Did you mean Ocean Conservatory or the Greenhouse?"
+    }
+  ]
+}

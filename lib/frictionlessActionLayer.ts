@@ -11,6 +11,12 @@
 
 import { detectAudioRequest } from "./audioSuggestions";
 import {
+  executeGuardedEnvironmentalAudioPlay,
+  resolveGuardedEnvironmentalAudioRequest,
+  shouldBlockAutoPlayForAudioQuery,
+  stopGuardedEnvironmentalAudio,
+} from "./estate/audioPlaybackGuard";
+import {
   isConfirmationAcceptance,
   isPureConfirmationDecline,
 } from "./conversationConfirmationGate";
@@ -111,6 +117,12 @@ import {
 import {
   syncUniversalCreationHandoffToSession,
 } from "./conversationSession";
+import {
+  resolveCompanionTurn,
+  updateCompanionContextFromDecision,
+  updateCompanionContextFromEstateRuntime,
+  writeCompanionConversationState,
+} from "./companionConversationContext";
 import {
   clearUniversalCreationSession,
   detectUniversalDocumentType,
@@ -254,6 +266,49 @@ import {
   resolveEstateNavigationDisambiguation,
   resolveEstateNavigationDiscovery,
 } from "./estateExperiences/resolveEstateNavigation";
+import {
+  formatDirectNavigationLine,
+  formatNavigationDecision,
+  resolveEstateNavigationIntent,
+  shouldNavigateFromDecision,
+} from "./estateNavigationIntelligence";
+import {
+  resolveEstateRecommendation,
+  isResolvedEstateRecommendation,
+} from "./estateRecommendationIntelligence";
+import {
+  deriveMemberStageFromJourney,
+  loadMemberJourneyProgress,
+  syncJourneyProgressFromDiscoveryHistory,
+} from "./estateProgressiveDiscoveryJourney";
+import { getDiscoveryMemberId } from "./estateDiscovery/memberId";
+import { getDefaultDiscoveryHistoryStore } from "./estateDiscovery/discoveryHistory";
+import type { HelpDiscoveryContext } from "./estateHelpDiscoveryIntelligence";
+import {
+  isResolvedHelpDiscovery,
+  resolveHelpDiscoveryQuery,
+} from "./estateHelpDiscoveryIntelligence";
+import {
+  isConversationStabilizationEnabled,
+  runConversationRoutingPipeline,
+  shouldBlockEstateSubsystem,
+  type ArbitrationResult,
+  type EstateSubsystem,
+  type StabilizationFastPathResult,
+} from "./conversationStabilization";
+import {
+  executeEstateIntelligence,
+  isEstateIntelligenceRuntimeEnabled,
+  type EstateIntelligenceRuntimeResult,
+} from "./estateIntelligenceRuntime";
+import {
+  companionSessionContinueHint,
+  shouldAllowEstateSuggestions,
+} from "./companionIntelligence";
+import {
+  applyCompanionDecisionGuidance,
+  type CompanionDecisionInput,
+} from "./companionDecisionIntelligence";
 import type { EstateNavigationDisambiguation } from "./estateExperiences/types";
 import { ESTATE_NAVIGATION_GOLDEN_RULE } from "./estateExperiences/navigationPhilosophy";
 import {
@@ -416,7 +471,7 @@ const PRODUCTIVITY_FRAMING_RE =
   /\b(?:plan my day|marketing plan|launch|revenue|clients?|business|productivity|get more done|prioritize my day)\b/i;
 
 const AFFIRMATION_RE =
-  /^(?:yes(?:\s+please)?|yep|yeah|yup|sure|ok(?:ay)?|please|do that|open it|do it|go ahead|let'?s do it|use it|let'?s use it|sounds good|that works|perfect|great|take me there|start|create it)\.?$/i;
+  /^(?:yes(?:\s+please)?|yep|yeah|yup|sure|ok(?:ay)?|please|do that|open it|do it|go ahead|let'?s do (?:it|that)|use it|let'?s use it|sounds good|that works|that would be great|perfect|great|take me there|start|create it)\.?$/i;
 
 export function isFrictionlessAffirmation(text: string): boolean {
   return AFFIRMATION_RE.test(text.trim());
@@ -638,6 +693,58 @@ export function frictionlessToToolSuggestion(
     keepTalkingLabel: "Keep Talking",
     action: { type: "tool", tool },
   };
+}
+
+function tryGuardedEnvironmentalAudioFlow(
+  userText: string,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const trimmed = userText.trim();
+  if (!trimmed) return null;
+
+  if (shouldBlockAutoPlayForAudioQuery(trimmed)) {
+    return null;
+  }
+
+  const playRequest = resolveGuardedEnvironmentalAudioRequest(trimmed);
+  if (playRequest) {
+    void executeGuardedEnvironmentalAudioPlay(playRequest, { userInitiated: true });
+    const label =
+      playRequest.trackId === "greenhouse-birds"
+        ? "bird sounds"
+        : "coffee chatter";
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint:
+        "ENVIRONMENTAL AUDIO (play): Member asked to play audio. Playback started — no navigation.",
+      localReply: `Starting ${label} for you.`,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    };
+  }
+
+  if (/\b(?:stop|turn off|silence)\b/i.test(trimmed) && /\b(?:audio|music|sound|birds?|chatter)\b/i.test(trimmed)) {
+    void stopGuardedEnvironmentalAudio();
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: "ENVIRONMENTAL AUDIO (stop): Silence room audio.",
+      localReply: "Got it — the room is quiet now.",
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    };
+  }
+
+  return null;
 }
 
 function buildAudioPending(
@@ -913,11 +1020,19 @@ function buildReminderDecision(
 function tryImpliedNeedFlow(
   input: FrictionlessActionInput,
   routing: IntentRoutingDecision,
+  stabilization?: ArbitrationResult | null,
 ): FrictionlessActionDecision | null {
   const userText = input.userText.trim();
   const currentTurn = input.currentTurn ?? 0;
   if (!userText) return null;
 
+  if (
+    stabilization &&
+    (shouldBlockEstateSubsystem(stabilization, "implied_need") ||
+      !shouldAllowEstateSuggestions(stabilization))
+  ) {
+    return null;
+  }
   const session = loadImpliedNeedSession();
   if (session) {
     const continuation = resolveImpliedNeedContinuation(userText, session);
@@ -2517,6 +2632,9 @@ function tryEarlyCompanionSupportFlow(
     return buildEmotionalRegulationDecision(userText, currentTurn);
   }
 
+  const guardedAudio = tryGuardedEnvironmentalAudioFlow(userText, routing);
+  if (guardedAudio) return guardedAudio;
+
   const audio = buildAudioPending(userText, currentTurn);
   if (audio) return audio;
 
@@ -2851,6 +2969,250 @@ function tryImmediateEstateExperienceAction(
   return null;
 }
 
+function buildHelpDiscoveryContext(
+  input: FrictionlessActionInput,
+): HelpDiscoveryContext {
+  const memberId = getDiscoveryMemberId();
+  const historyStore = getDefaultDiscoveryHistoryStore();
+  let journeyProgress = loadMemberJourneyProgress(memberId);
+  journeyProgress = syncJourneyProgressFromDiscoveryHistory(
+    journeyProgress,
+    historyStore,
+  );
+
+  return {
+    currentLocationId: input.currentRoom ?? undefined,
+    memberId,
+    journeyProgress,
+    historyStore,
+    memberStage: deriveMemberStageFromJourney(journeyProgress),
+    exploredDiscoveryIds: journeyProgress.discoveriesViewed,
+  };
+}
+
+function tryConversationStabilizationFlow(
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+  fast: StabilizationFastPathResult,
+): FrictionlessActionDecision {
+  const base: FrictionlessActionDecision = {
+    category:
+      fast.category === "universal_creation"
+        ? "universal_creation"
+        : "direct_action",
+    suppressRelationship: fast.suppressRelationship,
+    suppressRecap: fast.suppressRecap,
+    suppressReflectionFirst: fast.suppressReflectionFirst,
+    responseHint: fast.responseHint,
+    localReply: fast.localReply,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+    immediateResearchOpen: fast.immediateResearchOpen,
+    immediateCreateProjectOpen: fast.immediateCreateProjectOpen,
+  };
+
+  if (fast.category === "universal_creation") {
+    const session = loadUniversalCreationSession();
+    if (session) {
+      base.pendingAction = universalCreationPendingAction(
+        session,
+        input.currentTurn ?? 0,
+        routing.artifactKind,
+      );
+      base.universalCreationSession = session;
+    }
+  }
+
+  return base;
+}
+
+function mapEstateIntelligenceRuntimeToFrictionless(
+  runtime: EstateIntelligenceRuntimeResult,
+  input: FrictionlessActionInput,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision {
+  const base: FrictionlessActionDecision = {
+    category:
+      runtime.category === "universal_creation"
+        ? "universal_creation"
+        : runtime.category === "estate_guide"
+          ? "estate_guide"
+          : runtime.category === "estate_concierge"
+            ? "estate_concierge"
+            : "direct_action",
+    suppressRelationship: runtime.suppressRelationship,
+    suppressRecap: runtime.suppressRecap,
+    suppressReflectionFirst: runtime.suppressReflectionFirst,
+    responseHint: runtime.responseHint,
+    localReply: runtime.localReply,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+    immediateResearchOpen: runtime.immediateResearchOpen,
+    immediateCreateProjectOpen: runtime.immediateCreateProjectOpen,
+    immediateEstatePlaceNavigate: runtime.immediateEstatePlaceNavigate,
+  };
+
+  if (runtime.universalCreationCategory || runtime.category === "universal_creation") {
+    const session = loadUniversalCreationSession();
+    if (session) {
+      base.pendingAction = universalCreationPendingAction(
+        session,
+        input.currentTurn ?? 0,
+        routing.artifactKind,
+      );
+      base.universalCreationSession = session;
+    }
+  }
+
+  return base;
+}
+
+function tryEstateHelpDiscoveryFlow(
+  userText: string,
+  routing: IntentRoutingDecision,
+  input: FrictionlessActionInput,
+  stabilization?: ArbitrationResult | null,
+): FrictionlessActionDecision | null {
+  if (
+    stabilization &&
+    shouldBlockEstateSubsystem(stabilization, "help_discovery_location") &&
+    !/\bwhere is\b/i.test(userText)
+  ) {
+    return null;
+  }
+  const helpContext = buildHelpDiscoveryContext(input);
+  const decision = resolveHelpDiscoveryQuery(userText, helpContext);
+  if (!isResolvedHelpDiscovery(decision)) return null;
+
+  const base: FrictionlessActionDecision = {
+    category: "estate_concierge",
+    suppressRelationship: false,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint: `HELP & DISCOVERY (${decision.route}): Knowledge Base guidance only. Permission before navigation.`,
+    localReply: decision.memberFacingResponse,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+  };
+
+  if (
+    decision.route === "location" &&
+    decision.navigation &&
+    shouldNavigateFromDecision(decision.navigation) &&
+    !/\bwhere is\b/i.test(userText) &&
+    decision.navigation.placeId
+  ) {
+    return {
+      ...base,
+      immediateEstatePlaceNavigate: {
+        placeId: decision.navigation.placeId,
+        navigationLine: decision.memberFacingResponse,
+        userText,
+      },
+    };
+  }
+
+  return base;
+}
+
+function tryEstateRecommendationInvitation(
+  userText: string,
+  routing: IntentRoutingDecision,
+  currentLocationId?: string,
+  stabilization?: ArbitrationResult | null,
+): FrictionlessActionDecision | null {
+  if (
+    stabilization &&
+    shouldBlockEstateSubsystem(stabilization, "recommendation")
+  ) {
+    return null;
+  }
+  if (stabilization && !shouldAllowEstateSuggestions(stabilization)) {
+    return null;
+  }
+  const decision = resolveEstateRecommendation(userText, {
+    currentLocationId,
+  });
+  if (!isResolvedEstateRecommendation(decision)) return null;
+  if (!decision.memberFacingInvitation) return null;
+
+  return {
+    category: "estate_concierge",
+    suppressRelationship: false,
+    suppressRecap: true,
+    suppressReflectionFirst: true,
+    responseHint:
+      "ESTATE RECOMMENDATION: Why-now invitation only — never force navigation. Staying is valid.",
+    localReply: decision.memberFacingInvitation,
+    pendingAction: null,
+    toolSuggestion: null,
+    workspaceOffer: null,
+    intentRouting: routing,
+  };
+}
+
+function tryEstateNavigationIntelligence(
+  userText: string,
+  routing: IntentRoutingDecision,
+): FrictionlessActionDecision | null {
+  const ESTATE_NAVIGATION_GOLDEN_RULE =
+    "Offer at most three thoughtful choices. Never guess. Member chooses.";
+
+  const decision = resolveEstateNavigationIntent(userText);
+  if (decision.kind === "unresolved") return null;
+
+  const localReply = formatNavigationDecision(decision);
+  if (!localReply) return null;
+
+  if (shouldNavigateFromDecision(decision)) {
+    const displayName =
+      decision.choices?.[0]?.officialDisplayName ?? "that place";
+    const hint = decision.choices?.[0]?.memberFacingHint;
+    const navigationLine = formatDirectNavigationLine(displayName, hint);
+
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: `ESTATE NAVIGATION (high confidence): ${ESTATE_NAVIGATION_GOLDEN_RULE}`,
+      localReply: navigationLine,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+      immediateEstatePlaceNavigate: {
+        placeId: decision.placeId!,
+        navigationLine,
+        userText,
+      },
+    };
+  }
+
+  if (decision.kind === "offer_choices" || decision.kind === "need_clarification") {
+    return {
+      category: "direct_action",
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: `ESTATE NAVIGATION (medium confidence): ${ESTATE_NAVIGATION_GOLDEN_RULE}`,
+      localReply,
+      pendingAction: null,
+      toolSuggestion: null,
+      workspaceOffer: null,
+      intentRouting: routing,
+    };
+  }
+
+  return null;
+}
+
 function tryEstateNavigationPhilosophy(
   userText: string,
   routing: IntentRoutingDecision,
@@ -2957,9 +3319,13 @@ function buildDirectActionDecision(
 function finishFrictionlessDecision(
   decision: FrictionlessActionDecision,
   runtime: SparkRuntimeAction,
+  decisionContext?: CompanionDecisionInput | null,
 ): FrictionlessActionDecision {
-  if (decision.sparkRuntime) return decision;
-  return attachSparkRuntime(decision, runtime);
+  let result = decision.sparkRuntime ? decision : attachSparkRuntime(decision, runtime);
+  if (decisionContext) {
+    result = applyCompanionDecisionGuidance(result, decisionContext);
+  }
+  return result;
 }
 
 function resolveFrictionlessActionImpl(
@@ -2983,6 +3349,29 @@ function resolveFrictionlessActionImpl(
   if (!userText) return none;
 
   const sparkRuntime = resolveSparkRuntime(input);
+  let routingPipeline: ReturnType<typeof runConversationRoutingPipeline> | null =
+    null;
+
+  const finish = (decision: FrictionlessActionDecision): FrictionlessActionDecision => {
+    const result = finishFrictionlessDecision(decision, sparkRuntime, {
+      userText,
+      lastAssistantText: input.lastAssistantText,
+      goal: routingPipeline?.arbitration.goal ?? "general_conversation",
+      arbitration: routingPipeline?.arbitration,
+      winningCapability: routingPipeline?.winningCapability,
+      overwhelmed: input.overwhelmed,
+      category: decision.category,
+    });
+    updateCompanionContextFromDecision({
+      userText,
+      lastAssistantText: input.lastAssistantText,
+      currentTurn,
+      decision: result,
+      goal: routingPipeline?.arbitration.goal ?? null,
+      arbitration: routingPipeline?.arbitration ?? null,
+    });
+    return result;
+  };
 
   const routing = resolveIntentRouting({
     userText,
@@ -2991,41 +3380,125 @@ function resolveFrictionlessActionImpl(
     overwhelmed: input.overwhelmed,
   });
 
+  const companionTurn = resolveCompanionTurn(
+    {
+      userText,
+      lastAssistantText: input.lastAssistantText,
+      currentTurn,
+      currentRoom: input.currentRoom,
+      activeWorkflow: input.activeWorkflow,
+      workspace: input.workspace,
+      overwhelmed: input.overwhelmed,
+    },
+    routing,
+  );
+  if (companionTurn.statePatch) {
+    writeCompanionConversationState(companionTurn.statePatch);
+  }
+  if (companionTurn.handled && companionTurn.decision) {
+    return finish({
+      ...none,
+      ...companionTurn.decision,
+      intentRouting: companionTurn.decision.intentRouting ?? routing,
+    });
+  }
+
   maybeClearStaleFrictionlessPending(input, routing);
 
   const earlySupport = tryEarlyCompanionSupportFlow(input, routing);
   if (earlySupport) {
-    return finishFrictionlessDecision(earlySupport, sparkRuntime);
+    return finish(earlySupport);
   }
 
   const pendingChoiceFlow = tryPendingChoiceFlow(input, routing);
   if (pendingChoiceFlow) {
-    return finishFrictionlessDecision(pendingChoiceFlow, sparkRuntime);
+    return finish(pendingChoiceFlow);
   }
 
   const yesContinuation = tryFrictionlessYesContinuation(input, routing);
   if (yesContinuation) {
-    return finishFrictionlessDecision(yesContinuation, sparkRuntime);
+    return finish(yesContinuation);
+  }
+
+  routingPipeline = runConversationRoutingPipeline(
+    {
+      userText,
+      lastAssistantText: input.lastAssistantText,
+      currentTurn: input.currentTurn,
+      activeWorkflow: input.activeWorkflow,
+      workspace: input.workspace ?? undefined,
+      helpDiscoveryContext: buildHelpDiscoveryContext(input),
+    },
+    routing,
+  );
+
+  const stabilization = routingPipeline.arbitration;
+
+  if (isConversationStabilizationEnabled() && routingPipeline.fastPath) {
+    return finish(
+      tryConversationStabilizationFlow(
+        input,
+        routing,
+        routingPipeline.fastPath,
+      ),
+    );
+  }
+
+  if (isEstateIntelligenceRuntimeEnabled()) {
+    const estateRuntime = executeEstateIntelligence({
+      pipeline: routingPipeline,
+      userText,
+      lastAssistantText: input.lastAssistantText,
+      currentTurn: input.currentTurn,
+      activeWorkflow: input.activeWorkflow,
+      workspace: input.workspace ?? undefined,
+      helpContext: buildHelpDiscoveryContext(input),
+      routing,
+    });
+    if (estateRuntime) {
+      updateCompanionContextFromEstateRuntime(
+        estateRuntime,
+        userText,
+        currentTurn,
+      );
+      return finish(
+        mapEstateIntelligenceRuntimeToFrictionless(
+          estateRuntime,
+          input,
+          routing,
+        ),
+      );
+    }
+  }
+
+  if (stabilization?.sessionLocked && !routingPipeline.fastPath) {
+    return finish({
+      ...none,
+      suppressRelationship: true,
+      suppressRecap: true,
+      suppressReflectionFirst: true,
+      responseHint: companionSessionContinueHint(stabilization.activeSession),
+      intentRouting: routing,
+    });
   }
 
   const visualStructureFlow = tryVisualStructureEarlyFlow(input, routing);
   if (visualStructureFlow) {
-    return finishFrictionlessDecision(visualStructureFlow, sparkRuntime);
+    return finish(visualStructureFlow);
   }
 
   const musicGuidance = tryMusicCreationGuidance(userText, routing);
   if (musicGuidance) {
-    return finishFrictionlessDecision(musicGuidance, sparkRuntime);
+    return finish(musicGuidance);
   }
 
   if (input.primaryTurn?.blockSecondaryResponders) {
     const owned = resolveFrictionlessForPrimaryTurn(input, routing);
-    return finishFrictionlessDecision(
+    return finish(
       finalizeFrictionlessDecision(
         owned ?? { ...none, intentRouting: routing },
         input.primaryTurn,
       ),
-      sparkRuntime,
     );
   }
 
@@ -3070,9 +3543,29 @@ function resolveFrictionlessActionImpl(
     return buildCreateFastPathRecoveryDecision(input, routing);
   }
 
-  const impliedNeedFlow = tryImpliedNeedFlow(input, routing);
+  const impliedNeedFlow = tryImpliedNeedFlow(input, routing, stabilization);
   if (impliedNeedFlow) {
     return attachSparkRuntime(impliedNeedFlow, sparkRuntime);
+  }
+
+  const helpDiscoveryFlow = tryEstateHelpDiscoveryFlow(
+    userText,
+    routing,
+    input,
+    stabilization,
+  );
+  if (helpDiscoveryFlow) {
+    return attachSparkRuntime(helpDiscoveryFlow, sparkRuntime);
+  }
+
+  const recommendationInvitation = tryEstateRecommendationInvitation(
+    userText,
+    routing,
+    input.currentRoom ?? undefined,
+    stabilization,
+  );
+  if (recommendationInvitation) {
+    return attachSparkRuntime(recommendationInvitation, sparkRuntime);
   }
 
   const estateRestorationFlow = tryEstateRestorationFlow(input, routing);
@@ -3097,9 +3590,8 @@ function resolveFrictionlessActionImpl(
     isDecisionCompassOfferSignal(userText) ||
     (/\bhelp me decide\b/i.test(userText) && routing.category === "decide")
   ) {
-    return finishFrictionlessDecision(
+    return finish(
       buildDecisionSupportDecision(routing, currentTurn, userText),
-      sparkRuntime,
     );
   }
 
@@ -3116,6 +3608,12 @@ function resolveFrictionlessActionImpl(
 
     const estateConciergeFlow = tryEstateConciergeFlow(input, routing);
     if (estateConciergeFlow) return estateConciergeFlow;
+
+    const navigationIntelligence = tryEstateNavigationIntelligence(
+      userText,
+      routing,
+    );
+    if (navigationIntelligence) return navigationIntelligence;
 
     const navigationPhilosophy = tryEstateNavigationPhilosophy(userText, routing);
     if (navigationPhilosophy) return navigationPhilosophy;
@@ -3231,7 +3729,7 @@ function resolveFrictionlessActionImpl(
   const visualRecommendationLate = tryVisualRecommendationFlow(input, routing);
   if (visualRecommendationLate) return visualRecommendationLate;
 
-  return {
+  return finish({
     ...none,
     suppressRelationship:
       none.suppressRelationship || routing.suppressRelationshipIntelligence,
@@ -3239,7 +3737,7 @@ function resolveFrictionlessActionImpl(
       none.suppressReflectionFirst || routing.suppressReflectionFirst,
     suppressRecap: none.suppressRecap || routing.suppressConversationSummary,
     intentRouting: routing,
-  };
+  });
 }
 
 /**
@@ -3272,11 +3770,10 @@ export function resolveFrictionlessAction(
 ): FrictionlessActionDecision {
   const userText = input.userText.trim();
   if (!userText) return resolveFrictionlessActionImpl(input);
-  const runtime = input.sparkRuntime ?? resolveSparkRuntime(input);
-  return finishFrictionlessDecision(
-    resolveFrictionlessActionImpl({ ...input, sparkRuntime: runtime }),
-    runtime,
-  );
+  return resolveFrictionlessActionImpl({
+    ...input,
+    sparkRuntime: input.sparkRuntime ?? resolveSparkRuntime(input),
+  });
 }
 
 export function shouldSuppressRelationshipForFrictionless(

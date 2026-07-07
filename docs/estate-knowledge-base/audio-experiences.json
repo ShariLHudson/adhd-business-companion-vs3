@@ -1,0 +1,216 @@
+{
+  "registry": "audio-experiences",
+  "version": "1.0.0",
+  "description": "Audio Experience Foundation™ — what audio exists on the Estate, where it lives, and when it may help. Not the full music library.",
+  "rules": {
+    "kbSourceOfTruth": true,
+    "neverInventAudio": true,
+    "liveOnlyForMemberFacing": true,
+    "fullLibraryFuture": true
+  },
+  "statusValues": ["Live", "Draft", "Future", "Hidden", "Retired"],
+  "itemSchema": {
+    "audioExperienceId": "string — stable id",
+    "name": "string — official member-facing name",
+    "description": "string — what this audio experience is",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "categoryId": "string — from audio-categories.json",
+    "location": "string — primary home: room id or feature id",
+    "purpose": "string[] — emotional + practical roles",
+    "experienceTags": "string[]",
+    "recommendedWhen": "string[] — human situations when audio may help",
+    "relatedLocations": "string[] — estate location ids",
+    "relatedFeatures": "string[] — estate feature ids",
+    "relatedDiscoveries": "string[] — DISC-xxx ids",
+    "accessRoute": "string | null — app route when applicable",
+    "lastUpdated": "string"
+  },
+  "experiences": [
+    {
+      "audioExperienceId": "peaceful-places-focus",
+      "name": "Peaceful Places™",
+      "description": "Estate focus audio and calm soundscapes — gentle company while you think.",
+      "status": "Live",
+      "categoryId": "focus-ambience",
+      "location": "focus-audio",
+      "purpose": [
+        "Support focus without loneliness",
+        "Offer calm company while working",
+        "Reduce auditory emptiness during thinking"
+      ],
+      "experienceTags": ["focus", "soundscape", "peaceful", "audio"],
+      "recommendedWhen": [
+        "Need to focus",
+        "Want gentle background sound",
+        "Feel alone while working",
+        "Overwhelmed but still need to think"
+      ],
+      "relatedLocations": ["music-room", "conservatory", "clear-my-mind"],
+      "relatedFeatures": ["focus-audio"],
+      "relatedDiscoveries": [],
+      "accessRoute": "/companion?section=focus-audio",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "audioExperienceId": "music-room-piano",
+      "name": "Music Room piano",
+      "description": "Soft piano and warm light in the Music Room — creative calm with gentle sound.",
+      "status": "Live",
+      "categoryId": "room-atmosphere",
+      "location": "music-room",
+      "purpose": [
+        "Listen while thinking or creating",
+        "Feel accompanied by music without performance pressure",
+        "Connect audio to a beloved room"
+      ],
+      "experienceTags": ["music", "piano", "room", "listen"],
+      "recommendedWhen": [
+        "Want to hear music",
+        "Need a place to listen",
+        "Creative calm with sound",
+        "Focus with musical warmth"
+      ],
+      "relatedLocations": ["music-room"],
+      "relatedFeatures": ["focus-audio"],
+      "relatedDiscoveries": ["DISC-004"],
+      "accessRoute": "/companion?section=focus-audio",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "audioExperienceId": "clear-my-mind-soft-audio",
+      "name": "Quiet company while unloading",
+      "description": "Optional soft audio while capturing thoughts — never required, always gentle.",
+      "status": "Live",
+      "categoryId": "restoration-soundscape",
+      "location": "clear-my-mind",
+      "purpose": [
+        "Make brain-dump feel less stark",
+        "Optional sound during mental unload"
+      ],
+      "experienceTags": ["relief", "capture", "quiet", "optional"],
+      "recommendedWhen": [
+        "Clearing my mind",
+        "Brain dump with calm",
+        "Overwhelmed and need to unload"
+      ],
+      "relatedLocations": ["clear-my-mind"],
+      "relatedFeatures": ["clear-my-mind", "focus-audio"],
+      "relatedDiscoveries": ["DISC-003"],
+      "accessRoute": "/companion?section=brain-dump",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "audioExperienceId": "conservatory-gentle-audio",
+      "name": "Conservatory calm",
+      "description": "Ocean-light quiet with optional gentle audio — thinking beside the glass.",
+      "status": "Live",
+      "categoryId": "focus-ambience",
+      "location": "conservatory",
+      "purpose": [
+        "Reflect with calm atmosphere",
+        "Think beside water and light"
+      ],
+      "experienceTags": ["reflect", "calm", "glass", "water"],
+      "recommendedWhen": [
+        "Need to think",
+        "Want quiet with a little warmth",
+        "Reflect on a decision"
+      ],
+      "relatedLocations": ["conservatory"],
+      "relatedFeatures": ["focus-audio"],
+      "relatedDiscoveries": ["DISC-005"],
+      "accessRoute": "/companion?section=focus-audio",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "audioExperienceId": "coffee-house-murmur",
+      "name": "Coffee House murmur",
+      "description": "Distant café warmth — gentle human murmur without conversation demands.",
+      "status": "Draft",
+      "categoryId": "creative-companionship",
+      "location": "coffee-house",
+      "purpose": [
+        "Feel social presence without interaction",
+        "Warm background for creative work"
+      ],
+      "experienceTags": ["coffee", "warmth", "company", "create"],
+      "recommendedWhen": [
+        "Want background café energy",
+        "Create with gentle company"
+      ],
+      "relatedLocations": ["coffee-house"],
+      "relatedFeatures": ["focus-audio"],
+      "relatedDiscoveries": [],
+      "accessRoute": null,
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "audioExperienceId": "peaceful-places-rain",
+      "name": "Rain at Peaceful Places",
+      "description": "Rain and still air — restoration soundscape for when the day feels loud.",
+      "status": "Draft",
+      "categoryId": "nature-listening",
+      "location": "peaceful-places",
+      "purpose": [
+        "Restore with nature sound",
+        "Rain as calm anchor"
+      ],
+      "experienceTags": ["rain", "nature", "rest", "soundscape"],
+      "recommendedWhen": [
+        "Need to rest",
+        "Want rain sounds",
+        "Overwhelmed and need quiet"
+      ],
+      "relatedLocations": ["peaceful-places", "woodland-path"],
+      "relatedFeatures": ["focus-audio"],
+      "relatedDiscoveries": [],
+      "accessRoute": null,
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "audioExperienceId": "estate-ambience-toggle",
+      "name": "Estate ambience",
+      "description": "Member-controlled Estate atmosphere — how warm, quiet, or alive the rooms feel.",
+      "status": "Live",
+      "categoryId": "room-atmosphere",
+      "location": "estate-ambience",
+      "purpose": [
+        "Personalize how the Estate sounds and feels",
+        "Reduce sensory mismatch"
+      ],
+      "experienceTags": ["settings", "ambience", "personalize"],
+      "recommendedWhen": [
+        "Too much or too little sound",
+        "Adjust how the Estate feels",
+        "Accessibility preferences"
+      ],
+      "relatedLocations": ["my-estate"],
+      "relatedFeatures": [],
+      "relatedDiscoveries": [],
+      "accessRoute": "/companion?section=settings",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "audioExperienceId": "seasonal-garden-listening",
+      "name": "Garden paths listening",
+      "description": "Seasonal outdoor sound on the garden paths — future expansion.",
+      "status": "Future",
+      "categoryId": "seasonal-ambience",
+      "location": "gardens",
+      "purpose": [
+        "Connect seasons to sound",
+        "Walk with gentle outdoor audio"
+      ],
+      "experienceTags": ["seasonal", "gardens", "walk"],
+      "recommendedWhen": [
+        "Spring walk",
+        "Seasonal reflection"
+      ],
+      "relatedLocations": ["gardens", "estate-gardens"],
+      "relatedFeatures": [],
+      "relatedDiscoveries": ["DISC-006"],
+      "accessRoute": null,
+      "lastUpdated": "2026-07-06"
+    }
+  ]
+}

@@ -1,0 +1,94 @@
+{
+  "registry": "momentum-mappings",
+  "version": "1.0.0",
+  "description": "Links Estate Knowledge Base entities to Momentum™ activities and suggestions.",
+  "itemSchema": {
+    "id": "string",
+    "activityId": "string",
+    "officialName": "string",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "description": "string",
+    "relatedRooms": "string[]",
+    "relatedFeatures": "string[]",
+    "relatedDiscoveries": "string[]",
+    "recommendedWhen": "string | null",
+    "route": "string | null",
+    "lastUpdated": "string"
+  },
+  "activities": [
+    {
+      "id": "morning-clarity",
+      "officialName": "Morning Clarity",
+      "status": "Live",
+      "description": "Gentle orientation for the day ahead.",
+      "relatedRooms": [],
+      "relatedFeatures": ["plan-my-day"],
+      "relatedDiscoveries": [],
+      "recommendedWhen": "Morning overwhelm or unclear priorities",
+      "route": "/companion?section=plan-my-day",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "mental-unload",
+      "officialName": "Mental Unload",
+      "status": "Live",
+      "description": "Set thoughts down without finishing anything.",
+      "relatedRooms": ["clear-my-mind"],
+      "relatedFeatures": ["clear-my-mind"],
+      "relatedDiscoveries": ["DISC-003"],
+      "recommendedWhen": "Racing thoughts or mental overload",
+      "route": "/companion?section=brain-dump",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "seasonal-walk",
+      "officialName": "Seasonal Walk",
+      "status": "Draft",
+      "description": "Short reflective walk through the Gardens.",
+      "relatedRooms": ["gardens"],
+      "relatedFeatures": [],
+      "relatedDiscoveries": ["DISC-006"],
+      "recommendedWhen": "Need fresh air or seasonal moment",
+      "route": "/companion?section=home",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "create-with-permission",
+      "officialName": "Create with Permission",
+      "status": "Future",
+      "description": "Draft support when the member is ready to make something.",
+      "relatedRooms": ["creative-studio"],
+      "relatedFeatures": ["create"],
+      "relatedDiscoveries": ["DISC-007"],
+      "recommendedWhen": "Member wants to create but fears rushing",
+      "route": "/companion?section=content-generator",
+      "lastUpdated": "2026-07-06"
+    }
+  ],
+  "entityMappings": [
+    {
+      "id": "momentum-map-greenhouse",
+      "sourceType": "room",
+      "sourceId": "greenhouse",
+      "status": "Draft",
+      "relatedMomentum": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "momentum-map-clear-my-mind",
+      "sourceType": "feature",
+      "sourceId": "clear-my-mind",
+      "status": "Live",
+      "relatedMomentum": ["mental-unload"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "momentum-map-plan-my-day",
+      "sourceType": "feature",
+      "sourceId": "plan-my-day",
+      "status": "Live",
+      "relatedMomentum": ["morning-clarity"],
+      "lastUpdated": "2026-07-06"
+    }
+  ]
+}

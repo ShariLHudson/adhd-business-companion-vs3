@@ -1,0 +1,34 @@
+{
+  "registry": "sparkcard-mappings",
+  "version": "1.0.0",
+  "description": "Links Estate Knowledge Base entities to Spark Cards™. Future: populated from Spark Card registry.",
+  "itemSchema": {
+    "id": "string",
+    "sourceType": "room | feature | tool | discovery",
+    "sourceId": "string",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "relatedSparkCards": "string[]",
+    "recommendedWhen": "string | null",
+    "lastUpdated": "string"
+  },
+  "mappings": [
+    {
+      "id": "sparkcard-map-greenhouse",
+      "sourceType": "room",
+      "sourceId": "greenhouse",
+      "status": "Draft",
+      "relatedSparkCards": [],
+      "recommendedWhen": "Member is nurturing a fragile idea",
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "sparkcard-map-clear-my-mind",
+      "sourceType": "feature",
+      "sourceId": "clear-my-mind",
+      "status": "Draft",
+      "relatedSparkCards": [],
+      "recommendedWhen": "Member needs relief before organizing",
+      "lastUpdated": "2026-07-06"
+    }
+  ]
+}

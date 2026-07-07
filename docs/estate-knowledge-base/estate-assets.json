@@ -1,0 +1,755 @@
+{
+  "registry": "estate-assets",
+  "version": "1.0.0",
+  "description": "Visual asset directory — assetFileName matches public/backgrounds/ exactly. Intelligence layer builds on top; never rename files here.",
+  "rules": {
+    "fileNameIsSourceOfTruth": true,
+    "doNotRenameAssets": true,
+    "doNotInventRoomNames": true
+  },
+  "itemSchema": {
+    "assetFileName": "string — exact filename under public/backgrounds/",
+    "assetType": "image | video",
+    "officialDisplayName": "string — member-facing name from canon",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "description": "string",
+    "locationType": "string",
+    "primaryPlaceId": "string — canonical place id",
+    "sharedByPlaceIds": "string[] — places sharing this plate",
+    "relatedExperienceGroups": "string[]",
+    "lastUpdated": "ISO date"
+  },
+  "assets": [
+    {
+      "assetFileName": "accomplisments-room-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Portfolio™",
+      "status": "Live",
+      "description": "Pride, craft, continuity",
+      "locationType": "destination",
+      "primaryPlaceId": "portfolio",
+      "sharedByPlaceIds": [
+        "portfolio"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "audio-rain-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Peaceful Places™",
+      "status": "Draft",
+      "description": "Calm, safety, restoration, breath",
+      "locationType": "living-place",
+      "primaryPlaceId": "peaceful-places",
+      "sharedByPlaceIds": [
+        "peaceful-places"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "evidence-vault-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Evidence Vault™",
+      "status": "Draft",
+      "description": "Confidence, proof, self-trust",
+      "locationType": "destination",
+      "primaryPlaceId": "evidence-vault",
+      "sharedByPlaceIds": [
+        "evidence-vault"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "fireside-deck-background.PNG",
+      "assetType": "image",
+      "officialDisplayName": "Fireside Deck™",
+      "status": "Draft",
+      "description": "Firelight, evening ease, gathered warmth",
+      "locationType": "living-place",
+      "primaryPlaceId": "fireside-deck",
+      "sharedByPlaceIds": [
+        "fireside-deck",
+        "porch-swing"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "gallery-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Hall of Accomplishments™",
+      "status": "Draft",
+      "description": "Pride, lineage, quiet celebration",
+      "locationType": "destination",
+      "primaryPlaceId": "gallery-of-firsts",
+      "sharedByPlaceIds": [
+        "gallery-of-firsts"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "game-room- background.webp",
+      "assetType": "image",
+      "officialDisplayName": "Game Room™",
+      "status": "Draft",
+      "description": "Playfulness, relief, light momentum",
+      "locationType": "destination",
+      "primaryPlaceId": "game-room",
+      "sharedByPlaceIds": [
+        "game-room"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "gazebo-journal-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Journal™",
+      "status": "Draft",
+      "description": "Privacy, honesty, gentle self-awareness",
+      "locationType": "destination",
+      "primaryPlaceId": "journal",
+      "sharedByPlaceIds": [
+        "journal"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "grand-terrace-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Grand Terrace™",
+      "status": "Draft",
+      "description": "Open air, vista, unhurried perspective",
+      "locationType": "living-place",
+      "primaryPlaceId": "grand-terrace",
+      "sharedByPlaceIds": [
+        "grand-terrace"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "greenhouse-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Greenhouse™",
+      "status": "Live",
+      "description": "Hopeful, patient, safe emergence",
+      "locationType": "living-place",
+      "primaryPlaceId": "greenhouse",
+      "sharedByPlaceIds": [
+        "greenhouse",
+        "growth-profile"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "kitchen-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Estate Kitchen™",
+      "status": "Draft",
+      "description": "Warmth, nourishment, belonging",
+      "locationType": "living-place",
+      "primaryPlaceId": "estate-kitchen",
+      "sharedByPlaceIds": [
+        "estate-kitchen"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "music-room-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Music Room™",
+      "status": "Draft",
+      "description": "Focus, warmth, creative calm",
+      "locationType": "living-place",
+      "primaryPlaceId": "music-room",
+      "sharedByPlaceIds": [
+        "music-room"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "observatory-daytime-outside-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Observatory™",
+      "status": "Draft",
+      "description": "Wonder, foresight, calm curiosity",
+      "locationType": "destination",
+      "primaryPlaceId": "observatory",
+      "sharedByPlaceIds": [
+        "observatory"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "peaceful-places/east-terrace-peaceful-places.png",
+      "assetType": "image",
+      "officialDisplayName": "Back Deck",
+      "status": "Draft",
+      "description": "Evening air, ease, conversation",
+      "locationType": "living-place",
+      "primaryPlaceId": "back-deck",
+      "sharedByPlaceIds": [
+        "back-deck"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "peaceful-places/woodland-pathway.png",
+      "assetType": "image",
+      "officialDisplayName": "Woodland Path",
+      "status": "Draft",
+      "description": "Calm approach, anticipation",
+      "locationType": "transition-space",
+      "primaryPlaceId": "woodland-path",
+      "sharedByPlaceIds": [
+        "woodland-path"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "place-estate-gardens-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Estate Gardens™",
+      "status": "Draft",
+      "description": "Grounds, paths, cultivated beauty",
+      "locationType": "living-place",
+      "primaryPlaceId": "estate-gardens",
+      "sharedByPlaceIds": [
+        "estate-gardens"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "private-balcony-sunset-background.PNG",
+      "assetType": "image",
+      "officialDisplayName": "Personal Deck™",
+      "status": "Draft",
+      "description": "Fireside ease, private conversation, evening air",
+      "locationType": "living-place",
+      "primaryPlaceId": "personal-deck",
+      "sharedByPlaceIds": [
+        "personal-deck",
+        "balcony"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "reading-nook-under-stairway-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Window Seat",
+      "status": "Draft",
+      "description": "Lookout, rest, quiet companionship",
+      "locationType": "living-place",
+      "primaryPlaceId": "window-seat",
+      "sharedByPlaceIds": [
+        "window-seat",
+        "main-staircase",
+        "stairway-reading-nook"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "reading-nook-window background.png",
+      "assetType": "image",
+      "officialDisplayName": "Reading Nook",
+      "status": "Draft",
+      "description": "Peaceful, timeless, unhurried",
+      "locationType": "living-place",
+      "primaryPlaceId": "reading-nook",
+      "sharedByPlaceIds": [
+        "reading-nook"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "room-celebration-hall-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Celebration Room™",
+      "status": "Draft",
+      "description": "Joyful, quiet, honored",
+      "locationType": "destination",
+      "primaryPlaceId": "celebration-room",
+      "sharedByPlaceIds": [
+        "celebration-room"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "room-coffee-house-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Coffee House™",
+      "status": "Draft",
+      "description": "Warmth, ease, gentle company",
+      "locationType": "living-place",
+      "primaryPlaceId": "coffee-house",
+      "sharedByPlaceIds": [
+        "coffee-house"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "room-create-studio-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Create",
+      "status": "Draft",
+      "description": "Creative calm, possibility, craft",
+      "locationType": "destination",
+      "primaryPlaceId": "creative-studio",
+      "sharedByPlaceIds": [
+        "creative-studio",
+        "art-studio"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "room-dining-room-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Dining Room™",
+      "status": "Draft",
+      "description": "Gathered warmth, hospitality, unhurried meals",
+      "locationType": "living-place",
+      "primaryPlaceId": "dining-room",
+      "sharedByPlaceIds": [
+        "dining-room"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "room-discovery-room-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Discovery Room™",
+      "status": "Draft",
+      "description": "Curiosity, emergence, quiet research",
+      "locationType": "destination",
+      "primaryPlaceId": "discovery-room",
+      "sharedByPlaceIds": [
+        "discovery-room"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "room-library-estate-background.png",
+      "assetType": "image",
+      "officialDisplayName": "The Library™",
+      "status": "Draft",
+      "description": "Curiosity, timelessness, intellectual warmth",
+      "locationType": "destination",
+      "primaryPlaceId": "library",
+      "sharedByPlaceIds": [
+        "library"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "room-library-personal-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Personal Library",
+      "status": "Draft",
+      "description": "Quiet ownership, reading at your own pace",
+      "locationType": "destination",
+      "primaryPlaceId": "personal-library",
+      "sharedByPlaceIds": [
+        "personal-library"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "round-table-boardroom-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Round Table™",
+      "status": "Draft",
+      "description": "Gathered judgment, ownership, honest debate",
+      "locationType": "destination",
+      "primaryPlaceId": "round-table",
+      "sharedByPlaceIds": [
+        "round-table",
+        "goals-projects"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "space-apple-orchard-background.webp",
+      "assetType": "image",
+      "officialDisplayName": "Apple Orchard™",
+      "status": "Draft",
+      "description": "Possibility, freshness, gentle abundance",
+      "locationType": "living-place",
+      "primaryPlaceId": "apple-orchard",
+      "sharedByPlaceIds": [
+        "apple-orchard"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "space-celebration-garden-background.png",
+      "assetType": "image",
+      "officialDisplayName": "The Gardens™",
+      "status": "Draft",
+      "description": "Growth, peace, natural rhythm",
+      "locationType": "living-place",
+      "primaryPlaceId": "gardens",
+      "sharedByPlaceIds": [
+        "gardens",
+        "garden-bench"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "spark-estate-photo-background.png",
+      "assetType": "image",
+      "officialDisplayName": "My Estate™",
+      "status": "Live",
+      "description": "Ownership, continuity, belonging",
+      "locationType": "collection",
+      "primaryPlaceId": "my-estate",
+      "sharedByPlaceIds": [
+        "my-estate",
+        "spark-estate"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "spark-estate-stables-background.png",
+      "assetType": "image",
+      "officialDisplayName": "The Stables™",
+      "status": "Live",
+      "description": "Safe, grounded, calm, capable",
+      "locationType": "destination",
+      "primaryPlaceId": "stables",
+      "sharedByPlaceIds": [
+        "stables"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "strategy-studio-workroom-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Strategy Studio™",
+      "status": "Draft",
+      "description": "Clarity, deliberate thinking, forward planning",
+      "locationType": "destination",
+      "primaryPlaceId": "strategy-studio",
+      "sharedByPlaceIds": [
+        "strategy-studio"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "study-hall-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Study Hall™",
+      "status": "Draft",
+      "description": "Quiet focus, hush, earned capability",
+      "locationType": "destination",
+      "primaryPlaceId": "study-hall",
+      "sharedByPlaceIds": [
+        "study-hall",
+        "momentum-builder"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "sunroom-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Sunroom",
+      "status": "Live",
+      "description": "Warmth, belonging, unhurried welcome",
+      "locationType": "living-place",
+      "primaryPlaceId": "sunroom",
+      "sharedByPlaceIds": [
+        "sunroom",
+        "clear-my-mind"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "tea-room-background.webp",
+      "assetType": "image",
+      "officialDisplayName": "Tea Room™",
+      "status": "Draft",
+      "description": "Stillness, ritual, gentle hospitality",
+      "locationType": "living-place",
+      "primaryPlaceId": "tea-room",
+      "sharedByPlaceIds": [
+        "tea-room"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "the-momentum-institute-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Momentum Institute™",
+      "status": "Draft",
+      "description": "Discovery, prestige, earned capability",
+      "locationType": "destination",
+      "primaryPlaceId": "momentum-institute",
+      "sharedByPlaceIds": [
+        "momentum-institute",
+        "momentum-room"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "the-ocean-conservatory-background.png",
+      "assetType": "image",
+      "officialDisplayName": "The Ocean Conservatory™",
+      "status": "Draft",
+      "description": "Stillness, clarity, peaceful sanctuary",
+      "locationType": "living-place",
+      "primaryPlaceId": "conservatory",
+      "sharedByPlaceIds": [
+        "conservatory"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "tree-swing-background.png",
+      "assetType": "image",
+      "officialDisplayName": "The Swing Beneath the Oak™",
+      "status": "Draft",
+      "description": "Rest, remembrance, gentle stillness",
+      "locationType": "living-place",
+      "primaryPlaceId": "the-swing-beneath-the-oak",
+      "sharedByPlaceIds": [
+        "the-swing-beneath-the-oak"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "treehouse-possibility-cabinet-of-chapters-background.png",
+      "assetType": "image",
+      "officialDisplayName": "house-possibility-cabinet-of-chapters",
+      "status": "Draft",
+      "description": "",
+      "locationType": "living-place",
+      "primaryPlaceId": "house-possibility-cabinet-of-chapters",
+      "sharedByPlaceIds": [
+        "house-possibility-cabinet-of-chapters",
+        "house-possibility-curiosity-cabinet"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "treehouse-possibility-discovery-chest-background.png",
+      "assetType": "image",
+      "officialDisplayName": "house-possibility-discovery-chest",
+      "status": "Draft",
+      "description": "",
+      "locationType": "living-place",
+      "primaryPlaceId": "house-possibility-discovery-chest",
+      "sharedByPlaceIds": [
+        "house-possibility-discovery-chest"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "treehouse-possibility-house-outside-background.png",
+      "assetType": "image",
+      "officialDisplayName": "house-possibility-outside",
+      "status": "Draft",
+      "description": "",
+      "locationType": "living-place",
+      "primaryPlaceId": "house-possibility-outside",
+      "sharedByPlaceIds": [
+        "house-possibility-outside"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "treehouse-possibility-legacy-room-background.png",
+      "assetType": "image",
+      "officialDisplayName": "house-possibility-legacy-room",
+      "status": "Draft",
+      "description": "",
+      "locationType": "living-place",
+      "primaryPlaceId": "house-possibility-legacy-room",
+      "sharedByPlaceIds": [
+        "house-possibility-legacy-room",
+        "legacy-room-main"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "treehouse-possibility-observatory-background.png",
+      "assetType": "image",
+      "officialDisplayName": "house-possibility-observatory",
+      "status": "Draft",
+      "description": "",
+      "locationType": "living-place",
+      "primaryPlaceId": "house-possibility-observatory",
+      "sharedByPlaceIds": [
+        "house-possibility-observatory",
+        "house-possibility-telescope-deck"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "treehouse-possibility-reflection-desk-background.png",
+      "assetType": "image",
+      "officialDisplayName": "house-possibility-reflection-desk",
+      "status": "Draft",
+      "description": "",
+      "locationType": "living-place",
+      "primaryPlaceId": "house-possibility-reflection-desk",
+      "sharedByPlaceIds": [
+        "house-possibility-reflection-desk"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "treehouse-possibility-staircase-window-reading-nook-background.png",
+      "assetType": "image",
+      "officialDisplayName": "house-possibility-staircase",
+      "status": "Draft",
+      "description": "",
+      "locationType": "living-place",
+      "primaryPlaceId": "house-possibility-staircase",
+      "sharedByPlaceIds": [
+        "house-possibility-staircase",
+        "house-possibility-window-nook"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "treehouse-possibility-studio.png",
+      "assetType": "image",
+      "officialDisplayName": "house-possibility-studio",
+      "status": "Draft",
+      "description": "",
+      "locationType": "living-place",
+      "primaryPlaceId": "house-possibility-studio",
+      "sharedByPlaceIds": [
+        "house-possibility-studio"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "water-lakeside-deck-verandah-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Lakeside Verandah™",
+      "status": "Draft",
+      "description": "Breeze, water rhythm, sheltered outlook",
+      "locationType": "living-place",
+      "primaryPlaceId": "lakeside-verandah",
+      "sharedByPlaceIds": [
+        "lakeside-verandah"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "water-lakeside-hammock-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Lakeside Hammock™",
+      "status": "Draft",
+      "description": "Drift, ease, gentle restoration",
+      "locationType": "living-place",
+      "primaryPlaceId": "lakeside-hammock",
+      "sharedByPlaceIds": [
+        "lakeside-hammock"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "water-seat-at-pond-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Seat at Pond / Dock",
+      "status": "Draft",
+      "description": "Still water, breath, rest",
+      "locationType": "living-place",
+      "primaryPlaceId": "seat-at-pond",
+      "sharedByPlaceIds": [
+        "seat-at-pond",
+        "reflection-pond"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "water-swimming-pool-private-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Summer Terrace™",
+      "status": "Draft",
+      "description": "Sun-warmed ease, water nearby, summer air",
+      "locationType": "living-place",
+      "primaryPlaceId": "summer-terrace",
+      "sharedByPlaceIds": [
+        "summer-terrace"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "welcome-home-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Welcome Home™",
+      "status": "Draft",
+      "description": "Belonging, warmth, orientation, hope",
+      "locationType": "living-place",
+      "primaryPlaceId": "welcome-home",
+      "sharedByPlaceIds": [
+        "welcome-home"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "writing-room-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Decision Compass™",
+      "status": "Live",
+      "description": "Steadiness, clarity, ownership",
+      "locationType": "destination",
+      "primaryPlaceId": "decision-compass",
+      "sharedByPlaceIds": [
+        "decision-compass"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-06"
+    }
+  ]
+}

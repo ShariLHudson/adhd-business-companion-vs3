@@ -9,7 +9,14 @@ import {
   isEstateSilenced,
 } from "@/lib/estate/estateAudioSettings";
 import { resolveEstatePlaceAmbientProfile } from "@/lib/estate/estatePlaceAmbientSound";
-import { refreshEstateSoundscapeOverlayVolume } from "@/lib/estate/estateSoundscapeOverlay";
+import {
+  refreshEstateSoundscapeOverlayVolume,
+  stopEstateSoundscapeOverlay,
+} from "@/lib/estate/estateSoundscapeOverlay";
+import {
+  isAudioPlaybackGuardEnabled,
+  prepareSingleTrackPlayback,
+} from "@/lib/estate/audioPlaybackGuard";
 import { fadeAudioVolumeAsync } from "@/lib/welcomeAudio/fadeVolume";
 import {
   ESTATE_AMBIENCE_FALLBACK_MP3,
@@ -132,6 +139,11 @@ export function kickstartEstateRoomAmbience(
 ): void {
   if (typeof window === "undefined") return;
 
+  if (isAudioPlaybackGuardEnabled()) {
+    void prepareSingleTrackPlayback(`room:${roomId}`);
+    void stopEstateSoundscapeOverlay();
+  }
+
   if (transitionInFlight === roomId) return;
 
   if (currentRoomId === roomId && activeSlot) {
@@ -232,8 +244,7 @@ export function activeEstateAmbienceRoomId(): string | null {
 }
 
 /**
- * Transition Layer 1 ambient sound on goToPlace — stops prior place, fades in new.
- * Keeps Layer 2 soundscape overlay if active.
+ * Transition Layer 1 ambient sound on goToPlace — single active track when guard is on.
  */
 export async function transitionEstatePlaceAmbient(
   placeId: string,
@@ -243,6 +254,10 @@ export async function transitionEstatePlaceAmbient(
   if (isEstateSilenced()) {
     await stopEstateRoomAmbience();
     return;
+  }
+
+  if (isAudioPlaybackGuardEnabled()) {
+    await stopEstateSoundscapeOverlay();
   }
 
   const profile = resolveEstatePlaceAmbientProfile(placeId);
@@ -255,5 +270,4 @@ export async function transitionEstatePlaceAmbient(
   }
 
   await startEstateRoomAmbience(placeId, profile, options);
-  void refreshEstateSoundscapeOverlayVolume();
 }

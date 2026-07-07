@@ -1,0 +1,248 @@
+{
+  "registry": "discovery-collections",
+  "version": "1.0.0",
+  "description": "Discovery Collections — organize Discovery Notes and estate knowledge into gentle curricula. Internal only.",
+  "itemSchema": {
+    "collectionId": "string — stable slug",
+    "officialName": "string — internal editorial name",
+    "purpose": "string",
+    "status": "Live | Draft | Future",
+    "order": "number — global collection sequence",
+    "presentationOrder": "sequential | curiosity",
+    "journeyStageId": "welcome | explore | discover-features | personalize | deeper-discovery | null",
+    "items": "CurriculumItemRef[]",
+    "relatedCollections": "string[] — collectionId cross-links",
+    "relatedRooms": "string[]",
+    "relatedFeatures": "string[]",
+    "relatedSparkCards": "string[]"
+  },
+  "collections": [
+    {
+      "collectionId": "welcome-to-spark-estate",
+      "officialName": "Welcome to Spark Estate",
+      "purpose": "Help new members feel comfortable and oriented.",
+      "status": "Live",
+      "order": 1,
+      "presentationOrder": "sequential",
+      "journeyStageId": "welcome",
+      "items": [
+        { "refType": "discovery", "refId": "DISC-001", "order": 1, "status": "Live" },
+        { "refType": "discovery", "refId": "DISC-002", "order": 2, "status": "Live" },
+        { "refType": "discovery", "refId": "DISC-003", "order": 3, "status": "Live" },
+        { "refType": "discovery", "refId": "DISC-004", "order": 4, "status": "Live" },
+        { "refType": "discovery", "refId": "DISC-005", "order": 5, "status": "Live" },
+        { "refType": "discovery", "refId": "DISC-006", "order": 6, "status": "Live" },
+        { "refType": "discovery", "refId": "DISC-007", "order": 7, "status": "Live" },
+        { "refType": "discovery", "refId": "DISC-008", "order": 8, "status": "Live" },
+        { "refType": "discovery", "refId": "DISC-009", "order": 9, "status": "Live" },
+        { "refType": "discovery", "refId": "DISC-010", "order": 10, "status": "Live" },
+        { "refType": "tool", "refId": "discovery-key", "order": 11, "status": "Live" },
+        { "refType": "tool", "refId": "folded-map", "order": 12, "status": "Live" }
+      ],
+      "relatedCollections": ["estate-rooms"],
+      "relatedRooms": ["sunroom"],
+      "relatedFeatures": [],
+      "relatedSparkCards": []
+    },
+    {
+      "collectionId": "estate-rooms",
+      "officialName": "Estate Rooms",
+      "purpose": "Introduce important places on the Estate.",
+      "status": "Live",
+      "order": 2,
+      "presentationOrder": "sequential",
+      "journeyStageId": "explore",
+      "items": [
+        { "refType": "room", "refId": "personal-library", "order": 1, "status": "Live" },
+        { "refType": "room", "refId": "music-room", "order": 2, "status": "Live" },
+        { "refType": "discovery", "refId": "DISC-014", "order": 3, "status": "Draft" },
+        { "refType": "room", "refId": "conservatory", "order": 4, "status": "Live" },
+        { "refType": "room", "refId": "reflection-pond", "order": 5, "status": "Live" },
+        { "refType": "room", "refId": "observatory", "order": 6, "status": "Draft" },
+        { "refType": "room", "refId": "creative-studio", "order": 7, "status": "Draft" },
+        { "refType": "room", "refId": "greenhouse", "order": 8, "status": "Live" },
+        { "refType": "discovery", "refId": "DISC-011", "order": 9, "status": "Live" },
+        { "refType": "room", "refId": "gardens", "order": 10, "status": "Draft" }
+      ],
+      "relatedCollections": ["listening-experiences", "estate-stories"],
+      "relatedRooms": [
+        "personal-library",
+        "music-room",
+        "conservatory",
+        "reflection-pond",
+        "greenhouse"
+      ],
+      "relatedFeatures": [],
+      "relatedSparkCards": []
+    },
+    {
+      "collectionId": "features-and-tools",
+      "officialName": "Features & Tools",
+      "purpose": "Teach members how to use Spark — conversationally, never as training.",
+      "status": "Live",
+      "order": 3,
+      "presentationOrder": "sequential",
+      "journeyStageId": "discover-features",
+      "items": [
+        { "refType": "discovery", "refId": "DISC-013", "order": 1, "status": "Live" },
+        { "refType": "feature", "refId": "clear-my-mind", "order": 2, "status": "Live" },
+        { "refType": "feature", "refId": "plan-my-day", "order": 3, "status": "Live" },
+        { "refType": "feature", "refId": "focus-audio", "order": 4, "status": "Live" },
+        { "refType": "discovery", "refId": "DISC-017", "order": 5, "status": "Draft" },
+        { "refType": "feature", "refId": "create", "order": 6, "status": "Draft" },
+        { "refType": "tool", "refId": "guidebook", "order": 7, "status": "Live" }
+      ],
+      "relatedCollections": ["settings-and-personalization", "listening-experiences"],
+      "relatedRooms": ["clear-my-mind", "creative-studio"],
+      "relatedFeatures": ["clear-my-mind", "plan-my-day", "focus-audio", "create"],
+      "relatedSparkCards": []
+    },
+    {
+      "collectionId": "settings-and-personalization",
+      "officialName": "Settings & Personalization",
+      "purpose": "Help members customize Spark to their needs.",
+      "status": "Live",
+      "order": 4,
+      "presentationOrder": "sequential",
+      "journeyStageId": "personalize",
+      "items": [
+        { "refType": "setting", "refId": "member-settings", "order": 1, "status": "Live" },
+        { "refType": "setting", "refId": "estate-ambience", "order": 2, "status": "Live" },
+        { "refType": "story", "refId": "settings-font-size", "order": 3, "status": "Draft" },
+        { "refType": "story", "refId": "settings-voice", "order": 4, "status": "Draft" },
+        { "refType": "story", "refId": "settings-accessibility", "order": 5, "status": "Draft" }
+      ],
+      "relatedCollections": ["features-and-tools"],
+      "relatedRooms": [],
+      "relatedFeatures": ["focus-audio"],
+      "relatedSparkCards": []
+    },
+    {
+      "collectionId": "listening-experiences",
+      "officialName": "Listening Experiences",
+      "purpose": "Introduce intentional listening across the Estate.",
+      "status": "Live",
+      "order": 5,
+      "presentationOrder": "curiosity",
+      "journeyStageId": "deeper-discovery",
+      "items": [
+        { "refType": "room", "refId": "music-room", "order": 1, "status": "Live" },
+        { "refType": "audio", "refId": "music-room-piano", "order": 2, "status": "Live" },
+        { "refType": "audio", "refId": "peaceful-places-focus", "order": 3, "status": "Live" },
+        { "refType": "audio", "refId": "conservatory-gentle-audio", "order": 4, "status": "Live" },
+        { "refType": "audio", "refId": "clear-my-mind-soft-audio", "order": 5, "status": "Live" },
+        { "refType": "story", "refId": "audio-categories-overview", "order": 6, "status": "Draft" },
+        { "refType": "story", "refId": "estate-ambience-soundscapes", "order": 7, "status": "Draft" }
+      ],
+      "relatedCollections": ["estate-rooms", "tips-and-shortcuts"],
+      "relatedRooms": ["music-room", "conservatory", "clear-my-mind"],
+      "relatedFeatures": ["focus-audio"],
+      "relatedSparkCards": ["music", "focus", "creativity"]
+    },
+    {
+      "collectionId": "tips-and-shortcuts",
+      "officialName": "Tips & Shortcuts",
+      "purpose": "Help members use Spark more effectively — quietly, when ready.",
+      "status": "Draft",
+      "order": 6,
+      "presentationOrder": "curiosity",
+      "journeyStageId": null,
+      "items": [
+        { "refType": "story", "refId": "tip-faster-navigation", "order": 1, "status": "Draft" },
+        { "refType": "story", "refId": "tip-favorite-places", "order": 2, "status": "Draft" },
+        { "refType": "story", "refId": "tip-search-estate", "order": 3, "status": "Draft" },
+        { "refType": "tool", "refId": "folded-map", "order": 4, "status": "Live" }
+      ],
+      "relatedCollections": ["welcome-to-spark-estate"],
+      "relatedRooms": [],
+      "relatedFeatures": [],
+      "relatedSparkCards": []
+    },
+    {
+      "collectionId": "estate-stories",
+      "officialName": "Estate Stories",
+      "purpose": "Bring the Estate to life through story and tradition.",
+      "status": "Live",
+      "order": 7,
+      "presentationOrder": "curiosity",
+      "journeyStageId": "deeper-discovery",
+      "items": [
+        { "refType": "story", "refId": "estate-story-greenhouse-patience", "order": 1, "status": "Live" },
+        { "refType": "story", "refId": "estate-story-sunroom-belonging", "order": 2, "status": "Live" },
+        { "refType": "story", "refId": "estate-story-observatory-wonder", "order": 3, "status": "Draft" },
+        { "refType": "story", "refId": "estate-story-possibility-house", "order": 4, "status": "Draft" },
+        { "refType": "story", "refId": "estate-story-discovery-chest", "order": 5, "status": "Draft" }
+      ],
+      "relatedCollections": ["hidden-treasures", "estate-rooms"],
+      "relatedRooms": ["greenhouse", "sunroom", "observatory"],
+      "relatedFeatures": [],
+      "relatedSparkCards": []
+    },
+    {
+      "collectionId": "hidden-treasures",
+      "officialName": "Hidden Treasures",
+      "purpose": "Reward curiosity with quiet surprises.",
+      "status": "Draft",
+      "order": 8,
+      "presentationOrder": "curiosity",
+      "journeyStageId": "deeper-discovery",
+      "items": [
+        { "refType": "discovery", "refId": "DISC-016", "order": 1, "status": "Draft" },
+        { "refType": "story", "refId": "hidden-object-conservatory-lantern", "order": 2, "status": "Draft" },
+        { "refType": "story", "refId": "seasonal-surprise-spring", "order": 3, "status": "Draft" }
+      ],
+      "relatedCollections": ["estate-stories"],
+      "relatedRooms": ["gardens", "conservatory"],
+      "relatedFeatures": [],
+      "relatedSparkCards": []
+    },
+    {
+      "collectionId": "spark-cards",
+      "officialName": "Spark Cards",
+      "purpose": "Interesting facts, curiosity, inspiration, and connections.",
+      "status": "Draft",
+      "order": 9,
+      "presentationOrder": "curiosity",
+      "journeyStageId": null,
+      "items": [
+        { "refType": "story", "refId": "spark-card-music-focus", "order": 1, "status": "Draft" },
+        { "refType": "story", "refId": "spark-card-creativity-rest", "order": 2, "status": "Draft" }
+      ],
+      "relatedCollections": ["listening-experiences"],
+      "relatedRooms": [],
+      "relatedFeatures": [],
+      "relatedSparkCards": ["music", "focus", "creativity"]
+    },
+    {
+      "collectionId": "personal-discoveries",
+      "officialName": "Personal Discoveries",
+      "purpose": "Positive observations and gentle encouragement — never surveillance.",
+      "status": "Draft",
+      "order": 10,
+      "presentationOrder": "curiosity",
+      "journeyStageId": "deeper-discovery",
+      "items": [
+        { "refType": "discovery", "refId": "DISC-015", "order": 1, "status": "Draft" }
+      ],
+      "relatedCollections": [],
+      "relatedRooms": ["conservatory"],
+      "relatedFeatures": [],
+      "relatedSparkCards": []
+    },
+    {
+      "collectionId": "whats-new",
+      "officialName": "What's New",
+      "purpose": "Introduce new features and rooms after updates — one at a time.",
+      "status": "Draft",
+      "order": 11,
+      "presentationOrder": "sequential",
+      "journeyStageId": null,
+      "items": [],
+      "relatedCollections": ["features-and-tools", "estate-rooms"],
+      "relatedRooms": [],
+      "relatedFeatures": [],
+      "relatedSparkCards": []
+    }
+  ],
+  "lastUpdated": "2026-07-06"
+}

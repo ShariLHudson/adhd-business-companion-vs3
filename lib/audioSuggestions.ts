@@ -3,6 +3,7 @@
 
 import type { EmotionalState } from "./companionEmotions";
 import { messageNamesExactEstateRoom } from "./estate/estateRoomAliasRegistry";
+import { shouldBlockAutoPlayForAudioQuery } from "./estate/audioPlaybackGuard";
 import {
   getRecommendedTrack,
   type AudioLink,
@@ -132,6 +133,10 @@ export function detectAudioRequest(text: string): {
   }
 
   const t = text.toLowerCase();
+
+  if (shouldBlockAutoPlayForAudioQuery(text)) {
+    return { isAudio: false, categoryId: "focus" };
+  }
 
   if (messageNamesExactEstateRoom(text) && !MUSIC_MEDIA_RE.test(t)) {
     return { isAudio: false, categoryId: "focus" };

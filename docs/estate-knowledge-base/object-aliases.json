@@ -1,0 +1,205 @@
+{
+  "registry": "object-aliases",
+  "version": "1.0.0",
+  "description": "Natural language ways members refer to estate objects. Resolves to objectId — never invented names.",
+  "rules": {
+    "resolvesToObjectId": true,
+    "approvedAliasesOnly": true,
+    "longestPhraseWins": true
+  },
+  "matchTypeValues": [
+    "visual-reference",
+    "nickname",
+    "colloquial",
+    "question",
+    "approved"
+  ],
+  "itemSchema": {
+    "phrase": "string — lowercase matching phrase",
+    "objectId": "string — estate-objects.objectId",
+    "matchType": "matchTypeValues",
+    "status": "Live | Draft | Hidden | Retired"
+  },
+  "aliases": [
+    {
+      "phrase": "what is that telescope",
+      "objectId": "observatory-telescope",
+      "matchType": "question",
+      "status": "Live"
+    },
+    {
+      "phrase": "that telescope",
+      "objectId": "observatory-telescope",
+      "matchType": "visual-reference",
+      "status": "Live"
+    },
+    {
+      "phrase": "the telescope",
+      "objectId": "observatory-telescope",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "telescope",
+      "objectId": "observatory-telescope",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "who is the dog",
+      "objectId": "kinsey",
+      "matchType": "question",
+      "status": "Live"
+    },
+    {
+      "phrase": "who is kinsey",
+      "objectId": "kinsey",
+      "matchType": "question",
+      "status": "Live"
+    },
+    {
+      "phrase": "the dog",
+      "objectId": "kinsey",
+      "matchType": "colloquial",
+      "status": "Live"
+    },
+    {
+      "phrase": "that dog",
+      "objectId": "kinsey",
+      "matchType": "visual-reference",
+      "status": "Live"
+    },
+    {
+      "phrase": "kinsey",
+      "objectId": "kinsey",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "what is that chest",
+      "objectId": "discovery-chest",
+      "matchType": "question",
+      "status": "Live"
+    },
+    {
+      "phrase": "that chest",
+      "objectId": "discovery-chest",
+      "matchType": "visual-reference",
+      "status": "Live"
+    },
+    {
+      "phrase": "the chest",
+      "objectId": "discovery-chest",
+      "matchType": "colloquial",
+      "status": "Live"
+    },
+    {
+      "phrase": "discovery chest",
+      "objectId": "discovery-chest",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the discovery chest",
+      "objectId": "discovery-chest",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "can i use that journal",
+      "objectId": "estate-journal",
+      "matchType": "question",
+      "status": "Live"
+    },
+    {
+      "phrase": "can i use the journal",
+      "objectId": "estate-journal",
+      "matchType": "question",
+      "status": "Live"
+    },
+    {
+      "phrase": "that journal",
+      "objectId": "estate-journal",
+      "matchType": "visual-reference",
+      "status": "Live"
+    },
+    {
+      "phrase": "the journal",
+      "objectId": "estate-journal",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "open the journal",
+      "objectId": "estate-journal",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "what is the guidebook",
+      "objectId": "guidebook",
+      "matchType": "question",
+      "status": "Live"
+    },
+    {
+      "phrase": "the guidebook",
+      "objectId": "guidebook",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "guidebook",
+      "objectId": "guidebook",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "discovery key",
+      "objectId": "discovery-key",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "that key",
+      "objectId": "discovery-key",
+      "matchType": "visual-reference",
+      "status": "Live"
+    },
+    {
+      "phrase": "folded map",
+      "objectId": "folded-map",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the map",
+      "objectId": "folded-map",
+      "matchType": "colloquial",
+      "status": "Live"
+    },
+    {
+      "phrase": "accomplishments book",
+      "objectId": "accomplishments-book",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "that piano",
+      "objectId": "music-room-piano",
+      "matchType": "visual-reference",
+      "status": "Live"
+    },
+    {
+      "phrase": "the piano",
+      "objectId": "music-room-piano",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "cabinet of chapters",
+      "objectId": "cabinet-of-chapters",
+      "matchType": "approved",
+      "status": "Live"
+    }
+  ]
+}

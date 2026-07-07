@@ -1,0 +1,157 @@
+{
+  "registry": "feature-how-to",
+  "version": "1.0.0",
+  "description": "How-to guidance for Estate features and settings — what it does, why it helps, how to access. Help & Discovery Intelligence™.",
+  "rules": {
+    "kbSourceOfTruth": true,
+    "neverInventFeatures": true,
+    "offerNavigationWithPermission": true
+  },
+  "itemSchema": {
+    "guideId": "string",
+    "targetType": "feature | setting | tool",
+    "targetId": "string — must exist in Estate Knowledge Base™",
+    "aliases": "string[] — natural language phrases",
+    "whatItDoes": "string",
+    "whyHelpful": "string",
+    "howToAccess": "string — member-facing, not file paths",
+    "accessRoute": "string | null",
+    "offerNavigation": "boolean",
+    "status": "Live | Draft | Hidden"
+  },
+  "guides": [
+    {
+      "guideId": "settings-overview",
+      "targetType": "setting",
+      "targetId": "member-settings",
+      "aliases": [
+        "where are my settings",
+        "open settings",
+        "my settings",
+        "change my preferences"
+      ],
+      "whatItDoes": "Settings hold your preferences — voice, accessibility, and how the Estate feels for you.",
+      "whyHelpful": "Small adjustments here can make every visit calmer and easier.",
+      "howToAccess": "You can open Settings from your profile, or just tell me what you'd like to change.",
+      "accessRoute": "/companion?section=settings",
+      "offerNavigation": true,
+      "status": "Live"
+    },
+    {
+      "guideId": "voice-preference",
+      "targetType": "setting",
+      "targetId": "member-settings",
+      "aliases": [
+        "change the voice",
+        "different voice",
+        "spark voice",
+        "how do i change the voice"
+      ],
+      "whatItDoes": "You can choose how Spark sounds when reading aloud — pace and voice live in Settings.",
+      "whyHelpful": "The right voice makes listening feel natural instead of tiring.",
+      "howToAccess": "Settings → voice and audio preferences.",
+      "accessRoute": "/companion?section=settings",
+      "offerNavigation": true,
+      "status": "Live"
+    },
+    {
+      "guideId": "reminders",
+      "targetType": "feature",
+      "targetId": "plan-my-day",
+      "aliases": [
+        "set a reminder",
+        "how do i set a reminder",
+        "remind me",
+        "spark reminders"
+      ],
+      "whatItDoes": "Spark Reminders help you keep small things from taking up mental space — say what to remember and when.",
+      "whyHelpful": "You don't have to hold it in your head once it's captured.",
+      "howToAccess": "Just tell me what to remind you about — for example, \"remind me to call Mom at 3.\" You can also find reminder options in Settings.",
+      "accessRoute": "/companion?section=settings",
+      "offerNavigation": false,
+      "status": "Live"
+    },
+    {
+      "guideId": "clear-my-mind",
+      "targetType": "feature",
+      "targetId": "clear-my-mind",
+      "aliases": [
+        "how does clear my mind work",
+        "how do i use clear my mind",
+        "brain dump how"
+      ],
+      "whatItDoes": "Clear My Mind is continuous capture — set thoughts down without organizing or finishing anything.",
+      "whyHelpful": "Relief comes from unloading, not from filing everything away.",
+      "howToAccess": "Say \"I need to clear my mind\" or \"let's brain dump\" — I'll go with you.",
+      "accessRoute": "/companion?section=brain-dump",
+      "offerNavigation": true,
+      "status": "Live"
+    },
+    {
+      "guideId": "plan-my-day",
+      "targetType": "feature",
+      "targetId": "plan-my-day",
+      "aliases": [
+        "how do i plan my day",
+        "plan my day how",
+        "morning planning"
+      ],
+      "whatItDoes": "Plan My Day is gentle morning orientation — one or two priorities without pressure.",
+      "whyHelpful": "Clarity about today reduces the weight of everything at once.",
+      "howToAccess": "Say \"help me plan my day\" when you're ready — we can do it in conversation.",
+      "accessRoute": "/companion?section=plan-my-day",
+      "offerNavigation": true,
+      "status": "Live"
+    },
+    {
+      "guideId": "peaceful-places",
+      "targetType": "feature",
+      "targetId": "focus-audio",
+      "aliases": [
+        "peaceful places",
+        "focus audio",
+        "soundscapes",
+        "how do i use peaceful places"
+      ],
+      "whatItDoes": "Peaceful Places offers calm soundscapes — rain, woodland, piano — for focus or quiet company.",
+      "whyHelpful": "Gentle audio can make thinking feel less lonely.",
+      "howToAccess": "Say \"I need peaceful places\" or \"play focus audio\" — or visit the Music Room.",
+      "accessRoute": "/companion?section=focus-audio",
+      "offerNavigation": true,
+      "status": "Live"
+    },
+    {
+      "guideId": "estate-map",
+      "targetType": "tool",
+      "targetId": "folded-map",
+      "aliases": [
+        "estate map",
+        "show me the estate",
+        "how do i see all the rooms",
+        "what rooms are there"
+      ],
+      "whatItDoes": "The folded map in the corner shows the Estate — places to explore when you're curious.",
+      "whyHelpful": "Orientation without memorizing names or menus.",
+      "howToAccess": "Tap the map in the corner, or say \"show me the Estate.\"",
+      "accessRoute": null,
+      "offerNavigation": false,
+      "status": "Live"
+    },
+    {
+      "guideId": "discovery-key",
+      "targetType": "tool",
+      "targetId": "discovery-key",
+      "aliases": [
+        "what is the discovery key",
+        "discovery key",
+        "brass key"
+      ],
+      "whatItDoes": "The Discovery Key is a gentle invitation — one note about something worth knowing on the Estate.",
+      "whyHelpful": "Curiosity without notification pressure or a pile of tips.",
+      "howToAccess": "When you see the key in a room, tap it — or ask me what you might explore next.",
+      "accessRoute": null,
+      "offerNavigation": false,
+      "status": "Live"
+    }
+  ]
+}

@@ -55,6 +55,8 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
     roomId: "conservatory",
     officialName: "The Conservatory™",
     aliases: [
+      "ocean conservatory",
+      "the ocean conservatory",
       "butterfly conservatory",
       "the butterfly conservatory",
       "conservatory",

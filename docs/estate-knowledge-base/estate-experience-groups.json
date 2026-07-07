@@ -1,0 +1,144 @@
+{
+  "registry": "estate-experience-groups",
+  "version": "1.0.0",
+  "description": "Experience intent groups — members describe a feeling, not a room. Spark offers thoughtful options (max 3).",
+  "rules": {
+    "neverChooseRandomly": true,
+    "maxMemberOptions": 3,
+    "fileNamesAreSourceOfTruth": true
+  },
+  "groups": [
+    {
+      "id": "nature-renewal",
+      "experienceGroup": "Nature & Renewal",
+      "status": "Live",
+      "userMayAsk": [
+        "I want nature",
+        "I need peace",
+        "Show me outside",
+        "I want somewhere relaxing"
+      ],
+      "locationIds": [
+        "greenhouse",
+        "conservatory",
+        "estate-gardens",
+        "gardens",
+        "seat-at-pond",
+        "reflection-pond"
+      ],
+      "presentationOrder": [
+        "greenhouse",
+        "conservatory",
+        "estate-gardens",
+        "reflection-pond",
+        "seat-at-pond"
+      ],
+      "keywords": [
+        "nature",
+        "outside",
+        "relaxing",
+        "garden",
+        "green",
+        "renewal",
+        "fresh air"
+      ],
+      "maxOptions": 3,
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "peaceful-quiet",
+      "experienceGroup": "Peaceful & Quiet",
+      "status": "Live",
+      "userMayAsk": [
+        "I want somewhere peaceful",
+        "somewhere quiet",
+        "I need calm",
+        "a quiet place",
+        "somewhere still"
+      ],
+      "locationIds": [
+        "reflection-pond",
+        "personal-library",
+        "house-possibility-outside",
+        "conservatory",
+        "greenhouse",
+        "estate-gardens",
+        "seat-at-pond",
+        "reading-nook"
+      ],
+      "presentationOrder": [
+        "reflection-pond",
+        "personal-library",
+        "house-possibility-outside",
+        "conservatory",
+        "greenhouse",
+        "estate-gardens"
+      ],
+      "keywords": [
+        "peaceful",
+        "quiet",
+        "calm",
+        "still",
+        "serene",
+        "restful"
+      ],
+      "maxOptions": 3,
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "water-swim",
+      "experienceGroup": "Water & Swim",
+      "status": "Live",
+      "userMayAsk": [
+        "I want to swim",
+        "take me to the pool",
+        "somewhere with water to swim"
+      ],
+      "locationIds": ["summer-terrace"],
+      "presentationOrder": ["summer-terrace"],
+      "keywords": ["swim", "swimming", "pool"],
+      "maxOptions": 1,
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "music-and-sound",
+      "experienceGroup": "Music & Sound",
+      "status": "Live",
+      "userMayAsk": [
+        "where can i listen to music",
+        "i want to hear music",
+        "somewhere with music",
+        "play music with me"
+      ],
+      "locationIds": ["music-room", "peaceful-places"],
+      "presentationOrder": ["music-room", "peaceful-places"],
+      "keywords": ["music", "piano", "listen to music"],
+      "maxOptions": 2,
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "think-and-reflect",
+      "experienceGroup": "Think & Reflect",
+      "status": "Live",
+      "userMayAsk": [
+        "find me a place to think",
+        "somewhere to think",
+        "i need to think",
+        "place to reflect"
+      ],
+      "locationIds": [
+        "personal-library",
+        "reflection-pond",
+        "conservatory"
+      ],
+      "presentationOrder": [
+        "personal-library",
+        "reflection-pond",
+        "conservatory"
+      ],
+      "keywords": ["think", "reflect", "contemplate"],
+      "maxOptions": 3,
+      "lastUpdated": "2026-07-06"
+    }
+  ]
+}

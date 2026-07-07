@@ -1,0 +1,64 @@
+{
+  "registry": "audio-categories",
+  "version": "1.0.0",
+  "description": "Audio Experience Foundation™ — taxonomy for Estate sound. Categories describe purpose, not playlists.",
+  "statusValues": ["Live", "Draft", "Future", "Hidden", "Retired"],
+  "itemSchema": {
+    "categoryId": "string — stable slug",
+    "label": "string — member-safe name",
+    "description": "string — what this kind of audio is for",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "experienceTags": "string[] — cross-filter tags",
+    "lastUpdated": "string"
+  },
+  "categories": [
+    {
+      "categoryId": "focus-ambience",
+      "label": "Focus & calm",
+      "description": "Gentle soundscapes that support thinking without demanding attention.",
+      "status": "Live",
+      "experienceTags": ["focus", "calm", "thinking", "work"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "categoryId": "room-atmosphere",
+      "label": "Room atmosphere",
+      "description": "Audio that belongs to a specific place on the Estate — piano, hearth, rain at the window.",
+      "status": "Live",
+      "experienceTags": ["room", "atmosphere", "belonging"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "categoryId": "restoration-soundscape",
+      "label": "Restoration",
+      "description": "Soft sound for recovery, overwhelm, or when the mind needs less.",
+      "status": "Live",
+      "experienceTags": ["rest", "recovery", "overwhelm", "quiet"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "categoryId": "creative-companionship",
+      "label": "Creative companionship",
+      "description": "Warm audio company while making, drafting, or exploring ideas.",
+      "status": "Live",
+      "experienceTags": ["create", "warmth", "company"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "categoryId": "nature-listening",
+      "label": "Nature listening",
+      "description": "Rain, paths, gardens — outdoor calm without leaving the Estate.",
+      "status": "Draft",
+      "experienceTags": ["nature", "rain", "gardens", "walk"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "categoryId": "seasonal-ambience",
+      "label": "Seasonal ambience",
+      "description": "Sound that shifts with the season — future full library expansion.",
+      "status": "Future",
+      "experienceTags": ["seasonal", "spring", "winter"],
+      "lastUpdated": "2026-07-06"
+    }
+  ]
+}

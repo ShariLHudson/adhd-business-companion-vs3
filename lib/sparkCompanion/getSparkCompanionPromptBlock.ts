@@ -2,7 +2,7 @@
  * Consolidated static companion prompt — replaces stacked constitution blocks.
  */
 
-import { SHARI_COMPANION_ENGINE_PROMPT_BLOCK } from "@/lib/conversation/shariCompanionEngine";
+import { SHARI_COMPANION_ENGINE_PROMPT_BLOCK } from "@/lib/conversation/shariCompanionEnginePrompt";
 import { SPARK_DECISION_ENGINE_PROMPT_BLOCK } from "./sparkDecisionEngine/principles";
 
 export const SPARK_COMPANION_CONSOLIDATED_PROMPT_BLOCK = `# SPARK COMPANION V4 (Decision Engine + Shari voice)

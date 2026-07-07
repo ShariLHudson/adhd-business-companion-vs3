@@ -1,0 +1,227 @@
+{
+  "registry": "discovery-prerequisites",
+  "version": "2.0.0",
+  "description": "Prerequisite relationships — Welcome Collection 001 is sequential; room discoveries follow welcome trust arc.",
+  "rules": {
+    "enforceForDiscoveryKey": true,
+    "enforceForHelpDiscovery": true,
+    "deferWhenUnmet": true,
+    "neverExplainPrerequisitesToMember": true
+  },
+  "itemSchema": {
+    "id": "string",
+    "targetType": "discovery | room | feature | tool | setting | audio | story",
+    "targetId": "string",
+    "requires": "PrerequisiteRequirement[]",
+    "reason": "string — internal editorial only"
+  },
+  "requirementSchema": {
+    "type": "discovery | room | feature | tool | setting",
+    "id": "string",
+    "minEngagement": "introduced | viewed | visited | explored | saved"
+  },
+  "prerequisites": [
+    {
+      "id": "prereq-sunroom-story-after-welcome",
+      "targetType": "discovery",
+      "targetId": "DISC-012",
+      "requires": [
+        { "type": "discovery", "id": "DISC-010", "minEngagement": "viewed" }
+      ],
+      "reason": "Welcome trust arc before room-specific sunroom story."
+    },
+    {
+      "id": "prereq-welcome-002-after-001",
+      "targetType": "discovery",
+      "targetId": "DISC-002",
+      "requires": [
+        { "type": "discovery", "id": "DISC-001", "minEngagement": "viewed" }
+      ],
+      "reason": "Welcome before Discovery Key introduction."
+    },
+    {
+      "id": "prereq-welcome-003-after-002",
+      "targetType": "discovery",
+      "targetId": "DISC-003",
+      "requires": [
+        { "type": "discovery", "id": "DISC-002", "minEngagement": "viewed" }
+      ],
+      "reason": "One companion message after key introduction."
+    },
+    {
+      "id": "prereq-welcome-004-after-003",
+      "targetType": "discovery",
+      "targetId": "DISC-004",
+      "requires": [
+        { "type": "discovery", "id": "DISC-003", "minEngagement": "viewed" }
+      ],
+      "reason": "Exploration freedom after companion orientation."
+    },
+    {
+      "id": "prereq-welcome-005-after-004",
+      "targetType": "discovery",
+      "targetId": "DISC-005",
+      "requires": [
+        { "type": "discovery", "id": "DISC-004", "minEngagement": "viewed" }
+      ],
+      "reason": "Natural language after exploration permission."
+    },
+    {
+      "id": "prereq-welcome-006-after-005",
+      "targetType": "discovery",
+      "targetId": "DISC-006",
+      "requires": [
+        { "type": "discovery", "id": "DISC-005", "minEngagement": "viewed" }
+      ],
+      "reason": "Estate unfolds over time — after ask naturally."
+    },
+    {
+      "id": "prereq-welcome-007-after-006",
+      "targetType": "discovery",
+      "targetId": "DISC-007",
+      "requires": [
+        { "type": "discovery", "id": "DISC-006", "minEngagement": "viewed" }
+      ],
+      "reason": "Memory trust after growth-over-time message."
+    },
+    {
+      "id": "prereq-welcome-008-after-007",
+      "targetType": "discovery",
+      "targetId": "DISC-008",
+      "requires": [
+        { "type": "discovery", "id": "DISC-007", "minEngagement": "viewed" }
+      ],
+      "reason": "Simply ask after memory orientation."
+    },
+    {
+      "id": "prereq-welcome-009-after-008",
+      "targetType": "discovery",
+      "targetId": "DISC-009",
+      "requires": [
+        { "type": "discovery", "id": "DISC-008", "minEngagement": "viewed" }
+      ],
+      "reason": "Curiosity after permission to ask."
+    },
+    {
+      "id": "prereq-welcome-010-after-009",
+      "targetType": "discovery",
+      "targetId": "DISC-010",
+      "requires": [
+        { "type": "discovery", "id": "DISC-009", "minEngagement": "viewed" }
+      ],
+      "reason": "Estate philosophy capstone after curiosity."
+    },
+    {
+      "id": "prereq-greenhouse-after-welcome",
+      "targetType": "discovery",
+      "targetId": "DISC-011",
+      "requires": [
+        { "type": "discovery", "id": "DISC-002", "minEngagement": "viewed" }
+      ],
+      "reason": "Welcome and belonging before deeper room discoveries."
+    },
+    {
+      "id": "prereq-clear-my-mind-after-welcome",
+      "targetType": "discovery",
+      "targetId": "DISC-013",
+      "requires": [
+        { "type": "discovery", "id": "DISC-003", "minEngagement": "viewed" }
+      ],
+      "reason": "One companion orientation before feature introductions."
+    },
+    {
+      "id": "prereq-music-room-before-listening-room-note",
+      "targetType": "discovery",
+      "targetId": "DISC-014",
+      "requires": [
+        { "type": "room", "id": "music-room", "minEngagement": "visited" }
+      ],
+      "reason": "Visit the Music Room before the Listening Room discovery note."
+    },
+    {
+      "id": "prereq-listening-room-before-focus-audio",
+      "targetType": "feature",
+      "targetId": "focus-audio",
+      "requires": [
+        { "type": "room", "id": "music-room", "minEngagement": "visited" }
+      ],
+      "reason": "Members should discover the Listening Room before building playlists or deep focus audio."
+    },
+    {
+      "id": "prereq-music-room-before-peaceful-places-audio",
+      "targetType": "audio",
+      "targetId": "peaceful-places-focus",
+      "requires": [
+        { "type": "room", "id": "music-room", "minEngagement": "visited" }
+      ],
+      "reason": "Place context before cross-estate focus audio."
+    },
+    {
+      "id": "prereq-reminders-before-advanced-reminders",
+      "targetType": "feature",
+      "targetId": "reminders-advanced",
+      "requires": [
+        { "type": "feature", "id": "reminders", "minEngagement": "explored" }
+      ],
+      "reason": "Basic reminders before advanced reminder settings — Future feature placeholder."
+    },
+    {
+      "id": "prereq-settings-before-ambience-deep",
+      "targetType": "setting",
+      "targetId": "estate-ambience",
+      "requires": [
+        { "type": "setting", "id": "member-settings", "minEngagement": "introduced" }
+      ],
+      "reason": "General settings orientation before ambience controls."
+    },
+    {
+      "id": "prereq-create-after-clear-my-mind",
+      "targetType": "discovery",
+      "targetId": "DISC-017",
+      "requires": [
+        { "type": "discovery", "id": "DISC-013", "minEngagement": "viewed" },
+        { "type": "feature", "id": "clear-my-mind", "minEngagement": "explored" }
+      ],
+      "reason": "Relief and capture before creation studio invitation."
+    },
+    {
+      "id": "prereq-personal-discovery-after-engagement",
+      "targetType": "discovery",
+      "targetId": "DISC-015",
+      "requires": [
+        { "type": "room", "id": "conservatory", "minEngagement": "visited" },
+        { "type": "discovery", "id": "DISC-002", "minEngagement": "viewed" }
+      ],
+      "reason": "Personal observations only after meaningful Estate familiarity."
+    },
+    {
+      "id": "prereq-seasonal-after-gardens",
+      "targetType": "discovery",
+      "targetId": "DISC-016",
+      "requires": [
+        { "type": "room", "id": "gardens", "minEngagement": "visited" }
+      ],
+      "reason": "Know the gardens before seasonal garden discoveries."
+    },
+    {
+      "id": "prereq-greenhouse-story-after-greenhouse-visit",
+      "targetType": "story",
+      "targetId": "estate-story-greenhouse-patience",
+      "requires": [
+        { "type": "room", "id": "greenhouse", "minEngagement": "visited" }
+      ],
+      "reason": "Story lands after the member has been to the Greenhouse."
+    }
+  ],
+  "relationshipExamples": [
+    {
+      "discoveryId": "DISC-014",
+      "relatedDiscoveries": ["peaceful-places-focus", "conservatory-gentle-audio"],
+      "relatedRooms": ["music-room"],
+      "relatedFeatures": ["focus-audio"],
+      "relatedSparkCards": ["music", "focus", "creativity"],
+      "notes": "Documented in discovery-collections listening-experiences — runtime uses discovery-mappings.json for entity cross-links."
+    }
+  ],
+  "lastUpdated": "2026-07-06"
+}
