@@ -87,7 +87,7 @@ const DECLINE_RE =
   /^(?:no|nope|nah|not now|not yet|stay(?:\s+here)?|something else|keep talking|later)\b/i;
 
 const ACCEPT_RE =
-  /^(?:yes|yep|yeah|yup|sure|ok(?:ay)?|please|open it|take me there|go ahead|do it|sounds good|that works|please do)\b/i;
+  /^(?:yes|yep|yeah|yup|sure|ok(?:ay)?|please|open it|take me there|go ahead|do it|sounds good|that works|that would be great|let'?s do (?:it|that)|please do)\b/i;
 
 export function isConfirmationAcceptance(text: string): boolean {
   const t = text.trim();

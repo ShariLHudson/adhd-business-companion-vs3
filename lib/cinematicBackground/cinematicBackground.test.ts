@@ -19,7 +19,7 @@ describe("cinematic background presets", () => {
 
   it("exports css variables for per-scene tuning", () => {
     const vars = cinematicFramingToCssVars(resolveCinematicPreset("clear-my-mind"));
-    expect(vars["--video-scale"]).toBe("1.06");
-    expect(vars["--video-position"]).toBe("center 45%");
+    expect(vars["--video-scale"]).toBe("1.05");
+    expect(vars["--video-position"]).toBe("center 42%");
   });
 });

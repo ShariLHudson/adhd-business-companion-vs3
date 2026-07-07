@@ -28,6 +28,6 @@ describe("welcomeAudio profiles", () => {
     );
     expect(WELCOME_HOME_AUDIO_PROFILE.voice?.playbackRate).toBe(1);
     expect(WELCOME_HOME_AUDIO_PROFILE.ambience).toBeUndefined();
-    expect(WELCOME_HOME_AUDIO_PROFILE.timeline?.voiceStartMs).toBe(250);
+    expect(WELCOME_HOME_AUDIO_PROFILE.timeline?.voiceStartMs).toBe(0);
   });
 });

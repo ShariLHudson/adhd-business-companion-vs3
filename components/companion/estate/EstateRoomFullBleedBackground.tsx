@@ -1,10 +1,14 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { OceanConservatoryAquariumLife } from "@/components/companion/estate/OceanConservatoryAquariumLife";
+import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
 import { backgroundUrlVariants } from "@/lib/roomBackgroundAssets";
 import { estateRoomBackgroundCandidates } from "@/lib/estate/estateRoomAssets";
 import { resolveEstateRoomBackgroundImage } from "@/lib/estate/estateRoomBackground";
+import {
+  OCEAN_CONSERVATORY_POSTER,
+  OCEAN_CONSERVATORY_VIDEO,
+} from "@/lib/oceanConservatory/media";
 import {
   isOceanConservatoryBackground,
   isOceanConservatoryRoom,
@@ -20,6 +24,7 @@ type Props = {
 
 /**
  * Full-viewport estate room photograph — edge to edge, nothing letterboxed.
+ * Ocean Conservatory™ uses the aquarium video plate; ambience stays on the room loop.
  */
 export function EstateRoomFullBleedBackground({
   roomId,
@@ -53,10 +58,16 @@ export function EstateRoomFullBleedBackground({
   }, [candidates.length]);
 
   const src = candidates[candidateIndex];
-  const showAquariumLife =
+  const useOceanConservatoryVideo =
     isOceanConservatoryRoom(roomId) || isOceanConservatoryBackground(src);
+  const poster = src ?? OCEAN_CONSERVATORY_POSTER;
 
-  if (!src) {
+  useEffect(() => {
+    if (!useOceanConservatoryVideo || !onLoad) return;
+    onLoad();
+  }, [onLoad, useOceanConservatoryVideo, poster]);
+
+  if (!src && !useOceanConservatoryVideo) {
     return (
       <div
         className={["estate-room-fullbleed-bg estate-room-fullbleed-bg--fallback", className]
@@ -64,6 +75,26 @@ export function EstateRoomFullBleedBackground({
           .join(" ")}
         aria-hidden
       />
+    );
+  }
+
+  if (useOceanConservatoryVideo) {
+    return (
+      <div className="estate-room-fullbleed-stack" aria-hidden>
+        <CinematicBackground
+          preset="default"
+          mode="video"
+          videoSrc={OCEAN_CONSERVATORY_VIDEO}
+          poster={poster}
+          fallbackBackground={`url('${poster}')`}
+          placement="fixed"
+          showBottomFade={false}
+          className="estate-room-fullbleed-cinematic"
+          mediaClassName={["estate-room-fullbleed-bg", className]
+            .filter(Boolean)
+            .join(" ")}
+        />
+      </div>
     );
   }
 
@@ -79,9 +110,6 @@ export function EstateRoomFullBleedBackground({
         onLoad={onLoad}
         onError={handleError}
       />
-      {showAquariumLife ? (
-        <OceanConservatoryAquariumLife backgroundImageUrl={src} />
-      ) : null}
     </div>
   );
 }

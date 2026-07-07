@@ -5,9 +5,9 @@ import {
 } from "./loginDoorwayPresence";
 
 describe("loginDoorwayPresence", () => {
-  it("uses the Welcome Home room photograph as the scene source", () => {
+  it("uses the Welcome Home front-door photograph as the scene source", () => {
     expect(LOGIN_SCENE_ASSET).toMatch(
-      /\/backgrounds\/welcome-home-background\.png\?v=/,
+      /\/backgrounds\/welcome-home-front-door\.png\?v=/,
     );
   });
 

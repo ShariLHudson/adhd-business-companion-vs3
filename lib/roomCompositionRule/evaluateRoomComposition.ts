@@ -33,8 +33,8 @@ export function evaluateRoomComposition(
 
   const centerMaxWidth = isConservatory
     ? mobile
-      ? "min(100%, 31.25rem)"
-      : "clamp(26.25rem, 92vw, 31.25rem)"
+      ? "min(100%, 30rem)"
+      : "clamp(25rem, 90vw, 30rem)"
     : mobile
       ? "100%"
       : "36rem";

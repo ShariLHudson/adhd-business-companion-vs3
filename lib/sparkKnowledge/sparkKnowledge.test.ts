@@ -56,11 +56,11 @@ describe("sparkKnowledge", () => {
 
   it("resolves room story for conservatory", () => {
     const turn = resolveEstateGuideTurn(
-      "Tell me about the Butterfly Conservatory",
+      "Tell me about the Ocean Conservatory",
     );
     expect(turn.topic).toBe("room_story");
     expect(turn.matchedPlaceId).toBe("conservatory");
-    expect(turn.body).toMatch(/Conservatory|conservatory/i);
+    expect(turn.body).toMatch(/Ocean Conservatory|Conservatory|conservatory/i);
   });
 
   it("recommends checklist after SOP", () => {

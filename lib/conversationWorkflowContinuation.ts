@@ -143,7 +143,7 @@ export function inferConversationWorkflowFromAssistant(
   }
 
   if (
-    /\b(?:clear my mind|brain dump|get (?:it |everything )?out of (?:your|my) head)\b/i.test(
+    /\b(?:clear my mind|clear your mind|brain dump|get (?:it |everything )?out of (?:your|my) head)\b/i.test(
       t,
     ) &&
     !/\bmy thoughts\b/i.test(t)

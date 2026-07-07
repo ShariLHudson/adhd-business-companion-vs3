@@ -15,36 +15,36 @@ type Props = {
 };
 
 /**
- * Single frosted workspace chrome — all copy lives inside the panel.
+ * Sunroom journal surface — warm paper over glass, not application chrome.
  */
 export function ClearMyMindConservatoryWorkspace({
   onBackToChat,
   children,
 }: Props) {
   return (
-    <div
-      className="clear-my-mind-conservatory-workspace"
+    <article
+      className="clear-my-mind-sunroom-workspace clear-my-mind-journal-page"
       data-testid="clear-my-mind-conservatory-workspace"
     >
-      <div className="clear-my-mind-conservatory-workspace__nav">
+      <div className="clear-my-mind-sunroom-workspace__nav">
         <AppBackButton
           destination={NAV_CHAT}
           onBack={onBackToChat}
           size="compact"
         />
       </div>
-      <header className="clear-my-mind-conservatory-workspace__header">
-        <h1 className="clear-my-mind-conservatory-workspace__title">
-          {CLEAR_MY_MIND_HEADER}
-        </h1>
-        <p className="clear-my-mind-conservatory-workspace__subtitle">
+      <header className="clear-my-mind-sunroom-workspace__opening">
+        <p className="clear-my-mind-sunroom-workspace__whisper">
           {CLEAR_MY_MIND_WORKSPACE_SUBTITLE}
         </p>
-        <p className="clear-my-mind-conservatory-workspace__welcome">
+        <h1 className="clear-my-mind-sunroom-workspace__title">
+          {CLEAR_MY_MIND_HEADER}
+        </h1>
+        <p className="clear-my-mind-sunroom-workspace__lead">
           {CLEAR_MY_MIND_WELCOME_LINES[0]}
         </p>
       </header>
-      <div className="clear-my-mind-conservatory-workspace__body">{children}</div>
-    </div>
+      <div className="clear-my-mind-sunroom-workspace__body">{children}</div>
+    </article>
   );
 }

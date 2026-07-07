@@ -25,7 +25,7 @@ import { isVisibleInMentalLandscape } from "@/lib/thoughtLifecycle";
 type PanelView = "capture" | "my-thoughts";
 
 /**
- * Clear My Mind — Garden Conservatory standalone room.
+ * Clear My Mind — Original Sunroom standalone room.
  */
 export function BrainDumpPanel({
   onOpen: _onOpen,

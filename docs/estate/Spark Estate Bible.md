@@ -21,6 +21,7 @@ If a question ever arises about how Spark Estate works, what belongs within it, 
 - The **Constitution** defines our principles.  
 - The **Experience Guide** describes how the Estate feels.  
 - **The Bible establishes what is true.**
+- The **[Master World Bible](./SPARK_ESTATE_MASTER_WORLD_BIBLE.md)** consolidates timeline, lore, operational laws, guide standards, and Spark's knowledge obligations.
 
 Every future document, room, image, conversation, feature, and line of code should align with this canon.
 

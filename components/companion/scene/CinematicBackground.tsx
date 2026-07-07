@@ -73,6 +73,7 @@ export function CinematicBackground({
     if (!video) return;
 
     let cancelled = false;
+    video.loop = true;
 
     const safePlay = async () => {
       if (cancelled) return;
@@ -95,7 +96,19 @@ export function CinematicBackground({
       void safePlay();
     };
 
+    const onEnded = () => {
+      if (cancelled) return;
+      try {
+        video.currentTime = 0;
+      } catch {
+        /* ignore */
+      }
+      void safePlay();
+    };
+
     const onLoadedData = () => startPlayback();
+
+    video.addEventListener("ended", onEnded);
 
     if (video.readyState >= HTMLMediaElement.HAVE_CURRENT_DATA) {
       startPlayback();
@@ -105,6 +118,7 @@ export function CinematicBackground({
 
     return () => {
       cancelled = true;
+      video.removeEventListener("ended", onEnded);
       video.removeEventListener("loadeddata", onLoadedData);
     };
   }, [mode, playKey, videoSrc]);
@@ -141,6 +155,7 @@ export function CinematicBackground({
               poster={poster}
               muted
               loop
+              autoPlay
               playsInline
               preload="auto"
               // @ts-expect-error fetchPriority is valid on video in modern browsers

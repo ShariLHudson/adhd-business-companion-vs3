@@ -1,75 +1,150 @@
 # Estate Intelligence Architecture™
 
-**Status:** BINDING (internal) · **Runtime:** `lib/estateBrain/` · **Member map:** `ESTATE_REGISTRY.md`
+**Status:** **Binding architecture** · **Runtime (transitional):** `lib/estateBrain/` · `lib/estateIntelligence/` · **Member map:** `ESTATE_REGISTRY.md`
 
-**Intent-first navigation:** [INTENT_FIRST_ESTATE_NAVIGATION.md](./INTENT_FIRST_ESTATE_NAVIGATION.md) — members think in goals; Spark chooses environment automatically.
+**Foundational principle:** **THE RELATIONSHIP OWNS THE WORK.**
 
-**Discovery Mode:** [ESTATE_DISCOVERY_MODE.md](./ESTATE_DISCOVERY_MODE.md) — understand before routing.
+**Full stack (2026-07-05):**
 
-**Adaptive Intelligence:** [ESTATE_ADAPTIVE_INTELLIGENCE.md](./ESTATE_ADAPTIVE_INTELLIGENCE.md) — learn preferences that change future decisions.
+```
+Relationship
+    ↓
+Conversation
+    ↓
+Estate Intelligence  ← this document
+    ↓
+Creating Together
+    ↓
+Studio (inside Estate Place)
+    ↓
+Artifact
+    ↓
+Member Journey
+```
 
-**Universal Creation:** [UNIVERSAL_CREATION_FRAMEWORK.md](./UNIVERSAL_CREATION_FRAMEWORK.md) — one journey for every document type.
+**Related:**
 
-**Shari Knowledge:** [SHARI_KNOWLEDGE_INTELLIGENCE_FRAMEWORK.md](./SHARI_KNOWLEDGE_INTELLIGENCE_FRAMEWORK.md) — unified Estate knowledge for conversation, guide, and recommendations.
+| Document | Role |
+|----------|------|
+| [MEMBER_JOURNEY_ARCHITECTURE.md](../MEMBER_JOURNEY_ARCHITECTURE.md) | Discovery · momentum · journey objects |
+| [ESTATE_CREATION_EXPERIENCE.md](../ESTATE_CREATION_EXPERIENCE.md) | Places + Studio Registry |
+| [ESTATE_KNOWLEDGE_REGISTRY_AUDIT.md](../ESTATE_KNOWLEDGE_REGISTRY_AUDIT.md) | Registry wiring |
+| [INTENT_FIRST_ESTATE_NAVIGATION.md](./INTENT_FIRST_ESTATE_NAVIGATION.md) | Intent-first navigation |
+| [SHARI_KNOWLEDGE_INTELLIGENCE_FRAMEWORK.md](./SHARI_KNOWLEDGE_INTELLIGENCE_FRAMEWORK.md) | Unified knowledge |
 
-**Intentional Restoration:** [ESTATE_RESTORATION_GUIDE.md](./ESTATE_RESTORATION_GUIDE.md) — Estate Guide as restorative experience, not documentation.
+> The Estate is Spark's **world model** — not a collection of workspaces. **Places are emotional. Studios are capabilities inside places.**
 
-**Spark Restoration Intelligence:** [SPARK_RESTORATION_INTELLIGENCE.md](./SPARK_RESTORATION_INTELLIGENCE.md) — seven energy types; what would give this person more energy?
+---
 
-**Intent-Aware Conversation:** [INTENT_AWARE_CONVERSATION_FRAMEWORK.md](./INTENT_AWARE_CONVERSATION_FRAMEWORK.md) — member sets depth; Spark follows intent.
+## Binding decisions (2026-07-05)
 
-> The Estate is Spark's **world model** — not a collection of workspaces.
+| Decision | Estate Intelligence behavior |
+|----------|------------------------------|
+| **Two layers** | Recommend **Place** first (emotional fit); resolve **Studio** second (capability) |
+| **Gentle Guidance** | Every recommendation includes **why** — never command |
+| **Discovery** | Organic via relationship · growth · need · milestone — not feature catalog |
+| **Registry authority** | Chat answers and menus read **Estate Knowledge Registry** — not static 3-room arrays |
+| **Member Journey inputs** | Discovery Keys, momentum, visit history inform recommendations — not surveillance |
 
-## Routing pipeline
+---
 
-Every member message passes through:
+## Routing pipeline (target)
+
+Every member message passes through **Conversation Intelligence** first, then Estate Intelligence when need involves place, atmosphere, or capability:
 
 ```
 User Request
     ↓
-Intent Detection (intentCategories.ts)
+Conversation Understanding + Priority Engine
     ↓
-Spark Restoration Intelligence (energy type → Estate path — play, curiosity, sensory…)
+Need Classification
     ↓
-Estate Guide stories (curiosity sub-layer — optional flipbook / inline)
+[Estate Intelligence when need ∈ place · rest · focus · explore · create-atmosphere]
     ↓
-Estate Guide (orientation — what can Spark do, room stories)
+Estate Judgment (evaluateEstateJudgment) — reads Estate Knowledge Registry
     ↓
-Universal Creation (create intents — Discover → Prepare → Create)
+Place recommendation (Layer 1 — emotional environment)
     ↓
-Estate Discovery Mode (focus, business growth, research — confidence ≥ 90%)
+Feature recommendation (breathe · audio · games · momentum · …) — unified catalog
     ↓
-Coaching Menu (when situation needs a human prescription)
+Studio Registry resolve (Layer 2 — when Creating Together needs surface)
     ↓
-Capability Selection (capabilityRegistry.ts)
+Gentle Guidance narrator (why · invitation · max 3 choices)
     ↓
-Best Estate Environment (environmentRegistry.ts)
-    ↓
-Expert Selection (invisible) + quiet preparation
-    ↓
-Navigate (last)
+Navigate (last — only when member accepts)
     ↓
 Conversation continues
 ```
 
-**Create intents** (email, SOP, newsletter, funnel, …) enter **Universal Creation** first — not Estate Discovery.  
-**Adaptive Intelligence** shapes questions, preparation, and anticipation throughout both flows.
+**Create intents** enter **Creating Together** — not a separate "Universal Creation" path in member experience.  
+**Adaptive Intelligence** + **Member Journey** shape recommendations throughout.
 
-**The room is not the first decision. The capability is.**
+**The room is not the first decision. The member's need is.**
+
+---
+
+## Two layers (Places vs Studios)
+
+| Layer | Estate Intelligence selects | Member experiences |
+|-------|----------------------------|-------------------|
+| **Layer 1 — Place** | `estatePlaceId` from registry + judgment | *"The Library might be peaceful for this."* |
+| **Layer 2 — Studio** | `studioId` from Studio Registry | Work surface inside place — rarely named |
+
+Example: Create SOP → **Working Conference Room** + **process** Studio inside it.
+
+See [ESTATE_CREATION_EXPERIENCE.md §3](../ESTATE_CREATION_EXPERIENCE.md).
+
+---
+
+## Discovery (organic Estate unfold)
+
+Spark introduces new places and capabilities through **relationship**, not menus:
+
+- *"I've been thinking about a place I'd like to show you."*  
+- *"I think you're ready for another part of the Estate."*  
+- *"I remembered somewhere that might help."*  
+
+**Inputs:** Member Journey (Discovery Keys, milestones), adaptive prefs, need, judgment — **never** day-count or streak.
+
+**Anti-patterns:** full estate map on arrival · achievement unlock pop-ups · "New feature available."
+
+Detail: [MEMBER_JOURNEY_ARCHITECTURE.md §Discovery](../MEMBER_JOURNEY_ARCHITECTURE.md).
+
+---
 
 ## Single source of truth
 
 | Registry | Path | Purpose |
 |----------|------|---------|
-| **Capabilities** | `lib/estateBrain/capabilityRegistry.ts` | What Spark can do |
-| **Environments** | `lib/estateBrain/environmentRegistry.ts` | Where work happens (rich metadata) |
-| **Intents** | `lib/estateBrain/intentCategories.ts` | Member goals in natural language |
-| **Experts** | `lib/estateBrain/expertRegistry.ts` | Who advises (internal) |
-| **Experiences & spaces** | `lib/estateBrain/knowledgeRegistry.ts` | Estate Brain knowledge |
-| **Adaptive preferences** | `lib/estateBrain/adaptiveIntelligence/` | Learned working/creative/decision patterns |
-| **Router** | `lib/estateBrain/routeIntentFirstNavigation.ts` + `routeEstateIntelligence.ts` | Decision tree |
+| **Estate Knowledge** | `lib/estateKnowledge/` | Places · features · groups · Q&A |
+| **Estate Judgment** | `lib/estateIntelligence/judgment/` | Reasoning over registry |
+| **Studio Registry** | `lib/studioRegistry/` (proposed) | Capability surfaces |
+| **Capabilities** | `lib/estateBrain/capabilityRegistry.ts` | What Spark can do (transitional) |
+| **Environments** | `lib/estateBrain/environmentRegistry.ts` | Rich metadata (transitional — merge toward Knowledge Registry) |
+| **Intents** | `lib/estateBrain/intentCategories.ts` | Member goals |
+| **Adaptive preferences** | `lib/estateBrain/adaptiveIntelligence/` | Learned patterns |
+| **Member Journey** | `lib/memberJourney/` (proposed) | Longitudinal life in Estate |
 
-Conversation · navigation · menus · suggestions · research · expert selection **read from here**.
+**Migration:** Capabilities/environments **converge** on Estate Knowledge Registry + judgment — not parallel forever.
+
+Conversation · navigation · menus · suggestions · research **must read from registry + judgment** — not hard-coded wander arrays.
+
+---
+
+## Unified feature catalog (Member Journey alignment)
+
+These are **one recommendation surface** — not separate frictionless branches:
+
+| Feature family | Examples | Recommendation style |
+|----------------|----------|----------------------|
+| Restoration | Breathe, meditations, Clear My Mind | Emotional need first |
+| Audio | Focus Audio, Audio Library, pleasure places | Atmosphere + permission |
+| Play | Games, refresh activities | Restoration Intelligence |
+| Growth | Momentum, Spark Cards, Discovery Keys | Journey layer |
+| Celebration | Gallery of Wins, Hall, Evidence Vault | Permission · quiet |
+| Thinking | Decision Compass, Visual maps | Thinking Studio inside place |
+
+---
 
 ## Research levels
 

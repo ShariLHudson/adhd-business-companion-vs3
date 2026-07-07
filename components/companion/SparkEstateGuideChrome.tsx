@@ -14,7 +14,7 @@ type Props = {
 };
 
 /**
- * Portaled guidebook chrome — cover anchor + flipbook overlay.
+ * Portaled guidebook chrome — cover anchor (bottom left) + flipbook overlay.
  * Fixed to the viewport so overflow-hidden shells never clip the book.
  */
 export function SparkEstateGuideChrome({

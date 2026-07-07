@@ -1,8 +1,80 @@
 {
   "registry": "room-placement-library",
-  "version": "1.0.0",
-  "description": "In-scene placement metadata for Discovery Key and diegetic UI — where keys, objects, and affordances appear in room images.",
+  "version": "2.0.0",
+  "description": "Approved in-scene Discovery Key™ placement zones per Estate room. The Estate Intelligence Engine selects ONE location per placement — never ad hoc UI coordinates.",
+  "supabase": {
+    "tableName": "room_placement_library",
+    "childTableName": "room_placement_locations",
+    "notes": "V1 reads JSON. Future: rooms row + locations rows; seasonal variants as JSONB."
+  },
   "statusValues": ["Live", "Draft", "Future", "Hidden", "Retired"],
+  "surfaceTypes": [
+    "mantel",
+    "desk",
+    "windowsill",
+    "table",
+    "shelf",
+    "bookshelf",
+    "bench",
+    "railing",
+    "flower-pot",
+    "chair",
+    "cabinet",
+    "dock",
+    "rock",
+    "bridge",
+    "telescope-table",
+    "potting-table",
+    "stone-wall",
+    "audio-cabinet",
+    "floor"
+  ],
+  "placementRules": {
+    "diegeticOnly": true,
+    "maxKeysPerRoom": 1,
+    "maxKeysEstateWide": 1,
+    "neverBlock": [
+      "buttons",
+      "primary-navigation",
+      "conversation-panel",
+      "folded-map",
+      "artwork-focal",
+      "readable-text",
+      "accessibility-targets"
+    ],
+    "neverOverlap": ["navigation", "member-facing-copy", "critical-scene-focal"],
+    "stableWhileInRoom": true,
+    "coordinatesAreRefinable": true
+  },
+  "itemSchema": {
+    "roomId": "string — must match estate-rooms.json id",
+    "officialName": "string",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "sceneImage": "string | null — default room plate",
+    "preferredLightingNotes": "string — warm light, lantern, fireplace guidance",
+    "defaultPlacementScale": "number — room-level default key scale (0–1)",
+    "safeArea": "SafeAreaDefinition",
+    "visibilityRules": "RoomVisibilityRules",
+    "seasonalVariants": "SeasonalPlacementVariant[]",
+    "approvedLocations": "ApprovedKeyLocation[]",
+    "lastUpdated": "ISO date"
+  },
+  "locationSchema": {
+    "id": "string — stable within room",
+    "label": "string — human name, e.g. Fireplace Mantel",
+    "surfaceType": "surfaceTypes value",
+    "status": "Live | Draft | Future | Hidden | Retired",
+    "description": "string | null",
+    "placementScale": "number | null — overrides room default",
+    "rotationDegrees": "number",
+    "depthLayer": "scene | object | foreground",
+    "position": "{ xPercent, yPercent, anchor }",
+    "shadow": "{ enabled, opacity, blurPx, offsetYPercent }",
+    "lightingAdjustment": "{ warmth, highlight }",
+    "safePlacementZone": "{ notes, avoidOverlapWith }",
+    "priority": "number — lower = preferred when multiple eligible",
+    "seasonalOnly": "string | null — season id when location appears only in seasonal art"
+  },
   "canonicalAssets": {
     "discoveryKey": {
       "officialName": "Discovery Key™",
@@ -12,17 +84,650 @@
       "reuseRule": "Single asset estate-wide — no alternate key designs"
     }
   },
-    "id": "string",
-    "roomId": "string",
-    "officialName": "string",
-    "placementType": "discovery-key | object | affordance",
-    "description": "string",
-    "status": "Live | Draft | Future | Hidden | Retired",
-    "sceneImage": "string | null",
-    "placementNotes": "string | null",
-    "relatedDiscoveryIds": "string[]",
-    "maxVisibleAtOnce": "number",
-    "lastUpdated": "string"
-  },
-  "items": []
+  "items": [
+    {
+      "roomId": "personal-library",
+      "officialName": "Personal Library",
+      "status": "Draft",
+      "sceneImage": "/backgrounds/room-library-personal-background.png",
+      "preferredLightingNotes": "Warm lamp glow on reading surfaces. Fireplace mantle catches soft gold in winter seasonal art. Never cool or harsh.",
+      "defaultPlacementScale": 0.4,
+      "safeArea": {
+        "description": "Furniture surfaces and lower scene — never over frosted conversation glass or folded map.",
+        "excludeZones": [
+          "conversation-panel",
+          "folded-map",
+          "primary-navigation",
+          "center-chat-column"
+        ],
+        "paddingPercent": { "top": 10, "right": 8, "bottom": 16, "left": 8 }
+      },
+      "visibilityRules": {
+        "maxKeysVisible": 1,
+        "gentleGlowAfterUnnoticedVisits": 3,
+        "neverBlock": ["buttons", "artwork-focal", "navigation", "text", "accessibility-targets"]
+      },
+      "seasonalVariants": [
+        {
+          "seasonId": "winter",
+          "label": "Winter hearth",
+          "sceneImage": "/backgrounds/room-library-personal-background.png",
+          "lightingNotes": "Fireplace mantle preferred — warmer brass reads against firelight.",
+          "enabledLocationIds": ["fireplace-mantel", "leather-reading-chair", "small-side-table"]
+        }
+      ],
+      "approvedLocations": [
+        {
+          "id": "fireplace-mantel",
+          "label": "Fireplace Mantel",
+          "surfaceType": "mantel",
+          "status": "Live",
+          "description": "Brass key resting beside a single book — discovered, not displayed.",
+          "placementScale": 0.38,
+          "rotationDegrees": -6,
+          "depthLayer": "object",
+          "position": { "xPercent": 24, "yPercent": 58, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.24, "blurPx": 10, "offsetYPercent": 1.4 },
+          "lightingAdjustment": { "warmth": 0.2, "highlight": "fireplace" },
+          "safePlacementZone": {
+            "notes": "Left mantle clear of portrait focal",
+            "avoidOverlapWith": ["artwork-focal", "conversation-panel"]
+          },
+          "priority": 1
+        },
+        {
+          "id": "writing-desk-corner",
+          "label": "Corner of Writing Desk",
+          "surfaceType": "desk",
+          "status": "Live",
+          "description": "Key laid near pen tray — as if set down mid-thought.",
+          "placementScale": 0.36,
+          "rotationDegrees": 12,
+          "depthLayer": "object",
+          "position": { "xPercent": 68, "yPercent": 66, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.2, "blurPx": 8, "offsetYPercent": 1 },
+          "lightingAdjustment": { "warmth": 0.12, "highlight": "lamp" },
+          "safePlacementZone": {
+            "notes": "Desk corner only — not over journal surface",
+            "avoidOverlapWith": ["readable-text", "buttons"]
+          },
+          "priority": 2
+        },
+        {
+          "id": "window-sill",
+          "label": "Window Sill",
+          "surfaceType": "windowsill",
+          "status": "Live",
+          "description": "Quiet daylight on brass — subtle, not glittering.",
+          "placementScale": 0.34,
+          "rotationDegrees": -3,
+          "depthLayer": "object",
+          "position": { "xPercent": 82, "yPercent": 42, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.16, "blurPx": 6, "offsetYPercent": 0.8 },
+          "lightingAdjustment": { "warmth": 0.08, "highlight": "daylight" },
+          "safePlacementZone": {
+            "notes": "Right sill — clear of curtain pull",
+            "avoidOverlapWith": ["navigation"]
+          },
+          "priority": 3
+        },
+        {
+          "id": "small-side-table",
+          "label": "Small Side Table",
+          "surfaceType": "table",
+          "status": "Live",
+          "description": "Beside the reading chair — within reach but not demanding.",
+          "placementScale": 0.37,
+          "rotationDegrees": 8,
+          "depthLayer": "object",
+          "position": { "xPercent": 42, "yPercent": 72, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.22, "blurPx": 9, "offsetYPercent": 1.2 },
+          "lightingAdjustment": { "warmth": 0.14, "highlight": "lamp" },
+          "safePlacementZone": {
+            "notes": "Table edge near chair arm",
+            "avoidOverlapWith": ["accessibility-targets"]
+          },
+          "priority": 4
+        },
+        {
+          "id": "bookshelf",
+          "label": "Bookshelf",
+          "surfaceType": "bookshelf",
+          "status": "Live",
+          "description": "Shelf ledge between volumes — belongs among stories.",
+          "placementScale": 0.35,
+          "rotationDegrees": -8,
+          "depthLayer": "object",
+          "position": { "xPercent": 18, "yPercent": 38, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.18, "blurPx": 7, "offsetYPercent": 1 },
+          "lightingAdjustment": { "warmth": 0.1, "highlight": "lantern" },
+          "safePlacementZone": {
+            "notes": "Mid shelf — not covering spines members read",
+            "avoidOverlapWith": ["readable-text"]
+          },
+          "priority": 5
+        },
+        {
+          "id": "leather-reading-chair",
+          "label": "Leather Reading Chair",
+          "surfaceType": "chair",
+          "status": "Live",
+          "description": "Key on chair arm — intimate, as if someone just stood up.",
+          "placementScale": 0.33,
+          "rotationDegrees": 5,
+          "depthLayer": "object",
+          "position": { "xPercent": 50, "yPercent": 68, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.2, "blurPx": 8, "offsetYPercent": 1.1 },
+          "lightingAdjustment": { "warmth": 0.11, "highlight": "lamp" },
+          "safePlacementZone": {
+            "notes": "Arm rest only",
+            "avoidOverlapWith": ["conversation-panel"]
+          },
+          "priority": 6
+        }
+      ],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "roomId": "greenhouse",
+      "officialName": "Greenhouse™",
+      "status": "Live",
+      "sceneImage": "/backgrounds/greenhouse-background.png",
+      "preferredLightingNotes": "Diffused glass light with warm amber at bench level. Kinsey asleep remains undisturbed — key never on sleeping cat.",
+      "defaultPlacementScale": 0.42,
+      "safeArea": {
+        "description": "Benches, pots, and stone ledges in lower two-thirds of scene.",
+        "excludeZones": ["conversation-panel", "folded-map", "glass-sky-focal"],
+        "paddingPercent": { "top": 12, "right": 10, "bottom": 18, "left": 10 }
+      },
+      "visibilityRules": {
+        "maxKeysVisible": 1,
+        "gentleGlowAfterUnnoticedVisits": 3,
+        "neverBlock": ["buttons", "artwork-focal", "navigation", "text", "accessibility-targets"]
+      },
+      "seasonalVariants": [
+        {
+          "seasonId": "spring",
+          "label": "Spring greenhouse",
+          "sceneImage": "/backgrounds/greenhouse-background.png",
+          "lightingNotes": "Flower pot and window shelf favored when blooms are visible.",
+          "enabledLocationIds": ["flower-pot", "window-shelf", "garden-bench"]
+        }
+      ],
+      "approvedLocations": [
+        {
+          "id": "garden-bench",
+          "label": "Garden Bench",
+          "surfaceType": "bench",
+          "status": "Live",
+          "description": "Key beside seed tray — patient, hopeful.",
+          "placementScale": 0.4,
+          "rotationDegrees": -5,
+          "depthLayer": "object",
+          "position": { "xPercent": 36, "yPercent": 70, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.22, "blurPx": 9, "offsetYPercent": 1.3 },
+          "lightingAdjustment": { "warmth": 0.16, "highlight": "daylight" },
+          "safePlacementZone": {
+            "notes": "Bench seat edge",
+            "avoidOverlapWith": ["conversation-panel"]
+          },
+          "priority": 1
+        },
+        {
+          "id": "potting-table",
+          "label": "Potting Table",
+          "surfaceType": "potting-table",
+          "status": "Live",
+          "description": "Among soil and trays — work-in-progress feeling.",
+          "placementScale": 0.38,
+          "rotationDegrees": 10,
+          "depthLayer": "object",
+          "position": { "xPercent": 62, "yPercent": 64, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.2, "blurPx": 8, "offsetYPercent": 1.1 },
+          "lightingAdjustment": { "warmth": 0.12, "highlight": "daylight" },
+          "safePlacementZone": {
+            "notes": "Corner of potting surface",
+            "avoidOverlapWith": ["buttons"]
+          },
+          "priority": 2
+        },
+        {
+          "id": "stone-wall",
+          "label": "Stone Wall",
+          "surfaceType": "stone-wall",
+          "status": "Live",
+          "description": "Ledge where wall meets glass — grounded.",
+          "placementScale": 0.36,
+          "rotationDegrees": -12,
+          "depthLayer": "object",
+          "position": { "xPercent": 14, "yPercent": 52, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.18, "blurPx": 7, "offsetYPercent": 0.9 },
+          "lightingAdjustment": { "warmth": 0.1, "highlight": "daylight" },
+          "safePlacementZone": {
+            "notes": "Flat stone ledge",
+            "avoidOverlapWith": ["artwork-focal"]
+          },
+          "priority": 3
+        },
+        {
+          "id": "flower-pot",
+          "label": "Flower Pot",
+          "surfaceType": "flower-pot",
+          "status": "Live",
+          "description": "Key tucked beside terracotta — seasonal charm.",
+          "placementScale": 0.34,
+          "rotationDegrees": 6,
+          "depthLayer": "object",
+          "position": { "xPercent": 78, "yPercent": 76, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.2, "blurPx": 8, "offsetYPercent": 1 },
+          "lightingAdjustment": { "warmth": 0.14, "highlight": "daylight" },
+          "safePlacementZone": {
+            "notes": "Pot rim — not obscuring plant",
+            "avoidOverlapWith": ["navigation"]
+          },
+          "priority": 4,
+          "seasonalOnly": "spring"
+        },
+        {
+          "id": "window-shelf",
+          "label": "Window Shelf",
+          "surfaceType": "windowsill",
+          "status": "Live",
+          "description": "Glass-edge shelf with soft light on brass.",
+          "placementScale": 0.35,
+          "rotationDegrees": -4,
+          "depthLayer": "object",
+          "position": { "xPercent": 88, "yPercent": 48, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.16, "blurPx": 6, "offsetYPercent": 0.8 },
+          "lightingAdjustment": { "warmth": 0.1, "highlight": "daylight" },
+          "safePlacementZone": {
+            "notes": "Shelf beside pane",
+            "avoidOverlapWith": ["readable-text"]
+          },
+          "priority": 5
+        }
+      ],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "roomId": "reflection-pond",
+      "officialName": "Reflection Pond™",
+      "status": "Draft",
+      "sceneImage": "/backgrounds/water-seat-at-pond-background.png",
+      "preferredLightingNotes": "Still water reflections — key reads warm against cool pond; lantern optional at dusk seasonal art.",
+      "defaultPlacementScale": 0.38,
+      "safeArea": {
+        "description": "Benches, dock, and stones only — never on water surface or over chat.",
+        "excludeZones": ["conversation-panel", "pond-center-focal", "folded-map"],
+        "paddingPercent": { "top": 10, "right": 8, "bottom": 14, "left": 8 }
+      },
+      "visibilityRules": {
+        "maxKeysVisible": 1,
+        "gentleGlowAfterUnnoticedVisits": 4,
+        "neverBlock": ["buttons", "artwork-focal", "navigation", "text", "accessibility-targets"]
+      },
+      "seasonalVariants": [],
+      "approvedLocations": [
+        {
+          "id": "wooden-bench",
+          "label": "Wooden Bench",
+          "surfaceType": "bench",
+          "status": "Live",
+          "description": "Key on bench slat — invitation to sit.",
+          "placementScale": 0.37,
+          "rotationDegrees": 7,
+          "depthLayer": "object",
+          "position": { "xPercent": 46, "yPercent": 68, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.2, "blurPx": 8, "offsetYPercent": 1.1 },
+          "lightingAdjustment": { "warmth": 0.1, "highlight": "daylight" },
+          "safePlacementZone": { "notes": "Bench arm", "avoidOverlapWith": ["conversation-panel"] },
+          "priority": 1
+        },
+        {
+          "id": "dock-railing",
+          "label": "Dock Railing",
+          "surfaceType": "railing",
+          "status": "Live",
+          "description": "Key on flat rail post — overlooking still water.",
+          "placementScale": 0.36,
+          "rotationDegrees": -8,
+          "depthLayer": "object",
+          "position": { "xPercent": 72, "yPercent": 58, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.18, "blurPx": 7, "offsetYPercent": 0.9 },
+          "lightingAdjustment": { "warmth": 0.08, "highlight": "daylight" },
+          "safePlacementZone": { "notes": "Flat rail cap", "avoidOverlapWith": ["navigation"] },
+          "priority": 2
+        },
+        {
+          "id": "flat-rock",
+          "label": "Flat Rock",
+          "surfaceType": "rock",
+          "status": "Live",
+          "description": "Natural stone ledge near shore.",
+          "placementScale": 0.34,
+          "rotationDegrees": 4,
+          "depthLayer": "object",
+          "position": { "xPercent": 28, "yPercent": 78, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.16, "blurPx": 6, "offsetYPercent": 0.7 },
+          "lightingAdjustment": { "warmth": 0.06, "highlight": "daylight" },
+          "safePlacementZone": { "notes": "Dry rock only", "avoidOverlapWith": ["pond-center-focal"] },
+          "priority": 3
+        },
+        {
+          "id": "bridge-post",
+          "label": "Bridge Post",
+          "surfaceType": "bridge",
+          "status": "Live",
+          "description": "Key on wooden post cap at bridge entry.",
+          "placementScale": 0.35,
+          "rotationDegrees": -6,
+          "depthLayer": "object",
+          "position": { "xPercent": 58, "yPercent": 54, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.18, "blurPx": 7, "offsetYPercent": 0.9 },
+          "lightingAdjustment": { "warmth": 0.09, "highlight": "lantern" },
+          "safePlacementZone": { "notes": "Post top", "avoidOverlapWith": ["buttons"] },
+          "priority": 4
+        }
+      ],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "roomId": "music-room",
+      "officialName": "Music Room",
+      "status": "Draft",
+      "sceneImage": "/backgrounds/music-room-background.png",
+      "preferredLightingNotes": "Piano lamp warmth. Key catches soft brass glint — never compete with sheet music focal.",
+      "defaultPlacementScale": 0.4,
+      "safeArea": {
+        "description": "Furniture surfaces near seating and piano — not on keyboard.",
+        "excludeZones": ["conversation-panel", "piano-keys", "folded-map"],
+        "paddingPercent": { "top": 10, "right": 8, "bottom": 16, "left": 8 }
+      },
+      "visibilityRules": {
+        "maxKeysVisible": 1,
+        "gentleGlowAfterUnnoticedVisits": 3,
+        "neverBlock": ["buttons", "artwork-focal", "navigation", "text", "accessibility-targets"]
+      },
+      "seasonalVariants": [],
+      "approvedLocations": [
+        {
+          "id": "end-table",
+          "label": "End Table",
+          "surfaceType": "table",
+          "status": "Live",
+          "description": "Beside listening chair.",
+          "placementScale": 0.38,
+          "rotationDegrees": 9,
+          "depthLayer": "object",
+          "position": { "xPercent": 32, "yPercent": 70, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.22, "blurPx": 8, "offsetYPercent": 1.2 },
+          "lightingAdjustment": { "warmth": 0.15, "highlight": "lamp" },
+          "safePlacementZone": { "notes": "Table corner", "avoidOverlapWith": ["conversation-panel"] },
+          "priority": 1
+        },
+        {
+          "id": "chair-arm",
+          "label": "Chair Arm",
+          "surfaceType": "chair",
+          "status": "Live",
+          "description": "Arm of listening chair.",
+          "placementScale": 0.34,
+          "rotationDegrees": 5,
+          "depthLayer": "object",
+          "position": { "xPercent": 48, "yPercent": 66, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.18, "blurPx": 7, "offsetYPercent": 1 },
+          "lightingAdjustment": { "warmth": 0.12, "highlight": "lamp" },
+          "safePlacementZone": { "notes": "Arm rest", "avoidOverlapWith": ["accessibility-targets"] },
+          "priority": 2
+        },
+        {
+          "id": "audio-cabinet",
+          "label": "Audio Cabinet",
+          "surfaceType": "audio-cabinet",
+          "status": "Live",
+          "description": "Cabinet top beside speakers.",
+          "placementScale": 0.36,
+          "rotationDegrees": -7,
+          "depthLayer": "object",
+          "position": { "xPercent": 76, "yPercent": 58, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.2, "blurPx": 8, "offsetYPercent": 1.1 },
+          "lightingAdjustment": { "warmth": 0.1, "highlight": "lamp" },
+          "safePlacementZone": { "notes": "Cabinet surface", "avoidOverlapWith": ["buttons"] },
+          "priority": 3
+        },
+        {
+          "id": "shelf",
+          "label": "Shelf",
+          "surfaceType": "shelf",
+          "status": "Live",
+          "description": "Sheet music shelf ledge.",
+          "placementScale": 0.35,
+          "rotationDegrees": -4,
+          "depthLayer": "object",
+          "position": { "xPercent": 64, "yPercent": 44, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.16, "blurPx": 6, "offsetYPercent": 0.8 },
+          "lightingAdjustment": { "warmth": 0.08, "highlight": "lamp" },
+          "safePlacementZone": { "notes": "Shelf edge", "avoidOverlapWith": ["readable-text"] },
+          "priority": 4
+        }
+      ],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "roomId": "observatory",
+      "officialName": "Observatory™",
+      "status": "Draft",
+      "sceneImage": null,
+      "preferredLightingNotes": "Low warm lamp at desk; horizon windows stay cool. Key brass picks up hearth or desk lamp only.",
+      "defaultPlacementScale": 0.39,
+      "safeArea": {
+        "description": "Research surfaces and shelves — not on telescope eyepiece.",
+        "excludeZones": ["conversation-panel", "telescope-focal", "folded-map"],
+        "paddingPercent": { "top": 10, "right": 8, "bottom": 14, "left": 8 }
+      },
+      "visibilityRules": {
+        "maxKeysVisible": 1,
+        "gentleGlowAfterUnnoticedVisits": 3,
+        "neverBlock": ["buttons", "artwork-focal", "navigation", "text", "accessibility-targets"]
+      },
+      "seasonalVariants": [],
+      "approvedLocations": [
+        {
+          "id": "telescope-table",
+          "label": "Telescope Table",
+          "surfaceType": "telescope-table",
+          "status": "Live",
+          "description": "Beside telescope base — curiosity without clutter.",
+          "placementScale": 0.37,
+          "rotationDegrees": 8,
+          "depthLayer": "object",
+          "position": { "xPercent": 54, "yPercent": 62, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.2, "blurPx": 8, "offsetYPercent": 1.1 },
+          "lightingAdjustment": { "warmth": 0.1, "highlight": "lamp" },
+          "safePlacementZone": { "notes": "Table corner away from eyepiece", "avoidOverlapWith": ["telescope-focal"] },
+          "priority": 1
+        },
+        {
+          "id": "window-ledge",
+          "label": "Window Ledge",
+          "surfaceType": "windowsill",
+          "status": "Live",
+          "description": "Horizon window ledge.",
+          "placementScale": 0.35,
+          "rotationDegrees": -5,
+          "depthLayer": "object",
+          "position": { "xPercent": 82, "yPercent": 40, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.16, "blurPx": 6, "offsetYPercent": 0.8 },
+          "lightingAdjustment": { "warmth": 0.06, "highlight": "daylight" },
+          "safePlacementZone": { "notes": "Ledge only", "avoidOverlapWith": ["navigation"] },
+          "priority": 2
+        },
+        {
+          "id": "book-shelf",
+          "label": "Book Shelf",
+          "surfaceType": "bookshelf",
+          "status": "Live",
+          "description": "Curated stack shelf.",
+          "placementScale": 0.34,
+          "rotationDegrees": -9,
+          "depthLayer": "object",
+          "position": { "xPercent": 22, "yPercent": 48, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.18, "blurPx": 7, "offsetYPercent": 0.9 },
+          "lightingAdjustment": { "warmth": 0.1, "highlight": "lamp" },
+          "safePlacementZone": { "notes": "Shelf ledge", "avoidOverlapWith": ["readable-text"] },
+          "priority": 3
+        },
+        {
+          "id": "cabinet",
+          "label": "Cabinet",
+          "surfaceType": "cabinet",
+          "status": "Live",
+          "description": "Research cabinet top.",
+          "placementScale": 0.36,
+          "rotationDegrees": 6,
+          "depthLayer": "object",
+          "position": { "xPercent": 38, "yPercent": 66, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.2, "blurPx": 8, "offsetYPercent": 1 },
+          "lightingAdjustment": { "warmth": 0.11, "highlight": "lamp" },
+          "safePlacementZone": { "notes": "Cabinet surface", "avoidOverlapWith": ["buttons"] },
+          "priority": 4
+        }
+      ],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "roomId": "sunroom",
+      "officialName": "Sunroom",
+      "status": "Live",
+      "sceneImage": "/backgrounds/sunroom-background.png",
+      "preferredLightingNotes": "Pond-view daylight with warm mug highlights. Key on table or sill — never on Shari's chair.",
+      "defaultPlacementScale": 0.4,
+      "safeArea": {
+        "description": "Side tables, sill, and shelf surfaces — preserve pond focal center.",
+        "excludeZones": ["conversation-panel", "pond-focal", "shari-chair", "folded-map"],
+        "paddingPercent": { "top": 10, "right": 8, "bottom": 16, "left": 8 }
+      },
+      "visibilityRules": {
+        "maxKeysVisible": 1,
+        "gentleGlowAfterUnnoticedVisits": 3,
+        "neverBlock": ["buttons", "artwork-focal", "navigation", "text", "accessibility-targets"]
+      },
+      "seasonalVariants": [],
+      "approvedLocations": [
+        {
+          "id": "side-table",
+          "label": "Side Table",
+          "surfaceType": "table",
+          "status": "Live",
+          "description": "Near Spark mugs — homelike.",
+          "placementScale": 0.38,
+          "rotationDegrees": 7,
+          "depthLayer": "object",
+          "position": { "xPercent": 30, "yPercent": 72, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.22, "blurPx": 8, "offsetYPercent": 1.2 },
+          "lightingAdjustment": { "warmth": 0.14, "highlight": "daylight" },
+          "safePlacementZone": { "notes": "Table beside seating", "avoidOverlapWith": ["conversation-panel"] },
+          "priority": 1
+        },
+        {
+          "id": "windowsill",
+          "label": "Window Sill",
+          "surfaceType": "windowsill",
+          "status": "Live",
+          "description": "Pond-view sill.",
+          "placementScale": 0.36,
+          "rotationDegrees": -4,
+          "depthLayer": "object",
+          "position": { "xPercent": 70, "yPercent": 46, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.16, "blurPx": 6, "offsetYPercent": 0.8 },
+          "lightingAdjustment": { "warmth": 0.1, "highlight": "daylight" },
+          "safePlacementZone": { "notes": "Sill edge", "avoidOverlapWith": ["pond-focal"] },
+          "priority": 2
+        },
+        {
+          "id": "bookshelf-ledge",
+          "label": "Bookshelf",
+          "surfaceType": "bookshelf",
+          "status": "Live",
+          "description": "Low shelf near plants.",
+          "placementScale": 0.34,
+          "rotationDegrees": -6,
+          "depthLayer": "object",
+          "position": { "xPercent": 16, "yPercent": 56, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.18, "blurPx": 7, "offsetYPercent": 0.9 },
+          "lightingAdjustment": { "warmth": 0.1, "highlight": "lamp" },
+          "safePlacementZone": { "notes": "Shelf ledge", "avoidOverlapWith": ["readable-text"] },
+          "priority": 3
+        }
+      ],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "roomId": "conservatory",
+      "officialName": "The Ocean Conservatory™",
+      "status": "Draft",
+      "sceneImage": "/backgrounds/the-ocean-conservatory-background.png",
+      "preferredLightingNotes": "Underwater calm with soft blue; key warmed by nearby chair lamp — estate-light-flicker compatible.",
+      "defaultPlacementScale": 0.38,
+      "safeArea": {
+        "description": "Chair side tables and recliner arms — not on glass focal.",
+        "excludeZones": ["conversation-panel", "reef-focal", "folded-map"],
+        "paddingPercent": { "top": 10, "right": 8, "bottom": 16, "left": 8 }
+      },
+      "visibilityRules": {
+        "maxKeysVisible": 1,
+        "gentleGlowAfterUnnoticedVisits": 4,
+        "neverBlock": ["buttons", "artwork-focal", "navigation", "text", "accessibility-targets"]
+      },
+      "seasonalVariants": [],
+      "approvedLocations": [
+        {
+          "id": "recliner-side-table",
+          "label": "Side Table",
+          "surfaceType": "table",
+          "status": "Live",
+          "description": "Between reclining chairs.",
+          "placementScale": 0.36,
+          "rotationDegrees": 6,
+          "depthLayer": "object",
+          "position": { "xPercent": 44, "yPercent": 70, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.2, "blurPx": 8, "offsetYPercent": 1.1 },
+          "lightingAdjustment": { "warmth": 0.12, "highlight": "lamp" },
+          "safePlacementZone": { "notes": "Table surface", "avoidOverlapWith": ["conversation-panel"] },
+          "priority": 1
+        },
+        {
+          "id": "recliner-arm",
+          "label": "Chair Arm",
+          "surfaceType": "chair",
+          "status": "Live",
+          "description": "Recliner armrest.",
+          "placementScale": 0.34,
+          "rotationDegrees": 4,
+          "depthLayer": "object",
+          "position": { "xPercent": 58, "yPercent": 66, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.18, "blurPx": 7, "offsetYPercent": 1 },
+          "lightingAdjustment": { "warmth": 0.1, "highlight": "lamp" },
+          "safePlacementZone": { "notes": "Arm only", "avoidOverlapWith": ["accessibility-targets"] },
+          "priority": 2
+        },
+        {
+          "id": "glass-sill",
+          "label": "Glass Ledge",
+          "surfaceType": "windowsill",
+          "status": "Live",
+          "description": "Narrow ledge beside glass wall.",
+          "placementScale": 0.33,
+          "rotationDegrees": -3,
+          "depthLayer": "object",
+          "position": { "xPercent": 84, "yPercent": 50, "anchor": "center" },
+          "shadow": { "enabled": true, "opacity": 0.14, "blurPx": 6, "offsetYPercent": 0.7 },
+          "lightingAdjustment": { "warmth": 0.08, "highlight": "daylight" },
+          "safePlacementZone": { "notes": "Ledge only", "avoidOverlapWith": ["reef-focal"] },
+          "priority": 3
+        }
+      ],
+      "lastUpdated": "2026-07-06"
+    }
+  ]
 }

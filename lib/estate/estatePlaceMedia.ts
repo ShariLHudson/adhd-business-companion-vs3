@@ -143,11 +143,7 @@ export const CANONICAL_PLACE_BACKGROUND_FALLBACKS: Readonly<
   "celebration-room": [
     estateBackgroundPath("space-celebration-garden-background.png"),
   ],
-  conservatory: [
-    estateBackgroundPath("the-ocean-conservatory-background.png"),
-    estateBackgroundPath("greenhouse-background.png"),
-    estateBackgroundPath("sunroom-background.png"),
-  ],
+  conservatory: [estateBackgroundPath("sunroom-background.png")],
   "clear-my-mind": [estateBackgroundPath("greenhouse-background.png")],
   library: [
     estateBackgroundPath("room-library-personal-background.png"),

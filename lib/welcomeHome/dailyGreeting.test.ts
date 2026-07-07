@@ -34,4 +34,13 @@ describe("evaluateWelcomeHomeExperience", () => {
     expect(plan.showIntro).toBe(false);
     expect(plan.greeting).toBeTruthy();
   });
+
+  it("skips intro on repeat login", () => {
+    const plan = evaluateWelcomeHomeExperience({
+      hasSeenWelcomeIntro: false,
+      isRepeatLogin: true,
+    });
+    expect(plan.showIntro).toBe(false);
+    expect(plan.visitorKind).toBe("returning");
+  });
 });

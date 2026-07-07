@@ -4,7 +4,7 @@
 
 | | |
 |---|---|
-| **Status** | Foundational — rules active; library not populated |
+| **Status** | Foundational — structure + seeded Live cross-references |
 | **Constitution** | [Discovery Key Constitution](./discovery-key/DiscoveryKey-Constitution.md) |
 | **Behavior** | [Discovery Key Behavior](./discovery-key/DiscoveryKey-Behavior.md) |
 | **Library** | [discovery-library.json](./discovery-library.json) |
@@ -93,7 +93,15 @@ Full guardrails: [Discovery Key Constitution](./discovery-key/DiscoveryKey-Const
 
 ## Population policy
 
-`discovery-library.json` remains **empty** until registry items are populated with Live entries. Do not seed discoveries that reference undefined targets.
+`discovery-library.json` is the **content engine** for Discovery Key™ (v2). Records must reference **Live** targets in Estate Intelligence registries.
+
+| Phase | Action |
+|-------|--------|
+| **V1** | JSON library + `lib/estateDiscovery/` runtime; seed Live cross-references only |
+| **Add discovery** | Insert a record in `discovery-library.json` — no code change |
+| **Before Live** | Run `validateDiscoveryLibrary()` — target must exist and be Live |
+
+See [DISCOVERY_LIBRARY.md](./DISCOVERY_LIBRARY.md).
 
 ---
 

@@ -410,9 +410,9 @@ const PLAY: EstateKnowledgeEntry = {
   experienceId: "play",
   spaceId: "game-room",
   primarySection: "games",
-  capabilities: ["Games", "Music Room", "Art Studio", "Butterfly Conservatory"],
-  suggestedActivities: ["Play a game", "Visit the conservatory", "Make art"],
-  tools: ["Games", "Art Studio", "Music Room", "Butterfly Conservatory"],
+  capabilities: ["Games", "Music Room", "Art Studio", "Ocean Conservatory"],
+  suggestedActivities: ["Play a game", "Visit the ocean conservatory", "Make art"],
+  tools: ["Games", "Art Studio", "Music Room", "Ocean Conservatory"],
   relatedSpaceIds: ["art-studio", "conservatory", "music-room", "celebration-room"],
   triggers: [
     "play",

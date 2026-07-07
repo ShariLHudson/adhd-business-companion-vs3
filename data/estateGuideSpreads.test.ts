@@ -439,12 +439,40 @@ describe("estateGuideSpreads", () => {
     const legacyIndex = ids.indexOf("house-possibility-legacy-room");
     const coffeeHouseIndex = ids.indexOf("coffee-house");
     const oceanIndex = ids.indexOf("ocean-conservatory");
+    const swingIndex = ids.indexOf("the-swing-beneath-the-oak");
     expect(discoveryIndex).toBeGreaterThanOrEqual(0);
     expect(houseIndex).toBeGreaterThan(discoveryIndex);
     expect(coffeeHouseIndex).toBeGreaterThan(discoveryIndex);
     expect(oceanIndex).toBeGreaterThan(coffeeHouseIndex);
-    expect(houseIndex).toBe(oceanIndex + 1);
+    expect(swingIndex).toBe(oceanIndex + 1);
+    expect(houseIndex).toBe(swingIndex + 1);
     expect(legacyIndex).toBe(ids.length - 1);
+  });
+
+  it("includes Swing Beneath the Oak guide spread before Treehouse section", () => {
+    const spread = getEstateGuideSpread("the-swing-beneath-the-oak");
+    expect(spread).toBeDefined();
+    expect(spread!.title).toMatch(/Swing Beneath the Oak/i);
+    expect(spread!.epigraph).toMatch(/heart remembers/i);
+    expect(spread!.imagePlaceId).toBe("the-swing-beneath-the-oak");
+    expect(spread!.blocks.some((block) => block.type === "why-this-room-exists")).toBe(
+      true,
+    );
+    expect(spread!.blocks.some((block) => block.type === "estate-secret")).toBe(true);
+    expect(
+      spread!.blocks.some(
+        (block) =>
+          block.type === "estate-secret" &&
+          block.paragraphs.some((p) => /SW loves RH/i.test(p)),
+      ),
+    ).toBe(true);
+    expect(
+      spread!.blocks.some(
+        (block) =>
+          block.type === "reflection" &&
+          block.attribution?.some((line) => /spark/i.test(line)),
+      ),
+    ).toBe(true);
   });
 
   it("includes Ocean Conservatory guide spread before Treehouse section", () => {

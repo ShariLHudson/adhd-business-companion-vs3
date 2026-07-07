@@ -8,14 +8,14 @@ import {
 } from "./index";
 
 describe("Room Composition Rule", () => {
-  it("maps Clear My Mind to Garden Conservatory", () => {
+  it("maps Clear My Mind to the original sunroom place slot", () => {
     expect(placeForWorkspace("clear-my-mind")).toBe("greenhouse");
   });
 
-  it("keeps signature feature at the top for the conservatory", () => {
+  it("keeps garden light on the right edge in the sunroom", () => {
     const verdict = evaluateRoomComposition({ workspaceId: "clear-my-mind" });
-    expect(verdict.signatureFeature.visibleZone).toBe("top");
-    expect(verdict.backgroundObjectPosition).toContain("45%");
+    expect(verdict.signatureFeature.visibleZone).toBe("right");
+    expect(verdict.backgroundObjectPosition).toContain("40%");
   });
 
   it("forbids hero features in center zone", () => {
@@ -36,7 +36,7 @@ describe("Room Composition Rule", () => {
       workspaceId: "clear-my-mind",
       mobile: true,
     });
-    expect(mobile.protectedConversationZone.maxWidth).toBe("min(100%, 31.25rem)");
+    expect(mobile.protectedConversationZone.maxWidth).toBe("min(100%, 30rem)");
     expect(Number(mobile.cssVars["--room-protected-zone-expand"])).toBeGreaterThan(
       Number(desktop.cssVars["--room-protected-zone-expand"]),
     );

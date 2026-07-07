@@ -2,7 +2,7 @@
 
 import { useEffect, type CSSProperties, type ReactNode } from "react";
 import { CinematicBackground } from "@/components/companion/scene/CinematicBackground";
-import { OceanConservatoryAquariumLife } from "@/components/companion/estate/OceanConservatoryAquariumLife";
+import { OCEAN_CONSERVATORY_VIDEO } from "@/lib/oceanConservatory/media";
 import { CompanionObjectVisual } from "@/components/companion/CompanionObjectVisual";
 import { LivingBorderFrame } from "@/components/companion/LivingBorderFrame";
 import {
@@ -72,10 +72,15 @@ export function SceneRenderer({
       ? roomBackgroundImageStyle(background.imageUrl)
       : undefined;
 
-  const showOceanAquariumLife =
+  const isOceanConservatoryScene =
     background.mode === "photo-scene" &&
     (isOceanConservatoryRoom(resolved.environment.placeId) ||
       isOceanConservatoryBackground(background.imageUrl));
+
+  const sceneVideoUrl =
+    isOceanConservatoryScene
+      ? OCEAN_CONSERVATORY_VIDEO
+      : background.videoUrl;
 
   return (
     <div
@@ -87,20 +92,21 @@ export function SceneRenderer({
       {/* Background layer — masked, dominance-capped; never in center zone */}
       {background.mode !== "none" ? (
         <div className={layout.backgroundClassName} aria-hidden="true">
-          {background.mode === "photo-scene" && background.videoUrl ? (
+          {background.mode === "photo-scene" && sceneVideoUrl ? (
             <CinematicBackground
               preset={cinematicPreset}
               mode="video"
-              videoSrc={background.videoUrl}
+              videoSrc={sceneVideoUrl}
               poster={background.imageUrl}
               placement="absolute"
               className="cinematic-background--scene-video"
               mediaClassName="companion-scene-fade"
+              showBottomFade={!isOceanConservatoryScene}
             />
           ) : null}
           {background.mode === "photo-scene" &&
           background.imageUrl &&
-          !background.videoUrl ? (
+          !sceneVideoUrl ? (
             <CinematicBackground
               preset={cinematicPreset}
               mode="image"
@@ -115,11 +121,6 @@ export function SceneRenderer({
             style={{ background: background.overlay }}
           />
           <div className={SCENE_BG_MASK_CLASS} />
-          {showOceanAquariumLife ? (
-            <OceanConservatoryAquariumLife
-              backgroundImageUrl={background.imageUrl}
-            />
-          ) : null}
         </div>
       ) : null}
 

@@ -148,6 +148,7 @@ export function outcomeThreadHintForChat(thread: OutcomeThread | null): string |
   }
   parts.push(
     "FORBIDDEN after user says yes/sure/okay: 'What would you like help with?', 'How can I help you today?', or any conversation reset.",
+    "Most Recent Meaning Wins: generic yes binds to the last assistant offer — not stale reminders.",
     "REQUIRED after acceptance: continue the workflow with the next concrete step — pass context, do not restart.",
   );
   return parts.join("\n");

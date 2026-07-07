@@ -78,6 +78,15 @@ describe("Welcome Home returning user — experience integration", () => {
     expect(welcomeHomeWalkPaused(firstVisitCinematic, true)).toBe(false);
   });
 
+  it("repeat login skips intro even when local intro flag is unset", () => {
+    const plan = evaluateWelcomeHomeExperience({
+      hasSeenWelcomeIntro: false,
+      isRepeatLogin: true,
+    });
+    expect(plan.visitorKind).toBe("returning");
+    expect(plan.showIntro).toBe(false);
+  });
+
   it("hero asset points at welcome-home-background", () => {
     expect(WELCOME_ROOM_ASSET).toBe(WELCOME_HOME_BACKGROUND);
     expect(WELCOME_ROOM_ASSET).toMatch(/welcome-home-background\.png/);

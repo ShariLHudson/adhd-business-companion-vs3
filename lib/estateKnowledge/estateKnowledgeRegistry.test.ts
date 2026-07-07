@@ -146,7 +146,7 @@ describe("estateKnowledgeRegistry", () => {
     expect(formatted).toMatch(/Planned\/non-walkable offered in wander menu/);
     expect(formatted).toMatch(/Registry places missing media/);
 
-    expect(report.counts.totalPlaces).toBe(81);
+    expect(report.counts.totalPlaces).toBe(82);
   });
 
   it("records Phase 1 audit counts snapshot", () => {
@@ -155,15 +155,15 @@ describe("estateKnowledgeRegistry", () => {
     expect(report.counts).toMatchInlineSnapshot(`
       {
         "broken": 19,
-        "chatCanDescribe": 53,
+        "chatCanDescribe": 54,
         "features": 134,
         "hidden": 2,
         "live": 33,
-        "planned": 27,
-        "totalPlaces": 81,
+        "planned": 28,
+        "totalPlaces": 82,
         "walkable": 50,
         "withBrainEntry": 18,
-        "withGuidebook": 45,
+        "withGuidebook": 46,
       }
     `);
   });

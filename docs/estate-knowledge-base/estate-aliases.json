@@ -69,6 +69,30 @@
       "status": "Live"
     },
     {
+      "phrase": "ocean aquarium",
+      "locationId": "conservatory",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the ocean aquarium",
+      "locationId": "conservatory",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "aquarium",
+      "locationId": "conservatory",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the aquarium",
+      "locationId": "conservatory",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
       "phrase": "conservatory",
       "locationId": "conservatory",
       "matchType": "approved",

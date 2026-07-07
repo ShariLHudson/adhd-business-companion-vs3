@@ -73,12 +73,14 @@ export function unlockBrowserAudioFromClick(): boolean {
 
   try {
     const audio = new Audio(SILENT_WAV);
-    audio.volume = 0.001;
+    audio.volume = 0;
+    audio.muted = true;
     const playPromise = audio.play();
     if (playPromise !== undefined) {
       void playPromise
         .then(() => {
           audio.pause();
+          audio.currentTime = 0;
         })
         .catch(() => {
           /* gesture may still have unlocked the document */
@@ -87,28 +89,14 @@ export function unlockBrowserAudioFromClick(): boolean {
     markSessionUnlocked();
     return true;
   } catch {
-    return false;
+    markSessionUnlocked();
+    return true;
   }
 }
 
 export async function unlockBrowserAudio(): Promise<boolean> {
   if (typeof window === "undefined") return false;
   if (isWelcomeAudioSessionUnlocked()) return true;
-  unlockBrowserAudioFromClick();
-  if (isWelcomeAudioSessionUnlocked()) return true;
-
-  try {
-    const ctx = new AudioContext();
-    const buffer = ctx.createBuffer(1, 1, 22050);
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.connect(ctx.destination);
-    source.start(0);
-    await ctx.resume();
-    await ctx.close();
-    markSessionUnlocked();
-    return true;
-  } catch {
-    return false;
-  }
+  /* Without a live user gesture, avoid AudioContext clicks — unlock only via click. */
+  return false;
 }

@@ -233,9 +233,9 @@ function resolveBackground(
         mode: "photo-scene",
         imageUrl: CLEAR_MY_MIND_CONSERVATORY_BG,
         scenePage: "recovery",
-        seed: "garden-conservatory",
-        overlay: "rgba(255, 252, 245, 0.06)",
-        objectPosition: "center center",
+        seed: "original-sunroom",
+        overlay: "rgba(255, 248, 232, 0.05)",
+        objectPosition: "center 42%",
         fit: "cover-safe-crop",
         dominanceCap: 1,
       };

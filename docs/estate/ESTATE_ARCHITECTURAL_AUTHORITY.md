@@ -8,7 +8,7 @@
 
 ---
 
-## The three authorities
+## The four authorities
 
 These documents **define Spark Estate**. They are not reference material, inspiration, or optional reading.
 
@@ -17,14 +17,16 @@ These documents **define Spark Estate**. They are not reference material, inspir
 | **1** | [01 — Spark Estate Constitution](./01%20-%20Spark%20Estate%20Constitution.md) | **Principles** — what must never break |
 | **2** | [Living in Spark Estate](./Living%20in%20Spark%20Estate.md) | **Experience** — how the Estate feels and behaves |
 | **3** | [Spark Estate Bible](./Spark%20Estate%20Bible.md) | **Canon** — what is true (places, objects, language, rules) |
+| **4** | [Master World Bible](./SPARK_ESTATE_MASTER_WORLD_BIBLE.md) | **Operational canon** — timeline, lore, laws, guide standards, Spark knowledge obligations |
 
-**Read together.** No single document overrides the other two on its domain:
+**Read together.** No single document overrides the others on its domain:
 
 - **Constitution** wins on moral law and immutable articles.  
 - **Experience Guide** wins on feeling, presence, silence, discovery.  
 - **Bible** wins on vocabulary, place types, objects, seasons, and the Spark Estate Test.
+- **Master World Bible** wins on timeline consistency, encyclopedia completeness, guide structure, and Law 4 (Spark knows the Estate).
 
-If all three agree and legacy code or docs disagree → **change the code**, not the canon.
+If all four agree and legacy code or docs disagree → **change the code**, not the canon.
 
 ---
 
@@ -116,11 +118,12 @@ Question arises
     → Constitution (principles)
     → Experience Guide (feeling)
     → Bible (facts, language, places)
+    → Master World Bible (timeline, lore, guide standards, Law 4)
     → Cleanup Roadmap (how to simplify toward alignment)
     → Code
 ```
 
-Legacy behavior that fails the three authorities is **debt to remove**, not precedent to preserve.
+Legacy behavior that fails the authorities is **debt to remove**, not precedent to preserve.
 
 ---
 

@@ -296,9 +296,7 @@ export function CompanionSignInForm({
         onProcessingChange?.(false);
         return;
       }
-      recordAuthLoginSuccess("google");
-      onProcessingChange?.(false);
-      onSuccess?.("google");
+      /* Browser navigates to Google — session completes on return to /companion/login. */
     } catch {
       setError("Google sign-in didn't work. Please try again.");
       authInFlightRef.current = false;

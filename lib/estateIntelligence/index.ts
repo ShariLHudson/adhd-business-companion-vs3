@@ -12,3 +12,4 @@ export * from "./estateConversationPipeline";
 export * from "./v3BehaviorRecovery";
 export * from "./estateCommandAliases";
 export * from "./estateCommandRouter";
+export * from "./judgment";

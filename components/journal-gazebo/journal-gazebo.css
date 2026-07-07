@@ -3060,6 +3060,10 @@
 }
 
 .journal-gazebo .journal-gazebo__estate-guide.spark-estate-guide-anchor {
+  top: auto;
+  right: auto;
+  bottom: var(--estate-chrome-bottom-left-inset-y);
+  left: var(--estate-chrome-bottom-left-inset-x);
   z-index: 100001;
 }
 

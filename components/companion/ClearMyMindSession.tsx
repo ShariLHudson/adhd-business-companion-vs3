@@ -336,7 +336,7 @@ export function ClearMyMindSession({
           aria-live="polite"
           data-testid="share-capture-button"
           data-share-confirming={shareConfirming ? "true" : "false"}
-          className={`clear-my-mind-hold-btn rounded-2xl px-7 py-3 text-base font-semibold text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1e4f4f]/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed ${
+          className={`clear-my-mind-release-btn focus:outline-none focus-visible:ring-2 focus-visible:ring-[#c4a882]/35 focus-visible:ring-offset-2 disabled:cursor-not-allowed ${
             shareConfirming ? "is-confirming" : ""
           }`}
         >

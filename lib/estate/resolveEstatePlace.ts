@@ -36,6 +36,7 @@ import { toCanonicalEstatePlace } from "./directory";
 import { extractRoomPhraseFromNavigation } from "./estateRoomAliasRegistry";
 import { formatEstatePlaceSuggestionMenu } from "./estatePlaceIdentityLock";
 import { isCelebrationSoundsIntent } from "./estatePlaceNavigationIntents";
+import { tryKnowledgeBasePlaceResolution } from "@/lib/estateNavigationIntelligence/bridge";
 
 export type EstatePlaceResolutionKind =
   | "exact-place"
@@ -429,6 +430,11 @@ export function resolveEstatePlace(
   const text = userText.trim();
   if (!text) {
     return { kind: "none", confidence: "low", reason: "empty text" };
+  }
+
+  const knowledgeBaseNav = tryKnowledgeBasePlaceResolution(text);
+  if (knowledgeBaseNav && knowledgeBaseNav.kind !== "none") {
+    return knowledgeBaseNav;
   }
 
   if (isCelebrationSoundsIntent(text)) {

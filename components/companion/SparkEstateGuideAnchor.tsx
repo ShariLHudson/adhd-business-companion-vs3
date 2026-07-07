@@ -10,7 +10,7 @@ type Props = {
   className?: string;
 };
 
-/** Bottom-right guidebook anchor — always visible companion chrome. */
+/** Bottom-left guidebook anchor — standard position on every companion surface. */
 export function SparkEstateGuideAnchor({ onClick, className }: Props) {
   return (
     <button
@@ -19,6 +19,7 @@ export function SparkEstateGuideAnchor({ onClick, className }: Props) {
       onClick={onClick}
       aria-label={SPARK_ESTATE_GUIDE_COVER_ALT}
       data-testid="spark-estate-guide-anchor"
+      data-estate-chrome-position="bottom-left"
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img

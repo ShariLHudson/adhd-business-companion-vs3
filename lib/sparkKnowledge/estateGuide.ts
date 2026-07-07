@@ -7,11 +7,20 @@ import {
   matchCanonicalPlaceInText,
 } from "@/lib/estate/canonicalEstateRegistry";
 import {
+  describeEstatePlace,
+  evaluateEstateJudgment,
+  isEstateJudgmentQuery,
+} from "@/lib/estateIntelligence/judgment";
+import {
   allEstateBrainEntries,
   estateBrainExperiences,
 } from "@/lib/estateBrain/knowledgeRegistry";
 import { searchEstateBrain } from "@/lib/estateBrain/search";
 import { isCreateFlowAssistantContext } from "@/lib/universalCreation/createFlowContext";
+import {
+  isRetrieveIntent,
+  isTemplateIntent,
+} from "@/lib/conversationStabilization/goalClassifier";
 import { THINKING_FRAMEWORKS } from "./thinkingFrameworkRegistry";
 import { UNIVERSAL_DOCUMENT_LABELS } from "./creationKnowledge";
 import type { EstateGuideTopic, EstateGuideTurnResult } from "./types";
@@ -50,7 +59,7 @@ export function isInformationalAdhdQuestion(text: string): boolean {
 }
 
 const ORIENTATION_WHAT_IS_RE =
-  /\bwhat(?:'s| is) (?:the )?(?:butterfly conservatory|conservatory|estate|spark estate)\b/i;
+  /\bwhat(?:'s| is) (?:the )?(?:ocean conservatory|butterfly conservatory|conservatory|estate|spark estate)\b/i;
 
 const ROOM_STORY_RE =
   /\b(?:tell me about|what is|what's|why was|history of|what(?:'s| is) special about)\s+(?:the\s+)?(.+)/i;
@@ -74,6 +83,7 @@ export function isEstateGuideQuestion(
 ): boolean {
   const t = text.trim();
   if (!t) return false;
+  if (isRetrieveIntent(t) || isTemplateIntent(t)) return false;
   if (CREATE_DISCOVERY_ADHD_PITCH_RE.test(t)) return false;
   if (
     lastAssistantText?.trim() &&
@@ -88,6 +98,7 @@ export function isEstateGuideQuestion(
   if (MEMBER_ADHD_SHARING_RE.test(t)) return true;
   if (isEstateOrientationQuestion(t)) return true;
   if (isEstateRoomStoryQuestion(t)) return true;
+  if (isEstateJudgmentQuery(t)) return true;
   return false;
 }
 
@@ -201,7 +212,7 @@ function roomStoryBody(placeId: string): string {
   const brain = searchEstateBrain(place?.officialName ?? placeId).best?.entry;
 
   if (!place && !brain) {
-    return "I'm not sure which place you mean — can you say the name again?";
+    return describeEstatePlace(placeId);
   }
 
   const name = place?.officialName ?? brain!.name;
@@ -243,10 +254,46 @@ function roomStoryBody(placeId: string): string {
   return parts.join("\n");
 }
 
-export function resolveEstateGuideTurn(userText: string): EstateGuideTurnResult {
+export type EstateGuideTurnOptions = {
+  currentPlaceId?: string | null;
+  visitedPlaceIds?: readonly string[];
+};
+
+export function resolveEstateGuideTurn(
+  userText: string,
+  options?: EstateGuideTurnOptions,
+): EstateGuideTurnResult {
   const topic = detectGuideTopic(userText);
   const placeMatch = matchCanonicalPlaceInText(userText);
   const placeId = placeMatch?.id;
+
+  const tryIntelligence =
+    topic === "rooms" ||
+    topic === "room_story" ||
+    isEstateJudgmentQuery(userText);
+
+  if (tryIntelligence) {
+    const intelligence = evaluateEstateJudgment({
+      userText,
+      currentPlaceId: options?.currentPlaceId,
+      visitedPlaceIds: options?.visitedPlaceIds,
+    });
+    if (intelligence.handled) {
+      const resolvedTopic: EstateGuideTopic = intelligence.signals.wantsRoomStory
+        ? "room_story"
+        : intelligence.signals.wantsCatalog
+          ? "rooms"
+          : topic;
+      return {
+        topic: resolvedTopic,
+        intro: intelligence.intro,
+        body: intelligence.body,
+        suggestions: [...intelligence.suggestions],
+        matchedPlaceId: intelligence.matchedPlaceId ?? placeId,
+        responseHint: intelligence.responseHint,
+      };
+    }
+  }
 
   let intro = "Happy to walk you through the Estate.";
   let body: string;
@@ -258,7 +305,7 @@ export function resolveEstateGuideTurn(userText: string): EstateGuideTurnResult 
         ? `Ah, ${getCanonicalEstatePlaceById(placeId)?.officialName ?? "that place"}.`
         : "Let me tell you about that place.";
       body = placeId ? roomStoryBody(placeId) : roomsGuideBody();
-      suggestions.push("Visit there", "Stay here", "Show me the Estate map");
+      suggestions.push("That sounds good", "Stay here", "Show me the Estate map");
       break;
     case "capabilities":
       body = capabilitiesGuideBody();
@@ -303,6 +350,7 @@ export function resolveEstateGuideTurn(userText: string): EstateGuideTurnResult 
       "ESTATE GUIDE (mandatory):",
       `Topic: ${topic}.`,
       "Speak as Shari who has lived here for years — warm, conversational, never a feature list or software tour.",
+      "Rule of Gentle Guidance: recommend, never direct. No Go to / Open / Launch.",
       "Do NOT read markdown headings aloud. Do NOT number five options.",
       "One primary invitation at most. Member chooses.",
       placeId ? `Matched place: ${placeId}.` : "",

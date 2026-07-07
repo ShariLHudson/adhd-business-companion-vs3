@@ -3870,47 +3870,78 @@
   margin-right: auto;
 }
 
-/* ── Clear My Mind cognitive relief ── */
+/* ── Clear My Mind — Original Sunroom ── */
 .clear-my-mind-capture::placeholder {
-  color: #8a8178;
+  color: #a39588;
   font-style: italic;
 }
 
+.clear-my-mind-journal-field {
+  min-height: 10rem;
+  padding: 0.15rem 0.1rem 0.35rem;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  font-size: clamp(1.05rem, 2.4vw, 1.2rem);
+  line-height: 1.65;
+  color: #3d342c;
+}
+
+.clear-my-mind-journal-field:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.clear-my-mind-release-btn,
 .clear-my-mind-hold-btn {
-  background: #1e4f4f;
-  box-shadow: 0 4px 16px rgba(30, 79, 79, 0.28);
-  min-height: 3rem;
+  border: 0;
+  border-radius: 999px;
+  padding: 0.55rem 1.15rem;
+  font-size: 0.95rem;
+  font-weight: 550;
+  letter-spacing: 0.01em;
+  color: #5c4a38;
+  background: rgba(196, 168, 130, 0.22);
+  box-shadow: 0 2px 10px rgba(88, 68, 48, 0.06);
+  min-height: auto;
   transition:
-    background 0.15s ease,
-    box-shadow 0.15s ease,
-    transform 0.1s ease;
+    background 0.2s ease,
+    box-shadow 0.2s ease,
+    transform 0.12s ease,
+    color 0.2s ease;
 }
 
+.clear-my-mind-release-btn:hover:not(:disabled),
 .clear-my-mind-hold-btn:hover:not(:disabled) {
-  background: #163c3c;
-  box-shadow: 0 6px 20px rgba(30, 79, 79, 0.34);
+  background: rgba(196, 168, 130, 0.32);
+  box-shadow: 0 4px 14px rgba(88, 68, 48, 0.08);
+  color: #4a3b2c;
 }
 
+.clear-my-mind-release-btn:active:not(:disabled),
 .clear-my-mind-hold-btn:active:not(:disabled) {
   transform: scale(0.98);
 }
 
+.clear-my-mind-release-btn:disabled,
 .clear-my-mind-hold-btn:disabled {
-  background: #b8c9c7;
+  background: rgba(210, 200, 188, 0.35);
+  color: #9a9086;
   box-shadow: none;
   opacity: 1;
 }
 
+.clear-my-mind-release-btn.is-confirming,
 .clear-my-mind-hold-btn.is-confirming {
-  background: #2a6565;
-  box-shadow: 0 2px 14px rgba(30, 79, 79, 0.22);
-  transition:
-    background 0.35s ease,
-    box-shadow 0.35s ease;
+  background: rgba(168, 196, 168, 0.28);
+  color: #4a5c48;
+  box-shadow: 0 2px 12px rgba(74, 92, 72, 0.08);
 }
 
+.clear-my-mind-release-btn.is-confirming:disabled,
 .clear-my-mind-hold-btn.is-confirming:disabled {
-  background: #2a6565;
+  background: rgba(168, 196, 168, 0.28);
+  color: #4a5c48;
   opacity: 1;
 }
 
@@ -3918,7 +3949,7 @@
   align-items: flex-start;
 }
 
-/* ── Clear My Mind Garden Conservatory ── */
+/* ── Clear My Mind — room shell ── */
 .clear-my-mind-standalone-shell,
 .clear-my-mind-standalone-frame,
 .clear-my-mind-room-shell {
@@ -3950,16 +3981,17 @@
   opacity: 1;
   background-size: cover;
   background-repeat: no-repeat;
+  background-position: center 42%;
 }
 
 .companion-scene-root--clear-my-mind .companion-scene-bg__mask,
 .companion-scene-root--clear-my-mind-thoughts .companion-scene-bg__mask,
 .companion-scene-root--room-greenhouse .companion-scene-bg__mask {
   background: radial-gradient(
-    ellipse 34% 40% at 50% 48%,
-    rgba(255, 252, 247, 0.16) 0%,
-    rgba(255, 252, 247, 0.05) 54%,
-    transparent 78%
+    ellipse 52% 58% at 50% 44%,
+    rgba(255, 252, 247, 0.1) 0%,
+    rgba(255, 252, 247, 0.03) 58%,
+    transparent 84%
   );
 }
 
@@ -3967,22 +3999,106 @@
 .companion-scene-root--clear-my-mind-thoughts .companion-scene-bg__wash,
 .companion-scene-root--room-greenhouse .companion-scene-bg__wash {
   background: linear-gradient(
-    160deg,
-    rgba(232, 238, 246, 0.1) 0%,
-    rgba(252, 246, 236, 0.08) 55%,
-    rgba(248, 242, 232, 0.05) 100%
+    145deg,
+    rgba(255, 236, 200, 0.14) 0%,
+    rgba(255, 252, 245, 0.08) 42%,
+    rgba(228, 238, 218, 0.06) 100%
   );
+}
+
+/* Warm sunlight + soft glass reflections — one continuous sunroom */
+.companion-scene-root--clear-my-mind::before,
+.companion-scene-root--clear-my-mind-thoughts::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background:
+    linear-gradient(
+      108deg,
+      transparent 34%,
+      rgba(255, 255, 255, 0.07) 46%,
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 78% 55% at 74% 16%,
+      rgba(255, 228, 168, 0.32) 0%,
+      transparent 58%
+    ),
+    radial-gradient(
+      ellipse 55% 45% at 14% 24%,
+      rgba(255, 248, 220, 0.18) 0%,
+      transparent 52%
+    );
+}
+
+.companion-scene-root--clear-my-mind::after,
+.companion-scene-root--clear-my-mind-thoughts::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0.28;
+  background:
+    radial-gradient(circle at 18% 28%, rgba(255, 255, 255, 0.35) 0 1px, transparent 2px),
+    radial-gradient(circle at 82% 34%, rgba(255, 248, 220, 0.28) 0 1px, transparent 2px);
+  animation: clear-my-mind-sunroom-drift 72s linear infinite;
+}
+
+@keyframes clear-my-mind-sunroom-drift {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-1%, -1.5%, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .companion-scene-root--clear-my-mind::after,
+  .companion-scene-root--clear-my-mind-thoughts::after {
+    animation: none;
+  }
 }
 
 .companion-scene-root--clear-my-mind .companion-scene-center,
 .companion-scene-root--clear-my-mind-thoughts .companion-scene-center {
-  width: min(100%, clamp(26.25rem, 92vw, 31.25rem));
-  padding: 0.75rem 0 2rem;
+  width: min(100%, clamp(25rem, 90vw, 30rem));
+  padding: 1rem 0 2.25rem;
 }
 
 .companion-scene-root--clear-my-mind .companion-scene-panel,
 .companion-scene-root--clear-my-mind-thoughts .companion-scene-panel {
-  padding: 1.1rem 1.15rem 1.25rem;
+  border: none;
+  border-radius: 1.85rem;
+  padding: clamp(1.15rem, 2.8vw, 1.65rem);
+  background: linear-gradient(
+    168deg,
+    rgba(255, 251, 244, 0.74) 0%,
+    rgba(252, 246, 236, 0.6) 100%
+  );
+  backdrop-filter: blur(20px) saturate(1.04);
+  -webkit-backdrop-filter: blur(20px) saturate(1.04);
+  box-shadow:
+    0 22px 52px rgba(58, 48, 38, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82),
+    inset 0 -1px 0 rgba(212, 198, 178, 0.12);
+}
+
+.companion-scene-root--clear-my-mind .companion-scene-panel.companion-glass-panel,
+.companion-scene-root--clear-my-mind-thoughts
+  .companion-scene-panel.companion-glass-panel {
+  border: none;
+  background: linear-gradient(
+    168deg,
+    rgba(255, 251, 244, 0.74) 0%,
+    rgba(252, 246, 236, 0.6) 100%
+  );
+  box-shadow:
+    0 22px 52px rgba(58, 48, 38, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
 .companion-scene-root--clear-my-mind .companion-scene-motion,
@@ -3990,34 +4106,51 @@
   display: none;
 }
 
-.clear-my-mind-conservatory-workspace__nav {
-  margin-bottom: 0.65rem;
+/* Journal page inside the sunroom panel */
+.clear-my-mind-sunroom-workspace__nav {
+  margin-bottom: 0.35rem;
+  opacity: 0.88;
 }
 
-.clear-my-mind-conservatory-workspace__title {
+.clear-my-mind-sunroom-workspace__opening {
+  margin-bottom: 0.35rem;
+}
+
+.clear-my-mind-sunroom-workspace__whisper {
   margin: 0;
-  font-size: clamp(1.35rem, 3.5vw, 1.65rem);
-  font-weight: 650;
-  letter-spacing: -0.02em;
-  color: #243528;
-}
-
-.clear-my-mind-conservatory-workspace__subtitle {
-  margin: 0.35rem 0 0;
-  font-size: 1rem;
+  font-size: 0.92rem;
   line-height: 1.5;
-  color: #3d4f3f;
+  font-style: italic;
+  color: #8a7d70;
 }
 
-.clear-my-mind-conservatory-workspace__welcome {
-  margin: 0.85rem 0 0;
-  font-size: 0.95rem;
-  line-height: 1.55;
-  color: #4a5648;
+.clear-my-mind-sunroom-workspace__title {
+  margin: 0.45rem 0 0;
+  font-size: clamp(1.15rem, 2.8vw, 1.35rem);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #4a4038;
 }
 
-.clear-my-mind-conservatory-workspace__body {
-  margin-top: 1rem;
+.clear-my-mind-sunroom-workspace__lead {
+  margin: 0.65rem 0 0;
+  font-size: 0.98rem;
+  line-height: 1.62;
+  color: #6b6156;
+}
+
+.clear-my-mind-sunroom-workspace__body {
+  margin-top: 0.85rem;
+}
+
+.clear-my-mind-capture-card {
+  border-radius: 1rem;
+  padding: 0.35rem 0.15rem 0.15rem;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 252, 246, 0.42) 0%,
+    rgba(255, 248, 238, 0.18) 100%
+  );
 }
 
 .clear-my-mind-input-card {
@@ -4030,39 +4163,18 @@
 .clear-my-mind-save-row {
   display: flex;
   justify-content: flex-start;
+  margin-top: 0.15rem;
 }
 
 .clear-my-mind-support-line {
-  margin-top: 0.55rem;
-  padding-left: 0;
-  font-size: 0.82rem;
+  margin-top: 0.5rem;
+  padding-left: 0.05rem;
+  font-size: 0.84rem;
   font-style: italic;
-  color: #6f7a6c;
+  color: #9a8f82;
 }
 
-/* Future-ready: subtle conservatory life at the edges */
-.companion-scene-root--clear-my-mind::after,
-.companion-scene-root--clear-my-mind-thoughts::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 2;
-  opacity: 0.35;
-  background:
-    radial-gradient(circle at 12% 22%, rgba(255, 255, 255, 0.45) 0 1px, transparent 2px),
-    radial-gradient(circle at 88% 30%, rgba(255, 248, 220, 0.35) 0 1px, transparent 2px);
-  animation: clear-my-mind-conservatory-drift 56s linear infinite;
-}
-
-@keyframes clear-my-mind-conservatory-drift {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(-1.5%, -2%, 0);
-  }
-}
+/* Legacy class aliases — kept for older references */
 
 /* ── Clear My Mind — Garden Conservatory full-viewport room ── */
 .companion-clear-my-mind-active {
@@ -7184,9 +7296,9 @@
 
 .clear-my-mind-result-card {
   border-radius: 1rem;
-  border: 1px solid rgba(231, 223, 212, 0.9);
-  background: rgba(255, 255, 255, 0.92);
-  box-shadow: 0 4px 16px rgba(31, 28, 25, 0.05);
+  border: 0;
+  background: rgba(255, 252, 246, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(212, 198, 178, 0.35);
   overflow: hidden;
 }
 
@@ -7272,12 +7384,12 @@
 }
 
 .clear-my-mind-suggestions__label {
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: #9a8f82;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: #a89888;
   margin-bottom: 0.5rem;
+  text-transform: none;
 }
 
 .clear-my-mind-suggestions__list {
@@ -7289,23 +7401,24 @@
 .clear-my-mind-suggestions__btn {
   text-align: left;
   border-radius: 0.85rem;
-  border: 1px solid #e4ddd2;
-  background: white;
-  padding: 0.75rem 1rem;
-  font-size: 0.95rem;
-  color: #1e4f4f;
-  box-shadow: 0 2px 10px rgba(31, 28, 25, 0.04);
+  border: 0;
+  background: rgba(255, 252, 246, 0.65);
+  padding: 0.7rem 0.95rem;
+  font-size: 0.94rem;
+  color: #5c4a38;
+  box-shadow: inset 0 0 0 1px rgba(212, 198, 178, 0.35);
 }
 
 .clear-my-mind-suggestions__btn:hover {
-  background: #f0f8f8;
+  background: rgba(255, 248, 238, 0.85);
 }
 
 .clear-my-mind-memory-permission {
   margin-top: 1rem;
   border-radius: 1rem;
-  border: 1px solid #e4ddd2;
-  background: #fff8ef;
+  border: 0;
+  background: rgba(255, 248, 238, 0.72);
+  box-shadow: inset 0 0 0 1px rgba(212, 198, 178, 0.35);
   padding: 1rem;
 }
 
@@ -7324,8 +7437,8 @@
 
 .clear-my-mind-memory-permission__yes {
   border-radius: 9999px;
-  background: #1e4f4f;
-  color: white;
+  background: rgba(196, 168, 130, 0.28);
+  color: #5c4a38;
   font-size: 0.85rem;
   font-weight: 600;
   padding: 0.45rem 0.9rem;
@@ -7334,9 +7447,10 @@
 
 .clear-my-mind-memory-permission__no {
   border-radius: 9999px;
-  border: 1px solid #d4cdc3;
-  background: white;
-  color: #6b635a;
+  border: 0;
+  box-shadow: inset 0 0 0 1px rgba(212, 198, 178, 0.45);
+  background: rgba(255, 252, 246, 0.65);
+  color: #7a7064;
   font-size: 0.85rem;
   font-weight: 600;
   padding: 0.45rem 0.9rem;
@@ -8824,7 +8938,7 @@
   }
 }
 
-/* ── Login background (welcome-home-background) — Welcome Home room ── */
+/* ── Login background (welcome-home-front-door) — estate threshold ── */
 
 .companion-login-page--welcome-bg {
   background: transparent;

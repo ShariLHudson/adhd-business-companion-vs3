@@ -12,10 +12,13 @@ import {
   inferMeaningTopicFromFrictionlessPending,
   recentAssistantOfferOverridesPendingMenu,
 } from "@/lib/conversation/mostRecentMeaningWins";
+import { isEmotionalSupportThread } from "@/lib/conversation/emotionalDistressRouting";
+import { hasHardEstateNavigationIntent } from "@/lib/estate/estateMetaNavigationPhrases";
 import { isBareGenericAcceptance } from "@/lib/pendingAcceptanceAuthority";
 import type { FrictionlessPendingAction } from "@/lib/frictionlessActionLayer";
 import {
   isCreateWorkflowContinuation,
+  isPendingMenuMetaQuestion,
 } from "@/lib/pendingChoice/listContinuation";
 import {
   isLikelyMenuSelectionInput,
@@ -95,19 +98,20 @@ export function stalePendingsToClearOnTopicShift(
   const restoration = isRestorationUserTurn(userText);
   const createShift = isCreateTopicUserTurn(userText);
 
+  const roomRequest = hasHardEstateNavigationIntent(userText);
+  const newTaskShift = restoration || createShift || roomRequest;
+
   if (input.frictionlessPending) {
     const pendingTopic = inferMeaningTopicFromFrictionlessPending(
       input.frictionlessPending,
     );
-    if (pendingTopic === "create" && restoration) {
+    if (pendingTopic === "create" && newTaskShift) {
       toClear.push("frictionless");
     }
   }
 
-  if (input.pendingChoiceState?.choices.length) {
-    if (restoration || createShift) {
-      toClear.push("pending_choice");
-    }
+  if (input.pendingChoiceState?.choices.length && newTaskShift) {
+    toClear.push("pending_choice");
   }
 
   return toClear;
@@ -206,6 +210,7 @@ function isClearMenuSelection(input: ConversationPriorityInput): boolean {
   const state = input.pendingChoiceState;
   if (!state?.choices.length) return false;
   const trimmed = input.userText.trim();
+  if (isPendingMenuMetaQuestion(trimmed)) return false;
   if (parsePendingChoiceSelection(trimmed, state.choices)) return true;
   if (
     isLikelyMenuSelectionInput(trimmed, state.choices.length) &&
@@ -268,6 +273,25 @@ export function resolveConversationPriority(
         deferPendingChoice: true,
         deferFrictionlessYes: true,
         reason: "active_universal_creation_yes",
+      },
+      clears,
+    );
+  }
+
+  if (
+    isEmotionalSupportThread(userText, lastAssistant) &&
+    !(input.hasUniversalCreationSession && continuationKind)
+  ) {
+    const clears: StalePendingKind[] = [...topicShiftClears];
+    if (input.frictionlessPending) clears.push("frictionless");
+    if (input.pendingChoiceState?.choices.length) clears.push("pending_choice");
+    return baseVerdict(
+      {
+        winner: "emotional_support",
+        bindAffirmationTo: "last_assistant",
+        deferPendingChoice: true,
+        deferFrictionlessYes: true,
+        reason: "emotional_need_outranks_unrelated_tasks",
       },
       clears,
     );

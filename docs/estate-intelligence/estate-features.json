@@ -26,5 +26,52 @@
     "searchTags": "string[]",
     "lastUpdated": "string"
   },
-  "items": []
+  "items": [
+    {
+      "id": "clear-my-mind",
+      "officialName": "Clear My Mind™",
+      "category": "capture",
+      "description": "Continuous thought capture for mental relief — separate from organizing.",
+      "purpose": "Unload racing thoughts without finishing or filing anything.",
+      "status": "Live",
+      "route": "/companion?section=brain-dump",
+      "image": "/backgrounds/sunroom-background.png",
+      "relatedRooms": ["clear-my-mind", "conservatory"],
+      "relatedFeatures": [],
+      "relatedDiscoveries": ["DISC-013"],
+      "relatedSparkCards": [],
+      "relatedMomentumActivities": [],
+      "primaryMemberProblemSolved": "Mental overload",
+      "memberBenefits": ["Relief", "Continuous capture", "No shame"],
+      "recommendedWhen": "Overwhelm or need to vent thoughts",
+      "navigationDestination": "/companion?section=brain-dump",
+      "buttonText": "Show Me How",
+      "keywords": ["clear my mind", "capture", "brain dump"],
+      "searchTags": ["feature", "capture", "relief"],
+      "lastUpdated": "2026-07-06"
+    },
+    {
+      "id": "create",
+      "officialName": "Create",
+      "category": "creation",
+      "description": "Draft and create with Spark — permission before showing finished work.",
+      "purpose": "Support creation without rushing to deliverables.",
+      "status": "Future",
+      "route": "/companion?section=content-generator",
+      "image": "/backgrounds/room-create-studio-background.png",
+      "relatedRooms": ["creative-studio"],
+      "relatedFeatures": [],
+      "relatedDiscoveries": ["DISC-017"],
+      "relatedSparkCards": [],
+      "relatedMomentumActivities": [],
+      "primaryMemberProblemSolved": "Need to make something with guidance",
+      "memberBenefits": ["Draft support", "Permission-first review"],
+      "recommendedWhen": "Member is ready to create",
+      "navigationDestination": "/companion?section=content-generator",
+      "buttonText": "Show Me How",
+      "keywords": ["create", "draft", "studio"],
+      "searchTags": ["feature", "create"],
+      "lastUpdated": "2026-07-06"
+    }
+  ]
 }

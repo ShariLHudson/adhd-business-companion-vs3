@@ -5,7 +5,7 @@
 import type { EstateResearchLevel } from "./intelligenceTypes";
 
 const RESEARCH_INTENT_RE =
-  /\b(?:research|look up|look into|find out|investigate|explore (?:the|what)|study (?:the|up on))\b/i;
+  /\b(?:research|look up|look into|find out|investigate|explore (?:the|what)|study (?:the|up on)|compare|competitors?|pricing|ideas? for)\b/i;
 
 export function isResearchIntent(userText: string): boolean {
   const t = userText.trim();

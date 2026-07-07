@@ -59,8 +59,8 @@ export const WELCOME_HOME_AUDIO_PROFILE: WelcomeAudioProfile = {
   id: "welcome-home",
   timeline: {
     silenceMs: 0,
-    musicStartMs: WELCOME_ROOM_PLAY_MUSIC_START_MS,
-    voiceStartMs: 250,
+    musicStartMs: Number.MAX_SAFE_INTEGER,
+    voiceStartMs: 0,
   },
   voice: {
     id: "welcome-home-founder-welcome",

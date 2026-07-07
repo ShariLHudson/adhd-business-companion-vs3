@@ -59,7 +59,7 @@ export function ClearMyMindCaptureCard({
           onVoiceUsed={onVoiceUsed}
           voiceProminent={false}
           placeholder={CLEAR_MY_MIND_INPUT_PLACEHOLDER}
-          inputClassName="clear-my-mind-capture clear-my-mind-capture--expand w-full resize-none rounded-xl border border-[#e8e0d4]/80 bg-white/55 px-3 py-2.5 text-base leading-relaxed text-[#1f1c19] outline-none min-h-[9rem] shadow-none focus:border-[#1e4f4f]/35 focus:ring-2 focus:ring-[#1e4f4f]/10"
+          inputClassName="clear-my-mind-capture clear-my-mind-capture--expand clear-my-mind-journal-field w-full resize-none outline-none"
           micTitle="Speak what's on your mind"
         />
         {supportLine ? (

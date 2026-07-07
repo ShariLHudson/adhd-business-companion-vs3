@@ -9,6 +9,10 @@ import { isRegistryArtifactExecution } from "@/lib/artifactRegistry";
 import { detectDirectCommand } from "@/lib/estateIntelligence/estateCommandRouter";
 import { shouldEnterDiscoveryMode } from "@/lib/estateBrain/discoveryMode";
 import { isResearchIntent } from "@/lib/estateBrain/researchRouting";
+import {
+  isRetrieveIntent,
+  isTemplateIntent,
+} from "@/lib/conversationStabilization/goalClassifier";
 import { isKnowledgeQuestion } from "@/lib/knowledgeIntelligence";
 import { isEstateGuideQuestion } from "@/lib/sparkKnowledge/estateGuide";
 import { shouldEnterUniversalCreation } from "@/lib/universalCreation";
@@ -82,6 +86,7 @@ function taskRequest(text: string): boolean {
 }
 
 function informationOrResearch(text: string): boolean {
+  if (isRetrieveIntent(text) || isTemplateIntent(text)) return true;
   if (isResearchIntent(text)) return true;
   if (isKnowledgeQuestion(text)) return true;
   if (INFORMATION_RE.test(text)) return true;

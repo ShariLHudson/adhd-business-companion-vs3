@@ -1,29 +1,29 @@
 # Estate Intelligence System™
 
-**Spark Estate's single source of truth**
+**Operational extensions for Discovery Key™ and placement**
 
 | | |
 |---|---|
-| **Status** | Foundational — structure only (not populated) |
-| **Parent** | [Estate Intelligence Architecture](../estate/ESTATE_INTELLIGENCE_ARCHITECTURE.md) · [Discovery Key Constitution](./discovery-key/DiscoveryKey-Constitution.md) |
-| **Runtime (future)** | `lib/estateIntelligence/` · `lib/estateBrain/` |
+| **Status** | Active — subsystem extensions |
+| **Source of truth** | **[Estate Knowledge Base™](../estate-knowledge-base/README.md)** |
+| **Runtime** | `lib/estateKnowledgeBase/` · `lib/estateDiscovery/` |
 
 ---
 
 ## Purpose
 
-This folder is Spark Estate's **brain** — the master documentation that describes every room, feature, tool, route, destination, and experience inside Spark Estate.
+This folder holds **Discovery Key™ subsystem** data — discovery content, placement coordinates, and behavior specs.
 
-| Consumer | Uses Estate Intelligence for |
-|----------|------------------------------|
-| **Spark Companion** | Accurate answers about places and capabilities |
-| **Discovery Key™** | Gentle recommendations (Live items only) |
-| **Momentum** | Opening features and activities |
-| **Onboarding** | Explaining what exists and why |
-| **Navigation** | Routes, destinations, button text |
-| **Future Companion Intelligence** | Unified world model |
+**Permanent estate knowledge** lives in **[Estate Knowledge Base™](../estate-knowledge-base/README.md)**.
 
-> Nothing in the application should **invent** functionality. Everything should reference this system.
+| Consumer | Primary source |
+|----------|----------------|
+| **All intelligent systems** | [Estate Knowledge Base™](../estate-knowledge-base/README.md) |
+| **Discovery Key™** | Knowledge Base + `discovery-library.json` + `room-placement-library.json` |
+| **Spark Companion** | `lib/estateKnowledgeBase/` |
+| **Momentum™ / Spark Cards™** | Knowledge Base mapping files |
+
+> Nothing in the application should **invent** functionality. Everything references the Knowledge Base.
 
 ---
 
@@ -38,7 +38,8 @@ This folder is Spark Estate's **brain** — the master documentation that descri
     estate-tools.json              ← Tools and utilities
     estate-settings.json           ← Settings and shortcuts
     estate-routes.json             ← Routes and navigation destinations
-    discovery-library.json         ← Discovery Key notes (when populated)
+    discovery-library.json         ← Discovery Key content engine (v2)
+    DISCOVERY_LIBRARY.md           ← Discovery Library architecture
     discovery-rules.md             ← How Discovery Key reads this system
     room-placement-library.json    ← In-scene placement metadata (when populated)
     discovery-key/
@@ -123,8 +124,9 @@ Runtime code should read registries — not hard-code estate knowledge in prompt
 
 | Phase | Action |
 |-------|--------|
-| **Now** | Structure and documentation only — empty `items` arrays |
-| **Next** | Populate from Estate Bible, canonical places, and live routes |
+| **Now** | Structure + seeded Live cross-references in registries and discovery library |
+| **Next** | Expand from Estate Bible, canonical places, and live routes |
+| **Placement** | [room-placement-library.json](./room-placement-library.json) — approved Discovery Key surfaces per room |
 | **Ongoing** | One official name per thing; status on every entry; Live gate for Discovery Key |
 
 Do not duplicate estate canon from `docs/estate/` — **reference and index** it here.

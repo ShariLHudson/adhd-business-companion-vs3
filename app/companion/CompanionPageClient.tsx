@@ -12,6 +12,11 @@ import { propertyNavComingSoonMessage } from "@/lib/companionPropertyNav";
 import { EstateArrivalHost } from "@/components/companion/estate/EstateArrivalHost";
 import { EstatePlaceAudioHost } from "@/components/companion/estate/EstatePlaceAudioHost";
 import { EstatePresence } from "@/components/companion/estate/EstatePresence";
+import { DiscoveryKeyHost } from "@/components/estate/discovery/DiscoveryKeyHost";
+import {
+  buildDiscoveryMemberContextFromEstateMemory,
+  getDiscoveryMemberId,
+} from "@/lib/estateDiscovery";
 import { EstateTopRightChrome } from "@/components/companion/estate/EstateTopRightChrome";
 import { SparkEstateGuideChrome } from "@/components/companion/SparkEstateGuideChrome";
 import { EnjoyEstateVisitorChrome } from "@/components/companion/estate/EnjoyEstateVisitorChrome";
@@ -17822,6 +17827,27 @@ export default function CompanionPageClient() {
       !stablesPrimary,
   );
 
+  const discoveryMemberId = useMemo(() => getDiscoveryMemberId(), []);
+
+  const discoveryMemberContext = useMemo(
+    () => {
+      const memory = getEstateMemory();
+      return buildDiscoveryMemberContextFromEstateMemory({
+        roomVisitCounts: memory.roomVisitMemory?.visitCounts ?? {},
+        featuresUsed: [],
+        favoriteRoomIds: memory.roomVisitMemory?.favoriteRoomIds ?? [],
+      });
+    },
+    [activeSection, estatePresenceRoomId],
+  );
+
+  const showDiscoveryKeyHost = Boolean(
+    showGlobalEstatePresence &&
+      estatePresenceRoomId &&
+      estateImmersiveActive &&
+      !overlay,
+  );
+
   const estatePlaceAudioHostPlaceId = resolveEstatePlaceAudioHostPlaceId({
     directEstateVisit,
     showDirectEstateOverlay,
@@ -18016,6 +18042,18 @@ export default function CompanionPageClient() {
       <EstatePlaceAudioHost placeId={estatePlaceAudioHostPlaceId} />
       {showGlobalEstatePresence && estatePresenceRoomId ? (
         <EstatePresence roomId={estatePresenceRoomId} />
+      ) : null}
+      {showDiscoveryKeyHost && estatePresenceRoomId ? (
+        <DiscoveryKeyHost
+          roomId={estatePresenceRoomId}
+          memberId={discoveryMemberId}
+          memberContext={discoveryMemberContext}
+          enabled={showDiscoveryKeyHost}
+          onNavigateSection={openStandaloneFocusSectionCore}
+          onCompanionResponse={(message) => {
+            setMessages((prev) => [...prev, { role: "assistant", content: message }]);
+          }}
+        />
       ) : null}
       <Suspense fallback={null}>
         <CompanionSignInFromQuery onOpen={openSignIn} />

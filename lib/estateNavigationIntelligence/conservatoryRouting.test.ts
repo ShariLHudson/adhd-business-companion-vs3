@@ -4,6 +4,7 @@ import { resolveLocationIntent } from "@/lib/estateKnowledgeBase/locationIntentR
 import { matchAmbiguousLocationTerm } from "./ambiguousLocations";
 import { resolveEstateNavigationIntent } from "./resolveEstateNavigationIntent";
 import { resolveEstateRoutingDecision } from "@/lib/estate/estateRoutingRegistry";
+import { resolveCanonicalPlaceBackgroundCandidates } from "@/lib/estate/estatePlaceMedia";
 
 describe("Conservatory routing precision", () => {
   it("F — ocean conservatory resolves to conservatory not greenhouse", () => {
@@ -38,5 +39,25 @@ describe("Conservatory routing precision", () => {
   it("ocean conservatory does not trigger bare conservatory ambiguity", () => {
     const q = "take me to the ocean conservatory";
     expect(matchAmbiguousLocationTerm(q)).toBeNull();
+  });
+
+  it("aquarium resolves to ocean conservatory", () => {
+    for (const q of [
+      "take me to the aquarium",
+      "go to the aquarium",
+      "aquarium",
+    ]) {
+      expect(matchEstateAlias(q)?.locationId).toBe("conservatory");
+      const nav = resolveEstateNavigationIntent(q, { bypassIntentGate: true });
+      expect(nav.kind).toBe("navigate_direct");
+      expect(nav.locationId).toBe("conservatory");
+      expect(nav.placeId).toBe("conservatory");
+    }
+  });
+
+  it("conservatory background fallbacks never use greenhouse plate", () => {
+    const candidates = resolveCanonicalPlaceBackgroundCandidates("conservatory");
+    expect(candidates.some((url) => url.includes("greenhouse"))).toBe(false);
+    expect(candidates[0]).toContain("the-ocean-conservatory-background");
   });
 });

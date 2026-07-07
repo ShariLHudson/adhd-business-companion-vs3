@@ -1,5 +1,5 @@
 /**
- * Login scene — estate Welcome Home room (same art as post-arrival living room).
+ * Login scene — open estate doors at the Welcome Home threshold.
  */
 
 import { COMPANION_LOGIN_BACKGROUND } from "@/lib/companionLoginPage";
@@ -13,7 +13,7 @@ export const LOGIN_DOORWAY_PRESENCE = {
   sceneAsset: LOGIN_SCENE_ASSET,
 } as const;
 
-/** Legacy doorway zone — porch overlays only; unused on Welcome Home login. */
+/** Doorway glow zone — warm light on the open threshold during sign-in. */
 export const LOGIN_DOORWAY_ZONE = {
   left: 52,
   right: 100,

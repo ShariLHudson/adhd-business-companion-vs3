@@ -12,6 +12,17 @@
   inset: 0;
 }
 
+.estate-room-fullbleed-stack .estate-room-fullbleed-cinematic {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.estate-room-fullbleed-stack .estate-room-fullbleed-cinematic .cinematic-background__media {
+  object-fit: cover;
+  object-position: center center;
+}
+
 .estate-room-fullbleed-bg {
   position: fixed;
   inset: 0;

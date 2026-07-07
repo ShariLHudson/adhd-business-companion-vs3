@@ -18,14 +18,14 @@ export const CINEMATIC_PRESETS: Record<CinematicPresetId, CinematicFraming> = {
     gradientStrength: 1,
   },
   "clear-my-mind": {
-    scale: 1.06,
-    position: "center 45%",
-    gradientStrength: 1,
+    scale: 1.05,
+    position: "center 42%",
+    gradientStrength: 0.72,
   },
   "clear-my-mind-thoughts": {
-    scale: 1.06,
-    position: "center 45%",
-    gradientStrength: 1,
+    scale: 1.05,
+    position: "center 42%",
+    gradientStrength: 0.72,
   },
   "plan-my-day": {
     scale: 1.05,

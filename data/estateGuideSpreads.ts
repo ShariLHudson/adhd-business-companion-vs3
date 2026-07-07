@@ -9,6 +9,7 @@ import type { EstateCollectionRoomId } from "@/lib/estate/collectionFramework/ty
 import type { EstateGuideSpreadData } from "@/lib/estate/estateGuideEditorial";
 import { POSSIBILITY_HOUSE_GUIDE_CHAPTERS } from "./estateGuideSpreads/possibilityHouseSection";
 import { OCEAN_CONSERVATORY_GUIDE_SPREAD } from "./estateGuideSpreads/oceanConservatory";
+import { SWING_BENEATH_THE_OAK_GUIDE_SPREAD } from "./estateGuideSpreads/swingBeneathTheOak";
 
 export type { EstateGuideSpreadData } from "@/lib/estate/estateGuideEditorial";
 export {
@@ -6335,6 +6336,7 @@ export const ESTATE_GUIDE_SPREADS: readonly EstateGuideSpreadData[] = [
     ],
   },
   OCEAN_CONSERVATORY_GUIDE_SPREAD,
+  SWING_BENEATH_THE_OAK_GUIDE_SPREAD,
   // —— The Treehouse Possibility House — dedicated section at the back of the guidebook ——
   ...POSSIBILITY_HOUSE_GUIDE_CHAPTERS,
 ];
@@ -6362,6 +6364,7 @@ export function getEstateGuideSpread(
 /** Canonical place id → guide spread (when ids align or mapped). */
 const GUIDE_SPREAD_BY_PLACE_ID: Readonly<Record<string, string>> = {
   conservatory: "ocean-conservatory",
+  "the-swing-beneath-the-oak": "the-swing-beneath-the-oak",
   "house-possibility-outside": "house-possibility-outside",
   "house-possibility-studio": "house-possibility-studio",
   "house-possibility-reflection-desk": "house-possibility-reflection-desk",

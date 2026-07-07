@@ -6,6 +6,7 @@ export type ConversationPriorityWinner =
   | "accept_last_assistant"
   | "frictionless_pending"
   | "pending_choice"
+  | "emotional_support"
   | "conversation"
   | "none";
 

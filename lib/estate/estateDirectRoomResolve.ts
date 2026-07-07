@@ -39,6 +39,7 @@ export type DirectRoomResolution = {
 const MENU_ACTION_ALIASES: Record<string, EstateMenuActionId> = {
   settings: "settings",
   profile: "estate-profile",
+  "my-profile": "my-profile",
 };
 
 function resolutionFromCanonicalPlace(

@@ -147,24 +147,29 @@ const OUTLOOK_POINT: RoomCompositionEntry = {
 
 const GREENHOUSE: RoomCompositionEntry = {
   placeId: "greenhouse",
-  name: "Garden Conservatory",
+  name: "Original Sunroom",
   signatureFeature: {
-    id: "conservatory-glass",
-    label: "Morning light through glass walls",
-    visibleZone: "top",
+    id: "sunroom-glass",
+    label: "Floor-to-ceiling garden light",
+    visibleZone: "right",
     description:
-      "Plants and butterflies stay at the edges — calm before a single word is written.",
+      "Reading chair, warm lamp, and living plants stay at the edges — one continuous sunroom.",
   },
   edgeLife: {
-    left: ["ferns", "butterfly", "leaves", "planters"],
-    right: ["glass", "garden", "bird", "butterfly", "morning-light"],
-    top: ["glass-roof", "filtered-sunlight", "branches"],
-    bottom: ["flowers", "leaves", "planters"],
+    left: ["indoor-plants", "ferns", "reading-chair", "throw-blanket", "natural-wood"],
+    right: [
+      "floor-to-ceiling-windows",
+      "garden",
+      "soft-glass-reflections",
+      "morning-light",
+    ],
+    top: ["glass-panes", "filtered-sunlight", "branches"],
+    bottom: ["side-table", "warm-lamp", "living-plants", "wood-floor"],
   },
   centerForbidden: CENTER_FORBIDDEN_ELEMENTS,
   motionZones: ["left", "right", "top"],
-  backgroundObjectPosition: "50% 45%",
-  panelFrostedOpacity: 0.46,
+  backgroundObjectPosition: "50% 40%",
+  panelFrostedOpacity: 0.4,
 };
 
 const READING_NOOK: RoomCompositionEntry = {

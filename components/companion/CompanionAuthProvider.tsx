@@ -15,6 +15,7 @@ import { usePathname } from "next/navigation";
 
 import { getAppSiteUrl } from "@/lib/appSite";
 import { isCompanionAuthBypassed } from "@/lib/companionAuthBypass";
+import { recordAuthLoginSuccess } from "@/lib/companionAuthIntelligence";
 import {
   clearCompanionAuthStorage,
   clearCompanionSignedOut,
@@ -251,19 +252,62 @@ async function resetPasswordDirect(
   }
 }
 
+function isOAuthReturnUrl(): boolean {
+  if (typeof window === "undefined") return false;
+  const search = new URLSearchParams(window.location.search);
+  if (search.has("code")) return true;
+  const hash = window.location.hash;
+  return hash.includes("access_token") || hash.includes("error_description");
+}
+
+function scrubOAuthParamsFromLoginUrl(): void {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  url.searchParams.delete("code");
+  url.searchParams.delete("state");
+  url.hash = "";
+  window.history.replaceState({}, "", `${url.pathname}${url.search}`);
+}
+
+async function restoreLoginPageSession(
+  supabase: NonNullable<ReturnType<typeof getCompanionSupabase>>,
+): Promise<Session | null> {
+  const oauthReturn = isOAuthReturnUrl();
+  const attempts = oauthReturn ? 40 : 1;
+
+  for (let i = 0; i < attempts; i += 1) {
+    const { data, error } = await supabase.auth.getSession();
+    if (error) break;
+    if (data.session?.access_token) {
+      const { data: userData, error: userError } = await supabase.auth.getUser();
+      if (!userError && userData.user) {
+        if (oauthReturn) scrubOAuthParamsFromLoginUrl();
+        return data.session;
+      }
+    }
+    if (!oauthReturn) break;
+    await new Promise((resolve) => window.setTimeout(resolve, 100));
+  }
+
+  return null;
+}
+
 async function signInWithGoogleDirect(): Promise<{ error: string | null }> {
   const supabase = getCompanionSupabase();
   if (!supabase) {
     return { error: "Could not connect to Supabase in your browser." };
   }
   try {
-    const { error } = await supabase.auth.signInWithOAuth({
+    const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
         redirectTo: `${getAppSiteUrl()}/companion/login`,
       },
     });
     if (error) return { error: sanitizeSupabaseAuthError(error.message) };
+    if (data?.url && typeof window !== "undefined") {
+      window.location.assign(data.url);
+    }
     return { error: null };
   } catch (e) {
     const message = e instanceof Error ? e.message : "Google sign-in failed.";
@@ -427,22 +471,26 @@ export function CompanionAuthProvider({
             return;
           }
 
-          const { data } = await supabase.auth.getSession();
-          if (data.session?.access_token) {
-            const { data: userData, error: userError } =
-              await supabase.auth.getUser();
-            if (!userError && userData.user) {
-              applySession(data.session);
-            } else {
-              clearCompanionAuthStorage();
-              try {
-                await supabase.auth.signOut({ scope: "local" });
-              } catch {
-                /* noop */
+          const { data: authSub } = supabase.auth.onAuthStateChange(
+            (event, sess) => {
+              if (!mounted) return;
+              if (event === "SIGNED_IN" || event === "INITIAL_SESSION") {
+                if (event === "SIGNED_IN" && isOAuthReturnUrl()) {
+                  recordAuthLoginSuccess("google");
+                }
+                applySession(sess);
               }
-              applySession(null);
-            }
-          } else if (hasCompanionAuthStorageHint()) {
+            },
+          );
+          unsubscribe = () => authSub.subscription.unsubscribe();
+
+          const restored = await restoreLoginPageSession(supabase);
+          if (restored) {
+            applySession(restored);
+          } else if (
+            !isOAuthReturnUrl() &&
+            hasCompanionAuthStorageHint()
+          ) {
             clearCompanionAuthStorage();
           }
           return;
