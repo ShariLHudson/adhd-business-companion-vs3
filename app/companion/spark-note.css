@@ -82,8 +82,18 @@
 }
 
 .spark-note-anchor__thumb-fallback {
-  font-size: 1.25rem;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  color: #f5d76e;
+  background: linear-gradient(160deg, var(--spark-note-teal) 0%, var(--spark-note-teal-deep) 100%);
+}
+
+.spark-note-anchor__thumb-flame {
+  width: 1.15rem;
+  height: 1.15rem;
 }
 
 .spark-note-anchor__copy {
@@ -173,12 +183,43 @@
 
 .spark-note-expanded__header {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 0.5rem;
   padding: 0.65rem 0.85rem 0.5rem;
   border-bottom: 1px solid rgba(201, 162, 39, 0.2);
   flex-wrap: wrap;
+}
+
+.spark-note-expanded__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
+}
+
+.spark-note-expanded__brand-flame {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.3rem;
+  background: linear-gradient(160deg, var(--spark-note-teal) 0%, var(--spark-note-teal-deep) 100%);
+  border: 1px solid var(--spark-note-gold);
+  color: #f5d76e;
+}
+
+.spark-note-expanded__brand-flame-svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.spark-note-expanded__brand-label {
+  font-family: "Segoe Script", "Bradley Hand", cursive;
+  font-size: 0.78rem;
+  color: #8b6914;
+  line-height: 1.2;
 }
 
 .spark-note-expanded__type {
@@ -235,6 +276,25 @@
   border-radius: 0.45rem;
   margin: 0.35rem 0 0.5rem;
   border: 1px solid rgba(201, 162, 39, 0.25);
+}
+
+.spark-note-expanded__image-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 5.5rem;
+  margin: 0.35rem 0 0.5rem;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(201, 162, 39, 0.25);
+  background:
+    linear-gradient(145deg, rgba(30, 92, 92, 0.12) 0%, rgba(255, 252, 245, 0.85) 100%);
+  color: #f5d76e;
+}
+
+.spark-note-expanded__image-placeholder-flame {
+  width: 2rem;
+  height: 2rem;
 }
 
 .spark-note-expanded__label {
@@ -313,7 +373,14 @@
 }
 
 .spark-note-expanded__footer-icon {
-  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  color: var(--spark-note-teal);
+}
+
+.spark-note-expanded__footer-flame {
+  width: 0.85rem;
+  height: 0.85rem;
 }
 
 .spark-note-expanded__reactions,
@@ -346,9 +413,15 @@
   border-radius: 0.45rem;
   background: rgba(255, 255, 255, 0.45);
   cursor: pointer;
-  font-size: 0.68rem;
+  font-size: 0.65rem;
   color: var(--spark-note-ink);
   text-align: left;
+}
+
+.spark-note-expanded__reaction-emoji {
+  font-size: 0.95rem;
+  line-height: 1;
+  flex-shrink: 0;
 }
 
 .spark-note-expanded__reaction--active {
@@ -387,6 +460,76 @@
   background: rgba(30, 92, 92, 0.08);
   font-size: 0.68rem;
   color: var(--spark-note-teal-deep);
+}
+
+.spark-note-expanded__picker {
+  padding: 0.5rem 1rem 0;
+}
+
+.spark-note-expanded__picker-label {
+  margin: 0 0 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 650;
+  color: var(--spark-note-teal-deep);
+  line-height: 1.35;
+}
+
+.spark-note-expanded__picker-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.spark-note-expanded__picker-row--compact {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.spark-note-expanded__picker-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  padding: 0.45rem 0.55rem;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 0.45rem;
+  background: rgba(255, 255, 255, 0.55);
+  cursor: pointer;
+  text-align: left;
+}
+
+.spark-note-expanded__picker-option-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--spark-note-teal-deep);
+}
+
+.spark-note-expanded__picker-option-hint {
+  font-size: 0.62rem;
+  color: var(--spark-note-ink-soft);
+  font-style: italic;
+}
+
+.spark-note-expanded__picker-chip {
+  padding: 0.35rem 0.65rem;
+  border: 1px solid rgba(30, 92, 92, 0.25);
+  border-radius: 999px;
+  background: rgba(30, 92, 92, 0.06);
+  font-size: 0.68rem;
+  font-weight: 650;
+  color: var(--spark-note-teal-deep);
+  cursor: pointer;
+}
+
+.spark-note-expanded__picker-cancel {
+  margin-top: 0.4rem;
+  border: none;
+  background: none;
+  font-size: 0.65rem;
+  color: var(--spark-note-ink-soft);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 /* ——— My Sparks collection ——— */
