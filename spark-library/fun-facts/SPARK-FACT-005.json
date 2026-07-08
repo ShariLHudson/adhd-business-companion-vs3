@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-FACT-005",
+  "title": "The Eiffel Tower Changes Size",
+  "category": "Fun Fact",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A famous landmark moves more than you might expect.",
+  "story": "Because metal expands when heated, the Eiffel Tower can become taller during warm weather. Temperature changes cause the structure to expand and contract.",
+  "impact": "Even things that appear permanent are constantly changing.",
+  "spark_application": "What small changes are happening around you that you might not notice?",
+  "tags": [
+    "engineering",
+    "science",
+    "curiosity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "fun_fact",
+  "category_label": "Fun Fact",
+  "spark_type": "quick",
+  "short_title": "Eiffel Tower Size"
+}

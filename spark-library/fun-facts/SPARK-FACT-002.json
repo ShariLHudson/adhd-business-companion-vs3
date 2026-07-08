@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-FACT-002",
+  "title": "Bananas Are Berries, But Strawberries Are Not",
+  "category": "Fun Fact",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "The way we name fruits is not always how science classifies them.",
+  "story": "Botanically speaking, bananas meet the scientific definition of a berry. Strawberries do not because their structure develops differently.",
+  "impact": "Sometimes what we assume is true is worth exploring. Looking closer can reveal something unexpected.",
+  "spark_application": "What assumption in your life or business might be worth questioning?",
+  "tags": [
+    "nature",
+    "science",
+    "curiosity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "fun_fact",
+  "category_label": "Fun Fact",
+  "spark_type": "quick",
+  "short_title": "Berry Surprise"
+}

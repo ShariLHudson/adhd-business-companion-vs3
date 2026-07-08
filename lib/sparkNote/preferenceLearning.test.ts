@@ -48,9 +48,9 @@ describe("preferenceLearning", () => {
   });
 
   it("pass reaction lowers affinity for that category", () => {
-    const entry = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-FUN-001")!;
+    const entry = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-FACT-006")!;
     const before = scoreEntryAffinity(entry);
-    recordSparkNoteReaction("SPARK-FUN-001", "pass", "fun_fact");
+    recordSparkNoteReaction("SPARK-FACT-006", "pass", "fun_fact");
     const after = scoreEntryAffinity(entry);
     expect(after).toBeLessThan(before);
   });

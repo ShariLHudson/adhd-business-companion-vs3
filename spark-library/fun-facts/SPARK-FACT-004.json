@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-FACT-004",
+  "title": "Octopuses Have Three Hearts",
+  "category": "Fun Fact",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Octopus",
+  "short_teaser": "One ocean creature has a surprisingly unusual design.",
+  "story": "Octopuses have three hearts. Two pump blood toward the gills, while one pumps blood through the rest of the body. Their unique biology helps them survive in the ocean.",
+  "impact": "Nature solves problems in creative ways.",
+  "spark_application": "Where could a different approach create a better solution?",
+  "tags": [
+    "animals",
+    "science",
+    "wonder"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "fun_fact",
+  "category_label": "Fun Fact",
+  "spark_type": "quick",
+  "short_title": "Three Hearts"
+}

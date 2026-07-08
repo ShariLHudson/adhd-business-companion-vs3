@@ -242,36 +242,131 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     thumbnailAlt: "Artist palette",
   },
 
-  // — Fun facts —
+  // — Fun facts (spark-notes-files/SPARK_NOTE_FUN_FACTS_AND_WONDER_SPARK_LIBRARY.md) —
   {
-    id: "SPARK-FUN-001",
+    id: "SPARK-FACT-001",
     category: "fun_fact",
-    categoryLabel: "Fun Facts",
+    categoryLabel: "Fun Fact",
     sparkType: "quick",
     title: "Honey Never Spoils",
-    teaser: "Archaeologists found edible honey in ancient Egyptian tombs.",
+    shortTitle: "Honey Never Spoils",
+    teaser: "A food discovered thousands of years ago can still be preserved today.",
     whatHappened:
-      "Honey's low moisture and natural acidity make it nearly impossible for bacteria to survive in it. Archaeologists have discovered 3,000-year-old honey in Egyptian tombs that was still perfectly edible.",
+      "Honey has natural properties that help prevent spoilage. Its low moisture content and natural acidity make it difficult for many microorganisms to grow. Archaeologists have discovered ancient honey that remained preserved.",
     whyItMatters:
-      "Nature sometimes creates solutions more durable than anything we engineer. Patience and the right conditions can preserve value for millennia.",
+      "Nature often contains solutions that inspire science and innovation.",
     sparkApplication:
-      "What work are you building that could still matter years from now?",
+      "What everyday thing around you might be more interesting than you realize?",
+    tags: ["nature", "science", "curiosity"],
     thumbnailAlt: "Honey jar",
   },
   {
-    id: "SPARK-FUN-002",
+    id: "SPARK-FACT-002",
     category: "fun_fact",
-    categoryLabel: "Fun Facts",
+    categoryLabel: "Fun Fact",
     sparkType: "quick",
-    title: "Octopus Hearts",
-    teaser: "Three hearts, blue blood, and a surprising level of intelligence.",
+    title: "Bananas Are Berries, But Strawberries Are Not",
+    shortTitle: "Berry Surprise",
+    teaser: "The way we name fruits is not always how science classifies them.",
     whatHappened:
-      "Octopuses have three hearts and blue blood. Two hearts pump blood to the gills, while the third pumps it to the rest of the body. When they swim, the main heart stops — which is why they prefer crawling.",
+      "Botanically speaking, bananas meet the scientific definition of a berry. Strawberries do not because their structure develops differently.",
     whyItMatters:
-      "The natural world is full of designs that challenge our assumptions. Different problems call for different architectures.",
+      "Sometimes what we assume is true is worth exploring. Looking closer can reveal something unexpected.",
     sparkApplication:
-      "What assumption about 'how things should work' might be worth questioning today?",
+      "What assumption in your life or business might be worth questioning?",
+    tags: ["nature", "science", "curiosity"],
+  },
+  {
+    id: "SPARK-FACT-003",
+    category: "fun_fact",
+    categoryLabel: "Fun Fact",
+    sparkType: "quick",
+    title: "The Smell After Rain Has a Name",
+    shortTitle: "Petrichor",
+    teaser: "That fresh smell after rain is a real phenomenon.",
+    whatHappened:
+      "The smell after rainfall is called petrichor. It comes from a combination of plant oils, soil compounds, and chemical reactions that happen when rain reaches dry ground.",
+    whyItMatters:
+      "Small details in everyday life can lead to fascinating discoveries.",
+    sparkApplication: "What ordinary moment could you slow down and notice today?",
+    tags: ["nature", "senses", "science"],
+  },
+  {
+    id: "SPARK-FACT-004",
+    category: "fun_fact",
+    categoryLabel: "Fun Fact",
+    sparkType: "quick",
+    title: "Octopuses Have Three Hearts",
+    shortTitle: "Three Hearts",
+    teaser: "One ocean creature has a surprisingly unusual design.",
+    whatHappened:
+      "Octopuses have three hearts. Two pump blood toward the gills, while one pumps blood through the rest of the body. Their unique biology helps them survive in the ocean.",
+    whyItMatters: "Nature solves problems in creative ways.",
+    sparkApplication:
+      "Where could a different approach create a better solution?",
+    tags: ["animals", "science", "wonder"],
     thumbnailAlt: "Octopus",
+  },
+  {
+    id: "SPARK-FACT-005",
+    category: "fun_fact",
+    categoryLabel: "Fun Fact",
+    sparkType: "quick",
+    title: "The Eiffel Tower Changes Size",
+    shortTitle: "Eiffel Tower Size",
+    teaser: "A famous landmark moves more than you might expect.",
+    whatHappened:
+      "Because metal expands when heated, the Eiffel Tower can become taller during warm weather. Temperature changes cause the structure to expand and contract.",
+    whyItMatters:
+      "Even things that appear permanent are constantly changing.",
+    sparkApplication:
+      "What small changes are happening around you that you might not notice?",
+    tags: ["engineering", "science", "curiosity"],
+  },
+  {
+    id: "SPARK-FACT-006",
+    category: "fun_fact",
+    categoryLabel: "Fun Fact",
+    sparkType: "quick",
+    title: "A Group of Flamingos Has a Special Name",
+    shortTitle: "A Flamboyance",
+    teaser: "Even groups of animals can have creative names.",
+    whatHappened:
+      "A group of flamingos is called a flamboyance. Many collective animal names were created because people noticed unique behaviors or appearances.",
+    whyItMatters: "Language itself is full of creativity.",
+    sparkApplication:
+      "What ordinary thing could you describe in a more creative way?",
+    tags: ["animals", "language", "humor"],
+  },
+  {
+    id: "SPARK-FACT-007",
+    category: "fun_fact",
+    categoryLabel: "Fun Fact",
+    sparkType: "quick",
+    title: "The First Computer Mouse Was Wooden",
+    shortTitle: "Wooden Mouse",
+    teaser: "One of the most familiar computer tools started as a simple wooden box.",
+    whatHappened:
+      "The first computer mouse was created in the 1960s and was made from wood. It was named because the cord looked similar to a mouse tail.",
+    whyItMatters: "Many technologies begin as simple prototypes.",
+    sparkApplication: "What simple version of an idea could you create first?",
+    tags: ["technology", "invention", "history"],
+  },
+  {
+    id: "SPARK-FACT-008",
+    category: "fun_fact",
+    categoryLabel: "Fun Fact",
+    sparkType: "quick",
+    title: "Trees Communicate",
+    shortTitle: "Talking Trees",
+    teaser: "Forests are more connected than they appear.",
+    whatHappened:
+      "Research has shown that trees and plants can exchange resources and chemical signals through underground fungal networks. Scientists continue studying these complex relationships.",
+    whyItMatters:
+      "Systems often work together in ways we cannot immediately see.",
+    sparkApplication:
+      "What connections in your life or business might you be overlooking?",
+    tags: ["nature", "science", "connection"],
   },
 
   // — Personal growth —

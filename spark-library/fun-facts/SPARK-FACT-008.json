@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-FACT-008",
+  "title": "Trees Communicate",
+  "category": "Fun Fact",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Forests are more connected than they appear.",
+  "story": "Research has shown that trees and plants can exchange resources and chemical signals through underground fungal networks. Scientists continue studying these complex relationships.",
+  "impact": "Systems often work together in ways we cannot immediately see.",
+  "spark_application": "What connections in your life or business might you be overlooking?",
+  "tags": [
+    "nature",
+    "science",
+    "connection"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "fun_fact",
+  "category_label": "Fun Fact",
+  "spark_type": "quick",
+  "short_title": "Talking Trees"
+}

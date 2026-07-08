@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-FACT-006",
+  "title": "A Group of Flamingos Has a Special Name",
+  "category": "Fun Fact",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Even groups of animals can have creative names.",
+  "story": "A group of flamingos is called a flamboyance. Many collective animal names were created because people noticed unique behaviors or appearances.",
+  "impact": "Language itself is full of creativity.",
+  "spark_application": "What ordinary thing could you describe in a more creative way?",
+  "tags": [
+    "animals",
+    "language",
+    "humor"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "fun_fact",
+  "category_label": "Fun Fact",
+  "spark_type": "quick",
+  "short_title": "A Flamboyance"
+}

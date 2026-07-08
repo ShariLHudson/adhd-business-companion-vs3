@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-FACT-007",
+  "title": "The First Computer Mouse Was Wooden",
+  "category": "Fun Fact",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "One of the most familiar computer tools started as a simple wooden box.",
+  "story": "The first computer mouse was created in the 1960s and was made from wood. It was named because the cord looked similar to a mouse tail.",
+  "impact": "Many technologies begin as simple prototypes.",
+  "spark_application": "What simple version of an idea could you create first?",
+  "tags": [
+    "technology",
+    "invention",
+    "history"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "fun_fact",
+  "category_label": "Fun Fact",
+  "spark_type": "quick",
+  "short_title": "Wooden Mouse"
+}

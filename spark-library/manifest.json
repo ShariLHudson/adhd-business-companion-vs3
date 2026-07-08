@@ -751,52 +751,230 @@
     "spark_type": "deep"
   },
   {
-    "spark_id": "SPARK-FUN-001",
+    "spark_id": "SPARK-FACT-001",
     "title": "Honey Never Spoils",
-    "category": "Fun Facts",
+    "category": "Fun Fact",
     "audience": [
       "Everyone"
     ],
     "image": null,
     "thumbnail": null,
     "thumbnail_alt": "Honey jar",
-    "short_teaser": "Archaeologists found edible honey in ancient Egyptian tombs.",
-    "story": "Honey's low moisture and natural acidity make it nearly impossible for bacteria to survive in it. Archaeologists have discovered 3,000-year-old honey in Egyptian tombs that was still perfectly edible.",
-    "impact": "Nature sometimes creates solutions more durable than anything we engineer. Patience and the right conditions can preserve value for millennia.",
-    "spark_application": "What work are you building that could still matter years from now?",
-    "tags": [],
+    "short_teaser": "A food discovered thousands of years ago can still be preserved today.",
+    "story": "Honey has natural properties that help prevent spoilage. Its low moisture content and natural acidity make it difficult for many microorganisms to grow. Archaeologists have discovered ancient honey that remained preserved.",
+    "impact": "Nature often contains solutions that inspire science and innovation.",
+    "spark_application": "What everyday thing around you might be more interesting than you realize?",
+    "tags": [
+      "nature",
+      "science",
+      "curiosity"
+    ],
     "date_rules": {
       "type": "evergreen"
     },
     "tone": "curious",
     "status": "active",
     "runtime_category": "fun_fact",
-    "category_label": "Fun Facts",
-    "spark_type": "quick"
+    "category_label": "Fun Fact",
+    "spark_type": "quick",
+    "short_title": "Honey Never Spoils"
   },
   {
-    "spark_id": "SPARK-FUN-002",
-    "title": "Octopus Hearts",
-    "category": "Fun Facts",
+    "spark_id": "SPARK-FACT-002",
+    "title": "Bananas Are Berries, But Strawberries Are Not",
+    "category": "Fun Fact",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "The way we name fruits is not always how science classifies them.",
+    "story": "Botanically speaking, bananas meet the scientific definition of a berry. Strawberries do not because their structure develops differently.",
+    "impact": "Sometimes what we assume is true is worth exploring. Looking closer can reveal something unexpected.",
+    "spark_application": "What assumption in your life or business might be worth questioning?",
+    "tags": [
+      "nature",
+      "science",
+      "curiosity"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "fun_fact",
+    "category_label": "Fun Fact",
+    "spark_type": "quick",
+    "short_title": "Berry Surprise"
+  },
+  {
+    "spark_id": "SPARK-FACT-003",
+    "title": "The Smell After Rain Has a Name",
+    "category": "Fun Fact",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "That fresh smell after rain is a real phenomenon.",
+    "story": "The smell after rainfall is called petrichor. It comes from a combination of plant oils, soil compounds, and chemical reactions that happen when rain reaches dry ground.",
+    "impact": "Small details in everyday life can lead to fascinating discoveries.",
+    "spark_application": "What ordinary moment could you slow down and notice today?",
+    "tags": [
+      "nature",
+      "senses",
+      "science"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "fun_fact",
+    "category_label": "Fun Fact",
+    "spark_type": "quick",
+    "short_title": "Petrichor"
+  },
+  {
+    "spark_id": "SPARK-FACT-004",
+    "title": "Octopuses Have Three Hearts",
+    "category": "Fun Fact",
     "audience": [
       "Everyone"
     ],
     "image": null,
     "thumbnail": null,
     "thumbnail_alt": "Octopus",
-    "short_teaser": "Three hearts, blue blood, and a surprising level of intelligence.",
-    "story": "Octopuses have three hearts and blue blood. Two hearts pump blood to the gills, while the third pumps it to the rest of the body. When they swim, the main heart stops — which is why they prefer crawling.",
-    "impact": "The natural world is full of designs that challenge our assumptions. Different problems call for different architectures.",
-    "spark_application": "What assumption about 'how things should work' might be worth questioning today?",
-    "tags": [],
+    "short_teaser": "One ocean creature has a surprisingly unusual design.",
+    "story": "Octopuses have three hearts. Two pump blood toward the gills, while one pumps blood through the rest of the body. Their unique biology helps them survive in the ocean.",
+    "impact": "Nature solves problems in creative ways.",
+    "spark_application": "Where could a different approach create a better solution?",
+    "tags": [
+      "animals",
+      "science",
+      "wonder"
+    ],
     "date_rules": {
       "type": "evergreen"
     },
     "tone": "curious",
     "status": "active",
     "runtime_category": "fun_fact",
-    "category_label": "Fun Facts",
-    "spark_type": "quick"
+    "category_label": "Fun Fact",
+    "spark_type": "quick",
+    "short_title": "Three Hearts"
+  },
+  {
+    "spark_id": "SPARK-FACT-005",
+    "title": "The Eiffel Tower Changes Size",
+    "category": "Fun Fact",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A famous landmark moves more than you might expect.",
+    "story": "Because metal expands when heated, the Eiffel Tower can become taller during warm weather. Temperature changes cause the structure to expand and contract.",
+    "impact": "Even things that appear permanent are constantly changing.",
+    "spark_application": "What small changes are happening around you that you might not notice?",
+    "tags": [
+      "engineering",
+      "science",
+      "curiosity"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "fun_fact",
+    "category_label": "Fun Fact",
+    "spark_type": "quick",
+    "short_title": "Eiffel Tower Size"
+  },
+  {
+    "spark_id": "SPARK-FACT-006",
+    "title": "A Group of Flamingos Has a Special Name",
+    "category": "Fun Fact",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Even groups of animals can have creative names.",
+    "story": "A group of flamingos is called a flamboyance. Many collective animal names were created because people noticed unique behaviors or appearances.",
+    "impact": "Language itself is full of creativity.",
+    "spark_application": "What ordinary thing could you describe in a more creative way?",
+    "tags": [
+      "animals",
+      "language",
+      "humor"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "fun_fact",
+    "category_label": "Fun Fact",
+    "spark_type": "quick",
+    "short_title": "A Flamboyance"
+  },
+  {
+    "spark_id": "SPARK-FACT-007",
+    "title": "The First Computer Mouse Was Wooden",
+    "category": "Fun Fact",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "One of the most familiar computer tools started as a simple wooden box.",
+    "story": "The first computer mouse was created in the 1960s and was made from wood. It was named because the cord looked similar to a mouse tail.",
+    "impact": "Many technologies begin as simple prototypes.",
+    "spark_application": "What simple version of an idea could you create first?",
+    "tags": [
+      "technology",
+      "invention",
+      "history"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "fun_fact",
+    "category_label": "Fun Fact",
+    "spark_type": "quick",
+    "short_title": "Wooden Mouse"
+  },
+  {
+    "spark_id": "SPARK-FACT-008",
+    "title": "Trees Communicate",
+    "category": "Fun Fact",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Forests are more connected than they appear.",
+    "story": "Research has shown that trees and plants can exchange resources and chemical signals through underground fungal networks. Scientists continue studying these complex relationships.",
+    "impact": "Systems often work together in ways we cannot immediately see.",
+    "spark_application": "What connections in your life or business might you be overlooking?",
+    "tags": [
+      "nature",
+      "science",
+      "connection"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "fun_fact",
+    "category_label": "Fun Fact",
+    "spark_type": "quick",
+    "short_title": "Talking Trees"
   },
   {
     "spark_id": "SPARK-GRO-001",

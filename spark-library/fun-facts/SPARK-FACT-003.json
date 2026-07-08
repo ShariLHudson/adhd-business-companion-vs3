@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-FACT-003",
+  "title": "The Smell After Rain Has a Name",
+  "category": "Fun Fact",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "That fresh smell after rain is a real phenomenon.",
+  "story": "The smell after rainfall is called petrichor. It comes from a combination of plant oils, soil compounds, and chemical reactions that happen when rain reaches dry ground.",
+  "impact": "Small details in everyday life can lead to fascinating discoveries.",
+  "spark_application": "What ordinary moment could you slow down and notice today?",
+  "tags": [
+    "nature",
+    "senses",
+    "science"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "fun_fact",
+  "category_label": "Fun Fact",
+  "spark_type": "quick",
+  "short_title": "Petrichor"
+}

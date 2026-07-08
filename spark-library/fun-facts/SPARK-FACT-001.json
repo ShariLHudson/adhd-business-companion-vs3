@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-FACT-001",
+  "title": "Honey Never Spoils",
+  "category": "Fun Fact",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Honey jar",
+  "short_teaser": "A food discovered thousands of years ago can still be preserved today.",
+  "story": "Honey has natural properties that help prevent spoilage. Its low moisture content and natural acidity make it difficult for many microorganisms to grow. Archaeologists have discovered ancient honey that remained preserved.",
+  "impact": "Nature often contains solutions that inspire science and innovation.",
+  "spark_application": "What everyday thing around you might be more interesting than you realize?",
+  "tags": [
+    "nature",
+    "science",
+    "curiosity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "fun_fact",
+  "category_label": "Fun Fact",
+  "spark_type": "quick",
+  "short_title": "Honey Never Spoils"
+}
