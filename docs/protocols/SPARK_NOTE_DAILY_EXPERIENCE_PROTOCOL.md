@@ -117,6 +117,7 @@ Per [SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md](SPARK_NOTE_CONTENT_LIBRAR
 | Draft / review / active / archived | `SparkContentRecord.status` | **v1** |
 | Publish validation | `npm run spark-library:validate` | **v1** |
 | Library balance report | `libraryBalance.ts` | **v1** |
+| Master standard taxonomy + quality tests | `categoryTaxonomy.ts`, `validateRecord.ts` | **v1** |
 | Admin UI / AI draft review | — | Future |
 
 ### Future (not v1)
