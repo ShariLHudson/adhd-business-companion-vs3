@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-MEAN-002",
+  "title": "Small Moments Become Big Memories",
+  "category": "Gratitude and Meaning",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "The moments we remember are often the simple ones.",
+  "story": "A conversation, a laugh, a shared meal, or a small act of kindness can become a meaningful memory. Life is often shaped by ordinary moments we recognize as special.",
+  "impact": "Paying attention helps us appreciate what is already around us.",
+  "spark_application": "What small moment recently brought you joy?",
+  "tags": [
+    "memories",
+    "appreciation",
+    "mindfulness"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "gratitude",
+  "category_label": "Gratitude and Meaning",
+  "spark_type": "story",
+  "short_title": "Small Moments"
+}

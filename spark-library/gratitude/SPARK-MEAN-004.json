@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-MEAN-004",
+  "title": "Your Story Has Value",
+  "category": "Gratitude and Meaning",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Your experiences can become something meaningful.",
+  "story": "Every person carries lessons from challenges, successes, relationships, and discoveries. Those experiences shape how we help and connect with others.",
+  "impact": "Your journey may contain wisdom that someone else needs.",
+  "spark_application": "What lesson from your life could help another person?",
+  "tags": [
+    "purpose",
+    "experiences",
+    "growth"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "gratitude",
+  "category_label": "Gratitude and Meaning",
+  "spark_type": "story",
+  "short_title": "Your Story Matters"
+}

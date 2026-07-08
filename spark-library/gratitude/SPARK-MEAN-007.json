@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-MEAN-007",
+  "title": "Making a Difference Does Not Require Being Famous",
+  "category": "Gratitude and Meaning",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Small contributions can create meaningful change.",
+  "story": "Many people improve the world through everyday actions: helping someone, teaching, creating, encouraging, and serving. Impact is not measured only by recognition.",
+  "impact": "Meaning comes from how we use what we have.",
+  "spark_application": "How can you make one person's day better?",
+  "tags": [
+    "purpose",
+    "impact",
+    "service"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "gratitude",
+  "category_label": "Gratitude and Meaning",
+  "spark_type": "story",
+  "short_title": "Quiet Impact"
+}

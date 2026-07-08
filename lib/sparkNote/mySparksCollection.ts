@@ -56,6 +56,7 @@ export function mySparksShelfBucket(
     case "entrepreneur":
       return "business";
     case "personal_growth":
+    case "gratitude":
     case "adhd_friendly":
     case "personal":
       return "growth";

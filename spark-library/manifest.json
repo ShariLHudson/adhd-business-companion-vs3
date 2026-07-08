@@ -1284,6 +1284,231 @@
     "category_label": "History of Inventions"
   },
   {
+    "spark_id": "SPARK-MEAN-001",
+    "title": "The Power of Saying Thank You",
+    "category": "Gratitude and Meaning",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Two simple words can have a lasting impact.",
+    "story": "A sincere thank you can change how people feel about their effort, their work, and their relationship with us. Small moments of appreciation often become the memories people carry with them.",
+    "impact": "People want to know they are seen and valued. Gratitude strengthens connections.",
+    "spark_application": "Who is someone you could thank today?",
+    "tags": [
+      "gratitude",
+      "relationships",
+      "kindness",
+      "connection"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "gratitude",
+    "category_label": "Gratitude and Meaning",
+    "spark_type": "quick",
+    "short_title": "Say Thank You"
+  },
+  {
+    "spark_id": "SPARK-MEAN-002",
+    "title": "Small Moments Become Big Memories",
+    "category": "Gratitude and Meaning",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "The moments we remember are often the simple ones.",
+    "story": "A conversation, a laugh, a shared meal, or a small act of kindness can become a meaningful memory. Life is often shaped by ordinary moments we recognize as special.",
+    "impact": "Paying attention helps us appreciate what is already around us.",
+    "spark_application": "What small moment recently brought you joy?",
+    "tags": [
+      "memories",
+      "appreciation",
+      "mindfulness"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "gratitude",
+    "category_label": "Gratitude and Meaning",
+    "spark_type": "story",
+    "short_title": "Small Moments"
+  },
+  {
+    "spark_id": "SPARK-MEAN-003",
+    "title": "The Ripple Effect of Kindness",
+    "category": "Gratitude and Meaning",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A small action can travel farther than we realize.",
+    "story": "A kind word or thoughtful action can influence someone else's day. That person may then pass that kindness forward.",
+    "impact": "Our actions affect people in ways we may never see.",
+    "spark_application": "What small kindness could you share today?",
+    "tags": [
+      "kindness",
+      "impact",
+      "connection"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "gratitude",
+    "category_label": "Gratitude and Meaning",
+    "spark_type": "quick",
+    "short_title": "Kindness Ripples"
+  },
+  {
+    "spark_id": "SPARK-MEAN-004",
+    "title": "Your Story Has Value",
+    "category": "Gratitude and Meaning",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Your experiences can become something meaningful.",
+    "story": "Every person carries lessons from challenges, successes, relationships, and discoveries. Those experiences shape how we help and connect with others.",
+    "impact": "Your journey may contain wisdom that someone else needs.",
+    "spark_application": "What lesson from your life could help another person?",
+    "tags": [
+      "purpose",
+      "experiences",
+      "growth"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "gratitude",
+    "category_label": "Gratitude and Meaning",
+    "spark_type": "story",
+    "short_title": "Your Story Matters"
+  },
+  {
+    "spark_id": "SPARK-MEAN-005",
+    "title": "The Gift of Being Present",
+    "category": "Gratitude and Meaning",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Sometimes the greatest gift is simply paying attention.",
+    "story": "Being fully present with someone communicates that they matter. Small moments of attention can create strong connections.",
+    "impact": "People remember how we made them feel.",
+    "spark_application": "Who deserves your full attention today?",
+    "tags": [
+      "presence",
+      "awareness",
+      "relationships"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "gratitude",
+    "category_label": "Gratitude and Meaning",
+    "spark_type": "quick",
+    "short_title": "Being Present"
+  },
+  {
+    "spark_id": "SPARK-MEAN-006",
+    "title": "Celebrate How Far You Have Come",
+    "category": "Gratitude and Meaning",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Growth deserves recognition along the way.",
+    "story": "People often focus on what remains unfinished and forget to recognize what they have already accomplished. Looking back reveals progress.",
+    "impact": "Acknowledging growth builds confidence and appreciation.",
+    "spark_application": "What is something you can celebrate about your journey?",
+    "tags": [
+      "progress",
+      "reflection",
+      "achievement"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "gratitude",
+    "category_label": "Gratitude and Meaning",
+    "spark_type": "story",
+    "short_title": "Celebrate Progress"
+  },
+  {
+    "spark_id": "SPARK-MEAN-007",
+    "title": "Making a Difference Does Not Require Being Famous",
+    "category": "Gratitude and Meaning",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Small contributions can create meaningful change.",
+    "story": "Many people improve the world through everyday actions: helping someone, teaching, creating, encouraging, and serving. Impact is not measured only by recognition.",
+    "impact": "Meaning comes from how we use what we have.",
+    "spark_application": "How can you make one person's day better?",
+    "tags": [
+      "purpose",
+      "impact",
+      "service"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "gratitude",
+    "category_label": "Gratitude and Meaning",
+    "spark_type": "story",
+    "short_title": "Quiet Impact"
+  },
+  {
+    "spark_id": "SPARK-MEAN-008",
+    "title": "Find Meaning in the Ordinary",
+    "category": "Gratitude and Meaning",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Meaning is often found in places we overlook.",
+    "story": "A familiar place, a routine moment, or a simple experience can become meaningful when we slow down enough to notice it.",
+    "impact": "A meaningful life is built from many small moments.",
+    "spark_application": "What ordinary thing are you grateful for today?",
+    "tags": [
+      "gratitude",
+      "perspective",
+      "awareness"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "gratitude",
+    "category_label": "Gratitude and Meaning",
+    "spark_type": "quick",
+    "short_title": "Ordinary Meaning"
+  },
+  {
     "spark_id": "SPARK-QTE-001",
     "title": "Start Where You Are",
     "category": "Meaningful Quotes",

@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-MEAN-001",
+  "title": "The Power of Saying Thank You",
+  "category": "Gratitude and Meaning",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Two simple words can have a lasting impact.",
+  "story": "A sincere thank you can change how people feel about their effort, their work, and their relationship with us. Small moments of appreciation often become the memories people carry with them.",
+  "impact": "People want to know they are seen and valued. Gratitude strengthens connections.",
+  "spark_application": "Who is someone you could thank today?",
+  "tags": [
+    "gratitude",
+    "relationships",
+    "kindness",
+    "connection"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "gratitude",
+  "category_label": "Gratitude and Meaning",
+  "spark_type": "quick",
+  "short_title": "Say Thank You"
+}

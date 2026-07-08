@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-MEAN-008",
+  "title": "Find Meaning in the Ordinary",
+  "category": "Gratitude and Meaning",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Meaning is often found in places we overlook.",
+  "story": "A familiar place, a routine moment, or a simple experience can become meaningful when we slow down enough to notice it.",
+  "impact": "A meaningful life is built from many small moments.",
+  "spark_application": "What ordinary thing are you grateful for today?",
+  "tags": [
+    "gratitude",
+    "perspective",
+    "awareness"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "gratitude",
+  "category_label": "Gratitude and Meaning",
+  "spark_type": "quick",
+  "short_title": "Ordinary Meaning"
+}

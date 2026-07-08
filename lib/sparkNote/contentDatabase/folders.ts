@@ -13,6 +13,7 @@ export const SPARK_LIBRARY_FOLDER_BY_CATEGORY: Record<SparkNoteCategory, string>
     quote: "quotes",
     creativity: "creativity",
     personal_growth: "personal-growth",
+    gratitude: "gratitude",
     adhd_friendly: "adhd-friendly",
     personal: "personal-events",
   };

@@ -369,6 +369,128 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     tags: ["nature", "science", "connection"],
   },
 
+  // — Gratitude & meaning (spark-notes-files/SPARK_NOTE_GRATITUDE_AND_MEANING_SPARK_LIBRARY.md) —
+  {
+    id: "SPARK-MEAN-001",
+    category: "gratitude",
+    categoryLabel: "Gratitude and Meaning",
+    sparkType: "quick",
+    title: "The Power of Saying Thank You",
+    shortTitle: "Say Thank You",
+    teaser: "Two simple words can have a lasting impact.",
+    whatHappened:
+      "A sincere thank you can change how people feel about their effort, their work, and their relationship with us. Small moments of appreciation often become the memories people carry with them.",
+    whyItMatters:
+      "People want to know they are seen and valued. Gratitude strengthens connections.",
+    sparkApplication: "Who is someone you could thank today?",
+    tags: ["gratitude", "relationships", "kindness", "connection"],
+  },
+  {
+    id: "SPARK-MEAN-002",
+    category: "gratitude",
+    categoryLabel: "Gratitude and Meaning",
+    sparkType: "story",
+    title: "Small Moments Become Big Memories",
+    shortTitle: "Small Moments",
+    teaser: "The moments we remember are often the simple ones.",
+    whatHappened:
+      "A conversation, a laugh, a shared meal, or a small act of kindness can become a meaningful memory. Life is often shaped by ordinary moments we recognize as special.",
+    whyItMatters:
+      "Paying attention helps us appreciate what is already around us.",
+    sparkApplication: "What small moment recently brought you joy?",
+    tags: ["memories", "appreciation", "mindfulness"],
+  },
+  {
+    id: "SPARK-MEAN-003",
+    category: "gratitude",
+    categoryLabel: "Gratitude and Meaning",
+    sparkType: "quick",
+    title: "The Ripple Effect of Kindness",
+    shortTitle: "Kindness Ripples",
+    teaser: "A small action can travel farther than we realize.",
+    whatHappened:
+      "A kind word or thoughtful action can influence someone else's day. That person may then pass that kindness forward.",
+    whyItMatters:
+      "Our actions affect people in ways we may never see.",
+    sparkApplication: "What small kindness could you share today?",
+    tags: ["kindness", "impact", "connection"],
+  },
+  {
+    id: "SPARK-MEAN-004",
+    category: "gratitude",
+    categoryLabel: "Gratitude and Meaning",
+    sparkType: "story",
+    title: "Your Story Has Value",
+    shortTitle: "Your Story Matters",
+    teaser: "Your experiences can become something meaningful.",
+    whatHappened:
+      "Every person carries lessons from challenges, successes, relationships, and discoveries. Those experiences shape how we help and connect with others.",
+    whyItMatters:
+      "Your journey may contain wisdom that someone else needs.",
+    sparkApplication:
+      "What lesson from your life could help another person?",
+    tags: ["purpose", "experiences", "growth"],
+  },
+  {
+    id: "SPARK-MEAN-005",
+    category: "gratitude",
+    categoryLabel: "Gratitude and Meaning",
+    sparkType: "quick",
+    title: "The Gift of Being Present",
+    shortTitle: "Being Present",
+    teaser: "Sometimes the greatest gift is simply paying attention.",
+    whatHappened:
+      "Being fully present with someone communicates that they matter. Small moments of attention can create strong connections.",
+    whyItMatters: "People remember how we made them feel.",
+    sparkApplication: "Who deserves your full attention today?",
+    tags: ["presence", "awareness", "relationships"],
+  },
+  {
+    id: "SPARK-MEAN-006",
+    category: "gratitude",
+    categoryLabel: "Gratitude and Meaning",
+    sparkType: "story",
+    title: "Celebrate How Far You Have Come",
+    shortTitle: "Celebrate Progress",
+    teaser: "Growth deserves recognition along the way.",
+    whatHappened:
+      "People often focus on what remains unfinished and forget to recognize what they have already accomplished. Looking back reveals progress.",
+    whyItMatters:
+      "Acknowledging growth builds confidence and appreciation.",
+    sparkApplication:
+      "What is something you can celebrate about your journey?",
+    tags: ["progress", "reflection", "achievement"],
+  },
+  {
+    id: "SPARK-MEAN-007",
+    category: "gratitude",
+    categoryLabel: "Gratitude and Meaning",
+    sparkType: "story",
+    title: "Making a Difference Does Not Require Being Famous",
+    shortTitle: "Quiet Impact",
+    teaser: "Small contributions can create meaningful change.",
+    whatHappened:
+      "Many people improve the world through everyday actions: helping someone, teaching, creating, encouraging, and serving. Impact is not measured only by recognition.",
+    whyItMatters: "Meaning comes from how we use what we have.",
+    sparkApplication: "How can you make one person's day better?",
+    tags: ["purpose", "impact", "service"],
+  },
+  {
+    id: "SPARK-MEAN-008",
+    category: "gratitude",
+    categoryLabel: "Gratitude and Meaning",
+    sparkType: "quick",
+    title: "Find Meaning in the Ordinary",
+    shortTitle: "Ordinary Meaning",
+    teaser: "Meaning is often found in places we overlook.",
+    whatHappened:
+      "A familiar place, a routine moment, or a simple experience can become meaningful when we slow down enough to notice it.",
+    whyItMatters:
+      "A meaningful life is built from many small moments.",
+    sparkApplication: "What ordinary thing are you grateful for today?",
+    tags: ["gratitude", "perspective", "awareness"],
+  },
+
   // — Personal growth —
   {
     id: "SPARK-GRO-001",

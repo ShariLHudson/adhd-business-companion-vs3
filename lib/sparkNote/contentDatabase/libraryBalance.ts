@@ -58,6 +58,7 @@ export const RECOMMENDED_SPARK_LIBRARY_BALANCE: {
     share: 0.05,
     match: (r) =>
       r.runtime_category === "personal_growth" ||
+      r.runtime_category === "gratitude" ||
       r.runtime_category === "adhd_friendly" ||
       r.runtime_category === "quote" ||
       r.runtime_category === "creativity",

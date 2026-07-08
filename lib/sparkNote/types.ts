@@ -13,6 +13,7 @@ export type SparkNoteCategory =
   | "quote"
   | "creativity"
   | "personal_growth"
+  | "gratitude"
   | "adhd_friendly"
   | "personal";
 

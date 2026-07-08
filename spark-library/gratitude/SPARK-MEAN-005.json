@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-MEAN-005",
+  "title": "The Gift of Being Present",
+  "category": "Gratitude and Meaning",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Sometimes the greatest gift is simply paying attention.",
+  "story": "Being fully present with someone communicates that they matter. Small moments of attention can create strong connections.",
+  "impact": "People remember how we made them feel.",
+  "spark_application": "Who deserves your full attention today?",
+  "tags": [
+    "presence",
+    "awareness",
+    "relationships"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "gratitude",
+  "category_label": "Gratitude and Meaning",
+  "spark_type": "quick",
+  "short_title": "Being Present"
+}

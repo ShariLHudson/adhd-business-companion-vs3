@@ -47,6 +47,7 @@ export const SPARK_ID_PREFIX_BY_CATEGORY: Partial<
   quote: "QTE",
   creativity: "CRE",
   personal_growth: "GRO",
+  gratitude: "MEAN",
   adhd_friendly: "ADHD",
   personal: "PER",
 };

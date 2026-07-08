@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-MEAN-003",
+  "title": "The Ripple Effect of Kindness",
+  "category": "Gratitude and Meaning",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A small action can travel farther than we realize.",
+  "story": "A kind word or thoughtful action can influence someone else's day. That person may then pass that kindness forward.",
+  "impact": "Our actions affect people in ways we may never see.",
+  "spark_application": "What small kindness could you share today?",
+  "tags": [
+    "kindness",
+    "impact",
+    "connection"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "gratitude",
+  "category_label": "Gratitude and Meaning",
+  "spark_type": "quick",
+  "short_title": "Kindness Ripples"
+}

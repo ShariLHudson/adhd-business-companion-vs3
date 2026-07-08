@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-MEAN-006",
+  "title": "Celebrate How Far You Have Come",
+  "category": "Gratitude and Meaning",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Growth deserves recognition along the way.",
+  "story": "People often focus on what remains unfinished and forget to recognize what they have already accomplished. Looking back reveals progress.",
+  "impact": "Acknowledging growth builds confidence and appreciation.",
+  "spark_application": "What is something you can celebrate about your journey?",
+  "tags": [
+    "progress",
+    "reflection",
+    "achievement"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "gratitude",
+  "category_label": "Gratitude and Meaning",
+  "spark_type": "story",
+  "short_title": "Celebrate Progress"
+}
