@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-PER-008",
+  "title": "Beethoven: Creating Through Challenges",
+  "category": "Inspiring People",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Some of the greatest creations come from overcoming obstacles.",
+  "story": "Ludwig van Beethoven continued composing even after experiencing significant hearing loss. His dedication allowed him to create some of history's most recognized music.",
+  "impact": "Challenges do not always remove possibility. Sometimes they shape it.",
+  "spark_application": "What strength have you discovered because of a challenge?",
+  "tags": [
+    "creativity",
+    "perseverance",
+    "music"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "entrepreneur",
+  "category_label": "Inspiring People",
+  "spark_type": "story",
+  "short_title": "Beethoven"
+}

@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-PER-002",
+  "title": "The Wright Brothers: Believing the Impossible",
+  "category": "Inspiring People",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Two bicycle makers changed transportation forever.",
+  "story": "Orville and Wilbur Wright were not famous scientists or wealthy inventors. They studied flight, tested ideas, built models, and kept improving. Their persistence led to the first successful powered airplane flight.",
+  "impact": "Big changes often begin with ordinary people who are willing to experiment.",
+  "spark_application": "What idea seems impossible until you take the first step?",
+  "tags": [
+    "innovation",
+    "courage",
+    "experimentation"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "entrepreneur",
+  "category_label": "Inspiring People",
+  "spark_type": "story",
+  "short_title": "Wright Brothers"
+}

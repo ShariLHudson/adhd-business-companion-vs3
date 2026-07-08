@@ -1884,6 +1884,231 @@
     "short_title": "Ordinary Meaning"
   },
   {
+    "spark_id": "SPARK-PER-001",
+    "title": "Thomas Edison: Persistence Through Failure",
+    "category": "Inspiring People",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Thousands of attempts can lead to one world-changing idea.",
+    "story": "Thomas Edison is remembered for inventions like the practical electric light bulb, but his journey included many unsuccessful experiments. He viewed failed attempts as information that helped him understand what did not work. His approach was based on curiosity and persistence.",
+    "impact": "Progress rarely happens perfectly the first time. Innovation often requires patience, experimentation, and learning.",
+    "spark_application": "What could you learn from something that did not work yet?",
+    "tags": [
+      "innovation",
+      "resilience",
+      "invention",
+      "persistence"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "entrepreneur",
+    "category_label": "Inspiring People",
+    "spark_type": "deep",
+    "short_title": "Edison's Persistence"
+  },
+  {
+    "spark_id": "SPARK-PER-002",
+    "title": "The Wright Brothers: Believing the Impossible",
+    "category": "Inspiring People",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Two bicycle makers changed transportation forever.",
+    "story": "Orville and Wilbur Wright were not famous scientists or wealthy inventors. They studied flight, tested ideas, built models, and kept improving. Their persistence led to the first successful powered airplane flight.",
+    "impact": "Big changes often begin with ordinary people who are willing to experiment.",
+    "spark_application": "What idea seems impossible until you take the first step?",
+    "tags": [
+      "innovation",
+      "courage",
+      "experimentation"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "entrepreneur",
+    "category_label": "Inspiring People",
+    "spark_type": "story",
+    "short_title": "Wright Brothers"
+  },
+  {
+    "spark_id": "SPARK-PER-003",
+    "title": "Maya Angelou: Finding Strength Through Words",
+    "category": "Inspiring People",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A difficult life became a source of powerful wisdom.",
+    "story": "Maya Angelou became a celebrated writer, poet, and speaker. Her experiences shaped her ability to connect with people through honesty, courage, and compassion.",
+    "impact": "Personal experiences can become sources of wisdom and connection.",
+    "spark_application": "How could your own experiences become something meaningful for others?",
+    "tags": [
+      "creativity",
+      "courage",
+      "storytelling"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "entrepreneur",
+    "category_label": "Inspiring People",
+    "spark_type": "story",
+    "short_title": "Maya Angelou"
+  },
+  {
+    "spark_id": "SPARK-PER-004",
+    "title": "Albert Einstein: Curiosity Changed Physics",
+    "category": "Inspiring People",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A curious mind changed how we understand the universe.",
+    "story": "Albert Einstein questioned ideas that many people accepted. His imagination and curiosity helped him develop theories that transformed modern physics.",
+    "impact": "Questioning assumptions can lead to discoveries.",
+    "spark_application": "What is something you could look at differently?",
+    "tags": [
+      "science",
+      "curiosity",
+      "imagination"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "entrepreneur",
+    "category_label": "Inspiring People",
+    "spark_type": "story",
+    "short_title": "Einstein's Curiosity"
+  },
+  {
+    "spark_id": "SPARK-PER-005",
+    "title": "Madam C.J. Walker: Building Opportunity",
+    "category": "Inspiring People",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A personal solution became a groundbreaking business.",
+    "story": "Madam C.J. Walker created hair care products and built one of the first major businesses led by an African American woman. She also created opportunities for others through employment and training.",
+    "impact": "Successful businesses can create impact beyond the product itself.",
+    "spark_application": "How can your work create value for others?",
+    "tags": [
+      "entrepreneurship",
+      "leadership",
+      "resilience"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "entrepreneur",
+    "category_label": "Inspiring People",
+    "spark_type": "deep",
+    "short_title": "Madam C.J. Walker"
+  },
+  {
+    "spark_id": "SPARK-PER-006",
+    "title": "Steve Jobs: Thinking Differently",
+    "category": "Inspiring People",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Technology became more human through design and imagination.",
+    "story": "Steve Jobs focused on combining technology with simplicity and user experience. His work helped shape personal computing, music, and mobile technology.",
+    "impact": "Innovation is not only about what something does. It is also about how people experience it.",
+    "spark_application": "How could you make something easier or more enjoyable?",
+    "tags": [
+      "innovation",
+      "creativity",
+      "design"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "entrepreneur",
+    "category_label": "Inspiring People",
+    "spark_type": "story",
+    "short_title": "Steve Jobs"
+  },
+  {
+    "spark_id": "SPARK-PER-007",
+    "title": "Temple Grandin: Seeing the World Differently",
+    "category": "Inspiring People",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A different way of thinking became a strength.",
+    "story": "Temple Grandin used her unique perspective to improve animal science and advocate for understanding different ways of thinking. Her work showed the value of different minds.",
+    "impact": "Different perspectives can create solutions others may not see.",
+    "spark_application": "What strength comes from the way you see the world?",
+    "tags": [
+      "neurodiversity",
+      "creativity",
+      "problem-solving"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "entrepreneur",
+    "category_label": "Inspiring People",
+    "spark_type": "story",
+    "short_title": "Temple Grandin"
+  },
+  {
+    "spark_id": "SPARK-PER-008",
+    "title": "Beethoven: Creating Through Challenges",
+    "category": "Inspiring People",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Some of the greatest creations come from overcoming obstacles.",
+    "story": "Ludwig van Beethoven continued composing even after experiencing significant hearing loss. His dedication allowed him to create some of history's most recognized music.",
+    "impact": "Challenges do not always remove possibility. Sometimes they shape it.",
+    "spark_application": "What strength have you discovered because of a challenge?",
+    "tags": [
+      "creativity",
+      "perseverance",
+      "music"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "entrepreneur",
+    "category_label": "Inspiring People",
+    "spark_type": "story",
+    "short_title": "Beethoven"
+  },
+  {
     "spark_id": "SPARK-QTE-001",
     "title": "Start Where You Are",
     "category": "Meaningful Quotes",

@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-PER-006",
+  "title": "Steve Jobs: Thinking Differently",
+  "category": "Inspiring People",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Technology became more human through design and imagination.",
+  "story": "Steve Jobs focused on combining technology with simplicity and user experience. His work helped shape personal computing, music, and mobile technology.",
+  "impact": "Innovation is not only about what something does. It is also about how people experience it.",
+  "spark_application": "How could you make something easier or more enjoyable?",
+  "tags": [
+    "innovation",
+    "creativity",
+    "design"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "entrepreneur",
+  "category_label": "Inspiring People",
+  "spark_type": "story",
+  "short_title": "Steve Jobs"
+}

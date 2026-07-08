@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-PER-007",
+  "title": "Temple Grandin: Seeing the World Differently",
+  "category": "Inspiring People",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A different way of thinking became a strength.",
+  "story": "Temple Grandin used her unique perspective to improve animal science and advocate for understanding different ways of thinking. Her work showed the value of different minds.",
+  "impact": "Different perspectives can create solutions others may not see.",
+  "spark_application": "What strength comes from the way you see the world?",
+  "tags": [
+    "neurodiversity",
+    "creativity",
+    "problem-solving"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "entrepreneur",
+  "category_label": "Inspiring People",
+  "spark_type": "story",
+  "short_title": "Temple Grandin"
+}

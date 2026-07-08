@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-PER-003",
+  "title": "Maya Angelou: Finding Strength Through Words",
+  "category": "Inspiring People",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A difficult life became a source of powerful wisdom.",
+  "story": "Maya Angelou became a celebrated writer, poet, and speaker. Her experiences shaped her ability to connect with people through honesty, courage, and compassion.",
+  "impact": "Personal experiences can become sources of wisdom and connection.",
+  "spark_application": "How could your own experiences become something meaningful for others?",
+  "tags": [
+    "creativity",
+    "courage",
+    "storytelling"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "entrepreneur",
+  "category_label": "Inspiring People",
+  "spark_type": "story",
+  "short_title": "Maya Angelou"
+}

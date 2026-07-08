@@ -182,6 +182,130 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     tags: ["learning", "creativity", "experimentation"],
   },
 
+  // — Inspiring people (spark-notes-files/SPARK_NOTE_INSPIRING_PEOPLE_SPARK_LIBRARY.md) —
+  {
+    id: "SPARK-PER-001",
+    category: "entrepreneur",
+    categoryLabel: "Inspiring People",
+    sparkType: "deep",
+    title: "Thomas Edison: Persistence Through Failure",
+    shortTitle: "Edison's Persistence",
+    teaser: "Thousands of attempts can lead to one world-changing idea.",
+    whatHappened:
+      "Thomas Edison is remembered for inventions like the practical electric light bulb, but his journey included many unsuccessful experiments. He viewed failed attempts as information that helped him understand what did not work. His approach was based on curiosity and persistence.",
+    whyItMatters:
+      "Progress rarely happens perfectly the first time. Innovation often requires patience, experimentation, and learning.",
+    sparkApplication: "What could you learn from something that did not work yet?",
+    tags: ["innovation", "resilience", "invention", "persistence"],
+  },
+  {
+    id: "SPARK-PER-002",
+    category: "entrepreneur",
+    categoryLabel: "Inspiring People",
+    sparkType: "story",
+    title: "The Wright Brothers: Believing the Impossible",
+    shortTitle: "Wright Brothers",
+    teaser: "Two bicycle makers changed transportation forever.",
+    whatHappened:
+      "Orville and Wilbur Wright were not famous scientists or wealthy inventors. They studied flight, tested ideas, built models, and kept improving. Their persistence led to the first successful powered airplane flight.",
+    whyItMatters:
+      "Big changes often begin with ordinary people who are willing to experiment.",
+    sparkApplication: "What idea seems impossible until you take the first step?",
+    tags: ["innovation", "courage", "experimentation"],
+  },
+  {
+    id: "SPARK-PER-003",
+    category: "entrepreneur",
+    categoryLabel: "Inspiring People",
+    sparkType: "story",
+    title: "Maya Angelou: Finding Strength Through Words",
+    shortTitle: "Maya Angelou",
+    teaser: "A difficult life became a source of powerful wisdom.",
+    whatHappened:
+      "Maya Angelou became a celebrated writer, poet, and speaker. Her experiences shaped her ability to connect with people through honesty, courage, and compassion.",
+    whyItMatters:
+      "Personal experiences can become sources of wisdom and connection.",
+    sparkApplication:
+      "How could your own experiences become something meaningful for others?",
+    tags: ["creativity", "courage", "storytelling"],
+  },
+  {
+    id: "SPARK-PER-004",
+    category: "entrepreneur",
+    categoryLabel: "Inspiring People",
+    sparkType: "story",
+    title: "Albert Einstein: Curiosity Changed Physics",
+    shortTitle: "Einstein's Curiosity",
+    teaser: "A curious mind changed how we understand the universe.",
+    whatHappened:
+      "Albert Einstein questioned ideas that many people accepted. His imagination and curiosity helped him develop theories that transformed modern physics.",
+    whyItMatters: "Questioning assumptions can lead to discoveries.",
+    sparkApplication: "What is something you could look at differently?",
+    tags: ["science", "curiosity", "imagination"],
+  },
+  {
+    id: "SPARK-PER-005",
+    category: "entrepreneur",
+    categoryLabel: "Inspiring People",
+    sparkType: "deep",
+    title: "Madam C.J. Walker: Building Opportunity",
+    shortTitle: "Madam C.J. Walker",
+    teaser: "A personal solution became a groundbreaking business.",
+    whatHappened:
+      "Madam C.J. Walker created hair care products and built one of the first major businesses led by an African American woman. She also created opportunities for others through employment and training.",
+    whyItMatters:
+      "Successful businesses can create impact beyond the product itself.",
+    sparkApplication: "How can your work create value for others?",
+    tags: ["entrepreneurship", "leadership", "resilience"],
+  },
+  {
+    id: "SPARK-PER-006",
+    category: "entrepreneur",
+    categoryLabel: "Inspiring People",
+    sparkType: "story",
+    title: "Steve Jobs: Thinking Differently",
+    shortTitle: "Steve Jobs",
+    teaser: "Technology became more human through design and imagination.",
+    whatHappened:
+      "Steve Jobs focused on combining technology with simplicity and user experience. His work helped shape personal computing, music, and mobile technology.",
+    whyItMatters:
+      "Innovation is not only about what something does. It is also about how people experience it.",
+    sparkApplication:
+      "How could you make something easier or more enjoyable?",
+    tags: ["innovation", "creativity", "design"],
+  },
+  {
+    id: "SPARK-PER-007",
+    category: "entrepreneur",
+    categoryLabel: "Inspiring People",
+    sparkType: "story",
+    title: "Temple Grandin: Seeing the World Differently",
+    shortTitle: "Temple Grandin",
+    teaser: "A different way of thinking became a strength.",
+    whatHappened:
+      "Temple Grandin used her unique perspective to improve animal science and advocate for understanding different ways of thinking. Her work showed the value of different minds.",
+    whyItMatters:
+      "Different perspectives can create solutions others may not see.",
+    sparkApplication: "What strength comes from the way you see the world?",
+    tags: ["neurodiversity", "creativity", "problem-solving"],
+  },
+  {
+    id: "SPARK-PER-008",
+    category: "entrepreneur",
+    categoryLabel: "Inspiring People",
+    sparkType: "story",
+    title: "Beethoven: Creating Through Challenges",
+    shortTitle: "Beethoven",
+    teaser: "Some of the greatest creations come from overcoming obstacles.",
+    whatHappened:
+      "Ludwig van Beethoven continued composing even after experiencing significant hearing loss. His dedication allowed him to create some of history's most recognized music.",
+    whyItMatters:
+      "Challenges do not always remove possibility. Sometimes they shape it.",
+    sparkApplication:
+      "What strength have you discovered because of a challenge?",
+    tags: ["creativity", "perseverance", "music"],
+  },
+
   // — Entrepreneurs & business (spark-notes-files/SPARK_NOTE_ENTREPRENEUR_BUSINESS_SPARK_LIBRARY.md) —
   {
     id: "SPARK-ENT-001",

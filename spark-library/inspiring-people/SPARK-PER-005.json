@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-PER-005",
+  "title": "Madam C.J. Walker: Building Opportunity",
+  "category": "Inspiring People",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A personal solution became a groundbreaking business.",
+  "story": "Madam C.J. Walker created hair care products and built one of the first major businesses led by an African American woman. She also created opportunities for others through employment and training.",
+  "impact": "Successful businesses can create impact beyond the product itself.",
+  "spark_application": "How can your work create value for others?",
+  "tags": [
+    "entrepreneurship",
+    "leadership",
+    "resilience"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "entrepreneur",
+  "category_label": "Inspiring People",
+  "spark_type": "deep",
+  "short_title": "Madam C.J. Walker"
+}

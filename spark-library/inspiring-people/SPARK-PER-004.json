@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-PER-004",
+  "title": "Albert Einstein: Curiosity Changed Physics",
+  "category": "Inspiring People",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A curious mind changed how we understand the universe.",
+  "story": "Albert Einstein questioned ideas that many people accepted. His imagination and curiosity helped him develop theories that transformed modern physics.",
+  "impact": "Questioning assumptions can lead to discoveries.",
+  "spark_application": "What is something you could look at differently?",
+  "tags": [
+    "science",
+    "curiosity",
+    "imagination"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "entrepreneur",
+  "category_label": "Inspiring People",
+  "spark_type": "story",
+  "short_title": "Einstein's Curiosity"
+}
