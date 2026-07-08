@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-SEA-SPRING",
+  "title": "Spring Begins Again",
+  "category": "Seasonal Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "New beginnings are already quietly starting.",
+  "story": "Every spring, the world rehearses a familiar miracle — bare branches bud, soil softens, and daylight stretches a little further. Cultures across history have celebrated renewal long before calendars marked the equinox.",
+  "impact": "Spring reminds us that dormant seasons don't last forever. What feels stuck can still move again with patience and light.",
+  "spark_application": "What small beginning could you nurture this week — even if it still looks tiny from the outside?",
+  "tags": [
+    "seasonal",
+    "spring",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "season",
+    "value": "spring"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "creativity",
+  "category_label": "Seasonal Spark",
+  "spark_type": "quick",
+  "short_title": "Spring Begins Again",
+  "priority": 55
+}

@@ -1,0 +1,33 @@
+{
+  "spark_id": "SPARK-HOL-SEASON-12",
+  "title": "December's Quiet Glow",
+  "category": "Seasonal Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Winter candles",
+  "short_teaser": "A season of light, reflection, and small rituals.",
+  "story": "December has carried meaning across cultures for centuries — from winter solstice gatherings to festivals of light. Long nights invite slower pacing, warmer rooms, and traditions that reconnect us to people we love.",
+  "why_interesting": "Many December traditions began as practical responses to darkness — candles, feasts, and gatherings that made the coldest month feel survivable, even beautiful.",
+  "impact": "Seasons shape how we work and rest. December reminds us that endings and celebrations can coexist — that closing a year is its own kind of beginning.",
+  "spark_application": "What small ritual could make this week feel warmer — for you or for someone else?",
+  "tags": [
+    "seasonal",
+    "december",
+    "holiday"
+  ],
+  "date_rules": {
+    "type": "months",
+    "months": [
+      12
+    ]
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "holiday",
+  "category_label": "Seasonal Spark",
+  "short_title": "December's Quiet Glow",
+  "priority": 60
+}

@@ -1,0 +1,24 @@
+{
+  "spark_id": "SPARK-FUN-002",
+  "title": "Octopus Hearts",
+  "category": "Fun Facts",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Octopus",
+  "short_teaser": "Three hearts, blue blood, and a surprising level of intelligence.",
+  "story": "Octopuses have three hearts and blue blood. Two hearts pump blood to the gills, while the third pumps it to the rest of the body. When they swim, the main heart stops — which is why they prefer crawling.",
+  "impact": "The natural world is full of designs that challenge our assumptions. Different problems call for different architectures.",
+  "spark_application": "What assumption about 'how things should work' might be worth questioning today?",
+  "tags": [],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "fun_fact",
+  "category_label": "Fun Facts",
+  "spark_type": "quick"
+}

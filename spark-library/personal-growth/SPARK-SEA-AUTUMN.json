@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-SEA-AUTUMN",
+  "title": "Autumn's Gentle Pause",
+  "category": "Seasonal Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Learning season — harvest what you have grown.",
+  "story": "Autumn invites reflection. Trees release what they no longer need; harvest traditions remind communities to notice what the year produced before rushing into the next chapter.",
+  "impact": "Reflection is not slowing down for its own sake — it helps us carry forward what worked and release what did not.",
+  "spark_application": "What is one thing from this year worth keeping — and one thing you are ready to let go?",
+  "tags": [
+    "seasonal",
+    "autumn",
+    "reflection"
+  ],
+  "date_rules": {
+    "type": "season",
+    "value": "autumn"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "personal_growth",
+  "category_label": "Seasonal Spark",
+  "spark_type": "story",
+  "short_title": "Autumn's Gentle Pause",
+  "priority": 55
+}

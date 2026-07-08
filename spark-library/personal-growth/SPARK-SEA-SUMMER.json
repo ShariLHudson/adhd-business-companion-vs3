@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-SEA-SUMMER",
+  "title": "Summer's Open Door",
+  "category": "Seasonal Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Adventure doesn't always require a plane ticket.",
+  "story": "Summer has long been the season of exploration — longer days, open schedules, and the feeling that something unexpected might be waiting just outside routine.",
+  "impact": "A change of pace can reset creativity. Adventure sometimes means curiosity in a familiar place seen with fresh eyes.",
+  "spark_application": "Where could you explore for twenty minutes today — a new path, a new recipe, a conversation you have been putting off?",
+  "tags": [
+    "seasonal",
+    "summer",
+    "adventure"
+  ],
+  "date_rules": {
+    "type": "season",
+    "value": "summer"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "personal_growth",
+  "category_label": "Seasonal Spark",
+  "spark_type": "quick",
+  "short_title": "Summer's Open Door",
+  "priority": 55
+}

@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-ADHD-001",
+  "title": "Different Thinking Creates Different Solutions",
+  "category": "ADHD-Friendly Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Some of the world's best ideas came from people who saw things differently.",
+  "story": "Many innovations happen because someone notices something others overlook. Different perspectives can reveal connections, possibilities, and solutions that may not be obvious to everyone.",
+  "impact": "A different approach is not automatically a disadvantage. Sometimes the ability to see patterns and possibilities becomes a strength.",
+  "spark_application": "What is something you notice that others may miss?",
+  "tags": [
+    "adhd",
+    "creativity",
+    "innovation",
+    "strengths"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "adhd_friendly",
+  "category_label": "ADHD-Friendly Spark",
+  "spark_type": "story",
+  "short_title": "Different Thinking"
+}

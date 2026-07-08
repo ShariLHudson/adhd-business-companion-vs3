@@ -1,0 +1,25 @@
+{
+  "spark_id": "SPARK-HOL-004",
+  "title": "National Chocolate Chip Cookie Day",
+  "category": "Weird & Fun Holidays",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Chocolate chip cookies",
+  "short_teaser": "The accidental invention that became America's favorite cookie.",
+  "story": "Ruth Wakefield invented the chocolate chip cookie in 1938 at the Toll House Inn in Massachusetts. She broke a Nestlé chocolate bar into her butter cookie dough, expecting it to melt — but the chunks held their shape, creating something entirely new.",
+  "impact": "Another reminder that happy accidents often become beloved traditions.",
+  "spark_application": "What 'mistake' in your work might actually be your best idea?",
+  "tags": [],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "08-04"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "holiday",
+  "category_label": "Weird & Fun Holidays",
+  "priority": 80
+}

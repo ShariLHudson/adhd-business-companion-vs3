@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-ADHD-002",
+  "title": "The Idea Flood",
+  "category": "ADHD-Friendly Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Having many ideas can be a challenge and a gift.",
+  "story": "Many creative entrepreneurs experience moments when ideas arrive quickly. The challenge is not always creating ideas — it is capturing, organizing, and choosing which ideas deserve attention.",
+  "impact": "Ideas are valuable when they are captured and given a place to grow.",
+  "spark_application": "What idea do you want to capture before it disappears?",
+  "tags": [
+    "ideas",
+    "creativity",
+    "entrepreneurship"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "adhd_friendly",
+  "category_label": "ADHD-Friendly Spark",
+  "spark_type": "quick",
+  "short_title": "The Idea Flood"
+}

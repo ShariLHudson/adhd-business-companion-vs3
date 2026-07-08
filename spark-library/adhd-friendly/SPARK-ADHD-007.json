@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-ADHD-007",
+  "title": "Your Brain Needs the Right Environment",
+  "category": "ADHD-Friendly Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Sometimes changing the surroundings changes the results.",
+  "story": "Different environments affect attention, creativity, and energy. Small adjustments — reducing distractions, changing locations, or adding helpful reminders — can make tasks easier.",
+  "impact": "The environment can support the brain instead of fighting it.",
+  "spark_application": "What small change could make something easier?",
+  "tags": [
+    "environment",
+    "focus",
+    "productivity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "adhd_friendly",
+  "category_label": "ADHD-Friendly Spark",
+  "spark_type": "story",
+  "short_title": "Right Environment"
+}

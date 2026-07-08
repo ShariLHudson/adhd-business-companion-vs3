@@ -1,0 +1,23 @@
+{
+  "spark_id": "SPARK-QTE-002",
+  "title": "Creativity Takes Courage",
+  "category": "Meaningful Quotes",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Artist palette",
+  "short_teaser": "Henri Matisse on the bravery of making art.",
+  "story": "\"Creativity takes courage.\" — Henri Matisse, one of the most influential artists of the 20th century. Matisse spent decades pushing past comfort, reinventing his style even when the world resisted change.",
+  "impact": "Sharing creative work means risking judgment. Matisse reminds us that the act of creating is itself an act of bravery.",
+  "spark_application": "What small experiment could you share before it feels 'ready'?",
+  "tags": [],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "quote",
+  "category_label": "Meaningful Quotes"
+}

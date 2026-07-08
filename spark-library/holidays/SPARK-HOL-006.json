@@ -1,0 +1,25 @@
+{
+  "spark_id": "SPARK-HOL-006",
+  "title": "National Puzzle Day",
+  "category": "Weird & Fun Holidays",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Jigsaw puzzle",
+  "short_teaser": "A day for pieces that fit together — eventually.",
+  "story": "January 29 is National Puzzle Day, celebrating jigsaws, crosswords, and brain teasers. Puzzles exercise patience, pattern recognition, and the satisfaction of finding where things belong.",
+  "impact": "Sometimes the best break is something that lets your hands work while your mind unwinds.",
+  "spark_application": "What problem are you trying to solve all at once that might benefit from one piece at a time?",
+  "tags": [],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "01-29"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "holiday",
+  "category_label": "Weird & Fun Holidays",
+  "priority": 80
+}

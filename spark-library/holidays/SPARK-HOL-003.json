@@ -1,0 +1,25 @@
+{
+  "spark_id": "SPARK-HOL-003",
+  "title": "National Book Lovers Day",
+  "category": "Weird & Fun Holidays",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Open book",
+  "short_teaser": "A day to celebrate stories that change us.",
+  "story": "August 9 is National Book Lovers Day — a quiet celebration of reading, discovery, and the worlds we enter through pages. No one knows exactly who started it, which feels fitting for a holiday about getting lost in someone else's words.",
+  "impact": "Books let us live other lives, learn from distant minds, and return changed. A single sentence can shift a perspective.",
+  "spark_application": "What book, article, or story has been waiting for your attention?",
+  "tags": [],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "08-09"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "holiday",
+  "category_label": "Weird & Fun Holidays",
+  "priority": 80
+}

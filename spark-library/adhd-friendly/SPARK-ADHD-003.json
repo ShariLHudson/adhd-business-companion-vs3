@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-ADHD-003",
+  "title": "Curiosity Is a Superpower",
+  "category": "ADHD-Friendly Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Questions can lead you toward your next breakthrough.",
+  "story": "Curious minds often explore topics deeply, make unexpected connections, and discover new possibilities. That curiosity can become a powerful creative advantage.",
+  "impact": "Many entrepreneurs succeed because they keep asking better questions.",
+  "spark_application": "What are you curious about right now?",
+  "tags": [
+    "curiosity",
+    "learning",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "adhd_friendly",
+  "category_label": "ADHD-Friendly Spark",
+  "spark_type": "quick",
+  "short_title": "Curiosity Superpower"
+}

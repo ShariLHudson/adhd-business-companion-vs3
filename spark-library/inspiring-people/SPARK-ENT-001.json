@@ -1,0 +1,24 @@
+{
+  "spark_id": "SPARK-ENT-001",
+  "title": "Walt Disney",
+  "category": "Inspiring People",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Castle silhouette",
+  "short_teaser": "A storyteller who built an entertainment empire.",
+  "story": "Walt Disney started with a mouse, a pencil, and a belief that imagination deserved a place in the world. He faced bankruptcy, skeptics, and setbacks — but kept building experiences that combined storytelling, technology, and wonder.",
+  "impact": "Disney changed entertainment by proving that customer experience, not just product, could create lasting magic. He built worlds people wanted to step into.",
+  "spark_application": "What experience can you create for people instead of just selling something?",
+  "tags": [],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "entrepreneur",
+  "category_label": "Inspiring People",
+  "spark_type": "deep"
+}

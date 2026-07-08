@@ -1,0 +1,25 @@
+{
+  "spark_id": "SPARK-HOL-005",
+  "title": "International Coffee Day",
+  "category": "Weird & Fun Holidays",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Coffee cup",
+  "short_teaser": "A global toast to the bean that fuels mornings.",
+  "story": "International Coffee Day on September 29 celebrates one of the world's most traded commodities. From Ethiopian highlands to your favorite mug, coffee has shaped cultures, economies, and countless morning rituals.",
+  "impact": "Rituals around food and drink connect us across cultures and give structure to our days.",
+  "spark_application": "What daily ritual helps you pause and reset — even for just a minute?",
+  "tags": [],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "09-29"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "holiday",
+  "category_label": "Weird & Fun Holidays",
+  "priority": 80
+}

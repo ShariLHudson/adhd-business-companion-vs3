@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-ADHD-004",
+  "title": "Follow the Energy",
+  "category": "ADHD-Friendly Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Understanding when you work best can change everything.",
+  "story": "People do not all have the same energy patterns. Some create best in the morning; others find their best ideas later in the day. Learning your patterns can help you work with yourself instead of against yourself.",
+  "impact": "Better self-awareness can reduce unnecessary struggle.",
+  "spark_application": "When does your best thinking usually happen?",
+  "tags": [
+    "energy",
+    "motivation",
+    "productivity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "adhd_friendly",
+  "category_label": "ADHD-Friendly Spark",
+  "spark_type": "story",
+  "short_title": "Follow the Energy"
+}

@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-SEA-WINTER",
+  "title": "Winter's Quiet Inspiration",
+  "category": "Seasonal Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Traditions and warmth when the world slows down.",
+  "story": "Winter has always been a season for gathering — firelight, stories, handmade gifts, and rituals that turn cold months into something human and hopeful.",
+  "impact": "Quiet seasons create space for imagination. Not every productive season looks busy from the outside.",
+  "spark_application": "What tradition — old or new — could make this week feel warmer for you or someone you care about?",
+  "tags": [
+    "seasonal",
+    "winter",
+    "inspiration"
+  ],
+  "date_rules": {
+    "type": "season",
+    "value": "winter"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "creativity",
+  "category_label": "Seasonal Spark",
+  "spark_type": "story",
+  "short_title": "Winter's Quiet Inspiration",
+  "priority": 55
+}

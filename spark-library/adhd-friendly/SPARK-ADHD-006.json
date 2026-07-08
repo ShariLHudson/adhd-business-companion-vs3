@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-ADHD-006",
+  "title": "Progress Over Perfection",
+  "category": "ADHD-Friendly Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Finished and improving beats waiting forever.",
+  "story": "Many creative people struggle because they want the final version before creating the first version. Small completed steps create momentum.",
+  "impact": "Action creates information that thinking alone cannot provide.",
+  "spark_application": "What could you finish imperfectly today?",
+  "tags": [
+    "perfectionism",
+    "action",
+    "momentum"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "adhd_friendly",
+  "category_label": "ADHD-Friendly Spark",
+  "spark_type": "quick",
+  "short_title": "Progress Over Perfection"
+}

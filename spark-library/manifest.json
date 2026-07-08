@@ -1,0 +1,818 @@
+[
+  {
+    "spark_id": "SPARK-ADHD-001",
+    "title": "Different Thinking Creates Different Solutions",
+    "category": "ADHD-Friendly Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Some of the world's best ideas came from people who saw things differently.",
+    "story": "Many innovations happen because someone notices something others overlook. Different perspectives can reveal connections, possibilities, and solutions that may not be obvious to everyone.",
+    "impact": "A different approach is not automatically a disadvantage. Sometimes the ability to see patterns and possibilities becomes a strength.",
+    "spark_application": "What is something you notice that others may miss?",
+    "tags": [
+      "adhd",
+      "creativity",
+      "innovation",
+      "strengths"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "adhd_friendly",
+    "category_label": "ADHD-Friendly Spark",
+    "spark_type": "story",
+    "short_title": "Different Thinking"
+  },
+  {
+    "spark_id": "SPARK-ADHD-002",
+    "title": "The Idea Flood",
+    "category": "ADHD-Friendly Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Having many ideas can be a challenge and a gift.",
+    "story": "Many creative entrepreneurs experience moments when ideas arrive quickly. The challenge is not always creating ideas — it is capturing, organizing, and choosing which ideas deserve attention.",
+    "impact": "Ideas are valuable when they are captured and given a place to grow.",
+    "spark_application": "What idea do you want to capture before it disappears?",
+    "tags": [
+      "ideas",
+      "creativity",
+      "entrepreneurship"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "adhd_friendly",
+    "category_label": "ADHD-Friendly Spark",
+    "spark_type": "quick",
+    "short_title": "The Idea Flood"
+  },
+  {
+    "spark_id": "SPARK-ADHD-003",
+    "title": "Curiosity Is a Superpower",
+    "category": "ADHD-Friendly Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Questions can lead you toward your next breakthrough.",
+    "story": "Curious minds often explore topics deeply, make unexpected connections, and discover new possibilities. That curiosity can become a powerful creative advantage.",
+    "impact": "Many entrepreneurs succeed because they keep asking better questions.",
+    "spark_application": "What are you curious about right now?",
+    "tags": [
+      "curiosity",
+      "learning",
+      "creativity"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "adhd_friendly",
+    "category_label": "ADHD-Friendly Spark",
+    "spark_type": "quick",
+    "short_title": "Curiosity Superpower"
+  },
+  {
+    "spark_id": "SPARK-ADHD-004",
+    "title": "Follow the Energy",
+    "category": "ADHD-Friendly Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Understanding when you work best can change everything.",
+    "story": "People do not all have the same energy patterns. Some create best in the morning; others find their best ideas later in the day. Learning your patterns can help you work with yourself instead of against yourself.",
+    "impact": "Better self-awareness can reduce unnecessary struggle.",
+    "spark_application": "When does your best thinking usually happen?",
+    "tags": [
+      "energy",
+      "motivation",
+      "productivity"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "adhd_friendly",
+    "category_label": "ADHD-Friendly Spark",
+    "spark_type": "story",
+    "short_title": "Follow the Energy"
+  },
+  {
+    "spark_id": "SPARK-ADHD-005",
+    "title": "Hyperfocus Can Become a Strength",
+    "category": "ADHD-Friendly Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Deep interest can create incredible progress.",
+    "story": "Many people experience periods where they become deeply absorbed in something meaningful. That intense focus can lead to learning, creativity, and breakthroughs when directed intentionally.",
+    "impact": "Understanding your strengths helps you use them more effectively.",
+    "spark_application": "What topic makes you lose track of time?",
+    "tags": [
+      "focus",
+      "creativity",
+      "strengths"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "adhd_friendly",
+    "category_label": "ADHD-Friendly Spark",
+    "spark_type": "story",
+    "short_title": "Hyperfocus Strength"
+  },
+  {
+    "spark_id": "SPARK-ADHD-006",
+    "title": "Progress Over Perfection",
+    "category": "ADHD-Friendly Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Finished and improving beats waiting forever.",
+    "story": "Many creative people struggle because they want the final version before creating the first version. Small completed steps create momentum.",
+    "impact": "Action creates information that thinking alone cannot provide.",
+    "spark_application": "What could you finish imperfectly today?",
+    "tags": [
+      "perfectionism",
+      "action",
+      "momentum"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "adhd_friendly",
+    "category_label": "ADHD-Friendly Spark",
+    "spark_type": "quick",
+    "short_title": "Progress Over Perfection"
+  },
+  {
+    "spark_id": "SPARK-ADHD-007",
+    "title": "Your Brain Needs the Right Environment",
+    "category": "ADHD-Friendly Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Sometimes changing the surroundings changes the results.",
+    "story": "Different environments affect attention, creativity, and energy. Small adjustments — reducing distractions, changing locations, or adding helpful reminders — can make tasks easier.",
+    "impact": "The environment can support the brain instead of fighting it.",
+    "spark_application": "What small change could make something easier?",
+    "tags": [
+      "environment",
+      "focus",
+      "productivity"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "adhd_friendly",
+    "category_label": "ADHD-Friendly Spark",
+    "spark_type": "story",
+    "short_title": "Right Environment"
+  },
+  {
+    "spark_id": "SPARK-ADHD-008",
+    "title": "Celebrate Evidence of Progress",
+    "category": "ADHD-Friendly Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Your accomplishments deserve to be remembered.",
+    "story": "Many people move quickly to the next challenge and forget what they have already achieved. Keeping evidence of wins creates a reminder of capability.",
+    "impact": "Past success can become fuel for future confidence.",
+    "spark_application": "What is one thing you have accomplished that you should celebrate?",
+    "tags": [
+      "confidence",
+      "achievements",
+      "encouragement"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "adhd_friendly",
+    "category_label": "ADHD-Friendly Spark",
+    "spark_type": "story",
+    "short_title": "Celebrate Progress"
+  },
+  {
+    "spark_id": "SPARK-BIZ-001",
+    "title": "The IKEA Effect",
+    "category": "Business Sparks",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Assembled furniture",
+    "short_teaser": "Why we value things more when we build them ourselves.",
+    "story": "Researchers found that people place higher value on furniture they assemble themselves — even when the result is imperfect. The effort of creation creates emotional ownership.",
+    "impact": "Involving customers in the creation process builds loyalty and satisfaction. People support what they help build.",
+    "spark_application": "Where could you invite your customers or team to co-create instead of just consume?",
+    "tags": [],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "business",
+    "category_label": "Business Sparks"
+  },
+  {
+    "spark_id": "SPARK-CRE-001",
+    "title": "Constraints Spark Creativity",
+    "category": "Creativity",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Green eggs illustration",
+    "short_teaser": "Limits can be the best muse.",
+    "story": "Dr. Seuss wrote Green Eggs and Ham using only 50 words — on a bet. Twitter's 140-character limit spawned new forms of wit. Haiku's rigid structure has produced centuries of beauty.",
+    "impact": "Unlimited options can paralyze. Constraints force focus and often produce the most memorable results.",
+    "spark_application": "What artificial limit could you set today to unlock a more creative solution?",
+    "tags": [],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "creativity",
+    "category_label": "Creativity"
+  },
+  {
+    "spark_id": "SPARK-ENT-001",
+    "title": "Walt Disney",
+    "category": "Inspiring People",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Castle silhouette",
+    "short_teaser": "A storyteller who built an entertainment empire.",
+    "story": "Walt Disney started with a mouse, a pencil, and a belief that imagination deserved a place in the world. He faced bankruptcy, skeptics, and setbacks — but kept building experiences that combined storytelling, technology, and wonder.",
+    "impact": "Disney changed entertainment by proving that customer experience, not just product, could create lasting magic. He built worlds people wanted to step into.",
+    "spark_application": "What experience can you create for people instead of just selling something?",
+    "tags": [],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "entrepreneur",
+    "category_label": "Inspiring People",
+    "spark_type": "deep"
+  },
+  {
+    "spark_id": "SPARK-FUN-001",
+    "title": "Honey Never Spoils",
+    "category": "Fun Facts",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Honey jar",
+    "short_teaser": "Archaeologists found edible honey in ancient Egyptian tombs.",
+    "story": "Honey's low moisture and natural acidity make it nearly impossible for bacteria to survive in it. Archaeologists have discovered 3,000-year-old honey in Egyptian tombs that was still perfectly edible.",
+    "impact": "Nature sometimes creates solutions more durable than anything we engineer. Patience and the right conditions can preserve value for millennia.",
+    "spark_application": "What work are you building that could still matter years from now?",
+    "tags": [],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "fun_fact",
+    "category_label": "Fun Facts",
+    "spark_type": "quick"
+  },
+  {
+    "spark_id": "SPARK-FUN-002",
+    "title": "Octopus Hearts",
+    "category": "Fun Facts",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Octopus",
+    "short_teaser": "Three hearts, blue blood, and a surprising level of intelligence.",
+    "story": "Octopuses have three hearts and blue blood. Two hearts pump blood to the gills, while the third pumps it to the rest of the body. When they swim, the main heart stops — which is why they prefer crawling.",
+    "impact": "The natural world is full of designs that challenge our assumptions. Different problems call for different architectures.",
+    "spark_application": "What assumption about 'how things should work' might be worth questioning today?",
+    "tags": [],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "fun_fact",
+    "category_label": "Fun Facts",
+    "spark_type": "quick"
+  },
+  {
+    "spark_id": "SPARK-GRO-001",
+    "title": "The Two-Minute Rule",
+    "category": "Personal Growth",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Checklist",
+    "short_teaser": "Small actions beat perfect plans.",
+    "story": "Productivity researchers found that if a task takes less than two minutes, doing it immediately prevents the mental overhead of tracking it. The rule isn't about speed — it's about reducing friction between intention and action.",
+    "impact": "Momentum often starts with the smallest possible step. Finishing tiny tasks builds confidence for bigger ones.",
+    "spark_application": "What two-minute action could you finish right now instead of adding it to a list?",
+    "tags": [],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "personal_growth",
+    "category_label": "Personal Growth"
+  },
+  {
+    "spark_id": "SPARK-HIS-001",
+    "title": "The Moon Landing",
+    "category": "Today in History",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Moon landing",
+    "short_teaser": "One small step that inspired generations.",
+    "story": "On July 20, 1969, Neil Armstrong became the first human to walk on the Moon. The Apollo 11 mission fulfilled a promise made years earlier and proved that audacious goals, backed by persistence, can become reality.",
+    "impact": "The moon landing showed humanity what focused collaboration can achieve — and gave every child permission to dream bigger.",
+    "spark_application": "What 'impossible' goal deserves another look with fresh eyes?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "07-20"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "history",
+    "category_label": "Today in History",
+    "priority": 85
+  },
+  {
+    "spark_id": "SPARK-HOL-001",
+    "title": "National Donut Day",
+    "category": "Weird & Fun Holidays",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Donuts",
+    "short_teaser": "A sweet tradition with a surprising origin.",
+    "story": "National Donut Day began in 1938 to honor the Salvation Army 'Donut Lassies' who served donuts to soldiers during World War I. What started as comfort food in the trenches became an annual celebration of small joys.",
+    "impact": "Sometimes the sweetest traditions come from simple acts of care during hard times.",
+    "spark_application": "Who could you surprise with a small treat or kind gesture today?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "06-06"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Weird & Fun Holidays",
+    "priority": 80
+  },
+  {
+    "spark_id": "SPARK-HOL-002",
+    "title": "National Ice Cream Day",
+    "category": "Weird & Fun Holidays",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Ice cream cone",
+    "short_teaser": "A presidential proclamation for something cold and sweet.",
+    "story": "President Ronald Reagan declared the third Sunday in July as National Ice Cream Day in 1984. Americans consume about 23 gallons of ice cream per person each year — making it one of the most beloved treats in the country.",
+    "impact": "Celebrating small pleasures reminds us that joy doesn't need a grand occasion.",
+    "spark_application": "What simple pleasure could you savor today without guilt or rush?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "07-21"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Weird & Fun Holidays",
+    "priority": 80
+  },
+  {
+    "spark_id": "SPARK-HOL-003",
+    "title": "National Book Lovers Day",
+    "category": "Weird & Fun Holidays",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Open book",
+    "short_teaser": "A day to celebrate stories that change us.",
+    "story": "August 9 is National Book Lovers Day — a quiet celebration of reading, discovery, and the worlds we enter through pages. No one knows exactly who started it, which feels fitting for a holiday about getting lost in someone else's words.",
+    "impact": "Books let us live other lives, learn from distant minds, and return changed. A single sentence can shift a perspective.",
+    "spark_application": "What book, article, or story has been waiting for your attention?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "08-09"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Weird & Fun Holidays",
+    "priority": 80
+  },
+  {
+    "spark_id": "SPARK-HOL-004",
+    "title": "National Chocolate Chip Cookie Day",
+    "category": "Weird & Fun Holidays",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Chocolate chip cookies",
+    "short_teaser": "The accidental invention that became America's favorite cookie.",
+    "story": "Ruth Wakefield invented the chocolate chip cookie in 1938 at the Toll House Inn in Massachusetts. She broke a Nestlé chocolate bar into her butter cookie dough, expecting it to melt — but the chunks held their shape, creating something entirely new.",
+    "impact": "Another reminder that happy accidents often become beloved traditions.",
+    "spark_application": "What 'mistake' in your work might actually be your best idea?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "08-04"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Weird & Fun Holidays",
+    "priority": 80
+  },
+  {
+    "spark_id": "SPARK-HOL-005",
+    "title": "International Coffee Day",
+    "category": "Weird & Fun Holidays",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Coffee cup",
+    "short_teaser": "A global toast to the bean that fuels mornings.",
+    "story": "International Coffee Day on September 29 celebrates one of the world's most traded commodities. From Ethiopian highlands to your favorite mug, coffee has shaped cultures, economies, and countless morning rituals.",
+    "impact": "Rituals around food and drink connect us across cultures and give structure to our days.",
+    "spark_application": "What daily ritual helps you pause and reset — even for just a minute?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "09-29"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Weird & Fun Holidays",
+    "priority": 80
+  },
+  {
+    "spark_id": "SPARK-HOL-006",
+    "title": "National Puzzle Day",
+    "category": "Weird & Fun Holidays",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Jigsaw puzzle",
+    "short_teaser": "A day for pieces that fit together — eventually.",
+    "story": "January 29 is National Puzzle Day, celebrating jigsaws, crosswords, and brain teasers. Puzzles exercise patience, pattern recognition, and the satisfaction of finding where things belong.",
+    "impact": "Sometimes the best break is something that lets your hands work while your mind unwinds.",
+    "spark_application": "What problem are you trying to solve all at once that might benefit from one piece at a time?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "01-29"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Weird & Fun Holidays",
+    "priority": 80
+  },
+  {
+    "spark_id": "SPARK-HOL-SEASON-12",
+    "title": "December's Quiet Glow",
+    "category": "Seasonal Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Winter candles",
+    "short_teaser": "A season of light, reflection, and small rituals.",
+    "story": "December has carried meaning across cultures for centuries — from winter solstice gatherings to festivals of light. Long nights invite slower pacing, warmer rooms, and traditions that reconnect us to people we love.",
+    "why_interesting": "Many December traditions began as practical responses to darkness — candles, feasts, and gatherings that made the coldest month feel survivable, even beautiful.",
+    "impact": "Seasons shape how we work and rest. December reminds us that endings and celebrations can coexist — that closing a year is its own kind of beginning.",
+    "spark_application": "What small ritual could make this week feel warmer — for you or for someone else?",
+    "tags": [
+      "seasonal",
+      "december",
+      "holiday"
+    ],
+    "date_rules": {
+      "type": "months",
+      "months": [
+        12
+      ]
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Seasonal Spark",
+    "short_title": "December's Quiet Glow",
+    "priority": 60
+  },
+  {
+    "spark_id": "SPARK-INV-001",
+    "title": "The Post-it® Note",
+    "category": "History of Inventions",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Colorful sticky notes",
+    "short_teaser": "A failed experiment became one of the world's favorite productivity tools.",
+    "story": "In 1968, 3M scientist Dr. Spencer Silver was trying to create a super-strong adhesive — but instead invented a reusable, low-tack glue. For years, nobody knew what to do with it.",
+    "why_interesting": "Then Art Fry, a fellow 3M scientist, needed bookmarks that wouldn't fall out of his church choir hymnal. He applied Silver's 'failed' adhesive to small paper squares — and the Post-it Note was born.",
+    "impact": "The Post-it Note changed how people capture ideas, leave reminders, and organize information. What started as a 'failed' experiment became a tool used in over 200 countries.",
+    "spark_application": "What idea have you been ignoring because it didn't work the first time? Sometimes ideas that seem wrong just need a different use.",
+    "tags": [
+      "invention",
+      "productivity",
+      "3m"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "invention",
+    "category_label": "History of Inventions",
+    "spark_type": "story",
+    "short_title": "The Post-it® Note"
+  },
+  {
+    "spark_id": "SPARK-INV-002",
+    "title": "The First Computer Mouse",
+    "category": "History of Inventions",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Vintage computer mouse",
+    "short_teaser": "A wooden block that changed how we interact with computers.",
+    "story": "In 1964, Douglas Engelbart built the first computer mouse from a wooden block, two metal wheels, and a single button. He called it a mouse because the cord looked like a tail. His goal was to make computers feel more intuitive — something you could point at, not just type at.",
+    "impact": "The mouse made personal computing accessible to everyone. Point-and-click became the bridge between human intention and digital action.",
+    "spark_application": "What tool could make something complicated feel simple for the people you serve?",
+    "tags": [],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "invention",
+    "category_label": "History of Inventions"
+  },
+  {
+    "spark_id": "SPARK-INV-003",
+    "title": "Velcro®",
+    "category": "History of Inventions",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Burrs and fabric",
+    "short_teaser": "Inspired by burrs stuck to a dog's fur after a walk.",
+    "story": "Swiss engineer George de Mestral noticed burrs clinging to his dog's coat after a hike in 1941. Under a microscope, he saw tiny hooks — and spent years perfecting a fabric fastener that mimicked nature's design.",
+    "impact": "Velcro showed that the best innovations often come from paying attention to ordinary moments. Nature had solved the problem long before we did.",
+    "spark_application": "What everyday annoyance could become your next breakthrough if you looked at it more closely?",
+    "tags": [],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "invention",
+    "category_label": "History of Inventions"
+  },
+  {
+    "spark_id": "SPARK-QTE-001",
+    "title": "Start Where You Are",
+    "category": "Meaningful Quotes",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Tennis court",
+    "short_teaser": "Arthur Ashe on beginning with what you have.",
+    "story": "\"Start where you are. Use what you have. Do what you can.\" — Arthur Ashe, tennis champion and civil rights advocate. Ashe faced barriers throughout his career but never waited for perfect conditions to begin.",
+    "impact": "Ashe's words remind us that action doesn't require ideal circumstances — only willingness to begin with what's in front of us.",
+    "spark_application": "What small step could you take today with exactly the resources you already have?",
+    "tags": [],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "quote",
+    "category_label": "Meaningful Quotes"
+  },
+  {
+    "spark_id": "SPARK-QTE-002",
+    "title": "Creativity Takes Courage",
+    "category": "Meaningful Quotes",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Artist palette",
+    "short_teaser": "Henri Matisse on the bravery of making art.",
+    "story": "\"Creativity takes courage.\" — Henri Matisse, one of the most influential artists of the 20th century. Matisse spent decades pushing past comfort, reinventing his style even when the world resisted change.",
+    "impact": "Sharing creative work means risking judgment. Matisse reminds us that the act of creating is itself an act of bravery.",
+    "spark_application": "What small experiment could you share before it feels 'ready'?",
+    "tags": [],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "quote",
+    "category_label": "Meaningful Quotes"
+  },
+  {
+    "spark_id": "SPARK-SEA-AUTUMN",
+    "title": "Autumn's Gentle Pause",
+    "category": "Seasonal Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Learning season — harvest what you have grown.",
+    "story": "Autumn invites reflection. Trees release what they no longer need; harvest traditions remind communities to notice what the year produced before rushing into the next chapter.",
+    "impact": "Reflection is not slowing down for its own sake — it helps us carry forward what worked and release what did not.",
+    "spark_application": "What is one thing from this year worth keeping — and one thing you are ready to let go?",
+    "tags": [
+      "seasonal",
+      "autumn",
+      "reflection"
+    ],
+    "date_rules": {
+      "type": "season",
+      "value": "autumn"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "personal_growth",
+    "category_label": "Seasonal Spark",
+    "spark_type": "story",
+    "short_title": "Autumn's Gentle Pause",
+    "priority": 55
+  },
+  {
+    "spark_id": "SPARK-SEA-SPRING",
+    "title": "Spring Begins Again",
+    "category": "Seasonal Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "New beginnings are already quietly starting.",
+    "story": "Every spring, the world rehearses a familiar miracle — bare branches bud, soil softens, and daylight stretches a little further. Cultures across history have celebrated renewal long before calendars marked the equinox.",
+    "impact": "Spring reminds us that dormant seasons don't last forever. What feels stuck can still move again with patience and light.",
+    "spark_application": "What small beginning could you nurture this week — even if it still looks tiny from the outside?",
+    "tags": [
+      "seasonal",
+      "spring",
+      "creativity"
+    ],
+    "date_rules": {
+      "type": "season",
+      "value": "spring"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "creativity",
+    "category_label": "Seasonal Spark",
+    "spark_type": "quick",
+    "short_title": "Spring Begins Again",
+    "priority": 55
+  },
+  {
+    "spark_id": "SPARK-SEA-SUMMER",
+    "title": "Summer's Open Door",
+    "category": "Seasonal Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Adventure doesn't always require a plane ticket.",
+    "story": "Summer has long been the season of exploration — longer days, open schedules, and the feeling that something unexpected might be waiting just outside routine.",
+    "impact": "A change of pace can reset creativity. Adventure sometimes means curiosity in a familiar place seen with fresh eyes.",
+    "spark_application": "Where could you explore for twenty minutes today — a new path, a new recipe, a conversation you have been putting off?",
+    "tags": [
+      "seasonal",
+      "summer",
+      "adventure"
+    ],
+    "date_rules": {
+      "type": "season",
+      "value": "summer"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "personal_growth",
+    "category_label": "Seasonal Spark",
+    "spark_type": "quick",
+    "short_title": "Summer's Open Door",
+    "priority": 55
+  },
+  {
+    "spark_id": "SPARK-SEA-WINTER",
+    "title": "Winter's Quiet Inspiration",
+    "category": "Seasonal Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Traditions and warmth when the world slows down.",
+    "story": "Winter has always been a season for gathering — firelight, stories, handmade gifts, and rituals that turn cold months into something human and hopeful.",
+    "impact": "Quiet seasons create space for imagination. Not every productive season looks busy from the outside.",
+    "spark_application": "What tradition — old or new — could make this week feel warmer for you or someone you care about?",
+    "tags": [
+      "seasonal",
+      "winter",
+      "inspiration"
+    ],
+    "date_rules": {
+      "type": "season",
+      "value": "winter"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "creativity",
+    "category_label": "Seasonal Spark",
+    "spark_type": "story",
+    "short_title": "Winter's Quiet Inspiration",
+    "priority": 55
+  }
+]

@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-ADHD-005",
+  "title": "Hyperfocus Can Become a Strength",
+  "category": "ADHD-Friendly Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Deep interest can create incredible progress.",
+  "story": "Many people experience periods where they become deeply absorbed in something meaningful. That intense focus can lead to learning, creativity, and breakthroughs when directed intentionally.",
+  "impact": "Understanding your strengths helps you use them more effectively.",
+  "spark_application": "What topic makes you lose track of time?",
+  "tags": [
+    "focus",
+    "creativity",
+    "strengths"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "adhd_friendly",
+  "category_label": "ADHD-Friendly Spark",
+  "spark_type": "story",
+  "short_title": "Hyperfocus Strength"
+}

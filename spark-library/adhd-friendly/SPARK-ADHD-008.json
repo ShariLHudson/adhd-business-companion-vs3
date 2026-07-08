@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-ADHD-008",
+  "title": "Celebrate Evidence of Progress",
+  "category": "ADHD-Friendly Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Your accomplishments deserve to be remembered.",
+  "story": "Many people move quickly to the next challenge and forget what they have already achieved. Keeping evidence of wins creates a reminder of capability.",
+  "impact": "Past success can become fuel for future confidence.",
+  "spark_application": "What is one thing you have accomplished that you should celebrate?",
+  "tags": [
+    "confidence",
+    "achievements",
+    "encouragement"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "adhd_friendly",
+  "category_label": "ADHD-Friendly Spark",
+  "spark_type": "story",
+  "short_title": "Celebrate Progress"
+}

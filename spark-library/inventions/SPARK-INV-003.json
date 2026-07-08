@@ -1,0 +1,23 @@
+{
+  "spark_id": "SPARK-INV-003",
+  "title": "Velcro®",
+  "category": "History of Inventions",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Burrs and fabric",
+  "short_teaser": "Inspired by burrs stuck to a dog's fur after a walk.",
+  "story": "Swiss engineer George de Mestral noticed burrs clinging to his dog's coat after a hike in 1941. Under a microscope, he saw tiny hooks — and spent years perfecting a fabric fastener that mimicked nature's design.",
+  "impact": "Velcro showed that the best innovations often come from paying attention to ordinary moments. Nature had solved the problem long before we did.",
+  "spark_application": "What everyday annoyance could become your next breakthrough if you looked at it more closely?",
+  "tags": [],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "invention",
+  "category_label": "History of Inventions"
+}

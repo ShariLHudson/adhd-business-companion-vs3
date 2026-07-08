@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-INV-001",
+  "title": "The Post-it® Note",
+  "category": "History of Inventions",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Colorful sticky notes",
+  "short_teaser": "A failed experiment became one of the world's favorite productivity tools.",
+  "story": "In 1968, 3M scientist Dr. Spencer Silver was trying to create a super-strong adhesive — but instead invented a reusable, low-tack glue. For years, nobody knew what to do with it.",
+  "why_interesting": "Then Art Fry, a fellow 3M scientist, needed bookmarks that wouldn't fall out of his church choir hymnal. He applied Silver's 'failed' adhesive to small paper squares — and the Post-it Note was born.",
+  "impact": "The Post-it Note changed how people capture ideas, leave reminders, and organize information. What started as a 'failed' experiment became a tool used in over 200 countries.",
+  "spark_application": "What idea have you been ignoring because it didn't work the first time? Sometimes ideas that seem wrong just need a different use.",
+  "tags": [
+    "invention",
+    "productivity",
+    "3m"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "invention",
+  "category_label": "History of Inventions",
+  "spark_type": "story",
+  "short_title": "The Post-it® Note"
+}

@@ -1,0 +1,23 @@
+{
+  "spark_id": "SPARK-CRE-001",
+  "title": "Constraints Spark Creativity",
+  "category": "Creativity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Green eggs illustration",
+  "short_teaser": "Limits can be the best muse.",
+  "story": "Dr. Seuss wrote Green Eggs and Ham using only 50 words — on a bet. Twitter's 140-character limit spawned new forms of wit. Haiku's rigid structure has produced centuries of beauty.",
+  "impact": "Unlimited options can paralyze. Constraints force focus and often produce the most memorable results.",
+  "spark_application": "What artificial limit could you set today to unlock a more creative solution?",
+  "tags": [],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "creativity",
+  "category_label": "Creativity"
+}

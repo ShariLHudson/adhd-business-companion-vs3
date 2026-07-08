@@ -20,7 +20,8 @@
     "welcome-voice:check": "node scripts/check-elevenlabs-env.mjs",
     "welcome-voice:list": "node scripts/list-elevenlabs-voices.mjs",
     "welcome-voice:cache": "node scripts/generate-welcome-voice-cache.mjs",
-    "curriculum:scan": "npx tsx scripts/curriculum/scan-curriculum-registry.ts"
+    "curriculum:scan": "npx tsx scripts/curriculum/scan-curriculum-registry.ts",
+    "spark-library:export": "npx tsx scripts/export-spark-library.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.108.1",

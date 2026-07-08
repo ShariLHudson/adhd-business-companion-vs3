@@ -1,0 +1,23 @@
+{
+  "spark_id": "SPARK-BIZ-001",
+  "title": "The IKEA Effect",
+  "category": "Business Sparks",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Assembled furniture",
+  "short_teaser": "Why we value things more when we build them ourselves.",
+  "story": "Researchers found that people place higher value on furniture they assemble themselves — even when the result is imperfect. The effort of creation creates emotional ownership.",
+  "impact": "Involving customers in the creation process builds loyalty and satisfaction. People support what they help build.",
+  "spark_application": "Where could you invite your customers or team to co-create instead of just consume?",
+  "tags": [],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Business Sparks"
+}

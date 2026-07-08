@@ -1,0 +1,25 @@
+{
+  "spark_id": "SPARK-HOL-001",
+  "title": "National Donut Day",
+  "category": "Weird & Fun Holidays",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Donuts",
+  "short_teaser": "A sweet tradition with a surprising origin.",
+  "story": "National Donut Day began in 1938 to honor the Salvation Army 'Donut Lassies' who served donuts to soldiers during World War I. What started as comfort food in the trenches became an annual celebration of small joys.",
+  "impact": "Sometimes the sweetest traditions come from simple acts of care during hard times.",
+  "spark_application": "Who could you surprise with a small treat or kind gesture today?",
+  "tags": [],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "06-06"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "holiday",
+  "category_label": "Weird & Fun Holidays",
+  "priority": 80
+}

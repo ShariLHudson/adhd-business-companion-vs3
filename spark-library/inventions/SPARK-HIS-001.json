@@ -1,0 +1,25 @@
+{
+  "spark_id": "SPARK-HIS-001",
+  "title": "The Moon Landing",
+  "category": "Today in History",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "thumbnail_alt": "Moon landing",
+  "short_teaser": "One small step that inspired generations.",
+  "story": "On July 20, 1969, Neil Armstrong became the first human to walk on the Moon. The Apollo 11 mission fulfilled a promise made years earlier and proved that audacious goals, backed by persistence, can become reality.",
+  "impact": "The moon landing showed humanity what focused collaboration can achieve — and gave every child permission to dream bigger.",
+  "spark_application": "What 'impossible' goal deserves another look with fresh eyes?",
+  "tags": [],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "07-20"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "history",
+  "category_label": "Today in History",
+  "priority": 85
+}
