@@ -39,7 +39,7 @@ describe("librarySelection", () => {
 
   it("getYesterdaySparkId reads prior day selection", () => {
     const now = new Date("2026-05-02T10:00:00");
-    recordDailySparkSelection("SPARK-QTE-001", new Date("2026-05-01T10:00:00"));
-    expect(getYesterdaySparkId(now)).toBe("SPARK-QTE-001");
+    recordDailySparkSelection("SPARK-QUOTE-001", new Date("2026-05-01T10:00:00"));
+    expect(getYesterdaySparkId(now)).toBe("SPARK-QUOTE-001");
   });
 });

@@ -977,29 +977,6 @@
     "short_title": "Talking Trees"
   },
   {
-    "spark_id": "SPARK-GRO-001",
-    "title": "The Two-Minute Rule",
-    "category": "Personal Growth",
-    "audience": [
-      "Everyone"
-    ],
-    "image": null,
-    "thumbnail": null,
-    "thumbnail_alt": "Checklist",
-    "short_teaser": "Small actions beat perfect plans.",
-    "story": "Productivity researchers found that if a task takes less than two minutes, doing it immediately prevents the mental overhead of tracking it. The rule isn't about speed — it's about reducing friction between intention and action.",
-    "impact": "Momentum often starts with the smallest possible step. Finishing tiny tasks builds confidence for bigger ones.",
-    "spark_application": "What two-minute action could you finish right now instead of adding it to a list?",
-    "tags": [],
-    "date_rules": {
-      "type": "evergreen"
-    },
-    "tone": "curious",
-    "status": "active",
-    "runtime_category": "personal_growth",
-    "category_label": "Personal Growth"
-  },
-  {
     "spark_id": "SPARK-GRO-009",
     "title": "The Two-Minute Rule",
     "category": "Personal Growth",
@@ -2363,7 +2340,7 @@
     "short_title": "Beethoven"
   },
   {
-    "spark_id": "SPARK-QTE-001",
+    "spark_id": "SPARK-QTE-003",
     "title": "Start Where You Are",
     "category": "Meaningful Quotes",
     "audience": [
@@ -2376,17 +2353,23 @@
     "story": "\"Start where you are. Use what you have. Do what you can.\" — Arthur Ashe, tennis champion and civil rights advocate. Ashe faced barriers throughout his career but never waited for perfect conditions to begin.",
     "impact": "Ashe's words remind us that action doesn't require ideal circumstances — only willingness to begin with what's in front of us.",
     "spark_application": "What small step could you take today with exactly the resources you already have?",
-    "tags": [],
+    "tags": [
+      "resilience",
+      "action",
+      "beginning"
+    ],
     "date_rules": {
       "type": "evergreen"
     },
     "tone": "curious",
     "status": "active",
     "runtime_category": "quote",
-    "category_label": "Meaningful Quotes"
+    "category_label": "Meaningful Quotes",
+    "spark_type": "story",
+    "short_title": "Arthur Ashe"
   },
   {
-    "spark_id": "SPARK-QTE-002",
+    "spark_id": "SPARK-QTE-004",
     "title": "Creativity Takes Courage",
     "category": "Meaningful Quotes",
     "audience": [
@@ -2399,14 +2382,245 @@
     "story": "\"Creativity takes courage.\" — Henri Matisse, one of the most influential artists of the 20th century. Matisse spent decades pushing past comfort, reinventing his style even when the world resisted change.",
     "impact": "Sharing creative work means risking judgment. Matisse reminds us that the act of creating is itself an act of bravery.",
     "spark_application": "What small experiment could you share before it feels 'ready'?",
-    "tags": [],
+    "tags": [
+      "creativity",
+      "courage",
+      "art"
+    ],
     "date_rules": {
       "type": "evergreen"
     },
     "tone": "curious",
     "status": "active",
     "runtime_category": "quote",
-    "category_label": "Meaningful Quotes"
+    "category_label": "Meaningful Quotes",
+    "spark_type": "story",
+    "short_title": "Henri Matisse"
+  },
+  {
+    "spark_id": "SPARK-QUOTE-001",
+    "title": "Stay Hungry. Stay Foolish.",
+    "category": "Quote",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A reminder that curiosity and willingness to learn can change what is possible.",
+    "story": "Steve Jobs shared this message during a commencement speech at Stanford University. The phrase encouraged people to remain curious, continue learning, and avoid becoming limited by what they already know.",
+    "impact": "Growth requires staying open to new ideas. Curiosity keeps possibilities alive.",
+    "spark_application": "What is something new you are willing to explore?",
+    "tags": [
+      "curiosity",
+      "learning",
+      "courage",
+      "innovation"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "quote",
+    "category_label": "Quote",
+    "spark_type": "story",
+    "short_title": "Steve Jobs"
+  },
+  {
+    "spark_id": "SPARK-QUOTE-002",
+    "title": "The Only Way to Do Great Work Is to Love What You Do.",
+    "category": "Quote",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Meaningful work often begins with caring deeply about what you create.",
+    "story": "Steve Jobs often emphasized the connection between passion and excellence. His belief was that people create their best work when they feel connected to the purpose behind it.",
+    "impact": "Passion does not mean every day is easy. It means the work matters enough to continue.",
+    "spark_application": "What part of your work feels most meaningful?",
+    "tags": [
+      "purpose",
+      "passion",
+      "creativity"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "quote",
+    "category_label": "Quote",
+    "spark_type": "story",
+    "short_title": "Steve Jobs"
+  },
+  {
+    "spark_id": "SPARK-QUOTE-003",
+    "title": "Success Is Not Final. Failure Is Not Fatal.",
+    "category": "Quote",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Both success and setbacks are moments in a longer journey.",
+    "story": "Winston Churchill reflected on the idea that life and leadership involve constant movement. A victory does not mean the journey ends, and a setback does not mean the journey is over.",
+    "impact": "Progress requires continuing through changing circumstances.",
+    "spark_application": "What challenge are you still moving through?",
+    "tags": [
+      "resilience",
+      "perseverance",
+      "growth"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "quote",
+    "category_label": "Quote",
+    "spark_type": "story",
+    "short_title": "Winston Churchill"
+  },
+  {
+    "spark_id": "SPARK-QUOTE-004",
+    "title": "Creativity Is Intelligence Having Fun.",
+    "category": "Quote",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Creative thinking combines knowledge with playfulness.",
+    "story": "Often attributed to Albert Einstein, this quote captures an idea many innovators understand: imagination grows when people explore, experiment, and make connections.",
+    "impact": "Play and curiosity are powerful parts of learning.",
+    "spark_application": "Where could you add more curiosity or play into your work?",
+    "tags": [
+      "creativity",
+      "imagination",
+      "learning"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "quote",
+    "category_label": "Quote",
+    "spark_type": "story",
+    "short_title": "Albert Einstein"
+  },
+  {
+    "spark_id": "SPARK-QUOTE-005",
+    "title": "The Way to Get Started Is to Quit Talking and Begin Doing.",
+    "category": "Quote",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Ideas become real when we take the first step.",
+    "story": "Walt Disney built a creative empire by moving ideas into action. The quote reflects the importance of beginning rather than waiting forever for perfect conditions.",
+    "impact": "Action creates information. You learn by doing.",
+    "spark_application": "What small action could move an idea forward today?",
+    "tags": [
+      "action",
+      "momentum",
+      "progress"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "quote",
+    "category_label": "Quote",
+    "spark_type": "story",
+    "short_title": "Walt Disney"
+  },
+  {
+    "spark_id": "SPARK-QUOTE-006",
+    "title": "Imagination Is More Important Than Knowledge.",
+    "category": "Quote",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Imagining new possibilities creates the beginning of change.",
+    "story": "Albert Einstein valued imagination because discoveries often begin before there is proof. Someone first has to imagine what might be possible.",
+    "impact": "Every invention begins as an idea.",
+    "spark_application": "What possibility can you imagine before you know exactly how it will happen?",
+    "tags": [
+      "creativity",
+      "possibility",
+      "innovation"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "quote",
+    "category_label": "Quote",
+    "spark_type": "story",
+    "short_title": "Albert Einstein"
+  },
+  {
+    "spark_id": "SPARK-QUOTE-007",
+    "title": "Whether You Think You Can or Think You Can't, You're Right.",
+    "category": "Quote",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "The beliefs we carry can influence the actions we take.",
+    "story": "Henry Ford highlighted the role confidence and perspective play in pursuing goals. Believing something is possible often changes how people approach challenges.",
+    "impact": "Mindset affects effort, persistence, and willingness to try.",
+    "spark_application": "What belief would help you move forward?",
+    "tags": [
+      "mindset",
+      "confidence",
+      "belief"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "quote",
+    "category_label": "Quote",
+    "spark_type": "story",
+    "short_title": "Henry Ford"
+  },
+  {
+    "spark_id": "SPARK-QUOTE-008",
+    "title": "Be Yourself; Everyone Else Is Already Taken.",
+    "category": "Quote",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Your uniqueness can become your greatest strength.",
+    "story": "Oscar Wilde was known for creativity, humor, and individuality. The quote reflects the value of embracing what makes each person different.",
+    "impact": "Authenticity builds connection.",
+    "spark_application": "What part of yourself deserves more room to show up?",
+    "tags": [
+      "authenticity",
+      "confidence",
+      "individuality"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "quote",
+    "category_label": "Quote",
+    "spark_type": "story",
+    "short_title": "Oscar Wilde"
   },
   {
     "spark_id": "SPARK-SEA-AUTUMN",

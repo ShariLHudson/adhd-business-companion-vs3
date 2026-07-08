@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-QUOTE-008",
+  "title": "Be Yourself; Everyone Else Is Already Taken.",
+  "category": "Quote",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Your uniqueness can become your greatest strength.",
+  "story": "Oscar Wilde was known for creativity, humor, and individuality. The quote reflects the value of embracing what makes each person different.",
+  "impact": "Authenticity builds connection.",
+  "spark_application": "What part of yourself deserves more room to show up?",
+  "tags": [
+    "authenticity",
+    "confidence",
+    "individuality"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "quote",
+  "category_label": "Quote",
+  "spark_type": "story",
+  "short_title": "Oscar Wilde"
+}

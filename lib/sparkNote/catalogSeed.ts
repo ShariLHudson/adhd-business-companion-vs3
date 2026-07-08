@@ -462,12 +462,133 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     tags: ["psychology", "customer-experience", "co-creation"],
   },
 
-  // — Quotes —
+  // — Quotes (spark-notes-files/SPARK_NOTE_QUOTES_WITH_STORIES_SPARK_LIBRARY.md) —
   {
-    id: "SPARK-QTE-001",
+    id: "SPARK-QUOTE-001",
+    category: "quote",
+    categoryLabel: "Quote",
+    sparkType: "story",
+    title: "Stay Hungry. Stay Foolish.",
+    shortTitle: "Steve Jobs",
+    teaser:
+      "A reminder that curiosity and willingness to learn can change what is possible.",
+    whatHappened:
+      "Steve Jobs shared this message during a commencement speech at Stanford University. The phrase encouraged people to remain curious, continue learning, and avoid becoming limited by what they already know.",
+    whyItMatters:
+      "Growth requires staying open to new ideas. Curiosity keeps possibilities alive.",
+    sparkApplication: "What is something new you are willing to explore?",
+    tags: ["curiosity", "learning", "courage", "innovation"],
+  },
+  {
+    id: "SPARK-QUOTE-002",
+    category: "quote",
+    categoryLabel: "Quote",
+    sparkType: "story",
+    title: "The Only Way to Do Great Work Is to Love What You Do.",
+    shortTitle: "Steve Jobs",
+    teaser: "Meaningful work often begins with caring deeply about what you create.",
+    whatHappened:
+      "Steve Jobs often emphasized the connection between passion and excellence. His belief was that people create their best work when they feel connected to the purpose behind it.",
+    whyItMatters:
+      "Passion does not mean every day is easy. It means the work matters enough to continue.",
+    sparkApplication: "What part of your work feels most meaningful?",
+    tags: ["purpose", "passion", "creativity"],
+  },
+  {
+    id: "SPARK-QUOTE-003",
+    category: "quote",
+    categoryLabel: "Quote",
+    sparkType: "story",
+    title: "Success Is Not Final. Failure Is Not Fatal.",
+    shortTitle: "Winston Churchill",
+    teaser: "Both success and setbacks are moments in a longer journey.",
+    whatHappened:
+      "Winston Churchill reflected on the idea that life and leadership involve constant movement. A victory does not mean the journey ends, and a setback does not mean the journey is over.",
+    whyItMatters:
+      "Progress requires continuing through changing circumstances.",
+    sparkApplication: "What challenge are you still moving through?",
+    tags: ["resilience", "perseverance", "growth"],
+  },
+  {
+    id: "SPARK-QUOTE-004",
+    category: "quote",
+    categoryLabel: "Quote",
+    sparkType: "story",
+    title: "Creativity Is Intelligence Having Fun.",
+    shortTitle: "Albert Einstein",
+    teaser: "Creative thinking combines knowledge with playfulness.",
+    whatHappened:
+      "Often attributed to Albert Einstein, this quote captures an idea many innovators understand: imagination grows when people explore, experiment, and make connections.",
+    whyItMatters: "Play and curiosity are powerful parts of learning.",
+    sparkApplication:
+      "Where could you add more curiosity or play into your work?",
+    tags: ["creativity", "imagination", "learning"],
+  },
+  {
+    id: "SPARK-QUOTE-005",
+    category: "quote",
+    categoryLabel: "Quote",
+    sparkType: "story",
+    title: "The Way to Get Started Is to Quit Talking and Begin Doing.",
+    shortTitle: "Walt Disney",
+    teaser: "Ideas become real when we take the first step.",
+    whatHappened:
+      "Walt Disney built a creative empire by moving ideas into action. The quote reflects the importance of beginning rather than waiting forever for perfect conditions.",
+    whyItMatters: "Action creates information. You learn by doing.",
+    sparkApplication: "What small action could move an idea forward today?",
+    tags: ["action", "momentum", "progress"],
+  },
+  {
+    id: "SPARK-QUOTE-006",
+    category: "quote",
+    categoryLabel: "Quote",
+    sparkType: "story",
+    title: "Imagination Is More Important Than Knowledge.",
+    shortTitle: "Albert Einstein",
+    teaser: "Imagining new possibilities creates the beginning of change.",
+    whatHappened:
+      "Albert Einstein valued imagination because discoveries often begin before there is proof. Someone first has to imagine what might be possible.",
+    whyItMatters: "Every invention begins as an idea.",
+    sparkApplication:
+      "What possibility can you imagine before you know exactly how it will happen?",
+    tags: ["creativity", "possibility", "innovation"],
+  },
+  {
+    id: "SPARK-QUOTE-007",
+    category: "quote",
+    categoryLabel: "Quote",
+    sparkType: "story",
+    title: "Whether You Think You Can or Think You Can't, You're Right.",
+    shortTitle: "Henry Ford",
+    teaser: "The beliefs we carry can influence the actions we take.",
+    whatHappened:
+      "Henry Ford highlighted the role confidence and perspective play in pursuing goals. Believing something is possible often changes how people approach challenges.",
+    whyItMatters:
+      "Mindset affects effort, persistence, and willingness to try.",
+    sparkApplication: "What belief would help you move forward?",
+    tags: ["mindset", "confidence", "belief"],
+  },
+  {
+    id: "SPARK-QUOTE-008",
+    category: "quote",
+    categoryLabel: "Quote",
+    sparkType: "story",
+    title: "Be Yourself; Everyone Else Is Already Taken.",
+    shortTitle: "Oscar Wilde",
+    teaser: "Your uniqueness can become your greatest strength.",
+    whatHappened:
+      "Oscar Wilde was known for creativity, humor, and individuality. The quote reflects the value of embracing what makes each person different.",
+    whyItMatters: "Authenticity builds connection.",
+    sparkApplication: "What part of yourself deserves more room to show up?",
+    tags: ["authenticity", "confidence", "individuality"],
+  },
+  {
+    id: "SPARK-QTE-003",
     category: "quote",
     categoryLabel: "Meaningful Quotes",
+    sparkType: "story",
     title: "Start Where You Are",
+    shortTitle: "Arthur Ashe",
     teaser: "Arthur Ashe on beginning with what you have.",
     whatHappened:
       '"Start where you are. Use what you have. Do what you can." — Arthur Ashe, tennis champion and civil rights advocate. Ashe faced barriers throughout his career but never waited for perfect conditions to begin.',
@@ -476,12 +597,15 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     sparkApplication:
       "What small step could you take today with exactly the resources you already have?",
     thumbnailAlt: "Tennis court",
+    tags: ["resilience", "action", "beginning"],
   },
   {
-    id: "SPARK-QTE-002",
+    id: "SPARK-QTE-004",
     category: "quote",
     categoryLabel: "Meaningful Quotes",
+    sparkType: "story",
     title: "Creativity Takes Courage",
+    shortTitle: "Henri Matisse",
     teaser: "Henri Matisse on the bravery of making art.",
     whatHappened:
       '"Creativity takes courage." — Henri Matisse, one of the most influential artists of the 20th century. Matisse spent decades pushing past comfort, reinventing his style even when the world resisted change.',
@@ -490,6 +614,7 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     sparkApplication:
       "What small experiment could you share before it feels 'ready'?",
     thumbnailAlt: "Artist palette",
+    tags: ["creativity", "courage", "art"],
   },
 
   // — Fun facts (spark-notes-files/SPARK_NOTE_FUN_FACTS_AND_WONDER_SPARK_LIBRARY.md) —

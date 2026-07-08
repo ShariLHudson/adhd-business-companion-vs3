@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-QUOTE-002",
+  "title": "The Only Way to Do Great Work Is to Love What You Do.",
+  "category": "Quote",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Meaningful work often begins with caring deeply about what you create.",
+  "story": "Steve Jobs often emphasized the connection between passion and excellence. His belief was that people create their best work when they feel connected to the purpose behind it.",
+  "impact": "Passion does not mean every day is easy. It means the work matters enough to continue.",
+  "spark_application": "What part of your work feels most meaningful?",
+  "tags": [
+    "purpose",
+    "passion",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "quote",
+  "category_label": "Quote",
+  "spark_type": "story",
+  "short_title": "Steve Jobs"
+}

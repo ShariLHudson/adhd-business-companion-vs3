@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-QUOTE-001",
+  "title": "Stay Hungry. Stay Foolish.",
+  "category": "Quote",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A reminder that curiosity and willingness to learn can change what is possible.",
+  "story": "Steve Jobs shared this message during a commencement speech at Stanford University. The phrase encouraged people to remain curious, continue learning, and avoid becoming limited by what they already know.",
+  "impact": "Growth requires staying open to new ideas. Curiosity keeps possibilities alive.",
+  "spark_application": "What is something new you are willing to explore?",
+  "tags": [
+    "curiosity",
+    "learning",
+    "courage",
+    "innovation"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "quote",
+  "category_label": "Quote",
+  "spark_type": "story",
+  "short_title": "Steve Jobs"
+}

@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-QUOTE-003",
+  "title": "Success Is Not Final. Failure Is Not Fatal.",
+  "category": "Quote",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Both success and setbacks are moments in a longer journey.",
+  "story": "Winston Churchill reflected on the idea that life and leadership involve constant movement. A victory does not mean the journey ends, and a setback does not mean the journey is over.",
+  "impact": "Progress requires continuing through changing circumstances.",
+  "spark_application": "What challenge are you still moving through?",
+  "tags": [
+    "resilience",
+    "perseverance",
+    "growth"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "quote",
+  "category_label": "Quote",
+  "spark_type": "story",
+  "short_title": "Winston Churchill"
+}

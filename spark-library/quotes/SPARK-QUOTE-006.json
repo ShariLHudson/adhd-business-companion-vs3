@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-QUOTE-006",
+  "title": "Imagination Is More Important Than Knowledge.",
+  "category": "Quote",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Imagining new possibilities creates the beginning of change.",
+  "story": "Albert Einstein valued imagination because discoveries often begin before there is proof. Someone first has to imagine what might be possible.",
+  "impact": "Every invention begins as an idea.",
+  "spark_application": "What possibility can you imagine before you know exactly how it will happen?",
+  "tags": [
+    "creativity",
+    "possibility",
+    "innovation"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "quote",
+  "category_label": "Quote",
+  "spark_type": "story",
+  "short_title": "Albert Einstein"
+}

@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-QUOTE-005",
+  "title": "The Way to Get Started Is to Quit Talking and Begin Doing.",
+  "category": "Quote",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Ideas become real when we take the first step.",
+  "story": "Walt Disney built a creative empire by moving ideas into action. The quote reflects the importance of beginning rather than waiting forever for perfect conditions.",
+  "impact": "Action creates information. You learn by doing.",
+  "spark_application": "What small action could move an idea forward today?",
+  "tags": [
+    "action",
+    "momentum",
+    "progress"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "quote",
+  "category_label": "Quote",
+  "spark_type": "story",
+  "short_title": "Walt Disney"
+}

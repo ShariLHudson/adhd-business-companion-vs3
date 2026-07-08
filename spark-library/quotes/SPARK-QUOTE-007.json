@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-QUOTE-007",
+  "title": "Whether You Think You Can or Think You Can't, You're Right.",
+  "category": "Quote",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "The beliefs we carry can influence the actions we take.",
+  "story": "Henry Ford highlighted the role confidence and perspective play in pursuing goals. Believing something is possible often changes how people approach challenges.",
+  "impact": "Mindset affects effort, persistence, and willingness to try.",
+  "spark_application": "What belief would help you move forward?",
+  "tags": [
+    "mindset",
+    "confidence",
+    "belief"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "quote",
+  "category_label": "Quote",
+  "spark_type": "story",
+  "short_title": "Henry Ford"
+}

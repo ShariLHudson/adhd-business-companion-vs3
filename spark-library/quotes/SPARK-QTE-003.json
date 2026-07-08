@@ -1,5 +1,5 @@
 {
-  "spark_id": "SPARK-QTE-001",
+  "spark_id": "SPARK-QTE-003",
   "title": "Start Where You Are",
   "category": "Meaningful Quotes",
   "audience": [
@@ -12,12 +12,18 @@
   "story": "\"Start where you are. Use what you have. Do what you can.\" — Arthur Ashe, tennis champion and civil rights advocate. Ashe faced barriers throughout his career but never waited for perfect conditions to begin.",
   "impact": "Ashe's words remind us that action doesn't require ideal circumstances — only willingness to begin with what's in front of us.",
   "spark_application": "What small step could you take today with exactly the resources you already have?",
-  "tags": [],
+  "tags": [
+    "resilience",
+    "action",
+    "beginning"
+  ],
   "date_rules": {
     "type": "evergreen"
   },
   "tone": "curious",
   "status": "active",
   "runtime_category": "quote",
-  "category_label": "Meaningful Quotes"
+  "category_label": "Meaningful Quotes",
+  "spark_type": "story",
+  "short_title": "Arthur Ashe"
 }

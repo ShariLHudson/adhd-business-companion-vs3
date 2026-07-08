@@ -27,8 +27,8 @@ describe("preferenceLearning", () => {
   });
 
   it("save reaction adds to favorites and collection", () => {
-    recordSparkNoteReaction("SPARK-QTE-001", "save", "quote");
-    expect(resolveMySparksCollection().some((s) => s.id === "SPARK-QTE-001")).toBe(
+    recordSparkNoteReaction("SPARK-QUOTE-001", "save", "quote");
+    expect(resolveMySparksCollection().some((s) => s.id === "SPARK-QUOTE-001")).toBe(
       true,
     );
   });

@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-QUOTE-004",
+  "title": "Creativity Is Intelligence Having Fun.",
+  "category": "Quote",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Creative thinking combines knowledge with playfulness.",
+  "story": "Often attributed to Albert Einstein, this quote captures an idea many innovators understand: imagination grows when people explore, experiment, and make connections.",
+  "impact": "Play and curiosity are powerful parts of learning.",
+  "spark_application": "Where could you add more curiosity or play into your work?",
+  "tags": [
+    "creativity",
+    "imagination",
+    "learning"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "quote",
+  "category_label": "Quote",
+  "spark_type": "story",
+  "short_title": "Albert Einstein"
+}
