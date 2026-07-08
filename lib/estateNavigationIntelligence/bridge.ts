@@ -88,5 +88,14 @@ export function tryKnowledgeBasePlaceResolution(
   userText: string,
 ): EstatePlaceResolution | null {
   const decision = resolveEstateNavigationIntent(userText);
-  return navigationDecisionToPlaceResolution(decision);
+  const resolution = navigationDecisionToPlaceResolution(decision);
+  if (!resolution || resolution.kind === "none") return null;
+  // Let explicit alias / registry routing handle navigation when KB has no match.
+  if (
+    decision.kind === "need_clarification" &&
+    decision.reason === "no_match"
+  ) {
+    return null;
+  }
+  return resolution;
 }

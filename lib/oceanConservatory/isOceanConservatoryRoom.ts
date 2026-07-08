@@ -2,7 +2,7 @@
 export const OCEAN_CONSERVATORY_PLACE_ID = "conservatory" as const;
 
 export const OCEAN_CONSERVATORY_BACKGROUND_FRAGMENT =
-  "the-ocean-conservatory-background" as const;
+  "aquarium-room-background" as const;
 
 export function isOceanConservatoryRoom(roomId?: string | null): boolean {
   return roomId === OCEAN_CONSERVATORY_PLACE_ID;

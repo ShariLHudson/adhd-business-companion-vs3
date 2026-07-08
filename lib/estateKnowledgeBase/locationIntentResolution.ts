@@ -41,14 +41,13 @@ function matchLocationByOfficialName(query: string): {
     return { locationId: match.item.locationId, matchedPhrase: match.phrase };
   }
 
-  const idMatch = longestPhraseMatch(
-    probe,
-    getLiveEstateLocations(),
-    (loc) => loc.locationId.replace(/-/g, " "),
-    { probeText: probe },
-  );
-  if (idMatch) {
-    return { locationId: idMatch.item.locationId, matchedPhrase: idMatch.phrase };
+  const idProbe = normalizeLocationPhrase(probe.replace(/^the\s+/, ""));
+  const idExact = getLiveEstateLocations().find((loc) => {
+    const idPhrase = normalizeLocationPhrase(loc.locationId.replace(/-/g, " "));
+    return idPhrase === idProbe;
+  });
+  if (idExact) {
+    return { locationId: idExact.locationId, matchedPhrase: idProbe };
   }
 
   return null;
@@ -93,15 +92,15 @@ export function resolveLocationIntent(query: string): LocationIntentResolution {
 
   if (!normalized) return base;
 
-  const official = matchLocationByOfficialName(query);
-  if (official) {
-    const direct = directResolution(query, official.locationId, official.matchedPhrase);
-    if (direct) return direct;
-  }
-
   const alias = matchEstateAlias(query);
   if (alias) {
     const direct = directResolution(query, alias.locationId, alias.phrase);
+    if (direct) return direct;
+  }
+
+  const official = matchLocationByOfficialName(query);
+  if (official) {
+    const direct = directResolution(query, official.locationId, official.matchedPhrase);
     if (direct) return direct;
   }
 

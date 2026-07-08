@@ -42,6 +42,7 @@ export const ESTATE_ROOM_DIRECT_SECTION_OVERRIDES: Partial<
 > = {
   conservatory: "home",
   "clear-my-mind": "brain-dump",
+  "butterfly-house": "focus",
   "coffee-house": "focus-audio",
   "estate-soundscapes": "focus-audio",
   "apple-orchard": "focus-audio",

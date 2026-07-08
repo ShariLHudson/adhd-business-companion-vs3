@@ -65,7 +65,7 @@ export const ESTATE_ROOM_BG = {
   sparkEstatePhoto: CANONICAL_PLACE_BACKGROUNDS["my-estate"],
   sparkEstate: CANONICAL_PLACE_BACKGROUNDS["spark-estate"],
   growthProfile: CANONICAL_PLACE_BACKGROUNDS["growth-profile"],
-  personalLibrary: estateBackgroundPath("room-library-personal-background.png"),
+  personalLibrary: estateBackgroundPath("reading-nook-under-stairway-background.png"),
   hallOfAchievements: estateBackgroundPath(
     "hall-of-achievements-room-background.png",
   ),

@@ -21,7 +21,7 @@ describe("Estate Knowledge Base", () => {
   });
 
   it("blocks recommendation for draft rooms", () => {
-    const room = getKnowledgeItem("rooms", "observatory");
+    const room = getKnowledgeItem("rooms", "gardens");
     expect(room?.status).toBe("Draft");
     expect(canRecommendKnowledgeItem(room)).toBe(false);
   });
@@ -62,7 +62,7 @@ describe("Estate Knowledge Base", () => {
   it("lists only live items per registry", () => {
     const liveRooms = getLiveKnowledgeItems("rooms");
     expect(liveRooms.every((room) => room.status === "Live")).toBe(true);
-    expect(liveRooms.some((room) => room.id === "observatory")).toBe(false);
+    expect(liveRooms.some((room) => room.id === "gardens")).toBe(false);
     expect(liveRooms.some((room) => room.id === "music-room")).toBe(true);
   });
 });

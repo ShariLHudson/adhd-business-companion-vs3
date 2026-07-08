@@ -267,7 +267,7 @@
       "assetFileName": "reading-nook-window background.png",
       "assetType": "image",
       "officialDisplayName": "Reading Nook",
-      "status": "Draft",
+      "status": "Live",
       "description": "Peaceful, timeless, unhurried",
       "locationType": "living-place",
       "primaryPlaceId": "reading-nook",
@@ -523,10 +523,10 @@
       "lastUpdated": "2026-07-06"
     },
     {
-      "assetFileName": "the-ocean-conservatory-background.png",
+      "assetFileName": "aquarium-room-background.png",
       "assetType": "image",
       "officialDisplayName": "The Ocean Conservatory™",
-      "status": "Draft",
+      "status": "Live",
       "description": "Stillness, clarity, peaceful sanctuary",
       "locationType": "living-place",
       "primaryPlaceId": "conservatory",
@@ -750,6 +750,111 @@
       ],
       "relatedExperienceGroups": [],
       "lastUpdated": "2026-07-06"
+    },
+    {
+      "assetFileName": "butterfly-conservatory.png",
+      "assetType": "image",
+      "officialDisplayName": "Butterfly House",
+      "status": "Live",
+      "description": "Calm focus in the butterfly conservatory — Focus My Brain sanctuary",
+      "locationType": "destination",
+      "primaryPlaceId": "butterfly-house",
+      "sharedByPlaceIds": [
+        "butterfly-house"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-08"
+    },
+    {
+      "assetFileName": "spark-chamber-of-momentum-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Momentum Institute™",
+      "status": "Live",
+      "description": "Prestige, focus, entrepreneurial momentum",
+      "locationType": "destination",
+      "primaryPlaceId": "momentum-institute",
+      "sharedByPlaceIds": [
+        "momentum-institute",
+        "game-room",
+        "momentum-room"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-08"
+    },
+    {
+      "assetFileName": "creative-studio-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Create",
+      "status": "Live",
+      "description": "Creative studio for drafting with permission-first conversation",
+      "locationType": "destination",
+      "primaryPlaceId": "creative-studio",
+      "sharedByPlaceIds": [
+        "creative-studio",
+        "art-studio",
+        "strategy-studio"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-08"
+    },
+    {
+      "assetFileName": "welcome-to-the-journal-gazebo.png",
+      "assetType": "image",
+      "officialDisplayName": "Journal Gazebo™",
+      "status": "Live",
+      "description": "Gazebo journal — growth reflection beside the garden",
+      "locationType": "destination",
+      "primaryPlaceId": "journal",
+      "sharedByPlaceIds": [
+        "journal"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-08"
+    },
+    {
+      "assetFileName": "study-hall-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Study Hall™",
+      "status": "Live",
+      "description": "Classroom hush, lecture energy, learning focus",
+      "locationType": "destination",
+      "primaryPlaceId": "study-hall",
+      "sharedByPlaceIds": [
+        "study-hall",
+        "momentum-builder"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-08"
+    },
+    {
+      "assetFileName": "room-library-estate-background.png",
+      "assetType": "image",
+      "officialDisplayName": "The Library™",
+      "status": "Live",
+      "description": "Floor-to-ceiling volumes, leather quiet, estate learning",
+      "locationType": "living-place",
+      "primaryPlaceId": "library",
+      "sharedByPlaceIds": [
+        "library"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-08"
+    },
+    {
+      "assetFileName": "observatory-daytime-outside-background.png",
+      "assetType": "image",
+      "officialDisplayName": "Observatory™",
+      "status": "Live",
+      "description": "Horizon windows, telescope, curated research stacks",
+      "locationType": "destination",
+      "primaryPlaceId": "observatory",
+      "sharedByPlaceIds": [
+        "observatory",
+        "house-possibility-observatory",
+        "house-possibility-telescope-deck"
+      ],
+      "relatedExperienceGroups": [],
+      "lastUpdated": "2026-07-08"
     }
   ]
 }

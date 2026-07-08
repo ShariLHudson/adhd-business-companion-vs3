@@ -19,6 +19,7 @@ export const ESTATE_DIRECTORY_PLACE_SECTION: Partial<
   "welcome-home": "welcome-room",
   conservatory: "home",
   "clear-my-mind": "brain-dump",
+  "butterfly-house": "focus",
   "coffee-house": "focus-audio",
   "apple-orchard": "focus-audio",
   "music-room": "focus-audio",

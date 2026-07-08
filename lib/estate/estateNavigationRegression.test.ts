@@ -5,7 +5,8 @@ import { detectDirectCommand } from "@/lib/estateIntelligence/estateCommandRoute
 import { extractRoomPhraseFromNavigation } from "./estateRoomAliasRegistry";
 
 const EXPLICIT_NAV_CASES: { text: string; placeId: string }[] = [
-  { text: "take me to the butterfly conservatory", placeId: "conservatory" },
+  { text: "take me to the butterfly conservatory", placeId: "butterfly-house" },
+  { text: "take me to the butterfly house", placeId: "butterfly-house" },
   { text: "take me to the music room", placeId: "music-room" },
   { text: "take me to the apple orchard", placeId: "apple-orchard" },
 ];
@@ -26,6 +27,9 @@ describe("estate navigation regression", () => {
         expect(turn.command.roomId ?? turn.command.entryId).toBe(placeId);
         if (placeId === "conservatory") {
           expect(turn.command.section).toBe("home");
+        }
+        if (placeId === "butterfly-house") {
+          expect(turn.command.section).toBe("focus");
         }
       }
 

@@ -58,6 +58,6 @@ describe("Conservatory routing precision", () => {
   it("conservatory background fallbacks never use greenhouse plate", () => {
     const candidates = resolveCanonicalPlaceBackgroundCandidates("conservatory");
     expect(candidates.some((url) => url.includes("greenhouse"))).toBe(false);
-    expect(candidates[0]).toContain("the-ocean-conservatory-background");
+    expect(candidates[0]).toContain("aquarium-room-background");
   });
 });

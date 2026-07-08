@@ -32,67 +32,57 @@ export function estateAudioPath(filename: string): string {
 export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "welcome-home": estateBackgroundPath("welcome-home-background.png"),
   sunroom: estateBackgroundPath("sunroom-background.png"),
-  conservatory: estateBackgroundPath("the-ocean-conservatory-background.png"),
+  conservatory: estateBackgroundPath("aquarium-room-background.png"),
   "clear-my-mind": estateBackgroundPath("sunroom-background.png"),
-  "coffee-house": estateBackgroundPath("room-coffee-house-background.png"),
+  "coffee-house": estateBackgroundPath("tea-room-background.webp"),
   "tea-room": estateBackgroundPath("tea-room-background.webp"),
   "dining-room": estateBackgroundPath("room-dining-room-background.png"),
   "estate-kitchen": estateBackgroundPath("kitchen-background.png"),
   "grand-terrace": estateBackgroundPath("grand-terrace-background.png"),
-  "lakeside-verandah": estateBackgroundPath(
-    "water-lakeside-deck-verandah-background.png",
-  ),
+  "lakeside-verandah": estateBackgroundPath("grand-terrace-background.png"),
   "lakeside-hammock": estateBackgroundPath("water-lakeside-hammock-background.png"),
   "discovery-room": estateBackgroundPath("room-discovery-room-background.png"),
-  "estate-gardens": estateBackgroundPath("place-estate-gardens-background.png"),
-  "music-room": estateBackgroundPath("music-room-background.png"),
+  "estate-gardens": estateBackgroundPath("greenhouse-background.png"),
+  "music-room": estateBackgroundPath("writing-room-background.png"),
   greenhouse: estateBackgroundPath("greenhouse-background.png"),
-  gardens: estateBackgroundPath("space-celebration-garden-background.png"),
+  gardens: estateBackgroundPath("greenhouse-background.png"),
   "celebration-room": estateBackgroundPath("room-celebration-hall-background.png"),
-  "apple-orchard": estateBackgroundPath("space-apple-orchard-background.webp"),
+  "apple-orchard": estateBackgroundPath("greenhouse-background.png"),
   "reading-nook": estateBackgroundPath("reading-nook-window background.png"),
   library: estateBackgroundPath("room-library-estate-background.png"),
-  "personal-library": estateBackgroundPath("room-library-personal-background.png"),
-  "momentum-institute": estateBackgroundPath(
-    "the-momentum-institute-background.png",
-  ),
-  "creative-studio": estateBackgroundPath("room-create-studio-background.png"),
-  "art-studio": estateBackgroundPath("room-create-studio-background.png"),
-  observatory: estateBackgroundPath(
-    "observatory-daytime-outside-background.png",
-  ),
+  "personal-library": estateBackgroundPath("reading-nook-under-stairway-background.png"),
+  "momentum-institute": estateBackgroundPath("spark-chamber-of-momentum-background.png"),
+  "creative-studio": estateBackgroundPath("creative-studio-background.png"),
+  "art-studio": estateBackgroundPath("creative-studio-background.png"),
+  observatory: estateBackgroundPath("observatory-daytime-outside-background.png"),
   "study-hall": estateBackgroundPath("study-hall-background.png"),
-  stables: estateBackgroundPath("spark-estate-stables-background.png"),
-  "game-room": estateBackgroundPath("game-room- background.webp"),
+  stables: estateBackgroundPath("spark-estate-photo-background.png"),
+  "game-room": estateBackgroundPath("spark-chamber-of-momentum-background.png"),
   "momentum-builder": estateBackgroundPath("study-hall-background.png"),
-  "strategy-studio": estateBackgroundPath(
-    "strategy-studio-workroom-background.png",
-  ),
-  "momentum-room": estateBackgroundPath("the-momentum-institute-background.png"),
-  "round-table": estateBackgroundPath("round-table-boardroom-background.png"),
-  "summer-terrace": estateBackgroundPath(
-    "water-swimming-pool-private-background.png",
-  ),
+  "strategy-studio": estateBackgroundPath("creative-studio-background.png"),
+  "momentum-room": estateBackgroundPath("spark-chamber-of-momentum-background.png"),
+  "round-table": estateBackgroundPath("room-dining-room-background.png"),
+  "summer-terrace": estateBackgroundPath("water-swimming-pool-private-background.png"),
   "decision-compass": estateBackgroundPath("writing-room-background.png"),
-  journal: estateBackgroundPath("gazebo-journal-background.png"),
-  "evidence-vault": estateBackgroundPath("evidence-vault-background.png"),
+  journal: estateBackgroundPath("welcome-to-the-journal-gazebo.png"),
+  "evidence-vault": estateBackgroundPath("hall-of-achievements-room-background.png"),
   "gallery-of-firsts": estateBackgroundPath("gallery-background.png"),
-  portfolio: estateBackgroundPath("accomplisments-room-background.png"),
-  "goals-projects": estateBackgroundPath("round-table-boardroom-background.png"),
-  "peaceful-places": estateBackgroundPath("audio-rain-background.png"),
+  portfolio: estateBackgroundPath("hall-of-achievements-room-background.png"),
+  "goals-projects": estateBackgroundPath("room-dining-room-background.png"),
+  "peaceful-places": estateBackgroundPath("water-seat-at-pond-background.png"),
   "seat-at-pond": estateBackgroundPath("water-seat-at-pond-background.png"),
   "reflection-pond": estateBackgroundPath("water-seat-at-pond-background.png"),
-  "garden-bench": estateBackgroundPath("space-celebration-garden-background.png"),
-  "back-deck": estateBackgroundPath(
-    "peaceful-places/east-terrace-peaceful-places.png",
-  ),
+  "garden-bench": estateBackgroundPath("greenhouse-background.png"),
+  "back-deck": estateBackgroundPath("fireside-deck-background.PNG"),
   "fireside-deck": estateBackgroundPath("fireside-deck-background.PNG"),
-  "personal-deck": estateBackgroundPath("private-balcony-sunset-background.PNG"),
+  "personal-deck": estateBackgroundPath("grand-terrace-background.png"),
   "porch-swing": estateBackgroundPath("fireside-deck-background.PNG"),
-  "the-swing-beneath-the-oak": estateBackgroundPath("tree-swing-background.png"),
+  "the-swing-beneath-the-oak": estateBackgroundPath(
+    "space-reflection-tree-swing-background.png",
+  ),
   "window-seat": estateBackgroundPath("reading-nook-under-stairway-background.png"),
-  balcony: estateBackgroundPath("private-balcony-sunset-background.PNG"),
-  "woodland-path": estateBackgroundPath("peaceful-places/woodland-pathway.png"),
+  balcony: estateBackgroundPath("grand-terrace-background.png"),
+  "woodland-path": estateBackgroundPath("space-reflection-tree-swing-background.png"),
   "main-staircase": estateBackgroundPath("reading-nook-under-stairway-background.png"),
   "stairway-reading-nook": estateBackgroundPath(
     "reading-nook-under-stairway-background.png",
@@ -114,72 +104,72 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
     "treehouse-possibility-reflection-desk-background.png",
   ),
   "house-possibility-observatory": estateBackgroundPath(
-    "treehouse-possibility-observatory-background.png",
+    "observatory-daytime-outside-background.png",
   ),
   "house-possibility-telescope-deck": estateBackgroundPath(
-    "treehouse-possibility-observatory-background.png",
+    "observatory-daytime-outside-background.png",
   ),
   "house-possibility-cabinet-of-chapters": estateBackgroundPath(
-    "treehouse-possibility-cabinet-of-chapters-background.png",
+    "treehouse-possibility-discovery-chest-background.png",
   ),
   "house-possibility-curiosity-cabinet": estateBackgroundPath(
-    "treehouse-possibility-cabinet-of-chapters-background.png",
+    "treehouse-possibility-discovery-chest-background.png",
   ),
   "house-possibility-discovery-chest": estateBackgroundPath(
     "treehouse-possibility-discovery-chest-background.png",
   ),
   "house-possibility-legacy-room": estateBackgroundPath(
-    "treehouse-possibility-legacy-room-background.png",
+    "treehouse-possibility-house-outside-background.png",
   ),
   "legacy-room-main": estateBackgroundPath(
-    "treehouse-possibility-legacy-room-background.png",
+    "treehouse-possibility-house-outside-background.png",
   ),
+  "reflection-tree-main": estateBackgroundPath(
+    "space-reflection-tree-swing-background.png",
+  ),
+  "butterfly-house": estateBackgroundPath("butterfly-conservatory.png"),
 };
 
 /** Ordered fallbacks when primary plate fails to load. */
 export const CANONICAL_PLACE_BACKGROUND_FALLBACKS: Readonly<
   Record<string, readonly string[]>
 > = {
-  "celebration-room": [
-    estateBackgroundPath("space-celebration-garden-background.png"),
+  "celebration-room": [estateBackgroundPath("greenhouse-background.png")],
+  conservatory: [
+    estateBackgroundPath("aquarium-room-background.png"),
+    estateBackgroundPath("sunroom-background.png"),
   ],
-  conservatory: [estateBackgroundPath("sunroom-background.png")],
   "clear-my-mind": [estateBackgroundPath("greenhouse-background.png")],
   library: [
-    estateBackgroundPath("room-library-personal-background.png"),
     estateBackgroundPath("reading-nook-under-stairway-background.png"),
+    estateBackgroundPath("room-library-estate-background.png"),
   ],
-  greenhouse: [estateBackgroundPath("space-celebration-garden-background.png")],
+  greenhouse: [estateBackgroundPath("greenhouse-background.png")],
   "dining-room": [estateBackgroundPath("tea-room-background.webp")],
   "estate-kitchen": [
-    estateBackgroundPath("room-coffee-house-background.png"),
+    estateBackgroundPath("tea-room-background.webp"),
     estateBackgroundPath("room-dining-room-background.png"),
   ],
   "grand-terrace": [
-    estateBackgroundPath("water-lakeside-deck-verandah-background.png"),
+    estateBackgroundPath("water-lakeside-hammock-background.png"),
     estateBackgroundPath("fireside-deck-background.PNG"),
   ],
   "estate-gardens": [
     estateBackgroundPath("greenhouse-background.png"),
-    estateBackgroundPath("space-celebration-garden-background.png"),
   ],
   "reading-nook": [
     estateBackgroundPath("reading-nook-under-stairway-background.png"),
   ],
   "back-deck": [
     estateBackgroundPath("fireside-deck-background.PNG"),
-    estateBackgroundPath("private-balcony-sunset-background.PNG"),
+    estateBackgroundPath("grand-terrace-background.png"),
   ],
-  "lakeside-verandah": [
-    estateBackgroundPath("private-balcony-sunset-background.PNG"),
-  ],
+  "lakeside-verandah": [estateBackgroundPath("grand-terrace-background.png")],
   "lakeside-hammock": [
     estateBackgroundPath("water-seat-at-pond-background.png"),
-    estateBackgroundPath("private-balcony-sunset-background.PNG"),
+    estateBackgroundPath("grand-terrace-background.png"),
   ],
-  "creative-studio": [
-    estateBackgroundPath("strategy-studio-workroom-background.png"),
-  ],
+  "creative-studio": [estateBackgroundPath("writing-room-background.png")],
   "gallery-of-firsts": [
     estateBackgroundPath("hall-of-achievements-room-background.png"),
   ],
@@ -189,27 +179,24 @@ export const CANONICAL_PLACE_BACKGROUND_FALLBACKS: Readonly<
   ],
   "personal-deck": [
     estateBackgroundPath("fireside-deck-background.PNG"),
-    estateBackgroundPath("peaceful-places/east-terrace-peaceful-places.png"),
+    estateBackgroundPath("grand-terrace-background.png"),
   ],
   "reflection-pond": [
     estateBackgroundPath("water-seat-at-pond-background.png"),
   ],
   "momentum-room": [estateBackgroundPath("study-hall-background.png")],
-  "round-table": [
-    estateBackgroundPath("strategy-studio-workroom-background.png"),
-  ],
+  "round-table": [estateBackgroundPath("creative-studio-background.png")],
   "summer-terrace": [
-    estateBackgroundPath("water-lakeside-deck-verandah-background.png"),
     estateBackgroundPath("water-lakeside-hammock-background.png"),
-    estateBackgroundPath("private-balcony-sunset-background.PNG"),
+    estateBackgroundPath("grand-terrace-background.png"),
   ],
   "music-room": [
-    estateBackgroundPath("peaceful-places/music-room-peaceful-places.png"),
-    estateBackgroundPath("room-coffee-house-background.png"),
+    estateBackgroundPath("writing-room-background.png"),
+    estateBackgroundPath("tea-room-background.webp"),
   ],
   stables: [
-    estateBackgroundPath("place-estate-gardens-background.png"),
     estateBackgroundPath("greenhouse-background.png"),
+    estateBackgroundPath("spark-estate-photo-background.png"),
   ],
 };
 

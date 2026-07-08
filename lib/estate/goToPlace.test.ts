@@ -79,14 +79,30 @@ describe("resolveEstatePlace — Phase C success tests", () => {
     expect(resolution.placeId).toBe("coffee-house");
   });
 
-  it("Take me to the butterfly conservatory → living place on home", () => {
+  it("Take me to the butterfly conservatory → Focus My Brain", () => {
     const { resolution, outcome } = navigate(
       "Take me to the butterfly conservatory.",
+    );
+    expect(resolution.placeId).toBe("butterfly-house");
+    expect(outcome.section).toBe("focus");
+  });
+
+  it("Take me to the ocean conservatory → aquarium conservatory on home", () => {
+    const { resolution, outcome } = navigate(
+      "Take me to the ocean conservatory.",
     );
     expect(resolution.placeId).toBe("conservatory");
     expect(outcome.section).toBe("home");
     expect(outcome.autoOpenActivity).toBe(false);
     expect(outcome.category).toBe("living-place");
+  });
+
+  it("Take me to the butterfly house → Focus My Brain", () => {
+    const { resolution, outcome } = navigate("Take me to the butterfly house.");
+    expect(resolution.placeId).toBe("butterfly-house");
+    expect(outcome.section).toBe("focus");
+    expect(outcome.autoOpenActivity).toBe(false);
+    expect(outcome.category).toBe("destination");
   });
 
   it("Let's go to the Apple Orchard.", () => {

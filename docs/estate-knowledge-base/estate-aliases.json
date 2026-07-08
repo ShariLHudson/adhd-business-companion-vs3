@@ -15,6 +15,204 @@
   },
   "aliases": [
     {
+      "phrase": "apple orchard",
+      "locationId": "apple-orchard",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the apple orchard",
+      "locationId": "apple-orchard",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "welcome home",
+      "locationId": "welcome-home",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the welcome home",
+      "locationId": "welcome-home",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "dining room",
+      "locationId": "dining-room",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the dining room",
+      "locationId": "dining-room",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "kitchen",
+      "locationId": "estate-kitchen",
+      "matchType": "colloquial",
+      "status": "Live"
+    },
+    {
+      "phrase": "estate kitchen",
+      "locationId": "estate-kitchen",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the kitchen",
+      "locationId": "estate-kitchen",
+      "matchType": "colloquial",
+      "status": "Live"
+    },
+    {
+      "phrase": "tea room",
+      "locationId": "tea-room",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the tea room",
+      "locationId": "tea-room",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "coffee house",
+      "locationId": "coffee-house",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the coffee house",
+      "locationId": "coffee-house",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "library",
+      "locationId": "library",
+      "matchType": "colloquial",
+      "status": "Live"
+    },
+    {
+      "phrase": "the library",
+      "locationId": "library",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "reading nook",
+      "locationId": "reading-nook",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the reading nook",
+      "locationId": "reading-nook",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "window seat",
+      "locationId": "window-seat",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the window seat",
+      "locationId": "window-seat",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "spark estate",
+      "locationId": "spark-estate",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the spark estate",
+      "locationId": "spark-estate",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "game room",
+      "locationId": "game-room",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the game room",
+      "locationId": "game-room",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "momentum institute",
+      "locationId": "momentum-institute",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the momentum institute",
+      "locationId": "momentum-institute",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "spark chamber of momentum",
+      "locationId": "momentum-institute",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "chamber of momentum",
+      "locationId": "momentum-institute",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "gallery",
+      "locationId": "gallery-of-firsts",
+      "matchType": "colloquial",
+      "status": "Live"
+    },
+    {
+      "phrase": "the gallery",
+      "locationId": "gallery-of-firsts",
+      "matchType": "colloquial",
+      "status": "Live"
+    },
+    {
+      "phrase": "hall of accomplishments",
+      "locationId": "gallery-of-firsts",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "reflection tree",
+      "locationId": "reflection-tree-main",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "tree swing",
+      "locationId": "the-swing-beneath-the-oak",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the tree swing",
+      "locationId": "the-swing-beneath-the-oak",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
       "phrase": "take me to the treehouse",
       "locationId": "house-possibility-outside",
       "matchType": "nickname",
@@ -46,13 +244,25 @@
     },
     {
       "phrase": "butterfly conservatory",
-      "locationId": "conservatory",
+      "locationId": "butterfly-house",
       "matchType": "nickname",
       "status": "Live"
     },
     {
       "phrase": "the butterfly conservatory",
-      "locationId": "conservatory",
+      "locationId": "butterfly-house",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "butterfly house",
+      "locationId": "butterfly-house",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the butterfly house",
+      "locationId": "butterfly-house",
       "matchType": "nickname",
       "status": "Live"
     },
@@ -252,6 +462,162 @@
       "phrase": "clear my mind",
       "locationId": "clear-my-mind",
       "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "aquarium room",
+      "locationId": "conservatory",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the aquarium room",
+      "locationId": "conservatory",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "celebration hall",
+      "locationId": "celebration-room",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the celebration hall",
+      "locationId": "celebration-room",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "estate library",
+      "locationId": "library",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the estate library",
+      "locationId": "library",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "journal gazebo",
+      "locationId": "journal",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the journal gazebo",
+      "locationId": "journal",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "writing room",
+      "locationId": "decision-compass",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "study hall",
+      "locationId": "study-hall",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the study hall",
+      "locationId": "study-hall",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "discovery room",
+      "locationId": "discovery-room",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the discovery room",
+      "locationId": "discovery-room",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "creative studio",
+      "locationId": "creative-studio",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the creative studio",
+      "locationId": "creative-studio",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "momentum chamber",
+      "locationId": "momentum-institute",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the momentum chamber",
+      "locationId": "momentum-institute",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "hall of achievements",
+      "locationId": "gallery-of-firsts",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "treehouse",
+      "locationId": "house-possibility-outside",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the treehouse",
+      "locationId": "house-possibility-outside",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "possibility house",
+      "locationId": "house-possibility-outside",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "fireside deck",
+      "locationId": "fireside-deck",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "grand terrace",
+      "locationId": "grand-terrace",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "lakeside hammock",
+      "locationId": "lakeside-hammock",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "stairway reading nook",
+      "locationId": "stairway-reading-nook",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "reading nook under the stairs",
+      "locationId": "stairway-reading-nook",
+      "matchType": "nickname",
       "status": "Live"
     }
   ]
