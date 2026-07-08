@@ -107,9 +107,21 @@ Per [SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md](SPARK_NOTE_CONTENT_DATAB
 | Seed / export | `catalogSeed.ts`, `npm run spark-library:export` |
 | Daily selection metadata | `persistence.ts` (`dailyRecords`, `ignoredCategories`) |
 
+### Content library admin (v1)
+
+Per [SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md](SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md):
+
+| Capability | Implementation | Status |
+|------------|----------------|--------|
+| Add/edit Sparks without code | `spark-library/**/*.json` + export | **v1** |
+| Draft / review / active / archived | `SparkContentRecord.status` | **v1** |
+| Publish validation | `npm run spark-library:validate` | **v1** |
+| Library balance report | `libraryBalance.ts` | **v1** |
+| Admin UI / AI draft review | — | Future |
+
 ### Future (not v1)
 
-- Admin CMS (`spark-notes-files/SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md`)
+- Admin CMS (`spark-notes-files/SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md`) — file-based v1 done; UI + AI review future
 - Visual Spark Shelf (saved Sparks as a shelf UI)
 - Share Spark / connect to project (deep workflow links)
 - Illustrated assets per card

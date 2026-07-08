@@ -47,7 +47,7 @@ Installed copies live in `docs/protocols/` — use those for implementation trac
 | [SPARK_NOTE_DAILY_ENGINE_IMPLEMENTATION_SPEC.md](SPARK_NOTE_DAILY_ENGINE_IMPLEMENTATION_SPEC.md) | Selection engine, content model | **Implemented** |
 | [SPARK_NOTE_DELIGHT_EXPERIENCE_EXPANSION_PROTOCOL.md](SPARK_NOTE_DELIGHT_EXPERIENCE_EXPANSION_PROTOCOL.md) | Reactions, learning, collection | **Implemented** (v1) |
 | [SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md](SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md) | App wiring requirements | **Implemented** |
-| [SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md](SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md) | CMS / admin workflow | Future |
+| [SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md](SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md) | CMS / admin workflow | **Partial v1** (`spark-library:validate`, file-based publish) |
 | [SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md](SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md) | Authoring standard | Authoring |
 | [SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md](SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md) | Database schema | **Implemented** (`spark-library/`, `contentDatabase/`) |
 | [SPARK_NOTE_SELECTION_INTELLIGENCE_RULES_PROTOCOL.md](SPARK_NOTE_SELECTION_INTELLIGENCE_RULES_PROTOCOL.md) | Advanced selection rules | Partial |
