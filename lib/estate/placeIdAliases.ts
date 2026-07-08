@@ -37,6 +37,10 @@ export const PLACE_ID_ALIASES: Readonly<Record<string, string>> = {
   "growth-reports": "celebration-room",
   "wins-this-week": "gardens",
 
+  // Removed navigable rooms — legacy ids redirect to canonical destination
+  "reflection-pond": "seat-at-pond",
+  "back-deck": "fireside-deck",
+
   // Registry / menu bridges
   "estate-registry-journal": "journal",
   kitchen: "estate-kitchen",

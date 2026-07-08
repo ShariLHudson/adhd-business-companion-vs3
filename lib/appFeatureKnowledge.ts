@@ -50,15 +50,15 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "focus",
     name: "Focus",
-    navigation: "Sidebar **Focus**",
+    navigation: "Say you'd like to focus, or tell me how you're feeling.",
     howTo:
-      "Calm support menu — pick how you're feeling, then open the tool that fits.",
+      "Say how you're feeling, then ask for the tool that fits — focus session, breathing, peaceful sound, and more.",
     match: [/\bfocus\b(?!\s*session|\s*audio)/i, /\bfocus menu\b/i],
   },
   {
     id: "clear-my-mind",
     name: "Clear My Mind",
-    navigation: "Top navigation **🧠 Clear My Mind** (or Sidebar **Focus**)",
+    navigation: "Say 'clear my mind' or tell me your head feels crowded.",
     howTo:
       "Empty your head safely — capture thoughts (commas are fine), see everything held, explore clusters, and act on thoughts when ready.",
     match: [
@@ -72,7 +72,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "plan-my-day",
     name: "Plan My Day",
-    navigation: "Top navigation **📅 Plan My Day**",
+    navigation: "Say 'plan my day' or tell me what today looks like.",
     howTo:
       "Daily decision workspace — choose what fits today's energy, time, and capacity. Not a long-term task manager.",
     match: [
@@ -85,7 +85,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "chat-workspace",
     name: "Chat Workspace",
-    navigation: "Top navigation **💬 Chat Workspace** ▼",
+    navigation: "Say 'new chat' or 'start fresh' for a clean conversation.",
     howTo:
       "**New Chat** — fresh conversation; memory, projects, goals, and learning stay. **New Day's Chat** — fresh daily start; resets Plan My Day and clears daily planning items; memory and projects stay.",
     match: [
@@ -101,8 +101,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "brain-parking-lot",
     name: "Brain Parking Lot",
-    navigation:
-      "Sidebar **Focus** → **I'm Stuck** or **I Need To Work** (activity tools)",
+    navigation: "Say 'park this for later' while you're working on something else.",
     howTo:
       "Save a stray idea for later while staying on task — quick park and tag, no sorting now.",
     match: [
@@ -115,8 +114,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "safe-for-today",
     name: "Safe For Today",
-    navigation:
-      "Sidebar **Focus** → pick a feeling, then open **Safe For Today** from Strategies or Focus tools",
+    navigation: "Say 'safe for today' or name what you're not tackling today.",
     howTo:
       "Permission to postpone — name what you're not solving today; relief, not a worry list.",
     match: [/\bsafe for today\b/i, /\bpermission not to\b/i, /\bnot doing this today\b/i],
@@ -124,7 +122,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "focus-session",
     name: "Focus Session",
-    navigation: "Sidebar **Focus** → **Start Here** → **Focus Session**",
+    navigation: "Say 'focus session' or ask for a timed work block.",
     howTo:
       "Answer a few quick questions, then work with a timer on one task.",
     match: [/\bfocus session\b/i, /\bpomodoro\b/i, /\bfocus timer\b/i],
@@ -132,14 +130,14 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "breathe",
     name: "Breathe & Reset",
-    navigation: "Sidebar **Focus** → **Focus Tools** → **Breathe & Reset**",
+    navigation: "Say 'help me breathe' or 'I need to reset.'",
     howTo: "Grounding exercise to calm your nervous system and regroup.",
     match: [/\bbreathe\b/i, /\breset\b/i, /\bgrounding\b/i],
   },
   {
     id: "focus-audio",
     name: "Peaceful Places",
-    navigation: "Sidebar **Focus** → **Focus Tools** → **Peaceful Places**",
+    navigation: "Say 'peaceful places' or ask for background sound.",
     howTo:
       "Choose an environment — rain, hearth, library, café, or morning light. Tap Play and stay inside the estate.",
     match: [
@@ -152,7 +150,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "time-block",
     name: "Momentum Appointments",
-    navigation: "Sidebar **Focus** → **Focus Tools** → **Block Out Time**",
+    navigation: "Say 'block out time' or 'set a momentum appointment.'",
     howTo:
       "Set a gentle intention — what to move forward, how long, and when. Success is movement, not perfection.",
     match: [
@@ -165,7 +163,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "momentum-games",
     name: "Quick Recharge",
-    navigation: "Sidebar **Focus** → **Quick Recharge**",
+    navigation: "Say 'quick recharge' or ask for a light reset.",
     howTo:
       "Light activities for when your brain needs a reset — simple games and playful pauses. For entrepreneurial practice, visit **Grow** → **Momentum Builders**.",
     match: [
@@ -181,8 +179,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "spin-wheel",
     name: "Spin The Wheel",
-    navigation:
-      "Sidebar **Focus** → **Momentum Boosters** → **Spin The Wheel**",
+    navigation: "Say 'spin the wheel' when everything feels equally urgent.",
     howTo:
       "Let the wheel pick one thing when everything feels equally important.",
     match: [/\bspin(?:ning)? (?:the )?wheel\b/i, /\bwheel\b/i],
@@ -190,8 +187,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "guided-exercises",
     name: "Guided Exercises",
-    navigation:
-      "Sidebar **Focus** → **Momentum Boosters** → **Guided Exercises**",
+    navigation: "Say 'guided exercise' or name the exercise you want.",
     howTo:
       "Structured thinking — ADHD Decision Compass, values, goals, priority sort, project breakdown, and more.",
     match: [
@@ -206,7 +202,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "snippets",
     name: "Snippets",
-    navigation: "Sidebar **More** → **Snippets**",
+    navigation: "Say 'snippets' or ask to save reusable text.",
     howTo:
       "Reusable text blocks saved on this device — create, edit, and use them in Create or chat.",
     match: [
@@ -218,7 +214,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "create",
     name: "Create",
-    navigation: "Sidebar **Create**",
+    navigation: "Tell me what you'd like to create — I'll open the workspace with you.",
     howTo:
       "Pick category → type → answer questions one at a time → build draft → improve → export.",
     match: [
@@ -230,7 +226,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "templates",
     name: "Templates",
-    navigation: "Sidebar **More** → **Templates**",
+    navigation: "Ask me to help with a template, or tell me what you'd like to make.",
     howTo:
       "Reusable starting points saved on this device. **Build With Shari** opens a chat to adapt a template together — nothing is drafted until you agree. Start from blank is for advanced users who want to edit the framework directly.",
     match: [/\btemplates?\b/i, /\btemplate library\b/i],
@@ -238,7 +234,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "strategies",
     name: "Strategies",
-    navigation: "Sidebar **More** → **Strategies**",
+    navigation: "Say 'strategies' or ask for an ADHD or business strategy.",
     howTo:
       "Choose **ADHD Strategies** to apply a technique now, or **Business Strategies** to build a plan with Shari one question at a time.",
     match: [
@@ -251,7 +247,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "projects",
     name: "Projects",
-    navigation: "Sidebar **More** → **Projects**",
+    navigation: "Say 'open my project' or name the project you're working on.",
     howTo:
       "Active work in one place — tasks, time blocks, notes, and files. Open from **More → Projects**; ask Shari from a project or jump into a time block when you're ready to work.",
     match: [/\bprojects?\b/i],
@@ -259,7 +255,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "how-do-i",
     name: "How Do I",
-    navigation: "Sidebar **More** → **How Do I**",
+    navigation: "Ask 'how do I…' in chat — I'll guide you.",
     howTo:
       "Search how the app works, read short guides, or ask Shari in chat.",
     match: [/\bhow do i\b.*\bapp\b/i, /\bhow-do-i\b/i],
@@ -267,7 +263,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "settings",
     name: "Settings",
-    navigation: "Top bar **Account (⋯)** → **Settings**",
+    navigation: "Say 'settings' or ask to change preferences or appearance.",
     howTo:
       "System preferences — tone, language, connections, celebrations, and **Appearance** (colors).",
     match: [/\bsettings?\b/i, /\bpreferences?\b/i],
@@ -275,7 +271,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "profile",
     name: "Profile",
-    navigation: "Top bar **Account (⋯)** → **Profile**",
+    navigation: "Say 'profile' or ask about your account and memory settings.",
     howTo:
       "Name, account, communication style, and **Memory & appearance** (links to color settings).",
     match: [/\bprofile\b/i, /\bmy account\b/i],
@@ -283,14 +279,14 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "client-avatars",
     name: "Client Avatars",
-    navigation: "Sidebar **Growth** or **My Work** → **Client Avatars** (or Profile settings)",
+    navigation: "Say 'client avatars' or describe who you help.",
     howTo: "Client/persona profiles for content tailored to specific audiences.",
     match: [/\bclient avatars?\b/i, /\bavatars?\b/i],
   },
   {
     id: "adjust-my-day",
     name: "Today's Reality",
-    navigation: "Top navigation **🌤️ Today's Reality**",
+    navigation: "Say 'today's reality' or tell me how your energy is today.",
     howTo:
       "Share today's energy, motivation, and vibe so support and Plan My Day fit your real capacity.",
     match: [
@@ -303,8 +299,7 @@ export const APP_FEATURES: AppFeatureEntry[] = [
   {
     id: "settings-appearance",
     name: "Appearance / Colors",
-    navigation:
-      "Top bar **Account (⋯)** → **Settings** → **Appearance** (or **Profile** → **Memory & appearance**)",
+    navigation: "Say 'change colors' or ask about appearance settings.",
     howTo:
       "Pick a visual color mode: **Adaptive Colors**, **Category Colors**, or **Minimal** — preview, then save.",
     match: [
@@ -318,29 +313,25 @@ export const APP_FEATURES: AppFeatureEntry[] = [
 ];
 
 /** Compact reference always included in the system prompt. */
-export const APP_FEATURE_KNOWLEDGE_COMPACT = `APP FEATURE KNOWLEDGE (authoritative — use for how-to/navigation; never deny these):
-• Companion-first top bar: Clear My Mind (🧠), Plan My Day (📅), Today's Reality (🌤️) — companion workspaces; Chat Workspace (💬) manages conversation context (New Chat / New Day's Chat)
-• Focus hub: Sidebar Focus → feelings-first tools (Focus Session, Guided Exercises, etc.)
-• Clear My Mind: Top bar 🧠 or Focus → Start Here → Clear My Mind
-• Plan My Day: Top bar 📅 — daily decision workspace (not long-term task manager)
-• Today's Reality: Top bar 🌤️ — today's energy and reality check-in
-• Chat Workspace: Top bar 💬 → New Chat (fresh conversation) or New Day's Chat (fresh daily start + Plan My Day reset)
-• Focus Session: Focus → Start Here → Focus Session
-• Breathe & Reset: Focus → Focus Tools → Breathe & Reset
-• Peaceful Places: Focus → Focus Tools → Peaceful Places
-• Time Blocks: Focus → Focus Tools → Block Out Time
-• Guided Exercises: Focus → Momentum Boosters → Guided Exercises
-• Momentum Builders: Focus → Momentum Boosters → Momentum Builders (short resets ARE in the app)
-• Spin The Wheel: Focus → Momentum Boosters → Spin The Wheel
-• Snippets: More → Snippets (reusable text blocks)
-• Create: Sidebar Create
-• Templates: More → Templates (reusable starting points on this device; Build With Shari in chat before drafting)
-• Strategies: More → Strategies → ADHD Strategies or Business Strategies
-• Projects: More → Projects (tasks, time blocks, notes, files)
-• How Do I: More → How Do I
-• Settings: Account (⋯) → Settings (Appearance for colors)
-• Profile: Account (⋯) → Profile (Memory & appearance → colors)
-If unsure about layout: "${APP_FEATURE_UNSURE}" — do NOT invent features or deny listed ones.`;
+export const APP_FEATURE_KNOWLEDGE_COMPACT = `APP FEATURE KNOWLEDGE (authoritative — conversation-first; never deny these features):
+• Clear My Mind: say "clear my mind" or describe mental clutter
+• Plan My Day: say "plan my day" or describe today's capacity
+• Today's Reality: say "today's reality" or share how your energy feels
+• Chat: say "new chat" or "start fresh" when you want a clean conversation
+• Focus / Focus Session: say "focus" or "focus session" for timed work
+• Breathe & Reset: say "help me breathe" or "I need to reset"
+• Peaceful Places: say "peaceful places" or ask for background sound
+• Momentum Appointments: say "block out time" or "momentum appointment"
+• Guided Exercises: say "guided exercise" or name the exercise
+• Quick Recharge / Spin The Wheel: say "quick recharge" or "spin the wheel"
+• Snippets: say "snippets" or ask to save reusable text
+• Create: tell Shari what you'd like to create
+• Templates: ask for help with a template or what to make
+• Strategies: say "strategies" or ask for ADHD/business strategy help
+• Projects: say "open my project" or name your project
+• How Do I: ask "how do I…" in chat
+• Settings / Profile / Appearance: say "settings", "profile", or "change colors"
+If unsure: "${APP_FEATURE_UNSURE}" — do NOT invent features or deny listed ones. Never point to menus or sidebars.`;
 
 function scoreFeature(text: string, entry: AppFeatureEntry): number {
   let score = 0;
@@ -465,9 +456,9 @@ export function appFeatureKnowledgeHintForChat(text: string): string | undefined
   return [
     "APP FEATURE KNOWLEDGE (authoritative for this turn — use this, not general AI knowledge):",
     ...lines,
-    "COMPANION FIRST (conversation-only): Give a 1–2 sentence brief answer, then name the UI button or menu path — chat does not open workspaces.",
+    "COMPANION FIRST (conversation-only): Give a 1–2 sentence brief answer, then offer the closest working action in natural language — never menus or sidebars. Chat does not open workspaces.",
     "Do NOT open Create to draft an explanation. Do NOT send users to documentation.",
-    "Answer with the exact navigation path only if they decline the offer. Do NOT say these features are missing or unavailable.",
+    "Answer with conversation triggers (what to say) — not UI chrome paths. Do NOT say these features are missing or unavailable.",
     `If the question is outside this list: "${APP_FEATURE_UNSURE}"`,
   ].join("\n");
 }

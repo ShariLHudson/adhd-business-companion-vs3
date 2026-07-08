@@ -54,7 +54,7 @@ export function recoveryMessageAfterPanelHide(
       );
     }
     if (hasProject) {
-      return "Your project is in **Projects** — pick it up anytime from the menu.";
+      return "Your project is in **Projects** — say 'open my project' anytime to pick it up.";
     }
   }
 

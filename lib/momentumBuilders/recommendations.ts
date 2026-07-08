@@ -118,7 +118,7 @@ export function recommendMomentumBuilders(
       used.add(item.id);
       out.push({
         item,
-        reason: "Something supportive from the menu — choose what feels right.",
+        reason: "Something supportive — tell me which one sounds right.",
       });
     }
   }

@@ -1,0 +1,55 @@
+import { describe, expect, it, beforeEach } from "vitest";
+import { SPARK_NOTE_CATALOG } from "./catalog";
+import { resolveMySparksCollection } from "./mySparksCollection";
+import {
+  pickAffinityWeightedFromPool,
+  scoreEntryAffinity,
+  topAffinityTopics,
+} from "./preferenceLearning";
+import {
+  recordSparkNoteReaction,
+  resetSparkNoteStoreForTests,
+  toggleSparkNoteFavorite,
+} from "./persistence";
+
+describe("preferenceLearning", () => {
+  beforeEach(() => {
+    resetSparkNoteStoreForTests();
+  });
+
+  it("boosts affinity score after loved reaction", () => {
+    const entry = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-INV-001")!;
+    const before = scoreEntryAffinity(entry);
+    recordSparkNoteReaction("SPARK-INV-001", "loved", "invention", ["invention"]);
+    const after = scoreEntryAffinity(entry);
+    expect(after).toBeGreaterThan(before);
+  });
+
+  it("save reaction adds to favorites and collection", () => {
+    recordSparkNoteReaction("SPARK-QTE-001", "save", "quote");
+    expect(resolveMySparksCollection().some((s) => s.id === "SPARK-QTE-001")).toBe(
+      true,
+    );
+  });
+
+  it("topAffinityTopics surfaces learned categories", () => {
+    recordSparkNoteReaction("SPARK-BIZ-001", "loved", "business");
+    recordSparkNoteReaction("SPARK-ENT-001", "smile", "entrepreneur");
+    const topics = topAffinityTopics(2);
+    expect(topics.length).toBeGreaterThan(0);
+  });
+
+  it("affinity score ranks loved category above others", () => {
+    recordSparkNoteReaction("SPARK-INV-001", "loved", "invention");
+    const inv = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-INV-001")!;
+    const ent = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-ENT-001")!;
+    expect(scoreEntryAffinity(inv)).toBeGreaterThan(scoreEntryAffinity(ent));
+  });
+
+  it("toggleSparkNoteFavorite still works alongside reactions", () => {
+    toggleSparkNoteFavorite("SPARK-GRO-001");
+    expect(resolveMySparksCollection().some((s) => s.id === "SPARK-GRO-001")).toBe(
+      true,
+    );
+  });
+});

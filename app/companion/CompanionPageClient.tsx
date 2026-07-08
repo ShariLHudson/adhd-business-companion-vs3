@@ -19,6 +19,7 @@ import {
 } from "@/lib/estateDiscovery";
 import { EstateTopRightChrome } from "@/components/companion/estate/EstateTopRightChrome";
 import { SparkEstateGuideChrome } from "@/components/companion/SparkEstateGuideChrome";
+import { SparkNoteChrome } from "@/components/companion/SparkNoteChrome";
 import { EnjoyEstateVisitorChrome } from "@/components/companion/estate/EnjoyEstateVisitorChrome";
 import { estateArrivalShariGreeting } from "@/lib/estate/estateArrivalExperience";
 import { getEstateMemory } from "@/lib/estateMemory/estateMemoryStore";
@@ -1292,6 +1293,10 @@ import {
   type EstateCommandDecision,
 } from "@/lib/estateIntelligence";
 import { estateNavigateCommandForPlace } from "@/lib/estateIntelligence/estateCommandRouter";
+import {
+  pickWanderDestination,
+  recordWanderTransition,
+} from "@/lib/estate/manifest/estateWanderMode";
 import type {
   ImmediateCreateOpenPayload,
   ImmediateCreateProjectOpenPayload,
@@ -7875,6 +7880,19 @@ export default function CompanionPageClient() {
     setJustBeHereChatVisible((visible) => !visible);
   }
 
+  function handleEstateWander(fromRoomId: string) {
+    const pick = pickWanderDestination(fromRoomId);
+    if (!pick) return;
+
+    const command = estateNavigateCommandForPlace(pick.legacyPlaceId, "wander");
+    if (!command) return;
+
+    recordWanderTransition(fromRoomId, pick.place);
+    runDirectEstateRoomNavigation(command, "wander", undefined, {
+      skipAssistantMessage: true,
+    });
+  }
+
   function toggleJustBeHereSound() {
     const roomId = justBeHereSession?.roomId;
     if (!roomId) return;
@@ -13351,7 +13369,7 @@ export default function CompanionPageClient() {
               content:
                 "I found a few saved items — which one do you mean?\n\n" +
                 `${list}\n\n` +
-                "Reply with the number or open **Saved Work** from the menu.",
+                "Reply with the number, or say 'open saved work' and I'll help you find it.",
             },
           ]);
           return;
@@ -19832,6 +19850,13 @@ export default function CompanionPageClient() {
         onOpen={openSparkEstateGuideCore}
         onClose={() => setEstateGuideFlipbookOpen(false)}
       />
+      <SparkNoteChrome
+        visible={showSparkEstateGuide}
+        firstName={getPrefs().name || null}
+        birthday={getRecognitionStore().birthday}
+        personalDates={getRecognitionStore().personalDates}
+        memberSinceIso={getMemberSinceIso()}
+      />
       <EstateTopRightChrome
         showProfile={showGlobalEstateMenu}
         showRoom={showEstateExperienceMenu}
@@ -19840,6 +19865,11 @@ export default function CompanionPageClient() {
         onJustBeHere={() => {
           if (estateExperienceMenuRoomId) {
             enterJustBeHere(estateExperienceMenuRoomId);
+          }
+        }}
+        onWander={() => {
+          if (estateExperienceMenuRoomId) {
+            handleEstateWander(estateExperienceMenuRoomId);
           }
         }}
       />

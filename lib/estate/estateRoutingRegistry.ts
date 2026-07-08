@@ -18,6 +18,10 @@ import {
 } from "./canonicalEstateRegistry";
 import { formatEstatePlaceSuggestionMenu } from "./estatePlaceIdentityLock";
 import { isPresenceModeRequest } from "./justBeHere";
+import {
+  getNavigationOptions,
+  resolveManifestNavigation,
+} from "./manifest/estatePlaceMasterManifest";
 import type { EstatePlaceResolution } from "./resolveEstatePlace";
 
 export type EstateRoutingDecisionKind =
@@ -77,15 +81,15 @@ export const ESTATE_ROUTING_EXCLUSIVE_PHRASES: Readonly<Record<string, string>> 
     "the reading nook by the window": "window-seat",
     "stairway reading nook": "stairway-reading-nook",
     "the stairway reading nook": "stairway-reading-nook",
-    "back deck": "back-deck",
-    "the back deck": "back-deck",
+  "back deck": "fireside-deck",
+  "the back deck": "fireside-deck",
     "personal deck": "personal-deck",
     "the personal deck": "personal-deck",
     "fireside deck": "fireside-deck",
     "the fireside deck": "fireside-deck",
     "seat at the pond": "seat-at-pond",
-    "reflection pond": "reflection-pond",
-    "the reflection pond": "reflection-pond",
+  "reflection pond": "seat-at-pond",
+  "the reflection pond": "seat-at-pond",
     "music room": "music-room",
     "the music room": "music-room",
     pool: "summer-terrace",
@@ -126,65 +130,8 @@ export type EstateRoutingAmbiguityGroup = {
   placeIds: readonly string[];
 };
 
-/** Ambiguous destination phrases → numbered choices (never guess). */
-export const ESTATE_ROUTING_AMBIGUITY_GROUPS: readonly EstateRoutingAmbiguityGroup[] =
-  [
-    {
-      id: "garden",
-      patterns: [/^(?:the\s+)?garden$/i, /^(?:the\s+)?gardens$/i],
-      intro: "We have a few garden spaces. Which one would you like?",
-      placeIds: [
-        "estate-gardens",
-        "gardens",
-        "conservatory",
-        "greenhouse",
-        "reflection-tree-main",
-      ],
-    },
-    {
-      id: "reading-nook",
-      patterns: [/^(?:the\s+)?reading nook$/i, /^(?:the\s+)?nook$/i],
-      intro: "We have a couple of reading nooks. Which one would you like?",
-      placeIds: ["reading-nook", "stairway-reading-nook", "window-seat"],
-    },
-    {
-      id: "telescope",
-      patterns: [
-        /^(?:the\s+)?telescope$/i,
-        /\b(?:take me to|go to|show me|visit)\s+(?:the\s+)?telescope\b/i,
-      ],
-      intro: "A couple of places with a telescope — which one?",
-      placeIds: [
-        "observatory-telescope-window",
-        "house-possibility-telescope-deck",
-      ],
-    },
-    {
-      id: "observatory",
-      patterns: [
-        /^(?:the\s+)?observatory$/i,
-        /\b(?:take me to|go to|show me|visit)\s+(?:the\s+)?observatory\b/i,
-      ],
-      intro: "We have two observatories — the Treehouse and the main Estate. Which one?",
-      placeIds: ["house-possibility-observatory", "observatory"],
-    },
-    {
-      id: "conservatory",
-      patterns: [
-        /^(?:the\s+)?conservatory$/i,
-        /\b(?:take me to|go to|show me|visit)\s+(?:the\s+)?conservatory\b/i,
-      ],
-      intro:
-        "I found a few conservatory spaces. Did you mean Ocean Conservatory or the Greenhouse?",
-      placeIds: ["conservatory", "greenhouse"],
-    },
-    {
-      id: "pond",
-      patterns: [/^(?:the\s+)?pond$/i],
-      intro: "We have a couple of pond spaces — which sounds better?",
-      placeIds: ["seat-at-pond", "reflection-pond"],
-    },
-  ];
+/** @deprecated Import from manifest — re-exported for legacy tests. */
+export { MANIFEST_NAVIGATION_AMBIGUITY_GROUPS as ESTATE_ROUTING_AMBIGUITY_GROUPS } from "./manifest/manifestNavigationGroups";
 
 const NAV_VERB_RE =
   /\b(?:take me to|go to|let(?:'s| us) go to|open|show me|visit|head to|bring me to)\b/i;
@@ -304,27 +251,50 @@ function matchAmbiguityGroup(
   text: string,
   context?: EstateRoutingContext,
 ): EstateRoutingDecision | null {
-  const stripped = stripNavigationVerbs(text);
-  const probe = stripped || text.trim();
+  const result = getNavigationOptions(text, context);
+  if (result.kind !== "suggest") return null;
 
-  for (const group of ESTATE_ROUTING_AMBIGUITY_GROUPS) {
-    if (!group.patterns.some((p) => p.test(probe))) continue;
+  const placeIds = result.options.map((option) => option.legacyPlaceId);
+  if (placeIds.length < 2) return null;
 
-    const placeIds = group.placeIds.filter(
-      (id) => id !== context?.currentPlaceId,
-    );
-    if (placeIds.length < 2) continue;
+  return {
+    kind: "suggest",
+    suggestedPlaceIds: placeIds.slice(0, 4),
+    menuIntro: formatEstatePlaceSuggestionMenu(placeIds.slice(0, 4), {
+      intro: result.intro,
+    }),
+    confidence: "high",
+    reason: result.reason,
+  };
+}
 
+function matchManifestNavigation(
+  text: string,
+  context?: EstateRoutingContext,
+): EstateRoutingDecision | null {
+  const result = resolveManifestNavigation(text, context);
+  if (result.kind === "suggest") {
+    const placeIds = result.options.map((option) => option.legacyPlaceId);
+    if (placeIds.length < 2) return null;
     return {
       kind: "suggest",
       suggestedPlaceIds: placeIds.slice(0, 4),
       menuIntro: formatEstatePlaceSuggestionMenu(placeIds.slice(0, 4), {
-        intro: group.intro,
+        intro: result.intro,
       }),
       confidence: "high",
-      reason: `ambiguous destination → ${group.id}`,
+      reason: result.reason,
     };
   }
+
+  if (result.kind === "navigate") {
+    return buildNavigateDecision(
+      result.legacyPlaceId,
+      `manifest → ${result.matchedBy}`,
+      { matchedAlias: result.matchedPhrase },
+    );
+  }
+
   return null;
 }
 
@@ -463,6 +433,9 @@ export function resolveEstateRoutingDecision(
 
   const exclusive = matchExclusivePhrase(text);
   if (exclusive) return exclusive;
+
+  const manifestNav = matchManifestNavigation(text, context);
+  if (manifestNav) return manifestNav;
 
   if (hasNavigationIntent(text) || OBJECT_VERB_RE.test(text)) {
     const phrase = stripNavigationVerbs(text) || text;

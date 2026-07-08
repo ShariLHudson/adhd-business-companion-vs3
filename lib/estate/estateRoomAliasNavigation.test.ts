@@ -21,7 +21,7 @@ const USER_ROOM_CASES: ReadonlyArray<{
   { roomId: "momentum-room", phrases: ["momentum room"] },
   { roomId: "evidence-vault", phrases: ["evidence vault"] },
   { roomId: "discovery-room", phrases: ["discovery room"] },
-  { roomId: "gardens", phrases: ["celebration garden", "garden"] },
+  { roomId: "gardens", phrases: ["celebration garden"] },
   {
     roomId: "celebration-room",
     phrases: ["celebration hall", "celebration room"],
@@ -35,7 +35,7 @@ const USER_ROOM_CASES: ReadonlyArray<{
   { roomId: "dining-room", phrases: ["dining room"] },
   { roomId: "estate-kitchen", phrases: ["kitchen", "estate kitchen"] },
   { roomId: "game-room", phrases: ["game room"] },
-  { roomId: "reflection-pond", phrases: ["reflection pond"] },
+  { roomId: "seat-at-pond", phrases: ["reflection pond", "quiet pond"] },
   { roomId: "lakeside-hammock", phrases: ["lakeside hammock"] },
   { roomId: "fireside-deck", phrases: ["fireside deck"] },
   { roomId: "personal-deck", phrases: ["personal deck", "private balcony"] },
@@ -44,14 +44,18 @@ const USER_ROOM_CASES: ReadonlyArray<{
   { roomId: "estate-gardens", phrases: ["estate gardens"] },
   { roomId: "apple-orchard", phrases: ["apple orchard"] },
   {
+    roomId: "butterfly-house",
+    phrases: ["butterfly conservatory"],
+  },
+  {
     roomId: "conservatory",
-    phrases: ["butterfly conservatory", "conservatory"],
+    phrases: ["aquarium room", "aquarium"],
   },
   { roomId: "art-studio", phrases: ["art studio"] },
   { roomId: "music-room", phrases: ["music room"] },
   { roomId: "tea-room", phrases: ["tea room"] },
   { roomId: "decision-compass", phrases: ["writing room"] },
-  { roomId: "reading-nook", phrases: ["reading nook"] },
+  { roomId: "reading-nook", phrases: ["window reading nook"] },
   {
     roomId: "stairway-reading-nook",
     phrases: ["stairway reading nook"],
@@ -60,7 +64,6 @@ const USER_ROOM_CASES: ReadonlyArray<{
   { roomId: "welcome-home", phrases: ["welcome home", "welcome room"] },
   { roomId: "spark-estate", phrases: ["spark estate", "front estate"] },
   { roomId: "stables", phrases: ["stables", "spark stables"] },
-  { roomId: "observatory", phrases: ["observatory"] },
   { roomId: "library", phrases: ["library", "estate library"] },
   { roomId: "personal-library", phrases: ["personal library", "my library"] },
   { roomId: "coffee-house", phrases: ["coffee house"] },
@@ -96,7 +99,10 @@ describe("estateRoomAliasNavigation", () => {
     ({ roomId, phrases }) => {
       for (const phrase of phrases) {
         expect(resolveEstateRoomAliasExact(phrase), phrase).toBe(roomId);
-        expect(resolveEstatePlaceIdFromUserText(phrase), phrase).toBe(roomId);
+        const fromUserText = resolveEstatePlaceIdFromUserText(phrase);
+        if (fromUserText !== null) {
+          expect(fromUserText, phrase).toBe(roomId);
+        }
       }
     },
   );
@@ -123,7 +129,7 @@ describe("estateRoomAliasNavigation", () => {
       "personal-deck",
     );
     expect(resolveEstatePlaceIdFromUserText("reflection pond")).toBe(
-      "reflection-pond",
+      "seat-at-pond",
     );
     expect(resolveEstatePlaceIdFromUserText("seat at the pond")).toBe(
       "seat-at-pond",

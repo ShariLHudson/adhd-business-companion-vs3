@@ -1,6 +1,9 @@
 /**
  * Spark Estate™ — member-facing alias catalog (single source for navigation phrases).
  * Sync aliases into `canonicalEstatePlaces.ts` when adding new canonical places.
+ *
+ * @deprecated Legacy adapter — aliases now derive from
+ * `docs/estate/ESTATE_PLACE_MASTER_MANIFEST.json`. Kept until manifest runtime verified.
  */
 
 import type { AppSection } from "@/lib/companionUi";
@@ -47,7 +50,15 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   {
     roomId: "sunroom",
     officialName: "Sunroom™",
-    aliases: ["sunroom", "the sunroom", "shari's sunroom"],
+    aliases: [
+      "sunroom",
+      "the sunroom",
+      "shari's sunroom",
+      "sun room",
+      "sunny room",
+      "glass room",
+      "morning room",
+    ],
     route: "welcome-room",
     roomType: "welcome",
   },
@@ -68,7 +79,6 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
       "conservatory room",
       "quiet glass room",
       "the quiet glass room",
-      "glass room",
     ],
     route: null,
     roomType: "reflection",
@@ -88,7 +98,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
   {
     roomId: "butterfly-house",
     officialName: "Butterfly House",
-    aliases: ["butterfly house", "the butterfly house", "butterfly conservatory", "the butterfly conservatory"],
+    aliases: ["butterfly house", "the butterfly house", "butterfly conservatory", "the butterfly conservatory", "butterfly garden", "the butterfly garden"],
     route: "focus",
     roomType: "reflection",
   },
@@ -183,36 +193,39 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
     roomType: "restoration",
   },
   {
-    roomId: "reflection-pond",
-    officialName: "Reflection Pond™",
-    aliases: [
-      "reflection pond",
-      "the reflection pond",
-      "visit the reflection pond",
-      "quiet pond",
-      "stream bench",
-      "the stream",
-    ],
-    route: "home",
-    roomType: "nature",
-  },
-  {
     roomId: "seat-at-pond",
-    officialName: "Seat at the Pond™",
+    officialName: "Seat at Pond / Dock™",
     aliases: [
       "seat at the pond",
       "seat at pond",
       "sit by the water",
       "the dock",
       "dock",
+      "pond",
+      "the pond",
+      "reflection pond",
+      "the reflection pond",
+      "pond seat",
+      "quiet pond",
+      "pond dock",
+      "peaceful water",
+      "stream bench",
+      "the stream",
     ],
-    route: "focus-audio",
+    route: "home",
     roomType: "restoration",
   },
   {
     roomId: "fireside-deck",
     officialName: "Fireside Deck™",
-    aliases: ["fireside deck", "the fireside deck"],
+    aliases: [
+      "fireside deck",
+      "the fireside deck",
+      "back deck",
+      "the back deck",
+      "sit outside",
+      "evening air",
+    ],
     route: "home",
     roomType: "restoration",
   },
@@ -226,13 +239,6 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
       "private balcony",
       "the private balcony",
     ],
-    route: "home",
-    roomType: "restoration",
-  },
-  {
-    roomId: "back-deck",
-    officialName: "Back Deck™",
-    aliases: ["back deck", "the back deck", "sit outside", "evening air"],
     route: "home",
     roomType: "restoration",
   },
@@ -254,7 +260,7 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
     roomId: "apple-orchard",
     officialName: "Apple Orchard™",
     aliases: ["apple orchard", "the apple orchard", "orchard", "the orchard"],
-    route: "focus-audio",
+    route: "home",
     roomType: "nature",
   },
   {
@@ -279,10 +285,8 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
       "the gardens",
       "garden",
       "the garden",
-      "my wins",
-      "wins this week",
     ],
-    route: "wins-this-week",
+    route: "home",
     roomType: "nature",
   },
   {
@@ -310,9 +314,6 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
     aliases: [
       "reading nook",
       "the reading nook",
-      "nook under the stairs",
-      "sit under the stairs",
-      "under the stairs",
       "quiet read",
       "arched window nook",
     ],
@@ -326,6 +327,10 @@ export const ESTATE_ROOM_ALIAS_CATALOG: readonly EstateRoomAliasSpec[] = [
       "stairway reading nook",
       "the stairway reading nook",
       "stairs reading nook",
+      "reading nook under the stairs",
+      "nook under the stairs",
+      "sit under the stairs",
+      "under the stairs",
     ],
     route: "home",
     roomType: "reflection",

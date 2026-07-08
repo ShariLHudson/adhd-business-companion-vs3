@@ -43,6 +43,7 @@ import "./just-be-here.css";
 import "./estate-presence.css";
 import "./global-estate-menu.css";
 import "./spark-estate-guide.css";
+import "./spark-note.css";
 import "./companion-chat-surface.css";
 import "./companion-layout-layers.css";
 

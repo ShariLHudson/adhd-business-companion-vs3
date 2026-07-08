@@ -1,5 +1,6 @@
 // Verify workspace opens before the assistant claims success.
 
+import { workspaceOpenFailureMessage } from "./conversationFirstLanguage";
 import type { AppSection } from "./companionUi";
 import { buildWorkspaceOpenedTransition } from "./humanConversation/actionTransition";
 import { workspaceTitle } from "./workspaceMode";
@@ -50,11 +51,7 @@ export function workspaceOpenSuccessAck(section: AppSection): string {
 }
 
 export function workspaceOpenFailureAck(section: AppSection): string {
-  const title = workspaceTitle(section);
-  return (
-    `I tried to open **${title}** but it didn't appear on screen. ` +
-    `Tap **${title}** in the menu, or tell me to try again.`
-  );
+  return workspaceOpenFailureMessage(workspaceTitle(section));
 }
 
 /** Pick success or failure copy based on verified state — never claim open when false. */

@@ -2,11 +2,9 @@ import { describe, expect, it } from "vitest";
 import { resolveEstateLocationShell } from "../directory/shell";
 
 describe("collection room shell navigation", () => {
-  it("maps celebration places to collection sections", () => {
-    expect(resolveEstateLocationShell("gardens").section).toBe("wins-this-week");
-    expect(resolveEstateLocationShell("celebration-garden").section).toBe(
-      "wins-this-week",
-    );
+  it("maps celebration garden place to home room shell", () => {
+    expect(resolveEstateLocationShell("gardens").section).toBe("home");
+    expect(resolveEstateLocationShell("celebration-garden").section).toBe("home");
     expect(resolveEstateLocationShell("celebration-room").section).toBe(
       "growth-reports",
     );

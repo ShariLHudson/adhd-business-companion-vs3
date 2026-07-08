@@ -26,7 +26,7 @@ export const COLLECTION_FLOW_DESIGN_RULES = [
     id: "permission-first",
     title: "Spark must always ask permission",
     detail:
-      "Every collection offer is a question. Yes opens the room; no stays in chat; different room shows the menu.",
+      "Every collection offer is a question. Yes opens the room; no stays in chat; a different room shows numbered choices in chat.",
   },
   {
     id: "no-interrupt",
@@ -148,7 +148,7 @@ export const COLLECTION_FLOW_QA_CHECKLIST: CollectionFlowQaChecklistItem[] = [
     followUpMessages: ["yes"],
     expectedRoomId: "celebration-garden",
     manualSteps: [
-      "Trigger an offer and reply yes (or pick a room from the menu).",
+      "Trigger an offer and reply yes (or name the room you'd like).",
       "The matching collection room should open.",
       "Compose textarea should contain your original message as a draft.",
     ],

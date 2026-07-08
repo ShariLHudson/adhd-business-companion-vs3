@@ -12,6 +12,7 @@ export type EstateTopRightChromeProps = {
   roomId: string | null;
   onEstateMenuAction: (actionId: EstateMenuActionId) => void;
   onJustBeHere: () => void;
+  onWander?: () => void;
 };
 
 /**
@@ -24,6 +25,7 @@ export function EstateTopRightChrome({
   roomId,
   onEstateMenuAction,
   onJustBeHere,
+  onWander,
 }: EstateTopRightChromeProps) {
   const [mounted, setMounted] = useState(false);
 
@@ -39,6 +41,7 @@ export function EstateTopRightChrome({
           embedded
           roomId={roomId}
           onJustBeHere={onJustBeHere}
+          onWander={onWander}
         />
       ) : null}
       {showProfile ? (

@@ -379,7 +379,7 @@ export function estateRoomHintForChat(room: EstateRoomDefinition): string {
     `What Shari does: ${room.whatShariDoes}`,
     room.route
       ? `Primary route: ${room.route}`
-      : "No dedicated route yet — invite conversationally or use Estate menu.",
+      : "No dedicated route yet — invite conversationally or ask where they'd like to go.",
     "Use Estate language — never 'Opening module…' or 'Navigate to…'.",
     `Preferred invitation: ${estateRoomNavigationLine(room.id) ?? "Let's go there together."}`,
   ].join("\n");

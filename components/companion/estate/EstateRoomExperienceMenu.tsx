@@ -14,6 +14,7 @@ import {
 } from "@/lib/estate/justBeHere";
 import { resolveEstatePlaceAmbientProfile } from "@/lib/estate/estatePlaceAmbientSound";
 import { kickstartEstateRoomAmbience } from "@/lib/estate/estateRoomAmbience";
+import { resolveWanderRoomDisplayName } from "@/lib/estate/manifest/estateWanderMode";
 import { useIdleChromeReveal } from "@/lib/estate/useIdleChromeReveal";
 
 export type EstateRoomExperienceMenuProps = {
@@ -24,6 +25,8 @@ export type EstateRoomExperienceMenuProps = {
   /** When true, render inline inside EstateTopRightChrome (no separate portal). */
   embedded?: boolean;
   onJustBeHere: () => void;
+  /** Manifest wander — pick another Live estate place. */
+  onWander?: () => void;
 };
 
 /**
@@ -36,6 +39,7 @@ export function EstateRoomExperienceMenu({
   withEstateMenu = false,
   embedded = false,
   onJustBeHere,
+  onWander,
 }: EstateRoomExperienceMenuProps) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
@@ -43,6 +47,7 @@ export function EstateRoomExperienceMenu({
   const rootRef = useRef<HTMLDivElement>(null);
   const profile = resolveEstatePlaceAmbientProfile(roomId);
   const soundAvailable = Boolean(profile);
+  const placeDisplayName = resolveWanderRoomDisplayName(roomId);
 
   const { fullscreen, faded, bumpVisibility } = useIdleChromeReveal({
     fullscreenIdleMs: ESTATE_ROOM_MENU_FULLSCREEN_IDLE_MS,
@@ -129,26 +134,47 @@ export function EstateRoomExperienceMenu({
         </button>
       ) : (
         <>
-          <button
-            type="button"
-            className="estate-room-experience-menu__trigger"
-            aria-expanded={open}
-            aria-haspopup="menu"
-            aria-label={
-              soundEnabled ? "Room — sound on" : "Room — sound off"
-            }
-            title="Room"
-            onClick={() => {
-              bumpVisibility();
-              setOpen((value) => !value);
-            }}
-          >
-            <span className="estate-room-experience-menu__trigger-icons" aria-hidden>
-              <span>🎵</span>
-              <span>🖼</span>
-            </span>
-            <span className="estate-room-experience-menu__trigger-label">Room</span>
-          </button>
+          <div className="estate-room-experience-menu__place-stack">
+            <button
+              type="button"
+              className="estate-room-experience-menu__trigger"
+              aria-expanded={open}
+              aria-haspopup="menu"
+              aria-label={
+                soundEnabled
+                  ? `${placeDisplayName} — sound on`
+                  : `${placeDisplayName} — room options`
+              }
+              title={placeDisplayName}
+              onClick={() => {
+                bumpVisibility();
+                setOpen((value) => !value);
+              }}
+            >
+              <span className="estate-room-experience-menu__trigger-icons" aria-hidden>
+                <span>🎵</span>
+                <span>🖼</span>
+              </span>
+              <span className="estate-room-experience-menu__trigger-label">
+                {placeDisplayName}
+              </span>
+            </button>
+            {onWander ? (
+              <button
+                type="button"
+                className="estate-room-experience-menu__wander"
+                aria-label="Wander to another Estate place"
+                data-testid="estate-wander-button"
+                onClick={() => {
+                  bumpVisibility();
+                  setOpen(false);
+                  onWander();
+                }}
+              >
+                Wander
+              </button>
+            ) : null}
+          </div>
 
           {open ? (
             <div

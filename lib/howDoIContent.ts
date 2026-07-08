@@ -140,7 +140,7 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
       "When you want to understand a topic more deeply, not just a quick definition.",
     steps: [
       "Ask a learning question in chat (e.g. “What is a sales funnel?”).",
-      "Pick from the menu: Quick Answer, Example, Apply to My Business, or Deep Dive.",
+      "Ask in chat for a quick answer, example, business application, or deep dive — or say 'give me a deep dive on…'",
       "Or ask directly: “Give me a deep dive on positioning.”",
       "Shari stays on the concept — one richer explanation, then you can apply or build.",
     ],
@@ -230,7 +230,7 @@ export const HOW_DO_I_ENTRIES: HowDoIEntry[] = [
       "Focus tools — timer, audio, breathing — to start one task without fighting your brain.",
     whenToUse: "When you know what to do but can't seem to start.",
     steps: [
-      "Open Focus from the sidebar.",
+      "Tell me you'd like to focus, or say what you want to work on.",
       "Pick a timer, calming audio, or breathing.",
       "Name one task — everything else can wait.",
       "Start the session and work until the timer ends.",

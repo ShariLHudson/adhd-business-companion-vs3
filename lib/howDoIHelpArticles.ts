@@ -117,7 +117,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "A map of the major destinations — Daily Use, Growth, and Resources — so you know where to go.",
     whenToUse: "When you are unsure which section fits what you need.",
     workflow: [
-      "Sidebar: Chat, Focus, Create, Growth, My Work, How Do I.",
+      "Main areas: Chat, Focus, Create, Growth, My Work, and How Do I — ask in conversation when you're unsure where to go.",
       `Top bar companion workspaces: ${TOP_NAV_COMPANION_WORKSPACES}.`,
       "Chat Workspace (💬) — New Chat or New Day's Chat when you need a fresh conversation or fresh daily start.",
       "Create: New Draft, Start From Template, Snippet, Audience Profile, Resume Draft.",
@@ -299,7 +299,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whatItIs: "Timed work with intention — timer, audio, and breathing when needed.",
     whenToUse: "You know what to do but cannot seem to start.",
     workflow: [
-      "Open Focus from the sidebar.",
+      "Tell me you'd like to focus, or say what you want to work on.",
       "Name one task — everything else waits.",
       "Pick a timer, audio, or breathing reset.",
       "Work until the session ends — then decide what's next.",
@@ -421,7 +421,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whenToUse:
       "When linear lists fail and you need to see relationships, paths, or patterns — not when you need today's task list.",
     workflow: [
-      "Open Visual Thinking from the sidebar.",
+      "Tell me you'd like to use Visual Thinking, or describe what you want to map out.",
       "Pick a card that matches what you're figuring out — each shows what it is, when to use it, and what you'll receive.",
       "Build your map, then Generate for visuals, insights, recommendations, and next steps.",
       "Continue Thinking resumes active work (up to 3 maps). Save intentionally when something is worth keeping.",
@@ -532,7 +532,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whatItIs: "Build business assets through guided conversation — you choose what gets saved.",
     whenToUse: "When you need a draft and want help thinking it through first.",
     workflow: [
-      "Open Create from the sidebar.",
+      "Tell me what you'd like to create — I'll open Create with you.",
       "Choose New Draft, Start From Template, Snippet, Audience Profile, or Resume Draft.",
       "Answer one question at a time with Shari beside you.",
       "Review the plan before generating.",
@@ -929,7 +929,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
       "One home for everything in progress, saved, and recent — organized into Continue Working and Browse My Work.",
     whenToUse: "Resume work or see the full picture.",
     workflow: [
-      "Open My Work from the sidebar (🏠 — beside Growth and How Do I).",
+      "Say 'open my work' or tell me what you're looking for.",
       "Search Everything to find any project, draft, strategy, or archive item.",
       "Continue Working — favorites, recently active, and resume items.",
       "Browse My Work — Created Content, Projects, Snippets, Strategies, Templates, and Archive.",
@@ -970,7 +970,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whenToUse:
       "When you want the big picture of how you are growing — not just today's tasks.",
     workflow: [
-      "Open Growth from the sidebar (🌱 — beside Create and My Work).",
+      "Say 'open growth' or tell me what you'd like to celebrate or track.",
       "Open Wins, Evidence Bank, My Highlights, or My Journey from the hub cards.",
       "Check Growth Inbox for moments the app noticed — save where they belong or dismiss.",
       "Tap 📖 Growth Reports to build a printable or downloadable combined report.",
@@ -1485,7 +1485,7 @@ export const HOW_DO_I_HELP_ARTICLES: HowDoIHelpArticle[] = [
     whatItIs: "Your login, profile, and account basics.",
     whenToUse: "When you need to update who you are in the app or manage your account.",
     workflow: [
-      "Open Settings from the ⋯ menu.",
+      "Say 'settings' or ask to change your preferences.",
       "Review Profile and account details.",
       "Update email or password when needed.",
       "Changes save automatically.",

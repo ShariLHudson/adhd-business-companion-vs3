@@ -180,11 +180,11 @@ const IMPLIED_RULES: readonly ImpliedRule[] = [
   {
     pattern:
       /\b(?:sit\s+(?:out\s+)?on\s+(?:the\s+)?deck|out\s+on\s+(?:the\s+)?deck|(?:the\s+)?back\s+deck)\b/i,
-    placeId: "back-deck",
+    placeId: "fireside-deck",
     confidence: 0.86,
     matchKey: "deck-sit",
-    reason: "implied:deck → Back Deck",
-    warmLine: "The Back Deck sounds perfect right now. I'll take you there.",
+    reason: "implied:deck → Fireside Deck",
+    warmLine: "The Fireside Deck sounds perfect right now. I'll take you there.",
   },
   {
     pattern: /\b(?:need to think|want to think)\b/i,

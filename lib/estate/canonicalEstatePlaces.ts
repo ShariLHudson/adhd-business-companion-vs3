@@ -1,5 +1,10 @@
 /**
  * Canonical place records — synced from SPARK_ESTATE_CANONICAL_REGISTRY.md.
+ *
+ * @deprecated Legacy adapter — runtime identity migrates to
+ * `docs/estate/ESTATE_PLACE_MASTER_MANIFEST.json` via `lib/estate/manifest/`.
+ * Do not delete until manifest runtime is verified.
+ *
  * @internal Import via canonicalEstateRegistry.ts only.
  */
 
@@ -207,7 +212,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     officialName: "The Gardens™",
     category: "living-place",
     primaryFeeling: "Growth, peace, natural rhythm",
-    backgroundImage: "/backgrounds/space-celebration-garden-background.png",
+    backgroundImage: "/backgrounds/space-reflection-tree-swing-background.png",
     aliases: [
       "gardens",
       "the gardens",
@@ -256,9 +261,9 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     officialName: "Apple Orchard™",
     category: "living-place",
     primaryFeeling: "Possibility, freshness, gentle abundance",
-    backgroundImage: "/backgrounds/greenhouse-background.png",
+    backgroundImage: "/backgrounds/space-reflection-tree-swing-background.png",
     aliases: ["apple orchard", "the orchard"],
-    arrivalBehavior: "ambient-crossfade",
+    arrivalBehavior: "presence-only",
     conversationStyle: "open-presence",
     permanentObjects: ["Trees", "Ladder (optional)", "Basket"],
     seasonalObjects: ["Blossom (spring)", "Harvest (autumn)"],
@@ -435,7 +440,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     officialName: "Personal Deck™",
     category: "living-place",
     primaryFeeling: "Fireside ease, private conversation, evening air",
-    backgroundImage: "/backgrounds/fireside-deck-background.PNG",
+    backgroundImage: "/backgrounds/grand-terrace-background.png",
     aliases: [
       "personal deck",
       "the personal deck",
@@ -638,7 +643,7 @@ export const CANONICAL_ESTATE_PLACES: readonly CanonicalEstatePlace[] = [
     officialName: "Estate Gardens™",
     category: "living-place",
     primaryFeeling: "Grounds, paths, cultivated beauty",
-    backgroundImage: "/backgrounds/place-estate-gardens-background.png",
+    backgroundImage: "/backgrounds/spark-estate-photo-background.png",
     aliases: [
       "estate gardens",
       "the estate gardens",

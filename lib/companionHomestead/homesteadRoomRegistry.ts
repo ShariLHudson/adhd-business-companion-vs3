@@ -43,6 +43,7 @@ export type HomesteadRoomEntry = {
 
 export const LIVING_ROOM_BG = homesteadLivingRoomImageUrl();
 
+/** Butterfly House™ — room experience video (ESTATE-VID-002). @see docs/estate/ESTATE_VIDEO_ASSET_REGISTRY.md */
 export const SUNROOM_BUTTERFLY_VIDEO =
   "/Videos/butterfly-house-video.mp4" as const;
 

@@ -787,12 +787,12 @@ function detectDeckArrivalCorrection(
   currentPlaceId?: string | null,
 ): EstatePlaceTurnResult | null {
   if (!isDeckCorrectionTurn(userText, currentPlaceId)) return null;
-  const command = navigateCommandForPlace("back-deck", userText);
+  const command = navigateCommandForPlace("fireside-deck", userText);
   if (!command) return null;
   return {
     type: "navigate",
     command,
-    navigationLine: "You're right — let me take you to the Back Deck.",
+    navigationLine: "You're right — let me take you to the Fireside Deck.",
   };
 }
 

@@ -34,7 +34,7 @@ const VAGUE_OUTSIDE_RE =
 const VAGUE_CLUSTERS: readonly ClusterRule[] = [
   {
     pattern: VAGUE_WATER_RE,
-    placeIds: ["seat-at-pond", "reflection-pond", "lakeside-verandah"],
+    placeIds: ["seat-at-pond", "lakeside-verandah", "peaceful-places"],
     lead: "A few peaceful spots by the water — which feels right?",
   },
   {
@@ -62,18 +62,13 @@ const VAGUE_CLUSTERS: readonly ClusterRule[] = [
 /** Bare destination phrases where multiple real rooms share the same words. */
 const AMBIGUOUS_DESTINATION_CLUSTERS: readonly ClusterRule[] = [
   {
-    pattern: /^(?:the\s+)?pond$/i,
-    placeIds: ["seat-at-pond", "reflection-pond"],
-    lead: "We have a couple of pond spaces — which sounds better?",
-  },
-  {
     pattern: /^(?:the\s+)?lake$/i,
     placeIds: ["lakeside-verandah", "lakeside-hammock", "seat-at-pond"],
     lead: "A few quiet spots by the lake:",
   },
   {
     pattern: /^(?:the\s+)?water$/i,
-    placeIds: ["seat-at-pond", "reflection-pond", "lakeside-verandah"],
+    placeIds: ["seat-at-pond", "lakeside-verandah", "peaceful-places"],
     lead: "A few peaceful spots by the water — which feels right?",
   },
   {

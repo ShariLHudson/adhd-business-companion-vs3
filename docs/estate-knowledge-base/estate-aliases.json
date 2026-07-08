@@ -267,6 +267,18 @@
       "status": "Live"
     },
     {
+      "phrase": "butterfly garden",
+      "locationId": "butterfly-house",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "the butterfly garden",
+      "locationId": "butterfly-house",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
       "phrase": "ocean conservatory",
       "locationId": "conservatory",
       "matchType": "approved",
@@ -316,13 +328,37 @@
     },
     {
       "phrase": "reflection pond",
-      "locationId": "reflection-pond",
+      "locationId": "seat-at-pond",
       "matchType": "approved",
       "status": "Live"
     },
     {
       "phrase": "the reflection pond",
-      "locationId": "reflection-pond",
+      "locationId": "seat-at-pond",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "pond seat",
+      "locationId": "seat-at-pond",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "quiet pond",
+      "locationId": "seat-at-pond",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "celebration garden",
+      "locationId": "gardens",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "the celebration garden",
+      "locationId": "gardens",
       "matchType": "approved",
       "status": "Live"
     },
@@ -456,6 +492,30 @@
       "phrase": "sunroom",
       "locationId": "sunroom",
       "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "sun room",
+      "locationId": "sunroom",
+      "matchType": "approved",
+      "status": "Live"
+    },
+    {
+      "phrase": "sunny room",
+      "locationId": "sunroom",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "glass room",
+      "locationId": "sunroom",
+      "matchType": "nickname",
+      "status": "Live"
+    },
+    {
+      "phrase": "morning room",
+      "locationId": "sunroom",
+      "matchType": "nickname",
       "status": "Live"
     },
     {

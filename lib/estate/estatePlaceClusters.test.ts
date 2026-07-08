@@ -28,7 +28,7 @@ describe("natural language place coverage", () => {
   it("offers water cluster for by the water", () => {
     const cluster = matchVaguePlaceCluster("I'd like to sit by the water");
     expect(cluster?.placeIds).toContain("seat-at-pond");
-    expect(cluster?.placeIds).toContain("reflection-pond");
+    expect(cluster?.placeIds).not.toContain("reflection-pond");
     expect(cluster?.placeIds.length).toBe(3);
   });
 
@@ -38,18 +38,24 @@ describe("natural language place coverage", () => {
     expect(cluster?.placeIds).toContain("reading-nook");
   });
 
-  it("offers pond choices for bare pond", () => {
-    const turn = evaluateEstatePlaceTurn({ userText: "the pond" });
-    expect(turn.type).toBe("offer");
-    if (turn.type === "offer") {
-      expect(turn.placeIds).toContain("seat-at-pond");
-      expect(turn.placeIds).toContain("reflection-pond");
+  it("routes bare pond to seat at pond", () => {
+    expect(resolveEstatePlaceIdFromUserText("the pond")).toBe("seat-at-pond");
+    const turn = evaluateEstatePlaceTurn({ userText: "take me to the pond" });
+    expect(turn.type).toBe("navigate");
+    if (turn.type === "navigate") {
+      expect(turn.command.roomId ?? turn.command.entryId).toBe("seat-at-pond");
     }
   });
 
-  it("routes stream bench to reflection pond", () => {
+  it("routes reflection pond to seat at pond", () => {
+    expect(resolveEstatePlaceIdFromUserText("reflection pond")).toBe(
+      "seat-at-pond",
+    );
+  });
+
+  it("routes stream bench to seat at pond", () => {
     expect(resolveEstatePlaceIdFromUserText("stream bench")).toBe(
-      "reflection-pond",
+      "seat-at-pond",
     );
   });
 
@@ -57,5 +63,22 @@ describe("natural language place coverage", () => {
     expect(resolveEstatePlaceIdFromUserText("quiet glass room")).toBe(
       "conservatory",
     );
+  });
+
+  it("routes glass room to sunroom", () => {
+    expect(resolveEstatePlaceIdFromUserText("glass room")).toBe("sunroom");
+    expect(resolveEstatePlaceIdFromUserText("morning room")).toBe("sunroom");
+    expect(resolveEstatePlaceIdFromUserText("sun room")).toBe("sunroom");
+  });
+
+  it("routes estate gardens separately from greenhouse", () => {
+    expect(resolveEstatePlaceIdFromUserText("estate gardens")).toBe(
+      "estate-gardens",
+    );
+    expect(resolveEstatePlaceIdFromUserText("greenhouse")).toBe("greenhouse");
+  });
+
+  it("routes back deck to fireside deck", () => {
+    expect(resolveEstatePlaceIdFromUserText("back deck")).toBe("fireside-deck");
   });
 });

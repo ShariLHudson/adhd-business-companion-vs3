@@ -1,0 +1,542 @@
+/* Spark Note™ — bottom right (permanent companion object) */
+
+:root {
+  --spark-note-anchor-width: clamp(14rem, 38vw, 18.5rem);
+  --estate-chrome-bottom-right-inset-x: max(0.85rem, env(safe-area-inset-right, 0px));
+  --estate-chrome-bottom-right-inset-y: max(1rem, env(safe-area-inset-bottom, 0px));
+  --spark-note-parchment: #f6f0e4;
+  --spark-note-parchment-deep: #ebe3d4;
+  --spark-note-gold: #c9a227;
+  --spark-note-gold-soft: rgba(201, 162, 39, 0.45);
+  --spark-note-teal: #1e5c5c;
+  --spark-note-teal-deep: #164848;
+  --spark-note-ink: #2c2820;
+  --spark-note-ink-soft: #5c5348;
+}
+
+/* ——— Collapsed anchor ——— */
+.spark-note-anchor {
+  position: fixed;
+  bottom: var(--estate-chrome-bottom-right-inset-y);
+  right: var(--estate-chrome-bottom-right-inset-x);
+  z-index: 100001;
+  width: var(--spark-note-anchor-width);
+  pointer-events: auto;
+}
+
+.spark-note-anchor__card {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 0.55rem 0.5rem 0.5rem;
+  border: 1px solid var(--spark-note-gold-soft);
+  border-radius: 0.55rem;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 252, 245, 0.97) 0%,
+      var(--spark-note-parchment) 48%,
+      var(--spark-note-parchment-deep) 100%
+    );
+  box-shadow:
+    0 4px 16px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.spark-note-anchor__card:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 8px 22px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+.spark-note-anchor__card:focus-visible {
+  outline: 2px solid rgba(255, 236, 200, 0.9);
+  outline-offset: 3px;
+}
+
+.spark-note-anchor__thumb {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.35rem;
+  background: rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(201, 162, 39, 0.25);
+  overflow: hidden;
+}
+
+.spark-note-anchor__thumb-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.spark-note-anchor__thumb-fallback {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.spark-note-anchor__copy {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+}
+
+.spark-note-anchor__label {
+  font-family: "Segoe Script", "Bradley Hand", cursive;
+  font-size: 0.62rem;
+  color: #8b6914;
+  line-height: 1.2;
+}
+
+.spark-note-anchor__title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--spark-note-teal-deep);
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spark-note-anchor__teaser {
+  font-size: 0.62rem;
+  line-height: 1.25;
+  color: var(--spark-note-ink-soft);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.spark-note-anchor__flame {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 0.3rem;
+  background: linear-gradient(160deg, var(--spark-note-teal) 0%, var(--spark-note-teal-deep) 100%);
+  border: 1.5px solid var(--spark-note-gold);
+  color: #f5d76e;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.spark-note-anchor__flame-svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+/* ——— Expanded card ——— */
+.spark-note-expanded {
+  position: fixed;
+  bottom: calc(var(--estate-chrome-bottom-right-inset-y) + 0.25rem);
+  right: var(--estate-chrome-bottom-right-inset-x);
+  z-index: 100005;
+  width: min(26rem, calc(100vw - 1.5rem));
+  max-height: min(78dvh, 36rem);
+  pointer-events: auto;
+}
+
+.spark-note-expanded__card {
+  display: flex;
+  flex-direction: column;
+  max-height: min(78dvh, 36rem);
+  overflow: hidden;
+  border: 1.5px solid var(--spark-note-gold-soft);
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(
+      160deg,
+      rgba(255, 252, 245, 0.98) 0%,
+      var(--spark-note-parchment) 40%,
+      var(--spark-note-parchment-deep) 100%
+    );
+  box-shadow:
+    0 12px 40px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.spark-note-expanded__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem 0.5rem;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.2);
+  flex-wrap: wrap;
+}
+
+.spark-note-expanded__type {
+  margin-left: auto;
+  font-size: 0.58rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--spark-note-teal);
+}
+
+.spark-note-expanded__category {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #e8f4f4;
+  background: linear-gradient(135deg, var(--spark-note-teal) 0%, var(--spark-note-teal-deep) 100%);
+  border: 1px solid rgba(201, 162, 39, 0.35);
+}
+
+.spark-note-expanded__close {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--spark-note-ink-soft);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.spark-note-expanded__close:hover {
+  background: rgba(255, 255, 255, 0.85);
+}
+
+.spark-note-expanded__hero {
+  padding: 0.75rem 1rem 0.5rem;
+}
+
+.spark-note-expanded__image {
+  display: block;
+  width: 100%;
+  max-height: 8rem;
+  object-fit: cover;
+  border-radius: 0.45rem;
+  margin: 0.35rem 0 0.5rem;
+  border: 1px solid rgba(201, 162, 39, 0.25);
+}
+
+.spark-note-expanded__label {
+  margin: 0;
+  font-family: "Segoe Script", "Bradley Hand", cursive;
+  font-size: 0.82rem;
+  color: #8b6914;
+}
+
+.spark-note-expanded__title {
+  margin: 0.15rem 0 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(1.15rem, 3vw, 1.45rem);
+  font-weight: 700;
+  line-height: 1.25;
+  color: #1a3d5c;
+}
+
+.spark-note-expanded__teaser {
+  margin: 0.35rem 0 0;
+  font-family: "Segoe Script", "Bradley Hand", cursive;
+  font-size: 0.88rem;
+  color: #9a7b1a;
+  line-height: 1.35;
+}
+
+.spark-note-expanded__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0.5rem 1rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.spark-note-expanded__section {
+  margin: 0;
+}
+
+.spark-note-expanded__section-title {
+  margin: 0 0 0.3rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--spark-note-teal-deep);
+}
+
+.spark-note-expanded__section p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--spark-note-ink);
+}
+
+.spark-note-expanded__section--spark {
+  padding: 0.65rem 0.75rem;
+  border-radius: 0.5rem;
+  background: rgba(30, 92, 92, 0.07);
+  border: 1px solid rgba(30, 92, 92, 0.12);
+}
+
+.spark-note-expanded__section--spark .spark-note-expanded__section-title {
+  color: var(--spark-note-teal);
+}
+
+.spark-note-expanded__footer {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.55rem 1rem 0.7rem;
+  border-top: 1px solid rgba(201, 162, 39, 0.2);
+  font-size: 0.68rem;
+  color: var(--spark-note-ink-soft);
+  font-style: italic;
+}
+
+.spark-note-expanded__footer-icon {
+  font-size: 0.85rem;
+}
+
+.spark-note-expanded__reactions,
+.spark-note-expanded__connections {
+  padding: 0.55rem 1rem 0;
+}
+
+.spark-note-expanded__reactions-label,
+.spark-note-expanded__connections-label {
+  margin: 0 0 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 650;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--spark-note-ink-soft);
+}
+
+.spark-note-expanded__reactions-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.35rem;
+}
+
+.spark-note-expanded__reaction {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.45rem;
+  border: 1px solid rgba(201, 162, 39, 0.28);
+  border-radius: 0.45rem;
+  background: rgba(255, 255, 255, 0.45);
+  cursor: pointer;
+  font-size: 0.68rem;
+  color: var(--spark-note-ink);
+  text-align: left;
+}
+
+.spark-note-expanded__reaction--active {
+  border-color: var(--spark-note-teal);
+  background: rgba(30, 92, 92, 0.1);
+}
+
+.spark-note-expanded__reaction-text {
+  line-height: 1.2;
+}
+
+.spark-note-expanded__connections-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.spark-note-expanded__connection {
+  padding: 0.3rem 0.5rem;
+  border: 1px dashed rgba(201, 162, 39, 0.45);
+  border-radius: 999px;
+  background: transparent;
+  font-size: 0.65rem;
+  color: var(--spark-note-teal-deep);
+  cursor: pointer;
+}
+
+.spark-note-expanded__connection:hover {
+  background: rgba(30, 92, 92, 0.06);
+}
+
+.spark-note-expanded__hint {
+  margin: 0.45rem 1rem 0;
+  padding: 0.4rem 0.55rem;
+  border-radius: 0.4rem;
+  background: rgba(30, 92, 92, 0.08);
+  font-size: 0.68rem;
+  color: var(--spark-note-teal-deep);
+}
+
+/* ——— My Sparks collection ——— */
+.spark-note-collection {
+  position: fixed;
+  bottom: calc(var(--estate-chrome-bottom-right-inset-y) + 0.25rem);
+  right: var(--estate-chrome-bottom-right-inset-x);
+  z-index: 100005;
+  width: min(26rem, calc(100vw - 1.5rem));
+  max-height: min(78dvh, 36rem);
+  pointer-events: auto;
+}
+
+.spark-note-collection__card {
+  display: flex;
+  flex-direction: column;
+  max-height: min(78dvh, 36rem);
+  overflow: hidden;
+  border: 1.5px solid var(--spark-note-gold-soft);
+  border-radius: 0.75rem;
+  background: linear-gradient(160deg, rgba(255, 252, 245, 0.98) 0%, var(--spark-note-parchment) 100%);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.28);
+}
+
+.spark-note-collection__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  border-bottom: 1px solid rgba(201, 162, 39, 0.2);
+}
+
+.spark-note-collection__back,
+.spark-note-collection__close {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 0.75rem;
+  color: var(--spark-note-teal-deep);
+}
+
+.spark-note-collection__title {
+  flex: 1;
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1rem;
+  color: #1a3d5c;
+}
+
+.spark-note-collection__subtitle {
+  margin: 0;
+  padding: 0.55rem 1rem 0;
+  font-size: 0.75rem;
+  color: var(--spark-note-ink-soft);
+  font-style: italic;
+}
+
+.spark-note-collection__topics {
+  padding: 0.5rem 1rem 0;
+}
+
+.spark-note-collection__topics-label {
+  display: block;
+  font-size: 0.62rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--spark-note-ink-soft);
+  margin-bottom: 0.3rem;
+}
+
+.spark-note-collection__topics-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.spark-note-collection__topic {
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.62rem;
+  background: rgba(30, 92, 92, 0.1);
+  color: var(--spark-note-teal-deep);
+}
+
+.spark-note-collection__empty {
+  margin: 0;
+  padding: 1rem;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--spark-note-ink-soft);
+}
+
+.spark-note-collection__list {
+  list-style: none;
+  margin: 0;
+  padding: 0.65rem 1rem 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.spark-note-collection__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  padding: 0.5rem 0.55rem;
+  border-radius: 0.45rem;
+  border: 1px solid rgba(201, 162, 39, 0.22);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.spark-note-collection__item-category {
+  font-size: 0.58rem;
+  font-weight: 650;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--spark-note-teal);
+}
+
+.spark-note-collection__item-title {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--spark-note-ink);
+}
+
+.spark-note-collection__item-teaser {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--spark-note-ink-soft);
+}
+
+@media (max-width: 600px) {
+  .spark-note-anchor {
+    width: min(var(--spark-note-anchor-width), calc(100vw - 1.5rem));
+  }
+
+  .spark-note-expanded {
+    width: calc(100vw - 1.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spark-note-anchor__card {
+    transition: none;
+  }
+
+  .spark-note-anchor__card:hover {
+    transform: none;
+  }
+}

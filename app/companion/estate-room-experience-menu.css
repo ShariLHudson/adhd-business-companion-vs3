@@ -16,6 +16,49 @@
   right: calc(max(0.85rem, env(safe-area-inset-right, 0px)) + 2.75rem + 0.45rem);
 }
 
+.estate-room-experience-menu__place-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.28rem;
+  max-width: min(14rem, 42vw);
+}
+
+.estate-room-experience-menu__wander {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.65rem;
+  padding: 0.2rem 0.72rem;
+  border: 1px solid rgba(255, 236, 200, 0.28);
+  border-radius: 999px;
+  background: rgba(22, 18, 14, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: rgba(255, 248, 235, 0.88);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.estate-room-experience-menu__wander:hover {
+  background: rgba(38, 30, 22, 0.82);
+  border-color: rgba(255, 236, 200, 0.48);
+  transform: translateY(-1px);
+}
+
+.estate-room-experience-menu__wander:focus-visible {
+  outline: 2px solid rgba(255, 236, 200, 0.85);
+  outline-offset: 2px;
+}
+
 .estate-room-experience-menu__trigger {
   display: inline-flex;
   align-items: center;
@@ -74,11 +117,17 @@
 }
 
 .estate-room-experience-menu__trigger-label {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: rgba(255, 248, 235, 0.92);
+  letter-spacing: 0.02em;
+  text-transform: none;
+  color: rgba(255, 248, 235, 0.96);
+  text-align: right;
+  line-height: 1.2;
+  max-width: 11rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .estate-room-experience-menu__panel {
@@ -196,12 +245,15 @@
 
 @media (max-width: 520px) {
   .estate-room-experience-menu__trigger-label {
-    display: none;
+    display: inline;
+    max-width: 7.5rem;
+    font-size: 0.72rem;
   }
 
   .estate-room-experience-menu__trigger {
-    width: 2.75rem;
-    padding: 0;
+    width: auto;
+    max-width: 100%;
+    padding: 0 0.5rem;
   }
 }
 

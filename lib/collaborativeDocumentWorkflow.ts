@@ -116,7 +116,7 @@ export const COLLABORATIVE_DOCUMENT_WORKFLOW: CollaborativeDocumentWorkflow = {
   verification: {
     rule: "Confirm workspace open only when panel + split view + reveal are verified.",
     failureTemplate:
-      "I tried to open {type}, but it didn't appear on screen. Tap {type} in the menu, or tell me to try again.",
+      "I tried to open {type}, but it didn't appear on screen. Tell me to try again, or describe what you'd like to create and we'll start together.",
   },
   ambiguity: {
     multiDraftPrompt:

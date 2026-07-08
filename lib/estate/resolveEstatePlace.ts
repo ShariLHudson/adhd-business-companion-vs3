@@ -107,8 +107,8 @@ const EXPLICIT_OBJECT_RULES: {
   {
     pattern:
       /\b(?:sit\s+(?:out\s+)?on\s+(?:the\s+)?deck|out\s+on\s+(?:the\s+)?deck|(?:the\s+)?back\s+deck|go\s+(?:out\s+)?on\s+(?:the\s+)?deck)\b/i,
-    placeId: "back-deck",
-    reason: "explicit place → Back Deck",
+    placeId: "fireside-deck",
+    reason: "explicit place → Fireside Deck (Back Deck merged)",
   },
 ];
 

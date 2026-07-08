@@ -11,6 +11,13 @@
 
 import type { AppSection } from "@/lib/companionUi";
 import { isMetaNavigationDestinationPhrase } from "./estateMetaNavigationPhrases";
+import {
+  findPlaceByAlias,
+  findPlacesByIntent,
+  getNavigationOptions,
+  resolveManifestExactLegacyPlaceId,
+  resolveSingleManifestLegacyPlaceFromPhrase,
+} from "./manifest/estatePlaceMasterManifest";
 import { ESTATE_ROOM_ALIAS_CATALOG } from "./estateRoomAliasCatalog";
 import { ESTATE_ROOM_BG_BY_ROOM_ID } from "./estateRoomAssets";
 import { getEstateRoomById } from "./estateRoomRegistry";
@@ -45,7 +52,7 @@ export const ESTATE_ROOM_DIRECT_SECTION_OVERRIDES: Partial<
   "butterfly-house": "focus",
   "coffee-house": "focus-audio",
   "estate-soundscapes": "focus-audio",
-  "apple-orchard": "focus-audio",
+  "apple-orchard": "home",
   "music-room": "focus-audio",
   sunroom: "welcome-room",
   "momentum-institute": "momentum-institute",
@@ -62,9 +69,9 @@ export const ESTATE_ROOM_DIRECT_SECTION_OVERRIDES: Partial<
   "grand-terrace": "home",
   "lakeside-verandah": "home",
   "lakeside-hammock": "home",
-  "reflection-pond": "home",
   "fireside-deck": "home",
   "estate-gardens": "home",
+  gardens: "home",
   "discovery-room": "home",
   "art-studio": "content-generator",
   "strategy-studio": "content-generator",
@@ -139,8 +146,11 @@ function phraseContainsBoundedAlias(text: string, aliasPhrase: string): boolean 
   return new RegExp(`(?:^|\\b)${escaped}(?:\\b|$)`, "i").test(text);
 }
 
-/** Exact phrase → room id (full string or without leading "the "). */
+/** Exact phrase → room id (full string or without leading "the "). Manifest first, legacy fallback. */
 export function resolveEstateRoomAliasExact(phrase: string): string | null {
+  const manifestExact = resolveManifestExactLegacyPlaceId(phrase);
+  if (manifestExact) return manifestExact;
+
   const spoken = normalizeSpokenPlaceText(phrase);
   const normalized = normalizeAliasPhrase(spoken);
   if (!normalized) return null;
@@ -156,8 +166,11 @@ export function resolveEstateRoomAliasExact(phrase: string): string | null {
   return null;
 }
 
-/** Bounded substring match — longest alias wins. */
+/** Bounded substring match — longest alias wins. Manifest first, legacy fallback. */
 export function resolveEstateRoomAliasBounded(phrase: string): string | null {
+  const manifestMatch = resolveSingleManifestLegacyPlaceFromPhrase(phrase);
+  if (manifestMatch) return manifestMatch;
+
   const spoken = normalizeSpokenPlaceText(phrase);
   const exact = resolveEstateRoomAliasExact(spoken);
   if (exact) return exact;
@@ -173,6 +186,16 @@ export function resolveEstateRoomAliasBounded(phrase: string): string | null {
 
 /** All rooms matching the longest alias in text — for disambiguation menus. */
 export function findAmbiguousPlaceMatches(phrase: string): string[] {
+  const manifestAliasMatches = findPlaceByAlias(phrase);
+  if (manifestAliasMatches.length > 1) {
+    return manifestAliasMatches.map((p) => p.legacy_place_id);
+  }
+
+  const manifestIntentMatches = findPlacesByIntent(phrase);
+  if (manifestIntentMatches.length > 1) {
+    return manifestIntentMatches.map((p) => p.legacy_place_id);
+  }
+
   const spoken = normalizeSpokenPlaceText(phrase);
   const normalized = normalizeAliasPhrase(spoken);
   if (!normalized) return [];
@@ -269,6 +292,9 @@ export function extractEstateDestinationPhrase(userText: string): string | null 
 export function resolveEstatePlaceIdFromUserText(userText: string): string | null {
   const trimmed = normalizeSpokenPlaceText(userText.trim());
   if (!trimmed) return null;
+
+  const ambiguity = getNavigationOptions(trimmed);
+  if (ambiguity.kind === "suggest") return null;
 
   const destination = extractEstateDestinationPhrase(trimmed);
   if (destination) {

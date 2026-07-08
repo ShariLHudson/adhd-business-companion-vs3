@@ -231,7 +231,7 @@ export const HOW_DO_I_ECOSYSTEM_CARDS: HowDoIEcosystemCard[] = [
       "Your trusted home for everything created, saved, and in progress.",
     whenToUse: "When you want to resume, find saved work, or see the full picture.",
     workflow: [
-      "Open My Work from the sidebar.",
+      "Say 'open my work' or tell me what you're looking for.",
       "Continue what you left mid-stream.",
       "Browse projects, saved work, and files.",
       "Search when you know a name but not where it lives.",
@@ -292,7 +292,7 @@ export const HOW_DO_I_ECOSYSTEM_CARDS: HowDoIEcosystemCard[] = [
       "Appearance, profile, business context, and how the Companion adapts to you.",
     whenToUse: "When colors feel too busy, you want to update your profile, or recommendations feel too generic.",
     workflow: [
-      "Open Settings from the ⋯ menu.",
+      "Say 'settings' or ask to change your preferences.",
       "Adjust appearance (Adaptive, Category, or Minimal colors).",
       "Update Profile and Business Profile when your context changes.",
       "Save changes — nothing else in the app changes until you act.",

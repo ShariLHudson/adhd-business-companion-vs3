@@ -1,4 +1,5 @@
 import type { AppSection } from "./companionUi";
+import { SPLIT_PANEL_CONVERSATION_HINT } from "./conversationFirstLanguage";
 import { workspaceObjectId, supportsWorkspace, workspaceAreaTitle } from "./workspaceMode";
 /** Areas users can open beside Chat — shown in empty-state suggestions. */
 export const SPLIT_BESIDE_SUGGESTIONS: readonly {
@@ -28,5 +29,5 @@ export function splitBesideAreaDescription(section: AppSection): string {
   if (supportsWorkspace(section)) {
     return `${title} is open beside your conversation. Work here while you talk with the Companion on the left.`;
   }
-  return `${title} works best on its own screen. Open it from the menu when you are ready — chat stays available when you return.`;
+  return `${title} ${SPLIT_PANEL_CONVERSATION_HINT}`;
 }

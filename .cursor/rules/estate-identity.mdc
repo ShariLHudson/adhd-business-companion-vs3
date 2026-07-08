@@ -1,0 +1,42 @@
+# Estate Identity Rule
+
+**Manifest (single source of truth):** `docs/estate/ESTATE_PLACE_MASTER_MANIFEST.json`  
+**Protocol:** `docs/estate/ESTATE_PLACE_MASTER_MANIFEST_PROTOCOL.md`  
+**Room registry:** `docs/estate/ESTATE_ROOM_REGISTRY.json` · `lib/estate/estateRoomAliasCatalog.ts`  
+**Regenerate:** `node scripts/generate-estate-place-master-manifest.mjs`
+
+## Binding rule
+
+A room name must **never** route to:
+
+- an app feature
+- a settings page
+- an audio category
+- a similar-looking room
+- a temporary image substitute
+
+Every physical Estate destination has **one permanent `ESTATE-ROOM` id**.
+
+Descriptions and aliases may vary. **The destination does not.**
+
+## Identity corrections (canonical)
+
+| Keep | Remove / merge | Rule |
+|------|----------------|------|
+| `ESTATE-ROOM-Estate-Gardens` (`estate-gardens`) | — | ≠ Greenhouse; dedicated `place-estate-gardens-background.png` |
+| `ESTATE-ROOM-Greenhouse` (`greenhouse`) | — | ≠ Estate Gardens, Apple Orchard, Celebration Garden |
+| `ESTATE-ROOM-Apple-Orchard` (`apple-orchard`) | — | ≠ Greenhouse; dedicated orchard artwork |
+| `Seat at Pond / Dock™` (`seat-at-pond`) | `reflection-pond` | One room; pond aliases merge here |
+| `Fireside Deck™` (`fireside-deck`) | `back-deck` | Back Deck is not separate |
+| `Personal Deck™` (`personal-deck`) | — | ≠ Fireside Deck; `private-balcony-sunset-background.PNG` |
+| `Celebration Garden™` (`gardens`) | — | Navigate to **room** (`home`); ≠ Celebration Sounds settings |
+| `Stairway Reading Nook™` | under-stairs aliases on Reading Nook | Stairs phrases → `stairway-reading-nook` |
+| `Butterfly House™` | Butterfly Conservatory as separate room | Alias only → `butterfly-house` |
+
+## When adding or editing estate navigation
+
+1. Assign or reuse a semantic `ESTATE-ROOM-*` id in the registry generator.
+2. Set `primary_owner` on images — never borrow greenhouse for gardens/orchard.
+3. Add `avoid_confusion_with` for look-alike rooms.
+4. Add `disallowed_aliases` so cross-room phrases do not steal navigation.
+5. Removed rooms: set `navigable: false`, `merged_into_place_id`, and `PLACE_ID_ALIASES` redirect.

@@ -1,6 +1,4 @@
-/**
- * Chat Role Reset — chat is conversation only; workspaces execute via UI buttons.
- */
+import { BANNED_UI_REFERENCE_HINT } from "./conversationFirstLanguage";
 
 import type { TurnSurface } from "./companionGovernor";
 
@@ -64,5 +62,5 @@ export function enforceConversationOnlyTurnSurface(
 }
 
 export function conversationOnlyFirstWorkflowHint(): string {
-  return `COMPANION FIRST (conversation-only): Brief answer in chat (1–2 sentences). Tell the user which workspace button or menu path to use when they are ready — do NOT offer to open it from chat or claim it is opening. Help them decide; UI buttons execute.`;
+  return `COMPANION FIRST (conversation-only): Brief answer in chat (1–2 sentences). Offer the closest working action in natural language — do NOT point to menus or sidebars. Do NOT offer to open from chat or claim it is opening. Help them decide; they accept offers or ask to open. ${BANNED_UI_REFERENCE_HINT}`;
 }

@@ -1,6 +1,9 @@
 /**
  * Canonical Estate place media — backgrounds + ambience on disk.
  *
+ * **Manifest:** Primary backgrounds and videos resolve from
+ * `ESTATE_PLACE_MASTER_MANIFEST.json` first; `CANONICAL_PLACE_BACKGROUNDS` is legacy fallback.
+ *
  * Filenames match `public/backgrounds/` and `public/audio/` (member-renamed assets).
  * Spaces in filenames are URL-encoded at runtime.
  *
@@ -11,6 +14,7 @@
 import type { EstateArrivalAmbienceProfile } from "./estateArrivalExperienceTypes";
 import { resolveCanonicalPlaceId } from "./canonicalEstateRegistry";
 import { enrichAmbienceProfileWithIntent } from "./estatePlaceAmbienceIntent";
+import { getPlaceMedia } from "./manifest/estatePlaceMasterManifest";
 import {
   APPLE_ORCHARD_AMBIENCE_MP3,
   COFFEE_HOUSE_AMBIENCE_MP3,
@@ -42,12 +46,12 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "lakeside-verandah": estateBackgroundPath("grand-terrace-background.png"),
   "lakeside-hammock": estateBackgroundPath("water-lakeside-hammock-background.png"),
   "discovery-room": estateBackgroundPath("room-discovery-room-background.png"),
-  "estate-gardens": estateBackgroundPath("greenhouse-background.png"),
+  "estate-gardens": estateBackgroundPath("spark-estate-photo-background.png"),
   "music-room": estateBackgroundPath("writing-room-background.png"),
   greenhouse: estateBackgroundPath("greenhouse-background.png"),
-  gardens: estateBackgroundPath("greenhouse-background.png"),
+  gardens: estateBackgroundPath("space-reflection-tree-swing-background.png"),
   "celebration-room": estateBackgroundPath("room-celebration-hall-background.png"),
-  "apple-orchard": estateBackgroundPath("greenhouse-background.png"),
+  "apple-orchard": estateBackgroundPath("space-reflection-tree-swing-background.png"),
   "reading-nook": estateBackgroundPath("reading-nook-window background.png"),
   library: estateBackgroundPath("room-library-estate-background.png"),
   "personal-library": estateBackgroundPath("reading-nook-under-stairway-background.png"),
@@ -127,7 +131,7 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   "reflection-tree-main": estateBackgroundPath(
     "space-reflection-tree-swing-background.png",
   ),
-  "butterfly-house": estateBackgroundPath("butterfly-conservatory.png"),
+  "butterfly-house": estateBackgroundPath("butterfly-house-background.png"),
 };
 
 /** Ordered fallbacks when primary plate fails to load. */
@@ -155,7 +159,13 @@ export const CANONICAL_PLACE_BACKGROUND_FALLBACKS: Readonly<
     estateBackgroundPath("fireside-deck-background.PNG"),
   ],
   "estate-gardens": [
-    estateBackgroundPath("greenhouse-background.png"),
+    estateBackgroundPath("welcome-home-background.png"),
+  ],
+  gardens: [
+    estateBackgroundPath("spark-estate-photo-background.png"),
+  ],
+  "apple-orchard": [
+    estateBackgroundPath("spark-estate-photo-background.png"),
   ],
   "reading-nook": [
     estateBackgroundPath("reading-nook-under-stairway-background.png"),
@@ -178,7 +188,6 @@ export const CANONICAL_PLACE_BACKGROUND_FALLBACKS: Readonly<
     estateBackgroundPath("observatory-night-outside-background.png"),
   ],
   "personal-deck": [
-    estateBackgroundPath("fireside-deck-background.PNG"),
     estateBackgroundPath("grand-terrace-background.png"),
   ],
   "reflection-pond": [
@@ -331,7 +340,15 @@ export const CANONICAL_PLACE_AMBIENCE: Readonly<
 export function resolveCanonicalPlaceBackground(
   placeId: string,
 ): string | null {
+  const manifestMedia = getPlaceMedia(placeId);
+  if (manifestMedia.backgroundUrl) return manifestMedia.backgroundUrl;
   return CANONICAL_PLACE_BACKGROUNDS[placeId] ?? null;
+}
+
+/** Approved room experience video from manifest (never substitute similar locations). */
+export function resolveCanonicalPlaceVideo(placeId: string): string | null {
+  const manifestMedia = getPlaceMedia(placeId);
+  return manifestMedia.videoUrl;
 }
 
 export function resolveCanonicalPlaceBackgroundCandidates(

@@ -83,11 +83,12 @@ describe("estateRoutingRegistry — canonical routing map", () => {
     ).toBe(false);
   });
 
-  it("observatory — ambiguous Treehouse vs main Estate", () => {
+  it("observatory — ambiguous Treehouse vs main Estate vs telescope deck", () => {
     const decision = resolveEstateRoutingDecision("observatory");
     expect(decision.kind).toBe("suggest");
     expect(decision.suggestedPlaceIds).toContain("house-possibility-observatory");
     expect(decision.suggestedPlaceIds).toContain("observatory");
+    expect(decision.suggestedPlaceIds).toContain("house-possibility-telescope-deck");
   });
 
   it("take me to the telescope — ambiguous choices", () => {

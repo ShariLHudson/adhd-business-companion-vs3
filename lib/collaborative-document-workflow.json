@@ -56,7 +56,7 @@
   },
   "verification": {
     "rule": "Confirm open only after workspace panel + split view + reveal verified",
-    "failureMessage": "I tried to open {type}, but it didn't appear on screen. Tap {type} in the menu, or tell me to try again."
+    "failureMessage": "I tried to open {type}, but it didn't appear on screen. Tell me to try again, or describe what you'd like to create and we'll start together."
   },
   "taskDumpRule": "Multi-task lists stay in chat — prioritize before opening Create",
   "copyPasteFallback": {

@@ -28,9 +28,9 @@ describe("resolveEstateShellState — Phase D.1", () => {
     expect(state?.officialName).toContain("Celebration Room");
   });
 
-  it("legacy celebration-garden id normalizes to celebration-room", () => {
+  it("legacy celebration-garden id normalizes to gardens room", () => {
     const state = resolveEstateShellState("celebration-garden");
-    expect(state?.placeId).toBe("celebration-room");
+    expect(state?.placeId).toBe("gardens");
   });
 
   it("profile estate mode is always conversation-only", () => {

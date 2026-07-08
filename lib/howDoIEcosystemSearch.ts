@@ -314,7 +314,7 @@ function buildIndex(): IndexEntry[] {
         id: `nav-${nav.id}`,
         title: nav.label,
         type: "Area",
-        description: `Open ${nav.label} from the sidebar.`,
+        description: `Ask to open ${nav.label}, or tell me what you'd like to do.`,
         emoji: nav.objectId,
         keywords: [nav.label.toLowerCase(), nav.id.replace(/-/g, " ")],
         aliases: [],

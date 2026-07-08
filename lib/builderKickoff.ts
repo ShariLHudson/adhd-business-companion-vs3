@@ -20,7 +20,7 @@ export const CREATE_STEP1_QUESTION = "What would you like to create?";
 
 export const CREATE_STEP1_CHAT = `**What would you like to create?**
 
-Pick from the dropdown beside chat — or tell me here.`;
+Tell me here — I'll open the creation workspace with you when you're ready.`;
 
 export type BuilderKickoffSection =
   | "client-avatars"

@@ -12,9 +12,9 @@ describe("estateRoomBackground", () => {
     );
   });
 
-  it("resolves conservatory from greenhouse plate when butterfly webp is absent", () => {
+  it("resolves conservatory to aquarium plate", () => {
     expect(resolveEstateRoomBackgroundImage("conservatory")).toBe(
-      "/backgrounds/greenhouse-background.png",
+      "/backgrounds/aquarium-room-background.png",
     );
   });
 
@@ -26,7 +26,7 @@ describe("estateRoomBackground", () => {
 
   it("resolves apple orchard plate", () => {
     expect(resolveEstateRoomBackgroundImage("apple-orchard")).toBe(
-      "/backgrounds/space-apple-orchard-background.webp",
+      "/backgrounds/space-reflection-tree-swing-background.png",
     );
   });
 

@@ -82,7 +82,7 @@ describe("PLACE_ID_ALIASES — additive resolution", () => {
     expect(resolvePlaceId("pool")).toBe("pool");
   });
 
-  it("preserves P0 celebration-garden → celebration-room", () => {
-    expect(resolvePlaceId("celebration-garden")).toBe("celebration-room");
+  it("preserves celebration-garden legacy id → gardens room", () => {
+    expect(resolvePlaceId("celebration-garden")).toBe("gardens");
   });
 });

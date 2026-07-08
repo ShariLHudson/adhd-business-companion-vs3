@@ -56,7 +56,7 @@ export type CompanionTurnResolution = {
 };
 
 const CONTEXT_HINT =
-  "One companion voice. Never mention routing, settings, reminders, or feature menus unless the member asked.";
+  "One companion voice. Never mention routing, settings, reminders, feature menus, sidebars, or navigation chrome unless the member asked. Conversation first.";
 
 function baseDecision(
   routing: IntentRoutingDecision | null,

@@ -1,0 +1,1803 @@
+{
+  "registry": "estate-room-registry",
+  "version": "1.0.0",
+  "description": "Authoritative Spark Estate room, image, and video registry. Registry assignment is authoritative — never assign media by visual similarity.",
+  "id_schemes": {
+    "room": "ESTATE-ROOM-###",
+    "image": "ESTATE-IMG-###",
+    "video": "ESTATE-VID-###"
+  },
+  "media_ownership_rules": {
+    "one_primary_owner_per_asset": true,
+    "never_assign_by_visual_similarity": true,
+    "registry_is_authoritative": true,
+    "video_attaches_to_room_not_separate_destination": true,
+    "do_not_substitute_image_when_video_available": true,
+    "only_approved_video_filenames": [
+      "aquarium-room-video.mp4",
+      "butterfly-house-video.mp4"
+    ],
+    "examples": [
+      {
+        "asset": "butterfly-house-video.mp4",
+        "video_id": "ESTATE-VID-002",
+        "primary_owner": "ESTATE-ROOM-Butterfly-House",
+        "avoid_confusion_with": [
+          "Butterfly House",
+          "Greenhouse"
+        ],
+        "allowed_navigation_names": [
+          "butterfly house",
+          "butterfly conservatory",
+          "butterfly garden"
+        ],
+        "not_allowed_without_clarification": [
+          "sunroom",
+          "garden room",
+          "conservatory",
+          "aquarium",
+          "ocean conservatory"
+        ]
+      },
+      {
+        "asset": "aquarium-room-video.mp4",
+        "video_id": "ESTATE-VID-001",
+        "primary_owner": "ESTATE-ROOM-003",
+        "avoid_confusion_with": [
+          "Sunroom",
+          "Greenhouse",
+          "Ocean Conservatory"
+        ],
+        "allowed_navigation_names": [
+          "aquarium",
+          "aquarium room",
+          "ocean conservatory",
+          "ocean aquarium"
+        ],
+        "not_allowed_without_clarification": [
+          "butterfly house",
+          "butterfly conservatory",
+          "greenhouse"
+        ]
+      }
+    ]
+  },
+  "media_assets": [
+    {
+      "image_id": "ESTATE-IMG-001",
+      "filename": "aquarium-room-background.png",
+      "primary_owner": "ESTATE-ROOM-003",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-002",
+      "filename": "butterfly-house-background.png",
+      "primary_owner": "ESTATE-ROOM-Butterfly-House",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-003",
+      "filename": "creative-studio-background.png",
+      "primary_owner": "ESTATE-ROOM-030",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-004",
+      "filename": "fireside-deck-background.PNG",
+      "primary_owner": "ESTATE-ROOM-019",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-005",
+      "filename": "founder-office-background.png",
+      "primary_owner": null,
+      "asset_role": "main_room_image",
+      "estate_navigable": false
+    },
+    {
+      "image_id": "ESTATE-IMG-006",
+      "filename": "gallery-background.png",
+      "primary_owner": "ESTATE-ROOM-035",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-007",
+      "filename": "grand-terrace-background.png",
+      "primary_owner": "ESTATE-ROOM-016",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-008",
+      "filename": "greenhouse-background.png",
+      "primary_owner": "ESTATE-ROOM-Greenhouse",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-009",
+      "filename": "hall-of-achievements-room-background.png",
+      "primary_owner": "ESTATE-ROOM-036",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-010",
+      "filename": "kitchen-background.png",
+      "primary_owner": "ESTATE-ROOM-014",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-011",
+      "filename": "observatory-daytime-inside.png",
+      "primary_owner": null,
+      "asset_role": "alternate_view",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-012",
+      "filename": "observatory-daytime-outside-background.png",
+      "primary_owner": null,
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-013",
+      "filename": "observatory-night-outside-background.png",
+      "primary_owner": null,
+      "asset_role": "alternate_view",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-014",
+      "filename": "reading-nook-under-stairway-background.png",
+      "primary_owner": "ESTATE-ROOM-024",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-015",
+      "filename": "reading-nook-window background.png",
+      "primary_owner": "ESTATE-ROOM-023",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-016",
+      "filename": "room-celebration-hall-background.png",
+      "primary_owner": null,
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-017",
+      "filename": "room-dining-room-background.png",
+      "primary_owner": "ESTATE-ROOM-015",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-018",
+      "filename": "room-discovery-room-background.png",
+      "primary_owner": "ESTATE-ROOM-029",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-019",
+      "filename": "room-library-estate-background.png",
+      "primary_owner": "ESTATE-ROOM-027",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-020",
+      "filename": "shari-office-autumn-background.png",
+      "primary_owner": null,
+      "asset_role": "main_room_image",
+      "estate_navigable": false
+    },
+    {
+      "image_id": "ESTATE-IMG-021",
+      "filename": "shari-office-background.png",
+      "primary_owner": null,
+      "asset_role": "main_room_image",
+      "estate_navigable": false
+    },
+    {
+      "image_id": "ESTATE-IMG-022",
+      "filename": "shari-office-Christmas-background.png",
+      "primary_owner": null,
+      "asset_role": "main_room_image",
+      "estate_navigable": false
+    },
+    {
+      "image_id": "ESTATE-IMG-023",
+      "filename": "space-reflection-tree-swing-background.png",
+      "primary_owner": "ESTATE-ROOM-022",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-024",
+      "filename": "spark-chamber-of-momentum-background.png",
+      "primary_owner": "ESTATE-ROOM-028",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-025",
+      "filename": "spark-estate-photo-background.png",
+      "primary_owner": "ESTATE-ROOM-001",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-026",
+      "filename": "study-hall-background.png",
+      "primary_owner": "ESTATE-ROOM-032",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-027",
+      "filename": "sunroom-background.png",
+      "primary_owner": "ESTATE-ROOM-Sunroom",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-028",
+      "filename": "tea-room-background.webp",
+      "primary_owner": "ESTATE-ROOM-007",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-029",
+      "filename": "treehouse-possibility-collage.png",
+      "primary_owner": null,
+      "asset_role": "decorative_unused",
+      "estate_navigable": false
+    },
+    {
+      "image_id": "ESTATE-IMG-030",
+      "filename": "treehouse-possibility-discovery-chest-background.png",
+      "primary_owner": "ESTATE-ROOM-049",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-031",
+      "filename": "treehouse-possibility-house-outside-background.png",
+      "primary_owner": "ESTATE-ROOM-044",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-032",
+      "filename": "treehouse-possibility-reflection-desk-background.png",
+      "primary_owner": null,
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-033",
+      "filename": "treehouse-possibility-staircase-window-reading-nook-background.png",
+      "primary_owner": "ESTATE-ROOM-046",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-034",
+      "filename": "treehouse-possibility-studio.png",
+      "primary_owner": null,
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-035",
+      "filename": "water-lakeside-hammock-background.png",
+      "primary_owner": null,
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-036",
+      "filename": "water-seat-at-pond-background.png",
+      "primary_owner": "ESTATE-ROOM-056",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-037",
+      "filename": "water-swimming-pool-private-background.png",
+      "primary_owner": "ESTATE-ROOM-059",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-038",
+      "filename": "welcome-home-background.png",
+      "primary_owner": null,
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-039",
+      "filename": "welcome-to-the-journal-gazebo.png",
+      "primary_owner": "ESTATE-ROOM-060",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "image_id": "ESTATE-IMG-040",
+      "filename": "writing-room-background.png",
+      "primary_owner": "ESTATE-ROOM-061",
+      "asset_role": "main_room_image",
+      "estate_navigable": true
+    },
+    {
+      "video_id": "ESTATE-VID-001",
+      "filename": "aquarium-room-video.mp4",
+      "primary_owner": "ESTATE-ROOM-003",
+      "poster_image_id": "ESTATE-IMG-001",
+      "asset_role": "room_experience_video"
+    },
+    {
+      "video_id": "ESTATE-VID-002",
+      "filename": "butterfly-house-video.mp4",
+      "primary_owner": "ESTATE-ROOM-Butterfly-House",
+      "poster_image_id": "ESTATE-IMG-002",
+      "asset_role": "room_experience_video"
+    }
+  ],
+  "rooms": [
+    {
+      "room_id": "ESTATE-ROOM-000",
+      "place_id": "welcome-home",
+      "official_name": "Welcome Home™",
+      "parent_area": "Main House",
+      "room_type": "Welcome",
+      "status": "Live",
+      "route": "/companion?section=welcome-room",
+      "image_asset_id": "ESTATE-IMG-038",
+      "image_file": "welcome-home-background.png",
+      "image_file_canonical": "estate-room-welcome-home-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "welcome home"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-001",
+      "place_id": "spark-estate",
+      "official_name": "Spark Estate™",
+      "parent_area": "Grounds",
+      "room_type": "Welcome",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-025",
+      "image_file": "spark-estate-photo-background.png",
+      "image_file_canonical": "estate-room-spark-estate-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "spark estate"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-002",
+      "place_id": "my-estate",
+      "official_name": "My Estate™",
+      "parent_area": "Profile",
+      "room_type": "Profile",
+      "status": "Live",
+      "route": null,
+      "image_asset_id": "ESTATE-IMG-025",
+      "image_file": "spark-estate-photo-background.png",
+      "image_file_canonical": "estate-room-my-estate-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "my estate"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-003",
+      "place_id": "conservatory",
+      "official_name": "Aquarium Room™",
+      "parent_area": "Nature Spaces",
+      "room_type": "Living",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-001",
+      "image_file": "aquarium-room-background.png",
+      "image_file_canonical": "estate-room-conservatory-main.png",
+      "video_file": "aquarium-room-video.mp4",
+      "video_asset_id": "ESTATE-VID-001",
+      "media_ownership": "owned",
+      "aliases": [
+        "aquarium",
+        "the aquarium",
+        "aquarium room",
+        "the aquarium room",
+        "ocean conservatory",
+        "the ocean conservatory",
+        "ocean aquarium",
+        "the ocean aquarium"
+      ],
+      "disallowed_aliases": [
+        "butterfly house",
+        "butterfly conservatory",
+        "butterfly garden",
+        "sunroom",
+        "sun room",
+        "sunny room",
+        "glass room",
+        "morning room"
+      ],
+      "avoid_confusion_with": [
+        "Sunroom",
+        "Greenhouse",
+        "Ocean Conservatory"
+      ],
+      "related_rooms": [
+        "ESTATE-ROOM-Butterfly-House",
+        "ESTATE-ROOM-009"
+      ]
+    },
+    {
+      "room_id": "ESTATE-ROOM-Butterfly-House",
+      "legacy_numeric_room_id": "ESTATE-ROOM-004",
+      "place_id": "butterfly-house",
+      "official_name": "Butterfly House™",
+      "parent_area": "Nature Spaces",
+      "room_type": "Focus",
+      "status": "Live",
+      "route": "/companion?section=focus",
+      "image_asset_id": "ESTATE-IMG-002",
+      "image_file": "butterfly-house-background.png",
+      "image_file_canonical": "estate-room-butterfly-house-main.png",
+      "video_file": "butterfly-house-video.mp4",
+      "video_asset_id": "ESTATE-VID-002",
+      "media_ownership": "owned",
+      "aliases": [
+        "butterfly house",
+        "butterfly conservatory",
+        "butterfly garden"
+      ],
+      "disallowed_aliases": [
+        "sunroom",
+        "sun room",
+        "sunny room",
+        "glass room",
+        "morning room",
+        "garden room",
+        "conservatory",
+        "the conservatory",
+        "aquarium",
+        "ocean conservatory"
+      ],
+      "avoid_confusion_with": [
+        "Butterfly House",
+        "Greenhouse"
+      ],
+      "related_rooms": [
+        "ESTATE-ROOM-003",
+        "ESTATE-ROOM-Sunroom"
+      ]
+    },
+    {
+      "room_id": "ESTATE-ROOM-Sunroom",
+      "legacy_numeric_room_id": "ESTATE-ROOM-005",
+      "place_id": "sunroom",
+      "official_name": "Sunroom™",
+      "parent_area": "Main House",
+      "room_type": "Welcome",
+      "status": "Live",
+      "route": "/companion?section=welcome-room",
+      "image_asset_id": "ESTATE-IMG-027",
+      "image_file": "sunroom-background.png",
+      "image_file_canonical": "estate-room-sunroom-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "sun room",
+        "sunny room",
+        "glass room",
+        "morning room"
+      ],
+      "disallowed_aliases": [
+        "butterfly house",
+        "butterfly conservatory",
+        "butterfly garden",
+        "aquarium",
+        "ocean conservatory",
+        "conservatory"
+      ],
+      "avoid_confusion_with": [
+        "Sunroom",
+        "Greenhouse"
+      ],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-006",
+      "place_id": "clear-my-mind",
+      "official_name": "Clear My Mind™",
+      "parent_area": "Main House",
+      "room_type": "Destination",
+      "status": "Live",
+      "route": "/companion?section=brain-dump",
+      "image_asset_id": "ESTATE-IMG-027",
+      "image_file": "sunroom-background.png",
+      "image_file_canonical": "estate-room-clear-my-mind-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "clear my mind"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-007",
+      "place_id": "tea-room",
+      "official_name": "Tea Room™",
+      "parent_area": "Main House",
+      "room_type": "Restoration",
+      "status": "Draft",
+      "route": "/companion?section=focus-audio",
+      "image_asset_id": "ESTATE-IMG-028",
+      "image_file": "tea-room-background.webp",
+      "image_file_canonical": "estate-room-tea-room-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "tea room"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-008",
+      "place_id": "coffee-house",
+      "official_name": "Coffee House™",
+      "parent_area": "Main House",
+      "room_type": "Restoration",
+      "status": "Draft",
+      "route": "/companion?section=focus-audio",
+      "image_asset_id": "ESTATE-IMG-028",
+      "image_file": "tea-room-background.webp",
+      "image_file_canonical": "estate-room-coffee-house-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "coffee house"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-Greenhouse",
+      "legacy_numeric_room_id": "ESTATE-ROOM-009",
+      "place_id": "greenhouse",
+      "official_name": "Greenhouse™",
+      "parent_area": "Nature Spaces",
+      "room_type": "Living",
+      "status": "Live",
+      "route": "/companion?section=growth-greenhouse",
+      "image_asset_id": "ESTATE-IMG-008",
+      "image_file": "greenhouse-background.png",
+      "image_file_canonical": "estate-room-greenhouse-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "greenhouse"
+      ],
+      "disallowed_aliases": [
+        "estate gardens",
+        "apple orchard",
+        "celebration garden",
+        "orchard"
+      ],
+      "avoid_confusion_with": [
+        "Estate Gardens",
+        "Apple Orchard",
+        "Celebration Garden"
+      ],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-Apple-Orchard",
+      "legacy_numeric_room_id": "ESTATE-ROOM-010",
+      "place_id": "apple-orchard",
+      "official_name": "Apple Orchard™",
+      "parent_area": "Nature Spaces",
+      "room_type": "Nature",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": null,
+      "image_file": "space-reflection-tree-swing-background.png",
+      "image_file_canonical": "estate-room-apple-orchard-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "missing_dedicated_asset",
+      "aliases": [
+        "apple orchard",
+        "the apple orchard",
+        "orchard",
+        "the orchard"
+      ],
+      "disallowed_aliases": [
+        "greenhouse",
+        "estate gardens",
+        "celebration garden"
+      ],
+      "avoid_confusion_with": [
+        "Greenhouse"
+      ],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-011",
+      "place_id": "gardens",
+      "official_name": "Celebration Garden™",
+      "parent_area": "Grounds",
+      "room_type": "Nature",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": null,
+      "image_file": "space-reflection-tree-swing-background.png",
+      "image_file_canonical": "space-celebration-garden-background.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "missing_dedicated_asset",
+      "aliases": [
+        "celebration garden",
+        "the celebration garden"
+      ],
+      "disallowed_aliases": [
+        "greenhouse",
+        "estate gardens",
+        "celebration sounds",
+        "celebration room"
+      ],
+      "avoid_confusion_with": [
+        "Celebration Sounds",
+        "Greenhouse"
+      ],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-Estate-Gardens",
+      "legacy_numeric_room_id": "ESTATE-ROOM-012",
+      "place_id": "estate-gardens",
+      "official_name": "Estate Gardens™",
+      "parent_area": "Grounds",
+      "room_type": "Nature",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": null,
+      "image_file": "spark-estate-photo-background.png",
+      "image_file_canonical": "place-estate-gardens-background.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "missing_dedicated_asset",
+      "aliases": [
+        "estate gardens",
+        "the estate gardens",
+        "estate garden",
+        "the estate garden"
+      ],
+      "disallowed_aliases": [
+        "greenhouse",
+        "celebration garden",
+        "apple orchard"
+      ],
+      "avoid_confusion_with": [
+        "Greenhouse"
+      ],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-013",
+      "place_id": "garden-bench",
+      "official_name": "Garden Bench™",
+      "parent_area": "Grounds",
+      "room_type": "Nature",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-008",
+      "image_file": "greenhouse-background.png",
+      "image_file_canonical": "estate-room-garden-bench-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "garden bench"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-014",
+      "place_id": "estate-kitchen",
+      "official_name": "Estate Kitchen™",
+      "parent_area": "Main House",
+      "room_type": "Living",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-010",
+      "image_file": "kitchen-background.png",
+      "image_file_canonical": "estate-room-estate-kitchen-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "estate kitchen"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-015",
+      "place_id": "dining-room",
+      "official_name": "Dining Room™",
+      "parent_area": "Main House",
+      "room_type": "Living",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-017",
+      "image_file": "room-dining-room-background.png",
+      "image_file_canonical": "estate-room-dining-room-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "dining room"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-016",
+      "place_id": "grand-terrace",
+      "official_name": "Grand Terrace™",
+      "parent_area": "Grounds",
+      "room_type": "Restoration",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-007",
+      "image_file": "grand-terrace-background.png",
+      "image_file_canonical": "estate-room-grand-terrace-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "grand terrace"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-017",
+      "place_id": "lakeside-hammock",
+      "official_name": "Lakeside Hammock™",
+      "parent_area": "Grounds",
+      "room_type": "Restoration",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-035",
+      "image_file": "water-lakeside-hammock-background.png",
+      "image_file_canonical": "estate-room-lakeside-hammock-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "lakeside hammock"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-018",
+      "place_id": "lakeside-verandah",
+      "official_name": "Lakeside Verandah™",
+      "parent_area": "Grounds",
+      "room_type": "Restoration",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-007",
+      "image_file": "grand-terrace-background.png",
+      "image_file_canonical": "estate-room-lakeside-verandah-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "lakeside verandah"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-019",
+      "place_id": "fireside-deck",
+      "official_name": "Fireside Deck™",
+      "parent_area": "Grounds",
+      "room_type": "Restoration",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-004",
+      "image_file": "fireside-deck-background.PNG",
+      "image_file_canonical": "estate-room-fireside-deck-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "back deck",
+        "the back deck"
+      ],
+      "disallowed_aliases": [
+        "personal deck",
+        "back deck"
+      ],
+      "avoid_confusion_with": [
+        "Personal Deck",
+        "Back Deck"
+      ],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-020",
+      "place_id": "back-deck",
+      "official_name": "Back Deck™",
+      "parent_area": "Grounds",
+      "room_type": "Restoration",
+      "status": "Removed",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-004",
+      "image_file": "fireside-deck-background.PNG",
+      "image_file_canonical": "estate-room-back-deck-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "back deck"
+      ],
+      "disallowed_aliases": [],
+      "navigable": false,
+      "merged_into_place_id": "fireside-deck",
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-021",
+      "place_id": "porch-swing",
+      "official_name": "Porch Swing™",
+      "parent_area": "Grounds",
+      "room_type": "Restoration",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-004",
+      "image_file": "fireside-deck-background.PNG",
+      "image_file_canonical": "estate-room-porch-swing-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "porch swing"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-022",
+      "place_id": "the-swing-beneath-the-oak",
+      "official_name": "The Swing Beneath the Oak™",
+      "parent_area": "Grounds",
+      "room_type": "Nature",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-023",
+      "image_file": "space-reflection-tree-swing-background.png",
+      "image_file_canonical": "estate-room-the-swing-beneath-the-oak-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "the swing beneath the oak"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-023",
+      "place_id": "reading-nook",
+      "official_name": "Reading Nook™",
+      "parent_area": "Reading Spaces",
+      "room_type": "Reflection",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-015",
+      "image_file": "reading-nook-window background.png",
+      "image_file_canonical": "estate-room-reading-nook-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "reading nook",
+        "the reading nook",
+        "arched window nook",
+        "window reading nook"
+      ],
+      "disallowed_aliases": [
+        "stairway reading nook",
+        "reading nook under the stairs",
+        "nook under the stairs",
+        "under the stairs",
+        "personal library",
+        "estate library"
+      ],
+      "related_rooms": [
+        "ESTATE-ROOM-024",
+        "ESTATE-ROOM-026"
+      ]
+    },
+    {
+      "room_id": "ESTATE-ROOM-024",
+      "place_id": "stairway-reading-nook",
+      "official_name": "Stairway Reading Nook™",
+      "parent_area": "Reading Spaces",
+      "room_type": "Reflection",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-014",
+      "image_file": "reading-nook-under-stairway-background.png",
+      "image_file_canonical": "estate-room-stairway-reading-nook-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "stairway reading nook",
+        "the stairway reading nook",
+        "reading nook under the stairs",
+        "nook under the stairs",
+        "under the stairs"
+      ],
+      "disallowed_aliases": [
+        "window seat",
+        "reading nook by the window",
+        "personal library"
+      ],
+      "related_rooms": [
+        "ESTATE-ROOM-025",
+        "ESTATE-ROOM-023",
+        "ESTATE-ROOM-027"
+      ]
+    },
+    {
+      "room_id": "ESTATE-ROOM-025",
+      "place_id": "personal-library",
+      "official_name": "Personal Library™",
+      "parent_area": "Reading Spaces",
+      "room_type": "Reading",
+      "status": "Live",
+      "route": "/companion?section=growth-library",
+      "image_asset_id": null,
+      "image_file": null,
+      "image_file_canonical": "estate-room-personal-library.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "missing_dedicated_asset",
+      "aliases": [
+        "personal library",
+        "the personal library",
+        "my library",
+        "private library",
+        "reading room"
+      ],
+      "disallowed_aliases": [
+        "estate library",
+        "the library",
+        "the estate library"
+      ],
+      "related_rooms": [
+        "ESTATE-ROOM-027",
+        "ESTATE-ROOM-023",
+        "ESTATE-ROOM-024"
+      ],
+      "borrowed_image_asset_id": "ESTATE-IMG-014",
+      "borrowed_image_file": "reading-nook-under-stairway-background.png"
+    },
+    {
+      "room_id": "ESTATE-ROOM-026",
+      "place_id": "window-seat",
+      "official_name": "Window Seat™",
+      "parent_area": "Reading Spaces",
+      "room_type": "Reflection",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-015",
+      "image_file": "reading-nook-window background.png",
+      "image_file_canonical": "estate-room-window-seat-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "window seat"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-027",
+      "place_id": "library",
+      "official_name": "The Library™",
+      "parent_area": "Reading Spaces",
+      "room_type": "Learning",
+      "status": "Live",
+      "route": "/companion?section=growth-library",
+      "image_asset_id": "ESTATE-IMG-019",
+      "image_file": "room-library-estate-background.png",
+      "image_file_canonical": "estate-room-library-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "library",
+        "the library",
+        "estate library",
+        "the estate library",
+        "achievement library"
+      ],
+      "disallowed_aliases": [
+        "personal library",
+        "my library",
+        "private library"
+      ],
+      "related_rooms": [
+        "ESTATE-ROOM-025",
+        "ESTATE-ROOM-023"
+      ]
+    },
+    {
+      "room_id": "ESTATE-ROOM-028",
+      "place_id": "momentum-institute",
+      "official_name": "Momentum Institute™",
+      "parent_area": "Institute",
+      "room_type": "Learning",
+      "status": "Live",
+      "route": "/companion?section=momentum-institute",
+      "image_asset_id": "ESTATE-IMG-024",
+      "image_file": "spark-chamber-of-momentum-background.png",
+      "image_file_canonical": "estate-room-momentum-institute-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "momentum institute"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-029",
+      "place_id": "discovery-room",
+      "official_name": "Discovery Room™",
+      "parent_area": "Main House",
+      "room_type": "Research",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-018",
+      "image_file": "room-discovery-room-background.png",
+      "image_file_canonical": "estate-room-discovery-room-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "discovery room"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-030",
+      "place_id": "creative-studio",
+      "official_name": "Creative Studio™",
+      "parent_area": "Possibility House",
+      "room_type": "Creation",
+      "status": "Live",
+      "route": "/companion?section=content-generator",
+      "image_asset_id": "ESTATE-IMG-003",
+      "image_file": "creative-studio-background.png",
+      "image_file_canonical": "estate-room-creative-studio-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "creative studio"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-031",
+      "place_id": "observatory",
+      "official_name": "Observatory™",
+      "parent_area": "Research",
+      "room_type": "Research",
+      "status": "Live",
+      "route": "/companion?section=grow-observatory",
+      "image_asset_id": "ESTATE-IMG-012",
+      "image_file": "observatory-daytime-outside-background.png",
+      "image_file_canonical": "estate-room-observatory-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "observatory"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": [],
+      "alternate_image_asset_ids": [
+        "ESTATE-IMG-011",
+        "ESTATE-IMG-013"
+      ]
+    },
+    {
+      "room_id": "ESTATE-ROOM-032",
+      "place_id": "study-hall",
+      "official_name": "Study Hall™",
+      "parent_area": "Institute",
+      "room_type": "Learning",
+      "status": "Live",
+      "route": "/companion?section=momentum-institute",
+      "image_asset_id": "ESTATE-IMG-026",
+      "image_file": "study-hall-background.png",
+      "image_file_canonical": "estate-room-study-hall-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "study hall"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-033",
+      "place_id": "round-table",
+      "official_name": "Round Table™",
+      "parent_area": "Planning",
+      "room_type": "Planning",
+      "status": "Draft",
+      "route": "/companion?section=projects",
+      "image_asset_id": "ESTATE-IMG-017",
+      "image_file": "room-dining-room-background.png",
+      "image_file_canonical": "estate-room-round-table-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "round table"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-034",
+      "place_id": "art-studio",
+      "official_name": "Art Studio™",
+      "parent_area": "Creation",
+      "room_type": "Creation",
+      "status": "Draft",
+      "route": "/companion?section=content-generator",
+      "image_asset_id": "ESTATE-IMG-003",
+      "image_file": "creative-studio-background.png",
+      "image_file_canonical": "estate-room-art-studio-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "art studio"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-035",
+      "place_id": "gallery-of-firsts",
+      "official_name": "Hall of Accomplishments™",
+      "parent_area": "Archive",
+      "room_type": "Archive",
+      "status": "Live",
+      "route": "/companion?section=growth-portfolio",
+      "image_asset_id": "ESTATE-IMG-006",
+      "image_file": "gallery-background.png",
+      "image_file_canonical": "estate-room-gallery-of-firsts-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "gallery of firsts"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-036",
+      "place_id": "evidence-vault",
+      "official_name": "Evidence Vault™",
+      "parent_area": "Archive",
+      "room_type": "Archive",
+      "status": "Draft",
+      "route": "/companion?section=evidence-bank",
+      "image_asset_id": "ESTATE-IMG-009",
+      "image_file": "hall-of-achievements-room-background.png",
+      "image_file_canonical": "estate-room-evidence-vault-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "evidence vault"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-037",
+      "place_id": "portfolio",
+      "official_name": "Portfolio™",
+      "parent_area": "Archive",
+      "room_type": "Archive",
+      "status": "Live",
+      "route": "/companion?section=growth-portfolio",
+      "image_asset_id": "ESTATE-IMG-009",
+      "image_file": "hall-of-achievements-room-background.png",
+      "image_file_canonical": "estate-room-portfolio-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "portfolio"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-038",
+      "place_id": "celebration-room",
+      "official_name": "Celebration Hall™",
+      "parent_area": "Archive",
+      "room_type": "Archive",
+      "status": "Live",
+      "route": "/companion?section=growth-reports",
+      "image_asset_id": "ESTATE-IMG-016",
+      "image_file": "room-celebration-hall-background.png",
+      "image_file_canonical": "estate-room-celebration-room-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "celebration room"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-039",
+      "place_id": "goals-projects",
+      "official_name": "Goals & Projects™",
+      "parent_area": "Planning",
+      "room_type": "Planning",
+      "status": "Live",
+      "route": "/companion?section=projects",
+      "image_asset_id": "ESTATE-IMG-017",
+      "image_file": "room-dining-room-background.png",
+      "image_file_canonical": "estate-room-goals-projects-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "goals projects"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-040",
+      "place_id": "game-room",
+      "official_name": "Game Room™",
+      "parent_area": "Play",
+      "room_type": "Play",
+      "status": "Live",
+      "route": "/companion?section=quick-recharge",
+      "image_asset_id": "ESTATE-IMG-024",
+      "image_file": "spark-chamber-of-momentum-background.png",
+      "image_file_canonical": "estate-room-game-room-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "game room"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-041",
+      "place_id": "momentum-room",
+      "official_name": "Momentum Room™",
+      "parent_area": "Institute",
+      "room_type": "Planning",
+      "status": "Draft",
+      "route": "/companion?section=momentum-institute",
+      "image_asset_id": "ESTATE-IMG-024",
+      "image_file": "spark-chamber-of-momentum-background.png",
+      "image_file_canonical": "estate-room-momentum-room-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "momentum room"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-042",
+      "place_id": "stables",
+      "official_name": "The Stables™",
+      "parent_area": "Grounds",
+      "room_type": "Reflection",
+      "status": "Live",
+      "route": "/companion?section=stables",
+      "image_asset_id": "ESTATE-IMG-025",
+      "image_file": "spark-estate-photo-background.png",
+      "image_file_canonical": "estate-room-stables-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "stables"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-043",
+      "place_id": "momentum-builder",
+      "official_name": "Momentum Builder™",
+      "parent_area": "Planning",
+      "room_type": "Planning",
+      "status": "Draft",
+      "route": "/companion?section=momentum-builder",
+      "image_asset_id": "ESTATE-IMG-026",
+      "image_file": "study-hall-background.png",
+      "image_file_canonical": "estate-room-momentum-builder-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "momentum builder"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-044",
+      "place_id": "house-possibility-outside",
+      "official_name": "Treehouse™",
+      "parent_area": "Possibility House",
+      "room_type": "Discovery",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-031",
+      "image_file": "treehouse-possibility-house-outside-background.png",
+      "image_file_canonical": "estate-room-house-possibility-outside-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "treehouse",
+        "the treehouse",
+        "possibility house",
+        "the possibility house"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-045",
+      "place_id": "house-possibility-reflection-desk",
+      "official_name": "Reflection Desk",
+      "parent_area": "Possibility House",
+      "room_type": "Reflection",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-032",
+      "image_file": "treehouse-possibility-reflection-desk-background.png",
+      "image_file_canonical": "estate-room-house-possibility-reflection-desk-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "house possibility reflection desk"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-046",
+      "place_id": "house-possibility-staircase",
+      "official_name": "Possibility Staircase",
+      "parent_area": "Possibility House",
+      "room_type": "Reflection",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-033",
+      "image_file": "treehouse-possibility-staircase-window-reading-nook-background.png",
+      "image_file_canonical": "estate-room-house-possibility-staircase-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "house possibility staircase"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-047",
+      "place_id": "house-possibility-window-nook",
+      "official_name": "Possibility Window Nook",
+      "parent_area": "Possibility House",
+      "room_type": "Reflection",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-033",
+      "image_file": "treehouse-possibility-staircase-window-reading-nook-background.png",
+      "image_file_canonical": "estate-room-house-possibility-window-nook-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "house possibility window nook"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-048",
+      "place_id": "house-possibility-studio",
+      "official_name": "Possibility Studio",
+      "parent_area": "Possibility House",
+      "room_type": "Creation",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-034",
+      "image_file": "treehouse-possibility-studio.png",
+      "image_file_canonical": "estate-room-house-possibility-studio-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "house possibility studio"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-049",
+      "place_id": "house-possibility-discovery-chest",
+      "official_name": "Discovery Chest",
+      "parent_area": "Possibility House",
+      "room_type": "Archive",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-030",
+      "image_file": "treehouse-possibility-discovery-chest-background.png",
+      "image_file_canonical": "estate-room-house-possibility-discovery-chest-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "house possibility discovery chest"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-050",
+      "place_id": "house-possibility-legacy-room",
+      "official_name": "Legacy Room",
+      "parent_area": "Possibility House",
+      "room_type": "Archive",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-031",
+      "image_file": "treehouse-possibility-house-outside-background.png",
+      "image_file_canonical": "estate-room-house-possibility-legacy-room-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "house possibility legacy room"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-051",
+      "place_id": "main-staircase",
+      "official_name": "Main Staircase™",
+      "parent_area": "Main House",
+      "room_type": "Reflection",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-014",
+      "image_file": "reading-nook-under-stairway-background.png",
+      "image_file_canonical": "estate-room-main-staircase-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "main staircase"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-052",
+      "place_id": "balcony",
+      "official_name": "Private Balcony™",
+      "parent_area": "Main House",
+      "room_type": "Restoration",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-007",
+      "image_file": "grand-terrace-background.png",
+      "image_file_canonical": "estate-room-balcony-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "balcony"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-053",
+      "place_id": "woodland-path",
+      "official_name": "Woodland Path™",
+      "parent_area": "Grounds",
+      "room_type": "Nature",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-023",
+      "image_file": "space-reflection-tree-swing-background.png",
+      "image_file_canonical": "estate-room-woodland-path-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "woodland path"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-054",
+      "place_id": "growth-profile",
+      "official_name": "Growth Profile™",
+      "parent_area": "Profile",
+      "room_type": "Profile",
+      "status": "Live",
+      "route": null,
+      "image_asset_id": "ESTATE-IMG-008",
+      "image_file": "greenhouse-background.png",
+      "image_file_canonical": "estate-room-growth-profile-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "growth profile"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-055",
+      "place_id": "reflection-tree-main",
+      "official_name": "Reflection Tree",
+      "parent_area": "Grounds",
+      "room_type": "Nature",
+      "status": "Draft",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-023",
+      "image_file": "space-reflection-tree-swing-background.png",
+      "image_file_canonical": "estate-room-reflection-tree-main-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "reflection tree main"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-056",
+      "place_id": "seat-at-pond",
+      "official_name": "Seat at Pond / Dock™",
+      "parent_area": "Grounds",
+      "room_type": "Restoration",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-036",
+      "image_file": "water-seat-at-pond-background.png",
+      "image_file_canonical": "estate-room-seat-at-pond-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "reflection pond",
+        "pond seat",
+        "quiet pond",
+        "pond dock",
+        "peaceful water",
+        "seat at the pond",
+        "seat at pond",
+        "pond",
+        "the pond"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-057",
+      "place_id": "reflection-pond",
+      "official_name": "Reflection Pond™",
+      "parent_area": "Grounds",
+      "room_type": "Nature",
+      "status": "Removed",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-036",
+      "image_file": "water-seat-at-pond-background.png",
+      "image_file_canonical": "estate-room-reflection-pond-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "reflection pond"
+      ],
+      "disallowed_aliases": [],
+      "navigable": false,
+      "merged_into_place_id": "seat-at-pond",
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-058",
+      "place_id": "peaceful-places",
+      "official_name": "Peaceful Places™",
+      "parent_area": "Restoration",
+      "room_type": "Restoration",
+      "status": "Draft",
+      "route": "/companion?section=focus-audio",
+      "image_asset_id": "ESTATE-IMG-036",
+      "image_file": "water-seat-at-pond-background.png",
+      "image_file_canonical": "estate-room-peaceful-places-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "peaceful places"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-059",
+      "place_id": "summer-terrace",
+      "official_name": "Summer Terrace™",
+      "parent_area": "Grounds",
+      "room_type": "Restoration",
+      "status": "Live",
+      "route": "/companion?section=home",
+      "image_asset_id": "ESTATE-IMG-037",
+      "image_file": "water-swimming-pool-private-background.png",
+      "image_file_canonical": "estate-room-summer-terrace-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "summer terrace"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-060",
+      "place_id": "journal",
+      "official_name": "Journal Gazebo™",
+      "parent_area": "Grounds",
+      "room_type": "Reflection",
+      "status": "Live",
+      "route": "/companion?section=growth-journal",
+      "image_asset_id": "ESTATE-IMG-039",
+      "image_file": "welcome-to-the-journal-gazebo.png",
+      "image_file_canonical": "estate-room-journal-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "journal"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-061",
+      "place_id": "decision-compass",
+      "official_name": "Decision Compass™",
+      "parent_area": "Planning",
+      "room_type": "Planning",
+      "status": "Live",
+      "route": "/companion?section=decision-compass",
+      "image_asset_id": "ESTATE-IMG-040",
+      "image_file": "writing-room-background.png",
+      "image_file_canonical": "estate-room-decision-compass-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "owned",
+      "aliases": [
+        "decision compass"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    },
+    {
+      "room_id": "ESTATE-ROOM-062",
+      "place_id": "music-room",
+      "official_name": "Music Room™",
+      "parent_area": "Audio",
+      "room_type": "Restoration",
+      "status": "Live",
+      "route": "/companion?section=focus-audio",
+      "image_asset_id": "ESTATE-IMG-040",
+      "image_file": "writing-room-background.png",
+      "image_file_canonical": "estate-room-music-room-main.png",
+      "video_file": null,
+      "video_asset_id": null,
+      "media_ownership": "borrowed_pending_dedicated_asset",
+      "aliases": [
+        "music room"
+      ],
+      "disallowed_aliases": [],
+      "related_rooms": []
+    }
+  ]
+}

@@ -30,6 +30,8 @@ export * from "./estateExpansionEngine";
 export * from "./canonicalPlaceSectionAdapter";
 export * from "./estateChromePolicy";
 export * from "./estatePlaceMedia";
+export * from "./manifest/estatePlaceMasterManifest";
+export * from "./manifest/estateWanderMode";
 export * from "./estateShellState";
 export * from "./estateImageStandards";
 export * from "./types";
