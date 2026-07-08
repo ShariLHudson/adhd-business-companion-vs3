@@ -13,6 +13,7 @@ export type SparkNoteCategory =
   | "quote"
   | "creativity"
   | "personal_growth"
+  | "adhd_friendly"
   | "personal";
 
 export type SparkNoteType = "quick" | "story" | "deep";

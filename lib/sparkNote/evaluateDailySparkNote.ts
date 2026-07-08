@@ -239,6 +239,8 @@ export function categoryEmoji(category: SparkNoteDailyCard["category"]): string 
       return "🎨";
     case "personal_growth":
       return "🌱";
+    case "adhd_friendly":
+      return "✦";
     case "personal":
       return "🎂";
     default:
