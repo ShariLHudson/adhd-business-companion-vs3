@@ -48,15 +48,17 @@ describe("SparkNoteAnchor", () => {
     expect(anchor?.getAttribute("data-estate-chrome-position")).toBe(
       "bottom-right",
     );
-    expect(container.textContent).toContain("Today's Spark");
+    expect(container.textContent).toContain("Spark Card™");
     expect(container.textContent).toContain(sampleCard.shortTitle);
-    expect(container.textContent).toContain(sampleCard.teaser);
+    expect(container.textContent).not.toContain(sampleCard.teaser);
   });
 
-  it("uses the Spark flame mark instead of notification badges", () => {
+  it("uses a single Spark flame mark instead of notification badges", () => {
     render();
-    expect(container.querySelectorAll("svg").length).toBeGreaterThan(0);
+    expect(container.querySelectorAll("svg").length).toBe(1);
     expect(container.querySelector("[class*='badge']")).toBeFalsy();
     expect(container.querySelector("[aria-label*='notification']")).toBeFalsy();
+    expect(container.querySelector(".spark-note-anchor__thumb")).toBeFalsy();
+    expect(container.querySelector(".spark-note-anchor__teaser")).toBeFalsy();
   });
 });

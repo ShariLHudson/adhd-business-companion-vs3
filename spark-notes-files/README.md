@@ -54,6 +54,8 @@ Installed copies live in `docs/protocols/` — use those for implementation trac
 | [SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md](SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md) | Database schema | **Implemented** (`spark-library/`, `contentDatabase/`) |
 | [SPARK_NOTE_SELECTION_INTELLIGENCE_RULES_PROTOCOL.md](SPARK_NOTE_SELECTION_INTELLIGENCE_RULES_PROTOCOL.md) | Advanced selection rules | **Implemented** — [protocol copy](../docs/protocols/SPARK_NOTE_SELECTION_INTELLIGENCE_RULES_PROTOCOL.md) |
 | [SPARK_NOTE_CARD_TEMPLATE_DESIGN_STANDARD.md](SPARK_NOTE_CARD_TEMPLATE_DESIGN_STANDARD.md) | Visual card template | **Implemented** (`SparkNoteAnchor`, `SparkNoteExpanded`, `spark-note.css`) |
+| [SPARK_CARD_COLLAPSED_VISUAL_DESIGN_FIX.md](SPARK_CARD_COLLAPSED_VISUAL_DESIGN_FIX.md) | Collapsed companion object (not banner) | **Implemented** — [protocol copy](../docs/protocols/SPARK_CARD_COLLAPSED_VISUAL_DESIGN_FIX.md) |
+| [SPARK_CARD_EXPANDED_EXPERIENCE_CORRECTION.md](SPARK_CARD_EXPANDED_EXPERIENCE_CORRECTION.md) | Lightweight expanded card UX | **Implemented** — [protocol copy](../docs/protocols/SPARK_CARD_EXPANDED_EXPERIENCE_CORRECTION.md) |
 | [SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md](SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md) | Experience + destination routing | **Implemented** (v1 — `sparkNoteDestinations.ts`, expanded UI) |
 
 ---

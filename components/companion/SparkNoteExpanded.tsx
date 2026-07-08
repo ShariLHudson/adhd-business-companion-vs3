@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import type { SparkNoteDailyCard, SparkNoteReaction } from "@/lib/sparkNote/types";
-import { sparkTypeDisplayLabel } from "@/lib/sparkNote/delightExperience";
 import { SparkFlameIcon } from "@/components/companion/SparkFlameIcon";
 import {
   buildSparkIdeaClipboard,
@@ -25,7 +24,7 @@ type Props = {
 
 type PickerMode = null | "capture-idea" | "idea-flow";
 
-const REACTIONS: {
+const CORE_REACTIONS: {
   id: SparkNoteReaction;
   label: string;
   emoji: string;
@@ -33,9 +32,6 @@ const REACTIONS: {
   { id: "loved", label: "Loved it", emoji: "❤️" },
   { id: "smile", label: "Made me smile", emoji: "😊" },
   { id: "idea", label: "Gave me an idea", emoji: "💡" },
-  { id: "think", label: "Made me think", emoji: "🤔" },
-  { id: "encouraged", label: "Encouraged me", emoji: "🌱" },
-  { id: "pass", label: "Not for me today", emoji: "😐" },
 ];
 
 const CAPTURE_DESTINATIONS: {
@@ -49,23 +45,20 @@ const CAPTURE_DESTINATIONS: {
     label: "Chamber of Momentum™",
     hint: "I want to make this happen.",
   },
-  { id: "journal", label: "Journal", hint: "I want to reflect on this." },
 ];
 
 const IDEA_FLOW_OPTIONS = [
   { id: "capture", label: "Capture" },
   { id: "explore", label: "Explore" },
-  { id: "project", label: "Create Project" },
+  { id: "project", label: "Connect to Project" },
 ] as const;
 
-/** Expanded Spark Note card — story, reactions, gentle routing. */
+/** Expanded Spark Card™ — lightweight note, not an article panel. */
 export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
   const [reactions, setReactions] = useState(() => getSparkReactions(card.id));
   const [hint, setHint] = useState<string | null>(null);
   const [picker, setPicker] = useState<PickerMode>(null);
-  const [heroImageFailed, setHeroImageFailed] = useState(false);
-  const sparkTypeLabel = sparkTypeDisplayLabel(card.sparkType);
-  const showHeroImage = Boolean(card.imageSrc) && !heroImageFailed;
+  const saved = reactions.includes("save");
 
   function showHint(message: string) {
     setHint(message);
@@ -79,16 +72,17 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
     }
     recordSparkNoteReaction(card.id, reaction, card.category, card.tags);
     setReactions(getSparkReactions(card.id));
-    if (reaction === "pass") {
-      showHint("Noted — Spark will keep mixing things up.");
-    }
   }
 
   function handleSave() {
-    const saved = toggleSparkNoteFavorite(card.id);
+    const nowSaved = toggleSparkNoteFavorite(card.id);
     recordSparkNoteReaction(card.id, "save", card.category, card.tags);
     setReactions(getSparkReactions(card.id));
-    showHint(saved ? "Saved to My Sparks." : "Removed from My Sparks.");
+    if (nowSaved) {
+      showHint("Saved to My Sparks.");
+    } else {
+      showHint("Removed from My Sparks.");
+    }
   }
 
   async function routeToDestination(destination: SparkNoteDestination) {
@@ -139,6 +133,10 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
     await routeToDestination("momentum");
   }
 
+  const storyText = [card.whatHappened, card.whyInteresting]
+    .filter(Boolean)
+    .join(" ");
+
   return (
     <div
       className="spark-note-expanded"
@@ -148,51 +146,30 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
     >
       <div className="spark-note-expanded__card">
         <header className="spark-note-expanded__header">
-          <div className="spark-note-expanded__brand">
-            <span className="spark-note-expanded__brand-flame" aria-hidden>
-              <SparkFlameIcon className="spark-note-expanded__brand-flame-svg" />
-            </span>
-            <span className="spark-note-expanded__brand-label">Today&apos;s Spark</span>
+          <div className="spark-note-expanded__header-top">
+            <div className="spark-note-expanded__brand">
+              <span className="spark-note-expanded__brand-flame" aria-hidden>
+                <SparkFlameIcon className="spark-note-expanded__brand-flame-svg" />
+              </span>
+              <span className="spark-note-expanded__brand-label">Today&apos;s Spark</span>
+            </div>
+            <button
+              type="button"
+              className="spark-note-expanded__close"
+              onClick={onClose}
+              aria-label="Close Spark Card"
+            >
+              ×
+            </button>
           </div>
           <span className="spark-note-expanded__category">{card.categoryLabel}</span>
-          {sparkTypeLabel ? (
-            <span className="spark-note-expanded__type">{sparkTypeLabel}</span>
-          ) : null}
-          <button
-            type="button"
-            className="spark-note-expanded__close"
-            onClick={onClose}
-            aria-label="Close Spark Note"
-          >
-            ×
-          </button>
-        </header>
-
-        <div className="spark-note-expanded__hero">
-          {showHeroImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={card.imageSrc}
-              alt=""
-              className="spark-note-expanded__image"
-              onError={() => setHeroImageFailed(true)}
-            />
-          ) : (
-            <div className="spark-note-expanded__image-placeholder" aria-hidden>
-              <SparkFlameIcon className="spark-note-expanded__image-placeholder-flame" />
-            </div>
-          )}
           <h2 className="spark-note-expanded__title">{card.title}</h2>
-          <p className="spark-note-expanded__teaser">{card.teaser}</p>
-        </div>
+        </header>
 
         <div className="spark-note-expanded__body">
           <section className="spark-note-expanded__section">
             <h3 className="spark-note-expanded__section-title">What Happened?</h3>
-            <p>
-              {card.whatHappened}
-              {card.whyInteresting ? ` ${card.whyInteresting}` : ""}
-            </p>
+            <p>{storyText}</p>
           </section>
 
           <section className="spark-note-expanded__section">
@@ -201,15 +178,14 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
           </section>
 
           <section className="spark-note-expanded__section spark-note-expanded__section--spark">
-            <h3 className="spark-note-expanded__section-title">Spark It Into Your Life</h3>
+            <h3 className="spark-note-expanded__section-title">Spark It</h3>
             <p>{card.sparkApplication}</p>
           </section>
         </div>
 
-        <div className="spark-note-expanded__reactions" aria-label="How did this land?">
-          <p className="spark-note-expanded__reactions-label">How did this land?</p>
+        <div className="spark-note-expanded__actions" aria-label="Spark reactions">
           <div className="spark-note-expanded__reactions-row">
-            {REACTIONS.map((reaction) => {
+            {CORE_REACTIONS.map((reaction) => {
               const active = reactions.includes(reaction.id);
               return (
                 <button
@@ -235,6 +211,19 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
               );
             })}
           </div>
+          <button
+            type="button"
+            className={[
+              "spark-note-expanded__save",
+              saved ? "spark-note-expanded__save--active" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+            onClick={handleSave}
+            aria-pressed={saved}
+          >
+            <span aria-hidden>⭐</span> Save Spark
+          </button>
         </div>
 
         {picker === "capture-idea" ? (
@@ -300,50 +289,39 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
           </div>
         ) : null}
 
-        <div className="spark-note-expanded__connections" aria-label="Optional actions">
-          <div className="spark-note-expanded__connections-row">
+        {!picker ? (
+          <div className="spark-note-expanded__optional" aria-label="Optional actions">
             <button
               type="button"
-              className="spark-note-expanded__connection"
-              onClick={() => setPicker("capture-idea")}
+              className="spark-note-expanded__optional-btn"
+              onClick={() => void handleJournal()}
             >
-              💡 Capture an Idea
-            </button>
-            <button type="button" className="spark-note-expanded__connection" onClick={() => void handleJournal()}>
               📓 Add to Journal
             </button>
             <button
               type="button"
-              className="spark-note-expanded__connection"
+              className="spark-note-expanded__optional-btn"
               onClick={() => void handleConnectProject()}
             >
-              📌 Connect to project
+              🔗 Connect to Project
             </button>
-            <button type="button" className="spark-note-expanded__connection" onClick={handleSave}>
-              ⭐ Save Spark
-            </button>
-            <button
-              type="button"
-              className="spark-note-expanded__connection"
-              onClick={onOpenCollection}
-            >
-              🔥 My Sparks
-            </button>
+            {saved ? (
+              <button
+                type="button"
+                className="spark-note-expanded__optional-btn spark-note-expanded__optional-btn--link"
+                onClick={onOpenCollection}
+              >
+                🔥 My Sparks
+              </button>
+            ) : null}
           </div>
-        </div>
+        ) : null}
 
         {hint ? (
           <p className="spark-note-expanded__hint" role="status">
             {hint}
           </p>
         ) : null}
-
-        <footer className="spark-note-expanded__footer">
-          <span className="spark-note-expanded__footer-icon" aria-hidden>
-            <SparkFlameIcon className="spark-note-expanded__footer-flame" />
-          </span>
-          <span>A little spark of curiosity. A lot of good for your day.</span>
-        </footer>
       </div>
     </div>
   );

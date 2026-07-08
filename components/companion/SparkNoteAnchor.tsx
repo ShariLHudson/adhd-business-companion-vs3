@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import type { SparkNoteDailyCard } from "@/lib/sparkNote/types";
 
 import { SparkFlameIcon } from "@/components/companion/SparkFlameIcon";
@@ -10,11 +9,8 @@ type Props = {
   onExpand: () => void;
 };
 
-/** Collapsed Spark Note — bottom-right daily companion card. */
+/** Collapsed Spark Card™ — compact companion object (bottom-right, opposite Guide Book). */
 export function SparkNoteAnchor({ card, onExpand }: Props) {
-  const [thumbFailed, setThumbFailed] = useState(false);
-  const showThumb = Boolean(card.thumbnailSrc) && !thumbFailed;
-
   return (
     <div
       className="spark-note-anchor"
@@ -25,31 +21,13 @@ export function SparkNoteAnchor({ card, onExpand }: Props) {
         type="button"
         className="spark-note-anchor__card"
         onClick={onExpand}
-        aria-label={`Today's Spark: ${card.title}. ${card.teaser}`}
+        aria-label={`Spark Card. Today's Spark: ${card.shortTitle}. Open to read.`}
       >
-        <span className="spark-note-anchor__thumb" aria-hidden>
-          {showThumb ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={card.thumbnailSrc}
-              alt=""
-              className="spark-note-anchor__thumb-img"
-              onError={() => setThumbFailed(true)}
-            />
-          ) : (
-            <span className="spark-note-anchor__thumb-fallback">
-              <SparkFlameIcon className="spark-note-anchor__thumb-flame" />
-            </span>
-          )}
+        <span className="spark-note-anchor__flame-wrap" aria-hidden>
+          <SparkFlameIcon className="spark-note-anchor__flame" />
         </span>
-        <span className="spark-note-anchor__copy">
-          <span className="spark-note-anchor__label">Today&apos;s Spark</span>
-          <span className="spark-note-anchor__title">{card.shortTitle}</span>
-          <span className="spark-note-anchor__teaser">{card.teaser}</span>
-        </span>
-        <span className="spark-note-anchor__flame" aria-hidden>
-          <SparkFlameIcon className="spark-note-anchor__flame-svg" />
-        </span>
+        <span className="spark-note-anchor__identity">Spark Card™</span>
+        <span className="spark-note-anchor__hint">{card.shortTitle}</span>
       </button>
     </div>
   );
