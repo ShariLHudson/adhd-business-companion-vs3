@@ -301,10 +301,8 @@ import {
   isEstateIntelligenceRuntimeEnabled,
   type EstateIntelligenceRuntimeResult,
 } from "./estateIntelligenceRuntime";
-import {
-  companionSessionContinueHint,
-  shouldAllowEstateSuggestions,
-} from "./companionIntelligence";
+import { companionSessionContinueHint } from "./companionIntelligence/activeSession";
+import { shouldAllowEstateSuggestions } from "./companionIntelligence/estateGate";
 import {
   applyCompanionDecisionGuidance,
   type CompanionDecisionInput,
