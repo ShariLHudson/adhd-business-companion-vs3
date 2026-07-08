@@ -36,7 +36,7 @@ describe("homesteadRoomRegistry", () => {
     const sunroom = homesteadRoomById("sunroom");
     expect(sunroom.name).toBe("Sunroom");
     expect(sunroom.purpose).toBe("Focus My Brain");
-    expect(sunroom.permanentBackground).toContain("butterfly-conservatory");
+    expect(sunroom.permanentBackground).toContain("butterfly-house-video");
     expect(sunroom.signatureMotionDescription).toMatch(/butterflies/i);
 
     const study = homesteadRoomById("study");

@@ -44,7 +44,7 @@ export type HomesteadRoomEntry = {
 export const LIVING_ROOM_BG = homesteadLivingRoomImageUrl();
 
 export const SUNROOM_BUTTERFLY_VIDEO =
-  "/backgrounds/butterfly-conservatory.mp4" as const;
+  "/Videos/butterfly-house-video.mp4" as const;
 
 export const SUNROOM_FALLBACK_IMAGE = ESTATE_ROOM_BG.sunroom;
 
