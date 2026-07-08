@@ -420,7 +420,7 @@ Every day:
 
 ## Daily selection order
 
-1. **Personal** — birthday, anniversaries, milestones, launches, workshops, speaking dates, saved celebrations (`targetDate` vacations/due dates), membership anniversary
+1. **Personal** — birthday; today's saved dates (celebration, reflection, remembrance, business milestones); membership anniversary; then major upcoming personal events within 7 days (trips, workshops, due dates)
 2. **Date-based** — `monthDay` holidays/history, `months` seasonal months, `seasons` personality sparks
 3. **Curated library** — affinity-weighted rotation with cooldowns, yesterday exclusion, and recent-category variety
 

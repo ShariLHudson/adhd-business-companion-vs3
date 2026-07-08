@@ -38,7 +38,15 @@ export type PersonalDateKind =
   | "workshop"
   | "speaking"
   | "due_date"
+  | "remembrance"
   | "custom";
+
+/** How Spark should speak on a saved personal date. */
+export type PersonalMomentTone =
+  | "celebration"
+  | "anticipation"
+  | "reflection"
+  | "gentle";
 
 export type PersonalDateCategory =
   | "personal"
@@ -60,6 +68,8 @@ export type PersonalDate = {
   category?: PersonalDateCategory;
   /** ISO date — vacation start, due date, launch day for countdown messaging. */
   targetDate?: string;
+  /** Optional tone override — Spark adapts message style, not just the label. */
+  tonePreference?: PersonalMomentTone;
 };
 
 export type MembershipMilestoneKey =

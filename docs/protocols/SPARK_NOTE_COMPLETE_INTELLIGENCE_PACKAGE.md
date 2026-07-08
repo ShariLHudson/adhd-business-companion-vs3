@@ -13,7 +13,7 @@
 | | Collapsed: flame, Today's Spark, title, teaser | `SparkNoteAnchor.tsx` | ✅ |
 | | Parchment / gold / teal styling | `spark-note.css` | ✅ |
 | | Expanded: title, category, story, impact, application | `SparkNoteExpanded.tsx` | ✅ |
-| **Part 2 — Engine** | Priority 1: personal (birthday, anniversaries, milestones) | `personalSparks.ts` | ✅ |
+| **Part 2 — Engine** | Priority 1: personal (birthday, tone-adapted dates, upcoming events) | `personalSparks.ts` | ✅ |
 | | Priority 2: date-based (holidays, history, seasons) | `evaluateDailySparkNote.ts`, `seasonalPersonality.ts` | ✅ |
 | | Priority 3: curated library + affinity | `catalog.ts`, `preferenceLearning.ts` | ✅ |
 | | One Spark per day | `persistence.ts` `dailySelection` | ✅ |
@@ -199,16 +199,17 @@ Selection order:
 Check:
 
 - birthday
-- anniversaries
-- achievements
-- milestones
-- saved celebrations
+- anniversaries, milestones, launches, celebrations
+- remembrance and gentle-tone dates
+- business milestones (`category: business`)
+- trips and due dates (`targetDate` today or within 7 days)
 
 Examples:
 
 - Happy Birthday Spark
-- Business Anniversary Spark
-- Achievement Spark
+- Adventure Ahead (upcoming trip)
+- Look How Far You Have Come (business anniversary)
+- A Meaningful Day (remembrance)
 
 ---
 

@@ -73,14 +73,14 @@ Use these when expanding `lib/sparkNote/catalog.ts` or a future CMS.
 | [SPARK_NOTE_HOLIDAY_DATE_BASED_SPARK_LIBRARY.md](SPARK_NOTE_HOLIDAY_DATE_BASED_SPARK_LIBRARY.md) | Holidays & dates | **In runtime** (`SPARK-HOL-001`–`003`, `HIST-002`–`003`, `SEASON-001`–`002`) |
 | [SPARK_NOTE_PERSONAL_GROWTH_AND_ENCOURAGEMENT_SPARK_LIBRARY.md](SPARK_NOTE_PERSONAL_GROWTH_AND_ENCOURAGEMENT_SPARK_LIBRARY.md) | Personal growth | **In runtime** (`SPARK-GROW-001`–`008`) |
 | [SPARK_NOTE_GRATITUDE_AND_MEANING_SPARK_LIBRARY.md](SPARK_NOTE_GRATITUDE_AND_MEANING_SPARK_LIBRARY.md) | Gratitude & meaning | **In runtime** (`SPARK-MEAN-001`–`008`) |
-| [SPARK_NOTE_PERSONAL_MOMENTS_AND_LIFE_EVENTS_SPARK_LIBRARY.md](SPARK_NOTE_PERSONAL_MOMENTS_AND_LIFE_EVENTS_SPARK_LIBRARY.md) | Personal moments |
+| [SPARK_NOTE_PERSONAL_MOMENTS_AND_LIFE_EVENTS_SPARK_LIBRARY.md](SPARK_NOTE_PERSONAL_MOMENTS_AND_LIFE_EVENTS_SPARK_LIBRARY.md) | Personal moments | **In runtime** (`personalSparks.ts` — tone-adapted personal cards) |
 | [SPARK_NOTE_ADHD_FRIENDLY_SPARKS_LIBRARY.md](SPARK_NOTE_ADHD_FRIENDLY_SPARKS_LIBRARY.md) | ADHD-friendly sparks | **In runtime** (`SPARK-ADHD-001`–`008`) |
 
 ---
 
 ## Daily selection order (runtime)
 
-1. **Personal** — birthday, anniversaries, milestones, membership anniversary
+1. **Personal** — birthday, anniversaries, milestones, launches, workshops, speaking dates, remembrance dates, saved celebrations (`targetDate` vacations/due dates), membership anniversary; then major upcoming personal events within 7 days
 2. **Date-based** — `monthDay`, `months`, seasonal `seasons`
 3. **Curated library** — affinity-weighted rotation with repeat prevention
 
