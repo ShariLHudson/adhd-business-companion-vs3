@@ -19,7 +19,7 @@ export type SparkTone =
   | "encouraging"
   | "supportive";
 
-export type SparkContentStatus = "active" | "draft" | "archived";
+export type SparkContentStatus = "draft" | "review" | "active" | "archived";
 
 export type SparkDateRules =
   | { type: "evergreen" }
