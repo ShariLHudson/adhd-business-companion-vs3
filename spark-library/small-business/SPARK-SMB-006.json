@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-SMB-006",
+  "title": "The Power of the First Customer",
+  "category": "Small Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "One customer can change how you see your idea.",
+  "story": "The first person who pays for a product or service provides more than income. They provide evidence that the idea has value.",
+  "impact": "Small wins create confidence and momentum.",
+  "spark_application": "What evidence of progress have you overlooked?",
+  "tags": [
+    "validation",
+    "confidence",
+    "entrepreneurship"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Small Business",
+  "spark_type": "quick",
+  "short_title": "First Customer"
+}

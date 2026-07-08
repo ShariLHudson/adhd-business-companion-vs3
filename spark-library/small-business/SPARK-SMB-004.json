@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-SMB-004",
+  "title": "A Better Way to Solve an Everyday Problem",
+  "category": "Small Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Businesses often begin by noticing frustrations.",
+  "story": "Entrepreneurs frequently discover opportunities by asking: \"Why is this harder than it needs to be?\" A better solution can become a valuable product or service.",
+  "impact": "Problems can become possibilities.",
+  "spark_application": "What problem do you notice that others accept?",
+  "tags": [
+    "problem-solving",
+    "innovation",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Small Business",
+  "spark_type": "story",
+  "short_title": "Everyday Problem"
+}

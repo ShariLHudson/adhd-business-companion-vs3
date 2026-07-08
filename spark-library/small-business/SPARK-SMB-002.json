@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-SMB-002",
+  "title": "The Customer Who Gives You Your Next Idea",
+  "category": "Small Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Your customers often show you where your business can grow.",
+  "story": "Many successful small businesses improve because they listen carefully to customers. Questions, requests, and feedback reveal opportunities.",
+  "impact": "Customers are not just buyers. They are sources of insight.",
+  "spark_application": "What question from a customer could inspire your next improvement?",
+  "tags": [
+    "customers",
+    "improvement",
+    "business-growth"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Small Business",
+  "spark_type": "story",
+  "short_title": "Customer Insight"
+}

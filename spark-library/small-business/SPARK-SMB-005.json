@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-SMB-005",
+  "title": "The Handmade Business Advantage",
+  "category": "Small Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "People often buy the story behind what you create.",
+  "story": "Small handmade businesses offer something beyond a product. They provide creativity, personality, and connection.",
+  "impact": "A personal touch can become a competitive advantage.",
+  "spark_application": "What makes your work uniquely yours?",
+  "tags": [
+    "crafts",
+    "creativity",
+    "connection"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Small Business",
+  "spark_type": "story",
+  "short_title": "Handmade Advantage"
+}

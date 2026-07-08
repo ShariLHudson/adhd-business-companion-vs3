@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-SMB-001",
+  "title": "The Homemade Product That Became a Business",
+  "category": "Small Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Many businesses begin with someone creating something they love.",
+  "story": "Some entrepreneurs begin by making something for themselves, friends, or family. A craft, recipe, design, or solution solves a small problem. Over time, others see the value and the idea grows.",
+  "impact": "A business does not always begin with a large plan. Sometimes it begins with one person creating something useful.",
+  "spark_application": "What do you already create, solve, or help with that others might value?",
+  "tags": [
+    "entrepreneurship",
+    "creativity",
+    "small-business",
+    "makers"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Small Business",
+  "spark_type": "story",
+  "short_title": "Homemade to Business"
+}

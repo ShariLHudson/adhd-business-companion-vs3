@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-SMB-008",
+  "title": "Your Experience Is an Asset",
+  "category": "Small Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "What you know may be more valuable than you realize.",
+  "story": "Many entrepreneurs build businesses from skills developed through life experiences, careers, hobbies, and challenges. Those experiences can become valuable solutions for others.",
+  "impact": "Your journey may contain knowledge someone else needs.",
+  "spark_application": "What have you learned that could help someone else?",
+  "tags": [
+    "skills",
+    "knowledge",
+    "expertise"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Small Business",
+  "spark_type": "story",
+  "short_title": "Your Experience"
+}

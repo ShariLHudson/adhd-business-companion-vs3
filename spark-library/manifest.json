@@ -2801,5 +2801,230 @@
     "spark_type": "story",
     "short_title": "Autumn Reflection",
     "priority": 75
+  },
+  {
+    "spark_id": "SPARK-SMB-001",
+    "title": "The Homemade Product That Became a Business",
+    "category": "Small Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Many businesses begin with someone creating something they love.",
+    "story": "Some entrepreneurs begin by making something for themselves, friends, or family. A craft, recipe, design, or solution solves a small problem. Over time, others see the value and the idea grows.",
+    "impact": "A business does not always begin with a large plan. Sometimes it begins with one person creating something useful.",
+    "spark_application": "What do you already create, solve, or help with that others might value?",
+    "tags": [
+      "entrepreneurship",
+      "creativity",
+      "small-business",
+      "makers"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "business",
+    "category_label": "Small Business",
+    "spark_type": "story",
+    "short_title": "Homemade to Business"
+  },
+  {
+    "spark_id": "SPARK-SMB-002",
+    "title": "The Customer Who Gives You Your Next Idea",
+    "category": "Small Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Your customers often show you where your business can grow.",
+    "story": "Many successful small businesses improve because they listen carefully to customers. Questions, requests, and feedback reveal opportunities.",
+    "impact": "Customers are not just buyers. They are sources of insight.",
+    "spark_application": "What question from a customer could inspire your next improvement?",
+    "tags": [
+      "customers",
+      "improvement",
+      "business-growth"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "business",
+    "category_label": "Small Business",
+    "spark_type": "story",
+    "short_title": "Customer Insight"
+  },
+  {
+    "spark_id": "SPARK-SMB-003",
+    "title": "The Power of Starting Small",
+    "category": "Small Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Big businesses often begin with one small step.",
+    "story": "Many entrepreneurs start with limited resources. They test ideas, learn from customers, improve their offer, and grow over time.",
+    "impact": "Small beginnings create opportunities for learning.",
+    "spark_application": "What small version of your idea could you test?",
+    "tags": [
+      "entrepreneurship",
+      "momentum",
+      "action"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "business",
+    "category_label": "Small Business",
+    "spark_type": "quick",
+    "short_title": "Start Small"
+  },
+  {
+    "spark_id": "SPARK-SMB-004",
+    "title": "A Better Way to Solve an Everyday Problem",
+    "category": "Small Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Businesses often begin by noticing frustrations.",
+    "story": "Entrepreneurs frequently discover opportunities by asking: \"Why is this harder than it needs to be?\" A better solution can become a valuable product or service.",
+    "impact": "Problems can become possibilities.",
+    "spark_application": "What problem do you notice that others accept?",
+    "tags": [
+      "problem-solving",
+      "innovation",
+      "creativity"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "business",
+    "category_label": "Small Business",
+    "spark_type": "story",
+    "short_title": "Everyday Problem"
+  },
+  {
+    "spark_id": "SPARK-SMB-005",
+    "title": "The Handmade Business Advantage",
+    "category": "Small Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "People often buy the story behind what you create.",
+    "story": "Small handmade businesses offer something beyond a product. They provide creativity, personality, and connection.",
+    "impact": "A personal touch can become a competitive advantage.",
+    "spark_application": "What makes your work uniquely yours?",
+    "tags": [
+      "crafts",
+      "creativity",
+      "connection"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "business",
+    "category_label": "Small Business",
+    "spark_type": "story",
+    "short_title": "Handmade Advantage"
+  },
+  {
+    "spark_id": "SPARK-SMB-006",
+    "title": "The Power of the First Customer",
+    "category": "Small Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "One customer can change how you see your idea.",
+    "story": "The first person who pays for a product or service provides more than income. They provide evidence that the idea has value.",
+    "impact": "Small wins create confidence and momentum.",
+    "spark_application": "What evidence of progress have you overlooked?",
+    "tags": [
+      "validation",
+      "confidence",
+      "entrepreneurship"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "business",
+    "category_label": "Small Business",
+    "spark_type": "quick",
+    "short_title": "First Customer"
+  },
+  {
+    "spark_id": "SPARK-SMB-007",
+    "title": "The Business That Listened",
+    "category": "Small Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Listening can become a business advantage.",
+    "story": "Many small businesses succeed because they build relationships with customers. They remember preferences, respond personally, and create trust.",
+    "impact": "Relationships are often the foundation of loyalty.",
+    "spark_application": "How can you make someone feel valued today?",
+    "tags": [
+      "customer-service",
+      "relationships",
+      "growth"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "business",
+    "category_label": "Small Business",
+    "spark_type": "story",
+    "short_title": "The Business That Listened"
+  },
+  {
+    "spark_id": "SPARK-SMB-008",
+    "title": "Your Experience Is an Asset",
+    "category": "Small Business",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "What you know may be more valuable than you realize.",
+    "story": "Many entrepreneurs build businesses from skills developed through life experiences, careers, hobbies, and challenges. Those experiences can become valuable solutions for others.",
+    "impact": "Your journey may contain knowledge someone else needs.",
+    "spark_application": "What have you learned that could help someone else?",
+    "tags": [
+      "skills",
+      "knowledge",
+      "expertise"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "business",
+    "category_label": "Small Business",
+    "spark_type": "story",
+    "short_title": "Your Experience"
   }
 ]

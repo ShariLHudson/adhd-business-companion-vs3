@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-SMB-003",
+  "title": "The Power of Starting Small",
+  "category": "Small Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Big businesses often begin with one small step.",
+  "story": "Many entrepreneurs start with limited resources. They test ideas, learn from customers, improve their offer, and grow over time.",
+  "impact": "Small beginnings create opportunities for learning.",
+  "spark_application": "What small version of your idea could you test?",
+  "tags": [
+    "entrepreneurship",
+    "momentum",
+    "action"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Small Business",
+  "spark_type": "quick",
+  "short_title": "Start Small"
+}

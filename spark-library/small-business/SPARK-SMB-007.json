@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-SMB-007",
+  "title": "The Business That Listened",
+  "category": "Small Business",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Listening can become a business advantage.",
+  "story": "Many small businesses succeed because they build relationships with customers. They remember preferences, respond personally, and create trust.",
+  "impact": "Relationships are often the foundation of loyalty.",
+  "spark_application": "How can you make someone feel valued today?",
+  "tags": [
+    "customer-service",
+    "relationships",
+    "growth"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Small Business",
+  "spark_type": "story",
+  "short_title": "The Business That Listened"
+}

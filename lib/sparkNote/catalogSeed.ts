@@ -462,6 +462,123 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     tags: ["psychology", "customer-experience", "co-creation"],
   },
 
+  // — Small business (spark-notes-files/SPARK_NOTE_SMALL_BUSINESS_ENTREPRENEUR_SPARK_LIBRARY.md) —
+  {
+    id: "SPARK-SMB-001",
+    category: "business",
+    categoryLabel: "Small Business",
+    sparkType: "story",
+    title: "The Homemade Product That Became a Business",
+    shortTitle: "Homemade to Business",
+    teaser: "Many businesses begin with someone creating something they love.",
+    whatHappened:
+      "Some entrepreneurs begin by making something for themselves, friends, or family. A craft, recipe, design, or solution solves a small problem. Over time, others see the value and the idea grows.",
+    whyItMatters:
+      "A business does not always begin with a large plan. Sometimes it begins with one person creating something useful.",
+    sparkApplication:
+      "What do you already create, solve, or help with that others might value?",
+    tags: ["entrepreneurship", "creativity", "small-business", "makers"],
+  },
+  {
+    id: "SPARK-SMB-002",
+    category: "business",
+    categoryLabel: "Small Business",
+    sparkType: "story",
+    title: "The Customer Who Gives You Your Next Idea",
+    shortTitle: "Customer Insight",
+    teaser: "Your customers often show you where your business can grow.",
+    whatHappened:
+      "Many successful small businesses improve because they listen carefully to customers. Questions, requests, and feedback reveal opportunities.",
+    whyItMatters: "Customers are not just buyers. They are sources of insight.",
+    sparkApplication:
+      "What question from a customer could inspire your next improvement?",
+    tags: ["customers", "improvement", "business-growth"],
+  },
+  {
+    id: "SPARK-SMB-003",
+    category: "business",
+    categoryLabel: "Small Business",
+    sparkType: "quick",
+    title: "The Power of Starting Small",
+    shortTitle: "Start Small",
+    teaser: "Big businesses often begin with one small step.",
+    whatHappened:
+      "Many entrepreneurs start with limited resources. They test ideas, learn from customers, improve their offer, and grow over time.",
+    whyItMatters: "Small beginnings create opportunities for learning.",
+    sparkApplication: "What small version of your idea could you test?",
+    tags: ["entrepreneurship", "momentum", "action"],
+  },
+  {
+    id: "SPARK-SMB-004",
+    category: "business",
+    categoryLabel: "Small Business",
+    sparkType: "story",
+    title: "A Better Way to Solve an Everyday Problem",
+    shortTitle: "Everyday Problem",
+    teaser: "Businesses often begin by noticing frustrations.",
+    whatHappened:
+      'Entrepreneurs frequently discover opportunities by asking: "Why is this harder than it needs to be?" A better solution can become a valuable product or service.',
+    whyItMatters: "Problems can become possibilities.",
+    sparkApplication: "What problem do you notice that others accept?",
+    tags: ["problem-solving", "innovation", "creativity"],
+  },
+  {
+    id: "SPARK-SMB-005",
+    category: "business",
+    categoryLabel: "Small Business",
+    sparkType: "story",
+    title: "The Handmade Business Advantage",
+    shortTitle: "Handmade Advantage",
+    teaser: "People often buy the story behind what you create.",
+    whatHappened:
+      "Small handmade businesses offer something beyond a product. They provide creativity, personality, and connection.",
+    whyItMatters: "A personal touch can become a competitive advantage.",
+    sparkApplication: "What makes your work uniquely yours?",
+    tags: ["crafts", "creativity", "connection"],
+  },
+  {
+    id: "SPARK-SMB-006",
+    category: "business",
+    categoryLabel: "Small Business",
+    sparkType: "quick",
+    title: "The Power of the First Customer",
+    shortTitle: "First Customer",
+    teaser: "One customer can change how you see your idea.",
+    whatHappened:
+      "The first person who pays for a product or service provides more than income. They provide evidence that the idea has value.",
+    whyItMatters: "Small wins create confidence and momentum.",
+    sparkApplication: "What evidence of progress have you overlooked?",
+    tags: ["validation", "confidence", "entrepreneurship"],
+  },
+  {
+    id: "SPARK-SMB-007",
+    category: "business",
+    categoryLabel: "Small Business",
+    sparkType: "story",
+    title: "The Business That Listened",
+    shortTitle: "The Business That Listened",
+    teaser: "Listening can become a business advantage.",
+    whatHappened:
+      "Many small businesses succeed because they build relationships with customers. They remember preferences, respond personally, and create trust.",
+    whyItMatters: "Relationships are often the foundation of loyalty.",
+    sparkApplication: "How can you make someone feel valued today?",
+    tags: ["customer-service", "relationships", "growth"],
+  },
+  {
+    id: "SPARK-SMB-008",
+    category: "business",
+    categoryLabel: "Small Business",
+    sparkType: "story",
+    title: "Your Experience Is an Asset",
+    shortTitle: "Your Experience",
+    teaser: "What you know may be more valuable than you realize.",
+    whatHappened:
+      "Many entrepreneurs build businesses from skills developed through life experiences, careers, hobbies, and challenges. Those experiences can become valuable solutions for others.",
+    whyItMatters: "Your journey may contain knowledge someone else needs.",
+    sparkApplication: "What have you learned that could help someone else?",
+    tags: ["skills", "knowledge", "expertise"],
+  },
+
   // — Quotes (spark-notes-files/SPARK_NOTE_QUOTES_WITH_STORIES_SPARK_LIBRARY.md) —
   {
     id: "SPARK-QUOTE-001",
