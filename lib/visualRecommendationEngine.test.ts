@@ -26,14 +26,15 @@ describe("visualRecommendationEngine (P0.20)", () => {
       expect(decision.immediateVisualOpen?.viewId).toBe(viewId);
     });
 
-    it("create a flowchart is planned — no immediate open", () => {
-      expect(detectVisualRecommendationIntent("create a flowchart")).toBe("none");
+    it("create a flowchart opens Process Flow immediately", () => {
+      expect(detectVisualRecommendationIntent("create a flowchart")).toBe(
+        "immediate",
+      );
       const decision = resolveFrictionlessAction({
         userText: "create a flowchart",
         currentTurn: 1,
       });
-      expect(decision.immediateVisualOpen).toBeUndefined();
-      expect(decision.localReply).toMatch(/aren't fully built/i);
+      expect(decision.immediateVisualOpen?.viewId).toBe("process-flow");
     });
   });
 
@@ -42,6 +43,7 @@ describe("visualRecommendationEngine (P0.20)", () => {
       const input = "I want to write a book about ADHD";
       const rec = recommendVisualStructures(input);
       expect(rec.recommendations.map((r) => r.visualType)).toEqual([
+        "hierarchy-tree",
         "mind-map",
         "customer-journey-map",
       ]);
@@ -50,14 +52,18 @@ describe("visualRecommendationEngine (P0.20)", () => {
     it("course launch recommends available types only", () => {
       const rec = recommendVisualStructures("I want to launch a course");
       expect(rec.recommendations.map((r) => r.visualType)).toEqual([
+        "hierarchy-tree",
         "project-map",
         "timeline",
       ]);
     });
 
-    it("sales funnel skips planned funnel and flow", () => {
+    it("sales funnel recommends flow and timeline", () => {
       const rec = recommendVisualStructures("I need a sales funnel");
-      expect(rec.recommendations.map((r) => r.visualType)).toEqual(["timeline"]);
+      expect(rec.recommendations.map((r) => r.visualType)).toEqual([
+        "process-flow",
+        "timeline",
+      ]);
     });
 
     it("turn this into something visual recommends options", () => {
@@ -83,7 +89,7 @@ describe("visualRecommendationEngine (P0.20)", () => {
 
     it("user says 1 → first available recommendation", () => {
       const pick = resolveVisualRecommendationSelection("1", pending);
-      expect(pick?.viewId).toBe("mind-map");
+      expect(pick?.viewId).toBe("hierarchy-tree");
     });
 
     it("user says mind map → mind map", () => {
@@ -102,7 +108,7 @@ describe("visualRecommendationEngine (P0.20)", () => {
         offeredAtTurn: 1,
       });
       expect(resolveVisualMenuSelection("1", menuPending)?.viewId).toBe(
-        "project-map",
+        "hierarchy-tree",
       );
     });
   });

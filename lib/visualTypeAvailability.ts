@@ -41,7 +41,7 @@ export const VISUAL_TYPES: Record<VisualTypeId, VisualTypeDef> = {
     aliases: [/\bdecision\s*trees?\b/i, /\bdecision\s*maps?\b/i],
   },
   flowchart: {
-    status: "planned",
+    status: "available",
     label: "Flowchart",
     viewId: "process-flow",
     mode: "decision-tree",
@@ -59,7 +59,7 @@ export const VISUAL_TYPES: Record<VisualTypeId, VisualTypeDef> = {
     aliases: [/\bdiagrams?\b/i],
   },
   hierarchy_tree: {
-    status: "planned",
+    status: "available",
     label: "Hierarchy Tree",
     viewId: "hierarchy-tree",
     mode: "project-map",

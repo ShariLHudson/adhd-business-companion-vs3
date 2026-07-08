@@ -64,7 +64,7 @@ const TASK_REQUEST_RE =
   /\b(?:help me (?:create|write|draft|build|make|plan|organize)|write (?:a|an|my)|create (?:a|an|my)|draft (?:a|an|my)|build (?:a|an|my)|make (?:a|an|my))\b/i;
 
 const EMOTIONAL_SUPPORT_RE =
-  /\b(?:i'?m overwhelmed|i feel overwhelmed|(?:i'?m|i am) discouraged|burned out|burnt out|so anxious|panicking|hopeless|can'?t do this|everything feels (?:heavy|hard|too much)|really struggling|feel(?:ing)? defeated|no motivation left)\b/i;
+  /\b(?:i'?m overwhelmed|i feel overwhelmed|(?:i'?m|i am) discouraged|burned out|burnt out|so anxious|panicking|panic attack|having a panic|hopeless|can'?t do this|everything feels (?:heavy|hard|too much)|really struggling|feel(?:ing)? defeated|no motivation left|need to calm down|calm me down|help me calm|feel(?:ing)? anxious|i am anxious|i'?m anxious)\b/i;
 
 const INFORMATION_RE =
   /^\s*(?:research|explain|compare|what is|what are|how does|how do|tell me about|describe)\b/i;

@@ -2624,6 +2624,13 @@ function tryEarlyCompanionSupportFlow(
   if (!userText) return null;
 
   if (
+    EMOTIONAL_REGULATION_RE.test(userText) &&
+    !PRODUCTIVITY_FRAMING_RE.test(userText)
+  ) {
+    return buildEmotionalRegulationDecision(userText, currentTurn);
+  }
+
+  if (
     isMotivationProblem(userText) &&
     !/\b(?:music|audio|sound|playlist|listen)\b/i.test(userText)
   ) {
@@ -3440,6 +3447,26 @@ function resolveFrictionlessActionImpl(
         routingPipeline.fastPath,
       ),
     );
+  }
+
+  const visualStructureBeforeEstate = tryVisualStructureEarlyFlow(input, routing);
+  if (visualStructureBeforeEstate) {
+    return finish(visualStructureBeforeEstate);
+  }
+
+  const visualRecommendationBeforeEstate = tryVisualRecommendationFlow(
+    input,
+    routing,
+  );
+  if (visualRecommendationBeforeEstate) {
+    return finish(visualRecommendationBeforeEstate);
+  }
+
+  if (
+    EMOTIONAL_REGULATION_RE.test(userText) &&
+    !PRODUCTIVITY_FRAMING_RE.test(userText)
+  ) {
+    return finish(buildEmotionalRegulationDecision(userText, currentTurn));
   }
 
   if (isEstateIntelligenceRuntimeEnabled()) {
