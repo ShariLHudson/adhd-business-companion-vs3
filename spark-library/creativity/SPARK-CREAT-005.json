@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-CREAT-005",
+  "title": "The Idea Notebook",
+  "category": "Creativity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Great ideas are often captured before they are understood.",
+  "story": "Many creators keep notebooks filled with unfinished thoughts, questions, sketches, and possibilities. Not every idea becomes something, but collecting ideas creates a resource for the future.",
+  "impact": "An idea does not need to be complete before it deserves attention.",
+  "spark_application": "What ideas have you been saving for later?",
+  "tags": [
+    "ideas",
+    "journaling",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "creativity",
+  "category_label": "Creativity",
+  "spark_type": "story",
+  "short_title": "Idea Notebook"
+}

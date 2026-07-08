@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-CREAT-008",
+  "title": "The Ten-Minute Idea Challenge",
+  "category": "Creativity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Small creative moments can create big possibilities.",
+  "story": "Setting aside a short amount of time to explore ideas removes pressure. The goal is not to create something perfect. The goal is to create movement.",
+  "impact": "Consistency builds creative confidence.",
+  "spark_application": "What idea could you explore for just ten minutes?",
+  "tags": [
+    "action",
+    "ideas",
+    "momentum"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "creativity",
+  "category_label": "Creativity",
+  "spark_type": "quick",
+  "short_title": "Ten-Minute Ideas"
+}

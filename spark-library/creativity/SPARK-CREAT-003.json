@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-CREAT-003",
+  "title": "Leonardo da Vinci: The Original Creative Thinker",
+  "category": "Creativity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "An artist who also imagined the future.",
+  "story": "Leonardo da Vinci explored art, science, engineering, anatomy, and invention. He did not separate creativity from knowledge. He believed curiosity connected everything.",
+  "impact": "Creativity grows when different ideas come together.",
+  "spark_application": "What two unrelated ideas could you combine?",
+  "tags": [
+    "art",
+    "invention",
+    "curiosity",
+    "imagination"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "creativity",
+  "category_label": "Creativity",
+  "spark_type": "story",
+  "short_title": "Leonardo's Curiosity"
+}

@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-CREAT-007",
+  "title": "Steal Like an Artist",
+  "category": "Creativity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Creative people build by connecting ideas.",
+  "story": "Artists and innovators often study what came before them. They learn, adapt, combine, and transform ideas into something new.",
+  "impact": "Creativity is often about making new connections.",
+  "spark_application": "What ideas could you combine in a new way?",
+  "tags": [
+    "learning",
+    "inspiration",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "creativity",
+  "category_label": "Creativity",
+  "spark_type": "story",
+  "short_title": "Steal Like an Artist"
+}

@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-CREAT-006",
+  "title": "The Power of Constraints",
+  "category": "Creativity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Sometimes limits create better ideas.",
+  "story": "Many creative solutions appear because people have restrictions. Limited time, money, or resources force people to think differently.",
+  "impact": "Constraints can encourage creativity instead of stopping it.",
+  "spark_application": "What limitation could become an opportunity?",
+  "tags": [
+    "innovation",
+    "problem-solving",
+    "design"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "creativity",
+  "category_label": "Creativity",
+  "spark_type": "quick",
+  "short_title": "Power of Constraints"
+}

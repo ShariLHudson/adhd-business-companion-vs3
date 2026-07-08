@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-CREAT-004",
+  "title": "The Power of Asking \"What If?\"",
+  "category": "Creativity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Many breakthroughs begin with one simple question.",
+  "story": "Inventors and creators often begin by challenging what already exists. \"What if this worked differently?\" \"What if there was another way?\" Questions create possibilities.",
+  "impact": "Curiosity is the beginning of innovation.",
+  "spark_application": "What assumption could you challenge today?",
+  "tags": [
+    "innovation",
+    "imagination",
+    "problem-solving"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "creativity",
+  "category_label": "Creativity",
+  "spark_type": "quick",
+  "short_title": "What If?"
+}

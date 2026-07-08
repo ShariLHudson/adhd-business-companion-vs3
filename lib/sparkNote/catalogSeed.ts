@@ -391,6 +391,124 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     tags: ["seasonal", "winter", "inspiration"],
   },
 
+  // — Creativity & ideas (spark-notes-files/SPARK_NOTE_CREATIVITY_AND_IDEAS_SPARK_LIBRARY.md) —
+  {
+    id: "SPARK-CREAT-001",
+    category: "creativity",
+    categoryLabel: "Creativity",
+    sparkType: "quick",
+    title: "The First Draft Is Supposed To Be Messy",
+    shortTitle: "First Draft Messy",
+    teaser: "Great creations usually begin as imperfect attempts.",
+    whatHappened:
+      "Many creators, writers, inventors, and entrepreneurs begin with rough versions. The first idea is not the final product. It is a starting point that gives something to improve.",
+    whyItMatters:
+      "Waiting for perfection often prevents ideas from becoming real. Creating something imperfect creates the opportunity to make it better.",
+    sparkApplication: "What could you start today if it did not have to be perfect?",
+    tags: ["creativity", "perfectionism", "action", "ideas"],
+  },
+  {
+    id: "SPARK-CREAT-002",
+    category: "creativity",
+    categoryLabel: "Creativity",
+    sparkType: "story",
+    title: "The Accidental Invention of Velcro",
+    shortTitle: "Velcro Curiosity",
+    teaser: "A walk in nature inspired a worldwide invention.",
+    whatHappened:
+      "Engineer George de Mestral noticed burrs sticking to his clothing and his dog's fur after a walk. Instead of simply removing them, he became curious about how they worked. That curiosity led to the development of Velcro.",
+    whyItMatters:
+      "Innovation often begins by paying attention to ordinary things.",
+    sparkApplication: "What small detail around you might inspire a new idea?",
+    tags: ["innovation", "curiosity", "invention"],
+  },
+  {
+    id: "SPARK-CREAT-003",
+    category: "creativity",
+    categoryLabel: "Creativity",
+    sparkType: "story",
+    title: "Leonardo da Vinci: The Original Creative Thinker",
+    shortTitle: "Leonardo's Curiosity",
+    teaser: "An artist who also imagined the future.",
+    whatHappened:
+      "Leonardo da Vinci explored art, science, engineering, anatomy, and invention. He did not separate creativity from knowledge. He believed curiosity connected everything.",
+    whyItMatters: "Creativity grows when different ideas come together.",
+    sparkApplication: "What two unrelated ideas could you combine?",
+    tags: ["art", "invention", "curiosity", "imagination"],
+  },
+  {
+    id: "SPARK-CREAT-004",
+    category: "creativity",
+    categoryLabel: "Creativity",
+    sparkType: "quick",
+    title: 'The Power of Asking "What If?"',
+    shortTitle: "What If?",
+    teaser: "Many breakthroughs begin with one simple question.",
+    whatHappened:
+      'Inventors and creators often begin by challenging what already exists. "What if this worked differently?" "What if there was another way?" Questions create possibilities.',
+    whyItMatters: "Curiosity is the beginning of innovation.",
+    sparkApplication: "What assumption could you challenge today?",
+    tags: ["innovation", "imagination", "problem-solving"],
+  },
+  {
+    id: "SPARK-CREAT-005",
+    category: "creativity",
+    categoryLabel: "Creativity",
+    sparkType: "story",
+    title: "The Idea Notebook",
+    shortTitle: "Idea Notebook",
+    teaser: "Great ideas are often captured before they are understood.",
+    whatHappened:
+      "Many creators keep notebooks filled with unfinished thoughts, questions, sketches, and possibilities. Not every idea becomes something, but collecting ideas creates a resource for the future.",
+    whyItMatters:
+      "An idea does not need to be complete before it deserves attention.",
+    sparkApplication: "What ideas have you been saving for later?",
+    tags: ["ideas", "journaling", "creativity"],
+  },
+  {
+    id: "SPARK-CREAT-006",
+    category: "creativity",
+    categoryLabel: "Creativity",
+    sparkType: "quick",
+    title: "The Power of Constraints",
+    shortTitle: "Power of Constraints",
+    teaser: "Sometimes limits create better ideas.",
+    whatHappened:
+      "Many creative solutions appear because people have restrictions. Limited time, money, or resources force people to think differently.",
+    whyItMatters:
+      "Constraints can encourage creativity instead of stopping it.",
+    sparkApplication: "What limitation could become an opportunity?",
+    tags: ["innovation", "problem-solving", "design"],
+  },
+  {
+    id: "SPARK-CREAT-007",
+    category: "creativity",
+    categoryLabel: "Creativity",
+    sparkType: "story",
+    title: "Steal Like an Artist",
+    shortTitle: "Steal Like an Artist",
+    teaser: "Creative people build by connecting ideas.",
+    whatHappened:
+      "Artists and innovators often study what came before them. They learn, adapt, combine, and transform ideas into something new.",
+    whyItMatters: "Creativity is often about making new connections.",
+    sparkApplication: "What ideas could you combine in a new way?",
+    tags: ["learning", "inspiration", "creativity"],
+  },
+  {
+    id: "SPARK-CREAT-008",
+    category: "creativity",
+    categoryLabel: "Creativity",
+    sparkType: "quick",
+    title: "The Ten-Minute Idea Challenge",
+    shortTitle: "Ten-Minute Ideas",
+    teaser: "Small creative moments can create big possibilities.",
+    whatHappened:
+      "Setting aside a short amount of time to explore ideas removes pressure. The goal is not to create something perfect. The goal is to create movement.",
+    whyItMatters: "Consistency builds creative confidence.",
+    sparkApplication: "What idea could you explore for just ten minutes?",
+    tags: ["action", "ideas", "momentum"],
+  },
+
   // — ADHD-friendly (spark-notes-files/SPARK_NOTE_ADHD_FRIENDLY_SPARKS_LIBRARY.md) —
   {
     id: "SPARK-ADHD-001",

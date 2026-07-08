@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-CREAT-002",
+  "title": "The Accidental Invention of Velcro",
+  "category": "Creativity",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A walk in nature inspired a worldwide invention.",
+  "story": "Engineer George de Mestral noticed burrs sticking to his clothing and his dog's fur after a walk. Instead of simply removing them, he became curious about how they worked. That curiosity led to the development of Velcro.",
+  "impact": "Innovation often begins by paying attention to ordinary things.",
+  "spark_application": "What small detail around you might inspire a new idea?",
+  "tags": [
+    "innovation",
+    "curiosity",
+    "invention"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "creativity",
+  "category_label": "Creativity",
+  "spark_type": "story",
+  "short_title": "Velcro Curiosity"
+}
