@@ -17,9 +17,6 @@ const LOADING = (
   </main>
 );
 
-/** Warm the home shell as soon as this module loads. */
-const companionPageImport = import("@/app/companion/CompanionPageClient");
-
 function logWorkspaceLoadFailure(error: Error): void {
   void import("@/lib/companionContextRouting/routeCompanionFailure").then(
     ({ logCompanionSystemFailure }) => {
@@ -81,17 +78,38 @@ class EstateErrorBoundary extends Component<
   }
 }
 
+function WorkspaceLoadRecovery({
+  onRetry,
+}: {
+  onRetry: () => void;
+}) {
+  return (
+    <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-[#f5f0e8] p-6 text-center text-[#3d3630]">
+      <p className="max-w-md text-base leading-relaxed">
+        {ESTATE_WORKSPACE_LOAD_RECOVERY}
+      </p>
+      <button
+        type="button"
+        onClick={onRetry}
+        className="rounded-full bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white"
+      >
+        Stay here
+      </button>
+    </main>
+  );
+}
+
 /**
- * Loads the companion shell only in the browser. Avoids SSR/hydration of the
- * large client tree.
+ * Loads CompanionPageClient only after auth gate passes — visitors are redirected
+ * to sign-in without pulling the full workspace bundle.
  */
-export function CompanionPageLoader() {
+function AuthenticatedCompanionShell() {
   const [Page, setPage] = useState<ComponentType | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
 
   useLayoutEffect(() => {
     let cancelled = false;
-    void companionPageImport
+    void import("@/app/companion/CompanionPageClient")
       .then((mod) => {
         if (!cancelled) setPage(() => mod.default);
       })
@@ -107,29 +125,26 @@ export function CompanionPageLoader() {
   }, []);
 
   if (loadFailed) {
-    return (
-      <main className="flex min-h-dvh flex-col items-center justify-center gap-3 bg-[#f5f0e8] p-6 text-center text-[#3d3630]">
-        <p className="max-w-md text-base leading-relaxed">
-          {ESTATE_WORKSPACE_LOAD_RECOVERY}
-        </p>
-        <button
-          type="button"
-          onClick={() => window.location.reload()}
-          className="rounded-full bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white"
-        >
-          Stay here
-        </button>
-      </main>
-    );
+    return <WorkspaceLoadRecovery onRetry={() => window.location.reload()} />;
   }
 
   if (!Page) return LOADING;
 
   return (
+    <EstateErrorBoundary>
+      <Page />
+    </EstateErrorBoundary>
+  );
+}
+
+/**
+ * Loads the companion shell only in the browser. Avoids SSR/hydration of the
+ * large client tree.
+ */
+export function CompanionPageLoader() {
+  return (
     <CompanionAuthGate>
-      <EstateErrorBoundary>
-        <Page />
-      </EstateErrorBoundary>
+      <AuthenticatedCompanionShell />
     </CompanionAuthGate>
   );
 }
