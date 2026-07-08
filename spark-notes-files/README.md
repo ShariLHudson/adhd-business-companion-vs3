@@ -49,7 +49,7 @@ Installed copies live in `docs/protocols/` — use those for implementation trac
 | [SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md](SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md) | App wiring requirements | **Implemented** |
 | [SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md](SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md) | CMS / admin workflow | Future |
 | [SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md](SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md) | Authoring standard | Authoring |
-| [SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md](SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md) | Database schema | Future |
+| [SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md](SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md) | Database schema | **Implemented** (`spark-library/`, `contentDatabase/`) |
 | [SPARK_NOTE_SELECTION_INTELLIGENCE_RULES_PROTOCOL.md](SPARK_NOTE_SELECTION_INTELLIGENCE_RULES_PROTOCOL.md) | Advanced selection rules | Partial |
 | [SPARK_NOTE_CARD_TEMPLATE_DESIGN_STANDARD.md](SPARK_NOTE_CARD_TEMPLATE_DESIGN_STANDARD.md) | Visual card template | **Implemented** (`SparkNoteAnchor`, `SparkNoteExpanded`, `spark-note.css`) |
 | [SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md](SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md) | Experience + destination routing | **Implemented** (v1 — `sparkNoteDestinations.ts`, expanded UI) |

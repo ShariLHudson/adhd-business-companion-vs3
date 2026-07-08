@@ -95,6 +95,18 @@ Per [SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md](SPARK_NOTE_COM
 npx vitest run lib/sparkNote
 ```
 
+### Content database
+
+Per [SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md](SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md):
+
+| Layer | Location |
+|-------|----------|
+| JSON records by category | `spark-library/{category}/SPARK-*.json` |
+| Runtime manifest | `spark-library/manifest.json` |
+| Record types + mapping | `lib/sparkNote/contentDatabase/` |
+| Seed / export | `catalogSeed.ts`, `npm run spark-library:export` |
+| Daily selection metadata | `persistence.ts` (`dailyRecords`, `ignoredCategories`) |
+
 ### Future (not v1)
 
 - Admin CMS (`spark-notes-files/SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md`)

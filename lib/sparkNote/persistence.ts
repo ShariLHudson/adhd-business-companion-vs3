@@ -1,10 +1,16 @@
 import type { SparkNoteCategory, SparkNoteReaction } from "./types";
+import type {
+  SparkDailySelectionReason,
+  SparkDailySelectionRecord,
+} from "./contentDatabase/types";
 
 const STORE_KEY = "companion-spark-note-v1";
 
 export type SparkNotePersistenceStore = {
-  /** dayKey -> spark id selected that day */
+  /** dayKey -> spark id selected that day (legacy) */
   dailySelection: Record<string, string>;
+  /** dayKey -> full daily selection record */
+  dailyRecords: Record<string, SparkDailySelectionRecord>;
   /** spark id -> ISO last shown */
   lastShownById: Record<string, string>;
   /** Recent spark ids for rotation avoidance */
@@ -17,6 +23,8 @@ export type SparkNotePersistenceStore = {
   completedIds: string[];
   /** Category/tag affinity from reactions and saves. */
   categoryAffinity: Record<string, number>;
+  /** Categories the user passed on — learning signal */
+  ignoredCategories: Record<string, number>;
   /** spark id → reactions given */
   reactionsBySparkId: Record<string, SparkNoteReaction[]>;
 };
@@ -24,12 +32,14 @@ export type SparkNotePersistenceStore = {
 function emptyStore(): SparkNotePersistenceStore {
   return {
     dailySelection: {},
+    dailyRecords: {},
     lastShownById: {},
     recentIds: [],
     viewedIds: [],
     favoriteIds: [],
     completedIds: [],
     categoryAffinity: {},
+    ignoredCategories: {},
     reactionsBySparkId: {},
   };
 }
@@ -45,12 +55,14 @@ export function readSparkNoteStore(): SparkNotePersistenceStore {
     const parsed = JSON.parse(raw) as Partial<SparkNotePersistenceStore>;
     return {
       dailySelection: parsed.dailySelection ?? {},
+      dailyRecords: parsed.dailyRecords ?? {},
       lastShownById: parsed.lastShownById ?? {},
       recentIds: parsed.recentIds ?? [],
       viewedIds: parsed.viewedIds ?? [],
       favoriteIds: parsed.favoriteIds ?? [],
       completedIds: parsed.completedIds ?? [],
       categoryAffinity: parsed.categoryAffinity ?? {},
+      ignoredCategories: parsed.ignoredCategories ?? {},
       reactionsBySparkId: parsed.reactionsBySparkId ?? {},
     };
   } catch {
@@ -90,6 +102,7 @@ export function getYesterdaySparkId(now = new Date()): string | null {
 export function recordDailySparkSelection(
   sparkId: string,
   now = new Date(),
+  selectedReason: SparkDailySelectionReason = "library",
 ): void {
   const store = readSparkNoteStore();
   const key = dayKey(now);
@@ -97,14 +110,33 @@ export function recordDailySparkSelection(
     sparkId,
     ...store.recentIds.filter((id) => id !== sparkId),
   ].slice(0, 12);
+  const dailyRecords = {
+    ...store.dailyRecords,
+    [key]: {
+      sparkId,
+      date: key,
+      selectedReason,
+      viewed: store.dailyRecords[key]?.viewed ?? false,
+      saved: store.dailyRecords[key]?.saved ?? false,
+    },
+  };
   writeSparkNoteStore({
+    ...store,
     dailySelection: { ...store.dailySelection, [key]: sparkId },
+    dailyRecords,
     lastShownById: {
       ...store.lastShownById,
       [sparkId]: now.toISOString(),
     },
     recentIds: recent,
   });
+}
+
+export function getDailySparkRecord(
+  now = new Date(),
+): SparkDailySelectionRecord | null {
+  const key = dayKey(now);
+  return readSparkNoteStore().dailyRecords[key] ?? null;
 }
 
 export function sparkNoteOnCooldown(
@@ -128,7 +160,12 @@ export function recordSparkNoteViewed(sparkId: string): void {
     sparkId,
     ...store.viewedIds.filter((id) => id !== sparkId),
   ].slice(0, 30);
-  writeSparkNoteStore({ ...store, viewedIds });
+  const key = dayKey();
+  const dailyRecords = { ...store.dailyRecords };
+  if (dailyRecords[key]?.sparkId === sparkId) {
+    dailyRecords[key] = { ...dailyRecords[key]!, viewed: true };
+  }
+  writeSparkNoteStore({ ...store, viewedIds, dailyRecords });
 }
 
 export function recordSparkNoteCompleted(sparkId: string): void {
@@ -186,11 +223,27 @@ export function recordSparkNoteReaction(
     favoriteIds = [sparkId, ...favoriteIds].slice(0, 20);
   }
 
+  const ignoredCategories = { ...store.ignoredCategories };
+  if (reaction === "pass") {
+    ignoredCategories[category] = (ignoredCategories[category] ?? 0) + 1;
+  }
+
+  const key = dayKey();
+  const dailyRecords = { ...store.dailyRecords };
+  if (dailyRecords[key]?.sparkId === sparkId) {
+    dailyRecords[key] = {
+      ...dailyRecords[key]!,
+      saved: reaction === "save" || dailyRecords[key]!.saved,
+    };
+  }
+
   writeSparkNoteStore({
     ...store,
     categoryAffinity,
     reactionsBySparkId,
     favoriteIds,
+    ignoredCategories,
+    dailyRecords,
   });
 }
 

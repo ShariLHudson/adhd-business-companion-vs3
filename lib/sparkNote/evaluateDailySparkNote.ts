@@ -207,14 +207,14 @@ export function evaluateDailySparkNote(
 
   const personalCard = resolvePersonalSpark(personal);
   if (personalCard) {
-    recordDailySparkSelection(personalCard.id, now);
+    recordDailySparkSelection(personalCard.id, now, "personal");
     return { card: personalCard };
   }
 
   const card = resolveFromCatalog(now, region);
   if (!card) return { card: null };
 
-  recordDailySparkSelection(card.id, now);
+  recordDailySparkSelection(card.id, now, card.source);
   return { card };
 }
 
