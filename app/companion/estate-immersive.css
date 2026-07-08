@@ -137,3 +137,11 @@
     transform: none;
   }
 }
+
+.companion-root[data-estate-room-chat-visible="false"]:not([data-just-be-here])
+  [data-companion-chat-layer="true"] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  transform: translateY(0.35rem);
+}

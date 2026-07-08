@@ -10,8 +10,13 @@ export type EstateTopRightChromeProps = {
   showProfile: boolean;
   showRoom: boolean;
   roomId: string | null;
+  chatVisible: boolean;
+  soundEnabled?: boolean;
   onEstateMenuAction: (actionId: EstateMenuActionId) => void;
-  onJustBeHere: () => void;
+  onToggleChat: () => void;
+  onToggleSound?: () => void;
+  onReturnToRoom: () => void;
+  onBackToEstate: () => void;
   onWander?: () => void;
 };
 
@@ -23,8 +28,13 @@ export function EstateTopRightChrome({
   showProfile,
   showRoom,
   roomId,
+  chatVisible,
+  soundEnabled,
   onEstateMenuAction,
-  onJustBeHere,
+  onToggleChat,
+  onToggleSound,
+  onReturnToRoom,
+  onBackToEstate,
   onWander,
 }: EstateTopRightChromeProps) {
   const [mounted, setMounted] = useState(false);
@@ -40,7 +50,12 @@ export function EstateTopRightChrome({
         <EstateRoomExperienceMenu
           embedded
           roomId={roomId}
-          onJustBeHere={onJustBeHere}
+          chatVisible={chatVisible}
+          soundEnabled={soundEnabled}
+          onToggleChat={onToggleChat}
+          onToggleSound={onToggleSound}
+          onReturnToRoom={onReturnToRoom}
+          onBackToEstate={onBackToEstate}
           onWander={onWander}
         />
       ) : null}

@@ -155,6 +155,19 @@ export function resolveWanderRoomDisplayName(
   legacyPlaceId: string,
 ): string {
   const fromManifest = getPlaceById(legacyPlaceId);
+  if (fromManifest?.display_name) return fromManifest.display_name;
   if (fromManifest?.official_name) return fromManifest.official_name;
   return legacyPlaceId;
+}
+
+/** Ensure wander pick uses one manifest record for name, image, and route. */
+export function validateWanderPick(pick: EstateWanderPick): boolean {
+  const { place, legacyPlaceId, manifestPlaceId } = pick;
+  if (place.place_id !== manifestPlaceId) return false;
+  if (place.legacy_place_id !== legacyPlaceId) return false;
+  if (!place.official_name?.trim()) return false;
+  if (!place.route?.trim()) return false;
+  if (!place.primary_image?.trim()) return false;
+  const resolved = getPlaceById(legacyPlaceId);
+  return resolved?.place_id === place.place_id;
 }

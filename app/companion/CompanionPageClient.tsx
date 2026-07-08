@@ -20,7 +20,6 @@ import {
 import { EstateTopRightChrome } from "@/components/companion/estate/EstateTopRightChrome";
 import { SparkEstateGuideChrome } from "@/components/companion/SparkEstateGuideChrome";
 import { SparkNoteChrome } from "@/components/companion/SparkNoteChrome";
-import { EnjoyEstateVisitorChrome } from "@/components/companion/estate/EnjoyEstateVisitorChrome";
 import { estateArrivalShariGreeting } from "@/lib/estate/estateArrivalExperience";
 import { getEstateMemory } from "@/lib/estateMemory/estateMemoryStore";
 import { SparkEstateShell } from "@/components/companion/estate/SparkEstateShell";
@@ -1296,6 +1295,7 @@ import { estateNavigateCommandForPlace } from "@/lib/estateIntelligence/estateCo
 import {
   pickWanderDestination,
   recordWanderTransition,
+  validateWanderPick,
 } from "@/lib/estate/manifest/estateWanderMode";
 import type {
   ImmediateCreateOpenPayload,
@@ -2699,6 +2699,7 @@ export default function CompanionPageClient() {
   >(null);
   const [justBeHereChatVisible, setJustBeHereChatVisible] = useState(false);
   const [justBeHereSoundEnabled, setJustBeHereSoundEnabled] = useState(false);
+  const [estateRoomChatVisible, setEstateRoomChatVisible] = useState(true);
   const justBeHereEnterTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
     null,
   );
@@ -7880,9 +7881,40 @@ export default function CompanionPageClient() {
     setJustBeHereChatVisible((visible) => !visible);
   }
 
+  function toggleEstateRoomChat() {
+    if (justBeHereSession) {
+      toggleJustBeHereChat();
+      return;
+    }
+    setEstateRoomChatVisible((visible) => !visible);
+  }
+
+  function returnToCurrentRoomView() {
+    if (justBeHereSession) {
+      clearJustBeHereMode();
+      return;
+    }
+    if (
+      overlay === "settings" ||
+      overlay === "profile" ||
+      overlay === "growth-profile"
+    ) {
+      setOverlay(null);
+      setSettingsSection(null);
+      return;
+    }
+    if (planMyDayDrawerOpen) {
+      setPlanMyDayDrawerOpen(false);
+    }
+  }
+
+  function navigateBackToEstateHome() {
+    returnFromJustBeHere();
+  }
+
   function handleEstateWander(fromRoomId: string) {
     const pick = pickWanderDestination(fromRoomId);
-    if (!pick) return;
+    if (!pick || !validateWanderPick(pick)) return;
 
     const command = estateNavigateCommandForPlace(pick.legacyPlaceId, "wander");
     if (!command) return;
@@ -17933,10 +17965,12 @@ export default function CompanionPageClient() {
     presenceRoomId: estatePresenceRoomId,
     fallbackRoomId: welcomeHomePrimary ? "welcome-home" : null,
   });
+  const roomMenuRoomId = justBeHereSession?.roomId ?? estateExperienceMenuRoomId;
+  const roomMenuChatVisible = justBeHereSession
+    ? justBeHereChatVisible
+    : estateRoomChatVisible;
   const showEstateExperienceMenu =
-    overlay !== "signin" &&
-    !justBeHereSession &&
-    Boolean(estateExperienceMenuRoomId);
+    overlay !== "signin" && Boolean(roomMenuRoomId);
 
   const handleCompanionBack = () => {
     if (
@@ -18042,6 +18076,9 @@ export default function CompanionPageClient() {
       data-just-be-here--active={justBeHerePhase === "active" ? "" : undefined}
       data-just-be-here-chat-visible={
         justBeHereChatVisible ? "true" : undefined
+      }
+      data-estate-room-chat-visible={
+        roomMenuChatVisible ? "true" : "false"
       }
       {...constitutionalRenderContext.environment.dataAttributes}
       {...constitutionalRenderContext.presence.dataAttributes}
@@ -19860,31 +19897,24 @@ export default function CompanionPageClient() {
       <EstateTopRightChrome
         showProfile={showGlobalEstateMenu}
         showRoom={showEstateExperienceMenu}
-        roomId={estateExperienceMenuRoomId}
+        roomId={roomMenuRoomId}
+        chatVisible={roomMenuChatVisible}
         onEstateMenuAction={handleEstateMenuAction}
-        onJustBeHere={() => {
-          if (estateExperienceMenuRoomId) {
-            enterJustBeHere(estateExperienceMenuRoomId);
-          }
-        }}
+        onToggleChat={toggleEstateRoomChat}
+        onToggleSound={
+          justBeHereSession ? toggleJustBeHereSound : undefined
+        }
+        soundEnabled={
+          justBeHereSession ? justBeHereSoundEnabled : undefined
+        }
+        onReturnToRoom={returnToCurrentRoomView}
+        onBackToEstate={navigateBackToEstateHome}
         onWander={() => {
-          if (estateExperienceMenuRoomId) {
-            handleEstateWander(estateExperienceMenuRoomId);
+          if (roomMenuRoomId) {
+            handleEstateWander(roomMenuRoomId);
           }
         }}
       />
-      {justBeHereSession ? (
-        <EnjoyEstateVisitorChrome
-          soundEnabled={justBeHereSoundEnabled}
-          soundAvailable={Boolean(
-            resolveEstatePlaceAmbientProfile(justBeHereSession.roomId),
-          )}
-          chatVisible={justBeHereChatVisible}
-          onReturnToEstate={returnFromJustBeHere}
-          onToggleChat={toggleJustBeHereChat}
-          onToggleSound={toggleJustBeHereSound}
-        />
-      ) : null}
     </div>
     </CompanionDeskProvider>
   );

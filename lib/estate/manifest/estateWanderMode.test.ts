@@ -9,6 +9,7 @@ import {
   pickWanderFromPool,
   recordWanderTransition,
   saveWanderRecentManifestPlaceIds,
+  validateWanderPick,
 } from "./estateWanderMode";
 import { getPlaceById } from "./estatePlaceMasterManifest";
 
@@ -71,5 +72,17 @@ describe("estateWanderMode", () => {
     expect(pick).not.toBeNull();
     expect(pick!.legacyPlaceId).not.toBe("butterfly-house");
     expect(pick!.place.primary_image).toBeTruthy();
+    expect(validateWanderPick(pick!)).toBe(true);
+  });
+
+  it("rejects wander picks with inconsistent manifest identity", () => {
+    const pick = pickWanderDestination("butterfly-house", () => 0.42);
+    expect(pick).not.toBeNull();
+    expect(
+      validateWanderPick({
+        ...pick!,
+        manifestPlaceId: "INVALID-PLACE",
+      }),
+    ).toBe(false);
   });
 });

@@ -9,6 +9,10 @@ import {
 import { subscribeEstateAudioSettings } from "@/lib/estate/estateAudioSettings";
 import { stopAllEstateEnvironmentalAudio } from "@/lib/estate/estateEnvironmentalAudio";
 import {
+  isEstateBrowserFullscreen,
+  toggleEstateBrowserFullscreen,
+} from "@/lib/estate/estateBrowserFullscreen";
+import {
   ESTATE_CHROME_IDLE_HINT_FULLSCREEN,
   ESTATE_ROOM_MENU_FULLSCREEN_IDLE_MS,
 } from "@/lib/estate/justBeHere";
@@ -24,42 +28,68 @@ export type EstateRoomExperienceMenuProps = {
   withEstateMenu?: boolean;
   /** When true, render inline inside EstateTopRightChrome (no separate portal). */
   embedded?: boolean;
-  onJustBeHere: () => void;
+  chatVisible: boolean;
+  onToggleChat: () => void;
+  onToggleSound?: () => void;
+  soundEnabled?: boolean;
+  onReturnToRoom: () => void;
+  onBackToEstate: () => void;
   /** Manifest wander — pick another Live estate place. */
   onWander?: () => void;
 };
 
 /**
- * One Room button — tap to reveal sound + Just Be Here™ underneath.
- * In browser fullscreen, fades after idle with a gentle return hint.
+ * Room button — one doorway for room identity, experience controls, and estate navigation.
+ * @see spark-notes-files/ESTATE_ROOM_BUTTON_AND_WANDER_NAVIGATION_SPECIFICATION.md
  */
 export function EstateRoomExperienceMenu({
   roomId,
   visible = true,
   withEstateMenu = false,
   embedded = false,
-  onJustBeHere,
+  chatVisible,
+  onToggleChat,
+  onToggleSound,
+  soundEnabled: soundEnabledProp,
+  onReturnToRoom,
+  onBackToEstate,
   onWander,
 }: EstateRoomExperienceMenuProps) {
   const [mounted, setMounted] = useState(false);
   const [open, setOpen] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(false);
+  const [fullscreen, setFullscreen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const profile = resolveEstatePlaceAmbientProfile(roomId);
   const soundAvailable = Boolean(profile);
   const placeDisplayName = resolveWanderRoomDisplayName(roomId);
 
-  const { fullscreen, faded, bumpVisibility } = useIdleChromeReveal({
-    fullscreenIdleMs: ESTATE_ROOM_MENU_FULLSCREEN_IDLE_MS,
-    onlyWhenFullscreen: true,
-  });
+  const { fullscreen: browserFullscreen, faded, bumpVisibility } =
+    useIdleChromeReveal({
+      fullscreenIdleMs: ESTATE_ROOM_MENU_FULLSCREEN_IDLE_MS,
+      onlyWhenFullscreen: true,
+    });
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    const sync = () => setSoundEnabled(isEstateAmbienceEnabled());
-    sync();
-    return subscribeEstateAudioSettings(sync);
+    const syncSound = () => {
+      if (soundEnabledProp !== undefined) {
+        setSoundEnabled(soundEnabledProp);
+        return;
+      }
+      setSoundEnabled(isEstateAmbienceEnabled());
+    };
+    syncSound();
+    if (soundEnabledProp !== undefined) return;
+    return subscribeEstateAudioSettings(syncSound);
+  }, [soundEnabledProp]);
+
+  useEffect(() => {
+    const syncFullscreen = () => setFullscreen(isEstateBrowserFullscreen());
+    syncFullscreen();
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreen);
   }, []);
 
   useEffect(() => {
@@ -86,7 +116,17 @@ export function EstateRoomExperienceMenu({
     };
   }, [open]);
 
+  const closeAndRun = useCallback((action: () => void) => {
+    setOpen(false);
+    bumpVisibility();
+    action();
+  }, [bumpVisibility]);
+
   const toggleSound = useCallback(() => {
+    if (onToggleSound) {
+      onToggleSound();
+      return;
+    }
     if (soundEnabled) {
       setEstateAmbienceEnabled(false);
       setSoundEnabled(false);
@@ -97,7 +137,12 @@ export function EstateRoomExperienceMenu({
     setEstateAmbienceEnabled(true);
     setSoundEnabled(true);
     kickstartEstateRoomAmbience(roomId, profile);
-  }, [soundEnabled, profile, roomId]);
+  }, [onToggleSound, soundEnabled, profile, roomId]);
+
+  const toggleFullscreen = useCallback(async () => {
+    await toggleEstateBrowserFullscreen();
+    setFullscreen(isEstateBrowserFullscreen());
+  }, []);
 
   if (!mounted || !visible) return null;
 
@@ -112,14 +157,14 @@ export function EstateRoomExperienceMenu({
         embedded ? "estate-room-experience-menu--embedded" : "",
         soundEnabled ? "estate-room-experience-menu--sound-on" : "",
         open ? "estate-room-experience-menu--open" : "",
-        fullscreen ? "estate-room-experience-menu--fullscreen" : "",
+        browserFullscreen ? "estate-room-experience-menu--fullscreen" : "",
         faded ? "estate-room-experience-menu--faded" : "",
       ]
         .filter(Boolean)
         .join(" ")}
       data-testid="estate-room-experience-menu"
-      onMouseMove={fullscreen ? bumpVisibility : undefined}
-      onTouchStart={fullscreen ? bumpVisibility : undefined}
+      onMouseMove={browserFullscreen ? bumpVisibility : undefined}
+      onTouchStart={browserFullscreen ? bumpVisibility : undefined}
     >
       {faded ? (
         <button
@@ -134,55 +179,56 @@ export function EstateRoomExperienceMenu({
         </button>
       ) : (
         <>
-          <div className="estate-room-experience-menu__place-stack">
-            <button
-              type="button"
-              className="estate-room-experience-menu__trigger"
-              aria-expanded={open}
-              aria-haspopup="menu"
-              aria-label={
-                soundEnabled
-                  ? `${placeDisplayName} — sound on`
-                  : `${placeDisplayName} — room options`
-              }
-              title={placeDisplayName}
-              onClick={() => {
-                bumpVisibility();
-                setOpen((value) => !value);
-              }}
-            >
-              <span className="estate-room-experience-menu__trigger-icons" aria-hidden>
-                <span>🎵</span>
-                <span>🖼</span>
-              </span>
-              <span className="estate-room-experience-menu__trigger-label">
-                {placeDisplayName}
-              </span>
-            </button>
-            {onWander ? (
-              <button
-                type="button"
-                className="estate-room-experience-menu__wander"
-                aria-label="Wander to another Estate place"
-                data-testid="estate-wander-button"
-                onClick={() => {
-                  bumpVisibility();
-                  setOpen(false);
-                  onWander();
-                }}
-              >
-                Wander
-              </button>
-            ) : null}
-          </div>
+          <button
+            type="button"
+            className="estate-room-experience-menu__trigger"
+            aria-expanded={open}
+            aria-haspopup="menu"
+            aria-label={`${placeDisplayName} — room menu`}
+            title={placeDisplayName}
+            onClick={() => {
+              bumpVisibility();
+              setOpen((value) => !value);
+            }}
+          >
+            <span className="estate-room-experience-menu__trigger-label">
+              {placeDisplayName}
+            </span>
+            <span className="estate-room-experience-menu__trigger-chevron" aria-hidden>
+              ▼
+            </span>
+          </button>
 
           {open ? (
             <div
               className="estate-room-experience-menu__panel"
               role="menu"
-              aria-label="Room choices"
+              aria-label="Room menu"
               data-testid="estate-room-quick-choices"
             >
+              <p className="estate-room-experience-menu__section-label">
+                Experience controls
+              </p>
+              <button
+                type="button"
+                role="menuitem"
+                className={[
+                  "estate-room-experience-menu__item",
+                  chatVisible ? "estate-room-experience-menu__item--active" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                aria-pressed={chatVisible}
+                data-testid="estate-room-chat-toggle"
+                onClick={() => closeAndRun(onToggleChat)}
+              >
+                <span className="estate-room-experience-menu__item-icon" aria-hidden>
+                  💬
+                </span>
+                <span className="estate-room-experience-menu__item-label">
+                  {chatVisible ? "Chat on" : "Chat off"}
+                </span>
+              </button>
               {soundAvailable ? (
                 <button
                   type="button"
@@ -194,7 +240,8 @@ export function EstateRoomExperienceMenu({
                     .filter(Boolean)
                     .join(" ")}
                   aria-pressed={soundEnabled}
-                  onClick={toggleSound}
+                  data-testid="estate-room-sound-toggle"
+                  onClick={() => closeAndRun(toggleSound)}
                 >
                   <span className="estate-room-experience-menu__item-icon" aria-hidden>
                     🎵
@@ -207,19 +254,76 @@ export function EstateRoomExperienceMenu({
               <button
                 type="button"
                 role="menuitem"
-                className="estate-room-experience-menu__item estate-room-experience-menu__item--presence"
+                className={[
+                  "estate-room-experience-menu__item",
+                  fullscreen ? "estate-room-experience-menu__item--active" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
+                aria-pressed={fullscreen}
+                data-testid="estate-room-fullscreen-toggle"
                 onClick={() => {
-                  setOpen(false);
-                  onJustBeHere();
+                  void closeAndRun(() => {
+                    void toggleFullscreen();
+                  });
                 }}
               >
                 <span className="estate-room-experience-menu__item-icon" aria-hidden>
-                  🌿
+                  {fullscreen ? "⤡" : "⛶"}
                 </span>
                 <span className="estate-room-experience-menu__item-label">
-                  Enjoy the Estate
+                  {fullscreen ? "Full screen on" : "Full screen off"}
                 </span>
               </button>
+              <button
+                type="button"
+                role="menuitem"
+                className="estate-room-experience-menu__item"
+                data-testid="estate-room-return-to-room"
+                onClick={() => closeAndRun(onReturnToRoom)}
+              >
+                <span className="estate-room-experience-menu__item-icon" aria-hidden>
+                  🖼
+                </span>
+                <span className="estate-room-experience-menu__item-label">
+                  Return to room
+                </span>
+              </button>
+
+              <p className="estate-room-experience-menu__section-label estate-room-experience-menu__section-label--nav">
+                Estate navigation
+              </p>
+              <button
+                type="button"
+                role="menuitem"
+                className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                data-testid="estate-back-to-estate"
+                onClick={() => closeAndRun(onBackToEstate)}
+              >
+                <span className="estate-room-experience-menu__item-icon" aria-hidden>
+                  🏠
+                </span>
+                <span className="estate-room-experience-menu__item-label">
+                  Back to Estate
+                </span>
+              </button>
+              {onWander ? (
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="estate-room-experience-menu__item estate-room-experience-menu__item--nav"
+                  aria-label="Wander to another Estate place"
+                  data-testid="estate-wander-button"
+                  onClick={() => closeAndRun(onWander)}
+                >
+                  <span className="estate-room-experience-menu__item-icon" aria-hidden>
+                    🌿
+                  </span>
+                  <span className="estate-room-experience-menu__item-label">
+                    Wander
+                  </span>
+                </button>
+              ) : null}
             </div>
           ) : null}
         </>

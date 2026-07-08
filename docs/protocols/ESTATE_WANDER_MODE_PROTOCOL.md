@@ -6,11 +6,15 @@ Casual exploration of Spark Estate™ from the Room chrome — not a replacement
 
 ## Placement
 
-Under the current room name in `EstateRoomExperienceMenu`:
+Inside the Room button dropdown under **Estate navigation** (not a separate top-bar button).
 
 ```
-Butterfly House™
-      Wander
+[ Garden Estate ▼ ]
+  Experience controls
+  …
+  Estate navigation
+    Back to Estate
+    Wander
 ```
 
 ## Behavior
@@ -22,9 +26,11 @@ Butterfly House™
 
 ## Implementation
 
-- `lib/estate/manifest/estateWanderMode.ts` — selection + `sessionStorage` recent history
-- `components/companion/estate/EstateRoomExperienceMenu.tsx` — Wander button
+- `lib/estate/manifest/estateWanderMode.ts` — selection + `sessionStorage` recent history + `validateWanderPick`
+- `components/companion/estate/EstateRoomExperienceMenu.tsx` — Room dropdown (experience + estate navigation)
 - `EstateTopRightChrome` / `CompanionPageClient` — `onWander` handler
+
+@see [ESTATE_ROOM_BUTTON_AND_WANDER_NAVIGATION_SPECIFICATION.md](ESTATE_ROOM_BUTTON_AND_WANDER_NAVIGATION_SPECIFICATION.md)
 
 ## Rules
 

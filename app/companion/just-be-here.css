@@ -23,10 +23,7 @@
 .companion-root[data-just-be-here] .companion-active-workspace-bar,
 .companion-root[data-just-be-here] .homestead-signpost-sidebar,
 .companion-root[data-just-be-here] .estate-immersive-home-link,
-.companion-root[data-just-be-here] .global-estate-menu,
-.companion-root[data-just-be-here] .estate-top-right-chrome,
 .companion-root[data-just-be-here] .spark-estate-guide-anchor,
-.companion-root[data-just-be-here] .estate-room-experience-menu,
 .companion-root[data-just-be-here] .estate-room-invitation,
 .companion-root[data-just-be-here] .estate-room-ambience-toggle,
 .companion-root[data-just-be-here] [data-estate-visit-chrome],
@@ -35,6 +32,14 @@
   visibility: hidden !important;
   pointer-events: none !important;
   transition: opacity 1.8s ease, visibility 0s linear 1.8s;
+}
+
+.companion-root[data-just-be-here] .estate-top-right-chrome,
+.companion-root[data-just-be-here] .estate-room-experience-menu {
+  opacity: 1 !important;
+  visibility: visible !important;
+  pointer-events: auto !important;
+  transition: opacity 0.35s ease;
 }
 
 .companion-root[data-just-be-here] [data-companion-chat-layer] {
