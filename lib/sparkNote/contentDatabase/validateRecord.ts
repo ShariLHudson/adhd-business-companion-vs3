@@ -1,4 +1,5 @@
 import type { SparkContentRecord } from "./types";
+import { SPARK_MASTER_RECOMMENDED_TAGS } from "./categoryTaxonomy";
 
 export type SparkRecordValidationIssue = {
   field: string;
@@ -8,9 +9,71 @@ export type SparkRecordValidationIssue = {
 
 const SPARK_ID_PATTERN = /^SPARK-[A-Z0-9-]+$/;
 
+/** Master standard quality tests (curiosity, story, connection, simplicity, spark). */
+function runMasterQualityTests(
+  record: SparkContentRecord,
+): SparkRecordValidationIssue[] {
+  const issues: SparkRecordValidationIssue[] = [];
+
+  if (record.short_teaser.trim().length < 20) {
+    issues.push({
+      field: "short_teaser",
+      message: "Curiosity test: teaser may be too short to open the card.",
+      severity: "warning",
+    });
+  }
+
+  if (record.story.trim().length < 80) {
+    issues.push({
+      field: "story",
+      message: "Story test: add more conversational detail (who, what, why).",
+      severity: "warning",
+    });
+  }
+
+  if (!record.spark_application.includes("?")) {
+    issues.push({
+      field: "spark_application",
+      message: "Connection test: end with a reflection question.",
+      severity: "warning",
+    });
+  }
+
+  const storyWords = record.story.split(/\s+/).length;
+  if (storyWords > 180) {
+    issues.push({
+      field: "story",
+      message: "Simplicity test: story may be long for a daily Spark (~180 words max).",
+      severity: "warning",
+    });
+  }
+
+  if (record.impact.trim().length < 40) {
+    issues.push({
+      field: "impact",
+      message: "Spark test: impact should create meaning or inspiration.",
+      severity: "warning",
+    });
+  }
+
+  const knownTags = new Set(
+    SPARK_MASTER_RECOMMENDED_TAGS.map((t) => t.toLowerCase()),
+  );
+  const hasKnownTag = record.tags.some((t) => knownTags.has(t.toLowerCase()));
+  if (!hasKnownTag && record.tags.length > 0) {
+    issues.push({
+      field: "tags",
+      message: `Consider master-standard tags: ${SPARK_MASTER_RECOMMENDED_TAGS.slice(0, 5).join(", ")}…`,
+      severity: "warning",
+    });
+  }
+
+  return issues;
+}
+
 /**
  * Validate a Spark library record per
- * SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md
+ * SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md and admin protocol.
  */
 export function validateSparkRecord(
   record: SparkContentRecord,
@@ -112,6 +175,8 @@ export function validateSparkRecord(
       severity: "warning",
     });
   }
+
+  issues.push(...runMasterQualityTests(record));
 
   return issues;
 }
