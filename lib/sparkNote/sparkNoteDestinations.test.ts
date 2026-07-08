@@ -28,7 +28,12 @@ describe("sparkNoteDestinations", () => {
 
   it("maps destinations to companion routes", () => {
     expect(SPARK_NOTE_DESTINATION_ROUTES.journal).toContain("growth-journal");
-    expect(SPARK_NOTE_DESTINATION_ROUTES.momentum).toContain("momentum-builder");
+    expect(SPARK_NOTE_DESTINATION_ROUTES.momentum).toContain(
+      "chamber-of-momentum",
+    );
+    expect(SPARK_NOTE_DESTINATION_ROUTES["momentum-project"]).toContain(
+      "chamber-of-momentum",
+    );
     expect(SPARK_NOTE_DESTINATION_ROUTES["idea-vault"]).toContain("evidence-bank");
   });
 });

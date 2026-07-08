@@ -11,6 +11,7 @@ import {
   getPlaceById,
   resolveManifestLegacyPlaceId,
 } from "./estatePlaceMasterManifest";
+import { resolveChamberMemberFacingName } from "../chamberOfMomentumIdentity";
 
 const WANDER_RECENT_KEY = "estate-wander-recent-v1";
 const MAX_RECENT = 8;
@@ -154,6 +155,9 @@ export function pickWanderDestination(
 export function resolveWanderRoomDisplayName(
   legacyPlaceId: string,
 ): string {
+  const chamberName = resolveChamberMemberFacingName(legacyPlaceId);
+  if (chamberName) return chamberName;
+
   const fromManifest = getPlaceById(legacyPlaceId);
   if (fromManifest?.display_name) return fromManifest.display_name;
   if (fromManifest?.official_name) return fromManifest.official_name;

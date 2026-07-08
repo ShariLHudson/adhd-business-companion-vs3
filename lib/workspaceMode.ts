@@ -73,7 +73,7 @@ export function supportsWorkspace(section: AppSection): boolean {
 }
 
 export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
-  projects: "Projects",
+  projects: "Chamber of Momentum™",
   "my-work": "Other",
   "content-generator": "Create",
   "google-workspace": "Google Workspace",
@@ -81,7 +81,8 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "saved-work": "Created Content",
   playbook: "Strategies",
   "how-do-i": "How Do I",
-  "momentum-institute": "Momentum Institute™",
+  "momentum-institute": "Chamber of Momentum™",
+  "chamber-of-momentum": "Chamber of Momentum™",
   "brain-dump": "Clear My Mind",
   "time-block": "Momentum Appointments",
   "email-generator": "Email",
@@ -129,8 +130,9 @@ const EXTRA_AREA_TITLES: Partial<Record<AppSection, string>> = {
   games: "Quick Recharge",
   "quick-recharge": "Quick Recharge",
   grow: "Grow",
-  "momentum-builder": "Momentum",
-  "grow-momentum-builders": "Momentum",
+  "momentum-builder": "Chamber of Momentum™",
+  "grow-momentum-builders": "Chamber of Momentum™",
+  "goals-projects": "Chamber of Momentum™",
   "grow-spark-cards": "Spark Cards",
   "grow-guilds": "Guilds",
   "grow-daily-discoveries": "Daily Discoveries",

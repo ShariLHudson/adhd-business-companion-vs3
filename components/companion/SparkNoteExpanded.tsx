@@ -130,7 +130,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
   }
 
   async function handleConnectProject() {
-    await routeToDestination("momentum");
+    await routeToDestination("momentum-project");
   }
 
   const storyText = [card.whatHappened, card.whyInteresting]

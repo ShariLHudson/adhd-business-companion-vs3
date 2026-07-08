@@ -8,6 +8,7 @@ import {
   pickWanderDestination,
   pickWanderFromPool,
   recordWanderTransition,
+  resolveWanderRoomDisplayName,
   saveWanderRecentManifestPlaceIds,
   validateWanderPick,
 } from "./estateWanderMode";
@@ -24,6 +25,23 @@ describe("estateWanderMode", () => {
     expect(places.every((p) => p.navigable && p.status === "Live")).toBe(true);
     expect(places.some((p) => p.legacy_place_id === "butterfly-house")).toBe(
       true,
+    );
+  });
+
+  it("excludes goals-projects from wanderable manifest places", () => {
+    const places = getWanderableManifestPlaces();
+    expect(places.map((p) => p.legacy_place_id)).not.toContain("goals-projects");
+  });
+
+  it("shows Chamber of Momentum for momentum sub-places in room chrome", () => {
+    expect(resolveWanderRoomDisplayName("momentum-institute")).toBe(
+      "Chamber of Momentum™",
+    );
+    expect(resolveWanderRoomDisplayName("momentum-builder")).toBe(
+      "Chamber of Momentum™",
+    );
+    expect(resolveWanderRoomDisplayName("goals-projects")).toBe(
+      "Chamber of Momentum™",
     );
   });
 

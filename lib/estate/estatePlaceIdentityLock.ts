@@ -16,6 +16,10 @@ import {
   NO_CANONICAL_PLACE_SUGGESTIONS_LINE,
   suggestCanonicalPlaceIds,
 } from "./canonicalPlaceSuggestions";
+import {
+  consolidateChamberPlaceIdsForMenu,
+  resolveChamberMemberFacingName,
+} from "./chamberOfMomentumIdentity";
 import { resolveEstateIntent } from "./estateIntentBridge";
 import { isPlaceSuggestionRequest, resolveEstatePlace } from "./resolveEstatePlace";
 
@@ -215,6 +219,8 @@ export const INVENTED_ESTATE_PLACE_PATTERNS: readonly RegExp[] = [
 ];
 
 export function canonicalPlaceOfficialName(placeId: string): string | null {
+  const chamberName = resolveChamberMemberFacingName(placeId);
+  if (chamberName) return chamberName;
   return getCanonicalEstatePlaceById(placeId)?.officialName ?? null;
 }
 
@@ -337,7 +343,9 @@ export function formatEstatePlaceSuggestionMenu(
   placeIds: readonly string[],
   opts?: { intro?: string; closer?: string },
 ): string {
-  const ordered = pinQuietSuggestionOrder(placeIds);
+  const ordered = pinQuietSuggestionOrder(
+    consolidateChamberPlaceIdsForMenu(placeIds),
+  );
   const places = ordered
     .map((id) => getCanonicalEstatePlaceById(id))
     .filter((p): p is NonNullable<typeof p> => Boolean(p))

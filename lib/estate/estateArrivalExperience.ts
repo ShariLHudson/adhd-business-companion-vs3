@@ -46,13 +46,24 @@ export const ESTATE_ARRIVAL_TOTAL_MS =
   ESTATE_ARRIVAL_HOLD_MS +
   ESTATE_ARRIVAL_TITLE_FADE_OUT_MS;
 
+const CHAMBER_ARRIVAL = {
+  title: "Chamber of Momentum™",
+  motto: "Turn ideas, challenges, and goals into forward movement.",
+  shariGreeting: "What would you like to move forward today?",
+  invitationAfterArrival: true,
+} as const;
+
 const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomId">> = {
+  "chamber-of-momentum": {
+    ...CHAMBER_ARRIVAL,
+    ambience: {
+      src: HALL_OF_REFLECTIONS_AMBIENCE_MP3,
+      volume: 0.14,
+      character: "soft library ambience, page turns, quiet footsteps",
+    },
+  },
   "momentum-institute": {
-    title: "Momentum Institute™",
-    motto: "Developing Better Entrepreneurs.",
-    shariGreeting:
-      "What would you like to do while we're here?",
-    invitationAfterArrival: true,
+    ...CHAMBER_ARRIVAL,
     ambience: {
       src: HALL_OF_REFLECTIONS_AMBIENCE_MP3,
       volume: 0.14,
@@ -208,15 +219,19 @@ const ARRIVAL_BY_ROOM: Record<string, Omit<EstateArrivalExperienceConfig, "roomI
     },
   },
   "momentum-builder": {
-    title: "Momentum Builder™",
-    motto: "One Honest Next Step.",
-    shariGreeting:
-      "What would you like to do while we're here?",
-    invitationAfterArrival: true,
+    ...CHAMBER_ARRIVAL,
     ambience: {
       src: BRIGHT_STUDIO_AMBIENCE_MP3,
       volume: 0.1,
       character: "morning studio calm",
+    },
+  },
+  "goals-projects": {
+    ...CHAMBER_ARRIVAL,
+    ambience: {
+      src: BRIGHT_STUDIO_AMBIENCE_MP3,
+      volume: 0.1,
+      character: "focused planning studio",
     },
   },
   journal: {

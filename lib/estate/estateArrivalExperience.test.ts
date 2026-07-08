@@ -17,12 +17,12 @@ describe("Estate Arrival Experience™", () => {
     expect(config?.ambience?.src).toBeTruthy();
   });
 
-  it("resolves momentum institute from library alias", () => {
+  it("resolves Chamber of Momentum from momentum institute entry", () => {
     const config = resolveEstateArrivalExperience("momentum-institute");
-    expect(config?.title).toBe("Momentum Institute™");
-    expect(config?.motto).toBe("Developing Better Entrepreneurs.");
+    expect(config?.title).toBe("Chamber of Momentum™");
+    expect(config?.motto).toContain("forward movement");
     expect(config?.shariGreeting).toBe(
-      "What would you like to do while we're here?",
+      "What would you like to move forward today?",
     );
   });
 

@@ -56,6 +56,8 @@ Installed copies live in `docs/protocols/` — use those for implementation trac
 | [SPARK_NOTE_CARD_TEMPLATE_DESIGN_STANDARD.md](SPARK_NOTE_CARD_TEMPLATE_DESIGN_STANDARD.md) | Visual card template | **Implemented** (`SparkNoteAnchor`, `SparkNoteExpanded`, `spark-note.css`) |
 | [SPARK_CARD_COLLAPSED_VISUAL_DESIGN_FIX.md](SPARK_CARD_COLLAPSED_VISUAL_DESIGN_FIX.md) | Collapsed companion object (not banner) | **Implemented** — [protocol copy](../docs/protocols/SPARK_CARD_COLLAPSED_VISUAL_DESIGN_FIX.md) |
 | [SPARK_CARD_EXPANDED_EXPERIENCE_CORRECTION.md](SPARK_CARD_EXPANDED_EXPERIENCE_CORRECTION.md) | Lightweight expanded card UX | **Implemented** — [protocol copy](../docs/protocols/SPARK_CARD_EXPANDED_EXPERIENCE_CORRECTION.md) |
+| [CHAMBER_OF_MOMENTUM_IDENTITY_CONSOLIDATION_FIX_PHASE1.md](CHAMBER_OF_MOMENTUM_IDENTITY_CONSOLIDATION_FIX_PHASE1.md) | Chamber umbrella identity | **Implemented** — [protocol copy](../docs/protocols/CHAMBER_OF_MOMENTUM_IDENTITY_CONSOLIDATION_FIX_PHASE1.md) |
+| [CHAMBER_OF_MOMENTUM_ROUTING_AND_EXPERIENCE_ALIGNMENT_PHASE2.md](CHAMBER_OF_MOMENTUM_ROUTING_AND_EXPERIENCE_ALIGNMENT_PHASE2.md) | Chamber entry + intent routing | **Implemented** — [protocol copy](../docs/protocols/CHAMBER_OF_MOMENTUM_ROUTING_AND_EXPERIENCE_ALIGNMENT_PHASE2.md) |
 | [SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md](SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md) | Experience + destination routing | **Implemented** (v1 — `sparkNoteDestinations.ts`, expanded UI) |
 
 ---

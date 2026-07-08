@@ -1,13 +1,20 @@
 import type { SparkNoteDailyCard } from "./types";
+import { stageChamberMomentumIntent } from "@/lib/estate/chamberOfMomentumRouting";
 
 /** Companion routes for Spark Note optional actions (per routing spec). */
-export type SparkNoteDestination = "idea-vault" | "journal" | "momentum";
+export type SparkNoteDestination =
+  | "idea-vault"
+  | "journal"
+  | "momentum"
+  | "momentum-project";
 
 export const SPARK_NOTE_DESTINATION_ROUTES: Record<SparkNoteDestination, string> = {
   /** Idea Vault — remember this (Evidence Vault™ until dedicated Idea Vault ships). */
   "idea-vault": "/companion?section=evidence-bank",
   journal: "/companion?section=growth-journal",
-  momentum: "/companion?section=momentum-builder",
+  /** Chamber doorway — system routes to Learn / Build / Execute. */
+  momentum: "/companion?section=chamber-of-momentum",
+  "momentum-project": "/companion?section=chamber-of-momentum",
 };
 
 export const SPARK_NOTE_CLIPBOARD_KEY = "spark-note-pending-clipboard";
@@ -44,5 +51,11 @@ export function navigateToSparkDestination(
 ): void {
   if (typeof window === "undefined") return;
   stageSparkNoteClipboard(clipboard);
+  if (destination === "momentum") {
+    stageChamberMomentumIntent("build");
+  }
+  if (destination === "momentum-project") {
+    stageChamberMomentumIntent("execute");
+  }
   window.location.assign(SPARK_NOTE_DESTINATION_ROUTES[destination]);
 }

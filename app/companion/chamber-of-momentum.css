@@ -1,0 +1,46 @@
+.chamber-entry__header {
+  margin-bottom: 0.35rem;
+}
+
+.chamber-entry__prompt {
+  max-width: 28rem;
+}
+
+.chamber-entry__option {
+  text-align: left;
+}
+
+.chamber-entry__internal {
+  margin-top: 1.25rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(201, 162, 39, 0.22);
+}
+
+.chamber-entry__internal-label {
+  margin: 0 0 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgba(26, 61, 92, 0.72);
+}
+
+.chamber-entry__internal-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chamber-entry__internal-btn {
+  padding: 0.32rem 0.55rem;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 999px;
+  background: rgba(255, 252, 245, 0.72);
+  font-size: 0.72rem;
+  color: #1a3d5c;
+  cursor: pointer;
+}
+
+.chamber-entry__internal-btn:hover {
+  background: rgba(255, 255, 255, 0.92);
+}

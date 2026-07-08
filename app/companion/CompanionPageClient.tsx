@@ -97,6 +97,7 @@ const VisualFocusWorkspacePanel = dynamic(
 import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawer";
 import { EstateCollectionRoomPanel } from "@/components/estate-collection";
 import { GrowLandingPanel } from "@/components/companion/GrowLandingPanel";
+import { ChamberOfMomentumEntryPanel } from "@/components/companion/chamber/ChamberOfMomentumEntryPanel";
 import { GrowthJournalPanel } from "@/components/companion/GrowthJournalPanel";
 import { MomentumBuilderRoomPanel } from "@/components/companion/MomentumBuilderRoomPanel";
 import { MomentumInstituteRoomPanel } from "@/components/companion/momentumInstitute/MomentumInstituteRoomPanel";
@@ -1347,6 +1348,11 @@ import {
   isMomentumInstituteSection,
 } from "@/lib/momentumInstitute/room/instituteRoomRegistry";
 import {
+  chamberMomentumIntentSection,
+  consumeChamberMomentumIntent,
+  type ChamberMomentumIntent,
+} from "@/lib/estate/chamberOfMomentumRouting";
+import {
   STABLES_ROOM_BG,
   isStablesSection,
   stablesRoomHintForChat,
@@ -2288,6 +2294,14 @@ export default function CompanionPageClient() {
       previousMomentumPathIdRef.current = path.id;
     }
   }, [momentumBuilderPrimary, momentumBuilderRoomExperience?.todaysPath]);
+
+  useEffect(() => {
+    if (activeSection !== "chamber-of-momentum") return;
+    const pendingIntent = consumeChamberMomentumIntent();
+    if (!pendingIntent) return;
+    routeChamberMomentumIntentCore(pendingIntent);
+  }, [activeSection]);
+
   const intelligenceIdle = isIdle && !workspaceActiveBeside;
   const homeCalm =
     activeSection === "home" &&
@@ -7396,6 +7410,28 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore("momentum-institute");
   }
 
+  function openChamberOfMomentumCore() {
+    pauseActiveArtifactIfLeavingCreate("chamber-of-momentum");
+    pushGrowBackLabel();
+    preloadRoomBackground(MOMENTUM_INSTITUTE_ROOM_BG);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore("chamber-of-momentum");
+  }
+
+  function routeChamberMomentumIntentCore(intent: ChamberMomentumIntent) {
+    const section = chamberMomentumIntentSection(intent);
+    if (section === "momentum-institute") {
+      openMomentumInstituteRoomCore();
+      return;
+    }
+    if (section === "momentum-builder") {
+      openMomentumBuilderRoomCore();
+      return;
+    }
+    openStandaloneFocusSectionCore("projects");
+  }
+
   function openStablesRoomCore() {
     pauseActiveArtifactIfLeavingCreate("stables");
     pushGrowBackLabel();
@@ -7424,6 +7460,10 @@ export default function CompanionPageClient() {
   );
 
   function openSectionFromUrlCore(section: AppSection) {
+    if (section === "chamber-of-momentum") {
+      openChamberOfMomentumCore();
+      return;
+    }
     if (section === "grow-momentum-builders" || section === "momentum-builder") {
       openMomentumBuilderRoomCore();
       return;
@@ -19294,6 +19334,13 @@ export default function CompanionPageClient() {
             <GrowLandingPanel
               onBack={goBack}
               onOpenSection={(section) => openGrowSectionCore(section)}
+            />
+          )}
+
+          {activeSection === "chamber-of-momentum" && (
+            <ChamberOfMomentumEntryPanel
+              onBack={goBack}
+              onSelectIntent={routeChamberMomentumIntentCore}
             />
           )}
 

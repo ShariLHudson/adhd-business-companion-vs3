@@ -3,6 +3,7 @@
  */
 
 import { getCanonicalEstatePlaceById } from "./canonicalEstateRegistry";
+import { resolveChamberMemberFacingName } from "./chamberOfMomentumIdentity";
 
 const RECIPE_RE =
   /\b(?:recipe|bake|baking|cook|cooking|apple\s+pie|pie\s+recipe)\b/i;
@@ -31,6 +32,8 @@ export function isGalleryPlaceId(placeId?: string | null): boolean {
 }
 
 export function memberFacingPlaceName(placeId: string): string {
+  const chamberName = resolveChamberMemberFacingName(placeId);
+  if (chamberName) return chamberName.replace(/™/g, "");
   const canonical = getCanonicalEstatePlaceById(placeId);
   if (canonical) return canonical.officialName.replace(/™/g, "");
   return placeId;
