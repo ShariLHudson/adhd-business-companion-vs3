@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-HIST-002",
+  "title": "The Birth of the Internet",
+  "category": "History",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A small message helped begin a connected world.",
+  "story": "On October 29, 1969, the first message was sent between two computers on ARPANET, an early foundation of today's internet. The system crashed after only two letters were transmitted, but the experiment represented a huge step forward.",
+  "impact": "Major changes often begin with small first attempts. The first version does not need to be perfect.",
+  "spark_application": "What first step could you take even if it is not the final version?",
+  "tags": [
+    "technology",
+    "innovation",
+    "communication"
+  ],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "10-29"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "history",
+  "category_label": "History",
+  "spark_type": "story",
+  "short_title": "Birth of the Internet",
+  "priority": 85
+}

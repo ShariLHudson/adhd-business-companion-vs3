@@ -1025,79 +1025,154 @@
     "priority": 85
   },
   {
-    "spark_id": "SPARK-HOL-001",
-    "title": "National Donut Day",
-    "category": "Weird & Fun Holidays",
+    "spark_id": "SPARK-HIST-002",
+    "title": "The Birth of the Internet",
+    "category": "History",
     "audience": [
       "Everyone"
     ],
     "image": null,
     "thumbnail": null,
-    "thumbnail_alt": "Donuts",
-    "short_teaser": "A sweet tradition with a surprising origin.",
-    "story": "National Donut Day began in 1938 to honor the Salvation Army 'Donut Lassies' who served donuts to soldiers during World War I. What started as comfort food in the trenches became an annual celebration of small joys.",
-    "impact": "Sometimes the sweetest traditions come from simple acts of care during hard times.",
-    "spark_application": "Who could you surprise with a small treat or kind gesture today?",
-    "tags": [],
+    "short_teaser": "A small message helped begin a connected world.",
+    "story": "On October 29, 1969, the first message was sent between two computers on ARPANET, an early foundation of today's internet. The system crashed after only two letters were transmitted, but the experiment represented a huge step forward.",
+    "impact": "Major changes often begin with small first attempts. The first version does not need to be perfect.",
+    "spark_application": "What first step could you take even if it is not the final version?",
+    "tags": [
+      "technology",
+      "innovation",
+      "communication"
+    ],
     "date_rules": {
       "type": "specific_date",
-      "date": "06-06"
+      "date": "10-29"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "history",
+    "category_label": "History",
+    "spark_type": "story",
+    "short_title": "Birth of the Internet",
+    "priority": 85
+  },
+  {
+    "spark_id": "SPARK-HIST-003",
+    "title": "The First iPhone",
+    "category": "History",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A phone became a pocket-sized computer.",
+    "story": "In 2007, Apple introduced the first iPhone and changed expectations for what a mobile device could do. It combined communication, internet access, music, and applications into one device.",
+    "impact": "Innovation often happens when existing ideas are combined in a new way.",
+    "spark_application": "What ideas could you combine to create something new?",
+    "tags": [
+      "technology",
+      "business",
+      "innovation"
+    ],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "01-09"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "history",
+    "category_label": "History",
+    "spark_type": "story",
+    "short_title": "First iPhone",
+    "priority": 85
+  },
+  {
+    "spark_id": "SPARK-HOL-001",
+    "title": "National Creativity Day",
+    "category": "Holiday",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A day dedicated to the ideas hiding inside every person.",
+    "story": "Creativity is not limited to artists. Every invention, business, solution, and improvement begins with someone imagining a different possibility. National Creativity Day celebrates the act of creating something new.",
+    "impact": "Many people believe creativity belongs only to certain people. In reality, creativity is a skill that grows through curiosity and practice.",
+    "spark_application": "What is one idea you have been waiting to explore?",
+    "tags": [
+      "creativity",
+      "ideas",
+      "imagination"
+    ],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "05-30"
     },
     "tone": "curious",
     "status": "active",
     "runtime_category": "holiday",
-    "category_label": "Weird & Fun Holidays",
-    "priority": 80
+    "category_label": "Holiday",
+    "spark_type": "story",
+    "short_title": "Creativity Day",
+    "priority": 82
   },
   {
     "spark_id": "SPARK-HOL-002",
-    "title": "National Ice Cream Day",
-    "category": "Weird & Fun Holidays",
+    "title": "World Creativity and Innovation Day",
+    "category": "Holiday",
     "audience": [
       "Everyone"
     ],
     "image": null,
     "thumbnail": null,
-    "thumbnail_alt": "Ice cream cone",
-    "short_teaser": "A presidential proclamation for something cold and sweet.",
-    "story": "President Ronald Reagan declared the third Sunday in July as National Ice Cream Day in 1984. Americans consume about 23 gallons of ice cream per person each year — making it one of the most beloved treats in the country.",
-    "impact": "Celebrating small pleasures reminds us that joy doesn't need a grand occasion.",
-    "spark_application": "What simple pleasure could you savor today without guilt or rush?",
-    "tags": [],
+    "short_teaser": "The world changes when someone asks, \"What if?\"",
+    "story": "Innovation often begins with a simple question. What if something could work differently? Across history, inventors, entrepreneurs, and creators have changed the world by challenging assumptions.",
+    "impact": "New ideas create new possibilities. Every business improvement starts with someone seeing an opportunity.",
+    "spark_application": "What is one thing in your life or business you would redesign?",
+    "tags": [
+      "innovation",
+      "creativity",
+      "entrepreneurship"
+    ],
     "date_rules": {
       "type": "specific_date",
-      "date": "07-21"
+      "date": "04-21"
     },
     "tone": "curious",
     "status": "active",
     "runtime_category": "holiday",
-    "category_label": "Weird & Fun Holidays",
-    "priority": 80
+    "category_label": "Holiday",
+    "spark_type": "story",
+    "short_title": "Innovation Day",
+    "priority": 82
   },
   {
     "spark_id": "SPARK-HOL-003",
-    "title": "National Book Lovers Day",
-    "category": "Weird & Fun Holidays",
+    "title": "National Inventors Day",
+    "category": "Holiday",
     "audience": [
       "Everyone"
     ],
     "image": null,
     "thumbnail": null,
-    "thumbnail_alt": "Open book",
-    "short_teaser": "A day to celebrate stories that change us.",
-    "story": "August 9 is National Book Lovers Day — a quiet celebration of reading, discovery, and the worlds we enter through pages. No one knows exactly who started it, which feels fitting for a holiday about getting lost in someone else's words.",
-    "impact": "Books let us live other lives, learn from distant minds, and return changed. A single sentence can shift a perspective.",
-    "spark_application": "What book, article, or story has been waiting for your attention?",
-    "tags": [],
+    "short_teaser": "A day celebrating the people who imagined something different.",
+    "story": "Inventors throughout history solved problems by looking at the world differently. Their ideas often started as simple questions.",
+    "impact": "Innovation begins with curiosity.",
+    "spark_application": "What problem around you deserves a creative solution?",
+    "tags": [
+      "inventions",
+      "creativity",
+      "entrepreneurship"
+    ],
     "date_rules": {
       "type": "specific_date",
-      "date": "08-09"
+      "date": "02-11"
     },
     "tone": "curious",
     "status": "active",
     "runtime_category": "holiday",
-    "category_label": "Weird & Fun Holidays",
-    "priority": 80
+    "category_label": "Holiday",
+    "spark_type": "story",
+    "short_title": "Inventors Day",
+    "priority": 82
   },
   {
     "spark_id": "SPARK-HOL-004",
@@ -1151,6 +1226,156 @@
   },
   {
     "spark_id": "SPARK-HOL-006",
+    "title": "National Puzzle Day",
+    "category": "Weird & Fun Holidays",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Jigsaw puzzle",
+    "short_teaser": "A day for pieces that fit together — eventually.",
+    "story": "January 29 is National Puzzle Day, celebrating jigsaws, crosswords, and brain teasers. Puzzles exercise patience, pattern recognition, and the satisfaction of finding where things belong.",
+    "impact": "Sometimes the best break is something that lets your hands work while your mind unwinds.",
+    "spark_application": "What problem are you trying to solve all at once that might benefit from one piece at a time?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "01-29"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Weird & Fun Holidays",
+    "priority": 80
+  },
+  {
+    "spark_id": "SPARK-HOL-010",
+    "title": "National Donut Day",
+    "category": "Weird & Fun Holidays",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Donuts",
+    "short_teaser": "A sweet tradition with a surprising origin.",
+    "story": "National Donut Day began in 1938 to honor the Salvation Army 'Donut Lassies' who served donuts to soldiers during World War I. What started as comfort food in the trenches became an annual celebration of small joys.",
+    "impact": "Sometimes the sweetest traditions come from simple acts of care during hard times.",
+    "spark_application": "Who could you surprise with a small treat or kind gesture today?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "06-06"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Weird & Fun Holidays",
+    "priority": 80
+  },
+  {
+    "spark_id": "SPARK-HOL-011",
+    "title": "National Ice Cream Day",
+    "category": "Weird & Fun Holidays",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Ice cream cone",
+    "short_teaser": "A presidential proclamation for something cold and sweet.",
+    "story": "President Ronald Reagan declared the third Sunday in July as National Ice Cream Day in 1984. Americans consume about 23 gallons of ice cream per person each year — making it one of the most beloved treats in the country.",
+    "impact": "Celebrating small pleasures reminds us that joy doesn't need a grand occasion.",
+    "spark_application": "What simple pleasure could you savor today without guilt or rush?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "07-21"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Weird & Fun Holidays",
+    "priority": 80
+  },
+  {
+    "spark_id": "SPARK-HOL-012",
+    "title": "National Book Lovers Day",
+    "category": "Weird & Fun Holidays",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Open book",
+    "short_teaser": "A day to celebrate stories that change us.",
+    "story": "August 9 is National Book Lovers Day — a quiet celebration of reading, discovery, and the worlds we enter through pages. No one knows exactly who started it, which feels fitting for a holiday about getting lost in someone else's words.",
+    "impact": "Books let us live other lives, learn from distant minds, and return changed. A single sentence can shift a perspective.",
+    "spark_application": "What book, article, or story has been waiting for your attention?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "08-09"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Weird & Fun Holidays",
+    "priority": 80
+  },
+  {
+    "spark_id": "SPARK-HOL-013",
+    "title": "National Chocolate Chip Cookie Day",
+    "category": "Weird & Fun Holidays",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Chocolate chip cookies",
+    "short_teaser": "The accidental invention that became America's favorite cookie.",
+    "story": "Ruth Wakefield invented the chocolate chip cookie in 1938 at the Toll House Inn in Massachusetts. She broke a Nestlé chocolate bar into her butter cookie dough, expecting it to melt — but the chunks held their shape, creating something entirely new.",
+    "impact": "Another reminder that happy accidents often become beloved traditions.",
+    "spark_application": "What 'mistake' in your work might actually be your best idea?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "08-04"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Weird & Fun Holidays",
+    "priority": 80
+  },
+  {
+    "spark_id": "SPARK-HOL-014",
+    "title": "International Coffee Day",
+    "category": "Weird & Fun Holidays",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Coffee cup",
+    "short_teaser": "A global toast to the bean that fuels mornings.",
+    "story": "International Coffee Day on September 29 celebrates one of the world's most traded commodities. From Ethiopian highlands to your favorite mug, coffee has shaped cultures, economies, and countless morning rituals.",
+    "impact": "Rituals around food and drink connect us across cultures and give structure to our days.",
+    "spark_application": "What daily ritual helps you pause and reset — even for just a minute?",
+    "tags": [],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "09-29"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Weird & Fun Holidays",
+    "priority": 80
+  },
+  {
+    "spark_id": "SPARK-HOL-015",
     "title": "National Puzzle Day",
     "category": "Weird & Fun Holidays",
     "audience": [
@@ -1673,5 +1898,65 @@
     "spark_type": "story",
     "short_title": "Winter's Quiet Inspiration",
     "priority": 55
+  },
+  {
+    "spark_id": "SPARK-SEASON-001",
+    "title": "Spring: New Beginnings",
+    "category": "Seasonal Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A new season reminds us that growth happens gradually.",
+    "story": "Nature does not rush. Seeds grow quietly before anything appears above the surface. Spring reminds us that progress is often happening before results are visible.",
+    "impact": "Personal and business growth also requires patience.",
+    "spark_application": "What are you growing that needs more time?",
+    "tags": [
+      "growth",
+      "renewal",
+      "creativity"
+    ],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "03-20"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Seasonal Spark",
+    "spark_type": "story",
+    "short_title": "Spring Beginnings",
+    "priority": 75
+  },
+  {
+    "spark_id": "SPARK-SEASON-002",
+    "title": "Autumn Reflection Spark",
+    "category": "Seasonal Spark",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A season for noticing how far you have come.",
+    "story": "Autumn is a reminder that change is part of growth. Trees let go of what they no longer need before beginning a new cycle.",
+    "impact": "Growth sometimes means releasing old habits, ideas, or expectations.",
+    "spark_application": "What is something you are ready to let go of?",
+    "tags": [
+      "reflection",
+      "gratitude",
+      "learning"
+    ],
+    "date_rules": {
+      "type": "specific_date",
+      "date": "09-22"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "holiday",
+    "category_label": "Seasonal Spark",
+    "spark_type": "story",
+    "short_title": "Autumn Reflection",
+    "priority": 75
   }
 ]

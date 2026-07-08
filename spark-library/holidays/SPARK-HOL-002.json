@@ -1,25 +1,30 @@
 {
   "spark_id": "SPARK-HOL-002",
-  "title": "National Ice Cream Day",
-  "category": "Weird & Fun Holidays",
+  "title": "World Creativity and Innovation Day",
+  "category": "Holiday",
   "audience": [
     "Everyone"
   ],
   "image": null,
   "thumbnail": null,
-  "thumbnail_alt": "Ice cream cone",
-  "short_teaser": "A presidential proclamation for something cold and sweet.",
-  "story": "President Ronald Reagan declared the third Sunday in July as National Ice Cream Day in 1984. Americans consume about 23 gallons of ice cream per person each year — making it one of the most beloved treats in the country.",
-  "impact": "Celebrating small pleasures reminds us that joy doesn't need a grand occasion.",
-  "spark_application": "What simple pleasure could you savor today without guilt or rush?",
-  "tags": [],
+  "short_teaser": "The world changes when someone asks, \"What if?\"",
+  "story": "Innovation often begins with a simple question. What if something could work differently? Across history, inventors, entrepreneurs, and creators have changed the world by challenging assumptions.",
+  "impact": "New ideas create new possibilities. Every business improvement starts with someone seeing an opportunity.",
+  "spark_application": "What is one thing in your life or business you would redesign?",
+  "tags": [
+    "innovation",
+    "creativity",
+    "entrepreneurship"
+  ],
   "date_rules": {
     "type": "specific_date",
-    "date": "07-21"
+    "date": "04-21"
   },
   "tone": "curious",
   "status": "active",
   "runtime_category": "holiday",
-  "category_label": "Weird & Fun Holidays",
-  "priority": 80
+  "category_label": "Holiday",
+  "spark_type": "story",
+  "short_title": "Innovation Day",
+  "priority": 82
 }

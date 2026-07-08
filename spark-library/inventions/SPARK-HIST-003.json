@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-HIST-003",
+  "title": "The First iPhone",
+  "category": "History",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A phone became a pocket-sized computer.",
+  "story": "In 2007, Apple introduced the first iPhone and changed expectations for what a mobile device could do. It combined communication, internet access, music, and applications into one device.",
+  "impact": "Innovation often happens when existing ideas are combined in a new way.",
+  "spark_application": "What ideas could you combine to create something new?",
+  "tags": [
+    "technology",
+    "business",
+    "innovation"
+  ],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "01-09"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "history",
+  "category_label": "History",
+  "spark_type": "story",
+  "short_title": "First iPhone",
+  "priority": 85
+}

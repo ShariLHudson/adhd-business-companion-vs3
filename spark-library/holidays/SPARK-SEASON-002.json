@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-SEASON-002",
+  "title": "Autumn Reflection Spark",
+  "category": "Seasonal Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A season for noticing how far you have come.",
+  "story": "Autumn is a reminder that change is part of growth. Trees let go of what they no longer need before beginning a new cycle.",
+  "impact": "Growth sometimes means releasing old habits, ideas, or expectations.",
+  "spark_application": "What is something you are ready to let go of?",
+  "tags": [
+    "reflection",
+    "gratitude",
+    "learning"
+  ],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "09-22"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "holiday",
+  "category_label": "Seasonal Spark",
+  "spark_type": "story",
+  "short_title": "Autumn Reflection",
+  "priority": 75
+}

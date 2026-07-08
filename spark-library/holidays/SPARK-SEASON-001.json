@@ -1,0 +1,30 @@
+{
+  "spark_id": "SPARK-SEASON-001",
+  "title": "Spring: New Beginnings",
+  "category": "Seasonal Spark",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A new season reminds us that growth happens gradually.",
+  "story": "Nature does not rush. Seeds grow quietly before anything appears above the surface. Spring reminds us that progress is often happening before results are visible.",
+  "impact": "Personal and business growth also requires patience.",
+  "spark_application": "What are you growing that needs more time?",
+  "tags": [
+    "growth",
+    "renewal",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "specific_date",
+    "date": "03-20"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "holiday",
+  "category_label": "Seasonal Spark",
+  "spark_type": "story",
+  "short_title": "Spring Beginnings",
+  "priority": 75
+}

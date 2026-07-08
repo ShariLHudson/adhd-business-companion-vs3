@@ -30,12 +30,23 @@ describe("evaluateDailySparkNote", () => {
   });
 
   it("selects date-based spark on matching calendar day", () => {
-    const now = new Date("2026-06-06T10:00:00");
+    const now = new Date("2026-05-30T10:00:00");
     const { card } = evaluateDailySparkNote({
       now,
       forceRefresh: true,
     });
     expect(card?.id).toBe("SPARK-HOL-001");
+    expect(card?.source).toBe("date");
+    expect(card?.title).toContain("Creativity");
+  });
+
+  it("selects legacy fun holiday on its calendar day", () => {
+    const now = new Date("2026-06-06T10:00:00");
+    const { card } = evaluateDailySparkNote({
+      now,
+      forceRefresh: true,
+    });
+    expect(card?.id).toBe("SPARK-HOL-010");
     expect(card?.source).toBe("date");
     expect(card?.title).toContain("Donut");
   });

@@ -521,9 +521,61 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     thumbnailAlt: "Green eggs illustration",
   },
 
-  // — Date-based holidays —
+  // — Date-based holidays (spark-notes-files/SPARK_NOTE_HOLIDAY_DATE_BASED_SPARK_LIBRARY.md) —
   {
     id: "SPARK-HOL-001",
+    category: "holiday",
+    categoryLabel: "Holiday",
+    sparkType: "story",
+    title: "National Creativity Day",
+    shortTitle: "Creativity Day",
+    teaser: "A day dedicated to the ideas hiding inside every person.",
+    whatHappened:
+      "Creativity is not limited to artists. Every invention, business, solution, and improvement begins with someone imagining a different possibility. National Creativity Day celebrates the act of creating something new.",
+    whyItMatters:
+      "Many people believe creativity belongs only to certain people. In reality, creativity is a skill that grows through curiosity and practice.",
+    sparkApplication: "What is one idea you have been waiting to explore?",
+    monthDay: { month: 5, day: 30 },
+    priority: 82,
+    tags: ["creativity", "ideas", "imagination"],
+  },
+  {
+    id: "SPARK-HOL-002",
+    category: "holiday",
+    categoryLabel: "Holiday",
+    sparkType: "story",
+    title: "World Creativity and Innovation Day",
+    shortTitle: "Innovation Day",
+    teaser: 'The world changes when someone asks, "What if?"',
+    whatHappened:
+      'Innovation often begins with a simple question. What if something could work differently? Across history, inventors, entrepreneurs, and creators have changed the world by challenging assumptions.',
+    whyItMatters:
+      "New ideas create new possibilities. Every business improvement starts with someone seeing an opportunity.",
+    sparkApplication:
+      "What is one thing in your life or business you would redesign?",
+    monthDay: { month: 4, day: 21 },
+    priority: 82,
+    tags: ["innovation", "creativity", "entrepreneurship"],
+  },
+  {
+    id: "SPARK-HOL-003",
+    category: "holiday",
+    categoryLabel: "Holiday",
+    sparkType: "story",
+    title: "National Inventors Day",
+    shortTitle: "Inventors Day",
+    teaser: "A day celebrating the people who imagined something different.",
+    whatHappened:
+      "Inventors throughout history solved problems by looking at the world differently. Their ideas often started as simple questions.",
+    whyItMatters: "Innovation begins with curiosity.",
+    sparkApplication:
+      "What problem around you deserves a creative solution?",
+    monthDay: { month: 2, day: 11 },
+    priority: 82,
+    tags: ["inventions", "creativity", "entrepreneurship"],
+  },
+  {
+    id: "SPARK-HOL-010",
     category: "holiday",
     categoryLabel: "Weird & Fun Holidays",
     title: "National Donut Day",
@@ -539,7 +591,7 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     thumbnailAlt: "Donuts",
   },
   {
-    id: "SPARK-HOL-002",
+    id: "SPARK-HOL-011",
     category: "holiday",
     categoryLabel: "Weird & Fun Holidays",
     title: "National Ice Cream Day",
@@ -555,7 +607,7 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     thumbnailAlt: "Ice cream cone",
   },
   {
-    id: "SPARK-HOL-003",
+    id: "SPARK-HOL-012",
     category: "holiday",
     categoryLabel: "Weird & Fun Holidays",
     title: "National Book Lovers Day",
@@ -571,7 +623,7 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     thumbnailAlt: "Open book",
   },
   {
-    id: "SPARK-HOL-004",
+    id: "SPARK-HOL-013",
     category: "holiday",
     categoryLabel: "Weird & Fun Holidays",
     title: "National Chocolate Chip Cookie Day",
@@ -587,7 +639,7 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     thumbnailAlt: "Chocolate chip cookies",
   },
   {
-    id: "SPARK-HOL-005",
+    id: "SPARK-HOL-014",
     category: "holiday",
     categoryLabel: "Weird & Fun Holidays",
     title: "International Coffee Day",
@@ -603,7 +655,7 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     thumbnailAlt: "Coffee cup",
   },
   {
-    id: "SPARK-HOL-006",
+    id: "SPARK-HOL-015",
     category: "holiday",
     categoryLabel: "Weird & Fun Holidays",
     title: "National Puzzle Day",
@@ -619,7 +671,7 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     thumbnailAlt: "Jigsaw puzzle",
   },
 
-  // — History —
+  // — History (date-based) —
   {
     id: "SPARK-HIS-001",
     category: "history",
@@ -635,6 +687,77 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     monthDay: { month: 7, day: 20 },
     priority: 85,
     thumbnailAlt: "Moon landing",
+  },
+  {
+    id: "SPARK-HIST-002",
+    category: "history",
+    categoryLabel: "History",
+    sparkType: "story",
+    title: "The Birth of the Internet",
+    shortTitle: "Birth of the Internet",
+    teaser: "A small message helped begin a connected world.",
+    whatHappened:
+      "On October 29, 1969, the first message was sent between two computers on ARPANET, an early foundation of today's internet. The system crashed after only two letters were transmitted, but the experiment represented a huge step forward.",
+    whyItMatters:
+      "Major changes often begin with small first attempts. The first version does not need to be perfect.",
+    sparkApplication:
+      "What first step could you take even if it is not the final version?",
+    monthDay: { month: 10, day: 29 },
+    priority: 85,
+    tags: ["technology", "innovation", "communication"],
+  },
+  {
+    id: "SPARK-HIST-003",
+    category: "history",
+    categoryLabel: "History",
+    sparkType: "story",
+    title: "The First iPhone",
+    shortTitle: "First iPhone",
+    teaser: "A phone became a pocket-sized computer.",
+    whatHappened:
+      "In 2007, Apple introduced the first iPhone and changed expectations for what a mobile device could do. It combined communication, internet access, music, and applications into one device.",
+    whyItMatters:
+      "Innovation often happens when existing ideas are combined in a new way.",
+    sparkApplication: "What ideas could you combine to create something new?",
+    monthDay: { month: 1, day: 9 },
+    priority: 85,
+    tags: ["technology", "business", "innovation"],
+  },
+
+  // — Seasonal equinox (protocol) —
+  {
+    id: "SPARK-SEASON-001",
+    category: "holiday",
+    categoryLabel: "Seasonal Spark",
+    sparkType: "story",
+    title: "Spring: New Beginnings",
+    shortTitle: "Spring Beginnings",
+    teaser: "A new season reminds us that growth happens gradually.",
+    whatHappened:
+      "Nature does not rush. Seeds grow quietly before anything appears above the surface. Spring reminds us that progress is often happening before results are visible.",
+    whyItMatters:
+      "Personal and business growth also requires patience.",
+    sparkApplication: "What are you growing that needs more time?",
+    monthDay: { month: 3, day: 20 },
+    priority: 75,
+    tags: ["growth", "renewal", "creativity"],
+  },
+  {
+    id: "SPARK-SEASON-002",
+    category: "holiday",
+    categoryLabel: "Seasonal Spark",
+    sparkType: "story",
+    title: "Autumn Reflection Spark",
+    shortTitle: "Autumn Reflection",
+    teaser: "A season for noticing how far you have come.",
+    whatHappened:
+      "Autumn is a reminder that change is part of growth. Trees let go of what they no longer need before beginning a new cycle.",
+    whyItMatters:
+      "Growth sometimes means releasing old habits, ideas, or expectations.",
+    sparkApplication: "What is something you are ready to let go of?",
+    monthDay: { month: 9, day: 22 },
+    priority: 75,
+    tags: ["reflection", "gratitude", "learning"],
   },
 
   // — Seasonal (month-based) —
