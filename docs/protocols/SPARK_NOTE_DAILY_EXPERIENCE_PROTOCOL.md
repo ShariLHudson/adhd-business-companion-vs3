@@ -54,12 +54,40 @@ Canonical specs:
 
 | Feature | Status |
 |---------|--------|
-| One-tap reactions (🔥 😊 💡 ⭐) | `SparkNoteExpanded` |
+| One-tap reactions (❤️ 😊 💡 🤔 🌱 😐) + ⭐ save | `SparkNoteExpanded` |
 | Preference learning | `preferenceLearning.ts` → weighted library picks |
 | My Sparks collection | `SparkNoteMyCollection` |
 | Gentle connections | Copy-to-capture / journal seed — optional, no pressure |
 | Spark types | `quick` / `story` / `deep` on catalog entries |
 | Visual Spark Shelf | Future |
+
+### Card template (design standard)
+
+One card template for all Spark categories — per `spark-notes-files/SPARK_NOTE_CARD_TEMPLATE_DESIGN_STANDARD.md`:
+
+| Spec element | Implementation |
+|--------------|----------------|
+| Collapsed — Today's Spark + flame + thumb + title + teaser | `SparkNoteAnchor.tsx` |
+| Expanded — Image, Title, Category, What Happened?, Why It Matters, Spark It Into Your Life | `SparkNoteExpanded.tsx` |
+| Parchment / gold / teal styling | `app/companion/spark-note.css` |
+| Reactions + optional actions | `SparkNoteExpanded.tsx` |
+
+### Complete Intelligence Package (master)
+
+All three parts of [SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md](SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md) are implemented at v1. Gaps: illustrated assets per card, user depth picker, dedicated Idea Vault room, server-side journal records, Visual Spark Shelf, admin CMS.
+
+### Experience & routing
+
+Per [SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md](SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md):
+
+| Spec | Implementation | Status |
+|------|----------------|--------|
+| 6 learning reactions + "How did this land?" | `SparkNoteExpanded.tsx` | **v1** |
+| ⭐ Save Spark → My Sparks | `persistence.ts`, `SparkNoteMyCollection.tsx` | **v1** |
+| 💡 Capture → Idea Vault / Momentum / Journal | `sparkNoteDestinations.ts` | **v1** (routes + clipboard staging) |
+| 💡 Gave me an idea → Capture / Explore / Project | `SparkNoteExpanded.tsx` picker | **v1** |
+| My Sparks shelf buckets | `mySparksCollection.ts` | **v1** (labels on saved items) |
+| Deep Journal / Idea Vault record creation | Server-side records | Future |
 
 ### Verify
 

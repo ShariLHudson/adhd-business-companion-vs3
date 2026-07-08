@@ -1,12 +1,37 @@
 # Spark Note™ Complete Intelligence Package
 
-> **Implementation status:** [SPARK_NOTE_DAILY_EXPERIENCE_PROTOCOL.md](SPARK_NOTE_DAILY_EXPERIENCE_PROTOCOL.md)  
-> **Runtime code:** `lib/sparkNote/` · **UI:** `SparkNoteChrome`  
-> **Verify:** `npx vitest run lib/sparkNote`
+> **Status: Implemented (v1)** — see [Daily Experience Protocol](SPARK_NOTE_DAILY_EXPERIENCE_PROTOCOL.md) for live tracking.  
+> **Runtime:** `lib/sparkNote/` · **UI:** `components/companion/SparkNote*.tsx` · **Styles:** `app/companion/spark-note.css`  
+> **Verify:** `npx vitest run lib/sparkNote`  
+> **Related specs:** [Card Template](SPARK_NOTE_CARD_TEMPLATE_DESIGN_STANDARD.md) · [Experience & Routing](SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md)
 
-Split protocols: [Intelligence System](SPARK_NOTE_DAILY_INTELLIGENCE_SYSTEM_PROTOCOL.md) · [Daily Engine](SPARK_NOTE_DAILY_ENGINE_IMPLEMENTATION_SPEC.md) · [Delight Expansion](SPARK_NOTE_DELIGHT_EXPERIENCE_EXPANSION_PROTOCOL.md)
+## Implementation map (Parts 1–3)
 
-## Purpose
+| Package section | Spec requirement | Runtime | Status |
+|-----------------|------------------|---------|--------|
+| **Part 1 — Display** | Bottom-right, opposite Guide Book | `SparkNoteChrome.tsx` (portaled) | ✅ |
+| | Collapsed: flame, Today's Spark, title, teaser | `SparkNoteAnchor.tsx` | ✅ |
+| | Parchment / gold / teal styling | `spark-note.css` | ✅ |
+| | Expanded: title, category, story, impact, application | `SparkNoteExpanded.tsx` | ✅ |
+| **Part 2 — Engine** | Priority 1: personal (birthday, anniversaries, milestones) | `personalSparks.ts` | ✅ |
+| | Priority 2: date-based (holidays, history, seasons) | `evaluateDailySparkNote.ts`, `seasonalPersonality.ts` | ✅ |
+| | Priority 3: curated library + affinity | `catalog.ts`, `preferenceLearning.ts` | ✅ |
+| | One Spark per day | `persistence.ts` `dailySelection` | ✅ |
+| | Repeat prevention / cooldowns | `librarySelection.ts`, `persistence.ts` | ✅ |
+| | Content model (`spark_id`, story, impact, etc.) | `types.ts`, `catalog.ts` (29 cards) | ✅ v1 |
+| | Primary / thumbnail images | `imageSrc`, `thumbnailSrc` fields | Partial — assets TBD |
+| **Part 3 — Delight** | Reactions + learning signals | `SparkNoteExpanded.tsx`, `persistence.ts` | ✅ (6 reactions per routing spec) |
+| | My Sparks collection | `SparkNoteMyCollection.tsx` | ✅ |
+| | Capture idea / journal / save (optional) | `sparkNoteDestinations.ts` | ✅ v1 |
+| | Connect to project | Idea flow → Momentum Builder | Partial |
+| | Quick / Story / Deep spark types | `sparkType` on catalog entries | ✅ catalog; user depth picker future |
+| | Seasonal personality | `seasonalPersonality.ts` | ✅ |
+| | Business + personal spark modes | Category mix in `catalog.ts` | ✅ |
+| | Admin CMS / visual shelf | — | Future |
+
+Split detail protocols: [Intelligence System](SPARK_NOTE_DAILY_INTELLIGENCE_SYSTEM_PROTOCOL.md) · [Daily Engine](SPARK_NOTE_DAILY_ENGINE_IMPLEMENTATION_SPEC.md) · [Delight Expansion](SPARK_NOTE_DELIGHT_EXPERIENCE_EXPANSION_PROTOCOL.md)
+
+---
 
 This document combines the complete Spark Note™ system specifications into one source-of-truth file.
 

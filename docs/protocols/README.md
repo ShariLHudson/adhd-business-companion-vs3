@@ -14,7 +14,7 @@ These protocols define cross-cutting fixes for conversation stability, routing, 
 | [Creation Workflow Engine](CREATION_WORKFLOW_ENGINE_PROTOCOL.md) | Partial | `lib/collaborativeDocumentWorkflow.ts` v2.0 exists; wire all creation intents |
 | [Old UI Reference Cleanup](OLD_UI_REFERENCE_CLEANUP_PROTOCOL.md) | **Implemented** | `lib/conversationFirstLanguage.ts`, prompts, help articles |
 | [Estate Wander Mode](ESTATE_WANDER_MODE_PROTOCOL.md) | **Implemented** | `lib/estate/manifest/estateWanderMode.ts`, Room chrome Wander button |
-| [Spark Note Daily Experience](SPARK_NOTE_DAILY_EXPERIENCE_PROTOCOL.md) | **Implemented** | Master: [Complete Intelligence Package](SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md) |
+| [Spark Note Daily Experience](SPARK_NOTE_DAILY_EXPERIENCE_PROTOCOL.md) | **Implemented** | Master: [Complete Intelligence Package](SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md); routing: [Experience & Routing Spec](SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md) |
 | [Regression Test Protocol](REGRESSION_TEST_PROTOCOL.md) | Partial | Estate cases in manifest tests; conversation + creation + clear-my-mind TBD |
 
 ## Estate manifest — quick verify

@@ -1,5 +1,8 @@
 # Spark Note™ Complete Intelligence Package
 
+> **Canonical runtime copy:** [docs/protocols/SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md](../docs/protocols/SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md) (implementation map + verify commands)  
+> **Status:** **Implemented (v1)** — `lib/sparkNote/` · `SparkNoteChrome` · `npx vitest run lib/sparkNote`
+
 ## Purpose
 
 This document combines the complete Spark Note™ system specifications into one source-of-truth file.

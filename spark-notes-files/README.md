@@ -42,7 +42,7 @@ Installed copies live in `docs/protocols/` — use those for implementation trac
 
 | File | Purpose | Runtime status |
 |------|---------|----------------|
-| [SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md](SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md) | Combined Parts 1–3 | **Implemented** (v1) |
+| [SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md](SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md) | Combined Parts 1–3 (master) | **Implemented** (v1) — [protocol copy](../docs/protocols/SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md) |
 | [SPARK_NOTE_DAILY_INTELLIGENCE_SYSTEM_PROTOCOL.md](SPARK_NOTE_DAILY_INTELLIGENCE_SYSTEM_PROTOCOL.md) | Placement, UX, display | **Implemented** |
 | [SPARK_NOTE_DAILY_ENGINE_IMPLEMENTATION_SPEC.md](SPARK_NOTE_DAILY_ENGINE_IMPLEMENTATION_SPEC.md) | Selection engine, content model | **Implemented** |
 | [SPARK_NOTE_DELIGHT_EXPERIENCE_EXPANSION_PROTOCOL.md](SPARK_NOTE_DELIGHT_EXPERIENCE_EXPANSION_PROTOCOL.md) | Reactions, learning, collection | **Implemented** (v1) |
@@ -51,7 +51,8 @@ Installed copies live in `docs/protocols/` — use those for implementation trac
 | [SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md](SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md) | Authoring standard | Authoring |
 | [SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md](SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md) | Database schema | Future |
 | [SPARK_NOTE_SELECTION_INTELLIGENCE_RULES_PROTOCOL.md](SPARK_NOTE_SELECTION_INTELLIGENCE_RULES_PROTOCOL.md) | Advanced selection rules | Partial |
-| [SPARK_NOTE_CARD_TEMPLATE_DESIGN_STANDARD.md](SPARK_NOTE_CARD_TEMPLATE_DESIGN_STANDARD.md) | Visual card template | Authoring |
+| [SPARK_NOTE_CARD_TEMPLATE_DESIGN_STANDARD.md](SPARK_NOTE_CARD_TEMPLATE_DESIGN_STANDARD.md) | Visual card template | **Implemented** (`SparkNoteAnchor`, `SparkNoteExpanded`, `spark-note.css`) |
+| [SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md](SPARK_NOTE_COMPLETE_EXPERIENCE_AND_ROUTING_SPECIFICATION.md) | Experience + destination routing | **Implemented** (v1 — `sparkNoteDestinations.ts`, expanded UI) |
 
 ---
 
