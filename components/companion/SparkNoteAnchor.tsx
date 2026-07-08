@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import type { SparkNoteDailyCard } from "@/lib/sparkNote/types";
 
 import { SparkFlameIcon } from "@/components/companion/SparkFlameIcon";
@@ -9,6 +12,9 @@ type Props = {
 
 /** Collapsed Spark Note — bottom-right daily companion card. */
 export function SparkNoteAnchor({ card, onExpand }: Props) {
+  const [thumbFailed, setThumbFailed] = useState(false);
+  const showThumb = Boolean(card.thumbnailSrc) && !thumbFailed;
+
   return (
     <div
       className="spark-note-anchor"
@@ -22,12 +28,13 @@ export function SparkNoteAnchor({ card, onExpand }: Props) {
         aria-label={`Today's Spark: ${card.title}. ${card.teaser}`}
       >
         <span className="spark-note-anchor__thumb" aria-hidden>
-          {card.thumbnailSrc ? (
+          {showThumb ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={card.thumbnailSrc}
               alt=""
               className="spark-note-anchor__thumb-img"
+              onError={() => setThumbFailed(true)}
             />
           ) : (
             <span className="spark-note-anchor__thumb-fallback">

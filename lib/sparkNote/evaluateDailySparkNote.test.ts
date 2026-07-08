@@ -164,10 +164,23 @@ describe("evaluateDailySparkNote", () => {
     expect(card?.source).toBe("date");
   });
 
-  it("uses deterministic day key for storage", () => {
+  it("uses deterministic local day key for storage", () => {
     const now = new Date("2026-05-01T08:00:00");
     evaluateDailySparkNote({ now, forceRefresh: true });
     expect(getStoredDailySparkId(now)).toBeTruthy();
     expect(dayKey(now)).toBe("2026-05-01");
+  });
+
+  it("uses local calendar date near midnight (not UTC day rollover)", () => {
+    const now = new Date(2026, 4, 1, 23, 30, 0);
+    expect(dayKey(now)).toBe("2026-05-01");
+  });
+
+  it("always returns a spark card for the day", () => {
+    const now = new Date("2026-04-10T10:00:00");
+    const { card } = evaluateDailySparkNote({ now, forceRefresh: true });
+    expect(card).not.toBeNull();
+    expect(card?.title).toBeTruthy();
+    expect(card?.teaser).toBeTruthy();
   });
 });

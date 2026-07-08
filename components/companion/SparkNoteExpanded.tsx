@@ -63,7 +63,9 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
   const [reactions, setReactions] = useState(() => getSparkReactions(card.id));
   const [hint, setHint] = useState<string | null>(null);
   const [picker, setPicker] = useState<PickerMode>(null);
+  const [heroImageFailed, setHeroImageFailed] = useState(false);
   const sparkTypeLabel = sparkTypeDisplayLabel(card.sparkType);
+  const showHeroImage = Boolean(card.imageSrc) && !heroImageFailed;
 
   function showHint(message: string) {
     setHint(message);
@@ -167,12 +169,13 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
         </header>
 
         <div className="spark-note-expanded__hero">
-          {card.imageSrc ? (
+          {showHeroImage ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={card.imageSrc}
               alt=""
               className="spark-note-expanded__image"
+              onError={() => setHeroImageFailed(true)}
             />
           ) : (
             <div className="spark-note-expanded__image-placeholder" aria-hidden>

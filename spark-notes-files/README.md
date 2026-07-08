@@ -11,13 +11,15 @@ Spark Note™ is the daily companion in the bottom-right corner — opposite the
 | Layer | Location |
 |-------|----------|
 | Daily engine | `lib/sparkNote/evaluateDailySparkNote.ts` |
-| Starter catalog (29 cards) | `lib/sparkNote/catalog.ts` |
-| UI — collapsed + expanded | `components/companion/SparkNoteChrome.tsx` |
+| Runtime integration (fallback, wiring) | `lib/sparkNote/runtimeIntegration.ts` |
+| Content library | `spark-library/` + `lib/sparkNote/catalog.ts` |
+| UI — collapsed widget | `SparkNoteChrome.tsx` → `SparkNoteAnchor.tsx` (`SparkNoteWidget`) |
+| UI — expanded card | `SparkNoteExpanded.tsx` (`SparkCardExpanded`) |
 | UI — reactions + My Sparks | `SparkNoteExpanded.tsx`, `SparkNoteMyCollection.tsx` |
 | Wiring | `app/companion/CompanionPageClient.tsx` |
 | Styles | `app/companion/spark-note.css` |
 
-**Implementation status:** [SPARK_NOTE_DAILY_EXPERIENCE_PROTOCOL.md](../docs/protocols/SPARK_NOTE_DAILY_EXPERIENCE_PROTOCOL.md)
+**Runtime integration:** [SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md](../docs/protocols/SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md)
 
 ```bash
 npx vitest run lib/sparkNote
@@ -46,7 +48,7 @@ Installed copies live in `docs/protocols/` — use those for implementation trac
 | [SPARK_NOTE_DAILY_INTELLIGENCE_SYSTEM_PROTOCOL.md](SPARK_NOTE_DAILY_INTELLIGENCE_SYSTEM_PROTOCOL.md) | Placement, UX, display | **Implemented** (`SparkNoteChrome`, `SparkNoteAnchor`, `spark-note.css`) |
 | [SPARK_NOTE_DAILY_ENGINE_IMPLEMENTATION_SPEC.md](SPARK_NOTE_DAILY_ENGINE_IMPLEMENTATION_SPEC.md) | Selection engine, content model | **Implemented** (`evaluateDailySparkNote.ts`, `personalSparks.ts`, `librarySelection.ts`) |
 | [SPARK_NOTE_DELIGHT_EXPERIENCE_EXPANSION_PROTOCOL.md](SPARK_NOTE_DELIGHT_EXPERIENCE_EXPANSION_PROTOCOL.md) | Reactions, learning, collection | **Implemented** (`delightExperience.ts`, `SparkNoteExpanded`, `My Sparks`) |
-| [SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md](SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md) | App wiring requirements | **Implemented** |
+| [SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md](SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md) | App wiring requirements | **Implemented** — [protocol copy](../docs/protocols/SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md) |
 | [SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md](SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md) | CMS / admin workflow | **Partial v1** (`spark-library:validate`, file-based publish) |
 | [SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md](SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md) | Authoring standard | **Implemented** (`categoryTaxonomy.ts`, `AUTHORING.md`, validate) |
 | [SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md](SPARK_NOTE_CONTENT_DATABASE_STRUCTURE_PROTOCOL.md) | Database schema | **Implemented** (`spark-library/`, `contentDatabase/`) |

@@ -17,6 +17,7 @@ import {
 } from "./persistence";
 import { filterLibraryCandidatePool } from "./librarySelection";
 import { pickAffinityWeightedFromPool } from "./preferenceLearning";
+import { resolveFallbackSparkCard } from "./runtimeIntegration";
 import { currentSparkSeason, matchesSeasonEntry } from "./seasonalPersonality";
 import type {
   EvaluateDailySparkNoteInput,
@@ -212,7 +213,11 @@ export function evaluateDailySparkNote(
   }
 
   const card = resolveFromCatalog(now, region);
-  if (!card) return { card: null };
+  if (!card) {
+    const fallback = resolveFallbackSparkCard();
+    recordDailySparkSelection(fallback.id, now, "library");
+    return { card: fallback };
+  }
 
   recordDailySparkSelection(card.id, now, card.source);
   return { card };

@@ -11,3 +11,7 @@ export * from "./preferenceLearning";
 export * from "./mySparksCollection";
 export * from "./seasonalPersonality";
 export * from "./delightExperience";
+export {
+  SPARK_NOTE_FALLBACK_ID,
+  resolveFallbackSparkCard,
+} from "./runtimeIntegration";
