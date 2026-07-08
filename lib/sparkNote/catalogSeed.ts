@@ -56,6 +56,132 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     thumbnailAlt: "Burrs and fabric",
   },
 
+  // — Innovation & discovery (spark-notes-files/SPARK_NOTE_INNOVATION_AND_DISCOVERY_SPARK_LIBRARY.md) —
+  {
+    id: "SPARK-INNOV-001",
+    category: "invention",
+    categoryLabel: "Innovation and Discovery",
+    sparkType: "story",
+    title: "The Discovery of Penicillin",
+    shortTitle: "Penicillin Discovery",
+    teaser: "A forgotten experiment became one of the most important discoveries in medicine.",
+    whatHappened:
+      "Alexander Fleming noticed that mold had affected a bacterial culture in his laboratory. Instead of throwing away the experiment, he investigated what had happened. That observation eventually led to the development of penicillin.",
+    whyItMatters:
+      "Important discoveries are not always planned. Sometimes progress comes from paying attention to unexpected results.",
+    sparkApplication:
+      "What unexpected result in your life or business might be worth exploring?",
+    tags: ["science", "discovery", "curiosity", "medicine"],
+  },
+  {
+    id: "SPARK-INNOV-002",
+    category: "invention",
+    categoryLabel: "Innovation and Discovery",
+    sparkType: "story",
+    title: "The Camera That Saw Beyond Visible Light",
+    shortTitle: "Beyond Visible Light",
+    teaser: "Scientists discovered that the world contains information we cannot see with our eyes.",
+    whatHappened:
+      "Different types of cameras and sensors allow people to observe things beyond normal human vision. These technologies have helped scientists study space, nature, health, and the environment.",
+    whyItMatters:
+      "New tools allow us to discover possibilities that were always there but hidden.",
+    sparkApplication: "What opportunity might exist that you have not noticed yet?",
+    tags: ["science", "technology", "exploration"],
+  },
+  {
+    id: "SPARK-INNOV-003",
+    category: "invention",
+    categoryLabel: "Innovation and Discovery",
+    sparkType: "story",
+    title: "The Accidental Creation of the Super Soaker",
+    shortTitle: "Super Soaker",
+    teaser: "A toy came from an idea that was never supposed to become a toy.",
+    whatHappened:
+      "Engineer Lonnie Johnson was working on technology related to energy systems when he experimented with water pressure. The idea eventually became the Super Soaker, one of the most popular toys of its time.",
+    whyItMatters:
+      "Ideas can travel unexpected paths. A solution for one problem may become something completely different.",
+    sparkApplication:
+      "What idea could have another purpose you have not considered?",
+    tags: ["invention", "creativity", "play"],
+  },
+  {
+    id: "SPARK-INNOV-004",
+    category: "invention",
+    categoryLabel: "Innovation and Discovery",
+    sparkType: "story",
+    title: "The Telescope Changed How We See the Universe",
+    shortTitle: "The Telescope",
+    teaser: "A simple tool changed humanity's understanding of space.",
+    whatHappened:
+      "The telescope allowed people to observe distant planets, stars, and galaxies. It transformed astronomy by allowing humans to explore beyond what they could see with their own eyes.",
+    whyItMatters: "The right tool can expand what is possible.",
+    sparkApplication:
+      "What tool, resource, or relationship could help you see something differently?",
+    tags: ["science", "exploration", "curiosity"],
+  },
+  {
+    id: "SPARK-INNOV-005",
+    category: "invention",
+    categoryLabel: "Innovation and Discovery",
+    sparkType: "quick",
+    title: "The Sticky Note Lesson",
+    shortTitle: "Sticky Note Lesson",
+    teaser: "A product can become valuable after someone discovers its purpose.",
+    whatHappened:
+      "The adhesive behind the Post-it Note was not originally created for sticky notes. It became useful when someone recognized a different possibility.",
+    whyItMatters:
+      "Innovation often comes from connecting an existing idea with a new need.",
+    sparkApplication:
+      "What resource do you already have that could be used differently?",
+    tags: ["creativity", "experimentation", "ideas"],
+  },
+  {
+    id: "SPARK-INNOV-006",
+    category: "invention",
+    categoryLabel: "Innovation and Discovery",
+    sparkType: "story",
+    title: "The First 3D Printer",
+    shortTitle: "First 3D Printer",
+    teaser: "A machine changed how people think about creating objects.",
+    whatHappened:
+      "3D printing introduced a new approach to manufacturing by building objects layer by layer. The technology opened possibilities for prototypes, education, design, and production.",
+    whyItMatters:
+      "New tools can change not only what we make but how we think.",
+    sparkApplication: "What new tool could change the way you create?",
+    tags: ["technology", "creativity", "manufacturing"],
+  },
+  {
+    id: "SPARK-INNOV-007",
+    category: "invention",
+    categoryLabel: "Innovation and Discovery",
+    sparkType: "story",
+    title: "The Space Program and Everyday Inventions",
+    shortTitle: "Space to Everyday",
+    teaser: "Exploring space helped create technologies used on Earth.",
+    whatHappened:
+      "Many technologies developed for space exploration influenced everyday products and systems. Research often creates benefits beyond its original purpose.",
+    whyItMatters:
+      "Investing in exploration can create unexpected possibilities.",
+    sparkApplication:
+      "What experiment today could create tomorrow's solution?",
+    tags: ["space", "technology", "invention"],
+  },
+  {
+    id: "SPARK-INNOV-008",
+    category: "invention",
+    categoryLabel: "Innovation and Discovery",
+    sparkType: "quick",
+    title: "Curiosity Before Expertise",
+    shortTitle: "Curiosity First",
+    teaser: "Many discoveries begin with a question, not an answer.",
+    whatHappened:
+      "Innovators often begin without knowing exactly how something will work. They learn through testing, adjusting, and continuing to explore.",
+    whyItMatters:
+      "You do not always need to know everything before you begin.",
+    sparkApplication: "What could you learn by experimenting?",
+    tags: ["learning", "creativity", "experimentation"],
+  },
+
   // — Entrepreneurs & business (spark-notes-files/SPARK_NOTE_ENTREPRENEUR_BUSINESS_SPARK_LIBRARY.md) —
   {
     id: "SPARK-ENT-001",

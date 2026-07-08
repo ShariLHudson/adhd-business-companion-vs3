@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-INNOV-006",
+  "title": "The First 3D Printer",
+  "category": "Innovation and Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A machine changed how people think about creating objects.",
+  "story": "3D printing introduced a new approach to manufacturing by building objects layer by layer. The technology opened possibilities for prototypes, education, design, and production.",
+  "impact": "New tools can change not only what we make but how we think.",
+  "spark_application": "What new tool could change the way you create?",
+  "tags": [
+    "technology",
+    "creativity",
+    "manufacturing"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "invention",
+  "category_label": "Innovation and Discovery",
+  "spark_type": "story",
+  "short_title": "First 3D Printer"
+}

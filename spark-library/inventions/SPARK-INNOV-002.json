@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-INNOV-002",
+  "title": "The Camera That Saw Beyond Visible Light",
+  "category": "Innovation and Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Scientists discovered that the world contains information we cannot see with our eyes.",
+  "story": "Different types of cameras and sensors allow people to observe things beyond normal human vision. These technologies have helped scientists study space, nature, health, and the environment.",
+  "impact": "New tools allow us to discover possibilities that were always there but hidden.",
+  "spark_application": "What opportunity might exist that you have not noticed yet?",
+  "tags": [
+    "science",
+    "technology",
+    "exploration"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "invention",
+  "category_label": "Innovation and Discovery",
+  "spark_type": "story",
+  "short_title": "Beyond Visible Light"
+}

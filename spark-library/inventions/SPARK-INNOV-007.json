@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-INNOV-007",
+  "title": "The Space Program and Everyday Inventions",
+  "category": "Innovation and Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Exploring space helped create technologies used on Earth.",
+  "story": "Many technologies developed for space exploration influenced everyday products and systems. Research often creates benefits beyond its original purpose.",
+  "impact": "Investing in exploration can create unexpected possibilities.",
+  "spark_application": "What experiment today could create tomorrow's solution?",
+  "tags": [
+    "space",
+    "technology",
+    "invention"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "invention",
+  "category_label": "Innovation and Discovery",
+  "spark_type": "story",
+  "short_title": "Space to Everyday"
+}

@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-INNOV-008",
+  "title": "Curiosity Before Expertise",
+  "category": "Innovation and Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Many discoveries begin with a question, not an answer.",
+  "story": "Innovators often begin without knowing exactly how something will work. They learn through testing, adjusting, and continuing to explore.",
+  "impact": "You do not always need to know everything before you begin.",
+  "spark_application": "What could you learn by experimenting?",
+  "tags": [
+    "learning",
+    "creativity",
+    "experimentation"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "invention",
+  "category_label": "Innovation and Discovery",
+  "spark_type": "quick",
+  "short_title": "Curiosity First"
+}

@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-INNOV-001",
+  "title": "The Discovery of Penicillin",
+  "category": "Innovation and Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A forgotten experiment became one of the most important discoveries in medicine.",
+  "story": "Alexander Fleming noticed that mold had affected a bacterial culture in his laboratory. Instead of throwing away the experiment, he investigated what had happened. That observation eventually led to the development of penicillin.",
+  "impact": "Important discoveries are not always planned. Sometimes progress comes from paying attention to unexpected results.",
+  "spark_application": "What unexpected result in your life or business might be worth exploring?",
+  "tags": [
+    "science",
+    "discovery",
+    "curiosity",
+    "medicine"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "invention",
+  "category_label": "Innovation and Discovery",
+  "spark_type": "story",
+  "short_title": "Penicillin Discovery"
+}

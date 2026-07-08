@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-INNOV-004",
+  "title": "The Telescope Changed How We See the Universe",
+  "category": "Innovation and Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A simple tool changed humanity's understanding of space.",
+  "story": "The telescope allowed people to observe distant planets, stars, and galaxies. It transformed astronomy by allowing humans to explore beyond what they could see with their own eyes.",
+  "impact": "The right tool can expand what is possible.",
+  "spark_application": "What tool, resource, or relationship could help you see something differently?",
+  "tags": [
+    "science",
+    "exploration",
+    "curiosity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "invention",
+  "category_label": "Innovation and Discovery",
+  "spark_type": "story",
+  "short_title": "The Telescope"
+}

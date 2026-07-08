@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-INNOV-003",
+  "title": "The Accidental Creation of the Super Soaker",
+  "category": "Innovation and Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A toy came from an idea that was never supposed to become a toy.",
+  "story": "Engineer Lonnie Johnson was working on technology related to energy systems when he experimented with water pressure. The idea eventually became the Super Soaker, one of the most popular toys of its time.",
+  "impact": "Ideas can travel unexpected paths. A solution for one problem may become something completely different.",
+  "spark_application": "What idea could have another purpose you have not considered?",
+  "tags": [
+    "invention",
+    "creativity",
+    "play"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "invention",
+  "category_label": "Innovation and Discovery",
+  "spark_type": "story",
+  "short_title": "Super Soaker"
+}

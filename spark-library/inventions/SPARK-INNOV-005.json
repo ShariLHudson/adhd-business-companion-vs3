@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-INNOV-005",
+  "title": "The Sticky Note Lesson",
+  "category": "Innovation and Discovery",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A product can become valuable after someone discovers its purpose.",
+  "story": "The adhesive behind the Post-it Note was not originally created for sticky notes. It became useful when someone recognized a different possibility.",
+  "impact": "Innovation often comes from connecting an existing idea with a new need.",
+  "spark_application": "What resource do you already have that could be used differently?",
+  "tags": [
+    "creativity",
+    "experimentation",
+    "ideas"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "invention",
+  "category_label": "Innovation and Discovery",
+  "spark_type": "quick",
+  "short_title": "Sticky Note Lesson"
+}
