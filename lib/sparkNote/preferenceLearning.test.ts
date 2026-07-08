@@ -8,6 +8,7 @@ import {
 } from "./preferenceLearning";
 import {
   recordSparkNoteReaction,
+  recordSparkNoteViewed,
   resetSparkNoteStoreForTests,
   toggleSparkNoteFavorite,
 } from "./persistence";
@@ -59,5 +60,13 @@ describe("preferenceLearning", () => {
     expect(resolveMySparksCollection().some((s) => s.id === "SPARK-GRO-001")).toBe(
       true,
     );
+  });
+
+  it("viewed sparks gently boost same-category affinity", () => {
+    const entry = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-INV-002")!;
+    const before = scoreEntryAffinity(entry);
+    recordSparkNoteViewed("SPARK-INV-001");
+    const after = scoreEntryAffinity(entry);
+    expect(after).toBeGreaterThan(before);
   });
 });

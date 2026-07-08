@@ -1,4 +1,5 @@
 import type { SparkNoteCatalogEntry } from "./types";
+import { categoryForSparkId } from "./librarySelection";
 import { getCategoryAffinity, readSparkNoteStore } from "./persistence";
 
 function hashSeed(input: string): number {
@@ -12,10 +13,18 @@ function hashSeed(input: string): number {
 /** Weight catalog entries by learned category/tag affinity. */
 export function scoreEntryAffinity(entry: SparkNoteCatalogEntry): number {
   const affinity = getCategoryAffinity();
-  const ignored = readSparkNoteStore().ignoredCategories[entry.category] ?? 0;
+  const store = readSparkNoteStore();
+  const ignored = store.ignoredCategories[entry.category] ?? 0;
   let score = 10;
   score += affinity[entry.category] ?? 0;
   score -= ignored * 2;
+
+  let viewedBoost = 0;
+  for (const id of store.viewedIds.slice(0, 10)) {
+    if (categoryForSparkId(id) === entry.category) viewedBoost += 0.5;
+  }
+  score += Math.min(viewedBoost, 2);
+
   for (const tag of entry.tags ?? []) {
     score += (affinity[`tag:${tag}`] ?? 0) * 0.5;
   }

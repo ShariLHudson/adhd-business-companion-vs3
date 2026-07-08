@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import type { SparkNoteDailyCard, SparkNoteReaction } from "@/lib/sparkNote/types";
+import { sparkTypeDisplayLabel } from "@/lib/sparkNote/delightExperience";
 import { SparkFlameIcon } from "@/components/companion/SparkFlameIcon";
 import {
   buildSparkIdeaClipboard,
@@ -62,6 +63,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
   const [reactions, setReactions] = useState(() => getSparkReactions(card.id));
   const [hint, setHint] = useState<string | null>(null);
   const [picker, setPicker] = useState<PickerMode>(null);
+  const sparkTypeLabel = sparkTypeDisplayLabel(card.sparkType);
 
   function showHint(message: string) {
     setHint(message);
@@ -131,6 +133,10 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
     await routeToDestination("momentum");
   }
 
+  async function handleConnectProject() {
+    await routeToDestination("momentum");
+  }
+
   return (
     <div
       className="spark-note-expanded"
@@ -147,6 +153,9 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
             <span className="spark-note-expanded__brand-label">Today&apos;s Spark</span>
           </div>
           <span className="spark-note-expanded__category">{card.categoryLabel}</span>
+          {sparkTypeLabel ? (
+            <span className="spark-note-expanded__type">{sparkTypeLabel}</span>
+          ) : null}
           <button
             type="button"
             className="spark-note-expanded__close"
@@ -299,6 +308,13 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
             </button>
             <button type="button" className="spark-note-expanded__connection" onClick={() => void handleJournal()}>
               📓 Add to Journal
+            </button>
+            <button
+              type="button"
+              className="spark-note-expanded__connection"
+              onClick={() => void handleConnectProject()}
+            >
+              📌 Connect to project
             </button>
             <button type="button" className="spark-note-expanded__connection" onClick={handleSave}>
               ⭐ Save Spark

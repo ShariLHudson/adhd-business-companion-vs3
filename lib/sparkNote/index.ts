@@ -10,3 +10,4 @@ export * from "./librarySelection";
 export * from "./preferenceLearning";
 export * from "./mySparksCollection";
 export * from "./seasonalPersonality";
+export * from "./delightExperience";
