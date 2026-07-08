@@ -110,6 +110,65 @@ export function buildMilestoneSpark(
   };
 }
 
+export function buildCelebrationSpark(
+  label: string,
+  firstName: string | null | undefined,
+  personalDateId: string,
+  now = new Date(),
+): SparkNoteDailyCard {
+  const name = firstName?.trim();
+  return {
+    id: `personal-celebration:${personalDateId}:${dayKey(now)}`,
+    category: "personal",
+    categoryLabel: "Personal Moment",
+    sparkType: "story",
+    title: label,
+    shortTitle: label,
+    teaser: name
+      ? `${name}, today is worth celebrating.`
+      : "Today is worth celebrating.",
+    whatHappened: `"${label}" is a saved celebration on your calendar — something you chose to remember and honor. Marking these moments keeps encouragement personal and intentional.`,
+    whyItMatters:
+      "Celebrating achievements, launches, and meaningful days reinforces that your progress counts — even when no one else is watching.",
+    sparkApplication:
+      "What part of this celebration do you want to carry with you into what comes next?",
+    tags: ["celebration", "achievement", "personal"],
+    source: "personal",
+  };
+}
+
+function targetDateMatchesToday(targetDate: string, now: Date): boolean {
+  return targetDate.slice(0, 10) === dayKey(now);
+}
+
+function resolvePersonalDateSpark(
+  pd: PersonalDate,
+  firstName: string | null | undefined,
+  now: Date,
+): SparkNoteDailyCard | null {
+  if (
+    (pd.kind === "vacation" || pd.kind === "due_date") &&
+    pd.targetDate &&
+    targetDateMatchesToday(pd.targetDate, now)
+  ) {
+    return buildCelebrationSpark(pd.label, firstName, pd.id, now);
+  }
+
+  if (!sameMonthDay(pd.month, pd.day, now)) return null;
+
+  if (pd.kind === "anniversary") {
+    return buildAnniversarySpark(pd.label, firstName, pd.id, now);
+  }
+  if (pd.kind === "milestone" || pd.kind === "launch" || pd.kind === "custom") {
+    return buildMilestoneSpark(pd.label, firstName, pd.id, now);
+  }
+  if (pd.kind === "workshop" || pd.kind === "speaking") {
+    return buildCelebrationSpark(pd.label, firstName, pd.id, now);
+  }
+
+  return null;
+}
+
 export type ResolvePersonalSparkInput = {
   now: Date;
   firstName?: string | null;
@@ -120,7 +179,7 @@ export type ResolvePersonalSparkInput = {
 
 /**
  * Personal Sparks — highest priority in daily selection.
- * Birthday > personal anniversary > membership anniversary > milestone/custom dates.
+ * Birthday > saved personal dates > membership anniversary.
  */
 export function resolvePersonalSpark(
   input: ResolvePersonalSparkInput,
@@ -133,16 +192,8 @@ export function resolvePersonalSpark(
   }
 
   for (const pd of personalDates) {
-    if (!sameMonthDay(pd.month, pd.day, now)) continue;
-    if (pd.kind === "anniversary") {
-      return buildAnniversarySpark(pd.label, firstName, pd.id, now);
-    }
-    if (pd.kind === "milestone" || pd.kind === "launch") {
-      return buildMilestoneSpark(pd.label, firstName, pd.id, now);
-    }
-    if (pd.kind === "custom") {
-      return buildMilestoneSpark(pd.label, firstName, pd.id, now);
-    }
+    const spark = resolvePersonalDateSpark(pd, firstName, now);
+    if (spark) return spark;
   }
 
   if (memberSinceIso && isAppAnniversaryToday(memberSinceIso, now)) {
@@ -166,7 +217,9 @@ function parsePersonalSparkId(
     return { kind };
   }
   if (
-    (kind === "personal-anniversary" || kind === "personal-milestone") &&
+    (kind === "personal-anniversary" ||
+      kind === "personal-milestone" ||
+      kind === "personal-celebration") &&
     parts.length >= 3
   ) {
     return { kind, personalDateId: parts[1] };
@@ -199,9 +252,23 @@ export function rebuildPersonalSparkFromId(
 
   if (parsed.personalDateId) {
     const pd = personalDates.find((d) => d.id === parsed.personalDateId);
-    if (!pd || !sameMonthDay(pd.month, pd.day, now)) return null;
+    if (!pd) return null;
+
+    if (
+      (pd.kind === "vacation" || pd.kind === "due_date") &&
+      pd.targetDate &&
+      targetDateMatchesToday(pd.targetDate, now)
+    ) {
+      return buildCelebrationSpark(pd.label, firstName, pd.id, now);
+    }
+
+    if (!sameMonthDay(pd.month, pd.day, now)) return null;
+
     if (parsed.kind === "personal-anniversary") {
       return buildAnniversarySpark(pd.label, firstName, pd.id, now);
+    }
+    if (parsed.kind === "personal-celebration") {
+      return buildCelebrationSpark(pd.label, firstName, pd.id, now);
     }
     return buildMilestoneSpark(pd.label, firstName, pd.id, now);
   }

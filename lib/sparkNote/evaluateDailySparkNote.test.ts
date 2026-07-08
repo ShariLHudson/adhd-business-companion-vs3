@@ -97,6 +97,25 @@ describe("evaluateDailySparkNote", () => {
     expect(card?.title).toBe("Business Launch Day");
   });
 
+  it("selects saved celebration spark for speaking engagement", () => {
+    const now = new Date("2026-08-01T10:00:00");
+    const { card } = evaluateDailySparkNote({
+      now,
+      personalDates: [
+        {
+          id: "keynote",
+          label: "Conference Keynote",
+          month: 8,
+          day: 1,
+          kind: "speaking",
+        },
+      ],
+      forceRefresh: true,
+    });
+    expect(card?.source).toBe("personal");
+    expect(card?.title).toBe("Conference Keynote");
+  });
+
   it("tracks viewed sparks when expanded", () => {
     recordSparkNoteViewed("SPARK-INV-001");
     expect(readSparkNoteStore().viewedIds).toContain("SPARK-INV-001");

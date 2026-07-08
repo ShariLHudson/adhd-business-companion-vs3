@@ -1,5 +1,5 @@
 import type { SparkNoteCatalogEntry } from "./types";
-import { getCategoryAffinity } from "./persistence";
+import { getCategoryAffinity, readSparkNoteStore } from "./persistence";
 
 function hashSeed(input: string): number {
   let h = 0;
@@ -12,12 +12,14 @@ function hashSeed(input: string): number {
 /** Weight catalog entries by learned category/tag affinity. */
 export function scoreEntryAffinity(entry: SparkNoteCatalogEntry): number {
   const affinity = getCategoryAffinity();
+  const ignored = readSparkNoteStore().ignoredCategories[entry.category] ?? 0;
   let score = 10;
   score += affinity[entry.category] ?? 0;
+  score -= ignored * 2;
   for (const tag of entry.tags ?? []) {
     score += (affinity[`tag:${tag}`] ?? 0) * 0.5;
   }
-  return score;
+  return Math.max(score, 1);
 }
 
 /** Pick from pool weighted by user affinity signals. */

@@ -11,7 +11,7 @@ export function categoryForSparkId(id: string): SparkNoteCategory | null {
 /**
  * Filter library pool per repeat-prevention rules:
  * - never same card as yesterday (when alternatives exist)
- * - avoid repeating the most recent category (when alternatives exist)
+ * - avoid categories from the last two selections (when alternatives exist)
  */
 export function filterLibraryCandidatePool(
   pool: readonly SparkNoteCatalogEntry[],
@@ -25,16 +25,18 @@ export function filterLibraryCandidatePool(
     : [...pool];
   if (filtered.length === 0) filtered = [...pool];
 
-  const recentIds = getRecentSparkNoteIds();
-  const lastCategory = recentIds
-    .map((id) => categoryForSparkId(id))
-    .find((cat): cat is SparkNoteCategory => cat != null);
+  const recentCategories = new Set(
+    getRecentSparkNoteIds()
+      .slice(0, 2)
+      .map((id) => categoryForSparkId(id))
+      .filter((cat): cat is SparkNoteCategory => cat != null),
+  );
 
-  if (lastCategory) {
-    const withoutCategory = filtered.filter(
-      (entry) => entry.category !== lastCategory,
+  if (recentCategories.size > 0) {
+    const withoutRecentCategories = filtered.filter(
+      (entry) => !recentCategories.has(entry.category),
     );
-    if (withoutCategory.length > 0) filtered = withoutCategory;
+    if (withoutRecentCategories.length > 0) filtered = withoutRecentCategories;
   }
 
   return filtered;
