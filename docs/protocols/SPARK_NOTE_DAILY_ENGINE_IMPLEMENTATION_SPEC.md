@@ -399,3 +399,54 @@ Every day:
 - it feels intentional
 - it teaches something
 - it connects back to the user's life
+
+---
+
+# Runtime Implementation (v1)
+
+**Status: Implemented** — see also [Daily Experience Protocol](SPARK_NOTE_DAILY_EXPERIENCE_PROTOCOL.md).
+
+## Architecture
+
+| Spec layer | Module |
+|------------|--------|
+| Content — Spark Card Library | `lib/sparkNote/catalog.ts` ← `spark-library/manifest.json` |
+| Logic — Daily Spark Engine | `lib/sparkNote/evaluateDailySparkNote.ts` |
+| Personal check (Step 1) | `lib/sparkNote/personalSparks.ts` |
+| Date-based check (Step 2) | `evaluateDailySparkNote.ts` + `seasonalPersonality.ts` |
+| Curated library (Step 3) | `librarySelection.ts` + `preferenceLearning.ts` |
+| Repeat prevention | `persistence.ts`, `librarySelection.ts` |
+| Display | `SparkNoteChrome`, `SparkNoteAnchor`, `SparkNoteExpanded` |
+
+## Daily selection order
+
+1. **Personal** — birthday, anniversaries, milestones, launches, workshops, speaking dates, saved celebrations (`targetDate` vacations/due dates), membership anniversary
+2. **Date-based** — `monthDay` holidays/history, `months` seasonal months, `seasons` personality sparks
+3. **Curated library** — affinity-weighted rotation with cooldowns, yesterday exclusion, and recent-category variety
+
+## Content model mapping
+
+| Spec field | Runtime field |
+|------------|---------------|
+| `spark_id` | `id` |
+| `title` / `short_title` | `title` / `shortTitle` |
+| `short_teaser` | `teaser` |
+| What Happened | `whatHappened` |
+| Why Is It Interesting | `whyInteresting` |
+| Why Does It Matter | `whyItMatters` |
+| Spark Application | `sparkApplication` |
+| `thumbnail_image` / primary image | `thumbnailSrc` / `imageSrc` |
+
+## Repeat prevention (v1)
+
+- Same card not shown on consecutive days when alternatives exist
+- Categories from the last two selections are avoided when alternatives exist
+- Per-spark cooldown (`lastShownById`)
+- Passed categories deprioritized via `ignoredCategories` affinity scoring
+- Viewed, saved, and favorite tracking in `persistence.ts`
+
+## Verify
+
+```bash
+npx vitest run lib/sparkNote
+```

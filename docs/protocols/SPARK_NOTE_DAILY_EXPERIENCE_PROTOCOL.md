@@ -24,7 +24,7 @@ Canonical specs:
 
 ### Daily selection (3 steps)
 
-1. **Personal** — birthday, anniversaries, milestones, membership anniversary
+1. **Personal** — birthday, anniversaries, milestones, membership anniversary, workshops, speaking dates, saved celebrations
 2. **Date-based** — `monthDay` holidays/history, `months` seasonal, `seasons` personality
 3. **Curated library** — variety, cooldowns, yesterday exclusion, category rotation
 
@@ -46,7 +46,7 @@ Canonical specs:
 ### Repeat prevention
 
 - Same card not shown two days in a row (when alternatives exist)
-- Recent category avoided in library rotation
+- Categories from the last two selections avoided in library rotation
 - Cooldown per spark (`lastShownById`)
 - Viewed / favorites / completed tracking
 
