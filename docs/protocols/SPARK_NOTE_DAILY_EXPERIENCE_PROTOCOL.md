@@ -20,7 +20,7 @@ Canonical specs:
 | Seasonal personality | `lib/sparkNote/seasonalPersonality.ts` |
 | Preference learning | `lib/sparkNote/preferenceLearning.ts` |
 | Persistence | `lib/sparkNote/persistence.ts` |
-| Display | `SparkNoteChrome`, `SparkNoteWidget`, `SparkCardExpanded` |
+| Display | `SparkNoteChrome`, `SparkNoteAnchor` (`SparkNoteWidget`), `SparkNoteExpanded` (`SparkCardExpanded`) |
 
 ### Daily selection (3 steps)
 

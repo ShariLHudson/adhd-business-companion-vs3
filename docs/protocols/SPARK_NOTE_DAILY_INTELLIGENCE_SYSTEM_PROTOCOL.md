@@ -285,3 +285,62 @@ They smile.
 They find a connection to their own life or business.
 
 The experience feels personal, curious, and uniquely Spark.
+
+---
+
+# Runtime Implementation (v1)
+
+**Status: Implemented** — see [Daily Experience Protocol](SPARK_NOTE_DAILY_EXPERIENCE_PROTOCOL.md) and [Daily Engine Spec](SPARK_NOTE_DAILY_ENGINE_IMPLEMENTATION_SPEC.md).
+
+## Experience architecture
+
+| Protocol layer | Implementation |
+|----------------|----------------|
+| Spark Note Display | `SparkNoteChrome.tsx` (portaled to `document.body`) |
+| Collapsed widget | `SparkNoteAnchor.tsx` / `SparkNoteWidget.tsx` |
+| Expanded card | `SparkNoteExpanded.tsx` / `SparkCardExpanded.tsx` |
+| Daily Spark Engine | `lib/sparkNote/evaluateDailySparkNote.ts` |
+| Spark Content Library | `spark-library/` → `lib/sparkNote/catalog.ts` |
+| Personalization | `lib/sparkNote/personalSparks.ts` + recognition store |
+| History / repeat prevention | `lib/sparkNote/persistence.ts`, `librarySelection.ts` |
+
+## Placement (companion)
+
+- Fixed **bottom-right** viewport chrome — opposite Spark Estate Guide Book™ (bottom-left)
+- Visible whenever `SparkNoteChrome` is shown (`overlay !== signin"`, not in Just Be Here)
+- Wired in `CompanionPageClient.tsx` with birthday, personal dates, and member-since
+- Separate from estate navigation, chat routing, and creation workflows
+
+## Visual design (collapsed)
+
+| Spec | Implementation |
+|------|----------------|
+| Parchment / cream background | `app/companion/spark-note.css` (`--spark-note-parchment`) |
+| Gold border | `--spark-note-gold` |
+| Teal accents | `--spark-note-teal` |
+| Spark flame icon | `SparkFlameIcon.tsx` |
+| Today's Spark label | `SparkNoteAnchor` |
+| Short title + teaser | `shortTitle`, `teaser` |
+| No notification badges | No badge UI on anchor |
+
+## Expanded card sections
+
+| Spec | Section |
+|------|---------|
+| Title | `SparkNoteExpanded` hero |
+| Category | `categoryLabel` pill |
+| Story | What Happened? (+ optional Why Interesting) |
+| Impact | Why It Matters |
+| Spark Application | Spark It Into Your Life |
+
+## What Spark Note is not (enforced by design)
+
+- Not a task list, reminder, or notification — no badges, counts, or urgency copy on the anchor
+- Not a menu — single daily card; optional gentle actions only after expand
+- Not required — user chooses to open; no push prompts
+
+## Verify
+
+```bash
+npx vitest run lib/sparkNote components/companion/SparkNoteAnchor.test.tsx
+```
