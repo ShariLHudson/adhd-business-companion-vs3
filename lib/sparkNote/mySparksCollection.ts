@@ -24,6 +24,56 @@ export type MySparkSavedItem = NonNullable<
   ReturnType<typeof catalogEntryToSavedCard>
 >;
 
+/** My Sparks shelf buckets (routing spec). */
+export type MySparksShelfBucket =
+  | "favorites"
+  | "ideas"
+  | "reflections"
+  | "business"
+  | "growth"
+  | "fun"
+  | "learning";
+
+export const MY_SPARKS_SHELF_BUCKETS: {
+  id: MySparksShelfBucket;
+  label: string;
+  emoji: string;
+}[] = [
+  { id: "favorites", label: "Favorites", emoji: "🔥" },
+  { id: "ideas", label: "Ideas", emoji: "💡" },
+  { id: "reflections", label: "Reflections", emoji: "📓" },
+  { id: "business", label: "Business", emoji: "🚀" },
+  { id: "growth", label: "Growth", emoji: "🌱" },
+  { id: "fun", label: "Fun", emoji: "😂" },
+  { id: "learning", label: "Learning", emoji: "📚" },
+];
+
+export function mySparksShelfBucket(
+  category: MySparkSavedItem["category"],
+): MySparksShelfBucket {
+  switch (category) {
+    case "business":
+    case "entrepreneur":
+      return "business";
+    case "personal_growth":
+    case "adhd_friendly":
+    case "personal":
+      return "growth";
+    case "fun_fact":
+    case "holiday":
+      return "fun";
+    case "invention":
+    case "inventor":
+    case "history":
+      return "learning";
+    case "creativity":
+    case "quote":
+      return "reflections";
+    default:
+      return "favorites";
+  }
+}
+
 /** Saved Sparks for My Sparks collection — simple, not a full library. */
 export function resolveMySparksCollection(): MySparkSavedItem[] {
   return getFavoriteSparkIds()

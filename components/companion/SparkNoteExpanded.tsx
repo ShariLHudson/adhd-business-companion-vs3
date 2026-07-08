@@ -2,6 +2,14 @@
 
 import { useState } from "react";
 import type { SparkNoteDailyCard, SparkNoteReaction } from "@/lib/sparkNote/types";
+import { SparkFlameIcon } from "@/components/companion/SparkFlameIcon";
+import {
+  buildSparkIdeaClipboard,
+  buildSparkJournalSeed,
+  copySparkNoteText,
+  navigateToSparkDestination,
+  type SparkNoteDestination,
+} from "@/lib/sparkNote/sparkNoteDestinations";
 import {
   getSparkReactions,
   recordSparkNoteReaction,
@@ -14,75 +22,62 @@ type Props = {
   onOpenCollection: () => void;
 };
 
+type PickerMode = null | "capture-idea" | "idea-flow";
+
 const REACTIONS: {
   id: SparkNoteReaction;
   label: string;
   emoji: string;
 }[] = [
-  { id: "loved", label: "Loved it", emoji: "🔥" },
+  { id: "loved", label: "Loved it", emoji: "❤️" },
   { id: "smile", label: "Made me smile", emoji: "😊" },
   { id: "idea", label: "Gave me an idea", emoji: "💡" },
-  { id: "save", label: "Save for later", emoji: "⭐" },
+  { id: "think", label: "Made me think", emoji: "🤔" },
+  { id: "encouraged", label: "Encouraged me", emoji: "🌱" },
+  { id: "pass", label: "Not for me today", emoji: "😐" },
 ];
 
-function sparkTypeLabel(type: SparkNoteDailyCard["sparkType"]): string {
-  switch (type) {
-    case "quick":
-      return "Quick Spark";
-    case "deep":
-      return "Deep Spark";
-    default:
-      return "Story Spark";
-  }
-}
+const CAPTURE_DESTINATIONS: {
+  id: SparkNoteDestination;
+  label: string;
+  hint: string;
+}[] = [
+  { id: "idea-vault", label: "Idea Vault", hint: "I want to remember this." },
+  {
+    id: "momentum",
+    label: "Chamber of Momentum™",
+    hint: "I want to make this happen.",
+  },
+  { id: "journal", label: "Journal", hint: "I want to reflect on this." },
+];
 
-async function copySparkPrompt(text: string): Promise<boolean> {
-  try {
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    return false;
-  }
-}
+const IDEA_FLOW_OPTIONS = [
+  { id: "capture", label: "Capture" },
+  { id: "explore", label: "Explore" },
+  { id: "project", label: "Create Project" },
+] as const;
 
-/** Expanded Spark Note card — story, reactions, gentle connections. */
+/** Expanded Spark Note card — story, reactions, gentle routing. */
 export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
   const [reactions, setReactions] = useState(() => getSparkReactions(card.id));
   const [hint, setHint] = useState<string | null>(null);
+  const [picker, setPicker] = useState<PickerMode>(null);
 
   function showHint(message: string) {
     setHint(message);
-    window.setTimeout(() => setHint(null), 2400);
+    window.setTimeout(() => setHint(null), 2800);
   }
 
   function handleReaction(reaction: SparkNoteReaction) {
+    if (reaction === "idea") {
+      setPicker("idea-flow");
+      return;
+    }
     recordSparkNoteReaction(card.id, reaction, card.category, card.tags);
     setReactions(getSparkReactions(card.id));
-    if (reaction === "save") {
-      showHint("Saved to My Sparks.");
+    if (reaction === "pass") {
+      showHint("Noted — Spark will keep mixing things up.");
     }
-  }
-
-  async function handleCaptureIdea() {
-    const text = `${card.title}\n\n${card.sparkApplication}`;
-    const ok = await copySparkPrompt(text);
-    showHint(
-      ok
-        ? "Spark copied — paste anywhere you capture ideas."
-        : "Spark application is right above if you want to jot it down.",
-    );
-    recordSparkNoteReaction(card.id, "idea", card.category, card.tags);
-    setReactions(getSparkReactions(card.id));
-  }
-
-  async function handleJournalSeed() {
-    const text = `Today's Spark: ${card.title}\n${card.teaser}\n\n${card.sparkApplication}`;
-    const ok = await copySparkPrompt(text);
-    showHint(
-      ok
-        ? "Copied for your journal — paste when you're ready."
-        : "No pressure — the Spark will be here when you return.",
-    );
   }
 
   function handleSave() {
@@ -90,6 +85,50 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
     recordSparkNoteReaction(card.id, "save", card.category, card.tags);
     setReactions(getSparkReactions(card.id));
     showHint(saved ? "Saved to My Sparks." : "Removed from My Sparks.");
+  }
+
+  async function routeToDestination(destination: SparkNoteDestination) {
+    const text = buildSparkIdeaClipboard(card);
+    const copied = await copySparkNoteText(text);
+    setPicker(null);
+    recordSparkNoteReaction(card.id, "idea", card.category, card.tags);
+    setReactions(getSparkReactions(card.id));
+    navigateToSparkDestination(destination, text);
+    if (!copied) {
+      showHint("Taking you there — your Spark is staged to paste when you arrive.");
+    }
+  }
+
+  async function handleJournal() {
+    const text = buildSparkJournalSeed(card);
+    const copied = await copySparkNoteText(text);
+    recordSparkNoteReaction(card.id, "idea", card.category, card.tags);
+    navigateToSparkDestination("journal", text);
+    if (!copied) {
+      showHint("Opening your journal — paste when you're ready.");
+    }
+  }
+
+  async function handleIdeaFlow(option: (typeof IDEA_FLOW_OPTIONS)[number]["id"]) {
+    if (option === "capture") {
+      setPicker("capture-idea");
+      return;
+    }
+    if (option === "explore") {
+      const text = buildSparkIdeaClipboard(card);
+      const ok = await copySparkNoteText(text);
+      setPicker(null);
+      recordSparkNoteReaction(card.id, "idea", card.category, card.tags);
+      setReactions(getSparkReactions(card.id));
+      showHint(
+        ok
+          ? "Spark copied — explore it anywhere you like."
+          : "The Spark prompt is right above whenever you want it.",
+      );
+      return;
+    }
+    setPicker(null);
+    await routeToDestination("momentum");
   }
 
   return (
@@ -101,8 +140,13 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
     >
       <div className="spark-note-expanded__card">
         <header className="spark-note-expanded__header">
+          <div className="spark-note-expanded__brand">
+            <span className="spark-note-expanded__brand-flame" aria-hidden>
+              <SparkFlameIcon className="spark-note-expanded__brand-flame-svg" />
+            </span>
+            <span className="spark-note-expanded__brand-label">Today&apos;s Spark</span>
+          </div>
           <span className="spark-note-expanded__category">{card.categoryLabel}</span>
-          <span className="spark-note-expanded__type">{sparkTypeLabel(card.sparkType)}</span>
           <button
             type="button"
             className="spark-note-expanded__close"
@@ -114,7 +158,6 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
         </header>
 
         <div className="spark-note-expanded__hero">
-          <p className="spark-note-expanded__label">Today&apos;s Spark</p>
           {card.imageSrc ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -122,7 +165,11 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
               alt=""
               className="spark-note-expanded__image"
             />
-          ) : null}
+          ) : (
+            <div className="spark-note-expanded__image-placeholder" aria-hidden>
+              <SparkFlameIcon className="spark-note-expanded__image-placeholder-flame" />
+            </div>
+          )}
           <h2 className="spark-note-expanded__title">{card.title}</h2>
           <p className="spark-note-expanded__teaser">{card.teaser}</p>
         </div>
@@ -130,17 +177,11 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
         <div className="spark-note-expanded__body">
           <section className="spark-note-expanded__section">
             <h3 className="spark-note-expanded__section-title">What Happened?</h3>
-            <p>{card.whatHappened}</p>
+            <p>
+              {card.whatHappened}
+              {card.whyInteresting ? ` ${card.whyInteresting}` : ""}
+            </p>
           </section>
-
-          {card.whyInteresting ? (
-            <section className="spark-note-expanded__section">
-              <h3 className="spark-note-expanded__section-title">
-                Why Is It Interesting?
-              </h3>
-              <p>{card.whyInteresting}</p>
-            </section>
-          ) : null}
 
           <section className="spark-note-expanded__section">
             <h3 className="spark-note-expanded__section-title">Why It Matters</h3>
@@ -153,7 +194,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
           </section>
         </div>
 
-        <div className="spark-note-expanded__reactions" aria-label="Spark reactions">
+        <div className="spark-note-expanded__reactions" aria-label="How did this land?">
           <p className="spark-note-expanded__reactions-label">How did this land?</p>
           <div className="spark-note-expanded__reactions-row">
             {REACTIONS.map((reaction) => {
@@ -172,7 +213,9 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
                   aria-pressed={active}
                   onClick={() => handleReaction(reaction.id)}
                 >
-                  <span aria-hidden>{reaction.emoji}</span>
+                  <span className="spark-note-expanded__reaction-emoji" aria-hidden>
+                    {reaction.emoji}
+                  </span>
                   <span className="spark-note-expanded__reaction-text">
                     {reaction.label}
                   </span>
@@ -182,14 +225,80 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
           </div>
         </div>
 
-        <div className="spark-note-expanded__connections" aria-label="Gentle next steps">
-          <p className="spark-note-expanded__connections-label">Optional — no pressure</p>
-          <div className="spark-note-expanded__connections-row">
-            <button type="button" className="spark-note-expanded__connection" onClick={handleCaptureIdea}>
-              💡 Capture an idea
+        {picker === "capture-idea" ? (
+          <div className="spark-note-expanded__picker" role="group" aria-label="Where should this idea go?">
+            <p className="spark-note-expanded__picker-label">
+              Where would you like this idea to go?
+            </p>
+            <div className="spark-note-expanded__picker-row">
+              {CAPTURE_DESTINATIONS.map((dest) => (
+                <button
+                  key={dest.id}
+                  type="button"
+                  className="spark-note-expanded__picker-option"
+                  onClick={() => void routeToDestination(dest.id)}
+                >
+                  <span className="spark-note-expanded__picker-option-title">
+                    {dest.label}
+                  </span>
+                  <span className="spark-note-expanded__picker-option-hint">
+                    {dest.hint}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="spark-note-expanded__picker-cancel"
+              onClick={() => setPicker(null)}
+            >
+              Stay with this Spark
             </button>
-            <button type="button" className="spark-note-expanded__connection" onClick={handleJournalSeed}>
-              📓 Add to journal
+          </div>
+        ) : null}
+
+        {picker === "idea-flow" ? (
+          <div
+            className="spark-note-expanded__picker"
+            role="group"
+            aria-label="What would you like to do with this idea?"
+          >
+            <p className="spark-note-expanded__picker-label">
+              What would you like to do with this idea?
+            </p>
+            <div className="spark-note-expanded__picker-row spark-note-expanded__picker-row--compact">
+              {IDEA_FLOW_OPTIONS.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className="spark-note-expanded__picker-chip"
+                  onClick={() => void handleIdeaFlow(option.id)}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="spark-note-expanded__picker-cancel"
+              onClick={() => setPicker(null)}
+            >
+              Stay with this Spark
+            </button>
+          </div>
+        ) : null}
+
+        <div className="spark-note-expanded__connections" aria-label="Optional actions">
+          <div className="spark-note-expanded__connections-row">
+            <button
+              type="button"
+              className="spark-note-expanded__connection"
+              onClick={() => setPicker("capture-idea")}
+            >
+              💡 Capture an Idea
+            </button>
+            <button type="button" className="spark-note-expanded__connection" onClick={() => void handleJournal()}>
+              📓 Add to Journal
             </button>
             <button type="button" className="spark-note-expanded__connection" onClick={handleSave}>
               ⭐ Save Spark
@@ -199,7 +308,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
               className="spark-note-expanded__connection"
               onClick={onOpenCollection}
             >
-              📌 My Sparks
+              🔥 My Sparks
             </button>
           </div>
         </div>
@@ -212,7 +321,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
 
         <footer className="spark-note-expanded__footer">
           <span className="spark-note-expanded__footer-icon" aria-hidden>
-            🔥
+            <SparkFlameIcon className="spark-note-expanded__footer-flame" />
           </span>
           <span>A little spark of curiosity. A lot of good for your day.</span>
         </footer>

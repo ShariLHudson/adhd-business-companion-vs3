@@ -18,7 +18,14 @@ export type SparkNoteCategory =
 
 export type SparkNoteType = "quick" | "story" | "deep";
 
-export type SparkNoteReaction = "loved" | "smile" | "idea" | "save";
+export type SparkNoteReaction =
+  | "loved"
+  | "smile"
+  | "idea"
+  | "think"
+  | "encouraged"
+  | "pass"
+  | "save";
 
 export type SparkNoteCatalogEntry = {
   id: string;

@@ -46,6 +46,14 @@ describe("preferenceLearning", () => {
     expect(scoreEntryAffinity(inv)).toBeGreaterThan(scoreEntryAffinity(ent));
   });
 
+  it("pass reaction lowers affinity for that category", () => {
+    const entry = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-FUN-001")!;
+    const before = scoreEntryAffinity(entry);
+    recordSparkNoteReaction("SPARK-FUN-001", "pass", "fun_fact");
+    const after = scoreEntryAffinity(entry);
+    expect(after).toBeLessThan(before);
+  });
+
   it("toggleSparkNoteFavorite still works alongside reactions", () => {
     toggleSparkNoteFavorite("SPARK-GRO-001");
     expect(resolveMySparksCollection().some((s) => s.id === "SPARK-GRO-001")).toBe(

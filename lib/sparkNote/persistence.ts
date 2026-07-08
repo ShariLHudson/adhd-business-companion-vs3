@@ -152,9 +152,12 @@ export function toggleSparkNoteFavorite(sparkId: string): boolean {
 
 const REACTION_AFFINITY_BOOST: Record<SparkNoteReaction, number> = {
   loved: 3,
-  save: 2,
+  encouraged: 2,
   idea: 2,
+  save: 2,
+  think: 1,
   smile: 1,
+  pass: -1,
 };
 
 export function recordSparkNoteReaction(
