@@ -45,7 +45,7 @@ Installed copies live in `docs/protocols/` — use those for implementation trac
 | [SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md](SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md) | Combined Parts 1–3 (master) | **Implemented** (v1) — [protocol copy](../docs/protocols/SPARK_NOTE_COMPLETE_INTELLIGENCE_PACKAGE.md) |
 | [SPARK_NOTE_DAILY_INTELLIGENCE_SYSTEM_PROTOCOL.md](SPARK_NOTE_DAILY_INTELLIGENCE_SYSTEM_PROTOCOL.md) | Placement, UX, display | **Implemented** (`SparkNoteChrome`, `SparkNoteAnchor`, `spark-note.css`) |
 | [SPARK_NOTE_DAILY_ENGINE_IMPLEMENTATION_SPEC.md](SPARK_NOTE_DAILY_ENGINE_IMPLEMENTATION_SPEC.md) | Selection engine, content model | **Implemented** (`evaluateDailySparkNote.ts`, `personalSparks.ts`, `librarySelection.ts`) |
-| [SPARK_NOTE_DELIGHT_EXPERIENCE_EXPANSION_PROTOCOL.md](SPARK_NOTE_DELIGHT_EXPERIENCE_EXPANSION_PROTOCOL.md) | Reactions, learning, collection | **Implemented** (v1) |
+| [SPARK_NOTE_DELIGHT_EXPERIENCE_EXPANSION_PROTOCOL.md](SPARK_NOTE_DELIGHT_EXPERIENCE_EXPANSION_PROTOCOL.md) | Reactions, learning, collection | **Implemented** (`delightExperience.ts`, `SparkNoteExpanded`, `My Sparks`) |
 | [SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md](SPARK_NOTE_RUNTIME_INTEGRATION_PROTOCOL.md) | App wiring requirements | **Implemented** |
 | [SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md](SPARK_NOTE_CONTENT_LIBRARY_AND_ADMIN_PROTOCOL.md) | CMS / admin workflow | **Partial v1** (`spark-library:validate`, file-based publish) |
 | [SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md](SPARK_NOTE_CONTENT_LIBRARY_MASTER_STANDARD.md) | Authoring standard | **Implemented** (`categoryTaxonomy.ts`, `AUTHORING.md`, validate) |

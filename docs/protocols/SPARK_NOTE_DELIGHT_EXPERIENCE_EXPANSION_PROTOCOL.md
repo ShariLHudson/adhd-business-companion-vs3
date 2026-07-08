@@ -313,3 +313,40 @@ The magic comes from combining:
 - imagination
 
 Spark should feel like a companion who leaves little sparks of possibility throughout the day.
+
+---
+
+# Runtime Implementation (v1)
+
+**Status: Implemented** — see [Daily Experience Protocol](SPARK_NOTE_DAILY_EXPERIENCE_PROTOCOL.md).
+
+## Delight layer
+
+| Protocol feature | Implementation | Status |
+|------------------|----------------|--------|
+| One Spark at a time | `evaluateDailySparkNote.ts` | **v1** |
+| Reactions (loved, smile, idea, save) | `SparkNoteExpanded.tsx` + extended learning reactions | **v1** |
+| Preference learning | `preferenceLearning.ts` — reactions, saves, views, passes | **v1** |
+| My Sparks collection | `SparkNoteMyCollection.tsx`, `mySparksCollection.ts` | **v1** |
+| Gentle connections | Capture, journal, save, connect to project | **v1** |
+| Spark types (quick / story / deep) | `sparkType` on catalog + `delightExperience.ts` label | **v1** |
+| Seasonal personality | `seasonalPersonality.ts` + `SPARK-SEA-*` sparks | **v1** |
+| Birthday & celebration sparks | `personalSparks.ts` | **v1** |
+| Visual Spark Shelf | Illustrated shelf UI | Future |
+
+## Learning signals tracked
+
+- Sparks opened → `recordSparkNoteViewed` → category affinity boost
+- Sparks saved → `toggleSparkNoteFavorite` / save reaction
+- Reactions → `recordSparkNoteReaction` → `categoryAffinity`, `ignoredCategories`
+- Topics revisited → tag affinity + `topAffinityTopics()` in My Sparks
+
+## My Sparks shelves (v1 labels)
+
+Favorites · Ideas · Reflections · Business · Growth · Fun · Learning — via `MY_SPARKS_SHELF_BUCKETS` in `mySparksCollection.ts`.
+
+## Verify
+
+```bash
+npx vitest run lib/sparkNote
+```
