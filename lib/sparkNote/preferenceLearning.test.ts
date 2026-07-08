@@ -34,7 +34,7 @@ describe("preferenceLearning", () => {
   });
 
   it("topAffinityTopics surfaces learned categories", () => {
-    recordSparkNoteReaction("SPARK-BIZ-001", "loved", "business");
+    recordSparkNoteReaction("SPARK-BIZ-004", "loved", "business");
     recordSparkNoteReaction("SPARK-ENT-001", "smile", "entrepreneur");
     const topics = topAffinityTopics(2);
     expect(topics.length).toBeGreaterThan(0);

@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-BIZ-002",
+  "title": "Airbnb: Creating Belonging",
+  "category": "Business Lesson",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A simple idea about extra space became a global company.",
+  "story": "Airbnb began when the founders needed a way to earn money and noticed travelers needed affordable places to stay. The idea grew beyond a place to sleep. They focused on creating connection, trust, and a feeling of belonging.",
+  "impact": "Great businesses often sell more than a product. They create an experience.",
+  "spark_application": "What feeling do you want customers to experience when they interact with your business?",
+  "tags": [
+    "customer-experience",
+    "entrepreneurship",
+    "innovation"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Business Lesson",
+  "spark_type": "story",
+  "short_title": "Airbnb Belonging"
+}

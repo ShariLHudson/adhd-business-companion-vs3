@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-BIZ-005",
+  "title": "The LEGO Comeback",
+  "category": "Business Lesson",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A company nearly failed by returning to what made it special.",
+  "story": "LEGO struggled when it expanded too far away from its core strengths. The company recovered by returning focus to creativity, building, and imagination.",
+  "impact": "Sometimes growth comes from adding more. Sometimes it comes from returning to what works.",
+  "spark_application": "What part of your business deserves more attention?",
+  "tags": [
+    "resilience",
+    "creativity",
+    "innovation"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Business Lesson",
+  "spark_type": "story",
+  "short_title": "LEGO Comeback"
+}

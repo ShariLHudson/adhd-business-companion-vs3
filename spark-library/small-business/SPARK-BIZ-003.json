@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-BIZ-003",
+  "title": "Disney: Selling Experiences, Not Just Products",
+  "category": "Business Lesson",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "The magic was never just the movie. It was the feeling.",
+  "story": "Disney built a powerful brand by focusing on imagination and emotional connection. Movies, parks, characters, and experiences all worked together to create memories.",
+  "impact": "People remember how something made them feel. Businesses that create meaningful experiences build stronger relationships.",
+  "spark_application": "What emotion should people associate with your work?",
+  "tags": [
+    "branding",
+    "storytelling",
+    "customer-experience"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Business Lesson",
+  "spark_type": "story",
+  "short_title": "Disney Experiences"
+}

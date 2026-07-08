@@ -56,7 +56,7 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     thumbnailAlt: "Burrs and fabric",
   },
 
-  // — Entrepreneurs & business —
+  // — Entrepreneurs & business (spark-notes-files/SPARK_NOTE_ENTREPRENEUR_BUSINESS_SPARK_LIBRARY.md) —
   {
     id: "SPARK-ENT-001",
     category: "entrepreneur",
@@ -74,8 +74,132 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
   },
   {
     id: "SPARK-BIZ-001",
+    category: "entrepreneur",
+    categoryLabel: "Entrepreneur",
+    sparkType: "deep",
+    title: "Sara Blakely: Turning an Annoyance Into Spanx",
+    shortTitle: "Sara Blakely & Spanx",
+    teaser: "A simple frustration became a billion-dollar business.",
+    whatHappened:
+      "Sara Blakely noticed a problem while getting dressed for an event. She wanted clothing that looked smoother under her outfit, but existing solutions did not work. Instead of accepting the problem, she experimented and created her own solution. She invested her savings, researched the product herself, and built Spanx into a global brand.",
+    whyItMatters:
+      "Many successful businesses begin with someone solving a problem they personally understand. The founder's frustration became a customer's solution.",
+    sparkApplication:
+      "What everyday frustration could reveal a business opportunity?",
+    tags: ["entrepreneurship", "innovation", "resilience", "creativity"],
+  },
+  {
+    id: "SPARK-BIZ-002",
+    category: "business",
+    categoryLabel: "Business Lesson",
+    sparkType: "story",
+    title: "Airbnb: Creating Belonging",
+    shortTitle: "Airbnb Belonging",
+    teaser: "A simple idea about extra space became a global company.",
+    whatHappened:
+      "Airbnb began when the founders needed a way to earn money and noticed travelers needed affordable places to stay. The idea grew beyond a place to sleep. They focused on creating connection, trust, and a feeling of belonging.",
+    whyItMatters:
+      "Great businesses often sell more than a product. They create an experience.",
+    sparkApplication:
+      "What feeling do you want customers to experience when they interact with your business?",
+    tags: ["customer-experience", "entrepreneurship", "innovation"],
+  },
+  {
+    id: "SPARK-BIZ-003",
+    category: "business",
+    categoryLabel: "Business Lesson",
+    sparkType: "story",
+    title: "Disney: Selling Experiences, Not Just Products",
+    shortTitle: "Disney Experiences",
+    teaser: "The magic was never just the movie. It was the feeling.",
+    whatHappened:
+      "Disney built a powerful brand by focusing on imagination and emotional connection. Movies, parks, characters, and experiences all worked together to create memories.",
+    whyItMatters:
+      "People remember how something made them feel. Businesses that create meaningful experiences build stronger relationships.",
+    sparkApplication: "What emotion should people associate with your work?",
+    tags: ["branding", "storytelling", "customer-experience"],
+  },
+  {
+    id: "SPARK-BIZ-004",
+    category: "business",
+    categoryLabel: "Business Lesson",
+    sparkType: "story",
+    title: "Amazon: Starting With Customer Obsession",
+    shortTitle: "Amazon Customer Focus",
+    teaser:
+      "A bookstore became one of the world's largest companies by focusing on the customer.",
+    whatHappened:
+      'Amazon began as an online bookstore. The company expanded by continually asking: "What does the customer need next?" That mindset influenced everything from delivery speed to technology.',
+    whyItMatters: "Growth often comes from understanding people deeply.",
+    sparkApplication:
+      "What does your customer need that you could understand better?",
+    tags: ["customer-service", "innovation", "leadership"],
+  },
+  {
+    id: "SPARK-BIZ-005",
+    category: "business",
+    categoryLabel: "Business Lesson",
+    sparkType: "story",
+    title: "The LEGO Comeback",
+    shortTitle: "LEGO Comeback",
+    teaser: "A company nearly failed by returning to what made it special.",
+    whatHappened:
+      "LEGO struggled when it expanded too far away from its core strengths. The company recovered by returning focus to creativity, building, and imagination.",
+    whyItMatters:
+      "Sometimes growth comes from adding more. Sometimes it comes from returning to what works.",
+    sparkApplication: "What part of your business deserves more attention?",
+    tags: ["resilience", "creativity", "innovation"],
+  },
+  {
+    id: "SPARK-BIZ-006",
+    category: "business",
+    categoryLabel: "Business Lesson",
+    sparkType: "story",
+    title: "The Starbucks Experience",
+    shortTitle: "Starbucks Experience",
+    teaser: "A coffee company created a place people wanted to belong.",
+    whatHappened:
+      "Starbucks focused on creating a consistent experience beyond the drink itself. The environment, service, and feeling became part of the product.",
+    whyItMatters:
+      "A business can become memorable through the experience around what it sells.",
+    sparkApplication:
+      "What makes your business experience different from everyone else?",
+    tags: ["branding", "customer-experience", "community"],
+  },
+  {
+    id: "SPARK-BIZ-007",
+    category: "business",
+    categoryLabel: "Business Lesson",
+    sparkType: "quick",
+    title: "The Accidental Success of Post-it Notes",
+    shortTitle: "Post-it Business Lesson",
+    teaser: "A product without a purpose found its purpose.",
+    whatHappened:
+      "The Post-it Note was not created from a perfect plan. It became successful because someone recognized a new use for an unexpected discovery.",
+    whyItMatters:
+      "Entrepreneurs often need the ability to adapt when reality changes.",
+    sparkApplication: "What could you rethink instead of abandoning?",
+    tags: ["innovation", "flexibility", "creativity"],
+  },
+  {
+    id: "SPARK-BIZ-008",
+    category: "business",
+    categoryLabel: "Business Lesson",
+    sparkType: "quick",
+    title: "The Customer Complaint That Built A Better Business",
+    shortTitle: "Complaints as Clues",
+    teaser: "Complaints can become clues.",
+    whatHappened:
+      "Many successful companies use customer complaints as information instead of criticism. Problems reveal where improvement is needed.",
+    whyItMatters: "Feedback can become a roadmap for growth.",
+    sparkApplication: "What feedback could help you improve?",
+    tags: ["customer-feedback", "improvement", "growth"],
+  },
+  {
+    id: "SPARK-BIZ-009",
     category: "business",
     categoryLabel: "Business Sparks",
+    sparkType: "story",
     title: "The IKEA Effect",
     teaser: "Why we value things more when we build them ourselves.",
     whatHappened:
@@ -85,6 +209,7 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     sparkApplication:
       "Where could you invite your customers or team to co-create instead of just consume?",
     thumbnailAlt: "Assembled furniture",
+    tags: ["psychology", "customer-experience", "co-creation"],
   },
 
   // — Quotes —

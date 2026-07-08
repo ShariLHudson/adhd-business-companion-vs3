@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-BIZ-007",
+  "title": "The Accidental Success of Post-it Notes",
+  "category": "Business Lesson",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A product without a purpose found its purpose.",
+  "story": "The Post-it Note was not created from a perfect plan. It became successful because someone recognized a new use for an unexpected discovery.",
+  "impact": "Entrepreneurs often need the ability to adapt when reality changes.",
+  "spark_application": "What could you rethink instead of abandoning?",
+  "tags": [
+    "innovation",
+    "flexibility",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Business Lesson",
+  "spark_type": "quick",
+  "short_title": "Post-it Business Lesson"
+}

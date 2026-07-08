@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-BIZ-008",
+  "title": "The Customer Complaint That Built A Better Business",
+  "category": "Business Lesson",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Complaints can become clues.",
+  "story": "Many successful companies use customer complaints as information instead of criticism. Problems reveal where improvement is needed.",
+  "impact": "Feedback can become a roadmap for growth.",
+  "spark_application": "What feedback could help you improve?",
+  "tags": [
+    "customer-feedback",
+    "improvement",
+    "growth"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Business Lesson",
+  "spark_type": "quick",
+  "short_title": "Complaints as Clues"
+}

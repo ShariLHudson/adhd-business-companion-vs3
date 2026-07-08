@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-BIZ-006",
+  "title": "The Starbucks Experience",
+  "category": "Business Lesson",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A coffee company created a place people wanted to belong.",
+  "story": "Starbucks focused on creating a consistent experience beyond the drink itself. The environment, service, and feeling became part of the product.",
+  "impact": "A business can become memorable through the experience around what it sells.",
+  "spark_application": "What makes your business experience different from everyone else?",
+  "tags": [
+    "branding",
+    "customer-experience",
+    "community"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Business Lesson",
+  "spark_type": "story",
+  "short_title": "Starbucks Experience"
+}

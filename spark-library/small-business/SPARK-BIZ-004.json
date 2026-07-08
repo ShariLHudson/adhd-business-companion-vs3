@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-BIZ-004",
+  "title": "Amazon: Starting With Customer Obsession",
+  "category": "Business Lesson",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A bookstore became one of the world's largest companies by focusing on the customer.",
+  "story": "Amazon began as an online bookstore. The company expanded by continually asking: \"What does the customer need next?\" That mindset influenced everything from delivery speed to technology.",
+  "impact": "Growth often comes from understanding people deeply.",
+  "spark_application": "What does your customer need that you could understand better?",
+  "tags": [
+    "customer-service",
+    "innovation",
+    "leadership"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Business Lesson",
+  "spark_type": "story",
+  "short_title": "Amazon Customer Focus"
+}

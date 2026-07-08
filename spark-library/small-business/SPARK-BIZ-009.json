@@ -1,5 +1,5 @@
 {
-  "spark_id": "SPARK-BIZ-001",
+  "spark_id": "SPARK-BIZ-009",
   "title": "The IKEA Effect",
   "category": "Business Sparks",
   "audience": [
@@ -12,12 +12,17 @@
   "story": "Researchers found that people place higher value on furniture they assemble themselves — even when the result is imperfect. The effort of creation creates emotional ownership.",
   "impact": "Involving customers in the creation process builds loyalty and satisfaction. People support what they help build.",
   "spark_application": "Where could you invite your customers or team to co-create instead of just consume?",
-  "tags": [],
+  "tags": [
+    "psychology",
+    "customer-experience",
+    "co-creation"
+  ],
   "date_rules": {
     "type": "evergreen"
   },
   "tone": "curious",
   "status": "active",
   "runtime_category": "business",
-  "category_label": "Business Sparks"
+  "category_label": "Business Sparks",
+  "spark_type": "story"
 }
