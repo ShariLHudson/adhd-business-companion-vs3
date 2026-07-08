@@ -83,6 +83,10 @@ Implementation must align. Legacy code and older docs are subordinate. If confli
 
 **[PHASE_H2_EXPANSION_ENGINE.md](./PHASE_H2_EXPANSION_ENGINE.md)** — classify new concepts before canon adoption (`lib/estate/estateExpansionEngine.ts`). Governance only — no new rooms.
 
+### Multilingual architecture (foundation)
+
+**[SPARK_ESTATE_MULTILINGUAL_ARCHITECTURE_STANDARD.md](./SPARK_ESTATE_MULTILINGUAL_ARCHITECTURE_STANDARD.md)** — translation rules, language files, Spark Card / Guide localization, user content boundaries, room names, navigation terms, and future AI translation workflow. **Binding for all new member-facing work** — prevents English hardcoding in components.
+
 ### Shari Companion Engine Rewrite
 
 **[SHARI_COMPANION_ENGINE_REWRITE.md](./SHARI_COMPANION_ENGINE_REWRITE.md)** — Emotion Before Instruction; runtime in `lib/conversation/shariCompanionEngine.ts`. Binding for all Shari responses.

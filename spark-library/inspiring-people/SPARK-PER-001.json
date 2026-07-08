@@ -1,21 +1,20 @@
 {
   "spark_id": "SPARK-PER-001",
-  "title": "Thomas Edison: Persistence Through Failure",
+  "title": "Walt Disney: The Power of Imagination",
   "category": "Inspiring People",
   "audience": [
     "Everyone"
   ],
   "image": null,
   "thumbnail": null,
-  "short_teaser": "Thousands of attempts can lead to one world-changing idea.",
-  "story": "Thomas Edison is remembered for inventions like the practical electric light bulb, but his journey included many unsuccessful experiments. He viewed failed attempts as information that helped him understand what did not work. His approach was based on curiosity and persistence.",
-  "impact": "Progress rarely happens perfectly the first time. Innovation often requires patience, experimentation, and learning.",
-  "spark_application": "What could you learn from something that did not work yet?",
+  "short_teaser": "A dreamer changed entertainment by believing stories could become experiences.",
+  "story": "Walt Disney started with a simple idea: create stories that brought people joy. Through animation, characters, and experiences, he built something much larger than movies. He created emotional connections with audiences around the world.",
+  "impact": "Great businesses often begin by understanding how people want to feel. Disney was not only selling entertainment. He was creating experiences.",
+  "spark_application": "What feeling do you want people to experience when they interact with your work?",
   "tags": [
-    "innovation",
-    "resilience",
-    "invention",
-    "persistence"
+    "creativity",
+    "storytelling",
+    "entrepreneurship"
   ],
   "date_rules": {
     "type": "evergreen"
@@ -25,5 +24,5 @@
   "runtime_category": "entrepreneur",
   "category_label": "Inspiring People",
   "spark_type": "deep",
-  "short_title": "Edison's Persistence"
+  "short_title": "Walt Disney"
 }

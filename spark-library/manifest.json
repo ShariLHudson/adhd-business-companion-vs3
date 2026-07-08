@@ -226,32 +226,31 @@
   },
   {
     "spark_id": "SPARK-BIZ-001",
-    "title": "Sara Blakely: Turning an Annoyance Into Spanx",
-    "category": "Entrepreneur",
+    "title": "The Airbnb Idea",
+    "category": "Business Lesson",
     "audience": [
       "Everyone"
     ],
     "image": null,
     "thumbnail": null,
-    "short_teaser": "A simple frustration became a billion-dollar business.",
-    "story": "Sara Blakely noticed a problem while getting dressed for an event. She wanted clothing that looked smoother under her outfit, but existing solutions did not work. Instead of accepting the problem, she experimented and created her own solution. She invested her savings, researched the product herself, and built Spanx into a global brand.",
-    "impact": "Many successful businesses begin with someone solving a problem they personally understand. The founder's frustration became a customer's solution.",
-    "spark_application": "What everyday frustration could reveal a business opportunity?",
+    "short_teaser": "A simple solution to a personal problem became a worldwide business.",
+    "story": "The founders of Airbnb struggled to pay rent and noticed that visitors needed places to stay when hotels were full. They started by offering a simple alternative: staying in someone's home. The idea grew by focusing on trust, experience, and belonging.",
+    "impact": "Many successful businesses begin by solving a problem the founder personally understands.",
+    "spark_application": "What frustration in your own life might reveal a need others share?",
     "tags": [
       "entrepreneurship",
       "innovation",
-      "resilience",
-      "creativity"
+      "customer-experience"
     ],
     "date_rules": {
       "type": "evergreen"
     },
     "tone": "curious",
     "status": "active",
-    "runtime_category": "entrepreneur",
-    "category_label": "Entrepreneur",
-    "spark_type": "deep",
-    "short_title": "Sara Blakely & Spanx"
+    "runtime_category": "business",
+    "category_label": "Business Lesson",
+    "spark_type": "story",
+    "short_title": "The Airbnb Idea"
   },
   {
     "spark_id": "SPARK-BIZ-002",
@@ -478,6 +477,35 @@
     "spark_type": "story"
   },
   {
+    "spark_id": "SPARK-BIZ-010",
+    "title": "Sara Blakely: Turning an Annoyance Into Spanx",
+    "category": "Entrepreneur",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A simple frustration became a billion-dollar business.",
+    "story": "Sara Blakely noticed a problem while getting dressed for an event. She wanted clothing that looked smoother under her outfit, but existing solutions did not work. Instead of accepting the problem, she experimented and created her own solution. She invested her savings, researched the product herself, and built Spanx into a global brand.",
+    "impact": "Many successful businesses begin with someone solving a problem they personally understand. The founder's frustration became a customer's solution.",
+    "spark_application": "What everyday frustration could reveal a business opportunity?",
+    "tags": [
+      "entrepreneurship",
+      "innovation",
+      "resilience",
+      "creativity"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "entrepreneur",
+    "category_label": "Entrepreneur",
+    "spark_type": "deep",
+    "short_title": "Sara Blakely & Spanx"
+  },
+  {
     "spark_id": "SPARK-CRE-001",
     "title": "Constraints Spark Creativity",
     "category": "Creativity",
@@ -502,17 +530,17 @@
   },
   {
     "spark_id": "SPARK-CREAT-001",
-    "title": "The First Draft Is Supposed To Be Messy",
+    "title": "The Power of the Bad First Draft",
     "category": "Creativity",
     "audience": [
       "Everyone"
     ],
     "image": null,
     "thumbnail": null,
-    "short_teaser": "Great creations usually begin as imperfect attempts.",
-    "story": "Many creators, writers, inventors, and entrepreneurs begin with rough versions. The first idea is not the final product. It is a starting point that gives something to improve.",
-    "impact": "Waiting for perfection often prevents ideas from becoming real. Creating something imperfect creates the opportunity to make it better.",
-    "spark_application": "What could you start today if it did not have to be perfect?",
+    "short_teaser": "Great ideas rarely begin perfectly.",
+    "story": "Many creators, writers, and inventors begin with rough versions. The first version is not meant to be the final version. It is meant to create something that can be improved.",
+    "impact": "Waiting for perfection prevents many ideas from ever becoming real.",
+    "spark_application": "What could you create if the first version was allowed to be imperfect?",
     "tags": [
       "creativity",
       "perfectionism",
@@ -527,7 +555,7 @@
     "runtime_category": "creativity",
     "category_label": "Creativity",
     "spark_type": "quick",
-    "short_title": "First Draft Messy"
+    "short_title": "Bad First Draft"
   },
   {
     "spark_id": "SPARK-CREAT-002",
@@ -761,9 +789,9 @@
     "thumbnail": null,
     "thumbnail_alt": "Honey jar",
     "short_teaser": "A food discovered thousands of years ago can still be preserved today.",
-    "story": "Honey has natural properties that help prevent spoilage. Its low moisture content and natural acidity make it difficult for many microorganisms to grow. Archaeologists have discovered ancient honey that remained preserved.",
+    "story": "Honey has natural properties that help prevent spoilage, including low moisture and acidity. Archaeologists have found ancient honey that remained preserved.",
     "impact": "Nature often contains solutions that inspire science and innovation.",
-    "spark_application": "What everyday thing around you might be more interesting than you realize?",
+    "spark_application": "Where might you find inspiration by looking at something familiar in a new way?",
     "tags": [
       "nature",
       "science",
@@ -1013,15 +1041,14 @@
     ],
     "image": null,
     "thumbnail": null,
-    "short_teaser": "Big changes often begin with very small steps.",
-    "story": "Many accomplishments are created through small actions repeated consistently. A person does not build a business, learn a skill, or create something meaningful in one moment. Progress is usually built one decision at a time.",
-    "impact": "Small wins create evidence that movement is happening. Progress does not have to be dramatic to be meaningful.",
-    "spark_application": "What is one small step you can take today?",
+    "short_teaser": "Tiny actions repeated over time can create surprising results.",
+    "story": "Many meaningful accomplishments are created through consistent small steps rather than one dramatic moment. Progress builds confidence.",
+    "impact": "Small wins create evidence that you are moving forward.",
+    "spark_application": "What is one small action you could complete today?",
     "tags": [
+      "growth",
       "progress",
-      "motivation",
-      "momentum",
-      "growth"
+      "motivation"
     ],
     "date_rules": {
       "type": "evergreen"
@@ -1254,6 +1281,34 @@
     "runtime_category": "history",
     "category_label": "Today in History",
     "priority": 85
+  },
+  {
+    "spark_id": "SPARK-HIST-001",
+    "title": "The First Email",
+    "category": "History",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A simple message changed how the world communicates.",
+    "story": "In 1971, Ray Tomlinson sent the first network email and helped create a new way for people to communicate. A small technical experiment became part of everyday life.",
+    "impact": "Many technologies we take for granted started as simple experiments.",
+    "spark_application": "What small experiment could lead to something bigger?",
+    "tags": [
+      "technology",
+      "communication",
+      "innovation"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "history",
+    "category_label": "History",
+    "spark_type": "story",
+    "short_title": "The First Email"
   },
   {
     "spark_id": "SPARK-HIST-002",
@@ -1816,22 +1871,22 @@
   {
     "spark_id": "SPARK-INV-001",
     "title": "The Post-it® Note",
-    "category": "History of Inventions",
+    "category": "Invention",
     "audience": [
       "Everyone"
     ],
     "image": null,
     "thumbnail": null,
     "thumbnail_alt": "Colorful sticky notes",
-    "short_teaser": "A failed experiment became one of the world's favorite productivity tools.",
-    "story": "In 1968, 3M scientist Dr. Spencer Silver was trying to create a super-strong adhesive — but instead invented a reusable, low-tack glue. For years, nobody knew what to do with it.",
-    "why_interesting": "Then Art Fry, a fellow 3M scientist, needed bookmarks that wouldn't fall out of his church choir hymnal. He applied Silver's 'failed' adhesive to small paper squares — and the Post-it Note was born.",
-    "impact": "The Post-it Note changed how people capture ideas, leave reminders, and organize information. What started as a 'failed' experiment became a tool used in over 200 countries.",
-    "spark_application": "What idea have you been ignoring because it didn't work the first time? Sometimes ideas that seem wrong just need a different use.",
+    "short_teaser": "A failed experiment became one of the world's favorite tools for capturing ideas.",
+    "story": "A scientist was trying to create a very strong adhesive. Instead, he created something unusual — an adhesive that could stick but also be removed. For years, the discovery did not have an obvious purpose. Another employee saw the possibility and realized it could solve an everyday problem: marking pages without damaging them. The mistake became an invention.",
+    "impact": "Some of the best ideas are not created by having the perfect plan. Sometimes innovation comes from noticing a possibility hidden inside an unexpected result.",
+    "spark_application": "What idea have you dismissed because it did not work the way you originally imagined?",
     "tags": [
-      "invention",
+      "innovation",
+      "creativity",
       "productivity",
-      "3m"
+      "accidental-discovery"
     ],
     "date_rules": {
       "type": "evergreen"
@@ -1839,32 +1894,39 @@
     "tone": "curious",
     "status": "active",
     "runtime_category": "invention",
-    "category_label": "History of Inventions",
+    "category_label": "Invention",
     "spark_type": "story",
     "short_title": "The Post-it® Note"
   },
   {
     "spark_id": "SPARK-INV-002",
-    "title": "The First Computer Mouse",
-    "category": "History of Inventions",
+    "title": "The Microwave Oven Accident",
+    "category": "Invention",
     "audience": [
       "Everyone"
     ],
     "image": null,
     "thumbnail": null,
-    "thumbnail_alt": "Vintage computer mouse",
-    "short_teaser": "A wooden block that changed how we interact with computers.",
-    "story": "In 1964, Douglas Engelbart built the first computer mouse from a wooden block, two metal wheels, and a single button. He called it a mouse because the cord looked like a tail. His goal was to make computers feel more intuitive — something you could point at, not just type at.",
-    "impact": "The mouse made personal computing accessible to everyone. Point-and-click became the bridge between human intention and digital action.",
-    "spark_application": "What tool could make something complicated feel simple for the people you serve?",
-    "tags": [],
+    "thumbnail_alt": "Microwave oven",
+    "short_teaser": "A melted candy bar helped create a kitchen revolution.",
+    "story": "Engineer Percy Spencer was working with radar technology when he noticed that a candy bar in his pocket had melted. Instead of ignoring it, he investigated. His curiosity led to the discovery that microwave energy could heat food.",
+    "impact": "Many breakthroughs begin with someone asking: \"Why did that happen?\" Curiosity turns ordinary moments into discoveries.",
+    "spark_application": "What everyday problem around you might contain an opportunity?",
+    "tags": [
+      "innovation",
+      "curiosity",
+      "science",
+      "accidental-discovery"
+    ],
     "date_rules": {
       "type": "evergreen"
     },
     "tone": "curious",
     "status": "active",
     "runtime_category": "invention",
-    "category_label": "History of Inventions"
+    "category_label": "Invention",
+    "spark_type": "story",
+    "short_title": "Microwave Accident"
   },
   {
     "spark_id": "SPARK-INV-003",
@@ -1888,6 +1950,35 @@
     "status": "active",
     "runtime_category": "invention",
     "category_label": "History of Inventions"
+  },
+  {
+    "spark_id": "SPARK-INV-010",
+    "title": "The First Computer Mouse",
+    "category": "History of Inventions",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Vintage computer mouse",
+    "short_teaser": "A wooden block that changed how we interact with computers.",
+    "story": "In 1964, Douglas Engelbart built the first computer mouse from a wooden block, two metal wheels, and a single button. He called it a mouse because the cord looked like a tail. His goal was to make computers feel more intuitive — something you could point at, not just type at.",
+    "impact": "The mouse made personal computing accessible to everyone. Point-and-click became the bridge between human intention and digital action.",
+    "spark_application": "What tool could make something complicated feel simple for the people you serve?",
+    "tags": [
+      "invention",
+      "technology",
+      "computing"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "invention",
+    "category_label": "History of Inventions",
+    "spark_type": "story",
+    "short_title": "First Computer Mouse"
   },
   {
     "spark_id": "SPARK-MEAN-001",
@@ -2116,22 +2207,21 @@
   },
   {
     "spark_id": "SPARK-PER-001",
-    "title": "Thomas Edison: Persistence Through Failure",
+    "title": "Walt Disney: The Power of Imagination",
     "category": "Inspiring People",
     "audience": [
       "Everyone"
     ],
     "image": null,
     "thumbnail": null,
-    "short_teaser": "Thousands of attempts can lead to one world-changing idea.",
-    "story": "Thomas Edison is remembered for inventions like the practical electric light bulb, but his journey included many unsuccessful experiments. He viewed failed attempts as information that helped him understand what did not work. His approach was based on curiosity and persistence.",
-    "impact": "Progress rarely happens perfectly the first time. Innovation often requires patience, experimentation, and learning.",
-    "spark_application": "What could you learn from something that did not work yet?",
+    "short_teaser": "A dreamer changed entertainment by believing stories could become experiences.",
+    "story": "Walt Disney started with a simple idea: create stories that brought people joy. Through animation, characters, and experiences, he built something much larger than movies. He created emotional connections with audiences around the world.",
+    "impact": "Great businesses often begin by understanding how people want to feel. Disney was not only selling entertainment. He was creating experiences.",
+    "spark_application": "What feeling do you want people to experience when they interact with your work?",
     "tags": [
-      "innovation",
-      "resilience",
-      "invention",
-      "persistence"
+      "creativity",
+      "storytelling",
+      "entrepreneurship"
     ],
     "date_rules": {
       "type": "evergreen"
@@ -2141,7 +2231,7 @@
     "runtime_category": "entrepreneur",
     "category_label": "Inspiring People",
     "spark_type": "deep",
-    "short_title": "Edison's Persistence"
+    "short_title": "Walt Disney"
   },
   {
     "spark_id": "SPARK-PER-002",
@@ -2338,6 +2428,35 @@
     "category_label": "Inspiring People",
     "spark_type": "story",
     "short_title": "Beethoven"
+  },
+  {
+    "spark_id": "SPARK-PER-009",
+    "title": "Thomas Edison: Persistence Through Failure",
+    "category": "Inspiring People",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Thousands of attempts can lead to one world-changing idea.",
+    "story": "Thomas Edison is remembered for inventions like the practical electric light bulb, but his journey included many unsuccessful experiments. He viewed failed attempts as information that helped him understand what did not work. His approach was based on curiosity and persistence.",
+    "impact": "Progress rarely happens perfectly the first time. Innovation often requires patience, experimentation, and learning.",
+    "spark_application": "What could you learn from something that did not work yet?",
+    "tags": [
+      "innovation",
+      "resilience",
+      "invention",
+      "persistence"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "entrepreneur",
+    "category_label": "Inspiring People",
+    "spark_type": "deep",
+    "short_title": "Edison's Persistence"
   },
   {
     "spark_id": "SPARK-QTE-003",

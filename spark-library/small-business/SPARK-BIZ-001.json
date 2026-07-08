@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-BIZ-001",
+  "title": "The Airbnb Idea",
+  "category": "Business Lesson",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A simple solution to a personal problem became a worldwide business.",
+  "story": "The founders of Airbnb struggled to pay rent and noticed that visitors needed places to stay when hotels were full. They started by offering a simple alternative: staying in someone's home. The idea grew by focusing on trust, experience, and belonging.",
+  "impact": "Many successful businesses begin by solving a problem the founder personally understands.",
+  "spark_application": "What frustration in your own life might reveal a need others share?",
+  "tags": [
+    "entrepreneurship",
+    "innovation",
+    "customer-experience"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "business",
+  "category_label": "Business Lesson",
+  "spark_type": "story",
+  "short_title": "The Airbnb Idea"
+}

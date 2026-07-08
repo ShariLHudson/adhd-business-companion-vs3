@@ -7,31 +7,52 @@ export const DEFAULT_SPARK_NOTE_COOLDOWN_DAYS = 45;
  * Date-based entries activate only on their monthDay.
  */
 export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
+  // — Starter set (spark-notes-files/SPARK_NOTE_STARTER_SPARK_LIBRARY.md) —
+  // SPARK-INV-001, SPARK-INV-002, SPARK-PER-001, SPARK-BIZ-001, SPARK-HIST-001,
+  // SPARK-FACT-001, SPARK-CREAT-001, SPARK-GROW-001
+
   // — Inventions —
   {
     id: "SPARK-INV-001",
     category: "invention",
-    categoryLabel: "History of Inventions",
+    categoryLabel: "Invention",
     sparkType: "story",
     title: "The Post-it® Note",
     shortTitle: "The Post-it® Note",
-    teaser: "A failed experiment became one of the world's favorite productivity tools.",
+    teaser:
+      "A failed experiment became one of the world's favorite tools for capturing ideas.",
     whatHappened:
-      "In 1968, 3M scientist Dr. Spencer Silver was trying to create a super-strong adhesive — but instead invented a reusable, low-tack glue. For years, nobody knew what to do with it.",
-    whyInteresting:
-      "Then Art Fry, a fellow 3M scientist, needed bookmarks that wouldn't fall out of his church choir hymnal. He applied Silver's 'failed' adhesive to small paper squares — and the Post-it Note was born.",
+      "A scientist was trying to create a very strong adhesive. Instead, he created something unusual — an adhesive that could stick but also be removed. For years, the discovery did not have an obvious purpose. Another employee saw the possibility and realized it could solve an everyday problem: marking pages without damaging them. The mistake became an invention.",
     whyItMatters:
-      "The Post-it Note changed how people capture ideas, leave reminders, and organize information. What started as a 'failed' experiment became a tool used in over 200 countries.",
+      "Some of the best ideas are not created by having the perfect plan. Sometimes innovation comes from noticing a possibility hidden inside an unexpected result.",
     sparkApplication:
-      "What idea have you been ignoring because it didn't work the first time? Sometimes ideas that seem wrong just need a different use.",
+      "What idea have you dismissed because it did not work the way you originally imagined?",
     thumbnailAlt: "Colorful sticky notes",
-    tags: ["invention", "productivity", "3m"],
+    tags: ["innovation", "creativity", "productivity", "accidental-discovery"],
   },
   {
     id: "SPARK-INV-002",
     category: "invention",
+    categoryLabel: "Invention",
+    sparkType: "story",
+    title: "The Microwave Oven Accident",
+    shortTitle: "Microwave Accident",
+    teaser: "A melted candy bar helped create a kitchen revolution.",
+    whatHappened:
+      "Engineer Percy Spencer was working with radar technology when he noticed that a candy bar in his pocket had melted. Instead of ignoring it, he investigated. His curiosity led to the discovery that microwave energy could heat food.",
+    whyItMatters:
+      "Many breakthroughs begin with someone asking: \"Why did that happen?\" Curiosity turns ordinary moments into discoveries.",
+    sparkApplication: "What everyday problem around you might contain an opportunity?",
+    thumbnailAlt: "Microwave oven",
+    tags: ["innovation", "curiosity", "science", "accidental-discovery"],
+  },
+  {
+    id: "SPARK-INV-010",
+    category: "invention",
     categoryLabel: "History of Inventions",
+    sparkType: "story",
     title: "The First Computer Mouse",
+    shortTitle: "First Computer Mouse",
     teaser: "A wooden block that changed how we interact with computers.",
     whatHappened:
       "In 1964, Douglas Engelbart built the first computer mouse from a wooden block, two metal wheels, and a single button. He called it a mouse because the cord looked like a tail. His goal was to make computers feel more intuitive — something you could point at, not just type at.",
@@ -40,6 +61,7 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     sparkApplication:
       "What tool could make something complicated feel simple for the people you serve?",
     thumbnailAlt: "Vintage computer mouse",
+    tags: ["invention", "technology", "computing"],
   },
   {
     id: "SPARK-INV-003",
@@ -188,15 +210,16 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     category: "entrepreneur",
     categoryLabel: "Inspiring People",
     sparkType: "deep",
-    title: "Thomas Edison: Persistence Through Failure",
-    shortTitle: "Edison's Persistence",
-    teaser: "Thousands of attempts can lead to one world-changing idea.",
+    title: "Walt Disney: The Power of Imagination",
+    shortTitle: "Walt Disney",
+    teaser: "A dreamer changed entertainment by believing stories could become experiences.",
     whatHappened:
-      "Thomas Edison is remembered for inventions like the practical electric light bulb, but his journey included many unsuccessful experiments. He viewed failed attempts as information that helped him understand what did not work. His approach was based on curiosity and persistence.",
+      "Walt Disney started with a simple idea: create stories that brought people joy. Through animation, characters, and experiences, he built something much larger than movies. He created emotional connections with audiences around the world.",
     whyItMatters:
-      "Progress rarely happens perfectly the first time. Innovation often requires patience, experimentation, and learning.",
-    sparkApplication: "What could you learn from something that did not work yet?",
-    tags: ["innovation", "resilience", "invention", "persistence"],
+      "Great businesses often begin by understanding how people want to feel. Disney was not only selling entertainment. He was creating experiences.",
+    sparkApplication:
+      "What feeling do you want people to experience when they interact with your work?",
+    tags: ["creativity", "storytelling", "entrepreneurship"],
   },
   {
     id: "SPARK-PER-002",
@@ -305,6 +328,21 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
       "What strength have you discovered because of a challenge?",
     tags: ["creativity", "perseverance", "music"],
   },
+  {
+    id: "SPARK-PER-009",
+    category: "entrepreneur",
+    categoryLabel: "Inspiring People",
+    sparkType: "deep",
+    title: "Thomas Edison: Persistence Through Failure",
+    shortTitle: "Edison's Persistence",
+    teaser: "Thousands of attempts can lead to one world-changing idea.",
+    whatHappened:
+      "Thomas Edison is remembered for inventions like the practical electric light bulb, but his journey included many unsuccessful experiments. He viewed failed attempts as information that helped him understand what did not work. His approach was based on curiosity and persistence.",
+    whyItMatters:
+      "Progress rarely happens perfectly the first time. Innovation often requires patience, experimentation, and learning.",
+    sparkApplication: "What could you learn from something that did not work yet?",
+    tags: ["innovation", "resilience", "invention", "persistence"],
+  },
 
   // — Entrepreneurs & business (spark-notes-files/SPARK_NOTE_ENTREPRENEUR_BUSINESS_SPARK_LIBRARY.md) —
   {
@@ -324,19 +362,19 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
   },
   {
     id: "SPARK-BIZ-001",
-    category: "entrepreneur",
-    categoryLabel: "Entrepreneur",
-    sparkType: "deep",
-    title: "Sara Blakely: Turning an Annoyance Into Spanx",
-    shortTitle: "Sara Blakely & Spanx",
-    teaser: "A simple frustration became a billion-dollar business.",
+    category: "business",
+    categoryLabel: "Business Lesson",
+    sparkType: "story",
+    title: "The Airbnb Idea",
+    shortTitle: "The Airbnb Idea",
+    teaser: "A simple solution to a personal problem became a worldwide business.",
     whatHappened:
-      "Sara Blakely noticed a problem while getting dressed for an event. She wanted clothing that looked smoother under her outfit, but existing solutions did not work. Instead of accepting the problem, she experimented and created her own solution. She invested her savings, researched the product herself, and built Spanx into a global brand.",
+      "The founders of Airbnb struggled to pay rent and noticed that visitors needed places to stay when hotels were full. They started by offering a simple alternative: staying in someone's home. The idea grew by focusing on trust, experience, and belonging.",
     whyItMatters:
-      "Many successful businesses begin with someone solving a problem they personally understand. The founder's frustration became a customer's solution.",
+      "Many successful businesses begin by solving a problem the founder personally understands.",
     sparkApplication:
-      "What everyday frustration could reveal a business opportunity?",
-    tags: ["entrepreneurship", "innovation", "resilience", "creativity"],
+      "What frustration in your own life might reveal a need others share?",
+    tags: ["entrepreneurship", "innovation", "customer-experience"],
   },
   {
     id: "SPARK-BIZ-002",
@@ -460,6 +498,22 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
       "Where could you invite your customers or team to co-create instead of just consume?",
     thumbnailAlt: "Assembled furniture",
     tags: ["psychology", "customer-experience", "co-creation"],
+  },
+  {
+    id: "SPARK-BIZ-010",
+    category: "entrepreneur",
+    categoryLabel: "Entrepreneur",
+    sparkType: "deep",
+    title: "Sara Blakely: Turning an Annoyance Into Spanx",
+    shortTitle: "Sara Blakely & Spanx",
+    teaser: "A simple frustration became a billion-dollar business.",
+    whatHappened:
+      "Sara Blakely noticed a problem while getting dressed for an event. She wanted clothing that looked smoother under her outfit, but existing solutions did not work. Instead of accepting the problem, she experimented and created her own solution. She invested her savings, researched the product herself, and built Spanx into a global brand.",
+    whyItMatters:
+      "Many successful businesses begin with someone solving a problem they personally understand. The founder's frustration became a customer's solution.",
+    sparkApplication:
+      "What everyday frustration could reveal a business opportunity?",
+    tags: ["entrepreneurship", "innovation", "resilience", "creativity"],
   },
 
   // — Small business (spark-notes-files/SPARK_NOTE_SMALL_BUSINESS_ENTREPRENEUR_SPARK_LIBRARY.md) —
@@ -744,11 +798,11 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     shortTitle: "Honey Never Spoils",
     teaser: "A food discovered thousands of years ago can still be preserved today.",
     whatHappened:
-      "Honey has natural properties that help prevent spoilage. Its low moisture content and natural acidity make it difficult for many microorganisms to grow. Archaeologists have discovered ancient honey that remained preserved.",
+      "Honey has natural properties that help prevent spoilage, including low moisture and acidity. Archaeologists have found ancient honey that remained preserved.",
     whyItMatters:
       "Nature often contains solutions that inspire science and innovation.",
     sparkApplication:
-      "What everyday thing around you might be more interesting than you realize?",
+      "Where might you find inspiration by looking at something familiar in a new way?",
     tags: ["nature", "science", "curiosity"],
     thumbnailAlt: "Honey jar",
   },
@@ -991,13 +1045,13 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     sparkType: "story",
     title: "Small Steps Create Momentum",
     shortTitle: "Small Steps",
-    teaser: "Big changes often begin with very small steps.",
+    teaser: "Tiny actions repeated over time can create surprising results.",
     whatHappened:
-      "Many accomplishments are created through small actions repeated consistently. A person does not build a business, learn a skill, or create something meaningful in one moment. Progress is usually built one decision at a time.",
+      "Many meaningful accomplishments are created through consistent small steps rather than one dramatic moment. Progress builds confidence.",
     whyItMatters:
-      "Small wins create evidence that movement is happening. Progress does not have to be dramatic to be meaningful.",
-    sparkApplication: "What is one small step you can take today?",
-    tags: ["progress", "motivation", "momentum", "growth"],
+      "Small wins create evidence that you are moving forward.",
+    sparkApplication: "What is one small action you could complete today?",
+    tags: ["growth", "progress", "motivation"],
   },
   {
     id: "SPARK-GROW-002",
@@ -1289,6 +1343,21 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
 
   // — History (date-based) —
   {
+    id: "SPARK-HIST-001",
+    category: "history",
+    categoryLabel: "History",
+    sparkType: "story",
+    title: "The First Email",
+    shortTitle: "The First Email",
+    teaser: "A simple message changed how the world communicates.",
+    whatHappened:
+      "In 1971, Ray Tomlinson sent the first network email and helped create a new way for people to communicate. A small technical experiment became part of everyday life.",
+    whyItMatters:
+      "Many technologies we take for granted started as simple experiments.",
+    sparkApplication: "What small experiment could lead to something bigger?",
+    tags: ["technology", "communication", "innovation"],
+  },
+  {
     id: "SPARK-HIS-001",
     category: "history",
     categoryLabel: "Today in History",
@@ -1478,14 +1547,15 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     category: "creativity",
     categoryLabel: "Creativity",
     sparkType: "quick",
-    title: "The First Draft Is Supposed To Be Messy",
-    shortTitle: "First Draft Messy",
-    teaser: "Great creations usually begin as imperfect attempts.",
+    title: "The Power of the Bad First Draft",
+    shortTitle: "Bad First Draft",
+    teaser: "Great ideas rarely begin perfectly.",
     whatHappened:
-      "Many creators, writers, inventors, and entrepreneurs begin with rough versions. The first idea is not the final product. It is a starting point that gives something to improve.",
+      "Many creators, writers, and inventors begin with rough versions. The first version is not meant to be the final version. It is meant to create something that can be improved.",
     whyItMatters:
-      "Waiting for perfection often prevents ideas from becoming real. Creating something imperfect creates the opportunity to make it better.",
-    sparkApplication: "What could you start today if it did not have to be perfect?",
+      "Waiting for perfection prevents many ideas from ever becoming real.",
+    sparkApplication:
+      "What could you create if the first version was allowed to be imperfect?",
     tags: ["creativity", "perfectionism", "action", "ideas"],
   },
   {

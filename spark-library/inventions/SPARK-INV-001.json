@@ -1,22 +1,22 @@
 {
   "spark_id": "SPARK-INV-001",
   "title": "The Post-it® Note",
-  "category": "History of Inventions",
+  "category": "Invention",
   "audience": [
     "Everyone"
   ],
   "image": null,
   "thumbnail": null,
   "thumbnail_alt": "Colorful sticky notes",
-  "short_teaser": "A failed experiment became one of the world's favorite productivity tools.",
-  "story": "In 1968, 3M scientist Dr. Spencer Silver was trying to create a super-strong adhesive — but instead invented a reusable, low-tack glue. For years, nobody knew what to do with it.",
-  "why_interesting": "Then Art Fry, a fellow 3M scientist, needed bookmarks that wouldn't fall out of his church choir hymnal. He applied Silver's 'failed' adhesive to small paper squares — and the Post-it Note was born.",
-  "impact": "The Post-it Note changed how people capture ideas, leave reminders, and organize information. What started as a 'failed' experiment became a tool used in over 200 countries.",
-  "spark_application": "What idea have you been ignoring because it didn't work the first time? Sometimes ideas that seem wrong just need a different use.",
+  "short_teaser": "A failed experiment became one of the world's favorite tools for capturing ideas.",
+  "story": "A scientist was trying to create a very strong adhesive. Instead, he created something unusual — an adhesive that could stick but also be removed. For years, the discovery did not have an obvious purpose. Another employee saw the possibility and realized it could solve an everyday problem: marking pages without damaging them. The mistake became an invention.",
+  "impact": "Some of the best ideas are not created by having the perfect plan. Sometimes innovation comes from noticing a possibility hidden inside an unexpected result.",
+  "spark_application": "What idea have you dismissed because it did not work the way you originally imagined?",
   "tags": [
-    "invention",
+    "innovation",
+    "creativity",
     "productivity",
-    "3m"
+    "accidental-discovery"
   ],
   "date_rules": {
     "type": "evergreen"
@@ -24,7 +24,7 @@
   "tone": "curious",
   "status": "active",
   "runtime_category": "invention",
-  "category_label": "History of Inventions",
+  "category_label": "Invention",
   "spark_type": "story",
   "short_title": "The Post-it® Note"
 }

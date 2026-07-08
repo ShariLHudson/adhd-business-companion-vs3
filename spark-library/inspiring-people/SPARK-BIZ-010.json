@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-BIZ-010",
+  "title": "Sara Blakely: Turning an Annoyance Into Spanx",
+  "category": "Entrepreneur",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A simple frustration became a billion-dollar business.",
+  "story": "Sara Blakely noticed a problem while getting dressed for an event. She wanted clothing that looked smoother under her outfit, but existing solutions did not work. Instead of accepting the problem, she experimented and created her own solution. She invested her savings, researched the product herself, and built Spanx into a global brand.",
+  "impact": "Many successful businesses begin with someone solving a problem they personally understand. The founder's frustration became a customer's solution.",
+  "spark_application": "What everyday frustration could reveal a business opportunity?",
+  "tags": [
+    "entrepreneurship",
+    "innovation",
+    "resilience",
+    "creativity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "entrepreneur",
+  "category_label": "Entrepreneur",
+  "spark_type": "deep",
+  "short_title": "Sara Blakely & Spanx"
+}

@@ -1,16 +1,16 @@
 {
   "spark_id": "SPARK-CREAT-001",
-  "title": "The First Draft Is Supposed To Be Messy",
+  "title": "The Power of the Bad First Draft",
   "category": "Creativity",
   "audience": [
     "Everyone"
   ],
   "image": null,
   "thumbnail": null,
-  "short_teaser": "Great creations usually begin as imperfect attempts.",
-  "story": "Many creators, writers, inventors, and entrepreneurs begin with rough versions. The first idea is not the final product. It is a starting point that gives something to improve.",
-  "impact": "Waiting for perfection often prevents ideas from becoming real. Creating something imperfect creates the opportunity to make it better.",
-  "spark_application": "What could you start today if it did not have to be perfect?",
+  "short_teaser": "Great ideas rarely begin perfectly.",
+  "story": "Many creators, writers, and inventors begin with rough versions. The first version is not meant to be the final version. It is meant to create something that can be improved.",
+  "impact": "Waiting for perfection prevents many ideas from ever becoming real.",
+  "spark_application": "What could you create if the first version was allowed to be imperfect?",
   "tags": [
     "creativity",
     "perfectionism",
@@ -25,5 +25,5 @@
   "runtime_category": "creativity",
   "category_label": "Creativity",
   "spark_type": "quick",
-  "short_title": "First Draft Messy"
+  "short_title": "Bad First Draft"
 }

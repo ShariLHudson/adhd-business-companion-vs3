@@ -1,23 +1,30 @@
 {
   "spark_id": "SPARK-INV-002",
-  "title": "The First Computer Mouse",
-  "category": "History of Inventions",
+  "title": "The Microwave Oven Accident",
+  "category": "Invention",
   "audience": [
     "Everyone"
   ],
   "image": null,
   "thumbnail": null,
-  "thumbnail_alt": "Vintage computer mouse",
-  "short_teaser": "A wooden block that changed how we interact with computers.",
-  "story": "In 1964, Douglas Engelbart built the first computer mouse from a wooden block, two metal wheels, and a single button. He called it a mouse because the cord looked like a tail. His goal was to make computers feel more intuitive — something you could point at, not just type at.",
-  "impact": "The mouse made personal computing accessible to everyone. Point-and-click became the bridge between human intention and digital action.",
-  "spark_application": "What tool could make something complicated feel simple for the people you serve?",
-  "tags": [],
+  "thumbnail_alt": "Microwave oven",
+  "short_teaser": "A melted candy bar helped create a kitchen revolution.",
+  "story": "Engineer Percy Spencer was working with radar technology when he noticed that a candy bar in his pocket had melted. Instead of ignoring it, he investigated. His curiosity led to the discovery that microwave energy could heat food.",
+  "impact": "Many breakthroughs begin with someone asking: \"Why did that happen?\" Curiosity turns ordinary moments into discoveries.",
+  "spark_application": "What everyday problem around you might contain an opportunity?",
+  "tags": [
+    "innovation",
+    "curiosity",
+    "science",
+    "accidental-discovery"
+  ],
   "date_rules": {
     "type": "evergreen"
   },
   "tone": "curious",
   "status": "active",
   "runtime_category": "invention",
-  "category_label": "History of Inventions"
+  "category_label": "Invention",
+  "spark_type": "story",
+  "short_title": "Microwave Accident"
 }

@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-HIST-001",
+  "title": "The First Email",
+  "category": "History",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A simple message changed how the world communicates.",
+  "story": "In 1971, Ray Tomlinson sent the first network email and helped create a new way for people to communicate. A small technical experiment became part of everyday life.",
+  "impact": "Many technologies we take for granted started as simple experiments.",
+  "spark_application": "What small experiment could lead to something bigger?",
+  "tags": [
+    "technology",
+    "communication",
+    "innovation"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "history",
+  "category_label": "History",
+  "spark_type": "story",
+  "short_title": "The First Email"
+}

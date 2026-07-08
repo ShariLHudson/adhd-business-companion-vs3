@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-PER-009",
+  "title": "Thomas Edison: Persistence Through Failure",
+  "category": "Inspiring People",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Thousands of attempts can lead to one world-changing idea.",
+  "story": "Thomas Edison is remembered for inventions like the practical electric light bulb, but his journey included many unsuccessful experiments. He viewed failed attempts as information that helped him understand what did not work. His approach was based on curiosity and persistence.",
+  "impact": "Progress rarely happens perfectly the first time. Innovation often requires patience, experimentation, and learning.",
+  "spark_application": "What could you learn from something that did not work yet?",
+  "tags": [
+    "innovation",
+    "resilience",
+    "invention",
+    "persistence"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "entrepreneur",
+  "category_label": "Inspiring People",
+  "spark_type": "deep",
+  "short_title": "Edison's Persistence"
+}

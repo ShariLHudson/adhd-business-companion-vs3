@@ -7,15 +7,14 @@
   ],
   "image": null,
   "thumbnail": null,
-  "short_teaser": "Big changes often begin with very small steps.",
-  "story": "Many accomplishments are created through small actions repeated consistently. A person does not build a business, learn a skill, or create something meaningful in one moment. Progress is usually built one decision at a time.",
-  "impact": "Small wins create evidence that movement is happening. Progress does not have to be dramatic to be meaningful.",
-  "spark_application": "What is one small step you can take today?",
+  "short_teaser": "Tiny actions repeated over time can create surprising results.",
+  "story": "Many meaningful accomplishments are created through consistent small steps rather than one dramatic moment. Progress builds confidence.",
+  "impact": "Small wins create evidence that you are moving forward.",
+  "spark_application": "What is one small action you could complete today?",
   "tags": [
+    "growth",
     "progress",
-    "motivation",
-    "momentum",
-    "growth"
+    "motivation"
   ],
   "date_rules": {
     "type": "evergreen"
