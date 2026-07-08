@@ -1030,3 +1030,43 @@ export function registerPendingEstatePlaceMenuFromAssistant(
   });
   return true;
 }
+
+// --- Fix B — declined place-menu suppression store ---------------------------
+const DECLINED_MENU_KEY = "companion-declined-estate-place-menu-v1";
+const DECLINED_MENU_WINDOW_TURNS = 2;
+
+type DeclinedEstatePlaceMenu = { declinedAtTurn: number };
+
+/** Record that the member just declined a place menu, so we don't re-offer immediately. */
+export function recordDeclinedEstatePlaceMenu(currentTurn: number): void {
+  if (typeof window === "undefined") return;
+  try {
+    const payload: DeclinedEstatePlaceMenu = { declinedAtTurn: currentTurn };
+    window.sessionStorage.setItem(DECLINED_MENU_KEY, JSON.stringify(payload));
+  } catch {
+    /* ignore storage errors */
+  }
+}
+
+/** True when a place menu was declined within the suppression window. */
+export function wasEstatePlaceMenuRecentlyDeclined(currentTurn: number): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const raw = window.sessionStorage.getItem(DECLINED_MENU_KEY);
+    if (!raw) return false;
+    const parsed = JSON.parse(raw) as DeclinedEstatePlaceMenu;
+    if (typeof parsed?.declinedAtTurn !== "number") return false;
+    return currentTurn - parsed.declinedAtTurn < DECLINED_MENU_WINDOW_TURNS;
+  } catch {
+    return false;
+  }
+}
+
+export function clearDeclinedEstatePlaceMenu(): void {
+  if (typeof window === "undefined") return;
+  try {
+    window.sessionStorage.removeItem(DECLINED_MENU_KEY);
+  } catch {
+    /* ignore storage errors */
+  }
+}

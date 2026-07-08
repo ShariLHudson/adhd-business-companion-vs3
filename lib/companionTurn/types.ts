@@ -5,6 +5,7 @@
  */
 
 import type { EstateActionExecutionPlan } from "@/lib/estate/decisionKernel";
+import type { PrimaryTurnDecision } from "@/lib/conversation/primaryTurnClassifier";
 
 export type CompanionIntentKind = "CHAT" | "NAVIGATE" | "CAPTURE" | "AUDIO";
 
@@ -22,4 +23,6 @@ export type ClassifyCompanionIntentInput = {
   soundscapeCategoryId?: string | null;
   /** Coaching / SOP / how-to — skip estate kernel, chat API only. */
   forceChat?: boolean;
+  /** Primary-turn verdict — Fix A uses this to suppress estate room routing on clear goal/help turns. */
+  primaryTurn?: PrimaryTurnDecision | null;
 };

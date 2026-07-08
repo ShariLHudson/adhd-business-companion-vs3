@@ -1310,6 +1310,7 @@ import {
   classifyCompanionIntent,
   executeCompanionIntent,
 } from "@/lib/companionTurn";
+import { isDirectHelpOverrideRequest } from "@/lib/companionTurn/classifyCompanionIntent";
 import { patchEstateRuntimeState } from "@/lib/estate/estateRuntimeState";
 import {
   estateMemoryHintForChat,
@@ -11612,8 +11613,11 @@ export default function CompanionPageClient() {
           lastAssistantText: lastAssistantBeforeSend,
           currentPlaceId: currentEstateRoomId,
           forceChat:
-            (informationalChatTurn || taskLockBlocksEstateRouting) &&
+            (informationalChatTurn ||
+              taskLockBlocksEstateRouting ||
+              isDirectHelpOverrideRequest(trimmed)) &&
             !estateKernelForced,
+          primaryTurn: primaryTurnDecision,
         }),
       {
         kind: "CHAT",
