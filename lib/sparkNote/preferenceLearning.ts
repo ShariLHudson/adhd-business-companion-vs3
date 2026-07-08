@@ -1,5 +1,10 @@
 import type { SparkNoteCatalogEntry } from "./types";
 import { categoryForSparkId } from "./librarySelection";
+import {
+  MAX_CATEGORY_AFFINITY_BOOST,
+  SAVED_CATEGORY_AFFINITY_BOOST,
+  VIEWED_CATEGORY_AFFINITY_BOOST,
+} from "./selectionIntelligence";
 import { getCategoryAffinity, readSparkNoteStore } from "./persistence";
 
 function hashSeed(input: string): number {
@@ -16,17 +21,33 @@ export function scoreEntryAffinity(entry: SparkNoteCatalogEntry): number {
   const store = readSparkNoteStore();
   const ignored = store.ignoredCategories[entry.category] ?? 0;
   let score = 10;
-  score += affinity[entry.category] ?? 0;
+
+  const categoryBoost = Math.min(
+    affinity[entry.category] ?? 0,
+    MAX_CATEGORY_AFFINITY_BOOST,
+  );
+  score += categoryBoost;
   score -= ignored * 2;
+
+  let savedBoost = 0;
+  for (const id of store.favoriteIds.slice(0, 12)) {
+    if (categoryForSparkId(id) === entry.category) {
+      savedBoost += SAVED_CATEGORY_AFFINITY_BOOST;
+    }
+  }
+  score += Math.min(savedBoost, SAVED_CATEGORY_AFFINITY_BOOST * 2);
 
   let viewedBoost = 0;
   for (const id of store.viewedIds.slice(0, 10)) {
-    if (categoryForSparkId(id) === entry.category) viewedBoost += 0.5;
+    if (categoryForSparkId(id) === entry.category) {
+      viewedBoost += VIEWED_CATEGORY_AFFINITY_BOOST;
+    }
   }
-  score += Math.min(viewedBoost, 2);
+  score += Math.min(viewedBoost, VIEWED_CATEGORY_AFFINITY_BOOST * 2);
 
   for (const tag of entry.tags ?? []) {
-    score += (affinity[`tag:${tag}`] ?? 0) * 0.5;
+    const tagBoost = Math.min(affinity[`tag:${tag}`] ?? 0, 4);
+    score += tagBoost * 0.5;
   }
   return Math.max(score, 1);
 }

@@ -68,5 +68,21 @@ describe("preferenceLearning", () => {
     recordSparkNoteViewed("SPARK-INV-001");
     const after = scoreEntryAffinity(entry);
     expect(after).toBeGreaterThan(before);
+    expect(after - before).toBeLessThanOrEqual(1);
+  });
+
+  it("saved sparks are a stronger signal than a single view", () => {
+    const invention = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-INV-001")!;
+    const business = SPARK_NOTE_CATALOG.find((e) => e.id === "SPARK-BIZ-004")!;
+
+    recordSparkNoteViewed("SPARK-INV-002");
+    const viewedOnly = scoreEntryAffinity(invention);
+
+    resetSparkNoteStoreForTests();
+    recordSparkNoteReaction("SPARK-INV-001", "save", "invention");
+    const savedBoost = scoreEntryAffinity(invention);
+
+    expect(savedBoost).toBeGreaterThan(viewedOnly);
+    expect(scoreEntryAffinity(business)).toBeLessThan(savedBoost);
   });
 });

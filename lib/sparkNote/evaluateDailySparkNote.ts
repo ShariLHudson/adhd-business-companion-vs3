@@ -184,7 +184,12 @@ function personalInput(input: EvaluateDailySparkNoteInput, now: Date) {
 
 /**
  * Select today's Spark Note — one card per day.
- * Priority: personal > date-based > curated library rotation.
+ *
+ * Selection intelligence (see selectionIntelligence.ts):
+ * 1. Personal meaningful moments today
+ * 2. Personal upcoming events (within 7 days)
+ * 3. Calendar / seasonal date-based sparks
+ * 4–5. Affinity-weighted evergreen library with variety rules
  */
 export function evaluateDailySparkNote(
   input: EvaluateDailySparkNoteInput = {},

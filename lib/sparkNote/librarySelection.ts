@@ -1,6 +1,10 @@
 import type { SparkNoteCatalogEntry, SparkNoteCategory } from "./types";
 import { SPARK_NOTE_CATALOG } from "./catalog";
-import { getRecentSparkNoteIds, getYesterdaySparkId } from "./persistence";
+import {
+  getRecentSelectionCategories,
+  getRecentSelectionSparkIds,
+} from "./selectionIntelligence";
+import { getYesterdaySparkId } from "./persistence";
 
 /** Map spark id → catalog category for repeat-prevention. */
 export function categoryForSparkId(id: string): SparkNoteCategory | null {
@@ -9,9 +13,10 @@ export function categoryForSparkId(id: string): SparkNoteCategory | null {
 }
 
 /**
- * Filter library pool per repeat-prevention rules:
+ * Filter library pool per selection intelligence variety rules:
  * - never same card as yesterday (when alternatives exist)
- * - avoid categories from the last two selections (when alternatives exist)
+ * - avoid sparks from the last few days (when alternatives exist)
+ * - avoid categories from recent selections (when alternatives exist)
  */
 export function filterLibraryCandidatePool(
   pool: readonly SparkNoteCatalogEntry[],
@@ -25,12 +30,11 @@ export function filterLibraryCandidatePool(
     : [...pool];
   if (filtered.length === 0) filtered = [...pool];
 
-  const recentCategories = new Set(
-    getRecentSparkNoteIds()
-      .slice(0, 2)
-      .map((id) => categoryForSparkId(id))
-      .filter((cat): cat is SparkNoteCategory => cat != null),
-  );
+  const recentIds = getRecentSelectionSparkIds();
+  const withoutRecentIds = filtered.filter((entry) => !recentIds.includes(entry.id));
+  if (withoutRecentIds.length > 0) filtered = withoutRecentIds;
+
+  const recentCategories = new Set(getRecentSelectionCategories());
 
   if (recentCategories.size > 0) {
     const withoutRecentCategories = filtered.filter(

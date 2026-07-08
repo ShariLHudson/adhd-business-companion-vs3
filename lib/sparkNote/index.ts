@@ -15,3 +15,4 @@ export {
   SPARK_NOTE_FALLBACK_ID,
   resolveFallbackSparkCard,
 } from "./runtimeIntegration";
+export * from "./selectionIntelligence";

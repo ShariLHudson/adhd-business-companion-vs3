@@ -29,6 +29,41 @@ describe("evaluateDailySparkNote", () => {
     expect(card?.title.toLowerCase()).toContain("birthday");
   });
 
+  it("personal birthday beats holiday on the same calendar day", () => {
+    const now = new Date("2026-05-30T10:00:00");
+    const holidayOnly = evaluateDailySparkNote({ now, forceRefresh: true });
+    expect(holidayOnly.card?.id).toBe("SPARK-HOL-001");
+
+    const { card } = evaluateDailySparkNote({
+      now,
+      firstName: "Jordan",
+      birthday: { month: 5, day: 30 },
+      forceRefresh: true,
+    });
+    expect(card?.source).toBe("personal");
+    expect(card?.id).toContain("personal-birthday");
+  });
+
+  it("upcoming personal event wins when nothing meaningful happens today", () => {
+    const now = new Date("2026-07-02T10:00:00");
+    const { card } = evaluateDailySparkNote({
+      now,
+      personalDates: [
+        {
+          id: "summer-trip",
+          label: "Summer Adventure",
+          month: 1,
+          day: 1,
+          kind: "vacation",
+          targetDate: "2026-07-05",
+        },
+      ],
+      forceRefresh: true,
+    });
+    expect(card?.source).toBe("personal");
+    expect(card?.shortTitle).toBe("Adventure Ahead");
+  });
+
   it("selects date-based spark on matching calendar day", () => {
     const now = new Date("2026-05-30T10:00:00");
     const { card } = evaluateDailySparkNote({
