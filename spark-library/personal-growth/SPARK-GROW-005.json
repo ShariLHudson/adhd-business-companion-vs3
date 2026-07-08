@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-GROW-005",
+  "title": "The Strength of Curiosity",
+  "category": "Personal Growth",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Questions can open doors that answers cannot.",
+  "story": "Curious people continue learning because they remain open to possibilities. Many discoveries begin with someone asking a simple question.",
+  "impact": "Curiosity keeps people growing.",
+  "spark_application": "What question are you curious about today?",
+  "tags": [
+    "curiosity",
+    "learning",
+    "discovery"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "personal_growth",
+  "category_label": "Personal Growth",
+  "spark_type": "quick",
+  "short_title": "Strength of Curiosity"
+}

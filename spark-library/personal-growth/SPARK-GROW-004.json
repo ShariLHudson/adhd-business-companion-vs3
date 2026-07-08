@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-GROW-004",
+  "title": "Progress Is Not Always Visible",
+  "category": "Personal Growth",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Some of the most important growth happens quietly.",
+  "story": "Seeds grow underground before anything appears above the surface. People often experience the same thing. Learning, healing, and building can happen before results become obvious.",
+  "impact": "Invisible progress is still progress.",
+  "spark_application": "What might be growing in your life that you cannot see yet?",
+  "tags": [
+    "patience",
+    "growth",
+    "encouragement"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "personal_growth",
+  "category_label": "Personal Growth",
+  "spark_type": "story",
+  "short_title": "Invisible Progress"
+}

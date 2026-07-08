@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-GROW-007",
+  "title": "Different Does Not Mean Wrong",
+  "category": "Personal Growth",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "A different way of thinking can become an advantage.",
+  "story": "Many innovations come from people who see problems differently. Unique perspectives can reveal solutions others miss.",
+  "impact": "The way you think may be part of your strength.",
+  "spark_application": "What is something unique about how you approach the world?",
+  "tags": [
+    "strengths",
+    "individuality",
+    "neurodiversity"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "personal_growth",
+  "category_label": "Personal Growth",
+  "spark_type": "story",
+  "short_title": "Different Strength"
+}

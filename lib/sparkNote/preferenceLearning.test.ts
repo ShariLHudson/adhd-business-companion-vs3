@@ -56,8 +56,8 @@ describe("preferenceLearning", () => {
   });
 
   it("toggleSparkNoteFavorite still works alongside reactions", () => {
-    toggleSparkNoteFavorite("SPARK-GRO-001");
-    expect(resolveMySparksCollection().some((s) => s.id === "SPARK-GRO-001")).toBe(
+    toggleSparkNoteFavorite("SPARK-GRO-009");
+    expect(resolveMySparksCollection().some((s) => s.id === "SPARK-GRO-009")).toBe(
       true,
     );
   });

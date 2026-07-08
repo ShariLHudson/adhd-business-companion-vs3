@@ -1000,6 +1000,260 @@
     "category_label": "Personal Growth"
   },
   {
+    "spark_id": "SPARK-GRO-009",
+    "title": "The Two-Minute Rule",
+    "category": "Personal Growth",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "thumbnail_alt": "Checklist",
+    "short_teaser": "Small actions beat perfect plans.",
+    "story": "Productivity researchers found that if a task takes less than two minutes, doing it immediately prevents the mental overhead of tracking it. The rule isn't about speed — it's about reducing friction between intention and action.",
+    "impact": "Momentum often starts with the smallest possible step. Finishing tiny tasks builds confidence for bigger ones.",
+    "spark_application": "What two-minute action could you finish right now instead of adding it to a list?",
+    "tags": [
+      "productivity",
+      "momentum",
+      "action"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "personal_growth",
+    "category_label": "Personal Growth",
+    "spark_type": "quick"
+  },
+  {
+    "spark_id": "SPARK-GROW-001",
+    "title": "Small Steps Create Momentum",
+    "category": "Personal Growth",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Big changes often begin with very small steps.",
+    "story": "Many accomplishments are created through small actions repeated consistently. A person does not build a business, learn a skill, or create something meaningful in one moment. Progress is usually built one decision at a time.",
+    "impact": "Small wins create evidence that movement is happening. Progress does not have to be dramatic to be meaningful.",
+    "spark_application": "What is one small step you can take today?",
+    "tags": [
+      "progress",
+      "motivation",
+      "momentum",
+      "growth"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "personal_growth",
+    "category_label": "Personal Growth",
+    "spark_type": "story",
+    "short_title": "Small Steps"
+  },
+  {
+    "spark_id": "SPARK-GROW-002",
+    "title": "The Power of Starting Before You Are Ready",
+    "category": "Personal Growth",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Many opportunities begin before we feel completely prepared.",
+    "story": "Creators, entrepreneurs, and leaders often begin with uncertainty. Confidence frequently comes after taking action, not before.",
+    "impact": "Waiting until everything is perfect can prevent meaningful progress.",
+    "spark_application": "What would you begin if you allowed yourself to learn along the way?",
+    "tags": [
+      "courage",
+      "action",
+      "confidence",
+      "growth"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "personal_growth",
+    "category_label": "Personal Growth",
+    "spark_type": "quick",
+    "short_title": "Start Before Ready"
+  },
+  {
+    "spark_id": "SPARK-GROW-003",
+    "title": "Your Past Can Become Wisdom",
+    "category": "Personal Growth",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Every chapter of life can teach something valuable.",
+    "story": "Experiences, challenges, successes, and mistakes all contribute to the person we become. The lessons we gain can become strengths we use later.",
+    "impact": "Your history is not only what happened to you. It is also what you learned from it.",
+    "spark_application": "What lesson from your past helps you today?",
+    "tags": [
+      "resilience",
+      "experience",
+      "learning"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "personal_growth",
+    "category_label": "Personal Growth",
+    "spark_type": "story",
+    "short_title": "Past as Wisdom"
+  },
+  {
+    "spark_id": "SPARK-GROW-004",
+    "title": "Progress Is Not Always Visible",
+    "category": "Personal Growth",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Some of the most important growth happens quietly.",
+    "story": "Seeds grow underground before anything appears above the surface. People often experience the same thing. Learning, healing, and building can happen before results become obvious.",
+    "impact": "Invisible progress is still progress.",
+    "spark_application": "What might be growing in your life that you cannot see yet?",
+    "tags": [
+      "patience",
+      "growth",
+      "encouragement"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "personal_growth",
+    "category_label": "Personal Growth",
+    "spark_type": "story",
+    "short_title": "Invisible Progress"
+  },
+  {
+    "spark_id": "SPARK-GROW-005",
+    "title": "The Strength of Curiosity",
+    "category": "Personal Growth",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Questions can open doors that answers cannot.",
+    "story": "Curious people continue learning because they remain open to possibilities. Many discoveries begin with someone asking a simple question.",
+    "impact": "Curiosity keeps people growing.",
+    "spark_application": "What question are you curious about today?",
+    "tags": [
+      "curiosity",
+      "learning",
+      "discovery"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "personal_growth",
+    "category_label": "Personal Growth",
+    "spark_type": "quick",
+    "short_title": "Strength of Curiosity"
+  },
+  {
+    "spark_id": "SPARK-GROW-006",
+    "title": "Celebrate Small Wins",
+    "category": "Personal Growth",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Small accomplishments deserve recognition.",
+    "story": "People often overlook progress because they focus only on the final goal. But every completed step builds confidence and momentum.",
+    "impact": "Recognizing progress helps create motivation for the next step.",
+    "spark_application": "What is something you accomplished that deserves more credit?",
+    "tags": [
+      "achievement",
+      "confidence",
+      "encouragement"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "personal_growth",
+    "category_label": "Personal Growth",
+    "spark_type": "quick",
+    "short_title": "Celebrate Small Wins"
+  },
+  {
+    "spark_id": "SPARK-GROW-007",
+    "title": "Different Does Not Mean Wrong",
+    "category": "Personal Growth",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "A different way of thinking can become an advantage.",
+    "story": "Many innovations come from people who see problems differently. Unique perspectives can reveal solutions others miss.",
+    "impact": "The way you think may be part of your strength.",
+    "spark_application": "What is something unique about how you approach the world?",
+    "tags": [
+      "strengths",
+      "individuality",
+      "neurodiversity"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "personal_growth",
+    "category_label": "Personal Growth",
+    "spark_type": "story",
+    "short_title": "Different Strength"
+  },
+  {
+    "spark_id": "SPARK-GROW-008",
+    "title": "Give Yourself Room To Learn",
+    "category": "Personal Growth",
+    "audience": [
+      "Everyone"
+    ],
+    "image": null,
+    "thumbnail": null,
+    "short_teaser": "Growth requires permission to be a beginner.",
+    "story": "Every expert started by not knowing. Learning includes mistakes, questions, and adjustments.",
+    "impact": "Allowing yourself to learn creates more opportunities.",
+    "spark_application": "What would you try if you did not need to be good at it immediately?",
+    "tags": [
+      "learning",
+      "patience",
+      "self-compassion"
+    ],
+    "date_rules": {
+      "type": "evergreen"
+    },
+    "tone": "curious",
+    "status": "active",
+    "runtime_category": "personal_growth",
+    "category_label": "Personal Growth",
+    "spark_type": "quick",
+    "short_title": "Room To Learn"
+  },
+  {
     "spark_id": "SPARK-HIS-001",
     "title": "The Moon Landing",
     "category": "Today in History",

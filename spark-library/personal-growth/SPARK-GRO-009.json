@@ -1,5 +1,5 @@
 {
-  "spark_id": "SPARK-GRO-001",
+  "spark_id": "SPARK-GRO-009",
   "title": "The Two-Minute Rule",
   "category": "Personal Growth",
   "audience": [
@@ -12,12 +12,17 @@
   "story": "Productivity researchers found that if a task takes less than two minutes, doing it immediately prevents the mental overhead of tracking it. The rule isn't about speed — it's about reducing friction between intention and action.",
   "impact": "Momentum often starts with the smallest possible step. Finishing tiny tasks builds confidence for bigger ones.",
   "spark_application": "What two-minute action could you finish right now instead of adding it to a list?",
-  "tags": [],
+  "tags": [
+    "productivity",
+    "momentum",
+    "action"
+  ],
   "date_rules": {
     "type": "evergreen"
   },
   "tone": "curious",
   "status": "active",
   "runtime_category": "personal_growth",
-  "category_label": "Personal Growth"
+  "category_label": "Personal Growth",
+  "spark_type": "quick"
 }

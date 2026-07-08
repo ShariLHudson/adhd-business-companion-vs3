@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-GROW-006",
+  "title": "Celebrate Small Wins",
+  "category": "Personal Growth",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Small accomplishments deserve recognition.",
+  "story": "People often overlook progress because they focus only on the final goal. But every completed step builds confidence and momentum.",
+  "impact": "Recognizing progress helps create motivation for the next step.",
+  "spark_application": "What is something you accomplished that deserves more credit?",
+  "tags": [
+    "achievement",
+    "confidence",
+    "encouragement"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "personal_growth",
+  "category_label": "Personal Growth",
+  "spark_type": "quick",
+  "short_title": "Celebrate Small Wins"
+}

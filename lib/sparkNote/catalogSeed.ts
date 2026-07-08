@@ -741,11 +741,134 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     tags: ["gratitude", "perspective", "awareness"],
   },
 
-  // — Personal growth —
+  // — Personal growth (spark-notes-files/SPARK_NOTE_PERSONAL_GROWTH_AND_ENCOURAGEMENT_SPARK_LIBRARY.md) —
   {
-    id: "SPARK-GRO-001",
+    id: "SPARK-GROW-001",
     category: "personal_growth",
     categoryLabel: "Personal Growth",
+    sparkType: "story",
+    title: "Small Steps Create Momentum",
+    shortTitle: "Small Steps",
+    teaser: "Big changes often begin with very small steps.",
+    whatHappened:
+      "Many accomplishments are created through small actions repeated consistently. A person does not build a business, learn a skill, or create something meaningful in one moment. Progress is usually built one decision at a time.",
+    whyItMatters:
+      "Small wins create evidence that movement is happening. Progress does not have to be dramatic to be meaningful.",
+    sparkApplication: "What is one small step you can take today?",
+    tags: ["progress", "motivation", "momentum", "growth"],
+  },
+  {
+    id: "SPARK-GROW-002",
+    category: "personal_growth",
+    categoryLabel: "Personal Growth",
+    sparkType: "quick",
+    title: "The Power of Starting Before You Are Ready",
+    shortTitle: "Start Before Ready",
+    teaser: "Many opportunities begin before we feel completely prepared.",
+    whatHappened:
+      "Creators, entrepreneurs, and leaders often begin with uncertainty. Confidence frequently comes after taking action, not before.",
+    whyItMatters:
+      "Waiting until everything is perfect can prevent meaningful progress.",
+    sparkApplication:
+      "What would you begin if you allowed yourself to learn along the way?",
+    tags: ["courage", "action", "confidence", "growth"],
+  },
+  {
+    id: "SPARK-GROW-003",
+    category: "personal_growth",
+    categoryLabel: "Personal Growth",
+    sparkType: "story",
+    title: "Your Past Can Become Wisdom",
+    shortTitle: "Past as Wisdom",
+    teaser: "Every chapter of life can teach something valuable.",
+    whatHappened:
+      "Experiences, challenges, successes, and mistakes all contribute to the person we become. The lessons we gain can become strengths we use later.",
+    whyItMatters:
+      "Your history is not only what happened to you. It is also what you learned from it.",
+    sparkApplication: "What lesson from your past helps you today?",
+    tags: ["resilience", "experience", "learning"],
+  },
+  {
+    id: "SPARK-GROW-004",
+    category: "personal_growth",
+    categoryLabel: "Personal Growth",
+    sparkType: "story",
+    title: "Progress Is Not Always Visible",
+    shortTitle: "Invisible Progress",
+    teaser: "Some of the most important growth happens quietly.",
+    whatHappened:
+      "Seeds grow underground before anything appears above the surface. People often experience the same thing. Learning, healing, and building can happen before results become obvious.",
+    whyItMatters: "Invisible progress is still progress.",
+    sparkApplication:
+      "What might be growing in your life that you cannot see yet?",
+    tags: ["patience", "growth", "encouragement"],
+  },
+  {
+    id: "SPARK-GROW-005",
+    category: "personal_growth",
+    categoryLabel: "Personal Growth",
+    sparkType: "quick",
+    title: "The Strength of Curiosity",
+    shortTitle: "Strength of Curiosity",
+    teaser: "Questions can open doors that answers cannot.",
+    whatHappened:
+      "Curious people continue learning because they remain open to possibilities. Many discoveries begin with someone asking a simple question.",
+    whyItMatters: "Curiosity keeps people growing.",
+    sparkApplication: "What question are you curious about today?",
+    tags: ["curiosity", "learning", "discovery"],
+  },
+  {
+    id: "SPARK-GROW-006",
+    category: "personal_growth",
+    categoryLabel: "Personal Growth",
+    sparkType: "quick",
+    title: "Celebrate Small Wins",
+    shortTitle: "Celebrate Small Wins",
+    teaser: "Small accomplishments deserve recognition.",
+    whatHappened:
+      "People often overlook progress because they focus only on the final goal. But every completed step builds confidence and momentum.",
+    whyItMatters:
+      "Recognizing progress helps create motivation for the next step.",
+    sparkApplication:
+      "What is something you accomplished that deserves more credit?",
+    tags: ["achievement", "confidence", "encouragement"],
+  },
+  {
+    id: "SPARK-GROW-007",
+    category: "personal_growth",
+    categoryLabel: "Personal Growth",
+    sparkType: "story",
+    title: "Different Does Not Mean Wrong",
+    shortTitle: "Different Strength",
+    teaser: "A different way of thinking can become an advantage.",
+    whatHappened:
+      "Many innovations come from people who see problems differently. Unique perspectives can reveal solutions others miss.",
+    whyItMatters: "The way you think may be part of your strength.",
+    sparkApplication:
+      "What is something unique about how you approach the world?",
+    tags: ["strengths", "individuality", "neurodiversity"],
+  },
+  {
+    id: "SPARK-GROW-008",
+    category: "personal_growth",
+    categoryLabel: "Personal Growth",
+    sparkType: "quick",
+    title: "Give Yourself Room To Learn",
+    shortTitle: "Room To Learn",
+    teaser: "Growth requires permission to be a beginner.",
+    whatHappened:
+      "Every expert started by not knowing. Learning includes mistakes, questions, and adjustments.",
+    whyItMatters:
+      "Allowing yourself to learn creates more opportunities.",
+    sparkApplication:
+      "What would you try if you did not need to be good at it immediately?",
+    tags: ["learning", "patience", "self-compassion"],
+  },
+  {
+    id: "SPARK-GRO-009",
+    category: "personal_growth",
+    categoryLabel: "Personal Growth",
+    sparkType: "quick",
     title: "The Two-Minute Rule",
     teaser: "Small actions beat perfect plans.",
     whatHappened:
@@ -755,6 +878,7 @@ export const SEED_SPARK_NOTE_CATALOG: readonly SparkNoteCatalogEntry[] = [
     sparkApplication:
       "What two-minute action could you finish right now instead of adding it to a list?",
     thumbnailAlt: "Checklist",
+    tags: ["productivity", "momentum", "action"],
   },
   {
     id: "SPARK-CRE-001",

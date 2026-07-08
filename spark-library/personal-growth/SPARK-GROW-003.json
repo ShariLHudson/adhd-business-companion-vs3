@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-GROW-003",
+  "title": "Your Past Can Become Wisdom",
+  "category": "Personal Growth",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Every chapter of life can teach something valuable.",
+  "story": "Experiences, challenges, successes, and mistakes all contribute to the person we become. The lessons we gain can become strengths we use later.",
+  "impact": "Your history is not only what happened to you. It is also what you learned from it.",
+  "spark_application": "What lesson from your past helps you today?",
+  "tags": [
+    "resilience",
+    "experience",
+    "learning"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "personal_growth",
+  "category_label": "Personal Growth",
+  "spark_type": "story",
+  "short_title": "Past as Wisdom"
+}

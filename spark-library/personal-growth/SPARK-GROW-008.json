@@ -1,0 +1,28 @@
+{
+  "spark_id": "SPARK-GROW-008",
+  "title": "Give Yourself Room To Learn",
+  "category": "Personal Growth",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Growth requires permission to be a beginner.",
+  "story": "Every expert started by not knowing. Learning includes mistakes, questions, and adjustments.",
+  "impact": "Allowing yourself to learn creates more opportunities.",
+  "spark_application": "What would you try if you did not need to be good at it immediately?",
+  "tags": [
+    "learning",
+    "patience",
+    "self-compassion"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "personal_growth",
+  "category_label": "Personal Growth",
+  "spark_type": "quick",
+  "short_title": "Room To Learn"
+}

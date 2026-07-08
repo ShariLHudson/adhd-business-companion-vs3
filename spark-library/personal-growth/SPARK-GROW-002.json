@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-GROW-002",
+  "title": "The Power of Starting Before You Are Ready",
+  "category": "Personal Growth",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Many opportunities begin before we feel completely prepared.",
+  "story": "Creators, entrepreneurs, and leaders often begin with uncertainty. Confidence frequently comes after taking action, not before.",
+  "impact": "Waiting until everything is perfect can prevent meaningful progress.",
+  "spark_application": "What would you begin if you allowed yourself to learn along the way?",
+  "tags": [
+    "courage",
+    "action",
+    "confidence",
+    "growth"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "personal_growth",
+  "category_label": "Personal Growth",
+  "spark_type": "quick",
+  "short_title": "Start Before Ready"
+}

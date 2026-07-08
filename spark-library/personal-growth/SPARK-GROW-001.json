@@ -1,0 +1,29 @@
+{
+  "spark_id": "SPARK-GROW-001",
+  "title": "Small Steps Create Momentum",
+  "category": "Personal Growth",
+  "audience": [
+    "Everyone"
+  ],
+  "image": null,
+  "thumbnail": null,
+  "short_teaser": "Big changes often begin with very small steps.",
+  "story": "Many accomplishments are created through small actions repeated consistently. A person does not build a business, learn a skill, or create something meaningful in one moment. Progress is usually built one decision at a time.",
+  "impact": "Small wins create evidence that movement is happening. Progress does not have to be dramatic to be meaningful.",
+  "spark_application": "What is one small step you can take today?",
+  "tags": [
+    "progress",
+    "motivation",
+    "momentum",
+    "growth"
+  ],
+  "date_rules": {
+    "type": "evergreen"
+  },
+  "tone": "curious",
+  "status": "active",
+  "runtime_category": "personal_growth",
+  "category_label": "Personal Growth",
+  "spark_type": "story",
+  "short_title": "Small Steps"
+}
