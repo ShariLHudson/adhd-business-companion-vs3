@@ -28,6 +28,7 @@ import { verifySparkEstateSystemGovernanceAndQualityStandards } from "./sparkEst
 import { verifySparkEstateTopNavigationAndProfileMenu } from "./sparkEstateTopNavigationAndProfileMenu";
 import { verifySparkEstateFounderIntelligenceDashboard } from "./sparkEstateFounderIntelligenceDashboard";
 import { verifySparkEstateIntelligentWorkspaceRecommendationSystem } from "./sparkEstateIntelligentWorkspaceRecommendationSystem";
+import { verifySparkEstateIntelligentProjectLifecycleEngine } from "./sparkEstateIntelligentProjectLifecycleEngine";
 import { verifySparkEstateMasterOperatingDocument } from "./sparkEstateMasterOperatingDocument";
 import { verifySparkEstateUserJourneyAndMemberLifecycle } from "./sparkEstateUserJourneyAndMemberLifecycleArchitecture";
 
@@ -101,6 +102,7 @@ export type SparkEstateIntegrationAssessment = {
   masterOperatingDocumentAligned: boolean;
   founderIntelligenceDashboardAligned: boolean;
   intelligentWorkspaceRecommendationAligned: boolean;
+  intelligentProjectLifecycleAligned: boolean;
 };
 
 export const SPARK_ESTATE_IMPLEMENTATION_PRINCIPLE =
@@ -436,6 +438,20 @@ export const SPARK_ESTATE_PHASE_MAPPINGS: readonly SparkEstatePhaseMapping[] = [
     status: "implemented",
     priority: 1,
     dependencies: [11, 14, 18, 29],
+  },
+  {
+    phase: 32,
+    spec: "SPARK_ESTATE_INTELLIGENT_PROJECT_LIFECYCLE_ENGINE_SPECIFICATION_PHASE32.md",
+    title: "Intelligent project lifecycle engine",
+    implementations: [
+      "lib/estate/sparkEstateIntelligentProjectLifecycleEngine.ts",
+      "lib/estate/chamberProjectEngine.ts",
+      "lib/estate/chamberProjectMeta.ts",
+      "lib/estate/sparkEstateCardEcosystem.ts",
+    ],
+    status: "implemented",
+    priority: 1,
+    dependencies: [4, 6, 11, 16, 20, 31],
   },
 ] as const;
 
@@ -842,6 +858,8 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     verifySparkEstateFounderIntelligenceDashboard().founderDashboardReady;
   const intelligentWorkspaceRecommendationAligned =
     verifySparkEstateIntelligentWorkspaceRecommendationSystem().recommendationReady;
+  const intelligentProjectLifecycleAligned =
+    verifySparkEstateIntelligentProjectLifecycleEngine().lifecycleReady;
 
   return {
     existing: entriesByStatus("implemented"),
@@ -872,6 +890,7 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     masterOperatingDocumentAligned,
     founderIntelligenceDashboardAligned,
     intelligentWorkspaceRecommendationAligned,
+    intelligentProjectLifecycleAligned,
   };
 }
 
@@ -904,6 +923,7 @@ export function verifySparkEstateArchitectureIntegration(): {
     assessment.masterOperatingDocumentAligned &&
     assessment.founderIntelligenceDashboardAligned &&
     assessment.intelligentWorkspaceRecommendationAligned &&
+    assessment.intelligentProjectLifecycleAligned &&
     blockingMissing.length === 0;
 
   return { aligned, assessment };
@@ -953,6 +973,7 @@ export function formatSparkEstateArchitectureReport(
     `  Master operating document: ${assessment.masterOperatingDocumentAligned ? "pass" : "fail"}`,
     `  Founder intelligence dashboard: ${assessment.founderIntelligenceDashboardAligned ? "pass" : "fail"}`,
     `  Intelligent workspace recommendation: ${assessment.intelligentWorkspaceRecommendationAligned ? "pass" : "fail"}`,
+    `  Intelligent project lifecycle: ${assessment.intelligentProjectLifecycleAligned ? "pass" : "fail"}`,
     "",
     "Recommended order:",
     ...assessment.recommendedOrder.map((step) => `  • ${step}`),
