@@ -24,6 +24,7 @@ import { sparkEstateMasterOperatingDocumentCompanionHint } from "@/lib/estate/sp
 import { sparkEstateAiPromptLayerCompanionHint } from "@/lib/estate/sparkEstateAiPromptAndIntelligenceLayerArchitecture";
 import { sparkEstateAnalyticsCompanionHint } from "@/lib/estate/sparkEstateAnalyticsAndLearningSystem";
 import { sparkEstateFounderIntelligenceCompanionHint } from "@/lib/estate/sparkEstateFounderIntelligenceDashboard";
+import { sparkEstateWorkspaceRecommendationCompanionHint } from "@/lib/estate/sparkEstateIntelligentWorkspaceRecommendationSystem";
 import { sparkEstateGovernanceCompanionHint } from "@/lib/estate/sparkEstateSystemGovernanceAndQualityStandards";
 import { sparkEstateMemberLifecycleCompanionHint } from "@/lib/estate/sparkEstateUserJourneyAndMemberLifecycleArchitecture";
 import { sparkEstateCompletionCompanionHint } from "@/lib/universalCreation/sparkEstateCompletionSystem";
@@ -206,6 +207,16 @@ export function buildSparkCompanionHint(
   const founderIntelligence = sparkEstateFounderIntelligenceCompanionHint({ text });
   if (founderIntelligence) {
     lines.push(founderIntelligence);
+  }
+
+  const workspaceRecommendation = sparkEstateWorkspaceRecommendationCompanionHint({
+    text,
+    currentSection: (input.placeId ?? input.currentRoom ?? undefined) as
+      | AppSection
+      | undefined,
+  });
+  if (workspaceRecommendation) {
+    lines.push(workspaceRecommendation);
   }
 
   const aiLayers = sparkEstateAiPromptLayerCompanionHint({ text });
