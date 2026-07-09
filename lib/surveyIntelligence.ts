@@ -7,6 +7,10 @@
 
 import type { ChatTurn } from "./companionIntelligence";
 import type { BusinessDecisionType } from "./companionDecisionIntelligence/types";
+import {
+  isSubstantiveConversationHelpRequest,
+  REJECT_SURVEY_OR_ROOM_MENU_RE,
+} from "./estate/substantiveConversationHelp";
 import type { CreationWorkspaceInput } from "./workspaceCreation";
 
 // ─── Survey types ────────────────────────────────────────────────────────────
@@ -306,7 +310,7 @@ const SURVEY_OFFER_RE =
 const DECISION_TYPE_SURVEY: Partial<Record<BusinessDecisionType, SurveyType>> = {
   business_expansion: "product_validation",
   pricing: "pricing_feedback",
-  strategy: "discovery_research",
+  // "strategy" alone is too broad (marketing strategy ≠ discovery survey)
   product_choice: "product_validation",
 };
 
@@ -474,6 +478,31 @@ export function evaluateSurveyIntelligence(
 ): SurveyIntelligenceResult {
   const thread = threadText(input.messages, input.userText);
   const rationale: string[] = [];
+
+  // Member asked for advice / rejected survey — do not pivot to Discovery Research Survey.
+  if (
+    REJECT_SURVEY_OR_ROOM_MENU_RE.test(input.userText) ||
+    (isSubstantiveConversationHelpRequest(input.userText) &&
+      !/\b(?:survey|questionnaire)\b/i.test(input.userText))
+  ) {
+    return {
+      needsSurvey: false,
+      surveyType: null,
+      template: null,
+      recommendedLength: "standard",
+      confidence: 0,
+      shouldOfferCreate: false,
+      offerReady: false,
+      shouldDeferSurvey: true,
+      situationId: input.situationId ?? null,
+      missingInformation: "",
+      rationale: [
+        "Substantive advice request or survey rejection — stay in conversation",
+      ],
+      resource: null,
+    };
+  }
+
   const signal = scoreSurveySignals(thread);
 
   let surveyType: SurveyType | null = signal?.type ?? null;

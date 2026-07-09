@@ -49,6 +49,11 @@ import {
   isEstateRoomListOrMapRequest,
 } from "@/lib/estate/estateMetaNavigationPhrases";
 import { isConversationOnlyTurn } from "@/lib/estate/estateConversationGuard";
+import {
+  isPhysicalQuietPlaceRequest,
+  isPlaceSuggestionRequest,
+} from "@/lib/estate/resolveEstatePlace";
+import { isSubstantiveConversationHelpRequest } from "@/lib/estate/substantiveConversationHelp";
 import { resolveSingleCanonicalPlaceMentionedInText } from "@/lib/estate/estatePlaceIdentityLock";
 
 export type EstateCommandKind = "direct" | "intent" | "hybrid" | "none";
@@ -380,6 +385,11 @@ export function detectDirectCommand(
     isAnotherRoomRequest(trimmed) ||
     isEstateRoomListOrMapRequest(trimmed)
   ) {
+    return null;
+  }
+  // Coaching / strategy questions and place-suggestion asks are not direct nav.
+  if (isSubstantiveConversationHelpRequest(trimmed)) return null;
+  if (isPlaceSuggestionRequest(trimmed) || isPhysicalQuietPlaceRequest(trimmed)) {
     return null;
   }
 

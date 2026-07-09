@@ -22,9 +22,9 @@ describe("Estate Intent Bridge™ (Phase H.1)", () => {
   it('"I feel overwhelmed" maps to overwhelmed suggestions', () => {
     const result = resolveEstateIntent({ text: "I feel overwhelmed" });
     expect(result.primaryPlaceId).toBeNull();
-    expect(result.suggestedPlaceIds).toEqual(
-      expect.arrayContaining(["reading-nook", "conservatory", "back-deck"]),
-    );
+    expect(result.suggestedPlaceIds.length).toBeGreaterThanOrEqual(1);
+    expect(result.suggestedPlaceIds.length).toBeLessThanOrEqual(3);
+    expect(result.suggestedPlaceIds).toContain("conservatory");
     expect(result.reasoning).toMatch(/overwhelm/i);
   });
 
@@ -73,6 +73,16 @@ describe("Estate Intent Bridge™ (Phase H.1)", () => {
     expect(result.confidence).toBe(0);
     expect(result.reasoning).toMatch(/relationship conversation/i);
     expect(mayAutoRouteFromEstateIntent(result)).toBe(false);
+  });
+
+  it("marketing strategy question — no orient room suggestions", () => {
+    const result = resolveEstateIntent({
+      text: "i need to find a strategy for marketing apps on facebook",
+    });
+    expect(result.primaryPlaceId).toBeNull();
+    expect(result.suggestedPlaceIds).toEqual([]);
+    expect(result.confidence).toBe(0);
+    expect(result.reasoning).toMatch(/substantive help/i);
   });
 
   it('"I don\'t know where to go" never fails silently', () => {

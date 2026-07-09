@@ -10,6 +10,7 @@ import { resolveCanonicalPlaceId } from "../canonicalEstateRegistry";
 import { formatEnvironmentPlaceOffer } from "./formatEnvironmentOffer";
 import { ENVIRONMENT_NEED_LEXICON } from "./environmentNeeds";
 import { shouldSuppressEnvironmentNeedDuringDistress } from "@/lib/conversation/emotionalDistressRouting";
+import { isSubstantiveConversationHelpRequest } from "@/lib/estate/substantiveConversationHelp";
 import type {
   ConversationEnvironmentEvaluation,
   EnvironmentNeedId,
@@ -75,6 +76,13 @@ export function evaluateConversationEnvironmentNeed(
   };
 
   if (!text) return empty;
+
+  if (isSubstantiveConversationHelpRequest(text)) {
+    return {
+      ...empty,
+      reasoning: "substantive help request — stay in conversation",
+    };
+  }
 
   if (
     shouldSuppressEnvironmentNeedDuringDistress(

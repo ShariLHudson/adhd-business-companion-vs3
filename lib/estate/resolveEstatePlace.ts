@@ -36,6 +36,7 @@ import { toCanonicalEstatePlace } from "./directory";
 import { extractRoomPhraseFromNavigation } from "./estateRoomAliasRegistry";
 import { formatEstatePlaceSuggestionMenu } from "./estatePlaceIdentityLock";
 import { isCelebrationSoundsIntent } from "./estatePlaceNavigationIntents";
+import { isSubstantiveConversationHelpRequest } from "./substantiveConversationHelp";
 import { tryKnowledgeBasePlaceResolution } from "@/lib/estateNavigationIntelligence/bridge";
 
 export type EstatePlaceResolutionKind =
@@ -432,6 +433,20 @@ export function resolveEstatePlace(
     return { kind: "none", confidence: "low", reason: "empty text" };
   }
 
+  // Explicit place/mood asks still resolve below; pure strategy/help stays in chat.
+  if (
+    isSubstantiveConversationHelpRequest(text) &&
+    !isPhysicalQuietPlaceRequest(text) &&
+    !isPlaceSuggestionRequest(text) &&
+    !hasNavigationIntent(text)
+  ) {
+    return {
+      kind: "none",
+      confidence: "high",
+      reason: "substantive help request — stay in conversation",
+    };
+  }
+
   const knowledgeBaseNav = tryKnowledgeBasePlaceResolution(text);
   if (knowledgeBaseNav && knowledgeBaseNav.kind !== "none") {
     return knowledgeBaseNav;
@@ -448,6 +463,9 @@ export function resolveEstatePlace(
   const activity = matchExplicitActivity(text);
   if (activity) return activity;
 
+  const wantsPlaceSuggestions =
+    isPlaceSuggestionRequest(text) || isPhysicalQuietPlaceRequest(text);
+
   const registryRouting = resolveEstateRoutingDecision(text, routingContext);
   if (isInformationalEstatePlaceQuestion(text)) {
     return {
@@ -463,15 +481,18 @@ export function resolveEstatePlace(
       reason: registryRouting.reason,
     };
   }
+  // Place-suggestion / quiet-place asks must stay on the suggestion path.
+  // Weak substring aliases (e.g. "quiet place") must not force exact navigation.
   if (
-    registryRouting.kind === "navigate" ||
-    registryRouting.kind === "suggest"
+    registryRouting.kind === "suggest" ||
+    (registryRouting.kind === "navigate" &&
+      (!wantsPlaceSuggestions || hasNavigationIntent(text)))
   ) {
     const adapted = routingDecisionToPlaceResolution(registryRouting);
     if (adapted.kind !== "none") return adapted;
   }
 
-  if (isPlaceSuggestionRequest(text)) {
+  if (wantsPlaceSuggestions) {
     const suggestion = matchFeelingSuggestion(text);
     if (suggestion) return suggestion;
   }

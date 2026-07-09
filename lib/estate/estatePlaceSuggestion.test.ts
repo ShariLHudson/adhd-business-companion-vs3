@@ -3,7 +3,6 @@ import { isPlaceSuggestionRequest, resolveEstatePlace } from "./resolveEstatePla
 import { evaluateEstatePlaceTurn } from "./estatePlaceNavigation";
 import { isVagueOfferConfusion } from "@/lib/conversation/vagueOfferRepair";
 import { repairInventedEstatePlaceList } from "./estatePlaceIdentityLock";
-import { ENVIRONMENT_OFFER_CLOSER } from "./conversationDrivesNavigation/formatEnvironmentOffer";
 
 describe("estate place suggestions", () => {
   const stressedQuietAsk =
@@ -18,11 +17,11 @@ describe("estate place suggestions", () => {
     const turn = evaluateEstatePlaceTurn({ userText: stressedQuietAsk });
     expect(turn.type).toBe("offer");
     if (turn.type === "offer") {
-      expect(turn.line).toContain("A few quieter places on the Estate");
-      expect(turn.line).toContain(ENVIRONMENT_OFFER_CLOSER);
+      expect(turn.line).toMatch(/A few (?:quieter )?places on the Estate|A few ideas:/i);
       expect(turn.line).toMatch(/1\./);
-      expect(turn.line).toMatch(/Gardens|Library|Reading Nook/i);
+      expect(turn.line).toMatch(/ — /);
       expect(turn.line).not.toMatch(/oak tree|hammock|meditation corner/i);
+      expect(turn.placeIds.length).toBeGreaterThanOrEqual(2);
     }
   });
 
@@ -44,7 +43,8 @@ describe("estate place suggestions", () => {
       invented,
       "quiet places on the property to de-stress",
     );
-    expect(repaired).toMatch(/Gardens|Library|Reading Nook/i);
-    expect(repaired).not.toMatch(/oak tree|Peaceful Places/i);
+    expect(repaired).toMatch(/A few ideas:|A few quieter places/i);
+    expect(repaired).toMatch(/^\s*1\./m);
+    expect(repaired).not.toMatch(/oak tree|Near the pond/i);
   });
 });

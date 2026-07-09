@@ -22,6 +22,7 @@ import {
 } from "./chamberOfMomentumIdentity";
 import { resolveEstateIntent } from "./estateIntentBridge";
 import { isPlaceSuggestionRequest, resolveEstatePlace } from "./resolveEstatePlace";
+import { isSubstantiveConversationHelpRequest } from "./substantiveConversationHelp";
 
 export const ESTATE_PLACE_IDENTITY_MAX_CHOICES = 3;
 
@@ -291,6 +292,7 @@ export function containsInventedPlaceLanguage(text: string): boolean {
 export function memberDescribesNonCanonicalPlace(userText: string): boolean {
   const text = userText.trim();
   if (!text) return false;
+  if (isSubstantiveConversationHelpRequest(text)) return false;
   if (textContainsCanonicalPlaceName(text)) return false;
   const resolution = resolveEstatePlace(text);
   if (resolution.kind !== "none") return true;
@@ -303,6 +305,7 @@ export function mapMemberDescriptionToCanonicalIds(
 ): string[] {
   const text = userText.trim();
   if (!text) return [];
+  if (isSubstantiveConversationHelpRequest(text)) return [];
 
   const registryIds = suggestCanonicalPlaceIds(text);
   if (registryIds.length > 0) {
@@ -398,8 +401,19 @@ export function repairInventedEstatePlaceList(
   if (isSystemEstatePlaceChoiceMenuFromText(text)) return text;
 
   const source = userText?.trim() || text;
+  // Never rewrite strategy / marketing / planning answers into room menus.
+  if (isSubstantiveConversationHelpRequest(source)) return text;
+  if (
+    userText?.trim() &&
+    !isPlaceSuggestionRequest(userText) &&
+    resolveEstatePlace(userText).kind === "none" &&
+    resolveEstateIntent({ text: userText }).suggestedPlaceIds.length === 0
+  ) {
+    return text;
+  }
+
   const placeIds = mapMemberDescriptionToCanonicalIds(source);
-  if (placeIds.length === 0) return NO_CANONICAL_PLACE_SUGGESTIONS_LINE;
+  if (placeIds.length === 0) return text;
 
   return formatEstatePlaceSuggestionMenu(placeIds);
 }
@@ -470,6 +484,14 @@ export function enforceCanonicalPlaceIdentityInCopy(
 }
 
 export function estatePlaceIdentityHintForChat(userText: string): string {
+  if (isSubstantiveConversationHelpRequest(userText)) {
+    return [
+      "ESTATE PLACE IDENTITY LOCK:",
+      "This turn is a substantive help / strategy request — answer in conversation.",
+      "Do NOT offer Estate room menus, place suggestions, or navigation.",
+    ].join("\n");
+  }
+
   const mapped = mapMemberDescriptionToCanonicalIds(userText);
   const canonicalExamples = mapped
     .map((id) => canonicalPlaceOfficialName(id))
@@ -496,7 +518,7 @@ export function estatePlaceIdentityHintForChat(userText: string): string {
     );
   } else {
     lines.push(
-      "If unsure, offer 2–3 canonical place names only — never descriptive locations.",
+      "No place mapping for this turn — answer in conversation; do not invent room menus.",
     );
   }
 

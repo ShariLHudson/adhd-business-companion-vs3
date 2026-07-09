@@ -27,6 +27,7 @@ import {
   evaluateSparkDecisionEngine,
   reconcilePrimaryTurnWithDecisionEngine,
 } from "@/lib/sparkCompanion";
+import { isSubstantiveConversationHelpRequest } from "@/lib/estate/substantiveConversationHelp";
 
 export type PrimaryConversationType =
   | "RELATIONSHIP_CHAT"
@@ -61,17 +62,20 @@ const DIRECT_OPEN_RE =
   /\bopen\s+(?:the\s+)?(?:coffee house|library|greenhouse|conservatory|create|plan my day|momentum|content generator|decision compass)\b/i;
 
 const TASK_REQUEST_RE =
-  /\b(?:help me (?:create|write|draft|build|make|plan|organize)|write (?:a|an|my)|create (?:a|an|my)|draft (?:a|an|my)|build (?:a|an|my)|make (?:a|an|my))\b/i;
+  /\b(?:help me (?:create|write|draft|build|make|plan|organize|strategiz(?:e|ing)?|market)|write (?:a|an|my)|create (?:a|an|my)|draft (?:a|an|my)|build (?:a|an|my)|make (?:a|an|my)|find (?:a |an |my )?(?:strategy|plan|approach|campaign)|need (?:to find|a) (?:strategy|plan|campaign)|strategiz(?:e|ing))\b/i;
 
 const EMOTIONAL_SUPPORT_RE =
   /\b(?:i'?m overwhelmed|i feel overwhelmed|(?:i'?m|i am) discouraged|burned out|burnt out|so anxious|panicking|panic attack|having a panic|hopeless|can'?t do this|everything feels (?:heavy|hard|too much)|really struggling|feel(?:ing)? defeated|no motivation left|need to calm down|calm me down|help me calm|feel(?:ing)? anxious|i am anxious|i'?m anxious)\b/i;
 
 const INFORMATION_RE =
-  /^\s*(?:research|explain|compare|what is|what are|how does|how do|tell me about|describe)\b/i;
+  /^\s*(?:research|explain|compare|what is|what are|what'?s|what should|how does|how do|how can|how should|how to|tell me about|describe)\b/i;
 
 function directCommand(text: string, lastAssistantText?: string | null): boolean {
   if (TASK_REQUEST_RE.test(text)) return false;
   if (INFORMATION_RE.test(text) || /\bresearch\b/i.test(text)) return false;
+  // Strategy / coaching questions must never become Estate navigation commands
+  // (e.g. "focus" falsely matching Butterfly House).
+  if (isSubstantiveConversationHelpRequest(text)) return false;
   if (DIRECT_NAV_RE.test(text) || DIRECT_OPEN_RE.test(text)) return true;
   if (detectDirectCommand(text, { lastAssistantText })) return true;
   return false;
@@ -82,6 +86,14 @@ function taskRequest(text: string): boolean {
   if (shouldEnterUniversalCreation(text)) return true;
   if (isRegistryArtifactExecution(text)) return true;
   if (TASK_REQUEST_RE.test(text)) return true;
+  if (
+    isSubstantiveConversationHelpRequest(text) &&
+    /\b(?:help me|create|write|draft|build|make|plan|strateg|campaign|find a)\b/i.test(
+      text,
+    )
+  ) {
+    return true;
+  }
   return false;
 }
 
@@ -91,6 +103,12 @@ function informationOrResearch(text: string): boolean {
   if (isKnowledgeQuestion(text)) return true;
   if (INFORMATION_RE.test(text)) return true;
   if (/\bresearch\b/i.test(text) && text.split(/\s+/).length <= 14) return true;
+  if (
+    isSubstantiveConversationHelpRequest(text) &&
+    /^\s*(?:how|what|explain|tell me|describe)/i.test(text)
+  ) {
+    return true;
+  }
   return false;
 }
 

@@ -468,6 +468,24 @@ export function resolveEstateRoutingDecision(
   }
 
   if (!hasNavigationIntent(text)) {
+    // Do not force navigation from weak substring aliases inside suggestion asks
+    // (e.g. "quiet place" inside "suggest a few quiet places").
+    // Inline patterns only — avoid importing resolveEstatePlace (circular).
+    if (
+      /\b(?:suggest(?:ions?)?|recommend(?:ations?)?|give me|show me).{0,90}(?:places?|rooms?|spots?|where)\b/i.test(
+        text,
+      ) ||
+      /\b(?:somewhere|some place|a place|need somewhere|want somewhere).{0,40}(?:quiet|peaceful|calm)\b/i.test(
+        text,
+      ) ||
+      /\b(?:quiet|peaceful|calm).{0,40}(?:places?|rooms?|spots?)\b/i.test(text)
+    ) {
+      return {
+        kind: "none",
+        confidence: "low",
+        reason: "suggestion ask — defer to place suggestion path",
+      };
+    }
     const substring = longestAliasInText(text, { minLength: 5 });
     if (substring) {
       return buildNavigateDecision(substring.placeId, "registry alias in text", {

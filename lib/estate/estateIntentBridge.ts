@@ -33,6 +33,7 @@ import {
   isRelationshipConversation,
 } from "@/lib/intentAwareConversation/routingGate";
 import type { CanonicalSuggestionProfile } from "./canonicalEstateRegistryTypes";
+import { isSubstantiveConversationHelpRequest } from "./substantiveConversationHelp";
 
 /** Minimum confidence before a consumer may auto-route (never force below this). */
 export const ESTATE_INTENT_AUTO_ROUTE_CONFIDENCE = 0.7;
@@ -58,7 +59,7 @@ const MOVE_INTENT_RE =
   /\b(?:take me|bring me|go to|let(?:'s| us) go|head to|visit|show me|open|can we go|want to go|need to go)\b/i;
 
 const UNCERTAIN_RE =
-  /\b(?:don'?t know where|not sure where|where should i go|where do i go|no idea where|anywhere is fine|don'?t know)\b/i;
+  /\b(?:don'?t know where|not sure where|where should i go|where do i go|no idea where|anywhere is fine)\b/i;
 
 const QUIET_RE =
   /\b(?:quiet|peaceful|peace|calm|silence|stillness|somewhere quiet|need quiet|want quiet|hush)\b/i;
@@ -436,6 +437,15 @@ export function resolveEstateIntent(
     });
   }
 
+  if (isSubstantiveConversationHelpRequest(text)) {
+    return buildResult({
+      primaryPlaceId: null,
+      confidence: 0,
+      reasoning:
+        "substantive help / strategy request — stay in chat, no place inference",
+    });
+  }
+
   const memberWantsMove = hasMoveIntent(text);
 
   // Priority 1–2: registry exact / alias
@@ -519,27 +529,34 @@ export function resolveEstateIntent(
     });
   }
 
-  // No confident match — still offer orientation, never fail silently
+  // No place match — stay in conversation. Do NOT invent orient room menus
+  // for every unmatched utterance (that rewrites strategy answers into rooms).
   if (input.currentPlaceId && !memberWantsMove) {
-    const placeIds = capSuggestions(
-      suggestCanonicalPlacesForProfile("orient").map((place) => place.id),
-    );
     return buildResult({
       primaryPlaceId: null,
-      suggestedPlaceIds: placeIds,
-      confidence: 0.25,
+      suggestedPlaceIds: [],
+      confidence: 0,
       reasoning: `no place match — member may stay at ${input.currentPlaceId}`,
     });
   }
 
-  const orientIds = capSuggestions(
-    suggestCanonicalPlacesForProfile("orient").map((place) => place.id),
-  );
+  if (memberWantsMove) {
+    const orientIds = capSuggestions(
+      suggestCanonicalPlacesForProfile("orient").map((place) => place.id),
+    );
+    return buildResult({
+      primaryPlaceId: null,
+      suggestedPlaceIds: orientIds,
+      confidence: 0.35,
+      reasoning: "move intent without destination — gentle Estate orientation",
+    });
+  }
+
   return buildResult({
     primaryPlaceId: null,
-    suggestedPlaceIds: orientIds,
-    confidence: 0.2,
-    reasoning: "no place match — gentle Estate orientation suggestions",
+    suggestedPlaceIds: [],
+    confidence: 0,
+    reasoning: "no place match — stay in conversation",
   });
 }
 

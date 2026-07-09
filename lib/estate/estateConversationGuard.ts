@@ -3,13 +3,10 @@
  */
 
 import { isPhysicalQuietPlaceRequest } from "./resolveEstatePlace";
+import { isSubstantiveConversationHelpRequest } from "./substantiveConversationHelp";
 
 const HARD_NAV_RE =
   /\b(?:take me to|go to|let(?:'s| us) go to|visit|head to|bring me to)\b/i;
-
-/** Business / coaching topics without Estate place intent → conversation only. */
-const CONVERSATION_TOPIC_RE =
-  /\b(?:pricing|newsletter|subject line|launch plan|revenue|profit|margin|email sequence|sales page|copywriting|business model|value proposition|funnel|webinar)\b/i;
 
 /** PATH A — coaching, learning, emotional support without place intent. */
 const PATH_A_SUPPORT_RE =
@@ -24,8 +21,9 @@ export function isConversationOnlyTurn(text: string): boolean {
   if (!t) return true;
   if (HARD_NAV_RE.test(t)) return false;
   if (isPhysicalQuietPlaceRequest(t)) return false;
+  // Substantive help beats weak place-signal words like "find" / "somewhere" in strategy asks.
+  if (isSubstantiveConversationHelpRequest(t)) return true;
   if (PLACE_SIGNAL_RE.test(t)) return false;
-  if (CONVERSATION_TOPIC_RE.test(t)) return true;
   if (PATH_A_SUPPORT_RE.test(t)) return true;
   return false;
 }
