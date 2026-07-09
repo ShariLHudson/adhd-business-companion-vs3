@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { LibraryCloseButton } from "@/components/companion/LibraryOrientationChrome";
 import { AppBackButton } from "@/components/companion/AppBackButton";
 import { NAV_FOCUS_MY_BRAIN } from "@/lib/navigationBack";
-import { VisualFocusStudioHub } from "@/components/companion/VisualFocusStudioHub";
 import { VisualFocusPurposeAnchor } from "@/components/companion/VisualFocusPurposeAnchor";
+import { CartographersStudioRoom } from "@/components/companion/cartographersStudio/CartographersStudioRoom";
+import { MindMapDiscoveryInterview } from "@/components/companion/cartographersStudio/MindMapDiscoveryInterview";
 import { VisualFocusMapHeader } from "@/components/companion/visualFocus/VisualFocusMapHeader";
 import { VisualFocusVisualCanvas } from "@/components/companion/visualFocus/VisualFocusVisualCanvas";
 import { VisualFocusIntelligencePanel } from "@/components/companion/visualFocus/VisualFocusIntelligencePanel";
@@ -52,6 +53,7 @@ import {
   setActiveVisualFocusMap,
   togglePinVisualFocusMap,
   studioCardTitleForMode,
+  listContinueThinkingMaps,
   type VisualFocusMap,
   type VisualFocusMode,
   type VisualFocusNode,
@@ -297,6 +299,9 @@ export function VisualFocusWorkspacePanel({
   const [active, setActive] = useState<VisualFocusMap | null>(null);
   const [pendingCreateMode, setPendingCreateMode] =
     useState<VisualFocusMode | null>(null);
+  const [mindMapDiscoveryOpen, setMindMapDiscoveryOpen] = useState(false);
+  const [showDraftReview, setShowDraftReview] = useState(false);
+  const [autosaveLabel, setAutosaveLabel] = useState<"saved" | "saving">("saved");
   const [showBuildPanel, setShowBuildPanel] = useState(true);
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [saveAsMode, setSaveAsMode] = useState(false);
@@ -313,6 +318,8 @@ export function VisualFocusWorkspacePanel({
     setActive(null);
     setView("hub");
     setWorkspaceMode("build");
+    setMindMapDiscoveryOpen(false);
+    setShowDraftReview(false);
   }, []);
 
   const openMapWorkspace = useCallback(
@@ -321,6 +328,7 @@ export function VisualFocusWorkspacePanel({
       const map = getVisualFocusMapById(mapId);
       setActive(map);
       setView("workspace");
+      setShowDraftReview(false);
       setWorkspaceMode(
         preferGenerated && map?.workflowStage === "generated"
           ? "generated"
@@ -405,14 +413,32 @@ export function VisualFocusWorkspacePanel({
   }, [registerBack, view, backToStudio]);
 
   function persist(map: VisualFocusMap) {
+    setAutosaveLabel("saving");
     const saved = saveVisualFocusMap(map);
     setActive(saved);
     setMaps(listVisualFocusMaps());
+    setAutosaveLabel("saved");
     return saved;
   }
 
-  function handleRequestCreate(mode: VisualFocusMode) {
-    setPendingCreateMode(mode);
+  function handleSelectMindMapFromRoom() {
+    setMindMapDiscoveryOpen(true);
+  }
+
+  function handleMindMapDiscoveryComplete(answers: {
+    topic: string;
+    everything: string;
+    anythingElse?: string;
+  }) {
+    const map = createAndActivateMap("mind-map", { mindMapDiscovery: answers });
+    const withLayout = generateVisualFocusMap(map);
+    const saved = persist(withLayout);
+    setActive(saved);
+    setMaps(listVisualFocusMaps());
+    setView("workspace");
+    setWorkspaceMode("generated");
+    setShowDraftReview(true);
+    setMindMapDiscoveryOpen(false);
   }
 
   function handleCreate(mode: VisualFocusMode, purposeAnswer: string) {
@@ -531,6 +557,11 @@ export function VisualFocusWorkspacePanel({
   }
 
   const modeBadge = active ? studioCardTitleForMode(active.mode) : null;
+  const continueThinking = useMemo(
+    () => listContinueThinkingMaps(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [maps],
+  );
   const showGenerated =
     active?.workflowStage === "generated" &&
     workspaceMode === "generated" &&
@@ -546,9 +577,9 @@ export function VisualFocusWorkspacePanel({
     >
       {view === "hub" ? (
         <>
-          <VisualFocusStudioHub
-            maps={maps}
-            onCreate={handleRequestCreate}
+          <CartographersStudioRoom
+            continueThinking={continueThinking}
+            onSelectMindMap={handleSelectMindMapFromRoom}
             onOpenMap={handleOpenMap}
             onRemoveMap={handleRemoveContinueThinkingMap}
             onDeleteMap={handleRequestDeleteContinueThinkingMap}
@@ -578,6 +609,12 @@ export function VisualFocusWorkspacePanel({
               reload();
             }}
           />
+          {mindMapDiscoveryOpen ? (
+            <MindMapDiscoveryInterview
+              onCancel={() => setMindMapDiscoveryOpen(false)}
+              onComplete={handleMindMapDiscoveryComplete}
+            />
+          ) : null}
           {pendingCreateMode ? (
             <VisualFocusPurposeAnchor
               mode={pendingCreateMode}
@@ -605,6 +642,14 @@ export function VisualFocusWorkspacePanel({
                   {modeBadge}
                 </span>
               ) : null}
+              <span
+                className={`cartographers-autosave${
+                  autosaveLabel === "saved" ? " cartographers-autosave--saved" : ""
+                }`}
+                data-testid="cartographers-autosave"
+              >
+                {autosaveLabel === "saving" ? "Saving…" : "Auto-saved"}
+              </span>
               {active.workflowStage === "generated" ? (
                 <button
                   type="button"
@@ -694,6 +739,55 @@ export function VisualFocusWorkspacePanel({
               ) : null}
             </div>
           </div>
+
+          {active.mode === "mind-map" &&
+          active.discoveryInterview &&
+          showDraftReview ? (
+            <div
+              className="cartographers-draft-review"
+              data-testid="mind-map-draft-review"
+            >
+              <p className="cartographers-draft-review__question">
+                Does this look like the right starting point?
+              </p>
+              {active.draftSuggestions && active.draftSuggestions.length > 0 ? (
+                <p className="mt-1 text-sm text-[#6b635a]">
+                  Spark also left soft prompts:{" "}
+                  {active.draftSuggestions.join(" · ")}
+                </p>
+              ) : null}
+              <div className="cartographers-draft-review__actions">
+                <button
+                  type="button"
+                  className="rounded-xl bg-[#1e4f4f] px-3 py-2 text-xs font-semibold text-white hover:bg-[#163c3c]"
+                  onClick={() => setShowDraftReview(false)}
+                >
+                  Yes, keep going
+                </button>
+                <button
+                  type="button"
+                  className="rounded-xl border border-[#e7dfd4] px-3 py-2 text-xs font-semibold text-[#6b635a] hover:bg-[#faf7f2]"
+                  onClick={() => {
+                    setWorkspaceMode("build");
+                    setShowBuildPanel(true);
+                    setShowDraftReview(false);
+                  }}
+                >
+                  Add or reshape
+                </button>
+                <button
+                  type="button"
+                  className="rounded-xl border border-[#e7dfd4] px-3 py-2 text-xs font-semibold text-[#6b635a] hover:bg-[#faf7f2]"
+                  onClick={() => {
+                    setWorkspaceMode("generated");
+                    setShowDraftReview(false);
+                  }}
+                >
+                  Show visual map
+                </button>
+              </div>
+            </div>
+          ) : null}
 
           <SaveDestinationDialog
             open={saveDialogOpen && Boolean(active)}

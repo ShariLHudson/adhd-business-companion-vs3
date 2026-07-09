@@ -52,9 +52,10 @@ describe("visualFocus studioCards", () => {
     expect(joined).toContain("ready to act");
   });
 
-  it("hero shows always-visible micro-copy without accordion", () => {
-    expect(VISUAL_FOCUS_STUDIO_HERO.tagline).toBe("Think visually, not linearly.");
-    expect(VISUAL_FOCUS_STUDIO_HERO.microCopy).toMatch(/insights, recommendations, and next steps/i);
+  it("hero shows Cartographer's Studio room identity", () => {
+    expect(VISUAL_FOCUS_STUDIO_HERO.title).toMatch(/Cartographer/i);
+    expect(VISUAL_FOCUS_STUDIO_HERO.tagline).toMatch(/Every map tells a story/i);
+    expect(VISUAL_FOCUS_STUDIO_HERO.microCopy).toMatch(/first draft/i);
   });
 
   it("work with shari copy reduces decision fatigue", () => {

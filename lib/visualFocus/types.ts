@@ -53,6 +53,11 @@ export type VisualFocusPurposeAnchor = {
   capturedAt: string;
 };
 
+export type {
+  VisualFocusDiscoveryAnswer,
+  VisualFocusDiscoveryInterview,
+} from "./discoveryInterview/types";
+
 export type VisualFocusWorkflowStage = "build" | "generated";
 
 export type VisualFocusSaveStatus = "unsaved" | "saving" | "saved";
@@ -139,6 +144,10 @@ export type VisualFocusMap = {
   mode: VisualFocusMode;
   root: VisualFocusNode;
   purposeAnchor?: VisualFocusPurposeAnchor;
+  /** Discovery Interview transcript (197) — Mind Map MVP. */
+  discoveryInterview?: import("./discoveryInterview/types").VisualFocusDiscoveryInterview;
+  /** Soft prompts Spark suggested after the first draft. */
+  draftSuggestions?: string[];
   businessCanvas?: BusinessCanvasData;
   kanban?: {
     columns: VisualKanbanColumn[];

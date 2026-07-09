@@ -5,6 +5,7 @@ import { beginVisualThinkingSession } from "./companionIntelligence";
 import { captureVisualThinkingLifecycleEvent } from "./companionIntelligence/lifecycleLearning";
 import { createBusinessCanvasVersionRecord } from "./businessCanvas/impactModel/versionReadiness";
 import { createVisualFocusMap } from "./templates";
+import type { CreateVisualFocusMapOptions } from "./templates";
 import {
   applyMapSnapshot,
   createMapSnapshot,
@@ -136,9 +137,9 @@ export function markVisualFocusMapSaving(map: VisualFocusMap): VisualFocusMap {
 
 export function createAndActivateMap(
   mode: VisualFocusMode,
-  purposeAnswer?: string,
+  purposeAnswerOrOptions?: string | CreateVisualFocusMapOptions,
 ): VisualFocusMap {
-  const map = createVisualFocusMap(mode, purposeAnswer);
+  const map = createVisualFocusMap(mode, purposeAnswerOrOptions);
   const store = readStore();
   const next = { ...map, saveStatus: "saved" as const, workflowStage: "build" as const };
   writeStore({

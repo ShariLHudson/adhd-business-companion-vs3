@@ -1,0 +1,278 @@
+/* Cartographer's Studio™ — room is the navigation (195 / 227). */
+
+.cartographers-studio-room {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  --carto-brass: #b8956a;
+  --carto-ink: #1f1c19;
+  --carto-cream: #fffdf8;
+  --carto-walnut: #3d3228;
+}
+
+.cartographers-studio-room__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-bottom: 1px solid rgba(184, 149, 106, 0.35);
+  padding-bottom: 1rem;
+}
+
+.cartographers-studio-room__plaque {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--carto-brass);
+}
+
+.cartographers-studio-room__title {
+  margin-top: 0.35rem;
+  max-width: 36rem;
+  font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--carto-ink);
+}
+
+.cartographers-studio-room__welcome {
+  margin-top: 0.5rem;
+  max-width: 36rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #6b635a;
+}
+
+.cartographers-studio-room__mvp-note {
+  margin-top: 0.5rem;
+  max-width: 36rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #1e4f4f;
+}
+
+.cartographers-studio-room__resume {
+  margin-top: 1.25rem;
+}
+
+.cartographers-studio-room__resume-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #1e4f4f;
+}
+
+.cartographers-wall {
+  margin-top: 1.5rem;
+}
+
+.cartographers-wall__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .cartographers-wall__grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.85rem;
+  }
+}
+
+.cartographers-frame {
+  position: relative;
+  display: flex;
+  min-height: 5.5rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;
+  border-radius: 0.35rem;
+  border: 3px solid #5c4632;
+  background:
+    linear-gradient(160deg, rgba(255, 248, 235, 0.55), rgba(232, 220, 200, 0.35)),
+    radial-gradient(ellipse at 50% 20%, rgba(184, 149, 106, 0.25), transparent 60%),
+    #2a2218;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 236, 210, 0.2),
+    0 6px 16px rgba(20, 14, 8, 0.18);
+  padding: 0.65rem 0.5rem 0.55rem;
+  text-align: center;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+
+.cartographers-frame__glow {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 220, 160, 0) 40%,
+    rgba(255, 220, 160, 0.08) 100%
+  );
+  opacity: 0;
+  transition: opacity 180ms ease;
+  pointer-events: none;
+}
+
+.cartographers-frame--live:hover,
+.cartographers-frame--live:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--carto-brass);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 236, 210, 0.35),
+    0 0 0 2px rgba(184, 149, 106, 0.35),
+    0 10px 22px rgba(20, 14, 8, 0.22);
+  outline: none;
+}
+
+.cartographers-frame--live:hover .cartographers-frame__glow,
+.cartographers-frame--live:focus-visible .cartographers-frame__glow {
+  opacity: 1;
+}
+
+.cartographers-frame--soon {
+  opacity: 0.72;
+  cursor: default;
+}
+
+.cartographers-frame__plate {
+  position: relative;
+  z-index: 1;
+  max-width: 100%;
+  border-radius: 0.2rem;
+  background: linear-gradient(180deg, #c9a66b, #9a7540);
+  padding: 0.2rem 0.45rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #1a140e;
+  text-shadow: 0 1px 0 rgba(255, 240, 210, 0.35);
+}
+
+.cartographers-frame__soon {
+  position: relative;
+  z-index: 1;
+  margin-top: 0.35rem;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 248, 235, 0.65);
+}
+
+.cartographers-studio-room__objects {
+  margin-top: 1.5rem;
+}
+
+.cartographers-atlas-stand {
+  display: flex;
+  width: 100%;
+  max-width: 28rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(184, 149, 106, 0.45);
+  background: linear-gradient(135deg, #f7f0e4, #efe4d2);
+  padding: 1rem 1.15rem;
+  text-align: left;
+  box-shadow: 0 4px 14px rgba(30, 22, 12, 0.08);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.cartographers-atlas-stand:hover,
+.cartographers-atlas-stand:focus-visible {
+  border-color: var(--carto-brass);
+  box-shadow: 0 6px 18px rgba(30, 22, 12, 0.12);
+  outline: none;
+}
+
+.cartographers-atlas-stand__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--carto-ink);
+}
+
+.cartographers-atlas-stand__body {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #6b635a;
+}
+
+.cartographers-learn-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(12, 8, 6, 0.4);
+  padding: 1rem;
+}
+
+.cartographers-learn-overlay__card {
+  width: 100%;
+  max-width: 24rem;
+  border-radius: 1rem;
+  border: 1px solid #e7dfd4;
+  background: var(--carto-cream);
+  padding: 1.35rem;
+  box-shadow: 0 16px 40px rgba(12, 8, 6, 0.25);
+}
+
+.cartographers-learn-overlay__card--wide {
+  max-width: 28rem;
+}
+
+.cartographers-learn-overlay__name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--carto-ink);
+}
+
+.cartographers-learn-overlay__tip {
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: #6b635a;
+}
+
+.cartographers-draft-review {
+  margin-top: 1rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(184, 149, 106, 0.4);
+  background: linear-gradient(135deg, #fffdf8, #f5efe6);
+  padding: 1rem 1.15rem;
+}
+
+.cartographers-draft-review__question {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--carto-ink);
+}
+
+.cartographers-draft-review__actions {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cartographers-autosave {
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #9a8f82;
+}
+
+.cartographers-autosave--saved {
+  color: #1e4f4f;
+}

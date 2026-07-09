@@ -12,3 +12,4 @@ export * from "./lifecycle";
 export * from "./intelligence";
 export * from "./companionIntelligence";
 export * from "./myWorkIntegration";
+export * from "./discoveryInterview";

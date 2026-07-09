@@ -35,13 +35,13 @@ export type VisualFocusStudioCard = {
 };
 
 export const VISUAL_FOCUS_STUDIO_HERO = {
-  title: "Visual Thinking",
-  tagline: "Think visually, not linearly.",
+  title: "Cartographer's Studio™",
+  tagline: "Every map tells a story. Every story reveals a path.",
   microCopy:
-    "Build a map, discover patterns, and receive insights, recommendations, and next steps.",
-  question: "How do you want to think today?",
+    "Choose a framed map. Spark asks the right questions, builds a first draft, and you reshape it.",
+  question: "Which map will help you see this clearly?",
   footer:
-    "The insight is the product — not the file. Save when something is worth keeping.",
+    "The room is the navigation. Mind Map is ready today — other frames open as this path feels complete.",
 } as const;
 
 export const VISUAL_FOCUS_WORK_WITH_SHARI = {

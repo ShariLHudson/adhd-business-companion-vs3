@@ -1,7 +1,12 @@
 import { createEmptyBusinessCanvas } from "./businessCanvas/factory";
 import { getStudioCardByMode } from "./studioCards";
 import { purposeAnchorTitle, purposeQuestionForMode } from "@/lib/companionEntry/purposeAnchor";
+import {
+  buildMindMapDiscoveryInterview,
+  buildMindMapDraftFromDiscovery,
+} from "./discoveryInterview/mindMapDiscovery";
 import type {
+  VisualFocusDiscoveryInterview,
   VisualFocusMap,
   VisualFocusMode,
   VisualFocusNode,
@@ -96,27 +101,59 @@ function treeTemplate(mode: VisualFocusMode): { title: string; root: VisualFocus
   }
 }
 
+export type CreateVisualFocusMapOptions = {
+  purposeAnswer?: string;
+  /** Mind Map Discovery Interview answers (199) — preferred over purposeAnswer. */
+  mindMapDiscovery?: {
+    topic: string;
+    everything: string;
+    anythingElse?: string;
+  };
+};
+
 export function createVisualFocusMap(
   mode: VisualFocusMode,
-  purposeAnswer?: string,
+  purposeAnswerOrOptions?: string | CreateVisualFocusMapOptions,
 ): VisualFocusMap {
+  const options: CreateVisualFocusMapOptions =
+    typeof purposeAnswerOrOptions === "string"
+      ? { purposeAnswer: purposeAnswerOrOptions }
+      : (purposeAnswerOrOptions ?? {});
+  const purposeAnswer = options.purposeAnswer;
   const now = new Date().toISOString();
   const id = `vf-${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
-  const { title: templateTitle, root } = treeTemplate(mode);
-  const purposeAnchor: VisualFocusPurposeAnchor | undefined = purposeAnswer?.trim()
-    ? {
-        question: purposeQuestionForMode(mode),
-        userAnswer: purposeAnswer.trim(),
-        mode,
-        capturedAt: new Date().toISOString(),
-      }
-    : undefined;
-  const title = purposeAnchor
-    ? purposeAnchorTitle(purposeAnchor)
-    : templateTitle;
-  const rooted: VisualFocusNode = purposeAnchor
-    ? { ...root, label: purposeAnchor.userAnswer }
-    : root;
+
+  let discoveryInterview: VisualFocusDiscoveryInterview | undefined;
+  let draftSuggestions: string[] | undefined;
+  let title: string;
+  let rooted: VisualFocusNode;
+  let purposeAnchor: VisualFocusPurposeAnchor | undefined;
+
+  if (mode === "mind-map" && options.mindMapDiscovery) {
+    const draft = buildMindMapDraftFromDiscovery(options.mindMapDiscovery);
+    discoveryInterview = buildMindMapDiscoveryInterview(options.mindMapDiscovery);
+    draftSuggestions = draft.suggestedGaps;
+    title = draft.title;
+    rooted = draft.root;
+    purposeAnchor = {
+      question: "What is the main topic?",
+      userAnswer: options.mindMapDiscovery.topic.trim(),
+      mode,
+      capturedAt: now,
+    };
+  } else {
+    const { title: templateTitle, root } = treeTemplate(mode);
+    purposeAnchor = purposeAnswer?.trim()
+      ? {
+          question: purposeQuestionForMode(mode),
+          userAnswer: purposeAnswer.trim(),
+          mode,
+          capturedAt: now,
+        }
+      : undefined;
+    title = purposeAnchor ? purposeAnchorTitle(purposeAnchor) : templateTitle;
+    rooted = purposeAnchor ? { ...root, label: purposeAnchor.userAnswer } : root;
+  }
 
   if (mode === "visual-kanban") {
     const c1 = `col-${id}-ideas`;
@@ -166,6 +203,8 @@ export function createVisualFocusMap(
     mode,
     root: rooted,
     purposeAnchor,
+    discoveryInterview,
+    draftSuggestions,
     createdAt: now,
     updatedAt: now,
   };

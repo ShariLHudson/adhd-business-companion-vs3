@@ -30,6 +30,7 @@ import "./welcome-home-first-launch.css";
 import "./momentum-builder-room.css";
 import "./momentum-institute-drawer-wall.css";
 import "./stables-room.css";
+import "./cartographers-studio.css";
 import "./estate-immersive.css";
 import "./estate-room-fullbleed.css";
 import "./ocean-conservatory-aquarium.css";
