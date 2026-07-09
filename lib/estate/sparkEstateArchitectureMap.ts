@@ -22,6 +22,7 @@ import { verifySparkEstateKnowledgeAndAssetLibrary } from "./sparkEstateKnowledg
 import { verifySparkEstateOnboardingAndFirst7Days } from "./sparkEstateOnboardingAndFirst7DaysExperience";
 import { verifySparkEstateRoomBlueprintTemplate } from "./sparkEstateRoomBlueprintTemplate";
 import { verifySparkEstateRoomIntelligenceArchitecture } from "./sparkEstateRoomIntelligenceArchitecture";
+import { verifySparkEstateAiPromptAndIntelligenceLayerArchitecture } from "./sparkEstateAiPromptAndIntelligenceLayerArchitecture";
 import { verifySparkEstateAnalyticsAndLearningSystem } from "./sparkEstateAnalyticsAndLearningSystem";
 import { verifySparkEstateSystemGovernanceAndQualityStandards } from "./sparkEstateSystemGovernanceAndQualityStandards";
 import { verifySparkEstateTopNavigationAndProfileMenu } from "./sparkEstateTopNavigationAndProfileMenu";
@@ -93,6 +94,7 @@ export type SparkEstateIntegrationAssessment = {
   topNavigationAligned: boolean;
   memberLifecycleAligned: boolean;
   analyticsAndLearningAligned: boolean;
+  aiPromptIntelligenceLayerAligned: boolean;
 };
 
 export const SPARK_ESTATE_IMPLEMENTATION_PRINCIPLE =
@@ -367,6 +369,15 @@ export const SPARK_ESTATE_PHASE_MAPPINGS: readonly SparkEstatePhaseMapping[] = [
     dependencies: [11, 16, 17, 19, 27],
   },
   {
+    phase: 26,
+    spec: "SPARK_ESTATE_AI_PROMPT_AND_INTELLIGENCE_LAYER_ARCHITECTURE_PHASE26.md",
+    title: "AI prompt and intelligence layer architecture",
+    implementations: ["lib/estate/sparkEstateAiPromptAndIntelligenceLayerArchitecture.ts"],
+    status: "implemented",
+    priority: 2,
+    dependencies: [11, 14, 15, 17, 18, 19],
+  },
+  {
     phase: 27,
     spec: "SPARK_ESTATE_FILE_AND_DATA_ARCHITECTURE_MAP_SPECIFICATION_PHASE27.md",
     title: "File and data architecture map",
@@ -439,6 +450,23 @@ export const SPARK_ESTATE_ARCHITECTURE_ENTRIES: readonly SparkEstateArchitecture
       "member-lifecycle-architecture",
       "data-architecture-map",
       "governance-quality-standards",
+    ],
+  },
+  {
+    id: "ai-prompt-intelligence-layers",
+    domain: "companion-intelligence",
+    label: "AI prompt and intelligence layer architecture",
+    existing: "Seven intelligence layers, prompt structure, conversation priority, quality test",
+    location: "lib/estate/sparkEstateAiPromptAndIntelligenceLayerArchitecture.ts",
+    status: "implemented",
+    priority: 2,
+    dependencies: [
+      "companion-shari-voice",
+      "member-profile-personalization",
+      "routing-estate-map",
+      "room-intelligence-architecture",
+      "creation-universal-journey",
+      "card-knowledge-library",
     ],
   },
   {
@@ -748,6 +776,8 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     verifySparkEstateUserJourneyAndMemberLifecycle().lifecycleResolutionReady;
   const analyticsAndLearningAligned =
     verifySparkEstateAnalyticsAndLearningSystem().analyticsReady;
+  const aiPromptIntelligenceLayerAligned =
+    verifySparkEstateAiPromptAndIntelligenceLayerArchitecture().intelligenceLayerReady;
 
   return {
     existing: entriesByStatus("implemented"),
@@ -774,6 +804,7 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     topNavigationAligned,
     memberLifecycleAligned,
     analyticsAndLearningAligned,
+    aiPromptIntelligenceLayerAligned,
   };
 }
 
@@ -802,6 +833,7 @@ export function verifySparkEstateArchitectureIntegration(): {
     assessment.topNavigationAligned &&
     assessment.memberLifecycleAligned &&
     assessment.analyticsAndLearningAligned &&
+    assessment.aiPromptIntelligenceLayerAligned &&
     blockingMissing.length === 0;
 
   return { aligned, assessment };
@@ -847,6 +879,7 @@ export function formatSparkEstateArchitectureReport(
     `  Top navigation correction: ${assessment.topNavigationAligned ? "pass" : "fail"}`,
     `  Member lifecycle architecture: ${assessment.memberLifecycleAligned ? "pass" : "fail"}`,
     `  Analytics and learning: ${assessment.analyticsAndLearningAligned ? "pass" : "fail"}`,
+    `  AI prompt intelligence layers: ${assessment.aiPromptIntelligenceLayerAligned ? "pass" : "fail"}`,
     "",
     "Recommended order:",
     ...assessment.recommendedOrder.map((step) => `  • ${step}`),

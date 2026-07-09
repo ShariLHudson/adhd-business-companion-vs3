@@ -12,8 +12,8 @@ import {
 } from "./sparkEstateArchitectureMap";
 
 describe("sparkEstateArchitectureMap", () => {
-  it("maps Spark Estate phase implementations including Phase 18, 19, 20, 21, 22, 23, 24, 25, 27, and 28", () => {
-    expect(SPARK_ESTATE_PHASE_MAPPINGS.length).toBe(27);
+  it("maps Spark Estate phase implementations including Phase 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, and 28", () => {
+    expect(SPARK_ESTATE_PHASE_MAPPINGS.length).toBe(28);
     expect(SPARK_ESTATE_PHASE_MAPPINGS.every((mapping) => mapping.phase >= 1)).toBe(
       true,
     );
@@ -59,6 +59,9 @@ describe("sparkEstateArchitectureMap", () => {
     expect(getPhaseMapping(25)?.implementations).toContain(
       "lib/estate/sparkEstateRoomBlueprintTemplate.ts",
     );
+    expect(getPhaseMapping(26)?.implementations).toContain(
+      "lib/estate/sparkEstateAiPromptAndIntelligenceLayerArchitecture.ts",
+    );
     expect(getPhaseMapping(27)?.implementations).toContain(
       "lib/estate/sparkEstateFileAndDataArchitectureMap.ts",
     );
@@ -101,6 +104,7 @@ describe("sparkEstateArchitectureMap", () => {
     expect(result.assessment.topNavigationAligned).toBe(true);
     expect(result.assessment.memberLifecycleAligned).toBe(true);
     expect(result.assessment.analyticsAndLearningAligned).toBe(true);
+    expect(result.assessment.aiPromptIntelligenceLayerAligned).toBe(true);
     expect(result.aligned).toBe(true);
   });
 
