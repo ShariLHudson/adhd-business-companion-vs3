@@ -117,8 +117,8 @@ export function gatherMindMapDiscoveryContext(): DiscoveryContextSeed {
     const projects = getProjects();
     const focus =
       projects.find((p) => p.id === continuity?.projectContinueId) ??
-      projects.find((p) => p.status === "in-progress") ??
-      projects.find((p) => p.status === "planned");
+      projects.find((p) => p.status === "active-focus") ??
+      projects.find((p) => p.status === "in-progress");
     if (focus) {
       sources.push("projects");
       if (!suggestedTopic) suggestedTopic = focus.name;
