@@ -20,6 +20,7 @@ import { sparkEstateKnowledgeCompanionHint } from "@/lib/estate/sparkEstateKnowl
 import { sparkEstateOnboardingCompanionHint } from "@/lib/estate/sparkEstateOnboardingAndFirst7DaysExperience";
 import { sparkEstateRoomBlueprintCompanionHint } from "@/lib/estate/sparkEstateRoomBlueprintTemplate";
 import { sparkEstateRoomIntelligenceCompanionHint } from "@/lib/estate/sparkEstateRoomIntelligenceArchitecture";
+import { sparkEstateAnalyticsCompanionHint } from "@/lib/estate/sparkEstateAnalyticsAndLearningSystem";
 import { sparkEstateGovernanceCompanionHint } from "@/lib/estate/sparkEstateSystemGovernanceAndQualityStandards";
 import { sparkEstateMemberLifecycleCompanionHint } from "@/lib/estate/sparkEstateUserJourneyAndMemberLifecycleArchitecture";
 import { sparkEstateCompletionCompanionHint } from "@/lib/universalCreation/sparkEstateCompletionSystem";
@@ -192,6 +193,11 @@ export function buildSparkCompanionHint(
   const governance = sparkEstateGovernanceCompanionHint({ text });
   if (governance) {
     lines.push(governance);
+  }
+
+  const analytics = sparkEstateAnalyticsCompanionHint({ text });
+  if (analytics) {
+    lines.push(analytics);
   }
 
   const completion = sparkEstateCompletionCompanionHint({ text });

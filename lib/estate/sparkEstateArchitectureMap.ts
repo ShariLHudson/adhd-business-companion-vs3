@@ -22,6 +22,7 @@ import { verifySparkEstateKnowledgeAndAssetLibrary } from "./sparkEstateKnowledg
 import { verifySparkEstateOnboardingAndFirst7Days } from "./sparkEstateOnboardingAndFirst7DaysExperience";
 import { verifySparkEstateRoomBlueprintTemplate } from "./sparkEstateRoomBlueprintTemplate";
 import { verifySparkEstateRoomIntelligenceArchitecture } from "./sparkEstateRoomIntelligenceArchitecture";
+import { verifySparkEstateAnalyticsAndLearningSystem } from "./sparkEstateAnalyticsAndLearningSystem";
 import { verifySparkEstateSystemGovernanceAndQualityStandards } from "./sparkEstateSystemGovernanceAndQualityStandards";
 import { verifySparkEstateTopNavigationAndProfileMenu } from "./sparkEstateTopNavigationAndProfileMenu";
 import { verifySparkEstateUserJourneyAndMemberLifecycle } from "./sparkEstateUserJourneyAndMemberLifecycleArchitecture";
@@ -91,6 +92,7 @@ export type SparkEstateIntegrationAssessment = {
   systemGovernanceAligned: boolean;
   topNavigationAligned: boolean;
   memberLifecycleAligned: boolean;
+  analyticsAndLearningAligned: boolean;
 };
 
 export const SPARK_ESTATE_IMPLEMENTATION_PRINCIPLE =
@@ -329,6 +331,15 @@ export const SPARK_ESTATE_PHASE_MAPPINGS: readonly SparkEstatePhaseMapping[] = [
     dependencies: [11, 14, 16, 17, 18, 27],
   },
   {
+    phase: 22,
+    spec: "SPARK_ESTATE_ANALYTICS_AND_LEARNING_SYSTEM_SPECIFICATION_PHASE22.md",
+    title: "Analytics and learning system",
+    implementations: ["lib/estate/sparkEstateAnalyticsAndLearningSystem.ts"],
+    status: "implemented",
+    priority: 2,
+    dependencies: [11, 15, 16, 20, 21, 27],
+  },
+  {
     phase: 23,
     spec: "SPARK_ESTATE_ONBOARDING_AND_FIRST_7_DAYS_EXPERIENCE_SPECIFICATION_PHASE23.md",
     title: "Onboarding and first 7 days experience",
@@ -413,6 +424,21 @@ export const SPARK_ESTATE_ARCHITECTURE_ENTRIES: readonly SparkEstateArchitecture
       "routing-estate-map",
       "card-ecosystem",
       "data-architecture-map",
+    ],
+  },
+  {
+    id: "analytics-learning-system",
+    domain: "data-integration",
+    label: "Analytics and learning system",
+    existing: "Seven analytics categories, local-first signals, founder reporting, friction detection",
+    location: "lib/estate/sparkEstateAnalyticsAndLearningSystem.ts",
+    status: "implemented",
+    priority: 2,
+    dependencies: [
+      "card-ecosystem",
+      "member-lifecycle-architecture",
+      "data-architecture-map",
+      "governance-quality-standards",
     ],
   },
   {
@@ -720,6 +746,8 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     verifySparkEstateTopNavigationAndProfileMenu().profileMenuAligned;
   const memberLifecycleAligned =
     verifySparkEstateUserJourneyAndMemberLifecycle().lifecycleResolutionReady;
+  const analyticsAndLearningAligned =
+    verifySparkEstateAnalyticsAndLearningSystem().analyticsReady;
 
   return {
     existing: entriesByStatus("implemented"),
@@ -745,6 +773,7 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     systemGovernanceAligned,
     topNavigationAligned,
     memberLifecycleAligned,
+    analyticsAndLearningAligned,
   };
 }
 
@@ -772,6 +801,7 @@ export function verifySparkEstateArchitectureIntegration(): {
     assessment.systemGovernanceAligned &&
     assessment.topNavigationAligned &&
     assessment.memberLifecycleAligned &&
+    assessment.analyticsAndLearningAligned &&
     blockingMissing.length === 0;
 
   return { aligned, assessment };
@@ -816,6 +846,7 @@ export function formatSparkEstateArchitectureReport(
     `  System governance: ${assessment.systemGovernanceAligned ? "pass" : "fail"}`,
     `  Top navigation correction: ${assessment.topNavigationAligned ? "pass" : "fail"}`,
     `  Member lifecycle architecture: ${assessment.memberLifecycleAligned ? "pass" : "fail"}`,
+    `  Analytics and learning: ${assessment.analyticsAndLearningAligned ? "pass" : "fail"}`,
     "",
     "Recommended order:",
     ...assessment.recommendedOrder.map((step) => `  • ${step}`),

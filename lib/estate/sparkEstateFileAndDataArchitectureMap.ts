@@ -206,11 +206,11 @@ export const SPARK_ESTATE_DATA_LAYERS = [
       "friction points",
       "improvement signals",
     ],
-    primaryOwner: "Companion usage signals (local-first)",
+    primaryOwner: "Spark Estate analytics and learning system",
     location:
-      "lib/companionStore.ts (companion-voice-usage-v1), lib/estate/chamberOfMomentumMemory.ts (pattern observations)",
-    usedBy: ["experience improvement", "pattern learning"],
-    status: "partial",
+      "lib/estate/sparkEstateAnalyticsAndLearningSystem.ts, lib/companionStore.ts (companion-voice-usage-v1), lib/estate/chamberOfMomentumMemory.ts (pattern observations)",
+    usedBy: ["experience improvement", "pattern learning", "founder reporting"],
+    status: "implemented",
   },
 ] as const;
 
