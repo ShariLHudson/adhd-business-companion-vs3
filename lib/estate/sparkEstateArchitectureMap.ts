@@ -713,8 +713,9 @@ export const SPARK_ESTATE_ARCHITECTURE_ENTRIES: readonly SparkEstateArchitecture
     id: "card-spark-note",
     domain: "card-system",
     label: "Spark Card™",
-    existing: "Daily Spark Note anchor + expanded experience",
-    location: "components/companion/SparkNoteAnchor.tsx, lib/sparkNote/",
+    existing: "Daily Spark Note anchor + expanded experience + one-per-day generation",
+    location:
+      "components/companion/SparkNoteAnchor.tsx, lib/sparkNote/sparkCardVisualDesignAndDailyGeneration.ts",
     status: "implemented",
     priority: 1,
   },

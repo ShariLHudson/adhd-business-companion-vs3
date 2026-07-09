@@ -151,7 +151,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
               <span className="spark-note-expanded__brand-flame" aria-hidden>
                 <SparkFlameIcon className="spark-note-expanded__brand-flame-svg" />
               </span>
-              <span className="spark-note-expanded__brand-label">Today&apos;s Spark</span>
+              <span className="spark-note-expanded__brand-label">Spark Card™</span>
             </div>
             <button
               type="button"
@@ -183,7 +183,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
           </section>
         </div>
 
-        <div className="spark-note-expanded__actions" aria-label="Spark reactions">
+        <div className="spark-note-expanded__actions" aria-label="How did this land?">
           <div className="spark-note-expanded__reactions-row">
             {CORE_REACTIONS.map((reaction) => {
               const active = reactions.includes(reaction.id);
@@ -222,7 +222,7 @@ export function SparkNoteExpanded({ card, onClose, onOpenCollection }: Props) {
             onClick={handleSave}
             aria-pressed={saved}
           >
-            <span aria-hidden>⭐</span> Save Spark
+            <span aria-hidden>⭐</span> Save to Journal
           </button>
         </div>
 

@@ -5,6 +5,7 @@ export {
   evaluateDailySparkNote,
   categoryEmoji,
 } from "./evaluateDailySparkNote";
+export * from "./sparkCardVisualDesignAndDailyGeneration";
 export * from "./personalSparks";
 export * from "./librarySelection";
 export * from "./preferenceLearning";

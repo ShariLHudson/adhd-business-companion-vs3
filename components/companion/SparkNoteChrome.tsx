@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { evaluateDailySparkNote } from "@/lib/sparkNote/evaluateDailySparkNote";
+import { resolveDailySparkCard } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
 import { recordSparkNoteCompleted, recordSparkNoteViewed } from "@/lib/sparkNote/persistence";
 import type { RegionCode } from "@/lib/companionLanguage";
 import type { PersonalDate } from "@/lib/recognition/types";
@@ -51,7 +51,7 @@ export function SparkNoteChrome({
 
   const { card } = useMemo(
     () =>
-      evaluateDailySparkNote({
+      resolveDailySparkCard({
         firstName,
         birthday,
         personalDates,
