@@ -26,6 +26,7 @@ import { verifySparkEstateAiPromptAndIntelligenceLayerArchitecture } from "./spa
 import { verifySparkEstateAnalyticsAndLearningSystem } from "./sparkEstateAnalyticsAndLearningSystem";
 import { verifySparkEstateSystemGovernanceAndQualityStandards } from "./sparkEstateSystemGovernanceAndQualityStandards";
 import { verifySparkEstateTopNavigationAndProfileMenu } from "./sparkEstateTopNavigationAndProfileMenu";
+import { verifySparkEstateFounderIntelligenceDashboard } from "./sparkEstateFounderIntelligenceDashboard";
 import { verifySparkEstateMasterOperatingDocument } from "./sparkEstateMasterOperatingDocument";
 import { verifySparkEstateUserJourneyAndMemberLifecycle } from "./sparkEstateUserJourneyAndMemberLifecycleArchitecture";
 
@@ -97,6 +98,7 @@ export type SparkEstateIntegrationAssessment = {
   analyticsAndLearningAligned: boolean;
   aiPromptIntelligenceLayerAligned: boolean;
   masterOperatingDocumentAligned: boolean;
+  founderIntelligenceDashboardAligned: boolean;
 };
 
 export const SPARK_ESTATE_IMPLEMENTATION_PRINCIPLE =
@@ -405,6 +407,19 @@ export const SPARK_ESTATE_PHASE_MAPPINGS: readonly SparkEstatePhaseMapping[] = [
     status: "implemented",
     priority: 1,
     dependencies: [11, 17, 18, 20, 21, 26, 27, 28],
+  },
+  {
+    phase: 30,
+    spec: "SPARK_ESTATE_FOUNDER_INTELLIGENCE_DASHBOARD_SPECIFICATION_PHASE30.md",
+    title: "Founder intelligence dashboard",
+    implementations: [
+      "lib/estate/sparkEstateFounderIntelligenceDashboard.ts",
+      "components/founderStudio/FounderExecutiveIntelligence.tsx",
+      "lib/founder/intelligence/services/intelligenceService.ts",
+    ],
+    status: "implemented",
+    priority: 1,
+    dependencies: [20, 22, 23, 24, 29],
   },
 ] as const;
 
@@ -807,6 +822,8 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     verifySparkEstateAiPromptAndIntelligenceLayerArchitecture().intelligenceLayerReady;
   const masterOperatingDocumentAligned =
     verifySparkEstateMasterOperatingDocument().operatingDocumentReady;
+  const founderIntelligenceDashboardAligned =
+    verifySparkEstateFounderIntelligenceDashboard().founderDashboardReady;
 
   return {
     existing: entriesByStatus("implemented"),
@@ -835,6 +852,7 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     analyticsAndLearningAligned,
     aiPromptIntelligenceLayerAligned,
     masterOperatingDocumentAligned,
+    founderIntelligenceDashboardAligned,
   };
 }
 
@@ -865,6 +883,7 @@ export function verifySparkEstateArchitectureIntegration(): {
     assessment.analyticsAndLearningAligned &&
     assessment.aiPromptIntelligenceLayerAligned &&
     assessment.masterOperatingDocumentAligned &&
+    assessment.founderIntelligenceDashboardAligned &&
     blockingMissing.length === 0;
 
   return { aligned, assessment };
@@ -912,6 +931,7 @@ export function formatSparkEstateArchitectureReport(
     `  Analytics and learning: ${assessment.analyticsAndLearningAligned ? "pass" : "fail"}`,
     `  AI prompt intelligence layers: ${assessment.aiPromptIntelligenceLayerAligned ? "pass" : "fail"}`,
     `  Master operating document: ${assessment.masterOperatingDocumentAligned ? "pass" : "fail"}`,
+    `  Founder intelligence dashboard: ${assessment.founderIntelligenceDashboardAligned ? "pass" : "fail"}`,
     "",
     "Recommended order:",
     ...assessment.recommendedOrder.map((step) => `  • ${step}`),

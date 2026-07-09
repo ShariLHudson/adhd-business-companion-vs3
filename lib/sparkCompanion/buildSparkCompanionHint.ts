@@ -23,6 +23,7 @@ import { sparkEstateRoomIntelligenceCompanionHint } from "@/lib/estate/sparkEsta
 import { sparkEstateMasterOperatingDocumentCompanionHint } from "@/lib/estate/sparkEstateMasterOperatingDocument";
 import { sparkEstateAiPromptLayerCompanionHint } from "@/lib/estate/sparkEstateAiPromptAndIntelligenceLayerArchitecture";
 import { sparkEstateAnalyticsCompanionHint } from "@/lib/estate/sparkEstateAnalyticsAndLearningSystem";
+import { sparkEstateFounderIntelligenceCompanionHint } from "@/lib/estate/sparkEstateFounderIntelligenceDashboard";
 import { sparkEstateGovernanceCompanionHint } from "@/lib/estate/sparkEstateSystemGovernanceAndQualityStandards";
 import { sparkEstateMemberLifecycleCompanionHint } from "@/lib/estate/sparkEstateUserJourneyAndMemberLifecycleArchitecture";
 import { sparkEstateCompletionCompanionHint } from "@/lib/universalCreation/sparkEstateCompletionSystem";
@@ -200,6 +201,11 @@ export function buildSparkCompanionHint(
   const analytics = sparkEstateAnalyticsCompanionHint({ text });
   if (analytics) {
     lines.push(analytics);
+  }
+
+  const founderIntelligence = sparkEstateFounderIntelligenceCompanionHint({ text });
+  if (founderIntelligence) {
+    lines.push(founderIntelligence);
   }
 
   const aiLayers = sparkEstateAiPromptLayerCompanionHint({ text });

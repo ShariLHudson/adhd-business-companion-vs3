@@ -46,6 +46,7 @@ These protocols define cross-cutting fixes for conversation stability, routing, 
 | [Spark Estate File & Data Architecture (Phase 27)](SPARK_ESTATE_FILE_AND_DATA_ARCHITECTURE_MAP_SPECIFICATION_PHASE27.md) | **Implemented** | `sparkEstateFileAndDataArchitectureMap.ts`, ten data layers, one source of truth per domain |
 | [Spark Estate Production Readiness (Phase 28)](SPARK_ESTATE_DEMO_TO_PRODUCTION_READINESS_CHECKLIST_PHASE28.md) | **Implemented** | `sparkEstateProductionReadinessChecklist.ts`, launch decision checks, priority-ordered verification |
 | [Spark Estate Master Operating Document (Phase 29)](SPARK_ESTATE_MASTER_OPERATING_DOCUMENT_SPECIFICATION_PHASE29.md) | **Implemented** | `sparkEstateMasterOperatingDocument.ts`, identity, promise, philosophies, quality standard |
+| [Spark Estate Founder Intelligence Dashboard (Phase 30)](SPARK_ESTATE_FOUNDER_INTELLIGENCE_DASHBOARD_SPECIFICATION_PHASE30.md) | **Implemented** | `sparkEstateFounderIntelligenceDashboard.ts`, eight intelligence categories, reporting rhythms, Founder Studio bridge |
 | [Regression Test Protocol](REGRESSION_TEST_PROTOCOL.md) | Partial | Estate cases in manifest tests; conversation + creation + clear-my-mind TBD |
 
 ## Estate manifest — quick verify
