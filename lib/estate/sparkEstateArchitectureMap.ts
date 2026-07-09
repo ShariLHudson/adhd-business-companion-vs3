@@ -26,6 +26,7 @@ import { verifySparkEstateAiPromptAndIntelligenceLayerArchitecture } from "./spa
 import { verifySparkEstateAnalyticsAndLearningSystem } from "./sparkEstateAnalyticsAndLearningSystem";
 import { verifySparkEstateSystemGovernanceAndQualityStandards } from "./sparkEstateSystemGovernanceAndQualityStandards";
 import { verifySparkEstateTopNavigationAndProfileMenu } from "./sparkEstateTopNavigationAndProfileMenu";
+import { verifySparkEstateMasterOperatingDocument } from "./sparkEstateMasterOperatingDocument";
 import { verifySparkEstateUserJourneyAndMemberLifecycle } from "./sparkEstateUserJourneyAndMemberLifecycleArchitecture";
 
 export type SparkEstateImplementationPriority = 1 | 2 | 3;
@@ -95,6 +96,7 @@ export type SparkEstateIntegrationAssessment = {
   memberLifecycleAligned: boolean;
   analyticsAndLearningAligned: boolean;
   aiPromptIntelligenceLayerAligned: boolean;
+  masterOperatingDocumentAligned: boolean;
 };
 
 export const SPARK_ESTATE_IMPLEMENTATION_PRINCIPLE =
@@ -395,6 +397,15 @@ export const SPARK_ESTATE_PHASE_MAPPINGS: readonly SparkEstatePhaseMapping[] = [
     priority: 1,
     dependencies: [9, 11, 12, 14, 15, 16, 17, 24],
   },
+  {
+    phase: 29,
+    spec: "SPARK_ESTATE_MASTER_OPERATING_DOCUMENT_SPECIFICATION_PHASE29.md",
+    title: "Master operating document",
+    implementations: ["lib/estate/sparkEstateMasterOperatingDocument.ts"],
+    status: "implemented",
+    priority: 1,
+    dependencies: [11, 17, 18, 20, 21, 26, 27, 28],
+  },
 ] as const;
 
 export const SPARK_ESTATE_ARCHITECTURE_ENTRIES: readonly SparkEstateArchitectureEntry[] = [
@@ -467,6 +478,22 @@ export const SPARK_ESTATE_ARCHITECTURE_ENTRIES: readonly SparkEstateArchitecture
       "room-intelligence-architecture",
       "creation-universal-journey",
       "card-knowledge-library",
+    ],
+  },
+  {
+    id: "master-operating-document",
+    domain: "companion-intelligence",
+    label: "Master operating document",
+    existing: "Single operating view — identity, promise, philosophies, quality standard",
+    location: "lib/estate/sparkEstateMasterOperatingDocument.ts",
+    status: "implemented",
+    priority: 1,
+    dependencies: [
+      "companion-shari-voice",
+      "creation-universal-journey",
+      "member-lifecycle-architecture",
+      "governance-quality-standards",
+      "ai-prompt-intelligence-layers",
     ],
   },
   {
@@ -778,6 +805,8 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     verifySparkEstateAnalyticsAndLearningSystem().analyticsReady;
   const aiPromptIntelligenceLayerAligned =
     verifySparkEstateAiPromptAndIntelligenceLayerArchitecture().intelligenceLayerReady;
+  const masterOperatingDocumentAligned =
+    verifySparkEstateMasterOperatingDocument().operatingDocumentReady;
 
   return {
     existing: entriesByStatus("implemented"),
@@ -805,6 +834,7 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     memberLifecycleAligned,
     analyticsAndLearningAligned,
     aiPromptIntelligenceLayerAligned,
+    masterOperatingDocumentAligned,
   };
 }
 
@@ -834,6 +864,7 @@ export function verifySparkEstateArchitectureIntegration(): {
     assessment.memberLifecycleAligned &&
     assessment.analyticsAndLearningAligned &&
     assessment.aiPromptIntelligenceLayerAligned &&
+    assessment.masterOperatingDocumentAligned &&
     blockingMissing.length === 0;
 
   return { aligned, assessment };
@@ -880,6 +911,7 @@ export function formatSparkEstateArchitectureReport(
     `  Member lifecycle architecture: ${assessment.memberLifecycleAligned ? "pass" : "fail"}`,
     `  Analytics and learning: ${assessment.analyticsAndLearningAligned ? "pass" : "fail"}`,
     `  AI prompt intelligence layers: ${assessment.aiPromptIntelligenceLayerAligned ? "pass" : "fail"}`,
+    `  Master operating document: ${assessment.masterOperatingDocumentAligned ? "pass" : "fail"}`,
     "",
     "Recommended order:",
     ...assessment.recommendedOrder.map((step) => `  • ${step}`),
