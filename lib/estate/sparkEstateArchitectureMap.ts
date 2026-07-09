@@ -27,6 +27,7 @@ import { verifySparkEstateAnalyticsAndLearningSystem } from "./sparkEstateAnalyt
 import { verifySparkEstateSystemGovernanceAndQualityStandards } from "./sparkEstateSystemGovernanceAndQualityStandards";
 import { verifySparkEstateTopNavigationAndProfileMenu } from "./sparkEstateTopNavigationAndProfileMenu";
 import { verifySparkEstateExpertTeamAndChamberMemberCollaboration } from "./sparkEstateExpertTeamAndChamberMemberCollaborationArchitecture";
+import { verifySparkEstateUniversalProjectWorkspaceArchitecture } from "./sparkEstateUniversalProjectWorkspaceArchitecture";
 import { verifySparkEstateFounderIntelligenceDashboard } from "./sparkEstateFounderIntelligenceDashboard";
 import { verifySparkEstateIntelligentWorkspaceRecommendationSystem } from "./sparkEstateIntelligentWorkspaceRecommendationSystem";
 import { verifySparkEstateIntelligentProjectLifecycleEngine } from "./sparkEstateIntelligentProjectLifecycleEngine";
@@ -105,6 +106,7 @@ export type SparkEstateIntegrationAssessment = {
   intelligentWorkspaceRecommendationAligned: boolean;
   intelligentProjectLifecycleAligned: boolean;
   expertTeamCollaborationAligned: boolean;
+  universalProjectWorkspaceAligned: boolean;
 };
 
 export const SPARK_ESTATE_IMPLEMENTATION_PRINCIPLE =
@@ -468,6 +470,21 @@ export const SPARK_ESTATE_PHASE_MAPPINGS: readonly SparkEstatePhaseMapping[] = [
     status: "implemented",
     priority: 1,
     dependencies: [10, 14, 17, 18, 22, 32],
+  },
+  {
+    phase: 34,
+    spec: "SPARK_ESTATE_UNIVERSAL_PROJECT_WORKSPACE_ARCHITECTURE_REFINEMENT_SPECIFICATION_PHASE34.md",
+    title: "Universal project workspace architecture",
+    implementations: [
+      "lib/estate/sparkEstateUniversalProjectWorkspaceArchitecture.ts",
+      "lib/estate/chamberProjectEngine.ts",
+      "lib/companionStore.ts",
+      "lib/estate/sparkEstateIntelligentProjectLifecycleEngine.ts",
+      "lib/universalCreation/sparkEstateCreationJourney.ts",
+    ],
+    status: "implemented",
+    priority: 1,
+    dependencies: [4, 6, 11, 16, 20, 32, 33],
   },
 ] as const;
 
@@ -879,6 +896,8 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     verifySparkEstateIntelligentProjectLifecycleEngine().lifecycleReady;
   const expertTeamCollaborationAligned =
     verifySparkEstateExpertTeamAndChamberMemberCollaboration().collaborationReady;
+  const universalProjectWorkspaceAligned =
+    verifySparkEstateUniversalProjectWorkspaceArchitecture().universalProjectReady;
 
   return {
     existing: entriesByStatus("implemented"),
@@ -911,6 +930,7 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     intelligentWorkspaceRecommendationAligned,
     intelligentProjectLifecycleAligned,
     expertTeamCollaborationAligned,
+    universalProjectWorkspaceAligned,
   };
 }
 
@@ -945,6 +965,7 @@ export function verifySparkEstateArchitectureIntegration(): {
     assessment.intelligentWorkspaceRecommendationAligned &&
     assessment.intelligentProjectLifecycleAligned &&
     assessment.expertTeamCollaborationAligned &&
+    assessment.universalProjectWorkspaceAligned &&
     blockingMissing.length === 0;
 
   return { aligned, assessment };
@@ -996,6 +1017,7 @@ export function formatSparkEstateArchitectureReport(
     `  Intelligent workspace recommendation: ${assessment.intelligentWorkspaceRecommendationAligned ? "pass" : "fail"}`,
     `  Intelligent project lifecycle: ${assessment.intelligentProjectLifecycleAligned ? "pass" : "fail"}`,
     `  Expert team collaboration: ${assessment.expertTeamCollaborationAligned ? "pass" : "fail"}`,
+    `  Universal project workspace: ${assessment.universalProjectWorkspaceAligned ? "pass" : "fail"}`,
     "",
     "Recommended order:",
     ...assessment.recommendedOrder.map((step) => `  • ${step}`),
