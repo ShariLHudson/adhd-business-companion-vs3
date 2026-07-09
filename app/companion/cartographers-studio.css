@@ -276,3 +276,344 @@
 .cartographers-autosave--saved {
   color: #1e4f4f;
 }
+
+/* ——— Immersive room (plate + hotspots) ——— */
+.cartographers-immersive {
+  position: relative;
+  display: flex;
+  min-height: min(70vh, 640px);
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 1rem;
+  --carto-brass: #b8956a;
+  --carto-cream: #fffdf8;
+  --carto-ink: #1f1c19;
+}
+
+.cartographers-immersive__plate {
+  position: absolute;
+  inset: 0;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  z-index: 0;
+}
+
+.cartographers-immersive__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    180deg,
+    rgba(12, 8, 6, 0.35) 0%,
+    transparent 28%,
+    transparent 62%,
+    rgba(12, 8, 6, 0.45) 100%
+  );
+}
+
+.cartographers-immersive__chrome {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 1rem 1.1rem 0.5rem;
+}
+
+.cartographers-immersive__plaque {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #f0d9a8;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+}
+
+.cartographers-immersive__tagline {
+  margin-top: 0.25rem;
+  max-width: 28rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff8eb;
+  text-shadow: 0 1px 5px rgba(0, 0, 0, 0.55);
+}
+
+.cartographers-immersive__resume {
+  position: relative;
+  z-index: 3;
+  margin: 0.5rem 1rem;
+  max-width: 100%;
+  border-radius: 0.85rem;
+  background: rgba(255, 253, 248, 0.92);
+  padding: 0.75rem;
+  backdrop-filter: blur(8px);
+}
+
+.cartographers-immersive__resume-label {
+  margin-bottom: 0.5rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #1e4f4f;
+}
+
+.cartographers-immersive__hotspots {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+.cartographers-hotspot {
+  position: absolute;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  background: transparent;
+  padding: 0.25rem;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.cartographers-hotspot__label {
+  border-radius: 0.2rem;
+  background: rgba(20, 14, 8, 0.55);
+  padding: 0.15rem 0.4rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #f5e6c8;
+  opacity: 0;
+  transition: opacity 160ms ease;
+}
+
+.cartographers-hotspot:hover,
+.cartographers-hotspot:focus-visible {
+  border-color: rgba(184, 149, 106, 0.85);
+  background: rgba(255, 220, 160, 0.12);
+  box-shadow: 0 0 0 2px rgba(184, 149, 106, 0.35);
+  outline: none;
+}
+
+.cartographers-hotspot:hover .cartographers-hotspot__label,
+.cartographers-hotspot:focus-visible .cartographers-hotspot__label,
+.cartographers-hotspot--live .cartographers-hotspot__label {
+  opacity: 1;
+}
+
+.cartographers-hotspot--live:hover {
+  background: rgba(255, 220, 160, 0.2);
+}
+
+.cartographers-hotspot--exit {
+  position: relative;
+  left: auto;
+  top: auto;
+  width: auto;
+  height: auto;
+  border: 1px solid rgba(240, 217, 168, 0.45);
+  background: rgba(20, 14, 8, 0.45);
+  padding: 0.4rem 0.85rem;
+  color: #f5e6c8;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.cartographers-hotspot--exit .cartographers-hotspot__label {
+  opacity: 1;
+  background: transparent;
+  padding: 0;
+}
+
+.cartographers-immersive__hint {
+  position: relative;
+  z-index: 3;
+  margin-top: auto;
+  padding: 0.75rem 1.1rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #f0e2c4;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* ——— Editable Mind Map canvas ——— */
+.mind-map-canvas {
+  display: flex;
+  min-height: 360px;
+  flex: 1;
+  flex-direction: column;
+  border-radius: 1rem;
+  border: 1px solid rgba(184, 149, 106, 0.35);
+  background: linear-gradient(165deg, #fffdf8, #f3ebe0);
+  overflow: hidden;
+}
+
+.mind-map-canvas__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  border-bottom: 1px solid rgba(184, 149, 106, 0.25);
+  background: rgba(255, 253, 248, 0.9);
+  padding: 0.5rem 0.65rem;
+}
+
+.mind-map-canvas__tool {
+  border-radius: 0.55rem;
+  border: 1px solid #e7dfd4;
+  background: white;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #3d3228;
+}
+
+.mind-map-canvas__tool:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.mind-map-canvas__tool--active {
+  border-color: #8b7355;
+  background: #f5efe6;
+  color: #1e4f4f;
+}
+
+.mind-map-canvas__hint {
+  margin-left: 0.35rem;
+  font-size: 0.68rem;
+  color: #9a8f82;
+}
+
+.mind-map-canvas__stage {
+  position: relative;
+  min-height: 320px;
+  flex: 1;
+}
+
+.mind-map-canvas__edges {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.mind-map-node {
+  position: absolute;
+  z-index: 1;
+  max-width: 11rem;
+  min-width: 5.5rem;
+  transform: translate(-50%, -50%);
+  border-radius: 0.85rem;
+  border: 2px solid #8b7355;
+  background: white;
+  padding: 0.55rem 0.7rem;
+  box-shadow: 0 4px 14px rgba(30, 22, 12, 0.1);
+  cursor: grab;
+  text-align: left;
+}
+
+.mind-map-node--selected {
+  box-shadow:
+    0 0 0 2px rgba(30, 79, 79, 0.35),
+    0 6px 16px rgba(30, 22, 12, 0.14);
+}
+
+.mind-map-node--drop {
+  border-color: #1e4f4f;
+  background: #f0f8f8;
+}
+
+.mind-map-node--connect-from {
+  outline: 2px dashed #c48992;
+}
+
+.mind-map-node__label {
+  margin: 0;
+  font-size: 0.82rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #1f1c19;
+}
+
+.mind-map-node__input {
+  width: 100%;
+  border: none;
+  background: #faf7f2;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #1f1c19;
+  outline: none;
+}
+
+.mind-map-node__notes-preview {
+  margin: 0.25rem 0 0;
+  font-size: 0.65rem;
+  line-height: 1.3;
+  color: #6b635a;
+}
+
+.mind-map-node__collapse {
+  position: absolute;
+  top: -0.35rem;
+  right: -0.35rem;
+  display: flex;
+  height: 1.15rem;
+  width: 1.15rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  border: 1px solid #e7dfd4;
+  background: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #1e4f4f;
+}
+
+.mind-map-canvas__notes {
+  border-top: 1px solid rgba(184, 149, 106, 0.25);
+  background: rgba(255, 253, 248, 0.95);
+  padding: 0.65rem 0.85rem;
+}
+
+.mind-map-canvas__notes-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #3d3228;
+}
+
+.mind-map-canvas__notes-input {
+  margin-top: 0.35rem;
+  width: 100%;
+  resize: vertical;
+  border-radius: 0.65rem;
+  border: 1px solid #c9bfb0;
+  background: white;
+  padding: 0.5rem 0.65rem;
+  font-size: 0.85rem;
+  color: #1f1c19;
+  outline: none;
+}
+
+.cartographers-workspace-shell {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  border-radius: 1rem;
+  background: rgba(255, 253, 248, 0.88);
+  backdrop-filter: blur(10px);
+}

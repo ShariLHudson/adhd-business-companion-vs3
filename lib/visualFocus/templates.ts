@@ -129,10 +129,18 @@ export function createVisualFocusMap(
   let rooted: VisualFocusNode;
   let purposeAnchor: VisualFocusPurposeAnchor | undefined;
 
+  let draftExplanation: string | undefined;
+  let draftDuplicates: string[] | undefined;
+
   if (mode === "mind-map" && options.mindMapDiscovery) {
     const draft = buildMindMapDraftFromDiscovery(options.mindMapDiscovery);
     discoveryInterview = buildMindMapDiscoveryInterview(options.mindMapDiscovery);
-    draftSuggestions = draft.suggestedGaps;
+    draftSuggestions = [
+      ...draft.suggestedBranches,
+      ...draft.suggestedGaps.filter((g) => !draft.suggestedBranches.includes(g)),
+    ].slice(0, 4);
+    draftExplanation = draft.explanation;
+    draftDuplicates = draft.duplicates;
     title = draft.title;
     rooted = draft.root;
     purposeAnchor = {
@@ -205,6 +213,8 @@ export function createVisualFocusMap(
     purposeAnchor,
     discoveryInterview,
     draftSuggestions,
+    draftExplanation,
+    draftDuplicates,
     createdAt: now,
     updatedAt: now,
   };

@@ -13,3 +13,5 @@ export * from "./intelligence";
 export * from "./companionIntelligence";
 export * from "./myWorkIntegration";
 export * from "./discoveryInterview";
+export * from "./mindMapEditing";
+export * from "./mindMapHistory";

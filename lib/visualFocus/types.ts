@@ -25,6 +25,8 @@ export type VisualFocusNode = {
   children: VisualFocusNode[];
   collapsed?: boolean;
   color?: string;
+  /** Member notes on this branch (224). */
+  notes?: string;
 };
 
 export type VisualKanbanColumn = {
@@ -148,6 +150,10 @@ export type VisualFocusMap = {
   discoveryInterview?: import("./discoveryInterview/types").VisualFocusDiscoveryInterview;
   /** Soft prompts Spark suggested after the first draft. */
   draftSuggestions?: string[];
+  /** Why Spark grouped the first draft this way. */
+  draftExplanation?: string;
+  /** Near-duplicate ideas Spark merged or flagged. */
+  draftDuplicates?: string[];
   businessCanvas?: BusinessCanvasData;
   kanban?: {
     columns: VisualKanbanColumn[];

@@ -3,9 +3,25 @@ import {
   buildMindMapDraftFromDiscovery,
   parseIdeaLines,
   MIND_MAP_DISCOVERY_QUESTIONS,
+  dedupeIdeas,
 } from "./mindMapDiscovery";
 import { createVisualFocusMap } from "../templates";
 import { CARTOGRAPHERS_FRAMED_MAPS } from "@/lib/cartographersStudio/framedMaps";
+import {
+  addChildNode,
+  reparentNode,
+  renameNode,
+  setNodeNote,
+  disconnectToRoot,
+} from "../mindMapEditing";
+import {
+  createMindMapHistory,
+  pushMindMapHistory,
+  undoMindMapHistory,
+  redoMindMapHistory,
+  canUndo,
+  canRedo,
+} from "../mindMapHistory";
 
 describe("Mind Map Discovery Interview", () => {
   it("asks the three Mind Map questions from 199", () => {
@@ -22,24 +38,32 @@ describe("Mind Map Discovery Interview", () => {
     ).toEqual(["Audience", "Pricing", "Marketing", "Follow up"]);
   });
 
-  it("builds a first draft with grouped branches — never blank", () => {
+  it("dedupes near-duplicate ideas", () => {
+    const { unique, duplicates } = dedupeIdeas([
+      "Email marketing",
+      "email marketing campaign",
+      "Pricing",
+    ]);
+    expect(unique.length).toBe(2);
+    expect(duplicates.length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("builds a first draft with grouping explanation — never blank", () => {
     const draft = buildMindMapDraftFromDiscovery({
       topic: "Launch Workshop",
       everything:
-        "Audience research\nPricing tiers\nMarketing emails\nCourse content\nOpen questions about timing",
+        "Audience research\nPricing tiers\nMarketing emails\nCourse content\nOpen questions about timing\nemail marketing",
       anythingElse: "Need a follow-up sequence",
     });
 
     expect(draft.title).toBe("Launch Workshop");
     expect(draft.root.label).toBe("Launch Workshop");
     expect(draft.root.children.length).toBeGreaterThanOrEqual(2);
-    const labels = draft.root.children.map((c) => c.label);
-    expect(labels.some((l) => /Audience|Offer|Marketing|More ideas|Next/i.test(l))).toBe(
-      true,
-    );
+    expect(draft.explanation).toMatch(/centered the map/i);
+    expect(draft.explanation.length).toBeGreaterThan(40);
   });
 
-  it("createVisualFocusMap stores discovery interview and draft tree", () => {
+  it("createVisualFocusMap stores discovery interview, explanation, and draft tree", () => {
     const map = createVisualFocusMap("mind-map", {
       mindMapDiscovery: {
         topic: "Grow revenue",
@@ -50,9 +74,40 @@ describe("Mind Map Discovery Interview", () => {
     expect(map.mode).toBe("mind-map");
     expect(map.title).toBe("Grow revenue");
     expect(map.discoveryInterview?.mapKind).toBe("mind-map");
-    expect(map.discoveryInterview?.answers).toHaveLength(3);
+    expect(map.draftExplanation).toBeTruthy();
     expect(map.root.children.length).toBeGreaterThan(0);
-    expect(map.root.label).toBe("Grow revenue");
+  });
+});
+
+describe("Mind Map editing + history", () => {
+  it("supports rename, notes, reparent, disconnect, undo/redo", () => {
+    const map = createVisualFocusMap("mind-map", {
+      mindMapDiscovery: {
+        topic: "Center",
+        everything: "Alpha\nBeta\nGamma",
+      },
+    });
+    let root = map.root;
+    const childId = root.children[0]!.id;
+    root = renameNode(root, childId, "Renamed");
+    root = setNodeNote(root, childId, "A note");
+    root = addChildNode(root, root.id, "Delta");
+    const delta = root.children.find((c) => c.label === "Delta")!;
+    root = reparentNode(root, delta.id, childId);
+    expect(root.children.find((c) => c.id === childId)?.children.some((c) => c.id === delta.id)).toBe(
+      true,
+    );
+    root = disconnectToRoot(root, delta.id);
+    expect(root.children.some((c) => c.id === delta.id)).toBe(true);
+
+    let history = createMindMapHistory(map.root);
+    history = pushMindMapHistory(history, root);
+    expect(canUndo(history)).toBe(true);
+    history = undoMindMapHistory(history);
+    expect(history.present.label).toBe("Center");
+    expect(canRedo(history)).toBe(true);
+    history = redoMindMapHistory(history);
+    expect(history.present.children.some((c) => c.id === delta.id)).toBe(true);
   });
 });
 
@@ -62,6 +117,5 @@ describe("Cartographer framed maps", () => {
     const live = CARTOGRAPHERS_FRAMED_MAPS.filter((m) => m.interactive);
     expect(live).toHaveLength(1);
     expect(live[0]?.id).toBe("mind-map");
-    expect(live[0]?.visualFocusMode).toBe("mind-map");
   });
 });

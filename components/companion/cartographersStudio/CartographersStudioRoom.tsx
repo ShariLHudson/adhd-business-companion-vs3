@@ -5,57 +5,29 @@ import {
   CARTOGRAPHERS_ATLAS_TEASER,
   CARTOGRAPHERS_FRAMED_MAPS,
   CARTOGRAPHERS_ROOM_INTRO,
+  CARTOGRAPHERS_STUDIO_BACKGROUND,
   type CartographersFramedMap,
   type CartographersFramedMapId,
 } from "@/lib/cartographersStudio";
 import type { VisualFocusMap } from "@/lib/visualFocus";
 import { ContinueThinkingCard } from "@/components/companion/ContinueThinkingCard";
-import { AppBackButton } from "@/components/companion/AppBackButton";
-import { NAV_FOCUS_MY_BRAIN } from "@/lib/navigationBack";
 
-function FramedMapButton({
-  map,
-  onSelect,
-  onLearn,
-}: {
-  map: CartographersFramedMap;
-  onSelect: (id: CartographersFramedMapId) => void;
-  onLearn: (map: CartographersFramedMap) => void;
-}) {
-  return (
-    <button
-      type="button"
-      data-testid={`cartographers-frame-${map.id}`}
-      data-interactive={map.interactive ? "true" : "false"}
-      aria-label={
-        map.interactive
-          ? `Open ${map.nameplate} Discovery Interview`
-          : `${map.nameplate} — coming soon`
-      }
-      title={map.interactive ? map.nameplate : `${map.nameplate} — coming soon`}
-      onClick={() => {
-        if (map.interactive) onSelect(map.id);
-        else onLearn(map);
-      }}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        onLearn(map);
-      }}
-      onPointerDown={(e) => {
-        if (e.pointerType === "touch") {
-          /* long-press handled via context menu / learn tip */
-        }
-      }}
-      className={`cartographers-frame${map.interactive ? " cartographers-frame--live" : " cartographers-frame--soon"}`}
-    >
-      <span className="cartographers-frame__glow" aria-hidden />
-      <span className="cartographers-frame__plate">{map.nameplate}</span>
-      {!map.interactive ? (
-        <span className="cartographers-frame__soon">Soon</span>
-      ) : null}
-    </button>
-  );
-}
+/** Approximate hotspot positions over the Cartographer plate (percent). */
+const FRAME_HOTSPOTS: Record<
+  CartographersFramedMapId,
+  { left: string; top: string; width: string; height: string }
+> = {
+  "mind-map": { left: "18%", top: "14%", width: "11%", height: "14%" },
+  "decision-map": { left: "30%", top: "14%", width: "11%", height: "14%" },
+  "relationship-map": { left: "42%", top: "14%", width: "11%", height: "14%" },
+  "process-map": { left: "54%", top: "14%", width: "11%", height: "14%" },
+  "journey-map": { left: "66%", top: "14%", width: "11%", height: "14%" },
+  "timeline-map": { left: "18%", top: "30%", width: "11%", height: "14%" },
+  "strategy-map": { left: "30%", top: "30%", width: "11%", height: "14%" },
+  "project-map": { left: "42%", top: "30%", width: "11%", height: "14%" },
+  "opportunity-map": { left: "54%", top: "30%", width: "11%", height: "14%" },
+  "priority-map": { left: "66%", top: "30%", width: "11%", height: "14%" },
+};
 
 export function CartographersStudioRoom({
   continueThinking,
@@ -66,7 +38,6 @@ export function CartographersStudioRoom({
   onWorkWithShari,
   onBack,
   onClose,
-  backDestination = NAV_FOCUS_MY_BRAIN,
 }: {
   continueThinking: VisualFocusMap[];
   onSelectMindMap: () => void;
@@ -76,53 +47,61 @@ export function CartographersStudioRoom({
   onWorkWithShari?: () => void;
   onBack?: () => void;
   onClose?: () => void;
-  backDestination?: string;
 }) {
   const [learnMap, setLearnMap] = useState<CartographersFramedMap | null>(null);
   const [atlasOpen, setAtlasOpen] = useState(false);
+  const [objectTip, setObjectTip] = useState<string | null>(null);
 
   function handleFrameSelect(id: CartographersFramedMapId) {
     if (id === "mind-map") onSelectMindMap();
   }
 
+  const exit = onBack ?? onClose;
+
   return (
     <div
-      className="cartographers-studio-room"
+      className="cartographers-immersive"
       data-testid="cartographers-studio-room"
     >
-      <header className="cartographers-studio-room__header">
-        <div className="min-w-0 flex-1">
-          <p className="cartographers-studio-room__plaque">
+      <div
+        className="cartographers-immersive__plate"
+        style={{ backgroundImage: `url(${CARTOGRAPHERS_STUDIO_BACKGROUND})` }}
+        role="img"
+        aria-label="Cartographer's Studio"
+      />
+      <div className="cartographers-immersive__veil" aria-hidden />
+
+      <div className="cartographers-immersive__chrome">
+        <div>
+          <p className="cartographers-immersive__plaque">
             {CARTOGRAPHERS_ROOM_INTRO.plaque}
           </p>
-          <h1 className="cartographers-studio-room__title">
+          <p className="cartographers-immersive__tagline">
             {CARTOGRAPHERS_ROOM_INTRO.tagline}
-          </h1>
-          <p className="cartographers-studio-room__welcome">
-            {CARTOGRAPHERS_ROOM_INTRO.welcome}
-          </p>
-          <p className="cartographers-studio-room__mvp-note">
-            {CARTOGRAPHERS_ROOM_INTRO.mindMapReady}
           </p>
         </div>
-        {onBack || onClose ? (
-          <AppBackButton
-            destination={backDestination}
-            onBack={onBack ?? onClose!}
-            size="compact"
-          />
+        {exit ? (
+          <button
+            type="button"
+            className="cartographers-hotspot cartographers-hotspot--exit"
+            data-testid="cartographers-exit"
+            onClick={exit}
+            aria-label="Leave Cartographer's Studio — resume later automatically"
+          >
+            Exit
+          </button>
         ) : null}
-      </header>
+      </div>
 
       {continueThinking.length > 0 ? (
         <section
-          className="cartographers-studio-room__resume"
+          className="cartographers-immersive__resume"
           data-testid="continue-thinking"
         >
-          <p className="cartographers-studio-room__resume-label">
+          <p className="cartographers-immersive__resume-label">
             Continue where you left off
           </p>
-          <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-2 sm:flex-row">
             {continueThinking.map((map) => (
               <ContinueThinkingCard
                 key={map.id}
@@ -136,65 +115,119 @@ export function CartographersStudioRoom({
         </section>
       ) : null}
 
-      <section
-        className="cartographers-wall"
-        aria-label="Framed maps"
-        data-testid="cartographers-wall"
-      >
-        <div className="cartographers-wall__grid">
-          {CARTOGRAPHERS_FRAMED_MAPS.map((map) => (
-            <FramedMapButton
+      <div className="cartographers-immersive__hotspots" aria-label="Room objects">
+        {CARTOGRAPHERS_FRAMED_MAPS.map((map) => {
+          const box = FRAME_HOTSPOTS[map.id];
+          return (
+            <button
               key={map.id}
-              map={map}
-              onSelect={handleFrameSelect}
-              onLearn={setLearnMap}
-            />
-          ))}
-        </div>
-      </section>
+              type="button"
+              className={`cartographers-hotspot cartographers-hotspot--frame${
+                map.interactive ? " cartographers-hotspot--live" : ""
+              }`}
+              style={{
+                left: box.left,
+                top: box.top,
+                width: box.width,
+                height: box.height,
+              }}
+              data-testid={`cartographers-frame-${map.id}`}
+              data-interactive={map.interactive ? "true" : "false"}
+              aria-label={
+                map.interactive
+                  ? `Open ${map.nameplate}`
+                  : `${map.nameplate} — coming soon`
+              }
+              onClick={() => {
+                if (map.interactive) handleFrameSelect(map.id);
+                else setLearnMap(map);
+              }}
+              onContextMenu={(e) => {
+                e.preventDefault();
+                setLearnMap(map);
+              }}
+            >
+              <span className="cartographers-hotspot__label">{map.nameplate}</span>
+            </button>
+          );
+        })}
 
-      <div className="cartographers-studio-room__objects">
         <button
           type="button"
-          className="cartographers-atlas-stand"
+          className="cartographers-hotspot cartographers-hotspot--atlas"
           data-testid="cartographers-atlas"
+          style={{ left: "72%", top: "58%", width: "16%", height: "18%" }}
           onClick={() => setAtlasOpen(true)}
           aria-label="Open Atlas of Visual Thinking"
         >
-          <span className="cartographers-atlas-stand__title">
-            {CARTOGRAPHERS_ATLAS_TEASER.title}
-          </span>
-          <span className="cartographers-atlas-stand__body">
-            {CARTOGRAPHERS_ATLAS_TEASER.body}
-          </span>
+          <span className="cartographers-hotspot__label">Atlas</span>
         </button>
-        {onWorkWithShari ? (
-          <button
-            type="button"
-            className="mt-3 text-sm font-semibold text-[#1e4f4f] underline-offset-2 hover:underline"
-            onClick={onWorkWithShari}
-            data-testid="cartographers-work-with-shari"
-          >
-            Not sure which map? Tell Shari what you&apos;re trying to see.
-          </button>
-        ) : null}
+
+        <button
+          type="button"
+          className="cartographers-hotspot cartographers-hotspot--table"
+          data-testid="cartographers-discovery-table"
+          style={{ left: "32%", top: "62%", width: "36%", height: "22%" }}
+          onClick={() => {
+            if (continueThinking[0]) onOpenMap(continueThinking[0].id);
+            else onSelectMindMap();
+          }}
+          aria-label="Discovery Table — create or continue a map"
+        >
+          <span className="cartographers-hotspot__label">Discovery Table</span>
+        </button>
+
+        <button
+          type="button"
+          className="cartographers-hotspot cartographers-hotspot--telescope"
+          data-testid="cartographers-telescope"
+          style={{ left: "8%", top: "55%", width: "10%", height: "16%" }}
+          onClick={() =>
+            setObjectTip(
+              "Telescope — zoom out to see related projects, goals, and connected maps. Full big-picture view arrives after Mind Map feels complete.",
+            )
+          }
+          aria-label="Telescope"
+        >
+          <span className="cartographers-hotspot__label">Telescope</span>
+        </button>
+
+        <button
+          type="button"
+          className="cartographers-hotspot cartographers-hotspot--globe"
+          data-testid="cartographers-globe"
+          style={{ left: "86%", top: "48%", width: "10%", height: "14%" }}
+          onClick={() =>
+            setObjectTip(
+              "Globe — browse map types by category. Mind Map is open today; other methods unlock when this path is ready.",
+            )
+          }
+          aria-label="Globe"
+        >
+          <span className="cartographers-hotspot__label">Globe</span>
+        </button>
       </div>
 
-      {learnMap ? (
-        <div
-          className="cartographers-learn-overlay"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="cartographers-learn-title"
-          data-testid="cartographers-learn-tip"
-        >
-          <div className="cartographers-learn-overlay__card">
-            <p
-              id="cartographers-learn-title"
-              className="cartographers-learn-overlay__name"
+      <p className="cartographers-immersive__hint">
+        {CARTOGRAPHERS_ROOM_INTRO.mindMapReady}
+        {onWorkWithShari ? (
+          <>
+            {" · "}
+            <button
+              type="button"
+              className="underline underline-offset-2"
+              onClick={onWorkWithShari}
             >
-              {learnMap.nameplate}
-            </p>
+              Ask Shari
+            </button>
+          </>
+        ) : null}
+      </p>
+
+      {learnMap ? (
+        <div className="cartographers-learn-overlay" role="dialog" aria-modal="true">
+          <div className="cartographers-learn-overlay__card">
+            <p className="cartographers-learn-overlay__name">{learnMap.nameplate}</p>
             <p className="cartographers-learn-overlay__tip">{learnMap.learnTip}</p>
             <div className="mt-4 flex flex-wrap justify-end gap-2">
               <button
@@ -207,7 +240,7 @@ export function CartographersStudioRoom({
               {learnMap.interactive ? (
                 <button
                   type="button"
-                  className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163c3c]"
+                  className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white"
                   onClick={() => {
                     setLearnMap(null);
                     onSelectMindMap();
@@ -222,18 +255,9 @@ export function CartographersStudioRoom({
       ) : null}
 
       {atlasOpen ? (
-        <div
-          className="cartographers-learn-overlay"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="cartographers-atlas-title"
-          data-testid="cartographers-atlas-panel"
-        >
+        <div className="cartographers-learn-overlay" role="dialog" aria-modal="true">
           <div className="cartographers-learn-overlay__card cartographers-learn-overlay__card--wide">
-            <p
-              id="cartographers-atlas-title"
-              className="cartographers-learn-overlay__name"
-            >
+            <p className="cartographers-learn-overlay__name">
               {CARTOGRAPHERS_ATLAS_TEASER.title}
             </p>
             <p className="cartographers-learn-overlay__tip">
@@ -245,20 +269,37 @@ export function CartographersStudioRoom({
             <div className="mt-4 flex flex-wrap justify-end gap-2">
               <button
                 type="button"
-                className="rounded-xl px-4 py-2 text-sm font-semibold text-[#6b635a] hover:bg-[#faf7f2]"
+                className="rounded-xl px-4 py-2 text-sm font-semibold text-[#6b635a]"
                 onClick={() => setAtlasOpen(false)}
               >
                 Close
               </button>
               <button
                 type="button"
-                className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[#163c3c]"
+                className="rounded-xl bg-[#1e4f4f] px-4 py-2.5 text-sm font-semibold text-white"
                 onClick={() => {
                   setAtlasOpen(false);
                   onSelectMindMap();
                 }}
               >
                 {CARTOGRAPHERS_ATLAS_TEASER.mindMapAction}
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
+      {objectTip ? (
+        <div className="cartographers-learn-overlay" role="dialog" aria-modal="true">
+          <div className="cartographers-learn-overlay__card">
+            <p className="cartographers-learn-overlay__tip">{objectTip}</p>
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                className="rounded-xl bg-[#1e4f4f] px-4 py-2 text-sm font-semibold text-white"
+                onClick={() => setObjectTip(null)}
+              >
+                Close
               </button>
             </div>
           </div>

@@ -7,6 +7,7 @@ import { NAV_FOCUS_MY_BRAIN } from "@/lib/navigationBack";
 import { VisualFocusPurposeAnchor } from "@/components/companion/VisualFocusPurposeAnchor";
 import { CartographersStudioRoom } from "@/components/companion/cartographersStudio/CartographersStudioRoom";
 import { MindMapDiscoveryInterview } from "@/components/companion/cartographersStudio/MindMapDiscoveryInterview";
+import { MindMapEditableCanvas } from "@/components/companion/cartographersStudio/MindMapEditableCanvas";
 import { VisualFocusMapHeader } from "@/components/companion/visualFocus/VisualFocusMapHeader";
 import { VisualFocusVisualCanvas } from "@/components/companion/visualFocus/VisualFocusVisualCanvas";
 import { VisualFocusIntelligencePanel } from "@/components/companion/visualFocus/VisualFocusIntelligencePanel";
@@ -64,6 +65,16 @@ import {
   mergeCanvasHighlights,
   type IntelligenceViewMode,
 } from "@/lib/visualFocus/intelligence";
+import {
+  canRedo,
+  canUndo,
+  createMindMapHistory,
+  pushMindMapHistory,
+  redoMindMapHistory,
+  undoMindMapHistory,
+  type MindMapHistoryState,
+} from "@/lib/visualFocus/mindMapHistory";
+import { cloneTree } from "@/lib/visualFocus/mindMapEditing";
 
 const NODE_COLORS = ["#1e4f4f", "#5b7c99", "#c48992", "#8b7355", "#6b8e6b"];
 
@@ -303,6 +314,9 @@ export function VisualFocusWorkspacePanel({
   const [showDraftReview, setShowDraftReview] = useState(false);
   const [autosaveLabel, setAutosaveLabel] = useState<"saved" | "saving">("saved");
   const [showBuildPanel, setShowBuildPanel] = useState(true);
+  const [mindHistory, setMindHistory] = useState<MindMapHistoryState | null>(
+    null,
+  );
   const [saveDialogOpen, setSaveDialogOpen] = useState(false);
   const [saveAsMode, setSaveAsMode] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -329,11 +343,17 @@ export function VisualFocusWorkspacePanel({
       setActive(map);
       setView("workspace");
       setShowDraftReview(false);
-      setWorkspaceMode(
-        preferGenerated && map?.workflowStage === "generated"
-          ? "generated"
-          : "build",
-      );
+      if (map?.mode === "mind-map") {
+        setMindHistory(createMindMapHistory(map.root));
+        setWorkspaceMode("build");
+      } else {
+        setMindHistory(null);
+        setWorkspaceMode(
+          preferGenerated && map?.workflowStage === "generated"
+            ? "generated"
+            : "build",
+        );
+      }
     },
     [],
   );
@@ -436,7 +456,8 @@ export function VisualFocusWorkspacePanel({
     setActive(saved);
     setMaps(listVisualFocusMaps());
     setView("workspace");
-    setWorkspaceMode("generated");
+    setWorkspaceMode("build");
+    setMindHistory(createMindMapHistory(saved.root));
     setShowDraftReview(true);
     setMindMapDiscoveryOpen(false);
   }
@@ -650,7 +671,7 @@ export function VisualFocusWorkspacePanel({
               >
                 {autosaveLabel === "saving" ? "Saving…" : "Auto-saved"}
               </span>
-              {active.workflowStage === "generated" ? (
+              {active.mode !== "mind-map" && active.workflowStage === "generated" ? (
                 <button
                   type="button"
                   onClick={() =>
@@ -750,10 +771,19 @@ export function VisualFocusWorkspacePanel({
               <p className="cartographers-draft-review__question">
                 Does this look like the right starting point?
               </p>
+              {active.draftExplanation ? (
+                <p className="mt-2 text-sm leading-relaxed text-[#6b635a]">
+                  {active.draftExplanation}
+                </p>
+              ) : null}
+              {active.draftDuplicates && active.draftDuplicates.length > 0 ? (
+                <p className="mt-1 text-xs text-[#9a8f82]">
+                  Merged near-duplicates: {active.draftDuplicates.slice(0, 3).join("; ")}
+                </p>
+              ) : null}
               {active.draftSuggestions && active.draftSuggestions.length > 0 ? (
                 <p className="mt-1 text-sm text-[#6b635a]">
-                  Spark also left soft prompts:{" "}
-                  {active.draftSuggestions.join(" · ")}
+                  Soft prompts: {active.draftSuggestions.join(" · ")}
                 </p>
               ) : null}
               <div className="cartographers-draft-review__actions">
@@ -767,23 +797,9 @@ export function VisualFocusWorkspacePanel({
                 <button
                   type="button"
                   className="rounded-xl border border-[#e7dfd4] px-3 py-2 text-xs font-semibold text-[#6b635a] hover:bg-[#faf7f2]"
-                  onClick={() => {
-                    setWorkspaceMode("build");
-                    setShowBuildPanel(true);
-                    setShowDraftReview(false);
-                  }}
+                  onClick={() => setShowDraftReview(false)}
                 >
-                  Add or reshape
-                </button>
-                <button
-                  type="button"
-                  className="rounded-xl border border-[#e7dfd4] px-3 py-2 text-xs font-semibold text-[#6b635a] hover:bg-[#faf7f2]"
-                  onClick={() => {
-                    setWorkspaceMode("generated");
-                    setShowDraftReview(false);
-                  }}
-                >
-                  Show visual map
+                  Keep editing on the map
                 </button>
               </div>
             </div>
@@ -880,7 +896,39 @@ export function VisualFocusWorkspacePanel({
             <VisualFocusMapHeader map={active} />
           </div>
 
-          {showGenerated ? (
+          {active.mode === "mind-map" ? (
+            <div className="cartographers-workspace-shell mt-4 min-h-0 flex-1 overflow-hidden p-3">
+              <input
+                value={active.title}
+                onChange={(e) => persist({ ...active, title: e.target.value })}
+                className="mb-3 w-full border-0 border-b border-[#e7dfd4] bg-transparent pb-2 text-xl font-semibold text-[#1f1c19] focus:border-[#8b7355] focus:outline-none"
+                aria-label="Map title"
+              />
+              <MindMapEditableCanvas
+                root={mindHistory?.present ?? active.root}
+                canUndo={mindHistory ? canUndo(mindHistory) : false}
+                canRedo={mindHistory ? canRedo(mindHistory) : false}
+                onUndo={() => {
+                  if (!mindHistory || !canUndo(mindHistory)) return;
+                  const next = undoMindMapHistory(mindHistory);
+                  setMindHistory(next);
+                  persist({ ...active, root: cloneTree(next.present) });
+                }}
+                onRedo={() => {
+                  if (!mindHistory || !canRedo(mindHistory)) return;
+                  const next = redoMindMapHistory(mindHistory);
+                  setMindHistory(next);
+                  persist({ ...active, root: cloneTree(next.present) });
+                }}
+                onChange={(root) => {
+                  const base = mindHistory ?? createMindMapHistory(active.root);
+                  const next = pushMindMapHistory(base, root);
+                  setMindHistory(next);
+                  persist({ ...active, root: cloneTree(root) });
+                }}
+              />
+            </div>
+          ) : showGenerated ? (
             <div className="mt-4 flex min-h-0 flex-1 flex-col gap-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className="text-xs font-bold uppercase tracking-wide text-[#6b635a]">
