@@ -26,6 +26,7 @@ import { verifySparkEstateAiPromptAndIntelligenceLayerArchitecture } from "./spa
 import { verifySparkEstateAnalyticsAndLearningSystem } from "./sparkEstateAnalyticsAndLearningSystem";
 import { verifySparkEstateSystemGovernanceAndQualityStandards } from "./sparkEstateSystemGovernanceAndQualityStandards";
 import { verifySparkEstateTopNavigationAndProfileMenu } from "./sparkEstateTopNavigationAndProfileMenu";
+import { verifySparkEstateExpertTeamAndChamberMemberCollaboration } from "./sparkEstateExpertTeamAndChamberMemberCollaborationArchitecture";
 import { verifySparkEstateFounderIntelligenceDashboard } from "./sparkEstateFounderIntelligenceDashboard";
 import { verifySparkEstateIntelligentWorkspaceRecommendationSystem } from "./sparkEstateIntelligentWorkspaceRecommendationSystem";
 import { verifySparkEstateIntelligentProjectLifecycleEngine } from "./sparkEstateIntelligentProjectLifecycleEngine";
@@ -103,6 +104,7 @@ export type SparkEstateIntegrationAssessment = {
   founderIntelligenceDashboardAligned: boolean;
   intelligentWorkspaceRecommendationAligned: boolean;
   intelligentProjectLifecycleAligned: boolean;
+  expertTeamCollaborationAligned: boolean;
 };
 
 export const SPARK_ESTATE_IMPLEMENTATION_PRINCIPLE =
@@ -452,6 +454,20 @@ export const SPARK_ESTATE_PHASE_MAPPINGS: readonly SparkEstatePhaseMapping[] = [
     status: "implemented",
     priority: 1,
     dependencies: [4, 6, 11, 16, 20, 31],
+  },
+  {
+    phase: 33,
+    spec: "SPARK_ESTATE_EXPERT_TEAM_AND_CHAMBER_MEMBER_COLLABORATION_ARCHITECTURE_PHASE33.md",
+    title: "Expert team and chamber member collaboration",
+    implementations: [
+      "lib/estate/sparkEstateExpertTeamAndChamberMemberCollaborationArchitecture.ts",
+      "lib/estate/sparkEstateIntelligenceRoutingMap.ts",
+      "lib/estate/sparkEstateRoomIntelligenceArchitecture.ts",
+      "lib/estate/chamber/chamberMemberJourney.ts",
+    ],
+    status: "implemented",
+    priority: 1,
+    dependencies: [10, 14, 17, 18, 22, 32],
   },
 ] as const;
 
@@ -860,6 +876,8 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     verifySparkEstateIntelligentWorkspaceRecommendationSystem().recommendationReady;
   const intelligentProjectLifecycleAligned =
     verifySparkEstateIntelligentProjectLifecycleEngine().lifecycleReady;
+  const expertTeamCollaborationAligned =
+    verifySparkEstateExpertTeamAndChamberMemberCollaboration().collaborationReady;
 
   return {
     existing: entriesByStatus("implemented"),
@@ -891,6 +909,7 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     founderIntelligenceDashboardAligned,
     intelligentWorkspaceRecommendationAligned,
     intelligentProjectLifecycleAligned,
+    expertTeamCollaborationAligned,
   };
 }
 
@@ -924,6 +943,7 @@ export function verifySparkEstateArchitectureIntegration(): {
     assessment.founderIntelligenceDashboardAligned &&
     assessment.intelligentWorkspaceRecommendationAligned &&
     assessment.intelligentProjectLifecycleAligned &&
+    assessment.expertTeamCollaborationAligned &&
     blockingMissing.length === 0;
 
   return { aligned, assessment };
@@ -974,6 +994,7 @@ export function formatSparkEstateArchitectureReport(
     `  Founder intelligence dashboard: ${assessment.founderIntelligenceDashboardAligned ? "pass" : "fail"}`,
     `  Intelligent workspace recommendation: ${assessment.intelligentWorkspaceRecommendationAligned ? "pass" : "fail"}`,
     `  Intelligent project lifecycle: ${assessment.intelligentProjectLifecycleAligned ? "pass" : "fail"}`,
+    `  Expert team collaboration: ${assessment.expertTeamCollaborationAligned ? "pass" : "fail"}`,
     "",
     "Recommended order:",
     ...assessment.recommendedOrder.map((step) => `  • ${step}`),

@@ -12,8 +12,8 @@ import {
 } from "./sparkEstateArchitectureMap";
 
 describe("sparkEstateArchitectureMap", () => {
-  it("maps Spark Estate phase implementations including Phase 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, and 32", () => {
-    expect(SPARK_ESTATE_PHASE_MAPPINGS.length).toBe(32);
+  it("maps Spark Estate phase implementations including Phase 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, and 33", () => {
+    expect(SPARK_ESTATE_PHASE_MAPPINGS.length).toBe(33);
     expect(SPARK_ESTATE_PHASE_MAPPINGS.every((mapping) => mapping.phase >= 1)).toBe(
       true,
     );
@@ -80,6 +80,9 @@ describe("sparkEstateArchitectureMap", () => {
     expect(getPhaseMapping(32)?.implementations).toContain(
       "lib/estate/sparkEstateIntelligentProjectLifecycleEngine.ts",
     );
+    expect(getPhaseMapping(33)?.implementations).toContain(
+      "lib/estate/sparkEstateExpertTeamAndChamberMemberCollaborationArchitecture.ts",
+    );
   });
 
   it("documents existing, missing, and consolidation targets", () => {
@@ -121,6 +124,7 @@ describe("sparkEstateArchitectureMap", () => {
     expect(result.assessment.founderIntelligenceDashboardAligned).toBe(true);
     expect(result.assessment.intelligentWorkspaceRecommendationAligned).toBe(true);
     expect(result.assessment.intelligentProjectLifecycleAligned).toBe(true);
+    expect(result.assessment.expertTeamCollaborationAligned).toBe(true);
     expect(result.aligned).toBe(true);
   });
 

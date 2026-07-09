@@ -26,6 +26,7 @@ import { sparkEstateAnalyticsCompanionHint } from "@/lib/estate/sparkEstateAnaly
 import { sparkEstateFounderIntelligenceCompanionHint } from "@/lib/estate/sparkEstateFounderIntelligenceDashboard";
 import { sparkEstateWorkspaceRecommendationCompanionHint } from "@/lib/estate/sparkEstateIntelligentWorkspaceRecommendationSystem";
 import { sparkEstateProjectLifecycleCompanionHint } from "@/lib/estate/sparkEstateIntelligentProjectLifecycleEngine";
+import { sparkEstateExpertCollaborationCompanionHint } from "@/lib/estate/sparkEstateExpertTeamAndChamberMemberCollaborationArchitecture";
 import { sparkEstateGovernanceCompanionHint } from "@/lib/estate/sparkEstateSystemGovernanceAndQualityStandards";
 import { sparkEstateMemberLifecycleCompanionHint } from "@/lib/estate/sparkEstateUserJourneyAndMemberLifecycleArchitecture";
 import { sparkEstateCompletionCompanionHint } from "@/lib/universalCreation/sparkEstateCompletionSystem";
@@ -228,6 +229,11 @@ export function buildSparkCompanionHint(
   });
   if (projectLifecycle) {
     lines.push(projectLifecycle);
+  }
+
+  const expertCollaboration = sparkEstateExpertCollaborationCompanionHint({ text });
+  if (expertCollaboration) {
+    lines.push(expertCollaboration);
   }
 
   const aiLayers = sparkEstateAiPromptLayerCompanionHint({ text });

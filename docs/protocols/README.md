@@ -49,6 +49,7 @@ These protocols define cross-cutting fixes for conversation stability, routing, 
 | [Spark Estate Founder Intelligence Dashboard (Phase 30)](SPARK_ESTATE_FOUNDER_INTELLIGENCE_DASHBOARD_SPECIFICATION_PHASE30.md) | **Implemented** | `sparkEstateFounderIntelligenceDashboard.ts`, eight intelligence categories, reporting rhythms, Founder Studio bridge |
 | [Spark Estate Intelligent Workspace Recommendation (Phase 31)](SPARK_ESTATE_INTELLIGENT_WORKSPACE_RECOMMENDATION_SYSTEM_SPECIFICATION_PHASE31.md) | **Implemented** | `sparkEstateIntelligentWorkspaceRecommendationSystem.ts`, guide-not-force workspace options, universal creation journey |
 | [Spark Estate Intelligent Project Lifecycle Engine (Phase 32)](SPARK_ESTATE_INTELLIGENT_PROJECT_LIFECYCLE_ENGINE_SPECIFICATION_PHASE32.md) | **Implemented** | `sparkEstateIntelligentProjectLifecycleEngine.ts`, eight lifecycle stages, chamber project bridge, project cards |
+| [Spark Estate Expert Team & Chamber Collaboration (Phase 33)](SPARK_ESTATE_EXPERT_TEAM_AND_CHAMBER_MEMBER_COLLABORATION_ARCHITECTURE_PHASE33.md) | **Implemented** | `sparkEstateExpertTeamAndChamberMemberCollaborationArchitecture.ts`, six expert intelligences, smallest helpful team, Shari coordination |
 | [Regression Test Protocol](REGRESSION_TEST_PROTOCOL.md) | Partial | Estate cases in manifest tests; conversation + creation + clear-my-mind TBD |
 
 ## Estate manifest — quick verify
