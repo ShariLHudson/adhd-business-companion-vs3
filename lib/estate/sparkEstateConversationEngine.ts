@@ -5,7 +5,7 @@
  * @see docs/protocols/SPARK_ESTATE_CONVERSATION_ENGINE_AND_SHARI_VOICE_SPECIFICATION_PHASE17.md
  */
 
-import { detectShariBannedPhrases } from "@/lib/conversation/shariCompanionEngine";
+import { detectShariBannedPhrases } from "@/lib/conversation/shariCompanionEnginePrompt";
 import {
   buildSparkEstatePersonalizationContext,
   getSparkEstateMemberProfile,

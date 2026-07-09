@@ -27,6 +27,31 @@ export const SHARI_BANNED_PHRASE_LABELS = [
 export const SHARI_ERROR_RECOVERY_LINE =
   "Something got tangled for a second, but I'm still here." as const;
 
+export const SHARI_BANNED_PHRASE_PATTERNS: readonly RegExp[] = [
+  /\blet'?s break (?:this |it )?down\b/i,
+  /\bthat sounds tough\b/i,
+  /\bwould you like assistance\b/i,
+  /\bhere'?s a simple outline\b/i,
+  /\bgreat!\b/i,
+  /\bhow does that sound\??\b/i,
+  /\bwhat specifically feels challenging\b/i,
+  /\blet'?s focus on key points\b/i,
+  /\bshall i help you\b/i,
+  /\bi'?m here to help\b/i,
+  /\bhow can i assist\b/i,
+  /\babsolutely[!]?\s/i,
+  /\bno worries\b/i,
+  /\bhappy to help\b/i,
+];
+
+export function detectShariBannedPhrases(text: string): string[] {
+  const hits: string[] = [];
+  for (const pattern of SHARI_BANNED_PHRASE_PATTERNS) {
+    if (pattern.test(text)) hits.push(pattern.source);
+  }
+  return hits;
+}
+
 export const SHARI_COMPANION_ENGINE_PROMPT_BLOCK = `# SHARI COMPANION ENGINE (supremacy — overrides generic AI coaching cadence)
 
 ${SHARI_CORE_LAW.map((l) => `- ${l}`).join("\n")}
