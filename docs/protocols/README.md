@@ -52,6 +52,7 @@ These protocols define cross-cutting fixes for conversation stability, routing, 
 | [Spark Estate Intelligent Project Lifecycle Engine (Phase 32)](SPARK_ESTATE_INTELLIGENT_PROJECT_LIFECYCLE_ENGINE_SPECIFICATION_PHASE32.md) | **Implemented** | `sparkEstateIntelligentProjectLifecycleEngine.ts`, eight lifecycle stages, chamber project bridge, project cards |
 | [Spark Estate Expert Team & Chamber Collaboration (Phase 33)](SPARK_ESTATE_EXPERT_TEAM_AND_CHAMBER_MEMBER_COLLABORATION_ARCHITECTURE_PHASE33.md) | **Implemented** | `sparkEstateExpertTeamAndChamberMemberCollaborationArchitecture.ts`, six expert intelligences, smallest helpful team, Shari coordination |
 | [Spark Estate Universal Project Workspace (Phase 34)](SPARK_ESTATE_UNIVERSAL_PROJECT_WORKSPACE_ARCHITECTURE_REFINEMENT_SPECIFICATION_PHASE34.md) | **Implemented** | `sparkEstateUniversalProjectWorkspaceArchitecture.ts`, member-owned projects, library shelves, workspace templates, continuity |
+| [Spark Estate Spark Tools Discovery (Phase 35)](SPARK_ESTATE_SPARK_TOOLS_DISCOVERY_AND_INTEGRATION_SPECIFICATION_PHASE35.md) | **Implemented** | `sparkEstateSparkToolsDiscoveryAndIntegration.ts`, Spark Tools hub, context suggestions, room integration, tool memory |
 | [Regression Test Protocol](REGRESSION_TEST_PROTOCOL.md) | Partial | Estate cases in manifest tests; conversation + creation + clear-my-mind TBD |
 
 ## Estate manifest — quick verify

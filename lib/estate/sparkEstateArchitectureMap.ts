@@ -28,6 +28,7 @@ import { verifySparkEstateSystemGovernanceAndQualityStandards } from "./sparkEst
 import { verifySparkEstateTopNavigationAndProfileMenu } from "./sparkEstateTopNavigationAndProfileMenu";
 import { verifySparkEstateExpertTeamAndChamberMemberCollaboration } from "./sparkEstateExpertTeamAndChamberMemberCollaborationArchitecture";
 import { verifySparkEstateUniversalProjectWorkspaceArchitecture } from "./sparkEstateUniversalProjectWorkspaceArchitecture";
+import { verifySparkEstateSparkToolsDiscoveryAndIntegration } from "./sparkEstateSparkToolsDiscoveryAndIntegration";
 import { verifySparkEstateFounderIntelligenceDashboard } from "./sparkEstateFounderIntelligenceDashboard";
 import { verifySparkEstateIntelligentWorkspaceRecommendationSystem } from "./sparkEstateIntelligentWorkspaceRecommendationSystem";
 import { verifySparkEstateIntelligentProjectLifecycleEngine } from "./sparkEstateIntelligentProjectLifecycleEngine";
@@ -107,6 +108,7 @@ export type SparkEstateIntegrationAssessment = {
   intelligentProjectLifecycleAligned: boolean;
   expertTeamCollaborationAligned: boolean;
   universalProjectWorkspaceAligned: boolean;
+  sparkToolsDiscoveryAligned: boolean;
 };
 
 export const SPARK_ESTATE_IMPLEMENTATION_PRINCIPLE =
@@ -485,6 +487,21 @@ export const SPARK_ESTATE_PHASE_MAPPINGS: readonly SparkEstatePhaseMapping[] = [
     status: "implemented",
     priority: 1,
     dependencies: [4, 6, 11, 16, 20, 32, 33],
+  },
+  {
+    phase: 35,
+    spec: "SPARK_ESTATE_SPARK_TOOLS_DISCOVERY_AND_INTEGRATION_SPECIFICATION_PHASE35.md",
+    title: "Spark Tools discovery and integration",
+    implementations: [
+      "lib/estate/sparkEstateSparkToolsDiscoveryAndIntegration.ts",
+      "lib/appFeatureKnowledge.ts",
+      "lib/companionUi.ts",
+      "lib/clearMyMind/conservatory.ts",
+      "lib/estateIntelligence/registrations/tools.ts",
+    ],
+    status: "implemented",
+    priority: 1,
+    dependencies: [4, 14, 17, 24, 34],
   },
 ] as const;
 
@@ -898,6 +915,8 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     verifySparkEstateExpertTeamAndChamberMemberCollaboration().collaborationReady;
   const universalProjectWorkspaceAligned =
     verifySparkEstateUniversalProjectWorkspaceArchitecture().universalProjectReady;
+  const sparkToolsDiscoveryAligned =
+    verifySparkEstateSparkToolsDiscoveryAndIntegration().discoveryReady;
 
   return {
     existing: entriesByStatus("implemented"),
@@ -931,6 +950,7 @@ export function assessSparkEstateIntegration(): SparkEstateIntegrationAssessment
     intelligentProjectLifecycleAligned,
     expertTeamCollaborationAligned,
     universalProjectWorkspaceAligned,
+    sparkToolsDiscoveryAligned,
   };
 }
 
@@ -966,6 +986,7 @@ export function verifySparkEstateArchitectureIntegration(): {
     assessment.intelligentProjectLifecycleAligned &&
     assessment.expertTeamCollaborationAligned &&
     assessment.universalProjectWorkspaceAligned &&
+    assessment.sparkToolsDiscoveryAligned &&
     blockingMissing.length === 0;
 
   return { aligned, assessment };
@@ -1018,6 +1039,7 @@ export function formatSparkEstateArchitectureReport(
     `  Intelligent project lifecycle: ${assessment.intelligentProjectLifecycleAligned ? "pass" : "fail"}`,
     `  Expert team collaboration: ${assessment.expertTeamCollaborationAligned ? "pass" : "fail"}`,
     `  Universal project workspace: ${assessment.universalProjectWorkspaceAligned ? "pass" : "fail"}`,
+    `  Spark Tools discovery: ${assessment.sparkToolsDiscoveryAligned ? "pass" : "fail"}`,
     "",
     "Recommended order:",
     ...assessment.recommendedOrder.map((step) => `  • ${step}`),

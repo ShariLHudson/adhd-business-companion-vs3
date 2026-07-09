@@ -29,6 +29,7 @@ import { sparkEstateProjectLifecycleCompanionHint } from "@/lib/estate/sparkEsta
 import { sparkCardVisualDesignCompanionHint } from "@/lib/sparkNote/sparkCardVisualDesignAndDailyGeneration";
 import { sparkEstateExpertCollaborationCompanionHint } from "@/lib/estate/sparkEstateExpertTeamAndChamberMemberCollaborationArchitecture";
 import { sparkEstateUniversalProjectWorkspaceCompanionHint } from "@/lib/estate/sparkEstateUniversalProjectWorkspaceArchitecture";
+import { sparkEstateSparkToolsCompanionHint } from "@/lib/estate/sparkEstateSparkToolsDiscoveryAndIntegration";
 import { sparkEstateGovernanceCompanionHint } from "@/lib/estate/sparkEstateSystemGovernanceAndQualityStandards";
 import { sparkEstateMemberLifecycleCompanionHint } from "@/lib/estate/sparkEstateUserJourneyAndMemberLifecycleArchitecture";
 import { sparkEstateCompletionCompanionHint } from "@/lib/universalCreation/sparkEstateCompletionSystem";
@@ -241,6 +242,14 @@ export function buildSparkCompanionHint(
   const universalProject = sparkEstateUniversalProjectWorkspaceCompanionHint({ text });
   if (universalProject) {
     lines.push(universalProject);
+  }
+
+  const sparkTools = sparkEstateSparkToolsCompanionHint({
+    text,
+    currentSection: input.currentRoom as AppSection | undefined,
+  });
+  if (sparkTools) {
+    lines.push(sparkTools);
   }
 
   const sparkCard = sparkCardVisualDesignCompanionHint({ text });
