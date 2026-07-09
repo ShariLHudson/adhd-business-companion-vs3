@@ -7,6 +7,7 @@ import {
   formatCompletionMenu,
   parseApprovalChoice,
 } from "./phases";
+import { formatSparkEstateReviewPrompt } from "./sparkEstateCompletionSystem";
 import { pluginById } from "./documentRegistry";
 import { applyDraftRevision, composeDocumentDraft } from "./draftComposer";
 import type {
@@ -226,10 +227,5 @@ export function advanceGuidedCreationFlow(
 
 /** Message shown after draft is first presented — invites revision before approval. */
 export function formatPostDraftReviewPrompt(): string {
-  return [
-    "",
-    "Take a look — what would you change, if anything?",
-    "",
-    "Tell me in your own words, or say it looks good as-is.",
-  ].join("\n");
+  return ["", formatSparkEstateReviewPrompt()].join("\n");
 }

@@ -12,6 +12,19 @@ import {
   SHARI_BANNED_PHRASE_LABELS,
   SHARI_CORE_LAW,
 } from "@/lib/conversation/shariCompanionEngine";
+import { sparkEstateConversationHint } from "@/lib/estate/sparkEstateConversationEngine";
+import {
+  buildSparkEstateIntelligenceRoutingCompanionHint,
+} from "@/lib/estate/sparkEstateIntelligenceRoutingMap";
+import { sparkEstateKnowledgeCompanionHint } from "@/lib/estate/sparkEstateKnowledgeAndAssetLibraryArchitecture";
+import { sparkEstateOnboardingCompanionHint } from "@/lib/estate/sparkEstateOnboardingAndFirst7DaysExperience";
+import { sparkEstateRoomBlueprintCompanionHint } from "@/lib/estate/sparkEstateRoomBlueprintTemplate";
+import { sparkEstateRoomIntelligenceCompanionHint } from "@/lib/estate/sparkEstateRoomIntelligenceArchitecture";
+import { sparkEstateGovernanceCompanionHint } from "@/lib/estate/sparkEstateSystemGovernanceAndQualityStandards";
+import { sparkEstateMemberLifecycleCompanionHint } from "@/lib/estate/sparkEstateUserJourneyAndMemberLifecycleArchitecture";
+import { sparkEstateCompletionCompanionHint } from "@/lib/universalCreation/sparkEstateCompletionSystem";
+import { buildSparkEstateMemberProfileCompanionHint } from "@/lib/estate/sparkEstateMemberProfileEngine";
+import type { AppSection } from "@/lib/companionUi";
 import { SPARK_LANDSCAPES } from "./sparkLandscapes/landscapes";
 import { evaluateSparkDecisionEngine } from "./sparkDecisionEngine/evaluateDecisionEngine";
 import { mapDecisionToRuntimeAction } from "./mapDecisionToRuntimeAction";
@@ -121,6 +134,75 @@ export function buildSparkCompanionHint(
   lines.push(
     `FORBIDDEN: ${SHARI_BANNED_PHRASE_LABELS.slice(0, 5).join(" · ")}`,
   );
+
+  const estateConversation = sparkEstateConversationHint({
+    text,
+    section: input.placeId ?? input.currentRoom ?? undefined,
+  });
+  lines.push(estateConversation);
+
+  const estateRouting = buildSparkEstateIntelligenceRoutingCompanionHint({
+    text,
+    currentSection: (input.placeId ?? input.currentRoom ?? undefined) as
+      | AppSection
+      | undefined,
+  });
+  if (estateRouting) {
+    lines.push(estateRouting);
+  }
+
+  const estateKnowledge = sparkEstateKnowledgeCompanionHint({
+    text,
+    section: (input.placeId ?? input.currentRoom ?? undefined) as
+      | AppSection
+      | undefined,
+  });
+  if (estateKnowledge) {
+    lines.push(estateKnowledge);
+  }
+
+  const memberProfile = buildSparkEstateMemberProfileCompanionHint({ text });
+  if (memberProfile) {
+    lines.push(memberProfile);
+  }
+
+  const onboarding = sparkEstateOnboardingCompanionHint();
+  if (onboarding) {
+    lines.push(onboarding);
+  }
+
+  const roomBlueprint = sparkEstateRoomBlueprintCompanionHint({
+    text,
+    roomId: input.currentRoom,
+  });
+  if (roomBlueprint) {
+    lines.push(roomBlueprint);
+  }
+
+  const roomIntelligence = sparkEstateRoomIntelligenceCompanionHint({
+    text,
+    section: (input.placeId ?? input.currentRoom ?? undefined) as
+      | AppSection
+      | undefined,
+  });
+  if (roomIntelligence) {
+    lines.push(roomIntelligence);
+  }
+
+  const governance = sparkEstateGovernanceCompanionHint({ text });
+  if (governance) {
+    lines.push(governance);
+  }
+
+  const completion = sparkEstateCompletionCompanionHint({ text });
+  if (completion) {
+    lines.push(completion);
+  }
+
+  const lifecycle = sparkEstateMemberLifecycleCompanionHint({ text });
+  if (lifecycle) {
+    lines.push(lifecycle);
+  }
 
   return lines.join("\n");
 }

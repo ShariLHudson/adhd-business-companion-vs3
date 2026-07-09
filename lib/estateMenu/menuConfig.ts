@@ -1,6 +1,8 @@
 /**
  * Global Estate Menu™ — universal upper-right session controls.
  * Dropdown shows five calm choices; other action ids remain for routing.
+ *
+ * @see docs/protocols/SPARK_ESTATE_TOP_NAVIGATION_AND_PROFILE_MENU_CORRECTION.md
  */
 
 export const ESTATE_MENU_ACTION_IDS = [
@@ -31,17 +33,12 @@ export type EstateMenuDropdownItem = {
   label: string;
 };
 
-/** Flat account menu — five choices only. */
+/** Profile initials menu — five member-facing choices (separate from room navigation). */
 export const ESTATE_MENU_DROPDOWN_ITEMS: readonly EstateMenuDropdownItem[] = [
   {
-    id: "start-new-day-conversation",
-    emoji: "🌅",
-    label: "Start a New Day",
-  },
-  {
-    id: "start-new-conversation",
-    emoji: "💬",
-    label: "Start a New Conversation",
+    id: "my-profile",
+    emoji: "👤",
+    label: "Profile",
   },
   {
     id: "settings",
@@ -49,14 +46,19 @@ export const ESTATE_MENU_DROPDOWN_ITEMS: readonly EstateMenuDropdownItem[] = [
     label: "Settings",
   },
   {
-    id: "my-profile",
-    emoji: "👤",
-    label: "My Profile",
+    id: "memory-library",
+    emoji: "💬",
+    label: "Conversations",
   },
   {
-    id: "log-out",
-    emoji: "🚪",
-    label: "Log Out",
+    id: "growth-profile",
+    emoji: "✨",
+    label: "Personalization",
+  },
+  {
+    id: "estate-profile",
+    emoji: "🏡",
+    label: "Account",
   },
 ];
 

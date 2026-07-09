@@ -15,6 +15,7 @@ export const CHAMBER_OF_MOMENTUM_SECTION = "chamber-of-momentum" as const;
 /** Legacy placeIds that share the Chamber member-facing identity. */
 export const CHAMBER_OF_MOMENTUM_PLACE_IDS = [
   "chamber-of-momentum",
+  "chamber-project-entry",
   "momentum-institute",
   "momentum-builder",
   "goals-projects",

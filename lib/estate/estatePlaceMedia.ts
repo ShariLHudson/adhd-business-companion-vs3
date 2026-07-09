@@ -56,6 +56,7 @@ export const CANONICAL_PLACE_BACKGROUNDS: Readonly<Record<string, string>> = {
   library: estateBackgroundPath("room-library-estate-background.png"),
   "personal-library": estateBackgroundPath("reading-nook-under-stairway-background.png"),
   "momentum-institute": estateBackgroundPath("spark-chamber-of-momentum-background.png"),
+  "chamber-of-momentum": estateBackgroundPath("spark-chamber-of-momentum-background.png"),
   "creative-studio": estateBackgroundPath("creative-studio-background.png"),
   "art-studio": estateBackgroundPath("creative-studio-background.png"),
   observatory: estateBackgroundPath("observatory-daytime-outside-background.png"),

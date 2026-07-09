@@ -20,9 +20,9 @@ describe("Estate Arrival Experience™", () => {
   it("resolves Chamber of Momentum from momentum institute entry", () => {
     const config = resolveEstateArrivalExperience("momentum-institute");
     expect(config?.title).toBe("Chamber of Momentum™");
-    expect(config?.motto).toContain("forward movement");
+    expect(config?.motto).toContain("figure everything out");
     expect(config?.shariGreeting).toBe(
-      "What would you like to move forward today?",
+      "What would help you move forward today?",
     );
   });
 

@@ -1,11 +1,16 @@
 /**
- * Chamber of Momentum™ — intent routing (Phase 2).
+ * Chamber of Momentum™ — intent routing (Phase 2–3).
  * Members describe what they need; the system routes internally.
  *
  * @see docs/protocols/CHAMBER_OF_MOMENTUM_ROUTING_AND_EXPERIENCE_ALIGNMENT_PHASE2.md
+ * @see docs/protocols/CHAMBER_OF_MOMENTUM_ENTRY_EXPERIENCE_SPECIFICATION_PHASE3.md
+ * @see docs/protocols/CHAMBER_OF_MOMENTUM_INTELLIGENCE_DECISION_LOGIC_SPECIFICATION_PHASE5.md
+ * @see docs/protocols/CHAMBER_OF_MOMENTUM_DEMO_EXPERIENCE_AND_VISUAL_ROOM_SPECIFICATION_PHASE7.md
  */
 
 import type { AppSection } from "@/lib/companionUi";
+import { assessChamberMomentum } from "./chamberOfMomentumIntelligence";
+import { CHAMBER_OF_MOMENTUM_ROOM_META } from "./chamber/chamberOfMomentumRoomRegistry";
 
 export const CHAMBER_MOMENTUM_SESSION_INTENT_KEY =
   "chamber-momentum-pending-intent";
@@ -17,11 +22,26 @@ export type ChamberMomentumIntent =
   | "idea"
   | "plan";
 
+export type ChamberUnsureOption =
+  | "clear-my-mind"
+  | "quick-capture"
+  | "small-first-step";
+
+export const CHAMBER_WELCOME_TITLE = CHAMBER_OF_MOMENTUM_ROOM_META.title;
+
+export const CHAMBER_WELCOME_SUBTITLE = CHAMBER_OF_MOMENTUM_ROOM_META.subtitle;
+
 export const CHAMBER_ENTRY_PROMPT =
   "What would help you move forward today?";
 
+export const CHAMBER_UNSURE_HEADING = "Not sure where to start?";
+
+export const CHAMBER_UNSURE_PROMPT =
+  "That's okay. Let's figure out the easiest next step.";
+
 export type ChamberEntryOption = {
   id: ChamberMomentumIntent;
+  emoji: string;
   label: string;
   hint: string;
 };
@@ -29,35 +49,58 @@ export type ChamberEntryOption = {
 export const CHAMBER_ENTRY_OPTIONS: readonly ChamberEntryOption[] = [
   {
     id: "idea",
+    emoji: "💡",
     label: "I have an idea",
-    hint: "Capture momentum from a spark of inspiration.",
+    hint: "Capture and explore ideas.",
   },
   {
     id: "build",
+    emoji: "🌪",
     label: "I feel stuck",
-    hint: "Conversation-first coaching — one step at a time.",
+    hint: "Get unstuck and find the next step.",
   },
   {
     id: "plan",
+    emoji: "📋",
     label: "I need a plan",
-    hint: "Shape today's path and name the next honest step.",
+    hint: "Create structure.",
   },
   {
     id: "learn",
+    emoji: "📚",
     label: "I want to learn",
-    hint: "Knowledge Cards™, drawers, and capability building.",
+    hint: "Build knowledge and skills.",
   },
   {
     id: "execute",
-    label: "I need to work on a project",
-    hint: "Projects, tasks, next actions, and plans.",
+    emoji: "🚀",
+    label: "I want to work on a project",
+    hint: "Move an existing goal forward.",
   },
 ] as const;
 
-export const CHAMBER_INTERNAL_ACCESS_OPTIONS = [
-  { id: "learn" as const, label: "Learn Momentum" },
-  { id: "build" as const, label: "Build Momentum" },
-  { id: "execute" as const, label: "Manage Projects" },
+export type ChamberUnsureEntryOption = {
+  id: ChamberUnsureOption;
+  label: string;
+  hint: string;
+};
+
+export const CHAMBER_UNSURE_OPTIONS: readonly ChamberUnsureEntryOption[] = [
+  {
+    id: "clear-my-mind",
+    label: "Clear My Mind",
+    hint: "Unload what's swirling — no sorting required.",
+  },
+  {
+    id: "quick-capture",
+    label: "Quick Brain Capture",
+    hint: "Park one thought and keep moving.",
+  },
+  {
+    id: "small-first-step",
+    label: "Small First Step",
+    hint: "What's one tiny step that would help right now?",
+  },
 ] as const;
 
 /** Map member intent to the existing internal shell section. */
@@ -68,11 +111,24 @@ export function chamberMomentumIntentSection(
     case "learn":
       return "momentum-institute";
     case "execute":
-      return "projects";
+      return "chamber-project-entry";
     case "idea":
+      return "evidence-bank";
     case "plan":
     case "build":
     default:
+      return "momentum-builder";
+  }
+}
+
+export function chamberUnsureOptionSection(
+  option: ChamberUnsureOption,
+): AppSection {
+  switch (option) {
+    case "clear-my-mind":
+    case "quick-capture":
+      return "brain-dump";
+    case "small-first-step":
       return "momentum-builder";
   }
 }
@@ -81,36 +137,11 @@ export function chamberMomentumIntentSection(
 export function classifyChamberMomentumIntent(
   text: string,
 ): ChamberMomentumIntent | null {
-  const t = text.trim();
-  if (!t) return null;
+  return assessChamberMomentum(text)?.intent ?? null;
+}
 
-  if (
-    /\b(?:teach me|i want to learn|how do i improve|learn something|help me learn|want to learn)\b/i.test(
-      t,
-    )
-  ) {
-    return "learn";
-  }
-
-  if (
-    /\b(?:finish my|complete (?:this )?project|work on (?:a )?project|break (?:this )?down|help me finish|need to finish)\b/i.test(
-      t,
-    )
-  ) {
-    return "execute";
-  }
-
-  if (
-    /\b(?:overwhelm(?:ed)?|stuck|don'?t know where to start|need help moving forward|feel stuck|i need a plan|need a plan)\b/i.test(
-      t,
-    )
-  ) {
-    return "build";
-  }
-
-  if (/\bi have an idea\b/i.test(t)) return "idea";
-
-  return null;
+export function isChamberUnsurePhrase(text: string): boolean {
+  return /\bi don'?t know\b/i.test(text.trim());
 }
 
 export function stageChamberMomentumIntent(intent: ChamberMomentumIntent): void {

@@ -48,8 +48,8 @@ export const ESTATE_ARRIVAL_TOTAL_MS =
 
 const CHAMBER_ARRIVAL = {
   title: "Chamber of Momentum™",
-  motto: "Turn ideas, challenges, and goals into forward movement.",
-  shariGreeting: "What would you like to move forward today?",
+  motto: "Let's find what will help you move forward today.",
+  shariGreeting: "What would help you move forward today?",
   invitationAfterArrival: true,
 } as const;
 

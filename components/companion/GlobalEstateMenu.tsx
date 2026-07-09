@@ -114,8 +114,8 @@ export function GlobalEstateMenu({
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-haspopup="menu"
-        aria-label="Account"
-        title="Account"
+        aria-label={`${initials} — profile menu`}
+        title="Profile"
         className={triggerClass}
         data-estate-menu-trigger=""
         data-top-bar-menu="account"
@@ -125,15 +125,15 @@ export function GlobalEstateMenu({
           <img
             src={imageUrl}
             alt=""
-            className="global-estate-menu__avatar-image"
+            className="global-estate-menu__avatar-image global-estate-menu__avatar-image--trigger"
           />
         ) : (
-          <span className="global-estate-menu__avatar-fallback" aria-hidden>
+          <span className="global-estate-menu__trigger-initials" aria-hidden>
             {initials}
           </span>
         )}
-        <span className="global-estate-menu__dots" aria-hidden>
-          ⋯
+        <span className="global-estate-menu__trigger-chevron" aria-hidden>
+          ▼
         </span>
       </button>
 
@@ -141,7 +141,7 @@ export function GlobalEstateMenu({
         <div
           className={panelClass}
           role="menu"
-          aria-label="Account"
+          aria-label="Profile menu"
           data-companion-menu-panel="true"
           data-estate-menu-panel=""
         >
@@ -171,9 +171,7 @@ export function GlobalEstateMenu({
                 type="button"
                 role="menuitem"
                 onClick={() => run(item.id)}
-                className={`global-estate-menu__item${
-                  item.id === "log-out" ? " global-estate-menu__item--logout" : ""
-                }`}
+                className="global-estate-menu__item"
                 data-estate-menu-item={item.id}
               >
                 <span className="global-estate-menu__item-emoji" aria-hidden>

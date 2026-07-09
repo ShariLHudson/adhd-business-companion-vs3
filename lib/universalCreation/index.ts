@@ -61,3 +61,52 @@ export {
   createFastPathRecoveryLine,
   SIMPLE_CREATE_VERB_RE,
 } from "./createFastPath";
+
+export {
+  SPARK_ESTATE_CREATION_STEPS,
+  CREATION_ARCHETYPE_BUILD_FIELDS,
+  SPARK_ESTATE_ROOM_INDEPENDENCE_RULE,
+  SPARK_ESTATE_CREATION_ADHD_RULES,
+  SPARK_ESTATE_CREATION_MEMORY_UPDATES,
+  mapUniversalPhaseToCreationStep,
+  inferCreationArchetype,
+  buildFieldsForArchetype,
+  roomUsesUniversalCreationJourney,
+  chamberProjectJourneyMatchesEstateJourney,
+  verifySparkEstateCreationJourney,
+  type SparkEstateCreationStepId,
+  type CreationArchetype,
+} from "./sparkEstateCreationJourney";
+
+export {
+  SHARI_CREATION_TRAITS,
+  SHARI_CREATION_AVOID,
+  SHARI_CREATION_CONVERSATION_RULES,
+  formatShariCreationIntro,
+  formatShariCreationQuestion,
+  formatShariCreationTurnReply,
+  shariCreationExperienceHint,
+} from "./shariCreationExperience";
+
+export {
+  SPARK_ESTATE_COMPLETION_STEPS,
+  SPARK_ESTATE_REVIEW_QUESTIONS,
+  SPARK_ESTATE_OUTPUT_OPTIONS,
+  SPARK_ESTATE_COMPLETION_MEMORY_UPDATES,
+  SPARK_ESTATE_COMPLETION_ADHD_RULES,
+  SPARK_ESTATE_COMPLETION_FEELING,
+  COMPLETION_CONNECTION_TARGETS,
+  mapUniversalPhaseToCompletionStep,
+  formatSparkEstateReviewPrompt,
+  formatSparkEstateOutputMenu,
+  buildSparkEstateCompletionMetadata,
+  recordSparkEstateReviewVersion,
+  getSparkEstateReviewHistory,
+  chamberProjectCompletionMatchesEstateSystem,
+  getChamberCompletionOutputOptions,
+  verifySparkEstateCompletionSystem,
+  type SparkEstateCompletionStepId,
+  type SparkEstateOutputOption,
+  type SparkEstateCompletionMetadata,
+  type SparkEstateReviewHistory,
+} from "./sparkEstateCompletionSystem";

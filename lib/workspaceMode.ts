@@ -83,6 +83,7 @@ export const WORKSPACE_TITLES: Partial<Record<AppSection, string>> = {
   "how-do-i": "How Do I",
   "momentum-institute": "Chamber of Momentum™",
   "chamber-of-momentum": "Chamber of Momentum™",
+  "chamber-project-entry": "Chamber of Momentum™",
   "brain-dump": "Clear My Mind",
   "time-block": "Momentum Appointments",
   "email-generator": "Email",

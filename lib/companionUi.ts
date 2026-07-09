@@ -27,6 +27,7 @@ export type AppSection =
   | "momentum-builder"
   | "momentum-institute"
   | "chamber-of-momentum"
+  | "chamber-project-entry"
   | "stables"
   | "grow-momentum-builders"
   | "grow-spark-cards"

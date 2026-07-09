@@ -98,6 +98,7 @@ import { PlanMyDayQuickDrawer } from "@/components/companion/PlanMyDayQuickDrawe
 import { EstateCollectionRoomPanel } from "@/components/estate-collection";
 import { GrowLandingPanel } from "@/components/companion/GrowLandingPanel";
 import { ChamberOfMomentumEntryPanel } from "@/components/companion/chamber/ChamberOfMomentumEntryPanel";
+import { ChamberProjectEntryPanel } from "@/components/companion/chamber/ChamberProjectEntryPanel";
 import { GrowthJournalPanel } from "@/components/companion/GrowthJournalPanel";
 import { MomentumBuilderRoomPanel } from "@/components/companion/MomentumBuilderRoomPanel";
 import { MomentumInstituteRoomPanel } from "@/components/companion/momentumInstitute/MomentumInstituteRoomPanel";
@@ -1343,6 +1344,9 @@ import {
   isMomentumBuilderRoomSection,
   momentumBuilderRoomHintForChat,
 } from "@/lib/momentumBuilderRoom/momentumBuilderPrompt";
+import { CHAMBER_OF_MOMENTUM_ROOM_BG } from "@/lib/estate/chamber/chamberOfMomentumRoomRegistry";
+import { ensureChamberDemoDataSeeded } from "@/lib/estate/chamber/seedChamberDemoData";
+import { isChamberDemoMode } from "@/lib/estate/chamber/chamberDemoMode";
 import {
   MOMENTUM_INSTITUTE_ROOM_BG,
   isMomentumInstituteSection,
@@ -1351,7 +1355,18 @@ import {
   chamberMomentumIntentSection,
   consumeChamberMomentumIntent,
   type ChamberMomentumIntent,
+  type ChamberUnsureOption,
 } from "@/lib/estate/chamberOfMomentumRouting";
+import {
+  consumeChamberIntelligence,
+  stageChamberIntelligence,
+  type ChamberIntelligenceAssessment,
+} from "@/lib/estate/chamberOfMomentumIntelligence";
+import {
+  selectChamberJourneySupport,
+  stageChamberJourneySelection,
+} from "@/lib/estate/chamber/chamberMemberJourney";
+import { recordChamberIntelligenceVisit } from "@/lib/estate/chamberOfMomentumMemory";
 import {
   STABLES_ROOM_BG,
   isStablesSection,
@@ -2297,6 +2312,11 @@ export default function CompanionPageClient() {
 
   useEffect(() => {
     if (activeSection !== "chamber-of-momentum") return;
+    const assessment = consumeChamberIntelligence();
+    if (assessment) {
+      routeChamberIntelligenceCore(assessment);
+      return;
+    }
     const pendingIntent = consumeChamberMomentumIntent();
     if (!pendingIntent) return;
     routeChamberMomentumIntentCore(pendingIntent);
@@ -7413,14 +7433,30 @@ export default function CompanionPageClient() {
   function openChamberOfMomentumCore() {
     pauseActiveArtifactIfLeavingCreate("chamber-of-momentum");
     pushGrowBackLabel();
-    preloadRoomBackground(MOMENTUM_INSTITUTE_ROOM_BG);
+    preloadRoomBackground(CHAMBER_OF_MOMENTUM_ROOM_BG);
+    if (isChamberDemoMode()) {
+      ensureChamberDemoDataSeeded();
+    }
     clearSplitBesideWorkspace();
     patchWorkspacePanel(null);
     openStandaloneFocusSectionCore("chamber-of-momentum");
   }
 
-  function routeChamberMomentumIntentCore(intent: ChamberMomentumIntent) {
-    const section = chamberMomentumIntentSection(intent);
+  function openChamberProjectEntryCore() {
+    pauseActiveArtifactIfLeavingCreate("chamber-project-entry");
+    pushGrowBackLabel();
+    preloadRoomBackground(CHAMBER_OF_MOMENTUM_ROOM_BG);
+    clearSplitBesideWorkspace();
+    patchWorkspacePanel(null);
+    openStandaloneFocusSectionCore("chamber-project-entry");
+  }
+
+  function openChamberProjectWorkspaceCore(projectId: string) {
+    setProjectsResumeId(projectId);
+    openStandaloneFocusSectionCore("projects");
+  }
+
+  function routeChamberSectionCore(section: AppSection) {
     if (section === "momentum-institute") {
       openMomentumInstituteRoomCore();
       return;
@@ -7429,7 +7465,59 @@ export default function CompanionPageClient() {
       openMomentumBuilderRoomCore();
       return;
     }
-    openStandaloneFocusSectionCore("projects");
+    if (section === "brain-dump") {
+      openClearMyMindCore();
+      return;
+    }
+    if (section === "evidence-bank") {
+      openStandaloneFocusSectionCore("evidence-bank");
+      return;
+    }
+    if (section === "chamber-project-entry") {
+      openChamberProjectEntryCore();
+      return;
+    }
+    if (section === "projects") {
+      openStandaloneFocusSectionCore("projects");
+      return;
+    }
+    openStandaloneFocusSectionCore(section);
+  }
+
+  function routeChamberMomentumIntentCore(intent: ChamberMomentumIntent) {
+    const selection = selectChamberJourneySupport({ intent });
+    if (selection) stageChamberJourneySelection(selection);
+    routeChamberSectionCore(chamberMomentumIntentSection(intent));
+  }
+
+  function routeChamberIntelligenceCore(
+    assessment: ChamberIntelligenceAssessment,
+  ) {
+    recordChamberIntelligenceVisit(assessment);
+    routeChamberSectionCore(assessment.section);
+  }
+
+  function routeChamberNaturalLanguageCore(text: string) {
+    const selection = selectChamberJourneySupport({ text });
+    if (!selection) return;
+    stageChamberJourneySelection(selection);
+    if (selection.assessment) {
+      stageChamberIntelligence(selection.assessment);
+      recordChamberIntelligenceVisit(selection.assessment);
+    }
+    routeChamberSectionCore(selection.target.section);
+  }
+
+  function routeChamberUnsureOptionCore(option: ChamberUnsureOption) {
+    if (option === "clear-my-mind") {
+      openClearMyMindCore();
+      return;
+    }
+    if (option === "quick-capture") {
+      openClearMyMindCore({ initialView: "capture" });
+      return;
+    }
+    openMomentumBuilderRoomCore();
   }
 
   function openStablesRoomCore() {
@@ -7462,6 +7550,10 @@ export default function CompanionPageClient() {
   function openSectionFromUrlCore(section: AppSection) {
     if (section === "chamber-of-momentum") {
       openChamberOfMomentumCore();
+      return;
+    }
+    if (section === "chamber-project-entry") {
+      openChamberProjectEntryCore();
       return;
     }
     if (section === "grow-momentum-builders" || section === "momentum-builder") {
@@ -19337,10 +19429,19 @@ export default function CompanionPageClient() {
             />
           )}
 
+          {activeSection === "chamber-project-entry" && (
+            <ChamberProjectEntryPanel
+              onBack={openChamberOfMomentumCore}
+              onOpenProject={openChamberProjectWorkspaceCore}
+            />
+          )}
+
           {activeSection === "chamber-of-momentum" && (
             <ChamberOfMomentumEntryPanel
               onBack={goBack}
               onSelectIntent={routeChamberMomentumIntentCore}
+              onSelectUnsure={routeChamberUnsureOptionCore}
+              onDescribeSituation={routeChamberNaturalLanguageCore}
             />
           )}
 

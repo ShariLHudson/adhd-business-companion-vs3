@@ -8,6 +8,8 @@ import type {
   UniversalDocumentPlugin,
   UniversalReviewChoice,
 } from "./types";
+import { formatSparkEstateOutputMenu } from "./sparkEstateCompletionSystem";
+import { inferCreationArchetype } from "./sparkEstateCreationJourney";
 
 export const REVIEW_MENU_INTRO =
   "I have a draft ready.\n\nHow would you like to review it?";
@@ -58,18 +60,12 @@ export function formatCompletionMenu(
   plugin: UniversalDocumentPlugin,
   adaptiveHints: string[] = [],
 ): string {
-  const lines = plugin.completionActions.map(
-    (a: UniversalCompletionAction, i: number) => `${i + 1}. ${a.label}`,
-  );
-  const parts = [
-    "What would you like to do with it?",
-    "",
-    ...lines,
-  ];
-  if (adaptiveHints.length) {
-    parts.push("", ...adaptiveHints);
-  }
-  return parts.join("\n");
+  const menu = formatSparkEstateOutputMenu({
+    archetype: inferCreationArchetype({ documentType: plugin.id }),
+    pluginActions: plugin.completionActions,
+  });
+  if (adaptiveHints.length === 0) return menu;
+  return `${menu}\n\n${adaptiveHints.join("\n")}`;
 }
 
 export function formatUncertaintyMenu(paths: readonly string[]): string {

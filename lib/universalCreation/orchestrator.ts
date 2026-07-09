@@ -28,6 +28,10 @@ import {
   guidedCreationHint,
 } from "./phases";
 import { formatPostDraftReviewPrompt } from "./guidedCreationFlow";
+import {
+  formatShariCreationIntro,
+  formatShariCreationQuestion,
+} from "./shariCreationExperience";
 import type {
   UniversalCreationSession,
   UniversalCreationTurnResult,
@@ -394,8 +398,8 @@ export function formatUniversalCreationQuestion(
   turn: Extract<UniversalCreationTurnResult, { kind: "question" }>,
 ): string {
   const parts: string[] = [];
-  if (turn.intro) parts.push(turn.intro, "");
-  parts.push(turn.question);
+  if (turn.intro) parts.push(formatShariCreationIntro(turn.intro), "");
+  parts.push(formatShariCreationQuestion(turn.question));
   return parts.join("\n");
 }
 
