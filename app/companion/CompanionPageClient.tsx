@@ -101,6 +101,7 @@ import { GrowLandingPanel } from "@/components/companion/GrowLandingPanel";
 import { ChamberOfMomentumRoomPanel } from "@/components/companion/chamber/ChamberOfMomentumRoomPanel";
 import { ChamberProjectEntryPanel } from "@/components/companion/chamber/ChamberProjectEntryPanel";
 import { GrowthJournalRoomPanel } from "@/components/companion/GrowthJournalRoomPanel";
+import { GrowthProfileRoomPanel } from "@/components/companion/GrowthProfileRoomPanel";
 import { GrowthPortfolioPanel } from "@/components/companion/GrowthPortfolioPanel";
 import { MomentumBuilderRoomPanel } from "@/components/companion/MomentumBuilderRoomPanel";
 import { MomentumInstituteRoomPanel } from "@/components/companion/momentumInstitute/MomentumInstituteRoomPanel";
@@ -1276,6 +1277,7 @@ import {
   shouldShowDirectEstateVisitOverlay,
   type DirectEstateVisit,
 } from "@/lib/estate/directEstateVisit";
+import { resolveSparkEstateShellPlaceId } from "@/lib/estate/estateShellRouting";
 import { isEstateFullBleedPanelSection } from "@/lib/estate/estateFullBleedPanelSections";
 import { EstateRoomErrorBoundary } from "@/components/companion/estate/EstateRoomErrorBoundary";
 import {
@@ -19844,12 +19846,14 @@ export default function CompanionPageClient() {
   const clearMyMindWorkspaceActive =
     activeSection === "brain-dump" || isClearMyMindModeActive();
 
-  const sparkEstateShellPlaceId = clearMyMindWorkspaceActive
-    ? null
-    : profileEstateRoomOverlayId ??
-      (showDirectEstateOverlay && !estateConservatoryEngaged
-        ? estateChatRoomId
-        : null);
+  const sparkEstateShellPlaceId = resolveSparkEstateShellPlaceId({
+    clearMyMindWorkspaceActive,
+    profileEstateRoomOverlayId,
+    showDirectEstateOverlay,
+    estateConservatoryEngaged,
+    estateChatRoomId,
+    activeSection,
+  });
   /**
    * Evidence Vault uses Arrival Before Activity (invitation grid).
    * Do not force profile conversation-only chrome — EST-001 place-first.
@@ -20305,6 +20309,13 @@ export default function CompanionPageClient() {
                 }
               />
             </div>
+          ) : growthProfilePrimary ? (
+            <main className="estate-room-main">
+              <GrowthProfileRoomPanel
+                emphasizeTimeline={growthProfileEmphasizeTimeline}
+                onOpenEstatePlace={handleEstateMenuAction}
+              />
+            </main>
           ) : null}
 
           {(activeSection === "home" ||
