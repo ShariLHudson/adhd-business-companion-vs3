@@ -102,6 +102,10 @@ import { ChamberOfMomentumRoomPanel } from "@/components/companion/chamber/Chamb
 import { ChamberProjectEntryPanel } from "@/components/companion/chamber/ChamberProjectEntryPanel";
 import { GrowthJournalRoomPanel } from "@/components/companion/GrowthJournalRoomPanel";
 import { GrowthProfileRoomPanel } from "@/components/companion/GrowthProfileRoomPanel";
+import { MyBusinessEstatePanel } from "@/components/companion/MyBusinessEstatePanel";
+import { PeopleIHelpPanel } from "@/components/companion/PeopleIHelpPanel";
+import type { ProfileDestination } from "@/lib/profile/profileDestination";
+import { resolveProfileDestinationNavigation } from "@/lib/profile/profileDestination";
 import { GrowthPortfolioPanel } from "@/components/companion/GrowthPortfolioPanel";
 import { MomentumBuilderRoomPanel } from "@/components/companion/MomentumBuilderRoomPanel";
 import { MomentumInstituteRoomPanel } from "@/components/companion/momentumInstitute/MomentumInstituteRoomPanel";
@@ -2955,6 +2959,7 @@ export default function CompanionPageClient() {
     | null
     | "settings"
     | "profile"
+    | "people-i-help"
     | "signin"
     | "whats-new"
     | "growth-profile"
@@ -2989,6 +2994,7 @@ export default function CompanionPageClient() {
     useState(false);
   const growthProfilePrimary = overlay === "growth-profile";
   const estateProfilePrimary = overlay === "profile";
+  const peopleIHelpProfilePrimary = overlay === "people-i-help";
   const profileEstateRoomOverlayId = useMemo((): ProfileEstateRoomId | null => {
     if (estateProfilePrimary) return "my-estate";
     if (growthProfilePrimary) return "growth-profile";
@@ -3012,7 +3018,8 @@ export default function CompanionPageClient() {
     directEstateVisit,
     activeSection,
   ]);
-  const profileEstateChromeActive = Boolean(profileEstateRoomOverlayId);
+  const profileEstateChromeActive =
+    Boolean(profileEstateRoomOverlayId) || peopleIHelpProfilePrimary;
   const [planMyDayDrawerOpen, setPlanMyDayDrawerOpen] = useState(false);
   const [planMyDayOpenItemId, setPlanMyDayOpenItemId] = useState<string | null>(
     null,
@@ -6268,6 +6275,11 @@ export default function CompanionPageClient() {
       return;
     }
 
+    if (overlay === "people-i-help") {
+      setOverlay("profile");
+      return;
+    }
+
     if (overlay) {
       setOverlay(null);
       setSettingsSection(null);
@@ -8772,6 +8784,18 @@ export default function CompanionPageClient() {
     openStandaloneFocusSectionCore(section);
   }
 
+  function openProfileDestinationCore(destination?: ProfileDestination) {
+    const navigation = resolveProfileDestinationNavigation(destination);
+    preloadRoomBackground(ESTATE_PROFILE_ROOM_BG);
+    setGrowthProfileEmphasizeTimeline(false);
+    syncDirectEstateVisit(null);
+    if (navigation.kind === "people-i-help-overlay") {
+      setOverlay("people-i-help");
+      return;
+    }
+    setOverlay("profile");
+  }
+
   function launchPreviewTestExperience(
     target: CompanionPreviewTestLaunchTarget,
     roomId?: string,
@@ -9036,6 +9060,16 @@ export default function CompanionPageClient() {
     }
     if (actionId === "journal") {
       openGrowthDestinationCore("growth-journal");
+      return;
+    }
+
+    if (actionId === "people-i-help") {
+      openProfileDestinationCore("people-i-help");
+      return;
+    }
+
+    if (actionId === "my-profile") {
+      openProfileDestinationCore("my-business-estate");
       return;
     }
 
@@ -18990,6 +19024,7 @@ export default function CompanionPageClient() {
               setActiveNav("chat");
               setActiveSection("home");
             }}
+            onOpenAvatars={() => openProfileDestinationCore("people-i-help")}
           />
         );
       case "brain-dump":
@@ -20310,6 +20345,20 @@ export default function CompanionPageClient() {
                 }
               />
             </div>
+          ) : estateProfilePrimary ? (
+            <main className="estate-room-main">
+              <MyBusinessEstatePanel
+                onOpenDestination={(destination) =>
+                  openProfileDestinationCore(destination)
+                }
+              />
+            </main>
+          ) : peopleIHelpProfilePrimary ? (
+            <main className="estate-room-main">
+              <PeopleIHelpPanel
+                onBackToProfile={() => setOverlay("profile")}
+              />
+            </main>
           ) : growthProfilePrimary ? (
             <main className="estate-room-main">
               <GrowthProfileRoomPanel
@@ -21685,6 +21734,7 @@ export default function CompanionPageClient() {
                 setActiveNav("chat");
                 setActiveSection("home");
               }}
+              onOpenAvatars={() => openProfileDestinationCore("people-i-help")}
             />
           )}
 

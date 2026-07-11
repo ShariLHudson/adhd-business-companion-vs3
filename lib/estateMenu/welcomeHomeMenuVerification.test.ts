@@ -32,6 +32,7 @@ const VISIBLE_ACTION_IDS: EstateMenuActionId[] = [
   "start-new-day-conversation",
   "settings",
   "my-profile",
+  "people-i-help",
   "log-out",
 ];
 
@@ -145,13 +146,16 @@ describe("Welcome Home menu — action wiring", () => {
     );
   });
 
-  it("Profile opens my-estate / profile overlay path", () => {
-    expect(isProfileEstateMenuAction("my-profile")).toBe(true);
-    expect(profileEstateRoomForMenuAction("my-profile")).toBe("my-estate");
-    expect(source).toMatch(/openProfileEstateRoomFromMenu/);
-    expect(source).toMatch(
-      /if \(roomId === "my-estate"\)[\s\S]*?setOverlay\("profile"\)/,
-    );
+  it("Profile opens My Business Estate via profile destination resolver", () => {
+    expect(source).toMatch(/openProfileDestinationCore\("my-business-estate"\)/);
+    expect(source).toMatch(/<MyBusinessEstatePanel/);
+    expect(source).toMatch(/setOverlay\("profile"\)/);
+  });
+
+  it("People I Help opens via profile destination resolver", () => {
+    expect(source).toMatch(/openProfileDestinationCore\("people-i-help"\)/);
+    expect(source).toMatch(/<PeopleIHelpPanel/);
+    expect(source).toMatch(/setOverlay\("people-i-help"\)/);
   });
 
   it("Logout signs out and routes to login", () => {
@@ -194,7 +198,7 @@ describe("Welcome Home menu — desktop + mobile layout", () => {
     );
   });
 
-  it("renders Conversations as a non-clickable group with nested actions", () => {
+  it("renders Conversations and Profile as non-clickable groups with nested actions", () => {
     const component = readFileSync(
       resolve(process.cwd(), "components/companion/GlobalEstateMenu.tsx"),
       "utf8",

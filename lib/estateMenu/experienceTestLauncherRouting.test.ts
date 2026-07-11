@@ -15,10 +15,11 @@ function readCompanionPageClient(): string {
 describe("experienceTestLauncherRouting", () => {
   const source = readCompanionPageClient();
 
-  it("imports GrowthProfileRoomPanel and mounts it for growth profile overlay", () => {
+  it("imports GrowthProfileRoomPanel and mounts dedicated profile panels", () => {
     expect(source).toMatch(/import \{ GrowthProfileRoomPanel \}/);
+    expect(source).toMatch(/import \{ MyBusinessEstatePanel \}/);
     expect(source).toMatch(/growthProfilePrimary\s*\?/);
-    expect(source).toMatch(/<GrowthProfileRoomPanel/);
+    expect(source).toMatch(/<MyBusinessEstatePanel/);
   });
 
   it("uses resolveSparkEstateShellPlaceId for shell selection", () => {

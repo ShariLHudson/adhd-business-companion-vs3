@@ -620,8 +620,8 @@ export const ESTATE_ROOM_REGISTRY: readonly EstateRoomDefinition[] = [
   },
   {
     id: "my-estate",
-    name: "My Estate",
-    trademark: "My Estate",
+    name: "My Business Estate",
+    trademark: "My Business Estate™",
     route: null,
     menuActionId: "estate-profile",
     overlayId: "profile",

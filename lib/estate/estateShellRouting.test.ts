@@ -10,7 +10,7 @@ describe("estateShellRouting", () => {
     expect(profileEstateRoomUsesDedicatedPanel("growth-profile")).toBe(true);
     expect(profileEstateRoomUsesDedicatedPanel("journal")).toBe(true);
     expect(profileEstateRoomUsesDedicatedPanel("evidence-vault")).toBe(true);
-    expect(profileEstateRoomUsesDedicatedPanel("my-estate")).toBe(false);
+    expect(profileEstateRoomUsesDedicatedPanel("my-estate")).toBe(true);
     expect(profileEstateRoomUsesDedicatedPanel("portfolio")).toBe(false);
   });
 
@@ -27,7 +27,7 @@ describe("estateShellRouting", () => {
     ).toBeNull();
   });
 
-  it("mounts SparkEstateShell for my-estate overlay", () => {
+  it("does not mount SparkEstateShell for my-estate overlay", () => {
     expect(
       resolveSparkEstateShellPlaceId({
         profileEstateRoomOverlayId: "my-estate",
@@ -37,7 +37,7 @@ describe("estateShellRouting", () => {
         clearMyMindWorkspaceActive: false,
         activeSection: "home",
       }),
-    ).toBe("my-estate");
+    ).toBeNull();
   });
 
   it("does not mount SparkEstateShell on dedicated sections", () => {

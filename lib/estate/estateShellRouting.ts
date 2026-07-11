@@ -9,7 +9,7 @@ import { isDedicatedEstateRoomPanelSection } from "./directEstateVisit";
 export function profileEstateRoomUsesDedicatedPanel(
   roomId: ProfileEstateRoomId,
 ): boolean {
-  if (roomId === "growth-profile") return true;
+  if (roomId === "growth-profile" || roomId === "my-estate") return true;
   return isDedicatedEstateRoomPanelSection(profileEstateSectionForRoom(roomId));
 }
 

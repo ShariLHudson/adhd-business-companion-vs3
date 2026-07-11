@@ -9,6 +9,7 @@ import {
   ESTATE_MENU_DROPDOWN_ENTRIES,
   ESTATE_MENU_DROPDOWN_ITEMS,
   type EstateMenuActionId,
+  type EstateMenuDropdownGroup,
 } from "@/lib/estateMenu";
 import { getPlaceById } from "@/lib/estate/manifest/estatePlaceMasterManifest";
 import {
@@ -72,15 +73,24 @@ export const SPARK_ESTATE_ROOM_MENU_EXPERIENCES_ITEMS = [
   },
 ] as const;
 
-/** Visible profile-menu actions (Personalization / Account hidden — not working yet). */
+/** Visible profile-menu top-level rows (Profile is a nested group). */
 export const SPARK_ESTATE_PROFILE_MENU_ITEMS: readonly {
-  id: EstateMenuActionId | "conversations";
+  id: EstateMenuActionId | "conversations" | "profile";
   label: string;
 }[] = [
   { id: "conversations", label: "Conversations" },
   { id: "settings", label: "Settings" },
-  { id: "my-profile", label: "Profile" },
+  { id: "profile", label: "Profile" },
   { id: "log-out", label: "Logout" },
+];
+
+/** Clickable leaf actions under Profile. */
+export const SPARK_ESTATE_PROFILE_MENU_PROFILE_ITEMS: readonly {
+  id: EstateMenuActionId;
+  label: string;
+}[] = [
+  { id: "my-profile", label: "My Business Estate™" },
+  { id: "people-i-help", label: "People I Help™" },
 ];
 
 /** Clickable leaf actions under Conversations. */
@@ -151,9 +161,16 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
 } {
   const topLevelLabels = ESTATE_MENU_DROPDOWN_ENTRIES.map((entry) => entry.label);
   const expectedTopLabels = SPARK_ESTATE_PROFILE_MENU_ITEMS.map((item) => item.label);
-  const conversationChildren =
-    ESTATE_MENU_DROPDOWN_ENTRIES.find((entry) => entry.kind === "group")?.children ??
-    [];
+  const conversationsGroup = ESTATE_MENU_DROPDOWN_ENTRIES.find(
+    (entry): entry is EstateMenuDropdownGroup =>
+      entry.kind === "group" && entry.id === "conversations",
+  );
+  const profileGroup = ESTATE_MENU_DROPDOWN_ENTRIES.find(
+    (entry): entry is EstateMenuDropdownGroup =>
+      entry.kind === "group" && entry.id === "profile",
+  );
+  const conversationChildren = conversationsGroup?.children ?? [];
+  const profileChildren = profileGroup?.children ?? [];
   const profileMenuAligned =
     ESTATE_MENU_DROPDOWN_ENTRIES.length === SPARK_ESTATE_PROFILE_MENU_ITEMS.length &&
     SPARK_ESTATE_PROFILE_MENU_ITEMS.every(
@@ -166,8 +183,19 @@ export function verifySparkEstateTopNavigationAndProfileMenu(): {
         conversationChildren[index]?.id === item.id &&
         conversationChildren[index]?.label === item.label,
     ) &&
+    profileChildren.length === SPARK_ESTATE_PROFILE_MENU_PROFILE_ITEMS.length &&
+    SPARK_ESTATE_PROFILE_MENU_PROFILE_ITEMS.every(
+      (item, index) =>
+        profileChildren[index]?.id === item.id &&
+        profileChildren[index]?.label === item.label,
+    ) &&
     !ESTATE_MENU_DROPDOWN_ITEMS.some(
-      (item) => item.id === "growth-profile" || item.id === "estate-profile",
+      (item) =>
+        item.id === "growth-profile" ||
+        item.id === "estate-profile" ||
+        item.id === "evidence-vault" ||
+        item.id === "portfolio" ||
+        item.id === "journal",
     );
 
   const wanderPlace = getWanderableManifestPlaces()[0];

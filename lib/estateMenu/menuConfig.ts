@@ -5,7 +5,7 @@
  * Visible menu:
  * 1. Conversations → New Chat · New Day Chat
  * 2. Settings
- * 3. Profile
+ * 3. Profile → My Business Estate™ · People I Help™
  * 4. Logout
  *
  * Personalization and Account are hidden (not currently working).
@@ -18,6 +18,7 @@ export const ESTATE_MENU_ACTION_IDS = [
   "memory-library",
   "estate-profile",
   "my-profile",
+  "people-i-help",
   "growth-profile",
   "institute-cabinet",
   "evidence-vault",
@@ -44,7 +45,7 @@ export type EstateMenuDropdownItem = {
 
 export type EstateMenuDropdownGroup = {
   kind: "group";
-  id: "conversations";
+  id: "conversations" | "profile";
   emoji: string;
   label: string;
   children: readonly EstateMenuDropdownItem[];
@@ -56,7 +57,7 @@ export type EstateMenuDropdownEntry =
 
 /**
  * Profile initials menu — working member-facing choices only.
- * Order: Conversations (with New Chat / New Day Chat) → Settings → Profile → Logout.
+ * Order: Conversations → Settings → Profile (nested) → Logout.
  */
 export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = [
   {
@@ -84,10 +85,22 @@ export const ESTATE_MENU_DROPDOWN_ENTRIES: readonly EstateMenuDropdownEntry[] = 
     label: "Settings",
   },
   {
-    kind: "item",
-    id: "my-profile",
+    kind: "group",
+    id: "profile",
     emoji: "👤",
     label: "Profile",
+    children: [
+      {
+        id: "my-profile",
+        emoji: "🏡",
+        label: "My Business Estate™",
+      },
+      {
+        id: "people-i-help",
+        emoji: "🤝",
+        label: "People I Help™",
+      },
+    ],
   },
   {
     kind: "item",
