@@ -13,7 +13,11 @@ import {
   companionLoginHeadline,
   companionLoginSubtext,
 } from "@/lib/companionLoginPage";
-import { navigateToCompanionHome, waitForCompanionAuthStorage } from "@/lib/companionLoginTransition";
+import {
+  COMPANION_AUTH_SESSION_PERSISTENCE_ERROR,
+  navigateToCompanionHome,
+  waitForCompanionAuthStorage,
+} from "@/lib/companionLoginTransition";
 import { getCompanionSupabase } from "@/lib/supabase/companionClient";
 import {
   dismissWelcomeRoomInvitation,
@@ -59,9 +63,7 @@ export function CompanionSignInExperience({
     if (!persisted) {
       navigatingRef.current = false;
       setRedirecting(false);
-      setRedirectError(
-        "Almost there — your browser did not save the session. Try signing in once more.",
-      );
+      setRedirectError(COMPANION_AUTH_SESSION_PERSISTENCE_ERROR);
       return;
     }
     navigateToCompanionHome();

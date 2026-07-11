@@ -1,7 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+  COMPANION_AUTH_STORAGE_KEY,
   createQuotaSafeStorage,
+  isCompanionLocalStorageAvailable,
   isStorageQuotaError,
+  reclaimAggressiveCompanionStorage,
   reclaimCompanionStorageHeadroom,
   safeLocalStorageSet,
 } from "./companionStorageRecovery";
@@ -56,7 +59,7 @@ describe("companionStorageRecovery", () => {
     );
     const ok = safeLocalStorageSet("companion-supabase-auth", '{"session":1}');
     expect(ok).toBe(true);
-    expect(localStorage.getItem("companion-supabase-auth")).toContain("session");
+    expect(localStorage.getItem(COMPANION_AUTH_STORAGE_KEY)).toContain("session");
     expect(
       localStorage.getItem("companion-clear-my-mind-intelligence-v2"),
     ).toBeNull();
@@ -79,5 +82,45 @@ describe("companionStorageRecovery", () => {
     expect(freed).toBeGreaterThan(0);
     expect(localStorage.getItem("companion-relief-intelligence-v1")).toBeNull();
     expect(localStorage.getItem("companion-brain-dumps-v1")).toBe("keep-me");
+  });
+
+  it("reclaimAggressiveCompanionStorage keeps prefs and auth", () => {
+    localStorage.setItem("companion-conversation-v1", "trim-me");
+    localStorage.setItem("companion-prefs-v1", '{"name":"Shari"}');
+    localStorage.setItem(COMPANION_AUTH_STORAGE_KEY, '{"access_token":"x"}');
+    reclaimAggressiveCompanionStorage();
+    expect(localStorage.getItem("companion-conversation-v1")).toBeNull();
+    expect(localStorage.getItem("companion-prefs-v1")).toContain("Shari");
+    expect(localStorage.getItem(COMPANION_AUTH_STORAGE_KEY)).toContain(
+      "access_token",
+    );
+  });
+
+  it("isCompanionLocalStorageAvailable returns false when setItem throws", () => {
+    vi.stubGlobal("localStorage", {
+      setItem: () => {
+        throw new DOMException("denied", "SecurityError");
+      },
+      getItem: () => null,
+      removeItem: () => undefined,
+    });
+    vi.stubGlobal("window", { localStorage });
+    expect(isCompanionLocalStorageAvailable()).toBe(false);
+  });
+
+  it("safeLocalStorageSet returns false when write cannot be verified", () => {
+    vi.stubGlobal("localStorage", {
+      getItem: () => "stale",
+      setItem: () => undefined,
+      removeItem: () => undefined,
+      get length() {
+        return 0;
+      },
+      key: () => null,
+    });
+    vi.stubGlobal("window", { localStorage });
+    expect(
+      safeLocalStorageSet(COMPANION_AUTH_STORAGE_KEY, '{"access_token":"new"}'),
+    ).toBe(false);
   });
 });

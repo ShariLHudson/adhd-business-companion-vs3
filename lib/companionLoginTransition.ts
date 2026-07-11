@@ -1,6 +1,12 @@
 /** Gentle login → home handoff — no modals, no blocking overlays. */
 
 import { getCompanionSupabase } from "@/lib/supabase/companionClient";
+import {
+  COMPANION_AUTH_STORAGE_KEY,
+  prepareStorageForAuthSession,
+  reclaimAggressiveCompanionStorage,
+  safeLocalStorageSet,
+} from "@/lib/companionStorageRecovery";
 import { COMPANION_LOGIN_OPENING_MESSAGE } from "@/lib/companionLoginPage";
 
 /** Immediate route change after auth — home shell hydrates progressively. */
@@ -55,8 +61,12 @@ export function consumeCompanionLoginArrival(): boolean {
   return quiet;
 }
 
-const AUTH_STORAGE_KEY = "companion-supabase-auth";
+const AUTH_STORAGE_KEY = COMPANION_AUTH_STORAGE_KEY;
 const SIGNED_OUT_KEY = "companion-signed-out-v1";
+
+/** Shown when auth succeeds in memory but companion-supabase-auth cannot be saved. */
+export const COMPANION_AUTH_SESSION_PERSISTENCE_ERROR =
+  "Signed in, but this browser could not save your session. Free some storage or try another browser.";
 
 /** After explicit sign-out — login page may show even when dev auth is bypassed. */
 export function markCompanionSignedOut(): void {
@@ -159,24 +169,6 @@ export function resetCompanionHomeNavigationForTests(): void {
   companionHomeNavigationPending = false;
 }
 
-/** Wait until Supabase has written the session to localStorage before navigating. */
-export async function waitForCompanionAuthStorage(
-  timeoutMs = 3000,
-): Promise<boolean> {
-  if (typeof window === "undefined") return false;
-  const deadline = Date.now() + timeoutMs;
-  while (Date.now() < deadline) {
-    try {
-      const raw = localStorage.getItem(AUTH_STORAGE_KEY);
-      if (raw && authStorageHasSession(raw)) return true;
-    } catch {
-      /* noop */
-    }
-    await new Promise((resolve) => window.setTimeout(resolve, 50));
-  }
-  return false;
-}
-
 export function hasCompanionAuthStorageHint(): boolean {
   if (typeof window === "undefined") return false;
   try {
@@ -185,4 +177,52 @@ export function hasCompanionAuthStorageHint(): boolean {
   } catch {
     return false;
   }
+}
+
+async function retryPersistInMemorySession(): Promise<boolean> {
+  const supabase = getCompanionSupabase();
+  if (!supabase) return false;
+
+  const { data } = await supabase.auth.getSession();
+  const session = data.session;
+  if (!session?.access_token || !session.refresh_token) return false;
+
+  prepareStorageForAuthSession();
+  const { error } = await supabase.auth.setSession({
+    access_token: session.access_token,
+    refresh_token: session.refresh_token,
+  });
+  if (!error && hasCompanionAuthStorageHint()) return true;
+
+  reclaimAggressiveCompanionStorage();
+  const retry = await supabase.auth.setSession({
+    access_token: session.access_token,
+    refresh_token: session.refresh_token,
+  });
+  if (!retry.error && hasCompanionAuthStorageHint()) return true;
+
+  return safeLocalStorageSet(AUTH_STORAGE_KEY, JSON.stringify(session));
+}
+
+/** Wait until Supabase has written the session to localStorage before navigating. */
+export async function waitForCompanionAuthStorage(
+  timeoutMs = 3000,
+): Promise<boolean> {
+  if (typeof window === "undefined") return false;
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    if (hasCompanionAuthStorageHint()) return true;
+
+    const supabase = getCompanionSupabase();
+    if (supabase) {
+      const { data } = await supabase.auth.getSession();
+      if (data.session?.access_token) {
+        const persisted = await retryPersistInMemorySession();
+        if (persisted) return true;
+      }
+    }
+
+    await new Promise((resolve) => window.setTimeout(resolve, 50));
+  }
+  return hasCompanionAuthStorageHint();
 }

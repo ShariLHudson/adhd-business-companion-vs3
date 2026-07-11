@@ -19,10 +19,15 @@ import { recordAuthLoginSuccess } from "@/lib/companionAuthIntelligence";
 import {
   clearCompanionAuthStorage,
   clearCompanionSignedOut,
+  COMPANION_AUTH_SESSION_PERSISTENCE_ERROR,
   hasCompanionAuthStorageHint,
   markCompanionSignedOut,
   waitForCompanionAuthStorage,
 } from "@/lib/companionLoginTransition";
+import {
+  isCompanionLocalStorageAvailable,
+  prepareStorageForAuthSession,
+} from "@/lib/companionStorageRecovery";
 import { languagePrefsFromUserMetadata } from "@/lib/companionUserLanguage";
 import { savePrefs } from "@/lib/companionStore";
 import {
@@ -152,6 +157,15 @@ async function signInDirect(
       return { error: "Sign-in failed — no session returned." };
     }
 
+    if (!isCompanionLocalStorageAvailable()) {
+      return { error: COMPANION_AUTH_SESSION_PERSISTENCE_ERROR };
+    }
+
+    prepareStorageForAuthSession();
+    if (!hasCompanionAuthStorageHint()) {
+      clearCompanionAuthStorage();
+    }
+
     const { data: sessionData, error } = await supabase.auth.setSession({
       access_token: session.access_token,
       refresh_token: session.refresh_token,
@@ -171,10 +185,7 @@ async function signInDirect(
         resetCompanionAuthBackoff();
         const persisted = await waitForCompanionAuthStorage(5_000);
         if (!persisted) {
-          return {
-            error:
-              "Signed in, but this browser could not save your session. Free some storage or try another browser.",
-          };
+          return { error: COMPANION_AUTH_SESSION_PERSISTENCE_ERROR };
         }
         return { error: null, session: retry.data.session };
       }
@@ -185,10 +196,7 @@ async function signInDirect(
     }
     const persisted = await waitForCompanionAuthStorage(5_000);
     if (!persisted) {
-      return {
-        error:
-          "Signed in, but this browser could not save your session. Free some storage or try another browser.",
-      };
+      return { error: COMPANION_AUTH_SESSION_PERSISTENCE_ERROR };
     }
     resetCompanionAuthBackoff();
     return { error: null, session: sessionData.session };
@@ -347,6 +355,13 @@ async function signUpDirect(
       | { access_token?: string; refresh_token?: string }
       | undefined;
     if (session?.access_token && session?.refresh_token) {
+      if (!isCompanionLocalStorageAvailable()) {
+        return { error: COMPANION_AUTH_SESSION_PERSISTENCE_ERROR };
+      }
+      prepareStorageForAuthSession();
+      if (!hasCompanionAuthStorageHint()) {
+        clearCompanionAuthStorage();
+      }
       const { data: sessionData, error } = await supabase.auth.setSession({
         access_token: session.access_token,
         refresh_token: session.refresh_token,
@@ -356,10 +371,7 @@ async function signUpDirect(
       }
       const persisted = await waitForCompanionAuthStorage(5_000);
       if (!persisted) {
-        return {
-          error:
-            "Account created, but this browser could not save your session. Free some storage or try another browser.",
-        };
+        return { error: COMPANION_AUTH_SESSION_PERSISTENCE_ERROR };
       }
       return {
         error: null,

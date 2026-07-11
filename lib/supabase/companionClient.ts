@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
-import { createQuotaSafeStorage } from "@/lib/companionStorageRecovery";
+import { createQuotaSafeStorage, COMPANION_AUTH_STORAGE_KEY } from "@/lib/companionStorageRecovery";
 import {
   resolveCompanionSupabaseEnv,
   type ResolvedCompanionSupabaseEnv,
@@ -285,7 +285,7 @@ export function getCompanionSupabase(): SupabaseClient | null {
       persistSession: true,
       autoRefreshToken: true,
       detectSessionInUrl: true,
-      storageKey: "companion-supabase-auth",
+      storageKey: COMPANION_AUTH_STORAGE_KEY,
       storage: companionAuthStorage,
     },
   });
