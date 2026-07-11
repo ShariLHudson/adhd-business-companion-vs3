@@ -1,0 +1,43 @@
+# ADHD Intelligence Library™ Manifest
+
+## Files
+
+- `ADHD-000_ADHD_Intelligence_Library_Standard_and_Index.md`
+- `ADHD-001_Master_Adult_ADHD_Friction_Map.md`
+- `ADHD-002_Working_Memory_and_Cognitive_Load.md`
+- `ADHD-003_Task_Initiation_and_Fear_of_Starting.md`
+- `ADHD-004_Transitions_and_Task_Switching.md`
+- `ADHD-005_Time_Blindness_and_Time_Estimation.md`
+- `ADHD-006_Prioritization_and_Competing_Demands.md`
+- `ADHD-007_Decision_Fatigue_and_Choice_Overload.md`
+- `ADHD-008_Overwhelm_and_Open_Loops.md`
+- `ADHD-009_Emotional_Dysregulation_and_Frustration.md`
+- `ADHD-010_Hyperfocus_and_Difficulty_Stopping.md`
+- `ADHD-011_Distraction_and_Attention_Shifts.md`
+- `ADHD-012_Procrastination_Avoidance_and_Boredom.md`
+- `ADHD-013_Perfectionism_and_Over_Refining.md`
+- `ADHD-014_Shame_Self_Criticism_and_Negative_History.md`
+- `ADHD-015_Rejection_Sensitivity_and_Interpersonal_Hurt.md`
+- `ADHD-016_Motivation_Interest_Novelty_and_Urgency.md`
+- `ADHD-017_Routines_Habits_and_Flexible_Rhythms.md`
+- `ADHD-018_Organization_Clutter_and_Findability.md`
+- `ADHD-019_Communication_Follow_Up_and_Conversation_Memory.md`
+- `ADHD-020_Sensory_Load_Environment_and_Regulation.md`
+- `ADHD-021_Sleep_Energy_and_Cognitive_Fatigue.md`
+- `ADHD-022_Capacity_Variability_and_Unpredictable_Days.md`
+- `ADHD-023_Impulsivity_Risk_and_Fast_Decisions.md`
+- `ADHD-024_Financial_Administrative_and_Compliance_Friction.md`
+- `ADHD-025_Project_Overload_Idea_Chasing_and_Maintenance.md`
+- `ADHD-026_Client_Relationships_Boundaries_and_Promises.md`
+- `ADHD-027_Recovery_Return_and_Reconnection.md`
+- `ADHD-028_Therapy_Dog_Companion_Behavior_Framework.md`
+- `ADHD-029_Prevention_Intelligence_Framework.md`
+- `ADHD-030_Anticipation_and_Risk_Detection_Framework.md`
+- `ADHD-031_Invisible_Calendar_and_Calendar_Concierge.md`
+- `ADHD-032_Shari_Preventive_Response_Library.md`
+- `ADHD-033_Founder_Intelligence_Research_to_Action_System.md`
+- `ADHD-034_Coverage_Gap_Audit_Template.md`
+- `ADHD-035_12_of_10_Opportunity_Prioritization.md`
+- `ADHD-036_Master_ADHD_to_Spark_Implementation_Map.md`
+- `ADHD-037_ADHD_Entrepreneur_Business_Lifecycle_Map.md`
+- `ADHD-038_Research_Question_and_User_Language_Bank.md`
