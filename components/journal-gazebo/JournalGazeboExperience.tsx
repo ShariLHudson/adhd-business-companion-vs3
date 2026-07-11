@@ -236,6 +236,12 @@ export function JournalGazeboExperience({
     }
   }, [backgroundUrl, useAtmosphere, prototypeMode]);
 
+  useEffect(() => {
+    if (!showWelcomeDesk && phase !== "gazebo-rest") return;
+    const timer = window.setTimeout(() => setSceneComposed(true), 350);
+    return () => window.clearTimeout(timer);
+  }, [showWelcomeDesk, phase]);
+
   useLayoutEffect(() => {
     if (prototypeMode && assumeFirstVisit) {
       setVisitMode("first");

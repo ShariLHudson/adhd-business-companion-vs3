@@ -10220,6 +10220,11 @@
   pointer-events: auto;
 }
 
+.companion-root[data-journal-gazebo-active] .spark-note-anchor {
+  z-index: 50;
+  pointer-events: none;
+}
+
 .companion-growth-active .clear-my-mind-standalone-frame:has(.journal-room),
 .companion-growth-active .clear-my-mind-standalone-frame:has(.journal-gazebo),
 .companion-growth-active .clear-my-mind-standalone-frame:has(.capture-moment-room),

@@ -25,6 +25,13 @@ function readCompanionPageClient(): string {
 describe("journalGazeboCompanion", () => {
   const experience = readJournalGazeboExperience();
   const companion = readCompanionPageClient();
+  const estateDesk = readFileSync(
+    resolve(
+      process.cwd(),
+      "components/journal-gazebo/JournalGazeboEstateDesk.tsx",
+    ),
+    "utf8",
+  );
 
   it("pins companion background to the canonical desk plate", () => {
     expect(experience).toMatch(
@@ -42,5 +49,10 @@ describe("journalGazeboCompanion", () => {
     expect(companion).toMatch(
       /case "growth-journal":[\s\S]*if \(activeSection === "growth-journal"\) return null/,
     );
+  });
+
+  it("shows welcome desk actions before the background finishes composing", () => {
+    expect(estateDesk).not.toMatch(/welcomeVisible[\s\S]*sceneComposed/);
+    expect(estateDesk).toMatch(/<JournalGazeboWelcomeDesk/);
   });
 });

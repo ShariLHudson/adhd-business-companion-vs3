@@ -21,7 +21,7 @@ type Props = {
   onOpenJournal: (journal: JournalGazeboConfig) => void;
 };
 
-/** Gazebo welcome — letter in the plate; desk journal + plate button hits. */
+/** Gazebo welcome — estate green plaques anchored to the viewport (always visible). */
 export function JournalGazeboEstateDesk({
   moment,
   showWelcome,
@@ -30,34 +30,19 @@ export function JournalGazeboEstateDesk({
   onCreateJournal,
   onOpenJournal,
 }: Props) {
-  const welcomeVisible =
+  const showDeskActions =
     showWelcome &&
-    sceneComposed &&
     moment !== "letter-fading" &&
     moment !== "letter-closing";
 
-  return (
-    <div
-      className={[
-        "journal-estate",
-        "journal-estate--photo-scene",
-        sceneComposed ? "journal-estate--composed" : "",
-        welcomeVisible ? "journal-estate--ready" : "",
-        moment === "rest" ? "journal-estate--rest" : "",
-      ]
-        .filter(Boolean)
-        .join(" ")}
-    >
-      <div className="journal-estate__glow" aria-hidden="true" />
+  if (!showDeskActions) return null;
 
-      {welcomeVisible ? (
-        <JournalGazeboWelcomeDesk
-          sceneComposed={sceneComposed}
-          journals={journals}
-          onCreateJournal={onCreateJournal}
-          onOpenJournal={onOpenJournal}
-        />
-      ) : null}
-    </div>
+  return (
+    <JournalGazeboWelcomeDesk
+      sceneComposed={sceneComposed}
+      journals={journals}
+      onCreateJournal={onCreateJournal}
+      onOpenJournal={onOpenJournal}
+    />
   );
 }

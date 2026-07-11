@@ -23,7 +23,7 @@
 .journal-gazebo--companion {
   position: fixed;
   inset: 0;
-  z-index: 120;
+  z-index: 190;
   width: 100vw;
   pointer-events: auto;
 }

@@ -53,7 +53,7 @@
 .jg-sanctuary-desk--actions-only {
   position: fixed;
   inset: 0;
-  z-index: 36;
+  z-index: 195;
   pointer-events: none;
 }
 
@@ -281,7 +281,7 @@
 .jg-sanctuary-desk {
   position: fixed;
   inset: 0;
-  z-index: 35;
+  z-index: 195;
   pointer-events: none;
 }
 
